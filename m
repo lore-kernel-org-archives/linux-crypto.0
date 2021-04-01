@@ -2,35 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA10C433ED
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 11:14:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDC2BC43140
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 17:42:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6370F61057
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 11:14:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6D8761165
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 17:42:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234201AbhDALN6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Apr 2021 07:13:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60924 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234103AbhDALN1 (ORCPT
+        id S234623AbhDARmK convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Apr 2021 13:42:10 -0400
+Received: from lithops.sigma-star.at ([195.201.40.130]:40430 "EHLO
+        lithops.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234180AbhDARgr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Apr 2021 07:13:27 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C994C061788
-        for <linux-crypto@vger.kernel.org>; Thu,  1 Apr 2021 04:13:27 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1lRvGO-0001R7-F8; Thu, 01 Apr 2021 13:13:24 +0200
-Subject: Re: [PATCH v1 0/3] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-To:     Richard Weinberger <richard@nod.at>
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Thu, 1 Apr 2021 13:36:47 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 81C17606BA2C;
+        Thu,  1 Apr 2021 15:59:27 +0200 (CEST)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id zwE_aygEcMAG; Thu,  1 Apr 2021 15:59:27 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 1458D60A3592;
+        Thu,  1 Apr 2021 15:59:27 +0200 (CEST)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id ETgRfEjK7WK1; Thu,  1 Apr 2021 15:59:26 +0200 (CEST)
+Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
+        by lithops.sigma-star.at (Postfix) with ESMTP id D76FC6071A7C;
+        Thu,  1 Apr 2021 15:59:26 +0200 (CEST)
+Date:   Thu, 1 Apr 2021 15:59:26 +0200 (CEST)
+From:   Richard Weinberger <richard@nod.at>
+To:     Sumit Garg <sumit.garg@linaro.org>
+Cc:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
         horia geanta <horia.geanta@nxp.com>,
         Mimi Zohar <zohar@linux.ibm.com>,
         aymen sghaier <aymen.sghaier@nxp.com>,
@@ -46,74 +55,49 @@ Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
         Jan Luebbe <j.luebbe@pengutronix.de>,
         david <david@sigma-star.at>,
         Franck Lenormand <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
         linux-integrity <linux-integrity@vger.kernel.org>,
         "open list, ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         LSM <linux-security-module@vger.kernel.org>
-References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
- <ca2a7c17-3ed0-e52f-2e2f-c0f8bbe10323@pengutronix.de>
- <CAFLxGvyj1aZ_3MuxJC6onejchV_6A8WbNR1vTLpSBF5QTxvLyQ@mail.gmail.com>
- <897df7dd-83a1-3e3e-1d9f-5a1adfd5b2fb@pengutronix.de>
- <1263763932.139584.1617272457698.JavaMail.zimbra@nod.at>
- <27d7d3fa-5df8-1880-df21-200de31cc629@pengutronix.de>
- <717795270.139671.1617274418087.JavaMail.zimbra@nod.at>
- <c72f93be-04e8-bb52-7252-4b4131648100@pengutronix.de>
- <1713376107.139705.1617275134320.JavaMail.zimbra@nod.at>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-Message-ID: <638717a5-a456-24a7-b0ab-9f71adb13687@pengutronix.de>
-Date:   Thu, 1 Apr 2021 13:13:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+Message-ID: <1846277009.140163.1617285566823.JavaMail.zimbra@nod.at>
+In-Reply-To: <CAFA6WYODfsMTiCEyFA2aRGm+UQE0OTe-ui7mMSK-cqUR_YJFTA@mail.gmail.com>
+References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de> <CAFLxGvzWLje+_HFeb+hKNch4U1f5uypVUOuP=QrEPn_JNM+scg@mail.gmail.com> <ca2a7c17-3ed0-e52f-2e2f-c0f8bbe10323@pengutronix.de> <CAFLxGvwNomKOo3mQLMxYGDA8T8zN=Szpo2q5jrp4D1CaMHydWA@mail.gmail.com> <CAFA6WYO29o73nSg4ikU9cyaOr0kpaXFJpcGLGmFLgjKQWchcEg@mail.gmail.com> <1666035815.140054.1617283065549.JavaMail.zimbra@nod.at> <ea261e53-8f5d-ac52-f3b9-7f2db4532244@pengutronix.de> <CAFA6WYODfsMTiCEyFA2aRGm+UQE0OTe-ui7mMSK-cqUR_YJFTA@mail.gmail.com>
+Subject: Re: [PATCH v1 0/3] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
 MIME-Version: 1.0
-In-Reply-To: <1713376107.139705.1617275134320.JavaMail.zimbra@nod.at>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [195.201.40.130]
+X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF78 (Linux)/8.8.12_GA_3809)
+Thread-Topic: KEYS: trusted: Introduce support for NXP CAAM-based trusted keys
+Thread-Index: jPSCsanR7JeNVp3vlsHfcUPQzmg/6A==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Richard,
+Sumit,
 
-On 01.04.21 13:05, Richard Weinberger wrote:
-> Ahmad,
-> 
-> ----- Ursprüngliche Mail -----
->> Von: "Ahmad Fatoum" <a.fatoum@pengutronix.de>
->>> I don't want you to force to use cryptsetup.
+----- Ursprüngliche Mail -----
+> Von: "Sumit Garg" <sumit.garg@linaro.org>
+> In this case why would one prefer to use CAAM when you have standards
+> compliant TPM-Chip which additionally offers sealing to specific PCR
+> (integrity measurement) values.
+
+I don't think we can dictate what good/sane solutions are and which are not.
+Both CAAM and TPM have pros and cons, I don't see why supporting both is a bad idea.
+
+>> > IMHO allowing only one backend at the same time is a little over simplified.
 >>
->> I'd love to use cryptsetup with LUKS and trusted keys eventually. I'll take
+>> It is, but I'd rather leave this until it's actually needed.
+>> What can be done now is adopting a format for the exported keys that would
+>> make this extension seamless in future.
+>>
 > 
-> But using LUKS would mean that cryptsetup has access to the plain disc encryption key material?
-> This would be a no-go for many systems out there, key material must not accessible to userspace.
-> I know, distrusting userspace root is not easy, but doable. :)
+> +1
 
-The LUKS2 format supports tokens. I see no reason why the encrypted blob
-couldn't be stored there along with the usual metadata. cryptsetup would
-then load it as kernel trusted key and use it for dmcrypt decryption.
+As long we don't make multiple backends at runtime impossible I'm
+fine and will happily add support for it when needed. :-)
 
-This will mean we have to part ways with features such as having multiple
-keys, but I think it's worth it to have a plug and play solution for
-trusted keys.
-
-Of course, someone needs to implement this first ^^.
-
-Cheers,
-Ahmad
-
-> 
-> Thanks,
-> //richard
-> 
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Thanks,
+//richard
