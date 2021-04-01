@@ -2,103 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA21C433ED
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 08:48:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF7EC43462
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 10:05:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B50F46100C
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 08:48:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEB776100C
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 10:05:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230291AbhDAIrm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Apr 2021 04:47:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36622 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229459AbhDAIrL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Apr 2021 04:47:11 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EFF56610A5;
-        Thu,  1 Apr 2021 08:47:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617266831;
-        bh=kIY39xSiWjoF6sZnoaotfSd9UwS1ZraiYATimaHn4q4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=dthggg8b7dAPmVCaE/dTavdjFa9rPW8UC6EfXQSxSbfgnQ9ohbBnbsZA43xvhJI/s
-         z5AUK4v+HYnJ5wBTqGGETFvrn6t7evM30qoWMU4SvAvJis8ig8zAD2M+K3dxU7pRjN
-         FvmyysaLIlQ/m4hZkAK1hPCX6sqxtbFEVdVewtBbcYW9KSc+cIBKDRyBb0T3xXdKak
-         PydMSo+vl7MDbweuD2w+RK4JAEeWVootOCKB20Rk5gQXPQF4rkAulqJ95gZruqdCYn
-         AsM1FKvblH5PGVDShbZ2Q4PDUuXU2qJn8cKgzxqPwv7l3c6SQkGb2dIquF0hgKdRuJ
-         Nh9W3nV64Iunw==
-Received: by mail-ot1-f48.google.com with SMTP id w21-20020a9d63950000b02901ce7b8c45b4so1465812otk.5;
-        Thu, 01 Apr 2021 01:47:10 -0700 (PDT)
-X-Gm-Message-State: AOAM532c6aKaIx4bB0ecoyi09cpft/YYs0vXQ2FrL8AvMunLTDPP6+Yt
-        EBhXL1YiKZwLJh0HvMCMUw3W0jJsbfeOd6YZ1jc=
-X-Google-Smtp-Source: ABdhPJxMNssJ30KB6dSY69fDuCOr4LCVZh/D5LIw2zyYA6sUCNNW1VJBb7EkMscKsxoRWI5AjBchYD6rYN1Quvypp1A=
-X-Received: by 2002:a9d:12cb:: with SMTP id g69mr5843158otg.77.1617266830166;
- Thu, 01 Apr 2021 01:47:10 -0700 (PDT)
+        id S233616AbhDAKEm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Apr 2021 06:04:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45908 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233650AbhDAKEk (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Apr 2021 06:04:40 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A9A6C0613E6
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Apr 2021 03:04:40 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1lRuBo-0000f3-JJ; Thu, 01 Apr 2021 12:04:36 +0200
+Subject: Re: [PATCH v1 0/3] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+To:     Richard Weinberger <richard.weinberger@gmail.com>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        James Bottomley <jejb@linux.ibm.com>, kernel@pengutronix.de,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        LSM <linux-security-module@vger.kernel.org>
+References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
+ <CAFLxGvzWLje+_HFeb+hKNch4U1f5uypVUOuP=QrEPn_JNM+scg@mail.gmail.com>
+ <ca2a7c17-3ed0-e52f-2e2f-c0f8bbe10323@pengutronix.de>
+ <CAFLxGvyj1aZ_3MuxJC6onejchV_6A8WbNR1vTLpSBF5QTxvLyQ@mail.gmail.com>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+Message-ID: <897df7dd-83a1-3e3e-1d9f-5a1adfd5b2fb@pengutronix.de>
+Date:   Thu, 1 Apr 2021 12:04:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-References: <MW2PR2101MB08924CD74C6EB773C4D5FAFDBF7E9@MW2PR2101MB0892.namprd21.prod.outlook.com>
- <CAJZ5v0g+=AnRAmAAn8NpHm8bmZ1WkwDpjb5rr_zPOVABW1PYug@mail.gmail.com>
- <4e95307db43e2f7cc8516e645b81db7db0dd8ad4.camel@redhat.com>
- <CAMj1kXHg2RDgwmOhJkaAPoWeHpxnd6tixp94Kha1-bzNvCaQUg@mail.gmail.com> <504652e70f0a4e42e4927583b9ed47cd78590329.camel@redhat.com>
-In-Reply-To: <504652e70f0a4e42e4927583b9ed47cd78590329.camel@redhat.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 1 Apr 2021 10:46:59 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXHRduBs0TJcLC4iMkyoGXyyrXPM_WpVVij33ki8THf9Kw@mail.gmail.com>
-Message-ID: <CAMj1kXHRduBs0TJcLC4iMkyoGXyyrXPM_WpVVij33ki8THf9Kw@mail.gmail.com>
-Subject: Re: Fix hibernation in FIPS mode?
-To:     Simo Sorce <simo@redhat.com>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "crecklin@redhat.com" <crecklin@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAFLxGvyj1aZ_3MuxJC6onejchV_6A8WbNR1vTLpSBF5QTxvLyQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 30 Mar 2021 at 21:56, Simo Sorce <simo@redhat.com> wrote:
->
-> On Tue, 2021-03-30 at 21:45 +0200, Ard Biesheuvel wrote:
-> > On Tue, 30 Mar 2021 at 20:05, Simo Sorce <simo@redhat.com> wrote:
-> > > On Tue, 2021-03-30 at 16:46 +0200, Rafael J. Wysocki wrote:
-> > > > On Tue, Mar 30, 2021 at 12:14 AM Dexuan Cui <decui@microsoft.com> wrote:
-> > > > > Hi,
-> > > > > MD5 was marked incompliant with FIPS in 2009:
-> > > > > a3bef3a31a19 ("crypto: testmgr - Skip algs not flagged fips_allowed in fips mode")
-> > > > > a1915d51e8e7 ("crypto: testmgr - Mark algs allowed in fips mode")
-> > > > >
-> > > > > But hibernation_e820_save() is still using MD5, and fails in FIPS mode
-> > > > > due to the 2018 patch:
-> > > > > 749fa17093ff ("PM / hibernate: Check the success of generating md5 digest before hibernation")
-> > > > >
-> > > > > As a result, hibernation doesn't work when FIPS is on.
-> > > > >
-> > > > > Do you think if hibernation_e820_save() should be changed to use a
-> > > > > FIPS-compliant algorithm like SHA-1?
-> > > >
-> > > > I would say yes, it should.
-> > > >
-> > > > > PS, currently it looks like FIPS mode is broken in the mainline:
-> > > > > https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg49414.html
-> > >
-> > > FYI, SHA-1 is not a good choice, it is only permitted in HMAC
-> > > constructions and only for specified uses. If you need to change
-> > > algorithm you should go straight to SHA-2 or SHA-3 based hashes.
-> > >
-> >
-> > What is the reason for using a [broken] cryptographic hash here? if
-> > this is just an integrity check, better use CRC32
->
-> If the integrity check is used exclusively to verify there were no
-> accidental changes and is not used as a security measure, by all means
-> I agree that using crc32 is a better idea.
->
+Hello Richard,
 
-Looking at 62a03defeabd58f74e07ca030d6c21e069d4d88e which introduced
-this, it is only a best effort check which is simply omitted if md5
-happens to be unavailable, so there is definitely no need for crypto
-here.
+On 30.03.21 23:50, Richard Weinberger wrote:
+> Ahmad,
+> 
+> On Wed, Mar 17, 2021 at 3:08 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> 
+>>     TABLE="0 $BLOCKS crypt $ALGO :32:trusted:$KEYNAME 0 $DEV 0 1 allow_discards"
+>>     echo $TABLE | dmsetup create mydev
+>>     echo $TABLE | dmsetup load mydev
+> 
+> Do you also plan to add support for this to cryptsetup?
+> 
+> David and I have added (rough) support for our CAAM/DCP based keyrings
+> to cryptsetup:
+> https://github.com/sigma-star/cryptsetup/tree/rw/plain
+> 
+> I'm pretty sure with minimal changes it will work with your recent approach too.
+
+I am using dmsetup directly in my project. I am not familiar with cryptsetup
+plain. What benefits do you see with this over direct dmsetup?
+
+What I'd like to see eventually is support for this with LUKS.
+There is a RFE on trusted keys and cryptsetup on the project's repository[1].
+
+The behavior I'd want it that the LUKS header would point at the trusted key
+blob to use and load it into the kernel. This of course means that
+you won't be able to have multiple keys for the encrypted partition.
+
+[1]: https://gitlab.com/cryptsetup/cryptsetup/-/issues/443
+
+Cheers,
+Ahmad
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
