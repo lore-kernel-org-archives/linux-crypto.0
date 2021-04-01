@@ -2,97 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84483C433B4
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 18:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 856E9C433ED
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 18:13:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 61B7F60241
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 18:13:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5715E601FC
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 18:13:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237370AbhDASNu convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Apr 2021 14:13:50 -0400
-Received: from lithops.sigma-star.at ([195.201.40.130]:41070 "EHLO
-        lithops.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234273AbhDASGq (ORCPT
+        id S236631AbhDASNx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Apr 2021 14:13:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35368 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236792AbhDASHj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Apr 2021 14:06:46 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 4FD18606BA25;
-        Thu,  1 Apr 2021 15:17:46 +0200 (CEST)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id bJBE-i7eTNS0; Thu,  1 Apr 2021 15:17:45 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id D512A606BA2C;
-        Thu,  1 Apr 2021 15:17:45 +0200 (CEST)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id tRm9oOfPG5bU; Thu,  1 Apr 2021 15:17:45 +0200 (CEST)
-Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 99E80606BA25;
-        Thu,  1 Apr 2021 15:17:45 +0200 (CEST)
-Date:   Thu, 1 Apr 2021 15:17:45 +0200 (CEST)
-From:   Richard Weinberger <richard@nod.at>
-To:     Sumit Garg <sumit.garg@linaro.org>
-Cc:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        horia geanta <horia.geanta@nxp.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        aymen sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        davem <davem@davemloft.net>,
-        James Bottomley <jejb@linux.ibm.com>,
-        kernel <kernel@pengutronix.de>,
-        David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        david <david@sigma-star.at>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        "open list, ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        LSM <linux-security-module@vger.kernel.org>
-Message-ID: <1666035815.140054.1617283065549.JavaMail.zimbra@nod.at>
-In-Reply-To: <CAFA6WYO29o73nSg4ikU9cyaOr0kpaXFJpcGLGmFLgjKQWchcEg@mail.gmail.com>
-References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de> <CAFLxGvzWLje+_HFeb+hKNch4U1f5uypVUOuP=QrEPn_JNM+scg@mail.gmail.com> <ca2a7c17-3ed0-e52f-2e2f-c0f8bbe10323@pengutronix.de> <CAFLxGvwNomKOo3mQLMxYGDA8T8zN=Szpo2q5jrp4D1CaMHydWA@mail.gmail.com> <CAFA6WYO29o73nSg4ikU9cyaOr0kpaXFJpcGLGmFLgjKQWchcEg@mail.gmail.com>
-Subject: Re: [PATCH v1 0/3] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
+        Thu, 1 Apr 2021 14:07:39 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2429C08EBAF;
+        Thu,  1 Apr 2021 06:38:26 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id t23-20020a0568301e37b02901b65ab30024so2140917otr.4;
+        Thu, 01 Apr 2021 06:38:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=h8G7y9c30KfRlKihNXRgoauoQW97JeaTkhUBkRBHJtk=;
+        b=bc4CWHskETvuX+z488KGBvudmdIYxCdrwoMjD/F74lcuHFiSQCbnF50DmyjcxI1eX0
+         5O6nYBAXuOJ8smFhaL384YoOYvVWfamu/HRg3cg4+PgXKbjOcDsZRdQe73LsWFD3uGgG
+         HmojeDE9mzXyMcQIBY0ORnzpjLfWORkI8YjsVQydsHXgaGb/iLYbDe+eO5PxZibvb7oh
+         Usywp+iWQm2yd20V3SGEqoWibPxOGACwKGagfchCrXhtFjxH2qpgWA1OqNztRczOXJsf
+         PXpV46H+OuI3KnrlklNPqGj4PSzHdVfyeRxmvL1/stofoo1o/2/OyJJyX2WE58IQgzJ5
+         jqsQ==
+X-Gm-Message-State: AOAM531W4RdkUPmXQtOMHCBGYoleIUZj2MaGXRC4Xn6gUO0jpygXVBW4
+        rINiaCykIBjCOA6vglbc02EZcqvidh10yOUkkqs=
+X-Google-Smtp-Source: ABdhPJzCR0gDaubIVEpSXyh38pTht2H8Xfn5MxhmAKQTle86XqlnC5JMvjkSxFajcAamy+BrTpyqyOx6AAJsCd/h+T8=
+X-Received: by 2002:a05:6830:55b:: with SMTP id l27mr6322628otb.260.1617284306011;
+ Thu, 01 Apr 2021 06:38:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [195.201.40.130]
-X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF78 (Linux)/8.8.12_GA_3809)
-Thread-Topic: KEYS: trusted: Introduce support for NXP CAAM-based trusted keys
-Thread-Index: b36oPlTcuCXRSzXZSqikRqY0W9mM2w==
+References: <MW2PR2101MB08924CD74C6EB773C4D5FAFDBF7E9@MW2PR2101MB0892.namprd21.prod.outlook.com>
+ <CAJZ5v0g+=AnRAmAAn8NpHm8bmZ1WkwDpjb5rr_zPOVABW1PYug@mail.gmail.com>
+ <4e95307db43e2f7cc8516e645b81db7db0dd8ad4.camel@redhat.com>
+ <CAMj1kXHg2RDgwmOhJkaAPoWeHpxnd6tixp94Kha1-bzNvCaQUg@mail.gmail.com>
+ <504652e70f0a4e42e4927583b9ed47cd78590329.camel@redhat.com> <CAMj1kXHRduBs0TJcLC4iMkyoGXyyrXPM_WpVVij33ki8THf9Kw@mail.gmail.com>
+In-Reply-To: <CAMj1kXHRduBs0TJcLC4iMkyoGXyyrXPM_WpVVij33ki8THf9Kw@mail.gmail.com>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Thu, 1 Apr 2021 15:38:12 +0200
+Message-ID: <CAJZ5v0hKPBtUzGKfGHD6KX-c2QEETfatCkNjCK8ukh-AhVfUhA@mail.gmail.com>
+Subject: Re: Fix hibernation in FIPS mode?
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Simo Sorce <simo@redhat.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Dexuan Cui <decui@microsoft.com>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+        "crecklin@redhat.com" <crecklin@redhat.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Sumit,
+On Thu, Apr 1, 2021 at 10:47 AM Ard Biesheuvel <ardb@kernel.org> wrote:
+>
+> On Tue, 30 Mar 2021 at 21:56, Simo Sorce <simo@redhat.com> wrote:
+> >
+> > On Tue, 2021-03-30 at 21:45 +0200, Ard Biesheuvel wrote:
+> > > On Tue, 30 Mar 2021 at 20:05, Simo Sorce <simo@redhat.com> wrote:
+> > > > On Tue, 2021-03-30 at 16:46 +0200, Rafael J. Wysocki wrote:
+> > > > > On Tue, Mar 30, 2021 at 12:14 AM Dexuan Cui <decui@microsoft.com> wrote:
+> > > > > > Hi,
+> > > > > > MD5 was marked incompliant with FIPS in 2009:
+> > > > > > a3bef3a31a19 ("crypto: testmgr - Skip algs not flagged fips_allowed in fips mode")
+> > > > > > a1915d51e8e7 ("crypto: testmgr - Mark algs allowed in fips mode")
+> > > > > >
+> > > > > > But hibernation_e820_save() is still using MD5, and fails in FIPS mode
+> > > > > > due to the 2018 patch:
+> > > > > > 749fa17093ff ("PM / hibernate: Check the success of generating md5 digest before hibernation")
+> > > > > >
+> > > > > > As a result, hibernation doesn't work when FIPS is on.
+> > > > > >
+> > > > > > Do you think if hibernation_e820_save() should be changed to use a
+> > > > > > FIPS-compliant algorithm like SHA-1?
+> > > > >
+> > > > > I would say yes, it should.
+> > > > >
+> > > > > > PS, currently it looks like FIPS mode is broken in the mainline:
+> > > > > > https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg49414.html
+> > > >
+> > > > FYI, SHA-1 is not a good choice, it is only permitted in HMAC
+> > > > constructions and only for specified uses. If you need to change
+> > > > algorithm you should go straight to SHA-2 or SHA-3 based hashes.
+> > > >
+> > >
+> > > What is the reason for using a [broken] cryptographic hash here? if
+> > > this is just an integrity check, better use CRC32
 
------ Ursprüngliche Mail -----
-> Von: "Sumit Garg" <sumit.garg@linaro.org>
-> IIUC, this would require support for multiple trusted keys backends at
-> runtime but currently the trusted keys subsystem only supports a
-> single backend which is selected via kernel module parameter during
-> boot.
-> 
-> So the trusted keys framework needs to evolve to support multiple
-> trust sources at runtime but I would like to understand the use-cases
-> first. IMO, selecting the best trust source available on a platform
-> for trusted keys should be a one time operation, so why do we need to
-> have other backends available at runtime as well?
+Not really.
 
-I thought about devices with a TPM-Chip and CAAM.
-IMHO allowing only one backend at the same time is a little over simplified. 
+CRC32 is not really sufficient for integrity checking here AFAICS.  It
+might be made a fallback option if MD5 is not available, but making it
+the default would be somewhat over the top IMO.
 
-Thanks,
-//richard
+> > If the integrity check is used exclusively to verify there were no
+> > accidental changes and is not used as a security measure, by all means
+> > I agree that using crc32 is a better idea.
+> >
+>
+> Looking at 62a03defeabd58f74e07ca030d6c21e069d4d88e which introduced
+> this, it is only a best effort check which is simply omitted if md5
+> happens to be unavailable, so there is definitely no need for crypto
+> here.
+
+Yes, it is about integrity checking only.  No, CRC32 is not equivalent
+to MD5 in that respect AFAICS.
+
+Thanks!
