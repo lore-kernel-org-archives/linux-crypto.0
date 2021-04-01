@@ -2,161 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B1B2C001BB
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 17:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87D30C46461
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 17:42:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03521613C7
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 17:42:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB92F613BE
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 17:42:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234548AbhDARmP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Apr 2021 13:42:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45272 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234893AbhDARlD (ORCPT
+        id S235092AbhDARmO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Apr 2021 13:42:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57240 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234648AbhDARi4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Apr 2021 13:41:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617298863;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:in-reply-to:in-reply-to:references:references;
-        bh=N2tZyDHI8yuulr5oAhszdAg4BY1xZKCEFn3sL3MLBYo=;
-        b=galdsy1+CdkhH9pYA81TjfWRJWxZbjYTR1sffoxnVgOEh4D+GVFc40FMAEFsjAkz9XI1xN
-        xEVmfkYisY9NnHZHj8EnWkG7glh3g2ScA9jCDYn3w1lzwGZ2KbltfCAEyZVrHteHqdtGRH
-        /41VWg6xLd+SKy+voPlwa1Ubxxt7mMA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-862U-t2IMrOje033oNCdkA-1; Thu, 01 Apr 2021 08:25:11 -0400
-X-MC-Unique: 862U-t2IMrOje033oNCdkA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26D4E881283;
-        Thu,  1 Apr 2021 12:25:10 +0000 (UTC)
-Received: from crecklin.bos.com (unknown [10.22.8.39])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 656805C233;
-        Thu,  1 Apr 2021 12:25:04 +0000 (UTC)
-From:   Chris von Recklinghausen <crecklin@redhat.com>
-To:     ardb@kernel.org, simo@redhat.com, rafael@kernel.org,
-        decui@microsoft.com, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] use crc32 instead of md5 for hibernation e820 integrity check
-Date:   Thu,  1 Apr 2021 08:24:58 -0400
-Message-Id: <20210401122458.12663-2-crecklin@redhat.com>
-In-Reply-To: <20210401122458.12663-1-crecklin@redhat.com>
-References: <20210401122458.12663-1-crecklin@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        Thu, 1 Apr 2021 13:38:56 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9981CC08EA78
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Apr 2021 06:30:35 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1lRxP6-0007mM-Fy; Thu, 01 Apr 2021 15:30:32 +0200
+Subject: Re: [PATCH v1 0/3] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+To:     Richard Weinberger <richard@nod.at>,
+        Sumit Garg <sumit.garg@linaro.org>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
+        horia geanta <horia.geanta@nxp.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        aymen sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        davem <davem@davemloft.net>,
+        James Bottomley <jejb@linux.ibm.com>,
+        kernel <kernel@pengutronix.de>,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        david <david@sigma-star.at>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        "open list, ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        LSM <linux-security-module@vger.kernel.org>
+References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
+ <CAFLxGvzWLje+_HFeb+hKNch4U1f5uypVUOuP=QrEPn_JNM+scg@mail.gmail.com>
+ <ca2a7c17-3ed0-e52f-2e2f-c0f8bbe10323@pengutronix.de>
+ <CAFLxGvwNomKOo3mQLMxYGDA8T8zN=Szpo2q5jrp4D1CaMHydWA@mail.gmail.com>
+ <CAFA6WYO29o73nSg4ikU9cyaOr0kpaXFJpcGLGmFLgjKQWchcEg@mail.gmail.com>
+ <1666035815.140054.1617283065549.JavaMail.zimbra@nod.at>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+Message-ID: <ea261e53-8f5d-ac52-f3b9-7f2db4532244@pengutronix.de>
+Date:   Thu, 1 Apr 2021 15:30:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
+MIME-Version: 1.0
+In-Reply-To: <1666035815.140054.1617283065549.JavaMail.zimbra@nod.at>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Suspend fails on a system in fips mode because md5 is used for the e820
-integrity check and is not available. Use crc32 instead.
+Hello Richard, Sumit,
 
-Fixes: 62a03defeabd ("PM / hibernate: Verify the consistent of e820 memory map
-       by md5 digest")
-Signed-off-by: Chris von Recklinghausen <crecklin@redhat.com>
----
- arch/x86/power/hibernate.c | 31 +++++++++++++++++--------------
- 1 file changed, 17 insertions(+), 14 deletions(-)
+On 01.04.21 15:17, Richard Weinberger wrote:
+> Sumit,
+> 
+> ----- Ursprüngliche Mail -----
+>> Von: "Sumit Garg" <sumit.garg@linaro.org>
+>> IIUC, this would require support for multiple trusted keys backends at
+>> runtime but currently the trusted keys subsystem only supports a
+>> single backend which is selected via kernel module parameter during
+>> boot.
+>>
+>> So the trusted keys framework needs to evolve to support multiple
+>> trust sources at runtime but I would like to understand the use-cases
+>> first. IMO, selecting the best trust source available on a platform
+>> for trusted keys should be a one time operation, so why do we need to
+>> have other backends available at runtime as well?
+> 
+> I thought about devices with a TPM-Chip and CAAM.
+> IMHO allowing only one backend at the same time is a little over simplified. 
 
-diff --git a/arch/x86/power/hibernate.c b/arch/x86/power/hibernate.c
-index cd3914fc9f3d..6a3f4e32e49c 100644
---- a/arch/x86/power/hibernate.c
-+++ b/arch/x86/power/hibernate.c
-@@ -55,31 +55,31 @@ int pfn_is_nosave(unsigned long pfn)
- }
- 
- 
--#define MD5_DIGEST_SIZE 16
-+#define CRC32_DIGEST_SIZE 16
- 
- struct restore_data_record {
- 	unsigned long jump_address;
- 	unsigned long jump_address_phys;
- 	unsigned long cr3;
- 	unsigned long magic;
--	u8 e820_digest[MD5_DIGEST_SIZE];
-+	u8 e820_digest[CRC32_DIGEST_SIZE];
- };
- 
--#if IS_BUILTIN(CONFIG_CRYPTO_MD5)
-+#if IS_BUILTIN(CONFIG_CRYPTO_CRC32)
- /**
-- * get_e820_md5 - calculate md5 according to given e820 table
-+ * get_e820_crc32 - calculate crc32 according to given e820 table
-  *
-  * @table: the e820 table to be calculated
-- * @buf: the md5 result to be stored to
-+ * @buf: the crc32 result to be stored to
-  */
--static int get_e820_md5(struct e820_table *table, void *buf)
-+static int get_e820_crc32(struct e820_table *table, void *buf)
- {
- 	struct crypto_shash *tfm;
- 	struct shash_desc *desc;
- 	int size;
- 	int ret = 0;
- 
--	tfm = crypto_alloc_shash("md5", 0, 0);
-+	tfm = crypto_alloc_shash("crc32", 0, 0);
- 	if (IS_ERR(tfm))
- 		return -ENOMEM;
- 
-@@ -107,24 +107,24 @@ static int get_e820_md5(struct e820_table *table, void *buf)
- 
- static int hibernation_e820_save(void *buf)
- {
--	return get_e820_md5(e820_table_firmware, buf);
-+	return get_e820_crc32(e820_table_firmware, buf);
- }
- 
- static bool hibernation_e820_mismatch(void *buf)
- {
- 	int ret;
--	u8 result[MD5_DIGEST_SIZE];
-+	u8 result[CRC32_DIGEST_SIZE];
- 
--	memset(result, 0, MD5_DIGEST_SIZE);
-+	memset(result, 0, CRC32_DIGEST_SIZE);
- 	/* If there is no digest in suspend kernel, let it go. */
--	if (!memcmp(result, buf, MD5_DIGEST_SIZE))
-+	if (!memcmp(result, buf, CRC32_DIGEST_SIZE))
- 		return false;
- 
--	ret = get_e820_md5(e820_table_firmware, result);
-+	ret = get_e820_crc32(e820_table_firmware, result);
- 	if (ret)
- 		return true;
- 
--	return memcmp(result, buf, MD5_DIGEST_SIZE) ? true : false;
-+	return memcmp(result, buf, CRC32_DIGEST_SIZE) ? true : false;
- }
- #else
- static int hibernation_e820_save(void *buf)
-@@ -134,7 +134,7 @@ static int hibernation_e820_save(void *buf)
- 
- static bool hibernation_e820_mismatch(void *buf)
- {
--	/* If md5 is not builtin for restore kernel, let it go. */
-+	/* If crc32 is not builtin for restore kernel, let it go. */
- 	return false;
- }
- #endif
-@@ -160,6 +160,9 @@ int arch_hibernation_header_save(void *addr, unsigned int max_size)
- 	rdr->jump_address = (unsigned long)restore_registers;
- 	rdr->jump_address_phys = __pa_symbol(restore_registers);
- 
-+	/* crc32 digest size is 4 but digest buffer size is 16 so zero it all */
-+	memset(rdr->e820_digest, 0, CRC32_DIGEST_SIZE);
-+
- 	/*
- 	 * The restore code fixes up CR3 and CR4 in the following sequence:
- 	 *
+It is, but I'd rather leave this until it's actually needed.
+What can be done now is adopting a format for the exported keys that would
+make this extension seamless in future.
+
+Cheers,
+Ahmad
+
 -- 
-2.18.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
