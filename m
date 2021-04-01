@@ -2,182 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9A0CC433B4
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 18:32:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 868F1C43470
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 18:32:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F1CA60FD9
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 18:32:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B66260FDA
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 18:32:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234563AbhDAScE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Apr 2021 14:32:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37958 "EHLO
+        id S235393AbhDAScD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Apr 2021 14:32:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236481AbhDASVf (ORCPT
+        with ESMTP id S235792AbhDASVH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Apr 2021 14:21:35 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3651C02FEAE;
-        Thu,  1 Apr 2021 09:22:55 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id i81so2321000oif.6;
-        Thu, 01 Apr 2021 09:22:55 -0700 (PDT)
+        Thu, 1 Apr 2021 14:21:07 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F01C9C05BD17
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Apr 2021 05:55:16 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 184so2122345ljf.9
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Apr 2021 05:55:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VIk1VyBFqF5fVZFBu0yexXHYaS9Jn30Rld7o2bVbBwk=;
+        b=Apd+UzHEAEi98S6OdfucHkNROZU7jCgX5/KNygYU3cVOLmi2PHXIN8LRL/INjJMZT2
+         +T7sbpkA1dHoI5hc7fww5ba5aE2TjM8dwGwwufSllGQiwylrGI0cS488JL/xNibDw5Cu
+         2+eknYxHVIfteXbHDfVGnwtETKC61+6Ys9Q59Y5+NreZIXf3O8ek1f6nwiPeAZ31FLYx
+         JP07cdx8Lht2U45g70INCV2MprWQgxaOUq4Y3uGF3LwH7J/nRfQOjuLD03XeTBhbnZ3w
+         3kGM/AEkbnuu9X/oEc2B9w4enaBqVfgrhZYb3ySlCRAGSvA6qD8rW+w9ga1FZsJLnIXC
+         z8Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=VyiK3ga+MjpNx3ROsvcuMTu8ZgQYqAmDYD3HeeCO9E8=;
-        b=uQClKYOH5szUATdP/CSDB9c3xJsfgRrcieOVUg3c3Z/1xlyidFHkgVzowu2cf/Gufy
-         gw7GzjHFgtYkaVnjdJ7NSnKYYaGFWU1TuI2RnEdgt871nsN/JfrwQVqMlWQ6Fbian0D8
-         BKrdYI8TXBTXMxGR89FIAmxs/dadVUtc1JhK1QIHKNXVzTfjkiwsku5QTpUapRRmRTnQ
-         C1oAYTIpEJ9Gq1stbqANEuYT6j6xBr1fdr6qqHV8/QuA0X0d5mh/HoaHEHZQQ70z6ZeV
-         OSfODwliHI8cE4w4TQ0QhYZNCFS5N3YmGlWFsY1qZ+ff/5Pr9fUPww9cPZbGNkUBywEA
-         tDLA==
-X-Gm-Message-State: AOAM530Wour3fi0nIHeIBEDk6cGQ0NLN/8/78WO/C+WLI3FjSQ6+lQkw
-        wzAPBZUeipz2OiJygzWGiT8ikcAiAX/a1pZhMew=
-X-Google-Smtp-Source: ABdhPJytJr7gZPGY5G1tj1N5bsPNGF/1NWZnXDUz8yajq4Ho2WuQPTQSPZvFqMq2Onp+MZu3YOOOjEkWVGwB1kurl6s=
-X-Received: by 2002:aca:c4c5:: with SMTP id u188mr6587947oif.71.1617294175221;
- Thu, 01 Apr 2021 09:22:55 -0700 (PDT)
+        bh=VIk1VyBFqF5fVZFBu0yexXHYaS9Jn30Rld7o2bVbBwk=;
+        b=e5HujAR2+OWVR9sPJSOIyx2rLh1+Hk9E/BmxJqLDa64FZpQm+kFUsK8+oo2AMYh7+z
+         l1nTbDZ1CV2lnunsNI3z383UJiuXw5eDIQWMk/Il4tQLx+45zaYBjySzwcGQqfp+T6VJ
+         hZ0i65OYlOl60ROxA39eD6dd0o6meGGXtobGQzADKpnoN4cDGRaQOdrien297kLAAG18
+         i/iC72VlV0Whq78/0SYRS7srzbbMyQUgtcr7MggVGaOySaXutW9ioa1ykVk3dLqi1CCV
+         lfnl/8YK2p+tyh+Nlk4wBAzseK5zh1Ey0XmX8SXYZyvp4XvWsQ1TdH+6hmiTzRykYnyq
+         p6RQ==
+X-Gm-Message-State: AOAM532AKPi9yekqqG3mOrViEd6GVT2HShSG6+v9ZorHgKjaBuR8A2gK
+        tR+SKjW/T2Cyn/LT8scjZrhg9iRaY2S351tdz1tWwQ==
+X-Google-Smtp-Source: ABdhPJzxwz2LDe0yIeonE1iDSI5e5lDG4mIYMjWxL+WfT+GgrPcNFOKL6OGonaimUeBpqxqGZ9SE9Ng/p3VJVcrOnEs=
+X-Received: by 2002:a2e:8e33:: with SMTP id r19mr5136316ljk.40.1617281715310;
+ Thu, 01 Apr 2021 05:55:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210401122458.12663-1-crecklin@redhat.com> <20210401122458.12663-2-crecklin@redhat.com>
- <CAJZ5v0gCkhoKC_81WP6wdehZBYpEpmNhHwDygYawFdrWk3K6vg@mail.gmail.com>
-In-Reply-To: <CAJZ5v0gCkhoKC_81WP6wdehZBYpEpmNhHwDygYawFdrWk3K6vg@mail.gmail.com>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Thu, 1 Apr 2021 18:22:43 +0200
-Message-ID: <CAJZ5v0gaawSNnB5V1WPR7Bj6HurGB9RmkgNN20uxF+iV+zikkA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] use crc32 instead of md5 for hibernation e820
- integrity check
-To:     Chris von Recklinghausen <crecklin@redhat.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>, simo@redhat.com,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Linux PM <linux-pm@vger.kernel.org>,
+References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
+ <CAFLxGvzWLje+_HFeb+hKNch4U1f5uypVUOuP=QrEPn_JNM+scg@mail.gmail.com>
+ <ca2a7c17-3ed0-e52f-2e2f-c0f8bbe10323@pengutronix.de> <CAFLxGvwNomKOo3mQLMxYGDA8T8zN=Szpo2q5jrp4D1CaMHydWA@mail.gmail.com>
+In-Reply-To: <CAFLxGvwNomKOo3mQLMxYGDA8T8zN=Szpo2q5jrp4D1CaMHydWA@mail.gmail.com>
+From:   Sumit Garg <sumit.garg@linaro.org>
+Date:   Thu, 1 Apr 2021 18:25:03 +0530
+Message-ID: <CAFA6WYO29o73nSg4ikU9cyaOr0kpaXFJpcGLGmFLgjKQWchcEg@mail.gmail.com>
+Subject: Re: [PATCH v1 0/3] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+To:     Richard Weinberger <richard.weinberger@gmail.com>
+Cc:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        James Bottomley <jejb@linux.ibm.com>, kernel@pengutronix.de,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        linux-integrity@vger.kernel.org,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+        LKML <linux-kernel@vger.kernel.org>,
+        LSM <linux-security-module@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 1, 2021 at 3:34 PM Rafael J. Wysocki <rafael@kernel.org> wrote:
->
-> On Thu, Apr 1, 2021 at 2:25 PM Chris von Recklinghausen
-> <crecklin@redhat.com> wrote:
-> >
-> > Suspend fails on a system in fips mode because md5 is used for the e820
-> > integrity check and is not available. Use crc32 instead.
-> >
-> > Fixes: 62a03defeabd ("PM / hibernate: Verify the consistent of e820 memory map
-> >        by md5 digest")
-> > Signed-off-by: Chris von Recklinghausen <crecklin@redhat.com>
-> > ---
-> >  arch/x86/power/hibernate.c | 31 +++++++++++++++++--------------
-> >  1 file changed, 17 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/arch/x86/power/hibernate.c b/arch/x86/power/hibernate.c
-> > index cd3914fc9f3d..6a3f4e32e49c 100644
-> > --- a/arch/x86/power/hibernate.c
-> > +++ b/arch/x86/power/hibernate.c
-> > @@ -55,31 +55,31 @@ int pfn_is_nosave(unsigned long pfn)
-> >  }
-> >
-> >
-> > -#define MD5_DIGEST_SIZE 16
-> > +#define CRC32_DIGEST_SIZE 16
-> >
-> >  struct restore_data_record {
-> >         unsigned long jump_address;
-> >         unsigned long jump_address_phys;
-> >         unsigned long cr3;
-> >         unsigned long magic;
-> > -       u8 e820_digest[MD5_DIGEST_SIZE];
-> > +       u8 e820_digest[CRC32_DIGEST_SIZE];
-> >  };
->
-> No.
->
-> CRC32 was used here before and it was deemed insufficient.
->
-> Please find a different way to address this issue.
+Hi Richard,
 
-Well, I guess I'm going to change my mind on this, so we can go with
-this patch, but please bump up RESTORE_MAGIC too.
+On Wed, 31 Mar 2021 at 03:34, Richard Weinberger
+<richard.weinberger@gmail.com> wrote:
+>
+> Ahmad,
+>
+> On Wed, Mar 17, 2021 at 3:08 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> >     keyctl add trusted $KEYNAME "load $(cat ~/kmk.blob)" @s
+>
+> Is there a reason why we can't pass the desired backend name in the
+> trusted key parameters?
+> e.g.
+> keyctl add trusted $KEYNAME "backendtype caam load $(cat ~/kmk.blob)" @s
+>
 
-> > -#if IS_BUILTIN(CONFIG_CRYPTO_MD5)
-> > +#if IS_BUILTIN(CONFIG_CRYPTO_CRC32)
-> >  /**
-> > - * get_e820_md5 - calculate md5 according to given e820 table
-> > + * get_e820_crc32 - calculate crc32 according to given e820 table
-> >   *
-> >   * @table: the e820 table to be calculated
-> > - * @buf: the md5 result to be stored to
-> > + * @buf: the crc32 result to be stored to
-> >   */
-> > -static int get_e820_md5(struct e820_table *table, void *buf)
-> > +static int get_e820_crc32(struct e820_table *table, void *buf)
-> >  {
-> >         struct crypto_shash *tfm;
-> >         struct shash_desc *desc;
-> >         int size;
-> >         int ret = 0;
-> >
-> > -       tfm = crypto_alloc_shash("md5", 0, 0);
-> > +       tfm = crypto_alloc_shash("crc32", 0, 0);
-> >         if (IS_ERR(tfm))
-> >                 return -ENOMEM;
-> >
-> > @@ -107,24 +107,24 @@ static int get_e820_md5(struct e820_table *table, void *buf)
-> >
-> >  static int hibernation_e820_save(void *buf)
-> >  {
-> > -       return get_e820_md5(e820_table_firmware, buf);
-> > +       return get_e820_crc32(e820_table_firmware, buf);
-> >  }
-> >
-> >  static bool hibernation_e820_mismatch(void *buf)
-> >  {
-> >         int ret;
-> > -       u8 result[MD5_DIGEST_SIZE];
-> > +       u8 result[CRC32_DIGEST_SIZE];
-> >
-> > -       memset(result, 0, MD5_DIGEST_SIZE);
-> > +       memset(result, 0, CRC32_DIGEST_SIZE);
-> >         /* If there is no digest in suspend kernel, let it go. */
-> > -       if (!memcmp(result, buf, MD5_DIGEST_SIZE))
-> > +       if (!memcmp(result, buf, CRC32_DIGEST_SIZE))
-> >                 return false;
-> >
-> > -       ret = get_e820_md5(e820_table_firmware, result);
-> > +       ret = get_e820_crc32(e820_table_firmware, result);
-> >         if (ret)
-> >                 return true;
-> >
-> > -       return memcmp(result, buf, MD5_DIGEST_SIZE) ? true : false;
-> > +       return memcmp(result, buf, CRC32_DIGEST_SIZE) ? true : false;
-> >  }
-> >  #else
-> >  static int hibernation_e820_save(void *buf)
-> > @@ -134,7 +134,7 @@ static int hibernation_e820_save(void *buf)
-> >
-> >  static bool hibernation_e820_mismatch(void *buf)
-> >  {
-> > -       /* If md5 is not builtin for restore kernel, let it go. */
-> > +       /* If crc32 is not builtin for restore kernel, let it go. */
-> >         return false;
-> >  }
-> >  #endif
-> > @@ -160,6 +160,9 @@ int arch_hibernation_header_save(void *addr, unsigned int max_size)
-> >         rdr->jump_address = (unsigned long)restore_registers;
-> >         rdr->jump_address_phys = __pa_symbol(restore_registers);
-> >
-> > +       /* crc32 digest size is 4 but digest buffer size is 16 so zero it all */
-> > +       memset(rdr->e820_digest, 0, CRC32_DIGEST_SIZE);
-> > +
-> >         /*
-> >          * The restore code fixes up CR3 and CR4 in the following sequence:
-> >          *
-> > --
-> > 2.18.1
-> >
+IIUC, this would require support for multiple trusted keys backends at
+runtime but currently the trusted keys subsystem only supports a
+single backend which is selected via kernel module parameter during
+boot.
+
+So the trusted keys framework needs to evolve to support multiple
+trust sources at runtime but I would like to understand the use-cases
+first. IMO, selecting the best trust source available on a platform
+for trusted keys should be a one time operation, so why do we need to
+have other backends available at runtime as well?
+
+-Sumit
+
+> --
+> Thanks,
+> //richard
