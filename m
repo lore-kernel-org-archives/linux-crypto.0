@@ -2,71 +2,145 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42706C43462
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 17:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF4FC43600
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 17:53:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D87160234
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 17:52:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 345E860FE7
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Apr 2021 17:53:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235234AbhDARw4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Apr 2021 13:52:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39013 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234184AbhDARoC (ORCPT
+        id S235263AbhDARw6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Apr 2021 13:52:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58416 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236560AbhDARpc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Apr 2021 13:44:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617299041;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc; bh=PuFHoI6wZ2vqFN8F+7P4hon8RWN2+MjgjmIvpt1EN7A=;
-        b=HOc1hJKFzmXCdJU6jeBCcfXNSwbW1LCM9p1C74qk3cIdndcLN1xvVAsSglpicy4xk++cUJ
-        SJRJbi+7juHrYieeGBsPW/0aflBLEvjjgqrXCsEic1nvM4ntmf2Vje08/hN8o0snerYiJS
-        luG6ZHcnTR9MujAh2jaJDyr3oXl4k64=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-lgkESsc8PAKfec_O1C3O2g-1; Thu, 01 Apr 2021 12:42:57 -0400
-X-MC-Unique: lgkESsc8PAKfec_O1C3O2g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 767721005D61;
-        Thu,  1 Apr 2021 16:42:49 +0000 (UTC)
-Received: from crecklin.bos.com (unknown [10.22.8.39])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C88C5D9CC;
-        Thu,  1 Apr 2021 16:42:43 +0000 (UTC)
-From:   Chris von Recklinghausen <crecklin@redhat.com>
-To:     ardb@kernel.org, simo@redhat.com, rafael@kernel.org,
-        decui@microsoft.com, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/1] use crc32 instead of md5 for hibernation e820 integrity check
-Date:   Thu,  1 Apr 2021 12:41:44 -0400
-Message-Id: <20210401164145.8051-1-crecklin@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+        Thu, 1 Apr 2021 13:45:32 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF0D6C08EC89
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Apr 2021 06:53:07 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id n138so2981763lfa.3
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Apr 2021 06:53:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=c893QbRRmjQkEtB2posydTcKTgGrQP7cS/Yzjgewk74=;
+        b=cU1/w+Ev6H6Wdyc50mYASof9MSjhUc9dkCpvuENGmyhJsVhMz+Ufq+lmVSgNIeVBeK
+         PbFUfLm4E1xcJ9HZ5XaHZORsL4dXolTon/o7fchVX7AzcKhccS4cnyNCP9eYDwkh/tjY
+         ObFY120/dvcpAvkUtDNcIeaJwwzWacVE1zgEio1J/pBBIaVkeDFrBTHmbkLbGmh8e/vy
+         7Jw5fVPkwDcKBziVeobEki4jh0HUVxqz4PODne1uZb1s1d+Z+c1J8ELr++rl+vf5b6KS
+         zS1VLh347XyLyD4Q/E6wnYQBFCViiNhC29iHIGiFl4tcSv9WSK5SmIy9d9L57/H4xDfk
+         b0rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=c893QbRRmjQkEtB2posydTcKTgGrQP7cS/Yzjgewk74=;
+        b=Vx0ZmejOcY2OBxCIWApBVQyBY3/79snb6dAgQLKGtGk3IZKoc7MBNXN4kstoHXsmXA
+         P81dsto4muHY0werGQxtQdMxns4IOLGpXGUcO+7L6j4VudH8AobnmTA41hRJQjrbgPaJ
+         2QoLLmOYR5xozw9fYHPZoBWD+Kkm4URmaeh8uKXMcyyn6EqouMj9NM67WeBmgriNQovJ
+         aUPoZws3bfqH80NQyGLnqWA1ak6l1JcWzBX6evrz+QW6xaI3re9fh59WwfrEaR7vnsn0
+         uB3phtNlRzTUllb336siHm08dpHJ62HzqW/xC69f5Q7EX3viCPV5nJwMhWwOLq+r6op3
+         ouMw==
+X-Gm-Message-State: AOAM533M+YzMgjKl7+G4qS2yxILSw1f80jAPypUaRxpvjoWPK+gn35MT
+        3yjR2WwbQchUx4hfo8x+dFBFhDFjXMaSsYbKZOD80A==
+X-Google-Smtp-Source: ABdhPJzf2Vf+J0kHLdivX0dvXkq4BlUU//tUmf8HMN2XU1LxE89EyoNOm2SAuZ5vFZYQrOuPdm9P3QNcmVEHVOzMvJw=
+X-Received: by 2002:a05:6512:1084:: with SMTP id j4mr5525797lfg.194.1617285186182;
+ Thu, 01 Apr 2021 06:53:06 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
+ <CAFLxGvzWLje+_HFeb+hKNch4U1f5uypVUOuP=QrEPn_JNM+scg@mail.gmail.com>
+ <ca2a7c17-3ed0-e52f-2e2f-c0f8bbe10323@pengutronix.de> <CAFLxGvwNomKOo3mQLMxYGDA8T8zN=Szpo2q5jrp4D1CaMHydWA@mail.gmail.com>
+ <CAFA6WYO29o73nSg4ikU9cyaOr0kpaXFJpcGLGmFLgjKQWchcEg@mail.gmail.com>
+ <1666035815.140054.1617283065549.JavaMail.zimbra@nod.at> <ea261e53-8f5d-ac52-f3b9-7f2db4532244@pengutronix.de>
+In-Reply-To: <ea261e53-8f5d-ac52-f3b9-7f2db4532244@pengutronix.de>
+From:   Sumit Garg <sumit.garg@linaro.org>
+Date:   Thu, 1 Apr 2021 19:22:54 +0530
+Message-ID: <CAFA6WYODfsMTiCEyFA2aRGm+UQE0OTe-ui7mMSK-cqUR_YJFTA@mail.gmail.com>
+Subject: Re: [PATCH v1 0/3] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     Richard Weinberger <richard@nod.at>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        horia geanta <horia.geanta@nxp.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        aymen sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        davem <davem@davemloft.net>,
+        James Bottomley <jejb@linux.ibm.com>,
+        kernel <kernel@pengutronix.de>,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        david <david@sigma-star.at>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        "open list, ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        LSM <linux-security-module@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently, suspend on x86_64 fails when FIPS mode is enabled because it uses md5
-to generate a digest of the e820 region. MD5 is not FIPS compliant so an error
-is reported and the suspend fails.
+On Thu, 1 Apr 2021 at 19:00, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>
+> Hello Richard, Sumit,
+>
+> On 01.04.21 15:17, Richard Weinberger wrote:
+> > Sumit,
+> >
+> > ----- Urspr=C3=BCngliche Mail -----
+> >> Von: "Sumit Garg" <sumit.garg@linaro.org>
+> >> IIUC, this would require support for multiple trusted keys backends at
+> >> runtime but currently the trusted keys subsystem only supports a
+> >> single backend which is selected via kernel module parameter during
+> >> boot.
+> >>
+> >> So the trusted keys framework needs to evolve to support multiple
+> >> trust sources at runtime but I would like to understand the use-cases
+> >> first. IMO, selecting the best trust source available on a platform
+> >> for trusted keys should be a one time operation, so why do we need to
+> >> have other backends available at runtime as well?
+> >
+> > I thought about devices with a TPM-Chip and CAAM.
 
-MD5 is used only to create a digest to ensure integrity of the region, no actual
-encryption is done. This patch set changes the integrity check to use crc32
-instead of md5 since crc32 is available in both FIPS and non-FIPS modes.
+In this case why would one prefer to use CAAM when you have standards
+compliant TPM-Chip which additionally offers sealing to specific PCR
+(integrity measurement) values.
 
-Chris von Recklinghausen (1):
-  use crc32 instead of md5 for hibernation e820 integrity check
+> > IMHO allowing only one backend at the same time is a little over simpli=
+fied.
+>
+> It is, but I'd rather leave this until it's actually needed.
+> What can be done now is adopting a format for the exported keys that woul=
+d
+> make this extension seamless in future.
+>
 
- arch/x86/power/hibernate.c | 35 +++++++++++++++++++----------------
- 1 file changed, 19 insertions(+), 16 deletions(-)
++1
 
--- 
-v1 -> v2
-   bump up RESTORE_MAGIC
-2.18.1
+-Sumit
 
+> Cheers,
+> Ahmad
+>
+> --
+> Pengutronix e.K.                           |                             =
+|
+> Steuerwalder Str. 21                       | http://www.pengutronix.de/  =
+|
+> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    =
+|
+> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 =
+|
