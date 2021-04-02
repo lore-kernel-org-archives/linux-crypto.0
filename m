@@ -2,168 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B27C433B4
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 19:26:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B48C433B4
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 23:37:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2902261158
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 19:26:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51F7161178
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 23:37:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231577AbhDBT0d (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Apr 2021 15:26:33 -0400
-Received: from stargate.chelsio.com ([12.32.117.8]:65353 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235392AbhDBT0a (ORCPT
+        id S235241AbhDBXhT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Apr 2021 19:37:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51758 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234161AbhDBXhS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Apr 2021 15:26:30 -0400
-Received: from beagle8.blr.asicdesigners.com (beagle8.blr.asicdesigners.com [10.193.80.125])
-        by stargate.chelsio.com (8.13.8/8.13.8) with ESMTP id 132JQI71005083;
-        Fri, 2 Apr 2021 12:26:19 -0700
-From:   Ayush Sawal <ayush.sawal@chelsio.com>
-To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc:     secdev@chelsio.com, Ayush Sawal <ayush.sawal@chelsio.com>
-Subject: [PATCH crypto] chcr: Read rxchannel-id from firmware
-Date:   Sat,  3 Apr 2021 00:55:48 +0530
-Message-Id: <20210402192548.9405-1-ayush.sawal@chelsio.com>
-X-Mailer: git-send-email 2.18.1
+        Fri, 2 Apr 2021 19:37:18 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19B8CC061788
+        for <linux-crypto@vger.kernel.org>; Fri,  2 Apr 2021 16:37:15 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id t5so10742439ybc.18
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Apr 2021 16:37:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=xjVYK5mNQJ2/NN13VjJsOwPYAqepZgVgkk4SOaWm23E=;
+        b=mqHeXZZ1B+Tm9h5UK2oztRPPQmzo7n1Fqx3Nx3sIENEHEfue7qDlNvha1zfD0T65nu
+         HXzHhU0ZxJvDaW1xqMfkX/tGpIxCr2CSoJDpCwRuUKESNfkcQfmAyWo+hvaYv4iGr3B+
+         97ZpXzK2pBA03CZznn+Bo4jT+UpvRhaNiazlvGqxIniysJqiHcIDGeXJPSphv8jIShyU
+         v4izN/skFvnVuOrOMOt0M2+LjEtP4qk/fmqFs+vXL1eWVRPa0wmn+X0cJthKKzFq5+ig
+         0RutQwQNeWIHMrOJbhBATnbC7IHrez2K0rySEQlQh5+EVLc7KdYxzBSrTCuw3REPfhbD
+         RZ+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=xjVYK5mNQJ2/NN13VjJsOwPYAqepZgVgkk4SOaWm23E=;
+        b=SAAnHlVb0MxyWv+6xxfa+BH69AifJK4L/ncSGSfaUsxm/Irto8MA7iROzA9rPL5r3j
+         04YgxtxU5JW9DAtN1s9NXPG21Ikjv9y4qcQ/xCMew37whrsPO6SutSnYDKP/+RVEEOKp
+         h1lkjDl2wFoAagYMo5F4TusmU6mmevZRYyy2Xp6xPp38cv6RPG722pbhlypbmCVD5WSw
+         9CRrhBi57tJW6DlEjnH2w0eWapyIsPmUMKjPYPPFSYnIEr+HdPbUFiVKfQkZiPI8dT58
+         9LuT5u2l1eto3dyMoS/xp8zPuxolOTPEkXm28YdOiopHRyze+WsBRroEkHeFVQ8ad/Wr
+         wI8g==
+X-Gm-Message-State: AOAM531D0DHwU7XAZhp9kUa59eqiMAPlYqPzso+Z5s5e1+A7CmbPaGrv
+        xJpOKqNgTr8n3iQCexFyNsikTifepzY=
+X-Google-Smtp-Source: ABdhPJwpzJvoUPM2VsTADsMCMUhBkIOf35+jqXhTBG7gS47Dz9zpQwjAxOQohrn+9EEBxcYlKKuTgGAKjwA=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:24a7:3342:da61:f6aa])
+ (user=seanjc job=sendgmr) by 2002:a25:e085:: with SMTP id x127mr14625429ybg.343.1617406634068;
+ Fri, 02 Apr 2021 16:37:14 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri,  2 Apr 2021 16:36:57 -0700
+Message-Id: <20210402233702.3291792-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
+Subject: [PATCH 0/5] ccp: KVM: SVM: Use stack for SEV command buffers
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Borislav Petkov <bp@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The rxchannel id is updated by the driver using the
-port no value, but this does not ensure that the value
-is correct. So now rx channel value is obtained from
-etoc channel map value.
+While doing minor KVM cleanup to account various kernel allocations, I
+noticed that all of the SEV command buffers are allocated via kmalloc(),
+even for commands whose payloads is smaller than a pointer.  After much
+head scratching, the only reason I could come up with for dynamically
+allocating the command data is CONFIG_VMAP_STACK=y.
 
-Fixes: 567be3a5d227 ("crypto: chelsio - Use multiple txq/rxq per tfm to process the requests)
-Signed-off-by: Ayush Sawal <ayush.sawal@chelsio.com>
----
- drivers/crypto/chelsio/chcr_algo.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+This series teaches __sev_do_cmd_locked() to gracefully handle vmalloc'd
+command buffers by copying such buffers an internal buffer before sending
+the command to the PSP.  The SEV driver and KVM are then converted to use
+the stack for all command buffers.
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index f77d3fd962bf..ef350285dd6f 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -769,13 +769,14 @@ static inline void create_wreq(struct chcr_context *ctx,
- 	struct uld_ctx *u_ctx = ULD_CTX(ctx);
- 	unsigned int tx_channel_id, rx_channel_id;
- 	unsigned int txqidx = 0, rxqidx = 0;
--	unsigned int qid, fid;
-+	unsigned int qid, fid, portno;
- 
- 	get_qidxs(req, &txqidx, &rxqidx);
- 	qid = u_ctx->lldi.rxq_ids[rxqidx];
- 	fid = u_ctx->lldi.rxq_ids[0];
-+	portno = rxqidx / ctx->rxq_perchan;
- 	tx_channel_id = txqidx / ctx->txq_perchan;
--	rx_channel_id = rxqidx / ctx->rxq_perchan;
-+	rx_channel_id = cxgb4_port_e2cchan(u_ctx->lldi.ports[portno]);
- 
- 
- 	chcr_req->wreq.op_to_cctx_size = FILL_WR_OP_CCTX_SIZE;
-@@ -803,6 +804,7 @@ static struct sk_buff *create_cipher_wr(struct cipher_wr_param *wrparam)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(wrparam->req);
- 	struct chcr_context *ctx = c_ctx(tfm);
-+	struct uld_ctx *u_ctx = ULD_CTX(ctx);
- 	struct ablk_ctx *ablkctx = ABLK_CTX(ctx);
- 	struct sk_buff *skb = NULL;
- 	struct chcr_wr *chcr_req;
-@@ -819,6 +821,7 @@ static struct sk_buff *create_cipher_wr(struct cipher_wr_param *wrparam)
- 	struct adapter *adap = padap(ctx->dev);
- 	unsigned int rx_channel_id = reqctx->rxqidx / ctx->rxq_perchan;
- 
-+	rx_channel_id = cxgb4_port_e2cchan(u_ctx->lldi.ports[rx_channel_id]);
- 	nents = sg_nents_xlen(reqctx->dstsg,  wrparam->bytes, CHCR_DST_SG_SIZE,
- 			      reqctx->dst_ofst);
- 	dst_size = get_space_for_phys_dsgl(nents);
-@@ -1578,6 +1581,7 @@ static struct sk_buff *create_hash_wr(struct ahash_request *req,
- 	int error = 0;
- 	unsigned int rx_channel_id = req_ctx->rxqidx / ctx->rxq_perchan;
- 
-+	rx_channel_id = cxgb4_port_e2cchan(u_ctx->lldi.ports[rx_channel_id]);
- 	transhdr_len = HASH_TRANSHDR_SIZE(param->kctx_len);
- 	req_ctx->hctx_wr.imm = (transhdr_len + param->bfr_len +
- 				param->sg_len) <= SGE_MAX_WR_LEN;
-@@ -2436,6 +2440,7 @@ static struct sk_buff *create_authenc_wr(struct aead_request *req,
- {
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct chcr_context *ctx = a_ctx(tfm);
-+	struct uld_ctx *u_ctx = ULD_CTX(ctx);
- 	struct chcr_aead_ctx *aeadctx = AEAD_CTX(ctx);
- 	struct chcr_authenc_ctx *actx = AUTHENC_CTX(aeadctx);
- 	struct chcr_aead_reqctx *reqctx = aead_request_ctx(req);
-@@ -2455,6 +2460,7 @@ static struct sk_buff *create_authenc_wr(struct aead_request *req,
- 	struct adapter *adap = padap(ctx->dev);
- 	unsigned int rx_channel_id = reqctx->rxqidx / ctx->rxq_perchan;
- 
-+	rx_channel_id = cxgb4_port_e2cchan(u_ctx->lldi.ports[rx_channel_id]);
- 	if (req->cryptlen == 0)
- 		return NULL;
- 
-@@ -2708,9 +2714,11 @@ void chcr_add_aead_dst_ent(struct aead_request *req,
- 	struct dsgl_walk dsgl_walk;
- 	unsigned int authsize = crypto_aead_authsize(tfm);
- 	struct chcr_context *ctx = a_ctx(tfm);
-+	struct uld_ctx *u_ctx = ULD_CTX(ctx);
- 	u32 temp;
- 	unsigned int rx_channel_id = reqctx->rxqidx / ctx->rxq_perchan;
- 
-+	rx_channel_id = cxgb4_port_e2cchan(u_ctx->lldi.ports[rx_channel_id]);
- 	dsgl_walk_init(&dsgl_walk, phys_cpl);
- 	dsgl_walk_add_page(&dsgl_walk, IV + reqctx->b0_len, reqctx->iv_dma);
- 	temp = req->assoclen + req->cryptlen +
-@@ -2750,9 +2758,11 @@ void chcr_add_cipher_dst_ent(struct skcipher_request *req,
- 	struct chcr_skcipher_req_ctx *reqctx = skcipher_request_ctx(req);
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(wrparam->req);
- 	struct chcr_context *ctx = c_ctx(tfm);
-+	struct uld_ctx *u_ctx = ULD_CTX(ctx);
- 	struct dsgl_walk dsgl_walk;
- 	unsigned int rx_channel_id = reqctx->rxqidx / ctx->rxq_perchan;
- 
-+	rx_channel_id = cxgb4_port_e2cchan(u_ctx->lldi.ports[rx_channel_id]);
- 	dsgl_walk_init(&dsgl_walk, phys_cpl);
- 	dsgl_walk_add_sg(&dsgl_walk, reqctx->dstsg, wrparam->bytes,
- 			 reqctx->dst_ofst);
-@@ -2956,6 +2966,7 @@ static void fill_sec_cpl_for_aead(struct cpl_tx_sec_pdu *sec_cpl,
- {
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct chcr_context *ctx = a_ctx(tfm);
-+	struct uld_ctx *u_ctx = ULD_CTX(ctx);
- 	struct chcr_aead_ctx *aeadctx = AEAD_CTX(ctx);
- 	struct chcr_aead_reqctx *reqctx = aead_request_ctx(req);
- 	unsigned int cipher_mode = CHCR_SCMD_CIPHER_MODE_AES_CCM;
-@@ -2965,6 +2976,8 @@ static void fill_sec_cpl_for_aead(struct cpl_tx_sec_pdu *sec_cpl,
- 	unsigned int tag_offset = 0, auth_offset = 0;
- 	unsigned int assoclen;
- 
-+	rx_channel_id = cxgb4_port_e2cchan(u_ctx->lldi.ports[rx_channel_id]);
-+
- 	if (get_aead_subtype(tfm) == CRYPTO_ALG_SUB_TYPE_AEAD_RFC4309)
- 		assoclen = req->assoclen - 8;
- 	else
-@@ -3125,6 +3138,7 @@ static struct sk_buff *create_gcm_wr(struct aead_request *req,
- {
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct chcr_context *ctx = a_ctx(tfm);
-+	struct uld_ctx *u_ctx = ULD_CTX(ctx);
- 	struct chcr_aead_ctx *aeadctx = AEAD_CTX(ctx);
- 	struct chcr_aead_reqctx  *reqctx = aead_request_ctx(req);
- 	struct sk_buff *skb = NULL;
-@@ -3141,6 +3155,7 @@ static struct sk_buff *create_gcm_wr(struct aead_request *req,
- 	struct adapter *adap = padap(ctx->dev);
- 	unsigned int rx_channel_id = reqctx->rxqidx / ctx->rxq_perchan;
- 
-+	rx_channel_id = cxgb4_port_e2cchan(u_ctx->lldi.ports[rx_channel_id]);
- 	if (get_aead_subtype(tfm) == CRYPTO_ALG_SUB_TYPE_AEAD_RFC4106)
- 		assoclen = req->assoclen - 8;
- 
+The first patch is optional, I included it in case someone wants to
+backport it to stable kernels.  It wouldn't actually fix bugs, but it
+would make debugging issues a lot easier if they did pop up.
+
+Tested everything except sev_ioctl_do_pek_import(), I don't know anywhere
+near enough about the PSP to give it the right input.
+
+Based on kvm/queue, commit f96be2deac9b ("KVM: x86: Support KVM VMs
+sharing SEV context") to avoid a minor conflict.
+
+Sean Christopherson (5):
+  crypto: ccp: Detect and reject vmalloc addresses destined for PSP
+  crypto: ccp: Reject SEV commands with mismatching command buffer
+  crypto: ccp: Play nice with vmalloc'd memory for SEV command structs
+  crypto: ccp: Use the stack for small SEV command buffers
+  KVM: SVM: Allocate SEV command structures on local stack
+
+ arch/x86/kvm/svm/sev.c       | 262 +++++++++++++----------------------
+ drivers/crypto/ccp/sev-dev.c | 161 ++++++++++-----------
+ drivers/crypto/ccp/sev-dev.h |   7 +
+ 3 files changed, 184 insertions(+), 246 deletions(-)
+
 -- 
-2.18.1
+2.31.0.208.g409f899ff0-goog
 
