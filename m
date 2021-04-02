@@ -7,52 +7,49 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDEEC433B4
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:49:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3275C433B4
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:49:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A21F6112E
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:49:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFC3760FE6
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:49:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234448AbhDBJt2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Apr 2021 05:49:28 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:33826 "EHLO fornost.hmeau.com"
+        id S234217AbhDBJtm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Apr 2021 05:49:42 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:33834 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234217AbhDBJt2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Apr 2021 05:49:28 -0400
+        id S229722AbhDBJtl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Apr 2021 05:49:41 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lSGQZ-0003b2-QM; Fri, 02 Apr 2021 20:49:20 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Apr 2021 20:49:19 +1100
-Date:   Fri, 2 Apr 2021 20:49:19 +1100
+        id 1lSGQp-0003cb-1L; Fri, 02 Apr 2021 20:49:36 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Apr 2021 20:49:34 +1100
+Date:   Fri, 2 Apr 2021 20:49:34 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Meng Yu <yumeng18@huawei.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        xuzaibo@huawei.com, wangzhou1@hisilicon.com,
+To:     Longfang Liu <liulongfang@huawei.com>
+Cc:     wangzhou1@hisilicon.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: hisilicon/hpre - Add processing of src_data in
- 'CURVE25519'
-Message-ID: <20210402094919.GL24509@gondor.apana.org.au>
-References: <1616838976-31936-1-git-send-email-yumeng18@huawei.com>
+Subject: Re: [PATCH] crypto: hisilicon/sec - Fixes AES algorithm mode
+ parameter problem
+Message-ID: <20210402094934.GM24509@gondor.apana.org.au>
+References: <1616840910-12727-1-git-send-email-liulongfang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1616838976-31936-1-git-send-email-yumeng18@huawei.com>
+In-Reply-To: <1616840910-12727-1-git-send-email-liulongfang@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Mar 27, 2021 at 05:56:16PM +0800, Meng Yu wrote:
-> HPRE can only deal with src_data smaller than 'p' in 'CURVE25519'
-> algorithm, but 'rfc7748' says:
-> 'Implementations MUST accept non-canonical values and process them as
-> if they had been reduced modulo the field prime'
-> So we get its modulus to p, and then deal it with HPRE.
+On Sat, Mar 27, 2021 at 06:28:30PM +0800, Longfang Liu wrote:
+> The input data of the ECB (AES) algorithm needs to be aligned
+> with 16 bytes, and the input data of the XTS (AES) algorithm is
+> at least 16 bytes. Otherwise the SEC hardware will go wrong.
 > 
-> Signed-off-by: Meng Yu <yumeng18@huawei.com>
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 > ---
->  drivers/crypto/hisilicon/hpre/hpre_crypto.c | 22 ++++++++++++++++++----
->  1 file changed, 18 insertions(+), 4 deletions(-)
+>  drivers/crypto/hisilicon/sec2/sec_crypto.c | 37 ++++++++++++++++++++++++++----
+>  1 file changed, 32 insertions(+), 5 deletions(-)
 
 Patch applied.  Thanks.
 -- 
