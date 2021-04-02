@@ -2,95 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7734BC433B4
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 10:34:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D02C433B4
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 11:18:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4B54E60FD7
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 10:34:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAF7C610D2
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 11:18:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229605AbhDBKex (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Apr 2021 06:34:53 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:54410 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229599AbhDBKex (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Apr 2021 06:34:53 -0400
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 4FBbyx42HFz9ty33;
-        Fri,  2 Apr 2021 12:34:49 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id XvwunlNFppuO; Fri,  2 Apr 2021 12:34:49 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 4FBbyx35lVz9ty2x;
-        Fri,  2 Apr 2021 12:34:49 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 0E3DF8BB66;
-        Fri,  2 Apr 2021 12:34:51 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id P-Pc_R-4lJcd; Fri,  2 Apr 2021 12:34:50 +0200 (CEST)
-Received: from [192.168.4.90] (unknown [192.168.4.90])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 83D938BB65;
-        Fri,  2 Apr 2021 12:34:50 +0200 (CEST)
-Subject: Re: [PATCH] ecc: delete a useless function declaration
-To:     Meng Yu <yumeng18@huawei.com>, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, wangzhou1@hisilicon.com,
-        linux-kernel@vger.kernel.org
-References: <1617357357-11828-1-git-send-email-yumeng18@huawei.com>
-From:   Christophe Leroy <christophe.leroy@csgroup.eu>
-Message-ID: <3fbc88c4-50ae-3ffb-14e5-0cd39d492251@csgroup.eu>
-Date:   Fri, 2 Apr 2021 12:34:50 +0200
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S229722AbhDBLSb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Apr 2021 07:18:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33044 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229599AbhDBLSa (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Apr 2021 07:18:30 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5183C0613E6;
+        Fri,  2 Apr 2021 04:18:29 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id x7so4452156wrw.10;
+        Fri, 02 Apr 2021 04:18:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=8E3SEQHWtD9oyxpVQil1WLhWIN1NJ4aU8PFyBCEE/9I=;
+        b=aqP3pMYBFohRF0lJwLR9OejAloqY6YrXbLNGYs9zFLgCv1MCuHZgj+iSPTeNoGQ12w
+         EyDaCkMvX460y0dvE3hkVfUSuIwTGfroRpBN9oog6OWB4hEKvepYFFPE+VeWXB49iqN5
+         dLgN+ei3rW27jDeJ26Zb4HM1zjaSGDUIkBjN6VeHlwK42H0NEhOg/oAPO2e8+hbrglCe
+         wFD0sJQ9wmT9rP2wWgsZ7iIi1RZNQMheo6Y9xqlezW7Mq2rwjKQKT6byD+VWJGctCxw6
+         xZcVGeNNDgjZ3a7OBtjjVcklPFudhVTg2Az6gV3ThEHsOoJQhKaV9EFaq/PKuz/32oWj
+         9MzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=8E3SEQHWtD9oyxpVQil1WLhWIN1NJ4aU8PFyBCEE/9I=;
+        b=hcnk2r0+WhYsR2/SqmOJhB7UC71jcrNlKLRSblqfsrrdNW9GWG6WpZEEPWMm0JrnVN
+         tczIh4eb/uH21tTpzwyjRqEccwb6X/jUEB6cHT+JaDgCIOtuzA/CPT3RrM2WNh8NDa1A
+         f4N4xMHmssccsFk9AcMaC15uuquhpef/FxRNkPZblWyPHNdDOvEV9q/M+WQKVjwx1ZyU
+         oODnpVt1EUQc2kzo5pLV0pTZIEyL6eJPBPXcaypXxrbsnIJ4FW7Jkej8njOe2ZqW0z94
+         BB/YxwFgtK92CJdeKo+fGPwZ8QWdpuxCpLeqahxhe0NDLWVAyF/igVoUeNDVuvDD3t1A
+         FqIw==
+X-Gm-Message-State: AOAM532nOyTMTpp+ZxaNkHID8Hbo4bVM8UrO40P67EWTD+tRCEacUh1h
+        mlX/AsPQ7l2MX+/t2Yu86QgOE16PXyo=
+X-Google-Smtp-Source: ABdhPJy/iKJNXmT3yHCYQCxdWaBoVuhIXj+nmkcu/NqP7UPz3sLXzXCR2emtqZGn7Kl5Og+YTtZr2g==
+X-Received: by 2002:adf:b345:: with SMTP id k5mr15205746wrd.14.1617362308620;
+        Fri, 02 Apr 2021 04:18:28 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id r10sm14279138wmh.45.2021.04.02.04.18.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Apr 2021 04:18:28 -0700 (PDT)
+Date:   Fri, 2 Apr 2021 13:18:25 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Colin King <colin.king@canonical.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@siol.net>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] crypto: sun8i-ss: Fix memory leak of pad
+Message-ID: <YGb9gYv1+2aqFUNa@Red>
+References: <20210401151827.2015960-1-colin.king@canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <1617357357-11828-1-git-send-email-yumeng18@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210401151827.2015960-1-colin.king@canonical.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-Le 02/04/2021 à 11:55, Meng Yu a écrit :
-> This function declaration has been added in 'ecc_curve.h',
-> delete it in 'crypto/ecc.h'.
+Le Thu, Apr 01, 2021 at 04:18:27PM +0100, Colin King a �crit :
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> Fixes: 14bb76768275(crypto: ecc - expose ecc curves)
-
-Fixes tag is wrong I think, should be 4e6602916bc6
-
-> Signed-off-by: Meng Yu <yumeng18@huawei.com>
+> It appears there are several failure return paths that don't seem
+> to be free'ing pad. Fix these.
+> 
+> Addresses-Coverity: ("Resource leak")
+> Fixes: d9b45418a917 ("crypto: sun8i-ss - support hash algorithms")
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 > ---
->   crypto/ecc.h | 8 --------
->   1 file changed, 8 deletions(-)
-> 
-> diff --git a/crypto/ecc.h b/crypto/ecc.h
-> index 46aa9bc..a006132 100644
-> --- a/crypto/ecc.h
-> +++ b/crypto/ecc.h
-> @@ -56,14 +56,6 @@ static inline void ecc_swap_digits(const u64 *in, u64 *out, unsigned int ndigits
->   }
->   
->   /**
-> - * ecc_get_curve()  - Get a curve given its curve_id
-> - * @curve_id:  Id of the curve
-> - *
-> - * Returns pointer to the curve data, NULL if curve is not available
-> - */
-> -const struct ecc_curve *ecc_get_curve(unsigned int curve_id);
-> -
-> -/**
->    * ecc_is_key_valid() - Validate a given ECDH private key
->    *
->    * @curve_id:		id representing the curve to use
-> 
+
+Hello
+
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Tested-on: sun8i-a83t-bananapi-m3
+
+Thanks
