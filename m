@@ -2,62 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,FAKE_REPLY_C,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 209E5C433ED
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDB1C433B4
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:04:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA0726108B
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:03:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C19E60724
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:04:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231287AbhDBJDs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Apr 2021 05:03:48 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:58910 "EHLO fornost.hmeau.com"
+        id S234354AbhDBJEB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Apr 2021 05:04:01 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:58930 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229553AbhDBJDs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Apr 2021 05:03:48 -0400
+        id S229553AbhDBJEB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Apr 2021 05:04:01 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lSFiF-0002Hr-Gw; Fri, 02 Apr 2021 20:03:32 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Apr 2021 20:03:31 +1100
-Date:   Fri, 2 Apr 2021 20:03:31 +1100
+        id 1lSFif-0002IM-40; Fri, 02 Apr 2021 20:03:58 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Apr 2021 20:03:56 +1100
+Date:   Fri, 2 Apr 2021 20:03:56 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, dan.carpenter@oracle.com,
-        nhorman@tuxdriver.com, clabbe@baylibre.com, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: rng - fix crypto_rng_reset() refcounting when
- !CRYPTO_STATS
-Message-ID: <20210402090331.GA24545@gondor.apana.org.au>
+Cc:     Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
+        Jann Horn <jannh@google.com>, Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH RESEND] random: initialize ChaCha20 constants with
+ correct endianness
+Message-ID: <20210402090356.GA24509@gondor.apana.org.au>
+References: <20210322051347.266831-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210322050748.265604-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi
+In-Reply-To: <20210322051347.266831-1-ebiggers@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric Biggers <ebiggers@kernel.org> wrote:
+On Sun, Mar 21, 2021 at 10:13:47PM -0700, Eric Biggers wrote:
 > From: Eric Biggers <ebiggers@google.com>
 > 
-> crypto_stats_get() is a no-op when the kernel is compiled without
-> CONFIG_CRYPTO_STATS, so pairing it with crypto_alg_put() unconditionally
-> (as crypto_rng_reset() does) is wrong.
+> On big endian CPUs, the ChaCha20-based CRNG is using the wrong
+> endianness for the ChaCha20 constants.
 > 
-> Fix this by moving the call to crypto_stats_get() to just before the
-> actual algorithm operation which might need it.  This makes it always
-> paired with crypto_stats_rng_seed().
+> This doesn't matter cryptographically, but technically it means it's not
+> ChaCha20 anymore.  Fix it to always use the standard constants.
 > 
-> Fixes: eed74b3eba9e ("crypto: rng - Fix a refcounting bug in crypto_rng_reset()")
-> Cc: stable@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Jann Horn <jannh@google.com>
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
-> crypto/rng.c | 10 +++-------
-> 1 file changed, 3 insertions(+), 7 deletions(-)
+>  drivers/char/random.c   | 4 ++--
+>  include/crypto/chacha.h | 9 +++++++--
+>  2 files changed, 9 insertions(+), 4 deletions(-)
 
 Patch applied.  Thanks.
 -- 
