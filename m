@@ -2,67 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34DA5C433B4
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FF6C433ED
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:48:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC0656112E
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:48:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C9436113A
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 09:48:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234433AbhDBJsg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Apr 2021 05:48:36 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:33770 "EHLO fornost.hmeau.com"
+        id S234448AbhDBJsz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Apr 2021 05:48:55 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:33790 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229722AbhDBJsg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Apr 2021 05:48:36 -0400
+        id S234217AbhDBJsz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Apr 2021 05:48:55 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lSGPl-0003Wm-T5; Fri, 02 Apr 2021 20:48:31 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Apr 2021 20:48:29 +1100
-Date:   Fri, 2 Apr 2021 20:48:29 +1100
+        id 1lSGOu-0003UO-NG; Fri, 02 Apr 2021 20:47:37 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Apr 2021 20:47:36 +1100
+Date:   Fri, 2 Apr 2021 20:47:36 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Yang Shen <shenyang39@huawei.com>
-Cc:     davem@davemloft.net, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, wangzhou1@hisilicon.com
-Subject: Re: [PATCH v2 0/4] crypto: hisilicon/zip - support new 'sqe' type in
- Kunpeng930
-Message-ID: <20210402094829.GH24509@gondor.apana.org.au>
-References: <1616830128-46827-1-git-send-email-shenyang39@huawei.com>
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org
+Subject: Re: [PATCH] crypto: poly1305: fix poly1305_core_setkey() declaration
+Message-ID: <20210402094736.GC24509@gondor.apana.org.au>
+References: <20210322170542.1791154-1-arnd@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1616830128-46827-1-git-send-email-shenyang39@huawei.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210322170542.1791154-1-arnd@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Mar 27, 2021 at 03:28:44PM +0800, Yang Shen wrote:
-> In Kunpeng930, some field meanings in 'sqe' are changed, so driver need to
-> distinguish the type on different platform.
+On Mon, Mar 22, 2021 at 06:05:15PM +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> To avoid checking the platform everytime when driver fills the 'sqe', add a
-> struct 'hisi_zip_sqe_ops' to describe the 'sqe' operations. The driver only
-> need to choose the 'ops' once when call 'hisi_zip_acomp_init'.
+> gcc-11 points out a mismatch between the declaration and the definition
+> of poly1305_core_setkey():
 > 
-> v1 -> v2:
-> * fix a sparse warning
+> lib/crypto/poly1305-donna32.c:13:67: error: argument 2 of type ‘const u8[16]’ {aka ‘const unsigned char[16]’} with mismatched bound [-Werror=array-parameter=]
+>    13 | void poly1305_core_setkey(struct poly1305_core_key *key, const u8 raw_key[16])
+>       |                                                          ~~~~~~~~~^~~~~~~~~~~
+> In file included from lib/crypto/poly1305-donna32.c:11:
+> include/crypto/internal/poly1305.h:21:68: note: previously declared as ‘const u8 *’ {aka ‘const unsigned char *’}
+>    21 | void poly1305_core_setkey(struct poly1305_core_key *key, const u8 *raw_key);
 > 
-> Yang Shen (4):
->   crypto: hisilicon/zip - adjust functions location
->   crypto: hisilicon/zip - add comments for 'hisi_zip_sqe'
->   crypto: hisilicon/zip - initialize operations about 'sqe' in
->     'acomp_alg.init'
->   crypto: hisilicon/zip - support new 'sqe' type in Kunpeng930
+> This is harmless in principle, as the calling conventions are the same,
+> but the more specific prototype allows better type checking in the
+> caller.
 > 
->  drivers/crypto/hisilicon/zip/zip.h        |  46 +-
->  drivers/crypto/hisilicon/zip/zip_crypto.c | 706 +++++++++++++++++-------------
->  2 files changed, 438 insertions(+), 314 deletions(-)
+> Change the declaration to match the actual function definition.
+> The poly1305_simd_init() is a bit suspicious here, as it previously
+> had a 32-byte argument type, but looks like it needs to take the
+> 16-byte POLY1305_BLOCK_SIZE array instead.
+> 
+> Fixes: 1c08a104360f ("crypto: poly1305 - add new 32 and 64-bit generic versions")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  arch/arm/crypto/poly1305-glue.c    | 2 +-
+>  arch/arm64/crypto/poly1305-glue.c  | 2 +-
+>  arch/mips/crypto/poly1305-glue.c   | 2 +-
+>  arch/x86/crypto/poly1305_glue.c    | 6 +++---
+>  include/crypto/internal/poly1305.h | 3 ++-
+>  include/crypto/poly1305.h          | 6 ++++--
+>  lib/crypto/poly1305-donna32.c      | 3 ++-
+>  lib/crypto/poly1305-donna64.c      | 3 ++-
+>  lib/crypto/poly1305.c              | 3 ++-
+>  9 files changed, 18 insertions(+), 12 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
