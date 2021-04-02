@@ -2,62 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44374C433ED
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 10:22:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7734BC433B4
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 10:34:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A09F610D1
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 10:22:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B54E60FD7
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 10:34:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229599AbhDBKWf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Apr 2021 06:22:35 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:33872 "EHLO fornost.hmeau.com"
+        id S229605AbhDBKex (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Apr 2021 06:34:53 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:54410 "EHLO pegase1.c-s.fr"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229553AbhDBKWe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Apr 2021 06:22:34 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lSGwZ-00041L-U9; Fri, 02 Apr 2021 21:22:25 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Apr 2021 21:22:23 +1100
-Date:   Fri, 2 Apr 2021 21:22:23 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     yumeng <yumeng18@huawei.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        xuzaibo@huawei.com, wangzhou1@hisilicon.com,
-        linux-kernel@vger.kernel.org, shenyang39@huawei.com
-Subject: Re: [PATCH] crypto: hisilicon/hpre - rsa key should not be empty
-Message-ID: <20210402102223.GA24978@gondor.apana.org.au>
-References: <1616739212-7751-1-git-send-email-yumeng18@huawei.com>
- <20210402071225.GA10423@gondor.apana.org.au>
- <7384e015-5514-d6b2-4215-beb1f4701adb@huawei.com>
+        id S229599AbhDBKex (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Apr 2021 06:34:53 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 4FBbyx42HFz9ty33;
+        Fri,  2 Apr 2021 12:34:49 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id XvwunlNFppuO; Fri,  2 Apr 2021 12:34:49 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 4FBbyx35lVz9ty2x;
+        Fri,  2 Apr 2021 12:34:49 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 0E3DF8BB66;
+        Fri,  2 Apr 2021 12:34:51 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id P-Pc_R-4lJcd; Fri,  2 Apr 2021 12:34:50 +0200 (CEST)
+Received: from [192.168.4.90] (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 83D938BB65;
+        Fri,  2 Apr 2021 12:34:50 +0200 (CEST)
+Subject: Re: [PATCH] ecc: delete a useless function declaration
+To:     Meng Yu <yumeng18@huawei.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, wangzhou1@hisilicon.com,
+        linux-kernel@vger.kernel.org
+References: <1617357357-11828-1-git-send-email-yumeng18@huawei.com>
+From:   Christophe Leroy <christophe.leroy@csgroup.eu>
+Message-ID: <3fbc88c4-50ae-3ffb-14e5-0cd39d492251@csgroup.eu>
+Date:   Fri, 2 Apr 2021 12:34:50 +0200
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7384e015-5514-d6b2-4215-beb1f4701adb@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <1617357357-11828-1-git-send-email-yumeng18@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 02, 2021 at 06:16:16PM +0800, yumeng wrote:
->
-> I think it is not a real bug, and soft fallback setkey can always catch the
-> error.
-> But our original intention was to make it don't go to 'xxx_set_pub_key'
-> when the key is null, and it can return an error earlier.
-> But maybe it is not good.
 
-It might make sense to check them twice if you were touching them
-directly, e.g., poking inside the key.  However, it appears that
-your driver simply palms off the key to rsa_helper.c which should
-check the key/keylen too so I think there is no need for this patch
-for now.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Le 02/04/2021 à 11:55, Meng Yu a écrit :
+> This function declaration has been added in 'ecc_curve.h',
+> delete it in 'crypto/ecc.h'.
+> 
+> Fixes: 14bb76768275(crypto: ecc - expose ecc curves)
+
+Fixes tag is wrong I think, should be 4e6602916bc6
+
+> Signed-off-by: Meng Yu <yumeng18@huawei.com>
+> ---
+>   crypto/ecc.h | 8 --------
+>   1 file changed, 8 deletions(-)
+> 
+> diff --git a/crypto/ecc.h b/crypto/ecc.h
+> index 46aa9bc..a006132 100644
+> --- a/crypto/ecc.h
+> +++ b/crypto/ecc.h
+> @@ -56,14 +56,6 @@ static inline void ecc_swap_digits(const u64 *in, u64 *out, unsigned int ndigits
+>   }
+>   
+>   /**
+> - * ecc_get_curve()  - Get a curve given its curve_id
+> - * @curve_id:  Id of the curve
+> - *
+> - * Returns pointer to the curve data, NULL if curve is not available
+> - */
+> -const struct ecc_curve *ecc_get_curve(unsigned int curve_id);
+> -
+> -/**
+>    * ecc_is_key_valid() - Validate a given ECDH private key
+>    *
+>    * @curve_id:		id representing the curve to use
+> 
