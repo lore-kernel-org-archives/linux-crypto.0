@@ -2,49 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DBDDC433B4
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 07:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C1CC433ED
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 07:12:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C8416610FC
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 07:06:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03041610CC
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Apr 2021 07:12:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbhDBHGq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Apr 2021 03:06:46 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:51420 "EHLO fornost.hmeau.com"
+        id S229684AbhDBHMm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Apr 2021 03:12:42 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:51434 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229594AbhDBHGp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Apr 2021 03:06:45 -0400
+        id S229594AbhDBHMk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Apr 2021 03:12:40 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lSDtB-0001Hi-0e; Fri, 02 Apr 2021 18:06:42 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Apr 2021 18:06:40 +1100
-Date:   Fri, 2 Apr 2021 18:06:40 +1100
+        id 1lSDyk-0001JW-7X; Fri, 02 Apr 2021 18:12:27 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Apr 2021 18:12:26 +1100
+Date:   Fri, 2 Apr 2021 18:12:26 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Kai Ye <yekai13@huawei.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        wangzhou1@hisilicon.com
-Subject: Re: [PATCH 0/3] crypto: replace memset by memzero_explicit
-Message-ID: <20210402070640.GA10374@gondor.apana.org.au>
-References: <1616721648-56258-1-git-send-email-yekai13@huawei.com>
+To:     Meng Yu <yumeng18@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        xuzaibo@huawei.com, wangzhou1@hisilicon.com,
+        linux-kernel@vger.kernel.org, shenyang39@huawei.com
+Subject: Re: [PATCH] crypto: hisilicon/hpre - rsa key should not be empty
+Message-ID: <20210402071225.GA10423@gondor.apana.org.au>
+References: <1616739212-7751-1-git-send-email-yumeng18@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1616721648-56258-1-git-send-email-yekai13@huawei.com>
+In-Reply-To: <1616739212-7751-1-git-send-email-yumeng18@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Mar 26, 2021 at 09:20:45AM +0800, Kai Ye wrote:
->  use memzero_explicit instead of memset to clear sensitive data,
->  such as buffer or key.
+On Fri, Mar 26, 2021 at 02:13:32PM +0800, Meng Yu wrote:
+> We should ensure key is not empty before we set key.
+> 
+> Signed-off-by: Meng Yu <yumeng18@huawei.com>
+> ---
+>  drivers/crypto/hisilicon/hpre/hpre_crypto.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+> index 53068d2..7cf7d80 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+> +++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+> @@ -1093,6 +1093,9 @@ static int hpre_rsa_setpubkey(struct crypto_akcipher *tfm, const void *key,
+>  	struct hpre_ctx *ctx = akcipher_tfm_ctx(tfm);
+>  	int ret;
+>  
+> +	if (!key || !keylen)
+> +		return -EINVAL;
+> +
+>  	ret = crypto_akcipher_set_pub_key(ctx->rsa.soft_tfm, key, keylen);
 
-Does this fix a real issue? If not then it's just unnecessary
-churn.
+Does this fix a real bug? Wouldn't the soft fallback setkey catch
+this anyhow?
 
 Thanks,
 -- 
