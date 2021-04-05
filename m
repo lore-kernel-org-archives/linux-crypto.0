@@ -2,102 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67725C433ED
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Apr 2021 15:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF8D3C433ED
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Apr 2021 15:07:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C496613B1
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Apr 2021 15:06:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C9A1613B4
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Apr 2021 15:07:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237722AbhDEPGO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Apr 2021 11:06:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48222 "EHLO
+        id S241440AbhDEPHH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Apr 2021 11:07:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237631AbhDEPGN (ORCPT
+        with ESMTP id S241428AbhDEPHH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Apr 2021 11:06:13 -0400
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EC0EC061756;
-        Mon,  5 Apr 2021 08:06:07 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id x16so5552667qvk.3;
-        Mon, 05 Apr 2021 08:06:07 -0700 (PDT)
+        Mon, 5 Apr 2021 11:07:07 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96DB6C06178C
+        for <linux-crypto@vger.kernel.org>; Mon,  5 Apr 2021 08:06:59 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id ot17-20020a17090b3b51b0290109c9ac3c34so7980485pjb.4
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Apr 2021 08:06:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=HkmaU7uO+Gqi6kwhuOZHzewjW4WyDN9p8QYZvkjmLUQ=;
-        b=o404+zvxbJSKgDlbAkPMDH2HzDB5brq2vP5av3WsRS2UuUrCuotltU74N0QB8HY2s0
-         Ha91HZwZDunWX+0+9cNbsqPogw6T56JcvaNJvEk3cgb5NUNOnF8bNdvGLQUt5igABMpS
-         ikfluW8Wdk7m0mkZsG/OTTloYLXSasnMUTGzVlMF+qKxLtHd1iHBGO53UpvAyPZsODE0
-         9FXlkNETRqJEKspdbig8ho2/4kZYIROfVFMqjl1dNgG+ySM93k5IwuvUjq+/V/5NtqTG
-         TnZDsnb+3kXYgMMaJoy4vBV/Gfr7tqV5C4s5bohYLwHTIFO4fM+2B3oxMVLf5ILuIQDd
-         wxYw==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=nBPPSw2BQxZv3JDlctzmEukgrzYX1yJ+ZaCR4IZI8eQ=;
+        b=NI+p1o0Q/CMmczfcVuoWxmf3Ag3le4FRp9YUh+wTgeNm7hm6t2SdT8SMhF/WhnqhDC
+         1wyQSlMAxO1h7+9N1lc9VS8xbeqJc08aDb6XpltI6iXdgAVd0HdRaV5ia5X4EjAFxm/B
+         LrUpy8vj7tP/zQs/Q5Ls670smqXpVWCu3FiSlgHfrNb1zfF6jiOQph4F6WiUIuroIjOS
+         PDo1GG4V6wLhicRUHpO9Y2GYAcWInEE/+dsrVNfA4mlgiSC6ThfZgwsnOuI3DoPKRyT4
+         /5M/RkaJM7acKMan4+n5DC2pg0N4qwFAYEw0TUq+jqElU0djXNimbQZC/OgHl+In/CiZ
+         cGgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=HkmaU7uO+Gqi6kwhuOZHzewjW4WyDN9p8QYZvkjmLUQ=;
-        b=AIuuMRCpkhMPY91rdGMPxNGj7y3knIbjd3EmSrNH54kF9SB3/weLSGlCOzQw9PGcCm
-         EKNTuX3t3QRdvFBbfudJr0sggWWI5pG3KPc99J147Om2HzhrEHskX7cLZ/F7p6kq8hG0
-         0QGhs6dvlsnh2A1JodTqRBmXsdinhluLY+2dB8yscn9NufByP89AqGTus83+M9+7C7Mc
-         tyHPvK+YTx4sqgkI+Yc5Dn/QusSRXMgX0NETKgJUHE/hrTVep8gtjql6zcJN7EWEw5gB
-         ikeFxhFfoo6hviWZ8K1bJa88rDmKw1zezNijMWMGmdnSIob8hRfG3jGizO3qcR6BOlV2
-         1ahQ==
-X-Gm-Message-State: AOAM532EnF0AOuolpmw/sdbh1X7q8Y3ccSwWVPI/MgF+VxjV8cOi6u2K
-        VLmZYVvJBlPzxsERCQAAFKg=
-X-Google-Smtp-Source: ABdhPJygbYx3zJzhtrL72zf74ZJyzq2AzYW85ZUytYz9wR9ou1xTAM6ilMcXTeWHSSRpesUBgQT60g==
-X-Received: by 2002:a05:6214:d65:: with SMTP id 5mr23915240qvs.56.1617635166456;
-        Mon, 05 Apr 2021 08:06:06 -0700 (PDT)
-Received: from ubuntu-mate-laptop.hsd1.fl.comcast.net ([2601:703:380:74f0:1809:8a92:469f:d1b4])
-        by smtp.gmail.com with ESMTPSA id h13sm12362025qtn.26.2021.04.05.08.06.05
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=nBPPSw2BQxZv3JDlctzmEukgrzYX1yJ+ZaCR4IZI8eQ=;
+        b=UsTvHiwfWb3ljEq66Q1Qwk0MA6uomE8SG/pbvl4nUHVXIHwzXpH++Bd0hOduSo71rF
+         QFir3mjaE0TtYDWHSD1SIzPrlCvSuA0gWS9t0J/5Zbm6ZlmRSivBJZF1wko7kzHhLGLD
+         479QfjrrXASDRedAg8EfyJCKH9b8vrFiwehMKL0j+D9nhHKteo8ss/3FX26WZNBT3TXB
+         FNOSEFivwjl5qyqrahaexHwV2e5lTFPUCjjjE+C+5CXeO3cZZH3Cq27cEp8YtE0NN8M4
+         S+4XYPvRmIHkadJryPOLPgTQF1RDFz8YUQp12BWEJug75txaM5yGD3SU383LPLPilATs
+         DjOA==
+X-Gm-Message-State: AOAM530J+7kYVzRIVC5Knf+6rMrDeefArTje8JkGVq0OF45Iam279Pa2
+        6cY30h0MAeTwNpBRyinhNkAO0A==
+X-Google-Smtp-Source: ABdhPJxZ9W4I9YiyB5+kofac4gwyWUVlvz+/SY21ytvS8APwanRKo2/mW4wfgUZ3G4lS9DZXDflNYQ==
+X-Received: by 2002:a17:902:988d:b029:e8:dd65:e2b5 with SMTP id s13-20020a170902988db02900e8dd65e2b5mr9896147plp.36.1617635218900;
+        Mon, 05 Apr 2021 08:06:58 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id v13sm15319156pfu.54.2021.04.05.08.06.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Apr 2021 08:06:06 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-From:   Julian Braha <julianbraha@gmail.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        fazilyildiran@gmail.com
-Subject: [PATCH] crypto: fix CRYPTO_LIB_* dependencies on CRYPTO
-Date:   Mon,  5 Apr 2021 11:04:38 -0400
-Message-Id: <20210405150438.177783-1-julianbraha@gmail.com>
-X-Mailer: git-send-email 2.27.0
+        Mon, 05 Apr 2021 08:06:58 -0700 (PDT)
+Date:   Mon, 5 Apr 2021 15:06:54 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Borislav Petkov <bp@suse.de>
+Subject: Re: [PATCH 3/5] crypto: ccp: Play nice with vmalloc'd memory for SEV
+ command structs
+Message-ID: <YGsnjqFLoqXTrAHo@google.com>
+References: <20210402233702.3291792-1-seanjc@google.com>
+ <20210402233702.3291792-4-seanjc@google.com>
+ <8ea3744f-fdf7-1704-2860-40c2b8fb47e1@csgroup.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <8ea3744f-fdf7-1704-2860-40c2b8fb47e1@csgroup.eu>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently, when a config option selects a
-CRYPTO_LIB_* option while CRYPTO is disabled,
-Kbuild gives an unmet dependency. However,
-these config options do not actually need to
-depend on CRYPTO.
+On Sun, Apr 04, 2021, Christophe Leroy wrote:
+> 
+> Le 03/04/2021 à 01:37, Sean Christopherson a écrit :
+> > @@ -152,11 +153,21 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+> >   	sev = psp->sev_data;
+> >   	buf_len = sev_cmd_buffer_len(cmd);
+> > -	if (WARN_ON_ONCE(!!data != !!buf_len))
+> > +	if (WARN_ON_ONCE(!!__data != !!buf_len))
+> >   		return -EINVAL;
+> > -	if (WARN_ON_ONCE(data && is_vmalloc_addr(data)))
+> > -		return -EINVAL;
+> > +	if (__data && is_vmalloc_addr(__data)) {
+> > +		/*
+> > +		 * If the incoming buffer is virtually allocated, copy it to
+> > +		 * the driver's scratch buffer as __pa() will not work for such
+> > +		 * addresses, vmalloc_to_page() is not guaranteed to succeed,
+> > +		 * and vmalloc'd data may not be physically contiguous.
+> > +		 */
+> > +		data = sev->cmd_buf;
+> > +		memcpy(data, __data, buf_len);
+> > +	} else {
+> > +		data = __data;
+> > +	}
+> 
+> I don't know how big commands are, but if they are small, it would probably
+> be more efficient to inconditionnally copy them to the buffer rather then
+> doing the test.
 
-Signed-off-by: Julian Braha <julianbraha@gmail.com>
----
- crypto/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 5809cc198fa7..fb7eca5cb8c6 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1870,9 +1870,9 @@ config CRYPTO_STATS
- config CRYPTO_HASH_INFO
- 	bool
- 
--source "lib/crypto/Kconfig"
- source "drivers/crypto/Kconfig"
- source "crypto/asymmetric_keys/Kconfig"
- source "certs/Kconfig"
- 
- endif	# if CRYPTO
-+source "lib/crypto/Kconfig"
--- 
-2.27.0
+Brijesh, I assume SNP support will need to copy the commands unconditionally? If
+yes, it probably makes sense to do so now and avoid vmalloc dependencies
+completely.  And I think that would allow for the removal of status_cmd_buf and
+init_cmd_buf, or is there another reason those dedicated buffers exist?
 
