@@ -2,137 +2,261 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE90C433B4
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Apr 2021 12:58:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50DF5C43462
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Apr 2021 13:12:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3315A613A0
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Apr 2021 12:58:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C364613D0
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Apr 2021 13:12:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243426AbhDFM66 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Apr 2021 08:58:58 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:15559 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242308AbhDFM66 (ORCPT
+        id S243574AbhDFNMS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Apr 2021 09:12:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54488 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243549AbhDFNMR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Apr 2021 08:58:58 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FF6w35vTdzPnkh;
-        Tue,  6 Apr 2021 20:56:03 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 6 Apr 2021 20:58:39 +0800
-From:   Weili Qian <qianweili@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>,
-        <liulongfang@huawei.com>, Weili Qian <qianweili@huawei.com>
-Subject: [PATCH] crypto: hisilicon/qm - add stop queue by hardware
-Date:   Tue, 6 Apr 2021 20:56:02 +0800
-Message-ID: <1617713762-52120-1-git-send-email-qianweili@huawei.com>
-X-Mailer: git-send-email 2.8.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+        Tue, 6 Apr 2021 09:12:17 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 932A2C06174A;
+        Tue,  6 Apr 2021 06:12:09 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id a12so10397174pfc.7;
+        Tue, 06 Apr 2021 06:12:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=4855aNw2LatAHXTXuzuJc1nAQQQ5xJZ+1xXY2jTJQsE=;
+        b=XXZGmLcVT68sBY3mzO2g0lCHyn+uHYijiqN0FsTYMbKR7OwptN+Xb2dLC635oWHPO+
+         yCbIy2vCr8RbCFO/wF94xUUJQxqJaFaFc4TuOnB5nUHY4X19Iy6oHoHxJZIBu6JULYlZ
+         0F6yBjGRLKgoerSnlGu3V+x3DOEeHW1+WgtQ9XylrDoIYaPYVE3MbyGJr10RPBdW7IND
+         2sizdCUmFjJAH7zRAhEvt5GTMuHaArxblA0FH9tXsSSUfvm1Onsng7blkTIvj09rHHqF
+         0FtPttOAehjdf9x97p9mZh2BEQ4UhtNobNcBXxjWrl2aYyXMsFOmL0zTA/Q4PpVB0jxO
+         mPjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=4855aNw2LatAHXTXuzuJc1nAQQQ5xJZ+1xXY2jTJQsE=;
+        b=q91IwXh7/cNx+QTYrEdZO9ogozQEvH+9Rvk0n0kr1twi5yOCPWfpunYxRHgeetoZhc
+         ZYp9JQV4wtJPTD1KelcfWHnXMRoXwp1oVAW6EIDVqw58n6PS+GuiGPAYVmY37LvYPX+r
+         PdHgYXETqFXwVtcRNhZop0mlXuAW/q14U4zPe92y/PlCnbALru6jMRttp6Mloit8O32b
+         6eNXenygKYl48N4PNTZMou2t065F9GUePhkNMAT6+kxV8glJCDFUYWRSm5HQgDwFh5VS
+         1D6H3QovnaenqQRldf88H4a+SiFs4iEKywHEPWkHnszCAdhQdBk8zL9NBwNMFyuyenOi
+         ibKg==
+X-Gm-Message-State: AOAM533Z6djdhHoEDpp7O7ZbqWlaLcqzEYPoxKkSf9ueSsVAHbXxAEBK
+        bjWtCeFsu0ISk3RvW6s8gzjRe/QtPkygPQ==
+X-Google-Smtp-Source: ABdhPJxXjgT+ZSCUEazm+W2pAtrVbVyGAT4XZO5RsU2AI+6/F3+eOMRHjn2PSM3IkG728+8F4dsD3w==
+X-Received: by 2002:a63:4944:: with SMTP id y4mr27461331pgk.9.1617714728748;
+        Tue, 06 Apr 2021 06:12:08 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.39])
+        by smtp.gmail.com with ESMTPSA id i73sm13801351pgc.9.2021.04.06.06.12.06
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 06 Apr 2021 06:12:08 -0700 (PDT)
+From:   Hongbo Li <herbert.tencent@gmail.com>
+To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, dhowells@redhat.com,
+        zohar@linux.ibm.com, jarkko@kernel.org, herberthbli@tencent.com
+Cc:     linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
+Subject: [PATCH 1/5] x509: add support for rsa-pss
+Date:   Tue,  6 Apr 2021 21:11:22 +0800
+Message-Id: <1617714686-25754-2-git-send-email-herbert.tencent@gmail.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1617714686-25754-1-git-send-email-herbert.tencent@gmail.com>
+References: <1617714686-25754-1-git-send-email-herbert.tencent@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Kunpeng930 could be able to stop queue by writing hardware registers,
-which will trigger tasks in device to be flushed out.
+From: Hongbo Li <herberthbli@tencent.com>
 
-In order to be compatible with the kunpeng920 driver, add 'qm_hw_ops_v3' to
-adapt Kunpeng930. And 'stop_qp' callback is added in 'qm_hw_ops_v3' to
-write hardware registers. Call 'stop_qp' to drain the tasks in device
-before releasing queue.
+This patch make x509 support rsa-pss, because the sha algo is
+in signature, so we need to parse the sha parameter, and skip
+other params.
 
-Signed-off-by: Weili Qian <qianweili@huawei.com>
-Reviewed-by: Longfang Liu <liulongfang@huawei.com>
+Signed-off-by: Hongbo Li <herberthbli@tencent.com>
 ---
- drivers/crypto/hisilicon/qm.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+ crypto/asymmetric_keys/Makefile           |  7 ++-
+ crypto/asymmetric_keys/public_key.c       |  5 +++
+ crypto/asymmetric_keys/x509_cert_parser.c | 71 +++++++++++++++++++++++++++++--
+ include/linux/oid_registry.h              |  2 +
+ 4 files changed, 80 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index c91e57a..05f96aa 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -38,6 +38,7 @@
- #define QM_MB_CMD_SQC_BT		0x4
- #define QM_MB_CMD_CQC_BT		0x5
- #define QM_MB_CMD_SQC_VFT_V2		0x6
-+#define QM_MB_CMD_STOP_QP		0x8
+diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
+index 28b91ad..9092de7 100644
+--- a/crypto/asymmetric_keys/Makefile
++++ b/crypto/asymmetric_keys/Makefile
+@@ -20,15 +20,20 @@ obj-$(CONFIG_X509_CERTIFICATE_PARSER) += x509_key_parser.o
+ x509_key_parser-y := \
+ 	x509.asn1.o \
+ 	x509_akid.asn1.o \
++	x509_rsapss_params.asn1.o \
+ 	x509_cert_parser.o \
+ 	x509_public_key.o
  
- #define QM_MB_CMD_SEND_BASE		0x300
- #define QM_MB_EVENT_SHIFT		8
-@@ -349,6 +350,7 @@ struct hisi_qm_hw_ops {
- 	void (*hw_error_init)(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe);
- 	void (*hw_error_uninit)(struct hisi_qm *qm);
- 	enum acc_err_result (*hw_error_handle)(struct hisi_qm *qm);
-+	int (*stop_qp)(struct hisi_qp *qp);
- };
- 
- struct qm_dfx_item {
-@@ -1711,6 +1713,11 @@ static enum acc_err_result qm_hw_error_handle_v2(struct hisi_qm *qm)
- 	return ACC_ERR_RECOVERED;
- }
- 
-+static int qm_stop_qp(struct hisi_qp *qp)
-+{
-+	return qm_mb(qp->qm, QM_MB_CMD_STOP_QP, 0, qp->qp_id, 0);
-+}
+ $(obj)/x509_cert_parser.o: \
+ 	$(obj)/x509.asn1.h \
+-	$(obj)/x509_akid.asn1.h
++	$(obj)/x509_akid.asn1.h \
++	$(obj)/x509_rsapss_params.asn1.h
 +
- static const struct hisi_qm_hw_ops qm_hw_ops_v1 = {
- 	.qm_db = qm_db_v1,
- 	.get_irq_num = qm_get_irq_num_v1,
-@@ -1726,6 +1733,16 @@ static const struct hisi_qm_hw_ops qm_hw_ops_v2 = {
- 	.hw_error_handle = qm_hw_error_handle_v2,
- };
  
-+static const struct hisi_qm_hw_ops qm_hw_ops_v3 = {
-+	.get_vft = qm_get_vft_v2,
-+	.qm_db = qm_db_v2,
-+	.get_irq_num = qm_get_irq_num_v2,
-+	.hw_error_init = qm_hw_error_init_v2,
-+	.hw_error_uninit = qm_hw_error_uninit_v2,
-+	.hw_error_handle = qm_hw_error_handle_v2,
-+	.stop_qp = qm_stop_qp,
-+};
-+
- static void *qm_get_avail_sqe(struct hisi_qp *qp)
- {
- 	struct hisi_qp_status *qp_status = &qp->qp_status;
-@@ -2005,6 +2022,14 @@ static int qm_drain_qp(struct hisi_qp *qp)
- 	if (qm->err_status.is_qm_ecc_mbit || qm->err_status.is_dev_ecc_mbit)
- 		return 0;
+ $(obj)/x509.asn1.o: $(obj)/x509.asn1.c $(obj)/x509.asn1.h
+ $(obj)/x509_akid.asn1.o: $(obj)/x509_akid.asn1.c $(obj)/x509_akid.asn1.h
++$(obj)/x509_rsapss_params.asn1.o: \
++	$(obj)/x509_rsapss_params.asn1.c $(obj)/x509_rsapss_params.asn1.h
  
-+	/* Kunpeng930 supports drain qp by device */
-+	if (qm->ops->stop_qp) {
-+		ret = qm->ops->stop_qp(qp);
-+		if (ret)
-+			dev_err(dev, "Failed to stop qp(%u)!\n", qp->qp_id);
-+		return ret;
+ #
+ # PKCS#8 private key handling
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 788a4ba..cf049fd 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -83,6 +83,11 @@ int software_key_determine_akcipher(const char *encoding,
+ 				     "pkcs1pad(%s,%s)",
+ 				     pkey->pkey_algo, hash_algo);
+ 		return n >= CRYPTO_MAX_ALG_NAME ? -EINVAL : 0;
++	} else if (strcmp(encoding, "pss") == 0) {
++		n = snprintf(alg_name, CRYPTO_MAX_ALG_NAME,
++			     "psspad(%s)",
++			     pkey->pkey_algo);
++		return n >= CRYPTO_MAX_ALG_NAME ? -EINVAL : 0;
+ 	}
+ 
+ 	if (strcmp(encoding, "raw") == 0) {
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 52c9b45..ec3428d 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -15,6 +15,7 @@
+ #include "x509_parser.h"
+ #include "x509.asn1.h"
+ #include "x509_akid.asn1.h"
++#include "x509_rsapss_params.asn1.h"
+ 
+ struct x509_parse_context {
+ 	struct x509_certificate	*cert;		/* Certificate being constructed */
+@@ -115,6 +116,17 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
+ 	cert->pub->paramlen = ctx->params_size;
+ 	cert->pub->algo = ctx->key_algo;
+ 
++	if (!strcmp(cert->sig->pkey_algo, "rsa") &&
++	    !strcmp(cert->sig->encoding, "pss") &&
++	    cert->pub->paramlen) {
++		ret = asn1_ber_decoder(&x509_rsapss_params_decoder, ctx,
++				       cert->pub->params, cert->pub->paramlen);
++		if (ret < 0) {
++			pr_warn("Couldn't decode rsapss params\n");
++			goto error_decode;
++		}
 +	}
 +
- 	addr = qm_ctx_alloc(qm, size, &dma_addr);
- 	if (IS_ERR(addr)) {
- 		dev_err(dev, "Failed to alloc ctx for sqc and cqc!\n");
-@@ -2565,8 +2590,10 @@ static void hisi_qm_pre_init(struct hisi_qm *qm)
+ 	/* Grab the signature bits */
+ 	ret = x509_get_sig_params(cert);
+ 	if (ret < 0)
+@@ -211,6 +223,10 @@ int x509_note_pkey_algo(void *context, size_t hdrlen,
+ 		ctx->cert->sig->hash_algo = "sha1";
+ 		goto rsa_pkcs1;
  
- 	if (qm->ver == QM_HW_V1)
- 		qm->ops = &qm_hw_ops_v1;
--	else
-+	else if (qm->ver == QM_HW_V2)
- 		qm->ops = &qm_hw_ops_v2;
-+	else
-+		qm->ops = &qm_hw_ops_v3;
++	case OID_rsa_pss:
++		ctx->cert->sig->hash_algo = "sha1";
++		goto rsa_pss;
++
+ 	case OID_sha256WithRSAEncryption:
+ 		ctx->cert->sig->hash_algo = "sha256";
+ 		goto rsa_pkcs1;
+@@ -245,6 +261,11 @@ int x509_note_pkey_algo(void *context, size_t hdrlen,
+ 	ctx->cert->sig->encoding = "pkcs1";
+ 	ctx->algo_oid = ctx->last_oid;
+ 	return 0;
++rsa_pss:
++	ctx->cert->sig->pkey_algo = "rsa";
++	ctx->cert->sig->encoding = "pss";
++	ctx->algo_oid = ctx->last_oid;
++	return 0;
+ ecrdsa:
+ 	ctx->cert->sig->pkey_algo = "ecrdsa";
+ 	ctx->cert->sig->encoding = "raw";
+@@ -440,17 +461,59 @@ int x509_note_params(void *context, size_t hdrlen,
+ 	struct x509_parse_context *ctx = context;
  
- 	pci_set_drvdata(pdev, qm);
- 	mutex_init(&qm->mailbox_lock);
+ 	/*
+-	 * AlgorithmIdentifier is used three times in the x509, we should skip
+-	 * first and ignore third, using second one which is after subject and
+-	 * before subjectPublicKey.
++	 * AlgorithmIdentifier is used three times in the x509,
++	 * rsapss:
++	 * we skip first(same as third) and second(may omit params).
++	 * others:
++	 * we should skip first and ignore third, using second one
++	 * which is after subject and before subjectPublicKey.
+ 	 */
+-	if (!ctx->cert->raw_subject || ctx->key)
++	if (!ctx->cert->raw_subject) {
++		return 0;
++	} else if (strcmp(ctx->cert->sig->pkey_algo, "rsa") ||
++		   strcmp(ctx->cert->sig->encoding, "pss")) {
++		if (ctx->key)
++			return 0;
++	} else if (!ctx->key) {
+ 		return 0;
++	}
++
+ 	ctx->params = value - hdrlen;
+ 	ctx->params_size = vlen + hdrlen;
+ 	return 0;
+ }
+ 
++int x509_note_rsapss_hash(void *context, size_t hdrlen,
++			  unsigned char tag,
++			  const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++	enum OID oid;
++
++	oid = look_up_OID(value, vlen);
++	switch (oid) {
++	case OID_sha1:
++		ctx->cert->sig->hash_algo = "sha1";
++		break;
++	case OID_sha224:
++		ctx->cert->sig->hash_algo = "sha224";
++		break;
++	case OID_sha256:
++		ctx->cert->sig->hash_algo = "sha256";
++		break;
++	case OID_sha384:
++		ctx->cert->sig->hash_algo = "sha384";
++		break;
++	case OID_sha512:
++		ctx->cert->sig->hash_algo = "sha512";
++		break;
++	default:
++		return -ENOPKG;
++	}
++
++	return 0;
++}
++
+ /*
+  * Extract the data for the public key algorithm
+  */
+diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
+index 4462ed2..bb22b84 100644
+--- a/include/linux/oid_registry.h
++++ b/include/linux/oid_registry.h
+@@ -28,6 +28,8 @@ enum OID {
+ 	OID_md3WithRSAEncryption,	/* 1.2.840.113549.1.1.3 */
+ 	OID_md4WithRSAEncryption,	/* 1.2.840.113549.1.1.4 */
+ 	OID_sha1WithRSAEncryption,	/* 1.2.840.113549.1.1.5 */
++	OID_rsa_mgf1,			/* 1.2.840.113549.1.1.8 */
++	OID_rsa_pss,			/* 1.2.840.113549.1.1.10 */
+ 	OID_sha256WithRSAEncryption,	/* 1.2.840.113549.1.1.11 */
+ 	OID_sha384WithRSAEncryption,	/* 1.2.840.113549.1.1.12 */
+ 	OID_sha512WithRSAEncryption,	/* 1.2.840.113549.1.1.13 */
 -- 
-2.8.1
+1.8.3.1
 
