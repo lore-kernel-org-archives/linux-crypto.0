@@ -2,113 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C38DC43460
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Apr 2021 13:12:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B14C433B4
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Apr 2021 14:25:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0718D613CA
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Apr 2021 13:12:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB3A3613C4
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Apr 2021 14:25:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344334AbhDFNMg (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Apr 2021 09:12:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54532 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344340AbhDFNM1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Apr 2021 09:12:27 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7D4C06174A;
-        Tue,  6 Apr 2021 06:12:19 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id k23-20020a17090a5917b02901043e35ad4aso9633995pji.3;
-        Tue, 06 Apr 2021 06:12:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=HYiI3Qt5V9Ym1wDCXtAMqzRtan5MPeNNbErHpQjqjSo=;
-        b=H1+5roLu+BgC96/PO7bvk2Fj+LggM1PiHxcKaDK5NixMlyj95EmmZ5O88WExJhjY7g
-         WLCjuZtbteWy0/qTUeREmJOnZDVTydhhLuTRrrfkPRbIVVpcXFGp/Vtzlzqbyx69k+Fn
-         eICIXLov5pAQJ7ezNug1i78DmcqSrxG9Uc+9w0fvYtoQ3paTFlXCh8xmjmuvZmm2Vv4Q
-         tWyEMXR4uREtGoBxu6yGZOGjeyQypQGsm5viPinZ2llLbF9r5GUM1WSFBc5T1fFd4qma
-         lgJu8Pja/hTVVNgSH4Nv3xGJjnGjXNbfZm7PDRn1TyxEXaRRM9la+nE4kaWjmHpSPx8p
-         6VVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=HYiI3Qt5V9Ym1wDCXtAMqzRtan5MPeNNbErHpQjqjSo=;
-        b=sItT37G3ht6H2xrOE9I+X2i/vRDunJFxXzAhFS28EeyfcoKFphl5GuyPQuYGKpubWt
-         IisaPl2p2unPhiufKt67MVFXzh+meoUkw6NV9VfwRx9fVMk0Pa1WVHHeFiqguIPPiy36
-         5MWoPODoyG2IU69o96utwT3pD1O5chEaxu8MEeSdGN5pqGg4NmzmCeKWbEYQVL5TYLs3
-         hdgvyXAuCl/pJD9wupyqbTLhgGy1Paj/TVxkmslms3+nr981rQE6w21LCILTChawNiPU
-         LKRHPCgM7YjaH/6IW1zFia6anU85WHi96PU3p64hrXmXy6OQuJqeKvE+x5611RnsKxj6
-         4gLA==
-X-Gm-Message-State: AOAM533AoZr9QnWMNGnhA+3tEQToDnpLlqTMTF50CStmqS0yTp8KNoOC
-        qWkkinF6EmnP2+V7nmWVrt7thSP1Yz+1Ww==
-X-Google-Smtp-Source: ABdhPJyTAOsz8017uMn9D36NmPU78+ws1EeSX9Yk2v+yRjXYtcQ+9zjIdNKM0ekzM2IcQ9GH0P/dEg==
-X-Received: by 2002:a17:90a:1f0e:: with SMTP id u14mr4425394pja.155.1617714738516;
-        Tue, 06 Apr 2021 06:12:18 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.39])
-        by smtp.gmail.com with ESMTPSA id i73sm13801351pgc.9.2021.04.06.06.12.16
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Apr 2021 06:12:18 -0700 (PDT)
-From:   Hongbo Li <herbert.tencent@gmail.com>
-To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, dhowells@redhat.com,
-        zohar@linux.ibm.com, jarkko@kernel.org, herberthbli@tencent.com
-Cc:     linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
-Subject: [PATCH 5/5] ima: add support for rsa pss verification
-Date:   Tue,  6 Apr 2021 21:11:26 +0800
-Message-Id: <1617714686-25754-6-git-send-email-herbert.tencent@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1617714686-25754-1-git-send-email-herbert.tencent@gmail.com>
-References: <1617714686-25754-1-git-send-email-herbert.tencent@gmail.com>
+        id S240673AbhDFOZg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Apr 2021 10:25:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44818 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230032AbhDFOZg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Apr 2021 10:25:36 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DCB3C613B3;
+        Tue,  6 Apr 2021 14:25:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1617719128;
+        bh=vNtEwGcZISehAqNRkZmr9T8agA6B1FBpji1ztURbj9c=;
+        h=From:To:Cc:Subject:Date:From;
+        b=fPEL+PrNq2Wo+kYIIz6T6zMJsLUuM0TNd1mTNhczorVRv/aBiuzw6a14Bx6XvaC78
+         xSSPcQD06GHTLq6PBybPWnzlNRSms/MtZPniIb9iwqfD6S15CK4PnODlxS51ZZ+tpd
+         LP5uStXqLWHG6tbYBIfJcvRr256xlEzXYA6u+iU2ltOKjcFQs+Aa840yS0JJkVNQoW
+         vc3gWUtcz374LgQ2Me/Iw/FYubwmbrv1foN0gRctguQa3G7WPRxUz8lfaRA83u9mHe
+         EyDg+eTwK+Ijh+/K8jdVuKw60CGrBRb6C2qNuOi9SGBV1IucF6Ypmc5R4Y7KC7Vg9b
+         XHTQwKulvnqww==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] crypto: arm64/aes-ce - deal with oversight in new CTR carry code
+Date:   Tue,  6 Apr 2021 16:25:23 +0200
+Message-Id: <20210406142523.1101817-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Hongbo Li <herberthbli@tencent.com>
+The new carry handling code in the CTR driver can deal with a carry
+occurring in the 4x/5x parallel code path, by using a computed goto to
+jump into the carry sequence at the right place as to only apply the
+carry to a subset of the blocks being processed.
 
-This patch adds support for ima verification for rsa with
-pss encoding.
+If the lower half of the counter wraps and ends up at exactly 0x0, a
+carry needs to be applied to the counter, but not to the counter values
+taken for the 4x/5x parallel sequence. In this case, the computed goto
+skips all register assignments, and branches straight to the jump
+instruction that gets us back to the fast path. This produces the
+correct result, but due to the fact that this branch target does not
+carry the correct BTI annotation, this fails when BTI is enabled.
 
-And a patch for ima-evm-utils will be sent later.
+Let's omit the computed goto entirely in this case, and jump straight
+back to the fast path after applying the carry to the main counter.
 
-Signed-off-by: Hongbo Li <herberthbli@tencent.com>
+Fixes: 5318d3db465d ("crypto: arm64/aes-ctr - improve tail handling")
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- security/integrity/digsig_asymmetric.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/arm64/crypto/aes-modes.S | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
-index 183f452..ef7a51a 100644
---- a/security/integrity/digsig_asymmetric.c
-+++ b/security/integrity/digsig_asymmetric.c
-@@ -85,6 +85,7 @@ int asymmetric_verify(struct key *keyring, const char *sig,
- 	struct public_key_signature pks;
- 	struct signature_v2_hdr *hdr = (struct signature_v2_hdr *)sig;
- 	const struct public_key *pk;
-+	struct public_key_signature *cert_sig;
- 	struct key *key;
- 	int ret;
+diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
+index ab6c14ef9f4e..6d1a120c533d 100644
+--- a/arch/arm64/crypto/aes-modes.S
++++ b/arch/arm64/crypto/aes-modes.S
+@@ -359,6 +359,7 @@ ST5(	mov		v4.16b, vctr.16b		)
+ 	ins		vctr.d[0], x8
  
-@@ -110,7 +111,11 @@ int asymmetric_verify(struct key *keyring, const char *sig,
- 	pk = asymmetric_key_public_key(key);
- 	pks.pkey_algo = pk->pkey_algo;
- 	if (!strcmp(pk->pkey_algo, "rsa")) {
--		pks.encoding = "pkcs1";
-+		cert_sig = key->payload.data[asym_auth];
-+		if (cert_sig)
-+			pks.encoding = cert_sig->encoding;
-+		else
-+			pks.encoding = "pkcs1";
- 	} else if (!strncmp(pk->pkey_algo, "ecdsa-", 6)) {
- 		/* edcsa-nist-p192 etc. */
- 		pks.encoding = "x962";
+ 	/* apply carry to N counter blocks for N := x12 */
++	cbz		x12, 2f
+ 	adr		x16, 1f
+ 	sub		x16, x16, x12, lsl #3
+ 	br		x16
 -- 
-1.8.3.1
+2.31.0.208.g409f899ff0-goog
 
