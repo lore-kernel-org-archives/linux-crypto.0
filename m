@@ -2,83 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C173AC433ED
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Apr 2021 22:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F69C433ED
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Apr 2021 00:52:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94647610A8
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Apr 2021 22:50:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC458613EA
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Apr 2021 00:52:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236175AbhDEWuZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Apr 2021 18:50:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49104 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230437AbhDEWuZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Apr 2021 18:50:25 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2C60B610F7;
-        Mon,  5 Apr 2021 22:50:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617663018;
-        bh=jwG/SVA70p3cCFjxeo1Cc4nwxlx4YQ4mgj/uqTiKhzM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SyXg+H61jDxehfGJrvMJx/iqfyWBFXFGaOqH4c5vN189apZMeIoT5+41PIVQm0dS8
-         Unby9nu9GA98/c5cj/jWidXatuzD3LD62GhBs/5IPlvmmsdVEks00LDkFBnex5XvAc
-         /kHrrmUDzJ3X6Nldye06AaEkYkCV24HvD/fx5OietwSDrdcAmf3z2zU+S3cd4mLL7x
-         WJrUszXA9v1O6A76lCzXthNWQ2rUAx/sEK2zXLe0F/n9Pd3o8pfTNINiWY5oVSeGNu
-         OLXoIn1oIHh3S1GSyx48+fgRAjw9ErWxbrirP67W11/goPiiCkg3pYhR+ye2B52KH5
-         C7+7BCNiaLhPg==
-Date:   Mon, 5 Apr 2021 15:50:16 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Julian Braha <julianbraha@gmail.com>
-Cc:     herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, fazilyildiran@gmail.com
-Subject: Re: [PATCH] crypto: fix CRYPTO_LIB_* dependencies on CRYPTO
-Message-ID: <YGuUKBPHRqjmjdQd@gmail.com>
-References: <20210405150438.177783-1-julianbraha@gmail.com>
+        id S238577AbhDFAwS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Apr 2021 20:52:18 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:15599 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237938AbhDFAwS (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Apr 2021 20:52:18 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FDppH5dlHz18H8f;
+        Tue,  6 Apr 2021 08:49:59 +0800 (CST)
+Received: from [10.67.103.10] (10.67.103.10) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.498.0; Tue, 6 Apr 2021
+ 08:52:00 +0800
+Subject: Re: [PATCH] crypto: hisilicon/hpre - rsa key should not be empty
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>,
+        <linux-kernel@vger.kernel.org>, <shenyang39@huawei.com>
+References: <1616739212-7751-1-git-send-email-yumeng18@huawei.com>
+ <20210402071225.GA10423@gondor.apana.org.au>
+ <7384e015-5514-d6b2-4215-beb1f4701adb@huawei.com>
+ <20210402102223.GA24978@gondor.apana.org.au>
+From:   yumeng <yumeng18@huawei.com>
+Message-ID: <639630ef-f0c3-1ccb-983d-0cb9d2ac2952@huawei.com>
+Date:   Tue, 6 Apr 2021 08:51:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210405150438.177783-1-julianbraha@gmail.com>
+In-Reply-To: <20210402102223.GA24978@gondor.apana.org.au>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.103.10]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 05, 2021 at 11:04:38AM -0400, Julian Braha wrote:
-> Currently, when a config option selects a
-> CRYPTO_LIB_* option while CRYPTO is disabled,
-> Kbuild gives an unmet dependency. However,
-> these config options do not actually need to
-> depend on CRYPTO.
-> 
-> Signed-off-by: Julian Braha <julianbraha@gmail.com>
-> ---
->  crypto/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 5809cc198fa7..fb7eca5cb8c6 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -1870,9 +1870,9 @@ config CRYPTO_STATS
->  config CRYPTO_HASH_INFO
->  	bool
->  
-> -source "lib/crypto/Kconfig"
->  source "drivers/crypto/Kconfig"
->  source "crypto/asymmetric_keys/Kconfig"
->  source "certs/Kconfig"
->  
->  endif	# if CRYPTO
-> +source "lib/crypto/Kconfig"
-> -- 
 
-Actually some of the files in lib/crypto/ do depend on CRYPTO.  For example,
-there are calls to crypto_xor_cpy() and crypto_memneq(), which call functions
-defined in crypto/algapi.c and crypto/memneq.c.  These helper functions would
-need to be moved into lib/crypto/ for this to work.
 
-- Eric
+ÔÚ 2021/4/2 18:22, Herbert Xu Ð´µÀ:
+> On Fri, Apr 02, 2021 at 06:16:16PM +0800, yumeng wrote:
+>>
+>> I think it is not a real bug, and soft fallback setkey can always catch the
+>> error.
+>> But our original intention was to make it don't go to 'xxx_set_pub_key'
+>> when the key is null, and it can return an error earlier.
+>> But maybe it is not good.
+> 
+> It might make sense to check them twice if you were touching them
+> directly, e.g., poking inside the key.  However, it appears that
+> your driver simply palms off the key to rsa_helper.c which should
+> check the key/keylen too so I think there is no need for this patch
+> for now.
+> 
+> Thanks,
+> 
+
+OK, thank you.
