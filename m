@@ -7,34 +7,34 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5514BC433B4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC21C433ED
 	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 14:18:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1874061359
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 14:18:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3EF4611C1
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 14:18:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348192AbhDGOSs (ORCPT
+        id S1348176AbhDGOSs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 7 Apr 2021 10:18:48 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:15159 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344321AbhDGOSs (ORCPT
+Received: from szxga07-in.huawei.com ([45.249.212.35]:16815 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232885AbhDGOSs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 7 Apr 2021 10:18:48 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FFmdd6xXszpW59;
-        Wed,  7 Apr 2021 22:15:49 +0800 (CST)
-Received: from localhost (10.174.179.96) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.498.0; Wed, 7 Apr 2021
- 22:18:28 +0800
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FFmfK3gNhz941H;
+        Wed,  7 Apr 2021 22:16:25 +0800 (CST)
+Received: from localhost (10.174.179.96) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.498.0; Wed, 7 Apr 2021
+ 22:18:30 +0800
 From:   YueHaibing <yuehaibing@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH -next 2/5] crypto: img-hash - Remove redundant dev_err call in img_hash_probe()
-Date:   Wed, 7 Apr 2021 22:18:16 +0800
-Message-ID: <20210407141819.32588-3-yuehaibing@huawei.com>
+Subject: [PATCH -next 4/5] crypto: keembay - Remove redundant dev_err calls
+Date:   Wed, 7 Apr 2021 22:18:18 +0800
+Message-ID: <20210407141819.32588-5-yuehaibing@huawei.com>
 X-Mailer: git-send-email 2.10.2.windows.1
 In-Reply-To: <20210407141819.32588-1-yuehaibing@huawei.com>
 References: <20210407141819.32588-1-yuehaibing@huawei.com>
@@ -46,36 +46,48 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-devm_platform_ioremap_resource() and devm_ioremap_resource()
-will print err msg while failing, so the redundant dev_err call
-can be removed.
+There is a error message within devm_ioremap_resource
+already, so remove the dev_err call to avoid redundant
+error message.
 
 Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- drivers/crypto/img-hash.c | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/crypto/keembay/keembay-ocs-aes-core.c | 4 +---
+ drivers/crypto/keembay/keembay-ocs-hcu-core.c | 4 +---
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
-index e813115d5432..aa4c7b2af3e2 100644
---- a/drivers/crypto/img-hash.c
-+++ b/drivers/crypto/img-hash.c
-@@ -963,8 +963,6 @@ static int img_hash_probe(struct platform_device *pdev)
- 	hdev->io_base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(hdev->io_base)) {
- 		err = PTR_ERR(hdev->io_base);
--		dev_err(dev, "can't ioremap, returned %d\n", err);
--
- 		goto res_err;
+diff --git a/drivers/crypto/keembay/keembay-ocs-aes-core.c b/drivers/crypto/keembay/keembay-ocs-aes-core.c
+index 2ef312866338..e2a39fdaf623 100644
+--- a/drivers/crypto/keembay/keembay-ocs-aes-core.c
++++ b/drivers/crypto/keembay/keembay-ocs-aes-core.c
+@@ -1623,10 +1623,8 @@ static int kmb_ocs_aes_probe(struct platform_device *pdev)
  	}
  
-@@ -972,7 +970,6 @@ static int img_hash_probe(struct platform_device *pdev)
- 	hash_res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
- 	hdev->cpu_addr = devm_ioremap_resource(dev, hash_res);
- 	if (IS_ERR(hdev->cpu_addr)) {
--		dev_err(dev, "can't ioremap write port\n");
- 		err = PTR_ERR(hdev->cpu_addr);
- 		goto res_err;
+ 	aes_dev->base_reg = devm_ioremap_resource(&pdev->dev, aes_mem);
+-	if (IS_ERR(aes_dev->base_reg)) {
+-		dev_err(dev, "Failed to get base address\n");
++	if (IS_ERR(aes_dev->base_reg))
+ 		return PTR_ERR(aes_dev->base_reg);
+-	}
+ 
+ 	/* Get and request IRQ */
+ 	aes_dev->irq = platform_get_irq(pdev, 0);
+diff --git a/drivers/crypto/keembay/keembay-ocs-hcu-core.c b/drivers/crypto/keembay/keembay-ocs-hcu-core.c
+index 322c51a6936f..0379dbf32a4c 100644
+--- a/drivers/crypto/keembay/keembay-ocs-hcu-core.c
++++ b/drivers/crypto/keembay/keembay-ocs-hcu-core.c
+@@ -1192,10 +1192,8 @@ static int kmb_ocs_hcu_probe(struct platform_device *pdev)
  	}
+ 
+ 	hcu_dev->io_base = devm_ioremap_resource(dev, hcu_mem);
+-	if (IS_ERR(hcu_dev->io_base)) {
+-		dev_err(dev, "Could not io-remap mem resource.\n");
++	if (IS_ERR(hcu_dev->io_base))
+ 		return PTR_ERR(hcu_dev->io_base);
+-	}
+ 
+ 	init_completion(&hcu_dev->irq_done);
+ 
 -- 
 2.17.1
 
