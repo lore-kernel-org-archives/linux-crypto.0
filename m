@@ -2,127 +2,377 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCEC6C433ED
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 03:50:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ABA3C433B4
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 05:18:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A48D8613BD
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 03:50:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0F18613C6
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 05:18:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348452AbhDGDuv (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Apr 2021 23:50:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48486 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348503AbhDGDuO (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Apr 2021 23:50:14 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CBCBC06174A;
-        Tue,  6 Apr 2021 20:50:05 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id v10so11930783pfn.5;
-        Tue, 06 Apr 2021 20:50:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=OnoshHT7kOoHWmdZSKOnaWYfp7XXeFLdosqxj5qpzjw=;
-        b=STPtszXRctw9+TT+8la68Rw7DOYaMtI0tX6b8mngOAGmS1T6mKx0a4cHotreGlXe6V
-         18OTdoQ0kuH07dofW/hHJ0EPEeQ3NSNPFXlnozpugT+8gU2CoSG4Pj/3yYR/843dxE5B
-         dG8uOypKWrfITGmTatSA/usQbXqaYeTuinYPVsOCx0jbjwxH/5+pgU0ZM1z+sghvk+99
-         OXCYYdawNMl4Lb7f7HzogMVVmdtbOKQeEfnPai4G/u+XRqfbAFfIYjJAFIv2sbFwp8M+
-         5RgWjN1M8zIPMCKy/enAamjffecFK8hbBCd1uiB4NyKoCjQMn57gzmH8GVftt4KF2sqN
-         JhdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=OnoshHT7kOoHWmdZSKOnaWYfp7XXeFLdosqxj5qpzjw=;
-        b=JSu8rj0Dvq/1DB2LaGP0liC0d12PmF5Dtnfi55O6Iq6jQMx0Prg7DUi/+omkrS5qPr
-         XZK0/yIisE9eNHM+Eqe80nNyVSJZgWZ3clFawhsasPEtpYLAvdCgAjR99A1+JTCxVvyi
-         0/pfQ3BW+RXWjxowdsn74bRlLea7+gjvNqbdVH8vcq8RCtbf+bhE4sV2uxJ76w6U0dVK
-         dTRDcE2BekOwzXKyJBpCUn+nEQx9d07aruO2flvjVus7L7rWkT75FkLwkIaiF5OAKu06
-         Wmvn4fFiEB8nKtjvrvoz3cBW3RCwZEhOxgysKPmDyK/0lRD+CwRt+naXl7B6PfJ6Ghf0
-         qUAw==
-X-Gm-Message-State: AOAM533QkLOAW8xAhENjiK3tsG4AeYj00tv9jsnwQYIMwYZ9M1TsSx4W
-        bOr13LtAtgwZVB8w2zjvUIgbbfEAr7Wujw==
-X-Google-Smtp-Source: ABdhPJxwUwf+Ht4SscvgaZ4jjMxxQAp1ebQInQIU8paP0SN8akViV9uKyJSfo+sAOtjokY76YKlI6g==
-X-Received: by 2002:aa7:8756:0:b029:242:3e63:87da with SMTP id g22-20020aa787560000b02902423e6387damr602819pfo.66.1617767404663;
-        Tue, 06 Apr 2021 20:50:04 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.39])
-        by smtp.gmail.com with ESMTPSA id s21sm6000922pgl.36.2021.04.06.20.50.02
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Apr 2021 20:50:04 -0700 (PDT)
-From:   Hongbo Li <herbert.tencent@gmail.com>
-To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, dhowells@redhat.com,
-        zohar@linux.ibm.com, jarkko@kernel.org, herberthbli@tencent.com
-Cc:     linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
-        Hongbo Li <herbert.tencent@gmail.com>
-Subject: [PATCH v3 4/4] ima: add support for rsa pss verification
-Date:   Wed,  7 Apr 2021 11:49:18 +0800
-Message-Id: <1617767358-25279-5-git-send-email-herbert.tencent@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1617767358-25279-1-git-send-email-herbert.tencent@gmail.com>
-References: <1617767358-25279-1-git-send-email-herbert.tencent@gmail.com>
+        id S244479AbhDGFS3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Apr 2021 01:18:29 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:56697 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229603AbhDGFS3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Apr 2021 01:18:29 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 4FFXjP3J3lz9txtp;
+        Wed,  7 Apr 2021 07:18:17 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id 6vzWpDzipn1p; Wed,  7 Apr 2021 07:18:17 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 4FFXjP1Vm5z9txtn;
+        Wed,  7 Apr 2021 07:18:17 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id BA7748B781;
+        Wed,  7 Apr 2021 07:18:17 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id 65bLtPcC481K; Wed,  7 Apr 2021 07:18:17 +0200 (CEST)
+Received: from [192.168.4.90] (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 6557F8B75F;
+        Wed,  7 Apr 2021 07:18:16 +0200 (CEST)
+Subject: Re: [PATCH v2 5/8] crypto: ccp: Use the stack for small SEV command
+ buffers
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Borislav Petkov <bp@suse.de>
+References: <20210406224952.4177376-1-seanjc@google.com>
+ <20210406224952.4177376-6-seanjc@google.com>
+From:   Christophe Leroy <christophe.leroy@csgroup.eu>
+Message-ID: <354d67c0-addc-011a-5203-93a2071bb780@csgroup.eu>
+Date:   Wed, 7 Apr 2021 07:18:13 +0200
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
+MIME-Version: 1.0
+In-Reply-To: <20210406224952.4177376-6-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds support for ima verification for rsa with
-pss encoding.
 
-And a patch for ima-evm-utils will be sent later.
 
-Signed-off-by: Hongbo Li <herbert.tencent@gmail.com>
----
- security/integrity/digsig_asymmetric.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+Le 07/04/2021 à 00:49, Sean Christopherson a écrit :
+> For commands with small input/output buffers, use the local stack to
+> "allocate" the structures used to communicate with the PSP.   Now that
+> __sev_do_cmd_locked() gracefully handles vmalloc'd buffers, there's no
+> reason to avoid using the stack, e.g. CONFIG_VMAP_STACK=y will just work.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   drivers/crypto/ccp/sev-dev.c | 122 ++++++++++++++---------------------
+>   1 file changed, 47 insertions(+), 75 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 4aedbdaffe90..bb0d6de071e6 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -396,7 +396,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+>   {
+>   	struct sev_device *sev = psp_master->sev_data;
+>   	struct sev_user_data_pek_csr input;
+> -	struct sev_data_pek_csr *data;
+> +	struct sev_data_pek_csr data;
 
-diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
-index 23240d7..ef7a51a 100644
---- a/security/integrity/digsig_asymmetric.c
-+++ b/security/integrity/digsig_asymmetric.c
-@@ -85,6 +85,7 @@ int asymmetric_verify(struct key *keyring, const char *sig,
- 	struct public_key_signature pks;
- 	struct signature_v2_hdr *hdr = (struct signature_v2_hdr *)sig;
- 	const struct public_key *pk;
-+	struct public_key_signature *cert_sig;
- 	struct key *key;
- 	int ret;
- 
-@@ -109,16 +110,21 @@ int asymmetric_verify(struct key *keyring, const char *sig,
- 
- 	pk = asymmetric_key_public_key(key);
- 	pks.pkey_algo = pk->pkey_algo;
--	if (!strcmp(pk->pkey_algo, "rsa"))
--		pks.encoding = "pkcs1";
--	else if (!strncmp(pk->pkey_algo, "ecdsa-", 6))
-+	if (!strcmp(pk->pkey_algo, "rsa")) {
-+		cert_sig = key->payload.data[asym_auth];
-+		if (cert_sig)
-+			pks.encoding = cert_sig->encoding;
-+		else
-+			pks.encoding = "pkcs1";
-+	} else if (!strncmp(pk->pkey_algo, "ecdsa-", 6)) {
- 		/* edcsa-nist-p192 etc. */
- 		pks.encoding = "x962";
--	else if (!strcmp(pk->pkey_algo, "ecrdsa") ||
--		   !strcmp(pk->pkey_algo, "sm2"))
-+	} else if (!strcmp(pk->pkey_algo, "ecrdsa") ||
-+		   !strcmp(pk->pkey_algo, "sm2")) {
- 		pks.encoding = "raw";
--	else
-+	} else {
- 		return -ENOPKG;
-+	}
- 
- 	pks.digest = (u8 *)data;
- 	pks.digest_size = datalen;
--- 
-1.8.3.1
+struct sev_data_pek_csr data = {0, 0};
 
+>   	void __user *input_address;
+>   	void *blob = NULL;
+>   	int ret;
+> @@ -407,29 +407,24 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+>   	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+>   		return -EFAULT;
+>   
+> -	data = kzalloc(sizeof(*data), GFP_KERNEL);
+> -	if (!data)
+> -		return -ENOMEM;
+> -
+>   	/* userspace wants to query CSR length */
+> -	if (!input.address || !input.length)
+> +	if (!input.address || !input.length) {
+> +		data.address = 0;
+> +		data.len = 0;
+
+With the change proposed above, those two new lines are unneeded.
+
+>   		goto cmd;
+> +	}
+>   
+>   	/* allocate a physically contiguous buffer to store the CSR blob */
+>   	input_address = (void __user *)input.address;
+> -	if (input.length > SEV_FW_BLOB_MAX_SIZE) {
+> -		ret = -EFAULT;
+> -		goto e_free;
+> -	}
+> +	if (input.length > SEV_FW_BLOB_MAX_SIZE)
+> +		return -EFAULT;
+>   
+>   	blob = kmalloc(input.length, GFP_KERNEL);
+> -	if (!blob) {
+> -		ret = -ENOMEM;
+> -		goto e_free;
+> -	}
+> +	if (!blob)
+> +		return -ENOMEM;
+>   
+> -	data->address = __psp_pa(blob);
+> -	data->len = input.length;
+> +	data.address = __psp_pa(blob);
+> +	data.len = input.length;
+>   
+>   cmd:
+>   	if (sev->state == SEV_STATE_UNINIT) {
+> @@ -438,10 +433,10 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+>   			goto e_free_blob;
+>   	}
+>   
+> -	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, data, &argp->error);
+> +	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
+>   
+>   	 /* If we query the CSR length, FW responded with expected data. */
+> -	input.length = data->len;
+> +	input.length = data.len;
+>   
+>   	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
+>   		ret = -EFAULT;
+> @@ -455,8 +450,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+>   
+>   e_free_blob:
+>   	kfree(blob);
+> -e_free:
+> -	kfree(data);
+>   	return ret;
+>   }
+>   
+> @@ -588,7 +581,7 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+>   {
+>   	struct sev_device *sev = psp_master->sev_data;
+>   	struct sev_user_data_pek_cert_import input;
+> -	struct sev_data_pek_cert_import *data;
+> +	struct sev_data_pek_cert_import data;
+>   	void *pek_blob, *oca_blob;
+>   	int ret;
+>   
+> @@ -598,19 +591,14 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+>   	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+>   		return -EFAULT;
+>   
+> -	data = kzalloc(sizeof(*data), GFP_KERNEL);
+> -	if (!data)
+> -		return -ENOMEM;
+> -
+>   	/* copy PEK certificate blobs from userspace */
+>   	pek_blob = psp_copy_user_blob(input.pek_cert_address, input.pek_cert_len);
+> -	if (IS_ERR(pek_blob)) {
+> -		ret = PTR_ERR(pek_blob);
+> -		goto e_free;
+> -	}
+> +	if (IS_ERR(pek_blob))
+> +		return PTR_ERR(pek_blob);
+>   
+> -	data->pek_cert_address = __psp_pa(pek_blob);
+> -	data->pek_cert_len = input.pek_cert_len;
+> +	data.reserved = 0;
+> +	data.pek_cert_address = __psp_pa(pek_blob);
+> +	data.pek_cert_len = input.pek_cert_len;
+>   
+>   	/* copy PEK certificate blobs from userspace */
+>   	oca_blob = psp_copy_user_blob(input.oca_cert_address, input.oca_cert_len);
+> @@ -619,8 +607,8 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+>   		goto e_free_pek;
+>   	}
+>   
+> -	data->oca_cert_address = __psp_pa(oca_blob);
+> -	data->oca_cert_len = input.oca_cert_len;
+> +	data.oca_cert_address = __psp_pa(oca_blob);
+> +	data.oca_cert_len = input.oca_cert_len;
+>   
+>   	/* If platform is not in INIT state then transition it to INIT */
+>   	if (sev->state != SEV_STATE_INIT) {
+> @@ -629,21 +617,19 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+>   			goto e_free_oca;
+>   	}
+>   
+> -	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, data, &argp->error);
+> +	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, &argp->error);
+>   
+>   e_free_oca:
+>   	kfree(oca_blob);
+>   e_free_pek:
+>   	kfree(pek_blob);
+> -e_free:
+> -	kfree(data);
+>   	return ret;
+>   }
+>   
+>   static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+>   {
+>   	struct sev_user_data_get_id2 input;
+> -	struct sev_data_get_id *data;
+> +	struct sev_data_get_id data;
+>   	void __user *input_address;
+>   	void *id_blob = NULL;
+>   	int ret;
+> @@ -657,28 +643,25 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+>   
+>   	input_address = (void __user *)input.address;
+>   
+> -	data = kzalloc(sizeof(*data), GFP_KERNEL);
+> -	if (!data)
+> -		return -ENOMEM;
+> -
+>   	if (input.address && input.length) {
+>   		id_blob = kmalloc(input.length, GFP_KERNEL);
+> -		if (!id_blob) {
+> -			kfree(data);
+> +		if (!id_blob)
+>   			return -ENOMEM;
+> -		}
+>   
+> -		data->address = __psp_pa(id_blob);
+> -		data->len = input.length;
+> +		data.address = __psp_pa(id_blob);
+> +		data.len = input.length;
+> +	} else {
+> +		data.address = 0;
+> +		data.len = 0;
+>   	}
+>   
+> -	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, data, &argp->error);
+> +	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, &data, &argp->error);
+>   
+>   	/*
+>   	 * Firmware will return the length of the ID value (either the minimum
+>   	 * required length or the actual length written), return it to the user.
+>   	 */
+> -	input.length = data->len;
+> +	input.length = data.len;
+>   
+>   	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
+>   		ret = -EFAULT;
+> @@ -686,7 +669,7 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+>   	}
+>   
+>   	if (id_blob) {
+> -		if (copy_to_user(input_address, id_blob, data->len)) {
+> +		if (copy_to_user(input_address, id_blob, data.len)) {
+>   			ret = -EFAULT;
+>   			goto e_free;
+>   		}
+> @@ -694,7 +677,6 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+>   
+>   e_free:
+>   	kfree(id_blob);
+> -	kfree(data);
+>   
+>   	return ret;
+>   }
+> @@ -744,7 +726,7 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>   	struct sev_device *sev = psp_master->sev_data;
+>   	struct sev_user_data_pdh_cert_export input;
+>   	void *pdh_blob = NULL, *cert_blob = NULL;
+> -	struct sev_data_pdh_cert_export *data;
+> +	struct sev_data_pdh_cert_export data;
+
+struct sev_data_pdh_cert_export data = {0, 0, 0, 0, 0};
+
+>   	void __user *input_cert_chain_address;
+>   	void __user *input_pdh_cert_address;
+>   	int ret;
+> @@ -762,9 +744,7 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>   	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+>   		return -EFAULT;
+>   
+> -	data = kzalloc(sizeof(*data), GFP_KERNEL);
+> -	if (!data)
+> -		return -ENOMEM;
+> +	memset(&data, 0, sizeof(data));
+
+You can avoid that memset by initing at declaration, see above.
+
+>   
+>   	/* Userspace wants to query the certificate length. */
+>   	if (!input.pdh_cert_address ||
+> @@ -776,25 +756,19 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>   	input_cert_chain_address = (void __user *)input.cert_chain_address;
+>   
+>   	/* Allocate a physically contiguous buffer to store the PDH blob. */
+> -	if (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE) {
+> -		ret = -EFAULT;
+> -		goto e_free;
+> -	}
+> +	if (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE)
+> +		return -EFAULT;
+>   
+>   	/* Allocate a physically contiguous buffer to store the cert chain blob. */
+> -	if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE) {
+> -		ret = -EFAULT;
+> -		goto e_free;
+> -	}
+> +	if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)
+> +		return -EFAULT;
+>   
+>   	pdh_blob = kmalloc(input.pdh_cert_len, GFP_KERNEL);
+> -	if (!pdh_blob) {
+> -		ret = -ENOMEM;
+> -		goto e_free;
+> -	}
+> +	if (!pdh_blob)
+> +		return -ENOMEM;
+>   
+> -	data->pdh_cert_address = __psp_pa(pdh_blob);
+> -	data->pdh_cert_len = input.pdh_cert_len;
+> +	data.pdh_cert_address = __psp_pa(pdh_blob);
+> +	data.pdh_cert_len = input.pdh_cert_len;
+>   
+>   	cert_blob = kmalloc(input.cert_chain_len, GFP_KERNEL);
+>   	if (!cert_blob) {
+> @@ -802,15 +776,15 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>   		goto e_free_pdh;
+>   	}
+>   
+> -	data->cert_chain_address = __psp_pa(cert_blob);
+> -	data->cert_chain_len = input.cert_chain_len;
+> +	data.cert_chain_address = __psp_pa(cert_blob);
+> +	data.cert_chain_len = input.cert_chain_len;
+>   
+>   cmd:
+> -	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, data, &argp->error);
+> +	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, &data, &argp->error);
+>   
+>   	/* If we query the length, FW responded with expected data. */
+> -	input.cert_chain_len = data->cert_chain_len;
+> -	input.pdh_cert_len = data->pdh_cert_len;
+> +	input.cert_chain_len = data.cert_chain_len;
+> +	input.pdh_cert_len = data.pdh_cert_len;
+>   
+>   	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
+>   		ret = -EFAULT;
+> @@ -835,8 +809,6 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>   	kfree(cert_blob);
+>   e_free_pdh:
+>   	kfree(pdh_blob);
+> -e_free:
+> -	kfree(data);
+>   	return ret;
+>   }
+>   
+> 
