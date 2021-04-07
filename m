@@ -2,669 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45597C433ED
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 05:25:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3430C433ED
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 08:27:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3B056113D
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 05:25:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81DA3613C0
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 08:27:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348662AbhDGFZV (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Apr 2021 01:25:21 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:18103 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348658AbhDGFZU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Apr 2021 01:25:20 -0400
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 4FFXs41SCvz9txtv;
-        Wed,  7 Apr 2021 07:24:56 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id T5beRjCfygZX; Wed,  7 Apr 2021 07:24:56 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 4FFXs408vRz9txtt;
-        Wed,  7 Apr 2021 07:24:56 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id AEB4B8B783;
-        Wed,  7 Apr 2021 07:24:56 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id ifU7OUdFeB9E; Wed,  7 Apr 2021 07:24:56 +0200 (CEST)
-Received: from [192.168.4.90] (unknown [192.168.4.90])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id B90FA8B75F;
-        Wed,  7 Apr 2021 07:24:55 +0200 (CEST)
-Subject: Re: [PATCH v2 8/8] KVM: SVM: Allocate SEV command structures on local
- stack
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Borislav Petkov <bp@suse.de>
-References: <20210406224952.4177376-1-seanjc@google.com>
- <20210406224952.4177376-9-seanjc@google.com>
-From:   Christophe Leroy <christophe.leroy@csgroup.eu>
-Message-ID: <9df3b755-d71a-bfdf-8bee-f2cd2883ea2f@csgroup.eu>
-Date:   Wed, 7 Apr 2021 07:24:54 +0200
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S237663AbhDGI2A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Apr 2021 04:28:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52620 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234075AbhDGI2A (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Apr 2021 04:28:00 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DFE9C06174A;
+        Wed,  7 Apr 2021 01:27:51 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id z136so9784577iof.10;
+        Wed, 07 Apr 2021 01:27:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=djudLDvHwEVU2WU8NDvA4IyM3ENxYTXigjVkyoD/6zA=;
+        b=YVtMO4qROFI2J7M7msR5I/ifZpotUbDk9w+rRLP04uVJomAUAtR/Cx3JpT4QpCyUHM
+         tuBEsVUO0hE/v7uXs1ya24JtCLYFtHoUZ6sEYqJ8A3YAL9lTR+R+7CKgKCOvE+0Xomuk
+         KNigI7Dio0f1Zf7shf5vIB4C6Q6xxMddkBhg3JsDHMMa0O95ssdrFvlWtouiMmrbrn8s
+         e51SarZBEa5r42cLvUEWPKlum5z5LAojm65hyX575gDM6zMsixt7/pBB/lVuT1twp2xI
+         DJ43xcs5AUUBQCboa9vzR1L94GEQhZ7UHStB14o/EvqUk7RguwIWDm17z9alJ00F/nzJ
+         AoxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=djudLDvHwEVU2WU8NDvA4IyM3ENxYTXigjVkyoD/6zA=;
+        b=Qu6+ECK9IlZpy8S4bR3FAdI4iA/iTqIp3FhHd1caxjc6eIvIQsjpBTakvDx0YZGETS
+         daIqjOvpwx6mEJYEcskazeUGL7h9hKPbWZ+dM0OVFET7Erbyt75gh51TvngNIdKo4kUI
+         e+K2jqsQ936FUwRd2xb/5kGQp6lDZ7azNWu0ucM2hrcD7qLvMEZfSYKCvCBSKvYoG8CJ
+         UcE4NRW34+POxIGaeT27wy+Icpx8ms2oS+BJoZHeT/ZtD+Nx94P3Y6lQHtq+poUxYx8E
+         DOAC9bEoWndL9RZSPtHkUm45lHhtEfG3nVfpSii6kA+ihhb1q9ds4y+Uvc+AZYsUEkX/
+         1QnA==
+X-Gm-Message-State: AOAM532nyKE3qUSBRId0+m/JTWKC/Xj4QwPI/ekh8wF/SFRfSO+X6lra
+        Zmz9JH5e+CPaEPsPYRH/IW1TxdsCRCIcpjdnaYA=
+X-Google-Smtp-Source: ABdhPJzL90CZ4H7yfHpvZX2YphgdvTHneERnJtP3zRX/dAAcA0ssysTUIBIrRDUmiyQcAxOXB2AvkybJU9h30AuRX+Q=
+X-Received: by 2002:a02:9645:: with SMTP id c63mr2375068jai.84.1617784070654;
+ Wed, 07 Apr 2021 01:27:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210406224952.4177376-9-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
+References: <20210330202829.4825-1-varad.gautam@suse.com> <20210330202829.4825-2-varad.gautam@suse.com>
+In-Reply-To: <20210330202829.4825-2-varad.gautam@suse.com>
+From:   hongbo li <herbert.tencent@gmail.com>
+Date:   Wed, 7 Apr 2021 16:27:40 +0800
+Message-ID: <CABpmuw+ht5BmNtqN+pJt7A0ZHp7JJArZtj51hkhBc96L8iwvwg@mail.gmail.com>
+Subject: Re: [PATCH 01/18] X.509: Parse RSASSA-PSS style certificates
+To:     Varad Gautam <varad.gautam@suse.com>
+Cc:     linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hello Varad=EF=BC=8C
 
+I also made an implementation of rsa pss: "[PATCH v3 0/4] crypto: add
+rsa pss support for x509".
+I notice your patches and did some review,  find the following
+differences between our patches:
+1. You rework the rsa pad framework. This is reasonable.
+2. You did some changes on the keyctl and asymmetric struct. I don't
+see the reason.
+    Because for x509 layer, it only need to know the hash param, and
+could ignore other params(salt len, mgfhash).
+    Let rsa-pss itself parse the pss related params. So it seems we
+don't need to change asymmetric's
+    common struct.
+3. Why reject the cert whose MGF is different from the hash function
+used for signature generation?
+   My implementation could support different hashes, so don't get your poin=
+t.
+4. I add a test vector and a patch to support using rsa-pss for iam.
+5. Other implementation difference, i.e. the mgf and verify functions.
 
-Le 07/04/2021 à 00:49, Sean Christopherson a écrit :
-> Use the local stack to "allocate" the structures used to communicate with
-> the PSP.  The largest struct used by KVM, sev_data_launch_secret, clocks
-> in at 52 bytes, well within the realm of reasonable stack usage.  The
-> smallest structs are a mere 4 bytes, i.e. the pointer for the allocation
-> is larger than the allocation itself.
-> 
-> Now that the PSP driver plays nice with vmalloc pointers, putting the
-> data on a virtually mapped stack (CONFIG_VMAP_STACK=y) will not cause
-> explosions.
-> 
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Maybe we could merge our patches, what's your opinion?
+
+Best regards
+
+Hongbo
+
+Varad Gautam <varad.gautam@suse.com> =E4=BA=8E2021=E5=B9=B43=E6=9C=8831=E6=
+=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=884:31=E5=86=99=E9=81=93=EF=BC=9A
+>
+> An X.509 wrapper for a RSASSA-PSS signature contains additional
+> signature parameters over the PKCSv.15 encoding scheme. Extend the
+> x509 parser to allow parsing RSASSA-PSS encoded certificates, with
+> the defaults taken from RFC8017.
+>
+> A certificate is rejected if the hash function used for the MGF is
+> different from the hash function used for signature generation,
+> although this is allowed in RFC8017.
+>
+> References: https://tools.ietf.org/html/rfc8017#appendix-C
+> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 > ---
->   arch/x86/kvm/svm/sev.c | 262 +++++++++++++++--------------------------
->   1 file changed, 96 insertions(+), 166 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 5457138c7347..316fd39c7aef 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -150,35 +150,22 @@ static void sev_asid_free(int asid)
->   
->   static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
->   {
-> -	struct sev_data_decommission *decommission;
-> -	struct sev_data_deactivate *data;
-> +	struct sev_data_decommission decommission;
-> +	struct sev_data_deactivate deactivate;
->   
->   	if (!handle)
->   		return;
->   
-> -	data = kzalloc(sizeof(*data), GFP_KERNEL);
-> -	if (!data)
-> -		return;
-> -
-> -	/* deactivate handle */
-> -	data->handle = handle;
-> +	deactivate.handle = handle;
->   
->   	/* Guard DEACTIVATE against WBINVD/DF_FLUSH used in ASID recycling */
->   	down_read(&sev_deactivate_lock);
-> -	sev_guest_deactivate(data, NULL);
-> +	sev_guest_deactivate(&deactivate, NULL);
->   	up_read(&sev_deactivate_lock);
->   
-> -	kfree(data);
-> -
-> -	decommission = kzalloc(sizeof(*decommission), GFP_KERNEL);
-> -	if (!decommission)
-> -		return;
-> -
->   	/* decommission handle */
-> -	decommission->handle = handle;
-> -	sev_guest_decommission(decommission, NULL);
-> -
-> -	kfree(decommission);
-> +	decommission.handle = handle;
-> +	sev_guest_decommission(&decommission, NULL);
->   }
->   
->   static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> @@ -216,19 +203,14 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   
->   static int sev_bind_asid(struct kvm *kvm, unsigned int handle, int *error)
->   {
-> -	struct sev_data_activate *data;
-> +	struct sev_data_activate activate;
->   	int asid = sev_get_asid(kvm);
->   	int ret;
->   
-> -	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
-> -	if (!data)
-> -		return -ENOMEM;
-> -
->   	/* activate ASID on the given handle */
-> -	data->handle = handle;
-> -	data->asid   = asid;
-> -	ret = sev_guest_activate(data, error);
-> -	kfree(data);
-> +	activate.handle = handle;
-> +	activate.asid   = asid;
-> +	ret = sev_guest_activate(&activate, error);
->   
->   	return ret;
->   }
-> @@ -258,7 +240,7 @@ static int sev_issue_cmd(struct kvm *kvm, int id, void *data, int *error)
->   static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   {
->   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> -	struct sev_data_launch_start *start;
-> +	struct sev_data_launch_start start;
-
-struct sev_data_launch_start start = {0, 0, 0, 0, 0, 0, 0};
-
->   	struct kvm_sev_launch_start params;
->   	void *dh_blob, *session_blob;
->   	int *error = &argp->error;
-> @@ -270,20 +252,16 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
->   		return -EFAULT;
->   
-> -	start = kzalloc(sizeof(*start), GFP_KERNEL_ACCOUNT);
-> -	if (!start)
-> -		return -ENOMEM;
-> +	memset(&start, 0, sizeof(start));
-
-Not needed.
-
->   
->   	dh_blob = NULL;
->   	if (params.dh_uaddr) {
->   		dh_blob = psp_copy_user_blob(params.dh_uaddr, params.dh_len);
-> -		if (IS_ERR(dh_blob)) {
-> -			ret = PTR_ERR(dh_blob);
-> -			goto e_free;
-> -		}
-> +		if (IS_ERR(dh_blob))
-> +			return PTR_ERR(dh_blob);
->   
-> -		start->dh_cert_address = __sme_set(__pa(dh_blob));
-> -		start->dh_cert_len = params.dh_len;
-> +		start.dh_cert_address = __sme_set(__pa(dh_blob));
-> +		start.dh_cert_len = params.dh_len;
->   	}
->   
->   	session_blob = NULL;
-> @@ -294,40 +272,38 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   			goto e_free_dh;
->   		}
->   
-> -		start->session_address = __sme_set(__pa(session_blob));
-> -		start->session_len = params.session_len;
-> +		start.session_address = __sme_set(__pa(session_blob));
-> +		start.session_len = params.session_len;
->   	}
->   
-> -	start->handle = params.handle;
-> -	start->policy = params.policy;
-> +	start.handle = params.handle;
-> +	start.policy = params.policy;
->   
->   	/* create memory encryption context */
-> -	ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_LAUNCH_START, start, error);
-> +	ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_LAUNCH_START, &start, error);
->   	if (ret)
->   		goto e_free_session;
->   
->   	/* Bind ASID to this guest */
-> -	ret = sev_bind_asid(kvm, start->handle, error);
-> +	ret = sev_bind_asid(kvm, start.handle, error);
->   	if (ret)
->   		goto e_free_session;
->   
->   	/* return handle to userspace */
-> -	params.handle = start->handle;
-> +	params.handle = start.handle;
->   	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params))) {
-> -		sev_unbind_asid(kvm, start->handle);
-> +		sev_unbind_asid(kvm, start.handle);
->   		ret = -EFAULT;
->   		goto e_free_session;
->   	}
->   
-> -	sev->handle = start->handle;
-> +	sev->handle = start.handle;
->   	sev->fd = argp->sev_fd;
->   
->   e_free_session:
->   	kfree(session_blob);
->   e_free_dh:
->   	kfree(dh_blob);
-> -e_free:
-> -	kfree(start);
->   	return ret;
->   }
->   
-> @@ -446,7 +422,7 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   	unsigned long vaddr, vaddr_end, next_vaddr, npages, pages, size, i;
->   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
->   	struct kvm_sev_launch_update_data params;
-> -	struct sev_data_launch_update_data *data;
-> +	struct sev_data_launch_update_data data;
->   	struct page **inpages;
->   	int ret;
->   
-> @@ -456,20 +432,14 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
->   		return -EFAULT;
->   
-> -	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
-> -	if (!data)
-> -		return -ENOMEM;
-> -
->   	vaddr = params.uaddr;
->   	size = params.len;
->   	vaddr_end = vaddr + size;
->   
->   	/* Lock the user memory. */
->   	inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
-> -	if (IS_ERR(inpages)) {
-> -		ret = PTR_ERR(inpages);
-> -		goto e_free;
-> -	}
-> +	if (IS_ERR(inpages))
-> +		return PTR_ERR(inpages);
->   
->   	/*
->   	 * Flush (on non-coherent CPUs) before LAUNCH_UPDATE encrypts pages in
-> @@ -477,6 +447,9 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   	 */
->   	sev_clflush_pages(inpages, npages);
->   
-> +	data.reserved = 0;
-> +	data.handle = sev->handle;
-> +
->   	for (i = 0; vaddr < vaddr_end; vaddr = next_vaddr, i += pages) {
->   		int offset, len;
->   
-> @@ -491,10 +464,9 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   
->   		len = min_t(size_t, ((pages * PAGE_SIZE) - offset), size);
->   
-> -		data->handle = sev->handle;
-> -		data->len = len;
-> -		data->address = __sme_page_pa(inpages[i]) + offset;
-> -		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA, data, &argp->error);
-> +		data.len = len;
-> +		data.address = __sme_page_pa(inpages[i]) + offset;
-> +		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA, &data, &argp->error);
->   		if (ret)
->   			goto e_unpin;
->   
-> @@ -510,8 +482,6 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   	}
->   	/* unlock the user pages */
->   	sev_unpin_memory(kvm, inpages, npages);
-> -e_free:
-> -	kfree(data);
->   	return ret;
->   }
->   
-> @@ -563,16 +533,14 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
->   static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   {
->   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> -	struct sev_data_launch_update_vmsa *vmsa;
-> +	struct sev_data_launch_update_vmsa vmsa;
->   	struct kvm_vcpu *vcpu;
->   	int i, ret;
->   
->   	if (!sev_es_guest(kvm))
->   		return -ENOTTY;
->   
-> -	vmsa = kzalloc(sizeof(*vmsa), GFP_KERNEL);
-> -	if (!vmsa)
-> -		return -ENOMEM;
-> +	vmsa.reserved = 0;
->   
->   	kvm_for_each_vcpu(i, vcpu, kvm) {
->   		struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -580,7 +548,7 @@ static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   		/* Perform some pre-encryption checks against the VMSA */
->   		ret = sev_es_sync_vmsa(svm);
->   		if (ret)
-> -			goto e_free;
-> +			return ret;
->   
->   		/*
->   		 * The LAUNCH_UPDATE_VMSA command will perform in-place
-> @@ -590,27 +558,25 @@ static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   		 */
->   		clflush_cache_range(svm->vmsa, PAGE_SIZE);
->   
-> -		vmsa->handle = sev->handle;
-> -		vmsa->address = __sme_pa(svm->vmsa);
-> -		vmsa->len = PAGE_SIZE;
-> -		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, vmsa,
-> +		vmsa.handle = sev->handle;
-> +		vmsa.address = __sme_pa(svm->vmsa);
-> +		vmsa.len = PAGE_SIZE;
-> +		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa,
->   				    &argp->error);
->   		if (ret)
-> -			goto e_free;
-> +			return ret;
->   
->   		svm->vcpu.arch.guest_state_protected = true;
->   	}
->   
-> -e_free:
-> -	kfree(vmsa);
-> -	return ret;
-> +	return 0;
->   }
->   
->   static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   {
->   	void __user *measure = (void __user *)(uintptr_t)argp->data;
->   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> -	struct sev_data_launch_measure *data;
-> +	struct sev_data_launch_measure data;
-
-struct sev_data_launch_measure data = {0, 0, 0, 0};
-
->   	struct kvm_sev_launch_measure params;
->   	void __user *p = NULL;
->   	void *blob = NULL;
-> @@ -622,9 +588,7 @@ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   	if (copy_from_user(&params, measure, sizeof(params)))
->   		return -EFAULT;
->   
-> -	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
-> -	if (!data)
-> -		return -ENOMEM;
-> +	memset(&data, 0, sizeof(data));
-
-Not needed
-
->   
->   	/* User wants to query the blob length */
->   	if (!params.len)
-> @@ -632,23 +596,20 @@ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   
->   	p = (void __user *)(uintptr_t)params.uaddr;
->   	if (p) {
-> -		if (params.len > SEV_FW_BLOB_MAX_SIZE) {
-> -			ret = -EINVAL;
-> -			goto e_free;
-> -		}
-> +		if (params.len > SEV_FW_BLOB_MAX_SIZE)
-> +			return -EINVAL;
->   
-> -		ret = -ENOMEM;
->   		blob = kmalloc(params.len, GFP_KERNEL_ACCOUNT);
->   		if (!blob)
-> -			goto e_free;
-> +			return -ENOMEM;
->   
-> -		data->address = __psp_pa(blob);
-> -		data->len = params.len;
-> +		data.address = __psp_pa(blob);
-> +		data.len = params.len;
->   	}
->   
->   cmd:
-> -	data->handle = sev->handle;
-> -	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_MEASURE, data, &argp->error);
-> +	data.handle = sev->handle;
-> +	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_MEASURE, &data, &argp->error);
->   
->   	/*
->   	 * If we query the session length, FW responded with expected data.
-> @@ -665,63 +626,50 @@ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   	}
->   
->   done:
-> -	params.len = data->len;
-> +	params.len = data.len;
->   	if (copy_to_user(measure, &params, sizeof(params)))
->   		ret = -EFAULT;
->   e_free_blob:
->   	kfree(blob);
-> -e_free:
-> -	kfree(data);
->   	return ret;
->   }
->   
->   static int sev_launch_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   {
->   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> -	struct sev_data_launch_finish *data;
-> -	int ret;
-> +	struct sev_data_launch_finish data;
->   
->   	if (!sev_guest(kvm))
->   		return -ENOTTY;
->   
-> -	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
-> -	if (!data)
-> -		return -ENOMEM;
-> -
-> -	data->handle = sev->handle;
-> -	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_FINISH, data, &argp->error);
-> -
-> -	kfree(data);
-> -	return ret;
-> +	data.handle = sev->handle;
-> +	return sev_issue_cmd(kvm, SEV_CMD_LAUNCH_FINISH, &data, &argp->error);
->   }
->   
->   static int sev_guest_status(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   {
->   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
->   	struct kvm_sev_guest_status params;
-> -	struct sev_data_guest_status *data;
-> +	struct sev_data_guest_status data = {0, 0, 0, 0};
->   	int ret;
->   
->   	if (!sev_guest(kvm))
->   		return -ENOTTY;
->   
-> -	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
-> -	if (!data)
-> -		return -ENOMEM;
-> +	memset(&data, 0, sizeof(data));
-
-not needed
-
->   
-> -	data->handle = sev->handle;
-> -	ret = sev_issue_cmd(kvm, SEV_CMD_GUEST_STATUS, data, &argp->error);
-> +	data.handle = sev->handle;
-> +	ret = sev_issue_cmd(kvm, SEV_CMD_GUEST_STATUS, &data, &argp->error);
->   	if (ret)
-> -		goto e_free;
-> +		return ret;
->   
-> -	params.policy = data->policy;
-> -	params.state = data->state;
-> -	params.handle = data->handle;
-> +	params.policy = data.policy;
-> +	params.state = data.state;
-> +	params.handle = data.handle;
->   
->   	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params)))
->   		ret = -EFAULT;
-> -e_free:
-> -	kfree(data);
-> +
->   	return ret;
->   }
->   
-> @@ -730,23 +678,17 @@ static int __sev_issue_dbg_cmd(struct kvm *kvm, unsigned long src,
->   			       int *error, bool enc)
->   {
->   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> -	struct sev_data_dbg *data;
-> -	int ret;
-> +	struct sev_data_dbg data;
->   
-> -	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
-> -	if (!data)
-> -		return -ENOMEM;
-> +	data.reserved = 0;
-> +	data.handle = sev->handle;
-> +	data.dst_addr = dst;
-> +	data.src_addr = src;
-> +	data.len = size;
->   
-> -	data->handle = sev->handle;
-> -	data->dst_addr = dst;
-> -	data->src_addr = src;
-> -	data->len = size;
-> -
-> -	ret = sev_issue_cmd(kvm,
-> -			    enc ? SEV_CMD_DBG_ENCRYPT : SEV_CMD_DBG_DECRYPT,
-> -			    data, error);
-> -	kfree(data);
-> -	return ret;
-> +	return sev_issue_cmd(kvm,
-> +			     enc ? SEV_CMD_DBG_ENCRYPT : SEV_CMD_DBG_DECRYPT,
-> +			     &data, error);
->   }
->   
->   static int __sev_dbg_decrypt(struct kvm *kvm, unsigned long src_paddr,
-> @@ -966,7 +908,7 @@ static int sev_dbg_crypt(struct kvm *kvm, struct kvm_sev_cmd *argp, bool dec)
->   static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   {
->   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> -	struct sev_data_launch_secret *data;
-> +	struct sev_data_launch_secret data;
->   	struct kvm_sev_launch_secret params;
->   	struct page **pages;
->   	void *blob, *hdr;
-> @@ -998,41 +940,36 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   		goto e_unpin_memory;
->   	}
->   
-> -	ret = -ENOMEM;
-> -	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
-> -	if (!data)
-> -		goto e_unpin_memory;
-> +	memset(&data, 0, sizeof(data));
->   
->   	offset = params.guest_uaddr & (PAGE_SIZE - 1);
-> -	data->guest_address = __sme_page_pa(pages[0]) + offset;
-> -	data->guest_len = params.guest_len;
-> +	data.guest_address = __sme_page_pa(pages[0]) + offset;
-> +	data.guest_len = params.guest_len;
->   
->   	blob = psp_copy_user_blob(params.trans_uaddr, params.trans_len);
->   	if (IS_ERR(blob)) {
->   		ret = PTR_ERR(blob);
-> -		goto e_free;
-> +		goto e_unpin_memory;
->   	}
->   
-> -	data->trans_address = __psp_pa(blob);
-> -	data->trans_len = params.trans_len;
-> +	data.trans_address = __psp_pa(blob);
-> +	data.trans_len = params.trans_len;
->   
->   	hdr = psp_copy_user_blob(params.hdr_uaddr, params.hdr_len);
->   	if (IS_ERR(hdr)) {
->   		ret = PTR_ERR(hdr);
->   		goto e_free_blob;
->   	}
-> -	data->hdr_address = __psp_pa(hdr);
-> -	data->hdr_len = params.hdr_len;
-> +	data.hdr_address = __psp_pa(hdr);
-> +	data.hdr_len = params.hdr_len;
->   
-> -	data->handle = sev->handle;
-> -	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_SECRET, data, &argp->error);
-> +	data.handle = sev->handle;
-> +	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_SECRET, &data, &argp->error);
->   
->   	kfree(hdr);
->   
->   e_free_blob:
->   	kfree(blob);
-> -e_free:
-> -	kfree(data);
->   e_unpin_memory:
->   	/* content of memory is updated, mark pages dirty */
->   	for (i = 0; i < n; i++) {
-> @@ -1047,7 +984,7 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   {
->   	void __user *report = (void __user *)(uintptr_t)argp->data;
->   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> -	struct sev_data_attestation_report *data;
-> +	struct sev_data_attestation_report data;
->   	struct kvm_sev_attestation_report params;
->   	void __user *p;
->   	void *blob = NULL;
-> @@ -1059,9 +996,7 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
->   		return -EFAULT;
->   
-> -	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
-> -	if (!data)
-> -		return -ENOMEM;
-> +	memset(&data, 0, sizeof(data));
->   
->   	/* User wants to query the blob length */
->   	if (!params.len)
-> @@ -1069,23 +1004,20 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   
->   	p = (void __user *)(uintptr_t)params.uaddr;
->   	if (p) {
-> -		if (params.len > SEV_FW_BLOB_MAX_SIZE) {
-> -			ret = -EINVAL;
-> -			goto e_free;
-> -		}
-> +		if (params.len > SEV_FW_BLOB_MAX_SIZE)
-> +			return -EINVAL;
->   
-> -		ret = -ENOMEM;
->   		blob = kmalloc(params.len, GFP_KERNEL_ACCOUNT);
->   		if (!blob)
-> -			goto e_free;
-> +			return -ENOMEM;
->   
-> -		data->address = __psp_pa(blob);
-> -		data->len = params.len;
-> -		memcpy(data->mnonce, params.mnonce, sizeof(params.mnonce));
-> +		data.address = __psp_pa(blob);
-> +		data.len = params.len;
-> +		memcpy(data.mnonce, params.mnonce, sizeof(params.mnonce));
->   	}
->   cmd:
-> -	data->handle = sev->handle;
-> -	ret = sev_issue_cmd(kvm, SEV_CMD_ATTESTATION_REPORT, data, &argp->error);
-> +	data.handle = sev->handle;
-> +	ret = sev_issue_cmd(kvm, SEV_CMD_ATTESTATION_REPORT, &data, &argp->error);
->   	/*
->   	 * If we query the session length, FW responded with expected data.
->   	 */
-> @@ -1101,13 +1033,11 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
->   	}
->   
->   done:
-> -	params.len = data->len;
-> +	params.len = data.len;
->   	if (copy_to_user(report, &params, sizeof(params)))
->   		ret = -EFAULT;
->   e_free_blob:
->   	kfree(blob);
-> -e_free:
-> -	kfree(data);
->   	return ret;
->   }
->   
-> 
+>  crypto/asymmetric_keys/Makefile           |   5 +-
+>  crypto/asymmetric_keys/x509_cert_parser.c | 152 ++++++++++++++++++++++
+>  crypto/asymmetric_keys/x509_rsassa.asn1   |  17 +++
+>  include/crypto/public_key.h               |   4 +
+>  include/linux/oid_registry.h              |   3 +
+>  5 files changed, 180 insertions(+), 1 deletion(-)
+>  create mode 100644 crypto/asymmetric_keys/x509_rsassa.asn1
+>
