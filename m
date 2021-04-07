@@ -2,114 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BB9DC433B4
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 17:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF929C433B4
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 17:34:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3DFED61242
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 17:19:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A508C61262
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 17:34:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354774AbhDGRUC (ORCPT
+        id S1354868AbhDGReX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Apr 2021 13:20:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57700 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354763AbhDGRUB (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Apr 2021 13:20:01 -0400
-Received: from smtp-8fab.mail.infomaniak.ch (smtp-8fab.mail.infomaniak.ch [IPv6:2001:1600:3:17::8fab])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B4FC06175F
-        for <linux-crypto@vger.kernel.org>; Wed,  7 Apr 2021 10:19:49 -0700 (PDT)
-Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
-        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4FFrjv6HTZzMqFPy;
-        Wed,  7 Apr 2021 19:19:47 +0200 (CEST)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4FFrjs34sYzlppyr;
-        Wed,  7 Apr 2021 19:19:45 +0200 (CEST)
-Subject: Re: [PATCH v7 0/5] Enable root to update the blacklist keyring
-To:     David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        David Woodhouse <dwmw2@infradead.org>
-References: <20210312171232.2681989-1-mic@digikod.net>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-Message-ID: <52f54ebb-6ac7-4d68-f97a-74219ed88d0b@digikod.net>
-Date:   Wed, 7 Apr 2021 19:21:30 +0200
-User-Agent: 
+        Wed, 7 Apr 2021 13:34:23 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43568 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1354864AbhDGReW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Apr 2021 13:34:22 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id A6A82ADB3;
+        Wed,  7 Apr 2021 17:34:11 +0000 (UTC)
+Date:   Wed, 7 Apr 2021 19:34:07 +0200
+From:   Borislav Petkov <bp@suse.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 8/8] KVM: SVM: Allocate SEV command structures on
+ local stack
+Message-ID: <20210407173407.GB25732@zn.tnic>
+References: <20210406224952.4177376-1-seanjc@google.com>
+ <20210406224952.4177376-9-seanjc@google.com>
+ <9df3b755-d71a-bfdf-8bee-f2cd2883ea2f@csgroup.eu>
+ <20210407102440.GA25732@zn.tnic>
+ <YG3mQ+U6ZnoWIZ9a@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210312171232.2681989-1-mic@digikod.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <YG3mQ+U6ZnoWIZ9a@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David and Jarkko,
+On Wed, Apr 07, 2021 at 05:05:07PM +0000, Sean Christopherson wrote:
+> I used memset() to defer initialization until after the various sanity
+> checks,
 
-What is the status of this patchset? Could someone take it to -next?
+I'd actually vote for that too - I don't like doing stuff which is not
+going to be used. I.e., don't change what you have.
 
-Regards,
- Mickaël
+-- 
+Regards/Gruss,
+    Boris.
 
-
-On 12/03/2021 18:12, Mickaël Salaün wrote:
-> This new patch series is a rebase on David Howells's and Eric Snowberg's
-> keys-cve-2020-26541-v3.
-> 
-> I successfully tested this patch series with the 186 entries from
-> https://uefi.org/sites/default/files/resources/dbxupdate_x64.bin (184
-> binary hashes and 2 certificates).
-> 
-> The goal of these patches is to add a new configuration option to enable the
-> root user to load signed keys in the blacklist keyring.  This keyring is useful
-> to "untrust" certificates or files.  Enabling to safely update this keyring
-> without recompiling the kernel makes it more usable.
-> 
-> This can be applied on top of David Howells's keys-cve-2020-26541-branch:
-> https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-cve-2020-26541-branch
-> 
-> Previous patch series:
-> https://lore.kernel.org/lkml/20210210120410.471693-1-mic@digikod.net/
-> 
-> Regards,
-> 
-> Mickaël Salaün (5):
->   tools/certs: Add print-cert-tbs-hash.sh
->   certs: Check that builtin blacklist hashes are valid
->   certs: Make blacklist_vet_description() more strict
->   certs: Factor out the blacklist hash creation
->   certs: Allow root user to append signed hashes to the blacklist
->     keyring
-> 
->  MAINTAINERS                                   |   2 +
->  certs/.gitignore                              |   1 +
->  certs/Kconfig                                 |  17 +-
->  certs/Makefile                                |  17 +-
->  certs/blacklist.c                             | 218 ++++++++++++++----
->  crypto/asymmetric_keys/x509_public_key.c      |   3 +-
->  include/keys/system_keyring.h                 |  14 +-
->  scripts/check-blacklist-hashes.awk            |  37 +++
->  .../platform_certs/keyring_handler.c          |  26 +--
->  tools/certs/print-cert-tbs-hash.sh            |  91 ++++++++
->  10 files changed, 346 insertions(+), 80 deletions(-)
->  create mode 100755 scripts/check-blacklist-hashes.awk
->  create mode 100755 tools/certs/print-cert-tbs-hash.sh
-> 
-> 
-> base-commit: ebd9c2ae369a45bdd9f8615484db09be58fc242b
-> 
+SUSE Software Solutions Germany GmbH, GF: Felix Imendörffer, HRB 36809, AG Nürnberg
