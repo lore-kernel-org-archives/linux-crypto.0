@@ -4,67 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 295D7C433B4
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 20:59:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B927AC433B4
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 21:12:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F203E611CC
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 20:59:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CFBC61205
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 21:12:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231640AbhDGU76 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Apr 2021 16:59:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35214 "EHLO mail.kernel.org"
+        id S229828AbhDGVMj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Apr 2021 17:12:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41140 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231603AbhDGU76 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Apr 2021 16:59:58 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B933461157;
-        Wed,  7 Apr 2021 20:59:47 +0000 (UTC)
+        id S229469AbhDGVMj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Apr 2021 17:12:39 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2F939611CC;
+        Wed,  7 Apr 2021 21:12:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617829188;
-        bh=sNiMUrpcF7JCIFONZnfz0/BK1ymmENjoizIXIsUdAy8=;
+        s=k20201202; t=1617829949;
+        bh=3ClaiXmoMxpwLarSFjiRGpAykEyCSoeO2i4RKoiLJjw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=A3lIlDBcoNuzA9mn2/q7yoSwhj/VqmvbRRMkPOw91ZpYqdgYkFmOOAbeMEYNuyf9a
-         mkx0l3la3/1KDC+FjIxHPlVxnN1mPvGibzc3DpQMe4kTAMu38oR1kp0HJBIBs5oETi
-         Z7N/6ezFOwgtchPnLLyx1LAK4Uk8GPZbUFtuGSKszT0f5UD9tRqjE3gvVjE/ZS9em/
-         zPRyJUqaki9uwH5NMbUsbciqfC1BtmkueRIYq6Se9C/meEI9zCcBrshXTM9BK0w+Ks
-         XwdhPYok2WtwQdmE9SEJlwmRQfU56Hle3EQyIpQ/x59lLP3PHVFu4nSsYp66a9drQ5
-         y+KjBL4N3XYvQ==
-Date:   Wed, 7 Apr 2021 13:59:46 -0700
+        b=kOkMQRKbNoGZJir5IqZsa5DWckU2utpxegMfi2tXvaKN+tznLQ7b/vsTrWy04J+US
+         8wFdOOQgZs0I7yE2+Uvih6z0fTTKY7hiAFLghtdJjMCsAcxhMROLwnOFHyHNccZh61
+         Rj0HWfzalucRa9+8Nl+TPR85leQgELeDc6dmc9iXjx8U/Ipl08BNFUdLcAhFaZM4Gp
+         /sGicmeMgHkEFuegFgWMF6N9FI2Jwq/m54G/CBeQYa5rj5OWVwH/jpPUvCRqERbbpd
+         l9hD5iGXLX/ncCAgPsU6yc9xAr9sqklpN0xnquKMbyH5hbUQyITRFyoQqlHIFdehWC
+         18M//9JNefbKQ==
+Date:   Wed, 7 Apr 2021 14:12:27 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Chris von Recklinghausen <crecklin@redhat.com>
-Cc:     ardb@kernel.org, simo@redhat.com, rafael@kernel.org,
-        decui@microsoft.com, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/1] use crc32 instead of md5 for hibernation e820
- integrity check
-Message-ID: <YG4dQlLrsAAUL3eq@quark.localdomain>
-References: <20210407100421.27542-1-crecklin@redhat.com>
+To:     Hangbin Liu <liuhangbin@gmail.com>
+Cc:     netdev@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
+Message-ID: <YG4gO15Q2CzTwlO7@quark.localdomain>
+References: <20210407113920.3735505-1-liuhangbin@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210407100421.27542-1-crecklin@redhat.com>
+In-Reply-To: <20210407113920.3735505-1-liuhangbin@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 07, 2021 at 06:04:21AM -0400, Chris von Recklinghausen wrote:
-> Suspend fails on a system in fips mode because md5 is used for the e820
-> integrity check and is not available. Use crc32 instead.
+On Wed, Apr 07, 2021 at 07:39:20PM +0800, Hangbin Liu wrote:
+> As the cryptos(BLAKE2S, Curve25519, CHACHA20POLY1305) in WireGuard are not
+> FIPS certified, the WireGuard module should be disabled in FIPS mode.
 > 
-> Prior to this patch, MD5 is used only to create a digest to ensure integrity of
-> the region, no actual encryption is done. This patch set changes the integrity
-> check to use crc32 instead of md5 since crc32 is available in both FIPS and
-> non-FIPS modes.
-> 
-> Fixes: 62a03defeabd ("PM / hibernate: Verify the consistent of e820 memory map
->        by md5 digest")
-> 
-> Tested-by: Dexuan Cui <decui@microsoft.com>
-> Reviewed-by: Dexuan Cui <decui@microsoft.com>
-> Signed-off-by: Chris von Recklinghausen <crecklin@redhat.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-Please include an explanation about whether this use case requires cryptographic
-security or not.
+I think you mean "FIPS allowed", not "FIPS certified"?  Even if it used FIPS
+allowed algorithms like AES, the Linux kernel doesn't come with any sort of FIPS
+certification out of the box.
+
+Also, couldn't you just consider WireGuard to be outside your FIPS module
+boundary, which would remove it from the scope of the certification?
+
+And how do you handle all the other places in the kernel that use ChaCha20 and
+SipHash?  For example, drivers/char/random.c?
 
 - Eric
