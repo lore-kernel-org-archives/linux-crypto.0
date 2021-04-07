@@ -2,168 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E86DC43461
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 03:04:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0F2C433B4
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 03:26:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01031613E3
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 03:04:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94C08613CC
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 03:26:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243638AbhDGDEo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Apr 2021 23:04:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38678 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229637AbhDGDEn (ORCPT
+        id S234174AbhDGD0h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Apr 2021 23:26:37 -0400
+Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:51542 "EHLO
+        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233915AbhDGD0h (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Apr 2021 23:04:43 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB56CC06174A;
-        Tue,  6 Apr 2021 20:04:33 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id g35so7167813pgg.9;
-        Tue, 06 Apr 2021 20:04:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=L2ZahL3BM9zMTRN6qi10FAZfrxjb2GT5DQ+NiJkPnJE=;
-        b=GwqKFBPMn4bFVhdezkkUI0ymRkbCcANy+U391GQLhZ1o+FLDlCjFtqX3B9Gnp6wKwT
-         QaGs2eJln78cXpBjhEpRqJR5WBrVkbzP9XD0hdUSt4RiYj5DizpLaZCBHVIBBb39SF/U
-         5qhFtpPwqESyyHtuwcbkUjI5ZuseMXDRWi3DdP/6sLYhr7EceHFibD1vngMUkzhCOmwl
-         p/hBlaId6GLdBS3fURHP/9eyOlvBgukmLD6C9B6vSUH9Ot5cEbDD4p0a0N57PUpVG/dX
-         4a3MMazn/QnE/AuXexyrh/AgQmDhwH6kivk1LQXze8oc2AW3DpGsgrE3lGJYxll68KGu
-         Kj2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=L2ZahL3BM9zMTRN6qi10FAZfrxjb2GT5DQ+NiJkPnJE=;
-        b=ly8mK7pSeMO5E0v9t+JSqAa//mUe4MZETT8pJhLk0qBlWp24rRGVjxof/1qvDsGJQ0
-         bK/eipH1WVsAqPv3mPJGEEVXwsjs2V1+9IJXnMpJLKhWlu3UM5Ah0aUmyvGjse189SdR
-         sm3F291J759/uJii+lpcL5tW0ll8TWexTXS5ZHHrAd0NDf9A5RQiswv6qtri7C5ZeiZf
-         UD0VwACw+f8DMA3IfRdI/TKQadY8y3Mt1XeabuoHMa4XcSI3h3CnKGyx9XnxZGyU2Ilq
-         nSCIO1j3FqTyn3gvAmokSK9Q+LYuqNVWabyEIs9Z/s8e6Qk0LP7zIMDIqLUgYnBmaxJA
-         PMxg==
-X-Gm-Message-State: AOAM530p+hVf6vMUFBxDeZNa6Tyw4X15xxh6hSAbZTk6HDtIXFfuwnGN
-        8V+5kH2k1M2VGq1stCFYAdmoUfe8Prgebw==
-X-Google-Smtp-Source: ABdhPJzcEIhqJm98AluNdVQFJvExLoakzANuWS4gJisMtZd4p9VhyVeQQfQGkdjTp1NEM5E4iw6cjw==
-X-Received: by 2002:a63:e552:: with SMTP id z18mr1258823pgj.100.1617764672735;
-        Tue, 06 Apr 2021 20:04:32 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.39])
-        by smtp.gmail.com with ESMTPSA id w3sm3395313pjg.7.2021.04.06.20.04.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Apr 2021 20:04:32 -0700 (PDT)
-From:   Hongbo Li <herbert.tencent@gmail.com>
-To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, dhowells@redhat.com,
-        zohar@linux.ibm.com, jarkko@kernel.org, herberthbli@tencent.com
-Cc:     linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
-        Hongbo Li <herbert.tencent@gmail.com>
-Subject: [PATCH v2 0/4] crypto: add rsa pss support for x509
-Date:   Wed,  7 Apr 2021 11:03:45 +0800
-Message-Id: <1617764625-15421-1-git-send-email-herbert.tencent@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
+        Tue, 6 Apr 2021 23:26:37 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UUky-cb_1617765985;
+Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UUky-cb_1617765985)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 07 Apr 2021 11:26:25 +0800
+Subject: Re: [PATCH] crypto: sm3 - use the more precise type u32 instead of
+ unsigned int
+To:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Jia Zhang <zhang.jia@linux.alibaba.com>
+References: <20210326022128.71727-1-tianjia.zhang@linux.alibaba.com>
+ <CAOtvUMfSC02o03c=Q-8d7vy8KS3QmNTBc59An=-m4BmNzt8_GA@mail.gmail.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Message-ID: <5a5028e1-7cb2-701c-ce0f-1bb9f79cb83d@linux.alibaba.com>
+Date:   Wed, 7 Apr 2021 11:26:25 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.0
+MIME-Version: 1.0
+In-Reply-To: <CAOtvUMfSC02o03c=Q-8d7vy8KS3QmNTBc59An=-m4BmNzt8_GA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Hongbo Li <herberthbli@tencent.com>
 
-This series of patches adds support for x509 cert signed by RSA
-with PSS encoding method. RSA PSS is described in rfc8017.
 
-Patch1 make x509 support rsa pss encoding and parse hash parameter.
+On 3/26/21 5:38 PM, Gilad Ben-Yossef wrote:
+> Hi,
+> 
+> Thank you for the patch!
+> 
+> On Fri, Mar 26, 2021 at 5:21 AM Tianjia Zhang
+> <tianjia.zhang@linux.alibaba.com> wrote:
+>>
+>> In the process of calculating the hash, use the more accurate type
+>> 'u32' instead of the original 'unsigned int' to avoid ambiguity.
+> 
+> I don't think there is any ambiguity here, as both forms are always
+> the same size.
+> 
+> Generally, I tend to use the convention of using 'u32' as denoting
+> variables where the size is meaningful - e.g. mathematical operations
+> that are defined in the standard on 32 bit buffers,  versus using
+> plain 'int' types where it isn't - e.g. loop counters etc.
+> 
+> Having said that, even under my own definition possibly the w and wt
+> arrays in sm3_trandform() should be changed to u32.
+> I don't object to changing those if it bugs you :-)
+> 
+> Cheers,
+> Gilad
+> 
+> 
 
-Patch2 add rsa pss template.
+Thanks for your opinions. This is just to make the form more uniform. 
+This is not a mistake. If it is not necessary, just ignore this 
+modification.
 
-Patch3 add test vector for rsa pss.
-
-Patch4 is the rsa-pss's ima patch.
-
-Test by the following script, it tests different saltlen, hash, mgfhash.
-
-keyctl newring test @u
-
-while :; do
-    for modbits in 1024 2048 4096; do
-	if [ $modbits -eq 1024 ]; then
-	    saltlen=(-1 -2 0 20 32 48 64 94)
-	elif [ $modbits -eq 2048 ]; then
-	    saltlen=(-1 -2 0 20 32 48 64 222)
-	else
-	    saltlen=(-1 -2 0 20 32 48 64 478)
-	fi
-
-	for slen in ${saltlen[@]}; do
-	    for hash in sha1 sha224 sha256 sha384 sha512; do
-		for mgfhash in sha1 sha224 sha256 sha384 sha512; do
-		    certfile="cert.der"
-		    echo slen $slen
-		    openssl req \
-			    -x509 \
-			    -${hash} \
-			    -newkey rsa:$modbits \
-			    -keyout key.pem \
-			    -days 365 \
-			    -subj '/CN=test' \
-			    -nodes \
-			    -sigopt rsa_padding_mode:pss \
-			    -sigopt rsa_mgf1_md:$mgfhash \
-			    -sigopt rsa_pss_saltlen:${slen} \
-			    -outform der \
-			    -out ${certfile} 2>/dev/null
-
-		    exp=0
-		    id=$(keyctl padd asymmetric testkey %keyring:test < "${certfile}")
-		    rc=$?
-		    if [ $rc -ne $exp ]; then
-			case "$exp" in
-			    0) echo "Error: Could not load rsa-pss certificate!";;
-			esac
-			echo "modbits $modbits sha: $hash mgfhash $mgfhash saltlen: $slen"
-			exit 1
-		    else
-			case "$rc" in
-			    0) echo "load cert: keyid: $id modbits $modbits hash: $hash mgfhash $mgfhash saltlen $slen"
-			esac
-		    fi
-		done
-	    done
-	done
-    done
-done
-
-Best Regards
-
-Hongbo
-
-v1->v2:
-  -rebase patches to cryptodev/master to fix the issues that
-   reported-by: kernel test robot <lkp@intel.com>
-
-Hongbo Li (5):
-  x509: add support for rsa-pss
-  crypto: support rsa-pss encoding
-  crypto: add rsa pss test vector
-  crypto: ecdsa ima support
-  ima: add support for rsa pss verification
-
- crypto/Makefile                           |   7 +-
- crypto/asymmetric_keys/Makefile           |   7 +-
- crypto/asymmetric_keys/public_key.c       |   5 ++
- crypto/asymmetric_keys/x509_cert_parser.c |  71 ++++++++++++++++-
- crypto/rsa.c                              |  14 ++--
- crypto/rsa_helper.c                       | 127 ++++++++++++++++++++++++++++++
- crypto/testmgr.c                          |   7 ++
- crypto/testmgr.h                          |  87 ++++++++++++++++++++
- include/crypto/internal/rsa.h             |  25 +++++-
- include/keys/asymmetric-type.h            |   6 ++
- include/linux/oid_registry.h              |   2 +
- security/integrity/digsig_asymmetric.c    |  34 ++++----
- 12 files changed, 363 insertions(+), 29 deletions(-)
-
--- 
-1.8.3.1
-
+Best regards,
+Tianjia
