@@ -2,117 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1544CC433ED
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 09:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB88AC43462
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 10:05:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B13DE613A0
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 09:47:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA49C6139E
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Apr 2021 10:05:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350276AbhDGJrZ (ORCPT
+        id S1350730AbhDGKF2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Apr 2021 05:47:25 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:15942 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350270AbhDGJrZ (ORCPT
+        Wed, 7 Apr 2021 06:05:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29618 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1346637AbhDGKEk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Apr 2021 05:47:25 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FFfdC22jJzyN2J;
-        Wed,  7 Apr 2021 17:45:03 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 7 Apr 2021 17:47:06 +0800
-From:   Weili Qian <qianweili@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>,
-        <liulongfang@huawei.com>
-Subject: [PATCH] crypto: hisilicon/trng - add version to adapt new algorithm
-Date:   Wed, 7 Apr 2021 17:44:33 +0800
-Message-ID: <1617788673-47222-1-git-send-email-qianweili@huawei.com>
-X-Mailer: git-send-email 2.8.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+        Wed, 7 Apr 2021 06:04:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617789869;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc; bh=hcG8hAioBizixLnzGlBmF7WJ9S27SPuTNee6pSwarp0=;
+        b=Vek/CW159qablsROoNQLNjtSu/KrCWUc0Qf1ZCOZXHgH8EySNl1IZV7VvbWvBSX7FNTJRT
+        D5ra/idF5tvEvY8nLHOfI7np/KCDcZO/BYop/Ww2QWg7m/H+51ApOZHpxsV3dYJuwjN+Tp
+        uH6GoebYUaITU5anouxb62Cvtng5b6c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-409-MbZHkvC-NASv29juh8kWNA-1; Wed, 07 Apr 2021 06:04:27 -0400
+X-MC-Unique: MbZHkvC-NASv29juh8kWNA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 477B518766D2;
+        Wed,  7 Apr 2021 10:04:26 +0000 (UTC)
+Received: from crecklin.bos.com (ovpn-113-158.rdu2.redhat.com [10.10.113.158])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2D1695D762;
+        Wed,  7 Apr 2021 10:04:22 +0000 (UTC)
+From:   Chris von Recklinghausen <crecklin@redhat.com>
+To:     ardb@kernel.org, simo@redhat.com, rafael@kernel.org,
+        decui@microsoft.com, linux-pm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 1/1] use crc32 instead of md5 for hibernation e820 integrity check
+Date:   Wed,  7 Apr 2021 06:04:21 -0400
+Message-Id: <20210407100421.27542-1-crecklin@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Kunpeng930 supports trng and prng, but Kunpeng920 only supports trng.
+Suspend fails on a system in fips mode because md5 is used for the e820
+integrity check and is not available. Use crc32 instead.
 
-Therefore, version information is added to ensure that prng is not
-registered to Crypto subsystem on Kunpeng920.
+Prior to this patch, MD5 is used only to create a digest to ensure integrity of
+the region, no actual encryption is done. This patch set changes the integrity
+check to use crc32 instead of md5 since crc32 is available in both FIPS and
+non-FIPS modes.
 
-Signed-off-by: Weili Qian <qianweili@huawei.com>
+Fixes: 62a03defeabd ("PM / hibernate: Verify the consistent of e820 memory map
+       by md5 digest")
+
+Tested-by: Dexuan Cui <decui@microsoft.com>
+Reviewed-by: Dexuan Cui <decui@microsoft.com>
+Signed-off-by: Chris von Recklinghausen <crecklin@redhat.com>
 ---
- drivers/crypto/hisilicon/trng/trng.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+v1 -> v2
+   bump up RESTORE_MAGIC
+v2 -> v3
+   move embelishment from cover letter to commit comments (no code change)
 
-diff --git a/drivers/crypto/hisilicon/trng/trng.c b/drivers/crypto/hisilicon/trng/trng.c
-index 2971268..829f2ca 100644
---- a/drivers/crypto/hisilicon/trng/trng.c
-+++ b/drivers/crypto/hisilicon/trng/trng.c
-@@ -18,6 +18,8 @@
- #define HISI_TRNG_REG		0x00F0
- #define HISI_TRNG_BYTES		4
- #define HISI_TRNG_QUALITY	512
-+#define HISI_TRNG_VERSION	0x01B8
-+#define HISI_TRNG_VER_V1	GENMASK(31, 0)
- #define SLEEP_US		10
- #define TIMEOUT_US		10000
- #define SW_DRBG_NUM_SHIFT	2
-@@ -50,6 +52,7 @@ struct hisi_trng {
- 	struct hisi_trng_list *trng_list;
- 	struct list_head list;
- 	struct hwrng rng;
-+	u32 ver;
- 	bool is_used;
- 	struct mutex mutex;
+ arch/x86/power/hibernate.c | 35 +++++++++++++++++++----------------
+ 1 file changed, 19 insertions(+), 16 deletions(-)
+
+diff --git a/arch/x86/power/hibernate.c b/arch/x86/power/hibernate.c
+index cd3914fc9f3d..b56172553275 100644
+--- a/arch/x86/power/hibernate.c
++++ b/arch/x86/power/hibernate.c
+@@ -55,31 +55,31 @@ int pfn_is_nosave(unsigned long pfn)
+ }
+ 
+ 
+-#define MD5_DIGEST_SIZE 16
++#define CRC32_DIGEST_SIZE 16
+ 
+ struct restore_data_record {
+ 	unsigned long jump_address;
+ 	unsigned long jump_address_phys;
+ 	unsigned long cr3;
+ 	unsigned long magic;
+-	u8 e820_digest[MD5_DIGEST_SIZE];
++	u8 e820_digest[CRC32_DIGEST_SIZE];
  };
-@@ -260,6 +263,7 @@ static int hisi_trng_probe(struct platform_device *pdev)
- 		return PTR_ERR(trng->base);
  
- 	trng->is_used = false;
-+	trng->ver = readl(trng->base + HISI_TRNG_VERSION);
- 	if (!trng_devices.is_init) {
- 		INIT_LIST_HEAD(&trng_devices.list);
- 		mutex_init(&trng_devices.lock);
-@@ -267,7 +271,8 @@ static int hisi_trng_probe(struct platform_device *pdev)
- 	}
+-#if IS_BUILTIN(CONFIG_CRYPTO_MD5)
++#if IS_BUILTIN(CONFIG_CRYPTO_CRC32)
+ /**
+- * get_e820_md5 - calculate md5 according to given e820 table
++ * get_e820_crc32 - calculate crc32 according to given e820 table
+  *
+  * @table: the e820 table to be calculated
+- * @buf: the md5 result to be stored to
++ * @buf: the crc32 result to be stored to
+  */
+-static int get_e820_md5(struct e820_table *table, void *buf)
++static int get_e820_crc32(struct e820_table *table, void *buf)
+ {
+ 	struct crypto_shash *tfm;
+ 	struct shash_desc *desc;
+ 	int size;
+ 	int ret = 0;
  
- 	hisi_trng_add_to_list(trng);
--	if (atomic_inc_return(&trng_active_devs) == 1) {
-+	if (trng->ver != HISI_TRNG_VER_V1 &&
-+	    atomic_inc_return(&trng_active_devs) == 1) {
- 		ret = crypto_register_rng(&hisi_trng_alg);
- 		if (ret) {
- 			dev_err(&pdev->dev,
-@@ -289,7 +294,8 @@ static int hisi_trng_probe(struct platform_device *pdev)
- 	return ret;
+-	tfm = crypto_alloc_shash("md5", 0, 0);
++	tfm = crypto_alloc_shash("crc32", 0, 0);
+ 	if (IS_ERR(tfm))
+ 		return -ENOMEM;
  
- err_crypto_unregister:
--	if (atomic_dec_return(&trng_active_devs) == 0)
-+	if (trng->ver != HISI_TRNG_VER_V1 &&
-+	    atomic_dec_return(&trng_active_devs) == 0)
- 		crypto_unregister_rng(&hisi_trng_alg);
+@@ -107,24 +107,24 @@ static int get_e820_md5(struct e820_table *table, void *buf)
  
- err_remove_from_list:
-@@ -305,7 +311,8 @@ static int hisi_trng_remove(struct platform_device *pdev)
- 	while (hisi_trng_del_from_list(trng))
- 		;
+ static int hibernation_e820_save(void *buf)
+ {
+-	return get_e820_md5(e820_table_firmware, buf);
++	return get_e820_crc32(e820_table_firmware, buf);
+ }
  
--	if (atomic_dec_return(&trng_active_devs) == 0)
-+	if (trng->ver != HISI_TRNG_VER_V1 &&
-+	    atomic_dec_return(&trng_active_devs) == 0)
- 		crypto_unregister_rng(&hisi_trng_alg);
+ static bool hibernation_e820_mismatch(void *buf)
+ {
+ 	int ret;
+-	u8 result[MD5_DIGEST_SIZE];
++	u8 result[CRC32_DIGEST_SIZE];
  
- 	return 0;
+-	memset(result, 0, MD5_DIGEST_SIZE);
++	memset(result, 0, CRC32_DIGEST_SIZE);
+ 	/* If there is no digest in suspend kernel, let it go. */
+-	if (!memcmp(result, buf, MD5_DIGEST_SIZE))
++	if (!memcmp(result, buf, CRC32_DIGEST_SIZE))
+ 		return false;
+ 
+-	ret = get_e820_md5(e820_table_firmware, result);
++	ret = get_e820_crc32(e820_table_firmware, result);
+ 	if (ret)
+ 		return true;
+ 
+-	return memcmp(result, buf, MD5_DIGEST_SIZE) ? true : false;
++	return memcmp(result, buf, CRC32_DIGEST_SIZE) ? true : false;
+ }
+ #else
+ static int hibernation_e820_save(void *buf)
+@@ -134,15 +134,15 @@ static int hibernation_e820_save(void *buf)
+ 
+ static bool hibernation_e820_mismatch(void *buf)
+ {
+-	/* If md5 is not builtin for restore kernel, let it go. */
++	/* If crc32 is not builtin for restore kernel, let it go. */
+ 	return false;
+ }
+ #endif
+ 
+ #ifdef CONFIG_X86_64
+-#define RESTORE_MAGIC	0x23456789ABCDEF01UL
++#define RESTORE_MAGIC	0x23456789ABCDEF02UL
+ #else
+-#define RESTORE_MAGIC	0x12345678UL
++#define RESTORE_MAGIC	0x12345679UL
+ #endif
+ 
+ /**
+@@ -160,6 +160,9 @@ int arch_hibernation_header_save(void *addr, unsigned int max_size)
+ 	rdr->jump_address = (unsigned long)restore_registers;
+ 	rdr->jump_address_phys = __pa_symbol(restore_registers);
+ 
++	/* crc32 digest size is 4 but digest buffer size is 16 so zero it all */
++	memset(rdr->e820_digest, 0, CRC32_DIGEST_SIZE);
++
+ 	/*
+ 	 * The restore code fixes up CR3 and CR4 in the following sequence:
+ 	 *
 -- 
-2.8.1
+2.18.1
 
