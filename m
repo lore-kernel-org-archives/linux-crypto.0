@@ -2,92 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23857C433ED
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 16:05:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8528DC433B4
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 19:13:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F1C4460FF1
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 16:05:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 502DB610F9
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 19:13:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232117AbhDHQF4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Apr 2021 12:05:56 -0400
-Received: from mail-oo1-f53.google.com ([209.85.161.53]:44000 "EHLO
-        mail-oo1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232053AbhDHQFz (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Apr 2021 12:05:55 -0400
-Received: by mail-oo1-f53.google.com with SMTP id x187-20020a4a41c40000b02901b664cf3220so621861ooa.10;
-        Thu, 08 Apr 2021 09:05:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=89GBzc2bbepFcIw25Q1AatCj5mIj6s7KJYpVy/c3qPA=;
-        b=P0t8He/1VAEjZ7GKaTsvjk/ibBrjeSyB1+JRlXczLxC3pLPfeSdH90fsqsugwyFk09
-         lKr2Dj6WyOim0F7CVlSLfraAwKjUi9+u6+RAu+7TTBA0NGAOU0B4Nk8WjwKoNyYbA4+M
-         1nm44J6lSFfkYILeSKdUK5YM+wGPmfFA04/76QBY8MQZaY9DnlsagVKxJxlzlOYut0o1
-         d4fKjHqRrdFh44zQiR8iMjiIEVf87ExPcllkqm5qd8xFMHbXU+VmVcMCZik+SifkDLMi
-         q0njsoEc2j1Tb79nW0UQlmqbk/bBq/W3M4NEeSRi3lQuK6xg2KPieIZJ6IXihy5rMF55
-         9YeA==
-X-Gm-Message-State: AOAM531I8Zqa8n8k3dLoVW/klZv6g72QU36fxwrTkT0HY4glPrxaSxaQ
-        /XDC/0xMwJGVjy1Z7on4cxLbychzpO46HnqpDzY=
-X-Google-Smtp-Source: ABdhPJzEV++CuhlA2YB8TcryrXXxfR5W+L9v5/DP3P/8iIkl8mXys5IFjX8yHkHEpgm9HpOWMh5BKf7s03p90uLLd18=
-X-Received: by 2002:a4a:d781:: with SMTP id c1mr8131686oou.44.1617897944147;
- Thu, 08 Apr 2021 09:05:44 -0700 (PDT)
+        id S232985AbhDHTN3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Apr 2021 15:13:29 -0400
+Received: from smtp21.cstnet.cn ([159.226.251.21]:37334 "EHLO cstnet.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232804AbhDHTN2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Apr 2021 15:13:28 -0400
+Received: from localhost.localdomain (unknown [124.16.141.242])
+        by APP-01 (Coremail) with SMTP id qwCowABnf7egVW9gQsQWAA--.23405S2;
+        Fri, 09 Apr 2021 03:12:41 +0800 (CST)
+From:   Jianmin Wang <jianmin@iscas.ac.cn>
+To:     gregkh@linuxfoundation.org
+Cc:     davem@davemloft.net, dzickus@redhat.com,
+        herbert@gondor.apana.org.au, jianmin@iscas.ac.cn,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        omosnace@redhat.com, smueller@chronox.de, stable@vger.kernel.org,
+        steffen.klassert@secunet.com
+Subject: Re: Re: [PATCH] backports: crypto user - make NETLINK_CRYPTO work 
+Date:   Thu,  8 Apr 2021 19:11:48 +0000
+Message-Id: <20210408191148.51259-1-jianmin@iscas.ac.cn>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <YGs3Voq0codXCHbA@kroah.com>
+References: <YGs3Voq0codXCHbA@kroah.com>
 MIME-Version: 1.0
-References: <20210408131506.17941-1-crecklin@redhat.com> <CAJZ5v0ib+jmbsD9taGW0RujY5c9BCK8yLHv065u44mb0AwO9vQ@mail.gmail.com>
- <YG8gqZoZGutPmROz@sol.localdomain>
-In-Reply-To: <YG8gqZoZGutPmROz@sol.localdomain>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Thu, 8 Apr 2021 18:05:33 +0200
-Message-ID: <CAJZ5v0g65irXKmy7pdgD8-5KWrxdtwiWbJsBD2A=PKf1D3RVZg@mail.gmail.com>
-Subject: Re: [PATCH v5 1/1] use crc32 instead of md5 for hibernation e820
- integrity check
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Chris von Recklinghausen <crecklin@redhat.com>,
-        Ard Biesheuvel <ardb@kernel.org>, Simo Sorce <simo@redhat.com>,
-        Dexuan Cui <decui@microsoft.com>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: qwCowABnf7egVW9gQsQWAA--.23405S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxXFyDCrWxZr1kCF4DXFykAFb_yoW5AF4xpF
+        yfKr4ayF45J3yxA3yxZr1Fq3sYg3yftr15G397W3y8ZF4UtryFvrZFvw15uryUGrs5WayY
+        yFWUKw1fWw4DArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+        6F4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
+        4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+        n2kIc2xKxwCY02Avz4vE14v_WwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJV
+        W8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF
+        1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6x
+        IIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF
+        0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
+        VjvjDU0xZFpf9x0JUfnYwUUUUU=
+X-Originating-IP: [124.16.141.242]
+X-CM-SenderInfo: xmld0z1lq6x2xfdvhtffof0/
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 8, 2021 at 5:26 PM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Thu, Apr 08, 2021 at 03:32:38PM +0200, Rafael J. Wysocki wrote:
-> > On Thu, Apr 8, 2021 at 3:15 PM Chris von Recklinghausen
-> > <crecklin@redhat.com> wrote:
-> > >
-> > > Suspend fails on a system in fips mode because md5 is used for the e820
-> > > integrity check and is not available. Use crc32 instead.
-> > >
-> > > This patch changes the integrity check algorithm from md5 to
-> > > crc32. This integrity check is used only to verify accidental
-> > > corruption of the hybernation data
-> >
-> > It isn't used for that.
-> >
-> > In fact, it is used to detect differences between the memory map used
-> > before hibernation and the one made available by the BIOS during the
-> > subsequent resume.  And the check is there, because it is generally
-> > unsafe to load the hibernation image into memory if the current memory
-> > map doesn't match the one used when the image was created.
->
-> So what types of "differences" are you trying to detect?  If you need to detect
-> differences caused by someone who maliciously made changes ("malicious" implies
-> they may try to avoid detection), then you need to use a cryptographic hash
-> function (or a cryptographic MAC if the hash value isn't stored separately).  If
-> you only need to detect non-malicious changes (normally these would be called
-> "accidental" changes, but sure, it could be changes that are "intentionally"
-> made provided that the other side can be trusted to not try to avoid
-> detection...)
+On Mon, Apr 05, 2021 at 16:14 UTC, Greg KH wrote:
+> On Mon, Apr 05, 2021 at 01:55:15PM +0000, Jianmin Wang wrote:
+> > There is same problem found in linux 4.19.y as upstream commit. The 
+> > changes of crypto_user_* and cryptouser.h files from upstream patch are merged into 
+> > crypto/crypto_user.c for backporting.
+> > 
+> > Upstream commit:
+> >     commit 91b05a7e7d8033a90a64f5fc0e3808db423e420a
+> >     Author: Ondrej Mosnacek <omosnace@redhat.com>
+> >     Date:   Tue,  9 Jul 2019 13:11:24 +0200
+> > 
+> >     Currently, NETLINK_CRYPTO works only in the init network namespace. It
+> >     doesn't make much sense to cut it out of the other network namespaces,
+> >     so do the minor plumbing work necessary to make it work in any network
+> >     namespace. Code inspired by net/core/sock_diag.c.
+> > 
+> >     Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
+> >     Signed-off-by: default avatarHerbert Xu <herbert@gondor.apana.org.au>
+> > 
+> > Signed-off-by: Jianmin Wang <jianmin@iscas.ac.cn>
+> > ---
+> >  crypto/crypto_user.c        | 37 +++++++++++++++++++++++++------------
+> >  include/net/net_namespace.h |  3 +++
+> >  2 files changed, 28 insertions(+), 12 deletions(-)
+> 
+> How does this change fit with the stable kernel rules?  It looks to be a
+> new feature, if you need this, why not just use a newer kernel version?
+> What is preventing you from doing that?
+> 
 
-That's the case here.
+This problem was found when we deployed new services on our container cluster, 
+while the new services need to invoke libkcapi in the container environment.
 
-> then a non-cryptographic checksum would be sufficient.
+We have verified that the problem doesn't exist on newer kernel version. 
+However, due to many services and the cluster running on many server machines 
+whose host os are long-term linux distribution with linux 4.19 kernel, it will 
+cost too much to migrate them to newer os with newer kernel version. This is 
+why we need to fix the problem on linux 4.19.
+
+Only when we run docker with param --net=host, the libkcapi can be invoked 
+properly. Otherwise, almost all test cases in smuellerDD/libkcapi [1] will 
+failed with same error as below:
+
+    libkcapi - Error: Netlink error: sendmsg failed
+    libkcapi - Error: Netlink error: sendmsg failed
+    libkcapi - Error: NETLINK_CRYPTO: cannot obtain cipher information for 
+      hmac(sha1) (is required crypto_user.c patch missing? see documentation)
+
+The cause is same as statement in upstream commit 91b05a7e, which is that 
+NETLINK_CRYPTO works only in the init network namespace.
+
+In my opinion, there are still many linux distribution running with linux 4.19 
+or similar version, such as Debian 10 with linux 4.19, CentOS 8 with linux 4.18
+and also their derivatives. If other people want to use libkcapi in container 
+environment, they will also be bothered by this problem. [2]
+
+So I think this patch meet two rules in stable kernel rules: It must fix a real
+bug that bothers people and the upstream commit 91b05a7e exists in Linus's tree
+from linux 5.4.
+
+Thanks for your review and reply.
+
+--
+Email: Jianmin Wang <jianmin@iscas.ac.cn>
+
