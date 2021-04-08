@@ -2,95 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95FC9C433ED
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 11:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29CA5C433B4
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 13:01:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C98E610E7
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 11:58:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5FC7610FC
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 13:01:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229751AbhDHL6c (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Apr 2021 07:58:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46772 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229741AbhDHL6b (ORCPT
+        id S230412AbhDHNCI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Apr 2021 09:02:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20011 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229741AbhDHNCH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Apr 2021 07:58:31 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 915FAC061760;
-        Thu,  8 Apr 2021 04:58:20 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id il9-20020a17090b1649b0290114bcb0d6c2so3054449pjb.0;
-        Thu, 08 Apr 2021 04:58:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jXH6y4YscxSeRR8s6JzgRu1L9W547REVPRiKHGjiNIY=;
-        b=AEkfymwhHejmj+SuWnfpyqSAcs38c+KHpcEFLT1SWYEww/z+pWc3bgh7wdO16/whqc
-         ueWd4yQNLE+nzlLLGR44cBKWCBBR20LwOxoJzJ8HiUnMfbnSbAtU5Dikoy2EwOwp0Ows
-         MP11DIQ3jh5JzldBnlnohBK+h4EkQ9kg5GRQsYF9d9nBYzd3ZKR0qFS7WQ28tWpSaSjV
-         3hQr3BRYwHAJZP1hNFST6HbMPN9ICX1St20knxO0ATCGV0dR4SiX1N2oQDRElnsdEBDl
-         rzKF/Thb8+bY0Tgu5I9k37zGzBRw7keb5FSEmJTsG1hl4gEobFxJL8/qfWu6p1Z3g25S
-         SNSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jXH6y4YscxSeRR8s6JzgRu1L9W547REVPRiKHGjiNIY=;
-        b=dhyhUMhY15PBXi2tBpv3NdwoZcAXYJqNZ9WRjqrdw8udBSBGrX7BON6k7BMZwft1vM
-         OMtUaVuAaCERCU6Zdz0RcAkuC3I/ehnbyZ9f11HaD9PQK18YFKa3slpRv/AoU837t2cV
-         lsfscEaUvlswb3D3xYColZgqeaJMKLzcZIlgo4jHdLChUJ1jT6VbLUvKCi9Qc9qxrbXe
-         PfNx0r/8HkVhSn3s5IDKNcGRrv5FPGZeIMy08cZMEDnigFO0vdiVGkiKBefJQznarsmI
-         96ykrLz15fZnDk4VuomiUM7H/H9DZzuCKiAxa2Lu8EgQyzWwE3MnM4T3ltrqvnYKmD03
-         9Jww==
-X-Gm-Message-State: AOAM531XCLWnCvg/T02ODWipu1Ho1iTGtMvJymPG1+nHwcss/H8pYDAb
-        521MKTQa7DuuS/rP4ci1Aej9d7IjY61sdg==
-X-Google-Smtp-Source: ABdhPJy+VZmkfEmzWiCs3m+xMSnafBHyXgL5Fv/HA7IG4QhkD5ZszMGt+N0tlgsnHJkgdL+dSia0DA==
-X-Received: by 2002:a17:90b:3b4e:: with SMTP id ot14mr1538820pjb.81.1617883100222;
-        Thu, 08 Apr 2021 04:58:20 -0700 (PDT)
-Received: from Leo-laptop-t470s ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id 22sm8154138pjl.31.2021.04.08.04.58.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Apr 2021 04:58:19 -0700 (PDT)
-Date:   Thu, 8 Apr 2021 19:58:08 +0800
-From:   Hangbin Liu <liuhangbin@gmail.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     netdev@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
-Message-ID: <20210408115808.GJ2900@Leo-laptop-t470s>
-References: <20210407113920.3735505-1-liuhangbin@gmail.com>
- <YG4gO15Q2CzTwlO7@quark.localdomain>
- <20210408010640.GH2900@Leo-laptop-t470s>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210408010640.GH2900@Leo-laptop-t470s>
+        Thu, 8 Apr 2021 09:02:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617886915;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SC4hNMbbB4hm2+rL5qMmQKUw2dEFlVpMyX9e9hUazm0=;
+        b=i+tqxyV1cBD7G9ZwQYFrYyUt6DVuMjfmS5LzIWni8WNggGrVTlkPyIypCacZduOwcKiROY
+        EoknCSHBLktguJJzCf6pLF2ZEAbE8FkDlCjl7REoRY4ceCf5bqlxdjrKm6/4onsTOBhghQ
+        Mq1xTuA8Wv+T6PyAU7Wer6kayYI1crE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-eei0jnrKMlCu2J2fgu6mzA-1; Thu, 08 Apr 2021 09:01:53 -0400
+X-MC-Unique: eei0jnrKMlCu2J2fgu6mzA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD4A2DF8A3;
+        Thu,  8 Apr 2021 13:01:52 +0000 (UTC)
+Received: from ovpn-113-96.phx2.redhat.com (ovpn-113-96.phx2.redhat.com [10.3.113.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1186119CBF;
+        Thu,  8 Apr 2021 13:01:51 +0000 (UTC)
+Message-ID: <e22b105449b6970177d5907d9cbb9e7f55bc72bb.camel@redhat.com>
+Subject: Re: [PATCH v4 1/1] use crc32 instead of md5 for hibernation e820
+ integrity check
+From:   Simo Sorce <simo@redhat.com>
+To:     Chris von Recklinghausen <crecklin@redhat.com>, ardb@kernel.org,
+        rafael@kernel.org, decui@microsoft.com, linux-pm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Thu, 08 Apr 2021 09:01:51 -0400
+In-Reply-To: <20210408104629.31357-1-crecklin@redhat.com>
+References: <20210408104629.31357-1-crecklin@redhat.com>
+Organization: Red Hat, Inc.
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 08, 2021 at 09:06:52AM +0800, Hangbin Liu wrote:
-> > Also, couldn't you just consider WireGuard to be outside your FIPS module
-> > boundary, which would remove it from the scope of the certification?
-> > 
-> > And how do you handle all the other places in the kernel that use ChaCha20 and
-> > SipHash?  For example, drivers/char/random.c?
+On Thu, 2021-04-08 at 06:46 -0400, Chris von Recklinghausen wrote:
+> Suspend fails on a system in fips mode because md5 is used for the e820
+> integrity check and is not available. Use crc32 instead.
 > 
-> Good question, I will check it and reply to you later.
+> Prior to this patch, MD5 is used only to create a digest to ensure integrity of
+> the region, no actual encryption is done. This patch set changes the integrity
+> check to use crc32 instead of md5 since crc32 is available in both FIPS and
+> non-FIPS modes.
+> 
+> Note that the digest is only used as an integrity check. No actual encryption
+> is done.
+> 
+> Fixes: 62a03defeabd ("PM / hibernate: Verify the consistent of e820 memory map
+>        by md5 digest")
+> 
+> Tested-by: Dexuan Cui <decui@microsoft.com>
+> Reviewed-by: Dexuan Cui <decui@microsoft.com>
+> Signed-off-by: Chris von Recklinghausen <crecklin@redhat.com>
 
-I just read the code. The drivers/char/random.c do has some fips specific
-parts(seems not related to crypto). After commit e192be9d9a30 ("random: replace
-non-blocking pool with a Chacha20-based CRNG") we moved part of chacha code to
-lib/chacha20.c and make that code out of control.
+Hi Chris,
+I would reword it this way:
+----------
+This patch(set) changes the integrity check algorithm from md5 to
+crc32. This integrity check is used only to verify accidental
+corruption of the hybernation data and is not intended as a
+cryptographic integrity check.
+Md5 is overkill in this case and also disabled in FIPS mode because it
+is known to be broken for cryptographic purposes.
+----------
 
-Thanks
-Hangbin
+HTH,
+Simo.
+
+-- 
+Simo Sorce
+RHEL Crypto Team
+Red Hat, Inc
+
+
+
+
