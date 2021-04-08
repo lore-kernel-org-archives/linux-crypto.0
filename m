@@ -2,100 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E179C433B4
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 01:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B373CC433B4
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 03:21:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E2A16121E
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 01:06:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8066761186
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 03:21:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229884AbhDHBHE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Apr 2021 21:07:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46506 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbhDHBHD (ORCPT
+        id S229512AbhDHDVq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Apr 2021 23:21:46 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:15958 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229510AbhDHDVp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Apr 2021 21:07:03 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60ED0C061760;
-        Wed,  7 Apr 2021 18:06:52 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id ha17so237856pjb.2;
-        Wed, 07 Apr 2021 18:06:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wilm16Ub8BB1XoT4ev+bET2RH1JL/eiAqerv1Ew7RoM=;
-        b=nvSTKc5PujztH5rKuQaDnnYjuR/107vkLSvjfbXWnXH0+3vlmNO4WUyh+ZViotytIB
-         wy9cKH7J8PrNRSNMEz2m9/6aIG8trf5YgdqRFBPS4agxPOWGVcdOBxeHdTo+jWDRVMFE
-         ifSfvWpUPSTZN8wpleooC+eqaOdI/nuTHncyBiinrCPDFOzPRMhdFoa2wopUBGbJEIGF
-         iySY7agK0k+urzIQTscqpWJK4LVyM/eWY1DAx1flaYedjLt8/jmnET7r9MiYBJcCTb25
-         KKzerHpVAvk6zm5NTBVBJq+FDSXxugMXVmnMjAH7ImFUJwjFdh9dH/jgEl+XWZ74nPsz
-         jqMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wilm16Ub8BB1XoT4ev+bET2RH1JL/eiAqerv1Ew7RoM=;
-        b=EL6RYUdBiyQ+ffbcRUbDj4i73crRnI0bQaaTJJ8Ka6HnjK5NiZBWCjvvSkRHPvUGJY
-         wd0Bbm15KVY85lxuIcfYsrEuHC2LBqNoOGJ4P8zUPeYHKGyT/UfU9kkfXQwavXUH9g8b
-         P1eCBdFkI5iLVnlJG7VfQ7Kb3gpoVF82/batYk2gbPvg45DrObQtZm8fDzm+gYhPVU8Q
-         4gR1hoTba969BaeJNbXPLZuy/zuA+TIQQ62n4qtBD5pLfT7aDuwcsGVZcJzLApXNVjeI
-         7kwKceJlqECJBaaAH7iMYHmalWLAOPFM7r0v6MtKekeGFARqXd/b3nfOF3VLzv7wUTCK
-         RYkg==
-X-Gm-Message-State: AOAM532tfAGiFrcqT03jcJ2WrisljT0hOykz4wEEIQz91mfps3py8Kt/
-        Pdp31HPlMGexWsHedzr06zw=
-X-Google-Smtp-Source: ABdhPJz5YV8kgLhUcjjLJDQLLyLHx53mfRkqMU4z/LR7KyArIJGVyBnMxzxwAZ20yizeLG0lfEd5sw==
-X-Received: by 2002:a17:902:7446:b029:e9:6692:f523 with SMTP id e6-20020a1709027446b02900e96692f523mr4904685plt.10.1617844011869;
-        Wed, 07 Apr 2021 18:06:51 -0700 (PDT)
-Received: from Leo-laptop-t470s ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id gg22sm6454563pjb.20.2021.04.07.18.06.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Apr 2021 18:06:51 -0700 (PDT)
-Date:   Thu, 8 Apr 2021 09:06:40 +0800
-From:   Hangbin Liu <liuhangbin@gmail.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     netdev@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
-Message-ID: <20210408010640.GH2900@Leo-laptop-t470s>
-References: <20210407113920.3735505-1-liuhangbin@gmail.com>
- <YG4gO15Q2CzTwlO7@quark.localdomain>
+        Wed, 7 Apr 2021 23:21:45 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FG61k1nkkzyNXH;
+        Thu,  8 Apr 2021 11:19:22 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 8 Apr 2021 11:21:26 +0800
+From:   Tian Tao <tiantao6@hisilicon.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, Tian Tao <tiantao6@hisilicon.com>,
+        "Zhiqi Song" <songzhiqi1@huawei.com>
+Subject: [PATCH] crypto: cavium - remove unused including <linux/version.h>
+Date:   Thu, 8 Apr 2021 11:21:51 +0800
+Message-ID: <1617852111-26441-1-git-send-email-tiantao6@hisilicon.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YG4gO15Q2CzTwlO7@quark.localdomain>
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 07, 2021 at 02:12:27PM -0700, Eric Biggers wrote:
-> On Wed, Apr 07, 2021 at 07:39:20PM +0800, Hangbin Liu wrote:
-> > As the cryptos(BLAKE2S, Curve25519, CHACHA20POLY1305) in WireGuard are not
-> > FIPS certified, the WireGuard module should be disabled in FIPS mode.
-> > 
-> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> 
-> I think you mean "FIPS allowed", not "FIPS certified"?  Even if it used FIPS
-> allowed algorithms like AES, the Linux kernel doesn't come with any sort of FIPS
-> certification out of the box.
+Remove including <linux/version.h> that don't need it.
 
-Yes, you are right.
-> 
-> Also, couldn't you just consider WireGuard to be outside your FIPS module
-> boundary, which would remove it from the scope of the certification?
-> 
-> And how do you handle all the other places in the kernel that use ChaCha20 and
-> SipHash?  For example, drivers/char/random.c?
+Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+Signed-off-by: Zhiqi Song <songzhiqi1@huawei.com>
+---
+ drivers/crypto/cavium/zip/common.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-Good question, I will check it and reply to you later.
+diff --git a/drivers/crypto/cavium/zip/common.h b/drivers/crypto/cavium/zip/common.h
+index 58fb3ed..54f6fb0 100644
+--- a/drivers/crypto/cavium/zip/common.h
++++ b/drivers/crypto/cavium/zip/common.h
+@@ -56,7 +56,6 @@
+ #include <linux/seq_file.h>
+ #include <linux/string.h>
+ #include <linux/types.h>
+-#include <linux/version.h>
+ 
+ /* Device specific zlib function definitions */
+ #include "zip_device.h"
+-- 
+2.7.4
 
-Thanks
-Hangbin
