@@ -2,156 +2,134 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE2E4C433B4
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 22:16:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B51CBC433B4
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 23:55:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9323C61132
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 22:16:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B6D26115B
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 23:55:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232376AbhDHWQV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Apr 2021 18:16:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35122 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232265AbhDHWQU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Apr 2021 18:16:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617920168;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=f53Jf6JjQR5CMt6Ykm4q1l2b8XVAEN4/334rnWuEa2Y=;
-        b=Rh1ayv16guG5Pir5SfyDP903d69yRDzmh1dttmO7qUi6afHj/EAa+tbJLJj/RtB2Jv0GVR
-        YY5ZD4DdgPPcfhMS8DXjyFmYOhxPNGTwMkB0DIpUPISuQyfpE1jRfmhuqqqBlutj2AXfJy
-        MpUG4uY6uCXsI0+1iM1Qkhkuhe53RiQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-co5dfCUxNFC3A9BXaJX4sg-1; Thu, 08 Apr 2021 18:16:06 -0400
-X-MC-Unique: co5dfCUxNFC3A9BXaJX4sg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F12B801814;
-        Thu,  8 Apr 2021 22:16:05 +0000 (UTC)
-Received: from ovpn-112-53.phx2.redhat.com (ovpn-112-53.phx2.redhat.com [10.3.112.53])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A711C6A97E;
-        Thu,  8 Apr 2021 22:16:01 +0000 (UTC)
-Message-ID: <5b9206d9d451de1358a2c633ebe460eeb5a84749.camel@redhat.com>
-Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
-From:   Simo Sorce <simo@redhat.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Hangbin Liu <liuhangbin@gmail.com>,
-        Netdev <netdev@vger.kernel.org>,
-        Toke =?ISO-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Date:   Thu, 08 Apr 2021 18:16:00 -0400
-In-Reply-To: <CAHmME9pRSOANrdvegLm9x8VTNWKcMtoymYrgStuSx+nsu=jpwA@mail.gmail.com>
-References: <20210407113920.3735505-1-liuhangbin@gmail.com>
-         <CAHmME9p40M5oHDZXnFDXfO4-JuJ7bUB5BnsccGV1pksguz73sg@mail.gmail.com>
-         <c47d99b9d0efeea4e6cd238c2affc0fbe296b53c.camel@redhat.com>
-         <CAHmME9pRSOANrdvegLm9x8VTNWKcMtoymYrgStuSx+nsu=jpwA@mail.gmail.com>
-Organization: Red Hat, Inc.
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+        id S233018AbhDHXzm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Apr 2021 19:55:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37036 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233009AbhDHXzm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Apr 2021 19:55:42 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1018861151;
+        Thu,  8 Apr 2021 23:55:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1617926130;
+        bh=SUv1EmiHLV/4OjfzTusbiqGWcCkMUz2DyvyUUnJ+SZ4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AiXVaVzfdo5Rr24r5RglJ24YvxSbVdSR9sUJMKrZNgIS5DA9xS7v9lUeDGp6SeG1P
+         y4SWJnCy2xrKfe8M0sEyjIAgPZePczJVNorjOkijUz9h9FahY7iwPtcq5y8EWiJFlX
+         DxHh/zmIhOd/GEfvrvvrfBu826zfgbBVRQAnlYDNZQD4M8zsGmJg00LKQiUyTWpahR
+         q8oqYve83TKwtCYjHXIqxOJ2/VZFW2vswrEF3aSYC/nQLCCkLuw943eo28Bpp0BbuN
+         zAy/6ORAIDY1L8DctfUMkLWcIa8AX7RtusWbAMPl0pXlIAb10NS/UnIbFbwY6E7fsQ
+         2aX2RrxjLEToA==
+Date:   Thu, 8 Apr 2021 16:55:28 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Chris von Recklinghausen <crecklin@redhat.com>
+Cc:     ardb@kernel.org, simo@redhat.com, rafael@kernel.org,
+        decui@microsoft.com, linux-pm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 1/1] use crc32 instead of md5 for hibernation e820
+ integrity check
+Message-ID: <YG+X8M6JfLY4cqmD@sol.localdomain>
+References: <20210408131506.17941-1-crecklin@redhat.com>
+ <YG8hgzBPQAvov9Vz@sol.localdomain>
+ <f01021a0-2edd-da43-5f04-043b4f42be8b@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f01021a0-2edd-da43-5f04-043b4f42be8b@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 2021-04-08 at 15:55 -0600, Jason A. Donenfeld wrote:
-> On Thu, Apr 8, 2021 at 7:55 AM Simo Sorce <simo@redhat.com> wrote:
-> > > I'm not sure this makes so much sense to do _in wireguard_. If you
-> > > feel like the FIPS-allergic part is actually blake, 25519, chacha, and
-> > > poly1305, then wouldn't it make most sense to disable _those_ modules
-> > > instead? And then the various things that rely on those (such as
-> > > wireguard, but maybe there are other things too, like
-> > > security/keys/big_key.c) would be naturally disabled transitively?
+On Thu, Apr 08, 2021 at 11:53:59AM -0400, Chris von Recklinghausen wrote:
+> On 4/8/21 11:30 AM, Eric Biggers wrote:
+> > On Thu, Apr 08, 2021 at 09:15:06AM -0400, Chris von Recklinghausen wrote:
+> > > Suspend fails on a system in fips mode because md5 is used for the e820
+> > > integrity check and is not available. Use crc32 instead.
+> > > 
+> > > This patch changes the integrity check algorithm from md5 to
+> > > crc32. This integrity check is used only to verify accidental
+> > > corruption of the hybernation data and is not intended as a
+> > > cryptographic integrity check.
+> > > Md5 is overkill in this case and also disabled in FIPS mode because it
+> > > is known to be broken for cryptographic purposes.
+> > > 
+> > > Fixes: 62a03defeabd ("PM / hibernate: Verify the consistent of e820 memory map
+> > >         by md5 digest")
+> > > 
+> > > Tested-by: Dexuan Cui <decui@microsoft.com>
+> > > Reviewed-by: Dexuan Cui <decui@microsoft.com>
+> > > Signed-off-by: Chris von Recklinghausen <crecklin@redhat.com>
+> > > ---
+> > > v1 -> v2
+> > >     bump up RESTORE_MAGIC
+> > > v2 -> v3
+> > >     move embelishment from cover letter to commit comments (no code change)
+> > > v3 -> v4
+> > >     add note to comments that md5 isn't used for encryption here.
+> > > v4 -> v5
+> > >     reword comment per Simo's suggestion
+> > > 
+> > >   arch/x86/power/hibernate.c | 35 +++++++++++++++++++----------------
+> > >   1 file changed, 19 insertions(+), 16 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/power/hibernate.c b/arch/x86/power/hibernate.c
+> > > index cd3914fc9f3d..b56172553275 100644
+> > > --- a/arch/x86/power/hibernate.c
+> > > +++ b/arch/x86/power/hibernate.c
+> > > @@ -55,31 +55,31 @@ int pfn_is_nosave(unsigned long pfn)
+> > >   }
+> > > -#define MD5_DIGEST_SIZE 16
+> > > +#define CRC32_DIGEST_SIZE 16
+> > >   struct restore_data_record {
+> > >   	unsigned long jump_address;
+> > >   	unsigned long jump_address_phys;
+> > >   	unsigned long cr3;
+> > >   	unsigned long magic;
+> > > -	u8 e820_digest[MD5_DIGEST_SIZE];
+> > > +	u8 e820_digest[CRC32_DIGEST_SIZE];
+> > >   };
+> > > -#if IS_BUILTIN(CONFIG_CRYPTO_MD5)
+> > > +#if IS_BUILTIN(CONFIG_CRYPTO_CRC32)
+> > Should CONFIG_CRYPTO_CRC32 be getting selected from somewhere?
+> 
+> 
+> Yes, presumably from the same source that sets CONFIG_CRYPTO_MD5. Also
+> presumably there's value to not forcing the check if the config value is not
+> set.
+
+I wouldn't be so sure about that.  It might just be a bug that CONFIG_CRYPTO_MD5
+wasn't being selected.  Where is it documented that the user needed to set
+CONFIG_CRYPTO_MD5=y if they wanted the hibernation image checksumming to work?
+
 > > 
-> > The reason why it is better to disable the whole module is that it
-> > provide much better feedback to users. Letting init go through and then
-> > just fail operations once someone tries to use it is much harder to
-> > deal with in terms of figuring out what went wrong.
-> > Also wireguard seem to be poking directly into the algorithms
-> > implementations and not use the crypto API, so disabling individual
-> > algorithm via the regular fips_enabled mechanism at runtime doesn't
-> > work.
+> > If that is too hard because it would pull in too much of the crypto API, maybe
+> > using the library interface to CRC-32 (lib/crc32.c) would be a better fit?
 > 
-> What I'm suggesting _would_ work in basically the exact same way as
-> this patch. Namely, something like:
 > 
-> diff --git a/lib/crypto/curve25519.c b/lib/crypto/curve25519.c
-> index 288a62cd29b2..b794f49c291a 100644
-> --- a/lib/crypto/curve25519.c
-> +++ b/lib/crypto/curve25519.c
-> @@ -12,11 +12,15 @@
->  #include <crypto/curve25519.h>
->  #include <linux/module.h>
->  #include <linux/init.h>
-> +#include <linux/fips.h>
+> Based on my statement above, the intent is to provide a simple drop in
+> replacement for md5 so that users of FIPS mode can suspend/resume without
+> any errors.
 > 
->  bool curve25519_selftest(void);
-> 
->  static int __init mod_init(void)
->  {
-> + if (!fips_enabled)
-> + return -EOPNOTSUPP;
-> +
->   if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
->       WARN_ON(!curve25519_selftest()))
->   return -ENODEV;
-> 
-> Making the various lib/crypto/* modules return EOPNOTSUPP will in turn
-> mean that wireguard will refuse to load, due to !fips_enabled. It has
-> the positive effect that all other things that use it will also be
-> EOPNOTSUPP.
-> 
-> For example, what are you doing about big_key.c? Right now, I assume
-> nothing. But this way, you'd get all of the various effects for free.
-> Are you going to continuously audit all uses of non-FIPS crypto and
-> add `if (!fips_enabled)` to every new use case, always, everywhere,
-> from now into the boundless future? By adding `if (!fips_enabled)` to
-> wireguard, that's what you're signing yourself up for. Instead, by
-> restricting the lib/crypto/* modules to !fips_enabled, you can get all
-> of those transitive effects without having to do anything additional.
 
-I guess that moving the fips check down at the algorithms level is a
-valid option. There are some cases that will be a little iffy though,
-like when only certain key sizes cannot be accepted, but for the
-wireguard case it would be clean.
+It's possible that most people have CONFIG_CRYPTO_MD5 enabled for some unrelated
+reason so the hibernation image checksumming works by chance.
+CONFIG_CRYPTO_CRC32 is a different option so the same is not necessarily true.
 
-> Alternatively, I agree with Eric - why not just consider this outside
-> your boundary?
+However, note that CONFIG_HIBERNATION already selects CONFIG_CRC32 (the library
+interface to CRC-32) but not CONFIG_CRYPTO_CRC32 (shash interface to CRC-32).
 
-For certification purposes wireguard is not part of the module boundary
-(speaking only for my company in this case).
+So, if this code just used the library interface crc32_le(), it will always be
+available and the IS_BUILTIN() checks can be removed...
 
-But that is not the issue.
-
-There is an expectation by customers that, when the kernel is in fips
-mode, non-approved cryptography is not used (given those customers are
-required by law/regulation to use only approved/certified
-cryptography).
-So we still have a strong desire, where possible, to not allow the
-kernel to use non-certified cryptography, regardless of what is the
-crypto module boundary (we do the same in user space).
-
-HTH,
-Simo.
-
--- 
-Simo Sorce
-RHEL Crypto Team
-Red Hat, Inc
-
-
-
-
+- Eric
