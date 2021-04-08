@@ -2,75 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A54AC433ED
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 15:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87180C433B4
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 15:11:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57A9B61107
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 15:08:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 520BC61130
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 15:11:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231945AbhDHPIW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Apr 2021 11:08:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58539 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231843AbhDHPIW (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Apr 2021 11:08:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617894490;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SRK35NZb8F0GlyP9zPwaWoJ38d3PF8a3EWrwShnrRxY=;
-        b=RQ2WSoZpsKxOBeLur/YhES0oZ+WKqMkXiegm2/mKivVSfzxnNRenc+8YLjJ5KcC0S0U+ip
-        g2huFYBuVzMvTCFELNnrfYRrVfYlDJOxtyn112gvY1t6OsmgtwYJPEUmcNXSzWbtX3a0BP
-        2NcoHEIe4k+RU/ar5v8OdDtCA59x2s8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-Zj79LQ1EPX61PwRan7PMyQ-1; Thu, 08 Apr 2021 11:08:08 -0400
-X-MC-Unique: Zj79LQ1EPX61PwRan7PMyQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DF0C56C9F;
-        Thu,  8 Apr 2021 15:08:07 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-119-35.rdu2.redhat.com [10.10.119.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6A6F260636;
-        Thu,  8 Apr 2021 15:08:05 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20210408141516.11369-1-varad.gautam@suse.com>
-References: <20210408141516.11369-1-varad.gautam@suse.com>
-To:     Varad Gautam <varad.gautam@suse.com>
-Cc:     dhowells@redhat.com, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net, vt@altlinux.org,
-        tianjia.zhang@linux.alibaba.com, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jarkko@kernel.org
-Subject: Re: [PATCH v2 00/18] Implement RSASSA-PSS signature verification
+        id S232035AbhDHPL6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Apr 2021 11:11:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43694 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231848AbhDHPL6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Apr 2021 11:11:58 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 9BE58610F9;
+        Thu,  8 Apr 2021 15:11:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1617894706;
+        bh=bMl0ZspmxcDB+rdC2aWpV/e54pDlpgNYgQrS5CBCgww=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lYUeGcO10VSf9p+yUdo9CkkX3KcPvxSgTjbgFg68zvDLnNzjeSXbComUqrWid70N/
+         tAV2XZ+UqrS7wtXFRMMeEGYhDjWhirxUvt+0JzZsrADzsP6ZI4QVdJtSsaRkTzpSqE
+         R6RQlkhFmzOzRukvf9SiCLTBgkFvrSTyVFLd6QaqBigGMP5AufjfFXBnrF+ymnzRox
+         3sjXAxWDxDATV4wATbTMqvwEW0Bw9Y9a9CbiAA82nXzm90Y93Su4/MpTtj74sy4Nsy
+         MBZTqQFn+f0U/sEHeUevoTY4nNMOtJVkRM7ekHBCU/wfPj3CxY8+Or5gN0QA+BClOk
+         LI7awGyZp7O9g==
+Date:   Thu, 8 Apr 2021 08:11:34 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Hangbin Liu <liuhangbin@gmail.com>
+Cc:     netdev@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
+Message-ID: <YG8dJpEEWP3PxUIm@sol.localdomain>
+References: <20210407113920.3735505-1-liuhangbin@gmail.com>
+ <YG4gO15Q2CzTwlO7@quark.localdomain>
+ <20210408010640.GH2900@Leo-laptop-t470s>
+ <20210408115808.GJ2900@Leo-laptop-t470s>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <13251.1617894484.1@warthog.procyon.org.uk>
-Date:   Thu, 08 Apr 2021 16:08:04 +0100
-Message-ID: <13252.1617894484@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210408115808.GJ2900@Leo-laptop-t470s>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Varad Gautam <varad.gautam@suse.com> wrote:
+On Thu, Apr 08, 2021 at 07:58:08PM +0800, Hangbin Liu wrote:
+> On Thu, Apr 08, 2021 at 09:06:52AM +0800, Hangbin Liu wrote:
+> > > Also, couldn't you just consider WireGuard to be outside your FIPS module
+> > > boundary, which would remove it from the scope of the certification?
+> > > 
+> > > And how do you handle all the other places in the kernel that use ChaCha20 and
+> > > SipHash?  For example, drivers/char/random.c?
+> > 
+> > Good question, I will check it and reply to you later.
+> 
+> I just read the code. The drivers/char/random.c do has some fips specific
+> parts(seems not related to crypto). After commit e192be9d9a30 ("random: replace
+> non-blocking pool with a Chacha20-based CRNG") we moved part of chacha code to
+> lib/chacha20.c and make that code out of control.
+> 
 
-> The test harness is available at [5].
+So you are saying that you removed drivers/char/random.c and lib/chacha20.c from
+your FIPS module boundary?  Why not do the same for WireGuard?
 
-Can you add this to the keyutils testsuite?
-
-https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git
-
-David
-
+- Eric
