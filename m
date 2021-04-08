@@ -5,44 +5,44 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18FC2C43461
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 14:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B495BC43462
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 14:18:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB74A61151
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 14:18:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E37661157
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 14:18:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232209AbhDHOSQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Apr 2021 10:18:16 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:37322 "EHLO
+        id S232151AbhDHOSa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Apr 2021 10:18:30 -0400
+Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:48011 "EHLO
         de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232119AbhDHORd (ORCPT
+        by vger.kernel.org with ESMTP id S231907AbhDHORo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Apr 2021 10:17:33 -0400
+        Thu, 8 Apr 2021 10:17:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1617891441;
+        t=1617891452;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iRrxgw68q6pfk4lUz7LU5w9BVk3PvX2ZAS9xN2QluJs=;
-        b=fmuLAz8RKg3DVudDCF/TLLcUEc1pWYHWih/YKzbNYTTsZDd5wD/csiopd7KkzSCtEA1zhf
-        mCrcq2PenIQl4VNqBRWTabZAw0evs3Tmuuu+5em04tgz+Ad+LFQBFsdmEdTf/ktpwdhYwB
-        3mofN1QdZTuihm/0i5ChY034Mu5/hjA=
+        bh=GnrmaZwbgXiIv/rOu4TL6GUmzZbQVWq/QF975uCU+sE=;
+        b=dilT9pfcIr2QbDWC154jGRfO6iNoSdxGD555ErI21vs4ahTHBxQx9ejVDhbfnpvO8c4+Sy
+        grJNV4KRlk+p2QkeubDEg8YdQiUvMs4qVjFdgxORty5JYPn1s9rDDfJJKZ8bhMsvUBQuD4
+        wyXD7XiNjyGwEpI/G0oYi+Q2MqmLly4=
 Received: from EUR05-DB8-obe.outbound.protection.outlook.com
  (mail-db8eur05lp2111.outbound.protection.outlook.com [104.47.17.111])
  (Using TLS) by relay.mimecast.com with ESMTP id
- de-mta-17-7CC3_sUfOXizLHEbsMdYEg-4; Thu, 08 Apr 2021 16:17:09 +0200
-X-MC-Unique: 7CC3_sUfOXizLHEbsMdYEg-4
+ de-mta-17-mwAIHhIrPtuF02ZRB0HTNA-5; Thu, 08 Apr 2021 16:17:16 +0200
+X-MC-Unique: mwAIHhIrPtuF02ZRB0HTNA-5
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Jl6LVUTO0gr6u4yPEmc6h5WgjAPe7BKkcUW690d5xoq9e6djKAsfpEHe3FEdYkVea4KPCGbZsZwETkpSsWyxWnEhzfCmMAsVjp9FlJifCCJjjAGiqrtze59wjCmGFU4ouTyXmFnXtXkYxAn8fXB228z0OhiHMjTAmJxuGzckYpNWoxg0IBQDq74gCUufsHDOQoSeyAMXhLJGTI1D5iS2NUGPViEVdznPetd9OWJEE9WKfCzJzv5qFCfXVBzYSLw+iuj8BkzVQWp8Gt4x1PO4bPZWXEx8bMoTGInHJBpnmo13Nr6hVN/6PizZ58QflstNGaKrVWzxu5JdaZFMGtV27A==
+ b=RAEmlPK8h90VVuqjeWOz2cVxYHFpVzXj0B6HCldgDypaxsfHl7noaCRseB4YtrskPjOyvuuE2tGxwg4/XNsLRdaIzxu3EgyzPqv27tY6enTofd1R/YFPhFK9TJj5BTpe2HDQX2Mww2YAq7VZfszZnJOEr30TLdr4zI58FeN90teqI+bSdWR4I1TG8mRfaBX3gk6XkQmf1MPGB384wr3Scsh/1YHC++FZbBZamBcTRmNHzY0syzb0abcJQIAbUkJ0JO0TvkP20of1pgpbRoAKVyW2+Z7LvrJOZXHKTmBypwWM79pT2dHi96cmpfXXhqzMXpumnxx+TBSzb/54ouuL9g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IskEQdezwsG+1Vbwgg1ivmFRskQn4FAtE3PJv8JoXBY=;
- b=faTpkP2a+EMm4J1jAdU1FPTJcymssBxWgQlE5R5/wRiabPWLPpWwxKJZl8KsYZ3/Ep2kRxXMSBqE6Uq28Da5RBtyBr3FbVw+5A6+WxHXXcCphyAM9mb3+eoB8blPvdVwwUaJ71YFq+3fRyiwDEAmrn4/dUzdSVL0JQwJRZbCeWST6CA5I1/4RpalUfBbXq3XuIzApfMqGbCjLulXoqN2Wnu4PACRQTUagmn+uBGm+TpGriLoyVjn4qo1B/nKU81PBhWK581XbGpWY1imvZ22B/WEu1VgywkUVFOHf5OM3g48Z+xffKqYbB/3wMNhZZpnPawhMBkDUx7GTMAD45w9iQ==
+ bh=N9fhs+zp4NcPCPGfLKrmGHO+qpgcx6wUB4XRLs0IAoo=;
+ b=RYl35YT//oPvratuWJ2KakkSWG3BirExb8oGu5o3iPQfNylfzuH1L57x+5CDpBPs5QEudV8zQcXhedAe+DAgejBLSVCWEKgJMg0hV68+TNkV5wBzUSB0wEXQvGCjrYkeuV5lX5oshWKy7UtDNQu2hzZQK2OyDuDsQaoq82LcxjNBogjykm4zocCb+VS0VINePJPYrZXwtCTk7hQiT6tnfGmtVoQjagLjDnnnM6Qh/Cx+lbmCPciV9XZXtVrjuqOXvAHvMbSeE1fU/U/UDSygbemft/7LB8RFfA+L5HlCQK45/Zh+xrxjyQNODFt2guK04Uy1eaoynA4MWZ4XIKD6CA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
  dkim=pass header.d=suse.com; arc=none
@@ -52,20 +52,23 @@ Received: from AM0PR04MB5650.eurprd04.prod.outlook.com (2603:10a6:208:128::18)
  by AM0PR0402MB3572.eurprd04.prod.outlook.com (2603:10a6:208:22::28) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.29; Thu, 8 Apr
- 2021 14:16:48 +0000
+ 2021 14:16:55 +0000
 Received: from AM0PR04MB5650.eurprd04.prod.outlook.com
  ([fe80::756a:86b8:8283:733d]) by AM0PR04MB5650.eurprd04.prod.outlook.com
  ([fe80::756a:86b8:8283:733d%6]) with mapi id 15.20.3999.032; Thu, 8 Apr 2021
- 14:16:48 +0000
+ 14:16:55 +0000
 From:   Varad Gautam <varad.gautam@suse.com>
 To:     linux-crypto@vger.kernel.org
 CC:     varad.gautam@suse.com, dhowells@redhat.com,
         herbert@gondor.apana.org.au, davem@davemloft.net, vt@altlinux.org,
         tianjia.zhang@linux.alibaba.com, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jarkko@kernel.org
-Subject: [PATCH v2 14/18] crypto: Implement MGF1 Mask Generation Function for RSASSA-PSS
-Date:   Thu,  8 Apr 2021 16:15:12 +0200
-Message-ID: <20210408141516.11369-15-varad.gautam@suse.com>
+        linux-kernel@vger.kernel.org, jarkko@kernel.org,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        linux-security-module@vger.kernel.org (open list:SECURITY SUBSYSTEM)
+Subject: [PATCH v2 18/18] keyctl_pkey: Add pkey parameters slen and mgfhash for PSS
+Date:   Thu,  8 Apr 2021 16:15:16 +0200
+Message-ID: <20210408141516.11369-19-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210408141516.11369-1-varad.gautam@suse.com>
 References: <20210408141516.11369-1-varad.gautam@suse.com>
@@ -77,135 +80,139 @@ X-ClientProxiedBy: ZR0P278CA0137.CHEP278.PROD.OUTLOOK.COM
  (2603:10a6:208:128::18)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from xps13.suse.cz (95.90.93.216) by ZR0P278CA0137.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:40::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend Transport; Thu, 8 Apr 2021 14:16:46 +0000
+Received: from xps13.suse.cz (95.90.93.216) by ZR0P278CA0137.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:40::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend Transport; Thu, 8 Apr 2021 14:16:54 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4e7dcb37-588e-432d-37a6-08d8fa98f279
+X-MS-Office365-Filtering-Correlation-Id: e623a562-3742-4eec-f9a2-08d8fa98f6b3
 X-MS-TrafficTypeDiagnostic: AM0PR0402MB3572:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0PR0402MB3572E102703BF373574E732AE0749@AM0PR0402MB3572.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-Microsoft-Antispam-PRVS: <AM0PR0402MB357278367423FE175DF31558E0749@AM0PR0402MB3572.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:972;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 43VUSBm4UyNwEBcrmhxFfTxwVBHo1hNWnTdqcHqegtToUJcwuZYDtgFwOClGTv8CUnZWdZnBe7IKgvaNSauj44vPTn7tota82YsHVU5cBFiCm6Ec9IWPW0p281v7JDm+82zfed3GDVIuwdE4AIhxia3zzzOBpdwvf8D/pcVq7mYZXVYkFEfp+KpKBqeT22w5DfXcVNS3FOqXaEwAp4tjRgi5bDT/V7lA/7K+ZmiwBmUTLhLlUdxfNcA6o7zyiuTTjsDXmJkjihJRyXJpJ4P8CfRpPMFQbTi4fHs7F+7FvI4KtVOsX79XTOvmkkOCUC5RboA/15cLRYAF52uPXLrMpo7JlXdXLKDF7yicK6R6ldlBv7ZQXOjlYoT2RRvY9zO6ZZbAhnBmivstMMuVbsaSWMx/eUEUtJNsPyVW50APXuKuyAf1cgbBpWZssfQdWsAKO65FrgpFeWvwI9i2YT451vIpz7S/iwzWZoYzAzZQP+OsF8ghMMSRM4czYXca4RfCEjAPT9koOMow7mx/dHsJ39nTgR3a7FaYi08l3n1BxjfpI4vWyrqk2N7/ojVPGJ10qo2CnvdXuqTlRwvZo5Mz1FE+0BFbQyoHPthPJimJ6y5h188UqvODef04/aLrF6VCr64g2OPQjQHZVMa+uB+bCmjhSdRYc/sKbtdJGqtBEyqi39Dhgffrrp7XU/YEFZ55ar4FpGZxw8QEC7NfJHep1Y1xtl2Bc/aAi3HurJuj4S4fnSl72nH5/ZnSWh/4D0S3
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5650.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(136003)(396003)(376002)(346002)(366004)(16526019)(186003)(966005)(38100700001)(2616005)(956004)(38350700001)(52116002)(6512007)(2906002)(36756003)(44832011)(6916009)(83380400001)(6666004)(8936002)(26005)(66476007)(66556008)(66946007)(4326008)(316002)(1076003)(6506007)(6486002)(478600001)(5660300002)(86362001)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?Y4f7O2+Zg+WZsnPJP2mwd7H0nmHhVDPYcUU42xkqu0oJxbjAGpKWOE1AxFjk?=
- =?us-ascii?Q?7GV74gLohGQPXKUA73MRyKEXUnsiUX+1KsxZHMT8PP97a/ZqUFKqmidW5VBw?=
- =?us-ascii?Q?wZq/k1v9iyxDfwIRj8w5ke5FUGQlWFt2XfkB9NDKoboYA3bP/Uheu1Ale1t8?=
- =?us-ascii?Q?wKqTCkTUcAeH8axN784uejMat4mFiS/eb29OgnVWyySCpD+qHyLt1x8XgfHO?=
- =?us-ascii?Q?DLnCS4tCvpLk4ik9Zg0KugcpBBsnBNXweYDacJg/hc8Hnq3Z2zzF+nCimpIU?=
- =?us-ascii?Q?7exorgQDcQisUImmSmVVlo3BIjTAiDLZt5Zm9CbaGDAWGTQ+8chPCWRxLAVy?=
- =?us-ascii?Q?ZIC2cnttoT0oEP5pSM85GdrWn3EJeg3i9zLrptoZvJbEoPKBUApnlv/hKvB2?=
- =?us-ascii?Q?bVO5+sUXV+SI69ugdgnPjGF809ZoxZ8coWypMXJzm9s8t5d7tzgA36kwVBTq?=
- =?us-ascii?Q?J23SzEeAJ2hAztxyjDG9awa4aHOYuVa+UeCS6T/JA19IAQ4Gp7j+63rDtMFd?=
- =?us-ascii?Q?l2KItwSkwgQ1EnGSd8FCmNUJqpM7kmJDyD0iztFLdIr24xnAZ9dIfPKx2EUa?=
- =?us-ascii?Q?MqKhhocj3eg+ix2C4zInLeFUbmn9oa/sMqanPLhTFlSqPWm6IfN4H5mpjn/C?=
- =?us-ascii?Q?qqekhlTOQ/XZOe8X2ZyM4P/mh4+7ZNBj2lxhZ25Oqg/zkIvpmgIaZ96NejPY?=
- =?us-ascii?Q?mC6oj0y0TKJHuqtp6pXnJCVWiDicz/nVINM5FTI6Ot/oGBMQT4qgoX8ReB/M?=
- =?us-ascii?Q?84XgBKZEbXcVA72PkQKCxZhx16CNN1ZuQ5Bm/zE8krK8CPL7MvetznXRUqgZ?=
- =?us-ascii?Q?0+LIycse94EEf//qkUAqb6DEOKdczshHl3dCfRfSsiUX5vz715XqbyqxFqOF?=
- =?us-ascii?Q?xu0YjITYbsIJXoeUT5OuQtMxON3Rvu5W/UOCklyC2WXW8RRgR8lIPaXV6DN/?=
- =?us-ascii?Q?GveZlTHMsl9OK4TR0Dynroy9mKK5LQST+QK3alR63jVDilqlp3RsuWyPMgN1?=
- =?us-ascii?Q?klCFQdlamT1YFZzVMetsYunktw0A/RSLatqigA3GZ2eBJ7rjzoLZ+4Y4h5Ec?=
- =?us-ascii?Q?e3NUO9u77NNfQgFssPRh9Fx8A7KMf00czobuOEyG309TwmMMRRGLBFE/ZNyg?=
- =?us-ascii?Q?SsOGQRciNn6Ebx1Po6coVxsgnR9UCZwYlEXUr4Z5vyWU+47YQHq9HcZB9sqd?=
- =?us-ascii?Q?GKH8Og/5F3VlTacb3K91aNBIxDg2OkPPOGf+c3x8ncWwVQBV4kI5BflKmvNu?=
- =?us-ascii?Q?Z+APT7ludipDlHWqqq8HfBrRPh8sQAkhvzZhCZCJ5xhh+A3pGSqsR18CgRYF?=
- =?us-ascii?Q?Qubie8lFKRn05yPwJ6NY6ixm?=
+X-Microsoft-Antispam-Message-Info: s52Pi7UpXJRp6WWS6WAwLFbfr2B4yxuyzJULYHHZ+VCEW0SP02jBTKZl2p+xyNeQPgJKy89Pymc4/m+Y00kCjSV7ITBSaDzQQqKCXEjqPZstT4D/AVCq12J8/n6rqMPRaEpIHb0eyVM19N6HIyGmKVjTHVc1qDFS/vcYXFMlqgPfHr+DZNQ3i/bWqq4oSU+rCV0LAvhE6f9fmRfL+H0ZYKkfgGy/ZGoxBsHzr3Wu/CkhCk/hSvldRKR6WiQ/Juw7HIcrT9So2a0kk5ZGMfvBSX1us5PELk0gIxcUXmmdtZMcFtnlsexajrVe04u67nsdoebl4m5qSSoz2O65AyEEuQ33f0CSaTtHtAuA+jaWUHv3+hetf4pvh6jrANXp9bzj/9e7x67oJGkkZdqEKe5rrBLcbgZv2kZaejVX9wLOzEj8mi9uSFUf62lT0kEm7DESWd4emQoeG6keAALP3IViFy+pe6VddThqlsNUHdIYGi83j97HMW+uUSRNsfbG3kH7/wW057bhb9nPhqhQ2wRiGLD/t3Wot+YNtpUjVjqyh/dJjWE3KqIO0vCQvSgPvW1+McewcVQBd6PJPQWGqnDwrswG4nBLhdGVi05WQI4mqCsQVUqgANw6/669tnyc+9mV41kRzlQ0ymtaUlM0D9RD29QQmM/tu0KLDfBgNp+KcWg2GTT4v1T0030Jx07Bt0Bh
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5650.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(136003)(396003)(376002)(346002)(366004)(16526019)(186003)(38100700001)(2616005)(956004)(38350700001)(54906003)(52116002)(6512007)(2906002)(36756003)(44832011)(6916009)(83380400001)(6666004)(8936002)(26005)(66476007)(66556008)(66946007)(4326008)(316002)(1076003)(6506007)(6486002)(478600001)(5660300002)(86362001)(8676002)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?6phw9izw0jEpewr6e+v+luN6tEbtsz/sgj2WYxwPBYXO4lwQuhYyCxM1jHnn?=
+ =?us-ascii?Q?geosy2e4XHX/vp+NXnDaoGw+VQOuX1L4SiQGyEb932iqe3hcExXA4GzQSb0O?=
+ =?us-ascii?Q?CCSWEdCjdRFE7fTMBl8tCY8mI8QX5nKDAQz5GCZ2cQJMKnB+ME7EasyF5WzE?=
+ =?us-ascii?Q?bIETo1q/uzY58N2Ojyes/mr2MNnOOwOV5/EALVEOGRIw/PS/EJd08PRkGqTk?=
+ =?us-ascii?Q?QLSpOM0yRDsb7FS8QWnHdOCr6Gkw6lsmhEXOyxJoiitb6fi0NclOCabIOSOf?=
+ =?us-ascii?Q?rIGzPNAUiDAUfrXNSRWTkZ55sOQX8eOa6FJcbF0m7ME3rosE/1FgJZTILds3?=
+ =?us-ascii?Q?MKm8mUcOVg2tUsodQDzx6hAxv6/ArqiprymxKbkpJTrnCqsLlAD5IwvKVrcS?=
+ =?us-ascii?Q?1BhTZR8jr8DayqO5wtLVyEzBgcIPo9RUu1kPxWsYlyXf5iof37EgPnhYmaMc?=
+ =?us-ascii?Q?UPP8pMcJvpim1eBZfxCRq1sk3gXFEHD89g8cjJ4PZ+RDsGKJdQlT1QszD6Ee?=
+ =?us-ascii?Q?TniGmWxH0cm8ocXXTeDJhgRw+TKshBD/aL+/xLd9A/oZrkba33zTJTdIdTaI?=
+ =?us-ascii?Q?glFxMYosybVEywOJUQZp8k5oVBW9Yu3FoSVBigPIJOn7bGJFlKBrJYVLIOfM?=
+ =?us-ascii?Q?RyNgOJdlYnS1ZUP1NfgUpCO4ipnYlcF4PM6MOi25gAGez9XFIClTRv9yYYHQ?=
+ =?us-ascii?Q?yPvdc+ox/3dW1eBTV1GXs9jzSgiRSfJ9iQvkpujyZuYODdyCBeMBCkVaV9Q/?=
+ =?us-ascii?Q?urEr4o7YQ0XZ2cOBd47UTJzRjiFj8ReX0ofA7kisGgmOPngPfx8se20l7C9V?=
+ =?us-ascii?Q?FeNI8ADgoYUa1ISQRnW5PZLFT9NvIsQM/OpkEFmgGBjrCaXyfe0Ghp9vwt64?=
+ =?us-ascii?Q?L+/IrmjuhyxE2J651yA13t5F/HKRTOe8emizS17jLz66faz2SnjzGyQlqsXm?=
+ =?us-ascii?Q?CwpLTYghDmYJ7POIRfJSA05yLqiwx0gQhdz2dX2S4EuWta01MOh/yUR3YD+N?=
+ =?us-ascii?Q?hHby+g6x80AvEUIkzb/P+XoyHiyYY+G4Yz6YEenk4YdtN6sA0SqlNJlSemTR?=
+ =?us-ascii?Q?U06bixFSqlk5BB+8mFHNP+FClLiURqpBX0GsRQPodEEpZaU7tI6bQurlE2Pf?=
+ =?us-ascii?Q?G6fPR9BsvzgNnCmNo3/rjYrKBC3HCqpXaEgUVdxORMqGyItHoUWF8U/7D7iH?=
+ =?us-ascii?Q?m8sonfax6iU3LbX44Xdn/h3eJnit4yLFE8bhSDhaHtH8oPRDRAnjiVDaBdzn?=
+ =?us-ascii?Q?cBbzr+ApFppPSkkuglxe+pqvoN1iQT1vL86pD13DMKTDW8vDcmGNW0naLj8R?=
+ =?us-ascii?Q?EgYEpF29I0k3RWqVFrspJqn1?=
 X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e7dcb37-588e-432d-37a6-08d8fa98f279
+X-MS-Exchange-CrossTenant-Network-Message-Id: e623a562-3742-4eec-f9a2-08d8fa98f6b3
 X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5650.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2021 14:16:48.3977
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2021 14:16:55.5247
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TRdmxlHOiNFBvNYT9Cmva2HTV82oRfisqN2GU2hLa/UpoHxxKigdQezGg+vFORMxHmqohRLEdlbm4OLnI1nODw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: A0iuqT2y/54YgdH1AYpKrWiLvWF93qyve1tVV2kSAIxO8h3oe7vJaHP8y4hMqnpsDUqevmsSasSK5kBdDvLoGQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR0402MB3572
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This generates a "mask" byte array of size mask_len bytes as a
-concatenation of digests, where each digest is calculated on a
-concatenation of an input seed and a running counter to fill up
-mask_len bytes - as described by RFC8017 sec B.2.1. "MGF1".
+keyctl pkey_* operations accept enc and hash parameters at present.
+RSASSA-PSS signatures also require passing in the signature salt
+length and the mgf hash function.
 
-The mask is useful for RSA signing/verification process with
-encoding RSASSA-PSS.
+Add parameters:
+- 'slen' to feed in salt length of a PSS signature.
+- 'mgfhash' to feed in the hash function used for MGF.
 
-Reference: https://tools.ietf.org/html/rfc8017#appendix-B.2.1
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+CC: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- crypto/rsa-psspad.c | 54 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+v2: Accept 'mgfhash' as a parameter. v1 assumed this to be the same
+  as the digest hash.
 
-diff --git a/crypto/rsa-psspad.c b/crypto/rsa-psspad.c
-index eec303bb55b2d..ed5374c381513 100644
---- a/crypto/rsa-psspad.c
-+++ b/crypto/rsa-psspad.c
-@@ -51,6 +51,60 @@ static int psspad_set_sig_params(struct crypto_akcipher =
-*tfm,
- 	return 0;
- }
+ crypto/asymmetric_keys/asymmetric_type.c |  2 ++
+ include/linux/keyctl.h                   |  2 ++
+ security/keys/keyctl_pkey.c              | 13 +++++++++++++
+ 3 files changed, 17 insertions(+)
+
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_k=
+eys/asymmetric_type.c
+index ad8af3d70ac04..72c1bf964826f 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -571,6 +571,8 @@ static int asymmetric_key_verify_signature(struct kerne=
+l_pkey_params *params,
+ 		.hash_algo	=3D params->hash_algo,
+ 		.digest		=3D (void *)in,
+ 		.s		=3D (void *)in2,
++		.salt_length	=3D params->slen,
++		.mgf_hash_algo	=3D params->mgf_hash_algo,
+ 	};
 =20
-+/* MGF1 per RFC8017 B.2.1. */
-+static int pkcs1_mgf1(u8 *seed, unsigned int seed_len,
-+		      struct shash_desc *desc,
-+		      u8 *mask, unsigned int mask_len)
-+{
-+	unsigned int pos, h_len, i, c;
-+	u8 *tmp;
-+	int ret =3D 0;
+ 	return verify_signature(params->key, &sig);
+diff --git a/include/linux/keyctl.h b/include/linux/keyctl.h
+index 5b79847207ef2..753d004d76ece 100644
+--- a/include/linux/keyctl.h
++++ b/include/linux/keyctl.h
+@@ -37,6 +37,8 @@ struct kernel_pkey_params {
+ 		__u32	in2_len;	/* 2nd input data size (verify) */
+ 	};
+ 	enum kernel_pkey_operation op : 8;
++	__u32		slen;
++	const char	*mgf_hash_algo;
+ };
+=20
+ #endif /* __LINUX_KEYCTL_H */
+diff --git a/security/keys/keyctl_pkey.c b/security/keys/keyctl_pkey.c
+index 5de0d599a2748..ae3a81c726322 100644
+--- a/security/keys/keyctl_pkey.c
++++ b/security/keys/keyctl_pkey.c
+@@ -24,11 +24,15 @@ enum {
+ 	Opt_err,
+ 	Opt_enc,		/* "enc=3D<encoding>" eg. "enc=3Doaep" */
+ 	Opt_hash,		/* "hash=3D<digest-name>" eg. "hash=3Dsha1" */
++	Opt_slen,		/* "slen=3D<salt-length>" eg. "slen=3D32" */
++	Opt_mgfhash,		/* "mgfhash=3D<digest-name>" eg. "mgfhash=3Dsha1" */
+ };
+=20
+ static const match_table_t param_keys =3D {
+ 	{ Opt_enc,	"enc=3D%s" },
+ 	{ Opt_hash,	"hash=3D%s" },
++	{ Opt_slen,	"slen=3D%u" },
++	{ Opt_mgfhash,	"mgfhash=3D%s" },
+ 	{ Opt_err,	NULL }
+ };
+=20
+@@ -63,6 +67,15 @@ static int keyctl_pkey_params_parse(struct kernel_pkey_p=
+arams *params)
+ 			params->hash_algo =3D q;
+ 			break;
+=20
++		case Opt_slen:
++			if (kstrtouint(q, 0, &params->slen))
++				return -EINVAL;
++			break;
 +
-+	h_len =3D crypto_shash_digestsize(desc->tfm);
++		case Opt_mgfhash:
++			params->mgf_hash_algo =3D q;
++			break;
 +
-+	pos =3D i =3D 0;
-+	while ((i < (mask_len / h_len) + 1) && pos < mask_len) {
-+		/* Compute T =3D T || Hash(mgfSeed || C) into mask at pos. */
-+		c =3D cpu_to_be32(i);
-+
-+		ret =3D crypto_shash_init(desc);
-+		if (ret < 0)
-+			goto out_err;
-+
-+		ret =3D crypto_shash_update(desc, seed, seed_len);
-+		if (ret < 0)
-+			goto out_err;
-+
-+		ret =3D crypto_shash_update(desc, (u8 *) &c, sizeof(c));
-+		if (ret < 0)
-+			goto out_err;
-+
-+		if (mask_len - pos >=3D h_len) {
-+			ret =3D crypto_shash_final(desc, mask + pos);
-+			pos +=3D h_len;
-+		} else {
-+			tmp =3D kzalloc(h_len, GFP_KERNEL);
-+			if (!tmp) {
-+				ret =3D -ENOMEM;
-+				goto out_err;
-+			}
-+			ret =3D crypto_shash_final(desc, tmp);
-+			/* copy the last hash */
-+			memcpy(mask + pos, tmp, mask_len - pos);
-+			kfree(tmp);
-+			pos =3D mask_len;
-+		}
-+		if (ret < 0) {
-+			goto out_err;
-+		}
-+
-+		i++;
-+	}
-+
-+out_err:
-+	return ret;
-+}
-+
- static int psspad_s_v_e_d(struct akcipher_request *req)
- {
- 	return -EOPNOTSUPP;
+ 		default:
+ 			return -EINVAL;
+ 		}
 --=20
 2.30.2
 
