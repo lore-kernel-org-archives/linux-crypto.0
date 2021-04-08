@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4AB7C433B4
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 14:17:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4CDC433ED
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 14:17:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BFED76113D
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 14:17:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E76161151
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 14:17:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231968AbhDHORh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Apr 2021 10:17:37 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:30131 "EHLO
+        id S232152AbhDHORl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Apr 2021 10:17:41 -0400
+Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:33132 "EHLO
         de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232006AbhDHORQ (ORCPT
+        by vger.kernel.org with ESMTP id S232053AbhDHORQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 8 Apr 2021 10:17:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1617891423;
+        t=1617891425;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9Igtuzm/ok+NRbcSZq13s9pDJLANSUiOqCGZ0QY7cno=;
-        b=NvLktv+I+77N4mbEO3WlHFVmusDwOtPcadB+Qos4IHLhy5BHbH03862k1f5T4BtHf0jNDl
-        Njp5MX29+Xy/mbC8pT4zor7cBYUqsUGCrdiKWalhy8K6PWnPSL9K9W9urru44werL9Whfa
-        giQph+rnQoxP1ABrbV5hb3ButvPhxT4=
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com
- (mail-db8eur05lp2111.outbound.protection.outlook.com [104.47.17.111])
- (Using TLS) by relay.mimecast.com with ESMTP id
- de-mta-17-FODe4QFwOwS8KoFUGSkj7w-2; Thu, 08 Apr 2021 16:16:52 +0200
-X-MC-Unique: FODe4QFwOwS8KoFUGSkj7w-2
+        bh=DWSSzP5QXhI7WRhos++wXtpxy/9BblHdAqI5QoxPlPY=;
+        b=RiwTC4Nd53V0nXvAtyjhyou6SdpaEqw9u0oZep2LGnLNtaL6r1zT9KfY8vBnaEc2LQ4y+Y
+        NvfrUW9/r6MkC+YlTJWMz4NFI9+2Li870qv+w9M4zC3ZI9do8jokNV+2vNZ0TV4Tg08YLk
+        vvIisa6l9+TGN2hj+bpL8NB13ZwP+kE=
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com
+ (mail-he1eur01lp2051.outbound.protection.outlook.com [104.47.0.51]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ de-mta-26-sRhzaybBPhqKB_esGrPGOw-1; Thu, 08 Apr 2021 16:16:53 +0200
+X-MC-Unique: sRhzaybBPhqKB_esGrPGOw-1
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=naUxeLsiv/2i/KlcmuXlumdaBOs5ZW7S9KTBJ0+YzTqzFR4oWNcfVHPQu4ZV+9PyZNTokqoZ/dSLuAAeVUzojSvA4yD/g5OgcSL5k0rTvED94ThKHKV1Ug7+UeTKBE3CY2RVnJgAYf1m1YsFpO/VkhGbF1DQD+vpDW1X04rCwYcFtgCx3wgdheWaqKQK6INdVSVumOpcptlCwc4RvEuTdqx0TqTALLTgHOLzYDSOB4GjRT4mpwgukrFCNpXbHW20QTxCKttuyYp8Mk6vwXW78a0GgW+43TrskrKnT45gfUJ3XqMxyTdX/Ia2c+yNwV00VNq1FYl6vorJEktG4N7AEA==
+ b=YK/19zV/q98+dyZkJx76wRPhNF96MRU5Ao7xrz9hNQE6JB4S5fCvZ4uk6pXoN74VAl8/slvZhda5txasTIuAvo/b7lcw9pnG+XcDaQewTFIfrlnMtxgpzMaAsMHUeb7C7v2LaFOnNN4U5NcJLrhxKC9ODv4lIwLK7byo7Fyquv0FhEBua1Pxdc8bxbrwiwkTQatqJtG26NPz3i3/k8UFK75mmqCZ1Z9YYeVKfG6zF2yVo8Ixw/2qJNEp/BhnFP6VW0raaWq9yDqsbnQHJBJXjNaFQ35noJwDsfhHVCqiyq6kjMrUlZkL+nb+lnBDj6rx89cJ4c2ZQ8LzLBAp5o67og==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e7DWld0uBXexXyntNHnpn8e2x15y1B2pMLwJzTav2Lw=;
- b=aiYgRDGO/a7HvOW9fVnIulVOJpiYqwc8qV1mPZRh6mFWvuBb6M+UaUNxlGEu65OuVD1Mwxm4x6khJEdtBxicYKScK2uKcIVua6YVRXg/8P/NE792QgGhFYPjhqxRsueq7/4D31If9/AP31FDjC1S3i0rH5arRH/sSpDpRv3vr8dtM5E3YWgWTgSpfeihpPETr5JglDHO9Sr89YuCZC31jLvDokolp1/XHq0a5A+1BATYu+Q4JCnK9hQmGp76YnReSSaWMs+PF9Nc4DQ9ik/z4DCGRWEXY4LepUvzVw2F/TC7cHt7FzcSNE/GVjOFQ1OLRKny9r52EKWILYWi1dDqWw==
+ bh=huqGSLffEZrdFn84hJb0MF2BX6fnQrDe+V+X+XzDV7k=;
+ b=ZFznT/6qdsV0oD3dI4tQNur5JSTAHuv0g43CKiuMmE/KJ3QBPJQ7caj0dsGgHExpWB6taIFD6ZRCSEG0KyA0rDQMXawdFM2tq1OegawrOlQs0ZNRLS1R8rx9WYTQR4cBTwNWOxkuaaQXf0Lyjcca/uYfQzex+qki9lxD4tuvigSEIxtWfZVYlGkaOgNf/vHVgZrh5kcTi3MK7Nb8w7RpJ+U9NV1Nq3TWi5o229CQwTHRe4WNZUndBbNw3uKK/rZVZs+g92FDjepsqD/PUhFRwGoOnGlMC6Zy4U8J1QemvOwwpqD/1Q05k8tbg352TsDtxhs0pTWAg3aoEB14XCXcMw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
  dkim=pass header.d=suse.com; arc=none
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=suse.com;
 Received: from AM0PR04MB5650.eurprd04.prod.outlook.com (2603:10a6:208:128::18)
- by AM0PR0402MB3572.eurprd04.prod.outlook.com (2603:10a6:208:22::28) with
+ by AM0PR04MB4833.eurprd04.prod.outlook.com (2603:10a6:208:c2::30) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.29; Thu, 8 Apr
- 2021 14:16:42 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.28; Thu, 8 Apr
+ 2021 14:16:52 +0000
 Received: from AM0PR04MB5650.eurprd04.prod.outlook.com
  ([fe80::756a:86b8:8283:733d]) by AM0PR04MB5650.eurprd04.prod.outlook.com
  ([fe80::756a:86b8:8283:733d%6]) with mapi id 15.20.3999.032; Thu, 8 Apr 2021
- 14:16:42 +0000
+ 14:16:52 +0000
 From:   Varad Gautam <varad.gautam@suse.com>
 To:     linux-crypto@vger.kernel.org
 CC:     varad.gautam@suse.com, dhowells@redhat.com,
         herbert@gondor.apana.org.au, davem@davemloft.net, vt@altlinux.org,
         tianjia.zhang@linux.alibaba.com, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org, jarkko@kernel.org
-Subject: [PATCH v2 11/18] crypto: Scaffolding for RSA-PSS signature style
-Date:   Thu,  8 Apr 2021 16:15:09 +0200
-Message-ID: <20210408141516.11369-12-varad.gautam@suse.com>
+Subject: [PATCH v2 16/18] crypto: rsa-psspad: Implement signature verify callback
+Date:   Thu,  8 Apr 2021 16:15:14 +0200
+Message-ID: <20210408141516.11369-17-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210408141516.11369-1-varad.gautam@suse.com>
 References: <20210408141516.11369-1-varad.gautam@suse.com>
@@ -77,195 +77,203 @@ X-ClientProxiedBy: ZR0P278CA0137.CHEP278.PROD.OUTLOOK.COM
  (2603:10a6:208:128::18)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from xps13.suse.cz (95.90.93.216) by ZR0P278CA0137.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:40::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend Transport; Thu, 8 Apr 2021 14:16:41 +0000
+Received: from xps13.suse.cz (95.90.93.216) by ZR0P278CA0137.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:40::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend Transport; Thu, 8 Apr 2021 14:16:50 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8c3a7e99-e990-448e-2ee9-08d8fa98eecf
-X-MS-TrafficTypeDiagnostic: AM0PR0402MB3572:
+X-MS-Office365-Filtering-Correlation-Id: 835ba732-e120-4355-dbeb-08d8fa98f4b5
+X-MS-TrafficTypeDiagnostic: AM0PR04MB4833:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0PR0402MB3572AE1F9CB02305082219CEE0749@AM0PR0402MB3572.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:747;
+X-Microsoft-Antispam-PRVS: <AM0PR04MB4833626CB01CF3090D5CB5F7E0749@AM0PR04MB4833.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:546;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zNTqufgO9RPVcc3WGkTL/EbzQslqML2QxocVZoljn2PAI3MVtio+ztM7pXMumuwaxOGy+lRh6kUQN1/Rjdjgg32hRC5++25+GnAmEUls39S0RznAKKwMm0As1MIH0u0sd8V/epMG9UNtClB3czkrksdvSkmF0ucJKSn17uia6VPgOyBgTNWoRKC4yWR9HqzQAaf0VBXpnovjrbYQcCbscqcmFTuzbouKWkCpvcw071Mo6ZQuDJTzf1R7uDLBTEk8c4d2wtebFLEIupGy/tXzZ+OBtPwM4WSFUAROZag1BOuOMRs9eysVjhhwlaHu6KKrTSTlawRU3a+YRlJ4MmHVUObqvHylaMi9d2fKJc6trH3Z0EbutczB7er4xPt+4nxMBoR/Cu3LhIBxAvfjz7W0I00xpnViSj9QZylJnDB+J3f5xkF9MeUYoy4X2dA0vV+DE3xtJiroSYPEpQsu46ccBYmx/ODkAL4GyCpjzLQdpy9E+C2B79OwxbICt6ZzTl3MfJxzHJRJKQEqZnv01YfEIkbvgBSdikhiEaTnuIaIgM9Q/dtPaMhRmpNysJqKvOE5cXOiSj+sJEo+r6rIeD/9+cVU18T2pHRmUVN1pW23iGJyyGdYpZ0HzL7CkzohgO+jYDwLMW3KBEJnyJZ+jv3SJZS7IygcZtZJvddzZF1bPBLHQR7tSOtJmzpwvA6h7lGm
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5650.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(136003)(396003)(376002)(346002)(366004)(16526019)(186003)(38100700001)(2616005)(956004)(38350700001)(52116002)(6512007)(2906002)(36756003)(44832011)(6916009)(83380400001)(6666004)(8936002)(26005)(66476007)(66556008)(66946007)(4326008)(316002)(1076003)(6506007)(6486002)(478600001)(5660300002)(86362001)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?qvxPb/lpbvZdmGd6ljo0jwSA856MTvTrD8I4SoxeANBARPr72kMUvk1bZG9w?=
- =?us-ascii?Q?k91VDkml5cdetlzPbbuaSFCMVIxcdze7n/9rNbNkHxxteak3w1ySbPr8tJhK?=
- =?us-ascii?Q?9yWDpaJP/DcVO3kJVhflcJOvg0Ii7/ltOtY5ozRwoRN7xy44uRSlrquyE3W3?=
- =?us-ascii?Q?QF45WCO3/BYUOZZFmYxjAS15DmNYw40UvGvo0dzUlmZMDyjMEDLzlgdaBgl9?=
- =?us-ascii?Q?WKq4rFqNYRxYnB4mG5T3WIdIsPqAkKPLWlX0fDKwh+BkZJ9v23lVTMzzl6M3?=
- =?us-ascii?Q?Nb4piJpPUEMTfJ1xK2dXLfZzCQ8B/49Teyp+f4xsYJ/vgv0IbcIkURTY5WTb?=
- =?us-ascii?Q?mAH/AZke2jLiZ0HuqViCzehzAIVx6FU/DIuOls8PSB4tPlByICBAPPSwaVda?=
- =?us-ascii?Q?3wAUZWacv+xf2Gl/2ZtLZLzEi3m1CBOn9ibPj+402osqEH2+BHCGSjvuI/cq?=
- =?us-ascii?Q?juDWDrhhW3D1S/eGJcLoh+Hr9lD5GDUXUJ4fVgqYpfGztyewZ1oyyD7gGzSR?=
- =?us-ascii?Q?mZJo3HzouQ5lDqfyUu1Z/nRt/l/IXW1T+LxzUxhlZ84pMKUNFo6HCsCCVCv0?=
- =?us-ascii?Q?V63j3GvHwbwH61Mp4GwsPUUCHsfFD+noJyQ6iygm2mwbSqsyHujDLx5PootH?=
- =?us-ascii?Q?sdR7KwOHJfeskVQQBoFXQyys1V03PEm8wOfQfXQkRvBghmMByWZzgG8A+wu4?=
- =?us-ascii?Q?n8P+KehlUesBT30udUZrW2Aedu3tbaVu9Xz674oQD+V1k2UQyHWCuLbNin7P?=
- =?us-ascii?Q?Q5WgDJy9q3JDCPYlECfegeJItvXsGgKSu//1doGXvtkb7JYK6JjNW04xRtAm?=
- =?us-ascii?Q?gfLk4lIb7jsQWnU54LE5D7rc/X15XyZuM2gwb18yoTu1A6LsFZrU4P3gcYmf?=
- =?us-ascii?Q?BIzcyHg21hnIxy23Mw0eNXJg2LhTdDq68n7+zJh0gLdAAOPQjRWsbxj9lwUf?=
- =?us-ascii?Q?A0QBdcgjg9oCVoSrTWC4uhYFYAaz9o5vJQA0Powk/BOQDc3zNm8nGTkKTr6G?=
- =?us-ascii?Q?I1d1Ehe4D68o2to5wgqoALVH1lFarGMJkk8BMSgfKuW5cJeWbXu1Qs8KAOxx?=
- =?us-ascii?Q?FslBIC8WvQwBo5FEOv2iO0cvp6ZkbUhULR4/CV6296kSEf1tylGdK6L3Gj8a?=
- =?us-ascii?Q?eYbJcPmeWFdt1PCuahHxdqMwfYwMaDz0ltcYaX6XohTTG6TJ6vkpN9RzQdXf?=
- =?us-ascii?Q?EfrfKzjJ9IqEScJyHEROk4uLeFeK9DhXtcgydfLC+l390lB8nLt0glg2altP?=
- =?us-ascii?Q?NPu6wreULOgIh9sX20cgRDSi7OqvD42E6NIEqp7f9hDl8hgkHQ5TIBc/lcS0?=
- =?us-ascii?Q?nm/5crR5Py4S4yrEdSGwfD65?=
+X-Microsoft-Antispam-Message-Info: IhEqgx0SzwGU7PxoMQOcCQRKF+H82EQWhANSv+XW1mcI71AzjW/BHa+c5WKA5cb3PjfOGjwb9KHrNAIZ3N5NuTuSSc3wbe/k9zj8ex2BrZxXujw5wG3MHF5obcP3yuYljcAOXxHFkuH58/HuLWKC5T4YjowZ/fQi99zKOOK8xsq6IDRJv2+eyvGQHpCdbZeb2DibeF7jZ/UhXwgWViPZkStFAhp72hnUSbgvGk1CWldeq0G07euT3E5dy7u1RXpdR3gdjRaQBrDdj5Olo1tK5jafeHYCo4t41ccEap4zObBF9ErwDnuZvaU1f8J1rKs2wL1mzvg/b1ors4a/bgQ5Ct913AkLhuYIVkmSXOJYRZcnhrjxOIjHVLHOE4x+O2Df3ZJ5d0aZozLMm7Lvbfj2hqbE0lKG7xHz+K0IpLIm3gL2I1InSK0iOLx8uX5xIsmVY9vtLxoASjB42tj1OMA4G1vD6LUf5wXam6M+stdTAqpj5sdC/FXHGdfVBJR4wSSNbT6MmBDbUTu9PE6PPFhj1ydpePSUhJnjl+Y3OOVvc1iB3x0VgDnuvjR3CpKvqoaamOBOtnjLuOr2eHAyB4VIgasSjxSITHthV4hxdesG9JBhC46CNVZLs7xqatdaou7wTL9YnYyZPzrPcCD1BglhQ3mxisNVy528GEvSWcmMUo8tGdg2MwbwwFkVrq4kQgdmaKOA1o1XYWc0OlrN+pAJiR2D7JcBGJfzACLAXJNqNkD98GvxP9BpO8aUXau64RTk
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5650.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(39860400002)(136003)(346002)(396003)(376002)(478600001)(36756003)(2616005)(83380400001)(966005)(38350700001)(956004)(6916009)(316002)(6512007)(52116002)(6506007)(38100700001)(6486002)(2906002)(66946007)(44832011)(1076003)(15650500001)(86362001)(186003)(4326008)(16526019)(8936002)(8676002)(6666004)(26005)(66556008)(5660300002)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?NNDZBXjoCmFE1i91tuNaSQhz0xp4I/QZd83W+bZM6Sk+9c5thgoYdyp+ZWdB?=
+ =?us-ascii?Q?8RVlzJEUCgONif0sECabHBWv66fXrTuuGEglikDKV7XEeFg5Oq/8/DcqoLhF?=
+ =?us-ascii?Q?idfXJFfd1vykL7yVruUfeqrLw6h1SpmB1u/228lpBZiLJ5Ftkajip2X4t4gy?=
+ =?us-ascii?Q?NzQ8ZvSKtFvazNvJ/dkgLwlPftXBCkaQTlli4e7rdKWpTkHk9pxU7ZlTta6s?=
+ =?us-ascii?Q?FIY9csG8ZlNUR/CLQGR3aLUJKAR9qPqxxa5Sd8o/jtKisMr587UNr7abgFGh?=
+ =?us-ascii?Q?C1D6XorLt9c9ocGgSoyAVKFjareJXFROGBbLECT6CqIR/fldAFV6cJXIxgei?=
+ =?us-ascii?Q?vQXgpBwcnDJtSSoRiXFJfOz37VUY0d+INNreiullyDvHmhJH62fhUmfhyRRP?=
+ =?us-ascii?Q?zeN8ju/g1MYQUUFsF3dATuguwLOYPySYpEgCyTXubLnIUY0IxLtrvoREnK+o?=
+ =?us-ascii?Q?QfrpT3XcO6nJmvwA3IrzdoJB6Lx1KmgvreQ8t2BRh1x9HSeJESK3txVvksml?=
+ =?us-ascii?Q?oKWPyCqMPHj9Az2Usky89j/nmZsxAsoKr25BHV2h0RxloL7K38QIwE/Aeu+a?=
+ =?us-ascii?Q?NVwpvtNHFvHEuogJUFspo0rYHwCfTOOfjCv1pPDaNRizx6zbmnOnISAcKPu9?=
+ =?us-ascii?Q?8Wp/odpe1GkGYUoR3sg63ww0CdWUqAxejNkupot0FCtnNnSy0U5DH1hklkwf?=
+ =?us-ascii?Q?XJZiICkEGxrttdjJsQTCK9VTdxK/2dTamfbloj/bWbE6a6pNg8yYFoeIBHqZ?=
+ =?us-ascii?Q?Nx0MC/cODmdw1Ltx90jW9mT2SPXPXXMDJktH7/f8C4hkd8SWwIMiNnpTGyNC?=
+ =?us-ascii?Q?Psg+xwUOLUe40T44gUFukNwytQJNPIwtTlBv5ESFeOelUDg10n4t7A8gTYM4?=
+ =?us-ascii?Q?DHo4kvJadew5vLIiqgGvwzJHjCR8dzsI0j0vFjYGTkWkiBZUQpb6VAQRJEen?=
+ =?us-ascii?Q?ace03+nClshPfPZkvIWc1N4IjbbSwHDUi+/HxQ93r1CXBpWgsPKt3+XmBXT4?=
+ =?us-ascii?Q?rX/wLcv30UeBlDf8LS+Q12E52PX3Poqlpa6u0+exicmRy0RhTQqYvo4kUKsU?=
+ =?us-ascii?Q?UDQLsNuEQNl1JqZRIAnjjyDtgS/YLlkSiUtdk9FRd0HYuQiiYfY/UhuMoE/e?=
+ =?us-ascii?Q?WjuCZDS8Ay9BVyefr7R2cJjZmIWxdUpsibkWQrjVAkYLSshHBmJ3cOR2xdgS?=
+ =?us-ascii?Q?YVJrPNaKN2E9BlnEcmwU6kX8m7T+8Wqm0/D1tsj9VsYQ7CYR+8F1zKZFF6fU?=
+ =?us-ascii?Q?Uo4c/XlA/OaH/F6zCagLaVmH7957F/KQdVaY0ninfjnlhob0bID1ViCk/Qws?=
+ =?us-ascii?Q?QHlejD9Hl+wWK50bto+mE40s?=
 X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c3a7e99-e990-448e-2ee9-08d8fa98eecf
+X-MS-Exchange-CrossTenant-Network-Message-Id: 835ba732-e120-4355-dbeb-08d8fa98f4b5
 X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5650.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2021 14:16:42.3262
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2021 14:16:52.2685
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: o+4seCmMFSyGrribJXIsFvPlUNB3A2czg8zw9/m0WGyWo936SRYa4RP7+8Z0X8oIQAEKell0XQF2Yt4z9NEXZQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR0402MB3572
+X-MS-Exchange-CrossTenant-UserPrincipalName: YdfLK66g6YLxVDDvu4vRkprGAwE5955KTi76zAHxhxuik3gVC6ysFXkjkPnZEC7nMOLNzDZNDTIm811W/TaMwg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB4833
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add a crypto_template for rsa-psspad, hidden behind
-CONFIG_CRYPTO_RSASSA_PSS. Set the sign/verify/encrypt/decrypt
-operations to return -EOPNOTSUPP, to be implemented in the future
+The RSA output must be processed as per the EMSA-PSS-VERIFY operation
+from RFC8017, which forms the core of the PSS signature verification.
 
+Implement the verification callback, which operates on the RSA output
+buffer.
+
+Reference: https://tools.ietf.org/html/rfc8017#section-9.1.2
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 ---
- crypto/Kconfig                |  6 ++++++
- crypto/Makefile               |  1 +
- crypto/rsa-psspad.c           | 39 +++++++++++++++++++++++++++++++++++
- crypto/rsa.c                  | 20 +++++++++++++++---
- include/crypto/internal/rsa.h |  3 +++
- 5 files changed, 66 insertions(+), 3 deletions(-)
- create mode 100644 crypto/rsa-psspad.c
+v2: Allow mgf_hash_algo to be different from digest hash algorithm.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 5809cc198fa7c..3aedb40aa08f1 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -224,6 +224,12 @@ config CRYPTO_RSA
- 	help
- 	  Generic implementation of the RSA public key algorithm.
-=20
-+config CRYPTO_RSASSA_PSS
-+	bool "RSASSA-PSS algorithm"
-+	select CRYPTO_RSA
-+	help
-+	  RSASSA-PSS signature verification scheme.
-+
- config CRYPTO_DH
- 	tristate "Diffie-Hellman algorithm"
- 	select CRYPTO_KPP
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 57a85b2b3429b..88be24b9bcb24 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -42,6 +42,7 @@ rsa_generic-y +=3D rsa_helper.o
- rsa_generic-y +=3D rsa-common.o
- rsa_generic-y +=3D rsa-pkcs1pad.o
- obj-$(CONFIG_CRYPTO_RSA) +=3D rsa_generic.o
-+obj-$(CONFIG_CRYPTO_RSASSA_PSS) +=3D rsa-psspad.o
-=20
- $(obj)/sm2signature.asn1.o: $(obj)/sm2signature.asn1.c $(obj)/sm2signature=
-.asn1.h
- $(obj)/sm2.o: $(obj)/sm2signature.asn1.h
+ crypto/rsa-psspad.c | 114 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 113 insertions(+), 1 deletion(-)
+
 diff --git a/crypto/rsa-psspad.c b/crypto/rsa-psspad.c
-new file mode 100644
-index 0000000000000..0e5422b05c081
---- /dev/null
+index 4ba4d69f6ce17..87e90479a4fa7 100644
+--- a/crypto/rsa-psspad.c
 +++ b/crypto/rsa-psspad.c
-@@ -0,0 +1,39 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * RSASSA-PSS signature scheme.
-+ *
-+ * Copyright (C) 2021, SUSE
-+ * Authors: Varad Gautam <varad.gautam@suse.com>
-+ */
-+
-+#include <crypto/internal/akcipher.h>
-+#include <crypto/internal/rsa-common.h>
-+
-+static int psspad_s_v_e_d(struct akcipher_request *req)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static struct akcipher_alg psspad_alg =3D {
-+	.init =3D rsapad_akcipher_init_tfm,
-+	.exit =3D rsapad_akcipher_exit_tfm,
-+
-+	.encrypt =3D psspad_s_v_e_d,
-+	.decrypt =3D psspad_s_v_e_d,
-+	.sign =3D psspad_s_v_e_d,
-+	.verify =3D psspad_s_v_e_d,
-+	.set_pub_key =3D rsapad_set_pub_key,
-+	.set_priv_key =3D rsapad_set_priv_key,
-+	.max_size =3D rsapad_get_max_size
-+};
-+
-+static int psspad_create(struct crypto_template *tmpl, struct rtattr **tb)
-+{
-+	return rsapad_akcipher_create(tmpl, tb, &psspad_alg);
-+}
-+
-+struct crypto_template rsa_psspad_tmpl =3D {
-+	.name =3D "psspad",
-+	.create =3D psspad_create,
-+	.module =3D THIS_MODULE,
-+};
-diff --git a/crypto/rsa.c b/crypto/rsa.c
-index 5c4eece5b8028..de4ad34f9cd95 100644
---- a/crypto/rsa.c
-+++ b/crypto/rsa.c
-@@ -258,17 +258,31 @@ static int rsa_init(void)
- 		return err;
+@@ -8,6 +8,7 @@
 =20
- 	err =3D crypto_register_template(&rsa_pkcs1pad_tmpl);
+ #include <crypto/hash.h>
+ #include <crypto/internal/akcipher.h>
++#include <crypto/internal/rsa.h>
+ #include <crypto/internal/rsa-common.h>
+ #include <crypto/public_key.h>
+=20
+@@ -107,7 +108,118 @@ static int pkcs1_mgf1(u8 *seed, unsigned int seed_len=
+,
+=20
+ static int psspad_verify_complete(struct akcipher_request *req, int err)
+ {
+-	return -EOPNOTSUPP;
++	struct crypto_akcipher *tfm =3D crypto_akcipher_reqtfm(req);
++	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
++	struct rsapad_akciper_req_ctx *req_ctx =3D akcipher_request_ctx(req);
++	struct akcipher_instance *inst =3D akcipher_alg_instance(tfm);
++	struct rsapad_inst_ctx *ictx =3D akcipher_instance_ctx(inst);
++	const struct rsa_asn1_template *digest_info =3D ictx->digest_info;
++	struct crypto_shash *hash_tfm =3D NULL;
++	struct shash_desc *desc =3D NULL;
++	struct rsa_mpi_key *pkey =3D akcipher_tfm_ctx(ctx->child);
++
++	u8 *em, *h, *salt, *maskeddb;
++	unsigned int em_len, em_bits, h_len, s_len, maskeddb_len;
++	u8 *m_hash, *db_mask, *db, *h_;
++	static u8 zeroes[8] =3D { 0 };
++	unsigned int pos;
++
 +	if (err)
-+		goto out_err;
++		goto out;
 +
-+#ifdef CONFIG_CRYPTO_RSASSA_PSS
-+	err =3D crypto_register_template(&rsa_psspad_tmpl);
- 	if (err) {
--		crypto_unregister_akcipher(&rsa);
--		return err;
-+		crypto_unregister_template(&rsa_pkcs1pad_tmpl);
-+		goto out_err;
- 	}
-+#endif
-=20
--	return 0;
-+	goto out;
++	err =3D -EINVAL;
++	if (!digest_info)
++		goto out;
 +
-+out_err:
-+	crypto_unregister_akcipher(&rsa);
++	em =3D req_ctx->out_buf;
++	em_len =3D ctx->key_size;
++	em_bits =3D mpi_get_nbits(pkey->n) - 1;
++	if ((em_bits & 0x7) =3D=3D 0) {
++		em_len--;
++		em++;
++	}
++
++	h_len =3D req->dst_len;
++	s_len =3D ictx->salt_len;
++
++	if (em_len < h_len + s_len + 2)
++		goto out;
++
++	if (em[em_len - 1] !=3D 0xbc)
++		goto out;
++
++	maskeddb =3D em;
++	maskeddb_len =3D em_len - h_len - 1;
++	h =3D em + maskeddb_len;
++
++	if (em[0] & ~((u8) 0xff >> (8 * em_len - em_bits)))
++		goto out;
++
++	db_mask =3D kzalloc(maskeddb_len, GFP_KERNEL);
++	if (!db_mask) {
++		err =3D -ENOMEM;
++		goto out;
++	}
++
++	err =3D psspad_setup_shash(&hash_tfm, &desc, ictx->mgf_hash_algo);
++	if (err < 0)
++		goto out_db_mask;
++
++	err =3D pkcs1_mgf1(h, h_len, desc, db_mask, maskeddb_len);
++	if (err < 0)
++		goto out_shash;
++
++	for (pos =3D 0; pos < maskeddb_len; pos++)
++		maskeddb[pos] ^=3D db_mask[pos];
++	db =3D maskeddb;
++
++	db[0] &=3D ((u8) 0xff >> (8 * em_len - em_bits));
++
++	err =3D -EINVAL;
++	for (pos =3D 0; pos < em_len - h_len - s_len - 2; pos++) {
++		if (db[pos] !=3D 0)
++			goto out_shash;
++	}
++	if (db[pos] !=3D 0x01)
++		goto out_shash;
++
++	salt =3D db + (maskeddb_len - s_len);
++
++	m_hash =3D req_ctx->out_buf + ctx->key_size;
++	sg_pcopy_to_buffer(req->src,
++			   sg_nents_for_len(req->src, req->src_len + req->dst_len),
++			   m_hash,
++			   req->dst_len, ctx->key_size);
++
++	if (strcmp(ictx->mgf_hash_algo, digest_info->name) !=3D 0) {
++		psspad_free_shash(hash_tfm, desc);
++		err =3D psspad_setup_shash(&hash_tfm, &desc, digest_info->name);
++		if (err < 0)
++			goto out_db_mask;
++	}
++
++	err =3D crypto_shash_init(desc);
++	if (!err)
++		err =3D crypto_shash_update(desc, zeroes, 8);
++	if (!err)
++		err =3D crypto_shash_update(desc, m_hash, h_len);
++	if (!err)
++		err =3D crypto_shash_finup(desc, salt, s_len, m_hash);
++	if (err < 0)
++		goto out_shash;
++
++	h_ =3D m_hash;
++
++	if (memcmp(h_, h, h_len) !=3D 0)
++		err =3D -EKEYREJECTED;
++
++out_shash:
++	psspad_free_shash(hash_tfm, desc);
++out_db_mask:
++	kfree(db_mask);
 +out:
++	kfree_sensitive(req_ctx->out_buf);
 +	return err;
  }
 =20
- static void rsa_exit(void)
- {
- 	crypto_unregister_template(&rsa_pkcs1pad_tmpl);
-+#ifdef CONFIG_CRYPTO_RSASSA_PSS
-+	crypto_unregister_template(&rsa_psspad_tmpl);
-+#endif
- 	crypto_unregister_akcipher(&rsa);
- }
-=20
-diff --git a/include/crypto/internal/rsa.h b/include/crypto/internal/rsa.h
-index e73c61f788e68..4c168ea2f050a 100644
---- a/include/crypto/internal/rsa.h
-+++ b/include/crypto/internal/rsa.h
-@@ -61,4 +61,7 @@ struct rsa_mpi_key {
- };
-=20
- extern struct crypto_template rsa_pkcs1pad_tmpl;
-+#ifdef CONFIG_CRYPTO_RSASSA_PSS
-+extern struct crypto_template rsa_psspad_tmpl;
-+#endif /* CONFIG_CRYPTO_RSASSA_PSS */
- #endif
+ static void psspad_verify_complete_cb(struct crypto_async_request *child_a=
+sync_req,
 --=20
 2.30.2
 
