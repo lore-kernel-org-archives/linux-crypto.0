@@ -7,50 +7,55 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EDFDC433ED
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 07:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F4C9C43460
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 07:55:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDF38610E7
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 07:55:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07800611AB
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 07:55:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229999AbhDIHzn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Apr 2021 03:55:43 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:52116 "EHLO fornost.hmeau.com"
+        id S229829AbhDIHzs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Apr 2021 03:55:48 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:52126 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229846AbhDIHzn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Apr 2021 03:55:43 -0400
+        id S231611AbhDIHzr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Apr 2021 03:55:47 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lUlzE-0006Q7-Gs; Fri, 09 Apr 2021 17:55:29 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 09 Apr 2021 17:55:28 +1000
-Date:   Fri, 9 Apr 2021 17:55:28 +1000
+        id 1lUlz6-0006Q3-Kw; Fri, 09 Apr 2021 17:55:21 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 09 Apr 2021 17:55:20 +1000
+Date:   Fri, 9 Apr 2021 17:55:20 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ayush Sawal <ayush.sawal@chelsio.com>
-Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net,
-        secdev@chelsio.com
-Subject: Re: [PATCH crypto] chcr: Read rxchannel-id from firmware
-Message-ID: <20210409075528.GM31447@gondor.apana.org.au>
-References: <20210402192548.9405-1-ayush.sawal@chelsio.com>
+To:     Lv Yunlong <lyl2019@mail.ustc.edu.cn>
+Cc:     giovanni.cabiddu@intel.com, davem@davemloft.net,
+        andriy.shevchenko@linux.intel.com, wojciech.ziemba@intel.com,
+        fiona.trahe@intel.com, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: qat: Fix a double free in adf_create_ring
+Message-ID: <20210409075520.GL31447@gondor.apana.org.au>
+References: <20210402171348.3581-1-lyl2019@mail.ustc.edu.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210402192548.9405-1-ayush.sawal@chelsio.com>
+In-Reply-To: <20210402171348.3581-1-lyl2019@mail.ustc.edu.cn>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Apr 03, 2021 at 12:55:48AM +0530, Ayush Sawal wrote:
-> The rxchannel id is updated by the driver using the
-> port no value, but this does not ensure that the value
-> is correct. So now rx channel value is obtained from
-> etoc channel map value.
+On Fri, Apr 02, 2021 at 10:13:48AM -0700, Lv Yunlong wrote:
+> In adf_create_ring, if the callee adf_init_ring() failed, the callee will
+> free the ring->base_addr by dma_free_coherent() and return -EFAULT. Then
+> adf_create_ring will goto err and the ring->base_addr will be freed again
+> in adf_cleanup_ring().
 > 
-> Fixes: 567be3a5d227 ("crypto: chelsio - Use multiple txq/rxq per tfm to process the requests)
-> Signed-off-by: Ayush Sawal <ayush.sawal@chelsio.com>
+> My patch sets ring->base_addr to NULL after the first freed to avoid the
+> double free.
+> 
+> Fixes: a672a9dc872ec ("crypto: qat - Intel(R) QAT transport code")
+> Signed-off-by: Lv Yunlong <lyl2019@mail.ustc.edu.cn>
 > ---
->  drivers/crypto/chelsio/chcr_algo.c | 19 +++++++++++++++++--
->  1 file changed, 17 insertions(+), 2 deletions(-)
+>  drivers/crypto/qat/qat_common/adf_transport.c | 1 +
+>  1 file changed, 1 insertion(+)
 
 Patch applied.  Thanks.
 -- 
