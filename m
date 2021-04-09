@@ -2,137 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1358EC433B4
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 12:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ACA2C43460
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 13:16:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC042610E7
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 12:47:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34D0961177
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 13:16:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231819AbhDIMr0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Apr 2021 08:47:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20611 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233038AbhDIMr0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Apr 2021 08:47:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617972432;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NQ5R2T8qFwf/2wrATCUkhLL2GL2aMOUO18RupDBYC9c=;
-        b=HAEKC+PN6YHh350Y7LKTl9guQsrxYrEY86FtwKdouNMxc8ni/fGLxiyNDfuFEYJvyDDoa1
-        yPlDy6Hzdrfv2j2Vq3vBBipbXFy39GsNc+bytcC3BTRJcyITgCWNez+IKkkAOl1GlahFYf
-        5vF9diUBMIkRt1AdOT7vq4JPyOkEE3I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-yWB4A258PCOomfXYG54EIg-1; Fri, 09 Apr 2021 08:47:08 -0400
-X-MC-Unique: yWB4A258PCOomfXYG54EIg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CB1F107ACC7;
-        Fri,  9 Apr 2021 12:47:07 +0000 (UTC)
-Received: from ovpn-112-53.phx2.redhat.com (ovpn-112-53.phx2.redhat.com [10.3.112.53])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2480C10013C1;
-        Fri,  9 Apr 2021 12:47:03 +0000 (UTC)
-Message-ID: <0ef180dea02996fc5f4660405f2333220e8ae4c4.camel@redhat.com>
-Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
-From:   Simo Sorce <simo@redhat.com>
-To:     Ard Biesheuvel <ardb@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Hangbin Liu <liuhangbin@gmail.com>,
-        Netdev <netdev@vger.kernel.org>,
-        Toke =?ISO-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Date:   Fri, 09 Apr 2021 08:47:02 -0400
-In-Reply-To: <CAMj1kXG-e_NtLkAdLYp70x5ft_Q1Bn9rmdXs4awt7FEd5PQ4+Q@mail.gmail.com>
-References: <20210407113920.3735505-1-liuhangbin@gmail.com>
-         <CAHmME9p40M5oHDZXnFDXfO4-JuJ7bUB5BnsccGV1pksguz73sg@mail.gmail.com>
-         <c47d99b9d0efeea4e6cd238c2affc0fbe296b53c.camel@redhat.com>
-         <CAHmME9pRSOANrdvegLm9x8VTNWKcMtoymYrgStuSx+nsu=jpwA@mail.gmail.com>
-         <20210409024143.GL2900@Leo-laptop-t470s>
-         <CAHmME9oqK9iXRn3wxAB-MZvX3k_hMbtjHF_V9UY96u6NLcczAw@mail.gmail.com>
-         <20210409024907.GN2900@Leo-laptop-t470s> <YG/EAePSEeYdonA0@zx2c4.com>
-         <CAMj1kXG-e_NtLkAdLYp70x5ft_Q1Bn9rmdXs4awt7FEd5PQ4+Q@mail.gmail.com>
-Organization: Red Hat, Inc.
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        id S231946AbhDINQU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Apr 2021 09:16:20 -0400
+Received: from smtp25.cstnet.cn ([159.226.251.25]:38168 "EHLO cstnet.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231127AbhDINQQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Apr 2021 09:16:16 -0400
+Received: from localhost.localdomain (unknown [124.16.141.242])
+        by APP-05 (Coremail) with SMTP id zQCowADX31ttU3BgsuQdAA--.25000S2;
+        Fri, 09 Apr 2021 21:15:33 +0800 (CST)
+From:   Jianmin Wang <jianmin@iscas.ac.cn>
+To:     gregkh@linuxfoundation.org
+Cc:     davem@davemloft.net, dzickus@redhat.com,
+        herbert@gondor.apana.org.au, jianmin@iscas.ac.cn,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        omosnace@redhat.com, smueller@chronox.de, stable@vger.kernel.org,
+        steffen.klassert@secunet.com
+Subject: Re: Re: [PATCH] backports: crypto user - make NETLINK_CRYPTO work
+Date:   Fri,  9 Apr 2021 13:14:57 +0000
+Message-Id: <20210409131457.51384-1-jianmin@iscas.ac.cn>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <YG/11xcauoPY0sn+@kroah.com>
+References: <YG/11xcauoPY0sn+@kroah.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: zQCowADX31ttU3BgsuQdAA--.25000S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7XFWDAFW8AFyDXrW7CFyUJrb_yoWDJrgEgF
+        yktr95C3sxuFZYkFn8Gr90vas0gFWFgry0q34jqrW5ZryDJasxZ3WrCr9ag3sxGw1rGrnI
+        kF12qa92ka429jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbxkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+        n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+        0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+        IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+        AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_
+        Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUb
+        0D73UUUUU==
+X-Originating-IP: [124.16.141.242]
+X-CM-SenderInfo: xmld0z1lq6x2xfdvhtffof0/
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2021-04-09 at 08:02 +0200, Ard Biesheuvel wrote:
-> On Fri, 9 Apr 2021 at 05:03, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> > On Fri, Apr 09, 2021 at 10:49:07AM +0800, Hangbin Liu wrote:
-> > > On Thu, Apr 08, 2021 at 08:44:35PM -0600, Jason A. Donenfeld wrote:
-> > > > Since it's just a normal module library, you can simply do this in the
-> > > > module_init function, rather than deep within registration
-> > > > abstractions.
-> > > 
-> > > I did a try but looks it's not that simple. Not sure if it's because wireguard
-> > > calls the library directly. Need to check more...
+On Fri, Apr 09, 2021 at 08:36:07 +0200, Greg KH
+> On Thu, Apr 08, 2021 at 07:11:48PM +0000, Jianmin Wang wrote:
+> > while the new services need to invoke libkcapi in the container environment.
 > > 
-> > Something like the below should work...
-> > 
+> > We have verified that the problem doesn't exist on newer kernel version. 
+> > However, due to many services and the cluster running on many server machines 
+> > whose host os are long-term linux distribution with linux 4.19 kernel, it will 
+> > cost too much to migrate them to newer os with newer kernel version. This is 
+> > why we need to fix the problem on linux 4.19.
+>
+> But this is not a regression, but rather a "resolve an issue that has
+> never worked for new hardware", right?
 > 
-> The below only works if all the code is modular. initcall return
-> values are ignored for builtin code, and so the library functions will
-> happily work regardless of fips_enabled, and there is generally no
-> guarantee that no library calls can be made before the initcall() is
-> invoked.
+> And for that, moving to a new kernel seems like a wise thing to do to
+> me because we do not like backporting new features.  Distro kernel are
+> of course, free to do that if they wish.
 > 
-> For ordinary crypto API client code, the algorithm in question may be
-> an a priori unknown, and so the only sensible place to put this check
-> is where the algorithms are registered or instantiated.
+> thanks,
 > 
-> For code such as WireGuard that is hardwired to use a single set of
-> (forbidden! :-)) algorithms via library calls, the simplest way to do
-> this securely is to disable the whole thing, even though I agree it is
-> not the most elegant solution.
-> 
-> If we go with Jason's approach, we would need to mandate each of these
-> drivers can only be built as a module if the kernel is built with
-> FIPS-200 support. This is rather trivial by itself, i.e.,
-> 
->   depends on m || !CRYPTO_FIPS
-> 
-> but I am a bit concerned that the rather intricate kconfig
-> dependencies between the generic and arch-optimized versions of those
-> drivers get complicated even further.
+> greg k-h
 
-Actually this is the opposite direction we are planning to go for
-future fips certifications.
-
-Due to requirements about crypto module naming and versioning in the
-new FIPS-140-3 standard we are planning to always build all the CRYPTO
-as bultin (and maybe even forbid loading additional crypto modules in
-FIPS mode). This is clearly just a vendor choice and has no bearing on
-what upstream ultimately will do, but just throwing it here as a data
-point.
-
-Plus, as you note, it would overly complicate the interfaces.
-
-As much as the check in wireguard is inelegant, it is much simpler to
-understand and is not invasive.
-
-Simo.
-
--- 
-Simo Sorce
-RHEL Crypto Team
-Red Hat, Inc
-
-
-
+I understand. Thank you for your review and response.
+--
+Email: Jianmin Wang <jianmin@iscas.ac.cn>
 
