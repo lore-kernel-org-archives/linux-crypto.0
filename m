@@ -6,54 +6,56 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20607C433B4
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 18:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D70C433B4
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 18:37:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D5EE361104
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 18:30:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9125761105
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 18:37:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234375AbhDISaM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Apr 2021 14:30:12 -0400
-Received: from mail.zx2c4.com ([104.131.123.232]:46354 "EHLO mail.zx2c4.com"
+        id S233332AbhDIShR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Apr 2021 14:37:17 -0400
+Received: from mail.zx2c4.com ([104.131.123.232]:46534 "EHLO mail.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234049AbhDISaM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Apr 2021 14:30:12 -0400
+        id S234273AbhDIShQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Apr 2021 14:37:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1617992995;
+        t=1617993421;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+0ncOBO/c3z/itUcQbIukquu48IT8Tw/ndnvlNHEQCg=;
-        b=aP9fj+/h2K5ZpZ8OnsJeRAafDSYLpCLm3/GejqKWJEvB9yCha76Bm+SU8WVOVUIHX7eWL6
-        9uaRTNU0mUiuC83skiTjml3Avf5UbTbfjzwNjbu/7ee7IyNFAHtyTrytITKM8q4PePgJtC
-        zQT6iGGSInvTiN5O79453bXnNgFQldQ=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id dd1322ec (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 9 Apr 2021 18:29:54 +0000 (UTC)
-Received: by mail-yb1-f172.google.com with SMTP id l14so1359280ybf.11;
-        Fri, 09 Apr 2021 11:29:54 -0700 (PDT)
-X-Gm-Message-State: AOAM53346EVS2Xg+ZJpOONO2fty80ud005TedT2zuZBvvdmRcbeYDxoZ
-        gsh8rUXIB/0RVoVfQl71NwlioEItHtDFgSK2x6o=
-X-Google-Smtp-Source: ABdhPJwVlAC/OHfEbxz18A0jkExt+gitOZduoT8tqKMkmGX4UEV1IuXXcMQi1Lk2zWVBXtmlDsJGVlKJ6ZVei275dUI=
-X-Received: by 2002:a25:ad0f:: with SMTP id y15mr17625771ybi.306.1617992994050;
- Fri, 09 Apr 2021 11:29:54 -0700 (PDT)
+        bh=oSVNwotPAPQJjl+GLbQuN3wvO2qB5A32VRDgEWPG81Q=;
+        b=R5t3fUIg90+qupBtku5bsLYEV+nt2qW7JuUuvNzAi10GKENgHZH60f6G9A5no/Qn997+4j
+        L37xAjd5OE/qhzc6lyIsHOYM983Z8t8qC8jQkCqcgfhQh+Ndu11lowdW33s6UJTOOEWbe5
+        OMHykg3GgyzG+vJPNPucNV8w7uDkpZU=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 54dfcd07 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 9 Apr 2021 18:37:00 +0000 (UTC)
+Received: by mail-yb1-f181.google.com with SMTP id o10so7585626ybb.10;
+        Fri, 09 Apr 2021 11:37:00 -0700 (PDT)
+X-Gm-Message-State: AOAM530TPfRltU9mXOJRECx5A1Rf02xiz3/eHYv5Rmbjs6tnyQPJbagr
+        dMTvAKcvaVDMf04Eza6s5wyjaUFTKUamPqx9BeI=
+X-Google-Smtp-Source: ABdhPJwk/MDUyxGAQVPcrk6s9phmYdpLpHbR9mLNDuiVI3g/Quu5obxcIhQdk/3kuJv59Ei2bU2uQFJjsQfvGTOFZ2M=
+X-Received: by 2002:a25:ad0f:: with SMTP id y15mr17665460ybi.306.1617993420125;
+ Fri, 09 Apr 2021 11:37:00 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210407113920.3735505-1-liuhangbin@gmail.com>
- <YG4gO15Q2CzTwlO7@quark.localdomain> <20210408010640.GH2900@Leo-laptop-t470s>
- <20210408115808.GJ2900@Leo-laptop-t470s> <YG8dJpEEWP3PxUIm@sol.localdomain>
- <20210409021121.GK2900@Leo-laptop-t470s> <7c2b6eff291b2d326e96c3a5f9cd70aa4ef92df3.camel@chronox.de>
- <20210409080804.GO2900@Leo-laptop-t470s>
-In-Reply-To: <20210409080804.GO2900@Leo-laptop-t470s>
+ <CAHmME9p40M5oHDZXnFDXfO4-JuJ7bUB5BnsccGV1pksguz73sg@mail.gmail.com>
+ <c47d99b9d0efeea4e6cd238c2affc0fbe296b53c.camel@redhat.com>
+ <CAHmME9pRSOANrdvegLm9x8VTNWKcMtoymYrgStuSx+nsu=jpwA@mail.gmail.com>
+ <20210409024143.GL2900@Leo-laptop-t470s> <CAHmME9oqK9iXRn3wxAB-MZvX3k_hMbtjHF_V9UY96u6NLcczAw@mail.gmail.com>
+ <20210409024907.GN2900@Leo-laptop-t470s> <YG/EAePSEeYdonA0@zx2c4.com>
+ <CAMj1kXG-e_NtLkAdLYp70x5ft_Q1Bn9rmdXs4awt7FEd5PQ4+Q@mail.gmail.com> <0ef180dea02996fc5f4660405f2333220e8ae4c4.camel@redhat.com>
+In-Reply-To: <0ef180dea02996fc5f4660405f2333220e8ae4c4.camel@redhat.com>
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 9 Apr 2021 12:29:42 -0600
-X-Gmail-Original-Message-ID: <CAHmME9o53wa-_Rpk41Wd34O81o34ndpuej0xz9tThvqiHVeiSQ@mail.gmail.com>
-Message-ID: <CAHmME9o53wa-_Rpk41Wd34O81o34ndpuej0xz9tThvqiHVeiSQ@mail.gmail.com>
+Date:   Fri, 9 Apr 2021 12:36:49 -0600
+X-Gmail-Original-Message-ID: <CAHmME9opMi_2_cOS66U6jJvYZ=WJWv4E-mjYr20YaL=zzJxv+Q@mail.gmail.com>
+Message-ID: <CAHmME9opMi_2_cOS66U6jJvYZ=WJWv4E-mjYr20YaL=zzJxv+Q@mail.gmail.com>
 Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
-To:     Hangbin Liu <liuhangbin@gmail.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
+To:     Simo Sorce <simo@redhat.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Hangbin Liu <liuhangbin@gmail.com>,
         Netdev <netdev@vger.kernel.org>,
         =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
         Ondrej Mosnacek <omosnace@redhat.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -61,15 +63,38 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 9, 2021 at 2:08 AM Hangbin Liu <liuhangbin@gmail.com> wrote:
-> After offline discussion with Herbert, here is
-> what he said:
+On Fri, Apr 9, 2021 at 6:47 AM Simo Sorce <simo@redhat.com> wrote:
+> >   depends on m || !CRYPTO_FIPS
+> >
+> > but I am a bit concerned that the rather intricate kconfig
+> > dependencies between the generic and arch-optimized versions of those
+> > drivers get complicated even further.
 >
-> """
-> This is not a problem in RHEL8 because the Crypto API RNG replaces /dev/random
-> in FIPS mode.
-> """
+> Actually this is the opposite direction we are planning to go for
+> future fips certifications.
+>
+> Due to requirements about crypto module naming and versioning in the
+> new FIPS-140-3 standard we are planning to always build all the CRYPTO
+> as bultin (and maybe even forbid loading additional crypto modules in
+> FIPS mode). This is clearly just a vendor choice and has no bearing on
+> what upstream ultimately will do, but just throwing it here as a data
+> point.
 
-So far as I can see, this isn't the case in the kernel sources I'm
-reading? Maybe you're doing some userspace hack with CUSE? But at
-least get_random_bytes doesn't behave this way...
+I'm wondering: do you intend to apply similar patches to all the other
+uses of "non-FIPS-certified" crypto in the kernel? I've already
+brought up big_key.c, for example. Also if you're intent on adding
+this check to WireGuard, because it tunnels packets without using
+FIPS-certified crypto primitives, do you also plan on adding this
+check to other network tunnels that don't tunnel packets using
+FIPS-certified crypto primitives? For example, GRE, VXLAN, GENEVE? I'd
+be inclined to take this patch more seriously if it was exhaustive and
+coherent for your use case. The targeted hit on WireGuard seems
+incoherent as a standalone patch, making it hard to even evaluate. So
+I think either you should send an exhaustive patch series that forbids
+all use of non-FIPS crypto anywhere in the kernel (another example:
+net/core/secure_seq.c) in addition to all tunneling modules that don't
+use FIPS-certified crypto, or figure out how to disable the lib/crypto
+primitives that you want to be disabled in "fips mode". With a
+coherent patchset for either of these, we can then evaluate it.
+
+Jason
