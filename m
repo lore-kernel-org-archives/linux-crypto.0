@@ -2,90 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F89C433B4
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 16:56:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20607C433B4
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 18:30:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 005CD610CC
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 16:56:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5EE361104
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 18:30:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234177AbhDIQ4Y convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Apr 2021 12:56:24 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:47292 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234174AbhDIQ4X (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Apr 2021 12:56:23 -0400
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-227-DriuMqMLOW-eHfKXrEcolA-1; Fri, 09 Apr 2021 17:56:06 +0100
-X-MC-Unique: DriuMqMLOW-eHfKXrEcolA-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.2; Fri, 9 Apr 2021 17:56:05 +0100
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.012; Fri, 9 Apr 2021 17:56:05 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Chris von Recklinghausen' <crecklin@redhat.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "simo@redhat.com" <simo@redhat.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "decui@microsoft.com" <decui@microsoft.com>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v4 1/1] use crc32 instead of md5 for hibernation e820
- integrity check
-Thread-Topic: [PATCH v4 1/1] use crc32 instead of md5 for hibernation e820
- integrity check
-Thread-Index: AQHXLGR5Apl1dLUk2U+lDfr8mZtTlqqsaSNw
-Date:   Fri, 9 Apr 2021 16:56:05 +0000
-Message-ID: <6be63531313d46caa7161697bf240dfc@AcuMS.aculab.com>
-References: <20210408104629.31357-1-crecklin@redhat.com>
-In-Reply-To: <20210408104629.31357-1-crecklin@redhat.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        id S234375AbhDISaM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Apr 2021 14:30:12 -0400
+Received: from mail.zx2c4.com ([104.131.123.232]:46354 "EHLO mail.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234049AbhDISaM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Apr 2021 14:30:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1617992995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+0ncOBO/c3z/itUcQbIukquu48IT8Tw/ndnvlNHEQCg=;
+        b=aP9fj+/h2K5ZpZ8OnsJeRAafDSYLpCLm3/GejqKWJEvB9yCha76Bm+SU8WVOVUIHX7eWL6
+        9uaRTNU0mUiuC83skiTjml3Avf5UbTbfjzwNjbu/7ee7IyNFAHtyTrytITKM8q4PePgJtC
+        zQT6iGGSInvTiN5O79453bXnNgFQldQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id dd1322ec (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 9 Apr 2021 18:29:54 +0000 (UTC)
+Received: by mail-yb1-f172.google.com with SMTP id l14so1359280ybf.11;
+        Fri, 09 Apr 2021 11:29:54 -0700 (PDT)
+X-Gm-Message-State: AOAM53346EVS2Xg+ZJpOONO2fty80ud005TedT2zuZBvvdmRcbeYDxoZ
+        gsh8rUXIB/0RVoVfQl71NwlioEItHtDFgSK2x6o=
+X-Google-Smtp-Source: ABdhPJwVlAC/OHfEbxz18A0jkExt+gitOZduoT8tqKMkmGX4UEV1IuXXcMQi1Lk2zWVBXtmlDsJGVlKJ6ZVei275dUI=
+X-Received: by 2002:a25:ad0f:: with SMTP id y15mr17625771ybi.306.1617992994050;
+ Fri, 09 Apr 2021 11:29:54 -0700 (PDT)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+References: <20210407113920.3735505-1-liuhangbin@gmail.com>
+ <YG4gO15Q2CzTwlO7@quark.localdomain> <20210408010640.GH2900@Leo-laptop-t470s>
+ <20210408115808.GJ2900@Leo-laptop-t470s> <YG8dJpEEWP3PxUIm@sol.localdomain>
+ <20210409021121.GK2900@Leo-laptop-t470s> <7c2b6eff291b2d326e96c3a5f9cd70aa4ef92df3.camel@chronox.de>
+ <20210409080804.GO2900@Leo-laptop-t470s>
+In-Reply-To: <20210409080804.GO2900@Leo-laptop-t470s>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 9 Apr 2021 12:29:42 -0600
+X-Gmail-Original-Message-ID: <CAHmME9o53wa-_Rpk41Wd34O81o34ndpuej0xz9tThvqiHVeiSQ@mail.gmail.com>
+Message-ID: <CAHmME9o53wa-_Rpk41Wd34O81o34ndpuej0xz9tThvqiHVeiSQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
+To:     Hangbin Liu <liuhangbin@gmail.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Chris von Recklinghausen
-> Sent: 08 April 2021 11:46
-> 
-> Suspend fails on a system in fips mode because md5 is used for the e820
-> integrity check and is not available. Use crc32 instead.
-> 
-> Prior to this patch, MD5 is used only to create a digest to ensure integrity of
-> the region, no actual encryption is done. This patch set changes the integrity
-> check to use crc32 instead of md5 since crc32 is available in both FIPS and
-> non-FIPS modes.
-> 
-> Note that the digest is only used as an integrity check. No actual encryption
-> is done.
+On Fri, Apr 9, 2021 at 2:08 AM Hangbin Liu <liuhangbin@gmail.com> wrote:
+> After offline discussion with Herbert, here is
+> what he said:
+>
+> """
+> This is not a problem in RHEL8 because the Crypto API RNG replaces /dev/random
+> in FIPS mode.
+> """
 
-If crc32 is good enough, would a 1's compliment sum be good enough?
-It is likely to be faster to calculate and not need special
-functions be built into the kernel at all.
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+So far as I can see, this isn't the case in the kernel sources I'm
+reading? Maybe you're doing some userspace hack with CUSE? But at
+least get_random_bytes doesn't behave this way...
