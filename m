@@ -2,134 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B51CBC433B4
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 23:55:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF7DC433ED
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 02:11:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B6D26115B
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Apr 2021 23:55:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EAAB60BBB
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 02:11:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233018AbhDHXzm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Apr 2021 19:55:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37036 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233009AbhDHXzm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Apr 2021 19:55:42 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1018861151;
-        Thu,  8 Apr 2021 23:55:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617926130;
-        bh=SUv1EmiHLV/4OjfzTusbiqGWcCkMUz2DyvyUUnJ+SZ4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=AiXVaVzfdo5Rr24r5RglJ24YvxSbVdSR9sUJMKrZNgIS5DA9xS7v9lUeDGp6SeG1P
-         y4SWJnCy2xrKfe8M0sEyjIAgPZePczJVNorjOkijUz9h9FahY7iwPtcq5y8EWiJFlX
-         DxHh/zmIhOd/GEfvrvvrfBu826zfgbBVRQAnlYDNZQD4M8zsGmJg00LKQiUyTWpahR
-         q8oqYve83TKwtCYjHXIqxOJ2/VZFW2vswrEF3aSYC/nQLCCkLuw943eo28Bpp0BbuN
-         zAy/6ORAIDY1L8DctfUMkLWcIa8AX7RtusWbAMPl0pXlIAb10NS/UnIbFbwY6E7fsQ
-         2aX2RrxjLEToA==
-Date:   Thu, 8 Apr 2021 16:55:28 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Chris von Recklinghausen <crecklin@redhat.com>
-Cc:     ardb@kernel.org, simo@redhat.com, rafael@kernel.org,
-        decui@microsoft.com, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 1/1] use crc32 instead of md5 for hibernation e820
- integrity check
-Message-ID: <YG+X8M6JfLY4cqmD@sol.localdomain>
-References: <20210408131506.17941-1-crecklin@redhat.com>
- <YG8hgzBPQAvov9Vz@sol.localdomain>
- <f01021a0-2edd-da43-5f04-043b4f42be8b@redhat.com>
+        id S232587AbhDICLt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Apr 2021 22:11:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36018 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232426AbhDICLq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Apr 2021 22:11:46 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1830C061760;
+        Thu,  8 Apr 2021 19:11:33 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id g35so2716633pgg.9;
+        Thu, 08 Apr 2021 19:11:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=M7qe7FCfvCPMcZYFuYoHbQMK4LgMH3etO2XanLRa5d8=;
+        b=SMX25MvqeE7Yr+RC/3xbxG29X1+VoXiVeju+8aEqyi2AMuaIQz3PA6malICPUm2W6K
+         Xx9Zviitp8INcWLAaHbNGCQKSur+ychxer6ldAg7zpv+GG8qK03DM8IjOJrR7UcisoM/
+         Rc8fyi++Y8gc2NjcQ5VlhLYosDCSAA2Rioprjm1qbMr1awBydTn2QOQkuOJX5Cn6MUya
+         TzUqOJz6SrFC1av8846816iEPRsG9jVC4tHiTwZWO00ajRvOPD7YdsQ3QgrOW1FwKqKo
+         NjBRyXr82DUTbpmHHZQik0Xewa4dkWZ/7SINLgdjkw9dym5ZDDmkPUC7XhqjbEM96oeW
+         uLxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=M7qe7FCfvCPMcZYFuYoHbQMK4LgMH3etO2XanLRa5d8=;
+        b=KgYsXHo/UHxNgrPDNJZ+s9U3eLkHOviAHZvrC3pU0bYDddyNBcLnjoWpjt0zK0W6Fj
+         O24Kk3cenT9PRIXPSnHLpDZkhlGdKsu5rVGIXfCnMti0wRg/+wNLQVI8gVnjQLrkG9pz
+         fKEJ7CTt1KAZj90RUDt1oAOFle/6jh9aLxi5olX1LnEkjm9lmruvT6ZaxFWnxXe2ubmg
+         LZT664yo0QBCBP2snrRgdUmz0JhFg3lRWLEtyhSgmK1eAB2wlBO25gAiUpG0pQMDfra3
+         Kw/iuOjbXAx/Y0X1UuJPqt96XN9Jzs+JkvtoqgDyPuIomfsTOsHghmA8FGupKifz1AK/
+         a1+Q==
+X-Gm-Message-State: AOAM531iNQgPfkRSwdPVreoVCIGK4RVOrO6E/0QngKBufJ/Z9adnRYt0
+        m60u9UDKFFiLE6RCk7zHhSY=
+X-Google-Smtp-Source: ABdhPJzzLDrJpyYDbLxTHzfPk8XomptqJPd8Rs79sUl9ODW5od30XDpJe8Bw/cJvHUDKfzjnKkNh4w==
+X-Received: by 2002:a63:5a50:: with SMTP id k16mr10599264pgm.185.1617934293086;
+        Thu, 08 Apr 2021 19:11:33 -0700 (PDT)
+Received: from Leo-laptop-t470s ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id p2sm563309pgm.24.2021.04.08.19.11.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Apr 2021 19:11:32 -0700 (PDT)
+Date:   Fri, 9 Apr 2021 10:11:21 +0800
+From:   Hangbin Liu <liuhangbin@gmail.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     netdev@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
+Message-ID: <20210409021121.GK2900@Leo-laptop-t470s>
+References: <20210407113920.3735505-1-liuhangbin@gmail.com>
+ <YG4gO15Q2CzTwlO7@quark.localdomain>
+ <20210408010640.GH2900@Leo-laptop-t470s>
+ <20210408115808.GJ2900@Leo-laptop-t470s>
+ <YG8dJpEEWP3PxUIm@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f01021a0-2edd-da43-5f04-043b4f42be8b@redhat.com>
+In-Reply-To: <YG8dJpEEWP3PxUIm@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 08, 2021 at 11:53:59AM -0400, Chris von Recklinghausen wrote:
-> On 4/8/21 11:30 AM, Eric Biggers wrote:
-> > On Thu, Apr 08, 2021 at 09:15:06AM -0400, Chris von Recklinghausen wrote:
-> > > Suspend fails on a system in fips mode because md5 is used for the e820
-> > > integrity check and is not available. Use crc32 instead.
+On Thu, Apr 08, 2021 at 08:11:34AM -0700, Eric Biggers wrote:
+> On Thu, Apr 08, 2021 at 07:58:08PM +0800, Hangbin Liu wrote:
+> > On Thu, Apr 08, 2021 at 09:06:52AM +0800, Hangbin Liu wrote:
+> > > > Also, couldn't you just consider WireGuard to be outside your FIPS module
+> > > > boundary, which would remove it from the scope of the certification?
+> > > > 
+> > > > And how do you handle all the other places in the kernel that use ChaCha20 and
+> > > > SipHash?  For example, drivers/char/random.c?
 > > > 
-> > > This patch changes the integrity check algorithm from md5 to
-> > > crc32. This integrity check is used only to verify accidental
-> > > corruption of the hybernation data and is not intended as a
-> > > cryptographic integrity check.
-> > > Md5 is overkill in this case and also disabled in FIPS mode because it
-> > > is known to be broken for cryptographic purposes.
-> > > 
-> > > Fixes: 62a03defeabd ("PM / hibernate: Verify the consistent of e820 memory map
-> > >         by md5 digest")
-> > > 
-> > > Tested-by: Dexuan Cui <decui@microsoft.com>
-> > > Reviewed-by: Dexuan Cui <decui@microsoft.com>
-> > > Signed-off-by: Chris von Recklinghausen <crecklin@redhat.com>
-> > > ---
-> > > v1 -> v2
-> > >     bump up RESTORE_MAGIC
-> > > v2 -> v3
-> > >     move embelishment from cover letter to commit comments (no code change)
-> > > v3 -> v4
-> > >     add note to comments that md5 isn't used for encryption here.
-> > > v4 -> v5
-> > >     reword comment per Simo's suggestion
-> > > 
-> > >   arch/x86/power/hibernate.c | 35 +++++++++++++++++++----------------
-> > >   1 file changed, 19 insertions(+), 16 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/power/hibernate.c b/arch/x86/power/hibernate.c
-> > > index cd3914fc9f3d..b56172553275 100644
-> > > --- a/arch/x86/power/hibernate.c
-> > > +++ b/arch/x86/power/hibernate.c
-> > > @@ -55,31 +55,31 @@ int pfn_is_nosave(unsigned long pfn)
-> > >   }
-> > > -#define MD5_DIGEST_SIZE 16
-> > > +#define CRC32_DIGEST_SIZE 16
-> > >   struct restore_data_record {
-> > >   	unsigned long jump_address;
-> > >   	unsigned long jump_address_phys;
-> > >   	unsigned long cr3;
-> > >   	unsigned long magic;
-> > > -	u8 e820_digest[MD5_DIGEST_SIZE];
-> > > +	u8 e820_digest[CRC32_DIGEST_SIZE];
-> > >   };
-> > > -#if IS_BUILTIN(CONFIG_CRYPTO_MD5)
-> > > +#if IS_BUILTIN(CONFIG_CRYPTO_CRC32)
-> > Should CONFIG_CRYPTO_CRC32 be getting selected from somewhere?
-> 
-> 
-> Yes, presumably from the same source that sets CONFIG_CRYPTO_MD5. Also
-> presumably there's value to not forcing the check if the config value is not
-> set.
-
-I wouldn't be so sure about that.  It might just be a bug that CONFIG_CRYPTO_MD5
-wasn't being selected.  Where is it documented that the user needed to set
-CONFIG_CRYPTO_MD5=y if they wanted the hibernation image checksumming to work?
-
+> > > Good question, I will check it and reply to you later.
 > > 
-> > If that is too hard because it would pull in too much of the crypto API, maybe
-> > using the library interface to CRC-32 (lib/crc32.c) would be a better fit?
-> 
-> 
-> Based on my statement above, the intent is to provide a simple drop in
-> replacement for md5 so that users of FIPS mode can suspend/resume without
-> any errors.
-> 
+> > I just read the code. The drivers/char/random.c do has some fips specific
+> > parts(seems not related to crypto). After commit e192be9d9a30 ("random: replace
+> > non-blocking pool with a Chacha20-based CRNG") we moved part of chacha code to
+> > lib/chacha20.c and make that code out of control.
+> > 
+> So you are saying that you removed drivers/char/random.c and lib/chacha20.c from
+> your FIPS module boundary?  Why not do the same for WireGuard?
 
-It's possible that most people have CONFIG_CRYPTO_MD5 enabled for some unrelated
-reason so the hibernation image checksumming works by chance.
-CONFIG_CRYPTO_CRC32 is a different option so the same is not necessarily true.
+No, I mean this looks like a bug (using not allowed crypto in FIPS mode) and
+we should fix it.
 
-However, note that CONFIG_HIBERNATION already selects CONFIG_CRC32 (the library
-interface to CRC-32) but not CONFIG_CRYPTO_CRC32 (shash interface to CRC-32).
-
-So, if this code just used the library interface crc32_le(), it will always be
-available and the IS_BUILTIN() checks can be removed...
-
-- Eric
+Thanks
+Hangbin
