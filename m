@@ -2,105 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F8FC43460
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 02:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D948FC433B4
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 02:49:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 905E6610F9
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 02:47:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FC2C60FE8
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 02:49:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233054AbhDICsC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Apr 2021 22:48:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43838 "EHLO
+        id S232688AbhDICta (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Apr 2021 22:49:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232921AbhDICsB (ORCPT
+        with ESMTP id S232638AbhDICta (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Apr 2021 22:48:01 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEE6AC061760;
-        Thu,  8 Apr 2021 19:47:49 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id g10so2017678plt.8;
-        Thu, 08 Apr 2021 19:47:49 -0700 (PDT)
+        Thu, 8 Apr 2021 22:49:30 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85854C061760;
+        Thu,  8 Apr 2021 19:49:18 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id t22so1700689ply.1;
+        Thu, 08 Apr 2021 19:49:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=wB1I6Nqq7AfdRuGhioLL2RWvT/EvSUrtBmeOoGNpC4c=;
-        b=m6llg1wz1AbvRLP0qKhVjJidA0yD+i4LsoBJ6TfkuD9vnR6jyqNnTzfVsq6VPlkZrm
-         DQP64fvm6kJQkRWdrQptJbTtjnBz/4aL8GYABAvauNucff1sUg6/oS7Ya3O86ZmwpZkQ
-         L1FBYM1A5reg1N0LbpjR13lI9uRIP6GrAXUjn4uWDEoac/5VuOUzgDbqwyE9FqxijXqp
-         6oiKv/s+v/xpPdivKYc38MX9O6CV6uq+44JjDRAkf0sWEsJ+DDPiY7HwYyO6t6Ke9JoM
-         lhVh2OPTIVD3qEb+p5b/krUgqsPC2chn3LzRVYumb/lW60UFU319y21iTyORgVW4p1AK
-         ErCQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dR80kyoECcnOrPvoj5x4devJIhpkiy288PkyOxO5h5k=;
+        b=AgwtRJau4jh/pRKYrdNuVTH5hr9Td73qOgEvqonERVLoAYuKQdb+2joVQiHn1OGI+n
+         oM/GJmYtykWSjMRmt7jCyC3yqTrOugmM5xOp70cUpzTC1Le7W3cd6SnpoXEj1RYLjX4q
+         Kk6RJcv6U2adjWHZAfDkbTDwWfSrJWJuEHGuAde7ZRTgsIF0vf0xsOoIL8MrsmAJVTet
+         Wb/M7aDcIxLF19ylQjjnqqeqz5UvnyOoIiorZHlh10O1QhErtSTNLzJiIXmKwcTBYjWZ
+         smlkA/jG5SLe8gSFX+dSV2mIFnmUEiB/Yb28C49SWTue3D8uuwkl4VMplPqsGMM6ffju
+         fqMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=wB1I6Nqq7AfdRuGhioLL2RWvT/EvSUrtBmeOoGNpC4c=;
-        b=tTWT50owUosFLFQMY0jyabGt1nBmTOoiQSuWF3ZQpsmCVrhbXhn8ny33P5F7ck/ymN
-         wF3pLp8S+TzyXrXS0iiBsJD57avghmTTiVA1hN24ZzhapSkzF3yEDz8bnjzD9JwpwPYf
-         eNaMVxW/nLjcUUTr/5XHIIpxVwtIRrtlkbbit7hqSQQxxRqSh232wkgtaqWG/mG/t0Db
-         yR//s1fSTMxb6MYNzrIpJQOwnI56D4JxEzbaWL2Kg7F3oVXlI9mSDVESedseYYTMbHrp
-         xZKEQQ93fmggNqtWYRMnMv+0rTuuleKFt1ylMyKLnAsvlg36gfCcJ2W5w2DgBiOGZ2YK
-         Ag0g==
-X-Gm-Message-State: AOAM531htF8ui6ot2nkRO/gxDAQGmMGChEJ5W7z1VNqjJKuPbIKg4PRI
-        LzmADTfjEKvj1YjZA/rZdOk=
-X-Google-Smtp-Source: ABdhPJxUYDPGfXbWq6ZhgcPjptCXqH2cmifLVZBYRe/Vs49P/0+eEQ4Hxh/QRFDGUb/2TZdNZVPTvA==
-X-Received: by 2002:a17:902:b210:b029:e6:33b4:cd9e with SMTP id t16-20020a170902b210b02900e633b4cd9emr10575859plr.67.1617936469326;
-        Thu, 08 Apr 2021 19:47:49 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id d26sm665525pfo.162.2021.04.08.19.47.46
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Apr 2021 19:47:49 -0700 (PDT)
-From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ben Boeckel <me@benboeckel.net>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Malte Gell <malte.gell@gmx.de>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [PATCH 4/4] Documentation/admin-guide/module-signing.rst: add openssl command option example for CodeSign EKU
-Date:   Fri,  9 Apr 2021 10:46:56 +0800
-Message-Id: <20210409024656.8083-5-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
-In-Reply-To: <20210409024656.8083-1-jlee@suse.com>
-References: <20210409024656.8083-1-jlee@suse.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dR80kyoECcnOrPvoj5x4devJIhpkiy288PkyOxO5h5k=;
+        b=KVcThJL5xH8DGeMXaZ42hs/+0y4OZa0tvxZwyJc8mqipsdaU/eL4srp9f89RasmyGZ
+         PcYQUETdADhnC75DhlVLOzyvfAEQfkOV/qsYMa0I7IWknEqInyLwaW73KoSmS4+i7JVq
+         xji/4lwJBjE++6z3gZnr9SLFaFddoz3Jdvz/HEOVBLJg7ZjHYn6EhjLT97zeoTuUpfOI
+         akH/6GUtkDDfg5HZ7iPwSAfboRaXUKgAVM2QLizsZuZFP8b0Ps9zBlO4oUNsANYYad1m
+         9/5nVVL/oj3W0BamyStX3wqnTv3vzZ7GtoCRuo8AXyTGjrn4rMQ857s5h9piH4FPYrxx
+         DRhg==
+X-Gm-Message-State: AOAM532MkmWbuH9LaFsNMLxEVU0tg0icvWj69NJTd27OZXAuomwyzk/w
+        RcL2cBNeb/65UkftfBk/TRA=
+X-Google-Smtp-Source: ABdhPJyjUso2B6BdwWk9dCEbwt7ZxZdLw+UIukBFasvwj8F6KCCo+SWt8BYrjf9wB4xD0YHhPrp0Ww==
+X-Received: by 2002:a17:90a:5889:: with SMTP id j9mr12051916pji.69.1617936558120;
+        Thu, 08 Apr 2021 19:49:18 -0700 (PDT)
+Received: from Leo-laptop-t470s ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id c193sm656029pfc.180.2021.04.08.19.49.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Apr 2021 19:49:17 -0700 (PDT)
+Date:   Fri, 9 Apr 2021 10:49:07 +0800
+From:   Hangbin Liu <liuhangbin@gmail.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Simo Sorce <simo@redhat.com>, Netdev <netdev@vger.kernel.org>,
+        Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
+Message-ID: <20210409024907.GN2900@Leo-laptop-t470s>
+References: <20210407113920.3735505-1-liuhangbin@gmail.com>
+ <CAHmME9p40M5oHDZXnFDXfO4-JuJ7bUB5BnsccGV1pksguz73sg@mail.gmail.com>
+ <c47d99b9d0efeea4e6cd238c2affc0fbe296b53c.camel@redhat.com>
+ <CAHmME9pRSOANrdvegLm9x8VTNWKcMtoymYrgStuSx+nsu=jpwA@mail.gmail.com>
+ <20210409024143.GL2900@Leo-laptop-t470s>
+ <CAHmME9oqK9iXRn3wxAB-MZvX3k_hMbtjHF_V9UY96u6NLcczAw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9oqK9iXRn3wxAB-MZvX3k_hMbtjHF_V9UY96u6NLcczAw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add an openssl command option example for generating CodeSign extended
-key usage in X.509 when CONFIG_CHECK_CODESIGN_EKU is enabled.
+On Thu, Apr 08, 2021 at 08:44:35PM -0600, Jason A. Donenfeld wrote:
+> Since it's just a normal module library, you can simply do this in the
+> module_init function, rather than deep within registration
+> abstractions.
 
-Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
----
- Documentation/admin-guide/module-signing.rst | 6 ++++++
- 1 file changed, 6 insertions(+)
+I did a try but looks it's not that simple. Not sure if it's because wireguard
+calls the library directly. Need to check more...
 
-diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
-index 7d7c7c8a545c..ca3b8f19466c 100644
---- a/Documentation/admin-guide/module-signing.rst
-+++ b/Documentation/admin-guide/module-signing.rst
-@@ -170,6 +170,12 @@ generate the public/private key files::
- 	   -config x509.genkey -outform PEM -out kernel_key.pem \
- 	   -keyout kernel_key.pem
- 
-+When ``CONFIG_CHECK_CODESIGN_EKU`` option is enabled, the following openssl
-+command option should be added where for generating CodeSign extended key usage
-+in X.509::
-+
-+        -addext "extendedKeyUsage=codeSigning"
-+
- The full pathname for the resulting kernel_key.pem file can then be specified
- in the ``CONFIG_MODULE_SIG_KEY`` option, and the certificate and key therein will
- be used instead of an autogenerated keypair.
--- 
-2.16.4
-
+Hangbin
