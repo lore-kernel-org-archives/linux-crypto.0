@@ -7,47 +7,51 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E970EC433B4
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 07:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A97EAC433ED
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 07:55:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A6922611AE
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 07:54:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A655611AE
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 07:55:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231950AbhDIHy5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Apr 2021 03:54:57 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:52092 "EHLO fornost.hmeau.com"
+        id S231952AbhDIHzY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Apr 2021 03:55:24 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:52100 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231891AbhDIHy4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Apr 2021 03:54:56 -0400
+        id S231611AbhDIHzY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Apr 2021 03:55:24 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lUlyR-0006Ne-3b; Fri, 09 Apr 2021 17:54:40 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 09 Apr 2021 17:54:38 +1000
-Date:   Fri, 9 Apr 2021 17:54:38 +1000
+        id 1lUlyt-0006PD-DM; Fri, 09 Apr 2021 17:55:08 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 09 Apr 2021 17:55:07 +1000
+Date:   Fri, 9 Apr 2021 17:55:07 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Kai Ye <yekai13@huawei.com>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        liulongfang@huawei.com
-Subject: Re: [PATCH] crypto:hisilicon/sec - fixup checking the 3DES weak key
-Message-ID: <20210409075438.GJ31447@gondor.apana.org.au>
-References: <1617331677-49794-1-git-send-email-yekai13@huawei.com>
+        wangzhou1@hisilicon.com
+Subject: Re: [PATCH v2] crypto: hisilicon/qm - delete redundant code
+Message-ID: <20210409075507.GK31447@gondor.apana.org.au>
+References: <1617362550-23630-1-git-send-email-yekai13@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1617331677-49794-1-git-send-email-yekai13@huawei.com>
+In-Reply-To: <1617362550-23630-1-git-send-email-yekai13@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 02, 2021 at 10:47:57AM +0800, Kai Ye wrote:
-> skcipher: Add a verifying to check whether the triple DES key
-> is weak.
+On Fri, Apr 02, 2021 at 07:22:30PM +0800, Kai Ye wrote:
+> The "qdma" is a structure variable instead of actual data. This
+> structure doesn't need to be zerod, The memset is useless and redundant.
+> So delete it.
 > 
 > Signed-off-by: Kai Ye <yekai13@huawei.com>
 > ---
->  drivers/crypto/hisilicon/sec2/sec_crypto.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
+> Changes v1 -> v2:
+>  Re-edit the description.
+> 
+>  drivers/crypto/hisilicon/qm.c | 1 -
+>  1 file changed, 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
