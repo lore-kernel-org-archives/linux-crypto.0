@@ -2,108 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BCC6C433ED
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 02:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE76FC43460
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 02:47:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB12F610C9
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 02:44:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8113E610F7
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 02:47:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232673AbhDICpD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Apr 2021 22:45:03 -0400
-Received: from mail.zx2c4.com ([104.131.123.232]:48744 "EHLO mail.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232616AbhDICpC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Apr 2021 22:45:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1617936286;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hbt6s8Xm+0C1xOzwiz1rM7kEjqZ3GwCpYUjNtvQ8fwo=;
-        b=NuoCA2qXSwXBxPHvGhsMX28Wp0sOMV4tfvJPmDdEP95/kXrI/Rd2V6UrSiDfVwqAzLwy4G
-        0eeTiSqtJYeM70fh29XPLBs7kIu+0oMNtFJGz+ZGOSsM7FVXL0gnIeZnd1X0dG5SFTX9cM
-        YxrDXQ3GLBGYoBSEJq6XwKpSSDGeIIE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2509b4cb (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 9 Apr 2021 02:44:46 +0000 (UTC)
-Received: by mail-yb1-f180.google.com with SMTP id n12so4951848ybf.8;
-        Thu, 08 Apr 2021 19:44:46 -0700 (PDT)
-X-Gm-Message-State: AOAM533kDwqTQ0PNOdEQkXuwtQdCRM94G+r6Ghl+Pqw0TjOeFb83efxP
-        71OlDILHdkHy5DDdrxXDk7Hz2T0VAlxfCeMeX2M=
-X-Google-Smtp-Source: ABdhPJx3eEkk2YNZQ0Z4xRktcT2FpMre8EaBM953qIVD47KrdvEHwwkk7M4/3W97SCtYfzxzQKOI3nyuo99+XSWUEUI=
-X-Received: by 2002:a25:ad0f:: with SMTP id y15mr12846290ybi.306.1617936285990;
- Thu, 08 Apr 2021 19:44:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210407113920.3735505-1-liuhangbin@gmail.com>
- <CAHmME9p40M5oHDZXnFDXfO4-JuJ7bUB5BnsccGV1pksguz73sg@mail.gmail.com>
- <c47d99b9d0efeea4e6cd238c2affc0fbe296b53c.camel@redhat.com>
- <CAHmME9pRSOANrdvegLm9x8VTNWKcMtoymYrgStuSx+nsu=jpwA@mail.gmail.com> <20210409024143.GL2900@Leo-laptop-t470s>
-In-Reply-To: <20210409024143.GL2900@Leo-laptop-t470s>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 8 Apr 2021 20:44:35 -0600
-X-Gmail-Original-Message-ID: <CAHmME9oqK9iXRn3wxAB-MZvX3k_hMbtjHF_V9UY96u6NLcczAw@mail.gmail.com>
-Message-ID: <CAHmME9oqK9iXRn3wxAB-MZvX3k_hMbtjHF_V9UY96u6NLcczAw@mail.gmail.com>
-Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
-To:     Hangbin Liu <liuhangbin@gmail.com>
-Cc:     Simo Sorce <simo@redhat.com>, Netdev <netdev@vger.kernel.org>,
-        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S232696AbhDICr2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Apr 2021 22:47:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43702 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232638AbhDICr1 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Apr 2021 22:47:27 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 894C1C061760;
+        Thu,  8 Apr 2021 19:47:14 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id t7so2021338plg.9;
+        Thu, 08 Apr 2021 19:47:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=/CvRWYjORCw8flby47H5HqIvyfw8yrJSz4E5Q321rKY=;
+        b=nJQs3VUsyXZWOWc+dq0sUZwNjP4JG5FztjLtdfDDqG2Y73O4WVpdjufpB9wLY9jnVB
+         AUkT9Qj6f1ASNZlpDMxqhswbk2j4vxT0U1WO2dstXYYfiedgMrAeqf/ZfElCq+GLGhJe
+         rjrq8rF/H3V35PcmOAEZ2RIQfyLchndVWoHcB7/b29460SBWpV0GtNWtEkCzDNsQsjTg
+         mHbPPWRTX8I0Zie+y0ZH5BDSBIarh3/D5bQOIjWFpJpMpuVDCFGCmQuTE0RICV5autib
+         9dMBzqae008v0sr9zA7tL+plbbqc2ULocXjHFNkgpPJxDh7l6UZjaNBSlDyh0zAxUc/+
+         JXig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=/CvRWYjORCw8flby47H5HqIvyfw8yrJSz4E5Q321rKY=;
+        b=YuXnlZL3rGcubHvwMrMme2G+6zLf/hPhn+nj1U986aakXeEtFfy4hFEJnWXK+CG71G
+         1CBwV7Jkw2kwxfHLHM10FkA8qBGZE6nTC6VesGwH27hKUj1XyUIbCLztGtIB4U4pkZCW
+         0KSSVfAWt8/eIV+cX/4Wld/hwYZ2sbMbhVzCjaqH1kn0gqHONljm5MC5UOP4d6Hhg4Vr
+         z/xj++G5VqFLm9Whvcgkwk8W4RLNRG5TvXjzQcxgfUeTfpAOb+JBx9Zh/3otmmYqGG48
+         OvCqp5b8cOvFbhUe2XNg63qiUeU+vNm1LzYpu2ssvO1LTU+c2S6jEXDrhhTGUsbwTD/P
+         fRVA==
+X-Gm-Message-State: AOAM533uR6mHk+9eFI+xgUgXLHojGbvv1JuO+aXdFQyP0k9iU8wHtGer
+        jEhostBCXVAaNKelK6HECxqBVy9txYc=
+X-Google-Smtp-Source: ABdhPJwp/lDI2Xcbvwun63Wndrd7Yh8trbP4ZdtEG+PvLXyNGXrQTI63YvJt4VBgRZIPapytCD0oiQ==
+X-Received: by 2002:a17:90a:5907:: with SMTP id k7mr5591823pji.197.1617936433989;
+        Thu, 08 Apr 2021 19:47:13 -0700 (PDT)
+Received: from linux-l9pv.suse ([124.11.22.254])
+        by smtp.gmail.com with ESMTPSA id d26sm665525pfo.162.2021.04.08.19.47.08
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 08 Apr 2021 19:47:12 -0700 (PDT)
+From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ben Boeckel <me@benboeckel.net>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Malte Gell <malte.gell@gmx.de>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Lee, Chun-Yi" <jlee@suse.com>
+Subject: [PATCH v5 0/4] Check codeSigning extended key usage extension
+Date:   Fri,  9 Apr 2021 10:46:52 +0800
+Message-Id: <20210409024656.8083-1-jlee@suse.com>
+X-Mailer: git-send-email 2.12.3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Hangbin,
+NIAP PP_OS certification requests that the OS shall validate the
+CodeSigning extended key usage extension field for integrity
+verifiction of exectable code:
 
-On Thu, Apr 8, 2021 at 8:41 PM Hangbin Liu <liuhangbin@gmail.com> wrote:
-> I agree that the best way is to disable the crypto modules in FIPS mode.
-> But the code in lib/crypto looks not the same with crypto/. For modules
-> in crypto, there is an alg_test() to check if the crytpo is FIPS allowed
-> when do register.
->
-> - crypto_register_alg()
->   - crypto_wait_for_test()
->     - crypto_probing_notify(CRYPTO_MSG_ALG_REGISTER, larval->adult)
->       - cryptomgr_schedule_test()
->         - cryptomgr_test()
->           - alg_test()
->
-> But in lib/crypto the code are more like a library. We can call it anytime
-> and there is no register. Maybe we should add a similar check in lib/crypto.
-> But I'm not familiar with crypto code... Not sure if anyone in linux-crypto@
-> would like help do that.
+    https://www.niap-ccevs.org/MMO/PP/-442-/
+        FIA_X509_EXT.1.1
 
-Since it's just a normal module library, you can simply do this in the
-module_init function, rather than deep within registration
-abstractions.
+This patchset adds the logic for parsing the codeSigning EKU extension
+field in X.509. And checking the CodeSigning EKU when verifying
+signature of kernel module or kexec PE binary in PKCS#7.
 
-> > diff --git a/lib/crypto/curve25519.c b/lib/crypto/curve25519.c
-> > index 288a62cd29b2..b794f49c291a 100644
-> > --- a/lib/crypto/curve25519.c
-> > +++ b/lib/crypto/curve25519.c
-> > @@ -12,11 +12,15 @@
-> >  #include <crypto/curve25519.h>
-> >  #include <linux/module.h>
-> >  #include <linux/init.h>
-> > +#include <linux/fips.h>
-> >
-> >  bool curve25519_selftest(void);
-> >
-> >  static int __init mod_init(void)
-> >  {
-> > + if (!fips_enabled)
-> > + return -EOPNOTSUPP;
->
-> Question here, why it is !fips_enabled? Shouldn't we return error when
-> fips_enabled?
+v5:
+Fixed the wording in module-signing.rst.
 
-Er, just not thinking straight today. `if (fips_enabled)` is probably
-what you want indeed.
+v4:
+Fixed the wording in patch description.
 
-Jason
+v3:
+- Add codeSigning EKU to x509.genkey key generation config.
+- Add openssl command option example for generating CodeSign EKU to
+  module-signing.rst document. 
+
+v2:
+Changed the help wording in the Kconfig.
+
+Lee, Chun-Yi (4):
+  X.509: Add CodeSigning extended key usage parsing
+  PKCS#7: Check codeSigning EKU for kernel module and kexec pe
+    verification
+  modsign: Add codeSigning EKU when generating X.509 key generation
+    config
+  Documentation/admin-guide/module-signing.rst: add openssl command
+    option example for CodeSign EKU
+
+ Documentation/admin-guide/module-signing.rst |  6 +++++
+ certs/Makefile                               |  1 +
+ certs/system_keyring.c                       |  2 +-
+ crypto/asymmetric_keys/Kconfig               |  9 +++++++
+ crypto/asymmetric_keys/pkcs7_trust.c         | 37 +++++++++++++++++++++++++---
+ crypto/asymmetric_keys/x509_cert_parser.c    | 24 ++++++++++++++++++
+ include/crypto/pkcs7.h                       |  3 ++-
+ include/crypto/public_key.h                  |  1 +
+ include/linux/oid_registry.h                 |  5 ++++
+ 9 files changed, 83 insertions(+), 5 deletions(-)
+
+-- 
+2.16.4
+
