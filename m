@@ -2,107 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB06DC43461
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 14:16:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F6D3C43460
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 16:26:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B229061182
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 14:16:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D1E7610E5
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Apr 2021 16:26:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232990AbhDIOQQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Apr 2021 10:16:16 -0400
-Received: from new1-smtp.messagingengine.com ([66.111.4.221]:35311 "EHLO
-        new1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231402AbhDIOQN (ORCPT
+        id S233674AbhDIQ0p (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Apr 2021 12:26:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56595 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234032AbhDIQ0o (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Apr 2021 10:16:13 -0400
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
-        by mailnew.nyi.internal (Postfix) with ESMTP id B6ED9580825;
-        Fri,  9 Apr 2021 10:15:57 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Fri, 09 Apr 2021 10:15:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
-         h=date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm1; bh=VTWVSPSXMxU3eqkzvycOyKEaZ8j
-        Pje2Egd37ULlw91I=; b=LJ1tXVR4CleGK91S0PFuJ8ctXbzH7y/xja8CQhsEVMq
-        Wffr1Pe+r9B0Jnl1UnGkY8nVY1In/udfnCXOdIC8Fys5zvk3f9Fo4VpdBHgyEzEL
-        eV6bCllI/g8KQIEBSUgmSi4hsFRq+wjyWVgsoO80cDlJAWacWDq0CPNdtjG0nY1f
-        BzWl5v3dOSi8qzxwiDh/dvh1oo5b3rFyDmt5AuacEOIfm8YqCb+QlEftK75i3jE+
-        5DEEWiGFnWhYLtSAWmb7W5HosiACKUbMWkJ5GmMjmAO4ePdrO2xz8zkvbESlY/ZL
-        jdvwX88fyOzQ2rsd/bm0FAzFdCPwMd7hT++xd71gc8w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=VTWVSP
-        SXMxU3eqkzvycOyKEaZ8jPje2Egd37ULlw91I=; b=TbKTg0vOgFGapSkoVphX+4
-        pV2XiuC8fzuWO5DP3ZbMMtI+4lc8CyIOz7+6K4Gfoy75XBffrO/C+CihQBFrK8MK
-        lSDNZRKhhFM4AMyE8JXOL9uoOVcx0x7a0p4+aUB5zSm0T1b77K9f5/BGGYVmp+b4
-        eAuYTeiXOxJ55/xQ/3Hk4rP9E1/oDCXNgMvHtKWfFOw4TBC1WxixDr1ANs9DL62f
-        2DpwZJDGpakH/WbTvYBNviwwrxE8kfokIkCWQ4aLjaq3LWLPoDabsFPopmTwbExj
-        A5C2soiKWje1t3BUd5+HaslTC2ghIbVkBnHn5DooHmpxt0KwrcjmvD370ecKRumA
-        ==
-X-ME-Sender: <xms:mmFwYJfKtY1f3QEXyBLJgi1138bfBGZaHN4HNvLIgrnX4UHJaEIllA>
-    <xme:mmFwYHMIlaeWCXJJ1zpD5ut53Hobrf7jFNYTce4VDkrXnIviplGdJReigZYg0HkR7
-    PVFGZkYnk1lw1yAiaw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrudekuddgjeeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtuggjfgesthdtredttderjeenucfhrhhomhepuegvnhcu
-    uehovggtkhgvlhcuoehmvgessggvnhgsohgvtghkvghlrdhnvghtqeenucggtffrrghtth
-    gvrhhnpeevffdtteetgfdttdekueefgedttddtueeugeekgeetffeuteffjeduieehhfek
-    tdenucfkphepjeefrddutddurdefvddrvddtudenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpehmvgessggvnhgsohgvtghkvghlrdhnvght
-X-ME-Proxy: <xmx:mmFwYChDcLuA3lygQQZIkYmoGXDsVmMq55NMGNl_Ej6_5jwtm-1emQ>
-    <xmx:mmFwYC_05Yh3-4QXzLnLA4ewN8tCMGeG3bbsU1CPzIZ0bz4ztLsc-w>
-    <xmx:mmFwYFv24vyjs-K4bUgcgG-XPytfAb1AigpyDIIhVXE0zT1N7oyYaA>
-    <xmx:nWFwYGnVL03gKX_b-I-tKklTB7H9c3BTJq34K9Pc7eFP4JyWIVQSug>
-Received: from localhost (c-73-101-32-201.hsd1.pa.comcast.net [73.101.32.201])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 873911080067;
-        Fri,  9 Apr 2021 10:15:54 -0400 (EDT)
-Date:   Fri, 9 Apr 2021 10:15:48 -0400
-From:   Ben Boeckel <me@benboeckel.net>
-To:     Varad Gautam <varad.gautam@suse.com>
-Cc:     linux-crypto@vger.kernel.org, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net, vt@altlinux.org,
-        tianjia.zhang@linux.alibaba.com, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jarkko@kernel.org,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        "open list:SECURITY SUBSYSTEM" 
-        <linux-security-module@vger.kernel.org>
-Subject: Re: [PATCH v2 18/18] keyctl_pkey: Add pkey parameters slen and
- mgfhash for PSS
-Message-ID: <YHBhlNsMTrOq0POE@erythro>
-References: <20210408141516.11369-1-varad.gautam@suse.com>
- <20210408141516.11369-19-varad.gautam@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210408141516.11369-19-varad.gautam@suse.com>
-User-Agent: Mutt/2.0.5 (2021-01-21)
+        Fri, 9 Apr 2021 12:26:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617985591;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=A+XNjjMj7uKb6cWyQ0FNy1WHSr2ChCgb+eT313GmatE=;
+        b=HUfj6BSta0agnITERRbj5/NIhh0cq+Lwi8UZ8PRhmk/GbuGSx2mp/uz4aikzdn3ps0+5oU
+        aEVldn1HE++y2BJB4E1T1nt7h3r+Xe3Z+VMUogfQIOSHd8ovPVoBa+XsDbou7ARNMvdgAF
+        Xxu97PuwduqVX5ZglEgMT7ypGM+7ulU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-245-70dw0YHIOQq_ivsp5kp6fg-1; Fri, 09 Apr 2021 12:26:27 -0400
+X-MC-Unique: 70dw0YHIOQq_ivsp5kp6fg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CE1B10054F6;
+        Fri,  9 Apr 2021 16:26:26 +0000 (UTC)
+Received: from ovpn-112-53.phx2.redhat.com (ovpn-112-53.phx2.redhat.com [10.3.112.53])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B6A4B5C1D5;
+        Fri,  9 Apr 2021 16:26:24 +0000 (UTC)
+Message-ID: <2ab19b062cf61cf6f54e7f0145c8d6fd77aee5ed.camel@redhat.com>
+Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
+From:   Simo Sorce <simo@redhat.com>
+To:     Hangbin Liu <liuhangbin@gmail.com>,
+        Stephan Mueller <smueller@chronox.de>
+Cc:     Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Toke =?ISO-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        linux-crypto@vger.kernel.org
+Date:   Fri, 09 Apr 2021 12:26:23 -0400
+In-Reply-To: <20210409080804.GO2900@Leo-laptop-t470s>
+References: <20210407113920.3735505-1-liuhangbin@gmail.com>
+         <YG4gO15Q2CzTwlO7@quark.localdomain>
+         <20210408010640.GH2900@Leo-laptop-t470s>
+         <20210408115808.GJ2900@Leo-laptop-t470s> <YG8dJpEEWP3PxUIm@sol.localdomain>
+         <20210409021121.GK2900@Leo-laptop-t470s>
+         <7c2b6eff291b2d326e96c3a5f9cd70aa4ef92df3.camel@chronox.de>
+         <20210409080804.GO2900@Leo-laptop-t470s>
+Organization: Red Hat, Inc.
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 08, 2021 at 16:15:16 +0200, Varad Gautam wrote:
-> keyctl pkey_* operations accept enc and hash parameters at present.
-> RSASSA-PSS signatures also require passing in the signature salt
-> length and the mgf hash function.
+On Fri, 2021-04-09 at 16:08 +0800, Hangbin Liu wrote:
+> On Fri, Apr 09, 2021 at 09:08:20AM +0200, Stephan Mueller wrote:
+> > > > > > > And how do you handle all the other places in the kernel that use
+> > > > > > > ChaCha20 and
+> > > > > > > SipHash?  For example, drivers/char/random.c?
+> > > > > > 
+> > > > > > Good question, I will check it and reply to you later.
+> > > > > 
+> > > > > I just read the code. The drivers/char/random.c do has some fips
+> > > > > specific
+> > > > > parts(seems not related to crypto). After commit e192be9d9a30 ("random:
+> > > > > replace
+> > > > > non-blocking pool with a Chacha20-based CRNG") we moved part of chacha
+> > > > > code to
+> > > > > lib/chacha20.c and make that code out of control.
+> > > > > 
+> > > > So you are saying that you removed drivers/char/random.c and
+> > > > lib/chacha20.c from
+> > > > your FIPS module boundary?  Why not do the same for WireGuard?
+> > > 
+> > > No, I mean this looks like a bug (using not allowed crypto in FIPS mode) and
+> > > we should fix it.
+> > 
+> > The entirety of random.c is not compliant to FIPS rules. ChaCha20 is the least
+> > of the problems. SP800-90B is the challenge. This is one of the motivation of
+> > the design and architecture of the LRNG allowing different types of crypto and
+> > have a different approach to post-process the data.
+> > 
+> > https://github.com/smuellerDD/lrng
 > 
-> Add parameters:
-> - 'slen' to feed in salt length of a PSS signature.
-> - 'mgfhash' to feed in the hash function used for MGF.
+> Thanks Stephan for this info. After offline discussion with Herbert, here is
+> what he said:
+> 
+> """
+> This is not a problem in RHEL8 because the Crypto API RNG replaces /dev/random
+> in FIPS mode.
+> """
+> 
+> I'm not familiar with this code, not sure how upstream handle this.
 
-Could `Documentation/security/keys/core.rst` be updated to mention these
-new parameters? Statements on what values are allowed would be
-appreciated as well (e.g., that `saltlen` (a far better name IMO) is
-unsigned 32-bits and where valid algorithm names could be found as
-well).
+It is an open problem upstream.
 
-Thanks,
+Simo.
 
---Ben
+-- 
+Simo Sorce
+RHEL Crypto Team
+Red Hat, Inc
+
+
+
+
