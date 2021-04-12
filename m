@@ -2,319 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0320C43460
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 12:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C93B2C43462
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 12:46:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 818B26128A
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 12:34:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EDFA61288
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 12:46:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241072AbhDLMer (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Apr 2021 08:34:47 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:16576 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241049AbhDLMeq (ORCPT
+        id S241375AbhDLMq6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Apr 2021 08:46:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59664 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241368AbhDLMq6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Apr 2021 08:34:46 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FJp5l1jnhz18H67;
-        Mon, 12 Apr 2021 20:32:11 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 12 Apr 2021 20:34:16 +0800
-From:   Weili Qian <qianweili@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>,
-        <liulongfang@huawei.com>, Weili Qian <qianweili@huawei.com>
-Subject: [PATCH 1/4] crypto: hisilicon - dynamic configuration 'err_info'
-Date:   Mon, 12 Apr 2021 20:31:32 +0800
-Message-ID: <1618230695-22775-2-git-send-email-qianweili@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1618230695-22775-1-git-send-email-qianweili@huawei.com>
-References: <1618230695-22775-1-git-send-email-qianweili@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+        Mon, 12 Apr 2021 08:46:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618231600;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gyRA3eXvjPEiAnUmzzROMJvtjDJt+882R/Pm9YO3IBI=;
+        b=O2By6KcIdBvikeSUSv9xjDybrHonKkdGa5IeNQcY5zVQLwLZJNp+nxpBU7143JUeKE2v9+
+        v4rYfoPySGWEQDfYQB1WHTpoeOCu6+8GU1enPp1yD4NNVvWwZQ/ZKs+Rl6NK4//TLpZA3S
+        Y/8DgcGpnsh31t9O0NwbsfCAs/VItcg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-509-H2Ovd74qMrWeALGVTF0e4Q-1; Mon, 12 Apr 2021 08:46:38 -0400
+X-MC-Unique: H2Ovd74qMrWeALGVTF0e4Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E15306D252;
+        Mon, 12 Apr 2021 12:46:36 +0000 (UTC)
+Received: from ovpn-112-53.phx2.redhat.com (ovpn-112-53.phx2.redhat.com [10.3.112.53])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A59646090F;
+        Mon, 12 Apr 2021 12:46:29 +0000 (UTC)
+Message-ID: <01fae6c3113d454cc009f065fde77f66af9845b6.camel@redhat.com>
+Subject: Re: [PATCH net-next] [RESEND] wireguard: disable in FIPS mode
+From:   Simo Sorce <simo@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Hangbin Liu <liuhangbin@gmail.com>,
+        Netdev <netdev@vger.kernel.org>,
+        Toke =?ISO-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "herbert.xu" <herbert.xu@redhat.com>
+Date:   Mon, 12 Apr 2021 08:46:28 -0400
+In-Reply-To: <5d6137d0e4ea1d67ee495398f2cb12a1c21653fd.camel@redhat.com>
+References: <20210407113920.3735505-1-liuhangbin@gmail.com>
+         <CAHmME9p40M5oHDZXnFDXfO4-JuJ7bUB5BnsccGV1pksguz73sg@mail.gmail.com>
+         <c47d99b9d0efeea4e6cd238c2affc0fbe296b53c.camel@redhat.com>
+         <CAHmME9pRSOANrdvegLm9x8VTNWKcMtoymYrgStuSx+nsu=jpwA@mail.gmail.com>
+         <20210409024143.GL2900@Leo-laptop-t470s>
+         <CAHmME9oqK9iXRn3wxAB-MZvX3k_hMbtjHF_V9UY96u6NLcczAw@mail.gmail.com>
+         <20210409024907.GN2900@Leo-laptop-t470s> <YG/EAePSEeYdonA0@zx2c4.com>
+         <CAMj1kXG-e_NtLkAdLYp70x5ft_Q1Bn9rmdXs4awt7FEd5PQ4+Q@mail.gmail.com>
+         <0ef180dea02996fc5f4660405f2333220e8ae4c4.camel@redhat.com>
+         <CAHmME9opMi_2_cOS66U6jJvYZ=WJWv4E-mjYr20YaL=zzJxv+Q@mail.gmail.com>
+         <5d6137d0e4ea1d67ee495398f2cb12a1c21653fd.camel@redhat.com>
+Organization: Red Hat, Inc.
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-'err_info' does not support dynamic configuration since it is const type.
-Therefore, in order to support new error type later, 'err_info' is changed
-to dynamic configuration.
+On Fri, 2021-04-09 at 14:56 -0400, Simo Sorce wrote:
+> Hi Jason,
+> I can't speak for Hangbin, we do not work for the same company and I
+> was not aware of his efforts until this patch landed.
 
-Signed-off-by: Weili Qian <qianweili@huawei.com>
----
- drivers/crypto/hisilicon/hpre/hpre_main.c | 26 ++++++++++++++++----------
- drivers/crypto/hisilicon/qm.c             | 22 ++++++++++------------
- drivers/crypto/hisilicon/qm.h             |  3 ++-
- drivers/crypto/hisilicon/sec2/sec_main.c  | 26 ++++++++++++++++----------
- drivers/crypto/hisilicon/zip/zip_main.c   | 25 +++++++++++++++----------
- 5 files changed, 59 insertions(+), 43 deletions(-)
+Turns out I and Hangbin do work for the same company after all.
+Left hand is meeting right hand internally now. :-D
+The comments still stand of course.
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index a8c7921..7fe7434 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -807,6 +807,20 @@ static void hpre_open_axi_master_ooo(struct hisi_qm *qm)
- 	       HPRE_ADDR(qm, HPRE_AM_OOO_SHUTDOWN_ENB));
- }
- 
-+static void hpre_err_info_init(struct hisi_qm *qm)
-+{
-+	struct hisi_qm_err_info *err_info = &qm->err_info;
-+
-+	err_info->ce = QM_BASE_CE;
-+	err_info->fe = 0;
-+	err_info->ecc_2bits_mask = HPRE_CORE_ECC_2BIT_ERR |
-+				   HPRE_OOO_ECC_2BIT_ERR;
-+	err_info->dev_ce_mask = HPRE_HAC_RAS_CE_ENABLE;
-+	err_info->msi_wr_port = HPRE_WR_MSI_PORT;
-+	err_info->acpi_rst = "HRST";
-+	err_info->nfe = QM_BASE_NFE | QM_ACC_DO_TASK_TIMEOUT;
-+}
-+
- static const struct hisi_qm_err_ini hpre_err_ini = {
- 	.hw_init		= hpre_set_user_domain_and_cache,
- 	.hw_err_enable		= hpre_hw_error_enable,
-@@ -815,16 +829,7 @@ static const struct hisi_qm_err_ini hpre_err_ini = {
- 	.clear_dev_hw_err_status = hpre_clear_hw_err_status,
- 	.log_dev_hw_err		= hpre_log_hw_error,
- 	.open_axi_master_ooo	= hpre_open_axi_master_ooo,
--	.err_info		= {
--		.ce			= QM_BASE_CE,
--		.nfe			= QM_BASE_NFE | QM_ACC_DO_TASK_TIMEOUT,
--		.fe			= 0,
--		.ecc_2bits_mask		= HPRE_CORE_ECC_2BIT_ERR |
--					  HPRE_OOO_ECC_2BIT_ERR,
--		.dev_ce_mask		= HPRE_HAC_RAS_CE_ENABLE,
--		.msi_wr_port		= HPRE_WR_MSI_PORT,
--		.acpi_rst		= "HRST",
--	}
-+	.err_info_init		= hpre_err_info_init,
- };
- 
- static int hpre_pf_probe_init(struct hpre *hpre)
-@@ -837,6 +842,7 @@ static int hpre_pf_probe_init(struct hpre *hpre)
- 		return ret;
- 
- 	qm->err_ini = &hpre_err_ini;
-+	qm->err_ini->err_info_init(qm);
- 	hisi_qm_dev_err_init(qm);
- 
- 	return 0;
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 35e6b58..deab797 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -1700,7 +1700,7 @@ static enum acc_err_result qm_hw_error_handle_v2(struct hisi_qm *qm)
- 		if (val == (QM_DB_RANDOM_INVALID | QM_BASE_CE)) {
- 			writel(error_status, qm->io_base +
- 			       QM_ABNORMAL_INT_SOURCE);
--			writel(qm->err_ini->err_info.nfe,
-+			writel(qm->err_info.nfe,
- 			       qm->io_base + QM_RAS_NFE_ENABLE);
- 			return ACC_ERR_RECOVERED;
- 		}
-@@ -3080,7 +3080,7 @@ EXPORT_SYMBOL_GPL(hisi_qm_debug_regs_clear);
- 
- static void qm_hw_error_init(struct hisi_qm *qm)
- {
--	const struct hisi_qm_err_info *err_info = &qm->err_ini->err_info;
-+	struct hisi_qm_err_info *err_info = &qm->err_info;
- 
- 	if (!qm->ops->hw_error_init) {
- 		dev_err(&qm->pdev->dev, "QM doesn't support hw error handling!\n");
-@@ -3432,15 +3432,15 @@ static enum acc_err_result qm_dev_err_handle(struct hisi_qm *qm)
- 	/* get device hardware error status */
- 	err_sts = qm->err_ini->get_dev_hw_err_status(qm);
- 	if (err_sts) {
--		if (err_sts & qm->err_ini->err_info.ecc_2bits_mask)
-+		if (err_sts & qm->err_info.ecc_2bits_mask)
- 			qm->err_status.is_dev_ecc_mbit = true;
- 
- 		if (qm->err_ini->log_dev_hw_err)
- 			qm->err_ini->log_dev_hw_err(qm, err_sts);
- 
- 		/* ce error does not need to be reset */
--		if ((err_sts | qm->err_ini->err_info.dev_ce_mask) ==
--		     qm->err_ini->err_info.dev_ce_mask) {
-+		if ((err_sts | qm->err_info.dev_ce_mask) ==
-+		     qm->err_info.dev_ce_mask) {
- 			if (qm->err_ini->clear_dev_hw_err_status)
- 				qm->err_ini->clear_dev_hw_err_status(qm,
- 								err_sts);
-@@ -3753,7 +3753,7 @@ static int qm_soft_reset(struct hisi_qm *qm)
- 		acpi_status s;
- 
- 		s = acpi_evaluate_integer(ACPI_HANDLE(&pdev->dev),
--					  qm->err_ini->err_info.acpi_rst,
-+					  qm->err_info.acpi_rst,
- 					  NULL, &value);
- 		if (ACPI_FAILURE(s)) {
- 			pci_err(pdev, "NO controller reset method!\n");
-@@ -3821,12 +3821,11 @@ static void qm_restart_prepare(struct hisi_qm *qm)
- 
- 	/* temporarily close the OOO port used for PEH to write out MSI */
- 	value = readl(qm->io_base + ACC_AM_CFG_PORT_WR_EN);
--	writel(value & ~qm->err_ini->err_info.msi_wr_port,
-+	writel(value & ~qm->err_info.msi_wr_port,
- 	       qm->io_base + ACC_AM_CFG_PORT_WR_EN);
- 
- 	/* clear dev ecc 2bit error source if having */
--	value = qm_get_dev_err_status(qm) &
--		qm->err_ini->err_info.ecc_2bits_mask;
-+	value = qm_get_dev_err_status(qm) & qm->err_info.ecc_2bits_mask;
- 	if (value && qm->err_ini->clear_dev_hw_err_status)
- 		qm->err_ini->clear_dev_hw_err_status(qm, value);
- 
-@@ -3850,7 +3849,7 @@ static void qm_restart_done(struct hisi_qm *qm)
- 
- 	/* open the OOO port for PEH to write out MSI */
- 	value = readl(qm->io_base + ACC_AM_CFG_PORT_WR_EN);
--	value |= qm->err_ini->err_info.msi_wr_port;
-+	value |= qm->err_info.msi_wr_port;
- 	writel(value, qm->io_base + ACC_AM_CFG_PORT_WR_EN);
- 
- 	qm->err_status.is_qm_ecc_mbit = false;
-@@ -3989,8 +3988,7 @@ static int qm_check_dev_error(struct hisi_qm *qm)
- 	if (ret)
- 		return ret;
- 
--	return (qm_get_dev_err_status(qm) &
--		qm->err_ini->err_info.ecc_2bits_mask);
-+	return (qm_get_dev_err_status(qm) & qm->err_info.ecc_2bits_mask);
- }
- 
- void hisi_qm_reset_prepare(struct pci_dev *pdev)
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index 34e69fe..8c67712 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -186,7 +186,7 @@ struct hisi_qm_err_ini {
- 	void (*open_axi_master_ooo)(struct hisi_qm *qm);
- 	void (*close_axi_master_ooo)(struct hisi_qm *qm);
- 	void (*log_dev_hw_err)(struct hisi_qm *qm, u32 err_sts);
--	struct hisi_qm_err_info err_info;
-+	void (*err_info_init)(struct hisi_qm *qm);
- };
- 
- struct hisi_qm_list {
-@@ -226,6 +226,7 @@ struct hisi_qm {
- 
- 	struct hisi_qm_status status;
- 	const struct hisi_qm_err_ini *err_ini;
-+	struct hisi_qm_err_info err_info;
- 	struct hisi_qm_err_status err_status;
- 	unsigned long misc_ctl; /* driver removing and reset sched */
- 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 1affa1b..26b9904 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -701,6 +701,20 @@ static void sec_open_axi_master_ooo(struct hisi_qm *qm)
- 	writel(val | SEC_AXI_SHUTDOWN_ENABLE, qm->io_base + SEC_CONTROL_REG);
- }
- 
-+static void sec_err_info_init(struct hisi_qm *qm)
-+{
-+	struct hisi_qm_err_info *err_info = &qm->err_info;
-+
-+	err_info->ce = QM_BASE_CE;
-+	err_info->fe = 0;
-+	err_info->ecc_2bits_mask = SEC_CORE_INT_STATUS_M_ECC;
-+	err_info->dev_ce_mask = SEC_RAS_CE_ENB_MSK;
-+	err_info->msi_wr_port = BIT(0);
-+	err_info->acpi_rst = "SRST";
-+	err_info->nfe = QM_BASE_NFE | QM_ACC_DO_TASK_TIMEOUT |
-+			QM_ACC_WB_NOT_READY_TIMEOUT;
-+}
-+
- static const struct hisi_qm_err_ini sec_err_ini = {
- 	.hw_init		= sec_set_user_domain_and_cache,
- 	.hw_err_enable		= sec_hw_error_enable,
-@@ -709,16 +723,7 @@ static const struct hisi_qm_err_ini sec_err_ini = {
- 	.clear_dev_hw_err_status = sec_clear_hw_err_status,
- 	.log_dev_hw_err		= sec_log_hw_error,
- 	.open_axi_master_ooo	= sec_open_axi_master_ooo,
--	.err_info		= {
--		.ce		= QM_BASE_CE,
--		.nfe		= QM_BASE_NFE | QM_ACC_DO_TASK_TIMEOUT |
--				  QM_ACC_WB_NOT_READY_TIMEOUT,
--		.fe		= 0,
--		.ecc_2bits_mask	= SEC_CORE_INT_STATUS_M_ECC,
--		.dev_ce_mask	= SEC_RAS_CE_ENB_MSK,
--		.msi_wr_port	= BIT(0),
--		.acpi_rst	= "SRST",
--	}
-+	.err_info_init		= sec_err_info_init,
- };
- 
- static int sec_pf_probe_init(struct sec_dev *sec)
-@@ -727,6 +732,7 @@ static int sec_pf_probe_init(struct sec_dev *sec)
- 	int ret;
- 
- 	qm->err_ini = &sec_err_ini;
-+	qm->err_ini->err_info_init(qm);
- 
- 	ret = sec_set_user_domain_and_cache(qm);
- 	if (ret)
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 4d2e9c8..50407bb 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -657,6 +657,19 @@ static void hisi_zip_close_axi_master_ooo(struct hisi_qm *qm)
- 	       qm->io_base + HZIP_CORE_INT_SET);
- }
- 
-+static void hisi_zip_err_info_init(struct hisi_qm *qm)
-+{
-+	struct hisi_qm_err_info *err_info = &qm->err_info;
-+
-+	err_info->ce = QM_BASE_CE;
-+	err_info->fe = 0;
-+	err_info->ecc_2bits_mask = HZIP_CORE_INT_STATUS_M_ECC;
-+	err_info->dev_ce_mask = HZIP_CORE_INT_RAS_CE_ENABLE;
-+	err_info->msi_wr_port = HZIP_WR_PORT;
-+	err_info->acpi_rst = "ZRST";
-+	err_info->nfe = QM_BASE_NFE | QM_ACC_WB_NOT_READY_TIMEOUT;
-+}
-+
- static const struct hisi_qm_err_ini hisi_zip_err_ini = {
- 	.hw_init		= hisi_zip_set_user_domain_and_cache,
- 	.hw_err_enable		= hisi_zip_hw_error_enable,
-@@ -666,16 +679,7 @@ static const struct hisi_qm_err_ini hisi_zip_err_ini = {
- 	.log_dev_hw_err		= hisi_zip_log_hw_error,
- 	.open_axi_master_ooo	= hisi_zip_open_axi_master_ooo,
- 	.close_axi_master_ooo	= hisi_zip_close_axi_master_ooo,
--	.err_info		= {
--		.ce			= QM_BASE_CE,
--		.nfe			= QM_BASE_NFE |
--					  QM_ACC_WB_NOT_READY_TIMEOUT,
--		.fe			= 0,
--		.ecc_2bits_mask		= HZIP_CORE_INT_STATUS_M_ECC,
--		.dev_ce_mask		= HZIP_CORE_INT_RAS_CE_ENABLE,
--		.msi_wr_port		= HZIP_WR_PORT,
--		.acpi_rst		= "ZRST",
--	}
-+	.err_info_init		= hisi_zip_err_info_init,
- };
- 
- static int hisi_zip_pf_probe_init(struct hisi_zip *hisi_zip)
-@@ -690,6 +694,7 @@ static int hisi_zip_pf_probe_init(struct hisi_zip *hisi_zip)
- 	hisi_zip->ctrl = ctrl;
- 	ctrl->hisi_zip = hisi_zip;
- 	qm->err_ini = &hisi_zip_err_ini;
-+	qm->err_ini->err_info_init(qm);
- 
- 	hisi_zip_set_user_domain_and_cache(qm);
- 	hisi_qm_dev_err_init(qm);
+Simo.
+
+> For my part we were already looking at big_key, wireguard and other
+> areas internally, but were not thinking of sending upstream patches
+> like these w/o first a good assessment with our teams and lab that they
+> were proper and sufficient.
+> 
+> >  So
+> > I think either you should send an exhaustive patch series that forbids
+> > all use of non-FIPS crypto anywhere in the kernel (another example:
+> > net/core/secure_seq.c) in addition to all tunneling modules that don't
+> > use FIPS-certified crypto, or figure out how to disable the lib/crypto
+> > primitives that you want to be disabled in "fips mode". With a
+> > coherent patchset for either of these, we can then evaluate it.
+> 
+> Yes a cohesive approach would be ideal, but I do not know if pushing
+> substantially the same checks we have in the Crypto API down to
+> lib/crypto is the right way to go, I am not oppose but I guess Herbert
+> would have to chime in here.
+> 
+
 -- 
-2.8.1
+Simo Sorce
+RHEL Crypto Team
+Red Hat, Inc
+
+
+
 
