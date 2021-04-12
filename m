@@ -2,153 +2,156 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A985C433B4
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 19:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A075C43460
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 20:29:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 545C96121D
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 19:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FEB261352
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 20:29:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237698AbhDLTvy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Apr 2021 15:51:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31965 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237406AbhDLTvy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Apr 2021 15:51:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618257096;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5P/eSXvLeEKIrDEUii8lpIPiiq4SsVgbm3uyEQEEKf4=;
-        b=CoD2kl2IccBHrgA9GWp8ep/c8T136QTgWglObg6rrj/fSqRELnxFkCDgj+mPj/1/rqu08U
-        L5KcrgTOF1gP7dJTj73WnZbJcW2mFTqQo92A662a8iB5K/ei5P41ZCY5HH6+37MaOUZVf1
-        fj4Nsh3OzDi2XzStaPUt0djRHDEnlTQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-GIGo0jZvNCeHf2gpe1YExQ-1; Mon, 12 Apr 2021 15:51:34 -0400
-X-MC-Unique: GIGo0jZvNCeHf2gpe1YExQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1B7664157;
-        Mon, 12 Apr 2021 19:51:32 +0000 (UTC)
-Received: from crecklin.bos.csb (unknown [10.10.115.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5729E1002388;
-        Mon, 12 Apr 2021 19:51:27 +0000 (UTC)
-Reply-To: crecklin@redhat.com
+        id S245740AbhDLU3r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Apr 2021 16:29:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48150 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S245725AbhDLU3n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Apr 2021 16:29:43 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6770361352;
+        Mon, 12 Apr 2021 20:29:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1618259365;
+        bh=FcOtNUQbFfQK74AGtBX5AVWG8SkkzjX2jpqxaTzdHz4=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=RFtKFPODGjddppDFyIvAAFgGspkwYphn6NGTQGKQXpGjWBXtf0kIoPMNtjqaKq1UO
+         G4i0buy1mz4BmZV3sZUHUWg1Mpg88zQDFWwUoPdgDge6uk3U/oZrKad6VUFtpZZGbc
+         1QqazNp8q//szMuUviM27+DjBFbPqJFLpsYfBGwQOGbru0uaMElPJ0PixPZekAzl+F
+         NbQXjYAt54COP+CGRuFyE7OXgKR/ZqjAM2ZWZG7dxZSLj1FClO7Pvb8+xkxrdLSTmI
+         sdSTPnyQrrb+9/MY6mBIz0Np1CIUAjf52JVahuuIXTM33+waSaXckJyAhucL+/KtDw
+         OWIGJJYnMZGrQ==
+Received: by mail-oo1-f41.google.com with SMTP id i20-20020a4a8d940000b02901bc71746525so3339071ook.2;
+        Mon, 12 Apr 2021 13:29:25 -0700 (PDT)
+X-Gm-Message-State: AOAM530eXWfscIV15r1kJfwi3+yKnsqwS3KhiI4EAabTZk7qgPqhpgv1
+        aBPWzIYE/SBIzjdHN4pFl0ekjArmhrDCwKJf1q0=
+X-Google-Smtp-Source: ABdhPJzDieySznqozYtC5FfXw3f2GImkv090qrcDj9TXCd+Iu8tejJyMVfpptMCuGRH3M/Ij6nkjusrVZ8/YFmEVDfE=
+X-Received: by 2002:a4a:b997:: with SMTP id e23mr6997057oop.13.1618259364572;
+ Mon, 12 Apr 2021 13:29:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210412140932.31162-1-crecklin@redhat.com> <YHSHPIXLhHjOu0jw@gmail.com>
+ <5795c815-7715-1ecb-dd83-65f3d18b9092@redhat.com> <YHSdgV6LIqSVxk+i@gmail.com>
+ <CAMj1kXGZt8+5MVG-mNi67KsG8=4HCqEPs+RkrtzHusmCPFqSTg@mail.gmail.com> <862c8208-5809-9726-7e22-7a16fcd30edd@redhat.com>
+In-Reply-To: <862c8208-5809-9726-7e22-7a16fcd30edd@redhat.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon, 12 Apr 2021 22:29:13 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHKcJ2rSsiuk3wdr+E0EXAeJeOtGvmSEE96wf5tFOC3BQ@mail.gmail.com>
+Message-ID: <CAMj1kXHKcJ2rSsiuk3wdr+E0EXAeJeOtGvmSEE96wf5tFOC3BQ@mail.gmail.com>
 Subject: Re: [PATCH v6 1/1] use crc32 instead of md5 for hibernation e820
  integrity check
-To:     Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc:     Simo Sorce <simo@redhat.com>,
+To:     Chris von Recklinghausen <crecklin@redhat.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>, Simo Sorce <simo@redhat.com>,
         "Rafael J. Wysocki" <rafael@kernel.org>,
         Dexuan Cui <decui@microsoft.com>,
         Linux PM <linux-pm@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <20210412140932.31162-1-crecklin@redhat.com>
- <YHSHPIXLhHjOu0jw@gmail.com>
- <5795c815-7715-1ecb-dd83-65f3d18b9092@redhat.com>
- <YHSdgV6LIqSVxk+i@gmail.com>
- <CAMj1kXGZt8+5MVG-mNi67KsG8=4HCqEPs+RkrtzHusmCPFqSTg@mail.gmail.com>
-From:   Chris von Recklinghausen <crecklin@redhat.com>
-Organization: Red Hat
-Message-ID: <862c8208-5809-9726-7e22-7a16fcd30edd@redhat.com>
-Date:   Mon, 12 Apr 2021 15:51:27 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
-MIME-Version: 1.0
-In-Reply-To: <CAMj1kXGZt8+5MVG-mNi67KsG8=4HCqEPs+RkrtzHusmCPFqSTg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/12/21 3:27 PM, Ard Biesheuvel wrote:
-> On Mon, 12 Apr 2021 at 21:20, Eric Biggers <ebiggers@kernel.org> wrote:
->> On Mon, Apr 12, 2021 at 03:04:58PM -0400, Chris von Recklinghausen wrote:
->>> On 4/12/21 1:45 PM, Eric Biggers wrote:
->>>> On Mon, Apr 12, 2021 at 10:09:32AM -0400, Chris von Recklinghausen wrote:
->>>>> Suspend fails on a system in fips mode because md5 is used for the e820
->>>>> integrity check and is not available. Use crc32 instead.
->>>>>
->>>>> This patch changes the integrity check algorithm from md5 to crc32.
->>>>>
->>>>> The purpose of the integrity check is to detect possible differences
->>>>> between the memory map used at the time when the hibernation image is
->>>>> about to be loaded into memory and the memory map used at the image
->>>>> creation time, because it is generally unsafe to load the image if the
->>>>> current memory map doesn't match the one used when it was created. so
->>>>> it is not intended as a cryptographic integrity check.
->>>> This still doesn't actually explain why a non-cryptographic checksum is
->>>> sufficient.  "Detection of possible differences" could very well require
->>>> cryptographic authentication; it depends on whether malicious changes need to be
->>>> detected or not.
->>> Hi Eric,
->>>
->>> The cases that the commit comments for 62a03defeabd mention are the same as
->>> for this patch, e.g.
->>>
->>>      1. Without this patch applied, it is possible that BIOS has
->>>         provided an inconsistent memory map, but the resume kernel is still
->>>         able to restore the image anyway(e.g, E820_RAM region is the superset
->>>         of the previous one), although the system might be unstable. So this
->>>         patch tries to treat any inconsistent e820 as illegal.
->>>
->>>      2. Another case is, this patch replies on comparing the e820_saved, but
->>>         currently the e820_save might not be strictly the same across
->>>         hibernation, even if BIOS has provided consistent e820 map - In
->>>         theory mptable might modify the BIOS-provided e820_saved dynamically
->>>         in early_reserve_e820_mpc_new, which would allocate a buffer from
->>>         E820_RAM, and marks it from E820_RAM to E820_RESERVED).
->>>         This is a potential and rare case we need to deal with in OS in
->>>         the future.
->>>
->>> Maybe they should be added to the comments with this patch as well? In any
->>> case, the above comments only mention detecting consequences of BIOS
->>> issues/actions on the e820 map and not intrusions from attackers requiring
->>> cryptographic protection. Does that seem to be a reasonable explanation to
->>> you? If so I can add these to the commit comments.
->>>
->>> I'll make the other changes you suggest below.
->>>
->>> Thanks,
->>>
->> Those details are still missing the high-level point.  Is this just meant to
->> detect non-malicious changes (presumably caused by BIOS bugs), or is it meant to
->> detect malicious changes?  That's all that really needs to be mentioned.
->>
-> This is not about BIOS bugs. Hibernation is deep suspend/resume
-> grafted onto cold boot, and it is perfectly legal for the firmware to
-> present a different memory map to the OS after a cold boot. It is
-> Linux that decides that it can restore the entire system state from a
-> swap file, and carry on as if the cold boot was just a [firmware
-> assisted] suspend/resume.
+On Mon, 12 Apr 2021 at 21:51, Chris von Recklinghausen
+<crecklin@redhat.com> wrote:
 >
-> So forging collisions is *not* a concern here. Let's avoid accidental
-> or malicious, as those adjectives seem to confuse some people. The
-> bottom line is that there is no need to protect against deliberate
-> attempts to hide the fact that the memory map has changed, and so
-> there is no reason to use cryptographic hashes here.
+> On 4/12/21 3:27 PM, Ard Biesheuvel wrote:
+> > On Mon, 12 Apr 2021 at 21:20, Eric Biggers <ebiggers@kernel.org> wrote:
+> >> On Mon, Apr 12, 2021 at 03:04:58PM -0400, Chris von Recklinghausen wrote:
+> >>> On 4/12/21 1:45 PM, Eric Biggers wrote:
+> >>>> On Mon, Apr 12, 2021 at 10:09:32AM -0400, Chris von Recklinghausen wrote:
+> >>>>> Suspend fails on a system in fips mode because md5 is used for the e820
+> >>>>> integrity check and is not available. Use crc32 instead.
+> >>>>>
+> >>>>> This patch changes the integrity check algorithm from md5 to crc32.
+> >>>>>
+> >>>>> The purpose of the integrity check is to detect possible differences
+> >>>>> between the memory map used at the time when the hibernation image is
+> >>>>> about to be loaded into memory and the memory map used at the image
+> >>>>> creation time, because it is generally unsafe to load the image if the
+> >>>>> current memory map doesn't match the one used when it was created. so
+> >>>>> it is not intended as a cryptographic integrity check.
+> >>>> This still doesn't actually explain why a non-cryptographic checksum is
+> >>>> sufficient.  "Detection of possible differences" could very well require
+> >>>> cryptographic authentication; it depends on whether malicious changes need to be
+> >>>> detected or not.
+> >>> Hi Eric,
+> >>>
+> >>> The cases that the commit comments for 62a03defeabd mention are the same as
+> >>> for this patch, e.g.
+> >>>
+> >>>      1. Without this patch applied, it is possible that BIOS has
+> >>>         provided an inconsistent memory map, but the resume kernel is still
+> >>>         able to restore the image anyway(e.g, E820_RAM region is the superset
+> >>>         of the previous one), although the system might be unstable. So this
+> >>>         patch tries to treat any inconsistent e820 as illegal.
+> >>>
+> >>>      2. Another case is, this patch replies on comparing the e820_saved, but
+> >>>         currently the e820_save might not be strictly the same across
+> >>>         hibernation, even if BIOS has provided consistent e820 map - In
+> >>>         theory mptable might modify the BIOS-provided e820_saved dynamically
+> >>>         in early_reserve_e820_mpc_new, which would allocate a buffer from
+> >>>         E820_RAM, and marks it from E820_RAM to E820_RESERVED).
+> >>>         This is a potential and rare case we need to deal with in OS in
+> >>>         the future.
+> >>>
+> >>> Maybe they should be added to the comments with this patch as well? In any
+> >>> case, the above comments only mention detecting consequences of BIOS
+> >>> issues/actions on the e820 map and not intrusions from attackers requiring
+> >>> cryptographic protection. Does that seem to be a reasonable explanation to
+> >>> you? If so I can add these to the commit comments.
+> >>>
+> >>> I'll make the other changes you suggest below.
+> >>>
+> >>> Thanks,
+> >>>
+> >> Those details are still missing the high-level point.  Is this just meant to
+> >> detect non-malicious changes (presumably caused by BIOS bugs), or is it meant to
+> >> detect malicious changes?  That's all that really needs to be mentioned.
+> >>
+> > This is not about BIOS bugs. Hibernation is deep suspend/resume
+> > grafted onto cold boot, and it is perfectly legal for the firmware to
+> > present a different memory map to the OS after a cold boot. It is
+> > Linux that decides that it can restore the entire system state from a
+> > swap file, and carry on as if the cold boot was just a [firmware
+> > assisted] suspend/resume.
+> >
+> > So forging collisions is *not* a concern here. Let's avoid accidental
+> > or malicious, as those adjectives seem to confuse some people. The
+> > bottom line is that there is no need to protect against deliberate
+> > attempts to hide the fact that the memory map has changed, and so
+> > there is no reason to use cryptographic hashes here.
+> >
+> How about :
 >
-How about :
+> The check is intended to differentiate between a resume (which expects
+> an identical e820 map to the one saved in suspend), and a cold boot
+> (which need not have an identical e820 map to that saved in suspend if
+> any was done at all). It is not necessary here to protect against
+> deliberate attempts to hide the fact that the memory map has changed, so
+> crc32 is sufficient for detection.
+>
 
-The check is intended to differentiate between a resume (which expects 
-an identical e820 map to the one saved in suspend), and a cold boot 
-(which need not have an identical e820 map to that saved in suspend if 
-any was done at all). It is not necessary here to protect against 
-deliberate attempts to hide the fact that the memory map has changed, so 
-crc32 is sufficient for detection.
+Almost. Hibernation always occurs after a cold boot, but usually, the
+E820 memory map happens to be the same.
 
+How about
 
+"""
+The check is intended to detect whether the E820 memory map provided
+by the firmware after cold boot unexpectedly differs from the one that
+was in use when the hibernation image was created. In this case, the
+hibernation image cannot be restored, as it may cover memory regions
+that are no longer available to the OS.
+
+A non-cryptographic hash such as CRC-32 is sufficient to detect such
+inadvertent deviations.
+"""
