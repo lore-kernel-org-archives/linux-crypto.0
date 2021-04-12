@@ -2,105 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9230AC43461
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 04:47:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2221C433B4
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 08:39:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 807A761260
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 04:47:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AFE46109E
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 08:39:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229810AbhDLEsB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Apr 2021 00:48:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39778 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbhDLEry (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Apr 2021 00:47:54 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 192D6C06138E;
-        Sun, 11 Apr 2021 21:47:32 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id s14so1142366pjl.5;
-        Sun, 11 Apr 2021 21:47:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=wB1I6Nqq7AfdRuGhioLL2RWvT/EvSUrtBmeOoGNpC4c=;
-        b=eEhL3hkNO0dsytCFG6zTFp3q3lxZbPWEmVGMllP6dUV8HcqGx/OWRVTRxyHRwyV4BN
-         +rBgX6ATm6BkVrGXBa6YeEjNfxIETKD5dNXmZmrVu98cteQzzZ0YA9IQi1x9IaAZn6c+
-         3NvmBn7vnteCNIl5cwubSYUc8042QxymMCErGiDZxxZZ/7TjyFd14OM01FTlwLqzIBbh
-         U0YVkcIwSt6W6GznUNU54V37nv8565TDGykCtzth4G2vUKRs8dOmXJw5lPQCVB+6AOtL
-         grcPM9qiYtIF8PSn717XJ8PnVX6VWJSxUNIO9TYgSxBQFC++pWs4Khw9TPKR26rxLqp2
-         CDTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=wB1I6Nqq7AfdRuGhioLL2RWvT/EvSUrtBmeOoGNpC4c=;
-        b=ALlgI/7UDIomOYKUx744rlPLSPOYMlkbiGCKeDqSmjlAVIWL5o6gZiG0Kzm//6YBGX
-         4+VjjEQ1zy1feQFmwRNtQS3yhi0EcwqaPaawTsD/LCwtZ2p8Z6ddA/A5dmQILWeBVwfG
-         8rnQlWxR9n79V9LeFtT6CtjZbLXn+EIEOUJMFthvRnSRwTS5aeQwMqcwxrvYNZj11Ppv
-         wpzJY+YlH3PhTPoItr96adrlV+kC4PJ9UPmNNDuaoAW/ZsDvIH32/nTB90h5gIvONYEk
-         8waC+gFSRMCgdw27fA6zR74BjMXbSs2c0AGyvS9BIklB0qxnTConxc56SGOiwDOlCN8g
-         IjFg==
-X-Gm-Message-State: AOAM533rxUHBMRBvpUwDEyhynCnXf0qKLi/FDcsQJONhIfOvEfQFhB2Q
-        Hb9NgX7N1N3TdZXQ3y+NuWU=
-X-Google-Smtp-Source: ABdhPJx+ejPnjpbm12qIZRhqEXS0YzVZ4ga5UBZTMoWcrmY01h3TJRr3cysHuvF0uzK2msXo8dHVvg==
-X-Received: by 2002:a17:902:ac89:b029:e6:d199:29ac with SMTP id h9-20020a170902ac89b02900e6d19929acmr24507684plr.46.1618202851663;
-        Sun, 11 Apr 2021 21:47:31 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id w16sm8514851pfj.87.2021.04.11.21.47.29
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 11 Apr 2021 21:47:31 -0700 (PDT)
-From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ben Boeckel <me@benboeckel.net>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Malte Gell <malte.gell@gmx.de>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [PATCH v5,4/4] Documentation/admin-guide/module-signing.rst: add openssl command option example for CodeSign EKU
-Date:   Mon, 12 Apr 2021 12:47:00 +0800
-Message-Id: <20210412044700.31639-5-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
-In-Reply-To: <20210412044700.31639-1-jlee@suse.com>
-References: <20210412044700.31639-1-jlee@suse.com>
+        id S237301AbhDLIja (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Apr 2021 04:39:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:32960 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237270AbhDLIj3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Apr 2021 04:39:29 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 290BB60241
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Apr 2021 08:39:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1618216752;
+        bh=DuOvMxZ8XJDOkEr5alXvgVhlP00/c6HSBIe8G41QU9U=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=e+Blt/vN7cKgjWNxR+p/OX3TCW+WYuRth7GTBklOaOG5MsHssHvzSimokmM36h3Ro
+         RDweK660qucRr2HIPZVrae67d+BBmrt1yhTunLKDj9lulZJyhC3XD1X5QZ7Sv1rIsV
+         xEYaCiARUuoFxh5Er1CCuyUSiBkS+50IRwNTXcQ5Hkba8GGe3Ewb/0DNU2CGVN04gy
+         6ZTvsTQXRkOp9/gNoYCOZ6LnmMsdk7mn2VMZ0gc6L7vGinR8zNCReQVGQI/HGD/cGq
+         XdGQ7xniv6Z3iT1pBNi9Is+q0D3ZOZIPEZn5dt83eY5bJe7OxOug8UmTrP7Cys+NMi
+         ywV5rqRRQdAsw==
+Received: by mail-oi1-f176.google.com with SMTP id k25so12705808oic.4
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Apr 2021 01:39:12 -0700 (PDT)
+X-Gm-Message-State: AOAM530A5iCGpnYEF4dWcO4+VD7cjDCITveW+oS5/u1pm97LMDrk6Ezf
+        Uywa1RVSP/5OJb1HS4S/WJ97LCJYgFFAS/M+fn4=
+X-Google-Smtp-Source: ABdhPJztZr9TEt3zZDoZayJ7cXkStQAcd44GGfS4QXeeiADHdDqIaiNe4VxMO+e40o2LiiwIR82qOgPhuk4gtA0H6Ek=
+X-Received: by 2002:a05:6808:4c3:: with SMTP id a3mr277852oie.174.1618216751431;
+ Mon, 12 Apr 2021 01:39:11 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210302090118.30666-1-ardb@kernel.org> <20210302090118.30666-2-ardb@kernel.org>
+ <20210330095250.GA5352@willie-the-truck>
+In-Reply-To: <20210330095250.GA5352@willie-the-truck>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon, 12 Apr 2021 10:39:00 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFS4e-0pTPx8B7HS=nkf55LfzFPCkohYbBBAiv+BEONeQ@mail.gmail.com>
+Message-ID: <CAMj1kXFS4e-0pTPx8B7HS=nkf55LfzFPCkohYbBBAiv+BEONeQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/9] arm64: assembler: remove conditional NEON yield macros
+To:     Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Dave Martin <dave.martin@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add an openssl command option example for generating CodeSign extended
-key usage in X.509 when CONFIG_CHECK_CODESIGN_EKU is enabled.
+On Tue, 30 Mar 2021 at 11:52, Will Deacon <will@kernel.org> wrote:
+>
+> On Tue, Mar 02, 2021 at 10:01:10AM +0100, Ard Biesheuvel wrote:
+> > The users of the conditional NEON yield macros have all been switched to
+> > the simplified cond_yield macro, and so the NEON specific ones can be
+> > removed.
+> >
+> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/assembler.h | 70 --------------------
+> >  1 file changed, 70 deletions(-)
+>
+> Acked-by: Will Deacon <will@kernel.org>
+>
 
-Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
----
- Documentation/admin-guide/module-signing.rst | 6 ++++++
- 1 file changed, 6 insertions(+)
+Thanks.
 
-diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
-index 7d7c7c8a545c..ca3b8f19466c 100644
---- a/Documentation/admin-guide/module-signing.rst
-+++ b/Documentation/admin-guide/module-signing.rst
-@@ -170,6 +170,12 @@ generate the public/private key files::
- 	   -config x509.genkey -outform PEM -out kernel_key.pem \
- 	   -keyout kernel_key.pem
- 
-+When ``CONFIG_CHECK_CODESIGN_EKU`` option is enabled, the following openssl
-+command option should be added where for generating CodeSign extended key usage
-+in X.509::
-+
-+        -addext "extendedKeyUsage=codeSigning"
-+
- The full pathname for the resulting kernel_key.pem file can then be specified
- in the ``CONFIG_MODULE_SIG_KEY`` option, and the certificate and key therein will
- be used instead of an autogenerated keypair.
--- 
-2.16.4
+Catalin,
 
+Please consider taking the first 3 patches of this series through the
+arm64 tree. I will then resubmit the rest to be taken via the crypto
+tree for the next cycle.
+
+Thanks,
+Ard.
