@@ -7,70 +7,69 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E07B7C433ED
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 08:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 177AFC433B4
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 08:29:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA52C613B2
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 08:29:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2FBC613C6
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 08:29:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229889AbhDMI3Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Apr 2021 04:29:25 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37348 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243002AbhDMI3W (ORCPT
+        id S229753AbhDMIaH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Apr 2021 04:30:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16720 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229995AbhDMIaE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Apr 2021 04:29:22 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13D83dc6191500;
-        Tue, 13 Apr 2021 04:28:57 -0400
+        Tue, 13 Apr 2021 04:30:04 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13D8344I024550;
+        Tue, 13 Apr 2021 04:29:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
  from : to : cc : date : in-reply-to : references : content-type :
  mime-version : content-transfer-encoding; s=pp1;
- bh=8VDNbTf7G5vRHHu4gG6mXsNruwZ1y+Folrm8GfKCM/o=;
- b=Sb8XFGKVB72fwAjD6uHz3wm2Cu7ChkiWVFgCYdMuzJ7sG5MWln9duN1Pa9qbS4c3VgsS
- kBTy+hBYf1ZTo8RySV/TCsUf85SrVoX0Y0MPrrZWFo++sVHeTDsvpHB31jjXQNqr4XTA
- SkP87i4IqPOMx+4nYAc2b8NEKMAcc1iPfIHPetpjWxgSfihmWLExpVXNs0Ol8pHorWQv
- OzTbedy0hqurRnI5FPoN6A8orrRp2EFYIFFc9q73sXVGBLgHnJng6HFVQmVDLXPJpHjR
- VZOLzp7PHrujlk48ZBRU3GL9qjuWwkLRkgvIG9L6tl3dLHrtdx7+FrzJfRpLoweg2qBt qw== 
+ bh=u+JBqnwj0F2DU2O+gzePPbaQbGSWFmasoJOhNAmfZp0=;
+ b=c0k/iXd818IOLkfuBhJkoICn22vCyzxx47Ec2RQo29azysgWPDJxqAdImqW32s3F55VW
+ sWnh5nnu33zkksm4X0UWySMBNQPW06VDqBkFyI20Zo9nKe5SZ6z8a3sCiDWvlc1rjBEy
+ tWwjIPdLaZQWX/c1XazUOjcVBOzxCMONYjyFRdSupdTXko4llY1UOLQ3l6ztxEsKnpkn
+ rUfildH0GTrOG6iqM8O+c3IbkOy9dQ7FMKBb1dqrhSDGA1K1mmJ2SZPTr0iXaOaAaZLC
+ 5A4ZAB+ez2jKybKfoeCndS5lHyTZnZuyIsPTJo9prccoj+rK6D4n6WR1BUHi6EtGpnKE mg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37w6wm9w2m-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37w6uvj0e6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Apr 2021 04:28:57 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13D84T5S194184;
-        Tue, 13 Apr 2021 04:28:56 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37w6wm9w28-1
+        Tue, 13 Apr 2021 04:29:37 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13D838qv025606;
+        Tue, 13 Apr 2021 04:29:36 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37w6uvj0dv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Apr 2021 04:28:56 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13D8S5LK016045;
-        Tue, 13 Apr 2021 08:28:55 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma04dal.us.ibm.com with ESMTP id 37u3n8vwsa-1
+        Tue, 13 Apr 2021 04:29:36 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13D8Rsp8018426;
+        Tue, 13 Apr 2021 08:29:36 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma03wdc.us.ibm.com with ESMTP id 37uhcmkdax-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Apr 2021 08:28:55 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13D8StK925362758
+        Tue, 13 Apr 2021 08:29:36 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13D8TZ2O50069854
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 13 Apr 2021 08:28:55 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0112A124054;
-        Tue, 13 Apr 2021 08:28:55 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F0CF8124053;
-        Tue, 13 Apr 2021 08:28:53 +0000 (GMT)
+        Tue, 13 Apr 2021 08:29:35 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5576A136059;
+        Tue, 13 Apr 2021 08:29:35 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0C086136051;
+        Tue, 13 Apr 2021 08:29:33 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.80.232.48])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 13 Apr 2021 08:28:53 +0000 (GMT)
-Message-ID: <c439ff8b36ff7ce59d44ce5d8911b1906415cbce.camel@linux.ibm.com>
-Subject: [V2 PATCH 13/16] crypto/nx: Rename nx-842-pseries file name to
- nx-common-pseries
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 13 Apr 2021 08:29:33 +0000 (GMT)
+Message-ID: <b097d71194d219995c54b8dd95e33c83341d8f1c.camel@linux.ibm.com>
+Subject: [V2 PATCH 14/16] crypto/nx: Register and unregister VAS interface
 From:   Haren Myneni <haren@linux.ibm.com>
 To:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
         mpe@ellerman.id.au, herbert@gondor.apana.org.au, npiggin@gmail.com
 Cc:     hbabu@us.ibm.com
-Date:   Tue, 13 Apr 2021 01:28:52 -0700
+Date:   Tue, 13 Apr 2021 01:29:32 -0700
 In-Reply-To: <68aa9f2860f9acffa41469d3858883c938634722.camel@linux.ibm.com>
 References: <68aa9f2860f9acffa41469d3858883c938634722.camel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
@@ -78,46 +77,75 @@ User-Agent: Evolution 3.36.2 (3.36.2-1.fc32)
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: FcRfx4-rUbEjyiLFvMkcUwOVNsBEZMVi
-X-Proofpoint-GUID: mUDOIhBOgevtbutXRvFQu1d_ygE_4Yz4
+X-Proofpoint-ORIG-GUID: 8ERV71IfxvV2L1M1wljqnZT89NUir_aN
+X-Proofpoint-GUID: aRgLnYxP_1ixjddjp7rpZbcWFbz-Yil2
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
  definitions=2021-04-13_03:2021-04-13,2021-04-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- mlxscore=0 suspectscore=0 spamscore=0 bulkscore=0 clxscore=1015
- phishscore=0 lowpriorityscore=0 priorityscore=1501 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ spamscore=0 clxscore=1015 impostorscore=0 suspectscore=0 bulkscore=0
+ mlxlogscore=999 priorityscore=1501 adultscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2104060000 definitions=main-2104130055
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-Rename nx-842-pseries.c to nx-common-pseries.c to add code for new
-GZIP compression type. The actual functionality is not changed in
-this patch.
+Changes to create /dev/crypto/nx-gzip interface with VAS register
+and to remove this interface with VAS unregister.
 
 Signed-off-by: Haren Myneni <haren@linux.ibm.com>
 ---
- drivers/crypto/nx/Makefile                                  | 2 +-
- drivers/crypto/nx/{nx-842-pseries.c => nx-common-pseries.c} | 0
- 2 files changed, 1 insertion(+), 1 deletion(-)
- rename drivers/crypto/nx/{nx-842-pseries.c => nx-common-pseries.c} (100%)
+ drivers/crypto/nx/Kconfig             | 1 +
+ drivers/crypto/nx/nx-common-pseries.c | 9 +++++++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/drivers/crypto/nx/Makefile b/drivers/crypto/nx/Makefile
-index bc89a20e5d9d..d00181a26dd6 100644
---- a/drivers/crypto/nx/Makefile
-+++ b/drivers/crypto/nx/Makefile
-@@ -14,5 +14,5 @@ nx-crypto-objs := nx.o \
- obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_PSERIES) += nx-compress-pseries.o nx-compress.o
- obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_POWERNV) += nx-compress-powernv.o nx-compress.o
- nx-compress-objs := nx-842.o
--nx-compress-pseries-objs := nx-842-pseries.o
-+nx-compress-pseries-objs := nx-common-pseries.o
- nx-compress-powernv-objs := nx-common-powernv.o
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
-similarity index 100%
-rename from drivers/crypto/nx/nx-842-pseries.c
-rename to drivers/crypto/nx/nx-common-pseries.c
+diff --git a/drivers/crypto/nx/Kconfig b/drivers/crypto/nx/Kconfig
+index 23e3d0160e67..2a35e0e785bd 100644
+--- a/drivers/crypto/nx/Kconfig
++++ b/drivers/crypto/nx/Kconfig
+@@ -29,6 +29,7 @@ if CRYPTO_DEV_NX_COMPRESS
+ config CRYPTO_DEV_NX_COMPRESS_PSERIES
+ 	tristate "Compression acceleration support on pSeries platform"
+ 	depends on PPC_PSERIES && IBMVIO
++	depends on PPC_VAS
+ 	default y
+ 	help
+ 	  Support for PowerPC Nest (NX) compression acceleration. This
+diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
+index cc8dd3072b8b..9a40fca8a9e6 100644
+--- a/drivers/crypto/nx/nx-common-pseries.c
++++ b/drivers/crypto/nx/nx-common-pseries.c
+@@ -9,6 +9,7 @@
+  */
+ 
+ #include <asm/vio.h>
++#include <asm/vas.h>
+ 
+ #include "nx-842.h"
+ #include "nx_csbcpb.h" /* struct nx_csbcpb */
+@@ -1101,6 +1102,12 @@ static int __init nx842_pseries_init(void)
+ 		return ret;
+ 	}
+ 
++	ret = vas_register_api_pseries(THIS_MODULE, VAS_COP_TYPE_GZIP,
++				       "nx-gzip");
++
++	if (ret)
++		pr_err("NX-GZIP is not supported. Returned=%d\n", ret);
++
+ 	return 0;
+ }
+ 
+@@ -1111,6 +1118,8 @@ static void __exit nx842_pseries_exit(void)
+ 	struct nx842_devdata *old_devdata;
+ 	unsigned long flags;
+ 
++	vas_unregister_api_pseries();
++
+ 	crypto_unregister_alg(&nx842_pseries_alg);
+ 
+ 	spin_lock_irqsave(&devdata_mutex, flags);
 -- 
 2.18.2
 
