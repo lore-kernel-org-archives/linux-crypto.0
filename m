@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0653C433ED
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 08:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C369DC433B4
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 08:25:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 87EFD613A9
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 08:24:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EBD561369
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 08:25:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbhDMIYy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Apr 2021 04:24:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63060 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229446AbhDMIYx (ORCPT
+        id S229589AbhDMIZ2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Apr 2021 04:25:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46908 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229379AbhDMIZ2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Apr 2021 04:24:53 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13D83Mjr063515;
-        Tue, 13 Apr 2021 04:24:24 -0400
+        Tue, 13 Apr 2021 04:25:28 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13D89Td6089149;
+        Tue, 13 Apr 2021 04:25:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
  from : to : cc : date : in-reply-to : references : content-type :
  mime-version : content-transfer-encoding; s=pp1;
- bh=xAabvqf+7v65N95vm6otfwdaGYBW7MTh6Z+fcF2lOwU=;
- b=BVJYS8QU4MVM7/SX5YU5Z0J0bV2QbwIwa/vcF923w7NIx31UuY/0maQ4YgaZTEzD1cFc
- 4iCtGhbWD0bc3HizE+5pf1mG9EC3LMbNU0IVpow7HKKDrr7E/YgFNzdnzeskDfSOwgWd
- 5cJK0H9xZ7OUmymAv4OaiJr9u6QlyBF5Q+9oEowxZutzNOdCRtpyqM38AfBz55yeGGRI
- Rvj7MzTKzw1qtui75E6yDBKzSdSfyz1FnhwEhrR58kbsFFelDr8NjJk2WV1BkdqZUe8K
- oWe89R6EOR6p637tCWoCLAyfCHyyQwRNgJHsaJyaCThHZTNymbNxCmGIMShoJ/wIQfRs YA== 
+ bh=9ETTbJjrjvw9mMBYfehCAwyxedjykqeURiOMtjUAEwo=;
+ b=EmugSNytv1RI+E/pyZh3g+gYcAAhJ2E1eTAXIBgaTR9uyBOjvV0Fv77u4j7eeS588U+q
+ GtBaodZyup0NP+Ulf8tRZF1JwLztcMHcrXXYi0xdoXy76YbuLZch866djfy/L7smI6Um
+ wXH15aBoYvR/gzNkk6I+0Ap2gez09qzBASnli/YHnrB4FBRoM0c8JQhDATHnAn8UkDwL
+ C+D79+owq3PkzMyc8dHBl60YrTi7EMhwO8zhwR5ul4w0ZtjYVmDC9/7xqyFR0HY98mdz
+ kioj/uhuTYKSMYmWcWlIiQvBI/Wqd4n8Vi31VmNI6PfdNUL93wunUF4kx5eQli9tsg0r 7w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37vtvy84se-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37vkdkthjv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Apr 2021 04:24:23 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13D84mpZ068829;
-        Tue, 13 Apr 2021 04:24:23 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37vtvy84ry-1
+        Tue, 13 Apr 2021 04:25:03 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13D89Xfs089428;
+        Tue, 13 Apr 2021 04:25:02 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37vkdkthhx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Apr 2021 04:24:23 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13D8MFOx028362;
-        Tue, 13 Apr 2021 08:24:22 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma05wdc.us.ibm.com with ESMTP id 37u3n9q301-1
+        Tue, 13 Apr 2021 04:25:02 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13D8M7xh007019;
+        Tue, 13 Apr 2021 08:25:01 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma04dal.us.ibm.com with ESMTP id 37u3n8vvyh-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Apr 2021 08:24:22 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13D8OLRY21561820
+        Tue, 13 Apr 2021 08:25:01 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13D8P1n620447710
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 13 Apr 2021 08:24:22 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D9575136051;
-        Tue, 13 Apr 2021 08:24:21 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9EC4413604F;
-        Tue, 13 Apr 2021 08:24:20 +0000 (GMT)
+        Tue, 13 Apr 2021 08:25:01 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 08C22124055;
+        Tue, 13 Apr 2021 08:25:01 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2B92C124053;
+        Tue, 13 Apr 2021 08:25:00 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.80.232.48])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 13 Apr 2021 08:24:20 +0000 (GMT)
-Message-ID: <6d38f5eeb1661f613bc020c4e71b3ea33e87afa1.camel@linux.ibm.com>
-Subject: [V2 PATCH 07/16] powerpc/vas: Define QoS credit flag to allocate
- window
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 13 Apr 2021 08:24:59 +0000 (GMT)
+Message-ID: <347ce23b6d8ab3a05b0f2b9ae59ec3977a7b981a.camel@linux.ibm.com>
+Subject: [V2 PATCH 08/16] powerpc/pseries/VAS: Implement
+ allocate/modify/deallocate HCALLS
 From:   Haren Myneni <haren@linux.ibm.com>
 To:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
         mpe@ellerman.id.au, herbert@gondor.apana.org.au, npiggin@gmail.com
 Cc:     hbabu@us.ibm.com
-Date:   Tue, 13 Apr 2021 01:24:18 -0700
+Date:   Tue, 13 Apr 2021 01:24:58 -0700
 In-Reply-To: <68aa9f2860f9acffa41469d3858883c938634722.camel@linux.ibm.com>
 References: <68aa9f2860f9acffa41469d3858883c938634722.camel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
@@ -78,61 +78,259 @@ User-Agent: Evolution 3.36.2 (3.36.2-1.fc32)
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: DQ0iIL8ez2RDtJ7WA6rB16noJqk-RoSf
-X-Proofpoint-GUID: BQxwn9ahUtXEm5gjLD20a33l4OebmkkW
+X-Proofpoint-ORIG-GUID: tXbMTvUeV2LG8MMCxTAYuxd-vThv8AZE
+X-Proofpoint-GUID: Cmp7BWr4_b6tb0GKatK3NxjG0bjJ95Hn
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
  definitions=2021-04-13_03:2021-04-13,2021-04-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- impostorscore=0 bulkscore=0 phishscore=0 mlxlogscore=999
- lowpriorityscore=0 priorityscore=1501 clxscore=1015 adultscore=0
- suspectscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2104060000 definitions=main-2104130055
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ phishscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015 spamscore=0
+ malwarescore=0 bulkscore=0 impostorscore=0 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
+ definitions=main-2104130055
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-pHyp introduces two different type of credits: Default and Quality
-of service (QoS).
+This patch adds the following HCALLs which are used to allocate,
+modify and deallocate VAS windows.
 
-The total number of default credits available on each LPAR depends
-on CPU resources configured. But these credits can be shared or
-over-committed across LPARs in shared mode which can result in
-paste command failure (RMA_busy). To avoid NX HW contention, phyp
-introduces QoS credit type which makes sure guaranteed access to NX
-resources. The system admins can assign QoS credits for each LPAR
-via HMC.
+H_ALLOCATE_VAS_WINDOW: Allocate VAS window
+H_DEALLOCATE_VAS_WINDOW: Close VAS window
+H_MODIFY_VAS_WINDOW: Setup window before using
 
-Default credit type is used to allocate a VAS window by default as
-on powerVM implementation. But the process can pass VAS_WIN_QOS_CREDITS
-flag with VAS_TX_WIN_OPEN ioctl to open VAS QoS type window.
+Also adds phyp call (H_QUERY_VAS_CAPABILITIES) to get all VAS
+capabilities that phyp provides.
 
 Signed-off-by: Haren Myneni <haren@linux.ibm.com>
 ---
- arch/powerpc/include/uapi/asm/vas-api.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/powerpc/platforms/pseries/vas.c | 217 +++++++++++++++++++++++++++
+ 1 file changed, 217 insertions(+)
+ create mode 100644 arch/powerpc/platforms/pseries/vas.c
 
-diff --git a/arch/powerpc/include/uapi/asm/vas-api.h b/arch/powerpc/include/uapi/asm/vas-api.h
-index ebd4b2424785..eb7c8694174f 100644
---- a/arch/powerpc/include/uapi/asm/vas-api.h
-+++ b/arch/powerpc/include/uapi/asm/vas-api.h
-@@ -13,11 +13,15 @@
- #define VAS_MAGIC	'v'
- #define VAS_TX_WIN_OPEN	_IOW(VAS_MAGIC, 0x20, struct vas_tx_win_open_attr)
- 
-+/* Flags to VAS TX open window ioctl */
-+/* To allocate a window with QoS credit, otherwise default credit is used */
-+#define	VAS_WIN_QOS_CREDITS	0x0000000000000001
+diff --git a/arch/powerpc/platforms/pseries/vas.c b/arch/powerpc/platforms/pseries/vas.c
+new file mode 100644
+index 000000000000..06960151477c
+--- /dev/null
++++ b/arch/powerpc/platforms/pseries/vas.c
+@@ -0,0 +1,217 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright 2020-21 IBM Corp.
++ */
 +
- struct vas_tx_win_open_attr {
- 	__u32	version;
- 	__s16	vas_id;	/* specific instance of vas or -1 for default */
- 	__u16	reserved1;
--	__u64	flags;	/* Future use */
-+	__u64	flags;
- 	__u64	reserved2[6];
- };
- 
++#define pr_fmt(fmt) "vas: " fmt
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/export.h>
++#include <linux/types.h>
++#include <linux/delay.h>
++#include <linux/slab.h>
++#include <linux/irqdomain.h>
++#include <linux/interrupt.h>
++#include <linux/sched/mm.h>
++#include <linux/mmu_context.h>
++#include <asm/hvcall.h>
++#include <asm/hvconsole.h>
++#include <asm/machdep.h>
++#include <asm/plpar_wrappers.h>
++#include <asm/vas.h>
++#include "vas.h"
++
++#define	VAS_INVALID_WIN_ADDRESS	0xFFFFFFFFFFFFFFFFul
++#define	VAS_DEFAULT_DOMAIN_ID	0xFFFFFFFFFFFFFFFFul
++/* Authority Mask Register (AMR) value is not supported in */
++/* linux implementation. So pass '0' to modify window HCALL */
++#define	VAS_AMR_VALUE	0
++/* phyp allows one credit per window right now */
++#define DEF_WIN_CREDS		1
++
++static int64_t hcall_return_busy_check(int64_t rc)
++{
++	/* Check if we are stalled for some time */
++	if (H_IS_LONG_BUSY(rc)) {
++		msleep(get_longbusy_msecs(rc));
++		rc = H_BUSY;
++	} else if (rc == H_BUSY) {
++		cond_resched();
++	}
++
++	return rc;
++}
++
++/*
++ * Allocate VAS window HCALL
++ */
++static int plpar_vas_allocate_window(struct vas_window *win, u64 *domain,
++				     u8 wintype, u16 credits)
++{
++	long retbuf[PLPAR_HCALL9_BUFSIZE] = {0};
++	int64_t rc;
++
++	do {
++		rc = plpar_hcall9(H_ALLOCATE_VAS_WINDOW, retbuf, wintype,
++				  credits, domain[0], domain[1], domain[2],
++				  domain[3], domain[4], domain[5]);
++
++		rc = hcall_return_busy_check(rc);
++	} while (rc == H_BUSY);
++
++	switch (rc) {
++	case H_SUCCESS:
++		win->winid = retbuf[0];
++		win->lpar.win_addr = retbuf[1];
++		win->lpar.complete_irq = retbuf[2];
++		win->lpar.fault_irq = retbuf[3];
++		if (win->lpar.win_addr == VAS_INVALID_WIN_ADDRESS) {
++			pr_err("HCALL(%x): COPY/PASTE is not supported\n",
++				H_ALLOCATE_VAS_WINDOW);
++			return -ENOTSUPP;
++		}
++		return 0;
++	case H_PARAMETER:
++		pr_err("HCALL(%x): Invalid window type (%u)\n",
++			H_ALLOCATE_VAS_WINDOW, wintype);
++		return -EINVAL;
++	case H_P2:
++		pr_err("HCALL(%x): Credits(%u) exceed maximum window credits\n",
++			H_ALLOCATE_VAS_WINDOW, credits);
++		return -EINVAL;
++	case H_COP_HW:
++		pr_err("HCALL(%x): User-mode COPY/PASTE is not supported\n",
++			H_ALLOCATE_VAS_WINDOW);
++		return -ENOTSUPP;
++	case H_RESOURCE:
++		pr_err("HCALL(%x): LPAR credit limit exceeds window limit\n",
++			H_ALLOCATE_VAS_WINDOW);
++		return -EPERM;
++	case H_CONSTRAINED:
++		pr_err("HCALL(%x): Credits (%u) are not available\n",
++			H_ALLOCATE_VAS_WINDOW, credits);
++		return -EPERM;
++	default:
++		pr_err("HCALL(%x): Unexpected error %lld\n",
++			H_ALLOCATE_VAS_WINDOW, rc);
++		return -EIO;
++	}
++}
++
++/*
++ * Deallocate VAS window HCALL.
++ */
++static int plpar_vas_deallocate_window(u64 winid)
++{
++	int64_t rc;
++
++	do {
++		rc = plpar_hcall_norets(H_DEALLOCATE_VAS_WINDOW, winid);
++
++		rc = hcall_return_busy_check(rc);
++	} while (rc == H_BUSY);
++
++	switch (rc) {
++	case H_SUCCESS:
++		return 0;
++	case H_PARAMETER:
++		pr_err("HCALL(%x): Invalid window ID %llu\n",
++			H_DEALLOCATE_VAS_WINDOW, winid);
++		return -EINVAL;
++	case H_STATE:
++		pr_err("HCALL(%x): Window(%llu): Invalid page table entries\n",
++			H_DEALLOCATE_VAS_WINDOW, winid);
++		return -EPERM;
++	default:
++		pr_err("HCALL(%x): Unexpected error %lld for window(%llu)\n",
++			H_DEALLOCATE_VAS_WINDOW, rc, winid);
++		return -EIO;
++	}
++}
++
++/*
++ * Modify VAS window.
++ * After the window is opened with allocate window HCALL, configure it
++ * with flags and LPAR PID before using.
++ */
++static int plpar_vas_modify_window(struct vas_window *win)
++{
++	int64_t rc;
++	u32 lpid = mfspr(SPRN_PID);
++
++	/*
++	 * AMR value is not supported in Linux implementation
++	 * phyp ignores it if 0 is passed.
++	 */
++	do {
++		rc = plpar_hcall_norets(H_MODIFY_VAS_WINDOW, win->winid,
++					lpid, 0, VAS_MOD_WIN_FLAGS,
++					VAS_AMR_VALUE);
++
++		rc = hcall_return_busy_check(rc);
++	} while (rc == H_BUSY);
++
++	switch (rc) {
++	case H_SUCCESS:
++		return 0;
++	case H_PARAMETER:
++		pr_err("HCALL(%x): Invalid window ID %u\n",
++			H_MODIFY_VAS_WINDOW, win->winid);
++		return -EINVAL;
++	case H_P2:
++		pr_err("HCALL(%x): Window(%d): Invalid LPAR Process ID %u\n",
++			H_MODIFY_VAS_WINDOW, lpid, win->winid);
++		return -EINVAL;
++	case H_P3:
++		/* LPAR thread ID is deprecated on P10 */
++		pr_err("HCALL(%x): Invalid LPAR Thread ID for window(%u)\n",
++			H_MODIFY_VAS_WINDOW, win->winid);
++		return -EINVAL;
++	case H_STATE:
++		pr_err("HCALL(%x): Jobs in progress, Can't modify window(%u)\n",
++			H_MODIFY_VAS_WINDOW, win->winid);
++		return -EBUSY;
++	default:
++		pr_err("HCALL(%x): Unexpected error %lld for window(%u)\n",
++			H_MODIFY_VAS_WINDOW, rc, win->winid);
++		return -EIO;
++	}
++}
++
++/*
++ * This HCALL is used to determine the capabilities that pHyp provides.
++ * @hcall: H_QUERY_VAS_CAPABILITIES or H_QUERY_NX_CAPABILITIES
++ * @query_type: If 0 is passed, phyp returns the overall capabilities
++ *		which provides all feature(s) that are available. Then
++ *		query phyp to get the corresponding capabilities for
++ *		the specific feature.
++ *		Example: H_QUERY_VAS_CAPABILITIES provides VAS GZIP QoS
++ *			and VAS GZIP Default capabilities.
++ *			H_QUERY_NX_CAPABILITIES provides NX GZIP
++ *			capabilities.
++ * @result: Return buffer to save capabilities.
++ */
++int plpar_vas_query_capabilities(const u64 hcall, u8 query_type,
++					u64 result)
++{
++	int64_t rc;
++
++	rc = plpar_hcall_norets(hcall, query_type, result);
++
++	switch (rc) {
++	case H_SUCCESS:
++		return 0;
++	case H_PARAMETER:
++		pr_err("HCALL(%llx): Invalid query type %u\n", hcall,
++			query_type);
++		return -EINVAL;
++	case H_PRIVILEGE:
++		pr_err("HCALL(%llx): Invalid result buffer 0x%llx\n",
++			hcall, result);
++		return -EACCES;
++	default:
++		pr_err("HCALL(%llx): Unexpected error %lld\n", hcall, rc);
++		return -EIO;
++	}
++}
 -- 
 2.18.2
 
