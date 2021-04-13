@@ -2,182 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF7CC433B4
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 21:11:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CCCDC433ED
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 05:44:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE041610CE
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Apr 2021 21:11:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 290EC61004
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 05:44:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240613AbhDLVLc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Apr 2021 17:11:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55892 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240417AbhDLVLb (ORCPT
+        id S1343827AbhDMFoi (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Apr 2021 01:44:38 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:50539 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245735AbhDMFoh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Apr 2021 17:11:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618261872;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=T1rjmwGZCfV3Wdujd1F9jgDadUdVKVMwRumv0bVuOOo=;
-        b=U0GWbiQ9yhQf9MljjMs79Xk9ecE86MN4iHHFuI4UR3C9MxFP26WOljOjVaimV6XM0wF+bI
-        vKKJ/B8cvqw9GcZWZ6AFpjdqE8FjoIWklLRlu/aRzQvd1g7ZXb7cJ5p/PkYqwhJdcmpN6T
-        KW+s5wgoD7iBajiE4hjkeW5eYcfb3EI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-549-tz4JTTSgN-SIKfWKa6REUQ-1; Mon, 12 Apr 2021 17:11:09 -0400
-X-MC-Unique: tz4JTTSgN-SIKfWKa6REUQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B812801814;
-        Mon, 12 Apr 2021 21:11:07 +0000 (UTC)
-Received: from ovpn-114-108.phx2.redhat.com (ovpn-114-108.phx2.redhat.com [10.3.114.108])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C0F955C1BB;
-        Mon, 12 Apr 2021 21:11:06 +0000 (UTC)
-Message-ID: <31b88b39772636f8faee6949562c76c82f615bdb.camel@redhat.com>
-Subject: Re: [PATCH v6 1/1] use crc32 instead of md5 for hibernation e820
- integrity check
-From:   Simo Sorce <simo@redhat.com>
-To:     Ard Biesheuvel <ardb@kernel.org>,
-        Chris von Recklinghausen <crecklin@redhat.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Date:   Mon, 12 Apr 2021 17:11:05 -0400
-In-Reply-To: <CAMj1kXHKcJ2rSsiuk3wdr+E0EXAeJeOtGvmSEE96wf5tFOC3BQ@mail.gmail.com>
-References: <20210412140932.31162-1-crecklin@redhat.com>
-         <YHSHPIXLhHjOu0jw@gmail.com>
-         <5795c815-7715-1ecb-dd83-65f3d18b9092@redhat.com>
-         <YHSdgV6LIqSVxk+i@gmail.com>
-         <CAMj1kXGZt8+5MVG-mNi67KsG8=4HCqEPs+RkrtzHusmCPFqSTg@mail.gmail.com>
-         <862c8208-5809-9726-7e22-7a16fcd30edd@redhat.com>
-         <CAMj1kXHKcJ2rSsiuk3wdr+E0EXAeJeOtGvmSEE96wf5tFOC3BQ@mail.gmail.com>
-Organization: Red Hat, Inc.
+        Tue, 13 Apr 2021 01:44:37 -0400
+Received: by mail-io1-f71.google.com with SMTP id a1so10385026iow.17
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Apr 2021 22:44:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=J5b//R78831zM4Ss3o6NkqUcVQQPCbS453yaDVWH/Vs=;
+        b=YkUz+jDXv9s8ZOAxyQcCCUI7YWX/Mu8ojgjul6Ib/MkvLY4RwbMHNzFfVyTqsYyvwO
+         yohjhfUjvDiW3tmYS3UvJsNKWCr2WiNugMGC/lZ4BZYcVbAC9dgTqsEcNIS0rkr/PdA3
+         BbuZ7tnwFAjbtp+qG2aoibszoiGsUeFPTkYdNFCdhhpVXQAiDrHRxDgwqdpVcs9lvM2T
+         /X8Qwv4NrwkrEkaPAl5E1a1mtQpDdG7VoBFo3Qd8gBnUP12sKrj6h7tskFcCRY+HslAp
+         pakoDEWCODa+e9U6rJrQvRTkbPF7z0VC33M2/7fQQxyLxDL6CQl7nh6EYI1hVofTa0NN
+         kMQg==
+X-Gm-Message-State: AOAM530ob0oekMwufvV5D1mBwtmKvazJGxDm04778QSe05SrJK+Z9jds
+        M5P72pFlndoTXabe1z6pikV/BDeNW8I5Q6RhOnyflUjqUUyh
+X-Google-Smtp-Source: ABdhPJy+sZUkg1hcJlwWeqyJcA3cvZrEDaJz8z8E9vswgCdfzcJbHFPg4IpNWs2hdoUqEZNkpKMT2vmB7cLSKqq7Ciz+a5vsto5d
+MIME-Version: 1.0
+X-Received: by 2002:a92:c9d1:: with SMTP id k17mr27614336ilq.60.1618292658270;
+ Mon, 12 Apr 2021 22:44:18 -0700 (PDT)
+Date:   Mon, 12 Apr 2021 22:44:18 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000009f87005bfd41f0e@google.com>
+Subject: [syzbot] KASAN: use-after-free Read in skcipher_walk_next
+From:   syzbot <syzbot+4061a98a8ab454dde8ff@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2021-04-12 at 22:29 +0200, Ard Biesheuvel wrote:
-> On Mon, 12 Apr 2021 at 21:51, Chris von Recklinghausen
-> <crecklin@redhat.com> wrote:
-> > On 4/12/21 3:27 PM, Ard Biesheuvel wrote:
-> > > On Mon, 12 Apr 2021 at 21:20, Eric Biggers <ebiggers@kernel.org> wrote:
-> > > > On Mon, Apr 12, 2021 at 03:04:58PM -0400, Chris von Recklinghausen wrote:
-> > > > > On 4/12/21 1:45 PM, Eric Biggers wrote:
-> > > > > > On Mon, Apr 12, 2021 at 10:09:32AM -0400, Chris von Recklinghausen wrote:
-> > > > > > > Suspend fails on a system in fips mode because md5 is used for the e820
-> > > > > > > integrity check and is not available. Use crc32 instead.
-> > > > > > > 
-> > > > > > > This patch changes the integrity check algorithm from md5 to crc32.
-> > > > > > > 
-> > > > > > > The purpose of the integrity check is to detect possible differences
-> > > > > > > between the memory map used at the time when the hibernation image is
-> > > > > > > about to be loaded into memory and the memory map used at the image
-> > > > > > > creation time, because it is generally unsafe to load the image if the
-> > > > > > > current memory map doesn't match the one used when it was created. so
-> > > > > > > it is not intended as a cryptographic integrity check.
-> > > > > > This still doesn't actually explain why a non-cryptographic checksum is
-> > > > > > sufficient.  "Detection of possible differences" could very well require
-> > > > > > cryptographic authentication; it depends on whether malicious changes need to be
-> > > > > > detected or not.
-> > > > > Hi Eric,
-> > > > > 
-> > > > > The cases that the commit comments for 62a03defeabd mention are the same as
-> > > > > for this patch, e.g.
-> > > > > 
-> > > > >      1. Without this patch applied, it is possible that BIOS has
-> > > > >         provided an inconsistent memory map, but the resume kernel is still
-> > > > >         able to restore the image anyway(e.g, E820_RAM region is the superset
-> > > > >         of the previous one), although the system might be unstable. So this
-> > > > >         patch tries to treat any inconsistent e820 as illegal.
-> > > > > 
-> > > > >      2. Another case is, this patch replies on comparing the e820_saved, but
-> > > > >         currently the e820_save might not be strictly the same across
-> > > > >         hibernation, even if BIOS has provided consistent e820 map - In
-> > > > >         theory mptable might modify the BIOS-provided e820_saved dynamically
-> > > > >         in early_reserve_e820_mpc_new, which would allocate a buffer from
-> > > > >         E820_RAM, and marks it from E820_RAM to E820_RESERVED).
-> > > > >         This is a potential and rare case we need to deal with in OS in
-> > > > >         the future.
-> > > > > 
-> > > > > Maybe they should be added to the comments with this patch as well? In any
-> > > > > case, the above comments only mention detecting consequences of BIOS
-> > > > > issues/actions on the e820 map and not intrusions from attackers requiring
-> > > > > cryptographic protection. Does that seem to be a reasonable explanation to
-> > > > > you? If so I can add these to the commit comments.
-> > > > > 
-> > > > > I'll make the other changes you suggest below.
-> > > > > 
-> > > > > Thanks,
-> > > > > 
-> > > > Those details are still missing the high-level point.  Is this just meant to
-> > > > detect non-malicious changes (presumably caused by BIOS bugs), or is it meant to
-> > > > detect malicious changes?  That's all that really needs to be mentioned.
-> > > > 
-> > > This is not about BIOS bugs. Hibernation is deep suspend/resume
-> > > grafted onto cold boot, and it is perfectly legal for the firmware to
-> > > present a different memory map to the OS after a cold boot. It is
-> > > Linux that decides that it can restore the entire system state from a
-> > > swap file, and carry on as if the cold boot was just a [firmware
-> > > assisted] suspend/resume.
-> > > 
-> > > So forging collisions is *not* a concern here. Let's avoid accidental
-> > > or malicious, as those adjectives seem to confuse some people. The
-> > > bottom line is that there is no need to protect against deliberate
-> > > attempts to hide the fact that the memory map has changed, and so
-> > > there is no reason to use cryptographic hashes here.
-> > > 
-> > How about :
-> > 
-> > The check is intended to differentiate between a resume (which expects
-> > an identical e820 map to the one saved in suspend), and a cold boot
-> > (which need not have an identical e820 map to that saved in suspend if
-> > any was done at all). It is not necessary here to protect against
-> > deliberate attempts to hide the fact that the memory map has changed, so
-> > crc32 is sufficient for detection.
-> > 
-> 
-> Almost. Hibernation always occurs after a cold boot, but usually, the
-> E820 memory map happens to be the same.
-> 
-> How about
-> 
-> """
-> The check is intended to detect whether the E820 memory map provided
-> by the firmware after cold boot unexpectedly differs from the one that
-> was in use when the hibernation image was created. In this case, the
-> hibernation image cannot be restored, as it may cover memory regions
-> that are no longer available to the OS.
-> 
-> A non-cryptographic hash such as CRC-32 is sufficient to detect such
-> inadvertent deviations.
-> """
+Hello,
 
-hash -> checksum
+syzbot found the following issue on:
 
-Simo.
+HEAD commit:    4fa56ad0 Merge tag 'for-linus' of git://git.kernel.org/pub..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17dbd09ad00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9320464bf47598bd
+dashboard link: https://syzkaller.appspot.com/bug?extid=4061a98a8ab454dde8ff
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4061a98a8ab454dde8ff@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: use-after-free in memcpy include/linux/fortify-string.h:191 [inline]
+BUG: KASAN: use-after-free in skcipher_next_copy crypto/skcipher.c:292 [inline]
+BUG: KASAN: use-after-free in skcipher_walk_next+0xb69/0x1680 crypto/skcipher.c:379
+Read of size 2785 at addr ffff8880781c0000 by task kworker/u4:3/204
+
+CPU: 0 PID: 204 Comm: kworker/u4:3 Not tainted 5.12.0-rc6-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: pencrypt_parallel padata_parallel_worker
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x141/0x1d7 lib/dump_stack.c:120
+ print_address_description.constprop.0.cold+0x5b/0x2f8 mm/kasan/report.c:232
+ __kasan_report mm/kasan/report.c:399 [inline]
+ kasan_report.cold+0x7c/0xd8 mm/kasan/report.c:416
+ check_region_inline mm/kasan/generic.c:180 [inline]
+ kasan_check_range+0x13d/0x180 mm/kasan/generic.c:186
+ memcpy+0x20/0x60 mm/kasan/shadow.c:65
+ memcpy include/linux/fortify-string.h:191 [inline]
+ skcipher_next_copy crypto/skcipher.c:292 [inline]
+ skcipher_walk_next+0xb69/0x1680 crypto/skcipher.c:379
+ skcipher_walk_done+0x7a3/0xf00 crypto/skcipher.c:159
+ gcmaes_crypt_by_sg+0x377/0x8a0 arch/x86/crypto/aesni-intel_glue.c:694
+
+The buggy address belongs to the page:
+page:ffffea0001e07000 refcount:0 mapcount:-128 mapping:0000000000000000 index:0x1 pfn:0x781c0
+flags: 0xfff00000000000()
+raw: 00fff00000000000 ffffea0001e06808 ffffea0001c67008 0000000000000000
+raw: 0000000000000001 0000000000000004 00000000ffffff7f 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff8880781bff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff8880781bff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffff8880781c0000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                   ^
+ ffff8880781c0080: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff8880781c0100: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+==================================================================
 
 
--- 
-Simo Sorce
-RHEL Crypto Team
-Red Hat, Inc
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-
-
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
