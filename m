@@ -2,117 +2,229 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CCCDC433ED
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 05:44:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4646FC433B4
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 08:16:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 290EC61004
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 05:44:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C2FA61278
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Apr 2021 08:16:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343827AbhDMFoi (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Apr 2021 01:44:38 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:50539 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245735AbhDMFoh (ORCPT
+        id S242343AbhDMIQl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Apr 2021 04:16:41 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40732 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242329AbhDMIQk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Apr 2021 01:44:37 -0400
-Received: by mail-io1-f71.google.com with SMTP id a1so10385026iow.17
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Apr 2021 22:44:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=J5b//R78831zM4Ss3o6NkqUcVQQPCbS453yaDVWH/Vs=;
-        b=YkUz+jDXv9s8ZOAxyQcCCUI7YWX/Mu8ojgjul6Ib/MkvLY4RwbMHNzFfVyTqsYyvwO
-         yohjhfUjvDiW3tmYS3UvJsNKWCr2WiNugMGC/lZ4BZYcVbAC9dgTqsEcNIS0rkr/PdA3
-         BbuZ7tnwFAjbtp+qG2aoibszoiGsUeFPTkYdNFCdhhpVXQAiDrHRxDgwqdpVcs9lvM2T
-         /X8Qwv4NrwkrEkaPAl5E1a1mtQpDdG7VoBFo3Qd8gBnUP12sKrj6h7tskFcCRY+HslAp
-         pakoDEWCODa+e9U6rJrQvRTkbPF7z0VC33M2/7fQQxyLxDL6CQl7nh6EYI1hVofTa0NN
-         kMQg==
-X-Gm-Message-State: AOAM530ob0oekMwufvV5D1mBwtmKvazJGxDm04778QSe05SrJK+Z9jds
-        M5P72pFlndoTXabe1z6pikV/BDeNW8I5Q6RhOnyflUjqUUyh
-X-Google-Smtp-Source: ABdhPJy+sZUkg1hcJlwWeqyJcA3cvZrEDaJz8z8E9vswgCdfzcJbHFPg4IpNWs2hdoUqEZNkpKMT2vmB7cLSKqq7Ciz+a5vsto5d
-MIME-Version: 1.0
-X-Received: by 2002:a92:c9d1:: with SMTP id k17mr27614336ilq.60.1618292658270;
- Mon, 12 Apr 2021 22:44:18 -0700 (PDT)
-Date:   Mon, 12 Apr 2021 22:44:18 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000009f87005bfd41f0e@google.com>
-Subject: [syzbot] KASAN: use-after-free Read in skcipher_walk_next
-From:   syzbot <syzbot+4061a98a8ab454dde8ff@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
+        Tue, 13 Apr 2021 04:16:40 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13D83Zoa110623;
+        Tue, 13 Apr 2021 04:16:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : content-type : content-transfer-encoding :
+ mime-version; s=pp1; bh=uoSVj3XbU0Xch1hF0j1+8Fxv52mAjUUVfCK0nDTPdy8=;
+ b=NJexlMzfehOLfBuV/xbAcZ2bZfhhqWMN0S2yut5uCEXXNsGadmrCpxz5v0FWyFyYkCgO
+ BAs1uKx43DsDlU6yomLppN5K8/MGpViNQCN5KUa6vmYwg42ZWDUjuQGi28ULPQXqofWH
+ 4IgWuAW3nkl+YtTUWrDI6oUKmW9e56MPTV7DQPlFntaGUKSXbTW8Anlnd4zyscSmNNaD
+ KIOf58+ipUCdemqEmOA3Hf668bV10d4nwr9DwJdp9Ivfq7145VLoHp7p9aPAcuWkoON5
+ zcSbQFUmFE4B29weW//XGAccqIPP7NH1PYHnLIpcUPOf/uOegsSPnPpw0PwD1BOXeZIn Uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37vjtu2mua-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Apr 2021 04:16:09 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13D83fnh111230;
+        Tue, 13 Apr 2021 04:16:09 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37vjtu2mtw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Apr 2021 04:16:09 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13D7w18a015385;
+        Tue, 13 Apr 2021 08:16:08 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma04wdc.us.ibm.com with ESMTP id 37u3n9y2b8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Apr 2021 08:16:08 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13D8G78n32375214
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Apr 2021 08:16:07 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 37E446E04C;
+        Tue, 13 Apr 2021 08:16:07 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C6FCF6E052;
+        Tue, 13 Apr 2021 08:16:05 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.80.232.48])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 13 Apr 2021 08:16:05 +0000 (GMT)
+Message-ID: <68aa9f2860f9acffa41469d3858883c938634722.camel@linux.ibm.com>
+Subject: [V2 PATCH 00/16] Enable VAS and NX-GZIP support on powerVM
+From:   Haren Myneni <haren@linux.ibm.com>
+To:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        mpe@ellerman.id.au, herbert@gondor.apana.org.au, npiggin@gmail.com
+Cc:     hbabu@us.ibm.com, haren@linux.ibm.com
+Date:   Tue, 13 Apr 2021 01:16:03 -0700
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7FZPF5Nbvi-M4065tl7DuKYYpHzbggi0
+X-Proofpoint-ORIG-GUID: _Rtv1lk66ettDhm43ULmtSGNCCRKn5EO
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-13_03:2021-04-13,2021-04-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ priorityscore=1501 impostorscore=0 suspectscore=0 bulkscore=0 adultscore=0
+ mlxscore=0 mlxlogscore=999 clxscore=1015 phishscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
+ definitions=main-2104130055
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
 
-syzbot found the following issue on:
+This patch series enables VAS / NX-GZIP on powerVM which allows
+the user space to do copy/paste with the same existing interface
+that is available on powerNV.
 
-HEAD commit:    4fa56ad0 Merge tag 'for-linus' of git://git.kernel.org/pub..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17dbd09ad00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9320464bf47598bd
-dashboard link: https://syzkaller.appspot.com/bug?extid=4061a98a8ab454dde8ff
+VAS Enablement:
+- Get all VAS capabilities using H_QUERY_VAS_CAPABILITIES that are
+  available in the hypervisor. These capabilities tells OS which
+  type of features (credit types such as Default and Quality of
+  Service (QoS)). Also gives specific capabilities for each credit
+  type: Maximum window credits, Maximum LPAR credits, Target credits
+  in that parition (varies from max LPAR credits based DLPAR
+  operation), whether supports user mode COPY/PASTE and etc.
+- Register LPAR VAS operations such as open window. get paste
+  address and close window with the current VAS user space API.
+- Open window operation - Use H_ALLOCATE_VAS_WINDOW HCALL to open
+  window and H_MODIFY_VAS_WINDOW HCALL to setup the window with LPAR
+  PID and etc.
+- mmap to paste address returned in H_ALLOCATE_VAS_WINDOW HCALL
+- To close window, H_DEALLOCATE_VAS_WINDOW HCALL is used to close in
+  the hypervisor.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+NX Enablement:
+- Get NX capabilities from the the hypervisor which provides Maximum
+  buffer length in a single GZIP request, recommended minimum
+  compression / decompression lengths.
+- Register to VAS to enable user space VAS API
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4061a98a8ab454dde8ff@syzkaller.appspotmail.com
+Main feature differences with powerNV implementation:
+- Each VAS window will be configured with a number of credits which
+  means that many requests can be issues simultaniously on that
+  window. On powerNV, 1K credits are configured per window.
+  Whereas on powerVM, the hypervisor allows 1 credit per window
+  at present.
+- The hypervisor introduced 2 different types of credits: Default -
+  Uses normal priority FIFO and Quality of Service (QoS) - Uses high
+  priority FIFO. On powerVM, VAS/NX HW resources are shared across
+  LPARs. The total number of credits available on a system depends
+  on cores configured. We may see more credits are assigned across
+  the system than the NX HW resources can handle. So to avoid NX HW
+  contention, pHyp introduced QoS credits which can be configured
+  by system administration with HMC API. Then the total number of
+  available default credits on LPAR varies based on QoS credits
+  configured.
+- On powerNV, windows are allocated on a specific VAS instance
+  and the user space can select VAS instance with the open window
+  ioctl. Since VAS instances can be shared across partitions on
+  powerVM, the hypervisor manages window allocations on different
+  VAS instances. So H_ALLOCATE_VAS_WINDOW allows to select by domain
+  indentifiers (H_HOME_NODE_ASSOCIATIVITY values by cpu). By default
+  the hypervisor selects VAS instance closer to CPU resources that the
+  parition uses. So vas_id in ioctl interface is ignored on powerVM
+  except vas_id=-1 which is used to allocate window based on CPU that
+  the process is executing. This option is needed for process affinity
+  to NUMA node.
 
-==================================================================
-BUG: KASAN: use-after-free in memcpy include/linux/fortify-string.h:191 [inline]
-BUG: KASAN: use-after-free in skcipher_next_copy crypto/skcipher.c:292 [inline]
-BUG: KASAN: use-after-free in skcipher_walk_next+0xb69/0x1680 crypto/skcipher.c:379
-Read of size 2785 at addr ffff8880781c0000 by task kworker/u4:3/204
+  The existing applications that linked with libnxz should work as
+  long as the job request length is restricted to
+  req_max_processed_len.
 
-CPU: 0 PID: 204 Comm: kworker/u4:3 Not tainted 5.12.0-rc6-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: pencrypt_parallel padata_parallel_worker
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x141/0x1d7 lib/dump_stack.c:120
- print_address_description.constprop.0.cold+0x5b/0x2f8 mm/kasan/report.c:232
- __kasan_report mm/kasan/report.c:399 [inline]
- kasan_report.cold+0x7c/0xd8 mm/kasan/report.c:416
- check_region_inline mm/kasan/generic.c:180 [inline]
- kasan_check_range+0x13d/0x180 mm/kasan/generic.c:186
- memcpy+0x20/0x60 mm/kasan/shadow.c:65
- memcpy include/linux/fortify-string.h:191 [inline]
- skcipher_next_copy crypto/skcipher.c:292 [inline]
- skcipher_walk_next+0xb69/0x1680 crypto/skcipher.c:379
- skcipher_walk_done+0x7a3/0xf00 crypto/skcipher.c:159
- gcmaes_crypt_by_sg+0x377/0x8a0 arch/x86/crypto/aesni-intel_glue.c:694
+  Tested the following patches on P10 successfully with test cases
+  given: https://github.com/libnxz/power-gzip
 
-The buggy address belongs to the page:
-page:ffffea0001e07000 refcount:0 mapcount:-128 mapping:0000000000000000 index:0x1 pfn:0x781c0
-flags: 0xfff00000000000()
-raw: 00fff00000000000 ffffea0001e06808 ffffea0001c67008 0000000000000000
-raw: 0000000000000001 0000000000000004 00000000ffffff7f 0000000000000000
-page dumped because: kasan: bad access detected
+  Note: The hypervisor supports user mode NX from p10 onwards. Linux
+        supports user mode VAS/NX on P10 only with radix page tables.
 
-Memory state around the buggy address:
- ffff8880781bff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff8880781bff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffff8880781c0000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-                   ^
- ffff8880781c0080: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
- ffff8880781c0100: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-==================================================================
+Patches 1- 4:   Make the code that is needed for both powerNV and
+                powerVM to powerpc platform independent.
+Patch5:         Modify vas-window struct to support both and the
+                related changes.
+Patch 6:        Define HCALL and the related VAS/NXGZIP specific
+                structs.
+Patch 7:        Define QoS credit flag in window open ioctl
+Patch 8:        Implement Allocate, Modify and Deallocate HCALLs
+Patch 9:        Retrieve VAS capabilities from the hypervisor
+Patch 10;       Implement window operations and integrate with API
+Patch 11:       Setup IRQ and NX fault handling
+Patch 12;       Add sysfs interface to expose VAS capabilities
+Patch 13 - 14:  Make the code common to add NX-GZIP enablement
+Patch 15:       Get NX capabilities from the hypervisor
+patch 16;       Add sysfs interface to expose NX capabilities
+
+Changes in V2:
+  - Rebase on 5.12-rc6
+  - Moved VAS Kconfig changes to arch/powerpc/platform as suggested
+    by Christophe Leroy
+  - build fix with allyesconfig (reported by kernel test build)
+
+Haren Myneni (16):
+  powerpc/powernv/vas: Rename register/unregister functions
+  powerpc/vas: Make VAS API powerpc platform independent
+  powerpc/vas: Create take/drop task reference functions
+  powerpc/vas: Move update_csb and dump_crb to platform independent
+  powerpc/vas:  Define and use common vas_window struct
+  powerpc/pseries/vas: Define VAS/NXGZIP HCALLs and structs
+  powerpc/vas: Define QoS credit flag to allocate window
+  powerpc/pseries/VAS: Implement allocate/modify/deallocate HCALLS
+  powerpc/pseries/vas: Implement to get all capabilities
+  powerpc/pseries/vas: Integrate API with open/close windows
+  powerpc/pseries/vas: Setup IRQ and fault handling
+  powerpc/pseries/vas: sysfs interface to export capabilities
+  crypto/nx: Rename nx-842-pseries file name to nx-common-pseries
+  crypto/nx: Register and unregister VAS interface
+  crypto/nx: Get NX capabilities for GZIP coprocessor type
+  crypto/nx: Add sysfs interface to export NX capabilities
+
+ arch/powerpc/include/asm/hvcall.h             |   7 +
+ arch/powerpc/include/asm/vas.h                | 122 +++-
+ arch/powerpc/include/uapi/asm/vas-api.h       |   6 +-
+ arch/powerpc/kernel/Makefile                  |   1 +
+ arch/powerpc/kernel/vas-api.c                 | 485 +++++++++++++
+ arch/powerpc/platforms/Kconfig                |  15 +
+ arch/powerpc/platforms/powernv/Kconfig        |  14 -
+ arch/powerpc/platforms/powernv/Makefile       |   2 +-
+ arch/powerpc/platforms/powernv/vas-api.c      | 278 --------
+ arch/powerpc/platforms/powernv/vas-debug.c    |  12 +-
+ arch/powerpc/platforms/powernv/vas-fault.c    | 155 +---
+ arch/powerpc/platforms/powernv/vas-trace.h    |   6 +-
+ arch/powerpc/platforms/powernv/vas-window.c   | 250 ++++---
+ arch/powerpc/platforms/powernv/vas.h          |  42 +-
+ arch/powerpc/platforms/pseries/Makefile       |   1 +
+ arch/powerpc/platforms/pseries/vas-sysfs.c    | 173 +++++
+ arch/powerpc/platforms/pseries/vas.c          | 674 ++++++++++++++++++
+ arch/powerpc/platforms/pseries/vas.h          |  98 +++
+ drivers/crypto/nx/Kconfig                     |   1 +
+ drivers/crypto/nx/Makefile                    |   2 +-
+ drivers/crypto/nx/nx-common-powernv.c         |   6 +-
+ .../{nx-842-pseries.c => nx-common-pseries.c} | 135 ++++
+ 22 files changed, 1886 insertions(+), 599 deletions(-)
+ create mode 100644 arch/powerpc/kernel/vas-api.c
+ delete mode 100644 arch/powerpc/platforms/powernv/vas-api.c
+ create mode 100644 arch/powerpc/platforms/pseries/vas-sysfs.c
+ create mode 100644 arch/powerpc/platforms/pseries/vas.c
+ create mode 100644 arch/powerpc/platforms/pseries/vas.h
+ rename drivers/crypto/nx/{nx-842-pseries.c => nx-common-pseries.c} (90%)
+
+-- 
+2.18.2
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
