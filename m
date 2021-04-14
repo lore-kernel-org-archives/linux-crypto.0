@@ -7,71 +7,66 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13E8BC433B4
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Apr 2021 09:17:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80AF0C433B4
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Apr 2021 11:39:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED75A611EE
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Apr 2021 09:17:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50D72613BB
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Apr 2021 11:39:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232755AbhDNJRy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Apr 2021 05:17:54 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:15677 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232715AbhDNJRy (ORCPT
+        id S232490AbhDNLkN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Apr 2021 07:40:13 -0400
+Received: from mail-m17635.qiye.163.com ([59.111.176.35]:53648 "EHLO
+        mail-m17635.qiye.163.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231668AbhDNLkM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Apr 2021 05:17:54 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FKxct19WTzpXfC;
-        Wed, 14 Apr 2021 17:14:38 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 14 Apr 2021 17:17:23 +0800
-From:   Tian Tao <tiantao6@hisilicon.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, Tian Tao <tiantao6@hisilicon.com>
-Subject: [PATCH] crypto: ccp - Fix to return the correct return value
-Date:   Wed, 14 Apr 2021 17:17:44 +0800
-Message-ID: <1618391864-55601-1-git-send-email-tiantao6@hisilicon.com>
-X-Mailer: git-send-email 2.7.4
+        Wed, 14 Apr 2021 07:40:12 -0400
+Received: from wanjb-virtual-machine.localdomain (unknown [36.152.145.182])
+        by mail-m17635.qiye.163.com (Hmail) with ESMTPA id E5DE0400495;
+        Wed, 14 Apr 2021 19:39:48 +0800 (CST)
+From:   Wan Jiabing <wanjiabing@vivo.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Wan Jiabing <wanjiabing@vivo.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     kael_w@yeah.net
+Subject: [PATCH] crypto: ux500: cryp: Remove duplicate argument
+Date:   Wed, 14 Apr 2021 19:38:59 +0800
+Message-Id: <20210414113910.10651-1-wanjiabing@vivo.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgYFAkeWUFZS1VLWVdZKFlBSE83V1ktWUFJV1kPCR
+        oVCBIfWUFZGUpNSVYYHkxNGkoZSkNNGk1VEwETFhoSFyQUDg9ZV1kWGg8SFR0UWUFZT0tIVUpKS0
+        hKTFVLWQY+
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6PCI6Pjo6Tj8PKBMrOBQXFiEu
+        SDgwCQJVSlVKTUpDT0tLSENCT0xNVTMWGhIXVQwaFRESGhkSFRw7DRINFFUYFBZFWVdZEgtZQVlI
+        TVVKTklVSk9OVUpDSVlXWQgBWUFKTkJONwY+
+X-HM-Tid: 0a78d02e27e4d991kuwse5de0400495
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-ccp_dev_suspend and ccp_dev_resume return 0 on error, which causes
-ret to equal 0 in sp_suspend and sp_resume, making the if condition
-impossible to use.
+Fix the following coccicheck warning:
 
-Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+./drivers/crypto/ux500/cryp/cryp_p.h:84:6-27:duplicated argument to |
+
+Signed-off-by: Wan Jiabing <wanjiabing@vivo.com>
 ---
- drivers/crypto/ccp/ccp-dev.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/ux500/cryp/cryp_p.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 0971ee6..6f2af7b 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -556,7 +556,7 @@ int ccp_dev_suspend(struct sp_device *sp)
- 
- 	/* If there's no device there's nothing to do */
- 	if (!ccp)
--		return 0;
-+		return -ENXIO;
- 
- 	spin_lock_irqsave(&ccp->cmd_lock, flags);
- 
-@@ -584,7 +584,7 @@ int ccp_dev_resume(struct sp_device *sp)
- 
- 	/* If there's no device there's nothing to do */
- 	if (!ccp)
--		return 0;
-+		return -ENXIO;
- 
- 	spin_lock_irqsave(&ccp->cmd_lock, flags);
- 
+diff --git a/drivers/crypto/ux500/cryp/cryp_p.h b/drivers/crypto/ux500/cryp/cryp_p.h
+index 0df84eaa8531..cbbca0020eb1 100644
+--- a/drivers/crypto/ux500/cryp/cryp_p.h
++++ b/drivers/crypto/ux500/cryp/cryp_p.h
+@@ -81,7 +81,6 @@
+ 					 CRYP_CR_PRLG_MASK |\
+ 					 CRYP_CR_ALGODIR_MASK |\
+ 					 CRYP_CR_ALGOMODE_MASK |\
+-					 CRYP_CR_DATATYPE_MASK |\
+ 					 CRYP_CR_KEYSIZE_MASK |\
+ 					 CRYP_CR_KEYRDEN_MASK |\
+ 					 CRYP_CR_DATATYPE_MASK)
 -- 
-2.7.4
+2.25.1
 
