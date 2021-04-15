@@ -2,593 +2,250 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D63C433B4
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Apr 2021 12:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48218C433B4
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Apr 2021 13:47:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C4C761152
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Apr 2021 12:28:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 146EF613B4
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Apr 2021 13:47:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231482AbhDOM3V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Apr 2021 08:29:21 -0400
-Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:26570 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230056AbhDOM3U (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Apr 2021 08:29:20 -0400
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-        by mx0a-0016f401.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13FC9ehm002045;
-        Thu, 15 Apr 2021 05:28:49 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=WeQ6MKbptIImu6T30PYfHMfQ+kH79n+DRDQCwcRtqZM=;
- b=ikebiLwL2ilRz61P6ARh+Bnv6I2/S8rJnEHKO3opIEvQSBZmqax2UFZ0+rdk4TGlbIOh
- FjxfdhTj3np+2/qGf7p99g3Z/tzKpeBrqvIkABFvjxbL4DtvqeIeooV9un2KVKvl5jFp
- KqBCJ45hwf0NeN0/Y2A1HG3fEUjr9SWZJPCiaCWe9RprbWsJC2Viib6MkIBNW0Osgv06
- Sl25FbpN1H1//8r3Avd2hzbImTE6lAhGdLAdJK/6ZEtg7qOJx/iSuke8NVZjWpa2CSvJ
- KPZxP6GhFO02SlIgQV9GVHMbROtTEBuIszMRjpDh7FkkUsxRWNthTokx2kiuG7a0S9Ve RQ== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-        by mx0a-0016f401.pphosted.com with ESMTP id 37xcn4sh9p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Thu, 15 Apr 2021 05:28:49 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 15 Apr
- 2021 05:28:48 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 15 Apr 2021 05:28:48 -0700
-Received: from hyd1schalla-dt.caveonetworks.com.com (unknown [10.29.8.39])
-        by maili.marvell.com (Postfix) with ESMTP id 2D6633F703F;
-        Thu, 15 Apr 2021 05:28:45 -0700 (PDT)
-From:   Srujana Challa <schalla@marvell.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-        <jerinj@marvell.com>, <pathreya@marvell.com>,
-        <sgoutham@marvell.com>, "Srujana Challa" <schalla@marvell.com>
-Subject: [PATCH] crypto: octeontx2: add support for OcteonTX2 98xx CPT block.
-Date:   Thu, 15 Apr 2021 17:58:37 +0530
-Message-ID: <20210415122837.20506-1-schalla@marvell.com>
-X-Mailer: git-send-email 2.29.0
+        id S232759AbhDONry (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Apr 2021 09:47:54 -0400
+Received: from mail-co1nam11on2052.outbound.protection.outlook.com ([40.107.220.52]:25495
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230056AbhDONrx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Apr 2021 09:47:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U9mHGsDllSjvLziHzEQ+T+yFgaovw366is+eY54PcdGyw08tCkA70vWqkfe3eQFvbE5nodxS7i34pphz62ik+JgVyXINsSBM8ga9s7ttM709EaUN9+qqpgNA6KF96zvrXnVX31vQzZI6as0lUa297/OyYNyWO8xAlCahfT9UqxBm8WP7bTaGt3AdEa4GLVuNdLGCcDsrwZfG5BNuSCSvSpt2aG+n9Zm3wf+U7AIHzj0DtaH6mbYr1gVRU6YWoiyUf54QpoZw4YIfumzCyBVenJ4ag2HgNhEnsEoCTqdoec2KXGYtVgQi16hbF42HmNYbvLAn+Hlr+6yQJRzRfHKjcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qSlXBi8ZKEGcOaKqkmDDpj/zhqaoGrYkctiGkeLg9Mo=;
+ b=PTSn2puLM5oOMJ/7CKjQdct4uzURAg6o1KmnKLXzfMLMKcGvDWp2vFnE3Cxjq0uUQOUeqtDdpI+J++e87p0gtg3JES0WvUO7gqO+YpjDUAya8X5A/45T5lPbLTg9F0TJI5eSm5laUv6UOkQLXxj5UAvnSvAQhOA/DVnO4Dm9zLYy5WX5aV6NZtLyqMOhUfr27gdcEx6qE5DO5IikYN4UFiqsLZ8e1D47wLR2GlD98/I1cAm+9tkQjWkth1r9Dl2LMrlseQiUM7xD2PsvEMc0yVJrCtGq8bGC/ZOSk2pWmmMlDNu0kM2ooFSrKtb5xIHXc0NBsm53QP4BH/n4vujKJA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qSlXBi8ZKEGcOaKqkmDDpj/zhqaoGrYkctiGkeLg9Mo=;
+ b=XQAadPxKZkn50A6418U+H7U8VefQ8VUO04Xld+w+ldJiAIAllKqWoP51iranE1e9+/VPG6RKvd8LGqkFf4QBxoW5n5/7nTJEt1cQwlSP88JlgRBozDrUYo1WetCXjWYcS7EgQc49ToDSfeMxm3QsbmlVjCadq15+BcWAJ6od6KE=
+Authentication-Results: amd.com; dkim=none (message not signed)
+ header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM6PR12MB4957.namprd12.prod.outlook.com (2603:10b6:5:20d::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3933.31; Thu, 15 Apr 2021 13:47:29 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4042.018; Thu, 15 Apr
+ 2021 13:47:29 +0000
+Subject: Re: [PATCH] crypto: ccp - Make ccp_dev_suspend and ccp_dev_resume
+ void functions
+To:     Tian Tao <tiantao6@hisilicon.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, John Allen <john.allen@amd.com>
+References: <1618466627-17596-1-git-send-email-tiantao6@hisilicon.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <3fca4c8e-19b4-a128-5bf4-4b231cb1f750@amd.com>
+Date:   Thu, 15 Apr 2021 08:47:26 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
+In-Reply-To: <1618466627-17596-1-git-send-email-tiantao6@hisilicon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [67.79.209.213]
+X-ClientProxiedBy: SN4PR0201CA0020.namprd02.prod.outlook.com
+ (2603:10b6:803:2b::30) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: rMdwmEiXSyNQln2pKwYtXbQifg9iHfUy
-X-Proofpoint-GUID: rMdwmEiXSyNQln2pKwYtXbQifg9iHfUy
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-15_04:2021-04-15,2021-04-15 signatures=0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from office-linux.texastahm.com (67.79.209.213) by SN4PR0201CA0020.namprd02.prod.outlook.com (2603:10b6:803:2b::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16 via Frontend Transport; Thu, 15 Apr 2021 13:47:28 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2223e36b-02df-4ddc-e34e-08d9001502e0
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4957:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB495714486585C70EE1F63FCDEC4D9@DM6PR12MB4957.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:751;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mC24u3TqRdIL2RxL2kSbdE4Qp/AbvEGtylxJ5omrZB9tUtInZwhCx0ZOu1bEYS18mLPpYKLSCjDi6Cd45FRAbWYTllXqRAwb/23KW194KgFJGC0a8YHSQeeNvLGxvS6vvyoh2P0mBCpNyS9+EPch5c1roKUtl2tLkR7WKd1JTd9jTfvHJjgiBzLSTVPgfva2fGtLD0ajTxJ57itzXQPj06OzishT11nSQO6HuKSoHTiSm1PFULLTKygexNV9jBO/nqVplNq1svGMnrDeubLYgolXlSV7hkge3+/E5D72WvbxuuxZaFkBSN/jxgYbNf9cdBWRhb1UKlx8/oUxOq+bd26BaCF0ZDUh8qBweIktn4ZxOxn9itR7lD6bQHlF7JH0pMGUBO/QOYSSjtko7FXsOhEe5PBFUPmEi5WR9sIWRH5UewH6iZobDnFaoWZGPt6dRk3+VA5vJM/aylbaoO5HQpPqIWZBkkCZ9NQRleJw+fVea0eTxfeN2WkURsdu7mmFV8HBIDWYjH7eYarDMo9CJArcZYMibMna9p/Rqjc5s9UvqbH4yGGvWcSqk3hbFkx2GxYHqX+NmbUos57XF+F7WwtwktnwW3VOwAv3AeU7sZf50GJmSZrPvHs+I3zuYsgJra+zi6QLFMA+xJu2zrlRC5nfDrJzeksuKJOeJFEfjfXDyrtG4V0dh2dRxX1kisYm
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(396003)(39860400002)(346002)(376002)(83380400001)(26005)(956004)(31696002)(5660300002)(16526019)(31686004)(2906002)(6512007)(478600001)(2616005)(66476007)(186003)(8676002)(8936002)(86362001)(6486002)(66946007)(66556008)(6506007)(4326008)(36756003)(316002)(53546011)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?bldtNVZIelZLYzYxVytreStIeGRINHJ3RFVGM2Y4VDIxZmM4NG1zWjVGS3lS?=
+ =?utf-8?B?dXRhNEN6VDhsRlJHb2tEWkIzYld0Sk4xeThTbk5vN2dTYjRQSDc3UllvZ0hY?=
+ =?utf-8?B?eEs3aWxKd0llZjBxSkFsWkliRzdDMlpEdmRLdlBGQlpwKzNEY2sxWjNNbEM5?=
+ =?utf-8?B?NXMreHMwWkZmUVJCcFRXMkxMR29Cc3JoZnFRcTRvOFU1bm83ajYvWGdyM1BL?=
+ =?utf-8?B?MlowS3lTS3paSDZONGNnaFZoZjdRSVNBTURxZnd3aE0zNVlvMmpoSXk0QnF3?=
+ =?utf-8?B?SisxczM1VGhIcGloSUlydjNiMGlSK3BiNmxpcnBRYXNTOTZSZWIvd3pCRzJE?=
+ =?utf-8?B?WFlhcjVHeDNmdXluTnYvQmZMVktoWW5FTjFEb2cyYnM3RVBNVGJIdzQ1NFha?=
+ =?utf-8?B?MzlXZW9OODRFaGhlaENrcUpmOWdGUWJEWXZVY0JyL29RenVvcXZSRmt6ak9N?=
+ =?utf-8?B?ZnRrZ1lkeE9NeW04ZXZYN2lYbU4yejBGZEwra3hSdzV1ZGh4ZW1VU3hSZElh?=
+ =?utf-8?B?a0lGWldNeVZPTXBLL3lYVDE2UVFXRUtmZnBFNiszSVhjV2JMYjVlTEMxVEh0?=
+ =?utf-8?B?enExK1lDbHhHSTVBYU50N1FBYkU0ZzNhNUR6bmZXZHdRaTZUakhHM0RWdlpG?=
+ =?utf-8?B?c2dVSHl6N1lIVnF3SktKNkRVZ2VEUmFpeGFlWTZ1TVNYMDlhSndIZG9YUUxF?=
+ =?utf-8?B?dDlob09CMkNleTRTSmJKdDh6VkdtY2FjcDBFTUZVZlI0RjRDcitKNSs3ZSt0?=
+ =?utf-8?B?RGZUNnVlajI5ZmRMVXluOUFtK2xRdHV6N2ZuVFgxOS8vUy9weTJGNW1SZnlm?=
+ =?utf-8?B?SVNraC9vbTlqQ1FlQWdob1QxVUlQRDJKbUUwNE9Ibk9nR28xTUhURFZ3MEhO?=
+ =?utf-8?B?c0Z6ckhoNUYxemE3T3NHaWY0cDc2UTZQQURFYkluL1hhSmk3dlByeXYrMHB1?=
+ =?utf-8?B?bENyWEhqWTJpdm1vVkpqenlkRWxlWktiNEI0QVpWSlhTKzJqT2xJd1cvbmZs?=
+ =?utf-8?B?RkpBSHRtbGk3RUJvbEFxeDhhUFhYeDR6bk5OMkNRYU9ZRXZSNUlINzFZemVX?=
+ =?utf-8?B?WDlscEJSMlhyTjFHRUpiMmNCQ3dHKyt3SlArRWplcDExbk80QkcvMjJRTm1D?=
+ =?utf-8?B?T251SlAvZ3FJS1dWbG1IREZsNFBpSUN4U21RZXdONG1NQ2tkdzVWUGdaOG5u?=
+ =?utf-8?B?dlh3T2FPWEpvYjBQTnRISUxEZCtnVUd6T2hTbTRZaUIrTW9zaHdEM0txdzV6?=
+ =?utf-8?B?Z3daOXFOVlJjbmcwb3d3QlJ4VHVBMDZCWUVoUnU3OHJwL0grbHNLVFoxSUVh?=
+ =?utf-8?B?TmowZThQaGZqbGJaem5YdVh0NHc4TnQ3QVZtWXRENU9DeS9BelcvRG1TNjVW?=
+ =?utf-8?B?bDJIQzZjVkxZOFNtMVBHUEU2WTZPNXhjQnpqN1JoUzR6L0Y2RjBxN1Q1ZmJl?=
+ =?utf-8?B?aTdhUlUyZUNtYUwweTBNa25wYmlTd0UzVXhhZWxGdFB2RlpTOWJEN1NuaTEr?=
+ =?utf-8?B?aEg1SjB1aDV2MGYvMTkydWJWNkhlSkJma3RscmRVS1BYYnJwQjFBNktuNFJC?=
+ =?utf-8?B?VDNmSUxzcmo4UmFLdUVQK3Q0a0NBWm52UDN6VUJ0djdjVVhTZjMralU0aEpu?=
+ =?utf-8?B?RWFkaEJQYkFrdWpqT2hlanV2emNwY09OcngvV2F6dktjT3ZNRHBjaGpFU1Zw?=
+ =?utf-8?B?UDZMVEVJUFcybkV3VVZVb0haMjM2ekFyamRQUkt0NGJMUjhWcmhJSDh4amUv?=
+ =?utf-8?Q?xqsmD7bCMGdYN8JjffC4vHWDI0DVYLoCbA1sWWY?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2223e36b-02df-4ddc-e34e-08d9001502e0
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2021 13:47:29.4210
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cP1xkH8aQ6ZKrgDhxO92n8K5Jg53dC0Rf1ZVDpj2TlCs0nM1Re0yQR/ZWzXRMlu/YyH1UD+Tkaq2XxCRbMzomQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4957
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-OcteonTX2 series of silicons have multiple variants, the
-98xx variant has two crypto (CPT0 & CPT1) blocks. This patch
-adds support for firmware load on new CPT block(CPT1).
+On 4/15/21 1:03 AM, Tian Tao wrote:
+> Since ccp_dev_suspend() and ccp_dev_resume() only return 0 which causes
+> ret to equal 0 in sp_suspend and sp_resume, making the if condition
+> impossible to use. it might be a more appropriate fix to have these be
+> void functions and eliminate the if condition in sp_suspend() and
+> sp_resume().
+> 
+> Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
 
-Signed-off-by: Srujana Challa <schalla@marvell.com>
----
- .../marvell/octeontx2/otx2_cpt_common.h       |  10 +-
- .../marvell/octeontx2/otx2_cpt_mbox_common.c  |  14 +-
- drivers/crypto/marvell/octeontx2/otx2_cptlf.c |   8 +-
- drivers/crypto/marvell/octeontx2/otx2_cptlf.h |   1 +
- drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   1 +
- .../marvell/octeontx2/otx2_cptpf_main.c       |  33 +++-
- .../marvell/octeontx2/otx2_cptpf_ucode.c      | 144 +++++++++++++-----
- 7 files changed, 153 insertions(+), 58 deletions(-)
+Your patch subject should have had a v2 in it, e.g. [PATCH v2]
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-index 3518fac29834..ecedd91a8d85 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-@@ -121,14 +121,14 @@ int otx2_cpt_send_mbox_msg(struct otx2_mbox *mbox, struct pci_dev *pdev);
- 
- int otx2_cpt_send_af_reg_requests(struct otx2_mbox *mbox,
- 				  struct pci_dev *pdev);
--int otx2_cpt_add_read_af_reg(struct otx2_mbox *mbox,
--			     struct pci_dev *pdev, u64 reg, u64 *val);
-+int otx2_cpt_add_read_af_reg(struct otx2_mbox *mbox, struct pci_dev *pdev,
-+			     u64 reg, u64 *val, int blkaddr);
- int otx2_cpt_add_write_af_reg(struct otx2_mbox *mbox, struct pci_dev *pdev,
--			      u64 reg, u64 val);
-+			      u64 reg, u64 val, int blkaddr);
- int otx2_cpt_read_af_reg(struct otx2_mbox *mbox, struct pci_dev *pdev,
--			 u64 reg, u64 *val);
-+			 u64 reg, u64 *val, int blkaddr);
- int otx2_cpt_write_af_reg(struct otx2_mbox *mbox, struct pci_dev *pdev,
--			  u64 reg, u64 val);
-+			  u64 reg, u64 val, int blkaddr);
- struct otx2_cptlfs_info;
- int otx2_cpt_attach_rscrs_msg(struct otx2_cptlfs_info *lfs);
- int otx2_cpt_detach_rsrcs_msg(struct otx2_cptlfs_info *lfs);
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c b/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
-index 51cb6404ded7..9074876d38e5 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
-@@ -43,7 +43,7 @@ int otx2_cpt_send_af_reg_requests(struct otx2_mbox *mbox, struct pci_dev *pdev)
- }
- 
- int otx2_cpt_add_read_af_reg(struct otx2_mbox *mbox, struct pci_dev *pdev,
--			     u64 reg, u64 *val)
-+			     u64 reg, u64 *val, int blkaddr)
- {
- 	struct cpt_rd_wr_reg_msg *reg_msg;
- 
-@@ -62,12 +62,13 @@ int otx2_cpt_add_read_af_reg(struct otx2_mbox *mbox, struct pci_dev *pdev,
- 	reg_msg->is_write = 0;
- 	reg_msg->reg_offset = reg;
- 	reg_msg->ret_val = val;
-+	reg_msg->blkaddr = blkaddr;
- 
- 	return 0;
- }
- 
- int otx2_cpt_add_write_af_reg(struct otx2_mbox *mbox, struct pci_dev *pdev,
--			      u64 reg, u64 val)
-+			      u64 reg, u64 val, int blkaddr)
- {
- 	struct cpt_rd_wr_reg_msg *reg_msg;
- 
-@@ -86,16 +87,17 @@ int otx2_cpt_add_write_af_reg(struct otx2_mbox *mbox, struct pci_dev *pdev,
- 	reg_msg->is_write = 1;
- 	reg_msg->reg_offset = reg;
- 	reg_msg->val = val;
-+	reg_msg->blkaddr = blkaddr;
- 
- 	return 0;
- }
- 
- int otx2_cpt_read_af_reg(struct otx2_mbox *mbox, struct pci_dev *pdev,
--			 u64 reg, u64 *val)
-+			 u64 reg, u64 *val, int blkaddr)
- {
- 	int ret;
- 
--	ret = otx2_cpt_add_read_af_reg(mbox, pdev, reg, val);
-+	ret = otx2_cpt_add_read_af_reg(mbox, pdev, reg, val, blkaddr);
- 	if (ret)
- 		return ret;
- 
-@@ -103,11 +105,11 @@ int otx2_cpt_read_af_reg(struct otx2_mbox *mbox, struct pci_dev *pdev,
- }
- 
- int otx2_cpt_write_af_reg(struct otx2_mbox *mbox, struct pci_dev *pdev,
--			  u64 reg, u64 val)
-+			  u64 reg, u64 val, int blkaddr)
- {
- 	int ret;
- 
--	ret = otx2_cpt_add_write_af_reg(mbox, pdev, reg, val);
-+	ret = otx2_cpt_add_write_af_reg(mbox, pdev, reg, val, blkaddr);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-index 823a4571fd67..34aba1532761 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-@@ -56,7 +56,7 @@ static int cptlf_set_pri(struct otx2_cptlf_info *lf, int pri)
- 
- 	ret = otx2_cpt_read_af_reg(lfs->mbox, lfs->pdev,
- 				   CPT_AF_LFX_CTL(lf->slot),
--				   &lf_ctrl.u);
-+				   &lf_ctrl.u, lfs->blkaddr);
- 	if (ret)
- 		return ret;
- 
-@@ -64,7 +64,7 @@ static int cptlf_set_pri(struct otx2_cptlf_info *lf, int pri)
- 
- 	ret = otx2_cpt_write_af_reg(lfs->mbox, lfs->pdev,
- 				    CPT_AF_LFX_CTL(lf->slot),
--				    lf_ctrl.u);
-+				    lf_ctrl.u, lfs->blkaddr);
- 	return ret;
- }
- 
-@@ -77,7 +77,7 @@ static int cptlf_set_eng_grps_mask(struct otx2_cptlf_info *lf,
- 
- 	ret = otx2_cpt_read_af_reg(lfs->mbox, lfs->pdev,
- 				   CPT_AF_LFX_CTL(lf->slot),
--				   &lf_ctrl.u);
-+				   &lf_ctrl.u, lfs->blkaddr);
- 	if (ret)
- 		return ret;
- 
-@@ -85,7 +85,7 @@ static int cptlf_set_eng_grps_mask(struct otx2_cptlf_info *lf,
- 
- 	ret = otx2_cpt_write_af_reg(lfs->mbox, lfs->pdev,
- 				    CPT_AF_LFX_CTL(lf->slot),
--				    lf_ctrl.u);
-+				    lf_ctrl.u, lfs->blkaddr);
- 	return ret;
- }
- 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-index 314e97354100..ab1678fc564d 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-@@ -95,6 +95,7 @@ struct otx2_cptlfs_info {
- 	u8 kcrypto_eng_grp_num;	/* Kernel crypto engine group number */
- 	u8 kvf_limits;          /* Kernel crypto limits */
- 	atomic_t state;         /* LF's state. started/reset */
-+	int blkaddr;            /* CPT blkaddr: BLKADDR_CPT0/BLKADDR_CPT1 */
- };
- 
- static inline void otx2_cpt_free_instruction_queues(
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf.h b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
-index 8c899ad531a5..e19af1356f12 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
-@@ -51,6 +51,7 @@ struct otx2_cptpf_dev {
- 	u8 max_vfs;		/* Maximum number of VFs supported by CPT */
- 	u8 enabled_vfs;		/* Number of enabled VFs */
- 	u8 kvf_limits;		/* Kernel crypto limits */
-+	bool has_cpt1;
- };
- 
- irqreturn_t otx2_cptpf_afpf_mbox_intr(int irq, void *arg);
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-index 5277e04badd9..58f47e3ab62e 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-@@ -451,19 +451,19 @@ static int cpt_is_pf_usable(struct otx2_cptpf_dev *cptpf)
- 	return 0;
- }
- 
--static int cptpf_device_reset(struct otx2_cptpf_dev *cptpf)
-+static int cptx_device_reset(struct otx2_cptpf_dev *cptpf, int blkaddr)
- {
- 	int timeout = 10, ret;
- 	u64 reg = 0;
- 
- 	ret = otx2_cpt_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
--				    CPT_AF_BLK_RST, 0x1);
-+				    CPT_AF_BLK_RST, 0x1, blkaddr);
- 	if (ret)
- 		return ret;
- 
- 	do {
- 		ret = otx2_cpt_read_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
--					   CPT_AF_BLK_RST, &reg);
-+					   CPT_AF_BLK_RST, &reg, blkaddr);
- 		if (ret)
- 			return ret;
- 
-@@ -478,11 +478,35 @@ static int cptpf_device_reset(struct otx2_cptpf_dev *cptpf)
- 	return ret;
- }
- 
-+static int cptpf_device_reset(struct otx2_cptpf_dev *cptpf)
-+{
-+	int ret = 0;
-+
-+	if (cptpf->has_cpt1) {
-+		ret = cptx_device_reset(cptpf, BLKADDR_CPT1);
-+		if (ret)
-+			return ret;
-+	}
-+	return cptx_device_reset(cptpf, BLKADDR_CPT0);
-+}
-+
-+static void cptpf_check_block_implemented(struct otx2_cptpf_dev *cptpf)
-+{
-+	u64 cfg;
-+
-+	cfg = otx2_cpt_read64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			      RVU_PF_BLOCK_ADDRX_DISC(BLKADDR_CPT1));
-+	if (cfg & BIT_ULL(11))
-+		cptpf->has_cpt1 = true;
-+}
-+
- static int cptpf_device_init(struct otx2_cptpf_dev *cptpf)
- {
- 	union otx2_cptx_af_constants1 af_cnsts1 = {0};
- 	int ret = 0;
- 
-+	/* check if 'implemented' bit is set for block BLKADDR_CPT1 */
-+	cptpf_check_block_implemented(cptpf);
- 	/* Reset the CPT PF device */
- 	ret = cptpf_device_reset(cptpf);
- 	if (ret)
-@@ -490,7 +514,8 @@ static int cptpf_device_init(struct otx2_cptpf_dev *cptpf)
- 
- 	/* Get number of SE, IE and AE engines */
- 	ret = otx2_cpt_read_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
--				   CPT_AF_CONSTANTS1, &af_cnsts1.u);
-+				   CPT_AF_CONSTANTS1, &af_cnsts1.u,
-+				   BLKADDR_CPT0);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-index 1dc3ba298139..a531f4c8b441 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-@@ -153,16 +153,16 @@ static int get_ucode_type(struct device *dev,
- }
- 
- static int __write_ucode_base(struct otx2_cptpf_dev *cptpf, int eng,
--			      dma_addr_t dma_addr)
-+			      dma_addr_t dma_addr, int blkaddr)
- {
- 	return otx2_cpt_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
- 				     CPT_AF_EXEX_UCODE_BASE(eng),
--				     (u64)dma_addr);
-+				     (u64)dma_addr, blkaddr);
- }
- 
--static int cpt_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp, void *obj)
-+static int cptx_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp,
-+			       struct otx2_cptpf_dev *cptpf, int blkaddr)
- {
--	struct otx2_cptpf_dev *cptpf = obj;
- 	struct otx2_cpt_engs_rsvd *engs;
- 	dma_addr_t dma_addr;
- 	int i, bit, ret;
-@@ -170,7 +170,7 @@ static int cpt_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp, void *obj)
- 	/* Set PF number for microcode fetches */
- 	ret = otx2_cpt_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
- 				    CPT_AF_PF_FUNC,
--				    cptpf->pf_id << RVU_PFVF_PF_SHIFT);
-+				    cptpf->pf_id << RVU_PFVF_PF_SHIFT, blkaddr);
- 	if (ret)
- 		return ret;
- 
-@@ -187,7 +187,8 @@ static int cpt_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp, void *obj)
- 		 */
- 		for_each_set_bit(bit, engs->bmap, eng_grp->g->engs_num)
- 			if (!eng_grp->g->eng_ref_cnt[bit]) {
--				ret = __write_ucode_base(cptpf, bit, dma_addr);
-+				ret = __write_ucode_base(cptpf, bit, dma_addr,
-+							 blkaddr);
- 				if (ret)
- 					return ret;
- 			}
-@@ -195,23 +196,32 @@ static int cpt_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp, void *obj)
- 	return 0;
- }
- 
--static int cpt_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
--					void *obj)
-+static int cpt_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp, void *obj)
- {
- 	struct otx2_cptpf_dev *cptpf = obj;
--	struct otx2_cpt_bitmap bmap;
-+	int ret;
-+
-+	if (cptpf->has_cpt1) {
-+		ret = cptx_set_ucode_base(eng_grp, cptpf, BLKADDR_CPT1);
-+		if (ret)
-+			return ret;
-+	}
-+	return cptx_set_ucode_base(eng_grp, cptpf, BLKADDR_CPT0);
-+}
-+
-+static int cptx_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
-+					 struct otx2_cptpf_dev *cptpf,
-+					 struct otx2_cpt_bitmap bmap,
-+					 int blkaddr)
-+{
- 	int i, timeout = 10;
- 	int busy, ret;
- 	u64 reg = 0;
- 
--	bmap = get_cores_bmap(&cptpf->pdev->dev, eng_grp);
--	if (!bmap.size)
--		return -EINVAL;
--
- 	/* Detach the cores from group */
- 	for_each_set_bit(i, bmap.bits, bmap.size) {
- 		ret = otx2_cpt_read_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
--					   CPT_AF_EXEX_CTL2(i), &reg);
-+					   CPT_AF_EXEX_CTL2(i), &reg, blkaddr);
- 		if (ret)
- 			return ret;
- 
-@@ -221,7 +231,8 @@ static int cpt_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
- 
- 			ret = otx2_cpt_write_af_reg(&cptpf->afpf_mbox,
- 						    cptpf->pdev,
--						    CPT_AF_EXEX_CTL2(i), reg);
-+						    CPT_AF_EXEX_CTL2(i), reg,
-+						    blkaddr);
- 			if (ret)
- 				return ret;
- 		}
-@@ -237,7 +248,8 @@ static int cpt_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
- 		for_each_set_bit(i, bmap.bits, bmap.size) {
- 			ret = otx2_cpt_read_af_reg(&cptpf->afpf_mbox,
- 						   cptpf->pdev,
--						   CPT_AF_EXEX_STS(i), &reg);
-+						   CPT_AF_EXEX_STS(i), &reg,
-+						   blkaddr);
- 			if (ret)
- 				return ret;
- 
-@@ -253,7 +265,8 @@ static int cpt_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
- 		if (!eng_grp->g->eng_ref_cnt[i]) {
- 			ret = otx2_cpt_write_af_reg(&cptpf->afpf_mbox,
- 						    cptpf->pdev,
--						    CPT_AF_EXEX_CTL(i), 0x0);
-+						    CPT_AF_EXEX_CTL(i), 0x0,
-+						    blkaddr);
- 			if (ret)
- 				return ret;
- 		}
-@@ -262,22 +275,39 @@ static int cpt_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
- 	return 0;
- }
- 
--static int cpt_attach_and_enable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
--				       void *obj)
-+static int cpt_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
-+					void *obj)
- {
- 	struct otx2_cptpf_dev *cptpf = obj;
- 	struct otx2_cpt_bitmap bmap;
--	u64 reg = 0;
--	int i, ret;
-+	int ret;
- 
- 	bmap = get_cores_bmap(&cptpf->pdev->dev, eng_grp);
- 	if (!bmap.size)
- 		return -EINVAL;
- 
-+	if (cptpf->has_cpt1) {
-+		ret = cptx_detach_and_disable_cores(eng_grp, cptpf, bmap,
-+						    BLKADDR_CPT1);
-+		if (ret)
-+			return ret;
-+	}
-+	return cptx_detach_and_disable_cores(eng_grp, cptpf, bmap,
-+					     BLKADDR_CPT0);
-+}
-+
-+static int cptx_attach_and_enable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
-+					struct otx2_cptpf_dev *cptpf,
-+					struct otx2_cpt_bitmap bmap,
-+					int blkaddr)
-+{
-+	u64 reg = 0;
-+	int i, ret;
-+
- 	/* Attach the cores to the group */
- 	for_each_set_bit(i, bmap.bits, bmap.size) {
- 		ret = otx2_cpt_read_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
--					   CPT_AF_EXEX_CTL2(i), &reg);
-+					   CPT_AF_EXEX_CTL2(i), &reg, blkaddr);
- 		if (ret)
- 			return ret;
- 
-@@ -287,7 +317,8 @@ static int cpt_attach_and_enable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
- 
- 			ret = otx2_cpt_write_af_reg(&cptpf->afpf_mbox,
- 						    cptpf->pdev,
--						    CPT_AF_EXEX_CTL2(i), reg);
-+						    CPT_AF_EXEX_CTL2(i), reg,
-+						    blkaddr);
- 			if (ret)
- 				return ret;
- 		}
-@@ -295,15 +326,33 @@ static int cpt_attach_and_enable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
- 
- 	/* Enable the cores */
- 	for_each_set_bit(i, bmap.bits, bmap.size) {
--		ret = otx2_cpt_add_write_af_reg(&cptpf->afpf_mbox,
--						cptpf->pdev,
--						CPT_AF_EXEX_CTL(i), 0x1);
-+		ret = otx2_cpt_add_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
-+						CPT_AF_EXEX_CTL(i), 0x1,
-+						blkaddr);
- 		if (ret)
- 			return ret;
- 	}
--	ret = otx2_cpt_send_af_reg_requests(&cptpf->afpf_mbox, cptpf->pdev);
-+	return otx2_cpt_send_af_reg_requests(&cptpf->afpf_mbox, cptpf->pdev);
-+}
- 
--	return ret;
-+static int cpt_attach_and_enable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
-+				       void *obj)
-+{
-+	struct otx2_cptpf_dev *cptpf = obj;
-+	struct otx2_cpt_bitmap bmap;
-+	int ret;
-+
-+	bmap = get_cores_bmap(&cptpf->pdev->dev, eng_grp);
-+	if (!bmap.size)
-+		return -EINVAL;
-+
-+	if (cptpf->has_cpt1) {
-+		ret = cptx_attach_and_enable_cores(eng_grp, cptpf, bmap,
-+						   BLKADDR_CPT1);
-+		if (ret)
-+			return ret;
-+	}
-+	return cptx_attach_and_enable_cores(eng_grp, cptpf, bmap, BLKADDR_CPT0);
- }
- 
- static int load_fw(struct device *dev, struct fw_info_t *fw_info,
-@@ -1140,20 +1189,18 @@ int otx2_cpt_create_eng_grps(struct pci_dev *pdev,
- 	return ret;
- }
- 
--int otx2_cpt_disable_all_cores(struct otx2_cptpf_dev *cptpf)
-+static int cptx_disable_all_cores(struct otx2_cptpf_dev *cptpf, int total_cores,
-+				  int blkaddr)
- {
--	int i, ret, busy, total_cores;
--	int timeout = 10;
--	u64 reg = 0;
--
--	total_cores = cptpf->eng_grps.avail.max_se_cnt +
--		      cptpf->eng_grps.avail.max_ie_cnt +
--		      cptpf->eng_grps.avail.max_ae_cnt;
-+	int timeout = 10, ret;
-+	int i, busy;
-+	u64 reg;
- 
- 	/* Disengage the cores from groups */
- 	for (i = 0; i < total_cores; i++) {
- 		ret = otx2_cpt_add_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
--						CPT_AF_EXEX_CTL2(i), 0x0);
-+						CPT_AF_EXEX_CTL2(i), 0x0,
-+						blkaddr);
- 		if (ret)
- 			return ret;
- 
-@@ -1173,7 +1220,8 @@ int otx2_cpt_disable_all_cores(struct otx2_cptpf_dev *cptpf)
- 		for (i = 0; i < total_cores; i++) {
- 			ret = otx2_cpt_read_af_reg(&cptpf->afpf_mbox,
- 						   cptpf->pdev,
--						   CPT_AF_EXEX_STS(i), &reg);
-+						   CPT_AF_EXEX_STS(i), &reg,
-+						   blkaddr);
- 			if (ret)
- 				return ret;
- 
-@@ -1187,13 +1235,30 @@ int otx2_cpt_disable_all_cores(struct otx2_cptpf_dev *cptpf)
- 	/* Disable the cores */
- 	for (i = 0; i < total_cores; i++) {
- 		ret = otx2_cpt_add_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
--						CPT_AF_EXEX_CTL(i), 0x0);
-+						CPT_AF_EXEX_CTL(i), 0x0,
-+						blkaddr);
- 		if (ret)
- 			return ret;
- 	}
- 	return otx2_cpt_send_af_reg_requests(&cptpf->afpf_mbox, cptpf->pdev);
- }
- 
-+int otx2_cpt_disable_all_cores(struct otx2_cptpf_dev *cptpf)
-+{
-+	int total_cores, ret;
-+
-+	total_cores = cptpf->eng_grps.avail.max_se_cnt +
-+		      cptpf->eng_grps.avail.max_ie_cnt +
-+		      cptpf->eng_grps.avail.max_ae_cnt;
-+
-+	if (cptpf->has_cpt1) {
-+		ret = cptx_disable_all_cores(cptpf, total_cores, BLKADDR_CPT1);
-+		if (ret)
-+			return ret;
-+	}
-+	return cptx_disable_all_cores(cptpf, total_cores, BLKADDR_CPT0);
-+}
-+
- void otx2_cpt_cleanup_eng_grps(struct pci_dev *pdev,
- 			       struct otx2_cpt_eng_grps *eng_grps)
- {
-@@ -1354,6 +1419,7 @@ int otx2_cpt_discover_eng_capabilities(struct otx2_cptpf_dev *cptpf)
- 	lfs->pdev = pdev;
- 	lfs->reg_base = cptpf->reg_base;
- 	lfs->mbox = &cptpf->afpf_mbox;
-+	lfs->blkaddr = BLKADDR_CPT0;
- 	ret = otx2_cptlf_init(&cptpf->lfs, OTX2_CPT_ALL_ENG_GRPS_MASK,
- 			      OTX2_CPT_QUEUE_HI_PRIO, 1);
- 	if (ret)
--- 
-2.29.0
+And please Cc: the other maintainer, who I've added via cc.
 
+> ---
+>  drivers/crypto/ccp/ccp-dev.c | 12 ++++--------
+>  drivers/crypto/ccp/sp-dev.c  | 12 ++----------
+>  drivers/crypto/ccp/sp-dev.h  |  4 ++--
+>  3 files changed, 8 insertions(+), 20 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+> index 0971ee6..6777582 100644
+> --- a/drivers/crypto/ccp/ccp-dev.c
+> +++ b/drivers/crypto/ccp/ccp-dev.c
+> @@ -548,7 +548,7 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
+>  	return ccp->cmd_q_count == suspended;
+>  }
+>  
+> -int ccp_dev_suspend(struct sp_device *sp)
+> +void ccp_dev_suspend(struct sp_device *sp)
+>  {
+>  	struct ccp_device *ccp = sp->ccp_data;
+>  	unsigned long flags;
+> @@ -556,7 +556,7 @@ int ccp_dev_suspend(struct sp_device *sp)
+>  
+>  	/* If there's no device there's nothing to do */
+>  	if (!ccp)
+> -		return 0;
+> +		return;
+>  
+>  	spin_lock_irqsave(&ccp->cmd_lock, flags);
+>  
+> @@ -572,11 +572,9 @@ int ccp_dev_suspend(struct sp_device *sp)
+>  	while (!ccp_queues_suspended(ccp))
+>  		wait_event_interruptible(ccp->suspend_queue,
+>  					 ccp_queues_suspended(ccp));
+> -
+> -	return 0;
+>  }
+>  
+> -int ccp_dev_resume(struct sp_device *sp)
+> +void ccp_dev_resume(struct sp_device *sp)
+>  {
+>  	struct ccp_device *ccp = sp->ccp_data;
+>  	unsigned long flags;
+> @@ -584,7 +582,7 @@ int ccp_dev_resume(struct sp_device *sp)
+>  
+>  	/* If there's no device there's nothing to do */
+>  	if (!ccp)
+> -		return 0;
+> +		return;
+>  
+>  	spin_lock_irqsave(&ccp->cmd_lock, flags);
+>  
+> @@ -597,8 +595,6 @@ int ccp_dev_resume(struct sp_device *sp)
+>  	}
+>  
+>  	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
+> -
+> -	return 0;
+>  }
+>  
+>  int ccp_dev_init(struct sp_device *sp)
+> diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
+> index 6284a15..7eb3e46 100644
+> --- a/drivers/crypto/ccp/sp-dev.c
+> +++ b/drivers/crypto/ccp/sp-dev.c
+> @@ -213,12 +213,8 @@ void sp_destroy(struct sp_device *sp)
+>  
+>  int sp_suspend(struct sp_device *sp)
+>  {
+> -	int ret;
+> -
+>  	if (sp->dev_vdata->ccp_vdata) {
+> -		ret = ccp_dev_suspend(sp);
+> -		if (ret)
+> -			return ret;
+> +		ccp_dev_suspend(sp);
+>  	}
+>  
+>  	return 0;
+> @@ -226,12 +222,8 @@ int sp_suspend(struct sp_device *sp)
+>  
+>  int sp_resume(struct sp_device *sp)
+>  {
+> -	int ret;
+> -
+>  	if (sp->dev_vdata->ccp_vdata) {
+> -		ret = ccp_dev_resume(sp);
+> -		if (ret)
+> -			return ret;
+> +		ccp_dev_resume(sp);
+>  	}
+>  
+>  	return 0;
+> diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
+> index 0218d06..e6e9f9d 100644
+> --- a/drivers/crypto/ccp/sp-dev.h
+> +++ b/drivers/crypto/ccp/sp-dev.h
+> @@ -134,8 +134,8 @@ struct sp_device *sp_get_psp_master_device(void);
+>  int ccp_dev_init(struct sp_device *sp);
+>  void ccp_dev_destroy(struct sp_device *sp);
+>  
+> -int ccp_dev_suspend(struct sp_device *sp);
+> -int ccp_dev_resume(struct sp_device *sp);
+> +void ccp_dev_suspend(struct sp_device *sp);
+> +void ccp_dev_resume(struct sp_device *sp);
+
+You should also change the static inline versions of these functions below
+in the #else path.
+
+Thanks,
+Tom
+
+>  
+>  #else	/* !CONFIG_CRYPTO_DEV_SP_CCP */
+>  
+> 
