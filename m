@@ -2,75 +2,57 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E31C433B4
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52719C433ED
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:33:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0869261153
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:32:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E03461153
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:33:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240007AbhDPLdC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Apr 2021 07:33:02 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:53120 "EHLO fornost.hmeau.com"
+        id S229706AbhDPLdg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Apr 2021 07:33:36 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:53140 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238757AbhDPLdC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Apr 2021 07:33:02 -0400
+        id S239096AbhDPLdg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Apr 2021 07:33:36 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lXMi9-0003WY-2n; Fri, 16 Apr 2021 21:32:34 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Apr 2021 21:32:32 +1000
-Date:   Fri, 16 Apr 2021 21:32:32 +1000
+        id 1lXMib-0003Wk-O3; Fri, 16 Apr 2021 21:33:02 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Apr 2021 21:33:01 +1000
+Date:   Fri, 16 Apr 2021 21:33:01 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>
-Subject: Re: [PATCH] crypto: qat - enable detection of accelerators hang
-Message-ID: <20210416113232.GL16633@gondor.apana.org.au>
-References: <20210409135619.3879-1-giovanni.cabiddu@intel.com>
+To:     Hui Tang <tanghui20@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        xuzaibo@huawei.com, wangzhou1@hisilicon.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] crypto: hisilicon/hpre - add debug log
+Message-ID: <20210416113301.GN16633@gondor.apana.org.au>
+References: <1618048021-50335-1-git-send-email-tanghui20@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210409135619.3879-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <1618048021-50335-1-git-send-email-tanghui20@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 09, 2021 at 02:56:19PM +0100, Giovanni Cabiddu wrote:
-> From: Wojciech Ziemba <wojciech.ziemba@intel.com>
+On Sat, Apr 10, 2021 at 05:46:58PM +0800, Hui Tang wrote:
+> This patchset adds the debug log and cleanup code style.
 > 
-> Enable the detection of hangs by setting watchdog timers (WDTs) on
-> generations that supports that feature.
+> Hui Tang (3):
+>   crypto: hisilicon/hpre - delete the rudundant space after return
+>   crypto: hisilicon/hpre - use the correct variable type
+>   crypto: hisilicon/hpre - add debug log
 > 
-> The default timeout value comes from HW specs. WTDs are reset each time
-> an accelerator wins arbitration and is able to send/read a command to/from
-> an accelerator.
-> 
-> The value has added significant margin to make sure there are no spurious
-> timeouts. The scope of watchdog is per QAT device.
-> 
-> If a timeout is detected, the firmware resets the accelerator and
-> returns a response descriptor with an appropriate error code.
-> 
-> Signed-off-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.c    |  1 +
->  .../crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c  |  1 +
->  .../crypto/qat/qat_c62x/adf_c62x_hw_data.c    |  1 +
->  .../crypto/qat/qat_common/adf_accel_devices.h |  1 +
->  .../crypto/qat/qat_common/adf_gen2_hw_data.c  | 25 ++++++++++++
->  .../crypto/qat/qat_common/adf_gen2_hw_data.h  | 13 ++++++
->  .../crypto/qat/qat_common/adf_gen4_hw_data.c  | 40 +++++++++++++++++++
->  .../crypto/qat/qat_common/adf_gen4_hw_data.h  | 14 ++++++-
->  drivers/crypto/qat/qat_common/adf_init.c      |  4 ++
->  9 files changed, 99 insertions(+), 1 deletion(-)
+>  drivers/crypto/hisilicon/hpre/hpre_crypto.c | 11 +++++++++--
+>  drivers/crypto/hisilicon/hpre/hpre_main.c   |  4 ++--
+>  2 files changed, 11 insertions(+), 4 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
