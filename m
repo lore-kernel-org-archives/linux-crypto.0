@@ -2,80 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61609C433B4
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 00:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D60AC433ED
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 01:06:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4073C610EA
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 00:29:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1340F61132
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 01:06:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236309AbhDPA3l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Apr 2021 20:29:41 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:58246 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234716AbhDPA3l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Apr 2021 20:29:41 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lXCLu-0002FG-QG; Fri, 16 Apr 2021 10:28:55 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Apr 2021 10:28:54 +1000
-Date:   Fri, 16 Apr 2021 10:28:54 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Borislav Petkov <bp@suse.de>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>
-Subject: Re: [PATCH v2 0/8] ccp: KVM: SVM: Use stack for SEV command buffers
-Message-ID: <20210416002854.GA28389@gondor.apana.org.au>
-References: <20210406224952.4177376-1-seanjc@google.com>
- <3d4ae355-1fc9-4333-643f-f163d32fbe17@amd.com>
- <88eef561-6fd8-a495-0d60-ff688070cc9e@redhat.com>
- <967c3477-f680-2b49-0286-0d3418597d89@amd.com>
+        id S234548AbhDPBG6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Apr 2021 21:06:58 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:16595 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237219AbhDPBG6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Apr 2021 21:06:58 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FLyf6359Cz18H8S;
+        Fri, 16 Apr 2021 09:04:14 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 16 Apr 2021 09:06:19 +0800
+From:   Tian Tao <tiantao6@hisilicon.com>
+To:     <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, Tian Tao <tiantao6@hisilicon.com>
+Subject: [PATCH v2] crypto: ccp - Make ccp_dev_suspend and ccp_dev_resume void functions
+Date:   Fri, 16 Apr 2021 09:06:42 +0800
+Message-ID: <1618535202-11397-1-git-send-email-tiantao6@hisilicon.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <967c3477-f680-2b49-0286-0d3418597d89@amd.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 15, 2021 at 01:15:59PM -0500, Tom Lendacky wrote:
-> On 4/15/21 11:09 AM, Paolo Bonzini wrote:
-> > On 07/04/21 20:00, Tom Lendacky wrote:
-> >> For the series:
-> >>
-> >> Acked-by: Tom Lendacky<thomas.lendacky@amd.com>
-> > 
-> > Shall I take this as a request (or permission, whatever :)) to merge it
-> > through the KVM tree?
-> 
-> Adding Herbert. Here's a link to the series:
-> 
-> https://lore.kernel.org/kvm/88eef561-6fd8-a495-0d60-ff688070cc9e@redhat.com/T/#m2bbdd12452970d3bd7d0b1464c22bf2f0227a9f1
-> 
-> I'm not sure how you typically do the cross-tree stuff. Patch 8 has a
-> requirement on patches 1-7. The arch/x86/kvm/svm/sev.c file tends to have
-> more activity/changes than drivers/crypto/ccp/sev-dev.{c,h}, so it would
-> make sense to take it through the KVM tree. But I think you need to verify
-> that with Herbert.
+Since ccp_dev_suspend() and ccp_dev_resume() only return 0 which causes
+ret to equal 0 in sp_suspend and sp_resume, making the if condition
+impossible to use. it might be a more appropriate fix to have these be
+void functions and eliminate the if condition in sp_suspend() and
+sp_resume().
 
-I don't mind at all.  Paolo you can take this through your tree.
+Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+---
+v2: handle the case that didn't define CONFIG_CRYPTO_DEV_SP_CCP.
+---
+ drivers/crypto/ccp/ccp-dev.c | 12 ++++--------
+ drivers/crypto/ccp/sp-dev.c  | 12 ++----------
+ drivers/crypto/ccp/sp-dev.h  | 15 ++++-----------
+ 3 files changed, 10 insertions(+), 29 deletions(-)
 
-Thanks,
+diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+index 0971ee6..6777582 100644
+--- a/drivers/crypto/ccp/ccp-dev.c
++++ b/drivers/crypto/ccp/ccp-dev.c
+@@ -548,7 +548,7 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
+ 	return ccp->cmd_q_count == suspended;
+ }
+ 
+-int ccp_dev_suspend(struct sp_device *sp)
++void ccp_dev_suspend(struct sp_device *sp)
+ {
+ 	struct ccp_device *ccp = sp->ccp_data;
+ 	unsigned long flags;
+@@ -556,7 +556,7 @@ int ccp_dev_suspend(struct sp_device *sp)
+ 
+ 	/* If there's no device there's nothing to do */
+ 	if (!ccp)
+-		return 0;
++		return;
+ 
+ 	spin_lock_irqsave(&ccp->cmd_lock, flags);
+ 
+@@ -572,11 +572,9 @@ int ccp_dev_suspend(struct sp_device *sp)
+ 	while (!ccp_queues_suspended(ccp))
+ 		wait_event_interruptible(ccp->suspend_queue,
+ 					 ccp_queues_suspended(ccp));
+-
+-	return 0;
+ }
+ 
+-int ccp_dev_resume(struct sp_device *sp)
++void ccp_dev_resume(struct sp_device *sp)
+ {
+ 	struct ccp_device *ccp = sp->ccp_data;
+ 	unsigned long flags;
+@@ -584,7 +582,7 @@ int ccp_dev_resume(struct sp_device *sp)
+ 
+ 	/* If there's no device there's nothing to do */
+ 	if (!ccp)
+-		return 0;
++		return;
+ 
+ 	spin_lock_irqsave(&ccp->cmd_lock, flags);
+ 
+@@ -597,8 +595,6 @@ int ccp_dev_resume(struct sp_device *sp)
+ 	}
+ 
+ 	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
+-
+-	return 0;
+ }
+ 
+ int ccp_dev_init(struct sp_device *sp)
+diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
+index 6284a15..7eb3e46 100644
+--- a/drivers/crypto/ccp/sp-dev.c
++++ b/drivers/crypto/ccp/sp-dev.c
+@@ -213,12 +213,8 @@ void sp_destroy(struct sp_device *sp)
+ 
+ int sp_suspend(struct sp_device *sp)
+ {
+-	int ret;
+-
+ 	if (sp->dev_vdata->ccp_vdata) {
+-		ret = ccp_dev_suspend(sp);
+-		if (ret)
+-			return ret;
++		ccp_dev_suspend(sp);
+ 	}
+ 
+ 	return 0;
+@@ -226,12 +222,8 @@ int sp_suspend(struct sp_device *sp)
+ 
+ int sp_resume(struct sp_device *sp)
+ {
+-	int ret;
+-
+ 	if (sp->dev_vdata->ccp_vdata) {
+-		ret = ccp_dev_resume(sp);
+-		if (ret)
+-			return ret;
++		ccp_dev_resume(sp);
+ 	}
+ 
+ 	return 0;
+diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
+index 0218d06..20377e6 100644
+--- a/drivers/crypto/ccp/sp-dev.h
++++ b/drivers/crypto/ccp/sp-dev.h
+@@ -134,8 +134,8 @@ struct sp_device *sp_get_psp_master_device(void);
+ int ccp_dev_init(struct sp_device *sp);
+ void ccp_dev_destroy(struct sp_device *sp);
+ 
+-int ccp_dev_suspend(struct sp_device *sp);
+-int ccp_dev_resume(struct sp_device *sp);
++void ccp_dev_suspend(struct sp_device *sp);
++void ccp_dev_resume(struct sp_device *sp);
+ 
+ #else	/* !CONFIG_CRYPTO_DEV_SP_CCP */
+ 
+@@ -144,15 +144,8 @@ static inline int ccp_dev_init(struct sp_device *sp)
+ 	return 0;
+ }
+ static inline void ccp_dev_destroy(struct sp_device *sp) { }
+-
+-static inline int ccp_dev_suspend(struct sp_device *sp)
+-{
+-	return 0;
+-}
+-static inline int ccp_dev_resume(struct sp_device *sp)
+-{
+-	return 0;
+-}
++static inline void ccp_dev_suspend(struct sp_device *sp) { }
++static inline void ccp_dev_resume(struct sp_device *sp) { }
+ #endif	/* CONFIG_CRYPTO_DEV_SP_CCP */
+ 
+ #ifdef CONFIG_CRYPTO_DEV_SP_PSP
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.4
+
