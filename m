@@ -5,61 +5,51 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4562C43462
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B14D3C433B4
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:34:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E85461166
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:33:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 92F18610F7
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:34:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242542AbhDPLeB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Apr 2021 07:34:01 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:53162 "EHLO fornost.hmeau.com"
+        id S242604AbhDPLe3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Apr 2021 07:34:29 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:53170 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242812AbhDPLeA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Apr 2021 07:34:00 -0400
+        id S235505AbhDPLe2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Apr 2021 07:34:28 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lXMj1-0003YU-2f; Fri, 16 Apr 2021 21:33:28 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Apr 2021 21:33:26 +1000
-Date:   Fri, 16 Apr 2021 21:33:26 +1000
+        id 1lXMjT-0003am-Jc; Fri, 16 Apr 2021 21:33:56 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Apr 2021 21:33:55 +1000
+Date:   Fri, 16 Apr 2021 21:33:55 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Hui Tang <tanghui20@huawei.com>
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        xuzaibo@huawei.com, wangzhou1@hisilicon.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] crypto: hisilicon/hpre - delete redundant log and
- return in advance
-Message-ID: <20210416113326.GO16633@gondor.apana.org.au>
-References: <1618048232-12634-1-git-send-email-tanghui20@huawei.com>
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] crypto: crc32-generic - Use SPDX-License-Identifier
+Message-ID: <20210416113355.GP16633@gondor.apana.org.au>
+References: <c7fb3d1f92d95cedd74b5caff8dbfe2f16370814.1618086551.git.christophe.jaillet@wanadoo.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1618048232-12634-1-git-send-email-tanghui20@huawei.com>
+In-Reply-To: <c7fb3d1f92d95cedd74b5caff8dbfe2f16370814.1618086551.git.christophe.jaillet@wanadoo.fr>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Apr 10, 2021 at 05:50:32PM +0800, Hui Tang wrote:
-> 'hpre_cfg_by_dsm' has checked and printed error path internally. It is not
-> necessary to do it here, so remove it.
+On Sat, Apr 10, 2021 at 10:30:16PM +0200, Christophe JAILLET wrote:
+> Use SPDX-License-Identifier: GPL-2.0-only, instead of hand writing it.
 > 
-> It should return error immediately when return value of 'hpre_cfg_by_dsm'
-> is non-zero, and no need to execute the remaining sentences.
+> This also removes a reference to http://www.xyratex.com which seems to be
+> down.
 > 
-> Signed-off-by: Hui Tang <tanghui20@huawei.com>
-> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 > ---
-> v1 -> v2:
->    - Return immediately when return value of 'hpre_cfg_by_dsm' is
->      non-zero.
-> v2 -> v3:
->    - Add description for return if function fails.
-> ---
->  drivers/crypto/hisilicon/hpre/hpre_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  crypto/crc32_generic.c | 24 +-----------------------
+>  1 file changed, 1 insertion(+), 23 deletions(-)
 
 Patch applied.  Thanks.
 -- 
