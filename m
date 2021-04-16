@@ -7,54 +7,61 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45AFAC433B4
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:30:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 075C2C433ED
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:30:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F6036115B
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:30:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD7A161153
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Apr 2021 11:30:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240846AbhDPLaZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Apr 2021 07:30:25 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:53032 "EHLO fornost.hmeau.com"
+        id S241812AbhDPLaj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Apr 2021 07:30:39 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:53042 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241819AbhDPLaZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Apr 2021 07:30:25 -0400
+        id S235124AbhDPLah (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Apr 2021 07:30:37 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lXMfe-0003L0-B2; Fri, 16 Apr 2021 21:29:59 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Apr 2021 21:29:58 +1000
-Date:   Fri, 16 Apr 2021 21:29:58 +1000
+        id 1lXMfq-0003L7-QI; Fri, 16 Apr 2021 21:30:11 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Apr 2021 21:30:10 +1000
+Date:   Fri, 16 Apr 2021 21:30:10 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Weili Qian <qianweili@huawei.com>
-Cc:     davem@davemloft.net, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, xuzaibo@huawei.com,
-        wangzhou1@hisilicon.com, liulongfang@huawei.com
-Subject: Re: [PATCH] crypto: hisilicon/qm - add stop queue by hardware
-Message-ID: <20210416112958.GD16633@gondor.apana.org.au>
-References: <1617713762-52120-1-git-send-email-qianweili@huawei.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: arm64/aes-ce - deal with oversight in new CTR
+ carry code
+Message-ID: <20210416113010.GE16633@gondor.apana.org.au>
+References: <20210406142523.1101817-1-ardb@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1617713762-52120-1-git-send-email-qianweili@huawei.com>
+In-Reply-To: <20210406142523.1101817-1-ardb@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 06, 2021 at 08:56:02PM +0800, Weili Qian wrote:
-> Kunpeng930 could be able to stop queue by writing hardware registers,
-> which will trigger tasks in device to be flushed out.
+On Tue, Apr 06, 2021 at 04:25:23PM +0200, Ard Biesheuvel wrote:
+> The new carry handling code in the CTR driver can deal with a carry
+> occurring in the 4x/5x parallel code path, by using a computed goto to
+> jump into the carry sequence at the right place as to only apply the
+> carry to a subset of the blocks being processed.
 > 
-> In order to be compatible with the kunpeng920 driver, add 'qm_hw_ops_v3' to
-> adapt Kunpeng930. And 'stop_qp' callback is added in 'qm_hw_ops_v3' to
-> write hardware registers. Call 'stop_qp' to drain the tasks in device
-> before releasing queue.
+> If the lower half of the counter wraps and ends up at exactly 0x0, a
+> carry needs to be applied to the counter, but not to the counter values
+> taken for the 4x/5x parallel sequence. In this case, the computed goto
+> skips all register assignments, and branches straight to the jump
+> instruction that gets us back to the fast path. This produces the
+> correct result, but due to the fact that this branch target does not
+> carry the correct BTI annotation, this fails when BTI is enabled.
 > 
-> Signed-off-by: Weili Qian <qianweili@huawei.com>
-> Reviewed-by: Longfang Liu <liulongfang@huawei.com>
+> Let's omit the computed goto entirely in this case, and jump straight
+> back to the fast path after applying the carry to the main counter.
+> 
+> Fixes: 5318d3db465d ("crypto: arm64/aes-ctr - improve tail handling")
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 > ---
->  drivers/crypto/hisilicon/qm.c | 29 ++++++++++++++++++++++++++++-
->  1 file changed, 28 insertions(+), 1 deletion(-)
+>  arch/arm64/crypto/aes-modes.S | 1 +
+>  1 file changed, 1 insertion(+)
 
 Patch applied.  Thanks.
 -- 
