@@ -2,178 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16147C433B4
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Apr 2021 21:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 356ADC433ED
+	for <linux-crypto@archiver.kernel.org>; Sun, 18 Apr 2021 00:39:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA06661354
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Apr 2021 21:13:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F052D6120A
+	for <linux-crypto@archiver.kernel.org>; Sun, 18 Apr 2021 00:39:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237116AbhDQVOS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 17 Apr 2021 17:14:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2708 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237100AbhDQVOR (ORCPT
+        id S231397AbhDRAkH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 17 Apr 2021 20:40:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36904 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230216AbhDRAkH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Apr 2021 17:14:17 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13HL3s1h002694;
-        Sat, 17 Apr 2021 17:13:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=QtHIP9dLzxxRRuIHGRlAtB+wH86pg3rz8isJQCt4K5Q=;
- b=Lyhz825S1dJwMxckBYNYHoDSPh839M5ZLZT0BhLKXrNgWuhkxvFoHLy3k+Uqa4TPsXId
- IAqYUELS5bzH4DQvUTPui8jhWX/9NQyxm5uC0S4Vrkpc+s1U46S+zJnyx83qzmGGfVGm
- K24CH/AQjmhzByVFrYMQ9yth4MikEnhgKUBHspzUNqBappVdnMC6pr0Ql0DHf2/Gwd2j
- XOZSd053VJQ5TCWRCytNHGAak9pfs/VMprsUGkCY0WNGSkYC8+PSWyxUhjJV2dFBSMeT
- 2v5DmgPYLgBGxK9ArpuPxJdHJHSjDY4b9zDuxPTJm1+zVuwdHZ69mDfOtkhpODoGRt5b GA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37yyxmergb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 17 Apr 2021 17:13:45 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13HL4GeY004074;
-        Sat, 17 Apr 2021 17:13:44 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37yyxmerg7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 17 Apr 2021 17:13:44 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13HLCY3n013546;
-        Sat, 17 Apr 2021 21:13:43 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma01wdc.us.ibm.com with ESMTP id 37yqa85k5u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 17 Apr 2021 21:13:43 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13HLDhkt37421542
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 17 Apr 2021 21:13:43 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 24A6B112063;
-        Sat, 17 Apr 2021 21:13:43 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1F5ED112061;
-        Sat, 17 Apr 2021 21:13:42 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.80.232.48])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Sat, 17 Apr 2021 21:13:41 +0000 (GMT)
-Message-ID: <b986d869ad5ead7aaa1bddbcf636aee87df6f105.camel@linux.ibm.com>
-Subject: [V3 PATCH 16/16] crypto/nx: Add sysfs interface to export NX
- capabilities
-From:   Haren Myneni <haren@linux.ibm.com>
-To:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        mpe@ellerman.id.au, herbert@gondor.apana.org.au, npiggin@gmail.com
-Cc:     hbabu@us.ibm.com, haren@us.ibm.com
-Date:   Sat, 17 Apr 2021 14:13:40 -0700
-In-Reply-To: <a910e5bd3f3398b4bd430b25a856500735b993c3.camel@linux.ibm.com>
-References: <a910e5bd3f3398b4bd430b25a856500735b993c3.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
+        Sat, 17 Apr 2021 20:40:07 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBFD4C06174A;
+        Sat, 17 Apr 2021 17:39:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:MIME-Version
+        :Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=1jbPADBGzc593GHzdh/K8qvQUZIwB+uLs/zlYNey+1k=; b=eSUJQKHrhmcqxFM5HwDvf1ei3C
+        itb1+9wNJRgSZ4OZnDkW765tLpBtB3UFLNElPcCG8GGQGrgm7KpcUvjcXWmXPeaFTpEXr2RISxu3c
+        k8s3mq32cQtrIequ2NCk3em+CrqziFdtZyNXWxk+lY2pnNbgeihwtt+L4mCejS5pjbqSdMMRjNjGB
+        5rxKl+7isMlhneFKx9bfnP6fSAGz8NN8iw47UJIKXymE6oWwO3vpK1bUFJfM+4Q/IioCgyQ3Kw+WZ
+        V6C/giYOJk3oFrnQ15v/t1MemU4Bkj2kSay/1CqJTthkar65KDnF/uic6IPh3PvqOc+x4cKMnsXDa
+        5YDA+uhg==;
+Received: from [2601:1c0:6280:3f0::df68] (helo=smtpauth.infradead.org)
+        by desiato.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lXvTK-006i2Z-Ew; Sun, 18 Apr 2021 00:39:34 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Sebastian Siewior <sebastian@breakpoint.cc>,
+        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: camellia: drop duplicate "depends on CRYPTO"
+Date:   Sat, 17 Apr 2021 17:39:29 -0700
+Message-Id: <20210418003929.5065-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: IcvJiGY0f7V31tDCeV9T7id1QK6qYJbW
-X-Proofpoint-GUID: njh3zWCq0-oeXkkvClOGksl0POurx78k
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-17_15:2021-04-16,2021-04-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- spamscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
- lowpriorityscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
- clxscore=1015 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2104060000 definitions=main-2104170152
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+All 5 CAMELLIA crypto driver Kconfig symbols have a duplicate
+"depends on CRYPTO" line but they are inside an
+"if CRYPTO"/"endif # if CRYPTO" block, so drop the duplicate "depends"
+lines.
 
-Changes to export the following NXGZIP capabilities through sysfs:
+These 5 symbols still depend on CRYPTO.
 
-/sys/devices/vio/ibm,compression-v1/NxGzCaps:
-min_compress_len  /*Recommended minimum compress length in bytes*/
-min_decompress_len /*Recommended minimum decompress length in bytes*/
-req_max_processed_len /* Maximum number of bytes processed in one
-			request */
-
-Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+Fixes: 584fffc8b196 ("[CRYPTO] kconfig: Ordering cleanup")
+Fixes: 0b95ec56ae19 ("crypto: camellia - add assembler implementation for x86_64")
+Fixes: d9b1d2e7e10d ("crypto: camellia - add AES-NI/AVX/x86_64 assembler implementation of camellia cipher")
+Fixes: f3f935a76aa0 ("crypto: camellia - add AVX2/AES-NI/x86_64 assembler implementation of camellia cipher")
+Fixes: c5aac2df6577 ("sparc64: Add DES driver making use of the new des opcodes.")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Sebastian Siewior <sebastian@breakpoint.cc>
+Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
 ---
- drivers/crypto/nx/nx-common-pseries.c | 43 +++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ crypto/Kconfig |    5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
-index 49224870d05e..cc258d2c6475 100644
---- a/drivers/crypto/nx/nx-common-pseries.c
-+++ b/drivers/crypto/nx/nx-common-pseries.c
-@@ -962,6 +962,36 @@ static struct attribute_group nx842_attribute_group = {
- 	.attrs = nx842_sysfs_entries,
- };
+--- linux-next-20210416.orig/crypto/Kconfig
++++ linux-next-20210416/crypto/Kconfig
+@@ -1223,7 +1223,6 @@ config CRYPTO_BLOWFISH_X86_64
  
-+#define	nxct_capab_read(_name)						\
-+static ssize_t nxct_##_name##_show(struct device *dev,			\
-+			struct device_attribute *attr, char *buf)	\
-+{									\
-+	return sprintf(buf, "%lld\n", nx_ct_capab._name);		\
-+}
-+
-+#define NXCT_ATTR_RO(_name)						\
-+	nxct_capab_read(_name);						\
-+	static struct device_attribute dev_attr_##_name = __ATTR(_name,	\
-+						0444,			\
-+						nxct_##_name##_show,	\
-+						NULL);
-+
-+NXCT_ATTR_RO(req_max_processed_len);
-+NXCT_ATTR_RO(min_compress_len);
-+NXCT_ATTR_RO(min_decompress_len);
-+
-+static struct attribute *nxct_capab_sysfs_entries[] = {
-+	&dev_attr_req_max_processed_len.attr,
-+	&dev_attr_min_compress_len.attr,
-+	&dev_attr_min_decompress_len.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group nxct_capab_attr_group = {
-+	.name	=	nx_ct_capab.name,
-+	.attrs	=	nxct_capab_sysfs_entries,
-+};
-+
- static struct nx842_driver nx842_pseries_driver = {
- 	.name =		KBUILD_MODNAME,
- 	.owner =	THIS_MODULE,
-@@ -1051,6 +1081,16 @@ static int nx842_probe(struct vio_dev *viodev,
- 		goto error;
- 	}
- 
-+	if (capab_feat) {
-+		if (sysfs_create_group(&viodev->dev.kobj,
-+					&nxct_capab_attr_group)) {
-+			dev_err(&viodev->dev,
-+				"Could not create sysfs NX capability entries\n");
-+			ret = -1;
-+			goto error;
-+		}
-+	}
-+
- 	return 0;
- 
- error_unlock:
-@@ -1070,6 +1110,9 @@ static void nx842_remove(struct vio_dev *viodev)
- 	pr_info("Removing IBM Power 842 compression device\n");
- 	sysfs_remove_group(&viodev->dev.kobj, &nx842_attribute_group);
- 
-+	if (capab_feat)
-+		sysfs_remove_group(&viodev->dev.kobj, &nxct_capab_attr_group);
-+
- 	crypto_unregister_alg(&nx842_pseries_alg);
- 
- 	spin_lock_irqsave(&devdata_mutex, flags);
--- 
-2.18.2
-
-
+ config CRYPTO_CAMELLIA
+ 	tristate "Camellia cipher algorithms"
+-	depends on CRYPTO
+ 	select CRYPTO_ALGAPI
+ 	help
+ 	  Camellia cipher algorithms module.
+@@ -1239,7 +1238,6 @@ config CRYPTO_CAMELLIA
+ config CRYPTO_CAMELLIA_X86_64
+ 	tristate "Camellia cipher algorithm (x86_64)"
+ 	depends on X86 && 64BIT
+-	depends on CRYPTO
+ 	select CRYPTO_SKCIPHER
+ 	imply CRYPTO_CTR
+ 	help
+@@ -1256,7 +1254,6 @@ config CRYPTO_CAMELLIA_X86_64
+ config CRYPTO_CAMELLIA_AESNI_AVX_X86_64
+ 	tristate "Camellia cipher algorithm (x86_64/AES-NI/AVX)"
+ 	depends on X86 && 64BIT
+-	depends on CRYPTO
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_CAMELLIA_X86_64
+ 	select CRYPTO_SIMD
+@@ -1275,7 +1272,6 @@ config CRYPTO_CAMELLIA_AESNI_AVX_X86_64
+ config CRYPTO_CAMELLIA_AESNI_AVX2_X86_64
+ 	tristate "Camellia cipher algorithm (x86_64/AES-NI/AVX2)"
+ 	depends on X86 && 64BIT
+-	depends on CRYPTO
+ 	select CRYPTO_CAMELLIA_AESNI_AVX_X86_64
+ 	help
+ 	  Camellia cipher algorithm module (x86_64/AES-NI/AVX2).
+@@ -1291,7 +1287,6 @@ config CRYPTO_CAMELLIA_AESNI_AVX2_X86_64
+ config CRYPTO_CAMELLIA_SPARC64
+ 	tristate "Camellia cipher algorithm (SPARC64)"
+ 	depends on SPARC64
+-	depends on CRYPTO
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_SKCIPHER
+ 	help
