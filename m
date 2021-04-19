@@ -2,38 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15701C433B4
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Apr 2021 18:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35281C433B4
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Apr 2021 18:37:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFE5D6127C
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Apr 2021 18:33:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E8C2613AA
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Apr 2021 18:37:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241029AbhDSSdo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Apr 2021 14:33:44 -0400
-Received: from mga12.intel.com ([192.55.52.136]:39816 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241010AbhDSSdm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Apr 2021 14:33:42 -0400
-IronPort-SDR: 0Y3snSQte4jA2Kiyn7obodLAhJHEE8npiFUy1AqLUPPqo5rJry2L0J6uCQvjLflyqeKCeye2i3
- Lt+DXr3PFg3Q==
-X-IronPort-AV: E=McAfee;i="6200,9189,9959"; a="174864997"
-X-IronPort-AV: E=Sophos;i="5.82,234,1613462400"; 
-   d="scan'208";a="174864997"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2021 11:33:09 -0700
-IronPort-SDR: yISBfxCwKCdA5nEad8k7d8swsX6vHSfDGubSaDKU1ZmSuDUNrkgTI7FjgpqFwJhlV6+wss6+Wq
- 6LGf8k/YVuXg==
-X-IronPort-AV: E=Sophos;i="5.82,234,1613462400"; 
-   d="scan'208";a="426611092"
-Received: from jcfarwe-mobl1.amr.corp.intel.com (HELO [10.212.244.217]) ([10.212.244.217])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2021 11:33:08 -0700
-Subject: Re: [RFC Part2 PATCH 04/30] x86/mm: split the physmap when adding the
- page in RMP table
-To:     Andy Lutomirski <luto@amacapital.net>
+        id S241092AbhDSShy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Apr 2021 14:37:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44890 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241082AbhDSShx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Apr 2021 14:37:53 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05566C061763
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Apr 2021 11:37:22 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id w8so20316660pfn.9
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Apr 2021 11:37:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=ai8urSCkfd8KqBe/Z0CzEZXhThfZtSSfYmfTJiDDXZc=;
+        b=zOeIYMUtTrpCHXxfvolG7AjkjRi8mAuwUc/OALV7FkrQFMdbVfNyy7eSgA25MEz5+K
+         d5St6m/cMFc2EIBcjhdTHIer7dVcDmRH+c6N2ywoofHgJ0cWsX46EDxSKyXeBuNFgKnV
+         3yz4ZITALnLrH00D9Jw9m6L8HU4WRTKOJ8xrer1IR+TL9lJmzfMi45iwnzWtN9ppSycx
+         DbdpqCRq5/N0G3qowU25pZaotqBOOUHwG3Uj6lCXGM5C058jIgRMMhAM9KtzG4XwHesu
+         8Guaw2lW+H/8o8TO/qpmhr0JWgnvdNbLI3cluAsDQs++AoiBMiDJv067toLMNOIhba7j
+         LyPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=ai8urSCkfd8KqBe/Z0CzEZXhThfZtSSfYmfTJiDDXZc=;
+        b=Zx9C5FIdGumGkE7X1ZWKP93mADJ8gvc2NVWSS/XEPc+13vtZJoyeXRRWKySfE2qS0E
+         GGZWCqb0XMN1a6XB9iwN7lCrbt90y2GuHNmufNWKUKDX8JINm26gYw3fXpW1/hJHznY3
+         biO5yQRuEI+TvmY0HjVj9mu6pN4PX+yIWGTC4O80548fC0Bl4Z9Su0TvhmldvKCglels
+         PhHrAWHZDWz9yWZv69RcgdaFX+u70cQA62uHPpF54ElABuT6Q5OW3wa0kP9Qu8Ex9yh1
+         e7DOA7BKuvkbbQT+er7jh43+c9afR2XMt/iyEcLhlDcd5XGxtRuUXW9kP2XBEoLXjIL4
+         HM8Q==
+X-Gm-Message-State: AOAM532cL7RdBHUuTbpgKEPU8FB412RCHdI2wLjaFJJ9Dt/OF0A6Xa0B
+        hOs2A9CJFvQTMd3/qMmPcopFxw==
+X-Google-Smtp-Source: ABdhPJyVPfwWQ7xSRvyhvtGFAW9QR1YAvPZxOUssTc/7vRuqSzrMjl5dow9HECjNRpqslNdP9Ci/0g==
+X-Received: by 2002:a63:28c2:: with SMTP id o185mr13092135pgo.40.1618857442475;
+        Mon, 19 Apr 2021 11:37:22 -0700 (PDT)
+Received: from ?IPv6:2600:1010:b018:f7a3:b93c:afa3:79ad:4736? ([2600:1010:b018:f7a3:b93c:afa3:79ad:4736])
+        by smtp.gmail.com with ESMTPSA id 144sm8053271pfc.101.2021.04.19.11.37.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Apr 2021 11:37:21 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [RFC Part2 PATCH 04/30] x86/mm: split the physmap when adding the page in RMP table
+Date:   Mon, 19 Apr 2021 11:37:19 -0700
+Message-Id: <D67BDFB6-84AA-4CA3-A951-7EEE0E4B4B26@amacapital.net>
+References: <535400b4-0593-a7ca-1548-532ee1fefbd7@intel.com>
 Cc:     Brijesh Singh <brijesh.singh@amd.com>,
         Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
         x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
@@ -47,81 +76,46 @@ Cc:     Brijesh Singh <brijesh.singh@amd.com>,
         David Rientjes <rientjes@google.com>,
         Sean Christopherson <seanjc@google.com>,
         Vlastimil Babka <vbabka@suse.cz>
-References: <61596c4c-3849-99d5-b0aa-6ad6b415dff9@intel.com>
- <B17112AE-8848-48B0-997D-E1A3D79BD395@amacapital.net>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <535400b4-0593-a7ca-1548-532ee1fefbd7@intel.com>
-Date:   Mon, 19 Apr 2021 11:33:08 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <B17112AE-8848-48B0-997D-E1A3D79BD395@amacapital.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <535400b4-0593-a7ca-1548-532ee1fefbd7@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+X-Mailer: iPhone Mail (18D70)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/19/21 11:10 AM, Andy Lutomirski wrote:
-> I’m confused by this scenario. This should only affect physical pages
-> that are in the 2M area that contains guest memory. But, if we have a
-> 2M direct map PMD entry that contains kernel data and guest private
-> memory, we’re already in a situation in which the kernel touching
-> that memory would machine check, right?
 
-Not machine check, but page fault.  Do machine checks even play a
-special role in SEV-SNP?  I thought that was only TDX?
 
-My point was just that you can't _easily_ do the 2M->4k kernel mapping
-demotion in a page fault handler, like I think Borislav was suggesting.
+> On Apr 19, 2021, at 11:33 AM, Dave Hansen <dave.hansen@intel.com> wrote:
+>=20
+> =EF=BB=BFOn 4/19/21 11:10 AM, Andy Lutomirski wrote:
+>> I=E2=80=99m confused by this scenario. This should only affect physical p=
+ages
+>> that are in the 2M area that contains guest memory. But, if we have a
+>> 2M direct map PMD entry that contains kernel data and guest private
+>> memory, we=E2=80=99re already in a situation in which the kernel touching=
 
-> ISTM we should fully unmap any guest private page from the kernel and
-> all host user pagetables before actually making it be a guest private
-> page.
+>> that memory would machine check, right?
+>=20
+> Not machine check, but page fault.  Do machine checks even play a
+> special role in SEV-SNP?  I thought that was only TDX?
 
-Yes, that sounds attractive.  Then, we'd actually know if the host
-kernel was doing stray reads somehow because we'd get a fault there too.
+Brain fart.
+
+>=20
+> My point was just that you can't _easily_ do the 2M->4k kernel mapping
+> demotion in a page fault handler, like I think Borislav was suggesting.
+
+We are certainly toast if this hits the stack.  Or if it hits a page table o=
+r the GDT or IDT :). The latter delightful choices would be triple faults.
+
+I sure hope the code we use to split a mapping is properly NMI safe.
+
+>=20
+>> ISTM we should fully unmap any guest private page from the kernel and
+>> all host user pagetables before actually making it be a guest private
+>> page.
+>=20
+> Yes, that sounds attractive.  Then, we'd actually know if the host
+> kernel was doing stray reads somehow because we'd get a fault there too.
+
+
