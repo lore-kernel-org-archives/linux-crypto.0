@@ -2,119 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 356ADC433ED
-	for <linux-crypto@archiver.kernel.org>; Sun, 18 Apr 2021 00:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F55BC433B4
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Apr 2021 03:02:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F052D6120A
-	for <linux-crypto@archiver.kernel.org>; Sun, 18 Apr 2021 00:39:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CECC610CD
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Apr 2021 03:02:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231397AbhDRAkH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 17 Apr 2021 20:40:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36904 "EHLO
+        id S237316AbhDSDCo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 18 Apr 2021 23:02:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230216AbhDRAkH (ORCPT
+        with ESMTP id S237256AbhDSDCn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Apr 2021 20:40:07 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBFD4C06174A;
-        Sat, 17 Apr 2021 17:39:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:MIME-Version
-        :Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=1jbPADBGzc593GHzdh/K8qvQUZIwB+uLs/zlYNey+1k=; b=eSUJQKHrhmcqxFM5HwDvf1ei3C
-        itb1+9wNJRgSZ4OZnDkW765tLpBtB3UFLNElPcCG8GGQGrgm7KpcUvjcXWmXPeaFTpEXr2RISxu3c
-        k8s3mq32cQtrIequ2NCk3em+CrqziFdtZyNXWxk+lY2pnNbgeihwtt+L4mCejS5pjbqSdMMRjNjGB
-        5rxKl+7isMlhneFKx9bfnP6fSAGz8NN8iw47UJIKXymE6oWwO3vpK1bUFJfM+4Q/IioCgyQ3Kw+WZ
-        V6C/giYOJk3oFrnQ15v/t1MemU4Bkj2kSay/1CqJTthkar65KDnF/uic6IPh3PvqOc+x4cKMnsXDa
-        5YDA+uhg==;
-Received: from [2601:1c0:6280:3f0::df68] (helo=smtpauth.infradead.org)
-        by desiato.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lXvTK-006i2Z-Ew; Sun, 18 Apr 2021 00:39:34 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Sebastian Siewior <sebastian@breakpoint.cc>,
-        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: camellia: drop duplicate "depends on CRYPTO"
-Date:   Sat, 17 Apr 2021 17:39:29 -0700
-Message-Id: <20210418003929.5065-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.26.2
+        Sun, 18 Apr 2021 23:02:43 -0400
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83648C061761
+        for <linux-crypto@vger.kernel.org>; Sun, 18 Apr 2021 20:02:14 -0700 (PDT)
+Received: by mail-ot1-x32f.google.com with SMTP id e89-20020a9d01e20000b0290294134181aeso5504544ote.5
+        for <linux-crypto@vger.kernel.org>; Sun, 18 Apr 2021 20:02:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=7wC8QKTZ9xEtfwhjX+LEpEPMChmLBOlIJZB30u0tbsA=;
+        b=Uvdz1wJBOBjBaXaPv6ZIzSTvt21UnnYo9XTaOjEIipgENy1+TkdxAELnu9I11RV3xM
+         ewyJmzytDcNgT0mul+pu7uItN8CdSU0E/OjJl+I1o6I5xYNGRQoBoeBNB83BaTVFo4L9
+         mLIzUbdEVt9YMoHLINVWGKECJeFo0k69soG2KxlBR9CwMULm/A3kbLuWd2+If5kXjRr+
+         t/xurUh2hYvGMqSksLyPOOSJaTNb5C3T1u1z/7L9O8d2Dt8DaWMXmPsucKpdiqutgbKo
+         MhqqRyVCR9Bs2wQ4VdiUebeSUJiRI5x2zoqDKcfc0YLZlL5YwGJ0eVaiTZ0ZBk5n6L2o
+         1wAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7wC8QKTZ9xEtfwhjX+LEpEPMChmLBOlIJZB30u0tbsA=;
+        b=mP09Vjl9ofgi8XkpOLFieztezUlBxvVSP4snzAWZrZoIOHIswxcSUminelfwX1YLcf
+         5JL3TdMv9qwLhepcvjMK/0WAzLTf7iybjexnPyBbbQLVEckngG/VPDmBP7jSLk+1hsSG
+         6BazhYoccDy23Nj3PYTihJBDSvwWOFHqqpUThOFzw4QgT0Fuo/pMAZHg6OPMycVZge9T
+         HXEAERE4lmC+3uhdPcmy1OoJ3QhKIB+SUPa75joypEYtq24hR53rNOsQai/Uu2szqdHp
+         Aq5sKKG/0fOUtVnK9O+dD8K/A+PfmpQxTHb2AC9MzGNf0pkSZnxkSTCAgt0fCos4mWF1
+         qMTg==
+X-Gm-Message-State: AOAM531a13i0HYz7WfI4uo2MYcHTviR/HZoQsWTBYpr/iuOgkeHvJ7cg
+        yesx33ctuMQqvVzL7G5n+noNuA==
+X-Google-Smtp-Source: ABdhPJxVKdpll0qVOlEiXZSl3AiLgR5ik1EzcgMRAExmmeNOHf0qqRZ5lcvvMZI/VPmYGynZ1uHgng==
+X-Received: by 2002:a9d:5541:: with SMTP id h1mr12472367oti.246.1618801333755;
+        Sun, 18 Apr 2021 20:02:13 -0700 (PDT)
+Received: from yoga (104-57-184-186.lightspeed.austtx.sbcglobal.net. [104.57.184.186])
+        by smtp.gmail.com with ESMTPSA id a6sm2863108oiw.44.2021.04.18.20.02.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Apr 2021 20:02:13 -0700 (PDT)
+Date:   Sun, 18 Apr 2021 22:02:11 -0500
+From:   Bjorn Andersson <bjorn.andersson@linaro.org>
+To:     Thara Gopinath <thara.gopinath@linaro.org>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+Subject: Re: [Patch v2 1/7] crypto: qce: common: Add MAC failed error checking
+Message-ID: <20210419030211.GI1538589@yoga>
+References: <20210417132503.1401128-1-thara.gopinath@linaro.org>
+ <20210417132503.1401128-2-thara.gopinath@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210417132503.1401128-2-thara.gopinath@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-All 5 CAMELLIA crypto driver Kconfig symbols have a duplicate
-"depends on CRYPTO" line but they are inside an
-"if CRYPTO"/"endif # if CRYPTO" block, so drop the duplicate "depends"
-lines.
+On Sat 17 Apr 08:24 CDT 2021, Thara Gopinath wrote:
 
-These 5 symbols still depend on CRYPTO.
+> MAC_FAILED gets set in the status register if authenthication fails
+> for ccm algorithms(during decryption). Add support to catch and flag
+> this error.
+> 
 
-Fixes: 584fffc8b196 ("[CRYPTO] kconfig: Ordering cleanup")
-Fixes: 0b95ec56ae19 ("crypto: camellia - add assembler implementation for x86_64")
-Fixes: d9b1d2e7e10d ("crypto: camellia - add AES-NI/AVX/x86_64 assembler implementation of camellia cipher")
-Fixes: f3f935a76aa0 ("crypto: camellia - add AVX2/AES-NI/x86_64 assembler implementation of camellia cipher")
-Fixes: c5aac2df6577 ("sparc64: Add DES driver making use of the new des opcodes.")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Sebastian Siewior <sebastian@breakpoint.cc>
-Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
----
- crypto/Kconfig |    5 -----
- 1 file changed, 5 deletions(-)
+Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
 
---- linux-next-20210416.orig/crypto/Kconfig
-+++ linux-next-20210416/crypto/Kconfig
-@@ -1223,7 +1223,6 @@ config CRYPTO_BLOWFISH_X86_64
- 
- config CRYPTO_CAMELLIA
- 	tristate "Camellia cipher algorithms"
--	depends on CRYPTO
- 	select CRYPTO_ALGAPI
- 	help
- 	  Camellia cipher algorithms module.
-@@ -1239,7 +1238,6 @@ config CRYPTO_CAMELLIA
- config CRYPTO_CAMELLIA_X86_64
- 	tristate "Camellia cipher algorithm (x86_64)"
- 	depends on X86 && 64BIT
--	depends on CRYPTO
- 	select CRYPTO_SKCIPHER
- 	imply CRYPTO_CTR
- 	help
-@@ -1256,7 +1254,6 @@ config CRYPTO_CAMELLIA_X86_64
- config CRYPTO_CAMELLIA_AESNI_AVX_X86_64
- 	tristate "Camellia cipher algorithm (x86_64/AES-NI/AVX)"
- 	depends on X86 && 64BIT
--	depends on CRYPTO
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_CAMELLIA_X86_64
- 	select CRYPTO_SIMD
-@@ -1275,7 +1272,6 @@ config CRYPTO_CAMELLIA_AESNI_AVX_X86_64
- config CRYPTO_CAMELLIA_AESNI_AVX2_X86_64
- 	tristate "Camellia cipher algorithm (x86_64/AES-NI/AVX2)"
- 	depends on X86 && 64BIT
--	depends on CRYPTO
- 	select CRYPTO_CAMELLIA_AESNI_AVX_X86_64
- 	help
- 	  Camellia cipher algorithm module (x86_64/AES-NI/AVX2).
-@@ -1291,7 +1287,6 @@ config CRYPTO_CAMELLIA_AESNI_AVX2_X86_64
- config CRYPTO_CAMELLIA_SPARC64
- 	tristate "Camellia cipher algorithm (SPARC64)"
- 	depends on SPARC64
--	depends on CRYPTO
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_SKCIPHER
- 	help
+Regards,
+Bjorn
+
+> Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
+> ---
+> 
+> v1->v2:
+> 	- Split the error checking for -ENXIO and -EBADMSG into if-else clause
+> 	  so that the code is more readable as per Bjorn's review comment.
+> 
+>  drivers/crypto/qce/common.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/crypto/qce/common.c b/drivers/crypto/qce/common.c
+> index dceb9579d87a..dd76175d5c62 100644
+> --- a/drivers/crypto/qce/common.c
+> +++ b/drivers/crypto/qce/common.c
+> @@ -419,6 +419,8 @@ int qce_check_status(struct qce_device *qce, u32 *status)
+>  	 */
+>  	if (*status & STATUS_ERRORS || !(*status & BIT(OPERATION_DONE_SHIFT)))
+>  		ret = -ENXIO;
+> +	else if (*status & BIT(MAC_FAILED_SHIFT))
+> +		ret = -EBADMSG;
+>  
+>  	return ret;
+>  }
+> -- 
+> 2.25.1
+> 
