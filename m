@@ -2,95 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A207C433B4
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Apr 2021 22:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D479C433ED
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Apr 2021 22:16:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 300916127C
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Apr 2021 22:05:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0185261008
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Apr 2021 22:16:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbhDSWF5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Apr 2021 18:05:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47366 "EHLO mail.kernel.org"
+        id S231579AbhDSWRX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Apr 2021 18:17:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48840 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229806AbhDSWF4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Apr 2021 18:05:56 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CD7C1613B4;
-        Mon, 19 Apr 2021 22:05:25 +0000 (UTC)
+        id S229597AbhDSWRX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Apr 2021 18:17:23 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8A6CD61077;
+        Mon, 19 Apr 2021 22:16:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618869926;
-        bh=7qxXUL+60tZO/lod/ToaBQJmBTycv2Zd4iAqoJm/Ieg=;
+        s=k20201202; t=1618870612;
+        bh=qRooJuDbQ+D+m6HobSIVP6DCMoUZC3we2TUQA6ENpSs=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mCRAHbLOOD0Uqg3frJEbdBxsnOsucQlbyCtdknPJzv8auys3C34tIJ03gsnqkk2tu
-         ZRmBJC5hgPR2vg8qyavmr8Ip5J8tfWDEvZHfLb8DD5GwSxXGZ6hvlSAr8mwQGatzKN
-         O/TvmOk1vH2yrcxh4ouYGWyJYx5BmzPfHTHBE0TQj6toMXuZ/bnsW08amHPEQB4PNm
-         yuo3iVSY3eVvrQ5dednFEeDWhs3r6klXjX98PrqmiRMv8XFpG/MaOq+pKSc/RR4AMH
-         HRJewi7AnY/lwIRkCYcqGLFD+/CbBFI/1E5fmcmZCImRzEneX31zGPUPumFwVJv0aL
-         EamfyDkYv/9yw==
-Date:   Mon, 19 Apr 2021 15:05:24 -0700
+        b=VMgB1sFI1Tn3I4bsx2aEhICJD1WjRUQ4jdAvLBctLLJ1J2HBvzBw0hwpdVHLPhFZq
+         DC84xZTg6CW642MyIMsYNTDztNu7FioZ+4p0edAT5UUmuw6kiBkgy74C9vXIiQITux
+         8mNqrbI30uSpiTh6wwdiyI2+fFjPaUDVnlYHCUymz4hO6HXnA9jsLcFqdxqR78uHAh
+         1bVWDt/ZXk8HHcry7MrAqLRWqjetuifKXcEZdi8+nJPzWJDAWEcYbdJ9pzOLuyFyj5
+         gzpyNKM0Oi2UZrnY0wamBYhEX61a99zxd46FdGagye58eyZdPhDaNP/V/lLsInbmFP
+         pXryfAo5s3GBA==
+Date:   Mon, 19 Apr 2021 15:16:51 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-Subject: Re: [PATCH 2/2] fsverity: relax build time dependency on
- CRYPTO_SHA256
-Message-ID: <YH3+pEyzcON8eEKJ@gmail.com>
-References: <20210416160642.85387-1-ardb@kernel.org>
- <20210416160642.85387-3-ardb@kernel.org>
+To:     Chris von Recklinghausen <crecklin@redhat.com>
+Cc:     ardb@kernel.org, simo@redhat.com, rafael@kernel.org,
+        decui@microsoft.com, linux-pm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1 v9] use crc32 instead of md5 for hibernation e820
+ integrity check
+Message-ID: <YH4BUx4Jkx8NtXtw@gmail.com>
+References: <20210416131655.22112-1-crecklin@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210416160642.85387-3-ardb@kernel.org>
+In-Reply-To: <20210416131655.22112-1-crecklin@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 16, 2021 at 06:06:42PM +0200, Ard Biesheuvel wrote:
-> CONFIG_CRYPTO_SHA256 denotes the generic C implementation of the SHA-256
-> shash algorithm, which is selected as the default crypto shash provider
-> for fsverity. However, fsverity has no strict link time dependency, and
-> the same shash could be exposed by an optimized implementation, and arm64
-> has a number of those (scalar, NEON-based and one based on special crypto
-> instructions). In such cases, it makes little sense to require that the
-> generic C implementation is incorporated as well, given that it will never
-> be called.
-> 
-> To address this, relax the 'select' clause to 'imply' so that the generic
-> driver can be omitted from the build if desired.
-> 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  fs/verity/Kconfig | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/verity/Kconfig b/fs/verity/Kconfig
-> index 88fb25119899..24d1b54de807 100644
-> --- a/fs/verity/Kconfig
-> +++ b/fs/verity/Kconfig
-> @@ -3,9 +3,13 @@
->  config FS_VERITY
->  	bool "FS Verity (read-only file-based authenticity protection)"
->  	select CRYPTO
-> -	# SHA-256 is selected as it's intended to be the default hash algorithm.
-> +	# SHA-256 is implied as it's intended to be the default hash algorithm.
->  	# To avoid bloat, other wanted algorithms must be selected explicitly.
-> -	select CRYPTO_SHA256
-> +	# Note that CRYPTO_SHA256 denotes the generic C implementation, but
-> +	# some architectures provided optimized implementations of the same
-> +	# algorithm that may be used instead. In this case, CRYPTO_SHA256 may
-> +	# be omitted even if SHA-256 is being used.
-> +	imply CRYPTO_SHA256
->  	help
->  	  This option enables fs-verity.  fs-verity is the dm-verity
->  	  mechanism implemented at the file level.  On supported
+On Fri, Apr 16, 2021 at 09:16:55AM -0400, Chris von Recklinghausen wrote:
+> Hibernation fails on a system in fips mode because md5 is used for the e820
+> integrity check and is not available. Use crc32 instead.
 
-Looks fine,
+Doesn't the commit title need to be prefixed with something like "x86/power"?
 
-Acked-by: Eric Biggers <ebiggers@google.com>
+> The check is intended to detect whether the E820 memory map provided
+> by the firmware after cold boot unexpectedly differs from the one that
+> was in use when the hibernation image was created. In this case, the
+> hibernation image cannot be restored, as it may cover memory regions
+> that are no longer available to the OS.
+> 
+> A non-cryptographic checksum such as CRC-32 is sufficient to detect such
+> inadvertent deviations.
+> 
+> Fixes: 62a03defeabd ("PM / hibernate: Verify the consistent of e820 memory map
+>        by md5 digest")
+
+The "Fixes" line shouldn't be line-wrapped.
+
+Otherwise this looks fine.  The explanation in the commit message still isn't
+great, but it's much better than it was before.
+
+You can add:
+
+	Reviewed-by: Eric Biggers <ebiggers@google.com>
 
 - Eric
