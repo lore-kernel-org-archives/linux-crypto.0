@@ -2,263 +2,162 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EFFBC43460
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Apr 2021 13:00:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 732BDC433ED
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Apr 2021 13:27:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21FB6613C8
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Apr 2021 13:00:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3901B61026
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Apr 2021 13:27:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232266AbhDTNAi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Apr 2021 09:00:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57076 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232268AbhDTNAh (ORCPT
+        id S232557AbhDTN1m (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Apr 2021 09:27:42 -0400
+Received: from new1-smtp.messagingengine.com ([66.111.4.221]:40301 "EHLO
+        new1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231422AbhDTN1l (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Apr 2021 09:00:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618923605;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc; bh=NQHj+Z0RSmuYblhHzrwE/j5Df/lULRXDHiHNLCKu+2E=;
-        b=OQ7rO82nWYJKDKWhNoxFBVKuSf0vrh/+FmDvYVmaucK9JLKGJtu/9zzx6Hc7YfYsRIksag
-        3jsBzTLFuJfofNrAA0vja0r4v0vYAMuyXvdU6DUgqBzZnGCKKPS+rxA4Z0Pl6kiCkmO3Xs
-        IcP2Q/ubQJ4979VVtVVwNMzTy3Ys1NQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-590-MdRiD_5FNh-KFiNXGFYVFw-1; Tue, 20 Apr 2021 09:00:04 -0400
-X-MC-Unique: MdRiD_5FNh-KFiNXGFYVFw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60BBF193578F;
-        Tue, 20 Apr 2021 12:57:45 +0000 (UTC)
-Received: from crecklin.bos.com (unknown [10.10.115.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C76855D9CA;
-        Tue, 20 Apr 2021 12:57:40 +0000 (UTC)
-From:   Chris von Recklinghausen <crecklin@redhat.com>
-To:     ebiggers@kernel.org, ardb@kernel.org, simo@redhat.com,
-        rafael@kernel.org, decui@microsoft.com, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1 v10] x86/power use crc32 instead of md5 for hibernation e820 integrity check
-Date:   Tue, 20 Apr 2021 08:57:39 -0400
-Message-Id: <20210420125739.29353-1-crecklin@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+        Tue, 20 Apr 2021 09:27:41 -0400
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+        by mailnew.nyi.internal (Postfix) with ESMTP id B835C580BEA;
+        Tue, 20 Apr 2021 09:27:09 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Tue, 20 Apr 2021 09:27:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
+         h=date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm1; bh=lf7gZahL/CrZJJ2BAIN/GfdWHpC
+        6k25LB28HnVyHJ24=; b=aHQfJNIfJMDDuMBwwETqMm4922gp0e/0stzqSx4sZ3a
+        IW/AXnYDor/sb7PJZUeLsh0hk1r/KweQzQ+ApWidEl+B3/Xmha+0W9pAo9u1j+cg
+        dcRhxdR7YWlBSEX4JReNIwAI516wHYAWR5Ptl8CoLF+DgteWFNHYYqbf1wRwZJR1
+        dUG0RK8IDki0UdgtLOZR99rVu+bzoeAJZwshtHU9RcSALBJhzwAjbBG7o0sDg69s
+        f4NfTgmKsHEz+qBwSOH1MlMnUfhI9/p1dL1vspP0rszctc5Gppw3Ee6FlZ4S9+On
+        PHQjr/SvyCSoVw6MMIe+zrwu6/Q2BYX3ziLcLDbTqoA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=lf7gZa
+        hL/CrZJJ2BAIN/GfdWHpC6k25LB28HnVyHJ24=; b=XmAEdqb6EucLwKqbzKynCg
+        cg9Q9fwpCfia6QU3+NiczikPeGSoWr46j/b5WIsQKYxhx33RwgUVGNEI+mymmuaA
+        U33jD/mzsYdjEsAyNn0TzKoloP9+EKd/qSpIgmkq8863ose7rOvSWv/fia1RbHRi
+        5C0LDhxC8k4xjQkBQBv71wv7I67qy/eWAtI74XDsDjJF/xG7G7O9B1uWca56F8Ku
+        hWUfMgCouZhK/N1ZXZOR8XfQBRp8frBVILhsIpYvxvLStykD8I9cdEz7OOyq8sDo
+        Yz+eTLx2TnihH9ciCy6jHkMs/YKaFr4e+YHOgINrNUEgw8jxMILco0nJcIMmVMaA
+        ==
+X-ME-Sender: <xms:qtZ-YAVw4ljvfvo2dUZjFRnIVyR3mpKTUBNuF687kA0Iut8KEXVmpA>
+    <xme:qtZ-YEixH0wxP7D6QplvBF7C3e9meCxIUB_c67TigAll-66DLMRmGHfUeyQ4LVxaM
+    oOZ2-guyatM76ZiJnQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddtiedgieeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffukfhfgggtuggjfgesthdtredttderjeenucfhrhhomhepuegvnhcu
+    uehovggtkhgvlhcuoehmvgessggvnhgsohgvtghkvghlrdhnvghtqeenucggtffrrghtth
+    gvrhhnpeevffdtteetgfdttdekueefgedttddtueeugeekgeetffeuteffjeduieehhfek
+    tdenucfkphepvdegrdduieelrddvtddrvdehheenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpehmvgessggvnhgsohgvtghkvghlrdhnvght
+X-ME-Proxy: <xmx:qtZ-YBQhSmKY4hV3Pap0xsiUJFtijExxgBD_z2uCW9SJepXlYK0r1w>
+    <xmx:qtZ-YHH6YgtJ1Ijsz_FRSmUETK39ukNGUbYIcuUiqLatxoXh9BdYJw>
+    <xmx:qtZ-YJkxUbN7oyPxjrX-m6JjFAK1ExOYhLg7SFsA8dVspAGs9-6TPA>
+    <xmx:rdZ-YITUwajNWGhgAXvAupjvtkXNSARTHax81wgO1ND1A0-YQjeMfQ>
+Received: from localhost (unknown [24.169.20.255])
+        by mail.messagingengine.com (Postfix) with ESMTPA id C81FB240057;
+        Tue, 20 Apr 2021 09:27:06 -0400 (EDT)
+Date:   Tue, 20 Apr 2021 09:27:05 -0400
+From:   Ben Boeckel <me@benboeckel.net>
+To:     Varad Gautam <varad.gautam@suse.com>
+Cc:     linux-crypto@vger.kernel.org, dhowells@redhat.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net, vt@altlinux.org,
+        tianjia.zhang@linux.alibaba.com, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jarkko@kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        "open list:SECURITY SUBSYSTEM" 
+        <linux-security-module@vger.kernel.org>
+Subject: Re: [PATCH v3 18/18] keyctl_pkey: Add pkey parameters saltlen and
+ mgfhash for PSS
+Message-ID: <YH7WqfjNo33vI0VM@erythro>
+References: <20210420114124.9684-1-varad.gautam@suse.com>
+ <20210420114124.9684-19-varad.gautam@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210420114124.9684-19-varad.gautam@suse.com>
+User-Agent: Mutt/2.0.5 (2021-01-21)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hibernation fails on a system in fips mode because md5 is used for the e820
-integrity check and is not available. Use crc32 instead.
+On Tue, Apr 20, 2021 at 13:41:23 +0200, Varad Gautam wrote:
+> keyctl pkey_* operations accept enc and hash parameters at present.
+> RSASSA-PSS signatures also require passing in the signature salt
+> length and the mgf hash function.
+> 
+> Add parameters:
+> - 'saltlen' to feed in salt length of a PSS signature.
+> - 'mgfhash' to feed in the hash function used for MGF.
+> 
+> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+> CC: Jarkko Sakkinen <jarkko@kernel.org>
+> CC: Ben Boeckel <me@benboeckel.net>
+> ---
+> v3: Rename slen to saltlen, update Documentation/security/keys/core.rst.
+> 
+>  Documentation/security/keys/core.rst     | 14 +++++++++++++-
+>  crypto/asymmetric_keys/asymmetric_type.c |  2 ++
+>  include/linux/keyctl.h                   |  2 ++
+>  security/keys/keyctl_pkey.c              | 13 +++++++++++++
+>  4 files changed, 30 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/security/keys/core.rst b/Documentation/security/keys/core.rst
+> index b3ed5c581034c..4bd774c56899e 100644
+> --- a/Documentation/security/keys/core.rst
+> +++ b/Documentation/security/keys/core.rst
+> @@ -1022,6 +1022,15 @@ The keyctl syscall functions are:
+>  			which hash function was used, the hash function can be
+>  			specified with this, eg. "hash=sha256".
+>  
+> +	``mgfhash=<algo>`` In case of "RSASSA-PSS" ("enc=pss"), this specifies
+> +			the hash function used with the Mask Generation Function
+> +			to generate a signature, eg. "mgfhash=sha256". Supported
+> +			hashes are: sha1, sha224, sha256, sha384, and sha512.
+> +
+> +	``saltlen=<salt_length>`` In case of "RSASSA-PSS" ("enc=pss"), this
+> +			specifies the salt length as a u16, used to generate a
+                                                ^
 
-The check is intended to detect whether the E820 memory map provided
-by the firmware after cold boot unexpectedly differs from the one that
-was in use when the hibernation image was created. In this case, the
-hibernation image cannot be restored, as it may cover memory regions
-that are no longer available to the OS.
+This feels like it is missing a comma at the designated location (after
+`length` if the whitespace gets mangled).
 
-A non-cryptographic checksum such as CRC-32 is sufficient to detect such
-inadvertent deviations.
+> +			signature. Eg. "saltlen=32".
+> +
+>       The ``__spare[]`` space in the parameter block must be set to 0.  This is
+>       intended, amongst other things, to allow the passing of passphrases
+>       required to unlock a key.
+> @@ -1700,6 +1709,8 @@ The structure has a number of fields, some of which are mandatory:
+>  			__u32	in2_len;
+>  		};
+>  		enum kernel_pkey_operation op : 8;
+> +		__u16		salt_len;
+> +		const char	*mgf_hash_algo;
+>  	};
+>  
+>       This includes the key to be used; a string indicating the encoding to use
+> @@ -1707,7 +1718,8 @@ The structure has a number of fields, some of which are mandatory:
+>       RSASSA-PKCS1-v1.5 or RSAES-PKCS1-v1.5 encoding or "raw" if no encoding);
+>       the name of the hash algorithm used to generate the data for a signature
+>       (if appropriate); the sizes of the input and output (or second input)
+> -     buffers; and the ID of the operation to be performed.
+> +     buffers; the ID of the operation to be performed; salt length to be used
+> +     in case of RSASSA-PSS; and hash algorithm used with MGF for RSASSA-PSS.
+>  
+>       For a given operation ID, the input and output buffers are used as
+>       follows::
 
-Fixes: 62a03defeabd ("PM / hibernate: Verify the consistent of e820 memory map by md5 digest")
+Thanks for the docs, they look good to me overall. Other than the comma:
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
-Tested-by: Dexuan Cui <decui@microsoft.com>
-Reviewed-by: Dexuan Cui <decui@microsoft.com>
+    Acked-by: Ben Boeckel <mathstuf@gmail.com>
 
-Signed-off-by: Chris von Recklinghausen <crecklin@redhat.com>
----
-v1 -> v2
-   bump up RESTORE_MAGIC
-v2 -> v3
-   move embelishment from cover letter to commit comments (no code change)
-v3 -> v4
-   add note to comments that md5 isn't used for encryption here.
-v4 -> v5
-   reword comment per Simo's suggestion
-v5 -> v6
-   use wording from Eric Biggers, use crc32_le instead of crc32 from crypto
-	framework (crc32_le is in the core API and removes need for #defines)
-v6 -> v7
-   reword with input from Eric/Ard/Simo, code changed per Eric's feedback
-v7 -> v8
-   More feedback per Eric -
-   change 'Suspend' to 'Hibernation' in commit comments, rename e820_digest to
-   e820_checksum and change it to an unsigned long. rename get_e820_md5 to
-   compute_e820_crc32 and have it return the checksum value instead of writing
-   it into a user supplied buffer, get rid of hibernation_e820_save in favor of
-   calling compute_e820_crc32 directly, likewise, get rid of
-   hibernation_e820_mismatch in favor of comparing e820_checksum to the return
-   value of compute_e820_crc32()
-v8 -> v9
-   Make comment for compute_e820_crc32 more kerneldoc friendly. Also update
-   comment about the e820 firmware table in arch/x86/kernel/e820.c since it
-   also referred to MD5 and hibernation.
-v9 -> v10
-   Don't line wrap Fixes: line, add Reviewed-by lines from Eric and Dexuan and
-   Tested-by line from Dexuan. No code changed.
-
- arch/x86/kernel/e820.c     |  4 +-
- arch/x86/power/hibernate.c | 89 ++++++--------------------------------
- 2 files changed, 16 insertions(+), 77 deletions(-)
-
-diff --git a/arch/x86/kernel/e820.c b/arch/x86/kernel/e820.c
-index 22aad412f965..629c4994f165 100644
---- a/arch/x86/kernel/e820.c
-+++ b/arch/x86/kernel/e820.c
-@@ -31,8 +31,8 @@
-  *       - inform the user about the firmware's notion of memory layout
-  *         via /sys/firmware/memmap
-  *
-- *       - the hibernation code uses it to generate a kernel-independent MD5
-- *         fingerprint of the physical memory layout of a system.
-+ *       - the hibernation code uses it to generate a kernel-independent CRC32
-+ *         checksum of the physical memory layout of a system.
-  *
-  * - 'e820_table_kexec': a slightly modified (by the kernel) firmware version
-  *   passed to us by the bootloader - the major difference between
-diff --git a/arch/x86/power/hibernate.c b/arch/x86/power/hibernate.c
-index cd3914fc9f3d..e94e0050a583 100644
---- a/arch/x86/power/hibernate.c
-+++ b/arch/x86/power/hibernate.c
-@@ -13,8 +13,8 @@
- #include <linux/kdebug.h>
- #include <linux/cpu.h>
- #include <linux/pgtable.h>
--
--#include <crypto/hash.h>
-+#include <linux/types.h>
-+#include <linux/crc32.h>
- 
- #include <asm/e820/api.h>
- #include <asm/init.h>
-@@ -54,95 +54,33 @@ int pfn_is_nosave(unsigned long pfn)
- 	return pfn >= nosave_begin_pfn && pfn < nosave_end_pfn;
- }
- 
--
--#define MD5_DIGEST_SIZE 16
--
- struct restore_data_record {
- 	unsigned long jump_address;
- 	unsigned long jump_address_phys;
- 	unsigned long cr3;
- 	unsigned long magic;
--	u8 e820_digest[MD5_DIGEST_SIZE];
-+	unsigned long e820_checksum;
- };
- 
--#if IS_BUILTIN(CONFIG_CRYPTO_MD5)
- /**
-- * get_e820_md5 - calculate md5 according to given e820 table
-+ * compute_e820_crc32 - calculate crc32 of a given e820 table
-  *
-  * @table: the e820 table to be calculated
-- * @buf: the md5 result to be stored to
-+ *
-+ * Return: the resulting checksum
-  */
--static int get_e820_md5(struct e820_table *table, void *buf)
-+static inline u32 compute_e820_crc32(struct e820_table *table)
- {
--	struct crypto_shash *tfm;
--	struct shash_desc *desc;
--	int size;
--	int ret = 0;
--
--	tfm = crypto_alloc_shash("md5", 0, 0);
--	if (IS_ERR(tfm))
--		return -ENOMEM;
--
--	desc = kmalloc(sizeof(struct shash_desc) + crypto_shash_descsize(tfm),
--		       GFP_KERNEL);
--	if (!desc) {
--		ret = -ENOMEM;
--		goto free_tfm;
--	}
--
--	desc->tfm = tfm;
--
--	size = offsetof(struct e820_table, entries) +
-+	int size = offsetof(struct e820_table, entries) +
- 		sizeof(struct e820_entry) * table->nr_entries;
- 
--	if (crypto_shash_digest(desc, (u8 *)table, size, buf))
--		ret = -EINVAL;
--
--	kfree_sensitive(desc);
--
--free_tfm:
--	crypto_free_shash(tfm);
--	return ret;
--}
--
--static int hibernation_e820_save(void *buf)
--{
--	return get_e820_md5(e820_table_firmware, buf);
--}
--
--static bool hibernation_e820_mismatch(void *buf)
--{
--	int ret;
--	u8 result[MD5_DIGEST_SIZE];
--
--	memset(result, 0, MD5_DIGEST_SIZE);
--	/* If there is no digest in suspend kernel, let it go. */
--	if (!memcmp(result, buf, MD5_DIGEST_SIZE))
--		return false;
--
--	ret = get_e820_md5(e820_table_firmware, result);
--	if (ret)
--		return true;
--
--	return memcmp(result, buf, MD5_DIGEST_SIZE) ? true : false;
--}
--#else
--static int hibernation_e820_save(void *buf)
--{
--	return 0;
--}
--
--static bool hibernation_e820_mismatch(void *buf)
--{
--	/* If md5 is not builtin for restore kernel, let it go. */
--	return false;
-+	return ~crc32_le(~0, (unsigned char const *)table, size);
- }
--#endif
- 
- #ifdef CONFIG_X86_64
--#define RESTORE_MAGIC	0x23456789ABCDEF01UL
-+#define RESTORE_MAGIC	0x23456789ABCDEF02UL
- #else
--#define RESTORE_MAGIC	0x12345678UL
-+#define RESTORE_MAGIC	0x12345679UL
- #endif
- 
- /**
-@@ -179,7 +117,8 @@ int arch_hibernation_header_save(void *addr, unsigned int max_size)
- 	 */
- 	rdr->cr3 = restore_cr3 & ~CR3_PCID_MASK;
- 
--	return hibernation_e820_save(rdr->e820_digest);
-+	rdr->e820_checksum = compute_e820_crc32(e820_table_firmware);
-+	return 0;
- }
- 
- /**
-@@ -200,7 +139,7 @@ int arch_hibernation_header_restore(void *addr)
- 	jump_address_phys = rdr->jump_address_phys;
- 	restore_cr3 = rdr->cr3;
- 
--	if (hibernation_e820_mismatch(rdr->e820_digest)) {
-+	if (rdr->e820_checksum != compute_e820_crc32(e820_table_firmware)) {
- 		pr_crit("Hibernate inconsistent memory map detected!\n");
- 		return -ENODEV;
- 	}
--- 
-2.18.1
-
+--Ben
