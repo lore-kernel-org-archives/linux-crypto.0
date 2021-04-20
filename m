@@ -2,162 +2,154 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 732BDC433ED
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Apr 2021 13:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3EF2C433B4
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Apr 2021 21:38:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3901B61026
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Apr 2021 13:27:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56521613F6
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Apr 2021 21:38:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232557AbhDTN1m (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Apr 2021 09:27:42 -0400
-Received: from new1-smtp.messagingengine.com ([66.111.4.221]:40301 "EHLO
-        new1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231422AbhDTN1l (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Apr 2021 09:27:41 -0400
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
-        by mailnew.nyi.internal (Postfix) with ESMTP id B835C580BEA;
-        Tue, 20 Apr 2021 09:27:09 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Tue, 20 Apr 2021 09:27:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
-         h=date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm1; bh=lf7gZahL/CrZJJ2BAIN/GfdWHpC
-        6k25LB28HnVyHJ24=; b=aHQfJNIfJMDDuMBwwETqMm4922gp0e/0stzqSx4sZ3a
-        IW/AXnYDor/sb7PJZUeLsh0hk1r/KweQzQ+ApWidEl+B3/Xmha+0W9pAo9u1j+cg
-        dcRhxdR7YWlBSEX4JReNIwAI516wHYAWR5Ptl8CoLF+DgteWFNHYYqbf1wRwZJR1
-        dUG0RK8IDki0UdgtLOZR99rVu+bzoeAJZwshtHU9RcSALBJhzwAjbBG7o0sDg69s
-        f4NfTgmKsHEz+qBwSOH1MlMnUfhI9/p1dL1vspP0rszctc5Gppw3Ee6FlZ4S9+On
-        PHQjr/SvyCSoVw6MMIe+zrwu6/Q2BYX3ziLcLDbTqoA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=lf7gZa
-        hL/CrZJJ2BAIN/GfdWHpC6k25LB28HnVyHJ24=; b=XmAEdqb6EucLwKqbzKynCg
-        cg9Q9fwpCfia6QU3+NiczikPeGSoWr46j/b5WIsQKYxhx33RwgUVGNEI+mymmuaA
-        U33jD/mzsYdjEsAyNn0TzKoloP9+EKd/qSpIgmkq8863ose7rOvSWv/fia1RbHRi
-        5C0LDhxC8k4xjQkBQBv71wv7I67qy/eWAtI74XDsDjJF/xG7G7O9B1uWca56F8Ku
-        hWUfMgCouZhK/N1ZXZOR8XfQBRp8frBVILhsIpYvxvLStykD8I9cdEz7OOyq8sDo
-        Yz+eTLx2TnihH9ciCy6jHkMs/YKaFr4e+YHOgINrNUEgw8jxMILco0nJcIMmVMaA
-        ==
-X-ME-Sender: <xms:qtZ-YAVw4ljvfvo2dUZjFRnIVyR3mpKTUBNuF687kA0Iut8KEXVmpA>
-    <xme:qtZ-YEixH0wxP7D6QplvBF7C3e9meCxIUB_c67TigAll-66DLMRmGHfUeyQ4LVxaM
-    oOZ2-guyatM76ZiJnQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddtiedgieeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtuggjfgesthdtredttderjeenucfhrhhomhepuegvnhcu
-    uehovggtkhgvlhcuoehmvgessggvnhgsohgvtghkvghlrdhnvghtqeenucggtffrrghtth
-    gvrhhnpeevffdtteetgfdttdekueefgedttddtueeugeekgeetffeuteffjeduieehhfek
-    tdenucfkphepvdegrdduieelrddvtddrvdehheenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpehmvgessggvnhgsohgvtghkvghlrdhnvght
-X-ME-Proxy: <xmx:qtZ-YBQhSmKY4hV3Pap0xsiUJFtijExxgBD_z2uCW9SJepXlYK0r1w>
-    <xmx:qtZ-YHH6YgtJ1Ijsz_FRSmUETK39ukNGUbYIcuUiqLatxoXh9BdYJw>
-    <xmx:qtZ-YJkxUbN7oyPxjrX-m6JjFAK1ExOYhLg7SFsA8dVspAGs9-6TPA>
-    <xmx:rdZ-YITUwajNWGhgAXvAupjvtkXNSARTHax81wgO1ND1A0-YQjeMfQ>
-Received: from localhost (unknown [24.169.20.255])
-        by mail.messagingengine.com (Postfix) with ESMTPA id C81FB240057;
-        Tue, 20 Apr 2021 09:27:06 -0400 (EDT)
-Date:   Tue, 20 Apr 2021 09:27:05 -0400
-From:   Ben Boeckel <me@benboeckel.net>
-To:     Varad Gautam <varad.gautam@suse.com>
-Cc:     linux-crypto@vger.kernel.org, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net, vt@altlinux.org,
-        tianjia.zhang@linux.alibaba.com, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jarkko@kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        "open list:SECURITY SUBSYSTEM" 
-        <linux-security-module@vger.kernel.org>
-Subject: Re: [PATCH v3 18/18] keyctl_pkey: Add pkey parameters saltlen and
- mgfhash for PSS
-Message-ID: <YH7WqfjNo33vI0VM@erythro>
-References: <20210420114124.9684-1-varad.gautam@suse.com>
- <20210420114124.9684-19-varad.gautam@suse.com>
-MIME-Version: 1.0
+        id S233769AbhDTVia (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Apr 2021 17:38:30 -0400
+Received: from mail-bn8nam12on2057.outbound.protection.outlook.com ([40.107.237.57]:37089
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233724AbhDTVi3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Apr 2021 17:38:29 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VG/uK7S4iarNoqqPi7YeQjOxedGiu/b6jRcH/qokISTaRq2N9QDPJeEvHWEfb6dCrTYskDaq9YAj5prN42bcBMQ1P8WE4ySVGyxVUneconoAaTLD1y7BnPhIIIh1bOoxtcLPDnIummQpMG3nW2yJc2v4SnbBiSUp4sRp3WDjJt4A0/cS2uOxko4u3xrdUt14U+ITainHX2+nOcBQjAJ0RRoFP61PabAe9N6VtmS0znKKjnEiXVqVB4njpAQTAgFKHnH/d95hi61OmzeFJ40bIrHtXTcddrZEfrwAlz1N5uV+/Bvg5rLiiBZYjU71MZbTnguMpM+oSBCCzrPcxRk01A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C2F7jS+8xw1le4cWjk5SI5BpfeCtMdqbT3AneXzYAzI=;
+ b=NxzJs93r+xgVRpfRDV5IHGrNqausdKTYpoDs6ycC986OV0qAWKCdfYUszUo/PvRXiomWHIe+DRcgViWxAQTL+rEdMxve1Sp7La0YS+vqP0/7GtUthbC8r/tbdegHErZAVt/0Szo/8uHe9L1kUibgc50HQ6hg63et40yIr8iiJ3YSWc+2/GKhcPI05J/zFI8FspK3kyT3cBnp4LmvlhwU+S5c9cU0JMVvbgsMCzt73F6hdiQBYhWUgS4Qbg8D92dwOMd8NuZR8L9NIrhGTjMtX1SgQL8gVWiMoZcE3zMKphoCxXDi0nn7iKl5MN/17WpK4Krz+/FWv+DRf2Uw7InkMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C2F7jS+8xw1le4cWjk5SI5BpfeCtMdqbT3AneXzYAzI=;
+ b=kqFm93irmwFWSp6TqwlRu8jJNXj0yuldGKoefRuU8VDLHBYJdJSf3YXLz3NMf0gigHrryWM2DLkX4ut/gf3RSB70huhoCgAGWYOlDqz63Oz6r9xelQJADukPba6tInRXSExMSQcXwB0kCNVG3XNEBcLpz9fU7olFOHkuLoyIyDk=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4415.namprd12.prod.outlook.com (2603:10b6:806:70::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16; Tue, 20 Apr
+ 2021 21:37:55 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4042.024; Tue, 20 Apr 2021
+ 21:37:55 +0000
+Cc:     brijesh.singh@amd.com, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        ak@linux.intel.com, herbert@gondor.apana.org.au,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC Part2 PATCH 05/30] x86: define RMP violation #PF error code
+To:     Borislav Petkov <bp@alien8.de>
+References: <20210324170436.31843-1-brijesh.singh@amd.com>
+ <20210324170436.31843-6-brijesh.singh@amd.com>
+ <20210420103232.GG5029@zn.tnic>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <e1657ea1-6f6a-b284-c2ff-26bff3b890b5@amd.com>
+Date:   Tue, 20 Apr 2021 16:37:53 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.1
+In-Reply-To: <20210420103232.GG5029@zn.tnic>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210420114124.9684-19-varad.gautam@suse.com>
-User-Agent: Mutt/2.0.5 (2021-01-21)
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [70.112.153.56]
+X-ClientProxiedBy: SN7PR04CA0157.namprd04.prod.outlook.com
+ (2603:10b6:806:125::12) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN7PR04CA0157.namprd04.prod.outlook.com (2603:10b6:806:125::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.20 via Frontend Transport; Tue, 20 Apr 2021 21:37:54 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c3f030c6-e497-4669-8e73-08d904448f01
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4415:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB44152C6CD393BFD31625C2A6E5489@SA0PR12MB4415.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yjuk/oOrfzSJwAUv3dCFqAlMBpWCvGq37NqwIw4qojxpu0WSei+SWw8xIy06/KCtaCnTCIiPMvn3miLuV91WVYxP0v1mllZ86RM2VUIxUZppTr7BK1a9AzIismkiXEKwAA2rEKdRt5k4UxGmGQOr8ezi39WY1cdhYDsyF4SOu19/thUpzUtjUsxC62Nlurl9GFRpA+8VkRb1uBqIXkuNGuO0PKyCP2vkW61Kuhn3tBT3pi6Ae9IWH3mzoHsmR3QQ6d++/m+7NHO7EXEYRwO3YNYF2HFyI7aAgcmCaG7rzk/+5+zMM+KuYEqgbnBvbXSc42hfOI6DkDBeNIqstEtqG2iStFaUXSNtPNvdFP/tHVlHL1yHVelrZtPDsAxwzzKu6690Gs5z/SSIbNJtaozwhZPFe8oqMixBMGL2uWodpJh2IN/fvzHGiITa7Iny5fAlBfWQsBe0vONqTbljxtfMAIEdKhG1/ZbeNfS6f5STM5IQlnrncYbTxo5r4DOpNvpPJNqF2yqENvwigbbh0Z2bQDKZRMuJxUpm8rbAG1gTCkuSpMyObl8dt1quhsbBIAUc3ZSAODoapPHx2F7+R+10Mw/ioY2hae7WlvuyfPVPeLoWROxO4LoSdl022rLSJGNUtfKgRm9eIsp9AMx81TWbDFgxg8Bfg2mPNboz2II0V9ToN0PfIxXjURCLU3am8vjk6vbxawDAqRU3g0PMCaH2ITdw95gvFkD4tT+LldklNo0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(376002)(366004)(136003)(396003)(8936002)(31696002)(6916009)(38350700002)(54906003)(2906002)(86362001)(4326008)(6512007)(956004)(2616005)(316002)(8676002)(4744005)(38100700002)(186003)(52116002)(26005)(5660300002)(44832011)(66476007)(6486002)(66946007)(31686004)(36756003)(7416002)(66556008)(16526019)(53546011)(6506007)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?NHFBYzExbjVhZkhGNzNDdmMwdWE3djJlMGw5aDdBNHprcFN3WFh1QUF0Z1BL?=
+ =?utf-8?B?MDNBM1g0RDREUHZEaG1IS2EraTR1NkFjNmw4OUU3T1JvSUt4L09tWHA4dkN5?=
+ =?utf-8?B?UmJ0TTN0L3ZMY2R4RlN2eEN4MUxJRy9sMm1EUzhwV3d0Qng2RFVqeitjWmtW?=
+ =?utf-8?B?TUlmZ01qQ3k2UEdpcmJReE9PMENvWTYzOWV0amlkdHlmcmdqdC9KT0w5UnpB?=
+ =?utf-8?B?K1M2ZFk0OXZuSVRQMEJaZjFNQ3ZGclIyYzYzSGtFL1RlLzRpL2NGcFo0alpT?=
+ =?utf-8?B?Z280V1pNL3JRMWI1QmdkVGZPajdMdDUybDY3SHVDblJwMnVUK1htWW5ZMzJL?=
+ =?utf-8?B?MHR1ZFNlcHkycE9KVHQ0dXlrd1lTR3ZSRkJYZFBBci9uNWVqbXp2R0h6eWdM?=
+ =?utf-8?B?dkJ5MUVINUw2Q3BhWDhsL2hmK25JSjJYdWFnT0VNZnJ4Q3YyaWVEL1BDNVBL?=
+ =?utf-8?B?SjdmeEtGUmV0WXpLOC9Helpkanp3MlJwUkRCM2VOUlV1ZW9ybkRVa0NWWXUv?=
+ =?utf-8?B?L2VIUmJBRnpZcGptcEkzb0ZPN1gvdHZjcEtzUis5MWs4NGc4b0pRK1lPbGpu?=
+ =?utf-8?B?UjhZVU1LREtUZ2pjRzZwRTVMWCtMc2dOWHA5OEVaL3hQNUtFa3VrVFIwOFho?=
+ =?utf-8?B?RlJZVmtUeDMrWTNmY3hicW0zUkRUYW1RYkZ0eS9RMEJsVHBFSXA0SHpRcHJx?=
+ =?utf-8?B?RWMwVytaSmg3QnhSV2lVazJHc2ZxdytZcEEwZ1ZYSWhmWitzWlBoNG5SWjlq?=
+ =?utf-8?B?dzBvZ3BNYlkrWkl2VWptYm53VjkzR05xcU15Y2ZKYkxjOGZyZEVZTnc0VVMv?=
+ =?utf-8?B?WEF6SmdodDJxNjlmbGw3VVltNHVVOWo2TjBHMW9PdUprczhmaGxaZzArL2JD?=
+ =?utf-8?B?b3RkWGZaR242RTFxTUpPcjlVdytFRUVKQkRmK1Frdmg4SVJEQ0ZSUys1N3lw?=
+ =?utf-8?B?TU1GNzBCd28wL3BHdzRrOUg1TW1VcFhMeTNHam1kVFFXRmllU3pSNVR2OHBX?=
+ =?utf-8?B?S2hod09ZK0FaQ3M2K0U5eG9ZSVV4Z2dTQW1IclRVaVF1WUt3L0FDVWc3Rm1t?=
+ =?utf-8?B?czFMeTNmdkd4ZEF4ZXBPTm96Ky9FbzZWUTdSNEFMZ003bEJZWElYWnk2WXhU?=
+ =?utf-8?B?TDdybW85YWZzS1J0MFEwdXRwbDA4MWl1eEpyVzdVYnVBTmhTaXVPaHJwQlNq?=
+ =?utf-8?B?ODZTeUQ0Y0w4cGNNaWE2a2E2ZVAyQTl4cmZIWmIwem5UN2NFUDFOT212SndV?=
+ =?utf-8?B?b3pjTldDWVVaRXJ6QVJVSmRFaWc3dTdpRjJQSW9PQjdsY2NTSVJmVWNVTFAx?=
+ =?utf-8?B?TndDd1dCTit0WCtPYTZjVlJXZDVCanZZN2kzY0luNEFjcUlzL3JYTVlweTdZ?=
+ =?utf-8?B?M0txMkRESmlvN0FPT3VzVzJ6a0hnU3ZLekt1SldXcWVqL2htL1d0V1BrSU94?=
+ =?utf-8?B?VFpVZWdlT1NVV1ZHMkVvMWNSTThvbmJXc1k4K0kxZUlmaUJMMHkrNUQzblF2?=
+ =?utf-8?B?ZENlRi9TUS94UURMd1dTUTdiNTdOTGNrK1FGUVMwQ0xiRjRhcFQycmRxTGlv?=
+ =?utf-8?B?Zk8vR3RLRGpHcjNYMlEyckI3VkpVcnRjNHdqQWxsa1JOaWh5VENLREd4eUxP?=
+ =?utf-8?B?RkFTRnMzcmg3NTJVU0Q3bGdSb2pZd0RjMGh0N0ppQldzL0NFMHM0YTNURExU?=
+ =?utf-8?B?YnJOajdEVFVKOFNKOUxGOUZGZGtoN0ZnZTNkdXdqRE9Md3NkOVk1UEV0ODJP?=
+ =?utf-8?Q?JHxHPOXsfSMaPAOBRYdg2dN0v7ys0ItPV349lov?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c3f030c6-e497-4669-8e73-08d904448f01
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Apr 2021 21:37:55.6255
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: embsApI95c0g95UmdFxUHHpOA0I1ohstAap2LdoWv+dQ6WMTxZmVJCaXC6S35qkOxqmnAtkSqNmtp1LMRVJ1qA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4415
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 20, 2021 at 13:41:23 +0200, Varad Gautam wrote:
-> keyctl pkey_* operations accept enc and hash parameters at present.
-> RSASSA-PSS signatures also require passing in the signature salt
-> length and the mgf hash function.
-> 
-> Add parameters:
-> - 'saltlen' to feed in salt length of a PSS signature.
-> - 'mgfhash' to feed in the hash function used for MGF.
-> 
-> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
-> CC: Jarkko Sakkinen <jarkko@kernel.org>
-> CC: Ben Boeckel <me@benboeckel.net>
-> ---
-> v3: Rename slen to saltlen, update Documentation/security/keys/core.rst.
-> 
->  Documentation/security/keys/core.rst     | 14 +++++++++++++-
->  crypto/asymmetric_keys/asymmetric_type.c |  2 ++
->  include/linux/keyctl.h                   |  2 ++
->  security/keys/keyctl_pkey.c              | 13 +++++++++++++
->  4 files changed, 30 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/security/keys/core.rst b/Documentation/security/keys/core.rst
-> index b3ed5c581034c..4bd774c56899e 100644
-> --- a/Documentation/security/keys/core.rst
-> +++ b/Documentation/security/keys/core.rst
-> @@ -1022,6 +1022,15 @@ The keyctl syscall functions are:
->  			which hash function was used, the hash function can be
->  			specified with this, eg. "hash=sha256".
->  
-> +	``mgfhash=<algo>`` In case of "RSASSA-PSS" ("enc=pss"), this specifies
-> +			the hash function used with the Mask Generation Function
-> +			to generate a signature, eg. "mgfhash=sha256". Supported
-> +			hashes are: sha1, sha224, sha256, sha384, and sha512.
-> +
-> +	``saltlen=<salt_length>`` In case of "RSASSA-PSS" ("enc=pss"), this
-> +			specifies the salt length as a u16, used to generate a
-                                                ^
 
-This feels like it is missing a comma at the designated location (after
-`length` if the whitespace gets mangled).
+On 4/20/21 5:32 AM, Borislav Petkov wrote:
+> On Wed, Mar 24, 2021 at 12:04:11PM -0500, Brijesh Singh wrote:
+>
+> Btw, for all your patches where the subject prefix is only "x86:":
+>
+> The tip tree preferred format for patch subject prefixes is
+> 'subsys/component:', e.g. 'x86/apic:', 'x86/mm/fault:', 'sched/fair:',
+> 'genirq/core:'. Please do not use file names or complete file paths as
+> prefix. 'git log path/to/file' should give you a reasonable hint in most
+> cases.
+>
+> The condensed patch description in the subject line should start with a
+> uppercase letter and should be written in imperative tone.
+>
+> Please go over them and fix that up.
 
-> +			signature. Eg. "saltlen=32".
-> +
->       The ``__spare[]`` space in the parameter block must be set to 0.  This is
->       intended, amongst other things, to allow the passing of passphrases
->       required to unlock a key.
-> @@ -1700,6 +1709,8 @@ The structure has a number of fields, some of which are mandatory:
->  			__u32	in2_len;
->  		};
->  		enum kernel_pkey_operation op : 8;
-> +		__u16		salt_len;
-> +		const char	*mgf_hash_algo;
->  	};
->  
->       This includes the key to be used; a string indicating the encoding to use
-> @@ -1707,7 +1718,8 @@ The structure has a number of fields, some of which are mandatory:
->       RSASSA-PKCS1-v1.5 or RSAES-PKCS1-v1.5 encoding or "raw" if no encoding);
->       the name of the hash algorithm used to generate the data for a signature
->       (if appropriate); the sizes of the input and output (or second input)
-> -     buffers; and the ID of the operation to be performed.
-> +     buffers; the ID of the operation to be performed; salt length to be used
-> +     in case of RSASSA-PSS; and hash algorithm used with MGF for RSASSA-PSS.
->  
->       For a given operation ID, the input and output buffers are used as
->       follows::
+Sure, I will go over each patch and fix them.
 
-Thanks for the docs, they look good to me overall. Other than the comma:
-
-    Acked-by: Ben Boeckel <mathstuf@gmail.com>
-
---Ben
+thanks
