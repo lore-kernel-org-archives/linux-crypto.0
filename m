@@ -2,92 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EF81C43470
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 07:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 561CDC433B4
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 12:59:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 577A661434
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 07:55:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12F5D6143C
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 12:59:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235107AbhDUHz6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Apr 2021 03:55:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54784 "EHLO mail.kernel.org"
+        id S238700AbhDUNAZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Apr 2021 09:00:25 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57428 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237503AbhDUHzz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Apr 2021 03:55:55 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 168806143A;
-        Wed, 21 Apr 2021 07:55:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618991722;
-        bh=Ckt8C8nl3QhgUfJhMmpZtLEs1VTyK1g47DgJO1qo5CI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qSvQ8qH+6Ef1OeqB7SaG0W6Kko1Utphhkn1DHCars7TQ/PmoCSauQYtb+bbu61gEd
-         VpHHSm0oLfzcEv9Wjgv/ThfpmX2J0vpyTrNA2CGNEvXAtIiXXuJw2N2ZjkcHN+6/Ai
-         X/1SedqFtDtfVxTCqNtIVUvaf1wJ3hgbRqSvpI1K3dMAM7W/MqsmBYoOinm6hXVTqS
-         xuIOP/eM3aAcg2HyBNy9+/3Vy8NYmQb80IqrusSONYWxeNjkLiG5FjTxgLatjDghtu
-         0Haf5ESq202HOGnmpQeuDreg22L3cQngHeF+m8sfWmCiRzOQyRXV+/KAl4DiXqHGKE
-         /VYqDBpsrJt5g==
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     linux-fscrypt@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eric Biggers <ebiggers@google.com>
-Subject: [PATCH v2 2/2] fsverity: relax build time dependency on CRYPTO_SHA256
-Date:   Wed, 21 Apr 2021 09:55:11 +0200
-Message-Id: <20210421075511.45321-3-ardb@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210421075511.45321-1-ardb@kernel.org>
-References: <20210421075511.45321-1-ardb@kernel.org>
+        id S238694AbhDUNAX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Apr 2021 09:00:23 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 61567ACC5;
+        Wed, 21 Apr 2021 12:59:48 +0000 (UTC)
+Subject: Re: [RFC Part2 PATCH 07/30] mm: add support to split the large THP
+ based on RMP violation
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Cc:     ak@linux.intel.com, herbert@gondor.apana.org.au,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20210324170436.31843-1-brijesh.singh@amd.com>
+ <20210324170436.31843-8-brijesh.singh@amd.com>
+ <0edd1350-4865-dd71-5c14-3d57c784d62d@intel.com>
+ <86c9d9db-a881-efa4-c937-12fc62ce97e8@amd.com>
+ <f8bf7e26-26dc-e19a-007c-40b26e0a0a45@intel.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+Message-ID: <55445efd-dc29-3693-a189-710c8a61dec2@suse.cz>
+Date:   Wed, 21 Apr 2021 14:59:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <f8bf7e26-26dc-e19a-007c-40b26e0a0a45@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CONFIG_CRYPTO_SHA256 denotes the generic C implementation of the SHA-256
-shash algorithm, which is selected as the default crypto shash provider
-for fsverity. However, fsverity has no strict link time dependency, and
-the same shash could be exposed by an optimized implementation, and arm64
-has a number of those (scalar, NEON-based and one based on special crypto
-instructions). In such cases, it makes little sense to require that the
-generic C implementation is incorporated as well, given that it will never
-be called.
+On 3/25/21 4:59 PM, Dave Hansen wrote:
+> On 3/25/21 8:24 AM, Brijesh Singh wrote:
+>> On 3/25/21 9:48 AM, Dave Hansen wrote:
+>>> On 3/24/21 10:04 AM, Brijesh Singh wrote:
+>>>> When SEV-SNP is enabled globally in the system, a write from the hypervisor
+>>>> can raise an RMP violation. We can resolve the RMP violation by splitting
+>>>> the virtual address to a lower page level.
+>>>>
+>>>> e.g
+>>>> - guest made a page shared in the RMP entry so that the hypervisor
+>>>>   can write to it.
+>>>> - the hypervisor has mapped the pfn as a large page. A write access
+>>>>   will cause an RMP violation if one of the pages within the 2MB region
+>>>>   is a guest private page.
+>>>>
+>>>> The above RMP violation can be resolved by simply splitting the large
+>>>> page.
+>>> What if the large page is provided by hugetlbfs?
+>> I was not able to find a method to split the large pages in the
+>> hugetlbfs. Unfortunately, at this time a VMM cannot use the backing
+>> memory from the hugetlbfs pool. An SEV-SNP aware VMM can use either
+>> transparent hugepage or small pages.
+> 
+> That's really, really nasty.  Especially since it might not be evident
+> until long after boot and the guest is killed.
 
-To address this, relax the 'select' clause to 'imply' so that the generic
-driver can be omitted from the build if desired.
+I'd assume a SNP-aware QEMU would be needed in the first place and thus this
+QEMU would know not to use hugetlbfs?
 
-Acked-by: Eric Biggers <ebiggers@google.com>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- fs/verity/Kconfig | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+> It's even nastier because hugetlbfs is actually a great fit for SEV-SNP
+> memory.  It's physically contiguous, so it would keep you from having to
 
-diff --git a/fs/verity/Kconfig b/fs/verity/Kconfig
-index 88fb25119899..24d1b54de807 100644
---- a/fs/verity/Kconfig
-+++ b/fs/verity/Kconfig
-@@ -3,9 +3,13 @@
- config FS_VERITY
- 	bool "FS Verity (read-only file-based authenticity protection)"
- 	select CRYPTO
--	# SHA-256 is selected as it's intended to be the default hash algorithm.
-+	# SHA-256 is implied as it's intended to be the default hash algorithm.
- 	# To avoid bloat, other wanted algorithms must be selected explicitly.
--	select CRYPTO_SHA256
-+	# Note that CRYPTO_SHA256 denotes the generic C implementation, but
-+	# some architectures provided optimized implementations of the same
-+	# algorithm that may be used instead. In this case, CRYPTO_SHA256 may
-+	# be omitted even if SHA-256 is being used.
-+	imply CRYPTO_SHA256
- 	help
- 	  This option enables fs-verity.  fs-verity is the dm-verity
- 	  mechanism implemented at the file level.  On supported
--- 
-2.30.2
+Maybe this could be solvable by remapping the hugetlbfs page with pte's when
+needed (a guest wants to share 4k out of 2MB with the host temporarily). But
+certainly never as flexibly as pte-mapped THP's as the complexity of that
+(refcounting tail pages etc) is significant.
 
+> fracture the direct map all the way down to 4k, it also can't be
+> reclaimed (just like all SEV memory).
+
+About that... the whitepaper I've seen [1] mentions support for swapping guest
+pages. I'd expect the same mechanism could be used for their migration -
+scattering 4kB unmovable SEV pages around would be terrible for fragmentation. I
+assume neither swap or migration support is part of the patchset(s) yet?
+
+> I think the minimal thing you can do here is to fail to add memory to
+> the RMP in the first place if you can't split it.  That way, users will
+> at least fail to _start_ their VM versus dying randomly for no good reason.
+> 
+> Even better would be to come up with a stronger contract between host
+> and guest.  I really don't think the host should be exposed to random
+> RMP faults on the direct map.  If the guest wants to share memory, then
+> it needs to tell the host and give the host an opportunity to move the
+> guest physical memory.  It might, for instance, sequester all the shared
+> pages in a single spot to minimize direct map fragmentation.
+
+Agreed, and the contract should be elaborated before going to implementation
+details (patches). Could a malicious guest violate such contract unilaterally? I
+guess not, because psmash is a hypervisor instruction? And if yes, the
+RMP-specific page fault handlers would be used just to kill such guest, not to
+fix things up during page fault.
+
+> I'll let the other x86 folks chime in on this, but I really think this
+> needs a different approach than what's being proposed.
+
+Not an x86 folk, but agreed :)
+
+[1]
+https://www.amd.com/system/files/TechDocs/SEV-SNP-strengthening-vm-isolation-with-integrity-protection-and-more.pdf
