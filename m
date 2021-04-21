@@ -2,241 +2,270 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD4BC433B4
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 13:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2490FC433B4
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 13:50:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FCC66144C
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 13:44:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9E2960C3E
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 13:50:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242675AbhDUNod (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Apr 2021 09:44:33 -0400
-Received: from mail-mw2nam10on2080.outbound.protection.outlook.com ([40.107.94.80]:4769
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        id S242848AbhDUNup (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Apr 2021 09:50:45 -0400
+Received: from mail-co1nam11on2067.outbound.protection.outlook.com ([40.107.220.67]:64144
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S242759AbhDUNoL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Apr 2021 09:44:11 -0400
+        id S242847AbhDUNun (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Apr 2021 09:50:43 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oFv4ZAOmscIkQz8Ndtb5jJkpiQcNNkdW+q6BwviXifb5cDC7GlCTMBQzXVEjFm67hRfYJAucgv9HT+zTPPSqTXaPQXRxsvb1XVPXtU0Zcm71ApEXGnaILNuB50ZPzPG22t+0SGpL7kbiOZKmOEo+fDv8E3iMkXwjRJnIl8mTHwFkFaQFPPsJ7DytVRkAwMWeYBWCs/R4y0VxI1F3BOFTXgIhLGmPbBlnsE6Hw+oWoBLledXytTZKlhWCq0Rd5969h/9tIxvzs7We4rx6CCBqEtXbdR8Bi9dN5UdrjT6N8CAMNrEajGVEcTG058AqFTvUdbNIt5l4LRdbFLATwfiSlg==
+ b=RdvhgBqLSRF6EpxP4bRC8XniFep77wNnH7b8lr4+aRFIAGuahq2VeF6Tv4T09YTiyZnHneUiETbW9V6bq99aEhzqDQCSA4LsdAhy8FJw8DyA5tCKmlCUfW5TTe5TmcqNVUPwsne9Mh1SfrNZs0TvBTuRrPTjNPgrPHVYOS7F7wkebnN783PP+53Rsiwk5oXwI61mfq4aakxaB/S/TZrnemrTsiP0AlZf3A0vHt/W8ORzqFYcqxkFzYJ0YDLfuOzCJcfEmMgeETnVC0SihYYPEx4jmYu2/ypGyOx1wxrFgv/cKNr/WS5Mc0TO8RtAIIXFKlC9IDopaQ/FuuNJPqgrQQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rJy6PBprzJALDqQ6yPg1AiC0FaKCkhf8msw9SM4tqtA=;
- b=IyEVKRkzVD2PTWB7Oct00/gzI7M8EnRszkr03gHgysp/S4SBgQFKNcCVPpow7FKzqQBuOV3FKRXJ8XA9+LXA5BvK38Jd8l3dtSKbBH6LoipK+Q7ieplqP/C/rwwc5PF34G27f1+Jz2IylJU4XmTpNtT9oIZqKoTXeseQHNc+pPJXr/7pvzUkNbvTVzMcHzaKlMzddzFesszW8KWsCHeEJft9JSm4H0jYYI0/R4/v+4l9RUWmwlxwc17Qz37Xi1dodCuXITc0a+kYiV+w0/4AWqcaXyVBizbqb2crRwRsOKPYhf3Wh4hoLYRPO5L+nEXnrgB+Q5i8m+M8FMvUpzSZdg==
+ bh=dmIS/bT5IERJ9yJXflrq5C4UNJs7NXNienclIJJo1lQ=;
+ b=XU/jYDSE31pP3xMWJGRovZto7GGNhrlM+TG1CtCsjm6vbDb1v48zyOGQIQxUB750Col1WEH0F6upNzmP/1UsgMEtrVCb8MYiNhsmOX0U+PtbPqbBX2AmaAoG6SJIHGNmqtg+9OSFZhBSUprOofo/fZAEmEG9GoLCe+GrrKovSVjddjVPEX7Fk3O5L7zHCUGiUIJz5m4DcUeQn/CbmQVLQXXzfA0EOPmKD7RGxlR7cajibkcPZk3q9QGqBGEpDa/MEZ5trrxCM3BHWtP8G2LOki8+30W3GUwmdwVoXbW6Vw3+udZXhmTQXn6ZVvMnvD8FP+gsXKdtxE8qoSjaFLfoQA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rJy6PBprzJALDqQ6yPg1AiC0FaKCkhf8msw9SM4tqtA=;
- b=bk9cG3bvA+TersLugacway7DV8ISDb1sIfil++zOkc69O4Ifn/i+9FnbkHL1SUlUx7rpl3GrZSQO9+icy5Ac5sN6IomGO7wf8BSGyuSZv1j7vk62QQ4K1sBDPDoekhpZiBaYzEHF6Q/47udKhjKx91su22aBOxz1c0Bn3H6/HHQ=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN6PR12MB2829.namprd12.prod.outlook.com (2603:10b6:805:e8::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.21; Wed, 21 Apr
- 2021 13:43:35 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4042.024; Wed, 21 Apr 2021
- 13:43:35 +0000
-Cc:     brijesh.singh@amd.com, ak@linux.intel.com,
-        herbert@gondor.apana.org.au, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC Part2 PATCH 07/30] mm: add support to split the large THP
- based on RMP violation
-To:     Vlastimil Babka <vbabka@suse.cz>,
-        Dave Hansen <dave.hansen@intel.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-References: <20210324170436.31843-1-brijesh.singh@amd.com>
- <20210324170436.31843-8-brijesh.singh@amd.com>
- <0edd1350-4865-dd71-5c14-3d57c784d62d@intel.com>
- <86c9d9db-a881-efa4-c937-12fc62ce97e8@amd.com>
- <f8bf7e26-26dc-e19a-007c-40b26e0a0a45@intel.com>
- <55445efd-dc29-3693-a189-710c8a61dec2@suse.cz>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <0a7a2ea4-6f07-61f8-fc02-c084734788ec@amd.com>
-Date:   Wed, 21 Apr 2021 08:43:32 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.1
-In-Reply-To: <55445efd-dc29-3693-a189-710c8a61dec2@suse.cz>
+ bh=dmIS/bT5IERJ9yJXflrq5C4UNJs7NXNienclIJJo1lQ=;
+ b=yfzdhVhdBZ2SV5wKO22hT5BuY+099oTxnhvzaPrqOrs6oxZmcxfNwgOfzZtjqsi0PsYWpmBQuFir58JDjEEv0B/8+3Z6HJS1mIkVluXVmoYlsfhvopFvBnfLsRS7SSvQTtML+p25pDBK/1IKobE7kZ0eBvB9xClZYBkgvH048MI=
+Authentication-Results: amd.com; dkim=none (message not signed)
+ header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM6PR12MB4337.namprd12.prod.outlook.com (2603:10b6:5:2a9::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4042.16; Wed, 21 Apr 2021 13:50:09 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4042.024; Wed, 21 Apr
+ 2021 13:50:09 +0000
+Subject: Re: [PATCH v2] crypto: ccp - Make ccp_dev_suspend and ccp_dev_resume
+ void functions
+To:     Tian Tao <tiantao6@hisilicon.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, John Allen <john.allen@amd.com>
+References: <1618535202-11397-1-git-send-email-tiantao6@hisilicon.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <105b9d35-7fd0-cd8e-ee24-a9824fe0ae1a@amd.com>
+Date:   Wed, 21 Apr 2021 08:50:06 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
+In-Reply-To: <1618535202-11397-1-git-send-email-tiantao6@hisilicon.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Originating-IP: [165.204.77.11]
-X-ClientProxiedBy: SN4PR0201CA0026.namprd02.prod.outlook.com
- (2603:10b6:803:2e::12) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [67.79.209.213]
+X-ClientProxiedBy: SA0PR11CA0097.namprd11.prod.outlook.com
+ (2603:10b6:806:d1::12) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (165.204.77.11) by SN4PR0201CA0026.namprd02.prod.outlook.com (2603:10b6:803:2e::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.20 via Frontend Transport; Wed, 21 Apr 2021 13:43:33 +0000
+Received: from office-linux.texastahm.com (67.79.209.213) by SA0PR11CA0097.namprd11.prod.outlook.com (2603:10b6:806:d1::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.22 via Frontend Transport; Wed, 21 Apr 2021 13:50:08 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 080e289b-f733-4ea3-557b-08d904cb75c7
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2829:
+X-MS-Office365-Filtering-Correlation-Id: 6307b7fb-3f9e-4de2-4656-08d904cc60c7
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4337:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB28297CDC5856AEF04F4376F6E5479@SN6PR12MB2829.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <DM6PR12MB43378F99F8EE01A5342B05F5EC479@DM6PR12MB4337.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JUtNXERfTvJ0yx/U5/EtuPJYx0rqsNtT1dDQPQLKSh4l77fNgqJCNG0X6uclU0wkctri7AQ2gUU1uIPT6j6ZtKLdbtqfkeoCdTpaxXDnOjsaceCsMVQvbdHtNOW+KuJOPk5FpXopC8hD2Eewx3MBSLBAjZs7G1LhZHqempEDEcEMQemz2H92KCVd3MklAjy/szDBI1beoZbnI10YKfC/elkllT0SVeMKmDcHKdWCwICquFPYRHd0Gyqe/XUIf1o/12SbDgi58tpGBuKFCiMkDOdFDQYO1k2WwlUbBDsSpTmtCYc5zGexZh0vu6KVoXGQZQQJES9Tc1swhgnEDjeCewY90GJrFDS9oJz5Bo+Ye91lGmpDmMbQPZWR4S14JShNT8CnpydbQhMZGKf2dqQZmj0z7lnQeCuyhbAgr+1LKHfrH34uADSrMK/eEP6CNQgqoSFANFNr3/MiBgzLOArQkLfGeroq7WeK/FtygNVsTUwjo7AIUdV7XjlBgrD63oVmjpFBfoyxfZsTuQlVl7B2/9zGgepZgsZqy022uB7Tq4R2ce06K9YpPl31vXSKBO9VVMJuVAySWTTM7/WP5CuCbbD0iO7alTDRcUzhnDCGTNiwTHkKTWe9AF7wOVl1oDdstLu9X7mUMysuIOHofaA5zxpkwOJetGmr7E1vL0b0o7J8Xlb1qCfFXNo792igttsMtKcy4UMSwJMxvQUsi/+C8l+T4byyIDkrDJyyaWh2amZRnQPCiB+5AHwTf0lUFLdILaOfZduoFQKAav2v9RR4y2pk2zci03XJa8zuecPFPgilSjP2hJ6LmVVuFKD6qgGQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(366004)(39850400004)(136003)(376002)(44832011)(31686004)(2906002)(26005)(8676002)(5660300002)(45080400002)(8936002)(6512007)(2616005)(186003)(53546011)(66946007)(478600001)(83380400001)(16526019)(38350700002)(6506007)(31696002)(66556008)(6486002)(66476007)(966005)(52116002)(7416002)(36756003)(956004)(4326008)(54906003)(316002)(86362001)(110136005)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?ckFzTUs5SlRGd1J3NnZQa1Q1Y1VuR3E3L1lMNXBmZGlwSXg0L3IxYUNtNEla?=
- =?utf-8?B?WTlwSGlOQnVsRm9xdno5S0cxem5SOEtVWWxqVWFYQzZBT0h1WVA4WkNXeFNY?=
- =?utf-8?B?VUdTakVWcXoycWJBV0NYYTRvZERqYjdwY1ZNRTBqbi95QWpKUDV3ZnByY2xq?=
- =?utf-8?B?MXc2Z0lNSTZwUERjVlBFdUthckMwcDY3QVBCVGpDdktSVDYxaHlERDJsQW1z?=
- =?utf-8?B?M2xQakpWbFZLVHd3KzFvNVFtOFlvcVluYlM2L29VN2J1bnoxL01ra1M1VlEv?=
- =?utf-8?B?ZUhucTgrbktyQmUyQjVaNHNpdHJSQ3ZmczRhNDVSNUllanVKZnl1QmVsRGdv?=
- =?utf-8?B?Z2pxUGgrVm9xMi9VcHJIaHh6aTRKb1ZGYkxIYXF4cXhNR0p1U0orNEdIRmQ5?=
- =?utf-8?B?c1VQaTlUSzVGeDlxN2k3YWN1LzN0WU1qRmdUbzdzYWhCM0lqdG5CbXdiMTEv?=
- =?utf-8?B?Yms0THJiaW04YUhDKzgxMkJMK1ZKSUNtSVdBdDRkVnVmc1I5MjFsTEtjMllL?=
- =?utf-8?B?ZmtOSkZRNG5xZFV1ZHhiN3VsYkFQa2xPRDZYRUNiSkJBa1RZM0dXQ3g2MTRP?=
- =?utf-8?B?aUNEMWJTeGw5RkVEMkxLQmk2TmFXSWl1TTZZREwvSW40cHlXZkRZUzJic3JQ?=
- =?utf-8?B?Slp0YzNLZDJGUEhHeHRsTE1rRlpRb2lyYWJCTE9JellHaDRjSHdrdDcyQzIr?=
- =?utf-8?B?SEtSc1R1MnYyR3lOODBLbjBhWUE2b1V4REh4RVRTWUtvN3Byc1NDeUxzMklJ?=
- =?utf-8?B?Y3ZoRWVhMFo5S0FvNnk2RG1mNGtSZ3ZiQW9OSkVZZ3RpaUtjSExVTytLUGFh?=
- =?utf-8?B?VUhOSEpYcGJGQ1dRd0VqWktYQjBIOFlOdGcwVG9qeG5vNkxHK2lib3gxdFcy?=
- =?utf-8?B?ekMrdFU4cDcrdnJDdnNWczNaYWlQZHdZdFlhOEZMSGtxMkgyNGhmanpiQWVI?=
- =?utf-8?B?eW9PV2oxZXl5TUtwUUMvKzVtYWhFUUFmbVhOZ1NTVlBzdWg1K1FlcHZrV3pU?=
- =?utf-8?B?aUxjVE1wamxTcnZXQWpJTDBhaHJLemkyS3FvQjlBNUUyaWRScGRlQjRJZCti?=
- =?utf-8?B?dG5XUUVpTGRKYk5mOTBEUmw0dHVScFhORlhOYzRsamIwSmk2RVg2K0RDMGIw?=
- =?utf-8?B?ek5XRStYdUFtS0V2RG02ZjMreng2UUlTVXZrS3B4N3Q3MGFTenlCWE9ya2Vk?=
- =?utf-8?B?cEpjbFlsUVlOT2tGMk5Mc2poTituMUpMRDA0MEpXbTNnczdBd0dIQUJFT0NY?=
- =?utf-8?B?aUhxUE0vOEpVSTVMRXRiT2E5KzFwYUtXYVVKaHI1TXJ3eGN0QUtIQzZWa0xL?=
- =?utf-8?B?ZklkdldXRStNV2xZRm9TTWxXWlN5UktkbmJTZUNpUkhiTGN1eVM0NlN4cjBD?=
- =?utf-8?B?dWxldXd3TEVrMHkyMUs0KzVUR0VlaVFzNythdHBZUVQyT1VzOGhBUFQrMzMz?=
- =?utf-8?B?TWVIWWlqU1pDZ3ZNQks0MFByTHV0YjdsTnZJcStlNXkvbHNid3NMa0xHcmUw?=
- =?utf-8?B?NkJtWDY2QVphL3hsbWhXVTdPSWpMM1R1MlpDb05pYmhyazYzcUliczEya3JH?=
- =?utf-8?B?Q2kvcWlXM2VyOWhWZ05MNVNwaXA1eXJDTTdtTDZCQnFTTjE0YWcyYXQzbm9O?=
- =?utf-8?B?NXh6WGtSa25uQlV5QXVuS3B2MXJ1eXU5WUNwWWwxenZXcG9OaGI0WU1FSEpZ?=
- =?utf-8?B?ZTFVL0ZGcHFWOGd5SmV5ZDUxM1QvY2xOLy8yaElsQTFiZTlMcHlXMUJQcndR?=
- =?utf-8?Q?iYNMMF7wkFntoXY3D3vkfI1BXVYy3vcNkzSl5tc?=
+X-Microsoft-Antispam-Message-Info: JBz/U3BzFmcKazNNh3ILYW94xgA1DVBsHweDPVnkFYpsPcJeNkJpcpUhx1iS3DsXcMXNeeFtzDgepylrvju+9EAfXDfs1bhaNRO0ZraQu+AlBaBlyu+9hl5iBjTWSsd2sAzYkuZni9nmxqfdPNFwc4LRjbvR443FLHjCytEhcB8DVQLNmeZPguldyPOAf5LF1YYcyYwl8tBydGco+Z38ZBknEh8aYp/xQoU/C9aZKmT8sUP3VIZxXcGLM/oTGEf4nv/xRX1ZjGXbIVEVZn7HiByX5jBSahL/qlZekMLASUTesFb+aCd9NGQVfiLzxO2YKCTrJvduHEk3MeBTOVBOCcVmFZ/hQ4F4nYi64rX6+iefUlH1teCXK+WQZ1lkLXNg57IjtJIzgvT727aBFm5Q2WORMk/YjnBdDCwoj8KwzqDbnPQdpvIxmtuoQAis7HdepZL6PxP9ATnhXSoLaqpWravWkFKwz1NONKvkDvfb+hEmOAuBiEB40XPLApI3nBYWVxofS+i3GxwIqJqMhRWkQGbBtdXM3Ydvpf2dx8h+Dz2cvQxA9zxCWpLs02LzoL4RvKppxKcBce4FRjEDDET94akSjd3wdYoIPjFqfpTvRr3K0NeP03Qwp/N50wR1cHvwFvY1QTUtz1ellN78HMVwhhHTuRUMqRbcPK8GbQsB45dBXOFLEL8I8QvtIVAYxQjH
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39850400004)(366004)(376002)(136003)(346002)(396003)(38100700002)(6486002)(31686004)(8676002)(6512007)(956004)(53546011)(5660300002)(6506007)(8936002)(26005)(2906002)(66946007)(66476007)(86362001)(36756003)(316002)(83380400001)(186003)(478600001)(2616005)(66556008)(4326008)(31696002)(16526019)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?NGhlWldRYlRwQ05qM2xEcVFMdGhwL1hvRDI5dVhZQktjNFN4Mk8zeHllQ1Ez?=
+ =?utf-8?B?c2hRcnMyUVMyMWdFUUJGdHNCVHZGV0tsRmpPa0hyM00wYUt3ZDNmc0dNOHJO?=
+ =?utf-8?B?MEJEK05ESmgvSXhyRHZYRy9IcERUN29BcklOS2dCWEV4bHhvQ2dZamJMUnZz?=
+ =?utf-8?B?SGVMTnM3QWtDTk94dUN5YThJemVzbWlPSFRGMjlxYW1GZmdHVm1YdmpESmtq?=
+ =?utf-8?B?eDhqS0puOWJOUHcxRGE0ZzZGdStCZVFwRHVQSXQvSkVHcGdzTWZ1Qmo5ZkE5?=
+ =?utf-8?B?ZEhuNzRaa2NLYVNFc1BxQnQ0M1A5cG5qeiswRjAyOHVsYzFHc3VvZ2VvYzhS?=
+ =?utf-8?B?aW9HdVB1cHc1TVk0dTh2SHdPRHBGZWN0RlJ1TnFaeXpnTG9pSUpGdDlhYzUz?=
+ =?utf-8?B?TVplMnk2SmpKVjdXRXE2N1p0cFFzeFIxWlA5Zzc5UThZYSt0WUtzYlY5QWs4?=
+ =?utf-8?B?TTMyTmI3Q243YkxVY1NzT01nMDNvQVNwUm8wSHpyNlBYTkNhUGRZakFZMmNj?=
+ =?utf-8?B?RG5Na3d1dVVjWGZXbDlSK1NUOFFncXoxWGFPM2NKemtXQ1BCT0Zxd0pSNDIv?=
+ =?utf-8?B?RkZTWEo0Q1BkT28xeVRyRzBPU3hTQlFRU1RibG1DN1ZnU2NEWFF1RjBqbStq?=
+ =?utf-8?B?aWQ1MHhQT2VRdDFySHh2OFJYeHA5RkEydmdERFJjVTg4UVc1aXNZREtiZThq?=
+ =?utf-8?B?c0txejlkbS9acmt6VEdiYjJCUy8xYVlTV3F6Y2lBeExTY21obTllSDkrcEQ2?=
+ =?utf-8?B?OXJKTDNINWIwZjBYZVMrdHc4M3NUYVd5REtHRXl0Vk45UWJENkJMNzRsb0lk?=
+ =?utf-8?B?TWtQQkIwMVBvb3h1QnFMRHFpcHVYMTRMcGlCNHdwT0lyNy9YWWhmV2pjMERE?=
+ =?utf-8?B?OXNXb2gyNHRkaHJaWVIzQWRoNHU3RzBRVGs1OHJKYk1HUFlwRU1ZNkZGNlNu?=
+ =?utf-8?B?L2ZidXJPR2EvZkt2K2RubW5zdFNmcWRvZGNnN3JuL3ZRaUI1TDl4NGg0S2J6?=
+ =?utf-8?B?VkFMYTJETmZ3angzZlVkckp2b2xidGlOb1RDL2VQN1JPRGdjNjBvcGh4bFN6?=
+ =?utf-8?B?OUMwM05JQ2Eva1VYZmtmS3pYZDRJZlAxRVZLZUpUWE5iUWJsMjROaFJaTjJY?=
+ =?utf-8?B?Y0NoODhpcEFwelhmeGVtcGJQV0pNdXJBNVoyNlZyWEoyR0FQdzI0cEVlTFJ0?=
+ =?utf-8?B?TzAwMGhpMEZYc00rbXhQSXBwSkVmMEV6bUFmMDEyVnY3UEVZcHNjR3dDKzlC?=
+ =?utf-8?B?aUtqZXdROWtCQXNlUTlod2pUejJkMHdIdEJIVEVEakxtOHBJR1NpT3ozN3JC?=
+ =?utf-8?B?MU9QZVpsN2FVcEVKcUU1MXpEUjd2Z294YkJReC9pdVN0YUdIdC9VeU9KQm1q?=
+ =?utf-8?B?VmdwZEdody9lZCtXUDRoTStDNzZtdkQxQjd3RzY0YkNGdFUrdlRmWDJLYnlm?=
+ =?utf-8?B?RnViVjc2bnBwS0J5RGFTc1JuVkQraUlCQzlQWU9OaVRrOUhVc2N1c0JlZysw?=
+ =?utf-8?B?Q3FCSkhQQnAybVlSQ2RLb3hZRFNYNjY4bU83VmF2UDdoWGNnMkx5RjlGRVZL?=
+ =?utf-8?B?cGswNXE2TWdVdjd2WW1wVlhmOWtWVkZGYkNEeUVSVWdpYythOXc2S2ROUHEw?=
+ =?utf-8?B?T0ZQVmthcGlwZzdHRllCeVp4RFdidmt4RlpxVUhnVnB1UGR5QVltZDVkZU5U?=
+ =?utf-8?B?ZUZJZUlxOFk4RkhHZGFEbi9CSDYzSko2alNHeVhxeGo2TlZIUzdhM0dvMVVR?=
+ =?utf-8?Q?N/gIxjv79vqz9ZiqAZn+qDleCWOPfkkrlGAXfHw?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 080e289b-f733-4ea3-557b-08d904cb75c7
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6307b7fb-3f9e-4de2-4656-08d904cc60c7
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2021 13:43:35.1605
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2021 13:50:09.4777
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zCshHIhWLiEOSTFhv7Nyu6QBXjxToEhONsiUt3chwXMjDn+ME6mMTryNUtlzssVL3qyDha3+Zif52Pl2eIT0ZA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2829
+X-MS-Exchange-CrossTenant-UserPrincipalName: Tp43Y4ma/+CN+xhe1GHinWzeuzND3cpiSPyQFwkCAfkJJI8vamnnWRuYQ0alWEUsp4Lxr2Hjj9WMLrH53vAc6w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4337
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 4/15/21 8:06 PM, Tian Tao wrote:
+> Since ccp_dev_suspend() and ccp_dev_resume() only return 0 which causes
+> ret to equal 0 in sp_suspend and sp_resume, making the if condition
+> impossible to use. it might be a more appropriate fix to have these be
+> void functions and eliminate the if condition in sp_suspend() and
+> sp_resume().
+> 
+> Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
 
-On 4/21/21 7:59 AM, Vlastimil Babka wrote:
-> On 3/25/21 4:59 PM, Dave Hansen wrote:
->> On 3/25/21 8:24 AM, Brijesh Singh wrote:
->>> On 3/25/21 9:48 AM, Dave Hansen wrote:
->>>> On 3/24/21 10:04 AM, Brijesh Singh wrote:
->>>>> When SEV-SNP is enabled globally in the system, a write from the hypervisor
->>>>> can raise an RMP violation. We can resolve the RMP violation by splitting
->>>>> the virtual address to a lower page level.
->>>>>
->>>>> e.g
->>>>> - guest made a page shared in the RMP entry so that the hypervisor
->>>>>   can write to it.
->>>>> - the hypervisor has mapped the pfn as a large page. A write access
->>>>>   will cause an RMP violation if one of the pages within the 2MB region
->>>>>   is a guest private page.
->>>>>
->>>>> The above RMP violation can be resolved by simply splitting the large
->>>>> page.
->>>> What if the large page is provided by hugetlbfs?
->>> I was not able to find a method to split the large pages in the
->>> hugetlbfs. Unfortunately, at this time a VMM cannot use the backing
->>> memory from the hugetlbfs pool. An SEV-SNP aware VMM can use either
->>> transparent hugepage or small pages.
->> That's really, really nasty.  Especially since it might not be evident
->> until long after boot and the guest is killed.
-> I'd assume a SNP-aware QEMU would be needed in the first place and thus this
-> QEMU would know not to use hugetlbfs?
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
+And please copy the maintainers associated with the files being patched
+should you submit more patches in the future.
 
-Yes, that is correct. Qemu patches will not launch SEV-SNP guest when
-hugetlbfs is used. I can also look to add the check in kernel to ensure
-that backing pages does not come from the hugetlbfs so that non-QEMU VMM
-will also fail to create the SNP guest.
+Thanks,
+Tom
 
->
->> It's even nastier because hugetlbfs is actually a great fit for SEV-SNP
->> memory.  It's physically contiguous, so it would keep you from having to
-> Maybe this could be solvable by remapping the hugetlbfs page with pte's when
-> needed (a guest wants to share 4k out of 2MB with the host temporarily). But
-> certainly never as flexibly as pte-mapped THP's as the complexity of that
-> (refcounting tail pages etc) is significant.
->
->> fracture the direct map all the way down to 4k, it also can't be
->> reclaimed (just like all SEV memory).
-> About that... the whitepaper I've seen [1] mentions support for swapping guest
-> pages. I'd expect the same mechanism could be used for their migration -
-> scattering 4kB unmovable SEV pages around would be terrible for fragmentation. I
-> assume neither swap or migration support is part of the patchset(s) yet?
-
-
-Yes, the patches does not support swapping guest pages yet. We want to
-add the support incrementally. The swap/move can be implemented after we
-have the base enabled in the kernel. Both the SEV and SNP firmware
-provides PSP commands that can be used to swap the guest pages. I
-believe KVM mmu notifier can use it during the page move.
-
->
->> I think the minimal thing you can do here is to fail to add memory to
->> the RMP in the first place if you can't split it.  That way, users will
->> at least fail to _start_ their VM versus dying randomly for no good reason.
->>
->> Even better would be to come up with a stronger contract between host
->> and guest.  I really don't think the host should be exposed to random
->> RMP faults on the direct map.  If the guest wants to share memory, then
->> it needs to tell the host and give the host an opportunity to move the
->> guest physical memory.  It might, for instance, sequester all the shared
->> pages in a single spot to minimize direct map fragmentation.
-> Agreed, and the contract should be elaborated before going to implementation
-> details (patches). Could a malicious guest violate such contract unilaterally? I
-> guess not, because psmash is a hypervisor instruction? And if yes, the
-> RMP-specific page fault handlers would be used just to kill such guest, not to
-> fix things up during page fault.
-
-The version 2 of GHCB specification defines a contract between the guest
-and the host. When guest is ready to share a page with the host it
-issues the page state change request to the hypervisor. Hypervisor is
-responsible to add the page in the RMP table using the RMPUPDATE
-instruction. The page state change request include an operation field.
-The operation can be one of the following
-
-1. Add page in RMP table (make guest page private)
-
-2. Remove page from RMP table (make guest page shared)
-
-3. Psmash - split the large RMP entry
-
-4. Unmash - merge small RMP entry into large. The unmash operation
-require the PSP assist.
-
-The current RMP-specific fault handler checks if host is attempting to
-write to a guest private page. If so, kill the guest. I guess it covers
-the case where a malicious guest violates the contract to issue the
-page-state-change.
-
-
->> I'll let the other x86 folks chime in on this, but I really think this
->> needs a different approach than what's being proposed.
-> Not an x86 folk, but agreed :)
->
-> [1]
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.amd.com%2Fsystem%2Ffiles%2FTechDocs%2FSEV-SNP-strengthening-vm-isolation-with-integrity-protection-and-more.pdf&amp;data=04%7C01%7Cbrijesh.singh%40amd.com%7C3a8c99a1738940b550af08d904c55938%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637546068243853651%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=x%2Bmtud8IxrykFCPAPgBu2CCAFO9Q26PA3OhryvlX%2BbM%3D&amp;reserved=0
+> ---
+> v2: handle the case that didn't define CONFIG_CRYPTO_DEV_SP_CCP.
+> ---
+>  drivers/crypto/ccp/ccp-dev.c | 12 ++++--------
+>  drivers/crypto/ccp/sp-dev.c  | 12 ++----------
+>  drivers/crypto/ccp/sp-dev.h  | 15 ++++-----------
+>  3 files changed, 10 insertions(+), 29 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+> index 0971ee6..6777582 100644
+> --- a/drivers/crypto/ccp/ccp-dev.c
+> +++ b/drivers/crypto/ccp/ccp-dev.c
+> @@ -548,7 +548,7 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
+>  	return ccp->cmd_q_count == suspended;
+>  }
+>  
+> -int ccp_dev_suspend(struct sp_device *sp)
+> +void ccp_dev_suspend(struct sp_device *sp)
+>  {
+>  	struct ccp_device *ccp = sp->ccp_data;
+>  	unsigned long flags;
+> @@ -556,7 +556,7 @@ int ccp_dev_suspend(struct sp_device *sp)
+>  
+>  	/* If there's no device there's nothing to do */
+>  	if (!ccp)
+> -		return 0;
+> +		return;
+>  
+>  	spin_lock_irqsave(&ccp->cmd_lock, flags);
+>  
+> @@ -572,11 +572,9 @@ int ccp_dev_suspend(struct sp_device *sp)
+>  	while (!ccp_queues_suspended(ccp))
+>  		wait_event_interruptible(ccp->suspend_queue,
+>  					 ccp_queues_suspended(ccp));
+> -
+> -	return 0;
+>  }
+>  
+> -int ccp_dev_resume(struct sp_device *sp)
+> +void ccp_dev_resume(struct sp_device *sp)
+>  {
+>  	struct ccp_device *ccp = sp->ccp_data;
+>  	unsigned long flags;
+> @@ -584,7 +582,7 @@ int ccp_dev_resume(struct sp_device *sp)
+>  
+>  	/* If there's no device there's nothing to do */
+>  	if (!ccp)
+> -		return 0;
+> +		return;
+>  
+>  	spin_lock_irqsave(&ccp->cmd_lock, flags);
+>  
+> @@ -597,8 +595,6 @@ int ccp_dev_resume(struct sp_device *sp)
+>  	}
+>  
+>  	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
+> -
+> -	return 0;
+>  }
+>  
+>  int ccp_dev_init(struct sp_device *sp)
+> diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
+> index 6284a15..7eb3e46 100644
+> --- a/drivers/crypto/ccp/sp-dev.c
+> +++ b/drivers/crypto/ccp/sp-dev.c
+> @@ -213,12 +213,8 @@ void sp_destroy(struct sp_device *sp)
+>  
+>  int sp_suspend(struct sp_device *sp)
+>  {
+> -	int ret;
+> -
+>  	if (sp->dev_vdata->ccp_vdata) {
+> -		ret = ccp_dev_suspend(sp);
+> -		if (ret)
+> -			return ret;
+> +		ccp_dev_suspend(sp);
+>  	}
+>  
+>  	return 0;
+> @@ -226,12 +222,8 @@ int sp_suspend(struct sp_device *sp)
+>  
+>  int sp_resume(struct sp_device *sp)
+>  {
+> -	int ret;
+> -
+>  	if (sp->dev_vdata->ccp_vdata) {
+> -		ret = ccp_dev_resume(sp);
+> -		if (ret)
+> -			return ret;
+> +		ccp_dev_resume(sp);
+>  	}
+>  
+>  	return 0;
+> diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
+> index 0218d06..20377e6 100644
+> --- a/drivers/crypto/ccp/sp-dev.h
+> +++ b/drivers/crypto/ccp/sp-dev.h
+> @@ -134,8 +134,8 @@ struct sp_device *sp_get_psp_master_device(void);
+>  int ccp_dev_init(struct sp_device *sp);
+>  void ccp_dev_destroy(struct sp_device *sp);
+>  
+> -int ccp_dev_suspend(struct sp_device *sp);
+> -int ccp_dev_resume(struct sp_device *sp);
+> +void ccp_dev_suspend(struct sp_device *sp);
+> +void ccp_dev_resume(struct sp_device *sp);
+>  
+>  #else	/* !CONFIG_CRYPTO_DEV_SP_CCP */
+>  
+> @@ -144,15 +144,8 @@ static inline int ccp_dev_init(struct sp_device *sp)
+>  	return 0;
+>  }
+>  static inline void ccp_dev_destroy(struct sp_device *sp) { }
+> -
+> -static inline int ccp_dev_suspend(struct sp_device *sp)
+> -{
+> -	return 0;
+> -}
+> -static inline int ccp_dev_resume(struct sp_device *sp)
+> -{
+> -	return 0;
+> -}
+> +static inline void ccp_dev_suspend(struct sp_device *sp) { }
+> +static inline void ccp_dev_resume(struct sp_device *sp) { }
+>  #endif	/* CONFIG_CRYPTO_DEV_SP_CCP */
+>  
+>  #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+> 
