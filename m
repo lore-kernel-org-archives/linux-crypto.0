@@ -2,72 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37385C433ED
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 18:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A5BC433B4
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 20:03:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0658D6143B
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 18:18:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D56CF61354
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Apr 2021 20:03:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245153AbhDUSSn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Apr 2021 14:18:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47448 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238637AbhDUSSl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Apr 2021 14:18:41 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 71C256143B;
-        Wed, 21 Apr 2021 18:18:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1619029087;
-        bh=vvEJ7OhCNNgyEkrC+b1mnLvIJJr1+wwY1dU/KtzL0Bc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=D/SlkDO9lFoi4+cY9RsVJyQPMOqxLruQDKyEtbWsoqMnw71/p2fzGQybqNDaM1ckS
-         RD78VtaHdXvEQbY1bqT57FQWCXkV+9Qkzfbtb1AzahdtsfPXaduLqE6eOsxfM9B1FX
-         KwABHPKxiS/pdXrF6nMh8Maamju/mVoj4rltWKH9naUnF25qbs0RbgM6l+gE8rCXMw
-         bGp1htEbvhYsMikFMdKdY13zodOGi4krJrdH3FkHKrrYWMhd/0566RYwwt5VLtryf9
-         v8yMF31+ajp07dmk4NMmSJbGjHe+jtxtVFVHEJXVaEhu+MtgjDsfcJts1kXxSUsmUg
-         y5MFZ/aTUIl0w==
-Date:   Wed, 21 Apr 2021 11:18:05 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v2 1/2] fscrypt: relax Kconfig dependencies for crypto
- API algorithms
-Message-ID: <YIBsXY5QOcEjnZ6I@gmail.com>
-References: <20210421075511.45321-1-ardb@kernel.org>
- <20210421075511.45321-2-ardb@kernel.org>
+        id S245613AbhDUUDz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Apr 2021 16:03:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47560 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245609AbhDUUDz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Apr 2021 16:03:55 -0400
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EFB0C06174A;
+        Wed, 21 Apr 2021 13:03:20 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id c15so33608496wro.13;
+        Wed, 21 Apr 2021 13:03:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
+        bh=g/C0hGCYFxl4/Qr2LMGGYLp3TN7XZ7nv/5+pCYVeG7I=;
+        b=O7fho6f5nhqb5B3JzKBMTkvefBc377OAxGKSC/Q7VttajQpqjiXQV360touKreN1CP
+         4W7fxQYm4ZFm7AnpXrT9wECu04yRvh52HE/9y8jhdHcX1fTAV+pzRCm9vSTJymcHjTEd
+         oA0lf1oOIMe76wxncDjfgVby3Fi/E6Kt24d8hApbPoat2h9jTTYOhE9RLw/adfKpn8eH
+         LnKFJ1zz8zprzkXWD7txiEF208oWGbLP5P82ANKSwfAh/h0U6gc2nRN6VPqEjks37ndQ
+         sDtN92XaSco6lkgfsNne9sqVNZLinY4kMhYmMUi290T406vLkPMdLpVEYdMJmk935Bp7
+         luFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=g/C0hGCYFxl4/Qr2LMGGYLp3TN7XZ7nv/5+pCYVeG7I=;
+        b=I5XxEO2/eekBajgabaq0wi1vkjBnZyEjdaH+iVJVCmfgCTg/nc7yUjlgIIpE1AuNHl
+         fRrirJLwJqENlJsIPyCxN7ShvzD3mlxt+bQKYdjeL8YncQOK9AIic9As98NrrSudDabY
+         +nFfZjUNO5sJMWKeaR2lzoy5YfE1ImfjLjam8XIVysmY7BvBr/81aPxAoGNVSA0yd7Zu
+         P3XFdSTUznbmXZQQo0f6ILJEirsav7JM1IYqWQ6fEdXJGXXzXtVOSIZBkXtGhthVhak4
+         W6cDPjgZowwS486dPvPhow2wKPYBDCIWK01fSMLUfdbhq3rcM9RQUAgYXc2CXN1JA+Uh
+         ilHw==
+X-Gm-Message-State: AOAM5333FxFpSXyePeTvgvNhfnvOKjr25S/LOGQwr2r2R/e4+xz8CICV
+        npmxktYTU+gyB8kWQZ0+/zKQdUgaisI=
+X-Google-Smtp-Source: ABdhPJzn7eFIA19T452EeOAnAcsm8CwotL2pkif6yFIwnWDZdp32y+fyBos86iAkOEnGyBhGO3EPog==
+X-Received: by 2002:adf:ef84:: with SMTP id d4mr28892489wro.74.1619035399126;
+        Wed, 21 Apr 2021 13:03:19 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id b12sm13085264wmj.1.2021.04.21.13.03.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Apr 2021 13:03:18 -0700 (PDT)
+Date:   Wed, 21 Apr 2021 22:03:17 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Cc:     linus.walleij@linaro.org, linux-kernel@vger.kernel.org
+Subject: cortina/gemini: hwrng: what is its quality ?
+Message-ID: <YICFBQ8mQRJ4zSh9@Red>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210421075511.45321-2-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 21, 2021 at 09:55:10AM +0200, Ard Biesheuvel wrote:
-> Even if FS encryption has strict functional dependencies on various
-> crypto algorithms and chaining modes. those dependencies could potentially
-> be satisified by other implementations than the generic ones, and no link
-> time dependency exists on the 'depends on' claused defined by
-> CONFIG_FS_ENCRYPTION_ALGS.
-> 
-> So let's relax these clauses to 'imply', so that the default behavior
-> is still to pull in those generic algorithms, but in a way that permits
-> them to be disabled again in Kconfig.
-> 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
+hello
 
-Acked-by: Eric Biggers <ebiggers@google.com>
+I work on the crypto part of the cortina/gemini SL3516 SoC.
+The datasheet mention a HWRNG in its IP but really briefly:
+"""
+The implementation is a 32-bit Hardware Random Number Generator that has a uniformed
+distribution between 0 and 2^32 -1. The hardware randomness is created by sampling data from
+different clock domains, and feeding it as input to the 32-bit maximum length LFSR (Linear Feedback
+Shift Register)
+"""
 
-Herbert, is there still time for you to take these two patches through the
-crypto tree for 5.13?  There aren't any other fscrypt or fsverity patches for
-5.13, so that would be easiest for me.
+Piping its output to rngtest give:
+dd if=/dev/hwrng count=2000 bs=2048 | rngtest
+rngtest 6.11
+rngtest: starting FIPS tests...
+rngtest: entropy source drained
+rngtest: bits received from input: 32768000
+rngtest: FIPS 140-2 successes: 1191
+rngtest: FIPS 140-2 failures: 447
+rngtest: FIPS 140-2(2001-10-10) Monobit: 183
+rngtest: FIPS 140-2(2001-10-10) Poker: 116
+rngtest: FIPS 140-2(2001-10-10) Runs: 346
+2000+0 records in
+2000+0 records out
+rngtest: FIPS 140-2(2001-10-10) Long run: 0
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=303.606; avg=3143.352; max=9712.208)Kibits/s
+rngtest: FIPS tests speed: (min=7.104; avg=10.332; max=10.638)Mibits/s
+rngtest: Program run time: 13303224 microseconds
 
-- Eric
+That's a quite number of failure.
+Can the hwrng still be used with some "hwrng->quality" setting ?
+Or it is just too many failure to be used ?
+
+Regards
