@@ -5,55 +5,55 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DCA3C433ED
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Apr 2021 10:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD682C433B4
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Apr 2021 10:41:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5871261450
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Apr 2021 10:17:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EB0D613C3
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Apr 2021 10:41:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235814AbhDVKSC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Apr 2021 06:18:02 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:47760 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234773AbhDVKSB (ORCPT
+        id S235810AbhDVKmY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Apr 2021 06:42:24 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:13173 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235097AbhDVKmY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Apr 2021 06:18:01 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20210422101725euoutp01660a75bcca86d892c124df819e9be153~4JrnN_v831728317283euoutp01-
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Apr 2021 10:17:25 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20210422101725euoutp01660a75bcca86d892c124df819e9be153~4JrnN_v831728317283euoutp01-
+        Thu, 22 Apr 2021 06:42:24 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20210422104146euoutp02992591d4b4ea987549b0c3dff83cdbad~4KA4Aecn53148431484euoutp02e
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Apr 2021 10:41:46 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20210422104146euoutp02992591d4b4ea987549b0c3dff83cdbad~4KA4Aecn53148431484euoutp02e
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1619086645;
-        bh=P1yzkGOkcnvwxAl/j9BN4l/zvJWfv1wrbb1pE4xRYuM=;
+        s=mail20170921; t=1619088106;
+        bh=jbZRehNx5NXEaCH90SwTt765oxUjcpQrES5K/+JgKcs=;
         h=From:To:Cc:Subject:Date:References:From;
-        b=RcUhcTXN1DSYB74xXQfJEQ4+3eU85kNobs/vbNmi9iZzthxc9sGKKvkt3Z2raapF7
-         /GwjJsy3H73qGhmh/3wxg2LEj7S7gQkWQJhFQvN65HmxyVbk6/HL2lfNuLnEhnRyYu
-         Dqi5/lnR+GHzuUsHlwBZtdhRlQcPpOXNigI83GEA=
+        b=RC0ycAaB9RzBmBCUMVFP5uvtV2JJsgtmGffcCaMjjSvVXUSuuGLobBGpBUHzR3GMI
+         CyyKlxOK+4/oVYUrGqp+W3cWdRtFhe401Z7oIERDSVoOZTax8Z/0O4isUO6P43MyK9
+         42uygVv/PzHt7IzWi3ldNY34oei9QJRoGLVydUNo=
 Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20210422101724eucas1p24cc33a8c94a8771cfe703895822760de~4JrmqwteE2135021350eucas1p2E;
-        Thu, 22 Apr 2021 10:17:24 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id CF.0B.09444.43D41806; Thu, 22
-        Apr 2021 11:17:24 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20210422104146eucas1p105a060bb3b260394d6e9d661b4e513d1~4KA3djRMI1752617526eucas1p17;
+        Thu, 22 Apr 2021 10:41:46 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id B1.6F.09444.9E251806; Thu, 22
+        Apr 2021 11:41:45 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
         eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20210422101724eucas1p13e2f002b63fe94ef2aa5268383f3a207~4Jrl9yJHG1714217142eucas1p1O;
-        Thu, 22 Apr 2021 10:17:24 +0000 (GMT)
+        20210422104145eucas1p17f46c95b72f3568761a9f7911bf072e1~4KA2tkWOq2196621966eucas1p1k;
+        Thu, 22 Apr 2021 10:41:45 +0000 (GMT)
 Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210422101724eusmtrp298a6611e5e2ac13712205d842e700acc~4Jrl86WF62586025860eusmtrp2K;
-        Thu, 22 Apr 2021 10:17:24 +0000 (GMT)
-X-AuditID: cbfec7f4-dd5ff700000024e4-73-60814d34a820
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id AE.23.08705.33D41806; Thu, 22
-        Apr 2021 11:17:24 +0100 (BST)
-Received: from localhost (unknown [106.120.51.46]) by eusmtip2.samsung.com
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20210422104145eusmtrp108e515d4b629345d47725dd03e17eb58~4KA2sxvw81696216962eusmtrp1U;
+        Thu, 22 Apr 2021 10:41:45 +0000 (GMT)
+X-AuditID: cbfec7f4-dbdff700000024e4-ce-608152e9da60
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id C0.07.08705.9E251806; Thu, 22
+        Apr 2021 11:41:45 +0100 (BST)
+Received: from localhost (unknown [106.120.51.46]) by eusmtip1.samsung.com
         (KnoxPortal) with ESMTPA id
-        20210422101723eusmtip2d58a0b0baa6994b96081725352605b63~4JrlubzJW2583225832eusmtip27;
-        Thu, 22 Apr 2021 10:17:23 +0000 (GMT)
+        20210422104145eusmtip1fe9f73fb1e323c14c358b06019056b95~4KA2fnx0d3135731357eusmtip1P;
+        Thu, 22 Apr 2021 10:41:44 +0000 (GMT)
 From:   =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
 To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -64,53 +64,52 @@ Cc:     =?UTF-8?q?Bart=C5=82omiej=20=C5=BBolnierkiewicz?=
         <b.zolnierkie@samsung.com>,
         Marek Szyprowski <m.szyprowski@samsung.com>,
         =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
-Subject: [PATCH] hwrng: exynos - Fix runtime PM imbalance on error
-Date:   Thu, 22 Apr 2021 12:17:05 +0200
-Message-Id: <20210422101705.15617-1-l.stelmach@samsung.com>
+Subject: [PATCH v2] hwrng: exynos - Fix runtime PM imbalance on error
+Date:   Thu, 22 Apr 2021 12:41:41 +0200
+Message-Id: <20210422104141.17668-1-l.stelmach@samsung.com>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Organization: Samsung R&D Institute Poland
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrEKsWRmVeSWpSXmKPExsWy7djPc7omvo0JBk//GVtsnLGe1aL7lYzF
-        xrc/mCxuHlrBaLHp8TVWi/v3fjJZXN41h81ixvl9TBZrj9xlt1iwrY/RgctjVkMvm8e2A6oe
-        m5fUe/RtWcXo0fdyA6PH501yAWxRXDYpqTmZZalF+nYJXBmL9u9jLfjGVTH93Cr2BsZpnF2M
-        nBwSAiYS+9rXsncxcnEICaxglPhxdwcbhPOFUeLz40eMEM5nRomuV3OZYFq6Ju1igkgsZ5T4
-        NW02VMtzRonf558wg1SxCThK9C89wQqSEBGYxCSxct4PsFnMAvsYJXbemwJWJSzgJPH0dBuQ
-        zcHBIqAq0XMnHcTkFbCW2DHVD2KbvET78u1sIDavgKDEyZlPWEBsfgEtiTVN18FsZqCa5q2z
-        mUHGSwg84JC4+OwtO0Szi8Sh5l5GCFtY4tXxLVBxGYn/O+czgeySEKiXmDzJDKK3h1Fi25wf
-        LBA11hJ3zv1iA6lhFtCUWL9LHyLsKNE0fTIjRCufxI23ghAn8ElM2jadGSLMK9HRJgRRrSKx
-        rn8P1EApid5XK6CO8ZC4efgt0wRGxVlIHpuF5JlZCHsXMDKvYhRPLS3OTU8tNspLLdcrTswt
-        Ls1L10vOz93ECExGp/8d/7KDcfmrj3qHGJk4GA8xSnAwK4nwri1uSBDiTUmsrEotyo8vKs1J
-        LT7EKM3BoiTOm7RlTbyQQHpiSWp2ampBahFMlomDU6qBKf5K99Ir+fFrXdYnZdj1K/4IT1jp
-        tj7jpaK1+527NdylH9nEjKzn/FFibN+qXn23kuVt/t4VukrKD65pr3J9G3T6X7H9ifvz93e8
-        uaw2m2/q5cap0w4dnBbD/9uc0/B/6KrC9bFbdx52+/A88eH57NsHRG9l3r1Ze6yu5FD/6YcB
-        Wj/W5d68de7GnaUVB3bf0WiZuiu4Xb1hqozfsauyJ0NCCi8lexyYXjbvD8/KuBub24wD3+/N
-        6F0ts+g1Y0j/heRvNTU2vtbHYyp3B8/4omEZYLDf7fujOQ0XmJYudFM+w8Wte/7Vr/ViV0wr
-        467o3Nh6eJuDd6bN/vQnqkcl38eKvI9p+pGkNNPG8OKsuclKLMUZiYZazEXFiQA7EitGtQMA
-        AA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJIsWRmVeSWpSXmKPExsVy+t/xe7omvo0JBjOfM1psnLGe1aL7lYzF
-        xrc/mCxuHlrBaLHp8TVWi/v3fjJZXN41h81ixvl9TBZrj9xlt1iwrY/RgctjVkMvm8e2A6oe
-        m5fUe/RtWcXo0fdyA6PH501yAWxRejZF+aUlqQoZ+cUltkrRhhZGeoaWFnpGJpZ6hsbmsVZG
-        pkr6djYpqTmZZalF+nYJehmL9u9jLfjGVTH93Cr2BsZpnF2MnBwSAiYSXZN2MXUxcnEICSxl
-        lNjyeC9rFyMHUEJKYuXcdIgaYYk/17rYQGwhgaeMEss7REBsNgFHif6lJ1hBekUEpjFJnF12
-        CsxhFtjHKLH/6GJ2kCphASeJp6fbmEGGsgioSvTcSQcxeQWsJXZM9YOYLy/Rvnw72HxeAUGJ
-        kzOfsICUMAuoS6yfJwQS5hfQkljTdJ0FxGYGKm/eOpt5AqPALCQdsxA6ZiGpWsDIvIpRJLW0
-        ODc9t9hQrzgxt7g0L10vOT93EyMwjrYd+7l5B+O8Vx/1DjEycTAeYpTgYFYS4V1b3JAgxJuS
-        WFmVWpQfX1Sak1p8iNEU6P6JzFKiyfnASM4riTc0MzA1NDGzNDC1NDNWEufdOndNvJBAemJJ
-        anZqakFqEUwfEwenVANTfxzfQqmSsqlOD9cdWvDy1RnW3jttHO5O2138s+rE+6WzXHO9ZBf/
-        dn+womBKvf+ZD4l2j3eFr1EVUyub+cop/eJUw7vnH7O8mnf16IoP657KpVtPYmB7eclZTX15
-        9Wqmr2frWH62HHx6UHmHyAam/2yhTMEmPG94Vq7rZixjlfqeUWB8ftmll6kRez9v7Wwp/r17
-        o9TvTZ3WTKcjRWra/WJPNxhri25Xcr5+3M/D9gqj78S1nOd2r8tW0frgIuIXcemH9Mp7Gy+n
-        TI3tazRllVLeMqNc5Xm98B2OJL/swpJ3zwLbU6vaZ893nPDex70kIfyo9s2Ip++/iRqdfcK+
-        pvyW2LTOuQIpN/ZITM9WYinOSDTUYi4qTgQARlr7viwDAAA=
-X-CMS-MailID: 20210422101724eucas1p13e2f002b63fe94ef2aa5268383f3a207
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrEKsWRmVeSWpSXmKPExsWy7djP87ovgxoTDJ7+sLTYOGM9q0X3KxmL
+        jW9/MFncPLSC0WLT42usFvfv/WSyuLxrDpvFjPP7mCzWHrnLbrFgWx+jA5fHrIZeNo9tB1Q9
+        Ni+p9+jbsorRo+/lBkaPz5vkAtiiuGxSUnMyy1KL9O0SuDLuXs8paOSuWNDynLmBcQpnFyMn
+        h4SAicScJQ/Zuhi5OIQEVjBKnDl0mQnC+cIo8engHVYI5zOjxJb/s1lgWjouTWCHSCxnlHh7
+        cQtU/3NGiSs7HrCDVLEJOEr0Lz0B1i4iMIlJYuW8H4wgDrPAPkaJnfemMINUCQu4SrRPvsAE
+        YrMIqEqc3nYRrJtXwFriYddsVoh98hLty7ezQcQFJU7OfAJ2B7+AlsSaputgNjNQTfPW2cwQ
+        9Xc4JBY984ewXSR2Letig7CFJV4d38IOYctInJ7cA9TLAWTXS0yeZAZym4RAD6PEtjk/oP60
+        lrhz7hcbSA2zgKbE+l36EGFHiddLvzNBtPJJ3HgrCHEBn8SkbdOZIcK8Eh1tQhDVKhLr+vdA
+        DZSS6H21ghHC9pB4fLWdaQKj4iwkf81C8ssshL0LGJlXMYqnlhbnpqcWG+WllusVJ+YWl+al
+        6yXn525iBCaj0/+Of9nBuPzVR71DjEwcjIcYJTiYlUR41xY3JAjxpiRWVqUW5ccXleakFh9i
+        lOZgURLnTdqyJl5IID2xJDU7NbUgtQgmy8TBKdXApHSt4l2IkOnTVQ4NPR/a80rvWX50VEmr
+        3n7o/fN4zz8eUxIVNulMu37VVjN1nZp0/rQtQocXmR10W7LsQw2/rNEDGe9rGpda33uxvy1t
+        Y2vc6GIza47Zo8Sel2ntB/j5/ZgZ90sWit/9P9+5qa0z3mWJi5zLqodmPP2/9iUsypVOqqt3
+        fbX8rMW+yGZ3nl1vVMSfuN3Z7LPX2vdO2rnCJVduFB+2FHfczuzxT+XYhoIk99iM6YYtyUeu
+        3v9R+3q19Zyg6EueOZW30/6tniGenC+yMZMv2SFD+k5r+Im5hZXaBR8fSUZHi9x9w5fV/KzP
+        J0wzqPaRX3Lu6reLd4ZPybEJaHgtnST3w3aS4mMlluKMREMt5qLiRABYsBrVtQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprNIsWRmVeSWpSXmKPExsVy+t/xu7ovgxoTDK7947DYOGM9q0X3KxmL
+        jW9/MFncPLSC0WLT42usFvfv/WSyuLxrDpvFjPP7mCzWHrnLbrFgWx+jA5fHrIZeNo9tB1Q9
+        Ni+p9+jbsorRo+/lBkaPz5vkAtii9GyK8ktLUhUy8otLbJWiDS2M9AwtLfSMTCz1DI3NY62M
+        TJX07WxSUnMyy1KL9O0S9DLuXs8paOSuWNDynLmBcQpnFyMnh4SAiUTHpQnsXYxcHEICSxkl
+        tr4+xtrFyAGUkJJYOTcdokZY4s+1LjaImqeMEhO/3mAGSbAJOEr0Lz3BCpIQEZjGJHF22Skw
+        h1lgH6PE/qOL2UGqhAVcJdonX2ACsVkEVCVOb7sIFucVsJZ42DWbFWKFvET78u1sEHFBiZMz
+        n7CAXMEsoC6xfp4QSJhfQEtiTdN1FhCbGai8eets5gmMArOQdMxC6JiFpGoBI/MqRpHU0uLc
+        9NxiQ73ixNzi0rx0veT83E2MwFjaduzn5h2M81591DvEyMTBeIhRgoNZSYR3bXFDghBvSmJl
+        VWpRfnxRaU5q8SFGU6APJjJLiSbnA6M5ryTe0MzA1NDEzNLA1NLMWEmcd+vcNfFCAumJJanZ
+        qakFqUUwfUwcnFINTEGX1WxUw5uWBLw72ejAyeX2ddOpu4375As9HzL6/dgVvtZ5qdXiz+08
+        k7JE7nQqf8rPsy+evX65bHTY+pSmuPqQ5XMDV/J/ZNj1xlzqpSKnutmNp0dufnJTkQzd8EKg
+        1WuBz+nJvIufsLWK7vSS73jHUi/MzeN5zpI1f+nSRNcgnc6MUFMr/+XNepddjnQ6/V3U3zQ9
+        U21bT1bQ5mCmjAzbK3/ZVk4PPzEptvnkj4DHH92M7qZM+2lmPedp8/WeV5494RN5Z/U2+nHH
+        rG0ulPiSs91cTHi+wUfGV6dPXYrtn57scPUf7+rAxO+enjks39bwntBWiFX+PIlr4tyWJlf+
+        pRuK/VS5vUWLf59SYinOSDTUYi4qTgQARow6/i4DAAA=
+X-CMS-MailID: 20210422104145eucas1p17f46c95b72f3568761a9f7911bf072e1
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20210422101724eucas1p13e2f002b63fe94ef2aa5268383f3a207
+X-RootMTR: 20210422104145eucas1p17f46c95b72f3568761a9f7911bf072e1
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20210422101724eucas1p13e2f002b63fe94ef2aa5268383f3a207
-References: <CGME20210422101724eucas1p13e2f002b63fe94ef2aa5268383f3a207@eucas1p1.samsung.com>
+X-CMS-RootMailID: 20210422104145eucas1p17f46c95b72f3568761a9f7911bf072e1
+References: <CGME20210422104145eucas1p17f46c95b72f3568761a9f7911bf072e1@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -119,9 +118,11 @@ pm_runtime_get_sync() increments the runtime PM usage counter even
 the call returns an error code. Thus a pairing decrement is needed
 on the error handling path to keep the counter balanced.
 
-Change-Id: I028915fbee9e4a050a1313119872d6043696632d
 Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
 ---
+Changes in v2:
+  - removed Change-Id from the commit message
+
  drivers/char/hw_random/exynos-trng.c | 8 +++-----
  1 file changed, 3 insertions(+), 5 deletions(-)
 
