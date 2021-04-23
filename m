@@ -2,43 +2,39 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4DCFC433B4
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Apr 2021 11:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8561C43461
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Apr 2021 15:01:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E16D610E6
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Apr 2021 11:10:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8535461492
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Apr 2021 15:01:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbhDWLLW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Apr 2021 07:11:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54676 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229807AbhDWLLQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Apr 2021 07:11:16 -0400
-Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2368C061574;
-        Fri, 23 Apr 2021 04:10:38 -0700 (PDT)
+        id S243621AbhDWPCM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Apr 2021 11:02:12 -0400
+Received: from 8bytes.org ([81.169.241.247]:36064 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241174AbhDWPBo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Apr 2021 11:01:44 -0400
 Received: from cap.home.8bytes.org (p5b0069de.dip0.t-ipconnect.de [91.0.105.222])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 0A0EFF3;
-        Fri, 23 Apr 2021 13:10:36 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id C7A3C293;
+        Fri, 23 Apr 2021 17:01:05 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     Brijesh Singh <brijesh.singh@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         John Allen <john.allen@amd.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Joerg Roedel <joro@sev.home.8bytes.org>,
-        stable@vger.kernel.org, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH v2] crypto: ccp: Annotate SEV Firmware file names
-Date:   Fri, 23 Apr 2021 13:10:34 +0200
-Message-Id: <20210423111034.10997-1-joro@8bytes.org>
+        joro@8bytes.org, Joerg Roedel <jroedel@suse.de>,
+        stable@vger.kernel.org
+Subject: [PATCH v3] crypto: ccp: Annotate SEV Firmware file names
+Date:   Fri, 23 Apr 2021 17:00:52 +0200
+Message-Id: <20210423150052.25080-1-joro@8bytes.org>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -46,7 +42,7 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Joerg Roedel <joro@sev.home.8bytes.org>
+From: Joerg Roedel <jroedel@suse.de>
 
 Annotate the firmware files CCP might need using MODULE_FIRMWARE().
 This will get them included into an initrd when CCP is also included
@@ -58,21 +54,20 @@ support current SEV and SEV-ES virtualization features.
 Cc: stable@vger.kernel.org
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
-Resending with correct Signed-off-by.
-
- drivers/crypto/ccp/sev-dev.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/crypto/ccp/sev-dev.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index cb9b4c4e371e..9883e3afe10b 100644
+index cb9b4c4e371e..675ff925a59d 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -42,6 +42,9 @@ static int psp_probe_timeout = 5;
+@@ -42,6 +42,10 @@ static int psp_probe_timeout = 5;
  module_param(psp_probe_timeout, int, 0644);
  MODULE_PARM_DESC(psp_probe_timeout, " default timeout value, in seconds, during PSP device probe");
  
-+MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin");
-+MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin");
++MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
++MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
++MODULE_FIRMWARE("amd/amd_sev_fam19h_model0xh.sbin"); /* 3rd gen EPYC */
 +
  static bool psp_dead;
  static int psp_timeout;
