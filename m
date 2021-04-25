@@ -7,86 +7,5955 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 568F2C433B4
-	for <linux-crypto@archiver.kernel.org>; Sun, 25 Apr 2021 18:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA042C433ED
+	for <linux-crypto@archiver.kernel.org>; Sun, 25 Apr 2021 18:06:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 215406128B
-	for <linux-crypto@archiver.kernel.org>; Sun, 25 Apr 2021 18:06:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98CE861175
+	for <linux-crypto@archiver.kernel.org>; Sun, 25 Apr 2021 18:06:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230363AbhDYSGp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 25 Apr 2021 14:06:45 -0400
-Received: from condef-08.nifty.com ([202.248.20.73]:48047 "EHLO
-        condef-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230329AbhDYSGo (ORCPT
+        id S230459AbhDYSHA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 25 Apr 2021 14:07:00 -0400
+Received: from condef-01.nifty.com ([202.248.20.66]:61803 "EHLO
+        condef-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230329AbhDYSHA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 25 Apr 2021 14:06:44 -0400
-X-Greylist: delayed 318 seconds by postgrey-1.27 at vger.kernel.org; Sun, 25 Apr 2021 14:06:44 EDT
-Received: from conuserg-08.nifty.com ([10.126.8.71])by condef-08.nifty.com with ESMTP id 13PHwVWr023010
-        for <linux-crypto@vger.kernel.org>; Mon, 26 Apr 2021 02:58:31 +0900
+        Sun, 25 Apr 2021 14:07:00 -0400
+Received: from conuserg-08.nifty.com ([10.126.8.71])by condef-01.nifty.com with ESMTP id 13PHwtCr008388
+        for <linux-crypto@vger.kernel.org>; Mon, 26 Apr 2021 02:58:55 +0900
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 13PHvbLV030691;
-        Mon, 26 Apr 2021 02:57:40 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 13PHvbLV030691
+        by conuserg-08.nifty.com with ESMTP id 13PHvbLS030691;
+        Mon, 26 Apr 2021 02:57:38 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 13PHvbLS030691
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1619373460;
-        bh=WPMOAoetHlwoC77DEFN4ntrJF0d2o3QlqMB4lX6w80Y=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yXej5X7WPmbCm/83/+2lzCQeh8tYn71hXSnL1bcHlvM7I9c/cErIXneg6Dzq6oLz8
-         XEpriLl3qdwyNMAKuLnBfe2uvkytSW0opskUGhoWUJFmu6JTdd1x+fhVLe2jn3DlGd
-         6Ya6Q64AFvknRo1yaa5WU5J6PrHCx7bv4+u244Ptv7haSzlmXO5x+6Gpu0zVGLQuIO
-         7Ijd+m2BuiL/I04XYnpBrOoVQetdNPBaekURgmERTs4mNsJiUYK0WlMX3y5jO2i97S
-         k9WMImPaQo3LFuvSW7PODAEG6haCAQLU88t/VkfB3SFupl5F8sjHjrut1Qqr0aYcgU
-         1A4kgwO01TSyg==
+        s=dec2015msa; t=1619373458;
+        bh=Ur8OvGMXEH3va7L+KUVKFP2rWvxMB12uUikE2wHzSUM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=LxafqL5rSWPgclc026dypB/qV74r4gaBoAPwsLSMKRQmMHaoGl8IztP/GqWAvf1ZS
+         7cnmzCVkRya3eOW4kUl1Y88uLyJGDU4V84zUbXhJ27uF4YkSd3hFdBRawohoVf6nfm
+         NVOivpCL2YTH8mRSENhKuXvRworuFq9NbpjYYQY6XtE3OHsdoJ+Fwzo7JeLOuuY8m3
+         UPjnS03KtWHJHzPqPzk1bgbb0mIRaE6K2t3PKionbRXdscHOD5IH1BmYgwqTzkESEK
+         T7M8Lq+nn5zusfg69uriYVMRCPpZIfmnC/Ft+K6nz0KURTGv64LWASo0OOOTclfLsv
+         o5TA79MaXP8Lg==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] crypto: arm64: use a pattern rule for generating *.S files
-Date:   Mon, 26 Apr 2021 02:57:34 +0900
-Message-Id: <20210425175734.1310191-4-masahiroy@kernel.org>
+Subject: [PATCH 1/4] crypto: arm: generate *.S by Perl at build time instead of shipping them
+Date:   Mon, 26 Apr 2021 02:57:31 +0900
+Message-Id: <20210425175734.1310191-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210425175734.1310191-1-masahiroy@kernel.org>
-References: <20210425175734.1310191-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Unify similar build rules.
-
-sha256-core.S opts out it because it is generated from sha512-armv8.pl.
+Generate *.S by Perl like arch/{mips,x86}/crypto/Makefile.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- arch/arm64/crypto/Makefile | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ arch/arm/crypto/Makefile                |    8 +-
+ arch/arm/crypto/poly1305-core.S_shipped | 1158 ----------
+ arch/arm/crypto/sha256-core.S_shipped   | 2816 -----------------------
+ arch/arm/crypto/sha512-core.S_shipped   | 1869 ---------------
+ 4 files changed, 3 insertions(+), 5848 deletions(-)
+ delete mode 100644 arch/arm/crypto/poly1305-core.S_shipped
+ delete mode 100644 arch/arm/crypto/sha256-core.S_shipped
+ delete mode 100644 arch/arm/crypto/sha512-core.S_shipped
 
-diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-index 592e52a08c62..09a805cc32d7 100644
---- a/arch/arm64/crypto/Makefile
-+++ b/arch/arm64/crypto/Makefile
-@@ -71,13 +71,10 @@ $(obj)/aes-glue-%.o: $(src)/aes-glue.c FORCE
- quiet_cmd_perlasm = PERLASM $@
-       cmd_perlasm = $(PERL) $(<) void $(@)
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index 8f26c454ea12..51f160c61740 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -45,19 +45,17 @@ poly1305-arm-y := poly1305-core.o poly1305-glue.o
+ nhpoly1305-neon-y := nh-neon-core.o nhpoly1305-neon-glue.o
+ curve25519-neon-y := curve25519-core.o curve25519-glue.o
  
--$(obj)/poly1305-core.S: $(src)/poly1305-armv8.pl
-+$(obj)/%-core.S: $(src)/%-armv8.pl
- 	$(call cmd,perlasm)
+-ifdef REGENERATE_ARM_CRYPTO
+ quiet_cmd_perl = PERL    $@
+       cmd_perl = $(PERL) $(<) > $(@)
  
- $(obj)/sha256-core.S: $(src)/sha512-armv8.pl
- 	$(call cmd,perlasm)
+-$(src)/poly1305-core.S_shipped: $(src)/poly1305-armv4.pl
++$(obj)/poly1305-core.S: $(src)/poly1305-armv4.pl
+ 	$(call cmd,perl)
  
--$(obj)/sha512-core.S: $(src)/sha512-armv8.pl
--	$(call cmd,perlasm)
--
+-$(src)/sha256-core.S_shipped: $(src)/sha256-armv4.pl
++$(obj)/sha256-core.S: $(src)/sha256-armv4.pl
+ 	$(call cmd,perl)
+ 
+-$(src)/sha512-core.S_shipped: $(src)/sha512-armv4.pl
++$(obj)/sha512-core.S: $(src)/sha512-armv4.pl
+ 	$(call cmd,perl)
+-endif
+ 
  clean-files += poly1305-core.S sha256-core.S sha512-core.S
+ 
+diff --git a/arch/arm/crypto/poly1305-core.S_shipped b/arch/arm/crypto/poly1305-core.S_shipped
+deleted file mode 100644
+index 37b71d990293..000000000000
+--- a/arch/arm/crypto/poly1305-core.S_shipped
++++ /dev/null
+@@ -1,1158 +0,0 @@
+-#ifndef	__KERNEL__
+-# include "arm_arch.h"
+-#else
+-# define __ARM_ARCH__ __LINUX_ARM_ARCH__
+-# define __ARM_MAX_ARCH__ __LINUX_ARM_ARCH__
+-# define poly1305_init   poly1305_init_arm
+-# define poly1305_blocks poly1305_blocks_arm
+-# define poly1305_emit   poly1305_emit_arm
+-.globl	poly1305_blocks_neon
+-#endif
+-
+-#if defined(__thumb2__)
+-.syntax	unified
+-.thumb
+-#else
+-.code	32
+-#endif
+-
+-.text
+-
+-.globl	poly1305_emit
+-.globl	poly1305_blocks
+-.globl	poly1305_init
+-.type	poly1305_init,%function
+-.align	5
+-poly1305_init:
+-.Lpoly1305_init:
+-	stmdb	sp!,{r4-r11}
+-
+-	eor	r3,r3,r3
+-	cmp	r1,#0
+-	str	r3,[r0,#0]		@ zero hash value
+-	str	r3,[r0,#4]
+-	str	r3,[r0,#8]
+-	str	r3,[r0,#12]
+-	str	r3,[r0,#16]
+-	str	r3,[r0,#36]		@ clear is_base2_26
+-	add	r0,r0,#20
+-
+-#ifdef	__thumb2__
+-	it	eq
+-#endif
+-	moveq	r0,#0
+-	beq	.Lno_key
+-
+-#if	__ARM_MAX_ARCH__>=7
+-	mov	r3,#-1
+-	str	r3,[r0,#28]		@ impossible key power value
+-# ifndef __KERNEL__
+-	adr	r11,.Lpoly1305_init
+-	ldr	r12,.LOPENSSL_armcap
+-# endif
+-#endif
+-	ldrb	r4,[r1,#0]
+-	mov	r10,#0x0fffffff
+-	ldrb	r5,[r1,#1]
+-	and	r3,r10,#-4		@ 0x0ffffffc
+-	ldrb	r6,[r1,#2]
+-	ldrb	r7,[r1,#3]
+-	orr	r4,r4,r5,lsl#8
+-	ldrb	r5,[r1,#4]
+-	orr	r4,r4,r6,lsl#16
+-	ldrb	r6,[r1,#5]
+-	orr	r4,r4,r7,lsl#24
+-	ldrb	r7,[r1,#6]
+-	and	r4,r4,r10
+-
+-#if	__ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+-# if !defined(_WIN32)
+-	ldr	r12,[r11,r12]		@ OPENSSL_armcap_P
+-# endif
+-# if defined(__APPLE__) || defined(_WIN32)
+-	ldr	r12,[r12]
+-# endif
+-#endif
+-	ldrb	r8,[r1,#7]
+-	orr	r5,r5,r6,lsl#8
+-	ldrb	r6,[r1,#8]
+-	orr	r5,r5,r7,lsl#16
+-	ldrb	r7,[r1,#9]
+-	orr	r5,r5,r8,lsl#24
+-	ldrb	r8,[r1,#10]
+-	and	r5,r5,r3
+-
+-#if	__ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+-	tst	r12,#ARMV7_NEON		@ check for NEON
+-# ifdef	__thumb2__
+-	adr	r9,.Lpoly1305_blocks_neon
+-	adr	r11,.Lpoly1305_blocks
+-	it	ne
+-	movne	r11,r9
+-	adr	r12,.Lpoly1305_emit
+-	orr	r11,r11,#1		@ thumb-ify addresses
+-	orr	r12,r12,#1
+-# else
+-	add	r12,r11,#(.Lpoly1305_emit-.Lpoly1305_init)
+-	ite	eq
+-	addeq	r11,r11,#(.Lpoly1305_blocks-.Lpoly1305_init)
+-	addne	r11,r11,#(.Lpoly1305_blocks_neon-.Lpoly1305_init)
+-# endif
+-#endif
+-	ldrb	r9,[r1,#11]
+-	orr	r6,r6,r7,lsl#8
+-	ldrb	r7,[r1,#12]
+-	orr	r6,r6,r8,lsl#16
+-	ldrb	r8,[r1,#13]
+-	orr	r6,r6,r9,lsl#24
+-	ldrb	r9,[r1,#14]
+-	and	r6,r6,r3
+-
+-	ldrb	r10,[r1,#15]
+-	orr	r7,r7,r8,lsl#8
+-	str	r4,[r0,#0]
+-	orr	r7,r7,r9,lsl#16
+-	str	r5,[r0,#4]
+-	orr	r7,r7,r10,lsl#24
+-	str	r6,[r0,#8]
+-	and	r7,r7,r3
+-	str	r7,[r0,#12]
+-#if	__ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+-	stmia	r2,{r11,r12}		@ fill functions table
+-	mov	r0,#1
+-#else
+-	mov	r0,#0
+-#endif
+-.Lno_key:
+-	ldmia	sp!,{r4-r11}
+-#if	__ARM_ARCH__>=5
+-	bx	lr				@ bx	lr
+-#else
+-	tst	lr,#1
+-	moveq	pc,lr			@ be binary compatible with V4, yet
+-	.word	0xe12fff1e			@ interoperable with Thumb ISA:-)
+-#endif
+-.size	poly1305_init,.-poly1305_init
+-.type	poly1305_blocks,%function
+-.align	5
+-poly1305_blocks:
+-.Lpoly1305_blocks:
+-	stmdb	sp!,{r3-r11,lr}
+-
+-	ands	r2,r2,#-16
+-	beq	.Lno_data
+-
+-	add	r2,r2,r1		@ end pointer
+-	sub	sp,sp,#32
+-
+-#if __ARM_ARCH__<7
+-	ldmia	r0,{r4-r12}		@ load context
+-	add	r0,r0,#20
+-	str	r2,[sp,#16]		@ offload stuff
+-	str	r0,[sp,#12]
+-#else
+-	ldr	lr,[r0,#36]		@ is_base2_26
+-	ldmia	r0!,{r4-r8}		@ load hash value
+-	str	r2,[sp,#16]		@ offload stuff
+-	str	r0,[sp,#12]
+-
+-	adds	r9,r4,r5,lsl#26	@ base 2^26 -> base 2^32
+-	mov	r10,r5,lsr#6
+-	adcs	r10,r10,r6,lsl#20
+-	mov	r11,r6,lsr#12
+-	adcs	r11,r11,r7,lsl#14
+-	mov	r12,r7,lsr#18
+-	adcs	r12,r12,r8,lsl#8
+-	mov	r2,#0
+-	teq	lr,#0
+-	str	r2,[r0,#16]		@ clear is_base2_26
+-	adc	r2,r2,r8,lsr#24
+-
+-	itttt	ne
+-	movne	r4,r9			@ choose between radixes
+-	movne	r5,r10
+-	movne	r6,r11
+-	movne	r7,r12
+-	ldmia	r0,{r9-r12}		@ load key
+-	it	ne
+-	movne	r8,r2
+-#endif
+-
+-	mov	lr,r1
+-	cmp	r3,#0
+-	str	r10,[sp,#20]
+-	str	r11,[sp,#24]
+-	str	r12,[sp,#28]
+-	b	.Loop
+-
+-.align	4
+-.Loop:
+-#if __ARM_ARCH__<7
+-	ldrb	r0,[lr],#16		@ load input
+-# ifdef	__thumb2__
+-	it	hi
+-# endif
+-	addhi	r8,r8,#1		@ 1<<128
+-	ldrb	r1,[lr,#-15]
+-	ldrb	r2,[lr,#-14]
+-	ldrb	r3,[lr,#-13]
+-	orr	r1,r0,r1,lsl#8
+-	ldrb	r0,[lr,#-12]
+-	orr	r2,r1,r2,lsl#16
+-	ldrb	r1,[lr,#-11]
+-	orr	r3,r2,r3,lsl#24
+-	ldrb	r2,[lr,#-10]
+-	adds	r4,r4,r3		@ accumulate input
+-
+-	ldrb	r3,[lr,#-9]
+-	orr	r1,r0,r1,lsl#8
+-	ldrb	r0,[lr,#-8]
+-	orr	r2,r1,r2,lsl#16
+-	ldrb	r1,[lr,#-7]
+-	orr	r3,r2,r3,lsl#24
+-	ldrb	r2,[lr,#-6]
+-	adcs	r5,r5,r3
+-
+-	ldrb	r3,[lr,#-5]
+-	orr	r1,r0,r1,lsl#8
+-	ldrb	r0,[lr,#-4]
+-	orr	r2,r1,r2,lsl#16
+-	ldrb	r1,[lr,#-3]
+-	orr	r3,r2,r3,lsl#24
+-	ldrb	r2,[lr,#-2]
+-	adcs	r6,r6,r3
+-
+-	ldrb	r3,[lr,#-1]
+-	orr	r1,r0,r1,lsl#8
+-	str	lr,[sp,#8]		@ offload input pointer
+-	orr	r2,r1,r2,lsl#16
+-	add	r10,r10,r10,lsr#2
+-	orr	r3,r2,r3,lsl#24
+-#else
+-	ldr	r0,[lr],#16		@ load input
+-	it	hi
+-	addhi	r8,r8,#1		@ padbit
+-	ldr	r1,[lr,#-12]
+-	ldr	r2,[lr,#-8]
+-	ldr	r3,[lr,#-4]
+-# ifdef	__ARMEB__
+-	rev	r0,r0
+-	rev	r1,r1
+-	rev	r2,r2
+-	rev	r3,r3
+-# endif
+-	adds	r4,r4,r0		@ accumulate input
+-	str	lr,[sp,#8]		@ offload input pointer
+-	adcs	r5,r5,r1
+-	add	r10,r10,r10,lsr#2
+-	adcs	r6,r6,r2
+-#endif
+-	add	r11,r11,r11,lsr#2
+-	adcs	r7,r7,r3
+-	add	r12,r12,r12,lsr#2
+-
+-	umull	r2,r3,r5,r9
+-	 adc	r8,r8,#0
+-	umull	r0,r1,r4,r9
+-	umlal	r2,r3,r8,r10
+-	umlal	r0,r1,r7,r10
+-	ldr	r10,[sp,#20]		@ reload r10
+-	umlal	r2,r3,r6,r12
+-	umlal	r0,r1,r5,r12
+-	umlal	r2,r3,r7,r11
+-	umlal	r0,r1,r6,r11
+-	umlal	r2,r3,r4,r10
+-	str	r0,[sp,#0]		@ future r4
+-	 mul	r0,r11,r8
+-	ldr	r11,[sp,#24]		@ reload r11
+-	adds	r2,r2,r1		@ d1+=d0>>32
+-	 eor	r1,r1,r1
+-	adc	lr,r3,#0		@ future r6
+-	str	r2,[sp,#4]		@ future r5
+-
+-	mul	r2,r12,r8
+-	eor	r3,r3,r3
+-	umlal	r0,r1,r7,r12
+-	ldr	r12,[sp,#28]		@ reload r12
+-	umlal	r2,r3,r7,r9
+-	umlal	r0,r1,r6,r9
+-	umlal	r2,r3,r6,r10
+-	umlal	r0,r1,r5,r10
+-	umlal	r2,r3,r5,r11
+-	umlal	r0,r1,r4,r11
+-	umlal	r2,r3,r4,r12
+-	ldr	r4,[sp,#0]
+-	mul	r8,r9,r8
+-	ldr	r5,[sp,#4]
+-
+-	adds	r6,lr,r0		@ d2+=d1>>32
+-	ldr	lr,[sp,#8]		@ reload input pointer
+-	adc	r1,r1,#0
+-	adds	r7,r2,r1		@ d3+=d2>>32
+-	ldr	r0,[sp,#16]		@ reload end pointer
+-	adc	r3,r3,#0
+-	add	r8,r8,r3		@ h4+=d3>>32
+-
+-	and	r1,r8,#-4
+-	and	r8,r8,#3
+-	add	r1,r1,r1,lsr#2		@ *=5
+-	adds	r4,r4,r1
+-	adcs	r5,r5,#0
+-	adcs	r6,r6,#0
+-	adcs	r7,r7,#0
+-	adc	r8,r8,#0
+-
+-	cmp	r0,lr			@ done yet?
+-	bhi	.Loop
+-
+-	ldr	r0,[sp,#12]
+-	add	sp,sp,#32
+-	stmdb	r0,{r4-r8}		@ store the result
+-
+-.Lno_data:
+-#if	__ARM_ARCH__>=5
+-	ldmia	sp!,{r3-r11,pc}
+-#else
+-	ldmia	sp!,{r3-r11,lr}
+-	tst	lr,#1
+-	moveq	pc,lr			@ be binary compatible with V4, yet
+-	.word	0xe12fff1e			@ interoperable with Thumb ISA:-)
+-#endif
+-.size	poly1305_blocks,.-poly1305_blocks
+-.type	poly1305_emit,%function
+-.align	5
+-poly1305_emit:
+-.Lpoly1305_emit:
+-	stmdb	sp!,{r4-r11}
+-
+-	ldmia	r0,{r3-r7}
+-
+-#if __ARM_ARCH__>=7
+-	ldr	ip,[r0,#36]		@ is_base2_26
+-
+-	adds	r8,r3,r4,lsl#26	@ base 2^26 -> base 2^32
+-	mov	r9,r4,lsr#6
+-	adcs	r9,r9,r5,lsl#20
+-	mov	r10,r5,lsr#12
+-	adcs	r10,r10,r6,lsl#14
+-	mov	r11,r6,lsr#18
+-	adcs	r11,r11,r7,lsl#8
+-	mov	r0,#0
+-	adc	r0,r0,r7,lsr#24
+-
+-	tst	ip,ip
+-	itttt	ne
+-	movne	r3,r8
+-	movne	r4,r9
+-	movne	r5,r10
+-	movne	r6,r11
+-	it	ne
+-	movne	r7,r0
+-#endif
+-
+-	adds	r8,r3,#5		@ compare to modulus
+-	adcs	r9,r4,#0
+-	adcs	r10,r5,#0
+-	adcs	r11,r6,#0
+-	adc	r0,r7,#0
+-	tst	r0,#4			@ did it carry/borrow?
+-
+-#ifdef	__thumb2__
+-	it	ne
+-#endif
+-	movne	r3,r8
+-	ldr	r8,[r2,#0]
+-#ifdef	__thumb2__
+-	it	ne
+-#endif
+-	movne	r4,r9
+-	ldr	r9,[r2,#4]
+-#ifdef	__thumb2__
+-	it	ne
+-#endif
+-	movne	r5,r10
+-	ldr	r10,[r2,#8]
+-#ifdef	__thumb2__
+-	it	ne
+-#endif
+-	movne	r6,r11
+-	ldr	r11,[r2,#12]
+-
+-	adds	r3,r3,r8
+-	adcs	r4,r4,r9
+-	adcs	r5,r5,r10
+-	adc	r6,r6,r11
+-
+-#if __ARM_ARCH__>=7
+-# ifdef __ARMEB__
+-	rev	r3,r3
+-	rev	r4,r4
+-	rev	r5,r5
+-	rev	r6,r6
+-# endif
+-	str	r3,[r1,#0]
+-	str	r4,[r1,#4]
+-	str	r5,[r1,#8]
+-	str	r6,[r1,#12]
+-#else
+-	strb	r3,[r1,#0]
+-	mov	r3,r3,lsr#8
+-	strb	r4,[r1,#4]
+-	mov	r4,r4,lsr#8
+-	strb	r5,[r1,#8]
+-	mov	r5,r5,lsr#8
+-	strb	r6,[r1,#12]
+-	mov	r6,r6,lsr#8
+-
+-	strb	r3,[r1,#1]
+-	mov	r3,r3,lsr#8
+-	strb	r4,[r1,#5]
+-	mov	r4,r4,lsr#8
+-	strb	r5,[r1,#9]
+-	mov	r5,r5,lsr#8
+-	strb	r6,[r1,#13]
+-	mov	r6,r6,lsr#8
+-
+-	strb	r3,[r1,#2]
+-	mov	r3,r3,lsr#8
+-	strb	r4,[r1,#6]
+-	mov	r4,r4,lsr#8
+-	strb	r5,[r1,#10]
+-	mov	r5,r5,lsr#8
+-	strb	r6,[r1,#14]
+-	mov	r6,r6,lsr#8
+-
+-	strb	r3,[r1,#3]
+-	strb	r4,[r1,#7]
+-	strb	r5,[r1,#11]
+-	strb	r6,[r1,#15]
+-#endif
+-	ldmia	sp!,{r4-r11}
+-#if	__ARM_ARCH__>=5
+-	bx	lr				@ bx	lr
+-#else
+-	tst	lr,#1
+-	moveq	pc,lr			@ be binary compatible with V4, yet
+-	.word	0xe12fff1e			@ interoperable with Thumb ISA:-)
+-#endif
+-.size	poly1305_emit,.-poly1305_emit
+-#if	__ARM_MAX_ARCH__>=7
+-.fpu	neon
+-
+-.type	poly1305_init_neon,%function
+-.align	5
+-poly1305_init_neon:
+-.Lpoly1305_init_neon:
+-	ldr	r3,[r0,#48]		@ first table element
+-	cmp	r3,#-1			@ is value impossible?
+-	bne	.Lno_init_neon
+-
+-	ldr	r4,[r0,#20]		@ load key base 2^32
+-	ldr	r5,[r0,#24]
+-	ldr	r6,[r0,#28]
+-	ldr	r7,[r0,#32]
+-
+-	and	r2,r4,#0x03ffffff	@ base 2^32 -> base 2^26
+-	mov	r3,r4,lsr#26
+-	mov	r4,r5,lsr#20
+-	orr	r3,r3,r5,lsl#6
+-	mov	r5,r6,lsr#14
+-	orr	r4,r4,r6,lsl#12
+-	mov	r6,r7,lsr#8
+-	orr	r5,r5,r7,lsl#18
+-	and	r3,r3,#0x03ffffff
+-	and	r4,r4,#0x03ffffff
+-	and	r5,r5,#0x03ffffff
+-
+-	vdup.32	d0,r2			@ r^1 in both lanes
+-	add	r2,r3,r3,lsl#2		@ *5
+-	vdup.32	d1,r3
+-	add	r3,r4,r4,lsl#2
+-	vdup.32	d2,r2
+-	vdup.32	d3,r4
+-	add	r4,r5,r5,lsl#2
+-	vdup.32	d4,r3
+-	vdup.32	d5,r5
+-	add	r5,r6,r6,lsl#2
+-	vdup.32	d6,r4
+-	vdup.32	d7,r6
+-	vdup.32	d8,r5
+-
+-	mov	r5,#2		@ counter
+-
+-.Lsquare_neon:
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ d0 = h0*r0 + h4*5*r1 + h3*5*r2 + h2*5*r3 + h1*5*r4
+-	@ d1 = h1*r0 + h0*r1   + h4*5*r2 + h3*5*r3 + h2*5*r4
+-	@ d2 = h2*r0 + h1*r1   + h0*r2   + h4*5*r3 + h3*5*r4
+-	@ d3 = h3*r0 + h2*r1   + h1*r2   + h0*r3   + h4*5*r4
+-	@ d4 = h4*r0 + h3*r1   + h2*r2   + h1*r3   + h0*r4
+-
+-	vmull.u32	q5,d0,d0[1]
+-	vmull.u32	q6,d1,d0[1]
+-	vmull.u32	q7,d3,d0[1]
+-	vmull.u32	q8,d5,d0[1]
+-	vmull.u32	q9,d7,d0[1]
+-
+-	vmlal.u32	q5,d7,d2[1]
+-	vmlal.u32	q6,d0,d1[1]
+-	vmlal.u32	q7,d1,d1[1]
+-	vmlal.u32	q8,d3,d1[1]
+-	vmlal.u32	q9,d5,d1[1]
+-
+-	vmlal.u32	q5,d5,d4[1]
+-	vmlal.u32	q6,d7,d4[1]
+-	vmlal.u32	q8,d1,d3[1]
+-	vmlal.u32	q7,d0,d3[1]
+-	vmlal.u32	q9,d3,d3[1]
+-
+-	vmlal.u32	q5,d3,d6[1]
+-	vmlal.u32	q8,d0,d5[1]
+-	vmlal.u32	q6,d5,d6[1]
+-	vmlal.u32	q7,d7,d6[1]
+-	vmlal.u32	q9,d1,d5[1]
+-
+-	vmlal.u32	q8,d7,d8[1]
+-	vmlal.u32	q5,d1,d8[1]
+-	vmlal.u32	q6,d3,d8[1]
+-	vmlal.u32	q7,d5,d8[1]
+-	vmlal.u32	q9,d0,d7[1]
+-
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ lazy reduction as discussed in "NEON crypto" by D.J. Bernstein
+-	@ and P. Schwabe
+-	@
+-	@ H0>>+H1>>+H2>>+H3>>+H4
+-	@ H3>>+H4>>*5+H0>>+H1
+-	@
+-	@ Trivia.
+-	@
+-	@ Result of multiplication of n-bit number by m-bit number is
+-	@ n+m bits wide. However! Even though 2^n is a n+1-bit number,
+-	@ m-bit number multiplied by 2^n is still n+m bits wide.
+-	@
+-	@ Sum of two n-bit numbers is n+1 bits wide, sum of three - n+2,
+-	@ and so is sum of four. Sum of 2^m n-m-bit numbers and n-bit
+-	@ one is n+1 bits wide.
+-	@
+-	@ >>+ denotes Hnext += Hn>>26, Hn &= 0x3ffffff. This means that
+-	@ H0, H2, H3 are guaranteed to be 26 bits wide, while H1 and H4
+-	@ can be 27. However! In cases when their width exceeds 26 bits
+-	@ they are limited by 2^26+2^6. This in turn means that *sum*
+-	@ of the products with these values can still be viewed as sum
+-	@ of 52-bit numbers as long as the amount of addends is not a
+-	@ power of 2. For example,
+-	@
+-	@ H4 = H4*R0 + H3*R1 + H2*R2 + H1*R3 + H0 * R4,
+-	@
+-	@ which can't be larger than 5 * (2^26 + 2^6) * (2^26 + 2^6), or
+-	@ 5 * (2^52 + 2*2^32 + 2^12), which in turn is smaller than
+-	@ 8 * (2^52) or 2^55. However, the value is then multiplied by
+-	@ by 5, so we should be looking at 5 * 5 * (2^52 + 2^33 + 2^12),
+-	@ which is less than 32 * (2^52) or 2^57. And when processing
+-	@ data we are looking at triple as many addends...
+-	@
+-	@ In key setup procedure pre-reduced H0 is limited by 5*4+1 and
+-	@ 5*H4 - by 5*5 52-bit addends, or 57 bits. But when hashing the
+-	@ input H0 is limited by (5*4+1)*3 addends, or 58 bits, while
+-	@ 5*H4 by 5*5*3, or 59[!] bits. How is this relevant? vmlal.u32
+-	@ instruction accepts 2x32-bit input and writes 2x64-bit result.
+-	@ This means that result of reduction have to be compressed upon
+-	@ loop wrap-around. This can be done in the process of reduction
+-	@ to minimize amount of instructions [as well as amount of
+-	@ 128-bit instructions, which benefits low-end processors], but
+-	@ one has to watch for H2 (which is narrower than H0) and 5*H4
+-	@ not being wider than 58 bits, so that result of right shift
+-	@ by 26 bits fits in 32 bits. This is also useful on x86,
+-	@ because it allows to use paddd in place for paddq, which
+-	@ benefits Atom, where paddq is ridiculously slow.
+-
+-	vshr.u64	q15,q8,#26
+-	vmovn.i64	d16,q8
+-	 vshr.u64	q4,q5,#26
+-	 vmovn.i64	d10,q5
+-	vadd.i64	q9,q9,q15		@ h3 -> h4
+-	vbic.i32	d16,#0xfc000000	@ &=0x03ffffff
+-	 vadd.i64	q6,q6,q4		@ h0 -> h1
+-	 vbic.i32	d10,#0xfc000000
+-
+-	vshrn.u64	d30,q9,#26
+-	vmovn.i64	d18,q9
+-	 vshr.u64	q4,q6,#26
+-	 vmovn.i64	d12,q6
+-	 vadd.i64	q7,q7,q4		@ h1 -> h2
+-	vbic.i32	d18,#0xfc000000
+-	 vbic.i32	d12,#0xfc000000
+-
+-	vadd.i32	d10,d10,d30
+-	vshl.u32	d30,d30,#2
+-	 vshrn.u64	d8,q7,#26
+-	 vmovn.i64	d14,q7
+-	vadd.i32	d10,d10,d30	@ h4 -> h0
+-	 vadd.i32	d16,d16,d8	@ h2 -> h3
+-	 vbic.i32	d14,#0xfc000000
+-
+-	vshr.u32	d30,d10,#26
+-	vbic.i32	d10,#0xfc000000
+-	 vshr.u32	d8,d16,#26
+-	 vbic.i32	d16,#0xfc000000
+-	vadd.i32	d12,d12,d30	@ h0 -> h1
+-	 vadd.i32	d18,d18,d8	@ h3 -> h4
+-
+-	subs		r5,r5,#1
+-	beq		.Lsquare_break_neon
+-
+-	add		r6,r0,#(48+0*9*4)
+-	add		r7,r0,#(48+1*9*4)
+-
+-	vtrn.32		d0,d10		@ r^2:r^1
+-	vtrn.32		d3,d14
+-	vtrn.32		d5,d16
+-	vtrn.32		d1,d12
+-	vtrn.32		d7,d18
+-
+-	vshl.u32	d4,d3,#2		@ *5
+-	vshl.u32	d6,d5,#2
+-	vshl.u32	d2,d1,#2
+-	vshl.u32	d8,d7,#2
+-	vadd.i32	d4,d4,d3
+-	vadd.i32	d2,d2,d1
+-	vadd.i32	d6,d6,d5
+-	vadd.i32	d8,d8,d7
+-
+-	vst4.32		{d0[0],d1[0],d2[0],d3[0]},[r6]!
+-	vst4.32		{d0[1],d1[1],d2[1],d3[1]},[r7]!
+-	vst4.32		{d4[0],d5[0],d6[0],d7[0]},[r6]!
+-	vst4.32		{d4[1],d5[1],d6[1],d7[1]},[r7]!
+-	vst1.32		{d8[0]},[r6,:32]
+-	vst1.32		{d8[1]},[r7,:32]
+-
+-	b		.Lsquare_neon
+-
+-.align	4
+-.Lsquare_break_neon:
+-	add		r6,r0,#(48+2*4*9)
+-	add		r7,r0,#(48+3*4*9)
+-
+-	vmov		d0,d10		@ r^4:r^3
+-	vshl.u32	d2,d12,#2		@ *5
+-	vmov		d1,d12
+-	vshl.u32	d4,d14,#2
+-	vmov		d3,d14
+-	vshl.u32	d6,d16,#2
+-	vmov		d5,d16
+-	vshl.u32	d8,d18,#2
+-	vmov		d7,d18
+-	vadd.i32	d2,d2,d12
+-	vadd.i32	d4,d4,d14
+-	vadd.i32	d6,d6,d16
+-	vadd.i32	d8,d8,d18
+-
+-	vst4.32		{d0[0],d1[0],d2[0],d3[0]},[r6]!
+-	vst4.32		{d0[1],d1[1],d2[1],d3[1]},[r7]!
+-	vst4.32		{d4[0],d5[0],d6[0],d7[0]},[r6]!
+-	vst4.32		{d4[1],d5[1],d6[1],d7[1]},[r7]!
+-	vst1.32		{d8[0]},[r6]
+-	vst1.32		{d8[1]},[r7]
+-
+-.Lno_init_neon:
+-	bx	lr				@ bx	lr
+-.size	poly1305_init_neon,.-poly1305_init_neon
+-
+-.type	poly1305_blocks_neon,%function
+-.align	5
+-poly1305_blocks_neon:
+-.Lpoly1305_blocks_neon:
+-	ldr	ip,[r0,#36]		@ is_base2_26
+-
+-	cmp	r2,#64
+-	blo	.Lpoly1305_blocks
+-
+-	stmdb	sp!,{r4-r7}
+-	vstmdb	sp!,{d8-d15}		@ ABI specification says so
+-
+-	tst	ip,ip			@ is_base2_26?
+-	bne	.Lbase2_26_neon
+-
+-	stmdb	sp!,{r1-r3,lr}
+-	bl	.Lpoly1305_init_neon
+-
+-	ldr	r4,[r0,#0]		@ load hash value base 2^32
+-	ldr	r5,[r0,#4]
+-	ldr	r6,[r0,#8]
+-	ldr	r7,[r0,#12]
+-	ldr	ip,[r0,#16]
+-
+-	and	r2,r4,#0x03ffffff	@ base 2^32 -> base 2^26
+-	mov	r3,r4,lsr#26
+-	 veor	d10,d10,d10
+-	mov	r4,r5,lsr#20
+-	orr	r3,r3,r5,lsl#6
+-	 veor	d12,d12,d12
+-	mov	r5,r6,lsr#14
+-	orr	r4,r4,r6,lsl#12
+-	 veor	d14,d14,d14
+-	mov	r6,r7,lsr#8
+-	orr	r5,r5,r7,lsl#18
+-	 veor	d16,d16,d16
+-	and	r3,r3,#0x03ffffff
+-	orr	r6,r6,ip,lsl#24
+-	 veor	d18,d18,d18
+-	and	r4,r4,#0x03ffffff
+-	mov	r1,#1
+-	and	r5,r5,#0x03ffffff
+-	str	r1,[r0,#36]		@ set is_base2_26
+-
+-	vmov.32	d10[0],r2
+-	vmov.32	d12[0],r3
+-	vmov.32	d14[0],r4
+-	vmov.32	d16[0],r5
+-	vmov.32	d18[0],r6
+-	adr	r5,.Lzeros
+-
+-	ldmia	sp!,{r1-r3,lr}
+-	b	.Lhash_loaded
+-
+-.align	4
+-.Lbase2_26_neon:
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ load hash value
+-
+-	veor		d10,d10,d10
+-	veor		d12,d12,d12
+-	veor		d14,d14,d14
+-	veor		d16,d16,d16
+-	veor		d18,d18,d18
+-	vld4.32		{d10[0],d12[0],d14[0],d16[0]},[r0]!
+-	adr		r5,.Lzeros
+-	vld1.32		{d18[0]},[r0]
+-	sub		r0,r0,#16		@ rewind
+-
+-.Lhash_loaded:
+-	add		r4,r1,#32
+-	mov		r3,r3,lsl#24
+-	tst		r2,#31
+-	beq		.Leven
+-
+-	vld4.32		{d20[0],d22[0],d24[0],d26[0]},[r1]!
+-	vmov.32		d28[0],r3
+-	sub		r2,r2,#16
+-	add		r4,r1,#32
+-
+-# ifdef	__ARMEB__
+-	vrev32.8	q10,q10
+-	vrev32.8	q13,q13
+-	vrev32.8	q11,q11
+-	vrev32.8	q12,q12
+-# endif
+-	vsri.u32	d28,d26,#8	@ base 2^32 -> base 2^26
+-	vshl.u32	d26,d26,#18
+-
+-	vsri.u32	d26,d24,#14
+-	vshl.u32	d24,d24,#12
+-	vadd.i32	d29,d28,d18	@ add hash value and move to #hi
+-
+-	vbic.i32	d26,#0xfc000000
+-	vsri.u32	d24,d22,#20
+-	vshl.u32	d22,d22,#6
+-
+-	vbic.i32	d24,#0xfc000000
+-	vsri.u32	d22,d20,#26
+-	vadd.i32	d27,d26,d16
+-
+-	vbic.i32	d20,#0xfc000000
+-	vbic.i32	d22,#0xfc000000
+-	vadd.i32	d25,d24,d14
+-
+-	vadd.i32	d21,d20,d10
+-	vadd.i32	d23,d22,d12
+-
+-	mov		r7,r5
+-	add		r6,r0,#48
+-
+-	cmp		r2,r2
+-	b		.Long_tail
+-
+-.align	4
+-.Leven:
+-	subs		r2,r2,#64
+-	it		lo
+-	movlo		r4,r5
+-
+-	vmov.i32	q14,#1<<24		@ padbit, yes, always
+-	vld4.32		{d20,d22,d24,d26},[r1]	@ inp[0:1]
+-	add		r1,r1,#64
+-	vld4.32		{d21,d23,d25,d27},[r4]	@ inp[2:3] (or 0)
+-	add		r4,r4,#64
+-	itt		hi
+-	addhi		r7,r0,#(48+1*9*4)
+-	addhi		r6,r0,#(48+3*9*4)
+-
+-# ifdef	__ARMEB__
+-	vrev32.8	q10,q10
+-	vrev32.8	q13,q13
+-	vrev32.8	q11,q11
+-	vrev32.8	q12,q12
+-# endif
+-	vsri.u32	q14,q13,#8		@ base 2^32 -> base 2^26
+-	vshl.u32	q13,q13,#18
+-
+-	vsri.u32	q13,q12,#14
+-	vshl.u32	q12,q12,#12
+-
+-	vbic.i32	q13,#0xfc000000
+-	vsri.u32	q12,q11,#20
+-	vshl.u32	q11,q11,#6
+-
+-	vbic.i32	q12,#0xfc000000
+-	vsri.u32	q11,q10,#26
+-
+-	vbic.i32	q10,#0xfc000000
+-	vbic.i32	q11,#0xfc000000
+-
+-	bls		.Lskip_loop
+-
+-	vld4.32		{d0[1],d1[1],d2[1],d3[1]},[r7]!	@ load r^2
+-	vld4.32		{d0[0],d1[0],d2[0],d3[0]},[r6]!	@ load r^4
+-	vld4.32		{d4[1],d5[1],d6[1],d7[1]},[r7]!
+-	vld4.32		{d4[0],d5[0],d6[0],d7[0]},[r6]!
+-	b		.Loop_neon
+-
+-.align	5
+-.Loop_neon:
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ ((inp[0]*r^4+inp[2]*r^2+inp[4])*r^4+inp[6]*r^2
+-	@ ((inp[1]*r^4+inp[3]*r^2+inp[5])*r^3+inp[7]*r
+-	@   ___________________/
+-	@ ((inp[0]*r^4+inp[2]*r^2+inp[4])*r^4+inp[6]*r^2+inp[8])*r^2
+-	@ ((inp[1]*r^4+inp[3]*r^2+inp[5])*r^4+inp[7]*r^2+inp[9])*r
+-	@   ___________________/ ____________________/
+-	@
+-	@ Note that we start with inp[2:3]*r^2. This is because it
+-	@ doesn't depend on reduction in previous iteration.
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ d4 = h4*r0 + h3*r1   + h2*r2   + h1*r3   + h0*r4
+-	@ d3 = h3*r0 + h2*r1   + h1*r2   + h0*r3   + h4*5*r4
+-	@ d2 = h2*r0 + h1*r1   + h0*r2   + h4*5*r3 + h3*5*r4
+-	@ d1 = h1*r0 + h0*r1   + h4*5*r2 + h3*5*r3 + h2*5*r4
+-	@ d0 = h0*r0 + h4*5*r1 + h3*5*r2 + h2*5*r3 + h1*5*r4
+-
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ inp[2:3]*r^2
+-
+-	vadd.i32	d24,d24,d14	@ accumulate inp[0:1]
+-	vmull.u32	q7,d25,d0[1]
+-	vadd.i32	d20,d20,d10
+-	vmull.u32	q5,d21,d0[1]
+-	vadd.i32	d26,d26,d16
+-	vmull.u32	q8,d27,d0[1]
+-	vmlal.u32	q7,d23,d1[1]
+-	vadd.i32	d22,d22,d12
+-	vmull.u32	q6,d23,d0[1]
+-
+-	vadd.i32	d28,d28,d18
+-	vmull.u32	q9,d29,d0[1]
+-	subs		r2,r2,#64
+-	vmlal.u32	q5,d29,d2[1]
+-	it		lo
+-	movlo		r4,r5
+-	vmlal.u32	q8,d25,d1[1]
+-	vld1.32		d8[1],[r7,:32]
+-	vmlal.u32	q6,d21,d1[1]
+-	vmlal.u32	q9,d27,d1[1]
+-
+-	vmlal.u32	q5,d27,d4[1]
+-	vmlal.u32	q8,d23,d3[1]
+-	vmlal.u32	q9,d25,d3[1]
+-	vmlal.u32	q6,d29,d4[1]
+-	vmlal.u32	q7,d21,d3[1]
+-
+-	vmlal.u32	q8,d21,d5[1]
+-	vmlal.u32	q5,d25,d6[1]
+-	vmlal.u32	q9,d23,d5[1]
+-	vmlal.u32	q6,d27,d6[1]
+-	vmlal.u32	q7,d29,d6[1]
+-
+-	vmlal.u32	q8,d29,d8[1]
+-	vmlal.u32	q5,d23,d8[1]
+-	vmlal.u32	q9,d21,d7[1]
+-	vmlal.u32	q6,d25,d8[1]
+-	vmlal.u32	q7,d27,d8[1]
+-
+-	vld4.32		{d21,d23,d25,d27},[r4]	@ inp[2:3] (or 0)
+-	add		r4,r4,#64
+-
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ (hash+inp[0:1])*r^4 and accumulate
+-
+-	vmlal.u32	q8,d26,d0[0]
+-	vmlal.u32	q5,d20,d0[0]
+-	vmlal.u32	q9,d28,d0[0]
+-	vmlal.u32	q6,d22,d0[0]
+-	vmlal.u32	q7,d24,d0[0]
+-	vld1.32		d8[0],[r6,:32]
+-
+-	vmlal.u32	q8,d24,d1[0]
+-	vmlal.u32	q5,d28,d2[0]
+-	vmlal.u32	q9,d26,d1[0]
+-	vmlal.u32	q6,d20,d1[0]
+-	vmlal.u32	q7,d22,d1[0]
+-
+-	vmlal.u32	q8,d22,d3[0]
+-	vmlal.u32	q5,d26,d4[0]
+-	vmlal.u32	q9,d24,d3[0]
+-	vmlal.u32	q6,d28,d4[0]
+-	vmlal.u32	q7,d20,d3[0]
+-
+-	vmlal.u32	q8,d20,d5[0]
+-	vmlal.u32	q5,d24,d6[0]
+-	vmlal.u32	q9,d22,d5[0]
+-	vmlal.u32	q6,d26,d6[0]
+-	vmlal.u32	q8,d28,d8[0]
+-
+-	vmlal.u32	q7,d28,d6[0]
+-	vmlal.u32	q5,d22,d8[0]
+-	vmlal.u32	q9,d20,d7[0]
+-	vmov.i32	q14,#1<<24		@ padbit, yes, always
+-	vmlal.u32	q6,d24,d8[0]
+-	vmlal.u32	q7,d26,d8[0]
+-
+-	vld4.32		{d20,d22,d24,d26},[r1]	@ inp[0:1]
+-	add		r1,r1,#64
+-# ifdef	__ARMEB__
+-	vrev32.8	q10,q10
+-	vrev32.8	q11,q11
+-	vrev32.8	q12,q12
+-	vrev32.8	q13,q13
+-# endif
+-
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ lazy reduction interleaved with base 2^32 -> base 2^26 of
+-	@ inp[0:3] previously loaded to q10-q13 and smashed to q10-q14.
+-
+-	vshr.u64	q15,q8,#26
+-	vmovn.i64	d16,q8
+-	 vshr.u64	q4,q5,#26
+-	 vmovn.i64	d10,q5
+-	vadd.i64	q9,q9,q15		@ h3 -> h4
+-	vbic.i32	d16,#0xfc000000
+-	  vsri.u32	q14,q13,#8		@ base 2^32 -> base 2^26
+-	 vadd.i64	q6,q6,q4		@ h0 -> h1
+-	  vshl.u32	q13,q13,#18
+-	 vbic.i32	d10,#0xfc000000
+-
+-	vshrn.u64	d30,q9,#26
+-	vmovn.i64	d18,q9
+-	 vshr.u64	q4,q6,#26
+-	 vmovn.i64	d12,q6
+-	 vadd.i64	q7,q7,q4		@ h1 -> h2
+-	  vsri.u32	q13,q12,#14
+-	vbic.i32	d18,#0xfc000000
+-	  vshl.u32	q12,q12,#12
+-	 vbic.i32	d12,#0xfc000000
+-
+-	vadd.i32	d10,d10,d30
+-	vshl.u32	d30,d30,#2
+-	  vbic.i32	q13,#0xfc000000
+-	 vshrn.u64	d8,q7,#26
+-	 vmovn.i64	d14,q7
+-	vaddl.u32	q5,d10,d30	@ h4 -> h0 [widen for a sec]
+-	  vsri.u32	q12,q11,#20
+-	 vadd.i32	d16,d16,d8	@ h2 -> h3
+-	  vshl.u32	q11,q11,#6
+-	 vbic.i32	d14,#0xfc000000
+-	  vbic.i32	q12,#0xfc000000
+-
+-	vshrn.u64	d30,q5,#26		@ re-narrow
+-	vmovn.i64	d10,q5
+-	  vsri.u32	q11,q10,#26
+-	  vbic.i32	q10,#0xfc000000
+-	 vshr.u32	d8,d16,#26
+-	 vbic.i32	d16,#0xfc000000
+-	vbic.i32	d10,#0xfc000000
+-	vadd.i32	d12,d12,d30	@ h0 -> h1
+-	 vadd.i32	d18,d18,d8	@ h3 -> h4
+-	  vbic.i32	q11,#0xfc000000
+-
+-	bhi		.Loop_neon
+-
+-.Lskip_loop:
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ multiply (inp[0:1]+hash) or inp[2:3] by r^2:r^1
+-
+-	add		r7,r0,#(48+0*9*4)
+-	add		r6,r0,#(48+1*9*4)
+-	adds		r2,r2,#32
+-	it		ne
+-	movne		r2,#0
+-	bne		.Long_tail
+-
+-	vadd.i32	d25,d24,d14	@ add hash value and move to #hi
+-	vadd.i32	d21,d20,d10
+-	vadd.i32	d27,d26,d16
+-	vadd.i32	d23,d22,d12
+-	vadd.i32	d29,d28,d18
+-
+-.Long_tail:
+-	vld4.32		{d0[1],d1[1],d2[1],d3[1]},[r7]!	@ load r^1
+-	vld4.32		{d0[0],d1[0],d2[0],d3[0]},[r6]!	@ load r^2
+-
+-	vadd.i32	d24,d24,d14	@ can be redundant
+-	vmull.u32	q7,d25,d0
+-	vadd.i32	d20,d20,d10
+-	vmull.u32	q5,d21,d0
+-	vadd.i32	d26,d26,d16
+-	vmull.u32	q8,d27,d0
+-	vadd.i32	d22,d22,d12
+-	vmull.u32	q6,d23,d0
+-	vadd.i32	d28,d28,d18
+-	vmull.u32	q9,d29,d0
+-
+-	vmlal.u32	q5,d29,d2
+-	vld4.32		{d4[1],d5[1],d6[1],d7[1]},[r7]!
+-	vmlal.u32	q8,d25,d1
+-	vld4.32		{d4[0],d5[0],d6[0],d7[0]},[r6]!
+-	vmlal.u32	q6,d21,d1
+-	vmlal.u32	q9,d27,d1
+-	vmlal.u32	q7,d23,d1
+-
+-	vmlal.u32	q8,d23,d3
+-	vld1.32		d8[1],[r7,:32]
+-	vmlal.u32	q5,d27,d4
+-	vld1.32		d8[0],[r6,:32]
+-	vmlal.u32	q9,d25,d3
+-	vmlal.u32	q6,d29,d4
+-	vmlal.u32	q7,d21,d3
+-
+-	vmlal.u32	q8,d21,d5
+-	 it		ne
+-	 addne		r7,r0,#(48+2*9*4)
+-	vmlal.u32	q5,d25,d6
+-	 it		ne
+-	 addne		r6,r0,#(48+3*9*4)
+-	vmlal.u32	q9,d23,d5
+-	vmlal.u32	q6,d27,d6
+-	vmlal.u32	q7,d29,d6
+-
+-	vmlal.u32	q8,d29,d8
+-	 vorn		q0,q0,q0	@ all-ones, can be redundant
+-	vmlal.u32	q5,d23,d8
+-	 vshr.u64	q0,q0,#38
+-	vmlal.u32	q9,d21,d7
+-	vmlal.u32	q6,d25,d8
+-	vmlal.u32	q7,d27,d8
+-
+-	beq		.Lshort_tail
+-
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ (hash+inp[0:1])*r^4:r^3 and accumulate
+-
+-	vld4.32		{d0[1],d1[1],d2[1],d3[1]},[r7]!	@ load r^3
+-	vld4.32		{d0[0],d1[0],d2[0],d3[0]},[r6]!	@ load r^4
+-
+-	vmlal.u32	q7,d24,d0
+-	vmlal.u32	q5,d20,d0
+-	vmlal.u32	q8,d26,d0
+-	vmlal.u32	q6,d22,d0
+-	vmlal.u32	q9,d28,d0
+-
+-	vmlal.u32	q5,d28,d2
+-	vld4.32		{d4[1],d5[1],d6[1],d7[1]},[r7]!
+-	vmlal.u32	q8,d24,d1
+-	vld4.32		{d4[0],d5[0],d6[0],d7[0]},[r6]!
+-	vmlal.u32	q6,d20,d1
+-	vmlal.u32	q9,d26,d1
+-	vmlal.u32	q7,d22,d1
+-
+-	vmlal.u32	q8,d22,d3
+-	vld1.32		d8[1],[r7,:32]
+-	vmlal.u32	q5,d26,d4
+-	vld1.32		d8[0],[r6,:32]
+-	vmlal.u32	q9,d24,d3
+-	vmlal.u32	q6,d28,d4
+-	vmlal.u32	q7,d20,d3
+-
+-	vmlal.u32	q8,d20,d5
+-	vmlal.u32	q5,d24,d6
+-	vmlal.u32	q9,d22,d5
+-	vmlal.u32	q6,d26,d6
+-	vmlal.u32	q7,d28,d6
+-
+-	vmlal.u32	q8,d28,d8
+-	 vorn		q0,q0,q0	@ all-ones
+-	vmlal.u32	q5,d22,d8
+-	 vshr.u64	q0,q0,#38
+-	vmlal.u32	q9,d20,d7
+-	vmlal.u32	q6,d24,d8
+-	vmlal.u32	q7,d26,d8
+-
+-.Lshort_tail:
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ horizontal addition
+-
+-	vadd.i64	d16,d16,d17
+-	vadd.i64	d10,d10,d11
+-	vadd.i64	d18,d18,d19
+-	vadd.i64	d12,d12,d13
+-	vadd.i64	d14,d14,d15
+-
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ lazy reduction, but without narrowing
+-
+-	vshr.u64	q15,q8,#26
+-	vand.i64	q8,q8,q0
+-	 vshr.u64	q4,q5,#26
+-	 vand.i64	q5,q5,q0
+-	vadd.i64	q9,q9,q15		@ h3 -> h4
+-	 vadd.i64	q6,q6,q4		@ h0 -> h1
+-
+-	vshr.u64	q15,q9,#26
+-	vand.i64	q9,q9,q0
+-	 vshr.u64	q4,q6,#26
+-	 vand.i64	q6,q6,q0
+-	 vadd.i64	q7,q7,q4		@ h1 -> h2
+-
+-	vadd.i64	q5,q5,q15
+-	vshl.u64	q15,q15,#2
+-	 vshr.u64	q4,q7,#26
+-	 vand.i64	q7,q7,q0
+-	vadd.i64	q5,q5,q15		@ h4 -> h0
+-	 vadd.i64	q8,q8,q4		@ h2 -> h3
+-
+-	vshr.u64	q15,q5,#26
+-	vand.i64	q5,q5,q0
+-	 vshr.u64	q4,q8,#26
+-	 vand.i64	q8,q8,q0
+-	vadd.i64	q6,q6,q15		@ h0 -> h1
+-	 vadd.i64	q9,q9,q4		@ h3 -> h4
+-
+-	cmp		r2,#0
+-	bne		.Leven
+-
+-	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+-	@ store hash value
+-
+-	vst4.32		{d10[0],d12[0],d14[0],d16[0]},[r0]!
+-	vst1.32		{d18[0]},[r0]
+-
+-	vldmia	sp!,{d8-d15}			@ epilogue
+-	ldmia	sp!,{r4-r7}
+-	bx	lr					@ bx	lr
+-.size	poly1305_blocks_neon,.-poly1305_blocks_neon
+-
+-.align	5
+-.Lzeros:
+-.long	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+-#ifndef	__KERNEL__
+-.LOPENSSL_armcap:
+-# ifdef	_WIN32
+-.word	OPENSSL_armcap_P
+-# else
+-.word	OPENSSL_armcap_P-.Lpoly1305_init
+-# endif
+-.comm	OPENSSL_armcap_P,4,4
+-.hidden	OPENSSL_armcap_P
+-#endif
+-#endif
+-.asciz	"Poly1305 for ARMv4/NEON, CRYPTOGAMS by @dot-asm"
+-.align	2
+diff --git a/arch/arm/crypto/sha256-core.S_shipped b/arch/arm/crypto/sha256-core.S_shipped
+deleted file mode 100644
+index 6363014a50d7..000000000000
+--- a/arch/arm/crypto/sha256-core.S_shipped
++++ /dev/null
+@@ -1,2816 +0,0 @@
+-@ SPDX-License-Identifier: GPL-2.0
+-
+-@ This code is taken from the OpenSSL project but the author (Andy Polyakov)
+-@ has relicensed it under the GPLv2. Therefore this program is free software;
+-@ you can redistribute it and/or modify it under the terms of the GNU General
+-@ Public License version 2 as published by the Free Software Foundation.
+-@
+-@ The original headers, including the original license headers, are
+-@ included below for completeness.
+-
+-@ ====================================================================
+-@ Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
+-@ project. The module is, however, dual licensed under OpenSSL and
+-@ CRYPTOGAMS licenses depending on where you obtain it. For further
+-@ details see https://www.openssl.org/~appro/cryptogams/.
+-@ ====================================================================
+-
+-@ SHA256 block procedure for ARMv4. May 2007.
+-
+-@ Performance is ~2x better than gcc 3.4 generated code and in "abso-
+-@ lute" terms is ~2250 cycles per 64-byte block or ~35 cycles per
+-@ byte [on single-issue Xscale PXA250 core].
+-
+-@ July 2010.
+-@
+-@ Rescheduling for dual-issue pipeline resulted in 22% improvement on
+-@ Cortex A8 core and ~20 cycles per processed byte.
+-
+-@ February 2011.
+-@
+-@ Profiler-assisted and platform-specific optimization resulted in 16%
+-@ improvement on Cortex A8 core and ~15.4 cycles per processed byte.
+-
+-@ September 2013.
+-@
+-@ Add NEON implementation. On Cortex A8 it was measured to process one
+-@ byte in 12.5 cycles or 23% faster than integer-only code. Snapdragon
+-@ S4 does it in 12.5 cycles too, but it's 50% faster than integer-only
+-@ code (meaning that latter performs sub-optimally, nothing was done
+-@ about it).
+-
+-@ May 2014.
+-@
+-@ Add ARMv8 code path performing at 2.0 cpb on Apple A7.
+-
+-#ifndef __KERNEL__
+-# include "arm_arch.h"
+-#else
+-# define __ARM_ARCH__ __LINUX_ARM_ARCH__
+-# define __ARM_MAX_ARCH__ 7
+-#endif
+-
+-.text
+-#if __ARM_ARCH__<7
+-.code	32
+-#else
+-.syntax unified
+-# ifdef __thumb2__
+-.thumb
+-# else
+-.code   32
+-# endif
+-#endif
+-
+-.type	K256,%object
+-.align	5
+-K256:
+-.word	0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5
+-.word	0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5
+-.word	0xd807aa98,0x12835b01,0x243185be,0x550c7dc3
+-.word	0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174
+-.word	0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc
+-.word	0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da
+-.word	0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7
+-.word	0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967
+-.word	0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13
+-.word	0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85
+-.word	0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3
+-.word	0xd192e819,0xd6990624,0xf40e3585,0x106aa070
+-.word	0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5
+-.word	0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3
+-.word	0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208
+-.word	0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+-.size	K256,.-K256
+-.word	0				@ terminator
+-#if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+-.LOPENSSL_armcap:
+-.word	OPENSSL_armcap_P-sha256_block_data_order
+-#endif
+-.align	5
+-
+-.global	sha256_block_data_order
+-.type	sha256_block_data_order,%function
+-sha256_block_data_order:
+-.Lsha256_block_data_order:
+-#if __ARM_ARCH__<7
+-	sub	r3,pc,#8		@ sha256_block_data_order
+-#else
+-	adr	r3,.Lsha256_block_data_order
+-#endif
+-#if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+-	ldr	r12,.LOPENSSL_armcap
+-	ldr	r12,[r3,r12]		@ OPENSSL_armcap_P
+-	tst	r12,#ARMV8_SHA256
+-	bne	.LARMv8
+-	tst	r12,#ARMV7_NEON
+-	bne	.LNEON
+-#endif
+-	add	r2,r1,r2,lsl#6	@ len to point at the end of inp
+-	stmdb	sp!,{r0,r1,r2,r4-r11,lr}
+-	ldmia	r0,{r4,r5,r6,r7,r8,r9,r10,r11}
+-	sub	r14,r3,#256+32	@ K256
+-	sub	sp,sp,#16*4		@ alloca(X[16])
+-.Loop:
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r5,r6		@ magic
+-	eor	r12,r12,r12
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 0
+-# if 0==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r8,r8,ror#5
+-	add	r4,r4,r12			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r8,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 0
+-	add	r4,r4,r12			@ h+=Maj(a,b,c) from the past
+-	ldrb	r12,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r12,lsl#8
+-	ldrb	r12,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 0==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r8,r8,ror#5
+-	orr	r2,r2,r12,lsl#24
+-	eor	r0,r0,r8,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r11,r11,r2			@ h+=X[i]
+-	str	r2,[sp,#0*4]
+-	eor	r2,r9,r10
+-	add	r11,r11,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r8
+-	add	r11,r11,r12			@ h+=K256[i]
+-	eor	r2,r2,r10			@ Ch(e,f,g)
+-	eor	r0,r4,r4,ror#11
+-	add	r11,r11,r2			@ h+=Ch(e,f,g)
+-#if 0==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 0<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r4,r5			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#2*4]		@ from future BODY_16_xx
+-	eor	r12,r4,r5			@ a^b, b^c in next round
+-	ldr	r1,[sp,#15*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r4,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r7,r7,r11			@ d+=h
+-	eor	r3,r3,r5			@ Maj(a,b,c)
+-	add	r11,r11,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r11,r11,r3			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 1
+-# if 1==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r7,r7,ror#5
+-	add	r11,r11,r3			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r7,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 1
+-	add	r11,r11,r3			@ h+=Maj(a,b,c) from the past
+-	ldrb	r3,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r3,lsl#8
+-	ldrb	r3,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 1==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r7,r7,ror#5
+-	orr	r2,r2,r3,lsl#24
+-	eor	r0,r0,r7,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r10,r10,r2			@ h+=X[i]
+-	str	r2,[sp,#1*4]
+-	eor	r2,r8,r9
+-	add	r10,r10,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r7
+-	add	r10,r10,r3			@ h+=K256[i]
+-	eor	r2,r2,r9			@ Ch(e,f,g)
+-	eor	r0,r11,r11,ror#11
+-	add	r10,r10,r2			@ h+=Ch(e,f,g)
+-#if 1==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 1<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r11,r4			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#3*4]		@ from future BODY_16_xx
+-	eor	r3,r11,r4			@ a^b, b^c in next round
+-	ldr	r1,[sp,#0*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r11,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r6,r6,r10			@ d+=h
+-	eor	r12,r12,r4			@ Maj(a,b,c)
+-	add	r10,r10,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r10,r10,r12			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 2
+-# if 2==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r6,r6,ror#5
+-	add	r10,r10,r12			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r6,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 2
+-	add	r10,r10,r12			@ h+=Maj(a,b,c) from the past
+-	ldrb	r12,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r12,lsl#8
+-	ldrb	r12,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 2==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r6,r6,ror#5
+-	orr	r2,r2,r12,lsl#24
+-	eor	r0,r0,r6,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r9,r9,r2			@ h+=X[i]
+-	str	r2,[sp,#2*4]
+-	eor	r2,r7,r8
+-	add	r9,r9,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r6
+-	add	r9,r9,r12			@ h+=K256[i]
+-	eor	r2,r2,r8			@ Ch(e,f,g)
+-	eor	r0,r10,r10,ror#11
+-	add	r9,r9,r2			@ h+=Ch(e,f,g)
+-#if 2==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 2<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r10,r11			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#4*4]		@ from future BODY_16_xx
+-	eor	r12,r10,r11			@ a^b, b^c in next round
+-	ldr	r1,[sp,#1*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r10,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r5,r5,r9			@ d+=h
+-	eor	r3,r3,r11			@ Maj(a,b,c)
+-	add	r9,r9,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r9,r9,r3			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 3
+-# if 3==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r5,r5,ror#5
+-	add	r9,r9,r3			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r5,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 3
+-	add	r9,r9,r3			@ h+=Maj(a,b,c) from the past
+-	ldrb	r3,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r3,lsl#8
+-	ldrb	r3,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 3==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r5,r5,ror#5
+-	orr	r2,r2,r3,lsl#24
+-	eor	r0,r0,r5,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r8,r8,r2			@ h+=X[i]
+-	str	r2,[sp,#3*4]
+-	eor	r2,r6,r7
+-	add	r8,r8,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r5
+-	add	r8,r8,r3			@ h+=K256[i]
+-	eor	r2,r2,r7			@ Ch(e,f,g)
+-	eor	r0,r9,r9,ror#11
+-	add	r8,r8,r2			@ h+=Ch(e,f,g)
+-#if 3==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 3<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r9,r10			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#5*4]		@ from future BODY_16_xx
+-	eor	r3,r9,r10			@ a^b, b^c in next round
+-	ldr	r1,[sp,#2*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r9,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r4,r4,r8			@ d+=h
+-	eor	r12,r12,r10			@ Maj(a,b,c)
+-	add	r8,r8,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r8,r8,r12			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 4
+-# if 4==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r4,r4,ror#5
+-	add	r8,r8,r12			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r4,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 4
+-	add	r8,r8,r12			@ h+=Maj(a,b,c) from the past
+-	ldrb	r12,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r12,lsl#8
+-	ldrb	r12,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 4==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r4,r4,ror#5
+-	orr	r2,r2,r12,lsl#24
+-	eor	r0,r0,r4,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r7,r7,r2			@ h+=X[i]
+-	str	r2,[sp,#4*4]
+-	eor	r2,r5,r6
+-	add	r7,r7,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r4
+-	add	r7,r7,r12			@ h+=K256[i]
+-	eor	r2,r2,r6			@ Ch(e,f,g)
+-	eor	r0,r8,r8,ror#11
+-	add	r7,r7,r2			@ h+=Ch(e,f,g)
+-#if 4==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 4<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r8,r9			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#6*4]		@ from future BODY_16_xx
+-	eor	r12,r8,r9			@ a^b, b^c in next round
+-	ldr	r1,[sp,#3*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r8,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r11,r11,r7			@ d+=h
+-	eor	r3,r3,r9			@ Maj(a,b,c)
+-	add	r7,r7,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r7,r7,r3			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 5
+-# if 5==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r11,r11,ror#5
+-	add	r7,r7,r3			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r11,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 5
+-	add	r7,r7,r3			@ h+=Maj(a,b,c) from the past
+-	ldrb	r3,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r3,lsl#8
+-	ldrb	r3,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 5==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r11,r11,ror#5
+-	orr	r2,r2,r3,lsl#24
+-	eor	r0,r0,r11,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r6,r6,r2			@ h+=X[i]
+-	str	r2,[sp,#5*4]
+-	eor	r2,r4,r5
+-	add	r6,r6,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r11
+-	add	r6,r6,r3			@ h+=K256[i]
+-	eor	r2,r2,r5			@ Ch(e,f,g)
+-	eor	r0,r7,r7,ror#11
+-	add	r6,r6,r2			@ h+=Ch(e,f,g)
+-#if 5==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 5<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r7,r8			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#7*4]		@ from future BODY_16_xx
+-	eor	r3,r7,r8			@ a^b, b^c in next round
+-	ldr	r1,[sp,#4*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r7,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r10,r10,r6			@ d+=h
+-	eor	r12,r12,r8			@ Maj(a,b,c)
+-	add	r6,r6,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r6,r6,r12			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 6
+-# if 6==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r10,r10,ror#5
+-	add	r6,r6,r12			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r10,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 6
+-	add	r6,r6,r12			@ h+=Maj(a,b,c) from the past
+-	ldrb	r12,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r12,lsl#8
+-	ldrb	r12,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 6==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r10,r10,ror#5
+-	orr	r2,r2,r12,lsl#24
+-	eor	r0,r0,r10,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r5,r5,r2			@ h+=X[i]
+-	str	r2,[sp,#6*4]
+-	eor	r2,r11,r4
+-	add	r5,r5,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r10
+-	add	r5,r5,r12			@ h+=K256[i]
+-	eor	r2,r2,r4			@ Ch(e,f,g)
+-	eor	r0,r6,r6,ror#11
+-	add	r5,r5,r2			@ h+=Ch(e,f,g)
+-#if 6==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 6<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r6,r7			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#8*4]		@ from future BODY_16_xx
+-	eor	r12,r6,r7			@ a^b, b^c in next round
+-	ldr	r1,[sp,#5*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r6,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r9,r9,r5			@ d+=h
+-	eor	r3,r3,r7			@ Maj(a,b,c)
+-	add	r5,r5,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r5,r5,r3			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 7
+-# if 7==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r9,r9,ror#5
+-	add	r5,r5,r3			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r9,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 7
+-	add	r5,r5,r3			@ h+=Maj(a,b,c) from the past
+-	ldrb	r3,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r3,lsl#8
+-	ldrb	r3,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 7==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r9,r9,ror#5
+-	orr	r2,r2,r3,lsl#24
+-	eor	r0,r0,r9,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r4,r4,r2			@ h+=X[i]
+-	str	r2,[sp,#7*4]
+-	eor	r2,r10,r11
+-	add	r4,r4,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r9
+-	add	r4,r4,r3			@ h+=K256[i]
+-	eor	r2,r2,r11			@ Ch(e,f,g)
+-	eor	r0,r5,r5,ror#11
+-	add	r4,r4,r2			@ h+=Ch(e,f,g)
+-#if 7==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 7<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r5,r6			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#9*4]		@ from future BODY_16_xx
+-	eor	r3,r5,r6			@ a^b, b^c in next round
+-	ldr	r1,[sp,#6*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r5,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r8,r8,r4			@ d+=h
+-	eor	r12,r12,r6			@ Maj(a,b,c)
+-	add	r4,r4,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r4,r4,r12			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 8
+-# if 8==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r8,r8,ror#5
+-	add	r4,r4,r12			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r8,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 8
+-	add	r4,r4,r12			@ h+=Maj(a,b,c) from the past
+-	ldrb	r12,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r12,lsl#8
+-	ldrb	r12,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 8==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r8,r8,ror#5
+-	orr	r2,r2,r12,lsl#24
+-	eor	r0,r0,r8,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r11,r11,r2			@ h+=X[i]
+-	str	r2,[sp,#8*4]
+-	eor	r2,r9,r10
+-	add	r11,r11,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r8
+-	add	r11,r11,r12			@ h+=K256[i]
+-	eor	r2,r2,r10			@ Ch(e,f,g)
+-	eor	r0,r4,r4,ror#11
+-	add	r11,r11,r2			@ h+=Ch(e,f,g)
+-#if 8==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 8<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r4,r5			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#10*4]		@ from future BODY_16_xx
+-	eor	r12,r4,r5			@ a^b, b^c in next round
+-	ldr	r1,[sp,#7*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r4,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r7,r7,r11			@ d+=h
+-	eor	r3,r3,r5			@ Maj(a,b,c)
+-	add	r11,r11,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r11,r11,r3			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 9
+-# if 9==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r7,r7,ror#5
+-	add	r11,r11,r3			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r7,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 9
+-	add	r11,r11,r3			@ h+=Maj(a,b,c) from the past
+-	ldrb	r3,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r3,lsl#8
+-	ldrb	r3,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 9==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r7,r7,ror#5
+-	orr	r2,r2,r3,lsl#24
+-	eor	r0,r0,r7,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r10,r10,r2			@ h+=X[i]
+-	str	r2,[sp,#9*4]
+-	eor	r2,r8,r9
+-	add	r10,r10,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r7
+-	add	r10,r10,r3			@ h+=K256[i]
+-	eor	r2,r2,r9			@ Ch(e,f,g)
+-	eor	r0,r11,r11,ror#11
+-	add	r10,r10,r2			@ h+=Ch(e,f,g)
+-#if 9==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 9<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r11,r4			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#11*4]		@ from future BODY_16_xx
+-	eor	r3,r11,r4			@ a^b, b^c in next round
+-	ldr	r1,[sp,#8*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r11,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r6,r6,r10			@ d+=h
+-	eor	r12,r12,r4			@ Maj(a,b,c)
+-	add	r10,r10,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r10,r10,r12			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 10
+-# if 10==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r6,r6,ror#5
+-	add	r10,r10,r12			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r6,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 10
+-	add	r10,r10,r12			@ h+=Maj(a,b,c) from the past
+-	ldrb	r12,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r12,lsl#8
+-	ldrb	r12,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 10==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r6,r6,ror#5
+-	orr	r2,r2,r12,lsl#24
+-	eor	r0,r0,r6,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r9,r9,r2			@ h+=X[i]
+-	str	r2,[sp,#10*4]
+-	eor	r2,r7,r8
+-	add	r9,r9,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r6
+-	add	r9,r9,r12			@ h+=K256[i]
+-	eor	r2,r2,r8			@ Ch(e,f,g)
+-	eor	r0,r10,r10,ror#11
+-	add	r9,r9,r2			@ h+=Ch(e,f,g)
+-#if 10==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 10<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r10,r11			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#12*4]		@ from future BODY_16_xx
+-	eor	r12,r10,r11			@ a^b, b^c in next round
+-	ldr	r1,[sp,#9*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r10,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r5,r5,r9			@ d+=h
+-	eor	r3,r3,r11			@ Maj(a,b,c)
+-	add	r9,r9,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r9,r9,r3			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 11
+-# if 11==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r5,r5,ror#5
+-	add	r9,r9,r3			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r5,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 11
+-	add	r9,r9,r3			@ h+=Maj(a,b,c) from the past
+-	ldrb	r3,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r3,lsl#8
+-	ldrb	r3,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 11==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r5,r5,ror#5
+-	orr	r2,r2,r3,lsl#24
+-	eor	r0,r0,r5,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r8,r8,r2			@ h+=X[i]
+-	str	r2,[sp,#11*4]
+-	eor	r2,r6,r7
+-	add	r8,r8,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r5
+-	add	r8,r8,r3			@ h+=K256[i]
+-	eor	r2,r2,r7			@ Ch(e,f,g)
+-	eor	r0,r9,r9,ror#11
+-	add	r8,r8,r2			@ h+=Ch(e,f,g)
+-#if 11==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 11<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r9,r10			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#13*4]		@ from future BODY_16_xx
+-	eor	r3,r9,r10			@ a^b, b^c in next round
+-	ldr	r1,[sp,#10*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r9,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r4,r4,r8			@ d+=h
+-	eor	r12,r12,r10			@ Maj(a,b,c)
+-	add	r8,r8,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r8,r8,r12			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 12
+-# if 12==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r4,r4,ror#5
+-	add	r8,r8,r12			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r4,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 12
+-	add	r8,r8,r12			@ h+=Maj(a,b,c) from the past
+-	ldrb	r12,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r12,lsl#8
+-	ldrb	r12,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 12==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r4,r4,ror#5
+-	orr	r2,r2,r12,lsl#24
+-	eor	r0,r0,r4,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r7,r7,r2			@ h+=X[i]
+-	str	r2,[sp,#12*4]
+-	eor	r2,r5,r6
+-	add	r7,r7,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r4
+-	add	r7,r7,r12			@ h+=K256[i]
+-	eor	r2,r2,r6			@ Ch(e,f,g)
+-	eor	r0,r8,r8,ror#11
+-	add	r7,r7,r2			@ h+=Ch(e,f,g)
+-#if 12==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 12<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r8,r9			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#14*4]		@ from future BODY_16_xx
+-	eor	r12,r8,r9			@ a^b, b^c in next round
+-	ldr	r1,[sp,#11*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r8,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r11,r11,r7			@ d+=h
+-	eor	r3,r3,r9			@ Maj(a,b,c)
+-	add	r7,r7,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r7,r7,r3			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 13
+-# if 13==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r11,r11,ror#5
+-	add	r7,r7,r3			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r11,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 13
+-	add	r7,r7,r3			@ h+=Maj(a,b,c) from the past
+-	ldrb	r3,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r3,lsl#8
+-	ldrb	r3,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 13==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r11,r11,ror#5
+-	orr	r2,r2,r3,lsl#24
+-	eor	r0,r0,r11,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r6,r6,r2			@ h+=X[i]
+-	str	r2,[sp,#13*4]
+-	eor	r2,r4,r5
+-	add	r6,r6,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r11
+-	add	r6,r6,r3			@ h+=K256[i]
+-	eor	r2,r2,r5			@ Ch(e,f,g)
+-	eor	r0,r7,r7,ror#11
+-	add	r6,r6,r2			@ h+=Ch(e,f,g)
+-#if 13==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 13<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r7,r8			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#15*4]		@ from future BODY_16_xx
+-	eor	r3,r7,r8			@ a^b, b^c in next round
+-	ldr	r1,[sp,#12*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r7,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r10,r10,r6			@ d+=h
+-	eor	r12,r12,r8			@ Maj(a,b,c)
+-	add	r6,r6,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r6,r6,r12			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 14
+-# if 14==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r10,r10,ror#5
+-	add	r6,r6,r12			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r10,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 14
+-	add	r6,r6,r12			@ h+=Maj(a,b,c) from the past
+-	ldrb	r12,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r12,lsl#8
+-	ldrb	r12,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 14==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r10,r10,ror#5
+-	orr	r2,r2,r12,lsl#24
+-	eor	r0,r0,r10,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r5,r5,r2			@ h+=X[i]
+-	str	r2,[sp,#14*4]
+-	eor	r2,r11,r4
+-	add	r5,r5,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r10
+-	add	r5,r5,r12			@ h+=K256[i]
+-	eor	r2,r2,r4			@ Ch(e,f,g)
+-	eor	r0,r6,r6,ror#11
+-	add	r5,r5,r2			@ h+=Ch(e,f,g)
+-#if 14==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 14<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r6,r7			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#0*4]		@ from future BODY_16_xx
+-	eor	r12,r6,r7			@ a^b, b^c in next round
+-	ldr	r1,[sp,#13*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r6,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r9,r9,r5			@ d+=h
+-	eor	r3,r3,r7			@ Maj(a,b,c)
+-	add	r5,r5,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r5,r5,r3			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	@ ldr	r2,[r1],#4			@ 15
+-# if 15==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r9,r9,ror#5
+-	add	r5,r5,r3			@ h+=Maj(a,b,c) from the past
+-	eor	r0,r0,r9,ror#19	@ Sigma1(e)
+-# ifndef __ARMEB__
+-	rev	r2,r2
+-# endif
+-#else
+-	@ ldrb	r2,[r1,#3]			@ 15
+-	add	r5,r5,r3			@ h+=Maj(a,b,c) from the past
+-	ldrb	r3,[r1,#2]
+-	ldrb	r0,[r1,#1]
+-	orr	r2,r2,r3,lsl#8
+-	ldrb	r3,[r1],#4
+-	orr	r2,r2,r0,lsl#16
+-# if 15==15
+-	str	r1,[sp,#17*4]			@ make room for r1
+-# endif
+-	eor	r0,r9,r9,ror#5
+-	orr	r2,r2,r3,lsl#24
+-	eor	r0,r0,r9,ror#19	@ Sigma1(e)
+-#endif
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r4,r4,r2			@ h+=X[i]
+-	str	r2,[sp,#15*4]
+-	eor	r2,r10,r11
+-	add	r4,r4,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r9
+-	add	r4,r4,r3			@ h+=K256[i]
+-	eor	r2,r2,r11			@ Ch(e,f,g)
+-	eor	r0,r5,r5,ror#11
+-	add	r4,r4,r2			@ h+=Ch(e,f,g)
+-#if 15==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 15<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r5,r6			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#1*4]		@ from future BODY_16_xx
+-	eor	r3,r5,r6			@ a^b, b^c in next round
+-	ldr	r1,[sp,#14*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r5,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r8,r8,r4			@ d+=h
+-	eor	r12,r12,r6			@ Maj(a,b,c)
+-	add	r4,r4,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r4,r4,r12			@ h+=Maj(a,b,c)
+-.Lrounds_16_xx:
+-	@ ldr	r2,[sp,#1*4]		@ 16
+-	@ ldr	r1,[sp,#14*4]
+-	mov	r0,r2,ror#7
+-	add	r4,r4,r12			@ h+=Maj(a,b,c) from the past
+-	mov	r12,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r12,r12,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#0*4]
+-	eor	r12,r12,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#9*4]
+-
+-	add	r12,r12,r0
+-	eor	r0,r8,r8,ror#5	@ from BODY_00_15
+-	add	r2,r2,r12
+-	eor	r0,r0,r8,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r11,r11,r2			@ h+=X[i]
+-	str	r2,[sp,#0*4]
+-	eor	r2,r9,r10
+-	add	r11,r11,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r8
+-	add	r11,r11,r12			@ h+=K256[i]
+-	eor	r2,r2,r10			@ Ch(e,f,g)
+-	eor	r0,r4,r4,ror#11
+-	add	r11,r11,r2			@ h+=Ch(e,f,g)
+-#if 16==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 16<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r4,r5			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#2*4]		@ from future BODY_16_xx
+-	eor	r12,r4,r5			@ a^b, b^c in next round
+-	ldr	r1,[sp,#15*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r4,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r7,r7,r11			@ d+=h
+-	eor	r3,r3,r5			@ Maj(a,b,c)
+-	add	r11,r11,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r11,r11,r3			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#2*4]		@ 17
+-	@ ldr	r1,[sp,#15*4]
+-	mov	r0,r2,ror#7
+-	add	r11,r11,r3			@ h+=Maj(a,b,c) from the past
+-	mov	r3,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r3,r3,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#1*4]
+-	eor	r3,r3,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#10*4]
+-
+-	add	r3,r3,r0
+-	eor	r0,r7,r7,ror#5	@ from BODY_00_15
+-	add	r2,r2,r3
+-	eor	r0,r0,r7,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r10,r10,r2			@ h+=X[i]
+-	str	r2,[sp,#1*4]
+-	eor	r2,r8,r9
+-	add	r10,r10,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r7
+-	add	r10,r10,r3			@ h+=K256[i]
+-	eor	r2,r2,r9			@ Ch(e,f,g)
+-	eor	r0,r11,r11,ror#11
+-	add	r10,r10,r2			@ h+=Ch(e,f,g)
+-#if 17==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 17<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r11,r4			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#3*4]		@ from future BODY_16_xx
+-	eor	r3,r11,r4			@ a^b, b^c in next round
+-	ldr	r1,[sp,#0*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r11,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r6,r6,r10			@ d+=h
+-	eor	r12,r12,r4			@ Maj(a,b,c)
+-	add	r10,r10,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r10,r10,r12			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#3*4]		@ 18
+-	@ ldr	r1,[sp,#0*4]
+-	mov	r0,r2,ror#7
+-	add	r10,r10,r12			@ h+=Maj(a,b,c) from the past
+-	mov	r12,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r12,r12,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#2*4]
+-	eor	r12,r12,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#11*4]
+-
+-	add	r12,r12,r0
+-	eor	r0,r6,r6,ror#5	@ from BODY_00_15
+-	add	r2,r2,r12
+-	eor	r0,r0,r6,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r9,r9,r2			@ h+=X[i]
+-	str	r2,[sp,#2*4]
+-	eor	r2,r7,r8
+-	add	r9,r9,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r6
+-	add	r9,r9,r12			@ h+=K256[i]
+-	eor	r2,r2,r8			@ Ch(e,f,g)
+-	eor	r0,r10,r10,ror#11
+-	add	r9,r9,r2			@ h+=Ch(e,f,g)
+-#if 18==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 18<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r10,r11			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#4*4]		@ from future BODY_16_xx
+-	eor	r12,r10,r11			@ a^b, b^c in next round
+-	ldr	r1,[sp,#1*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r10,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r5,r5,r9			@ d+=h
+-	eor	r3,r3,r11			@ Maj(a,b,c)
+-	add	r9,r9,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r9,r9,r3			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#4*4]		@ 19
+-	@ ldr	r1,[sp,#1*4]
+-	mov	r0,r2,ror#7
+-	add	r9,r9,r3			@ h+=Maj(a,b,c) from the past
+-	mov	r3,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r3,r3,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#3*4]
+-	eor	r3,r3,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#12*4]
+-
+-	add	r3,r3,r0
+-	eor	r0,r5,r5,ror#5	@ from BODY_00_15
+-	add	r2,r2,r3
+-	eor	r0,r0,r5,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r8,r8,r2			@ h+=X[i]
+-	str	r2,[sp,#3*4]
+-	eor	r2,r6,r7
+-	add	r8,r8,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r5
+-	add	r8,r8,r3			@ h+=K256[i]
+-	eor	r2,r2,r7			@ Ch(e,f,g)
+-	eor	r0,r9,r9,ror#11
+-	add	r8,r8,r2			@ h+=Ch(e,f,g)
+-#if 19==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 19<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r9,r10			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#5*4]		@ from future BODY_16_xx
+-	eor	r3,r9,r10			@ a^b, b^c in next round
+-	ldr	r1,[sp,#2*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r9,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r4,r4,r8			@ d+=h
+-	eor	r12,r12,r10			@ Maj(a,b,c)
+-	add	r8,r8,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r8,r8,r12			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#5*4]		@ 20
+-	@ ldr	r1,[sp,#2*4]
+-	mov	r0,r2,ror#7
+-	add	r8,r8,r12			@ h+=Maj(a,b,c) from the past
+-	mov	r12,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r12,r12,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#4*4]
+-	eor	r12,r12,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#13*4]
+-
+-	add	r12,r12,r0
+-	eor	r0,r4,r4,ror#5	@ from BODY_00_15
+-	add	r2,r2,r12
+-	eor	r0,r0,r4,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r7,r7,r2			@ h+=X[i]
+-	str	r2,[sp,#4*4]
+-	eor	r2,r5,r6
+-	add	r7,r7,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r4
+-	add	r7,r7,r12			@ h+=K256[i]
+-	eor	r2,r2,r6			@ Ch(e,f,g)
+-	eor	r0,r8,r8,ror#11
+-	add	r7,r7,r2			@ h+=Ch(e,f,g)
+-#if 20==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 20<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r8,r9			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#6*4]		@ from future BODY_16_xx
+-	eor	r12,r8,r9			@ a^b, b^c in next round
+-	ldr	r1,[sp,#3*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r8,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r11,r11,r7			@ d+=h
+-	eor	r3,r3,r9			@ Maj(a,b,c)
+-	add	r7,r7,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r7,r7,r3			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#6*4]		@ 21
+-	@ ldr	r1,[sp,#3*4]
+-	mov	r0,r2,ror#7
+-	add	r7,r7,r3			@ h+=Maj(a,b,c) from the past
+-	mov	r3,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r3,r3,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#5*4]
+-	eor	r3,r3,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#14*4]
+-
+-	add	r3,r3,r0
+-	eor	r0,r11,r11,ror#5	@ from BODY_00_15
+-	add	r2,r2,r3
+-	eor	r0,r0,r11,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r6,r6,r2			@ h+=X[i]
+-	str	r2,[sp,#5*4]
+-	eor	r2,r4,r5
+-	add	r6,r6,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r11
+-	add	r6,r6,r3			@ h+=K256[i]
+-	eor	r2,r2,r5			@ Ch(e,f,g)
+-	eor	r0,r7,r7,ror#11
+-	add	r6,r6,r2			@ h+=Ch(e,f,g)
+-#if 21==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 21<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r7,r8			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#7*4]		@ from future BODY_16_xx
+-	eor	r3,r7,r8			@ a^b, b^c in next round
+-	ldr	r1,[sp,#4*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r7,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r10,r10,r6			@ d+=h
+-	eor	r12,r12,r8			@ Maj(a,b,c)
+-	add	r6,r6,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r6,r6,r12			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#7*4]		@ 22
+-	@ ldr	r1,[sp,#4*4]
+-	mov	r0,r2,ror#7
+-	add	r6,r6,r12			@ h+=Maj(a,b,c) from the past
+-	mov	r12,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r12,r12,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#6*4]
+-	eor	r12,r12,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#15*4]
+-
+-	add	r12,r12,r0
+-	eor	r0,r10,r10,ror#5	@ from BODY_00_15
+-	add	r2,r2,r12
+-	eor	r0,r0,r10,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r5,r5,r2			@ h+=X[i]
+-	str	r2,[sp,#6*4]
+-	eor	r2,r11,r4
+-	add	r5,r5,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r10
+-	add	r5,r5,r12			@ h+=K256[i]
+-	eor	r2,r2,r4			@ Ch(e,f,g)
+-	eor	r0,r6,r6,ror#11
+-	add	r5,r5,r2			@ h+=Ch(e,f,g)
+-#if 22==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 22<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r6,r7			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#8*4]		@ from future BODY_16_xx
+-	eor	r12,r6,r7			@ a^b, b^c in next round
+-	ldr	r1,[sp,#5*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r6,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r9,r9,r5			@ d+=h
+-	eor	r3,r3,r7			@ Maj(a,b,c)
+-	add	r5,r5,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r5,r5,r3			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#8*4]		@ 23
+-	@ ldr	r1,[sp,#5*4]
+-	mov	r0,r2,ror#7
+-	add	r5,r5,r3			@ h+=Maj(a,b,c) from the past
+-	mov	r3,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r3,r3,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#7*4]
+-	eor	r3,r3,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#0*4]
+-
+-	add	r3,r3,r0
+-	eor	r0,r9,r9,ror#5	@ from BODY_00_15
+-	add	r2,r2,r3
+-	eor	r0,r0,r9,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r4,r4,r2			@ h+=X[i]
+-	str	r2,[sp,#7*4]
+-	eor	r2,r10,r11
+-	add	r4,r4,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r9
+-	add	r4,r4,r3			@ h+=K256[i]
+-	eor	r2,r2,r11			@ Ch(e,f,g)
+-	eor	r0,r5,r5,ror#11
+-	add	r4,r4,r2			@ h+=Ch(e,f,g)
+-#if 23==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 23<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r5,r6			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#9*4]		@ from future BODY_16_xx
+-	eor	r3,r5,r6			@ a^b, b^c in next round
+-	ldr	r1,[sp,#6*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r5,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r8,r8,r4			@ d+=h
+-	eor	r12,r12,r6			@ Maj(a,b,c)
+-	add	r4,r4,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r4,r4,r12			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#9*4]		@ 24
+-	@ ldr	r1,[sp,#6*4]
+-	mov	r0,r2,ror#7
+-	add	r4,r4,r12			@ h+=Maj(a,b,c) from the past
+-	mov	r12,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r12,r12,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#8*4]
+-	eor	r12,r12,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#1*4]
+-
+-	add	r12,r12,r0
+-	eor	r0,r8,r8,ror#5	@ from BODY_00_15
+-	add	r2,r2,r12
+-	eor	r0,r0,r8,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r11,r11,r2			@ h+=X[i]
+-	str	r2,[sp,#8*4]
+-	eor	r2,r9,r10
+-	add	r11,r11,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r8
+-	add	r11,r11,r12			@ h+=K256[i]
+-	eor	r2,r2,r10			@ Ch(e,f,g)
+-	eor	r0,r4,r4,ror#11
+-	add	r11,r11,r2			@ h+=Ch(e,f,g)
+-#if 24==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 24<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r4,r5			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#10*4]		@ from future BODY_16_xx
+-	eor	r12,r4,r5			@ a^b, b^c in next round
+-	ldr	r1,[sp,#7*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r4,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r7,r7,r11			@ d+=h
+-	eor	r3,r3,r5			@ Maj(a,b,c)
+-	add	r11,r11,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r11,r11,r3			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#10*4]		@ 25
+-	@ ldr	r1,[sp,#7*4]
+-	mov	r0,r2,ror#7
+-	add	r11,r11,r3			@ h+=Maj(a,b,c) from the past
+-	mov	r3,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r3,r3,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#9*4]
+-	eor	r3,r3,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#2*4]
+-
+-	add	r3,r3,r0
+-	eor	r0,r7,r7,ror#5	@ from BODY_00_15
+-	add	r2,r2,r3
+-	eor	r0,r0,r7,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r10,r10,r2			@ h+=X[i]
+-	str	r2,[sp,#9*4]
+-	eor	r2,r8,r9
+-	add	r10,r10,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r7
+-	add	r10,r10,r3			@ h+=K256[i]
+-	eor	r2,r2,r9			@ Ch(e,f,g)
+-	eor	r0,r11,r11,ror#11
+-	add	r10,r10,r2			@ h+=Ch(e,f,g)
+-#if 25==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 25<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r11,r4			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#11*4]		@ from future BODY_16_xx
+-	eor	r3,r11,r4			@ a^b, b^c in next round
+-	ldr	r1,[sp,#8*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r11,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r6,r6,r10			@ d+=h
+-	eor	r12,r12,r4			@ Maj(a,b,c)
+-	add	r10,r10,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r10,r10,r12			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#11*4]		@ 26
+-	@ ldr	r1,[sp,#8*4]
+-	mov	r0,r2,ror#7
+-	add	r10,r10,r12			@ h+=Maj(a,b,c) from the past
+-	mov	r12,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r12,r12,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#10*4]
+-	eor	r12,r12,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#3*4]
+-
+-	add	r12,r12,r0
+-	eor	r0,r6,r6,ror#5	@ from BODY_00_15
+-	add	r2,r2,r12
+-	eor	r0,r0,r6,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r9,r9,r2			@ h+=X[i]
+-	str	r2,[sp,#10*4]
+-	eor	r2,r7,r8
+-	add	r9,r9,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r6
+-	add	r9,r9,r12			@ h+=K256[i]
+-	eor	r2,r2,r8			@ Ch(e,f,g)
+-	eor	r0,r10,r10,ror#11
+-	add	r9,r9,r2			@ h+=Ch(e,f,g)
+-#if 26==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 26<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r10,r11			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#12*4]		@ from future BODY_16_xx
+-	eor	r12,r10,r11			@ a^b, b^c in next round
+-	ldr	r1,[sp,#9*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r10,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r5,r5,r9			@ d+=h
+-	eor	r3,r3,r11			@ Maj(a,b,c)
+-	add	r9,r9,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r9,r9,r3			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#12*4]		@ 27
+-	@ ldr	r1,[sp,#9*4]
+-	mov	r0,r2,ror#7
+-	add	r9,r9,r3			@ h+=Maj(a,b,c) from the past
+-	mov	r3,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r3,r3,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#11*4]
+-	eor	r3,r3,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#4*4]
+-
+-	add	r3,r3,r0
+-	eor	r0,r5,r5,ror#5	@ from BODY_00_15
+-	add	r2,r2,r3
+-	eor	r0,r0,r5,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r8,r8,r2			@ h+=X[i]
+-	str	r2,[sp,#11*4]
+-	eor	r2,r6,r7
+-	add	r8,r8,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r5
+-	add	r8,r8,r3			@ h+=K256[i]
+-	eor	r2,r2,r7			@ Ch(e,f,g)
+-	eor	r0,r9,r9,ror#11
+-	add	r8,r8,r2			@ h+=Ch(e,f,g)
+-#if 27==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 27<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r9,r10			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#13*4]		@ from future BODY_16_xx
+-	eor	r3,r9,r10			@ a^b, b^c in next round
+-	ldr	r1,[sp,#10*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r9,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r4,r4,r8			@ d+=h
+-	eor	r12,r12,r10			@ Maj(a,b,c)
+-	add	r8,r8,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r8,r8,r12			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#13*4]		@ 28
+-	@ ldr	r1,[sp,#10*4]
+-	mov	r0,r2,ror#7
+-	add	r8,r8,r12			@ h+=Maj(a,b,c) from the past
+-	mov	r12,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r12,r12,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#12*4]
+-	eor	r12,r12,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#5*4]
+-
+-	add	r12,r12,r0
+-	eor	r0,r4,r4,ror#5	@ from BODY_00_15
+-	add	r2,r2,r12
+-	eor	r0,r0,r4,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r7,r7,r2			@ h+=X[i]
+-	str	r2,[sp,#12*4]
+-	eor	r2,r5,r6
+-	add	r7,r7,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r4
+-	add	r7,r7,r12			@ h+=K256[i]
+-	eor	r2,r2,r6			@ Ch(e,f,g)
+-	eor	r0,r8,r8,ror#11
+-	add	r7,r7,r2			@ h+=Ch(e,f,g)
+-#if 28==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 28<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r8,r9			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#14*4]		@ from future BODY_16_xx
+-	eor	r12,r8,r9			@ a^b, b^c in next round
+-	ldr	r1,[sp,#11*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r8,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r11,r11,r7			@ d+=h
+-	eor	r3,r3,r9			@ Maj(a,b,c)
+-	add	r7,r7,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r7,r7,r3			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#14*4]		@ 29
+-	@ ldr	r1,[sp,#11*4]
+-	mov	r0,r2,ror#7
+-	add	r7,r7,r3			@ h+=Maj(a,b,c) from the past
+-	mov	r3,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r3,r3,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#13*4]
+-	eor	r3,r3,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#6*4]
+-
+-	add	r3,r3,r0
+-	eor	r0,r11,r11,ror#5	@ from BODY_00_15
+-	add	r2,r2,r3
+-	eor	r0,r0,r11,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r6,r6,r2			@ h+=X[i]
+-	str	r2,[sp,#13*4]
+-	eor	r2,r4,r5
+-	add	r6,r6,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r11
+-	add	r6,r6,r3			@ h+=K256[i]
+-	eor	r2,r2,r5			@ Ch(e,f,g)
+-	eor	r0,r7,r7,ror#11
+-	add	r6,r6,r2			@ h+=Ch(e,f,g)
+-#if 29==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 29<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r7,r8			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#15*4]		@ from future BODY_16_xx
+-	eor	r3,r7,r8			@ a^b, b^c in next round
+-	ldr	r1,[sp,#12*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r7,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r10,r10,r6			@ d+=h
+-	eor	r12,r12,r8			@ Maj(a,b,c)
+-	add	r6,r6,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r6,r6,r12			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#15*4]		@ 30
+-	@ ldr	r1,[sp,#12*4]
+-	mov	r0,r2,ror#7
+-	add	r6,r6,r12			@ h+=Maj(a,b,c) from the past
+-	mov	r12,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r12,r12,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#14*4]
+-	eor	r12,r12,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#7*4]
+-
+-	add	r12,r12,r0
+-	eor	r0,r10,r10,ror#5	@ from BODY_00_15
+-	add	r2,r2,r12
+-	eor	r0,r0,r10,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r12,[r14],#4			@ *K256++
+-	add	r5,r5,r2			@ h+=X[i]
+-	str	r2,[sp,#14*4]
+-	eor	r2,r11,r4
+-	add	r5,r5,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r10
+-	add	r5,r5,r12			@ h+=K256[i]
+-	eor	r2,r2,r4			@ Ch(e,f,g)
+-	eor	r0,r6,r6,ror#11
+-	add	r5,r5,r2			@ h+=Ch(e,f,g)
+-#if 30==31
+-	and	r12,r12,#0xff
+-	cmp	r12,#0xf2			@ done?
+-#endif
+-#if 30<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r12,r6,r7			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#0*4]		@ from future BODY_16_xx
+-	eor	r12,r6,r7			@ a^b, b^c in next round
+-	ldr	r1,[sp,#13*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r6,ror#20	@ Sigma0(a)
+-	and	r3,r3,r12			@ (b^c)&=(a^b)
+-	add	r9,r9,r5			@ d+=h
+-	eor	r3,r3,r7			@ Maj(a,b,c)
+-	add	r5,r5,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r5,r5,r3			@ h+=Maj(a,b,c)
+-	@ ldr	r2,[sp,#0*4]		@ 31
+-	@ ldr	r1,[sp,#13*4]
+-	mov	r0,r2,ror#7
+-	add	r5,r5,r3			@ h+=Maj(a,b,c) from the past
+-	mov	r3,r1,ror#17
+-	eor	r0,r0,r2,ror#18
+-	eor	r3,r3,r1,ror#19
+-	eor	r0,r0,r2,lsr#3	@ sigma0(X[i+1])
+-	ldr	r2,[sp,#15*4]
+-	eor	r3,r3,r1,lsr#10	@ sigma1(X[i+14])
+-	ldr	r1,[sp,#8*4]
+-
+-	add	r3,r3,r0
+-	eor	r0,r9,r9,ror#5	@ from BODY_00_15
+-	add	r2,r2,r3
+-	eor	r0,r0,r9,ror#19	@ Sigma1(e)
+-	add	r2,r2,r1			@ X[i]
+-	ldr	r3,[r14],#4			@ *K256++
+-	add	r4,r4,r2			@ h+=X[i]
+-	str	r2,[sp,#15*4]
+-	eor	r2,r10,r11
+-	add	r4,r4,r0,ror#6	@ h+=Sigma1(e)
+-	and	r2,r2,r9
+-	add	r4,r4,r3			@ h+=K256[i]
+-	eor	r2,r2,r11			@ Ch(e,f,g)
+-	eor	r0,r5,r5,ror#11
+-	add	r4,r4,r2			@ h+=Ch(e,f,g)
+-#if 31==31
+-	and	r3,r3,#0xff
+-	cmp	r3,#0xf2			@ done?
+-#endif
+-#if 31<15
+-# if __ARM_ARCH__>=7
+-	ldr	r2,[r1],#4			@ prefetch
+-# else
+-	ldrb	r2,[r1,#3]
+-# endif
+-	eor	r3,r5,r6			@ a^b, b^c in next round
+-#else
+-	ldr	r2,[sp,#1*4]		@ from future BODY_16_xx
+-	eor	r3,r5,r6			@ a^b, b^c in next round
+-	ldr	r1,[sp,#14*4]	@ from future BODY_16_xx
+-#endif
+-	eor	r0,r0,r5,ror#20	@ Sigma0(a)
+-	and	r12,r12,r3			@ (b^c)&=(a^b)
+-	add	r8,r8,r4			@ d+=h
+-	eor	r12,r12,r6			@ Maj(a,b,c)
+-	add	r4,r4,r0,ror#2	@ h+=Sigma0(a)
+-	@ add	r4,r4,r12			@ h+=Maj(a,b,c)
+-#if __ARM_ARCH__>=7
+-	ite	eq			@ Thumb2 thing, sanity check in ARM
+-#endif
+-	ldreq	r3,[sp,#16*4]		@ pull ctx
+-	bne	.Lrounds_16_xx
+-
+-	add	r4,r4,r12		@ h+=Maj(a,b,c) from the past
+-	ldr	r0,[r3,#0]
+-	ldr	r2,[r3,#4]
+-	ldr	r12,[r3,#8]
+-	add	r4,r4,r0
+-	ldr	r0,[r3,#12]
+-	add	r5,r5,r2
+-	ldr	r2,[r3,#16]
+-	add	r6,r6,r12
+-	ldr	r12,[r3,#20]
+-	add	r7,r7,r0
+-	ldr	r0,[r3,#24]
+-	add	r8,r8,r2
+-	ldr	r2,[r3,#28]
+-	add	r9,r9,r12
+-	ldr	r1,[sp,#17*4]		@ pull inp
+-	ldr	r12,[sp,#18*4]		@ pull inp+len
+-	add	r10,r10,r0
+-	add	r11,r11,r2
+-	stmia	r3,{r4,r5,r6,r7,r8,r9,r10,r11}
+-	cmp	r1,r12
+-	sub	r14,r14,#256	@ rewind Ktbl
+-	bne	.Loop
+-
+-	add	sp,sp,#19*4	@ destroy frame
+-#if __ARM_ARCH__>=5
+-	ldmia	sp!,{r4-r11,pc}
+-#else
+-	ldmia	sp!,{r4-r11,lr}
+-	tst	lr,#1
+-	moveq	pc,lr			@ be binary compatible with V4, yet
+-	.word	0xe12fff1e			@ interoperable with Thumb ISA:-)
+-#endif
+-.size	sha256_block_data_order,.-sha256_block_data_order
+-#if __ARM_MAX_ARCH__>=7
+-.arch	armv7-a
+-.fpu	neon
+-
+-.global	sha256_block_data_order_neon
+-.type	sha256_block_data_order_neon,%function
+-.align	4
+-sha256_block_data_order_neon:
+-.LNEON:
+-	stmdb	sp!,{r4-r12,lr}
+-
+-	sub	r11,sp,#16*4+16
+-	adr	r14,.Lsha256_block_data_order
+-	sub	r14,r14,#.Lsha256_block_data_order-K256
+-	bic	r11,r11,#15		@ align for 128-bit stores
+-	mov	r12,sp
+-	mov	sp,r11			@ alloca
+-	add	r2,r1,r2,lsl#6	@ len to point at the end of inp
+-
+-	vld1.8		{q0},[r1]!
+-	vld1.8		{q1},[r1]!
+-	vld1.8		{q2},[r1]!
+-	vld1.8		{q3},[r1]!
+-	vld1.32		{q8},[r14,:128]!
+-	vld1.32		{q9},[r14,:128]!
+-	vld1.32		{q10},[r14,:128]!
+-	vld1.32		{q11},[r14,:128]!
+-	vrev32.8	q0,q0		@ yes, even on
+-	str		r0,[sp,#64]
+-	vrev32.8	q1,q1		@ big-endian
+-	str		r1,[sp,#68]
+-	mov		r1,sp
+-	vrev32.8	q2,q2
+-	str		r2,[sp,#72]
+-	vrev32.8	q3,q3
+-	str		r12,[sp,#76]		@ save original sp
+-	vadd.i32	q8,q8,q0
+-	vadd.i32	q9,q9,q1
+-	vst1.32		{q8},[r1,:128]!
+-	vadd.i32	q10,q10,q2
+-	vst1.32		{q9},[r1,:128]!
+-	vadd.i32	q11,q11,q3
+-	vst1.32		{q10},[r1,:128]!
+-	vst1.32		{q11},[r1,:128]!
+-
+-	ldmia		r0,{r4-r11}
+-	sub		r1,r1,#64
+-	ldr		r2,[sp,#0]
+-	eor		r12,r12,r12
+-	eor		r3,r5,r6
+-	b		.L_00_48
+-
+-.align	4
+-.L_00_48:
+-	vext.8	q8,q0,q1,#4
+-	add	r11,r11,r2
+-	eor	r2,r9,r10
+-	eor	r0,r8,r8,ror#5
+-	vext.8	q9,q2,q3,#4
+-	add	r4,r4,r12
+-	and	r2,r2,r8
+-	eor	r12,r0,r8,ror#19
+-	vshr.u32	q10,q8,#7
+-	eor	r0,r4,r4,ror#11
+-	eor	r2,r2,r10
+-	vadd.i32	q0,q0,q9
+-	add	r11,r11,r12,ror#6
+-	eor	r12,r4,r5
+-	vshr.u32	q9,q8,#3
+-	eor	r0,r0,r4,ror#20
+-	add	r11,r11,r2
+-	vsli.32	q10,q8,#25
+-	ldr	r2,[sp,#4]
+-	and	r3,r3,r12
+-	vshr.u32	q11,q8,#18
+-	add	r7,r7,r11
+-	add	r11,r11,r0,ror#2
+-	eor	r3,r3,r5
+-	veor	q9,q9,q10
+-	add	r10,r10,r2
+-	vsli.32	q11,q8,#14
+-	eor	r2,r8,r9
+-	eor	r0,r7,r7,ror#5
+-	vshr.u32	d24,d7,#17
+-	add	r11,r11,r3
+-	and	r2,r2,r7
+-	veor	q9,q9,q11
+-	eor	r3,r0,r7,ror#19
+-	eor	r0,r11,r11,ror#11
+-	vsli.32	d24,d7,#15
+-	eor	r2,r2,r9
+-	add	r10,r10,r3,ror#6
+-	vshr.u32	d25,d7,#10
+-	eor	r3,r11,r4
+-	eor	r0,r0,r11,ror#20
+-	vadd.i32	q0,q0,q9
+-	add	r10,r10,r2
+-	ldr	r2,[sp,#8]
+-	veor	d25,d25,d24
+-	and	r12,r12,r3
+-	add	r6,r6,r10
+-	vshr.u32	d24,d7,#19
+-	add	r10,r10,r0,ror#2
+-	eor	r12,r12,r4
+-	vsli.32	d24,d7,#13
+-	add	r9,r9,r2
+-	eor	r2,r7,r8
+-	veor	d25,d25,d24
+-	eor	r0,r6,r6,ror#5
+-	add	r10,r10,r12
+-	vadd.i32	d0,d0,d25
+-	and	r2,r2,r6
+-	eor	r12,r0,r6,ror#19
+-	vshr.u32	d24,d0,#17
+-	eor	r0,r10,r10,ror#11
+-	eor	r2,r2,r8
+-	vsli.32	d24,d0,#15
+-	add	r9,r9,r12,ror#6
+-	eor	r12,r10,r11
+-	vshr.u32	d25,d0,#10
+-	eor	r0,r0,r10,ror#20
+-	add	r9,r9,r2
+-	veor	d25,d25,d24
+-	ldr	r2,[sp,#12]
+-	and	r3,r3,r12
+-	vshr.u32	d24,d0,#19
+-	add	r5,r5,r9
+-	add	r9,r9,r0,ror#2
+-	eor	r3,r3,r11
+-	vld1.32	{q8},[r14,:128]!
+-	add	r8,r8,r2
+-	vsli.32	d24,d0,#13
+-	eor	r2,r6,r7
+-	eor	r0,r5,r5,ror#5
+-	veor	d25,d25,d24
+-	add	r9,r9,r3
+-	and	r2,r2,r5
+-	vadd.i32	d1,d1,d25
+-	eor	r3,r0,r5,ror#19
+-	eor	r0,r9,r9,ror#11
+-	vadd.i32	q8,q8,q0
+-	eor	r2,r2,r7
+-	add	r8,r8,r3,ror#6
+-	eor	r3,r9,r10
+-	eor	r0,r0,r9,ror#20
+-	add	r8,r8,r2
+-	ldr	r2,[sp,#16]
+-	and	r12,r12,r3
+-	add	r4,r4,r8
+-	vst1.32	{q8},[r1,:128]!
+-	add	r8,r8,r0,ror#2
+-	eor	r12,r12,r10
+-	vext.8	q8,q1,q2,#4
+-	add	r7,r7,r2
+-	eor	r2,r5,r6
+-	eor	r0,r4,r4,ror#5
+-	vext.8	q9,q3,q0,#4
+-	add	r8,r8,r12
+-	and	r2,r2,r4
+-	eor	r12,r0,r4,ror#19
+-	vshr.u32	q10,q8,#7
+-	eor	r0,r8,r8,ror#11
+-	eor	r2,r2,r6
+-	vadd.i32	q1,q1,q9
+-	add	r7,r7,r12,ror#6
+-	eor	r12,r8,r9
+-	vshr.u32	q9,q8,#3
+-	eor	r0,r0,r8,ror#20
+-	add	r7,r7,r2
+-	vsli.32	q10,q8,#25
+-	ldr	r2,[sp,#20]
+-	and	r3,r3,r12
+-	vshr.u32	q11,q8,#18
+-	add	r11,r11,r7
+-	add	r7,r7,r0,ror#2
+-	eor	r3,r3,r9
+-	veor	q9,q9,q10
+-	add	r6,r6,r2
+-	vsli.32	q11,q8,#14
+-	eor	r2,r4,r5
+-	eor	r0,r11,r11,ror#5
+-	vshr.u32	d24,d1,#17
+-	add	r7,r7,r3
+-	and	r2,r2,r11
+-	veor	q9,q9,q11
+-	eor	r3,r0,r11,ror#19
+-	eor	r0,r7,r7,ror#11
+-	vsli.32	d24,d1,#15
+-	eor	r2,r2,r5
+-	add	r6,r6,r3,ror#6
+-	vshr.u32	d25,d1,#10
+-	eor	r3,r7,r8
+-	eor	r0,r0,r7,ror#20
+-	vadd.i32	q1,q1,q9
+-	add	r6,r6,r2
+-	ldr	r2,[sp,#24]
+-	veor	d25,d25,d24
+-	and	r12,r12,r3
+-	add	r10,r10,r6
+-	vshr.u32	d24,d1,#19
+-	add	r6,r6,r0,ror#2
+-	eor	r12,r12,r8
+-	vsli.32	d24,d1,#13
+-	add	r5,r5,r2
+-	eor	r2,r11,r4
+-	veor	d25,d25,d24
+-	eor	r0,r10,r10,ror#5
+-	add	r6,r6,r12
+-	vadd.i32	d2,d2,d25
+-	and	r2,r2,r10
+-	eor	r12,r0,r10,ror#19
+-	vshr.u32	d24,d2,#17
+-	eor	r0,r6,r6,ror#11
+-	eor	r2,r2,r4
+-	vsli.32	d24,d2,#15
+-	add	r5,r5,r12,ror#6
+-	eor	r12,r6,r7
+-	vshr.u32	d25,d2,#10
+-	eor	r0,r0,r6,ror#20
+-	add	r5,r5,r2
+-	veor	d25,d25,d24
+-	ldr	r2,[sp,#28]
+-	and	r3,r3,r12
+-	vshr.u32	d24,d2,#19
+-	add	r9,r9,r5
+-	add	r5,r5,r0,ror#2
+-	eor	r3,r3,r7
+-	vld1.32	{q8},[r14,:128]!
+-	add	r4,r4,r2
+-	vsli.32	d24,d2,#13
+-	eor	r2,r10,r11
+-	eor	r0,r9,r9,ror#5
+-	veor	d25,d25,d24
+-	add	r5,r5,r3
+-	and	r2,r2,r9
+-	vadd.i32	d3,d3,d25
+-	eor	r3,r0,r9,ror#19
+-	eor	r0,r5,r5,ror#11
+-	vadd.i32	q8,q8,q1
+-	eor	r2,r2,r11
+-	add	r4,r4,r3,ror#6
+-	eor	r3,r5,r6
+-	eor	r0,r0,r5,ror#20
+-	add	r4,r4,r2
+-	ldr	r2,[sp,#32]
+-	and	r12,r12,r3
+-	add	r8,r8,r4
+-	vst1.32	{q8},[r1,:128]!
+-	add	r4,r4,r0,ror#2
+-	eor	r12,r12,r6
+-	vext.8	q8,q2,q3,#4
+-	add	r11,r11,r2
+-	eor	r2,r9,r10
+-	eor	r0,r8,r8,ror#5
+-	vext.8	q9,q0,q1,#4
+-	add	r4,r4,r12
+-	and	r2,r2,r8
+-	eor	r12,r0,r8,ror#19
+-	vshr.u32	q10,q8,#7
+-	eor	r0,r4,r4,ror#11
+-	eor	r2,r2,r10
+-	vadd.i32	q2,q2,q9
+-	add	r11,r11,r12,ror#6
+-	eor	r12,r4,r5
+-	vshr.u32	q9,q8,#3
+-	eor	r0,r0,r4,ror#20
+-	add	r11,r11,r2
+-	vsli.32	q10,q8,#25
+-	ldr	r2,[sp,#36]
+-	and	r3,r3,r12
+-	vshr.u32	q11,q8,#18
+-	add	r7,r7,r11
+-	add	r11,r11,r0,ror#2
+-	eor	r3,r3,r5
+-	veor	q9,q9,q10
+-	add	r10,r10,r2
+-	vsli.32	q11,q8,#14
+-	eor	r2,r8,r9
+-	eor	r0,r7,r7,ror#5
+-	vshr.u32	d24,d3,#17
+-	add	r11,r11,r3
+-	and	r2,r2,r7
+-	veor	q9,q9,q11
+-	eor	r3,r0,r7,ror#19
+-	eor	r0,r11,r11,ror#11
+-	vsli.32	d24,d3,#15
+-	eor	r2,r2,r9
+-	add	r10,r10,r3,ror#6
+-	vshr.u32	d25,d3,#10
+-	eor	r3,r11,r4
+-	eor	r0,r0,r11,ror#20
+-	vadd.i32	q2,q2,q9
+-	add	r10,r10,r2
+-	ldr	r2,[sp,#40]
+-	veor	d25,d25,d24
+-	and	r12,r12,r3
+-	add	r6,r6,r10
+-	vshr.u32	d24,d3,#19
+-	add	r10,r10,r0,ror#2
+-	eor	r12,r12,r4
+-	vsli.32	d24,d3,#13
+-	add	r9,r9,r2
+-	eor	r2,r7,r8
+-	veor	d25,d25,d24
+-	eor	r0,r6,r6,ror#5
+-	add	r10,r10,r12
+-	vadd.i32	d4,d4,d25
+-	and	r2,r2,r6
+-	eor	r12,r0,r6,ror#19
+-	vshr.u32	d24,d4,#17
+-	eor	r0,r10,r10,ror#11
+-	eor	r2,r2,r8
+-	vsli.32	d24,d4,#15
+-	add	r9,r9,r12,ror#6
+-	eor	r12,r10,r11
+-	vshr.u32	d25,d4,#10
+-	eor	r0,r0,r10,ror#20
+-	add	r9,r9,r2
+-	veor	d25,d25,d24
+-	ldr	r2,[sp,#44]
+-	and	r3,r3,r12
+-	vshr.u32	d24,d4,#19
+-	add	r5,r5,r9
+-	add	r9,r9,r0,ror#2
+-	eor	r3,r3,r11
+-	vld1.32	{q8},[r14,:128]!
+-	add	r8,r8,r2
+-	vsli.32	d24,d4,#13
+-	eor	r2,r6,r7
+-	eor	r0,r5,r5,ror#5
+-	veor	d25,d25,d24
+-	add	r9,r9,r3
+-	and	r2,r2,r5
+-	vadd.i32	d5,d5,d25
+-	eor	r3,r0,r5,ror#19
+-	eor	r0,r9,r9,ror#11
+-	vadd.i32	q8,q8,q2
+-	eor	r2,r2,r7
+-	add	r8,r8,r3,ror#6
+-	eor	r3,r9,r10
+-	eor	r0,r0,r9,ror#20
+-	add	r8,r8,r2
+-	ldr	r2,[sp,#48]
+-	and	r12,r12,r3
+-	add	r4,r4,r8
+-	vst1.32	{q8},[r1,:128]!
+-	add	r8,r8,r0,ror#2
+-	eor	r12,r12,r10
+-	vext.8	q8,q3,q0,#4
+-	add	r7,r7,r2
+-	eor	r2,r5,r6
+-	eor	r0,r4,r4,ror#5
+-	vext.8	q9,q1,q2,#4
+-	add	r8,r8,r12
+-	and	r2,r2,r4
+-	eor	r12,r0,r4,ror#19
+-	vshr.u32	q10,q8,#7
+-	eor	r0,r8,r8,ror#11
+-	eor	r2,r2,r6
+-	vadd.i32	q3,q3,q9
+-	add	r7,r7,r12,ror#6
+-	eor	r12,r8,r9
+-	vshr.u32	q9,q8,#3
+-	eor	r0,r0,r8,ror#20
+-	add	r7,r7,r2
+-	vsli.32	q10,q8,#25
+-	ldr	r2,[sp,#52]
+-	and	r3,r3,r12
+-	vshr.u32	q11,q8,#18
+-	add	r11,r11,r7
+-	add	r7,r7,r0,ror#2
+-	eor	r3,r3,r9
+-	veor	q9,q9,q10
+-	add	r6,r6,r2
+-	vsli.32	q11,q8,#14
+-	eor	r2,r4,r5
+-	eor	r0,r11,r11,ror#5
+-	vshr.u32	d24,d5,#17
+-	add	r7,r7,r3
+-	and	r2,r2,r11
+-	veor	q9,q9,q11
+-	eor	r3,r0,r11,ror#19
+-	eor	r0,r7,r7,ror#11
+-	vsli.32	d24,d5,#15
+-	eor	r2,r2,r5
+-	add	r6,r6,r3,ror#6
+-	vshr.u32	d25,d5,#10
+-	eor	r3,r7,r8
+-	eor	r0,r0,r7,ror#20
+-	vadd.i32	q3,q3,q9
+-	add	r6,r6,r2
+-	ldr	r2,[sp,#56]
+-	veor	d25,d25,d24
+-	and	r12,r12,r3
+-	add	r10,r10,r6
+-	vshr.u32	d24,d5,#19
+-	add	r6,r6,r0,ror#2
+-	eor	r12,r12,r8
+-	vsli.32	d24,d5,#13
+-	add	r5,r5,r2
+-	eor	r2,r11,r4
+-	veor	d25,d25,d24
+-	eor	r0,r10,r10,ror#5
+-	add	r6,r6,r12
+-	vadd.i32	d6,d6,d25
+-	and	r2,r2,r10
+-	eor	r12,r0,r10,ror#19
+-	vshr.u32	d24,d6,#17
+-	eor	r0,r6,r6,ror#11
+-	eor	r2,r2,r4
+-	vsli.32	d24,d6,#15
+-	add	r5,r5,r12,ror#6
+-	eor	r12,r6,r7
+-	vshr.u32	d25,d6,#10
+-	eor	r0,r0,r6,ror#20
+-	add	r5,r5,r2
+-	veor	d25,d25,d24
+-	ldr	r2,[sp,#60]
+-	and	r3,r3,r12
+-	vshr.u32	d24,d6,#19
+-	add	r9,r9,r5
+-	add	r5,r5,r0,ror#2
+-	eor	r3,r3,r7
+-	vld1.32	{q8},[r14,:128]!
+-	add	r4,r4,r2
+-	vsli.32	d24,d6,#13
+-	eor	r2,r10,r11
+-	eor	r0,r9,r9,ror#5
+-	veor	d25,d25,d24
+-	add	r5,r5,r3
+-	and	r2,r2,r9
+-	vadd.i32	d7,d7,d25
+-	eor	r3,r0,r9,ror#19
+-	eor	r0,r5,r5,ror#11
+-	vadd.i32	q8,q8,q3
+-	eor	r2,r2,r11
+-	add	r4,r4,r3,ror#6
+-	eor	r3,r5,r6
+-	eor	r0,r0,r5,ror#20
+-	add	r4,r4,r2
+-	ldr	r2,[r14]
+-	and	r12,r12,r3
+-	add	r8,r8,r4
+-	vst1.32	{q8},[r1,:128]!
+-	add	r4,r4,r0,ror#2
+-	eor	r12,r12,r6
+-	teq	r2,#0				@ check for K256 terminator
+-	ldr	r2,[sp,#0]
+-	sub	r1,r1,#64
+-	bne	.L_00_48
+-
+-	ldr		r1,[sp,#68]
+-	ldr		r0,[sp,#72]
+-	sub		r14,r14,#256	@ rewind r14
+-	teq		r1,r0
+-	it		eq
+-	subeq		r1,r1,#64		@ avoid SEGV
+-	vld1.8		{q0},[r1]!		@ load next input block
+-	vld1.8		{q1},[r1]!
+-	vld1.8		{q2},[r1]!
+-	vld1.8		{q3},[r1]!
+-	it		ne
+-	strne		r1,[sp,#68]
+-	mov		r1,sp
+-	add	r11,r11,r2
+-	eor	r2,r9,r10
+-	eor	r0,r8,r8,ror#5
+-	add	r4,r4,r12
+-	vld1.32	{q8},[r14,:128]!
+-	and	r2,r2,r8
+-	eor	r12,r0,r8,ror#19
+-	eor	r0,r4,r4,ror#11
+-	eor	r2,r2,r10
+-	vrev32.8	q0,q0
+-	add	r11,r11,r12,ror#6
+-	eor	r12,r4,r5
+-	eor	r0,r0,r4,ror#20
+-	add	r11,r11,r2
+-	vadd.i32	q8,q8,q0
+-	ldr	r2,[sp,#4]
+-	and	r3,r3,r12
+-	add	r7,r7,r11
+-	add	r11,r11,r0,ror#2
+-	eor	r3,r3,r5
+-	add	r10,r10,r2
+-	eor	r2,r8,r9
+-	eor	r0,r7,r7,ror#5
+-	add	r11,r11,r3
+-	and	r2,r2,r7
+-	eor	r3,r0,r7,ror#19
+-	eor	r0,r11,r11,ror#11
+-	eor	r2,r2,r9
+-	add	r10,r10,r3,ror#6
+-	eor	r3,r11,r4
+-	eor	r0,r0,r11,ror#20
+-	add	r10,r10,r2
+-	ldr	r2,[sp,#8]
+-	and	r12,r12,r3
+-	add	r6,r6,r10
+-	add	r10,r10,r0,ror#2
+-	eor	r12,r12,r4
+-	add	r9,r9,r2
+-	eor	r2,r7,r8
+-	eor	r0,r6,r6,ror#5
+-	add	r10,r10,r12
+-	and	r2,r2,r6
+-	eor	r12,r0,r6,ror#19
+-	eor	r0,r10,r10,ror#11
+-	eor	r2,r2,r8
+-	add	r9,r9,r12,ror#6
+-	eor	r12,r10,r11
+-	eor	r0,r0,r10,ror#20
+-	add	r9,r9,r2
+-	ldr	r2,[sp,#12]
+-	and	r3,r3,r12
+-	add	r5,r5,r9
+-	add	r9,r9,r0,ror#2
+-	eor	r3,r3,r11
+-	add	r8,r8,r2
+-	eor	r2,r6,r7
+-	eor	r0,r5,r5,ror#5
+-	add	r9,r9,r3
+-	and	r2,r2,r5
+-	eor	r3,r0,r5,ror#19
+-	eor	r0,r9,r9,ror#11
+-	eor	r2,r2,r7
+-	add	r8,r8,r3,ror#6
+-	eor	r3,r9,r10
+-	eor	r0,r0,r9,ror#20
+-	add	r8,r8,r2
+-	ldr	r2,[sp,#16]
+-	and	r12,r12,r3
+-	add	r4,r4,r8
+-	add	r8,r8,r0,ror#2
+-	eor	r12,r12,r10
+-	vst1.32	{q8},[r1,:128]!
+-	add	r7,r7,r2
+-	eor	r2,r5,r6
+-	eor	r0,r4,r4,ror#5
+-	add	r8,r8,r12
+-	vld1.32	{q8},[r14,:128]!
+-	and	r2,r2,r4
+-	eor	r12,r0,r4,ror#19
+-	eor	r0,r8,r8,ror#11
+-	eor	r2,r2,r6
+-	vrev32.8	q1,q1
+-	add	r7,r7,r12,ror#6
+-	eor	r12,r8,r9
+-	eor	r0,r0,r8,ror#20
+-	add	r7,r7,r2
+-	vadd.i32	q8,q8,q1
+-	ldr	r2,[sp,#20]
+-	and	r3,r3,r12
+-	add	r11,r11,r7
+-	add	r7,r7,r0,ror#2
+-	eor	r3,r3,r9
+-	add	r6,r6,r2
+-	eor	r2,r4,r5
+-	eor	r0,r11,r11,ror#5
+-	add	r7,r7,r3
+-	and	r2,r2,r11
+-	eor	r3,r0,r11,ror#19
+-	eor	r0,r7,r7,ror#11
+-	eor	r2,r2,r5
+-	add	r6,r6,r3,ror#6
+-	eor	r3,r7,r8
+-	eor	r0,r0,r7,ror#20
+-	add	r6,r6,r2
+-	ldr	r2,[sp,#24]
+-	and	r12,r12,r3
+-	add	r10,r10,r6
+-	add	r6,r6,r0,ror#2
+-	eor	r12,r12,r8
+-	add	r5,r5,r2
+-	eor	r2,r11,r4
+-	eor	r0,r10,r10,ror#5
+-	add	r6,r6,r12
+-	and	r2,r2,r10
+-	eor	r12,r0,r10,ror#19
+-	eor	r0,r6,r6,ror#11
+-	eor	r2,r2,r4
+-	add	r5,r5,r12,ror#6
+-	eor	r12,r6,r7
+-	eor	r0,r0,r6,ror#20
+-	add	r5,r5,r2
+-	ldr	r2,[sp,#28]
+-	and	r3,r3,r12
+-	add	r9,r9,r5
+-	add	r5,r5,r0,ror#2
+-	eor	r3,r3,r7
+-	add	r4,r4,r2
+-	eor	r2,r10,r11
+-	eor	r0,r9,r9,ror#5
+-	add	r5,r5,r3
+-	and	r2,r2,r9
+-	eor	r3,r0,r9,ror#19
+-	eor	r0,r5,r5,ror#11
+-	eor	r2,r2,r11
+-	add	r4,r4,r3,ror#6
+-	eor	r3,r5,r6
+-	eor	r0,r0,r5,ror#20
+-	add	r4,r4,r2
+-	ldr	r2,[sp,#32]
+-	and	r12,r12,r3
+-	add	r8,r8,r4
+-	add	r4,r4,r0,ror#2
+-	eor	r12,r12,r6
+-	vst1.32	{q8},[r1,:128]!
+-	add	r11,r11,r2
+-	eor	r2,r9,r10
+-	eor	r0,r8,r8,ror#5
+-	add	r4,r4,r12
+-	vld1.32	{q8},[r14,:128]!
+-	and	r2,r2,r8
+-	eor	r12,r0,r8,ror#19
+-	eor	r0,r4,r4,ror#11
+-	eor	r2,r2,r10
+-	vrev32.8	q2,q2
+-	add	r11,r11,r12,ror#6
+-	eor	r12,r4,r5
+-	eor	r0,r0,r4,ror#20
+-	add	r11,r11,r2
+-	vadd.i32	q8,q8,q2
+-	ldr	r2,[sp,#36]
+-	and	r3,r3,r12
+-	add	r7,r7,r11
+-	add	r11,r11,r0,ror#2
+-	eor	r3,r3,r5
+-	add	r10,r10,r2
+-	eor	r2,r8,r9
+-	eor	r0,r7,r7,ror#5
+-	add	r11,r11,r3
+-	and	r2,r2,r7
+-	eor	r3,r0,r7,ror#19
+-	eor	r0,r11,r11,ror#11
+-	eor	r2,r2,r9
+-	add	r10,r10,r3,ror#6
+-	eor	r3,r11,r4
+-	eor	r0,r0,r11,ror#20
+-	add	r10,r10,r2
+-	ldr	r2,[sp,#40]
+-	and	r12,r12,r3
+-	add	r6,r6,r10
+-	add	r10,r10,r0,ror#2
+-	eor	r12,r12,r4
+-	add	r9,r9,r2
+-	eor	r2,r7,r8
+-	eor	r0,r6,r6,ror#5
+-	add	r10,r10,r12
+-	and	r2,r2,r6
+-	eor	r12,r0,r6,ror#19
+-	eor	r0,r10,r10,ror#11
+-	eor	r2,r2,r8
+-	add	r9,r9,r12,ror#6
+-	eor	r12,r10,r11
+-	eor	r0,r0,r10,ror#20
+-	add	r9,r9,r2
+-	ldr	r2,[sp,#44]
+-	and	r3,r3,r12
+-	add	r5,r5,r9
+-	add	r9,r9,r0,ror#2
+-	eor	r3,r3,r11
+-	add	r8,r8,r2
+-	eor	r2,r6,r7
+-	eor	r0,r5,r5,ror#5
+-	add	r9,r9,r3
+-	and	r2,r2,r5
+-	eor	r3,r0,r5,ror#19
+-	eor	r0,r9,r9,ror#11
+-	eor	r2,r2,r7
+-	add	r8,r8,r3,ror#6
+-	eor	r3,r9,r10
+-	eor	r0,r0,r9,ror#20
+-	add	r8,r8,r2
+-	ldr	r2,[sp,#48]
+-	and	r12,r12,r3
+-	add	r4,r4,r8
+-	add	r8,r8,r0,ror#2
+-	eor	r12,r12,r10
+-	vst1.32	{q8},[r1,:128]!
+-	add	r7,r7,r2
+-	eor	r2,r5,r6
+-	eor	r0,r4,r4,ror#5
+-	add	r8,r8,r12
+-	vld1.32	{q8},[r14,:128]!
+-	and	r2,r2,r4
+-	eor	r12,r0,r4,ror#19
+-	eor	r0,r8,r8,ror#11
+-	eor	r2,r2,r6
+-	vrev32.8	q3,q3
+-	add	r7,r7,r12,ror#6
+-	eor	r12,r8,r9
+-	eor	r0,r0,r8,ror#20
+-	add	r7,r7,r2
+-	vadd.i32	q8,q8,q3
+-	ldr	r2,[sp,#52]
+-	and	r3,r3,r12
+-	add	r11,r11,r7
+-	add	r7,r7,r0,ror#2
+-	eor	r3,r3,r9
+-	add	r6,r6,r2
+-	eor	r2,r4,r5
+-	eor	r0,r11,r11,ror#5
+-	add	r7,r7,r3
+-	and	r2,r2,r11
+-	eor	r3,r0,r11,ror#19
+-	eor	r0,r7,r7,ror#11
+-	eor	r2,r2,r5
+-	add	r6,r6,r3,ror#6
+-	eor	r3,r7,r8
+-	eor	r0,r0,r7,ror#20
+-	add	r6,r6,r2
+-	ldr	r2,[sp,#56]
+-	and	r12,r12,r3
+-	add	r10,r10,r6
+-	add	r6,r6,r0,ror#2
+-	eor	r12,r12,r8
+-	add	r5,r5,r2
+-	eor	r2,r11,r4
+-	eor	r0,r10,r10,ror#5
+-	add	r6,r6,r12
+-	and	r2,r2,r10
+-	eor	r12,r0,r10,ror#19
+-	eor	r0,r6,r6,ror#11
+-	eor	r2,r2,r4
+-	add	r5,r5,r12,ror#6
+-	eor	r12,r6,r7
+-	eor	r0,r0,r6,ror#20
+-	add	r5,r5,r2
+-	ldr	r2,[sp,#60]
+-	and	r3,r3,r12
+-	add	r9,r9,r5
+-	add	r5,r5,r0,ror#2
+-	eor	r3,r3,r7
+-	add	r4,r4,r2
+-	eor	r2,r10,r11
+-	eor	r0,r9,r9,ror#5
+-	add	r5,r5,r3
+-	and	r2,r2,r9
+-	eor	r3,r0,r9,ror#19
+-	eor	r0,r5,r5,ror#11
+-	eor	r2,r2,r11
+-	add	r4,r4,r3,ror#6
+-	eor	r3,r5,r6
+-	eor	r0,r0,r5,ror#20
+-	add	r4,r4,r2
+-	ldr	r2,[sp,#64]
+-	and	r12,r12,r3
+-	add	r8,r8,r4
+-	add	r4,r4,r0,ror#2
+-	eor	r12,r12,r6
+-	vst1.32	{q8},[r1,:128]!
+-	ldr	r0,[r2,#0]
+-	add	r4,r4,r12			@ h+=Maj(a,b,c) from the past
+-	ldr	r12,[r2,#4]
+-	ldr	r3,[r2,#8]
+-	ldr	r1,[r2,#12]
+-	add	r4,r4,r0			@ accumulate
+-	ldr	r0,[r2,#16]
+-	add	r5,r5,r12
+-	ldr	r12,[r2,#20]
+-	add	r6,r6,r3
+-	ldr	r3,[r2,#24]
+-	add	r7,r7,r1
+-	ldr	r1,[r2,#28]
+-	add	r8,r8,r0
+-	str	r4,[r2],#4
+-	add	r9,r9,r12
+-	str	r5,[r2],#4
+-	add	r10,r10,r3
+-	str	r6,[r2],#4
+-	add	r11,r11,r1
+-	str	r7,[r2],#4
+-	stmia	r2,{r8-r11}
+-
+-	ittte	ne
+-	movne	r1,sp
+-	ldrne	r2,[sp,#0]
+-	eorne	r12,r12,r12
+-	ldreq	sp,[sp,#76]			@ restore original sp
+-	itt	ne
+-	eorne	r3,r5,r6
+-	bne	.L_00_48
+-
+-	ldmia	sp!,{r4-r12,pc}
+-.size	sha256_block_data_order_neon,.-sha256_block_data_order_neon
+-#endif
+-#if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+-
+-# ifdef __thumb2__
+-#  define INST(a,b,c,d)	.byte	c,d|0xc,a,b
+-# else
+-#  define INST(a,b,c,d)	.byte	a,b,c,d
+-# endif
+-
+-.type	sha256_block_data_order_armv8,%function
+-.align	5
+-sha256_block_data_order_armv8:
+-.LARMv8:
+-	vld1.32	{q0,q1},[r0]
+-# ifdef __thumb2__
+-	adr	r3,.LARMv8
+-	sub	r3,r3,#.LARMv8-K256
+-# else
+-	adrl	r3,K256
+-# endif
+-	add	r2,r1,r2,lsl#6	@ len to point at the end of inp
+-
+-.Loop_v8:
+-	vld1.8		{q8-q9},[r1]!
+-	vld1.8		{q10-q11},[r1]!
+-	vld1.32		{q12},[r3]!
+-	vrev32.8	q8,q8
+-	vrev32.8	q9,q9
+-	vrev32.8	q10,q10
+-	vrev32.8	q11,q11
+-	vmov		q14,q0	@ offload
+-	vmov		q15,q1
+-	teq		r1,r2
+-	vld1.32		{q13},[r3]!
+-	vadd.i32	q12,q12,q8
+-	INST(0xe2,0x03,0xfa,0xf3)	@ sha256su0 q8,q9
+-	vmov		q2,q0
+-	INST(0x68,0x0c,0x02,0xf3)	@ sha256h q0,q1,q12
+-	INST(0x68,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q12
+-	INST(0xe6,0x0c,0x64,0xf3)	@ sha256su1 q8,q10,q11
+-	vld1.32		{q12},[r3]!
+-	vadd.i32	q13,q13,q9
+-	INST(0xe4,0x23,0xfa,0xf3)	@ sha256su0 q9,q10
+-	vmov		q2,q0
+-	INST(0x6a,0x0c,0x02,0xf3)	@ sha256h q0,q1,q13
+-	INST(0x6a,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q13
+-	INST(0xe0,0x2c,0x66,0xf3)	@ sha256su1 q9,q11,q8
+-	vld1.32		{q13},[r3]!
+-	vadd.i32	q12,q12,q10
+-	INST(0xe6,0x43,0xfa,0xf3)	@ sha256su0 q10,q11
+-	vmov		q2,q0
+-	INST(0x68,0x0c,0x02,0xf3)	@ sha256h q0,q1,q12
+-	INST(0x68,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q12
+-	INST(0xe2,0x4c,0x60,0xf3)	@ sha256su1 q10,q8,q9
+-	vld1.32		{q12},[r3]!
+-	vadd.i32	q13,q13,q11
+-	INST(0xe0,0x63,0xfa,0xf3)	@ sha256su0 q11,q8
+-	vmov		q2,q0
+-	INST(0x6a,0x0c,0x02,0xf3)	@ sha256h q0,q1,q13
+-	INST(0x6a,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q13
+-	INST(0xe4,0x6c,0x62,0xf3)	@ sha256su1 q11,q9,q10
+-	vld1.32		{q13},[r3]!
+-	vadd.i32	q12,q12,q8
+-	INST(0xe2,0x03,0xfa,0xf3)	@ sha256su0 q8,q9
+-	vmov		q2,q0
+-	INST(0x68,0x0c,0x02,0xf3)	@ sha256h q0,q1,q12
+-	INST(0x68,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q12
+-	INST(0xe6,0x0c,0x64,0xf3)	@ sha256su1 q8,q10,q11
+-	vld1.32		{q12},[r3]!
+-	vadd.i32	q13,q13,q9
+-	INST(0xe4,0x23,0xfa,0xf3)	@ sha256su0 q9,q10
+-	vmov		q2,q0
+-	INST(0x6a,0x0c,0x02,0xf3)	@ sha256h q0,q1,q13
+-	INST(0x6a,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q13
+-	INST(0xe0,0x2c,0x66,0xf3)	@ sha256su1 q9,q11,q8
+-	vld1.32		{q13},[r3]!
+-	vadd.i32	q12,q12,q10
+-	INST(0xe6,0x43,0xfa,0xf3)	@ sha256su0 q10,q11
+-	vmov		q2,q0
+-	INST(0x68,0x0c,0x02,0xf3)	@ sha256h q0,q1,q12
+-	INST(0x68,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q12
+-	INST(0xe2,0x4c,0x60,0xf3)	@ sha256su1 q10,q8,q9
+-	vld1.32		{q12},[r3]!
+-	vadd.i32	q13,q13,q11
+-	INST(0xe0,0x63,0xfa,0xf3)	@ sha256su0 q11,q8
+-	vmov		q2,q0
+-	INST(0x6a,0x0c,0x02,0xf3)	@ sha256h q0,q1,q13
+-	INST(0x6a,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q13
+-	INST(0xe4,0x6c,0x62,0xf3)	@ sha256su1 q11,q9,q10
+-	vld1.32		{q13},[r3]!
+-	vadd.i32	q12,q12,q8
+-	INST(0xe2,0x03,0xfa,0xf3)	@ sha256su0 q8,q9
+-	vmov		q2,q0
+-	INST(0x68,0x0c,0x02,0xf3)	@ sha256h q0,q1,q12
+-	INST(0x68,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q12
+-	INST(0xe6,0x0c,0x64,0xf3)	@ sha256su1 q8,q10,q11
+-	vld1.32		{q12},[r3]!
+-	vadd.i32	q13,q13,q9
+-	INST(0xe4,0x23,0xfa,0xf3)	@ sha256su0 q9,q10
+-	vmov		q2,q0
+-	INST(0x6a,0x0c,0x02,0xf3)	@ sha256h q0,q1,q13
+-	INST(0x6a,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q13
+-	INST(0xe0,0x2c,0x66,0xf3)	@ sha256su1 q9,q11,q8
+-	vld1.32		{q13},[r3]!
+-	vadd.i32	q12,q12,q10
+-	INST(0xe6,0x43,0xfa,0xf3)	@ sha256su0 q10,q11
+-	vmov		q2,q0
+-	INST(0x68,0x0c,0x02,0xf3)	@ sha256h q0,q1,q12
+-	INST(0x68,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q12
+-	INST(0xe2,0x4c,0x60,0xf3)	@ sha256su1 q10,q8,q9
+-	vld1.32		{q12},[r3]!
+-	vadd.i32	q13,q13,q11
+-	INST(0xe0,0x63,0xfa,0xf3)	@ sha256su0 q11,q8
+-	vmov		q2,q0
+-	INST(0x6a,0x0c,0x02,0xf3)	@ sha256h q0,q1,q13
+-	INST(0x6a,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q13
+-	INST(0xe4,0x6c,0x62,0xf3)	@ sha256su1 q11,q9,q10
+-	vld1.32		{q13},[r3]!
+-	vadd.i32	q12,q12,q8
+-	vmov		q2,q0
+-	INST(0x68,0x0c,0x02,0xf3)	@ sha256h q0,q1,q12
+-	INST(0x68,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q12
+-
+-	vld1.32		{q12},[r3]!
+-	vadd.i32	q13,q13,q9
+-	vmov		q2,q0
+-	INST(0x6a,0x0c,0x02,0xf3)	@ sha256h q0,q1,q13
+-	INST(0x6a,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q13
+-
+-	vld1.32		{q13},[r3]
+-	vadd.i32	q12,q12,q10
+-	sub		r3,r3,#256-16	@ rewind
+-	vmov		q2,q0
+-	INST(0x68,0x0c,0x02,0xf3)	@ sha256h q0,q1,q12
+-	INST(0x68,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q12
+-
+-	vadd.i32	q13,q13,q11
+-	vmov		q2,q0
+-	INST(0x6a,0x0c,0x02,0xf3)	@ sha256h q0,q1,q13
+-	INST(0x6a,0x2c,0x14,0xf3)	@ sha256h2 q1,q2,q13
+-
+-	vadd.i32	q0,q0,q14
+-	vadd.i32	q1,q1,q15
+-	it		ne
+-	bne		.Loop_v8
+-
+-	vst1.32		{q0,q1},[r0]
+-
+-	bx	lr		@ bx lr
+-.size	sha256_block_data_order_armv8,.-sha256_block_data_order_armv8
+-#endif
+-.asciz  "SHA256 block transform for ARMv4/NEON/ARMv8, CRYPTOGAMS by <appro@openssl.org>"
+-.align	2
+-#if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+-.comm   OPENSSL_armcap_P,4,4
+-#endif
+diff --git a/arch/arm/crypto/sha512-core.S_shipped b/arch/arm/crypto/sha512-core.S_shipped
+deleted file mode 100644
+index 03014624f2ab..000000000000
+--- a/arch/arm/crypto/sha512-core.S_shipped
++++ /dev/null
+@@ -1,1869 +0,0 @@
+-@ SPDX-License-Identifier: GPL-2.0
+-
+-@ This code is taken from the OpenSSL project but the author (Andy Polyakov)
+-@ has relicensed it under the GPLv2. Therefore this program is free software;
+-@ you can redistribute it and/or modify it under the terms of the GNU General
+-@ Public License version 2 as published by the Free Software Foundation.
+-@
+-@ The original headers, including the original license headers, are
+-@ included below for completeness.
+-
+-@ ====================================================================
+-@ Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
+-@ project. The module is, however, dual licensed under OpenSSL and
+-@ CRYPTOGAMS licenses depending on where you obtain it. For further
+-@ details see https://www.openssl.org/~appro/cryptogams/.
+-@ ====================================================================
+-
+-@ SHA512 block procedure for ARMv4. September 2007.
+-
+-@ This code is ~4.5 (four and a half) times faster than code generated
+-@ by gcc 3.4 and it spends ~72 clock cycles per byte [on single-issue
+-@ Xscale PXA250 core].
+-@
+-@ July 2010.
+-@
+-@ Rescheduling for dual-issue pipeline resulted in 6% improvement on
+-@ Cortex A8 core and ~40 cycles per processed byte.
+-
+-@ February 2011.
+-@
+-@ Profiler-assisted and platform-specific optimization resulted in 7%
+-@ improvement on Coxtex A8 core and ~38 cycles per byte.
+-
+-@ March 2011.
+-@
+-@ Add NEON implementation. On Cortex A8 it was measured to process
+-@ one byte in 23.3 cycles or ~60% faster than integer-only code.
+-
+-@ August 2012.
+-@
+-@ Improve NEON performance by 12% on Snapdragon S4. In absolute
+-@ terms it's 22.6 cycles per byte, which is disappointing result.
+-@ Technical writers asserted that 3-way S4 pipeline can sustain
+-@ multiple NEON instructions per cycle, but dual NEON issue could
+-@ not be observed, see https://www.openssl.org/~appro/Snapdragon-S4.html
+-@ for further details. On side note Cortex-A15 processes one byte in
+-@ 16 cycles.
+-
+-@ Byte order [in]dependence. =========================================
+-@
+-@ Originally caller was expected to maintain specific *dword* order in
+-@ h[0-7], namely with most significant dword at *lower* address, which
+-@ was reflected in below two parameters as 0 and 4. Now caller is
+-@ expected to maintain native byte order for whole 64-bit values.
+-#ifndef __KERNEL__
+-# include "arm_arch.h"
+-# define VFP_ABI_PUSH	vstmdb	sp!,{d8-d15}
+-# define VFP_ABI_POP	vldmia	sp!,{d8-d15}
+-#else
+-# define __ARM_ARCH__ __LINUX_ARM_ARCH__
+-# define __ARM_MAX_ARCH__ 7
+-# define VFP_ABI_PUSH
+-# define VFP_ABI_POP
+-#endif
+-
+-#ifdef __ARMEL__
+-# define LO 0
+-# define HI 4
+-# define WORD64(hi0,lo0,hi1,lo1)	.word	lo0,hi0, lo1,hi1
+-#else
+-# define HI 0
+-# define LO 4
+-# define WORD64(hi0,lo0,hi1,lo1)	.word	hi0,lo0, hi1,lo1
+-#endif
+-
+-.text
+-#if __ARM_ARCH__<7
+-.code	32
+-#else
+-.syntax unified
+-# ifdef __thumb2__
+-.thumb
+-# else
+-.code   32
+-# endif
+-#endif
+-
+-.type	K512,%object
+-.align	5
+-K512:
+-WORD64(0x428a2f98,0xd728ae22, 0x71374491,0x23ef65cd)
+-WORD64(0xb5c0fbcf,0xec4d3b2f, 0xe9b5dba5,0x8189dbbc)
+-WORD64(0x3956c25b,0xf348b538, 0x59f111f1,0xb605d019)
+-WORD64(0x923f82a4,0xaf194f9b, 0xab1c5ed5,0xda6d8118)
+-WORD64(0xd807aa98,0xa3030242, 0x12835b01,0x45706fbe)
+-WORD64(0x243185be,0x4ee4b28c, 0x550c7dc3,0xd5ffb4e2)
+-WORD64(0x72be5d74,0xf27b896f, 0x80deb1fe,0x3b1696b1)
+-WORD64(0x9bdc06a7,0x25c71235, 0xc19bf174,0xcf692694)
+-WORD64(0xe49b69c1,0x9ef14ad2, 0xefbe4786,0x384f25e3)
+-WORD64(0x0fc19dc6,0x8b8cd5b5, 0x240ca1cc,0x77ac9c65)
+-WORD64(0x2de92c6f,0x592b0275, 0x4a7484aa,0x6ea6e483)
+-WORD64(0x5cb0a9dc,0xbd41fbd4, 0x76f988da,0x831153b5)
+-WORD64(0x983e5152,0xee66dfab, 0xa831c66d,0x2db43210)
+-WORD64(0xb00327c8,0x98fb213f, 0xbf597fc7,0xbeef0ee4)
+-WORD64(0xc6e00bf3,0x3da88fc2, 0xd5a79147,0x930aa725)
+-WORD64(0x06ca6351,0xe003826f, 0x14292967,0x0a0e6e70)
+-WORD64(0x27b70a85,0x46d22ffc, 0x2e1b2138,0x5c26c926)
+-WORD64(0x4d2c6dfc,0x5ac42aed, 0x53380d13,0x9d95b3df)
+-WORD64(0x650a7354,0x8baf63de, 0x766a0abb,0x3c77b2a8)
+-WORD64(0x81c2c92e,0x47edaee6, 0x92722c85,0x1482353b)
+-WORD64(0xa2bfe8a1,0x4cf10364, 0xa81a664b,0xbc423001)
+-WORD64(0xc24b8b70,0xd0f89791, 0xc76c51a3,0x0654be30)
+-WORD64(0xd192e819,0xd6ef5218, 0xd6990624,0x5565a910)
+-WORD64(0xf40e3585,0x5771202a, 0x106aa070,0x32bbd1b8)
+-WORD64(0x19a4c116,0xb8d2d0c8, 0x1e376c08,0x5141ab53)
+-WORD64(0x2748774c,0xdf8eeb99, 0x34b0bcb5,0xe19b48a8)
+-WORD64(0x391c0cb3,0xc5c95a63, 0x4ed8aa4a,0xe3418acb)
+-WORD64(0x5b9cca4f,0x7763e373, 0x682e6ff3,0xd6b2b8a3)
+-WORD64(0x748f82ee,0x5defb2fc, 0x78a5636f,0x43172f60)
+-WORD64(0x84c87814,0xa1f0ab72, 0x8cc70208,0x1a6439ec)
+-WORD64(0x90befffa,0x23631e28, 0xa4506ceb,0xde82bde9)
+-WORD64(0xbef9a3f7,0xb2c67915, 0xc67178f2,0xe372532b)
+-WORD64(0xca273ece,0xea26619c, 0xd186b8c7,0x21c0c207)
+-WORD64(0xeada7dd6,0xcde0eb1e, 0xf57d4f7f,0xee6ed178)
+-WORD64(0x06f067aa,0x72176fba, 0x0a637dc5,0xa2c898a6)
+-WORD64(0x113f9804,0xbef90dae, 0x1b710b35,0x131c471b)
+-WORD64(0x28db77f5,0x23047d84, 0x32caab7b,0x40c72493)
+-WORD64(0x3c9ebe0a,0x15c9bebc, 0x431d67c4,0x9c100d4c)
+-WORD64(0x4cc5d4be,0xcb3e42b6, 0x597f299c,0xfc657e2a)
+-WORD64(0x5fcb6fab,0x3ad6faec, 0x6c44198c,0x4a475817)
+-.size	K512,.-K512
+-#if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+-.LOPENSSL_armcap:
+-.word	OPENSSL_armcap_P-sha512_block_data_order
+-.skip	32-4
+-#else
+-.skip	32
+-#endif
+-
+-.global	sha512_block_data_order
+-.type	sha512_block_data_order,%function
+-sha512_block_data_order:
+-.Lsha512_block_data_order:
+-#if __ARM_ARCH__<7
+-	sub	r3,pc,#8		@ sha512_block_data_order
+-#else
+-	adr	r3,.Lsha512_block_data_order
+-#endif
+-#if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+-	ldr	r12,.LOPENSSL_armcap
+-	ldr	r12,[r3,r12]		@ OPENSSL_armcap_P
+-	tst	r12,#1
+-	bne	.LNEON
+-#endif
+-	add	r2,r1,r2,lsl#7	@ len to point at the end of inp
+-	stmdb	sp!,{r4-r12,lr}
+-	sub	r14,r3,#672		@ K512
+-	sub	sp,sp,#9*8
+-
+-	ldr	r7,[r0,#32+LO]
+-	ldr	r8,[r0,#32+HI]
+-	ldr	r9, [r0,#48+LO]
+-	ldr	r10, [r0,#48+HI]
+-	ldr	r11, [r0,#56+LO]
+-	ldr	r12, [r0,#56+HI]
+-.Loop:
+-	str	r9, [sp,#48+0]
+-	str	r10, [sp,#48+4]
+-	str	r11, [sp,#56+0]
+-	str	r12, [sp,#56+4]
+-	ldr	r5,[r0,#0+LO]
+-	ldr	r6,[r0,#0+HI]
+-	ldr	r3,[r0,#8+LO]
+-	ldr	r4,[r0,#8+HI]
+-	ldr	r9, [r0,#16+LO]
+-	ldr	r10, [r0,#16+HI]
+-	ldr	r11, [r0,#24+LO]
+-	ldr	r12, [r0,#24+HI]
+-	str	r3,[sp,#8+0]
+-	str	r4,[sp,#8+4]
+-	str	r9, [sp,#16+0]
+-	str	r10, [sp,#16+4]
+-	str	r11, [sp,#24+0]
+-	str	r12, [sp,#24+4]
+-	ldr	r3,[r0,#40+LO]
+-	ldr	r4,[r0,#40+HI]
+-	str	r3,[sp,#40+0]
+-	str	r4,[sp,#40+4]
+-
+-.L00_15:
+-#if __ARM_ARCH__<7
+-	ldrb	r3,[r1,#7]
+-	ldrb	r9, [r1,#6]
+-	ldrb	r10, [r1,#5]
+-	ldrb	r11, [r1,#4]
+-	ldrb	r4,[r1,#3]
+-	ldrb	r12, [r1,#2]
+-	orr	r3,r3,r9,lsl#8
+-	ldrb	r9, [r1,#1]
+-	orr	r3,r3,r10,lsl#16
+-	ldrb	r10, [r1],#8
+-	orr	r3,r3,r11,lsl#24
+-	orr	r4,r4,r12,lsl#8
+-	orr	r4,r4,r9,lsl#16
+-	orr	r4,r4,r10,lsl#24
+-#else
+-	ldr	r3,[r1,#4]
+-	ldr	r4,[r1],#8
+-#ifdef __ARMEL__
+-	rev	r3,r3
+-	rev	r4,r4
+-#endif
+-#endif
+-	@ Sigma1(x)	(ROTR((x),14) ^ ROTR((x),18)  ^ ROTR((x),41))
+-	@ LO		lo>>14^hi<<18 ^ lo>>18^hi<<14 ^ hi>>9^lo<<23
+-	@ HI		hi>>14^lo<<18 ^ hi>>18^lo<<14 ^ lo>>9^hi<<23
+-	mov	r9,r7,lsr#14
+-	str	r3,[sp,#64+0]
+-	mov	r10,r8,lsr#14
+-	str	r4,[sp,#64+4]
+-	eor	r9,r9,r8,lsl#18
+-	ldr	r11,[sp,#56+0]	@ h.lo
+-	eor	r10,r10,r7,lsl#18
+-	ldr	r12,[sp,#56+4]	@ h.hi
+-	eor	r9,r9,r7,lsr#18
+-	eor	r10,r10,r8,lsr#18
+-	eor	r9,r9,r8,lsl#14
+-	eor	r10,r10,r7,lsl#14
+-	eor	r9,r9,r8,lsr#9
+-	eor	r10,r10,r7,lsr#9
+-	eor	r9,r9,r7,lsl#23
+-	eor	r10,r10,r8,lsl#23	@ Sigma1(e)
+-	adds	r3,r3,r9
+-	ldr	r9,[sp,#40+0]	@ f.lo
+-	adc	r4,r4,r10		@ T += Sigma1(e)
+-	ldr	r10,[sp,#40+4]	@ f.hi
+-	adds	r3,r3,r11
+-	ldr	r11,[sp,#48+0]	@ g.lo
+-	adc	r4,r4,r12		@ T += h
+-	ldr	r12,[sp,#48+4]	@ g.hi
+-
+-	eor	r9,r9,r11
+-	str	r7,[sp,#32+0]
+-	eor	r10,r10,r12
+-	str	r8,[sp,#32+4]
+-	and	r9,r9,r7
+-	str	r5,[sp,#0+0]
+-	and	r10,r10,r8
+-	str	r6,[sp,#0+4]
+-	eor	r9,r9,r11
+-	ldr	r11,[r14,#LO]	@ K[i].lo
+-	eor	r10,r10,r12		@ Ch(e,f,g)
+-	ldr	r12,[r14,#HI]	@ K[i].hi
+-
+-	adds	r3,r3,r9
+-	ldr	r7,[sp,#24+0]	@ d.lo
+-	adc	r4,r4,r10		@ T += Ch(e,f,g)
+-	ldr	r8,[sp,#24+4]	@ d.hi
+-	adds	r3,r3,r11
+-	and	r9,r11,#0xff
+-	adc	r4,r4,r12		@ T += K[i]
+-	adds	r7,r7,r3
+-	ldr	r11,[sp,#8+0]	@ b.lo
+-	adc	r8,r8,r4		@ d += T
+-	teq	r9,#148
+-
+-	ldr	r12,[sp,#16+0]	@ c.lo
+-#if __ARM_ARCH__>=7
+-	it	eq			@ Thumb2 thing, sanity check in ARM
+-#endif
+-	orreq	r14,r14,#1
+-	@ Sigma0(x)	(ROTR((x),28) ^ ROTR((x),34) ^ ROTR((x),39))
+-	@ LO		lo>>28^hi<<4  ^ hi>>2^lo<<30 ^ hi>>7^lo<<25
+-	@ HI		hi>>28^lo<<4  ^ lo>>2^hi<<30 ^ lo>>7^hi<<25
+-	mov	r9,r5,lsr#28
+-	mov	r10,r6,lsr#28
+-	eor	r9,r9,r6,lsl#4
+-	eor	r10,r10,r5,lsl#4
+-	eor	r9,r9,r6,lsr#2
+-	eor	r10,r10,r5,lsr#2
+-	eor	r9,r9,r5,lsl#30
+-	eor	r10,r10,r6,lsl#30
+-	eor	r9,r9,r6,lsr#7
+-	eor	r10,r10,r5,lsr#7
+-	eor	r9,r9,r5,lsl#25
+-	eor	r10,r10,r6,lsl#25	@ Sigma0(a)
+-	adds	r3,r3,r9
+-	and	r9,r5,r11
+-	adc	r4,r4,r10		@ T += Sigma0(a)
+-
+-	ldr	r10,[sp,#8+4]	@ b.hi
+-	orr	r5,r5,r11
+-	ldr	r11,[sp,#16+4]	@ c.hi
+-	and	r5,r5,r12
+-	and	r12,r6,r10
+-	orr	r6,r6,r10
+-	orr	r5,r5,r9		@ Maj(a,b,c).lo
+-	and	r6,r6,r11
+-	adds	r5,r5,r3
+-	orr	r6,r6,r12		@ Maj(a,b,c).hi
+-	sub	sp,sp,#8
+-	adc	r6,r6,r4		@ h += T
+-	tst	r14,#1
+-	add	r14,r14,#8
+-	tst	r14,#1
+-	beq	.L00_15
+-	ldr	r9,[sp,#184+0]
+-	ldr	r10,[sp,#184+4]
+-	bic	r14,r14,#1
+-.L16_79:
+-	@ sigma0(x)	(ROTR((x),1)  ^ ROTR((x),8)  ^ ((x)>>7))
+-	@ LO		lo>>1^hi<<31  ^ lo>>8^hi<<24 ^ lo>>7^hi<<25
+-	@ HI		hi>>1^lo<<31  ^ hi>>8^lo<<24 ^ hi>>7
+-	mov	r3,r9,lsr#1
+-	ldr	r11,[sp,#80+0]
+-	mov	r4,r10,lsr#1
+-	ldr	r12,[sp,#80+4]
+-	eor	r3,r3,r10,lsl#31
+-	eor	r4,r4,r9,lsl#31
+-	eor	r3,r3,r9,lsr#8
+-	eor	r4,r4,r10,lsr#8
+-	eor	r3,r3,r10,lsl#24
+-	eor	r4,r4,r9,lsl#24
+-	eor	r3,r3,r9,lsr#7
+-	eor	r4,r4,r10,lsr#7
+-	eor	r3,r3,r10,lsl#25
+-
+-	@ sigma1(x)	(ROTR((x),19) ^ ROTR((x),61) ^ ((x)>>6))
+-	@ LO		lo>>19^hi<<13 ^ hi>>29^lo<<3 ^ lo>>6^hi<<26
+-	@ HI		hi>>19^lo<<13 ^ lo>>29^hi<<3 ^ hi>>6
+-	mov	r9,r11,lsr#19
+-	mov	r10,r12,lsr#19
+-	eor	r9,r9,r12,lsl#13
+-	eor	r10,r10,r11,lsl#13
+-	eor	r9,r9,r12,lsr#29
+-	eor	r10,r10,r11,lsr#29
+-	eor	r9,r9,r11,lsl#3
+-	eor	r10,r10,r12,lsl#3
+-	eor	r9,r9,r11,lsr#6
+-	eor	r10,r10,r12,lsr#6
+-	ldr	r11,[sp,#120+0]
+-	eor	r9,r9,r12,lsl#26
+-
+-	ldr	r12,[sp,#120+4]
+-	adds	r3,r3,r9
+-	ldr	r9,[sp,#192+0]
+-	adc	r4,r4,r10
+-
+-	ldr	r10,[sp,#192+4]
+-	adds	r3,r3,r11
+-	adc	r4,r4,r12
+-	adds	r3,r3,r9
+-	adc	r4,r4,r10
+-	@ Sigma1(x)	(ROTR((x),14) ^ ROTR((x),18)  ^ ROTR((x),41))
+-	@ LO		lo>>14^hi<<18 ^ lo>>18^hi<<14 ^ hi>>9^lo<<23
+-	@ HI		hi>>14^lo<<18 ^ hi>>18^lo<<14 ^ lo>>9^hi<<23
+-	mov	r9,r7,lsr#14
+-	str	r3,[sp,#64+0]
+-	mov	r10,r8,lsr#14
+-	str	r4,[sp,#64+4]
+-	eor	r9,r9,r8,lsl#18
+-	ldr	r11,[sp,#56+0]	@ h.lo
+-	eor	r10,r10,r7,lsl#18
+-	ldr	r12,[sp,#56+4]	@ h.hi
+-	eor	r9,r9,r7,lsr#18
+-	eor	r10,r10,r8,lsr#18
+-	eor	r9,r9,r8,lsl#14
+-	eor	r10,r10,r7,lsl#14
+-	eor	r9,r9,r8,lsr#9
+-	eor	r10,r10,r7,lsr#9
+-	eor	r9,r9,r7,lsl#23
+-	eor	r10,r10,r8,lsl#23	@ Sigma1(e)
+-	adds	r3,r3,r9
+-	ldr	r9,[sp,#40+0]	@ f.lo
+-	adc	r4,r4,r10		@ T += Sigma1(e)
+-	ldr	r10,[sp,#40+4]	@ f.hi
+-	adds	r3,r3,r11
+-	ldr	r11,[sp,#48+0]	@ g.lo
+-	adc	r4,r4,r12		@ T += h
+-	ldr	r12,[sp,#48+4]	@ g.hi
+-
+-	eor	r9,r9,r11
+-	str	r7,[sp,#32+0]
+-	eor	r10,r10,r12
+-	str	r8,[sp,#32+4]
+-	and	r9,r9,r7
+-	str	r5,[sp,#0+0]
+-	and	r10,r10,r8
+-	str	r6,[sp,#0+4]
+-	eor	r9,r9,r11
+-	ldr	r11,[r14,#LO]	@ K[i].lo
+-	eor	r10,r10,r12		@ Ch(e,f,g)
+-	ldr	r12,[r14,#HI]	@ K[i].hi
+-
+-	adds	r3,r3,r9
+-	ldr	r7,[sp,#24+0]	@ d.lo
+-	adc	r4,r4,r10		@ T += Ch(e,f,g)
+-	ldr	r8,[sp,#24+4]	@ d.hi
+-	adds	r3,r3,r11
+-	and	r9,r11,#0xff
+-	adc	r4,r4,r12		@ T += K[i]
+-	adds	r7,r7,r3
+-	ldr	r11,[sp,#8+0]	@ b.lo
+-	adc	r8,r8,r4		@ d += T
+-	teq	r9,#23
+-
+-	ldr	r12,[sp,#16+0]	@ c.lo
+-#if __ARM_ARCH__>=7
+-	it	eq			@ Thumb2 thing, sanity check in ARM
+-#endif
+-	orreq	r14,r14,#1
+-	@ Sigma0(x)	(ROTR((x),28) ^ ROTR((x),34) ^ ROTR((x),39))
+-	@ LO		lo>>28^hi<<4  ^ hi>>2^lo<<30 ^ hi>>7^lo<<25
+-	@ HI		hi>>28^lo<<4  ^ lo>>2^hi<<30 ^ lo>>7^hi<<25
+-	mov	r9,r5,lsr#28
+-	mov	r10,r6,lsr#28
+-	eor	r9,r9,r6,lsl#4
+-	eor	r10,r10,r5,lsl#4
+-	eor	r9,r9,r6,lsr#2
+-	eor	r10,r10,r5,lsr#2
+-	eor	r9,r9,r5,lsl#30
+-	eor	r10,r10,r6,lsl#30
+-	eor	r9,r9,r6,lsr#7
+-	eor	r10,r10,r5,lsr#7
+-	eor	r9,r9,r5,lsl#25
+-	eor	r10,r10,r6,lsl#25	@ Sigma0(a)
+-	adds	r3,r3,r9
+-	and	r9,r5,r11
+-	adc	r4,r4,r10		@ T += Sigma0(a)
+-
+-	ldr	r10,[sp,#8+4]	@ b.hi
+-	orr	r5,r5,r11
+-	ldr	r11,[sp,#16+4]	@ c.hi
+-	and	r5,r5,r12
+-	and	r12,r6,r10
+-	orr	r6,r6,r10
+-	orr	r5,r5,r9		@ Maj(a,b,c).lo
+-	and	r6,r6,r11
+-	adds	r5,r5,r3
+-	orr	r6,r6,r12		@ Maj(a,b,c).hi
+-	sub	sp,sp,#8
+-	adc	r6,r6,r4		@ h += T
+-	tst	r14,#1
+-	add	r14,r14,#8
+-#if __ARM_ARCH__>=7
+-	ittt	eq			@ Thumb2 thing, sanity check in ARM
+-#endif
+-	ldreq	r9,[sp,#184+0]
+-	ldreq	r10,[sp,#184+4]
+-	beq	.L16_79
+-	bic	r14,r14,#1
+-
+-	ldr	r3,[sp,#8+0]
+-	ldr	r4,[sp,#8+4]
+-	ldr	r9, [r0,#0+LO]
+-	ldr	r10, [r0,#0+HI]
+-	ldr	r11, [r0,#8+LO]
+-	ldr	r12, [r0,#8+HI]
+-	adds	r9,r5,r9
+-	str	r9, [r0,#0+LO]
+-	adc	r10,r6,r10
+-	str	r10, [r0,#0+HI]
+-	adds	r11,r3,r11
+-	str	r11, [r0,#8+LO]
+-	adc	r12,r4,r12
+-	str	r12, [r0,#8+HI]
+-
+-	ldr	r5,[sp,#16+0]
+-	ldr	r6,[sp,#16+4]
+-	ldr	r3,[sp,#24+0]
+-	ldr	r4,[sp,#24+4]
+-	ldr	r9, [r0,#16+LO]
+-	ldr	r10, [r0,#16+HI]
+-	ldr	r11, [r0,#24+LO]
+-	ldr	r12, [r0,#24+HI]
+-	adds	r9,r5,r9
+-	str	r9, [r0,#16+LO]
+-	adc	r10,r6,r10
+-	str	r10, [r0,#16+HI]
+-	adds	r11,r3,r11
+-	str	r11, [r0,#24+LO]
+-	adc	r12,r4,r12
+-	str	r12, [r0,#24+HI]
+-
+-	ldr	r3,[sp,#40+0]
+-	ldr	r4,[sp,#40+4]
+-	ldr	r9, [r0,#32+LO]
+-	ldr	r10, [r0,#32+HI]
+-	ldr	r11, [r0,#40+LO]
+-	ldr	r12, [r0,#40+HI]
+-	adds	r7,r7,r9
+-	str	r7,[r0,#32+LO]
+-	adc	r8,r8,r10
+-	str	r8,[r0,#32+HI]
+-	adds	r11,r3,r11
+-	str	r11, [r0,#40+LO]
+-	adc	r12,r4,r12
+-	str	r12, [r0,#40+HI]
+-
+-	ldr	r5,[sp,#48+0]
+-	ldr	r6,[sp,#48+4]
+-	ldr	r3,[sp,#56+0]
+-	ldr	r4,[sp,#56+4]
+-	ldr	r9, [r0,#48+LO]
+-	ldr	r10, [r0,#48+HI]
+-	ldr	r11, [r0,#56+LO]
+-	ldr	r12, [r0,#56+HI]
+-	adds	r9,r5,r9
+-	str	r9, [r0,#48+LO]
+-	adc	r10,r6,r10
+-	str	r10, [r0,#48+HI]
+-	adds	r11,r3,r11
+-	str	r11, [r0,#56+LO]
+-	adc	r12,r4,r12
+-	str	r12, [r0,#56+HI]
+-
+-	add	sp,sp,#640
+-	sub	r14,r14,#640
+-
+-	teq	r1,r2
+-	bne	.Loop
+-
+-	add	sp,sp,#8*9		@ destroy frame
+-#if __ARM_ARCH__>=5
+-	ldmia	sp!,{r4-r12,pc}
+-#else
+-	ldmia	sp!,{r4-r12,lr}
+-	tst	lr,#1
+-	moveq	pc,lr			@ be binary compatible with V4, yet
+-	.word	0xe12fff1e			@ interoperable with Thumb ISA:-)
+-#endif
+-.size	sha512_block_data_order,.-sha512_block_data_order
+-#if __ARM_MAX_ARCH__>=7
+-.arch	armv7-a
+-.fpu	neon
+-
+-.global	sha512_block_data_order_neon
+-.type	sha512_block_data_order_neon,%function
+-.align	4
+-sha512_block_data_order_neon:
+-.LNEON:
+-	dmb				@ errata #451034 on early Cortex A8
+-	add	r2,r1,r2,lsl#7	@ len to point at the end of inp
+-	VFP_ABI_PUSH
+-	adr	r3,.Lsha512_block_data_order
+-	sub	r3,r3,.Lsha512_block_data_order-K512
+-	vldmia	r0,{d16-d23}		@ load context
+-.Loop_neon:
+-	vshr.u64	d24,d20,#14	@ 0
+-#if 0<16
+-	vld1.64		{d0},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d20,#18
+-#if 0>0
+-	 vadd.i64	d16,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d20,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d20,#50
+-	vsli.64		d25,d20,#46
+-	vmov		d29,d20
+-	vsli.64		d26,d20,#23
+-#if 0<16 && defined(__ARMEL__)
+-	vrev64.8	d0,d0
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d21,d22		@ Ch(e,f,g)
+-	vshr.u64	d24,d16,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d23
+-	vshr.u64	d25,d16,#34
+-	vsli.64		d24,d16,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d16,#39
+-	vadd.i64	d28,d0
+-	vsli.64		d25,d16,#30
+-	veor		d30,d16,d17
+-	vsli.64		d26,d16,#25
+-	veor		d23,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d18,d17		@ Maj(a,b,c)
+-	veor		d23,d26			@ Sigma0(a)
+-	vadd.i64	d19,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d23,d30
+-	vshr.u64	d24,d19,#14	@ 1
+-#if 1<16
+-	vld1.64		{d1},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d19,#18
+-#if 1>0
+-	 vadd.i64	d23,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d19,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d19,#50
+-	vsli.64		d25,d19,#46
+-	vmov		d29,d19
+-	vsli.64		d26,d19,#23
+-#if 1<16 && defined(__ARMEL__)
+-	vrev64.8	d1,d1
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d20,d21		@ Ch(e,f,g)
+-	vshr.u64	d24,d23,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d22
+-	vshr.u64	d25,d23,#34
+-	vsli.64		d24,d23,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d23,#39
+-	vadd.i64	d28,d1
+-	vsli.64		d25,d23,#30
+-	veor		d30,d23,d16
+-	vsli.64		d26,d23,#25
+-	veor		d22,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d17,d16		@ Maj(a,b,c)
+-	veor		d22,d26			@ Sigma0(a)
+-	vadd.i64	d18,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d22,d30
+-	vshr.u64	d24,d18,#14	@ 2
+-#if 2<16
+-	vld1.64		{d2},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d18,#18
+-#if 2>0
+-	 vadd.i64	d22,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d18,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d18,#50
+-	vsli.64		d25,d18,#46
+-	vmov		d29,d18
+-	vsli.64		d26,d18,#23
+-#if 2<16 && defined(__ARMEL__)
+-	vrev64.8	d2,d2
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d19,d20		@ Ch(e,f,g)
+-	vshr.u64	d24,d22,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d21
+-	vshr.u64	d25,d22,#34
+-	vsli.64		d24,d22,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d22,#39
+-	vadd.i64	d28,d2
+-	vsli.64		d25,d22,#30
+-	veor		d30,d22,d23
+-	vsli.64		d26,d22,#25
+-	veor		d21,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d16,d23		@ Maj(a,b,c)
+-	veor		d21,d26			@ Sigma0(a)
+-	vadd.i64	d17,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d21,d30
+-	vshr.u64	d24,d17,#14	@ 3
+-#if 3<16
+-	vld1.64		{d3},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d17,#18
+-#if 3>0
+-	 vadd.i64	d21,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d17,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d17,#50
+-	vsli.64		d25,d17,#46
+-	vmov		d29,d17
+-	vsli.64		d26,d17,#23
+-#if 3<16 && defined(__ARMEL__)
+-	vrev64.8	d3,d3
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d18,d19		@ Ch(e,f,g)
+-	vshr.u64	d24,d21,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d20
+-	vshr.u64	d25,d21,#34
+-	vsli.64		d24,d21,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d21,#39
+-	vadd.i64	d28,d3
+-	vsli.64		d25,d21,#30
+-	veor		d30,d21,d22
+-	vsli.64		d26,d21,#25
+-	veor		d20,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d23,d22		@ Maj(a,b,c)
+-	veor		d20,d26			@ Sigma0(a)
+-	vadd.i64	d16,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d20,d30
+-	vshr.u64	d24,d16,#14	@ 4
+-#if 4<16
+-	vld1.64		{d4},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d16,#18
+-#if 4>0
+-	 vadd.i64	d20,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d16,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d16,#50
+-	vsli.64		d25,d16,#46
+-	vmov		d29,d16
+-	vsli.64		d26,d16,#23
+-#if 4<16 && defined(__ARMEL__)
+-	vrev64.8	d4,d4
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d17,d18		@ Ch(e,f,g)
+-	vshr.u64	d24,d20,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d19
+-	vshr.u64	d25,d20,#34
+-	vsli.64		d24,d20,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d20,#39
+-	vadd.i64	d28,d4
+-	vsli.64		d25,d20,#30
+-	veor		d30,d20,d21
+-	vsli.64		d26,d20,#25
+-	veor		d19,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d22,d21		@ Maj(a,b,c)
+-	veor		d19,d26			@ Sigma0(a)
+-	vadd.i64	d23,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d19,d30
+-	vshr.u64	d24,d23,#14	@ 5
+-#if 5<16
+-	vld1.64		{d5},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d23,#18
+-#if 5>0
+-	 vadd.i64	d19,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d23,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d23,#50
+-	vsli.64		d25,d23,#46
+-	vmov		d29,d23
+-	vsli.64		d26,d23,#23
+-#if 5<16 && defined(__ARMEL__)
+-	vrev64.8	d5,d5
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d16,d17		@ Ch(e,f,g)
+-	vshr.u64	d24,d19,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d18
+-	vshr.u64	d25,d19,#34
+-	vsli.64		d24,d19,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d19,#39
+-	vadd.i64	d28,d5
+-	vsli.64		d25,d19,#30
+-	veor		d30,d19,d20
+-	vsli.64		d26,d19,#25
+-	veor		d18,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d21,d20		@ Maj(a,b,c)
+-	veor		d18,d26			@ Sigma0(a)
+-	vadd.i64	d22,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d18,d30
+-	vshr.u64	d24,d22,#14	@ 6
+-#if 6<16
+-	vld1.64		{d6},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d22,#18
+-#if 6>0
+-	 vadd.i64	d18,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d22,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d22,#50
+-	vsli.64		d25,d22,#46
+-	vmov		d29,d22
+-	vsli.64		d26,d22,#23
+-#if 6<16 && defined(__ARMEL__)
+-	vrev64.8	d6,d6
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d23,d16		@ Ch(e,f,g)
+-	vshr.u64	d24,d18,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d17
+-	vshr.u64	d25,d18,#34
+-	vsli.64		d24,d18,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d18,#39
+-	vadd.i64	d28,d6
+-	vsli.64		d25,d18,#30
+-	veor		d30,d18,d19
+-	vsli.64		d26,d18,#25
+-	veor		d17,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d20,d19		@ Maj(a,b,c)
+-	veor		d17,d26			@ Sigma0(a)
+-	vadd.i64	d21,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d17,d30
+-	vshr.u64	d24,d21,#14	@ 7
+-#if 7<16
+-	vld1.64		{d7},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d21,#18
+-#if 7>0
+-	 vadd.i64	d17,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d21,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d21,#50
+-	vsli.64		d25,d21,#46
+-	vmov		d29,d21
+-	vsli.64		d26,d21,#23
+-#if 7<16 && defined(__ARMEL__)
+-	vrev64.8	d7,d7
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d22,d23		@ Ch(e,f,g)
+-	vshr.u64	d24,d17,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d16
+-	vshr.u64	d25,d17,#34
+-	vsli.64		d24,d17,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d17,#39
+-	vadd.i64	d28,d7
+-	vsli.64		d25,d17,#30
+-	veor		d30,d17,d18
+-	vsli.64		d26,d17,#25
+-	veor		d16,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d19,d18		@ Maj(a,b,c)
+-	veor		d16,d26			@ Sigma0(a)
+-	vadd.i64	d20,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d16,d30
+-	vshr.u64	d24,d20,#14	@ 8
+-#if 8<16
+-	vld1.64		{d8},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d20,#18
+-#if 8>0
+-	 vadd.i64	d16,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d20,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d20,#50
+-	vsli.64		d25,d20,#46
+-	vmov		d29,d20
+-	vsli.64		d26,d20,#23
+-#if 8<16 && defined(__ARMEL__)
+-	vrev64.8	d8,d8
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d21,d22		@ Ch(e,f,g)
+-	vshr.u64	d24,d16,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d23
+-	vshr.u64	d25,d16,#34
+-	vsli.64		d24,d16,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d16,#39
+-	vadd.i64	d28,d8
+-	vsli.64		d25,d16,#30
+-	veor		d30,d16,d17
+-	vsli.64		d26,d16,#25
+-	veor		d23,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d18,d17		@ Maj(a,b,c)
+-	veor		d23,d26			@ Sigma0(a)
+-	vadd.i64	d19,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d23,d30
+-	vshr.u64	d24,d19,#14	@ 9
+-#if 9<16
+-	vld1.64		{d9},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d19,#18
+-#if 9>0
+-	 vadd.i64	d23,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d19,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d19,#50
+-	vsli.64		d25,d19,#46
+-	vmov		d29,d19
+-	vsli.64		d26,d19,#23
+-#if 9<16 && defined(__ARMEL__)
+-	vrev64.8	d9,d9
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d20,d21		@ Ch(e,f,g)
+-	vshr.u64	d24,d23,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d22
+-	vshr.u64	d25,d23,#34
+-	vsli.64		d24,d23,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d23,#39
+-	vadd.i64	d28,d9
+-	vsli.64		d25,d23,#30
+-	veor		d30,d23,d16
+-	vsli.64		d26,d23,#25
+-	veor		d22,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d17,d16		@ Maj(a,b,c)
+-	veor		d22,d26			@ Sigma0(a)
+-	vadd.i64	d18,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d22,d30
+-	vshr.u64	d24,d18,#14	@ 10
+-#if 10<16
+-	vld1.64		{d10},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d18,#18
+-#if 10>0
+-	 vadd.i64	d22,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d18,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d18,#50
+-	vsli.64		d25,d18,#46
+-	vmov		d29,d18
+-	vsli.64		d26,d18,#23
+-#if 10<16 && defined(__ARMEL__)
+-	vrev64.8	d10,d10
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d19,d20		@ Ch(e,f,g)
+-	vshr.u64	d24,d22,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d21
+-	vshr.u64	d25,d22,#34
+-	vsli.64		d24,d22,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d22,#39
+-	vadd.i64	d28,d10
+-	vsli.64		d25,d22,#30
+-	veor		d30,d22,d23
+-	vsli.64		d26,d22,#25
+-	veor		d21,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d16,d23		@ Maj(a,b,c)
+-	veor		d21,d26			@ Sigma0(a)
+-	vadd.i64	d17,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d21,d30
+-	vshr.u64	d24,d17,#14	@ 11
+-#if 11<16
+-	vld1.64		{d11},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d17,#18
+-#if 11>0
+-	 vadd.i64	d21,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d17,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d17,#50
+-	vsli.64		d25,d17,#46
+-	vmov		d29,d17
+-	vsli.64		d26,d17,#23
+-#if 11<16 && defined(__ARMEL__)
+-	vrev64.8	d11,d11
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d18,d19		@ Ch(e,f,g)
+-	vshr.u64	d24,d21,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d20
+-	vshr.u64	d25,d21,#34
+-	vsli.64		d24,d21,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d21,#39
+-	vadd.i64	d28,d11
+-	vsli.64		d25,d21,#30
+-	veor		d30,d21,d22
+-	vsli.64		d26,d21,#25
+-	veor		d20,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d23,d22		@ Maj(a,b,c)
+-	veor		d20,d26			@ Sigma0(a)
+-	vadd.i64	d16,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d20,d30
+-	vshr.u64	d24,d16,#14	@ 12
+-#if 12<16
+-	vld1.64		{d12},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d16,#18
+-#if 12>0
+-	 vadd.i64	d20,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d16,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d16,#50
+-	vsli.64		d25,d16,#46
+-	vmov		d29,d16
+-	vsli.64		d26,d16,#23
+-#if 12<16 && defined(__ARMEL__)
+-	vrev64.8	d12,d12
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d17,d18		@ Ch(e,f,g)
+-	vshr.u64	d24,d20,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d19
+-	vshr.u64	d25,d20,#34
+-	vsli.64		d24,d20,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d20,#39
+-	vadd.i64	d28,d12
+-	vsli.64		d25,d20,#30
+-	veor		d30,d20,d21
+-	vsli.64		d26,d20,#25
+-	veor		d19,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d22,d21		@ Maj(a,b,c)
+-	veor		d19,d26			@ Sigma0(a)
+-	vadd.i64	d23,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d19,d30
+-	vshr.u64	d24,d23,#14	@ 13
+-#if 13<16
+-	vld1.64		{d13},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d23,#18
+-#if 13>0
+-	 vadd.i64	d19,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d23,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d23,#50
+-	vsli.64		d25,d23,#46
+-	vmov		d29,d23
+-	vsli.64		d26,d23,#23
+-#if 13<16 && defined(__ARMEL__)
+-	vrev64.8	d13,d13
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d16,d17		@ Ch(e,f,g)
+-	vshr.u64	d24,d19,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d18
+-	vshr.u64	d25,d19,#34
+-	vsli.64		d24,d19,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d19,#39
+-	vadd.i64	d28,d13
+-	vsli.64		d25,d19,#30
+-	veor		d30,d19,d20
+-	vsli.64		d26,d19,#25
+-	veor		d18,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d21,d20		@ Maj(a,b,c)
+-	veor		d18,d26			@ Sigma0(a)
+-	vadd.i64	d22,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d18,d30
+-	vshr.u64	d24,d22,#14	@ 14
+-#if 14<16
+-	vld1.64		{d14},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d22,#18
+-#if 14>0
+-	 vadd.i64	d18,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d22,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d22,#50
+-	vsli.64		d25,d22,#46
+-	vmov		d29,d22
+-	vsli.64		d26,d22,#23
+-#if 14<16 && defined(__ARMEL__)
+-	vrev64.8	d14,d14
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d23,d16		@ Ch(e,f,g)
+-	vshr.u64	d24,d18,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d17
+-	vshr.u64	d25,d18,#34
+-	vsli.64		d24,d18,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d18,#39
+-	vadd.i64	d28,d14
+-	vsli.64		d25,d18,#30
+-	veor		d30,d18,d19
+-	vsli.64		d26,d18,#25
+-	veor		d17,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d20,d19		@ Maj(a,b,c)
+-	veor		d17,d26			@ Sigma0(a)
+-	vadd.i64	d21,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d17,d30
+-	vshr.u64	d24,d21,#14	@ 15
+-#if 15<16
+-	vld1.64		{d15},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d21,#18
+-#if 15>0
+-	 vadd.i64	d17,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d21,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d21,#50
+-	vsli.64		d25,d21,#46
+-	vmov		d29,d21
+-	vsli.64		d26,d21,#23
+-#if 15<16 && defined(__ARMEL__)
+-	vrev64.8	d15,d15
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d22,d23		@ Ch(e,f,g)
+-	vshr.u64	d24,d17,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d16
+-	vshr.u64	d25,d17,#34
+-	vsli.64		d24,d17,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d17,#39
+-	vadd.i64	d28,d15
+-	vsli.64		d25,d17,#30
+-	veor		d30,d17,d18
+-	vsli.64		d26,d17,#25
+-	veor		d16,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d19,d18		@ Maj(a,b,c)
+-	veor		d16,d26			@ Sigma0(a)
+-	vadd.i64	d20,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d16,d30
+-	mov		r12,#4
+-.L16_79_neon:
+-	subs		r12,#1
+-	vshr.u64	q12,q7,#19
+-	vshr.u64	q13,q7,#61
+-	 vadd.i64	d16,d30			@ h+=Maj from the past
+-	vshr.u64	q15,q7,#6
+-	vsli.64		q12,q7,#45
+-	vext.8		q14,q0,q1,#8	@ X[i+1]
+-	vsli.64		q13,q7,#3
+-	veor		q15,q12
+-	vshr.u64	q12,q14,#1
+-	veor		q15,q13				@ sigma1(X[i+14])
+-	vshr.u64	q13,q14,#8
+-	vadd.i64	q0,q15
+-	vshr.u64	q15,q14,#7
+-	vsli.64		q12,q14,#63
+-	vsli.64		q13,q14,#56
+-	vext.8		q14,q4,q5,#8	@ X[i+9]
+-	veor		q15,q12
+-	vshr.u64	d24,d20,#14		@ from NEON_00_15
+-	vadd.i64	q0,q14
+-	vshr.u64	d25,d20,#18		@ from NEON_00_15
+-	veor		q15,q13				@ sigma0(X[i+1])
+-	vshr.u64	d26,d20,#41		@ from NEON_00_15
+-	vadd.i64	q0,q15
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d20,#50
+-	vsli.64		d25,d20,#46
+-	vmov		d29,d20
+-	vsli.64		d26,d20,#23
+-#if 16<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d21,d22		@ Ch(e,f,g)
+-	vshr.u64	d24,d16,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d23
+-	vshr.u64	d25,d16,#34
+-	vsli.64		d24,d16,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d16,#39
+-	vadd.i64	d28,d0
+-	vsli.64		d25,d16,#30
+-	veor		d30,d16,d17
+-	vsli.64		d26,d16,#25
+-	veor		d23,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d18,d17		@ Maj(a,b,c)
+-	veor		d23,d26			@ Sigma0(a)
+-	vadd.i64	d19,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d23,d30
+-	vshr.u64	d24,d19,#14	@ 17
+-#if 17<16
+-	vld1.64		{d1},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d19,#18
+-#if 17>0
+-	 vadd.i64	d23,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d19,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d19,#50
+-	vsli.64		d25,d19,#46
+-	vmov		d29,d19
+-	vsli.64		d26,d19,#23
+-#if 17<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d20,d21		@ Ch(e,f,g)
+-	vshr.u64	d24,d23,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d22
+-	vshr.u64	d25,d23,#34
+-	vsli.64		d24,d23,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d23,#39
+-	vadd.i64	d28,d1
+-	vsli.64		d25,d23,#30
+-	veor		d30,d23,d16
+-	vsli.64		d26,d23,#25
+-	veor		d22,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d17,d16		@ Maj(a,b,c)
+-	veor		d22,d26			@ Sigma0(a)
+-	vadd.i64	d18,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d22,d30
+-	vshr.u64	q12,q0,#19
+-	vshr.u64	q13,q0,#61
+-	 vadd.i64	d22,d30			@ h+=Maj from the past
+-	vshr.u64	q15,q0,#6
+-	vsli.64		q12,q0,#45
+-	vext.8		q14,q1,q2,#8	@ X[i+1]
+-	vsli.64		q13,q0,#3
+-	veor		q15,q12
+-	vshr.u64	q12,q14,#1
+-	veor		q15,q13				@ sigma1(X[i+14])
+-	vshr.u64	q13,q14,#8
+-	vadd.i64	q1,q15
+-	vshr.u64	q15,q14,#7
+-	vsli.64		q12,q14,#63
+-	vsli.64		q13,q14,#56
+-	vext.8		q14,q5,q6,#8	@ X[i+9]
+-	veor		q15,q12
+-	vshr.u64	d24,d18,#14		@ from NEON_00_15
+-	vadd.i64	q1,q14
+-	vshr.u64	d25,d18,#18		@ from NEON_00_15
+-	veor		q15,q13				@ sigma0(X[i+1])
+-	vshr.u64	d26,d18,#41		@ from NEON_00_15
+-	vadd.i64	q1,q15
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d18,#50
+-	vsli.64		d25,d18,#46
+-	vmov		d29,d18
+-	vsli.64		d26,d18,#23
+-#if 18<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d19,d20		@ Ch(e,f,g)
+-	vshr.u64	d24,d22,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d21
+-	vshr.u64	d25,d22,#34
+-	vsli.64		d24,d22,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d22,#39
+-	vadd.i64	d28,d2
+-	vsli.64		d25,d22,#30
+-	veor		d30,d22,d23
+-	vsli.64		d26,d22,#25
+-	veor		d21,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d16,d23		@ Maj(a,b,c)
+-	veor		d21,d26			@ Sigma0(a)
+-	vadd.i64	d17,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d21,d30
+-	vshr.u64	d24,d17,#14	@ 19
+-#if 19<16
+-	vld1.64		{d3},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d17,#18
+-#if 19>0
+-	 vadd.i64	d21,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d17,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d17,#50
+-	vsli.64		d25,d17,#46
+-	vmov		d29,d17
+-	vsli.64		d26,d17,#23
+-#if 19<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d18,d19		@ Ch(e,f,g)
+-	vshr.u64	d24,d21,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d20
+-	vshr.u64	d25,d21,#34
+-	vsli.64		d24,d21,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d21,#39
+-	vadd.i64	d28,d3
+-	vsli.64		d25,d21,#30
+-	veor		d30,d21,d22
+-	vsli.64		d26,d21,#25
+-	veor		d20,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d23,d22		@ Maj(a,b,c)
+-	veor		d20,d26			@ Sigma0(a)
+-	vadd.i64	d16,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d20,d30
+-	vshr.u64	q12,q1,#19
+-	vshr.u64	q13,q1,#61
+-	 vadd.i64	d20,d30			@ h+=Maj from the past
+-	vshr.u64	q15,q1,#6
+-	vsli.64		q12,q1,#45
+-	vext.8		q14,q2,q3,#8	@ X[i+1]
+-	vsli.64		q13,q1,#3
+-	veor		q15,q12
+-	vshr.u64	q12,q14,#1
+-	veor		q15,q13				@ sigma1(X[i+14])
+-	vshr.u64	q13,q14,#8
+-	vadd.i64	q2,q15
+-	vshr.u64	q15,q14,#7
+-	vsli.64		q12,q14,#63
+-	vsli.64		q13,q14,#56
+-	vext.8		q14,q6,q7,#8	@ X[i+9]
+-	veor		q15,q12
+-	vshr.u64	d24,d16,#14		@ from NEON_00_15
+-	vadd.i64	q2,q14
+-	vshr.u64	d25,d16,#18		@ from NEON_00_15
+-	veor		q15,q13				@ sigma0(X[i+1])
+-	vshr.u64	d26,d16,#41		@ from NEON_00_15
+-	vadd.i64	q2,q15
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d16,#50
+-	vsli.64		d25,d16,#46
+-	vmov		d29,d16
+-	vsli.64		d26,d16,#23
+-#if 20<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d17,d18		@ Ch(e,f,g)
+-	vshr.u64	d24,d20,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d19
+-	vshr.u64	d25,d20,#34
+-	vsli.64		d24,d20,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d20,#39
+-	vadd.i64	d28,d4
+-	vsli.64		d25,d20,#30
+-	veor		d30,d20,d21
+-	vsli.64		d26,d20,#25
+-	veor		d19,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d22,d21		@ Maj(a,b,c)
+-	veor		d19,d26			@ Sigma0(a)
+-	vadd.i64	d23,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d19,d30
+-	vshr.u64	d24,d23,#14	@ 21
+-#if 21<16
+-	vld1.64		{d5},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d23,#18
+-#if 21>0
+-	 vadd.i64	d19,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d23,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d23,#50
+-	vsli.64		d25,d23,#46
+-	vmov		d29,d23
+-	vsli.64		d26,d23,#23
+-#if 21<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d16,d17		@ Ch(e,f,g)
+-	vshr.u64	d24,d19,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d18
+-	vshr.u64	d25,d19,#34
+-	vsli.64		d24,d19,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d19,#39
+-	vadd.i64	d28,d5
+-	vsli.64		d25,d19,#30
+-	veor		d30,d19,d20
+-	vsli.64		d26,d19,#25
+-	veor		d18,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d21,d20		@ Maj(a,b,c)
+-	veor		d18,d26			@ Sigma0(a)
+-	vadd.i64	d22,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d18,d30
+-	vshr.u64	q12,q2,#19
+-	vshr.u64	q13,q2,#61
+-	 vadd.i64	d18,d30			@ h+=Maj from the past
+-	vshr.u64	q15,q2,#6
+-	vsli.64		q12,q2,#45
+-	vext.8		q14,q3,q4,#8	@ X[i+1]
+-	vsli.64		q13,q2,#3
+-	veor		q15,q12
+-	vshr.u64	q12,q14,#1
+-	veor		q15,q13				@ sigma1(X[i+14])
+-	vshr.u64	q13,q14,#8
+-	vadd.i64	q3,q15
+-	vshr.u64	q15,q14,#7
+-	vsli.64		q12,q14,#63
+-	vsli.64		q13,q14,#56
+-	vext.8		q14,q7,q0,#8	@ X[i+9]
+-	veor		q15,q12
+-	vshr.u64	d24,d22,#14		@ from NEON_00_15
+-	vadd.i64	q3,q14
+-	vshr.u64	d25,d22,#18		@ from NEON_00_15
+-	veor		q15,q13				@ sigma0(X[i+1])
+-	vshr.u64	d26,d22,#41		@ from NEON_00_15
+-	vadd.i64	q3,q15
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d22,#50
+-	vsli.64		d25,d22,#46
+-	vmov		d29,d22
+-	vsli.64		d26,d22,#23
+-#if 22<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d23,d16		@ Ch(e,f,g)
+-	vshr.u64	d24,d18,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d17
+-	vshr.u64	d25,d18,#34
+-	vsli.64		d24,d18,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d18,#39
+-	vadd.i64	d28,d6
+-	vsli.64		d25,d18,#30
+-	veor		d30,d18,d19
+-	vsli.64		d26,d18,#25
+-	veor		d17,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d20,d19		@ Maj(a,b,c)
+-	veor		d17,d26			@ Sigma0(a)
+-	vadd.i64	d21,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d17,d30
+-	vshr.u64	d24,d21,#14	@ 23
+-#if 23<16
+-	vld1.64		{d7},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d21,#18
+-#if 23>0
+-	 vadd.i64	d17,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d21,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d21,#50
+-	vsli.64		d25,d21,#46
+-	vmov		d29,d21
+-	vsli.64		d26,d21,#23
+-#if 23<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d22,d23		@ Ch(e,f,g)
+-	vshr.u64	d24,d17,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d16
+-	vshr.u64	d25,d17,#34
+-	vsli.64		d24,d17,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d17,#39
+-	vadd.i64	d28,d7
+-	vsli.64		d25,d17,#30
+-	veor		d30,d17,d18
+-	vsli.64		d26,d17,#25
+-	veor		d16,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d19,d18		@ Maj(a,b,c)
+-	veor		d16,d26			@ Sigma0(a)
+-	vadd.i64	d20,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d16,d30
+-	vshr.u64	q12,q3,#19
+-	vshr.u64	q13,q3,#61
+-	 vadd.i64	d16,d30			@ h+=Maj from the past
+-	vshr.u64	q15,q3,#6
+-	vsli.64		q12,q3,#45
+-	vext.8		q14,q4,q5,#8	@ X[i+1]
+-	vsli.64		q13,q3,#3
+-	veor		q15,q12
+-	vshr.u64	q12,q14,#1
+-	veor		q15,q13				@ sigma1(X[i+14])
+-	vshr.u64	q13,q14,#8
+-	vadd.i64	q4,q15
+-	vshr.u64	q15,q14,#7
+-	vsli.64		q12,q14,#63
+-	vsli.64		q13,q14,#56
+-	vext.8		q14,q0,q1,#8	@ X[i+9]
+-	veor		q15,q12
+-	vshr.u64	d24,d20,#14		@ from NEON_00_15
+-	vadd.i64	q4,q14
+-	vshr.u64	d25,d20,#18		@ from NEON_00_15
+-	veor		q15,q13				@ sigma0(X[i+1])
+-	vshr.u64	d26,d20,#41		@ from NEON_00_15
+-	vadd.i64	q4,q15
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d20,#50
+-	vsli.64		d25,d20,#46
+-	vmov		d29,d20
+-	vsli.64		d26,d20,#23
+-#if 24<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d21,d22		@ Ch(e,f,g)
+-	vshr.u64	d24,d16,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d23
+-	vshr.u64	d25,d16,#34
+-	vsli.64		d24,d16,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d16,#39
+-	vadd.i64	d28,d8
+-	vsli.64		d25,d16,#30
+-	veor		d30,d16,d17
+-	vsli.64		d26,d16,#25
+-	veor		d23,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d18,d17		@ Maj(a,b,c)
+-	veor		d23,d26			@ Sigma0(a)
+-	vadd.i64	d19,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d23,d30
+-	vshr.u64	d24,d19,#14	@ 25
+-#if 25<16
+-	vld1.64		{d9},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d19,#18
+-#if 25>0
+-	 vadd.i64	d23,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d19,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d19,#50
+-	vsli.64		d25,d19,#46
+-	vmov		d29,d19
+-	vsli.64		d26,d19,#23
+-#if 25<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d20,d21		@ Ch(e,f,g)
+-	vshr.u64	d24,d23,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d22
+-	vshr.u64	d25,d23,#34
+-	vsli.64		d24,d23,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d23,#39
+-	vadd.i64	d28,d9
+-	vsli.64		d25,d23,#30
+-	veor		d30,d23,d16
+-	vsli.64		d26,d23,#25
+-	veor		d22,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d17,d16		@ Maj(a,b,c)
+-	veor		d22,d26			@ Sigma0(a)
+-	vadd.i64	d18,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d22,d30
+-	vshr.u64	q12,q4,#19
+-	vshr.u64	q13,q4,#61
+-	 vadd.i64	d22,d30			@ h+=Maj from the past
+-	vshr.u64	q15,q4,#6
+-	vsli.64		q12,q4,#45
+-	vext.8		q14,q5,q6,#8	@ X[i+1]
+-	vsli.64		q13,q4,#3
+-	veor		q15,q12
+-	vshr.u64	q12,q14,#1
+-	veor		q15,q13				@ sigma1(X[i+14])
+-	vshr.u64	q13,q14,#8
+-	vadd.i64	q5,q15
+-	vshr.u64	q15,q14,#7
+-	vsli.64		q12,q14,#63
+-	vsli.64		q13,q14,#56
+-	vext.8		q14,q1,q2,#8	@ X[i+9]
+-	veor		q15,q12
+-	vshr.u64	d24,d18,#14		@ from NEON_00_15
+-	vadd.i64	q5,q14
+-	vshr.u64	d25,d18,#18		@ from NEON_00_15
+-	veor		q15,q13				@ sigma0(X[i+1])
+-	vshr.u64	d26,d18,#41		@ from NEON_00_15
+-	vadd.i64	q5,q15
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d18,#50
+-	vsli.64		d25,d18,#46
+-	vmov		d29,d18
+-	vsli.64		d26,d18,#23
+-#if 26<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d19,d20		@ Ch(e,f,g)
+-	vshr.u64	d24,d22,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d21
+-	vshr.u64	d25,d22,#34
+-	vsli.64		d24,d22,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d22,#39
+-	vadd.i64	d28,d10
+-	vsli.64		d25,d22,#30
+-	veor		d30,d22,d23
+-	vsli.64		d26,d22,#25
+-	veor		d21,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d16,d23		@ Maj(a,b,c)
+-	veor		d21,d26			@ Sigma0(a)
+-	vadd.i64	d17,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d21,d30
+-	vshr.u64	d24,d17,#14	@ 27
+-#if 27<16
+-	vld1.64		{d11},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d17,#18
+-#if 27>0
+-	 vadd.i64	d21,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d17,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d17,#50
+-	vsli.64		d25,d17,#46
+-	vmov		d29,d17
+-	vsli.64		d26,d17,#23
+-#if 27<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d18,d19		@ Ch(e,f,g)
+-	vshr.u64	d24,d21,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d20
+-	vshr.u64	d25,d21,#34
+-	vsli.64		d24,d21,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d21,#39
+-	vadd.i64	d28,d11
+-	vsli.64		d25,d21,#30
+-	veor		d30,d21,d22
+-	vsli.64		d26,d21,#25
+-	veor		d20,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d23,d22		@ Maj(a,b,c)
+-	veor		d20,d26			@ Sigma0(a)
+-	vadd.i64	d16,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d20,d30
+-	vshr.u64	q12,q5,#19
+-	vshr.u64	q13,q5,#61
+-	 vadd.i64	d20,d30			@ h+=Maj from the past
+-	vshr.u64	q15,q5,#6
+-	vsli.64		q12,q5,#45
+-	vext.8		q14,q6,q7,#8	@ X[i+1]
+-	vsli.64		q13,q5,#3
+-	veor		q15,q12
+-	vshr.u64	q12,q14,#1
+-	veor		q15,q13				@ sigma1(X[i+14])
+-	vshr.u64	q13,q14,#8
+-	vadd.i64	q6,q15
+-	vshr.u64	q15,q14,#7
+-	vsli.64		q12,q14,#63
+-	vsli.64		q13,q14,#56
+-	vext.8		q14,q2,q3,#8	@ X[i+9]
+-	veor		q15,q12
+-	vshr.u64	d24,d16,#14		@ from NEON_00_15
+-	vadd.i64	q6,q14
+-	vshr.u64	d25,d16,#18		@ from NEON_00_15
+-	veor		q15,q13				@ sigma0(X[i+1])
+-	vshr.u64	d26,d16,#41		@ from NEON_00_15
+-	vadd.i64	q6,q15
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d16,#50
+-	vsli.64		d25,d16,#46
+-	vmov		d29,d16
+-	vsli.64		d26,d16,#23
+-#if 28<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d17,d18		@ Ch(e,f,g)
+-	vshr.u64	d24,d20,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d19
+-	vshr.u64	d25,d20,#34
+-	vsli.64		d24,d20,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d20,#39
+-	vadd.i64	d28,d12
+-	vsli.64		d25,d20,#30
+-	veor		d30,d20,d21
+-	vsli.64		d26,d20,#25
+-	veor		d19,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d22,d21		@ Maj(a,b,c)
+-	veor		d19,d26			@ Sigma0(a)
+-	vadd.i64	d23,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d19,d30
+-	vshr.u64	d24,d23,#14	@ 29
+-#if 29<16
+-	vld1.64		{d13},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d23,#18
+-#if 29>0
+-	 vadd.i64	d19,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d23,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d23,#50
+-	vsli.64		d25,d23,#46
+-	vmov		d29,d23
+-	vsli.64		d26,d23,#23
+-#if 29<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d16,d17		@ Ch(e,f,g)
+-	vshr.u64	d24,d19,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d18
+-	vshr.u64	d25,d19,#34
+-	vsli.64		d24,d19,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d19,#39
+-	vadd.i64	d28,d13
+-	vsli.64		d25,d19,#30
+-	veor		d30,d19,d20
+-	vsli.64		d26,d19,#25
+-	veor		d18,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d21,d20		@ Maj(a,b,c)
+-	veor		d18,d26			@ Sigma0(a)
+-	vadd.i64	d22,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d18,d30
+-	vshr.u64	q12,q6,#19
+-	vshr.u64	q13,q6,#61
+-	 vadd.i64	d18,d30			@ h+=Maj from the past
+-	vshr.u64	q15,q6,#6
+-	vsli.64		q12,q6,#45
+-	vext.8		q14,q7,q0,#8	@ X[i+1]
+-	vsli.64		q13,q6,#3
+-	veor		q15,q12
+-	vshr.u64	q12,q14,#1
+-	veor		q15,q13				@ sigma1(X[i+14])
+-	vshr.u64	q13,q14,#8
+-	vadd.i64	q7,q15
+-	vshr.u64	q15,q14,#7
+-	vsli.64		q12,q14,#63
+-	vsli.64		q13,q14,#56
+-	vext.8		q14,q3,q4,#8	@ X[i+9]
+-	veor		q15,q12
+-	vshr.u64	d24,d22,#14		@ from NEON_00_15
+-	vadd.i64	q7,q14
+-	vshr.u64	d25,d22,#18		@ from NEON_00_15
+-	veor		q15,q13				@ sigma0(X[i+1])
+-	vshr.u64	d26,d22,#41		@ from NEON_00_15
+-	vadd.i64	q7,q15
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d22,#50
+-	vsli.64		d25,d22,#46
+-	vmov		d29,d22
+-	vsli.64		d26,d22,#23
+-#if 30<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d23,d16		@ Ch(e,f,g)
+-	vshr.u64	d24,d18,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d17
+-	vshr.u64	d25,d18,#34
+-	vsli.64		d24,d18,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d18,#39
+-	vadd.i64	d28,d14
+-	vsli.64		d25,d18,#30
+-	veor		d30,d18,d19
+-	vsli.64		d26,d18,#25
+-	veor		d17,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d20,d19		@ Maj(a,b,c)
+-	veor		d17,d26			@ Sigma0(a)
+-	vadd.i64	d21,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d17,d30
+-	vshr.u64	d24,d21,#14	@ 31
+-#if 31<16
+-	vld1.64		{d15},[r1]!	@ handles unaligned
+-#endif
+-	vshr.u64	d25,d21,#18
+-#if 31>0
+-	 vadd.i64	d17,d30			@ h+=Maj from the past
+-#endif
+-	vshr.u64	d26,d21,#41
+-	vld1.64		{d28},[r3,:64]!	@ K[i++]
+-	vsli.64		d24,d21,#50
+-	vsli.64		d25,d21,#46
+-	vmov		d29,d21
+-	vsli.64		d26,d21,#23
+-#if 31<16 && defined(__ARMEL__)
+-	vrev64.8	,
+-#endif
+-	veor		d25,d24
+-	vbsl		d29,d22,d23		@ Ch(e,f,g)
+-	vshr.u64	d24,d17,#28
+-	veor		d26,d25			@ Sigma1(e)
+-	vadd.i64	d27,d29,d16
+-	vshr.u64	d25,d17,#34
+-	vsli.64		d24,d17,#36
+-	vadd.i64	d27,d26
+-	vshr.u64	d26,d17,#39
+-	vadd.i64	d28,d15
+-	vsli.64		d25,d17,#30
+-	veor		d30,d17,d18
+-	vsli.64		d26,d17,#25
+-	veor		d16,d24,d25
+-	vadd.i64	d27,d28
+-	vbsl		d30,d19,d18		@ Maj(a,b,c)
+-	veor		d16,d26			@ Sigma0(a)
+-	vadd.i64	d20,d27
+-	vadd.i64	d30,d27
+-	@ vadd.i64	d16,d30
+-	bne		.L16_79_neon
+-
+-	 vadd.i64	d16,d30		@ h+=Maj from the past
+-	vldmia		r0,{d24-d31}	@ load context to temp
+-	vadd.i64	q8,q12		@ vectorized accumulate
+-	vadd.i64	q9,q13
+-	vadd.i64	q10,q14
+-	vadd.i64	q11,q15
+-	vstmia		r0,{d16-d23}	@ save context
+-	teq		r1,r2
+-	sub		r3,#640	@ rewind K512
+-	bne		.Loop_neon
+-
+-	VFP_ABI_POP
+-	bx	lr				@ .word	0xe12fff1e
+-.size	sha512_block_data_order_neon,.-sha512_block_data_order_neon
+-#endif
+-.asciz	"SHA512 block transform for ARMv4/NEON, CRYPTOGAMS by <appro@openssl.org>"
+-.align	2
+-#if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+-.comm	OPENSSL_armcap_P,4,4
+-#endif
 -- 
 2.27.0
 
