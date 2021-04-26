@@ -2,54 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42BB6C433ED
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Apr 2021 09:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40862C433B4
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Apr 2021 10:41:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 001D860232
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Apr 2021 09:01:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1475160FE6
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Apr 2021 10:41:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232078AbhDZJCg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Apr 2021 05:02:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34652 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232068AbhDZJCg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Apr 2021 05:02:36 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4221061139;
-        Mon, 26 Apr 2021 09:01:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1619427715;
-        bh=t3czjXocmQ55D2hIA7IF6tpRkkrO+CYu0SYiBaFbz1Y=;
+        id S233120AbhDZKmA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Apr 2021 06:42:00 -0400
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:51209 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233149AbhDZKl5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Apr 2021 06:41:57 -0400
+X-Greylist: delayed 60167 seconds by postgrey-1.27 at vger.kernel.org; Mon, 26 Apr 2021 06:41:57 EDT
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 13QAf2EF001749;
+        Mon, 26 Apr 2021 19:41:03 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 13QAf2EF001749
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1619433663;
+        bh=A/AFSUsmk8GSI8VlkwdoqysmX6n1tl4gnFBoHFKOnt8=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Rr+xnQ9bh2WK8O/8hfZ126rO6UOx2U5yz/82OPuEcM/63rxn3pZU2mIi1ZytNaPi1
-         Q0urBmzwLalR1PIiMmcY15FIdU8E4ejI2vORj0T6FlEN80iTP3D/u2Bo27vEzqrzqk
-         FKu4rfU+Xcud/PmQRq8m03q1Oe1sPuVlX/fUqIewk9S3jWYPS1U/VVtiTID74zAJHC
-         Z7Ue0v8s7ocR/1iFU3IInJt93pXxOO0nhkfX44LQUd2kEfKYXChwrwyrhE6O+YsgaS
-         zXTtRFA9tKHtIpoBj0G3yuioFLQX+N8l+sQ7PaghSC0iz9MDubGkwd8OScSSpunduO
-         KLBBRzRjEcVzw==
-Received: by mail-oi1-f180.google.com with SMTP id m13so55772353oiw.13;
-        Mon, 26 Apr 2021 02:01:55 -0700 (PDT)
-X-Gm-Message-State: AOAM530zoz3k0y0lASOW1Ndd6QlxLdDmCad7xSdIaSIebmm9sNAZAoY+
-        31NQQPbUmlZEAYwRtwxUUYftBCIGDJIaaabIya4=
-X-Google-Smtp-Source: ABdhPJz490C9Bm6kCo7qnrhIQmJXGMOsL4UyybpS8HkW9UBlUjHlPJc3QUhNKE17yuV4sZvhQGWABW2vijsRIQpxtRs=
-X-Received: by 2002:aca:4056:: with SMTP id n83mr12587221oia.47.1619427714462;
- Mon, 26 Apr 2021 02:01:54 -0700 (PDT)
+        b=UFEAB5xyFk1ZiXHs0t+2WeIy+x00RzTJgToP/pE1e+H3Lr/Xm7UFs7f7lJbH9UvIE
+         QZFpd8yud13e7CO7sd/PiafI74xW2KPL5x0DqJiNLpeFRsYzG19dm88df4tw56XoNM
+         kA1l9OAidjwH3C5Y9DJg5j5yYvkgoPR5bNh98NNwnPkbrw04IOMaNmOElQXKAYRvZq
+         pWs3yvmB7MkVBo92haIqRcli25/jC5OzZogscaEahnB0tGjP0dYe463PJegVeoN9kS
+         hKn89CytYRIql7aJdvg6hIn0Qv6DqjkeRgpOiL2/E23ZB8wH4XCa4cySJFL1hI47UK
+         v1k42W8Nac0iw==
+X-Nifty-SrcIP: [209.85.216.46]
+Received: by mail-pj1-f46.google.com with SMTP id f2-20020a17090a4a82b02900c67bf8dc69so4950850pjh.1;
+        Mon, 26 Apr 2021 03:41:03 -0700 (PDT)
+X-Gm-Message-State: AOAM533Vi30QwMzfz60f0biPqXcdWR2IOMdkGABQqbjZYxH515KIUPh7
+        wtjqCCDV4QV+4x95Gn/0+3EhDuXWlMwtV/ru37k=
+X-Google-Smtp-Source: ABdhPJzn/di78c+8czLJrNo4jmACFnoKtdKgSMSJGKqB/K/iu2xwqySD7ggAsYTD38yYzuznyTgvVXrnesPH1uaw3CA=
+X-Received: by 2002:a17:902:d645:b029:e8:ec90:d097 with SMTP id
+ y5-20020a170902d645b02900e8ec90d097mr18106542plh.47.1619433662462; Mon, 26
+ Apr 2021 03:41:02 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210425175734.1310191-1-masahiroy@kernel.org>
  <20210425175734.1310191-3-masahiroy@kernel.org> <20210426085836.GA5802@willie-the-truck>
-In-Reply-To: <20210426085836.GA5802@willie-the-truck>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 26 Apr 2021 11:01:43 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFe7wf_3jmoSAM98s+sZS4Ex4yyoXXiToR-EX8K0e-aNw@mail.gmail.com>
-Message-ID: <CAMj1kXFe7wf_3jmoSAM98s+sZS4Ex4yyoXXiToR-EX8K0e-aNw@mail.gmail.com>
+ <CAMj1kXFe7wf_3jmoSAM98s+sZS4Ex4yyoXXiToR-EX8K0e-aNw@mail.gmail.com>
+In-Reply-To: <CAMj1kXFe7wf_3jmoSAM98s+sZS4Ex4yyoXXiToR-EX8K0e-aNw@mail.gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Mon, 26 Apr 2021 19:40:24 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAR+3DKGOdg=Jo1yt0QvjjjCzthKzpx5RCMK3x+MO0oMew@mail.gmail.com>
+Message-ID: <CAK7LNAR+3DKGOdg=Jo1yt0QvjjjCzthKzpx5RCMK3x+MO0oMew@mail.gmail.com>
 Subject: Re: [PATCH 3/4] crypto: arm64: generate *.S by Perl at build time
  instead of shipping them
-To:     Will Deacon <will@kernel.org>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Will Deacon <will@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
@@ -61,30 +67,58 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 26 Apr 2021 at 10:58, Will Deacon <will@kernel.org> wrote:
+On Mon, Apr 26, 2021 at 6:01 PM Ard Biesheuvel <ardb@kernel.org> wrote:
 >
-> [+Ard]
->
-> On Mon, Apr 26, 2021 at 02:57:33AM +0900, Masahiro Yamada wrote:
-> > Generate *.S by Perl like arch/{mips,x86}/crypto/Makefile.
+> On Mon, 26 Apr 2021 at 10:58, Will Deacon <will@kernel.org> wrote:
 > >
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> > ---
+> > [+Ard]
 > >
-> >  arch/arm64/crypto/Makefile                |    9 +-
-> >  arch/arm64/crypto/poly1305-core.S_shipped |  835 ---------
-> >  arch/arm64/crypto/sha256-core.S_shipped   | 2069 ---------------------
-> >  arch/arm64/crypto/sha512-core.S_shipped   | 1093 -----------
-> >  4 files changed, 3 insertions(+), 4003 deletions(-)
-> >  delete mode 100644 arch/arm64/crypto/poly1305-core.S_shipped
-> >  delete mode 100644 arch/arm64/crypto/sha256-core.S_shipped
-> >  delete mode 100644 arch/arm64/crypto/sha512-core.S_shipped
+> > On Mon, Apr 26, 2021 at 02:57:33AM +0900, Masahiro Yamada wrote:
+> > > Generate *.S by Perl like arch/{mips,x86}/crypto/Makefile.
+> > >
+> > > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > > ---
+> > >
+> > >  arch/arm64/crypto/Makefile                |    9 +-
+> > >  arch/arm64/crypto/poly1305-core.S_shipped |  835 ---------
+> > >  arch/arm64/crypto/sha256-core.S_shipped   | 2069 ---------------------
+> > >  arch/arm64/crypto/sha512-core.S_shipped   | 1093 -----------
+> > >  4 files changed, 3 insertions(+), 4003 deletions(-)
+> > >  delete mode 100644 arch/arm64/crypto/poly1305-core.S_shipped
+> > >  delete mode 100644 arch/arm64/crypto/sha256-core.S_shipped
+> > >  delete mode 100644 arch/arm64/crypto/sha512-core.S_shipped
+> >
+> > What's the advantage of removing the _shipped files? We included them
+> > originally so that we didn't require perl for the kernel build -- is that no
+> > longer an issue?
+> >
+> > I guess I'm just missing the justification for the change.
 >
-> What's the advantage of removing the _shipped files? We included them
-> originally so that we didn't require perl for the kernel build -- is that no
-> longer an issue?
->
-> I guess I'm just missing the justification for the change.
+> Removing 4000 lines of code is an improvement in itself, I suppose,
+> but I have no preference either way,
 
-Removing 4000 lines of code is an improvement in itself, I suppose,
-but I have no preference either way,
+
+
+If necessary, I can send v2 with the following info added.
+
+
+------------------------------>8---------------------------------
+People building the arm64 kernel are likely to have Perl already
+installed on the system.
+
+ARCH=arm64 defconfig sets CONFIG_OID_REGISTRY=y, so Perl is required
+to generate lib/oid_registery_data.c anyway.
+
+Also, Documentation/process/changes.rst says:
+
+You will need perl 5 and the following modules: ``Getopt::Long``,
+``Getopt::Std``, ``File::Basename``, and ``File::Find`` to build the kernel.
+------------------------------>8---------------------------------
+
+
+
+
+
+--
+Best Regards
+Masahiro Yamada
