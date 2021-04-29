@@ -2,91 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C32B7C43461
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 14:05:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 198DBC433B4
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 15:07:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F0656143A
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 14:05:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAA3261447
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 15:07:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238595AbhD2OGA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Apr 2021 10:06:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34928 "EHLO
+        id S233290AbhD2PIC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Apr 2021 11:08:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239049AbhD2OF6 (ORCPT
+        with ESMTP id S240450AbhD2PH4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Apr 2021 10:05:58 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BC07C06138B;
-        Thu, 29 Apr 2021 07:05:11 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id a36so65713287ljq.8;
-        Thu, 29 Apr 2021 07:05:11 -0700 (PDT)
+        Thu, 29 Apr 2021 11:07:56 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 976D9C06138B
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Apr 2021 08:07:09 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id u20so35292623qku.10
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Apr 2021 08:07:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Y6odb9TW+6unlb0u1kmwWgOwlmmDgi1XBtwxHyVRntg=;
-        b=Ln6wZyd2hkc4PwaDRTAFNM06A+bwtzAw0AqBWHNuWQSh0SXjmN0Ev5KYMtxqjYEb3F
-         durCpqsOSoNillWO0eMdQY4GlXKm71VhhC5cYrfDNWsUmf+JDXSKWD83MsuykSaJ9Lik
-         tCkz6V1sip2rGoERzhy/jMfPcqD/m2qQmFwx5kZWyPi0+H8wkNIBqsY4EvURMljWYukR
-         7Kog60p9Si2V1TeTECCWVcZVFUMCRasRJkUxAwrAte+VBU/ydKzHxJpJ6YNaMb91nkGD
-         lMrk7n2SNy2PGrBRS+cAffXvnekn8xFkO+kshy+FpZ/SwwryIFo60qrw0hpLOnsiWV+0
-         HNCw==
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PJriSY/3BoO1fHsVgHab2OGWTgIWKz/XuakYolqJtHg=;
+        b=P43IVnbOO1KOh0wwx2LKjHbidBxkD+RQyNaMv1TLiF6K5NcRwSd9UeIE4ozLi05/9r
+         mt0LXt3WDcvq3LGkC8/zgqAuFvF3+C3Mrgn/IwXMteNul6/BWKRDrLTozu1aeBROuj43
+         lp+cgQvjJSBIuFWdAo7jQbUOxMKR/yXUNabsNZj//ghJ0lyo6actzWuwEOnbFPpvULVb
+         mVvn1n3VHcBWRuhDr1AouhWJkNfu3zGSjVmo68gc9T2//tKjxIUJrLK++yo38Z868Sur
+         Zo7uhaUXm1bEhnmpepCjYuul3SU4Hj+6W7VKGuVJxBRncm+0xhQHByjqJpT5q6JIxH9j
+         1Vlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Y6odb9TW+6unlb0u1kmwWgOwlmmDgi1XBtwxHyVRntg=;
-        b=pRvji8o9mMVkahD8IMhvnEajN9i3HeEvVOu/AOB8zbTm0K86gQKGblZLM0p/W8Mmn5
-         Z51J6x+WvlEHsFCqymct/m+Fe5FBALmDYVF7A09QC3zb/U8YcOwpOpwN4aMyTFngNg2b
-         sIeffiQsAKoJNDiV1768HphDHAckOJNAAiWeMCQq3mxgHfMQXffgFgcCvmcB1NZLmabY
-         7dmH3Vmu0UoTi5FbSlYUa5WHw3y0FGFI9ayE8pl5EZK7bnJc/TI06frqbOIlusBEdH/I
-         c7TTLTeaBqPvi0kNxCAW1Z8Q10SM0uk4fxF2Xk0oiqe2IzhU/8upG6ADOWzjyZoi+VAX
-         V6ig==
-X-Gm-Message-State: AOAM533BHmGpn2uaIMwkhnyMi1ORNpMc6XwYSL8Fy5KiU/ofPmiw+d99
-        IpNMO1V/onTuMruJyvHrq+QH6dK6dfI67kSoYlE=
-X-Google-Smtp-Source: ABdhPJwx4t1tAnURqC3cIXrCQ9MYDyCneDMRS6iP4fzjzrcrxfCRfpoLO16QkB+XdR5dd9BybJbBRrESpxlRoa448/Y=
-X-Received: by 2002:a2e:95d7:: with SMTP id y23mr22044832ljh.444.1619705109668;
- Thu, 29 Apr 2021 07:05:09 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PJriSY/3BoO1fHsVgHab2OGWTgIWKz/XuakYolqJtHg=;
+        b=ik57uwdEjQeNIjHkQOLM6m4t+WkK2vEIJXidi1KbkTesM8/kPmurCAPizYf2oRLbWA
+         8nF3AktO1RAJl/zx0uV+oNcDsC2r/qTosMfFNJA6JVnhvn+ekxgLSX/b/GKC+G3wIYCF
+         x8fC5LwxXEJ9q7vnpU+vYmtnxn0UEYKqtG0hAtgJyQqv7G4hLGW+Zf/CCZ6f1tjRf7/s
+         5g7IzqI1l5IWQvqrkN6EWNStIs0T8hWdFgS1YEGFu6YaqJGNMQj0gPxH7Yt2wGbU3i5o
+         X0CtWd77GNk9mcYzpz7qllgRtJkf0lF/kko26KItw5g7X2FjlC01uwySTl/d0cz/iDYK
+         fKnw==
+X-Gm-Message-State: AOAM532niwGSvDqPkqKoI84FQ2kVXtJiMwvuUNs6QZUjrDJCGiu29ffC
+        ldPKkafs4RaQCiDnJNnkJGjpCg==
+X-Google-Smtp-Source: ABdhPJw6BVL6oIwP9QDnk+MHuqu75/I+KE0MpjMGALVikb4wE3xysyeuazVjIkJ9H4vT8A58dMBXow==
+X-Received: by 2002:a37:4c4:: with SMTP id 187mr87385qke.163.1619708828855;
+        Thu, 29 Apr 2021 08:07:08 -0700 (PDT)
+Received: from pop-os.fios-router.home (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
+        by smtp.googlemail.com with ESMTPSA id j191sm2223822qke.131.2021.04.29.08.07.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Apr 2021 08:07:08 -0700 (PDT)
+From:   Thara Gopinath <thara.gopinath@linaro.org>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        bjorn.andersson@linaro.org
+Cc:     ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+Subject: [Patch v4 0/7] Add support for AEAD algorithms in Qualcomm Crypto Engine driver
+Date:   Thu, 29 Apr 2021 11:07:00 -0400
+Message-Id: <20210429150707.3168383-1-thara.gopinath@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20210429140250.2321-1-alice.guo@oss.nxp.com> <20210429140250.2321-2-alice.guo@oss.nxp.com>
-In-Reply-To: <20210429140250.2321-2-alice.guo@oss.nxp.com>
-From:   Fabio Estevam <festevam@gmail.com>
-Date:   Thu, 29 Apr 2021 11:04:58 -0300
-Message-ID: <CAOMZO5Cbfh3Aj5-i2y+GDZ=-SZw-wLMbPMew=YTcf9Yr6ohVCw@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] caam: imx8m: change to use of_match_node in run_descriptor_deco0
-To:     "Alice Guo (OSS)" <alice.guo@oss.nxp.com>
-Cc:     Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Sascha Hauer <kernel@pengutronix.de>,
-        Horia Geanta Neag <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        dominique.martinet@atmark-techno.com,
-        NXP Linux Team <linux-imx@nxp.com>,
-        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
-        <linux-arm-kernel@lists.infradead.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Alice
+Enable support for AEAD algorithms in Qualcomm CE driver.  The first three
+patches in this series are cleanups and add a few missing pieces required
+to add support for AEAD algorithms.  Patch 4 introduces supported AEAD
+transformations on Qualcomm CE.  Patches 5 and 6 implements the h/w
+infrastructure needed to enable and run the AEAD transformations on
+Qualcomm CE.  Patch 7 adds support to queue fallback algorithms in case of
+unsupported special inputs.
 
-On Thu, Apr 29, 2021 at 11:02 AM Alice Guo (OSS) <alice.guo@oss.nxp.com> wrote:
->
-> From: Alice Guo <alice.guo@nxp.com>
->
-> Patch "fix the built-in caam driver cannot match soc_id" provides
-> imx8m_machine_match to match i.MX8M{Q,M,N,P}, so change to use to
-> of_match_node which can simplify the code.
+This patch series has been tested with in kernel crypto testing module
+tcrypt.ko with fuzz tests enabled as well.
 
-Shouldn't these patches be squashed?
+Thara Gopinath (7):
+  crypto: qce: common: Add MAC failed error checking
+  crypto: qce: common: Make result dump optional
+  crypto: qce: Add mode for rfc4309
+  crypto: qce: Add support for AEAD algorithms
+  crypto: qce: common: Clean up qce_auth_cfg
+  crypto: qce: common: Add support for AEAD algorithms
+  crypto: qce: aead: Schedule fallback algorithm
+
+ drivers/crypto/Kconfig      |  15 +
+ drivers/crypto/qce/Makefile |   1 +
+ drivers/crypto/qce/aead.c   | 841 ++++++++++++++++++++++++++++++++++++
+ drivers/crypto/qce/aead.h   |  56 +++
+ drivers/crypto/qce/common.c | 196 ++++++++-
+ drivers/crypto/qce/common.h |   9 +-
+ drivers/crypto/qce/core.c   |   4 +
+ 7 files changed, 1102 insertions(+), 20 deletions(-)
+ create mode 100644 drivers/crypto/qce/aead.c
+ create mode 100644 drivers/crypto/qce/aead.h
+
+-- 
+2.25.1
+
