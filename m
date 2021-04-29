@@ -2,324 +2,157 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17D4FC433ED
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 15:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 300F7C433B4
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 15:22:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D646E61441
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 15:07:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC90D61447
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 15:22:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240804AbhD2PI3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Apr 2021 11:08:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49042 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233420AbhD2PIE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Apr 2021 11:08:04 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60034C06138D
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Apr 2021 08:07:16 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id l1so9556564qtr.12
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Apr 2021 08:07:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=koWFXsRK9IOTnpHaJ55PNA1ty9M1SO3yZ97+vGTbhqk=;
-        b=wJPcyxX5SqL6cfCTtyPGKo3PubcSSqRVCU4sVPaQP3KURaD64/KYq21QAXXgf3NwKS
-         lPehlj8cuKL0rJ54YDMYePk+MifJ4ONoqboCR0nXX7Hh0bymQHGR4SUmUsp4QL3erdyL
-         1tnKs+p32Xs6VT+ScQrQMhqMMzRLwdG4hh7pyga15tLRMl1tkMPzXpSBqGeHaWcUSwO4
-         Xz9j4T3KATqJ4jCdzNa+UfHKSv22RucNm8R7TKtVCyFl0Cg4ZIddJ2j/wF/OfC1Eu/uk
-         laNua71XGSCcg7S41xTDrElmMI1+mZSs1cj4cBwYU+EPV62X+r+CuqLN/CtnUB2+BSj/
-         AFKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=koWFXsRK9IOTnpHaJ55PNA1ty9M1SO3yZ97+vGTbhqk=;
-        b=WeZpvyQCisDLgNC00Ou0C8oP7myWifvCqS1PAvhlAGlxgK++ZRq4GPhrHStOwgez9Y
-         wlpU1gP+TkDmzlm0Zv8X13P/pk/p3CPm0i+zamkTDau/0wLRvzJgZMoDYC4vjm1AoJoL
-         nCSUU6RiVIomE1k5+uQuLeQBw99HC6OyPMrVQfIeoUylELs20bo6ZE7nDmURZ02sriOi
-         PLJeXZkiMVRhBlm3Z17249VO3tjxGihJ9ln9l379CgBduVLE7fcmyu7R7Zc3gZlev1nG
-         1iKexOq0ubjd8MfqRWeDh9Pgbp83njmn4BWuwUgF7ZPgZh2CZTnVI7eFSGEBM/mALh9H
-         WpSA==
-X-Gm-Message-State: AOAM530+Q2hiFAN0qSz2MvDk3FB7ta0ZbEuJSGJtNSe75EzyqEQVZn+a
-        qc4sWIooagMBcX7tAbWGL7Noow==
-X-Google-Smtp-Source: ABdhPJz10w4OQRcQPzpTv7kUB192KtAjVTSZNxFU5btjoad9EBpjxUv+KLydOqvFMYM4mFK2y9L/uw==
-X-Received: by 2002:ac8:5157:: with SMTP id h23mr19981611qtn.45.1619708835288;
-        Thu, 29 Apr 2021 08:07:15 -0700 (PDT)
-Received: from pop-os.fios-router.home (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.googlemail.com with ESMTPSA id j191sm2223822qke.131.2021.04.29.08.07.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Apr 2021 08:07:14 -0700 (PDT)
-From:   Thara Gopinath <thara.gopinath@linaro.org>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        bjorn.andersson@linaro.org
-Cc:     ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
-Subject: [Patch v4 6/7] crypto: qce: common: Add support for AEAD algorithms
-Date:   Thu, 29 Apr 2021 11:07:06 -0400
-Message-Id: <20210429150707.3168383-7-thara.gopinath@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210429150707.3168383-1-thara.gopinath@linaro.org>
-References: <20210429150707.3168383-1-thara.gopinath@linaro.org>
+        id S240603AbhD2PXn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Apr 2021 11:23:43 -0400
+Received: from mail-eopbgr20076.outbound.protection.outlook.com ([40.107.2.76]:46214
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232989AbhD2PXm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Apr 2021 11:23:42 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ixzwn6v7aKt1xxcQOQfa/eBnKngBC3+v4CgDT2gM4RKilo74pSO/MiggkiACSe+KnQRgZGFXtwH7TzoBXZI3U7gha2NorC5ZJGKYw1AFsrxNnUM6V3ZQ6ATFYsksUD1cZ6KxlNQI8QZNIKDqr1bmOWg8emjf2GvSRXHCJbIy52tG17O3P7c6armdP9JQpTwn6HzAQVeoNknMen0Q8PcY+6f+8zN86USXGbz10YNrIKDSA0uEX2+BGqZeQ5fIcrwRtW5AB4glSHmgF3Ke/ZBKiqozKRfRVd4FzVcdvgb7jG46Z3+I4knjHvTfwe9GYZhN9MUQMEqNnfZO7cCDi8Zh2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E1cCO2A+lX6ecM+zjv1WfM3Fr3iIhR6Gw3YRNEPUrZk=;
+ b=R2JW3Jo9qb8+gLn1zY8gCSH0GAHv58K7An6qDfoHXyw8K6ryBfP/VuaRnHuy4Qcw4m96Z42oiYoB2QsEtBVFhyqa0duDqexKf3PVeoF8NWXkvINd6CxbLGuqpuBHNPsO3zJh8BX0L63ftUaoRZmX5EzvD2ChpFUaTgohU1DvytUgJMWBM4bdNrcrwjBPTNdgyd5I74dNk2k8bAuctaU5qFFdqOLZ2VMYeDGbuMDBx6V8fcWNjl7Gzt0Cuje/tZGo47Ly+Xf+7PYx5tyLeQtjMhAohKZ+031lBOyq4D0sX70vYas5iH3TR3nMRYTYsRDHBEwwPtM7aaaxrCAh1+Fk+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E1cCO2A+lX6ecM+zjv1WfM3Fr3iIhR6Gw3YRNEPUrZk=;
+ b=U8Ky0R9c0K3A0e2PyN9wqSl/hSRvizf31n/+lHdk815tAFGPAVZizhMHUWWnao3uslEnDod6ufK2c8Fdh+jXWbjfqwbZ+qZrKrGlq2/CK7Bnyxw9ZE7JsgvfbzBO+VXjMwFABylZKE2S76bTTqiynprSMZX6ka0oTmAXBM/Ecr0=
+Received: from AM6PR04MB6053.eurprd04.prod.outlook.com (2603:10a6:20b:b9::10)
+ by AM6PR04MB4199.eurprd04.prod.outlook.com (2603:10a6:209:49::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.21; Thu, 29 Apr
+ 2021 15:22:51 +0000
+Received: from AM6PR04MB6053.eurprd04.prod.outlook.com
+ ([fe80::b034:690:56aa:7b18]) by AM6PR04MB6053.eurprd04.prod.outlook.com
+ ([fe80::b034:690:56aa:7b18%4]) with mapi id 15.20.4087.025; Thu, 29 Apr 2021
+ 15:22:51 +0000
+From:   "Alice Guo (OSS)" <alice.guo@oss.nxp.com>
+To:     Fabio Estevam <festevam@gmail.com>,
+        "Alice Guo (OSS)" <alice.guo@oss.nxp.com>
+CC:     Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Sascha Hauer <kernel@pengutronix.de>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "dominique.martinet@atmark-techno.com" 
+        <dominique.martinet@atmark-techno.com>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
+        <linux-arm-kernel@lists.infradead.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
+Subject: RE: [PATCH v1 2/2] caam: imx8m: change to use of_match_node in
+ run_descriptor_deco0
+Thread-Topic: [PATCH v1 2/2] caam: imx8m: change to use of_match_node in
+ run_descriptor_deco0
+Thread-Index: AQHXPQBPQp7syc9+7kmnegummfCQsqrLh0YAgAASmjA=
+Date:   Thu, 29 Apr 2021 15:22:51 +0000
+Message-ID: <AM6PR04MB60536DF97D12915D5E5A8663E25F9@AM6PR04MB6053.eurprd04.prod.outlook.com>
+References: <20210429140250.2321-1-alice.guo@oss.nxp.com>
+ <20210429140250.2321-2-alice.guo@oss.nxp.com>
+ <CAOMZO5Cbfh3Aj5-i2y+GDZ=-SZw-wLMbPMew=YTcf9Yr6ohVCw@mail.gmail.com>
+In-Reply-To: <CAOMZO5Cbfh3Aj5-i2y+GDZ=-SZw-wLMbPMew=YTcf9Yr6ohVCw@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=oss.nxp.com;
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [92.121.68.129]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2b6a604c-4962-47f5-51c9-08d90b22a785
+x-ms-traffictypediagnostic: AM6PR04MB4199:
+x-ms-exchange-sharedmailbox-routingagent-processed: True
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR04MB4199889ED6E864A48523D56FA35F9@AM6PR04MB4199.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Y9BU/wExQeUU6b/V+L+i8uNv0j9sRZrZhwoND7ujb4l73VyxW+ndBhuh5EdiG7hTdyVLV9z0MPwJnhxU5SO+zZOp95lPnbfWTOlccISVr4AayEUT+bqoBjTLrAETxSdZ8EoyESzfj0tWDT1+nRgbmEpUi+t7kk+s5XBdZJx7mV3tILDxXK19XX6owO7a/p2G6stL97MF4dtQPxLSAsKgZabF3mP4X6S2Ny2vQPO/FqNCcHHwS734ZOGkcaeGYDGNSwrUqVHuuR0LDb68nLY6mMFedZI/UoWH5vkBSG42mpkA6++J+r8hp52+QkJ+jmNfSOiqbRZQy9b+MmpGUHow45URLltZnBUupB0hk8zxVB+ycwqQ5K4jFYoe+fqyavlsZoZm8RP1/iazFSh4n4WrpQAoYzLciJAmWM+lt2+iszJsfX6uKfjIaxI1ZeULbojwZ79VaaOCzyuVVcKdZcx6VnkBBVakxjKivpjP1cFlsAv0kogz+lZlp5o6IOCzimf82E/dDiBtC+fr0o64LcEhbmBpVrwDbS4BObZ9PaJg/oyJrccfCjiXTydQk6zG58xfH5xwXtUFnztpQOvN0e/mUeKlFVQfPcsWTF6SrritzvB29prhuwfuMFCwPWehojjzKlTeRsle7vxIujbtJznQVg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR04MB6053.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(498600001)(54906003)(8936002)(76116006)(2906002)(110136005)(186003)(122000001)(52536014)(66446008)(66476007)(26005)(66946007)(66556008)(64756008)(7416002)(55016002)(5660300002)(53546011)(4744005)(7696005)(33656002)(6506007)(8676002)(86362001)(71200400001)(9686003)(83380400001)(4326008)(38100700002)(32563001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: =?utf-8?B?Y3JPNkhxS2VGY3V0STNyY0gzRm02c3VocWxpV3RHNmxhM0tKYWo0TkVKamJ3?=
+ =?utf-8?B?VTlaQmo4T0swRjFVTjBoZWRNK1h2U1pucjlGT2k0UHc1dHJUSU9idW54d3B6?=
+ =?utf-8?B?VDMxTERxYlpRWmE4YlY0OW9zMlFYNWsxdlY3ZUxHa0tBSVc1bWRwdTNSdzJ1?=
+ =?utf-8?B?aFBCWE9IVzZoMU9paFNualdJNDlrSVlMRjF6K1NhMnh3R0wxd0NSNEsxWEZ5?=
+ =?utf-8?B?TFlPZEsvQzdFb1RxQlVGeXByQXFzTTYvaHNSeTZxcDE5MHpuZEtNd2gwcEYv?=
+ =?utf-8?B?N3NNVVhPL3JpZGJDeGRHdjkrenNLU0JOWmlYVGJCTU9qM2d6OVY3QTdBRjRa?=
+ =?utf-8?B?S1FLWkVEaFdPUzNIZXExZHVCaXJSa2Q4bTBSS1pTS0x1WWFRdU1UNU1PWXlP?=
+ =?utf-8?B?VkpSamlOb0ZjcXdhaWFjSU1lTTVURFR4VURHUVFaTVJ0S0NiWllNKzArT2gy?=
+ =?utf-8?B?bHVpdUFDd3FVU1hMWHNlN01NYnhDdkZOWHdUQ2NCWWN6TkVRaUN2QXhNRTBC?=
+ =?utf-8?B?T1dnY2JOSGFzMjU1eEVnM3hZQ05hWVRXdW0rYU5ZbTFibG5aM1Mrb0FZUWVQ?=
+ =?utf-8?B?d3RTTzZtdlAya25lSSs1cnlCR1Y5WVFkN2xGZlVJbFlHS1o3bTMxbkltM2F2?=
+ =?utf-8?B?YnFhYmQzd1BNTFhsdTRFd090Q2Q5SVl5N0EwRDNkcllkUFBuSnZEcVFRWWRt?=
+ =?utf-8?B?SDV6a1p6R0t4WXRxY2FHTnBOaGZiekNodkpKSnFhOWtPTFZwSkZ6OG1ld3k2?=
+ =?utf-8?B?MWFSSi9PZ1JnREpwbVhGeEN2Z2lSK0RIZlZEL1dVQmZzOVhNQThNVWxpbmZZ?=
+ =?utf-8?B?blVWL1dxSFRjNllzcEdablhSK1ZDOUNHM3NQR2hSOVlBM3kxeWZ2bXNodzRV?=
+ =?utf-8?B?cDBQY0ozemRvdnNrN0Z1ZWd3VHBQVlI0U1pvQ24ycHAwc1BRR1J6OUpLL1dR?=
+ =?utf-8?B?VVp0eEhnb0Nza2FWQ0NHbVoyNFo2WUhVMTlXVy9SNENaTi9pd0h0VVNhTzRO?=
+ =?utf-8?B?U3dEREJDdUNteW5iWVQ1SEFDdjQ1c1JIVC9QMCtTTUpPRlh5a1BaYWxJdEdY?=
+ =?utf-8?B?VElwUXZENHlVSUVLQUJZQU1IVUZubHNTbXlwNTUwYW9GQmZmSDNOYmxnRVRa?=
+ =?utf-8?B?QjVlcE1mcExrcjg5UmdXSStIM2xoQ29abDJpeU5NMXp2MnFpWnVvZGVEL1NW?=
+ =?utf-8?B?VWFwSC9LaFJQVENOLzlISDFZT1k3b0FFL1pocjduUTFYOFN6cWwvbXJkWlZy?=
+ =?utf-8?B?eGJYYlAwTXFoY1VyRkcrS3g5a0hlSnBIeTB5MXVXQnZUdks5bzcxNVN6eUhK?=
+ =?utf-8?B?ektwdGxGSktoWmhUL1Vya2dVNVpQS3JEVzYxNmZTb3FFdHUyRTZ4QW5nTjFK?=
+ =?utf-8?B?c0xNNThlV3hiVWVBclpDWnlPUzdrYnpDMGZyWUdqeGlySzdDQkI2ZzF1UjIv?=
+ =?utf-8?B?eVoxbjdsUm1EQVF0Uml2dFJQaUpoVHRyY28wK3JRWFJDUmxZV3V1UWhGZUtD?=
+ =?utf-8?B?QUVMTlNOSHhtMi80SGhOSW1aSitFWFFvakRIa0MwZ2J3eEJTa01YMGFzM1k1?=
+ =?utf-8?B?cXBYelI1MlVQSGZBT2ovVWVlaEFmRUJrVkIwV3JLaUpBMUVJa2MxcFZLdDIv?=
+ =?utf-8?B?UzBHcFRVZC8xWVduZDRWWm5VdEUzNWpDQ1FzTG9qNS9OcEhjOVhMUEs4anpN?=
+ =?utf-8?B?NkFPbkRETWJoQzkyNldPd3V6Wi94Uk1xdUJxYmp3TnRMMUdTU3Jjc2RkRkFH?=
+ =?utf-8?Q?ZEieNMW5GmVtx3JN8t+6GxCFjy+mBai9SlNuczK?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR04MB6053.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2b6a604c-4962-47f5-51c9-08d90b22a785
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2021 15:22:51.5632
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dtfpC3vqvCUJ0GAgvU7Artvfy6iElzQaKKtW2/z2H/F3Res9RbCwzy+DrjF3e/FBtqc+vjMO/ECI7am1E8Nzhg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB4199
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add register programming sequence for enabling AEAD
-algorithms on the Qualcomm crypto engine.
-
-Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
----
-
-v3->v2: - Initialized auth_ivsize to 0 to avoid -Wsometimes-uninitialized warning as
-	  reported by kernel test robot <lkp@intel.com>.
-v2->v3:
-	- Made qce_be32_to_cpu_array truly be32 to cpu endian by using be32_to_cpup
-	  instead of cpu_to_be32p. Also remove the (u32 *) typcasting of arrays obtained
-	  as output from qce_be32_to_cpu_array as per Bjorn's review comments.
-	- Wrapped newly introduced std_iv_sha1, std_iv_sha256 and qce_be32_to_cpu_array
-	  in CONFIG_CRYPTO_DEV_QCE_AEAD to prevent W1 warnings as reported by kernel
-	  test robot <lkp@intel.com>.
-
-v1->v2:
-	- Minor fixes like removing not needed initializing of variables
-	  and using bool values in lieu of 0 and 1 as pointed out by Bjorn.
-	- Introduced qce_be32_to_cpu_array which converts the u8 string in big
-	  endian order to array of u32 and returns back total number of words,
-	  as per Bjorn's review comments. Presently this function is used only by
-	  qce_setup_regs_aead to format keys, iv and nonce. cipher and hash 
-	  algorithms can be made to use this function as a separate clean up patch.
-
- drivers/crypto/qce/common.c | 162 +++++++++++++++++++++++++++++++++++-
- drivers/crypto/qce/common.c | 162 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 160 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/qce/common.c b/drivers/crypto/qce/common.c
-index 7b3d6caec1b2..7c612ba5068f 100644
---- a/drivers/crypto/qce/common.c
-+++ b/drivers/crypto/qce/common.c
-@@ -15,6 +15,7 @@
- #include "core.h"
- #include "regs-v5.h"
- #include "sha.h"
-+#include "aead.h"
- 
- static inline u32 qce_read(struct qce_device *qce, u32 offset)
- {
-@@ -96,7 +97,7 @@ static inline void qce_crypto_go(struct qce_device *qce, bool result_dump)
- 		qce_write(qce, REG_GOPROC, BIT(GO_SHIFT));
- }
- 
--#ifdef CONFIG_CRYPTO_DEV_QCE_SHA
-+#if defined(CONFIG_CRYPTO_DEV_QCE_SHA) || defined(CONFIG_CRYPTO_DEV_QCE_AEAD)
- static u32 qce_auth_cfg(unsigned long flags, u32 key_size, u32 auth_size)
- {
- 	u32 cfg = 0;
-@@ -139,7 +140,9 @@ static u32 qce_auth_cfg(unsigned long flags, u32 key_size, u32 auth_size)
- 
- 	return cfg;
- }
-+#endif
- 
-+#ifdef CONFIG_CRYPTO_DEV_QCE_SHA
- static int qce_setup_regs_ahash(struct crypto_async_request *async_req)
- {
- 	struct ahash_request *req = ahash_request_cast(async_req);
-@@ -225,7 +228,7 @@ static int qce_setup_regs_ahash(struct crypto_async_request *async_req)
- }
- #endif
- 
--#ifdef CONFIG_CRYPTO_DEV_QCE_SKCIPHER
-+#if defined(CONFIG_CRYPTO_DEV_QCE_SKCIPHER) || defined(CONFIG_CRYPTO_DEV_QCE_AEAD)
- static u32 qce_encr_cfg(unsigned long flags, u32 aes_key_size)
- {
- 	u32 cfg = 0;
-@@ -271,7 +274,9 @@ static u32 qce_encr_cfg(unsigned long flags, u32 aes_key_size)
- 
- 	return cfg;
- }
-+#endif
- 
-+#ifdef CONFIG_CRYPTO_DEV_QCE_SKCIPHER
- static void qce_xts_swapiv(__be32 *dst, const u8 *src, unsigned int ivsize)
- {
- 	u8 swap[QCE_AES_IV_LENGTH];
-@@ -386,6 +391,155 @@ static int qce_setup_regs_skcipher(struct crypto_async_request *async_req)
- }
- #endif
- 
-+#ifdef CONFIG_CRYPTO_DEV_QCE_AEAD
-+static const u32 std_iv_sha1[SHA256_DIGEST_SIZE / sizeof(u32)] = {
-+	SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4, 0, 0, 0
-+};
-+
-+static const u32 std_iv_sha256[SHA256_DIGEST_SIZE / sizeof(u32)] = {
-+	SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
-+	SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7
-+};
-+
-+static unsigned int qce_be32_to_cpu_array(u32 *dst, const u8 *src, unsigned int len)
-+{
-+	u32 *d = dst;
-+	const u8 *s = src;
-+	unsigned int n;
-+
-+	n = len / sizeof(u32);
-+	for (; n > 0; n--) {
-+		*d = be32_to_cpup((const __be32 *)s);
-+		s += sizeof(u32);
-+		d++;
-+	}
-+	return DIV_ROUND_UP(len, sizeof(u32));
-+}
-+
-+static int qce_setup_regs_aead(struct crypto_async_request *async_req)
-+{
-+	struct aead_request *req = aead_request_cast(async_req);
-+	struct qce_aead_reqctx *rctx = aead_request_ctx(req);
-+	struct qce_aead_ctx *ctx = crypto_tfm_ctx(async_req->tfm);
-+	struct qce_alg_template *tmpl = to_aead_tmpl(crypto_aead_reqtfm(req));
-+	struct qce_device *qce = tmpl->qce;
-+	u32 enckey[QCE_MAX_CIPHER_KEY_SIZE / sizeof(u32)] = {0};
-+	u32 enciv[QCE_MAX_IV_SIZE / sizeof(u32)] = {0};
-+	u32 authkey[QCE_SHA_HMAC_KEY_SIZE / sizeof(u32)] = {0};
-+	u32 authiv[SHA256_DIGEST_SIZE / sizeof(u32)] = {0};
-+	u32 authnonce[QCE_MAX_NONCE / sizeof(u32)] = {0};
-+	unsigned int enc_keylen = ctx->enc_keylen;
-+	unsigned int auth_keylen = ctx->auth_keylen;
-+	unsigned int enc_ivsize = rctx->ivsize;
-+	unsigned int auth_ivsize = 0;
-+	unsigned int enckey_words, enciv_words;
-+	unsigned int authkey_words, authiv_words, authnonce_words;
-+	unsigned long flags = rctx->flags;
-+	u32 encr_cfg, auth_cfg, config, totallen;
-+	u32 iv_last_word;
-+
-+	qce_setup_config(qce);
-+
-+	/* Write encryption key */
-+	enckey_words = qce_be32_to_cpu_array(enckey, ctx->enc_key, enc_keylen);
-+	qce_write_array(qce, REG_ENCR_KEY0, enckey, enckey_words);
-+
-+	/* Write encryption iv */
-+	enciv_words = qce_be32_to_cpu_array(enciv, rctx->iv, enc_ivsize);
-+	qce_write_array(qce, REG_CNTR0_IV0, enciv, enciv_words);
-+
-+	if (IS_CCM(rctx->flags)) {
-+		iv_last_word = enciv[enciv_words - 1];
-+		qce_write(qce, REG_CNTR3_IV3, iv_last_word + 1);
-+		qce_write_array(qce, REG_ENCR_CCM_INT_CNTR0, (u32 *)enciv, enciv_words);
-+		qce_write(qce, REG_CNTR_MASK, ~0);
-+		qce_write(qce, REG_CNTR_MASK0, ~0);
-+		qce_write(qce, REG_CNTR_MASK1, ~0);
-+		qce_write(qce, REG_CNTR_MASK2, ~0);
-+	}
-+
-+	/* Clear authentication IV and KEY registers of previous values */
-+	qce_clear_array(qce, REG_AUTH_IV0, 16);
-+	qce_clear_array(qce, REG_AUTH_KEY0, 16);
-+
-+	/* Clear byte count */
-+	qce_clear_array(qce, REG_AUTH_BYTECNT0, 4);
-+
-+	/* Write authentication key */
-+	authkey_words = qce_be32_to_cpu_array(authkey, ctx->auth_key, auth_keylen);
-+	qce_write_array(qce, REG_AUTH_KEY0, (u32 *)authkey, authkey_words);
-+
-+	/* Write initial authentication IV only for HMAC algorithms */
-+	if (IS_SHA_HMAC(rctx->flags)) {
-+		/* Write default authentication iv */
-+		if (IS_SHA1_HMAC(rctx->flags)) {
-+			auth_ivsize = SHA1_DIGEST_SIZE;
-+			memcpy(authiv, std_iv_sha1, auth_ivsize);
-+		} else if (IS_SHA256_HMAC(rctx->flags)) {
-+			auth_ivsize = SHA256_DIGEST_SIZE;
-+			memcpy(authiv, std_iv_sha256, auth_ivsize);
-+		}
-+		authiv_words = auth_ivsize / sizeof(u32);
-+		qce_write_array(qce, REG_AUTH_IV0, (u32 *)authiv, authiv_words);
-+	} else if (IS_CCM(rctx->flags)) {
-+		/* Write nonce for CCM algorithms */
-+		authnonce_words = qce_be32_to_cpu_array(authnonce, rctx->ccm_nonce, QCE_MAX_NONCE);
-+		qce_write_array(qce, REG_AUTH_INFO_NONCE0, authnonce, authnonce_words);
-+	}
-+
-+	/* Set up ENCR_SEG_CFG */
-+	encr_cfg = qce_encr_cfg(flags, enc_keylen);
-+	if (IS_ENCRYPT(flags))
-+		encr_cfg |= BIT(ENCODE_SHIFT);
-+	qce_write(qce, REG_ENCR_SEG_CFG, encr_cfg);
-+
-+	/* Set up AUTH_SEG_CFG */
-+	auth_cfg = qce_auth_cfg(rctx->flags, auth_keylen, ctx->authsize);
-+	auth_cfg |= BIT(AUTH_LAST_SHIFT);
-+	auth_cfg |= BIT(AUTH_FIRST_SHIFT);
-+	if (IS_ENCRYPT(flags)) {
-+		if (IS_CCM(rctx->flags))
-+			auth_cfg |= AUTH_POS_BEFORE << AUTH_POS_SHIFT;
-+		else
-+			auth_cfg |= AUTH_POS_AFTER << AUTH_POS_SHIFT;
-+	} else {
-+		if (IS_CCM(rctx->flags))
-+			auth_cfg |= AUTH_POS_AFTER << AUTH_POS_SHIFT;
-+		else
-+			auth_cfg |= AUTH_POS_BEFORE << AUTH_POS_SHIFT;
-+	}
-+	qce_write(qce, REG_AUTH_SEG_CFG, auth_cfg);
-+
-+	totallen = rctx->cryptlen + rctx->assoclen;
-+
-+	/* Set the encryption size and start offset */
-+	if (IS_CCM(rctx->flags) && IS_DECRYPT(rctx->flags))
-+		qce_write(qce, REG_ENCR_SEG_SIZE, rctx->cryptlen + ctx->authsize);
-+	else
-+		qce_write(qce, REG_ENCR_SEG_SIZE, rctx->cryptlen);
-+	qce_write(qce, REG_ENCR_SEG_START, rctx->assoclen & 0xffff);
-+
-+	/* Set the authentication size and start offset */
-+	qce_write(qce, REG_AUTH_SEG_SIZE, totallen);
-+	qce_write(qce, REG_AUTH_SEG_START, 0);
-+
-+	/* Write total length */
-+	if (IS_CCM(rctx->flags) && IS_DECRYPT(rctx->flags))
-+		qce_write(qce, REG_SEG_SIZE, totallen + ctx->authsize);
-+	else
-+		qce_write(qce, REG_SEG_SIZE, totallen);
-+
-+	/* get little endianness */
-+	config = qce_config_reg(qce, 1);
-+	qce_write(qce, REG_CONFIG, config);
-+
-+	/* Start the process */
-+	qce_crypto_go(qce, !IS_CCM(flags));
-+
-+	return 0;
-+}
-+#endif
-+
- int qce_start(struct crypto_async_request *async_req, u32 type)
- {
- 	switch (type) {
-@@ -396,6 +550,10 @@ int qce_start(struct crypto_async_request *async_req, u32 type)
- #ifdef CONFIG_CRYPTO_DEV_QCE_SHA
- 	case CRYPTO_ALG_TYPE_AHASH:
- 		return qce_setup_regs_ahash(async_req);
-+#endif
-+#ifdef CONFIG_CRYPTO_DEV_QCE_AEAD
-+	case CRYPTO_ALG_TYPE_AEAD:
-+		return qce_setup_regs_aead(async_req);
- #endif
- 	default:
- 		return -EINVAL;
--- 
-2.25.1
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRmFiaW8gRXN0ZXZhbSA8
+ZmVzdGV2YW1AZ21haWwuY29tPg0KPiBTZW50OiAyMDIx5bm0NOaciDI55pelIDIyOjA1DQo+IFN1
+YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMi8yXSBjYWFtOiBpbXg4bTogY2hhbmdlIHRvIHVzZSBvZl9t
+YXRjaF9ub2RlIGluDQo+IHJ1bl9kZXNjcmlwdG9yX2RlY28wDQo+IA0KPiBIaSBBbGljZQ0KPiAN
+Cj4gT24gVGh1LCBBcHIgMjksIDIwMjEgYXQgMTE6MDIgQU0gQWxpY2UgR3VvIChPU1MpIDxhbGlj
+ZS5ndW9Ab3NzLm54cC5jb20+DQo+IHdyb3RlOg0KPiA+DQo+ID4gRnJvbTogQWxpY2UgR3VvIDxh
+bGljZS5ndW9AbnhwLmNvbT4NCj4gPg0KPiA+IFBhdGNoICJmaXggdGhlIGJ1aWx0LWluIGNhYW0g
+ZHJpdmVyIGNhbm5vdCBtYXRjaCBzb2NfaWQiIHByb3ZpZGVzDQo+ID4gaW14OG1fbWFjaGluZV9t
+YXRjaCB0byBtYXRjaCBpLk1YOE17USxNLE4sUH0sIHNvIGNoYW5nZSB0byB1c2UgdG8NCj4gPiBv
+Zl9tYXRjaF9ub2RlIHdoaWNoIGNhbiBzaW1wbGlmeSB0aGUgY29kZS4NCj4gDQo+IFNob3VsZG4n
+dCB0aGVzZSBwYXRjaGVzIGJlIHNxdWFzaGVkPw0KDQpUaGVzZSBwYXRjaGVzIHNob3VsZCBub3Qg
+YmUgc3F1YXNoZWQgYmVjYXVzZSAiZml4IHRoZSBidWlsdC1pbiBjYWFtIGRyaXZlciBjYW5ub3Qg
+bWF0Y2ggc29jX2lkIg0KaXMgbWFpbmx5IHVzZWQgdG8gcHJvdmlkZSBkZWZlciBwcm9iZSB3aGVu
+IHNvYyBkZXZpY2UgaGFzIG5vdCBiZWVuIHByb2JlZCB5ZXQsIGFuZCBpcyBvbmx5IGZvcg0KaS5N
+WDhNLiAiY2hhbmdlIHRvIHVzZSBvZl9tYXRjaF9ub2RlIGluIHJ1bl9kZXNjcmlwdG9yX2RlY28w
+IiBpcyBqdXN0IHRvIHNpbXBsaWZ5IGNvZGUuDQoNCkJlc3QgUmVnYXJkcywNCkFsaWNlIEd1bw0K
+DQogDQoNCg==
