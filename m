@@ -2,101 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC92C43617
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 07:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F801C433ED
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 11:33:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C974061449
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 07:29:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F5EE6143D
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Apr 2021 11:33:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239385AbhD2Hag (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Apr 2021 03:30:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60282 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237274AbhD2Hac (ORCPT
+        id S231925AbhD2Ld6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Apr 2021 07:33:58 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:43873 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230148AbhD2Ld6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Apr 2021 03:30:32 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC582C06138E;
-        Thu, 29 Apr 2021 00:29:16 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id md17so6751878pjb.0;
-        Thu, 29 Apr 2021 00:29:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=0K/5T+kjg5bUp8NoaWrtPzP6S5C7jDdO1DR3so4Nqo4=;
-        b=sqoNKt7+3vONwGRr0hXIPRFpB9B8Tq8ACtN/E6TjmLMBGWrFZXxmAy6OGA4MmeVT+Y
-         UC1UwGxfGOAe1UcUD/zkT9ptMP5ddKRZWdJcxXPHh0jAO2dvgqt+OJ+cGwjjjcaYm7Nm
-         UuSPQfQ0d5SSF1+HjKJ6/X7dA+YGsjKQz6vTaqiCRN7bqSE0f0i/MWaLlUXISg+q5nqc
-         n78RI5gT1qaB32XkK0soA1GMkhl5EwFtdtP/4M7NjCwXxPPEvlxeM0CegZ2cimToCEht
-         naLQPWeZSTwwyg3Z0wSNKy58WEq3cyM98UfytbQ1S3xInQygoLuEP50QJu+dHCenCQp8
-         OOpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=0K/5T+kjg5bUp8NoaWrtPzP6S5C7jDdO1DR3so4Nqo4=;
-        b=oLpEoFKmtar2u830AxptlLDycL+T+VcqDrq2ODjtHHvbGivjV+8SNCtBDkg9HF8OAN
-         uqsmn/6g7npV/kDjmR2XIxNLfT9i1h+Ca6o9kqsiUKdXO6lQRtID7eA4NdkmaXRue5Te
-         5kY0wvfCR+k+P0T9djkRXGf1Wir3WB7bq5xeP9ORnXWvKxTh2Kq6TR1VFVmu2q7N9oEb
-         j7XX4PDtmSHd5pei/0jonsZcrWA5SyUqmD0/pHh/eEghwGiWWlPqiH802QnuFzfgQrbS
-         gIVZ9XCx+1Jw2svtbt7RGDmL+3UrpuTMTZOUGVmZS3NJZTHHlHNJk46QYBHlpFfGvBAq
-         5YPw==
-X-Gm-Message-State: AOAM531x2V64Tz14cngIn5kq+I27BO6sKq7ZN71dp4lWlWPo+CsYQtpL
-        2EAnSuSPzUwEQaJn03sqqDU=
-X-Google-Smtp-Source: ABdhPJwNbZW2wwzNBHQ0pWicw/SZIo+wAA9ralW2B5LYjMOa1x4G8zzj+sDGhOnsS3jKrK68OudDqA==
-X-Received: by 2002:a17:90a:1d44:: with SMTP id u4mr8408497pju.46.1619681356326;
-        Thu, 29 Apr 2021 00:29:16 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id z29sm1632085pga.52.2021.04.29.00.29.14
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 29 Apr 2021 00:29:16 -0700 (PDT)
-From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ben Boeckel <me@benboeckel.net>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Malte Gell <malte.gell@gmx.de>,
-        Varad Gautam <varad.gautam@suse.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [PATCH v6,3/4] modsign: Add codeSigning EKU when generating X.509 key generation config
-Date:   Thu, 29 Apr 2021 15:28:50 +0800
-Message-Id: <20210429072851.24057-4-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
-In-Reply-To: <20210429072851.24057-1-jlee@suse.com>
-References: <20210429072851.24057-1-jlee@suse.com>
+        Thu, 29 Apr 2021 07:33:58 -0400
+Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <colin.king@canonical.com>)
+        id 1lc4uc-0003Ou-4G; Thu, 29 Apr 2021 11:32:54 +0000
+From:   Colin King <colin.king@canonical.com>
+To:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] hwrng: amd: remove redundant initialization of variable err
+Date:   Thu, 29 Apr 2021 12:32:53 +0100
+Message-Id: <20210429113253.63960-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add codeSigning EKU to the X.509 key generation config for the build time
-autogenerated kernel key.
+From: Colin Ian King <colin.king@canonical.com>
 
-Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+The variable err is being initialized with a value that is
+never read and it is being updated later with a new value.  The
+initialization is redundant and can be removed
+
+Addresses-Coverity: ("Unused value")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
- certs/Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/char/hw_random/amd-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/certs/Makefile b/certs/Makefile
-index b6db52ebf0be..d9515d68778f 100644
---- a/certs/Makefile
-+++ b/certs/Makefile
-@@ -89,6 +89,7 @@ $(obj)/x509.genkey:
- 	@echo >>$@ "keyUsage=digitalSignature"
- 	@echo >>$@ "subjectKeyIdentifier=hash"
- 	@echo >>$@ "authorityKeyIdentifier=keyid"
-+	@echo >>$@ "extendedKeyUsage=codeSigning"
- endif # CONFIG_MODULE_SIG_KEY
+diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
+index 9959c762da2f..d8d4ef5214a1 100644
+--- a/drivers/char/hw_random/amd-rng.c
++++ b/drivers/char/hw_random/amd-rng.c
+@@ -126,7 +126,7 @@ static struct hwrng amd_rng = {
  
- $(eval $(call config_filename,MODULE_SIG_KEY))
+ static int __init mod_init(void)
+ {
+-	int err = -ENODEV;
++	int err;
+ 	struct pci_dev *pdev = NULL;
+ 	const struct pci_device_id *ent;
+ 	u32 pmbase;
 -- 
-2.16.4
+2.30.2
 
