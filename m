@@ -4,42 +4,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C18EC43600
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:05:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FE8C43461
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:05:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 043BD613DB
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:05:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 036FA613C7
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:05:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232830AbhEBOFy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 2 May 2021 10:05:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50390 "EHLO mail.kernel.org"
+        id S233253AbhEBOGg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 2 May 2021 10:06:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51334 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232599AbhEBOFe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 May 2021 10:05:34 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CD307613D7;
-        Sun,  2 May 2021 14:04:41 +0000 (UTC)
+        id S233257AbhEBOGD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 2 May 2021 10:06:03 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3EAB4613E4;
+        Sun,  2 May 2021 14:05:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1619964282;
-        bh=Uc8tXsIHRsuaiYVvz1xm0zrbot1Lgb5vstXRryIUeU4=;
+        s=k20201202; t=1619964312;
+        bh=1ZR2hGCVxl/AUz/DPdg4lR6EqMKap5Sr4BtBZj9BvF4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uSPcpV6ef5l8SwjasEtT2Cuk2Dll8eMDbhuQu4i/FQuBCtKzkcetAziotpA10GIiR
-         ITtPBAgeRko6GEtikmu+wvGFxRxEo2pVhL8a4XqNRrPPuXkHs0LyPH3JgEtDNxo2t8
-         s/bTxk9UDaTiCv+AV1bDLHB+mAfdIbzD3tjB8qN7DmDSn7lnjJ7VSs4t0fsaf9zo2Q
-         03dZdqB1m/Pm5JGQzi9BvVKl/eC8I+ZKlommCA0z6JGkZ/fGUQ37IMTbcwOJvCx/99
-         uyEL214wSYjxOuUzg1KCU1L16HTjHKLccHE3HZiwSVaIfwr7keF7oe/Dr5cy+X8fnC
-         okOL0IjzO0aEQ==
+        b=oFVib25LXxUmVygEkyQazzfwdGmDOiBvDTFwbN7c/4fGMtL8Vs21i7NbNU7qc2wkK
+         CH45N4bpwaSI92o+Q4vCSsb5Y+6O2dcADIxLCzlYdmrOXsRhkovLjtju9AdrqW0ama
+         Yj0RgXBkeR3zoRMLdYwN3/VbFv3hwRLz8IXfaFouse5Xlqq8pH/s6foPulvbXPT8/x
+         /+vlhRUreHT4fekV8BRUQoP1A5R5fpymgk+TZryY8kT/sj/+JzglZO8lWcgaw5bpVk
+         pNOcPVZIFuQkto6EzdcAu1BfI66m12c8qO+5KCYJdxH7v8DmKmyDGiG4p0khmPO737
+         sI/oxq9d0FAAA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Hui Tang <tanghui20@huawei.com>,
+Cc:     Shixin Liu <liushixin2@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 06/34] crypto: qat - fix unmap invalid dma address
-Date:   Sun,  2 May 2021 10:04:06 -0400
-Message-Id: <20210502140434.2719553-6-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.4 30/34] crypto: stm32/hash - Fix PM reference leak on stm32-hash.c
+Date:   Sun,  2 May 2021 10:04:30 -0400
+Message-Id: <20210502140434.2719553-30-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210502140434.2719553-1-sashal@kernel.org>
 References: <20210502140434.2719553-1-sashal@kernel.org>
@@ -51,58 +52,61 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Hui Tang <tanghui20@huawei.com>
+From: Shixin Liu <liushixin2@huawei.com>
 
-[ Upstream commit 792b32fad548281e1b7fe14df9063a96c54b32a2 ]
+[ Upstream commit 1cb3ad701970e68f18a9e5d090baf2b1b703d729 ]
 
-'dma_mapping_error' return a negative value if 'dma_addr' is equal to
-'DMA_MAPPING_ERROR' not zero, so fix initialization of 'dma_addr'.
+pm_runtime_get_sync will increment pm usage counter even it failed.
+Forgetting to putting operation will result in reference leak here.
+Fix it by replacing it with pm_runtime_resume_and_get to keep usage
+counter balanced.
 
-Signed-off-by: Hui Tang <tanghui20@huawei.com>
+Signed-off-by: Shixin Liu <liushixin2@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/qat/qat_common/qat_algs.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ drivers/crypto/stm32/stm32-hash.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index 0d67cf5ede51..6b8ad3d67481 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -715,7 +715,7 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
- 	struct qat_alg_buf_list *bufl;
- 	struct qat_alg_buf_list *buflout = NULL;
- 	dma_addr_t blp;
--	dma_addr_t bloutp = 0;
-+	dma_addr_t bloutp;
- 	struct scatterlist *sg;
- 	size_t sz_out, sz = struct_size(bufl, bufers, n + 1);
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index cfc8e0e37bee..dcce15b55809 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -810,7 +810,7 @@ static void stm32_hash_finish_req(struct ahash_request *req, int err)
+ static int stm32_hash_hw_init(struct stm32_hash_dev *hdev,
+ 			      struct stm32_hash_request_ctx *rctx)
+ {
+-	pm_runtime_get_sync(hdev->dev);
++	pm_runtime_resume_and_get(hdev->dev);
  
-@@ -727,6 +727,9 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
- 	if (unlikely(!bufl))
- 		return -ENOMEM;
+ 	if (!(HASH_FLAGS_INIT & hdev->flags)) {
+ 		stm32_hash_write(hdev, HASH_CR, HASH_CR_INIT);
+@@ -959,7 +959,7 @@ static int stm32_hash_export(struct ahash_request *req, void *out)
+ 	u32 *preg;
+ 	unsigned int i;
  
-+	for_each_sg(sgl, sg, n, i)
-+		bufl->bufers[i].addr = DMA_MAPPING_ERROR;
-+
- 	blp = dma_map_single(dev, bufl, sz, DMA_TO_DEVICE);
- 	if (unlikely(dma_mapping_error(dev, blp)))
- 		goto err_in;
-@@ -760,10 +763,14 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
- 				       dev_to_node(&GET_DEV(inst->accel_dev)));
- 		if (unlikely(!buflout))
- 			goto err_in;
-+
-+		bufers = buflout->bufers;
-+		for_each_sg(sglout, sg, n, i)
-+			bufers[i].addr = DMA_MAPPING_ERROR;
-+
- 		bloutp = dma_map_single(dev, buflout, sz_out, DMA_TO_DEVICE);
- 		if (unlikely(dma_mapping_error(dev, bloutp)))
- 			goto err_out;
--		bufers = buflout->bufers;
- 		for_each_sg(sglout, sg, n, i) {
- 			int y = sg_nctr;
+-	pm_runtime_get_sync(hdev->dev);
++	pm_runtime_resume_and_get(hdev->dev);
+ 
+ 	while ((stm32_hash_read(hdev, HASH_SR) & HASH_SR_BUSY))
+ 		cpu_relax();
+@@ -997,7 +997,7 @@ static int stm32_hash_import(struct ahash_request *req, const void *in)
+ 
+ 	preg = rctx->hw_context;
+ 
+-	pm_runtime_get_sync(hdev->dev);
++	pm_runtime_resume_and_get(hdev->dev);
+ 
+ 	stm32_hash_write(hdev, HASH_IMR, *preg++);
+ 	stm32_hash_write(hdev, HASH_STR, *preg++);
+@@ -1553,7 +1553,7 @@ static int stm32_hash_remove(struct platform_device *pdev)
+ 	if (!hdev)
+ 		return -ENODEV;
+ 
+-	ret = pm_runtime_get_sync(hdev->dev);
++	ret = pm_runtime_resume_and_get(hdev->dev);
+ 	if (ret < 0)
+ 		return ret;
  
 -- 
 2.30.2
