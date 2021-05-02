@@ -4,44 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 516B8C433B4
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:03:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F84DC4361A
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:04:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 35C1F613C7
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:03:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6ABB3613C1
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:04:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232348AbhEBOEe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 2 May 2021 10:04:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49398 "EHLO mail.kernel.org"
+        id S232498AbhEBOEw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 2 May 2021 10:04:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49926 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232225AbhEBOEb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 May 2021 10:04:31 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4FDBC613CF;
-        Sun,  2 May 2021 14:03:35 +0000 (UTC)
+        id S232511AbhEBOEs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 2 May 2021 10:04:48 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 590526102A;
+        Sun,  2 May 2021 14:03:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1619964216;
-        bh=P+MciOeJe4AEg7XLz9vY9+C/A9tx5y4O7vzUZ5zAoKA=;
+        s=k20201202; t=1619964237;
+        bh=WbJu0u7MJwy3RscsOsX336uq5nkuxqwK3Zpg3GAfOt4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WHSwuwL1+wKDH+QXYIapTW1hsdEKv8Blh79Bf+o9TWT59o2qMDPD98Nv+vo5iWSA5
-         ER2a5miwLlNUGA3Mu+4FuVgJgAKHXlcQJn3Cd1JJ0C8sG8lW9P4WroHmUcQBK+yLDd
-         ZpdoIi4txCnDsQdB0GC2odfl/DE9/8XHgCT0a0uEn8U2dygt4U7ntMjOwEa+xJXth5
-         mJFpyeCLic0PAGFHtuKZ5tFz3Xs7Tvuq4IGEWoQStozMVD99UuV7m+dU2/PUHTTI1T
-         h0cy6vpPRPf4lLN/OD9I36VuLpc50qXVB8FDakM8MmaihiYJ1VmdXxyJDyNDLaE8tF
-         KscXKESaK8kfQ==
+        b=RATQovsax3/IaqU9DKzYPouFNamMWQsNKguJT1+6cN1/gQToT6u7h9lNmW5dj0JBp
+         28GIzDjBGKYqbTKA0ASKa82/PgmxKEsZfi0kB25OBWKorhjs9ftPsH8jlCeyY9D3qO
+         0llFvqjrWUGVsQxEnQ6RNqeu6rkLdg1xqpDWfmrGMgud0jL4nKqLnnvy1gvX01hOcO
+         lJR6A947cCnmsmdKdVF8jtjzJ9DMQIuRcSRMbXiqOk/YrTx5WVfUduJQ3Z4QxNFpEr
+         D7wsLZShoH7q+/5AUXeQYYmye+3UQqrnSqoxSn11Q6UNeD5BdHY94KKMudb9hmoMDL
+         yNLBCV8hySK9Q==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Longfang Liu <liulongfang@huawei.com>,
+Cc:     Hui Tang <tanghui20@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.12 14/79] crypto: hisilicon/sec - fixes a printing error
-Date:   Sun,  2 May 2021 10:02:11 -0400
-Message-Id: <20210502140316.2718705-14-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.11 08/70] crypto: qat - fix unmap invalid dma address
+Date:   Sun,  2 May 2021 10:02:42 -0400
+Message-Id: <20210502140344.2719040-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210502140316.2718705-1-sashal@kernel.org>
-References: <20210502140316.2718705-1-sashal@kernel.org>
+In-Reply-To: <20210502140344.2719040-1-sashal@kernel.org>
+References: <20210502140344.2719040-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -50,32 +51,58 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Longfang Liu <liulongfang@huawei.com>
+From: Hui Tang <tanghui20@huawei.com>
 
-[ Upstream commit 4b7aef0230418345be1fb77abbb1592801869901 ]
+[ Upstream commit 792b32fad548281e1b7fe14df9063a96c54b32a2 ]
 
-When the log is output here, the device has not
-been initialized yet.
+'dma_mapping_error' return a negative value if 'dma_addr' is equal to
+'DMA_MAPPING_ERROR' not zero, so fix initialization of 'dma_addr'.
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+Signed-off-by: Hui Tang <tanghui20@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/qat/qat_common/qat_algs.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 2eaa516b3231..8adcbb327126 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -546,7 +546,7 @@ static int sec_skcipher_init(struct crypto_skcipher *tfm)
- 	crypto_skcipher_set_reqsize(tfm, sizeof(struct sec_req));
- 	ctx->c_ctx.ivsize = crypto_skcipher_ivsize(tfm);
- 	if (ctx->c_ctx.ivsize > SEC_IV_SIZE) {
--		dev_err(SEC_CTX_DEV(ctx), "get error skcipher iv size!\n");
-+		pr_err("get error skcipher iv size!\n");
- 		return -EINVAL;
- 	}
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index 31c7a206a629..362c2d18b292 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -718,7 +718,7 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 	struct qat_alg_buf_list *bufl;
+ 	struct qat_alg_buf_list *buflout = NULL;
+ 	dma_addr_t blp;
+-	dma_addr_t bloutp = 0;
++	dma_addr_t bloutp;
+ 	struct scatterlist *sg;
+ 	size_t sz_out, sz = struct_size(bufl, bufers, n + 1);
+ 
+@@ -730,6 +730,9 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 	if (unlikely(!bufl))
+ 		return -ENOMEM;
+ 
++	for_each_sg(sgl, sg, n, i)
++		bufl->bufers[i].addr = DMA_MAPPING_ERROR;
++
+ 	blp = dma_map_single(dev, bufl, sz, DMA_TO_DEVICE);
+ 	if (unlikely(dma_mapping_error(dev, blp)))
+ 		goto err_in;
+@@ -763,10 +766,14 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 				       dev_to_node(&GET_DEV(inst->accel_dev)));
+ 		if (unlikely(!buflout))
+ 			goto err_in;
++
++		bufers = buflout->bufers;
++		for_each_sg(sglout, sg, n, i)
++			bufers[i].addr = DMA_MAPPING_ERROR;
++
+ 		bloutp = dma_map_single(dev, buflout, sz_out, DMA_TO_DEVICE);
+ 		if (unlikely(dma_mapping_error(dev, bloutp)))
+ 			goto err_out;
+-		bufers = buflout->bufers;
+ 		for_each_sg(sglout, sg, n, i) {
+ 			int y = sg_nctr;
  
 -- 
 2.30.2
