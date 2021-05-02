@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FE8C43461
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:05:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD7DC433B4
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:05:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 036FA613C7
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:05:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7222B613D8
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 14:05:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233253AbhEBOGg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 2 May 2021 10:06:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51334 "EHLO mail.kernel.org"
+        id S233172AbhEBOGh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 2 May 2021 10:06:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51352 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233257AbhEBOGD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 May 2021 10:06:03 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3EAB4613E4;
-        Sun,  2 May 2021 14:05:11 +0000 (UTC)
+        id S232878AbhEBOGH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 2 May 2021 10:06:07 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 866DC6102A;
+        Sun,  2 May 2021 14:05:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1619964312;
-        bh=1ZR2hGCVxl/AUz/DPdg4lR6EqMKap5Sr4BtBZj9BvF4=;
+        s=k20201202; t=1619964313;
+        bh=lUX4eytSW0bGZZYiuwe9s9CZeSADcmyNb4eWnzvha/w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=oFVib25LXxUmVygEkyQazzfwdGmDOiBvDTFwbN7c/4fGMtL8Vs21i7NbNU7qc2wkK
-         CH45N4bpwaSI92o+Q4vCSsb5Y+6O2dcADIxLCzlYdmrOXsRhkovLjtju9AdrqW0ama
-         Yj0RgXBkeR3zoRMLdYwN3/VbFv3hwRLz8IXfaFouse5Xlqq8pH/s6foPulvbXPT8/x
-         /+vlhRUreHT4fekV8BRUQoP1A5R5fpymgk+TZryY8kT/sj/+JzglZO8lWcgaw5bpVk
-         pNOcPVZIFuQkto6EzdcAu1BfI66m12c8qO+5KCYJdxH7v8DmKmyDGiG4p0khmPO737
-         sI/oxq9d0FAAA==
+        b=KXR3I1Z3inrnG4in57J/MruXywKCsBE8xnlcdCmjouytG7jT8XmeNyeo+rVHEfD0m
+         lytIJKbXzie2Ytoofam3zgb7VqWQuztf2PVRvLjkPYe4TeyxdX6wPQE7SxvOH2TDev
+         OYud/Jxt8jZydQEGCJkfRJnWagY6oCbkVa8i9dPtfEq75JinnRBWoRZcTMKFox3uD9
+         mVoC3pLrC8EFpJfkqsq2RMl9jZ4EX+RunomwnN2f9WRS+OZC7wbz8GMZgkuxQRKl87
+         US8ZDWQ7KVNd4t/2xZJAp3CUHAzVYhH+RsVPBhDjVb8w8SSAaTIV3VdcxPrvBnvXLj
+         Fp0aaOXRenXyg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Shixin Liu <liushixin2@huawei.com>,
@@ -38,9 +38,9 @@ Cc:     Shixin Liu <liushixin2@huawei.com>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
         linux-stm32@st-md-mailman.stormreply.com,
         linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.4 30/34] crypto: stm32/hash - Fix PM reference leak on stm32-hash.c
-Date:   Sun,  2 May 2021 10:04:30 -0400
-Message-Id: <20210502140434.2719553-30-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 31/34] crypto: stm32/cryp - Fix PM reference leak on stm32-cryp.c
+Date:   Sun,  2 May 2021 10:04:31 -0400
+Message-Id: <20210502140434.2719553-31-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210502140434.2719553-1-sashal@kernel.org>
 References: <20210502140434.2719553-1-sashal@kernel.org>
@@ -54,7 +54,7 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Shixin Liu <liushixin2@huawei.com>
 
-[ Upstream commit 1cb3ad701970e68f18a9e5d090baf2b1b703d729 ]
+[ Upstream commit 747bf30fd944f02f341b5f3bc7d97a13f2ae2fbe ]
 
 pm_runtime_get_sync will increment pm usage counter even it failed.
 Forgetting to putting operation will result in reference leak here.
@@ -65,46 +65,28 @@ Signed-off-by: Shixin Liu <liushixin2@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/stm32/stm32-hash.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/crypto/stm32/stm32-cryp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index cfc8e0e37bee..dcce15b55809 100644
---- a/drivers/crypto/stm32/stm32-hash.c
-+++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -810,7 +810,7 @@ static void stm32_hash_finish_req(struct ahash_request *req, int err)
- static int stm32_hash_hw_init(struct stm32_hash_dev *hdev,
- 			      struct stm32_hash_request_ctx *rctx)
- {
--	pm_runtime_get_sync(hdev->dev);
-+	pm_runtime_resume_and_get(hdev->dev);
+diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
+index ba5ea6434f9c..9b3511236ba2 100644
+--- a/drivers/crypto/stm32/stm32-cryp.c
++++ b/drivers/crypto/stm32/stm32-cryp.c
+@@ -537,7 +537,7 @@ static int stm32_cryp_hw_init(struct stm32_cryp *cryp)
+ 	int ret;
+ 	u32 cfg, hw_mode;
  
- 	if (!(HASH_FLAGS_INIT & hdev->flags)) {
- 		stm32_hash_write(hdev, HASH_CR, HASH_CR_INIT);
-@@ -959,7 +959,7 @@ static int stm32_hash_export(struct ahash_request *req, void *out)
- 	u32 *preg;
- 	unsigned int i;
+-	pm_runtime_get_sync(cryp->dev);
++	pm_runtime_resume_and_get(cryp->dev);
  
--	pm_runtime_get_sync(hdev->dev);
-+	pm_runtime_resume_and_get(hdev->dev);
- 
- 	while ((stm32_hash_read(hdev, HASH_SR) & HASH_SR_BUSY))
- 		cpu_relax();
-@@ -997,7 +997,7 @@ static int stm32_hash_import(struct ahash_request *req, const void *in)
- 
- 	preg = rctx->hw_context;
- 
--	pm_runtime_get_sync(hdev->dev);
-+	pm_runtime_resume_and_get(hdev->dev);
- 
- 	stm32_hash_write(hdev, HASH_IMR, *preg++);
- 	stm32_hash_write(hdev, HASH_STR, *preg++);
-@@ -1553,7 +1553,7 @@ static int stm32_hash_remove(struct platform_device *pdev)
- 	if (!hdev)
+ 	/* Disable interrupt */
+ 	stm32_cryp_write(cryp, CRYP_IMSCR, 0);
+@@ -2054,7 +2054,7 @@ static int stm32_cryp_remove(struct platform_device *pdev)
+ 	if (!cryp)
  		return -ENODEV;
  
--	ret = pm_runtime_get_sync(hdev->dev);
-+	ret = pm_runtime_resume_and_get(hdev->dev);
+-	ret = pm_runtime_get_sync(cryp->dev);
++	ret = pm_runtime_resume_and_get(cryp->dev);
  	if (ret < 0)
  		return ret;
  
