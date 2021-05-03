@@ -2,287 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEED9C433ED
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 19:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 799C1C433ED
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 May 2021 07:57:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C5FB061284
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 May 2021 19:29:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C65C6121E
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 May 2021 07:57:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232330AbhEBTap (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 2 May 2021 15:30:45 -0400
-Received: from smtp04.smtpout.orange.fr ([80.12.242.126]:32448 "EHLO
-        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230036AbhEBTap (ORCPT
+        id S232979AbhECH6A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 May 2021 03:58:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47526 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232972AbhECH57 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 May 2021 15:30:45 -0400
-Received: from localhost.localdomain ([86.243.172.93])
-        by mwinf5d60 with ME
-        id zvVp2400521Fzsu03vVpt8; Sun, 02 May 2021 21:29:51 +0200
-X-ME-Helo: localhost.localdomain
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 02 May 2021 21:29:51 +0200
-X-ME-IP: 86.243.172.93
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [RFC PATCH] crypto: arc4: Implement a version optimized for memory usage
-Date:   Sun,  2 May 2021 21:29:46 +0200
-Message-Id: <c52bd8972c9763c3fac685d7c6af3c46a23a1477.1619983555.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.30.2
+        Mon, 3 May 2021 03:57:59 -0400
+Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 416CBC061761
+        for <linux-crypto@vger.kernel.org>; Mon,  3 May 2021 00:57:06 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id z5so3079868qts.3
+        for <linux-crypto@vger.kernel.org>; Mon, 03 May 2021 00:57:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=f/I8crA6XyQMlGZyflnFllaw+4mke1a81RQOyGK/4Q0=;
+        b=pRa5Vdjw8OkcL5+KzBwx7yDLiyHNcNSZpWxfWVYiPRdsOIl/yT7tShaMCvI6Mblsai
+         TBHqeEAPB+YbMJDbA2KxCvd+vJ3y8H1iM/pOAs7miw05Rs6svZ9+xSkYCVdiWyt5Rz5d
+         cJ7dul62EcoxHVnsHtv9lpN4GA7bSkLhK7GM3+Cf5tiKUkN0M037T6zy9uewuOTsGshB
+         C7eAdCsV58+ZoNW5W5p7YG7YVmsRfLVvOI5QzmOOD5Y/Q0jO18BRcIdkbj5veEJK/nTH
+         +hGtoYCusdsNST01R3ztLDiu7zbrIcHg8PEYC5MalOmwdFkl5AGESn9h19akpOpI+tWe
+         wabg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=f/I8crA6XyQMlGZyflnFllaw+4mke1a81RQOyGK/4Q0=;
+        b=XkcA1B5Esm83Lahg6l5UIAHcWazmfZMszS1PqcN2HRNZZd9ut1zWIK8flRPkNpLwzQ
+         F9cYqUvEVZEoRMd4RSNde3i8xIhx3sPK2GbLmhTU3m630CbHmXh6VBlKbAY96ulagopn
+         lMxJRRUQJ2KPGxOZzfG0C0x0VPpvZhyT20tOJxsDpcbaK7nojk8msjatwg5f/geKYjFi
+         YbJYsbf0NaWJysevQvsaP+mwzNSEmNudXAd6yt+pZH5QDSbDbM3gPogwlLTUhIV50Jce
+         sBxFZziA/waXFKdmiCOX83htUoo4g/w1AKYK41e6KFYmTqVWbXOPkqqH9xV0m7/jyi3w
+         J+gQ==
+X-Gm-Message-State: AOAM533S+8dt9zrdeV9Aq5xmxSxkSraK47por9D85fOQPeTzd9Z2s0ZZ
+        vKW0N/FlD9TzCyWUENgACO4ukoWLBwyUiqzxSNOCO4RytLnj6Q==
+X-Google-Smtp-Source: ABdhPJx+lMnwFE2Je5ybjtX2c2dwneu4eZqt6Okp1l26cWgQ0XdxYtJ9YBqYvuOR4ARtPs3fDwDXFGh5WGcaxfpaHwE=
+X-Received: by 2002:a05:622a:1387:: with SMTP id o7mr9212517qtk.387.1620028625455;
+ Mon, 03 May 2021 00:57:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Kestrel seventyfour <kestrelseventyfour@gmail.com>
+Date:   Mon, 3 May 2021 09:56:40 +0200
+Message-ID: <CAE9cyGSX4nwRrDbazih2FDp1_8e+wGTD17euyCJyitXWOignMw@mail.gmail.com>
+Subject: cannot pass split cryptomgr tests for aes ctr
+To:     linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The S array does not need to be u32, u8 is enough
-On machine which have efficient unaligned access, use u8 to save some
-memory.
+Hi,
 
-So, provide a version optimized for memory usage in such a case.
+I am trying to update the old ifxdeu driver to pass the crypto mgr tests.
+However, I continously fail to pass the split tests and I wonder what to do.
 
-Based on my testing, the size of arc4_ctx is:
-	u8  version:  264
-	u32 version: 1032
+For example, I successfully pass the test vector 0 here:
+https://elixir.bootlin.com/linux/latest/source/crypto/testmgr.h#L16654
+if there is no split.
 
-On my machine, the u8 version is about 5% faster.
-It save ~800 bytes of memory or stack depending on how arc4_ctx is stored.
-It is likely to be more cache friendly.
+But if the text "Single block msg" is split into two 8 byte blocks
+(single even aligned splits), which end up as separate skcipher walks
+in the driver, the second block is wrong and does not compare
+correctly, to what is hardcoded in testmgr.h. Same if I try it with
+online aes-ctr encoders in the web.
+I have tried doing the xor manually with the aes encoded iv, but I get
+the same result as the hardware and if I use the next last iv, I still
+do not get the second 8 bytes that are hardcoded in cryptomgr.h.
 
-It has been tested an Core i7-3770 with the following test program:
+Can someone shed a light on it?
+Is it valid to compare a crypto result that was done on a single walk
+with 16byte with two separate walks on the 8 byte splits (of the
+original 16)? Is the cryptomgr test on the split tests expecting that
+I concat the two walks into a single one?
+If yes, how to do that on the uneven splits with separations like 15
+16 5 byte sequences, etc., fill up the walk up to full block size and
+spill over into the next walk?
 
- #include <stdlib.h>
- #include <stdio.h>
- #include <string.h>
-
- #define u8      unsigned char
- #define u32     unsigned int
- #define true    1
-
-struct arc4_ctx_8 {
-	u8 S[256];
-	u32 x, y;
-};
-struct arc4_ctx_32 {
-	u32 S[256];
-	u32 x, y;
-};
-
- #define S_type	u8
-int arc4_setkey_8(struct arc4_ctx_8 *ctx, const u8 *in_key, unsigned int key_len)
-{
-	int i, j = 0, k = 0;
-
-	ctx->x = 1;
-	ctx->y = 0;
-
-	for (i = 0; i < 256; i++)
-		ctx->S[i] = i;
-
-	for (i = 0; i < 256; i++) {
-		S_type a = ctx->S[i];
-
-		j = (j + in_key[k] + a) & 0xff;
-		ctx->S[i] = ctx->S[j];
-		ctx->S[j] = a;
-		if (++k >= key_len)
-			k = 0;
-	}
-
-	return 0;
-}
-
-void arc4_crypt_8(struct arc4_ctx_8 *ctx, u8 *out, const u8 *in, unsigned int len)
-{
-	S_type *const S = ctx->S;
-	S_type a, b, ta, tb;
-	u32 x, y, ty;
-
-	if (len == 0)
-		return;
-
-	x = ctx->x;
-	y = ctx->y;
-
-	a = S[x];
-	y = (y + a) & 0xff;
-	b = S[y];
-
-	do {
-		S[y] = a;
-		a = (a + b) & 0xff;
-		S[x] = b;
-		x = (x + 1) & 0xff;
-		ta = S[x];
-		ty = (y + ta) & 0xff;
-		tb = S[ty];
-		*out++ = *in++ ^ S[a];
-		if (--len == 0)
-			break;
-		y = ty;
-		a = ta;
-		b = tb;
-	} while (true);
-
-	ctx->x = x;
-	ctx->y = y;
-}
-
- #undef S_type
- #define S_type	u32
-int arc4_setkey_32(struct arc4_ctx_32 *ctx, const u8 *in_key, unsigned int key_len)
-{
-	int i, j = 0, k = 0;
-
-	ctx->x = 1;
-	ctx->y = 0;
-
-	for (i = 0; i < 256; i++)
-		ctx->S[i] = i;
-
-	for (i = 0; i < 256; i++) {
-		S_type a = ctx->S[i];
-
-		j = (j + in_key[k] + a) & 0xff;
-		ctx->S[i] = ctx->S[j];
-		ctx->S[j] = a;
-		if (++k >= key_len)
-			k = 0;
-	}
-
-	return 0;
-}
-
-void arc4_crypt_32(struct arc4_ctx_32 *ctx, u8 *out, const u8 *in, unsigned int len)
-{
-	S_type *const S = ctx->S;
-	S_type a, b, ta, tb;
-	u32 x, y, ty;
-
-	if (len == 0)
-		return;
-
-	x = ctx->x;
-	y = ctx->y;
-
-	a = S[x];
-	y = (y + a) & 0xff;
-	b = S[y];
-
-	do {
-		S[y] = a;
-		a = (a + b) & 0xff;
-		S[x] = b;
-		x = (x + 1) & 0xff;
-		ta = S[x];
-		ty = (y + ta) & 0xff;
-		tb = S[ty];
-		*out++ = *in++ ^ S[a];
-		if (--len == 0)
-			break;
-		y = ty;
-		a = ta;
-		b = tb;
-	} while (true);
-
-	ctx->x = x;
-	ctx->y = y;
-}
-
- #define KEY     "AZERTY"
- #define in      "AZERTYUIOP_QSDFGHJKLM_WXCVBN"
-
-int main() {
-        long i;
-        struct arc4_ctx_8 ctx_8;
-        u8 out8[1024] = { };
-        struct arc4_ctx_32 ctx_32;
-        u8 out32[1024] = { };
-
-        arc4_setkey_8(&ctx_8, KEY, strlen(KEY));
-        arc4_crypt_8(&ctx_8, out8, in, strlen(in));
-
-        arc4_setkey_32(&ctx_32, KEY, strlen(KEY));
-        arc4_crypt_32(&ctx_32, out32, in, strlen(in));
-
-        printf("%ld vs %ld\n", sizeof(ctx_8), sizeof(ctx_32));
-        if (memcmp(out8, out32, 1024) == 0)
-                printf("Ok\n");
-        else
-                printf("Broken\n");
-
-        return 0;
-}
-
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-The idea came from code found in staging/rtl8712/
-See at the top of:
-   https://elixir.bootlin.com/linux/v5.12/source/drivers/staging/rtl8712/rtl871x_security.c
-
-More precisely, in an attempt to clean staging/rtl8712/, I triggered the
-kernel test robot about some increasing stack usage:
-   https://lore.kernel.org/kernel-janitors/YHQUH+Nqc%2FzS14Tb@kroah.com/T/#m832a01a9d1517e7efc4f671ed46deae9993d6ae9
-
-The above patch works for me, but should be taken as a RFC.
----
- include/crypto/arc4.h | 8 +++++++-
- lib/crypto/arc4.c     | 8 ++++----
- 2 files changed, 11 insertions(+), 5 deletions(-)
-
-diff --git a/include/crypto/arc4.h b/include/crypto/arc4.h
-index f3c22fe01704..39545ed486e2 100644
---- a/include/crypto/arc4.h
-+++ b/include/crypto/arc4.h
-@@ -12,8 +12,14 @@
- #define ARC4_MAX_KEY_SIZE	256
- #define ARC4_BLOCK_SIZE		1
- 
-+#if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)
-+#define S_type	u8
-+#else
-+#define S_type	u32
-+#endif
-+
- struct arc4_ctx {
--	u32 S[256];
-+	S_type S[256];
- 	u32 x, y;
- };
- 
-diff --git a/lib/crypto/arc4.c b/lib/crypto/arc4.c
-index c2020f19c652..e0be0c2a08d9 100644
---- a/lib/crypto/arc4.c
-+++ b/lib/crypto/arc4.c
-@@ -21,7 +21,7 @@ int arc4_setkey(struct arc4_ctx *ctx, const u8 *in_key, unsigned int key_len)
- 		ctx->S[i] = i;
- 
- 	for (i = 0; i < 256; i++) {
--		u32 a = ctx->S[i];
-+		S_type a = ctx->S[i];
- 
- 		j = (j + in_key[k] + a) & 0xff;
- 		ctx->S[i] = ctx->S[j];
-@@ -36,9 +36,9 @@ EXPORT_SYMBOL(arc4_setkey);
- 
- void arc4_crypt(struct arc4_ctx *ctx, u8 *out, const u8 *in, unsigned int len)
- {
--	u32 *const S = ctx->S;
--	u32 x, y, a, b;
--	u32 ty, ta, tb;
-+	S_type *const S = ctx->S;
-+	S_type a, b, ta, tb;
-+	u32 x, y, ty;
- 
- 	if (len == 0)
- 		return;
--- 
-2.30.2
-
+Thanks in advance.
