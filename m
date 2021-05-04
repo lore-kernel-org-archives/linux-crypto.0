@@ -2,93 +2,116 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5A3AC433B4
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 May 2021 16:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 483B8C43461
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 May 2021 10:31:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76DA161059
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 May 2021 16:57:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19D6A613C1
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 May 2021 10:31:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234722AbhECQ6q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 May 2021 12:58:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43348 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234401AbhECQxD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 May 2021 12:53:03 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7074B61958;
-        Mon,  3 May 2021 16:42:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620060123;
-        bh=zdyythD21HvJgoFCj/9ADYkiuDf0zulSgc++zqebsM8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=heYlbIjWjziNCi8v6z4XxiRaz1XJQnqQHniHAun5EMoIb89MD4XUf7pRsKaMJX+h9
-         T+n3f2D8DkTZZIBZM7VnNCmBsRU8fl8j6MkK48P+jPMLEsODr4XX26yEr4PdIL4IZx
-         pc/jcon9V42i15LdkCzSlkofClgB0hUD9bxDTZu7PqX+/ta8sli/L+z7dTPpIvbFe+
-         8U8TerF8N2vWsW103VU9baWjTOILAFXl5CYwCw1xj+YhX5yx0YV2sjl9Zs1j+80mRR
-         BbTpGbVYg0RAAH3h7LVZdEyyD/MRJaT2mBLSIYGvoIHv5kKKgs0zE6z+kpAiMWGzlC
-         Ku1UQC2KX9I5Q==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Harald Freudenberger <freude@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 35/35] s390/archrandom: add parameter check for s390_arch_random_generate
-Date:   Mon,  3 May 2021 12:41:09 -0400
-Message-Id: <20210503164109.2853838-35-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210503164109.2853838-1-sashal@kernel.org>
-References: <20210503164109.2853838-1-sashal@kernel.org>
+        id S230295AbhEDKcA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 May 2021 06:32:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33656 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230253AbhEDKb7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 May 2021 06:31:59 -0400
+Received: from smtp-8fab.mail.infomaniak.ch (smtp-8fab.mail.infomaniak.ch [IPv6:2001:1600:3:17::8fab])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A209BC061574;
+        Tue,  4 May 2021 03:31:03 -0700 (PDT)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4FZGMn6ZThzMqPTp;
+        Tue,  4 May 2021 12:31:01 +0200 (CEST)
+Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
+        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4FZGMl3dv5zlh8TS;
+        Tue,  4 May 2021 12:30:59 +0200 (CEST)
+Subject: Re: [PATCH v7 0/5] Enable root to update the blacklist keyring
+To:     David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Eric Snowberg <eric.snowberg@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        David Woodhouse <dwmw2@infradead.org>
+References: <20210312171232.2681989-1-mic@digikod.net>
+ <52f54ebb-6ac7-4d68-f97a-74219ed88d0b@digikod.net>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+Message-ID: <ef2f9a31-e01f-2443-08a0-c78dd3750cbb@digikod.net>
+Date:   Tue, 4 May 2021 12:31:43 +0200
+User-Agent: 
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+In-Reply-To: <52f54ebb-6ac7-4d68-f97a-74219ed88d0b@digikod.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Harald Freudenberger <freude@linux.ibm.com>
+Are you waiting for the end of the merge window to push to linux-next?
 
-[ Upstream commit 28096067686c5a5cbd4c35b079749bd805df5010 ]
-
-A review of the code showed, that this function which is exposed
-within the whole kernel should do a parameter check for the
-amount of bytes requested. If this requested bytes is too high
-an unsigned int overflow could happen causing this function to
-try to memcpy a really big memory chunk.
-
-This is not a security issue as there are only two invocations
-of this function from arch/s390/include/asm/archrandom.h and both
-are not exposed to userland.
-
-Reported-by: Sven Schnelle <svens@linux.ibm.com>
-Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
-Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/s390/crypto/arch_random.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/arch/s390/crypto/arch_random.c b/arch/s390/crypto/arch_random.c
-index dd95cdbd22ce..4cbb4b6d85a8 100644
---- a/arch/s390/crypto/arch_random.c
-+++ b/arch/s390/crypto/arch_random.c
-@@ -53,6 +53,10 @@ static DECLARE_DELAYED_WORK(arch_rng_work, arch_rng_refill_buffer);
- 
- bool s390_arch_random_generate(u8 *buf, unsigned int nbytes)
- {
-+	/* max hunk is ARCH_RNG_BUF_SIZE */
-+	if (nbytes > ARCH_RNG_BUF_SIZE)
-+		return false;
-+
- 	/* lock rng buffer */
- 	if (!spin_trylock(&arch_rng_lock))
- 		return false;
--- 
-2.30.2
-
+On 07/04/2021 19:21, Mickaël Salaün wrote:
+> Hi David and Jarkko,
+> 
+> What is the status of this patchset? Could someone take it to -next?
+> 
+> Regards,
+>  Mickaël
+> 
+> 
+> On 12/03/2021 18:12, Mickaël Salaün wrote:
+>> This new patch series is a rebase on David Howells's and Eric Snowberg's
+>> keys-cve-2020-26541-v3.
+>>
+>> I successfully tested this patch series with the 186 entries from
+>> https://uefi.org/sites/default/files/resources/dbxupdate_x64.bin (184
+>> binary hashes and 2 certificates).
+>>
+>> The goal of these patches is to add a new configuration option to enable the
+>> root user to load signed keys in the blacklist keyring.  This keyring is useful
+>> to "untrust" certificates or files.  Enabling to safely update this keyring
+>> without recompiling the kernel makes it more usable.
+>>
+>> This can be applied on top of David Howells's keys-cve-2020-26541-branch:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-cve-2020-26541-branch
+>>
+>> Previous patch series:
+>> https://lore.kernel.org/lkml/20210210120410.471693-1-mic@digikod.net/
+>>
+>> Regards,
+>>
+>> Mickaël Salaün (5):
+>>   tools/certs: Add print-cert-tbs-hash.sh
+>>   certs: Check that builtin blacklist hashes are valid
+>>   certs: Make blacklist_vet_description() more strict
+>>   certs: Factor out the blacklist hash creation
+>>   certs: Allow root user to append signed hashes to the blacklist
+>>     keyring
+>>
+>>  MAINTAINERS                                   |   2 +
+>>  certs/.gitignore                              |   1 +
+>>  certs/Kconfig                                 |  17 +-
+>>  certs/Makefile                                |  17 +-
+>>  certs/blacklist.c                             | 218 ++++++++++++++----
+>>  crypto/asymmetric_keys/x509_public_key.c      |   3 +-
+>>  include/keys/system_keyring.h                 |  14 +-
+>>  scripts/check-blacklist-hashes.awk            |  37 +++
+>>  .../platform_certs/keyring_handler.c          |  26 +--
+>>  tools/certs/print-cert-tbs-hash.sh            |  91 ++++++++
+>>  10 files changed, 346 insertions(+), 80 deletions(-)
+>>  create mode 100755 scripts/check-blacklist-hashes.awk
+>>  create mode 100755 tools/certs/print-cert-tbs-hash.sh
+>>
+>>
+>> base-commit: ebd9c2ae369a45bdd9f8615484db09be58fc242b
+>>
