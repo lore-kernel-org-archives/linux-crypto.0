@@ -2,68 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56922C43461
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 22:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2752BC433B4
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 22:54:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A285613D8
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 22:09:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE26B611ED
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 22:54:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233369AbhEEWKm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 May 2021 18:10:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51138 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229691AbhEEWKl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 May 2021 18:10:41 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 62919613D6;
-        Wed,  5 May 2021 22:09:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620252584;
-        bh=MrFPJWMFWa2Yv9X0RL/C0HOz8fh7sy6Uvwm9FYcYjag=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HsZXp4zUwt0UoBrKcTcj6EsxJQg9uZZYCxa4FRbrCpAmBwzWySsLoqBR4DcWc++kN
-         DTH8r+R2tQ9HEFB+csGOwEc2tvq9g7oEx3tvuaWz2a0oH87B2q6ueKrQEMWia8EE4i
-         uu1VqX//aBuEXL+uDX4zREvvz85UCtUgHfHih2g1lJVr+9eI9uDzMpSh1YIzSFkcdY
-         hYAtXrMu8H3q+6iueFg2WdAEgsD4ugtQsNRWc/vP8G0ieyR4C14zW4YF/O9bgwKVFP
-         EEdJVvL06zCIDXNGisyAO0AzgffRJ/RdrDocj4Sq6Wp34s4DozFNC8Kgh7CK9d3oFB
-         XG50JVFe9yhHA==
-Date:   Wed, 5 May 2021 15:09:42 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     linux-arm-msm@vger.kernel.org,
-        Thara Gopinath <thara.gopinath@linaro.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Andy Gross <agross@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bhupesh.linux@gmail.com
-Subject: Re: [PATCH v2 00/17]  Enable Qualcomm Crypto Engine on sm8250
-Message-ID: <YJMXpi1V/2vTdJKD@gmail.com>
-References: <20210505213731.538612-1-bhupesh.sharma@linaro.org>
+        id S229966AbhEEWzU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 May 2021 18:55:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38474 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229497AbhEEWzT (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 May 2021 18:55:19 -0400
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81383C061574
+        for <linux-crypto@vger.kernel.org>; Wed,  5 May 2021 15:54:22 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id p6so2580511qtk.13
+        for <linux-crypto@vger.kernel.org>; Wed, 05 May 2021 15:54:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=q0zaKRzVGTfWicFKwAlACr051DkRY61aB+V34lEP+IA=;
+        b=j//dnuDqqgd1N5DOil+G4gzmT2ik8uFoLeEhVq+HpkRWkz4y7xDWHyiP4LF77UzSB/
+         vKwools9QClihcN9Mop6spO30pPbEfXMt5YxnKxoYgUzKn09yW0gANLO9ipUbm7izU7W
+         Z4lcJiv2mBnf8KssxDIHZeZ9hVUwSAehuuywggg4TmaZbdkzzFCtHcY32HoKxGW7lbK0
+         0Ixx8OUlqM3wQ3EITck0/gPsfD7ZCi+msx191keWX/4G89grao/VJuEecz/kpZYg8Iiw
+         HE8SDOado5mFDuoafp/E3flRCIC5N72u2rtTfzWvJmPSJnRSN0aYaxhaJC367CKdHz9T
+         Ebkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=q0zaKRzVGTfWicFKwAlACr051DkRY61aB+V34lEP+IA=;
+        b=LumHeEBIAeivsXx8iKZyegqdkwwkoLGLfE4FHnp2H5eBelhcm4uMDPK7k/J0BDEviN
+         rhDFzA0VIfaqj3pA+OMVablcEMaiT/T4gOFDMODnjTkwhjGPEYs3kE3KeafXEIvtm4nt
+         BDZdBGDuxi1+KDziEmv8qm/2ufHOP4IHFOUur+Dof5ZcsT5WsB98AfyVTFc3sTX7C4JU
+         GHqbjWMUVPigySzeAMyng5YmfmLMloB5nksDwIh+pu54P+0ApA+PRp9lH+psVo+KA1HP
+         JuG/fVrG1CVAkC0RIu4PrHk8tYlFpLOl14w0pv/EHZkStPNjngeiH/A1heIxZRGxoxL0
+         QZFw==
+X-Gm-Message-State: AOAM531iXibqZUFs9gcDL1uGtoKkvS0y2rY0u5lPcbUA4Okx9eG5jCSp
+        twoqPVodYdiXZQlgoz3CJSPk3Q==
+X-Google-Smtp-Source: ABdhPJxV4JR7XYvl9CET37aFz6TdncEItz78NEQmI3EZzHqQXLhOb8abvNkaRYc9/Jd6307iu7d5zQ==
+X-Received: by 2002:ac8:6f79:: with SMTP id u25mr960182qtv.166.1620255261363;
+        Wed, 05 May 2021 15:54:21 -0700 (PDT)
+Received: from [192.168.1.93] (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
+        by smtp.gmail.com with ESMTPSA id x13sm627365qtf.32.2021.05.05.15.54.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 May 2021 15:54:20 -0700 (PDT)
+Subject: Re: [Patch v4 0/7] Add support for AEAD algorithms in Qualcomm Crypto
+ Engine driver
+From:   Thara Gopinath <thara.gopinath@linaro.org>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        bjorn.andersson@linaro.org
+Cc:     ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+References: <20210429150707.3168383-1-thara.gopinath@linaro.org>
+Message-ID: <48d51bb5-a107-4756-4767-f62131d28505@linaro.org>
+Date:   Wed, 5 May 2021 18:54:18 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210505213731.538612-1-bhupesh.sharma@linaro.org>
+In-Reply-To: <20210429150707.3168383-1-thara.gopinath@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 06, 2021 at 03:07:14AM +0530, Bhupesh Sharma wrote:
+
+
+On 4/29/21 11:07 AM, Thara Gopinath wrote:
+> Enable support for AEAD algorithms in Qualcomm CE driver.  The first three
+> patches in this series are cleanups and add a few missing pieces required
+> to add support for AEAD algorithms.  Patch 4 introduces supported AEAD
+> transformations on Qualcomm CE.  Patches 5 and 6 implements the h/w
+> infrastructure needed to enable and run the AEAD transformations on
+> Qualcomm CE.  Patch 7 adds support to queue fallback algorithms in case of
+> unsupported special inputs.
 > 
-> Tested the enabled crypto algorithms with cryptsetup test utilities
-> on sm8250-mtp and RB5 board (see [1]).
+> This patch series has been tested with in kernel crypto testing module
+> tcrypt.ko with fuzz tests enabled as well.
+
+Hi Herbert,
+
+I have fixed all the review comments on this series and fuzz tests pass 
+as well. Do you think this can be merged ?
+
+-- 
+Warm Regards
+Thara
+> 
+> Thara Gopinath (7):
+>    crypto: qce: common: Add MAC failed error checking
+>    crypto: qce: common: Make result dump optional
+>    crypto: qce: Add mode for rfc4309
+>    crypto: qce: Add support for AEAD algorithms
+>    crypto: qce: common: Clean up qce_auth_cfg
+>    crypto: qce: common: Add support for AEAD algorithms
+>    crypto: qce: aead: Schedule fallback algorithm
+> 
+>   drivers/crypto/Kconfig      |  15 +
+>   drivers/crypto/qce/Makefile |   1 +
+>   drivers/crypto/qce/aead.c   | 841 ++++++++++++++++++++++++++++++++++++
+>   drivers/crypto/qce/aead.h   |  56 +++
+>   drivers/crypto/qce/common.c | 196 ++++++++-
+>   drivers/crypto/qce/common.h |   9 +-
+>   drivers/crypto/qce/core.c   |   4 +
+>   7 files changed, 1102 insertions(+), 20 deletions(-)
+>   create mode 100644 drivers/crypto/qce/aead.c
+>   create mode 100644 drivers/crypto/qce/aead.h
 > 
 
-Does this driver also pass the crypto self-tests, including the fuzz tests
-(CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y)?
 
-- Eric
