@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99BCAC433B4
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 20:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16039C43460
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 20:26:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72D0261057
+	by mail.kernel.org (Postfix) with ESMTP id EA38C61057
 	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 20:26:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235417AbhEEU1b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 May 2021 16:27:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33558 "EHLO
+        id S235444AbhEEU1c (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 May 2021 16:27:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235233AbhEEU11 (ORCPT
+        with ESMTP id S235254AbhEEU11 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 5 May 2021 16:27:27 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77E54C061761
-        for <linux-crypto@vger.kernel.org>; Wed,  5 May 2021 13:26:30 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id a10-20020a05600c068ab029014dcda1971aso2014611wmn.3
-        for <linux-crypto@vger.kernel.org>; Wed, 05 May 2021 13:26:30 -0700 (PDT)
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 981FEC061574
+        for <linux-crypto@vger.kernel.org>; Wed,  5 May 2021 13:26:29 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id l13so3203073wru.11
+        for <linux-crypto@vger.kernel.org>; Wed, 05 May 2021 13:26:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=DPi3GWFf6k778V89ksbErMgoKxDVX/Ki9ZfOEswj8Wc=;
-        b=mu8aSZVBwYaPSF8UH/aaPLDoKDGLMm2P7jX1e+72RGxjGqhiquhRbvpngx8ak/j5JG
-         vppOayT09Wvbpx3gDY9pVeF60+Qa9BqLJlhCVJCf2uEti+6fChf2+llFon20P2Gy7Bsl
-         kV6b32k5xN+MNkKW3ZM1HoWaThc8OSRxs3NdAnoHc9r5J+iJiVkCfEB9qJfaProaEAr/
-         eybmzMqRBW12ZoIV5eoouA6UBvlwWJMI0kmjDNkKwJjj/mrVOY7CRUcgmbtZPvF7kF+o
-         6feH6cLmdZVe01D8FLQFl5iTOMZgJuf237zVIXD7IHpdPNlh6YB222wxs7UT7EMKrPQO
-         sqJA==
+        bh=qNHcmRakO4ShV9Tx/kw4hZ3DZlWxxa2CciC+xe4iDkw=;
+        b=ZGHzV3C0LweoW7LZFx17Cue7cb1oRbtXcybhex81gLaPOYS/x3q8xHNV0ndBEBh+u6
+         6T+rhqzodln3fzWoMJCk5sbQdTEgJhJFvG+vh4JAJCFTHsD1NJkvFTBjjZyAChFNL+ry
+         tFw6uJb65nh9atC93vEo6A3SXrJv/3xoeUIqetLTsuwEipPxLzLTwrU8qYRABT8DomCu
+         7T+WUVGDJbkj/wsaXIu/LK/hyRdIvaS8i54dN+2ARwlIPjTH4M+kVINXl0YApaBDF1w0
+         VhXRwq8+sNUQeulqSExfio9FKyhu87k6oAn41DRHYf9qkI7qrct2oZsXIMLhI/WPTJA7
+         AW3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=DPi3GWFf6k778V89ksbErMgoKxDVX/Ki9ZfOEswj8Wc=;
-        b=rMWMF5KIGBr0H/lobB7NZc85I19k1oRBFZVJuY2CyA93tX3eFjAdiICB/ckxm7rF/+
-         2j6CHYu1n9feHqBV6LlRlHBMzisXyPSZBjGlHbF+TVpGD/lqjWGauBzZPPKF3i6LFmM8
-         0ta/5kbG1C3yjBPYfg7tkAu7ULbhWixAGEeO/Bz3NajP9k4TTDGk/x5HZMZBypCm3ltN
-         nF1xaRN9npRroSXRI3t8rmjUdzAEFkR8rny0x0I0xLvfOCpnAH8leDeXTv12F6FNALXE
-         21kVLP2cZioVlAHrj3nsefjT2gmD0ZDmJlDbF8zQEvRRem3Kl9rIvVw7eS/T7Lvp1Eef
-         5eXw==
-X-Gm-Message-State: AOAM533r5QKNy7hl7+8jr5nCgVZUWZn4J+LXYs3JfsCOeyZCzGlmxnwh
-        02gcsCHOq+Teg2Zy4aTaqoYcJg==
-X-Google-Smtp-Source: ABdhPJwKq/kRYVK1eC9epDFRwCi1he4uYcedqIqwnaRlTJ+gR4PxjYAyPW6kePP1pp+RxJJxyZZBQg==
-X-Received: by 2002:a7b:c191:: with SMTP id y17mr11586488wmi.19.1620246389196;
-        Wed, 05 May 2021 13:26:29 -0700 (PDT)
+        bh=qNHcmRakO4ShV9Tx/kw4hZ3DZlWxxa2CciC+xe4iDkw=;
+        b=oejdqMvxV6JqOF+QTknQXnNjKsEtGh5WrT++2Yf0n1mlZZ0VuW6R7oRlO1XJX9Ctli
+         ebWYoEmbymNHWISYgoB0zOkxYX3ndlbHCyhZuUKUcOilvA2Ca1n8Wjxj5+49psikJsdu
+         x23w0JtqeSji+gWK2id92x09c+op0juUf7p0ek1pNjMxpskgtxa5SPBZLEDF0Sv5hzgX
+         raDXQOlakztqoDOrCTH6oPO/5BOrYz1CBZ+8SsmmkeuFCsUgy7BFGGjCzGstqsJMdfZ2
+         iejxpFTyABcbK0DapgG9lxUry/kyzb8McjzLtZLF/r3R/o6+95XV75Wf7H/fpMbvFnjb
+         a2Tw==
+X-Gm-Message-State: AOAM532UQ+DyY01nV7+LFLYJJRXNLZIAzsZJ2NhdHH5vUGBE/oVRCzLN
+        TBrOtBe5z/nfznvT06GhGAGlwA==
+X-Google-Smtp-Source: ABdhPJx3HAtoecZ3LrqPdXeOVl4Y6DnFRP713ydPKXezA4AaHQl/5MlcA4VJMRR2hH6IWyu1opcTTg==
+X-Received: by 2002:a5d:4e0b:: with SMTP id p11mr903183wrt.220.1620246388414;
+        Wed, 05 May 2021 13:26:28 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id a15sm497245wrr.53.2021.05.05.13.26.28
+        by smtp.googlemail.com with ESMTPSA id a15sm497245wrr.53.2021.05.05.13.26.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 05 May 2021 13:26:28 -0700 (PDT)
 From:   Corentin Labbe <clabbe@baylibre.com>
@@ -61,9 +61,9 @@ To:     chohnstaedt@innominate.com, davem@davemloft.net,
         herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 05/11] crypto: ixp4xx: convert all printk to dev_xxx
-Date:   Wed,  5 May 2021 20:26:12 +0000
-Message-Id: <20210505202618.2663889-6-clabbe@baylibre.com>
+Subject: [PATCH 04/11] crypto: ixp4xx: convert unsigned to unsigned int
+Date:   Wed,  5 May 2021 20:26:11 +0000
+Message-Id: <20210505202618.2663889-5-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210505202618.2663889-1-clabbe@baylibre.com>
 References: <20210505202618.2663889-1-clabbe@baylibre.com>
@@ -73,73 +73,90 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert all old printk to dev_xxx.
-
+Fixes all issues reported by checkpatch about "unsigned", lets convert
+them to unsigned int.
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/ixp4xx_crypto.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ drivers/crypto/ixp4xx_crypto.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index 17de9e60adad..486a388c909f 100644
+index 8bbf2ead6e79..17de9e60adad 100644
 --- a/drivers/crypto/ixp4xx_crypto.c
 +++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -452,7 +452,7 @@ static int init_ixp_crypto(struct device *dev)
+@@ -136,7 +136,7 @@ struct crypt_ctl {
+ 	u32 crypto_ctx;		/* NPE Crypto Param structure address */
  
- 	if (! ( ~(*IXP4XX_EXP_CFG2) & (IXP4XX_FEATURE_HASH |
- 				IXP4XX_FEATURE_AES | IXP4XX_FEATURE_DES))) {
--		printk(KERN_ERR "ixp_crypto: No HW crypto available\n");
-+		dev_err(dev, "ixp_crypto: No HW crypto available\n");
- 		return ret;
- 	}
- 	npe_c = npe_request(NPE_ID);
-@@ -475,8 +475,7 @@ static int init_ixp_crypto(struct device *dev)
- 
- 	switch ((msg[1]>>16) & 0xff) {
- 	case 3:
--		printk(KERN_WARNING "Firmware of %s lacks AES support\n",
--				npe_name(npe_c));
-+		dev_warn(dev, "Firmware of %s lacks AES support\n", npe_name(npe_c));
- 		support_aes = 0;
- 		break;
- 	case 4:
-@@ -484,8 +483,7 @@ static int init_ixp_crypto(struct device *dev)
- 		support_aes = 1;
- 		break;
- 	default:
--		printk(KERN_ERR "Firmware of %s lacks crypto support\n",
--			npe_name(npe_c));
-+		dev_err(dev, "Firmware of %s lacks crypto support\n", npe_name(npe_c));
- 		ret = -ENODEV;
- 		goto npe_release;
- 	}
-@@ -521,7 +519,7 @@ static int init_ixp_crypto(struct device *dev)
+ 	/* Used by Host: 4*4 bytes*/
+-	unsigned ctl_flags;
++	unsigned int ctl_flags;
+ 	union {
+ 		struct skcipher_request *ablk_req;
+ 		struct aead_request *aead_req;
+@@ -184,7 +184,7 @@ struct ixp_ctx {
+ 	u8 enckey[MAX_KEYLEN];
+ 	u8 salt[MAX_IVLEN];
+ 	u8 nonce[CTR_RFC3686_NONCE_SIZE];
+-	unsigned salted;
++	unsigned int salted;
+ 	atomic_t configuring;
+ 	struct completion completion;
+ 	struct crypto_skcipher *fallback_tfm;
+@@ -695,8 +695,8 @@ static int register_chain_var(struct crypto_tfm *tfm, u8 xpad, u32 target,
  	return 0;
+ }
  
- npe_error:
--	printk(KERN_ERR "%s not responding\n", npe_name(npe_c));
-+	dev_err(dev, "%s not responding\n", npe_name(npe_c));
- 	ret = -EIO;
- err:
- 	dma_pool_destroy(ctx_pool);
-@@ -1487,7 +1485,7 @@ static int __init ixp_module_init(void)
- 		cra->base.cra_alignmask = 3;
- 		cra->base.cra_priority = 300;
- 		if (crypto_register_skcipher(cra))
--			printk(KERN_ERR "Failed to register '%s'\n",
-+			dev_err(&pdev->dev, "Failed to register '%s'\n",
- 				cra->base.cra_name);
- 		else
- 			ixp4xx_algos[i].registered = 1;
-@@ -1520,7 +1518,7 @@ static int __init ixp_module_init(void)
- 		cra->base.cra_priority = 300;
+-static int setup_auth(struct crypto_tfm *tfm, int encrypt, unsigned authsize,
+-		const u8 *key, int key_len, unsigned digest_len)
++static int setup_auth(struct crypto_tfm *tfm, int encrypt, unsigned int authsize,
++		      const u8 *key, int key_len, unsigned int digest_len)
+ {
+ 	u32 itarget, otarget, npe_ctx_addr;
+ 	unsigned char *cinfo;
+@@ -823,12 +823,12 @@ static int setup_cipher(struct crypto_tfm *tfm, int encrypt,
+ }
  
- 		if (crypto_register_aead(cra))
--			printk(KERN_ERR "Failed to register '%s'\n",
-+			dev_err(&pdev->dev, "Failed to register '%s'\n",
- 				cra->base.cra_driver_name);
- 		else
- 			ixp4xx_aeads[i].registered = 1;
+ static struct buffer_desc *chainup_buffers(struct device *dev,
+-		struct scatterlist *sg,	unsigned nbytes,
++		struct scatterlist *sg,	unsigned int nbytes,
+ 		struct buffer_desc *buf, gfp_t flags,
+ 		enum dma_data_direction dir)
+ {
+ 	for (; nbytes > 0; sg = sg_next(sg)) {
+-		unsigned len = min(nbytes, sg->length);
++		unsigned int len = min(nbytes, sg->length);
+ 		struct buffer_desc *next_buf;
+ 		dma_addr_t next_buf_phys;
+ 		void *ptr;
+@@ -930,7 +930,7 @@ static int ablk_perform(struct skcipher_request *req, int encrypt)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct ixp_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	unsigned ivsize = crypto_skcipher_ivsize(tfm);
++	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
+ 	struct ix_sa_dir *dir;
+ 	struct crypt_ctl *crypt;
+ 	unsigned int nbytes = req->cryptlen;
+@@ -1045,8 +1045,8 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ {
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct ixp_ctx *ctx = crypto_aead_ctx(tfm);
+-	unsigned ivsize = crypto_aead_ivsize(tfm);
+-	unsigned authsize = crypto_aead_authsize(tfm);
++	unsigned int ivsize = crypto_aead_ivsize(tfm);
++	unsigned int authsize = crypto_aead_authsize(tfm);
+ 	struct ix_sa_dir *dir;
+ 	struct crypt_ctl *crypt;
+ 	unsigned int cryptlen;
+@@ -1157,7 +1157,7 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ static int aead_setup(struct crypto_aead *tfm, unsigned int authsize)
+ {
+ 	struct ixp_ctx *ctx = crypto_aead_ctx(tfm);
+-	unsigned digest_len = crypto_aead_maxauthsize(tfm);
++	unsigned int digest_len = crypto_aead_maxauthsize(tfm);
+ 	int ret;
+ 
+ 	if (!ctx->enckey_len && !ctx->authkey_len)
 -- 
 2.26.3
 
