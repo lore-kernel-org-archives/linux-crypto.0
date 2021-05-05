@@ -5,32 +5,32 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDDBC43600
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 16:46:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AC19C433ED
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 16:57:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0C6C61424
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 16:46:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50854610A7
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 16:57:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235248AbhEEQru (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 May 2021 12:47:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50828 "EHLO mail.kernel.org"
+        id S235641AbhEEQ5z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 May 2021 12:57:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60398 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236051AbhEEQpe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 May 2021 12:45:34 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EE9736193F;
-        Wed,  5 May 2021 16:36:22 +0000 (UTC)
+        id S236460AbhEEQyO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 May 2021 12:54:14 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E302461979;
+        Wed,  5 May 2021 16:38:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620232583;
+        s=k20201202; t=1620232711;
         bh=0Bk3nstHtjG3V4hoyPoe7jruEuZv2r2/30Mm86m3eM0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=I2RsiHxYN0kNjXeIVz2mGvOVSLM20J6qLrZPRvOaWMn3ETmh8wSxXZfLkTxsk7Lng
-         IP/LeaBHSWH9NJIyZxGOdNnaeffy+79m157r/jydJHHqCOfeZluKWr/3b7r9XlRw52
-         jW+6MyfMMdDwbC4ZYyrfKdT20ZhnHq2Z2W4lSJ9cbsUJAlDE6BC6SyHstb4jbCa/6V
-         P0sJFQf/VcIOUBiZtJjsIi5ChYNwyzOY4Nq9CgPRwI2CjtRk324aZcEKXKDh7l56iD
-         dQF8SfWqxhUUjnRDbH3y0UmoMo27afoWCfuiAD7kZrqbBo8Jq5RfxckuvvKsNhO7SB
-         Y4u/0in1RWeHg==
+        b=SOGgNIDu+/Cl5Voe3aq3RwacBvdQuhQFt2N0/l/URbDhmpM93Y4tYqE4dba1AQbRo
+         Oz83gLrUtWBgmmh/wqTafCRlh67Vu/GFAhV0TIx1VkLXTXYZ9WGwbrQfaHciH1Kzaf
+         AWviaA6fM22S/xUVjAIhPDiSf2gcUJOXtGDWEPISGT+ddOCIkVVtusPDT19JmPHOFl
+         5snKKcS8FhvLFGL4/8hQN5F2Wko9cQ+qC4KGzdUVmm0pfftb6v3pWOK13zbymgscV8
+         a8oKU4I5w1xCfmOPXD6NWLlhucqVyZVEhCBsr4hbikfw9k6XJPOM3Oua7MIfO/klGk
+         cAZlKacg8S46w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -38,12 +38,12 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 089/104] crypto: ccp: Free SEV device if SEV init fails
-Date:   Wed,  5 May 2021 12:33:58 -0400
-Message-Id: <20210505163413.3461611-89-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 70/85] crypto: ccp: Free SEV device if SEV init fails
+Date:   Wed,  5 May 2021 12:36:33 -0400
+Message-Id: <20210505163648.3462507-70-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210505163413.3461611-1-sashal@kernel.org>
-References: <20210505163413.3461611-1-sashal@kernel.org>
+In-Reply-To: <20210505163648.3462507-1-sashal@kernel.org>
+References: <20210505163648.3462507-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
