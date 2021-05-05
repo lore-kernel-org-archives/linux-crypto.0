@@ -2,106 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78310C43460
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 03:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E8A7C433ED
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 10:20:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54A66613D6
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 03:45:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD0ED61222
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 May 2021 10:20:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230505AbhEEDqj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 May 2021 23:46:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37326 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230483AbhEEDqi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 May 2021 23:46:38 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AB7526112F;
-        Wed,  5 May 2021 03:45:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620186343;
-        bh=R/JyAKDyJKGKvvQXuafoRRyXBimPMKueTQ6KKgAKfww=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lGmV119In9JTgyt66QPQey4xSOUN9ETJKt3aUfFPmf5mBZha78nVjwmOZSingGZha
-         bU9FPN1fKrFz7WemS0arBiEx3RZstPdpSLsnovX3p8CenjO+JKlwJT4VOne3Z6cyuS
-         axOUJqdK1vjQTWGEhIKgwJGoVo7xDssJoFIKQxM7bZK8O0oStov4B3foK/i1jBVcmh
-         hYVmmzXegpD3wTxNDkcYdfDE+C0kkOP3OnQDNg7QMU82FzsH5x14fHzcPAmvd2MIPr
-         c05BBd0xm9gzpeOd9VDOr7c0dyk4Dp+Y7QT5bbP+V502O7buNx++7zX55U8OyMyS88
-         urCvI/cSjB9lw==
-Date:   Tue, 4 May 2021 20:45:41 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Pavel Machek <pavel@ucw.cz>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Chris von Recklinghausen <crecklin@redhat.com>,
-        Ard Biesheuvel <ardb@kernel.org>, Simo Sorce <simo@redhat.com>,
-        Dexuan Cui <decui@microsoft.com>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 1/1] use crc32 instead of md5 for hibernation e820
- integrity check
-Message-ID: <YJIU5fd5e2FwrEB/@gmail.com>
-References: <20210408131506.17941-1-crecklin@redhat.com>
- <CAJZ5v0ib+jmbsD9taGW0RujY5c9BCK8yLHv065u44mb0AwO9vQ@mail.gmail.com>
- <YG8gqZoZGutPmROz@sol.localdomain>
- <CAJZ5v0g65irXKmy7pdgD8-5KWrxdtwiWbJsBD2A=PKf1D3RVZg@mail.gmail.com>
- <20210429195944.GB1067@bug>
+        id S232200AbhEEKVl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 May 2021 06:21:41 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.85.151]:51044 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232139AbhEEKVl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 May 2021 06:21:41 -0400
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-226-NBzCLfwUMDaGZYPLw1SIkQ-1; Wed, 05 May 2021 11:20:41 +0100
+X-MC-Unique: NBzCLfwUMDaGZYPLw1SIkQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.2; Wed, 5 May 2021 11:20:41 +0100
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.015; Wed, 5 May 2021 11:20:41 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Christophe JAILLET' <christophe.jaillet@wanadoo.fr>,
+        Eric Biggers <ebiggers@kernel.org>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
+Subject: RE: [RFC PATCH] crypto: arc4: Implement a version optimized for
+ memory usage
+Thread-Topic: [RFC PATCH] crypto: arc4: Implement a version optimized for
+ memory usage
+Thread-Index: AQHXQQ8/MxI87C5LlEaRIASgh2FBkKrUrGEQ
+Date:   Wed, 5 May 2021 10:20:41 +0000
+Message-ID: <4fe67cdda2c64c1da314142eda998967@AcuMS.aculab.com>
+References: <c52bd8972c9763c3fac685d7c6af3c46a23a1477.1619983555.git.christophe.jaillet@wanadoo.fr>
+ <YJF8/oaWUqZsWfOb@gmail.com>
+ <d523902e-744c-1291-aee8-9be734f2a3ce@wanadoo.fr>
+In-Reply-To: <d523902e-744c-1291-aee8-9be734f2a3ce@wanadoo.fr>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210429195944.GB1067@bug>
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 29, 2021 at 09:59:44PM +0200, Pavel Machek wrote:
-> Hi!
-> 
-> > > > > Suspend fails on a system in fips mode because md5 is used for the e820
-> > > > > integrity check and is not available. Use crc32 instead.
-> > > > >
-> > > > > This patch changes the integrity check algorithm from md5 to
-> > > > > crc32. This integrity check is used only to verify accidental
-> > > > > corruption of the hybernation data
-> > > >
-> > > > It isn't used for that.
-> > > >
-> > > > In fact, it is used to detect differences between the memory map used
-> > > > before hibernation and the one made available by the BIOS during the
-> > > > subsequent resume.  And the check is there, because it is generally
-> > > > unsafe to load the hibernation image into memory if the current memory
-> > > > map doesn't match the one used when the image was created.
-> > >
-> > > So what types of "differences" are you trying to detect?  If you need to detect
-> > > differences caused by someone who maliciously made changes ("malicious" implies
-> > > they may try to avoid detection), then you need to use a cryptographic hash
-> > > function (or a cryptographic MAC if the hash value isn't stored separately).  If
-> > > you only need to detect non-malicious changes (normally these would be called
-> > > "accidental" changes, but sure, it could be changes that are "intentionally"
-> > > made provided that the other side can be trusted to not try to avoid
-> > > detection...)
-> > 
-> > That's the case here.
-> 
-> md5 is fine for this purpose. crc32 may be too weak. I don't see why this needs changing.
-> 
-> Maybe fips should understand that md5 has other uses than crypto?
-> 
-> Best regards,
-> 									Pavel
+RnJvbTogQ2hyaXN0b3BoZSBKQUlMTEVUDQo+IFNlbnQ6IDA0IE1heSAyMDIxIDE5OjAwDQo+IA0K
+PiBMZSAwNC8wNS8yMDIxIMOgIDE4OjU3LCBFcmljIEJpZ2dlcnMgYSDDqWNyaXTCoDoNCj4gPiBP
+biBTdW4sIE1heSAwMiwgMjAyMSBhdCAwOToyOTo0NlBNICswMjAwLCBDaHJpc3RvcGhlIEpBSUxM
+RVQgd3JvdGU6DQo+ID4+ICsjaWYgZGVmaW5lZChDT05GSUdfSEFWRV9FRkZJQ0lFTlRfVU5BTElH
+TkVEX0FDQ0VTUykNCj4gPj4gKyNkZWZpbmUgU190eXBlCXU4DQo+ID4+ICsjZWxzZQ0KPiA+PiAr
+I2RlZmluZSBTX3R5cGUJdTMyDQo+ID4+ICsjZW5kaWYNCj4gPj4gKw0KPiA+PiAgIHN0cnVjdCBh
+cmM0X2N0eCB7DQo+ID4+IC0JdTMyIFNbMjU2XTsNCj4gPj4gKwlTX3R5cGUgU1syNTZdOw0KPiA+
+PiAgIAl1MzIgeCwgeTsNCj4gPj4gICB9Ow0KPiA+DQo+ID4gSXMgaXQgYWN0dWFsbHkgdXNlZnVs
+IHRvIGtlZXAgYm90aCB2ZXJzaW9ucz8gIEl0IHNlZW1zIHdlIGNvdWxkIGp1c3QgdXNlIHRoZSB1
+OA0KPiA+IHZlcnNpb24gZXZlcnl3aGVyZS4gIE5vdGUgdGhhdCB0aGVyZSBhcmVuJ3QgYWN0dWFs
+bHkgYW55IHVuYWxpZ25lZCBtZW1vcnkNCj4gPiBhY2Nlc3Nlcywgc28gY2hvb3NpbmcgdGhlIHZl
+cnNpb24gY29uZGl0aW9uYWxseSBvbg0KPiA+IENPTkZJR19IQVZFX0VGRklDSUVOVF9VTkFMSUdO
+RURfQUNDRVNTIHNlZW1zIG9kZC4gIFdoYXQgYXJlIHlvdSB0cnlpbmcgdG8NCj4gPiBkZXRlcm1p
+bmUgYnkgY2hlY2tpbmcgdGhhdD8NCj4gDQo+IEhpLCB0aGlzIGlzIGEgYmFkIGludGVycHJldGF0
+aW9uIGZyb20gbWUuDQouLi4NCj4gDQo+IEkgd2FudGVkIHRvIGF2b2lkIHBvdGVudGlhbCBwZXJm
+b3JtYW5jZSBjb3N0IHJlbGF0ZWQgdG8gdXNpbmcgY2hhciAoaS5lDQo+IHU4KSBpbnN0ZWFkIG9m
+IGludCAoaS5lLiB1MzIpLg0KPiBPbiBzb21lIGFyY2hpdGVjdHVyZSB0aGlzIGNvdWxkIHJlcXVp
+cmUgc29tZSBzaGlmdCBvciBtYXNraW5nIG9yDQo+IHdoYXRldmVyIHRvICJ1bnBhY2siIHRoZSB2
+YWx1ZXMgb2YgUy4NCg0KVGhlIG9ubHkgYXJjaGl0ZWN0dXJlIHRoYXQgTGludXggcmFuIG9uIHdo
+ZXJlIHRoZSBoYXJkd2FyZQ0KZGlkIFJNVyBhY2Nlc3NlcyBmb3IgYnl0ZSB3cml0ZXMgd2FzIHNv
+bWUgdmVyeSBvbGQgYWxwaGEgY3B1Lg0KRXZlbiBtb3JlIHJlY2VudCBhbHBoYSBzdXBwb3J0ZWQg
+Ynl0ZSB3cml0ZXMgdG8gbWVtb3J5Lg0KDQpPbiBtYW55IGFyY2hpdGVjdHVyZXMgKG5vdCB4ODYg
+b3IgYXJtKSBpbmRleGluZyBhIGJ5dGUgYXJyYXkNCmlzIGJldHRlciBiZWNhdXNlIGl0IHNhdmVz
+IHRoZSBpbnN0cnVjdGlvbiB0byBtdWx0aXBseSB0aGUgaW5kZXggYnkgNC4NCk9uIHg4Ni02NCB5
+b3Ugd2FudCB0byBiZSB1c2luZyAndW5zaWduZWQgaW50JyBmb3IgYXJyYXkgaW5kZXhlcw0Kc28g
+dGhlIGNvbXBpbGVyIGRvZXNuJ3QgaGF2ZSB0byBlbWl0IHRoZSBpbnN0cnVjdGlvbiB0byBzaWdu
+IGV4dGVuZA0KYSAzMmJpdCBpbnQgdG8gNjQgYml0cyAoc29tZXRpbWVzIGl0IGtub3dzIGl0IGNh
+bid0IGJlIG5lZWRlZCkuDQoNCkZXSVcgd2l0aCBhIG1vZGVybiBjb21waWxlciBhbGwgdGhvc2Ug
+dGVtcG9yYXJpZXMgYXJlIHBvaW50bGVzcy4NClRoZSBudW1iZXIgb2YgbGluZXMgb2YgY29kZSBj
+YW4gYmUgaGFsdmVkLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRl
+LCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpS
+ZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
 
-This would be a good change even if FIPS didn't exist, because either you need a
-cryptographic digest or you don't.  Using MD5 is a big red flag as there isn't
-really any valid use case for it anymore.  We should be working to eliminate all
-uses of MD5 from the kernel, and likewise for other broken crypto algorithms
-like RC4.  Note that that includes not just upgrading crypto algorithms, but
-also eliminating cases where crypto was improperly used when it isn't needed.
-
-As far as non-cryptographic checksums go, CRC-32 has less than a 1 in 4 billion
-chance of a collision.  People seemed happy with that for this use case.  But if
-a stronger checksum is desired, then CRC-64 or xxHash64 would give a 1 in 2^64
-chance of collision instead.
-
-- Eric
