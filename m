@@ -2,69 +2,63 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86734C433B4
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 06:12:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69106C433B4
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 06:56:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52F0F613EA
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 06:12:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 314DA61164
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 06:56:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229886AbhEGGNr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 May 2021 02:13:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58516 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229801AbhEGGNr (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 May 2021 02:13:47 -0400
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34030C061574
-        for <linux-crypto@vger.kernel.org>; Thu,  6 May 2021 23:12:48 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id o5so7471226qkb.0
-        for <linux-crypto@vger.kernel.org>; Thu, 06 May 2021 23:12:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=CzbCCZ6Zre6aJu1FfMOWI8mPWtp4+EWTeIofxDtbSp0=;
-        b=RgyC/Z2qNiTD1vKuniSLbLKMCU5tSF5aE7LdL3TurQn8Zkff54gzBYZVajWtBxUrxY
-         oqMWMxpBNXhoTySxgGwV3EQI/jl6ZSZ3at46tUqzq5pzHS69SC6FJY1geRYcM9DTC9tH
-         JPdFC/VhuwockLhWDVj5aQqIjdUjyka+5aYeVgmNjWWA70DTEcAArnpeISnjZmMZbv7l
-         HgXEGV3YzUbQDTMslVcBfFKp6BBVxRfJDrPKbanihC9LSuo0BYgijbNhvyJPUfBEtwer
-         Ch52hH9ofekIWIf09F9yRiDzCMhpUiHYSL57KIDJ7EcljeV6BtYSKi4o+Ly6Op5cqs38
-         7XUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=CzbCCZ6Zre6aJu1FfMOWI8mPWtp4+EWTeIofxDtbSp0=;
-        b=UGoCXIoNU9dLYHDJRuj5MUWJieOIB3r3dAyq5C+6/PF83RMUN0WtcqBtczFc4k9x2l
-         E/xAzHPUvFiom2xUt98JAt0lxzdr+XyJ6nmAJJjwXnohuGepML9uWsaCRxd4nb0VqWg8
-         SIzZDyGtHs8qj3/Alc/jgCAQVjL23YTmfstmQJeMglgccluX6sp2m8X4DVwTjIo6T/30
-         tiro01Ajk/aSbLLADxM2b3pLEWCv25xE0/Z/M7VEEuGzNp7ivb0BOzGQjzEfuFJOKdNW
-         oHxg0RHj8djs9INQPDkM4EMLdYy3FxK3wLywyc1S2GkiOscx77if/kU1U3p5vDK3oqRt
-         9cfg==
-X-Gm-Message-State: AOAM532g0ro5aQYLSn0kKkS9EaDE7HvTTQRhvp+VaOJOJXbhs80U/TW3
-        rpTPldC9HJUgi8Cr7qGD4aRTxeupORTSzUKOrWyXkhqgrNw=
-X-Google-Smtp-Source: ABdhPJxDKx6fDrOoeZJSNGgiTTJeNWP+UETl9BiimnnkH2WxXNDB3o4TdAc74AIANuqdSHWqfSYPvwym/otUySGEWAU=
-X-Received: by 2002:a37:62cf:: with SMTP id w198mr7832038qkb.126.1620367967558;
- Thu, 06 May 2021 23:12:47 -0700 (PDT)
+        id S234525AbhEGG5B (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 May 2021 02:57:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56260 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232974AbhEGG5B (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 May 2021 02:57:01 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6EBDD61164;
+        Fri,  7 May 2021 06:56:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1620370561;
+        bh=5oJ7/xRlvEPW7909i7SHjDtYMORz8Ni4G8mzMy6rqdw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=jP+MW8zigZV/sd1L87PnhXbALvTo9d67vwc/XP60wvtfTdukLArbMJqtPQ9NMMfuw
+         gQhEaX1/iLx/h/SGYhVjwHvngJRUuLZNDyXZO41YN8TVqvoCrf9kTAcunhMmq+s6FQ
+         Q/COIVr7z/bWhzdSORg2RGz0Vg7bcGM8uFFvVuqOKqu/DbXjepdZLBTuHNR+rvymJb
+         qnqS1OX4TDCzJa1Ekf0SQB3AUUob3wAZ8jHhPexCXwHuoHg6cL6OOVXR5omjs1Ifcz
+         ZOq4SGExO1EQDL287phRdKfOVJc1exgmynd0CAlR+ms8+N3875lAR5FMER5rj9htRd
+         5kst/LuIwZoXA==
+Date:   Thu, 6 May 2021 23:55:59 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Kestrel seventyfour <kestrelseventyfour@gmail.com>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: xts.c and block size inkonsistency? cannot pass generic driver
+ comparision tests
+Message-ID: <YJTkf0F5IZhqiXI5@sol.localdomain>
+References: <CAE9cyGRzwN8AMzdf=E+rBgrhkDxyV52h8t_cBWgiXscvX_2UtQ@mail.gmail.com>
 MIME-Version: 1.0
-From:   Kestrel seventyfour <kestrelseventyfour@gmail.com>
-Date:   Fri, 7 May 2021 08:12:36 +0200
-Message-ID: <CAE9cyGTQZXW-6YsmHu3mGSHonTztBszqaYske7PKgz0pWHxQKA@mail.gmail.com>
-Subject: or should block size for xts.c set to 1 instead of AES block size?
-To:     linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAE9cyGRzwN8AMzdf=E+rBgrhkDxyV52h8t_cBWgiXscvX_2UtQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Fri, May 07, 2021 at 07:57:01AM +0200, Kestrel seventyfour wrote:
+> Hi,
+> 
+> I have also added xts aes on combining the old hardware cbc algorithm
+> with an additional xor and the gfmul tweak handling. However, I
+> struggle to pass the comparision tests to the generic xts
+> implementation.
 
-one more thought, shouldn't the block size for generic xts set to 1 in
-order to reflect that any input size length is allowed to the
-algorithm?
+XTS can't be built on top of CBC, unless you only do 1 block at a time.
 
-Thanks.
+It can be built on top of ECB, which is what the template already does.
+
+Before getting too far into your questions, are you sure that what you're trying
+to do actually makes sense?
+
+- Eric
