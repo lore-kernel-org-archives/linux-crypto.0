@@ -2,159 +2,218 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03CADC43470
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 21:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E94D9C43460
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 22:09:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF276611ED
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 21:14:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA50C61400
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 22:09:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229524AbhEGVPj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 May 2021 17:15:39 -0400
-Received: from mail-ot1-f50.google.com ([209.85.210.50]:41561 "EHLO
-        mail-ot1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbhEGVPi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 May 2021 17:15:38 -0400
-Received: by mail-ot1-f50.google.com with SMTP id 36-20020a9d0ba70000b02902e0a0a8fe36so2774485oth.8;
-        Fri, 07 May 2021 14:14:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7veamalGpZ3JPYDEzgwvaohfG+qmQaU3ikes2gGH9cY=;
-        b=so6LJ1RBcGzpR+s3GBJ2bspHXUghZvAg8bmKPaIsOa7VtNbOzkDEcmO/jsRPzWHM7d
-         RXL4OfYKw7eEed+8cUyCxuXVGHgXHUgnyhXePc+MOyJSt83qZb/OxAZnXhWaDtwjDaf0
-         F1PEywpwxdDK0q1XZ1IA+VjzUtkI4cZbRygdEaU8ZqTgjFWkz77LumaLSa7rRawm5cmX
-         zDioXvOsesDO/U9jpUwGzU9I2oWKR/hFo33yKBR8WuirO4hWSFVzFB0OBz8IUWYImdJ/
-         iKMPjy3ytRqPCXq07ZG5fDU5HoqG+vcjFXwR8NfOrgZcsa+MyQi0mFzgfM05vWhKA2MY
-         PdxQ==
-X-Gm-Message-State: AOAM530VTkZ1a1F7jQGCLiz+ERkiHNEIXWA0ZLcPoww3f3+k6+1/UDaQ
-        0dnlmFOPpFji2yd976mieJJ73lBHEg==
-X-Google-Smtp-Source: ABdhPJws1frb5rRP1SOGObFpTLxgTjiWmAFCGMur/wBJeGgvCd26jhJ/gW4kSV1Zn+ctT9nDKHskEA==
-X-Received: by 2002:a9d:7593:: with SMTP id s19mr10190187otk.268.1620422076830;
-        Fri, 07 May 2021 14:14:36 -0700 (PDT)
-Received: from robh.at.kernel.org (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id c18sm128622otm.1.2021.05.07.14.14.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 May 2021 14:14:35 -0700 (PDT)
-Received: (nullmailer pid 2897610 invoked by uid 1000);
-        Fri, 07 May 2021 21:14:34 -0000
-Date:   Fri, 7 May 2021 16:14:34 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     linux-arm-msm@vger.kernel.org,
-        Thara Gopinath <thara.gopinath@linaro.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bhupesh.linux@gmail.com
-Subject: Re: [PATCH v2 00/17]  Enable Qualcomm Crypto Engine on sm8250
-Message-ID: <20210507211434.GA2879094@robh.at.kernel.org>
-References: <20210505213731.538612-1-bhupesh.sharma@linaro.org>
+        id S229780AbhEGWKF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 May 2021 18:10:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56016 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229713AbhEGWKE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 May 2021 18:10:04 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AA33B60BD3;
+        Fri,  7 May 2021 22:08:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1620425342;
+        bh=pLN/AlAGxiGZnqtkHzoskF1g1y+Og1zx70nNd/gvob8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=GZ13BdKpryifxhRwUeXYiDxMV+BWySTA7GY7/CWwvuCWkusUFDxkw2jKiOlfzjbCr
+         So4fZaGkAyPTwA8Q1TjLVhcTwgJc8xvHUXFTKFHcbAkEIqYdWcKh0axCM+T92qoOrQ
+         bkgNUSiGEeKqAdmwuN3qiVKoII2y7FbwOUX6mX301a6kiRL+VhsHKLQbMnh2CNRIHJ
+         HKxjre312EfivKKOz+Q2DN/Jdax+mgS6zOKiXtE7A5jQN2E+WeTOOh+m15wqAaIqSp
+         vmCijYogutqPzDP5KIogDPopYspUOizf4eB1toyhkfcE7uWw2BB6nwUsTEL9hofb0l
+         fr7hse6Wb3kJA==
+From:   Arnd Bergmann <arnd@kernel.org>
+To:     linux-arch@vger.kernel.org
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Vineet Gupta <vgupta@synopsys.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Eric Dumazet <edumazet@google.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ganapathi Bhat <ganapathi017@gmail.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        James Morris <jmorris@namei.org>, Jens Axboe <axboe@kernel.dk>,
+        John Johansen <john.johansen@canonical.com>,
+        Jonas Bonn <jonas@southpole.se>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>,
+        Rich Felker <dalias@libc.org>,
+        "Richard Russon (FlatCap)" <ldm@flatcap.org>,
+        Russell King <linux@armlinux.org.uk>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Sharvari Harisangam <sharvari.harisangam@nxp.com>,
+        Stafford Horne <shorne@gmail.com>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Xinming Hu <huxinming820@gmail.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-m68k@lists.linux-m68k.org, linux-crypto@vger.kernel.org,
+        openrisc@lists.librecores.org, linuxppc-dev@lists.ozlabs.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, linux-block@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: [RFC 0/12] Unify asm/unaligned.h around struct helper
+Date:   Sat,  8 May 2021 00:07:45 +0200
+Message-Id: <20210507220813.365382-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210505213731.538612-1-bhupesh.sharma@linaro.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 06, 2021 at 03:07:14AM +0530, Bhupesh Sharma wrote:
-> Changes since v1:
-> =================
-> - v1 can be seen here: https://lore.kernel.org/linux-arm-msm/20210310052503.3618486-1-bhupesh.sharma@linaro.org/ 
-> - v1 did not work well as reported earlier by Dmitry, so v2 contains the following
->   changes/fixes:
->   ~ Enable the interconnect path b/w BAM DMA and main memory first
->     before trying to access the BAM DMA registers.
->   ~ Enable the interconnect path b/w qce crytpo and main memory first
->     before trying to access the qce crypto registers.
->   ~ Make sure to document the required and optional properties for both
->     BAM DMA and qce crypto drivers.
->   ~ Add a few debug related print messages in case the qce crypto driver
->     passes or fails to probe.
->   ~ Convert the qce crypto driver probe to a defered one in case the BAM DMA
->     or the interconnect driver(s) (needed on specific Qualcomm parts) are not
->     yet probed.
-> 
-> Qualcomm crypto engine is also available on sm8250 SoC.
-> It supports hardware accelerated algorithms for encryption
-> and authentication. It also provides support for aes, des, 3des
-> encryption algorithms and sha1, sha256, hmac(sha1), hmac(sha256)
-> authentication algorithms.
-> 
-> Tested the enabled crypto algorithms with cryptsetup test utilities
-> on sm8250-mtp and RB5 board (see [1]).
-> 
-> While at it, also make a minor fix in 'sdm845.dtsi', to make
-> sure it confirms with the other .dtsi files which expose
-> crypto nodes on qcom SoCs.
-> 
-> Cc: Thara Gopinath <thara.gopinath@linaro.org>
-> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> Cc: Rob Herring <robh+dt@kernel.org>
-> Cc: Andy Gross <agross@kernel.org>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Stephen Boyd <sboyd@kernel.org>
-> Cc: Michael Turquette <mturquette@baylibre.com>
-> Cc: Vinod Koul <vkoul@kernel.org>
-> Cc: dmaengine@vger.kernel.org
-> Cc: linux-clk@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: devicetree@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: bhupesh.linux@gmail.com
->  
-> Bhupesh Sharma (14):
->   dt-bindings: qcom-bam: Add 'interconnects' & 'interconnect-names' to
->     optional properties
->   dt-bindings: qcom-bam: Add 'iommus' to required properties
->   dt-bindings: qcom-qce: Add 'iommus' to required properties
->   dt-bindings: qcom-qce: Add 'interconnects' and move 'clocks' to
->     optional properties
->   arm64/dts: qcom: sdm845: Use RPMH_CE_CLK macro directly
->   dt-bindings: crypto : Add new compatible strings for qcom-qce
+From: Arnd Bergmann <arnd@arndb.de>
 
-Please convert these bindings to schemas.
+The get_unaligned()/put_unaligned() helpers are traditionally architecture
+specific, with the two main variants being the "access-ok.h" version
+that assumes unaligned pointer accesses always work on a particular
+architecture, and the "le-struct.h" version that casts the data to a
+byte aligned type before dereferencing, for architectures that cannot
+always do unaligned accesses in hardware.
 
+Based on the discussion linked below, it appears that the access-ok
+version is not realiable on any architecture, but the struct version
+probably has no downsides. This series changes the code to use the
+same implementation on all architectures, addressing the few exceptions
+separately.
 
->   arm64/dts: qcom: Use new compatibles for crypto nodes
->   crypto: qce: Add new compatibles for qce crypto driver
->   crypto: qce: Print a failure msg in case probe() fails
->   crypto: qce: Convert the device found dev_dbg() to dev_info()
->   dma: qcom: bam_dma: Create a new header file for BAM DMA driver
->   crypto: qce: Defer probing if BAM dma is not yet initialized
->   crypto: qce: Defer probe in case interconnect is not yet initialized
->   arm64/dts: qcom: sm8250: Add dt entries to support crypto engine.
-> 
-> Thara Gopinath (3):
->   dma: qcom: bam_dma: Add support to initialize interconnect path
->   crypto: qce: core: Add support to initialize interconnect path
->   crypto: qce: core: Make clocks optional
-> 
->  .../devicetree/bindings/crypto/qcom-qce.txt   |  22 +-
->  .../devicetree/bindings/dma/qcom_bam_dma.txt  |   5 +
->  arch/arm64/boot/dts/qcom/ipq6018.dtsi         |   2 +-
->  arch/arm64/boot/dts/qcom/sdm845.dtsi          |   6 +-
->  arch/arm64/boot/dts/qcom/sm8250.dtsi          |  28 ++
->  drivers/crypto/qce/core.c                     | 112 +++++--
->  drivers/crypto/qce/core.h                     |   3 +
->  drivers/dma/qcom/bam_dma.c                    | 306 ++----------------
->  include/soc/qcom/bam_dma.h                    | 290 +++++++++++++++++
->  9 files changed, 457 insertions(+), 317 deletions(-)
->  create mode 100644 include/soc/qcom/bam_dma.h
-> 
-> -- 
-> 2.30.2
-> 
+I've pushed the patches to the asm-generic git tree for testing.
+
+	Arnd
+
+Link: https://lore.kernel.org/lkml/75d07691-1e4f-741f-9852-38c0b4f520bc@synopsys.com/
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100363
+Link: git://git.kernel.org/pub/scm/linux/kernel/git/arnd/asm-generic.git unaligned-rework
+
+Arnd Bergmann (12):
+  asm-generic: use asm-generic/unaligned.h for most architectures
+  openrisc: always use unaligned-struct header
+  sh: remove unaligned access for sh4a
+  m68k: select CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+  powerpc: use linux/unaligned/le_struct.h on LE power7
+  asm-generic: unaligned: remove byteshift helpers
+  asm-generic: unaligned always use struct helpers
+  partitions: msdos: fix one-byte get_unaligned()
+  apparmor: use get_unaligned() only for multi-byte words
+  mwifiex: re-fix for unaligned accesses
+  netpoll: avoid put_unaligned() on single character
+  asm-generic: simplify asm/unaligned.h
+
+ arch/alpha/include/asm/unaligned.h          |  12 --
+ arch/arm/include/asm/unaligned.h            |  27 ---
+ arch/ia64/include/asm/unaligned.h           |  12 --
+ arch/m68k/Kconfig                           |   1 +
+ arch/m68k/include/asm/unaligned.h           |  26 ---
+ arch/microblaze/include/asm/unaligned.h     |  27 ---
+ arch/mips/crypto/crc32-mips.c               |   2 +-
+ arch/openrisc/include/asm/unaligned.h       |  47 -----
+ arch/parisc/include/asm/unaligned.h         |   6 +-
+ arch/powerpc/include/asm/unaligned.h        |  22 ---
+ arch/sh/include/asm/unaligned-sh4a.h        | 199 --------------------
+ arch/sh/include/asm/unaligned.h             |  13 --
+ arch/sparc/include/asm/unaligned.h          |  11 --
+ arch/x86/include/asm/unaligned.h            |  15 --
+ arch/xtensa/include/asm/unaligned.h         |  29 ---
+ block/partitions/ldm.h                      |   2 +-
+ block/partitions/msdos.c                    |   2 +-
+ drivers/net/wireless/marvell/mwifiex/pcie.c |  10 +-
+ include/asm-generic/unaligned.h             | 149 ++++++++++++---
+ include/linux/unaligned/access_ok.h         |  68 -------
+ include/linux/unaligned/be_byteshift.h      |  71 -------
+ include/linux/unaligned/be_memmove.h        |  37 ----
+ include/linux/unaligned/be_struct.h         |  37 ----
+ include/linux/unaligned/generic.h           | 115 -----------
+ include/linux/unaligned/le_byteshift.h      |  71 -------
+ include/linux/unaligned/le_memmove.h        |  37 ----
+ include/linux/unaligned/le_struct.h         |  37 ----
+ include/linux/unaligned/memmove.h           |  46 -----
+ net/core/netpoll.c                          |   4 +-
+ security/apparmor/policy_unpack.c           |   2 +-
+ 30 files changed, 137 insertions(+), 1000 deletions(-)
+ delete mode 100644 arch/alpha/include/asm/unaligned.h
+ delete mode 100644 arch/arm/include/asm/unaligned.h
+ delete mode 100644 arch/ia64/include/asm/unaligned.h
+ delete mode 100644 arch/m68k/include/asm/unaligned.h
+ delete mode 100644 arch/microblaze/include/asm/unaligned.h
+ delete mode 100644 arch/openrisc/include/asm/unaligned.h
+ delete mode 100644 arch/powerpc/include/asm/unaligned.h
+ delete mode 100644 arch/sh/include/asm/unaligned-sh4a.h
+ delete mode 100644 arch/sh/include/asm/unaligned.h
+ delete mode 100644 arch/sparc/include/asm/unaligned.h
+ delete mode 100644 arch/x86/include/asm/unaligned.h
+ delete mode 100644 arch/xtensa/include/asm/unaligned.h
+ delete mode 100644 include/linux/unaligned/access_ok.h
+ delete mode 100644 include/linux/unaligned/be_byteshift.h
+ delete mode 100644 include/linux/unaligned/be_memmove.h
+ delete mode 100644 include/linux/unaligned/be_struct.h
+ delete mode 100644 include/linux/unaligned/generic.h
+ delete mode 100644 include/linux/unaligned/le_byteshift.h
+ delete mode 100644 include/linux/unaligned/le_memmove.h
+ delete mode 100644 include/linux/unaligned/le_struct.h
+ delete mode 100644 include/linux/unaligned/memmove.h
+
+Cc: Amitkumar Karwar <amitkarwar@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Ganapathi Bhat <ganapathi017@gmail.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: James Morris <jmorris@namei.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: John Johansen <john.johansen@canonical.com>
+Cc: Jonas Bonn <jonas@southpole.se>
+Cc: Kalle Valo <kvalo@codeaurora.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Rich Felker <dalias@libc.org>
+Cc: "Richard Russon (FlatCap)" <ldm@flatcap.org>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: "Serge E. Hallyn" <serge@hallyn.com>
+Cc: Sharvari Harisangam <sharvari.harisangam@nxp.com>
+Cc: Stafford Horne <shorne@gmail.com>
+Cc: Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Xinming Hu <huxinming820@gmail.com>
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-m68k@lists.linux-m68k.org
+Cc: linux-crypto@vger.kernel.org
+Cc: openrisc@lists.librecores.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-sh@vger.kernel.org
+Cc: sparclinux@vger.kernel.org
+Cc: linux-ntfs-dev@lists.sourceforge.net
+Cc: linux-block@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-arch@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org
+
+-- 
+2.29.2
+
