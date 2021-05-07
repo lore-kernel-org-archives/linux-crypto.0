@@ -3,76 +3,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E94D9C43460
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 22:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF67C43460
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 22:11:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CA50C61400
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 22:09:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDB23613D8
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 22:11:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229780AbhEGWKF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 May 2021 18:10:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56016 "EHLO mail.kernel.org"
+        id S229819AbhEGWM1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 May 2021 18:12:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58896 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229713AbhEGWKE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 May 2021 18:10:04 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AA33B60BD3;
-        Fri,  7 May 2021 22:08:54 +0000 (UTC)
+        id S229713AbhEGWM1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 May 2021 18:12:27 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C707761157;
+        Fri,  7 May 2021 22:11:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620425342;
-        bh=pLN/AlAGxiGZnqtkHzoskF1g1y+Og1zx70nNd/gvob8=;
-        h=From:To:Cc:Subject:Date:From;
-        b=GZ13BdKpryifxhRwUeXYiDxMV+BWySTA7GY7/CWwvuCWkusUFDxkw2jKiOlfzjbCr
-         So4fZaGkAyPTwA8Q1TjLVhcTwgJc8xvHUXFTKFHcbAkEIqYdWcKh0axCM+T92qoOrQ
-         bkgNUSiGEeKqAdmwuN3qiVKoII2y7FbwOUX6mX301a6kiRL+VhsHKLQbMnh2CNRIHJ
-         HKxjre312EfivKKOz+Q2DN/Jdax+mgS6zOKiXtE7A5jQN2E+WeTOOh+m15wqAaIqSp
-         vmCijYogutqPzDP5KIogDPopYspUOizf4eB1toyhkfcE7uWw2BB6nwUsTEL9hofb0l
-         fr7hse6Wb3kJA==
+        s=k20201202; t=1620425487;
+        bh=/1/UOIWYPn5kTgiSiyWVzm4Z1WNjAYR3GXsRt8d07s8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=mdxBHSXbZGh610xS0FF+osRCTW+mIxD8lfa3TIlAAzehIGr3CK7mjH6fFNaW8pnLT
+         VmBgHLsVEShQxz2UHsaO8ECgg+bc3252dQbGDjCr0tWRoLBON39UPYHlReqQk5t+HM
+         X87S8V8DLQEEpxJYV9ijxeeH0eDYfsAAIML+XMfK9PlCIenMHvlSBwVzxZOcQvsMr1
+         KnIvpczf0x2/RFGBXZL5dL/9r0UbNlVEiJZ7yJau3AcwdG0/zdc7iVWrfyY/gYO30x
+         Pj6efwHMiXv4gXWil/90RZwzdgseoPDH7p6QFMb9FNpytAdXJZuMtlDGcwBwQtguaY
+         JEuXigjLSgLoQ==
 From:   Arnd Bergmann <arnd@kernel.org>
 To:     linux-arch@vger.kernel.org
 Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         Vineet Gupta <vgupta@synopsys.com>,
         Arnd Bergmann <arnd@arndb.de>,
-        Amitkumar Karwar <amitkarwar@gmail.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Ganapathi Bhat <ganapathi017@gmail.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        James Morris <jmorris@namei.org>, Jens Axboe <axboe@kernel.dk>,
-        John Johansen <john.johansen@canonical.com>,
-        Jonas Bonn <jonas@southpole.se>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@samba.org>,
-        Rich Felker <dalias@libc.org>,
-        "Richard Russon (FlatCap)" <ldm@flatcap.org>,
         Russell King <linux@armlinux.org.uk>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Sharvari Harisangam <sharvari.harisangam@nxp.com>,
-        Stafford Horne <shorne@gmail.com>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        Xinming Hu <huxinming820@gmail.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-m68k@lists.linux-m68k.org, linux-crypto@vger.kernel.org,
-        openrisc@lists.librecores.org, linuxppc-dev@lists.ozlabs.org,
-        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, linux-block@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: [RFC 0/12] Unify asm/unaligned.h around struct helper
-Date:   Sat,  8 May 2021 00:07:45 +0200
-Message-Id: <20210507220813.365382-1-arnd@kernel.org>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-mips@vger.kernel.org
+Subject: [RFC 07/12] asm-generic: unaligned always use struct helpers
+Date:   Sat,  8 May 2021 00:07:52 +0200
+Message-Id: <20210507220813.365382-8-arnd@kernel.org>
 X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210507220813.365382-1-arnd@kernel.org>
+References: <20210507220813.365382-1-arnd@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -81,139 +56,198 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-The get_unaligned()/put_unaligned() helpers are traditionally architecture
-specific, with the two main variants being the "access-ok.h" version
-that assumes unaligned pointer accesses always work on a particular
-architecture, and the "le-struct.h" version that casts the data to a
-byte aligned type before dereferencing, for architectures that cannot
-always do unaligned accesses in hardware.
+As found by Vineet Gupta and Linus Torvalds, gcc has somewhat unexpected
+behavior when faced with overlapping unaligned pointers. The kernel's
+unaligned/access-ok.h header technically invokes undefined behavior
+that happens to usually work on the architectures using it, but if the
+compiler optimizes code based on the assumption that undefined behavior
+doesn't happen, it can create output that actually causes data corruption.
 
-Based on the discussion linked below, it appears that the access-ok
-version is not realiable on any architecture, but the struct version
-probably has no downsides. This series changes the code to use the
-same implementation on all architectures, addressing the few exceptions
-separately.
+A related problem was previously found on 32-bit ARMv7, where most
+instructions can be used on unaligned data, but 64-bit ldrd/strd causes
+an exception. The workaround was to always use the unaligned/le_struct.h
+helper instead of unaligned/access-ok.h, in commit 1cce91dfc8f7 ("ARM:
+8715/1: add a private asm/unaligned.h").
 
-I've pushed the patches to the asm-generic git tree for testing.
+The same solution should work on all other architectures as well, so
+remove the access-ok.h variant and use the other one unconditionally on
+all architectures, picking either the big-endian or little-endian version.
 
-	Arnd
+With this, the arm specific header can be removed as well, and the
+only file including linux/unaligned/access_ok.h gets moved to including
+the normal file.
 
-Link: https://lore.kernel.org/lkml/75d07691-1e4f-741f-9852-38c0b4f520bc@synopsys.com/
+Fortunately, this made almost no difference to the object code produced
+by gcc-11. On x86, s390, powerpc, and arc, the resulting binary appears
+to be identical to the previous version, while on arm64 and m68k there
+are minimal differences that looks like an optimization pass went into
+a different direction, usually using fewer stack spills on the new
+version.
+
 Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100363
-Link: git://git.kernel.org/pub/scm/linux/kernel/git/arnd/asm-generic.git unaligned-rework
-
-Arnd Bergmann (12):
-  asm-generic: use asm-generic/unaligned.h for most architectures
-  openrisc: always use unaligned-struct header
-  sh: remove unaligned access for sh4a
-  m68k: select CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
-  powerpc: use linux/unaligned/le_struct.h on LE power7
-  asm-generic: unaligned: remove byteshift helpers
-  asm-generic: unaligned always use struct helpers
-  partitions: msdos: fix one-byte get_unaligned()
-  apparmor: use get_unaligned() only for multi-byte words
-  mwifiex: re-fix for unaligned accesses
-  netpoll: avoid put_unaligned() on single character
-  asm-generic: simplify asm/unaligned.h
-
- arch/alpha/include/asm/unaligned.h          |  12 --
- arch/arm/include/asm/unaligned.h            |  27 ---
- arch/ia64/include/asm/unaligned.h           |  12 --
- arch/m68k/Kconfig                           |   1 +
- arch/m68k/include/asm/unaligned.h           |  26 ---
- arch/microblaze/include/asm/unaligned.h     |  27 ---
- arch/mips/crypto/crc32-mips.c               |   2 +-
- arch/openrisc/include/asm/unaligned.h       |  47 -----
- arch/parisc/include/asm/unaligned.h         |   6 +-
- arch/powerpc/include/asm/unaligned.h        |  22 ---
- arch/sh/include/asm/unaligned-sh4a.h        | 199 --------------------
- arch/sh/include/asm/unaligned.h             |  13 --
- arch/sparc/include/asm/unaligned.h          |  11 --
- arch/x86/include/asm/unaligned.h            |  15 --
- arch/xtensa/include/asm/unaligned.h         |  29 ---
- block/partitions/ldm.h                      |   2 +-
- block/partitions/msdos.c                    |   2 +-
- drivers/net/wireless/marvell/mwifiex/pcie.c |  10 +-
- include/asm-generic/unaligned.h             | 149 ++++++++++++---
- include/linux/unaligned/access_ok.h         |  68 -------
- include/linux/unaligned/be_byteshift.h      |  71 -------
- include/linux/unaligned/be_memmove.h        |  37 ----
- include/linux/unaligned/be_struct.h         |  37 ----
- include/linux/unaligned/generic.h           | 115 -----------
- include/linux/unaligned/le_byteshift.h      |  71 -------
- include/linux/unaligned/le_memmove.h        |  37 ----
- include/linux/unaligned/le_struct.h         |  37 ----
- include/linux/unaligned/memmove.h           |  46 -----
- net/core/netpoll.c                          |   4 +-
- security/apparmor/policy_unpack.c           |   2 +-
- 30 files changed, 137 insertions(+), 1000 deletions(-)
- delete mode 100644 arch/alpha/include/asm/unaligned.h
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ arch/arm/include/asm/unaligned.h    | 25 -----------
+ arch/mips/crypto/crc32-mips.c       |  2 +-
+ include/asm-generic/unaligned.h     | 13 +-----
+ include/linux/unaligned/access_ok.h | 68 -----------------------------
+ 4 files changed, 3 insertions(+), 105 deletions(-)
  delete mode 100644 arch/arm/include/asm/unaligned.h
- delete mode 100644 arch/ia64/include/asm/unaligned.h
- delete mode 100644 arch/m68k/include/asm/unaligned.h
- delete mode 100644 arch/microblaze/include/asm/unaligned.h
- delete mode 100644 arch/openrisc/include/asm/unaligned.h
- delete mode 100644 arch/powerpc/include/asm/unaligned.h
- delete mode 100644 arch/sh/include/asm/unaligned-sh4a.h
- delete mode 100644 arch/sh/include/asm/unaligned.h
- delete mode 100644 arch/sparc/include/asm/unaligned.h
- delete mode 100644 arch/x86/include/asm/unaligned.h
- delete mode 100644 arch/xtensa/include/asm/unaligned.h
  delete mode 100644 include/linux/unaligned/access_ok.h
- delete mode 100644 include/linux/unaligned/be_byteshift.h
- delete mode 100644 include/linux/unaligned/be_memmove.h
- delete mode 100644 include/linux/unaligned/be_struct.h
- delete mode 100644 include/linux/unaligned/generic.h
- delete mode 100644 include/linux/unaligned/le_byteshift.h
- delete mode 100644 include/linux/unaligned/le_memmove.h
- delete mode 100644 include/linux/unaligned/le_struct.h
- delete mode 100644 include/linux/unaligned/memmove.h
 
-Cc: Amitkumar Karwar <amitkarwar@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Ganapathi Bhat <ganapathi017@gmail.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: James Morris <jmorris@namei.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: John Johansen <john.johansen@canonical.com>
-Cc: Jonas Bonn <jonas@southpole.se>
-Cc: Kalle Valo <kvalo@codeaurora.org>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Rich Felker <dalias@libc.org>
-Cc: "Richard Russon (FlatCap)" <ldm@flatcap.org>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: "Serge E. Hallyn" <serge@hallyn.com>
-Cc: Sharvari Harisangam <sharvari.harisangam@nxp.com>
-Cc: Stafford Horne <shorne@gmail.com>
-Cc: Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Xinming Hu <huxinming820@gmail.com>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-Cc: x86@kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-m68k@lists.linux-m68k.org
-Cc: linux-crypto@vger.kernel.org
-Cc: openrisc@lists.librecores.org
-Cc: linuxppc-dev@lists.ozlabs.org
-Cc: linux-sh@vger.kernel.org
-Cc: sparclinux@vger.kernel.org
-Cc: linux-ntfs-dev@lists.sourceforge.net
-Cc: linux-block@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-arch@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org
-
+diff --git a/arch/arm/include/asm/unaligned.h b/arch/arm/include/asm/unaligned.h
+deleted file mode 100644
+index 3c5248fb4cdc..000000000000
+--- a/arch/arm/include/asm/unaligned.h
++++ /dev/null
+@@ -1,25 +0,0 @@
+-#ifndef __ASM_ARM_UNALIGNED_H
+-#define __ASM_ARM_UNALIGNED_H
+-
+-/*
+- * We generally want to set CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS on ARMv6+,
+- * but we don't want to use linux/unaligned/access_ok.h since that can lead
+- * to traps on unaligned stm/ldm or strd/ldrd.
+- */
+-#include <asm/byteorder.h>
+-
+-#if defined(__LITTLE_ENDIAN)
+-# include <linux/unaligned/le_struct.h>
+-# include <linux/unaligned/generic.h>
+-# define get_unaligned	__get_unaligned_le
+-# define put_unaligned	__put_unaligned_le
+-#elif defined(__BIG_ENDIAN)
+-# include <linux/unaligned/be_struct.h>
+-# include <linux/unaligned/generic.h>
+-# define get_unaligned	__get_unaligned_be
+-# define put_unaligned	__put_unaligned_be
+-#else
+-# error need to define endianess
+-#endif
+-
+-#endif /* __ASM_ARM_UNALIGNED_H */
+diff --git a/arch/mips/crypto/crc32-mips.c b/arch/mips/crypto/crc32-mips.c
+index faa88a6a74c0..0a03529cf317 100644
+--- a/arch/mips/crypto/crc32-mips.c
++++ b/arch/mips/crypto/crc32-mips.c
+@@ -8,13 +8,13 @@
+  * Copyright (C) 2018 MIPS Tech, LLC
+  */
+ 
+-#include <linux/unaligned/access_ok.h>
+ #include <linux/cpufeature.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
+ #include <asm/mipsregs.h>
++#include <asm/unaligned.h>
+ 
+ #include <crypto/internal/hash.h>
+ 
+diff --git a/include/asm-generic/unaligned.h b/include/asm-generic/unaligned.h
+index d79df721ae60..36bf03aaa674 100644
+--- a/include/asm-generic/unaligned.h
++++ b/include/asm-generic/unaligned.h
+@@ -8,22 +8,13 @@
+  */
+ #include <asm/byteorder.h>
+ 
+-/* Set by the arch if it can handle unaligned accesses in hardware. */
+-#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+-# include <linux/unaligned/access_ok.h>
+-#endif
+-
+ #if defined(__LITTLE_ENDIAN)
+-# ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+-#  include <linux/unaligned/le_struct.h>
+-# endif
++# include <linux/unaligned/le_struct.h>
+ # include <linux/unaligned/generic.h>
+ # define get_unaligned	__get_unaligned_le
+ # define put_unaligned	__put_unaligned_le
+ #elif defined(__BIG_ENDIAN)
+-# ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+-#  include <linux/unaligned/be_struct.h>
+-# endif
++# include <linux/unaligned/be_struct.h>
+ # include <linux/unaligned/generic.h>
+ # define get_unaligned	__get_unaligned_be
+ # define put_unaligned	__put_unaligned_be
+diff --git a/include/linux/unaligned/access_ok.h b/include/linux/unaligned/access_ok.h
+deleted file mode 100644
+index 167aa849c0ce..000000000000
+--- a/include/linux/unaligned/access_ok.h
++++ /dev/null
+@@ -1,68 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _LINUX_UNALIGNED_ACCESS_OK_H
+-#define _LINUX_UNALIGNED_ACCESS_OK_H
+-
+-#include <linux/kernel.h>
+-#include <asm/byteorder.h>
+-
+-static __always_inline u16 get_unaligned_le16(const void *p)
+-{
+-	return le16_to_cpup((__le16 *)p);
+-}
+-
+-static __always_inline u32 get_unaligned_le32(const void *p)
+-{
+-	return le32_to_cpup((__le32 *)p);
+-}
+-
+-static __always_inline u64 get_unaligned_le64(const void *p)
+-{
+-	return le64_to_cpup((__le64 *)p);
+-}
+-
+-static __always_inline u16 get_unaligned_be16(const void *p)
+-{
+-	return be16_to_cpup((__be16 *)p);
+-}
+-
+-static __always_inline u32 get_unaligned_be32(const void *p)
+-{
+-	return be32_to_cpup((__be32 *)p);
+-}
+-
+-static __always_inline u64 get_unaligned_be64(const void *p)
+-{
+-	return be64_to_cpup((__be64 *)p);
+-}
+-
+-static __always_inline void put_unaligned_le16(u16 val, void *p)
+-{
+-	*((__le16 *)p) = cpu_to_le16(val);
+-}
+-
+-static __always_inline void put_unaligned_le32(u32 val, void *p)
+-{
+-	*((__le32 *)p) = cpu_to_le32(val);
+-}
+-
+-static __always_inline void put_unaligned_le64(u64 val, void *p)
+-{
+-	*((__le64 *)p) = cpu_to_le64(val);
+-}
+-
+-static __always_inline void put_unaligned_be16(u16 val, void *p)
+-{
+-	*((__be16 *)p) = cpu_to_be16(val);
+-}
+-
+-static __always_inline void put_unaligned_be32(u32 val, void *p)
+-{
+-	*((__be32 *)p) = cpu_to_be32(val);
+-}
+-
+-static __always_inline void put_unaligned_be64(u64 val, void *p)
+-{
+-	*((__be64 *)p) = cpu_to_be64(val);
+-}
+-
+-#endif /* _LINUX_UNALIGNED_ACCESS_OK_H */
 -- 
 2.29.2
 
