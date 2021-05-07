@@ -2,63 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69106C433B4
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 06:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2610BC433ED
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 09:57:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 314DA61164
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 06:56:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1C3D613D6
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 09:57:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234525AbhEGG5B (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 May 2021 02:57:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56260 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232974AbhEGG5B (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 May 2021 02:57:01 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6EBDD61164;
-        Fri,  7 May 2021 06:56:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620370561;
-        bh=5oJ7/xRlvEPW7909i7SHjDtYMORz8Ni4G8mzMy6rqdw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jP+MW8zigZV/sd1L87PnhXbALvTo9d67vwc/XP60wvtfTdukLArbMJqtPQ9NMMfuw
-         gQhEaX1/iLx/h/SGYhVjwHvngJRUuLZNDyXZO41YN8TVqvoCrf9kTAcunhMmq+s6FQ
-         Q/COIVr7z/bWhzdSORg2RGz0Vg7bcGM8uFFvVuqOKqu/DbXjepdZLBTuHNR+rvymJb
-         qnqS1OX4TDCzJa1Ekf0SQB3AUUob3wAZ8jHhPexCXwHuoHg6cL6OOVXR5omjs1Ifcz
-         ZOq4SGExO1EQDL287phRdKfOVJc1exgmynd0CAlR+ms8+N3875lAR5FMER5rj9htRd
-         5kst/LuIwZoXA==
-Date:   Thu, 6 May 2021 23:55:59 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Kestrel seventyfour <kestrelseventyfour@gmail.com>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: xts.c and block size inkonsistency? cannot pass generic driver
- comparision tests
-Message-ID: <YJTkf0F5IZhqiXI5@sol.localdomain>
-References: <CAE9cyGRzwN8AMzdf=E+rBgrhkDxyV52h8t_cBWgiXscvX_2UtQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAE9cyGRzwN8AMzdf=E+rBgrhkDxyV52h8t_cBWgiXscvX_2UtQ@mail.gmail.com>
+        id S229621AbhEGJ6D (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 May 2021 05:58:03 -0400
+Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:57219 "EHLO
+        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229492AbhEGJ6C (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 May 2021 05:58:02 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UY2dZi5_1620381419;
+Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0UY2dZi5_1620381419)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 07 May 2021 17:57:00 +0800
+From:   Yang Li <yang.lee@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au
+Cc:     davem@davemloft.net, nathan@kernel.org, ndesaulniers@google.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
+        Yang Li <yang.lee@linux.alibaba.com>
+Subject: [PATCH] crypto: cavium/nitrox - Remove redundant initialization of 'sg'
+Date:   Fri,  7 May 2021 17:56:57 +0800
+Message-Id: <1620381417-44442-1-git-send-email-yang.lee@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 07, 2021 at 07:57:01AM +0200, Kestrel seventyfour wrote:
-> Hi,
-> 
-> I have also added xts aes on combining the old hardware cbc algorithm
-> with an additional xor and the gfmul tweak handling. However, I
-> struggle to pass the comparision tests to the generic xts
-> implementation.
+Pointer 'sg' is being initialized however this value is never
+read as 'sg' is assigned a same value in for_each_sg().
+Remove the redundant assignment.
 
-XTS can't be built on top of CBC, unless you only do 1 block at a time.
+Cleans up clang warning:
 
-It can be built on top of ECB, which is what the template already does.
+drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:161:22: warning: Value
+stored to 'sg' during its initialization is never read
+[clang-analyzer-deadcode.DeadStores]
 
-Before getting too far into your questions, are you sure that what you're trying
-to do actually makes sense?
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+---
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- Eric
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
+index df95ba2..bc35d4c 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
+@@ -159,7 +159,7 @@ static int dma_map_inbufs(struct nitrox_softreq *sr,
+ 			  struct se_crypto_request *req)
+ {
+ 	struct device *dev = DEV(sr->ndev);
+-	struct scatterlist *sg = req->src;
++	struct scatterlist *sg;
+ 	int i, nents, ret = 0;
+ 
+ 	nents = dma_map_sg(dev, req->src, sg_nents(req->src),
+-- 
+1.8.3.1
+
