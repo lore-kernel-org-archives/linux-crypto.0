@@ -7,105 +7,91 @@ X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9E3CC43461
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 05:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4989EC433ED
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 05:57:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCE8060FE9
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 05:41:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2385F613E8
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 May 2021 05:57:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233669AbhEGFms (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 May 2021 01:42:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51688 "EHLO
+        id S234400AbhEGF6e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 May 2021 01:58:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232868AbhEGFmq (ORCPT
+        with ESMTP id S234382AbhEGF6a (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 May 2021 01:42:46 -0400
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F041DC0613ED
-        for <linux-crypto@vger.kernel.org>; Thu,  6 May 2021 22:41:46 -0700 (PDT)
-Received: by mail-qt1-x82e.google.com with SMTP id j11so5840880qtn.12
-        for <linux-crypto@vger.kernel.org>; Thu, 06 May 2021 22:41:46 -0700 (PDT)
+        Fri, 7 May 2021 01:58:30 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1830C061574
+        for <linux-crypto@vger.kernel.org>; Thu,  6 May 2021 22:57:12 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id i67so7422719qkc.4
+        for <linux-crypto@vger.kernel.org>; Thu, 06 May 2021 22:57:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=G2kOry2o6vDINWYKN+kItqoO3L4K4kcs80lC7IG5WJU=;
-        b=bRNCVPdRqAocCuyFxBXJy2AsS3Qe16WxtrKO74QvMjIBi0wx/v0BGOcsSVuCwagmwO
-         mEpXlMTxD1HFdaXZU/T1fxWDz699KuxZayEaQSrFIDZLj8Ead5DAxXB9JfrfRt3f2cRc
-         rNLBYP7Y77arlJFye/ae+jdYD4IXyPTUZ0cUY0OXf49OBpBiYq76ArNyvrHpbghR9Rhg
-         qOhCTh4uIpwLhVXQOSAPeJwuful8xOMAXw5jI01ZZNM/dq+XJLqGGQ63QLXI42+uDEF0
-         pU9ZzPvgxK4IDacYhC1eWthFdl4lsGumueuhlWco99oFSq6f1ccZdXPiqKhDsysYq+Jx
-         PGCg==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=u9p/hcj120BpkW4kUwOeQkNGvLx4nAXkS2ikZg09zjg=;
+        b=sTaHQ1B7k1EgneBBm6KSnNkhpxsgRTLJ3lBWP6r+zHo/uQIF9HytOIS0yAiuDsGkui
+         XNz1TmErmNWYuLQxW1vc5G7inQMDv6jdDyOtdzNzS/InBsCjfKm9EoIvufpbo1SOM6/U
+         vdA2FmEwOPZQ/fPVpyI9VeL2xh+oHewRO9hHJCMb53XgpvdaSD8kYKckxZygoXXDFPQd
+         aFoovB/k3qcyS9Fgix7SKSJhYj4Ifl6NRPgcoOEMduJmljf662L9i+oAsAk0S+CYlrVD
+         dNOu2t58eL5/4Ci1BstUcG2PfXBJ4ioq7Vq1DtSjyqdDk0dBX8gRskSUxc0T2FDxmwf3
+         OW5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=G2kOry2o6vDINWYKN+kItqoO3L4K4kcs80lC7IG5WJU=;
-        b=lWC7Qy9tZY3Wz12h5ikmUH6Zrt5hxJC1m0OwHdZj+YBvQhXzpCtSXm482w0WcpjIK/
-         j8ETFmb7JwYirQeFaumi/TCALz4ggPG1HU2Sg/GP6UahZWhD9zrsKn0ubNnumUxTPwA6
-         R7+VpldsOHSnXF7innXrBqnzkMldUXkMt+N7ix9FVLTMYSwaGMhDP6IVqF9rA+qWrZRS
-         eKnfs9deQK1mtzcfR7/EEZdvIlNXL+T6NDrpdnk4Gwi587C6xUmYhsw0u+rQ6j9Qpzh7
-         DsIqx79b3kbGn2jPZpuaefrF5p5N8+/Miaaid2FTOfBCaGtgfVTY1WvmG5+BnDrGck7k
-         SbEg==
-X-Gm-Message-State: AOAM531Eq7IvL3GT2lbTm2lyVE70m0RvOMkMajoX3z1MVYYbE7MQCJAK
-        LOG2s2UAZpvNNwRk+OddbfzlsiVhGiqiiXMcfDJffnVWdDY=
-X-Google-Smtp-Source: ABdhPJxKzVdU7bSErDYXXQjwSjZWZmXz9hyH9G8BChwcxOvNxbG1yz0nOahlJ4/XXLydJCJ11FAw2oQ3ssxn5ejbvYM=
-X-Received: by 2002:ac8:714c:: with SMTP id h12mr8066884qtp.221.1620366106260;
- Thu, 06 May 2021 22:41:46 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=u9p/hcj120BpkW4kUwOeQkNGvLx4nAXkS2ikZg09zjg=;
+        b=i0/pR/QdVu5eNypP6ipGZytUcvI8ttYq2u/Vu5W8rl7exfCnMJmzqlKBkPB4Ls4oGp
+         AR9UeqGgH0b2GD20SF360r9RkTFzjEQfZQYD7/Tw0X3MRRNuH/jz5CTxAgiehkatkWWz
+         cM4dWqyE9x8nLc2zeSGwpAfkl5TT6OT8iIR0zpusIKAAu3d+lhljX33QJ0VHKYOmQ6Wn
+         sWTbEck316BiNS7WpajQ4efTvJ0p3EyLfWt6ITtx6YyM53MRIIhVYh0oPGzCfC6NMCzO
+         y8V202NJNmxt3symTm0tOgfpQvHukfwnWP6Z5BK47tW0GpsHyAlMxuRxuKcaxJ3KX+2D
+         gnQw==
+X-Gm-Message-State: AOAM530lXtlvsNYOqoE2TnDMVEBNuu7MS8wX9D1VX6sUrBYERpsNCJRT
+        8rqWKB0H8oc+ohzMZT5J2UUiQtivFKwddUAEsl0v9S4QKVOONw==
+X-Google-Smtp-Source: ABdhPJwFpH3/BliswBv2ABr2E/3PRA1DzDsEMvuG0EjxJ+GLl0kjnk4QVQ9OIQJGLj4fqxRuh5BGN/FtJ6PVI22cMmY=
+X-Received: by 2002:a37:62cf:: with SMTP id w198mr7783930qkb.126.1620367032109;
+ Thu, 06 May 2021 22:57:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAE9cyGSX4nwRrDbazih2FDp1_8e+wGTD17euyCJyitXWOignMw@mail.gmail.com>
- <YJF708LCG0l8WBaD@gmail.com>
-In-Reply-To: <YJF708LCG0l8WBaD@gmail.com>
 From:   Kestrel seventyfour <kestrelseventyfour@gmail.com>
-Date:   Fri, 7 May 2021 07:41:35 +0200
-Message-ID: <CAE9cyGToQUPuU3GfZK1SSTEUts3Ot1x7nAW1QdttvfVNDQqBoQ@mail.gmail.com>
-Subject: Re: cannot pass split cryptomgr tests for aes ctr
+Date:   Fri, 7 May 2021 07:57:01 +0200
+Message-ID: <CAE9cyGRzwN8AMzdf=E+rBgrhkDxyV52h8t_cBWgiXscvX_2UtQ@mail.gmail.com>
+Subject: xts.c and block size inkonsistency? cannot pass generic driver
+ comparision tests
 To:     linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+Hi,
 
-thanks for the info. Walksize did the trick returning the chunks.
+I have also added xts aes on combining the old hardware cbc algorithm
+with an additional xor and the gfmul tweak handling. However, I
+struggle to pass the comparision tests to the generic xts
+implementation.
 
+In detail, xts.c exposes the block size of the underlying algo, which
+is AES_BLOCK_SIZE. But it does not use the walk functions, because
+they do not work if the input is not dividable by blocksize. Now the
+xts.c has its own implementation, but I wonder, if that implementation
+should accept input sizes other than dividable by block size?
+
+Actually if xts would only accept multiples of block size, the cipher
+text stealing would be obsolete. If I use walksize=1, I get the issues
+with the unaligned or splitted scatterlists.
+
+I really would prefer using walk just returning the remaining bytes
+instead of moving out with -EINVAL:
+https://elixir.bootlin.com/linux/latest/source/crypto/skcipher.c#L360
+Is that intentional? For me its not logical to allow any input size to
+xts, but the walk functions return errors if there are inputs not a
+multiple of block size. Furthermore, its a waste of resources to
+process all previous walks and then return an error on the last walk?!
+
+I would expect xts to work in a similar way as ecb and ignore extra bytes?
+https://elixir.bootlin.com/linux/latest/source/crypto/ecb.c#L36
+
+Or is the advice simply, implement xts to work as in xts.c without
+using walks and not worry about the inkonsistencies?
+
+Thanks,
 D. Kestrel
-
-Am Di., 4. Mai 2021 um 18:52 Uhr schrieb Eric Biggers <ebiggers@kernel.org>:
->
-> On Mon, May 03, 2021 at 09:56:40AM +0200, Kestrel seventyfour wrote:
-> > Hi,
-> >
-> > I am trying to update the old ifxdeu driver to pass the crypto mgr tests.
-> > However, I continously fail to pass the split tests and I wonder what to do.
-> >
-> > For example, I successfully pass the test vector 0 here:
-> > https://elixir.bootlin.com/linux/latest/source/crypto/testmgr.h#L16654
-> > if there is no split.
-> >
-> > But if the text "Single block msg" is split into two 8 byte blocks
-> > (single even aligned splits), which end up as separate skcipher walks
-> > in the driver, the second block is wrong and does not compare
-> > correctly, to what is hardcoded in testmgr.h. Same if I try it with
-> > online aes-ctr encoders in the web.
-> > I have tried doing the xor manually with the aes encoded iv, but I get
-> > the same result as the hardware and if I use the next last iv, I still
-> > do not get the second 8 bytes that are hardcoded in cryptomgr.h.
-> >
-> > Can someone shed a light on it?
-> > Is it valid to compare a crypto result that was done on a single walk
-> > with 16byte with two separate walks on the 8 byte splits (of the
-> > original 16)? Is the cryptomgr test on the split tests expecting that
-> > I concat the two walks into a single one?
-> > If yes, how to do that on the uneven splits with separations like 15
-> > 16 5 byte sequences, etc., fill up the walk up to full block size and
-> > spill over into the next walk?
-> >
->
-> The split test cases expect the same output (same sequence of bytes) as the
-> non-split test cases.  The only difference is how the data is split up into
-> scatterlist elements.  Yes, that means that a single 16-byte block of the
-> keystream may need to be XOR'ed with data from multiple scatterlist elements.
-> Take a look at how other drivers handle this.
->
-> - Eric
