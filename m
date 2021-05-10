@@ -1,77 +1,231 @@
 Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.0 required=3.0 tests=BAYES_50,DKIMWL_BL,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9EC9C43462
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 14:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC1CC433ED
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 17:00:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B02BA61490
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 14:59:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5412061490
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 17:00:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233648AbhEJPAd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 May 2021 11:00:33 -0400
-Received: from flippiebeckerswealth.xyz ([62.173.147.206]:35070 "EHLO
-        host.flippiebeckerswealth.xyz" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235800AbhEJO6H (ORCPT
+        id S231432AbhEJRBR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 May 2021 13:01:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22926 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232170AbhEJRAy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 May 2021 10:58:07 -0400
-Received: from flippiebeckerswealth.xyz (ec2-3-142-218-249.us-east-2.compute.amazonaws.com [3.142.218.249])
-        by host.flippiebeckerswealth.xyz (Postfix) with ESMTPA id 515771E01C3
-        for <linux-crypto@vger.kernel.org>; Mon, 10 May 2021 17:06:49 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippiebeckerswealth.xyz 515771E01C3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippiebeckerswealth.xyz; s=default; t=1620655609;
-        bh=Lxx5rGQCX/MQzrwE9epz1Mb5yPYRqDyEupWj6GReobo=;
-        h=Reply-To:From:To:Subject:Date:From;
-        b=TT/vBFVYpdheYGhNDtObRPOnwka3Ozuoitl3BevdE9omVJr2VIspoosXyTouqaf0R
-         mbuZPNRrIrPdKm4Af3RTO45rx+aXonKN03eKYS4XyqmaWZEYLt7R/WIR9y2YZ4VEkR
-         3qnSE7zzJB9T+dCHkiLCdRvZVb5Vo4p6W4QqzCt8=
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippiebeckerswealth.xyz 515771E01C3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippiebeckerswealth.xyz; s=default; t=1620655609;
-        bh=Lxx5rGQCX/MQzrwE9epz1Mb5yPYRqDyEupWj6GReobo=;
-        h=Reply-To:From:To:Subject:Date:From;
-        b=TT/vBFVYpdheYGhNDtObRPOnwka3Ozuoitl3BevdE9omVJr2VIspoosXyTouqaf0R
-         mbuZPNRrIrPdKm4Af3RTO45rx+aXonKN03eKYS4XyqmaWZEYLt7R/WIR9y2YZ4VEkR
-         3qnSE7zzJB9T+dCHkiLCdRvZVb5Vo4p6W4QqzCt8=
-Reply-To: cpavlides@flippiebeckerwealthservices.com
-From:   Chris Pavlides <cpavlides@flippiebeckerswealth.xyz>
-To:     linux-crypto@vger.kernel.org
-Subject: Personal
-Date:   10 May 2021 14:06:49 +0000
-Message-ID: <20210510140649.9D4C178DDB12CDAB@flippiebeckerswealth.xyz>
-Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 10 May 2021 13:00:54 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14AGWua4136907;
+        Mon, 10 May 2021 12:59:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=1J3o0ph0nYvWYFdBL4TxTPBj+S4EYoDcGQlVU4GLd7A=;
+ b=jBN5eKxkrqIVhq82CuRgk/9SDG2o/8k+Ff1wBr02gt4Eqw3p2f2U+nyVG2SD2265+2GI
+ 705jVAVz7/LZvkal8Wwzwqq3fDtGR6saZ9HJodnZ6nimSCGf0gET3t6Sa93SLnD4eitk
+ cG7ADCLDEBCYfAm+HLlYlraMzrd9nE5JLhQhsZPIJPfaPs4DrAlh0xiJMEvuxBXrfZNb
+ Lac5BiwRc+6mTBlj4XWJzX17VZ+YSlwv1QPJOikilUgB6jNOrT1wflTfTj3qhIPTHGev
+ g+JSeulWDOwZ47lIVTYkhBWSglUAmY/YWuJ8ESE9FhMducCGvrJoz9vWdcuRRV1cYMTB Nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38f8curqch-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 May 2021 12:59:39 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14AGXJxK138256;
+        Mon, 10 May 2021 12:59:39 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38f8curqc8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 May 2021 12:59:39 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14AGrtPI013775;
+        Mon, 10 May 2021 16:59:37 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma02wdc.us.ibm.com with ESMTP id 38dj997s1r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 May 2021 16:59:37 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14AGxbXs14156142
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 May 2021 16:59:37 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 03C9BBE056;
+        Mon, 10 May 2021 16:59:37 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 99D4DBE051;
+        Mon, 10 May 2021 16:59:35 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.80.194.217])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon, 10 May 2021 16:59:35 +0000 (GMT)
+Message-ID: <4c49eeee852256ef5bdd264d5e99a41c9bd03b07.camel@linux.ibm.com>
+Subject: Re: [V3 PATCH 01/16] powerpc/powernv/vas: Rename
+ register/unregister functions
+From:   Haren Myneni <haren@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au
+Cc:     haren@us.ibm.com, hbabu@us.ibm.com
+Date:   Mon, 10 May 2021 09:59:33 -0700
+In-Reply-To: <1620622742.tr9lqg4vzz.astroid@bobo.none>
+References: <a910e5bd3f3398b4bd430b25a856500735b993c3.camel@linux.ibm.com>
+         <86bae80a92b8465d663f72e7fadc1fa3671e8a4f.camel@linux.ibm.com>
+         <1620622742.tr9lqg4vzz.astroid@bobo.none>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Lg76D9DRngSat3MfdMyipnvLhrvsr7bb
+X-Proofpoint-ORIG-GUID: dvVaq8dbkmIc2J17kIBxtrgEzcPaquDL
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-10_09:2021-05-10,2021-05-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 suspectscore=0 lowpriorityscore=0 spamscore=0
+ priorityscore=1501 bulkscore=0 impostorscore=0 phishscore=0 clxscore=1015
+ mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105100113
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello there,
+On Mon, 2021-05-10 at 15:10 +1000, Nicholas Piggin wrote:
+> Excerpts from Haren Myneni's message of April 18, 2021 7:00 am:
+> > powerNV and pseries drivers register / unregister to the
+> > corresponding
+> > VAS code separately. So rename powerNV VAS API register/unregister
+> > functions.
+> 
+> The pseries VAS driver will have different calls for registering a
+> coprocessor driver, you mean?
+> 
+> It certainly looks the same 
+> 
+> (from patch 13)
+> 	ret = vas_register_api_pseries(THIS_MODULE, VAS_COP_TYPE_GZIP,
+> 				       "nx-gzip");
+> 
+> So I guess it's just a matter of the driver being different enough
+> that 
+> there is no benefit to making this call common (and branching to
+> pseries
+> or powernv dynamically).
 
-I hope this message finds you in good spirits especially during=20
-this challenging time of coronavirus pandemic. I hope you and=20
-your family are well and keeping safe. Anyway, I am Chris=20
-Pavlides, a broker working with Flippiebecker Wealth. I got your=20
-contact (along with few other contacts) through an online=20
-business directory and I thought I should contact you to see if=20
-you are interested in this opportunity. I am contacting you=20
-because one of my high profile clients is interested in investing=20
-abroad and has asked me to look for individuals and companies=20
-with interesting business ideas and projects that he can invest=20
-in. He wants to invest a substantial amount of asset abroad.
+Thanks for your review and comments on all patches. 
 
-Please kindly respond back to this email if you are interested in=20
-this opportunity. Once I receive your response, I will give you=20
-more details and we can plan a strategy that will be beneficial=20
-to all parties.
+Yes, we have separate drivers nx-common-powernv/nx-common-pseries for
+powerNV and pseries. 
+API registeration patch is:
+- driver calls platform specific API
+   vas_register_api_powernv/pseries
+- Platform specific code calls common API with its vas_user_win_ops
+   vas_register_coproc_api()
 
-Best regards
+> 
+> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+> 
+> > Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+> > ---
+> >  arch/powerpc/include/asm/vas.h           |  6 +++---
+> >  arch/powerpc/platforms/powernv/vas-api.c | 10 +++++-----
+> >  drivers/crypto/nx/nx-common-powernv.c    |  6 +++---
+> >  3 files changed, 11 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arch/powerpc/include/asm/vas.h
+> > b/arch/powerpc/include/asm/vas.h
+> > index e33f80b0ea81..41f73fae7ab8 100644
+> > --- a/arch/powerpc/include/asm/vas.h
+> > +++ b/arch/powerpc/include/asm/vas.h
+> > @@ -170,8 +170,8 @@ int vas_paste_crb(struct vas_window *win, int
+> > offset, bool re);
+> >   * Only NX GZIP coprocessor type is supported now, but this API
+> > can be
+> >   * used for others in future.
+> >   */
+> > -int vas_register_coproc_api(struct module *mod, enum vas_cop_type
+> > cop_type,
+> > -				const char *name);
+> > -void vas_unregister_coproc_api(void);
+> > +int vas_register_api_powernv(struct module *mod, enum vas_cop_type
+> > cop_type,
+> > +			     const char *name);
+> > +void vas_unregister_api_powernv(void);
+> >  
+> >  #endif /* __ASM_POWERPC_VAS_H */
+> > diff --git a/arch/powerpc/platforms/powernv/vas-api.c
+> > b/arch/powerpc/platforms/powernv/vas-api.c
+> > index 98ed5d8c5441..72d8ce39e56c 100644
+> > --- a/arch/powerpc/platforms/powernv/vas-api.c
+> > +++ b/arch/powerpc/platforms/powernv/vas-api.c
+> > @@ -207,8 +207,8 @@ static struct file_operations coproc_fops = {
+> >   * Supporting only nx-gzip coprocessor type now, but this API code
+> >   * extended to other coprocessor types later.
+> >   */
+> > -int vas_register_coproc_api(struct module *mod, enum vas_cop_type
+> > cop_type,
+> > -				const char *name)
+> > +int vas_register_api_powernv(struct module *mod, enum vas_cop_type
+> > cop_type,
+> > +			     const char *name)
+> >  {
+> >  	int rc = -EINVAL;
+> >  	dev_t devno;
+> > @@ -262,9 +262,9 @@ int vas_register_coproc_api(struct module *mod,
+> > enum vas_cop_type cop_type,
+> >  	unregister_chrdev_region(coproc_device.devt, 1);
+> >  	return rc;
+> >  }
+> > -EXPORT_SYMBOL_GPL(vas_register_coproc_api);
+> > +EXPORT_SYMBOL_GPL(vas_register_api_powernv);
+> >  
+> > -void vas_unregister_coproc_api(void)
+> > +void vas_unregister_api_powernv(void)
+> >  {
+> >  	dev_t devno;
+> >  
+> > @@ -275,4 +275,4 @@ void vas_unregister_coproc_api(void)
+> >  	class_destroy(coproc_device.class);
+> >  	unregister_chrdev_region(coproc_device.devt, 1);
+> >  }
+> > -EXPORT_SYMBOL_GPL(vas_unregister_coproc_api);
+> > +EXPORT_SYMBOL_GPL(vas_unregister_api_powernv);
+> > diff --git a/drivers/crypto/nx/nx-common-powernv.c
+> > b/drivers/crypto/nx/nx-common-powernv.c
+> > index 13c65deda8e9..88d728415bb2 100644
+> > --- a/drivers/crypto/nx/nx-common-powernv.c
+> > +++ b/drivers/crypto/nx/nx-common-powernv.c
+> > @@ -1090,8 +1090,8 @@ static __init int
+> > nx_compress_powernv_init(void)
+> >  		 * normal FIFO priority is assigned for userspace.
+> >  		 * 842 compression is supported only in kernel.
+> >  		 */
+> > -		ret = vas_register_coproc_api(THIS_MODULE,
+> > VAS_COP_TYPE_GZIP,
+> > -						"nx-gzip");
+> > +		ret = vas_register_api_powernv(THIS_MODULE,
+> > VAS_COP_TYPE_GZIP,
+> > +					       "nx-gzip");
+> >  
+> >  		/*
+> >  		 * GZIP is not supported in kernel right now.
+> > @@ -1127,7 +1127,7 @@ static void __exit
+> > nx_compress_powernv_exit(void)
+> >  	 * use. So delete this API use for GZIP engine.
+> >  	 */
+> >  	if (!nx842_ct)
+> > -		vas_unregister_coproc_api();
+> > +		vas_unregister_api_powernv();
+> >  
+> >  	crypto_unregister_alg(&nx842_powernv_alg);
+> >  
+> > -- 
+> > 2.18.2
+> > 
+> > 
+> > 
 
-C Pavlides
-Flippiebecker Wealth
