@@ -7,27 +7,27 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F377C4360C
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 10:45:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82CC5C43461
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 11:00:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D3F36199E
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 10:45:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 424586199D
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 11:00:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231771AbhEJKqq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 May 2021 06:46:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52048 "EHLO mail.kernel.org"
+        id S233279AbhEJK6r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 May 2021 06:58:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52164 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233157AbhEJKpO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 May 2021 06:45:14 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 401A761922;
-        Mon, 10 May 2021 10:35:04 +0000 (UTC)
+        id S234609AbhEJK4m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 May 2021 06:56:42 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 107F261996;
+        Mon, 10 May 2021 10:47:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1620642904;
-        bh=aVs0ptwrKAuYYrOXZ0AJejYscH6XWpUiinncldzBGv4=;
+        s=korg; t=1620643652;
+        bh=asomZ+kRFPRoSB5TGczuJaRN0Bm74d6NDyfTAA8isgw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=mCgT77+bQGG3XQjBALAjfRyusqyVXPX/z3VRT3KkqJCyaYyYZqz5N48AhEbPPUjMR
-         TjW2ieiAb1XSwzozpWAxNWULhAnsBEgZbaqzymGjyH1GOMdFbO7kiZXknfeThM49i/
-         XfkU1day744DKgkswebsW6wrLlomH6FKMLwQGvHI=
+        b=CLERZuIo5NoP/ufQVnIHV+Z9hNdTXqY5Zg/9+54T/uty/0epB96RZCLw2N08N+vDT
+         MNKmN4R+fxx/wcrXpB3fM/KLhd+XxvTRoQghRVDBqDACMoTh3QAo2HiGwXwVLxg+Ce
+         Pu/zQvEtNBQyC+agLYbXHYi+z1UCH3F2nhn3iAX4=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -38,12 +38,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Eric Biggers <ebiggers@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10 082/299] random: initialize ChaCha20 constants with correct endianness
-Date:   Mon, 10 May 2021 12:17:59 +0200
-Message-Id: <20210510102007.633969883@linuxfoundation.org>
+Subject: [PATCH 5.11 095/342] random: initialize ChaCha20 constants with correct endianness
+Date:   Mon, 10 May 2021 12:18:05 +0200
+Message-Id: <20210510102013.247209825@linuxfoundation.org>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210510102004.821838356@linuxfoundation.org>
-References: <20210510102004.821838356@linuxfoundation.org>
+In-Reply-To: <20210510102010.096403571@linuxfoundation.org>
+References: <20210510102010.096403571@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -76,7 +76,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index f462b9d2f5a5..340ad21491e2 100644
+index a894c0559a8c..ffec899f4450 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
 @@ -819,7 +819,7 @@ static bool __init crng_init_try_arch_early(struct crng_state *crng)
