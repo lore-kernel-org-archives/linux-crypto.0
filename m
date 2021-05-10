@@ -1,70 +1,77 @@
 Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=BAYES_00,BODY_SINGLE_WORD,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.0 required=3.0 tests=BAYES_50,DKIMWL_BL,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08866C43461
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 14:39:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9EC9C43462
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 14:59:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7EAD61278
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 14:39:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B02BA61490
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 May 2021 14:59:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242561AbhEJOkr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 May 2021 10:40:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36842 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245667AbhEJOid (ORCPT
+        id S233648AbhEJPAd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 May 2021 11:00:33 -0400
+Received: from flippiebeckerswealth.xyz ([62.173.147.206]:35070 "EHLO
+        host.flippiebeckerswealth.xyz" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235800AbhEJO6H (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 May 2021 10:38:33 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F774C061238;
-        Mon, 10 May 2021 07:00:51 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id t20so7666071qtx.8;
-        Mon, 10 May 2021 07:00:51 -0700 (PDT)
+        Mon, 10 May 2021 10:58:07 -0400
+Received: from flippiebeckerswealth.xyz (ec2-3-142-218-249.us-east-2.compute.amazonaws.com [3.142.218.249])
+        by host.flippiebeckerswealth.xyz (Postfix) with ESMTPA id 515771E01C3
+        for <linux-crypto@vger.kernel.org>; Mon, 10 May 2021 17:06:49 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippiebeckerswealth.xyz 515771E01C3
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=wjunn4+x2QEs4HRrQcozT7INn2DM0lGSHIZkmkDz3T0=;
-        b=L/ovaQGsIQJ16RcBfR6b/a0uw1v8AuIn7fQ9eh4YsdSSKvDW4CkAjvTB/dGpjznghX
-         L6lqqe+Kk27OTwdCf5fqsCSYKCCvyNzjzN9aiIHsKJHBeR7fNrjGs7yHW7aNgkvz0jj3
-         2Hz07jB83RuuTOK0PhpCj+/L95e8wZN0INkyMFHz3yI1uGZ2iuQZ155bQk8hz5CDmYMy
-         mAKvWtMz2MxKZfQB2ixw/N0ydujFB/OUGVn5AxrTTELxqskFotx9R2X0D47OMzDdM4rx
-         o83MVzN0/LS6fc5WGdsq+8nmxXaXakboOJmLEvl4lKLaJYqdsf1toqitIi0UCwEU1TvF
-         5mwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=wjunn4+x2QEs4HRrQcozT7INn2DM0lGSHIZkmkDz3T0=;
-        b=VIlCq8g19SysQ8JfhD4fTrtj8PMz8ZMM15Jy+3Bv6LrEGWBP5PYlT56bcci1gKiFTd
-         tvPmXGt1z7pa5TNuIQLybEuhNF4G7XIIjObisF90lrIVGpV1W49staeDSMhG52LNFIQ0
-         h7Waiip3fCU4IUiWD/Wx370nTzqaclFRWsQflAEOSVV25lAdoPlCsj6WCHPollcf6ofL
-         69aOpuc3Fwh/k+Io80yQrsK6PKDi1zYzzVpZmRgBR4yselDpyz7Kqm8IRIJC2qbopF/i
-         huLCnSVuw4FMNgWU55254qHUoJu4FmA8npp3vKTerloDwpfsd9ABDDbJzSc9nihh71V1
-         hHtw==
-X-Gm-Message-State: AOAM533uECgE81YC/TPMXyz/bw78hXT45DcHzwbpAT6PqWk4HsRbjo1L
-        HTUjxyFmL0N7SoI3op/PzLZUrh1yIE8eYmdG9IqWzbBQRn0=
-X-Google-Smtp-Source: ABdhPJwh5JX+bwkggx6HLDsx//+0oTOuuzpBvGpN6VQvRf6Z6sNFlcsbQacasqJW84jKbyHf62u2uu3iQdIRPdfCXYY=
-X-Received: by 2002:ac8:6a01:: with SMTP id t1mr19600561qtr.47.1620655250595;
- Mon, 10 May 2021 07:00:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210505213731.538612-1-bhupesh.sharma@linaro.org> <20210505213731.538612-17-bhupesh.sharma@linaro.org>
-In-Reply-To: <20210505213731.538612-17-bhupesh.sharma@linaro.org>
-From:   Rafael Reinoldes <rafareino@gmail.com>
-Date:   Mon, 10 May 2021 10:58:49 -0300
-Message-ID: <CAOZB5GH1r+T9xMuO9vi-R_h_T5q0jvOZ2As0MUeESPxM1MHcLw@mail.gmail.com>
-Subject: Re: [PATCH v2 16/17] crypto: qce: Defer probe in case interconnect is
- not yet initialized
-To:     linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, dmaengine@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        d=flippiebeckerswealth.xyz; s=default; t=1620655609;
+        bh=Lxx5rGQCX/MQzrwE9epz1Mb5yPYRqDyEupWj6GReobo=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=TT/vBFVYpdheYGhNDtObRPOnwka3Ozuoitl3BevdE9omVJr2VIspoosXyTouqaf0R
+         mbuZPNRrIrPdKm4Af3RTO45rx+aXonKN03eKYS4XyqmaWZEYLt7R/WIR9y2YZ4VEkR
+         3qnSE7zzJB9T+dCHkiLCdRvZVb5Vo4p6W4QqzCt8=
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippiebeckerswealth.xyz 515771E01C3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=flippiebeckerswealth.xyz; s=default; t=1620655609;
+        bh=Lxx5rGQCX/MQzrwE9epz1Mb5yPYRqDyEupWj6GReobo=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=TT/vBFVYpdheYGhNDtObRPOnwka3Ozuoitl3BevdE9omVJr2VIspoosXyTouqaf0R
+         mbuZPNRrIrPdKm4Af3RTO45rx+aXonKN03eKYS4XyqmaWZEYLt7R/WIR9y2YZ4VEkR
+         3qnSE7zzJB9T+dCHkiLCdRvZVb5Vo4p6W4QqzCt8=
+Reply-To: cpavlides@flippiebeckerwealthservices.com
+From:   Chris Pavlides <cpavlides@flippiebeckerswealth.xyz>
+To:     linux-crypto@vger.kernel.org
+Subject: Personal
+Date:   10 May 2021 14:06:49 +0000
+Message-ID: <20210510140649.9D4C178DDB12CDAB@flippiebeckerswealth.xyz>
+Mime-Version: 1.0
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-unsubscribe
+Hello there,
+
+I hope this message finds you in good spirits especially during=20
+this challenging time of coronavirus pandemic. I hope you and=20
+your family are well and keeping safe. Anyway, I am Chris=20
+Pavlides, a broker working with Flippiebecker Wealth. I got your=20
+contact (along with few other contacts) through an online=20
+business directory and I thought I should contact you to see if=20
+you are interested in this opportunity. I am contacting you=20
+because one of my high profile clients is interested in investing=20
+abroad and has asked me to look for individuals and companies=20
+with interesting business ideas and projects that he can invest=20
+in. He wants to invest a substantial amount of asset abroad.
+
+Please kindly respond back to this email if you are interested in=20
+this opportunity. Once I receive your response, I will give you=20
+more details and we can plan a strategy that will be beneficial=20
+to all parties.
+
+Best regards
+
+C Pavlides
+Flippiebecker Wealth
