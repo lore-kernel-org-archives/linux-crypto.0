@@ -2,155 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DATE_IN_PAST_24_48,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E36C4363F
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 21:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E822FC43140
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 22:23:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 430C86143A
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 21:08:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5BDF61419
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 22:23:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243238AbhELVII (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 May 2021 17:08:08 -0400
-Received: from mail-oo1-f46.google.com ([209.85.161.46]:34510 "EHLO
-        mail-oo1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385221AbhELUHV (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 May 2021 16:07:21 -0400
-Received: by mail-oo1-f46.google.com with SMTP id i8-20020a4aa1080000b0290201edd785e7so5222353ool.1;
-        Wed, 12 May 2021 13:06:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jo6Dz46BspHZ5QKYcvfVJgbPf+bpiO7/FDHcJz0o1TI=;
-        b=uXtOda6Qec9S90mCBHObhMdMpTp6fURNfmMK5WKDhJLp68KqDRy+X2SfcxN5OkccrA
-         mXhFlrlKFb0HHfq6JxbQUzG0PehhANpB0l/k9rIV4n5fyXA980WFQ4lvZazyFZCmiM6H
-         ngEo+ndBb/B44RoJhKHg7EnN/WPPeLvJ/LPRvszizHmvy5E5EpTjAadfCJYv2MfpsP3Z
-         +fj0gKxuUfSL7H/G3wUFRblzigD8EutH+SuwLDRQ0uRHQNC8TIgn/c0oDzK/fb/XT6kC
-         GLxEbUlxRTWEAghtZHDLTcAFkKF9NdukvZ9nmd+4DonLc+cpeZvPy9/cO6QlH2a++M6P
-         9SzA==
-X-Gm-Message-State: AOAM533o5ktTp4tHcBF4hUaVjY1QBiNc8Qeb0pvOyZN4fsVexmTO4JfH
-        90csMkwTrikd1To632/lGg==
-X-Google-Smtp-Source: ABdhPJxDFSQVxLClkJTg+b6TFZAy9l8JrP9W5GwVfM62sQew6UGxQEpVQ1d+msGrVdPqxIQ5m7el5A==
-X-Received: by 2002:a4a:a3c3:: with SMTP id t3mr18346160ool.50.1620849972488;
-        Wed, 12 May 2021 13:06:12 -0700 (PDT)
-Received: from robh.at.kernel.org (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id r10sm192474oic.4.2021.05.12.13.06.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 May 2021 13:06:11 -0700 (PDT)
-Received: (nullmailer pid 2214054 invoked by uid 1000);
-        Tue, 11 May 2021 16:16:48 -0000
-Date:   Tue, 11 May 2021 11:16:48 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Imre Kaloz <kaloz@openwrt.org>,
-        Krzysztof Halasa <khalasa@piap.pl>,
-        Arnd Bergmann <arnd@arndb.de>, devicetree@vger.kernel.org
-Subject: Re: [PATCH 2/3] crypto: ixp4xx: Add DT bindings
-Message-ID: <20210511161648.GA2209918@robh.at.kernel.org>
-References: <20210510213634.600866-1-linus.walleij@linaro.org>
- <20210510213634.600866-2-linus.walleij@linaro.org>
+        id S231204AbhELWUz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 May 2021 18:20:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49204 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1387602AbhELVZa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 May 2021 17:25:30 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1C88E613E6
+        for <linux-crypto@vger.kernel.org>; Wed, 12 May 2021 21:24:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1620854661;
+        bh=dpMpwE/+0xsrNEBWSrB3F2tfcXWYhcQJFd7Iugffe4g=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=TI6i2pnrjixOQ0EjSlyqNi776kSVB26wcmAwfSxkf8IAT8tjTGYETNOmQmVmIOozX
+         uElNWaC2sIgq0uigB5eT9PK8DK5BlntjroQBeTrYDvFZighVUHMzI+pgjcrW6vnRfe
+         zZ7avYbmJc5WDFYGTgU0KarRQRGSapYh6LcQALob12EIRLzIf8ZZJxG5DUpz6kyWZI
+         luOwi9Bh/G6PbEEuKz6M3QEvh1k30qsZvjrcXNbjLRPmyVrNfN23pJozx0+UMq6hu2
+         2uY2gXVqyEqafogjKgEXn2MURj5cOj6RcEMU2DYvGFde3MC+BkfQL8UZq5ZiBpR7Pc
+         g5gfo45WZU7CQ==
+Received: by mail-ot1-f54.google.com with SMTP id g15-20020a9d128f0000b02902a7d7a7bb6eso21872159otg.9
+        for <linux-crypto@vger.kernel.org>; Wed, 12 May 2021 14:24:21 -0700 (PDT)
+X-Gm-Message-State: AOAM530koBdD/2PT2Wk9PgcHo7giVugBPq223w/tGZusQOrHqeaGpJHd
+        StNyiG5JXCUHh5+hLR55I6pbonJMdo8WvmPy9Jg=
+X-Google-Smtp-Source: ABdhPJz1crGpZ2a/Nstlgsq6mSlP9NuQT6jz7eZ0TUXDgP1IP3cYsDpVaNhe/4teRWkhB86fF1AT2AoSZl5bA/LQBAQ=
+X-Received: by 2002:a9d:7cd8:: with SMTP id r24mr20523715otn.90.1620854660323;
+ Wed, 12 May 2021 14:24:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210510213634.600866-2-linus.walleij@linaro.org>
+References: <20210512184439.8778-1-ardb@kernel.org> <20210512184439.8778-2-ardb@kernel.org>
+ <YJw01Z3oxwY5Sfpa@gmail.com>
+In-Reply-To: <YJw01Z3oxwY5Sfpa@gmail.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 12 May 2021 23:24:09 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHofDrzEs4qc8VNCLpyL-Hc4PSg-JXKTckJvfD6qoK78Q@mail.gmail.com>
+Message-ID: <CAMj1kXHofDrzEs4qc8VNCLpyL-Hc4PSg-JXKTckJvfD6qoK78Q@mail.gmail.com>
+Subject: Re: [PATCH v3 1/7] crypto: handle zero sized AEAD inputs correctly
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Will Deacon <will@kernel.org>,
+        Android Kernel Team <kernel-team@android.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 10, 2021 at 11:36:33PM +0200, Linus Walleij wrote:
-> This adds device tree bindings for the ixp4xx crypto engine.
-> 
-> Cc: devicetree@vger.kernel.org
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
-> Herbert, David: This can be applied separately once we are
-> happy with the bindings, alternatively it can be merged
-> with the support code into ARM SoC.
-> ---
->  .../bindings/crypto/intel,ixp4xx-crypto.yaml  | 59 +++++++++++++++++++
->  1 file changed, 59 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/intel,ixp4xx-crypto.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/intel,ixp4xx-crypto.yaml b/Documentation/devicetree/bindings/crypto/intel,ixp4xx-crypto.yaml
-> new file mode 100644
-> index 000000000000..28d75f4f9a76
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/intel,ixp4xx-crypto.yaml
-> @@ -0,0 +1,59 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +# Copyright 2018 Linaro Ltd.
-> +%YAML 1.2
-> +---
-> +$id: "http://devicetree.org/schemas/crypto/intel,ixp4xx-crypto.yaml#"
-> +$schema: "http://devicetree.org/meta-schemas/core.yaml#"
-> +
-> +title: Intel IXP4xx cryptographic engine
-> +
-> +maintainers:
-> +  - Linus Walleij <linus.walleij@linaro.org>
-> +
-> +description: |
-> +  The Intel IXP4xx cryptographic engine makes use of the IXP4xx NPE
-> +  (Network Processing Engine). Since it is not a device on its own
-> +  it is defined as a subnode of the NPE, if crypto support is
-> +  available on the platform.
-> +
-> +properties:
-> +  compatible:
-> +    const: intel,ixp4xx-crypto
-> +
-> +  intel,npe-handle:
-> +    $ref: '/schemas/types.yaml#/definitions/phandle-array'
-> +    maxItems: 1
-> +    description: phandle to the NPE this ethernet instance is using
-> +      and the instance to use in the second cell
-> +
-> +  queue-rx:
-> +    $ref: '/schemas/types.yaml#/definitions/phandle-array'
-> +    maxItems: 1
-> +    description: phandle to the RX queue on the NPE
-> +
-> +  queue-txready:
-> +    $ref: '/schemas/types.yaml#/definitions/phandle-array'
-> +    maxItems: 1
-> +    description: phandle to the TX READY queue on the NPE
-> +
-> +required:
-> +  - compatible
-> +  - intel,npe-handle
-> +  - queue-rx
-> +  - queue-txready
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    npe: npe@c8006000 {
-> +         compatible = "intel,ixp4xx-network-processing-engine";
-> +         reg = <0xc8006000 0x1000>, <0xc8007000 0x1000>, <0xc8008000 0x1000>;
-> +
-> +         crypto {
+On Wed, 12 May 2021 at 22:04, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Wed, May 12, 2021 at 08:44:33PM +0200, Ard Biesheuvel wrote:
+> > There are corner cases where skcipher_walk_aead_[en|de]crypt() may be
+> > invoked with a zero sized input, which is not rejected by the walker
+> > code, but results in the skcipher_walk structure to not be fully
+> > initialized. This will leave stale values in its page and buffer
+> > members, which will be subsequently passed to kfree() or free_page() by
+> > skcipher_walk_done(), resulting in a crash if those routines fail to
+> > identify them as in valid inputs.
+> >
+> > Fix this by setting page and buffer to NULL even if the size of the
+> > input is zero.
+> >
+> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+>
+> Is this fixing an existing bug, or only a bug that got exposed by this patchset?
+> It would be helpful to make that clear (and if it fixes an existing bug, include
+> a Fixes tag).
+>
 
-The parent schema needs to define 'crypto' and have a ref to this 
-schema. I'd put the example there rather than piecemeal.
+The CCM change in the last patch uncovers this issue, and I don't
+think it is likely we would ever hit it anywhere else.
 
-> +             compatible = "intel,ixp4xx-crypto";
-> +             intel,npe-handle = <&npe 2>;
+> Also, skcipher_walk_virt() doesn't set page and buffer to NULL, as it is
+> currently expected that skcipher_walk_done() is only called when
+> walk.nbytes != 0.  Is something different for skcipher_walk_aead_[en|de]crypt()?
+>
 
-A bit redundant to have a phandle to the parent.
+The difference is that zero sized inputs never make sense for
+skciphers, but for AEADs, they could occur, even if they are uncommon
+(the AEAD could have associated data only, and no plain/ciphertext)
 
-> +             queue-rx = <&qmgr 30>;
-> +             queue-txready = <&qmgr 29>;
-> +         };
-> +    };
-> -- 
-> 2.30.2
-> 
+But in the general case, I would assume that skcipher_walk_done() can
+be called on a walk that was successfully started with
+skcipher_walk_virt() without crashing, even if the scatterlist has
+size zero, so perhaps we should fix that one as well.
