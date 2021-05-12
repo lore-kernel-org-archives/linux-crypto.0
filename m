@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19CF1C43462
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46855C43470
 	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 21:08:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D75BC61439
+	by mail.kernel.org (Postfix) with ESMTP id 00628613D6
 	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 21:08:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233130AbhELVHv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 May 2021 17:07:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56230 "EHLO mail.kernel.org"
+        id S235199AbhELVH4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 May 2021 17:07:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56248 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S245259AbhELSqO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S245329AbhELSqO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 12 May 2021 14:46:14 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6572F6142D;
-        Wed, 12 May 2021 18:44:50 +0000 (UTC)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7A9BD6142E;
+        Wed, 12 May 2021 18:44:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620845092;
-        bh=SmBuw5/my1vcoFAJsK9Niemsp+zYVD3mIjyRu1+S350=;
+        s=k20201202; t=1620845094;
+        bh=S3KKKNKzTWfeXIZjH0pC8hheu1idhy5KiXXoGJ8ax6A=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GXHvPcUMlEhYbcijXWwlUHQgce2c9Ib9yTDzmBL4YG7dnOovASp0AjESwfNexi3QE
-         USE/L1kR0UTx8lM3Jtp1NXrWqfv6DAsUPxwUpe198I8lhPrPo0nzOk/B1r7J330X3l
-         n2WCj86XfHHqndgPDjzSanXjYetPIDpRg3TXSpgvN6OXXRGejRyYvO4//TwOfO0eBO
-         NCuO+BD1cVikdBMVEXgaiFI62j0AxqbWu13dOzhtabaj/jPGHQ87oW5Qu89lVkla6a
-         FCIWhp2EFhbXAL6LcJTvpT4L80eqrLB6kxzmRQvZLbQM0HhzRrt8aLSHAY6rxARqUl
-         /NwdIq++nIMRQ==
+        b=IAH9DYe598YTA6Eqec62ROVfNXx+Du1DET628X2aY9f2qU1GO+eZd3Bc9zWHUJhEY
+         qPNcmNz4EIN503+xcDynjxWEE9o/cQndJTRbkN9LHoxizLFaALIrHbuL2WHl/VU8R4
+         XmRG4RO8LWp0F8bfFkKi8KKqZg+BerGxAI+lJyTyACz7juUWkL4blyTcHh9Ce+d/M/
+         GdCgU8DjGq5yWXCf1iG8TsTLLepNTCf1lx7Vf3iIw4qxUHfJNmYvzHz+kUDUkQRniW
+         HHtwfP0u2NpJfb3F8S9xn7ryVVO4xH/ntMTfgIolc8X6aAZuo1y4LL5Hb54KrCaXw3
+         bZTWibp345lVA==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     linux-arm-kernel@lists.infradead.org, ebiggers@kernel.org,
         herbert@gondor.apana.org.au, will@kernel.org,
         kernel-team@android.com, Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH v3 3/7] crypto: skcipher - disallow en/decrypt for non-task or non-softirq context
-Date:   Wed, 12 May 2021 20:44:35 +0200
-Message-Id: <20210512184439.8778-4-ardb@kernel.org>
+Subject: [PATCH v3 4/7] crypto: arm64/gcm-aes-ce - remove non-SIMD fallback path
+Date:   Wed, 12 May 2021 20:44:36 +0200
+Message-Id: <20210512184439.8778-5-ardb@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210512184439.8778-1-ardb@kernel.org>
 References: <20210512184439.8778-1-ardb@kernel.org>
@@ -48,44 +48,264 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to ensure that kernel mode SIMD routines will not need a scalar
-fallback if they run with softirqs disabled, disallow any use of the
-skcipher encrypt and decrypt routines from outside of task or softirq
-context.
+Now that kernel mode SIMD is guaranteed to be available when executing
+in task or softirq context, we no longer need scalar fallbacks to use
+when the NEON is unavailable. So get rid of them.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- crypto/skcipher.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ arch/arm64/crypto/ghash-ce-glue.c | 209 +++++---------------
+ 1 file changed, 51 insertions(+), 158 deletions(-)
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 93fdacf49697..9bce5350008b 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -625,6 +625,11 @@ int crypto_skcipher_encrypt(struct skcipher_request *req)
- 	unsigned int cryptlen = req->cryptlen;
- 	int ret;
+diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
+index 720cd3a58da3..15794fe21a0b 100644
+--- a/arch/arm64/crypto/ghash-ce-glue.c
++++ b/arch/arm64/crypto/ghash-ce-glue.c
+@@ -362,84 +362,36 @@ static int gcm_encrypt(struct aead_request *req)
  
-+	if (!(alg->cra_flags & CRYPTO_ALG_ASYNC) &&
-+	    WARN_ONCE(!in_task() && !in_serving_softirq(),
-+		      "synchronous call from invalid context\n"))
-+		return -EBUSY;
-+
- 	crypto_stats_get(alg);
- 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		ret = -ENOKEY;
-@@ -642,6 +647,11 @@ int crypto_skcipher_decrypt(struct skcipher_request *req)
- 	unsigned int cryptlen = req->cryptlen;
- 	int ret;
+ 	err = skcipher_walk_aead_encrypt(&walk, req, false);
  
-+	if (!(alg->cra_flags & CRYPTO_ALG_ASYNC) &&
-+	    WARN_ONCE(!in_task() && !in_serving_softirq(),
-+		      "synchronous call from invalid context\n"))
-+		return -EBUSY;
+-	if (likely(crypto_simd_usable())) {
+-		do {
+-			const u8 *src = walk.src.virt.addr;
+-			u8 *dst = walk.dst.virt.addr;
+-			int nbytes = walk.nbytes;
+-
+-			tag = (u8 *)&lengths;
+-
+-			if (unlikely(nbytes > 0 && nbytes < AES_BLOCK_SIZE)) {
+-				src = dst = memcpy(buf + sizeof(buf) - nbytes,
+-						   src, nbytes);
+-			} else if (nbytes < walk.total) {
+-				nbytes &= ~(AES_BLOCK_SIZE - 1);
+-				tag = NULL;
+-			}
+-
+-			kernel_neon_begin();
+-			pmull_gcm_encrypt(nbytes, dst, src, ctx->ghash_key.h,
+-					  dg, iv, ctx->aes_key.key_enc, nrounds,
+-					  tag);
+-			kernel_neon_end();
+-
+-			if (unlikely(!nbytes))
+-				break;
+-
+-			if (unlikely(nbytes > 0 && nbytes < AES_BLOCK_SIZE))
+-				memcpy(walk.dst.virt.addr,
+-				       buf + sizeof(buf) - nbytes, nbytes);
+-
+-			err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
+-		} while (walk.nbytes);
+-	} else {
+-		while (walk.nbytes >= AES_BLOCK_SIZE) {
+-			int blocks = walk.nbytes / AES_BLOCK_SIZE;
+-			const u8 *src = walk.src.virt.addr;
+-			u8 *dst = walk.dst.virt.addr;
+-			int remaining = blocks;
+-
+-			do {
+-				aes_encrypt(&ctx->aes_key, buf, iv);
+-				crypto_xor_cpy(dst, src, buf, AES_BLOCK_SIZE);
+-				crypto_inc(iv, AES_BLOCK_SIZE);
+-
+-				dst += AES_BLOCK_SIZE;
+-				src += AES_BLOCK_SIZE;
+-			} while (--remaining > 0);
+-
+-			ghash_do_update(blocks, dg, walk.dst.virt.addr,
+-					&ctx->ghash_key, NULL);
+-
+-			err = skcipher_walk_done(&walk,
+-						 walk.nbytes % AES_BLOCK_SIZE);
+-		}
+-
+-		/* handle the tail */
+-		if (walk.nbytes) {
+-			aes_encrypt(&ctx->aes_key, buf, iv);
++	do {
++		const u8 *src = walk.src.virt.addr;
++		u8 *dst = walk.dst.virt.addr;
++		int nbytes = walk.nbytes;
+ 
+-			crypto_xor_cpy(walk.dst.virt.addr, walk.src.virt.addr,
+-				       buf, walk.nbytes);
++		tag = (u8 *)&lengths;
+ 
+-			memcpy(buf, walk.dst.virt.addr, walk.nbytes);
+-			memset(buf + walk.nbytes, 0, sizeof(buf) - walk.nbytes);
++		if (unlikely(nbytes > 0 && nbytes < AES_BLOCK_SIZE)) {
++			src = dst = memcpy(buf + sizeof(buf) - nbytes,
++					   src, nbytes);
++		} else if (nbytes < walk.total) {
++			nbytes &= ~(AES_BLOCK_SIZE - 1);
++			tag = NULL;
+ 		}
+ 
+-		tag = (u8 *)&lengths;
+-		ghash_do_update(1, dg, tag, &ctx->ghash_key,
+-				walk.nbytes ? buf : NULL);
++		kernel_neon_begin();
++		pmull_gcm_encrypt(nbytes, dst, src, ctx->ghash_key.h,
++				  dg, iv, ctx->aes_key.key_enc, nrounds,
++				  tag);
++		kernel_neon_end();
+ 
+-		if (walk.nbytes)
+-			err = skcipher_walk_done(&walk, 0);
++		if (unlikely(!nbytes))
++			break;
+ 
+-		put_unaligned_be64(dg[1], tag);
+-		put_unaligned_be64(dg[0], tag + 8);
+-		put_unaligned_be32(1, iv + GCM_IV_SIZE);
+-		aes_encrypt(&ctx->aes_key, iv, iv);
+-		crypto_xor(tag, iv, AES_BLOCK_SIZE);
+-	}
++		if (unlikely(nbytes > 0 && nbytes < AES_BLOCK_SIZE))
++			memcpy(walk.dst.virt.addr,
++			       buf + sizeof(buf) - nbytes, nbytes);
 +
- 	crypto_stats_get(alg);
- 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		ret = -ENOKEY;
++		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
++	} while (walk.nbytes);
+ 
+ 	if (err)
+ 		return err;
+@@ -464,6 +416,7 @@ static int gcm_decrypt(struct aead_request *req)
+ 	u64 dg[2] = {};
+ 	be128 lengths;
+ 	u8 *tag;
++	int ret;
+ 	int err;
+ 
+ 	lengths.a = cpu_to_be64(req->assoclen * 8);
+@@ -481,101 +434,41 @@ static int gcm_decrypt(struct aead_request *req)
+ 
+ 	err = skcipher_walk_aead_decrypt(&walk, req, false);
+ 
+-	if (likely(crypto_simd_usable())) {
+-		int ret;
+-
+-		do {
+-			const u8 *src = walk.src.virt.addr;
+-			u8 *dst = walk.dst.virt.addr;
+-			int nbytes = walk.nbytes;
+-
+-			tag = (u8 *)&lengths;
+-
+-			if (unlikely(nbytes > 0 && nbytes < AES_BLOCK_SIZE)) {
+-				src = dst = memcpy(buf + sizeof(buf) - nbytes,
+-						   src, nbytes);
+-			} else if (nbytes < walk.total) {
+-				nbytes &= ~(AES_BLOCK_SIZE - 1);
+-				tag = NULL;
+-			}
+-
+-			kernel_neon_begin();
+-			ret = pmull_gcm_decrypt(nbytes, dst, src,
+-						ctx->ghash_key.h,
+-						dg, iv, ctx->aes_key.key_enc,
+-						nrounds, tag, otag, authsize);
+-			kernel_neon_end();
+-
+-			if (unlikely(!nbytes))
+-				break;
+-
+-			if (unlikely(nbytes > 0 && nbytes < AES_BLOCK_SIZE))
+-				memcpy(walk.dst.virt.addr,
+-				       buf + sizeof(buf) - nbytes, nbytes);
+-
+-			err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
+-		} while (walk.nbytes);
+-
+-		if (err)
+-			return err;
+-		if (ret)
+-			return -EBADMSG;
+-	} else {
+-		while (walk.nbytes >= AES_BLOCK_SIZE) {
+-			int blocks = walk.nbytes / AES_BLOCK_SIZE;
+-			const u8 *src = walk.src.virt.addr;
+-			u8 *dst = walk.dst.virt.addr;
+-
+-			ghash_do_update(blocks, dg, walk.src.virt.addr,
+-					&ctx->ghash_key, NULL);
+-
+-			do {
+-				aes_encrypt(&ctx->aes_key, buf, iv);
+-				crypto_xor_cpy(dst, src, buf, AES_BLOCK_SIZE);
+-				crypto_inc(iv, AES_BLOCK_SIZE);
+-
+-				dst += AES_BLOCK_SIZE;
+-				src += AES_BLOCK_SIZE;
+-			} while (--blocks > 0);
++	do {
++		const u8 *src = walk.src.virt.addr;
++		u8 *dst = walk.dst.virt.addr;
++		int nbytes = walk.nbytes;
+ 
+-			err = skcipher_walk_done(&walk,
+-						 walk.nbytes % AES_BLOCK_SIZE);
+-		}
++		tag = (u8 *)&lengths;
+ 
+-		/* handle the tail */
+-		if (walk.nbytes) {
+-			memcpy(buf, walk.src.virt.addr, walk.nbytes);
+-			memset(buf + walk.nbytes, 0, sizeof(buf) - walk.nbytes);
++		if (unlikely(nbytes > 0 && nbytes < AES_BLOCK_SIZE)) {
++			src = dst = memcpy(buf + sizeof(buf) - nbytes,
++					   src, nbytes);
++		} else if (nbytes < walk.total) {
++			nbytes &= ~(AES_BLOCK_SIZE - 1);
++			tag = NULL;
+ 		}
+ 
+-		tag = (u8 *)&lengths;
+-		ghash_do_update(1, dg, tag, &ctx->ghash_key,
+-				walk.nbytes ? buf : NULL);
+-
+-		if (walk.nbytes) {
+-			aes_encrypt(&ctx->aes_key, buf, iv);
++		kernel_neon_begin();
++		ret = pmull_gcm_decrypt(nbytes, dst, src, ctx->ghash_key.h,
++					dg, iv, ctx->aes_key.key_enc,
++					nrounds, tag, otag, authsize);
++		kernel_neon_end();
+ 
+-			crypto_xor_cpy(walk.dst.virt.addr, walk.src.virt.addr,
+-				       buf, walk.nbytes);
++		if (unlikely(!nbytes))
++			break;
+ 
+-			err = skcipher_walk_done(&walk, 0);
+-		}
++		if (unlikely(nbytes > 0 && nbytes < AES_BLOCK_SIZE))
++			memcpy(walk.dst.virt.addr,
++			       buf + sizeof(buf) - nbytes, nbytes);
+ 
+-		if (err)
+-			return err;
++		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
++	} while (walk.nbytes);
+ 
+-		put_unaligned_be64(dg[1], tag);
+-		put_unaligned_be64(dg[0], tag + 8);
+-		put_unaligned_be32(1, iv + GCM_IV_SIZE);
+-		aes_encrypt(&ctx->aes_key, iv, iv);
+-		crypto_xor(tag, iv, AES_BLOCK_SIZE);
++	if (err)
++		return err;
+ 
+-		if (crypto_memneq(tag, otag, authsize)) {
+-			memzero_explicit(tag, AES_BLOCK_SIZE);
+-			return -EBADMSG;
+-		}
+-	}
+-	return 0;
++	return ret ? -EBADMSG : 0;
+ }
+ 
+ static struct aead_alg gcm_aes_alg = {
 -- 
 2.20.1
 
