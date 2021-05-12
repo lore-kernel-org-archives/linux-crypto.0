@@ -2,150 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9231C433ED
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 06:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A893C433B4
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 07:04:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A06161465
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 06:43:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E3EF6188B
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 07:04:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230211AbhELGoY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 May 2021 02:44:24 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3730 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230129AbhELGoV (ORCPT
+        id S229627AbhELHFY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 May 2021 03:05:24 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:2636 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229626AbhELHFY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 May 2021 02:44:21 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Fg4sF0CF9zmftm;
-        Wed, 12 May 2021 14:39:45 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 12 May 2021 14:43:00 +0800
-From:   Hui Tang <tanghui20@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
-        <wangzhou1@hisilicon.com>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH 3/3] crypto: ecdh - add test suite for NIST P384
-Date:   Wed, 12 May 2021 14:40:02 +0800
-Message-ID: <1620801602-49287-4-git-send-email-tanghui20@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1620801602-49287-1-git-send-email-tanghui20@huawei.com>
-References: <1620801602-49287-1-git-send-email-tanghui20@huawei.com>
+        Wed, 12 May 2021 03:05:24 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Fg5Lz70RMzld5G;
+        Wed, 12 May 2021 15:02:03 +0800 (CST)
+Received: from [10.174.178.208] (10.174.178.208) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 12 May 2021 15:04:07 +0800
+Subject: Re: [PATCH -next] crypto: hisilicon -: switch to memdup_user_nul()
+To:     Zhou Wang <wangzhou1@hisilicon.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <1620715031-107265-1-git-send-email-zou_wei@huawei.com>
+ <c3bfff60-5e78-c0b0-797b-499c70da0ff2@hisilicon.com>
+From:   Samuel Zou <zou_wei@huawei.com>
+Message-ID: <04aa944f-c07c-1263-a17d-ac647725e2b9@huawei.com>
+Date:   Wed, 12 May 2021 15:04:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
+In-Reply-To: <c3bfff60-5e78-c0b0-797b-499c70da0ff2@hisilicon.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.208]
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add test vector params for NIST P384, add test vector for
-NIST P384 on vector of tests.
+Hi,
 
-Vector param from:
-https://datatracker.ietf.org/doc/html/rfc5903#section-3.1
+Sorry for the mistake, I will send v2 soon.
 
-Signed-off-by: Hui Tang <tanghui20@huawei.com>
----
- crypto/testmgr.c |  7 +++++++
- crypto/testmgr.h | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 68 insertions(+)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 10c5b3b..e79cbf6 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4915,6 +4915,13 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			.kpp = __VECS(ecdh_p256_tv_template)
- 		}
- 	}, {
-+		.alg = "ecdh-nist-p384",
-+		.test = alg_test_kpp,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.kpp = __VECS(ecdh_p384_tv_template)
-+		}
-+	}, {
- 		.alg = "ecdsa-nist-p192",
- 		.test = alg_test_akcipher,
- 		.suite = {
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index aead75d..3d74b518 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -2814,6 +2814,67 @@ static const struct kpp_testvec ecdh_p256_tv_template[] = {
- };
- 
- /*
-+ * NIST P384 test vectors from RFC5903
-+ */
-+static const struct kpp_testvec ecdh_p384_tv_template[] = {
-+	{
-+	.secret =
-+#ifdef __LITTLE_ENDIAN
-+	"\x02\x00" /* type */
-+	"\x36\x00" /* len */
-+	"\x30\x00" /* key_size */
-+#else
-+	"\x00\x02" /* type */
-+	"\x00\x36" /* len */
-+	"\x00\x30" /* key_size */
-+#endif
-+	"\x09\x9F\x3C\x70\x34\xD4\xA2\xC6"
-+	"\x99\x88\x4D\x73\xA3\x75\xA6\x7F"
-+	"\x76\x24\xEF\x7C\x6B\x3C\x0F\x16"
-+	"\x06\x47\xB6\x74\x14\xDC\xE6\x55"
-+	"\xE3\x5B\x53\x80\x41\xE6\x49\xEE"
-+	"\x3F\xAE\xF8\x96\x78\x3A\xB1\x94",
-+	.b_public =
-+	"\xE5\x58\xDB\xEF\x53\xEE\xCD\xE3"
-+	"\xD3\xFC\xCF\xC1\xAE\xA0\x8A\x89"
-+	"\xA9\x87\x47\x5D\x12\xFD\x95\x0D"
-+	"\x83\xCF\xA4\x17\x32\xBC\x50\x9D"
-+	"\x0D\x1A\xC4\x3A\x03\x36\xDE\xF9"
-+	"\x6F\xDA\x41\xD0\x77\x4A\x35\x71"
-+	"\xDC\xFB\xEC\x7A\xAC\xF3\x19\x64"
-+	"\x72\x16\x9E\x83\x84\x30\x36\x7F"
-+	"\x66\xEE\xBE\x3C\x6E\x70\xC4\x16"
-+	"\xDD\x5F\x0C\x68\x75\x9D\xD1\xFF"
-+	"\xF8\x3F\xA4\x01\x42\x20\x9D\xFF"
-+	"\x5E\xAA\xD9\x6D\xB9\xE6\x38\x6C",
-+	.expected_a_public =
-+	"\x66\x78\x42\xD7\xD1\x80\xAC\x2C"
-+	"\xDE\x6F\x74\xF3\x75\x51\xF5\x57"
-+	"\x55\xC7\x64\x5C\x20\xEF\x73\xE3"
-+	"\x16\x34\xFE\x72\xB4\xC5\x5E\xE6"
-+	"\xDE\x3A\xC8\x08\xAC\xB4\xBD\xB4"
-+	"\xC8\x87\x32\xAE\xE9\x5F\x41\xAA"
-+	"\x94\x82\xED\x1F\xC0\xEE\xB9\xCA"
-+	"\xFC\x49\x84\x62\x5C\xCF\xC2\x3F"
-+	"\x65\x03\x21\x49\xE0\xE1\x44\xAD"
-+	"\xA0\x24\x18\x15\x35\xA0\xF3\x8E"
-+	"\xEB\x9F\xCF\xF3\xC2\xC9\x47\xDA"
-+	"\xE6\x9B\x4C\x63\x45\x73\xA8\x1C",
-+	.expected_ss =
-+	"\x11\x18\x73\x31\xC2\x79\x96\x2D"
-+	"\x93\xD6\x04\x24\x3F\xD5\x92\xCB"
-+	"\x9D\x0A\x92\x6F\x42\x2E\x47\x18"
-+	"\x75\x21\x28\x7E\x71\x56\xC5\xC4"
-+	"\xD6\x03\x13\x55\x69\xB9\xE9\xD0"
-+	"\x9C\xF5\xD4\xA2\x70\xF5\x97\x46",
-+	.secret_size = 54,
-+	.b_public_size = 96,
-+	.expected_a_public_size = 96,
-+	.expected_ss_size = 48
-+	}
-+};
-+
-+/*
-  * MD4 test vectors from RFC1320
-  */
- static const struct hash_testvec md4_tv_template[] = {
--- 
-2.8.1
-
+On 2021/5/11 15:07, Zhou Wang wrote:
+> On 2021/5/11 14:37, Zou Wei wrote:
+>> Use memdup_user_nul() helper instead of open-coding to
+>> simplify the code.
+>>
+>> Reported-by: Hulk Robot <hulkci@huawei.com>
+>> Signed-off-by: Zou Wei <zou_wei@huawei.com>
+>> ---
+>>   drivers/crypto/hisilicon/qm.c | 11 ++---------
+>>   1 file changed, 2 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+>> index ce439a0..83a5d30 100644
+>> --- a/drivers/crypto/hisilicon/qm.c
+>> +++ b/drivers/crypto/hisilicon/qm.c
+>> @@ -1570,17 +1570,10 @@ static ssize_t qm_cmd_write(struct file *filp, const char __user *buffer,
+>>   	if (count > QM_DBG_WRITE_LEN)
+>>   		return -ENOSPC;
+>>   
+>> -	cmd_buf = kzalloc(count + 1, GFP_KERNEL);
+>> -	if (!cmd_buf)
+>> +	cmd_buf = memdup_user_nul(buffer, count);
+>> +	if (IS_ERR(cmd_buf))
+>>   		return -ENOMEM;
+>>   
+>> -	if (copy_from_user(cmd_buf, buffer, count)) {
+>> -		kfree(cmd_buf);
+>> -		return -EFAULT;
+>> -	}
+>> -
+>> -	cmd_buf[count] = '\0';
+>> -
+>>   	cmd_buf_tmp = strchr(cmd_buf, '\n');
+>>   	if (cmd_buf_tmp) {
+>>   		*cmd_buf_tmp = '\0';
+>>
+> 
+> It is fine to me, thanks!
+> 
+> BTW, normally we use crypto: hisilicon - switch to memdup_user_nul() as the subject line,
+> just like other patches :)
+> 
+> .
+> 
