@@ -2,75 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB230C433ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 May 2021 08:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CCADC433B4
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 May 2021 08:59:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77EEB6144F
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 May 2021 08:06:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42A90613DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 May 2021 08:59:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230035AbhENIHL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 May 2021 04:07:11 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:36258 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229654AbhENIHL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 May 2021 04:07:11 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.89 #2 (Debian))
-        id 1lhSpY-0007zl-Qd; Fri, 14 May 2021 16:05:56 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lhSpV-00025g-Ux; Fri, 14 May 2021 16:05:53 +0800
-Date:   Fri, 14 May 2021 16:05:53 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Mike Brooks <m@ib.tc>, Ard Biesheuvel <ardb@kernel.org>,
-        Kestrel seventyfour <kestrelseventyfour@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: or should block size for xts.c set to 1 instead of AES block
- size?
-Message-ID: <20210514080553.bogfwvq6vs6wvdch@gondor.apana.org.au>
-References: <CAE9cyGTQZXW-6YsmHu3mGSHonTztBszqaYske7PKgz0pWHxQKA@mail.gmail.com>
- <CAMj1kXHOVRDAt7-C8UKi=5=MAgQ9kQz=HUtiuK_gt7ch_i950w@mail.gmail.com>
- <CALFqKjQVz7xyEZN0XWdGGHOfP4wRMsnU6amN11ege0XXbhQq8Q@mail.gmail.com>
- <YJrbhR/EruMOMHd9@gmail.com>
+        id S230403AbhENJAb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 May 2021 05:00:31 -0400
+Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:47329 "EHLO
+        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229544AbhENJAa (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 May 2021 05:00:30 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R511e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0UYq6CHI_1620982756;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UYq6CHI_1620982756)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 14 May 2021 16:59:17 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        "Gilad Ben-Yossef" <gilad@benyossef.com>,
+        Pascal van Leeuwen <pvanleeuwen@rambus.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jia Zhang <zhang.jia@linux.alibaba.com>
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH] pkcs7: make parser enable SM2 and SM3 algorithms combination
+Date:   Fri, 14 May 2021 16:59:16 +0800
+Message-Id: <20210514085916.66546-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.3.ge56e4f7
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YJrbhR/EruMOMHd9@gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 11, 2021 at 12:31:17PM -0700, Eric Biggers wrote:
->
-> Well, the problem is that it isn't well defined what the cra_blocksize property
-> actually means.  Depending on the algorithm, it can mean either the minimum
-> input size, the required alignment of the input size, the exact input size that
-> is required (in the case of block ciphers), or the input size that is required
-> by the algorithm's internal compression function (in the case of hashes).
-> 
-> "xts" follows the convention of cra_blocksize meaning the "minimum input size",
-> as do "cts" and "adiantum" which have the same constraints on input sizes as
-> "xts".
-> 
-> So I'm not sure that changing cra_blocksize for xts to 1 would accomplish
-> anything useful, other than confuse things further.
+Support parsing the message signature of the SM2 and SM3 algorithm
+combination. This group of algorithms has been well supported. One
+of the main users is module signature verification.
 
-At this point we can't change the blocksize of cts/xts to 1 without
-breaking af_alg because it needs to treat them differently than it
-would for a stream cipher like ctr.
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ crypto/asymmetric_keys/pkcs7_parser.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-But to properly support af_alg on cts/xts we do need to do this.
-I have a patch-set that adds the final chunk size to do exactly
-that but I haven't had the time to finish it.
-
-Cheers,
+diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
+index 967329e0a07b..6cf6c4552c11 100644
+--- a/crypto/asymmetric_keys/pkcs7_parser.c
++++ b/crypto/asymmetric_keys/pkcs7_parser.c
+@@ -248,6 +248,9 @@ int pkcs7_sig_note_digest_algo(void *context, size_t hdrlen,
+ 	case OID_sha224:
+ 		ctx->sinfo->sig->hash_algo = "sha224";
+ 		break;
++	case OID_sm3:
++		ctx->sinfo->sig->hash_algo = "sm3";
++		break;
+ 	default:
+ 		printk("Unsupported digest algo: %u\n", ctx->last_oid);
+ 		return -ENOPKG;
+@@ -269,6 +272,10 @@ int pkcs7_sig_note_pkey_algo(void *context, size_t hdrlen,
+ 		ctx->sinfo->sig->pkey_algo = "rsa";
+ 		ctx->sinfo->sig->encoding = "pkcs1";
+ 		break;
++	case OID_SM2_with_SM3:
++		ctx->sinfo->sig->pkey_algo = "sm2";
++		ctx->sinfo->sig->encoding = "raw";
++		break;
+ 	default:
+ 		printk("Unsupported pkey algo: %u\n", ctx->last_oid);
+ 		return -ENOPKG;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.19.1.3.ge56e4f7
+
