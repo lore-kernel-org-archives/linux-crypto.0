@@ -2,97 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EFF8C2B9F2
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 22:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B685C43461
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 May 2021 04:52:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F205161420
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 May 2021 22:23:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D71161454
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 May 2021 04:52:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232353AbhELWYT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 May 2021 18:24:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54886 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1391836AbhELVc3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 May 2021 17:32:29 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 98558613F7
-        for <linux-crypto@vger.kernel.org>; Wed, 12 May 2021 21:31:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620855078;
-        bh=OAAlNOf1uOXTWb17XYkxTD2FRz+0rfsKiFX8+G83r0o=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=u0wt+mvVnpqtUirH/i1z/hLrWQc1u8GiS1LRUg2uLxhAWeV7lr8NND/061hJBw8c5
-         2e3hKJjVy1KOY/n568ac9ZBjtiA8kYErjPs7hZ6zmmU3KSEYoAptnHUPgcipmO3siG
-         wN7kZ02vFBHpv0EUlRSDDd/FnHjBfoqH65vqPml/tVCMQdpWkxgQLE/E/DYIJfWn2K
-         XR4nVSsyaF1CGOArSrRLfXQPbs5P8CK4SWfeOGLXml96+WRRXtMpZnCnZ1ewXp85+f
-         T6sCn57AvwDRDtpRC2j9+nohAsP7n2zbsrJTOi01gCn/ivD5vtfsxvMJjhDeoIhpaw
-         2GbRfp0rjFH0w==
-Received: by mail-ot1-f44.google.com with SMTP id 36-20020a9d0ba70000b02902e0a0a8fe36so15588425oth.8
-        for <linux-crypto@vger.kernel.org>; Wed, 12 May 2021 14:31:18 -0700 (PDT)
-X-Gm-Message-State: AOAM5300ynicrN8DyiFpnNJK+B81TvhTvgePoTsw6fcjBko7ddu+NHt8
-        8y8raPsYQQQ5r5SfUIQ6Bpj1/37VGJANgjFltZc=
-X-Google-Smtp-Source: ABdhPJyrUMSRYMeITDk5+ILCDguAypmRVcPtQOTC2Xo5lgpzcNFod81nouBZbhXIWcH8a7oJ+AgJk3CCQCDUoOQ5H4w=
-X-Received: by 2002:a9d:69c5:: with SMTP id v5mr31870218oto.108.1620855077847;
- Wed, 12 May 2021 14:31:17 -0700 (PDT)
+        id S232241AbhENExp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 May 2021 00:53:45 -0400
+Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:51986 "EHLO
+        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231967AbhENExp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 May 2021 00:53:45 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R681e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UYoDsTm_1620967950;
+Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UYoDsTm_1620967950)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 14 May 2021 12:52:31 +0800
+Subject: Re: [PATCH 1/7] crypto: fix a memory leak in sm2
+To:     Hongbo Li <herbert.tencent@gmail.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        dhowells@redhat.com, jarkko@kernel.org, herberthbli@tencent.com,
+        stable@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+References: <1620828254-25545-1-git-send-email-herbert.tencent@gmail.com>
+ <1620828254-25545-2-git-send-email-herbert.tencent@gmail.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Message-ID: <246ad441-76c9-0934-d132-42d263d63195@linux.alibaba.com>
+Date:   Fri, 14 May 2021 12:52:29 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.0
 MIME-Version: 1.0
-References: <20210512184439.8778-1-ardb@kernel.org> <YJw2Z5zlFtAx9koA@gmail.com>
-In-Reply-To: <YJw2Z5zlFtAx9koA@gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 12 May 2021 23:31:06 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXF6XU8MLHZYAEnNa4v0G0k1vshxNkXpZ8ijG-BxzV=5fw@mail.gmail.com>
-Message-ID: <CAMj1kXF6XU8MLHZYAEnNa4v0G0k1vshxNkXpZ8ijG-BxzV=5fw@mail.gmail.com>
-Subject: Re: [PATCH v3 0/7] running kernel mode SIMD with softirqs disabled
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Will Deacon <will@kernel.org>,
-        Android Kernel Team <kernel-team@android.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1620828254-25545-2-git-send-email-herbert.tencent@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 12 May 2021 at 22:11, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Wed, May 12, 2021 at 08:44:32PM +0200, Ard Biesheuvel wrote:
-> > This is a follow-up to [0], but given that the arm64 architectural
-> > pieces have been merged for arm64, the only remaining changes are crypto
-> > specific. Therefore, the audience has been reduced to those people who
-> > are likely to care about these specifics.
-> >
-> > Patch #1 addresses an issue in the skcipher walker which doesn't handle
-> > zero sized AEAD inputs entirely consistently, which is uncovered by the
-> > change in patch #7.
-> >
-> > Patches #2 and #3 add some sanity checks to the public AEAD and skcipher
-> > APIs to limit their availibility to either task or softirq context
-> > (which is the only way in which they are currently being used). Adding
-> > this restriction permits the arm64 crypto code to get rid of all scalar
-> > fallbacks, given that on this architecture, softirqs are no longer
-> > served while the SIMD unit is being used in kernel mode, which means
-> > that the scalar fallbacks are never needed. These are removed in the
-> > remaining 4 patches.
-> >
-> > [0] https://lore.kernel.org/linux-arm-kernel/20210302090118.30666-1-ardb@kernel.org/
->
-> Did you check whether any updates to the self-tests in testmgr.c are warranted?
-> Specifically, is disabling the use of SIMD for testing still something that
-> makes sense?
->
+Hi Hongbo,
 
-The situation is not ideal, but I am not sure what we can do about
-this: the scalar fallbacks are gone, which means that the SIMD unit
-will be used in the test even if testmgr attempts to disable it. But
-keeping the scalar fallbacks just for the test suite makes no sense
-either. So I don't think we should change anything, other than perhaps
-document this somewhere (any suggestions on a place to put that)
+On 5/12/21 10:04 PM, Hongbo Li wrote:
+> From: Hongbo Li <herberthbli@tencent.com>
+> 
+> SM2 module alloc ec->Q in sm2_set_pub_key(), when doing alg test in
+> test_akcipher_one(), it will set public key for every test vector,
+> and don't free ec->Q. This will cause a memory leak.
+> 
+> This patch alloc ec->Q in sm2_ec_ctx_init().
+> 
+> Signed-off-by: Hongbo Li <herberthbli@tencent.com>
+> ---
+>   crypto/sm2.c | 24 ++++++++++--------------
+>   1 file changed, 10 insertions(+), 14 deletions(-)
+> 
+> diff --git a/crypto/sm2.c b/crypto/sm2.c
+> index b21addc..db8a4a2 100644
+> --- a/crypto/sm2.c
+> +++ b/crypto/sm2.c
+> @@ -79,10 +79,17 @@ static int sm2_ec_ctx_init(struct mpi_ec_ctx *ec)
+>   		goto free;
+>   
+>   	rc = -ENOMEM;
+> +
+> +	ec->Q = mpi_point_new(0);
+> +	if (!ec->Q)
+> +		goto free;
+> +
+>   	/* mpi_ec_setup_elliptic_curve */
+>   	ec->G = mpi_point_new(0);
+> -	if (!ec->G)
+> +	if (!ec->G) {
+> +		mpi_point_release(ec->Q);
+>   		goto free;
+> +	}
+>   
+>   	mpi_set(ec->G->x, x);
+>   	mpi_set(ec->G->y, y);
+> @@ -91,6 +98,7 @@ static int sm2_ec_ctx_init(struct mpi_ec_ctx *ec)
+>   	rc = -EINVAL;
+>   	ec->n = mpi_scanval(ecp->n);
+>   	if (!ec->n) {
+> +		mpi_point_release(ec->Q);
+>   		mpi_point_release(ec->G);
+>   		goto free;
+>   	}
+> @@ -386,27 +394,15 @@ static int sm2_set_pub_key(struct crypto_akcipher *tfm,
+>   	MPI a;
+>   	int rc;
+>   
+> -	ec->Q = mpi_point_new(0);
+> -	if (!ec->Q)
+> -		return -ENOMEM;
+> -
+>   	/* include the uncompressed flag '0x04' */
+> -	rc = -ENOMEM;
+>   	a = mpi_read_raw_data(key, keylen);
+>   	if (!a)
+> -		goto error;
+> +		return -ENOMEM;
+>   
+>   	mpi_normalize(a);
+>   	rc = sm2_ecc_os2ec(ec->Q, a);
+>   	mpi_free(a);
+> -	if (rc)
+> -		goto error;
+> -
+> -	return 0;
+>   
+> -error:
+> -	mpi_point_release(ec->Q);
+> -	ec->Q = NULL;
+>   	return rc;
+>   }
+>   
+> 
 
-Note that the library routines, as well as shashes (which are
-sometimes exposed via library routines, e.g., CRC-T10DIF and CRC-32,
-and maybe others) are different, which is why their scalar fallbacks
-are retained. There, we need the testmgr to override SIMD availability
-to ensure that combinations of the SIMD and scalar code are tested.
+Thanks a lot for fixing this issue.
+
+Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+
+Also added:
+
+Cc: stable@vger.kernel.org # v5.10+
+
+Best regards,
+Tianjia
