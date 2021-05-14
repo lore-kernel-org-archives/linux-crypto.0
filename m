@@ -2,63 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C44C433ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 May 2021 11:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF500C433ED
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 May 2021 16:13:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60FD761453
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 May 2021 11:36:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 790C661442
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 May 2021 16:13:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232402AbhENLhx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 May 2021 07:37:53 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:37334 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231897AbhENLhx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 May 2021 07:37:53 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.89 #2 (Debian))
-        id 1lhW7O-00033U-1s; Fri, 14 May 2021 19:36:34 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lhW7N-0002ZW-KO; Fri, 14 May 2021 19:36:33 +0800
-Date:   Fri, 14 May 2021 19:36:33 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Zhen Lei <thunder.leizhen@huawei.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Andreas Westin <andreas.westin@stericsson.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/1] crypto: ux500 - Fix error return code in
- hash_hw_final()
-Message-ID: <20210514113633.faxp737uxm2w5x7f@gondor.apana.org.au>
-References: <20210508070049.2674-1-thunder.leizhen@huawei.com>
+        id S232955AbhENQOL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 May 2021 12:14:11 -0400
+Received: from fllv0016.ext.ti.com ([198.47.19.142]:38384 "EHLO
+        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229932AbhENQOL (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 May 2021 12:14:11 -0400
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 14EGCq4c130809;
+        Fri, 14 May 2021 11:12:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1621008772;
+        bh=YSz5ZzwYTAOT6ei8Kseph07xBTeULMtnxUdf40KMmaQ=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References;
+        b=dX1AYcBfQPSPJPnpGiGZ0icM/enMu5aWMjxkL5fHO1xIHyeyqNROluExor+a7Xlxc
+         JpxJT+cytB+IEnaC2ZfGHo4QzfWVZbBye1guoI/p1DJ1/8nhNAhIbmM5EVtbFTGoop
+         IyATEoxe6v8bBQZCPXmoQ3jlMr0gI8slJ6/VYfXI=
+Received: from DLEE112.ent.ti.com (dlee112.ent.ti.com [157.170.170.23])
+        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 14EGCqAD007529
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 14 May 2021 11:12:52 -0500
+Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Fri, 14
+ May 2021 11:12:51 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2 via
+ Frontend Transport; Fri, 14 May 2021 11:12:52 -0500
+Received: from fllv0103.dal.design.ti.com (fllv0103.dal.design.ti.com [10.247.120.73])
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 14EGCpr0049105;
+        Fri, 14 May 2021 11:12:51 -0500
+Received: from localhost ([10.250.35.60])
+        by fllv0103.dal.design.ti.com (8.14.7/8.14.7) with ESMTP id 14EGCpCi035305;
+        Fri, 14 May 2021 11:12:51 -0500
+From:   Suman Anna <s-anna@ti.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+CC:     Deepak Saxena <dsaxena@plexity.net>,
+        Tero Kristo <kristo@kernel.org>, Keerthy <j-keerthy@ti.com>,
+        Gowtham Tammana <g-tammana@ti.com>,
+        Vaibhav Gupta <v_gupta@ti.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Suman Anna <s-anna@ti.com>
+Subject: [PATCH 1/6] hwrng: omap - Enable driver for TI K3 family
+Date:   Fri, 14 May 2021 11:12:41 -0500
+Message-ID: <20210514161246.22517-2-s-anna@ti.com>
+X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20210514161246.22517-1-s-anna@ti.com>
+References: <20210514161246.22517-1-s-anna@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210508070049.2674-1-thunder.leizhen@huawei.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, May 08, 2021 at 03:00:49PM +0800, Zhen Lei wrote:
-> Fix to return a negative error code from the error handling
-> case instead of 0, as done elsewhere in this function.
-> 
-> Fixes: 8a63b1994c50 ("crypto: ux500 - Add driver for HASH hardware")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
-> ---
->  drivers/crypto/ux500/hash/hash_core.c | 1 +
->  1 file changed, 1 insertion(+)
+The TI K3 family of SoCs have a SA2UL IP that contains a
+SafeXcel IP-76 RNG block which is supported by the OMAP
+RNG driver. Allow this driver to be built for TI K3
+family as well.
 
-Patch applied.  Thanks.
+Signed-off-by: Suman Anna <s-anna@ti.com>
+---
+ drivers/char/hw_random/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 1fe006f3f12f..6450074c0ad7 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -165,7 +165,7 @@ config HW_RANDOM_IXP4XX
+ 
+ config HW_RANDOM_OMAP
+ 	tristate "OMAP Random Number Generator support"
+-	depends on ARCH_OMAP16XX || ARCH_OMAP2PLUS || ARCH_MVEBU
++	depends on ARCH_OMAP16XX || ARCH_OMAP2PLUS || ARCH_MVEBU || ARCH_K3
+ 	default HW_RANDOM
+ 	help
+  	  This driver provides kernel-side support for the Random Number
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.30.1
+
