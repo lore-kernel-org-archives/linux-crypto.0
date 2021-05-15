@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB39BC433ED
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 May 2021 10:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD82FC433B4
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 May 2021 10:48:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79CF5613CA
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 May 2021 10:48:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80EBF613C5
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 May 2021 10:48:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232994AbhEOKtT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S233018AbhEOKtT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 15 May 2021 06:49:19 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3694 "EHLO
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3696 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231163AbhEOKtR (ORCPT
+        with ESMTP id S230463AbhEOKtR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 15 May 2021 06:49:17 -0400
 Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Fj28p1gMHz16QD6;
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Fj28p2BYDz16QDM;
         Sat, 15 May 2021 18:44:58 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.498.0; Sat, 15 May 2021 18:47:34 +0800
+ 14.3.498.0; Sat, 15 May 2021 18:47:35 +0800
 From:   Weili Qian <qianweili@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>,
         <liulongfang@huawei.com>
-Subject: [PATCH 1/4] crypto: hisilicon/qm - initialize the device before doing tasks
-Date:   Sat, 15 May 2021 18:44:37 +0800
-Message-ID: <1621075480-52869-2-git-send-email-qianweili@huawei.com>
+Subject: [PATCH 3/4] crypto: hisilicon/qm - adjust order of device error configuration
+Date:   Sat, 15 May 2021 18:44:39 +0800
+Message-ID: <1621075480-52869-4-git-send-email-qianweili@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1621075480-52869-1-git-send-email-qianweili@huawei.com>
 References: <1621075480-52869-1-git-send-email-qianweili@huawei.com>
@@ -45,46 +45,142 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The device needs to be initialized first, and then restart the queue to
-execute tasks after PF reset.
+In order to avoid reporting an exception but the error type is not
+configured, the driver needs to configure the error type first, and then
+enable the error interrupt. Before executing the task, hardware error
+initialization is needed so that the hardware can detect the error in time.
 
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_main.c |  6 ++++--
+ drivers/crypto/hisilicon/qm.c             |  2 +-
+ drivers/crypto/hisilicon/sec2/sec_main.c  | 24 ++++++++++--------------
+ drivers/crypto/hisilicon/zip/zip_main.c   |  6 +++---
+ 4 files changed, 18 insertions(+), 20 deletions(-)
 
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 046bc96..0ba43515 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -433,8 +433,7 @@ static void hpre_hw_error_enable(struct hisi_qm *qm)
+ 	/* clear HPRE hw error source if having */
+ 	writel(HPRE_CORE_INT_DISABLE, qm->io_base + HPRE_HAC_SOURCE_INT);
+ 
+-	/* enable hpre hw error interrupts */
+-	writel(HPRE_CORE_INT_ENABLE, qm->io_base + HPRE_INT_MASK);
++	/* configure error type */
+ 	writel(HPRE_HAC_RAS_CE_ENABLE, qm->io_base + HPRE_RAS_CE_ENB);
+ 	writel(HPRE_HAC_RAS_NFE_ENABLE, qm->io_base + HPRE_RAS_NFE_ENB);
+ 	writel(HPRE_HAC_RAS_FE_ENABLE, qm->io_base + HPRE_RAS_FE_ENB);
+@@ -443,6 +442,9 @@ static void hpre_hw_error_enable(struct hisi_qm *qm)
+ 	val = readl(qm->io_base + HPRE_AM_OOO_SHUTDOWN_ENB);
+ 	val |= HPRE_AM_OOO_SHUTDOWN_ENABLE;
+ 	writel(val, qm->io_base + HPRE_AM_OOO_SHUTDOWN_ENB);
++
++	/* enable hpre hw error interrupts */
++	writel(HPRE_CORE_INT_ENABLE, qm->io_base + HPRE_INT_MASK);
+ }
+ 
+ static inline struct hisi_qm *hpre_file_to_qm(struct hpre_debugfs_file *file)
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index ce439a0..6a9c18f 100644
+index 09f0370..04c0905 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -4085,6 +4085,14 @@ void hisi_qm_reset_done(struct pci_dev *pdev)
- 	struct hisi_qm *qm = pci_get_drvdata(pdev);
- 	int ret;
- 
-+	if (qm->fun_type == QM_HW_PF) {
-+		ret = qm_dev_hw_init(qm);
-+		if (ret) {
-+			pci_err(pdev, "Failed to init PF, ret = %d.\n", ret);
-+			goto flr_done;
-+		}
-+	}
-+
- 	hisi_qm_dev_err_init(pf_qm);
- 
- 	ret = qm_restart(qm);
-@@ -4094,12 +4102,6 @@ void hisi_qm_reset_done(struct pci_dev *pdev)
+@@ -3917,6 +3917,7 @@ static int qm_controller_reset_done(struct hisi_qm *qm)
  	}
  
- 	if (qm->fun_type == QM_HW_PF) {
--		ret = qm_dev_hw_init(qm);
--		if (ret) {
--			pci_err(pdev, "Failed to init PF, ret = %d.\n", ret);
--			goto flr_done;
--		}
--
- 		if (!qm->vfs_num)
- 			goto flr_done;
+ 	qm_restart_prepare(qm);
++	hisi_qm_dev_err_init(qm);
  
+ 	ret = qm_restart(qm);
+ 	if (ret) {
+@@ -3938,7 +3939,6 @@ static int qm_controller_reset_done(struct hisi_qm *qm)
+ 		return -EPERM;
+ 	}
+ 
+-	hisi_qm_dev_err_init(qm);
+ 	qm_restart_done(qm);
+ 
+ 	clear_bit(QM_RESETTING, &qm->misc_ctl);
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 6f0062d..e57167d 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -440,43 +440,39 @@ static void sec_hw_error_enable(struct hisi_qm *qm)
+ 		return;
+ 	}
+ 
+-	val = readl(qm->io_base + SEC_CONTROL_REG);
+-
+ 	/* clear SEC hw error source if having */
+ 	writel(SEC_CORE_INT_CLEAR, qm->io_base + SEC_CORE_INT_SOURCE);
+ 
+-	/* enable SEC hw error interrupts */
+-	writel(SEC_CORE_INT_ENABLE, qm->io_base + SEC_CORE_INT_MASK);
+-
+ 	/* enable RAS int */
+ 	writel(SEC_RAS_CE_ENB_MSK, qm->io_base + SEC_RAS_CE_REG);
+ 	writel(SEC_RAS_FE_ENB_MSK, qm->io_base + SEC_RAS_FE_REG);
+ 	writel(SEC_RAS_NFE_ENB_MSK, qm->io_base + SEC_RAS_NFE_REG);
+ 
+ 	/* enable SEC block master OOO when m-bit error occur */
++	val = readl(qm->io_base + SEC_CONTROL_REG);
+ 	val = val | SEC_AXI_SHUTDOWN_ENABLE;
+-
+ 	writel(val, qm->io_base + SEC_CONTROL_REG);
++
++	/* enable SEC hw error interrupts */
++	writel(SEC_CORE_INT_ENABLE, qm->io_base + SEC_CORE_INT_MASK);
+ }
+ 
+ static void sec_hw_error_disable(struct hisi_qm *qm)
+ {
+ 	u32 val;
+ 
+-	val = readl(qm->io_base + SEC_CONTROL_REG);
+-
+-	/* disable RAS int */
+-	writel(SEC_RAS_DISABLE, qm->io_base + SEC_RAS_CE_REG);
+-	writel(SEC_RAS_DISABLE, qm->io_base + SEC_RAS_FE_REG);
+-	writel(SEC_RAS_DISABLE, qm->io_base + SEC_RAS_NFE_REG);
+-
+ 	/* disable SEC hw error interrupts */
+ 	writel(SEC_CORE_INT_DISABLE, qm->io_base + SEC_CORE_INT_MASK);
+ 
+ 	/* disable SEC block master OOO when m-bit error occur */
++	val = readl(qm->io_base + SEC_CONTROL_REG);
+ 	val = val & SEC_AXI_SHUTDOWN_DISABLE;
+-
+ 	writel(val, qm->io_base + SEC_CONTROL_REG);
++
++	/* disable RAS int */
++	writel(SEC_RAS_DISABLE, qm->io_base + SEC_RAS_CE_REG);
++	writel(SEC_RAS_DISABLE, qm->io_base + SEC_RAS_FE_REG);
++	writel(SEC_RAS_DISABLE, qm->io_base + SEC_RAS_NFE_REG);
+ }
+ 
+ static u32 sec_clear_enable_read(struct sec_debug_file *file)
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 2178b40..8e3a522 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -333,13 +333,13 @@ static void hisi_zip_hw_error_enable(struct hisi_qm *qm)
+ 	writel(HZIP_CORE_INT_RAS_NFE_ENABLE,
+ 	       qm->io_base + HZIP_CORE_INT_RAS_NFE_ENB);
+ 
+-	/* enable ZIP hw error interrupts */
+-	writel(0, qm->io_base + HZIP_CORE_INT_MASK_REG);
+-
+ 	/* enable ZIP block master OOO when m-bit error occur */
+ 	val = readl(qm->io_base + HZIP_SOFT_CTRL_ZIP_CONTROL);
+ 	val = val | HZIP_AXI_SHUTDOWN_ENABLE;
+ 	writel(val, qm->io_base + HZIP_SOFT_CTRL_ZIP_CONTROL);
++
++	/* enable ZIP hw error interrupts */
++	writel(0, qm->io_base + HZIP_CORE_INT_MASK_REG);
+ }
+ 
+ static void hisi_zip_hw_error_disable(struct hisi_qm *qm)
 -- 
 2.8.1
 
