@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 546B4C433B4
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 May 2021 11:13:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5626AC43461
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 May 2021 11:13:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 37BB56121F
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 May 2021 11:13:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 379D3611ED
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 May 2021 11:13:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236644AbhEQLOT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S236651AbhEQLOT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 17 May 2021 07:14:19 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3718 "EHLO
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3719 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236622AbhEQLOS (ORCPT
+        with ESMTP id S236623AbhEQLOT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 May 2021 07:14:18 -0400
-Received: from dggems705-chm.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FkGd46XZqz16QNM;
-        Mon, 17 May 2021 19:10:16 +0800 (CST)
+        Mon, 17 May 2021 07:14:19 -0400
+Received: from dggems706-chm.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FkGd50Zcbz16QQg;
+        Mon, 17 May 2021 19:10:17 +0800 (CST)
 Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
- dggems705-chm.china.huawei.com (10.3.19.182) with Microsoft SMTP Server
+ dggems706-chm.china.huawei.com (10.3.19.183) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.1.2176.2; Mon, 17 May 2021 19:13:01 +0800
 Received: from huawei.com (10.67.165.24) by dggpeml500012.china.huawei.com
  (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Mon, 17 May
- 2021 19:13:00 +0800
+ 2021 19:13:01 +0800
 From:   Kai Ye <yekai13@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH 1/2] crypto: hisilicon/sec - add new type of SQE
-Date:   Mon, 17 May 2021 19:09:59 +0800
-Message-ID: <1621249800-11582-2-git-send-email-yekai13@huawei.com>
+Subject: [PATCH 2/2] crypto: hisilicon/sec - driver adapt to new SQE
+Date:   Mon, 17 May 2021 19:10:00 +0800
+Message-ID: <1621249800-11582-3-git-send-email-yekai13@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1621249800-11582-1-git-send-email-yekai13@huawei.com>
 References: <1621249800-11582-1-git-send-email-yekai13@huawei.com>
@@ -51,232 +51,456 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add new type of sqe for Kunpeng930, which is the next generation
-of SEC accelerator hardware. The hardware adds a new SQE data
-structure.
+Due to Kunpeng930 adds new SQE data structure, the SEC driver needs
+to be upgraded. It mainly includes bd parsing process and bd filling
+process.
 
-Signed-off-by: Sihang Chen <chensihang1@hisilicon.com>
+Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 ---
- drivers/crypto/hisilicon/sec2/sec.h        |   5 +-
- drivers/crypto/hisilicon/sec2/sec_crypto.h | 174 +++++++++++++++++++++++++++++
- 2 files changed, 178 insertions(+), 1 deletion(-)
+ drivers/crypto/hisilicon/sec2/sec.h        |   1 +
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 291 ++++++++++++++++++++++++-----
+ drivers/crypto/hisilicon/sec2/sec_crypto.h |   7 +
+ 3 files changed, 256 insertions(+), 43 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index dfdce2f..28679cf 100644
+index 28679cf..14ba66d 100644
 --- a/drivers/crypto/hisilicon/sec2/sec.h
 +++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -38,7 +38,10 @@ struct sec_aead_req {
- 
- /* SEC request of Crypto */
- struct sec_req {
--	struct sec_sqe sec_sqe;
-+	union {
-+		struct sec_sqe sec_sqe;
-+		struct sec_sqe3 sec_sqe3;
-+	};
- 	struct sec_ctx *ctx;
- 	struct sec_qp_ctx *qp_ctx;
- 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-index 9c78eda..3b64e17 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-@@ -44,6 +44,7 @@ enum sec_ckey_type {
- enum sec_bd_type {
- 	SEC_BD_TYPE1 = 0x1,
- 	SEC_BD_TYPE2 = 0x2,
-+	SEC_BD_TYPE3 = 0x3,
+@@ -140,6 +140,7 @@ struct sec_ctx {
+ 	bool pbuf_supported;
+ 	struct sec_cipher_ctx c_ctx;
+ 	struct sec_auth_ctx a_ctx;
++	u8 type_supported;
+ 	struct device *dev;
  };
  
- enum sec_auth {
-@@ -63,6 +64,16 @@ enum sec_addr_type {
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 133aede..d9ab503 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -37,10 +37,22 @@
+ #define SEC_AEAD_ALG_OFFSET     11
+ #define SEC_AUTH_OFFSET		6
+ 
++#define SEC_DE_OFFSET_V3		9
++#define SEC_SCENE_OFFSET_V3	5
++#define SEC_CKEY_OFFSET_V3	13
++#define SEC_SRC_SGL_OFFSET_V3	11
++#define SEC_DST_SGL_OFFSET_V3	14
++#define SEC_CALG_OFFSET_V3	4
++#define SEC_AKEY_OFFSET_V3	9
++#define SEC_MAC_OFFSET_V3	4
++#define SEC_AUTH_ALG_OFFSET_V3	15
++#define SEC_CIPHER_AUTH_V3	0xbf
++#define SEC_AUTH_CIPHER_V3	0x40
+ #define SEC_FLAG_OFFSET		7
+ #define SEC_FLAG_MASK		0x0780
+ #define SEC_TYPE_MASK		0x0F
+ #define SEC_DONE_MASK		0x0001
++#define SEC_SQE_LEN_RATE_MASK	0x3
+ 
+ #define SEC_TOTAL_IV_SZ		(SEC_IV_SIZE * QM_Q_DEPTH)
+ #define SEC_SGL_SGE_NR		128
+@@ -145,44 +157,90 @@ static int sec_aead_verify(struct sec_req *req)
+ 	return 0;
+ }
+ 
++static u8 pre_parse_finished_bd(struct bd_status *status, void *resp)
++{
++	struct sec_sqe *bd = resp;
++
++	status->done = le16_to_cpu(bd->type2.done_flag) & SEC_DONE_MASK;
++	status->flag = (le16_to_cpu(bd->type2.done_flag) &
++					SEC_FLAG_MASK) >> SEC_FLAG_OFFSET;
++	status->tag = le16_to_cpu(bd->type2.tag);
++	status->err_type = bd->type2.error_type;
++
++	return bd->type_cipher_auth & SEC_TYPE_MASK;
++}
++
++static u8 pre_parse_finished_bd3(struct bd_status *status, void *resp)
++{
++	struct sec_sqe3 *bd3 = resp;
++
++	status->done = le16_to_cpu(bd3->done_flag) & SEC_DONE_MASK;
++	status->flag = (le16_to_cpu(bd3->done_flag) &
++					SEC_FLAG_MASK) >> SEC_FLAG_OFFSET;
++	status->tag = le64_to_cpu(bd3->tag);
++	status->err_type = bd3->error_type;
++
++	return le32_to_cpu(bd3->bd_param) & SEC_TYPE_MASK;
++}
++
++static int sec_cb_status_check(struct sec_req *req,
++			       struct bd_status *status)
++{
++	struct sec_ctx *ctx = req->ctx;
++
++	if (unlikely(req->err_type || status->done != SEC_SQE_DONE)) {
++		dev_err_ratelimited(ctx->dev, "err_type[%d], done[%u]\n",
++				    req->err_type, status->done);
++		return -EIO;
++	}
++
++	if (unlikely(ctx->alg_type == SEC_SKCIPHER)) {
++		if (unlikely(status->flag != SEC_SQE_CFLAG)) {
++			dev_err_ratelimited(ctx->dev, "flag[%u]\n",
++					    status->flag);
++			return -EIO;
++		}
++	}
++
++	return 0;
++}
++
+ static void sec_req_cb(struct hisi_qp *qp, void *resp)
+ {
+ 	struct sec_qp_ctx *qp_ctx = qp->qp_ctx;
+ 	struct sec_dfx *dfx = &qp_ctx->ctx->sec->debug.dfx;
+-	struct sec_sqe *bd = resp;
++	u8 type_supported = qp_ctx->ctx->type_supported;
++	struct bd_status status;
+ 	struct sec_ctx *ctx;
+ 	struct sec_req *req;
+-	u16 done, flag;
+-	int err = 0;
++	int err;
+ 	u8 type;
+ 
+-	type = bd->type_cipher_auth & SEC_TYPE_MASK;
+-	if (unlikely(type != SEC_BD_TYPE2)) {
++	if (type_supported == SEC_BD_TYPE2) {
++		type = pre_parse_finished_bd(&status, resp);
++		req = qp_ctx->req_list[status.tag];
++	} else {
++		type = pre_parse_finished_bd3(&status, resp);
++		req = (void *)(uintptr_t)status.tag;
++	}
++
++	if (unlikely(type != type_supported)) {
+ 		atomic64_inc(&dfx->err_bd_cnt);
+ 		pr_err("err bd type [%d]\n", type);
+ 		return;
+ 	}
+ 
+-	req = qp_ctx->req_list[le16_to_cpu(bd->type2.tag)];
+ 	if (unlikely(!req)) {
+ 		atomic64_inc(&dfx->invalid_req_cnt);
+ 		atomic_inc(&qp->qp_status.used);
+ 		return;
+ 	}
+-	req->err_type = bd->type2.error_type;
++
++	req->err_type = status.err_type;
+ 	ctx = req->ctx;
+-	done = le16_to_cpu(bd->type2.done_flag) & SEC_DONE_MASK;
+-	flag = (le16_to_cpu(bd->type2.done_flag) &
+-		SEC_FLAG_MASK) >> SEC_FLAG_OFFSET;
+-	if (unlikely(req->err_type || done != SEC_SQE_DONE ||
+-	    (ctx->alg_type == SEC_SKCIPHER && flag != SEC_SQE_CFLAG) ||
+-	    (ctx->alg_type == SEC_AEAD && flag != SEC_SQE_AEAD_FLAG))) {
+-		dev_err_ratelimited(ctx->dev,
+-			"err_type[%d],done[%d],flag[%d]\n",
+-			req->err_type, done, flag);
+-		err = -EIO;
++	err = sec_cb_status_check(req, &status);
++	if (err)
+ 		atomic64_inc(&dfx->done_flag_cnt);
+-	}
+ 
+ 	if (ctx->alg_type == SEC_AEAD && !req->c_req.encrypt)
+ 		err = sec_aead_verify(req);
+@@ -382,10 +440,11 @@ static int sec_create_qp_ctx(struct hisi_qm *qm, struct sec_ctx *ctx,
+ 	qp = ctx->qps[qp_ctx_id];
+ 	qp->req_type = 0;
+ 	qp->qp_ctx = qp_ctx;
+-	qp->req_cb = sec_req_cb;
+ 	qp_ctx->qp = qp;
+ 	qp_ctx->ctx = ctx;
+ 
++	qp->req_cb = sec_req_cb;
++
+ 	mutex_init(&qp_ctx->req_lock);
+ 	idr_init(&qp_ctx->req_idr);
+ 	INIT_LIST_HEAD(&qp_ctx->backlog);
+@@ -615,19 +674,25 @@ static int sec_skcipher_aes_sm4_setkey(struct sec_cipher_ctx *c_ctx,
+ 			return -EINVAL;
+ 		}
+ 	} else {
+-		switch (keylen) {
+-		case AES_KEYSIZE_128:
+-			c_ctx->c_key_len = SEC_CKEY_128BIT;
+-			break;
+-		case AES_KEYSIZE_192:
+-			c_ctx->c_key_len = SEC_CKEY_192BIT;
+-			break;
+-		case AES_KEYSIZE_256:
+-			c_ctx->c_key_len = SEC_CKEY_256BIT;
+-			break;
+-		default:
+-			pr_err("hisi_sec2: aes key error!\n");
++		if (c_ctx->c_alg == SEC_CALG_SM4 &&
++		    keylen != AES_KEYSIZE_128) {
++			pr_err("hisi_sec2: sm4 key error!\n");
+ 			return -EINVAL;
++		} else {
++			switch (keylen) {
++			case AES_KEYSIZE_128:
++				c_ctx->c_key_len = SEC_CKEY_128BIT;
++				break;
++			case AES_KEYSIZE_192:
++				c_ctx->c_key_len = SEC_CKEY_192BIT;
++				break;
++			case AES_KEYSIZE_256:
++				c_ctx->c_key_len = SEC_CKEY_256BIT;
++				break;
++			default:
++				pr_err("hisi_sec2: aes key error!\n");
++				return -EINVAL;
++			}
+ 		}
+ 	}
+ 
+@@ -915,6 +980,12 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+ 		goto bad_key;
+ 	}
+ 
++	if ((ctx->a_ctx.mac_len & SEC_SQE_LEN_RATE_MASK)  ||
++	    (ctx->a_ctx.a_key_len & SEC_SQE_LEN_RATE_MASK)) {
++		dev_err(dev, "MAC or AUTH key length error!\n");
++		goto bad_key;
++	}
++
+ 	return 0;
+ 
+ bad_key:
+@@ -1014,29 +1085,75 @@ static int sec_skcipher_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
+ 		cipher = SEC_CIPHER_DEC << SEC_CIPHER_OFFSET;
+ 	sec_sqe->type_cipher_auth = bd_type | cipher;
+ 
+-	if (req->use_pbuf)
++	/* Set destination and source address type */
++	if (req->use_pbuf) {
+ 		sa_type = SEC_PBUF << SEC_SRC_SGL_OFFSET;
+-	else
++		da_type = SEC_PBUF << SEC_DST_SGL_OFFSET;
++	} else {
+ 		sa_type = SEC_SGL << SEC_SRC_SGL_OFFSET;
++		da_type = SEC_SGL << SEC_DST_SGL_OFFSET;
++	}
++
++	sec_sqe->sdm_addr_type |= da_type;
+ 	scene = SEC_COMM_SCENE << SEC_SCENE_OFFSET;
+ 	if (c_req->c_in_dma != c_req->c_out_dma)
+ 		de = 0x1 << SEC_DE_OFFSET;
+ 
+ 	sec_sqe->sds_sa_type = (de | scene | sa_type);
+ 
+-	/* Just set DST address type */
+-	if (req->use_pbuf)
+-		da_type = SEC_PBUF << SEC_DST_SGL_OFFSET;
+-	else
+-		da_type = SEC_SGL << SEC_DST_SGL_OFFSET;
+-	sec_sqe->sdm_addr_type |= da_type;
+-
+ 	sec_sqe->type2.clen_ivhlen |= cpu_to_le32(c_req->c_len);
+ 	sec_sqe->type2.tag = cpu_to_le16((u16)req->req_id);
+ 
+ 	return 0;
+ }
+ 
++static int sec_skcipher_bd_fill_v3(struct sec_ctx *ctx, struct sec_req *req)
++{
++	struct sec_sqe3 *sec_sqe3 = &req->sec_sqe3;
++	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
++	struct sec_cipher_req *c_req = &req->c_req;
++	u32 bd_param = 0;
++	u16 cipher;
++
++	memset(sec_sqe3, 0, sizeof(struct sec_sqe3));
++
++	sec_sqe3->c_key_addr = cpu_to_le64(c_ctx->c_key_dma);
++	sec_sqe3->no_scene.c_ivin_addr = cpu_to_le64(c_req->c_ivin_dma);
++	sec_sqe3->data_src_addr = cpu_to_le64(c_req->c_in_dma);
++	sec_sqe3->data_dst_addr = cpu_to_le64(c_req->c_out_dma);
++
++	sec_sqe3->c_mode_alg = ((u8)c_ctx->c_alg << SEC_CALG_OFFSET_V3) |
++						c_ctx->c_mode;
++	sec_sqe3->c_icv_key |= cpu_to_le16(((u16)c_ctx->c_key_len) <<
++						SEC_CKEY_OFFSET_V3);
++
++	if (c_req->encrypt)
++		cipher = SEC_CIPHER_ENC;
++	else
++		cipher = SEC_CIPHER_DEC;
++	sec_sqe3->c_icv_key |= cpu_to_le16(cipher);
++
++	if (req->use_pbuf) {
++		bd_param |= SEC_PBUF << SEC_SRC_SGL_OFFSET_V3;
++		bd_param |= SEC_PBUF << SEC_DST_SGL_OFFSET_V3;
++	} else {
++		bd_param |= SEC_SGL << SEC_SRC_SGL_OFFSET_V3;
++		bd_param |= SEC_SGL << SEC_DST_SGL_OFFSET_V3;
++	}
++
++	bd_param |= SEC_COMM_SCENE << SEC_SCENE_OFFSET_V3;
++	if (c_req->c_in_dma != c_req->c_out_dma)
++		bd_param |= 0x1 << SEC_DE_OFFSET_V3;
++
++	bd_param |= SEC_BD_TYPE3;
++	sec_sqe3->bd_param = cpu_to_le32(bd_param);
++
++	sec_sqe3->c_len_ivin |= cpu_to_le32(c_req->c_len);
++	sec_sqe3->tag = cpu_to_le64(req);
++
++	return 0;
++}
++
+ static void sec_update_iv(struct sec_req *req, enum sec_alg_type alg_type)
+ {
+ 	struct aead_request *aead_req = req->aead_req.aead_req;
+@@ -1170,6 +1287,57 @@ static int sec_aead_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
+ 	return 0;
+ }
+ 
++static void sec_auth_bd_fill_ex_v3(struct sec_auth_ctx *ctx, int dir,
++				   struct sec_req *req, struct sec_sqe3 *sqe3)
++{
++	struct sec_aead_req *a_req = &req->aead_req;
++	struct sec_cipher_req *c_req = &req->c_req;
++	struct aead_request *aq = a_req->aead_req;
++
++	sqe3->a_key_addr = cpu_to_le64(ctx->a_key_dma);
++
++	sqe3->auth_mac_key |=
++			cpu_to_le32((u32)(ctx->mac_len /
++			SEC_SQE_LEN_RATE) << SEC_MAC_OFFSET_V3);
++
++	sqe3->auth_mac_key |=
++			cpu_to_le32((u32)(ctx->a_key_len /
++			SEC_SQE_LEN_RATE) << SEC_AKEY_OFFSET_V3);
++
++	sqe3->auth_mac_key |=
++			cpu_to_le32((u32)(ctx->a_alg) << SEC_AUTH_ALG_OFFSET_V3);
++
++	if (dir) {
++		sqe3->auth_mac_key |= SEC_AUTH_TYPE1;
++		sqe3->huk_iv_seq &= SEC_CIPHER_AUTH_V3;
++	} else {
++		sqe3->auth_mac_key |= SEC_AUTH_TYPE2;
++		sqe3->huk_iv_seq |= SEC_AUTH_CIPHER_V3;
++	}
++	sqe3->a_len_key = cpu_to_le32(c_req->c_len + aq->assoclen);
++
++	sqe3->cipher_src_offset = cpu_to_le16((u16)aq->assoclen);
++
++	sqe3->mac_addr = cpu_to_le64(a_req->out_mac_dma);
++}
++
++static int sec_aead_bd_fill_v3(struct sec_ctx *ctx, struct sec_req *req)
++{
++	struct sec_auth_ctx *auth_ctx = &ctx->a_ctx;
++	struct sec_sqe3 *sec_sqe3 = &req->sec_sqe3;
++	int ret;
++
++	ret = sec_skcipher_bd_fill_v3(ctx, req);
++	if (unlikely(ret)) {
++		dev_err(ctx->dev, "skcipher bd3 fill is error!\n");
++		return ret;
++	}
++
++	sec_auth_bd_fill_ex_v3(auth_ctx, req->c_req.encrypt, req, sec_sqe3);
++
++	return 0;
++}
++
+ static void sec_aead_callback(struct sec_ctx *c, struct sec_req *req, int err)
+ {
+ 	struct aead_request *a_req = req->aead_req.aead_req;
+@@ -1303,13 +1471,44 @@ static const struct sec_req_op sec_aead_req_ops = {
+ 	.process	= sec_process,
+ };
+ 
++static const struct sec_req_op sec_skcipher_req_ops_v3 = {
++	.buf_map	= sec_skcipher_sgl_map,
++	.buf_unmap	= sec_skcipher_sgl_unmap,
++	.do_transfer	= sec_skcipher_copy_iv,
++	.bd_fill	= sec_skcipher_bd_fill_v3,
++	.bd_send	= sec_bd_send,
++	.callback	= sec_skcipher_callback,
++	.process	= sec_process,
++};
++
++static const struct sec_req_op sec_aead_req_ops_v3 = {
++	.buf_map	= sec_aead_sgl_map,
++	.buf_unmap	= sec_aead_sgl_unmap,
++	.do_transfer	= sec_aead_copy_iv,
++	.bd_fill	= sec_aead_bd_fill_v3,
++	.bd_send	= sec_bd_send,
++	.callback	= sec_aead_callback,
++	.process	= sec_process,
++};
++
+ static int sec_skcipher_ctx_init(struct crypto_skcipher *tfm)
+ {
+ 	struct sec_ctx *ctx = crypto_skcipher_ctx(tfm);
++	int ret;
+ 
+-	ctx->req_op = &sec_skcipher_req_ops;
++	ret = sec_skcipher_init(tfm);
++	if (ret)
++		return ret;
++
++	if (ctx->sec->qm.ver < QM_HW_V3) {
++		ctx->type_supported = SEC_BD_TYPE2;
++		ctx->req_op = &sec_skcipher_req_ops;
++	} else {
++		ctx->type_supported = SEC_BD_TYPE3;
++		ctx->req_op = &sec_skcipher_req_ops_v3;
++	}
+ 
+-	return sec_skcipher_init(tfm);
++	return ret;
+ }
+ 
+ static void sec_skcipher_ctx_exit(struct crypto_skcipher *tfm)
+@@ -1330,10 +1529,16 @@ static int sec_aead_init(struct crypto_aead *tfm)
+ 		return -EINVAL;
+ 	}
+ 
+-	ctx->req_op = &sec_aead_req_ops;
+ 	ret = sec_ctx_base_init(ctx);
+ 	if (ret)
+ 		return ret;
++	if (ctx->sec->qm.ver < QM_HW_V3) {
++		ctx->type_supported = SEC_BD_TYPE2;
++		ctx->req_op = &sec_aead_req_ops;
++	} else {
++		ctx->type_supported = SEC_BD_TYPE3;
++		ctx->req_op = &sec_aead_req_ops_v3;
++	}
+ 
+ 	ret = sec_auth_init(ctx);
+ 	if (ret)
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+index 3b64e17..163e813 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+@@ -64,6 +64,13 @@ enum sec_addr_type {
  	SEC_PRP  = 0x2,
  };
  
-+enum {
-+	AUTHPAD_PAD,
-+	AUTHPAD_NOPAD,
++struct bd_status {
++	u64 tag;
++	u8 done;
++	u8 err_type;
++	u16 flag;
 +};
 +
-+enum {
-+	AIGEN_GEN,
-+	AIGEN_NOGEN,
-+};
-+
- struct sec_sqe_type2 {
- 	/*
- 	 * mac_len: 0~4 bits
-@@ -209,6 +220,169 @@ struct sec_sqe {
- 	struct sec_sqe_type2 type2;
- };
- 
-+struct bd3_auth_ivin {
-+	__le64 a_ivin_addr;
-+	__le32 rsvd0;
-+	__le32 rsvd1;
-+} __packed __aligned(4);
-+
-+struct bd3_skip_data {
-+	__le32 rsvd0;
-+
-+	/*
-+	 * gran_num: 0~15 bits
-+	 * reserved: 16~31 bits
-+	 */
-+	__le32 gran_num;
-+
-+	/*
-+	 * src_skip_data_len: 0~24 bits
-+	 * reserved: 25~31 bits
-+	 */
-+	__le32 src_skip_data_len;
-+
-+	/*
-+	 * dst_skip_data_len: 0~24 bits
-+	 * reserved: 25~31 bits
-+	 */
-+	__le32 dst_skip_data_len;
-+};
-+
-+struct bd3_stream_scene {
-+	__le64 c_ivin_addr;
-+	__le64 long_a_data_len;
-+
-+	/*
-+	 * auth_pad: 0~1 bits
-+	 * stream_protocol: 2~4 bits
-+	 * reserved: 5~7 bits
-+	 */
-+	__u8 stream_auth_pad;
-+	__u8 plaintext_type;
-+	__le16 pad_len_1p3;
-+} __packed __aligned(4);
-+
-+struct bd3_no_scene {
-+	__le64 c_ivin_addr;
-+	__le32 rsvd0;
-+	__le32 rsvd1;
-+	__le32 rsvd2;
-+} __packed __aligned(4);
-+
-+struct bd3_check_sum {
-+	__u8 rsvd0;
-+	__u8 hac_sva_status;
-+	__le16 check_sum_i;
-+};
-+
-+struct bd3_tls_type_back {
-+	__u8 tls_1p3_type_back;
-+	__u8 hac_sva_status;
-+	__le16 pad_len_1p3_back;
-+};
-+
-+struct sec_sqe3 {
-+	/*
-+	 * type: 0~3 bit
-+	 * bd_invalid: 4 bit
-+	 * scene: 5~8 bit
-+	 * de: 9~10 bit
-+	 * src_addr_type: 11~13 bit
-+	 * dst_addr_type: 14~16 bit
-+	 * mac_addr_type: 17~19 bit
-+	 * reserved: 20~31 bits
-+	 */
-+	__le32 bd_param;
-+
-+	/*
-+	 * cipher: 0~1 bits
-+	 * ci_gen: 2~3 bit
-+	 * c_icv_len: 4~9 bit
-+	 * c_width: 10~12 bits
-+	 * c_key_len: 13~15 bits
-+	 */
-+	__le16 c_icv_key;
-+
-+	/*
-+	 * c_mode : 0~3 bits
-+	 * c_alg : 4~7 bits
-+	 */
-+	__u8 c_mode_alg;
-+
-+	/*
-+	 * nonce_len : 0~3 bits
-+	 * huk : 4 bits
-+	 * cal_iv_addr_en : 5 bits
-+	 * seq : 6 bits
-+	 * reserved : 7 bits
-+	 */
-+	__u8 huk_iv_seq;
-+
-+	__le64 tag;
-+	__le64 data_src_addr;
-+	__le64 a_key_addr;
-+	union {
-+		struct bd3_auth_ivin auth_ivin;
-+		struct bd3_skip_data skip_data;
-+	};
-+
-+	__le64 c_key_addr;
-+
-+	/*
-+	 * auth: 0~1 bits
-+	 * ai_gen: 2~3 bits
-+	 * mac_len: 4~8 bits
-+	 * akey_len: 9~14 bits
-+	 * a_alg: 15~20 bits
-+	 * key_sel: 21~24 bits
-+	 * updata_key: 25 bits
-+	 * reserved: 26~31 bits
-+	 */
-+	__le32 auth_mac_key;
-+	__le32 salt;
-+	__le16 auth_src_offset;
-+	__le16 cipher_src_offset;
-+
-+	/*
-+	 * auth_len: 0~23 bit
-+	 * auth_key_offset: 24~31 bits
-+	 */
-+	__le32 a_len_key;
-+
-+	/*
-+	 * cipher_len: 0~23 bit
-+	 * auth_ivin_offset: 24~31 bits
-+	 */
-+	__le32 c_len_ivin;
-+	__le64 data_dst_addr;
-+	__le64 mac_addr;
-+	union {
-+		struct bd3_stream_scene stream_scene;
-+		struct bd3_no_scene no_scene;
-+	};
-+
-+	/*
-+	 * done: 0 bit
-+	 * icv: 1~3 bit
-+	 * csc: 4~6 bit
-+	 * flag: 7~10 bit
-+	 * reserved: 11~15 bit
-+	 */
-+	__le16 done_flag;
-+	__u8 error_type;
-+	__u8 warning_type;
-+	union {
-+		__le32 mac_i;
-+		__le32 kek_key_addr_l;
-+	};
-+	union {
-+		__le32 kek_key_addr_h;
-+		struct bd3_check_sum check_sum;
-+		struct bd3_tls_type_back tls_type_back;
-+	};
-+	__le32 counter;
-+} __packed __aligned(4);
-+
- int sec_register_to_crypto(struct hisi_qm *qm);
- void sec_unregister_from_crypto(struct hisi_qm *qm);
- #endif
+ enum {
+ 	AUTHPAD_PAD,
+ 	AUTHPAD_NOPAD,
 -- 
 2.8.1
 
