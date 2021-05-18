@@ -2,128 +2,156 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14895C433ED
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 13:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7047C43461
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 14:39:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAC7361185
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 13:57:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84DCB611CE
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 14:39:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349732AbhERN7N (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 May 2021 09:59:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47850 "EHLO
+        id S234223AbhEROlM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 May 2021 10:41:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349697AbhERN7C (ORCPT
+        with ESMTP id S234490AbhEROlH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 May 2021 09:59:02 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF75C061573;
-        Tue, 18 May 2021 06:57:44 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id g11so5196451ilq.3;
-        Tue, 18 May 2021 06:57:44 -0700 (PDT)
+        Tue, 18 May 2021 10:41:07 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 076DAC061760
+        for <linux-crypto@vger.kernel.org>; Tue, 18 May 2021 07:39:49 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id j75so9936041oih.10
+        for <linux-crypto@vger.kernel.org>; Tue, 18 May 2021 07:39:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=0oL71Oy3H/CHTvb8C+6ZsDj12BqzersACAVWISPYbd8=;
-        b=eRh0T5EVi1kIcpi1vcCkBQrsbPN0jU65b5Z+Xk6EWXTHKmkZJn5WFhQ3sLu5bhKw1x
-         AlcHKdW7+uhWDa5X+bF85G0Zubf6TVcj68gM5O56gi0xeq26faQsl/erGF0x6TcPA7L3
-         XU5/8KBwOirlV69gr62MNbJzJnItyuzunJlqZ37iCGnm70cxw02PxlLPTtYgZ4vQrrVc
-         KMq9asooN+qx3EJfEIWS+cAUNFbYmztihoHEltLxFn3RWtMcKGozUY+31ppoANwX9TzX
-         6noIdVAMw7UkcKEcScIEC6KbQEkFHJQweUvRXNln4kHgJKe+6kaHJS8NUXnaVXo3PpCL
-         eVEw==
+         :cc;
+        bh=zp3it5Zu0KA9JHtt+jDEOh0cwWAwW8S1nVYQo9cUI6g=;
+        b=M+LBCcMHMPB69ojN8igqTaiE33ZRMpEcF1APy9OlgsLWEwTLhd++g9E5r/PdgPXEYk
+         Sf+oWKImVvjttXeuquw1tqKq5sDT5hjJaJrr+UNwmVU4yyHWnKmjWyMw/MlpRuRujG3f
+         OPz9XnatcZBy1chC6V/PUTr8885yi7PK0DlXuwh780MM5fxWeByS/rU5afx+k05h1jpm
+         6Fcu7iuPNq3rkO4cA5dE3C1+aLyOA0g1mfkf0PgTpooOLOhwOnpmJucMbwAHPEXBoGUI
+         M0YmbK1i3TawT2Kq/MdoI37cIF1l4xEwiO9riemaM2il88FrHe0Ly8xeiVsF219JVpb/
+         6zcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=0oL71Oy3H/CHTvb8C+6ZsDj12BqzersACAVWISPYbd8=;
-        b=B7K0tzZJINTvsKCUjj04YDBqc2xX08FQawvw40rseVlZ0d6kDXTn3L5BJmL/q3SSUB
-         IacQMZHeTFOdlZBFmk5rPqv/+dwmCKtfT/TDCZgB7NrvlqNoUhP7Dxqpww+ZF2K10NlW
-         4g+bfeDbhFlNt2sqgab7yZEhkwnaBYDJdxepyIkm1pSuaKt+dGWX14UcBqjpHOnTWS3z
-         6YyU0DfSVambe0bmZ4/N9T9ANE6MKndJI5GIP8DCt18MjddLYMkLTKzmfKUIQpOOin3s
-         CyEDVEPo2392nD0aSiIX3O5i9Py4MtSpYujX0ROEHfNBVGErYdcVsCuWBQupdv5rOJFq
-         0CCg==
-X-Gm-Message-State: AOAM531vYMi2n748MkVp7Q7CR821A/eA4+2iupXjMDwj1QsCYKvTQcQH
-        3jNrRNTG3gw204+Mb3dntIIxKOaZV3VvatfWikM=
-X-Google-Smtp-Source: ABdhPJyfRmH+RE7CHOWqTgnFcTBe0JQF7CKfdZc5YfxJnYKX8l2iTFLkX2Su1s1Gle6uhcKprG96xv0zR4Sz2PWQF8I=
-X-Received: by 2002:a92:6b05:: with SMTP id g5mr4411861ilc.40.1621346264021;
- Tue, 18 May 2021 06:57:44 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=zp3it5Zu0KA9JHtt+jDEOh0cwWAwW8S1nVYQo9cUI6g=;
+        b=PUqsqXzZfClUfZMaSI1t8jDrsPVgCMD3W4Zjc4W7SHttjaLimjyN6GQPDUmr1U+UWL
+         7DT5JXN1k0P4KLklIBeruWNSD7m//ZCSXGCA7F64k9KnRIuZvozqllqc7BklaqStvEW9
+         JtIagTfJhuFaO2gMLaPoMWdi3ZoD5axbqmIc5HNoTVGHy9Oh6+7AwjCRESHSXEZBTsu+
+         LdbRhpD4Ubt9s+84ou+mFloEv5M8WZm6yJaoLqmCOoMLZ1coAquGrZVQW9XvtbxGulxc
+         mcuMUJPmVSuVQncvPPUHS5v5xUXWDqFvRj21nR+6oNcX0O0mBJGW87bfZr7gGknlUFzW
+         i9iA==
+X-Gm-Message-State: AOAM533vP5+1IN2Y5UsWKt/btKEzQFr9Rke6CuUqjsx15T5CR50ZnC6f
+        pjmMPt40GAkBAxk3DiX6YlogYoJOipaKG6lW9d6aCA==
+X-Google-Smtp-Source: ABdhPJztinWXNYTl+kiATtOdsiKD/CaM/e4dVlbDyWrHV5TSscaWHVYcyb9gQYVDavq46dJM3FBF4Qd71vU3cs+rKMU=
+X-Received: by 2002:a05:6808:f0b:: with SMTP id m11mr3641199oiw.12.1621348788489;
+ Tue, 18 May 2021 07:39:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <1620828254-25545-1-git-send-email-herbert.tencent@gmail.com>
- <YJwodhUpsdBbknLo@gmail.com> <dade7666956c41718ce00e681156533e@tencent.com> <YKLeQjjFL88nABqP@gmail.com>
-In-Reply-To: <YKLeQjjFL88nABqP@gmail.com>
-From:   hongbo li <herbert.tencent@gmail.com>
-Date:   Tue, 18 May 2021 21:57:32 +0800
-Message-ID: <CABpmuwKjKekcU8NJ1vmH0FD8kE-p_zeTXjuFcDngx8b7qsvY5g@mail.gmail.com>
-Subject: Re: [PATCH 0/7] crypto: add eddsa support for x509(Internet mail)
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     =?UTF-8?B?aGVyYmVydGhibGko5p2O5byY5Y2aKQ==?= 
-        <herberthbli@tencent.com>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>,
-        "tianjia.zhang@linux.alibaba.com" <tianjia.zhang@linux.alibaba.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20210505213731.538612-1-bhupesh.sharma@linaro.org>
+ <20210505213731.538612-17-bhupesh.sharma@linaro.org> <d809f290-ed94-7e35-bc4d-bd695965fa04@linaro.org>
+In-Reply-To: <d809f290-ed94-7e35-bc4d-bd695965fa04@linaro.org>
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Date:   Tue, 18 May 2021 20:09:37 +0530
+Message-ID: <CAH=2NtwS+WBbwbp1tftyMjOCWo9ORZfiZFRr+UNxKQLc9aUNcA@mail.gmail.com>
+Subject: Re: [PATCH v2 16/17] crypto: qce: Defer probe in case interconnect is
+ not yet initialized
+To:     Thara Gopinath <thara.gopinath@linaro.org>
+Cc:     linux-arm-msm@vger.kernel.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Andy Gross <agross@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bhupesh.linux@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric Biggers <ebiggers@kernel.org> =E4=BA=8E2021=E5=B9=B45=E6=9C=8818=E6=97=
-=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=885:21=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Thu, May 13, 2021 at 02:44:07PM +0000, herberthbli(=E6=9D=8E=E5=BC=98=
-=E5=8D=9A) wrote:
-> > =E5=9C=A8 2021/5/13 3:12, Eric Biggers =E5=86=99=E9=81=93:
-> >
-> > On Wed, May 12, 2021 at 10:04:07PM +0800, Hongbo Li wrote:
-> >
-> >
-> > From: Hongbo Li <herberthbli@tencent.com><mailto:herberthbli@tencent.co=
-m>
-> >
-> > This series of patches add support for x509 cert signed by eddsa,
-> > which is described in RFC8032 [1], currently ed25519 only.
-> >
-> >
-> >
-> > It would be helpful to explain how this is related to the kernel's exis=
-ting
-> > Curve25519 support.
-> >
-> > - Eric
-> >
-> >
-> > Curve25519 is an elliptic curve used for key agreement(ECDH). It is a M=
-ontgomery curve.
-> >
-> > Edwards25519 is a twisted Edwards curve and birationally equivalent to =
-Curve25519, the
-> > birational maps are described in rfc7748 section 4.1.
-> > https://datatracker.ietf.org/doc/html/rfc7748#section-4.1
-> >
-> >
-> > Ed25519 is a Digital Signature Algorithm over Edwards25519.
-> >
->
-> Sure, but what does that mean in terms of code.  Can you reuse any of the=
- code,
-> and if not why not?  I *think* the answer is no, but this is a common poi=
-nt of
-> confusion, so it would be helpful to properly explain this...
->
-> - Eric
+Hi Thara,
 
-Thank you for your review. No, the eddsa can't reuse the code of curve25519=
-.
-I'll also explain this in the next version of patches.
+On Mon, 10 May 2021 at 18:53, Thara Gopinath <thara.gopinath@linaro.org> wrote:
+>
+>
+>
+> On 5/5/21 5:37 PM, Bhupesh Sharma wrote:
+> > On some Qualcomm parts the qce crypto driver needs the interconnect between
+> > the crypto block and main memory to be initialized first before the crypto
+> > registers can be accessed. So it makes sense to defer the qce crypto driver
+> > probing in case the interconnect driver is not yet probed.
+> >
+> > This fixes the qce probe failure issues when both qce and
+> > interconnect drivers are compiled as static part of the kernel.
+> >
+> > Cc: Thara Gopinath <thara.gopinath@linaro.org>
+> > Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+> > Cc: Rob Herring <robh+dt@kernel.org>
+> > Cc: Andy Gross <agross@kernel.org>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: David S. Miller <davem@davemloft.net>
+> > Cc: Stephen Boyd <sboyd@kernel.org>
+> > Cc: Michael Turquette <mturquette@baylibre.com>
+> > Cc: Vinod Koul <vkoul@kernel.org>
+> > Cc: dmaengine@vger.kernel.org
+> > Cc: linux-clk@vger.kernel.org
+> > Cc: linux-crypto@vger.kernel.org
+> > Cc: devicetree@vger.kernel.org
+> > Cc: linux-kernel@vger.kernel.org
+> > Cc: bhupesh.linux@gmail.com
+> > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> > ---
+> >   drivers/crypto/qce/core.c | 14 ++++++++++++++
+> >   1 file changed, 14 insertions(+)
+> >
+> > diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+> > index 3e742e9911fa..9915b184f780 100644
+> > --- a/drivers/crypto/qce/core.c
+> > +++ b/drivers/crypto/qce/core.c
+> > @@ -222,6 +222,20 @@ static int qce_crypto_probe(struct platform_device *pdev)
+> >               return ret;
+> >
+> >       qce->mem_path = of_icc_get(qce->dev, "memory");
+> > +
+> > +     /* Check for NULL return path, which indicates
+> > +      * interconnect API is disabled or the "interconnects"
+> > +      * DT property is missing.
+> > +      */
+> > +     if (!qce->mem_path)
+> > +             /* On some qcom parts, the qce crypto block needs interconnect
+> > +              * paths to be configured before the registers can be accessed.
+> > +              * Check here for the same.
+> > +              */
+> > +             if (!strcmp(of_id->compatible, "qcom,ipq6018-qce") ||
+> > +                 !strcmp(of_id->compatible, "qcom,sdm845-qce"))
+> > +                     return -EPROBE_DEFER;
+> > +
+>
+> Hi Bhupesh,
+>
+> You don't need this here. of_icc_get returns -EPROBE_DEFER if the
+> interconnect provider is not initialized yet.
+
+Thanks for the review.
+
+Yes, I finished testing all the possible combinations with qce, bam
+dma and interconnect drivers compiled as modules v/s as static parts
+of the kernel and we don't need this extra check for the interconnect
+here. We should be fine with checking just the qce_dma_request()
+return value and returning early in the qce probe() flow if no dma
+channels are yet available from the bam dma driver.
+
+I have made the changes in v3 and will post it for review shortly.
+
 Regards,
-Hongbo
+Bhupesh
