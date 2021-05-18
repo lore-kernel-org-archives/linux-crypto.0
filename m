@@ -2,104 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 497CAC43461
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 21:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18FCDC433B4
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 21:36:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1997B6135C
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 21:31:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF6F261244
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 21:36:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236935AbhERVcd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 May 2021 17:32:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51602 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236729AbhERVcc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 May 2021 17:32:32 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 90A876124C;
-        Tue, 18 May 2021 21:31:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621373474;
-        bh=d0+hSpHTltY5juyqwHwyL+G+xHCIlY0BOiHIqPiFSTM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=K3IkDYf5WzG84qZdrk493mElmsqetEgx7UtrgyRD92P25kMU/2NnsR1jUS/IdYBj1
-         KpHfDimRF4fXrFQ75vN7kAoaJxW4DtlpllTLXKjN74Jpdfzywy0nuBMQU4uNjPLvzq
-         YcCKMH0JQ/3Yj+KZUonoDZ7j2+U6eZbzWHXYcHSkRoTnTwDSQ7iepxk8u6YzIuknPW
-         nBT2zx6uFojpxjdgasR5X+VLrmXSALrJceUxQ1Qi8sZNBiFNgek49YbyWhFHhYoGLM
-         Sr6kLztyMyuHVPK+zmrSMFT6aM6wrdbq9TagKSMB9QL/nSAfL+JlINx3IkVwMWq/xO
-         KG87Ke2bRZjyQ==
-Date:   Tue, 18 May 2021 14:31:12 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Vineet Gupta <vgupta@synopsys.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        Nobuhiro Iwamatsu <iwamatsu@debian.org>
-Subject: Re: [PATCH v2 07/13] asm-generic: unaligned always use struct helpers
-Message-ID: <YKQyICQuyJZsl+/j@gmail.com>
-References: <20210514100106.3404011-1-arnd@kernel.org>
- <20210514100106.3404011-8-arnd@kernel.org>
- <YKLlyQnR+3uW4ETD@gmail.com>
- <CAK8P3a0iqe5V6uvaW+Eo0qiwzvyUVavVEfZGwXh4s8ad+0RdCg@mail.gmail.com>
- <CAHk-=wjjo+F8HVkq3eLg+=7hjZPF5mkA4JbgAU8FGE_oAw2MEg@mail.gmail.com>
- <CAK8P3a3hbts4k+rrfnE8Z78ezCaME0UVgwqkdLW5NOps2YHUQQ@mail.gmail.com>
- <CAHk-=wjuoGyxDhAF8SsrTkN0-YfCx7E6jUN3ikC_tn2AKWTTsA@mail.gmail.com>
- <CAK8P3a0QMjP-i7aw_CBRHPu7ffzX0p_vYF_SRtpd_iB8HW5TqQ@mail.gmail.com>
+        id S1352337AbhERVhd (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 May 2021 17:37:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39162 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244028AbhERVhd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 May 2021 17:37:33 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A4A3C061573
+        for <linux-crypto@vger.kernel.org>; Tue, 18 May 2021 14:36:14 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id o8so13237874ljp.0
+        for <linux-crypto@vger.kernel.org>; Tue, 18 May 2021 14:36:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dn4EVgYJrZEh+NwmIsnwQyOdHzd0yPpGagCfbDkwtqA=;
+        b=X0U/cWNHtr9rj18Ej6uRpSwMq9LAHrLwzRrt8j/1xbDDR3dC6q7f2BOTa7z06ry3vm
+         zwoG7M3aOaXMrIxlPbLasgkIMRg/PI1A+Y+EqZmeTYuoeu8tvk9BJU7Pr/BM2NfzZBIz
+         Myayrc2FepSptqNzp+HBnDzeek6r5xIk54DOvDeBARwJ4C9ixlkCXhDq3e+KjdrKr1Qx
+         yLtrUgL/tSzUhh/pytENftLVRcYGI7BaMSq7zPh2WOw76vl83zo3FZ5dMQEpkehaGTeE
+         txeRQlOs8FFEDhMX5xEQ4Z5SXxKQf77eCj24jNyG1DdYCMVU67lKpSbAO98GvYRUI8hs
+         CmAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dn4EVgYJrZEh+NwmIsnwQyOdHzd0yPpGagCfbDkwtqA=;
+        b=LzuVJhytSlIcib0Z+gczOkdvoo52BXnqMzzsWnh/hpXyaHFieSG1UkfrEORDaMNNCY
+         iqHhJB1u161dHkZwGBqvFLZe9i5jJaT5BbWsgDu8ZlPsrnlSLupJrj2ppMa97cnXULpK
+         XAvgRVZSmYLF4poxAjTK0WyTdIH8/xLVwHeXrtsu7L1QMBPOGRyba4nE5j5RmEjX/T+M
+         MIy6UNWatBSAuQj5Gg8BweSJpZ/+aUkoCUkSmmV6EDeo4NoxegEis3XwKNqWbYrpKC65
+         kbhJCt2DcTwEwYJbc80YAzMTjC+w4X6fmkZlvxttNWIL5Oc4M16PzAitti/2u0VtpJuL
+         PXqg==
+X-Gm-Message-State: AOAM530V++C/HC/sCPgoujQh5X6B31/yCYVeBKqVazKLpWBNed46lrvH
+        2EbJAR9O1hbAY7+EA+Qrr97sib4y/aCwPt6xVXPyDoHbQPM7LA==
+X-Google-Smtp-Source: ABdhPJxiiYCLgo6v1wkmf1ffz+9LT1EFC2e9HHWQhseZrXKs2+leqMj7P7SZn6RRYUWehbP2Y/PLl9VwzWnfzUL542U=
+X-Received: by 2002:a2e:90c7:: with SMTP id o7mr5685489ljg.368.1621373773064;
+ Tue, 18 May 2021 14:36:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK8P3a0QMjP-i7aw_CBRHPu7ffzX0p_vYF_SRtpd_iB8HW5TqQ@mail.gmail.com>
+References: <20210505202618.2663889-1-clabbe@baylibre.com> <CACRpkdbR9mt-X-Dt9uR9vGtg_EDJCk3H5Umuh2eUX-PGZ7VBfQ@mail.gmail.com>
+ <20210518011930.nywtcgualmsrx35v@gondor.apana.org.au>
+In-Reply-To: <20210518011930.nywtcgualmsrx35v@gondor.apana.org.au>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Tue, 18 May 2021 23:36:01 +0200
+Message-ID: <CACRpkdbi+1tVL04HQ5Uufpw3-ORp3W4Cs1AyHrjQwJ149T8MMQ@mail.gmail.com>
+Subject: Re: [PATCH 00/11] crypto: start to fix ixp4xx
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Corentin Labbe <clabbe@baylibre.com>, chohnstaedt@innominate.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 18, 2021 at 10:51:23PM +0200, Arnd Bergmann wrote:
-> 
-> > zstd looks very similar to lz4.
-> 
-> > End result: at a minimum, I'd suggest using
-> > "-fno-tree-loop-vectorize", although somebody should check that NEON
-> > case.
-> 
-> > And I still think that using O3 for anything halfway complicated
-> > should be considered odd and need some strong numbers to enable.
-> 
-> Agreed. I think there is a fairly strong case for just using -O2 on lz4
-> and backport that to stable.
-> Searching for lz4 bugs with -O3 also finds several reports including
-> one that I sent myself:
-> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65709
-> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69702
-> 
-> I see that user space zstd is built with -O3 in Debian, but it the changelog
-> also lists "Improved : better speed on clang and gcc -O2, thanks to Eric
-> Biggers", so maybe Eric has some useful ideas on whether we should
-> just use -O2 for the in-kernel version.
-> 
+On Tue, May 18, 2021 at 3:19 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Tue, May 18, 2021 at 01:53:56AM +0200, Linus Walleij wrote:
+> > On Wed, May 5, 2021 at 10:26 PM Corentin Labbe <clabbe@baylibre.com> wrote:
+> >
+> > > Loading the ixp4xx crypto driver exhibits lots of error.
+> > > All algorithm fail selftests with different reasons.
+> > > This series start to fixes some of thoses problem.
+> >
+> > Excellent! Thanks for taking over this Corentin!!
+> > FWIW:
+> > Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> >
+> > If I merge my 3 additional patches through ARM SoC
+> > will it work out or do I need to think about some clever
+> > merging strategy?
+>
+> Well if your patches don't touch the drivers/crypto then there
+> shouldn't be any conflicts.
 
-In my opinion, -O2 is a good default even for compression code.  I generally
-don't see any benefit from -O3 in compression code I've written.
+Sadly they do, it's these:
+https://lore.kernel.org/linux-crypto/20210510213634.600866-1-linus.walleij@linaro.org/
+https://lore.kernel.org/linux-crypto/20210510213634.600866-2-linus.walleij@linaro.org/
+https://lore.kernel.org/linux-crypto/20210510213634.600866-3-linus.walleij@linaro.org/
 
-That being said, -O2 is what I usually use during development.  Other people
-could write code that relies on -O3 to be optimized well.
+I guess we could turn it around: I see if I can apply these two
+on top of the crypto tree and resend then we hope there is no
+collision in the ARM SoC tree instead.
 
-The Makefiles for lz4 and zstd use -O3 by default, which is a little concerning.
-I do expect that they're still well-written enough to do well with -O2 too, but
-it would require doing benchmarks to tell for sure.  (As Arnd noted, it happens
-that I did do such benchmarks on zstd about 5 years ago, and I found an issue
-where some functions weren't marked inline when they should be, causing them to
-be inlined at -O3 but not at -O2.  That got fixed.)
+I need to respin the series anyway so shall we try this?
 
-- Eric
+Yours,
+Linus Walleij
