@@ -2,134 +2,177 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B60BC43461
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 07:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 541CDC433ED
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 11:23:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 306A061028
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 07:27:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3770961285
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 11:23:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240600AbhERH20 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 May 2021 03:28:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56646 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240235AbhERH2X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 May 2021 03:28:23 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EE75161353;
-        Tue, 18 May 2021 07:27:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621322826;
-        bh=tr42CgFCvzDLTaED1GLg2sfLJpu7z95Hx0uB17IraIA=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=vFuTpSZlyekcp66+1xXP7UZO1BN2bgkvFtUPcj1zJCS149c+Zvi5hPquocBVIojB2
-         Z7exeBYrhumkzjJUSvEpKFGW4FaqBqZSq7xU7M8ZbBXk0ZQ5jVfmLPFTh3D4RbZM9j
-         lrUhs82y4HlTvmFkV/mBBanL9tIfDdHW4GCSJAjCwx8xBjvD/9MzWbWnE1oIuT7iX5
-         gYhCI1yVOzSCg5K38ilmDg450rgYNeNMsjsLC6gOgw0amIXTpygFFnPllY+Yc4M1UR
-         B2od90rmhi/bP2cvywv26nLYI1niEqFU+sMFU1it04NiboiejydzFTKGEQcZqqBYpS
-         U/cWQ9vRIoLtg==
-Received: by mail-wr1-f49.google.com with SMTP id a4so9011174wrr.2;
-        Tue, 18 May 2021 00:27:05 -0700 (PDT)
-X-Gm-Message-State: AOAM533uYGieda+TwW6tF4wz8TdYChzHQDjVJR2354nb6NmMyl4ketaJ
-        8Bg2PHoUUjerVtW3qhap3NailXosaBVZsQYTYjQ=
-X-Google-Smtp-Source: ABdhPJw7JTt4IAZe/TChTanjbi1ijbilhjNGsF3uk1EUqanoDrTYb4AVMmBaFkHaFRFYOWXro9yDE/Lwgvl9R0Actyg=
-X-Received: by 2002:a5d:6dc4:: with SMTP id d4mr5094533wrz.105.1621322824578;
- Tue, 18 May 2021 00:27:04 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210514100106.3404011-1-arnd@kernel.org> <20210514100106.3404011-8-arnd@kernel.org>
- <YKLlyQnR+3uW4ETD@gmail.com>
-In-Reply-To: <YKLlyQnR+3uW4ETD@gmail.com>
-From:   Arnd Bergmann <arnd@kernel.org>
-Date:   Tue, 18 May 2021 09:25:54 +0200
-X-Gmail-Original-Message-ID: <CAK8P3a0iqe5V6uvaW+Eo0qiwzvyUVavVEfZGwXh4s8ad+0RdCg@mail.gmail.com>
-Message-ID: <CAK8P3a0iqe5V6uvaW+Eo0qiwzvyUVavVEfZGwXh4s8ad+0RdCg@mail.gmail.com>
-Subject: Re: [PATCH v2 07/13] asm-generic: unaligned always use struct helpers
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-arch <linux-arch@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Vineet Gupta <vgupta@synopsys.com>,
-        Russell King <linux@armlinux.org.uk>,
+        id S240104AbhERLYc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 May 2021 07:24:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40228 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233486AbhERLYT (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 May 2021 07:24:19 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0580DC061573
+        for <linux-crypto@vger.kernel.org>; Tue, 18 May 2021 04:23:00 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id r12so9812186wrp.1
+        for <linux-crypto@vger.kernel.org>; Tue, 18 May 2021 04:22:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DCCqrr8wK9Z3oX5rCaA/n2nKsKJmS6s8+5KqyY7fBB4=;
+        b=ADRUVcjfyh7wZo3ai7Jq+kamkrpn1NhqE2Uw9xnl7FpO6NO3acOJ188VsHlZh4yXed
+         aBMn0Mg9z1PGgva7uPUyTXObcFMPAL7XkomDwf1ygn6kCsZ2P/FqRF8QQE9LmKVEebBD
+         BWdo60LPPy42Ak5WblviNwa40W0eUHs1VlDY8voDaWXGRP3rVnz68rAY5HfXXeHF97+c
+         /hIYla5G5VSW6srZin6MsA4xVbPUY5D+lfKTanbB5tYkHmQq10mdAvHoH6YBefBOoCaX
+         1eKuuhHEdjbNcVuoQfAJkPCqwwHlsRi6W+7GPWVjU31bmXaatCxQe5qZmgCRaDwWNZ9h
+         lIzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DCCqrr8wK9Z3oX5rCaA/n2nKsKJmS6s8+5KqyY7fBB4=;
+        b=Zd6YI6SRpzoNvIWR/ZGe4gNEkXuNyqojZKYqkASxQW/kazRRlz43tZms6FOcTxJpVd
+         dtS+a7TY9CkIbtk4B5TWap1Sx0lgNRRt3rb84HYbIVWgup4oP05n4aB3TP3wERWAq+Ex
+         7SvWDUbmwVhsUS69Pon+yQ7yY4aPmzwwIYu3TOGahVR+4D5rsyXLKJUPVNtnAn5+ie4Q
+         eE43EY237KqFJ+H/nBJJAOoEukietc9oC84iFav2vFeCSqTBXSBqZZp+qxLjv5+tH0cj
+         SntMZmEpSqqIhg/tLeAqbMxCo+d3HNlOHI/r4a8DxLXme6sxhBIFzg6av0QN/jRvptKA
+         LfAw==
+X-Gm-Message-State: AOAM532GZb72UM3p5n74y6l71edfu75F/a2jc9t04Z2Y6Z1oL0xOUg6X
+        ERJKaIi2r4dbN7KGpAk3+U1wbQ==
+X-Google-Smtp-Source: ABdhPJzWfBKWSIvh12WRInRFuIbcscfo06bwrlqRgQ6iVnYGxH1e0APjYYd/RYQzdnFUMzyG5/s2Zg==
+X-Received: by 2002:a5d:45c6:: with SMTP id b6mr6217248wrs.333.1621336978698;
+        Tue, 18 May 2021 04:22:58 -0700 (PDT)
+Received: from localhost.localdomain ([88.160.162.107])
+        by smtp.gmail.com with ESMTPSA id y20sm2881337wmi.0.2021.05.18.04.22.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 May 2021 04:22:58 -0700 (PDT)
+From:   Fabien Parent <fparent@baylibre.com>
+To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Rob Herring <robh+dt@kernel.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Sean Wang <sean.wang@mediatek.com>
+Cc:     mkorpershoek@baylibre.com, Fabien Parent <fparent@baylibre.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] dt-bindings: rng: mediatek: convert to yaml schema
+Date:   Tue, 18 May 2021 13:22:49 +0200
+Message-Id: <20210518112250.2146819-1-fparent@baylibre.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 17, 2021 at 11:53 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> On Fri, May 14, 2021 at 12:00:55PM +0200, Arnd Bergmann wrote:
-> > From: Arnd Bergmann <arnd@arndb.de>
-> >
-> > As found by Vineet Gupta and Linus Torvalds, gcc has somewhat unexpected
-> > behavior when faced with overlapping unaligned pointers. The kernel's
-> > unaligned/access-ok.h header technically invokes undefined behavior
-> > that happens to usually work on the architectures using it, but if the
-> > compiler optimizes code based on the assumption that undefined behavior
-> > doesn't happen, it can create output that actually causes data corruption.
-> >
-> > A related problem was previously found on 32-bit ARMv7, where most
-> > instructions can be used on unaligned data, but 64-bit ldrd/strd causes
-> > an exception. The workaround was to always use the unaligned/le_struct.h
-> > helper instead of unaligned/access-ok.h, in commit 1cce91dfc8f7 ("ARM:
-> > 8715/1: add a private asm/unaligned.h").
-> >
-> > The same solution should work on all other architectures as well, so
-> > remove the access-ok.h variant and use the other one unconditionally on
-> > all architectures, picking either the big-endian or little-endian version.
->
-> FYI, gcc 10 had a bug where it miscompiled code that uses "packed structs" to
-> copy between overlapping unaligned pointers
-> (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94994).
+Convert the RNG binding for MediaTek to use YAML schema.
 
-Thank you for pointing this out
+Signed-off-by: Fabien Parent <fparent@baylibre.com>
+---
+ .../devicetree/bindings/rng/mtk-rng.txt       | 22 --------
+ .../devicetree/bindings/rng/mtk-rng.yaml      | 53 +++++++++++++++++++
+ 2 files changed, 53 insertions(+), 22 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rng/mtk-rng.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/mtk-rng.yaml
 
-> I'm not sure whether the kernel will run into that or not, and gcc has since
-> fixed it.  But it's worth mentioning, especially since the issue mentioned in
-> this commit sounds very similar (overlapping unaligned pointers), and both
-> involved implementations of DEFLATE decompression.
+diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
+deleted file mode 100644
+index dfdcb5cd2ea8..000000000000
+--- a/Documentation/devicetree/bindings/rng/mtk-rng.txt
++++ /dev/null
+@@ -1,22 +0,0 @@
+-Device-Tree bindings for Mediatek random number generator
+-found in MediaTek SoC family
+-
+-Required properties:
+-- compatible	    : Should be
+-			"mediatek,mt7622-rng", 	"mediatek,mt7623-rng" : for MT7622
+-			"mediatek,mt7629-rng",  "mediatek,mt7623-rng" : for MT7629
+-			"mediatek,mt7623-rng" : for MT7623
+-			"mediatek,mt8516-rng", "mediatek,mt7623-rng" : for MT8516
+-- clocks	    : list of clock specifiers, corresponding to
+-		      entries in clock-names property;
+-- clock-names	    : Should contain "rng" entries;
+-- reg 		    : Specifies base physical address and size of the registers
+-
+-Example:
+-
+-rng: rng@1020f000 {
+-	compatible = "mediatek,mt7623-rng";
+-	reg = <0 0x1020f000 0 0x1000>;
+-	clocks = <&infracfg CLK_INFRA_TRNG>;
+-	clock-names = "rng";
+-};
+diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.yaml b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+new file mode 100644
+index 000000000000..d9731f0ae47d
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+@@ -0,0 +1,53 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: "http://devicetree.org/schemas/rng/mtk-rng.yaml#"
++$schema: "http://devicetree.org/meta-schemas/core.yaml#"
++
++title: MediaTek Random number generator
++
++maintainers:
++  - Sean Wang <sean.wang@mediatek.com>
++
++properties:
++  compatible:
++    oneOf:
++      - enum:
++          - mediatek,mt7623-rng
++      - items:
++          - const: mediatek,mt7622-rng
++          - const: mediatek,mt7623-rng
++      - items:
++          - const: mediatek,mt7629-rng
++          - const: mediatek,mt7623-rng
++      - items:
++          - const: mediatek,mt8516-rng
++          - const: mediatek,mt7623-rng
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  clock-names:
++    items:
++      - const: rng
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - clock-names
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/mt2701-clk.h>
++    rng: rng@1020f000 {
++            compatible = "mediatek,mt7623-rng";
++            reg = <0x1020f000 0x1000>;
++            clocks = <&infracfg CLK_INFRA_TRNG>;
++            clock-names = "rng";
++    };
+-- 
+2.31.1
 
-I tried reproducing this on the kernel deflate code with the kernel.org gcc-10.1
-and gcc-10.3 crosstool versions but couldn't quite get there with Vineet's
-preprocessed source https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100363
-
-Trying with both the original get_unaligned() version in there and the
-packed-struct
-variant, I get the same output from gcc-10.1 and gcc-10.3 when I compile those
-myself for arc hs4x , but it's rather different from the output that Vineet got
-and I don't know how to spot whether the problem exists in any of those
-versions.
-
-> Anyway, partly due to the above, in userspace I now only use memcpy() to
-> implement {get,put}_unaligned_*, since these days it seems to be compiled
-> optimally and have the least amount of problems.
->
-> I wonder if the kernel should do the same, or whether there are still cases
-> where memcpy() isn't compiled optimally.  armv6/7 used to be one such case, but
-> it was fixed in gcc 6.
-
-It would have to be memmove(), not memcpy() in this case, right?
-My feeling is that if gcc-4.9 and gcc-5 produce correct but slightly slower
-code, we can live with that, unlike the possibility of gcc-10.{1,2} producing
-incorrect code.
-
-Since the new asm/unaligned.h has a single implementation across all
-architectures, we could probably fall back to a memmove based version for
-the compilers affected by the 94994 bug,  but I'd first need to have a better
-way to test regarding whether given combination of asm/unaligned.h and
-compiler version runs into this bug.
-
-I have checked your reproducer and confirmed that it does affect x86_64
-gcc-10.1 -O3 with my proposed version of asm-generic/unaligned.h, but
-does not trigger on any other version (4.9 though 9.3, 10.3 or 11.1), and not
-on -O2 or "-O3 -mno-sse" builds or on arm64, but that doesn't necessarily
-mean it's safe on these.
-
-        Arnd
