@@ -2,54 +2,55 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_RED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_RED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82ED5C43460
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 18:16:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2393BC43460
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 20:52:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 659CF61261
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 18:16:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 038E361028
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 May 2021 20:52:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234187AbhERSRn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 May 2021 14:17:43 -0400
-Received: from mail.zx2c4.com ([104.131.123.232]:58458 "EHLO mail.zx2c4.com"
+        id S1351962AbhERUx5 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 May 2021 16:53:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37590 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229652AbhERSRl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 May 2021 14:17:41 -0400
-X-Greylist: delayed 397 seconds by postgrey-1.27 at vger.kernel.org; Tue, 18 May 2021 14:17:40 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1621361380;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8rS8izsTLYXgTg5EMvpq46Wwtz/UgRyB75Drw18GbEc=;
-        b=ordstdKxuroSvOenGkA5+S0n5Eaelw4XVAjEk8UkZ+3isrXKa/wmD2IPj5r0Kfvq1zfUvP
-        CY+6i6WC3N7rlrm8aZt38e2edfNAMTLd+AO8SdHBhlEwi2KfGNHs1D7pQQWn5EZk5/Ft6s
-        3IM/CNVZLwMM7ldWaZFwTTdsthAFBJk=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id dd3e8623 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 18 May 2021 18:09:40 +0000 (UTC)
-Received: by mail-yb1-f175.google.com with SMTP id g38so14466582ybi.12;
-        Tue, 18 May 2021 11:09:40 -0700 (PDT)
-X-Gm-Message-State: AOAM533Fu+hAseTLmikalDAeO39oFaAUX/oBSRZs40DjskHEVMYuQuNd
-        E+jEl+sU9jL/f36vhSipVszbjC+cFV2t6fZ0QrM=
-X-Google-Smtp-Source: ABdhPJzjL1VkURyiOt9hWVcfIhsJ4Fpd+evfXoJrwAsTV/P9d+CfD5cJgWw4InGE4VmuxwkJA2Pvdq6MOW/JGmXtt8w=
-X-Received: by 2002:a25:be09:: with SMTP id h9mr9533216ybk.239.1621361379012;
- Tue, 18 May 2021 11:09:39 -0700 (PDT)
+        id S241378AbhERUxy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 May 2021 16:53:54 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E701261369;
+        Tue, 18 May 2021 20:52:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1621371155;
+        bh=YlMi/y1ocUW8FCBYYgYe9EQZBo6QiWLJNh5f/j+pP0E=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=OLkXv26WRHCFwP9ZdDJc/27YfDoAVhIBcnSIKC+rjNsOgVFXIkoWKfcDNwr3Fuwiu
+         FMWuLnxquY14Wo7eqgnPX3svft1esnEYWXViA2TDt5Eqgm1aCMjK02QamFKdUQYqYc
+         EUsApt5yKyYtIESaVa1iQ0k17SyqcsKte9kDWMhLufib+7iHzUo5s8BdzOysPGjLdG
+         EO4BePVHXLG5V4yaAa5hTIc1ROTNW0zomq3qna8+C5jUnCe6h1lmAWFsnS67CWA1/a
+         VT+yr7OrTgR+UbaTfdWVl3plamW5qoNPsJLYMPWOPpNJjc0cY1crMdWW/0/hfrVK+/
+         CLOnbPqsFDhzw==
+Received: by mail-wr1-f47.google.com with SMTP id x8so11662574wrq.9;
+        Tue, 18 May 2021 13:52:35 -0700 (PDT)
+X-Gm-Message-State: AOAM531Cf/Cp/t5vT61rO1SWK2xRAvjlYk7d9fxDYKLh2JunckO8hjXh
+        6F/Bb1XMvpUY6VFR4eBXzDfRD0gF1/2/p0zZK1o=
+X-Google-Smtp-Source: ABdhPJxil0NvKEv6VrVk2cq755gNemDrX2zp1yGDNAS6XdSetBpoojcm3BTi60gUywyeb4P0aQGylNMfelDFfmGQxqk=
+X-Received: by 2002:a5d:6dc4:: with SMTP id d4mr9728575wrz.105.1621371154421;
+ Tue, 18 May 2021 13:52:34 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210514100106.3404011-1-arnd@kernel.org> <20210514100106.3404011-8-arnd@kernel.org>
  <YKLlyQnR+3uW4ETD@gmail.com> <CAK8P3a0iqe5V6uvaW+Eo0qiwzvyUVavVEfZGwXh4s8ad+0RdCg@mail.gmail.com>
  <CAHk-=wjjo+F8HVkq3eLg+=7hjZPF5mkA4JbgAU8FGE_oAw2MEg@mail.gmail.com>
  <CAK8P3a3hbts4k+rrfnE8Z78ezCaME0UVgwqkdLW5NOps2YHUQQ@mail.gmail.com> <CAHk-=wjuoGyxDhAF8SsrTkN0-YfCx7E6jUN3ikC_tn2AKWTTsA@mail.gmail.com>
 In-Reply-To: <CAHk-=wjuoGyxDhAF8SsrTkN0-YfCx7E6jUN3ikC_tn2AKWTTsA@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 18 May 2021 20:09:27 +0200
-X-Gmail-Original-Message-ID: <CAHmME9otB5Wwxp7H8bR_i2uH2esEMvoBMC8uEXBMH9p0q1s6Bw@mail.gmail.com>
-Message-ID: <CAHmME9otB5Wwxp7H8bR_i2uH2esEMvoBMC8uEXBMH9p0q1s6Bw@mail.gmail.com>
+From:   Arnd Bergmann <arnd@kernel.org>
+Date:   Tue, 18 May 2021 22:51:23 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a0QMjP-i7aw_CBRHPu7ffzX0p_vYF_SRtpd_iB8HW5TqQ@mail.gmail.com>
+Message-ID: <CAK8P3a0QMjP-i7aw_CBRHPu7ffzX0p_vYF_SRtpd_iB8HW5TqQ@mail.gmail.com>
 Subject: Re: [PATCH v2 07/13] asm-generic: unaligned always use struct helpers
 To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Arnd Bergmann <arnd@kernel.org>,
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Eric Biggers <ebiggers@kernel.org>,
         linux-arch <linux-arch@vger.kernel.org>,
         Vineet Gupta <vgupta@synopsys.com>,
@@ -61,48 +62,76 @@ Cc:     Arnd Bergmann <arnd@kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        Nobuhiro Iwamatsu <iwamatsu@debian.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus,
-
 On Tue, May 18, 2021 at 6:12 PM Linus Torvalds
 <torvalds@linux-foundation.org> wrote:
-> I'm actually surprised wireguard would use -O3. Yes, performance is
-> important. But for wireguard, correctness is certainly important too.
-> Maybe Jason isn't aware of just how bad gcc -O3 has historically been?
-> Jason? How big of a deal is that -O3 for wireguard wrt the normal -O2?
-> There are known buggy gcc versions that aren't ancient.
+> On Tue, May 18, 2021 at 5:42 AM Arnd Bergmann <arnd@kernel.org> wrote:
+>
+> Of the other cases, that xor-neon.c case actually makes sense. For
+> that file, it literally exists _only_ to get a vectorized version of
+> the trivial xor_8regs loop. It's one of the (very very few) cases of
+> vectorization we actually want. And in that case, we might even want
+> to make things easier - and more explicit - for the compiler by making
+> the xor_8regs loops use "restrict" pointers.
+>
+> That neon case actually wants and needs that tree-vectorization to
+> DTRT. But maybe it doesn't need the actual _loop_ vectorization? The
+> xor_8regs code is literally using hand-unrolled loops already, exactly
+> to make it as simple as possible for the compiler (but the lack of
+> "restrict" pointers means that it's not all that simple after all, and
+> I assume the compiler generates conditionals for the NEON case?
 
-My impression has always been that O3 might sometimes generate slower
-code, but not that it generates buggy code so commonly. Thanks for
-letting me know.
+Right, I think there is an ongoing debate over how to best handle this
+one in clang, since that does not do any vectorization for this file
+unless the pointers are marked "restrict". As far as I remember, there
+are some callers that want to do the xor in place though, which
+means restrict is wrong.
 
-I have a habit of compulsively run IDA Pro after making changes (brain
-damage from too many years as a "security person" or something), to
-see what the compiler did, and I've just been doing that with O3 since
-the beginning of the project, so that's what I wound up optimizing
-for. Or sometimes I'll work little things out in Godbolt's compiler
-explorer. It's not like it matters much most of the time, but
-sometimes I enjoy the golf. Anyway, I've never noticed it producing
-any clearly wrong code compared to O2. But I'm obviously not testing
-on all compilers or on all architectures. So if you think there's
-danger lurking somewhere, it seems reasonable to change that to O2.
+> lz4 is questionable - yes, upstream lh4 seems to use -O3 (good), but
+> it also very much uses unaligned accesses, which is where the gcc bug
+> hits. I doubt that it really needs or wants the loop vectorization.
 
-Comparing gcc 11's output between O2 and O3, it looks like the primary
-difference is that the constant propagation is much less aggressive
-with O2, and less inlining in general also means that some stores and
-loads to local variables across static function calls aren't being
-coalesced. A few null checks are removed too, where the compiler can
-prove them away.
+I ran some limited speed tests with the lz4 sources that come with Ubuntu,
+using gcc-10.3 on an AMD Zen1 Threadripper with 10GB of /dev/urandom
+input.
+This package patches the sources to use -O2 and no vectorization,
+which turns out to be the fastest combination for my stupid test as well.
 
-So while I've never seen issues with that code under O3, I don't see a
-super compelling speed up anywhere either, but rather a bunch of
-places that may or may not be theoretically faster or slower on some
-system, maybe. I can queue up a patch for the next wireguard series I
-send to Dave.
+The results are barely above noise, but it appears that  -O2
+-ftree-loop-vectorize
+makes it slightly slower than just -O2, while -O3 is even slower than
+that regardless of -fno-tree-loop-vectorize/-ftree-loop-vectorize.
 
-Jason
+I see that Nobuhiro Iwamatsu (Cc'd) changed the Debian lz4 package to
+use -O2, but I don't see an explanation for it. I also see that the lz4 sources
+force -O2 on ppc64 because -O3 causes a 30% slowdown from vectorization.
+The kernel version is missing the bit that does this.
+
+> zstd looks very similar to lz4.
+
+> End result: at a minimum, I'd suggest using
+> "-fno-tree-loop-vectorize", although somebody should check that NEON
+> case.
+
+> And I still think that using O3 for anything halfway complicated
+> should be considered odd and need some strong numbers to enable.
+
+Agreed. I think there is a fairly strong case for just using -O2 on lz4
+and backport that to stable.
+Searching for lz4 bugs with -O3 also finds several reports including
+one that I sent myself:
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65709
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69702
+
+I see that user space zstd is built with -O3 in Debian, but it the changelog
+also lists "Improved : better speed on clang and gcc -O2, thanks to Eric
+Biggers", so maybe Eric has some useful ideas on whether we should
+just use -O2 for the in-kernel version.
+
+        Arnd
