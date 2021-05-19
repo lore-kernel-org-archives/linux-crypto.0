@@ -2,137 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E53C433ED
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 May 2021 06:02:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCCA0C433ED
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 May 2021 11:22:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 92A4D61355
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 May 2021 06:02:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B03D56135F
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 May 2021 11:22:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234889AbhESGEK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 May 2021 02:04:10 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:3418 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232880AbhESGEJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 May 2021 02:04:09 -0400
-Received: from dggems703-chm.china.huawei.com (unknown [172.30.72.59])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FlMf95p6SzCt6b;
-        Wed, 19 May 2021 14:00:01 +0800 (CST)
-Received: from dggemi760-chm.china.huawei.com (10.1.198.146) by
- dggems703-chm.china.huawei.com (10.3.19.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Wed, 19 May 2021 14:02:48 +0800
-Received: from localhost.localdomain (10.67.165.24) by
- dggemi760-chm.china.huawei.com (10.1.198.146) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Wed, 19 May 2021 14:02:47 +0800
-From:   Hui Tang <tanghui20@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: remove leading spaces before tabs
-Date:   Wed, 19 May 2021 13:59:44 +0800
-Message-ID: <1621403984-40037-1-git-send-email-tanghui20@huawei.com>
-X-Mailer: git-send-email 2.8.1
+        id S1349993AbhESLYE (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 May 2021 07:24:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52792 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241088AbhESLYE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 May 2021 07:24:04 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4745D611BF;
+        Wed, 19 May 2021 11:22:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1621423364;
+        bh=leATF6xB7khhsf31CJbhvizT6L2Nn6/9FnFi7jswHew=;
+        h=From:To:Cc:Subject:Date:From;
+        b=HAbIPP/mw/tWP55YJ9V9WVqyomYfanElyt9Czi95kw+LwT/eG8YDpFd30gz0/z6AO
+         Pi34kBP+bTprpeG0yla3u8wmCCImvbG/JJ8lM72Op3j+yCCQaax+Ao/SKOpias30xs
+         Z/0/pNAmb0FGWu3KKUSsOSEjOzYEVmmliggU7qVp1ybgy2EREVFbdMmr6KfL+HTOBQ
+         5//OcefrsA7NMu7kjwrjRVvC5Ow8tbjtGlOrxoIsWOYuij4VVqGY2TzWPk4+vQPDQB
+         murPzGZbaAoXMTMVJ4lIxGeTiUpmoPMbOvaRCABQV61fzH8NppRxr7oEJSF2oNtSeL
+         OqTV7ApgTH+zw==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, ebiggers@kernel.org,
+        herbert@gondor.apana.org.au, will@kernel.org,
+        kernel-team@android.com, Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH v4 0/7] running kernel mode SIMD with softirqs disabled
+Date:   Wed, 19 May 2021 13:22:32 +0200
+Message-Id: <20210519112239.33664-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggemi760-chm.china.huawei.com (10.1.198.146)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There are a few leading spaces before tabs and remove it by running the
-following commard:
+This is a follow-up to [0], but given that the arm64 architectural
+pieces have been merged for arm64, the only remaining changes are crypto
+specific. Therefore, the audience has been reduced to those people who
+are likely to care about these specifics.
 
-	$ find . -name '*.c' | xargs sed -r -i 's/^[ ]+\t/\t/'
+Patch #1 addresses an issue in the skcipher walker which doesn't handle
+zero sized AEAD inputs entirely consistently, which is uncovered by the
+change in patch #7.
 
-At the same time, fix two warning by running checkpatch.pl:
-	WARNING: suspect code indent for conditional statements (16, 16)
-	WARNING: braces {} are not necessary for single statement blocks
+Patches #2 and #3 add some sanity checks to the public AEAD and skcipher
+APIs to limit their availibility to either task or softirq context
+(which is the only way in which they are currently being used). Adding
+this restriction permits the arm64 crypto code to get rid of all scalar
+fallbacks, given that on this architecture, softirqs are no longer
+served while the SIMD unit is being used in kernel mode, which means
+that the scalar fallbacks are never needed. These are removed in the
+remaining 4 patches.
 
-Signed-off-by: Hui Tang <tanghui20@huawei.com>
----
- crypto/khazad.c |  2 +-
- crypto/wp512.c  | 40 +++++++++++++++++++---------------------
- 2 files changed, 20 insertions(+), 22 deletions(-)
+Changes since v3:
+- clarify the nature of the issue addressed by patch #1, and apply the
+  same fix to the skcipher walker
+- update patches #2 and #3 so that the failures can be observed by the
+  crypto stats code
 
-diff --git a/crypto/khazad.c b/crypto/khazad.c
-index 14ca7f1..f193399 100644
---- a/crypto/khazad.c
-+++ b/crypto/khazad.c
-@@ -819,7 +819,7 @@ static void khazad_crypt(const u64 roundKey[KHAZAD_ROUNDS + 1],
- 			T6[(int)(state >>  8) & 0xff] ^
- 			T7[(int)(state      ) & 0xff] ^
- 			roundKey[r];
--    	}
-+	}
- 
- 	state = (T0[(int)(state >> 56)       ] & 0xff00000000000000ULL) ^
- 		(T1[(int)(state >> 48) & 0xff] & 0x00ff000000000000ULL) ^
-diff --git a/crypto/wp512.c b/crypto/wp512.c
-index feadc13..bf79fbb 100644
---- a/crypto/wp512.c
-+++ b/crypto/wp512.c
-@@ -1066,33 +1066,31 @@ static int wp512_final(struct shash_desc *desc, u8 *out)
- {
- 	struct wp512_ctx *wctx = shash_desc_ctx(desc);
- 	int i;
--   	u8 *buffer      = wctx->buffer;
--   	u8 *bitLength   = wctx->bitLength;
--   	int bufferBits  = wctx->bufferBits;
--   	int bufferPos   = wctx->bufferPos;
-+	u8 *buffer      = wctx->buffer;
-+	u8 *bitLength   = wctx->bitLength;
-+	int bufferBits  = wctx->bufferBits;
-+	int bufferPos   = wctx->bufferPos;
- 	__be64 *digest  = (__be64 *)out;
- 
--   	buffer[bufferPos] |= 0x80U >> (bufferBits & 7);
--   	bufferPos++;
--   	if (bufferPos > WP512_BLOCK_SIZE - WP512_LENGTHBYTES) {
--   		if (bufferPos < WP512_BLOCK_SIZE) {
--	   	memset(&buffer[bufferPos], 0, WP512_BLOCK_SIZE - bufferPos);
--   		}
--   		wp512_process_buffer(wctx);
--   		bufferPos = 0;
--   	}
--   	if (bufferPos < WP512_BLOCK_SIZE - WP512_LENGTHBYTES) {
--   		memset(&buffer[bufferPos], 0,
-+	buffer[bufferPos] |= 0x80U >> (bufferBits & 7);
-+	bufferPos++;
-+	if (bufferPos > WP512_BLOCK_SIZE - WP512_LENGTHBYTES) {
-+		if (bufferPos < WP512_BLOCK_SIZE)
-+			memset(&buffer[bufferPos], 0, WP512_BLOCK_SIZE - bufferPos);
-+		wp512_process_buffer(wctx);
-+		bufferPos = 0;
-+	}
-+	if (bufferPos < WP512_BLOCK_SIZE - WP512_LENGTHBYTES)
-+		memset(&buffer[bufferPos], 0,
- 			  (WP512_BLOCK_SIZE - WP512_LENGTHBYTES) - bufferPos);
--   	}
--   	bufferPos = WP512_BLOCK_SIZE - WP512_LENGTHBYTES;
--   	memcpy(&buffer[WP512_BLOCK_SIZE - WP512_LENGTHBYTES],
-+	bufferPos = WP512_BLOCK_SIZE - WP512_LENGTHBYTES;
-+	memcpy(&buffer[WP512_BLOCK_SIZE - WP512_LENGTHBYTES],
- 		   bitLength, WP512_LENGTHBYTES);
--   	wp512_process_buffer(wctx);
-+	wp512_process_buffer(wctx);
- 	for (i = 0; i < WP512_DIGEST_SIZE/8; i++)
- 		digest[i] = cpu_to_be64(wctx->hash[i]);
--   	wctx->bufferBits   = bufferBits;
--   	wctx->bufferPos    = bufferPos;
-+	wctx->bufferBits   = bufferBits;
-+	wctx->bufferPos    = bufferPos;
- 
- 	return 0;
- }
+[0] https://lore.kernel.org/linux-arm-kernel/20210302090118.30666-1-ardb@kernel.org/
+
+Ard Biesheuvel (7):
+  crypto: skcipher - handle zero sized inputs correctly
+  crypto: aead - disallow en/decrypt for non-task or non-softirq context
+  crypto: skcipher - disallow en/decrypt for non-task or non-softirq
+    context
+  crypto: arm64/gcm-aes-ce - remove non-SIMD fallback path
+  crypto: arm64/aes-neonbs - stop using SIMD helper for skciphers
+  crypto: arm64/aes-ce - stop using SIMD helper for skciphers
+  crypto: arm64/aes-ccm - remove non-SIMD fallback path
+
+ arch/arm64/crypto/Kconfig           |   6 -
+ arch/arm64/crypto/aes-ce-ccm-core.S |   1 +
+ arch/arm64/crypto/aes-ce-ccm-glue.c | 183 +++++------------
+ arch/arm64/crypto/aes-glue.c        | 102 ++--------
+ arch/arm64/crypto/aes-neonbs-glue.c | 122 +-----------
+ arch/arm64/crypto/ghash-ce-glue.c   | 209 +++++---------------
+ crypto/aead.c                       |  12 +-
+ crypto/skcipher.c                   |  16 +-
+ 8 files changed, 150 insertions(+), 501 deletions(-)
+
 -- 
-2.8.1
+2.20.1
 
