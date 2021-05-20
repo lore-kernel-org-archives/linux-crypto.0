@@ -5,71 +5,67 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1A1C433B4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B4FC43461
 	for <linux-crypto@archiver.kernel.org>; Thu, 20 May 2021 09:35:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B3E3613AD
+	by mail.kernel.org (Postfix) with ESMTP id 8D76E61606
 	for <linux-crypto@archiver.kernel.org>; Thu, 20 May 2021 09:35:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232874AbhETJg1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S232882AbhETJg1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 20 May 2021 05:36:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45168 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232889AbhETJe0 (ORCPT
+        with ESMTP id S232895AbhETJe0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 20 May 2021 05:34:26 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAC75C061345
-        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 02:27:39 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id i17so16878477wrq.11
-        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 02:27:39 -0700 (PDT)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDEE7C0612A4
+        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 02:27:38 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 62so7712360wmb.3
+        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 02:27:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=rS7P8Ei6Lo3i+RlQq5zKImv/cfX/br3YBCEeZlUR+Wo=;
-        b=fyvFyYwTHmysyDvUCxIUqz4GHhibyDSHfz1LJ24o5pcPss1gmV+GmcTdA5C0BZmnpL
-         84K5AkNzJxeWBcNhA0BdAQ2aWQyMOvyATMjlqxbOYFrk2U60M/QKYKruXetGnSetmeqS
-         I7vCvJk//2EyTCHUsbSTwa5pOdo2r36ZtpEf3PLHCJ715UCvCEebEyTGAyrS5h1S60c5
-         jzZT/wq1PNaaUZU57Ej2EQJIoqvk5N0zdxPirMmP52uCWsi5tZQVG6V7rX+UPSUOZc7L
-         3VMa81rJpjZE43EN/OUnJGzrn2EwfMw4tDEmXSAW27hnLioaQaGRK+da4dwWVTRlt7JE
-         lY5w==
+        bh=vcq3anHnSeSLpEDPgaw2WlJt773i7Ai6CVK22immmrg=;
+        b=Z9JdVvLS9muvINy9rohhP2YBdp+KBjFplNimDfPxaQrph6GTa6oJ5frvs/IkDw/AJL
+         gTTvcwja0cIkTbh2EYo1ATdpmVKVO83cCBL6PRxpEb1PNLRdEpOjAeYWmwIJIi6vGeA4
+         bR0G6/S+EQMGR5qzX861aXnQQbT21wU+qk7h3AGbz+ABzYkX7fSjEhCaBf+9J39E5+o7
+         4TC/IltnKBQJqSP5Cc8pC40EfEJwr9te4j+T0HumuZ21944FBefLDk4X6GLeKzy0a+uy
+         RIwhif6SViRp2xT1TbC5XxJhumKjzrtqz4JYENP07tZo9RQ1SuaU6BxRgJWgZxHKTipJ
+         8/Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=rS7P8Ei6Lo3i+RlQq5zKImv/cfX/br3YBCEeZlUR+Wo=;
-        b=oqbXRN6Qq0jekE4HD7xvXAhaKVPZL4LhwzH7r+wMZCNXcJ58M3zlwJGEbQHaEzKxqe
-         XTq2BdrRSsIo1OusMozVgghdo/ABJopdtoNGkxawW5HXUkTk8ap6GDUxD7k3oJrTKoJJ
-         9iC/4KvqnRcccXJ6AXP0zyAzTtwtOsi9z6X5b7yrppdcPW2iCb4Wj3WWIgQadbH0yc7F
-         qsd9aUf9nFOBLF53xiwRCAMWSi626T+Ubw8T9GeI+KS7mrGYFBjnV4Cc2+ADzrHRZxt0
-         0XNmWtArLFQdnO3EpCFqzRWtTg0X8CpYjVOykknRiBGLOThROaJR90rZfN9AJ///7GES
-         cNHQ==
-X-Gm-Message-State: AOAM5317dQqwGqZZ/4hGJ25K7ZYTPtnkuhTdZb4IHxjIq1LPi/jsC+ki
-        cRyYhOh4qt6JM/daYqC7iItErw==
-X-Google-Smtp-Source: ABdhPJwhzqzv8ZBlSOOdzJVfnyeZCdwIgAf8NIgxGoUr4jQPPkKtw2EeCYoF6aW4L0gQERY0JDP8Tw==
-X-Received: by 2002:a5d:5249:: with SMTP id k9mr3291616wrc.301.1621502858330;
-        Thu, 20 May 2021 02:27:38 -0700 (PDT)
-Received: from dell.default ([91.110.221.215])
-        by smtp.gmail.com with ESMTPSA id u11sm722971wrw.14.2021.05.20.02.27.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=vcq3anHnSeSLpEDPgaw2WlJt773i7Ai6CVK22immmrg=;
+        b=XInhqWDCrkISpjEyD/G6ZkRRtrAoPeLIlb+hNkaLP0ptqknO2QmsBpoeq5n96VeJlg
+         /8CK11dZhuRAtzBxtTSjs+NTxl2NOy8W09rx5W+mxbyaeHHP8+5yrmeDE4LmK+DcbsWG
+         vXgglJUR/wJZe2kdRZOdeX/HiyGSS6twsgb96cWgD8r74tBO3gG4t8d3afkewyOZDyYv
+         GmEnf3/aSPeAc/U3Cy8NEtst6OLkNu9QNZPveBGG4h550HFvPMNTR85UaDLAp18O9sQG
+         K4Iq/ndHVM48OLi6kzjaya+D7yRCIwwHbSpjt0MRcAjjwjNrQwyQD6DoMhx65XnGi9CI
+         XAiQ==
+X-Gm-Message-State: AOAM5314ZbD0/4etuheieibqRNJUKOHQCsSnJTFuj+ZHw6tO1PmtJUu1
+        4WfckXOsNzB3ABFM/fSN1lC+4Q==
+X-Google-Smtp-Source: ABdhPJx729hK29beb50o3uS4oYe550wD6Jv1xdh+11VEeWP4brJbb+3hKjfjIueSqYr017+zORZnXw==
+X-Received: by 2002:a7b:c052:: with SMTP id u18mr3097847wmc.105.1621502857275;
         Thu, 20 May 2021 02:27:37 -0700 (PDT)
+Received: from dell.default ([91.110.221.215])
+        by smtp.gmail.com with ESMTPSA id u11sm722971wrw.14.2021.05.20.02.27.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 May 2021 02:27:36 -0700 (PDT)
 From:   Lee Jones <lee.jones@linaro.org>
 To:     lee.jones@linaro.org
-Cc:     linux-kernel@vger.kernel.org, Haren Myneni <haren@us.ibm.com>,
+Cc:     linux-kernel@vger.kernel.org,
+        George Cherian <gcherian@marvell.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Robert Jennings <rcj@linux.vnet.ibm.com>,
-        Seth Jennings <sjenning@linux.vnet.ibm.com>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 2/3] crypto: nx: nx-aes-gcm: Kernel-doc formatting should not be used for headers
-Date:   Thu, 20 May 2021 10:27:32 +0100
-Message-Id: <20210520092733.3434378-3-lee.jones@linaro.org>
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 1/3] crypto: cavium: Fix a bunch of kernel-doc related issues
+Date:   Thu, 20 May 2021 10:27:31 +0100
+Message-Id: <20210520092733.3434378-2-lee.jones@linaro.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210520092733.3434378-1-lee.jones@linaro.org>
 References: <20210520092733.3434378-1-lee.jones@linaro.org>
@@ -81,140 +77,180 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Fixes the following W=1 kernel build warning(s):
 
- drivers/crypto/nx/nx-aes-gcm.c:26: warning: Function parameter or member 'tfm' not described in 'gcm_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-gcm.c:26: warning: Function parameter or member 'in_key' not described in 'gcm_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-gcm.c:26: warning: Function parameter or member 'key_len' not described in 'gcm_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-gcm.c:26: warning: expecting prototype for Nest Accelerators driver(). Prototype was for gcm_aes_nx_set_key() instead
- drivers/crypto/nx/nx-aes-ecb.c:24: warning: Function parameter or member 'tfm' not described in 'ecb_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-ecb.c:24: warning: Function parameter or member 'in_key' not described in 'ecb_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-ecb.c:24: warning: Function parameter or member 'key_len' not described in 'ecb_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-ecb.c:24: warning: expecting prototype for Nest Accelerators driver(). Prototype was for ecb_aes_nx_set_key() instead
- drivers/crypto/nx/nx-aes-ccm.c:26: warning: Function parameter or member 'tfm' not described in 'ccm_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-ccm.c:26: warning: Function parameter or member 'in_key' not described in 'ccm_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-ccm.c:26: warning: Function parameter or member 'key_len' not described in 'ccm_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-ccm.c:26: warning: expecting prototype for Nest Accelerators driver(). Prototype was for ccm_aes_nx_set_key() instead
- drivers/crypto/nx/nx-aes-ctr.c:25: warning: Function parameter or member 'tfm' not described in 'ctr_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-ctr.c:25: warning: Function parameter or member 'in_key' not described in 'ctr_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-ctr.c:25: warning: Function parameter or member 'key_len' not described in 'ctr_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-ctr.c:25: warning: expecting prototype for Nest Accelerators driver(). Prototype was for ctr_aes_nx_set_key() instead
- drivers/crypto/nx/nx-aes-xcbc.c:22: warning: cannot understand function prototype: 'struct xcbc_state '
- drivers/crypto/nx/nx-sha256.c:21: warning: Function parameter or member 'tfm' not described in 'nx_crypto_ctx_sha256_init'
- drivers/crypto/nx/nx-sha256.c:21: warning: expecting prototype for SHA(). Prototype was for nx_crypto_ctx_sha256_init() instead
- drivers/crypto/nx/nx-sha512.c:20: warning: Function parameter or member 'tfm' not described in 'nx_crypto_ctx_sha512_init'
- drivers/crypto/nx/nx-sha512.c:20: warning: expecting prototype for SHA(). Prototype was for nx_crypto_ctx_sha512_init() instead
- drivers/crypto/nx/nx-842-pseries.c:280: warning: Function parameter or member 'wmem' not described in 'nx842_pseries_compress'
- drivers/crypto/nx/nx-842-pseries.c:280: warning: Excess function parameter 'wrkmem' description in 'nx842_pseries_compress'
- drivers/crypto/nx/nx-842-pseries.c:410: warning: Function parameter or member 'wmem' not described in 'nx842_pseries_decompress'
- drivers/crypto/nx/nx-842-pseries.c:410: warning: Excess function parameter 'wrkmem' description in 'nx842_pseries_decompress'
- drivers/crypto/nx/nx-842-pseries.c:523: warning: Function parameter or member 'devdata' not described in 'nx842_OF_set_defaults'
- drivers/crypto/nx/nx-842-pseries.c:548: warning: Function parameter or member 'prop' not described in 'nx842_OF_upd_status'
- drivers/crypto/nx/nx-842-pseries.c:582: warning: Function parameter or member 'devdata' not described in 'nx842_OF_upd_maxsglen'
- drivers/crypto/nx/nx-842-pseries.c:582: warning: Function parameter or member 'prop' not described in 'nx842_OF_upd_maxsglen'
- drivers/crypto/nx/nx-842-pseries.c:630: warning: Function parameter or member 'devdata' not described in 'nx842_OF_upd_maxsyncop'
- drivers/crypto/nx/nx-842-pseries.c:630: warning: Function parameter or member 'prop' not described in 'nx842_OF_upd_maxsyncop'
- drivers/crypto/nx/nx-842-pseries.c:692: warning: Cannot understand  *
- drivers/crypto/nx/nx-842-pseries.c:825: warning: Function parameter or member 'data' not described in 'nx842_OF_notifier'
- drivers/crypto/nx/nx-842-pseries.c:825: warning: Excess function parameter 'update' description in 'nx842_OF_notifier'
+ drivers/crypto/cavium/nitrox/nitrox_main.c:41: warning: cannot understand function prototype: 'const struct pci_device_id nitrox_pci_tbl[] = '
+ drivers/crypto/cavium/nitrox/nitrox_main.c:73: warning: Function parameter or member 'ndev' not described in 'write_to_ucd_unit'
+ drivers/crypto/cavium/nitrox/nitrox_main.c:73: warning: Function parameter or member 'ucode_size' not described in 'write_to_ucd_unit'
+ drivers/crypto/cavium/nitrox/nitrox_main.c:73: warning: Function parameter or member 'ucode_data' not described in 'write_to_ucd_unit'
+ drivers/crypto/cavium/nitrox/nitrox_main.c:73: warning: Function parameter or member 'block_num' not described in 'write_to_ucd_unit'
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:46: warning: Function parameter or member 'index' not described in 'incr_index'
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:46: warning: Function parameter or member 'count' not described in 'incr_index'
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:46: warning: Function parameter or member 'max' not described in 'incr_index'
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:46: warning: expecting prototype for Response codes from SE microcode(). Prototype was for incr_index() instead
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:287: warning: Function parameter or member 'cmdq' not described in 'post_se_instr'
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:381: warning: Function parameter or member 'callback' not described in 'nitrox_process_se_request'
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:381: warning: Function parameter or member 'cb_arg' not described in 'nitrox_process_se_request'
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:381: warning: expecting prototype for nitrox_se_request(). Prototype was for nitrox_process_se_request() instead
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:535: warning: Function parameter or member 'cmdq' not described in 'process_response_list'
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:535: warning: expecting prototype for process_request_list(). Prototype was for process_response_list() instead
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:584: warning: Function parameter or member 'data' not described in 'pkt_slc_resp_tasklet'
+ drivers/crypto/cavium/nitrox/nitrox_mbx.c:14: warning: cannot understand function prototype: 'enum mbx_msg_type '
+ drivers/crypto/cavium/nitrox/nitrox_mbx.c:24: warning: cannot understand function prototype: 'enum mbx_msg_opcode '
+ drivers/crypto/cavium/nitrox/nitrox_skcipher.c:26: warning: cannot understand function prototype: 'const struct nitrox_cipher flexi_cipher_table[] = '
+ drivers/crypto/cavium/cpt/cptpf_main.c:411: warning: Function parameter or member 'cpt' not described in 'cpt_unload_microcode'
+ drivers/crypto/cavium/cpt/cptpf_main.c:411: warning: expecting prototype for Ensure all cores are disengaged from all groups by(). Prototype was for cpt_unload_microcode() instead
+ drivers/crypto/cavium/cpt/cptvf_reqmanager.c:17: warning: Function parameter or member 'q' not described in 'get_free_pending_entry'
+ drivers/crypto/cavium/cpt/cptvf_reqmanager.c:17: warning: Function parameter or member 'qlen' not described in 'get_free_pending_entry'
 
-Cc: Haren Myneni <haren@us.ibm.com>
+Cc: George Cherian <gcherian@marvell.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Robert Jennings <rcj@linux.vnet.ibm.com>
-Cc: Seth Jennings <sjenning@linux.vnet.ibm.com>
 Cc: linux-crypto@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- drivers/crypto/nx/nx-842-pseries.c | 24 +++++++++++-------------
- 1 file changed, 11 insertions(+), 13 deletions(-)
+ drivers/crypto/cavium/cpt/cptpf_main.c         |  2 +-
+ drivers/crypto/cavium/cpt/cptvf_reqmanager.c   |  4 ++--
+ drivers/crypto/cavium/nitrox/nitrox_main.c     |  4 ++--
+ drivers/crypto/cavium/nitrox/nitrox_mbx.c      |  4 ++--
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c   | 12 +++++++-----
+ drivers/crypto/cavium/nitrox/nitrox_skcipher.c |  2 +-
+ 6 files changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
-index 8ee547ee378ec..67caff73f058f 100644
---- a/drivers/crypto/nx/nx-842-pseries.c
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -264,8 +264,8 @@ static int nx842_validate_result(struct device *dev,
-  * @inlen: Length of input buffer
-  * @out: Pointer to output buffer
-  * @outlen: Length of output buffer
-- * @wrkmem: ptr to buffer for working memory, size determined by
-- *          nx842_pseries_driver.workmem_size
-+ * @wmem: ptr to buffer for working memory, size determined by
-+ *        nx842_pseries_driver.workmem_size
-  *
-  * Returns:
-  *   0		Success, output of length @outlen stored in the buffer at @out
-@@ -393,8 +393,8 @@ static int nx842_pseries_compress(const unsigned char *in, unsigned int inlen,
-  * @inlen: Length of input buffer
-  * @out: Pointer to output buffer
-  * @outlen: Length of output buffer
-- * @wrkmem: ptr to buffer for working memory, size determined by
-- *          nx842_pseries_driver.workmem_size
-+ * @wmem: ptr to buffer for working memory, size determined by
-+ *        nx842_pseries_driver.workmem_size
-  *
-  * Returns:
-  *   0		Success, output of length @outlen stored in the buffer at @out
-@@ -513,7 +513,7 @@ static int nx842_pseries_decompress(const unsigned char *in, unsigned int inlen,
+diff --git a/drivers/crypto/cavium/cpt/cptpf_main.c b/drivers/crypto/cavium/cpt/cptpf_main.c
+index 06ee42e8a2458..8c32d0eb8fcf2 100644
+--- a/drivers/crypto/cavium/cpt/cptpf_main.c
++++ b/drivers/crypto/cavium/cpt/cptpf_main.c
+@@ -401,7 +401,7 @@ static void cpt_disable_all_cores(struct cpt_device *cpt)
+ 	cpt_write_csr64(cpt->reg_base, CPTX_PF_EXE_CTL(0), 0);
+ }
+ 
+-/**
++/*
+  * Ensure all cores are disengaged from all groups by
+  * calling cpt_disable_all_cores() before calling this
+  * function.
+diff --git a/drivers/crypto/cavium/cpt/cptvf_reqmanager.c b/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
+index feb0f76783dda..153004bdfb5cd 100644
+--- a/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
++++ b/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
+@@ -9,8 +9,8 @@
+ 
  /**
-  * nx842_OF_set_defaults -- Set default (disabled) values for devdata
+  * get_free_pending_entry - get free entry from pending queue
+- * @param pqinfo: pending_qinfo structure
+- * @param qno: queue number
++ * @q: pending queue
++ * @qlen: queue length
+  */
+ static struct pending_entry *get_free_pending_entry(struct pending_queue *q,
+ 						    int qlen)
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
+index d385daf2c71c3..144d554bd44dd 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_main.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
+@@ -35,7 +35,7 @@ static LIST_HEAD(ndevlist);
+ static DEFINE_MUTEX(devlist_lock);
+ static unsigned int num_devices;
+ 
+-/**
++/*
+  * nitrox_pci_tbl - PCI Device ID Table
+  */
+ static const struct pci_device_id nitrox_pci_tbl[] = {
+@@ -65,7 +65,7 @@ struct ucode {
+ 	u64 code[];
+ };
+ 
+-/**
++/*
+  * write_to_ucd_unit - Write Firmware to NITROX UCD unit
+  */
+ static void write_to_ucd_unit(struct nitrox_device *ndev, u32 ucode_size,
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_mbx.c b/drivers/crypto/cavium/nitrox/nitrox_mbx.c
+index c1af9d4fca6e3..2e9c0d2143632 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_mbx.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_mbx.c
+@@ -8,7 +8,7 @@
+ 
+ #define RING_TO_VFNO(_x, _y)	((_x) / (_y))
+ 
+-/**
++/*
+  * mbx_msg_type - Mailbox message types
+  */
+ enum mbx_msg_type {
+@@ -18,7 +18,7 @@ enum mbx_msg_type {
+ 	MBX_MSG_TYPE_NACK,
+ };
+ 
+-/**
++/*
+  * mbx_msg_opcode - Mailbox message opcodes
+  */
+ enum mbx_msg_opcode {
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
+index 4434c92d6229f..55c18da4a5007 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
+@@ -19,7 +19,7 @@
+ #define REQ_BACKLOG    2
+ #define REQ_POSTED     3
+ 
+-/**
++/*
+  * Response codes from SE microcode
+  * 0x00 - Success
+  *   Completion with no error
+@@ -279,6 +279,7 @@ static inline bool cmdq_full(struct nitrox_cmdq *cmdq, int qlen)
+ /**
+  * post_se_instr - Post SE instruction to Packet Input ring
+  * @sr: Request structure
++ * @cmdq: Command queue structure
   *
-- * @devdata - struct nx842_devdata to update
-+ * @devdata: struct nx842_devdata to update
+  * Returns 0 if successful or a negative error code,
+  * if no space in ring.
+@@ -372,6 +373,8 @@ static int nitrox_enqueue_request(struct nitrox_softreq *sr)
+  * nitrox_process_se_request - Send request to SE core
+  * @ndev: NITROX device
+  * @req: Crypto request
++ * @callback: Completion callback
++ * @cb_arg: Completion callback arguments
   *
-  * Returns:
-  *  0 on success
-@@ -538,7 +538,7 @@ static int nx842_OF_set_defaults(struct nx842_devdata *devdata)
-  * The status field indicates if the device is enabled when the status
-  * is 'okay'.  Otherwise the device driver will be disabled.
-  *
-- * @prop - struct property point containing the maxsyncop for the update
-+ * @prop: struct property point containing the maxsyncop for the update
-  *
-  * Returns:
-  *  0 - Device is available
-@@ -571,8 +571,8 @@ static int nx842_OF_upd_status(struct property *prop)
-  *  In this example, the maximum byte length of a scatter list is
-  *  0x0ff0 (4,080).
-  *
-- * @devdata - struct nx842_devdata to update
-- * @prop - struct property point containing the maxsyncop for the update
-+ * @devdata: struct nx842_devdata to update
-+ * @prop: struct property point containing the maxsyncop for the update
-  *
-  * Returns:
-  *  0 on success
-@@ -619,8 +619,8 @@ static int nx842_OF_upd_maxsglen(struct nx842_devdata *devdata,
-  *  0x1000 (4,096) data byte length and 0x1f3 (510) total scatter list
-  *  elements.
-  *
-- * @devdata - struct nx842_devdata to update
-- * @prop - struct property point containing the maxsyncop for the update
-+ * @devdata: struct nx842_devdata to update
-+ * @prop: struct property point containing the maxsyncop for the update
-  *
-  * Returns:
-  *  0 on success
-@@ -689,7 +689,6 @@ static int nx842_OF_upd_maxsyncop(struct nx842_devdata *devdata,
+  * Returns 0 on success, or a negative error code.
+  */
+@@ -526,9 +529,8 @@ static bool sr_completed(struct nitrox_softreq *sr)
  }
  
  /**
-- *
-  * nx842_OF_upd -- Handle OF properties updates for the device.
+- * process_request_list - process completed requests
+- * @ndev: N5 device
+- * @qno: queue to operate
++ * process_response_list - process completed requests
++ * @cmdq: Command queue structure
   *
-  * Set all properties from the OF tree.  Optionally, a new property
-@@ -812,8 +811,7 @@ static int nx842_OF_upd(struct property *new_prop)
-  *
-  * @np: notifier block
-  * @action: notifier action
-- * @update: struct pSeries_reconfig_prop_update pointer if action is
-- *	PSERIES_UPDATE_PROPERTY
-+ * @data: struct of_reconfig_data pointer
-  *
-  * Returns:
-  *	NOTIFY_OK on success
+  * Returns the number of responses processed.
+  */
+@@ -578,7 +580,7 @@ static void process_response_list(struct nitrox_cmdq *cmdq)
+ 	}
+ }
+ 
+-/**
++/*
+  * pkt_slc_resp_tasklet - post processing of SE responses
+  */
+ void pkt_slc_resp_tasklet(unsigned long data)
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_skcipher.c b/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
+index a553ac65f3249..248b4fff1c729 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
+@@ -20,7 +20,7 @@ struct nitrox_cipher {
+ 	enum flexi_cipher value;
+ };
+ 
+-/**
++/*
+  * supported cipher list
+  */
+ static const struct nitrox_cipher flexi_cipher_table[] = {
 -- 
 2.31.1
 
