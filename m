@@ -7,65 +7,66 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B4FC43461
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 May 2021 09:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD3DEC43460
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 May 2021 09:35:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D76E61606
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 May 2021 09:35:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C25E3614A5
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 May 2021 09:35:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232882AbhETJg1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 May 2021 05:36:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45158 "EHLO
+        id S232523AbhETJgf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 May 2021 05:36:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232895AbhETJe0 (ORCPT
+        with ESMTP id S232971AbhETJed (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 May 2021 05:34:26 -0400
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDEE7C0612A4
-        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 02:27:38 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 62so7712360wmb.3
-        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 02:27:38 -0700 (PDT)
+        Thu, 20 May 2021 05:34:33 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB723C0612A7
+        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 02:27:40 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id f75-20020a1c1f4e0000b0290171001e7329so4778976wmf.1
+        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 02:27:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=vcq3anHnSeSLpEDPgaw2WlJt773i7Ai6CVK22immmrg=;
-        b=Z9JdVvLS9muvINy9rohhP2YBdp+KBjFplNimDfPxaQrph6GTa6oJ5frvs/IkDw/AJL
-         gTTvcwja0cIkTbh2EYo1ATdpmVKVO83cCBL6PRxpEb1PNLRdEpOjAeYWmwIJIi6vGeA4
-         bR0G6/S+EQMGR5qzX861aXnQQbT21wU+qk7h3AGbz+ABzYkX7fSjEhCaBf+9J39E5+o7
-         4TC/IltnKBQJqSP5Cc8pC40EfEJwr9te4j+T0HumuZ21944FBefLDk4X6GLeKzy0a+uy
-         RIwhif6SViRp2xT1TbC5XxJhumKjzrtqz4JYENP07tZo9RQ1SuaU6BxRgJWgZxHKTipJ
-         8/Kg==
+        bh=ev36AD8P1tZ8Io8ti68c31JmA1kiPIGkayWSiC/TI+Q=;
+        b=eRfsQDwEm/ebGY/glkv9Xwd2xAvNwThENHMMC7CHV3o4wqFsoWtFq4rare1gg9pmx9
+         T0UldRmt9aEGk/eSuxGRRDi8Cejeii9HEvUyPSTPIEVtz2hCvlohXtLQSVbP/cxwMUMl
+         mcDWd6xWgM9cQLvUhxYuiNFDnd6/5uSSzK9T6bONB2qExE4tgsBQWRLqJtuibVENhEQK
+         +lU/stGTI9kyhV/1JLm8DlGq5tyAQyLvOptpUSnIBTKhj9J4la7QDPanmGuRzrE1CTpK
+         DHGODIhixjNXunQWOam4FSkrIyUYgr59p+4X0IYncpfCaP2Sog/4VvzKTL4kLUt1bllE
+         duDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=vcq3anHnSeSLpEDPgaw2WlJt773i7Ai6CVK22immmrg=;
-        b=XInhqWDCrkISpjEyD/G6ZkRRtrAoPeLIlb+hNkaLP0ptqknO2QmsBpoeq5n96VeJlg
-         /8CK11dZhuRAtzBxtTSjs+NTxl2NOy8W09rx5W+mxbyaeHHP8+5yrmeDE4LmK+DcbsWG
-         vXgglJUR/wJZe2kdRZOdeX/HiyGSS6twsgb96cWgD8r74tBO3gG4t8d3afkewyOZDyYv
-         GmEnf3/aSPeAc/U3Cy8NEtst6OLkNu9QNZPveBGG4h550HFvPMNTR85UaDLAp18O9sQG
-         K4Iq/ndHVM48OLi6kzjaya+D7yRCIwwHbSpjt0MRcAjjwjNrQwyQD6DoMhx65XnGi9CI
-         XAiQ==
-X-Gm-Message-State: AOAM5314ZbD0/4etuheieibqRNJUKOHQCsSnJTFuj+ZHw6tO1PmtJUu1
-        4WfckXOsNzB3ABFM/fSN1lC+4Q==
-X-Google-Smtp-Source: ABdhPJx729hK29beb50o3uS4oYe550wD6Jv1xdh+11VEeWP4brJbb+3hKjfjIueSqYr017+zORZnXw==
-X-Received: by 2002:a7b:c052:: with SMTP id u18mr3097847wmc.105.1621502857275;
-        Thu, 20 May 2021 02:27:37 -0700 (PDT)
+        bh=ev36AD8P1tZ8Io8ti68c31JmA1kiPIGkayWSiC/TI+Q=;
+        b=AHobm4KXR/1Agh2cMt9JomGJYPhY0/1O94a3rHeFq0e6PHbuNKsbhcF8q/eV5T8awq
+         AUIQrJnSZHF6p96uTDXXxLqxK/+o/n4lSRtagKgRzUCokdWzV589rsXFVrVVkgLA0asi
+         qM2QkQmeOR3CN5IYrohKE0J9deVQ9OqEcTvsMZz62L7IQPc9/BIubJAvoniUtNgQ6yBb
+         beLA/UZ2x/H+UZ73LMy9u0I8O9D833pKHw3kodVIm3HjR+gSTJolvwf84yJLJsUKAU74
+         ZNPdPK/Vu7dhz8E3UlpZYDUgevILN8UxlRYY6dIVPjkApbkJSQUzvTELzxYpgqfovJjf
+         PJCQ==
+X-Gm-Message-State: AOAM531Cwa4mizNlXv6Rc7AA9Ldexy+n9qpNMJKCIWaC8n/4PMU8UVJL
+        pw+TaLNiHXZ3snPdh9DW2Co02w==
+X-Google-Smtp-Source: ABdhPJyKv98dmQ8FbNJOLTNBePZq7HZCtNU3K1hIM8XiMoixuN+EEgxdK+Do0V7LXKJ8if8wKdbpoA==
+X-Received: by 2002:a7b:c752:: with SMTP id w18mr3057460wmk.56.1621502859277;
+        Thu, 20 May 2021 02:27:39 -0700 (PDT)
 Received: from dell.default ([91.110.221.215])
-        by smtp.gmail.com with ESMTPSA id u11sm722971wrw.14.2021.05.20.02.27.36
+        by smtp.gmail.com with ESMTPSA id u11sm722971wrw.14.2021.05.20.02.27.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 May 2021 02:27:36 -0700 (PDT)
+        Thu, 20 May 2021 02:27:38 -0700 (PDT)
 From:   Lee Jones <lee.jones@linaro.org>
 To:     lee.jones@linaro.org
 Cc:     linux-kernel@vger.kernel.org,
-        George Cherian <gcherian@marvell.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 1/3] crypto: cavium: Fix a bunch of kernel-doc related issues
-Date:   Thu, 20 May 2021 10:27:31 +0100
-Message-Id: <20210520092733.3434378-2-lee.jones@linaro.org>
+        Gary R Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org
+Subject: [PATCH 3/3] crypto: ccp: ccp-dev: Fix a little doc-rot
+Date:   Thu, 20 May 2021 10:27:33 +0100
+Message-Id: <20210520092733.3434378-4-lee.jones@linaro.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210520092733.3434378-1-lee.jones@linaro.org>
 References: <20210520092733.3434378-1-lee.jones@linaro.org>
@@ -77,180 +78,35 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Fixes the following W=1 kernel build warning(s):
 
- drivers/crypto/cavium/nitrox/nitrox_main.c:41: warning: cannot understand function prototype: 'const struct pci_device_id nitrox_pci_tbl[] = '
- drivers/crypto/cavium/nitrox/nitrox_main.c:73: warning: Function parameter or member 'ndev' not described in 'write_to_ucd_unit'
- drivers/crypto/cavium/nitrox/nitrox_main.c:73: warning: Function parameter or member 'ucode_size' not described in 'write_to_ucd_unit'
- drivers/crypto/cavium/nitrox/nitrox_main.c:73: warning: Function parameter or member 'ucode_data' not described in 'write_to_ucd_unit'
- drivers/crypto/cavium/nitrox/nitrox_main.c:73: warning: Function parameter or member 'block_num' not described in 'write_to_ucd_unit'
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:46: warning: Function parameter or member 'index' not described in 'incr_index'
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:46: warning: Function parameter or member 'count' not described in 'incr_index'
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:46: warning: Function parameter or member 'max' not described in 'incr_index'
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:46: warning: expecting prototype for Response codes from SE microcode(). Prototype was for incr_index() instead
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:287: warning: Function parameter or member 'cmdq' not described in 'post_se_instr'
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:381: warning: Function parameter or member 'callback' not described in 'nitrox_process_se_request'
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:381: warning: Function parameter or member 'cb_arg' not described in 'nitrox_process_se_request'
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:381: warning: expecting prototype for nitrox_se_request(). Prototype was for nitrox_process_se_request() instead
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:535: warning: Function parameter or member 'cmdq' not described in 'process_response_list'
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:535: warning: expecting prototype for process_request_list(). Prototype was for process_response_list() instead
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c:584: warning: Function parameter or member 'data' not described in 'pkt_slc_resp_tasklet'
- drivers/crypto/cavium/nitrox/nitrox_mbx.c:14: warning: cannot understand function prototype: 'enum mbx_msg_type '
- drivers/crypto/cavium/nitrox/nitrox_mbx.c:24: warning: cannot understand function prototype: 'enum mbx_msg_opcode '
- drivers/crypto/cavium/nitrox/nitrox_skcipher.c:26: warning: cannot understand function prototype: 'const struct nitrox_cipher flexi_cipher_table[] = '
- drivers/crypto/cavium/cpt/cptpf_main.c:411: warning: Function parameter or member 'cpt' not described in 'cpt_unload_microcode'
- drivers/crypto/cavium/cpt/cptpf_main.c:411: warning: expecting prototype for Ensure all cores are disengaged from all groups by(). Prototype was for cpt_unload_microcode() instead
- drivers/crypto/cavium/cpt/cptvf_reqmanager.c:17: warning: Function parameter or member 'q' not described in 'get_free_pending_entry'
- drivers/crypto/cavium/cpt/cptvf_reqmanager.c:17: warning: Function parameter or member 'qlen' not described in 'get_free_pending_entry'
+ drivers/crypto/ccp/ccp-dev.c:476: warning: Function parameter or member 'sp' not described in 'ccp_alloc_struct'
+ drivers/crypto/ccp/ccp-dev.c:476: warning: Excess function parameter 'dev' description in 'ccp_alloc_struct'
+ drivers/crypto/ccp/ccp-dev.c:476: warning: Function parameter or member 'sp' not described in 'ccp_alloc_struct'
+ drivers/crypto/ccp/ccp-dev.c:476: warning: Excess function parameter 'dev' description in 'ccp_alloc_struct'
 
-Cc: George Cherian <gcherian@marvell.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: John Allen <john.allen@amd.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Gary R Hook <gary.hook@amd.com>
 Cc: linux-crypto@vger.kernel.org
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- drivers/crypto/cavium/cpt/cptpf_main.c         |  2 +-
- drivers/crypto/cavium/cpt/cptvf_reqmanager.c   |  4 ++--
- drivers/crypto/cavium/nitrox/nitrox_main.c     |  4 ++--
- drivers/crypto/cavium/nitrox/nitrox_mbx.c      |  4 ++--
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c   | 12 +++++++-----
- drivers/crypto/cavium/nitrox/nitrox_skcipher.c |  2 +-
- 6 files changed, 15 insertions(+), 13 deletions(-)
+ drivers/crypto/ccp/ccp-dev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/cavium/cpt/cptpf_main.c b/drivers/crypto/cavium/cpt/cptpf_main.c
-index 06ee42e8a2458..8c32d0eb8fcf2 100644
---- a/drivers/crypto/cavium/cpt/cptpf_main.c
-+++ b/drivers/crypto/cavium/cpt/cptpf_main.c
-@@ -401,7 +401,7 @@ static void cpt_disable_all_cores(struct cpt_device *cpt)
- 	cpt_write_csr64(cpt->reg_base, CPTX_PF_EXE_CTL(0), 0);
- }
- 
--/**
-+/*
-  * Ensure all cores are disengaged from all groups by
-  * calling cpt_disable_all_cores() before calling this
-  * function.
-diff --git a/drivers/crypto/cavium/cpt/cptvf_reqmanager.c b/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
-index feb0f76783dda..153004bdfb5cd 100644
---- a/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
-+++ b/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
-@@ -9,8 +9,8 @@
- 
+diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+index 6777582aa1cee..9ce4b68e9c483 100644
+--- a/drivers/crypto/ccp/ccp-dev.c
++++ b/drivers/crypto/ccp/ccp-dev.c
+@@ -470,7 +470,7 @@ int ccp_cmd_queue_thread(void *data)
  /**
-  * get_free_pending_entry - get free entry from pending queue
-- * @param pqinfo: pending_qinfo structure
-- * @param qno: queue number
-+ * @q: pending queue
-+ * @qlen: queue length
-  */
- static struct pending_entry *get_free_pending_entry(struct pending_queue *q,
- 						    int qlen)
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
-index d385daf2c71c3..144d554bd44dd 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_main.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
-@@ -35,7 +35,7 @@ static LIST_HEAD(ndevlist);
- static DEFINE_MUTEX(devlist_lock);
- static unsigned int num_devices;
- 
--/**
-+/*
-  * nitrox_pci_tbl - PCI Device ID Table
-  */
- static const struct pci_device_id nitrox_pci_tbl[] = {
-@@ -65,7 +65,7 @@ struct ucode {
- 	u64 code[];
- };
- 
--/**
-+/*
-  * write_to_ucd_unit - Write Firmware to NITROX UCD unit
-  */
- static void write_to_ucd_unit(struct nitrox_device *ndev, u32 ucode_size,
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_mbx.c b/drivers/crypto/cavium/nitrox/nitrox_mbx.c
-index c1af9d4fca6e3..2e9c0d2143632 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_mbx.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_mbx.c
-@@ -8,7 +8,7 @@
- 
- #define RING_TO_VFNO(_x, _y)	((_x) / (_y))
- 
--/**
-+/*
-  * mbx_msg_type - Mailbox message types
-  */
- enum mbx_msg_type {
-@@ -18,7 +18,7 @@ enum mbx_msg_type {
- 	MBX_MSG_TYPE_NACK,
- };
- 
--/**
-+/*
-  * mbx_msg_opcode - Mailbox message opcodes
-  */
- enum mbx_msg_opcode {
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
-index 4434c92d6229f..55c18da4a5007 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
-@@ -19,7 +19,7 @@
- #define REQ_BACKLOG    2
- #define REQ_POSTED     3
- 
--/**
-+/*
-  * Response codes from SE microcode
-  * 0x00 - Success
-  *   Completion with no error
-@@ -279,6 +279,7 @@ static inline bool cmdq_full(struct nitrox_cmdq *cmdq, int qlen)
- /**
-  * post_se_instr - Post SE instruction to Packet Input ring
-  * @sr: Request structure
-+ * @cmdq: Command queue structure
+  * ccp_alloc_struct - allocate and initialize the ccp_device struct
   *
-  * Returns 0 if successful or a negative error code,
-  * if no space in ring.
-@@ -372,6 +373,8 @@ static int nitrox_enqueue_request(struct nitrox_softreq *sr)
-  * nitrox_process_se_request - Send request to SE core
-  * @ndev: NITROX device
-  * @req: Crypto request
-+ * @callback: Completion callback
-+ * @cb_arg: Completion callback arguments
-  *
-  * Returns 0 on success, or a negative error code.
+- * @dev: device struct of the CCP
++ * @sp: sp_device struct of the CCP
   */
-@@ -526,9 +529,8 @@ static bool sr_completed(struct nitrox_softreq *sr)
- }
- 
- /**
-- * process_request_list - process completed requests
-- * @ndev: N5 device
-- * @qno: queue to operate
-+ * process_response_list - process completed requests
-+ * @cmdq: Command queue structure
-  *
-  * Returns the number of responses processed.
-  */
-@@ -578,7 +580,7 @@ static void process_response_list(struct nitrox_cmdq *cmdq)
- 	}
- }
- 
--/**
-+/*
-  * pkt_slc_resp_tasklet - post processing of SE responses
-  */
- void pkt_slc_resp_tasklet(unsigned long data)
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_skcipher.c b/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
-index a553ac65f3249..248b4fff1c729 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
-@@ -20,7 +20,7 @@ struct nitrox_cipher {
- 	enum flexi_cipher value;
- };
- 
--/**
-+/*
-  * supported cipher list
-  */
- static const struct nitrox_cipher flexi_cipher_table[] = {
+ struct ccp_device *ccp_alloc_struct(struct sp_device *sp)
+ {
 -- 
 2.31.1
 
