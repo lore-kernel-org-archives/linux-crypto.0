@@ -2,376 +2,268 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A1B0C433B4
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 May 2021 22:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48BEDC43470
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 01:43:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7920613AC
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 May 2021 22:35:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26FB661355
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 01:43:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231644AbhETWhA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 May 2021 18:37:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53136 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231593AbhETWhA (ORCPT
+        id S237565AbhEUBop (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 May 2021 21:44:45 -0400
+Received: from mail-ot1-f44.google.com ([209.85.210.44]:44824 "EHLO
+        mail-ot1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237548AbhEUBoo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 May 2021 18:37:00 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C6FAC061574
-        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 15:35:38 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id b12so14490764ljp.1
-        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 15:35:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xxMLiFU4ShB3xIHT5czNCruDS+vGOG9vjGd2RHO+G3Y=;
-        b=XYCDhvURIC0PFSvZiAnKSd44xrNDEdDCpyjHR0d1kC/N9+iop4s2dsE2s84LXc7oYs
-         b0M0cMtmfmSLThiv9uQ10I9aPPCTscP3p2mmlIke8QikTaYKq4guryxGLdmrUhxYT9sB
-         In0sMaswypwk1h5fBfgF9eziHdZuLElpZ21LB8GJxoLsc8AAmxSOqp3Mt2G2heCRj642
-         sh0Kuvr2H+GhPshqoW8O2LZY/BBBZ02VvzbEMlDupMGQx7GmoJ11IuJKW3um4e/lEiRQ
-         DLPl8iWIlvH9DvYGc6rCa6kGXP2k7xSdDbzaryAAzZ0J1ePPZGplFSHxrQIXvX6vAl5H
-         7jyw==
+        Thu, 20 May 2021 21:44:44 -0400
+Received: by mail-ot1-f44.google.com with SMTP id r26-20020a056830121ab02902a5ff1c9b81so16636342otp.11;
+        Thu, 20 May 2021 18:43:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xxMLiFU4ShB3xIHT5czNCruDS+vGOG9vjGd2RHO+G3Y=;
-        b=k+JD3+a6t9MKpr3COUm+gENjB3DlWfB2zXXIiSH6kcYSHGrcIn92eEV5ftyM4ppI1x
-         PIARmfNw1+Oy9Zqis6Jy85w1oM2vZZLm/UyOEoT8lo5nwBHlfw4scgdge7QjqZoCcKlZ
-         HHOxJ6LbabRe/IztyMeLB03B464gMRjgQAQaNd4tlGwpED/91FnooaOlPhv4yrKtsVyP
-         hZIruVkpVpONEPor4xJ6rapk6ge5YPDqtMec75wOBsAbUAVhN3pUNzxPCdw1YsezmjnS
-         /7Qtwhfucs1IN7sAx0I6YjvWEKARgElgISoKHbK/yj7IgEqApnBkreutt3qLhdgOWwe8
-         wFHA==
-X-Gm-Message-State: AOAM530f+kytasDeiNWL5usKbFzkghgoKIptwMS45d4RKJfolFkty7Dy
-        vN/BeiSCoj6cXhxCah1MzCKr+ooQJwomcQ==
-X-Google-Smtp-Source: ABdhPJxTds63tRdcW11SA1EIVD2zVAu+AYKffhxbJvQATxgFZN/Gp02d7OMKRY/yvMDXtdfoSkyXdQ==
-X-Received: by 2002:a2e:22c3:: with SMTP id i186mr4547591lji.273.1621550136285;
-        Thu, 20 May 2021 15:35:36 -0700 (PDT)
-Received: from localhost.localdomain (c-fdcc225c.014-348-6c756e10.bbcust.telenor.se. [92.34.204.253])
-        by smtp.gmail.com with ESMTPSA id b18sm419835lfc.77.2021.05.20.15.35.35
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9S9XS3Yg9GWaFqOj2PYCXeBhYEX4PcdUFzpuE9sqB4g=;
+        b=GjOKCVe3XUpMHF7f59Q8JC2KCyNmACD3u614tR1/qgY7b9rAVRl1fEO/HzAyepKJiN
+         YXvZ4MnLiu4WS3DyZ2KGaKbGC+s4wFLxgMV9XXt5Zf8t2gfXfZpyD3W1uAJNq1kZGj29
+         7XPGIof4v0xDYcULx051rIG8vQVzIotrTvYiI1QtZYWAr5jKXwQE/60nNj0jI9o8d/Tu
+         imVNd6oJ4lsuGzYQXunGfSs97vZzsLAZYoOZSsmMPxlscQgY16bn+T186t9xju1gf7Jf
+         rDGO1gxCOdSLNgGGHW9a4l95oDpB57jQYYyE9p4uofTRUhMUERMWXVCTMN7X+OFlaBzU
+         Y3GA==
+X-Gm-Message-State: AOAM5336UlGxQAp70TnHE6rQZkl0IlDOuiC2J1nXPuVxBqMHl4OdgVTD
+        fwpOPJrOeB3Br62VE9wwqQ==
+X-Google-Smtp-Source: ABdhPJzEANfqFxE4Om5iMLjsSLwh6xktkUCyClwjVw7r/DNw3lOe3BzOKAJKqe6s95hkV2bCtuDbDQ==
+X-Received: by 2002:a05:6830:1bed:: with SMTP id k13mr3959289otb.194.1621561398402;
+        Thu, 20 May 2021 18:43:18 -0700 (PDT)
+Received: from robh.at.kernel.org (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id y7sm999499oto.60.2021.05.20.18.43.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 May 2021 15:35:35 -0700 (PDT)
-From:   Linus Walleij <linus.walleij@linaro.org>
-To:     linux-crypto@vger.kernel.org,
+        Thu, 20 May 2021 18:43:17 -0700 (PDT)
+Received: (nullmailer pid 2467209 invoked by uid 1000);
+        Fri, 21 May 2021 01:43:16 -0000
+Date:   Thu, 20 May 2021 20:43:16 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     linux-arm-msm@vger.kernel.org,
+        Thara Gopinath <thara.gopinath@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Andy Gross <agross@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        Corentin Labbe <clabbe@baylibre.com>
-Cc:     linux-arm-kernel@lists.infradead.org,
-        Imre Kaloz <kaloz@openwrt.org>,
-        Krzysztof Halasa <khalasa@piap.pl>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 3/3 v2] crypto: ixp4xx: Add device tree support
-Date:   Fri, 21 May 2021 00:33:34 +0200
-Message-Id: <20210520223334.732056-1-linus.walleij@linaro.org>
-X-Mailer: git-send-email 2.31.1
+        Stephen Boyd <sboyd@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bhupesh.linux@gmail.com
+Subject: Re: [PATCH v3 01/17] dt-bindings: qcom-bam: Convert binding to YAML
+Message-ID: <20210521014316.GA2462277@robh.at.kernel.org>
+References: <20210519143700.27392-1-bhupesh.sharma@linaro.org>
+ <20210519143700.27392-2-bhupesh.sharma@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210519143700.27392-2-bhupesh.sharma@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This makes the IXP4xx driver probe from the device tree
-and retrieve the NPE and two queue manager handled used
-to process crypto from the device tree.
+On Wed, May 19, 2021 at 08:06:44PM +0530, Bhupesh Sharma wrote:
+> Convert Qualcomm BAM DMA devicetree binding to YAML.
+> 
+> Cc: Thara Gopinath <thara.gopinath@linaro.org>
+> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Cc: Rob Herring <robh+dt@kernel.org>
+> Cc: Andy Gross <agross@kernel.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Stephen Boyd <sboyd@kernel.org>
+> Cc: Michael Turquette <mturquette@baylibre.com>
+> Cc: Vinod Koul <vkoul@kernel.org>
+> Cc: dmaengine@vger.kernel.org
+> Cc: linux-clk@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: devicetree@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: bhupesh.linux@gmail.com
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>  .../devicetree/bindings/dma/qcom_bam_dma.txt  | 50 ----------
+>  .../devicetree/bindings/dma/qcom_bam_dma.yaml | 91 +++++++++++++++++++
+>  2 files changed, 91 insertions(+), 50 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/dma/qcom_bam_dma.txt
+>  create mode 100644 Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/dma/qcom_bam_dma.txt b/Documentation/devicetree/bindings/dma/qcom_bam_dma.txt
+> deleted file mode 100644
+> index cf5b9e44432c..000000000000
+> --- a/Documentation/devicetree/bindings/dma/qcom_bam_dma.txt
+> +++ /dev/null
+> @@ -1,50 +0,0 @@
+> -QCOM BAM DMA controller
+> -
+> -Required properties:
+> -- compatible: must be one of the following:
+> - * "qcom,bam-v1.4.0" for MSM8974, APQ8074 and APQ8084
+> - * "qcom,bam-v1.3.0" for APQ8064, IPQ8064 and MSM8960
+> - * "qcom,bam-v1.7.0" for MSM8916
+> -- reg: Address range for DMA registers
+> -- interrupts: Should contain the one interrupt shared by all channels
+> -- #dma-cells: must be <1>, the cell in the dmas property of the client device
+> -  represents the channel number
+> -- clocks: required clock
+> -- clock-names: must contain "bam_clk" entry
+> -- qcom,ee : indicates the active Execution Environment identifier (0-7) used in
+> -  the secure world.
+> -- qcom,controlled-remotely : optional, indicates that the bam is controlled by
+> -  remote proccessor i.e. execution environment.
+> -- num-channels : optional, indicates supported number of DMA channels in a
+> -  remotely controlled bam.
+> -- qcom,num-ees : optional, indicates supported number of Execution Environments
+> -  in a remotely controlled bam.
+> -
+> -Example:
+> -
+> -	uart-bam: dma@f9984000 = {
+> -		compatible = "qcom,bam-v1.4.0";
+> -		reg = <0xf9984000 0x15000>;
+> -		interrupts = <0 94 0>;
+> -		clocks = <&gcc GCC_BAM_DMA_AHB_CLK>;
+> -		clock-names = "bam_clk";
+> -		#dma-cells = <1>;
+> -		qcom,ee = <0>;
+> -	};
+> -
+> -DMA clients must use the format described in the dma.txt file, using a two cell
+> -specifier for each channel.
+> -
+> -Example:
+> -	serial@f991e000 {
+> -		compatible = "qcom,msm-uart";
+> -		reg = <0xf991e000 0x1000>
+> -			<0xf9944000 0x19000>;
+> -		interrupts = <0 108 0>;
+> -		clocks = <&gcc GCC_BLSP1_UART2_APPS_CLK>,
+> -			<&gcc GCC_BLSP1_AHB_CLK>;
+> -		clock-names = "core", "iface";
+> -
+> -		dmas = <&uart-bam 0>, <&uart-bam 1>;
+> -		dma-names = "rx", "tx";
+> -	};
+> diff --git a/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml b/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
+> new file mode 100644
+> index 000000000000..173e4d7508a6
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
+> @@ -0,0 +1,91 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/dma/qcom_bam_dma.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: QCOM BAM DMA controller binding
+> +
+> +maintainers:
+> +  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> +
+> +description: |
+> +  This document defines the binding for the BAM DMA controller
+> +  found on Qualcomm parts.
+> +
+> +allOf:
+> +  - $ref: "dma-controller.yaml#"
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - qcom,bam-v1.4.0
+> +      - qcom,bam-v1.3.0
+> +      - qcom,bam-v1.7.0
 
-As the crypto engine is topologically a part of the NPE
-hardware, we augment the NPE driver to spawn the
-crypto engine as a child.
+Can we keep the SoC association please.
 
-The platform data probe path is going away in due time,
-for now it is an isolated else clause.
+> +
+> +  reg:
+> +    maxItems: 1
+> +    description: Address range of the DMA registers.
 
-Cc: Corentin Labbe <clabbe@baylibre.com>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
-ChangeLog v1->v2:
-- Rebase on Corentin's patches in the cryptodev tree
-- Drop unused ret variable (leftover from development)
-- DTS patch can be found at:
-  https://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-nomadik.git/log/?h=ixp4xx-crypto-v5.13-rc1
----
- drivers/crypto/ixp4xx_crypto.c  | 104 +++++++++++++++++++++++---------
- drivers/soc/ixp4xx/ixp4xx-npe.c |   7 +++
- 2 files changed, 83 insertions(+), 28 deletions(-)
+Drop description.
 
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index 76099d6cfff9..051d308c48c5 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -15,6 +15,7 @@
- #include <linux/spinlock.h>
- #include <linux/gfp.h>
- #include <linux/module.h>
-+#include <linux/of.h>
- 
- #include <crypto/ctr.h>
- #include <crypto/internal/des.h>
-@@ -71,15 +72,11 @@
- #define MOD_AES256  (0x0a00 | KEYLEN_256)
- 
- #define MAX_IVLEN   16
--#define NPE_ID      2  /* NPE C */
- #define NPE_QLEN    16
- /* Space for registering when the first
-  * NPE_QLEN crypt_ctl are busy */
- #define NPE_QLEN_TOTAL 64
- 
--#define SEND_QID    29
--#define RECV_QID    30
--
- #define CTL_FLAG_UNUSED		0x0000
- #define CTL_FLAG_USED		0x1000
- #define CTL_FLAG_PERFORM_ABLK	0x0001
-@@ -221,6 +218,9 @@ static const struct ix_hash_algo hash_alg_sha1 = {
- };
- 
- static struct npe *npe_c;
-+
-+static unsigned int send_qid;
-+static unsigned int recv_qid;
- static struct dma_pool *buffer_pool;
- static struct dma_pool *ctx_pool;
- 
-@@ -437,8 +437,7 @@ static void crypto_done_action(unsigned long arg)
- 	int i;
- 
- 	for (i = 0; i < 4; i++) {
--		dma_addr_t phys = qmgr_get_entry(RECV_QID);
--
-+		dma_addr_t phys = qmgr_get_entry(recv_qid);
- 		if (!phys)
- 			return;
- 		one_packet(phys);
-@@ -448,10 +447,49 @@ static void crypto_done_action(unsigned long arg)
- 
- static int init_ixp_crypto(struct device *dev)
- {
--	int ret = -ENODEV;
-+	struct device_node *np = dev->of_node;
- 	u32 msg[2] = { 0, 0 };
-+	int ret = -ENODEV;
-+	u32 npe_id;
-+
-+	dev_info(dev, "probing...\n");
-+
-+	/* Locate the NPE and queue manager to use from device tree */
-+	if (IS_ENABLED(CONFIG_OF) && np) {
-+		struct of_phandle_args queue_spec;
-+
-+		ret = of_property_read_u32(np, "intel,npe", &npe_id);
-+		if (ret) {
-+			dev_err(dev, "no NPE engine specified\n");
-+			return -ENODEV;
-+		}
- 
--	npe_c = npe_request(NPE_ID);
-+		ret = of_parse_phandle_with_fixed_args(np, "queue-rx", 1, 0,
-+						       &queue_spec);
-+		if (ret) {
-+			dev_err(dev, "no rx queue phandle\n");
-+			return -ENODEV;
-+		}
-+		recv_qid = queue_spec.args[0];
-+
-+		ret = of_parse_phandle_with_fixed_args(np, "queue-txready", 1, 0,
-+						       &queue_spec);
-+		if (ret) {
-+			dev_err(dev, "no txready queue phandle\n");
-+			return -ENODEV;
-+		}
-+		send_qid = queue_spec.args[0];
-+	} else {
-+		/*
-+		 * Hardcoded engine when using platform data, this goes away
-+		 * when we switch to using DT only.
-+		 */
-+		npe_id = 2;
-+		send_qid = 29;
-+		recv_qid = 30;
-+	}
-+
-+	npe_c = npe_request(npe_id);
- 	if (!npe_c)
- 		return ret;
- 
-@@ -497,20 +535,20 @@ static int init_ixp_crypto(struct device *dev)
- 	if (!ctx_pool)
- 		goto err;
- 
--	ret = qmgr_request_queue(SEND_QID, NPE_QLEN_TOTAL, 0, 0,
-+	ret = qmgr_request_queue(send_qid, NPE_QLEN_TOTAL, 0, 0,
- 				 "ixp_crypto:out", NULL);
- 	if (ret)
- 		goto err;
--	ret = qmgr_request_queue(RECV_QID, NPE_QLEN, 0, 0,
-+	ret = qmgr_request_queue(recv_qid, NPE_QLEN, 0, 0,
- 				 "ixp_crypto:in", NULL);
- 	if (ret) {
--		qmgr_release_queue(SEND_QID);
-+		qmgr_release_queue(send_qid);
- 		goto err;
- 	}
--	qmgr_set_irq(RECV_QID, QUEUE_IRQ_SRC_NOT_EMPTY, irqhandler, NULL);
-+	qmgr_set_irq(recv_qid, QUEUE_IRQ_SRC_NOT_EMPTY, irqhandler, NULL);
- 	tasklet_init(&crypto_done_tasklet, crypto_done_action, 0);
- 
--	qmgr_enable_irq(RECV_QID);
-+	qmgr_enable_irq(recv_qid);
- 	return 0;
- 
- npe_error:
-@@ -526,11 +564,11 @@ static int init_ixp_crypto(struct device *dev)
- 
- static void release_ixp_crypto(struct device *dev)
- {
--	qmgr_disable_irq(RECV_QID);
-+	qmgr_disable_irq(recv_qid);
- 	tasklet_kill(&crypto_done_tasklet);
- 
--	qmgr_release_queue(SEND_QID);
--	qmgr_release_queue(RECV_QID);
-+	qmgr_release_queue(send_qid);
-+	qmgr_release_queue(recv_qid);
- 
- 	dma_pool_destroy(ctx_pool);
- 	dma_pool_destroy(buffer_pool);
-@@ -682,8 +720,8 @@ static int register_chain_var(struct crypto_tfm *tfm, u8 xpad, u32 target,
- 	buf->phys_addr = pad_phys;
- 
- 	atomic_inc(&ctx->configuring);
--	qmgr_put_entry(SEND_QID, crypt_virt2phys(crypt));
--	BUG_ON(qmgr_stat_overflow(SEND_QID));
-+	qmgr_put_entry(send_qid, crypt_virt2phys(crypt));
-+	BUG_ON(qmgr_stat_overflow(send_qid));
- 	return 0;
- }
- 
-@@ -757,8 +795,8 @@ static int gen_rev_aes_key(struct crypto_tfm *tfm)
- 	crypt->ctl_flags |= CTL_FLAG_GEN_REVAES;
- 
- 	atomic_inc(&ctx->configuring);
--	qmgr_put_entry(SEND_QID, crypt_virt2phys(crypt));
--	BUG_ON(qmgr_stat_overflow(SEND_QID));
-+	qmgr_put_entry(send_qid, crypt_virt2phys(crypt));
-+	BUG_ON(qmgr_stat_overflow(send_qid));
- 	return 0;
- }
- 
-@@ -943,7 +981,7 @@ static int ablk_perform(struct skcipher_request *req, int encrypt)
- 	if (sg_nents(req->src) > 1 || sg_nents(req->dst) > 1)
- 		return ixp4xx_cipher_fallback(req, encrypt);
- 
--	if (qmgr_stat_full(SEND_QID))
-+	if (qmgr_stat_full(send_qid))
- 		return -EAGAIN;
- 	if (atomic_read(&ctx->configuring))
- 		return -EAGAIN;
-@@ -993,8 +1031,8 @@ static int ablk_perform(struct skcipher_request *req, int encrypt)
- 	req_ctx->src = src_hook.next;
- 	crypt->src_buf = src_hook.phys_next;
- 	crypt->ctl_flags |= CTL_FLAG_PERFORM_ABLK;
--	qmgr_put_entry(SEND_QID, crypt_virt2phys(crypt));
--	BUG_ON(qmgr_stat_overflow(SEND_QID));
-+	qmgr_put_entry(send_qid, crypt_virt2phys(crypt));
-+	BUG_ON(qmgr_stat_overflow(send_qid));
- 	return -EINPROGRESS;
- 
- free_buf_src:
-@@ -1057,7 +1095,7 @@ static int aead_perform(struct aead_request *req, int encrypt,
- 	enum dma_data_direction src_direction = DMA_BIDIRECTIONAL;
- 	unsigned int lastlen;
- 
--	if (qmgr_stat_full(SEND_QID))
-+	if (qmgr_stat_full(send_qid))
- 		return -EAGAIN;
- 	if (atomic_read(&ctx->configuring))
- 		return -EAGAIN;
-@@ -1141,8 +1179,8 @@ static int aead_perform(struct aead_request *req, int encrypt,
- 	}
- 
- 	crypt->ctl_flags |= CTL_FLAG_PERFORM_AEAD;
--	qmgr_put_entry(SEND_QID, crypt_virt2phys(crypt));
--	BUG_ON(qmgr_stat_overflow(SEND_QID));
-+	qmgr_put_entry(send_qid, crypt_virt2phys(crypt));
-+	BUG_ON(qmgr_stat_overflow(send_qid));
- 	return -EINPROGRESS;
- 
- free_buf_dst:
-@@ -1436,12 +1474,13 @@ static struct ixp_aead_alg ixp4xx_aeads[] = {
- 
- static int ixp_crypto_probe(struct platform_device *_pdev)
- {
-+	struct device *dev = &_pdev->dev;
- 	int num = ARRAY_SIZE(ixp4xx_algos);
- 	int i, err;
- 
- 	pdev = _pdev;
- 
--	err = init_ixp_crypto(&pdev->dev);
-+	err = init_ixp_crypto(dev);
- 	if (err)
- 		return err;
- 
-@@ -1533,11 +1572,20 @@ static int ixp_crypto_remove(struct platform_device *pdev)
- 
- 	return 0;
- }
-+static const struct of_device_id ixp4xx_crypto_of_match[] = {
-+	{
-+		.compatible = "intel,ixp4xx-crypto",
-+	},
-+	{},
-+};
- 
- static struct platform_driver ixp_crypto_driver = {
- 	.probe = ixp_crypto_probe,
- 	.remove = ixp_crypto_remove,
--	.driver = { .name = "ixp4xx_crypto" },
-+	.driver = {
-+		.name = "ixp4xx_crypto",
-+		.of_match_table = ixp4xx_crypto_of_match,
-+	},
- };
- module_platform_driver(ixp_crypto_driver);
- 
-diff --git a/drivers/soc/ixp4xx/ixp4xx-npe.c b/drivers/soc/ixp4xx/ixp4xx-npe.c
-index ec90b44fa0cd..3c158251a58b 100644
---- a/drivers/soc/ixp4xx/ixp4xx-npe.c
-+++ b/drivers/soc/ixp4xx/ixp4xx-npe.c
-@@ -18,6 +18,7 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/of.h>
-+#include <linux/of_platform.h>
- #include <linux/platform_device.h>
- #include <linux/soc/ixp4xx/npe.h>
- 
-@@ -679,6 +680,7 @@ static int ixp4xx_npe_probe(struct platform_device *pdev)
- {
- 	int i, found = 0;
- 	struct device *dev = &pdev->dev;
-+	struct device_node *np = dev->of_node;
- 	struct resource *res;
- 
- 	for (i = 0; i < NPE_COUNT; i++) {
-@@ -711,6 +713,11 @@ static int ixp4xx_npe_probe(struct platform_device *pdev)
- 
- 	if (!found)
- 		return -ENODEV;
-+
-+	/* Spawn crypto subdevice if using device tree */
-+	if (IS_ENABLED(CONFIG_OF) && np)
-+		devm_of_platform_populate(dev);
-+
- 	return 0;
- }
- 
--- 
-2.31.1
+> +
+> +  clocks:
+> +    minItems: 1
+> +    maxItems: 8
+> +
+> +  clock-names:
+> +    const: bam_clk
 
+This is going to fail if you try more than 1 clock.
+
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +    description: Single interrupt line shared by all channels.
+
+Drop description
+
+> +
+> +  num-channels:
+> +    maxItems: 31
+> +    description: |
+> +      Indicates supported number of DMA channels in a remotely controlled bam.
+> +
+> +  "#dma-cells":
+> +    const: 1
+> +    description: The single cell represents the channel index.
+> +
+> +  qcom,ee:
+> +    $ref: /schemas/types.yaml#/definitions/uint8
+> +    description:
+> +      Indicates the active Execution Environment identifier (0-7)
+> +      used in the secure world.
+> +    enum: [0, 1, 2, 3, 4, 5, 6, 7]
+> +
+> +  qcom,controlled-remotely:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description:
+> +      Indicates that the bam is controlled by remote proccessor i.e.
+> +      execution environment.
+> +
+> +  qcom,num-ees:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description:
+> +      Indicates supported number of Execution Environments in a
+> +      remotely controlled bam.
+
+0-2^32 is valid?
+
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +  - clocks
+> +  - clock-names
+> +  - "#dma-cells"
+> +  - qcom,ee
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/clock/qcom,gcc-msm8974.h>
+> +    dma-controller@f9984000 {
+> +        compatible = "qcom,bam-v1.4.0";
+> +        reg = <0xf9984000 0x15000>;
+> +        interrupts = <0 94 0>;
+> +        clocks = <&gcc GCC_BAM_DMA_AHB_CLK>;
+> +        clock-names = "bam_clk";
+> +        #dma-cells = <1>;
+> +        qcom,ee = /bits/ 8 <0>;
+> +    };
+> -- 
+> 2.31.1
+> 
