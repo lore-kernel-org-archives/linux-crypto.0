@@ -2,86 +2,151 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94415C433B4
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 08:14:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CBC2C43460
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 08:18:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5F1E36135A
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 08:14:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8122D61363
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 08:18:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230226AbhEUIP3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 May 2021 04:15:29 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:55980 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229629AbhEUIP3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 May 2021 04:15:29 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lk0IA-0004pW-RG; Fri, 21 May 2021 16:13:58 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lk0I8-0005ur-GX; Fri, 21 May 2021 16:13:56 +0800
-Date:   Fri, 21 May 2021 16:13:56 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Hui Tang <tanghui20@huawei.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        xuzaibo@huawei.com, wangzhou1@hisilicon.com,
-        linux-kernel@vger.kernel.org, Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 1/3] crypto: ecdh - fix 'ecdh_init'
-Message-ID: <20210521081356.3bnytzdxhjkgzb7g@gondor.apana.org.au>
-References: <1620801602-49287-1-git-send-email-tanghui20@huawei.com>
- <1620801602-49287-2-git-send-email-tanghui20@huawei.com>
- <20210521074553.w6qtqv5nnbdbqycx@gondor.apana.org.au>
- <2a5bcd22-455d-6348-9a72-dc5a7ab49ca6@huawei.com>
+        id S234922AbhEUIUN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 May 2021 04:20:13 -0400
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.83]:19236 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230366AbhEUIUG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 May 2021 04:20:06 -0400
+X-Greylist: delayed 479 seconds by postgrey-1.27 at vger.kernel.org; Fri, 21 May 2021 04:20:04 EDT
+ARC-Seal: i=1; a=rsa-sha256; t=1621584692; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=px0a8MPK74qUXfzV5oznTizuZ6wSYWw1PnTyWPCWdSDm/VNlPpcX9mJnG6EcNy9+al
+    IrLqSd+SHTUy+MUh4/hS/NujOZyXCwe5HSxvwd14I4cIgw7AXjiqrNMEjfoNtHxIys+M
+    a14YcQqlLi/YEf8/g4X4ZGU/AalgcmEhdVB1NzRcUZHOqu2GPZZa5cXxBMD4g12p5vTr
+    1ZuiaGzrocf8qKnkp/grY2j8Mk/T8asPYHcGr9U72ssFsDrf0PwyrMIcLvz2THFrDc1E
+    Q0RN+6nMx63661R9AByJ0js93R8df2y6lfNya9k+aTx+RhVCKBFHq6sggs8ml9fW/Mm+
+    GM3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1621584692;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:Cc:Date:
+    From:Subject:Sender;
+    bh=P7QD5eRHBuT1lh8i7wzUly3dzKODxjJ0OhwZcPAUEZs=;
+    b=qOvPJEGTxcu4ftC0OhXI8oXRU/fO3ZYD1+OJWQuXaRw0/0pVx5jb5rJU6Tdvzny/1t
+    q9kdVB/kSfoQheuv6mQ2ldYRUjTTQWfloUKYv3uVD0uaGqjs/fn7oRNK+GbfNjfg7Xvc
+    oUwGQB8uW6oqv/0EjOr4ISA5eEP8c1nv/XkFEjtEDjcj6fHN0WqmL1pno8Ifjy2Nd4K3
+    NdgKAgA3gzct4XSyv4PdgbwS4wJseRljsozSAgx2sM2h8w9XhYASEBzMbh0TPkqJ1at7
+    r35/EciNY0gCLtIMeKlIFzHsRjCNrgxe50OG6ghPv/pdNOM+7tuATln42+LmxkY73GCk
+    MHaA==
+ARC-Authentication-Results: i=1; strato.com;
+    dkim=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1621584692;
+    s=strato-dkim-0002; d=gerhold.net;
+    h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:Cc:Date:
+    From:Subject:Sender;
+    bh=P7QD5eRHBuT1lh8i7wzUly3dzKODxjJ0OhwZcPAUEZs=;
+    b=DqIzGoyybqPjiuFKLTxGZ6dWr/44ExmlF0FdJwNkGyMj6i0q4h4RS5yv5ONtvUEhMS
+    UB0osp8RELueRhSHyAG5nZgDxXvuGtfICJE1uWislHsnMqjyaoixsw9e0L2IB7+Z3uIW
+    RQtga13/EQTxsVG5KS78sR+Kfez1hbP5UGPbr7omd2Z31kDFcdrTBCDtWtX2TPhwj/eh
+    0XHq1pF8QHpkCFwA9SryKT0kGu9MW/fI/sqNvv1N+EVOA2jnEP92M667faGDxbN8Y4Pz
+    PyaZDAzCgW4Hd4v8hXWa0dly72EjDd9Fi45Fze1iyvh4hrfANIvuems9VscDkHxCxDia
+    JaFQ==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P3gBZUipdd93FF5ZZvYFPugejmSTVR2nRPhVOQ/OcYgojyw4j34+u26zEodhPgRDZ8j8IcvEBg=="
+X-RZG-CLASS-ID: mo00
+Received: from gerhold.net
+    by smtp.strato.de (RZmta 47.26.1 DYNA|AUTH)
+    with ESMTPSA id 2037acx4L8BW0Pp
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Fri, 21 May 2021 10:11:32 +0200 (CEST)
+Date:   Fri, 21 May 2021 10:11:30 +0200
+From:   Stephan Gerhold <stephan@gerhold.net>
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     linux-arm-msm@vger.kernel.org,
+        Thara Gopinath <thara.gopinath@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Andy Gross <agross@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bhupesh.linux@gmail.com
+Subject: Re: [PATCH v3 03/17] dt-bindings: qcom-bam: Add 'iommus' to required
+ properties
+Message-ID: <YKdrMoSFAh1bR3xT@gerhold.net>
+References: <20210519143700.27392-1-bhupesh.sharma@linaro.org>
+ <20210519143700.27392-4-bhupesh.sharma@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2a5bcd22-455d-6348-9a72-dc5a7ab49ca6@huawei.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20210519143700.27392-4-bhupesh.sharma@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 21, 2021 at 04:08:10PM +0800, Hui Tang wrote:
+Hi,
+
+On Wed, May 19, 2021 at 08:06:46PM +0530, Bhupesh Sharma wrote:
+> Add the missing required property - 'iommus' to the
+> device-tree binding documentation for qcom-bam DMA IP.
 > 
-> On 2021/5/21 15:45, Herbert Xu wrote:
-> > On Wed, May 12, 2021 at 02:40:00PM +0800, Hui Tang wrote:
-> > > NIST P192 is not unregistered if failed to register NIST P256,
-> > > actually it need to unregister the algorithms already registered.
-> > > 
-> > > Signed-off-by: Hui Tang <tanghui20@huawei.com>
-> > > ---
-> > >  crypto/ecdh.c | 11 ++++++++++-
-> > >  1 file changed, 10 insertions(+), 1 deletion(-)
-> > 
-> > Thanks for catching this.  The variable ecdh_nist_p192_registered
-> > is bogus.  You should just make it so that if p192 fails to
-> > register then the init function aborts.  There would then be
-> > no need to check for the registered state in the exit function.
+> This property describes the phandle(s) to apps_smmu node with sid mask.
 > 
-> Okay, I will fix it in next version, and 'ecdsa_init' should
-> do the same thing too?
+> Cc: Thara Gopinath <thara.gopinath@linaro.org>
+> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Cc: Rob Herring <robh+dt@kernel.org>
+> Cc: Andy Gross <agross@kernel.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Stephen Boyd <sboyd@kernel.org>
+> Cc: Michael Turquette <mturquette@baylibre.com>
+> Cc: Vinod Koul <vkoul@kernel.org>
+> Cc: dmaengine@vger.kernel.org
+> Cc: linux-clk@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: devicetree@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: bhupesh.linux@gmail.com
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>  .../devicetree/bindings/dma/qcom_bam_dma.yaml         | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml b/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
+> index d2900616006c..2479862a3654 100644
+> --- a/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
+> +++ b/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
+> @@ -55,6 +55,12 @@ properties:
+>    interconnect-names:
+>      const: memory
+>  
+> +  iommus:
+> +    minItems: 1
+> +    maxItems: 8
+> +    description: |
+> +      phandle to apps_smmu node with sid mask.
+> +
+>    qcom,ee:
+>      $ref: /schemas/types.yaml#/definitions/uint8
+>      description:
+> @@ -81,6 +87,7 @@ required:
+>    - clocks
+>    - clock-names
+>    - "#dma-cells"
+> +  - iommus
 
-Actually, it looks like it is needed for FIPS.  We should add
-a comment that p192 will fail to register in FIPS mode and that's
-why there is a check for it.
+I don't think we can make this required, older SoCs don't use "iommus"
+for bam_dma.
 
-Funnily enough, ecdsa has the FIPS comment but testmgr doesn't
-set fips_allowed for any of them while ecdh is set but has no
-comment.
+arch/arm64/boot/dts/qcom/apq8016-sbc.dt.yaml: dma-controller@7884000: 'iommus' is a required property
+        From schema: Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
 
-Stephan, can you confirm that both ecdh-nist-p192 and ecdsa-nist-p192
-should be disabled in FIPS mode?
-
-Also, we should fix ecdh-nist-p192's entry in testmgr by removing
-the ifdefs and not setting fips_allowed.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Stephan
