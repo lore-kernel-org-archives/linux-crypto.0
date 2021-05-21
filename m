@@ -2,42 +2,45 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D00FC433ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 10:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D5D7C433B4
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 10:01:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8408613CA
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 10:01:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CC3861019
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 10:01:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231833AbhEUKCf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 May 2021 06:02:35 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5653 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233094AbhEUKCQ (ORCPT
+        id S231584AbhEUKCv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 May 2021 06:02:51 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:3468 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232211AbhEUKCW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 May 2021 06:02:16 -0400
-Received: from dggems701-chm.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Fmhqw3Fblz16Q39;
-        Fri, 21 May 2021 17:58:04 +0800 (CST)
+        Fri, 21 May 2021 06:02:22 -0400
+Received: from dggems703-chm.china.huawei.com (unknown [172.30.72.59])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Fmhr1622czCvSg;
+        Fri, 21 May 2021 17:58:09 +0800 (CST)
 Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
- dggems701-chm.china.huawei.com (10.3.19.178) with Microsoft SMTP Server
+ dggems703-chm.china.huawei.com (10.3.19.180) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.1.2176.2; Fri, 21 May 2021 18:00:52 +0800
 Received: from huawei.com (10.67.165.24) by dggpeml500012.china.huawei.com
  (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 21 May
- 2021 18:00:51 +0800
+ 2021 18:00:52 +0800
 From:   Kai Ye <yekai13@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH 0/2] crypto: hisilicon/qm - add dfx log and a bugfix
-Date:   Fri, 21 May 2021 17:57:48 +0800
-Message-ID: <1621591070-15652-1-git-send-email-yekai13@huawei.com>
+Subject: [PATCH 2/2] crypto: hisilicon/qm - fix the process of VF's list adding
+Date:   Fri, 21 May 2021 17:57:50 +0800
+Message-ID: <1621591070-15652-3-git-send-email-yekai13@huawei.com>
 X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1621591070-15652-1-git-send-email-yekai13@huawei.com>
+References: <1621591070-15652-1-git-send-email-yekai13@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.67.165.24]
@@ -48,15 +51,58 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patchset add the dfx log and fix a algorithm registration bug.
+If Kunpeng 920 enabled the sva mode, the "qm alg register" process will
+return directly. So the list of VF wasn't added to QM list.
 
-Kai Ye (2):
-  crypto: hisilicon/qm - add dfx log if not use hardware crypto algs
-  crypto: hisilicon/qm - fix the process of VF's list adding
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+---
+ drivers/crypto/hisilicon/qm.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
- drivers/crypto/hisilicon/qm.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
-
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index deb104e..c671f94 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -4256,17 +4256,17 @@ int hisi_qm_alg_register(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
+ 	int flag = 0;
+ 	int ret = 0;
+ 
+-	if (qm->ver <= QM_HW_V2 && qm->use_sva) {
+-		dev_info(dev, "HW V2 not both use uacce sva mode and hardware crypto algs.\n");
+-		return 0;
+-	}
+-
+ 	mutex_lock(&qm_list->lock);
+ 	if (list_empty(&qm_list->list))
+ 		flag = 1;
+ 	list_add_tail(&qm->list, &qm_list->list);
+ 	mutex_unlock(&qm_list->lock);
+ 
++	if (qm->ver <= QM_HW_V2 && qm->use_sva) {
++		dev_info(dev, "HW V2 not both use uacce sva mode and hardware crypto algs.\n");
++		return 0;
++	}
++
+ 	if (flag) {
+ 		ret = qm_list->register_to_crypto(qm);
+ 		if (ret) {
+@@ -4291,13 +4291,13 @@ EXPORT_SYMBOL_GPL(hisi_qm_alg_register);
+  */
+ void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
+ {
+-	if (qm->ver <= QM_HW_V2 && qm->use_sva)
+-		return;
+-
+ 	mutex_lock(&qm_list->lock);
+ 	list_del(&qm->list);
+ 	mutex_unlock(&qm_list->lock);
+ 
++	if (qm->ver <= QM_HW_V2 && qm->use_sva)
++		return;
++
+ 	if (list_empty(&qm_list->list))
+ 		qm_list->unregister_from_crypto(qm);
+ }
 -- 
 2.8.1
 
