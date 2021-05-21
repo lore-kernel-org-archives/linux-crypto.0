@@ -4,72 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4717C433ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 09:30:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8435C433ED
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 09:30:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C2562613C4
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 09:30:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA3266100C
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 09:30:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233657AbhEUJbp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 May 2021 05:31:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35458 "EHLO
+        id S234108AbhEUJcK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 May 2021 05:32:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21098 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236410AbhEUJ3o (ORCPT
+        by vger.kernel.org with ESMTP id S232906AbhEUJcK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 May 2021 05:29:44 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14L9DoNd075405;
-        Fri, 21 May 2021 05:28:15 -0400
+        Fri, 21 May 2021 05:32:10 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14L942x1055978;
+        Fri, 21 May 2021 05:30:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
  from : to : cc : date : in-reply-to : references : content-type :
  mime-version : content-transfer-encoding; s=pp1;
- bh=w0E3E4AVY3KCTpUe8XtkiCkXDxyxEUyjCtRABnUD21M=;
- b=pd6+CT8zsEtE7Jo3aGZiTAD1yglcqM7RF/nBPZ+hEvbiW/ChJ9Wy+cgEQve+RQB03zOK
- 4YmZv4kkqJ2/vWk0NRkT654xm2gX3PAjVQ/Ro7mnffKodVyIKhVkvpceSwS04Rfwllxq
- +FXWsMJG/C4NFbOJ4On+qI+2VJ70qg+aAzwNy2BvsepMN6+oBLqiWjaq3Zk413IIw/4q
- fRxWTsxtOSEpflMHS59bLTYm0isMAwEeLQ7lklgTVTLf0/qCmQ+W1qJ3z7CrPZtQnuui
- QHxkqrjKOE79OSW4a3TtBZjd68aK6+UtJOqsSyUAtJXwsgSPBI1iuhOAQw+R8rd7w78/ ZA== 
+ bh=x7QU9NTpAp3HyPx6jpSHnUv3olMqJJPp0fMyEyuap6g=;
+ b=P5ocjvpnge4OEx1vdCLT5FBB3hgPkZ5ZNrHbnt6OyTcbvuV6CJiABj9oyFBTIkdfj289
+ iPlH9aTYU+mxVF8FYwDidylwM6pwwO3vAI3iUcU7h91ui0J0dKGkcNZB84Dx2RPJbklz
+ etbLJcp4xI4lvl5sirik/w6H/xVBpObXrt0FAW7BpP9/9LmL78HTKTpR1SOZ4RfiskJ4
+ 86q+9oI/vAjyiTLvCRc9AUjMeGkbN7M4KN2K4fjUcZ8vUcnIMHvYGwJwnFiEMmuskayv
+ B+lSUVZFbATLWZdAMhBYbyOKdPXhph9QdfrF3B6Zm3cnberAjA8fjsMIdpBreAjz0KAB 3A== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38pa2109uy-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38p4bfgy6h-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 May 2021 05:28:14 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14L9EPlK076363;
-        Fri, 21 May 2021 05:28:14 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38pa2109u6-1
+        Fri, 21 May 2021 05:30:39 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14L95moC066070;
+        Fri, 21 May 2021 05:30:38 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38p4bfgy68-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 May 2021 05:28:14 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14L9CiQJ005624;
-        Fri, 21 May 2021 09:28:12 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma03wdc.us.ibm.com with ESMTP id 38j5x9xj2t-1
+        Fri, 21 May 2021 05:30:38 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14L9DgS0014021;
+        Fri, 21 May 2021 09:30:37 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma03dal.us.ibm.com with ESMTP id 38j5xaa5d9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 May 2021 09:28:12 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14L9SBNZ10813794
+        Fri, 21 May 2021 09:30:37 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14L9UaZq28246498
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 21 May 2021 09:28:12 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E63E2136053;
-        Fri, 21 May 2021 09:28:11 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 78DAD136055;
-        Fri, 21 May 2021 09:28:10 +0000 (GMT)
+        Fri, 21 May 2021 09:30:36 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 76B4CB2066;
+        Fri, 21 May 2021 09:30:36 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 731A4B2064;
+        Fri, 21 May 2021 09:30:35 +0000 (GMT)
 Received: from sig-9-65-94-165.ibm.com (unknown [9.65.94.165])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 21 May 2021 09:28:10 +0000 (GMT)
-Message-ID: <5933dd793bf0d0d1389877715d936cc321ee86d1.camel@linux.ibm.com>
-Subject: [PATCH v4 01/16] powerpc/vas: Move VAS API to book3s common platform
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 21 May 2021 09:30:35 +0000 (GMT)
+Message-ID: <f4fb4b7bb98580ae3c025d83148a6406541de892.camel@linux.ibm.com>
+Subject: [PATCH v4 03/16] powerpc/vas: Add platform specific user window
+ operations
 From:   Haren Myneni <haren@linux.ibm.com>
 To:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
         mpe@ellerman.id.au, herbert@gondor.apana.org.au, npiggin@gmail.com
-Cc:     hbabu@us.ibm.com
-Date:   Fri, 21 May 2021 02:28:08 -0700
+Cc:     hbabu@us.ibm.com, haren@us.ibm.com
+Date:   Fri, 21 May 2021 02:30:33 -0700
 In-Reply-To: <8d219c0816133a8643d650709066cf04c9c77322.camel@linux.ibm.com>
 References: <8d219c0816133a8643d650709066cf04c9c77322.camel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
@@ -77,159 +78,258 @@ User-Agent: Evolution 3.36.2 (3.36.2-1.fc32)
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: O4GwibBLQnZS6sKJBVkBYK_5h6yRe9jn
-X-Proofpoint-ORIG-GUID: RNJT-UYBPfiz1-jkkHiTUbWOJjusj2es
+X-Proofpoint-ORIG-GUID: qIDOychJVE6Z-xMZhW2dqstXyLU7T4xT
+X-Proofpoint-GUID: sg11XH0HZRb1lh02lIKg8VJH4c1NcgyT
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
  definitions=2021-05-21_03:2021-05-20,2021-05-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- adultscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0 lowpriorityscore=0
- spamscore=0 malwarescore=0 priorityscore=1501 phishscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2105210059
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 phishscore=0 bulkscore=0 spamscore=0 suspectscore=0
+ mlxscore=0 clxscore=1015 lowpriorityscore=0 priorityscore=1501
+ impostorscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104190000 definitions=main-2105210059
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-Using the same /dev/crypto/nx-gzip interface for both powerNV and
-pseries. So this patch creates platforms/book3s/ and moves VAS API
-to that directory. The actual functionality is not changed.
+PowerNV uses registers to open/close VAS windows, and getting the
+paste address. Whereas the hypervisor calls are used on PowerVM.
+
+This patch adds the platform specific user space window operations
+and register with the common VAS user space interface.
 
 Signed-off-by: Haren Myneni <haren@linux.ibm.com>
 ---
- arch/powerpc/include/asm/vas.h                    |  3 +++
- arch/powerpc/platforms/Kconfig                    |  1 +
- arch/powerpc/platforms/Makefile                   |  1 +
- arch/powerpc/platforms/book3s/Kconfig             | 15 +++++++++++++++
- arch/powerpc/platforms/book3s/Makefile            |  2 ++
- .../platforms/{powernv => book3s}/vas-api.c       |  2 +-
- arch/powerpc/platforms/powernv/Kconfig            | 14 --------------
- arch/powerpc/platforms/powernv/Makefile           |  2 +-
- 8 files changed, 24 insertions(+), 16 deletions(-)
- create mode 100644 arch/powerpc/platforms/book3s/Kconfig
- create mode 100644 arch/powerpc/platforms/book3s/Makefile
- rename arch/powerpc/platforms/{powernv => book3s}/vas-api.c (99%)
+ arch/powerpc/include/asm/vas.h              | 14 +++++-
+ arch/powerpc/platforms/book3s/vas-api.c     | 52 ++++++++++++---------
+ arch/powerpc/platforms/powernv/vas-window.c | 46 +++++++++++++++++-
+ 3 files changed, 89 insertions(+), 23 deletions(-)
 
 diff --git a/arch/powerpc/include/asm/vas.h b/arch/powerpc/include/asm/vas.h
-index e33f80b0ea81..3be76e813e2d 100644
+index 6076adf9ab4f..668303198772 100644
 --- a/arch/powerpc/include/asm/vas.h
 +++ b/arch/powerpc/include/asm/vas.h
-@@ -162,6 +162,9 @@ int vas_copy_crb(void *crb, int offset);
+@@ -5,6 +5,7 @@
+ 
+ #ifndef _ASM_POWERPC_VAS_H
+ #define _ASM_POWERPC_VAS_H
++#include <uapi/asm/vas-api.h>
+ 
+ struct vas_window;
+ 
+@@ -48,6 +49,16 @@ enum vas_cop_type {
+ 	VAS_COP_TYPE_MAX,
+ };
+ 
++/*
++ * User space window operations used for powernv and powerVM
++ */
++struct vas_user_win_ops {
++	struct vas_window * (*open_win)(struct vas_tx_win_open_attr *,
++				enum vas_cop_type);
++	u64 (*paste_addr)(void *);
++	int (*close_win)(void *);
++};
++
+ /*
+  * Receive window attributes specified by the (in-kernel) owner of window.
   */
- int vas_paste_crb(struct vas_window *win, int offset, bool re);
+@@ -177,7 +188,8 @@ void vas_unregister_api_powernv(void);
+  * used for others in future.
+  */
+ int vas_register_coproc_api(struct module *mod, enum vas_cop_type cop_type,
+-				const char *name);
++			    const char *name,
++			    struct vas_user_win_ops *vops);
+ void vas_unregister_coproc_api(void);
  
-+void vas_win_paste_addr(struct vas_window *window, u64 *addr,
-+			int *len);
-+
- /*
-  * Register / unregister coprocessor type to VAS API which will be exported
-  * to user space. Applications can use this API to open / close window
-diff --git a/arch/powerpc/platforms/Kconfig b/arch/powerpc/platforms/Kconfig
-index 7a5e8f4541e3..594544a65b02 100644
---- a/arch/powerpc/platforms/Kconfig
-+++ b/arch/powerpc/platforms/Kconfig
-@@ -20,6 +20,7 @@ source "arch/powerpc/platforms/embedded6xx/Kconfig"
- source "arch/powerpc/platforms/44x/Kconfig"
- source "arch/powerpc/platforms/40x/Kconfig"
- source "arch/powerpc/platforms/amigaone/Kconfig"
-+source "arch/powerpc/platforms/book3s/Kconfig"
- 
- config KVM_GUEST
- 	bool "KVM Guest support"
-diff --git a/arch/powerpc/platforms/Makefile b/arch/powerpc/platforms/Makefile
-index 143d4417f6cc..0e75d7df387b 100644
---- a/arch/powerpc/platforms/Makefile
-+++ b/arch/powerpc/platforms/Makefile
-@@ -22,3 +22,4 @@ obj-$(CONFIG_PPC_CELL)		+= cell/
- obj-$(CONFIG_PPC_PS3)		+= ps3/
- obj-$(CONFIG_EMBEDDED6xx)	+= embedded6xx/
- obj-$(CONFIG_AMIGAONE)		+= amigaone/
-+obj-$(CONFIG_PPC_BOOK3S)	+= book3s/
-diff --git a/arch/powerpc/platforms/book3s/Kconfig b/arch/powerpc/platforms/book3s/Kconfig
-new file mode 100644
-index 000000000000..bed21449e8e5
---- /dev/null
-+++ b/arch/powerpc/platforms/book3s/Kconfig
-@@ -0,0 +1,15 @@
-+# SPDX-License-Identifier: GPL-2.0
-+config PPC_VAS
-+	bool "IBM Virtual Accelerator Switchboard (VAS)"
-+	depends on (PPC_POWERNV || PPC_PSERIES) && PPC_64K_PAGES
-+	default y
-+	help
-+	  This enables support for IBM Virtual Accelerator Switchboard (VAS).
-+
-+	  VAS allows accelerators in co-processors like NX-GZIP and NX-842
-+	  to be accessible to kernel subsystems and user processes.
-+	  VAS adapters are found in POWER9 and later based systems.
-+	  The user mode NX-GZIP support is added on P9 for powerNV and on
-+	  P10 for powerVM.
-+
-+	  If unsure, say "N".
-diff --git a/arch/powerpc/platforms/book3s/Makefile b/arch/powerpc/platforms/book3s/Makefile
-new file mode 100644
-index 000000000000..e790f1910f61
---- /dev/null
-+++ b/arch/powerpc/platforms/book3s/Makefile
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_PPC_VAS)	+= vas-api.o
-diff --git a/arch/powerpc/platforms/powernv/vas-api.c b/arch/powerpc/platforms/book3s/vas-api.c
-similarity index 99%
-rename from arch/powerpc/platforms/powernv/vas-api.c
-rename to arch/powerpc/platforms/book3s/vas-api.c
-index 98ed5d8c5441..cfc9d7dd65ab 100644
---- a/arch/powerpc/platforms/powernv/vas-api.c
+ #endif /* __ASM_POWERPC_VAS_H */
+diff --git a/arch/powerpc/platforms/book3s/vas-api.c b/arch/powerpc/platforms/book3s/vas-api.c
+index 72c126d87216..6c39320bfb9b 100644
+--- a/arch/powerpc/platforms/book3s/vas-api.c
 +++ b/arch/powerpc/platforms/book3s/vas-api.c
-@@ -10,9 +10,9 @@
- #include <linux/fs.h>
- #include <linux/slab.h>
- #include <linux/uaccess.h>
-+#include <linux/io.h>
- #include <asm/vas.h>
- #include <uapi/asm/vas-api.h>
--#include "vas.h"
+@@ -42,6 +42,7 @@ static struct coproc_dev {
+ 	dev_t devt;
+ 	struct class *class;
+ 	enum vas_cop_type cop_type;
++	struct vas_user_win_ops *vops;
+ } coproc_device;
  
+ struct coproc_instance {
+@@ -72,11 +73,10 @@ static int coproc_open(struct inode *inode, struct file *fp)
+ static int coproc_ioc_tx_win_open(struct file *fp, unsigned long arg)
+ {
+ 	void __user *uptr = (void __user *)arg;
+-	struct vas_tx_win_attr txattr = {};
+ 	struct vas_tx_win_open_attr uattr;
+ 	struct coproc_instance *cp_inst;
+ 	struct vas_window *txwin;
+-	int rc, vasid;
++	int rc;
+ 
+ 	cp_inst = fp->private_data;
+ 
+@@ -93,27 +93,20 @@ static int coproc_ioc_tx_win_open(struct file *fp, unsigned long arg)
+ 	}
+ 
+ 	if (uattr.version != 1) {
+-		pr_err("Invalid version\n");
++		pr_err("Invalid window open API version\n");
+ 		return -EINVAL;
+ 	}
+ 
+-	vasid = uattr.vas_id;
+-
+-	vas_init_tx_win_attr(&txattr, cp_inst->coproc->cop_type);
+-
+-	txattr.lpid = mfspr(SPRN_LPID);
+-	txattr.pidr = mfspr(SPRN_PID);
+-	txattr.user_win = true;
+-	txattr.rsvd_txbuf_count = false;
+-	txattr.pswid = false;
+-
+-	pr_devel("Pid %d: Opening txwin, PIDR %ld\n", txattr.pidr,
+-				mfspr(SPRN_PID));
++	if (!cp_inst->coproc->vops && !cp_inst->coproc->vops->open_win) {
++		pr_err("VAS API is not registered\n");
++		return -EACCES;
++	}
+ 
+-	txwin = vas_tx_win_open(vasid, cp_inst->coproc->cop_type, &txattr);
++	txwin = cp_inst->coproc->vops->open_win(&uattr,
++						cp_inst->coproc->cop_type);
+ 	if (IS_ERR(txwin)) {
+-		pr_err("%s() vas_tx_win_open() failed, %ld\n", __func__,
+-					PTR_ERR(txwin));
++		pr_err("%s() VAS window open failed, %ld\n", __func__,
++				PTR_ERR(txwin));
+ 		return PTR_ERR(txwin);
+ 	}
+ 
+@@ -125,9 +118,15 @@ static int coproc_ioc_tx_win_open(struct file *fp, unsigned long arg)
+ static int coproc_release(struct inode *inode, struct file *fp)
+ {
+ 	struct coproc_instance *cp_inst = fp->private_data;
++	int rc;
+ 
+ 	if (cp_inst->txwin) {
+-		vas_win_close(cp_inst->txwin);
++		if (cp_inst->coproc->vops &&
++			cp_inst->coproc->vops->close_win) {
++			rc = cp_inst->coproc->vops->close_win(cp_inst->txwin);
++			if (rc)
++				return rc;
++		}
+ 		cp_inst->txwin = NULL;
+ 	}
+ 
+@@ -168,7 +167,17 @@ static int coproc_mmap(struct file *fp, struct vm_area_struct *vma)
+ 		return -EINVAL;
+ 	}
+ 
+-	vas_win_paste_addr(txwin, &paste_addr, NULL);
++	if (!cp_inst->coproc->vops && !cp_inst->coproc->vops->paste_addr) {
++		pr_err("%s(): VAS API is not registered\n", __func__);
++		return -EACCES;
++	}
++
++	paste_addr = cp_inst->coproc->vops->paste_addr(txwin);
++	if (!paste_addr) {
++		pr_err("%s(): Window paste address failed\n", __func__);
++		return -EINVAL;
++	}
++
+ 	pfn = paste_addr >> PAGE_SHIFT;
+ 
+ 	/* flags, page_prot from cxl_mmap(), except we want cachable */
+@@ -208,7 +217,7 @@ static struct file_operations coproc_fops = {
+  * extended to other coprocessor types later.
+  */
+ int vas_register_coproc_api(struct module *mod, enum vas_cop_type cop_type,
+-				const char *name)
++			    const char *name, struct vas_user_win_ops *vops)
+ {
+ 	int rc = -EINVAL;
+ 	dev_t devno;
+@@ -230,6 +239,7 @@ int vas_register_coproc_api(struct module *mod, enum vas_cop_type cop_type,
+ 	}
+ 	coproc_device.class->devnode = coproc_devnode;
+ 	coproc_device.cop_type = cop_type;
++	coproc_device.vops = vops;
+ 
+ 	coproc_fops.owner = mod;
+ 	cdev_init(&coproc_device.cdev, &coproc_fops);
+diff --git a/arch/powerpc/platforms/powernv/vas-window.c b/arch/powerpc/platforms/powernv/vas-window.c
+index 2fc0fbc4a3d1..3ccd3edcaf1a 100644
+--- a/arch/powerpc/platforms/powernv/vas-window.c
++++ b/arch/powerpc/platforms/powernv/vas-window.c
+@@ -16,6 +16,7 @@
+ #include <linux/mmu_context.h>
+ #include <asm/switch_to.h>
+ #include <asm/ppc-opcode.h>
++#include <asm/vas.h>
+ #include "vas.h"
+ #include "copy-paste.h"
+ 
+@@ -1442,6 +1443,49 @@ struct vas_window *vas_pswid_to_window(struct vas_instance *vinst,
+ 	return window;
+ }
+ 
++static struct vas_window *vas_user_win_open(struct vas_tx_win_open_attr *uattr,
++				enum vas_cop_type cop_type)
++{
++	struct vas_tx_win_attr txattr = {};
++
++	vas_init_tx_win_attr(&txattr, cop_type);
++
++	txattr.lpid = mfspr(SPRN_LPID);
++	txattr.pidr = mfspr(SPRN_PID);
++	txattr.user_win = true;
++	txattr.rsvd_txbuf_count = false;
++	txattr.pswid = false;
++
++	pr_devel("Pid %d: Opening txwin, PIDR %ld\n", txattr.pidr,
++				mfspr(SPRN_PID));
++
++	return vas_tx_win_open(uattr->vas_id, cop_type, &txattr);
++}
++
++static u64 vas_user_win_paste_addr(void *addr)
++{
++	u64 paste_addr;
++
++	vas_win_paste_addr((struct vas_window *)addr, &paste_addr, NULL);
++
++	return paste_addr;
++}
++
++static int vas_user_win_close(void *addr)
++{
++	struct vas_window *txwin = addr;
++
++	vas_win_close(txwin);
++
++	return 0;
++}
++
++static struct vas_user_win_ops vops =  {
++	.open_win	=	vas_user_win_open,
++	.paste_addr	=	vas_user_win_paste_addr,
++	.close_win	=	vas_user_win_close,
++};
++
  /*
-  * The driver creates the device node that can be used as follows:
-diff --git a/arch/powerpc/platforms/powernv/Kconfig b/arch/powerpc/platforms/powernv/Kconfig
-index 619b093a0657..043eefbbdd28 100644
---- a/arch/powerpc/platforms/powernv/Kconfig
-+++ b/arch/powerpc/platforms/powernv/Kconfig
-@@ -33,20 +33,6 @@ config PPC_MEMTRACE
- 	  Enabling this option allows for runtime allocation of memory (RAM)
- 	  for hardware tracing.
+  * Supporting only nx-gzip coprocessor type now, but this API code
+  * extended to other coprocessor types later.
+@@ -1450,7 +1494,7 @@ int vas_register_api_powernv(struct module *mod, enum vas_cop_type cop_type,
+ 			     const char *name)
+ {
  
--config PPC_VAS
--	bool "IBM Virtual Accelerator Switchboard (VAS)"
--	depends on PPC_POWERNV && PPC_64K_PAGES
--	default y
--	help
--	  This enables support for IBM Virtual Accelerator Switchboard (VAS).
--
--	  VAS allows accelerators in co-processors like NX-GZIP and NX-842
--	  to be accessible to kernel subsystems and user processes.
--
--	  VAS adapters are found in POWER9 based systems.
--
--	  If unsure, say N.
--
- config SCOM_DEBUGFS
- 	bool "Expose SCOM controllers via debugfs"
- 	depends on DEBUG_FS
-diff --git a/arch/powerpc/platforms/powernv/Makefile b/arch/powerpc/platforms/powernv/Makefile
-index be2546b96816..dc7b37c23b60 100644
---- a/arch/powerpc/platforms/powernv/Makefile
-+++ b/arch/powerpc/platforms/powernv/Makefile
-@@ -18,7 +18,7 @@ obj-$(CONFIG_MEMORY_FAILURE)	+= opal-memory-errors.o
- obj-$(CONFIG_OPAL_PRD)	+= opal-prd.o
- obj-$(CONFIG_PERF_EVENTS) += opal-imc.o
- obj-$(CONFIG_PPC_MEMTRACE)	+= memtrace.o
--obj-$(CONFIG_PPC_VAS)	+= vas.o vas-window.o vas-debug.o vas-fault.o vas-api.o
-+obj-$(CONFIG_PPC_VAS)	+= vas.o vas-window.o vas-debug.o vas-fault.o
- obj-$(CONFIG_OCXL_BASE)	+= ocxl.o
- obj-$(CONFIG_SCOM_DEBUGFS) += opal-xscom.o
- obj-$(CONFIG_PPC_SECURE_BOOT) += opal-secvar.o
+-	return vas_register_coproc_api(mod, cop_type, name);
++	return vas_register_coproc_api(mod, cop_type, name, &vops);
+ }
+ EXPORT_SYMBOL_GPL(vas_register_api_powernv);
+ 
 -- 
 2.18.2
 
