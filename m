@@ -2,64 +2,154 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFBC6C433ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 07:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10EFEC433B4
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 07:23:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFB88611ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 07:11:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1A0361261
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 07:23:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235464AbhEUHMe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 May 2021 03:12:34 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:55504 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234228AbhEUHMe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 May 2021 03:12:34 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1ljzJN-0003wW-44; Fri, 21 May 2021 15:11:09 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1ljzJN-0005lP-0l; Fri, 21 May 2021 15:11:09 +0800
-Date:   Fri, 21 May 2021 15:11:09 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Deepak Saxena <dsaxena@plexity.net>,
-        linux-crypto@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 5/5] hw_random: ixp4xx: Add OF support
-Message-ID: <20210521071108.jcy7ypnl36bnzxj7@gondor.apana.org.au>
-References: <20210511132928.814697-1-linus.walleij@linaro.org>
- <20210511132928.814697-5-linus.walleij@linaro.org>
+        id S235737AbhEUHY0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 May 2021 03:24:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57946 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233890AbhEUHYQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 May 2021 03:24:16 -0400
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10215C061574
+        for <linux-crypto@vger.kernel.org>; Fri, 21 May 2021 00:22:41 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id o127so10534880wmo.4
+        for <linux-crypto@vger.kernel.org>; Fri, 21 May 2021 00:22:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=Ue4q25tfYI5RxLcBXPlMjiSrTwgCV0DfcVN25afL2bA=;
+        b=zxBkF2RpmykF6ze5xWEoQ0Sr0EVVAWgufL4N4uYCEfvvr/9dBYRwNyhiILH7xolYIM
+         mUMpEc0xXBJpplnd2Ws45Umks7zwOxUWKpLSks7U3bsdswos3yo/TMqCb97EECv4oO9i
+         nPR3MbzV+M8Ol9Hmhi9U7j556tKkgEURhOKEJ/ZmzIh4muKbO6krDSxmt3Mv2RYCjfFw
+         SNhb3NzpB5FQ50Ylct/Z3K/asq2FOTFjZf9FGqtQMB038gZT8Vu7p5RSiGdzGms2OD8X
+         yPYCJ7kZe/aC4GAdyvCUeySQ3fymFp3DS+oe58blNwY5pF5JgI3E7v419huXJyQo0bbH
+         XGvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=Ue4q25tfYI5RxLcBXPlMjiSrTwgCV0DfcVN25afL2bA=;
+        b=kYOgnTr1wa2IV/OYwwvgQvJw8M3Wsq6IRSk6HKfpdkwR6KE25jnRI6aNjXhiGMwwYp
+         hVEFdw6SZ9v/9jfrKni4UH/Da3DAOR/2qEDJFFhJ+qYz5hBozQmK8ed7pJl9wqQkvfyG
+         iokxLJp08/seGPTrx1I1BGs4acUS7OZimeEBK4I+nCXjrCkloXGKuOaE+77insTBhpMP
+         /FxEurHBF41S0BG2cCW+lSPn8ju6URDL7g2tE304o4d/fE2xQH5rxSjBqdTnWsGsE2Aq
+         n3QcQHDy/MSONoVAKv0oWbnwLptK4fTFROHUufwaqxrGgbLyyiqeZQ6AA4ntaRruzVby
+         S2Ug==
+X-Gm-Message-State: AOAM5337/ks6mzmpx0gFPMSl46d8njlesRshg+KIQljQvN795VuIdHMu
+        cWSefJAlpVRGCyolCAr8tQyCCA==
+X-Google-Smtp-Source: ABdhPJzAs4JWDKxcLcuodJXaj7alnXNl7eWaJK+ZI+9Sb3ggP4ft8Mue6yj3TwDmFJ/1VFJt4AdOjA==
+X-Received: by 2002:a1c:2985:: with SMTP id p127mr7390963wmp.165.1621581759653;
+        Fri, 21 May 2021 00:22:39 -0700 (PDT)
+Received: from dell ([91.110.221.215])
+        by smtp.gmail.com with ESMTPSA id c15sm1041514wro.21.2021.05.21.00.22.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 May 2021 00:22:39 -0700 (PDT)
+Date:   Fri, 21 May 2021 08:22:36 +0100
+From:   Lee Jones <lee.jones@linaro.org>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Bob Picco <robert.picco@hp.com>,
+        Clemens Ladisch <clemens@ladisch.de>,
+        "C. Scott Ananian" <cananian@alumni.princeton.edu>,
+        "cs.c" <support.linux@omnikey.com>,
+        Dave Safford <safford@watson.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Harald Welte <laforge@gnumonks.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jerome Glisse <j.glisse@gmail.com>,
+        Kanoj Sarcar <kanoj@sgi.com>, Kylene Hall <kjhall@us.ibm.com>,
+        Lijun Pan <ljp@linux.ibm.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, linux-integrity@vger.kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michael Neuling <mikey@neuling.org>,
+        Paul Fulghum <paulkf@microgate.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Reiner Sailer <sailer@watson.ibm.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Thirupathaiah Annapureddy <thiruan@microsoft.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>,
+        van Doorn <leendert@watson.ibm.com>
+Subject: Re: [PATCH 00/16] Rid W=1 warnings from Char
+Message-ID: <20210521072236.GX2549456@dell>
+References: <20210520121347.3467794-1-lee.jones@linaro.org>
+ <CAK8P3a0VujuG8eU_CEVSvzbk4nAJz8fStedM5eMUrLAr9EJxDQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210511132928.814697-5-linus.walleij@linaro.org>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAK8P3a0VujuG8eU_CEVSvzbk4nAJz8fStedM5eMUrLAr9EJxDQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 11, 2021 at 03:29:28PM +0200, Linus Walleij wrote:
-> This makes the hardware random number generator found in
-> the IXP46x SoCs probe from the device tree.
-> 
-> Cc: Deepak Saxena <dsaxena@plexity.net>
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
-> The idea is to apply this through the ARM SoC tree along
-> with other IXP4xx refactorings.
-> Please tell me if you prefer another solution.
-> ---
->  drivers/char/hw_random/ixp4xx-rng.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+On Thu, 20 May 2021, Arnd Bergmann wrote:
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> On Thu, May 20, 2021 at 2:13 PM Lee Jones <lee.jones@linaro.org> wrote:
+> >
+> > This set is part of a larger effort attempting to clean-up W=1
+> > kernel builds, which are currently overwhelmingly riddled with
+> > niggly little warnings.
+> >
+> > Lee Jones (16):
+> >   char: pcmcia: cm4000_cs: Remove unused variable 'tmp'
+> >   char: pcmcia: cm4040_cs: Remove unused variable 'uc'
+> >   char: random: Include header containing our prototypes
+> >   char: pcmcia: synclink_cs: Fix a bunch of kernel-doc issues
+> >   char: pcmcia: synclink_cs: Fix a bunch of kernel-doc issues
+> >   char: applicom: Remove 3 unused variables 'ret' and 2 instances of
+> >     'byte_reset_it'
+> >   char: tpm: tpm1-cmd: Fix a couple of misnamed functions
+> >   char: tpm: tpm_ftpm_tee: Fix a couple of kernel-doc misdemeanours
+> >   char: agp: backend: Demote some non-conformant kernel-doc headers
+> >   char: agp: frontend: Include header file containing our prototypes
+> >   char: agp: via-agp: Remove unused variable 'current_size'
+> >   char: hpet: Remove unused variable 'm'
+> >   char: agp: generic: Place braces around optimised out function in if()
+> >   char: agp: uninorth-agp: Remove unused variable 'size'
+> >   char: hw_random: pseries-rng: Demote non-conformant kernel-doc header
+> >   char: mem: Provide local prototype for non-static function
+> 
+> Thanks a lot!
+> 
+> I've looked all the patches now and commented on patches 6 and 16.
+> With my comments addressed
+> 
+> Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+
+Thanks Arnd.
+
+Would it be possible for the remaining 14 patches to be taken in
+please?  I will work on the 2 Arnd commented on in due course and
+resubmit them independently.
+
+TIA.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Lee Jones [李琼斯]
+Senior Technical Lead - Developer Services
+Linaro.org │ Open source software for Arm SoCs
+Follow Linaro: Facebook | Twitter | Blog
