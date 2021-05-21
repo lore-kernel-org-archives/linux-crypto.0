@@ -2,154 +2,143 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10EFEC433B4
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 07:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E451C433B4
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 07:27:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E1A0361261
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 07:23:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 230996135B
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 07:27:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235737AbhEUHY0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 May 2021 03:24:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57946 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233890AbhEUHYQ (ORCPT
+        id S233763AbhEUH2b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 May 2021 03:28:31 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.216]:10268 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231915AbhEUH2b (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 May 2021 03:24:16 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10215C061574
-        for <linux-crypto@vger.kernel.org>; Fri, 21 May 2021 00:22:41 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id o127so10534880wmo.4
-        for <linux-crypto@vger.kernel.org>; Fri, 21 May 2021 00:22:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=Ue4q25tfYI5RxLcBXPlMjiSrTwgCV0DfcVN25afL2bA=;
-        b=zxBkF2RpmykF6ze5xWEoQ0Sr0EVVAWgufL4N4uYCEfvvr/9dBYRwNyhiILH7xolYIM
-         mUMpEc0xXBJpplnd2Ws45Umks7zwOxUWKpLSks7U3bsdswos3yo/TMqCb97EECv4oO9i
-         nPR3MbzV+M8Ol9Hmhi9U7j556tKkgEURhOKEJ/ZmzIh4muKbO6krDSxmt3Mv2RYCjfFw
-         SNhb3NzpB5FQ50Ylct/Z3K/asq2FOTFjZf9FGqtQMB038gZT8Vu7p5RSiGdzGms2OD8X
-         yPYCJ7kZe/aC4GAdyvCUeySQ3fymFp3DS+oe58blNwY5pF5JgI3E7v419huXJyQo0bbH
-         XGvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=Ue4q25tfYI5RxLcBXPlMjiSrTwgCV0DfcVN25afL2bA=;
-        b=kYOgnTr1wa2IV/OYwwvgQvJw8M3Wsq6IRSk6HKfpdkwR6KE25jnRI6aNjXhiGMwwYp
-         hVEFdw6SZ9v/9jfrKni4UH/Da3DAOR/2qEDJFFhJ+qYz5hBozQmK8ed7pJl9wqQkvfyG
-         iokxLJp08/seGPTrx1I1BGs4acUS7OZimeEBK4I+nCXjrCkloXGKuOaE+77insTBhpMP
-         /FxEurHBF41S0BG2cCW+lSPn8ju6URDL7g2tE304o4d/fE2xQH5rxSjBqdTnWsGsE2Aq
-         n3QcQHDy/MSONoVAKv0oWbnwLptK4fTFROHUufwaqxrGgbLyyiqeZQ6AA4ntaRruzVby
-         S2Ug==
-X-Gm-Message-State: AOAM5337/ks6mzmpx0gFPMSl46d8njlesRshg+KIQljQvN795VuIdHMu
-        cWSefJAlpVRGCyolCAr8tQyCCA==
-X-Google-Smtp-Source: ABdhPJzAs4JWDKxcLcuodJXaj7alnXNl7eWaJK+ZI+9Sb3ggP4ft8Mue6yj3TwDmFJ/1VFJt4AdOjA==
-X-Received: by 2002:a1c:2985:: with SMTP id p127mr7390963wmp.165.1621581759653;
-        Fri, 21 May 2021 00:22:39 -0700 (PDT)
-Received: from dell ([91.110.221.215])
-        by smtp.gmail.com with ESMTPSA id c15sm1041514wro.21.2021.05.21.00.22.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 May 2021 00:22:39 -0700 (PDT)
-Date:   Fri, 21 May 2021 08:22:36 +0100
-From:   Lee Jones <lee.jones@linaro.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Bob Picco <robert.picco@hp.com>,
-        Clemens Ladisch <clemens@ladisch.de>,
-        "C. Scott Ananian" <cananian@alumni.princeton.edu>,
-        "cs.c" <support.linux@omnikey.com>,
-        Dave Safford <safford@watson.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Harald Welte <laforge@gnumonks.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jerome Glisse <j.glisse@gmail.com>,
-        Kanoj Sarcar <kanoj@sgi.com>, Kylene Hall <kjhall@us.ibm.com>,
-        Lijun Pan <ljp@linux.ibm.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, linux-integrity@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michael Neuling <mikey@neuling.org>,
-        Paul Fulghum <paulkf@microgate.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Peter Huewe <peterhuewe@gmx.de>,
-        Reiner Sailer <sailer@watson.ibm.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Thirupathaiah Annapureddy <thiruan@microsoft.com>,
-        Tyrel Datwyler <tyreld@linux.ibm.com>,
-        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>,
-        van Doorn <leendert@watson.ibm.com>
-Subject: Re: [PATCH 00/16] Rid W=1 warnings from Char
-Message-ID: <20210521072236.GX2549456@dell>
-References: <20210520121347.3467794-1-lee.jones@linaro.org>
- <CAK8P3a0VujuG8eU_CEVSvzbk4nAJz8fStedM5eMUrLAr9EJxDQ@mail.gmail.com>
+        Fri, 21 May 2021 03:28:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1621582024; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=ZXy7snFZewmp25x52Hsqq85wU7yaW8i1hZ74y3E+eTK42qM6E+dqjs2rioC1Nc9UIZ
+    Io+CyjGpiRonvmY7l4YKIRezonsRnVtmxfxCZUItE4pmD/HeWjSD4N/S4q0Sx7prYexC
+    +iynzU+3OIzLo0AIQfaktFpplb76Ev49vO51sHuuAHBbpYCDlQkBHrsyASEMa+ydiP71
+    o6hhaRWyI6lxtANkJJ3pOv+JNCzzA/BnTByeY/HaFL0uFu1gF31n8sF96KwT6KcRqE8E
+    CUj/jTJffDDGFqH53g2TOuHDN80F/6hdQwiE1sc0TxgnecBlQtlU/O4Sa9WbfwWqG2zk
+    sl/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1621582024;
+    s=strato-dkim-0002; d=strato.com;
+    h=References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=6NSDXC09BFXaREsayvFsrKY2oVDkya6ZgyDLRcDATPc=;
+    b=aJ085sN0TwUxpo7phON0YaPy7Ktx1Ro9bjH+cbD/p1lPaGW9s/L7YVrk2ywGFmCFU7
+    fE5AraHn9azJpF8S75mPgb0iU169QInbU8T6C75b7kPhnyS+ZBgrDgxCiK4x55xm4hYg
+    spqE8X3tuNgaeQ/YLUWXasitFBMZBxUQo9AF0EuxCDpBOzAdEgoNSEAI7gzQZ0Ka7WvL
+    TTDe1nBQVJRbjWZ5yl/ngsV9rYA5NMUGreRW8xT7XJxcBfe5+bLZgtC2Ng94pBkvRnwB
+    dNs1SlMwo0x+rv9XDgdTCJKNXcaOK1+tVCmzNiFgRz7dV2/LUVLXx5vC7F6jkscqrpKZ
+    Gqxg==
+ARC-Authentication-Results: i=1; strato.com;
+    dkim=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1621582024;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=6NSDXC09BFXaREsayvFsrKY2oVDkya6ZgyDLRcDATPc=;
+    b=tx7Sg1AgTgGUbiSeUsWXrvzMfpfRuiuQh1Ez8AKhZmFPFo2VPuY6XfuUHZvuv/iOVh
+    +xHBeTh4m2zvUNVer+49iSxB0YRiScjTDMYA6cZ3JX5xkdt5kmTcXwxcFAWowV8ZcgCz
+    UChm/3YBaehiU+LIDOwuvlItd+xSTM2R1PM9R0BsdvBX03+lRmdDcuR8lzhQKkmrwIQV
+    OchpO/PShaK5hsvxg27CPXhIIYQ0dVEE5scF8GWGpRM56LJsFQopeKWQBsBF42h2dMfw
+    5DLBktKuFfWzqghHjoq7xx+0Pbo2wBAYFlkJWvodZ25KpwPEeHz4ecij55Kswvs3qj+N
+    fDog==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNzyCzy1Sfr67uExK884EC0GFGHavJSlFkMRYOkE="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+    by smtp.strato.de (RZmta 47.26.1 DYNA|AUTH)
+    with ESMTPSA id V06bffx4L7R308z
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Fri, 21 May 2021 09:27:03 +0200 (CEST)
+Message-ID: <7621dbe1bfb4f461382952ebeaada5ce103eaf88.camel@chronox.de>
+Subject: Re: A possible divide by zero bug in drbg_ctr_df
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Yiyuan guo <yguoaz@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net
+Date:   Fri, 21 May 2021 09:27:03 +0200
+In-Reply-To: <20210521064825.vhovv7sa5qif2f3j@gondor.apana.org.au>
+References: <CAM7=BFrCTTuBkYb-ceX5C=e8VhAuWBVb_pYQ+K0LB1gn3h=hqA@mail.gmail.com>
+         <20210521064825.vhovv7sa5qif2f3j@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAK8P3a0VujuG8eU_CEVSvzbk4nAJz8fStedM5eMUrLAr9EJxDQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 20 May 2021, Arnd Bergmann wrote:
+Am Freitag, dem 21.05.2021 um 14:48 +0800 schrieb Herbert Xu:
+> On Fri, May 21, 2021 at 11:23:36AM +0800, Yiyuan guo wrote:
+> > In crypto/drbg.c, the function drbg_ctr_df has the following code:
+> > 
+> > padlen = (inputlen + sizeof(L_N) + 1) % (drbg_blocklen(drbg));
+> > 
+> > However, the function drbg_blocklen may return zero:
+> > 
+> > static inline __u8 drbg_blocklen(struct drbg_state *drbg)
+> > {
+> >     if (drbg && drbg->core)
+> >         return drbg->core->blocklen_bytes;
+> >     return 0;
+> > }
+> > 
+> > Is it possible to trigger a divide by zero problem here?
 
-> On Thu, May 20, 2021 at 2:13 PM Lee Jones <lee.jones@linaro.org> wrote:
-> >
-> > This set is part of a larger effort attempting to clean-up W=1
-> > kernel builds, which are currently overwhelmingly riddled with
-> > niggly little warnings.
-> >
-> > Lee Jones (16):
-> >   char: pcmcia: cm4000_cs: Remove unused variable 'tmp'
-> >   char: pcmcia: cm4040_cs: Remove unused variable 'uc'
-> >   char: random: Include header containing our prototypes
-> >   char: pcmcia: synclink_cs: Fix a bunch of kernel-doc issues
-> >   char: pcmcia: synclink_cs: Fix a bunch of kernel-doc issues
-> >   char: applicom: Remove 3 unused variables 'ret' and 2 instances of
-> >     'byte_reset_it'
-> >   char: tpm: tpm1-cmd: Fix a couple of misnamed functions
-> >   char: tpm: tpm_ftpm_tee: Fix a couple of kernel-doc misdemeanours
-> >   char: agp: backend: Demote some non-conformant kernel-doc headers
-> >   char: agp: frontend: Include header file containing our prototypes
-> >   char: agp: via-agp: Remove unused variable 'current_size'
-> >   char: hpet: Remove unused variable 'm'
-> >   char: agp: generic: Place braces around optimised out function in if()
-> >   char: agp: uninorth-agp: Remove unused variable 'size'
-> >   char: hw_random: pseries-rng: Demote non-conformant kernel-doc header
-> >   char: mem: Provide local prototype for non-static function
-> 
-> Thanks a lot!
-> 
-> I've looked all the patches now and commented on patches 6 and 16.
-> With my comments addressed
-> 
-> Reviewed-by: Arnd Bergmann <arnd@arndb.de>
 
-Thanks Arnd.
+I do not think there is a problem. Allow me to explain:
 
-Would it be possible for the remaining 14 patches to be taken in
-please?  I will work on the 2 Arnd commented on in due course and
-resubmit them independently.
+To reach the drbg_ctr_df function, the drbg_ctr_update function must be
+called. This is either called from the seeding operation or the generate
+operation.
 
-TIA.
+The seeding operation is guarded as follows:
 
--- 
-Lee Jones [李琼斯]
-Senior Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+1. if called from the instantiation drbg_instantiate, we have:
+
+        if (!drbg->core) {
+                drbg->core = &drbg_cores[coreref];
+
+2. if called from the generate function drbg_generate, we have:
+
+	if (!drbg->core) {
+                pr_devel("DRBG: not yet seeded\n");
+                return -EINVAL;
+        }
+
+Thus, in both cases, when no drbg and no drbg->core is present, either the
+code tries to get it or it fails before trying to invoke the concerning code
+path.
+
+
+When the drbg_ctr_update function is invoked from the generate operation, the
+step 2 above applies.
+
+
+Thus, when we reach the call for drbg_blocklen to get the padlen, we always
+have a drbg and a drbg->core pointer.
+
+In general, as soon as the DRBG code path reaches the DRBG-specific
+implementations hiding behind drbg->[update|generate], the entire DRBG is
+fully initialized and all pointers/memory is set up as needed.
+
+The sanity check in drbg_blocklen is there as the function may be called in
+earlier functions where it is not fully guaranteed that the drbg and drbg-
+>core is set.
+
+Thanks for the review.
+Stephan
+
+
+
