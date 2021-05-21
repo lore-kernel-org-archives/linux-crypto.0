@@ -8,58 +8,58 @@ X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2839AC433ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 01:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC47FC43460
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 01:51:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BBEB6135A
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 01:47:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91B20613AA
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 01:51:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237211AbhEUBsg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 May 2021 21:48:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39504 "EHLO
+        id S237829AbhEUBw1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 May 2021 21:52:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237007AbhEUBsf (ORCPT
+        with ESMTP id S237814AbhEUBw0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 May 2021 21:48:35 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC96CC0613CE
-        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 18:47:13 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id k4so7202301qkd.0
-        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 18:47:13 -0700 (PDT)
+        Thu, 20 May 2021 21:52:26 -0400
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5199DC061574
+        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 18:51:04 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id h24so2894116qtm.12
+        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 18:51:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=m4x7lU1U7Nhzd1I5e57Naj6BhSC/JD8u6YQwuIwYouE=;
-        b=Jv66ORDh/GUPU+ziJkeIfJao5g5k+Gn979a/+af8pXMgS21oiuBKVeO4JVq3HoYiXX
-         ksOVdHjKYPObmYufYaKOZ3BO8dPeNT2g6q67R+Uw+RKO0r6ZYArypFy1dpGYkb8oi+QR
-         afNiXzYbIjDyXa6gu2HD8bMwIFswPPj4dcA85oAyb1cExpDh4+K/suH2IU7cpS0SmJ19
-         IFtUaoXDHHoBaSqGyzLIZGukGY2ZArBfIJ4RTZJJ341z4usaU7LXMGsx8cR9AX956ugM
-         T3SmPW/qzHjW0M8W23cXKdOtX3s7eiC0muF4jv0B+ubcWj1Q8de5A3Fe+4yj9mLS5rAd
-         qOwg==
+        bh=dSie+npZSkADJ7V+ho8kAal6Ij8W1UB//HsiRO+ZSP8=;
+        b=vOzl2Ya9ahmcJE4NCzJ9YVIp8x1hqcye6X09xrg0Q1XTV8b4ot9MTBFjizfbo6YeDj
+         3BSH9eXImPHo7gQFFgYi0Cutw9EYhBYjHozC2AHE3WsVNHNUEAZsA7JD0YFhOrFoYtfU
+         wwcr3xsE0+cWHCX1/nu5s+J2WYyF4QSBCL5S+ku0iP+NQKS8kv4S5NxdpORp8bVpGWqJ
+         Vi9Gr4A3WPJmaYF1XbwkeRpe/253gnG6PCoMlCGKv8R9XiuAHLogdMdU/JLbor/Cky8t
+         AyiIlY6KH2wcXnJIL9J7lUtcAP3E3+o1d/j3GLyWwYmoi0+KyGemqz3Knz4MS4Oizu+6
+         7+ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=m4x7lU1U7Nhzd1I5e57Naj6BhSC/JD8u6YQwuIwYouE=;
-        b=UMNXrwz3cyHWta6JCELWxs+p9sEcnsFwHgrIIfNvIrP2BuHBWZ78SxCt+dWPZ5ZzNb
-         1AJVFkZ4iVl/5T64r3/SV7jsN1g+2zHcsQYVAOC6gW0YcbVGDNNavB7pYksb1WMRYrYw
-         lBTTgG4HfmA4DHs6uG6SKbB8NT/sxN5V2euf6itWrZRuFmA/xR2s2V7AthUDVh898n1W
-         rmLCZGyIVhdGKFnHblU9NSjS+n0NG64YwraWOINDyPetVxTkRGLFiJ3lAPMVKjVGi0wa
-         7htAP6MmYyCD0O0zJOA38WDJFI9AC7Mv0HKYoNBbQqmaupOb7e2OJ4rcH8FavOE1aTWa
-         IINQ==
-X-Gm-Message-State: AOAM533YAtQD3yRILoikB9Y8tTfsVi+SeJ0BkEDGR/riCcSguBWzQML9
-        usRjNm994SibP4FvYeYtiqdqMg==
-X-Google-Smtp-Source: ABdhPJwsz3B6Ow0zdsob/uNRAg7KYoQSta4h9ulEkAfsBE/ikkwVlrzwDK+nX2qnpzqBReNRxCgSqQ==
-X-Received: by 2002:a37:8b86:: with SMTP id n128mr7761986qkd.141.1621561632844;
-        Thu, 20 May 2021 18:47:12 -0700 (PDT)
+        bh=dSie+npZSkADJ7V+ho8kAal6Ij8W1UB//HsiRO+ZSP8=;
+        b=dgLdfJOQ1pTZ17JI2DNQPmrxXH8NnBpSnx0WKl4IujLYcLk7868SSa912NMPJvjfS6
+         BqFkdXbrq2ovvoPpZRm6cbj48IY1QlCKUDogDrSAUYLIQEqshy5u3UpAkji8dvmDbTuI
+         LJKt9ScuXoGXObQH3DDxZobrhTkbbHFZvSVpaKMCGnaVgToUBpo3Nv11nCx6QooBfTyq
+         wsEUWDJGgGjGjy+F4xGROpiZc5G6/jmAQV40/HyHOO0wXS00gP81PwiPWM96vL/eik6/
+         pkp7rHHnmkoBp/70PtJGpyV51oktDe4dZGUC2flPZN0wcaqpE1R4NHFWgxH/EjTK3SYu
+         ekWA==
+X-Gm-Message-State: AOAM533Ca0vHbtiJr1jgB5QK0l3LbUJuwbFkTisJjLFU97ItH3p+3XGX
+        U/l0JVAWFoNkGsW+5omUrX3Gbw==
+X-Google-Smtp-Source: ABdhPJyfQ8Ksqhw/qYqkxD1Xtxi9JLGZRyD0jjn0+B2XiJN1JfRDZtttRX3iVIqVj3VCjoxF3jfjFQ==
+X-Received: by 2002:ac8:7d56:: with SMTP id h22mr8701787qtb.151.1621561863530;
+        Thu, 20 May 2021 18:51:03 -0700 (PDT)
 Received: from [192.168.1.93] (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.gmail.com with ESMTPSA id a14sm3356422qtj.57.2021.05.20.18.47.11
+        by smtp.gmail.com with ESMTPSA id h23sm3678998qka.22.2021.05.20.18.51.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 May 2021 18:47:12 -0700 (PDT)
-Subject: Re: [PATCH v3 07/17] arm64/dts: qcom: sdm845: Use RPMH_CE_CLK macro
- directly
+        Thu, 20 May 2021 18:51:03 -0700 (PDT)
+Subject: Re: [PATCH v3 15/17] crypto: qce: Convert the device found dev_dbg()
+ to dev_info()
 To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
         linux-arm-msm@vger.kernel.org
 Cc:     Bjorn Andersson <bjorn.andersson@linaro.org>,
@@ -74,14 +74,14 @@ Cc:     Bjorn Andersson <bjorn.andersson@linaro.org>,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         bhupesh.linux@gmail.com
 References: <20210519143700.27392-1-bhupesh.sharma@linaro.org>
- <20210519143700.27392-8-bhupesh.sharma@linaro.org>
+ <20210519143700.27392-16-bhupesh.sharma@linaro.org>
 From:   Thara Gopinath <thara.gopinath@linaro.org>
-Message-ID: <ead0b21e-3cf3-e882-ebef-eecf2e0a0f8c@linaro.org>
-Date:   Thu, 20 May 2021 21:47:11 -0400
+Message-ID: <731b0382-9e77-2a3a-cc83-4f1c63e9f8ce@linaro.org>
+Date:   Thu, 20 May 2021 21:50:59 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210519143700.27392-8-bhupesh.sharma@linaro.org>
+In-Reply-To: <20210519143700.27392-16-bhupesh.sharma@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -92,14 +92,10 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 On 5/19/21 10:36 AM, Bhupesh Sharma wrote:
-> In commit 3e482859f1ef ("dts: qcom: sdm845: Add dt entries
-> to support crypto engine."), we decided to use the value indicated
-> by constant RPMH_CE_CLK rather than using it directly.
+> QCE crypto driver is right now too silent even if the probe() is ok
+> and a valid crypto IP version is found.
 > 
-> Now that the same RPMH clock value might be used for other
-> SoCs (in addition to sdm845), let's use the constant
-> RPMH_CE_CLK to make sure that this dtsi is compatible with the
-> other qcom ones.
+> Convert the dev_dbg() message to a dev_info() instead.
 > 
 > Cc: Thara Gopinath <thara.gopinath@linaro.org>
 > Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
@@ -120,36 +116,25 @@ On 5/19/21 10:36 AM, Bhupesh Sharma wrote:
 
 Reviewed-by: Thara Gopinath <thara.gopinath@linaro.org>
 
-
 Warm Regards
 Thara
-
 > ---
->   arch/arm64/boot/dts/qcom/sdm845.dtsi | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>   drivers/crypto/qce/core.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/boot/dts/qcom/sdm845.dtsi b/arch/arm64/boot/dts/qcom/sdm845.dtsi
-> index 0a86fe71a66d..2ec4be930fd6 100644
-> --- a/arch/arm64/boot/dts/qcom/sdm845.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/sdm845.dtsi
-> @@ -2316,7 +2316,7 @@ cryptobam: dma@1dc4000 {
->   			compatible = "qcom,bam-v1.7.0";
->   			reg = <0 0x01dc4000 0 0x24000>;
->   			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-> -			clocks = <&rpmhcc 15>;
-> +			clocks = <&rpmhcc RPMH_CE_CLK>;
->   			clock-names = "bam_clk";
->   			#dma-cells = <1>;
->   			qcom,ee = <0>;
-> @@ -2332,7 +2332,7 @@ crypto: crypto@1dfa000 {
->   			reg = <0 0x01dfa000 0 0x6000>;
->   			clocks = <&gcc GCC_CE1_AHB_CLK>,
->   				 <&gcc GCC_CE1_AHB_CLK>,
-> -				 <&rpmhcc 15>;
-> +				 <&rpmhcc RPMH_CE_CLK>;
->   			clock-names = "iface", "bus", "core";
->   			dmas = <&cryptobam 6>, <&cryptobam 7>;
->   			dma-names = "rx", "tx";
+> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+> index aecb2cdd79e5..8b3e2b4580c2 100644
+> --- a/drivers/crypto/qce/core.c
+> +++ b/drivers/crypto/qce/core.c
+> @@ -179,7 +179,7 @@ static int qce_check_version(struct qce_device *qce)
+>   	 */
+>   	qce->pipe_pair_id = qce->dma.rxchan->chan_id >> 1;
+>   
+> -	dev_dbg(qce->dev, "Crypto device found, version %d.%d.%d\n",
+> +	dev_info(qce->dev, "Crypto device found, version %d.%d.%d\n",
+>   		major, minor, step);
+>   
+>   	return 0;
 > 
 
 
