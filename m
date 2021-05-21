@@ -2,78 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07296C433ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 03:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A192BC433ED
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 03:58:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C964660232
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 03:24:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F685611BD
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 03:58:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238891AbhEUDZs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 May 2021 23:25:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32772 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238890AbhEUDZk (ORCPT
+        id S238962AbhEUD7h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 May 2021 23:59:37 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:3638 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233879AbhEUD7h (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 May 2021 23:25:40 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F99C061574
-        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 20:23:46 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d16so13890321pfn.12
-        for <linux-crypto@vger.kernel.org>; Thu, 20 May 2021 20:23:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=5yJ93m6CegNlSMHAeMKjyxLyMafra/bBo5cvOo7vxug=;
-        b=OHl4KuE0KdFyZ8dehKBcShzJE8s8GtJAKwXzgEzq/w4irCWtLKlO+abL6xE/fyIjsl
-         mNXH9j/fo6MJQ103l1NxrAL0dFS/KbYNdVS6GvF6ntBfh4VSnIm8rjxw+Zl7BxYnCOPW
-         JNkRi+WAnRagh0HaVyGzTVxGo+Lt6kVBhTAhDMjkuUzAXcp1Tfca/nbeJ3LQ6xs+OBSp
-         5WkXsnl10z+0rTl3xVoci9j9kAdgBOXp8pnu/rdKvAsWAWK2geyIDSa4VXjgZ1Z0mhqC
-         RNxOpbiCZ0tY74lWxf0H6Ri++d11SPJJd3Jko2YBl8Ujvwh4H7bN8+K8ZHMLdVAfAG8c
-         xfRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=5yJ93m6CegNlSMHAeMKjyxLyMafra/bBo5cvOo7vxug=;
-        b=jfckIV3KOMHvEqrEmkIgqVxVD+G6fypqnXOMzlefKdNWUoFkzcsH+bQWKZUWkQDzNy
-         ya4X+Si5R06/locU5gcOm8IrfyVc1HycRXQ5P4/deE0LuphVOxfJNqqVM4rHlPXMvXL8
-         FlpKLcb0I7XJI7qUREUyXOFigJ1gswjtruzaFU83E/i3oxgoM0Upvoy/cQr7KrycCXzG
-         +3kZYpOyWXHKUE5/K2VbdB3yjMigPPUBURK3CdfFBrHGLIKQrK0H6B+DgFmWEhgF8kgT
-         7WhW2yGtSGwBF2ISzoti/VlCloIlglZtng7mPrdJVk6NlS+xFiuhEoQvQS1KaWIbb+8/
-         YI4g==
-X-Gm-Message-State: AOAM532OQG8NPNLSZAXFaZ1VoF7JdlgagM4IoMXfDVLQrwiQwk+9Od3C
-        /GK/G0gbUIfk+RDO0CwTo1GGJOYw+oiJdiVrD7vobjZwZMSB4Q==
-X-Google-Smtp-Source: ABdhPJzVeUBQKlTb7gMMh5rgmKoqOL3vrdhloMn7tOOKF2WUd4Xc/dVx0f04KsUsUy3D7ScLKFe/+zpKfaQ25JSy3eg=
-X-Received: by 2002:a65:6a4f:: with SMTP id o15mr7574107pgu.399.1621567425529;
- Thu, 20 May 2021 20:23:45 -0700 (PDT)
+        Thu, 20 May 2021 23:59:37 -0400
+Received: from dggems702-chm.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FmXp34bqCzlfPC;
+        Fri, 21 May 2021 11:55:55 +0800 (CST)
+Received: from dggeme759-chm.china.huawei.com (10.3.19.105) by
+ dggems702-chm.china.huawei.com (10.3.19.179) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Fri, 21 May 2021 11:58:12 +0800
+Received: from localhost.localdomain (10.69.192.56) by
+ dggeme759-chm.china.huawei.com (10.3.19.105) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Fri, 21 May 2021 11:58:12 +0800
+From:   Tian Tao <tiantao6@hisilicon.com>
+To:     <l.stelmach@samsung.com>, <krzysztof.kozlowski@canonical.com>
+CC:     <linux-samsung-soc@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, "Tian Tao" <tiantao6@hisilicon.com>
+Subject: [PATCH] hwrng: exynos: Use pm_runtime_resume_and_get() to replace open coding
+Date:   Fri, 21 May 2021 11:58:09 +0800
+Message-ID: <1621569489-20554-1-git-send-email-tiantao6@hisilicon.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-From:   Yiyuan guo <yguoaz@gmail.com>
-Date:   Fri, 21 May 2021 11:23:36 +0800
-Message-ID: <CAM7=BFrCTTuBkYb-ceX5C=e8VhAuWBVb_pYQ+K0LB1gn3h=hqA@mail.gmail.com>
-Subject: A possible divide by zero bug in drbg_ctr_df
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net,
-        Yiyuan guo <yguoaz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggeme759-chm.china.huawei.com (10.3.19.105)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In crypto/drbg.c, the function drbg_ctr_df has the following code:
+use pm_runtime_resume_and_get() to replace pm_runtime_get_sync and
+pm_runtime_put_noidle. this change is just to simplify the code, no
+actual functional changes.
 
-padlen = (inputlen + sizeof(L_N) + 1) % (drbg_blocklen(drbg));
+Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+---
+ drivers/char/hw_random/exynos-trng.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-However, the function drbg_blocklen may return zero:
+diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+index 8e1fe3f..d71ef3c 100644
+--- a/drivers/char/hw_random/exynos-trng.c
++++ b/drivers/char/hw_random/exynos-trng.c
+@@ -196,10 +196,9 @@ static int __maybe_unused exynos_trng_resume(struct device *dev)
+ {
+ 	int ret;
+ 
+-	ret = pm_runtime_get_sync(dev);
+-	if (ret < 0) {
++	ret = pm_runtime_resume_and_get(dev);
++	if (ret) {
+ 		dev_err(dev, "Could not get runtime PM.\n");
+-		pm_runtime_put_noidle(dev);
+ 		return ret;
+ 	}
+ 
+-- 
+2.7.4
 
-static inline __u8 drbg_blocklen(struct drbg_state *drbg)
-{
-    if (drbg && drbg->core)
-        return drbg->core->blocklen_bytes;
-    return 0;
-}
-
-Is it possible to trigger a divide by zero problem here?
