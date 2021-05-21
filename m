@@ -2,107 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D030AC433ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 10:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C57C433ED
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 10:21:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A5B3861019
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 10:05:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B38A613BD
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 10:21:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232353AbhEUKHP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 May 2021 06:07:15 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5654 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231995AbhEUKHN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 May 2021 06:07:13 -0400
-Received: from dggems702-chm.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Fmhxd4Yf2z16QhZ;
-        Fri, 21 May 2021 18:03:01 +0800 (CST)
-Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
- dggems702-chm.china.huawei.com (10.3.19.179) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 21 May 2021 18:05:48 +0800
-Received: from huawei.com (10.67.165.24) by dggpeml500012.china.huawei.com
- (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 21 May
- 2021 18:05:48 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH v2 2/2] crypto: hisilicon/qm - fix the process of VF's list adding
-Date:   Fri, 21 May 2021 18:02:44 +0800
-Message-ID: <1621591364-46526-3-git-send-email-yekai13@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1621591364-46526-1-git-send-email-yekai13@huawei.com>
-References: <1621591364-46526-1-git-send-email-yekai13@huawei.com>
+        id S233003AbhEUKWa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 May 2021 06:22:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59106 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231186AbhEUKW2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 May 2021 06:22:28 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 26BA76135C;
+        Fri, 21 May 2021 10:21:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1621592465;
+        bh=N+w5QEO42mQlB9ymFmNmNrF3+V7f2xlncBeYmpsHWVs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=tttVzajuy000G2FpHHokr6dTFG+sWZTx/MuVQO5Lr/P66zqYVA8/48HkDisGWhqla
+         RTVGySsnv3LWGWeWLDXxXX60aVdCKjVHfpHuKPMwyTFh/Ctt/MkHqdqMI42b6maKXs
+         EIpa/c8bYWJpq8jKFeantHrmroOr+rVoLfcxbe6DvjrETvJaRUs0jATQQeXQzLiwjO
+         RGcROk8y8FOiccMFCfkCpTpWe4eUGGQ81Amip+VsEvWhrMnaKq6Txg/SiShzZOOFXG
+         MemreCEArfNOJn+rgL1We0mOrMT/suTOOUdbXtnmZRZYPHoyrFH5hS39lUmwwSo7dM
+         nxhXyk/iZvRiw==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, ebiggers@kernel.org,
+        herbert@gondor.apana.org.au, will@kernel.org,
+        kernel-team@android.com, Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH v5 0/5] running kernel mode SIMD with softirqs disabled
+Date:   Fri, 21 May 2021 12:20:48 +0200
+Message-Id: <20210521102053.66609-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpeml500012.china.huawei.com (7.185.36.15)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If Kunpeng 920 enabled the sva mode, the "qm alg register" process will
-return directly. So the list of VF wasn't added to QM list.
+This is a follow-up to [0], but given that the arm64 architectural
+pieces have been merged for arm64, the only remaining changes are crypto
+specific. Therefore, the audience has been reduced to those people who
+are somewhat more likely to care about these specifics.
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
----
- drivers/crypto/hisilicon/qm.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+The AEAD and skcipher APIs may only be called from task or softirq
+context. This permits the arm64 AEAD and skcipher code to get rid of all
+scalar fallbacks, given that on this architecture, softirqs are now no
+longer served while the SIMD unit is being used in kernel mode, which
+means that the scalar fallbacks are never needed. These are removed in
+this series.
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index deb104e..c671f94 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -4256,17 +4256,17 @@ int hisi_qm_alg_register(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
- 	int flag = 0;
- 	int ret = 0;
- 
--	if (qm->ver <= QM_HW_V2 && qm->use_sva) {
--		dev_info(dev, "HW V2 not both use uacce sva mode and hardware crypto algs.\n");
--		return 0;
--	}
--
- 	mutex_lock(&qm_list->lock);
- 	if (list_empty(&qm_list->list))
- 		flag = 1;
- 	list_add_tail(&qm->list, &qm_list->list);
- 	mutex_unlock(&qm_list->lock);
- 
-+	if (qm->ver <= QM_HW_V2 && qm->use_sva) {
-+		dev_info(dev, "HW V2 not both use uacce sva mode and hardware crypto algs.\n");
-+		return 0;
-+	}
-+
- 	if (flag) {
- 		ret = qm_list->register_to_crypto(qm);
- 		if (ret) {
-@@ -4291,13 +4291,13 @@ EXPORT_SYMBOL_GPL(hisi_qm_alg_register);
-  */
- void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
- {
--	if (qm->ver <= QM_HW_V2 && qm->use_sva)
--		return;
--
- 	mutex_lock(&qm_list->lock);
- 	list_del(&qm->list);
- 	mutex_unlock(&qm_list->lock);
- 
-+	if (qm->ver <= QM_HW_V2 && qm->use_sva)
-+		return;
-+
- 	if (list_empty(&qm_list->list))
- 		qm_list->unregister_from_crypto(qm);
- }
+Changes since v4:
+- drop skcipher_walk layer change to deal with zero sized walks
+- drop aead/skcipher layer sanity checks on invocations from hardirq
+  context
+- add patch to clean up CCM a bit more after removing the SIMD code path
+
+Changes since v3:
+- clarify the nature of the issue addressed by patch #1, and apply the
+  same fix to the skcipher walker
+- update patches #2 and #3 so that the failures can be observed by the
+  crypto stats code
+
+[0] https://lore.kernel.org/linux-arm-kernel/20210302090118.30666-1-ardb@kernel.org/
+
+Ard Biesheuvel (5):
+  crypto: arm64/gcm-aes-ce - remove non-SIMD fallback path
+  crypto: arm64/aes-neonbs - stop using SIMD helper for skciphers
+  crypto: arm64/aes-ce - stop using SIMD helper for skciphers
+  crypto: arm64/aes-ccm - remove non-SIMD fallback path
+  crypto: arm64/aes-ccm - avoid by-ref argument for ce_aes_ccm_auth_data
+
+ arch/arm64/crypto/Kconfig           |   6 -
+ arch/arm64/crypto/aes-ce-ccm-core.S |  24 +--
+ arch/arm64/crypto/aes-ce-ccm-glue.c | 194 ++++++------------
+ arch/arm64/crypto/aes-glue.c        | 102 ++--------
+ arch/arm64/crypto/aes-neonbs-glue.c | 122 +-----------
+ arch/arm64/crypto/ghash-ce-glue.c   | 209 +++++---------------
+ 6 files changed, 141 insertions(+), 516 deletions(-)
+
 -- 
-2.8.1
+2.20.1
 
