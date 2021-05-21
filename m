@@ -2,103 +2,256 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47522C433ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 09:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97543C433ED
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 09:38:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E453613CA
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 09:36:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79C6A60FEF
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 May 2021 09:38:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232672AbhEUJiM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 May 2021 05:38:12 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.53]:21258 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235864AbhEUJiL (ORCPT
+        id S236669AbhEUJkQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 May 2021 05:40:16 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57836 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S236665AbhEUJkP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 May 2021 05:38:11 -0400
-X-Greylist: delayed 50552 seconds by postgrey-1.27 at vger.kernel.org; Fri, 21 May 2021 05:38:11 EDT
-ARC-Seal: i=1; a=rsa-sha256; t=1621589799; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=BaUO0T48o2BBSBIUlpg6MAtCbQmFLghTYhZG5sh3iFYk9Kb3XH8186hhCv+QSYneLt
-    WfAAVNc8bkcCq2wJ4IWzCDz44CSPkZVC+RzXGMkXoNkps4va627N8up74Za7rnntS3fK
-    SdSuNmpTVe5pmvSeo1OJXXtyyMdcNUHRuzyVe+lBGA4pn9u0rDx+7Jpyi7j6rEkY0Qa8
-    TGdh8UC8tN8Zayk8BOrxdRV/hkCI8npWzEL1k9Tdn0hNOBfnpDguhAnaGtltkcd8SzXv
-    bAXx6dNShL7TiV7qUmiOn7b7HYX8whc77PgrJGoKGiKj96cd3hO4tGJ4zgyWl1ziY5vp
-    m7jQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1621589799;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=YlKEEZGvqj2UMPUU2zRqh3Rd+Verps4P/6rJsZNP/To=;
-    b=b/ACE0RN82kXLCnK7XYuc8mZQM6pwbIO5iFxregEg59rvhIEui9MJy+9YAUkVZqW9O
-    i2LdYnMeSa+S/G1eV6CgNcCx9wgj6dj+PFLyf+b0qnvRodJUDl7JucnnpfWxG55ghBqQ
-    G8pUQzhAEx9yVmCndQoKVe3iwn7rfbgki288Co+Lg+LrIKgsZAh24OOj1zIf9V1HRatu
-    yOj8G3J+/BGC1q6yDOio1wXe3sPpe/WViUaxtMmpj/FpT5FxzuS9bmJNRmSf13Gsa+NW
-    hHJIZR1MWXZC92hmK1a7OmH9L2Nzkt708YVj7i0eCAV5b7F1m09F9UEoeyXEXBXQZ2yF
-    Aayw==
-ARC-Authentication-Results: i=1; strato.com;
-    dkim=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1621589799;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=YlKEEZGvqj2UMPUU2zRqh3Rd+Verps4P/6rJsZNP/To=;
-    b=pUEeVOB9VJmVeO7BWmK0nXrki8h3pdXCVGsdhM1HTI8+eLjIcHEb0gMTfHHQ3+n7tg
-    LJowg/Cp5y+zqxSAgz6UZxq0EuewcOWCPhAFlnDrOq/ixSrT64xRBCvomIGs9wGzuz9G
-    6LNxRBQkgj5kWVSdDZ1Xp8acuk6DkxTDk2+5LBfcXZBl/Pb7QbNu5x/dS7dfQAMD4CQL
-    yRLfHnoN2wigsJKOPpbs0Zs0oGoLPiTWM5y7xiBeGPeEBXusN/Z0yC7/wx9lOeAwDB4y
-    IVfXUfRapNAPO8fRD2JDnPbH9OYorV04DqiMxfKpM/UXGeUBudUWmNc5dtuTPotHzx1W
-    UvjA==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNzyCzy1Sfr67uExK884EC0GFGHavJSlFkMRYOkE="
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 47.26.1 DYNA|AUTH)
-    with ESMTPSA id V06bffx4L9ab15j
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Fri, 21 May 2021 11:36:37 +0200 (CEST)
-Message-ID: <878011e1735e84d4e16ab68d9f03e2f62b531314.camel@chronox.de>
-Subject: Re: [PATCH 1/3] crypto: ecdh - fix 'ecdh_init'
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Hui Tang <tanghui20@huawei.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        xuzaibo@huawei.com, wangzhou1@hisilicon.com,
-        linux-kernel@vger.kernel.org
-Date:   Fri, 21 May 2021 11:36:37 +0200
-In-Reply-To: <20210521081356.3bnytzdxhjkgzb7g@gondor.apana.org.au>
-References: <1620801602-49287-1-git-send-email-tanghui20@huawei.com>
-         <1620801602-49287-2-git-send-email-tanghui20@huawei.com>
-         <20210521074553.w6qtqv5nnbdbqycx@gondor.apana.org.au>
-         <2a5bcd22-455d-6348-9a72-dc5a7ab49ca6@huawei.com>
-         <20210521081356.3bnytzdxhjkgzb7g@gondor.apana.org.au>
+        Fri, 21 May 2021 05:40:15 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14L9YKRE135909;
+        Fri, 21 May 2021 05:38:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=6qpsYRM7SdSzsr/04hAGbz0BvbpaZjVFG1T/rcUESMg=;
+ b=ssHPUPhFqrZZqOslu+ukYiL7IHU7br0MuPzPdXcr4mo8TPk6WwnG+n3JdUNrVhUpRHBj
+ of4VisSHIi1o64f8KD9mRZ0EmS2Yht3IkQZLBWeaFMuKZ17me7L5GH3zrnWl9GMGkFRk
+ XeetKeKX7mixz/t/L/dMtWmbPElu7whNQFmn9FvIxTRuogndKRIPTrafnMOIIsZ9JzWk
+ AFC6phFhKbt7hlxUqkMRDS+Op0DNVX+cxK3fVmr5GUfe7VI8iDh4huJf0w/azk7n6SVn
+ HXiSfucCIWv68sgps2BEOY7N7wFNMsgYDDQhdaK26zB1BzR7Fa47GzE8D+AY/xft8RaM Fg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38pa92g7nn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 May 2021 05:38:44 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14L9ZK22142931;
+        Fri, 21 May 2021 05:38:44 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 38pa92g7nd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 May 2021 05:38:44 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14L9X57G003222;
+        Fri, 21 May 2021 09:38:43 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma05wdc.us.ibm.com with ESMTP id 38j7tbp2vw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 May 2021 09:38:43 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14L9chYB30933498
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 May 2021 09:38:43 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 27B2EB2065;
+        Fri, 21 May 2021 09:38:43 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D6DD4B205F;
+        Fri, 21 May 2021 09:38:41 +0000 (GMT)
+Received: from sig-9-65-94-165.ibm.com (unknown [9.65.94.165])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 21 May 2021 09:38:41 +0000 (GMT)
+Message-ID: <38548221cc275e0ab7c88fc545fb2f087830af3a.camel@linux.ibm.com>
+Subject: [PATCH v4 10/16] powerpc/pseries/vas: Implement getting
+ capabilities from hypervisor
+From:   Haren Myneni <haren@linux.ibm.com>
+To:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        mpe@ellerman.id.au, herbert@gondor.apana.org.au, npiggin@gmail.com
+Cc:     hbabu@us.ibm.com, haren@us.ibm.com
+Date:   Fri, 21 May 2021 02:38:39 -0700
+In-Reply-To: <8d219c0816133a8643d650709066cf04c9c77322.camel@linux.ibm.com>
+References: <8d219c0816133a8643d650709066cf04c9c77322.camel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: U8vppd0CtucjqDK9B6bUQDshxRJYI5d7
+X-Proofpoint-GUID: ad4lcpXEwQZzKCkc9p0i5g35Vwz0UeMf
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-21_03:2021-05-20,2021-05-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ phishscore=0 mlxlogscore=999 spamscore=0 clxscore=1015 lowpriorityscore=0
+ adultscore=0 impostorscore=0 priorityscore=1501 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2105210061
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, dem 21.05.2021 um 16:13 +0800 schrieb Herbert Xu:
-> On Fri, May 21, 2021 at 04:08:10PM +0800, Hui Tang wrote:
-> 
-> 
-> Stephan, can you confirm that both ecdh-nist-p192 and ecdsa-nist-p192
-> should be disabled in FIPS mode?
 
-Confirmed with the following caveat: sigver is allowed due to legacy
-considerations. Siggen / ECDH is only allowed for curves P-224 and higher.
+The hypervisor provides VAS capabilities for GZIP default and QoS
+features. These capabilities gives information for the specific
+features such as total number of credits available in LPAR,
+maximum credits allowed per window, maximum credits allowed in
+LPAR, whether usermode copy/paste is supported, and etc.
 
-As we introduce ECDSA today, I would not consider a legacy mode and thus
-disable P-192.
+This patch adds the following:
+- Retrieve all features that are provided by hypervisor using
+  H_QUERY_VAS_CAPABILITIES hcall with 0 as feature type.
+- Retrieve capabilities for the specific feature using the same
+  hcall and the feature type (1 for QoS and 2 for default type).
 
-Ciao
-Stephan
+Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+---
+ arch/powerpc/platforms/pseries/vas.c | 127 +++++++++++++++++++++++++++
+ 1 file changed, 127 insertions(+)
+
+diff --git a/arch/powerpc/platforms/pseries/vas.c b/arch/powerpc/platforms/pseries/vas.c
+index 06960151477c..9976f6b614b9 100644
+--- a/arch/powerpc/platforms/pseries/vas.c
++++ b/arch/powerpc/platforms/pseries/vas.c
+@@ -30,6 +30,13 @@
+ /* phyp allows one credit per window right now */
+ #define DEF_WIN_CREDS		1
+ 
++static struct vas_all_caps caps_all;
++static bool copypaste_feat;
++
++static struct vas_caps vascaps[VAS_MAX_FEAT_TYPE];
++
++static DEFINE_MUTEX(vas_pseries_mutex);
++
+ static int64_t hcall_return_busy_check(int64_t rc)
+ {
+ 	/* Check if we are stalled for some time */
+@@ -215,3 +222,123 @@ int plpar_vas_query_capabilities(const u64 hcall, u8 query_type,
+ 		return -EIO;
+ 	}
+ }
++
++/*
++ * Get the specific capabilities based on the feature type.
++ * Right now supports GZIP default and GZIP QoS capabilities.
++ */
++static int get_vas_capabilities(u8 feat, enum vas_cop_feat_type type,
++				struct hv_vas_ct_caps *hv_caps)
++{
++	struct vas_ct_caps *caps;
++	struct vas_caps *vcaps;
++	int rc = 0;
++
++	vcaps = &vascaps[type];
++	memset(vcaps, 0, sizeof(*vcaps));
++	INIT_LIST_HEAD(&vcaps->list);
++
++	caps = &vcaps->caps;
++
++	rc = plpar_vas_query_capabilities(H_QUERY_VAS_CAPABILITIES, feat,
++					  (u64)virt_to_phys(hv_caps));
++	if (rc)
++		return rc;
++
++	caps->user_mode = hv_caps->user_mode;
++	if (!(caps->user_mode & VAS_COPY_PASTE_USER_MODE)) {
++		pr_err("User space COPY/PASTE is not supported\n");
++		return -ENOTSUPP;
++	}
++
++	snprintf(caps->name, VAS_DESCR_LEN + 1, "%.8s",
++		 (char *)&hv_caps->descriptor);
++	caps->descriptor = be64_to_cpu(hv_caps->descriptor);
++	caps->win_type = hv_caps->win_type;
++	if (caps->win_type >= VAS_MAX_FEAT_TYPE) {
++		pr_err("Unsupported window type %u\n", caps->win_type);
++		return -EINVAL;
++	}
++	caps->max_lpar_creds = be16_to_cpu(hv_caps->max_lpar_creds);
++	caps->max_win_creds = be16_to_cpu(hv_caps->max_win_creds);
++	atomic_set(&caps->target_lpar_creds,
++		   be16_to_cpu(hv_caps->target_lpar_creds));
++	if (feat == VAS_GZIP_DEF_FEAT) {
++		caps->def_lpar_creds = be16_to_cpu(hv_caps->def_lpar_creds);
++
++		if (caps->max_win_creds < DEF_WIN_CREDS) {
++			pr_err("Window creds(%u) > max allowed window creds(%u)\n",
++			       DEF_WIN_CREDS, caps->max_win_creds);
++			return -EINVAL;
++		}
++	}
++
++	copypaste_feat = true;
++
++	return 0;
++}
++
++static int __init pseries_vas_init(void)
++{
++	struct hv_vas_ct_caps *hv_ct_caps;
++	struct hv_vas_all_caps *hv_caps;
++	int rc;
++
++	/*
++	 * Linux supports user space COPY/PASTE only with Radix
++	 */
++	if (!radix_enabled()) {
++		pr_err("API is supported only with radix page tables\n");
++		return -ENOTSUPP;
++	}
++
++	hv_caps = kmalloc(sizeof(*hv_caps), GFP_KERNEL);
++	if (!hv_caps)
++		return -ENOMEM;
++	/*
++	 * Get VAS overall capabilities by passing 0 to feature type.
++	 */
++	rc = plpar_vas_query_capabilities(H_QUERY_VAS_CAPABILITIES, 0,
++					  (u64)virt_to_phys(hv_caps));
++	if (rc)
++		goto out;
++
++	snprintf(caps_all.name, VAS_DESCR_LEN, "%.7s",
++		 (char *)&hv_caps->descriptor);
++	caps_all.descriptor = be64_to_cpu(hv_caps->descriptor);
++	caps_all.feat_type = be64_to_cpu(hv_caps->feat_type);
++
++	hv_ct_caps = kmalloc(sizeof(*hv_ct_caps), GFP_KERNEL);
++	if (!hv_ct_caps) {
++		rc = -ENOMEM;
++		goto out;
++	}
++	/*
++	 * QOS capabilities available
++	 */
++	if (caps_all.feat_type & VAS_GZIP_QOS_FEAT_BIT) {
++		rc = get_vas_capabilities(VAS_GZIP_QOS_FEAT,
++					  VAS_GZIP_QOS_FEAT_TYPE, hv_ct_caps);
++
++		if (rc)
++			goto out_ct;
++	}
++	/*
++	 * Default capabilities available
++	 */
++	if (caps_all.feat_type & VAS_GZIP_DEF_FEAT_BIT) {
++		rc = get_vas_capabilities(VAS_GZIP_DEF_FEAT,
++					  VAS_GZIP_DEF_FEAT_TYPE, hv_ct_caps);
++		if (rc)
++			goto out_ct;
++	}
++
++	pr_info("GZIP feature is available\n");
++
++out_ct:
++	kfree(hv_ct_caps);
++out:
++	kfree(hv_caps);
++	return rc;
++}
++machine_device_initcall(pseries, pseries_vas_init);
+-- 
+2.18.2
 
 
