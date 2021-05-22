@@ -2,60 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-23.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C9C1C2B9F2
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 May 2021 17:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D975C4707E
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 May 2021 17:01:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 661E161164
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 May 2021 17:01:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B94C611AB
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 May 2021 17:01:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231300AbhEVRCs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 22 May 2021 13:02:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54834 "EHLO
+        id S231301AbhEVRCz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 22 May 2021 13:02:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231299AbhEVRCs (ORCPT
+        with ESMTP id S231310AbhEVRCy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 May 2021 13:02:48 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9415C061574
-        for <linux-crypto@vger.kernel.org>; Sat, 22 May 2021 10:01:20 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id q7so32980029lfr.6
-        for <linux-crypto@vger.kernel.org>; Sat, 22 May 2021 10:01:20 -0700 (PDT)
+        Sat, 22 May 2021 13:02:54 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76C86C0613ED
+        for <linux-crypto@vger.kernel.org>; Sat, 22 May 2021 10:01:28 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id j6so31648525lfr.11
+        for <linux-crypto@vger.kernel.org>; Sat, 22 May 2021 10:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=cq6+ozOHxatifJxmjJnhjKtut+46PPMCogrnEz7m7b0=;
-        b=UAVFWis8oSSM6tsabuur7WglLQPrnLt2nHbWJlJ5cssnDGXqj8Z5Yg0krfCbVG1aJe
-         B6bxsqQxP4v+Er2ucGNFdE0z2ettZZlrWu+7k6kJH+P5pkcFErF3JP6fPhQQyXQtlqrV
-         o3QmEKAFAWYJcSd0Qj331nOVS7xOORhqRH1xRtiUXn3DriCx3wckNnuC6rER1iqVocDu
-         DAZFbrlK9hyyfEOT/zRu9CYGy4JrIy0vZPhbkY/24SWDTWo3m5L7CDlIpp6Fpaq6ztcp
-         QkV0TjwWE4IRZuKAd8cAXBgqajoiOV9Oz6qWDKD49LcHcVarnFc0cKwiKyxHUkQVGEi1
-         vuqA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=mVMJHfjDD5IkzeoHiBhWOuMXuxE2USwuY8rYMEaa1uo=;
+        b=Ud5Lsmhxs8m39BHz+jVmp18GMBFyB+1oeOn4Xy8pry0y0cxEx4OYjMbgu84TNOYMbo
+         DIQ/3+TRxhNqu8kyjVKNhVre2gUCu5zREKCvY9C/H0ouN3lMKv7485JXv5sPdHwhgSgb
+         wAmZfZyr6z7SGYLLZJ62NjwHwJrSidlGM56PrJtYJZQMVQ4l05B/P31Cw6qDoepf0mdv
+         YbGw2h73+N5AgdPYhwdSvwQrXmHiLjSF8hSxl/9o7KF0iCgS77MbIoaZyBypU8H2kGcO
+         hC9QRpqAU8YNy8g/7iDVsekvG7Tu2qu76TTfzKRZWjaBhZWGrkkv2Sibws164ls9OUlW
+         OQXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=cq6+ozOHxatifJxmjJnhjKtut+46PPMCogrnEz7m7b0=;
-        b=QIPKKIIU2sd4M9mvtkHAdtIwlpgvH9gnvd2GRsOOSSHUFFZ+RNhH79MZFYKTfis5wg
-         C+NjYz2UK4InXHey/n43YDp23K93uzPUI+GwQ6tjy4VPH//WzDaUuNPaThEl8kXoYsRo
-         qhMY7Px04oI5Fgj3bdUZ86iTMCm05kX42y+kYl89yIbZfINjWF779WBtVhEfQtbOVu2t
-         d8pqFMfhwSbUnmKoTDS7USRytanMGotPVMKaPGHLj5cRgAKrcdYfjC8ELUlDK7HzJZ3K
-         BVFpJBj8VXbCpVBlV67X87tsq8DM3ZFrLqV60XeoC6IGfzMg9Sdr1/pniFu7SX4O1dkT
-         yeMA==
-X-Gm-Message-State: AOAM532OT43Xkfe8Rz3McW2ygZycqf42sG3Kl7EXbj7oijM9rWmc1J39
-        vSLCUnmkhlJEhaDYFH8Sgww55x+C46XSlQ==
-X-Google-Smtp-Source: ABdhPJzG+z9Qjdc+9D2ks76dCLD7hvXbetW6b0VU5Zkz3/r4fD/i3Mllb2JarGZwVahNNNkx1jnVqA==
-X-Received: by 2002:a05:6512:a83:: with SMTP id m3mr5545501lfu.44.1621702878939;
-        Sat, 22 May 2021 10:01:18 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=mVMJHfjDD5IkzeoHiBhWOuMXuxE2USwuY8rYMEaa1uo=;
+        b=pW7R1JsVZdxWuMOjZwCEbVmeu0B8BHnooPzD7PW35fQU3YGYt+bEEGVGzqG8iWDxPF
+         zyDiseVdvOH/WoSv6F0XUZojaQnPv2w1K+1NPt+Ze5J5rDWY5cs8U/NBUxLUXCpH9DM1
+         mVp0roem1a/BTuPj/LxO3OEBYgeuzcjTijNLdjAa59um1RJFTb4PpxvkUiKCpex18Ezo
+         0ktuVx1FzHPDoN7jg6ldFYXq+fR4sRID/Tyt2R0R9J45R6sHgLACrpWquJUPmmur64s3
+         KhDPTttcqZTLelF5F+jVapwwu7O2iaJNxRB8UqirbNoKXq6yJCm5VqlPAN9rKzk15nzB
+         0Myg==
+X-Gm-Message-State: AOAM533ycgm5LaejtcxLU5gY+Gn5AH/c5Eppg9D/NV8zhctPG0vX6nbA
+        29UPX/jwDOOfSYVe+3sL1/656pIqBSvrQA==
+X-Google-Smtp-Source: ABdhPJwJvPpnDHItdSaJHeCbn5fHeM7FxeiBjUyboW6vs8PAbsvi8F0HoMOR3wJ7aT/wEn8zgF2Lww==
+X-Received: by 2002:a05:6512:3313:: with SMTP id k19mr5847608lfe.235.1621702886596;
+        Sat, 22 May 2021 10:01:26 -0700 (PDT)
 Received: from localhost.localdomain (c-fdcc225c.014-348-6c756e10.bbcust.telenor.se. [92.34.204.253])
-        by smtp.gmail.com with ESMTPSA id u15sm958870lfs.67.2021.05.22.10.01.18
+        by smtp.gmail.com with ESMTPSA id u15sm958870lfs.67.2021.05.22.10.01.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 May 2021 10:01:18 -0700 (PDT)
+        Sat, 22 May 2021 10:01:26 -0700 (PDT)
 From:   Linus Walleij <linus.walleij@linaro.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -66,175 +66,316 @@ Cc:     linux-arm-kernel@lists.infradead.org,
         Krzysztof Halasa <khalasa@piap.pl>,
         Arnd Bergmann <arnd@arndb.de>,
         Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 1/3 v3] crypto: ixp4xx: convert to platform driver
-Date:   Sat, 22 May 2021 18:59:11 +0200
-Message-Id: <20210522165913.915100-1-linus.walleij@linaro.org>
+Subject: [PATCH 3/3 v3] crypto: ixp4xx: Add device tree support
+Date:   Sat, 22 May 2021 18:59:13 +0200
+Message-Id: <20210522165913.915100-3-linus.walleij@linaro.org>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210522165913.915100-1-linus.walleij@linaro.org>
+References: <20210522165913.915100-1-linus.walleij@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+This makes the IXP4xx driver probe from the device tree
+and retrieve the NPE and two queue manager handled used
+to process crypto from the device tree.
 
-The ixp4xx_crypto driver traditionally registers a bare platform
-device without attaching it to a driver, and detects the hardware
-at module init time by reading an SoC specific hardware register.
+As the crypto engine is topologically a part of the NPE
+hardware, we augment the NPE driver to spawn the
+crypto engine as a child.
 
-Change this to the conventional method of registering the platform
-device from the platform code itself when the device is present,
-turning the module_init/module_exit functions into probe/release
-driver callbacks.
-
-This enables compile-testing as well as potentially having ixp4xx
-coexist with other ARMv5 platforms in the same kernel in the future.
+The platform data probe path is going away in due time,
+for now it is an isolated else clause.
 
 Cc: Corentin Labbe <clabbe@baylibre.com>
-Tested-by: Corentin Labbe <clabbe@baylibre.com>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
 ChangeLog v2->v3:
-- No changes, just resending with the other patches.
+- Get NPE instance number from the reg property.
 ChangeLog v1->v2:
 - Rebase on Corentin's patches in the cryptodev tree
-- Drop the compile test Kconfig, it will not compile for
-  anything not IXP4xx anyway because it needs the NPE and QMGR
-  to be compiled in and those only exist on IXP4xx.
+- Drop unused ret variable (leftover from development)
+- DTS patch can be found at:
+  https://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-nomadik.git/log/?h=ixp4xx-crypto-v5.13-rc1
 ---
- arch/arm/mach-ixp4xx/common.c  | 26 ++++++++++++++++++++++++
- drivers/crypto/ixp4xx_crypto.c | 37 ++++++++++++----------------------
- 2 files changed, 39 insertions(+), 24 deletions(-)
+ drivers/crypto/ixp4xx_crypto.c  | 104 +++++++++++++++++++++++---------
+ drivers/soc/ixp4xx/ixp4xx-npe.c |   7 +++
+ 2 files changed, 83 insertions(+), 28 deletions(-)
 
-diff --git a/arch/arm/mach-ixp4xx/common.c b/arch/arm/mach-ixp4xx/common.c
-index 000f672a94c9..007a44412e24 100644
---- a/arch/arm/mach-ixp4xx/common.c
-+++ b/arch/arm/mach-ixp4xx/common.c
-@@ -233,12 +233,38 @@ static struct platform_device *ixp46x_devices[] __initdata = {
- unsigned long ixp4xx_exp_bus_size;
- EXPORT_SYMBOL(ixp4xx_exp_bus_size);
- 
-+static struct platform_device_info ixp_dev_info __initdata = {
-+	.name		= "ixp4xx_crypto",
-+	.id		= 0,
-+	.dma_mask	= DMA_BIT_MASK(32),
-+};
-+
-+static int __init ixp_crypto_register(void)
-+{
-+	struct platform_device *pdev;
-+
-+	if (!(~(*IXP4XX_EXP_CFG2) & (IXP4XX_FEATURE_HASH |
-+				IXP4XX_FEATURE_AES | IXP4XX_FEATURE_DES))) {
-+		printk(KERN_ERR "ixp_crypto: No HW crypto available\n");
-+		return -ENODEV;
-+	}
-+
-+	pdev = platform_device_register_full(&ixp_dev_info);
-+	if (IS_ERR(pdev))
-+		return PTR_ERR(pdev);
-+
-+	return 0;
-+}
-+
- void __init ixp4xx_sys_init(void)
- {
- 	ixp4xx_exp_bus_size = SZ_16M;
- 
- 	platform_add_devices(ixp4xx_devices, ARRAY_SIZE(ixp4xx_devices));
- 
-+	if (IS_ENABLED(CONFIG_CRYPTO_DEV_IXP4XX))
-+		ixp_crypto_register();
-+
- 	if (cpu_is_ixp46x()) {
- 		int region;
- 
 diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index b38650b0fea1..76099d6cfff9 100644
+index 76099d6cfff9..1667b9b24c11 100644
 --- a/drivers/crypto/ixp4xx_crypto.c
 +++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -229,8 +229,6 @@ static dma_addr_t crypt_phys;
+@@ -15,6 +15,7 @@
+ #include <linux/spinlock.h>
+ #include <linux/gfp.h>
+ #include <linux/module.h>
++#include <linux/of.h>
  
- static int support_aes = 1;
+ #include <crypto/ctr.h>
+ #include <crypto/internal/des.h>
+@@ -71,15 +72,11 @@
+ #define MOD_AES256  (0x0a00 | KEYLEN_256)
  
--#define DRIVER_NAME "ixp4xx_crypto"
+ #define MAX_IVLEN   16
+-#define NPE_ID      2  /* NPE C */
+ #define NPE_QLEN    16
+ /* Space for registering when the first
+  * NPE_QLEN crypt_ctl are busy */
+ #define NPE_QLEN_TOTAL 64
+ 
+-#define SEND_QID    29
+-#define RECV_QID    30
 -
- static struct platform_device *pdev;
+ #define CTL_FLAG_UNUSED		0x0000
+ #define CTL_FLAG_USED		0x1000
+ #define CTL_FLAG_PERFORM_ABLK	0x0001
+@@ -221,6 +218,9 @@ static const struct ix_hash_algo hash_alg_sha1 = {
+ };
  
- static inline dma_addr_t crypt_virt2phys(struct crypt_ctl *virt)
-@@ -453,11 +451,6 @@ static int init_ixp_crypto(struct device *dev)
- 	int ret = -ENODEV;
+ static struct npe *npe_c;
++
++static unsigned int send_qid;
++static unsigned int recv_qid;
+ static struct dma_pool *buffer_pool;
+ static struct dma_pool *ctx_pool;
+ 
+@@ -437,8 +437,7 @@ static void crypto_done_action(unsigned long arg)
+ 	int i;
+ 
+ 	for (i = 0; i < 4; i++) {
+-		dma_addr_t phys = qmgr_get_entry(RECV_QID);
+-
++		dma_addr_t phys = qmgr_get_entry(recv_qid);
+ 		if (!phys)
+ 			return;
+ 		one_packet(phys);
+@@ -448,10 +447,49 @@ static void crypto_done_action(unsigned long arg)
+ 
+ static int init_ixp_crypto(struct device *dev)
+ {
+-	int ret = -ENODEV;
++	struct device_node *np = dev->of_node;
  	u32 msg[2] = { 0, 0 };
++	int ret = -ENODEV;
++	u32 npe_id;
++
++	dev_info(dev, "probing...\n");
++
++	/* Locate the NPE and queue manager to use from device tree */
++	if (IS_ENABLED(CONFIG_OF) && np) {
++		struct of_phandle_args queue_spec;
++
++		ret = of_property_read_u32(np, "reg", &npe_id);
++		if (ret) {
++			dev_err(dev, "no NPE engine specified\n");
++			return -ENODEV;
++		}
  
--	if (! ( ~(*IXP4XX_EXP_CFG2) & (IXP4XX_FEATURE_HASH |
--				IXP4XX_FEATURE_AES | IXP4XX_FEATURE_DES))) {
--		dev_err(dev, "ixp_crypto: No HW crypto available\n");
--		return ret;
--	}
- 	npe_c = npe_request(NPE_ID);
+-	npe_c = npe_request(NPE_ID);
++		ret = of_parse_phandle_with_fixed_args(np, "queue-rx", 1, 0,
++						       &queue_spec);
++		if (ret) {
++			dev_err(dev, "no rx queue phandle\n");
++			return -ENODEV;
++		}
++		recv_qid = queue_spec.args[0];
++
++		ret = of_parse_phandle_with_fixed_args(np, "queue-txready", 1, 0,
++						       &queue_spec);
++		if (ret) {
++			dev_err(dev, "no txready queue phandle\n");
++			return -ENODEV;
++		}
++		send_qid = queue_spec.args[0];
++	} else {
++		/*
++		 * Hardcoded engine when using platform data, this goes away
++		 * when we switch to using DT only.
++		 */
++		npe_id = 2;
++		send_qid = 29;
++		recv_qid = 30;
++	}
++
++	npe_c = npe_request(npe_id);
  	if (!npe_c)
  		return ret;
-@@ -1441,26 +1434,17 @@ static struct ixp_aead_alg ixp4xx_aeads[] = {
  
- #define IXP_POSTFIX "-ixp4xx"
+@@ -497,20 +535,20 @@ static int init_ixp_crypto(struct device *dev)
+ 	if (!ctx_pool)
+ 		goto err;
  
--static const struct platform_device_info ixp_dev_info __initdata = {
--	.name		= DRIVER_NAME,
--	.id		= 0,
--	.dma_mask	= DMA_BIT_MASK(32),
--};
--
--static int __init ixp_module_init(void)
-+static int ixp_crypto_probe(struct platform_device *_pdev)
+-	ret = qmgr_request_queue(SEND_QID, NPE_QLEN_TOTAL, 0, 0,
++	ret = qmgr_request_queue(send_qid, NPE_QLEN_TOTAL, 0, 0,
+ 				 "ixp_crypto:out", NULL);
+ 	if (ret)
+ 		goto err;
+-	ret = qmgr_request_queue(RECV_QID, NPE_QLEN, 0, 0,
++	ret = qmgr_request_queue(recv_qid, NPE_QLEN, 0, 0,
+ 				 "ixp_crypto:in", NULL);
+ 	if (ret) {
+-		qmgr_release_queue(SEND_QID);
++		qmgr_release_queue(send_qid);
+ 		goto err;
+ 	}
+-	qmgr_set_irq(RECV_QID, QUEUE_IRQ_SRC_NOT_EMPTY, irqhandler, NULL);
++	qmgr_set_irq(recv_qid, QUEUE_IRQ_SRC_NOT_EMPTY, irqhandler, NULL);
+ 	tasklet_init(&crypto_done_tasklet, crypto_done_action, 0);
+ 
+-	qmgr_enable_irq(RECV_QID);
++	qmgr_enable_irq(recv_qid);
+ 	return 0;
+ 
+ npe_error:
+@@ -526,11 +564,11 @@ static int init_ixp_crypto(struct device *dev)
+ 
+ static void release_ixp_crypto(struct device *dev)
  {
- 	int num = ARRAY_SIZE(ixp4xx_algos);
- 	int i, err;
+-	qmgr_disable_irq(RECV_QID);
++	qmgr_disable_irq(recv_qid);
+ 	tasklet_kill(&crypto_done_tasklet);
  
--	pdev = platform_device_register_full(&ixp_dev_info);
--	if (IS_ERR(pdev))
--		return PTR_ERR(pdev);
-+	pdev = _pdev;
+-	qmgr_release_queue(SEND_QID);
+-	qmgr_release_queue(RECV_QID);
++	qmgr_release_queue(send_qid);
++	qmgr_release_queue(recv_qid);
  
- 	err = init_ixp_crypto(&pdev->dev);
--	if (err) {
--		platform_device_unregister(pdev);
-+	if (err)
- 		return err;
--	}
-+
- 	for (i = 0; i < num; i++) {
- 		struct skcipher_alg *cra = &ixp4xx_algos[i].crypto;
+ 	dma_pool_destroy(ctx_pool);
+ 	dma_pool_destroy(buffer_pool);
+@@ -682,8 +720,8 @@ static int register_chain_var(struct crypto_tfm *tfm, u8 xpad, u32 target,
+ 	buf->phys_addr = pad_phys;
  
-@@ -1531,7 +1515,7 @@ static int __init ixp_module_init(void)
+ 	atomic_inc(&ctx->configuring);
+-	qmgr_put_entry(SEND_QID, crypt_virt2phys(crypt));
+-	BUG_ON(qmgr_stat_overflow(SEND_QID));
++	qmgr_put_entry(send_qid, crypt_virt2phys(crypt));
++	BUG_ON(qmgr_stat_overflow(send_qid));
  	return 0;
  }
  
--static void __exit ixp_module_exit(void)
-+static int ixp_crypto_remove(struct platform_device *pdev)
- {
- 	int num = ARRAY_SIZE(ixp4xx_algos);
- 	int i;
-@@ -1546,11 +1530,16 @@ static void __exit ixp_module_exit(void)
- 			crypto_unregister_skcipher(&ixp4xx_algos[i].crypto);
- 	}
- 	release_ixp_crypto(&pdev->dev);
--	platform_device_unregister(pdev);
-+
-+	return 0;
+@@ -757,8 +795,8 @@ static int gen_rev_aes_key(struct crypto_tfm *tfm)
+ 	crypt->ctl_flags |= CTL_FLAG_GEN_REVAES;
+ 
+ 	atomic_inc(&ctx->configuring);
+-	qmgr_put_entry(SEND_QID, crypt_virt2phys(crypt));
+-	BUG_ON(qmgr_stat_overflow(SEND_QID));
++	qmgr_put_entry(send_qid, crypt_virt2phys(crypt));
++	BUG_ON(qmgr_stat_overflow(send_qid));
+ 	return 0;
  }
  
--module_init(ixp_module_init);
--module_exit(ixp_module_exit);
-+static struct platform_driver ixp_crypto_driver = {
-+	.probe = ixp_crypto_probe,
-+	.remove = ixp_crypto_remove,
-+	.driver = { .name = "ixp4xx_crypto" },
-+};
-+module_platform_driver(ixp_crypto_driver);
+@@ -943,7 +981,7 @@ static int ablk_perform(struct skcipher_request *req, int encrypt)
+ 	if (sg_nents(req->src) > 1 || sg_nents(req->dst) > 1)
+ 		return ixp4xx_cipher_fallback(req, encrypt);
  
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Christian Hohnstaedt <chohnstaedt@innominate.com>");
+-	if (qmgr_stat_full(SEND_QID))
++	if (qmgr_stat_full(send_qid))
+ 		return -EAGAIN;
+ 	if (atomic_read(&ctx->configuring))
+ 		return -EAGAIN;
+@@ -993,8 +1031,8 @@ static int ablk_perform(struct skcipher_request *req, int encrypt)
+ 	req_ctx->src = src_hook.next;
+ 	crypt->src_buf = src_hook.phys_next;
+ 	crypt->ctl_flags |= CTL_FLAG_PERFORM_ABLK;
+-	qmgr_put_entry(SEND_QID, crypt_virt2phys(crypt));
+-	BUG_ON(qmgr_stat_overflow(SEND_QID));
++	qmgr_put_entry(send_qid, crypt_virt2phys(crypt));
++	BUG_ON(qmgr_stat_overflow(send_qid));
+ 	return -EINPROGRESS;
+ 
+ free_buf_src:
+@@ -1057,7 +1095,7 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ 	enum dma_data_direction src_direction = DMA_BIDIRECTIONAL;
+ 	unsigned int lastlen;
+ 
+-	if (qmgr_stat_full(SEND_QID))
++	if (qmgr_stat_full(send_qid))
+ 		return -EAGAIN;
+ 	if (atomic_read(&ctx->configuring))
+ 		return -EAGAIN;
+@@ -1141,8 +1179,8 @@ static int aead_perform(struct aead_request *req, int encrypt,
+ 	}
+ 
+ 	crypt->ctl_flags |= CTL_FLAG_PERFORM_AEAD;
+-	qmgr_put_entry(SEND_QID, crypt_virt2phys(crypt));
+-	BUG_ON(qmgr_stat_overflow(SEND_QID));
++	qmgr_put_entry(send_qid, crypt_virt2phys(crypt));
++	BUG_ON(qmgr_stat_overflow(send_qid));
+ 	return -EINPROGRESS;
+ 
+ free_buf_dst:
+@@ -1436,12 +1474,13 @@ static struct ixp_aead_alg ixp4xx_aeads[] = {
+ 
+ static int ixp_crypto_probe(struct platform_device *_pdev)
+ {
++	struct device *dev = &_pdev->dev;
+ 	int num = ARRAY_SIZE(ixp4xx_algos);
+ 	int i, err;
+ 
+ 	pdev = _pdev;
+ 
+-	err = init_ixp_crypto(&pdev->dev);
++	err = init_ixp_crypto(dev);
+ 	if (err)
+ 		return err;
+ 
+@@ -1533,11 +1572,20 @@ static int ixp_crypto_remove(struct platform_device *pdev)
+ 
+ 	return 0;
+ }
++static const struct of_device_id ixp4xx_crypto_of_match[] = {
++	{
++		.compatible = "intel,ixp4xx-crypto",
++	},
++	{},
++};
+ 
+ static struct platform_driver ixp_crypto_driver = {
+ 	.probe = ixp_crypto_probe,
+ 	.remove = ixp_crypto_remove,
+-	.driver = { .name = "ixp4xx_crypto" },
++	.driver = {
++		.name = "ixp4xx_crypto",
++		.of_match_table = ixp4xx_crypto_of_match,
++	},
+ };
+ module_platform_driver(ixp_crypto_driver);
+ 
+diff --git a/drivers/soc/ixp4xx/ixp4xx-npe.c b/drivers/soc/ixp4xx/ixp4xx-npe.c
+index ec90b44fa0cd..3c158251a58b 100644
+--- a/drivers/soc/ixp4xx/ixp4xx-npe.c
++++ b/drivers/soc/ixp4xx/ixp4xx-npe.c
+@@ -18,6 +18,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
++#include <linux/of_platform.h>
+ #include <linux/platform_device.h>
+ #include <linux/soc/ixp4xx/npe.h>
+ 
+@@ -679,6 +680,7 @@ static int ixp4xx_npe_probe(struct platform_device *pdev)
+ {
+ 	int i, found = 0;
+ 	struct device *dev = &pdev->dev;
++	struct device_node *np = dev->of_node;
+ 	struct resource *res;
+ 
+ 	for (i = 0; i < NPE_COUNT; i++) {
+@@ -711,6 +713,11 @@ static int ixp4xx_npe_probe(struct platform_device *pdev)
+ 
+ 	if (!found)
+ 		return -ENODEV;
++
++	/* Spawn crypto subdevice if using device tree */
++	if (IS_ENABLED(CONFIG_OF) && np)
++		devm_of_platform_populate(dev);
++
+ 	return 0;
+ }
+ 
 -- 
 2.31.1
 
