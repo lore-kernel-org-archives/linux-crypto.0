@@ -4,33 +4,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15278C2B9F8
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 14:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC5A9C47088
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 14:50:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA3D8613B0
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 14:46:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF1DE61601
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 14:50:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233145AbhEXOry (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 May 2021 10:47:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54030 "EHLO mail.kernel.org"
+        id S233335AbhEXOwU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 24 May 2021 10:52:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54806 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232960AbhEXOrx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 May 2021 10:47:53 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5A3BF613CB;
-        Mon, 24 May 2021 14:46:24 +0000 (UTC)
+        id S233492AbhEXOuT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 May 2021 10:50:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A930A6140D;
+        Mon, 24 May 2021 14:47:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621867585;
-        bh=HtUfS1IYrpmkkbbRs5ghCDWJ7J7xHW4JZRf67JBRtoI=;
+        s=k20201202; t=1621867668;
+        bh=29yBi7z/CJIiEuekGlfUeyaZL3+2djxDR7+tD7HwhU0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=D3VFafBypOIS4UnbEr1C11ugnvgKx9zwpmhW6ltMCOZ9aaWtPQYRyJTmV6zJ9ykdg
-         gwlcgcGbroLhKohjYTaVzf/Y4pajmTSqGi8zs3t8NBVoWxq/v9NZ3h5HE0RyAsosIu
-         vF+lxAvtvTbdNKBpxqrahjVzcYgRC7EXneuDgIqsIfUtbPFVxPHAXI7noQi36jFkyA
-         CBqqY8qk3Kfc0hC/x9obXYHLeq742zQFrFrbqxKhKK2jHxOsRFZHTvsxdPu3IVawdn
-         o56CCCQdR3hBkYdGDiJD6Ou3TW9fG9ASbVf9XvGZ4AhoM/0y0VX5VjbfRflnrqSs4F
-         cPeg4UJWMNvJA==
+        b=X46QwoLQCKA/QLslmUwF088tys+Qqp0ZKBsJf3eEee/vx2bVdhOFbogImYxWm/fba
+         E4oiMVA7p83EQ66QvSeFB+bfYIOoE+8SW79hax9RBeD6DbVxgZaKH6zqE7a8r7DsdD
+         lVR4fApFjD5lmcvsug5XukaVhH0U8fbUMJZca4FdQiJG4GtRWWrvBk9QFJcgqYck4y
+         mavTM9+bHJZkGOl/7s0tpwkSsmYQW1I8pYp6qh1c7KxnpKyoaOpVaELPNKJtm/rlje
+         7QFr1ZCcZkXQEBsFuoeoHGwZfYYEBdHDWr9oo28fr7PSwGCTvubFnBAr+nefcZ2rsM
+         F6yRK4DYugvOA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -39,12 +39,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.12 03/63] Revert "crypto: cavium/nitrox - add an error message to explain the failure of pci_request_mem_regions"
-Date:   Mon, 24 May 2021 10:45:20 -0400
-Message-Id: <20210524144620.2497249-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 03/62] Revert "crypto: cavium/nitrox - add an error message to explain the failure of pci_request_mem_regions"
+Date:   Mon, 24 May 2021 10:46:44 -0400
+Message-Id: <20210524144744.2497894-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210524144620.2497249-1-sashal@kernel.org>
-References: <20210524144620.2497249-1-sashal@kernel.org>
+In-Reply-To: <20210524144744.2497894-1-sashal@kernel.org>
+References: <20210524144744.2497894-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -87,10 +87,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 deletion(-)
 
 diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
-index facc8e6bc580..d385daf2c71c 100644
+index 9d14be97e381..cee2a2713038 100644
 --- a/drivers/crypto/cavium/nitrox/nitrox_main.c
 +++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
-@@ -442,7 +442,6 @@ static int nitrox_probe(struct pci_dev *pdev,
+@@ -451,7 +451,6 @@ static int nitrox_probe(struct pci_dev *pdev,
  	err = pci_request_mem_regions(pdev, nitrox_driver_name);
  	if (err) {
  		pci_disable_device(pdev);
