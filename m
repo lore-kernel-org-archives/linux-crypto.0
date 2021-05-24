@@ -4,154 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1EC0C47085
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 21:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24390C04FF3
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 21:46:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D25176141D
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 21:33:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBCCA61413
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 21:46:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233373AbhEXVfF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 May 2021 17:35:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43994 "EHLO mail.kernel.org"
+        id S233301AbhEXVrf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 24 May 2021 17:47:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48694 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232911AbhEXVfF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 May 2021 17:35:05 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1AA206140A;
-        Mon, 24 May 2021 21:33:35 +0000 (UTC)
+        id S232693AbhEXVrf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 May 2021 17:47:35 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C3FB6613F5;
+        Mon, 24 May 2021 21:46:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621892016;
-        bh=WBD2e9btmxzFICv0BVxtiErmuAMyfocstBLKIppfHWY=;
+        s=k20201202; t=1621892767;
+        bh=GKBkDVTR6U4A8LLVKMf0yBj3svKYZlzUW+v2aVViaJw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=p2MYVMlcO1FbZIp10u3/ossHfO/cul/EMEiUkkbpFmjwRE4HjIcLp/V6ZArMhd5Zv
-         KVijKoFqmbMrg5q1P8e9E6vSjNAEGPPyM0HSpGVKgDgkcQMMC/Vsgdr90jLhVJamUg
-         81kxjVY0cO1RS/ux6EobSoYgBlJsC9Aix/s854D46UXC2pxdxFWR48xJgWflXCfDjH
-         fPmcryCWaHwaE4hzhRovn+LnGJOySE0bdWB8ClQDh7PmJlpz/j6l3ZCX4AxaufnOuC
-         MZkDxQ9a1GGy8kE3yvwZUggk2IKVWgY0aa0YCvZc6fXiBgP7dKxl13hqDWOuoOrfV5
-         VUbqMJrCIjj5w==
-Date:   Tue, 25 May 2021 00:33:34 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ben Boeckel <me@benboeckel.net>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Malte Gell <malte.gell@gmx.de>,
-        Varad Gautam <varad.gautam@suse.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Lee, Chun-Yi" <jlee@suse.com>
-Subject: Re: [PATCH v8,1/4] X.509: Add CodeSigning extended key usage parsing
-Message-ID: <YKwbrlXGePkinTHb@kernel.org>
-References: <20210524021540.18736-1-jlee@suse.com>
- <20210524021540.18736-2-jlee@suse.com>
+        b=NJWTjTUZALSTvd/Re0iNJkunzZ18jSfygkanIFmlZC7HvVKCcf5xZfCeFdSGQ9g6Y
+         LeYhrSk2Z4sqjsq6Ns4EOO14aBuTTWiLdbg+xF2c7L8JekA5ZsC4QwHDAWUzzogwyM
+         8OTjhjaj03NZb3tsa5ngevR06nlziacJPVvK3GoOCIF/63F+P4pCRppin+kaGpPb0U
+         n+PP6UXYCugdH4vxiCGpdg8MH+wnqRZzSvthnz/HLakYcClvYx3b7uJbK91FKFAuP+
+         Ixv+oMfR1SQspm5vnST8sQC8dZ8p6Fpd1seTOUBkwRu19x5YnMr1ZVidV5Y4Wfoss7
+         sBxsLPTKfAaTA==
+Date:   Mon, 24 May 2021 14:46:05 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        herbert@gondor.apana.org.au, will@kernel.org,
+        kernel-team@android.com
+Subject: Re: [PATCH v5 1/5] crypto: arm64/gcm-aes-ce - remove non-SIMD
+ fallback path
+Message-ID: <YKwenSYKlQF77Dz2@gmail.com>
+References: <20210521102053.66609-1-ardb@kernel.org>
+ <20210521102053.66609-2-ardb@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210524021540.18736-2-jlee@suse.com>
+In-Reply-To: <20210521102053.66609-2-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 24, 2021 at 10:15:37AM +0800, Lee, Chun-Yi wrote:
-> This patch adds the logic for parsing the CodeSign extended key usage
-> extension in X.509. The parsing result will be set to the eku flag
-> which is carried by public key. It can be used in the PKCS#7
-> verification.
+On Fri, May 21, 2021 at 12:20:49PM +0200, Ard Biesheuvel wrote:
+> Now that kernel mode SIMD is guaranteed to be available when executing
+> in task or softirq context, we no longer need scalar fallbacks to use
+> when the NEON is unavailable. So get rid of them.
 > 
-> Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 > ---
->  crypto/asymmetric_keys/x509_cert_parser.c | 25 +++++++++++++++++++++++++
->  include/crypto/public_key.h               |  1 +
->  include/linux/oid_registry.h              |  5 +++++
->  3 files changed, 31 insertions(+)
-> 
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-> index 6d003096b5bc..996db9419474 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -542,6 +542,8 @@ int x509_process_extension(void *context, size_t hdrlen,
->  	struct x509_parse_context *ctx = context;
->  	struct asymmetric_key_id *kid;
->  	const unsigned char *v = value;
-> +	int i = 0;
-> +	enum OID oid;
->  
->  	pr_debug("Extension: %u\n", ctx->last_oid);
->  
-> @@ -571,6 +573,29 @@ int x509_process_extension(void *context, size_t hdrlen,
->  		return 0;
->  	}
->  
-> +	if (ctx->last_oid == OID_extKeyUsage) {
-> +		if (vlen < 2 ||
-> +		    v[0] != ((ASN1_UNIV << 6) | ASN1_CONS_BIT | ASN1_SEQ) ||
-> +		    v[1] != vlen - 2)
-> +			return -EBADMSG;
-> +		i += 2;
-> +
-> +		while (i < vlen) {
-> +			/* A 10 bytes EKU OID Octet blob =
-> +			 * ASN1_OID + size byte + 8 bytes OID */
-> +			if ((i + 10) > vlen || v[i] != ASN1_OID || v[i + 1] != 8)
-> +				return -EBADMSG;
-> +
-> +			oid = look_up_OID(v + i + 2, v[i + 1]);
-> +			if (oid == OID_codeSigning) {
-> +				ctx->cert->pub->eku |= EKU_codeSigning;
-> +			}
-> +			i += 10;
-> +		}
-> +		pr_debug("extKeyUsage: %d\n", ctx->cert->pub->eku);
-> +		return 0;
-> +	}
-> +
->  	return 0;
->  }
->  
-> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-> index 47accec68cb0..1ccaebe2a28b 100644
-> --- a/include/crypto/public_key.h
-> +++ b/include/crypto/public_key.h
-> @@ -28,6 +28,7 @@ struct public_key {
->  	bool key_is_private;
->  	const char *id_type;
->  	const char *pkey_algo;
-> +	unsigned int eku : 9;      /* Extended Key Usage (9-bit) */
+>  arch/arm64/crypto/ghash-ce-glue.c | 209 +++++---------------
+>  1 file changed, 51 insertions(+), 158 deletions(-)
 
-Why no just name it ext_key_usage? I get the use of "EKU" elsewhere
-but not in the variable name. Now you have to remember too much
-context when just looking at this (and it's even undocumented to
-add that).
-
->  };
->  
->  extern void public_key_free(struct public_key *key);
-> diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-> index 461b7aa587ba..8c8935f0eb73 100644
-> --- a/include/linux/oid_registry.h
-> +++ b/include/linux/oid_registry.h
-> @@ -125,9 +125,14 @@ enum OID {
->  	OID_TPMImportableKey,		/* 2.23.133.10.1.4 */
->  	OID_TPMSealedData,		/* 2.23.133.10.1.5 */
->  
-> +	/* Extended key purpose OIDs [RFC 5280] */
-> +	OID_codeSigning,		/* 1.3.6.1.5.5.7.3.3 */
-> +
->  	OID__NR
->  };
->  
-> +#define EKU_codeSigning	(1 << 2)
-> +
->  extern enum OID look_up_OID(const void *data, size_t datasize);
->  extern int parse_OID(const void *data, size_t datasize, enum OID *oid);
->  extern int sprint_oid(const void *, size_t, char *, size_t);
-> -- 
-> 2.16.4
-> 
->005diaq6539262 
-
-
-/Jarkko
+Reviewed-by: Eric Biggers <ebiggers@google.com>
