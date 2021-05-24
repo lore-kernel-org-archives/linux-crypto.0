@@ -2,106 +2,169 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F0BC47083
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 02:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E56C47083
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 08:32:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 637B561104
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 02:16:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C7D161354
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 08:32:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232249AbhEXCSU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 23 May 2021 22:18:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37896 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232230AbhEXCSS (ORCPT
+        id S232415AbhEXIeP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 24 May 2021 04:34:15 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:23795 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232347AbhEXIeO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 May 2021 22:18:18 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 228D4C06138A;
-        Sun, 23 May 2021 19:16:51 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id v14so16252360pgi.6;
-        Sun, 23 May 2021 19:16:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=wB1I6Nqq7AfdRuGhioLL2RWvT/EvSUrtBmeOoGNpC4c=;
-        b=cSDpuKDMyT8z0ju0o2rO6qkPyzkFBJTWUNHR0ITwX+tv4e57LFAYbwpKiBzQN15nQd
-         z0oy3wjedU/TJqeK/gQrBeUGom0xPVkw9LL8jo3IHllS04LrALKAtGG//TUNXHUD/LFb
-         3OIgQzFyEISouaifCGLNE4fxfn9PsyZCaou+7F/5x7tAU9RQCCtLX/vpCv89aGi43TxQ
-         1Tzuse0OnKOx8GbOPrfoZxFwz9MnsVGXS0h0awi+l3iZCbnJ915uqadN9b1oStwyGoXN
-         41tDeHmXMX2tjo9Vtlz3NbOdTwQtmS8s9nAL1r1DXkOD92MrFl9akw11vcUSRgpGj55T
-         3cSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=wB1I6Nqq7AfdRuGhioLL2RWvT/EvSUrtBmeOoGNpC4c=;
-        b=RmQpW+Ch6QRroHYxp+OhV9sDKoURdGQVeZQkFEPWhipx4OkrMNCV4epuc+V/ZjjhYn
-         vTeOBFujz2fWr0teUvv5g6lFXmDeYi+oFd/rM9qFw+/0jo3WCKv9Hw7sFPc7QpkKou/N
-         Y1rbcw0pPISvy8exqR4Q13NhNuE7jEDNgG4iWg7B0DAS0H4vSqx1zICzEcjDXqi/usf8
-         NSgE7EQr/7VYo3TTzMjeFPjargLTlSxb104naxh9IPY5kJKk8mwyYql85Q8rnFkoQ0x9
-         V0vk9x7fbNXc92dsHFCrs5cVzY3eushDprFiiABaFWPMEodhzYvNyBVEENnHOSkxOcVG
-         LHTg==
-X-Gm-Message-State: AOAM530VhY25l1IJ2kUGC21LkaUjfi/x2cbm7glJcPSMyztx8NXDgR5y
-        cffDCMrqVxVa3D+G77xgXj0=
-X-Google-Smtp-Source: ABdhPJwejrj/eHiZMZfHhuHqKsMJoLaJ7eqvWpYxGs6BJWkzowOCykhS1Bz2NadhFlOl1zAozIEeBQ==
-X-Received: by 2002:a63:5504:: with SMTP id j4mr11186091pgb.238.1621822610732;
-        Sun, 23 May 2021 19:16:50 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id h1sm9474960pfh.72.2021.05.23.19.16.47
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 23 May 2021 19:16:50 -0700 (PDT)
-From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ben Boeckel <me@benboeckel.net>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Malte Gell <malte.gell@gmx.de>,
-        Varad Gautam <varad.gautam@suse.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [PATCH v8,4/4] Documentation/admin-guide/module-signing.rst: add openssl command option example for CodeSign EKU
-Date:   Mon, 24 May 2021 10:15:40 +0800
-Message-Id: <20210524021540.18736-5-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
-In-Reply-To: <20210524021540.18736-1-jlee@suse.com>
-References: <20210524021540.18736-1-jlee@suse.com>
+        Mon, 24 May 2021 04:34:14 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20210524083245euoutp0247e9c49324bc01ac2e097399ce06036c~B85XDs0EA0318303183euoutp02D;
+        Mon, 24 May 2021 08:32:45 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20210524083245euoutp0247e9c49324bc01ac2e097399ce06036c~B85XDs0EA0318303183euoutp02D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1621845165;
+        bh=qwqR1BNh3mimBBRmdJxT8M1e0EB8tVvcsh5WWn2peN4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=PalQo9i/or2FTzwmu1ANp2KD57fEWwXA4/II6M8LxUDnE9ZIJNHlW01MVAbAk9twY
+         rJWdbpDjjb3LYtx0SvnDZayZJ9VJSL2SE6VSUsYm971vqk+dFoKyB+4gjcphW+u42R
+         37XGGI4eRbNLv26DErjjG+E2/6uhwKwEDvumyft4=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20210524083245eucas1p14d2b4f0b579dc7ef5589ea6db0422f4f~B85W48a2E1964819648eucas1p1z;
+        Mon, 24 May 2021 08:32:45 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 45.59.09444.DA46BA06; Mon, 24
+        May 2021 09:32:45 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20210524083244eucas1p263470ad84270aa59c06432c92cf56280~B85Wf1XRQ3250432504eucas1p2F;
+        Mon, 24 May 2021 08:32:44 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210524083244eusmtrp2da8abe0073e15fa8594edd99597023af~B85WfM_Qa2429424294eusmtrp21;
+        Mon, 24 May 2021 08:32:44 +0000 (GMT)
+X-AuditID: cbfec7f4-dd5ff700000024e4-35-60ab64ad72e9
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id EB.27.08696.CA46BA06; Mon, 24
+        May 2021 09:32:44 +0100 (BST)
+Received: from localhost (unknown [106.120.51.46]) by eusmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20210524083244eusmtip2fe1925d329ae959edce653f598931cb2~B85WUK5Hr1154311543eusmtip24;
+        Mon, 24 May 2021 08:32:44 +0000 (GMT)
+From:   Lukasz Stelmach <l.stelmach@samsung.com>
+To:     Tian Tao <tiantao6@hisilicon.com>
+Cc:     <krzysztof.kozlowski@canonical.com>,
+        <linux-samsung-soc@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] hwrng: exynos: Use pm_runtime_resume_and_get() to
+ replace open coding
+Date:   Mon, 24 May 2021 10:32:33 +0200
+In-Reply-To: <1621569489-20554-1-git-send-email-tiantao6@hisilicon.com>
+        (Tian Tao's message of "Fri, 21 May 2021 11:58:09 +0800")
+Message-ID: <dleftjy2c4zg4e.fsf%l.stelmach@samsung.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
+        protocol="application/pgp-signature"
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHKsWRmVeSWpSXmKPExsWy7djP87prU1YnGCyeyGGx8e0PJov7934y
+        Wcw4v4/JYvXrfewOLB6zGnrZPB7P3cju8XmTXABzFJdNSmpOZllqkb5dAldGQ9NR5oJbfBUN
+        H/4yNzDe4Oli5OSQEDCRONf1ir2LkYtDSGAFo8SOMxNZIJwvjBKz359mhHA+M0o8XvufHaZl
+        3/O5rBCJ5UBVR58xQTjPGSXOfprB3MXIwcEmoCexdm0ESIOIgKrEkqblrCA2s0C+xMEZV5hA
+        bGGBGInrV06CDWUBqlm+uwnsDk6BZkaJc3uXgBXxCphL3H95EqxZVMBSYsuL++wQcUGJkzOf
+        sEAMzZWYef4N2KkSAhc4JB433WWEONVF4sv5RywQtrDEq+NboF6Qkfi/cz4TyKESAvUSkyeZ
+        QfT2MEpsm/MDqt5a4s65X2wQtqPE9/YZrBD1fBI33gpC7OWTmLRtOjNEmFeio00IolpFYl3/
+        HqgpUhK9r1ZAXeMh8XL3B2hYz2KUePZtMfMERoVZSN6ZheSdWUBjmQU0Jdbv0ocIa0ssW/ia
+        GcK2lVi37j3LAkbWVYziqaXFuempxUZ5qeV6xYm5xaV56XrJ+bmbGIHJ5vS/4192MC5/9VHv
+        ECMTB+MhRhWg5kcbVl9glGLJy89LVRLh/du3MkGINyWxsiq1KD++qDQntfgQozQHi5I4b9KW
+        NfFCAumJJanZqakFqUUwWSYOTqkGpqXHypRXpdwU5BSeceDYjPC/Gyep+ZZVnZ92+tOX/Fre
+        jhXG7HPuzebTFT9eVlb/QkpZ93O3yLFNZucnLGaMYiiIUbpxon+nzSlTszwTycnW0z7OmRg7
+        Q7Vue4ftV+WynoxFake3zqyZstSkfltg1P/sIN3ktGwb5zVdm6UanyqHiR02vXFpybNzD293
+        fp3fKqAsv2byxqgVmy6vWlixQDVK8lHvpAeeM4/OFTeUSbb7fWbPnAVl7gJb+JaJak6YlTXT
+        PuOSkId3k/jOtYpFXt8ebMqpuzJ9E3+uss/Kj2kPz+xQPndxonhi2a6eyznqH636ji0UNlVx
+        nXru/EuxhcFCqpu1VjCH5v3Z9oT100YlluKMREMt5qLiRAB+UxBNsQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKIsWRmVeSWpSXmKPExsVy+t/xe7prUlYnGJw6q22x8e0PJov7934y
+        Wcw4v4/JYvXrfewOLB6zGnrZPB7P3cju8XmTXABzlJ5NUX5pSapCRn5xia1StKGFkZ6hpYWe
+        kYmlnqGxeayVkamSvp1NSmpOZllqkb5dgl5GQ9NR5oJbfBUNH/4yNzDe4Oli5OSQEDCR2Pd8
+        LmsXIxeHkMBSRomOR7+Yuhg5gBJSEivnpkPUCEv8udbFBlHzlFFi669edpAaNgE9ibVrI0Bq
+        RARUJZY0LWcFsZkF8iQ6N61gBrGFBaIkjt9bzgZiCwm4SbxcfgGshgWofvnuJnaQmZwCzYwS
+        XasPsoMkeAXMJe6/PAlWJCpgKbHlxX2ouKDEyZlPWCAWZEt8Xf2ceQKjwCwkqVlIUrOAzmMW
+        0JRYv0sfIqwtsWzha2YI21Zi3br3LAsYWVcxiqSWFuem5xYb6RUn5haX5qXrJefnbmIExsm2
+        Yz+37GBc+eqj3iFGJg7GQ4wqQJ2PNqy+wCjFkpefl6okwvu3b2WCEG9KYmVValF+fFFpTmrx
+        IUZToN8mMkuJJucDIzivJN7QzMDU0MTM0sDU0sxYSZzX5MiaeCGB9MSS1OzU1ILUIpg+Jg5O
+        qQYmvp2VzBYPTFTn8k7yY+p5qZ39IDn8a43XY8FProKvPprwHXySsUtipcquKSydD3d8Sm33
+        SuWcs6CsmdlO+ui6RTXvbXTDdgZdep319+l6RfkGvagvc7sUN1ne1E5YckT9V7a+99UOk3/M
+        V5Ia7DgD5pV9/j17wWX5IKsnZv/elLw+4tBw8if/vaf/ttamC8Vm3o19MNfkRzUPQ+Yjc+n+
+        ALF3tYckn39WPnt2Rz9jdixPSD2DQviiRSn8PWpKirHPdJu32fzYeqhch/FRWYwBW/PvavF9
+        0sa+Alln7afm+3r2mp5f+H7HPb8/iyz/F+/MYrZ4tH9Pj+bqb2fTTy7eve+a72H+3kW72AwN
+        Tf4osRRnJBpqMRcVJwIAfH9IpSgDAAA=
+X-CMS-MailID: 20210524083244eucas1p263470ad84270aa59c06432c92cf56280
+X-Msg-Generator: CA
+X-RootMTR: 20210524083244eucas1p263470ad84270aa59c06432c92cf56280
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20210524083244eucas1p263470ad84270aa59c06432c92cf56280
+References: <1621569489-20554-1-git-send-email-tiantao6@hisilicon.com>
+        <CGME20210524083244eucas1p263470ad84270aa59c06432c92cf56280@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add an openssl command option example for generating CodeSign extended
-key usage in X.509 when CONFIG_CHECK_CODESIGN_EKU is enabled.
+--=-=-=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
----
- Documentation/admin-guide/module-signing.rst | 6 ++++++
- 1 file changed, 6 insertions(+)
+It was <2021-05-21 pi=C4=85 11:58>, when Tian Tao wrote:
+> use pm_runtime_resume_and_get() to replace pm_runtime_get_sync and
+> pm_runtime_put_noidle. this change is just to simplify the code, no
+> actual functional changes.
+>
+> Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+> ---
+>  drivers/char/hw_random/exynos-trng.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_rando=
+m/exynos-trng.c
+> index 8e1fe3f..d71ef3c 100644
+> --- a/drivers/char/hw_random/exynos-trng.c
+> +++ b/drivers/char/hw_random/exynos-trng.c
+> @@ -196,10 +196,9 @@ static int __maybe_unused exynos_trng_resume(struct =
+device *dev)
+>  {
+>  	int ret;
+>=20=20
+> -	ret =3D pm_runtime_get_sync(dev);
+> -	if (ret < 0) {
+> +	ret =3D pm_runtime_resume_and_get(dev);
+> +	if (ret) {
 
-diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
-index 7d7c7c8a545c..ca3b8f19466c 100644
---- a/Documentation/admin-guide/module-signing.rst
-+++ b/Documentation/admin-guide/module-signing.rst
-@@ -170,6 +170,12 @@ generate the public/private key files::
- 	   -config x509.genkey -outform PEM -out kernel_key.pem \
- 	   -keyout kernel_key.pem
- 
-+When ``CONFIG_CHECK_CODESIGN_EKU`` option is enabled, the following openssl
-+command option should be added where for generating CodeSign extended key usage
-+in X.509::
-+
-+        -addext "extendedKeyUsage=codeSigning"
-+
- The full pathname for the resulting kernel_key.pem file can then be specified
- in the ``CONFIG_MODULE_SIG_KEY`` option, and the certificate and key therein will
- be used instead of an autogenerated keypair.
--- 
-2.16.4
+pm_runtime_resume_and_get() (see include/linux/pm_runtime.h) checks for
+ret < 0 and returns it, so I think it is better to keep (ret < 0).
 
+>  		dev_err(dev, "Could not get runtime PM.\n");
+> -		pm_runtime_put_noidle(dev);
+>  		return ret;
+>  	}
+
+=2D-=20
+=C5=81ukasz Stelmach
+Samsung R&D Institute Poland
+Samsung Electronics
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEXpuyqjq9kGEVr9UQsK4enJilgBAFAmCrZKIACgkQsK4enJil
+gBCyEAf/d2Zw70kujgGEQWPrkeLmvoZmGFM7fhsVYADO4PvD55QRF3Er0bLWC2sf
+xd6gbcVU935trDA3UfRIT5fgEx6Dzxudz8CGmDbGnrX6cSV14kSOrYy8FEC7++Cw
+19dPfIayqUszjUMprKoHlNcs+02y/Uth1OFm58uB0ptPwbvRmzpNAQiRcEFyc/u7
+zv1py8TYLwMa1hptu1ZgZV1uqXA+8lktA8iOQHkWqp78H2wcm82sGalTCmvE1v4U
+coe+NGbUVBCx7NqY802VzZh53MxEd+nYzxMk55DEF0YzCG2rsp3DwE9NFDv5EPCn
+p0+0v4nwQn/K/4yUvD8ChDGcxtYQkA==
+=J0qR
+-----END PGP SIGNATURE-----
+--=-=-=--
