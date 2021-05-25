@@ -2,411 +2,168 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B67C2B9F8
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 May 2021 16:15:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20428C47084
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 May 2021 16:29:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B59D2611C2
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 May 2021 16:15:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F05206141D
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 May 2021 16:29:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232656AbhEYQRZ convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 May 2021 12:17:25 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:33752 "EHLO pegase1.c-s.fr"
+        id S233494AbhEYQbG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 May 2021 12:31:06 -0400
+Received: from namei.org ([65.99.196.166]:49298 "EHLO mail.namei.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232561AbhEYQRY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 May 2021 12:17:24 -0400
-Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
-        by localhost (Postfix) with ESMTP id 4FqK2137DzzB7k2;
-        Tue, 25 May 2021 18:15:53 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id jqBU9LutuFUq; Tue, 25 May 2021 18:15:53 +0200 (CEST)
-Received: from vm-hermes.si.c-s.fr (vm-hermes.si.c-s.fr [192.168.25.253])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 4FqK2120ZlzB7DJ;
-        Tue, 25 May 2021 18:15:53 +0200 (CEST)
-Received: by vm-hermes.si.c-s.fr (Postfix, from userid 33)
-        id C888764E; Tue, 25 May 2021 18:20:18 +0200 (CEST)
-Received: from 37.173.125.11 ([37.173.125.11]) by messagerie.c-s.fr (Horde
- Framework) with HTTP; Tue, 25 May 2021 18:20:18 +0200
-Date:   Tue, 25 May 2021 18:20:18 +0200
-Message-ID: <20210525182018.Horde.RpVsAs9V_zh-RmbuxnlQTQ2@messagerie.c-s.fr>
-From:   Christophe Leroy <christophe.leroy@csgroup.eu>
-To:     Shubhankar Kuranagatti <shubhankarvk@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, herbert@gondor.apana.org.au
-Subject: Re: [PATCH] drivers: crypto: talitos.c: Replace space with tabs
-In-Reply-To: <20210525140903.nqj5rdohduzemm4l@kewl-virtual-machine>
-User-Agent: Internet Messaging Program (IMP) H5 (6.2.3)
-Content-Type: text/plain; charset=UTF-8; format=flowed; DelSp=Yes
+        id S233485AbhEYQbG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 May 2021 12:31:06 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by mail.namei.org (Postfix) with ESMTPS id 9AC61DCF;
+        Tue, 25 May 2021 16:24:35 +0000 (UTC)
+Date:   Wed, 26 May 2021 02:24:35 +1000 (AEST)
+From:   James Morris <jmorris@namei.org>
+To:     linux-security-module@vger.kernel.org
+cc:     linux-kernel@vger.kernel.org, lwn@lwn.net,
+        fedora-selinux-list@redhat.com, linux-crypto@vger.kernel.org,
+        kernel-hardening@lists.openwall.com,
+        linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
+        Audit-ML <linux-audit@redhat.com>, gentoo-hardened@gentoo.org,
+        keyrings@linux-nfs.org, tpmdd-devel@lists.sourceforge.net,
+        Linux Security Summit Program Committee 
+        <lss-pc@lists.linuxfoundation.org>
+Subject: Re: [ANNOUNCE][CFP] Linux Security Summit 2021
+In-Reply-To: <c244f77-56a1-c089-521d-2e670488c10@namei.org>
+Message-ID: <5b3a0bf-226d-6ee-d0b-d6673eff32b2@namei.org>
+References: <c244f77-56a1-c089-521d-2e670488c10@namei.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Shubhankar Kuranagatti <shubhankarvk@gmail.com> a écrit :
+Note that the venue of LSS 2021 has now changed to Seattle, USA.
 
-> Tabs have been used instead of spaces for indentation
-> This is done to maintain code uniformity(LINDENT).
+See https://events.linuxfoundation.org/linux-security-summit-north-america/
 
-Nack.
+The new event dates are 29 September to 01 October.
 
-The changes done by this patch break linux codying style. For  
-instance, additional lines alignment must match open parenthesis.
+The CFP closes on June 27th.
 
-Did you run checkpatch.pl on your path ?
 
->
-> Signed-off-by: Shubhankar Kuranagatti <shubhankarvk@gmail.com>
-> ---
->  drivers/crypto/talitos.c | 198 +++++++++++++++++++--------------------
->  1 file changed, 99 insertions(+), 99 deletions(-)
->
-> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-> index 25c9f825b8b5..e40f78ec8c4b 100644
-> --- a/drivers/crypto/talitos.c
-> +++ b/drivers/crypto/talitos.c
-> @@ -174,7 +174,7 @@ static int reset_channel(struct device *dev, int ch)
->  	/* and ICCR writeback, if available */
->  	if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
->  		setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
-> -		          TALITOS_CCCR_LO_IWSE);
-> +				TALITOS_CCCR_LO_IWSE);
->
->  	return 0;
->  }
-> @@ -249,7 +249,7 @@ static int init_device(struct device *dev)
->  	/* disable integrity check error interrupts (use writeback instead) */
->  	if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
->  		setbits32(priv->reg_mdeu + TALITOS_EUICR_LO,
-> -		          TALITOS_MDEUICR_LO_ICE);
-> +				TALITOS_MDEUICR_LO_ICE);
->
->  	return 0;
->  }
-> @@ -2276,12 +2276,12 @@ static struct talitos_alg_template driver_algs[] = {
->  			.maxauthsize = SHA1_DIGEST_SIZE,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
-> -			             DESC_HDR_SEL0_AESU |
-> -		                     DESC_HDR_MODE0_AESU_CBC |
-> -		                     DESC_HDR_SEL1_MDEUA |
-> -		                     DESC_HDR_MODE1_MDEU_INIT |
-> -		                     DESC_HDR_MODE1_MDEU_PAD |
-> -		                     DESC_HDR_MODE1_MDEU_SHA1_HMAC,
-> +			DESC_HDR_SEL0_AESU |
-> +			DESC_HDR_MODE0_AESU_CBC |
-> +			DESC_HDR_SEL1_MDEUA |
-> +			DESC_HDR_MODE1_MDEU_INIT |
-> +			DESC_HDR_MODE1_MDEU_PAD |
-> +			DESC_HDR_MODE1_MDEU_SHA1_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
-> @@ -2321,13 +2321,13 @@ static struct talitos_alg_template driver_algs[] = {
->  			.setkey = aead_des3_setkey,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
-> -			             DESC_HDR_SEL0_DEU |
-> -		                     DESC_HDR_MODE0_DEU_CBC |
-> -		                     DESC_HDR_MODE0_DEU_3DES |
-> -		                     DESC_HDR_SEL1_MDEUA |
-> -		                     DESC_HDR_MODE1_MDEU_INIT |
-> -		                     DESC_HDR_MODE1_MDEU_PAD |
-> -		                     DESC_HDR_MODE1_MDEU_SHA1_HMAC,
-> +					DESC_HDR_SEL0_DEU |
-> +					DESC_HDR_MODE0_DEU_CBC |
-> +					DESC_HDR_MODE0_DEU_3DES |
-> +					DESC_HDR_SEL1_MDEUA |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEU_SHA1_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
-> @@ -2413,13 +2413,13 @@ static struct talitos_alg_template driver_algs[] = {
->  			.setkey = aead_des3_setkey,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
-> -			             DESC_HDR_SEL0_DEU |
-> -		                     DESC_HDR_MODE0_DEU_CBC |
-> -		                     DESC_HDR_MODE0_DEU_3DES |
-> -		                     DESC_HDR_SEL1_MDEUA |
-> -		                     DESC_HDR_MODE1_MDEU_INIT |
-> -		                     DESC_HDR_MODE1_MDEU_PAD |
-> -		                     DESC_HDR_MODE1_MDEU_SHA224_HMAC,
-> +					DESC_HDR_SEL0_DEU |
-> +					DESC_HDR_MODE0_DEU_CBC |
-> +					DESC_HDR_MODE0_DEU_3DES |
-> +					DESC_HDR_SEL1_MDEUA |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEU_SHA224_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
-> @@ -2438,13 +2438,13 @@ static struct talitos_alg_template driver_algs[] = {
->  			.setkey = aead_des3_setkey,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_DEU |
-> -				     DESC_HDR_MODE0_DEU_CBC |
-> -				     DESC_HDR_MODE0_DEU_3DES |
-> -				     DESC_HDR_SEL1_MDEUA |
-> -				     DESC_HDR_MODE1_MDEU_INIT |
-> -				     DESC_HDR_MODE1_MDEU_PAD |
-> -				     DESC_HDR_MODE1_MDEU_SHA224_HMAC,
-> +					DESC_HDR_SEL0_DEU |
-> +					DESC_HDR_MODE0_DEU_CBC |
-> +					DESC_HDR_MODE0_DEU_3DES |
-> +					DESC_HDR_SEL1_MDEUA |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEU_SHA224_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.alg.aead = {
-> @@ -2460,12 +2460,12 @@ static struct talitos_alg_template driver_algs[] = {
->  			.maxauthsize = SHA256_DIGEST_SIZE,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
-> -			             DESC_HDR_SEL0_AESU |
-> -		                     DESC_HDR_MODE0_AESU_CBC |
-> -		                     DESC_HDR_SEL1_MDEUA |
-> -		                     DESC_HDR_MODE1_MDEU_INIT |
-> -		                     DESC_HDR_MODE1_MDEU_PAD |
-> -		                     DESC_HDR_MODE1_MDEU_SHA256_HMAC,
-> +					DESC_HDR_SEL0_AESU |
-> +					DESC_HDR_MODE0_AESU_CBC |
-> +					DESC_HDR_SEL1_MDEUA |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEU_SHA256_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
-> @@ -2505,13 +2505,13 @@ static struct talitos_alg_template driver_algs[] = {
->  			.setkey = aead_des3_setkey,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
-> -			             DESC_HDR_SEL0_DEU |
-> -		                     DESC_HDR_MODE0_DEU_CBC |
-> -		                     DESC_HDR_MODE0_DEU_3DES |
-> -		                     DESC_HDR_SEL1_MDEUA |
-> -		                     DESC_HDR_MODE1_MDEU_INIT |
-> -		                     DESC_HDR_MODE1_MDEU_PAD |
-> -		                     DESC_HDR_MODE1_MDEU_SHA256_HMAC,
-> +					DESC_HDR_SEL0_DEU |
-> +					DESC_HDR_MODE0_DEU_CBC |
-> +					DESC_HDR_MODE0_DEU_3DES |
-> +					DESC_HDR_SEL1_MDEUA |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEU_SHA256_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
-> @@ -2530,13 +2530,13 @@ static struct talitos_alg_template driver_algs[] = {
->  			.setkey = aead_des3_setkey,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_DEU |
-> -				     DESC_HDR_MODE0_DEU_CBC |
-> -				     DESC_HDR_MODE0_DEU_3DES |
-> -				     DESC_HDR_SEL1_MDEUA |
-> -				     DESC_HDR_MODE1_MDEU_INIT |
-> -				     DESC_HDR_MODE1_MDEU_PAD |
-> -				     DESC_HDR_MODE1_MDEU_SHA256_HMAC,
-> +					DESC_HDR_SEL0_DEU |
-> +					DESC_HDR_MODE0_DEU_CBC |
-> +					DESC_HDR_MODE0_DEU_3DES |
-> +					DESC_HDR_SEL1_MDEUA |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEU_SHA256_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.alg.aead = {
-> @@ -2552,12 +2552,12 @@ static struct talitos_alg_template driver_algs[] = {
->  			.maxauthsize = SHA384_DIGEST_SIZE,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
-> -			             DESC_HDR_SEL0_AESU |
-> -		                     DESC_HDR_MODE0_AESU_CBC |
-> -		                     DESC_HDR_SEL1_MDEUB |
-> -		                     DESC_HDR_MODE1_MDEU_INIT |
-> -		                     DESC_HDR_MODE1_MDEU_PAD |
-> -		                     DESC_HDR_MODE1_MDEUB_SHA384_HMAC,
-> +					DESC_HDR_SEL0_AESU |
-> +					DESC_HDR_MODE0_AESU_CBC |
-> +					DESC_HDR_SEL1_MDEUB |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEUB_SHA384_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.alg.aead = {
-> @@ -2575,13 +2575,13 @@ static struct talitos_alg_template driver_algs[] = {
->  			.setkey = aead_des3_setkey,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
-> -			             DESC_HDR_SEL0_DEU |
-> -		                     DESC_HDR_MODE0_DEU_CBC |
-> -		                     DESC_HDR_MODE0_DEU_3DES |
-> -		                     DESC_HDR_SEL1_MDEUB |
-> -		                     DESC_HDR_MODE1_MDEU_INIT |
-> -		                     DESC_HDR_MODE1_MDEU_PAD |
-> -		                     DESC_HDR_MODE1_MDEUB_SHA384_HMAC,
-> +				DESC_HDR_SEL0_DEU |
-> +				DESC_HDR_MODE0_DEU_CBC |
-> +				DESC_HDR_MODE0_DEU_3DES |
-> +				DESC_HDR_SEL1_MDEUB |
-> +				DESC_HDR_MODE1_MDEU_INIT |
-> +				DESC_HDR_MODE1_MDEU_PAD |
-> +				DESC_HDR_MODE1_MDEUB_SHA384_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.alg.aead = {
-> @@ -2597,12 +2597,12 @@ static struct talitos_alg_template driver_algs[] = {
->  			.maxauthsize = SHA512_DIGEST_SIZE,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
-> -			             DESC_HDR_SEL0_AESU |
-> -		                     DESC_HDR_MODE0_AESU_CBC |
-> -		                     DESC_HDR_SEL1_MDEUB |
-> -		                     DESC_HDR_MODE1_MDEU_INIT |
-> -		                     DESC_HDR_MODE1_MDEU_PAD |
-> -		                     DESC_HDR_MODE1_MDEUB_SHA512_HMAC,
-> +					DESC_HDR_SEL0_AESU |
-> +					DESC_HDR_MODE0_AESU_CBC |
-> +					DESC_HDR_SEL1_MDEUB |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEUB_SHA512_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.alg.aead = {
-> @@ -2620,13 +2620,13 @@ static struct talitos_alg_template driver_algs[] = {
->  			.setkey = aead_des3_setkey,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
-> -			             DESC_HDR_SEL0_DEU |
-> -		                     DESC_HDR_MODE0_DEU_CBC |
-> -		                     DESC_HDR_MODE0_DEU_3DES |
-> -		                     DESC_HDR_SEL1_MDEUB |
-> -		                     DESC_HDR_MODE1_MDEU_INIT |
-> -		                     DESC_HDR_MODE1_MDEU_PAD |
-> -		                     DESC_HDR_MODE1_MDEUB_SHA512_HMAC,
-> +					DESC_HDR_SEL0_DEU |
-> +					DESC_HDR_MODE0_DEU_CBC |
-> +					DESC_HDR_MODE0_DEU_3DES |
-> +					DESC_HDR_SEL1_MDEUB |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEUB_SHA512_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.alg.aead = {
-> @@ -2642,12 +2642,12 @@ static struct talitos_alg_template driver_algs[] = {
->  			.maxauthsize = MD5_DIGEST_SIZE,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
-> -			             DESC_HDR_SEL0_AESU |
-> -		                     DESC_HDR_MODE0_AESU_CBC |
-> -		                     DESC_HDR_SEL1_MDEUA |
-> -		                     DESC_HDR_MODE1_MDEU_INIT |
-> -		                     DESC_HDR_MODE1_MDEU_PAD |
-> -		                     DESC_HDR_MODE1_MDEU_MD5_HMAC,
-> +					DESC_HDR_SEL0_AESU |
-> +					DESC_HDR_MODE0_AESU_CBC |
-> +					DESC_HDR_SEL1_MDEUA |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEU_MD5_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
-> @@ -2664,12 +2664,12 @@ static struct talitos_alg_template driver_algs[] = {
->  			.maxauthsize = MD5_DIGEST_SIZE,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_AESU |
-> -				     DESC_HDR_MODE0_AESU_CBC |
-> -				     DESC_HDR_SEL1_MDEUA |
-> -				     DESC_HDR_MODE1_MDEU_INIT |
-> -				     DESC_HDR_MODE1_MDEU_PAD |
-> -				     DESC_HDR_MODE1_MDEU_MD5_HMAC,
-> +					DESC_HDR_SEL0_AESU |
-> +					DESC_HDR_MODE0_AESU_CBC |
-> +					DESC_HDR_SEL1_MDEUA |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEU_MD5_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.alg.aead = {
-> @@ -2686,13 +2686,13 @@ static struct talitos_alg_template driver_algs[] = {
->  			.setkey = aead_des3_setkey,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
-> -			             DESC_HDR_SEL0_DEU |
-> -		                     DESC_HDR_MODE0_DEU_CBC |
-> -		                     DESC_HDR_MODE0_DEU_3DES |
-> -		                     DESC_HDR_SEL1_MDEUA |
-> -		                     DESC_HDR_MODE1_MDEU_INIT |
-> -		                     DESC_HDR_MODE1_MDEU_PAD |
-> -		                     DESC_HDR_MODE1_MDEU_MD5_HMAC,
-> +					DESC_HDR_SEL0_DEU |
-> +					DESC_HDR_MODE0_DEU_CBC |
-> +					DESC_HDR_MODE0_DEU_3DES |
-> +					DESC_HDR_SEL1_MDEUA |
-> +					DESC_HDR_MODE1_MDEU_INIT |
-> +					DESC_HDR_MODE1_MDEU_PAD |
-> +					DESC_HDR_MODE1_MDEU_MD5_HMAC,
->  	},
->  	{	.type = CRYPTO_ALG_TYPE_AEAD,
->  		.priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
-> @@ -2839,9 +2839,9 @@ static struct talitos_alg_template driver_algs[] = {
->  			.setkey = skcipher_des3_setkey,
->  		},
->  		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -			             DESC_HDR_SEL0_DEU |
-> -		                     DESC_HDR_MODE0_DEU_CBC |
-> -		                     DESC_HDR_MODE0_DEU_3DES,
-> +					DESC_HDR_SEL0_DEU |
-> +					DESC_HDR_MODE0_DEU_CBC |
-> +					DESC_HDR_MODE0_DEU_3DES,
->  	},
->  	/* AHASH algorithms. */
->  	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> @@ -3131,7 +3131,7 @@ static int hw_supports(struct device *dev,  
-> __be32 desc_hdr_template)
->
->  	if (SECONDARY_EU(desc_hdr_template))
->  		ret = ret && (1 << SECONDARY_EU(desc_hdr_template)
-> -		              & priv->exec_units);
-> +				& priv->exec_units);
->
->  	return ret;
->  }
-> @@ -3176,7 +3176,7 @@ static int talitos_remove(struct  
-> platform_device *ofdev)
->
->  static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
->  						    struct talitos_alg_template
-> -						           *template)
-> +							*template)
->  {
->  	struct talitos_private *priv = dev_get_drvdata(dev);
->  	struct talitos_crypto_alg *t_alg;
-> --
-> 2.17.1
 
+
+
+On Tue, 9 Feb 2021, James Morris wrote:
+
+> ==============================================================================
+>                    ANNOUNCEMENT AND CALL FOR PARTICIPATION
+> 
+>                          LINUX SECURITY SUMMIT 2021
+>                              
+>                               27-29 September
+>                               Dublin, Ireland
+> ==============================================================================
+> 
+> DESCRIPTION
+>  
+> Linux Security Summit (LSS) is a technical forum for collaboration between
+> Linux developers, researchers, and end-users.  Its primary aim is to foster
+> community efforts in analyzing and solving Linux security challenges.
+> 
+>  The program committee currently seeks proposals for:
+>  
+>    * Refereed Presentations:
+>      45 minutes in length.
+>  
+>    * Panel Discussion Topics:
+>      45 minutes in length.
+>  
+>    * Short Topics:
+>      30 minutes in total, including at least 10 minutes discussion.
+>  
+>    * Tutorials
+>      90 minutes in length.
+>  
+> Tutorial sessions should be focused on advanced Linux security defense
+> topics within areas such as the kernel, compiler, and security-related
+> libraries.  Priority will be given to tutorials created for this conference,
+> and those where the presenter a leading subject matter expert on the topic.
+>  
+> Topic areas include, but are not limited to:
+>  
+>    * Kernel self-protection
+>    * Access control
+>    * Cryptography and key management
+>    * Integrity policy and enforcement
+>    * Hardware Security
+>    * IoT and embedded security
+>    * Virtualization and containers
+>    * System-specific system hardening
+>    * Case studies
+>    * Security tools
+>    * Security UX
+>    * Emerging technologies, threats & techniques
+> 
+>   Proposals should be submitted via:
+>     https://events.linuxfoundation.org/linux-security-summit-europe/program/cfp/
+> 
+> 
+> ** Note that for 2021, the North American and European events are combined into
+> a single event planned for Dublin, Ireland. **
+>  
+> 
+> DATES
+>  
+>   * CFP close:            June 27
+>   * CFP notifications:    July 20
+>   * Schedule announced:   July 22
+>   * Event:                September 27-29
+> 
+> WHO SHOULD ATTEND
+>  
+> We're seeking a diverse range of attendees and welcome participation by
+> people involved in Linux security development, operations, and research.
+>  
+> LSS is a unique global event that provides the opportunity to present and
+> discuss your work or research with key Linux security community members and
+> maintainers.  It's also useful for those who wish to keep up with the latest
+> in Linux security development and to provide input to the development
+> process.
+> 
+> WEB SITE
+> 
+>     https://events.linuxfoundation.org/linux-security-summit-europe/
+> 
+> TWITTER
+> 
+>   For event updates and announcements, follow:
+> 
+>     https://twitter.com/LinuxSecSummit
+>   
+>     #linuxsecuritysummit
+> 
+> PROGRAM COMMITTEE
+> 
+>   The program committee for LSS 2021 is:
+> 
+>     * James Morris, Microsoft
+>     * Serge Hallyn, Cisco
+>     * Paul Moore, Cisco
+>     * Stephen Smalley, NSA
+>     * Elena Reshetova, Intel
+>     * John Johansen, Canonical
+>     * Kees Cook, Google
+>     * Casey Schaufler, Intel
+>     * Mimi Zohar, IBM
+>     * David A. Wheeler, Institute for Defense Analyses
+> 
+>   The program committee may be contacted as a group via email:
+>     lss-pc () lists.linuxfoundation.org
+> 
+> 
+
+-- 
+James Morris
+<jmorris@namei.org>
 
