@@ -2,76 +2,64 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CCEFC04FF3
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 21:57:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7AEC47085
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 May 2021 08:08:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C2B161413
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 May 2021 21:57:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89EE661401
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 May 2021 08:08:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233778AbhEXV7V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 May 2021 17:59:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53202 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233603AbhEXV7U (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 May 2021 17:59:20 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0139161403;
-        Mon, 24 May 2021 21:57:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621893472;
-        bh=mT2xSuaz7GfCwIuGVfSy11J/JNH1BcBFokdxMEzAXCY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=q5HWxNpaLfusJXb1UsoaR1Ao6nLHxOw108FYU8AyYlZ99PhyTvL8wygw7Mf7FtTw/
-         IuIvU8amvov34lCweXLN6Qo3+StJncqYsSu+i648fRZtO7lcl7DU6sJgDxEydUcO+6
-         rfuaLxBM8/rDotVM3/S9fYrZs+/V26b931rtkU43Fwq7RhCOLIxcGlwishI5RiZ7sy
-         0LZCWnfm1ekNDri6+Nn2HcfNfAaVzFDmCAtv6TgD1ZO/YtYb4+Pc9DHCD9fEL14oFj
-         Wa9oHGRP2Lbre+3vN6dYrAgHoGBU7/Z06yRB73PisdPLjSBldLdqrHRixmuXx18nmj
-         z3dRqG7lgwCJA==
-Date:   Mon, 24 May 2021 14:57:50 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Liu Shixin <liushixin2@huawei.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next] crypto: algboss - Replaced simple_strtol() with
- kstrtouint()
-Message-ID: <YKwhXlrJzdOjS9lJ@gmail.com>
-References: <20210524120834.1580343-1-liushixin2@huawei.com>
+        id S232132AbhEYIJl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 May 2021 04:09:41 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5699 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232010AbhEYIJN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 May 2021 04:09:13 -0400
+Received: from dggems704-chm.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Fq5kd73PSz1BRfP;
+        Tue, 25 May 2021 15:46:49 +0800 (CST)
+Received: from dggpeml500019.china.huawei.com (7.185.36.137) by
+ dggems704-chm.china.huawei.com (10.3.19.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Tue, 25 May 2021 15:49:40 +0800
+Received: from huawei.com (10.175.124.27) by dggpeml500019.china.huawei.com
+ (7.185.36.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Tue, 25 May
+ 2021 15:49:40 +0800
+From:   Wu Bo <wubo40@huawei.com>
+To:     <viro@zeniv.linux.org.uk>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <linux-fsdevel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     <linfeilong@huawei.com>, <wubo40@huawei.com>
+Subject: [PATCH 0/2] use DIV_ROUND_UP helper macro for calculations
+Date:   Tue, 25 May 2021 16:15:18 +0800
+Message-ID: <1621930520-515336-1-git-send-email-wubo40@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210524120834.1580343-1-liushixin2@huawei.com>
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.27]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpeml500019.china.huawei.com (7.185.36.137)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 24, 2021 at 08:08:34PM +0800, Liu Shixin wrote:
-> The simple_strtol() function is deprecated in some situation since
-> it does not check for the range overflow. Use kstrtouint() instead.
-> 
-> Signed-off-by: Liu Shixin <liushixin2@huawei.com>
-> ---
->  crypto/algboss.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/crypto/algboss.c b/crypto/algboss.c
-> index 5ebccbd6b74e..64bb8dab9584 100644
-> --- a/crypto/algboss.c
-> +++ b/crypto/algboss.c
-> @@ -140,8 +140,8 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
->  			param->attrs[i].nu32.attr.rta_len =
->  				sizeof(param->attrs[i].nu32);
->  			param->attrs[i].nu32.attr.rta_type = CRYPTOA_U32;
-> -			param->attrs[i].nu32.data.num =
-> -				simple_strtol(name, NULL, 0);
-> +			if (unlikely(kstrtouint(name, 0, &param->attrs[i].nu32.data.num)))
-> +				goto err_free_param;
+This patchset is replace open coded divisor calculations with the 
+DIV_ROUND_UP kernel macro for better readability.
 
-It would be better to just remove all the code related to CRYPTOA_U32 and
-crypto_attr_u32, as it is never used.
+Wu Bo (2):
+  crypto: af_alg - use DIV_ROUND_UP helper macro for calculations
+  fs: direct-io: use DIV_ROUND_UP helper macro for calculations
 
-- Eric
+ crypto/af_alg.c | 2 +-
+ fs/direct-io.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+-- 
+1.8.3.1
+
