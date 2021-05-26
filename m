@@ -2,68 +2,449 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A4CC47088
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 May 2021 17:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11415C47088
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 May 2021 17:37:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC7A0613D2
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 May 2021 17:18:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF24F613D2
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 May 2021 17:37:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234350AbhEZRTl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 May 2021 13:19:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48532 "EHLO mail.kernel.org"
+        id S231461AbhEZRim convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 May 2021 13:38:42 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:7186 "EHLO pegase1.c-s.fr"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234273AbhEZRTl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 May 2021 13:19:41 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9B0E7611B0;
-        Wed, 26 May 2021 17:18:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1622049489;
-        bh=fue/kOF/ZOdJ77PEzAFEhm+XX/PeZi69M1P5v2+QnWc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GNtglhlGxNzBlWnhUrmXDUMYf+jw6Yb9kZCSfhNTKjIMYYrFpSwiBELyDeJVhCqBM
-         QlUpwdnA3i3wKMw/xPZIbz5WpRK2+vBFFm0FY1YEfxOuJbxGtR2kyP7tlSUJJltR2S
-         FMJkjYncZARKnS6MtC4WS5vwk5GSMjdo39C508zlU/FFjGb1qzytdmYy/yo/PvunDU
-         b6F2q+9W+Wbiq1w9+z7ZkOYJ2acjt68HN4BQ+8tS5pOl8QLApujRrV4Uh/x+PbswFV
-         B6t2EaX2Sre7vkeHAzWbRzR67wwgvdVgg3ofmHde+wYYG7ULOEa1adUiluRzcb0rGW
-         h3f2jJCEivs/A==
-Date:   Wed, 26 May 2021 10:18:08 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        herbert@gondor.apana.org.au, will@kernel.org,
-        kernel-team@android.com
-Subject: Re: [PATCH v6 6/6] crypto: arm64/aes-ccm - avoid by-ref argument for
- ce_aes_ccm_auth_data
-Message-ID: <YK6C0Ogq9tpByQOk@gmail.com>
-References: <20210526100729.12939-1-ardb@kernel.org>
- <20210526100729.12939-7-ardb@kernel.org>
+        id S234503AbhEZRim (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 May 2021 13:38:42 -0400
+Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
+        by localhost (Postfix) with ESMTP id 4FqynJ3yqzzB9TW;
+        Wed, 26 May 2021 19:37:08 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id Ynwg8D8Vnwr9; Wed, 26 May 2021 19:37:08 +0200 (CEST)
+Received: from vm-hermes.si.c-s.fr (vm-hermes.si.c-s.fr [192.168.25.253])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 4FqynJ2n7tzB9T7;
+        Wed, 26 May 2021 19:37:08 +0200 (CEST)
+Received: by vm-hermes.si.c-s.fr (Postfix, from userid 33)
+        id CF086DB; Wed, 26 May 2021 19:41:34 +0200 (CEST)
+Received: from 37.164.193.73 ([37.164.193.73]) by messagerie.c-s.fr (Horde
+ Framework) with HTTP; Wed, 26 May 2021 19:41:34 +0200
+Date:   Wed, 26 May 2021 19:41:34 +0200
+Message-ID: <20210526194134.Horde.D-ye6muSh6JiRURHrCTrZQ1@messagerie.c-s.fr>
+From:   Christophe Leroy <christophe.leroy@csgroup.eu>
+To:     shubh vk <shubhankarvk@gmail.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] drivers: crypto: talitos.c: Replace space with tabs
+References: <20210525140903.nqj5rdohduzemm4l@kewl-virtual-machine>
+ <20210525182018.Horde.RpVsAs9V_zh-RmbuxnlQTQ2@messagerie.c-s.fr>
+ <CAOMz5Fg0FW=_i_V9sKCuvUZj9+vmoF13LD384S97YiMXGfGEwA@mail.gmail.com>
+In-Reply-To: <CAOMz5Fg0FW=_i_V9sKCuvUZj9+vmoF13LD384S97YiMXGfGEwA@mail.gmail.com>
+User-Agent: Internet Messaging Program (IMP) H5 (6.2.3)
+Content-Type: text/plain; charset=UTF-8; format=flowed; DelSp=Yes
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210526100729.12939-7-ardb@kernel.org>
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 26, 2021 at 12:07:29PM +0200, Ard Biesheuvel wrote:
-> With the SIMD code path removed, we can clean up the CCM auth-only path
-> a bit further, by passing the 'macp' input buffer pointer by value,
-> rather than by reference, and taking the output value from the
-> function's return value.
-> 
-> This way, the compiler is no longer forced to allocate macp on the
-> stack. This is not expected to make any difference in practice, it just
-> makes for slightly cleaner code.
-> 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  arch/arm64/crypto/aes-ce-ccm-core.S | 23 ++++++++++----------
->  arch/arm64/crypto/aes-ce-ccm-glue.c | 17 +++++----------
->  2 files changed, 17 insertions(+), 23 deletions(-)
+shubh vk <shubhankarvk@gmail.com> a écrit :
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+> On Tue, 25 May 2021, 9:45 pm Christophe Leroy, <christophe.leroy@csgroup.eu>
+> wrote:
+>
+>> Shubhankar Kuranagatti <shubhankarvk@gmail.com> a écrit :
+>>
+>> > Tabs have been used instead of spaces for indentation
+>> > This is done to maintain code uniformity(LINDENT).
+>>
+>> Nack.
+>>
+>> The changes done by this patch break linux codying style. For
+>> instance, additional lines alignment must match open parenthesis.
+>>
+>> Did you run checkpatch.pl on your path?
+>>
+>> Yes, I have run checkpatch on my file and it showed no errors or warnings.
+>
+
+Surprising.
+
+Nevertheless, this kind of cosmetic patch is not good because it makes  
+backporting fixes to stable a nightmare and it makes the use of git  
+blame less easy, all this for no real added value.
+
+>>
+>> > Signed-off-by: Shubhankar Kuranagatti <shubhankarvk@gmail.com>
+>> > ---
+>> >  drivers/crypto/talitos.c | 198 +++++++++++++++++++--------------------
+>> >  1 file changed, 99 insertions(+), 99 deletions(-)
+>> >
+>> > diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+>> > index 25c9f825b8b5..e40f78ec8c4b 100644
+>> > --- a/drivers/crypto/talitos.c
+>> > +++ b/drivers/crypto/talitos.c
+>> > @@ -174,7 +174,7 @@ static int reset_channel(struct device *dev, int ch)
+>> >       /* and ICCR writeback, if available */
+>> >       if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
+>> >               setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
+>> > -                       TALITOS_CCCR_LO_IWSE);
+>> > +                             TALITOS_CCCR_LO_IWSE);
+>> >
+>> >       return 0;
+>> >  }
+>> > @@ -249,7 +249,7 @@ static int init_device(struct device *dev)
+>> >       /* disable integrity check error interrupts (use writeback
+>> instead) */
+>> >       if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
+>> >               setbits32(priv->reg_mdeu + TALITOS_EUICR_LO,
+>> > -                       TALITOS_MDEUICR_LO_ICE);
+>> > +                             TALITOS_MDEUICR_LO_ICE);
+>> >
+>> >       return 0;
+>> >  }
+>> > @@ -2276,12 +2276,12 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .maxauthsize = SHA1_DIGEST_SIZE,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
+>> > -                                  DESC_HDR_SEL0_AESU |
+>> > -                                  DESC_HDR_MODE0_AESU_CBC |
+>> > -                                  DESC_HDR_SEL1_MDEUA |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEU_SHA1_HMAC,
+>> > +                     DESC_HDR_SEL0_AESU |
+>> > +                     DESC_HDR_MODE0_AESU_CBC |
+>> > +                     DESC_HDR_SEL1_MDEUA |
+>> > +                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                     DESC_HDR_MODE1_MDEU_SHA1_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
+>> > @@ -2321,13 +2321,13 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .setkey = aead_des3_setkey,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
+>> > -                                  DESC_HDR_SEL0_DEU |
+>> > -                                  DESC_HDR_MODE0_DEU_CBC |
+>> > -                                  DESC_HDR_MODE0_DEU_3DES |
+>> > -                                  DESC_HDR_SEL1_MDEUA |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEU_SHA1_HMAC,
+>> > +                                     DESC_HDR_SEL0_DEU |
+>> > +                                     DESC_HDR_MODE0_DEU_CBC |
+>> > +                                     DESC_HDR_MODE0_DEU_3DES |
+>> > +                                     DESC_HDR_SEL1_MDEUA |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEU_SHA1_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
+>> > @@ -2413,13 +2413,13 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .setkey = aead_des3_setkey,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
+>> > -                                  DESC_HDR_SEL0_DEU |
+>> > -                                  DESC_HDR_MODE0_DEU_CBC |
+>> > -                                  DESC_HDR_MODE0_DEU_3DES |
+>> > -                                  DESC_HDR_SEL1_MDEUA |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEU_SHA224_HMAC,
+>> > +                                     DESC_HDR_SEL0_DEU |
+>> > +                                     DESC_HDR_MODE0_DEU_CBC |
+>> > +                                     DESC_HDR_MODE0_DEU_3DES |
+>> > +                                     DESC_HDR_SEL1_MDEUA |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEU_SHA224_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
+>> > @@ -2438,13 +2438,13 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .setkey = aead_des3_setkey,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU |
+>> > -                                  DESC_HDR_SEL0_DEU |
+>> > -                                  DESC_HDR_MODE0_DEU_CBC |
+>> > -                                  DESC_HDR_MODE0_DEU_3DES |
+>> > -                                  DESC_HDR_SEL1_MDEUA |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEU_SHA224_HMAC,
+>> > +                                     DESC_HDR_SEL0_DEU |
+>> > +                                     DESC_HDR_MODE0_DEU_CBC |
+>> > +                                     DESC_HDR_MODE0_DEU_3DES |
+>> > +                                     DESC_HDR_SEL1_MDEUA |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEU_SHA224_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .alg.aead = {
+>> > @@ -2460,12 +2460,12 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .maxauthsize = SHA256_DIGEST_SIZE,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
+>> > -                                  DESC_HDR_SEL0_AESU |
+>> > -                                  DESC_HDR_MODE0_AESU_CBC |
+>> > -                                  DESC_HDR_SEL1_MDEUA |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEU_SHA256_HMAC,
+>> > +                                     DESC_HDR_SEL0_AESU |
+>> > +                                     DESC_HDR_MODE0_AESU_CBC |
+>> > +                                     DESC_HDR_SEL1_MDEUA |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEU_SHA256_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
+>> > @@ -2505,13 +2505,13 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .setkey = aead_des3_setkey,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
+>> > -                                  DESC_HDR_SEL0_DEU |
+>> > -                                  DESC_HDR_MODE0_DEU_CBC |
+>> > -                                  DESC_HDR_MODE0_DEU_3DES |
+>> > -                                  DESC_HDR_SEL1_MDEUA |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEU_SHA256_HMAC,
+>> > +                                     DESC_HDR_SEL0_DEU |
+>> > +                                     DESC_HDR_MODE0_DEU_CBC |
+>> > +                                     DESC_HDR_MODE0_DEU_3DES |
+>> > +                                     DESC_HDR_SEL1_MDEUA |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEU_SHA256_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
+>> > @@ -2530,13 +2530,13 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .setkey = aead_des3_setkey,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU |
+>> > -                                  DESC_HDR_SEL0_DEU |
+>> > -                                  DESC_HDR_MODE0_DEU_CBC |
+>> > -                                  DESC_HDR_MODE0_DEU_3DES |
+>> > -                                  DESC_HDR_SEL1_MDEUA |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEU_SHA256_HMAC,
+>> > +                                     DESC_HDR_SEL0_DEU |
+>> > +                                     DESC_HDR_MODE0_DEU_CBC |
+>> > +                                     DESC_HDR_MODE0_DEU_3DES |
+>> > +                                     DESC_HDR_SEL1_MDEUA |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEU_SHA256_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .alg.aead = {
+>> > @@ -2552,12 +2552,12 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .maxauthsize = SHA384_DIGEST_SIZE,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
+>> > -                                  DESC_HDR_SEL0_AESU |
+>> > -                                  DESC_HDR_MODE0_AESU_CBC |
+>> > -                                  DESC_HDR_SEL1_MDEUB |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEUB_SHA384_HMAC,
+>> > +                                     DESC_HDR_SEL0_AESU |
+>> > +                                     DESC_HDR_MODE0_AESU_CBC |
+>> > +                                     DESC_HDR_SEL1_MDEUB |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEUB_SHA384_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .alg.aead = {
+>> > @@ -2575,13 +2575,13 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .setkey = aead_des3_setkey,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
+>> > -                                  DESC_HDR_SEL0_DEU |
+>> > -                                  DESC_HDR_MODE0_DEU_CBC |
+>> > -                                  DESC_HDR_MODE0_DEU_3DES |
+>> > -                                  DESC_HDR_SEL1_MDEUB |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEUB_SHA384_HMAC,
+>> > +                             DESC_HDR_SEL0_DEU |
+>> > +                             DESC_HDR_MODE0_DEU_CBC |
+>> > +                             DESC_HDR_MODE0_DEU_3DES |
+>> > +                             DESC_HDR_SEL1_MDEUB |
+>> > +                             DESC_HDR_MODE1_MDEU_INIT |
+>> > +                             DESC_HDR_MODE1_MDEU_PAD |
+>> > +                             DESC_HDR_MODE1_MDEUB_SHA384_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .alg.aead = {
+>> > @@ -2597,12 +2597,12 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .maxauthsize = SHA512_DIGEST_SIZE,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
+>> > -                                  DESC_HDR_SEL0_AESU |
+>> > -                                  DESC_HDR_MODE0_AESU_CBC |
+>> > -                                  DESC_HDR_SEL1_MDEUB |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEUB_SHA512_HMAC,
+>> > +                                     DESC_HDR_SEL0_AESU |
+>> > +                                     DESC_HDR_MODE0_AESU_CBC |
+>> > +                                     DESC_HDR_SEL1_MDEUB |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEUB_SHA512_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .alg.aead = {
+>> > @@ -2620,13 +2620,13 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .setkey = aead_des3_setkey,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
+>> > -                                  DESC_HDR_SEL0_DEU |
+>> > -                                  DESC_HDR_MODE0_DEU_CBC |
+>> > -                                  DESC_HDR_MODE0_DEU_3DES |
+>> > -                                  DESC_HDR_SEL1_MDEUB |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEUB_SHA512_HMAC,
+>> > +                                     DESC_HDR_SEL0_DEU |
+>> > +                                     DESC_HDR_MODE0_DEU_CBC |
+>> > +                                     DESC_HDR_MODE0_DEU_3DES |
+>> > +                                     DESC_HDR_SEL1_MDEUB |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEUB_SHA512_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .alg.aead = {
+>> > @@ -2642,12 +2642,12 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .maxauthsize = MD5_DIGEST_SIZE,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
+>> > -                                  DESC_HDR_SEL0_AESU |
+>> > -                                  DESC_HDR_MODE0_AESU_CBC |
+>> > -                                  DESC_HDR_SEL1_MDEUA |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEU_MD5_HMAC,
+>> > +                                     DESC_HDR_SEL0_AESU |
+>> > +                                     DESC_HDR_MODE0_AESU_CBC |
+>> > +                                     DESC_HDR_SEL1_MDEUA |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEU_MD5_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
+>> > @@ -2664,12 +2664,12 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .maxauthsize = MD5_DIGEST_SIZE,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU |
+>> > -                                  DESC_HDR_SEL0_AESU |
+>> > -                                  DESC_HDR_MODE0_AESU_CBC |
+>> > -                                  DESC_HDR_SEL1_MDEUA |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEU_MD5_HMAC,
+>> > +                                     DESC_HDR_SEL0_AESU |
+>> > +                                     DESC_HDR_MODE0_AESU_CBC |
+>> > +                                     DESC_HDR_SEL1_MDEUA |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEU_MD5_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .alg.aead = {
+>> > @@ -2686,13 +2686,13 @@ static struct talitos_alg_template driver_algs[]
+>> = {
+>> >                       .setkey = aead_des3_setkey,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
+>> > -                                  DESC_HDR_SEL0_DEU |
+>> > -                                  DESC_HDR_MODE0_DEU_CBC |
+>> > -                                  DESC_HDR_MODE0_DEU_3DES |
+>> > -                                  DESC_HDR_SEL1_MDEUA |
+>> > -                                  DESC_HDR_MODE1_MDEU_INIT |
+>> > -                                  DESC_HDR_MODE1_MDEU_PAD |
+>> > -                                  DESC_HDR_MODE1_MDEU_MD5_HMAC,
+>> > +                                     DESC_HDR_SEL0_DEU |
+>> > +                                     DESC_HDR_MODE0_DEU_CBC |
+>> > +                                     DESC_HDR_MODE0_DEU_3DES |
+>> > +                                     DESC_HDR_SEL1_MDEUA |
+>> > +                                     DESC_HDR_MODE1_MDEU_INIT |
+>> > +                                     DESC_HDR_MODE1_MDEU_PAD |
+>> > +                                     DESC_HDR_MODE1_MDEU_MD5_HMAC,
+>> >       },
+>> >       {       .type = CRYPTO_ALG_TYPE_AEAD,
+>> >               .priority = TALITOS_CRA_PRIORITY_AEAD_HSNA,
+>> > @@ -2839,9 +2839,9 @@ static struct talitos_alg_template driver_algs[] =
+>> {
+>> >                       .setkey = skcipher_des3_setkey,
+>> >               },
+>> >               .desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU
+>> |
+>> > -                                  DESC_HDR_SEL0_DEU |
+>> > -                                  DESC_HDR_MODE0_DEU_CBC |
+>> > -                                  DESC_HDR_MODE0_DEU_3DES,
+>> > +                                     DESC_HDR_SEL0_DEU |
+>> > +                                     DESC_HDR_MODE0_DEU_CBC |
+>> > +                                     DESC_HDR_MODE0_DEU_3DES,
+>> >       },
+>> >       /* AHASH algorithms. */
+>> >       {       .type = CRYPTO_ALG_TYPE_AHASH,
+>> > @@ -3131,7 +3131,7 @@ static int hw_supports(struct device *dev,
+>> > __be32 desc_hdr_template)
+>> >
+>> >       if (SECONDARY_EU(desc_hdr_template))
+>> >               ret = ret && (1 << SECONDARY_EU(desc_hdr_template)
+>> > -                           & priv->exec_units);
+>> > +                             & priv->exec_units);
+>> >
+>> >       return ret;
+>> >  }
+>> > @@ -3176,7 +3176,7 @@ static int talitos_remove(struct
+>> > platform_device *ofdev)
+>> >
+>> >  static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
+>> >                                                   struct
+>> talitos_alg_template
+>> > -                                                        *template)
+>> > +                                                     *template)
+>> >  {
+>> >       struct talitos_private *priv = dev_get_drvdata(dev);
+>> >       struct talitos_crypto_alg *t_alg;
+>> > --
+>> > 2.17.1
+>>
+>>
+>>
+
+
