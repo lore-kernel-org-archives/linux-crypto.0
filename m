@@ -2,168 +2,127 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20428C47084
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 May 2021 16:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C3B2C2B9F7
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 May 2021 03:54:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F05206141D
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 May 2021 16:29:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 275A761159
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 May 2021 03:54:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233494AbhEYQbG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 May 2021 12:31:06 -0400
-Received: from namei.org ([65.99.196.166]:49298 "EHLO mail.namei.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233485AbhEYQbG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 May 2021 12:31:06 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mail.namei.org (Postfix) with ESMTPS id 9AC61DCF;
-        Tue, 25 May 2021 16:24:35 +0000 (UTC)
-Date:   Wed, 26 May 2021 02:24:35 +1000 (AEST)
-From:   James Morris <jmorris@namei.org>
-To:     linux-security-module@vger.kernel.org
-cc:     linux-kernel@vger.kernel.org, lwn@lwn.net,
-        fedora-selinux-list@redhat.com, linux-crypto@vger.kernel.org,
-        kernel-hardening@lists.openwall.com,
-        linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
-        Audit-ML <linux-audit@redhat.com>, gentoo-hardened@gentoo.org,
-        keyrings@linux-nfs.org, tpmdd-devel@lists.sourceforge.net,
-        Linux Security Summit Program Committee 
-        <lss-pc@lists.linuxfoundation.org>
-Subject: Re: [ANNOUNCE][CFP] Linux Security Summit 2021
-In-Reply-To: <c244f77-56a1-c089-521d-2e670488c10@namei.org>
-Message-ID: <5b3a0bf-226d-6ee-d0b-d6673eff32b2@namei.org>
-References: <c244f77-56a1-c089-521d-2e670488c10@namei.org>
+        id S232107AbhEZDzb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 May 2021 23:55:31 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5705 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231960AbhEZDzb (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 May 2021 23:55:31 -0400
+Received: from dggems703-chm.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FqcSB33GVz1BN3t;
+        Wed, 26 May 2021 11:51:06 +0800 (CST)
+Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
+ dggems703-chm.china.huawei.com (10.3.19.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 26 May 2021 11:53:58 +0800
+Received: from thunder-town.china.huawei.com (10.174.177.72) by
+ dggpemm500006.china.huawei.com (7.185.36.236) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 26 May 2021 11:53:56 +0800
+From:   Zhen Lei <thunder.leizhen@huawei.com>
+To:     Jason Wessel <jason.wessel@windriver.com>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Balbir Singh <bsingharora@gmail.com>,
+        Barry Song <song.bao.hua@hisilicon.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Marek Szyprowski" <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Darren Hart <dvhart@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Eric Biederman <ebiederm@xmission.com>,
+        "Naveen N . Rao" <naveen.n.rao@linux.ibm.com>,
+        Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        "Steffen Klassert" <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Oleg Nesterov <oleg@redhat.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Tejun Heo <tj@kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        kgdb-bugreport <kgdb-bugreport@lists.sourceforge.net>,
+        kexec <kexec@lists.infradead.org>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+CC:     Zhen Lei <thunder.leizhen@huawei.com>
+Subject: [PATCH 0/1] kernel: fix numerous spelling mistakes
+Date:   Wed, 26 May 2021 11:53:44 +0800
+Message-ID: <20210526035345.9113-1-thunder.leizhen@huawei.com>
+X-Mailer: git-send-email 2.26.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.177.72]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500006.china.huawei.com (7.185.36.236)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Note that the venue of LSS 2021 has now changed to Seattle, USA.
+These files are not organized by module(subdirectory), or even if they can, the
+number of spelling mistakes is small and not worth generating a separate patch.
 
-See https://events.linuxfoundation.org/linux-security-summit-north-america/
-
-The new event dates are 29 September to 01 October.
-
-The CFP closes on June 27th.
+This patch is based on the latest linux-next. But except the modification of
+kernel/delayacct.c, the remaining can also be applied on 5.13-rc3.
 
 
+Zhen Lei (1):
+  kernel: fix numerous spelling mistakes
 
-
-
-On Tue, 9 Feb 2021, James Morris wrote:
-
-> ==============================================================================
->                    ANNOUNCEMENT AND CALL FOR PARTICIPATION
-> 
->                          LINUX SECURITY SUMMIT 2021
->                              
->                               27-29 September
->                               Dublin, Ireland
-> ==============================================================================
-> 
-> DESCRIPTION
->  
-> Linux Security Summit (LSS) is a technical forum for collaboration between
-> Linux developers, researchers, and end-users.  Its primary aim is to foster
-> community efforts in analyzing and solving Linux security challenges.
-> 
->  The program committee currently seeks proposals for:
->  
->    * Refereed Presentations:
->      45 minutes in length.
->  
->    * Panel Discussion Topics:
->      45 minutes in length.
->  
->    * Short Topics:
->      30 minutes in total, including at least 10 minutes discussion.
->  
->    * Tutorials
->      90 minutes in length.
->  
-> Tutorial sessions should be focused on advanced Linux security defense
-> topics within areas such as the kernel, compiler, and security-related
-> libraries.  Priority will be given to tutorials created for this conference,
-> and those where the presenter a leading subject matter expert on the topic.
->  
-> Topic areas include, but are not limited to:
->  
->    * Kernel self-protection
->    * Access control
->    * Cryptography and key management
->    * Integrity policy and enforcement
->    * Hardware Security
->    * IoT and embedded security
->    * Virtualization and containers
->    * System-specific system hardening
->    * Case studies
->    * Security tools
->    * Security UX
->    * Emerging technologies, threats & techniques
-> 
->   Proposals should be submitted via:
->     https://events.linuxfoundation.org/linux-security-summit-europe/program/cfp/
-> 
-> 
-> ** Note that for 2021, the North American and European events are combined into
-> a single event planned for Dublin, Ireland. **
->  
-> 
-> DATES
->  
->   * CFP close:            June 27
->   * CFP notifications:    July 20
->   * Schedule announced:   July 22
->   * Event:                September 27-29
-> 
-> WHO SHOULD ATTEND
->  
-> We're seeking a diverse range of attendees and welcome participation by
-> people involved in Linux security development, operations, and research.
->  
-> LSS is a unique global event that provides the opportunity to present and
-> discuss your work or research with key Linux security community members and
-> maintainers.  It's also useful for those who wish to keep up with the latest
-> in Linux security development and to provide input to the development
-> process.
-> 
-> WEB SITE
-> 
->     https://events.linuxfoundation.org/linux-security-summit-europe/
-> 
-> TWITTER
-> 
->   For event updates and announcements, follow:
-> 
->     https://twitter.com/LinuxSecSummit
->   
->     #linuxsecuritysummit
-> 
-> PROGRAM COMMITTEE
-> 
->   The program committee for LSS 2021 is:
-> 
->     * James Morris, Microsoft
->     * Serge Hallyn, Cisco
->     * Paul Moore, Cisco
->     * Stephen Smalley, NSA
->     * Elena Reshetova, Intel
->     * John Johansen, Canonical
->     * Kees Cook, Google
->     * Casey Schaufler, Intel
->     * Mimi Zohar, IBM
->     * David A. Wheeler, Institute for Defense Analyses
-> 
->   The program committee may be contacted as a group via email:
->     lss-pc () lists.linuxfoundation.org
-> 
-> 
+ kernel/acct.c                  | 2 +-
+ kernel/context_tracking.c      | 2 +-
+ kernel/cpu.c                   | 2 +-
+ kernel/debug/debug_core.c      | 2 +-
+ kernel/debug/kdb/kdb_main.c    | 8 ++++----
+ kernel/debug/kdb/kdb_private.h | 2 +-
+ kernel/delayacct.c             | 2 +-
+ kernel/dma/map_benchmark.c     | 2 +-
+ kernel/dma/swiotlb.c           | 2 +-
+ kernel/exit.c                  | 2 +-
+ kernel/hung_task.c             | 2 +-
+ kernel/kexec_core.c            | 2 +-
+ kernel/kprobes.c               | 2 +-
+ kernel/latencytop.c            | 2 +-
+ kernel/module.c                | 4 ++--
+ kernel/notifier.c              | 2 +-
+ kernel/padata.c                | 2 +-
+ kernel/panic.c                 | 2 +-
+ kernel/pid.c                   | 2 +-
+ kernel/ptrace.c                | 2 +-
+ kernel/relay.c                 | 2 +-
+ kernel/signal.c                | 4 ++--
+ kernel/smp.c                   | 2 +-
+ kernel/taskstats.c             | 2 +-
+ kernel/time/alarmtimer.c       | 2 +-
+ kernel/time/timer.c            | 4 ++--
+ kernel/umh.c                   | 2 +-
+ kernel/user_namespace.c        | 2 +-
+ kernel/usermode_driver.c       | 2 +-
+ kernel/watchdog.c              | 2 +-
+ kernel/workqueue.c             | 4 ++--
+ 31 files changed, 38 insertions(+), 38 deletions(-)
 
 -- 
-James Morris
-<jmorris@namei.org>
+2.25.1
+
 
