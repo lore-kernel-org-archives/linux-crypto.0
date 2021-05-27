@@ -2,149 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A04FEC4708B
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 13:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F837C4707F
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 16:12:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85788613CC
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 13:55:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BDD661248
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 16:12:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236685AbhE0N4d (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 May 2021 09:56:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40898 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236696AbhE0N4U (ORCPT
+        id S237061AbhE0QON (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 May 2021 12:14:13 -0400
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.81]:10366 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235776AbhE0QOM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 May 2021 09:56:20 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20AA6C06138D;
-        Thu, 27 May 2021 06:54:47 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id t21so24188plo.2;
-        Thu, 27 May 2021 06:54:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=e2Q9Fi4+Y3HDr0p6x7AzX3U4YPXNdxuFZ7l9M0bi/AI=;
-        b=qnB5RTc/6YtVrmIAgqR+Rr40dJeVcNVXbAQZVC8mLbmSj015v7oAcLdkklaMEt0zEa
-         CkL1MEkQA5E38KMEYXb8XIz/6CY2KwU+3bqo1pu06CINeMlOz4LOQ9+lF1D+IV7hcGEx
-         n9OUpJs4nr78QHJ06woTHGZahnmlfxZRAykB5wA8yJaG3GhPRRhoh56g+iN7J0szLGB6
-         slPwUQY+Wf7VzsFyPE80N7QqOfkXzI+w5o+no6YCFa5HSfQuACesMYWvq32xirStu1YX
-         iJWeLm1dT/pXwEsSZ6Twb8mMGpCftmw4ezSB30i7gvkieGakCIg23Bt83L06mdjzV5sk
-         cbNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=e2Q9Fi4+Y3HDr0p6x7AzX3U4YPXNdxuFZ7l9M0bi/AI=;
-        b=f2qrdaGap/BXqZ7i2sCKmLnVC8GOlaZ3xSHWiXaBQcZqqtcVMMsMKBdHMGsVtWyLCc
-         Ua7hnrlzKwBftutRi+3jBR/ayHY1gj0Wae6jddfmrpS0r6dFzEYYjJOg4RQuLwSx/PSa
-         fVQa6UMMyJrNoOWxvXok+Ww0QtUgnBWGEiUguK/uep5BydOPp8qgk4eNKx7mCW9NWWk6
-         fK4T4IbAG3QhWu49R3h+pweQiGxqrCznrzWtyAxvJy+nxV8EoMP+OVFrxwmJN8Zp+H9o
-         3Y36CJIvKOYQIAJGOkmcfXcRVwilDcXrGczI+sTfKMdvYESfg2dOywqQpyLm6PZLTMLS
-         Bi+A==
-X-Gm-Message-State: AOAM533P6afiH0o+ARUDHGJ8du+sm2c6FYqDPUc/sHjOMfl7ukvmFA32
-        NMmW0tIfNvGrj/WQ9UxClXBBYIZaIy4=
-X-Google-Smtp-Source: ABdhPJyQUMsBrYjMTZ9of8jWYyYdJXwXhPAvB1qiqKeQreJ0Iw3GmWjgpd3Mi4dsoJyq8wiUlxPWpg==
-X-Received: by 2002:a17:90a:5309:: with SMTP id x9mr9483917pjh.111.1622123686351;
-        Thu, 27 May 2021 06:54:46 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.39])
-        by smtp.gmail.com with ESMTPSA id 10sm2163387pgl.39.2021.05.27.06.54.43
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 27 May 2021 06:54:46 -0700 (PDT)
-From:   Hongbo Li <herbert.tencent@gmail.com>
-To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, ebiggers@kernel.org,
-        dhowells@redhat.com, jarkko@kernel.org,
-        tianjia.zhang@linux.alibaba.com, herberthbli@tencent.com
-Cc:     linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
-Subject: [PATCH v2 7/7] crypto: add eddsa test vector
-Date:   Thu, 27 May 2021 21:53:35 +0800
-Message-Id: <1622123615-15517-8-git-send-email-herbert.tencent@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1622123615-15517-1-git-send-email-herbert.tencent@gmail.com>
-References: <1622123615-15517-1-git-send-email-herbert.tencent@gmail.com>
+        Thu, 27 May 2021 12:14:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1622131879; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=L1Xnks6vErY0v6eEsjYD04tzc4I8FlY6WQ22pL41gMjxsVXMidOoKAOOwSSwsj3VAY
+    RSIXZaMqzemZfWEfKT4/fKdAJVVJCSS7uIIO9gS+2+sKkp/aZzkUwA15FKU0blTABIdh
+    20jGtMUZZso4Z+24VHlr4yRAy1GN5Qc5FLQ4WOO/Qjz6YH2jQJYkqvJKD4PUbfTZC/GR
+    dZJ0bC6Z47IyHRpqMRh8XI6YI9D+HYiLgwnFKCLld8JHBylgMBR3tit+ajoQGYgUBbcK
+    ZRmphbXFmdPm1ai6CNUcDx3zvJJY/4+XH7BgTdPieidbSfIG9njmEiaYweJ7QX5Jtz+V
+    GUQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1622131879;
+    s=strato-dkim-0002; d=strato.com;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=DaGsRIbTE+dpm/xL2jUOYDDmL1LWBM873TfFSQzlyAQ=;
+    b=Gl9cE2GL4Agrz7BbmthTrttlmTRC6rgj4Ed/ZqML5cOeYz1HkOq6amogXceh1wmoku
+    /IQGjcUGdt7Ym0JX9DLpf0kZfRwkM29pwTLALNGY5DLB2iE1dnHnU457enx17Dw4CpjE
+    OSBQS9TpOMN2QqB5Uv7WF1ZQtV/wvK3FnxclnuCWhSQZvoxvWagQ4MioCIKEM6QqkHK1
+    rpSMfPlttCUT5MbjFshK43pj5uh6iGec4bTgmgtRa0A5Kjc2udGTw8WXDD4Owre7Bare
+    aFEmE5w7llyT4Ptu4/NdZlWCRUJzHejD8rXagahDOeZGGnWln+v76hV9at/NBp4qy29A
+    Cy+g==
+ARC-Authentication-Results: i=1; strato.com;
+    dkim=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1622131879;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=DaGsRIbTE+dpm/xL2jUOYDDmL1LWBM873TfFSQzlyAQ=;
+    b=UTxleyIp1j06XoUdO7jJdHSwlVK5i21B6ldGLZiwNzsAGpFvmmgW5Kqvi+Gp38CGEK
+    az45TAmdNg5AAS8xaC3wRXnSvR0WJkL8mTCru56Tcpf647KYh5ht5i6hmePMf+ZKN+6H
+    H9mj+AVG7k+cufv0sF+2spJm7Bfg2lHAjU2yWqlpEqkgW7PebjCuicdDzl/09KCZZ8Yy
+    w4ybe2ypUcsgONfE+0cxL7Agjv1dvdewFl7SVIyAgGaC1CpENcs3096AKN9s04amvTuo
+    sqNkesgjP2VlzUjK15FG2/1w1DOVenaUookzKAB7Dd12R5rnmUSHacQ10YhV8CyfMjQu
+    Y27Q==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbJvSfFeK2"
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 47.26.3 DYNA|AUTH)
+    with ESMTPSA id R0123ax4RGBG0Td
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Thu, 27 May 2021 18:11:16 +0200 (CEST)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
+Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>
+Subject: Re: [PATCH v40 00/13] /dev/random - a new approach
+Date:   Thu, 27 May 2021 18:07:24 +0200
+Message-ID: <11281728.7PdXrjIb7g@positron.chronox.de>
+In-Reply-To: <18450229.rjpLZT9oXI@positron.chronox.de>
+References: <18450229.rjpLZT9oXI@positron.chronox.de>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Hongbo Li <herberthbli@tencent.com>
+Hi,
 
-This patch adds the test vector for ed25519.
-The test vector is from RFC8032 section 7.1 [1]
+I prepared a small presentation providing a good overview of the LRNG if you 
+do not want to go through the lengthy design document.
 
-[1]https://datatracker.ietf.org/doc/html/rfc8032#section-7.1
+It is available at [1].
 
-Signed-off-by: Hongbo Li <herberthbli@tencent.com>
----
- crypto/testmgr.c |  6 ++++++
- crypto/testmgr.h | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+[1] http://www.chronox.de/lrng/doc/lrng_presentation_v40.pdf
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 10c5b3b01ec4..498d1866ef77 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4938,6 +4938,12 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.suite = {
- 			.akcipher = __VECS(ecrdsa_tv_template)
- 		}
-+	}, {
-+		.alg = "eddsa-25519",
-+		.test = alg_test_akcipher,
-+		.suite = {
-+			.akcipher = __VECS(eddsa_25519_tv_template)
-+		}
- 	}, {
- 		.alg = "essiv(authenc(hmac(sha256),cbc(aes)),sha256)",
- 		.test = alg_test_aead,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 34e4a3db3991..11807a308ef9 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -1144,6 +1144,38 @@ static const struct akcipher_testvec ecrdsa_tv_template[] = {
- 	},
- };
- 
-+/*
-+ * EDDSA test vectors.
-+ * From RFC8032 section 7.1
-+ */
-+static const struct akcipher_testvec eddsa_25519_tv_template[] = {
-+	{
-+	.key =
-+	"\x3d\x40\x17\xc3\xe8\x43\x89\x5a\x92\xb7\x0a\xa7\x4d\x1b\x7e\xbc"
-+	"\x9c\x98\x2c\xcf\x2e\xc4\x96\x8c\xc0\xcd\x55\xf1\x2a\xf4\x66\x0c",
-+	.key_len = 32,
-+	/*
-+	 * RFC8032 section 5.1.7. m is SHA512(dom2(F, C) || R || A || PH(M))
-+	 * M is 0x72
-+	 */
-+	.m =
-+	"\xa2\x71\xdf\x0d\x2b\x0d\x03\xbd\x17\xb4\xed\x9a\x4b\x6a\xfd\xdf"
-+	"\x2e\x73\x28\x7f\xd6\x30\xf1\xa1\x37\xd8\x7c\xe8\x73\xa5\x91\xcc"
-+	"\x31\xb6\xdd\x85\x2a\x98\xb5\xdd\x12\x26\xfe\x99\x3d\x82\x28\x27"
-+	"\x8c\xeb\xa2\x1f\x80\xb8\xfc\x95\x98\x6a\x70\xd7\x1e\xdf\x3f\xaf",
-+	.m_size = 64,
-+	.c =
-+	"\x92\xa0\x09\xa9\xf0\xd4\xca\xb8\x72\x0e\x82\x0b\x5f\x64\x25\x40"
-+	"\xa2\xb2\x7b\x54\x16\x50\x3f\x8f\xb3\x76\x22\x23\xeb\xdb\x69\xda"
-+	"\x08\x5a\xc1\xe4\x3e\x15\x99\x6e\x45\x8f\x36\x13\xd0\xf1\x1d\x8c"
-+	"\x38\x7b\x2e\xae\xb4\x30\x2a\xee\xb0\x0d\x29\x16\x12\xbb\x0c\x00",
-+	.c_size = 64,
-+	.algo = OID_ed25519,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	}
-+};
-+
- /*
-  * PKCS#1 RSA test vectors. Obtained from CAVS testing.
-  */
--- 
-2.27.0
+Ciao
+Stephan
+
 
