@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2984FC4708A
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 19:13:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0897DC4707F
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 19:13:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0AE576139A
+	by mail.kernel.org (Postfix) with ESMTP id E67C96135F
 	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 19:13:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234629AbhE0TO6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 May 2021 15:14:58 -0400
+        id S234641AbhE0TPA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 May 2021 15:15:00 -0400
 Received: from mga06.intel.com ([134.134.136.31]:7489 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234233AbhE0TO6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 May 2021 15:14:58 -0400
-IronPort-SDR: 4uMrCnngX9fCyfkfEx4r7rGMYKIszLbD8vE11GA/+vzs67HFlPlDcth57dnvtdYxKaJlUsEM0m
- WEH84C6mXhZQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,9997"; a="264012424"
+        id S234635AbhE0TO7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 May 2021 15:14:59 -0400
+IronPort-SDR: +8F/DGXIb2avip/D7jt9JEp0kg8JIYMLmqu/eXjkAMjALxZGOG7+MuCmR7kqnIW16kok6a6hKG
+ N8qQqyd9smMg==
+X-IronPort-AV: E=McAfee;i="6200,9189,9997"; a="264012431"
 X-IronPort-AV: E=Sophos;i="5.83,228,1616482800"; 
-   d="scan'208";a="264012424"
+   d="scan'208";a="264012431"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2021 12:13:24 -0700
-IronPort-SDR: u/n14luTwEIeNTrinNfa41kPyWwqSgESyTI3aGsVc8ytRQSjABb8qL10S6qzuylXMO1XKA+eHz
- 4zXP4l9Wtn4w==
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2021 12:13:25 -0700
+IronPort-SDR: 3pHGXxP8QbQ+k4FwRxTkooEtBQ7EcaPa25QLBEGnR62k4OcV6kn+AkmYOMbu/scuJ18pIzuBVi
+ 83wppLkV6eDQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.83,228,1616482800"; 
-   d="scan'208";a="480717736"
+   d="scan'208";a="480717742"
 Received: from silpixa00393544.ir.intel.com ([10.237.213.118])
-  by fmsmga002.fm.intel.com with ESMTP; 27 May 2021 12:13:23 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 27 May 2021 12:13:24 -0700
 From:   Marco Chiappero <marco.chiappero@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Marco Chiappero <marco.chiappero@intel.com>
-Subject: [PATCH 01/10] crypto: qat - use proper type for vf_mask
-Date:   Thu, 27 May 2021 20:12:42 +0100
-Message-Id: <20210527191251.6317-2-marco.chiappero@intel.com>
+        Marco Chiappero <marco.chiappero@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH 02/10] crypto: qat - remove empty sriov_configure()
+Date:   Thu, 27 May 2021 20:12:43 +0100
+Message-Id: <20210527191251.6317-3-marco.chiappero@intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210527191251.6317-1-marco.chiappero@intel.com>
 References: <20210527191251.6317-1-marco.chiappero@intel.com>
@@ -51,67 +51,96 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Remove the empty implementation of sriov_configure() and set the
+sriov_configure member of the pci_driver structure to NULL.
+This way, if a user tries to enable VFs on a device, when kernel and
+driver are built with CONFIG_PCI_IOV=n, the kernel reports an error
+message saying that the driver does not support SRIOV configuration via
+sysfs.
 
-Replace vf_mask type with unsigned long to avoid a stack-out-of-bound.
-
-This is to fix the following warning reported by KASAN the first time
-adf_msix_isr_ae() gets called.
-
-    [  692.091987] BUG: KASAN: stack-out-of-bounds in find_first_bit+0x28/0x50
-    [  692.092017] Read of size 8 at addr ffff88afdf789e60 by task swapper/32/0
-    [  692.092076] Call Trace:
-    [  692.092089]  <IRQ>
-    [  692.092101]  dump_stack+0x9c/0xcf
-    [  692.092132]  print_address_description.constprop.0+0x18/0x130
-    [  692.092164]  ? find_first_bit+0x28/0x50
-    [  692.092185]  kasan_report.cold+0x7f/0x111
-    [  692.092213]  ? static_obj+0x10/0x80
-    [  692.092234]  ? find_first_bit+0x28/0x50
-    [  692.092262]  find_first_bit+0x28/0x50
-    [  692.092288]  adf_msix_isr_ae+0x16e/0x230 [intel_qat]
-
-Fixes: ed8ccaef52fa ("crypto: qat - Add support for SRIOV")
+Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
+Co-developed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
 ---
- drivers/crypto/qat/qat_common/adf_isr.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/crypto/qat/qat_4xxx/adf_drv.c          | 2 ++
+ drivers/crypto/qat/qat_c3xxx/adf_drv.c         | 2 ++
+ drivers/crypto/qat/qat_c62x/adf_drv.c          | 2 ++
+ drivers/crypto/qat/qat_common/adf_common_drv.h | 5 -----
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c      | 2 ++
+ 5 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_isr.c b/drivers/crypto/qat/qat_common/adf_isr.c
-index e3ad5587be49..22f8ef5bfbc5 100644
---- a/drivers/crypto/qat/qat_common/adf_isr.c
-+++ b/drivers/crypto/qat/qat_common/adf_isr.c
-@@ -15,6 +15,10 @@
- #include "adf_transport_access_macros.h"
- #include "adf_transport_internal.h"
- 
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+index a8805c815d16..b77290d3da10 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+@@ -309,7 +309,9 @@ static struct pci_driver adf_driver = {
+ 	.name = ADF_4XXX_DEVICE_NAME,
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
 +#ifdef CONFIG_PCI_IOV
-+#define ADF_MAX_NUM_VFS	32
+ 	.sriov_configure = adf_sriov_configure,
 +#endif
-+
- static int adf_enable_msix(struct adf_accel_dev *accel_dev)
+ };
+ 
+ module_pci_driver(adf_driver);
+diff --git a/drivers/crypto/qat/qat_c3xxx/adf_drv.c b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
+index 7fb3343ae8b0..70be2383dce2 100644
+--- a/drivers/crypto/qat/qat_c3xxx/adf_drv.c
++++ b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
+@@ -32,7 +32,9 @@ static struct pci_driver adf_driver = {
+ 	.name = ADF_C3XXX_DEVICE_NAME,
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
++#ifdef CONFIG_PCI_IOV
+ 	.sriov_configure = adf_sriov_configure,
++#endif
+ };
+ 
+ static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
+diff --git a/drivers/crypto/qat/qat_c62x/adf_drv.c b/drivers/crypto/qat/qat_c62x/adf_drv.c
+index 1f5de442e1e6..ab03acb06365 100644
+--- a/drivers/crypto/qat/qat_c62x/adf_drv.c
++++ b/drivers/crypto/qat/qat_c62x/adf_drv.c
+@@ -32,7 +32,9 @@ static struct pci_driver adf_driver = {
+ 	.name = ADF_C62X_DEVICE_NAME,
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
++#ifdef CONFIG_PCI_IOV
+ 	.sriov_configure = adf_sriov_configure,
++#endif
+ };
+ 
+ static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
+diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
+index c61476553728..0150fce09600 100644
+--- a/drivers/crypto/qat/qat_common/adf_common_drv.h
++++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
+@@ -205,11 +205,6 @@ void adf_exit_pf_wq(void);
+ int adf_init_vf_wq(void);
+ void adf_exit_vf_wq(void);
+ #else
+-static inline int adf_sriov_configure(struct pci_dev *pdev, int numvfs)
+-{
+-	return 0;
+-}
+-
+ static inline void adf_disable_sriov(struct adf_accel_dev *accel_dev)
  {
- 	struct adf_accel_pci *pci_dev_info = &accel_dev->accel_pci_dev;
-@@ -72,7 +76,7 @@ static irqreturn_t adf_msix_isr_ae(int irq, void *dev_ptr)
- 		struct adf_bar *pmisc =
- 			&GET_BARS(accel_dev)[hw_data->get_misc_bar_id(hw_data)];
- 		void __iomem *pmisc_bar_addr = pmisc->virt_addr;
--		u32 vf_mask;
-+		unsigned long vf_mask;
+ }
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+index a9ec4357144c..31dd2a8e32b0 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+@@ -32,7 +32,9 @@ static struct pci_driver adf_driver = {
+ 	.name = ADF_DH895XCC_DEVICE_NAME,
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
++#ifdef CONFIG_PCI_IOV
+ 	.sriov_configure = adf_sriov_configure,
++#endif
+ };
  
- 		/* Get the interrupt sources triggered by VFs */
- 		vf_mask = ((ADF_CSR_RD(pmisc_bar_addr, ADF_ERRSOU5) &
-@@ -93,8 +97,7 @@ static irqreturn_t adf_msix_isr_ae(int irq, void *dev_ptr)
- 			 * unless the VF is malicious and is attempting to
- 			 * flood the host OS with VF2PF interrupts.
- 			 */
--			for_each_set_bit(i, (const unsigned long *)&vf_mask,
--					 (sizeof(vf_mask) * BITS_PER_BYTE)) {
-+			for_each_set_bit(i, &vf_mask, ADF_MAX_NUM_VFS) {
- 				vf_info = accel_dev->pf.vf_info + i;
- 
- 				if (!__ratelimit(&vf_info->vf2pf_ratelimit)) {
+ static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
 -- 
 2.26.2
 
