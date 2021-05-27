@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FB46C4707F
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 19:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A89AEC4708A
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 19:13:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 400E06139A
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 19:13:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 891D66135F
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 19:13:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234663AbhE0TPD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S234700AbhE0TPD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 27 May 2021 15:15:03 -0400
 Received: from mga06.intel.com ([134.134.136.31]:7489 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234700AbhE0TPB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 May 2021 15:15:01 -0400
-IronPort-SDR: m8vTblZcSyeZhrPhWcidaF7+/hXUQY3hSsEa0I50hTpADIMAJGtuVVahB7fhypk2k5XUZ89PBP
- N/Ti2JHvDolg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9997"; a="264012439"
+        id S234635AbhE0TPD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 May 2021 15:15:03 -0400
+IronPort-SDR: JRq42eTz/uHWfmlOJkSBrl1GOEg4I3WVC/xCaoiPjAtBgYOY7Yp+dWKxK/9lzCFwnNS3LYyDr4
+ WhShg4m2Qe3Q==
+X-IronPort-AV: E=McAfee;i="6200,9189,9997"; a="264012443"
 X-IronPort-AV: E=Sophos;i="5.83,228,1616482800"; 
-   d="scan'208";a="264012439"
+   d="scan'208";a="264012443"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2021 12:13:28 -0700
-IronPort-SDR: 18vNle/iBcNaUlzwCI9HWnTMZd6u/whLXx2F+OmB1H6n8FxWjDCtTN3OLI1q/jpPFxDiUI9tL7
- 75qydiDjHh0g==
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2021 12:13:29 -0700
+IronPort-SDR: zcKSbupV7B2jYexqM4bZBjR2wl5RTHQaLxqbXLTs1yPfTf83OhnTBF0Tf+3l5W5Qv323WTvxSg
+ EUhXylzE8RBQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.83,228,1616482800"; 
-   d="scan'208";a="480717758"
+   d="scan'208";a="480717768"
 Received: from silpixa00393544.ir.intel.com ([10.237.213.118])
-  by fmsmga002.fm.intel.com with ESMTP; 27 May 2021 12:13:27 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 27 May 2021 12:13:28 -0700
 From:   Marco Chiappero <marco.chiappero@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Marco Chiappero <marco.chiappero@intel.com>
-Subject: [PATCH 04/10] crypto: qat - do not ignore errors from enable_vf2pf_comms()
-Date:   Thu, 27 May 2021 20:12:45 +0100
-Message-Id: <20210527191251.6317-5-marco.chiappero@intel.com>
+Subject: [PATCH 05/10] crypto: qat - handle both source of interrupt in VF ISR
+Date:   Thu, 27 May 2021 20:12:46 +0100
+Message-Id: <20210527191251.6317-6-marco.chiappero@intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210527191251.6317-1-marco.chiappero@intel.com>
 References: <20210527191251.6317-1-marco.chiappero@intel.com>
@@ -53,42 +53,54 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-The function adf_dev_init() ignores the error code reported by
-enable_vf2pf_comms(). If the latter fails, e.g. the VF is not compatible
-with the pf, then the load of the VF driver progresses.
-This patch changes adf_dev_init() so that the error code from
-enable_vf2pf_comms() is returned to the caller.
+The top half of the VF drivers handled only a source at the time.
+If an interrupt for PF2VF and bundle occurred at the same time, the ISR
+scheduled only the bottom half for PF2VF.
+This patch fixes the VF top half so that if both sources of interrupt
+trigger at the same time, both bottom halves are scheduled.
+
+This patch is based on earlier work done by Conor McLoughlin.
 
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
 ---
- drivers/crypto/qat/qat_common/adf_init.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/crypto/qat/qat_common/adf_vf_isr.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_init.c b/drivers/crypto/qat/qat_common/adf_init.c
-index 14e9f3b22c60..346dcb8bcca5 100644
---- a/drivers/crypto/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/qat/qat_common/adf_init.c
-@@ -61,6 +61,7 @@ int adf_dev_init(struct adf_accel_dev *accel_dev)
- 	struct service_hndl *service;
- 	struct list_head *list_itr;
- 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	int ret;
+diff --git a/drivers/crypto/qat/qat_common/adf_vf_isr.c b/drivers/crypto/qat/qat_common/adf_vf_isr.c
+index 888388acb6bd..3e4f64d248f9 100644
+--- a/drivers/crypto/qat/qat_common/adf_vf_isr.c
++++ b/drivers/crypto/qat/qat_common/adf_vf_isr.c
+@@ -160,6 +160,7 @@ static irqreturn_t adf_isr(int irq, void *privdata)
+ 	struct adf_bar *pmisc =
+ 			&GET_BARS(accel_dev)[hw_data->get_misc_bar_id(hw_data)];
+ 	void __iomem *pmisc_bar_addr = pmisc->virt_addr;
++	bool handled = false;
+ 	u32 v_int;
  
- 	if (!hw_data) {
- 		dev_err(&GET_DEV(accel_dev),
-@@ -127,9 +128,9 @@ int adf_dev_init(struct adf_accel_dev *accel_dev)
+ 	/* Read VF INT source CSR to determine the source of VF interrupt */
+@@ -172,7 +173,7 @@ static irqreturn_t adf_isr(int irq, void *privdata)
+ 
+ 		/* Schedule tasklet to handle interrupt BH */
+ 		tasklet_hi_schedule(&accel_dev->vf.pf2vf_bh_tasklet);
+-		return IRQ_HANDLED;
++		handled = true;
  	}
  
- 	hw_data->enable_error_correction(accel_dev);
--	hw_data->enable_vf2pf_comms(accel_dev);
-+	ret = hw_data->enable_vf2pf_comms(accel_dev);
+ 	/* Check bundle interrupt */
+@@ -184,10 +185,10 @@ static irqreturn_t adf_isr(int irq, void *privdata)
+ 		csr_ops->write_csr_int_flag_and_col(bank->csr_addr,
+ 						    bank->bank_number, 0);
+ 		tasklet_hi_schedule(&bank->resp_handler);
+-		return IRQ_HANDLED;
++		handled = true;
+ 	}
  
--	return 0;
-+	return ret;
+-	return IRQ_NONE;
++	return handled ? IRQ_HANDLED : IRQ_NONE;
  }
- EXPORT_SYMBOL_GPL(adf_dev_init);
  
+ static int adf_request_msi_irq(struct adf_accel_dev *accel_dev)
 -- 
 2.26.2
 
