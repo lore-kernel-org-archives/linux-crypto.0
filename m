@@ -2,111 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E71B9C4707F
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 06:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1AF8C4708A
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 13:54:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C51C9613C9
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 06:28:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95168613BF
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 13:54:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233884AbhE0G36 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 May 2021 02:29:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50810 "EHLO
+        id S236638AbhE0N4B (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 May 2021 09:56:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbhE0G3u (ORCPT
+        with ESMTP id S236616AbhE0N4B (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 May 2021 02:29:50 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81817C061574;
-        Wed, 26 May 2021 23:28:15 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id m190so2942302pga.2;
-        Wed, 26 May 2021 23:28:15 -0700 (PDT)
+        Thu, 27 May 2021 09:56:01 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7641EC061574;
+        Thu, 27 May 2021 06:54:28 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id g18so645194pfr.2;
+        Thu, 27 May 2021 06:54:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :content-transfer-encoding:user-agent;
-        bh=vzY8Oad/4R9FZQwiT5mR4g0+2i9N6VivPydMdc1n6Lw=;
-        b=jV1LydVtgiAkGzkhsRGre3UOT0KKR7Q6JRQR+9bK/8iY/hT6uZn9cc7AcYtFm8ZoGp
-         RNgWfZUxeQjUQtejKhtLzBEC1RkLesoMSMd+/lUATBa47N/T5Lm+xCcQFIi+Ac+P7TDW
-         lWpxbifbvjvkyq0SACzQyuuZqUbzbNsbON3+Eo4VGdctbHN/3IagWrDi75F6lJTNsIF0
-         AAH6Pq388+sKOxxMmlUuA0we62AIzOw7c87lH+DZRbrmeMLXq8XsMyV2qEs4ZZo3PAN/
-         OpkaluVCDZ7v+IYc8t9KxrBb2RByoHDbTMNvwyjbe5OLw/+9EQR2/AGYt7p0ROht9rk3
-         fh/w==
+        h=from:to:cc:subject:date:message-id;
+        bh=LR6D5K3uAI+YCRmgnJRZEuK6Dn6CALSy8IeIHX8nBa4=;
+        b=poOiwLvNz1oNH1mN/IOC18I0gbkaEmZaSw/u6eJjwlJapDkW6gCbF/hyXclcjnDRmS
+         qNK1UbXZDXY+Mh8ep9U7fc4WbL9qDwIJdv0R+tnGydlnq5717DARIcGkjgv2nU8+QJXy
+         i8DCw0TszjvCWro0La1Ngw+vlBT5UjUIekzXDeUeOEfcgc09DKJEjGBcOof16YyBE00T
+         c7y5KuJPsrcP3Rcn3qXM5cSgjuzt1MUSEvalsukUjVx4snQnwR/2VcSOvXJgR790yS8Y
+         4UNYRLoacbKFsrwLJOeXuLfE8vmNBAGyY2oPbbPdzPmOf4sdXp3WjmHYY7+jQG8HVDBw
+         KbGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:content-transfer-encoding:user-agent;
-        bh=vzY8Oad/4R9FZQwiT5mR4g0+2i9N6VivPydMdc1n6Lw=;
-        b=c/vxr+RlbyKFtvZr1Dl9NQKp6OAy8+R6uuZ0rDZLpz8FWlWds9jMcMEhsQPjomp6jm
-         du64IO4vqPMH5CjSazAcQJ2W/fzILdSrZjNpVIWUWhfQ6zBEtMCn3UlCpFZwirLcboRV
-         0X5slS8aUhBRFglgwMxC4BH2jp3G0z4L5tPOZH8rPLMmnNd4JOzXH2cuYiQt2xXIpAUU
-         1TYHep/299+vDEw1UZasst3WNZPkNVE64GVOwtMtlx5DILp5/O/sjsj7LBg5eW9Yf0hj
-         d3xrQZ+35B8t9UAMyZuams+liQG/aXczFZ2TxC851WrDJ9CFVbXPgeYHwzVQbZLJfm9G
-         8Ijw==
-X-Gm-Message-State: AOAM530pS8EYxuVlLHXx/0Fr57aCMacxvv9lvPR2lPZJMOpgeU0z2Pbs
-        Rs9Zj4LiGRS8w0Mfg4b6pmY=
-X-Google-Smtp-Source: ABdhPJz6+4e2i6pbAyIN2RXp6pfitGlDeZtSkpa4S/KLBw1iB5ae/NT6z4jfA8knHCP36a+s61zV0w==
-X-Received: by 2002:a63:e015:: with SMTP id e21mr2277845pgh.442.1622096895122;
-        Wed, 26 May 2021 23:28:15 -0700 (PDT)
-Received: from raspberrypi ([125.141.84.155])
-        by smtp.gmail.com with ESMTPSA id s123sm935741pfb.78.2021.05.26.23.28.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 May 2021 23:28:14 -0700 (PDT)
-Date:   Thu, 27 May 2021 07:28:09 +0100
-From:   Austin Kim <austindh.kim@gmail.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        catalin.marinas@arm.com, will@kernel.org,
-        john.johansen@canonical.com, jmorris@namei.org, serge@hallyn.com
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-security-module@vger.kernel.org,
-        linux-crypto@vger.kernel.org, austindh.kim@gmail.com,
-        austin.kim@lge.com
-Subject: [PATCH] crypto: arm64/gcm - remove Wunused-const-variable
- ghash_cpu_feature
-Message-ID: <20210527062809.GA1251@raspberrypi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=LR6D5K3uAI+YCRmgnJRZEuK6Dn6CALSy8IeIHX8nBa4=;
+        b=E6qnEOUzaFHMZwAZ0shPAf/fqNcfFxNuZfH/ISJcjRgH5huQeUWHGXNBka1gjqEtc2
+         fV1m2cvG2hP8UHKLtgc9ZBVah8/UT58IhIsCfk3vqkx9AAL1ks0dqarMWgkinBOgE06G
+         8PeJjqtrLz8SM7cSEGk6L1/LoH3cvCAYt1PPeZ9Nyt1H1cH3ydF/cLh/JSeCyTBNjhkO
+         qf3z5ZToUXmpPgDTN0YhUL0O09wg/VpWBFwv1VLkLUttrBS6QC49vBkKmsBtLiKou1Fa
+         +dIJ6GESDBZdUrVkTWJsBCHQoxrQl7kOuagr/iCf2nXTAL/PiUFjPoG9T81EtgRGoLDr
+         kNjg==
+X-Gm-Message-State: AOAM531oFebpAVA9R9To6ZP5u7oGTyH+6QYP4+15maSF/5pugS6IOA9X
+        mzh+7f5FluWSt2N5EGVXtum5umv8PvE=
+X-Google-Smtp-Source: ABdhPJxRRHW6DmbG3lK+mQLgTmkdC5dMuTV8JWB+J6eaJpTzYoRkr4gJTz29JnqgpbIk1BMYlzjzpQ==
+X-Received: by 2002:a05:6a00:1992:b029:2df:b93b:49a with SMTP id d18-20020a056a001992b02902dfb93b049amr3439399pfl.11.1622123667633;
+        Thu, 27 May 2021 06:54:27 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.39])
+        by smtp.gmail.com with ESMTPSA id 10sm2163387pgl.39.2021.05.27.06.54.25
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 27 May 2021 06:54:27 -0700 (PDT)
+From:   Hongbo Li <herbert.tencent@gmail.com>
+To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        dhowells@redhat.com, jarkko@kernel.org,
+        tianjia.zhang@linux.alibaba.com, herberthbli@tencent.com
+Cc:     linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
+Subject: [PATCH v2 0/7] crypto: add eddsa support for x509
+Date:   Thu, 27 May 2021 21:53:28 +0800
+Message-Id: <1622123615-15517-1-git-send-email-herbert.tencent@gmail.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-GCC compiler complains with below messages.
+From: Hongbo Li <herberthbli@tencent.com>
 
-   warning: ‘ghash_cpu_feature’ defined but not used [-Wunused-const-variable=]
-   static const struct cpu_feature ghash_cpu_feature[] = {
-			    ^~~~~~~~~~~~~~~~~
+This series of patches add support for x509 cert signed by eddsa,
+which is described in RFC8032 [1], currently ed25519 only.
 
-The variable with MODULE_DEVICE_TABLE() is registered as platform_driver.
-But ghash_cpu_feature is not used, so remove ghash_cpu_feature.
+Curve25519 is an elliptic curve used for key agreement(ECDH).
+It is a Montgomery curve.
 
-Signed-off-by: Austin Kim <austindh.kim@gmail.com>
----
- arch/arm64/crypto/ghash-ce-glue.c | 5 -----
- 1 file changed, 5 deletions(-)
+Edwards25519 is a twisted Edwards curve and birationally equivalent
+to Curve25519, the birational maps are described in rfc7748 section 4.1.[2]
+Ed25519 is a Digital Signature Algorithm over Edwards25519.
 
-diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-index 720cd3a58da3..c3f27d0d5329 100644
---- a/arch/arm64/crypto/ghash-ce-glue.c
-+++ b/arch/arm64/crypto/ghash-ce-glue.c
-@@ -615,10 +615,5 @@ static void __exit ghash_ce_mod_exit(void)
- 		crypto_unregister_shash(&ghash_alg);
- }
- 
--static const struct cpu_feature ghash_cpu_feature[] = {
--	{ cpu_feature(PMULL) }, { }
--};
--MODULE_DEVICE_TABLE(cpu, ghash_cpu_feature);
--
- module_init(ghash_ce_mod_init);
- module_exit(ghash_ce_mod_exit);
+The kernel's curve25519 code is used for ECDH, such as set_secret(),
+generate_public_key() and compute_shared_secret(), these are useless
+for eddsa, and can not be reused, eddsa do the verification on the
+given public key and signature.
+
+According to RFC8032 section 4 [3], there're two variants: PureEdDSA and
+HashEdDSA. These patches support PureEdDSA which named Ed25519.
+
+Patch1 fix a memory leak bug in sm2.
+
+Patch2 fix a mpi_resize bug, this bug will cause eddsa verification failed.
+
+Patch3 exports some mpi common functions.
+
+Patch4 makes x509 layer support eddsa.
+
+Patch5 moves some common code in sm2 to separate files. These code is also
+       used by eddsa.
+
+Patch6 is the implementation of eddsa verification according to RFC8032
+       section 5.1.7 [4].
+
+Patch7 adds test vector for eddsa.
+
+Test by the following script:
+
+keyctl newring test @u
+
+while :; do
+    certfile="cert.der"
+
+    openssl req \
+            -x509 \
+            -newkey ED25519 \
+            -keyout key.pem \
+            -days 365 \
+            -subj '/CN=test' \
+            -nodes \
+            -outform der \
+            -out ${certfile} 2>/dev/null
+
+    exp=0
+    id=$(keyctl padd asymmetric testkey %keyring:test < "${certfile}")
+    rc=$?
+    if [ $rc -ne $exp ]; then
+        case "$exp" in
+            0) echo "Error: Could not load ed25519 certificate $certfile!";
+        esac
+        exit 1
+    else
+        case "$rc" in
+            0) printf "load ed25519 cert keyid: %-10s\n" $id;
+        esac
+    fi
+done
+
+Best Regards
+Hongbo
+
+[1] https://datatracker.ietf.org/doc/html/rfc8032
+[2] https://datatracker.ietf.org/doc/html/rfc7748#section-4.1
+[3] https://datatracker.ietf.org/doc/html/rfc8032#section-4
+[4] https://datatracker.ietf.org/doc/html/rfc8032#section-5.1.7
+
+v1->v2:
+  -fix the warning "warning: no previous prototype"
+   reported-by: kernel test robot <lkp@intel.com>
+  -add more comments about these patches
+
+Hongbo Li (7):
+  crypto: fix a memory leak in sm2
+  lib/mpi: use kcalloc in mpi_resize
+  lib/mpi: export some common function
+  x509: add support for eddsa
+  crypto: move common code in sm2 to ec_mpi.c and ec_mpi.h
+  crypto: ed25519 cert verification
+  crypto: add eddsa test vector
+
+ crypto/Kconfig                            |  15 +
+ crypto/Makefile                           |   4 +
+ crypto/asymmetric_keys/public_key.c       |  73 ++++-
+ crypto/asymmetric_keys/x509_cert_parser.c |  14 +-
+ crypto/asymmetric_keys/x509_public_key.c  |   4 +-
+ crypto/ec_mpi.c                           |  82 ++++++
+ crypto/ec_mpi.h                           |  37 +++
+ crypto/eddsa.c                            | 326 ++++++++++++++++++++++
+ crypto/sm2.c                              | 104 +------
+ crypto/testmgr.c                          |   6 +
+ crypto/testmgr.h                          |  32 +++
+ include/linux/oid_registry.h              |   1 +
+ lib/mpi/mpi-add.c                         |   4 +-
+ lib/mpi/mpiutil.c                         |   2 +-
+ 14 files changed, 591 insertions(+), 113 deletions(-)
+ create mode 100644 crypto/ec_mpi.c
+ create mode 100644 crypto/ec_mpi.h
+ create mode 100644 crypto/eddsa.c
+
 -- 
-2.20.1
+2.27.0
 
