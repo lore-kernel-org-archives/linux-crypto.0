@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6918C4707F
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 19:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C14CC4708A
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 19:13:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8FD6613DD
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 19:13:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 691AE613AB
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 19:13:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234714AbhE0TPJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S234635AbhE0TPJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 27 May 2021 15:15:09 -0400
-Received: from mga06.intel.com ([134.134.136.31]:7504 "EHLO mga06.intel.com"
+Received: from mga06.intel.com ([134.134.136.31]:7511 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234770AbhE0TPF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 May 2021 15:15:05 -0400
-IronPort-SDR: dp9iJ5DghotfCgypiTJcfFLPpBbCokal4sVYLnT2fJWsIt4e8t6gTvYnIMU23YAVTMj/9u8O8F
- +X7h1eoDfI9A==
-X-IronPort-AV: E=McAfee;i="6200,9189,9997"; a="264012450"
+        id S234775AbhE0TPI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 May 2021 15:15:08 -0400
+IronPort-SDR: 2zob3/fzHKRnLO7t4p3SM7jGuahaGrGYof7U8qM/d/qshTmRX+fGc/uHlR/GeYjF83Q90K9QEG
+ oIVubZKzCekQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9997"; a="264012458"
 X-IronPort-AV: E=Sophos;i="5.83,228,1616482800"; 
-   d="scan'208";a="264012450"
+   d="scan'208";a="264012458"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2021 12:13:32 -0700
-IronPort-SDR: hWOakFUOzuwy7T04a4o2bEcoH6N8NT0nkQLbu3i2YOGYKKA67QOhELpriZefWr5X5vrQ66x6Bx
- RD0zANOenQ4w==
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2021 12:13:33 -0700
+IronPort-SDR: ENe62335a0arQYclZ3Pg3Ejc2ygM0u5UM3mFzF/XE2dPOz7VAuo8MSW8jdnYogJvBmBI1KA8/f
+ M9jO1btISNrw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.83,228,1616482800"; 
-   d="scan'208";a="480717785"
+   d="scan'208";a="480717794"
 Received: from silpixa00393544.ir.intel.com ([10.237.213.118])
-  by fmsmga002.fm.intel.com with ESMTP; 27 May 2021 12:13:30 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 27 May 2021 12:13:32 -0700
 From:   Marco Chiappero <marco.chiappero@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         Marco Chiappero <marco.chiappero@intel.com>,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH 07/10] crypto: qat - prevent spurious MSI interrupt in PF
-Date:   Thu, 27 May 2021 20:12:48 +0100
-Message-Id: <20210527191251.6317-8-marco.chiappero@intel.com>
+Subject: [PATCH 08/10] crypto: qat - rename compatibility version definition
+Date:   Thu, 27 May 2021 20:12:49 +0100
+Message-Id: <20210527191251.6317-9-marco.chiappero@intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210527191251.6317-1-marco.chiappero@intel.com>
 References: <20210527191251.6317-1-marco.chiappero@intel.com>
@@ -51,86 +51,193 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There is a chance of getting a "spurious interrupt" warning from the
-adf_vf2pf_bh_handler() bottom half when multiple interrupts come
-simultaneously from different VFs.
-Since the source VF is identified by a positional bit set in the ERRSOU
-registers and that it is not cleared until the bottom half completes,
-new top halves from other VFs may reschedule a second bottom half
-for previous interrupts.
-
-This patch solves the problem in the ISR handler by not considering
-sources with already disabled interrupts (and processing pending), as
-set in the ERRMSK registers.
-
-Also, move some definitions where actually needed.
+Rename ADF_PFVF_COMPATIBILITY_VERSION in ADF_PFVF_COMPAT_THIS_VERSION
+since it is used to indicate the current version of the PFVF protocol.
 
 Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- .../crypto/qat/qat_common/adf_accel_devices.h |  2 --
- drivers/crypto/qat/qat_common/adf_isr.c       | 25 +++++++++++++++----
- 2 files changed, 20 insertions(+), 7 deletions(-)
+ drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c |  2 +-
+ .../crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |  2 +-
+ .../qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c      |  2 +-
+ drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c |  2 +-
+ .../crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c |  2 +-
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.c  | 18 +++++++++---------
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.h  |  2 +-
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c    |  2 +-
+ .../qat_dh895xccvf/adf_dh895xccvf_hw_data.c    |  2 +-
+ 9 files changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-index ac435b44f1d2..2ee11b4763cd 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-@@ -18,8 +18,6 @@
- #define ADF_4XXX_DEVICE_NAME "4xxx"
- #define ADF_4XXX_PCI_DEVICE_ID 0x4940
- #define ADF_4XXXIOV_PCI_DEVICE_ID 0x4941
--#define ADF_ERRSOU3 (0x3A000 + 0x0C)
--#define ADF_ERRSOU5 (0x3A000 + 0xD8)
- #define ADF_DEVICE_FUSECTL_OFFSET 0x40
- #define ADF_DEVICE_LEGFUSE_OFFSET 0x4C
- #define ADF_DEVICE_FUSECTL_MASK 0x80000000
-diff --git a/drivers/crypto/qat/qat_common/adf_isr.c b/drivers/crypto/qat/qat_common/adf_isr.c
-index 22f8ef5bfbc5..403d2fc00a7d 100644
---- a/drivers/crypto/qat/qat_common/adf_isr.c
-+++ b/drivers/crypto/qat/qat_common/adf_isr.c
-@@ -17,6 +17,12 @@
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
+index 3524ddd48930..a72142413caa 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
+@@ -218,7 +218,7 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data)
+ 	hw_data->enable_ints = adf_enable_ints;
+ 	hw_data->enable_vf2pf_comms = adf_pf_enable_vf2pf_comms;
+ 	hw_data->reset_device = adf_reset_flr;
+-	hw_data->min_iov_compat_ver = ADF_PFVF_COMPATIBILITY_VERSION;
++	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
+ 	hw_data->admin_ae_mask = ADF_4XXX_ADMIN_AE_MASK;
+ 	hw_data->uof_get_num_objs = uof_get_num_objs;
+ 	hw_data->uof_get_name = uof_get_name;
+diff --git a/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c b/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c
+index 1dd64af22bea..1c7f6a6f6f2d 100644
+--- a/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c
++++ b/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c
+@@ -211,7 +211,7 @@ void adf_init_hw_data_c3xxx(struct adf_hw_device_data *hw_data)
+ 	hw_data->enable_ints = adf_enable_ints;
+ 	hw_data->enable_vf2pf_comms = adf_pf_enable_vf2pf_comms;
+ 	hw_data->reset_device = adf_reset_flr;
+-	hw_data->min_iov_compat_ver = ADF_PFVF_COMPATIBILITY_VERSION;
++	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
+ 	hw_data->set_ssm_wdtimer = adf_gen2_set_ssm_wdtimer;
+ 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
+ }
+diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c b/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
+index 15f6b9bdfb22..476a4bf3de56 100644
+--- a/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
++++ b/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
+@@ -96,7 +96,7 @@ void adf_init_hw_data_c3xxxiov(struct adf_hw_device_data *hw_data)
+ 	hw_data->get_sku = get_sku;
+ 	hw_data->enable_ints = adf_vf_void_noop;
+ 	hw_data->enable_vf2pf_comms = adf_enable_vf2pf_comms;
+-	hw_data->min_iov_compat_ver = ADF_PFVF_COMPATIBILITY_VERSION;
++	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
+ 	hw_data->dev_class->instances++;
+ 	adf_devmgr_update_class_index(hw_data);
+ 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
+diff --git a/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
+index 30337390513c..a202f912820c 100644
+--- a/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
++++ b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
+@@ -213,7 +213,7 @@ void adf_init_hw_data_c62x(struct adf_hw_device_data *hw_data)
+ 	hw_data->enable_ints = adf_enable_ints;
+ 	hw_data->enable_vf2pf_comms = adf_pf_enable_vf2pf_comms;
+ 	hw_data->reset_device = adf_reset_flr;
+-	hw_data->min_iov_compat_ver = ADF_PFVF_COMPATIBILITY_VERSION;
++	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
+ 	hw_data->set_ssm_wdtimer = adf_gen2_set_ssm_wdtimer;
+ 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
+ }
+diff --git a/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c b/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c
+index d231583428c9..0c867208eb90 100644
+--- a/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c
++++ b/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c
+@@ -96,7 +96,7 @@ void adf_init_hw_data_c62xiov(struct adf_hw_device_data *hw_data)
+ 	hw_data->get_sku = get_sku;
+ 	hw_data->enable_ints = adf_vf_void_noop;
+ 	hw_data->enable_vf2pf_comms = adf_enable_vf2pf_comms;
+-	hw_data->min_iov_compat_ver = ADF_PFVF_COMPATIBILITY_VERSION;
++	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
+ 	hw_data->dev_class->instances++;
+ 	adf_devmgr_update_class_index(hw_data);
+ 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
+diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+index a1b77bd7a894..e29f5f1dc806 100644
+--- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
++++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+@@ -216,7 +216,7 @@ void adf_vf2pf_req_hndl(struct adf_accel_vf_info *vf_info)
+ 		resp = (ADF_PF2VF_MSGORIGIN_SYSTEM |
+ 			 (ADF_PF2VF_MSGTYPE_VERSION_RESP <<
+ 			  ADF_PF2VF_MSGTYPE_SHIFT) |
+-			 (ADF_PFVF_COMPATIBILITY_VERSION <<
++			 (ADF_PFVF_COMPAT_THIS_VERSION <<
+ 			  ADF_PF2VF_VERSION_RESP_VERS_SHIFT));
  
- #ifdef CONFIG_PCI_IOV
- #define ADF_MAX_NUM_VFS	32
-+#define ADF_ERRSOU3 (0x3A000 + 0x0C)
-+#define ADF_ERRSOU5 (0x3A000 + 0xD8)
-+#define ADF_ERRMSK3 (0x3A000 + 0x1C)
-+#define ADF_ERRMSK5 (0x3A000 + 0xDC)
-+#define ADF_ERR_REG_VF2PF_L(vf_src)	(((vf_src) & 0x01FFFE00) >> 9)
-+#define ADF_ERR_REG_VF2PF_U(vf_src)	(((vf_src) & 0x0000FFFF) << 16)
- #endif
+ 		dev_dbg(&GET_DEV(accel_dev),
+@@ -226,19 +226,19 @@ void adf_vf2pf_req_hndl(struct adf_accel_vf_info *vf_info)
+ 		if (vf_compat_ver < hw_data->min_iov_compat_ver) {
+ 			dev_err(&GET_DEV(accel_dev),
+ 				"VF (vers %d) incompatible with PF (vers %d)\n",
+-				vf_compat_ver, ADF_PFVF_COMPATIBILITY_VERSION);
++				vf_compat_ver, ADF_PFVF_COMPAT_THIS_VERSION);
+ 			resp |= ADF_PF2VF_VF_INCOMPATIBLE <<
+ 				ADF_PF2VF_VERSION_RESP_RESULT_SHIFT;
+-		} else if (vf_compat_ver > ADF_PFVF_COMPATIBILITY_VERSION) {
++		} else if (vf_compat_ver > ADF_PFVF_COMPAT_THIS_VERSION) {
+ 			dev_err(&GET_DEV(accel_dev),
+ 				"VF (vers %d) compat with PF (vers %d) unkn.\n",
+-				vf_compat_ver, ADF_PFVF_COMPATIBILITY_VERSION);
++				vf_compat_ver, ADF_PFVF_COMPAT_THIS_VERSION);
+ 			resp |= ADF_PF2VF_VF_COMPAT_UNKNOWN <<
+ 				ADF_PF2VF_VERSION_RESP_RESULT_SHIFT;
+ 		} else {
+ 			dev_dbg(&GET_DEV(accel_dev),
+ 				"VF (vers %d) compatible with PF (vers %d)\n",
+-				vf_compat_ver, ADF_PFVF_COMPATIBILITY_VERSION);
++				vf_compat_ver, ADF_PFVF_COMPAT_THIS_VERSION);
+ 			resp |= ADF_PF2VF_VF_COMPATIBLE <<
+ 				ADF_PF2VF_VERSION_RESP_RESULT_SHIFT;
+ 		}
+@@ -251,7 +251,7 @@ void adf_vf2pf_req_hndl(struct adf_accel_vf_info *vf_info)
+ 		resp = (ADF_PF2VF_MSGORIGIN_SYSTEM |
+ 			 (ADF_PF2VF_MSGTYPE_VERSION_RESP <<
+ 			  ADF_PF2VF_MSGTYPE_SHIFT) |
+-			 (ADF_PFVF_COMPATIBILITY_VERSION <<
++			 (ADF_PFVF_COMPAT_THIS_VERSION <<
+ 			  ADF_PF2VF_VERSION_RESP_VERS_SHIFT));
+ 		resp |= ADF_PF2VF_VF_COMPATIBLE <<
+ 			ADF_PF2VF_VERSION_RESP_RESULT_SHIFT;
+@@ -313,8 +313,8 @@ static int adf_vf2pf_request_version(struct adf_accel_dev *accel_dev)
  
- static int adf_enable_msix(struct adf_accel_dev *accel_dev)
-@@ -75,14 +81,23 @@ static irqreturn_t adf_msix_isr_ae(int irq, void *dev_ptr)
- 		struct adf_hw_device_data *hw_data = accel_dev->hw_device;
- 		struct adf_bar *pmisc =
- 			&GET_BARS(accel_dev)[hw_data->get_misc_bar_id(hw_data)];
--		void __iomem *pmisc_bar_addr = pmisc->virt_addr;
-+		void __iomem *pmisc_addr = pmisc->virt_addr;
-+		u32 errsou3, errsou5, errmsk3, errmsk5;
- 		unsigned long vf_mask;
+ 	msg = ADF_VF2PF_MSGORIGIN_SYSTEM;
+ 	msg |= ADF_VF2PF_MSGTYPE_COMPAT_VER_REQ << ADF_VF2PF_MSGTYPE_SHIFT;
+-	msg |= ADF_PFVF_COMPATIBILITY_VERSION << ADF_VF2PF_COMPAT_VER_REQ_SHIFT;
+-	BUILD_BUG_ON(ADF_PFVF_COMPATIBILITY_VERSION > 255);
++	msg |= ADF_PFVF_COMPAT_THIS_VERSION << ADF_VF2PF_COMPAT_VER_REQ_SHIFT;
++	BUILD_BUG_ON(ADF_PFVF_COMPAT_THIS_VERSION > 255);
  
- 		/* Get the interrupt sources triggered by VFs */
--		vf_mask = ((ADF_CSR_RD(pmisc_bar_addr, ADF_ERRSOU5) &
--			    0x0000FFFF) << 16) |
--			  ((ADF_CSR_RD(pmisc_bar_addr, ADF_ERRSOU3) &
--			    0x01FFFE00) >> 9);
-+		errsou3 = ADF_CSR_RD(pmisc_addr, ADF_ERRSOU3);
-+		errsou5 = ADF_CSR_RD(pmisc_addr, ADF_ERRSOU5);
-+		vf_mask = ADF_ERR_REG_VF2PF_L(errsou3);
-+		vf_mask |= ADF_ERR_REG_VF2PF_U(errsou5);
-+
-+		/* To avoid adding duplicate entries to work queue, clear
-+		 * vf_int_mask_sets bits that are already masked in ERRMSK register.
-+		 */
-+		errmsk3 = ADF_CSR_RD(pmisc_addr, ADF_ERRMSK3);
-+		errmsk5 = ADF_CSR_RD(pmisc_addr, ADF_ERRMSK5);
-+		vf_mask &= ~ADF_ERR_REG_VF2PF_L(errmsk3);
-+		vf_mask &= ~ADF_ERR_REG_VF2PF_U(errmsk5);
+ 	/* Send request from VF to PF */
+ 	ret = adf_iov_putmsg(accel_dev, msg, 0);
+@@ -345,7 +345,7 @@ static int adf_vf2pf_request_version(struct adf_accel_dev *accel_dev)
+ 		dev_err(&GET_DEV(accel_dev),
+ 			"PF (vers %d) and VF (vers %d) are not compatible\n",
+ 			accel_dev->vf.pf_version,
+-			ADF_PFVF_COMPATIBILITY_VERSION);
++			ADF_PFVF_COMPAT_THIS_VERSION);
+ 		return -EINVAL;
+ 	default:
+ 		dev_err(&GET_DEV(accel_dev),
+diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.h b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.h
+index 0690c031bfce..ffd43aa50b57 100644
+--- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.h
++++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.h
+@@ -52,7 +52,7 @@
+  * IN_USE_BY pattern as part of a collision control scheme (see adf_iov_putmsg).
+  */
  
- 		if (vf_mask) {
- 			struct adf_accel_vf_info *vf_info;
+-#define ADF_PFVF_COMPATIBILITY_VERSION		0x1	/* PF<->VF compat */
++#define ADF_PFVF_COMPAT_THIS_VERSION		0x1	/* PF<->VF compat */
+ 
+ /* PF->VF messages */
+ #define ADF_PF2VF_INT				BIT(0)
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
+index 7dd7cd6c3ef8..dced2426edc1 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
+@@ -232,7 +232,7 @@ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data)
+ 	hw_data->enable_ints = adf_enable_ints;
+ 	hw_data->enable_vf2pf_comms = adf_pf_enable_vf2pf_comms;
+ 	hw_data->reset_device = adf_reset_sbr;
+-	hw_data->min_iov_compat_ver = ADF_PFVF_COMPATIBILITY_VERSION;
++	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
+ 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
+ }
+ 
+diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c b/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
+index f14fb82ed6df..ac233a39a530 100644
+--- a/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
++++ b/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
+@@ -96,7 +96,7 @@ void adf_init_hw_data_dh895xcciov(struct adf_hw_device_data *hw_data)
+ 	hw_data->get_sku = get_sku;
+ 	hw_data->enable_ints = adf_vf_void_noop;
+ 	hw_data->enable_vf2pf_comms = adf_enable_vf2pf_comms;
+-	hw_data->min_iov_compat_ver = ADF_PFVF_COMPATIBILITY_VERSION;
++	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
+ 	hw_data->dev_class->instances++;
+ 	adf_devmgr_update_class_index(hw_data);
+ 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
 -- 
 2.26.2
 
