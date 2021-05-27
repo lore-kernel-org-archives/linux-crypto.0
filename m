@@ -2,116 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D165DC47088
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 May 2021 18:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E71B9C4707F
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 06:28:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7DCE613C5
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 May 2021 18:08:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C51C9613C9
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 May 2021 06:28:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232473AbhEZSJu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 May 2021 14:09:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59430 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232141AbhEZSJt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 May 2021 14:09:49 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 498B4613C5
-        for <linux-crypto@vger.kernel.org>; Wed, 26 May 2021 18:08:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1622052497;
-        bh=zAZnDSIbfABqd5FjYbFPVJIQeD9gn+rnSYeWj3D63Fs=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=iJKyoSOkCxXQU50KofSW9/CMJblQX683qy2zM6Rp4EfCRRtwgNeCetNqC4uybwg73
-         8YiJuLZcmJfO2cZ0ipG53cBqktigKFuFEDsGMgEA5aKDMLw5XgObvvWnQSHwYRnsvM
-         TyiJ9U0uNvBHe1ucH25tQKDfAqt0kTg8a6OoMdBKtHtxEBrIxfLTwZ1H0+MKEeohC4
-         Dt8B93CDlIpccwxKA824KEVDPBOoQEyzbtQTvaLKDOJ3aNg/AlxtQVOh0D5f9FHMoR
-         q3AJlY7u1TyL6oU5LGs8ru4OtGTy9eEjlcyrcbE9z5UsoHy0DKEpbTN53s/hzTBi3U
-         SiwBxtsVLKLXA==
-Received: by mail-ot1-f53.google.com with SMTP id t10-20020a05683022eab0290304ed8bc759so1835580otc.12
-        for <linux-crypto@vger.kernel.org>; Wed, 26 May 2021 11:08:17 -0700 (PDT)
-X-Gm-Message-State: AOAM533QmNhv+rTTMo35L1EluQMU5sKm1kbBaSAOhoSM6JAzRt+kAi5U
-        tTsWT+HB4CADhvIePjUuel/k3uF8FfvVcOfeQlM=
-X-Google-Smtp-Source: ABdhPJydlSrS8LwujCrDRJIT5PtVl1P/VeL34UmOw7LukyNZdvJsNkGeKrafTNuzFWuM4Rik/o7Gn+OiawIi+8tJOug=
-X-Received: by 2002:a05:6830:4da:: with SMTP id s26mr3357643otd.77.1622052496611;
- Wed, 26 May 2021 11:08:16 -0700 (PDT)
+        id S233884AbhE0G36 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 May 2021 02:29:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50810 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229670AbhE0G3u (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 May 2021 02:29:50 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81817C061574;
+        Wed, 26 May 2021 23:28:15 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id m190so2942302pga.2;
+        Wed, 26 May 2021 23:28:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :content-transfer-encoding:user-agent;
+        bh=vzY8Oad/4R9FZQwiT5mR4g0+2i9N6VivPydMdc1n6Lw=;
+        b=jV1LydVtgiAkGzkhsRGre3UOT0KKR7Q6JRQR+9bK/8iY/hT6uZn9cc7AcYtFm8ZoGp
+         RNgWfZUxeQjUQtejKhtLzBEC1RkLesoMSMd+/lUATBa47N/T5Lm+xCcQFIi+Ac+P7TDW
+         lWpxbifbvjvkyq0SACzQyuuZqUbzbNsbON3+Eo4VGdctbHN/3IagWrDi75F6lJTNsIF0
+         AAH6Pq388+sKOxxMmlUuA0we62AIzOw7c87lH+DZRbrmeMLXq8XsMyV2qEs4ZZo3PAN/
+         OpkaluVCDZ7v+IYc8t9KxrBb2RByoHDbTMNvwyjbe5OLw/+9EQR2/AGYt7p0ROht9rk3
+         fh/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:content-transfer-encoding:user-agent;
+        bh=vzY8Oad/4R9FZQwiT5mR4g0+2i9N6VivPydMdc1n6Lw=;
+        b=c/vxr+RlbyKFtvZr1Dl9NQKp6OAy8+R6uuZ0rDZLpz8FWlWds9jMcMEhsQPjomp6jm
+         du64IO4vqPMH5CjSazAcQJ2W/fzILdSrZjNpVIWUWhfQ6zBEtMCn3UlCpFZwirLcboRV
+         0X5slS8aUhBRFglgwMxC4BH2jp3G0z4L5tPOZH8rPLMmnNd4JOzXH2cuYiQt2xXIpAUU
+         1TYHep/299+vDEw1UZasst3WNZPkNVE64GVOwtMtlx5DILp5/O/sjsj7LBg5eW9Yf0hj
+         d3xrQZ+35B8t9UAMyZuams+liQG/aXczFZ2TxC851WrDJ9CFVbXPgeYHwzVQbZLJfm9G
+         8Ijw==
+X-Gm-Message-State: AOAM530pS8EYxuVlLHXx/0Fr57aCMacxvv9lvPR2lPZJMOpgeU0z2Pbs
+        Rs9Zj4LiGRS8w0Mfg4b6pmY=
+X-Google-Smtp-Source: ABdhPJz6+4e2i6pbAyIN2RXp6pfitGlDeZtSkpa4S/KLBw1iB5ae/NT6z4jfA8knHCP36a+s61zV0w==
+X-Received: by 2002:a63:e015:: with SMTP id e21mr2277845pgh.442.1622096895122;
+        Wed, 26 May 2021 23:28:15 -0700 (PDT)
+Received: from raspberrypi ([125.141.84.155])
+        by smtp.gmail.com with ESMTPSA id s123sm935741pfb.78.2021.05.26.23.28.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 May 2021 23:28:14 -0700 (PDT)
+Date:   Thu, 27 May 2021 07:28:09 +0100
+From:   Austin Kim <austindh.kim@gmail.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        catalin.marinas@arm.com, will@kernel.org,
+        john.johansen@canonical.com, jmorris@namei.org, serge@hallyn.com
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-security-module@vger.kernel.org,
+        linux-crypto@vger.kernel.org, austindh.kim@gmail.com,
+        austin.kim@lge.com
+Subject: [PATCH] crypto: arm64/gcm - remove Wunused-const-variable
+ ghash_cpu_feature
+Message-ID: <20210527062809.GA1251@raspberrypi>
 MIME-Version: 1.0
-References: <20210526100729.12939-1-ardb@kernel.org> <20210526100729.12939-6-ardb@kernel.org>
- <YK6B4PDchHbXNx3U@gmail.com>
-In-Reply-To: <YK6B4PDchHbXNx3U@gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 26 May 2021 20:08:05 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFKPB12QtP__7ANN5n-SFvmrskoCN2zwe-pXD_0HPrnBQ@mail.gmail.com>
-Message-ID: <CAMj1kXFKPB12QtP__7ANN5n-SFvmrskoCN2zwe-pXD_0HPrnBQ@mail.gmail.com>
-Subject: Re: [PATCH v6 5/6] crypto: arm64/aes-ccm - reduce NEON begin/end
- calls for common case
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        herbert@gondor.apana.org.au, will@kernel.org,
-        kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 26 May 2021 at 19:14, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Wed, May 26, 2021 at 12:07:28PM +0200, Ard Biesheuvel wrote:
-> > AES-CCM (as used in WPA2 CCMP, for instance) typically involves
-> > authenticate-only data, and operates on a single network packet, and so
-> > the common case is for the authenticate, en/decrypt and finalize SIMD
-> > helpers to all be called exactly once in sequence. Since
-> > kernel_neon_end() now involves manipulation of the preemption state as
-> > well as the softirq mask state, let's reduce the number of times we are
-> > forced to call it to only once if we are handling this common case.
-> >
-> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> > ---
-> >  arch/arm64/crypto/aes-ce-ccm-core.S |  1 +
-> >  arch/arm64/crypto/aes-ce-ccm-glue.c | 74 +++++++++++---------
-> >  2 files changed, 43 insertions(+), 32 deletions(-)
-> >
-> > diff --git a/arch/arm64/crypto/aes-ce-ccm-core.S b/arch/arm64/crypto/aes-ce-ccm-core.S
-> > index 99a028e298ed..8adff299fcd3 100644
-> > --- a/arch/arm64/crypto/aes-ce-ccm-core.S
-> > +++ b/arch/arm64/crypto/aes-ce-ccm-core.S
-> > @@ -124,6 +124,7 @@ SYM_FUNC_START(ce_aes_ccm_final)
-> >  SYM_FUNC_END(ce_aes_ccm_final)
-> >
-> >       .macro  aes_ccm_do_crypt,enc
-> > +     cbz     x2, 5f
-> >       ldr     x8, [x6, #8]                    /* load lower ctr */
-> >       ld1     {v0.16b}, [x5]                  /* load mac */
-> >  CPU_LE(      rev     x8, x8                  )       /* keep swabbed ctr in reg */
-> > diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
-> > index 54bd2494a000..98159f2c49ae 100644
-> > --- a/arch/arm64/crypto/aes-ce-ccm-glue.c
-> > +++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
-> > @@ -97,10 +97,8 @@ static int ccm_init_mac(struct aead_request *req, u8 maciv[], u32 msglen)
-> >  static void ccm_update_mac(struct crypto_aes_ctx *key, u8 mac[], u8 const in[],
-> >                          u32 abytes, u32 *macp)
-> >  {
-> > -     kernel_neon_begin();
-> >       ce_aes_ccm_auth_data(mac, in, abytes, macp, key->key_enc,
-> >                            num_rounds(key));
-> > -     kernel_neon_end();
-> >  }
-> [...]
-> > +     if (req->assoclen)
-> > +             ccm_calculate_auth_mac(req, mac);
-> > +
->
-> This still makes all the associated data be processed under a single
-> kernel_neon_begin() / kernel_neon_end() pair, even if there is a large amount of
-> it.  Shouldn't it be limited to a reasonable amount at a time, like 4K?
-> This sort of thing has been considered a bug before, e.g. see
-> commit 706024a52c6 ("crypto: arch/lib - limit simd usage to 4k chunks").
->
-> You could do the entire CCM operation under a single pair as long as there isn't
-> more than 4K of associated data.
->
+GCC compiler complains with below messages.
 
-Good point. I'll add a separate patch for that.
+   warning: ‘ghash_cpu_feature’ defined but not used [-Wunused-const-variable=]
+   static const struct cpu_feature ghash_cpu_feature[] = {
+			    ^~~~~~~~~~~~~~~~~
+
+The variable with MODULE_DEVICE_TABLE() is registered as platform_driver.
+But ghash_cpu_feature is not used, so remove ghash_cpu_feature.
+
+Signed-off-by: Austin Kim <austindh.kim@gmail.com>
+---
+ arch/arm64/crypto/ghash-ce-glue.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
+index 720cd3a58da3..c3f27d0d5329 100644
+--- a/arch/arm64/crypto/ghash-ce-glue.c
++++ b/arch/arm64/crypto/ghash-ce-glue.c
+@@ -615,10 +615,5 @@ static void __exit ghash_ce_mod_exit(void)
+ 		crypto_unregister_shash(&ghash_alg);
+ }
+ 
+-static const struct cpu_feature ghash_cpu_feature[] = {
+-	{ cpu_feature(PMULL) }, { }
+-};
+-MODULE_DEVICE_TABLE(cpu, ghash_cpu_feature);
+-
+ module_init(ghash_ce_mod_init);
+ module_exit(ghash_ce_mod_exit);
+-- 
+2.20.1
+
