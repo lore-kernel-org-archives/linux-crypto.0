@@ -2,275 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C1DC47087
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 11:45:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F7A8C2B9F7
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 13:51:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB47F613DA
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 11:45:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E027461019
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 13:51:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235898AbhE1Lqv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 May 2021 07:46:51 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2396 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235690AbhE1Lqt (ORCPT
+        id S235966AbhE1NxR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 May 2021 09:53:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52886 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235676AbhE1NxQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 May 2021 07:46:49 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Fs2p43dvhz65hN;
-        Fri, 28 May 2021 19:41:32 +0800 (CST)
-Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 28 May 2021 19:45:11 +0800
-Received: from huawei.com (10.67.165.24) by dggpeml500012.china.huawei.com
- (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 28 May
- 2021 19:45:11 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH 1/3] crypto: hisilicon/sec - add new skcipher mode for SEC
-Date:   Fri, 28 May 2021 19:42:04 +0800
-Message-ID: <1622202126-19237-2-git-send-email-yekai13@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1622202126-19237-1-git-send-email-yekai13@huawei.com>
-References: <1622202126-19237-1-git-send-email-yekai13@huawei.com>
+        Fri, 28 May 2021 09:53:16 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AD72C061574;
+        Fri, 28 May 2021 06:51:42 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id r1so2573913pgk.8;
+        Fri, 28 May 2021 06:51:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=St+typHKzUUHCLcGqwo1YuMiqNw+EQW0Fgi4q8xjUjg=;
+        b=bucn/0pTL5a01KenTEgCyU+fttb45un1+4uHVJyaTTP3mYo/+uYeKIcn3oQBwdx7aC
+         Xaamf8AIFpFWEoZPbNS7cM+9pOPZmgiqOTeX7hfUGX2PdJRDqi8bvHE8eE5/u+x/OaW+
+         /6/C1Q8wyDHvf8SccQQCDdm2gNpJlcJ2MC/DyPd336MuH1X3SlLZElATZwdrlsbf11ve
+         rwSfO16yl5mMuruIni31qqS7Qxdvpv4Sm+lP93MOxNuCA/i5xMJHGo2fZmpguHHbo6yV
+         vyNCQkVBfqMsKCOSGMmDS9re2lTgktZ3xfOikMsm0d7GUsG6yJEHHLtPH3AiYjNiFfze
+         vPPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=St+typHKzUUHCLcGqwo1YuMiqNw+EQW0Fgi4q8xjUjg=;
+        b=dl8+rJy4frJAMlAF4F3ef6Ro92rM9/c1w5KtSw9Uy+mJCBNAFn9TzimEZ1zD/Bjywk
+         qSdHmK5B7tAY/Jm1DvA+YFzO4g1L2PbcTfe9DxDvuHpcLM0Ah7qskTCCh99r6NMfV1ju
+         bv925ahU5N8U+RK9KXIZflcXHT7yS5eoBfXS6qD3PZy1kzI5dXY3L0VcIjEkJrigtGxN
+         jABMotqqAs9BPFCZP1gLEMXw85SMg2xkQQPOE3OSDQFL5bFojnILem32AUlyVZ/OGjtF
+         DMx1V+zlA4F4xUwlKJ+AXFkz2UEXk98coOTLr/uubCupoy+2/UlP5R7NAZUQqMu3Bor8
+         nS4Q==
+X-Gm-Message-State: AOAM533h0OwWOrpJRFCdQkGMOSAcJZ+QFUONWNOLtTSnCeEAIgoPVkb+
+        M+l3grIt0OolYiUkH2zCFt6Z+23w8dKcWMk+I0M=
+X-Google-Smtp-Source: ABdhPJx6QLP1NcHNcae4Goasd3V+OI6/Cno3PYqY4cqFiiiwH722T6CrZ1asHkIJeD6N7M4X+1KIUE3+QLJfDbSt85Y=
+X-Received: by 2002:a63:b211:: with SMTP id x17mr9001925pge.106.1622209901916;
+ Fri, 28 May 2021 06:51:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500012.china.huawei.com (7.185.36.15)
-X-CFilter-Loop: Reflected
+References: <20210527062809.GA1251@raspberrypi> <YK/a8f7MhO2SlrMS@gmail.com>
+In-Reply-To: <YK/a8f7MhO2SlrMS@gmail.com>
+From:   Austin Kim <austindh.kim@gmail.com>
+Date:   Fri, 28 May 2021 22:51:33 +0900
+Message-ID: <CADLLry6AfRT6mGXnd66OV57YP4=m2PpOT5tom4QxVrOqGchw4w@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm64/gcm - remove Wunused-const-variable ghash_cpu_feature
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        catalin.marinas@arm.com, will@kernel.org,
+        John Johansen <john.johansen@canonical.com>, jmorris@namei.org,
+        serge@hallyn.com, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-security-module@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        =?UTF-8?B?6rmA64+Z7ZiE?= <austin.kim@lge.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add new skcipher algorithms for Kunpeng930 SEC:
-OFB(AES), CFB(AES), CTR(AES),
-OFB(SM4), CFB(SM4), CTR(SM4).
+2021=EB=85=84 5=EC=9B=94 28=EC=9D=BC (=EA=B8=88) =EC=98=A4=EC=A0=84 2:46, E=
+ric Biggers <ebiggers@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+> On Thu, May 27, 2021 at 07:28:09AM +0100, Austin Kim wrote:
+> >
+> > The variable with MODULE_DEVICE_TABLE() is registered as platform_drive=
+r.
+>
+> What does this mean?  There is no platform_driver involved here at all.
+>
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
-Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
----
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 103 +++++++++++++++++++++++++----
- drivers/crypto/hisilicon/sec2/sec_crypto.h |   3 +
- 2 files changed, 94 insertions(+), 12 deletions(-)
+What I would like to say is "in many cases, MODULE_DEVICE_TABLE is
+registered as struct of platform_driver"
+ex) [drivers/char/hw_random/meson-rng.c]
+MODULE_DEVICE_TABLE(of, meson_rng_of_match);
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index d9ab503..b399315 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -78,6 +78,9 @@
- #define SEC_SQE_CFLAG		2
- #define SEC_SQE_AEAD_FLAG	3
- #define SEC_SQE_DONE		0x1
-+#define MAX_INPUT_DATA_LEN	0xFFFE00
-+#define BITS_MASK		0xFF
-+#define BYTE_BITS		0x8
- 
- /* Get an en/de-cipher queue cyclically to balance load over queues of TFM */
- static inline int sec_alloc_queue_id(struct sec_ctx *ctx, struct sec_req *req)
-@@ -751,12 +754,16 @@ static int sec_setkey_##name(struct crypto_skcipher *tfm, const u8 *key,\
- GEN_SEC_SETKEY_FUNC(aes_ecb, SEC_CALG_AES, SEC_CMODE_ECB)
- GEN_SEC_SETKEY_FUNC(aes_cbc, SEC_CALG_AES, SEC_CMODE_CBC)
- GEN_SEC_SETKEY_FUNC(aes_xts, SEC_CALG_AES, SEC_CMODE_XTS)
--
-+GEN_SEC_SETKEY_FUNC(aes_ofb, SEC_CALG_AES, SEC_CMODE_OFB)
-+GEN_SEC_SETKEY_FUNC(aes_cfb, SEC_CALG_AES, SEC_CMODE_CFB)
-+GEN_SEC_SETKEY_FUNC(aes_ctr, SEC_CALG_AES, SEC_CMODE_CTR)
- GEN_SEC_SETKEY_FUNC(3des_ecb, SEC_CALG_3DES, SEC_CMODE_ECB)
- GEN_SEC_SETKEY_FUNC(3des_cbc, SEC_CALG_3DES, SEC_CMODE_CBC)
--
- GEN_SEC_SETKEY_FUNC(sm4_xts, SEC_CALG_SM4, SEC_CMODE_XTS)
- GEN_SEC_SETKEY_FUNC(sm4_cbc, SEC_CALG_SM4, SEC_CMODE_CBC)
-+GEN_SEC_SETKEY_FUNC(sm4_ofb, SEC_CALG_SM4, SEC_CMODE_OFB)
-+GEN_SEC_SETKEY_FUNC(sm4_cfb, SEC_CALG_SM4, SEC_CMODE_CFB)
-+GEN_SEC_SETKEY_FUNC(sm4_ctr, SEC_CALG_SM4, SEC_CMODE_CTR)
- 
- static int sec_cipher_pbuf_map(struct sec_ctx *ctx, struct sec_req *req,
- 			struct scatterlist *src)
-@@ -1154,6 +1161,17 @@ static int sec_skcipher_bd_fill_v3(struct sec_ctx *ctx, struct sec_req *req)
- 	return 0;
- }
- 
-+/* increment counter (128-bit int) */
-+static void ctr_iv_inc(__u8 *counter, __u8 bits, __u32 nums)
-+{
-+	do {
-+		--bits;
-+		nums += counter[bits];
-+		counter[bits] = nums & BITS_MASK;
-+		nums >>= BYTE_BITS;
-+	} while (bits && nums);
-+}
-+
- static void sec_update_iv(struct sec_req *req, enum sec_alg_type alg_type)
- {
- 	struct aead_request *aead_req = req->aead_req.aead_req;
-@@ -1177,10 +1195,17 @@ static void sec_update_iv(struct sec_req *req, enum sec_alg_type alg_type)
- 		cryptlen = aead_req->cryptlen;
- 	}
- 
--	sz = sg_pcopy_to_buffer(sgl, sg_nents(sgl), iv, iv_size,
--				cryptlen - iv_size);
--	if (unlikely(sz != iv_size))
--		dev_err(req->ctx->dev, "copy output iv error!\n");
-+	if (req->ctx->c_ctx.c_mode == SEC_CMODE_CBC) {
-+		sz = sg_pcopy_to_buffer(sgl, sg_nents(sgl), iv, iv_size,
-+					cryptlen - iv_size);
-+		if (unlikely(sz != iv_size))
-+			dev_err(req->ctx->dev, "copy output iv error!\n");
-+	} else {
-+		sz = cryptlen / iv_size;
-+		if (cryptlen % iv_size)
-+			sz += 1;
-+		ctr_iv_inc(iv, iv_size, sz);
-+	}
- }
- 
- static struct sec_req *sec_back_req_clear(struct sec_ctx *ctx,
-@@ -1211,8 +1236,9 @@ static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req,
- 
- 	sec_free_req_id(req);
- 
--	/* IV output at encrypto of CBC mode */
--	if (!err && ctx->c_ctx.c_mode == SEC_CMODE_CBC && req->c_req.encrypt)
-+	/* IV output at encrypto of CBC/CTR mode */
-+	if (!err && (ctx->c_ctx.c_mode == SEC_CMODE_CBC ||
-+	    ctx->c_ctx.c_mode == SEC_CMODE_CTR) && req->c_req.encrypt)
- 		sec_update_iv(req, SEC_SKCIPHER);
- 
- 	while (1) {
-@@ -1422,7 +1448,8 @@ static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
- 		goto err_uninit_req;
- 
- 	/* Output IV as decrypto */
--	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && !req->c_req.encrypt)
-+	if (!req->c_req.encrypt && (ctx->c_ctx.c_mode == SEC_CMODE_CBC ||
-+	    ctx->c_ctx.c_mode == SEC_CMODE_CTR))
- 		sec_update_iv(req, ctx->alg_type);
- 
- 	ret = ctx->req_op->bd_send(ctx, req);
-@@ -1634,6 +1661,14 @@ static int sec_skcipher_cryptlen_ckeck(struct sec_ctx *ctx,
- 			ret = -EINVAL;
- 		}
- 		break;
-+	case SEC_CMODE_CFB:
-+	case SEC_CMODE_OFB:
-+	case SEC_CMODE_CTR:
-+		if (unlikely(ctx->sec->qm.ver < QM_HW_V3)) {
-+			dev_err(dev, "skcipher HW version error!\n");
-+			ret = -EINVAL;
-+		}
-+		break;
- 	default:
- 		ret = -EINVAL;
- 	}
-@@ -1647,7 +1682,8 @@ static int sec_skcipher_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
- 	struct device *dev = ctx->dev;
- 	u8 c_alg = ctx->c_ctx.c_alg;
- 
--	if (unlikely(!sk_req->src || !sk_req->dst)) {
-+	if (unlikely(!sk_req->src || !sk_req->dst ||
-+		     sk_req->cryptlen > MAX_INPUT_DATA_LEN)) {
- 		dev_err(dev, "skcipher input param error!\n");
- 		return -EINVAL;
- 	}
-@@ -1762,6 +1798,32 @@ static struct skcipher_alg sec_skciphers[] = {
- 			 AES_BLOCK_SIZE, AES_BLOCK_SIZE)
- };
- 
-+static struct skcipher_alg sec_skciphers_v3[] = {
-+	SEC_SKCIPHER_ALG("ofb(aes)", sec_setkey_aes_ofb,
-+			 AES_MIN_KEY_SIZE, AES_MAX_KEY_SIZE,
-+			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
-+
-+	SEC_SKCIPHER_ALG("cfb(aes)", sec_setkey_aes_cfb,
-+			 AES_MIN_KEY_SIZE, AES_MAX_KEY_SIZE,
-+			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
-+
-+	SEC_SKCIPHER_ALG("ctr(aes)", sec_setkey_aes_ctr,
-+			 AES_MIN_KEY_SIZE, AES_MAX_KEY_SIZE,
-+			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
-+
-+	SEC_SKCIPHER_ALG("ofb(sm4)", sec_setkey_sm4_ofb,
-+			 AES_MIN_KEY_SIZE, AES_MIN_KEY_SIZE,
-+			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
-+
-+	SEC_SKCIPHER_ALG("cfb(sm4)", sec_setkey_sm4_cfb,
-+			 AES_MIN_KEY_SIZE, AES_MIN_KEY_SIZE,
-+			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
-+
-+	SEC_SKCIPHER_ALG("ctr(sm4)", sec_setkey_sm4_ctr,
-+			 AES_MIN_KEY_SIZE, AES_MIN_KEY_SIZE,
-+			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
-+};
-+
- static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
- {
- 	struct aead_request *req = sreq->aead_req.aead_req;
-@@ -1878,15 +1940,32 @@ int sec_register_to_crypto(struct hisi_qm *qm)
- 	if (ret)
- 		return ret;
- 
-+	if (qm->ver > QM_HW_V2) {
-+		ret = crypto_register_skciphers(sec_skciphers_v3,
-+						ARRAY_SIZE(sec_skciphers_v3));
-+		if (ret)
-+			goto reg_skcipher_fail;
-+	}
- 	ret = crypto_register_aeads(sec_aeads, ARRAY_SIZE(sec_aeads));
- 	if (ret)
--		crypto_unregister_skciphers(sec_skciphers,
--					    ARRAY_SIZE(sec_skciphers));
-+		goto reg_aead_fail;
-+	return ret;
-+
-+reg_aead_fail:
-+	if (qm->ver > QM_HW_V2)
-+		crypto_unregister_skciphers(sec_skciphers_v3,
-+					    ARRAY_SIZE(sec_skciphers_v3));
-+reg_skcipher_fail:
-+	crypto_unregister_skciphers(sec_skciphers,
-+				    ARRAY_SIZE(sec_skciphers));
- 	return ret;
- }
- 
- void sec_unregister_from_crypto(struct hisi_qm *qm)
- {
-+	if (qm->ver > QM_HW_V2)
-+		crypto_unregister_skciphers(sec_skciphers_v3,
-+					    ARRAY_SIZE(sec_skciphers_v3));
- 	crypto_unregister_skciphers(sec_skciphers,
- 				    ARRAY_SIZE(sec_skciphers));
- 	crypto_unregister_aeads(sec_aeads, ARRAY_SIZE(sec_aeads));
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-index 163e813..c9bfe75 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-@@ -7,6 +7,7 @@
- #define SEC_IV_SIZE		24
- #define SEC_MAX_KEY_SIZE	64
- #define SEC_COMM_SCENE		0
-+#define SEC_MIN_BLOCK_SZ	1
- 
- enum sec_calg {
- 	SEC_CALG_3DES = 0x1,
-@@ -29,6 +30,8 @@ enum sec_mac_len {
- enum sec_cmode {
- 	SEC_CMODE_ECB    = 0x0,
- 	SEC_CMODE_CBC    = 0x1,
-+	SEC_CMODE_CFB    = 0x2,
-+	SEC_CMODE_OFB    = 0x3,
- 	SEC_CMODE_CTR    = 0x4,
- 	SEC_CMODE_XTS    = 0x7,
- };
--- 
-2.8.1
+static struct platform_driver meson_rng_driver =3D {
+.probe =3D meson_rng_probe,
+.driver =3D {
+.name =3D "meson-rng",
+.of_match_table =3D meson_rng_of_match,
+},
+};
 
+> > But ghash_cpu_feature is not used, so remove ghash_cpu_feature.
+>
+> It is used when the file is built as a module.
+>
+
+Thanks for the information. But it looks like this file is compiled
+as built-in with 'CONFIG_CRYPTO_GHASH_ARM64_CE=3Dy' by default.
+
+> > diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghas=
+h-ce-glue.c
+> > index 720cd3a58da3..c3f27d0d5329 100644
+>>[...]
+>
+> Probably adding __maybe_unused to ghash_cpu_feature[] is the right thing =
+to do.
+> That's what module_cpu_feature_match() does.
+>
+> (Note that module_cpu_feature_match() can't be used here, as it seems the=
+ intent
+> is for this module to be autoloaded when PMULL is detected, but still be
+> loadable without it.  So, that's apparently the reason for using
+> MODULE_DEVICE_TABLE() directly.)
+
+Thanks for the valuable idea and feedback.
+
+>
+> - Eric
