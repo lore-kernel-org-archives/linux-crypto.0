@@ -7,53 +7,51 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE02C4708D
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:25:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9DAFC47087
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:25:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3093E61378
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:25:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A023F611C9
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:25:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230187AbhE1H1Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 May 2021 03:27:24 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:50222 "EHLO deadmen.hmeau.com"
+        id S235836AbhE1H1b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 May 2021 03:27:31 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50228 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229642AbhE1H1X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 May 2021 03:27:23 -0400
+        id S229642AbhE1H1a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 May 2021 03:27:30 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lmWsM-0003af-1Y; Fri, 28 May 2021 15:25:46 +0800
+        id 1lmWsV-0003bH-Ai; Fri, 28 May 2021 15:25:55 +0800
 Received: from herbert by gondobar with local (Exim 4.92)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lmWsK-0001xb-Ij; Fri, 28 May 2021 15:25:44 +0800
-Date:   Fri, 28 May 2021 15:25:44 +0800
+        id 1lmWsV-0001xw-1E; Fri, 28 May 2021 15:25:55 +0800
+Date:   Fri, 28 May 2021 15:25:55 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Wei Yongjun <weiyongjun1@huawei.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Thara Gopinath <thara.gopinath@linaro.org>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Hulk Robot <hulkci@huawei.com>
-Subject: Re: [PATCH -next] crypto: qce - Fix some error handling path
-Message-ID: <20210528072544.GE7392@gondor.apana.org.au>
-References: <20210519141650.3059054-1-weiyongjun1@huawei.com>
+To:     Shaokun Zhang <zhangshaokun@hisilicon.com>
+Cc:     linux-crypto@vger.kernel.org,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH] hwrng: core - remove redundant initialization of
+ variable err
+Message-ID: <20210528072554.GF7392@gondor.apana.org.au>
+References: <1621497371-14746-1-git-send-email-zhangshaokun@hisilicon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210519141650.3059054-1-weiyongjun1@huawei.com>
+In-Reply-To: <1621497371-14746-1-git-send-email-zhangshaokun@hisilicon.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 19, 2021 at 02:16:50PM +0000, Wei Yongjun wrote:
-> Fix to return negative error code from the error handling
-> cases instead of 0.
+On Thu, May 20, 2021 at 03:56:11PM +0800, Shaokun Zhang wrote:
+> 'err' will be assigned later and cleanup the redundant initialization.
 > 
-> Fixes: 9363efb4181c ("crypto: qce - Add support for AEAD algorithms")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
 > ---
->  drivers/crypto/qce/aead.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
+>  drivers/char/hw_random/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
