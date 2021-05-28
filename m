@@ -7,22 +7,22 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B3AC4708E
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 11:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C1DC47087
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 11:45:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6E736113D
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 11:45:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB47F613DA
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 11:45:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235859AbhE1Lqt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 May 2021 07:46:49 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2516 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235632AbhE1Lqt (ORCPT
+        id S235898AbhE1Lqv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 May 2021 07:46:51 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2396 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235690AbhE1Lqt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 28 May 2021 07:46:49 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Fs2qC0m05zYqMw;
-        Fri, 28 May 2021 19:42:31 +0800 (CST)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Fs2p43dvhz65hN;
+        Fri, 28 May 2021 19:41:32 +0800 (CST)
 Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
  dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -35,9 +35,9 @@ From:   Kai Ye <yekai13@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH 2/3] crypto: hisilicon/sec - add fallback tfm supporting for XTS mode
-Date:   Fri, 28 May 2021 19:42:05 +0800
-Message-ID: <1622202126-19237-3-git-send-email-yekai13@huawei.com>
+Subject: [PATCH 1/3] crypto: hisilicon/sec - add new skcipher mode for SEC
+Date:   Fri, 28 May 2021 19:42:04 +0800
+Message-ID: <1622202126-19237-2-git-send-email-yekai13@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1622202126-19237-1-git-send-email-yekai13@huawei.com>
 References: <1622202126-19237-1-git-send-email-yekai13@huawei.com>
@@ -51,201 +51,226 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add fallback tfm supporting for hisi_sec driver. Due to the hardware
-not supports 192bit key length when using XTS mode. So the driver needs
-to setting the soft fallback skcipher tfm for user.
+Add new skcipher algorithms for Kunpeng930 SEC:
+OFB(AES), CFB(AES), CTR(AES),
+OFB(SM4), CFB(SM4), CTR(SM4).
 
 Signed-off-by: Kai Ye <yekai13@huawei.com>
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
 ---
- drivers/crypto/hisilicon/sec2/sec.h        |  4 ++
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 85 ++++++++++++++++++++++++++++--
- 2 files changed, 86 insertions(+), 3 deletions(-)
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 103 +++++++++++++++++++++++++----
+ drivers/crypto/hisilicon/sec2/sec_crypto.h |   3 +
+ 2 files changed, 94 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 14ba66d..935d8d9 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -97,6 +97,10 @@ struct sec_cipher_ctx {
- 	u8 c_mode;
- 	u8 c_alg;
- 	u8 c_key_len;
-+
-+	/* add software support */
-+	bool fallback;
-+	struct crypto_sync_skcipher *fbtfm;
- };
- 
- /* SEC queue context which defines queue's relatives */
 diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index b399315..25da33a 100644
+index d9ab503..b399315 100644
 --- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
 +++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -21,6 +21,7 @@
- 
- #define SEC_PRIORITY		4001
- #define SEC_XTS_MIN_KEY_SIZE	(2 * AES_MIN_KEY_SIZE)
-+#define SEC_XTS_MID_KEY_SIZE	(3 * AES_MIN_KEY_SIZE)
- #define SEC_XTS_MAX_KEY_SIZE	(2 * AES_MAX_KEY_SIZE)
- #define SEC_DES3_2KEY_SIZE	(2 * DES_KEY_SIZE)
- #define SEC_DES3_3KEY_SIZE	(3 * DES_KEY_SIZE)
-@@ -81,6 +82,7 @@
- #define MAX_INPUT_DATA_LEN	0xFFFE00
- #define BITS_MASK		0xFF
- #define BYTE_BITS		0x8
-+#define SEC_XTS_NAME_SZ		0x3
+@@ -78,6 +78,9 @@
+ #define SEC_SQE_CFLAG		2
+ #define SEC_SQE_AEAD_FLAG	3
+ #define SEC_SQE_DONE		0x1
++#define MAX_INPUT_DATA_LEN	0xFFFE00
++#define BITS_MASK		0xFF
++#define BYTE_BITS		0x8
  
  /* Get an en/de-cipher queue cyclically to balance load over queues of TFM */
  static inline int sec_alloc_queue_id(struct sec_ctx *ctx, struct sec_req *req)
-@@ -598,6 +600,26 @@ static void sec_auth_uninit(struct sec_ctx *ctx)
- 			  a_ctx->a_key, a_ctx->a_key_dma);
+@@ -751,12 +754,16 @@ static int sec_setkey_##name(struct crypto_skcipher *tfm, const u8 *key,\
+ GEN_SEC_SETKEY_FUNC(aes_ecb, SEC_CALG_AES, SEC_CMODE_ECB)
+ GEN_SEC_SETKEY_FUNC(aes_cbc, SEC_CALG_AES, SEC_CMODE_CBC)
+ GEN_SEC_SETKEY_FUNC(aes_xts, SEC_CALG_AES, SEC_CMODE_XTS)
+-
++GEN_SEC_SETKEY_FUNC(aes_ofb, SEC_CALG_AES, SEC_CMODE_OFB)
++GEN_SEC_SETKEY_FUNC(aes_cfb, SEC_CALG_AES, SEC_CMODE_CFB)
++GEN_SEC_SETKEY_FUNC(aes_ctr, SEC_CALG_AES, SEC_CMODE_CTR)
+ GEN_SEC_SETKEY_FUNC(3des_ecb, SEC_CALG_3DES, SEC_CMODE_ECB)
+ GEN_SEC_SETKEY_FUNC(3des_cbc, SEC_CALG_3DES, SEC_CMODE_CBC)
+-
+ GEN_SEC_SETKEY_FUNC(sm4_xts, SEC_CALG_SM4, SEC_CMODE_XTS)
+ GEN_SEC_SETKEY_FUNC(sm4_cbc, SEC_CALG_SM4, SEC_CMODE_CBC)
++GEN_SEC_SETKEY_FUNC(sm4_ofb, SEC_CALG_SM4, SEC_CMODE_OFB)
++GEN_SEC_SETKEY_FUNC(sm4_cfb, SEC_CALG_SM4, SEC_CMODE_CFB)
++GEN_SEC_SETKEY_FUNC(sm4_ctr, SEC_CALG_SM4, SEC_CMODE_CTR)
+ 
+ static int sec_cipher_pbuf_map(struct sec_ctx *ctx, struct sec_req *req,
+ 			struct scatterlist *src)
+@@ -1154,6 +1161,17 @@ static int sec_skcipher_bd_fill_v3(struct sec_ctx *ctx, struct sec_req *req)
+ 	return 0;
  }
  
-+static int sec_skcipher_fbtfm_init(struct crypto_skcipher *tfm)
++/* increment counter (128-bit int) */
++static void ctr_iv_inc(__u8 *counter, __u8 bits, __u32 nums)
 +{
-+	const char *alg = crypto_tfm_alg_name(&tfm->base);
-+	struct sec_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
-+
-+	c_ctx->fallback = false;
-+	if (likely(strncmp(alg, "xts", SEC_XTS_NAME_SZ)))
-+		return 0;
-+
-+	c_ctx->fbtfm = crypto_alloc_sync_skcipher(alg, 0,
-+						  CRYPTO_ALG_NEED_FALLBACK);
-+	if (IS_ERR(c_ctx->fbtfm)) {
-+		pr_err("failed to alloc fallback tfm!\n");
-+		return PTR_ERR(c_ctx->fbtfm);
-+	}
-+
-+	return 0;
++	do {
++		--bits;
++		nums += counter[bits];
++		counter[bits] = nums & BITS_MASK;
++		nums >>= BYTE_BITS;
++	} while (bits && nums);
 +}
 +
- static int sec_skcipher_init(struct crypto_skcipher *tfm)
+ static void sec_update_iv(struct sec_req *req, enum sec_alg_type alg_type)
  {
- 	struct sec_ctx *ctx = crypto_skcipher_ctx(tfm);
-@@ -619,8 +641,14 @@ static int sec_skcipher_init(struct crypto_skcipher *tfm)
- 	if (ret)
- 		goto err_cipher_init;
- 
-+	ret = sec_skcipher_fbtfm_init(tfm);
-+	if (ret)
-+		goto err_fbtfm_init;
-+
- 	return 0;
- 
-+err_fbtfm_init:
-+	sec_cipher_uninit(ctx);
- err_cipher_init:
- 	sec_ctx_base_uninit(ctx);
- 	return ret;
-@@ -630,6 +658,9 @@ static void sec_skcipher_uninit(struct crypto_skcipher *tfm)
- {
- 	struct sec_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
-+	if (ctx->c_ctx.fbtfm)
-+		crypto_free_sync_skcipher(ctx->c_ctx.fbtfm);
-+
- 	sec_cipher_uninit(ctx);
- 	sec_ctx_base_uninit(ctx);
- }
-@@ -669,6 +700,9 @@ static int sec_skcipher_aes_sm4_setkey(struct sec_cipher_ctx *c_ctx,
- 		case SEC_XTS_MIN_KEY_SIZE:
- 			c_ctx->c_key_len = SEC_CKEY_128BIT;
- 			break;
-+		case SEC_XTS_MID_KEY_SIZE:
-+			c_ctx->fallback = true;
-+			break;
- 		case SEC_XTS_MAX_KEY_SIZE:
- 			c_ctx->c_key_len = SEC_CKEY_256BIT;
- 			break;
-@@ -740,7 +774,13 @@ static int sec_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 	struct aead_request *aead_req = req->aead_req.aead_req;
+@@ -1177,10 +1195,17 @@ static void sec_update_iv(struct sec_req *req, enum sec_alg_type alg_type)
+ 		cryptlen = aead_req->cryptlen;
  	}
  
- 	memcpy(c_ctx->c_key, key, keylen);
--
-+	if (c_ctx->fallback) {
-+		ret = crypto_sync_skcipher_setkey(c_ctx->fbtfm, key, keylen);
-+		if (ret) {
-+			dev_err(dev, "failed to set fallback skcipher key!\n");
-+			return ret;
+-	sz = sg_pcopy_to_buffer(sgl, sg_nents(sgl), iv, iv_size,
+-				cryptlen - iv_size);
+-	if (unlikely(sz != iv_size))
+-		dev_err(req->ctx->dev, "copy output iv error!\n");
++	if (req->ctx->c_ctx.c_mode == SEC_CMODE_CBC) {
++		sz = sg_pcopy_to_buffer(sgl, sg_nents(sgl), iv, iv_size,
++					cryptlen - iv_size);
++		if (unlikely(sz != iv_size))
++			dev_err(req->ctx->dev, "copy output iv error!\n");
++	} else {
++		sz = cryptlen / iv_size;
++		if (cryptlen % iv_size)
++			sz += 1;
++		ctr_iv_inc(iv, iv_size, sz);
++	}
+ }
+ 
+ static struct sec_req *sec_back_req_clear(struct sec_ctx *ctx,
+@@ -1211,8 +1236,9 @@ static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req,
+ 
+ 	sec_free_req_id(req);
+ 
+-	/* IV output at encrypto of CBC mode */
+-	if (!err && ctx->c_ctx.c_mode == SEC_CMODE_CBC && req->c_req.encrypt)
++	/* IV output at encrypto of CBC/CTR mode */
++	if (!err && (ctx->c_ctx.c_mode == SEC_CMODE_CBC ||
++	    ctx->c_ctx.c_mode == SEC_CMODE_CTR) && req->c_req.encrypt)
+ 		sec_update_iv(req, SEC_SKCIPHER);
+ 
+ 	while (1) {
+@@ -1422,7 +1448,8 @@ static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
+ 		goto err_uninit_req;
+ 
+ 	/* Output IV as decrypto */
+-	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && !req->c_req.encrypt)
++	if (!req->c_req.encrypt && (ctx->c_ctx.c_mode == SEC_CMODE_CBC ||
++	    ctx->c_ctx.c_mode == SEC_CMODE_CTR))
+ 		sec_update_iv(req, ctx->alg_type);
+ 
+ 	ret = ctx->req_op->bd_send(ctx, req);
+@@ -1634,6 +1661,14 @@ static int sec_skcipher_cryptlen_ckeck(struct sec_ctx *ctx,
+ 			ret = -EINVAL;
+ 		}
+ 		break;
++	case SEC_CMODE_CFB:
++	case SEC_CMODE_OFB:
++	case SEC_CMODE_CTR:
++		if (unlikely(ctx->sec->qm.ver < QM_HW_V3)) {
++			dev_err(dev, "skcipher HW version error!\n");
++			ret = -EINVAL;
 +		}
-+	}
- 	return 0;
- }
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 	}
+@@ -1647,7 +1682,8 @@ static int sec_skcipher_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
+ 	struct device *dev = ctx->dev;
+ 	u8 c_alg = ctx->c_ctx.c_alg;
  
-@@ -1709,6 +1749,37 @@ static int sec_skcipher_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
- 	return -EINVAL;
- }
- 
-+static int sec_skcipher_soft_crypto(struct sec_ctx *ctx,
-+				    struct skcipher_request *sreq, bool encrypt)
-+{
-+	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
-+	struct device *dev = ctx->dev;
-+	int ret;
-+
-+	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, c_ctx->fbtfm);
-+
-+	if (!c_ctx->fbtfm) {
-+		dev_err(dev, "failed to check fallback tfm\n");
-+		return -EINVAL;
-+	}
-+
-+	skcipher_request_set_sync_tfm(subreq, c_ctx->fbtfm);
-+
-+	/* software need sync mode to do crypto */
-+	skcipher_request_set_callback(subreq, sreq->base.flags,
-+				      NULL, NULL);
-+	skcipher_request_set_crypt(subreq, sreq->src, sreq->dst,
-+				   sreq->cryptlen, sreq->iv);
-+	if (encrypt)
-+		ret = crypto_skcipher_encrypt(subreq);
-+	else
-+		ret = crypto_skcipher_decrypt(subreq);
-+
-+	skcipher_request_zero(subreq);
-+
-+	return ret;
-+}
-+
- static int sec_skcipher_crypto(struct skcipher_request *sk_req, bool encrypt)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(sk_req);
-@@ -1716,8 +1787,11 @@ static int sec_skcipher_crypto(struct skcipher_request *sk_req, bool encrypt)
- 	struct sec_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int ret;
- 
--	if (!sk_req->cryptlen)
-+	if (!sk_req->cryptlen) {
-+		if (ctx->c_ctx.c_mode == SEC_CMODE_XTS)
-+			return -EINVAL;
- 		return 0;
-+	}
- 
- 	req->flag = sk_req->base.flags;
- 	req->c_req.sk_req = sk_req;
-@@ -1728,6 +1802,9 @@ static int sec_skcipher_crypto(struct skcipher_request *sk_req, bool encrypt)
- 	if (unlikely(ret))
+-	if (unlikely(!sk_req->src || !sk_req->dst)) {
++	if (unlikely(!sk_req->src || !sk_req->dst ||
++		     sk_req->cryptlen > MAX_INPUT_DATA_LEN)) {
+ 		dev_err(dev, "skcipher input param error!\n");
  		return -EINVAL;
+ 	}
+@@ -1762,6 +1798,32 @@ static struct skcipher_alg sec_skciphers[] = {
+ 			 AES_BLOCK_SIZE, AES_BLOCK_SIZE)
+ };
  
-+	if (unlikely(ctx->c_ctx.fallback))
-+		return sec_skcipher_soft_crypto(ctx, sk_req, encrypt);
++static struct skcipher_alg sec_skciphers_v3[] = {
++	SEC_SKCIPHER_ALG("ofb(aes)", sec_setkey_aes_ofb,
++			 AES_MIN_KEY_SIZE, AES_MAX_KEY_SIZE,
++			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
 +
- 	return ctx->req_op->process(ctx, req);
++	SEC_SKCIPHER_ALG("cfb(aes)", sec_setkey_aes_cfb,
++			 AES_MIN_KEY_SIZE, AES_MAX_KEY_SIZE,
++			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
++
++	SEC_SKCIPHER_ALG("ctr(aes)", sec_setkey_aes_ctr,
++			 AES_MIN_KEY_SIZE, AES_MAX_KEY_SIZE,
++			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
++
++	SEC_SKCIPHER_ALG("ofb(sm4)", sec_setkey_sm4_ofb,
++			 AES_MIN_KEY_SIZE, AES_MIN_KEY_SIZE,
++			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
++
++	SEC_SKCIPHER_ALG("cfb(sm4)", sec_setkey_sm4_cfb,
++			 AES_MIN_KEY_SIZE, AES_MIN_KEY_SIZE,
++			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
++
++	SEC_SKCIPHER_ALG("ctr(sm4)", sec_setkey_sm4_ctr,
++			 AES_MIN_KEY_SIZE, AES_MIN_KEY_SIZE,
++			 SEC_MIN_BLOCK_SZ, AES_BLOCK_SIZE)
++};
++
+ static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
+ {
+ 	struct aead_request *req = sreq->aead_req.aead_req;
+@@ -1878,15 +1940,32 @@ int sec_register_to_crypto(struct hisi_qm *qm)
+ 	if (ret)
+ 		return ret;
+ 
++	if (qm->ver > QM_HW_V2) {
++		ret = crypto_register_skciphers(sec_skciphers_v3,
++						ARRAY_SIZE(sec_skciphers_v3));
++		if (ret)
++			goto reg_skcipher_fail;
++	}
+ 	ret = crypto_register_aeads(sec_aeads, ARRAY_SIZE(sec_aeads));
+ 	if (ret)
+-		crypto_unregister_skciphers(sec_skciphers,
+-					    ARRAY_SIZE(sec_skciphers));
++		goto reg_aead_fail;
++	return ret;
++
++reg_aead_fail:
++	if (qm->ver > QM_HW_V2)
++		crypto_unregister_skciphers(sec_skciphers_v3,
++					    ARRAY_SIZE(sec_skciphers_v3));
++reg_skcipher_fail:
++	crypto_unregister_skciphers(sec_skciphers,
++				    ARRAY_SIZE(sec_skciphers));
+ 	return ret;
  }
  
-@@ -1748,7 +1825,9 @@ static int sec_skcipher_decrypt(struct skcipher_request *sk_req)
- 		.cra_name = sec_cra_name,\
- 		.cra_driver_name = "hisi_sec_"sec_cra_name,\
- 		.cra_priority = SEC_PRIORITY,\
--		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,\
-+		.cra_flags = CRYPTO_ALG_ASYNC |\
-+		 CRYPTO_ALG_ALLOCATES_MEMORY |\
-+		 CRYPTO_ALG_NEED_FALLBACK,\
- 		.cra_blocksize = blk_size,\
- 		.cra_ctxsize = sizeof(struct sec_ctx),\
- 		.cra_module = THIS_MODULE,\
+ void sec_unregister_from_crypto(struct hisi_qm *qm)
+ {
++	if (qm->ver > QM_HW_V2)
++		crypto_unregister_skciphers(sec_skciphers_v3,
++					    ARRAY_SIZE(sec_skciphers_v3));
+ 	crypto_unregister_skciphers(sec_skciphers,
+ 				    ARRAY_SIZE(sec_skciphers));
+ 	crypto_unregister_aeads(sec_aeads, ARRAY_SIZE(sec_aeads));
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+index 163e813..c9bfe75 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+@@ -7,6 +7,7 @@
+ #define SEC_IV_SIZE		24
+ #define SEC_MAX_KEY_SIZE	64
+ #define SEC_COMM_SCENE		0
++#define SEC_MIN_BLOCK_SZ	1
+ 
+ enum sec_calg {
+ 	SEC_CALG_3DES = 0x1,
+@@ -29,6 +30,8 @@ enum sec_mac_len {
+ enum sec_cmode {
+ 	SEC_CMODE_ECB    = 0x0,
+ 	SEC_CMODE_CBC    = 0x1,
++	SEC_CMODE_CFB    = 0x2,
++	SEC_CMODE_OFB    = 0x3,
+ 	SEC_CMODE_CTR    = 0x4,
+ 	SEC_CMODE_XTS    = 0x7,
+ };
 -- 
 2.8.1
 
