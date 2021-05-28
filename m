@@ -7,53 +7,56 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B26C47087
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F06C47087
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:25:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F6FD61378
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:25:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CC59611C9
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:25:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230200AbhE1H0u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 May 2021 03:26:50 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:50194 "EHLO deadmen.hmeau.com"
+        id S230133AbhE1H1M (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 May 2021 03:27:12 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50206 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234347AbhE1H0q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 May 2021 03:26:46 -0400
+        id S229641AbhE1H1L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 May 2021 03:27:11 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lmWrj-0003Y5-VJ; Fri, 28 May 2021 15:25:07 +0800
+        id 1lmWsA-0003Zj-HQ; Fri, 28 May 2021 15:25:34 +0800
 Received: from herbert by gondobar with local (Exim 4.92)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lmWrj-0001wd-ER; Fri, 28 May 2021 15:25:07 +0800
-Date:   Fri, 28 May 2021 15:25:07 +0800
+        id 1lmWsA-0001xI-By; Fri, 28 May 2021 15:25:34 +0800
+Date:   Fri, 28 May 2021 15:25:34 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Zhen Lei <thunder.leizhen@huawei.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        linux-crypto <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 1/1] crypto: Fix spelling mistakes in header files
-Message-ID: <20210528072507.GC7392@gondor.apana.org.au>
-References: <20210517110234.7416-1-thunder.leizhen@huawei.com>
+To:     Hui Tang <tanghui20@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: remove leading spaces before tabs
+Message-ID: <20210528072534.GD7392@gondor.apana.org.au>
+References: <1621403984-40037-1-git-send-email-tanghui20@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210517110234.7416-1-thunder.leizhen@huawei.com>
+In-Reply-To: <1621403984-40037-1-git-send-email-tanghui20@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 17, 2021 at 07:02:34PM +0800, Zhen Lei wrote:
-> Fix some spelling mistakes in comments:
-> cipherntext ==> ciphertext
-> syncronise ==> synchronise
-> feeded ==> fed
+On Wed, May 19, 2021 at 01:59:44PM +0800, Hui Tang wrote:
+> There are a few leading spaces before tabs and remove it by running the
+> following commard:
 > 
-> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
+> 	$ find . -name '*.c' | xargs sed -r -i 's/^[ ]+\t/\t/'
+> 
+> At the same time, fix two warning by running checkpatch.pl:
+> 	WARNING: suspect code indent for conditional statements (16, 16)
+> 	WARNING: braces {} are not necessary for single statement blocks
+> 
+> Signed-off-by: Hui Tang <tanghui20@huawei.com>
 > ---
->  include/crypto/aead.h   | 2 +-
->  include/crypto/engine.h | 2 +-
->  include/crypto/hash.h   | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
+>  crypto/khazad.c |  2 +-
+>  crypto/wp512.c  | 40 +++++++++++++++++++---------------------
+>  2 files changed, 20 insertions(+), 22 deletions(-)
 
 Patch applied.  Thanks.
 -- 
