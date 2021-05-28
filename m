@@ -2,77 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A92EFC4708D
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 06:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B74C4708E
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:05:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77B756135C
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 06:27:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEB87613F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:05:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230264AbhE1G3U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 May 2021 02:29:20 -0400
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:38192 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229753AbhE1G3T (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 May 2021 02:29:19 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R521e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0UaLIcr6_1622183262;
-Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UaLIcr6_1622183262)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 28 May 2021 14:27:42 +0800
-Subject: Re: [PATCH v2 1/7] crypto: fix a memory leak in sm2
-To:     Hongbo Li <herbert.tencent@gmail.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        ebiggers@kernel.org, dhowells@redhat.com, jarkko@kernel.org,
-        herberthbli@tencent.com
-Cc:     linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
-References: <1622123615-15517-1-git-send-email-herbert.tencent@gmail.com>
- <1622123615-15517-2-git-send-email-herbert.tencent@gmail.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <47cf4353-b4bb-3907-6017-60bf87805d0c@linux.alibaba.com>
-Date:   Fri, 28 May 2021 14:27:41 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
+        id S234595AbhE1HHK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 May 2021 03:07:10 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:49854 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229574AbhE1HHK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 May 2021 03:07:10 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1lmWYc-0003HJ-5Y; Fri, 28 May 2021 15:05:22 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1lmWYR-0005t1-99; Fri, 28 May 2021 15:05:11 +0800
+Date:   Fri, 28 May 2021 15:05:11 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     davem@davemloft.net, linus.walleij@linaro.org,
+        linux@armlinux.org.uk, robh+dt@kernel.org,
+        ulli.kroll@googlemail.com, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/5] crypto: Add sl3516 crypto engine
+Message-ID: <20210528070511.GA22601@gondor.apana.org.au>
+References: <20210518151655.125153-1-clabbe@baylibre.com>
+ <20210518151655.125153-3-clabbe@baylibre.com>
 MIME-Version: 1.0
-In-Reply-To: <1622123615-15517-2-git-send-email-herbert.tencent@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210518151655.125153-3-clabbe@baylibre.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert, Hongbo,
+On Tue, May 18, 2021 at 03:16:52PM +0000, Corentin Labbe wrote:
+>
+> +static int sl3516_ce_cipher_fallback(struct skcipher_request *areq)
+> +{
+> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(areq);
+> +	struct sl3516_ce_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+> +	struct sl3516_ce_cipher_req_ctx *rctx = skcipher_request_ctx(areq);
+> +	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+> +	struct sl3516_ce_alg_template *algt;
+> +	int err;
+> +
+> +	algt = container_of(alg, struct sl3516_ce_alg_template, alg.skcipher);
+> +	algt->stat_fb++;
 
-On 5/27/21 9:53 PM, Hongbo Li wrote:
-> From: Hongbo Li <herberthbli@tencent.com>
-> 
-> SM2 module alloc ec->Q in sm2_set_pub_key(), when doing alg test in
-> test_akcipher_one(), it will set public key for every test vector,
-> and don't free ec->Q. This will cause a memory leak.
-> 
-> This patch alloc ec->Q in sm2_ec_ctx_init().
-> 
-> Fixes: ea7ecb66440b ("crypto: sm2 - introduce OSCCA SM2 asymmetric cipher algorithm")
-> Signed-off-by: Hongbo Li <herberthbli@tencent.com>
-> Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> ---
->   crypto/sm2.c | 24 ++++++++++--------------
->   1 file changed, 10 insertions(+), 14 deletions(-)
-> 
+This fails to build if CRYPTO_DEV_SL3516_DEBUG is off.
 
-Patch 1/7 is an independent bugfix patch. If possible, consider applying 
-it first.
-
-The commit message header should start with: crypto: sm2 -
-
-Also added:
-
-Cc: stable@vger.kernel.org # v5.10+
-
-Best regards,
-Tianjia
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
