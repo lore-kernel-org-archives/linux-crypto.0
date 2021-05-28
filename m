@@ -2,70 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87945C4708C
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 498F0C47087
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 10:29:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57C4F611CD
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 07:29:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A0F56139A
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 May 2021 10:29:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229608AbhE1Hbb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 May 2021 03:31:31 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:50404 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236024AbhE1Hb1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 May 2021 03:31:27 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lmWvj-0003q7-QY; Fri, 28 May 2021 15:29:15 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lmWvj-00022Z-LG; Fri, 28 May 2021 15:29:15 +0800
-Date:   Fri, 28 May 2021 15:29:15 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Weili Qian <qianweili@huawei.com>
-Cc:     davem@davemloft.net, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, xuzaibo@huawei.com,
-        wangzhou1@hisilicon.com, liulongfang@huawei.com
-Subject: Re: [PATCH] crypto: hisilicon/qm - support address prefetching
-Message-ID: <20210528072915.GR7392@gondor.apana.org.au>
-References: <1621668604-14973-1-git-send-email-qianweili@huawei.com>
+        id S236468AbhE1Kaz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 May 2021 06:30:55 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:2337 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236334AbhE1Kaz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 May 2021 06:30:55 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Fs15R1Nqsz1BFqY;
+        Fri, 28 May 2021 18:24:43 +0800 (CST)
+Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 28 May 2021 18:29:19 +0800
+Received: from huawei.com (10.67.165.24) by dggpeml500012.china.huawei.com
+ (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 28 May
+ 2021 18:29:19 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
+Subject: [PATCH v2 0/2] crypto: hisilicon - add new type of sqe for Kunpeng930
+Date:   Fri, 28 May 2021 18:26:12 +0800
+Message-ID: <1622197574-7779-1-git-send-email-yekai13@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1621668604-14973-1-git-send-email-qianweili@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500012.china.huawei.com (7.185.36.15)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, May 22, 2021 at 03:30:04PM +0800, Weili Qian wrote:
-> From: Longfang Liu <liulongfang@huawei.com>
-> 
-> Kunpeng930 hardware supports address prefetching to improve performance
-> before doing tasks in SVA scenario.
-> 
-> This patch enables this function in device initialization by writing
-> hardware registers. In the process of reset, address prefetching is
-> disabled to avoid the failure of interaction between accelerator device
-> and SMMU.
-> 
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> Signed-off-by: Weili Qian <qianweili@huawei.com>
-> ---
->  drivers/crypto/hisilicon/hpre/hpre_main.c | 50 +++++++++++++++++++++++++++++++
->  drivers/crypto/hisilicon/qm.c             | 35 ++++++++++++++++++++++
->  drivers/crypto/hisilicon/qm.h             |  2 ++
->  drivers/crypto/hisilicon/sec2/sec_main.c  | 45 ++++++++++++++++++++++++++++
->  drivers/crypto/hisilicon/zip/zip_main.c   | 50 +++++++++++++++++++++++++++++++
->  5 files changed, 182 insertions(+)
+Add new type of sqe for Kunpeng930, and modify the driver as needed.
 
-Patch applied.  Thanks.
+chages v1->v2:
+	fix two sparse warnings.
+
+Kai Ye (2):
+  crypto: hisilicon/sec - add new type of SQE
+  crypto: hisilicon/sec - driver adapt to new SQE
+
+ drivers/crypto/hisilicon/sec2/sec.h        |   6 +-
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 291 ++++++++++++++++++++++++-----
+ drivers/crypto/hisilicon/sec2/sec_crypto.h | 181 ++++++++++++++++++
+ 3 files changed, 434 insertions(+), 44 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.8.1
+
