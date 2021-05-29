@@ -2,177 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91413C47082
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 May 2021 09:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3C7C4708E
+	for <linux-crypto@archiver.kernel.org>; Sat, 29 May 2021 09:22:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A444613CD
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 May 2021 09:02:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 755E8610FC
+	for <linux-crypto@archiver.kernel.org>; Sat, 29 May 2021 09:22:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229679AbhE2JDj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 29 May 2021 05:03:39 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2530 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229559AbhE2JDj (ORCPT
+        id S229614AbhE2JXo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 29 May 2021 05:23:44 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:2348 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229560AbhE2JXo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 29 May 2021 05:03:39 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Fsb8R6F04zYpPF;
-        Sat, 29 May 2021 16:59:19 +0800 (CST)
-Received: from dggemi760-chm.china.huawei.com (10.1.198.146) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Sat, 29 May 2021 17:02:01 +0800
-Received: from localhost.localdomain (10.67.165.24) by
- dggemi760-chm.china.huawei.com (10.1.198.146) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Sat, 29 May 2021 17:02:00 +0800
-From:   Hui Tang <tanghui20@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
-        <wangzhou1@hisilicon.com>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: hisilicon/hpre - register ecdh NIST P384
-Date:   Sat, 29 May 2021 16:58:47 +0800
-Message-ID: <1622278727-22349-1-git-send-email-tanghui20@huawei.com>
-X-Mailer: git-send-email 2.8.1
+        Sat, 29 May 2021 05:23:44 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4FsbYM5cKkz1BFmf;
+        Sat, 29 May 2021 17:17:27 +0800 (CST)
+Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Sat, 29 May 2021 17:22:04 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml500012.china.huawei.com (7.185.36.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Sat, 29 May 2021 17:22:04 +0800
+Subject: Re: [PATCH 2/3] crypto: hisilicon/sec - add fallback tfm supporting
+ for XTS mode
+To:     kernel test robot <lkp@intel.com>, <herbert@gondor.apana.org.au>
+References: <1622202126-19237-3-git-send-email-yekai13@huawei.com>
+ <202105282256.hUBoOJ3Z-lkp@intel.com>
+CC:     <kbuild-all@lists.01.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>
+From:   "yekai(A)" <yekai13@huawei.com>
+Message-ID: <c265adb3-4cba-a6f7-6ba5-9a065fe5aeca@huawei.com>
+Date:   Sat, 29 May 2021 17:22:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggemi760-chm.china.huawei.com (10.1.198.146)
+In-Reply-To: <202105282256.hUBoOJ3Z-lkp@intel.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500012.china.huawei.com (7.185.36.15)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Register ecdh NIST P384 curve and add the tfm initialization.
 
-Signed-off-by: Hui Tang <tanghui20@huawei.com>
----
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 56 ++++++++++++++++++++++++++---
- 1 file changed, 52 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 323418b..a032c19 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -45,9 +45,11 @@ struct hpre_ctx;
- /* size in bytes of the n prime */
- #define HPRE_ECC_NIST_P192_N_SIZE	24
- #define HPRE_ECC_NIST_P256_N_SIZE	32
-+#define HPRE_ECC_NIST_P384_N_SIZE	48
- 
- /* size in bytes */
- #define HPRE_ECC_HW256_KSZ_B	32
-+#define HPRE_ECC_HW384_KSZ_B	48
- 
- typedef void (*hpre_cb)(struct hpre_ctx *ctx, void *sqe);
- 
-@@ -1211,12 +1213,21 @@ static void hpre_ecc_clear_ctx(struct hpre_ctx *ctx, bool is_clear_all,
- 	hpre_ctx_clear(ctx, is_clear_all);
- }
- 
-+/*
-+ * The bits of 192/224/256/384/521 are supported by HPRE,
-+ * and convert the bits like:
-+ * bits<=256, bits=256; 256<bits<=384, bits=384; 384<bits<=576, bits=576;
-+ * If the parameter bit width is insufficient, then we fill in the
-+ * high-order zeros by soft, so TASK_LENGTH1 is 0x3/0x5/0x8;
-+ */
- static unsigned int hpre_ecdh_supported_curve(unsigned short id)
- {
- 	switch (id) {
- 	case ECC_CURVE_NIST_P192:
- 	case ECC_CURVE_NIST_P256:
- 		return HPRE_ECC_HW256_KSZ_B;
-+	case ECC_CURVE_NIST_P384:
-+		return HPRE_ECC_HW384_KSZ_B;
- 	default:
- 		break;
- 	}
-@@ -1281,6 +1292,8 @@ static unsigned int hpre_ecdh_get_curvesz(unsigned short id)
- 		return HPRE_ECC_NIST_P192_N_SIZE;
- 	case ECC_CURVE_NIST_P256:
- 		return HPRE_ECC_NIST_P256_N_SIZE;
-+	case ECC_CURVE_NIST_P384:
-+		return HPRE_ECC_NIST_P384_N_SIZE;
- 	default:
- 		break;
- 	}
-@@ -1613,6 +1626,15 @@ static int hpre_ecdh_nist_p256_init_tfm(struct crypto_kpp *tfm)
- 	return hpre_ctx_init(ctx, HPRE_V3_ECC_ALG_TYPE);
- }
- 
-+static int hpre_ecdh_nist_p384_init_tfm(struct crypto_kpp *tfm)
-+{
-+	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
-+
-+	ctx->curve_id = ECC_CURVE_NIST_P384;
-+
-+	return hpre_ctx_init(ctx, HPRE_V3_ECC_ALG_TYPE);
-+}
-+
- static void hpre_ecdh_exit_tfm(struct crypto_kpp *tfm)
- {
- 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
-@@ -2017,6 +2039,23 @@ static struct kpp_alg ecdh_nist_p256 = {
- 	},
- };
- 
-+static struct kpp_alg ecdh_nist_p384 = {
-+	.set_secret = hpre_ecdh_set_secret,
-+	.generate_public_key = hpre_ecdh_compute_value,
-+	.compute_shared_secret = hpre_ecdh_compute_value,
-+	.max_size = hpre_ecdh_max_size,
-+	.init = hpre_ecdh_nist_p384_init_tfm,
-+	.exit = hpre_ecdh_exit_tfm,
-+	.reqsize = sizeof(struct hpre_asym_request) + HPRE_ALIGN_SZ,
-+	.base = {
-+		.cra_ctxsize = sizeof(struct hpre_ctx),
-+		.cra_priority = HPRE_CRYPTO_ALG_PRI,
-+		.cra_name = "ecdh-nist-p384",
-+		.cra_driver_name = "hpre-ecdh-nist-p384",
-+		.cra_module = THIS_MODULE,
-+	},
-+};
-+
- static struct kpp_alg curve25519_alg = {
- 	.set_secret = hpre_curve25519_set_secret,
- 	.generate_public_key = hpre_curve25519_compute_value,
-@@ -2044,16 +2083,25 @@ static int hpre_register_ecdh(void)
- 		return ret;
- 
- 	ret = crypto_register_kpp(&ecdh_nist_p256);
--	if (ret) {
--		crypto_unregister_kpp(&ecdh_nist_p192);
--		return ret;
--	}
-+	if (ret)
-+		goto unregister_ecdh_p192;
-+
-+	ret = crypto_register_kpp(&ecdh_nist_p384);
-+	if (ret)
-+		goto unregister_ecdh_p256;
- 
- 	return 0;
-+
-+unregister_ecdh_p256:
-+	crypto_unregister_kpp(&ecdh_nist_p256);
-+unregister_ecdh_p192:
-+	crypto_unregister_kpp(&ecdh_nist_p192);
-+	return ret;
- }
- 
- static void hpre_unregister_ecdh(void)
- {
-+	crypto_unregister_kpp(&ecdh_nist_p384);
- 	crypto_unregister_kpp(&ecdh_nist_p256);
- 	crypto_unregister_kpp(&ecdh_nist_p192);
- }
--- 
-2.8.1
+On 2021/5/28 22:13, kernel test robot wrote:
+> Hi Kai,
+>
+> Thank you for the patch! Yet something to improve:
+>
+> [auto build test ERROR on cryptodev/master]
+> [also build test ERROR on crypto/master linux/master linus/master v5.13-rc3 next-20210528]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch]
+>
+> url:    https://github.com/0day-ci/linux/commits/Kai-Ye/crypto-hisilicon-supports-new-skciphers-for-new-hardware/20210528-194644
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> config: ia64-allmodconfig (attached as .config)
+> compiler: ia64-linux-gcc (GCC) 9.3.0
+> reproduce (this is a W=1 build):
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # https://github.com/0day-ci/linux/commit/60bae5ed49c53ea90c82125a8295fb72833a3b68
+>         git remote add linux-review https://github.com/0day-ci/linux
+>         git fetch --no-tags linux-review Kai-Ye/crypto-hisilicon-supports-new-skciphers-for-new-hardware/20210528-194644
+>         git checkout 60bae5ed49c53ea90c82125a8295fb72833a3b68
+>         # save the attached .config to linux build tree
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0 make.cross ARCH=ia64
+>
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+>
+> All errors (new ones prefixed by >>):
+>
+>    drivers/crypto/hisilicon/sec2/sec_crypto.c: In function 'sec_aead_crypto':
+>>> drivers/crypto/hisilicon/sec2/sec_crypto.c:1751:40: error: 'sk_req' undeclared (first use in this function); did you mean 'a_req'?
+>     1751 |   return sec_skcipher_soft_crypto(ctx, sk_req, encrypt);
+>          |                                        ^~~~~~
+>          |                                        a_req
+>    drivers/crypto/hisilicon/sec2/sec_crypto.c:1751:40: note: each undeclared identifier is reported only once for each function it appears in
+>
+>
+> vim +1751 drivers/crypto/hisilicon/sec2/sec_crypto.c
+>
+>   1733	
+>   1734	static int sec_aead_crypto(struct aead_request *a_req, bool encrypt)
+>   1735	{
+>   1736		struct crypto_aead *tfm = crypto_aead_reqtfm(a_req);
+>   1737		struct sec_req *req = aead_request_ctx(a_req);
+>   1738		struct sec_ctx *ctx = crypto_aead_ctx(tfm);
+>   1739		int ret;
+>   1740	
+>   1741		req->flag = a_req->base.flags;
+>   1742		req->aead_req.aead_req = a_req;
+>   1743		req->c_req.encrypt = encrypt;
+>   1744		req->ctx = ctx;
+>   1745	
+>   1746		ret = sec_aead_param_check(ctx, req);
+>   1747		if (unlikely(ret))
+>   1748			return -EINVAL;
+>   1749	
+>   1750		if (unlikely(ctx->c_ctx.fallback))
+>> 1751			return sec_skcipher_soft_crypto(ctx, sk_req, encrypt);
+>   1752	
+>   1753		return ctx->req_op->process(ctx, req);
+>   1754	}
+>   1755	
+>
+> ---
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+>
 
+
+You shouldn't git am this patchset directly, because this patchset 
+depends on previous patchset.
+the series is "crypto: hisilicon - add new type of sqe for Kunpeng930",
+the patchwork is 
+https://patchwork.kernel.org/project/linux-crypto/list/?series=490143,
+thank you
+Kai
