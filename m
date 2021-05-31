@@ -7,27 +7,27 @@ X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B31BC47083
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 13:59:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37695C47083
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 14:47:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D94061446
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 13:59:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 143B661186
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 14:47:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232688AbhEaOAw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 May 2021 10:00:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59374 "EHLO mail.kernel.org"
+        id S232158AbhEaOss (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 31 May 2021 10:48:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40254 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232065AbhEaN6u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 May 2021 09:58:50 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0B32561936;
-        Mon, 31 May 2021 13:35:39 +0000 (UTC)
+        id S233758AbhEaOqj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 31 May 2021 10:46:39 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id CDDFC61C8A;
+        Mon, 31 May 2021 13:55:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1622468140;
-        bh=29yBi7z/CJIiEuekGlfUeyaZL3+2djxDR7+tD7HwhU0=;
+        s=korg; t=1622469347;
+        bh=HtUfS1IYrpmkkbbRs5ghCDWJ7J7xHW4JZRf67JBRtoI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qFHveuq1xI0N6yw4lwyj2SpgcV3yoF2c5lrmt8FSsg5eB4OF2tVyIWzUepE892z/S
-         +7BMjZ4OKBAVneR2fA1ae3IEYk+jKXxTTb8BKTzSMtRsBkJpt2kpocpnin9bylISRY
-         3LxWRbMqn8lIZQrGVterHU4LIJX2/xFYs+mqrovk=
+        b=FiFpNEEWg5Tw4Mozohrzz/gA+KHWmmL7ez1kKSDE6wqH3M9PbuRFtpbtmLSAab8g5
+         z65UeRObdSfEVxgl4fktwy+RV+RAtcAi60NUiU/DY4+HI8uDG+RF2veg1eYnBu2rwr
+         RNRIydhCpvQecB3X2bTcmR/+0RYIiRbJOMp4wp4Y=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -36,12 +36,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10 132/252] Revert "crypto: cavium/nitrox - add an error message to explain the failure of pci_request_mem_regions"
-Date:   Mon, 31 May 2021 15:13:17 +0200
-Message-Id: <20210531130702.491494728@linuxfoundation.org>
+Subject: [PATCH 5.12 162/296] Revert "crypto: cavium/nitrox - add an error message to explain the failure of pci_request_mem_regions"
+Date:   Mon, 31 May 2021 15:13:37 +0200
+Message-Id: <20210531130709.304966184@linuxfoundation.org>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210531130657.971257589@linuxfoundation.org>
-References: <20210531130657.971257589@linuxfoundation.org>
+In-Reply-To: <20210531130703.762129381@linuxfoundation.org>
+References: <20210531130703.762129381@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -84,10 +84,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 deletion(-)
 
 diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
-index 9d14be97e381..cee2a2713038 100644
+index facc8e6bc580..d385daf2c71c 100644
 --- a/drivers/crypto/cavium/nitrox/nitrox_main.c
 +++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
-@@ -451,7 +451,6 @@ static int nitrox_probe(struct pci_dev *pdev,
+@@ -442,7 +442,6 @@ static int nitrox_probe(struct pci_dev *pdev,
  	err = pci_request_mem_regions(pdev, nitrox_driver_name);
  	if (err) {
  		pci_disable_device(pdev);
