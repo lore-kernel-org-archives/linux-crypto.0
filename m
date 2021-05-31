@@ -2,101 +2,72 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37695C47083
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 14:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB43C47080
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 15:01:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 143B661186
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 14:47:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC37160FE8
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 15:01:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232158AbhEaOss (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 May 2021 10:48:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40254 "EHLO mail.kernel.org"
+        id S234414AbhEaPCo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 31 May 2021 11:02:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50548 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233758AbhEaOqj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 May 2021 10:46:39 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CDDFC61C8A;
-        Mon, 31 May 2021 13:55:46 +0000 (UTC)
+        id S234137AbhEaPAj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 31 May 2021 11:00:39 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6C42F6135C;
+        Mon, 31 May 2021 14:12:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1622469347;
-        bh=HtUfS1IYrpmkkbbRs5ghCDWJ7J7xHW4JZRf67JBRtoI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FiFpNEEWg5Tw4Mozohrzz/gA+KHWmmL7ez1kKSDE6wqH3M9PbuRFtpbtmLSAab8g5
-         z65UeRObdSfEVxgl4fktwy+RV+RAtcAi60NUiU/DY4+HI8uDG+RF2veg1eYnBu2rwr
-         RNRIydhCpvQecB3X2bTcmR/+0RYIiRbJOMp4wp4Y=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.12 162/296] Revert "crypto: cavium/nitrox - add an error message to explain the failure of pci_request_mem_regions"
-Date:   Mon, 31 May 2021 15:13:37 +0200
-Message-Id: <20210531130709.304966184@linuxfoundation.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210531130703.762129381@linuxfoundation.org>
-References: <20210531130703.762129381@linuxfoundation.org>
-User-Agent: quilt/0.66
+        s=korg; t=1622470356;
+        bh=1Z4N68USn6iPKdDMjFITCt216+Ua2Rfye0Lg+zWhbVc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NLgjMQcVMAQPs742r0SR/Bsv+AzgTgaIIIE4ipSVzQ3HKX6QNMEvAjhR2qHjvwHGJ
+         hOHciiMs2Rzs/w9ahE652fS2IMvAeBhSt/6pURtev4T9NAY7GRbtHntObxCPdNoreb
+         xDioKm7qjlB1KSwupIA8Iqowi2pqdJ62GgbR/N34=
+Date:   Mon, 31 May 2021 16:09:52 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Hongbo Li <herbert.tencent@gmail.com>
+Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        dhowells@redhat.com, jarkko@kernel.org,
+        tianjia.zhang@linux.alibaba.com, herberthbli@tencent.com,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: fix a memory leak in sm2
+Message-ID: <YLTuML8P8fXCl7iw@kroah.com>
+References: <1622467611-30383-1-git-send-email-herbert.tencent@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1622467611-30383-1-git-send-email-herbert.tencent@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+On Mon, May 31, 2021 at 09:26:51PM +0800, Hongbo Li wrote:
+> From: Hongbo Li <herberthbli@tencent.com>
+> 
+> SM2 module alloc ec->Q in sm2_set_pub_key(), when doing alg test in
+> test_akcipher_one(), it will set public key for every test vector,
+> and don't free ec->Q. This will cause a memory leak.
+> 
+> This patch alloc ec->Q in sm2_ec_ctx_init().
+> 
+> Fixes: ea7ecb66440b ("crypto: sm2 - introduce OSCCA SM2 asymmetric cipher algorithm")
+> Signed-off-by: Hongbo Li <herberthbli@tencent.com>
+> Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> ---
+>  crypto/sm2.c | 24 ++++++++++--------------
+>  1 file changed, 10 insertions(+), 14 deletions(-)
 
-[ Upstream commit 6a3239a738d86c5e9b5aad17fefe2c2bfd6ced83 ]
+<formletter>
 
-This reverts commit 9fcddaf2e28d779cb946d23838ba6d50f299aa80 as it was
-submitted under a fake name and we can not knowingly accept anonymous
-contributions to the repository.
+This is not the correct way to submit patches for inclusion in the
+stable kernel tree.  Please read:
+    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+for how to do this properly.
 
-This commit was part of a submission "test" to the Linux kernel
-community by some "researchers" at umn.edu.  As outlined at:
-	https://www-users.cs.umn.edu/%7Ekjlu/papers/full-disclosure.pdf
-it was done so as an attempt to submit a known-buggy patch to see if it
-could get by our review.  However, the submission turned out to actually
-be correct, and not have a bug in it as the author did not understand
-how the PCI driver model works at all, and so the submission was
-accepted.
-
-As this change is of useless consequence, there is no loss of
-functionality in reverting it.
-
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: linux-crypto@vger.kernel.org
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Link: https://lore.kernel.org/r/YIkTi9a3nnL50wMq@kroah.com
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/crypto/cavium/nitrox/nitrox_main.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
-index facc8e6bc580..d385daf2c71c 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_main.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
-@@ -442,7 +442,6 @@ static int nitrox_probe(struct pci_dev *pdev,
- 	err = pci_request_mem_regions(pdev, nitrox_driver_name);
- 	if (err) {
- 		pci_disable_device(pdev);
--		dev_err(&pdev->dev, "Failed to request mem regions!\n");
- 		return err;
- 	}
- 	pci_set_master(pdev);
--- 
-2.30.2
-
-
-
+</formletter>
