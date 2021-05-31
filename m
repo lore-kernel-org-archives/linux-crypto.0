@@ -2,177 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46524C47092
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 01:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E4BFC47082
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 12:43:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B9CE6100B
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 01:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7C2561287
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 12:43:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbhEaBYe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 30 May 2021 21:24:34 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2473 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229891AbhEaBYd (ORCPT
+        id S231539AbhEaMpH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 31 May 2021 08:45:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48518 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231565AbhEaMo4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 May 2021 21:24:33 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4FtcsR3BcHz68BY;
-        Mon, 31 May 2021 09:19:55 +0800 (CST)
-Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Mon, 31 May 2021 09:22:51 +0800
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml500012.china.huawei.com (7.185.36.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Mon, 31 May 2021 09:22:51 +0800
-Subject: Re: [kbuild-all] Re: [PATCH 2/3] crypto: hisilicon/sec - add fallback
- tfm supporting for XTS mode
-To:     Rong Chen <rong.a.chen@intel.com>,
-        kernel test robot <lkp@intel.com>,
-        <herbert@gondor.apana.org.au>
-References: <1622202126-19237-3-git-send-email-yekai13@huawei.com>
- <202105282256.hUBoOJ3Z-lkp@intel.com>
- <c265adb3-4cba-a6f7-6ba5-9a065fe5aeca@huawei.com>
- <7c435436-cf38-7c09-9141-8410a8c18cc8@intel.com>
-CC:     <kbuild-all@lists.01.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>
-From:   "yekai(A)" <yekai13@huawei.com>
-Message-ID: <ee6a4b40-de82-57e9-ba7a-4e3aceac12a4@huawei.com>
-Date:   Mon, 31 May 2021 09:22:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Mon, 31 May 2021 08:44:56 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73812C061574;
+        Mon, 31 May 2021 05:43:16 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id v5so14794776ljg.12;
+        Mon, 31 May 2021 05:43:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=A73j5gfyhf0kaSot1r4cuCgREnISlDQgXL2RSfW904E=;
+        b=TVlblWlh307l5p4aWPY8vA4Jihb6CDsGKAr/G9XH/4AqnapaTB3R8huPmSNsVuZx+b
+         yzZQ6MSRCncH+7IfjCpYfXUi/XG1Hx9688sqFNArkPEJ5ENbWc6qwmhUTA/IjPpsoLPp
+         HpAjNodzljr0vbzRT/h+74w0sYtsbLEMRzfwUtbmKKSo000u8gFjaWHpmPgtvRA90448
+         MwO6NsxsLtK1K7xgKubwjGjmC6dpBehlXoufd6CSSV8pHfgzX7ejSedvRUshZ/gk4Xio
+         YhWmLxdPe50XPrm6qkLfCFAhaCucxbRuu/CExBhxC+IL+8M7AyUMCBbDQgGl2NvuS90A
+         XxNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=A73j5gfyhf0kaSot1r4cuCgREnISlDQgXL2RSfW904E=;
+        b=mT2c6HA6UXIB/BXe0Y1cLbUkhICXvHgcYYQ6ywKVIOSS+H6PvDTrGxGX1rvlKSrhmm
+         z9DY9x4obZP+y7TKglMUHDbp77xvhH0xWPBid2dzrfU28yHGLNZE6b+e6X1DTzFVVdce
+         RB2eKMIYdPmJ931d0PgISyuLsWDv2E/g4HDEroO+Bk4ecKAR4I4LM3H9jen5xi4zG6ND
+         hvB+kMeavQlBqx1Iw2e719/gvbjBW7gio8SmEIVhcIFtMejMbzrQybc4R2qMYjKfVyHd
+         Sq54qkK4msT3Uciq4m/jvkrROMD73VmFaihze6UcqU6Cbb89MzZyIsTp7Ic2XO6jTjCm
+         QUoQ==
+X-Gm-Message-State: AOAM531chcPriWG+y/ZkWrSmy33ZTDDVu/dVryh0EnNg8pSsj6uuCHwF
+        E/XjnQOz5UeIsf/54VvmcsB1Ln2NR4kCazAIGzfALnjU
+X-Google-Smtp-Source: ABdhPJy2wSR7fuTYBXX5HkgOt6f7QpRaKy1VKFMom6FmaoLaw15313yuwsmOlRJhDm2tsCT3+gTuNcPONDo5b05HaMQ=
+X-Received: by 2002:a2e:b80b:: with SMTP id u11mr16911734ljo.94.1622464994778;
+ Mon, 31 May 2021 05:43:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <7c435436-cf38-7c09-9141-8410a8c18cc8@intel.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500012.china.huawei.com (7.185.36.15)
-X-CFilter-Loop: Reflected
+References: <1622123615-15517-1-git-send-email-herbert.tencent@gmail.com>
+ <1622123615-15517-2-git-send-email-herbert.tencent@gmail.com> <47cf4353-b4bb-3907-6017-60bf87805d0c@linux.alibaba.com>
+In-Reply-To: <47cf4353-b4bb-3907-6017-60bf87805d0c@linux.alibaba.com>
+From:   hongbo li <herbert.tencent@gmail.com>
+Date:   Mon, 31 May 2021 20:43:04 +0800
+Message-ID: <CABpmuwLUZY=aPjeH=AdPvP2jq2+jnTyUyLLOoAwCg+hBZJB2Xg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/7] crypto: fix a memory leak in sm2
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>,
+        David Howells <dhowells@redhat.com>, jarkko@kernel.org,
+        =?UTF-8?B?aGVyYmVydGhibGko5p2O5byY5Y2aKQ==?= 
+        <herberthbli@tencent.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-integrity@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Tianjia Zhang <tianjia.zhang@linux.alibaba.com> =E4=BA=8E2021=E5=B9=B45=E6=
+=9C=8828=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=882:27=E5=86=99=E9=81=
+=93=EF=BC=9A
+>
+> Hi Herbert, Hongbo,
+>
+> On 5/27/21 9:53 PM, Hongbo Li wrote:
+> > From: Hongbo Li <herberthbli@tencent.com>
+> >
+> > SM2 module alloc ec->Q in sm2_set_pub_key(), when doing alg test in
+> > test_akcipher_one(), it will set public key for every test vector,
+> > and don't free ec->Q. This will cause a memory leak.
+> >
+> > This patch alloc ec->Q in sm2_ec_ctx_init().
+> >
+> > Fixes: ea7ecb66440b ("crypto: sm2 - introduce OSCCA SM2 asymmetric ciph=
+er algorithm")
+> > Signed-off-by: Hongbo Li <herberthbli@tencent.com>
+> > Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> > ---
+> >   crypto/sm2.c | 24 ++++++++++--------------
+> >   1 file changed, 10 insertions(+), 14 deletions(-)
+> >
+>
+> Patch 1/7 is an independent bugfix patch. If possible, consider applying
+> it first.
+>
+> The commit message header should start with: crypto: sm2 -
+>
+> Also added:
+>
+> Cc: stable@vger.kernel.org # v5.10+
+>
+> Best regards,
+> Tianjia
 
+OK, will send this patch later.
 
-On 2021/5/31 8:51, Rong Chen wrote:
->
->
-> On 5/29/21 5:22 PM, yekai(A) wrote:
->>
->>
->> On 2021/5/28 22:13, kernel test robot wrote:
->>> Hi Kai,
->>>
->>> Thank you for the patch! Yet something to improve:
->>>
->>> [auto build test ERROR on cryptodev/master]
->>> [also build test ERROR on crypto/master linux/master linus/master
->>> v5.13-rc3 next-20210528]
->>> [If your patch is applied to the wrong git tree, kindly drop us a note.
->>> And when submitting patch, we suggest to use '--base' as documented in
->>> https://git-scm.com/docs/git-format-patch]
->>>
->>> url:
->>> https://github.com/0day-ci/linux/commits/Kai-Ye/crypto-hisilicon-supports-new-skciphers-for-new-hardware/20210528-194644
->>>
->>> base:
->>> https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
->>> master
->>> config: ia64-allmodconfig (attached as .config)
->>> compiler: ia64-linux-gcc (GCC) 9.3.0
->>> reproduce (this is a W=1 build):
->>>         wget
->>> https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross
->>> -O ~/bin/make.cross
->>>         chmod +x ~/bin/make.cross
->>>         #
->>> https://github.com/0day-ci/linux/commit/60bae5ed49c53ea90c82125a8295fb72833a3b68
->>>
->>>         git remote add linux-review https://github.com/0day-ci/linux
->>>         git fetch --no-tags linux-review
->>> Kai-Ye/crypto-hisilicon-supports-new-skciphers-for-new-hardware/20210528-194644
->>>
->>>         git checkout 60bae5ed49c53ea90c82125a8295fb72833a3b68
->>>         # save the attached .config to linux build tree
->>>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0
->>> make.cross ARCH=ia64
->>>
->>> If you fix the issue, kindly add following tag as appropriate
->>> Reported-by: kernel test robot <lkp@intel.com>
->>>
->>> All errors (new ones prefixed by >>):
->>>
->>>    drivers/crypto/hisilicon/sec2/sec_crypto.c: In function
->>> 'sec_aead_crypto':
->>>>> drivers/crypto/hisilicon/sec2/sec_crypto.c:1751:40: error: 'sk_req'
->>>>> undeclared (first use in this function); did you mean 'a_req'?
->>>     1751 |   return sec_skcipher_soft_crypto(ctx, sk_req, encrypt);
->>>          |                                        ^~~~~~
->>>          |                                        a_req
->>>    drivers/crypto/hisilicon/sec2/sec_crypto.c:1751:40: note: each
->>> undeclared identifier is reported only once for each function it
->>> appears in
->>>
->>>
->>> vim +1751 drivers/crypto/hisilicon/sec2/sec_crypto.c
->>>
->>>   1733
->>>   1734    static int sec_aead_crypto(struct aead_request *a_req, bool
->>> encrypt)
->>>   1735    {
->>>   1736        struct crypto_aead *tfm = crypto_aead_reqtfm(a_req);
->>>   1737        struct sec_req *req = aead_request_ctx(a_req);
->>>   1738        struct sec_ctx *ctx = crypto_aead_ctx(tfm);
->>>   1739        int ret;
->>>   1740
->>>   1741        req->flag = a_req->base.flags;
->>>   1742        req->aead_req.aead_req = a_req;
->>>   1743        req->c_req.encrypt = encrypt;
->>>   1744        req->ctx = ctx;
->>>   1745
->>>   1746        ret = sec_aead_param_check(ctx, req);
->>>   1747        if (unlikely(ret))
->>>   1748            return -EINVAL;
->>>   1749
->>>   1750        if (unlikely(ctx->c_ctx.fallback))
->>>> 1751            return sec_skcipher_soft_crypto(ctx, sk_req, encrypt);
->>>   1752
->>>   1753        return ctx->req_op->process(ctx, req);
->>>   1754    }
->>>   1755
->>>
->>> ---
->>> 0-DAY CI Kernel Test Service, Intel Corporation
->>> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
->>>
->>
->>
->> You shouldn't git am this patchset directly, because this patchset
->> depends on previous patchset.
->> the series is "crypto: hisilicon - add new type of sqe for Kunpeng930",
->> the patchwork is
->> https://patchwork.kernel.org/project/linux-crypto/list/?series=490143,
->> thank you
->> Kai
->
-> Hi Kai,
->
-> Thanks for the clarification, it could be very helpful for us if
-> '--base' for git format-patch used or
-> there is a patchwork link in cover letter file.
->
-> Best Regards,
-> Rong Chen
-> .
->
-thanks for your suggestion.
-
-Best Regards
-Kai
+Regards,
+Hongbo
