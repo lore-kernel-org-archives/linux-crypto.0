@@ -2,148 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E18C47080
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 13:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B31BC47083
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 13:59:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4CDFE61423
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 13:50:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D94061446
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 May 2021 13:59:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232470AbhEaNvo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 May 2021 09:51:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34258 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232490AbhEaNtZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 May 2021 09:49:25 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEBDAC0610E8;
-        Mon, 31 May 2021 06:30:44 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id 22-20020a17090a0c16b0290164a5354ad0so1335237pjs.2;
-        Mon, 31 May 2021 06:30:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=6mf9vxePMwOECmPy8sralSQirr3sPMiFyk3gZWElr34=;
-        b=NOrEdIkmcjZaaZLptcbrxJMPUDa7Q/13ezvdv+3nz9bra+EWHxhkXbET2vWbh+Nof1
-         e7AsdZc5ECngckio0j237QPh9MtqHrvhpjNGcAerPxinHYjUdTqhZAynfj2s5ReDRQsG
-         EMEFkK3ckomIHPn5f+r4s6jFsAbJWEim9r77wnppxxuwhVEHkWsAkXlCvZ5Hmpclm4cu
-         7xdUhszx/Fo9p8Z7Dl40pORAxOQuSoTSk/GE1OGl2DPwDKQQ3h88XBc7hU4+aWv9we42
-         GRvKDZBxvzNh/P6qQeUimp76SjT/DohFQRyhLYw/NJhdi6TZywt+d2388QsdFaEGWevu
-         NcBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=6mf9vxePMwOECmPy8sralSQirr3sPMiFyk3gZWElr34=;
-        b=AkLofsZH3P9NCMLnEz5KcEPLCs/aH2aUE1DiBrTKe64KtIINpXQheVZmWC/yKgdGsu
-         X6edlsdTGMw9ycQkgzFUPDNau8KHCZGzXhHc88kdHokhpC5VmOuLgZBOmDHwrX/xAj3Q
-         2QE8UM8tNvhBnriJYfZZem0tZa3ekHHXJLzNm7bqGb5xP4r0R6AXOiptZXPd+0r48yN0
-         r5EemHhytxxonYwCUE4NqqGslEt+Eognswq3o0oyoUaQIiLJP9ElF0VkmJ8YYuQVhWPb
-         edVF7hcdxyegSHlQqkFD5VaBMgpdOHKw9nKVl/+lwaVEf3gGT3yLPjTQnOFchMSUn5Nl
-         wkLg==
-X-Gm-Message-State: AOAM531MvsaZYA72OARUIw3O3Yc/PyYVy9adtzWtF1yZR9ItWwUXro/6
-        4Bjk5PLP/hrgsk/elkMoP6WhwrEDCo8=
-X-Google-Smtp-Source: ABdhPJydb/0iJtzHNck3YPyW8ss9CWq2h6HdUdwgEV4dWTCY+4Iusd66oOusFiw3mRC6FGxQgyKVkA==
-X-Received: by 2002:a17:90a:ce02:: with SMTP id f2mr11705623pju.45.1622467844182;
-        Mon, 31 May 2021 06:30:44 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.39])
-        by smtp.gmail.com with ESMTPSA id p36sm11836646pgm.74.2021.05.31.06.30.41
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 31 May 2021 06:30:43 -0700 (PDT)
-From:   Hongbo Li <herbert.tencent@gmail.com>
-To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, ebiggers@kernel.org,
-        dhowells@redhat.com, jarkko@kernel.org,
-        tianjia.zhang@linux.alibaba.com, herberthbli@tencent.com
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH] crypto: sm2 - fix a memory leak in sm2
-Date:   Mon, 31 May 2021 21:30:01 +0800
-Message-Id: <1622467801-30957-1-git-send-email-herbert.tencent@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S232688AbhEaOAw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 31 May 2021 10:00:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59374 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232065AbhEaN6u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 31 May 2021 09:58:50 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0B32561936;
+        Mon, 31 May 2021 13:35:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1622468140;
+        bh=29yBi7z/CJIiEuekGlfUeyaZL3+2djxDR7+tD7HwhU0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=qFHveuq1xI0N6yw4lwyj2SpgcV3yoF2c5lrmt8FSsg5eB4OF2tVyIWzUepE892z/S
+         +7BMjZ4OKBAVneR2fA1ae3IEYk+jKXxTTb8BKTzSMtRsBkJpt2kpocpnin9bylISRY
+         3LxWRbMqn8lIZQrGVterHU4LIJX2/xFYs+mqrovk=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.10 132/252] Revert "crypto: cavium/nitrox - add an error message to explain the failure of pci_request_mem_regions"
+Date:   Mon, 31 May 2021 15:13:17 +0200
+Message-Id: <20210531130702.491494728@linuxfoundation.org>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210531130657.971257589@linuxfoundation.org>
+References: <20210531130657.971257589@linuxfoundation.org>
+User-Agent: quilt/0.66
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Hongbo Li <herberthbli@tencent.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-SM2 module alloc ec->Q in sm2_set_pub_key(), when doing alg test in
-test_akcipher_one(), it will set public key for every test vector,
-and don't free ec->Q. This will cause a memory leak.
+[ Upstream commit 6a3239a738d86c5e9b5aad17fefe2c2bfd6ced83 ]
 
-This patch alloc ec->Q in sm2_ec_ctx_init().
+This reverts commit 9fcddaf2e28d779cb946d23838ba6d50f299aa80 as it was
+submitted under a fake name and we can not knowingly accept anonymous
+contributions to the repository.
 
-Fixes: ea7ecb66440b ("crypto: sm2 - introduce OSCCA SM2 asymmetric cipher algorithm")
-Signed-off-by: Hongbo Li <herberthbli@tencent.com>
-Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+This commit was part of a submission "test" to the Linux kernel
+community by some "researchers" at umn.edu.  As outlined at:
+	https://www-users.cs.umn.edu/%7Ekjlu/papers/full-disclosure.pdf
+it was done so as an attempt to submit a known-buggy patch to see if it
+could get by our review.  However, the submission turned out to actually
+be correct, and not have a bug in it as the author did not understand
+how the PCI driver model works at all, and so the submission was
+accepted.
+
+As this change is of useless consequence, there is no loss of
+functionality in reverting it.
+
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: linux-crypto@vger.kernel.org
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Link: https://lore.kernel.org/r/YIkTi9a3nnL50wMq@kroah.com
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/sm2.c | 24 ++++++++++--------------
- 1 file changed, 10 insertions(+), 14 deletions(-)
+ drivers/crypto/cavium/nitrox/nitrox_main.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/crypto/sm2.c b/crypto/sm2.c
-index b21addc..db8a4a2 100644
---- a/crypto/sm2.c
-+++ b/crypto/sm2.c
-@@ -79,10 +79,17 @@ static int sm2_ec_ctx_init(struct mpi_ec_ctx *ec)
- 		goto free;
- 
- 	rc = -ENOMEM;
-+
-+	ec->Q = mpi_point_new(0);
-+	if (!ec->Q)
-+		goto free;
-+
- 	/* mpi_ec_setup_elliptic_curve */
- 	ec->G = mpi_point_new(0);
--	if (!ec->G)
-+	if (!ec->G) {
-+		mpi_point_release(ec->Q);
- 		goto free;
-+	}
- 
- 	mpi_set(ec->G->x, x);
- 	mpi_set(ec->G->y, y);
-@@ -91,6 +98,7 @@ static int sm2_ec_ctx_init(struct mpi_ec_ctx *ec)
- 	rc = -EINVAL;
- 	ec->n = mpi_scanval(ecp->n);
- 	if (!ec->n) {
-+		mpi_point_release(ec->Q);
- 		mpi_point_release(ec->G);
- 		goto free;
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
+index 9d14be97e381..cee2a2713038 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_main.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
+@@ -451,7 +451,6 @@ static int nitrox_probe(struct pci_dev *pdev,
+ 	err = pci_request_mem_regions(pdev, nitrox_driver_name);
+ 	if (err) {
+ 		pci_disable_device(pdev);
+-		dev_err(&pdev->dev, "Failed to request mem regions!\n");
+ 		return err;
  	}
-@@ -386,27 +394,15 @@ static int sm2_set_pub_key(struct crypto_akcipher *tfm,
- 	MPI a;
- 	int rc;
- 
--	ec->Q = mpi_point_new(0);
--	if (!ec->Q)
--		return -ENOMEM;
--
- 	/* include the uncompressed flag '0x04' */
--	rc = -ENOMEM;
- 	a = mpi_read_raw_data(key, keylen);
- 	if (!a)
--		goto error;
-+		return -ENOMEM;
- 
- 	mpi_normalize(a);
- 	rc = sm2_ecc_os2ec(ec->Q, a);
- 	mpi_free(a);
--	if (rc)
--		goto error;
--
--	return 0;
- 
--error:
--	mpi_point_release(ec->Q);
--	ec->Q = NULL;
- 	return rc;
- }
- 
+ 	pci_set_master(pdev);
 -- 
-1.8.3.1
+2.30.2
+
+
 
