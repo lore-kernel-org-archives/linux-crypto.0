@@ -8,44 +8,44 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 327B5C47083
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Jun 2021 14:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FC0C4708F
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Jun 2021 14:12:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 108176140C
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Jun 2021 14:12:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E3D3613EE
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Jun 2021 14:12:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231363AbhFBONu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Jun 2021 10:13:50 -0400
-Received: from mail-bn8nam11on2066.outbound.protection.outlook.com ([40.107.236.66]:15585
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        id S230145AbhFBOOD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Jun 2021 10:14:03 -0400
+Received: from mail-dm3nam07on2077.outbound.protection.outlook.com ([40.107.95.77]:45953
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230029AbhFBON0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Jun 2021 10:13:26 -0400
+        id S230204AbhFBONe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Jun 2021 10:13:34 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZjUs7zkZyX+mUjz95dZd6sRgSx1Ea6kv1v8iRGEvX9WuB2IwYM0oHGwQ/rP1DLeECNUa/yjWEb64tBYQxngIWPsBiNsktMldAmOT8hwdfmAOfbUW2YgcndfBNzdDhye9Kk/BMC36j+MpEq/bPVYUALg2i+n18PkZ1jvKwhwX2I+ITsIuP9V9BbwzPl+n/v5GFTTDqNEimv9uQnRhrvUxuJEsofbbPyHRAZjMu7vOjVbgIkPV99mYs/rxacEFiPLPVCDsfmrXD0RIO3nJHs7XdttfTkObqQcJLFFPQhRJNHl0C1FVPX76phNx5vJlxHZc559s4lvmbE1iJBmD3Lpwkg==
+ b=KzKrpe5TwxP4JQFyBdcBGGvDvsIoYvalSN7uOgfv5XYzeCau+cX3t86HvSoAcO3vI/nQfCMBSR22VZL85/jT5EDDQ7VuJWV3sXDHM+XfslmpFUpcdI+Wi/1bCzSmEvxYi7D2ed3onKd6J8Sg31ClLMnPHOFkZ42VwjLJUGI7QYnqf5Q45ZFol4kOkfBgFk1i+kkAYoOJERosnir1sDnd6sm2npeO5AN4fQyekXRPHt+uq8y1hHQoInMwjaIJc56L5Wr6kXBWowPlWu8MP1dURg+LQL8ZGpvD5MK38LmNwl0l0S4fxYa1TifcsRt/XnEM43/UPG5FHbhWX+I1O8bDAg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1UphxcpY5uChYPHuOjoorgCa1mz8ved+dqYE3LBHz70=;
- b=fvtcJjR3tD316KOLsgkuOxYiWBoumYB3DRA7NtHfG5gvGmyfnVbMZJg+uR3xwcSdylWAEkUX7Dihz2s1gsEfci5o5sIDxlRCr/ML03iMzzZ974y0IEbTqp5/x8Twi4kUGE4/GAnCCToXoASKgUucy221NHwCJp1VvuxXP8NE0AIcvsqRoBZd0l153ofL79hOCg7yonlqJ/KF/72xro68pdqIz4EZz9Mf55cXEwE8wGAuRPUo2F7FRNV0bBAkYuHbbBkyww0tfTggpNdoEodkDJS0sAFpstV1V0TuQDE6EbnXo1Hqg4Uuda/OTsnMs0DHwFHq/IV6sJlL5cdkLfaD3w==
+ bh=vA9Y7FTLsl3X3KXsPSydxPwo+ZSKbBDJMa3NZmmwxmI=;
+ b=kwCY2Km1qEOpqGmLAySR+S0N5EZWD6CfN4XN6jmWs0g75ytdnZgtpbtaYkhI0fT3e/bMAxb83YUDU3Wyu6jWPPh23AAUiafLqeZQd+By3wHqPLo2Q5iEl7e+Y2QnSN3qmRQuARdr+ZtiUVav2P79stQBKcLNB+J3IGasXau1/OwAfzZ33bzFD84GUKdayxY3kTtzkPEVCJSyw4XRVPUNG829yCW933T4Q3j6Lgj1nox2H/y6LXRMeCtrO+R/sJSAYF7Lv17qenFLfy10BUycX6fK56Ncz49oIUxkwkkOENh+QGzZM414H4M2T9lAGLwz3i7rYK1VFiFZ9Q6Eh1AD2g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1UphxcpY5uChYPHuOjoorgCa1mz8ved+dqYE3LBHz70=;
- b=3YaLkSTOm2nHMb+lmDc2TvCsa7Cuja5HBxLF9X4XhJTEK25hXBhT1UIhu3e4hDm1KTBl0TDKZ2jGPXoTo+vUdlSmh4nvWqmC2RQi/t0+6wScVsTQv1fviOy8eXSmLIlMqm2K5/iyl/oT13RKfsFhJ/wzfINXuaNQ1cMa5XxzG3Y=
+ bh=vA9Y7FTLsl3X3KXsPSydxPwo+ZSKbBDJMa3NZmmwxmI=;
+ b=2GouCPbDU5yVrZUytDaADmGSJOcD6v00kCxjh5zLr+EIg+lDZNe5kcNGIVV+7mkQOuo2hG5xOOOK4VEHiFQGjV1NFj7fygCfoPHM7y3M6D8Ni67qDSjGWCjQxkrUW4TqubqDrzc4jsXZbEjQOhq/2GzhI3q18U7y7eCca6Y1lpA=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN1PR12MB2368.namprd12.prod.outlook.com (2603:10b6:802:32::23) with
+ by SA0PR12MB4495.namprd12.prod.outlook.com (2603:10b6:806:70::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20; Wed, 2 Jun
- 2021 14:11:34 +0000
+ 2021 14:11:30 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4173.030; Wed, 2 Jun 2021
- 14:11:34 +0000
+ 14:11:30 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -67,9 +67,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         David Rientjes <rientjes@google.com>, tony.luck@intel.com,
         npmccallum@redhat.com, Borislav Petkov <bp@suse.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 RFC v3 04/37] x86/sev: Add the host SEV-SNP initialization support
-Date:   Wed,  2 Jun 2021 09:10:24 -0500
-Message-Id: <20210602141057.27107-5-brijesh.singh@amd.com>
+Subject: [PATCH Part2 RFC v3 01/37] KVM: SVM: Add support to handle AP reset MSR protocol
+Date:   Wed,  2 Jun 2021 09:10:21 -0500
+Message-Id: <20210602141057.27107-2-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210602141057.27107-1-brijesh.singh@amd.com>
 References: <20210602141057.27107-1-brijesh.singh@amd.com>
@@ -80,274 +80,191 @@ X-ClientProxiedBy: SA0PR11CA0056.namprd11.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:11:32 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0056.namprd11.prod.outlook.com (2603:10b6:806:d0::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.20 via Frontend Transport; Wed, 2 Jun 2021 14:11:29 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 025ba9c4-ed41-4ca3-e2fc-08d925d05371
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2368:
+X-MS-Office365-Filtering-Correlation-Id: 47b0fc7a-3848-4e22-0bbc-08d925d0516f
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4495:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB23689FA05E1305B0B7623D0DE53D9@SN1PR12MB2368.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4495E47B235D26DF3D682650E53D9@SA0PR12MB4495.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jYrpWFsqujSvcHKdrDhKkOwUbeKCOkNCvA2kc4LQUoV9m4uCBO4j0LP1m4YDO3dkXIsMk+SUxcfNnXfVncoqUFffnptxs91c4IDfwWvfZja03HEWZnB6PFXeXGhdhXqx9/Eo72SzHr4ZD9wkwLR94coS12dk41AYW3jY8/3UBL/ZXEPtOKxl/GFYQfYl7+9EJpF5+g6VR2+PRKaRPJfpFqiehK2UNRpjpOZEgvMeCBMZttE85C5tJrQtPgGkSH2Af8tLinI1Qpg98xduW04Upbh/92gu4mafAJT43vfeGXrXMzxuq+k2TKoLSa2T6gQeCG8MgMUCWyFGzVwyYqqTamB4bjTUV5g6KQogrCHdgPcfKRAp2lCK4nxZgZdKdoMSDBxetK9IqK2FWb0c+3rFxFk1ePTj/z93tfqt8fnqi9tH39OKg50IbsBnGvO+89brVNCO6HxDVfYiaukn5g9+FUkMK8PulKFQpZks5/YjWpxg3tnBDgh+4VV7Bw5KU4f0+xT3MfrtQX61qn63B6NvkDA2L4rMsZ63ek6aU8EmYOSX3Li/vdKdgpaNCdSXE4ruo1cRRW0bQ1h+417m0tJcNH4qn+1k1++uZkI47BjpQOHwnz/ljIskHSaPwhRnltuFXHZYJN5mOzsSa7Key1/h8A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(376002)(366004)(346002)(39860400002)(5660300002)(86362001)(6486002)(52116002)(7696005)(44832011)(38350700002)(38100700002)(956004)(2616005)(1076003)(8676002)(7416002)(8936002)(478600001)(186003)(316002)(4326008)(16526019)(26005)(66556008)(66476007)(2906002)(36756003)(54906003)(83380400001)(6666004)(66946007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?tedJwENNpupSH40iWmDpWNExfA+E7/8RAygnFGj953xk/XEIBGoGTRuHFm7q?=
- =?us-ascii?Q?wQ5WUWLaI8wUSufC8zaeIMkW64FgKEqz+nhFbTsSAZLTz85tDQEK+HKDu8s7?=
- =?us-ascii?Q?nX0IIGNPEHXZh+kSVU7tNlcXY6Zyqh5pC7jeGgmN/YZKbkIJFhqRYSWCkPaY?=
- =?us-ascii?Q?GhbUd+CXreKdtQnnMMyUPU2827vUlvlpcVaojwrtE4c+RYgZinGWSJ5cf2J4?=
- =?us-ascii?Q?O1DfpO9mi84UAQT1pVzNY9dYoxVpet/bwk1GIYyT7qxrggzbeBk8xFDUs+gl?=
- =?us-ascii?Q?WVGzBdEK5uuRHtSxbrYMIKQ91GAj9OJklNhZG9Qb/Z8eoox72QAtP4pmoZ0m?=
- =?us-ascii?Q?5e3rGzYIFXEm8g6N6vXeIUFLWLBg1AiyQGbqPRxzRQFGWJsfqdZ/X+EhuucN?=
- =?us-ascii?Q?LxwdDz9FyCoB+7K2XDEZxUdPrQ0i107C/7ywXbE3P37ycb19ukY8JlXQmA7b?=
- =?us-ascii?Q?q6WKx4LG/OtyutIgGDyWwZXevueJk/H2iry3PwjPLXIpCXnKILEomyFEo4oy?=
- =?us-ascii?Q?oGZpA/IesqdxYOat57Uct+AzyAWUKLGWcgpce+Tke62IMo/2lkjHW6ENsAGf?=
- =?us-ascii?Q?YcoqXpedstHmZqeg1BM7rkpBzuarVnpOk5DHN3H8NMunpmfaV5CFBrF516BB?=
- =?us-ascii?Q?YiJtO7zk5DMM405xl44Ck1c97ybkgfAvh4g/xXiRq+yi4aHeb8z+0wBaaTJr?=
- =?us-ascii?Q?CL5czMX37EogjZmQISdj1d3kGgWeeJCpDaWQjPTZvDRwH0N38yY3Scg1XHuH?=
- =?us-ascii?Q?eVJ+qt4xf6mrdzK+MXPyiMqH6zoZIwMvQZ/yqwp4ywiwwkiTksF+gnFeiIRF?=
- =?us-ascii?Q?++FG0Q9+SMrCjFjy12ilsScJC4nqcz7/wKSwUOg4ejmxzXgfIS4idwZu5yZd?=
- =?us-ascii?Q?LSlWqy41rK1ouwo/gRW1RH/gzS98/FV1Bj5fNEmItkJEwip+0UQc08g4yaR8?=
- =?us-ascii?Q?nx/6YYr/d7VIzaVMB8cL5QR6X53pHHmXR/CFdfthvKytxmMp46UpNrHl/s3k?=
- =?us-ascii?Q?EgDeaiG2FsbwA4p6KbzWaQ4kj7SkfMG4rKaBHBLnnghHaTmkeyAeP8j9wQcZ?=
- =?us-ascii?Q?WgYfrxjUo41UjEmNNiCQbxVvsiSdP51qaejRmEQeBQYASIpXS36U24HMwelS?=
- =?us-ascii?Q?/FNx+NijzOhAiSlkQgnXsVZcHEMVrBW+IqHP2l6A7nHbov7aOh9EAXyzixsh?=
- =?us-ascii?Q?gwun3mjgqHMkKFIqYBHk1XhKy4X5WWfdfdK3Ofv3SWtIiIPJJYfDv7qabGHI?=
- =?us-ascii?Q?Z/54YHNaHoTEgdp3nrqx8R2Dd7uXJAUIvuhzTO9KaKULZP8xUzQYzxetbBSo?=
- =?us-ascii?Q?mI2kjJss6YJwrHk60OUgMCK0?=
+X-Microsoft-Antispam-Message-Info: HAdQCQYuW9bo+ta1Dw6hsrXKWyk1kMhpx2riMl7lVsdWaAH9Oy6hG3QiGDZTHYJ8o6u08b5Sc1IqfqbDfdDN5ok3MQ/RLirldHAdsfa/EQ0rJma68aIM5JLDXAm2OLBneWdBkukTNP1hDLwE8AI7MuEvBvAx+QZkF4zZ5a1qs930uxUuwW77vIhLVIWZZJ3h6R0kJYm5mSo8mH7CB3UY3ZGkeKk9BlGWeD1eFGSnOSQlNiycAxHJQxlum/hu0HxPZo9FB+meGNNUGv7ejQ8ZLRIsUOAGe3rvZMSBhADVUeWugIyzkKg46MJzFPlpONfNIWA5cpZQXBXZVe0+hJU4CHVXYo1/h+tLBWoPejo2n4Xiv60AjoyJoa1SLBFN4vBxuClYaP1WIGb2LyVhiygjes8VSjha8lXmYZ6RSup34kQKbjC+Lf/rmKTHM+vyZZDs2NEvcTwPQogQehKz/XTrnvbxWgT5qxIRhbb34CE/+/oz9zN8KB3JL1kepSbE6Wru3qklUSCeRA7Ns02Wn8SBGMOI9sxSp5JbczMtOXLg+P96oGwSxlBhTjq730csNcX6clN5mJTYRQkr7kb6qprAfztDOE5SCePw4FsUdRe1E32Zm6hqMQ4Pm0kEdKkIVO9eRY8NGo4D77EZ4Ct5zZgPUw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(396003)(346002)(366004)(39860400002)(1076003)(54906003)(44832011)(8676002)(2616005)(956004)(478600001)(6486002)(316002)(86362001)(4326008)(7416002)(6666004)(38100700002)(7696005)(38350700002)(52116002)(16526019)(26005)(186003)(2906002)(5660300002)(66946007)(8936002)(83380400001)(36756003)(66556008)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?VOC/OmfkogO4b/NPmeECsMq6EP7hA04zC14KYZc6jaRwrAMfUQYyS3y9DyYk?=
+ =?us-ascii?Q?gGcy/abwkDD3jJ6Zy6+aVnQJvVs9Ky9QDbjrNUtfcqJi6R5hqtb7tBG3Dsxt?=
+ =?us-ascii?Q?DHIkOx1Efh+exn7+2qmHyMss8J0KEKB+y5pwEqqljEEpNdfuKkvrUoJf+5IJ?=
+ =?us-ascii?Q?+i1Smoj2kf9FOribUAxLGeBJjfKJGFIaUGfQ8BBQzVtYe7NvD+rDm4lJZqee?=
+ =?us-ascii?Q?CMU0Zf+TNYqQPSnGekjmhL2xVvLLYbhf7sMm/e4xlDyJ/E4sw8A/qXwuowsy?=
+ =?us-ascii?Q?+V0oaFCEfOI9M0ZRgWo2Jv1rxACuEaY+2ilp4piZV5ZBf1dy7Wk5cpusm+/a?=
+ =?us-ascii?Q?WEKW4ypjLXPD6Yc/cjq+bCxPBVy+yKipstHIb8vONA3bHUwvAKBChjTNCA07?=
+ =?us-ascii?Q?txIylLouVdIV23hjFho/iLWVmuCquBn1wwUJsTeSlWWmHkYvLmv9ErP85FQJ?=
+ =?us-ascii?Q?pfKk1AiA4f0JbTdwZ3jVz7jWhfeOj1z/tKawvWgieLUzl4NZXgE3gtZPWNPj?=
+ =?us-ascii?Q?PSQzh5EfzwpyDFiJigy451s1sssSVGcvHiyS/Yi4nov+6pTlPv9YWP/w3Mj7?=
+ =?us-ascii?Q?j3BTofYrqcPzZIqphwZYMMq22m1scOns501WXEPmuKK08rPoG+fQTo+uXoVU?=
+ =?us-ascii?Q?Fe/pHf8GeesBEYXKDF4WXQGCV2S94RKhZEZpO3BU3rPBsesxpXf3gPg0sDXL?=
+ =?us-ascii?Q?QAK36f8wcwQ1tU9WSVbtSjnxUAAbvPWmf1K+6TTeIzjgUZfwXOJlNCpMOQZB?=
+ =?us-ascii?Q?kspvkiMZAa6UKXwBBwlxGNlOVdMyVilxeVnIyfzIK4FYUfDiZN59vpnTz5R/?=
+ =?us-ascii?Q?cq4edXoIVr7xMXWmPPj7pV5wavxboOMJkRCcKSyjT7fe5PFx/Tek/7DXaZYs?=
+ =?us-ascii?Q?I1WSUjXKu7v8ba5lO5ufVdsw9VPmkbSC4IbWtefwtGWWqaEitcVpybK/umKT?=
+ =?us-ascii?Q?9N3qPhUQmo9/fJM63Wy4NlPynWY9nRLoUzKiQM/JHl5ToZiE543Ml+Rh770V?=
+ =?us-ascii?Q?oBAi+8cBl8TRf6IPgoB7Ltjf7WMdqXxDcv6S+Z8jSWPalCVy2+0FtBsZJ0dD?=
+ =?us-ascii?Q?edVsHdyXYl/RGYiOrNtB0p9IrO0fAY56vXzda1Vc1GBjshtblW5XB3qGTMWb?=
+ =?us-ascii?Q?c23TJEs2A3mCPPk5KH29I2UGq+aMHdqlT9MnTLUDizYmdlke/yh+DLyLYIi2?=
+ =?us-ascii?Q?jho1mTxMoE+hTx+CYg3KBrt6SawTcp8RzH/7mMMDS8mRbsbGA9mFSlZ+sThR?=
+ =?us-ascii?Q?QNGDzjzATQdpTTnwIwi40ZAO7dtYLc6bI+vnskRijyx4J5M2YUOeaIZHZhDH?=
+ =?us-ascii?Q?c4MIRtphpPpyaHHy7ri9ohTu?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 025ba9c4-ed41-4ca3-e2fc-08d925d05371
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47b0fc7a-3848-4e22-0bbc-08d925d0516f
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:11:33.5242
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2021 14:11:30.0972
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: s8LadkHFVD+9sZs4VRGO9LXFTQ5LjhfHaSecUDL8jH4hsTg6yoGYcVCVD+3twKh8oihWJYV00Z1CQrK8E6z1NQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2368
+X-MS-Exchange-CrossTenant-UserPrincipalName: I1Wfg8N+dm3UZe6n+jcIv3kRDM7hgWmaNaK014CFhnCE/NDd1yJLN3cjxhWRVt1G9MDOVISHyw3lAuHlnUNCwQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4495
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The memory integrity guarantees of SEV-SNP are enforced through a new
-structure called the Reverse Map Table (RMP). The RMP is a single data
-structure shared across the system that contains one entry for every 4K
-page of DRAM that may be used by SEV-SNP VMs. The goal of RMP is to
-track the owner of each page of memory. Pages of memory can be owned by
-the hypervisor, owned by a specific VM or owned by the AMD-SP. See APM2
-section 15.36.3 for more detail on RMP.
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-The RMP table is used to enforce access control to memory. The table itself
-is not directly writable by the software. New CPU instructions (RMPUPDATE,
-PVALIDATE, RMPADJUST) are used to manipulate the RMP entries.
+Add support for AP Reset Hold being invoked using the GHCB MSR protocol,
+available in version 2 of the GHCB specification.
 
-Based on the platform configuration, the BIOS reserves the memory used
-for the RMP table. The start and end address of the RMP table must be
-queried by reading the RMP_BASE and RMP_END MSRs. If the RMP_BASE and
-RMP_END are not set then disable the SEV-SNP feature.
-
-The SEV-SNP feature is enabled only after the RMP table is successfully
-initialized.
-
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/disabled-features.h |   8 +-
- arch/x86/include/asm/msr-index.h         |   6 ++
- arch/x86/kernel/sev.c                    | 113 +++++++++++++++++++++++
- 3 files changed, 126 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/sev-common.h |  6 ++++
+ arch/x86/kvm/svm/sev.c            | 56 ++++++++++++++++++++++++++-----
+ arch/x86/kvm/svm/svm.h            |  1 +
+ 3 files changed, 55 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
-index b7dd944dc867..0d5c8d08185c 100644
---- a/arch/x86/include/asm/disabled-features.h
-+++ b/arch/x86/include/asm/disabled-features.h
-@@ -68,6 +68,12 @@
- # define DISABLE_SGX	(1 << (X86_FEATURE_SGX & 31))
- #endif
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+index 47aa57bf654a..97137f1a567b 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -45,6 +45,12 @@
+ 		(((unsigned long)reg & GHCB_MSR_CPUID_REG_MASK) << GHCB_MSR_CPUID_REG_POS) | \
+ 		(((unsigned long)fn) << GHCB_MSR_CPUID_FUNC_POS))
  
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+# define DISABLE_SEV_SNP	0
-+#else
-+# define DISABLE_SEV_SNP	(1 << (X86_FEATURE_SEV_SNP & 31))
-+#endif
++/* AP Reset Hold */
++#define GHCB_MSR_AP_RESET_HOLD_REQ		0x006
++#define GHCB_MSR_AP_RESET_HOLD_RESP		0x007
++#define GHCB_MSR_AP_RESET_HOLD_RESULT_POS	12
++#define GHCB_MSR_AP_RESET_HOLD_RESULT_MASK	GENMASK_ULL(51, 0)
 +
- /*
-  * Make sure to add features to the correct mask
-  */
-@@ -91,7 +97,7 @@
- 			 DISABLE_ENQCMD)
- #define DISABLED_MASK17	0
- #define DISABLED_MASK18	0
--#define DISABLED_MASK19	0
-+#define DISABLED_MASK19	(DISABLE_SEV_SNP)
- #define DISABLED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 20)
+ /* GHCB Hypervisor Feature Request */
+ #define GHCB_MSR_HV_FT_REQ	0x080
+ #define GHCB_MSR_HV_FT_RESP	0x081
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index d93a1c368b61..7d0b98dbe523 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -57,6 +57,10 @@ module_param_named(sev_es, sev_es_enabled, bool, 0444);
+ #define sev_es_enabled false
+ #endif /* CONFIG_KVM_AMD_SEV */
  
- #endif /* _ASM_X86_DISABLED_FEATURES_H */
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 69ce50fa3565..e8d45929010a 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -485,6 +485,8 @@
- #define MSR_AMD64_SEV_ENABLED		BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
- #define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
- #define MSR_AMD64_SEV_SNP_ENABLED	BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
-+#define MSR_AMD64_RMP_BASE		0xc0010132
-+#define MSR_AMD64_RMP_END		0xc0010133
- 
- #define MSR_AMD64_VIRT_SPEC_CTRL	0xc001011f
- 
-@@ -542,6 +544,10 @@
- #define MSR_AMD64_SYSCFG		0xc0010010
- #define MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT	23
- #define MSR_AMD64_SYSCFG_MEM_ENCRYPT	BIT_ULL(MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT)
-+#define MSR_AMD64_SYSCFG_SNP_EN_BIT		24
-+#define MSR_AMD64_SYSCFG_SNP_EN		BIT_ULL(MSR_AMD64_SYSCFG_SNP_EN_BIT)
-+#define MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT	25
-+#define MSR_AMD64_SYSCFG_SNP_VMPL_EN	BIT_ULL(MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT)
- #define MSR_K8_INT_PENDING_MSG		0xc0010055
- /* C1E active bits in int pending message */
- #define K8_INTP_C1E_ACTIVE_MASK		0x18000000
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index 8aae1166f52e..172497d6cbb9 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -24,6 +24,8 @@
- #include <linux/mm.h>
- #include <linux/cpumask.h>
- #include <linux/io.h>
-+#include <linux/io.h>
-+#include <linux/iommu.h>
- 
- #include <asm/cpu_entry_area.h>
- #include <asm/stacktrace.h>
-@@ -38,6 +40,7 @@
- #include <asm/cpu.h>
- #include <asm/apic.h>
- #include <asm/setup.h>		/* For struct boot_params */
-+#include <asm/iommu.h>
- 
- #include "sev-internal.h"
- 
-@@ -54,6 +57,9 @@ static struct ghcb __initdata *boot_ghcb;
- 
- static unsigned long snp_secrets_phys;
- 
-+static unsigned long rmptable_start __ro_after_init;
-+static unsigned long rmptable_end __ro_after_init;
++#define AP_RESET_HOLD_NONE		0
++#define AP_RESET_HOLD_NAE_EVENT		1
++#define AP_RESET_HOLD_MSR_PROTO		2
 +
- /* #VC handler runtime per-CPU data */
- struct sev_es_runtime_data {
- 	struct ghcb ghcb_page;
-@@ -2085,3 +2091,110 @@ unsigned long snp_issue_guest_request(int type, struct snp_guest_request_data *i
- 	return ret;
+ static u8 sev_enc_bit;
+ static DECLARE_RWSEM(sev_deactivate_lock);
+ static DEFINE_MUTEX(sev_bitmap_lock);
+@@ -2199,6 +2203,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 
+ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
+ {
++	/* Clear any indication that the vCPU is in a type of AP Reset Hold */
++	svm->ap_reset_hold_type = AP_RESET_HOLD_NONE;
++
+ 	if (!svm->ghcb)
+ 		return;
+ 
+@@ -2404,6 +2411,22 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 				  GHCB_MSR_INFO_POS);
+ 		break;
+ 	}
++	case GHCB_MSR_AP_RESET_HOLD_REQ:
++		svm->ap_reset_hold_type = AP_RESET_HOLD_MSR_PROTO;
++		ret = kvm_emulate_ap_reset_hold(&svm->vcpu);
++
++		/*
++		 * Preset the result to a non-SIPI return and then only set
++		 * the result to non-zero when delivering a SIPI.
++		 */
++		set_ghcb_msr_bits(svm, 0,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
++
++		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
++				  GHCB_MSR_INFO_MASK,
++				  GHCB_MSR_INFO_POS);
++		break;
+ 	case GHCB_MSR_TERM_REQ: {
+ 		u64 reason_set, reason_code;
+ 
+@@ -2491,6 +2514,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
+ 		break;
+ 	case SVM_VMGEXIT_AP_HLT_LOOP:
++		svm->ap_reset_hold_type = AP_RESET_HOLD_NAE_EVENT;
+ 		ret = kvm_emulate_ap_reset_hold(vcpu);
+ 		break;
+ 	case SVM_VMGEXIT_AP_JUMP_TABLE: {
+@@ -2628,13 +2652,29 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+ 		return;
+ 	}
+ 
+-	/*
+-	 * Subsequent SIPI: Return from an AP Reset Hold VMGEXIT, where
+-	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
+-	 * non-zero value.
+-	 */
+-	if (!svm->ghcb)
+-		return;
++	/* Subsequent SIPI */
++	switch (svm->ap_reset_hold_type) {
++	case AP_RESET_HOLD_NAE_EVENT:
++		/*
++		 * Return from an AP Reset Hold VMGEXIT, where the guest will
++		 * set the CS and RIP. Set SW_EXIT_INFO_2 to a non-zero value.
++		 */
++		ghcb_set_sw_exit_info_2(svm->ghcb, 1);
++		break;
++	case AP_RESET_HOLD_MSR_PROTO:
++		/*
++		 * Return from an AP Reset Hold VMGEXIT, where the guest will
++		 * set the CS and RIP. Set GHCB data field to a non-zero value.
++		 */
++		set_ghcb_msr_bits(svm, 1,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
+ 
+-	ghcb_set_sw_exit_info_2(svm->ghcb, 1);
++		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
++				  GHCB_MSR_INFO_MASK,
++				  GHCB_MSR_INFO_POS);
++		break;
++	default:
++		break;
++	}
  }
- EXPORT_SYMBOL_GPL(snp_issue_guest_request);
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt)	"SEV-SNP: " fmt
-+
-+static int __snp_enable(unsigned int cpu)
-+{
-+	u64 val;
-+
-+	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+		return 0;
-+
-+	rdmsrl(MSR_AMD64_SYSCFG, val);
-+
-+	val |= MSR_AMD64_SYSCFG_SNP_EN;
-+	val |= MSR_AMD64_SYSCFG_SNP_VMPL_EN;
-+
-+	wrmsrl(MSR_AMD64_SYSCFG, val);
-+
-+	return 0;
-+}
-+
-+static __init void snp_enable(void *arg)
-+{
-+	__snp_enable(smp_processor_id());
-+}
-+
-+static __init int __snp_rmptable_init(void)
-+{
-+	u64 rmp_base, rmp_end;
-+	unsigned long sz;
-+	void *start;
-+	u64 val;
-+
-+	rdmsrl(MSR_AMD64_RMP_BASE, rmp_base);
-+	rdmsrl(MSR_AMD64_RMP_END, rmp_end);
-+
-+	if (!rmp_base || !rmp_end) {
-+		pr_info("Memory for the RMP table has not been reserved by BIOS\n");
-+		return 1;
-+	}
-+
-+	sz = rmp_end - rmp_base + 1;
-+
-+	start = memremap(rmp_base, sz, MEMREMAP_WB);
-+	if (!start) {
-+		pr_err("Failed to map RMP table 0x%llx-0x%llx\n", rmp_base, rmp_end);
-+		return 1;
-+	}
-+
-+	/*
-+	 * Check if SEV-SNP is already enabled, this can happen if we are coming from
-+	 * kexec boot.
-+	 */
-+	rdmsrl(MSR_AMD64_SYSCFG, val);
-+	if (val & MSR_AMD64_SYSCFG_SNP_EN)
-+		goto skip_enable;
-+
-+	/* Initialize the RMP table to zero */
-+	memset(start, 0, sz);
-+
-+	/* Flush the caches to ensure that data is written before SNP is enabled. */
-+	wbinvd_on_all_cpus();
-+
-+	/* Enable SNP on all CPUs. */
-+	on_each_cpu(snp_enable, NULL, 1);
-+
-+skip_enable:
-+	rmptable_start = (unsigned long)start;
-+	rmptable_end = rmptable_start + sz;
-+
-+	pr_info("RMP table physical address 0x%016llx - 0x%016llx\n", rmp_base, rmp_end);
-+
-+	return 0;
-+}
-+
-+static int __init snp_rmptable_init(void)
-+{
-+	if (!boot_cpu_has(X86_FEATURE_SEV_SNP))
-+		return 0;
-+
-+	/*
-+	 * The SEV-SNP support requires that IOMMU must be enabled, and is not
-+	 * configured in the passthrough mode.
-+	 */
-+	if (no_iommu || iommu_default_passthrough()) {
-+		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-+		pr_err("IOMMU is either disabled or configured in passthrough mode.\n");
-+		return 0;
-+	}
-+
-+	if (__snp_rmptable_init()) {
-+		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-+		return 1;
-+	}
-+
-+	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/rmptable_init:online", __snp_enable, NULL);
-+
-+	return 0;
-+}
-+
-+/*
-+ * This must be called after the PCI subsystem. This is because before enabling
-+ * the SNP feature we need to ensure that IOMMU is not configured in the
-+ * passthrough mode. The iommu_default_passthrough() is used for checking the
-+ * passthough state, and it is available after subsys_initcall().
-+ */
-+fs_initcall(snp_rmptable_init);
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 0b89aee51b74..ad12ca26b2d8 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -174,6 +174,7 @@ struct vcpu_svm {
+ 	struct ghcb *ghcb;
+ 	struct kvm_host_map ghcb_map;
+ 	bool received_first_sipi;
++	unsigned int ap_reset_hold_type;
+ 
+ 	/* SEV-ES scratch area support */
+ 	void *ghcb_sa;
 -- 
 2.17.1
 
