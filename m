@@ -2,394 +2,137 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0AFAC47080
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 04:22:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35754C47082
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 04:26:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FAF2613E3
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 04:22:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C5BE613E3
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 04:26:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229501AbhFCEYg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Jun 2021 00:24:36 -0400
-Received: from mail-pl1-f181.google.com ([209.85.214.181]:38483 "EHLO
-        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbhFCEYf (ORCPT
+        id S229697AbhFCE2e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Jun 2021 00:28:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53194 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229623AbhFCE2d (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jun 2021 00:24:35 -0400
-Received: by mail-pl1-f181.google.com with SMTP id 69so2230000plc.5
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Jun 2021 21:22:38 -0700 (PDT)
+        Thu, 3 Jun 2021 00:28:33 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5A48C06174A
+        for <linux-crypto@vger.kernel.org>; Wed,  2 Jun 2021 21:26:34 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id d16so3893935pfn.12
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Jun 2021 21:26:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:subject:to:cc:references:in-reply-to:mime-version
          :message-id:content-transfer-encoding;
-        bh=t/G8ts/OsTfzZ2YcjxToq7b0TvLbNV1D7hhxkpokyx8=;
-        b=IWkwZG5N0JiGkMMKDhrJN9ZGpgNfQZ8iMnAiXhPbaXK/gKaudoaRd64lPSk8rww+/A
-         UPaceYY64viUcn7D6+q+qMzpPt9ex23vlyKu/Sq7Bt/ZLOEnr2MHDj9SDKlg18AklLrZ
-         yiAC597idqw3WZTOvP3DiAAf0IWjiLfufz51i/g275GHrr6WUme67rcx4ijaNxXkpc5/
-         Fxk/heJMgFyGT8GYcwgsesQ6xT2vqZKDLcu+iA5cBZCwCBJJVd3WK5pVkgs+YVW1SqoO
-         bO07HsSkCXQnG5QnfLhLvaex5epTSpe2XeBSw1zquPWCvJ8V3AaHDeSQa0GzXA44NeM1
-         2PLw==
+        bh=hadN1zKWfMzs8CNVqhf3si3r1zptnb25lQyw1l4DEJo=;
+        b=nlgSXqG4KLQpB0O0mupGwzaKX0KxGlZssCJFbzlrDZMaaJl7NGSLiG7dBfKx7Xlbc5
+         cypvQXE0ODiFXHu3vK/TNLt57BRW7Fx1lmSWfkog+OflJ2qjPtaoU1QMvqqB6EX0U6Tp
+         LZSj5SUzf54Mj/LwrEkNG9eqWV0eOZzLo/Wtn0YTWMRAEtlsTKSLPumDi40o/pgaOzLy
+         7TSwcyXLkvPpNJzWw+gSWTo20R6ISEnKz+pbcwQuAVWbZv9+5XMTTIMTaEVS98RVtwCK
+         N2td55lji2rY9LcHZAE8dm+9TZ3zPaTdmDOTu8pso2WV0Sf1Zfo2cBP7d0ESwgxaEt1r
+         ciSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
          :mime-version:message-id:content-transfer-encoding;
-        bh=t/G8ts/OsTfzZ2YcjxToq7b0TvLbNV1D7hhxkpokyx8=;
-        b=Ea4fuT/St+RDH1U0/Z1fhACU0DlQ4wDSQ1BHMb2sO/6ZvmLUkIR7n1kPhJHIq1yl31
-         PfFwqphXfvnTw9K0myYSHgq+UrzD92qGqrs8Xz6RSPf1A+JUffQLHDcI57iKcOeq5KAJ
-         NdP7CRjw0Vy8tVAoT0+aIiyrs6Db+e0mtiZpGNHK/eBapm3wgkQb1w56ZVdW0kaDx+OC
-         cDtfDFojrfGSVF7t6D+haydNKtALc0TFj5dwFikZbgi+yUScfpa4KeHuEh42sRrqUCNO
-         Z6QFPLPpihtTVv8EgnMaE5oJxk7LMwdr4f6wi04rGMtNHAckIHimAdKFhgTSQQuPblRJ
-         rnTQ==
-X-Gm-Message-State: AOAM5300Y+yrSoSmRu6yK5cRmJXVDRvk+D7vTHAKwvVDakAP27ODmKoP
-        oUku4tMSfx+vGPB+7dBLNfk=
-X-Google-Smtp-Source: ABdhPJxP67T9jOdIqO7xSJRrJTFbT/U41fB1ffMQOiYKG71geKU07OBpeHOsLS0r0Flj9IB3BMwVMw==
-X-Received: by 2002:a17:902:860b:b029:ef:46b8:886e with SMTP id f11-20020a170902860bb02900ef46b8886emr34068937plo.18.1622694098100;
-        Wed, 02 Jun 2021 21:21:38 -0700 (PDT)
+        bh=hadN1zKWfMzs8CNVqhf3si3r1zptnb25lQyw1l4DEJo=;
+        b=Cz68jg/VZqo+m5uJB6r80DHs+vHod3rcNctro7nRqQob6JSAExF5cLRVeNyEZD3kQc
+         4Jey5v4XSKW3fEoZrOiMpQMAsDkMP341GD/mY4gRAcMcG+UUe60GqFnQ9xAajrPbSIF1
+         uTY7Gp+h0o2uVgPksRAKEO04IYQhqM/dtoI1qwIlGs/pgeKbvcEkJhuCBxePn0hoYGrA
+         sKQ4EUHOW/S4er71Lyy8HkOZ/MKASmskDi/B3UMMyvSbzneBycRAtOcMO96eP5SZ5lYT
+         lc518yS1HwWP01UxhFRKhn7pMrfW6yHZJRnJ/xX2S4hp/u+q28FDT2p00EEnalrcznfh
+         k8gA==
+X-Gm-Message-State: AOAM531V5f8X1u3kwFQgji2oZjV9LCKa0WJDT4lXl0NsKIQnUySg8fNB
+        NnAFRcsW09Tw4IWJ6WAnerU=
+X-Google-Smtp-Source: ABdhPJw9xulYWMtCGTR8p5sCoVzQhygQRWw5b7lFmCWGeU36P/jdRGvSy6mz1tqOmNNUa+M/Xn7gAg==
+X-Received: by 2002:a63:f615:: with SMTP id m21mr37851279pgh.282.1622694394117;
+        Wed, 02 Jun 2021 21:26:34 -0700 (PDT)
 Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
-        by smtp.gmail.com with ESMTPSA id n72sm959106pfd.8.2021.06.02.21.21.37
+        by smtp.gmail.com with ESMTPSA id j12sm1158876pgs.83.2021.06.02.21.26.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jun 2021 21:21:37 -0700 (PDT)
-Date:   Thu, 03 Jun 2021 14:21:32 +1000
+        Wed, 02 Jun 2021 21:26:33 -0700 (PDT)
+Date:   Thu, 03 Jun 2021 14:26:28 +1000
 From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v4 04/16] powerpc/vas: Create take/drop pid and mm
- references
+Subject: Re: [PATCH v4 05/16] powerpc/vas: Move update_csb/dump_crb to common
+ book3s platform
 To:     Haren Myneni <haren@linux.ibm.com>, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         mpe@ellerman.id.au
 Cc:     haren@us.ibm.com, hbabu@us.ibm.com
 References: <8d219c0816133a8643d650709066cf04c9c77322.camel@linux.ibm.com>
-        <16a319614a7ab4ce843f42a49c3ecf68ed03dd36.camel@linux.ibm.com>
-In-Reply-To: <16a319614a7ab4ce843f42a49c3ecf68ed03dd36.camel@linux.ibm.com>
+        <b1c0661b5ff896b2ce7b1202a5e6efeb2dae68a8.camel@linux.ibm.com>
+In-Reply-To: <b1c0661b5ff896b2ce7b1202a5e6efeb2dae68a8.camel@linux.ibm.com>
 MIME-Version: 1.0
-Message-Id: <1622693213.hz0uqko6dk.astroid@bobo.none>
+Message-Id: <1622694146.br4czu7jza.astroid@bobo.none>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Excerpts from Haren Myneni's message of May 21, 2021 7:31 pm:
->=20
-> Take pid and mm references when each window opens and drops during
-> close. This functionality is needed for powerNV and pseries. So
-> this patch defines the existing code as functions in common book3s
-> platform vas-api.c
->=20
-> Signed-off-by: Haren Myneni <haren@linux.ibm.com>
-
-Seems like a good idea to put these into their own helper functions.
-
-> ---
->  arch/powerpc/include/asm/vas.h              | 25 +++++++++
->  arch/powerpc/platforms/book3s/vas-api.c     | 51 ++++++++++++++++++
->  arch/powerpc/platforms/powernv/vas-fault.c  | 10 ++--
->  arch/powerpc/platforms/powernv/vas-window.c | 57 ++-------------------
->  arch/powerpc/platforms/powernv/vas.h        |  6 +--
->  5 files changed, 88 insertions(+), 61 deletions(-)
->=20
-> diff --git a/arch/powerpc/include/asm/vas.h b/arch/powerpc/include/asm/va=
-s.h
-> index 668303198772..3f2b02461a76 100644
-> --- a/arch/powerpc/include/asm/vas.h
-> +++ b/arch/powerpc/include/asm/vas.h
-> @@ -5,6 +5,9 @@
-> =20
->  #ifndef _ASM_POWERPC_VAS_H
->  #define _ASM_POWERPC_VAS_H
-> +#include <linux/sched/mm.h>
-> +#include <linux/mmu_context.h>
-> +#include <asm/icswx.h>
->  #include <uapi/asm/vas-api.h>
-> =20
->  struct vas_window;
-> @@ -49,6 +52,17 @@ enum vas_cop_type {
->  	VAS_COP_TYPE_MAX,
->  };
-> =20
-> +/*
-> + * User space VAS windows are opened by tasks and take references
-> + * to pid and mm until windows are closed.
-> + * Stores pid, mm, and tgid for each window.
-> + */
-> +struct vas_user_win_ref {
-> +	struct pid *pid;	/* PID of owner */
-> +	struct pid *tgid;	/* Thread group ID of owner */
-> +	struct mm_struct *mm;	/* Linux process mm_struct */
-> +};
+Excerpts from Haren Myneni's message of May 21, 2021 7:32 pm:
 > +
->  /*
->   * User space window operations used for powernv and powerVM
->   */
-> @@ -59,6 +73,16 @@ struct vas_user_win_ops {
->  	int (*close_win)(void *);
->  };
-> =20
-> +static inline void vas_drop_reference_pid_mm(struct vas_user_win_ref *re=
-f)
-> +{
-> +	/* Drop references to pid and mm */
-> +	put_pid(ref->pid);
-> +	if (ref->mm) {
-> +		mm_context_remove_vas_window(ref->mm);
-> +		mmdrop(ref->mm);
+> +	pid =3D task_ref->pid;
+> +	tsk =3D get_pid_task(pid, PIDTYPE_PID);
+> +	/*
+> +	 * Process closes send window after all pending NX requests are
+> +	 * completed. In multi-thread applications, a child thread can
+> +	 * open a window and can exit without closing it. May be some
+> +	 * requests are pending or this window can be used by other
+> +	 * threads later. We should handle faults if NX encounters
+> +	 * pages faults on these requests. Update CSB with translation
+> +	 * error and fault address. If csb_addr passed by user space is
+> +	 * invalid, send SEGV signal to pid saved in window. If the
+> +	 * child thread is not running, send the signal to tgid.
+> +	 * Parent thread (tgid) will close this window upon its exit.
+> +	 *
+> +	 * pid and mm references are taken when window is opened by
+> +	 * process (pid). So tgid is used only when child thread opens
+> +	 * a window and exits without closing it.
+> +	 */
+> +	if (!tsk) {
+> +		pid =3D task_ref->tgid;
+> +		tsk =3D get_pid_task(pid, PIDTYPE_PID);
+> +		/*
+> +		 * Parent thread (tgid) will be closing window when it
+> +		 * exits. So should not get here.
+> +		 */
+> +		if (WARN_ON_ONCE(!tsk))
+> +			return;
 > +	}
-> +}
-
-You don't have to make up a new name for such a thing because you=20
-already have one
-
-put_vas_user_win_ref(struct vas_user_win_ref *ref)
-
-
 > +
->  /*
->   * Receive window attributes specified by the (in-kernel) owner of windo=
-w.
->   */
-> @@ -192,4 +216,5 @@ int vas_register_coproc_api(struct module *mod, enum =
-vas_cop_type cop_type,
->  			    struct vas_user_win_ops *vops);
->  void vas_unregister_coproc_api(void);
-> =20
-> +int vas_reference_pid_mm(struct vas_user_win_ref *task_ref);
->  #endif /* __ASM_POWERPC_VAS_H */
-> diff --git a/arch/powerpc/platforms/book3s/vas-api.c b/arch/powerpc/platf=
-orms/book3s/vas-api.c
-> index 6c39320bfb9b..a0141bfb2e4b 100644
-> --- a/arch/powerpc/platforms/book3s/vas-api.c
-> +++ b/arch/powerpc/platforms/book3s/vas-api.c
-> @@ -55,6 +55,57 @@ static char *coproc_devnode(struct device *dev, umode_=
-t *mode)
->  	return kasprintf(GFP_KERNEL, "crypto/%s", dev_name(dev));
->  }
-> =20
-> +/*
-> + * Take reference to pid and mm
-> + */
-> +int vas_reference_pid_mm(struct vas_user_win_ref *task_ref)
-> +{
+> +	/* Return if the task is exiting. */
+> +	if (tsk->flags & PF_EXITING) {
+> +		put_task_struct(tsk);
+> +		return;
+> +	}
 
-So this is quite different from a typical refcount object in that it's=20
-opening it for access as well. I would split it in two functions, one
-matching put_vas_user_win_ref() and appearing in the same place in code,
-which is up to about mmput and another function that adds the window and
-does the CP_ABORT etc... hmm, where do you release tgid?
+Just as an aside, I know this is existing code, after this series it=20
+might be good to think about factoring out this above chunk of code=20
+(possibly +/- the kthread_use_mm() bit), and put it together with the=20
+rest of the task/mm refcounting stuff.
 
 Thanks,
 Nick
 
+> +
+> +	kthread_use_mm(task_ref->mm);
+> +	rc =3D copy_to_user(csb_addr, &csb, sizeof(csb));
 > +	/*
-> +	 * Window opened by a child thread may not be closed when
-> +	 * it exits. So take reference to its pid and release it
-> +	 * when the window is free by parent thread.
-> +	 * Acquire a reference to the task's pid to make sure
-> +	 * pid will not be re-used - needed only for multithread
-> +	 * applications.
+> +	 * User space polls on csb.flags (first byte). So add barrier
+> +	 * then copy first byte with csb flags update.
 > +	 */
-> +	task_ref->pid =3D get_task_pid(current, PIDTYPE_PID);
-> +	/*
-> +	 * Acquire a reference to the task's mm.
-> +	 */
-> +	task_ref->mm =3D get_task_mm(current);
-> +	if (!task_ref->mm) {
-> +		put_pid(task_ref->pid);
-> +		pr_err("VAS: pid(%d): mm_struct is not found\n",
-> +				current->pid);
-> +		return -EPERM;
+> +	if (!rc) {
+> +		csb.flags =3D CSB_V;
+> +		/* Make sure update to csb.flags is visible now */
+> +		smp_mb();
+> +		rc =3D copy_to_user(csb_addr, &csb, sizeof(u8));
 > +	}
+> +	kthread_unuse_mm(task_ref->mm);
+> +	put_task_struct(tsk);
 > +
-> +	mmgrab(task_ref->mm);
-> +	mmput(task_ref->mm);
-> +	mm_context_add_vas_window(task_ref->mm);
-> +	/*
-> +	 * Process closes window during exit. In the case of
-> +	 * multithread application, the child thread can open
-> +	 * window and can exit without closing it. Expects parent
-> +	 * thread to use and close the window. So do not need
-> +	 * to take pid reference for parent thread.
-> +	 */
-> +	task_ref->tgid =3D find_get_pid(task_tgid_vnr(current));
-> +	/*
-> +	 * Even a process that has no foreign real address mapping can
-> +	 * use an unpaired COPY instruction (to no real effect). Issue
-> +	 * CP_ABORT to clear any pending COPY and prevent a covert
-> +	 * channel.
-> +	 *
-> +	 * __switch_to() will issue CP_ABORT on future context switches
-> +	 * if process / thread has any open VAS window (Use
-> +	 * current->mm->context.vas_windows).
-> +	 */
-> +	asm volatile(PPC_CP_ABORT);
-> +
-> +	return 0;
-> +}
-> +
->  static int coproc_open(struct inode *inode, struct file *fp)
->  {
->  	struct coproc_instance *cp_inst;
-> diff --git a/arch/powerpc/platforms/powernv/vas-fault.c b/arch/powerpc/pl=
-atforms/powernv/vas-fault.c
-> index 3d21fce254b7..ac3a71ec3bd5 100644
-> --- a/arch/powerpc/platforms/powernv/vas-fault.c
-> +++ b/arch/powerpc/platforms/powernv/vas-fault.c
-> @@ -73,7 +73,7 @@ static void update_csb(struct vas_window *window,
->  	 * NX user space windows can not be opened for task->mm=3DNULL
->  	 * and faults will not be generated for kernel requests.
->  	 */
-> -	if (WARN_ON_ONCE(!window->mm || !window->user_win))
-> +	if (WARN_ON_ONCE(!window->task_ref.mm || !window->user_win))
->  		return;
-> =20
->  	csb_addr =3D (void __user *)be64_to_cpu(crb->csb_addr);
-> @@ -92,7 +92,7 @@ static void update_csb(struct vas_window *window,
->  	csb.address =3D crb->stamp.nx.fault_storage_addr;
->  	csb.flags =3D 0;
-> =20
-> -	pid =3D window->pid;
-> +	pid =3D window->task_ref.pid;
->  	tsk =3D get_pid_task(pid, PIDTYPE_PID);
->  	/*
->  	 * Process closes send window after all pending NX requests are
-> @@ -111,7 +111,7 @@ static void update_csb(struct vas_window *window,
->  	 * a window and exits without closing it.
->  	 */
->  	if (!tsk) {
-> -		pid =3D window->tgid;
-> +		pid =3D window->task_ref.tgid;
->  		tsk =3D get_pid_task(pid, PIDTYPE_PID);
->  		/*
->  		 * Parent thread (tgid) will be closing window when it
-> @@ -127,7 +127,7 @@ static void update_csb(struct vas_window *window,
->  		return;
->  	}
-> =20
-> -	kthread_use_mm(window->mm);
-> +	kthread_use_mm(window->task_ref.mm);
->  	rc =3D copy_to_user(csb_addr, &csb, sizeof(csb));
->  	/*
->  	 * User space polls on csb.flags (first byte). So add barrier
-> @@ -139,7 +139,7 @@ static void update_csb(struct vas_window *window,
->  		smp_mb();
->  		rc =3D copy_to_user(csb_addr, &csb, sizeof(u8));
->  	}
-> -	kthread_unuse_mm(window->mm);
-> +	kthread_unuse_mm(window->task_ref.mm);
->  	put_task_struct(tsk);
-> =20
->  	/* Success */
-> diff --git a/arch/powerpc/platforms/powernv/vas-window.c b/arch/powerpc/p=
-latforms/powernv/vas-window.c
-> index 3ccd3edcaf1a..ffd619e5a218 100644
-> --- a/arch/powerpc/platforms/powernv/vas-window.c
-> +++ b/arch/powerpc/platforms/powernv/vas-window.c
-> @@ -1065,51 +1065,9 @@ struct vas_window *vas_tx_win_open(int vasid, enum=
- vas_cop_type cop,
->  			rc =3D -ENODEV;
->  			goto free_window;
->  		}
-> -
-> -		/*
-> -		 * Window opened by a child thread may not be closed when
-> -		 * it exits. So take reference to its pid and release it
-> -		 * when the window is free by parent thread.
-> -		 * Acquire a reference to the task's pid to make sure
-> -		 * pid will not be re-used - needed only for multithread
-> -		 * applications.
-> -		 */
-> -		txwin->pid =3D get_task_pid(current, PIDTYPE_PID);
-> -		/*
-> -		 * Acquire a reference to the task's mm.
-> -		 */
-> -		txwin->mm =3D get_task_mm(current);
-> -
-> -		if (!txwin->mm) {
-> -			put_pid(txwin->pid);
-> -			pr_err("VAS: pid(%d): mm_struct is not found\n",
-> -					current->pid);
-> -			rc =3D -EPERM;
-> +		rc =3D vas_reference_pid_mm(&txwin->task_ref);
-> +		if (rc)
->  			goto free_window;
-> -		}
-> -
-> -		mmgrab(txwin->mm);
-> -		mmput(txwin->mm);
-> -		mm_context_add_vas_window(txwin->mm);
-> -		/*
-> -		 * Process closes window during exit. In the case of
-> -		 * multithread application, the child thread can open
-> -		 * window and can exit without closing it. Expects parent
-> -		 * thread to use and close the window. So do not need
-> -		 * to take pid reference for parent thread.
-> -		 */
-> -		txwin->tgid =3D find_get_pid(task_tgid_vnr(current));
-> -		/*
-> -		 * Even a process that has no foreign real address mapping can
-> -		 * use an unpaired COPY instruction (to no real effect). Issue
-> -		 * CP_ABORT to clear any pending COPY and prevent a covert
-> -		 * channel.
-> -		 *
-> -		 * __switch_to() will issue CP_ABORT on future context switches
-> -		 * if process / thread has any open VAS window (Use
-> -		 * current->mm->context.vas_windows).
-> -		 */
-> -		asm volatile(PPC_CP_ABORT);
->  	}
-> =20
->  	set_vinst_win(vinst, txwin);
-> @@ -1339,14 +1297,9 @@ int vas_win_close(struct vas_window *window)
-> =20
->  	/* if send window, drop reference to matching receive window */
->  	if (window->tx_win) {
-> -		if (window->user_win) {
-> -			/* Drop references to pid and mm */
-> -			put_pid(window->pid);
-> -			if (window->mm) {
-> -				mm_context_remove_vas_window(window->mm);
-> -				mmdrop(window->mm);
-> -			}
-> -		}
-> +		if (window->user_win)
-> +			vas_drop_reference_pid_mm(&window->task_ref);
-> +
->  		put_rx_win(window->rxwin);
->  	}
-> =20
-> diff --git a/arch/powerpc/platforms/powernv/vas.h b/arch/powerpc/platform=
-s/powernv/vas.h
-> index c7db3190baca..f354dd5c51bd 100644
-> --- a/arch/powerpc/platforms/powernv/vas.h
-> +++ b/arch/powerpc/platforms/powernv/vas.h
-> @@ -357,11 +357,9 @@ struct vas_window {
->  	bool user_win;		/* True if user space window */
->  	void *hvwc_map;		/* HV window context */
->  	void *uwc_map;		/* OS/User window context */
-> -	struct pid *pid;	/* Linux process id of owner */
-> -	struct pid *tgid;	/* Thread group ID of owner */
-> -	struct mm_struct *mm;	/* Linux process mm_struct */
->  	int wcreds_max;		/* Window credits */
-> =20
-> +	struct vas_user_win_ref task_ref;
->  	char *dbgname;
->  	struct dentry *dbgdir;
-> =20
-> @@ -443,7 +441,7 @@ extern void vas_win_paste_addr(struct vas_window *win=
-dow, u64 *addr,
-> =20
->  static inline int vas_window_pid(struct vas_window *window)
->  {
-> -	return pid_vnr(window->pid);
-> +	return pid_vnr(window->task_ref.pid);
->  }
-> =20
->  static inline void vas_log_write(struct vas_window *win, char *name,
-> --=20
-> 2.18.2
->=20
->=20
->=20
