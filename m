@@ -2,84 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC59C47096
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 12:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5EE0C47096
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 12:30:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15B62610CB
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 12:30:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F971613E6
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 12:30:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229976AbhFCMcX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Jun 2021 08:32:23 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:60890 "EHLO deadmen.hmeau.com"
+        id S229892AbhFCMcg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Jun 2021 08:32:36 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:60906 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229966AbhFCMcX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jun 2021 08:32:23 -0400
+        id S229871AbhFCMcg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Jun 2021 08:32:36 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lomUg-0001zr-3M; Thu, 03 Jun 2021 20:30:38 +0800
+        id 1lomUs-000207-Pb; Thu, 03 Jun 2021 20:30:50 +0800
 Received: from herbert by gondobar with local (Exim 4.92)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lomUa-0001eU-Vf; Thu, 03 Jun 2021 20:30:33 +0800
-Date:   Thu, 3 Jun 2021 20:30:32 +0800
+        id 1lomUp-0001ev-9c; Thu, 03 Jun 2021 20:30:47 +0800
+Date:   Thu, 3 Jun 2021 20:30:47 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>,
-        Corentin Labbe <clabbe@baylibre.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Imre Kaloz <kaloz@openwrt.org>,
-        Krzysztof Halasa <khalasa@piap.pl>,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 1/3 v4] crypto: ixp4xx: convert to platform driver
-Message-ID: <20210603123032.GE6161@gondor.apana.org.au>
-References: <20210525083048.1113870-1-linus.walleij@linaro.org>
+To:     Srujana Challa <schalla@marvell.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        arno@natisbad.org, bbrezillon@kernel.org, jerinj@marvell.com
+Subject: Re: [PATCH 0/4] Add support for Marvell CN10K CPT block
+Message-ID: <20210603123047.GF6161@gondor.apana.org.au>
+References: <20210525112718.18288-1-schalla@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210525083048.1113870-1-linus.walleij@linaro.org>
+In-Reply-To: <20210525112718.18288-1-schalla@marvell.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 25, 2021 at 10:30:46AM +0200, Linus Walleij wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Tue, May 25, 2021 at 04:57:14PM +0530, Srujana Challa wrote:
+> The current CPT driver supports OcteonTX2 silicon variants.
+> The same OcteonTX2 Resource Virtualization Unit(RVU) is
+> carried forward to the next-gen silicon ie OcteonTX3(CN10K),
+> with some changes and feature enhancements.
 > 
-> The ixp4xx_crypto driver traditionally registers a bare platform
-> device without attaching it to a driver, and detects the hardware
-> at module init time by reading an SoC specific hardware register.
+> This patch series adds support for CN10K silicon.
 > 
-> Change this to the conventional method of registering the platform
-> device from the platform code itself when the device is present,
-> turning the module_init/module_exit functions into probe/release
-> driver callbacks.
+> Srujana Challa (4):
+>   crypto: octeontx2: Add mailbox support for CN10K
+>   crypto: octeontx2: add support to map LMTST region for CN10K
+>   crypto: octeontx2: add support for CPT operations on CN10K
+>   crypto: octeontx2: enable and handle ME interrupts
 > 
-> This enables compile-testing as well as potentially having ixp4xx
-> coexist with other ARMv5 platforms in the same kernel in the future.
-> 
-> Cc: Corentin Labbe <clabbe@baylibre.com>
-> Tested-by: Corentin Labbe <clabbe@baylibre.com>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
-> ChangeLog v3->v4:
-> - No changes, just resending with the other patches.
-> ChangeLog v2->v3:
-> - No changes, just resending with the other patches.
-> ChangeLog v1->v2:
-> - Rebase on Corentin's patches in the cryptodev tree
-> - Drop the compile test Kconfig, it will not compile for
->   anything not IXP4xx anyway because it needs the NPE and QMGR
->   to be compiled in and those only exist on IXP4xx.
-> ---
->  arch/arm/mach-ixp4xx/common.c  | 26 ++++++++++++++++++++++++
->  drivers/crypto/ixp4xx_crypto.c | 37 ++++++++++++----------------------
->  2 files changed, 39 insertions(+), 24 deletions(-)
+>  drivers/crypto/marvell/octeontx2/Makefile     |  13 +-
+>  drivers/crypto/marvell/octeontx2/cn10k_cpt.c  |  93 ++++++++++
+>  drivers/crypto/marvell/octeontx2/cn10k_cpt.h  |  36 ++++
+>  .../marvell/octeontx2/otx2_cpt_common.h       |  23 +++
+>  .../marvell/octeontx2/otx2_cpt_hw_types.h     |  16 +-
+>  drivers/crypto/marvell/octeontx2/otx2_cptlf.c |   9 +-
+>  drivers/crypto/marvell/octeontx2/otx2_cptlf.h |  10 ++
+>  drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   1 +
+>  .../marvell/octeontx2/otx2_cptpf_main.c       | 160 +++++++++++++-----
+>  .../marvell/octeontx2/otx2_cptpf_ucode.c      |  32 +++-
+>  .../marvell/octeontx2/otx2_cptpf_ucode.h      |   8 +-
+>  drivers/crypto/marvell/octeontx2/otx2_cptvf.h |   3 +
+>  .../marvell/octeontx2/otx2_cptvf_main.c       |  49 ++++--
+>  .../marvell/octeontx2/otx2_cptvf_mbox.c       |  43 +++++
+>  .../marvell/octeontx2/otx2_cptvf_reqmgr.c     |  17 +-
+>  15 files changed, 438 insertions(+), 75 deletions(-)
+>  create mode 100644 drivers/crypto/marvell/octeontx2/cn10k_cpt.c
+>  create mode 100644 drivers/crypto/marvell/octeontx2/cn10k_cpt.h
 
 All applied.  Thanks.
 -- 
