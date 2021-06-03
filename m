@@ -2,98 +2,57 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1532C47096
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 05:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E29BC47096
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 08:12:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F811613F0
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 05:53:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3C23613DA
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 08:12:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229747AbhFCFzf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Jun 2021 01:55:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43772 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229667AbhFCFzf (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jun 2021 01:55:35 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A11AC06174A;
-        Wed,  2 Jun 2021 22:53:51 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id s5-20020a7bc0c50000b0290147d0c21c51so2921060wmh.4;
-        Wed, 02 Jun 2021 22:53:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=+LavzohDJpbvg/dpCNljR3NbpSeXC/kKjcfv8mBT/jc=;
-        b=guI7rJGwRqalQxlRFJ83qNrLap9ESqnpMotNGMlOc29W/d6GsmHFpZm3xiEPaX7TP/
-         TNtw8t3P8y3IZGAWyH/K4CKR8mRpt/osLOYq+nkQtaS3GAId0WkMf8fvfXmkhrwi8vm2
-         BjZmDo20YCoEEDGqoCaui/Zkyij1Uo26e6Co3wWmBEQfqKYp24tPMbC89NMstQCB71rW
-         kpIeRdKIAltgfW2szfDh4i5S8Uv2RnKoyFI3asJVlKZVCRb2ZfhhrrAMlsabz5eVcS1p
-         iWGIrYS1p4zIZ1EhoU+1dA0FKkR8Ql2hyczUhEpUKZt+DXFTC6LDi29C+exWRISVZ/Nq
-         GBJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=+LavzohDJpbvg/dpCNljR3NbpSeXC/kKjcfv8mBT/jc=;
-        b=UqwE47GCl8dK4Ct5jz1b3omCAYkhmuWYWrIB3XGmWRC+onpqDmo5oAKoPs1g8C1sXN
-         ewIZjRIQsoloFEklTfdSk4s1u20W9mmZKpuvUnqHepn0ONBIxy98wo1IX7wfxpY27vnv
-         CYU9xtAInOVV6xlZjOTDk/hze0ui650OsxRNtLo5RUzgiIAfMwyl2Jl9HGyLi2i44yoO
-         qOAoVKSY9GhsEnn/5ocI/0uYr9Tq70lVAs6R2cZb7yb6kxBT+ghg7f5buFuf+IjWsM28
-         waUWqBH2iriQrUf75eLiI9SAVuFoRbbxZlcEBkvpTJvLkM0tMiIWXGV1bwv5s265HSDT
-         VQmg==
-X-Gm-Message-State: AOAM533R1mpEhJATQ1fJ6F5RZr9CHAwh/NnyLclYh8L8n1jdnvZtGvtz
-        MTMxotIyxGhqUhKGZYG+hvPcSqz5SNw8DA==
-X-Google-Smtp-Source: ABdhPJxTE6CaglFYIN0bT7p+BDX3O+bhx3vkXDZHLkVV5VX1+AWxmSHjKEwEnT4mmgTq/ZwQAB+4/w==
-X-Received: by 2002:a1c:2155:: with SMTP id h82mr35846198wmh.115.1622699629622;
-        Wed, 02 Jun 2021 22:53:49 -0700 (PDT)
-Received: from wsfd-netdev-buildsys.ntdv.lab.eng.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id e17sm2219784wre.79.2021.06.02.22.53.48
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 02 Jun 2021 22:53:49 -0700 (PDT)
-From:   Hangbin Liu <liuhangbin@gmail.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        netdev@vger.kernel.org, Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH] crypto: x86/curve25519 - fix cpu feature checking logic in mod_exit
-Date:   Thu,  3 Jun 2021 01:53:40 -0400
-Message-Id: <20210603055341.24473-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.18.1
+        id S229479AbhFCIOe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Jun 2021 04:14:34 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:57644 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229769AbhFCIOe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Jun 2021 04:14:34 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1loiT5-0005Rj-I2; Thu, 03 Jun 2021 16:12:43 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1loiT0-0000JW-UU; Thu, 03 Jun 2021 16:12:39 +0800
+Date:   Thu, 3 Jun 2021 16:12:38 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Liu Shixin <liushixin2@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next] crypto: algboss - Replaced simple_strtol() with
+ kstrtouint()
+Message-ID: <20210603081238.GA1160@gondor.apana.org.au>
+References: <20210524120834.1580343-1-liushixin2@huawei.com>
+ <YKwhXlrJzdOjS9lJ@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YKwhXlrJzdOjS9lJ@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In curve25519_mod_init() the curve25519_alg will be registered only when
-(X86_FEATURE_BMI2 && X86_FEATURE_ADX). But in curve25519_mod_exit()
-it still checks (X86_FEATURE_BMI2 || X86_FEATURE_ADX) when do crypto
-unregister. This will trigger a BUG_ON in crypto_unregister_alg() as
-alg->cra_refcnt is 0 if the cpu only supports one of X86_FEATURE_BMI2
-and X86_FEATURE_ADX.
+On Mon, May 24, 2021 at 02:57:50PM -0700, Eric Biggers wrote:
+>
+> It would be better to just remove all the code related to CRYPTOA_U32 and
+> crypto_attr_u32, as it is never used.
 
-Fixes: 07b586fe0662 ("crypto: x86/curve25519 - replace with formally verified implementation")
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- arch/x86/crypto/curve25519-x86_64.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I agree, it's been unused for over a decade.
 
-diff --git a/arch/x86/crypto/curve25519-x86_64.c b/arch/x86/crypto/curve25519-x86_64.c
-index 6706b6cb1d0f..38caf61cd5b7 100644
---- a/arch/x86/crypto/curve25519-x86_64.c
-+++ b/arch/x86/crypto/curve25519-x86_64.c
-@@ -1500,7 +1500,7 @@ static int __init curve25519_mod_init(void)
- static void __exit curve25519_mod_exit(void)
- {
- 	if (IS_REACHABLE(CONFIG_CRYPTO_KPP) &&
--	    (boot_cpu_has(X86_FEATURE_BMI2) || boot_cpu_has(X86_FEATURE_ADX)))
-+	    static_branch_likely(&curve25519_use_bmi2_adx))
- 		crypto_unregister_kpp(&curve25519_alg);
- }
- 
+Thanks,
 -- 
-2.26.3
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
