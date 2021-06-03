@@ -7,56 +7,81 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81BBCC47082
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 12:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC59C47096
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 12:30:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B014613F0
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 12:30:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15B62610CB
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 12:30:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230158AbhFCMb7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Jun 2021 08:31:59 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:60882 "EHLO deadmen.hmeau.com"
+        id S229976AbhFCMcX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Jun 2021 08:32:23 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:60890 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230197AbhFCMb6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jun 2021 08:31:58 -0400
+        id S229966AbhFCMcX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Jun 2021 08:32:23 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lomUE-0001y4-P9; Thu, 03 Jun 2021 20:30:10 +0800
+        id 1lomUg-0001zr-3M; Thu, 03 Jun 2021 20:30:38 +0800
 Received: from herbert by gondobar with local (Exim 4.92)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lomUD-0001dk-QX; Thu, 03 Jun 2021 20:30:09 +0800
-Date:   Thu, 3 Jun 2021 20:30:09 +0800
+        id 1lomUa-0001eU-Vf; Thu, 03 Jun 2021 20:30:33 +0800
+Date:   Thu, 3 Jun 2021 20:30:32 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Wu Bo <wubo40@huawei.com>
-Cc:     viro@zeniv.linux.org.uk, davem@davemloft.net,
-        linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linfeilong@huawei.com
-Subject: Re: [PATCH 1/2] crypto: af_alg - use DIV_ROUND_UP helper macro for
- calculations
-Message-ID: <20210603123009.GD6161@gondor.apana.org.au>
-References: <1621930520-515336-1-git-send-email-wubo40@huawei.com>
- <1621930520-515336-2-git-send-email-wubo40@huawei.com>
+To:     Linus Walleij <linus.walleij@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        Corentin Labbe <clabbe@baylibre.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Imre Kaloz <kaloz@openwrt.org>,
+        Krzysztof Halasa <khalasa@piap.pl>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 1/3 v4] crypto: ixp4xx: convert to platform driver
+Message-ID: <20210603123032.GE6161@gondor.apana.org.au>
+References: <20210525083048.1113870-1-linus.walleij@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1621930520-515336-2-git-send-email-wubo40@huawei.com>
+In-Reply-To: <20210525083048.1113870-1-linus.walleij@linaro.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 25, 2021 at 04:15:19PM +0800, Wu Bo wrote:
-> From: Wu Bo <wubo40@huawei.com>
+On Tue, May 25, 2021 at 10:30:46AM +0200, Linus Walleij wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> Replace open coded divisor calculations with the DIV_ROUND_UP kernel
-> macro for better readability.
+> The ixp4xx_crypto driver traditionally registers a bare platform
+> device without attaching it to a driver, and detects the hardware
+> at module init time by reading an SoC specific hardware register.
 > 
-> Signed-off-by: Wu Bo <wubo40@huawei.com>
+> Change this to the conventional method of registering the platform
+> device from the platform code itself when the device is present,
+> turning the module_init/module_exit functions into probe/release
+> driver callbacks.
+> 
+> This enables compile-testing as well as potentially having ixp4xx
+> coexist with other ARMv5 platforms in the same kernel in the future.
+> 
+> Cc: Corentin Labbe <clabbe@baylibre.com>
+> Tested-by: Corentin Labbe <clabbe@baylibre.com>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 > ---
->  crypto/af_alg.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> ChangeLog v3->v4:
+> - No changes, just resending with the other patches.
+> ChangeLog v2->v3:
+> - No changes, just resending with the other patches.
+> ChangeLog v1->v2:
+> - Rebase on Corentin's patches in the cryptodev tree
+> - Drop the compile test Kconfig, it will not compile for
+>   anything not IXP4xx anyway because it needs the NPE and QMGR
+>   to be compiled in and those only exist on IXP4xx.
+> ---
+>  arch/arm/mach-ixp4xx/common.c  | 26 ++++++++++++++++++++++++
+>  drivers/crypto/ixp4xx_crypto.c | 37 ++++++++++++----------------------
+>  2 files changed, 39 insertions(+), 24 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
