@@ -8,137 +8,167 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 601C6C47096
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 05:00:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB47BC47082
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 05:49:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3580C613EE
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 05:00:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9878613EE
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 05:49:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229625AbhFCFC2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Jun 2021 01:02:28 -0400
-Received: from mail-pf1-f171.google.com ([209.85.210.171]:41881 "EHLO
-        mail-pf1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbhFCFC2 (ORCPT
+        id S229799AbhFCFvP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Jun 2021 01:51:15 -0400
+Received: from mail-pl1-f174.google.com ([209.85.214.174]:46027 "EHLO
+        mail-pl1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229635AbhFCFvO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jun 2021 01:02:28 -0400
-Received: by mail-pf1-f171.google.com with SMTP id x73so3978485pfc.8
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Jun 2021 22:00:29 -0700 (PDT)
+        Thu, 3 Jun 2021 01:51:14 -0400
+Received: by mail-pl1-f174.google.com with SMTP id 11so2303985plk.12
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Jun 2021 22:49:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:subject:to:cc:references:in-reply-to:mime-version
          :message-id:content-transfer-encoding;
-        bh=wP8kwWHvWPOSW3Kxg0y5i10MeeFhZ5W8gU40UHd6LVk=;
-        b=QpYPrtZi34g2iPYCmRMlWxtW9XBnrY+oeGgWWi9RDUIirPnvEWtjlNh3l0UtluNu1t
-         IxsfJ03eN2U9wMAMGuc15m9s/NJxsXrIdHijIEjLpO4NtT45PNM/dfgoBq65WzW6oBHg
-         EApYdyV+Qw5G6qLvrB4QIevFNzTqWSdQZ0v8bGC3bG3U4Yiqdk05izROlnLlC11EFova
-         yy40mAGUb2JUyeG5YXDY9iDaH8EnaPNfu2W4H/Dpwzug1wLjwQH+0UT5NH3Y3Os/LnYM
-         D3VP6diqnkr6Fn9kQRV+POUTwOYgU+72PR2dmYzzkl+Ph10QE3FkLiIoR+q+8MV1rXaD
-         DuAg==
+        bh=hOp7TXbbzxwcDVaO5twCPbrsbPsqYeAyZBDbH4F+cUA=;
+        b=UnvI1Q09TdXGZbuK8RLfB53qwo3E6WQdOZYKJ0M0HHXBJrkw2enL4HzQiDXnaXgrxt
+         BK1VRaWLxaqMKhbGEhv2W3NPNYrZ0V9Q8NZLPCVPjMEXmfss3DfTaKvF+877FhS7La5A
+         TsH4IUayaV0v8kupwrxq6nBuollykW1j9xZti5DWjvEF7/x2du39gjmMuG9KmeIXE7q6
+         jHdVGmMkN9J/qKX3w+JhMl8nzrgoTb2ZrRreil07t4Y7YMwkkEypn4/K4PigNsEIBi+Z
+         Xaa5HosqA+x+C35bv9o7AExDQBRED0ubIA6hu+WBLcYySMXIJnocHjtz9f9ROUDeykmB
+         AT6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
          :mime-version:message-id:content-transfer-encoding;
-        bh=wP8kwWHvWPOSW3Kxg0y5i10MeeFhZ5W8gU40UHd6LVk=;
-        b=rlP+hzFqEsSjbtkg2KOh8Wi5EGFKwTrzxKFR1c9fVOtbcPc8vAlyb0+Myad4012Hef
-         v9dEjB/e12yMvlbtsAt5NHBJrS5cqLgOdWWmR0YmJ/F3X0IZh9P7yioTyraiUTQ0Lqo8
-         yD27+q2VH+U22yqtSyMGxcG3YYoAvOBNeu32Oqv2yzE42u5DO4Q3Z4OO45Vyjg3nM3lt
-         Ie/NwCm2i6RnTyIQ/0niCF/PEvn4BSmQSza/mrlHO61nqLFcXNWfvMSZ0XGnHb0VqpPf
-         GQEusLUlYFb0K4D4q9xiRdDMjbWKajevWjUpyvB0vbFHgKgZEGOPjkLSbZcVdvNAEiZU
-         1mqg==
-X-Gm-Message-State: AOAM533HidIyfD9nvUb+Pk3QV0AQ+athxxrcl3dDypOHDpD52LqSp/FN
-        UpVZWu8af2aBH6Zcifya+AF0oqDP/aA=
-X-Google-Smtp-Source: ABdhPJy+ldXCfckWAtAmrnYX3/p5DGgrvukhHO4fWZvH8wTPxP3vHI6u1y15Zp0e1S2Aua1EGX9qOA==
-X-Received: by 2002:a62:51c2:0:b029:2e9:e4c5:2a74 with SMTP id f185-20020a6251c20000b02902e9e4c52a74mr15858037pfb.51.1622696369006;
-        Wed, 02 Jun 2021 21:59:29 -0700 (PDT)
+        bh=hOp7TXbbzxwcDVaO5twCPbrsbPsqYeAyZBDbH4F+cUA=;
+        b=QZhi0GQ5NpVtiArOFb/LGnsCRJZ1PwsnTenTZ06Y59EANKB6gk94PAVoHoEa885mSB
+         BHzWydfTZj+uZ6PayHcz9TxaFvOW0Taz2FwKEw12+GOy6OAIZwK6Ph37d3MRUUG2Kwsq
+         YHIn8NCaCgXnBRcraA5j9neYdhUTSHsE6P2SIkIsKtQBfLRg2/WIFZrKhlX5DsxaI/mX
+         841yhPbCKJgcxjQ3PImcgDhHXGXjwWd8zfJb1F4ik1yMxo2h5mUaiDJfR41R7BnsUsq4
+         brAFVn4VzJMPq/oeCiHXNOJEHa1AJRVSuOHj9iXDlmDtoX8JMbo7883YfIVPUJftxual
+         8t/w==
+X-Gm-Message-State: AOAM532AYlSIdUIrTAbuQeKBynMASAnY5JsukaySeTdrLEmEJpPd+fJy
+        lBVVPvSKqVp0OrOrNVN27A0=
+X-Google-Smtp-Source: ABdhPJxRYrVxjLMNjIKO3w0ToqQU4v73cKYA8u7ElSTEmcbcbhY25FsehBLB31QlqhRtw+9k/QCCuw==
+X-Received: by 2002:a17:902:8695:b029:fd:6105:c936 with SMTP id g21-20020a1709028695b02900fd6105c936mr34402638plo.25.1622699296444;
+        Wed, 02 Jun 2021 22:48:16 -0700 (PDT)
 Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
-        by smtp.gmail.com with ESMTPSA id q91sm910669pja.50.2021.06.02.21.59.28
+        by smtp.gmail.com with ESMTPSA id h12sm1429148pgn.54.2021.06.02.22.48.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jun 2021 21:59:28 -0700 (PDT)
-Date:   Thu, 03 Jun 2021 14:59:23 +1000
+        Wed, 02 Jun 2021 22:48:15 -0700 (PDT)
+Date:   Thu, 03 Jun 2021 15:48:10 +1000
 From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v4 14/16] crypto/nx: Register and unregister VAS interface
+Subject: Re: [PATCH v4 12/16] powerpc/pseries/vas: Setup IRQ and fault
+ handling
 To:     Haren Myneni <haren@linux.ibm.com>, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         mpe@ellerman.id.au
 Cc:     haren@us.ibm.com, hbabu@us.ibm.com
 References: <8d219c0816133a8643d650709066cf04c9c77322.camel@linux.ibm.com>
-        <af17f1cd30b9bbece7e160d78fb83fe5e0e823f5.camel@linux.ibm.com>
-In-Reply-To: <af17f1cd30b9bbece7e160d78fb83fe5e0e823f5.camel@linux.ibm.com>
+        <5ac32e4d07bd048e3d687354501d36c334f1c8e0.camel@linux.ibm.com>
+In-Reply-To: <5ac32e4d07bd048e3d687354501d36c334f1c8e0.camel@linux.ibm.com>
 MIME-Version: 1.0
-Message-Id: <1622696256.om3tqko8hq.astroid@bobo.none>
+Message-Id: <1622697882.lu1gj10oe8.astroid@bobo.none>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Excerpts from Haren Myneni's message of May 21, 2021 7:41 pm:
+Excerpts from Haren Myneni's message of May 21, 2021 7:39 pm:
 >=20
-> Changes to create /dev/crypto/nx-gzip interface with VAS register
-> and to remove this interface with VAS unregister.
+> NX generates an interrupt when sees a fault on the user space
+> buffer and the hypervisor forwards that interrupt to OS. Then
+> the kernel handles the interrupt by issuing H_GET_NX_FAULT hcall
+> to retrieve the fault CRB information.
 >=20
-
-Could you include why the change is done, or what goes wrong without it?
-
-Thanks,
-Nick
-
+> This patch also adds changes to setup and free IRQ per each
+> window and also handles the fault by updating the CSB.
+>=20
 > Signed-off-by: Haren Myneni <haren@linux.ibm.com>
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 > ---
->  drivers/crypto/nx/Kconfig             | 1 +
->  drivers/crypto/nx/nx-common-pseries.c | 9 +++++++++
->  2 files changed, 10 insertions(+)
+>  arch/powerpc/platforms/pseries/vas.c | 111 +++++++++++++++++++++++++++
+>  1 file changed, 111 insertions(+)
 >=20
-> diff --git a/drivers/crypto/nx/Kconfig b/drivers/crypto/nx/Kconfig
-> index 23e3d0160e67..2a35e0e785bd 100644
-> --- a/drivers/crypto/nx/Kconfig
-> +++ b/drivers/crypto/nx/Kconfig
-> @@ -29,6 +29,7 @@ if CRYPTO_DEV_NX_COMPRESS
->  config CRYPTO_DEV_NX_COMPRESS_PSERIES
->  	tristate "Compression acceleration support on pSeries platform"
->  	depends on PPC_PSERIES && IBMVIO
-> +	depends on PPC_VAS
->  	default y
->  	help
->  	  Support for PowerPC Nest (NX) compression acceleration. This
-> diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx=
--common-pseries.c
-> index cc8dd3072b8b..9a40fca8a9e6 100644
-> --- a/drivers/crypto/nx/nx-common-pseries.c
-> +++ b/drivers/crypto/nx/nx-common-pseries.c
-> @@ -9,6 +9,7 @@
->   */
-> =20
->  #include <asm/vio.h>
-> +#include <asm/vas.h>
-> =20
->  #include "nx-842.h"
->  #include "nx_csbcpb.h" /* struct nx_csbcpb */
-> @@ -1101,6 +1102,12 @@ static int __init nx842_pseries_init(void)
->  		return ret;
->  	}
-> =20
-> +	ret =3D vas_register_api_pseries(THIS_MODULE, VAS_COP_TYPE_GZIP,
-> +				       "nx-gzip");
-> +
-> +	if (ret)
-> +		pr_err("NX-GZIP is not supported. Returned=3D%d\n", ret);
-> +
->  	return 0;
+> diff --git a/arch/powerpc/platforms/pseries/vas.c b/arch/powerpc/platform=
+s/pseries/vas.c
+> index ef0c455f6e93..31dc17573f50 100644
+> --- a/arch/powerpc/platforms/pseries/vas.c
+> +++ b/arch/powerpc/platforms/pseries/vas.c
+> @@ -224,6 +224,62 @@ int plpar_vas_query_capabilities(const u64 hcall, u8=
+ query_type,
 >  }
+>  EXPORT_SYMBOL_GPL(plpar_vas_query_capabilities);
 > =20
-> @@ -1111,6 +1118,8 @@ static void __exit nx842_pseries_exit(void)
->  	struct nx842_devdata *old_devdata;
->  	unsigned long flags;
-> =20
-> +	vas_unregister_api_pseries();
+> +/*
+> + * HCALL to get fault CRB from pHyp.
+> + */
+> +static int plpar_get_nx_fault(u32 winid, u64 buffer)
+> +{
+> +	int64_t rc;
 > +
->  	crypto_unregister_alg(&nx842_pseries_alg);
-> =20
->  	spin_lock_irqsave(&devdata_mutex, flags);
-> --=20
-> 2.18.2
->=20
->=20
->=20
+> +	rc =3D plpar_hcall_norets(H_GET_NX_FAULT, winid, buffer);
+> +
+> +	switch (rc) {
+> +	case H_SUCCESS:
+> +		return 0;
+> +	case H_PARAMETER:
+> +		pr_err("HCALL(%x): Invalid window ID %u\n", H_GET_NX_FAULT,
+> +		       winid);
+> +		return -EINVAL;
+> +	case H_STATE:
+> +		pr_err("HCALL(%x): No outstanding faults for window ID %u\n",
+> +		       H_GET_NX_FAULT, winid);
+> +		return -EINVAL;
+> +	case H_PRIVILEGE:
+> +		pr_err("HCALL(%x): Window(%u): Invalid fault buffer 0x%llx\n",
+> +		       H_GET_NX_FAULT, winid, buffer);
+> +		return -EACCES;
+> +	default:
+> +		pr_err("HCALL(%x): Unexpected error %lld for window(%u)\n",
+> +		       H_GET_NX_FAULT, rc, winid);
+> +		return -EIO;
+> +	}
+> +}
+
+Out of curiosity, you get one of these errors and it just drops the
+interrupt on the floor. Then what happens, I assume everything
+stops. Should it put some error in the csb, or signal the process or
+something? Or is there nothing very sane that can be done?
+
+> +
+> +/*
+> + * Handle the fault interrupt.
+> + * When the fault interrupt is received for each window, query pHyp to g=
+et
+> + * the fault CRB on the specific fault. Then process the CRB by updating
+> + * CSB or send signal if the user space CSB is invalid.
+> + * Note: pHyp forwards an interrupt for each fault request. So one fault
+> + *	CRB to process for each H_GET_NX_FAULT HCALL.
+> + */
+> +irqreturn_t pseries_vas_fault_thread_fn(int irq, void *data)
+> +{
+> +	struct vas_window *txwin =3D data;
+> +	struct coprocessor_request_block crb;
+> +	struct vas_user_win_ref *tsk_ref;
+> +	int rc;
+> +
+> +	rc =3D plpar_get_nx_fault(txwin->winid, (u64)virt_to_phys(&crb));
+> +	if (!rc) {
+> +		tsk_ref =3D &txwin->task_ref;
+> +		vas_dump_crb(&crb);
+
+This (and existing powernv vas code) is printk()ing a lot of lines per=20
+fault. This should be pretty normal operation I think? It should avoid
+filling the kernel logs, if so. Particularly if it can be triggered by=20
+userspace.
+
+I know it's existing code, so could be fixed separately from the series.
+
+
+> +		vas_update_csb(&crb, tsk_ref);
+
+> +	}
+
+> +
+> +	return IRQ_HANDLED;
+> +}
+> +
