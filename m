@@ -2,173 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB47BC47082
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 05:49:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1532C47096
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 05:53:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A9878613EE
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 05:49:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F811613F0
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 05:53:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229799AbhFCFvP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Jun 2021 01:51:15 -0400
-Received: from mail-pl1-f174.google.com ([209.85.214.174]:46027 "EHLO
-        mail-pl1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbhFCFvO (ORCPT
+        id S229747AbhFCFzf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Jun 2021 01:55:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43772 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229667AbhFCFzf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jun 2021 01:51:14 -0400
-Received: by mail-pl1-f174.google.com with SMTP id 11so2303985plk.12
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Jun 2021 22:49:16 -0700 (PDT)
+        Thu, 3 Jun 2021 01:55:35 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A11AC06174A;
+        Wed,  2 Jun 2021 22:53:51 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id s5-20020a7bc0c50000b0290147d0c21c51so2921060wmh.4;
+        Wed, 02 Jun 2021 22:53:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=hOp7TXbbzxwcDVaO5twCPbrsbPsqYeAyZBDbH4F+cUA=;
-        b=UnvI1Q09TdXGZbuK8RLfB53qwo3E6WQdOZYKJ0M0HHXBJrkw2enL4HzQiDXnaXgrxt
-         BK1VRaWLxaqMKhbGEhv2W3NPNYrZ0V9Q8NZLPCVPjMEXmfss3DfTaKvF+877FhS7La5A
-         TsH4IUayaV0v8kupwrxq6nBuollykW1j9xZti5DWjvEF7/x2du39gjmMuG9KmeIXE7q6
-         jHdVGmMkN9J/qKX3w+JhMl8nzrgoTb2ZrRreil07t4Y7YMwkkEypn4/K4PigNsEIBi+Z
-         Xaa5HosqA+x+C35bv9o7AExDQBRED0ubIA6hu+WBLcYySMXIJnocHjtz9f9ROUDeykmB
-         AT6A==
+        h=from:to:cc:subject:date:message-id;
+        bh=+LavzohDJpbvg/dpCNljR3NbpSeXC/kKjcfv8mBT/jc=;
+        b=guI7rJGwRqalQxlRFJ83qNrLap9ESqnpMotNGMlOc29W/d6GsmHFpZm3xiEPaX7TP/
+         TNtw8t3P8y3IZGAWyH/K4CKR8mRpt/osLOYq+nkQtaS3GAId0WkMf8fvfXmkhrwi8vm2
+         BjZmDo20YCoEEDGqoCaui/Zkyij1Uo26e6Co3wWmBEQfqKYp24tPMbC89NMstQCB71rW
+         kpIeRdKIAltgfW2szfDh4i5S8Uv2RnKoyFI3asJVlKZVCRb2ZfhhrrAMlsabz5eVcS1p
+         iWGIrYS1p4zIZ1EhoU+1dA0FKkR8Ql2hyczUhEpUKZt+DXFTC6LDi29C+exWRISVZ/Nq
+         GBJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=hOp7TXbbzxwcDVaO5twCPbrsbPsqYeAyZBDbH4F+cUA=;
-        b=QZhi0GQ5NpVtiArOFb/LGnsCRJZ1PwsnTenTZ06Y59EANKB6gk94PAVoHoEa885mSB
-         BHzWydfTZj+uZ6PayHcz9TxaFvOW0Taz2FwKEw12+GOy6OAIZwK6Ph37d3MRUUG2Kwsq
-         YHIn8NCaCgXnBRcraA5j9neYdhUTSHsE6P2SIkIsKtQBfLRg2/WIFZrKhlX5DsxaI/mX
-         841yhPbCKJgcxjQ3PImcgDhHXGXjwWd8zfJb1F4ik1yMxo2h5mUaiDJfR41R7BnsUsq4
-         brAFVn4VzJMPq/oeCiHXNOJEHa1AJRVSuOHj9iXDlmDtoX8JMbo7883YfIVPUJftxual
-         8t/w==
-X-Gm-Message-State: AOAM532AYlSIdUIrTAbuQeKBynMASAnY5JsukaySeTdrLEmEJpPd+fJy
-        lBVVPvSKqVp0OrOrNVN27A0=
-X-Google-Smtp-Source: ABdhPJxRYrVxjLMNjIKO3w0ToqQU4v73cKYA8u7ElSTEmcbcbhY25FsehBLB31QlqhRtw+9k/QCCuw==
-X-Received: by 2002:a17:902:8695:b029:fd:6105:c936 with SMTP id g21-20020a1709028695b02900fd6105c936mr34402638plo.25.1622699296444;
-        Wed, 02 Jun 2021 22:48:16 -0700 (PDT)
-Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
-        by smtp.gmail.com with ESMTPSA id h12sm1429148pgn.54.2021.06.02.22.48.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jun 2021 22:48:15 -0700 (PDT)
-Date:   Thu, 03 Jun 2021 15:48:10 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v4 12/16] powerpc/pseries/vas: Setup IRQ and fault
- handling
-To:     Haren Myneni <haren@linux.ibm.com>, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        mpe@ellerman.id.au
-Cc:     haren@us.ibm.com, hbabu@us.ibm.com
-References: <8d219c0816133a8643d650709066cf04c9c77322.camel@linux.ibm.com>
-        <5ac32e4d07bd048e3d687354501d36c334f1c8e0.camel@linux.ibm.com>
-In-Reply-To: <5ac32e4d07bd048e3d687354501d36c334f1c8e0.camel@linux.ibm.com>
-MIME-Version: 1.0
-Message-Id: <1622697882.lu1gj10oe8.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=+LavzohDJpbvg/dpCNljR3NbpSeXC/kKjcfv8mBT/jc=;
+        b=UqwE47GCl8dK4Ct5jz1b3omCAYkhmuWYWrIB3XGmWRC+onpqDmo5oAKoPs1g8C1sXN
+         ewIZjRIQsoloFEklTfdSk4s1u20W9mmZKpuvUnqHepn0ONBIxy98wo1IX7wfxpY27vnv
+         CYU9xtAInOVV6xlZjOTDk/hze0ui650OsxRNtLo5RUzgiIAfMwyl2Jl9HGyLi2i44yoO
+         qOAoVKSY9GhsEnn/5ocI/0uYr9Tq70lVAs6R2cZb7yb6kxBT+ghg7f5buFuf+IjWsM28
+         waUWqBH2iriQrUf75eLiI9SAVuFoRbbxZlcEBkvpTJvLkM0tMiIWXGV1bwv5s265HSDT
+         VQmg==
+X-Gm-Message-State: AOAM533R1mpEhJATQ1fJ6F5RZr9CHAwh/NnyLclYh8L8n1jdnvZtGvtz
+        MTMxotIyxGhqUhKGZYG+hvPcSqz5SNw8DA==
+X-Google-Smtp-Source: ABdhPJxTE6CaglFYIN0bT7p+BDX3O+bhx3vkXDZHLkVV5VX1+AWxmSHjKEwEnT4mmgTq/ZwQAB+4/w==
+X-Received: by 2002:a1c:2155:: with SMTP id h82mr35846198wmh.115.1622699629622;
+        Wed, 02 Jun 2021 22:53:49 -0700 (PDT)
+Received: from wsfd-netdev-buildsys.ntdv.lab.eng.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id e17sm2219784wre.79.2021.06.02.22.53.48
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 02 Jun 2021 22:53:49 -0700 (PDT)
+From:   Hangbin Liu <liuhangbin@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        netdev@vger.kernel.org, Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH] crypto: x86/curve25519 - fix cpu feature checking logic in mod_exit
+Date:   Thu,  3 Jun 2021 01:53:40 -0400
+Message-Id: <20210603055341.24473-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.18.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Excerpts from Haren Myneni's message of May 21, 2021 7:39 pm:
->=20
-> NX generates an interrupt when sees a fault on the user space
-> buffer and the hypervisor forwards that interrupt to OS. Then
-> the kernel handles the interrupt by issuing H_GET_NX_FAULT hcall
-> to retrieve the fault CRB information.
->=20
-> This patch also adds changes to setup and free IRQ per each
-> window and also handles the fault by updating the CSB.
->=20
-> Signed-off-by: Haren Myneni <haren@linux.ibm.com>
-> ---
->  arch/powerpc/platforms/pseries/vas.c | 111 +++++++++++++++++++++++++++
->  1 file changed, 111 insertions(+)
->=20
-> diff --git a/arch/powerpc/platforms/pseries/vas.c b/arch/powerpc/platform=
-s/pseries/vas.c
-> index ef0c455f6e93..31dc17573f50 100644
-> --- a/arch/powerpc/platforms/pseries/vas.c
-> +++ b/arch/powerpc/platforms/pseries/vas.c
-> @@ -224,6 +224,62 @@ int plpar_vas_query_capabilities(const u64 hcall, u8=
- query_type,
->  }
->  EXPORT_SYMBOL_GPL(plpar_vas_query_capabilities);
-> =20
-> +/*
-> + * HCALL to get fault CRB from pHyp.
-> + */
-> +static int plpar_get_nx_fault(u32 winid, u64 buffer)
-> +{
-> +	int64_t rc;
-> +
-> +	rc =3D plpar_hcall_norets(H_GET_NX_FAULT, winid, buffer);
-> +
-> +	switch (rc) {
-> +	case H_SUCCESS:
-> +		return 0;
-> +	case H_PARAMETER:
-> +		pr_err("HCALL(%x): Invalid window ID %u\n", H_GET_NX_FAULT,
-> +		       winid);
-> +		return -EINVAL;
-> +	case H_STATE:
-> +		pr_err("HCALL(%x): No outstanding faults for window ID %u\n",
-> +		       H_GET_NX_FAULT, winid);
-> +		return -EINVAL;
-> +	case H_PRIVILEGE:
-> +		pr_err("HCALL(%x): Window(%u): Invalid fault buffer 0x%llx\n",
-> +		       H_GET_NX_FAULT, winid, buffer);
-> +		return -EACCES;
-> +	default:
-> +		pr_err("HCALL(%x): Unexpected error %lld for window(%u)\n",
-> +		       H_GET_NX_FAULT, rc, winid);
-> +		return -EIO;
-> +	}
-> +}
+In curve25519_mod_init() the curve25519_alg will be registered only when
+(X86_FEATURE_BMI2 && X86_FEATURE_ADX). But in curve25519_mod_exit()
+it still checks (X86_FEATURE_BMI2 || X86_FEATURE_ADX) when do crypto
+unregister. This will trigger a BUG_ON in crypto_unregister_alg() as
+alg->cra_refcnt is 0 if the cpu only supports one of X86_FEATURE_BMI2
+and X86_FEATURE_ADX.
 
-Out of curiosity, you get one of these errors and it just drops the
-interrupt on the floor. Then what happens, I assume everything
-stops. Should it put some error in the csb, or signal the process or
-something? Or is there nothing very sane that can be done?
+Fixes: 07b586fe0662 ("crypto: x86/curve25519 - replace with formally verified implementation")
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ arch/x86/crypto/curve25519-x86_64.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +
-> +/*
-> + * Handle the fault interrupt.
-> + * When the fault interrupt is received for each window, query pHyp to g=
-et
-> + * the fault CRB on the specific fault. Then process the CRB by updating
-> + * CSB or send signal if the user space CSB is invalid.
-> + * Note: pHyp forwards an interrupt for each fault request. So one fault
-> + *	CRB to process for each H_GET_NX_FAULT HCALL.
-> + */
-> +irqreturn_t pseries_vas_fault_thread_fn(int irq, void *data)
-> +{
-> +	struct vas_window *txwin =3D data;
-> +	struct coprocessor_request_block crb;
-> +	struct vas_user_win_ref *tsk_ref;
-> +	int rc;
-> +
-> +	rc =3D plpar_get_nx_fault(txwin->winid, (u64)virt_to_phys(&crb));
-> +	if (!rc) {
-> +		tsk_ref =3D &txwin->task_ref;
-> +		vas_dump_crb(&crb);
+diff --git a/arch/x86/crypto/curve25519-x86_64.c b/arch/x86/crypto/curve25519-x86_64.c
+index 6706b6cb1d0f..38caf61cd5b7 100644
+--- a/arch/x86/crypto/curve25519-x86_64.c
++++ b/arch/x86/crypto/curve25519-x86_64.c
+@@ -1500,7 +1500,7 @@ static int __init curve25519_mod_init(void)
+ static void __exit curve25519_mod_exit(void)
+ {
+ 	if (IS_REACHABLE(CONFIG_CRYPTO_KPP) &&
+-	    (boot_cpu_has(X86_FEATURE_BMI2) || boot_cpu_has(X86_FEATURE_ADX)))
++	    static_branch_likely(&curve25519_use_bmi2_adx))
+ 		crypto_unregister_kpp(&curve25519_alg);
+ }
+ 
+-- 
+2.26.3
 
-This (and existing powernv vas code) is printk()ing a lot of lines per=20
-fault. This should be pretty normal operation I think? It should avoid
-filling the kernel logs, if so. Particularly if it can be triggered by=20
-userspace.
-
-I know it's existing code, so could be fixed separately from the series.
-
-
-> +		vas_update_csb(&crb, tsk_ref);
-
-> +	}
-
-> +
-> +	return IRQ_HANDLED;
-> +}
-> +
