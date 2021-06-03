@@ -2,75 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B59B3C47096
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 12:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B17B6C47082
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 14:07:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A12BE6136E
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 12:34:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D1C9613F4
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 14:07:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230387AbhFCMge (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Jun 2021 08:36:34 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:32772 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230255AbhFCMge (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jun 2021 08:36:34 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lomYb-0002Da-T8; Thu, 03 Jun 2021 20:34:41 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lomYa-0001iF-5L; Thu, 03 Jun 2021 20:34:40 +0800
-Date:   Thu, 3 Jun 2021 20:34:40 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Hongbo Li <herbert.tencent@gmail.com>
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        ebiggers@kernel.org, dhowells@redhat.com, jarkko@kernel.org,
-        tianjia.zhang@linux.alibaba.com, herberthbli@tencent.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: sm2 - fix a memory leak in sm2
-Message-ID: <20210603123357.GM6161@gondor.apana.org.au>
-References: <1622552752-15501-1-git-send-email-herbert.tencent@gmail.com>
+        id S231376AbhFCOI4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Jun 2021 10:08:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38896 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230114AbhFCOI4 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Jun 2021 10:08:56 -0400
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD451C06174A;
+        Thu,  3 Jun 2021 07:07:08 -0700 (PDT)
+Received: by mail-qk1-x72b.google.com with SMTP id i67so6006452qkc.4;
+        Thu, 03 Jun 2021 07:07:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gBucM2tWIfE7RZufFyihAb1W7wKbEZlz8vfM9AwERz4=;
+        b=fGK8XT6+BUSnhZ8oa5WyG3+FwOoVnO7kx1SWuB1mWpl8OSCDir9F25H536ejgTS5MW
+         zEP18f/4RqSBokjZipKa28rD/yHbL40Ik1TtuOGvN3KhRjstap7dLalCasO3rKIZAyCT
+         LGh3UhS3NyagGfg3oKKmXH48t5uKuo7WgRWy3ZZ1Nwsvcx9wakm79frr+jsaehC4LNPJ
+         1BfFcn1OCaAyJjmWD6VQovcjuamQ2ZVwsF7QivS8uexgpAKYv3V7Eiwm1Qi/OQDgjkIS
+         lCw/02Zs5IVl3EubFSsyWR84WtIcFcPCfCCpvoYGW0ff9hL+qAo1TZGkbFduwyBQ4XLX
+         YLZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gBucM2tWIfE7RZufFyihAb1W7wKbEZlz8vfM9AwERz4=;
+        b=B7uj0sdCGfmw/3QW5lw3Gvf19miPQvvPqAsWaJy8bd4A/CoEAaLT39LZZ3EjMMohyE
+         NOg12kl1tFXOXg/4Ij08kiVIgjz1iEu63Wnx4UJz0aCL7sEmZimMQjdL9imxEqNzjJ5j
+         tPdRMCz1hc/0O9bBsEqd+GajZFisNwC5W0Yc8UbWLEY6qVAzXEgqn2UgREIHdKlxN1EE
+         qw3HsmUHwP56L9tnvJ/Q2jgz+eVy2XRsPZicblmErnJSoVQP8/ahTCX4CPrE7FhMH7e3
+         E/Pp2X3irN9nGHA+3PpyrwRmsoMaBMkIr0cw0rKYcOgOfCmhs0aKUJTSqhje1PhRhRjs
+         11lQ==
+X-Gm-Message-State: AOAM532zrIn3pctLq7NUXl33HxjWg0gTJcN/IspCqIlkMn/o/f3+aAv1
+        Uv3QLj2kvlugfc8wLG6LajLX0sSWpUJmm9JUuFc0TMKuMKYVhQ==
+X-Google-Smtp-Source: ABdhPJyzJGfYVLXjE2rKVFFPW1eTVljleEGXu/Loi96HQQFmPgfV7xyiZKnx/eOHaIP5sMbJgN5cep7fHsDhQZO3IbA=
+X-Received: by 2002:a05:620a:22f3:: with SMTP id p19mr32675566qki.281.1622729228073;
+ Thu, 03 Jun 2021 07:07:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1622552752-15501-1-git-send-email-herbert.tencent@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20210603055341.24473-1-liuhangbin@gmail.com> <CAHmME9qXTYVLenPBfq2xpfq=DSJAsdUwSqP4Fzc=0YP6kW+QsQ@mail.gmail.com>
+In-Reply-To: <CAHmME9qXTYVLenPBfq2xpfq=DSJAsdUwSqP4Fzc=0YP6kW+QsQ@mail.gmail.com>
+From:   Hangbin Liu <liuhangbin@gmail.com>
+Date:   Thu, 3 Jun 2021 22:06:56 +0800
+Message-ID: <CAPwn2JQh2ahvSwJiuMNSeoVe7czM1x=Pt5jyXQBVxpPb5PbU1A@mail.gmail.com>
+Subject: Re: [PATCH] crypto: x86/curve25519 - fix cpu feature checking logic
+ in mod_exit
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Netdev <netdev@vger.kernel.org>, stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 01, 2021 at 09:05:52PM +0800, Hongbo Li wrote:
-> From: Hongbo Li <herberthbli@tencent.com>
-> 
-> SM2 module alloc ec->Q in sm2_set_pub_key(), when doing alg test in
-> test_akcipher_one(), it will set public key for every test vector,
-> and don't free ec->Q. This will cause a memory leak.
-> 
-> This patch alloc ec->Q in sm2_ec_ctx_init().
-> 
-> Fixes: ea7ecb66440b ("crypto: sm2 - introduce OSCCA SM2 asymmetric cipher algorithm")
-> Signed-off-by: Hongbo Li <herberthbli@tencent.com>
-> Cc: stable@vger.kernel.org # v5.10+
-> Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> ---
->  crypto/sm2.c | 24 ++++++++++--------------
->  1 file changed, 10 insertions(+), 14 deletions(-)
+On Thu, Jun 3, 2021 at 6:24 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >         if (IS_REACHABLE(CONFIG_CRYPTO_KPP) &&
+> > -           (boot_cpu_has(X86_FEATURE_BMI2) || boot_cpu_has(X86_FEATURE_ADX)))
+> > +           static_branch_likely(&curve25519_use_bmi2_adx))
+> >                 crypto_unregister_kpp(&curve25519_alg);
+> >  }
+>
+> Looks like the error is actually that the `||` should be a `&&`. But
+> if you'd like to branch on that static key instead, that's fine.
 
-Your patch has been discarded by patchwork because you didn't
-update the Subject.  The usual method is to use a version prefix
-such as v2, v3, etc. so that the Subject remains distinct.
+Yes, the code would be shorter by checking the static key :)
 
-Please resubmit with a new Subject.
-
-Oh and don't cc stable@vger.kernel.org.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks
+hangbin
