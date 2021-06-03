@@ -2,89 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE32C47082
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 10:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E1DBC47082
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 10:53:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 080C6600EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 10:24:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FBB1613D8
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Jun 2021 10:53:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbhFCK0L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Jun 2021 06:26:11 -0400
-Received: from mail.zx2c4.com ([104.131.123.232]:39792 "EHLO mail.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229610AbhFCK0L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jun 2021 06:26:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1622715862;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GyH1gx7L7M3lribcnda2WYET6S9/o5F6OxhuQOeFGSI=;
-        b=RwCicTeA4FkqDwhVszPp/M7WDMtv8Wn+vo7lT/eF0EH4dPhghUP59K+6gdhwoes+Ln28c3
-        N36t7Z6rwrFb4OREmLfdht4twh+o5WS2NMAe1RtjBXlCsPDC9xTWOqHJE0bJ/1EoRftzaN
-        n6FKWJ/9ACKJSIradpYQg4oQCrwfO3w=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 13f8325f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 3 Jun 2021 10:24:22 +0000 (UTC)
-Received: by mail-yb1-f170.google.com with SMTP id e10so8110554ybb.7;
-        Thu, 03 Jun 2021 03:24:22 -0700 (PDT)
-X-Gm-Message-State: AOAM530aDyPqYlvOT7lLXIfC7emmXvf0ZbM5wGSmHQBoyy5Vt5pI61/t
-        6GEhRzvFION3xs++Kjv0PZNOF63XP6hoPtNTgnw=
-X-Google-Smtp-Source: ABdhPJzENh/NXNtOHfgoNtZEqo49ueK1GGr1R9Q3CD2YaGJkF973Ns5YPi5eJh/bpn0c9h5TsLnY6IcynydHv2vCeww=
-X-Received: by 2002:a5b:5c6:: with SMTP id w6mr52152482ybp.279.1622715861520;
- Thu, 03 Jun 2021 03:24:21 -0700 (PDT)
+        id S229665AbhFCKyu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Jun 2021 06:54:50 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:7090 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229620AbhFCKys (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Jun 2021 06:54:48 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4FwjN86jZlzYqK7;
+        Thu,  3 Jun 2021 18:50:16 +0800 (CST)
+Received: from dggpemm500009.china.huawei.com (7.185.36.225) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 3 Jun 2021 18:53:02 +0800
+Received: from [10.174.179.24] (10.174.179.24) by
+ dggpemm500009.china.huawei.com (7.185.36.225) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 3 Jun 2021 18:53:01 +0800
+Subject: Re: [PATCH -next] crypto: algboss - Replaced simple_strtol() with
+ kstrtouint()
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>
+References: <20210524120834.1580343-1-liushixin2@huawei.com>
+ <YKwhXlrJzdOjS9lJ@gmail.com> <20210603081238.GA1160@gondor.apana.org.au>
+CC:     "David S. Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+From:   Liu Shixin <liushixin2@huawei.com>
+Message-ID: <cbb52d9a-af7a-b920-0471-1efe0ee480e2@huawei.com>
+Date:   Thu, 3 Jun 2021 18:53:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-References: <20210603055341.24473-1-liuhangbin@gmail.com>
-In-Reply-To: <20210603055341.24473-1-liuhangbin@gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 3 Jun 2021 12:24:10 +0200
-X-Gmail-Original-Message-ID: <CAHmME9qXTYVLenPBfq2xpfq=DSJAsdUwSqP4Fzc=0YP6kW+QsQ@mail.gmail.com>
-Message-ID: <CAHmME9qXTYVLenPBfq2xpfq=DSJAsdUwSqP4Fzc=0YP6kW+QsQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: x86/curve25519 - fix cpu feature checking logic
- in mod_exit
-To:     Hangbin Liu <liuhangbin@gmail.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Netdev <netdev@vger.kernel.org>, stable <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210603081238.GA1160@gondor.apana.org.au>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.24]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500009.china.huawei.com (7.185.36.225)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 3, 2021 at 7:53 AM Hangbin Liu <liuhangbin@gmail.com> wrote:
+On 2021/6/3 16:12, Herbert Xu wrote:
+> On Mon, May 24, 2021 at 02:57:50PM -0700, Eric Biggers wrote:
+>> It would be better to just remove all the code related to CRYPTOA_U32 and
+>> crypto_attr_u32, as it is never used.
+> I agree, it's been unused for over a decade.
 >
-> In curve25519_mod_init() the curve25519_alg will be registered only when
-> (X86_FEATURE_BMI2 && X86_FEATURE_ADX). But in curve25519_mod_exit()
-> it still checks (X86_FEATURE_BMI2 || X86_FEATURE_ADX) when do crypto
-> unregister. This will trigger a BUG_ON in crypto_unregister_alg() as
-> alg->cra_refcnt is 0 if the cpu only supports one of X86_FEATURE_BMI2
-> and X86_FEATURE_ADX.
->
-> Fixes: 07b586fe0662 ("crypto: x86/curve25519 - replace with formally verified implementation")
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  arch/x86/crypto/curve25519-x86_64.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/crypto/curve25519-x86_64.c b/arch/x86/crypto/curve25519-x86_64.c
-> index 6706b6cb1d0f..38caf61cd5b7 100644
-> --- a/arch/x86/crypto/curve25519-x86_64.c
-> +++ b/arch/x86/crypto/curve25519-x86_64.c
-> @@ -1500,7 +1500,7 @@ static int __init curve25519_mod_init(void)
->  static void __exit curve25519_mod_exit(void)
->  {
->         if (IS_REACHABLE(CONFIG_CRYPTO_KPP) &&
-> -           (boot_cpu_has(X86_FEATURE_BMI2) || boot_cpu_has(X86_FEATURE_ADX)))
-> +           static_branch_likely(&curve25519_use_bmi2_adx))
->                 crypto_unregister_kpp(&curve25519_alg);
->  }
+> Thanks,
 
-Looks like the error is actually that the `||` should be a `&&`. But
-if you'd like to branch on that static key instead, that's fine.
+Thank you both for the advice, I will fix it.
+Besides, I noticed that type CRYPTOA_UNSPEC has never been used, should I remove it together?
 
-Cc: stable@vger.kernel.org
-Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Thanks,
