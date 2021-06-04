@@ -2,230 +2,453 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C63B2C47083
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 03:42:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53814C47083
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 04:08:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A62956140B
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 03:42:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 365D2613F6
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 04:08:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229936AbhFDDnz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Jun 2021 23:43:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47574 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229886AbhFDDnz (ORCPT
+        id S229490AbhFDEKQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Jun 2021 00:10:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24998 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229628AbhFDEKP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jun 2021 23:43:55 -0400
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23436C061761
-        for <linux-crypto@vger.kernel.org>; Thu,  3 Jun 2021 20:41:53 -0700 (PDT)
-Received: by mail-ot1-x32d.google.com with SMTP id h24-20020a9d64180000b029036edcf8f9a6so7887320otl.3
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Jun 2021 20:41:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qDKqotNOGIxidneZCpCOFm1Xj7iQGtbVhRVMvdBpFyw=;
-        b=FrW4olx7vH1AWpZD4jiByfMBDwVT9dg4znQeN7xlFnmHlgwgZfuneJl36K8INWvP7S
-         RnDudy0d7iVbU2l1xvdenvPuV4HuItSIRlA7CG2/qt4ye3I/DpVYkTSoy2/+I6DD7GoF
-         HS2ctFuqsS6vAHeld+orfNCC61pfw9MV9kCV6agFhqpAUXNZB8vv2Rw0vD2m/0t+VJnA
-         InK5jZr0vsAfHSeonW30O07YgBryNQ/HtsPAipgo8nzhzJYV6MdIlHkQF23DZdseVV42
-         x0dJycPdpgaJJ7v4skSAm5C4Y4mGWs5ZxHIjZVvri/joAxcFeY75eTIS5mcCbIGk1BLX
-         c5HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qDKqotNOGIxidneZCpCOFm1Xj7iQGtbVhRVMvdBpFyw=;
-        b=fmAMSLkBS0jo+erkjHcVs/DOjpnjpsb5MYqKDp2SHiUlt2nyrxkOF4hRq2yFieVzkN
-         jUn49mpPb66xnuwL2Lz5bINHIMed1TWJgGAXrN/UJ4vsWlklPBYYBNvgdDtv5wHCj6aI
-         Vecc7pawnO+TUWli8okQx3X9svuJPJybIg291BZR/QUf7rS/HNFD9Dl9sOJ055Ib2x4C
-         IqI5gKZGwPKuwQq2aiMiDLKV+0xCI3N9I22EstIILa8BnRxYt3eX1R6nmPJLYJyS1Xu9
-         5QHQ4k3ISK2JksobyxR25XQDvekyJ/uzQqEVEKxUpKyl3/ZSXADkrFoXzFEfiawbVTpq
-         BDNw==
-X-Gm-Message-State: AOAM533usd1C/QCkCrEHugv1H8bwOO+of8f9pL5qq8AdkPANxg5PZQZf
-        A+2zadYU2PIyI/UWFIxelWuiQqN2luMtiyBO9rYBxg==
-X-Google-Smtp-Source: ABdhPJyBlwS4ywW9sYM/BIc6j44E7w/DxEwFdwnUPP5GI2rf2VfVa1kQMxnDXRQPbeqMJpbsxfrDhGUQO3gEMNTgd6s=
-X-Received: by 2002:a9d:4f15:: with SMTP id d21mr2107757otl.155.1622778112475;
- Thu, 03 Jun 2021 20:41:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210519143700.27392-1-bhupesh.sharma@linaro.org>
- <20210519143700.27392-5-bhupesh.sharma@linaro.org> <20210521014547.GA2469643@robh.at.kernel.org>
-In-Reply-To: <20210521014547.GA2469643@robh.at.kernel.org>
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Date:   Fri, 4 Jun 2021 09:11:41 +0530
-Message-ID: <CAH=2Ntz4x08UZp2guT4YX6A1UPKDk9nThuBtbj=vARMO2AK84w@mail.gmail.com>
-Subject: Re: [PATCH v3 04/17] dt-bindings: qcom-qce: Convert bindings to yaml
-To:     Rob Herring <robh@kernel.org>
-Cc:     linux-arm-msm@vger.kernel.org,
-        Thara Gopinath <thara.gopinath@linaro.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bhupesh.linux@gmail.com
+        Fri, 4 Jun 2021 00:10:15 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15444LeO184392;
+        Fri, 4 Jun 2021 00:08:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=QwhkEDTGgfwD/P3nkbmfDrPdWfWplfT9dYlqWKiEPHU=;
+ b=o2zRQTTbZ3PCziDXQ+t7YcbyfoRcHLsI804vXQeXFQvDBzy0idU5IKTWRrOypdch114s
+ zAiKtMnantLV8LB6g+lFGCV73g701Nj9pnQxkeg76tuzRnZxldrRhmIg9ashoEvxNUQH
+ BDXDFGWDfFBARewIHuKqNKzh7j84aTxNnOb7cwJuxNluH66oiHiY7ZmOhOsIg5Xp+YXV
+ M47xhp5RU/folfIHgKoro6KGGXG2WQlRoLjub4IxCyS32jGuLTOygUnVsPhhFSy8yavM
+ vTYGr16Y9vZngW8HZRmGp9mpkgfBASa89qOIySiAqVTl3csJf1iOG5rx2dPej9FDZ469 EQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38ybnpsfku-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Jun 2021 00:08:18 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 154458Rk187328;
+        Fri, 4 Jun 2021 00:08:18 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38ybnpsfkh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Jun 2021 00:08:18 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15447GVl030650;
+        Fri, 4 Jun 2021 04:08:17 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma04dal.us.ibm.com with ESMTP id 38ud8ag9nh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Jun 2021 04:08:17 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15448G7431981984
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Jun 2021 04:08:16 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 68038136053;
+        Fri,  4 Jun 2021 04:08:16 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 944A413604F;
+        Fri,  4 Jun 2021 04:08:14 +0000 (GMT)
+Received: from sig-9-77-136-17.ibm.com (unknown [9.77.136.17])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri,  4 Jun 2021 04:08:14 +0000 (GMT)
+Message-ID: <6a67ebd5f728966312063e132c4f6aba70285c72.camel@linux.ibm.com>
+Subject: Re: [PATCH v4 04/16] powerpc/vas: Create take/drop pid and mm
+ references
+From:   Haren Myneni <haren@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au
+Cc:     haren@us.ibm.com, hbabu@us.ibm.com
+Date:   Thu, 03 Jun 2021 21:08:12 -0700
+In-Reply-To: <1622693213.hz0uqko6dk.astroid@bobo.none>
+References: <8d219c0816133a8643d650709066cf04c9c77322.camel@linux.ibm.com>
+         <16a319614a7ab4ce843f42a49c3ecf68ed03dd36.camel@linux.ibm.com>
+         <1622693213.hz0uqko6dk.astroid@bobo.none>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: -hYI19aW5LoVwBSOo7SGBv3Vm6HbAUoP
+X-Proofpoint-GUID: JEID1MEzCJWsf_IOqdXbKsHnedpYiG-m
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-04_01:2021-06-04,2021-06-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 mlxlogscore=917 lowpriorityscore=0 mlxscore=0 bulkscore=0
+ malwarescore=0 impostorscore=0 spamscore=0 adultscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106040030
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Rob,
-
-On Fri, 21 May 2021 at 07:15, Rob Herring <robh@kernel.org> wrote:
->
-> On Wed, May 19, 2021 at 08:06:47PM +0530, Bhupesh Sharma wrote:
-> > Convert Qualcomm QCE crypto devicetree binding to YAML.
-> >
-> > Cc: Thara Gopinath <thara.gopinath@linaro.org>
-> > Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> > Cc: Rob Herring <robh+dt@kernel.org>
-> > Cc: Andy Gross <agross@kernel.org>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: David S. Miller <davem@davemloft.net>
-> > Cc: Stephen Boyd <sboyd@kernel.org>
-> > Cc: Michael Turquette <mturquette@baylibre.com>
-> > Cc: Vinod Koul <vkoul@kernel.org>
-> > Cc: dmaengine@vger.kernel.org
-> > Cc: linux-clk@vger.kernel.org
-> > Cc: linux-crypto@vger.kernel.org
-> > Cc: devicetree@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Cc: bhupesh.linux@gmail.com
-> > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+On Thu, 2021-06-03 at 14:21 +1000, Nicholas Piggin wrote:
+> Excerpts from Haren Myneni's message of May 21, 2021 7:31 pm:
+> > Take pid and mm references when each window opens and drops during
+> > close. This functionality is needed for powerNV and pseries. So
+> > this patch defines the existing code as functions in common book3s
+> > platform vas-api.c
+> > 
+> > Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+> 
+> Seems like a good idea to put these into their own helper functions.
+> 
 > > ---
-> >  .../devicetree/bindings/crypto/qcom-qce.txt   | 25 -------
-> >  .../devicetree/bindings/crypto/qcom-qce.yaml  | 69 +++++++++++++++++++
-> >  2 files changed, 69 insertions(+), 25 deletions(-)
-> >  delete mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.txt
-> >  create mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.txt b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
-> > deleted file mode 100644
-> > index fdd53b184ba8..000000000000
-> > --- a/Documentation/devicetree/bindings/crypto/qcom-qce.txt
-> > +++ /dev/null
-> > @@ -1,25 +0,0 @@
-> > -Qualcomm crypto engine driver
-> > -
-> > -Required properties:
-> > -
-> > -- compatible  : should be "qcom,crypto-v5.1"
-> > -- reg         : specifies base physical address and size of the registers map
-> > -- clocks      : phandle to clock-controller plus clock-specifier pair
-> > -- clock-names : "iface" clocks register interface
-> > -                "bus" clocks data transfer interface
-> > -                "core" clocks rest of the crypto block
-> > -- dmas        : DMA specifiers for tx and rx dma channels. For more see
-> > -                Documentation/devicetree/bindings/dma/dma.txt
-> > -- dma-names   : DMA request names should be "rx" and "tx"
-> > -
-> > -Example:
-> > -     crypto@fd45a000 {
-> > -             compatible = "qcom,crypto-v5.1";
-> > -             reg = <0xfd45a000 0x6000>;
-> > -             clocks = <&gcc GCC_CE2_AHB_CLK>,
-> > -                      <&gcc GCC_CE2_AXI_CLK>,
-> > -                      <&gcc GCC_CE2_CLK>;
-> > -             clock-names = "iface", "bus", "core";
-> > -             dmas = <&cryptobam 2>, <&cryptobam 3>;
-> > -             dma-names = "rx", "tx";
-> > -     };
-> > diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> > new file mode 100644
-> > index 000000000000..a691cd08f372
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> > @@ -0,0 +1,69 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/crypto/qcom-qce.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> >  arch/powerpc/include/asm/vas.h              | 25 +++++++++
+> >  arch/powerpc/platforms/book3s/vas-api.c     | 51
+> > ++++++++++++++++++
+> >  arch/powerpc/platforms/powernv/vas-fault.c  | 10 ++--
+> >  arch/powerpc/platforms/powernv/vas-window.c | 57 ++---------------
+> > ----
+> >  arch/powerpc/platforms/powernv/vas.h        |  6 +--
+> >  5 files changed, 88 insertions(+), 61 deletions(-)
+> > 
+> > diff --git a/arch/powerpc/include/asm/vas.h
+> > b/arch/powerpc/include/asm/vas.h
+> > index 668303198772..3f2b02461a76 100644
+> > --- a/arch/powerpc/include/asm/vas.h
+> > +++ b/arch/powerpc/include/asm/vas.h
+> > @@ -5,6 +5,9 @@
+> >  
+> >  #ifndef _ASM_POWERPC_VAS_H
+> >  #define _ASM_POWERPC_VAS_H
+> > +#include <linux/sched/mm.h>
+> > +#include <linux/mmu_context.h>
+> > +#include <asm/icswx.h>
+> >  #include <uapi/asm/vas-api.h>
+> >  
+> >  struct vas_window;
+> > @@ -49,6 +52,17 @@ enum vas_cop_type {
+> >  	VAS_COP_TYPE_MAX,
+> >  };
+> >  
+> > +/*
+> > + * User space VAS windows are opened by tasks and take references
+> > + * to pid and mm until windows are closed.
+> > + * Stores pid, mm, and tgid for each window.
+> > + */
+> > +struct vas_user_win_ref {
+> > +	struct pid *pid;	/* PID of owner */
+> > +	struct pid *tgid;	/* Thread group ID of owner */
+> > +	struct mm_struct *mm;	/* Linux process mm_struct */
+> > +};
 > > +
-> > +title: Qualcomm crypto engine driver
+> >  /*
+> >   * User space window operations used for powernv and powerVM
+> >   */
+> > @@ -59,6 +73,16 @@ struct vas_user_win_ops {
+> >  	int (*close_win)(void *);
+> >  };
+> >  
+> > +static inline void vas_drop_reference_pid_mm(struct
+> > vas_user_win_ref *ref)
+> > +{
+> > +	/* Drop references to pid and mm */
+> > +	put_pid(ref->pid);
+> > +	if (ref->mm) {
+> > +		mm_context_remove_vas_window(ref->mm);
+> > +		mmdrop(ref->mm);
+> > +	}
+> > +}
+> 
+> You don't have to make up a new name for such a thing because you 
+> already have one
+> 
+> put_vas_user_win_ref(struct vas_user_win_ref *ref)
+> 
+> 
 > > +
-> > +maintainers:
-> > +  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> > +
-> > +description: |
-> > +  This document defines the binding for the QCE crypto
-> > +  controller found on Qualcomm parts.
-> > +
-> > +properties:
-> > +  compatible:
-> > +    const: qcom,crypto-v5.1
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +    description: |
-> > +      Specifies base physical address and size of the registers map.
->
-> Yep, that's every 'reg'. Drop.
->
-> With that dropped,
->
-> Reviewed-by: Rob Herring <robh@kernel.org>
+> >  /*
+> >   * Receive window attributes specified by the (in-kernel) owner of
+> > window.
+> >   */
+> > @@ -192,4 +216,5 @@ int vas_register_coproc_api(struct module *mod,
+> > enum vas_cop_type cop_type,
+> >  			    struct vas_user_win_ops *vops);
+> >  void vas_unregister_coproc_api(void);
+> >  
+> > +int vas_reference_pid_mm(struct vas_user_win_ref *task_ref);
+> >  #endif /* __ASM_POWERPC_VAS_H */
+> > diff --git a/arch/powerpc/platforms/book3s/vas-api.c
+> > b/arch/powerpc/platforms/book3s/vas-api.c
+> > index 6c39320bfb9b..a0141bfb2e4b 100644
+> > --- a/arch/powerpc/platforms/book3s/vas-api.c
+> > +++ b/arch/powerpc/platforms/book3s/vas-api.c
+> > @@ -55,6 +55,57 @@ static char *coproc_devnode(struct device *dev,
+> > umode_t *mode)
+> >  	return kasprintf(GFP_KERNEL, "crypto/%s", dev_name(dev));
+> >  }
+> >  
+> > +/*
+> > + * Take reference to pid and mm
+> > + */
+> > +int vas_reference_pid_mm(struct vas_user_win_ref *task_ref)
+> > +{
+> 
+> So this is quite different from a typical refcount object in that
+> it's 
+> opening it for access as well. I would split it in two functions, one
+> matching put_vas_user_win_ref() and appearing in the same place in
+> code,
+> which is up to about mmput and another function that adds the window
+> and
+> does the CP_ABORT etc... hmm, where do you release tgid?
 
-Ok, I will drop this in v4.
+Basically copied the existing code in to these functions
+(vas_reference_pid_mm/vas_drop_reference_pid_mm) so that useful for
+both platforms. 
 
-Thanks,
-Bhupesh
+mm_context_add/remove_vas_window() is also like taking reference. So
+instead of adding 2 seperate functions, how about naming
+get/put_vas_user_win_ref() 
 
+Regarding tgid, the reference is taking only with pid, but not tgid.
+pid reuse can happen only in the case of multithread applications when
+the child that opened VAS window exits. But these windows will be
+closed when tgid exists. So do not need tgid reference.
+  
+Thanks
+Haren
+
+
+> 
+> Thanks,
+> Nick
+> 
+> > +	/*
+> > +	 * Window opened by a child thread may not be closed when
+> > +	 * it exits. So take reference to its pid and release it
+> > +	 * when the window is free by parent thread.
+> > +	 * Acquire a reference to the task's pid to make sure
+> > +	 * pid will not be re-used - needed only for multithread
+> > +	 * applications.
+> > +	 */
+> > +	task_ref->pid = get_task_pid(current, PIDTYPE_PID);
+> > +	/*
+> > +	 * Acquire a reference to the task's mm.
+> > +	 */
+> > +	task_ref->mm = get_task_mm(current);
+> > +	if (!task_ref->mm) {
+> > +		put_pid(task_ref->pid);
+> > +		pr_err("VAS: pid(%d): mm_struct is not found\n",
+> > +				current->pid);
+> > +		return -EPERM;
+> > +	}
 > > +
-> > +  clocks:
-> > +    items:
-> > +      - description: iface clocks register interface.
-> > +      - description: bus clocks data transfer interface.
-> > +      - description: core clocks rest of the crypto block.
+> > +	mmgrab(task_ref->mm);
+> > +	mmput(task_ref->mm);
+> > +	mm_context_add_vas_window(task_ref->mm);
+> > +	/*
+> > +	 * Process closes window during exit. In the case of
+> > +	 * multithread application, the child thread can open
+> > +	 * window and can exit without closing it. Expects parent
+> > +	 * thread to use and close the window. So do not need
+> > +	 * to take pid reference for parent thread.
+> > +	 */
+> > +	task_ref->tgid = find_get_pid(task_tgid_vnr(current));
+> > +	/*
+> > +	 * Even a process that has no foreign real address mapping can
+> > +	 * use an unpaired COPY instruction (to no real effect). Issue
+> > +	 * CP_ABORT to clear any pending COPY and prevent a covert
+> > +	 * channel.
+> > +	 *
+> > +	 * __switch_to() will issue CP_ABORT on future context switches
+> > +	 * if process / thread has any open VAS window (Use
+> > +	 * current->mm->context.vas_windows).
+> > +	 */
+> > +	asm volatile(PPC_CP_ABORT);
 > > +
-> > +  clock-names:
-> > +    items:
-> > +      - const: iface
-> > +      - const: bus
-> > +      - const: core
+> > +	return 0;
+> > +}
 > > +
-> > +  dmas:
-> > +    items:
-> > +      - description: DMA specifiers for tx dma channel.
-> > +      - description: DMA specifiers for rx dma channel.
+> >  static int coproc_open(struct inode *inode, struct file *fp)
+> >  {
+> >  	struct coproc_instance *cp_inst;
+> > diff --git a/arch/powerpc/platforms/powernv/vas-fault.c
+> > b/arch/powerpc/platforms/powernv/vas-fault.c
+> > index 3d21fce254b7..ac3a71ec3bd5 100644
+> > --- a/arch/powerpc/platforms/powernv/vas-fault.c
+> > +++ b/arch/powerpc/platforms/powernv/vas-fault.c
+> > @@ -73,7 +73,7 @@ static void update_csb(struct vas_window *window,
+> >  	 * NX user space windows can not be opened for task->mm=NULL
+> >  	 * and faults will not be generated for kernel requests.
+> >  	 */
+> > -	if (WARN_ON_ONCE(!window->mm || !window->user_win))
+> > +	if (WARN_ON_ONCE(!window->task_ref.mm || !window->user_win))
+> >  		return;
+> >  
+> >  	csb_addr = (void __user *)be64_to_cpu(crb->csb_addr);
+> > @@ -92,7 +92,7 @@ static void update_csb(struct vas_window *window,
+> >  	csb.address = crb->stamp.nx.fault_storage_addr;
+> >  	csb.flags = 0;
+> >  
+> > -	pid = window->pid;
+> > +	pid = window->task_ref.pid;
+> >  	tsk = get_pid_task(pid, PIDTYPE_PID);
+> >  	/*
+> >  	 * Process closes send window after all pending NX requests are
+> > @@ -111,7 +111,7 @@ static void update_csb(struct vas_window
+> > *window,
+> >  	 * a window and exits without closing it.
+> >  	 */
+> >  	if (!tsk) {
+> > -		pid = window->tgid;
+> > +		pid = window->task_ref.tgid;
+> >  		tsk = get_pid_task(pid, PIDTYPE_PID);
+> >  		/*
+> >  		 * Parent thread (tgid) will be closing window when it
+> > @@ -127,7 +127,7 @@ static void update_csb(struct vas_window
+> > *window,
+> >  		return;
+> >  	}
+> >  
+> > -	kthread_use_mm(window->mm);
+> > +	kthread_use_mm(window->task_ref.mm);
+> >  	rc = copy_to_user(csb_addr, &csb, sizeof(csb));
+> >  	/*
+> >  	 * User space polls on csb.flags (first byte). So add barrier
+> > @@ -139,7 +139,7 @@ static void update_csb(struct vas_window
+> > *window,
+> >  		smp_mb();
+> >  		rc = copy_to_user(csb_addr, &csb, sizeof(u8));
+> >  	}
+> > -	kthread_unuse_mm(window->mm);
+> > +	kthread_unuse_mm(window->task_ref.mm);
+> >  	put_task_struct(tsk);
+> >  
+> >  	/* Success */
+> > diff --git a/arch/powerpc/platforms/powernv/vas-window.c
+> > b/arch/powerpc/platforms/powernv/vas-window.c
+> > index 3ccd3edcaf1a..ffd619e5a218 100644
+> > --- a/arch/powerpc/platforms/powernv/vas-window.c
+> > +++ b/arch/powerpc/platforms/powernv/vas-window.c
+> > @@ -1065,51 +1065,9 @@ struct vas_window *vas_tx_win_open(int
+> > vasid, enum vas_cop_type cop,
+> >  			rc = -ENODEV;
+> >  			goto free_window;
+> >  		}
+> > -
+> > -		/*
+> > -		 * Window opened by a child thread may not be closed
+> > when
+> > -		 * it exits. So take reference to its pid and release
+> > it
+> > -		 * when the window is free by parent thread.
+> > -		 * Acquire a reference to the task's pid to make sure
+> > -		 * pid will not be re-used - needed only for
+> > multithread
+> > -		 * applications.
+> > -		 */
+> > -		txwin->pid = get_task_pid(current, PIDTYPE_PID);
+> > -		/*
+> > -		 * Acquire a reference to the task's mm.
+> > -		 */
+> > -		txwin->mm = get_task_mm(current);
+> > -
+> > -		if (!txwin->mm) {
+> > -			put_pid(txwin->pid);
+> > -			pr_err("VAS: pid(%d): mm_struct is not
+> > found\n",
+> > -					current->pid);
+> > -			rc = -EPERM;
+> > +		rc = vas_reference_pid_mm(&txwin->task_ref);
+> > +		if (rc)
+> >  			goto free_window;
+> > -		}
+> > -
+> > -		mmgrab(txwin->mm);
+> > -		mmput(txwin->mm);
+> > -		mm_context_add_vas_window(txwin->mm);
+> > -		/*
+> > -		 * Process closes window during exit. In the case of
+> > -		 * multithread application, the child thread can open
+> > -		 * window and can exit without closing it. Expects
+> > parent
+> > -		 * thread to use and close the window. So do not need
+> > -		 * to take pid reference for parent thread.
+> > -		 */
+> > -		txwin->tgid = find_get_pid(task_tgid_vnr(current));
+> > -		/*
+> > -		 * Even a process that has no foreign real address
+> > mapping can
+> > -		 * use an unpaired COPY instruction (to no real
+> > effect). Issue
+> > -		 * CP_ABORT to clear any pending COPY and prevent a
+> > covert
+> > -		 * channel.
+> > -		 *
+> > -		 * __switch_to() will issue CP_ABORT on future context
+> > switches
+> > -		 * if process / thread has any open VAS window (Use
+> > -		 * current->mm->context.vas_windows).
+> > -		 */
+> > -		asm volatile(PPC_CP_ABORT);
+> >  	}
+> >  
+> >  	set_vinst_win(vinst, txwin);
+> > @@ -1339,14 +1297,9 @@ int vas_win_close(struct vas_window *window)
+> >  
+> >  	/* if send window, drop reference to matching receive window */
+> >  	if (window->tx_win) {
+> > -		if (window->user_win) {
+> > -			/* Drop references to pid and mm */
+> > -			put_pid(window->pid);
+> > -			if (window->mm) {
+> > -				mm_context_remove_vas_window(window-
+> > >mm);
+> > -				mmdrop(window->mm);
+> > -			}
+> > -		}
+> > +		if (window->user_win)
+> > +			vas_drop_reference_pid_mm(&window->task_ref);
 > > +
-> > +  dma-names:
-> > +    items:
-> > +      - const: rx
-> > +      - const: tx
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - clocks
-> > +  - clock-names
-> > +  - dmas
-> > +  - dma-names
-> > +
-> > +additionalProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    #include <dt-bindings/clock/qcom,gcc-apq8084.h>
-> > +    crypto-engine@fd45a000 {
-> > +        compatible = "qcom,crypto-v5.1";
-> > +        reg = <0xfd45a000 0x6000>;
-> > +        clocks = <&gcc GCC_CE2_AHB_CLK>,
-> > +                 <&gcc GCC_CE2_AXI_CLK>,
-> > +                 <&gcc GCC_CE2_CLK>;
-> > +        clock-names = "iface", "bus", "core";
-> > +        dmas = <&cryptobam 2>, <&cryptobam 3>;
-> > +        dma-names = "rx", "tx";
-> > +    };
-> > --
-> > 2.31.1
-> >
+> >  		put_rx_win(window->rxwin);
+> >  	}
+> >  
+> > diff --git a/arch/powerpc/platforms/powernv/vas.h
+> > b/arch/powerpc/platforms/powernv/vas.h
+> > index c7db3190baca..f354dd5c51bd 100644
+> > --- a/arch/powerpc/platforms/powernv/vas.h
+> > +++ b/arch/powerpc/platforms/powernv/vas.h
+> > @@ -357,11 +357,9 @@ struct vas_window {
+> >  	bool user_win;		/* True if user space window */
+> >  	void *hvwc_map;		/* HV window context */
+> >  	void *uwc_map;		/* OS/User window context */
+> > -	struct pid *pid;	/* Linux process id of owner */
+> > -	struct pid *tgid;	/* Thread group ID of owner */
+> > -	struct mm_struct *mm;	/* Linux process mm_struct */
+> >  	int wcreds_max;		/* Window credits */
+> >  
+> > +	struct vas_user_win_ref task_ref;
+> >  	char *dbgname;
+> >  	struct dentry *dbgdir;
+> >  
+> > @@ -443,7 +441,7 @@ extern void vas_win_paste_addr(struct
+> > vas_window *window, u64 *addr,
+> >  
+> >  static inline int vas_window_pid(struct vas_window *window)
+> >  {
+> > -	return pid_vnr(window->pid);
+> > +	return pid_vnr(window->task_ref.pid);
+> >  }
+> >  
+> >  static inline void vas_log_write(struct vas_window *win, char
+> > *name,
+> > -- 
+> > 2.18.2
+> > 
+> > 
+> > 
+
