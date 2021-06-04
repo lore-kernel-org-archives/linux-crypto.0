@@ -2,80 +2,457 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66DF2C4743C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 21:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E19D4C4743C
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 21:53:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5083E61407
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 21:50:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C969F61402
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 21:53:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230105AbhFDVwg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Jun 2021 17:52:36 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:47394 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229929AbhFDVwg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Jun 2021 17:52:36 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lpHiK-0005OW-8V; Sat, 05 Jun 2021 05:50:48 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lpHiH-00014j-NG; Sat, 05 Jun 2021 05:50:45 +0800
-Date:   Sat, 5 Jun 2021 05:50:45 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, ebiggers@kernel.org,
-        Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCH] crypto: shash - stop comparing function pointers to
- avoid breaking CFI
-Message-ID: <20210604215045.GA4052@gondor.apana.org.au>
-References: <20210604190009.33022-1-ardb@kernel.org>
+        id S229755AbhFDVzK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Jun 2021 17:55:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5428 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229930AbhFDVzK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Jun 2021 17:55:10 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 154LY7uD030421;
+        Fri, 4 Jun 2021 17:53:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=3ylY8P2/3DTxRHozCmcFghyxxXy3o1A1gbdKhJJWS3A=;
+ b=nLB6LdSgETsUdRdUG9TnN4rHoxBJ1ULcClsAFxOzWK3yQfcEwciEzWCc0BZmSilY/dT0
+ GDYS+DadEe8kZBPROmNyWlzlCGnu689y1uQ3C954lFAeO4MUK964L0p0Q6f3F2LgQnGy
+ BzbHu4X5hjUjowVGTr590mDoqQOvIkMbM0ljjJoxRmGwTpMlTL6Yl0xg2TwRsyNsSjXY
+ QrcNoxzdwl+N9WXy9GG5qPNwahDXzfRa30hdfZbXGhx7EPLDbnkPciUJciPe7Ji9kVb7
+ lMPKjVi/hbo1fe5HJ4t/Qe+zY/hnXnO49JrtLtfejEQ8rOC4UfUO0R1HkGqz4mGrCJVJ bg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38yu8ssmb7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Jun 2021 17:53:12 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 154LZqOH038516;
+        Fri, 4 Jun 2021 17:53:11 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38yu8ssmb0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Jun 2021 17:53:11 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 154LlI42005781;
+        Fri, 4 Jun 2021 21:53:11 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma02dal.us.ibm.com with ESMTP id 38ud8afxna-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Jun 2021 21:53:11 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 154LrA6I22151456
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Jun 2021 21:53:10 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0E074B205F;
+        Fri,  4 Jun 2021 21:53:10 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AB34AB2065;
+        Fri,  4 Jun 2021 21:53:08 +0000 (GMT)
+Received: from sig-9-77-136-17.ibm.com (unknown [9.77.136.17])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri,  4 Jun 2021 21:53:08 +0000 (GMT)
+Message-ID: <93586baca94d10ec5658d547b109aaa6a55ff635.camel@linux.ibm.com>
+Subject: Re: [PATCH v4 09/16] powerpc/pseries/vas: Add HCALL wrappers for
+ VAS handling
+From:   Haren Myneni <haren@linux.ibm.com>
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, npiggin@gmail.com
+Cc:     hbabu@us.ibm.com, haren@us.ibm.com
+Date:   Fri, 04 Jun 2021 14:53:06 -0700
+In-Reply-To: <87o8clg83d.fsf@mpe.ellerman.id.au>
+References: <8d219c0816133a8643d650709066cf04c9c77322.camel@linux.ibm.com>
+         <f52961e6941803366ecf6239ddb9532680516b78.camel@linux.ibm.com>
+         <87o8clg83d.fsf@mpe.ellerman.id.au>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210604190009.33022-1-ardb@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: BpMnBlDZpF-dmGmJA1l5Nm7OH_JwixAR
+X-Proofpoint-GUID: IScL52jMTxVr1CAZqr6naDQN2p-Z7QDD
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-04_12:2021-06-04,2021-06-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 mlxscore=0 priorityscore=1501 suspectscore=0
+ bulkscore=0 spamscore=0 malwarescore=0 clxscore=1015 adultscore=0
+ phishscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104190000 definitions=main-2106040148
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 04, 2021 at 09:00:09PM +0200, Ard Biesheuvel wrote:
-> crypto_shash_alg_has_setkey() is implemented by testing whether the
-> .setkey() member of a struct shash_alg points to the default version
-> called shash_no_setkey(). As crypto_shash_alg_has_setkey() is a static
-> inline, this requires shash_no_setkey() to be exported to modules.
+On Fri, 2021-06-04 at 21:52 +1000, Michael Ellerman wrote:
+> Haren Myneni <haren@linux.ibm.com> writes:
+> > This patch adds the following HCALL wrapper functions to allocate,
 > 
-> Unfortunately, when building with CFI, function pointers are routed
-> via CFI stubs which are private to each module (or to the kernel proper)
-> and so this function pointer comparison may fail spuriously.
+> Normal spelling is "hcall".
 > 
-> Let's fix this by turning crypto_shash_alg_has_setkey() into an out of
-> line function, which makes the problem go away.
+> > modify and deallocate VAS windows, and retrieve VAS capabilities.
+> > 
+> > H_ALLOCATE_VAS_WINDOW: Allocate VAS window
+> > H_DEALLOCATE_VAS_WINDOW: Close VAS window
+> > H_MODIFY_VAS_WINDOW: Setup window before using
+> > H_QUERY_VAS_CAPABILITIES: Get VAS capabilities
 > 
-> Cc: Sami Tolvanen <samitolvanen@google.com>
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  crypto/shash.c                 | 11 ++++++++---
->  include/crypto/internal/hash.h |  8 +-------
->  2 files changed, 9 insertions(+), 10 deletions(-)
+> Please tell us which version of PAPR, and in which section etc.,
+> these
+> are described in.
+> 
+> > Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+> > Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+> > ---
+> >  arch/powerpc/platforms/pseries/vas.c | 217
+> > +++++++++++++++++++++++++++
+> >  1 file changed, 217 insertions(+)
+> >  create mode 100644 arch/powerpc/platforms/pseries/vas.c
+> > 
+> > diff --git a/arch/powerpc/platforms/pseries/vas.c
+> > b/arch/powerpc/platforms/pseries/vas.c
+> > new file mode 100644
+> > index 000000000000..06960151477c
+> > --- /dev/null
+> > +++ b/arch/powerpc/platforms/pseries/vas.c
+> > @@ -0,0 +1,217 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/*
+> > + * Copyright 2020-21 IBM Corp.
+> > + */
+> > +
+> > +#define pr_fmt(fmt) "vas: " fmt
+> > +
+> > +#include <linux/module.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/export.h>
+> > +#include <linux/types.h>
+> > +#include <linux/delay.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/irqdomain.h>
+> > +#include <linux/interrupt.h>
+> > +#include <linux/sched/mm.h>
+> > +#include <linux/mmu_context.h>
+> > +#include <asm/hvcall.h>
+> > +#include <asm/hvconsole.h>
+> > +#include <asm/machdep.h>
+> 
+> Do we need all those headers?
+> 
+> > +#include <asm/plpar_wrappers.h>
+> > +#include <asm/vas.h>
+> > +#include "vas.h"
+> > +
+> > +#define	VAS_INVALID_WIN_ADDRESS	0xFFFFFFFFFFFFFFFFul
+> > +#define	VAS_DEFAULT_DOMAIN_ID	0xFFFFFFFFFFFFFFFFul
+> 
+> Some blank lines for formatting please.
+> 
+> > +/* Authority Mask Register (AMR) value is not supported in */
+> > +/* linux implementation. So pass '0' to modify window HCALL */
+> 
+> Please fix the comment formatting.
+> 
+> > +#define	VAS_AMR_VALUE	0
+> 
+> This is only used in one place. It'd be simpler to just pass 0 and
+> move
+> the comment there.
+> 
+> > +/* phyp allows one credit per window right now */
+> > +#define DEF_WIN_CREDS		1
+> > +
+> > +static int64_t hcall_return_busy_check(int64_t rc)
+> > +{
+> 
+> Please use normal kernel types, ie. s64, or just long.
+> 
+> Same comment throughout.
+> 
+> > +	/* Check if we are stalled for some time */
+> > +	if (H_IS_LONG_BUSY(rc)) {
+> > +		msleep(get_longbusy_msecs(rc));
+> > +		rc = H_BUSY;
+> > +	} else if (rc == H_BUSY) {
+> > +		cond_resched();
+> > +	}
+> > +
+> > +	return rc;
+> > +}
+> > +
+> > +/*
+> > + * Allocate VAS window HCALL
+> > + */
+> > +static int plpar_vas_allocate_window(struct vas_window *win, u64
+> > *domain,
+> > +				     u8 wintype, u16 credits)
+> 
+> You don't have to use the "plpar" prefix for these sort of wrappers.
+> 
+> Just naming them after the hcall would probably be clearer, so:
+> 
+>  h_allocate_vas_window(... )
+> 
+> > +{
+> > +	long retbuf[PLPAR_HCALL9_BUFSIZE] = {0};
+> > +	int64_t rc;
+> > +
+> > +	do {
+> > +		rc = plpar_hcall9(H_ALLOCATE_VAS_WINDOW, retbuf,
+> > wintype,
+> > +				  credits, domain[0], domain[1],
+> > domain[2],
+> > +				  domain[3], domain[4], domain[5]);
+> > +
+> > +		rc = hcall_return_busy_check(rc);
+> > +	} while (rc == H_BUSY);
+> > +
+> > +	switch (rc) {
+> > +	case H_SUCCESS:
+> > +		win->winid = retbuf[0];
+> > +		win->lpar.win_addr = retbuf[1];
+> > +		win->lpar.complete_irq = retbuf[2];
+> > +		win->lpar.fault_irq = retbuf[3];
+> 
+> You shouldn't mutate win until you know there is no error.
+> 
+> > +		if (win->lpar.win_addr == VAS_INVALID_WIN_ADDRESS) {
+> > +			pr_err("HCALL(%x): COPY/PASTE is not
+> > supported\n",
+> > +				H_ALLOCATE_VAS_WINDOW);
+> > +			return -ENOTSUPP;
+> > +		}
+> > +		return 0;
+> > +	case H_PARAMETER:
+> > +		pr_err("HCALL(%x): Invalid window type (%u)\n",
+> > +			H_ALLOCATE_VAS_WINDOW, wintype);
+> > +		return -EINVAL;
+> > +	case H_P2:
+> > +		pr_err("HCALL(%x): Credits(%u) exceed maximum window
+> > credits\n",
+> > +			H_ALLOCATE_VAS_WINDOW, credits);
+> > +		return -EINVAL;
+> > +	case H_COP_HW:
+> > +		pr_err("HCALL(%x): User-mode COPY/PASTE is not
+> > supported\n",
+> > +			H_ALLOCATE_VAS_WINDOW);
+> > +		return -ENOTSUPP;
+> > +	case H_RESOURCE:
+> > +		pr_err("HCALL(%x): LPAR credit limit exceeds window
+> > limit\n",
+> > +			H_ALLOCATE_VAS_WINDOW);
+> > +		return -EPERM;
+> > +	case H_CONSTRAINED:
+> > +		pr_err("HCALL(%x): Credits (%u) are not available\n",
+> > +			H_ALLOCATE_VAS_WINDOW, credits);
+> > +		return -EPERM;
+> > +	default:
+> > +		pr_err("HCALL(%x): Unexpected error %lld\n",
+> > +			H_ALLOCATE_VAS_WINDOW, rc);
+> > +		return -EIO;
+> > +	}
+> 
+> Do we really need all these error prints? It's very verbose, and
+> presumably in normal operation none of these are meant to happen
+> anyway.
+> 
+> Can't we just have a single case that prints the error value?
 
-I think this deserves a comment in the code.
+Right, generally we should not see these errors. But few of them are
+failures based on argument(s) passing to hcall. like passing invalid
+window type or credits are not availavble. 
 
-> +bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
-> +{
-> +       return alg->setkey != shash_no_setkey;
-> +}
-> +EXPORT_SYMBOL_GPL(crypto_shash_alg_has_setkey);
+So can I add error messages for these specific ones and common error
+message for other failures with the error code?
 
-This would be a good spot for the comment so someone doesn't try
-to make it inline again later.
+case H_PARAMETER:
+   	pr_err("HCALL(%x): Invalid window type (%u)\n",
+		H_ALLOCATE_VAS_WINDOW, wintype);
+case H_CONSTRAINED:
+   	pr_err("HCALL(%x): Credits (%u) are not available\n",
+		H_ALLOCATE_VAS_WINDOW, credits);
+case H_P2:
+	pr_err("HCALL(%x): Credits(%u) exceed maximum window
+credits\n", H_ALLOCATE_VAS_WINDOW, credits);
+default:
+	pr_err("HCALL(%x): failure with error code %d\n", 	
+		H_ALLOCATE_VAS_WINDOW, rc);
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+> 
+> Same comment for the other hcalls.
+> 
+> > +}
+> > +
+> > +/*
+> > + * Deallocate VAS window HCALL.
+> > + */
+> > +static int plpar_vas_deallocate_window(u64 winid)
+> > +{
+> > +	int64_t rc;
+> > +
+> > +	do {
+> > +		rc = plpar_hcall_norets(H_DEALLOCATE_VAS_WINDOW,
+> > winid);
+> > +
+> > +		rc = hcall_return_busy_check(rc);
+> > +	} while (rc == H_BUSY);
+> > +
+> > +	switch (rc) {
+> > +	case H_SUCCESS:
+> > +		return 0;
+> > +	case H_PARAMETER:
+> > +		pr_err("HCALL(%x): Invalid window ID %llu\n",
+> > +			H_DEALLOCATE_VAS_WINDOW, winid);
+> > +		return -EINVAL;
+> > +	case H_STATE:
+> > +		pr_err("HCALL(%x): Window(%llu): Invalid page table
+> > entries\n",
+> > +			H_DEALLOCATE_VAS_WINDOW, winid);
+> > +		return -EPERM;
+> > +	default:
+> > +		pr_err("HCALL(%x): Unexpected error %lld for
+> > window(%llu)\n",
+> > +			H_DEALLOCATE_VAS_WINDOW, rc, winid);
+> > +		return -EIO;
+> > +	}
+> > +}
+> > +
+> > +/*
+> > + * Modify VAS window.
+> > + * After the window is opened with allocate window HCALL,
+> > configure it
+> > + * with flags and LPAR PID before using.
+> > + */
+> > +static int plpar_vas_modify_window(struct vas_window *win)
+> > +{
+> > +	int64_t rc;
+> > +	u32 lpid = mfspr(SPRN_PID);
+> 
+> The lpid would be SPRN_LPID ?
+> But you can't read it from a guest. Is the variable just misnamed?
+
+yes, not using in pseries code now, but thought LPID is available in
+SPRN_PID - PIDR is SPR48 and access to that in LPAR. Not true?
+
+"processId : The LPAR process ID to bind to the specified window. This
+parameter is ignored if the “closeWindow” flag is set.
+threadId : The LPAR thread ID to bind to the specified window. This
+parameter is ignored if the “closeWindow”
+flag is set."
+
+since TIDR is deprecated on p10, we are not passing threadID
+> 
+> > +
+> > +	/*
+> > +	 * AMR value is not supported in Linux implementation
+> > +	 * phyp ignores it if 0 is passed.
+> > +	 */
+> 
+> Heh, this comment is already here.
+> 
+> Do you mean the Linux VAS implementation doesn't support AMR? Because
+> Linux definitely does use AMR.
+
+Linux VAS implementation does not support AMR. The application /
+library has to pass this value with TX_WIN_OPEN ioctl. We do not have
+any use case right now. I will change the above comment to make it
+clear.
+
+phyp added this interface for future reference and AIX may be using it.
+
+Thanks
+Haren
+> 
+> > +	do {
+> > +		rc = plpar_hcall_norets(H_MODIFY_VAS_WINDOW, win-
+> > >winid,
+> > +					lpid, 0, VAS_MOD_WIN_FLAGS,
+> > +					VAS_AMR_VALUE);
+> > +
+> > +		rc = hcall_return_busy_check(rc);
+> > +	} while (rc == H_BUSY);
+> > +
+> > +	switch (rc) {
+> > +	case H_SUCCESS:
+> > +		return 0;
+> > +	case H_PARAMETER:
+> > +		pr_err("HCALL(%x): Invalid window ID %u\n",
+> > +			H_MODIFY_VAS_WINDOW, win->winid);
+> > +		return -EINVAL;
+> > +	case H_P2:
+> > +		pr_err("HCALL(%x): Window(%d): Invalid LPAR Process ID
+> > %u\n",
+> > +			H_MODIFY_VAS_WINDOW, lpid, win->winid);
+> > +		return -EINVAL;
+> > +	case H_P3:
+> > +		/* LPAR thread ID is deprecated on P10 */
+> > +		pr_err("HCALL(%x): Invalid LPAR Thread ID for
+> > window(%u)\n",
+> > +			H_MODIFY_VAS_WINDOW, win->winid);
+> > +		return -EINVAL;
+> > +	case H_STATE:
+> > +		pr_err("HCALL(%x): Jobs in progress, Can't modify
+> > window(%u)\n",
+> > +			H_MODIFY_VAS_WINDOW, win->winid);
+> > +		return -EBUSY;
+> > +	default:
+> > +		pr_err("HCALL(%x): Unexpected error %lld for
+> > window(%u)\n",
+> > +			H_MODIFY_VAS_WINDOW, rc, win->winid);
+> > +		return -EIO;
+> > +	}
+> > +}
+> > +
+> > +/*
+> > + * This HCALL is used to determine the capabilities that pHyp
+> > provides.
+> > + * @hcall: H_QUERY_VAS_CAPABILITIES or H_QUERY_NX_CAPABILITIES
+> > + * @query_type: If 0 is passed, phyp returns the overall
+> > capabilities
+> > + *		which provides all feature(s) that are available. Then
+> > + *		query phyp to get the corresponding capabilities for
+> > + *		the specific feature.
+> > + *		Example: H_QUERY_VAS_CAPABILITIES provides VAS GZIP QoS
+> > + *			and VAS GZIP Default capabilities.
+> > + *			H_QUERY_NX_CAPABILITIES provides NX GZIP
+> > + *			capabilities.
+> > + * @result: Return buffer to save capabilities.
+> > + */
+> > +int plpar_vas_query_capabilities(const u64 hcall, u8 query_type,
+> > +					u64 result)
+> > +{
+> > +	int64_t rc;
+> > +
+> > +	rc = plpar_hcall_norets(hcall, query_type, result);
+> > +
+> > +	switch (rc) {
+> > +	case H_SUCCESS:
+> > +		return 0;
+> > +	case H_PARAMETER:
+> > +		pr_err("HCALL(%llx): Invalid query type %u\n", hcall,
+> > +			query_type);
+> > +		return -EINVAL;
+> > +	case H_PRIVILEGE:
+> > +		pr_err("HCALL(%llx): Invalid result buffer 0x%llx\n",
+> > +			hcall, result);
+> > +		return -EACCES;
+> > +	default:
+> > +		pr_err("HCALL(%llx): Unexpected error %lld\n", hcall,
+> > rc);
+> > +		return -EIO;
+> > +	}
+> > +}
+> 
+> cheers
+
