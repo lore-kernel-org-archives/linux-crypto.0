@@ -2,177 +2,272 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AE46C07E94
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 09:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4EC6C47083
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 11:28:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F0E06140B
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 09:25:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B763961400
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 11:28:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229958AbhFDJ1b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Jun 2021 05:27:31 -0400
-Received: from mga09.intel.com ([134.134.136.24]:46002 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229936AbhFDJ1a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Jun 2021 05:27:30 -0400
-IronPort-SDR: CPGg4WpqTUcWEP08JM32G60Q2nB/Bn7xggqtMqfeCWliUyKdO40Bwt9c3vLuAa5Z2EWAPfV5hh
- i39/I6PgdxFA==
-X-IronPort-AV: E=McAfee;i="6200,9189,10004"; a="204237062"
-X-IronPort-AV: E=Sophos;i="5.83,248,1616482800"; 
-   d="scan'208";a="204237062"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2021 02:25:42 -0700
-IronPort-SDR: 0bNmXvy+3wsCypK3US+PPrb+KMn5Ole/Kshch4WB08I3IJGy5WOC7ROg6fgUA7m86Tnj7n42YE
- 8AoOk2C1N2eg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.83,248,1616482800"; 
-   d="scan'208";a="483851585"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga002.fm.intel.com with ESMTP; 04 Jun 2021 02:25:36 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Fri, 4 Jun 2021 02:25:36 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
- via Frontend Transport; Fri, 4 Jun 2021 02:25:36 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.175)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.4; Fri, 4 Jun 2021 02:25:35 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FFnIcCJ3p0ck3Bxw5JE7LaM2Q2G1CJkKfAXMTUeBVrBN9jfvIsbQrJCvmoK/GKnfXGzrUlaHb2KEA2RBfZ9hK8mK6gxQkkEqRSMt+iLMr/YkEzRVukDbXGPd3elY1SyLyNLbqLp3Cq6NJtLVVmQwR9o+CTAvLsaj2H0eVrhsHQuA8P+E9Hhkj63fRIQpikQW6T0PU1ovaqjhVEvpX5l+llnOepRQc/fgg/mQjHCcIgCO4zL48kxVNmjC1+OxniBT4Do4kJ1xMhD1pLvnozyMljIgeqVHVx5TaxvFqKrJdOxnQx5m54cWGfDcBfnGB8LBaowWZ02Tds4IufTy5c4sPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TG1O0XlQYtvhGJJGfAFyVwo1ZLwQrX0Jim4Az6kSlm4=;
- b=aCsO9kqIsKzANP6nmyGoOG4ne+K5T/sOaIP2FJ/AFaoycpkf3ELklm/pAMp+g13f0bCr15bwc536N6bxgg8W4E5cZdMdL5lp5Qm92NWGKgHrYFUOt3mgHrIZyTNSyI474F3C1D31KFMrS9SB7Zu3n/7ptyN1j/PZLqv5onVrT4904JWywr45oWu+ZdS20jkuMsamCTSQFv8qX2u1o0blo0D2gCfjADAp8tlsNJIjMndvL3I50etilqDCYY9hnZQrS6yix+p414I5SsgyssP72/H90LQZz04gmHGdiMTFDz/tsBtr4D5Y4SoRPy1sGE/n/pR9x8GaVxP+v1DQeWMBhw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TG1O0XlQYtvhGJJGfAFyVwo1ZLwQrX0Jim4Az6kSlm4=;
- b=S6nWswMCJcqoDULI7CaEqLHl/T6BIvk7nWqZs3SnG78kE1PgJZmrveawpOJ+ESaZmhoYyN08eQVT0JFdquHRv3xCCnlvpevYLBgM6/iHlorGYRK8ljI6dCWyZQFU9SksSW/5geekbQGN5xQ4yCzLowILkRYGPKiiDdWcvJOpOsM=
-Received: from MN2PR11MB4598.namprd11.prod.outlook.com (2603:10b6:208:26f::8)
- by MN2PR11MB4288.namprd11.prod.outlook.com (2603:10b6:208:18c::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4195.24; Fri, 4 Jun
- 2021 09:25:34 +0000
-Received: from MN2PR11MB4598.namprd11.prod.outlook.com
- ([fe80::9810:b8a7:e8f9:621b]) by MN2PR11MB4598.namprd11.prod.outlook.com
- ([fe80::9810:b8a7:e8f9:621b%9]) with mapi id 15.20.4195.024; Fri, 4 Jun 2021
- 09:25:34 +0000
-From:   "Chiappero, Marco" <marco.chiappero@intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        qat-linux <qat-linux@intel.com>,
-        "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-Subject: RE: [PATCH 01/10] crypto: qat - use proper type for vf_mask
-Thread-Topic: [PATCH 01/10] crypto: qat - use proper type for vf_mask
-Thread-Index: AQHXUyxizwA/ExRIuEmtD+e94UxcQ6sCPhGAgAFiU2A=
-Date:   Fri, 4 Jun 2021 09:25:33 +0000
-Message-ID: <MN2PR11MB45984EF188CF5385A3BF65D5E83B9@MN2PR11MB4598.namprd11.prod.outlook.com>
-References: <20210527191251.6317-1-marco.chiappero@intel.com>
- <20210527191251.6317-2-marco.chiappero@intel.com>
- <20210603121557.GB2062@gondor.apana.org.au>
-In-Reply-To: <20210603121557.GB2062@gondor.apana.org.au>
-Accept-Language: en-IE, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.5.1.3
-authentication-results: gondor.apana.org.au; dkim=none (message not signed)
- header.d=none;gondor.apana.org.au; dmarc=none action=none
- header.from=intel.com;
-x-originating-ip: [87.13.7.173]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a1879a86-9f7e-4258-3363-08d9273ab48a
-x-ms-traffictypediagnostic: MN2PR11MB4288:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR11MB4288C0530072551BFD000499E83B9@MN2PR11MB4288.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: RxC5x6hclL+L/OFfb2DU4+FxVhdGgoWtHDOvtRntawi2+u2r5tiRn27gDRU5tVqDPhmcv/VuvvP2Zyl3J0m79EZlEMySQedeYoMTd3NrokU5z3+rbqZr1wZN+64Xj3DlWfAxd2aobUyI5PcNN9NBcbsB4viQnPXapx/+QgHpcWt0du+hFYZ5a9rxC+zW7vr7p9/6+uZ6hE2RodzEpxFym0rOL2EppBUq2eK1RSUt5Kilb0R30mG6vLe1bD6QFgKyQmtJcCIVrtg2t+4GvA6ERqqH2r9LvN4Nk4JL/SysQDmsiJxrxA0wB9PCIsvGeutGXgaH6KXrFL7jcxAocAgO2iqnWnXtZY36sgZKPS1fkQUklP1EOtzygKYsPivagvrbZXnwtO6Xi+CqM3HWIbu5H05MG7NSJYBrQHO7J9wrpo3cgX7/a4hvVnW+h7kGapTpsOb1f5ZbGMaJNt0m0TCgs1hwnu0aksYD8GR59UlHWSf3q2v1fd7nJrWcOqgkWWTMz/aamYc2SvsTuvXqvz5I70rntAIfhINBbgj+KHIoch5g7h2s3D+20HlwU5ivu9V9JV4IvjQscTR5unvLYWlsqmzvvI+waxxsorg6DavTOxI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR11MB4598.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(396003)(39860400002)(136003)(346002)(366004)(76116006)(66556008)(66946007)(66476007)(66446008)(64756008)(52536014)(5660300002)(86362001)(4744005)(55016002)(4326008)(33656002)(83380400001)(478600001)(107886003)(2906002)(8676002)(9686003)(6916009)(8936002)(38100700002)(122000001)(26005)(54906003)(316002)(7696005)(6506007)(53546011)(71200400001)(186003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?RNedtuBNlUHRhM1jbQGg9wmfTMrEQZAH7kpACYZKTmAwZDyg7Hw8J0BGd2k9?=
- =?us-ascii?Q?V7xQZvLgcyTWLjaf3DcjPIZAMsbHecLbIZ+lI5EOY4+7U2vBiXjH0NG9ldDP?=
- =?us-ascii?Q?JM+S3lK2cTMr2k/Waul+PwouwunHoH/W2E+U3MptMkbE+et9X65wRUdHKni2?=
- =?us-ascii?Q?wVCxqoeYt3sola/TBc0KmAL3Tc1SWvO1soO9evFbkusjXdnj8H02Tb330q1S?=
- =?us-ascii?Q?5K6IxzsL1m/AQT2uhbwfV6CRFiVr6385lbMwdWAm/ktJY39sICGlJ3uRGR3R?=
- =?us-ascii?Q?ZlIwbLEHpfdhTFokTPd3iQMdu/2PzzJfz9czfhYflkt6Za2catyhGjvQW6Wp?=
- =?us-ascii?Q?7ohv5U70UW6LoqCC8MEVQj8WtZBfXhn8fNdSTA9eIYsXctEmVgpUY2sJTzor?=
- =?us-ascii?Q?bnQxkezdzrl8CTujgWO2SHGpNKE8rIXIT6yj3Q1IahSuMvLThyH9hDdEifuG?=
- =?us-ascii?Q?cBuVu3EQuv+m+JH6PQRhgyKIWAJMQ+JR7l69T1ZMFu6VRWpzeBcQYKeI6JK1?=
- =?us-ascii?Q?BYhD3fTJa0UJATCG76wNqgX9hvvjyb6qvOEy+50Z4O5GQBgqjxenlBBxKNkt?=
- =?us-ascii?Q?2Kr4vCT2liCTi7YqkFsO7x6jaKi7CvtbvYqYWUwO8+ZOFqNyIBXwwO6STNmn?=
- =?us-ascii?Q?PPUuL3Nv8uFiatHY4PkXumPIor8SFQFUrmUBHHXWLhUxQp4dc1sVfy+SBhZA?=
- =?us-ascii?Q?XJe2IKmugjVgZiUiIKH5hUHL80hx3qcfQ/KSDTv3eqdoG0RFYDb83TN71oY9?=
- =?us-ascii?Q?Nsyp+0ypIgD8iJvwFrq3BoARSYIIucQGcosekLyk9eXRlFq24vEetYtDvMnJ?=
- =?us-ascii?Q?jiv6W3DDNJXmIfvfVmCr9REFI9T9mgQNv1h0ddXc2yR1q0e9Y9LufOnYZeeG?=
- =?us-ascii?Q?qOgAW8xs/QlYj5rmwajYGMw7NSgLS8bvPw7XvKKxz1NY5XCtrnlbcdm11X91?=
- =?us-ascii?Q?InSXo07/awuWkXXLo0z+XF0jIOOSJaR4iV4XEvvlHzRJ8TQ1KiKSJU63JTu4?=
- =?us-ascii?Q?s+1pVbmR9mTxPa5upcdD1t/zAHrFHeJJaVb4PEDkwn3T7lC6/i3OfxfnUJdW?=
- =?us-ascii?Q?hP2STf7xqefAI33kSIPo0n/hBYURvnKmwJYIZ4V6tvLSoMDDw4pACTa73rOu?=
- =?us-ascii?Q?qY2zQ/520qZY4a83n+vuz0rqK4lSLy1oE4ibqs66yZiwinazHIvOJscofLrO?=
- =?us-ascii?Q?jg1Ep6s0ZaG8B63B05jTe//JG7kqrL38c1RAVft8qsRzGZ49lNnV97i5jaVu?=
- =?us-ascii?Q?UUrClMcuwq2vqaB364aDM4dHI+48G3e81Aa4PaMNbMFThw4Bf+pkMn/Ny6S8?=
- =?us-ascii?Q?oDc=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S230112AbhFDLab (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Jun 2021 07:30:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48214 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229958AbhFDLab (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Jun 2021 07:30:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622806124;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9JlDk2HXRpq+0Yz9Nhh2pEWG9N+2ttsSNHw0y4E3f+k=;
+        b=StAYpnSTpvoEnSKIG1lOqMJ85yzNK6fE7ZLgHP6UYMFmxni1Ig+EVfz3s3zki2urlerFjg
+        wHJissy7tjzLIk+KEehRoG7OcXss98nobPtUereTWNRl+nUhSkE0KB3Xfq/fb1H0ZkCKn9
+        1CZQBwngcL8RkBnOHMcIpl25nL8LS7k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-N8QlJu15MRiiMx2LncVKfQ-1; Fri, 04 Jun 2021 07:28:42 -0400
+X-MC-Unique: N8QlJu15MRiiMx2LncVKfQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 078BE1083E94;
+        Fri,  4 Jun 2021 11:28:39 +0000 (UTC)
+Received: from localhost (unknown [10.33.37.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0209960C17;
+        Fri,  4 Jun 2021 11:28:34 +0000 (UTC)
+Date:   Fri, 4 Jun 2021 13:28:33 +0200
+From:   Sergio Lopez <slp@redhat.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 21/22] x86/sev: Register SNP guest request
+ platform device
+Message-ID: <20210604112833.poejnvqchjtp4wns@mhamilton>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-22-brijesh.singh@amd.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR11MB4598.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1879a86-9f7e-4258-3363-08d9273ab48a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2021 09:25:33.9073
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: GD2VF1a3zrbL8UZYN0HmaIRmk4JckF40HPMqIP8n728F62JPkt/qYcWptE47WOuN5jPq3qDDb0oX2lctDzxpH71jalzJDymkURTfQ5Kaf0s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4288
-X-OriginatorOrg: intel.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="taqeb7q6ydrmwa3u"
+Content-Disposition: inline
+In-Reply-To: <20210602140416.23573-22-brijesh.singh@amd.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Thursday, June 3, 2021 1:16 PM
-> To: Chiappero, Marco <marco.chiappero@intel.com>
-> Cc: linux-crypto@vger.kernel.org; qat-linux <qat-linux@intel.com>; Cabidd=
-u,
-> Giovanni <giovanni.cabiddu@intel.com>
-> Subject: Re: [PATCH 01/10] crypto: qat - use proper type for vf_mask
->=20
-> On Thu, May 27, 2021 at 08:12:42PM +0100, Marco Chiappero wrote:
-> >
-> > diff --git a/drivers/crypto/qat/qat_common/adf_isr.c
-> > b/drivers/crypto/qat/qat_common/adf_isr.c
-> > index e3ad5587be49..22f8ef5bfbc5 100644
-> > --- a/drivers/crypto/qat/qat_common/adf_isr.c
-> > +++ b/drivers/crypto/qat/qat_common/adf_isr.c
-> > @@ -15,6 +15,10 @@
-> >  #include "adf_transport_access_macros.h"
-> >  #include "adf_transport_internal.h"
-> >
-> > +#ifdef CONFIG_PCI_IOV
-> > +#define ADF_MAX_NUM_VFS	32
-> > +#endif
->=20
-> The #ifdef is not necessary.
 
-Right, will resubmit soon.
+--taqeb7q6ydrmwa3u
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thank you,
-Marco
+On Wed, Jun 02, 2021 at 09:04:15AM -0500, Brijesh Singh wrote:
+> Version 2 of GHCB specification provides NAEs that can be used by the SNP
+> guest to communicate with the PSP without risk from a malicious hypervisor
+> who wishes to read, alter, drop or replay the messages sent.
+>=20
+> The hypervisor uses the SNP_GUEST_REQUEST command interface provided by
+> the SEV-SNP firmware to forward the guest messages to the PSP.
+>=20
+> In order to communicate with the PSP, the guest need to locate the secrets
+> page inserted by the hypervisor during the SEV-SNP guest launch. The
+> secrets page contains the communication keys used to send and receive the
+> encrypted messages between the guest and the PSP.
+>=20
+> The secrets page is located either through the setup_data cc_blob_address
+> or EFI configuration table.
+>=20
+> Create a platform device that the SNP guest driver can bind to get the
+> platform resources. The SNP guest driver can provide userspace interface
+> to get the attestation report, key derivation etc.
+>=20
+> The helper snp_issue_guest_request() will be used by the drivers to
+> send the guest message request to the hypervisor. The guest message header
+> contains a message count. The message count is used in the IV. The
+> firmware increments the message count by 1, and expects that next message
+> will be using the incremented count.
+>=20
+> The helper snp_msg_seqno() will be used by driver to get and message
+> sequence counter, and it will be automatically incremented by the
+> snp_issue_guest_request(). The incremented value is be saved in the
+> secrets page so that the kexec'ed kernel knows from where to begin.
+>=20
+> See SEV-SNP and GHCB spec for more details.
+>=20
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/include/asm/sev.h      |  12 +++
+>  arch/x86/include/uapi/asm/svm.h |   2 +
+>  arch/x86/kernel/sev.c           | 176 ++++++++++++++++++++++++++++++++
+>  arch/x86/platform/efi/efi.c     |   2 +
+>  include/linux/efi.h             |   1 +
+>  include/linux/sev-guest.h       |  76 ++++++++++++++
+>  6 files changed, 269 insertions(+)
+>  create mode 100644 include/linux/sev-guest.h
+>=20
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 640108402ae9..da2f757cd9bc 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -59,6 +59,18 @@ extern void vc_no_ghcb(void);
+>  extern void vc_boot_ghcb(void);
+>  extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
+> =20
+> +/* AMD SEV Confidential computing blob structure */
+> +#define CC_BLOB_SEV_HDR_MAGIC	0x45444d41
+> +struct cc_blob_sev_info {
+> +	u32 magic;
+> +	u16 version;
+> +	u16 reserved;
+> +	u64 secrets_phys;
+> +	u32 secrets_len;
+> +	u64 cpuid_phys;
+> +	u32 cpuid_len;
+> +};
+> +
+>  /* Software defined (when rFlags.CF =3D 1) */
+>  #define PVALIDATE_FAIL_NOUPDATE		255
+> =20
+> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/=
+svm.h
+> index c0152186a008..bd64f2b98ac7 100644
+> --- a/arch/x86/include/uapi/asm/svm.h
+> +++ b/arch/x86/include/uapi/asm/svm.h
+> @@ -109,6 +109,7 @@
+>  #define SVM_VMGEXIT_SET_AP_JUMP_TABLE		0
+>  #define SVM_VMGEXIT_GET_AP_JUMP_TABLE		1
+>  #define SVM_VMGEXIT_PSC				0x80000010
+> +#define SVM_VMGEXIT_GUEST_REQUEST		0x80000011
+>  #define SVM_VMGEXIT_AP_CREATION			0x80000013
+>  #define SVM_VMGEXIT_AP_CREATE_ON_INIT		0
+>  #define SVM_VMGEXIT_AP_CREATE			1
+> @@ -222,6 +223,7 @@
+>  	{ SVM_VMGEXIT_AP_JUMP_TABLE,	"vmgexit_ap_jump_table" }, \
+>  	{ SVM_VMGEXIT_PSC,		"vmgexit_page_state_change" }, \
+>  	{ SVM_VMGEXIT_AP_CREATION,	"vmgexit_ap_creation" }, \
+> +	{ SVM_VMGEXIT_GUEST_REQUEST,	"vmgexit_guest_request" }, \
+>  	{ SVM_EXIT_ERR,         "invalid_guest_state" }
+> =20
+> =20
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 8f7ef35a25ef..8aae1166f52e 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -9,6 +9,7 @@
+> =20
+>  #define pr_fmt(fmt)	"SEV-ES: " fmt
+> =20
+> +#include <linux/platform_device.h>
+>  #include <linux/sched/debug.h>	/* For show_regs() */
+>  #include <linux/percpu-defs.h>
+>  #include <linux/mem_encrypt.h>
+> @@ -16,10 +17,13 @@
+>  #include <linux/printk.h>
+>  #include <linux/mm_types.h>
+>  #include <linux/set_memory.h>
+> +#include <linux/sev-guest.h>
+>  #include <linux/memblock.h>
+>  #include <linux/kernel.h>
+> +#include <linux/efi.h>
+>  #include <linux/mm.h>
+>  #include <linux/cpumask.h>
+> +#include <linux/io.h>
+> =20
+>  #include <asm/cpu_entry_area.h>
+>  #include <asm/stacktrace.h>
+> @@ -33,6 +37,7 @@
+>  #include <asm/smp.h>
+>  #include <asm/cpu.h>
+>  #include <asm/apic.h>
+> +#include <asm/setup.h>		/* For struct boot_params */
+> =20
+>  #include "sev-internal.h"
+> =20
+> @@ -47,6 +52,8 @@ static struct ghcb boot_ghcb_page __bss_decrypted __ali=
+gned(PAGE_SIZE);
+>   */
+>  static struct ghcb __initdata *boot_ghcb;
+> =20
+> +static unsigned long snp_secrets_phys;
+> +
+>  /* #VC handler runtime per-CPU data */
+>  struct sev_es_runtime_data {
+>  	struct ghcb ghcb_page;
+> @@ -105,6 +112,10 @@ struct ghcb_state {
+>  	struct ghcb *ghcb;
+>  };
+> =20
+> +#ifdef CONFIG_EFI
+> +extern unsigned long cc_blob_phys;
+> +#endif
+> +
+>  static DEFINE_PER_CPU(struct sev_es_runtime_data*, runtime_data);
+>  DEFINE_STATIC_KEY_FALSE(sev_es_enable_key);
+> =20
+> @@ -1909,3 +1920,168 @@ bool __init handle_vc_boot_ghcb(struct pt_regs *r=
+egs)
+>  	while (true)
+>  		halt();
+>  }
+> +
+> +static struct resource guest_req_res[0];
+> +static struct platform_device guest_req_device =3D {
+> +	.name		=3D "snp-guest",
+> +	.id		=3D -1,
+> +	.resource	=3D guest_req_res,
+> +	.num_resources	=3D 1,
+> +};
+
+Perhaps I'm missing something, but I can't find where the memory for
+"guest_req_res" is allocated. In my tests I had to turn this
+zero-length array into a single struct to prevent the kernel from
+crashing.
+
+Thanks,
+Sergio.
+
+--taqeb7q6ydrmwa3u
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAmC6DmEACgkQ9GknjS8M
+AjUFoA/+IrYKJWSfbZbq0p0d37bRCDQdxKuwCA5d4z9spAkWPRBo9rTbVpR7w9o+
+qr3PHMb920L4ZDtppUk8cqazsG52OXd6Jb0pugiGbYWbO8dmLC1STKuLqnQzVdS+
+1QwBeRpgjVOxpf8oh9NdpI3J7XVpJsAdTCwrp/HFNpjZRd0lW/kE2nLMUqzmO6bi
+cNIWdk73I/spC8GL3VZFf/JkbRk14eT9LGxYcqghBuClk90FPUYAbvF6Y7bBxy2U
+7KLBgpcOZs+iSLWSPwRnehLLLrncvk2HqvSHwCLj3d7e1jhUiFF6xJL0wTj1gS/Z
+F+dyvZD/BX/iDIehtGZr+U2kr5gD2mEF9/epJV2FL8jBcOkAxrFoG2udtIqji+pi
+OkvQvpytNR46M6OWPh0axet83xb6OO3YR7Ongr6jONkEArQoS8xthEtNBZTCFKAU
++kMPsq5nvaQ2s12u0zpFqOlSCZFkcKVziPARHMdgpE/K7t7i+H8a5ykMiDlbZzGK
+l4H6jW2L0fjcf/8lXXXH5AsizfSNnHcWca/CqoKgPcRAsUI/YSGdgWnEhwUEFNht
+3DOaPdpOAOVD4Q0G0QNRnT3Cuh1LPEPWUARPD8UsFaN1ZPlW1g1qrp4VXsJDkww+
+Aw2F9NZvRsy8hqnc8BDF+Tr1rqwl+skd+h0bG5fIDa3zlMjVwrg=
+=3qjK
+-----END PGP SIGNATURE-----
+
+--taqeb7q6ydrmwa3u--
+
