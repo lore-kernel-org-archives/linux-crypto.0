@@ -2,110 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BBA4C47082
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 02:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85AF9C47097
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 03:20:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DC26613E7
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 02:13:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6DA6F6140C
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 03:20:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229835AbhFDCPD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Jun 2021 22:15:03 -0400
-Received: from mail-lf1-f47.google.com ([209.85.167.47]:33716 "EHLO
-        mail-lf1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229758AbhFDCPD (ORCPT
+        id S229849AbhFDDWD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Jun 2021 23:22:03 -0400
+Received: from mail-oi1-f182.google.com ([209.85.167.182]:43945 "EHLO
+        mail-oi1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229818AbhFDDWC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jun 2021 22:15:03 -0400
-Received: by mail-lf1-f47.google.com with SMTP id t7so4596469lff.0;
-        Thu, 03 Jun 2021 19:13:01 -0700 (PDT)
+        Thu, 3 Jun 2021 23:22:02 -0400
+Received: by mail-oi1-f182.google.com with SMTP id x196so8043193oif.10
+        for <linux-crypto@vger.kernel.org>; Thu, 03 Jun 2021 20:20:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=e938uIx3j0ytYF43Gu2UvAvTYhUrU4CqL39m4sXKDLo=;
-        b=jB1o57YFZ/z0UbSQMIix1odWKf3OKj1Vgv/cx+oEn2BynbKVvg9pupzQed/QD90X11
-         lu72W+nmvPDDJe4OzPjww9OIaoAxobSsxWT/KDppr2lZViTBJWNNRF74KBCrvSDE8AWB
-         csSm2g1MuA7/AD9ML5bsrsX8MUOT7hqq2A+oOj8Sicsww+XmeiJuVzPBKGf/F6wzs0W9
-         7G1EMfBsXShX55BN2MAShuDehdhr9Zmhs3nJ57j7/plSPpHJ5s1xuAzK2tAYrA8iueWs
-         RH22q1SxsROzvJUFrgnae0Sbs7qfVptfoE6Xt1AZH/efiOCCfL1MsplNcDDOR37oL8RM
-         LAcw==
+         :cc;
+        bh=XTLBAwmqsG3vEJ4E4BdrtXVL2NeOeIgl+wmT0+LyvMk=;
+        b=AQvU2E2DBR78Ykvj2qLHtpb2LgMH7EVti1dRcbTmuhm5gNebiFl5ExGpyRLziKTFZp
+         E95YFVmuiqVwABsG3QViv2WD3FMnjyYBrtHRxXBggGg/+egbDA32c0TVIUdm8KCXJVhi
+         x+3T7L/CHVFKHY5dAaLkcx+s+jaxxfvZwWqWfzMapHj6SGcUC6qMRh1IupTyAdWXgdc/
+         oFdikrJpH6WKufIMZMVbt49C2FJopa7z6LcOyqGEEQpUaqFqGT7rG93RUz6DWT/4VaKP
+         DcL5BwQEWI62dNFNrCC/grf3xmcAEXaBySnaTHppUz4gK9Ed4gJ4MMEIxDAozUOt/cQT
+         jADg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=e938uIx3j0ytYF43Gu2UvAvTYhUrU4CqL39m4sXKDLo=;
-        b=UcZ1vmj32dOQnwaivpAQSdh1a0MlGbonCxtfmd7txy4pAKjl2lBGMf1tOk8EK3Kq55
-         y/VTjrAZs64wTCWQzNVPbzYhRfNeMWUAmd5e5Qgho2dyhrw6T47/M4mbY4OFZOd1ELh/
-         QkZ48ijlS9ruav2hXQ32QnnFyzREApZXR2kBL9XKPbvfmiIxqN42M7oXonJEVD1IrDDC
-         jcRD96pQRu5sBdLWUvGvJnGUBPS2fy/nIEKDusViqMjMDCcvVsIATmuKxfEkZYs61FPj
-         OK599bXZ9HeOZzWmwykbYQBBxh1Ik9pCgTjthY5r5zxHdircOZQyv+/xUHubOnXGopDb
-         b96Q==
-X-Gm-Message-State: AOAM530WlJP767ZoEI3PPdr3WywbG5vQnyvbFyNAblLU3IDtD4goKeHg
-        gla57hbrgfP51rCHtLB5cFxk6Ky4ScRJ4y0G71g=
-X-Google-Smtp-Source: ABdhPJyS7VJbQHWYeAVHWleNzp1SXF1+rmRnM1VyuMhNAt40ga1HjAGJ1WD9vjZKZle7LrPwk2tDKOOYpuiB8Hw9yNE=
-X-Received: by 2002:a05:6512:21ae:: with SMTP id c14mr1162158lft.483.1622772721138;
- Thu, 03 Jun 2021 19:12:01 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=XTLBAwmqsG3vEJ4E4BdrtXVL2NeOeIgl+wmT0+LyvMk=;
+        b=t6DEMEWjdhnVs9GosPdJtVfiIlFk3BuxCggq6IrVuQCMUw36+YKpUk/dsy+1op9jH1
+         9hjebSB5YRvj2oFV/g6iUh9ODHXpJkBWDRyku7HySZyYqkimDB63SVTVmyd2e/NnJ4Zb
+         fpj/7eR20CWLAH4pzoWTqfXXJp8oiRQ8hVEH1K2KsBIbGunKHYf/FFoUJloiPbsEfpnC
+         vMf3MbFom1Xhm0JP2trD2bgtrSVt9VrxvITwzVfsBMjyjI9WcuqNHKtTmdsvennXm4Ih
+         t4MilFytTzT3UnkSr73aphozWAYblm6otL0KANTcQ8kAw5meHkHVKPWHRPEQlkI167mT
+         JJVQ==
+X-Gm-Message-State: AOAM531Z+dYBt3BIPBESbftxk3+L3i/eNXx8CsM2lf5ee6H20uJ3uxJp
+        9e6WtM/IQK/hbOyQuh6n/5CD5re99k0ZfLQlVLM1fg==
+X-Google-Smtp-Source: ABdhPJzcMqINfAPFcCbEC12gkbN5NqzJM1RhTsVmVuiZUMohZbipEZxJMYUD0qnQChKUKe6fRlpUPJq80TheN/gzEcs=
+X-Received: by 2002:a05:6808:f0b:: with SMTP id m11mr9178581oiw.12.1622776740786;
+ Thu, 03 Jun 2021 20:19:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <1622552752-15501-1-git-send-email-herbert.tencent@gmail.com> <20210603123357.GM6161@gondor.apana.org.au>
-In-Reply-To: <20210603123357.GM6161@gondor.apana.org.au>
-From:   hongbo li <herbert.tencent@gmail.com>
-Date:   Fri, 4 Jun 2021 10:11:51 +0800
-Message-ID: <CABpmuwJepSr3eE9OQoNUV6761agn7+OU1eG766W2B96rVo1S3A@mail.gmail.com>
-Subject: Re: [PATCH] crypto: sm2 - fix a memory leak in sm2
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
-        David Howells <dhowells@redhat.com>, jarkko@kernel.org,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        =?UTF-8?B?aGVyYmVydGhibGko5p2O5byY5Y2aKQ==?= 
-        <herberthbli@tencent.com>, open list <linux-kernel@vger.kernel.org>
+References: <20210519143700.27392-1-bhupesh.sharma@linaro.org> <162261866806.4130789.17734233133141728573@swboyd.mtv.corp.google.com>
+In-Reply-To: <162261866806.4130789.17734233133141728573@swboyd.mtv.corp.google.com>
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Date:   Fri, 4 Jun 2021 08:48:49 +0530
+Message-ID: <CAH=2Ntz7=e8w1fvXtpe-aXUFAreOiyb=xxKvU_1pmzBHyVXitA@mail.gmail.com>
+Subject: Re: [PATCH v3 00/17] Enable Qualcomm Crypto Engine on sm8250
+To:     Stephen Boyd <sboyd@kernel.org>
+Cc:     linux-arm-msm@vger.kernel.org,
+        Thara Gopinath <thara.gopinath@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Andy Gross <agross@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bhupesh.linux@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thank you for your review, I will resend this patch.
-Regards,
-Hongbo
+Hi Stephen,
 
-Herbert Xu <herbert@gondor.apana.org.au> =E4=BA=8E2021=E5=B9=B46=E6=9C=883=
-=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=888:34=E5=86=99=E9=81=93=EF=BC=
-=9A
+On Wed, 2 Jun 2021 at 12:54, Stephen Boyd <sboyd@kernel.org> wrote:
 >
-> On Tue, Jun 01, 2021 at 09:05:52PM +0800, Hongbo Li wrote:
-> > From: Hongbo Li <herberthbli@tencent.com>
+> Quoting Bhupesh Sharma (2021-05-19 07:36:43)
 > >
-> > SM2 module alloc ec->Q in sm2_set_pub_key(), when doing alg test in
-> > test_akcipher_one(), it will set public key for every test vector,
-> > and don't free ec->Q. This will cause a memory leak.
-> >
-> > This patch alloc ec->Q in sm2_ec_ctx_init().
-> >
-> > Fixes: ea7ecb66440b ("crypto: sm2 - introduce OSCCA SM2 asymmetric ciph=
-er algorithm")
-> > Signed-off-by: Hongbo Li <herberthbli@tencent.com>
-> > Cc: stable@vger.kernel.org # v5.10+
-> > Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> > ---
-> >  crypto/sm2.c | 24 ++++++++++--------------
-> >  1 file changed, 10 insertions(+), 14 deletions(-)
+> > Cc: Thara Gopinath <thara.gopinath@linaro.org>
+> > Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+> > Cc: Rob Herring <robh+dt@kernel.org>
+> > Cc: Andy Gross <agross@kernel.org>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: David S. Miller <davem@davemloft.net>
+> > Cc: Stephen Boyd <sboyd@kernel.org>
+> > Cc: Michael Turquette <mturquette@baylibre.com>
+> > Cc: Vinod Koul <vkoul@kernel.org>
+> > Cc: dmaengine@vger.kernel.org
+> > Cc: linux-clk@vger.kernel.org
 >
-> Your patch has been discarded by patchwork because you didn't
-> update the Subject.  The usual method is to use a version prefix
-> such as v2, v3, etc. so that the Subject remains distinct.
->
-> Please resubmit with a new Subject.
->
-> Oh and don't cc stable@vger.kernel.org.
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Can you stop Cc-ing the clk list? It puts it into my review queue when
+> as far as I can tell there isn't anything really clk related to review
+> here. Or do you need an ack on something?
+
+Sure, I will drop the clk-list from Cc-list of future patchset versions.
+Since I had a couple of clk driver changes in v1 which were dropped
+starting from v2, I thought it would be good to Cc clk-list for v2
+(and so on..)
+
+Thanks,
+Bhupesh
