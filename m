@@ -2,92 +2,284 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03BA1C4743E
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 16:49:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2324DC4743C
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 17:02:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DDC15611CA
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 16:49:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0756F613F8
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 17:02:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229902AbhFDQvh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Jun 2021 12:51:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50524 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229878AbhFDQvh (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Jun 2021 12:51:37 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA83C061766
-        for <linux-crypto@vger.kernel.org>; Fri,  4 Jun 2021 09:49:50 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id c124so9962014qkd.8
-        for <linux-crypto@vger.kernel.org>; Fri, 04 Jun 2021 09:49:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=fbrknCH2vbby+m6sJDW2xyfJlzKeJZUszdPMgrqvItA=;
-        b=LcDa4rEP8tgp2Z9UtTKWD/82ciJAtX7ynXqvqZCdC2smBByA6MvJnBze0HA7M8mq6A
-         7sgT6CSXkq04gqFW8KFg9ta30wDl/bQHT0WQmZnRrjuZfVAnOmevpT5SYC4NVO4HLkFj
-         Vd5IU+tsRk8J7i2yUZV3PWajQGXFanxlMyEmiHlonoiCLKpvQHWq091fq/NVia2LOOhq
-         OK1ums0mbHw+wjNiMjVczCbhYmBbJ6Cp9obGgp7V3VQaCX6DBQoUYAX62DNb7J85p8qs
-         D2Q3W4aD1rBPuMHQu92AVhKqq2xTPjhtGCsD3fB3WswnPQDz/iaQ5ebY2V/xpY+efA3T
-         kWhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=fbrknCH2vbby+m6sJDW2xyfJlzKeJZUszdPMgrqvItA=;
-        b=bie2ocx+2JTY1Dg+LTri7+HKjL4+zwo5YVZB1GHg+d7L8vjotORo8RjwYGiwKngxVb
-         VqQoPmuuF5RsgAi9s1uyK1hqL2HT0/4ZNnUNMPQrNfvTdtUh72BdLS3NYvTPJvNpQgzg
-         UJb935gd+sxBci2IzKh/OVkCWHo8PYBB3EkEKx/J9qYL6UynaICpNlHKzWdjpWd03MMT
-         CdchIzzJMgourYxDihevY6go4pOQfQwQ10/VpVBGk+hZ96wGeVUnAGQvn6o8X14HfhR7
-         J2y0HVre301vW0TnorAwYyr0k4TFXrB66DPcBz/jmMpZ77HZgPxh3aYllsWiES+RXK+c
-         HPog==
-X-Gm-Message-State: AOAM533yutwwhpQaLVuOhXY1IG0UVKeVUHgmPlVP/z9fKi3nyMOrXeKZ
-        eg5rxZfLSGzWfyM8P3vxasjq/7D8/0z8wtB5
-X-Google-Smtp-Source: ABdhPJy5LaTZz9UJB7BmVbShctgH/0xLeAGvS0aMe5OFrFskhozwH0VqL6DuKEmNqruIAxRSeuRAjw==
-X-Received: by 2002:a37:496:: with SMTP id 144mr5094900qke.456.1622825386306;
-        Fri, 04 Jun 2021 09:49:46 -0700 (PDT)
-Received: from [192.168.1.93] (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.gmail.com with ESMTPSA id z15sm4246959qkj.49.2021.06.04.09.49.45
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Jun 2021 09:49:45 -0700 (PDT)
-To:     linux-crypto@vger.kernel.org
-From:   Thara Gopinath <thara.gopinath@linaro.org>
-Subject: Qualcomm Crypto Engine performance numbers on mainline kernel
-Message-ID: <bc3c139f-4c0c-a9b7-ae00-59c2f8292ef8@linaro.org>
-Date:   Fri, 4 Jun 2021 12:49:44 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S229778AbhFDREN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Jun 2021 13:04:13 -0400
+Received: from foss.arm.com ([217.140.110.172]:43528 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229690AbhFDREN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Jun 2021 13:04:13 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ACCD61063;
+        Fri,  4 Jun 2021 10:02:26 -0700 (PDT)
+Received: from localhost.localdomain (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0D5503F73D;
+        Fri,  4 Jun 2021 10:02:24 -0700 (PDT)
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
+        Ali Saidi <alisaidi@amazon.com>
+Subject: [PATCH] hwrng: Add Arm SMCCC TRNG based driver
+Date:   Fri,  4 Jun 2021 18:02:16 +0100
+Message-Id: <20210604170216.4705-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.14.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+The "Arm True Random Number Generator Firmware Interface"[1] provides
+an SMCCC based interface to a true hardware random number generator.
+So far we are using that in arch_get_random_seed(), but it might be
+useful to expose the entropy through the /dev/hwrng device as well. This
+allows to assess the quality of the implementation, by using "rngtest"
+from the rng-tools package, for example.
 
-Hi All,
+Add a simple platform driver implementing the hw_random interface.
+We unconditionally instantiate the platform device in the driver file,
+then probe for the existence of the SMCCC TRNG implementation in the
+driver's probe routine.
+Since the firmware takes care about serialisation, this can happily
+coexist with the arch_get_random_seed() bits.
 
-Below are the performance numbers from running "crypsetup benchmark" on 
-CE algorithms in the mainline kernel. All numbers are in MiB/s. The 
-platform used is RB3 for sdm845 and MTPs for rest of them.
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 
+[1] https://developer.arm.com/documentation/den0098/latest/
+---
+Hi,
 
-			SDM845 	  SM8150     SM8250 	SM8350
-AES-CBC (128)
-Encrypt / Decrypt	114/106  36/48 	     120/188    133/197
+as Ard mentioned in some recent thread, we might consider this driver
+now (which was dismissed when arch_get_random() got SMCCC TRNG support).
 
-AES-XTS (256)
-Encrypt / Decrypt	100/102  49/48 	     186/187 	n/a
+The device/driver instantiation is not really great, ideally we let
+some generic SMCCC discovery instantiate the device or trigger the driver
+probe.
+Let me know what you think!
 
+Btw: this can be easily tested in a KVM guest (on a recent host kernel).
 
+Cheers,
+Andre
+
+ drivers/char/hw_random/Kconfig          |  11 ++
+ drivers/char/hw_random/Makefile         |   1 +
+ drivers/char/hw_random/arm_smccc_trng.c | 162 ++++++++++++++++++++++++
+ 3 files changed, 174 insertions(+)
+ create mode 100644 drivers/char/hw_random/arm_smccc_trng.c
+
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 1fe006f3f12f..7d65a0da2170 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -524,6 +524,17 @@ config HW_RANDOM_XIPHERA
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called xiphera-trng.
+ 
++config HW_RANDOM_ARM_SMCCC_TRNG
++	tristate "Arm SMCCC TRNG firmware interface support"
++	depends on HAVE_ARM_SMCCC_DISCOVERY
++	default HW_RANDOM
++	help
++	  Say 'Y' to enable the True Random Number Generator driver using
++	  the Arm SMCCC TRNG firmware interface. This reads entropy from
++	  higher exception levels (firmware, hypervisor). Uses SMCCC for
++	  communicating with the firmware.
++	  https://developer.arm.com/documentation/den0098/latest/
++
+ endif # HW_RANDOM
+ 
+ config UML_RANDOM
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index 8933fada74f2..a5a1c765a394 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -45,3 +45,4 @@ obj-$(CONFIG_HW_RANDOM_OPTEE) += optee-rng.o
+ obj-$(CONFIG_HW_RANDOM_NPCM) += npcm-rng.o
+ obj-$(CONFIG_HW_RANDOM_CCTRNG) += cctrng.o
+ obj-$(CONFIG_HW_RANDOM_XIPHERA) += xiphera-trng.o
++obj-$(CONFIG_HW_RANDOM_ARM_SMCCC_TRNG) += arm_smccc_trng.o
+diff --git a/drivers/char/hw_random/arm_smccc_trng.c b/drivers/char/hw_random/arm_smccc_trng.c
+new file mode 100644
+index 000000000000..584ed5ffe1ce
+--- /dev/null
++++ b/drivers/char/hw_random/arm_smccc_trng.c
+@@ -0,0 +1,162 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Randomness driver for the ARM SMCCC TRNG Firmware Interface
++ * https://developer.arm.com/documentation/den0098/latest/
++ *
++ *  Copyright (C) 2020 Arm Ltd.
++ *
++ * The ARM TRNG firmware interface specifies a protocol to read entropy
++ * from a higher exception level, to abstract from any machine specific
++ * implemenations and allow easier use in hypervisors.
++ *
++ * The firmware interface is realised using the SMCCC specification.
++ */
++
++#include <linux/bits.h>
++#include <linux/device.h>
++#include <linux/hw_random.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/arm-smccc.h>
++
++#ifdef CONFIG_ARM64
++#define ARM_SMCCC_TRNG_RND	ARM_SMCCC_TRNG_RND64
++#define MAX_BITS_PER_CALL	(3 * 64UL)
++#else
++#define ARM_SMCCC_TRNG_RND	ARM_SMCCC_TRNG_RND32
++#define MAX_BITS_PER_CALL	(3 * 32UL)
++#endif
++
++/* We don't want to allow the firmware to stall us forever. */
++#define SMCCC_TRNG_MAX_TRIES	20
++
++#define SMCCC_RET_TRNG_INVALID_PARAMETER	-2
++#define SMCCC_RET_TRNG_NO_ENTROPY		-3
++
++static int smccc_trng_init(struct hwrng *rng)
++{
++	return 0;
++}
++
++static int copy_from_registers(char *buf, struct arm_smccc_res *res,
++			       size_t bytes)
++{
++	unsigned int chunk, copied;
++
++	if (bytes == 0)
++		return 0;
++
++	chunk = min(bytes, sizeof(long));
++	memcpy(buf, &res->a3, chunk);
++	copied = chunk;
++	if (copied >= bytes)
++		return copied;
++
++	chunk = min((bytes - copied), sizeof(long));
++	memcpy(&buf[copied], &res->a2, chunk);
++	copied += chunk;
++	if (copied >= bytes)
++		return copied;
++
++	chunk = min((bytes - copied), sizeof(long));
++	memcpy(&buf[copied], &res->a1, chunk);
++
++	return copied + chunk;
++}
++
++static int smccc_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
++{
++	struct arm_smccc_res res;
++	u8 *buf = data;
++	unsigned int copied = 0;
++	int tries = 0;
++
++	while (copied < max) {
++		size_t bits = min_t(size_t, (max - copied) * BITS_PER_BYTE,
++				  MAX_BITS_PER_CALL);
++
++		arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND, bits, &res);
++		if ((int)res.a0 < 0)
++			return (int)res.a0;
++
++		switch ((int)res.a0) {
++		case SMCCC_RET_SUCCESS:
++			copied += copy_from_registers(buf + copied, &res,
++						      bits / BITS_PER_BYTE);
++			tries = 0;
++			break;
++		case SMCCC_RET_TRNG_NO_ENTROPY:
++			if (!wait)
++				return copied;
++			tries++;
++			if (tries >= SMCCC_TRNG_MAX_TRIES)
++				return copied;
++			cond_resched();
++			break;
++		}
++	}
++
++	return copied;
++}
++
++static int smccc_trng_probe(struct platform_device *pdev)
++{
++	struct arm_smccc_res res;
++	struct hwrng *trng;
++	u32 version;
++	int ret;
++
++	/* We need ARM SMCCC v1.1, with its autodetection feature. */
++	if (arm_smccc_get_version() < ARM_SMCCC_VERSION_1_1)
++		return -ENODEV;
++
++	arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_VERSION, &res);
++	if ((int)res.a0 < 0)
++		return -ENODEV;
++	version = res.a0;
++
++	arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_FEATURES,
++			     ARM_SMCCC_TRNG_RND, &res);
++	if ((int)res.a0 < 0)
++		return -ENODEV;
++
++	trng = devm_kzalloc(&pdev->dev, sizeof(*trng), GFP_KERNEL);
++	if (!trng)
++		return -ENOMEM;
++
++	trng->name = "smccc_trng";
++	trng->init = smccc_trng_init;
++	trng->read = smccc_trng_read;
++
++	platform_set_drvdata(pdev, trng);
++	ret = devm_hwrng_register(&pdev->dev, trng);
++	if (ret)
++		return -ENOENT;
++
++	dev_info(&pdev->dev,
++		 "ARM SMCCC TRNG firmware random number generator v%d.%d\n",
++		 version >> 16, version & 0xffff);
++
++	return 0;
++}
++
++static struct platform_driver smccc_trng_driver = {
++	.driver = {
++		.name		= "smccc_trng",
++	},
++	.probe		= smccc_trng_probe,
++};
++
++module_platform_driver(smccc_trng_driver);
++
++static int __init smccc_trng_dev_init(void)
++{
++	platform_device_register_simple("smccc_trng", -1, NULL, 0);
++
++	return 0;
++}
++
++device_initcall(smccc_trng_dev_init);
++
++MODULE_AUTHOR("Andre Przywara");
++MODULE_LICENSE("GPL");
 -- 
-Warm Regards
-Thara (She/Her/Hers)
+2.17.5
+
