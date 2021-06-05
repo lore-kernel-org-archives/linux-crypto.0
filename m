@@ -2,147 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24087C4743D
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Jun 2021 08:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C40E2C4743E
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Jun 2021 10:53:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0672961403
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Jun 2021 08:33:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA572613F1
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Jun 2021 10:53:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229926AbhFEIfa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Jun 2021 04:35:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58336 "EHLO
+        id S230161AbhFEKy7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 5 Jun 2021 06:54:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229902AbhFEIfa (ORCPT
+        with ESMTP id S229924AbhFEKy7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Jun 2021 04:35:30 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FD62C061768
-        for <linux-crypto@vger.kernel.org>; Sat,  5 Jun 2021 01:33:42 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id v27-20020a056830091bb02903cd67d40070so8385562ott.1
-        for <linux-crypto@vger.kernel.org>; Sat, 05 Jun 2021 01:33:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xBV9HQE6LSgYnjZVgsIOmo2PRbMwZA/ckSgBtoYgAJM=;
-        b=STGjXij3JqwF7wloVQRWY4phBR14Uf0yDtHOxJ/sYXc1OwcDp5c+IXfOtARdk1Frx4
-         kXI0QW0NyKG/IaOry5E96m9X8EwovQ0CJgUP2D4z6VNpnb17GNGnPd1UormSjUCpc+sQ
-         7cgJlSdp7ETsEe0TwYVsCRYs1nWwdDyQ/ptKDLpmJ74ZQVYcy2RAniy+IFMyxbbJQby+
-         lX7BDN1VnEIUN3l58Dro+7xcHF5lw2YF7qxg7w+5oK4MPRQ+IOixFP2D1y2JPoqjqFST
-         Q4A+/v1+tTi/cf/wMWXmBJTBMnPWhlaBuTZIF8Lk4aViocWjSPQvs2/Eb052iTYEHVX4
-         mizw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xBV9HQE6LSgYnjZVgsIOmo2PRbMwZA/ckSgBtoYgAJM=;
-        b=iqx/WeY5n42re+OtAaaoMLmf5cNom6gs/A5y6a1AcCbwiEtGj502jvk/CYCp0vimBF
-         iAgBaVK39b5q6CuGH1qjmHc9uYG3qNMMwBDpUphA505NND30ZonM7nBHwrxbFMlIZXeA
-         nwK87hVckCNqsAXhe3eBhAjAbYQKZdP5Oj/Y78ALhy1Cl4tmpx9W+i4AyMZlWydCJrxZ
-         Jl/25sesMPolFrU+6XtXzy897GNbcKwzhKRaq6NgWN4wTmhSdPo5XKbSTOkEBuwJZjPh
-         tWBAciNqCfIrJwDTcU4Z0KYeie/+lawyeSPinDifmzij6+HHvkaHy70fkUm1qxfuXbb9
-         gvDA==
-X-Gm-Message-State: AOAM532XDwsSJk+mw144GmWlLoMz12iKE9Nl+ypAjOkpbPlEuK8lMqo+
-        XUMrzroMmlcZyGKfHzu2D36qrkbcRstnWbjU6c9oRQ==
-X-Google-Smtp-Source: ABdhPJxRmPVU6f456kI2Kv4UtWeYtFvXR43WBVmOga1zilDIm/FcYb+VcXfmzAcsqPPxx3iIignQ0+Ff8kG68Gq8t0k=
-X-Received: by 2002:a9d:6117:: with SMTP id i23mr6623646otj.28.1622882021804;
- Sat, 05 Jun 2021 01:33:41 -0700 (PDT)
+        Sat, 5 Jun 2021 06:54:59 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F69BC061766;
+        Sat,  5 Jun 2021 03:53:11 -0700 (PDT)
+Received: from zn.tnic (p4fed32f0.dip0.t-ipconnect.de [79.237.50.240])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C2FC41EC01A2;
+        Sat,  5 Jun 2021 12:53:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1622890389;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=m4WFNDMn/F2hBFMtOb5KcbkKEA5fPujaJDdSpXTf3yI=;
+        b=b9euwxNWNDPFTyr/DO+tkH5SKsRbrIAcUy0+u+Jvmj/u6fbpiZz9u3lFXvXcgwIemAcufI
+        NyCxlLalL3M1NPfNHFgQhUWN/nBA/Vh8556EE5bzxFiKvpEO+aa9S/C6oi3V7LKg6VQ6eu
+        Z/KRkDNbfBU2ttfxGH9aWiVrTQ//cn8=
+Date:   Sat, 5 Jun 2021 12:50:53 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 04/22] x86/mm: Add sev_feature_enabled()
+ helper
+Message-ID: <YLtXDQHWnAvCl99M@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-5-brijesh.singh@amd.com>
 MIME-Version: 1.0
-References: <20210519143700.27392-1-bhupesh.sharma@linaro.org>
- <20210519143700.27392-9-bhupesh.sharma@linaro.org> <20210521014646.GA2472971@robh.at.kernel.org>
-In-Reply-To: <20210521014646.GA2472971@robh.at.kernel.org>
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Date:   Sat, 5 Jun 2021 14:03:31 +0530
-Message-ID: <CAH=2Ntw=d9bf44mHp=tHDNuo-3bK+mcBZ3WgLESF5UNCRXj2Lg@mail.gmail.com>
-Subject: Re: [PATCH v3 08/17] dt-bindings: crypto : Add new compatible strings
- for qcom-qce
-To:     Rob Herring <robh@kernel.org>
-Cc:     linux-arm-msm@vger.kernel.org,
-        Thara Gopinath <thara.gopinath@linaro.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bhupesh.linux@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210602140416.23573-5-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Rob,
+On Wed, Jun 02, 2021 at 09:03:58AM -0500, Brijesh Singh wrote:
+> @@ -78,6 +85,7 @@ static inline void sev_es_init_vc_handling(void) { }
+>  static inline bool sme_active(void) { return false; }
+>  static inline bool sev_active(void) { return false; }
+>  static inline bool sev_es_active(void) { return false; }
+> +static inline bool sev_snp_active(void) { return false; }
 
-On Fri, 21 May 2021 at 07:16, Rob Herring <robh@kernel.org> wrote:
->
-> On Wed, May 19, 2021 at 08:06:51PM +0530, Bhupesh Sharma wrote:
-> > Newer qcom chips support newer versions of the qce crypto IP, so add
-> > soc specific compatible strings for qcom-qce instead of using crypto
-> > IP version specific ones.
-> >
-> > Cc: Thara Gopinath <thara.gopinath@linaro.org>
-> > Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> > Cc: Rob Herring <robh+dt@kernel.org>
-> > Cc: Andy Gross <agross@kernel.org>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: David S. Miller <davem@davemloft.net>
-> > Cc: Stephen Boyd <sboyd@kernel.org>
-> > Cc: Michael Turquette <mturquette@baylibre.com>
-> > Cc: Vinod Koul <vkoul@kernel.org>
-> > Cc: dmaengine@vger.kernel.org
-> > Cc: linux-clk@vger.kernel.org
-> > Cc: linux-crypto@vger.kernel.org
-> > Cc: devicetree@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Cc: bhupesh.linux@gmail.com
-> > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> > ---
-> >  Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 9 +++++++--
-> >  1 file changed, 7 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> > index 4be9ce697123..7722ac9529bf 100644
-> > --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> > +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> > @@ -15,7 +15,12 @@ description: |
-> >
-> >  properties:
-> >    compatible:
-> > -    const: qcom,crypto-v5.1
->
-> You can't get rid of the old one.
+Leftover from the previous version, can go.
 
-Ok, I will fix it in v4.
+> +bool sev_feature_enabled(unsigned int type)
+> +{
+> +	switch (type) {
+> +	case SEV: return sev_status & MSR_AMD64_SEV_ENABLED;
+> +	case SEV_ES: return sev_status & MSR_AMD64_SEV_ES_ENABLED;
+> +	case SEV_SNP: return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
+> +	default: return false;
+> +	}
+> +}
 
-Thanks,
-Bhupesh
+Yeah, btw, we might even do a generic one, see:
 
-> > +    enum:
-> > +      - qcom,ipq6018-qce
-> > +      - qcom,sdm845-qce
-> > +      - qcom,sm8150-qce
-> > +      - qcom,sm8250-qce
-> > +      - qcom,sm8350-qce
-> >
-> >    reg:
-> >      maxItems: 1
-> > @@ -71,7 +76,7 @@ examples:
-> >    - |
-> >      #include <dt-bindings/clock/qcom,gcc-apq8084.h>
-> >      crypto-engine@fd45a000 {
-> > -        compatible = "qcom,crypto-v5.1";
-> > +        compatible = "qcom,ipq6018-qce";
-> >          reg = <0xfd45a000 0x6000>;
-> >          clocks = <&gcc GCC_CE2_AHB_CLK>,
-> >                   <&gcc GCC_CE2_AXI_CLK>,
-> > --
-> > 2.31.1
-> >
+https://lkml.kernel.org/r/YLkcIuL2qvo0hviU@zn.tnic
+
+and the following mail.
+
+But that doesn't matter as sev_feature_enabled()'s body can go into
+sev_protected_guest_has() or whatever we end up calling it.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
