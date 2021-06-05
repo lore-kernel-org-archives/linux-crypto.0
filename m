@@ -2,457 +2,230 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E19D4C4743C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 21:53:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE919C4743C
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Jun 2021 00:32:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C969F61402
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jun 2021 21:53:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A75EE613D8
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Jun 2021 00:32:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229755AbhFDVzK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Jun 2021 17:55:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5428 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229930AbhFDVzK (ORCPT
+        id S229873AbhFEAem (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Jun 2021 20:34:42 -0400
+Received: from mail-pg1-f176.google.com ([209.85.215.176]:43996 "EHLO
+        mail-pg1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229847AbhFEAel (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Jun 2021 17:55:10 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 154LY7uD030421;
-        Fri, 4 Jun 2021 17:53:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=3ylY8P2/3DTxRHozCmcFghyxxXy3o1A1gbdKhJJWS3A=;
- b=nLB6LdSgETsUdRdUG9TnN4rHoxBJ1ULcClsAFxOzWK3yQfcEwciEzWCc0BZmSilY/dT0
- GDYS+DadEe8kZBPROmNyWlzlCGnu689y1uQ3C954lFAeO4MUK964L0p0Q6f3F2LgQnGy
- BzbHu4X5hjUjowVGTr590mDoqQOvIkMbM0ljjJoxRmGwTpMlTL6Yl0xg2TwRsyNsSjXY
- QrcNoxzdwl+N9WXy9GG5qPNwahDXzfRa30hdfZbXGhx7EPLDbnkPciUJciPe7Ji9kVb7
- lMPKjVi/hbo1fe5HJ4t/Qe+zY/hnXnO49JrtLtfejEQ8rOC4UfUO0R1HkGqz4mGrCJVJ bg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38yu8ssmb7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Jun 2021 17:53:12 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 154LZqOH038516;
-        Fri, 4 Jun 2021 17:53:11 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38yu8ssmb0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Jun 2021 17:53:11 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 154LlI42005781;
-        Fri, 4 Jun 2021 21:53:11 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma02dal.us.ibm.com with ESMTP id 38ud8afxna-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Jun 2021 21:53:11 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 154LrA6I22151456
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 4 Jun 2021 21:53:10 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0E074B205F;
-        Fri,  4 Jun 2021 21:53:10 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AB34AB2065;
-        Fri,  4 Jun 2021 21:53:08 +0000 (GMT)
-Received: from sig-9-77-136-17.ibm.com (unknown [9.77.136.17])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri,  4 Jun 2021 21:53:08 +0000 (GMT)
-Message-ID: <93586baca94d10ec5658d547b109aaa6a55ff635.camel@linux.ibm.com>
-Subject: Re: [PATCH v4 09/16] powerpc/pseries/vas: Add HCALL wrappers for
- VAS handling
-From:   Haren Myneni <haren@linux.ibm.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, npiggin@gmail.com
-Cc:     hbabu@us.ibm.com, haren@us.ibm.com
-Date:   Fri, 04 Jun 2021 14:53:06 -0700
-In-Reply-To: <87o8clg83d.fsf@mpe.ellerman.id.au>
+        Fri, 4 Jun 2021 20:34:41 -0400
+Received: by mail-pg1-f176.google.com with SMTP id e22so9124495pgv.10
+        for <linux-crypto@vger.kernel.org>; Fri, 04 Jun 2021 17:32:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=MUq6X8/ZPIBrKdk3i3SE6IJReD3LrwPz//1n2EnyP3Q=;
+        b=X074mGFT8XaS9PX3jk/A+Y5QmVPd3uxA8If6/e6C2ICQXasf98PrVS+wNyMdcKxZOo
+         wwms5it3fD0KICYLv/aHwUrWzjADgMkMNSrtqnoM1U4q7EmoiHM5pwy3fUIV3a4s8+C8
+         wrhA8BAUpJqLdkPdUJu/SHhn00mQSsNJ0mkv89Q4YfGcjSxlBG5mrPMqPh2hVz4Bhs6B
+         bCQQAb4VB6h/9n3fRo0BoyqQe3kfi+6y0ay3C0D0nfGkjIQQDvq6yZrBdt45mm509iZO
+         3QgRiElKJvfAIhmQXn0RAycoT8ThhOBxDkaeTZtqTiXT/4LjMHDMG5U7lBvi9PQtwWs9
+         icVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=MUq6X8/ZPIBrKdk3i3SE6IJReD3LrwPz//1n2EnyP3Q=;
+        b=BH1fkLoRbkrAbht8XJhk1S7ivqbkUeP25z4MJBwiNkl53ryvVh8iPzgrsprr73bGZd
+         6EWFofB3W0xhEh1ZBo66VkFi8adcTcJzZPzCI0loLoouDqGHd0O3GUerlLpIgQDiaMQq
+         x0W/2hls/TaGIbwDCcXaC1xnvdPDXp/Xfju41ASWVP0USW28i3UrXAl7eWsCAd/uIl2X
+         G4pptpGt82jigkyJY+fbOQ3ghc2TmP6nRiyGPOa4IGYKREJ5ieYVSUV4b2us3QVIbRLX
+         vdcti3DR3HHKwTv9IMOU4p2VCv8HHTRyWaTHu42rDytsXwtnQVnvz4IGVLfDZr+a79u1
+         tx5A==
+X-Gm-Message-State: AOAM531OZccIw+onaUE0MoV2ib2BRjPiES1rtBhXkFExX1p6/pMNZvW+
+        OeRBKd/JWK8yYOTlTeK+004=
+X-Google-Smtp-Source: ABdhPJwXiFnJQj4oLIJsGDkMxLgXqAQTko8IVI1OMYwx/T2aA9dKJF9QIzIoABl91TeiLJyK8K0lMQ==
+X-Received: by 2002:a62:5444:0:b029:2e9:c69d:dc64 with SMTP id i65-20020a6254440000b02902e9c69ddc64mr6841873pfb.32.1622853102671;
+        Fri, 04 Jun 2021 17:31:42 -0700 (PDT)
+Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
+        by smtp.gmail.com with ESMTPSA id 21sm2480032pfh.103.2021.06.04.17.31.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Jun 2021 17:31:42 -0700 (PDT)
+Date:   Sat, 05 Jun 2021 10:31:36 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v4 04/16] powerpc/vas: Create take/drop pid and mm
+ references
+To:     Haren Myneni <haren@linux.ibm.com>, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au
+Cc:     haren@us.ibm.com, hbabu@us.ibm.com
 References: <8d219c0816133a8643d650709066cf04c9c77322.camel@linux.ibm.com>
-         <f52961e6941803366ecf6239ddb9532680516b78.camel@linux.ibm.com>
-         <87o8clg83d.fsf@mpe.ellerman.id.au>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
+        <16a319614a7ab4ce843f42a49c3ecf68ed03dd36.camel@linux.ibm.com>
+        <1622693213.hz0uqko6dk.astroid@bobo.none>
+        <6a67ebd5f728966312063e132c4f6aba70285c72.camel@linux.ibm.com>
+In-Reply-To: <6a67ebd5f728966312063e132c4f6aba70285c72.camel@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: BpMnBlDZpF-dmGmJA1l5Nm7OH_JwixAR
-X-Proofpoint-GUID: IScL52jMTxVr1CAZqr6naDQN2p-Z7QDD
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-06-04_12:2021-06-04,2021-06-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 mlxscore=0 priorityscore=1501 suspectscore=0
- bulkscore=0 spamscore=0 malwarescore=0 clxscore=1015 adultscore=0
- phishscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2104190000 definitions=main-2106040148
+Message-Id: <1622852830.f2v4xyjvwu.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2021-06-04 at 21:52 +1000, Michael Ellerman wrote:
-> Haren Myneni <haren@linux.ibm.com> writes:
-> > This patch adds the following HCALL wrapper functions to allocate,
-> 
-> Normal spelling is "hcall".
-> 
-> > modify and deallocate VAS windows, and retrieve VAS capabilities.
-> > 
-> > H_ALLOCATE_VAS_WINDOW: Allocate VAS window
-> > H_DEALLOCATE_VAS_WINDOW: Close VAS window
-> > H_MODIFY_VAS_WINDOW: Setup window before using
-> > H_QUERY_VAS_CAPABILITIES: Get VAS capabilities
-> 
-> Please tell us which version of PAPR, and in which section etc.,
-> these
-> are described in.
-> 
-> > Signed-off-by: Haren Myneni <haren@linux.ibm.com>
-> > Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
-> > ---
-> >  arch/powerpc/platforms/pseries/vas.c | 217
-> > +++++++++++++++++++++++++++
-> >  1 file changed, 217 insertions(+)
-> >  create mode 100644 arch/powerpc/platforms/pseries/vas.c
-> > 
-> > diff --git a/arch/powerpc/platforms/pseries/vas.c
-> > b/arch/powerpc/platforms/pseries/vas.c
-> > new file mode 100644
-> > index 000000000000..06960151477c
-> > --- /dev/null
-> > +++ b/arch/powerpc/platforms/pseries/vas.c
-> > @@ -0,0 +1,217 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/*
-> > + * Copyright 2020-21 IBM Corp.
-> > + */
-> > +
-> > +#define pr_fmt(fmt) "vas: " fmt
-> > +
-> > +#include <linux/module.h>
-> > +#include <linux/kernel.h>
-> > +#include <linux/export.h>
-> > +#include <linux/types.h>
-> > +#include <linux/delay.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/irqdomain.h>
-> > +#include <linux/interrupt.h>
-> > +#include <linux/sched/mm.h>
-> > +#include <linux/mmu_context.h>
-> > +#include <asm/hvcall.h>
-> > +#include <asm/hvconsole.h>
-> > +#include <asm/machdep.h>
-> 
-> Do we need all those headers?
-> 
-> > +#include <asm/plpar_wrappers.h>
-> > +#include <asm/vas.h>
-> > +#include "vas.h"
-> > +
-> > +#define	VAS_INVALID_WIN_ADDRESS	0xFFFFFFFFFFFFFFFFul
-> > +#define	VAS_DEFAULT_DOMAIN_ID	0xFFFFFFFFFFFFFFFFul
-> 
-> Some blank lines for formatting please.
-> 
-> > +/* Authority Mask Register (AMR) value is not supported in */
-> > +/* linux implementation. So pass '0' to modify window HCALL */
-> 
-> Please fix the comment formatting.
-> 
-> > +#define	VAS_AMR_VALUE	0
-> 
-> This is only used in one place. It'd be simpler to just pass 0 and
-> move
-> the comment there.
-> 
-> > +/* phyp allows one credit per window right now */
-> > +#define DEF_WIN_CREDS		1
-> > +
-> > +static int64_t hcall_return_busy_check(int64_t rc)
-> > +{
-> 
-> Please use normal kernel types, ie. s64, or just long.
-> 
-> Same comment throughout.
-> 
-> > +	/* Check if we are stalled for some time */
-> > +	if (H_IS_LONG_BUSY(rc)) {
-> > +		msleep(get_longbusy_msecs(rc));
-> > +		rc = H_BUSY;
-> > +	} else if (rc == H_BUSY) {
-> > +		cond_resched();
-> > +	}
-> > +
-> > +	return rc;
-> > +}
-> > +
-> > +/*
-> > + * Allocate VAS window HCALL
-> > + */
-> > +static int plpar_vas_allocate_window(struct vas_window *win, u64
-> > *domain,
-> > +				     u8 wintype, u16 credits)
-> 
-> You don't have to use the "plpar" prefix for these sort of wrappers.
-> 
-> Just naming them after the hcall would probably be clearer, so:
-> 
->  h_allocate_vas_window(... )
-> 
-> > +{
-> > +	long retbuf[PLPAR_HCALL9_BUFSIZE] = {0};
-> > +	int64_t rc;
-> > +
-> > +	do {
-> > +		rc = plpar_hcall9(H_ALLOCATE_VAS_WINDOW, retbuf,
-> > wintype,
-> > +				  credits, domain[0], domain[1],
-> > domain[2],
-> > +				  domain[3], domain[4], domain[5]);
-> > +
-> > +		rc = hcall_return_busy_check(rc);
-> > +	} while (rc == H_BUSY);
-> > +
-> > +	switch (rc) {
-> > +	case H_SUCCESS:
-> > +		win->winid = retbuf[0];
-> > +		win->lpar.win_addr = retbuf[1];
-> > +		win->lpar.complete_irq = retbuf[2];
-> > +		win->lpar.fault_irq = retbuf[3];
-> 
-> You shouldn't mutate win until you know there is no error.
-> 
-> > +		if (win->lpar.win_addr == VAS_INVALID_WIN_ADDRESS) {
-> > +			pr_err("HCALL(%x): COPY/PASTE is not
-> > supported\n",
-> > +				H_ALLOCATE_VAS_WINDOW);
-> > +			return -ENOTSUPP;
-> > +		}
-> > +		return 0;
-> > +	case H_PARAMETER:
-> > +		pr_err("HCALL(%x): Invalid window type (%u)\n",
-> > +			H_ALLOCATE_VAS_WINDOW, wintype);
-> > +		return -EINVAL;
-> > +	case H_P2:
-> > +		pr_err("HCALL(%x): Credits(%u) exceed maximum window
-> > credits\n",
-> > +			H_ALLOCATE_VAS_WINDOW, credits);
-> > +		return -EINVAL;
-> > +	case H_COP_HW:
-> > +		pr_err("HCALL(%x): User-mode COPY/PASTE is not
-> > supported\n",
-> > +			H_ALLOCATE_VAS_WINDOW);
-> > +		return -ENOTSUPP;
-> > +	case H_RESOURCE:
-> > +		pr_err("HCALL(%x): LPAR credit limit exceeds window
-> > limit\n",
-> > +			H_ALLOCATE_VAS_WINDOW);
-> > +		return -EPERM;
-> > +	case H_CONSTRAINED:
-> > +		pr_err("HCALL(%x): Credits (%u) are not available\n",
-> > +			H_ALLOCATE_VAS_WINDOW, credits);
-> > +		return -EPERM;
-> > +	default:
-> > +		pr_err("HCALL(%x): Unexpected error %lld\n",
-> > +			H_ALLOCATE_VAS_WINDOW, rc);
-> > +		return -EIO;
-> > +	}
-> 
-> Do we really need all these error prints? It's very verbose, and
-> presumably in normal operation none of these are meant to happen
-> anyway.
-> 
-> Can't we just have a single case that prints the error value?
+Excerpts from Haren Myneni's message of June 4, 2021 2:08 pm:
+> On Thu, 2021-06-03 at 14:21 +1000, Nicholas Piggin wrote:
+>> Excerpts from Haren Myneni's message of May 21, 2021 7:31 pm:
+>> > Take pid and mm references when each window opens and drops during
+>> > close. This functionality is needed for powerNV and pseries. So
+>> > this patch defines the existing code as functions in common book3s
+>> > platform vas-api.c
+>> >=20
+>> > Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+>>=20
+>> Seems like a good idea to put these into their own helper functions.
+>>=20
+>> > ---
+>> >  arch/powerpc/include/asm/vas.h              | 25 +++++++++
+>> >  arch/powerpc/platforms/book3s/vas-api.c     | 51
+>> > ++++++++++++++++++
+>> >  arch/powerpc/platforms/powernv/vas-fault.c  | 10 ++--
+>> >  arch/powerpc/platforms/powernv/vas-window.c | 57 ++---------------
+>> > ----
+>> >  arch/powerpc/platforms/powernv/vas.h        |  6 +--
+>> >  5 files changed, 88 insertions(+), 61 deletions(-)
+>> >=20
+>> > diff --git a/arch/powerpc/include/asm/vas.h
+>> > b/arch/powerpc/include/asm/vas.h
+>> > index 668303198772..3f2b02461a76 100644
+>> > --- a/arch/powerpc/include/asm/vas.h
+>> > +++ b/arch/powerpc/include/asm/vas.h
+>> > @@ -5,6 +5,9 @@
+>> > =20
+>> >  #ifndef _ASM_POWERPC_VAS_H
+>> >  #define _ASM_POWERPC_VAS_H
+>> > +#include <linux/sched/mm.h>
+>> > +#include <linux/mmu_context.h>
+>> > +#include <asm/icswx.h>
+>> >  #include <uapi/asm/vas-api.h>
+>> > =20
+>> >  struct vas_window;
+>> > @@ -49,6 +52,17 @@ enum vas_cop_type {
+>> >  	VAS_COP_TYPE_MAX,
+>> >  };
+>> > =20
+>> > +/*
+>> > + * User space VAS windows are opened by tasks and take references
+>> > + * to pid and mm until windows are closed.
+>> > + * Stores pid, mm, and tgid for each window.
+>> > + */
+>> > +struct vas_user_win_ref {
+>> > +	struct pid *pid;	/* PID of owner */
+>> > +	struct pid *tgid;	/* Thread group ID of owner */
+>> > +	struct mm_struct *mm;	/* Linux process mm_struct */
+>> > +};
+>> > +
+>> >  /*
+>> >   * User space window operations used for powernv and powerVM
+>> >   */
+>> > @@ -59,6 +73,16 @@ struct vas_user_win_ops {
+>> >  	int (*close_win)(void *);
+>> >  };
+>> > =20
+>> > +static inline void vas_drop_reference_pid_mm(struct
+>> > vas_user_win_ref *ref)
+>> > +{
+>> > +	/* Drop references to pid and mm */
+>> > +	put_pid(ref->pid);
+>> > +	if (ref->mm) {
+>> > +		mm_context_remove_vas_window(ref->mm);
+>> > +		mmdrop(ref->mm);
+>> > +	}
+>> > +}
+>>=20
+>> You don't have to make up a new name for such a thing because you=20
+>> already have one
+>>=20
+>> put_vas_user_win_ref(struct vas_user_win_ref *ref)
+>>=20
+>>=20
+>> > +
+>> >  /*
+>> >   * Receive window attributes specified by the (in-kernel) owner of
+>> > window.
+>> >   */
+>> > @@ -192,4 +216,5 @@ int vas_register_coproc_api(struct module *mod,
+>> > enum vas_cop_type cop_type,
+>> >  			    struct vas_user_win_ops *vops);
+>> >  void vas_unregister_coproc_api(void);
+>> > =20
+>> > +int vas_reference_pid_mm(struct vas_user_win_ref *task_ref);
+>> >  #endif /* __ASM_POWERPC_VAS_H */
+>> > diff --git a/arch/powerpc/platforms/book3s/vas-api.c
+>> > b/arch/powerpc/platforms/book3s/vas-api.c
+>> > index 6c39320bfb9b..a0141bfb2e4b 100644
+>> > --- a/arch/powerpc/platforms/book3s/vas-api.c
+>> > +++ b/arch/powerpc/platforms/book3s/vas-api.c
+>> > @@ -55,6 +55,57 @@ static char *coproc_devnode(struct device *dev,
+>> > umode_t *mode)
+>> >  	return kasprintf(GFP_KERNEL, "crypto/%s", dev_name(dev));
+>> >  }
+>> > =20
+>> > +/*
+>> > + * Take reference to pid and mm
+>> > + */
+>> > +int vas_reference_pid_mm(struct vas_user_win_ref *task_ref)
+>> > +{
+>>=20
+>> So this is quite different from a typical refcount object in that
+>> it's=20
+>> opening it for access as well. I would split it in two functions, one
+>> matching put_vas_user_win_ref() and appearing in the same place in
+>> code,
+>> which is up to about mmput and another function that adds the window
+>> and
+>> does the CP_ABORT etc... hmm, where do you release tgid?
+>=20
+> Basically copied the existing code in to these functions
+> (vas_reference_pid_mm/vas_drop_reference_pid_mm) so that useful for
+> both platforms.=20
+>=20
+> mm_context_add/remove_vas_window() is also like taking reference. So
+> instead of adding 2 seperate functions, how about naming
+> get/put_vas_user_win_ref()=20
 
-Right, generally we should not see these errors. But few of them are
-failures based on argument(s) passing to hcall. like passing invalid
-window type or credits are not availavble. 
+It's actually different though. What I'm asking is the parts where you=20
+interact with core kernel data structure refcounts go into their own=20
+get/put functions.
 
-So can I add error messages for these specific ones and common error
-message for other failures with the error code?
+Someone who understands that refcounting and looks at the code will care=20
+about those bits, so having them all together I think is helpful. They=20
+don't know about adding vas windows or CP_ABORT.
 
-case H_PARAMETER:
-   	pr_err("HCALL(%x): Invalid window type (%u)\n",
-		H_ALLOCATE_VAS_WINDOW, wintype);
-case H_CONSTRAINED:
-   	pr_err("HCALL(%x): Credits (%u) are not available\n",
-		H_ALLOCATE_VAS_WINDOW, credits);
-case H_P2:
-	pr_err("HCALL(%x): Credits(%u) exceed maximum window
-credits\n", H_ALLOCATE_VAS_WINDOW, credits);
-default:
-	pr_err("HCALL(%x): failure with error code %d\n", 	
-		H_ALLOCATE_VAS_WINDOW, rc);
+> Regarding tgid, the reference is taking only with pid, but not tgid.
+> pid reuse can happen only in the case of multithread applications when
+> the child that opened VAS window exits. But these windows will be
+> closed when tgid exists. So do not need tgid reference.
 
+I don't understand you.  The code you added does take a reference to=20
+tgid...
 
-> 
-> Same comment for the other hcalls.
-> 
-> > +}
-> > +
-> > +/*
-> > + * Deallocate VAS window HCALL.
-> > + */
-> > +static int plpar_vas_deallocate_window(u64 winid)
-> > +{
-> > +	int64_t rc;
-> > +
-> > +	do {
-> > +		rc = plpar_hcall_norets(H_DEALLOCATE_VAS_WINDOW,
-> > winid);
-> > +
-> > +		rc = hcall_return_busy_check(rc);
-> > +	} while (rc == H_BUSY);
-> > +
-> > +	switch (rc) {
-> > +	case H_SUCCESS:
-> > +		return 0;
-> > +	case H_PARAMETER:
-> > +		pr_err("HCALL(%x): Invalid window ID %llu\n",
-> > +			H_DEALLOCATE_VAS_WINDOW, winid);
-> > +		return -EINVAL;
-> > +	case H_STATE:
-> > +		pr_err("HCALL(%x): Window(%llu): Invalid page table
-> > entries\n",
-> > +			H_DEALLOCATE_VAS_WINDOW, winid);
-> > +		return -EPERM;
-> > +	default:
-> > +		pr_err("HCALL(%x): Unexpected error %lld for
-> > window(%llu)\n",
-> > +			H_DEALLOCATE_VAS_WINDOW, rc, winid);
-> > +		return -EIO;
-> > +	}
-> > +}
-> > +
-> > +/*
-> > + * Modify VAS window.
-> > + * After the window is opened with allocate window HCALL,
-> > configure it
-> > + * with flags and LPAR PID before using.
-> > + */
-> > +static int plpar_vas_modify_window(struct vas_window *win)
-> > +{
-> > +	int64_t rc;
-> > +	u32 lpid = mfspr(SPRN_PID);
-> 
-> The lpid would be SPRN_LPID ?
-> But you can't read it from a guest. Is the variable just misnamed?
+>> > +	/*
+>> > +	 * Window opened by a child thread may not be closed when
+>> > +	 * it exits. So take reference to its pid and release it
+>> > +	 * when the window is free by parent thread.
+>> > +	 * Acquire a reference to the task's pid to make sure
+>> > +	 * pid will not be re-used - needed only for multithread
+>> > +	 * applications.
+>> > +	 */
+>> > +	task_ref->pid =3D get_task_pid(current, PIDTYPE_PID);
 
-yes, not using in pseries code now, but thought LPID is available in
-SPRN_PID - PIDR is SPR48 and access to that in LPAR. Not true?
+My question is, where is this reference released. I can't see it. I'm=20
+asking about existing upstream code really because this patch is just=20
+copying existing code around.
 
-"processId : The LPAR process ID to bind to the specified window. This
-parameter is ignored if the “closeWindow” flag is set.
-threadId : The LPAR thread ID to bind to the specified window. This
-parameter is ignored if the “closeWindow”
-flag is set."
-
-since TIDR is deprecated on p10, we are not passing threadID
-> 
-> > +
-> > +	/*
-> > +	 * AMR value is not supported in Linux implementation
-> > +	 * phyp ignores it if 0 is passed.
-> > +	 */
-> 
-> Heh, this comment is already here.
-> 
-> Do you mean the Linux VAS implementation doesn't support AMR? Because
-> Linux definitely does use AMR.
-
-Linux VAS implementation does not support AMR. The application /
-library has to pass this value with TX_WIN_OPEN ioctl. We do not have
-any use case right now. I will change the above comment to make it
-clear.
-
-phyp added this interface for future reference and AIX may be using it.
-
-Thanks
-Haren
-> 
-> > +	do {
-> > +		rc = plpar_hcall_norets(H_MODIFY_VAS_WINDOW, win-
-> > >winid,
-> > +					lpid, 0, VAS_MOD_WIN_FLAGS,
-> > +					VAS_AMR_VALUE);
-> > +
-> > +		rc = hcall_return_busy_check(rc);
-> > +	} while (rc == H_BUSY);
-> > +
-> > +	switch (rc) {
-> > +	case H_SUCCESS:
-> > +		return 0;
-> > +	case H_PARAMETER:
-> > +		pr_err("HCALL(%x): Invalid window ID %u\n",
-> > +			H_MODIFY_VAS_WINDOW, win->winid);
-> > +		return -EINVAL;
-> > +	case H_P2:
-> > +		pr_err("HCALL(%x): Window(%d): Invalid LPAR Process ID
-> > %u\n",
-> > +			H_MODIFY_VAS_WINDOW, lpid, win->winid);
-> > +		return -EINVAL;
-> > +	case H_P3:
-> > +		/* LPAR thread ID is deprecated on P10 */
-> > +		pr_err("HCALL(%x): Invalid LPAR Thread ID for
-> > window(%u)\n",
-> > +			H_MODIFY_VAS_WINDOW, win->winid);
-> > +		return -EINVAL;
-> > +	case H_STATE:
-> > +		pr_err("HCALL(%x): Jobs in progress, Can't modify
-> > window(%u)\n",
-> > +			H_MODIFY_VAS_WINDOW, win->winid);
-> > +		return -EBUSY;
-> > +	default:
-> > +		pr_err("HCALL(%x): Unexpected error %lld for
-> > window(%u)\n",
-> > +			H_MODIFY_VAS_WINDOW, rc, win->winid);
-> > +		return -EIO;
-> > +	}
-> > +}
-> > +
-> > +/*
-> > + * This HCALL is used to determine the capabilities that pHyp
-> > provides.
-> > + * @hcall: H_QUERY_VAS_CAPABILITIES or H_QUERY_NX_CAPABILITIES
-> > + * @query_type: If 0 is passed, phyp returns the overall
-> > capabilities
-> > + *		which provides all feature(s) that are available. Then
-> > + *		query phyp to get the corresponding capabilities for
-> > + *		the specific feature.
-> > + *		Example: H_QUERY_VAS_CAPABILITIES provides VAS GZIP QoS
-> > + *			and VAS GZIP Default capabilities.
-> > + *			H_QUERY_NX_CAPABILITIES provides NX GZIP
-> > + *			capabilities.
-> > + * @result: Return buffer to save capabilities.
-> > + */
-> > +int plpar_vas_query_capabilities(const u64 hcall, u8 query_type,
-> > +					u64 result)
-> > +{
-> > +	int64_t rc;
-> > +
-> > +	rc = plpar_hcall_norets(hcall, query_type, result);
-> > +
-> > +	switch (rc) {
-> > +	case H_SUCCESS:
-> > +		return 0;
-> > +	case H_PARAMETER:
-> > +		pr_err("HCALL(%llx): Invalid query type %u\n", hcall,
-> > +			query_type);
-> > +		return -EINVAL;
-> > +	case H_PRIVILEGE:
-> > +		pr_err("HCALL(%llx): Invalid result buffer 0x%llx\n",
-> > +			hcall, result);
-> > +		return -EACCES;
-> > +	default:
-> > +		pr_err("HCALL(%llx): Unexpected error %lld\n", hcall,
-> > rc);
-> > +		return -EIO;
-> > +	}
-> > +}
-> 
-> cheers
+Thanks,
+Nick
 
