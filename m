@@ -2,108 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C40E2C4743E
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Jun 2021 10:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FE1C47082
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Jun 2021 12:56:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA572613F1
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Jun 2021 10:53:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2D2A613AA
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Jun 2021 12:56:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230161AbhFEKy7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Jun 2021 06:54:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60332 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbhFEKy7 (ORCPT
+        id S229930AbhFEM5w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 5 Jun 2021 08:57:52 -0400
+Received: from smtp02.smtpout.orange.fr ([80.12.242.124]:56233 "EHLO
+        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229957AbhFEM5w (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Jun 2021 06:54:59 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F69BC061766;
-        Sat,  5 Jun 2021 03:53:11 -0700 (PDT)
-Received: from zn.tnic (p4fed32f0.dip0.t-ipconnect.de [79.237.50.240])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C2FC41EC01A2;
-        Sat,  5 Jun 2021 12:53:09 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1622890389;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=m4WFNDMn/F2hBFMtOb5KcbkKEA5fPujaJDdSpXTf3yI=;
-        b=b9euwxNWNDPFTyr/DO+tkH5SKsRbrIAcUy0+u+Jvmj/u6fbpiZz9u3lFXvXcgwIemAcufI
-        NyCxlLalL3M1NPfNHFgQhUWN/nBA/Vh8556EE5bzxFiKvpEO+aa9S/C6oi3V7LKg6VQ6eu
-        Z/KRkDNbfBU2ttfxGH9aWiVrTQ//cn8=
-Date:   Sat, 5 Jun 2021 12:50:53 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 04/22] x86/mm: Add sev_feature_enabled()
- helper
-Message-ID: <YLtXDQHWnAvCl99M@zn.tnic>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-5-brijesh.singh@amd.com>
+        Sat, 5 Jun 2021 08:57:52 -0400
+Received: from localhost.localdomain ([86.243.172.93])
+        by mwinf5d78 with ME
+        id DQvx2500221Fzsu03QvxbN; Sat, 05 Jun 2021 14:56:02 +0200
+X-ME-Helo: localhost.localdomain
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 05 Jun 2021 14:56:02 +0200
+X-ME-IP: 86.243.172.93
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        gregkh@linuxfoundation.org, acostag.ubuntu@gmail.com,
+        lee.jones@linaro.org, Jampala.Srikanth@cavium.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH] crypto: cavium/nitrox - Fix an erro rhandling path in 'nitrox_probe()'
+Date:   Sat,  5 Jun 2021 14:55:56 +0200
+Message-Id: <26f71d3925541924bfda1dca9114a48db5ffafe4.1622897629.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210602140416.23573-5-brijesh.singh@amd.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 09:03:58AM -0500, Brijesh Singh wrote:
-> @@ -78,6 +85,7 @@ static inline void sev_es_init_vc_handling(void) { }
->  static inline bool sme_active(void) { return false; }
->  static inline bool sev_active(void) { return false; }
->  static inline bool sev_es_active(void) { return false; }
-> +static inline bool sev_snp_active(void) { return false; }
+If an error occurs after a successful 'ioremap()' call, it must be undone
+by a corresponding 'iounmap()' call, as already done in the remove
+function.
+Ass a 'pf_sw_fail' label in the error handling path and add the missing
+'iounmap()'.
 
-Leftover from the previous version, can go.
+While at it, also add a 'flr_fail' label in the error handling path and use
+it to avoid some code duplication.
 
-> +bool sev_feature_enabled(unsigned int type)
-> +{
-> +	switch (type) {
-> +	case SEV: return sev_status & MSR_AMD64_SEV_ENABLED;
-> +	case SEV_ES: return sev_status & MSR_AMD64_SEV_ES_ENABLED;
-> +	case SEV_SNP: return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
-> +	default: return false;
-> +	}
-> +}
+Fixes: 14fa93cdcd9b ("crypto: cavium - Add support for CNN55XX adapters.")
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ drivers/crypto/cavium/nitrox/nitrox_main.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-Yeah, btw, we might even do a generic one, see:
-
-https://lkml.kernel.org/r/YLkcIuL2qvo0hviU@zn.tnic
-
-and the following mail.
-
-But that doesn't matter as sev_feature_enabled()'s body can go into
-sev_protected_guest_has() or whatever we end up calling it.
-
-Thx.
-
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
+index 144d554bd44d..96bc7b5c6532 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_main.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
+@@ -424,8 +424,7 @@ static int nitrox_probe(struct pci_dev *pdev,
+ 	err = nitrox_device_flr(pdev);
+ 	if (err) {
+ 		dev_err(&pdev->dev, "FLR failed\n");
+-		pci_disable_device(pdev);
+-		return err;
++		goto flr_fail;
+ 	}
+ 
+ 	if (!dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
+@@ -434,16 +433,13 @@ static int nitrox_probe(struct pci_dev *pdev,
+ 		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
+ 		if (err) {
+ 			dev_err(&pdev->dev, "DMA configuration failed\n");
+-			pci_disable_device(pdev);
+-			return err;
++			goto flr_fail;
+ 		}
+ 	}
+ 
+ 	err = pci_request_mem_regions(pdev, nitrox_driver_name);
+-	if (err) {
+-		pci_disable_device(pdev);
+-		return err;
+-	}
++	if (err)
++		goto flr_fail;
+ 	pci_set_master(pdev);
+ 
+ 	ndev = kzalloc(sizeof(*ndev), GFP_KERNEL);
+@@ -479,7 +475,7 @@ static int nitrox_probe(struct pci_dev *pdev,
+ 
+ 	err = nitrox_pf_sw_init(ndev);
+ 	if (err)
+-		goto ioremap_err;
++		goto pf_sw_fail;
+ 
+ 	err = nitrox_pf_hw_init(ndev);
+ 	if (err)
+@@ -509,12 +505,15 @@ static int nitrox_probe(struct pci_dev *pdev,
+ 	smp_mb__after_atomic();
+ pf_hw_fail:
+ 	nitrox_pf_sw_cleanup(ndev);
++pf_sw_fail:
++	iounmap(ndev->bar_addr);
+ ioremap_err:
+ 	nitrox_remove_from_devlist(ndev);
+ 	kfree(ndev);
+ 	pci_set_drvdata(pdev, NULL);
+ ndev_fail:
+ 	pci_release_mem_regions(pdev);
++flr_fail:
+ 	pci_disable_device(pdev);
+ 	return err;
+ }
 -- 
-Regards/Gruss,
-    Boris.
+2.30.2
 
-https://people.kernel.org/tglx/notes-about-netiquette
