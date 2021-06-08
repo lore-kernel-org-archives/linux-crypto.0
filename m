@@ -2,63 +2,63 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C863C48BE8
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Jun 2021 21:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC2EC4743D
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Jun 2021 21:24:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 827F56108D
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Jun 2021 21:24:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6607613AC
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Jun 2021 21:24:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234191AbhFHV0J (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Jun 2021 17:26:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26185 "EHLO
+        id S234300AbhFHV0K (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Jun 2021 17:26:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27770 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234302AbhFHV0H (ORCPT
+        by vger.kernel.org with ESMTP id S234282AbhFHV0K (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Jun 2021 17:26:07 -0400
+        Tue, 8 Jun 2021 17:26:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623187453;
+        s=mimecast20190719; t=1623187456;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wp596HvsXKCpAwusArsHwfjreuet0FT2ap8ASM9VttM=;
-        b=TFlPNDMjf+cHohtSQI0/ectI6u99+m29yOM1BwoID2JD+SKcYFGbXh+WpDVLgr1Kzh08q9
-        S5sUUne9RkJ1Jazy5V+1zWxcOGx2rFdAW2enDfRH6Tn7+oCG1fx15dL4OQ36W4VGe+PCCA
-        s+aR1K6JCkhoBxqyzkLAjF+HBsl47Bw=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-432-2-X3caPbMLySsjb7h1Qxcw-1; Tue, 08 Jun 2021 17:24:12 -0400
-X-MC-Unique: 2-X3caPbMLySsjb7h1Qxcw-1
-Received: by mail-ot1-f71.google.com with SMTP id i25-20020a9d4a990000b0290304f00e3e3aso14767928otf.15
-        for <linux-crypto@vger.kernel.org>; Tue, 08 Jun 2021 14:24:12 -0700 (PDT)
+        bh=9WOcYtG36rVjuPEj8K6lgDL7dCdoY9WpL7jwDyU54B8=;
+        b=R6eO4w0/Dgbf0omZBJxn/yAHMCQVfRE4CvqouAOHaIGuvHXtFmMzPcKIDTZzVPOmuiXrSt
+        2cDKwYxb1M7t3BFDIs9UOhTNblbQ+133a4MpEyn40Bz+gEgBAPBAILeQyikc/tUA+327A3
+        TswMeI3IKMS5aLQ4fedVme4OSFEZa+M=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-537-rAq_T716PzaesuD5rkMM0Q-1; Tue, 08 Jun 2021 17:24:02 -0400
+X-MC-Unique: rAq_T716PzaesuD5rkMM0Q-1
+Received: by mail-ot1-f70.google.com with SMTP id i25-20020a9d4a990000b0290304f00e3e3aso14767732otf.15
+        for <linux-crypto@vger.kernel.org>; Tue, 08 Jun 2021 14:24:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wp596HvsXKCpAwusArsHwfjreuet0FT2ap8ASM9VttM=;
-        b=oS1yi4gpRHFSpoJV7uwyaam9V4RGK8OKr+ZTrMykUcQAYK823iAvGoQ3jjTqNAJNAU
-         o9qlwa9hzWiJhQrdX3IFfHxnNXsa4K1WvD9MwzGyJPREBtgL2KB+wblfQBLsidABtCtI
-         z9Wz/uLrxxRiKyMiOLm59l9R7zS8Ws7Ybmrp5WKMWe8E/+Jh/g+jJgI/DrzJL1OMhh4x
-         PBmIaNc+Cxe+MxaIVqlojUg1k+kNTc5wY/nDFle7223CrobxtmuS90qBkuRuOpbCPmNy
-         4+Tr91MTY4lOMyaDy+tPjh84VIC+MDTjL9uHNaBnVRWNNYAZml0AHiX6jj3OeP39+hG/
-         RzuA==
-X-Gm-Message-State: AOAM530QZ0oVmfB282ldpD5kpBi6APceB3siFoJW5bg6ASDBs9Q/qdA8
-        v/+SfmYF6Q69Xcndu3CGPy+6kRegLQLPM6vKbpvZxNMEt4ZAr6d8hYX/xGxAd4+XhrxHIT+zgTZ
-        aMv7336XCAGm8uqVlfmmMOuRh
-X-Received: by 2002:a05:6830:161a:: with SMTP id g26mr12732186otr.62.1623187451519;
-        Tue, 08 Jun 2021 14:24:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzLOwO0hiMF+KA6dMHmw2cY7cTlxB9WKoQb/W2MRs5OG0rKOt4HtiG8bWLvQUw/6wISGO0yyQ==
-X-Received: by 2002:a05:6830:161a:: with SMTP id g26mr12732164otr.62.1623187451344;
-        Tue, 08 Jun 2021 14:24:11 -0700 (PDT)
+        bh=9WOcYtG36rVjuPEj8K6lgDL7dCdoY9WpL7jwDyU54B8=;
+        b=uBsEMH4wobSs67+K7K3vNOxh9UfzFxHRNC1ICQr1rT+7zgTf4+AwjMjc5oFK35Mda1
+         Y6Tgtv3y7WV5fbf2UzQCaFjkGhixuVY5u5fy7fUKTaoig0wzvFODwcLyFRp4p0G5s6zJ
+         7LZkL0V4kDBoScZoSBxjOyfBSENm/JDeQwtvugHHBmSK7XMFnRmbHhxg987d95bO7BAB
+         vwJ6AN6c6Edc5co9CGstBagUeLkSwFeNHbjXaN0BX1x0J8UVK33h5kq8XfTIRQAraSRR
+         jcJOpz8QPzR3ZqTikCcr6LcXpivBo8AL7BrF2TPDswMr59YjXrYrKR421srDRYbswlga
+         TSxw==
+X-Gm-Message-State: AOAM532wwZX7l8d5QB9ucCVVzP3rktNDozDDCdV1sv+OmWsZzFo36k7U
+        UPaTXKrdmxuF8aiExPu862SNIPTBoq0pU2G9BIO3m8OoPWWCzOBJBxX5xSekzmj1FJ3pC/H/8p4
+        kzeZhcw086fIVvJvgEaQmCMLQ
+X-Received: by 2002:aca:4703:: with SMTP id u3mr4203137oia.37.1623187441880;
+        Tue, 08 Jun 2021 14:24:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxOmes5a6/9rFBo39RJQElGnhgBYJ++iI8VFQf2/yT0UFkGTfCosxrJuI7CS1xqFaTnjT/XLg==
+X-Received: by 2002:aca:4703:: with SMTP id u3mr4203117oia.37.1623187441736;
+        Tue, 08 Jun 2021 14:24:01 -0700 (PDT)
 Received: from localhost.localdomain.com (075-142-250-213.res.spectrum.com. [75.142.250.213])
-        by smtp.gmail.com with ESMTPSA id x199sm1954310oif.5.2021.06.08.14.24.09
+        by smtp.gmail.com with ESMTPSA id x199sm1954310oif.5.2021.06.08.14.23.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jun 2021 14:24:11 -0700 (PDT)
+        Tue, 08 Jun 2021 14:24:01 -0700 (PDT)
 From:   trix@redhat.com
 To:     mdf@kernel.org, robh+dt@kernel.org, hao.wu@intel.com,
         corbet@lwn.net, fbarrat@linux.ibm.com, ajd@linux.ibm.com,
@@ -70,9 +70,9 @@ Cc:     linux-fpga@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
         linux-staging@lists.linux.dev, Tom Rix <trix@redhat.com>
-Subject: [PATCH 04/11] crypto: marvell: cesa: change FPGA indirect article to an
-Date:   Tue,  8 Jun 2021 14:23:43 -0700
-Message-Id: <20210608212350.3029742-6-trix@redhat.com>
+Subject: [PATCH 00/11] fpga: change FPGA indirect article to an
+Date:   Tue,  8 Jun 2021 14:23:39 -0700
+Message-Id: <20210608212350.3029742-2-trix@redhat.com>
 X-Mailer: git-send-email 2.26.3
 In-Reply-To: <20210608212350.3029742-1-trix@redhat.com>
 References: <20210608212350.3029742-1-trix@redhat.com>
@@ -84,26 +84,53 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Tom Rix <trix@redhat.com>
 
-Change use of 'a fpga' to 'an fpga'
+A treewide followup of
+https://lore.kernel.org/linux-fpga/2faf6ccb-005b-063a-a2a3-e177082c4b3c@silicom.dk/
 
-Signed-off-by: Tom Rix <trix@redhat.com>
----
- drivers/crypto/marvell/cesa/cesa.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Change the use of 'a fpga' to 'an fpga'
+Ref usage in wiki
+https://en.wikipedia.org/wiki/Field-programmable_gate_array
+and Intel's 'FPGAs For Dummies'
+https://plan.seek.intel.com/PSG_WW_NC_LPCD_FR_2018_FPGAforDummiesbook
 
-diff --git a/drivers/crypto/marvell/cesa/cesa.h b/drivers/crypto/marvell/cesa/cesa.h
-index c1007f2ba79c8..d215a6bed6bc7 100644
---- a/drivers/crypto/marvell/cesa/cesa.h
-+++ b/drivers/crypto/marvell/cesa/cesa.h
-@@ -66,7 +66,7 @@
- #define CESA_SA_ST_ACT_1			BIT(1)
- 
- /*
-- * CESA_SA_FPGA_INT_STATUS looks like a FPGA leftover and is documented only
-+ * CESA_SA_FPGA_INT_STATUS looks like an FPGA leftover and is documented only
-  * in Errata 4.12. It looks like that it was part of an IRQ-controller in FPGA
-  * and someone forgot to remove  it while switching to the core and moving to
-  * CESA_SA_INT_STATUS.
+Change was mechanical
+ !/bin/sh                                                        
+ for f in `find . -type f`; do
+   sed -i.bak 's/ a fpga/ an fpga/g' $f
+   sed -i.bak 's/ A fpga/ An fpga/g' $f
+   sed -i.bak 's/ a FPGA/ an FPGA/g' $f
+   sed -i.bak 's/ A FPGA/ An FPGA/g' $f
+ done
+
+
+Tom Rix (11):
+  dt-bindings: fpga: fpga-region: change FPGA indirect article to an
+  Documentation: fpga: dfl: change FPGA indirect article to an
+  Documentation: ocxl.rst: change FPGA indirect article to an
+  crypto: marvell: cesa: change FPGA indirect article to an
+  fpga: change FPGA indirect article to an
+  fpga: bridge: change FPGA indirect article to an
+  fpga-mgr: change FPGA indirect article to an
+  fpga: region: change FPGA indirect article to an
+  fpga: of-fpga-region: change FPGA indirect article to an
+  fpga: stratix10-soc: change FPGA indirect article to an
+  staging: fpgaboot: change FPGA indirect article to an
+
+ .../devicetree/bindings/fpga/fpga-region.txt  | 22 +++++++++----------
+ Documentation/fpga/dfl.rst                    |  4 ++--
+ .../userspace-api/accelerators/ocxl.rst       |  2 +-
+ drivers/crypto/marvell/cesa/cesa.h            |  2 +-
+ drivers/fpga/Kconfig                          |  4 ++--
+ drivers/fpga/fpga-bridge.c                    | 22 +++++++++----------
+ drivers/fpga/fpga-mgr.c                       | 22 +++++++++----------
+ drivers/fpga/fpga-region.c                    | 14 ++++++------
+ drivers/fpga/of-fpga-region.c                 |  8 +++----
+ drivers/fpga/stratix10-soc.c                  |  2 +-
+ drivers/staging/gs_fpgaboot/README            |  2 +-
+ include/linux/fpga/fpga-bridge.h              |  2 +-
+ include/linux/fpga/fpga-mgr.h                 |  2 +-
+ 13 files changed, 54 insertions(+), 54 deletions(-)
+
 -- 
 2.26.3
 
