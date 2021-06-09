@@ -2,125 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A403DC4743F
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Jun 2021 22:43:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC87C48BCF
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Jun 2021 03:11:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 87C9E61351
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Jun 2021 22:43:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C7A86128D
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Jun 2021 03:11:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229526AbhFHWpZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Jun 2021 18:45:25 -0400
-Received: from mail-qk1-f180.google.com ([209.85.222.180]:35477 "EHLO
-        mail-qk1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbhFHWpY (ORCPT
+        id S236309AbhFIDNP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Jun 2021 23:13:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27816 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S233316AbhFIDNP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Jun 2021 18:45:24 -0400
-Received: by mail-qk1-f180.google.com with SMTP id j189so21964381qkf.2
-        for <linux-crypto@vger.kernel.org>; Tue, 08 Jun 2021 15:43:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=CiEH93oHxFAht+7aZTEKeBrzaSNOlcRE/Xf1r7kSjCA=;
-        b=Zc3jz63eFflFy1UVb/XgVYb2q+Oj0swYgmxeHSt/JLKGSZW34UgF8esnYCsF0IP7gx
-         YU/1cY18LflhO7EBiqBq0arSQMC9DhTbJaVS19hKY/kQBbib2GHX6bxhfNHBDOMHwXIJ
-         +Y02rE+pMr9WPHLdF5yKRUD8W0fLg+DtMssTOi9lc7D4ZF4//Tiwk+ikn8EwHo8ipJQ9
-         flXVXYyyE3u00z2Q3B/dYxtT5GP95yXptfiMLCMO+BazRWJv06zJgbfv5owqO+PRtPsJ
-         zRe1Pk3TospkQb4K6oZvpsclNPN3Jm7db+KKGFp3PYvPGCLRwFc4/E8NLMJcDNOvAfxL
-         ZXjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CiEH93oHxFAht+7aZTEKeBrzaSNOlcRE/Xf1r7kSjCA=;
-        b=rxJg54woKc/5tTNj3amExpXdswrdeCy/Cry0OJZzyjf7U82KLtcOjtziDuqM5nwDDn
-         paRbxPCJs0NE7wc4tkRGE/jHb3y5oSIgb8FNxba9GzQu4XwPONcfKIq9F05RIRJIJyGp
-         Tk9c0wbEsceXk+bYXB0YI2jzzD0+BPRUgcbWWIXmi/eAdYbYHQOMWGrwbj/E3lTyo4zd
-         Mmdf49k9ZbrTdnCjr4kcojnlpvzPI29jnNn/W1I/y0CHgTLK2rbFL+/6jq1ab+SALLKn
-         1nzzb/06MJigr08tYCLSKlRxN6ehjnAdN5hIVNaMjmJ6VxANtO/kFmH48VNhYRBSbPa4
-         pzsQ==
-X-Gm-Message-State: AOAM530nwWesO3wCNuMhL4sPWth374FC/gcq0p7wL65Ei8+chF+8SYx2
-        iOXo6aNOQl/bGnCcDWDkrshVUA==
-X-Google-Smtp-Source: ABdhPJyU+QIql5Y85Kiw+E7Je6AmK+VfYGY88+WbqGXNVf3BQkCaeLT4cnYJP9HeCybWB7I3sWEiVQ==
-X-Received: by 2002:a37:a80e:: with SMTP id r14mr24381754qke.386.1623192138166;
-        Tue, 08 Jun 2021 15:42:18 -0700 (PDT)
-Received: from [192.168.1.93] (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.gmail.com with ESMTPSA id p3sm11444145qti.31.2021.06.08.15.42.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jun 2021 15:42:17 -0700 (PDT)
-Subject: Re: [PATCH -next] crypto: qce: skcipher: fix error return code in
- qce_skcipher_async_req_handle()
-To:     Wei Yongjun <weiyongjun1@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, Hulk Robot <hulkci@huawei.com>
-References: <20210602113645.3038800-1-weiyongjun1@huawei.com>
-From:   Thara Gopinath <thara.gopinath@linaro.org>
-Message-ID: <09514ef3-183f-db3d-7525-aefcb1275383@linaro.org>
-Date:   Tue, 8 Jun 2021 18:42:16 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 8 Jun 2021 23:13:15 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1592Yljn166699;
+        Tue, 8 Jun 2021 23:10:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XA2LuTKM6oytXDfyhlj9P6N1EyqEbVoRRxJ1vjn8jgc=;
+ b=bLiCk1FtCU1F6m72Dk44bIJFumRDvGvlg2fqfyuWKdtHqeyisSOg0Ssi5jUy0EYvs60p
+ p7bV5IHrSao073RmGCDxVCXX818TC6/xLLwqhefYKegxfikoO7UcSNfUcG18Cn1+aPRj
+ UghMgSQQ/f9aXTIYUc2UNSl9ChjkW3VI+7+hVBBmUj+Pxa8dmJ8WoEJfnvjSwJMsGLw7
+ ptC/ZuIHAImVOxRultXmhS1nBL3+KGVTfrU2+WmIYMJXxcF5iAmXWa/WsqJ4KzKMQTW/
+ Ps34kkPPXz+8bJsSCYIkoZhz0+9SlQyjFSPxoaWmEtHdKedXYHrRi2yPsUNWJQAszQbh 6A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 392d7pkpsb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Jun 2021 23:10:57 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1592ZWrv168759;
+        Tue, 8 Jun 2021 23:10:57 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 392d7pkprx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Jun 2021 23:10:57 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1593AtHT020402;
+        Wed, 9 Jun 2021 03:10:55 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma01fra.de.ibm.com with ESMTP id 3900w891e2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Jun 2021 03:10:55 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1593ArdC25625026
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Jun 2021 03:10:53 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 01D3942042;
+        Wed,  9 Jun 2021 03:10:53 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9F1864203F;
+        Wed,  9 Jun 2021 03:10:52 +0000 (GMT)
+Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  9 Jun 2021 03:10:52 +0000 (GMT)
+Received: from [9.206.155.145] (unknown [9.206.155.145])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by ozlabs.au.ibm.com (Postfix) with ESMTPSA id 27FAB60134;
+        Wed,  9 Jun 2021 13:10:44 +1000 (AEST)
+Subject: Re: [PATCH 03/11] Documentation: ocxl.rst: change FPGA indirect
+ article to an
+To:     trix@redhat.com, mdf@kernel.org, robh+dt@kernel.org,
+        hao.wu@intel.com, corbet@lwn.net, fbarrat@linux.ibm.com,
+        bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Sven.Auhagen@voleatech.de,
+        grandmaster@al2klimov.de
+Cc:     linux-fpga@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        linux-staging@lists.linux.dev
+References: <20210608212350.3029742-1-trix@redhat.com>
+ <20210608212350.3029742-5-trix@redhat.com>
+From:   Andrew Donnellan <ajd@linux.ibm.com>
+Message-ID: <01f22915-0a72-1d16-7a42-a6e870ccaec2@linux.ibm.com>
+Date:   Wed, 9 Jun 2021 13:10:39 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210602113645.3038800-1-weiyongjun1@huawei.com>
+In-Reply-To: <20210608212350.3029742-5-trix@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: rhKqRFJG-wMyLq05xrV-qvprdaqJmQuI
+X-Proofpoint-GUID: nFu8dFCLDDKqockFlSmj80mifT7sH7nq
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-09_01:2021-06-04,2021-06-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 phishscore=0 spamscore=0 mlxlogscore=999 bulkscore=0
+ priorityscore=1501 malwarescore=0 adultscore=0 clxscore=1011
+ suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106090001
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 6/2/21 7:36 AM, Wei Yongjun wrote:
-> Fix to return a negative error code from the error handling
-> case instead of 0, as done elsewhere in this function.
+On 9/6/21 7:23 am, trix@redhat.com wrote:
+> From: Tom Rix <trix@redhat.com>
 > 
-> Fixes: 1339a7c3ba05 ("crypto: qce: skcipher: Fix incorrect sg count for dma transfers")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> Change use of 'a fpga' to 'an fpga'
+> 
+> Signed-off-by: Tom Rix <trix@redhat.com>
 
-Reviewed-by: Thara Gopinath <thara.gopinath@linaro.org>
+Acked-by: Andrew Donnellan <ajd@linux.ibm.com>
+
 
 -- 
-Warm Regards
-Thara
-
-> ---
->   drivers/crypto/qce/skcipher.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
-> index 259418479227..8ff10928f581 100644
-> --- a/drivers/crypto/qce/skcipher.c
-> +++ b/drivers/crypto/qce/skcipher.c
-> @@ -124,13 +124,17 @@ qce_skcipher_async_req_handle(struct crypto_async_request *async_req)
->   	rctx->dst_sg = rctx->dst_tbl.sgl;
->   
->   	dst_nents = dma_map_sg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst);
-> -	if (dst_nents < 0)
-> +	if (dst_nents < 0) {
-> +		ret = dst_nents;
->   		goto error_free;
-> +	}
->   
->   	if (diff_dst) {
->   		src_nents = dma_map_sg(qce->dev, req->src, rctx->src_nents, dir_src);
-> -		if (src_nents < 0)
-> +		if (src_nents < 0) {
-> +			ret = src_nents;
->   			goto error_unmap_dst;
-> +		}
->   		rctx->src_sg = req->src;
->   	} else {
->   		rctx->src_sg = rctx->dst_sg;
-> 
-
-
+Andrew Donnellan              OzLabs, ADL Canberra
+ajd@linux.ibm.com             IBM Australia Limited
