@@ -1,78 +1,99 @@
 Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.0 required=3.0 tests=BAYES_50,DKIMWL_BL,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ADDEC48BCF
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Jun 2021 14:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16572C48BCD
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Jun 2021 17:47:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 135DC613AD
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Jun 2021 14:05:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB543613D7
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Jun 2021 17:47:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237445AbhFIOHg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Jun 2021 10:07:36 -0400
-Received: from flippie-beckerswealthsa.xyz ([62.173.138.170]:49586 "EHLO
-        host.flippie-beckerswealthsa.xyz" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237461AbhFIOHe (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Jun 2021 10:07:34 -0400
-X-Greylist: delayed 6158 seconds by postgrey-1.27 at vger.kernel.org; Wed, 09 Jun 2021 10:07:34 EDT
-Received: from flippie-beckerswealthsa.xyz (ec2-18-118-29-154.us-east-2.compute.amazonaws.com [18.118.29.154])
-        by host.flippie-beckerswealthsa.xyz (Postfix) with ESMTPA id 34B0E30C3EC3
-        for <linux-crypto@vger.kernel.org>; Wed,  9 Jun 2021 15:09:33 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealthsa.xyz 34B0E30C3EC3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippie-beckerswealthsa.xyz; s=default; t=1623240573;
-        bh=h0ivQLrZuUWuyEKz/TWb+FP9AASpHhVqOsJtRcwKQV4=;
-        h=Reply-To:From:To:Subject:Date:From;
-        b=loWvoOWp1tReD8z2HBFwqojvFeSgyaGEjs4qaB5ZQJCpsz/BmdXiwGzYnvq1bBjw2
-         YaysDJRbwhC5SY96TkPSCbjp++LMrw3wzuF2Qmvom2rstI1AauccXvSyL3Y17b4hzd
-         tAKSJ6+nEb2++GEunPxYeByNK/AKjuNfuAn7l1wo=
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealthsa.xyz 34B0E30C3EC3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippie-beckerswealthsa.xyz; s=default; t=1623240573;
-        bh=h0ivQLrZuUWuyEKz/TWb+FP9AASpHhVqOsJtRcwKQV4=;
-        h=Reply-To:From:To:Subject:Date:From;
-        b=loWvoOWp1tReD8z2HBFwqojvFeSgyaGEjs4qaB5ZQJCpsz/BmdXiwGzYnvq1bBjw2
-         YaysDJRbwhC5SY96TkPSCbjp++LMrw3wzuF2Qmvom2rstI1AauccXvSyL3Y17b4hzd
-         tAKSJ6+nEb2++GEunPxYeByNK/AKjuNfuAn7l1wo=
-Reply-To: jmasuku40@flippiebeckerwealthservices.com
-From:   Jotham Masuku <jmasuku40@flippie-beckerswealthsa.xyz>
-To:     linux-crypto@vger.kernel.org
-Subject: Projects
-Date:   09 Jun 2021 12:09:32 +0000
-Message-ID: <20210609120932.8B77FB7A74CE53B1@flippie-beckerswealthsa.xyz>
-Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+        id S231783AbhFIRtA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Jun 2021 13:49:00 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:43442 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231670AbhFIRs7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Jun 2021 13:48:59 -0400
+Received: from zn.tnic (p200300ec2f0cf6007c78e5fe5429f9b4.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:f600:7c78:e5fe:5429:f9b4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1E6531EC0570;
+        Wed,  9 Jun 2021 19:47:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1623260823;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=wSATXOOyGt9i64iSiH+y4PdoutUxKH/Ox+6Sp2p3E6I=;
+        b=OhU591mPW3/AXQerpYOAsiWAncFI3bpSWloN5ZmmzLW/XQj8K6WqVZrg415AJ4V78a3RaH
+        ChWB6TW6rGbokkHZ787rQUOFcjBM6xeABnr82utwiuyzMnpTga0VJe8odXUKUr80pNY/HV
+        pItHvwa38FQL5ylBZ/Rb1GVajBKE8Ds=
+Date:   Wed, 9 Jun 2021 19:47:02 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 09/22] x86/compressed: Register GHCB memory
+ when SEV-SNP is active
+Message-ID: <YMD+lpyZfYgekRsj@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-10-brijesh.singh@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210602140416.23573-10-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello there,
+On Wed, Jun 02, 2021 at 09:04:03AM -0500, Brijesh Singh wrote:
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index 1424b8ffde0b..ae99a8a756fe 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -75,6 +75,17 @@
+>  #define GHCB_MSR_PSC_ERROR_POS		32
+>  #define GHCB_MSR_PSC_RESP_VAL(val)	((val) >> GHCB_MSR_PSC_ERROR_POS)
+>  
+> +/* GHCB GPA Register */
+> +#define GHCB_MSR_GPA_REG_REQ		0x012
+> +#define GHCB_MSR_GPA_REG_VALUE_POS	12
+> +#define GHCB_MSR_GPA_REG_GFN_MASK	GENMASK_ULL(51, 0)
+> +#define GHCB_MSR_GPA_REQ_GFN_VAL(v)		\
+> +	(((unsigned long)((v) & GHCB_MSR_GPA_REG_GFN_MASK) << GHCB_MSR_GPA_REG_VALUE_POS)| \
+> +	GHCB_MSR_GPA_REG_REQ)
+> +
+> +#define GHCB_MSR_GPA_REG_RESP		0x013
+> +#define GHCB_MSR_GPA_REG_RESP_VAL(v)	((v) >> GHCB_MSR_GPA_REG_VALUE_POS)
+> +
 
-I hope this message finds you in good spirits especially during=20
-this challenging time of coronavirus pandemic. I hope you and=20
-your family are well and keeping safe. Anyway, I am Jotham=20
-Masuku, a broker working with Flippiebecker Wealth. I got your=20
-contact (along with few other contacts) through an online=20
-business directory and I thought I should contact you to see if=20
-you are interested in this opportunity. I am contacting you=20
-because one of my high profile clients is interested in investing=20
-abroad and has asked me to look for individuals and companies=20
-with interesting business ideas and projects that he can invest=20
-in. He wants to invest a substantial amount of asset abroad.
+Can we pls pay attention to having those REQuests sorted by their
+number, like in the GHCB spec, for faster finding?
 
-Please kindly respond back to this email if you are interested in=20
-this opportunity. Once I receive your response, I will give you=20
-more details and we can plan a strategy that will be beneficial=20
-to all parties.
+-- 
+Regards/Gruss,
+    Boris.
 
-Best regards
-
-J Masuku
-Flippiebecker Wealth
+https://people.kernel.org/tglx/notes-about-netiquette
