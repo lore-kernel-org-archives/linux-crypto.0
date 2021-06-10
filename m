@@ -2,266 +2,391 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D983C47094
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Jun 2021 14:52:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3A75C48BE0
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Jun 2021 15:51:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D341610E6
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Jun 2021 14:52:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D90AE613E3
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Jun 2021 15:51:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231366AbhFJOyJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Jun 2021 10:54:09 -0400
-Received: from mail-eopbgr150047.outbound.protection.outlook.com ([40.107.15.47]:33957
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231337AbhFJOyI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jun 2021 10:54:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DKVA7SY7UFH+W1Z5F+bNWw5CBNEXt5mTrO4S6QN+xS4+wPMJ6Pl2WGUthlJ678MrDZ7GAyHwb1v/eR26tPfME0xq4s83LkFCKmz3+hsMy3SKDhdvXVWPGzFz7Qjl5kBmIekyMhcjMsgHigS8DX3pWrEN+idRie8K9H6krD3PEstdGFtMNn0/m9gy1bDOfN/5s0iqVdCtqYuHU15z2hlWjexVh3r4XHiFvq3GC4tdJLIPGE0afmsQtnteLk6jEmj8Lsw1O5J9ULI4IsOPJtUB2m8NAq5C0SkeOJaTejYeoS5+VLb+zcPhsXVCtnusJBH35EZE2p8d3FpMad016uI6pg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+putAtfRiM2iBKqceOyA10Rf3OE07Fy+GsVAKbVMFzI=;
- b=b2fcmiKgjr1kIHNO5QtLkvmmu2TkNowxX7agOjlBvkNh195Bqel56ABaKG6jS6byMAkSovTEresPA/IfnfpP7JKND6VPpS/gzUIA8jR6KK8Pk+X5a7yqRaCWEMVUDoQijkYCGl0BtcA8ImXu5XFHwATDrZtaOJYksGOlbIzYOpiqWhYzxYSeJ3ibBNDnkTYjYv0H+Q3k56svJP8OJOorT3+DYbHJb2pofexpCYU/Lcfeic2iIdmD9IAuqd+zyn0TKuWPvyePkxtcWO8Zj4eGj2Oi35FntBaM6wetL8cjjwKBEfPQzpjMkL22UV/CAvSwEY/ChNKD/CjiCM97DfuxRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+putAtfRiM2iBKqceOyA10Rf3OE07Fy+GsVAKbVMFzI=;
- b=k/v/aCrJmcYiY+o2yYu5/Pt2qYZwPgjfy9pykOCWs5OAGqGp7/DooazFTaMgGYUwGmG4JQaPYyNm0gnG7trWxyIld0iayQWpfaeCV6HrnZvgYCOTSuszWlyGlUl80Yo2NTquLrXOS7WXYb2oQmOCfwW5On/tjtfDDDBONCew+aM=
-Authentication-Results: lists.linux-foundation.org; dkim=none (message not
- signed) header.d=none;lists.linux-foundation.org; dmarc=none action=none
- header.from=nxp.com;
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
- by VI1PR04MB4048.eurprd04.prod.outlook.com (2603:10a6:803:44::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21; Thu, 10 Jun
- 2021 14:52:10 +0000
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::e8df:8117:d230:f321]) by VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::e8df:8117:d230:f321%5]) with mapi id 15.20.4219.022; Thu, 10 Jun 2021
- 14:52:10 +0000
-Subject: Re: swiotlb/caamjr regression (Was: [GIT PULL] (swiotlb)
- stable/for-linus-5.12)
-To:     Dominique MARTINET <dominique.martinet@atmark-techno.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jianxiong Gao <jxgao@google.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Lukas Hartmann <lukas@mntmn.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
-References: <YDkbCHHBUOmfI59K@Konrads-MacBook-Pro.local>
- <YL7XXNOnbaDgmTB9@atmark-techno.com>
-From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-Message-ID: <2e899de2-4b69-c4b6-33a6-09fb8949d2fd@nxp.com>
-Date:   Thu, 10 Jun 2021 17:52:07 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YL7XXNOnbaDgmTB9@atmark-techno.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [78.97.206.147]
-X-ClientProxiedBy: AM0PR04CA0131.eurprd04.prod.outlook.com
- (2603:10a6:208:55::36) To VI1PR04MB4046.eurprd04.prod.outlook.com
- (2603:10a6:803:4d::29)
+        id S230366AbhFJPwz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Jun 2021 11:52:55 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:47044 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230298AbhFJPwz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Jun 2021 11:52:55 -0400
+Received: from zn.tnic (p200300ec2f0cf600591105fc6a1dcc4d.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:f600:5911:5fc:6a1d:cc4d])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1C6851EC047D;
+        Thu, 10 Jun 2021 17:50:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1623340257;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=/ucDEPiAjCNgh+5QYV19aaLxDA7Gu7w2xk6M9j+LUNE=;
+        b=hw2aXx8BFfNHa4IZlkwBdukgEW8Ik8YFYC6RGLU1bKHqwQ80CVn0B0VEaJxiCjJln46oPK
+        fYImG+6j+vFbfPd4bXZgu/g/Jzv1RMvR0bmq9ul0RLWe/yTIRreFOeWAtTyiBzTg2GEPDI
+        4imoc5EragOgkErfv4T4zV31vKEHWG8=
+Date:   Thu, 10 Jun 2021 17:50:51 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 11/22] x86/sev: Add helper for validating
+ pages in early enc attribute changes
+Message-ID: <YMI02+k2zk9eazjQ@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-12-brijesh.singh@amd.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.0.213] (78.97.206.147) by AM0PR04CA0131.eurprd04.prod.outlook.com (2603:10a6:208:55::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21 via Frontend Transport; Thu, 10 Jun 2021 14:52:08 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4a1fd4c5-35aa-41ba-b4e9-08d92c1f531b
-X-MS-TrafficTypeDiagnostic: VI1PR04MB4048:
-X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR04MB404803EE388E9643F578659898359@VI1PR04MB4048.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Xh5AAVHc/0r+Q/6paQlib+U4Wq5v41XOQbxdzL9cVfnn3PYWghw/8GpQgpn602X1SrtspvWXF1C492V4jW9vPohGQQMsPMdHvDRBqAJ4HakaCLMaN0iyjxYU09bRKVJTtAuD32slCUVZTmNwlCmE3QjIvnH4TrwUs8mIImQD7ENwtpHbonNJFDByP/jvOdvqXs6vFqI2bj8ZcXYSjFg3gBVoxUOY1XRMLplljgMqs3LWoRWrRyCBh2gK9KLC+CcTNKIzBpzDZ5wdUQ+pKe+Km8vAU2Z4CpkilVIsgv1ctrT7ImTHinGgEE4WsfeMInVZHhHsgPWDi5n/7J1st/7vLtrtOckky5RhVTC0dKechu/fQm8jYbHQiRe0s/qi5WPQiRR72dwsQOaGUaP4t03Jv5+bMfp4WOzR8kSZyv3VuwZL/D6XTSbF4q5YlQIStYWhyoAs+MinU1TfppxAmf9pNRcWMd6lRV3JoCkrCMCuD546TzY7EJ4I+zsr4Pai3LSrq9rmDTQkf64MSoG3JO+eP7L+ajepnDsrAY/MvTBpqGDjyYv9+ojNeZR8CNzgKL8IJpYvEsRyOyg/ms8Pi909BlsQd9MfCZYbHpyvUZp2GvqkXBTsEfO6QMn6HjU0HZSm1uTaCX6LABvD/UwDxwzFXBoNQmZuHcDh1Yf8zAo7cMaMZdbdBopkOLhgWu6ETzhDyVzzMXyD+iSggNs8BpSEcbC2xdA3kb5vw6MS/f4yTky3wFsFXY97OmOnx66EWisXYJFGiOdQN6CU20pn7UYW0W97oA8sMMQPcWeYM+GQ8xevF3xB8Wx6FeMgGKuwUZABrHuwH2lQ4kaD02ecI3sBkw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(366004)(136003)(396003)(39860400002)(346002)(38350700002)(16576012)(38100700002)(45080400002)(478600001)(8936002)(110136005)(54906003)(2616005)(966005)(83380400001)(5660300002)(31686004)(36756003)(26005)(4326008)(53546011)(66556008)(316002)(66476007)(31696002)(52116002)(86362001)(2906002)(66946007)(956004)(6486002)(186003)(7416002)(16526019)(8676002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?UTVQaXN1bWpjUmJkUFdheXhxd1lkZHdNdlFBOG9PZTl6TGVtbVMxQ2hpY25n?=
- =?utf-8?B?dXdCRjNnekhRUjR4ZUViMGRsYit1UGM4MFdMSzN5cFNIWmRHUTJWaXV2ckda?=
- =?utf-8?B?djVTUFNHQmM1cXN6SlBTSEo5N2JjYXVoMWNNR2VCcEltcFhPcVJkOU5sVk5J?=
- =?utf-8?B?TTZoa1hoeEw1c2hNK0pNb3FZamxlV1JUWTUzQU1xUnRYZEpicE84Nld5WnUv?=
- =?utf-8?B?Mi9uNUcyUDNaM3cyL0RvaEtIS2JsK2dwSjZqZFZ0M1gvV050Z1p2R0VjZk44?=
- =?utf-8?B?bmlRYmhvME9tQzlkTFM2SlIyeW92RnFkU1BaZEZGYzVzZWpQNlJhK3Zzcndo?=
- =?utf-8?B?Rk84YSt5ZFF1Snl5ZlV4U1lTVjJBV0pkS2paSDB2d0IwSWxsRUxXQ0hCSGxv?=
- =?utf-8?B?U0VQUDVjWUFoKzJLdm9Jc3BWK01QSGwwMGZIaW5YK2thUXhmME5idTh4S09J?=
- =?utf-8?B?aFd6cHhtSnFETDc2ZHRjeFFRZk5mLzNVTkZvTzVSN3JZQ2RRVVJqOGY2SlY3?=
- =?utf-8?B?eVVFQ2JmVC9wQzdoWVAwTEk2MStTMjl1dTJteTJYRHpTYis5L0ZsbFYwTytX?=
- =?utf-8?B?UlFIdHRVbW1uaUNQTGVQK0Z5VCtHNHdVK0JWR0dWRUJ4b1R6RVM5b2h3eklE?=
- =?utf-8?B?SWx4MnJ2NjZ4a1VRZWEvOUI3aEc0ZnlRa0UxOHpTS09ZR3Zlb21HV0JiNEdn?=
- =?utf-8?B?bHFZaS9OQmMzQnp2R0trMm9CazJQZm0xOFRyRHRKSDNtK0NNekZBMWdhSlll?=
- =?utf-8?B?ZFc2OXZ6bkpmRFZWL3pIRTc0cWhlZWRZazF6U1Rnd21paGFKbVlxemh6SnhR?=
- =?utf-8?B?MGRmZnM5QzIvSmtwY3lzR1hMRnhNOStiWjhacC8wN005UTRsOWVpcW9RRmVy?=
- =?utf-8?B?OGc1VE92aXpNaE8rMlRYYktHS3pnUjI2UTk4Z3lZVlArRUZsaEpQOXllN091?=
- =?utf-8?B?M1l3Q1lNSFZZWFFzR2I0cmgwbGlNbDZ4eE1UT2NtMmVzZjZxajVobUc3K3Yx?=
- =?utf-8?B?eGI3Nk9VYlNGbE5ma09IajRhd2NwQnp1NDZnd2luYzFaT0VGZjB2SWNwN1ox?=
- =?utf-8?B?M3paTitBS1JnL2Z1U21ydDZNNkx1M0hVTy95dGp4S0ZpZDhIcGJ3emdPYzNo?=
- =?utf-8?B?VEFtc09RdEdiOCtGVldxdlZpUXVZZ2R6eS8xdk1pVU1RaWt1M1dGOEFsY2U5?=
- =?utf-8?B?VmNFdk8xRTFqMmRGTXVyb1dRaDBTTlYySjZpZzFyZG50Q0pSczloMjVuY0px?=
- =?utf-8?B?aUN1czUvVVJicjRzelArbVhIa0pHRURQRjBYbzNLWEIvMjlXQ0Z5OVhBK0or?=
- =?utf-8?B?aWdzN3ZUM3c4L0p6Y3RJMm9hcnhZS3Y3VzM5Z0ZNUkpmTDVpL3JXZG9wZ2lw?=
- =?utf-8?B?NUkzaHhFNkhQdFZWUjQxWFVQalRCQTFDQ2JONGRrWG96bjBTanQ5NUlqWkFH?=
- =?utf-8?B?aXB2NTNqVGIrQ0ljUm4xZXpud2diWk0vdXNCNkgxZ3EvQ0pVaGkwVkRUUmhD?=
- =?utf-8?B?bDA0TGdYeVdmT0VoTFhPK1BrTElFTHFtV3Z2L0VRWXIvRGdpZTlDaGdPUlhT?=
- =?utf-8?B?eTJlV1lvMFhwYmZCeEdtdG5LTExLYTFVMXYyaWZpOG00R29kcEtUMkxFL2FC?=
- =?utf-8?B?MG12RHJrNjFHZElLY3NGQmgyVVFoTjNzUFRGN21CZ2N3YnhEKzYxVExDMzRk?=
- =?utf-8?B?UXNtTTd2NDYwVW1KRHNSeXdDalJJaGhZa2JXT2g0MW91SUU5YnljbVhLcExt?=
- =?utf-8?Q?TvPFlu98O3oRyZkbwywfyYoiyfn//xBYkyGlQwt?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4a1fd4c5-35aa-41ba-b4e9-08d92c1f531b
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2021 14:52:10.2087
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yxiJUdWkNjXNfAahzWa6om8Rg1S9NANYUtAumj/+/ktAQAZF2DTTil/hp2jEIL7Qtu6qTjyrqMJXSUwpH53H3g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB4048
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210602140416.23573-12-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/8/2021 5:35 AM, Dominique MARTINET wrote:
-> I'm not able to find any individual mails for Christoph's patches so
-> replying to the PR.
-> 
-The patch set is here:
-https://lore.kernel.org/linux-iommu/20210207160327.2955490-1-hch@lst.de
+On Wed, Jun 02, 2021 at 09:04:05AM -0500, Brijesh Singh wrote:
+> @@ -65,6 +65,12 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
+>  /* RMP page size */
+>  #define RMP_PG_SIZE_4K			0
+>  
+> +/* Memory opertion for snp_prep_memory() */
+> +enum snp_mem_op {
+> +	MEMORY_PRIVATE,
+> +	MEMORY_SHARED
 
-> In particular, this commit:
-> Konrad Rzeszutek Wilk wrote on Fri, Feb 26, 2021 at 11:00:08AM -0500:
->> Christoph Hellwig (8):
->>       swiotlb: don't modify orig_addr in swiotlb_tbl_sync_single
-> 
-> merged as 16fc3cef33a0, breaks caam as used today (thanks Lukas for
-> bisecting it!)
-> 
-Thanks.
+See below.
 
-I've noticed the failure also in v5.10 and v5.11 stable kernels,
-since the patch set has been backported.
+> +};
+> +
+>  #ifdef CONFIG_AMD_MEM_ENCRYPT
+>  extern struct static_key_false sev_es_enable_key;
+>  extern void __sev_es_ist_enter(struct pt_regs *regs);
+> @@ -103,6 +109,11 @@ static inline int pvalidate(unsigned long vaddr, bool rmp_psize, bool validate)
+>  
+>  	return rc;
+>  }
+> +void __init early_snp_set_memory_private(unsigned long vaddr, unsigned long paddr,
+> +		unsigned int npages);
+> +void __init early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr,
+> +		unsigned int npages);
 
-> 
-> More precisely, drivers/crypto/caam/caamalg.c does a lot of mappings
-> that aren't aligned:
-> 
-> dma_sync_single_for_device(jrdev, ctx->sh_desc_enc_dma,
->                            desc_bytes(desc), ctx->dir);
-> dma_sync_single_for_device(jrdev, ctx->sh_desc_dec_dma,
->                            desc_bytes(desc), ctx->dir);
-> 
-Right. These dma sync ops are in caaamalg.c and should be fixed.
+Align arguments on the opening brace.
 
-OTOH there are other dma sync ops in caam driver - e.g. caamhash.c:
-	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_dma,
-				   desc_bytes(desc), ctx->dir);
-where the mappings are aligned (see struct caam_hash_ctx),
-but even in this case the crypto algorithms are failing.
+> +void __init snp_prep_memory(unsigned long paddr, unsigned int sz, int op);
+>  #else
+>  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
+>  static inline void sev_es_ist_exit(void) { }
+> @@ -110,6 +121,15 @@ static inline int sev_es_setup_ap_jump_table(struct real_mode_header *rmh) { ret
+>  static inline void sev_es_nmi_complete(void) { }
+>  static inline int sev_es_efi_map_ghcbs(pgd_t *pgd) { return 0; }
+>  static inline int pvalidate(unsigned long vaddr, bool rmp_psize, bool validate) { return 0; }
+> +static inline void __init
+> +early_snp_set_memory_private(unsigned long vaddr, unsigned long paddr, unsigned int npages)
 
-> 
-> which can be caught by crypto tests with this caam enabled, for example
-> adding a warning when an unaligned mapping happens I get this trace:
-> --------
-> [ 1628.670226]  swiotlb_tbl_sync_single+0x74/0xa0
-> [ 1628.674677]  dma_sync_single_for_device+0xe4/0x110
-> [ 1628.679472]  skcipher_setkey+0xd0/0xf0
-> [ 1628.683224]  des3_skcipher_setkey+0x74/0xac
-> [ 1628.687416]  crypto_skcipher_setkey+0x54/0x110
-> [ 1628.691866]  crypto_authenc_setkey+0x94/0xd0
-> [ 1628.696138]  crypto_aead_setkey+0x34/0x10c
-> [ 1628.700236]  test_aead_vec_cfg+0x3a0/0x770
-> [ 1628.704338]  test_aead+0xac/0x130
-> [ 1628.707656]  alg_test_aead+0xa8/0x190
-> [ 1628.711324]  alg_test.part.0+0xf4/0x41c
-> [ 1628.715161]  alg_test+0x1c/0x60
-> [ 1628.718307]  do_test+0x37ec/0x4c50
-> [ 1628.721709]  do_test+0x4bec/0x4c50
-> [ 1628.725114]  tcrypt_mod_init+0x54/0xac
-> [ 1628.728864]  do_one_initcall+0x4c/0x1b0
-> [ 1628.732701]  kernel_init_freeable+0x1d0/0x234
-> [ 1628.737060]  kernel_init+0x10/0x114
-> [ 1628.740550]  ret_from_fork+0x10/0x24
-> -----
-> 
-> and the tests themselves also fail (all or at least most of them) with
-> e.g.
-> ------
-> [    8.454233] caam_jr 30901000.jr: 40001713: DECO: desc idx 23: Header Error. Invalid length or parity, or certain other problems.
-> [    8.465820] alg: ahash: hmac-sha256-caam final() failed with err -22 on test vector 0, cfg="init+update+final aligned buffer"
-> [    8.477149] ------------[ cut here ]------------
-> [    8.481781] alg: self-tests for hmac-sha256-caam (hmac(sha256)) failed (rc=-22)
-> [    8.481818] WARNING: CPU: 2 PID: 295 at crypto/testmgr.c:5645 alg_test.part.0+0x128/0x41c
-> [    8.497307] Modules linked in:
-> [    8.500365] CPU: 2 PID: 295 Comm: cryptomgr_test Tainted: G        W         5.13.0-rc5-00002-gc98cdee6172e #23
-> [    8.510455] Hardware name: NXP i.MX8MPlus EVK board (DT)
-> [    8.515767] pstate: 60000005 (nZCv daif -PAN -UAO -TCO BTYPE=--)
-> [    8.521778] pc : alg_test.part.0+0x128/0x41c
-> [    8.526050] lr : alg_test.part.0+0x128/0x41c
-> [    8.530324] sp : ffff80001371bd10
-> [    8.533637] x29: ffff80001371bd10 x28: 000000000000008f x27: 000000000000008f
-> [    8.540785] x26: 000000000000008f x25: 0000000000000400 x24: ffff8000111658c8
-> [    8.547930] x23: ffff0000c02aaa80 x22: 000000000001008f x21: ffff0000c02aaa00
-> [    8.555075] x20: 0000000000000085 x19: 00000000ffffffea x18: 00000000fffffffc
-> [    8.562221] x17: 0000000000000001 x16: 0000000000000003 x15: 0000000000000020
-> [    8.569365] x14: ffffffffffffffff x13: 00000000000003e7 x12: ffff80001371b9e0
-> [    8.576511] x11: ffff80001188c940 x10: ffff800011844300 x9 : ffff800011886b98
-> [    8.583658] x8 : ffff80001182eb98 x7 : ffff800011886b98 x6 : ffffffffffff0888
-> [    8.590801] x5 : 0000000000000000 x4 : 0000000000000000 x3 : 00000000ffffffff
-> [    8.597945] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff0000c1684e00
-> [    8.605093] Call trace:
-> [    8.607540]  alg_test.part.0+0x128/0x41c
-> [    8.611467]  alg_test+0x1c/0x60
-> [    8.614608]  cryptomgr_test+0x28/0x50
-> [    8.618275]  kthread+0x154/0x160
-> [    8.621511]  ret_from_fork+0x10/0x24
-> [    8.625088] ---[ end trace 2d195377ee3c219e ]---
-> ------
-> 
-> 
-> 
-> Looking at it a bit further it seems to me that swiotlb_bounce() should
-> either keep the offset (re-adding the line that was removed except it
-> would go back in swiotlb_bounce, diff at end of mail), or the size
-> should be adjusted to cover from the start of the page up until the
-> original offset + size which would also probably work (not tested)
-> 
-> That, or make unaligned mappings forbidden and warn when we see one, but
-> I have no idea what other component could be doing some -- I'm not sure
-> if what the caam code does it legitimate (e.g. would it be possible to
-> do the mappings once at init and use them?), but the swiotlb code
-> doesn't look quite right.
-> 
-Well, it's not only about unaligned accesses.
+Put those { } at the end of the line:
 
-It's also about partial syncs, e.g.
-	dma_handle = dma_map_single(dev, cpu_addr, size, DMA_BIDIRECTIONAL);
-	[...]
-	dma_sync_single_for_device(dev, dma_handle + offset, size - offset,
-				   DMA_BIDIRECTIONAL);
-(where dma_handle + offset should be cacheline-aligned).
+early_snp_set_memory_private(unsigned long vaddr, unsigned long paddr, unsigned int npages) { }
 
-Documentation/core-api/dma-api.rst explicitly allows for partial syncs:
-Synchronise a single contiguous or scatter/gather mapping for the CPU
-and device. With the sync_sg API, all the parameters must be the same
-as those passed into the single mapping API. With the sync_single API,
-you can use dma_handle and size parameters that aren't identical to
-those passed into the single mapping API to do a partial sync.
+no need for separate lines. Ditto below.
 
-AFAICS commit 16fc3cef33a0 ("swiotlb: don't modify orig_addr in swiotlb_tbl_sync_single")
-is breaking this functionality.
+> +{
+> +}
+> +static inline void __init
+> +early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr, unsigned int npages)
+> +{
+> +}
+> +static inline void __init snp_prep_memory(unsigned long paddr, unsigned int sz, int op) { }
+>  #endif
+>  
+>  #endif
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 455c09a9b2c2..6e9b45bb38ab 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -532,6 +532,111 @@ static u64 get_jump_table_addr(void)
+>  	return ret;
+>  }
+>  
+> +static void pvalidate_pages(unsigned long vaddr, unsigned int npages, bool validate)
+> +{
+> +	unsigned long vaddr_end;
+> +	int rc;
+> +
+> +	vaddr = vaddr & PAGE_MASK;
+> +	vaddr_end = vaddr + (npages << PAGE_SHIFT);
+> +
+> +	while (vaddr < vaddr_end) {
+> +		rc = pvalidate(vaddr, RMP_PG_SIZE_4K, validate);
+> +		if (WARN(rc, "Failed to validate address 0x%lx ret %d", vaddr, rc))
+> +			sev_es_terminate(1, GHCB_TERM_PVALIDATE);
+					^^
 
-Thanks,
-Horia
+I guess that 1 should be a define too, if we have to be correct:
+
+			sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_PVALIDATE);
+
+or so. Ditto for all other calls of this.
+
+> +
+> +		vaddr = vaddr + PAGE_SIZE;
+> +	}
+> +}
+> +
+> +static void __init early_set_page_state(unsigned long paddr, unsigned int npages, int op)
+> +{
+> +	unsigned long paddr_end;
+> +	u64 val;
+> +
+> +	paddr = paddr & PAGE_MASK;
+> +	paddr_end = paddr + (npages << PAGE_SHIFT);
+> +
+> +	while (paddr < paddr_end) {
+> +		/*
+> +		 * Use the MSR protocol because this function can be called before the GHCB
+> +		 * is established.
+> +		 */
+> +		sev_es_wr_ghcb_msr(GHCB_MSR_PSC_REQ_GFN(paddr >> PAGE_SHIFT, op));
+> +		VMGEXIT();
+> +
+> +		val = sev_es_rd_ghcb_msr();
+> +
+> +		if (GHCB_RESP_CODE(val) != GHCB_MSR_PSC_RESP)
+
+From a previous review:
+
+Does that one need a warning too or am I being too paranoid?
+
+> +			goto e_term;
+> +
+> +		if (WARN(GHCB_MSR_PSC_RESP_VAL(val),
+> +			 "Failed to change page state to '%s' paddr 0x%lx error 0x%llx\n",
+> +			 op == SNP_PAGE_STATE_PRIVATE ? "private" : "shared",
+> +			 paddr, GHCB_MSR_PSC_RESP_VAL(val)))
+> +			goto e_term;
+> +
+> +		paddr = paddr + PAGE_SIZE;
+> +	}
+> +
+> +	return;
+> +
+> +e_term:
+> +	sev_es_terminate(1, GHCB_TERM_PSC);
+> +}
+> +
+> +void __init early_snp_set_memory_private(unsigned long vaddr, unsigned long paddr,
+> +					 unsigned int npages)
+> +{
+> +	if (!sev_feature_enabled(SEV_SNP))
+> +		return;
+> +
+> +	 /* Ask hypervisor to add the memory pages in RMP table as a 'private'. */
+
+	    Ask the hypervisor to mark the memory pages as private in the RMP table.
+
+> +	early_set_page_state(paddr, npages, SNP_PAGE_STATE_PRIVATE);
+> +
+> +	/* Validate the memory pages after they've been added in the RMP table. */
+> +	pvalidate_pages(vaddr, npages, 1);
+> +}
+> +
+> +void __init early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr,
+> +					unsigned int npages)
+> +{
+> +	if (!sev_feature_enabled(SEV_SNP))
+> +		return;
+> +
+> +	/*
+> +	 * Invalidate the memory pages before they are marked shared in the
+> +	 * RMP table.
+> +	 */
+> +	pvalidate_pages(vaddr, npages, 0);
+> +
+> +	 /* Ask hypervisor to make the memory pages shared in the RMP table. */
+
+			      mark
+
+> +	early_set_page_state(paddr, npages, SNP_PAGE_STATE_SHARED);
+> +}
+> +
+> +void __init snp_prep_memory(unsigned long paddr, unsigned int sz, int op)
+> +{
+> +	unsigned long vaddr, npages;
+> +
+> +	vaddr = (unsigned long)__va(paddr);
+> +	npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
+> +
+> +	switch (op) {
+> +	case MEMORY_PRIVATE: {
+> +		early_snp_set_memory_private(vaddr, paddr, npages);
+> +		return;
+> +	}
+> +	case MEMORY_SHARED: {
+> +		early_snp_set_memory_shared(vaddr, paddr, npages);
+> +		return;
+> +	}
+> +	default:
+> +		break;
+> +	}
+> +
+> +	WARN(1, "invalid memory op %d\n", op);
+
+A lot easier, diff ontop of your patch:
+
+---
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index 7c2cb5300e43..2ad4b5ab3f6c 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -65,12 +65,6 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
+ /* RMP page size */
+ #define RMP_PG_SIZE_4K			0
+ 
+-/* Memory opertion for snp_prep_memory() */
+-enum snp_mem_op {
+-	MEMORY_PRIVATE,
+-	MEMORY_SHARED
+-};
+-
+ #ifdef CONFIG_AMD_MEM_ENCRYPT
+ extern struct static_key_false sev_es_enable_key;
+ extern void __sev_es_ist_enter(struct pt_regs *regs);
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index 2a5dce42af35..991d7964cee9 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -662,20 +662,13 @@ void __init snp_prep_memory(unsigned long paddr, unsigned int sz, int op)
+ 	vaddr = (unsigned long)__va(paddr);
+ 	npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
+ 
+-	switch (op) {
+-	case MEMORY_PRIVATE: {
++	if (op == SNP_PAGE_STATE_PRIVATE)
+ 		early_snp_set_memory_private(vaddr, paddr, npages);
+-		return;
+-	}
+-	case MEMORY_SHARED: {
++	else if (op == SNP_PAGE_STATE_SHARED)
+ 		early_snp_set_memory_shared(vaddr, paddr, npages);
+-		return;
++	else {
++		WARN(1, "invalid memory page op %d\n", op);
+ 	}
+-	default:
+-		break;
+-	}
+-
+-	WARN(1, "invalid memory op %d\n", op);
+ }
+ 
+ int sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
+---
+
+>  static char sme_early_buffer[PAGE_SIZE] __initdata __aligned(PAGE_SIZE);
+>  
+> +/*
+> + * When SNP is active, changes the page state from private to shared before
+
+s/changes/change/
+
+> + * copying the data from the source to destination and restore after the copy.
+> + * This is required because the source address is mapped as decrypted by the
+> + * caller of the routine.
+> + */
+> +static inline void __init snp_memcpy(void *dst, void *src, size_t sz,
+> +				     unsigned long paddr, bool decrypt)
+> +{
+> +	unsigned long npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
+> +
+> +	if (!sev_feature_enabled(SEV_SNP) || !decrypt) {
+> +		memcpy(dst, src, sz);
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * If the paddr needs to be accessed decrypted, mark the page
+
+What do you mean "If" - this is the SNP version of memcpy. Just say:
+
+	/*
+	 * With SNP, the page address needs to be ...
+	 */
+
+> +	 * shared in the RMP table before copying it.
+> +	 */
+> +	early_snp_set_memory_shared((unsigned long)__va(paddr), paddr, npages);
+> +
+> +	memcpy(dst, src, sz);
+> +
+> +	/* Restore the page state after the memcpy. */
+> +	early_snp_set_memory_private((unsigned long)__va(paddr), paddr, npages);
+> +}
+> +
+>  /*
+>   * This routine does not change the underlying encryption setting of the
+>   * page(s) that map this memory. It assumes that eventually the memory is
+> @@ -96,8 +125,8 @@ static void __init __sme_early_enc_dec(resource_size_t paddr,
+>  		 * Use a temporary buffer, of cache-line multiple size, to
+>  		 * avoid data corruption as documented in the APM.
+>  		 */
+> -		memcpy(sme_early_buffer, src, len);
+> -		memcpy(dst, sme_early_buffer, len);
+> +		snp_memcpy(sme_early_buffer, src, len, paddr, enc);
+> +		snp_memcpy(dst, sme_early_buffer, len, paddr, !enc);
+>  
+>  		early_memunmap(dst, len);
+>  		early_memunmap(src, len);
+> @@ -277,9 +306,23 @@ static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
+>  	else
+>  		sme_early_decrypt(pa, size);
+>  
+> +	/*
+> +	 * If page is getting mapped decrypted in the page table, then the page state
+> +	 * change in the RMP table must happen before the page table updates.
+> +	 */
+> +	if (!enc)
+> +		early_snp_set_memory_shared((unsigned long)__va(pa), pa, 1);
+
+Merge the two branches:
+
+	/* Encrypt/decrypt the contents in-place */
+        if (enc) {
+                sme_early_encrypt(pa, size);
+        } else {
+                sme_early_decrypt(pa, size);
+
+                /*
+                 * On SNP, the page state change in the RMP table must happen
+                 * before the page table updates.
+                 */
+                early_snp_set_memory_shared((unsigned long)__va(pa), pa, 1);
+        }
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
