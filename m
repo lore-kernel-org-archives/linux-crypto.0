@@ -2,127 +2,148 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,FORGED_MUA_MOZILLA,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7998C48BD1
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 16:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D10C48BE0
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 20:25:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BA8961181
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 16:22:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C780613C6
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 20:25:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229753AbhFKQYk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Jun 2021 12:24:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51428 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229634AbhFKQYk (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jun 2021 12:24:40 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 159C1C0617AF
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Jun 2021 09:22:42 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id f30so9400916lfj.1
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Jun 2021 09:22:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=O7VLGpzo0pic/uCZ5FLPezepVfzXChJpgysJmVZaFsc=;
-        b=J/Dt9jQa1QKH8awC7zPDGpIDCC1B4T52bk/xbJkYWmrsyiPBf1xyBpuuJ6YktX8o19
-         OGXWD4ofRJ+1Y/e3NXpAm87lNARcyx+eUZLb2kGvTbni8Z4d4UmVsZbpfpQ1wYz+9Ynn
-         Tu2YFuveWjy2F/JCy1EWycl4zSkeUBSU/byuI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=O7VLGpzo0pic/uCZ5FLPezepVfzXChJpgysJmVZaFsc=;
-        b=TwXuIVICd22R/qN57MWlKHqtI+I8mBy/Kd51Fqy/qZxupnPYZEB0oVMqvxgVhBgqVN
-         juvRURSfuoGwsOlheQejl2LaXLJDIN/UjINJpU1eii4IkLo8XETfddEN8S1lUGJF9O2P
-         CTRVDYJuJmxpZrRoLsa23QP3ZS4YfaGCnUMBO33mhzHb1LJBilsE0CillNaCFM1vWDJ5
-         zCX8/OMEWqmOxQg8AI28ECzxBNJ+BwOLnfId46Gi/xFZF/YRMipxvye/D5BWQYSUqkVu
-         xKpBwpKDSkT6zh7Q/xQnBQPkIRWu8x5xqnjVpldDKJJanLmgYZeIwkETDmMf73nhk5UD
-         1/BA==
-X-Gm-Message-State: AOAM531Yej/+6Cqt10BnGr5TFjyB7Qksf5Z66ARHoEe/0rBEc/ggAcH1
-        YDIpKmv9tbXXsvHkrZF/xi46a0zoTNCZP2zV4b0=
-X-Google-Smtp-Source: ABdhPJzYVOgVTgEhDdH9AOkaJ7v66TE3XzEFcPS4P2xnlJG8YShtPBjZsktOcCBekR2GJ5E4PQ3aBg==
-X-Received: by 2002:a19:ed04:: with SMTP id y4mr3140783lfy.562.1623428560163;
-        Fri, 11 Jun 2021 09:22:40 -0700 (PDT)
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com. [209.85.208.172])
-        by smtp.gmail.com with ESMTPSA id h22sm774252ljk.133.2021.06.11.09.21.59
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jun 2021 09:22:12 -0700 (PDT)
-Received: by mail-lj1-f172.google.com with SMTP id r16so10540986ljc.0
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Jun 2021 09:21:59 -0700 (PDT)
-X-Received: by 2002:a2e:c52:: with SMTP id o18mr3611750ljd.411.1623428518600;
- Fri, 11 Jun 2021 09:21:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <YDkbCHHBUOmfI59K@Konrads-MacBook-Pro.local> <YL7XXNOnbaDgmTB9@atmark-techno.com>
- <2e899de2-4b69-c4b6-33a6-09fb8949d2fd@nxp.com> <20210611062153.GA30906@lst.de>
- <YMM8Ua0HMmErLIQg@0xbeefdead.lan>
-In-Reply-To: <YMM8Ua0HMmErLIQg@0xbeefdead.lan>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 11 Jun 2021 09:21:42 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgxgTB=G7P6KRneAd0s310WYK2NDisXM5P-wsNibgLrQA@mail.gmail.com>
-Message-ID: <CAHk-=wgxgTB=G7P6KRneAd0s310WYK2NDisXM5P-wsNibgLrQA@mail.gmail.com>
-Subject: Re: swiotlb/caamjr regression (Was: [GIT PULL] (swiotlb) stable/for-linus-5.12)
-To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Dominique MARTINET <dominique.martinet@atmark-techno.com>,
-        jianxiong Gao <jxgao@google.com>,
-        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Lukas Hartmann <lukas@mntmn.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S229951AbhFKU1C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Jun 2021 16:27:02 -0400
+Received: from ciao.gmane.io ([116.202.254.214]:35424 "EHLO ciao.gmane.io"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229937AbhFKU1C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jun 2021 16:27:02 -0400
+X-Greylist: delayed 301 seconds by postgrey-1.27 at vger.kernel.org; Fri, 11 Jun 2021 16:27:02 EDT
+Received: from list by ciao.gmane.io with local (Exim 4.92)
+        (envelope-from <glkc-linux-crypto@m.gmane-mx.org>)
+        id 1lrndK-0005WL-4K
+        for linux-crypto@vger.kernel.org; Fri, 11 Jun 2021 22:20:02 +0200
+X-Injected-Via-Gmane: http://gmane.org/
+To:     linux-crypto@vger.kernel.org
+From:   Jean-Denis Girard <jd.girard@sysnux.pf>
+Subject: Re: [GIT PULL][PATCH v11 0/4] Update to zstd-1.4.10
+Date:   Fri, 11 Jun 2021 10:06:58 -1000
+Message-ID: <sa0fp3$12s9$1@ciao.gmane.io>
+References: <20210430013157.747152-1-nickrterrell@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <20210430013157.747152-1-nickrterrell@gmail.com>
+Content-Language: fr
+Cc:     linux-btrfs@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 11, 2021 at 3:35 AM Konrad Rzeszutek Wilk
-<konrad.wilk@oracle.com> wrote:
->
-> Linus,
->
-> Would you be terribly offended if I took your code (s/unsigned
-> long/unsigned int), and used Chanho's description of the problem (see below)?
+Hi list,
 
-No offense to that at all - that looks like the right solution. See my
-answer to Christoph: I do think my patch does the right one, but I
-can't test it and my knowledge of the swiotlb code is not complete
-enough to really do anything else than "this looks right".
+Le 29/04/2021 à 15:31, Nick Terrell a écrit :
+> From: Nick Terrell <terrelln@fb.com>
+> 
+> Please pull from
+> 
+>    git@github.com:terrelln/linux.git tags/v11-zstd-1.4.10
+> 
+> to get these changes. Alternatively the patchset is included.
+> 
+> This patchset lists me as the maintainer for zstd and upgrades the zstd library
+> to the latest upstream release. The current zstd version in the kernel is a
+> modified version of upstream zstd-1.3.1. At the time it was integrated, zstd
+> wasn't ready to be used in the kernel as-is. But, it is now possible to use
+> upstream zstd directly in the kernel.
+> 
+> I have not yet released zstd-1.4.10 upstream. I want the zstd version in the
+> kernel to match up with a known upstream release, so we know exactly what code
+> is running. Whenever this patchset is ready for merge, I will cut a release at
+> the upstream commit that gets merged. This should not be necessary for future
+> releases.
+> 
+> The kernel zstd library is automatically generated from upstream zstd. A script
+> makes the necessary changes and imports it into the kernel. The changes are:
+> 
+> 1. Replace all libc dependencies with kernel replacements and rewrite includes.
+> 2. Remove unncessary portability macros like: #if defined(_MSC_VER).
+> 3. Use the kernel xxhash instead of bundling it.
+> 
+> This automation gets tested every commit by upstream's continuous integration.
+> When we cut a new zstd release, we will submit a patch to the kernel to update
+> the zstd version in the kernel.
+> 
+> I've updated zstd to upstream with one big patch because every commit must build,
+> so that precludes partial updates. Since the commit is 100% generated, I hope the
+> review burden is lightened. I considered replaying upstream commits, but that is
+> not possible because there have been ~3500 upstream commits since the last zstd
+> import, and the commits don't all build individually. The bulk update preserves
+> bisectablity because bugs can be bisected to the zstd version update. At that
+> point the update can be reverted, and we can work with upstream to find and fix
+> the bug. After this big switch in how the kernel consumes zstd, future patches
+> will be smaller, because they will only have one upstream release worth of
+> changes each.
+> 
+> This patchset adds a new kernel-style wrapper around zstd. This wrapper API is
+> functionally equivalent to the subset of the current zstd API that is currently
+> used. The wrapper API changes to be kernel style so that the symbols don't
+> collide with zstd's symbols. The update to zstd-1.4.6 maintains the same API
+> and preserves the semantics, so that none of the callers need to be updated.
+> 
+> This patchset comes in 2 parts:
+> 1. The first 2 patches prepare for the zstd upgrade. The first patch adds the
+>     new kernel style API so zstd can be upgraded without modifying any callers.
+>     The second patch adds an indirection for the lib/decompress_unzstd.c
+>     including of all decompression source files.
+> 2. Import zstd-1.4.10. This patch is completely generated from upstream using
+>     automated tooling.
+> 
+> I tested every caller of zstd on x86_64. I tested both after the 1.4.10 upgrade
+> using the compatibility wrapper, and after the final patch in this series.
+> 
+> I tested kernel and initramfs decompression in i386 and arm.
+> 
+> I ran benchmarks to compare the current zstd in the kernel with zstd-1.4.6.
+> I benchmarked on x86_64 using QEMU with KVM enabled on an Intel i9-9900k.
+> I found:
+> * BtrFS zstd compression at levels 1 and 3 is 5% faster
+> * BtrFS zstd decompression+read is 15% faster
+> * SquashFS zstd decompression+read is 15% faster
+> * F2FS zstd compression+write at level 3 is 8% faster
+> * F2FS zstd decompression+read is 20% faster
+> * ZRAM decompression+read is 30% faster
+> * Kernel zstd decompression is 35% faster
+> * Initramfs zstd decompression+build is 5% faster
+> 
+> The latest zstd also offers bug fixes. For example the problem with large kernel
+> decompression has been fixed upstream for over 2 years
+> https://lkml.org/lkml/2020/9/29/27.
+> 
+> Please let me know if there is anything that I can do to ease the way for these
+> patches. I think it is important because it gets large performance improvements,
+> contains bug fixes, and is switching to a more maintainable model of consuming
+> upstream zstd directly, making it easy to keep up to date.
+> 
+> Best,
+> Nick Terrell
 
-And adding my sign-off to the patch is fine, but I don't necessarily
-need the authorship credit - mine was a throw-away patch just looking
-at what the bisection report said. All the real effort was by the
-reporters (and for the commit message, Bumyong Lee & co).
 
-Finally - looking at the two places that do have that
-swiotlb_align_offset(), my reaction is "I don't understand what that
-code is doing".
+I've been using this series on stable kernel since 5.12.3 (now on 
+5.12.10) on my main system without issues.
 
-The index does that
+Tested-by: Jean-Denis Girard <jd.girard@sysnux.pf>
 
-        index = find_slots(dev, orig_addr, alloc_size + offset);
 
-so that offset does seem to depend on how the find_slots code works.
-Which in turn does use the same dma_get_min_align_mask() thing that
-swiotlb_align_offset() uses.  So the offsets do seem to match, but
-find_slots(dev() does a lot of stuff that I don't know. so...
+Thanks,
+-- 
+Jean-Denis Girard
 
-IOW, it does reinforce my "I don't know this code AT ALL". Which just
-makes me more convinced that I shouldn't get authorship of the patch
-because if something goes wrong with it, I can't help.
+SysNux                   Systèmes   Linux   en   Polynésie  française
+https://www.sysnux.pf/   Tél: +689 40.50.10.40 / GSM: +689 87.797.527
 
-So at most maybe a "Suggested-by:".
-
-My patch really was based on very little context and "this is the
-calculation that makes sense given the other calculations in the
-function".
-
-              Linus
