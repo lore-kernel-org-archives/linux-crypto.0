@@ -2,102 +2,251 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA56C48BE0
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 09:45:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC7AFC48BE0
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 09:46:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABC99613D5
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 09:45:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A63DD61287
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 09:46:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229480AbhFKJrE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Jun 2021 05:47:04 -0400
-Received: from mail-wm1-f50.google.com ([209.85.128.50]:53861 "EHLO
-        mail-wm1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231574AbhFKJrE (ORCPT
+        id S231667AbhFKJsh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Jun 2021 05:48:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47890 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231665AbhFKJsg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jun 2021 05:47:04 -0400
-Received: by mail-wm1-f50.google.com with SMTP id b205so3037440wmb.3
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Jun 2021 02:45:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=Iohi461kjcJMARSaZJtMtzgG1Y04ZNwqpJYB6vEREOE=;
-        b=Ym8Hcdc8JD8YE1hevYjwN5wHnINI60kjdJnJgyB0GfB8M66tpxkw+8vA1wrwbvQcV0
-         jdFieWUBRPqTqAvQYpzXy1MogRF2dgdZzQ9Ei6bzEB7JQHrQL70S4/95mUZt0lLkAM28
-         LqarfU7FK856wqutC5XWrjTOB3AVrT5sojFHhEFHyvo2nxH9SOPoKMqyLpQ4kbX73riK
-         mHwrU7n2oNf8Gw3h1x4O7mkW8HgDmNyLF/tlCjW1CYsbFU733TEaWPfY6RGFvVoA8Y4H
-         7/4TcOUnADQK8ACBIslL7bnRqhwkZVFHc5oaILZfpPfxTwVrx+OXvdQWfp4MCEJ66jTL
-         3QQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=Iohi461kjcJMARSaZJtMtzgG1Y04ZNwqpJYB6vEREOE=;
-        b=HPQipksMsxp6/yv95C7FdAzi/IUDcb1URLZHvEYGHHC+I28t297Ajdf4dUBFHz/fI0
-         y/8The2u/9xvShdrKfFJ1Lsas/I9+h1eVjMa2H/cP/vjZY+W5JYzkbskgCju3Mwq1IMn
-         cVy2O8NAMnvkZKHK95TY3EEOWQZtaeo+H25mBO62uIlctptXBwNlpq57KabPeac/3VS9
-         KzWj9eiJNThr/8W9PoA2hpdFACpXOBg1yrL1+CRx8t8uq47jFDfQycLBgvEh1+7E5c8f
-         tUTrn1p70IDRVkgf8tHkuncj36wPAypGAp0x5sVd72UA/JyooLqMq28J2YBvuOJuYQRW
-         oE0w==
-X-Gm-Message-State: AOAM531zt63vQgUmg/t4vd2fKCaZX8alCG0C4imS7q+9xePCEaIWTcTf
-        NzRC93JTVrkXdJv1sgYBtatGKLZb8wMt5Nk8G0T3mFwVZzw=
-X-Google-Smtp-Source: ABdhPJy9m2r9OaAQWG+tlKB6rQYExtmtyg2ZFLH2qcpQ2fU7jqcOwtapOfWrdv/34RcyqMBvhSLWGyfItrQDf/UVbwk=
-X-Received: by 2002:a7b:c192:: with SMTP id y18mr19502274wmi.65.1623404645585;
- Fri, 11 Jun 2021 02:44:05 -0700 (PDT)
+        Fri, 11 Jun 2021 05:48:36 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FCBFC061574;
+        Fri, 11 Jun 2021 02:46:38 -0700 (PDT)
+Received: from zn.tnic (p2e584d18.dip0.t-ipconnect.de [46.88.77.24])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 575011EC056B;
+        Fri, 11 Jun 2021 11:46:36 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1623404796;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=pIMNvquN7Yk04MU9AUNgn/GvSbJpSgYJlr5tfol/dGg=;
+        b=NbqOZf7MlRJZ2KcZbt+hvJUI2BDZeUwT6CiGj6Ims6a6THannsqU5vJgtU+o5tIheT3bjq
+        YVcUD/Uf6HdMndfxtei0l16Wlfoc7AY6ac7CdzWNq2Rrbl9Yltmhky8LWnYFb27od18e+j
+        2S8Vj661tQC5cY80ZFV8+KUhhgkUwQE=
+Date:   Fri, 11 Jun 2021 11:44:20 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 14/22] x86/mm: Add support to validate
+ memory when changing C-bit
+Message-ID: <YMMwdJRwbbsh1VVO@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-15-brijesh.singh@amd.com>
 MIME-Version: 1.0
-References: <CALFqKjSnOWyFjp7NQZKMXQ+TfzXMCBS=y8xnv5GE56SHVr5tCg@mail.gmail.com>
- <CACXcFmnRAkrj0Q3uFjyLu7RaWQh0VPbmErkj+cUaxZMb=YiGCw@mail.gmail.com>
-In-Reply-To: <CACXcFmnRAkrj0Q3uFjyLu7RaWQh0VPbmErkj+cUaxZMb=YiGCw@mail.gmail.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Fri, 11 Jun 2021 17:43:52 +0800
-Message-ID: <CACXcFmmW+tCUf8JS=a=wJEnBY2JojP8VwEGLncYcGLZqiU+5Jw@mail.gmail.com>
-Subject: Re: Lockless /dev/random - Performance/Security/Stability improvement
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Ted Ts'o" <tytso@mit.edu>, Stephan Mueller <smueller@chronox.de>,
-        John Denker <jsd@av8n.com>, m@ib.tc
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210602140416.23573-15-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Sandy Harris <sandyinchina@gmail.com> wrote:
+On Wed, Jun 02, 2021 at 09:04:08AM -0500, Brijesh Singh wrote:
+> +/* SNP Page State Change NAE event */
+> +#define VMGEXIT_PSC_MAX_ENTRY		253
+> +
+> +struct __packed snp_page_state_header {
 
-> The basic ideas here look good to me; I will look at details later.
+psc_hdr
 
-Looking now, finding some things questionable.
+> +	u16 cur_entry;
+> +	u16 end_entry;
+> +	u32 reserved;
+> +};
+> +
+> +struct __packed snp_page_state_entry {
 
-Your doc has:
+psc_entry
 
-" /dev/random needs to be fast, and in the past it relied on using a
-cryptographic primitive for expansion of PNRG to fill a given request
+> +	u64	cur_page	: 12,
+> +		gfn		: 40,
+> +		operation	: 4,
+> +		pagesize	: 1,
+> +		reserved	: 7;
+> +};
+> +
+> +struct __packed snp_page_state_change {
 
-" urandom on the other hand uses a cryptographic primitive to compact
-rather than expand,
+snp_psc_desc
 
-This does not seem coherent to me & as far as I can tell, it is wrong as well.
-/dev/random neither uses a PRNG nor does expansion.
-/dev/urandom does both, but you seem to be saying the opposite.
+or so.
 
-" We can assume AES preserves confidentiality...
+> +	struct snp_page_state_header header;
+> +	struct snp_page_state_entry entry[VMGEXIT_PSC_MAX_ENTRY];
+> +};
 
-That is a reasonable assumption & it does make the design easier, but
-is it necessary? If I understood some of Ted's writing correctly, one
-of his design goals was not to have to trust the crypto too much. It
-seems to me that is a worthy goal. One of John Denker's papers has
-some quite nice stuff about using a hash function to compress input
-data while preserving entropy. It needs only quite weak assumptions
-about the hash.
-https://www.av8n.com/turbid/
+Which would make this struct a lot more readable:
 
-You want to use AES in OFB mode. Why? The existing driver uses ChaCha,
-I think mainly because it is faster.
+struct __packed snp_psc_desc {
+	struct psc_hdr hdr;
+	struct psc_entry entries[VMGEXIT_PSC_MAX_ENTRY];
 
-The classic analysis of how to use a block cipher to build a hash is
-Preneel et al.
-https://link.springer.com/content/pdf/10.1007%2F3-540-48329-2_31.pdf
-As I recall, it examines 64 possibilities & finds only 9 are secure. I
-do not know if OFB, used as you propose, is one of those. Do you?
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 6e9b45bb38ab..4847ac81cca3 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -637,6 +637,113 @@ void __init snp_prep_memory(unsigned long paddr, unsigned int sz, int op)
+>  	WARN(1, "invalid memory op %d\n", op);
+>  }
+>  
+> +static int page_state_vmgexit(struct ghcb *ghcb, struct snp_page_state_change *data)
+
+vmgexit_psc
+
+> +{
+> +	struct snp_page_state_header *hdr;
+> +	int ret = 0;
+> +
+> +	hdr = &data->header;
+
+Make sure to verify that snp_page_state_header.reserved field is always
+0 before working more on the header so that people don't put stuff in
+there which you cannot change later because it becomes ABI or whatnot.
+Ditto for the other reserved fields.
+
+> +
+> +	/*
+> +	 * As per the GHCB specification, the hypervisor can resume the guest before
+> +	 * processing all the entries. The loop checks whether all the entries are
+
+s/The loop checks/Check/
+
+> +	 * processed. If not, then keep retrying.
+
+What guarantees that that loop will terminate eventually?
+
+> +	 */
+> +	while (hdr->cur_entry <= hdr->end_entry) {
+
+I see that "[t]he hypervisor should ensure that cur_entry and end_entry
+represent values within the limits of the GHCB Shared Buffer." but let's
+sanity-check that HV here too. We don't trust it, remember? :)
+
+> +
+> +		ghcb_set_sw_scratch(ghcb, (u64)__pa(data));
+> +
+> +		ret = sev_es_ghcb_hv_call(ghcb, NULL, SVM_VMGEXIT_PSC, 0, 0);
+> +
+> +		/* Page State Change VMGEXIT can pass error code through exit_info_2. */
+> +		if (WARN(ret || ghcb->save.sw_exit_info_2,
+> +			 "SEV-SNP: page state change failed ret=%d exit_info_2=%llx\n",
+> +			 ret, ghcb->save.sw_exit_info_2))
+> +			return 1;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void set_page_state(unsigned long vaddr, unsigned int npages, int op)
+> +{
+> +	struct snp_page_state_change *data;
+> +	struct snp_page_state_header *hdr;
+> +	struct snp_page_state_entry *e;
+> +	unsigned long vaddr_end;
+> +	struct ghcb_state state;
+> +	struct ghcb *ghcb;
+> +	int idx;
+> +
+> +	vaddr = vaddr & PAGE_MASK;
+> +	vaddr_end = vaddr + (npages << PAGE_SHIFT);
+
+Move those...
+
+> +
+> +	ghcb = sev_es_get_ghcb(&state);
+> +	if (unlikely(!ghcb))
+> +		panic("SEV-SNP: Failed to get GHCB\n");
+
+<--- ... here.
+
+> +
+> +	data = (struct snp_page_state_change *)ghcb->shared_buffer;
+> +	hdr = &data->header;
+> +
+> +	while (vaddr < vaddr_end) {
+> +		e = data->entry;
+> +		memset(data, 0, sizeof(*data));
+> +
+> +		for (idx = 0; idx < VMGEXIT_PSC_MAX_ENTRY; idx++, e++) {
+> +			unsigned long pfn;
+> +
+> +			if (is_vmalloc_addr((void *)vaddr))
+> +				pfn = vmalloc_to_pfn((void *)vaddr);
+> +			else
+> +				pfn = __pa(vaddr) >> PAGE_SHIFT;
+> +
+> +			e->gfn = pfn;
+> +			e->operation = op;
+> +			hdr->end_entry = idx;
+> +
+> +			/*
+> +			 * The GHCB specification provides the flexibility to
+> +			 * use either 4K or 2MB page size in the RMP table.
+> +			 * The current SNP support does not keep track of the
+> +			 * page size used in the RMP table. To avoid the
+> +			 * overlap request, use the 4K page size in the RMP
+> +			 * table.
+> +			 */
+> +			e->pagesize = RMP_PG_SIZE_4K;
+> +			vaddr = vaddr + PAGE_SIZE;
+
+Please put that
+			e++;
+
+here.
+
+It took me a while to find it hidden at the end of the loop and was
+scratching my head as to why are we overwriting e-> everytime.
+
+> +
+> +			if (vaddr >= vaddr_end)
+> +				break;
+
+Instead of this silly check here, you can compute the range starting at
+vaddr, VMGEXIT_PSC_MAX_ENTRY pages worth, carve out that second for-loop
+in a helper called
+
+__set_page_state()
+
+which does the data preparation and does the vmgexit at the end.
+
+Then the outer loop does only the computation and calls that helper.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
