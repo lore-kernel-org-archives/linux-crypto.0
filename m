@@ -7,54 +7,53 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F3DC4743D
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 07:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C43C4743D
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 07:17:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2DD44613AE
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 07:03:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EE86613B4
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 07:17:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230303AbhFKHF2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Jun 2021 03:05:28 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:50544 "EHLO deadmen.hmeau.com"
+        id S230205AbhFKHTN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Jun 2021 03:19:13 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50546 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230168AbhFKHF2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jun 2021 03:05:28 -0400
+        id S230188AbhFKHTM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jun 2021 03:19:12 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lrbCK-0004pj-MH; Fri, 11 Jun 2021 15:03:20 +0800
+        id 1lrbPi-00057q-HA; Fri, 11 Jun 2021 15:17:10 +0800
 Received: from herbert by gondobar with local (Exim 4.92)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lrbC5-0003l8-K7; Fri, 11 Jun 2021 15:03:05 +0800
-Date:   Fri, 11 Jun 2021 15:03:05 +0800
+        id 1lrbPX-000812-Tj; Fri, 11 Jun 2021 15:16:59 +0800
+Date:   Fri, 11 Jun 2021 15:16:59 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Zhang Qilong <zhangqilong3@huawei.com>
-Cc:     dsaxena@plexity.net, mpm@selenic.com, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH -next] hwrng: omap - Using pm_runtime_resume_and_get
- instead of pm_runtime_get_sync
-Message-ID: <20210611070305.GA14427@gondor.apana.org.au>
-References: <20210601144914.125679-1-zhangqilong3@huawei.com>
+To:     Tong Tiangen <tongtiangen@huawei.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next] crypto: nitrox - fix unchecked variable in
+ nitrox_register_interrupts
+Message-ID: <20210611071659.GA23016@gondor.apana.org.au>
+References: <20210601100155.69681-1-tongtiangen@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210601144914.125679-1-zhangqilong3@huawei.com>
+In-Reply-To: <20210601100155.69681-1-tongtiangen@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 01, 2021 at 10:49:14PM +0800, Zhang Qilong wrote:
-> Using pm_runtime_resume_and_get() to replace pm_runtime_get_sync and
-> pm_runtime_put_noidle. This change is just to simplify the code, no
-> actual functional changes.
+On Tue, Jun 01, 2021 at 06:01:55PM +0800, Tong Tiangen wrote:
+> Function nitrox_register_interrupts leaves variable 'nr_vecs' unchecked, which
+> would be use as kcalloc parameter later.
 > 
-> Signed-off-by: Zhang Qilong <zhangqilong3@huawei.com>
+> Fixes: 5155e118dda9 ("crypto: cavium/nitrox - use pci_alloc_irq_vectors() while enabling MSI-X.")
+> Signed-off-by: Tong Tiangen <tongtiangen@huawei.com>
 > ---
->  drivers/char/hw_random/omap-rng.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+>  drivers/crypto/cavium/nitrox/nitrox_isr.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-This patch doesn't apply against the current cryptodev tree.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
