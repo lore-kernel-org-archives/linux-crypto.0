@@ -6,68 +6,72 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 207ABC48BD1
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 16:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7998C48BD1
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 16:22:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 06A13613F0
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 16:03:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BA8961181
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 16:22:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230502AbhFKQFm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Jun 2021 12:05:42 -0400
-Received: from mail-lf1-f46.google.com ([209.85.167.46]:33465 "EHLO
-        mail-lf1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231380AbhFKQEj (ORCPT
+        id S229753AbhFKQYk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Jun 2021 12:24:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51428 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229634AbhFKQYk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jun 2021 12:04:39 -0400
-Received: by mail-lf1-f46.google.com with SMTP id bp38so9342977lfb.0
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Jun 2021 09:02:29 -0700 (PDT)
+        Fri, 11 Jun 2021 12:24:40 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 159C1C0617AF
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Jun 2021 09:22:42 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id f30so9400916lfj.1
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Jun 2021 09:22:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=8cTgYop9NFZ0qyAjdKFalLsNoJbK6hVndemtwl7l5Ok=;
-        b=JI+g1YiYzhV06je+UJHtI4hG3GnxkuzxgymgJDwaeWA6WGD2qXUyRj1NOBlwnKuyTd
-         NaPkND+luK7G0qt+yz8ypcgXRq7rKjgstB/RCNkCODwAPj1YApFLufh5S0QBvekiKtX5
-         97Nw+Lmo2DmelofysTIDQKdXUYR22ffH2MAzs=
+        bh=O7VLGpzo0pic/uCZ5FLPezepVfzXChJpgysJmVZaFsc=;
+        b=J/Dt9jQa1QKH8awC7zPDGpIDCC1B4T52bk/xbJkYWmrsyiPBf1xyBpuuJ6YktX8o19
+         OGXWD4ofRJ+1Y/e3NXpAm87lNARcyx+eUZLb2kGvTbni8Z4d4UmVsZbpfpQ1wYz+9Ynn
+         Tu2YFuveWjy2F/JCy1EWycl4zSkeUBSU/byuI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=8cTgYop9NFZ0qyAjdKFalLsNoJbK6hVndemtwl7l5Ok=;
-        b=b0kBsc5g+BVBnTjVlbcDweyrpubgAzl0/Vwu6bNgaNPaVsB2vGKtpwftxuhh4youGx
-         DOccEMc69r6u+Zb52VoYF4qgGNz7PS9IHroSK7r8tGJd5ii/cXUrDuMOiwd2qgBUTC48
-         jrp6IgTcZPPcj/JWltroEpq75XNYiSwT6JHetkt9IXaPOOGY6ocK59yN7uNVhB5nkCQi
-         ptvrP6yhxQF39ayKFdnfeY6WIKwESQBFtuMlseZ0kpaSGgKN/HRjDjtkz39iX/Hne5mn
-         4/foAnZu4wa8TQ8Ph/IGMD5GjYo+Do4zMP1dn4wB9+J8GjypKpmYrcKqkFbdQPFCaP7j
-         +JFQ==
-X-Gm-Message-State: AOAM531WD69fsY6q6X3vHU+DxfZ7jF36i9lYGKRhYFzzg826hNXEKWBT
-        smJsvYHTq8AvGmEIMdkjMJyE86MtCkVuAntuqmY=
-X-Google-Smtp-Source: ABdhPJxu16ZE7SUHVnauZ8MQLrNwQXTF/9KwjCYrN6jWNb3gCtXuV2Tb0yWdrmoHPxqV0FAXMyaEXA==
-X-Received: by 2002:ac2:4c83:: with SMTP id d3mr3083176lfl.543.1623427288395;
-        Fri, 11 Jun 2021 09:01:28 -0700 (PDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com. [209.85.167.45])
-        by smtp.gmail.com with ESMTPSA id v9sm766277ljv.131.2021.06.11.09.01.22
+        bh=O7VLGpzo0pic/uCZ5FLPezepVfzXChJpgysJmVZaFsc=;
+        b=TwXuIVICd22R/qN57MWlKHqtI+I8mBy/Kd51Fqy/qZxupnPYZEB0oVMqvxgVhBgqVN
+         juvRURSfuoGwsOlheQejl2LaXLJDIN/UjINJpU1eii4IkLo8XETfddEN8S1lUGJF9O2P
+         CTRVDYJuJmxpZrRoLsa23QP3ZS4YfaGCnUMBO33mhzHb1LJBilsE0CillNaCFM1vWDJ5
+         zCX8/OMEWqmOxQg8AI28ECzxBNJ+BwOLnfId46Gi/xFZF/YRMipxvye/D5BWQYSUqkVu
+         xKpBwpKDSkT6zh7Q/xQnBQPkIRWu8x5xqnjVpldDKJJanLmgYZeIwkETDmMf73nhk5UD
+         1/BA==
+X-Gm-Message-State: AOAM531Yej/+6Cqt10BnGr5TFjyB7Qksf5Z66ARHoEe/0rBEc/ggAcH1
+        YDIpKmv9tbXXsvHkrZF/xi46a0zoTNCZP2zV4b0=
+X-Google-Smtp-Source: ABdhPJzYVOgVTgEhDdH9AOkaJ7v66TE3XzEFcPS4P2xnlJG8YShtPBjZsktOcCBekR2GJ5E4PQ3aBg==
+X-Received: by 2002:a19:ed04:: with SMTP id y4mr3140783lfy.562.1623428560163;
+        Fri, 11 Jun 2021 09:22:40 -0700 (PDT)
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com. [209.85.208.172])
+        by smtp.gmail.com with ESMTPSA id h22sm774252ljk.133.2021.06.11.09.21.59
         for <linux-crypto@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jun 2021 09:01:24 -0700 (PDT)
-Received: by mail-lf1-f45.google.com with SMTP id p7so9299666lfg.4
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Jun 2021 09:01:22 -0700 (PDT)
-X-Received: by 2002:a19:7d04:: with SMTP id y4mr2952000lfc.201.1623427281920;
- Fri, 11 Jun 2021 09:01:21 -0700 (PDT)
+        Fri, 11 Jun 2021 09:22:12 -0700 (PDT)
+Received: by mail-lj1-f172.google.com with SMTP id r16so10540986ljc.0
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Jun 2021 09:21:59 -0700 (PDT)
+X-Received: by 2002:a2e:c52:: with SMTP id o18mr3611750ljd.411.1623428518600;
+ Fri, 11 Jun 2021 09:21:58 -0700 (PDT)
 MIME-Version: 1.0
 References: <YDkbCHHBUOmfI59K@Konrads-MacBook-Pro.local> <YL7XXNOnbaDgmTB9@atmark-techno.com>
  <2e899de2-4b69-c4b6-33a6-09fb8949d2fd@nxp.com> <20210611062153.GA30906@lst.de>
-In-Reply-To: <20210611062153.GA30906@lst.de>
+ <YMM8Ua0HMmErLIQg@0xbeefdead.lan>
+In-Reply-To: <YMM8Ua0HMmErLIQg@0xbeefdead.lan>
 From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 11 Jun 2021 09:01:05 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wh70m5dYtJcoc3TQtJSp0+AHTuXZM=raBXQVW9CJKG5ng@mail.gmail.com>
-Message-ID: <CAHk-=wh70m5dYtJcoc3TQtJSp0+AHTuXZM=raBXQVW9CJKG5ng@mail.gmail.com>
+Date:   Fri, 11 Jun 2021 09:21:42 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgxgTB=G7P6KRneAd0s310WYK2NDisXM5P-wsNibgLrQA@mail.gmail.com>
+Message-ID: <CAHk-=wgxgTB=G7P6KRneAd0s310WYK2NDisXM5P-wsNibgLrQA@mail.gmail.com>
 Subject: Re: swiotlb/caamjr regression (Was: [GIT PULL] (swiotlb) stable/for-linus-5.12)
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
         Dominique MARTINET <dominique.martinet@atmark-techno.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jianxiong Gao <jxgao@google.com>,
+        jianxiong Gao <jxgao@google.com>,
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Lukas Hartmann <lukas@mntmn.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
@@ -80,55 +84,45 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 10, 2021 at 11:21 PM Christoph Hellwig <hch@lst.de> wrote:
+On Fri, Jun 11, 2021 at 3:35 AM Konrad Rzeszutek Wilk
+<konrad.wilk@oracle.com> wrote:
 >
-> FYI, there has been a patch on the list that should have fixed this
-> for about a month:
+> Linus,
 >
-> https://lore.kernel.org/linux-iommu/20210510091816.GA2084@lst.de/T/#m0d0df6490350a08dcc24c9086c8edc165b402d6f
+> Would you be terribly offended if I took your code (s/unsigned
+> long/unsigned int), and used Chanho's description of the problem (see below)?
 
-Honestly, that patch is all kinds of strange.
+No offense to that at all - that looks like the right solution. See my
+answer to Christoph: I do think my patch does the right one, but I
+can't test it and my knowledge of the swiotlb code is not complete
+enough to really do anything else than "this looks right".
 
-This expression:
+And adding my sign-off to the patch is fine, but I don't necessarily
+need the authorship credit - mine was a throw-away patch just looking
+at what the bisection report said. All the real effort was by the
+reporters (and for the commit message, Bumyong Lee & co).
 
-    tlb_offset = (tlb_addr & (IO_TLB_SIZE - 1)) -
-        swiotlb_align_offset(dev, orig_addr);
+Finally - looking at the two places that do have that
+swiotlb_align_offset(), my reaction is "I don't understand what that
+code is doing".
 
-makes no sense to me. Maybe it happens to work, but I think it does so
-by mistake rather than by design.
+The index does that
 
-What my patch used was:
+        index = find_slots(dev, orig_addr, alloc_size + offset);
 
-    unsigned long offset = (tlb_addr - mem->start) & (IO_TLB_SIZE - 1);
+so that offset does seem to depend on how the find_slots code works.
+Which in turn does use the same dma_get_min_align_mask() thing that
+swiotlb_align_offset() uses.  So the offsets do seem to match, but
+find_slots(dev() does a lot of stuff that I don't know. so...
 
-which actually pairs with - and makes sense with - the index calculation:
+IOW, it does reinforce my "I don't know this code AT ALL". Which just
+makes me more convinced that I shouldn't get authorship of the patch
+because if something goes wrong with it, I can't help.
 
-    int index = (tlb_addr - mem->start) >> IO_TLB_SHIFT;
+So at most maybe a "Suggested-by:".
 
-so that offset truly is the offset within that index. Look at how that
-'index' calculation calculates the high bits of the difference, and
-the 'offset' calculation now literally is the low bits of the same
-thing that got dropped on the floor by the 'index' calculation?
+My patch really was based on very little context and "this is the
+calculation that makes sense given the other calculations in the
+function".
 
-So those two calculations actually make sense. The
-swiotlb_align_offset() one doesn't.
-
-It's possible that that swiotlb_align_offset() function ends up giving
-the right answer just almost by mistake (because of how tlb_addr and
-orig_addr end up being related - the swiotlb_align_offset() expression
-might just end up being the same thing - I didn't look deeper), but
-even if the result is the same, it's not _sensible_ code,
-
-It's also possible that the swiotlb_align_offset() function ends up
-giving the right answer very much by design and because of how
-orig_addr works - because maybe the remapping is doing odd things and
-using that swiotlb_align_offset() function in ways that make the
-*obvious* and natural offset calculation not actually work.
-
-So it's at least in theory possible that my "natural offset"
-calculation that matches how the index is calculated doesn't actually
-work. But that means that the swiotlb remapping is doing some really
-odd things, and then I think the patch would need a lot more
-commentary on exactly what those very odd things are.
-
-            Linus
+              Linus
