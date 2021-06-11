@@ -2,160 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E16A0C48BE0
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 12:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F92CC48BE0
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 12:46:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C613D61246
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 12:20:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83491613DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Jun 2021 12:46:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231420AbhFKMWW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Jun 2021 08:22:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54074 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229785AbhFKMWV (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jun 2021 08:22:21 -0400
-Received: from michel.telenet-ops.be (michel.telenet-ops.be [IPv6:2a02:1800:110:4::f00:18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF5A4C061574
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Jun 2021 05:20:23 -0700 (PDT)
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed20:2411:a261:8fe2:b47f])
-        by michel.telenet-ops.be with bizsmtp
-        id FoLL2500425eH3q06oLLgv; Fri, 11 Jun 2021 14:20:21 +0200
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan.of.borg with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1lrg95-00FfOh-Lm; Fri, 11 Jun 2021 14:20:19 +0200
-Received: from geert by rox.of.borg with local (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1lrg94-00Cgtb-Tc; Fri, 11 Jun 2021 14:20:18 +0200
-From:   Geert Uytterhoeven <geert+renesas@glider.be>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH] dt-bindings: crypto: ccree: Convert to json-schema
-Date:   Fri, 11 Jun 2021 14:20:17 +0200
-Message-Id: <ab361a862755e281f5fef67b3f678d66ae201781.1623413974.git.geert+renesas@glider.be>
-X-Mailer: git-send-email 2.25.1
+        id S231515AbhFKMsW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Jun 2021 08:48:22 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50566 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230382AbhFKMsU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jun 2021 08:48:20 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1lrgYH-00037O-FJ; Fri, 11 Jun 2021 20:46:21 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1lrgYG-0002P6-7b; Fri, 11 Jun 2021 20:46:20 +0800
+Date:   Fri, 11 Jun 2021 20:46:20 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Hangbin Liu <liuhangbin@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] crypto: x86/curve25519 - fix cpu feature checking logic
+ in mod_exit
+Message-ID: <20210611124620.GA9125@gondor.apana.org.au>
+References: <20210603055341.24473-1-liuhangbin@gmail.com>
+ <20210611072312.GE23016@gondor.apana.org.au>
+ <CAHmME9qE=CAtNjTPTwapUf0eGALkwbL+qVGRi3F88J_sE2-1vQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9qE=CAtNjTPTwapUf0eGALkwbL+qVGRi3F88J_sE2-1vQ@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert the Arm TrustZone CryptoCell cryptographic engine Device Tree
-binding documentation to json-schema.
+On Fri, Jun 11, 2021 at 12:07:43PM +0200, Jason A. Donenfeld wrote:
+> Hi Herbert,
+> 
+> Is there a reason why in
+> https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/patch/?id=1b82435d17774f3eaab35dce239d354548aa9da2
+> you didn't mark it with the Cc: stable@ line that I included above my
+> Reviewed-by? Netdev no longer has their own stable process. Do you
+> have something else in mind for this?
 
-Document missing properties.
-Update the example to match reality.
+Hi Jason:
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- .../bindings/crypto/arm,cryptocell.yaml       | 53 +++++++++++++++++++
- .../bindings/crypto/arm-cryptocell.txt        | 25 ---------
- 2 files changed, 53 insertions(+), 25 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/arm,cryptocell.yaml
- delete mode 100644 Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+This patch has a Fixes header set and it'll be automatically pushed
+to stable.
 
-diff --git a/Documentation/devicetree/bindings/crypto/arm,cryptocell.yaml b/Documentation/devicetree/bindings/crypto/arm,cryptocell.yaml
-new file mode 100644
-index 0000000000000000..9c97874a6dbd1db9
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/arm,cryptocell.yaml
-@@ -0,0 +1,53 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/arm,cryptocell.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Arm TrustZone CryptoCell cryptographic engine
-+
-+maintainers:
-+  - Gilad Ben-Yossef <gilad@benyossef.com>
-+
-+properties:
-+  compatible:
-+    enum:
-+      - arm,cryptocell-713-ree
-+      - arm,cryptocell-703-ree
-+      - arm,cryptocell-712-ree
-+      - arm,cryptocell-710-ree
-+      - arm,cryptocell-630p-ree
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  clocks:
-+    maxItems: 1
-+
-+  power-domains:
-+    maxItems: 1
-+
-+  resets:
-+    maxItems: 1
-+
-+  dma-coherent: true
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+
-+    arm_cc712: crypto@80000000 {
-+            compatible = "arm,cryptocell-712-ree";
-+            reg = <0x80000000 0x10000>;
-+            interrupts = <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>;
-+    };
-diff --git a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
-deleted file mode 100644
-index 6130e6eb4af89135..0000000000000000
---- a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
-+++ /dev/null
-@@ -1,25 +0,0 @@
--Arm TrustZone CryptoCell cryptographic engine
--
--Required properties:
--- compatible: Should be one of -
--   "arm,cryptocell-713-ree"
--   "arm,cryptocell-703-ree"
--   "arm,cryptocell-712-ree"
--   "arm,cryptocell-710-ree"
--   "arm,cryptocell-630p-ree"
--- reg: Base physical address of the engine and length of memory mapped region.
--- interrupts: Interrupt number for the device.
--
--Optional properties:
--- clocks: Reference to the crypto engine clock.
--- dma-coherent: Present if dma operations are coherent.
--
--Examples:
--
--       arm_cc712: crypto@80000000 {
--               compatible = "arm,cryptocell-712-ree";
--               interrupt-parent = <&intc>;
--               interrupts = < 0 30 4 >;
--               reg = < 0x80000000 0x10000 >;
--
--       };
+Cheers,
 -- 
-2.25.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
