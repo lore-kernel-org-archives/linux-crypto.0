@@ -2,212 +2,264 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF875C48BDF
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Jun 2021 10:14:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C7DC48BE8
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Jun 2021 10:53:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7FC161283
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Jun 2021 10:14:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 580946108E
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Jun 2021 10:53:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231672AbhFMKQ6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Jun 2021 06:16:58 -0400
-Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:35255 "EHLO
-        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231671AbhFMKQ6 (ORCPT
+        id S231697AbhFMKz5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Jun 2021 06:55:57 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23908 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231176AbhFMKz4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Jun 2021 06:16:58 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R941e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0UcCrzkx_1623579293;
-Received: from 30.25.254.38(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UcCrzkx_1623579293)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Sun, 13 Jun 2021 18:14:54 +0800
-Subject: Re: [PATCH 3/3] crypto: x86/sm4 - add AES-NI/AVX/x86_64 assembler
- implementation
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "Markku-Juhani O . Saarinen" <mjos@iki.fi>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-References: <20210610134459.28541-1-tianjia.zhang@linux.alibaba.com>
- <20210610134459.28541-4-tianjia.zhang@linux.alibaba.com>
- <YMKf93/cnPGGtRW3@gmail.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <d8df4d67-1a01-ff83-7739-af49b5b5e574@linux.alibaba.com>
-Date:   Sun, 13 Jun 2021 18:14:52 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <YMKf93/cnPGGtRW3@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+        Sun, 13 Jun 2021 06:55:56 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15DAiKHC086777;
+        Sun, 13 Jun 2021 06:53:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : content-type : content-transfer-encoding :
+ mime-version; s=pp1; bh=+kasN4Z0mgsLJNRce1oGr7HM37TQzJbk6NbguIGLi0k=;
+ b=oLp3ATAk91KpU1vbX/BbB1OXLgs0Cck0VgMBSlIHGcyGe186pJtqCczA2hVU5TTWiUCA
+ 9dwzra3xtuzWsJksrt96xbTIpji2XG4he32/ewFTCH/PMaJmrUkCZhCNNjCjRGqMmxkP
+ nQo7NcPAH0beLiZ6gBEwDpEAzD0TAVeD5BuI5pfll3zNLbe436/1Zi9flm78bRygJU5n
+ 88W0+nsgUSyLs3xiF8kf3Mw2lL14xYcCrrmBru5A8KgZhbEC2vsjPZKXmdcoLbiFMv8t
+ 79IZmG3pj86DEdo7VaX3fP54zLvVdoVrbidYekYM6Z0tE+RdOZniRXGw4citGp21b3fL dw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 395gh4r3ny-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 13 Jun 2021 06:53:44 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15DAiAmi086680;
+        Sun, 13 Jun 2021 06:53:44 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 395gh4r3nr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 13 Jun 2021 06:53:44 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15DApsdL029946;
+        Sun, 13 Jun 2021 10:53:43 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma02dal.us.ibm.com with ESMTP id 394mj929n3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 13 Jun 2021 10:53:43 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15DArh9F33489226
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 13 Jun 2021 10:53:43 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F36A2AC05B;
+        Sun, 13 Jun 2021 10:53:42 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F09A3AC059;
+        Sun, 13 Jun 2021 10:53:41 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.160.180.39])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Sun, 13 Jun 2021 10:53:41 +0000 (GMT)
+Message-ID: <ed7a09822cf3a2e463f942e5a37309a2365c9d79.camel@linux.ibm.com>
+Subject: [PATCH v5 00/17] Enable VAS and NX-GZIP support on PowerVM
+From:   Haren Myneni <haren@linux.ibm.com>
+To:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        mpe@ellerman.id.au, herbert@gondor.apana.org.au, npiggin@gmail.com
+Cc:     hbabu@us.ibm.com, haren@us.ibm.com
+Date:   Sun, 13 Jun 2021 03:53:40 -0700
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: EVFxl59D4Qtm1MAu5tsg4CfIO2H5RS6h
+X-Proofpoint-ORIG-GUID: oEI2ortFMpfEaUtBnx-dL-mn5oe792Sp
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-13_04:2021-06-11,2021-06-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ priorityscore=1501 bulkscore=0 impostorscore=0 mlxscore=0 phishscore=0
+ mlxlogscore=999 malwarescore=0 lowpriorityscore=0 clxscore=1015
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106130078
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
 
-On 6/11/21 7:27 AM, Eric Biggers wrote:
-> On Thu, Jun 10, 2021 at 09:44:59PM +0800, Tianjia Zhang wrote:
->> This patch adds AES-NI/AVX/x86_64 assembler implementation of SM4
->> block cipher. Through two affine transforms, we can use the AES
->> S-Box to simulate the SM4 S-Box to achieve the effect of instruction
->> acceleration.
->>
-> 
-> Benchmark results, please.
-> 
-> Also, is this passing the self-tests, including the fuzz tests?
-> 
+Virtual Accelerator Switchboard (VAS) allows kernel subsystems
+and user space processes to directly access the Nest Accelerator
+(NX) engines which provides HW compression. The true user mode
+VAS/NX support on PowerNV is already included in Linux. Whereas
+PowerVM support is available from P10 onwards.
 
-I will provide this information in the next version.
+This patch series enables VAS / NX-GZIP on PowerVM which allows
+the user space to do copy/paste with the same existing interface
+that is available on PowerNV.
 
->> +/*
->> + * void sm4_aesni_avx_expand_key(const u8 *key, u32 *rk_enc,
->> + *                  u32 *rk_dec, const u32 *fk, const u32 *ck);
->> + */
->> +SYM_FUNC_START(sm4_aesni_avx_expand_key)
->> +	/* input:
->> +	 *	%rdi: 128-bit key
->> +	 *	%rsi: rkey_enc
->> +	 *	%rdx: rkey_dec
->> +	 *	%rcx: fk array
->> +	 *	%r8: ck array
->> +	 */
->> +	FRAME_BEGIN
-> 
-> Key expansion isn't performance-critical.  Can the C library version be used, or
-> does the key need to be expanded in a way specific to this x86 implementation?
-> 
+VAS Enablement:
+- Get all VAS capabilities using H_QUERY_VAS_CAPABILITIES that are
+  available in the hypervisor. These capabilities tells OS which
+  type of features (credit types such as Default and Quality of
+  Service (QoS)). Also gives specific capabilities for each credit
+  type: Maximum window credits, Maximum LPAR credits, Target credits
+  in that parition (varies from max LPAR credits based DLPAR
+  operation), whether supports user mode COPY/PASTE and etc.
+- Register LPAR VAS operations such as open window. get paste
+  address and close window with the current VAS user space API.
+- Open window operation - Use H_ALLOCATE_VAS_WINDOW HCALL to open
+  window and H_MODIFY_VAS_WINDOW HCALL to setup the window with LPAR
+  PID and etc.
+- mmap to paste address returned in H_ALLOCATE_VAS_WINDOW HCALL
+- To close window, H_DEALLOCATE_VAS_WINDOW HCALL is used to close in
+  the hypervisor.
 
-It can be replaced by a common implementation of C library. For expand 
-key that are not called frequently, the optimization of a specific 
-instruction set does not bring much benefit. Of course, it is possible 
-to delete this implementation.
+NX Enablement:
+- Get NX capabilities from the the hypervisor which provides Maximum
+  buffer length in a single GZIP request, recommended minimum
+  compression / decompression lengths.
+- Register to VAS to enable user space VAS API
 
->> +/*
->> + * void sm4_aesni_avx_crypt4(const u32 *rk, u8 *dst,
->> + *                          const u8 *src, int nblocks)
->> + */
->> +SYM_FUNC_START(sm4_aesni_avx_crypt4)
->> +	/* input:
->> +	 *	%rdi: round key array, CTX
->> +	 *	%rsi: dst (1..4 blocks)
->> +	 *	%rdx: src (1..4 blocks)
->> +	 *	%rcx: num blocks (1..4)
->> +	 */
->> +	FRAME_BEGIN
-> [...]
-> 
->> +static void sm4_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->> +{
->> +	const struct crypto_sm4_ctx *ctx = crypto_tfm_ctx(tfm);
->> +
->> +	if (crypto_simd_usable()) {
->> +		kernel_fpu_begin();
->> +		sm4_aesni_avx_crypt4(ctx->rkey_enc, out, in, 1);
->> +		kernel_fpu_end();
->> +	} else
->> +		crypto_sm4_do_crypt(ctx->rkey_enc, out, in);
->> +}
->> +
->> +static void sm4_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->> +{
->> +	const struct crypto_sm4_ctx *ctx = crypto_tfm_ctx(tfm);
->> +
->> +	if (crypto_simd_usable()) {
->> +		kernel_fpu_begin();
->> +		sm4_aesni_avx_crypt4(ctx->rkey_dec, out, in, 1);
->> +		kernel_fpu_end();
->> +	} else
->> +		crypto_sm4_do_crypt(ctx->rkey_dec, out, in);
->> +}
-> 
-> Your assembly code appears to handle encrypting up to 4 blocks at a time.
-> However you have only wired this up to the "cipher" API which does 1 block at a
-> time.  Is this intentional?
-> 
-> What are your performance results with real-world chaining modes like XTS, and
-> do you plan to implement any of these modes directly?
-> 
+Main feature differences with PowerNV implementation:
+- Each VAS window will be configured with a number of credits which
+  means that many requests can be issues simultaniously on that
+  window. On PowerNV, 1K credits are configured per window.
+  Whereas on PowerVM, the hypervisor allows 1 credit per window
+  at present.
+- The hypervisor introduced 2 different types of credits: Default -
+  Uses normal priority FIFO and Quality of Service (QoS) - Uses high
+  priority FIFO. On PowerVM, VAS/NX HW resources are shared across
+ LPARs. The total number of credits available on a system depends
+  on cores configured. We may see more credits are assigned across
+  the system than the NX HW resources can handle. So to avoid NX HW
+  contention, the hypervisor introduced QoS credits which can be
+  configured by system administration with HMC API. Then the total
+  number of available default credits on LPAR varies based on QoS
+  credits configured.
+- On PowerNV, windows are allocated on a specific VAS instance
+  and the user space can select VAS instance with the open window
+  ioctl. Since VAS instances can be shared across partitions on
+  PowerVM, the hypervisor manages window allocations on different
+  VAS instances. So H_ALLOCATE_VAS_WINDOW allows to select by domain
+  indentifiers (H_HOME_NODE_ASSOCIATIVITY values by cpu). By default
+  the hypervisor selects VAS instance closer to CPU resources that the
+  parition uses. So vas_id in ioctl interface is ignored on PowerVM
+  except vas_id=-1 which is used to allocate window based on CPU that
+  the process is executing. This option is needed for process affinity
+  to NUMA node.
 
-This implementation is intentional. First, a general block encryption is 
-provided. There is no obvious performance improvement in this 
-implementation. The key to optimization is to make full use of parallel 
-four blocks encryption at a time. This is still under development, and I 
-will continue to implement things like XTS in the future. Optimization 
-of such specific modes.
+  The existing applications that linked with libnxz should work as
+  long as the job request length is restricted to
+  req_max_processed_len.
 
->> +
->> +static struct crypto_alg sm4_asm_alg = {
->> +	.cra_name		= "sm4",
->> +	.cra_driver_name	= "sm4-asm",
-> 
-> In arch/x86/crypto/, "-asm" usually means a vanilla x86 assembly implementation
-> without any AES-NI, SSE, AVX, etc. instructions.  Calling this something like
-> "sm4-aesni-avx" would make more sense.  (Or is it actually avx2, not avx?)
-> 
+  Tested the following patches on P10 successfully with test cases
+  given: https://github.com/libnxz/power-gzip
 
-will do in next version patch.
+  Note: The hypervisor supports user mode NX from p10 onwards. Linux
+        supports user mode VAS/NX on P10 only with radix page tables.
 
->> +config CRYPTO_SM4_AESNI_AVX_X86_64
->> +	tristate "SM4 cipher algorithm (x86_64/AES-NI/AVX)"
->> +	depends on X86 && 64BIT
->> +	select CRYPTO_SKCIPHER
->> +	select CRYPTO_SIMD
->> +	select CRYPTO_ALGAPI
->> +	select CRYPTO_LIB_SM4
-> 
-> As-is, neither CRYPTO_SKCIPHER nor CRYPTO_SIMD needs to be selected here.
-> 
+Patch 1:	Fix to release reference to tgid during window close
+Patches 2- 6:   Move the code that is needed for both PowerNV and
+                PowerVM to powerpc book3s platform directory
+Patch 7:        Modify vas-window struct to support both platforms
+                and the related changes.
+Patch 8:        Define HCALL and the related VAS/NXGZIP specific
+                structs.
+Patch 9:        Define QoS credit flag in window open ioctl
+Patch 10:       Implement Allocate, Modify and Deallocate HCALLs
+Patch 11:       Retrieve VAS capabilities from the hypervisor
+Patch 12;       Implement window operations and integrate with API
+Patch 13:       Setup IRQ and NX fault handling
+Patch 14 - 15:  Make the code common to add NX-GZIP enablement
+Patch 16:       Get NX capabilities from the hypervisor
+patch 17;       Add sysfs interface to expose NX capabilities
 
-ditto.
+Changes in v2:
+  - Rebase on 5.12-rc6
+  - Moved VAS Kconfig changes to arch/powerpc/platform as suggested
+    by Christophe Leroy
+  - build fix with allyesconfig (reported by kernel test build)
 
->> +	help
->> +	  SM4 cipher algorithms (OSCCA GB/T 32907-2016) (x86_64/AES-NI/AVX).
->> +
->> +	  SM4 (GBT.32907-2016) is a cryptographic standard issued by the
->> +	  Organization of State Commercial Administration of China (OSCCA)
->> +	  as an authorized cryptographic algorithms for the use within China.
->> +
->> +	  SMS4 was originally created for use in protecting wireless
->> +	  networks, and is mandated in the Chinese National Standard for
->> +	  Wireless LAN WAPI (Wired Authentication and Privacy Infrastructure)
->> +	  (GB.15629.11-2003).
->> +
->> +	  The latest SM4 standard (GBT.32907-2016) was proposed by OSCCA and
->> +	  standardized through TC 260 of the Standardization Administration
->> +	  of the People's Republic of China (SAC).
->> +
->> +	  The input, output, and key of SMS4 are each 128 bits.
->> +
->> +	  See also: <https://eprint.iacr.org/2008/329.pdf>
->> +
->> +	  If unsure, say N.
-> 
-> This is the help text for the x86 implementation specifically.  Please don't
-> have boilerplate text about the algorithm here; that already exists for the
-> generic implementation.  The text should explain about the x86 implementation.
-> 
+Changes in v3:
+  - Rebase on 5.12-rc7
+  - Moved vas-api.c and VAS Kconfig changes to
+    arch/powerpc/platform/book3s as Michael Ellerman suggested
 
-ditto.
+Changes in v4:
+  - Rebase on 5.13-rc2
+  - Changes based on review comments from Nicholas Piggin
+    - Add seperate patch to define user window operations
+    - Drop "sysfs interface to export VAS capabilities" patch
+      This interface is mainly needed for DLPAR operations
+      and this patch will be included when DLPAR/LPM support
+      is added.
+    - Other cleanup changes
 
-> - Eric
-> 
+Changes in v5:
+  - Rebase on 5.13-rc5
+  - Changes based on review comments from Nicholas Piggin
+    and Michael Ellerman:
+    - Add new patch to fix tgid reference release. This fix
+      should be also included in stable 5.8+
+    - Define platform specific VAS window structs
+    - Define helper functions to take and release pid, tgid
+      and mm references
+    - Other cleanup suggestions
 
-Thanks for your suggestion.
+Haren Myneni (17):
+  powerpc/powernv/vas: Release reference to tgid during window close
+  powerpc/vas: Move VAS API to book3s common platform
+  powerpc/powernv/vas: Rename register/unregister functions
+  powerpc/vas: Add platform specific user window operations
+  powerpc/vas: Create take/drop pid and mm reference functions
+  powerpc/vas: Move update_csb/dump_crb to common book3s platform
+  powerpc/vas:  Define and use common vas_window struct
+  powerpc/pseries/vas: Define VAS/NXGZIP hcalls and structs
+  powerpc/vas: Define QoS credit flag to allocate window
+  powerpc/pseries/vas: Add hcall wrappers for VAS handling
+  powerpc/pseries/vas: Implement getting capabilities from hypervisor
+  powerpc/pseries/vas: Integrate API with open/close windows
+  powerpc/pseries/vas: Setup IRQ and fault handling
+  crypto/nx: Rename nx-842-pseries file name to nx-common-pseries
+  crypto/nx: Register and unregister VAS interface on PowerVM
+  crypto/nx: Get NX capabilities for GZIP coprocessor type
+  crypto/nx: Add sysfs interface to export NX capabilities
 
-Cheers,
-Tianjia
+ arch/powerpc/include/asm/hvcall.h             |   7 +
+ arch/powerpc/include/asm/vas.h                | 109 ++-
+ arch/powerpc/include/uapi/asm/vas-api.h       |   6 +-
+ arch/powerpc/platforms/Kconfig                |   1 +
+ arch/powerpc/platforms/Makefile               |   1 +
+ arch/powerpc/platforms/book3s/Kconfig         |  15 +
+ arch/powerpc/platforms/book3s/Makefile        |   2 +
+ arch/powerpc/platforms/book3s/vas-api.c       | 473 +++++++++++++
+ arch/powerpc/platforms/powernv/Kconfig        |  14 -
+ arch/powerpc/platforms/powernv/Makefile       |   2 +-
+ arch/powerpc/platforms/powernv/vas-api.c      | 278 --------
+ arch/powerpc/platforms/powernv/vas-debug.c    |  27 +-
+ arch/powerpc/platforms/powernv/vas-fault.c    | 173 +----
+ arch/powerpc/platforms/powernv/vas-trace.h    |   4 +-
+ arch/powerpc/platforms/powernv/vas-window.c   | 264 ++++----
+ arch/powerpc/platforms/powernv/vas.h          |  48 +-
+ arch/powerpc/platforms/pseries/Makefile       |   1 +
+ arch/powerpc/platforms/pseries/vas.c          | 636 ++++++++++++++++++
+ arch/powerpc/platforms/pseries/vas.h          | 125 ++++
+ drivers/crypto/nx/Kconfig                     |   1 +
+ drivers/crypto/nx/Makefile                    |   2 +-
+ drivers/crypto/nx/nx-common-powernv.c         |   6 +-
+ .../{nx-842-pseries.c => nx-common-pseries.c} | 138 ++++
+ 23 files changed, 1717 insertions(+), 616 deletions(-)
+ create mode 100644 arch/powerpc/platforms/book3s/Kconfig
+ create mode 100644 arch/powerpc/platforms/book3s/Makefile
+ create mode 100644 arch/powerpc/platforms/book3s/vas-api.c
+ delete mode 100644 arch/powerpc/platforms/powernv/vas-api.c
+ create mode 100644 arch/powerpc/platforms/pseries/vas.c
+ create mode 100644 arch/powerpc/platforms/pseries/vas.h
+ rename drivers/crypto/nx/{nx-842-pseries.c => nx-common-pseries.c} (90%)
+
+-- 
+2.18.2
+
+
