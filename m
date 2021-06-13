@@ -3,262 +3,141 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C7DC48BE8
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Jun 2021 10:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98993C48BCF
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Jun 2021 10:55:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 580946108E
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Jun 2021 10:53:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B53B61042
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Jun 2021 10:55:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231697AbhFMKz5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Jun 2021 06:55:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23908 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231176AbhFMKz4 (ORCPT
+        id S231659AbhFMK5N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Jun 2021 06:57:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5962 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231176AbhFMK5N (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Jun 2021 06:55:56 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15DAiKHC086777;
-        Sun, 13 Jun 2021 06:53:45 -0400
+        Sun, 13 Jun 2021 06:57:13 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15DAn0O5023430;
+        Sun, 13 Jun 2021 06:55:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : content-type : content-transfer-encoding :
- mime-version; s=pp1; bh=+kasN4Z0mgsLJNRce1oGr7HM37TQzJbk6NbguIGLi0k=;
- b=oLp3ATAk91KpU1vbX/BbB1OXLgs0Cck0VgMBSlIHGcyGe186pJtqCczA2hVU5TTWiUCA
- 9dwzra3xtuzWsJksrt96xbTIpji2XG4he32/ewFTCH/PMaJmrUkCZhCNNjCjRGqMmxkP
- nQo7NcPAH0beLiZ6gBEwDpEAzD0TAVeD5BuI5pfll3zNLbe436/1Zi9flm78bRygJU5n
- 88W0+nsgUSyLs3xiF8kf3Mw2lL14xYcCrrmBru5A8KgZhbEC2vsjPZKXmdcoLbiFMv8t
- 79IZmG3pj86DEdo7VaX3fP54zLvVdoVrbidYekYM6Z0tE+RdOZniRXGw4citGp21b3fL dw== 
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=KTtX+syhVsp3EKtNv4+mXEMJYwINd+QKLT2o6wNy4jk=;
+ b=kS8ZAQbjvNaLDjLDZgzICTL1STDSzX34q9jBE6VaA3yOrbRhtOKOkIvJnprYHMaVkBDv
+ mr1GHRT9twQk2QHqu07rHJ/2i1fvGREKPrGsdYxJ3VKLYbtNczulrdz4sGemInDEOkno
+ pbFe3YIu6YBSjKGQndHVINE6l78UXxeyOLHO5ZwEWOwYiKj+1hVZNcrqitj+neuDgHDH
+ XGBndFAOHEKFengp54ARmxiA4KG4fXiCRCjugEKIT1rAbRNlKr7suHwfOTdFUliVyR4s
+ +atkqiRCY6A3KDJLC7aQ7Gmby7ZRKNuZNiUliouAig5Uioh55Sy7XoNZ4xRVLcUEW2qY cA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 395gh4r3ny-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 395gkpg1k4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 13 Jun 2021 06:53:44 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15DAiAmi086680;
-        Sun, 13 Jun 2021 06:53:44 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 395gh4r3nr-1
+        Sun, 13 Jun 2021 06:55:03 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15DAr9kd035212;
+        Sun, 13 Jun 2021 06:55:02 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 395gkpg1jt-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 13 Jun 2021 06:53:44 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15DApsdL029946;
-        Sun, 13 Jun 2021 10:53:43 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02dal.us.ibm.com with ESMTP id 394mj929n3-1
+        Sun, 13 Jun 2021 06:55:02 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15DAqBBZ006317;
+        Sun, 13 Jun 2021 10:55:02 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma04dal.us.ibm.com with ESMTP id 394yr5pbnu-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 13 Jun 2021 10:53:43 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15DArh9F33489226
+        Sun, 13 Jun 2021 10:55:02 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15DAt0Kq27918642
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 13 Jun 2021 10:53:43 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F36A2AC05B;
-        Sun, 13 Jun 2021 10:53:42 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F09A3AC059;
-        Sun, 13 Jun 2021 10:53:41 +0000 (GMT)
+        Sun, 13 Jun 2021 10:55:00 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BEF466A051;
+        Sun, 13 Jun 2021 10:55:00 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 238986A04D;
+        Sun, 13 Jun 2021 10:54:59 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.160.180.39])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Sun, 13 Jun 2021 10:53:41 +0000 (GMT)
-Message-ID: <ed7a09822cf3a2e463f942e5a37309a2365c9d79.camel@linux.ibm.com>
-Subject: [PATCH v5 00/17] Enable VAS and NX-GZIP support on PowerVM
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Sun, 13 Jun 2021 10:54:58 +0000 (GMT)
+Message-ID: <4c769385e96a9b7022a4fd22938310550ceba5e1.camel@linux.ibm.com>
+Subject: [PATCH v5 01/17] powerpc/powernv/vas: Release reference to tgid
+ during window close
 From:   Haren Myneni <haren@linux.ibm.com>
 To:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
         mpe@ellerman.id.au, herbert@gondor.apana.org.au, npiggin@gmail.com
 Cc:     hbabu@us.ibm.com, haren@us.ibm.com
-Date:   Sun, 13 Jun 2021 03:53:40 -0700
+Date:   Sun, 13 Jun 2021 03:54:56 -0700
+In-Reply-To: <ed7a09822cf3a2e463f942e5a37309a2365c9d79.camel@linux.ibm.com>
+References: <ed7a09822cf3a2e463f942e5a37309a2365c9d79.camel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: EVFxl59D4Qtm1MAu5tsg4CfIO2H5RS6h
-X-Proofpoint-ORIG-GUID: oEI2ortFMpfEaUtBnx-dL-mn5oe792Sp
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 2fyfXEnR7sHKJSospIzRKF0qXBqDUzLi
+X-Proofpoint-ORIG-GUID: iKiSzB4omFD8P9ucoroSCvN6kIQuuIuk
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
  definitions=2021-06-13_04:2021-06-11,2021-06-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- priorityscore=1501 bulkscore=0 impostorscore=0 mlxscore=0 phishscore=0
- mlxlogscore=999 malwarescore=0 lowpriorityscore=0 clxscore=1015
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ impostorscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0 bulkscore=0
+ mlxscore=0 priorityscore=1501 clxscore=1015 malwarescore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2104190000 definitions=main-2106130078
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-Virtual Accelerator Switchboard (VAS) allows kernel subsystems
-and user space processes to directly access the Nest Accelerator
-(NX) engines which provides HW compression. The true user mode
-VAS/NX support on PowerNV is already included in Linux. Whereas
-PowerVM support is available from P10 onwards.
+The kernel handles the NX fault by updating CSB or sending
+signal to process. In multithread applications, children can
+open VAS windows and can exit without closing them. But the
+parent can continue to send NX requests with these windows. To
+prevent pid reuse, reference will be taken on pid and tgid
+when the window is opened and release them during window close.
 
-This patch series enables VAS / NX-GZIP on PowerVM which allows
-the user space to do copy/paste with the same existing interface
-that is available on PowerNV.
+The current code is not releasing the tgid reference which can
+cause pid leak and this patch fixes the issue.
 
-VAS Enablement:
-- Get all VAS capabilities using H_QUERY_VAS_CAPABILITIES that are
-  available in the hypervisor. These capabilities tells OS which
-  type of features (credit types such as Default and Quality of
-  Service (QoS)). Also gives specific capabilities for each credit
-  type: Maximum window credits, Maximum LPAR credits, Target credits
-  in that parition (varies from max LPAR credits based DLPAR
-  operation), whether supports user mode COPY/PASTE and etc.
-- Register LPAR VAS operations such as open window. get paste
-  address and close window with the current VAS user space API.
-- Open window operation - Use H_ALLOCATE_VAS_WINDOW HCALL to open
-  window and H_MODIFY_VAS_WINDOW HCALL to setup the window with LPAR
-  PID and etc.
-- mmap to paste address returned in H_ALLOCATE_VAS_WINDOW HCALL
-- To close window, H_DEALLOCATE_VAS_WINDOW HCALL is used to close in
-  the hypervisor.
+Fixes: db1c08a740635 ("powerpc/vas: Take reference to PID and mm for user space windows")
+Cc: stable@vger.kernel.org # 5.8+
+Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+Reported-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ arch/powerpc/platforms/powernv/vas-window.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-NX Enablement:
-- Get NX capabilities from the the hypervisor which provides Maximum
-  buffer length in a single GZIP request, recommended minimum
-  compression / decompression lengths.
-- Register to VAS to enable user space VAS API
-
-Main feature differences with PowerNV implementation:
-- Each VAS window will be configured with a number of credits which
-  means that many requests can be issues simultaniously on that
-  window. On PowerNV, 1K credits are configured per window.
-  Whereas on PowerVM, the hypervisor allows 1 credit per window
-  at present.
-- The hypervisor introduced 2 different types of credits: Default -
-  Uses normal priority FIFO and Quality of Service (QoS) - Uses high
-  priority FIFO. On PowerVM, VAS/NX HW resources are shared across
- LPARs. The total number of credits available on a system depends
-  on cores configured. We may see more credits are assigned across
-  the system than the NX HW resources can handle. So to avoid NX HW
-  contention, the hypervisor introduced QoS credits which can be
-  configured by system administration with HMC API. Then the total
-  number of available default credits on LPAR varies based on QoS
-  credits configured.
-- On PowerNV, windows are allocated on a specific VAS instance
-  and the user space can select VAS instance with the open window
-  ioctl. Since VAS instances can be shared across partitions on
-  PowerVM, the hypervisor manages window allocations on different
-  VAS instances. So H_ALLOCATE_VAS_WINDOW allows to select by domain
-  indentifiers (H_HOME_NODE_ASSOCIATIVITY values by cpu). By default
-  the hypervisor selects VAS instance closer to CPU resources that the
-  parition uses. So vas_id in ioctl interface is ignored on PowerVM
-  except vas_id=-1 which is used to allocate window based on CPU that
-  the process is executing. This option is needed for process affinity
-  to NUMA node.
-
-  The existing applications that linked with libnxz should work as
-  long as the job request length is restricted to
-  req_max_processed_len.
-
-  Tested the following patches on P10 successfully with test cases
-  given: https://github.com/libnxz/power-gzip
-
-  Note: The hypervisor supports user mode NX from p10 onwards. Linux
-        supports user mode VAS/NX on P10 only with radix page tables.
-
-Patch 1:	Fix to release reference to tgid during window close
-Patches 2- 6:   Move the code that is needed for both PowerNV and
-                PowerVM to powerpc book3s platform directory
-Patch 7:        Modify vas-window struct to support both platforms
-                and the related changes.
-Patch 8:        Define HCALL and the related VAS/NXGZIP specific
-                structs.
-Patch 9:        Define QoS credit flag in window open ioctl
-Patch 10:       Implement Allocate, Modify and Deallocate HCALLs
-Patch 11:       Retrieve VAS capabilities from the hypervisor
-Patch 12;       Implement window operations and integrate with API
-Patch 13:       Setup IRQ and NX fault handling
-Patch 14 - 15:  Make the code common to add NX-GZIP enablement
-Patch 16:       Get NX capabilities from the hypervisor
-patch 17;       Add sysfs interface to expose NX capabilities
-
-Changes in v2:
-  - Rebase on 5.12-rc6
-  - Moved VAS Kconfig changes to arch/powerpc/platform as suggested
-    by Christophe Leroy
-  - build fix with allyesconfig (reported by kernel test build)
-
-Changes in v3:
-  - Rebase on 5.12-rc7
-  - Moved vas-api.c and VAS Kconfig changes to
-    arch/powerpc/platform/book3s as Michael Ellerman suggested
-
-Changes in v4:
-  - Rebase on 5.13-rc2
-  - Changes based on review comments from Nicholas Piggin
-    - Add seperate patch to define user window operations
-    - Drop "sysfs interface to export VAS capabilities" patch
-      This interface is mainly needed for DLPAR operations
-      and this patch will be included when DLPAR/LPM support
-      is added.
-    - Other cleanup changes
-
-Changes in v5:
-  - Rebase on 5.13-rc5
-  - Changes based on review comments from Nicholas Piggin
-    and Michael Ellerman:
-    - Add new patch to fix tgid reference release. This fix
-      should be also included in stable 5.8+
-    - Define platform specific VAS window structs
-    - Define helper functions to take and release pid, tgid
-      and mm references
-    - Other cleanup suggestions
-
-Haren Myneni (17):
-  powerpc/powernv/vas: Release reference to tgid during window close
-  powerpc/vas: Move VAS API to book3s common platform
-  powerpc/powernv/vas: Rename register/unregister functions
-  powerpc/vas: Add platform specific user window operations
-  powerpc/vas: Create take/drop pid and mm reference functions
-  powerpc/vas: Move update_csb/dump_crb to common book3s platform
-  powerpc/vas:  Define and use common vas_window struct
-  powerpc/pseries/vas: Define VAS/NXGZIP hcalls and structs
-  powerpc/vas: Define QoS credit flag to allocate window
-  powerpc/pseries/vas: Add hcall wrappers for VAS handling
-  powerpc/pseries/vas: Implement getting capabilities from hypervisor
-  powerpc/pseries/vas: Integrate API with open/close windows
-  powerpc/pseries/vas: Setup IRQ and fault handling
-  crypto/nx: Rename nx-842-pseries file name to nx-common-pseries
-  crypto/nx: Register and unregister VAS interface on PowerVM
-  crypto/nx: Get NX capabilities for GZIP coprocessor type
-  crypto/nx: Add sysfs interface to export NX capabilities
-
- arch/powerpc/include/asm/hvcall.h             |   7 +
- arch/powerpc/include/asm/vas.h                | 109 ++-
- arch/powerpc/include/uapi/asm/vas-api.h       |   6 +-
- arch/powerpc/platforms/Kconfig                |   1 +
- arch/powerpc/platforms/Makefile               |   1 +
- arch/powerpc/platforms/book3s/Kconfig         |  15 +
- arch/powerpc/platforms/book3s/Makefile        |   2 +
- arch/powerpc/platforms/book3s/vas-api.c       | 473 +++++++++++++
- arch/powerpc/platforms/powernv/Kconfig        |  14 -
- arch/powerpc/platforms/powernv/Makefile       |   2 +-
- arch/powerpc/platforms/powernv/vas-api.c      | 278 --------
- arch/powerpc/platforms/powernv/vas-debug.c    |  27 +-
- arch/powerpc/platforms/powernv/vas-fault.c    | 173 +----
- arch/powerpc/platforms/powernv/vas-trace.h    |   4 +-
- arch/powerpc/platforms/powernv/vas-window.c   | 264 ++++----
- arch/powerpc/platforms/powernv/vas.h          |  48 +-
- arch/powerpc/platforms/pseries/Makefile       |   1 +
- arch/powerpc/platforms/pseries/vas.c          | 636 ++++++++++++++++++
- arch/powerpc/platforms/pseries/vas.h          | 125 ++++
- drivers/crypto/nx/Kconfig                     |   1 +
- drivers/crypto/nx/Makefile                    |   2 +-
- drivers/crypto/nx/nx-common-powernv.c         |   6 +-
- .../{nx-842-pseries.c => nx-common-pseries.c} | 138 ++++
- 23 files changed, 1717 insertions(+), 616 deletions(-)
- create mode 100644 arch/powerpc/platforms/book3s/Kconfig
- create mode 100644 arch/powerpc/platforms/book3s/Makefile
- create mode 100644 arch/powerpc/platforms/book3s/vas-api.c
- delete mode 100644 arch/powerpc/platforms/powernv/vas-api.c
- create mode 100644 arch/powerpc/platforms/pseries/vas.c
- create mode 100644 arch/powerpc/platforms/pseries/vas.h
- rename drivers/crypto/nx/{nx-842-pseries.c => nx-common-pseries.c} (90%)
-
+diff --git a/arch/powerpc/platforms/powernv/vas-window.c b/arch/powerpc/platforms/powernv/vas-window.c
+index 5f5fe63a3d1c..7ba0840fc3b5 100644
+--- a/arch/powerpc/platforms/powernv/vas-window.c
++++ b/arch/powerpc/platforms/powernv/vas-window.c
+@@ -1093,9 +1093,9 @@ struct vas_window *vas_tx_win_open(int vasid, enum vas_cop_type cop,
+ 		/*
+ 		 * Process closes window during exit. In the case of
+ 		 * multithread application, the child thread can open
+-		 * window and can exit without closing it. Expects parent
+-		 * thread to use and close the window. So do not need
+-		 * to take pid reference for parent thread.
++		 * window and can exit without closing it. so takes tgid
++		 * reference until window closed to make sure tgid is not
++		 * reused.
+ 		 */
+ 		txwin->tgid = find_get_pid(task_tgid_vnr(current));
+ 		/*
+@@ -1339,8 +1339,9 @@ int vas_win_close(struct vas_window *window)
+ 	/* if send window, drop reference to matching receive window */
+ 	if (window->tx_win) {
+ 		if (window->user_win) {
+-			/* Drop references to pid and mm */
++			/* Drop references to pid. tgid and mm */
+ 			put_pid(window->pid);
++			put_pid(window->tgid);
+ 			if (window->mm) {
+ 				mm_context_remove_vas_window(window->mm);
+ 				mmdrop(window->mm);
 -- 
 2.18.2
 
