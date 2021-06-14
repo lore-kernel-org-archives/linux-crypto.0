@@ -2,38 +2,39 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F909C2B9F4
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Jun 2021 20:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D01BC49EAF
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Jun 2021 20:24:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8166061246
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Jun 2021 20:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BAC2613D9
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Jun 2021 20:24:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235145AbhFNU0W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Jun 2021 16:26:22 -0400
-Received: from lilium.sigma-star.at ([109.75.188.150]:59380 "EHLO
+        id S235172AbhFNU0Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Jun 2021 16:26:24 -0400
+Received: from lilium.sigma-star.at ([109.75.188.150]:59386 "EHLO
         lilium.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234848AbhFNU0W (ORCPT
+        with ESMTP id S234933AbhFNU0W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 14 Jun 2021 16:26:22 -0400
-X-Greylist: delayed 455 seconds by postgrey-1.27 at vger.kernel.org; Mon, 14 Jun 2021 16:26:18 EDT
 Received: from localhost (localhost [127.0.0.1])
-        by lilium.sigma-star.at (Postfix) with ESMTP id 7C89818190E4A;
-        Mon, 14 Jun 2021 22:16:38 +0200 (CEST)
+        by lilium.sigma-star.at (Postfix) with ESMTP id 093011817A0CF;
+        Mon, 14 Jun 2021 22:16:37 +0200 (CEST)
 Received: from lilium.sigma-star.at ([127.0.0.1])
         by localhost (lilium.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id EytU5U21JfDt; Mon, 14 Jun 2021 22:16:37 +0200 (CEST)
+        with ESMTP id 3etoU-Nb0K0y; Mon, 14 Jun 2021 22:16:35 +0200 (CEST)
 Received: from lilium.sigma-star.at ([127.0.0.1])
         by localhost (lilium.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id Yxr3TtJK9DNP; Mon, 14 Jun 2021 22:16:37 +0200 (CEST)
+        with ESMTP id YZRu3oErkG0w; Mon, 14 Jun 2021 22:16:35 +0200 (CEST)
 From:   Richard Weinberger <richard@nod.at>
 To:     keyrings@vger.kernel.org
-Cc:     David Gstir <david@sigma-star.at>,
+Cc:     Richard Weinberger <richard@nod.at>,
         Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
         David Howells <dhowells@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Fabio Estevam <festevam@gmail.com>,
@@ -49,13 +50,12 @@ Cc:     David Gstir <david@sigma-star.at>,
         Mimi Zohar <zohar@linux.ibm.com>,
         NXP Linux Team <linux-imx@nxp.com>,
         Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Richard Weinberger <richard@nod.at>,
         Sascha Hauer <s.hauer@pengutronix.de>,
         "Serge E. Hallyn" <serge@hallyn.com>,
         Shawn Guo <shawnguo@kernel.org>
-Subject: [PATCH 3/3] doc: trusted-encrypted: add DCP as new trust source
-Date:   Mon, 14 Jun 2021 22:16:20 +0200
-Message-Id: <20210614201620.30451-4-richard@nod.at>
+Subject: [PATCH 1/3] crypto: mxs-dcp: Add support for hardware provided keys
+Date:   Mon, 14 Jun 2021 22:16:18 +0200
+Message-Id: <20210614201620.30451-2-richard@nod.at>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210614201620.30451-1-richard@nod.at>
 References: <20210614201620.30451-1-richard@nod.at>
@@ -65,14 +65,24 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: David Gstir <david@sigma-star.at>
+DCP is capable to performing AES with hardware-bound keys.
+These keys are not stored in main memory and are therefore not directly
+accessible by the operating system.
 
-Update the documentation for trusted and encrypted KEYS with DCP as new
-trust source:
+So instead of feeding the key into DCP, we need to place a
+reference to such a key before initiating the crypto operation.
+Keys are referenced by a one byte identifiers.
 
-- Describe security properties of DCP trust source
-- Describe key usage
-- Document blob format
+DCP supports 6 different keys: 4 slots in the secure memory area,
+a one time programmable key which can be burnt via on-chip fuses
+and an unique device key.
+
+Using these keys is restricted to in-kernel users that use them as buildi=
+ng
+block for other crypto tools such as trusted keys. Allowing userspace
+(e.g. via AF_ALG) to use these keys to crypt or decrypt data is a securit=
+y
+risk, because there is no access control mechanism.
 
 Cc: Ahmad Fatoum <a.fatoum@pengutronix.de>
 Cc: David Gstir <david@sigma-star.at>
@@ -98,180 +108,261 @@ Cc: Richard Weinberger <richard@nod.at>
 Cc: Sascha Hauer <s.hauer@pengutronix.de>
 Cc: "Serge E. Hallyn" <serge@hallyn.com>
 Cc: Shawn Guo <shawnguo@kernel.org>
-Co-developed-by: Richard Weinberger <richard@nod.at>
+Co-developed-by: David Gstir <david@sigma-star.at>
 Signed-off-by: David Gstir <david@sigma-star.at>
+Signed-off-by: Richard Weinberger <richard@nod.at>
 ---
- .../security/keys/trusted-encrypted.rst       | 84 ++++++++++++++++++-
- 1 file changed, 83 insertions(+), 1 deletion(-)
+ drivers/crypto/mxs-dcp.c | 110 ++++++++++++++++++++++++++++++++++-----
+ include/linux/mxs-dcp.h  |  19 +++++++
+ 2 files changed, 117 insertions(+), 12 deletions(-)
+ create mode 100644 include/linux/mxs-dcp.h
 
-diff --git a/Documentation/security/keys/trusted-encrypted.rst b/Document=
-ation/security/keys/trusted-encrypted.rst
-index 80d5a5af62a1..e8413122e4bc 100644
---- a/Documentation/security/keys/trusted-encrypted.rst
-+++ b/Documentation/security/keys/trusted-encrypted.rst
-@@ -35,6 +35,11 @@ safe.
-          Rooted to Hardware Unique Key (HUK) which is generally burnt in=
- on-chip
-          fuses and is accessible to TEE only.
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index d6a7784d2988..c3e0c0ccbc20 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -15,6 +15,7 @@
+ #include <linux/platform_device.h>
+ #include <linux/stmp_device.h>
+ #include <linux/clk.h>
++#include <linux/mxs-dcp.h>
 =20
-+     (3) DCP (Data Co-Processor: crypto accelerator of various i.MX SoCs=
-)
-+
-+         Rooted to a one-time programmable key (OTP) that is generally b=
-urnt in
-+         the on-chip fuses and is accessbile to the DCP encryption engin=
-e only.
-+
-   *  Execution isolation
+ #include <crypto/aes.h>
+ #include <crypto/sha1.h>
+@@ -101,6 +102,7 @@ struct dcp_async_ctx {
+ 	struct crypto_skcipher		*fallback;
+ 	unsigned int			key_len;
+ 	uint8_t				key[AES_KEYSIZE_128];
++	bool				refkey;
+ };
 =20
-      (1) TPM
-@@ -46,6 +51,12 @@ safe.
-          Customizable set of operations running in isolated execution
-          environment verified via Secure/Trusted boot process.
+ struct dcp_aes_req_ctx {
+@@ -155,6 +157,7 @@ static struct dcp *global_sdcp;
+ #define MXS_DCP_CONTROL0_HASH_TERM		(1 << 13)
+ #define MXS_DCP_CONTROL0_HASH_INIT		(1 << 12)
+ #define MXS_DCP_CONTROL0_PAYLOAD_KEY		(1 << 11)
++#define MXS_DCP_CONTROL0_OTP_KEY		(1 << 10)
+ #define MXS_DCP_CONTROL0_CIPHER_ENCRYPT		(1 << 8)
+ #define MXS_DCP_CONTROL0_CIPHER_INIT		(1 << 9)
+ #define MXS_DCP_CONTROL0_ENABLE_HASH		(1 << 6)
+@@ -168,6 +171,8 @@ static struct dcp *global_sdcp;
+ #define MXS_DCP_CONTROL1_CIPHER_MODE_ECB	(0 << 4)
+ #define MXS_DCP_CONTROL1_CIPHER_SELECT_AES128	(0 << 0)
 =20
-+     (3) DCP
++#define MXS_DCP_CONTROL1_KEY_SELECT_SHIFT	8
 +
-+         Fixed set of cryptographic operations running in isolated execu=
-tion
-+         environment. Only basic blob key encryption is executed there.
-+         The actual key sealing/unsealing is done on main processor/kern=
-el space.
-+
-   * Optional binding to platform integrity state
+ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
+ {
+ 	struct dcp *sdcp =3D global_sdcp;
+@@ -219,15 +224,18 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *ac=
+tx,
+ 	struct dcp *sdcp =3D global_sdcp;
+ 	struct dcp_dma_desc *desc =3D &sdcp->coh->desc[actx->chan];
+ 	struct dcp_aes_req_ctx *rctx =3D skcipher_request_ctx(req);
++	dma_addr_t src_phys, dst_phys, key_phys =3D {0};
++	bool key_referenced =3D actx->refkey;
+ 	int ret;
 =20
-      (1) TPM
-@@ -63,6 +74,11 @@ safe.
-          Relies on Secure/Trusted boot process for platform integrity. I=
-t can
-          be extended with TEE based measured boot process.
+-	dma_addr_t key_phys =3D dma_map_single(sdcp->dev, sdcp->coh->aes_key,
+-					     2 * AES_KEYSIZE_128,
+-					     DMA_TO_DEVICE);
+-	dma_addr_t src_phys =3D dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf=
+,
+-					     DCP_BUF_SZ, DMA_TO_DEVICE);
+-	dma_addr_t dst_phys =3D dma_map_single(sdcp->dev, sdcp->coh->aes_out_bu=
+f,
+-					     DCP_BUF_SZ, DMA_FROM_DEVICE);
++	if (!key_referenced) {
++		key_phys =3D dma_map_single(sdcp->dev, sdcp->coh->aes_key,
++					  2 * AES_KEYSIZE_128, DMA_TO_DEVICE);
++	}
++	src_phys =3D dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf, DCP_BUF_S=
+Z,
++				  DMA_TO_DEVICE);
++	dst_phys =3D dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf, DCP_BUF_=
+SZ,
++				  DMA_FROM_DEVICE);
 =20
-+     (3) DCP
-+
-+         Relies on Secure/Trusted boot process (called HAB by vendor) fo=
-r
-+         platform integrity.
-+
-   *  Interfaces and APIs
+ 	if (actx->fill % AES_BLOCK_SIZE) {
+ 		dev_err(sdcp->dev, "Invalid block size!\n");
+@@ -240,8 +248,13 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *act=
+x,
+ 		    MXS_DCP_CONTROL0_INTERRUPT |
+ 		    MXS_DCP_CONTROL0_ENABLE_CIPHER;
 =20
-      (1) TPM
-@@ -74,10 +90,14 @@ safe.
-          TEEs have well-documented, standardized client interface and AP=
-Is. For
-          more details refer to ``Documentation/staging/tee.rst``.
+-	/* Payload contains the key. */
+-	desc->control0 |=3D MXS_DCP_CONTROL0_PAYLOAD_KEY;
++	if (key_referenced) {
++		/* Set OTP key bit to select the key via KEY_SELECT. */
++		desc->control0 |=3D MXS_DCP_CONTROL0_OTP_KEY;
++	} else {
++		/* Payload contains the key. */
++		desc->control0 |=3D MXS_DCP_CONTROL0_PAYLOAD_KEY;
++	}
 =20
-+     (3) DCP
-+
-+         Vendor-specific API that is implemented as part of the DCP cryp=
-to driver in
-+         ``drivers/crypto/mxs-dcp.c``.
+ 	if (rctx->enc)
+ 		desc->control0 |=3D MXS_DCP_CONTROL0_CIPHER_ENCRYPT;
+@@ -255,6 +268,9 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx=
+,
+ 	else
+ 		desc->control1 |=3D MXS_DCP_CONTROL1_CIPHER_MODE_CBC;
 =20
-   *  Threat model
++	if (key_referenced)
++		desc->control1 |=3D sdcp->coh->aes_key[0] << MXS_DCP_CONTROL1_KEY_SELE=
+CT_SHIFT;
++
+ 	desc->next_cmd_addr =3D 0;
+ 	desc->source =3D src_phys;
+ 	desc->destination =3D dst_phys;
+@@ -265,8 +281,10 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *act=
+x,
+ 	ret =3D mxs_dcp_start_dma(actx);
 =20
--     The strength and appropriateness of a particular TPM or TEE for a g=
-iven
-+     The strength and appropriateness of a particular TPM, TEE or DCP fo=
-r a given
-      purpose must be assessed when using them to protect security-releva=
-nt data.
+ aes_done_run:
+-	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
+-			 DMA_TO_DEVICE);
++	if (!key_referenced) {
++		dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
++				 DMA_TO_DEVICE);
++	}
+ 	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+ 	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
 =20
+@@ -454,7 +472,7 @@ static int mxs_dcp_aes_enqueue(struct skcipher_reques=
+t *req, int enc, int ecb)
+ 	struct dcp_aes_req_ctx *rctx =3D skcipher_request_ctx(req);
+ 	int ret;
 =20
-@@ -103,6 +123,14 @@ access control policy within the trust source.
-      from platform specific hardware RNG or a software based Fortuna CSP=
-RNG
-      which can be seeded via multiple entropy sources.
+-	if (unlikely(actx->key_len !=3D AES_KEYSIZE_128))
++	if (unlikely(actx->key_len !=3D AES_KEYSIZE_128 && !actx->refkey))
+ 		return mxs_dcp_block_fallback(req, enc);
 =20
-+  * DCP (Data Co-Processor: crypto accelerator of various i.MX SoCs)
-+
-+     The DCP hardware device itself does not provide a dedicated RNG int=
-erface,
-+     so the kernel default RNG is used. SoCs with DCP like the i.MX6ULL =
-do have
-+     a dedicated hardware RNG that is independent from DCP which can be =
-enabled
-+     to back the kernel RNG.
-+
-+
- Encrypted Keys
- --------------
+ 	rctx->enc =3D enc;
+@@ -501,6 +519,7 @@ static int mxs_dcp_aes_setkey(struct crypto_skcipher =
+*tfm, const u8 *key,
+ 	 * there can still be an operation in progress.
+ 	 */
+ 	actx->key_len =3D len;
++	actx->refkey =3D false;
+ 	if (len =3D=3D AES_KEYSIZE_128) {
+ 		memcpy(actx->key, key, len);
+ 		return 0;
+@@ -517,6 +536,33 @@ static int mxs_dcp_aes_setkey(struct crypto_skcipher=
+ *tfm, const u8 *key,
+ 	return crypto_skcipher_setkey(actx->fallback, key, len);
+ }
 =20
-@@ -188,6 +216,19 @@ Usage::
- specific to TEE device implementation.  The key length for new keys is a=
-lways
- in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
++static int mxs_dcp_aes_setrefkey(struct crypto_skcipher *tfm, const u8 *=
+key,
++				 unsigned int len)
++{
++	struct dcp_async_ctx *actx =3D crypto_skcipher_ctx(tfm);
++	int ret =3D -EINVAL;
++
++	if (len !=3D DCP_PAES_KEYSIZE)
++		goto out;
++
++	actx->key_len =3D len;
++	actx->refkey =3D true;
++
++	switch (key[0]) {
++	case DCP_PAES_KEY_SLOT0:
++	case DCP_PAES_KEY_SLOT1:
++	case DCP_PAES_KEY_SLOT2:
++	case DCP_PAES_KEY_SLOT3:
++	case DCP_PAES_KEY_UNIQUE:
++	case DCP_PAES_KEY_OTP:
++		memcpy(actx->key, key, len);
++		ret =3D 0;
++	}
++
++out:
++	return ret;
++}
++
+ static int mxs_dcp_aes_fallback_init_tfm(struct crypto_skcipher *tfm)
+ {
+ 	const char *name =3D crypto_tfm_alg_name(crypto_skcipher_tfm(tfm));
+@@ -540,6 +586,13 @@ static void mxs_dcp_aes_fallback_exit_tfm(struct cry=
+pto_skcipher *tfm)
+ 	crypto_free_skcipher(actx->fallback);
+ }
 =20
-+Trusted Keys usage: DCP
-+-----------------------
++static int mxs_dcp_paes_init_tfm(struct crypto_skcipher *tfm)
++{
++	crypto_skcipher_set_reqsize(tfm, sizeof(struct dcp_aes_req_ctx));
 +
-+Usage::
++	return 0;
++}
 +
-+    keyctl add trusted name "new keylen" ring
-+    keyctl add trusted name "load hex_blob" ring
-+    keyctl print keyid
+ /*
+  * Hashing (SHA1/SHA256)
+  */
+@@ -882,6 +935,39 @@ static struct skcipher_alg dcp_aes_algs[] =3D {
+ 		.ivsize			=3D AES_BLOCK_SIZE,
+ 		.init			=3D mxs_dcp_aes_fallback_init_tfm,
+ 		.exit			=3D mxs_dcp_aes_fallback_exit_tfm,
++	}, {
++		.base.cra_name		=3D "ecb(paes)",
++		.base.cra_driver_name	=3D "ecb-paes-dcp",
++		.base.cra_priority	=3D 401,
++		.base.cra_alignmask	=3D 15,
++		.base.cra_flags		=3D CRYPTO_ALG_ASYNC | CRYPTO_ALG_INTERNAL,
++		.base.cra_blocksize	=3D AES_BLOCK_SIZE,
++		.base.cra_ctxsize	=3D sizeof(struct dcp_async_ctx),
++		.base.cra_module	=3D THIS_MODULE,
 +
-+"keyctl print" returns an ASCII hex copy of the sealed key, which is in =
-format
-+specific to this DCP key-blob implementation.  The key length for new ke=
-ys is
-+always in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
++		.min_keysize		=3D DCP_PAES_KEYSIZE,
++		.max_keysize		=3D DCP_PAES_KEYSIZE,
++		.setkey			=3D mxs_dcp_aes_setrefkey,
++		.encrypt		=3D mxs_dcp_aes_ecb_encrypt,
++		.decrypt		=3D mxs_dcp_aes_ecb_decrypt,
++		.init			=3D mxs_dcp_paes_init_tfm,
++	}, {
++		.base.cra_name		=3D "cbc(paes)",
++		.base.cra_driver_name	=3D "cbc-paes-dcp",
++		.base.cra_priority	=3D 401,
++		.base.cra_alignmask	=3D 15,
++		.base.cra_flags		=3D CRYPTO_ALG_ASYNC | CRYPTO_ALG_INTERNAL,
++		.base.cra_blocksize	=3D AES_BLOCK_SIZE,
++		.base.cra_ctxsize	=3D sizeof(struct dcp_async_ctx),
++		.base.cra_module	=3D THIS_MODULE,
 +
- Encrypted Keys usage
- --------------------
++		.min_keysize		=3D DCP_PAES_KEYSIZE,
++		.max_keysize		=3D DCP_PAES_KEYSIZE,
++		.setkey			=3D mxs_dcp_aes_setrefkey,
++		.encrypt		=3D mxs_dcp_aes_cbc_encrypt,
++		.decrypt		=3D mxs_dcp_aes_cbc_decrypt,
++		.ivsize			=3D AES_BLOCK_SIZE,
++		.init			=3D mxs_dcp_paes_init_tfm,
+ 	},
+ };
 =20
-@@ -370,3 +411,44 @@ string length.
- privkey is the binary representation of TPM2B_PUBLIC excluding the
- initial TPM2B header which can be reconstructed from the ASN.1 octed
- string length.
+diff --git a/include/linux/mxs-dcp.h b/include/linux/mxs-dcp.h
+new file mode 100644
+index 000000000000..df6678ee10a1
+--- /dev/null
++++ b/include/linux/mxs-dcp.h
+@@ -0,0 +1,19 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2021 sigma star gmbh
++ * Authors: David Gstir <david@sigma-star.at>
++ *          Richard Weinberger <richard@sigma-star.at>
++ */
 +
-+DCP Blob Format
-+---------------
++#ifndef MXS_DCP_H
++#define MXS_DCP_H
 +
-+The Data Co-Processor (DCP) provides hardware-bound AES keys using its
-+AES encryption engine only. It does not provide direct key sealing/unsea=
-ling.
-+To make DCP hardware encryption keys usable as trust source, we define
-+our own custom format that uses a hardware-bound key to secure the seali=
-ng
-+key stored in the key blob.
++#define DCP_PAES_KEYSIZE 1
++#define DCP_PAES_KEY_SLOT0 0x00
++#define DCP_PAES_KEY_SLOT1 0x01
++#define DCP_PAES_KEY_SLOT2 0x02
++#define DCP_PAES_KEY_SLOT3 0x03
++#define DCP_PAES_KEY_UNIQUE 0xfe
++#define DCP_PAES_KEY_OTP 0xff
 +
-+Whenever a new tusted key using DCP is generated, we generate a random 1=
-28-bit
-+blob encryption key (BEK) and 128-bit nonce. The BEK and nonce are used =
-to
-+encrypt the trusted key payload using AES-128-GCM.
-+
-+The BEK itself is encrypted using the hardware-bound key using the DCP's=
- AES
-+encryption engine with AES-128-ECB. The encrypted BEK, generated nonce,
-+BEK-encrypted payload and authentication tag make up the blob format tog=
-ether
-+with a version number, payload length and authentication tag::
-+
-+    /*
-+     * struct dcp_blob_fmt - DCP BLOB format.
-+     *
-+     * @fmt_version: Format version, currently being %1
-+     * @blob_key: Random AES 128 key which is used to encrypt @payload,
-+     *            @blob_key itself is encrypted with OTP or UNIQUE devic=
-e key in
-+     *            AES-128-ECB mode by DCP.
-+     * @nonce: Random nonce used for @payload encryption.
-+     * @payload_len: Length of the plain text @payload.
-+     * @payload: The payload itself, encrypted using AES-128-GCM and @bl=
-ob_key,
-+     *           GCM auth tag of size AES_BLOCK_SIZE is attached at the =
-end of it.
-+     *
-+     * The total size of a DCP BLOB is sizeof(struct dcp_blob_fmt) + @pa=
-yload_len +
-+     * AES_BLOCK_SIZE.
-+     */
-+    struct dcp_blob_fmt {
-+            __u8 fmt_version;
-+            __u8 blob_key[AES_KEYSIZE_128];
-+            __u8 nonce[AES_KEYSIZE_128];
-+            __le32 payload_len;
-+            __u8 payload[0];
-+    } __packed;
++#endif /* MXS_DCP_H */
 --=20
 2.26.2
 
