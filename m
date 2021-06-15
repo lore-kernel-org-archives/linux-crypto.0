@@ -7,384 +7,457 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BA09C48BE5
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 06:37:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48071C48BDF
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 06:51:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4FB94613B6
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 06:37:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 264DD61413
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 06:51:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229659AbhFOGjg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Jun 2021 02:39:36 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23700 "EHLO
+        id S229781AbhFOGxb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Jun 2021 02:53:31 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62366 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229488AbhFOGjg (ORCPT
+        by vger.kernel.org with ESMTP id S229845AbhFOGxa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jun 2021 02:39:36 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15F6XUQ5027197;
-        Tue, 15 Jun 2021 02:37:21 -0400
+        Tue, 15 Jun 2021 02:53:30 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15F6odZG059711;
+        Tue, 15 Jun 2021 02:51:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
  from : to : cc : date : in-reply-to : references : content-type :
  mime-version : content-transfer-encoding; s=pp1;
- bh=02GwyeUK1Ad616n3iPIjje3OLiJe7KMwztSOPf/IMe8=;
- b=aciG92SjXjzkgy8kSq5hyWjmOQGHW6FSbDSh8QndlM47ZUHFewQOlx6qGQCAjZ5a2q8M
- Pw4Mhrs8MacOdxi8voYzKyh4IVk4lqSvBv/jhRMT0Pqs8AoF24RDsDPiDrGOUvgs4FhH
- 3OSjFwdf07POE430kz4E3wR2F13krVP1Ng+zysIa/V5ogNuC74dBKN41e8CY+ry2n4f+
- hTbiUz/dJ9hFth42QVnD2boq1N3K7gBDL/yU8djq0Wk1VfFWWAdXZBke3x0bFe5xZ3Or
- 74LWefyMqzDwwmx63P6lgskLBGBcwteu98ahXxcTw3zCzPK3KpnsccNsf6z1GgMehNtX lw== 
+ bh=i3K4MRTLGv9vyEyq/44Tf6WUUQ+9nAC4ClnhHYNGWaA=;
+ b=NOLmjFTQT93DqIdn/aI+5E2DLKDIHFN2gS7Uyu2PjkdaTnlMMJxIxpGLyMII4SX0gZX1
+ 1QH88eJuWSRGovz1XWCF816QA7X+gnxshuabmrCDxjvMEXpG+Aucl4qr6J9CSaI7jOwP
+ ecJVLmjdV+o3TOPoZihyz6hVFOy6i0mbo3XV0xQK9bCssRiigAdts9ggv09QQQZotGq1
+ wvNY4llxswSJVlVgxBujxDjHzGn+dHikDcMT++//VaHKONGSsqVfsRELDytIqkIoq9wx
+ TD1YCUGyc/9jHlrk5mI9pyCEXWxGI5wPzlVcZSWlOhPp8qxVcai0rrJifprjuLdX7wpM ug== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 396n0ftu8c-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 396mp0kwbx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Jun 2021 02:37:21 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15F6XUcb027179;
-        Tue, 15 Jun 2021 02:37:20 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 396n0ftu82-1
+        Tue, 15 Jun 2021 02:51:17 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15F6of3v059796;
+        Tue, 15 Jun 2021 02:51:16 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 396mp0kwbr-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Jun 2021 02:37:20 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15F6W7FE025036;
-        Tue, 15 Jun 2021 06:37:20 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma02wdc.us.ibm.com with ESMTP id 394mj9nfw0-1
+        Tue, 15 Jun 2021 02:51:16 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15F6mPgE027519;
+        Tue, 15 Jun 2021 06:51:16 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma04wdc.us.ibm.com with ESMTP id 394mj9dhsx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Jun 2021 06:37:20 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15F6bJvn16777590
+        Tue, 15 Jun 2021 06:51:16 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15F6pFHY7996278
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Jun 2021 06:37:19 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0CA15BE065;
-        Tue, 15 Jun 2021 06:37:19 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 51294BE05B;
-        Tue, 15 Jun 2021 06:37:17 +0000 (GMT)
+        Tue, 15 Jun 2021 06:51:15 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A3A15B206B;
+        Tue, 15 Jun 2021 06:51:15 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B88A2B2064;
+        Tue, 15 Jun 2021 06:51:14 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.160.180.39])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Jun 2021 06:37:17 +0000 (GMT)
-Message-ID: <e409750a3bd5f8410d7a8a290c69375486420b93.camel@linux.ibm.com>
-Subject: Re: [PATCH v5 04/17] powerpc/vas: Add platform specific user window
- operations
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 15 Jun 2021 06:51:14 +0000 (GMT)
+Message-ID: <920cb54747efa2ff4148c829d83c2bddb08a3fab.camel@linux.ibm.com>
+Subject: Re: [PATCH v5 12/17] powerpc/pseries/vas: Integrate API with
+ open/close windows
 From:   Haren Myneni <haren@linux.ibm.com>
 To:     Nicholas Piggin <npiggin@gmail.com>, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         mpe@ellerman.id.au
 Cc:     haren@us.ibm.com, hbabu@us.ibm.com
-Date:   Mon, 14 Jun 2021 23:37:15 -0700
-In-Reply-To: <1623636838.8tsdy9nisc.astroid@bobo.none>
+Date:   Mon, 14 Jun 2021 23:51:12 -0700
+In-Reply-To: <1623638159.6pp87imz6a.astroid@bobo.none>
 References: <ed7a09822cf3a2e463f942e5a37309a2365c9d79.camel@linux.ibm.com>
-         <c64fda6e9b684c175cedb3ec448cce7aaf0f4615.camel@linux.ibm.com>
-         <1623636838.8tsdy9nisc.astroid@bobo.none>
+         <58c2f9debeff2ff6515ea950ebdd6483c147c843.camel@linux.ibm.com>
+         <1623638159.6pp87imz6a.astroid@bobo.none>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ARJQs9xIiTuKBCu0TUgENN226-h1QDb_
-X-Proofpoint-GUID: KFEP1vqnlt5NvFP9jCgVJpQtZh6Bh6Ea
+X-Proofpoint-ORIG-GUID: ah9B9ZOpmikMgfoBlhYWAVl5io3Z26XV
+X-Proofpoint-GUID: JWStV_Ssk9zuT19yoBhxWL95FonQCKD6
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-06-15_03:2021-06-14,2021-06-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- mlxlogscore=999 malwarescore=0 impostorscore=0 phishscore=0 bulkscore=0
- spamscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ definitions=2021-06-15_04:2021-06-14,2021-06-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 clxscore=1015
+ priorityscore=1501 lowpriorityscore=0 spamscore=0 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2104190000 definitions=main-2106150038
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2021-06-14 at 12:24 +1000, Nicholas Piggin wrote:
-> Excerpts from Haren Myneni's message of June 13, 2021 8:57 pm:
-> > PowerNV uses registers to open/close VAS windows, and getting the
-> > paste address. Whereas the hypervisor calls are used on PowerVM.
+On Mon, 2021-06-14 at 12:55 +1000, Nicholas Piggin wrote:
+> Excerpts from Haren Myneni's message of June 13, 2021 9:02 pm:
+> > This patch adds VAS window allocatioa/close with the corresponding
+> > hcalls. Also changes to integrate with the existing user space VAS
+> > API and provide register/unregister functions to NX pseries driver.
 > > 
-> > This patch adds the platform specific user space window operations
-> > and register with the common VAS user space interface.
+> > The driver register function is used to create the user space
+> > interface (/dev/crypto/nx-gzip) and unregister to remove this
+> > entry.
+> > 
+> > The user space process opens this device node and makes an ioctl
+> > to allocate VAS window. The close interface is used to deallocate
+> > window.
 > > 
 > > Signed-off-by: Haren Myneni <haren@linux.ibm.com>
 > > ---
-> >  arch/powerpc/include/asm/vas.h              | 14 +++++-
-> >  arch/powerpc/platforms/book3s/vas-api.c     | 53 +++++++++++++--
-> > ------
-> >  arch/powerpc/platforms/powernv/vas-window.c | 45 ++++++++++++++++-
-> >  3 files changed, 89 insertions(+), 23 deletions(-)
+> >  arch/powerpc/include/asm/vas.h          |   4 +
+> >  arch/powerpc/platforms/pseries/Makefile |   1 +
+> >  arch/powerpc/platforms/pseries/vas.c    | 223
+> > ++++++++++++++++++++++++
+> >  3 files changed, 228 insertions(+)
 > > 
 > > diff --git a/arch/powerpc/include/asm/vas.h
 > > b/arch/powerpc/include/asm/vas.h
-> > index bab7891d43f5..85318d7446c7 100644
+> > index eefc758d8cd4..9d5646d721c4 100644
 > > --- a/arch/powerpc/include/asm/vas.h
 > > +++ b/arch/powerpc/include/asm/vas.h
-> > @@ -5,6 +5,7 @@
-> >  
-> >  #ifndef _ASM_POWERPC_VAS_H
-> >  #define _ASM_POWERPC_VAS_H
-> > +#include <uapi/asm/vas-api.h>
-> >  
-> >  struct vas_window;
-> >  
-> > @@ -48,6 +49,16 @@ enum vas_cop_type {
-> >  	VAS_COP_TYPE_MAX,
+> > @@ -254,6 +254,10 @@ struct vas_all_caps {
+> >  	u64     feat_type;
 > >  };
 > >  
-> > +/*
-> > + * User space window operations used for powernv and powerVM
-> > + */
-> > +struct vas_user_win_ops {
-> > +	struct vas_window * (*open_win)(struct vas_tx_win_open_attr *,
-> > +				enum vas_cop_type);
-> > +	u64 (*paste_addr)(struct vas_window *);
-> > +	int (*close_win)(struct vas_window *);
-> > +};
-> 
-> This looks better, but rather than pull in uapi and the user API 
-> structure here, could you just pass in vas_id and flags after the
-> common 
-> code does the user copy and verifies the version and other details?
-> 
-> I think it's generally good practice to limit the data that the usre
-> can influence as much as possible. Sorry for not picking up on that
-> earlier.
-
-The user space pass vas_tx_win_open_attr struct - use only vas_id and
-flags right now but it can be extended in future with reserve elements.
-So passing the same struct to platform specific API.
-
-do you prefer "struct vas_window * (*open_win)(vas_id, flags, cop)" and
-extend later when more elments are used?
-
-Thanks
-Haren 
-
-> 
-> If that's changed, then
-> 
-> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
-> 
-> Thanks,
-> Nick
-> 
-> > +
+> > +int h_query_vas_capabilities(const u64 hcall, u8 query_type, u64
+> > result);
+> > +int vas_register_api_pseries(struct module *mod,
+> > +			     enum vas_cop_type cop_type, const char
+> > *name);
+> > +void vas_unregister_api_pseries(void);
+> >  #endif
+> >  
 > >  /*
-> >   * Receive window attributes specified by the (in-kernel) owner of
-> > window.
-> >   */
-> > @@ -175,7 +186,8 @@ void vas_unregister_api_powernv(void);
-> >   * used for others in future.
-> >   */
-> >  int vas_register_coproc_api(struct module *mod, enum vas_cop_type
-> > cop_type,
-> > -				const char *name);
-> > +			    const char *name,
-> > +			    const struct vas_user_win_ops *vops);
-> >  void vas_unregister_coproc_api(void);
+> > diff --git a/arch/powerpc/platforms/pseries/Makefile
+> > b/arch/powerpc/platforms/pseries/Makefile
+> > index c8a2b0b05ac0..4cda0ef87be0 100644
+> > --- a/arch/powerpc/platforms/pseries/Makefile
+> > +++ b/arch/powerpc/platforms/pseries/Makefile
+> > @@ -30,3 +30,4 @@ obj-$(CONFIG_PPC_SVM)		+= svm.o
+> >  obj-$(CONFIG_FA_DUMP)		+= rtas-fadump.o
 > >  
-> >  #endif /* __ASM_POWERPC_VAS_H */
-> > diff --git a/arch/powerpc/platforms/book3s/vas-api.c
-> > b/arch/powerpc/platforms/book3s/vas-api.c
-> > index 72c126d87216..7cfc4b435ae8 100644
-> > --- a/arch/powerpc/platforms/book3s/vas-api.c
-> > +++ b/arch/powerpc/platforms/book3s/vas-api.c
-> > @@ -42,6 +42,7 @@ static struct coproc_dev {
-> >  	dev_t devt;
-> >  	struct class *class;
-> >  	enum vas_cop_type cop_type;
-> > +	const struct vas_user_win_ops *vops;
-> >  } coproc_device;
-> >  
-> >  struct coproc_instance {
-> > @@ -72,11 +73,10 @@ static int coproc_open(struct inode *inode,
-> > struct file *fp)
-> >  static int coproc_ioc_tx_win_open(struct file *fp, unsigned long
-> > arg)
-> >  {
-> >  	void __user *uptr = (void __user *)arg;
-> > -	struct vas_tx_win_attr txattr = {};
-> >  	struct vas_tx_win_open_attr uattr;
-> >  	struct coproc_instance *cp_inst;
-> >  	struct vas_window *txwin;
-> > -	int rc, vasid;
-> > +	int rc;
-> >  
-> >  	cp_inst = fp->private_data;
-> >  
-> > @@ -93,27 +93,20 @@ static int coproc_ioc_tx_win_open(struct file
-> > *fp, unsigned long arg)
+> >  obj-$(CONFIG_SUSPEND)		+= suspend.o
+> > +obj-$(CONFIG_PPC_VAS)		+= vas.o
+> > diff --git a/arch/powerpc/platforms/pseries/vas.c
+> > b/arch/powerpc/platforms/pseries/vas.c
+> > index 98109a13f1c2..fe375f7a7029 100644
+> > --- a/arch/powerpc/platforms/pseries/vas.c
+> > +++ b/arch/powerpc/platforms/pseries/vas.c
+> > @@ -10,6 +10,7 @@
+> >  #include <linux/export.h>
+> >  #include <linux/types.h>
+> >  #include <linux/delay.h>
+> > +#include <linux/slab.h>
+> >  #include <asm/machdep.h>
+> >  #include <asm/hvcall.h>
+> >  #include <asm/plpar_wrappers.h>
+> > @@ -187,6 +188,228 @@ int h_query_vas_capabilities(const u64 hcall,
+> > u8 query_type, u64 result)
+> >  		return -EIO;
 > >  	}
-> >  
-> >  	if (uattr.version != 1) {
-> > -		pr_err("Invalid version\n");
-> > +		pr_err("Invalid window open API version\n");
-> >  		return -EINVAL;
-> >  	}
-> >  
-> > -	vasid = uattr.vas_id;
-> > -
-> > -	vas_init_tx_win_attr(&txattr, cp_inst->coproc->cop_type);
-> > -
-> > -	txattr.lpid = mfspr(SPRN_LPID);
-> > -	txattr.pidr = mfspr(SPRN_PID);
-> > -	txattr.user_win = true;
-> > -	txattr.rsvd_txbuf_count = false;
-> > -	txattr.pswid = false;
-> > -
-> > -	pr_devel("Pid %d: Opening txwin, PIDR %ld\n", txattr.pidr,
-> > -				mfspr(SPRN_PID));
-> > +	if (!cp_inst->coproc->vops && !cp_inst->coproc->vops->open_win) 
-> > {
-> > +		pr_err("VAS API is not registered\n");
-> > +		return -EACCES;
-> > +	}
-> >  
-> > -	txwin = vas_tx_win_open(vasid, cp_inst->coproc->cop_type,
-> > &txattr);
-> > +	txwin = cp_inst->coproc->vops->open_win(&uattr,
-> > +						cp_inst->coproc-
-> > >cop_type);
-> >  	if (IS_ERR(txwin)) {
-> > -		pr_err("%s() vas_tx_win_open() failed, %ld\n",
-> > __func__,
-> > -					PTR_ERR(txwin));
-> > +		pr_err("%s() VAS window open failed, %ld\n", __func__,
-> > +				PTR_ERR(txwin));
-> >  		return PTR_ERR(txwin);
-> >  	}
-> >  
-> > @@ -125,9 +118,15 @@ static int coproc_ioc_tx_win_open(struct file
-> > *fp, unsigned long arg)
-> >  static int coproc_release(struct inode *inode, struct file *fp)
-> >  {
-> >  	struct coproc_instance *cp_inst = fp->private_data;
-> > +	int rc;
-> >  
-> >  	if (cp_inst->txwin) {
-> > -		vas_win_close(cp_inst->txwin);
-> > +		if (cp_inst->coproc->vops &&
-> > +			cp_inst->coproc->vops->close_win) {
-> > +			rc = cp_inst->coproc->vops->close_win(cp_inst-
-> > >txwin);
-> > +			if (rc)
-> > +				return rc;
-> > +		}
-> >  		cp_inst->txwin = NULL;
-> >  	}
-> >  
-> > @@ -168,7 +167,17 @@ static int coproc_mmap(struct file *fp, struct
-> > vm_area_struct *vma)
-> >  		return -EINVAL;
-> >  	}
-> >  
-> > -	vas_win_paste_addr(txwin, &paste_addr, NULL);
-> > +	if (!cp_inst->coproc->vops && !cp_inst->coproc->vops-
-> > >paste_addr) {
-> > +		pr_err("%s(): VAS API is not registered\n", __func__);
-> > +		return -EACCES;
-> > +	}
-> > +
-> > +	paste_addr = cp_inst->coproc->vops->paste_addr(txwin);
-> > +	if (!paste_addr) {
-> > +		pr_err("%s(): Window paste address failed\n",
-> > __func__);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> >  	pfn = paste_addr >> PAGE_SHIFT;
-> >  
-> >  	/* flags, page_prot from cxl_mmap(), except we want cachable */
-> > @@ -208,7 +217,8 @@ static struct file_operations coproc_fops = {
-> >   * extended to other coprocessor types later.
-> >   */
-> >  int vas_register_coproc_api(struct module *mod, enum vas_cop_type
-> > cop_type,
-> > -				const char *name)
-> > +			    const char *name,
-> > +			    const struct vas_user_win_ops *vops)
-> >  {
-> >  	int rc = -EINVAL;
-> >  	dev_t devno;
-> > @@ -230,6 +240,7 @@ int vas_register_coproc_api(struct module *mod,
-> > enum vas_cop_type cop_type,
-> >  	}
-> >  	coproc_device.class->devnode = coproc_devnode;
-> >  	coproc_device.cop_type = cop_type;
-> > +	coproc_device.vops = vops;
-> >  
-> >  	coproc_fops.owner = mod;
-> >  	cdev_init(&coproc_device.cdev, &coproc_fops);
-> > diff --git a/arch/powerpc/platforms/powernv/vas-window.c
-> > b/arch/powerpc/platforms/powernv/vas-window.c
-> > index 41712b4b268e..5162e95c4090 100644
-> > --- a/arch/powerpc/platforms/powernv/vas-window.c
-> > +++ b/arch/powerpc/platforms/powernv/vas-window.c
-> > @@ -16,6 +16,7 @@
-> >  #include <linux/mmu_context.h>
-> >  #include <asm/switch_to.h>
-> >  #include <asm/ppc-opcode.h>
-> > +#include <asm/vas.h>
-> >  #include "vas.h"
-> >  #include "copy-paste.h"
-> >  
-> > @@ -1443,6 +1444,48 @@ struct vas_window
-> > *vas_pswid_to_window(struct vas_instance *vinst,
-> >  	return window;
 > >  }
-> >  
-> > +static struct vas_window *vas_user_win_open(struct
-> > vas_tx_win_open_attr *uattr,
-> > +				enum vas_cop_type cop_type)
+> > +EXPORT_SYMBOL_GPL(h_query_vas_capabilities);
+> > +
+> > +/*
+> > + * Allocate window and setup IRQ mapping.
+> > + */
+> > +static int allocate_setup_window(struct pseries_vas_window *txwin,
+> > +				 u64 *domain, u8 wintype)
 > > +{
-> > +	struct vas_tx_win_attr txattr = {};
+> > +	int rc;
 > > +
-> > +	vas_init_tx_win_attr(&txattr, cop_type);
+> > +	rc = h_allocate_vas_window(txwin, domain, wintype,
+> > DEF_WIN_CREDS);
+> > +	if (rc)
+> > +		return rc;
 > > +
-> > +	txattr.lpid = mfspr(SPRN_LPID);
-> > +	txattr.pidr = mfspr(SPRN_PID);
-> > +	txattr.user_win = true;
-> > +	txattr.rsvd_txbuf_count = false;
-> > +	txattr.pswid = false;
-> > +
-> > +	pr_devel("Pid %d: Opening txwin, PIDR %ld\n", txattr.pidr,
-> > +				mfspr(SPRN_PID));
-> > +
-> > +	return vas_tx_win_open(uattr->vas_id, cop_type, &txattr);
-> > +}
-> > +
-> > +static u64 vas_user_win_paste_addr(struct vas_window *win)
-> > +{
-> > +	u64 paste_addr;
-> > +
-> > +	vas_win_paste_addr(win, &paste_addr, NULL);
-> > +
-> > +	return paste_addr;
-> > +}
-> > +
-> > +static int vas_user_win_close(struct vas_window *txwin)
-> > +{
-> > +
-> > +	vas_win_close(txwin);
+> > +	txwin->vas_win.wcreds_max = DEF_WIN_CREDS;
 > > +
 > > +	return 0;
 > > +}
 > > +
-> > +static const struct vas_user_win_ops vops =  {
-> > +	.open_win	=	vas_user_win_open,
-> > +	.paste_addr	=	vas_user_win_paste_addr,
-> > +	.close_win	=	vas_user_win_close,
+> > +static struct vas_window *vas_allocate_window(struct
+> > vas_tx_win_open_attr *uattr,
+> > +					      enum vas_cop_type
+> > cop_type)
+> > +{
+> > +	long domain[PLPAR_HCALL9_BUFSIZE] = {VAS_DEFAULT_DOMAIN_ID};
+> > +	struct vas_ct_caps *ct_caps;
+> > +	struct vas_caps *caps;
+> > +	struct pseries_vas_window *txwin;
+> > +	int rc;
+> > +
+> > +	txwin = kzalloc(sizeof(*txwin), GFP_KERNEL);
+> > +	if (!txwin)
+> > +		return ERR_PTR(-ENOMEM);
+> > +
+> > +	/*
+> > +	 * A VAS window can have many credits which means that many
+> > +	 * requests can be issued simultaneously. But phyp restricts
+> > +	 * one credit per window.
+> > +	 * phyp introduces 2 different types of credits:
+> > +	 * Default credit type (Uses normal priority FIFO):
+> > +	 *	A limited number of credits are assigned to partitions
+> > +	 *	based on processor entitlement. But these credits may be
+> > +	 *	over-committed on a system depends on whether the CPUs
+> > +	 *	are in shared or dedicated modes - that is, more requests
+> > +	 *	may be issued across the system than NX can service at
+> > +	 *	once which can result in paste command failure (RMA_busy).
+> > +	 *	Then the process has to resend requests or fall-back to
+> > +	 *	SW compression.
+> > +	 * Quality of Service (QoS) credit type (Uses high priority
+> > FIFO):
+> > +	 *	To avoid NX HW contention, the system admins can assign
+> > +	 *	QoS credits for each LPAR so that this partition is
+> > +	 *	guaranteed access to NX resources. These credits are
+> > +	 *	assigned to partitions via the HMC.
+> > +	 *	Refer PAPR for more information.
+> > +	 *
+> > +	 * Allocate window with QoS credits if user requested.
+> > Otherwise
+> > +	 * default credits are used.
+> > +	 */
+> > +	if (uattr->flags & VAS_TX_WIN_FLAG_QOS_CREDIT)
+> > +		caps = &vascaps[VAS_GZIP_QOS_FEAT_TYPE];
+> > +	else
+> > +		caps = &vascaps[VAS_GZIP_DEF_FEAT_TYPE];
+> > +
+> > +	ct_caps = &caps->caps;
+> > +
+> > +	if (atomic_inc_return(&ct_caps->used_lpar_creds) >
+> > +			atomic_read(&ct_caps->target_lpar_creds)) {
+> > +		pr_err("Credits are not available to allocate
+> > window\n");
+> > +		rc = -EINVAL;
+> > +		goto out;
+> > +	}
+> > +
+> > +	/*
+> > +	 * The user space is requesting to allocate a window on a VAS
+> > +	 * instance (or chip) where the process is executing.
+> > +	 * On powerVM, domain values are passed to pHyp to select chip
+> > /
+> > +	 * VAS instance. Useful if the process is affinity to NUMA
+> > node.
+> > +	 * pHyp selects VAS instance if VAS_DEFAULT_DOMAIN_ID (-1) is
+> > +	 * passed for domain values.
+> > +	 */
+> 
+> s/powerVM/PowerVM
+> s/pHyp/PowerVM
+> 
+> You could also just call it the hypervisor. KVM may not implement
+> the 
+> hcalls now, but in future it could.
+> 
+> > +	if (uattr->vas_id == -1) {
+> 
+> Should the above comment fit under here? vas_id == -1 means
+> userspace 
+> asks for any VAS but preferably a local one?
+
+yes, the user space is requesting window to be allocated on the local
+VAS. Added the first comment to explain about vas_id = -1 and the
+second comment on why same domain values from H_HOME_NODE_ASSOCIATIVITY
+are passed to allocate window HCALL. 
+
+I will remove the first comment and merge it later after "if (uattr-
+>vas_id == -1) {"
+
+Thanks
+Haren
+> 
+> > +		/*
+> > +		 * To allocate VAS window, pass same domain values
+> > returned
+> > +		 * from this HCALL.
+> > +		 */
+> 
+> Then you could merge it with this comment and make it a bit clearer:
+> the h_allocate_vas_window hcall is defined to take a domain as
+> specified by h_home_node_associativity, so no conversions or
+> unpacking
+> needs to be done.
+> 
+> > +		rc = plpar_hcall9(H_HOME_NODE_ASSOCIATIVITY, domain,
+> > +				  VPHN_FLAG_VCPU, smp_processor_id());
+> > +		if (rc != H_SUCCESS) {
+> > +			pr_err("HCALL(%x): failed with ret(%d)\n",
+> > +			       H_HOME_NODE_ASSOCIATIVITY, rc);
+> > +			goto out;
+> > +		}
+> > +	}
+> > +
+> > +	/*
+> > +	 * Allocate / Deallocate window HCALLs and setup / free IRQs
+> > +	 * have to be protected with mutex.
+> > +	 * Open VAS window: Allocate window HCALL and setup IRQ
+> > +	 * Close VAS window: Deallocate window HCALL and free IRQ
+> > +	 *	The hypervisor waits until all NX requests are
+> > +	 *	completed before closing the window. So expects OS
+> > +	 *	to handle NX faults, means IRQ can be freed only
+> > +	 *	after the deallocate window HCALL is returned.
+> > +	 * So once the window is closed with deallocate HCALL before
+> > +	 * the IRQ is freed, it can be assigned to new allocate
+> > +	 * HCALL with the same fault IRQ by the hypervisor. It can
+> > +	 * result in setup IRQ fail for the new window since the
+> > +	 * same fault IRQ is not freed by the OS.
+> > +	 */
+> > +	mutex_lock(&vas_pseries_mutex);
+> 
+> Why? What's the mutex protecting here?
+> 
+> > +	rc = allocate_setup_window(txwin, (u64 *)&domain[0],
+> > +				   ct_caps->win_type);
+> 
+> If you define the types to be the same, can you avoid this casting?
+> allocate_setup_window specifically needs an array of 
+> PLPAR_HCALL9_BUFSIZE longs.
+> 
+> > +	mutex_unlock(&vas_pseries_mutex);
+> > +	if (rc)
+> > +		goto out;
+> > +
+> > +	/*
+> > +	 * Modify window and it is ready to use.
+> > +	 */
+> > +	rc = h_modify_vas_window(txwin);
+> > +	if (!rc)
+> > +		rc = get_vas_user_win_ref(&txwin->vas_win.task_ref);
+> > +	if (rc)
+> > +		goto out_free;
+> > +
+> > +	vas_user_win_add_mm_context(&txwin->vas_win.task_ref);
+> > +	txwin->win_type = ct_caps->win_type;
+> > +	mutex_lock(&vas_pseries_mutex);
+> > +	list_add(&txwin->win_list, &caps->list);
+> > +	mutex_unlock(&vas_pseries_mutex);
+> > +
+> > +	return &txwin->vas_win;
+> > +
+> > +out_free:
+> > +	h_deallocate_vas_window(txwin->vas_win.winid);
+> 
+> No mutex here in this deallocate hcall.
+> 
+> I suspect you don't actually need the mutex for the hcalls
+> themselves, 
+> but the list manipulations. I would possibly consider putting 
+> used_lpar_creds under that same lock rather than making it atomic and
+> playing lock free games, unless you really need to.
+> 
+> Also... "creds". credentials? credits, right? Don't go through and 
+> change everything now, but not skimping on naming helps a lot with
+> reading code that you're not familiar with. All the vas/nx stuff
+> could probably do with a pass to make the names a bit easier.
+> 
+> (creds isn't so bad, "ct" for "coprocessor type" is pretty obscure 
+> though).
+> 
+> Thanks,
+> Nick
+> 
+> > +out:
+> > +	atomic_dec(&ct_caps->used_lpar_creds);
+> > +	kfree(txwin);
+> > +	return ERR_PTR(rc);
+> > +}
+> > +
+> > +static u64 vas_paste_address(struct vas_window *vwin)
+> > +{
+> > +	struct pseries_vas_window *win;
+> > +
+> > +	win = container_of(vwin, struct pseries_vas_window, vas_win);
+> > +	return win->win_addr;
+> > +}
+> > +
+> > +static int deallocate_free_window(struct pseries_vas_window *win)
+> > +{
+> > +	int rc = 0;
+> > +
+> > +	rc = h_deallocate_vas_window(win->vas_win.winid);
+> > +
+> > +	return rc;
+> > +}
+> > +
+> > +static int vas_deallocate_window(struct vas_window *vwin)
+> > +{
+> > +	struct pseries_vas_window *win;
+> > +	struct vas_ct_caps *caps;
+> > +	int rc = 0;
+> > +
+> > +	if (!vwin)
+> > +		return -EINVAL;
+> > +
+> > +	win = container_of(vwin, struct pseries_vas_window, vas_win);
+> > +
+> > +	/* Should not happen */
+> > +	if (win->win_type >= VAS_MAX_FEAT_TYPE) {
+> > +		pr_err("Window (%u): Invalid window type %u\n",
+> > +				vwin->winid, win->win_type);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	caps = &vascaps[win->win_type].caps;
+> > +	mutex_lock(&vas_pseries_mutex);
+> > +	rc = deallocate_free_window(win);
+> > +	if (rc) {
+> > +		mutex_unlock(&vas_pseries_mutex);
+> > +		return rc;
+> > +	}
+> > +
+> > +	list_del(&win->win_list);
+> > +	atomic_dec(&caps->used_lpar_creds);
+> > +	mutex_unlock(&vas_pseries_mutex);
+> > +
+> > +	put_vas_user_win_ref(&vwin->task_ref);
+> > +	mm_context_remove_vas_window(vwin->task_ref.mm);
+> > +
+> > +	kfree(win);
+> > +	return 0;
+> > +}
+> > +
+> > +static const struct vas_user_win_ops vops_pseries = {
+> > +	.open_win	= vas_allocate_window,	/* Open and configure
+> > window */
+> > +	.paste_addr	= vas_paste_address,	/* To do copy/paste */
+> > +	.close_win	= vas_deallocate_window, /* Close window */
 > > +};
 > > +
+> > +/*
+> > + * Supporting only nx-gzip coprocessor type now, but this API code
+> > + * extended to other coprocessor types later.
+> > + */
+> > +int vas_register_api_pseries(struct module *mod, enum vas_cop_type
+> > cop_type,
+> > +			     const char *name)
+> > +{
+> > +	int rc;
+> > +
+> > +	if (!copypaste_feat)
+> > +		return -ENOTSUPP;
+> > +
+> > +	rc = vas_register_coproc_api(mod, cop_type, name,
+> > &vops_pseries);
+> > +
+> > +	return rc;
+> > +}
+> > +EXPORT_SYMBOL_GPL(vas_register_api_pseries);
+> > +
+> > +void vas_unregister_api_pseries(void)
+> > +{
+> > +	vas_unregister_coproc_api();
+> > +}
+> > +EXPORT_SYMBOL_GPL(vas_unregister_api_pseries);
+> >  
 > >  /*
-> >   * Supporting only nx-gzip coprocessor type now, but this API code
-> >   * extended to other coprocessor types later.
-> > @@ -1451,7 +1494,7 @@ int vas_register_api_powernv(struct module
-> > *mod, enum vas_cop_type cop_type,
-> >  			     const char *name)
-> >  {
-> >  
-> > -	return vas_register_coproc_api(mod, cop_type, name);
-> > +	return vas_register_coproc_api(mod, cop_type, name, &vops);
-> >  }
-> >  EXPORT_SYMBOL_GPL(vas_register_api_powernv);
-> >  
+> >   * Get the specific capabilities based on the feature type.
 > > -- 
 > > 2.18.2
 > > 
