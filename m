@@ -7,524 +7,334 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D18CC48BE5
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 07:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9860EC48BE5
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 09:01:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E10E161417
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 07:26:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FBE9610CD
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 09:01:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229613AbhFOH2b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Jun 2021 03:28:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48252 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229493AbhFOH2a (ORCPT
+        id S231174AbhFOJDg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Jun 2021 05:03:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27314 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231243AbhFOJDf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jun 2021 03:28:30 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15F75LPn066048;
-        Tue, 15 Jun 2021 03:26:18 -0400
+        Tue, 15 Jun 2021 05:03:35 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15F8XvEK175759;
+        Tue, 15 Jun 2021 05:01:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
  from : to : cc : date : in-reply-to : references : content-type :
  mime-version : content-transfer-encoding; s=pp1;
- bh=W1eEDicscE0biyRUSl9dgwGh/xMGC4oDv+0cOmDQJMI=;
- b=dMv7xI9xwsv7eT9hnLqOGEx1uiEurtvwYZ5xt5brnIL9a+IWd+jN42wDGdAjllcNsLdY
- tM9yi3QtF10mmdh76UMUPszpzO9LHUTF4OIsLzhiopY0ok8/3Y2uD8HBxWGqhBcK0u79
- PV5mWUh+a9crRwcmiP1oMszUmYZDOovf93U0jccB41LIXnLfXBX/c2iDenEmF9sJPWJ5
- Mvr+EwcAdLLw98a0NzLkYHoMpw80SL2W9dmBTtgaHqC7My96l+0h40ViOa7kYq7Ra9F7
- xaYe+Hd8WF4yOMYe+6m4RqtQHxohgXpn/fP/suk02lz+qp4bNIVvG73Io95MoY8gZG+X ZQ== 
+ bh=1QXn0DRR/E8VxqdKD7SQVXeoDlJZb9XOvfDDurNWDYY=;
+ b=eAdJ4UXIGU5M/nMRn+OisLkUO6AZeCMBvsmtL/AcLzvjlJQwLRBVp81K1YEmfsZq2Zxg
+ gAh9C0jNnO1gYWLrF4ZvrQV3/61oDPcte68myvPOCi34/+h4Aj1ugI1Dp5g109cThWs8
+ 1q/t6gVaQyTsK4bvCoO5igEciHMCMVcJ3X/iK48759JswWLy2vXV2q0Mic2nqXVNWhU6
+ fQDEqWXZVu/epUUutcOLADqbaK/BjQ+FW/rprPRO0QjHXPyPdOAq1nSnFjooBZw4w9T3
+ 8/7ZKDs3pdimMy0gIFk1dyBe9oBV/mnkb20/TDGt15rahPmRrazseKJ0R94KyS0+6M2v Kw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 396ng3c0kh-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 396q7v3v0u-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Jun 2021 03:26:18 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15F75ZX3067286;
-        Tue, 15 Jun 2021 03:26:17 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 396ng3c0k2-1
+        Tue, 15 Jun 2021 05:01:16 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15F8Y4BB176506;
+        Tue, 15 Jun 2021 05:01:15 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 396q7v3v0b-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Jun 2021 03:26:17 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15F7I6WG013817;
-        Tue, 15 Jun 2021 07:26:16 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma02wdc.us.ibm.com with ESMTP id 394mj9nry7-1
+        Tue, 15 Jun 2021 05:01:15 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15F8w9hQ008014;
+        Tue, 15 Jun 2021 09:01:15 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma04dal.us.ibm.com with ESMTP id 3965yth8e8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Jun 2021 07:26:16 +0000
+        Tue, 15 Jun 2021 09:01:15 +0000
 Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15F7QGeD15008226
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15F91EGs24641996
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Jun 2021 07:26:16 GMT
+        Tue, 15 Jun 2021 09:01:14 GMT
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1E4A2B206C;
-        Tue, 15 Jun 2021 07:26:16 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 22724B2064;
+        Tue, 15 Jun 2021 09:01:14 +0000 (GMT)
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C14C3B2064;
-        Tue, 15 Jun 2021 07:26:14 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 21268B205F;
+        Tue, 15 Jun 2021 09:01:13 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.160.180.39])
         by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Jun 2021 07:26:14 +0000 (GMT)
-Message-ID: <91d139adcbd9e4851fdb11d30888f5f5a923b764.camel@linux.ibm.com>
-Subject: Re: [PATCH v5 12/17] powerpc/pseries/vas: Integrate API with
- open/close windows
+        Tue, 15 Jun 2021 09:01:12 +0000 (GMT)
+Message-ID: <09992f14d25b9212686acfa85e8e4cab93b6b1fc.camel@linux.ibm.com>
+Subject: Re: [PATCH v5 13/17] powerpc/pseries/vas: Setup IRQ and fault
+ handling
 From:   Haren Myneni <haren@linux.ibm.com>
 To:     Nicholas Piggin <npiggin@gmail.com>, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         mpe@ellerman.id.au
 Cc:     haren@us.ibm.com, hbabu@us.ibm.com
-Date:   Tue, 15 Jun 2021 00:26:12 -0700
-In-Reply-To: <1623638159.6pp87imz6a.astroid@bobo.none>
+Date:   Tue, 15 Jun 2021 02:01:11 -0700
+In-Reply-To: <1623639403.054wgu233i.astroid@bobo.none>
 References: <ed7a09822cf3a2e463f942e5a37309a2365c9d79.camel@linux.ibm.com>
-         <58c2f9debeff2ff6515ea950ebdd6483c147c843.camel@linux.ibm.com>
-         <1623638159.6pp87imz6a.astroid@bobo.none>
+         <8a9fe47a17d1f89cc43885d2ef8c2f09e4e90d7a.camel@linux.ibm.com>
+         <1623639403.054wgu233i.astroid@bobo.none>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: zibvKjPVy9DDCZLZfhghDnYsV_4unums
-X-Proofpoint-GUID: xmDcos6AX-TLy-q9oSlYZRe6mVrBoKa8
+X-Proofpoint-ORIG-GUID: lLoIccTf1gtvk6P8Yi52fVUjUb6vQ5y9
+X-Proofpoint-GUID: 6ZyYZ8DOKysSol7dfI2GEujj9LGQfNYf
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
  definitions=2021-06-15_04:2021-06-14,2021-06-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
- malwarescore=0 bulkscore=0 spamscore=0 impostorscore=0 phishscore=0
- clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106150042
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0 mlxscore=0
+ impostorscore=0 suspectscore=0 malwarescore=0 mlxlogscore=999 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106150051
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2021-06-14 at 12:55 +1000, Nicholas Piggin wrote:
+On Mon, 2021-06-14 at 13:07 +1000, Nicholas Piggin wrote:
 > Excerpts from Haren Myneni's message of June 13, 2021 9:02 pm:
-> > This patch adds VAS window allocatioa/close with the corresponding
-> > hcalls. Also changes to integrate with the existing user space VAS
-> > API and provide register/unregister functions to NX pseries driver.
+> > NX generates an interrupt when sees a fault on the user space
+> > buffer and the hypervisor forwards that interrupt to OS. Then
+> > the kernel handles the interrupt by issuing H_GET_NX_FAULT hcall
+> > to retrieve the fault CRB information.
 > > 
-> > The driver register function is used to create the user space
-> > interface (/dev/crypto/nx-gzip) and unregister to remove this
-> > entry.
-> > 
-> > The user space process opens this device node and makes an ioctl
-> > to allocate VAS window. The close interface is used to deallocate
-> > window.
+> > This patch also adds changes to setup and free IRQ per each
+> > window and also handles the fault by updating the CSB.
 > > 
 > > Signed-off-by: Haren Myneni <haren@linux.ibm.com>
 > > ---
-> >  arch/powerpc/include/asm/vas.h          |   4 +
-> >  arch/powerpc/platforms/pseries/Makefile |   1 +
-> >  arch/powerpc/platforms/pseries/vas.c    | 223
-> > ++++++++++++++++++++++++
-> >  3 files changed, 228 insertions(+)
+> >  arch/powerpc/platforms/pseries/vas.c | 108
+> > +++++++++++++++++++++++++++
+> >  1 file changed, 108 insertions(+)
 > > 
-> > diff --git a/arch/powerpc/include/asm/vas.h
-> > b/arch/powerpc/include/asm/vas.h
-> > index eefc758d8cd4..9d5646d721c4 100644
-> > --- a/arch/powerpc/include/asm/vas.h
-> > +++ b/arch/powerpc/include/asm/vas.h
-> > @@ -254,6 +254,10 @@ struct vas_all_caps {
-> >  	u64     feat_type;
-> >  };
-> >  
-> > +int h_query_vas_capabilities(const u64 hcall, u8 query_type, u64
-> > result);
-> > +int vas_register_api_pseries(struct module *mod,
-> > +			     enum vas_cop_type cop_type, const char
-> > *name);
-> > +void vas_unregister_api_pseries(void);
-> >  #endif
-> >  
-> >  /*
-> > diff --git a/arch/powerpc/platforms/pseries/Makefile
-> > b/arch/powerpc/platforms/pseries/Makefile
-> > index c8a2b0b05ac0..4cda0ef87be0 100644
-> > --- a/arch/powerpc/platforms/pseries/Makefile
-> > +++ b/arch/powerpc/platforms/pseries/Makefile
-> > @@ -30,3 +30,4 @@ obj-$(CONFIG_PPC_SVM)		+= svm.o
-> >  obj-$(CONFIG_FA_DUMP)		+= rtas-fadump.o
-> >  
-> >  obj-$(CONFIG_SUSPEND)		+= suspend.o
-> > +obj-$(CONFIG_PPC_VAS)		+= vas.o
 > > diff --git a/arch/powerpc/platforms/pseries/vas.c
 > > b/arch/powerpc/platforms/pseries/vas.c
-> > index 98109a13f1c2..fe375f7a7029 100644
+> > index fe375f7a7029..55185bdd3776 100644
 > > --- a/arch/powerpc/platforms/pseries/vas.c
 > > +++ b/arch/powerpc/platforms/pseries/vas.c
-> > @@ -10,6 +10,7 @@
-> >  #include <linux/export.h>
+> > @@ -11,6 +11,7 @@
 > >  #include <linux/types.h>
 > >  #include <linux/delay.h>
-> > +#include <linux/slab.h>
+> >  #include <linux/slab.h>
+> > +#include <linux/interrupt.h>
 > >  #include <asm/machdep.h>
 > >  #include <asm/hvcall.h>
 > >  #include <asm/plpar_wrappers.h>
-> > @@ -187,6 +188,228 @@ int h_query_vas_capabilities(const u64 hcall,
+> > @@ -190,6 +191,58 @@ int h_query_vas_capabilities(const u64 hcall,
 > > u8 query_type, u64 result)
-> >  		return -EIO;
-> >  	}
 > >  }
-> > +EXPORT_SYMBOL_GPL(h_query_vas_capabilities);
-> > +
+> >  EXPORT_SYMBOL_GPL(h_query_vas_capabilities);
+> >  
 > > +/*
-> > + * Allocate window and setup IRQ mapping.
+> > + * hcall to get fault CRB from pHyp.
 > > + */
-> > +static int allocate_setup_window(struct pseries_vas_window *txwin,
-> > +				 u64 *domain, u8 wintype)
+> > +static int h_get_nx_fault(u32 winid, u64 buffer)
 > > +{
-> > +	int rc;
+> > +	long rc;
 > > +
-> > +	rc = h_allocate_vas_window(txwin, domain, wintype,
-> > DEF_WIN_CREDS);
-> > +	if (rc)
-> > +		return rc;
+> > +	rc = plpar_hcall_norets(H_GET_NX_FAULT, winid, buffer);
 > > +
-> > +	txwin->vas_win.wcreds_max = DEF_WIN_CREDS;
-> > +
-> > +	return 0;
+> > +	switch (rc) {
+> > +	case H_SUCCESS:
+> > +		return 0;
+> > +	case H_PARAMETER:
+> > +		pr_err("HCALL(%x): Invalid window ID %u\n",
+> > H_GET_NX_FAULT,
+> > +		       winid);
+> > +		return -EINVAL;
+> > +	case H_PRIVILEGE:
+> > +		pr_err("HCALL(%x): Window(%u): Invalid fault buffer
+> > 0x%llx\n",
+> > +		       H_GET_NX_FAULT, winid, buffer);
+> > +		return -EACCES;
+> > +	default:
+> > +		pr_err("HCALL(%x): Failed with error %ld for
+> > window(%u)\n",
+> > +		       H_GET_NX_FAULT, rc, winid);
+> > +		return -EIO;
+> 
+> 3 error messages have 3 different formats for window ID.
+> 
+> I agree with Michael you could just have one error message that
+> reports 
+> the return value. Also "H_GET_NX_FAULT: " would be nicer than
+> "HCALL(380): "
+
+yes, Added just one printk for all error codes except for errors which
+depend on arguments to HCALL (Ex: WinID).
+
+Sure, I will add just one error message and print all arguments passed
+to HCALL. 
+
+pr_err("H_GET_NX_FAULT: window(%u), fault buffer(0x%llx) Failed with
+error %ld\n", rc, winid, buffer);
+
+
+> 
+> Check how some other hcall failures are reported, "hcall failed: 
+> H_CALL_NAME" seems to have a few takers.
+> 
+> > +	}
 > > +}
 > > +
-> > +static struct vas_window *vas_allocate_window(struct
-> > vas_tx_win_open_attr *uattr,
-> > +					      enum vas_cop_type
-> > cop_type)
+> > +/*
+> > + * Handle the fault interrupt.
+> > + * When the fault interrupt is received for each window, query
+> > pHyp to get
+> > + * the fault CRB on the specific fault. Then process the CRB by
+> > updating
+> > + * CSB or send signal if the user space CSB is invalid.
+> > + * Note: pHyp forwards an interrupt for each fault request. So one
+> > fault
+> > + *	CRB to process for each H_GET_NX_FAULT HCALL.
+> > + */
+> > +irqreturn_t pseries_vas_fault_thread_fn(int irq, void *data)
 > > +{
-> > +	long domain[PLPAR_HCALL9_BUFSIZE] = {VAS_DEFAULT_DOMAIN_ID};
-> > +	struct vas_ct_caps *ct_caps;
-> > +	struct vas_caps *caps;
-> > +	struct pseries_vas_window *txwin;
+> > +	struct pseries_vas_window *txwin = data;
+> > +	struct coprocessor_request_block crb;
+> > +	struct vas_user_win_ref *tsk_ref;
 > > +	int rc;
 > > +
-> > +	txwin = kzalloc(sizeof(*txwin), GFP_KERNEL);
-> > +	if (!txwin)
-> > +		return ERR_PTR(-ENOMEM);
+> > +	rc = h_get_nx_fault(txwin->vas_win.winid,
+> > (u64)virt_to_phys(&crb));
+> > +	if (!rc) {
+> > +		tsk_ref = &txwin->vas_win.task_ref;
+> > +		vas_dump_crb(&crb);
+> > +		vas_update_csb(&crb, tsk_ref);
+> > +	}
 > > +
+> > +	return IRQ_HANDLED;
+> > +}
+> > +
+> >  /*
+> >   * Allocate window and setup IRQ mapping.
+> >   */
+> > @@ -201,10 +254,51 @@ static int allocate_setup_window(struct
+> > pseries_vas_window *txwin,
+> >  	rc = h_allocate_vas_window(txwin, domain, wintype,
+> > DEF_WIN_CREDS);
+> >  	if (rc)
+> >  		return rc;
 > > +	/*
-> > +	 * A VAS window can have many credits which means that many
-> > +	 * requests can be issued simultaneously. But phyp restricts
-> > +	 * one credit per window.
-> > +	 * phyp introduces 2 different types of credits:
-> > +	 * Default credit type (Uses normal priority FIFO):
-> > +	 *	A limited number of credits are assigned to partitions
-> > +	 *	based on processor entitlement. But these credits may be
-> > +	 *	over-committed on a system depends on whether the CPUs
-> > +	 *	are in shared or dedicated modes - that is, more requests
-> > +	 *	may be issued across the system than NX can service at
-> > +	 *	once which can result in paste command failure (RMA_busy).
-> > +	 *	Then the process has to resend requests or fall-back to
-> > +	 *	SW compression.
-> > +	 * Quality of Service (QoS) credit type (Uses high priority
-> > FIFO):
-> > +	 *	To avoid NX HW contention, the system admins can assign
-> > +	 *	QoS credits for each LPAR so that this partition is
-> > +	 *	guaranteed access to NX resources. These credits are
-> > +	 *	assigned to partitions via the HMC.
-> > +	 *	Refer PAPR for more information.
-> > +	 *
-> > +	 * Allocate window with QoS credits if user requested.
-> > Otherwise
-> > +	 * default credits are used.
+> > +	 * On powerVM, pHyp setup and forwards the fault interrupt per
+> 
+>            The hypervisor forwards the fault interrupt per-window...
+> 
+> > +	 * window. So the IRQ setup and fault handling will be done for
+> > +	 * each open window separately.
 > > +	 */
-> > +	if (uattr->flags & VAS_TX_WIN_FLAG_QOS_CREDIT)
-> > +		caps = &vascaps[VAS_GZIP_QOS_FEAT_TYPE];
-> > +	else
-> > +		caps = &vascaps[VAS_GZIP_DEF_FEAT_TYPE];
-> > +
-> > +	ct_caps = &caps->caps;
-> > +
-> > +	if (atomic_inc_return(&ct_caps->used_lpar_creds) >
-> > +			atomic_read(&ct_caps->target_lpar_creds)) {
-> > +		pr_err("Credits are not available to allocate
-> > window\n");
+> > +	txwin->fault_virq = irq_create_mapping(NULL, txwin->fault_irq);
+> > +	if (!txwin->fault_virq) {
+> > +		pr_err("Failed irq mapping %d\n", txwin->fault_irq);
 > > +		rc = -EINVAL;
-> > +		goto out;
+> > +		goto out_win;
 > > +	}
 > > +
-> > +	/*
-> > +	 * The user space is requesting to allocate a window on a VAS
-> > +	 * instance (or chip) where the process is executing.
-> > +	 * On powerVM, domain values are passed to pHyp to select chip
-> > /
-> > +	 * VAS instance. Useful if the process is affinity to NUMA
-> > node.
-> > +	 * pHyp selects VAS instance if VAS_DEFAULT_DOMAIN_ID (-1) is
-> > +	 * passed for domain values.
-> > +	 */
-> 
-> s/powerVM/PowerVM
-> s/pHyp/PowerVM
-> 
-> You could also just call it the hypervisor. KVM may not implement
-> the 
-> hcalls now, but in future it could.
-> 
-> > +	if (uattr->vas_id == -1) {
-> 
-> Should the above comment fit under here? vas_id == -1 means
-> userspace 
-> asks for any VAS but preferably a local one?
-> 
-> > +		/*
-> > +		 * To allocate VAS window, pass same domain values
-> > returned
-> > +		 * from this HCALL.
-> > +		 */
-> 
-> Then you could merge it with this comment and make it a bit clearer:
-> the h_allocate_vas_window hcall is defined to take a domain as
-> specified by h_home_node_associativity, so no conversions or
-> unpacking
-> needs to be done.
-> 
-> > +		rc = plpar_hcall9(H_HOME_NODE_ASSOCIATIVITY, domain,
-> > +				  VPHN_FLAG_VCPU, smp_processor_id());
-> > +		if (rc != H_SUCCESS) {
-> > +			pr_err("HCALL(%x): failed with ret(%d)\n",
-> > +			       H_HOME_NODE_ASSOCIATIVITY, rc);
-> > +			goto out;
-> > +		}
+> > +	txwin->name = kasprintf(GFP_KERNEL, "vas-win-%d",
+> > +				txwin->vas_win.winid);
+> > +	if (!txwin->name) {
+> > +		rc = -ENOMEM;
+> > +		goto out_irq;
 > > +	}
 > > +
-> > +	/*
-> > +	 * Allocate / Deallocate window HCALLs and setup / free IRQs
-> > +	 * have to be protected with mutex.
-> > +	 * Open VAS window: Allocate window HCALL and setup IRQ
-> > +	 * Close VAS window: Deallocate window HCALL and free IRQ
-> > +	 *	The hypervisor waits until all NX requests are
-> > +	 *	completed before closing the window. So expects OS
-> > +	 *	to handle NX faults, means IRQ can be freed only
-> > +	 *	after the deallocate window HCALL is returned.
-> > +	 * So once the window is closed with deallocate HCALL before
-> > +	 * the IRQ is freed, it can be assigned to new allocate
-> > +	 * HCALL with the same fault IRQ by the hypervisor. It can
-> > +	 * result in setup IRQ fail for the new window since the
-> > +	 * same fault IRQ is not freed by the OS.
-> > +	 */
-> > +	mutex_lock(&vas_pseries_mutex);
-> 
-> Why? What's the mutex protecting here?
-This mutex is protecting Allocate/ Deallocate HCAlls and setup/free
-IRQ. Basically once the window is opened and setup IRQ successfully,
-makes sure same IRQ is not assigned to otherwindow before the IRQ is
-freed in OS. 
-
-Allocate window: 
-	Allocate window HCALL
-	setup IRQ
-
-Deallocate window:
-	Deallocate window HCALL - The hypervisor waits all credits are
-returned including any faults. Disable window on this VAS so that do
-not take new requests and wait for all pending requests (faults are
-processed) 
-	free IRQ (We can not free IRQ before the HCALL so that pending
-faults can be processed and credits returned)
-
-So if we do not jave mutex, possible that same fault IRQ may be
-assigned to different window open HCALL before it is actually freed in
-OS.
-
-Process A:
-Allocate window HCALL (winID 123)
-Setup IRQ (IRQ# 321)
-Process requests
-Deallocate HCALL(winID 123)       Process B:
-                                    Allocate window HCALL (winID 123)
-                                    setup IRQ (IRQ# 321) -- will fail.
-Free IRQ (IRQ#321)
-
-                        
-> 
-> > +	rc = allocate_setup_window(txwin, (u64 *)&domain[0],
-> > +				   ct_caps->win_type);
-> 
-> If you define the types to be the same, can you avoid this casting?
-> allocate_setup_window specifically needs an array of 
-> PLPAR_HCALL9_BUFSIZE longs.
-
-Yes H_HOME_NODE_ASSOCIATIVITY returns longs (PLPAR_HCALL9_BUFSIZE) but
-H_ALLOCATE_VAS_WINDOW expects u64.
-
-Syntax:
-int64 /* H_Success, H_Parameter, H_Resource, H_Constrained */
-/* H_Cop_Hw, H_Unsupported, H_Busy */
-/* H_LongBusyOrder1mSec, LongBusyOrder10mSec */
-hcall(const uint64 H_ALLOCATE_VAS_WINDOW /* Allocate a VAS window */
-uint8 vasWindowType, /* The type of VAS window to allocate */
-uint16 numCredits, /* Number of credits to assign to the window */
-uint64 desiredAssociativityDomainIdentifier1, /* Associativity Domain
-Identifier Doubleword 1 */
-uint64 desiredAssociativityDomainIdentifier2, /* Associativity Domain
-Identifier Doubleword 2 */
-uint64 desiredAssociativityDomainIdentifier3, /* Associativity Domain
-Identifier Doubleword 3 */
-uint64 desiredAssociativityDomainIdentifier4, /* Associativity Domain
-Identifier Doubleword 4 */
-uint64 desiredAssociativityDomainIdentifier5, /* Associativity Domain
-Identifier Doubleword 5 */
-uint64 desiredAssociativityDomainIdentifier6) /* Associativity Domain
-Identifier Doubleword 6 */
-
-> 
-> > +	mutex_unlock(&vas_pseries_mutex);
-> > +	if (rc)
-> > +		goto out;
-> > +
-> > +	/*
-> > +	 * Modify window and it is ready to use.
-> > +	 */
-> > +	rc = h_modify_vas_window(txwin);
-> > +	if (!rc)
-> > +		rc = get_vas_user_win_ref(&txwin->vas_win.task_ref);
-> > +	if (rc)
+> > +	rc = request_threaded_irq(txwin->fault_virq, NULL,
+> > +				  pseries_vas_fault_thread_fn,
+> > IRQF_ONESHOT,
+> > +				  txwin->name, txwin);
+> > +	if (rc) {
+> > +		pr_err("VAS-Window[%d]: Request IRQ(%u) failed with
+> > %d\n",
+> > +		       txwin->vas_win.winid, txwin->fault_virq, rc);
 > > +		goto out_free;
-> > +
-> > +	vas_user_win_add_mm_context(&txwin->vas_win.task_ref);
-> > +	txwin->win_type = ct_caps->win_type;
-> > +	mutex_lock(&vas_pseries_mutex);
-> > +	list_add(&txwin->win_list, &caps->list);
-> > +	mutex_unlock(&vas_pseries_mutex);
-> > +
-> > +	return &txwin->vas_win;
-> > +
+> > +	}
+> >  
+> >  	txwin->vas_win.wcreds_max = DEF_WIN_CREDS;
+> >  
+> >  	return 0;
 > > +out_free:
+> > +	kfree(txwin->name);
+> > +out_irq:
+> > +	irq_dispose_mapping(txwin->fault_virq);
+> > +out_win:
 > > +	h_deallocate_vas_window(txwin->vas_win.winid);
+> > +	return rc;
+> > +}
+> > +
+> > +static inline void free_irq_setup(struct pseries_vas_window
+> > *txwin)
+> > +{
+> > +	free_irq(txwin->fault_virq, txwin);
+> > +	irq_dispose_mapping(txwin->fault_virq);
+> > +	kfree(txwin->name);
 > 
-> No mutex here in this deallocate hcall.
+> Nit, but this freeing is in a different order than the error handling
+> in 
+> the function does. I'd just keep it the same unless there is a reason
+> to 
+> be different, in which case it could use a comment.
 
-We do not need mutex just for this hcall which is executing during
-failure. Need mutex only for the code patch as explained above. 
-
-If the window open is not returned to user space successfully, window
-close path will be:
-
- free_irq_setup(txwin);
- h_deallocate_vas_window(txwin->vas_win.winid);
-
-
-> 
-> I suspect you don't actually need the mutex for the hcalls
-> themselves, 
-> but the list manipulations. I would possibly consider putting 
-> used_lpar_creds under that same lock rather than making it atomic and
-> playing lock free games, unless you really need to.
-> 
-> Also... "creds". credentials? credits, right? Don't go through and 
-> change everything now, but not skimping on naming helps a lot with
-> reading code that you're not familiar with. All the vas/nx stuff
-> could probably do with a pass to make the names a bit easier.
-
-Yes creds is for credits. We have names like credits and capabilities
-for VAS/NX. Using creds for credits and caps for capabilities. creds is
-already used in the existing code.
-
-> 
-> (creds isn't so bad, "ct" for "coprocessor type" is pretty obscure 
-> though).
-
-So can I use 'copt' coprocessor type?
+shouldn't matter, I can change it to:
+static inline void free_irq_setup(struct pseries_vas_window *txwin)
+{
+        free_irq(txwin->fault_virq, txwin);
+        kfree(txwin->name);
+        irq_dispose_mapping(txwin->fault_virq);
+}
 
 Thanks
 Haren
 
-
+> 
+> So long as the irq can't somehow fire and try to use txwin->name,
+> you 
+> might be okay.
+> 
+> Otherwise I _think_ it's okay, but I don't know the irq APIs well.
 > 
 > Thanks,
 > Nick
 > 
-> > +out:
-> > +	atomic_dec(&ct_caps->used_lpar_creds);
-> > +	kfree(txwin);
-> > +	return ERR_PTR(rc);
-> > +}
-> > +
-> > +static u64 vas_paste_address(struct vas_window *vwin)
-> > +{
-> > +	struct pseries_vas_window *win;
-> > +
-> > +	win = container_of(vwin, struct pseries_vas_window, vas_win);
-> > +	return win->win_addr;
-> > +}
-> > +
-> > +static int deallocate_free_window(struct pseries_vas_window *win)
-> > +{
-> > +	int rc = 0;
-> > +
-> > +	rc = h_deallocate_vas_window(win->vas_win.winid);
-> > +
-> > +	return rc;
-> > +}
-> > +
-> > +static int vas_deallocate_window(struct vas_window *vwin)
-> > +{
-> > +	struct pseries_vas_window *win;
-> > +	struct vas_ct_caps *caps;
-> > +	int rc = 0;
-> > +
-> > +	if (!vwin)
-> > +		return -EINVAL;
-> > +
-> > +	win = container_of(vwin, struct pseries_vas_window, vas_win);
-> > +
-> > +	/* Should not happen */
-> > +	if (win->win_type >= VAS_MAX_FEAT_TYPE) {
-> > +		pr_err("Window (%u): Invalid window type %u\n",
-> > +				vwin->winid, win->win_type);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	caps = &vascaps[win->win_type].caps;
-> > +	mutex_lock(&vas_pseries_mutex);
-> > +	rc = deallocate_free_window(win);
-> > +	if (rc) {
-> > +		mutex_unlock(&vas_pseries_mutex);
-> > +		return rc;
-> > +	}
-> > +
-> > +	list_del(&win->win_list);
-> > +	atomic_dec(&caps->used_lpar_creds);
-> > +	mutex_unlock(&vas_pseries_mutex);
-> > +
-> > +	put_vas_user_win_ref(&vwin->task_ref);
-> > +	mm_context_remove_vas_window(vwin->task_ref.mm);
-> > +
-> > +	kfree(win);
-> > +	return 0;
-> > +}
-> > +
-> > +static const struct vas_user_win_ops vops_pseries = {
-> > +	.open_win	= vas_allocate_window,	/* Open and configure
-> > window */
-> > +	.paste_addr	= vas_paste_address,	/* To do copy/paste */
-> > +	.close_win	= vas_deallocate_window, /* Close window */
-> > +};
-> > +
-> > +/*
-> > + * Supporting only nx-gzip coprocessor type now, but this API code
-> > + * extended to other coprocessor types later.
-> > + */
-> > +int vas_register_api_pseries(struct module *mod, enum vas_cop_type
-> > cop_type,
-> > +			     const char *name)
-> > +{
-> > +	int rc;
-> > +
-> > +	if (!copypaste_feat)
-> > +		return -ENOTSUPP;
-> > +
-> > +	rc = vas_register_coproc_api(mod, cop_type, name,
-> > &vops_pseries);
-> > +
-> > +	return rc;
-> > +}
-> > +EXPORT_SYMBOL_GPL(vas_register_api_pseries);
-> > +
-> > +void vas_unregister_api_pseries(void)
-> > +{
-> > +	vas_unregister_coproc_api();
-> > +}
-> > +EXPORT_SYMBOL_GPL(vas_unregister_api_pseries);
+> >  }
 > >  
-> >  /*
-> >   * Get the specific capabilities based on the feature type.
+> >  static struct vas_window *vas_allocate_window(struct
+> > vas_tx_win_open_attr *uattr,
+> > @@ -320,6 +414,11 @@ static struct vas_window
+> > *vas_allocate_window(struct vas_tx_win_open_attr *uattr
+> >  	return &txwin->vas_win;
+> >  
+> >  out_free:
+> > +	/*
+> > +	 * Window is not operational. Free IRQ before closing
+> > +	 * window so that do not have to hold mutex.
+> > +	 */
+> 
+> Why don't you have to hold the mutex in that case?
+> 
+> > +	free_irq_setup(txwin);
+> >  	h_deallocate_vas_window(txwin->vas_win.winid);
+> >  out:
+> >  	atomic_dec(&ct_caps->used_lpar_creds);
+> > @@ -339,7 +438,16 @@ static int deallocate_free_window(struct
+> > pseries_vas_window *win)
+> >  {
+> >  	int rc = 0;
+> >  
+> > +	/*
+> > +	 * Free IRQ after executing H_DEALLOCATE_VAS_WINDOW HCALL
+> > +	 * to close the window. pHyp waits for all requests including
+> > +	 * faults are processed before closing the window - Means all
+> > +	 * credits are returned. In the case of fault request, credit
+> > +	 * is returned after OS issues H_GET_NX_FAULT HCALL.
+> > +	 */
+> >  	rc = h_deallocate_vas_window(win->vas_win.winid);
+> > +	if (!rc)
+> > +		free_irq_setup(win);
+> >  
+> >  	return rc;
+> >  }
 > > -- 
 > > 2.18.2
 > > 
