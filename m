@@ -2,102 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25A92C48BE6
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 02:33:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FA2C48BDF
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 03:13:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2B9F61404
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 02:33:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C290613F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 03:13:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229829AbhFOCfE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Jun 2021 22:35:04 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:51417 "EHLO ozlabs.org"
+        id S230344AbhFODP1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Jun 2021 23:15:27 -0400
+Received: from mga14.intel.com ([192.55.52.115]:63362 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229649AbhFOCfE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Jun 2021 22:35:04 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4G3rbB38Ffz9s24;
-        Tue, 15 Jun 2021 11:39:34 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1623721175;
-        bh=bOhTI7o+PdpYMoKU9KNxyet2ETe62XZScIPvP+N/xXM=;
-        h=Date:From:To:Cc:Subject:From;
-        b=oiyWxZ4jP7EokekE0sBJeiSU/WvvrYepu0JO7PXlHKDRHKgX3x40rL9bsfnpowWSN
-         v5pMWAuW3kS80JKNGi8WucY1FbfMlSLa5QNuGh6hvubhTJU/D2IV01O/yHAfcKaU2u
-         nRhZOvYU/br167KeLUrK7HHTUBQS5jkIN7OMCTHJ2MnLRbzyuBbHrdbl22cKNJlT8p
-         cJqxthTcRb7RwPolMDkvQF3ZsoVeHBX/ysW+gYJTG3N7j+Lc96079HaVnV+kftX0aC
-         yeiJssvwCivAi/ePHMdLrEujPaf0zA6EigxAOBL3yaqSFj/mviAfO7ZV4ydOO3fn0G
-         m45Th070kXJAw==
-Date:   Tue, 15 Jun 2021 11:39:32 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the crypto tree with Linus' tree
-Message-ID: <20210615113932.322a3186@canb.auug.org.au>
+        id S230411AbhFODPY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Jun 2021 23:15:24 -0400
+IronPort-SDR: 4GM09+ZIt0OlZY+VQgYCZm0FEW5fTLY/1sY44njkZL5cWYtSwX3B3PL+R9HPAyEmYDsgTY25lM
+ ukaaRMYSNZUQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,10015"; a="205724461"
+X-IronPort-AV: E=Sophos;i="5.83,273,1616482800"; 
+   d="scan'208";a="205724461"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2021 18:30:13 -0700
+IronPort-SDR: KxB7ziHQCmRbLm/hWG1xbTTTvK1ZnFKf/FCVDrJhA/grBuHz/2IMBLS/cKr3P3oqWu3gGRFrxH
+ eFoWoFp1MJwA==
+X-IronPort-AV: E=Sophos;i="5.83,273,1616482800"; 
+   d="scan'208";a="450069047"
+Received: from shao2-debian.sh.intel.com (HELO localhost) ([10.239.13.11])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2021 18:30:11 -0700
+Date:   Tue, 15 Jun 2021 09:30:09 +0800
+From:   kernel test robot <rong.a.chen@intel.com>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     kbuild-all@lists.01.org, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-kernel@vger.kernel.org
+Subject: [cryptodev:master 110/119] drivers/crypto/gemini/sl3516-ce-cipher.c:
+ linux/io.h is included more than once.
+Message-ID: <20210615013009.GV237458@shao2-debian>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/boe+D/qNj2=0uef7llGtZMh";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/boe+D/qNj2=0uef7llGtZMh
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+head:   0dc64297c8ac98503a7c7621b3c78e151deb75b6
+commit: 46c5338db7bd45b2cf99570560f00389d60fd6b4 [110/119] crypto: sl3516 - Add sl3516 crypto engine
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
 
-Hi all,
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-Today's linux-next merge of the crypto tree got a conflict in:
 
-  drivers/crypto/cavium/nitrox/nitrox_main.c
+includecheck warnings: (new ones prefixed by >>)
+>> drivers/crypto/gemini/sl3516-ce-cipher.c: linux/io.h is included more than once.
 
-between commit:
+Please review and possibly fold the followup patch.
 
-  6a3239a738d8 ("Revert "crypto: cavium/nitrox - add an error message to ex=
-plain the failure of pci_request_mem_regions"")
-
-from Linus' tree and commit:
-
-  0dc64297c8ac ("crypto: cavium/nitrox - Fix an error rhandling path in 'ni=
-trox_probe()'")
-
-from the crypto tree.
-
-I fixed it up (I just used the latter since it also did what the former
-did) and can carry the fix as necessary. This is now fixed as far as
-linux-next is concerned, but any non trivial conflicts should be mentioned
-to your upstream maintainer when your tree is submitted for merging.
-You may also want to consider cooperating with the maintainer of the
-conflicting tree to minimise any particularly complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/boe+D/qNj2=0uef7llGtZMh
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmDIBNQACgkQAVBC80lX
-0GzcuAf8DhLw/frgCfNKQFW47NftZFMHAzUkKGbDvF+EVTfE+AzsCVOtwAq0NuSx
-qoijibo0zgxTQEFEMlcXihjY1KDpe0CtEKUlaWdJk7UPD/XYcIgao8D4kqMLGErZ
-sqRpg1jSFzwjbyruqWYhrx4Rz1NGp/RaqPH92Ljb7eXvCcGGHSlsmpJsoyRTXZcH
-yEYSVdA0bnsKpA5fEDnxr1YtiYduRsjotUVE3sOFpKMVWdqCQPcyOauHEUJlkfru
-rGjqML5ycupHGr1KEeDI9qtgm+BS724xLYAvR7PzaEChHj6Emu2A7c8QyZxfOn6c
-ugjbF7o69+uGDCumYiyFbBzmzhXwOA==
-=5EeB
------END PGP SIGNATURE-----
-
---Sig_/boe+D/qNj2=0uef7llGtZMh--
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
