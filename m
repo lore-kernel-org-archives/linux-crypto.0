@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48071C48BDF
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 06:51:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D18CC48BE5
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 07:26:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 264DD61413
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 06:51:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E10E161417
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 07:26:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229781AbhFOGxb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Jun 2021 02:53:31 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62366 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229845AbhFOGxa (ORCPT
+        id S229613AbhFOH2b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Jun 2021 03:28:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48252 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229493AbhFOH2a (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jun 2021 02:53:30 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15F6odZG059711;
-        Tue, 15 Jun 2021 02:51:17 -0400
+        Tue, 15 Jun 2021 03:28:30 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15F75LPn066048;
+        Tue, 15 Jun 2021 03:26:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
  from : to : cc : date : in-reply-to : references : content-type :
  mime-version : content-transfer-encoding; s=pp1;
- bh=i3K4MRTLGv9vyEyq/44Tf6WUUQ+9nAC4ClnhHYNGWaA=;
- b=NOLmjFTQT93DqIdn/aI+5E2DLKDIHFN2gS7Uyu2PjkdaTnlMMJxIxpGLyMII4SX0gZX1
- 1QH88eJuWSRGovz1XWCF816QA7X+gnxshuabmrCDxjvMEXpG+Aucl4qr6J9CSaI7jOwP
- ecJVLmjdV+o3TOPoZihyz6hVFOy6i0mbo3XV0xQK9bCssRiigAdts9ggv09QQQZotGq1
- wvNY4llxswSJVlVgxBujxDjHzGn+dHikDcMT++//VaHKONGSsqVfsRELDytIqkIoq9wx
- TD1YCUGyc/9jHlrk5mI9pyCEXWxGI5wPzlVcZSWlOhPp8qxVcai0rrJifprjuLdX7wpM ug== 
+ bh=W1eEDicscE0biyRUSl9dgwGh/xMGC4oDv+0cOmDQJMI=;
+ b=dMv7xI9xwsv7eT9hnLqOGEx1uiEurtvwYZ5xt5brnIL9a+IWd+jN42wDGdAjllcNsLdY
+ tM9yi3QtF10mmdh76UMUPszpzO9LHUTF4OIsLzhiopY0ok8/3Y2uD8HBxWGqhBcK0u79
+ PV5mWUh+a9crRwcmiP1oMszUmYZDOovf93U0jccB41LIXnLfXBX/c2iDenEmF9sJPWJ5
+ Mvr+EwcAdLLw98a0NzLkYHoMpw80SL2W9dmBTtgaHqC7My96l+0h40ViOa7kYq7Ra9F7
+ xaYe+Hd8WF4yOMYe+6m4RqtQHxohgXpn/fP/suk02lz+qp4bNIVvG73Io95MoY8gZG+X ZQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 396mp0kwbx-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 396ng3c0kh-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Jun 2021 02:51:17 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15F6of3v059796;
-        Tue, 15 Jun 2021 02:51:16 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 396mp0kwbr-1
+        Tue, 15 Jun 2021 03:26:18 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15F75ZX3067286;
+        Tue, 15 Jun 2021 03:26:17 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 396ng3c0k2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Jun 2021 02:51:16 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15F6mPgE027519;
-        Tue, 15 Jun 2021 06:51:16 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma04wdc.us.ibm.com with ESMTP id 394mj9dhsx-1
+        Tue, 15 Jun 2021 03:26:17 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15F7I6WG013817;
+        Tue, 15 Jun 2021 07:26:16 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma02wdc.us.ibm.com with ESMTP id 394mj9nry7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Jun 2021 06:51:16 +0000
+        Tue, 15 Jun 2021 07:26:16 +0000
 Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15F6pFHY7996278
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15F7QGeD15008226
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Jun 2021 06:51:15 GMT
+        Tue, 15 Jun 2021 07:26:16 GMT
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A3A15B206B;
-        Tue, 15 Jun 2021 06:51:15 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 1E4A2B206C;
+        Tue, 15 Jun 2021 07:26:16 +0000 (GMT)
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B88A2B2064;
-        Tue, 15 Jun 2021 06:51:14 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C14C3B2064;
+        Tue, 15 Jun 2021 07:26:14 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.160.180.39])
         by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Jun 2021 06:51:14 +0000 (GMT)
-Message-ID: <920cb54747efa2ff4148c829d83c2bddb08a3fab.camel@linux.ibm.com>
+        Tue, 15 Jun 2021 07:26:14 +0000 (GMT)
+Message-ID: <91d139adcbd9e4851fdb11d30888f5f5a923b764.camel@linux.ibm.com>
 Subject: Re: [PATCH v5 12/17] powerpc/pseries/vas: Integrate API with
  open/close windows
 From:   Haren Myneni <haren@linux.ibm.com>
@@ -71,7 +71,7 @@ To:     Nicholas Piggin <npiggin@gmail.com>, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         mpe@ellerman.id.au
 Cc:     haren@us.ibm.com, hbabu@us.ibm.com
-Date:   Mon, 14 Jun 2021 23:51:12 -0700
+Date:   Tue, 15 Jun 2021 00:26:12 -0700
 In-Reply-To: <1623638159.6pp87imz6a.astroid@bobo.none>
 References: <ed7a09822cf3a2e463f942e5a37309a2365c9d79.camel@linux.ibm.com>
          <58c2f9debeff2ff6515ea950ebdd6483c147c843.camel@linux.ibm.com>
@@ -81,15 +81,15 @@ User-Agent: Evolution 3.36.2 (3.36.2-1.fc32)
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ah9B9ZOpmikMgfoBlhYWAVl5io3Z26XV
-X-Proofpoint-GUID: JWStV_Ssk9zuT19yoBhxWL95FonQCKD6
+X-Proofpoint-ORIG-GUID: zibvKjPVy9DDCZLZfhghDnYsV_4unums
+X-Proofpoint-GUID: xmDcos6AX-TLy-q9oSlYZRe6mVrBoKa8
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
  definitions=2021-06-15_04:2021-06-14,2021-06-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- suspectscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 clxscore=1015
- priorityscore=1501 lowpriorityscore=0 spamscore=0 bulkscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106150038
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
+ malwarescore=0 bulkscore=0 spamscore=0 impostorscore=0 phishscore=0
+ clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106150042
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -261,17 +261,6 @@ On Mon, 2021-06-14 at 12:55 +1000, Nicholas Piggin wrote:
 > Should the above comment fit under here? vas_id == -1 means
 > userspace 
 > asks for any VAS but preferably a local one?
-
-yes, the user space is requesting window to be allocated on the local
-VAS. Added the first comment to explain about vas_id = -1 and the
-second comment on why same domain values from H_HOME_NODE_ASSOCIATIVITY
-are passed to allocate window HCALL. 
-
-I will remove the first comment and merge it later after "if (uattr-
->vas_id == -1) {"
-
-Thanks
-Haren
 > 
 > > +		/*
 > > +		 * To allocate VAS window, pass same domain values
@@ -312,6 +301,37 @@ Haren
 > > +	mutex_lock(&vas_pseries_mutex);
 > 
 > Why? What's the mutex protecting here?
+This mutex is protecting Allocate/ Deallocate HCAlls and setup/free
+IRQ. Basically once the window is opened and setup IRQ successfully,
+makes sure same IRQ is not assigned to otherwindow before the IRQ is
+freed in OS. 
+
+Allocate window: 
+	Allocate window HCALL
+	setup IRQ
+
+Deallocate window:
+	Deallocate window HCALL - The hypervisor waits all credits are
+returned including any faults. Disable window on this VAS so that do
+not take new requests and wait for all pending requests (faults are
+processed) 
+	free IRQ (We can not free IRQ before the HCALL so that pending
+faults can be processed and credits returned)
+
+So if we do not jave mutex, possible that same fault IRQ may be
+assigned to different window open HCALL before it is actually freed in
+OS.
+
+Process A:
+Allocate window HCALL (winID 123)
+Setup IRQ (IRQ# 321)
+Process requests
+Deallocate HCALL(winID 123)       Process B:
+                                    Allocate window HCALL (winID 123)
+                                    setup IRQ (IRQ# 321) -- will fail.
+Free IRQ (IRQ#321)
+
+                        
 > 
 > > +	rc = allocate_setup_window(txwin, (u64 *)&domain[0],
 > > +				   ct_caps->win_type);
@@ -319,6 +339,30 @@ Haren
 > If you define the types to be the same, can you avoid this casting?
 > allocate_setup_window specifically needs an array of 
 > PLPAR_HCALL9_BUFSIZE longs.
+
+Yes H_HOME_NODE_ASSOCIATIVITY returns longs (PLPAR_HCALL9_BUFSIZE) but
+H_ALLOCATE_VAS_WINDOW expects u64.
+
+Syntax:
+int64 /* H_Success, H_Parameter, H_Resource, H_Constrained */
+/* H_Cop_Hw, H_Unsupported, H_Busy */
+/* H_LongBusyOrder1mSec, LongBusyOrder10mSec */
+hcall(const uint64 H_ALLOCATE_VAS_WINDOW /* Allocate a VAS window */
+uint8 vasWindowType, /* The type of VAS window to allocate */
+uint16 numCredits, /* Number of credits to assign to the window */
+uint64 desiredAssociativityDomainIdentifier1, /* Associativity Domain
+Identifier Doubleword 1 */
+uint64 desiredAssociativityDomainIdentifier2, /* Associativity Domain
+Identifier Doubleword 2 */
+uint64 desiredAssociativityDomainIdentifier3, /* Associativity Domain
+Identifier Doubleword 3 */
+uint64 desiredAssociativityDomainIdentifier4, /* Associativity Domain
+Identifier Doubleword 4 */
+uint64 desiredAssociativityDomainIdentifier5, /* Associativity Domain
+Identifier Doubleword 5 */
+uint64 desiredAssociativityDomainIdentifier6) /* Associativity Domain
+Identifier Doubleword 6 */
+
 > 
 > > +	mutex_unlock(&vas_pseries_mutex);
 > > +	if (rc)
@@ -345,6 +389,17 @@ Haren
 > > +	h_deallocate_vas_window(txwin->vas_win.winid);
 > 
 > No mutex here in this deallocate hcall.
+
+We do not need mutex just for this hcall which is executing during
+failure. Need mutex only for the code patch as explained above. 
+
+If the window open is not returned to user space successfully, window
+close path will be:
+
+ free_irq_setup(txwin);
+ h_deallocate_vas_window(txwin->vas_win.winid);
+
+
 > 
 > I suspect you don't actually need the mutex for the hcalls
 > themselves, 
@@ -356,9 +411,21 @@ Haren
 > change everything now, but not skimping on naming helps a lot with
 > reading code that you're not familiar with. All the vas/nx stuff
 > could probably do with a pass to make the names a bit easier.
+
+Yes creds is for credits. We have names like credits and capabilities
+for VAS/NX. Using creds for credits and caps for capabilities. creds is
+already used in the existing code.
+
 > 
 > (creds isn't so bad, "ct" for "coprocessor type" is pretty obscure 
 > though).
+
+So can I use 'copt' coprocessor type?
+
+Thanks
+Haren
+
+
 > 
 > Thanks,
 > Nick
