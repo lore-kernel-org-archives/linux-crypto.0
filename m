@@ -2,68 +2,225 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8607C48BE8
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 10:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C05C48BDF
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 11:23:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A610B61438
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 10:12:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3E5F61455
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jun 2021 11:23:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231415AbhFOKOG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Jun 2021 06:14:06 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:54820 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231350AbhFOKOF (ORCPT
+        id S229937AbhFOLZb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Jun 2021 07:25:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59332 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229528AbhFOLZb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jun 2021 06:14:05 -0400
-Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
-        by youngberry.canonical.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <colin.king@canonical.com>)
-        id 1lt62z-0001AH-K8; Tue, 15 Jun 2021 10:11:53 +0000
-From:   Colin King <colin.king@canonical.com>
-To:     Zaibo Xu <xuzaibo@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH][next] crypto: hisilicon/sec: Fix spelling mistake "fallbcak" -> "fallback"
-Date:   Tue, 15 Jun 2021 11:11:53 +0100
-Message-Id: <20210615101153.9298-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.31.1
+        Tue, 15 Jun 2021 07:25:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623756206;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6zIhA2yJuykBLTAxFpo5bYvmvbrLn/gng5f4bN7IW1A=;
+        b=BX06zhZORedZP42ZDuzZIPQ3o42HlTgLfk88W6pyWs1moViIAj32o+3cJjltYtsmaCTOMy
+        v7y6sEDtR2TCNlAd1tS7+B04V3pFoUexuJby1yqDuMXdcAekA0rUHzq1l+zFHVOHzn3S9y
+        a50HxzcBQFv60ipxPfTUEMqqBeS8Cgw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-pXEN-AimNDuyli6m1JxVag-1; Tue, 15 Jun 2021 07:23:25 -0400
+X-MC-Unique: pXEN-AimNDuyli6m1JxVag-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C0C9107ACF6;
+        Tue, 15 Jun 2021 11:23:22 +0000 (UTC)
+Received: from work-vm (ovpn-112-179.ams2.redhat.com [10.36.112.179])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E0E301001B2C;
+        Tue, 15 Jun 2021 11:23:10 +0000 (UTC)
+Date:   Tue, 15 Jun 2021 12:23:08 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com, Borislav Petkov <bp@suse.de>
+Subject: Re: [PATCH Part2 RFC v3 14/37] crypto:ccp: Provide APIs to issue
+ SEV-SNP commands
+Message-ID: <YMiNnN99PuAKbplA@work-vm>
+References: <20210602141057.27107-1-brijesh.singh@amd.com>
+ <20210602141057.27107-15-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210602141057.27107-15-brijesh.singh@amd.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+* Brijesh Singh (brijesh.singh@amd.com) wrote:
+> Provide the APIs for the hypervisor to manage an SEV-SNP guest. The
+> commands for SEV-SNP is defined in the SEV-SNP firmware specification.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 24 ++++++++++++
+>  include/linux/psp-sev.h      | 74 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 98 insertions(+)
+> 
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index b225face37b1..def2996111db 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1014,6 +1014,30 @@ int sev_guest_df_flush(int *error)
+>  }
+>  EXPORT_SYMBOL_GPL(sev_guest_df_flush);
+>  
+> +int snp_guest_decommission(struct sev_data_snp_decommission *data, int *error)
+> +{
+> +	return sev_do_cmd(SEV_CMD_SNP_DECOMMISSION, data, error);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_guest_decommission);
+> +
+> +int snp_guest_df_flush(int *error)
+> +{
+> +	return sev_do_cmd(SEV_CMD_SNP_DF_FLUSH, NULL, error);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_guest_df_flush);
+> +
+> +int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error)
+> +{
+> +	return sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, data, error);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_guest_page_reclaim);
+> +
+> +int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
+> +{
+> +	return sev_do_cmd(SEV_CMD_SNP_DBG_DECRYPT, data, error);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt);
+> +
+>  static void sev_exit(struct kref *ref)
+>  {
+>  	misc_deregister(&misc_dev->misc);
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 1b53e8782250..63ef766cbd7a 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -860,6 +860,65 @@ int sev_guest_df_flush(int *error);
+>   */
+>  int sev_guest_decommission(struct sev_data_decommission *data, int *error);
+>  
+> +/**
+> + * snp_guest_df_flush - perform SNP DF_FLUSH command
+> + *
+> + * @sev_ret: sev command return code
+> + *
+> + * Returns:
+> + * 0 if the sev successfully processed the command
+> + * -%ENODEV    if the sev device is not available
+> + * -%ENOTSUPP  if the sev does not support SEV
 
-There is a spelling mistake in a dev_err message. Fix it.
+sev not supporting SEV? Is that actually 'sev does not support SNP'?
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index f23af61661de..6a45bd23b363 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -2290,7 +2290,7 @@ static int sec_aead_soft_crypto(struct sec_ctx *ctx,
- 
- 	/* Kunpeng920 aead mode not support input 0 size */
- 	if (!a_ctx->fallback_aead_tfm) {
--		dev_err(dev, "aead fallbcak tfm is NULL!\n");
-+		dev_err(dev, "aead fallback tfm is NULL!\n");
- 		return -EINVAL;
- 	}
- 
+> + * -%ETIMEDOUT if the sev command timed out
+> + * -%EIO       if the sev returned a non-zero return code
+> + */
+> +int snp_guest_df_flush(int *error);
+> +
+> +/**
+> + * snp_guest_decommission - perform SNP_DECOMMISSION command
+> + *
+> + * @decommission: sev_data_decommission structure to be processed
+> + * @sev_ret: sev command return code
+> + *
+> + * Returns:
+> + * 0 if the sev successfully processed the command
+> + * -%ENODEV    if the sev device is not available
+> + * -%ENOTSUPP  if the sev does not support SEV
+> + * -%ETIMEDOUT if the sev command timed out
+> + * -%EIO       if the sev returned a non-zero return code
+> + */
+> +int snp_guest_decommission(struct sev_data_snp_decommission *data, int *error);
+> +
+> +/**
+> + * snp_guest_page_reclaim - perform SNP_PAGE_RECLAIM command
+> + *
+> + * @decommission: sev_snp_page_reclaim structure to be processed
+> + * @sev_ret: sev command return code
+> + *
+> + * Returns:
+> + * 0 if the sev successfully processed the command
+> + * -%ENODEV    if the sev device is not available
+> + * -%ENOTSUPP  if the sev does not support SEV
+> + * -%ETIMEDOUT if the sev command timed out
+> + * -%EIO       if the sev returned a non-zero return code
+> + */
+> +int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error);
+> +
+> +/**
+> + * snp_guest_dbg_decrypt - perform SEV SNP_DBG_DECRYPT command
+> + *
+> + * @sev_ret: sev command return code
+> + *
+> + * Returns:
+> + * 0 if the sev successfully processed the command
+> + * -%ENODEV    if the sev device is not available
+> + * -%ENOTSUPP  if the sev does not support SEV
+> + * -%ETIMEDOUT if the sev command timed out
+> + * -%EIO       if the sev returned a non-zero return code
+> + */
+> +int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error);
+> +
+> +
+>  void *psp_copy_user_blob(u64 uaddr, u32 len);
+>  
+>  #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
+> @@ -887,6 +946,21 @@ sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int
+>  
+>  static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_PTR(-EINVAL); }
+>  
+> +static inline int
+> +snp_guest_decommission(struct sev_data_snp_decommission *data, int *error) { return -ENODEV; }
+> +
+> +static inline int snp_guest_df_flush(int *error) { return -ENODEV; }
+> +
+> +static inline int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+> +static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+>  #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
+>  
+>  #endif	/* __PSP_SEV_H__ */
+> -- 
+> 2.17.1
+> 
+> 
 -- 
-2.31.1
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
