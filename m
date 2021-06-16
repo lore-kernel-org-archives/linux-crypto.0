@@ -2,104 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F03D4C48BE8
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Jun 2021 12:03:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71008C49EA3
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Jun 2021 12:27:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFEC061245
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Jun 2021 12:03:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6595F6135C
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Jun 2021 12:27:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232543AbhFPMFa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Jun 2021 08:05:30 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:56520 "EHLO mail.skyhub.de"
+        id S232892AbhFPM3w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Jun 2021 08:29:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48688 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232164AbhFPMFY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Jun 2021 08:05:24 -0400
-Received: from zn.tnic (p200300ec2f0c2b00ec25a986a17212ee.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:2b00:ec25:a986:a172:12ee])
+        id S232637AbhFPM3l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Jun 2021 08:29:41 -0400
+Received: from jic23-huawei (cpc108967-cmbg20-2-0-cust86.5-4.cable.virginm.net [81.101.6.87])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3BAEE1EC03E4;
-        Wed, 16 Jun 2021 14:03:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1623844996;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=qK3Y1DHOt57Qig7xfqZFQT3ydoFk9JaEiyImUpf/4h4=;
-        b=mPkX1WjdJx43H98yJ0xojjxpLkY44F46gfmAvHgRhvQxPBJMGtuYOk9hA3L8aJwckyEYjZ
-        5rQCCG8gEnwy45fVBV3wv3aILo7Xjvo6F5qham5jpiWltLR6fF3pok4WGqWjxdq/L0DgZ2
-        ArwOn584uWA7wywbnefvHhDirxUBCUM=
-Date:   Wed, 16 Jun 2021 14:03:05 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 11/22] x86/sev: Add helper for validating
- pages in early enc attribute changes
-Message-ID: <YMnoeRcuMfAqX5Vf@zn.tnic>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-12-brijesh.singh@amd.com>
- <YMI02+k2zk9eazjQ@zn.tnic>
- <d0759889-94df-73b0-4285-fa064eb187cd@amd.com>
- <YMen5wVqR31D/Q4z@zn.tnic>
- <70db789d-b1aa-c355-2d16-51ace4666b3f@amd.com>
- <YMnNYNBvEEAr5kqd@zn.tnic>
- <f7e70782-701c-13dd-43d2-67c92f8cf36f@amd.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id BBA8561369;
+        Wed, 16 Jun 2021 12:27:07 +0000 (UTC)
+Date:   Wed, 16 Jun 2021 13:29:08 +0100
+From:   Jonathan Cameron <jic23@kernel.org>
+To:     Rob Herring <robh@kernel.org>
+Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, dmaengine@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
+        alsa-devel@alsa-project.org, iommu@lists.linux-foundation.org,
+        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-phy@lists.infradead.org,
+        linux-gpio@vger.kernel.org, linux-pwm@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-rtc@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Stephen Boyd <sboyd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>, Vinod Koul <vkoul@kernel.org>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= 
+        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [PATCH] dt-bindings: Drop redundant minItems/maxItems
+Message-ID: <20210616132908.76a780b8@jic23-huawei>
+In-Reply-To: <20210615191543.1043414-1-robh@kernel.org>
+References: <20210615191543.1043414-1-robh@kernel.org>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f7e70782-701c-13dd-43d2-67c92f8cf36f@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 16, 2021 at 06:00:09AM -0500, Brijesh Singh wrote:
-> I am trying to be consistent with previous VMGEXIT implementations. If
-> the command itself failed then use the command specific error code to
-> tell hypervisor why we terminated but if the hypervisor violated the
-> GHCB specification then use the "general request termination".
+On Tue, 15 Jun 2021 13:15:43 -0600
+Rob Herring <robh@kernel.org> wrote:
 
-I feel like we're running in circles here: I ask about debuggability
-and telling the user what exactly failed and you're giving me some
-explanation about what the error codes mean. I can see what they mean.
+> If a property has an 'items' list, then a 'minItems' or 'maxItems' with the
+> same size as the list is redundant and can be dropped. Note that is DT
+> schema specific behavior and not standard json-schema behavior. The tooling
+> will fixup the final schema adding any unspecified minItems/maxItems.
+> 
+> This condition is partially checked with the meta-schema already, but
+> only if both 'minItems' and 'maxItems' are equal to the 'items' length.
+> An improved meta-schema is pending.
+> 
 
-So let me try again:
+...
 
-Imagine you're a guest owner and you haven't written the SNP code and
-you don't know how it works.
+>  .../devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml   | 1 -
 
-You start a guest in the public cloud and it fails because the
-hypervisor violates the GHCB protocol and all that guest prints before
-it dies is
+For this one, the fact it overrides maxItems elsewhere makes this a little
+bit odd.  I guess we can get used to it being implicit.
 
-"general request termination"
+>  .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml     | 2 --
 
-How are you - the guest owner - going to find out what exactly happened?
+Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-Call support?
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
