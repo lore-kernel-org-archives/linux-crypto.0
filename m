@@ -2,186 +2,204 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8A6C49361
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Jun 2021 14:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 092E4C48BE8
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Jun 2021 15:06:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AF5E61356
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Jun 2021 14:37:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E14D3611CE
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Jun 2021 15:06:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233914AbhFPOjt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Jun 2021 10:39:49 -0400
-Received: from mail-co1nam11on2079.outbound.protection.outlook.com ([40.107.220.79]:62551
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233563AbhFPOjt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Jun 2021 10:39:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cAvkly4N0aWsKZtks7uUEYGvL96aEFLWEunOilLjb+go18FCD+zbUAm8p/tzGwU4LkNS8ZNa1OU95S9EUWpMb8OP/YwZpePJL0DOvA87hpeSaIqj3QEnut4oEzP5nE06FzzCoMMSO8PNmc8li+Aua/4ZoXEz2p54knbPa3JJS2NFTgo/ljSyMwULkqV6yusSzWe1+XjuxuydoMqTCeaydvUVXoqrZ1KwS76aqS36/XN+fjw/f+Lug/t4hJOjLPHI54q/edOD9cBfMcuxTh3HF8BXM9+DwyouNavmZYZ9qkHSNQXoJ+8vDgpFiZQZgzFOM9Z9rbRoxlxLSQvEihQ/pw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IBoLkF67ESvNjPF8brhVKT5lCNzmUCVWdQZ56D5zHt8=;
- b=lQuBnDrgs1z9RIc/r1fjeQRb9d1jAvnycbp5f4X2i+dKqc7lDn30k9JGCR7vXwEj1BBH8y/vjhDBEgx7rs9lm9dEpn9zsvhw1OYhfudFW6YOkKZWT5jKJfAWVpBZwYGbFNF+4zmh0z+ifDP5gJyqelFdxSJrfWMV/QQqdBMAeyVjbGcUsA7jYG+7GUITuBFdNcq1TxEcT7/ZyEkfcffMHmy19EWsvKAztgnkOQVIwtprz1vD9AB4oh8xfXfbEOQ0Sa92nrnDwjXOkdDxPzxRMAMHN9wuVRMXRO5bCW7vxzT1isjI0iECGW/ehRFUi9qUOszP57bHwjD77siqOTydzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IBoLkF67ESvNjPF8brhVKT5lCNzmUCVWdQZ56D5zHt8=;
- b=dgwFuawgmty/N2J2/vQn/wPUmphisYVKtCV9ylglI6ILXQq884jpoe43TO8zTshz/SYu4Wx2fEbJQOK06C4A6wulpJfCRwVvIhTloxuyc2pvBgXJ9KbQgGEAxNyCtwgsSVZGt5lFc5emF9698jz1kgStQyyRJn7a5RjbCS9MNiI=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2714.namprd12.prod.outlook.com (2603:10b6:5:42::18) by
- DM5PR1201MB0268.namprd12.prod.outlook.com (2603:10b6:4:54::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4242.16; Wed, 16 Jun 2021 14:37:40 +0000
-Received: from DM6PR12MB2714.namprd12.prod.outlook.com
- ([fe80::7df8:b0cd:fe1b:ae7b]) by DM6PR12MB2714.namprd12.prod.outlook.com
- ([fe80::7df8:b0cd:fe1b:ae7b%5]) with mapi id 15.20.4219.022; Wed, 16 Jun 2021
- 14:37:40 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 11/22] x86/sev: Add helper for validating
- pages in early enc attribute changes
-To:     Borislav Petkov <bp@alien8.de>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-12-brijesh.singh@amd.com> <YMI02+k2zk9eazjQ@zn.tnic>
- <d0759889-94df-73b0-4285-fa064eb187cd@amd.com> <YMen5wVqR31D/Q4z@zn.tnic>
- <70db789d-b1aa-c355-2d16-51ace4666b3f@amd.com> <YMnNYNBvEEAr5kqd@zn.tnic>
- <f7e70782-701c-13dd-43d2-67c92f8cf36f@amd.com> <YMnoeRcuMfAqX5Vf@zn.tnic>
- <9f012bcb-4756-600d-6fe8-b1db9b972f17@amd.com> <YMn2aiMSEVUuWW8B@zn.tnic>
- <91db9dfc-068a-3709-925b-9e249fbe8f6f@amd.com>
- <c3a4419e-4b05-cf4d-2fe7-0d046cb36484@amd.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <06ffeaae-259c-67ea-617c-f1d8c1e1c015@amd.com>
-Date:   Wed, 16 Jun 2021 09:37:34 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <c3a4419e-4b05-cf4d-2fe7-0d046cb36484@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [165.204.77.11]
-X-ClientProxiedBy: SA9PR13CA0120.namprd13.prod.outlook.com
- (2603:10b6:806:24::35) To DM6PR12MB2714.namprd12.prod.outlook.com
- (2603:10b6:5:42::18)
+        id S234444AbhFPPIe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Jun 2021 11:08:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33740 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234389AbhFPPIc (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Jun 2021 11:08:32 -0400
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 706C3C061574
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Jun 2021 08:06:25 -0700 (PDT)
+Received: by mail-yb1-xb2f.google.com with SMTP id f84so3565661ybg.0
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Jun 2021 08:06:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=WnfyWeDtfp9wJ03e/Pygdz8GkYlJkHUmw4KuNZkZtsI=;
+        b=p3V/tsAvBKNW1/fLQw1cxjbLxmkzY+NCFM6sFUd5MYQR/I99nfYHtTeZ6GX29HX2fP
+         7B98Hz0iPFw7ln3a7oZUSV0D7wBHs3Nx8bP1yD75PLFbtaitHUMldchawAE3t6u9Gr4D
+         +thcqYz5DsdBNhUKylMKadu7gU+x9Y8f2HR9pkqCG44mo9Eiw3E0Ef0UBgaALPUnEwZM
+         OMSgYp3yI11h4BO8U2bJwEZbzXXy3AGA4tyIzRoWlJw5Et2h2p95BbZaXl2/0i99CK6D
+         VK4iEQKVOgzlpWTXxuWr4K4Kh5NwNdhEEHtoPFEUOX+aMGa4KVLNyO/kl/oNBYMPHM53
+         BQJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=WnfyWeDtfp9wJ03e/Pygdz8GkYlJkHUmw4KuNZkZtsI=;
+        b=oXikfcVNYZG085hbjdblfJZCqVno+1bnFPYKo34g6EEr0JHX0ySA/TA/qtRil5F8or
+         Zb59qE26/M7uCMT1iFMfQ2/vNwTOBZTAYZe4M4kVyG1yp/xJSLTMRT7l6qpcM0C53C89
+         0OGwKI+RoX3F9vCOvrdi8YEplm0LJ0JMJnZSi1XIi0PYzly555BE8Z0bV/B0FwZ9rdKt
+         4a2s753kRK1ZiFIbFYwg5q13VWkW2uOsSKyZ8zRclnP00G30Nay1mmql+yg7TJlwTGO2
+         5AxQf5HcnBrl7vWOg+sY2dgVvVL/X7OgACIR3jpAlIZsMCZJFySMrEEc/X7pHYyMlUeK
+         SxXQ==
+X-Gm-Message-State: AOAM530h3T8McdbV8J2h78bmtMyg5Cfk2k3eBJwpXYHRccgL83iuyEac
+        1E7MvJ25SsmJNvjg4ZTIju8VvxoQXBP0Iqsq811VBlxYpaM=
+X-Google-Smtp-Source: ABdhPJxsvfFKJlCl0Fv1Q0JQBOSrY9fTTPwXdoG5i6bwF+xZjcAotFA7K4MfWyuapR5FEhTmK4mSmAAff0KtXHI/vxk=
+X-Received: by 2002:a25:8088:: with SMTP id n8mr196816ybk.375.1623855984676;
+ Wed, 16 Jun 2021 08:06:24 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.31.11.236] (165.204.77.11) by SA9PR13CA0120.namprd13.prod.outlook.com (2603:10b6:806:24::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4242.9 via Frontend Transport; Wed, 16 Jun 2021 14:37:36 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cadbac02-1a42-451b-6bc6-08d930d44a7d
-X-MS-TrafficTypeDiagnostic: DM5PR1201MB0268:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR1201MB0268FEA78745EB9738AA3B86E50F9@DM5PR1201MB0268.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: TciyEop83rHJrHeCZL4KxcZJpuIOVPLnSoBIvJc4iheVl4ty8X0BcDT/8dd2bMPc4YeLo50urRgTcoxZeuMBkO+S+7NrUeZm/r+4y0M4Gto7YQAWpE6wBag2Pl168t9wZrUU7Q+O6T0YHabF2kL2Mk2c0wBL0hQ6uJVx+kR+QPIpXfYhklC7bebHJpwAKhk0+VmeLyM2gAcGXu1SptM8KjnM0xXDFY78//dTGkeT9zZ3cD5MRD1Ou58bJYh2nXdEy6audsEfr4aexgwXRE8I+CCs9dEb+sWODByZRG61mdeUAADAYIkUu8Sl08es2knt2VNSDZihtxv+638D2S1biRN4TY8TiMw00sLhMomJGMDIhPb2CgljJi2cLQosUwIuLjBvgevMMj17iAY8jUA7GxaGE1N8wVXxbiliRH7TicOI2LopfzJKp8mnRGjDZUsnI7ko52IfkFNZhPiMCn/Mx4auPbv06OBrWVOFCRd336QqbyFx5YVD3Q8ZDtAXJZvbrplRi09lZSkHvSPU1gpcEy0c2YVfgXS50TpQcJAlnQuWeVQ43SQdUtMi4qVBbihiD5gctWibaFrCzRlmhdYX/t8yF2NjDBxsgKrjXiZ5iuo2an+qhpz0TGym2UxyHmIq7lV/HiskPxbn5ayjjJiMAQQTkB89yVR9XOdWLtnuvfRkovpAWszQDXeUIFleJJxWjSrmRl6ChCo0e21+YF49ad0Q3Pig2Ycc6gB0eFdDUh8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2714.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(26005)(498600001)(53546011)(83380400001)(956004)(6486002)(2906002)(2616005)(66476007)(16526019)(38100700002)(66556008)(38350700002)(66946007)(31686004)(186003)(8936002)(86362001)(8676002)(6916009)(16576012)(52116002)(36756003)(5660300002)(54906003)(4326008)(44832011)(31696002)(7416002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U1NTSE1XYVFKYks4Y0ZNelJzL1J4Y3grMzlUa1NTZENoemE0bDg2RUFzL0ZS?=
- =?utf-8?B?cGFVYUxQZzlLWm5zSEJXbnc1Q2pSYWxXdEZxZ3UvOFlKUE9mNElMK2lzRWNB?=
- =?utf-8?B?ZEdXUDBBL2YxNk8wdEo4UnRRQ3lCRlp0WExtcnNnMGRSL0EycVFMcTVxVDc2?=
- =?utf-8?B?YW1sa0F5dDYyYWU5Ujd3cGR1VG9KVWFyYWx1ZVV5YWF1S1FIbitQMWhoU2Ur?=
- =?utf-8?B?dGlGYUlWNzJZTnF5eFFoMnkwQjNoNnRLZ2FQUjNOR0w2ZVRFQXVzLzgxNmMw?=
- =?utf-8?B?Yk5uek5iZHhRaXZlSmwwMzc3UTdsOTFTZC9FSUtVcGVXalV1eUdyQktRMXMx?=
- =?utf-8?B?OE1MbmFOb3hBeXFJSkhFak1oOUpCeGJ6QWVUZk1EY3VON3RwWUlqczFzN3VW?=
- =?utf-8?B?blVIazJySEo5VWJSWWlaSXkrSGl3bEdnOEdsN2NiT2hkZHpDVmM3aWkrNldX?=
- =?utf-8?B?QjFxaWM1TFJnYWVqdVBBSkI1OGJGTkphcEhyYzR2ZG83NE0yQ0liTkFNV2hs?=
- =?utf-8?B?UXFZOXpRSWRnMXRFamtiK1lTNmVrL1orL1lIOGFvbmd3ajduRTJMVHo4L3dL?=
- =?utf-8?B?amxXSlM4Mmh3aDNlMDZhZmVVVzY4SHJFc084U3dGTCt3dmZqT1dXdC9CRFZD?=
- =?utf-8?B?MURodnIrSHVXTC9oUjdwOUYxbWpnNldVcW5ZSHZ6alN1dEVxZEVIRkI5Wnlo?=
- =?utf-8?B?SWJ3bTBxaXQ5NEhDaW9sSzVMSlVNNGxvemYxa01MMTl5ZTNFcjVuZ1FQVStI?=
- =?utf-8?B?T0FDNGIwZjRXUFpSNkwzcGRoSFF5eUxXQi8yRk9QRHMwNmlLZFM2Y1RGOVBB?=
- =?utf-8?B?NGlkTHRSSzZGcC9oaGF4bjdMUGgvNG1Zc2FHam9wbWxseCsyNEtyTERuaGFP?=
- =?utf-8?B?UEpqYStiMmZ6cE9qd1hEVHNlYWZDbncza0NieCtGb25FWnd4blFYRUJmbmt0?=
- =?utf-8?B?cEF3R01wVytYeklQTERtZEF5UlgzeVFDN05xZjVEc3lxdXRXU0FSU0VKdUIr?=
- =?utf-8?B?QmF6WHZGUEgxNzRFVTdMeWxYUFRKYllvVXd4ZElPQyszNEx6TUYvWDZoV3BT?=
- =?utf-8?B?S2dUOEpmRzZpOHQzVEVlZmFsQWpKa2lxdXk3K0gzNTNBQVF2cmdmWHBuQW1P?=
- =?utf-8?B?MHBhUGRsWUtpUnA4SGtjejVxRDEyU24vdXAwOFdYUWtMUlFRbytNcFZJQ1ZQ?=
- =?utf-8?B?bEJvaEhNK1I4M1V1Sm44ZjVLaWZwc2V6YjFZZzNQbCt4dlhFelhHSmtzTFlC?=
- =?utf-8?B?ZUxaQ0ROMmlOUGhkMG9JZ2NSU1FuQmlRSkxGR2NzcmxaTGhZYkhyZ0hiUjZT?=
- =?utf-8?B?YU9HNzExT3p2YVFTV3g1dWcvYmVEWmltQkQ4SEFvdy9jaDNQc2oxVnVUcW1J?=
- =?utf-8?B?M1FjZHA3VFNzazhkZXBva2tFVldITmVFa3E2dytIUmI4UHVOS2QrMmpnbjVM?=
- =?utf-8?B?VU55ZU00eEdlUm12b1JEL2grcURnUXJJWC8wMVB5VTcxR3hGa2EvbHV6ZC9F?=
- =?utf-8?B?MFpwbm5JM0tDOXh3cEJueGhXaExHV1FSUDl1ckt4aDBNSW9RVnNKU3k0YmVy?=
- =?utf-8?B?aXB0Nm5nTXJ6UDdmSmwxYjQ0NXNUZWRNREhxb0RUMHcxb2xxMFN4VzZhdzd5?=
- =?utf-8?B?emJQSFNlYUNQcE1iRFczQ1Jpam1sM1B2RjFub1NzRW1yVk1iSERON1IyODZm?=
- =?utf-8?B?T3I1UmhTZGR4TDZ0UjVFVUw4NmhzZ2RXaE84QkdxVEpLNHRWOWc1bzVPV1RH?=
- =?utf-8?Q?AVFN3BFeKScwnLH+LKbstdI9cN40iSLTBbpDqoQ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cadbac02-1a42-451b-6bc6-08d930d44a7d
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2714.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2021 14:37:39.8594
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kIi0xuc/tBk3a2naSd9od9rOiymn/2OP38OTeO7WYDAYcKW/VO3MATzK0U9Ly6nvRWdlsqxg+lntpD3PoA7eWA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0268
+References: <b4e3ac1e393dd3ec9d6086e3d216bf9d0fdfc0e8.1623835679.git.geert+renesas@glider.be>
+In-Reply-To: <b4e3ac1e393dd3ec9d6086e3d216bf9d0fdfc0e8.1623835679.git.geert+renesas@glider.be>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Wed, 16 Jun 2021 18:06:13 +0300
+Message-ID: <CAOtvUMcJzide=sinBSMGocKhyErECE3e0H-KGDX9RhXHeVhK4w@mail.gmail.com>
+Subject: Re: [PATCH v2] dt-bindings: crypto: ccree: Convert to json-schema
+To:     Geert Uytterhoeven <geert+renesas@glider.be>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, Jun 16, 2021 at 12:29 PM Geert Uytterhoeven
+<geert+renesas@glider.be> wrote:
+>
+> Convert the Arm TrustZone CryptoCell cryptographic engine Device Tree
+> binding documentation to json-schema.
+>
+> Document missing properties.
+> Update the example to match reality.
+>
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+> v2:
+>   - Use "SPDX-License-Identifier: GPL-2.0", as requested by Gilad.
+
+Acked-by: Gilad Ben Yossef <gilad@benyossef.com>
 
 
-On 6/16/2021 9:36 AM, Brijesh Singh wrote:
-> 
-> 
-> On 6/16/2021 8:10 AM, Brijesh Singh wrote:
->>
->> On 6/16/21 8:02 AM, Borislav Petkov wrote:
->>> On Wed, Jun 16, 2021 at 07:49:25AM -0500, Brijesh Singh wrote:
->>>> If you still think ...
->>> I think you should answer my question first:
->>>
->>>> Imagine you're a guest owner and you haven't written the SNP code and
->>>> you don't know how it works.
->>>>
->>>> You start a guest in the public cloud and it fails because the
->>>> hypervisor violates the GHCB protocol and all that guest prints before
->>>> it dies is
->>>>
->>>> "general request termination"
->>>>
->>>> How are you - the guest owner - going to find out what exactly happened?
->>>>
->>>> Call support?
->>> And let me paraphrase it again: if the error condition with which the
->>> guest terminates is not uniquely identifiable but simply a "general
->>> request", how are such conditions going to be debugged?
->>> I thought I said it somewhere in our previous conversation, I would look
->> at the KVM trace log, each vmgexit entry and exit are logged. The log
->> contains full GHCB MSR value, and in it you can see both the request and
->> response code and decode the failure reason.
->>
-> 
-> I now realized that in this case we may not have the trace's. It's
-> a production environment and my development machine :(.
 
-I am mean to say *not* my development machine
+> ---
+>  .../bindings/crypto/arm,cryptocell.yaml       | 53 +++++++++++++++++++
+>  .../bindings/crypto/arm-cryptocell.txt        | 25 ---------
+>  2 files changed, 53 insertions(+), 25 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/arm,cryptoce=
+ll.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/crypto/arm-cryptoce=
+ll.txt
+>
+> diff --git a/Documentation/devicetree/bindings/crypto/arm,cryptocell.yaml=
+ b/Documentation/devicetree/bindings/crypto/arm,cryptocell.yaml
+> new file mode 100644
+> index 0000000000000000..b8331863ee754988
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/arm,cryptocell.yaml
+> @@ -0,0 +1,53 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/crypto/arm,cryptocell.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Arm TrustZone CryptoCell cryptographic engine
+> +
+> +maintainers:
+> +  - Gilad Ben-Yossef <gilad@benyossef.com>
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - arm,cryptocell-713-ree
+> +      - arm,cryptocell-703-ree
+> +      - arm,cryptocell-712-ree
+> +      - arm,cryptocell-710-ree
+> +      - arm,cryptocell-630p-ree
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  power-domains:
+> +    maxItems: 1
+> +
+> +  resets:
+> +    maxItems: 1
+> +
+> +  dma-coherent: true
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +
+> +    arm_cc712: crypto@80000000 {
+> +            compatible =3D "arm,cryptocell-712-ree";
+> +            reg =3D <0x80000000 0x10000>;
+> +            interrupts =3D <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>;
+> +    };
+> diff --git a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt =
+b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+> deleted file mode 100644
+> index 6130e6eb4af89135..0000000000000000
+> --- a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+> +++ /dev/null
+> @@ -1,25 +0,0 @@
+> -Arm TrustZone CryptoCell cryptographic engine
+> -
+> -Required properties:
+> -- compatible: Should be one of -
+> -   "arm,cryptocell-713-ree"
+> -   "arm,cryptocell-703-ree"
+> -   "arm,cryptocell-712-ree"
+> -   "arm,cryptocell-710-ree"
+> -   "arm,cryptocell-630p-ree"
+> -- reg: Base physical address of the engine and length of memory mapped r=
+egion.
+> -- interrupts: Interrupt number for the device.
+> -
+> -Optional properties:
+> -- clocks: Reference to the crypto engine clock.
+> -- dma-coherent: Present if dma operations are coherent.
+> -
+> -Examples:
+> -
+> -       arm_cc712: crypto@80000000 {
+> -               compatible =3D "arm,cryptocell-712-ree";
+> -               interrupt-parent =3D <&intc>;
+> -               interrupts =3D < 0 30 4 >;
+> -               reg =3D < 0x80000000 0x10000 >;
+> -
+> -       };
+> --
+> 2.25.1
+>
 
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
