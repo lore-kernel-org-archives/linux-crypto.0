@@ -2,326 +2,487 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFBAC49EA7
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 22:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07763C2B9F4
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 23:10:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3BB76613CE
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 22:17:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFAF1613B4
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 23:10:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232094AbhFQWTP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Jun 2021 18:19:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56494 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232088AbhFQWTM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jun 2021 18:19:12 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id F0DD6613B4;
-        Thu, 17 Jun 2021 22:17:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1623968224;
-        bh=8lLNvAQJFBYHcwyHgNEpUKH4liF//tJL8IXh/++g2VQ=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=huvrHHpH2Av8vejTexiFgCIX8gaey/rp/0fjLnRAt1uHvre0POa9FMvPn6CSKF4vP
-         c1dyDYSMYo16eAP+y8b7jCtqCSK/GxM08QdxX1G394l3E8JBesdgSfezsVwCObf+XY
-         7aWLgTlzsBBO6TKNEHxE7nsZ/+OgD85yLW8ohdjh7wOtV4YkqobaNmS5taze+KHWCO
-         fK6lrJ8I7DNEWJB2YicAQ/PLhU6Y66Is1uaJonoeXzDn/9t9wK0lIH/tQqckcXFuET
-         u5Swl2hwja6dodRo6iE7Vpv+Vl8JR6ZLXVJxbLuKQjO/HsCiolAUliP6AHbf478B1T
-         ZnwiO+IrhijxQ==
-Received: by mail-ej1-f42.google.com with SMTP id g8so12572868ejx.1;
-        Thu, 17 Jun 2021 15:17:03 -0700 (PDT)
-X-Gm-Message-State: AOAM533H3WTBiNxJM6fB2cmYC7GQaa7pmWFlsaU47n2KIwiQ92m1Lq8f
-        UK4pz+k6qhTXDxkxwrDizAPdZXHPBGMyCwOnhw==
-X-Google-Smtp-Source: ABdhPJxzgkf6C07sPN7yjl1phyvHCv9pAxXmIQ1iuWsb7n6aw/LK46UKCpGaWvweVtQco41YaA9gmDx268LBgSxFl4o=
-X-Received: by 2002:a17:907:264b:: with SMTP id ar11mr7391845ejc.525.1623968222450;
- Thu, 17 Jun 2021 15:17:02 -0700 (PDT)
+        id S232640AbhFQXMq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Jun 2021 19:12:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39034 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231523AbhFQXMp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jun 2021 19:12:45 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CB1CC061574
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Jun 2021 16:10:36 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id bb20so496261pjb.3
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Jun 2021 16:10:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=e5Pt0kZsBxNEHIKD1Am2RxXX0rGU0t2MvLg8kEWEZFk=;
+        b=MAIEJin+adv/lDbD8N9vBou5sd2HLwBSC2nMbkBpryb+TC+ZplveBYZx4AYQv3Z8eL
+         p2Yusuzfu3W+wvkOvETbJWfCFAZA0yoM2tVJWL0pCgbN1YgcuRxJScb0ZutYbqhXPoyn
+         3bbl1Co99dWwkdQcUZ7EWASJiSy9PSLTgb0zKoP9BnOr7n8mLa8APPnhDZkYQm4MvX2N
+         vcugDrdaLwd42Lqs2LZfNfHWHIS8i11cGbcQTf+hO5/gIrsofg6T6qNn6DZXwzxNRiyd
+         kqcZIMqhYvmLmzhGE8oNABbhOQnxUJFmyiVUAuvyfyWo5IKK7aeIY9QjMREM1slFaVOr
+         zd0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=e5Pt0kZsBxNEHIKD1Am2RxXX0rGU0t2MvLg8kEWEZFk=;
+        b=gaF6o2tcNJCvDR1gNrowGNxULyy9s3tbfmw+6iv6na0gz/QeK9PzXvAMIl6P/4QMnH
+         Im7vJ25+WpH8IXvCsqM55knWeb3uYDupslKoCf8oEPRwq1DPzHcfKRw/x8TAhq2j2yR4
+         WRNj3rrQCqJl28ZseG9N1Lmy3yqVzUJHziM/vc3vBr0cKE5StZ4j+JLke5l+x7uT0KnM
+         zSz2e+C+jFALfJgXQm8RGojxlM9yMW4vpi/NN5B8hOzMHqPCnn9yiq/gAByB4VeQf31s
+         FZHKbZtZIOCjtA6ZL7AZZjGFW8NjDIIfxGQj6vNHVPjvIQnS8GSMyz5GNTAiE39BQrl3
+         djxA==
+X-Gm-Message-State: AOAM533OTXmmYKB+fs2K6hi30z15zWdq7OPbY7AhargKuboPoTn70Ttq
+        kEeX7ivXf7YnTD+KxoJ1SY0Vo1T7O1U=
+X-Google-Smtp-Source: ABdhPJwiIfs8OhjgdC97QS99WwT3cMlYhVxXcLf0Zc4Ms9jIRhvW/hC7b4MyO9SgO8WQ2nUUfgSJfw==
+X-Received: by 2002:a17:90a:d18f:: with SMTP id fu15mr7744651pjb.78.1623971435979;
+        Thu, 17 Jun 2021 16:10:35 -0700 (PDT)
+Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
+        by smtp.gmail.com with ESMTPSA id y8sm681068pfe.162.2021.06.17.16.10.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Jun 2021 16:10:35 -0700 (PDT)
+Date:   Fri, 18 Jun 2021 09:10:29 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v6 06/17] powerpc/vas: Move update_csb/dump_crb to common
+ book3s platform
+To:     Haren Myneni <haren@linux.ibm.com>, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au
+Cc:     haren@us.ibm.com, hbabu@us.ibm.com
+References: <827bf56dce09620ebecd8a00a5f97105187a6205.camel@linux.ibm.com>
+        <bf8d5b0770fa1ef5cba88c96580caa08d999d3b5.camel@linux.ibm.com>
+In-Reply-To: <bf8d5b0770fa1ef5cba88c96580caa08d999d3b5.camel@linux.ibm.com>
 MIME-Version: 1.0
-References: <20210615191543.1043414-1-robh@kernel.org> <bb8c18f6-139d-76be-87e7-0c93e03cc92c@ti.com>
-In-Reply-To: <bb8c18f6-139d-76be-87e7-0c93e03cc92c@ti.com>
-From:   Rob Herring <robh@kernel.org>
-Date:   Thu, 17 Jun 2021 16:16:50 -0600
-X-Gmail-Original-Message-ID: <CAL_Jsq+-ggeBMT_507HN+mM1KirM+w2ZnhZNe+Q7tRsFRJxDOw@mail.gmail.com>
-Message-ID: <CAL_Jsq+-ggeBMT_507HN+mM1KirM+w2ZnhZNe+Q7tRsFRJxDOw@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: Drop redundant minItems/maxItems
-To:     Suman Anna <s-anna@ti.com>
-Cc:     devicetree@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-        Linux-ALSA <alsa-devel@alsa-project.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        "open list:IIO SUBSYSTEM AND DRIVERS" <linux-iio@vger.kernel.org>,
-        PCI <linux-pci@vger.kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        "open list:REMOTE PROCESSOR (REMOTEPROC) SUBSYSTEM" 
-        <linux-remoteproc@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
-        <linux-ide@vger.kernel.org>, Linux I2C <linux-i2c@vger.kernel.org>,
-        linux-phy@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        Lee Jones <lee.jones@linaro.org>,
-        linux-clk <linux-clk@vger.kernel.org>,
-        "open list:REAL TIME CLOCK (RTC) SUBSYSTEM" 
-        <linux-rtc@vger.kernel.org>, Lars-Peter Clausen <lars@metafoo.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        David Airlie <airlied@linux.ie>,
-        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
-        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>, Jakub Kicinski <kuba@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Vivien Didelot <vivien.didelot@gmail.com>,
-        Wolfgang Grandegger <wg@grandegger.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Linux PWM List <linux-pwm@vger.kernel.org>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        LINUX-WATCHDOG <linux-watchdog@vger.kernel.org>,
-        "open list:THERMAL" <linux-pm@vger.kernel.org>,
-        linux-can@vger.kernel.org,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        Mark Brown <broonie@kernel.org>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Linux USB List <linux-usb@vger.kernel.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org,
-        iommu@lists.linux-foundation.org,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        linux-crypto@vger.kernel.org, Daniel Vetter <daniel@ffwll.ch>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        dmaengine@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Cameron <jic23@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Message-Id: <1623971353.tmbx8zufeh.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 17, 2021 at 10:06 AM Suman Anna <s-anna@ti.com> wrote:
->
-> Hi Rob,
->
-> On 6/15/21 2:15 PM, Rob Herring wrote:
-> > If a property has an 'items' list, then a 'minItems' or 'maxItems' with=
- the
-> > same size as the list is redundant and can be dropped. Note that is DT
-> > schema specific behavior and not standard json-schema behavior. The too=
-ling
-> > will fixup the final schema adding any unspecified minItems/maxItems.
-> >
-> > This condition is partially checked with the meta-schema already, but
-> > only if both 'minItems' and 'maxItems' are equal to the 'items' length.
-> > An improved meta-schema is pending.
-> >
-> > Cc: Jens Axboe <axboe@kernel.dk>
-> > Cc: Stephen Boyd <sboyd@kernel.org>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: David Airlie <airlied@linux.ie>
-> > Cc: Daniel Vetter <daniel@ffwll.ch>
-> > Cc: Vinod Koul <vkoul@kernel.org>
-> > Cc: Bartosz Golaszewski <bgolaszewski@baylibre.com>
-> > Cc: Kamal Dasu <kdasu.kdev@gmail.com>
-> > Cc: Jonathan Cameron <jic23@kernel.org>
-> > Cc: Lars-Peter Clausen <lars@metafoo.de>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Joerg Roedel <joro@8bytes.org>
-> > Cc: Jassi Brar <jassisinghbrar@gmail.com>
-> > Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> > Cc: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-> > Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: Wolfgang Grandegger <wg@grandegger.com>
-> > Cc: Marc Kleine-Budde <mkl@pengutronix.de>
-> > Cc: Andrew Lunn <andrew@lunn.ch>
-> > Cc: Vivien Didelot <vivien.didelot@gmail.com>
-> > Cc: Vladimir Oltean <olteanv@gmail.com>
-> > Cc: Bjorn Helgaas <bhelgaas@google.com>
-> > Cc: Kishon Vijay Abraham I <kishon@ti.com>
-> > Cc: Linus Walleij <linus.walleij@linaro.org>
-> > Cc: "Uwe Kleine-K=C3=B6nig" <u.kleine-koenig@pengutronix.de>
-> > Cc: Lee Jones <lee.jones@linaro.org>
-> > Cc: Ohad Ben-Cohen <ohad@wizery.com>
-> > Cc: Mathieu Poirier <mathieu.poirier@linaro.org>
-> > Cc: Philipp Zabel <p.zabel@pengutronix.de>
-> > Cc: Paul Walmsley <paul.walmsley@sifive.com>
-> > Cc: Palmer Dabbelt <palmer@dabbelt.com>
-> > Cc: Albert Ou <aou@eecs.berkeley.edu>
-> > Cc: Alessandro Zummo <a.zummo@towertech.it>
-> > Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > Cc: Mark Brown <broonie@kernel.org>
-> > Cc: Zhang Rui <rui.zhang@intel.com>
-> > Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
-> > Cc: Wim Van Sebroeck <wim@linux-watchdog.org>
-> > Cc: Guenter Roeck <linux@roeck-us.net>
-> > Signed-off-by: Rob Herring <robh@kernel.org>
-> > ---
-> >  .../devicetree/bindings/ata/nvidia,tegra-ahci.yaml          | 1 -
-> >  .../devicetree/bindings/clock/allwinner,sun4i-a10-ccu.yaml  | 2 --
-> >  .../devicetree/bindings/clock/qcom,gcc-apq8064.yaml         | 1 -
-> >  Documentation/devicetree/bindings/clock/qcom,gcc-sdx55.yaml | 2 --
-> >  .../devicetree/bindings/clock/qcom,gcc-sm8350.yaml          | 2 --
-> >  .../devicetree/bindings/clock/sprd,sc9863a-clk.yaml         | 1 -
-> >  .../devicetree/bindings/crypto/allwinner,sun8i-ce.yaml      | 2 --
-> >  Documentation/devicetree/bindings/crypto/fsl-dcp.yaml       | 1 -
-> >  .../display/allwinner,sun4i-a10-display-backend.yaml        | 6 ------
-> >  .../bindings/display/allwinner,sun6i-a31-mipi-dsi.yaml      | 1 -
-> >  .../bindings/display/allwinner,sun8i-a83t-dw-hdmi.yaml      | 4 ----
-> >  .../bindings/display/allwinner,sun8i-a83t-hdmi-phy.yaml     | 2 --
-> >  .../bindings/display/allwinner,sun8i-r40-tcon-top.yaml      | 2 --
-> >  .../devicetree/bindings/display/bridge/cdns,mhdp8546.yaml   | 2 --
-> >  .../bindings/display/rockchip/rockchip,dw-hdmi.yaml         | 2 --
-> >  Documentation/devicetree/bindings/display/st,stm32-dsi.yaml | 2 --
-> >  .../devicetree/bindings/display/st,stm32-ltdc.yaml          | 1 -
-> >  .../devicetree/bindings/display/xlnx/xlnx,zynqmp-dpsub.yaml | 4 ----
-> >  .../devicetree/bindings/dma/renesas,rcar-dmac.yaml          | 1 -
-> >  .../devicetree/bindings/edac/amazon,al-mc-edac.yaml         | 2 --
-> >  Documentation/devicetree/bindings/eeprom/at24.yaml          | 1 -
-> >  Documentation/devicetree/bindings/example-schema.yaml       | 2 --
-> >  Documentation/devicetree/bindings/gpu/brcm,bcm-v3d.yaml     | 1 -
-> >  Documentation/devicetree/bindings/gpu/vivante,gc.yaml       | 1 -
-> >  Documentation/devicetree/bindings/i2c/brcm,brcmstb-i2c.yaml | 1 -
-> >  .../devicetree/bindings/i2c/marvell,mv64xxx-i2c.yaml        | 2 --
-> >  .../devicetree/bindings/i2c/mellanox,i2c-mlxbf.yaml         | 1 -
-> >  .../devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml   | 1 -
-> >  .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml     | 2 --
-> >  .../bindings/interrupt-controller/fsl,irqsteer.yaml         | 1 -
-> >  .../bindings/interrupt-controller/loongson,liointc.yaml     | 1 -
-> >  Documentation/devicetree/bindings/iommu/arm,smmu-v3.yaml    | 1 -
-> >  .../devicetree/bindings/iommu/renesas,ipmmu-vmsa.yaml       | 1 -
-> >  .../devicetree/bindings/mailbox/st,stm32-ipcc.yaml          | 2 --
-> >  .../devicetree/bindings/media/amlogic,gx-vdec.yaml          | 1 -
-> >  Documentation/devicetree/bindings/media/i2c/adv7604.yaml    | 1 -
-> >  .../devicetree/bindings/media/marvell,mmp2-ccic.yaml        | 1 -
-> >  .../devicetree/bindings/media/qcom,sc7180-venus.yaml        | 1 -
-> >  .../devicetree/bindings/media/qcom,sdm845-venus-v2.yaml     | 1 -
-> >  .../devicetree/bindings/media/qcom,sm8250-venus.yaml        | 1 -
-> >  Documentation/devicetree/bindings/media/renesas,drif.yaml   | 1 -
-> >  .../bindings/memory-controllers/mediatek,smi-common.yaml    | 6 ++----
-> >  .../bindings/memory-controllers/mediatek,smi-larb.yaml      | 1 -
-> >  .../devicetree/bindings/mmc/allwinner,sun4i-a10-mmc.yaml    | 2 --
-> >  Documentation/devicetree/bindings/mmc/fsl-imx-esdhc.yaml    | 1 -
-> >  Documentation/devicetree/bindings/mmc/mtk-sd.yaml           | 2 --
-> >  Documentation/devicetree/bindings/mmc/renesas,sdhi.yaml     | 2 --
-> >  Documentation/devicetree/bindings/mmc/sdhci-am654.yaml      | 1 -
-> >  Documentation/devicetree/bindings/mmc/sdhci-pxa.yaml        | 1 -
-> >  .../devicetree/bindings/net/amlogic,meson-dwmac.yaml        | 2 --
-> >  .../devicetree/bindings/net/brcm,bcm4908-enet.yaml          | 2 --
-> >  Documentation/devicetree/bindings/net/can/bosch,m_can.yaml  | 2 --
-> >  Documentation/devicetree/bindings/net/dsa/brcm,sf2.yaml     | 2 --
-> >  Documentation/devicetree/bindings/net/snps,dwmac.yaml       | 2 --
-> >  Documentation/devicetree/bindings/net/stm32-dwmac.yaml      | 1 -
-> >  Documentation/devicetree/bindings/pci/brcm,stb-pcie.yaml    | 2 --
-> >  Documentation/devicetree/bindings/pci/loongson.yaml         | 1 -
-> >  .../devicetree/bindings/pci/mediatek-pcie-gen3.yaml         | 1 -
-> >  .../devicetree/bindings/pci/microchip,pcie-host.yaml        | 2 --
-> >  Documentation/devicetree/bindings/perf/arm,cmn.yaml         | 1 -
-> >  .../devicetree/bindings/phy/brcm,bcm63xx-usbh-phy.yaml      | 1 -
-> >  .../devicetree/bindings/phy/brcm,brcmstb-usb-phy.yaml       | 3 ---
-> >  Documentation/devicetree/bindings/phy/brcm,sata-phy.yaml    | 1 -
-> >  Documentation/devicetree/bindings/phy/mediatek,tphy.yaml    | 2 --
-> >  .../devicetree/bindings/phy/phy-cadence-sierra.yaml         | 2 --
-> >  .../devicetree/bindings/phy/phy-cadence-torrent.yaml        | 4 ----
-> >  .../devicetree/bindings/phy/qcom,ipq806x-usb-phy-hs.yaml    | 1 -
-> >  .../devicetree/bindings/phy/qcom,ipq806x-usb-phy-ss.yaml    | 1 -
-> >  Documentation/devicetree/bindings/phy/qcom,qmp-phy.yaml     | 1 -
-> >  Documentation/devicetree/bindings/phy/qcom,qusb2-phy.yaml   | 2 --
-> >  Documentation/devicetree/bindings/phy/renesas,usb2-phy.yaml | 2 --
-> >  Documentation/devicetree/bindings/phy/renesas,usb3-phy.yaml | 1 -
-> >  .../devicetree/bindings/pinctrl/actions,s500-pinctrl.yaml   | 1 -
-> >  .../devicetree/bindings/power/amlogic,meson-ee-pwrc.yaml    | 1 -
-> >  .../devicetree/bindings/pwm/allwinner,sun4i-a10-pwm.yaml    | 1 -
-> >  .../devicetree/bindings/remoteproc/st,stm32-rproc.yaml      | 2 --
-> >  .../devicetree/bindings/remoteproc/ti,k3-dsp-rproc.yaml     | 1 -
-> >  .../devicetree/bindings/remoteproc/ti,omap-remoteproc.yaml  | 1 -
-> >  Documentation/devicetree/bindings/reset/fsl,imx-src.yaml    | 1 -
-> >  .../devicetree/bindings/riscv/sifive-l2-cache.yaml          | 1 -
-> >  .../devicetree/bindings/rtc/allwinner,sun6i-a31-rtc.yaml    | 1 -
-> >  Documentation/devicetree/bindings/rtc/imxdi-rtc.yaml        | 1 -
-> >  Documentation/devicetree/bindings/serial/fsl-lpuart.yaml    | 2 --
-> >  Documentation/devicetree/bindings/serial/samsung_uart.yaml  | 1 -
-> >  .../devicetree/bindings/soc/qcom/qcom,geni-se.yaml          | 1 -
-> >  Documentation/devicetree/bindings/soc/ti/ti,pruss.yaml      | 2 --
-> >  .../bindings/sound/nvidia,tegra-audio-graph-card.yaml       | 1 -
-> >  .../devicetree/bindings/sound/nvidia,tegra210-i2s.yaml      | 2 --
-> >  Documentation/devicetree/bindings/sound/st,stm32-sai.yaml   | 3 ---
-> >  .../devicetree/bindings/spi/amlogic,meson-gx-spicc.yaml     | 1 -
-> >  .../devicetree/bindings/spi/brcm,spi-bcm-qspi.yaml          | 2 --
-> >  .../bindings/thermal/allwinner,sun8i-a83t-ths.yaml          | 2 --
-> >  Documentation/devicetree/bindings/thermal/qcom-tsens.yaml   | 1 -
-> >  .../bindings/timer/allwinner,sun5i-a13-hstimer.yaml         | 1 -
-> >  Documentation/devicetree/bindings/timer/arm,arch_timer.yaml | 1 -
-> >  .../devicetree/bindings/timer/arm,arch_timer_mmio.yaml      | 2 --
-> >  .../devicetree/bindings/timer/intel,ixp4xx-timer.yaml       | 1 -
-> >  .../devicetree/bindings/usb/maxim,max3420-udc.yaml          | 2 --
-> >  .../devicetree/bindings/usb/nvidia,tegra-xudc.yaml          | 4 ----
-> >  Documentation/devicetree/bindings/usb/renesas,usbhs.yaml    | 3 ---
-> >  .../devicetree/bindings/watchdog/st,stm32-iwdg.yaml         | 1 -
-> >  101 files changed, 2 insertions(+), 163 deletions(-)
-> >
->
-> [snip]
->
-> > diff --git a/Documentation/devicetree/bindings/remoteproc/ti,k3-dsp-rpr=
-oc.yaml b/Documentation/devicetree/bindings/remoteproc/ti,k3-dsp-rproc.yaml
-> > index 6070456a7b67..f399743b631b 100644
-> > --- a/Documentation/devicetree/bindings/remoteproc/ti,k3-dsp-rproc.yaml
-> > +++ b/Documentation/devicetree/bindings/remoteproc/ti,k3-dsp-rproc.yaml
-> > @@ -57,7 +57,6 @@ properties:
-> >
-> >    memory-region:
-> >      minItems: 2
-> > -    maxItems: 8
-> >      description: |
-> >        phandle to the reserved memory nodes to be associated with the r=
-emoteproc
-> >        device. There should be at least two reserved memory nodes defin=
-ed. The
->
-> Does this enforce the maxItems to be 2 only now? Or should this be droppi=
-ng the
-> minItems here which matches the length of items instead of maxItems?
->
-> I have originally listed the individual item list only for the mandatory =
-items
-> and rest are scalable. I provided this through "additionalItems: true" un=
-der
-> this property.
+Excerpts from Haren Myneni's message of June 18, 2021 6:32 am:
+>=20
+> If a coprocessor encounters an error translating an address, the
+> VAS will cause an interrupt in the host. The kernel processes
+> the fault by updating CSB. This functionality is same for both
+> powerNV and pseries. So this patch moves these functions to
+> common vas-api.c and the actual functionality is not changed.
+>=20
+> Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>  arch/powerpc/include/asm/vas.h             |   3 +
+>  arch/powerpc/platforms/book3s/vas-api.c    | 167 +++++++++++++++++++++
+>  arch/powerpc/platforms/powernv/vas-fault.c | 155 ++-----------------
+>  3 files changed, 179 insertions(+), 146 deletions(-)
+>=20
+> diff --git a/arch/powerpc/include/asm/vas.h b/arch/powerpc/include/asm/va=
+s.h
+> index 71cff6d6bf3a..6b41c0818958 100644
+> --- a/arch/powerpc/include/asm/vas.h
+> +++ b/arch/powerpc/include/asm/vas.h
+> @@ -230,4 +230,7 @@ int vas_register_coproc_api(struct module *mod, enum =
+vas_cop_type cop_type,
+>  void vas_unregister_coproc_api(void);
+> =20
+>  int get_vas_user_win_ref(struct vas_user_win_ref *task_ref);
+> +void vas_update_csb(struct coprocessor_request_block *crb,
+> +		    struct vas_user_win_ref *task_ref);
+> +void vas_dump_crb(struct coprocessor_request_block *crb);
+>  #endif /* __ASM_POWERPC_VAS_H */
+> diff --git a/arch/powerpc/platforms/book3s/vas-api.c b/arch/powerpc/platf=
+orms/book3s/vas-api.c
+> index 4ce82500f4c5..30172e52e16b 100644
+> --- a/arch/powerpc/platforms/book3s/vas-api.c
+> +++ b/arch/powerpc/platforms/book3s/vas-api.c
+> @@ -10,6 +10,9 @@
+>  #include <linux/fs.h>
+>  #include <linux/slab.h>
+>  #include <linux/uaccess.h>
+> +#include <linux/kthread.h>
+> +#include <linux/sched/signal.h>
+> +#include <linux/mmu_context.h>
+>  #include <linux/io.h>
+>  #include <asm/vas.h>
+>  #include <uapi/asm/vas-api.h>
+> @@ -94,6 +97,170 @@ int get_vas_user_win_ref(struct vas_user_win_ref *tas=
+k_ref)
+>  	return 0;
+>  }
+> =20
+> +/*
+> + * Successful return must release the task reference with
+> + * put_task_struct
+> + */
+> +static bool ref_get_pid_and_task(struct vas_user_win_ref *task_ref,
+> +			  struct task_struct **tskp, struct pid **pidp)
+> +{
+> +	struct task_struct *tsk;
+> +	struct pid *pid;
+> +
+> +	pid =3D task_ref->pid;
+> +	tsk =3D get_pid_task(pid, PIDTYPE_PID);
+> +	if (!tsk) {
+> +		pid =3D task_ref->tgid;
+> +		tsk =3D get_pid_task(pid, PIDTYPE_PID);
+> +		/*
+> +		 * Parent thread (tgid) will be closing window when it
+> +		 * exits. So should not get here.
+> +		 */
+> +		if (WARN_ON_ONCE(!tsk))
+> +			return false;
+> +	}
+> +
+> +	/* Return if the task is exiting. */
+> +	if (tsk->flags & PF_EXITING) {
+> +		put_task_struct(tsk);
+> +		return false;
+> +	}
+> +
+> +	*tskp =3D tsk;
+> +	*pidp =3D pid;
+> +
+> +	return true;
+> +}
 
-Good catch. This should be dropped. The meta-schema doesn't enforce
-this if "additionalItems: true" which is rarely used.
+Thanks for making this change.
 
-> Also, have the exact same usage in
-> Documentation/devicetree/bindings/remoteproc/ti,k3-r5f-rproc.yaml as well=
- which
-> is not included in this patch.
+I think that's good to factor all these out and put them together.
 
-Yeah, I just missed this one. I've double checked and there aren't any more=
-.
+Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
 
-Rob
+> +
+> +/*
+> + * Update the CSB to indicate a translation error.
+> + *
+> + * User space will be polling on CSB after the request is issued.
+> + * If NX can handle the request without any issues, it updates CSB.
+> + * Whereas if NX encounters page fault, the kernel will handle the
+> + * fault and update CSB with translation error.
+> + *
+> + * If we are unable to update the CSB means copy_to_user failed due to
+> + * invalid csb_addr, send a signal to the process.
+> + */
+> +void vas_update_csb(struct coprocessor_request_block *crb,
+> +		    struct vas_user_win_ref *task_ref)
+> +{
+> +	struct coprocessor_status_block csb;
+> +	struct kernel_siginfo info;
+> +	struct task_struct *tsk;
+> +	void __user *csb_addr;
+> +	struct pid *pid;
+> +	int rc;
+> +
+> +	/*
+> +	 * NX user space windows can not be opened for task->mm=3DNULL
+> +	 * and faults will not be generated for kernel requests.
+> +	 */
+> +	if (WARN_ON_ONCE(!task_ref->mm))
+> +		return;
+> +
+> +	csb_addr =3D (void __user *)be64_to_cpu(crb->csb_addr);
+> +
+> +	memset(&csb, 0, sizeof(csb));
+> +	csb.cc =3D CSB_CC_FAULT_ADDRESS;
+> +	csb.ce =3D CSB_CE_TERMINATION;
+> +	csb.cs =3D 0;
+> +	csb.count =3D 0;
+> +
+> +	/*
+> +	 * NX operates and returns in BE format as defined CRB struct.
+> +	 * So saves fault_storage_addr in BE as NX pastes in FIFO and
+> +	 * expects user space to convert to CPU format.
+> +	 */
+> +	csb.address =3D crb->stamp.nx.fault_storage_addr;
+> +	csb.flags =3D 0;
+> +
+> +	/*
+> +	 * Process closes send window after all pending NX requests are
+> +	 * completed. In multi-thread applications, a child thread can
+> +	 * open a window and can exit without closing it. May be some
+> +	 * requests are pending or this window can be used by other
+> +	 * threads later. We should handle faults if NX encounters
+> +	 * pages faults on these requests. Update CSB with translation
+> +	 * error and fault address. If csb_addr passed by user space is
+> +	 * invalid, send SEGV signal to pid saved in window. If the
+> +	 * child thread is not running, send the signal to tgid.
+> +	 * Parent thread (tgid) will close this window upon its exit.
+> +	 *
+> +	 * pid and mm references are taken when window is opened by
+> +	 * process (pid). So tgid is used only when child thread opens
+> +	 * a window and exits without closing it.
+> +	 */
+> +
+> +	if (!ref_get_pid_and_task(task_ref, &tsk, &pid))
+> +		return;
+> +
+> +	kthread_use_mm(task_ref->mm);
+> +	rc =3D copy_to_user(csb_addr, &csb, sizeof(csb));
+> +	/*
+> +	 * User space polls on csb.flags (first byte). So add barrier
+> +	 * then copy first byte with csb flags update.
+> +	 */
+> +	if (!rc) {
+> +		csb.flags =3D CSB_V;
+> +		/* Make sure update to csb.flags is visible now */
+> +		smp_mb();
+> +		rc =3D copy_to_user(csb_addr, &csb, sizeof(u8));
+> +	}
+> +	kthread_unuse_mm(task_ref->mm);
+> +	put_task_struct(tsk);
+> +
+> +	/* Success */
+> +	if (!rc)
+> +		return;
+> +
+> +
+> +	pr_debug("Invalid CSB address 0x%p signalling pid(%d)\n",
+> +			csb_addr, pid_vnr(pid));
+> +
+> +	clear_siginfo(&info);
+> +	info.si_signo =3D SIGSEGV;
+> +	info.si_errno =3D EFAULT;
+> +	info.si_code =3D SEGV_MAPERR;
+> +	info.si_addr =3D csb_addr;
+> +	/*
+> +	 * process will be polling on csb.flags after request is sent to
+> +	 * NX. So generally CSB update should not fail except when an
+> +	 * application passes invalid csb_addr. So an error message will
+> +	 * be displayed and leave it to user space whether to ignore or
+> +	 * handle this signal.
+> +	 */
+> +	rcu_read_lock();
+> +	rc =3D kill_pid_info(SIGSEGV, &info, pid);
+> +	rcu_read_unlock();
+> +
+> +	pr_devel("%s(): pid %d kill_proc_info() rc %d\n", __func__,
+> +			pid_vnr(pid), rc);
+> +}
+> +
+> +void vas_dump_crb(struct coprocessor_request_block *crb)
+> +{
+> +	struct data_descriptor_entry *dde;
+> +	struct nx_fault_stamp *nx;
+> +
+> +	dde =3D &crb->source;
+> +	pr_devel("SrcDDE: addr 0x%llx, len %d, count %d, idx %d, flags %d\n",
+> +		be64_to_cpu(dde->address), be32_to_cpu(dde->length),
+> +		dde->count, dde->index, dde->flags);
+> +
+> +	dde =3D &crb->target;
+> +	pr_devel("TgtDDE: addr 0x%llx, len %d, count %d, idx %d, flags %d\n",
+> +		be64_to_cpu(dde->address), be32_to_cpu(dde->length),
+> +		dde->count, dde->index, dde->flags);
+> +
+> +	nx =3D &crb->stamp.nx;
+> +	pr_devel("NX Stamp: PSWID 0x%x, FSA 0x%llx, flags 0x%x, FS 0x%x\n",
+> +		be32_to_cpu(nx->pswid),
+> +		be64_to_cpu(crb->stamp.nx.fault_storage_addr),
+> +		nx->flags, nx->fault_status);
+> +}
+> +
+>  static int coproc_open(struct inode *inode, struct file *fp)
+>  {
+>  	struct coproc_instance *cp_inst;
+> diff --git a/arch/powerpc/platforms/powernv/vas-fault.c b/arch/powerpc/pl=
+atforms/powernv/vas-fault.c
+> index ac3a71ec3bd5..2729ac541fb3 100644
+> --- a/arch/powerpc/platforms/powernv/vas-fault.c
+> +++ b/arch/powerpc/platforms/powernv/vas-fault.c
+> @@ -26,150 +26,6 @@
+>   */
+>  #define VAS_FAULT_WIN_FIFO_SIZE	(4 << 20)
+> =20
+> -static void dump_crb(struct coprocessor_request_block *crb)
+> -{
+> -	struct data_descriptor_entry *dde;
+> -	struct nx_fault_stamp *nx;
+> -
+> -	dde =3D &crb->source;
+> -	pr_devel("SrcDDE: addr 0x%llx, len %d, count %d, idx %d, flags %d\n",
+> -		be64_to_cpu(dde->address), be32_to_cpu(dde->length),
+> -		dde->count, dde->index, dde->flags);
+> -
+> -	dde =3D &crb->target;
+> -	pr_devel("TgtDDE: addr 0x%llx, len %d, count %d, idx %d, flags %d\n",
+> -		be64_to_cpu(dde->address), be32_to_cpu(dde->length),
+> -		dde->count, dde->index, dde->flags);
+> -
+> -	nx =3D &crb->stamp.nx;
+> -	pr_devel("NX Stamp: PSWID 0x%x, FSA 0x%llx, flags 0x%x, FS 0x%x\n",
+> -		be32_to_cpu(nx->pswid),
+> -		be64_to_cpu(crb->stamp.nx.fault_storage_addr),
+> -		nx->flags, nx->fault_status);
+> -}
+> -
+> -/*
+> - * Update the CSB to indicate a translation error.
+> - *
+> - * User space will be polling on CSB after the request is issued.
+> - * If NX can handle the request without any issues, it updates CSB.
+> - * Whereas if NX encounters page fault, the kernel will handle the
+> - * fault and update CSB with translation error.
+> - *
+> - * If we are unable to update the CSB means copy_to_user failed due to
+> - * invalid csb_addr, send a signal to the process.
+> - */
+> -static void update_csb(struct vas_window *window,
+> -			struct coprocessor_request_block *crb)
+> -{
+> -	struct coprocessor_status_block csb;
+> -	struct kernel_siginfo info;
+> -	struct task_struct *tsk;
+> -	void __user *csb_addr;
+> -	struct pid *pid;
+> -	int rc;
+> -
+> -	/*
+> -	 * NX user space windows can not be opened for task->mm=3DNULL
+> -	 * and faults will not be generated for kernel requests.
+> -	 */
+> -	if (WARN_ON_ONCE(!window->task_ref.mm || !window->user_win))
+> -		return;
+> -
+> -	csb_addr =3D (void __user *)be64_to_cpu(crb->csb_addr);
+> -
+> -	memset(&csb, 0, sizeof(csb));
+> -	csb.cc =3D CSB_CC_FAULT_ADDRESS;
+> -	csb.ce =3D CSB_CE_TERMINATION;
+> -	csb.cs =3D 0;
+> -	csb.count =3D 0;
+> -
+> -	/*
+> -	 * NX operates and returns in BE format as defined CRB struct.
+> -	 * So saves fault_storage_addr in BE as NX pastes in FIFO and
+> -	 * expects user space to convert to CPU format.
+> -	 */
+> -	csb.address =3D crb->stamp.nx.fault_storage_addr;
+> -	csb.flags =3D 0;
+> -
+> -	pid =3D window->task_ref.pid;
+> -	tsk =3D get_pid_task(pid, PIDTYPE_PID);
+> -	/*
+> -	 * Process closes send window after all pending NX requests are
+> -	 * completed. In multi-thread applications, a child thread can
+> -	 * open a window and can exit without closing it. May be some
+> -	 * requests are pending or this window can be used by other
+> -	 * threads later. We should handle faults if NX encounters
+> -	 * pages faults on these requests. Update CSB with translation
+> -	 * error and fault address. If csb_addr passed by user space is
+> -	 * invalid, send SEGV signal to pid saved in window. If the
+> -	 * child thread is not running, send the signal to tgid.
+> -	 * Parent thread (tgid) will close this window upon its exit.
+> -	 *
+> -	 * pid and mm references are taken when window is opened by
+> -	 * process (pid). So tgid is used only when child thread opens
+> -	 * a window and exits without closing it.
+> -	 */
+> -	if (!tsk) {
+> -		pid =3D window->task_ref.tgid;
+> -		tsk =3D get_pid_task(pid, PIDTYPE_PID);
+> -		/*
+> -		 * Parent thread (tgid) will be closing window when it
+> -		 * exits. So should not get here.
+> -		 */
+> -		if (WARN_ON_ONCE(!tsk))
+> -			return;
+> -	}
+> -
+> -	/* Return if the task is exiting. */
+> -	if (tsk->flags & PF_EXITING) {
+> -		put_task_struct(tsk);
+> -		return;
+> -	}
+> -
+> -	kthread_use_mm(window->task_ref.mm);
+> -	rc =3D copy_to_user(csb_addr, &csb, sizeof(csb));
+> -	/*
+> -	 * User space polls on csb.flags (first byte). So add barrier
+> -	 * then copy first byte with csb flags update.
+> -	 */
+> -	if (!rc) {
+> -		csb.flags =3D CSB_V;
+> -		/* Make sure update to csb.flags is visible now */
+> -		smp_mb();
+> -		rc =3D copy_to_user(csb_addr, &csb, sizeof(u8));
+> -	}
+> -	kthread_unuse_mm(window->task_ref.mm);
+> -	put_task_struct(tsk);
+> -
+> -	/* Success */
+> -	if (!rc)
+> -		return;
+> -
+> -	pr_debug("Invalid CSB address 0x%p signalling pid(%d)\n",
+> -			csb_addr, pid_vnr(pid));
+> -
+> -	clear_siginfo(&info);
+> -	info.si_signo =3D SIGSEGV;
+> -	info.si_errno =3D EFAULT;
+> -	info.si_code =3D SEGV_MAPERR;
+> -	info.si_addr =3D csb_addr;
+> -
+> -	/*
+> -	 * process will be polling on csb.flags after request is sent to
+> -	 * NX. So generally CSB update should not fail except when an
+> -	 * application passes invalid csb_addr. So an error message will
+> -	 * be displayed and leave it to user space whether to ignore or
+> -	 * handle this signal.
+> -	 */
+> -	rcu_read_lock();
+> -	rc =3D kill_pid_info(SIGSEGV, &info, pid);
+> -	rcu_read_unlock();
+> -
+> -	pr_devel("%s(): pid %d kill_proc_info() rc %d\n", __func__,
+> -			pid_vnr(pid), rc);
+> -}
+> -
+>  static void dump_fifo(struct vas_instance *vinst, void *entry)
+>  {
+>  	unsigned long *end =3D vinst->fault_fifo + vinst->fault_fifo_size;
+> @@ -272,7 +128,7 @@ irqreturn_t vas_fault_thread_fn(int irq, void *data)
+>  				vinst->vas_id, vinst->fault_fifo, fifo,
+>  				vinst->fault_crbs);
+> =20
+> -		dump_crb(crb);
+> +		vas_dump_crb(crb);
+>  		window =3D vas_pswid_to_window(vinst,
+>  				be32_to_cpu(crb->stamp.nx.pswid));
+> =20
+> @@ -293,7 +149,14 @@ irqreturn_t vas_fault_thread_fn(int irq, void *data)
+> =20
+>  			WARN_ON_ONCE(1);
+>  		} else {
+> -			update_csb(window, crb);
+> +			/*
+> +			 * NX sees faults only with user space windows.
+> +			 */
+> +			if (window->user_win)
+> +				vas_update_csb(crb, &window->task_ref);
+> +			else
+> +				WARN_ON_ONCE(!window->user_win);
+> +
+>  			/*
+>  			 * Return credit for send window after processing
+>  			 * fault CRB.
+> --=20
+> 2.18.2
+>=20
+>=20
+>=20
