@@ -4,70 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB541C2B9F4
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 08:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EC2EC49361
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 08:01:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D52C261076
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 08:01:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BD9361076
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 08:01:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229834AbhFQIDM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Jun 2021 04:03:12 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:50726 "EHLO deadmen.hmeau.com"
+        id S229783AbhFQIDP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Jun 2021 04:03:15 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50724 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229783AbhFQIDL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jun 2021 04:03:11 -0400
+        id S229716AbhFQIDK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jun 2021 04:03:10 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1ltmxT-0003ht-FX; Thu, 17 Jun 2021 16:01:03 +0800
+        id 1ltmxP-0003hM-8f; Thu, 17 Jun 2021 16:00:59 +0800
 Received: from herbert by gondobar with local (Exim 4.92)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1ltmxT-0002n5-63; Thu, 17 Jun 2021 16:01:03 +0800
-Date:   Thu, 17 Jun 2021 16:01:03 +0800
+        id 1ltmxJ-0002md-OH; Thu, 17 Jun 2021 16:00:53 +0800
+Date:   Thu, 17 Jun 2021 16:00:53 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH v3] crypto: shash - avoid comparing pointers to exported
- functions under CFI
-Message-ID: <20210617080103.GC10662@gondor.apana.org.au>
-References: <20210610062150.212779-1-ardb@kernel.org>
+To:     Baokun Li <libaokun1@huawei.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        "David S. Miller" <davem@davemloft.net>, weiyongjun1@huawei.com,
+        yuehaibing@huawei.com, yangjihong1@huawei.com, yukuai3@huawei.com,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Hulk Robot <hulkci@huawei.com>
+Subject: Re: [PATCH -next v2] crypto: ccp - Use list_move_tail instead of
+ list_del/list_add_tail in ccp-dmaengine.c
+Message-ID: <20210617080053.GB10662@gondor.apana.org.au>
+References: <20210609071526.1338089-1-libaokun1@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210610062150.212779-1-ardb@kernel.org>
+In-Reply-To: <20210609071526.1338089-1-libaokun1@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 10, 2021 at 08:21:50AM +0200, Ard Biesheuvel wrote:
-> crypto_shash_alg_has_setkey() is implemented by testing whether the
-> .setkey() member of a struct shash_alg points to the default version,
-> called shash_no_setkey(). As crypto_shash_alg_has_setkey() is a static
-> inline, this requires shash_no_setkey() to be exported to modules.
+On Wed, Jun 09, 2021 at 03:15:26PM +0800, Baokun Li wrote:
+> Using list_move_tail() instead of list_del() + list_add_tail() in ccp-dmaengine.c.
 > 
-> Unfortunately, when building with CFI, function pointers are routed
-> via CFI stubs which are private to each module (or to the kernel proper)
-> and so this function pointer comparison may fail spuriously.
-> 
-> Let's fix this by turning crypto_shash_alg_has_setkey() into an out of
-> line function.
-> 
-> Cc: Sami Tolvanen <samitolvanen@google.com>
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Baokun Li <libaokun1@huawei.com>
 > ---
-> v3: improve comment as per Eric's suggestion
-> v2: add code comment to explain why the function needs to remain out of
-> line
+> V1->V2:
+> 	CC mailist
 > 
->  crypto/shash.c                 | 18 +++++++++++++++---
->  include/crypto/internal/hash.h |  8 +-------
->  2 files changed, 16 insertions(+), 10 deletions(-)
+>  drivers/crypto/ccp/ccp-dmaengine.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
