@@ -2,346 +2,191 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_RED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33224C49EA6
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 16:08:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF6B5C49EA6
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 18:46:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1CF406141F
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 16:08:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90C2361412
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 18:46:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233829AbhFQQK6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Jun 2021 12:10:58 -0400
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:37854 "EHLO
-        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233682AbhFQQKB (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jun 2021 12:10:01 -0400
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 15HG62FL083373;
-        Thu, 17 Jun 2021 11:06:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1623945962;
-        bh=LVkWEpy5e6cRZkuXdEoUXgk9+WHo500mtyYaCdD+Lf0=;
-        h=Subject:To:CC:References:From:Date:In-Reply-To;
-        b=jeALzHLk3n7+qQeuxED/H4L5B0pUGfd+IKm4cHUnNDcbGNi/N/vECD6HccgWs8Rdc
-         A79ZIeBKglC2uQcNptT6Rqq9rI3jaHqWmNvG1vKe80Rl9RF+rCyfhlpGUEyO1JBVae
-         q2yQKhqF9u2BVEw+7gi7jwzlSE7Jbm56DgmZH8PQ=
-Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 15HG60jb058606
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 17 Jun 2021 11:06:01 -0500
-Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE113.ent.ti.com
- (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Thu, 17
- Jun 2021 11:06:00 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2 via
- Frontend Transport; Thu, 17 Jun 2021 11:06:00 -0500
-Received: from [10.250.36.147] (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 15HG5xDj116986;
-        Thu, 17 Jun 2021 11:05:59 -0500
-Subject: Re: [PATCH] dt-bindings: Drop redundant minItems/maxItems
-To:     Rob Herring <robh@kernel.org>, <devicetree@vger.kernel.org>
-CC:     Andrew Lunn <andrew@lunn.ch>, <alsa-devel@alsa-project.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        <linux-iio@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        <linux-remoteproc@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        <dri-devel@lists.freedesktop.org>, <linux-ide@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-riscv@lists.infradead.org>,
-        Lee Jones <lee.jones@linaro.org>, <linux-clk@vger.kernel.org>,
-        <linux-rtc@vger.kernel.org>, Lars-Peter Clausen <lars@metafoo.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        David Airlie <airlied@linux.ie>,
-        <linux-serial@vger.kernel.org>,
-        =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Vivien Didelot <vivien.didelot@gmail.com>,
-        Wolfgang Grandegger <wg@grandegger.com>,
-        <linux-media@vger.kernel.org>, Ohad Ben-Cohen <ohad@wizery.com>,
-        <linux-pwm@vger.kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
-        <linux-watchdog@vger.kernel.org>, <linux-pm@vger.kernel.org>,
-        <linux-can@vger.kernel.org>, <linux-gpio@vger.kernel.org>,
-        Mark Brown <broonie@kernel.org>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>, <netdev@vger.kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        <linux-usb@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <iommu@lists.linux-foundation.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        <linux-crypto@vger.kernel.org>, Daniel Vetter <daniel@ffwll.ch>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        <dmaengine@vger.kernel.org>, Vladimir Oltean <olteanv@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Cameron <jic23@kernel.org>
-References: <20210615191543.1043414-1-robh@kernel.org>
-From:   Suman Anna <s-anna@ti.com>
-Message-ID: <bb8c18f6-139d-76be-87e7-0c93e03cc92c@ti.com>
-Date:   Thu, 17 Jun 2021 11:05:59 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-MIME-Version: 1.0
-In-Reply-To: <20210615191543.1043414-1-robh@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+        id S233288AbhFQSs3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Jun 2021 14:48:29 -0400
+Received: from mail-bn7nam10on2046.outbound.protection.outlook.com ([40.107.92.46]:12278
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233040AbhFQSs2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jun 2021 14:48:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=A3FIaBolGyW/FQSq80i8RuYkm8h4omqESbIDoyU0yVzHAILFCfut/MSy6IwQ+h8cCOM/Cmi66n09cey20SCk895r9aOVRLJqU1WFoCyt2a+QzReQup6rT+aQLDZlbrjOadAMGWGSrwABFKLh372mxLfwb4nX7bti9jP1q9yC4VGq0wLJDW68nsDaJlDSBFmEhmvL0A8o1abElPwibW6RbF0vEfPdTpDmiDJsTmEAcdye5E0j4mInpV/UBXSA+huEPZ/DGnvfRgmLjiZkzIW8Ifs+hxD1U3TJYig01pyfcO9p8bG09ilYmq6h/NgAhV2naYgnD38LBfae0EV0jCrusg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zoB28LGbzw6CufgVrXYQ5ruVMnpRzOlNv6COUXeGkgA=;
+ b=IVB7B0Z7OPSuIzVQevnidmQ4EyLwl1OS0zhmMYqQyyLtEJka2pJJ0S5goJmycz1/eQpvmgnr7BWzW+tC7x1VyweUxaS+3QJsIdcRq2mvQMp8jbUMgRCOkQgLF05cKUcTwIJ/xnKpxzsZy0zPf3if2DLsmudbHwIYBinHc12C8EofqJvVFSweyO/66M11Otb+3BwSV7VhBDvkBNIuaCpRL1h67tYWQJ4TknFt/9MLrv4Tth8IsXOYMSPINv2IpKT9wtGBMBf7nuGpMW2VmTypliYOqM9PICj2iW7c9Pubuz3nwB63R5turKp0yRb4xqx1HmURtwBxntTQDrW8mw/2iw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zoB28LGbzw6CufgVrXYQ5ruVMnpRzOlNv6COUXeGkgA=;
+ b=XDVYEORxaGbpCIsj7ZYO8c5HpKCF3pS03sxbFWbdCDhi1cTsRagnWGTe0eRumPrZyDvsNU4b/LDbHS/Oqcndzo9V7tHjrOfES7RcaHfZN5Y2/ST+F4yeBj4p4Z1Inr3ObGc801ptGtPa+JIjqO4FBRnQ9JucCAZTMvgy2s+FqPc=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2714.namprd12.prod.outlook.com (2603:10b6:5:42::18) by
+ DM6PR12MB3035.namprd12.prod.outlook.com (2603:10b6:5:3a::24) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4242.16; Thu, 17 Jun 2021 18:46:15 +0000
+Received: from DM6PR12MB2714.namprd12.prod.outlook.com
+ ([fe80::7df8:b0cd:fe1b:ae7b]) by DM6PR12MB2714.namprd12.prod.outlook.com
+ ([fe80::7df8:b0cd:fe1b:ae7b%5]) with mapi id 15.20.4219.022; Thu, 17 Jun 2021
+ 18:46:15 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 06/22] x86/sev: check SEV-SNP features
+ support
+To:     Borislav Petkov <bp@alien8.de>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-7-brijesh.singh@amd.com> <YL4zJT1v6OuH+tvI@zn.tnic>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <e617a0a1-bb8d-9d75-56a4-2ac1138ebf8b@amd.com>
+Date:   Thu, 17 Jun 2021 13:46:08 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <YL4zJT1v6OuH+tvI@zn.tnic>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [165.204.84.11]
+X-ClientProxiedBy: BN9PR03CA0431.namprd03.prod.outlook.com
+ (2603:10b6:408:113::16) To DM6PR12MB2714.namprd12.prod.outlook.com
+ (2603:10b6:5:42::18)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.254.35.102] (165.204.84.11) by BN9PR03CA0431.namprd03.prod.outlook.com (2603:10b6:408:113::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4242.16 via Frontend Transport; Thu, 17 Jun 2021 18:46:11 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 47f5ed94-eb52-4cc6-8a49-08d931c02f67
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3035:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3035E7074C11DCE4497FD261E50E9@DM6PR12MB3035.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tWmLsRq75GOFxgz5ElZdKveLYOyjCzjc803NmyHH/NgkB0W6IQObzHZ6DqwXIRvKv4GeCcaFulpv3/AvawfDRzt+nAxFsniCj2JV9XRFrhBKIBFIra8vXMWZWKJ+CPrtDbSn+8pRQWSSrq2N9+DaAoEeyvuGFj0OaT3DZ3O0fr3rst3WHK1sNG2ovB17gAXOSzpcs1zc+BbAnOkq2coPRzDF2K+Ka7WiRfKTZ4UQaQfnkQhHqZEevtD9QROPY94kmQ8o/BBjIe7mOMEHLAn1LJISd/K3etPU+QFV3PSJFjAy6ezRkMj5xR89pfJ55Grakro6jItRlwE1Eckh5fePSYSbheMiujJXSZlKFNyumNM0rcrfOXYci3maI73eitSqnZTB/VvqTpQnkuD43iaTdzH2GoyTA/aY1wgqk6AFz3KudNjKGdfSe2U34ba5nz9q/wRw5OgQDy4GuGxUraUdp21IHZaEbgxl2Y6gOH5at/ZhGtdm8WtV0OgrmhKVU2vOBDYpJgWaU3lFF8+JhgaLnP0NQQPRr5iO87EfcGkPr79Rj5JyVE2Ku6pBlRglsAI2FkGuULHApDLlZ9IG+yPpaVbbBDCado9ShZjiauBQ3VAHgQv3bCeIWHFz1PjE6j4Iydphwc4geHjIfFGqEe/J/IearrdSHvnhmyy9vc4uLzww1dffB2eBQWp9CfYERGBZoNj7+qLIl1FC2nTBeMzymA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2714.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(346002)(136003)(366004)(376002)(2906002)(8936002)(8676002)(52116002)(6666004)(66946007)(16526019)(186003)(7416002)(53546011)(26005)(31686004)(478600001)(66556008)(66476007)(83380400001)(6486002)(2616005)(31696002)(16576012)(956004)(38100700002)(38350700002)(86362001)(36756003)(54906003)(6916009)(44832011)(5660300002)(4326008)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a3paWEtzdDVWbmtMbGZ6VFJVVTllMzlyMGpEcDlmOVM4RU1qaThCcGMzcDQ5?=
+ =?utf-8?B?dnBJZUlaSjdTQkxoazFGY1NNRGxQYWpJSUFWVXJ2VFdwNjN0ZjF0Q2drQjdk?=
+ =?utf-8?B?U05yUzBFS0FtV0FaaUpMTys2SWdkNUc5SWZvQWFSdHVsUHA0RmpCdHpmRFRG?=
+ =?utf-8?B?blRUYjkyaGpXOUUwRVQ4UGZxVDBVMFhCbjN0MGhrY0hNbmZtaHdZaCtSMDF2?=
+ =?utf-8?B?TGk0bHgwazRDU1ljWUZCMGdPUUdNUGZsbkNpeDF4L1RiUmNna1FUWlVHR29F?=
+ =?utf-8?B?SExWUDl2ZWNmVS9VUDEyNjR2TEMxRks3VU1NdXFNY0N4ZHBZY1puVkp4QUVh?=
+ =?utf-8?B?aVgvY0tEb1BOZ0YrWnREcy8zVHRjZmdtYlNzM3F0ajI4OHVKK055VG1xanBi?=
+ =?utf-8?B?SzRnT3pWY1B1TG9BNHFYcG1tVDBCNzJxQ0QwU1p2M2t1TW9hVDBiOC9rNU9N?=
+ =?utf-8?B?M3FhVkErUmdaMmx4VmNLR0V4bVhReEhkMk8yMmx3S0t2RHJCbnJRUlNGYUc5?=
+ =?utf-8?B?TVRWbkdrRjcvT1ZxdTM4d2JMQVRuOGErdEJtMlcvVzRKNGZyZWkwdDJYMDFI?=
+ =?utf-8?B?NlZoNXc5Q0liNTl5MUxHT1JZRUR4VWk3Vmo1NUw4YlRQc3ZJUXRwZk41MUV3?=
+ =?utf-8?B?UDhHdU1JQXlOQ2hqR1Uxa09DZHZjd0dESHBuNkc1YUNPSy9uNGliODUxd3Ja?=
+ =?utf-8?B?QThlRUlQa3BNYVAvZ3lxdTRFT1p0SXdmbGluekNZdEZoMXZuODNvZzhFMitn?=
+ =?utf-8?B?c244YkVOVU4xbmkyNFFFZHlpNGI1c1NyS3dUdnNmZk9qeWNaYmlMa01HSHk2?=
+ =?utf-8?B?Wmh5dXdUUnJWYTZhYitQQWtmTk1zYStHUk8vb1R6UExEOG9JbytZYk54MDdu?=
+ =?utf-8?B?OVdvOE9Ed2dQbzduaEpoQ2U3STgzemcvR1RSak5RN3EvWlNGbnlHZ0N6anZE?=
+ =?utf-8?B?NlBMcDB4UkUrWHhwdFhUeHl6NUlsZXZJbDZWQWx2QnR2Q1M3M1E3czZhdG02?=
+ =?utf-8?B?aVNMTGlmSC92V1ZsdEtFU3hwMnBDZHhXazRZSjMzV2xHTFJhM05hd3VBTXVj?=
+ =?utf-8?B?Zmt4eHNNZDRoMFlvVFk3STlHMEROZEM2V3h2Qkg2VlRGUFI2WUt5WE4vcVZ4?=
+ =?utf-8?B?eTJoYmxCcDJTcGErTStoc3hpazRkUzBwS0daNFBLbzhrcTN6YVZqSndsSlpE?=
+ =?utf-8?B?QWZrNHRiMlJUSC9zcVBqNS9DWWRBWXhENXYvNURaNGtUM2IrQkYwZlJ5UHRX?=
+ =?utf-8?B?dnhhaUlxS2p2WUdVa2tVcUh0K0tQUW5wdC9wVU4remhMSGY3RGxkT25ibFF2?=
+ =?utf-8?B?THY2SFRYU3dBNU5QVmVZcjhBYmsxSnYvY04xSlJJOG9ZU25NYmhOblg0SFZt?=
+ =?utf-8?B?MUoweWI1L2owNjgzUTRMY0l0NWdBOEQ5ZW5VZHdmZkVKdWZ1dVIvODJveHI2?=
+ =?utf-8?B?V2tUVXRYRGxtaVF0U3d3UTU4ckMwREJkMzUvWGdoamtZRVNrdHArVmR5Z3JQ?=
+ =?utf-8?B?THpQdE91UVU2dEVaTGJZQnlDRDFtZ0U0WW1hajNOZkYyYjFrWTREVU5ETEt3?=
+ =?utf-8?B?SWtnMEhvbWlqcWZ1Wit1bTQ1Wm5MRS9xMmEwVWtSNUxhaEU2VkZhaVRCQllP?=
+ =?utf-8?B?TER4dDFWUlhqOTZZeGhJNElhOFFHZE0wdmFiK2lPMFJBejRpck5JeDZUQVky?=
+ =?utf-8?B?M2ZoVTJDbWhjTVhZcnFrYWxsQ2Z0Q0kxeXlTU0ppK2tEL0Q4WVBhVFB1OGNa?=
+ =?utf-8?Q?HxtHEZd6vXeSVt0nslYHhOu4OTMnrjZ8miHEtoC?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47f5ed94-eb52-4cc6-8a49-08d931c02f67
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2714.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2021 18:46:15.1320
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: b3SiVCvlB9ViIunsf6TBjQ7F5CVGYxvoRg8i3fdF1RcSatcHI/oZ0ChGzAPqr4G1S5Jj0Myhutw0lDPQl3c8EQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3035
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Rob,
+Hi Boris,
 
-On 6/15/21 2:15 PM, Rob Herring wrote:
-> If a property has an 'items' list, then a 'minItems' or 'maxItems' with the
-> same size as the list is redundant and can be dropped. Note that is DT
-> schema specific behavior and not standard json-schema behavior. The tooling
-> will fixup the final schema adding any unspecified minItems/maxItems.
+
+On 6/7/2021 9:54 AM, Borislav Petkov wrote:
+> On Wed, Jun 02, 2021 at 09:04:00AM -0500, Brijesh Singh wrote:
+>>  static bool early_setup_sev_es(void)
 > 
-> This condition is partially checked with the meta-schema already, but
-> only if both 'minItems' and 'maxItems' are equal to the 'items' length.
-> An improved meta-schema is pending.
+> This function is doing SNP init now too, so it should be called
+> something generic like
 > 
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Stephen Boyd <sboyd@kernel.org>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: David Airlie <airlied@linux.ie>
-> Cc: Daniel Vetter <daniel@ffwll.ch>
-> Cc: Vinod Koul <vkoul@kernel.org>
-> Cc: Bartosz Golaszewski <bgolaszewski@baylibre.com>
-> Cc: Kamal Dasu <kdasu.kdev@gmail.com>
-> Cc: Jonathan Cameron <jic23@kernel.org>
-> Cc: Lars-Peter Clausen <lars@metafoo.de>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Jassi Brar <jassisinghbrar@gmail.com>
-> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> Cc: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Wolfgang Grandegger <wg@grandegger.com>
-> Cc: Marc Kleine-Budde <mkl@pengutronix.de>
-> Cc: Andrew Lunn <andrew@lunn.ch>
-> Cc: Vivien Didelot <vivien.didelot@gmail.com>
-> Cc: Vladimir Oltean <olteanv@gmail.com>
-> Cc: Bjorn Helgaas <bhelgaas@google.com>
-> Cc: Kishon Vijay Abraham I <kishon@ti.com>
-> Cc: Linus Walleij <linus.walleij@linaro.org>
-> Cc: "Uwe Kleine-König" <u.kleine-koenig@pengutronix.de>
-> Cc: Lee Jones <lee.jones@linaro.org>
-> Cc: Ohad Ben-Cohen <ohad@wizery.com>
-> Cc: Mathieu Poirier <mathieu.poirier@linaro.org>
-> Cc: Philipp Zabel <p.zabel@pengutronix.de>
-> Cc: Paul Walmsley <paul.walmsley@sifive.com>
-> Cc: Palmer Dabbelt <palmer@dabbelt.com>
-> Cc: Albert Ou <aou@eecs.berkeley.edu>
-> Cc: Alessandro Zummo <a.zummo@towertech.it>
-> Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: Zhang Rui <rui.zhang@intel.com>
-> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
-> Cc: Wim Van Sebroeck <wim@linux-watchdog.org>
-> Cc: Guenter Roeck <linux@roeck-us.net>
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
->  .../devicetree/bindings/ata/nvidia,tegra-ahci.yaml          | 1 -
->  .../devicetree/bindings/clock/allwinner,sun4i-a10-ccu.yaml  | 2 --
->  .../devicetree/bindings/clock/qcom,gcc-apq8064.yaml         | 1 -
->  Documentation/devicetree/bindings/clock/qcom,gcc-sdx55.yaml | 2 --
->  .../devicetree/bindings/clock/qcom,gcc-sm8350.yaml          | 2 --
->  .../devicetree/bindings/clock/sprd,sc9863a-clk.yaml         | 1 -
->  .../devicetree/bindings/crypto/allwinner,sun8i-ce.yaml      | 2 --
->  Documentation/devicetree/bindings/crypto/fsl-dcp.yaml       | 1 -
->  .../display/allwinner,sun4i-a10-display-backend.yaml        | 6 ------
->  .../bindings/display/allwinner,sun6i-a31-mipi-dsi.yaml      | 1 -
->  .../bindings/display/allwinner,sun8i-a83t-dw-hdmi.yaml      | 4 ----
->  .../bindings/display/allwinner,sun8i-a83t-hdmi-phy.yaml     | 2 --
->  .../bindings/display/allwinner,sun8i-r40-tcon-top.yaml      | 2 --
->  .../devicetree/bindings/display/bridge/cdns,mhdp8546.yaml   | 2 --
->  .../bindings/display/rockchip/rockchip,dw-hdmi.yaml         | 2 --
->  Documentation/devicetree/bindings/display/st,stm32-dsi.yaml | 2 --
->  .../devicetree/bindings/display/st,stm32-ltdc.yaml          | 1 -
->  .../devicetree/bindings/display/xlnx/xlnx,zynqmp-dpsub.yaml | 4 ----
->  .../devicetree/bindings/dma/renesas,rcar-dmac.yaml          | 1 -
->  .../devicetree/bindings/edac/amazon,al-mc-edac.yaml         | 2 --
->  Documentation/devicetree/bindings/eeprom/at24.yaml          | 1 -
->  Documentation/devicetree/bindings/example-schema.yaml       | 2 --
->  Documentation/devicetree/bindings/gpu/brcm,bcm-v3d.yaml     | 1 -
->  Documentation/devicetree/bindings/gpu/vivante,gc.yaml       | 1 -
->  Documentation/devicetree/bindings/i2c/brcm,brcmstb-i2c.yaml | 1 -
->  .../devicetree/bindings/i2c/marvell,mv64xxx-i2c.yaml        | 2 --
->  .../devicetree/bindings/i2c/mellanox,i2c-mlxbf.yaml         | 1 -
->  .../devicetree/bindings/iio/adc/amlogic,meson-saradc.yaml   | 1 -
->  .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml     | 2 --
->  .../bindings/interrupt-controller/fsl,irqsteer.yaml         | 1 -
->  .../bindings/interrupt-controller/loongson,liointc.yaml     | 1 -
->  Documentation/devicetree/bindings/iommu/arm,smmu-v3.yaml    | 1 -
->  .../devicetree/bindings/iommu/renesas,ipmmu-vmsa.yaml       | 1 -
->  .../devicetree/bindings/mailbox/st,stm32-ipcc.yaml          | 2 --
->  .../devicetree/bindings/media/amlogic,gx-vdec.yaml          | 1 -
->  Documentation/devicetree/bindings/media/i2c/adv7604.yaml    | 1 -
->  .../devicetree/bindings/media/marvell,mmp2-ccic.yaml        | 1 -
->  .../devicetree/bindings/media/qcom,sc7180-venus.yaml        | 1 -
->  .../devicetree/bindings/media/qcom,sdm845-venus-v2.yaml     | 1 -
->  .../devicetree/bindings/media/qcom,sm8250-venus.yaml        | 1 -
->  Documentation/devicetree/bindings/media/renesas,drif.yaml   | 1 -
->  .../bindings/memory-controllers/mediatek,smi-common.yaml    | 6 ++----
->  .../bindings/memory-controllers/mediatek,smi-larb.yaml      | 1 -
->  .../devicetree/bindings/mmc/allwinner,sun4i-a10-mmc.yaml    | 2 --
->  Documentation/devicetree/bindings/mmc/fsl-imx-esdhc.yaml    | 1 -
->  Documentation/devicetree/bindings/mmc/mtk-sd.yaml           | 2 --
->  Documentation/devicetree/bindings/mmc/renesas,sdhi.yaml     | 2 --
->  Documentation/devicetree/bindings/mmc/sdhci-am654.yaml      | 1 -
->  Documentation/devicetree/bindings/mmc/sdhci-pxa.yaml        | 1 -
->  .../devicetree/bindings/net/amlogic,meson-dwmac.yaml        | 2 --
->  .../devicetree/bindings/net/brcm,bcm4908-enet.yaml          | 2 --
->  Documentation/devicetree/bindings/net/can/bosch,m_can.yaml  | 2 --
->  Documentation/devicetree/bindings/net/dsa/brcm,sf2.yaml     | 2 --
->  Documentation/devicetree/bindings/net/snps,dwmac.yaml       | 2 --
->  Documentation/devicetree/bindings/net/stm32-dwmac.yaml      | 1 -
->  Documentation/devicetree/bindings/pci/brcm,stb-pcie.yaml    | 2 --
->  Documentation/devicetree/bindings/pci/loongson.yaml         | 1 -
->  .../devicetree/bindings/pci/mediatek-pcie-gen3.yaml         | 1 -
->  .../devicetree/bindings/pci/microchip,pcie-host.yaml        | 2 --
->  Documentation/devicetree/bindings/perf/arm,cmn.yaml         | 1 -
->  .../devicetree/bindings/phy/brcm,bcm63xx-usbh-phy.yaml      | 1 -
->  .../devicetree/bindings/phy/brcm,brcmstb-usb-phy.yaml       | 3 ---
->  Documentation/devicetree/bindings/phy/brcm,sata-phy.yaml    | 1 -
->  Documentation/devicetree/bindings/phy/mediatek,tphy.yaml    | 2 --
->  .../devicetree/bindings/phy/phy-cadence-sierra.yaml         | 2 --
->  .../devicetree/bindings/phy/phy-cadence-torrent.yaml        | 4 ----
->  .../devicetree/bindings/phy/qcom,ipq806x-usb-phy-hs.yaml    | 1 -
->  .../devicetree/bindings/phy/qcom,ipq806x-usb-phy-ss.yaml    | 1 -
->  Documentation/devicetree/bindings/phy/qcom,qmp-phy.yaml     | 1 -
->  Documentation/devicetree/bindings/phy/qcom,qusb2-phy.yaml   | 2 --
->  Documentation/devicetree/bindings/phy/renesas,usb2-phy.yaml | 2 --
->  Documentation/devicetree/bindings/phy/renesas,usb3-phy.yaml | 1 -
->  .../devicetree/bindings/pinctrl/actions,s500-pinctrl.yaml   | 1 -
->  .../devicetree/bindings/power/amlogic,meson-ee-pwrc.yaml    | 1 -
->  .../devicetree/bindings/pwm/allwinner,sun4i-a10-pwm.yaml    | 1 -
->  .../devicetree/bindings/remoteproc/st,stm32-rproc.yaml      | 2 --
->  .../devicetree/bindings/remoteproc/ti,k3-dsp-rproc.yaml     | 1 -
->  .../devicetree/bindings/remoteproc/ti,omap-remoteproc.yaml  | 1 -
->  Documentation/devicetree/bindings/reset/fsl,imx-src.yaml    | 1 -
->  .../devicetree/bindings/riscv/sifive-l2-cache.yaml          | 1 -
->  .../devicetree/bindings/rtc/allwinner,sun6i-a31-rtc.yaml    | 1 -
->  Documentation/devicetree/bindings/rtc/imxdi-rtc.yaml        | 1 -
->  Documentation/devicetree/bindings/serial/fsl-lpuart.yaml    | 2 --
->  Documentation/devicetree/bindings/serial/samsung_uart.yaml  | 1 -
->  .../devicetree/bindings/soc/qcom/qcom,geni-se.yaml          | 1 -
->  Documentation/devicetree/bindings/soc/ti/ti,pruss.yaml      | 2 --
->  .../bindings/sound/nvidia,tegra-audio-graph-card.yaml       | 1 -
->  .../devicetree/bindings/sound/nvidia,tegra210-i2s.yaml      | 2 --
->  Documentation/devicetree/bindings/sound/st,stm32-sai.yaml   | 3 ---
->  .../devicetree/bindings/spi/amlogic,meson-gx-spicc.yaml     | 1 -
->  .../devicetree/bindings/spi/brcm,spi-bcm-qspi.yaml          | 2 --
->  .../bindings/thermal/allwinner,sun8i-a83t-ths.yaml          | 2 --
->  Documentation/devicetree/bindings/thermal/qcom-tsens.yaml   | 1 -
->  .../bindings/timer/allwinner,sun5i-a13-hstimer.yaml         | 1 -
->  Documentation/devicetree/bindings/timer/arm,arch_timer.yaml | 1 -
->  .../devicetree/bindings/timer/arm,arch_timer_mmio.yaml      | 2 --
->  .../devicetree/bindings/timer/intel,ixp4xx-timer.yaml       | 1 -
->  .../devicetree/bindings/usb/maxim,max3420-udc.yaml          | 2 --
->  .../devicetree/bindings/usb/nvidia,tegra-xudc.yaml          | 4 ----
->  Documentation/devicetree/bindings/usb/renesas,usbhs.yaml    | 3 ---
->  .../devicetree/bindings/watchdog/st,stm32-iwdg.yaml         | 1 -
->  101 files changed, 2 insertions(+), 163 deletions(-)
+> 	do_early_sev_setup()
+> 
+> or so.
+> 
+>>  #define GHCB_SEV_ES_GEN_REQ		0
+>>  #define GHCB_SEV_ES_PROT_UNSUPPORTED	1
+>> +#define GHCB_SEV_ES_SNP_UNSUPPORTED	2
+> 
+> GHCB_SNP_UNSUPPORTED
+> 
+>> +static bool __init sev_snp_check_hypervisor_features(void)
+> 
+> check_hv_features()
 > 
 
-[snip]
+Based on your feedback on AP creation patch to not use the accessors, I am inclined to
+remove this helper and have the caller directly check the feature bit, is that okay ?
 
-> diff --git a/Documentation/devicetree/bindings/remoteproc/ti,k3-dsp-rproc.yaml b/Documentation/devicetree/bindings/remoteproc/ti,k3-dsp-rproc.yaml
-> index 6070456a7b67..f399743b631b 100644
-> --- a/Documentation/devicetree/bindings/remoteproc/ti,k3-dsp-rproc.yaml
-> +++ b/Documentation/devicetree/bindings/remoteproc/ti,k3-dsp-rproc.yaml
-> @@ -57,7 +57,6 @@ properties:
->  
->    memory-region:
->      minItems: 2
-> -    maxItems: 8
->      description: |
->        phandle to the reserved memory nodes to be associated with the remoteproc
->        device. There should be at least two reserved memory nodes defined. The
+something like:
 
-Does this enforce the maxItems to be 2 only now? Or should this be dropping the
-minItems here which matches the length of items instead of maxItems?
+if (sev_snp_enabled() && !(hv_features & GHCB_HV_FT_SNP))
+	sev_es_terminate(GHCB_SNP_UNSUPPORTED);
 
-I have originally listed the individual item list only for the mandatory items
-and rest are scalable. I provided this through "additionalItems: true" under
-this property.
+Let me know if you think I should still keep the accessors.
 
-Also, have the exact same usage in
-Documentation/devicetree/bindings/remoteproc/ti,k3-r5f-rproc.yaml as well which
-is not included in this patch.
+-Brijesh
 
-> diff --git a/Documentation/devicetree/bindings/remoteproc/ti,omap-remoteproc.yaml b/Documentation/devicetree/bindings/remoteproc/ti,omap-remoteproc.yaml
-> index 73400bc6e91d..75161f191ac3 100644
-> --- a/Documentation/devicetree/bindings/remoteproc/ti,omap-remoteproc.yaml
-> +++ b/Documentation/devicetree/bindings/remoteproc/ti,omap-remoteproc.yaml
-> @@ -116,7 +116,6 @@ properties:
->        list, in the specified order, each representing the corresponding
->        internal RAM memory region.
->      minItems: 1
-> -    maxItems: 3
->      items:
->        - const: l2ram
->        - const: l1pram
-
-
-[snip]
-
-> diff --git a/Documentation/devicetree/bindings/soc/ti/ti,pruss.yaml b/Documentation/devicetree/bindings/soc/ti/ti,pruss.yaml
-> index dbc62821c60b..9790617af1bc 100644
-> --- a/Documentation/devicetree/bindings/soc/ti/ti,pruss.yaml
-> +++ b/Documentation/devicetree/bindings/soc/ti/ti,pruss.yaml
-> @@ -100,7 +100,6 @@ patternProperties:
->      properties:
->        reg:
->          minItems: 2 # On AM437x one of two PRUSS units don't contain Shared RAM.
-> -        maxItems: 3
->          items:
->            - description: Address and size of the Data RAM0.
->            - description: Address and size of the Data RAM1.
-> @@ -111,7 +110,6 @@ patternProperties:
->  
->        reg-names:
->          minItems: 2
-> -        maxItems: 3
->          items:
->            - const: dram0
->            - const: dram1
-
-
-regards
-Suman
+> is nice and short.
+> 
+>> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+>> index 77a754365ba9..9b70b7332614 100644
+>> --- a/arch/x86/kernel/sev.c
+>> +++ b/arch/x86/kernel/sev.c
+>> @@ -609,6 +609,10 @@ static bool __init sev_es_setup_ghcb(void)
+> 
+> Ditto for this one: setup_ghcb()
+> 
+> Thx.
+> 
