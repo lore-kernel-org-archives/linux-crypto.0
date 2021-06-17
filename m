@@ -2,102 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17BDCC48BE5
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 06:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C885DC2B9F4
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 07:00:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0A7661351
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 06:08:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9423610EA
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 07:00:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229741AbhFQGKb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Jun 2021 02:10:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36050 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229683AbhFQGKa (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jun 2021 02:10:30 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF8F5C061574;
-        Wed, 16 Jun 2021 23:08:22 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4G5BSJ40jBz9sSn;
-        Thu, 17 Jun 2021 16:08:16 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1623910098;
-        bh=hVSqDU1BBeAnmrNw6zEidn4Sen3Yd1tIwA02D0sarGQ=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=oZZoiBeVQr61j2bwMuugaKP9gv5ITKpktufP160mgBAmaarcFH8bPXbdJ5s5ZAoT7
-         68SUZpMPCycXQb4uZ+AqRADj/OQdoSYJqDG4hYoefgWjS0qZPtMny18lrv1bnWbnGs
-         KBOE5Mko05q8bQdSFjqPAZizL+y7tz+XE6RsTtBK58oVtL0mWznrq5K0szKgbLprNl
-         Z2mnxDi277OL/yq/XSkTEPwus9+Y6U5LpWAEUvgYl5ngSjQplmDenWM0kYCDcyyNHl
-         F+wAZD7749u+k4C1USPD+m0b5eb8oHPeBRu1X7PoJNLikR6YONWawdwD8yIVLS7tIK
-         85QrKv0/sir6g==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Kees Cook <keescook@chromium.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Kees Cook <keescook@chromium.org>, stable@vger.kernel.org,
-        Breno =?utf-8?Q?Leit=C3=A3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] crypto: nx: Fix memcpy() over-reading in nonce
-In-Reply-To: <20210616203459.1248036-1-keescook@chromium.org>
-References: <20210616203459.1248036-1-keescook@chromium.org>
-Date:   Thu, 17 Jun 2021 16:08:15 +1000
-Message-ID: <87zgvpqb00.fsf@mpe.ellerman.id.au>
+        id S229580AbhFQHCi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Jun 2021 03:02:38 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50714 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229515AbhFQHCg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jun 2021 03:02:36 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1ltm0h-0002PZ-6Z; Thu, 17 Jun 2021 15:00:19 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1ltm0c-0004Tx-BN; Thu, 17 Jun 2021 15:00:14 +0800
+Date:   Thu, 17 Jun 2021 15:00:14 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+Cc:     clabbe@baylibre.com, ulli.kroll@googlemail.com,
+        linus.walleij@linaro.org, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: sl3516 - Fix duplicate included linux/io.h
+Message-ID: <20210617070014.GA17174@gondor.apana.org.au>
+References: <1623823082-3880-1-git-send-email-jiapeng.chong@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1623823082-3880-1-git-send-email-jiapeng.chong@linux.alibaba.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Kees Cook <keescook@chromium.org> writes:
-> Fix typo in memcpy() where size should be CTR_RFC3686_NONCE_SIZE.
->
-> Fixes: 030f4e968741 ("crypto: nx - Fix reentrancy bugs")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-
-Thanks.
-
+On Wed, Jun 16, 2021 at 01:58:02PM +0800, Jiapeng Chong wrote:
+> Clean up the following includecheck warning:
+> 
+> ./drivers/crypto/gemini/sl3516-ce-cipher.c: linux/io.h is included more
+> than once.
+> 
+> No functional change.
+> 
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
 > ---
->  drivers/crypto/nx/nx-aes-ctr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/crypto/nx/nx-aes-ctr.c b/drivers/crypto/nx/nx-aes-ctr.c
-> index 13f518802343..6120e350ff71 100644
-> --- a/drivers/crypto/nx/nx-aes-ctr.c
-> +++ b/drivers/crypto/nx/nx-aes-ctr.c
-> @@ -118,7 +118,7 @@ static int ctr3686_aes_nx_crypt(struct skcipher_request *req)
->  	struct nx_crypto_ctx *nx_ctx = crypto_skcipher_ctx(tfm);
->  	u8 iv[16];
->  
-> -	memcpy(iv, nx_ctx->priv.ctr.nonce, CTR_RFC3686_IV_SIZE);
-> +	memcpy(iv, nx_ctx->priv.ctr.nonce, CTR_RFC3686_NONCE_SIZE);
->  	memcpy(iv + CTR_RFC3686_NONCE_SIZE, req->iv, CTR_RFC3686_IV_SIZE);
->  	iv[12] = iv[13] = iv[14] = 0;
->  	iv[15] = 1;
+>  drivers/crypto/gemini/sl3516-ce-cipher.c | 1 -
+>  1 file changed, 1 deletion(-)
 
-Where IV_SIZE is 8 and NONCE_SIZE is 4.
+There is already an identical patch from lkp@intel.com in the
+queue fixing this.
 
-And iv is 16 bytes, so it's not a buffer overflow.
-
-But priv.ctr.nonce is 4 bytes, and at the end of the struct, so it reads
-4 bytes past the end of the nx_crypto_ctx, which is not good.
-
-But then immediately overwrites whatever it read with req->iv.
-
-So seems pretty harmless in practice?
-
-cheers
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
