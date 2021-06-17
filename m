@@ -2,191 +2,272 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF6B5C49EA6
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 18:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8541CC2B9F4
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 20:24:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90C2361412
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 18:46:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E3DD613D8
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 20:24:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233288AbhFQSs3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Jun 2021 14:48:29 -0400
-Received: from mail-bn7nam10on2046.outbound.protection.outlook.com ([40.107.92.46]:12278
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233040AbhFQSs2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jun 2021 14:48:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A3FIaBolGyW/FQSq80i8RuYkm8h4omqESbIDoyU0yVzHAILFCfut/MSy6IwQ+h8cCOM/Cmi66n09cey20SCk895r9aOVRLJqU1WFoCyt2a+QzReQup6rT+aQLDZlbrjOadAMGWGSrwABFKLh372mxLfwb4nX7bti9jP1q9yC4VGq0wLJDW68nsDaJlDSBFmEhmvL0A8o1abElPwibW6RbF0vEfPdTpDmiDJsTmEAcdye5E0j4mInpV/UBXSA+huEPZ/DGnvfRgmLjiZkzIW8Ifs+hxD1U3TJYig01pyfcO9p8bG09ilYmq6h/NgAhV2naYgnD38LBfae0EV0jCrusg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zoB28LGbzw6CufgVrXYQ5ruVMnpRzOlNv6COUXeGkgA=;
- b=IVB7B0Z7OPSuIzVQevnidmQ4EyLwl1OS0zhmMYqQyyLtEJka2pJJ0S5goJmycz1/eQpvmgnr7BWzW+tC7x1VyweUxaS+3QJsIdcRq2mvQMp8jbUMgRCOkQgLF05cKUcTwIJ/xnKpxzsZy0zPf3if2DLsmudbHwIYBinHc12C8EofqJvVFSweyO/66M11Otb+3BwSV7VhBDvkBNIuaCpRL1h67tYWQJ4TknFt/9MLrv4Tth8IsXOYMSPINv2IpKT9wtGBMBf7nuGpMW2VmTypliYOqM9PICj2iW7c9Pubuz3nwB63R5turKp0yRb4xqx1HmURtwBxntTQDrW8mw/2iw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zoB28LGbzw6CufgVrXYQ5ruVMnpRzOlNv6COUXeGkgA=;
- b=XDVYEORxaGbpCIsj7ZYO8c5HpKCF3pS03sxbFWbdCDhi1cTsRagnWGTe0eRumPrZyDvsNU4b/LDbHS/Oqcndzo9V7tHjrOfES7RcaHfZN5Y2/ST+F4yeBj4p4Z1Inr3ObGc801ptGtPa+JIjqO4FBRnQ9JucCAZTMvgy2s+FqPc=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2714.namprd12.prod.outlook.com (2603:10b6:5:42::18) by
- DM6PR12MB3035.namprd12.prod.outlook.com (2603:10b6:5:3a::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4242.16; Thu, 17 Jun 2021 18:46:15 +0000
-Received: from DM6PR12MB2714.namprd12.prod.outlook.com
- ([fe80::7df8:b0cd:fe1b:ae7b]) by DM6PR12MB2714.namprd12.prod.outlook.com
- ([fe80::7df8:b0cd:fe1b:ae7b%5]) with mapi id 15.20.4219.022; Thu, 17 Jun 2021
- 18:46:15 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 06/22] x86/sev: check SEV-SNP features
- support
-To:     Borislav Petkov <bp@alien8.de>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-7-brijesh.singh@amd.com> <YL4zJT1v6OuH+tvI@zn.tnic>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <e617a0a1-bb8d-9d75-56a4-2ac1138ebf8b@amd.com>
-Date:   Thu, 17 Jun 2021 13:46:08 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YL4zJT1v6OuH+tvI@zn.tnic>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        id S230137AbhFQU06 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Jun 2021 16:26:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41994 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229819AbhFQU06 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jun 2021 16:26:58 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15HK2plF171526;
+        Thu, 17 Jun 2021 16:24:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : content-type : content-transfer-encoding :
+ mime-version; s=pp1; bh=LUTI1s9KyK/LuGQMnTwUfakRUtk6FK2IWF7mMhCvE3k=;
+ b=rqd8AxKrqdFqwtlTOaKEk0ITTQnOCYoFy4fDqZ51dapi+JZRzSyvxCKHI7NO/kOMoomo
+ aYBXUEF5ExNR5gvy/piLpWM0sa8EifuPL0WaondloiAb4iwFTwigwYBn50QawpugXAho
+ +YZjJ5+FAEZuwTlqqsk81UrJAd8Ipm5DPdlUI5lvQ5NVISaWenyZRNLUkSG2eawqRcA0
+ 2lapPGfWbN80oHbMDTOhJJ8FpuBwPBWBY6zlNjdjwVdvaULVoMQ0LYExuwn7X7NmrpqR
+ LCqBG7tdxYRhBjGXP4JtEKtOKIAaD2eVET6ik43MyuvMpF8jAKA/Lk+SO/RB0sAZ2DEr Bw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3988xqreft-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Jun 2021 16:24:37 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15HK4TZY182021;
+        Thu, 17 Jun 2021 16:24:36 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3988xqrefn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Jun 2021 16:24:36 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15HKICIG023910;
+        Thu, 17 Jun 2021 20:24:36 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma02wdc.us.ibm.com with ESMTP id 394mjabtqv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Jun 2021 20:24:36 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15HKOZEg22282690
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Jun 2021 20:24:35 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 492E413605D;
+        Thu, 17 Jun 2021 20:24:35 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DAB0E136051;
+        Thu, 17 Jun 2021 20:24:33 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.160.180.39])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 17 Jun 2021 20:24:33 +0000 (GMT)
+Message-ID: <827bf56dce09620ebecd8a00a5f97105187a6205.camel@linux.ibm.com>
+Subject: [PATCH v6 00/17] Enable VAS and NX-GZIP support on PowerVM
+From:   Haren Myneni <haren@linux.ibm.com>
+To:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        mpe@ellerman.id.au, herbert@gondor.apana.org.au, npiggin@gmail.com
+Cc:     hbabu@us.ibm.com, haren@us.ibm.com
+Date:   Thu, 17 Jun 2021 13:24:31 -0700
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: CzPuj9HpPWGoJ3bhxZ3PAQIUvzP0HZq_
+X-Proofpoint-ORIG-GUID: GzGMoyxWhEQwA6tY4-eRchEGGLPrPwzq
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [165.204.84.11]
-X-ClientProxiedBy: BN9PR03CA0431.namprd03.prod.outlook.com
- (2603:10b6:408:113::16) To DM6PR12MB2714.namprd12.prod.outlook.com
- (2603:10b6:5:42::18)
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.254.35.102] (165.204.84.11) by BN9PR03CA0431.namprd03.prod.outlook.com (2603:10b6:408:113::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4242.16 via Frontend Transport; Thu, 17 Jun 2021 18:46:11 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 47f5ed94-eb52-4cc6-8a49-08d931c02f67
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3035:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3035E7074C11DCE4497FD261E50E9@DM6PR12MB3035.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tWmLsRq75GOFxgz5ElZdKveLYOyjCzjc803NmyHH/NgkB0W6IQObzHZ6DqwXIRvKv4GeCcaFulpv3/AvawfDRzt+nAxFsniCj2JV9XRFrhBKIBFIra8vXMWZWKJ+CPrtDbSn+8pRQWSSrq2N9+DaAoEeyvuGFj0OaT3DZ3O0fr3rst3WHK1sNG2ovB17gAXOSzpcs1zc+BbAnOkq2coPRzDF2K+Ka7WiRfKTZ4UQaQfnkQhHqZEevtD9QROPY94kmQ8o/BBjIe7mOMEHLAn1LJISd/K3etPU+QFV3PSJFjAy6ezRkMj5xR89pfJ55Grakro6jItRlwE1Eckh5fePSYSbheMiujJXSZlKFNyumNM0rcrfOXYci3maI73eitSqnZTB/VvqTpQnkuD43iaTdzH2GoyTA/aY1wgqk6AFz3KudNjKGdfSe2U34ba5nz9q/wRw5OgQDy4GuGxUraUdp21IHZaEbgxl2Y6gOH5at/ZhGtdm8WtV0OgrmhKVU2vOBDYpJgWaU3lFF8+JhgaLnP0NQQPRr5iO87EfcGkPr79Rj5JyVE2Ku6pBlRglsAI2FkGuULHApDLlZ9IG+yPpaVbbBDCado9ShZjiauBQ3VAHgQv3bCeIWHFz1PjE6j4Iydphwc4geHjIfFGqEe/J/IearrdSHvnhmyy9vc4uLzww1dffB2eBQWp9CfYERGBZoNj7+qLIl1FC2nTBeMzymA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2714.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(346002)(136003)(366004)(376002)(2906002)(8936002)(8676002)(52116002)(6666004)(66946007)(16526019)(186003)(7416002)(53546011)(26005)(31686004)(478600001)(66556008)(66476007)(83380400001)(6486002)(2616005)(31696002)(16576012)(956004)(38100700002)(38350700002)(86362001)(36756003)(54906003)(6916009)(44832011)(5660300002)(4326008)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a3paWEtzdDVWbmtMbGZ6VFJVVTllMzlyMGpEcDlmOVM4RU1qaThCcGMzcDQ5?=
- =?utf-8?B?dnBJZUlaSjdTQkxoazFGY1NNRGxQYWpJSUFWVXJ2VFdwNjN0ZjF0Q2drQjdk?=
- =?utf-8?B?U05yUzBFS0FtV0FaaUpMTys2SWdkNUc5SWZvQWFSdHVsUHA0RmpCdHpmRFRG?=
- =?utf-8?B?blRUYjkyaGpXOUUwRVQ4UGZxVDBVMFhCbjN0MGhrY0hNbmZtaHdZaCtSMDF2?=
- =?utf-8?B?TGk0bHgwazRDU1ljWUZCMGdPUUdNUGZsbkNpeDF4L1RiUmNna1FUWlVHR29F?=
- =?utf-8?B?SExWUDl2ZWNmVS9VUDEyNjR2TEMxRks3VU1NdXFNY0N4ZHBZY1puVkp4QUVh?=
- =?utf-8?B?aVgvY0tEb1BOZ0YrWnREcy8zVHRjZmdtYlNzM3F0ajI4OHVKK055VG1xanBi?=
- =?utf-8?B?SzRnT3pWY1B1TG9BNHFYcG1tVDBCNzJxQ0QwU1p2M2t1TW9hVDBiOC9rNU9N?=
- =?utf-8?B?M3FhVkErUmdaMmx4VmNLR0V4bVhReEhkMk8yMmx3S0t2RHJCbnJRUlNGYUc5?=
- =?utf-8?B?TVRWbkdrRjcvT1ZxdTM4d2JMQVRuOGErdEJtMlcvVzRKNGZyZWkwdDJYMDFI?=
- =?utf-8?B?NlZoNXc5Q0liNTl5MUxHT1JZRUR4VWk3Vmo1NUw4YlRQc3ZJUXRwZk41MUV3?=
- =?utf-8?B?UDhHdU1JQXlOQ2hqR1Uxa09DZHZjd0dESHBuNkc1YUNPSy9uNGliODUxd3Ja?=
- =?utf-8?B?QThlRUlQa3BNYVAvZ3lxdTRFT1p0SXdmbGluekNZdEZoMXZuODNvZzhFMitn?=
- =?utf-8?B?c244YkVOVU4xbmkyNFFFZHlpNGI1c1NyS3dUdnNmZk9qeWNaYmlMa01HSHk2?=
- =?utf-8?B?Wmh5dXdUUnJWYTZhYitQQWtmTk1zYStHUk8vb1R6UExEOG9JbytZYk54MDdu?=
- =?utf-8?B?OVdvOE9Ed2dQbzduaEpoQ2U3STgzemcvR1RSak5RN3EvWlNGbnlHZ0N6anZE?=
- =?utf-8?B?NlBMcDB4UkUrWHhwdFhUeHl6NUlsZXZJbDZWQWx2QnR2Q1M3M1E3czZhdG02?=
- =?utf-8?B?aVNMTGlmSC92V1ZsdEtFU3hwMnBDZHhXazRZSjMzV2xHTFJhM05hd3VBTXVj?=
- =?utf-8?B?Zmt4eHNNZDRoMFlvVFk3STlHMEROZEM2V3h2Qkg2VlRGUFI2WUt5WE4vcVZ4?=
- =?utf-8?B?eTJoYmxCcDJTcGErTStoc3hpazRkUzBwS0daNFBLbzhrcTN6YVZqSndsSlpE?=
- =?utf-8?B?QWZrNHRiMlJUSC9zcVBqNS9DWWRBWXhENXYvNURaNGtUM2IrQkYwZlJ5UHRX?=
- =?utf-8?B?dnhhaUlxS2p2WUdVa2tVcUh0K0tQUW5wdC9wVU4remhMSGY3RGxkT25ibFF2?=
- =?utf-8?B?THY2SFRYU3dBNU5QVmVZcjhBYmsxSnYvY04xSlJJOG9ZU25NYmhOblg0SFZt?=
- =?utf-8?B?MUoweWI1L2owNjgzUTRMY0l0NWdBOEQ5ZW5VZHdmZkVKdWZ1dVIvODJveHI2?=
- =?utf-8?B?V2tUVXRYRGxtaVF0U3d3UTU4ckMwREJkMzUvWGdoamtZRVNrdHArVmR5Z3JQ?=
- =?utf-8?B?THpQdE91UVU2dEVaTGJZQnlDRDFtZ0U0WW1hajNOZkYyYjFrWTREVU5ETEt3?=
- =?utf-8?B?SWtnMEhvbWlqcWZ1Wit1bTQ1Wm5MRS9xMmEwVWtSNUxhaEU2VkZhaVRCQllP?=
- =?utf-8?B?TER4dDFWUlhqOTZZeGhJNElhOFFHZE0wdmFiK2lPMFJBejRpck5JeDZUQVky?=
- =?utf-8?B?M2ZoVTJDbWhjTVhZcnFrYWxsQ2Z0Q0kxeXlTU0ppK2tEL0Q4WVBhVFB1OGNa?=
- =?utf-8?Q?HxtHEZd6vXeSVt0nslYHhOu4OTMnrjZ8miHEtoC?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47f5ed94-eb52-4cc6-8a49-08d931c02f67
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2714.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2021 18:46:15.1320
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: b3SiVCvlB9ViIunsf6TBjQ7F5CVGYxvoRg8i3fdF1RcSatcHI/oZ0ChGzAPqr4G1S5Jj0Myhutw0lDPQl3c8EQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3035
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-17_16:2021-06-15,2021-06-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 phishscore=0 priorityscore=1501 mlxscore=0 malwarescore=0
+ adultscore=0 impostorscore=0 clxscore=1015 spamscore=0 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106170122
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Boris,
+
+Virtual Accelerator Switchboard (VAS) allows kernel subsystems
+and user space processes to directly access the Nest Accelerator
+(NX) engines which provides HW compression. The true user mode
+VAS/NX support on PowerNV is already included in Linux. Whereas
+PowerVM support is available from P10 onwards.
+
+This patch series enables VAS / NX-GZIP on PowerVM which allows
+the user space to do copy/paste with the same existing interface
+that is available on PowerNV.
+
+VAS Enablement:
+- Get all VAS capabilities using H_QUERY_VAS_CAPABILITIES that are
+  available in the hypervisor. These capabilities tells OS which
+  type of features (credit types such as Default and Quality of
+  Service (QoS)). Also gives specific capabilities for each credit
+  type: Maximum window credits, Maximum LPAR credits, Target credits
+  in that parition (varies from max LPAR credits based DLPAR
+  operation), whether supports user mode COPY/PASTE and etc.
+- Register LPAR VAS operations such as open window. get paste
+  address and close window with the current VAS user space API.
+- Open window operation - Use H_ALLOCATE_VAS_WINDOW HCALL to open
+  window and H_MODIFY_VAS_WINDOW HCALL to setup the window with LPAR
+  PID and etc.
+- mmap to paste address returned in H_ALLOCATE_VAS_WINDOW HCALL
+- To close window, H_DEALLOCATE_VAS_WINDOW HCALL is used to close in
+  the hypervisor.
+
+NX Enablement:
+- Get NX capabilities from the the hypervisor which provides Maximum
+  buffer length in a single GZIP request, recommended minimum
+  compression / decompression lengths.
+- Register to VAS to enable user space VAS API
+
+Main feature differences with PowerNV implementation:
+- Each VAS window will be configured with a number of credits which
+  means that many requests can be issues simultaniously on that
+  window. On PowerNV, 1K credits are configured per window.
+  Whereas on PowerVM, the hypervisor allows 1 credit per window
+  at present.
+- The hypervisor introduced 2 different types of credits: Default -
+  Uses normal priority FIFO and Quality of Service (QoS) - Uses high
+  priority FIFO. On PowerVM, VAS/NX HW resources are shared across
+  LPARs. The total number of credits available on a system depends
+  on cores configured. We may see more credits are assigned across
+  the system than the NX HW resources can handle. So to avoid NX HW
+  contention, the hypervisor introduced QoS credits which can be
+  configured by system administration with HMC API. Then the total
+  number of available default credits on LPAR varies based on QoS
+  credits configured.
+- On PowerNV, windows are allocated on a specific VAS instance
+  and the user space can select VAS instance with the open window
+  ioctl. Since VAS instances can be shared across partitions on
+  PowerVM, the hypervisor manages window allocations on different
+  VAS instances. So H_ALLOCATE_VAS_WINDOW allows to select by domain
+  indentifiers (H_HOME_NODE_ASSOCIATIVITY values by cpu). By default
+  the hypervisor selects VAS instance closer to CPU resources that the
+  parition uses. So vas_id in ioctl interface is ignored on PowerVM
+  except vas_id=-1 which is used to allocate window based on CPU that
+  the process is executing. This option is needed for process affinity
+  to NUMA node.
+
+  The existing applications that linked with libnxz should work as
+  long as the job request length is restricted to
+  req_max_processed_len.
+
+  Tested the following patches on P10 successfully with test cases
+  given: https://github.com/libnxz/power-gzip
+
+  Note: The hypervisor supports user mode NX from p10 onwards. Linux
+        supports user mode VAS/NX on P10 only with radix page tables.
+
+Patch 1:        Fix to release reference to tgid during window close
+Patches 2- 6:   Move the code that is needed for both PowerNV and
+                PowerVM to powerpc book3s platform directory
+Patch 7:        Modify vas-window struct to support both platforms
+                and the related changes.
+Patch 8:        Define HCALL and the related VAS/NXGZIP specific
+                structs.
+Patch 9:        Define QoS credit flag in window open ioctl
+Patch 10:       Implement Allocate, Modify and Deallocate HCALLs
+Patch 11:       Retrieve VAS capabilities from the hypervisor
+Patch 12;       Implement window operations and integrate with API
+Patch 13:       Setup IRQ and NX fault handling
+Patch 14 - 15:  Make the code common to add NX-GZIP enablement
+Patch 16:       Get NX capabilities from the hypervisor
+patch 17;       Add sysfs interface to expose NX capabilities
+
+Changes in v2:
+  - Rebase on 5.12-rc6
+  - Moved VAS Kconfig changes to arch/powerpc/platform as suggested
+    by Christophe Leroy
+  - build fix with allyesconfig (reported by kernel test build)
+
+Changes in v3:
+  - Rebase on 5.12-rc7
+  - Moved vas-api.c and VAS Kconfig changes to
+    arch/powerpc/platform/book3s as Michael Ellerman suggested
+
+Changes in v4:
+  - Rebase on 5.13-rc2
+  - Changes based on review comments from Nicholas Piggin
+    - Add seperate patch to define user window operations
+    - Drop "sysfs interface to export VAS capabilities" patch
+      This interface is mainly needed for DLPAR operations
+      and this patch will be included when DLPAR/LPM support
+      is added.
+    - Other cleanup changes
+
+Changes in v5:
+  - Rebase on 5.13-rc5
+  - Changes based on review comments from Nicholas Piggin
+    and Michael Ellerman:
+    - Add new patch to fix tgid reference release. This fix
+      should be also included in stable 5.8+
+    - Define platform specific VAS window structs
+    - Define helper functions to take and release pid, tgid
+      and mm references
+    - Other cleanup suggestions
+
+Changes in v6:
+  - Rebase on 5.13-rc6
+  - Changes based on suggestions from Nicholas Piggin
+    - Create ref_get_pid_and_task() helper function which
+      takes task refrence based on pid or tgid
+    - Pass vas_id and flags to platform specific open window API
+    - Miscellaneous changes
+
+Haren Myneni (17):
+  powerpc/powernv/vas: Release reference to tgid during window close
+  powerpc/vas: Move VAS API to book3s common platform
+  powerpc/powernv/vas: Rename register/unregister functions
+  powerpc/vas: Add platform specific user window operations
+  powerpc/vas: Create take/drop pid and mm reference functions
+  powerpc/vas: Move update_csb/dump_crb to common book3s platform
+  powerpc/vas:  Define and use common vas_window struct
+  powerpc/pseries/vas: Define VAS/NXGZIP hcalls and structs
+  powerpc/vas: Define QoS credit flag to allocate window
+  powerpc/pseries/vas: Add hcall wrappers for VAS handling
+  powerpc/pseries/vas: Implement getting capabilities from hypervisor
+  powerpc/pseries/vas: Integrate API with open/close windows
+  powerpc/pseries/vas: Setup IRQ and fault handling
+  crypto/nx: Rename nx-842-pseries file name to nx-common-pseries
+  crypto/nx: Get NX capabilities for GZIP coprocessor type
+  crypto/nx: Add sysfs interface to export NX capabilities
+  crypto/nx: Register and unregister VAS interface on PowerVM
+
+ arch/powerpc/include/asm/hvcall.h             |   7 +
+ arch/powerpc/include/asm/vas.h                | 109 +++-
+ arch/powerpc/include/uapi/asm/vas-api.h       |   6 +-
+ arch/powerpc/platforms/Kconfig                |   1 +
+ arch/powerpc/platforms/Makefile               |   1 +
+ arch/powerpc/platforms/book3s/Kconfig         |  15 +
+ arch/powerpc/platforms/book3s/Makefile        |   2 +
+ arch/powerpc/platforms/book3s/vas-api.c       | 493 +++++++++++++++
+ arch/powerpc/platforms/powernv/Kconfig        |  14 -
+ arch/powerpc/platforms/powernv/Makefile       |   2 +-
+ arch/powerpc/platforms/powernv/vas-api.c      | 278 --------
+ arch/powerpc/platforms/powernv/vas-debug.c    |  27 +-
+ arch/powerpc/platforms/powernv/vas-fault.c    | 173 +----
+ arch/powerpc/platforms/powernv/vas-trace.h    |   4 +-
+ arch/powerpc/platforms/powernv/vas-window.c   | 264 ++++----
+ arch/powerpc/platforms/powernv/vas.h          |  50 +-
+ arch/powerpc/platforms/pseries/Makefile       |   1 +
+ arch/powerpc/platforms/pseries/vas.c          | 594 ++++++++++++++++++
+ arch/powerpc/platforms/pseries/vas.h          | 125 ++++
+ drivers/crypto/nx/Kconfig                     |   1 +
+ drivers/crypto/nx/Makefile                    |   2 +-
+ drivers/crypto/nx/nx-common-powernv.c         |   6 +-
+ .../{nx-842-pseries.c => nx-common-pseries.c} | 138 ++++
+ 23 files changed, 1696 insertions(+), 617 deletions(-)
+ create mode 100644 arch/powerpc/platforms/book3s/Kconfig
+ create mode 100644 arch/powerpc/platforms/book3s/Makefile
+ create mode 100644 arch/powerpc/platforms/book3s/vas-api.c
+ delete mode 100644 arch/powerpc/platforms/powernv/vas-api.c
+ create mode 100644 arch/powerpc/platforms/pseries/vas.c
+ create mode 100644 arch/powerpc/platforms/pseries/vas.h
+ rename drivers/crypto/nx/{nx-842-pseries.c => nx-common-pseries.c} (90%)
+
+-- 
+2.18.2
 
 
-On 6/7/2021 9:54 AM, Borislav Petkov wrote:
-> On Wed, Jun 02, 2021 at 09:04:00AM -0500, Brijesh Singh wrote:
->>  static bool early_setup_sev_es(void)
-> 
-> This function is doing SNP init now too, so it should be called
-> something generic like
-> 
-> 	do_early_sev_setup()
-> 
-> or so.
-> 
->>  #define GHCB_SEV_ES_GEN_REQ		0
->>  #define GHCB_SEV_ES_PROT_UNSUPPORTED	1
->> +#define GHCB_SEV_ES_SNP_UNSUPPORTED	2
-> 
-> GHCB_SNP_UNSUPPORTED
-> 
->> +static bool __init sev_snp_check_hypervisor_features(void)
-> 
-> check_hv_features()
-> 
-
-Based on your feedback on AP creation patch to not use the accessors, I am inclined to
-remove this helper and have the caller directly check the feature bit, is that okay ?
-
-something like:
-
-if (sev_snp_enabled() && !(hv_features & GHCB_HV_FT_SNP))
-	sev_es_terminate(GHCB_SNP_UNSUPPORTED);
-
-Let me know if you think I should still keep the accessors.
-
--Brijesh
-
-> is nice and short.
-> 
->> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
->> index 77a754365ba9..9b70b7332614 100644
->> --- a/arch/x86/kernel/sev.c
->> +++ b/arch/x86/kernel/sev.c
->> @@ -609,6 +609,10 @@ static bool __init sev_es_setup_ghcb(void)
-> 
-> Ditto for this one: setup_ghcb()
-> 
-> Thx.
-> 
