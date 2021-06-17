@@ -2,146 +2,220 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB04C2B9F4
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 09:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEE1C2B9F4
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 10:09:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0057C613DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 09:20:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEB9261245
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 10:09:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231390AbhFQJWW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Jun 2021 05:22:22 -0400
-Received: from mail-eopbgr80051.outbound.protection.outlook.com ([40.107.8.51]:22180
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231398AbhFQJWV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jun 2021 05:22:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D6SNmU/W6dyBmHEZEQwSghCCi5TIJhjXTJ0vDVUflrX1wBbMI/Ny4eF8Bt5JKJDm9XURys/JHIQrATorRFkCpM9UjXH8wyNgZc66n8SLFr9lt2R75iLYqY0MW5x7tf0HDfXEfVaJzhk4VfdJ9PlII6a8O6WzXFgg/MNnLHWqjIFcVTcsjaZT+GTQqVCdzWReL+hvMtdGzvL+VT8xfafoavw8fsnzYQAF+o9P0NgeQld2yo6MvD9rNB7kaFNxXIDzWzUPPtdDHSUSfg1MzXfsa9R8YDZ/8YhttjxgmBOE8InboouseW0WsSE9wmdiyC6qkKJiq7wtylAE+dsNi2KPag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=akgVAqoUyXpYCzj7FDEekxywENfU6srRYjH89yPZ1/c=;
- b=PUxV8wyvnM0qG1axpYBY2JkmQ0FbBetLMwrNOAmrs38I49T7wdhNl9AbUbNw2FIZ5EV62JtW0Du4GdqXGHMv6mN3ZhsCGlUNMgiWUxyQcZJsiIP1k/Qc34Tp1rJ/f9AmAAFTr11lK/p2y9J0VslwoprkuckLwAmoSecq1PSOIz71gwUpgGEdl3B1QpwLj8laouNiCK5ZeAfVbDPriFtPkyHZDRlHRE99Z80E7NuS9kfZ2mMXkdOWiDQyb5W54hYFvRePuLTuWcF/hIHJ21wGkwb+0Dha7Zi0Qhfx2nnJqlAW30jWDPTUKBuxSkw/2d3u6ATc0FvU/YPbAnsIO/3KFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=akgVAqoUyXpYCzj7FDEekxywENfU6srRYjH89yPZ1/c=;
- b=jJV2QjfJXBxE1B/bK6N9mHUrz/Jp6IljLXBOvFN+aOkt0I7+1yuue1KeB4x0ktAt10J/fyKvc+kQTMM5MgfbP+dEhPZeCb70jvE8haDw/ucQV1kK+tUNaSGMscDOHiMe2eT4Lo7FZXvFUnKgwVDsEP2OOzMJR1DoNryNxlBAj/Y=
-Authentication-Results: gondor.apana.org.au; dkim=none (message not signed)
- header.d=none;gondor.apana.org.au; dmarc=none action=none
- header.from=nxp.com;
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
- by VI1PR0402MB3405.eurprd04.prod.outlook.com (2603:10a6:803:3::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.23; Thu, 17 Jun
- 2021 09:20:11 +0000
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::4dde:d71f:1082:6351]) by VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::4dde:d71f:1082:6351%3]) with mapi id 15.20.4242.019; Thu, 17 Jun 2021
- 09:20:11 +0000
-From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        linux-crypto@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] MAINTAINERS: update caam crypto driver maintainers list
-Date:   Thu, 17 Jun 2021 12:19:26 +0300
-Message-Id: <20210617091926.23517-1-horia.geanta@nxp.com>
-X-Mailer: git-send-email 2.17.1
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [83.217.231.2]
-X-ClientProxiedBy: AM3PR05CA0153.eurprd05.prod.outlook.com
- (2603:10a6:207:3::31) To VI1PR04MB4046.eurprd04.prod.outlook.com
- (2603:10a6:803:4d::29)
+        id S230383AbhFQKL3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Jun 2021 06:11:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33944 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229872AbhFQKL2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jun 2021 06:11:28 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434C1C061574
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Jun 2021 03:09:20 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id r9so6072525wrz.10
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Jun 2021 03:09:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=85427KYEYrrxwKEdUbPTushEwCA9Yj+mHAXG+be0wiQ=;
+        b=ttYfq9i1x7QIrjWzVzFNF0/Yga/Dz40ydsjJEj7uh+PXkMrnUJ2hsdHlomTa6ESs76
+         r5zfisWrMys099EXuEPMVK+u1L1+X5n2KNDi95fCUeId8585XBWfYmDhhXGNf6+eIVFF
+         roAW5awVpHV4M/3kPttlNbeE1lpFW7P1e+8KWAKTUlnowl/KKyF8ozr0de38aXeUR3p+
+         Ejg9E3i+kWn7nPnEPbOb0D7EJq+/NkMe7LY/zK7X+wK+ow4yT5KohD6RkKmc25l/MEiW
+         3kbCASbl2CfsT+ldYu2eGdR/MNLH6GumtSF23MqAutzAJHveVt11yFZkfCYDME2XFnH7
+         YP4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=85427KYEYrrxwKEdUbPTushEwCA9Yj+mHAXG+be0wiQ=;
+        b=q53zoJoowi1SwbYDJRWktocYrbbOv7PzWHGTpsKN5pJlsr0fVyCsWwky/1hyX3+rhr
+         MsGR3q/ivm9V2CzpJfPjo6MlOwi/l8Guk4WR4m9bCRTDdYrmjQopvoj9/Y5O3AksVjfh
+         L5V5qwZPZYTybwGRrNdeyRM5fKT9wq3UItbKSb+nEQB2K2flAc6f16hu6RRkTox7Q4cx
+         HE+M3YQTjHE9Ew0CylWImfkzkacDzL+eH1s31mHGX5Lv18781cJCcCsxv2n7wxgANcpy
+         eUjp8tNcPG7k+BVd7aDMX4Z3JDklJ3ac9wTd0x2NNeRBMPq3oTNlynIdTMohz+4gAEpZ
+         hwvg==
+X-Gm-Message-State: AOAM532Yr4Z2ol7aNPG62f+U/HJAR3ZDAa7FrI/EejbcEXkVPnzVXf/U
+        RqtkW7vXb8UJVE196jTk9Mj14g==
+X-Google-Smtp-Source: ABdhPJyMRnQGkJqXInfJRRkjjvjeyqgSs/jdM6jdSZaC5UXJ6ejRI+yr8yC8Hw65Qu43dQuGuEf4dw==
+X-Received: by 2002:a5d:6d8b:: with SMTP id l11mr4647383wrs.21.1623924558847;
+        Thu, 17 Jun 2021 03:09:18 -0700 (PDT)
+Received: from maple.lan (cpc141216-aztw34-2-0-cust174.18-1.cable.virginm.net. [80.7.220.175])
+        by smtp.gmail.com with ESMTPSA id h18sm4993756wrs.64.2021.06.17.03.09.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Jun 2021 03:09:18 -0700 (PDT)
+Date:   Thu, 17 Jun 2021 11:09:16 +0100
+From:   Daniel Thompson <daniel.thompson@linaro.org>
+To:     Zhen Lei <thunder.leizhen@huawei.com>
+Cc:     Jason Wessel <jason.wessel@windriver.com>,
+        Douglas Anderson <dianders@chromium.org>,
+        Balbir Singh <bsingharora@gmail.com>,
+        Barry Song <song.bao.hua@hisilicon.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Darren Hart <dvhart@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Eric Biederman <ebiederm@xmission.com>,
+        "Naveen N . Rao" <naveen.n.rao@linux.ibm.com>,
+        Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Oleg Nesterov <oleg@redhat.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Tejun Heo <tj@kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        kgdb-bugreport <kgdb-bugreport@lists.sourceforge.net>,
+        kexec <kexec@lists.infradead.org>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 2/4] kgdb: Fix spelling mistakes
+Message-ID: <20210617100916.ynovtwbtsq7eaabw@maple.lan>
+References: <20210529110305.9446-1-thunder.leizhen@huawei.com>
+ <20210529110305.9446-3-thunder.leizhen@huawei.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from lsv15138.swis.ro-buh01.nxp.com (83.217.231.2) by AM3PR05CA0153.eurprd05.prod.outlook.com (2603:10a6:207:3::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4242.16 via Frontend Transport; Thu, 17 Jun 2021 09:20:10 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 84676460-9b55-4944-2c21-08d931711b9e
-X-MS-TrafficTypeDiagnostic: VI1PR0402MB3405:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR0402MB34057CE8AA5557CEADB3AD62980E9@VI1PR0402MB3405.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:345;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: F5jMA0GPxtk9Pyho10DVGEQ5YimF0qWOHLllNI1iZZUBRt4rYCYTeTHWqsO0LknIWc5q95CS4SkZ+IEiFeWFnwTJc6MIAdpUTDoFof0/e1PLoLAMzPWrLAlIUQfFqqsPDUSa2dOIM4NTh3qSyWBbFd1/13dNn6rURszlwd3CKVrnkz7gczqnmLCj97C+BIj/AvlwvLzUxusGZbfZ+heVeHTqnQoQeC0gd2d//CfP/HebbyVajV+V1gHkzD0JvKpDejx5CiIMoTme8fMOjcUv84Z+7bo87vW42YOg8VTaizEi4aEZgynAXBmxlgRO3a88fQ4F/G0PyoTos4TPxhs4GYkasGSDEhBJV558pkxXcS/aps/A33tSSEdisRr09h8d7FWI36jYY3LQBbIsA9LjyLQ5+fGG/TOYws6p9GYLZaJuUkr5GdNGCetbFgIxoUBrdXqAE1xpW9CbQJyZShlL7LQmDvqvIqD0kVk+V87ahRkl3mjPhE9gSNjevQ4RSK9rEELO7uWo4rK+B58kb4q1hqbC7l+YGeRcrhkMzEqMTNiXsUumGKQyjGyIgVVzF7k2PvUC0eYpnXqaNngxRvLMcAYuY7GEJIhxLO80mC8GhME5gmrJ2LSLjzd01ifwENq0MBoDoeE1ZxTCKxzZ8EPm6g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39840400004)(376002)(346002)(396003)(136003)(8676002)(8936002)(38100700002)(38350700002)(4326008)(4744005)(52116002)(7696005)(1076003)(478600001)(5660300002)(36756003)(83380400001)(2906002)(2616005)(316002)(956004)(54906003)(6666004)(86362001)(66476007)(66946007)(66556008)(186003)(6486002)(16526019)(26005)(6916009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OUxNeWc2aXNTZjQ0Tm96OHRJQjdLemoyVUdQY1d6d1daajV0UXlEUFBEOXBx?=
- =?utf-8?B?WVZvWUhya3Y1SzJxWGdYV0R4VEh5ZkY3bHE2M3UvZU9SYkN1WVh3QnowL3pm?=
- =?utf-8?B?YzkwTzJHWXA0bDkwY0xIbjZRUE9lYmNGdHhKaUVqK2R2cVVuc2tUYlI0SS9l?=
- =?utf-8?B?YUVMV3ZkcVEwQUN3VHN3dE9GMjhiMUNRT3dWaTVXYmJvUlJDY3FWeG9QbnBV?=
- =?utf-8?B?d2hwbm9pTitXRGV4NDBHMy93bnpRL1grTHMrdVRDdm1YbTA1dFEvMWFWU1pB?=
- =?utf-8?B?MGQ2Tm5tZnBOYmQ3c3pCdVpPSC9EZzlITjJMODNXWWRSRTZsbzhqVm4xcE1S?=
- =?utf-8?B?djhPSmdKQmFzWjk5eWh4MkwyVmJKeURDRFVxV1RVUHNYU1ZiNkRHRHZ3c3pM?=
- =?utf-8?B?QkFDOElFRjJYVlpQUkh0dlVCalhLRm04WHkxRGNRMmtEZWRpU3RQS1l6OVRB?=
- =?utf-8?B?dnV6Z1NuakY4Wkg3blNSbERYSTRIY2pBclNmRDBvRUJtV21vbk1RejBWTHJh?=
- =?utf-8?B?bzhSL1U2aVRqalJMWkZINi94Mm92Qy9qa2hjUlY5MlR2SmozcFZ4ZFVYTVdn?=
- =?utf-8?B?SWdyaEo5RHJUNjl3eDRUZHlBa244eUdvZDBtYlNBWnZ3UlM5ZTdmTVdTL1d0?=
- =?utf-8?B?dmRwUFg0UWZrN0NQWUkrcUJMSEh0b2RUZUkyMk92cVErT0k3MDFUNE50blNY?=
- =?utf-8?B?TCt1clFOZUh5NE1jMG1ocTRLcVRFYURVUVpKTitxRVdLNk5xUzBCMnAvT1pu?=
- =?utf-8?B?ZFI3akNST1JpcytKOTQ2ZWJvRlNNbnZ2c0pETGRYRVp4S2NIL0hUVkNpLzRm?=
- =?utf-8?B?Y1J3OFpUdnVkaTlpcHVhM2QzMzBXbUlEU0FwWlJlczRlejV4bUlOa2JiYTRs?=
- =?utf-8?B?clRuM3Y2Y2Z0M1gwNngwbGhTdUhvTFZ5V09hK0xOelVIdTFVcHFjb01nc3hF?=
- =?utf-8?B?VktqYXk4MEJzRXlkUGowSi9UYmU5VXRCRzB0SEFFblRjVi81cms5TXQvMmxL?=
- =?utf-8?B?QXZ1NkltL2ZwVDVVSmpBeXdNVjh4aWFrOXpCQmR1WWNQMmlWeU40QlJQRVp3?=
- =?utf-8?B?clZYOHJMRERLeldoTmVUOUI5OHQ2V29aMkZ0WFEwWFIvVFg3WlZvcnlvM2RG?=
- =?utf-8?B?QVNYNlJYbUxzT3czM2J6SmI5UWRneU5SemVoN3hlZmgrVCs3QnVMWGFndWNj?=
- =?utf-8?B?S3p2L05NQ1hQTkQ2Q2tjaE9lQUFrRCtRUDRobHFVZHRtTE5LTEFaS3g2UjVl?=
- =?utf-8?B?WDhUWVhOdW15MmQzbkxaQVlpRXhocHpORmtLbG1vUHg1K3ZwaGlWTHQzVTla?=
- =?utf-8?B?THFpeWprU29RUzZVclgvR2VkMS91djN3MnhwTmt6Y0JwdmpiSmJjaFRvamNO?=
- =?utf-8?B?ZnNtaHpGUkNvdWxaQ1N6MWFDUmNEYTFUUnBBT0pEVG1BMzhDY1I0bThMZHd3?=
- =?utf-8?B?cWY2YUYyWEo4ekc1cHlzRUNLZnJjQmpyaUdpajVrV0pCekFtSFBzelBIZUJr?=
- =?utf-8?B?cFJreUgzclEyVzJsMnA3bFdYQzdZNStoSG4xcWJSWXkzQnBxSmNPaUxITE9T?=
- =?utf-8?B?ME5EaW9oeFpXcFpsRDA2YXZCZHIxTG4vNlZ6T3NaR1M3T3g3Q0xoTCs1SGR6?=
- =?utf-8?B?c0tsSVZkL3QyT1laYWY3WDFqbkh0VnZHMHZtT05IZkJwaGp2eWxsYUhaVWoz?=
- =?utf-8?B?ZldYRURXL0d3RjBVV01MeXpDOHVJNk9mZXd6OXFXcHl3WDM5d3RLczd1VVJO?=
- =?utf-8?Q?aTfN6ew3QesTGOi7SlkSt2B3S720RjILMFnTQiC?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 84676460-9b55-4944-2c21-08d931711b9e
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2021 09:20:11.6001
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Zt15hbqOy16Lmlqpbsy7bKAC65OJ1NVisGrFunrRKci00wEujILMes4nc2g1S/ppXG3jONGUq9MeIm+AwdXq7A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3405
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210529110305.9446-3-thunder.leizhen@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Aymen steps down as caam maintainer, being replaced by Pankaj.
+On Sat, May 29, 2021 at 07:03:03PM +0800, Zhen Lei wrote:
+> Fix some spelling mistakes in comments:
+> initalization ==> initialization
+> detatch ==> detach
+> represntation ==> representation
+> hexidecimal ==> hexadecimal
+> delimeter ==> delimiter
+> architecure ==> architecture
+> 
+> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
 
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied, thanks.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 388924c2d23a..690e54bf7e23 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -7159,7 +7159,7 @@ F:	include/video/
- 
- FREESCALE CAAM (Cryptographic Acceleration and Assurance Module) DRIVER
- M:	Horia Geantă <horia.geanta@nxp.com>
--M:	Aymen Sghaier <aymen.sghaier@nxp.com>
-+M:	Pankaj Gupta <pankaj.gupta@nxp.com>
- L:	linux-crypto@vger.kernel.org
- S:	Maintained
- F:	Documentation/devicetree/bindings/crypto/fsl-sec4.txt
--- 
-2.17.1
 
+> ---
+>  include/linux/kgdb.h           | 8 ++++----
+>  kernel/debug/debug_core.c      | 2 +-
+>  kernel/debug/kdb/kdb_main.c    | 8 ++++----
+>  kernel/debug/kdb/kdb_private.h | 2 +-
+>  4 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/linux/kgdb.h b/include/linux/kgdb.h
+> index 392a3670944c..258cdde8d356 100644
+> --- a/include/linux/kgdb.h
+> +++ b/include/linux/kgdb.h
+> @@ -105,9 +105,9 @@ extern int dbg_set_reg(int regno, void *mem, struct pt_regs *regs);
+>   */
+>  
+>  /**
+> - *	kgdb_arch_init - Perform any architecture specific initalization.
+> + *	kgdb_arch_init - Perform any architecture specific initialization.
+>   *
+> - *	This function will handle the initalization of any architecture
+> + *	This function will handle the initialization of any architecture
+>   *	specific callbacks.
+>   */
+>  extern int kgdb_arch_init(void);
+> @@ -229,9 +229,9 @@ extern int kgdb_arch_set_breakpoint(struct kgdb_bkpt *bpt);
+>  extern int kgdb_arch_remove_breakpoint(struct kgdb_bkpt *bpt);
+>  
+>  /**
+> - *	kgdb_arch_late - Perform any architecture specific initalization.
+> + *	kgdb_arch_late - Perform any architecture specific initialization.
+>   *
+> - *	This function will handle the late initalization of any
+> + *	This function will handle the late initialization of any
+>   *	architecture specific callbacks.  This is an optional function for
+>   *	handling things like late initialization of hw breakpoints.  The
+>   *	default implementation does nothing.
+> diff --git a/kernel/debug/debug_core.c b/kernel/debug/debug_core.c
+> index 4708aec492df..a1f26766eb90 100644
+> --- a/kernel/debug/debug_core.c
+> +++ b/kernel/debug/debug_core.c
+> @@ -1032,7 +1032,7 @@ dbg_notify_reboot(struct notifier_block *this, unsigned long code, void *x)
+>  	/*
+>  	 * Take the following action on reboot notify depending on value:
+>  	 *    1 == Enter debugger
+> -	 *    0 == [the default] detatch debug client
+> +	 *    0 == [the default] detach debug client
+>  	 *   -1 == Do nothing... and use this until the board resets
+>  	 */
+>  	switch (kgdbreboot) {
+> diff --git a/kernel/debug/kdb/kdb_main.c b/kernel/debug/kdb/kdb_main.c
+> index 622410c45da1..d8ee5647b732 100644
+> --- a/kernel/debug/kdb/kdb_main.c
+> +++ b/kernel/debug/kdb/kdb_main.c
+> @@ -253,7 +253,7 @@ static char *kdballocenv(size_t bytes)
+>   * Parameters:
+>   *	match	A character string representing a numeric value
+>   * Outputs:
+> - *	*value  the unsigned long represntation of the env variable 'match'
+> + *	*value  the unsigned long representation of the env variable 'match'
+>   * Returns:
+>   *	Zero on success, a kdb diagnostic on failure.
+>   */
+> @@ -356,7 +356,7 @@ static void kdb_printenv(void)
+>   * Parameters:
+>   *	arg	A character string representing a numeric value
+>   * Outputs:
+> - *	*value  the unsigned long represntation of arg.
+> + *	*value  the unsigned long representation of arg.
+>   * Returns:
+>   *	Zero on success, a kdb diagnostic on failure.
+>   */
+> @@ -470,7 +470,7 @@ static int kdb_check_regs(void)
+>   *	symbol name, and offset to the caller.
+>   *
+>   *	The argument may consist of a numeric value (decimal or
+> - *	hexidecimal), a symbol name, a register name (preceded by the
+> + *	hexadecimal), a symbol name, a register name (preceded by the
+>   *	percent sign), an environment variable with a numeric value
+>   *	(preceded by a dollar sign) or a simple arithmetic expression
+>   *	consisting of a symbol name, +/-, and a numeric constant value
+> @@ -894,7 +894,7 @@ static void parse_grep(const char *str)
+>   *	Limited to 20 tokens.
+>   *
+>   *	Real rudimentary tokenization. Basically only whitespace
+> - *	is considered a token delimeter (but special consideration
+> + *	is considered a token delimiter (but special consideration
+>   *	is taken of the '=' sign as used by the 'set' command).
+>   *
+>   *	The algorithm used to tokenize the input string relies on
+> diff --git a/kernel/debug/kdb/kdb_private.h b/kernel/debug/kdb/kdb_private.h
+> index ccbed9089808..170c69aedebb 100644
+> --- a/kernel/debug/kdb/kdb_private.h
+> +++ b/kernel/debug/kdb/kdb_private.h
+> @@ -64,7 +64,7 @@
+>  
+>  /*
+>   * KDB_MAXBPT describes the total number of breakpoints
+> - * supported by this architecure.
+> + * supported by this architecture.
+>   */
+>  #define KDB_MAXBPT	16
+>  
+> -- 
+> 2.25.1
