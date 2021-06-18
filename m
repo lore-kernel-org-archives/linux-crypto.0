@@ -2,241 +2,232 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5712DC48BE8
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 18:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16248C48BDF
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 21:14:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 311A9613EE
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 18:17:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2D7E61260
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 21:14:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236217AbhFRSTi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Jun 2021 14:19:38 -0400
-Received: from mail-io1-f69.google.com ([209.85.166.69]:52189 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235010AbhFRSTf (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Jun 2021 14:19:35 -0400
-Received: by mail-io1-f69.google.com with SMTP id x21-20020a5d99150000b02904e00bb129f0so1164332iol.18
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Jun 2021 11:17:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=miL4vYc454/8TvcuBV9VOLxWlMT+rOmYqHNBKteuPv4=;
-        b=Pc7QbRAQmCSVVGkDec5Lz1lEsqmlbrTjHZrJ6ElEr/ofCRd9MGz/HbKIV7x+TwQplh
-         fZuM3tLJNJSgrJLPjpWa6TMFla9cG2Eh6+e5JceLqRdWAVrW+BNeYEGXKsJ1dnbLWdUE
-         r0DS3kQ7YSx5IKgPvNPu0M7hkpUyB8KMW0VlBgEJ9pqFqUKS+/azYLcPgT5D/LA7Xmps
-         1LJz+iyvWLLAH+QsQQhaXGx4Moy/RoqdWuopQWhxhR2vzNA23SG2HN8AlmYEaFKYxo34
-         QW1FQuZaqGgHzrT1Z6xsmq7iDil0ZKiAecKI+AeUJoNhgA4O4/WEmPWFzs6w+G5Q2aHL
-         O53g==
-X-Gm-Message-State: AOAM532yPAKjh/mb59Fvh6F1cOs34U7JqP1MhcafSNPA9kLSi/WGCFlm
-        LzEhxTtLbuKFcR5aOYuOn+goEFu2qBoK8RMv5GOxPxf6pjG8
-X-Google-Smtp-Source: ABdhPJwVpqDrxJpeZzN/aSMAxym9o34BDpK3cgNAYo8mhiRgcsrEkE4AcVmA095mU5A03VBgmB1PfpixLqWMN/7Kv4ATj9DgZDwX
+        id S233903AbhFRVQn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Jun 2021 17:16:43 -0400
+Received: from mail-eopbgr130084.outbound.protection.outlook.com ([40.107.13.84]:47206
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233501AbhFRVQm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jun 2021 17:16:42 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MAfhi+cRzEFP6MQFhVUcDhgqr9AjxpuPizm4M+m9ZPqDEornjDFD0ymeZtr11mTWJjrMH41mufI3S3oZdQ1S9UN/AOCv/uxB/vM/wsNm2bIiKeCP3695u79C90radvHDpPj/XQXfdIOrRkMzJSHJ6NEnzhw6S6DwjjHb/LhF4+wtma2fC95GKZa5p0GO+3AidMQfy4PdE6aMnphztPPshgCy1cvyk8ZipAO+2teI519zH1sOIqhDn3Kjx85AZa4OTyfWhW7S4qWvnFptzdy1SBHnb8GMSHX7eCUAWWMcLU9lA1kI1tsPD6qAZtV/QeyG2JuDDPa6mVLZtmwZ9TC58A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gK1y8E0HhEKMnSZi0iyyi9TsYQIm4nowwbVB+0nU9PY=;
+ b=OWnjfIsV/Q780ElRSVvmLd9a/vk8RtVLKu0zBmNmbxURopt5z6O+bIp3r8aI4jdbBG+ikEv4fyq7Oy0KvH0xUZw8zKFxcpGQf6KlN5R1SpiWyL1pzYaQGTbLaT2Jg6f3pn1NP5hBV9pA6poYuZIzL0Bh6zQCsTXit4rZsNEZCUWB9IulofGWfairj7uXKglCAQeZejhbRCQdjufhx3iIuDCTmD8gWQz5kscN8fKKe3u8T1+TS9nWVECAxlVQB/FsgJ0bGmXkIVczXCisCWFG44RcsTJU8Gx7Y8Bp+VTvxOzd4D5clY1M9ADhWs/ukdLJ24Su5l2ihyhUwDWkeiGFhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=seco.com; dmarc=pass action=none header.from=seco.com;
+ dkim=pass header.d=seco.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=secospa.onmicrosoft.com; s=selector2-secospa-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gK1y8E0HhEKMnSZi0iyyi9TsYQIm4nowwbVB+0nU9PY=;
+ b=eEFzhI+Hwgnqj7vFPH9Lm9yC0OCx9QoEmEy9DcGhvCaozr7EnWRqpDO2Kz8qv3onyeV5m3Dv0pn/VqB/o6GI9Suh6sxOg5ZcK3/+gaq4afGjxq98+jhSCNTIbV0HlZhEKle3x5aEkYmazcKSnfdP08MzbVZEgNCDuItAWbwd7Xo=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=seco.com;
+Received: from DB7PR03MB4523.eurprd03.prod.outlook.com (2603:10a6:10:19::27)
+ by DBBPR03MB7129.eurprd03.prod.outlook.com (2603:10a6:10:206::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4242.19; Fri, 18 Jun
+ 2021 21:14:28 +0000
+Received: from DB7PR03MB4523.eurprd03.prod.outlook.com
+ ([fe80::40d5:3554:c709:6b1b]) by DB7PR03MB4523.eurprd03.prod.outlook.com
+ ([fe80::40d5:3554:c709:6b1b%5]) with mapi id 15.20.4242.019; Fri, 18 Jun 2021
+ 21:14:28 +0000
+From:   Sean Anderson <sean.anderson@seco.com>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-arm-kernel@lists.infradead.org, Marek Vasut <marex@denx.de>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Sean Anderson <sean.anderson@seco.com>
+Subject: [PATCH 1/2] crypto: mxs-dcp: Check for DMA mapping errors
+Date:   Fri, 18 Jun 2021 17:14:10 -0400
+Message-Id: <20210618211411.1167726-1-sean.anderson@seco.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [50.195.82.171]
+X-ClientProxiedBy: BL1PR13CA0244.namprd13.prod.outlook.com
+ (2603:10b6:208:2ba::9) To DB7PR03MB4523.eurprd03.prod.outlook.com
+ (2603:10a6:10:19::27)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:8ee:: with SMTP id n14mr6995095ilt.205.1624040244781;
- Fri, 18 Jun 2021 11:17:24 -0700 (PDT)
-Date:   Fri, 18 Jun 2021 11:17:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e4266905c50e5553@google.com>
-Subject: [syzbot] inconsistent lock state in padata_do_serial
-From:   syzbot <syzbot+5952f5d2983bea3ff2ba@syzkaller.appspotmail.com>
-To:     daniel.m.jordan@oracle.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        steffen.klassert@secunet.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from plantagenet.inhand.com (50.195.82.171) by BL1PR13CA0244.namprd13.prod.outlook.com (2603:10b6:208:2ba::9) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.7 via Frontend Transport; Fri, 18 Jun 2021 21:14:27 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 68cb1800-f80e-452b-626f-08d9329e0ef5
+X-MS-TrafficTypeDiagnostic: DBBPR03MB7129:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DBBPR03MB71293F8A116B2932F7EF027E960D9@DBBPR03MB7129.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: N2l0Xloihr+xdzssEEcdbfP1ePxJrOZYJ57mm/wD8eQoo+or+xwsi+goLTjJ6g0gv5gtTpa5Olcnn22MavXB6k5eucv19HFaG6MDHw5HwyZi7eYlO8ac5rJ6ynxRElRHHZdMD6Xe2Ew7sUVL6sLm+PLRltF7K9w1UvPo8Vb3MWwqXQ4NuNHcuw2XJ6ar9Z5kqgWFJmvdkd9aP/h44KfDtWJMBeJZBirUCumT7CGyvn2KDue5X5asqSWEocAaufHZlgTvVgY6Idxy4jXwc/H5po4xgajOr+9iweX5bWGiaGzmfr4dQ7dkKzTtT1VJJBbDjhs5uEfQsGGg/SJGzwBWp+xFVbTvZk6IBPxY8XlRplILl6SMydHlKygcJCWAb/bhafCAHIEHNcQUHID9Z4bU1XIjm3drbWAQ95w50+BXCCttfdXC/ZRKZH+owPEuU+pS8ZY+4escsvMwn4RAPF+q8fMXTvnlJ+0gS9x2X89E4ad6+HdDpd2ZiAc49qrY8fKtNvVIsRaFVfvZ5sUhP003QgbrtrXD61a8YJEzOGB52U04dwqc2zDbDi37Ol4wsJANU2hRHDl0wtT/P7F+aDU+QoaiGO5RmzsYz89Y4/oY6KmQ/BtleMdqlYJ3Nv7UZza1lOs2DMDAvL2vDDYCcilYpA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR03MB4523.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(346002)(366004)(39830400003)(136003)(396003)(4326008)(110136005)(16526019)(66556008)(66476007)(54906003)(956004)(83380400001)(1076003)(6666004)(36756003)(478600001)(8936002)(8676002)(44832011)(6512007)(316002)(6506007)(5660300002)(52116002)(86362001)(186003)(2906002)(66946007)(2616005)(38100700002)(107886003)(26005)(6486002)(38350700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?feSRiWcyvrHOeYvnEJT+Sf3w9oU+VpSjs7hLBxa+nwdn+3arCQABeJaSGN90?=
+ =?us-ascii?Q?XvD+BR5pHK74UU01y+/K11gnv+eyqnS31fzaIpDHz5pN3ZQ7JiCl4TsvJtif?=
+ =?us-ascii?Q?/TQ2ZE3ubsDZelYq+sLG1RXX488G0bDKa0nDrtiNX4GhxkA8+qiJ3QxZcnBD?=
+ =?us-ascii?Q?PzkNGrRl8Tya+xF+oVThhWFyOAsWu431rp8kVwnB1wJ0iNwX8ZaqEhidDY5a?=
+ =?us-ascii?Q?w3dwn879Cl9dMatoGsIaCC9ceWpGLRrQ/MVDgLh+CqUqW7jRHvRPkWVuX6Mp?=
+ =?us-ascii?Q?yNC0mnc44p/dqHbjJQh2pff1hhR2GRQux38TqxbdOh3qu5CQvXykkwTYY8+/?=
+ =?us-ascii?Q?3kBaEnORya90TGcwDHDwvP5hcBGBK8bTI/cvWyHPNxcwzvfsGEU/iiAtNxB8?=
+ =?us-ascii?Q?vNonEFPCceTNXznlDAcfP6ACmk4Kv9slkDtYagDaI7DrVHBWJXdnfUMzOZIQ?=
+ =?us-ascii?Q?3REabfApRyX95ErDB1iqtpPToYGfjkJMae8uP9NStMiWrbwDCWTN3Zue6RD/?=
+ =?us-ascii?Q?HXIA9Y4R97ubRKHjXu3NJCTmqmOLyhHHbExNp5yx5EadQvcMKf/kR8eAVdmO?=
+ =?us-ascii?Q?rj7rMgJBD3Rw5RFKS4Ev+JQqLfFtnl/K8o40nMtElUNbn+uks2jGOWnkBP5/?=
+ =?us-ascii?Q?WKEfZ3k11Qd/A/i4GYU36AClMfh3mm28pV0qQ4cEUTZGc3iH0+NfhCD70omC?=
+ =?us-ascii?Q?1ebWpmdnEYVnVe/JN1Zt5dNUIYO4F+GVTmbHcy39OGiQLgRORQ/Bh+CUrdjW?=
+ =?us-ascii?Q?am4WxFiX8bS7pay0k5Ib/cvOq4t80edNDmqQXlp8JPpUG0bVO5j5lBGfGiAz?=
+ =?us-ascii?Q?ZLYGXMVDwYQCoEgFNkbbJmu2s85lfsPU9B3wzDPq9IPKXExPcMVQQns7qoJJ?=
+ =?us-ascii?Q?ydzUgccu6h0lPWUQvQs2dsGQl+QityypM/7uTODWUSAZ6JKAVKMRnL4nMbkV?=
+ =?us-ascii?Q?53Q9sin9lARaPEoKVnqDjaQbh59lD5Kh4ytk6GcSbpnMSWJ/YEd7DA6kY5al?=
+ =?us-ascii?Q?8nfSZyXsT8MkuE1dPcbZfefkKpCYcZI4WN6dsFQwhEuwEcKV9oD7u3AYa1WZ?=
+ =?us-ascii?Q?exgtO3ukPh+jenPZpT2ElnwaduYcHugU14YKBLXTHf0LICPygnBX8zZvmVLY?=
+ =?us-ascii?Q?fg97wwgARIvwKf69D00LZblokgEirI06iPsiJ8vuykt4GmuNcY+nPQfkUQIe?=
+ =?us-ascii?Q?9zcKx3uVByOYv9oLWtUnesDtdKe3pDAlEpiMexbgNYvjH12KAce1pND4Ik76?=
+ =?us-ascii?Q?wnuuLj0BM2KPILZb3MVEff75g827wbpHqBAkgg11IMswzL+zKNBN04ZtFiv+?=
+ =?us-ascii?Q?eEK26Qfps/pBhMPTKEuAgreb?=
+X-OriginatorOrg: seco.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 68cb1800-f80e-452b-626f-08d9329e0ef5
+X-MS-Exchange-CrossTenant-AuthSource: DB7PR03MB4523.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2021 21:14:28.7539
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bebe97c3-6438-442e-ade3-ff17aa50e733
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CKFDTcpqxWpDzJw8C6WViST5QqjmGTHdNEa+IOFd+XfJIkOWC4w6MK141bgiifhN29tbF1xMgXBp9tjIe4lzkA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR03MB7129
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+After calling dma_map_single(), we must also call dma_mapping_error().
+This fixes the following warning when compiling with CONFIG_DMA_API_DEBUG:
 
-syzbot found the following issue on:
+[  311.241478] WARNING: CPU: 0 PID: 428 at kernel/dma/debug.c:1027 check_unmap+0x79c/0x96c
+[  311.249547] DMA-API: mxs-dcp 2280000.crypto: device driver failed to check map error[device address=0x00000000860cb080] [size=32 bytes] [mapped as single]
 
-HEAD commit:    f4cdcae0 Merge branch 'cxgb4-fixes'
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=14e3ef4fd00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=770708ea7cfd4916
-dashboard link: https://syzkaller.appspot.com/bug?extid=5952f5d2983bea3ff2ba
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5952f5d2983bea3ff2ba@syzkaller.appspotmail.com
-
-================================
-WARNING: inconsistent lock state
-5.13.0-rc3-syzkaller #0 Not tainted
---------------------------------
-inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
-syz-executor.0/15349 [HC0[0]:SC1[1]:HE1:SE0] takes:
-ffffe8ffff939e90 (&pd_list->lock){+.?.}-{2:2}, at: spin_lock include/linux/spinlock.h:354 [inline]
-ffffe8ffff939e90 (&pd_list->lock){+.?.}-{2:2}, at: padata_do_serial+0x192/0x410 kernel/padata.c:405
-{SOFTIRQ-ON-W} state was registered at:
-  lock_acquire kernel/locking/lockdep.c:5512 [inline]
-  lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5477
-  __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
-  _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
-  spin_lock include/linux/spinlock.h:354 [inline]
-  padata_do_serial+0x192/0x410 kernel/padata.c:405
-  pcrypt_aead_enc+0x57/0x70 crypto/pcrypt.c:87
-  padata_do_parallel+0x759/0x890 kernel/padata.c:230
-  pcrypt_aead_encrypt+0x39f/0x4d0 crypto/pcrypt.c:115
-  crypto_aead_encrypt+0xaa/0xf0 crypto/aead.c:94
-  tls_do_encryption net/tls/tls_sw.c:529 [inline]
-  tls_push_record+0x13d7/0x3230 net/tls/tls_sw.c:762
-  bpf_exec_tx_verdict+0xd82/0x11a0 net/tls/tls_sw.c:802
-  tls_sw_sendmsg+0xa41/0x1800 net/tls/tls_sw.c:1014
-  inet6_sendmsg+0x99/0xe0 net/ipv6/af_inet6.c:642
-  sock_sendmsg_nosec net/socket.c:654 [inline]
-  sock_sendmsg+0xcf/0x120 net/socket.c:674
-  __sys_sendto+0x21c/0x320 net/socket.c:1977
-  __do_sys_sendto net/socket.c:1989 [inline]
-  __se_sys_sendto net/socket.c:1985 [inline]
-  __x64_sys_sendto+0xdd/0x1b0 net/socket.c:1985
-  do_syscall_64+0x3a/0xb0 arch/x86/entry/common.c:47
-  entry_SYSCALL_64_after_hwframe+0x44/0xae
-irq event stamp: 20754
-hardirqs last  enabled at (20754): [<ffffffff8145d500>] __local_bh_enable_ip+0xa0/0x120 kernel/softirq.c:389
-hardirqs last disabled at (20753): [<ffffffff8145d523>] __local_bh_enable_ip+0xc3/0x120 kernel/softirq.c:366
-softirqs last  enabled at (20356): [<ffffffff8145d336>] invoke_softirq kernel/softirq.c:433 [inline]
-softirqs last  enabled at (20356): [<ffffffff8145d336>] __irq_exit_rcu+0x136/0x200 kernel/softirq.c:637
-softirqs last disabled at (20733): [<ffffffff8145d336>] invoke_softirq kernel/softirq.c:433 [inline]
-softirqs last disabled at (20733): [<ffffffff8145d336>] __irq_exit_rcu+0x136/0x200 kernel/softirq.c:637
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&pd_list->lock);
-  <Interrupt>
-    lock(&pd_list->lock);
-
- *** DEADLOCK ***
-
-4 locks held by syz-executor.0/15349:
- #0: ffff88802938a460 (sb_writers#5){.+.+}-{0:0}, at: __do_sys_sendfile64 fs/read_write.c:1325 [inline]
- #0: ffff88802938a460 (sb_writers#5){.+.+}-{0:0}, at: __se_sys_sendfile64 fs/read_write.c:1311 [inline]
- #0: ffff88802938a460 (sb_writers#5){.+.+}-{0:0}, at: __x64_sys_sendfile64+0x1cc/0x210 fs/read_write.c:1311
- #1: ffff888079db0488 (&sb->s_type->i_mutex_key#10){++++}-{3:3}, at: inode_lock include/linux/fs.h:774 [inline]
- #1: ffff888079db0488 (&sb->s_type->i_mutex_key#10){++++}-{3:3}, at: ext4_dio_write_iter fs/ext4/file.c:510 [inline]
- #1: ffff888079db0488 (&sb->s_type->i_mutex_key#10){++++}-{3:3}, at: ext4_file_write_iter+0xaeb/0x14e0 fs/ext4/file.c:678
- #2: ffffc90000007d70 ((&d->timer)){+.-.}-{0:0}, at: lockdep_copy_map include/linux/lockdep.h:35 [inline]
- #2: ffffc90000007d70 ((&d->timer)){+.-.}-{0:0}, at: call_timer_fn+0xd5/0x6b0 kernel/time/timer.c:1421
- #3: ffffffff8bf79320 (rcu_read_lock){....}-{1:2}, at: buf_msg net/tipc/msg.h:201 [inline]
- #3: ffffffff8bf79320 (rcu_read_lock){....}-{1:2}, at: tipc_bearer_xmit_skb+0x8c/0x3f0 net/tipc/bearer.c:549
-
-stack backtrace:
-CPU: 0 PID: 15349 Comm: syz-executor.0 Not tainted 5.13.0-rc3-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x141/0x1d7 lib/dump_stack.c:120
- print_usage_bug kernel/locking/lockdep.c:203 [inline]
- valid_state kernel/locking/lockdep.c:3820 [inline]
- mark_lock_irq kernel/locking/lockdep.c:4023 [inline]
- mark_lock.cold+0x61/0x8e kernel/locking/lockdep.c:4480
- mark_usage kernel/locking/lockdep.c:4375 [inline]
- __lock_acquire+0x11aa/0x5230 kernel/locking/lockdep.c:4856
- lock_acquire kernel/locking/lockdep.c:5512 [inline]
- lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5477
- __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
- _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
- spin_lock include/linux/spinlock.h:354 [inline]
- padata_do_serial+0x192/0x410 kernel/padata.c:405
- pcrypt_aead_enc+0x57/0x70 crypto/pcrypt.c:87
- padata_do_parallel+0x759/0x890 kernel/padata.c:230
- pcrypt_aead_encrypt+0x39f/0x4d0 crypto/pcrypt.c:115
- crypto_aead_encrypt+0xaa/0xf0 crypto/aead.c:94
- tipc_aead_encrypt net/tipc/crypto.c:828 [inline]
- tipc_crypto_xmit+0x10b4/0x2d40 net/tipc/crypto.c:1769
- tipc_bearer_xmit_skb+0x180/0x3f0 net/tipc/bearer.c:556
- tipc_disc_timeout+0x864/0xc80 net/tipc/discover.c:335
- call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1431
- expire_timers kernel/time/timer.c:1476 [inline]
- __run_timers.part.0+0x67c/0xa50 kernel/time/timer.c:1745
- __run_timers kernel/time/timer.c:1726 [inline]
- run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1758
- __do_softirq+0x29b/0x9f6 kernel/softirq.c:559
- invoke_softirq kernel/softirq.c:433 [inline]
- __irq_exit_rcu+0x136/0x200 kernel/softirq.c:637
- irq_exit_rcu+0x5/0x20 kernel/softirq.c:649
- sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1100
- </IRQ>
- asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:647
-RIP: 0010:__raw_spin_unlock_irq include/linux/spinlock_api_smp.h:169 [inline]
-RIP: 0010:_raw_spin_unlock_irq+0x25/0x40 kernel/locking/spinlock.c:199
-Code: 0f 1f 44 00 00 55 48 8b 74 24 08 48 89 fd 48 83 c7 18 e8 de 51 41 f8 48 89 ef e8 76 ca 41 f8 e8 d1 be 61 f8 fb bf 01 00 00 00 <e8> 56 c0 35 f8 65 8b 05 3f c2 e8 76 85 c0 74 02 5d c3 e8 fb 17 e7
-RSP: 0018:ffffc9000121efc8 EFLAGS: 00000202
-RAX: 00000000000050fb RBX: 0000000000000402 RCX: 1ffffffff204bf8a
-RDX: 0000000000000000 RSI: 0000000000000002 RDI: 0000000000000001
-RBP: ffff8880b9c35640 R08: 0000000000000001 R09: ffffffff90226937
-R10: 0000000000000001 R11: 0000000000000001 R12: ffff8880b9c35640
-R13: ffff88801c033880 R14: ffff888028956200 R15: ffff88801fb23880
- finish_lock_switch kernel/sched/core.c:4093 [inline]
- finish_task_switch.isra.0+0x15d/0x810 kernel/sched/core.c:4210
- context_switch kernel/sched/core.c:4342 [inline]
- __schedule+0x91e/0x23e0 kernel/sched/core.c:5147
- preempt_schedule_common+0x45/0xc0 kernel/sched/core.c:5307
- preempt_schedule_thunk+0x16/0x18 arch/x86/entry/thunk_64.S:35
- __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:161 [inline]
- _raw_spin_unlock_irqrestore+0x57/0x70 kernel/locking/spinlock.c:191
- spin_unlock_irqrestore include/linux/spinlock.h:409 [inline]
- prepare_to_wait+0x122/0x3f0 kernel/sched/wait.c:263
- __wait_on_bit+0xd1/0x190 kernel/sched/wait_bit.c:47
- out_of_line_wait_on_bit+0xd5/0x110 kernel/sched/wait_bit.c:64
- wait_on_bit_io include/linux/wait_bit.h:101 [inline]
- __wait_on_buffer fs/buffer.c:122 [inline]
- wait_on_buffer include/linux/buffer_head.h:356 [inline]
- __sync_dirty_buffer+0x2fb/0x3f0 fs/buffer.c:3177
- ext4_write_inode+0x574/0x630 fs/ext4/inode.c:5236
- write_inode fs/fs-writeback.c:1320 [inline]
- __writeback_single_inode+0xae9/0xfd0 fs/fs-writeback.c:1525
- writeback_single_inode+0x2a5/0x460 fs/fs-writeback.c:1580
- sync_inode fs/fs-writeback.c:2624 [inline]
- sync_inode_metadata+0x93/0xd0 fs/fs-writeback.c:2644
- ext4_fsync_nojournal fs/ext4/fsync.c:92 [inline]
- ext4_sync_file+0x9cc/0xfd0 fs/ext4/fsync.c:170
- vfs_fsync_range+0x13a/0x220 fs/sync.c:200
- generic_write_sync include/linux/fs.h:2982 [inline]
- iomap_dio_complete+0x5f9/0x780 fs/iomap/direct-io.c:127
- iomap_dio_rw+0x62/0x90 fs/iomap/direct-io.c:652
- ext4_dio_write_iter fs/ext4/file.c:568 [inline]
- ext4_file_write_iter+0xe18/0x14e0 fs/ext4/file.c:678
- call_write_iter include/linux/fs.h:2114 [inline]
- do_iter_readv_writev+0x46f/0x740 fs/read_write.c:740
- do_iter_write+0x188/0x670 fs/read_write.c:866
- vfs_iter_write+0x70/0xa0 fs/read_write.c:907
- iter_file_splice_write+0x723/0xc70 fs/splice.c:689
- do_splice_from fs/splice.c:767 [inline]
- direct_splice_actor+0x110/0x180 fs/splice.c:936
- splice_direct_to_actor+0x34b/0x8c0 fs/splice.c:891
- do_splice_direct+0x1b3/0x280 fs/splice.c:979
- do_sendfile+0x9f0/0x1110 fs/read_write.c:1260
- __do_sys_sendfile64 fs/read_write.c:1325 [inline]
- __se_sys_sendfile64 fs/read_write.c:1311 [inline]
- __x64_sys_sendfile64+0x1cc/0x210 fs/read_write.c:1311
- do_syscall_64+0x3a/0xb0 arch/x86/entry/common.c:47
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x4665d9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f7748bc2188 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
-RAX: ffffffffffffffda RBX: 000000000056bf80 RCX: 00000000004665d9
-RDX: 0000000000000000 RSI: 0000000000000005 RDI: 0000000000000006
-RBP: 00000000004bfcb9 R08: 0000000000000000 R09: 0000000000000000
-R10: 000800000000000c R11: 0000000000000246 R12: 000000000056bf80
-R13: 00007fff0dc53ccf R14: 00007f7748bc2300 R15: 0000000000022000
-TCP: request_sock_TCPv6: Possible SYN flooding on port 20002. Sending cookies.  Check SNMP counters.
-
-
+Signed-off-by: Sean Anderson <sean.anderson@seco.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ drivers/crypto/mxs-dcp.c | 45 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 35 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index d6a7784d2988..f397cc5bf102 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -170,15 +170,19 @@ static struct dcp *global_sdcp;
+ 
+ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
+ {
++	int dma_err;
+ 	struct dcp *sdcp = global_sdcp;
+ 	const int chan = actx->chan;
+ 	uint32_t stat;
+ 	unsigned long ret;
+ 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+-
+ 	dma_addr_t desc_phys = dma_map_single(sdcp->dev, desc, sizeof(*desc),
+ 					      DMA_TO_DEVICE);
+ 
++	dma_err = dma_mapping_error(sdcp->dev, desc_phys);
++	if (dma_err)
++		return dma_err;
++
+ 	reinit_completion(&sdcp->completion[chan]);
+ 
+ 	/* Clear status register. */
+@@ -216,18 +220,29 @@ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
+ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+ 			   struct skcipher_request *req, int init)
+ {
++	dma_addr_t key_phys, src_phys, dst_phys;
+ 	struct dcp *sdcp = global_sdcp;
+ 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+ 	struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
+ 	int ret;
+ 
+-	dma_addr_t key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
+-					     2 * AES_KEYSIZE_128,
+-					     DMA_TO_DEVICE);
+-	dma_addr_t src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
+-					     DCP_BUF_SZ, DMA_TO_DEVICE);
+-	dma_addr_t dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
+-					     DCP_BUF_SZ, DMA_FROM_DEVICE);
++	key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
++				  2 * AES_KEYSIZE_128, DMA_TO_DEVICE);
++	ret = dma_mapping_error(sdcp->dev, key_phys);
++	if (ret)
++		return ret;
++
++	src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
++				  DCP_BUF_SZ, DMA_TO_DEVICE);
++	ret = dma_mapping_error(sdcp->dev, src_phys);
++	if (ret)
++		goto err_src;
++
++	dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
++				  DCP_BUF_SZ, DMA_FROM_DEVICE);
++	ret = dma_mapping_error(sdcp->dev, dst_phys);
++	if (ret)
++		goto err_dst;
+ 
+ 	if (actx->fill % AES_BLOCK_SIZE) {
+ 		dev_err(sdcp->dev, "Invalid block size!\n");
+@@ -265,10 +280,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+ 	ret = mxs_dcp_start_dma(actx);
+ 
+ aes_done_run:
++	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
++err_dst:
++	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
++err_src:
+ 	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
+ 			 DMA_TO_DEVICE);
+-	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+-	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
+ 
+ 	return ret;
+ }
+@@ -557,6 +574,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
+ 	dma_addr_t buf_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_in_buf,
+ 					     DCP_BUF_SZ, DMA_TO_DEVICE);
+ 
++	ret = dma_mapping_error(sdcp->dev, buf_phys);
++	if (ret)
++		return ret;
++
+ 	/* Fill in the DMA descriptor. */
+ 	desc->control0 = MXS_DCP_CONTROL0_DECR_SEMAPHORE |
+ 		    MXS_DCP_CONTROL0_INTERRUPT |
+@@ -589,6 +610,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
+ 	if (rctx->fini) {
+ 		digest_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_out_buf,
+ 					     DCP_SHA_PAY_SZ, DMA_FROM_DEVICE);
++		ret = dma_mapping_error(sdcp->dev, digest_phys);
++		if (ret)
++			goto done_run;
++
+ 		desc->control0 |= MXS_DCP_CONTROL0_HASH_TERM;
+ 		desc->payload = digest_phys;
+ 	}
+-- 
+2.25.1
+
