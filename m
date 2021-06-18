@@ -2,51 +2,50 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16248C48BDF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A2FC49361
 	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 21:14:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2D7E61260
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 21:14:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9770661261
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 21:14:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233903AbhFRVQn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Jun 2021 17:16:43 -0400
+        id S233501AbhFRVQo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Jun 2021 17:16:44 -0400
 Received: from mail-eopbgr130084.outbound.protection.outlook.com ([40.107.13.84]:47206
         "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233501AbhFRVQm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Jun 2021 17:16:42 -0400
+        id S233725AbhFRVQn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jun 2021 17:16:43 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MAfhi+cRzEFP6MQFhVUcDhgqr9AjxpuPizm4M+m9ZPqDEornjDFD0ymeZtr11mTWJjrMH41mufI3S3oZdQ1S9UN/AOCv/uxB/vM/wsNm2bIiKeCP3695u79C90radvHDpPj/XQXfdIOrRkMzJSHJ6NEnzhw6S6DwjjHb/LhF4+wtma2fC95GKZa5p0GO+3AidMQfy4PdE6aMnphztPPshgCy1cvyk8ZipAO+2teI519zH1sOIqhDn3Kjx85AZa4OTyfWhW7S4qWvnFptzdy1SBHnb8GMSHX7eCUAWWMcLU9lA1kI1tsPD6qAZtV/QeyG2JuDDPa6mVLZtmwZ9TC58A==
+ b=UWaYFnjhQOvy2nB3mL7O/XZdz9ohkQzaIlzM5pY1t7Dw7zzaoYH+dMYLrCv15SjKhnN4Dvse7Z8hKzd+K6zgtZ3jPyOzuBAgiok/mGMDM1VEiOwF2vdvgrO1qfK7BUGIPEw/rdWMzgZ6wwEs5595NLhIOzmNdbExLyMEDAWSFlNayjXms47ZUEBDhjXOgmzsVZucBdUewdLnPKZ7vrqJwjV4qgEUQaf9KHVXGR5tvcvs9JCHBSJXKVmmlDn3WqwE9ztEjMbhkqoP2jcIIQlRhiKecUeeA/Kms4bJubP45pzg/a6lN56v/HEoRtSDckyvQeGEaGkiwT0QzWKK3HF4+Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gK1y8E0HhEKMnSZi0iyyi9TsYQIm4nowwbVB+0nU9PY=;
- b=OWnjfIsV/Q780ElRSVvmLd9a/vk8RtVLKu0zBmNmbxURopt5z6O+bIp3r8aI4jdbBG+ikEv4fyq7Oy0KvH0xUZw8zKFxcpGQf6KlN5R1SpiWyL1pzYaQGTbLaT2Jg6f3pn1NP5hBV9pA6poYuZIzL0Bh6zQCsTXit4rZsNEZCUWB9IulofGWfairj7uXKglCAQeZejhbRCQdjufhx3iIuDCTmD8gWQz5kscN8fKKe3u8T1+TS9nWVECAxlVQB/FsgJ0bGmXkIVczXCisCWFG44RcsTJU8Gx7Y8Bp+VTvxOzd4D5clY1M9ADhWs/ukdLJ24Su5l2ihyhUwDWkeiGFhg==
+ bh=pvxPr0+O//CkYJu24UkFiUkqCz+YfcRGFxO6GsUpURI=;
+ b=IihfPu24LmH5x70bwN8n1pmIBguQY63EARFgPaVvTp85MQi+WhN4ubblItA7H7Hsz99rHsK+f8svdjd7lvRh/skBENBaCo27V0TMgmbgd0t2BbF3J2dK1d6dlEHCnHTCYCaCKJtVD2AwSqUQcSYV8QTDRP6nb8xLFBazqNV/u5Rn7wujrhVF2JY9nA2shdV334W/N8hOHAIDWRLRmM89xRL8bqj5ibti6cvqJYQ4UzqYRre/6TJ0DgjrZCzQDGbS/WRYNZgUQ+AET8E+77hD/qRwv3Hdbdz4aikCN3rM9k0XhbaqKICxxtvUGzzTQDGCpZwc/IThx3fA6TE8dRMCCA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=seco.com; dmarc=pass action=none header.from=seco.com;
  dkim=pass header.d=seco.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=secospa.onmicrosoft.com; s=selector2-secospa-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gK1y8E0HhEKMnSZi0iyyi9TsYQIm4nowwbVB+0nU9PY=;
- b=eEFzhI+Hwgnqj7vFPH9Lm9yC0OCx9QoEmEy9DcGhvCaozr7EnWRqpDO2Kz8qv3onyeV5m3Dv0pn/VqB/o6GI9Suh6sxOg5ZcK3/+gaq4afGjxq98+jhSCNTIbV0HlZhEKle3x5aEkYmazcKSnfdP08MzbVZEgNCDuItAWbwd7Xo=
+ bh=pvxPr0+O//CkYJu24UkFiUkqCz+YfcRGFxO6GsUpURI=;
+ b=DU8z+BkAfYHOG/EKKRI8BC3KY0BAOrKmlb8eQw+c8DcNbNR2zcP/hajguTazv8qbUnHWEiz8mB1V5fgG1RySW+nKQMHP66JFZB44VcDQhjstjtiqhSIpKg+IrzcJs9nbNoVh7l7yUs68QUFINNwXdnThk4lbNF+RwRBBx8i8zoo=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=seco.com;
 Received: from DB7PR03MB4523.eurprd03.prod.outlook.com (2603:10a6:10:19::27)
  by DBBPR03MB7129.eurprd03.prod.outlook.com (2603:10a6:10:206::24) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4242.19; Fri, 18 Jun
- 2021 21:14:28 +0000
+ 2021 21:14:30 +0000
 Received: from DB7PR03MB4523.eurprd03.prod.outlook.com
  ([fe80::40d5:3554:c709:6b1b]) by DB7PR03MB4523.eurprd03.prod.outlook.com
  ([fe80::40d5:3554:c709:6b1b%5]) with mapi id 15.20.4242.019; Fri, 18 Jun 2021
- 21:14:28 +0000
+ 21:14:30 +0000
 From:   Sean Anderson <sean.anderson@seco.com>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -55,179 +54,212 @@ Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
         linux-arm-kernel@lists.infradead.org, Marek Vasut <marex@denx.de>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Sean Anderson <sean.anderson@seco.com>
-Subject: [PATCH 1/2] crypto: mxs-dcp: Check for DMA mapping errors
-Date:   Fri, 18 Jun 2021 17:14:10 -0400
-Message-Id: <20210618211411.1167726-1-sean.anderson@seco.com>
+Subject: [PATCH 2/2] crypto: mxs_dcp: Use sg_mapping_iter to copy data
+Date:   Fri, 18 Jun 2021 17:14:11 -0400
+Message-Id: <20210618211411.1167726-2-sean.anderson@seco.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210618211411.1167726-1-sean.anderson@seco.com>
+References: <20210618211411.1167726-1-sean.anderson@seco.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 X-Originating-IP: [50.195.82.171]
 X-ClientProxiedBy: BL1PR13CA0244.namprd13.prod.outlook.com
  (2603:10b6:208:2ba::9) To DB7PR03MB4523.eurprd03.prod.outlook.com
  (2603:10a6:10:19::27)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from plantagenet.inhand.com (50.195.82.171) by BL1PR13CA0244.namprd13.prod.outlook.com (2603:10b6:208:2ba::9) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.7 via Frontend Transport; Fri, 18 Jun 2021 21:14:27 +0000
+Received: from plantagenet.inhand.com (50.195.82.171) by BL1PR13CA0244.namprd13.prod.outlook.com (2603:10b6:208:2ba::9) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.7 via Frontend Transport; Fri, 18 Jun 2021 21:14:29 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 68cb1800-f80e-452b-626f-08d9329e0ef5
+X-MS-Office365-Filtering-Correlation-Id: 5a845748-870d-4f9f-b958-08d9329e0fb1
 X-MS-TrafficTypeDiagnostic: DBBPR03MB7129:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DBBPR03MB71293F8A116B2932F7EF027E960D9@DBBPR03MB7129.eurprd03.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <DBBPR03MB7129016688ABAAC4599FB0C4960D9@DBBPR03MB7129.eurprd03.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: N2l0Xloihr+xdzssEEcdbfP1ePxJrOZYJ57mm/wD8eQoo+or+xwsi+goLTjJ6g0gv5gtTpa5Olcnn22MavXB6k5eucv19HFaG6MDHw5HwyZi7eYlO8ac5rJ6ynxRElRHHZdMD6Xe2Ew7sUVL6sLm+PLRltF7K9w1UvPo8Vb3MWwqXQ4NuNHcuw2XJ6ar9Z5kqgWFJmvdkd9aP/h44KfDtWJMBeJZBirUCumT7CGyvn2KDue5X5asqSWEocAaufHZlgTvVgY6Idxy4jXwc/H5po4xgajOr+9iweX5bWGiaGzmfr4dQ7dkKzTtT1VJJBbDjhs5uEfQsGGg/SJGzwBWp+xFVbTvZk6IBPxY8XlRplILl6SMydHlKygcJCWAb/bhafCAHIEHNcQUHID9Z4bU1XIjm3drbWAQ95w50+BXCCttfdXC/ZRKZH+owPEuU+pS8ZY+4escsvMwn4RAPF+q8fMXTvnlJ+0gS9x2X89E4ad6+HdDpd2ZiAc49qrY8fKtNvVIsRaFVfvZ5sUhP003QgbrtrXD61a8YJEzOGB52U04dwqc2zDbDi37Ol4wsJANU2hRHDl0wtT/P7F+aDU+QoaiGO5RmzsYz89Y4/oY6KmQ/BtleMdqlYJ3Nv7UZza1lOs2DMDAvL2vDDYCcilYpA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR03MB4523.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(346002)(366004)(39830400003)(136003)(396003)(4326008)(110136005)(16526019)(66556008)(66476007)(54906003)(956004)(83380400001)(1076003)(6666004)(36756003)(478600001)(8936002)(8676002)(44832011)(6512007)(316002)(6506007)(5660300002)(52116002)(86362001)(186003)(2906002)(66946007)(2616005)(38100700002)(107886003)(26005)(6486002)(38350700002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 11P6FBPbv3k7DO7bCP7mB669ljctvL90uQT1D+Zvor7VFDpZwxpnYPHAagOgqbtF3NrLpwwwXSRTT6unh0CId3QXpox5ep1CnGkITREPjt/SW/5Xc0I7Kuslp2oAe++VHD8fx6dAuisO/rP0ZIqWQaEFgAkd7hQ2T6//TQ8H2k8Pmxj7aTZ7qw3SQAoL0eSTUKzwL5n8KqwOPfYY96hm2dJQxgDalNtXoTxeac9FrPGtjJuIJnSdcwnKcQoCxKkK6Wuu8OuUVpSNJhzYMtLN7Jh1a6gW52Fn/JwtPCx4YhjPMW2MtoFzwsdSOUsOT1VP8iXBulqxF9ozr9XXPxQ7Nkn1X0jABM72wi5dqHZVqDVOOID8TlN++tYbyRmwgUX6aTtV3Ox/kOnHBNdQs11Q8Eyaqt/XYzXwULRCeEaeIrJP3zqeAeUGP4LPXOestFW4tFa11p3i9/8JXbrdYwlr0xS2Gd+vnUYhCqgpbRuOw1YkDsOJWZeIOxR6iV9O6HNoTC8lhdv+DbbtiCdpTgutcCaoGOSWuPSrDGi0JqI0hudt7WJiwoF103dBCNkwyvMULwdQhFSZtKKFvnPpaH+1K9lRVW1/QUHh/xXTxwOwL1h0NcVPf6DvkIsbk/1bMQ3w5inRmNbvtOR9okpnboOq5HFnIg0nxVLW/+k3tNzS4xk=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR03MB4523.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(346002)(366004)(39830400003)(136003)(396003)(4326008)(110136005)(16526019)(66556008)(66476007)(54906003)(956004)(83380400001)(1076003)(6666004)(36756003)(478600001)(8936002)(8676002)(44832011)(45080400002)(6512007)(316002)(6506007)(5660300002)(52116002)(86362001)(186003)(2906002)(66946007)(2616005)(38100700002)(107886003)(26005)(6486002)(38350700002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?feSRiWcyvrHOeYvnEJT+Sf3w9oU+VpSjs7hLBxa+nwdn+3arCQABeJaSGN90?=
- =?us-ascii?Q?XvD+BR5pHK74UU01y+/K11gnv+eyqnS31fzaIpDHz5pN3ZQ7JiCl4TsvJtif?=
- =?us-ascii?Q?/TQ2ZE3ubsDZelYq+sLG1RXX488G0bDKa0nDrtiNX4GhxkA8+qiJ3QxZcnBD?=
- =?us-ascii?Q?PzkNGrRl8Tya+xF+oVThhWFyOAsWu431rp8kVwnB1wJ0iNwX8ZaqEhidDY5a?=
- =?us-ascii?Q?w3dwn879Cl9dMatoGsIaCC9ceWpGLRrQ/MVDgLh+CqUqW7jRHvRPkWVuX6Mp?=
- =?us-ascii?Q?yNC0mnc44p/dqHbjJQh2pff1hhR2GRQux38TqxbdOh3qu5CQvXykkwTYY8+/?=
- =?us-ascii?Q?3kBaEnORya90TGcwDHDwvP5hcBGBK8bTI/cvWyHPNxcwzvfsGEU/iiAtNxB8?=
- =?us-ascii?Q?vNonEFPCceTNXznlDAcfP6ACmk4Kv9slkDtYagDaI7DrVHBWJXdnfUMzOZIQ?=
- =?us-ascii?Q?3REabfApRyX95ErDB1iqtpPToYGfjkJMae8uP9NStMiWrbwDCWTN3Zue6RD/?=
- =?us-ascii?Q?HXIA9Y4R97ubRKHjXu3NJCTmqmOLyhHHbExNp5yx5EadQvcMKf/kR8eAVdmO?=
- =?us-ascii?Q?rj7rMgJBD3Rw5RFKS4Ev+JQqLfFtnl/K8o40nMtElUNbn+uks2jGOWnkBP5/?=
- =?us-ascii?Q?WKEfZ3k11Qd/A/i4GYU36AClMfh3mm28pV0qQ4cEUTZGc3iH0+NfhCD70omC?=
- =?us-ascii?Q?1ebWpmdnEYVnVe/JN1Zt5dNUIYO4F+GVTmbHcy39OGiQLgRORQ/Bh+CUrdjW?=
- =?us-ascii?Q?am4WxFiX8bS7pay0k5Ib/cvOq4t80edNDmqQXlp8JPpUG0bVO5j5lBGfGiAz?=
- =?us-ascii?Q?ZLYGXMVDwYQCoEgFNkbbJmu2s85lfsPU9B3wzDPq9IPKXExPcMVQQns7qoJJ?=
- =?us-ascii?Q?ydzUgccu6h0lPWUQvQs2dsGQl+QityypM/7uTODWUSAZ6JKAVKMRnL4nMbkV?=
- =?us-ascii?Q?53Q9sin9lARaPEoKVnqDjaQbh59lD5Kh4ytk6GcSbpnMSWJ/YEd7DA6kY5al?=
- =?us-ascii?Q?8nfSZyXsT8MkuE1dPcbZfefkKpCYcZI4WN6dsFQwhEuwEcKV9oD7u3AYa1WZ?=
- =?us-ascii?Q?exgtO3ukPh+jenPZpT2ElnwaduYcHugU14YKBLXTHf0LICPygnBX8zZvmVLY?=
- =?us-ascii?Q?fg97wwgARIvwKf69D00LZblokgEirI06iPsiJ8vuykt4GmuNcY+nPQfkUQIe?=
- =?us-ascii?Q?9zcKx3uVByOYv9oLWtUnesDtdKe3pDAlEpiMexbgNYvjH12KAce1pND4Ik76?=
- =?us-ascii?Q?wnuuLj0BM2KPILZb3MVEff75g827wbpHqBAkgg11IMswzL+zKNBN04ZtFiv+?=
- =?us-ascii?Q?eEK26Qfps/pBhMPTKEuAgreb?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y2Y2Z3NWTENWdE50ckpUN1Z1UW9HemdiZ3ZhMGE4YmdnZnc5QWdCSThpV3Y1?=
+ =?utf-8?B?UDU5V3JUd1FBU3J6NklPb0VPZlExWjJVVFRZWDVOcG9nb3BVbGhkaVcyK216?=
+ =?utf-8?B?Lys3cGEwQUtHM3ltdlh0MUw5SnI1aGlLK1BJc0JoS1NzNzJVOGVOU2hwQ2lo?=
+ =?utf-8?B?MTN6UkVZSmZsZi9lMmppa0RkckdKVnBIVUxFTWljeWtpL1ZjaTVjTjhMZ01P?=
+ =?utf-8?B?WktaTGdMaEJ5dTR6TVV0bG9BK0NPU21uN05UMkdtckJGc0k5bXRsdWJyS3Bp?=
+ =?utf-8?B?YnFlcE9xVVQ5UzNNaFFZNG5xMGluSUJpTDkwOHhsWWdRU0U5V3pPK3lVUHcv?=
+ =?utf-8?B?eFN0SzhodXR3WmFvZisyQWZrMXJpY2Z6NUQra1lJMjRuSnhPb1BzbHJRc1NZ?=
+ =?utf-8?B?UExmaVN5NEJVTytXU1VHcHl3VVBRTWZacVJRNHdrT1FxN3VyZlVpWFFzaFhn?=
+ =?utf-8?B?dndLMmZrL1pBK3BiOWhPT0gzYXBVdVgxOXY2Z3dDN3lBemZkQmNnQ29KTUxa?=
+ =?utf-8?B?RHY1TFRIWHFRcGIzbjVqTEVTbm1INWIzdXZLcGVHcjB5b1FtZ0tLWkpuMktF?=
+ =?utf-8?B?VE1SN0RFcmNrRExUaVBwWldqUm5sTkNTUmtvRkZVTGFNYmJIVkdJTmxwQm1F?=
+ =?utf-8?B?YzI2MWQ2TEF6aFM4aFRjSi90eFdqU05VYUo2cXpEZmZjSWRCVk5tWUNFcnho?=
+ =?utf-8?B?N3hNY09USzNvQXZzQjRFblZ0ZVhJR0wwUHJmaE1MN0tMYk9helZMK0VpKzB3?=
+ =?utf-8?B?MGpJcnRIc21tRzlwQTZkTkxQak9XRkZ3N2lPMG1rdjBuRW54VGRrOXNyanI2?=
+ =?utf-8?B?S0NuUlR0UnFOK0pzaDNHOTdxYnhRYkFNUlRra3UrWnhaTk55OXNxQTcyNlRh?=
+ =?utf-8?B?dWxyYXd0Q3RpdzV2Q2RTWmltNGFJUGtwNFRmREQ1NXhJSXV3Qk1zZVNoNHJV?=
+ =?utf-8?B?RURjYktkTUw4MXdZMmlMUjJOTEpJVXZGakNROTJEVXltbGdVbWhQcWg4UXFC?=
+ =?utf-8?B?bVRMUGd0cmVvMnJ0c0pUZzhrLzhzR1BtUE55N2V0SDRwQ0I1bW54UkNQN2gx?=
+ =?utf-8?B?djV5dnlnT2ZzQ0xVQUREZitpSFZBb2g3a3k1c0laUDZaNlErRkwycDJDMkl0?=
+ =?utf-8?B?dGk5d2F4S21qZ1JvRlh0ZmFhRUhIK1JKaE9EcVl0MG0xL2w5anRkUFVSZGcw?=
+ =?utf-8?B?VkpwdkZLMVlPN0JGK2YwMExUWkxBc2I5ZWM1Y1hSQTJHcGsxVnZrZ3RnOEJU?=
+ =?utf-8?B?L3JudUlGQWRTUk5nRTREd0tHYnVTblZyajhrWkNhVU1DY0JEa1hXYVNsZ1VR?=
+ =?utf-8?B?ZHFiMVNNTmxPR0FYOFUwK21hSmJxNGFLUGN2bkdOTHdGMjI4RnhITmxCWHNq?=
+ =?utf-8?B?d3hYRlRweG1tdEMyQTV3S1d5dDl3aXhvSXpZZjhjY0hSYkFTQVA1Qy9yb3g2?=
+ =?utf-8?B?RElYZGlGenNkTDl6dUt4aDFiV05wY3ZyWTVxbFRmczIzcVNhb0laSzVVZEhY?=
+ =?utf-8?B?emwvNHduM3NQYk5MQjNFdFBSSmZYcmhEejRYTmpsTVN1bWNOQWNBUDVHSENl?=
+ =?utf-8?B?Vy9xR3Yxa3B3Y2pQK3RKMUdrZW9FTTAvdWp3T0NpYk9EVEJaa1Z3R3lrSlZQ?=
+ =?utf-8?B?cURaQzVlbUFEbWY2Yi9ab0VYcmV6ajBlQzZSeGgzSDlrM0swWkluMWl6cEhD?=
+ =?utf-8?B?K0JNcFlsQUR3UVNBODI1L0FobncyUHNyMjNXT0o0T1RreVhnc0xQTlZCNDZm?=
+ =?utf-8?Q?xm3PGintRMoc9aVpzjWsW5EJDiAHLBNNIs9pgcW?=
 X-OriginatorOrg: seco.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68cb1800-f80e-452b-626f-08d9329e0ef5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a845748-870d-4f9f-b958-08d9329e0fb1
 X-MS-Exchange-CrossTenant-AuthSource: DB7PR03MB4523.eurprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2021 21:14:28.7539
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2021 21:14:30.0002
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: bebe97c3-6438-442e-ade3-ff17aa50e733
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CKFDTcpqxWpDzJw8C6WViST5QqjmGTHdNEa+IOFd+XfJIkOWC4w6MK141bgiifhN29tbF1xMgXBp9tjIe4lzkA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: tF7r5nc8rVQcZVTYYkP2OaLd+1urbRYr4cIKy9Uf0TB1C9oUTVnzDawvvnepMXP4POq8yv2UD8iJr1jQJTHqcw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR03MB7129
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-After calling dma_map_single(), we must also call dma_mapping_error().
-This fixes the following warning when compiling with CONFIG_DMA_API_DEBUG:
+This uses the sg_miter_*() functions to copy data, instead of doing it
+ourselves. Using sg_copy_buffer() would be better, but this way we don't
+have to keep traversing the beginning of the scatterlist every time we
+do another copy.
 
-[  311.241478] WARNING: CPU: 0 PID: 428 at kernel/dma/debug.c:1027 check_unmap+0x79c/0x96c
-[  311.249547] DMA-API: mxs-dcp 2280000.crypto: device driver failed to check map error[device address=0x00000000860cb080] [size=32 bytes] [mapped as single]
+In addition to reducing code size, this fixes the following oops
+resulting from failing to kmap the page:
+
+[   68.896381] Unable to handle kernel NULL pointer dereference at virtual address 00000ab8
+[   68.904539] pgd = 3561adb3
+[   68.907475] [00000ab8] *pgd=00000000
+[   68.911153] Internal error: Oops: 805 [#1] ARM
+[   68.915618] Modules linked in: cfg80211 rfkill des_generic libdes arc4 libarc4 cbc ecb algif_skcipher sha256_generic libsha256 sha1_generic hmac aes_generic libaes cmac sha512_generic md5 md4 algif_hash af_alg i2c_imx i2c_core ci_hdrc_imx ci_hdrc mxs_dcp ulpi roles udc_core imx_sdma usbmisc_imx usb_common firmware_class virt_dma phy_mxs_usb nf_tables nfnetlink ip_tables x_tables ipv6 autofs4
+[   68.950741] CPU: 0 PID: 139 Comm: mxs_dcp_chan/ae Not tainted 5.10.34 #296
+[   68.958501] Hardware name: Freescale i.MX6 Ultralite (Device Tree)
+[   68.964710] PC is at memcpy+0xa8/0x330
+[   68.968479] LR is at 0xd7b2bc9d
+[   68.971638] pc : [<c053e7c8>]    lr : [<d7b2bc9d>]    psr: 000f0013
+[   68.977920] sp : c2cbbee4  ip : 00000010  fp : 00000010
+[   68.983159] r10: 00000000  r9 : c3283a40  r8 : 1a5a6f08
+[   68.988402] r7 : 4bfe0ecc  r6 : 76d8a220  r5 : c32f9050  r4 : 00000001
+[   68.994945] r3 : 00000ab8  r2 : fffffff0  r1 : c32f9050  r0 : 00000ab8
+[   69.001492] Flags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+[   69.008646] Control: 10c53c7d  Table: 83664059  DAC: 00000051
+[   69.014414] Process mxs_dcp_chan/ae (pid: 139, stack limit = 0x667b57ab)
+[   69.021133] Stack: (0xc2cbbee4 to 0xc2cbc000)
+[   69.025519] bee0:          c32f9050 c3235408 00000010 00000010 00000ab8 00000001 bf10406c
+[   69.033720] bf00: 00000000 00000000 00000010 00000000 c32355d0 832fb080 00000000 c13de2fc
+[   69.041921] bf20: c3628010 00000010 c33d5780 00000ab8 bf1067e8 00000002 c21e5010 c2cba000
+[   69.050125] bf40: c32f8040 00000000 bf106a40 c32f9040 c3283a80 00000001 bf105240 c3234040
+[   69.058327] bf60: ffffe000 c3204100 c2c69800 c2cba000 00000000 bf103b84 00000000 c2eddc54
+[   69.066530] bf80: c3204144 c0140d1c c2cba000 c2c69800 c0140be8 00000000 00000000 00000000
+[   69.074730] bfa0: 00000000 00000000 00000000 c0100114 00000000 00000000 00000000 00000000
+[   69.082932] bfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[   69.091131] bfe0: 00000000 00000000 00000000 00000000 00000013 00000000 00000000 00000000
+[   69.099364] [<c053e7c8>] (memcpy) from [<bf10406c>] (dcp_chan_thread_aes+0x4e8/0x840 [mxs_dcp])
+[   69.108117] [<bf10406c>] (dcp_chan_thread_aes [mxs_dcp]) from [<c0140d1c>] (kthread+0x134/0x160)
+[   69.116941] [<c0140d1c>] (kthread) from [<c0100114>] (ret_from_fork+0x14/0x20)
+[   69.124178] Exception stack(0xc2cbbfb0 to 0xc2cbbff8)
+[   69.129250] bfa0:                                     00000000 00000000 00000000 00000000
+[   69.137450] bfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[   69.145648] bfe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[   69.152289] Code: e320f000 e4803004 e4804004 e4805004 (e4806004)
 
 Signed-off-by: Sean Anderson <sean.anderson@seco.com>
 ---
 
- drivers/crypto/mxs-dcp.c | 45 +++++++++++++++++++++++++++++++---------
- 1 file changed, 35 insertions(+), 10 deletions(-)
+ drivers/crypto/mxs-dcp.c | 34 +++++++++++-----------------------
+ 1 file changed, 11 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index d6a7784d2988..f397cc5bf102 100644
+index f397cc5bf102..5d2670a70e46 100644
 --- a/drivers/crypto/mxs-dcp.c
 +++ b/drivers/crypto/mxs-dcp.c
-@@ -170,15 +170,19 @@ static struct dcp *global_sdcp;
+@@ -300,20 +300,18 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
  
- static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
- {
-+	int dma_err;
- 	struct dcp *sdcp = global_sdcp;
- 	const int chan = actx->chan;
- 	uint32_t stat;
- 	unsigned long ret;
- 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
--
- 	dma_addr_t desc_phys = dma_map_single(sdcp->dev, desc, sizeof(*desc),
- 					      DMA_TO_DEVICE);
+ 	struct scatterlist *dst = req->dst;
+ 	struct scatterlist *src = req->src;
+-	const int nents = sg_nents(req->src);
++	struct sg_mapping_iter dst_iter;
  
-+	dma_err = dma_mapping_error(sdcp->dev, desc_phys);
-+	if (dma_err)
-+		return dma_err;
-+
- 	reinit_completion(&sdcp->completion[chan]);
+ 	const int out_off = DCP_BUF_SZ;
+ 	uint8_t *in_buf = sdcp->coh->aes_in_buf;
+ 	uint8_t *out_buf = sdcp->coh->aes_out_buf;
  
- 	/* Clear status register. */
-@@ -216,18 +220,29 @@ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
- static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
- 			   struct skcipher_request *req, int init)
- {
-+	dma_addr_t key_phys, src_phys, dst_phys;
- 	struct dcp *sdcp = global_sdcp;
- 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
- 	struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
- 	int ret;
+-	uint8_t *out_tmp, *src_buf, *dst_buf = NULL;
+-	uint32_t dst_off = 0;
++	uint8_t *out_tmp, *src_buf = NULL;
+ 	uint32_t last_out_len = 0;
  
--	dma_addr_t key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
--					     2 * AES_KEYSIZE_128,
--					     DMA_TO_DEVICE);
--	dma_addr_t src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
--					     DCP_BUF_SZ, DMA_TO_DEVICE);
--	dma_addr_t dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
--					     DCP_BUF_SZ, DMA_FROM_DEVICE);
-+	key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
-+				  2 * AES_KEYSIZE_128, DMA_TO_DEVICE);
-+	ret = dma_mapping_error(sdcp->dev, key_phys);
-+	if (ret)
-+		return ret;
-+
-+	src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
-+				  DCP_BUF_SZ, DMA_TO_DEVICE);
-+	ret = dma_mapping_error(sdcp->dev, src_phys);
-+	if (ret)
-+		goto err_src;
-+
-+	dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
-+				  DCP_BUF_SZ, DMA_FROM_DEVICE);
-+	ret = dma_mapping_error(sdcp->dev, dst_phys);
-+	if (ret)
-+		goto err_dst;
+ 	uint8_t *key = sdcp->coh->aes_key;
  
- 	if (actx->fill % AES_BLOCK_SIZE) {
- 		dev_err(sdcp->dev, "Invalid block size!\n");
-@@ -265,10 +280,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
- 	ret = mxs_dcp_start_dma(actx);
- 
- aes_done_run:
-+	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
-+err_dst:
-+	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
-+err_src:
- 	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
- 			 DMA_TO_DEVICE);
--	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
--	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
- 
- 	return ret;
- }
-@@ -557,6 +574,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
- 	dma_addr_t buf_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_in_buf,
- 					     DCP_BUF_SZ, DMA_TO_DEVICE);
- 
-+	ret = dma_mapping_error(sdcp->dev, buf_phys);
-+	if (ret)
-+		return ret;
-+
- 	/* Fill in the DMA descriptor. */
- 	desc->control0 = MXS_DCP_CONTROL0_DECR_SEMAPHORE |
- 		    MXS_DCP_CONTROL0_INTERRUPT |
-@@ -589,6 +610,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
- 	if (rctx->fini) {
- 		digest_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_out_buf,
- 					     DCP_SHA_PAY_SZ, DMA_FROM_DEVICE);
-+		ret = dma_mapping_error(sdcp->dev, digest_phys);
-+		if (ret)
-+			goto done_run;
-+
- 		desc->control0 |= MXS_DCP_CONTROL0_HASH_TERM;
- 		desc->payload = digest_phys;
+ 	int ret = 0;
+-	int split = 0;
+ 	unsigned int i, len, clen, rem = 0, tlen = 0;
+ 	int init = 0;
+ 	bool limit_hit = false;
+@@ -332,7 +330,8 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 		memset(key + AES_KEYSIZE_128, 0, AES_KEYSIZE_128);
  	}
+ 
+-	for_each_sg(req->src, src, nents, i) {
++	sg_miter_start(&dst_iter, dst, sg_nents(dst), SG_MITER_TO_SG);
++	for_each_sg(req->src, src, sg_nents(src), i) {
+ 		src_buf = sg_virt(src);
+ 		len = sg_dma_len(src);
+ 		tlen += len;
+@@ -357,7 +356,7 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 			 * submit the buffer.
+ 			 */
+ 			if (actx->fill == out_off || sg_is_last(src) ||
+-				limit_hit) {
++			    limit_hit) {
+ 				ret = mxs_dcp_run_aes(actx, req, init);
+ 				if (ret)
+ 					return ret;
+@@ -365,25 +364,13 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 
+ 				out_tmp = out_buf;
+ 				last_out_len = actx->fill;
+-				while (dst && actx->fill) {
+-					if (!split) {
+-						dst_buf = sg_virt(dst);
+-						dst_off = 0;
+-					}
+-					rem = min(sg_dma_len(dst) - dst_off,
+-						  actx->fill);
+-
+-					memcpy(dst_buf + dst_off, out_tmp, rem);
++
++				while (sg_miter_next(&dst_iter) && actx->fill) {
++					rem = min(dst_iter.length, actx->fill);
++
++					memcpy(dst_iter.addr, out_tmp, rem);
+ 					out_tmp += rem;
+-					dst_off += rem;
+ 					actx->fill -= rem;
+-
+-					if (dst_off == sg_dma_len(dst)) {
+-						dst = sg_next(dst);
+-						split = 0;
+-					} else {
+-						split = 1;
+-					}
+ 				}
+ 			}
+ 		} while (len);
+@@ -391,6 +378,7 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 		if (limit_hit)
+ 			break;
+ 	}
++	sg_miter_stop(&dst_iter);
+ 
+ 	/* Copy the IV for CBC for chaining */
+ 	if (!rctx->ecb) {
 -- 
 2.25.1
 
