@@ -2,122 +2,146 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B8BC49361
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 06:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4684BC48BDF
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 07:50:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C687F6023F
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 06:08:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28D7B613B9
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 07:50:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232383AbhFRGKg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Jun 2021 02:10:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45418 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232270AbhFRGKg (ORCPT
+        id S233325AbhFRHwI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Jun 2021 03:52:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57958 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231449AbhFRHwI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Jun 2021 02:10:36 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87C47C061574;
-        Thu, 17 Jun 2021 23:08:27 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0dd800c1c0f109d0ca36f4.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:d800:c1c0:f109:d0ca:36f4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0C0031EC0527;
-        Fri, 18 Jun 2021 08:08:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1623996506;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=8nhiIyd0UfJ51I2mU8e1o3cOfn6a+lJAiwXGrRATjfQ=;
-        b=gLOiSEFoAu3J7Hu9gnfMHFwA24+s3/87n4JIQn9IVDbmQVOI/gWUr6HIJ+qJpXJd0+Amid
-        rFN/qnWzoWxg0GTgjsGo+YkQHI4ObOZHxfJpgWdzJGZPR3N1hPHmmlGKVT57c9THN1OEkG
-        2u2NqZqAOMZN3IY2Fi+OvPgnMh/6S1Y=
-Date:   Fri, 18 Jun 2021 08:08:17 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
- address to setup_header
-Message-ID: <YMw4UZn6AujpPSZO@zn.tnic>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-21-brijesh.singh@amd.com>
+        Fri, 18 Jun 2021 03:52:08 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15I7XnRa161809;
+        Fri, 18 Jun 2021 03:49:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=dTIZ5axw1NujsOwjATMsWE2BYptzs1vQcDRoq+UzODc=;
+ b=iKTGuRJGcMJlsSjyQ0h1w3xc7lYS2wKMe3kBH0g51YT1ORK8ddRKk8kUwQNWD28iGms9
+ tCw4KcBSZvm+uOSsImlHkayo9CEwGpsHx9lViY58WjJG0xvKsNrIfcEG0xemV6Pkllst
+ RDuzs8PAYtDkxwFThFec4ahLG28Xkns/+B4d1Ke+kyHSoeOaU8D4jzl5cjeS2VFIH75k
+ T9nBRkSEow12WzUEk8vHEw6skUD0Zp546jgmOCUKwK6r3t99RpKgM10JwvIEQ8Q1VPh/
+ Cj/gc6eiuhFNfNdlgYQaDgQLRLUqH0uYNkvL/1OjelOA8pQxbldNVljttrsQBBSBj2+S pg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 398nktkaxv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Jun 2021 03:49:46 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15I7YpSB168121;
+        Fri, 18 Jun 2021 03:49:46 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 398nktkaxj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Jun 2021 03:49:46 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15I7haP4005960;
+        Fri, 18 Jun 2021 07:49:45 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma01wdc.us.ibm.com with ESMTP id 394mj9yk4x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Jun 2021 07:49:45 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15I7niNQ32833936
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 18 Jun 2021 07:49:44 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 252D5C605D;
+        Fri, 18 Jun 2021 07:49:44 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ADA21C605B;
+        Fri, 18 Jun 2021 07:49:42 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.160.180.39])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 18 Jun 2021 07:49:42 +0000 (GMT)
+Message-ID: <0d6ca1ec553a61b219f42ebf6699dd6c56e2e978.camel@linux.ibm.com>
+Subject: Re: [PATCH v6 12/17] powerpc/pseries/vas: Integrate API with
+ open/close windows
+From:   Haren Myneni <haren@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au
+Cc:     haren@us.ibm.com, hbabu@us.ibm.com
+Date:   Fri, 18 Jun 2021 00:49:40 -0700
+In-Reply-To: <1623971609.844odc55aw.astroid@bobo.none>
+References: <827bf56dce09620ebecd8a00a5f97105187a6205.camel@linux.ibm.com>
+         <e8d956bace3f182c4d2e66e343ff37cb0391d1fd.camel@linux.ibm.com>
+         <1623971609.844odc55aw.astroid@bobo.none>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210602140416.23573-21-brijesh.singh@amd.com>
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: S-sC37TKa9kPXiwhITFGlx0mpRHLq70M
+X-Proofpoint-ORIG-GUID: q7BpOxNwB48C9HNNG4XB9yOINExUJ77G
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-17_17:2021-06-15,2021-06-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 phishscore=0 malwarescore=0 suspectscore=0 bulkscore=0
+ spamscore=0 mlxlogscore=999 adultscore=0 lowpriorityscore=0 mlxscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106180042
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 02, 2021 at 09:04:14AM -0500, Brijesh Singh wrote:
-> While launching the encrypted guests, the hypervisor may need to provide
-> some additional information that will used during the guest boot. In the
-> case of AMD SEV-SNP the information includes the address of the secrets
-> and CPUID pages. The secrets page contains information such as a VM to
-> PSP communication key and CPUID page contain PSP filtered CPUID values.
+On Fri, 2021-06-18 at 09:22 +1000, Nicholas Piggin wrote:
+> Excerpts from Haren Myneni's message of June 18, 2021 6:36 am:
+> > This patch adds VAS window allocatioa/close with the corresponding
+> > hcalls. Also changes to integrate with the existing user space VAS
+> > API and provide register/unregister functions to NX pseries driver.
+> > 
+> > The driver register function is used to create the user space
+> > interface (/dev/crypto/nx-gzip) and unregister to remove this
+> > entry.
+> > 
+> > The user space process opens this device node and makes an ioctl
+> > to allocate VAS window. The close interface is used to deallocate
+> > window.
+> > 
+> > Signed-off-by: Haren Myneni <haren@linux.ibm.com>
 > 
-> When booting under the EFI based BIOS, the EFI configuration table
-> contains an entry for the confidential computing blob. In order to support
-> booting encrypted guests on non EFI VM, the hypervisor to pass these
-> additional information to the kernel with different method.
+> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
 > 
-> For this purpose expand the struct setup_header to hold the physical
-> address of the confidential computing blob location. Being zero means it
-> isn't passed.
+> Unless there is some significant performance reason it might be
+> simplest
+> to take the mutex for the duration of the allocate and frees rather
+> than 
+> taking it several times, covering the atomic with the lock instead.
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  Documentation/x86/boot.rst            | 27 +++++++++++++++++++++++++++
->  arch/x86/boot/header.S                |  7 ++++++-
->  arch/x86/include/uapi/asm/bootparam.h |  1 +
->  3 files changed, 34 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/x86/boot.rst b/Documentation/x86/boot.rst
-> index fc844913dece..9b32805617bb 100644
-> --- a/Documentation/x86/boot.rst
-> +++ b/Documentation/x86/boot.rst
-> @@ -75,6 +75,8 @@ Protocol 2.14	BURNT BY INCORRECT COMMIT
->  		DO NOT USE!!! ASSUME SAME AS 2.13.
->  
->  Protocol 2.15	(Kernel 5.5) Added the kernel_info and kernel_info.setup_type_max.
-> +
-> +Protocol 2.16	(Kernel 5.14) Added the confidential computing blob address
->  =============	============================================================
->  
->  .. note::
-> @@ -226,6 +228,7 @@ Offset/Size	Proto		Name			Meaning
->  0260/4		2.10+		init_size		Linear memory required during initialization
->  0264/4		2.11+		handover_offset		Offset of handover entry point
->  0268/4		2.15+		kernel_info_offset	Offset of the kernel_info
-> +026C/4		2.16+		cc_blob_address	        Physical address of the confidential computing blob
+> You have a big lock, might as well use it and not have to wonder what
+> if 
+> things race here or there.
 
-Why is this a separate thing instead of being passed as setup_data?
+Using mutex to protect allocate/deallocate window and setup/free IRQ,
+also to protect updating the list. We do not need lock for modify
+window hcall and other things. Hence taking mutex several times. Also
+used atomic for counters (used_lpar_creds) which can be exported in
+sysfs (this patch will be added later in next enhancement seris). 
 
--- 
-Regards/Gruss,
-    Boris.
+Genarlly applications open window initially, do continuous copy/paste
+operations and close window later. But possible that the library /
+application to open/close window for each request. Also may be opening
+or closing multiple windows (say 1000 depends on cores on the system)
+at the same time. These cases may affect the application performance.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks
+Haren
+
+> 
+> But don't rework that now, maybe just something to consider for
+> later.
+> 
+> Thanks,
+> Nick
+> 
+
