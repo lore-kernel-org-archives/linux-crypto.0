@@ -2,304 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F23CC2B9F4
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 02:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD016C49EA3
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 05:46:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EDA27613BD
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 02:09:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CA556054E
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 05:46:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231536AbhFRCL2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Jun 2021 22:11:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25418 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231289AbhFRCL2 (ORCPT
+        id S232274AbhFRFs7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Jun 2021 01:48:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40686 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229671AbhFRFs7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jun 2021 22:11:28 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15I23PoW122777;
-        Thu, 17 Jun 2021 22:09:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=CDvDUJ9lGuEW5fVkMiSdllq6N5HsFkKaefCea8olEq8=;
- b=eL+S4PBN1iQsweJKQ9bBAubz64WXn0nRrVI3/IgR97s7k3kwiEzgskakNT2mSQlE1HCS
- XSgbkYavYxMjDL7mNS2FyvT5FWUk/b0OlvBhW52+HAFuE+lfG5cd9z8c3EN/tFQGkwpX
- u88W3e89hgPxHAec1u0botmY5W2edhMgTtN7GSjmrQQmqxFEGhVjYqIpgz8U9Mlvufjc
- cKVJRd4zxfzlKh6q7+cBmeA4ZgDARl3eIvthtMf7MAan4CE5/A4IVKQ1+8BIfUXoXj41
- UqeZnl1uWEPES6fMl43HWQGxb0bmQzWziEJ3JNYuXnH8RgeWFhUwLHmGlGruVcwKrg6R Kw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 398gy0a5c8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Jun 2021 22:09:08 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15I23mQo124028;
-        Thu, 17 Jun 2021 22:09:07 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 398gy0a5bw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Jun 2021 22:09:07 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15I21nZk010160;
-        Fri, 18 Jun 2021 02:09:06 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma03dal.us.ibm.com with ESMTP id 394mjah2kp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Jun 2021 02:09:06 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15I295Hf24641942
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Jun 2021 02:09:05 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8FBF313605D;
-        Fri, 18 Jun 2021 02:09:05 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 47907136055;
-        Fri, 18 Jun 2021 02:09:04 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.160.180.39])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 18 Jun 2021 02:09:04 +0000 (GMT)
-Message-ID: <a19e7839316c9ec4f7901e97b551fcf4219de82f.camel@linux.ibm.com>
-Subject: Re: [PATCH v6 13/17] powerpc/pseries/vas: Setup IRQ and fault
- handling
-From:   Haren Myneni <haren@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        mpe@ellerman.id.au
-Cc:     haren@us.ibm.com, hbabu@us.ibm.com
-Date:   Thu, 17 Jun 2021 19:09:01 -0700
-In-Reply-To: <1623972635.u8jj6g26re.astroid@bobo.none>
-References: <827bf56dce09620ebecd8a00a5f97105187a6205.camel@linux.ibm.com>
-         <b8fc66dcb783d06a099a303e5cfc69087bb3357a.camel@linux.ibm.com>
-         <1623972635.u8jj6g26re.astroid@bobo.none>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
+        Fri, 18 Jun 2021 01:48:59 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEF98C061574;
+        Thu, 17 Jun 2021 22:46:50 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0dd800c1c0f109d0ca36f4.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:d800:c1c0:f109:d0ca:36f4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 739671EC054F;
+        Fri, 18 Jun 2021 07:46:49 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1623995209;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Z2NcsQEXbnE2U0G6jQczPtJMf0zCLQ336536FRXg81M=;
+        b=gf8n4odDGWXwGJEBtSR/Ph2wRe/dCxc/qC6TznTV/wZrAPIanM6DBG6ZnaRQcHTW2w7jNL
+        7X76OBMJf6LrsqYa+IVNSsAA0wJdWACrEla2WhdlZQLbax/a9Joo5Vv5xqQ+MarhLrZCi2
+        E5aBSMueO9iMceLUivF9j6PX26bQGqo=
+Date:   Fri, 18 Jun 2021 07:46:38 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 06/22] x86/sev: check SEV-SNP features
+ support
+Message-ID: <YMwzPjV9s/6qW75m@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-7-brijesh.singh@amd.com>
+ <YL4zJT1v6OuH+tvI@zn.tnic>
+ <e617a0a1-bb8d-9d75-56a4-2ac1138ebf8b@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: PzkMWa4scMM60VapGycZCKD4jBky2VXF
-X-Proofpoint-GUID: L-6EETqXBBZPgrS1ivjT0QnKbUva0FnR
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-17_17:2021-06-15,2021-06-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- spamscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501 phishscore=0
- malwarescore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106180008
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e617a0a1-bb8d-9d75-56a4-2ac1138ebf8b@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2021-06-18 at 09:34 +1000, Nicholas Piggin wrote:
-> Excerpts from Haren Myneni's message of June 18, 2021 6:37 am:
-> > NX generates an interrupt when sees a fault on the user space
-> > buffer and the hypervisor forwards that interrupt to OS. Then
-> > the kernel handles the interrupt by issuing H_GET_NX_FAULT hcall
-> > to retrieve the fault CRB information.
-> > 
-> > This patch also adds changes to setup and free IRQ per each
-> > window and also handles the fault by updating the CSB.
+On Thu, Jun 17, 2021 at 01:46:08PM -0500, Brijesh Singh wrote:
+> Based on your feedback on AP creation patch to not use the accessors, I am inclined to
+> remove this helper and have the caller directly check the feature bit, is that okay ?
 > 
-> In as much as this pretty well corresponds to the PowerNV code
-> AFAIKS,
-> it looks okay to me.
+> something like:
 > 
-> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+> if (sev_snp_enabled() && !(hv_features & GHCB_HV_FT_SNP))
+> 	sev_es_terminate(GHCB_SNP_UNSUPPORTED);
 > 
-> Could you have an irq handler in your ops vector and have 
-> the core code set up the irq and call your handler, so the Linux irq
-> handling is in one place? Not something for this series, I was just
-> wondering.
+> Let me know if you think I should still keep the accessors.
 
-Not possible to have common core code for IRQ  setup. 
+Yeah, looks about right. Let's keep hv_features in a sev-specific
+header so that there are no name clashes. Or maybe we should call it
+sev_hv_features since it is going to be read-only anyway.
 
-PowerNV: Every VAS instance will be having IRQ and this setup will be
-done during initialization (system boot). A fault FIFO will be assigned
-for each instance and registered to VAS so that VAS/NX writes fault CRB
-into this FIFO.  
+Thx.
 
-PowerVM: Each window will have an IRQ and the setup will be done during
-window open. 
+-- 
+Regards/Gruss,
+    Boris.
 
-Thanks
-Haren
-
-> 
-> Thanks,
-> Nick
-> 
-> > Signed-off-by: Haren Myneni <haren@linux.ibm.com>
-> > ---
-> >  arch/powerpc/platforms/pseries/vas.c | 102
-> > +++++++++++++++++++++++++++
-> >  1 file changed, 102 insertions(+)
-> > 
-> > diff --git a/arch/powerpc/platforms/pseries/vas.c
-> > b/arch/powerpc/platforms/pseries/vas.c
-> > index f5a44f2f0e99..3385b5400cc6 100644
-> > --- a/arch/powerpc/platforms/pseries/vas.c
-> > +++ b/arch/powerpc/platforms/pseries/vas.c
-> > @@ -11,6 +11,7 @@
-> >  #include <linux/types.h>
-> >  #include <linux/delay.h>
-> >  #include <linux/slab.h>
-> > +#include <linux/interrupt.h>
-> >  #include <asm/machdep.h>
-> >  #include <asm/hvcall.h>
-> >  #include <asm/plpar_wrappers.h>
-> > @@ -155,6 +156,50 @@ int h_query_vas_capabilities(const u64 hcall,
-> > u8 query_type, u64 result)
-> >  }
-> >  EXPORT_SYMBOL_GPL(h_query_vas_capabilities);
-> >  
-> > +/*
-> > + * hcall to get fault CRB from the hypervisor.
-> > + */
-> > +static int h_get_nx_fault(u32 winid, u64 buffer)
-> > +{
-> > +	long rc;
-> > +
-> > +	rc = plpar_hcall_norets(H_GET_NX_FAULT, winid, buffer);
-> > +
-> > +	if (rc == H_SUCCESS)
-> > +		return 0;
-> > +
-> > +	pr_err("H_GET_NX_FAULT error: %ld, winid %u, buffer 0x%llx\n",
-> > +		rc, winid, buffer);
-> > +	return -EIO;
-> > +
-> > +}
-> > +
-> > +/*
-> > + * Handle the fault interrupt.
-> > + * When the fault interrupt is received for each window, query the
-> > + * hypervisor to get the fault CRB on the specific fault. Then
-> > + * process the CRB by updating CSB or send signal if the user
-> > space
-> > + * CSB is invalid.
-> > + * Note: The hypervisor forwards an interrupt for each fault
-> > request.
-> > + *	So one fault CRB to process for each H_GET_NX_FAULT hcall.
-> > + */
-> > +irqreturn_t pseries_vas_fault_thread_fn(int irq, void *data)
-> > +{
-> > +	struct pseries_vas_window *txwin = data;
-> > +	struct coprocessor_request_block crb;
-> > +	struct vas_user_win_ref *tsk_ref;
-> > +	int rc;
-> > +
-> > +	rc = h_get_nx_fault(txwin->vas_win.winid,
-> > (u64)virt_to_phys(&crb));
-> > +	if (!rc) {
-> > +		tsk_ref = &txwin->vas_win.task_ref;
-> > +		vas_dump_crb(&crb);
-> > +		vas_update_csb(&crb, tsk_ref);
-> > +	}
-> > +
-> > +	return IRQ_HANDLED;
-> > +}
-> > +
-> >  /*
-> >   * Allocate window and setup IRQ mapping.
-> >   */
-> > @@ -166,10 +211,51 @@ static int allocate_setup_window(struct
-> > pseries_vas_window *txwin,
-> >  	rc = h_allocate_vas_window(txwin, domain, wintype,
-> > DEF_WIN_CREDS);
-> >  	if (rc)
-> >  		return rc;
-> > +	/*
-> > +	 * On PowerVM, the hypervisor setup and forwards the fault
-> > +	 * interrupt per window. So the IRQ setup and fault handling
-> > +	 * will be done for each open window separately.
-> > +	 */
-> > +	txwin->fault_virq = irq_create_mapping(NULL, txwin->fault_irq);
-> > +	if (!txwin->fault_virq) {
-> > +		pr_err("Failed irq mapping %d\n", txwin->fault_irq);
-> > +		rc = -EINVAL;
-> > +		goto out_win;
-> > +	}
-> > +
-> > +	txwin->name = kasprintf(GFP_KERNEL, "vas-win-%d",
-> > +				txwin->vas_win.winid);
-> > +	if (!txwin->name) {
-> > +		rc = -ENOMEM;
-> > +		goto out_irq;
-> > +	}
-> > +
-> > +	rc = request_threaded_irq(txwin->fault_virq, NULL,
-> > +				  pseries_vas_fault_thread_fn,
-> > IRQF_ONESHOT,
-> > +				  txwin->name, txwin);
-> > +	if (rc) {
-> > +		pr_err("VAS-Window[%d]: Request IRQ(%u) failed with
-> > %d\n",
-> > +		       txwin->vas_win.winid, txwin->fault_virq, rc);
-> > +		goto out_free;
-> > +	}
-> >  
-> >  	txwin->vas_win.wcreds_max = DEF_WIN_CREDS;
-> >  
-> >  	return 0;
-> > +out_free:
-> > +	kfree(txwin->name);
-> > +out_irq:
-> > +	irq_dispose_mapping(txwin->fault_virq);
-> > +out_win:
-> > +	h_deallocate_vas_window(txwin->vas_win.winid);
-> > +	return rc;
-> > +}
-> > +
-> > +static inline void free_irq_setup(struct pseries_vas_window
-> > *txwin)
-> > +{
-> > +	free_irq(txwin->fault_virq, txwin);
-> > +	kfree(txwin->name);
-> > +	irq_dispose_mapping(txwin->fault_virq);
-> >  }
-> >  
-> >  static struct vas_window *vas_allocate_window(int vas_id, u64
-> > flags,
-> > @@ -284,6 +370,11 @@ static struct vas_window
-> > *vas_allocate_window(int vas_id, u64 flags,
-> >  	return &txwin->vas_win;
-> >  
-> >  out_free:
-> > +	/*
-> > +	 * Window is not operational. Free IRQ before closing
-> > +	 * window so that do not have to hold mutex.
-> > +	 */
-> > +	free_irq_setup(txwin);
-> >  	h_deallocate_vas_window(txwin->vas_win.winid);
-> >  out:
-> >  	atomic_dec(&cop_feat_caps->used_lpar_creds);
-> > @@ -303,7 +394,18 @@ static int deallocate_free_window(struct
-> > pseries_vas_window *win)
-> >  {
-> >  	int rc = 0;
-> >  
-> > +	/*
-> > +	 * The hypervisor waits for all requests including faults
-> > +	 * are processed before closing the window - Means all
-> > +	 * credits have to be returned. In the case of fault
-> > +	 * request, a credit is returned after OS issues
-> > +	 * H_GET_NX_FAULT hcall.
-> > +	 * So free IRQ after executing H_DEALLOCATE_VAS_WINDOW
-> > +	 * hcall.
-> > +	 */
-> >  	rc = h_deallocate_vas_window(win->vas_win.winid);
-> > +	if (!rc)
-> > +		free_irq_setup(win);
-> >  
-> >  	return rc;
-> >  }
-> > -- 
-> > 2.18.2
-> > 
-> > 
-> > 
-
+https://people.kernel.org/tglx/notes-about-netiquette
