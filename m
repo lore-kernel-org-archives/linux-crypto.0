@@ -2,85 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F4D2C48BDF
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 09:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B081C48BE8
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 09:47:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23739613ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 09:36:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C957613D5
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 09:47:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229523AbhFRJjA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Jun 2021 05:39:00 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:11064 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232806AbhFRJi7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Jun 2021 05:38:59 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4G5tz36kxKzZgD6;
-        Fri, 18 Jun 2021 17:33:51 +0800 (CST)
-Received: from dggema769-chm.china.huawei.com (10.1.198.211) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Fri, 18 Jun 2021 17:36:48 +0800
-Received: from localhost (10.174.179.215) by dggema769-chm.china.huawei.com
- (10.1.198.211) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Fri, 18
- Jun 2021 17:36:47 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     <ulli.kroll@googlemail.com>, <linus.walleij@linaro.org>,
-        <clabbe@baylibre.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH v2 -next] crypto: sl3516 - Fix build warning without CONFIG_PM
-Date:   Fri, 18 Jun 2021 17:35:51 +0800
-Message-ID: <20210618093551.23748-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+        id S232399AbhFRJtN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Jun 2021 05:49:13 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:34154 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230399AbhFRJtL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jun 2021 05:49:11 -0400
+Received: from zn.tnic (p200300ec2f0dd8004fc95bebb5201001.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:d800:4fc9:5beb:b520:1001])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6F1EC1EC0559;
+        Fri, 18 Jun 2021 11:46:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1624009601;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=fhCS1VjB+E7C2WKgFiWhTOQPZHXnjbEcqr3FRlWi0xU=;
+        b=mVNHyRCG/AgGBIUULY2n0rYyqbBpwtuaHTqg5MgQ8DzjcE9TF4eqo9kb51Zi7yIPdYmL1j
+        UmVDFMG5XYUnevK4WKpCAJrbwegX9Q43eENYMOjzOw/qYPF1y04M24QPeRJ9ZYw+hFFVzJ
+        pl8wgyAk+mMAdq8y2SXzcZsoQS0G0Ek=
+Date:   Fri, 18 Jun 2021 11:46:31 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 21/22] x86/sev: Register SNP guest request
+ platform device
+Message-ID: <YMxrd5M1teku/hnA@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-22-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggema769-chm.china.huawei.com (10.1.198.211)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210602140416.23573-22-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-drivers/crypto/gemini/sl3516-ce-core.c:345:12:
- warning: ‘sl3516_ce_pm_resume’ defined but not used [-Wunused-function]
- static int sl3516_ce_pm_resume(struct device *dev)
-            ^~~~~~~~~~~~~~~~~~~
+On Wed, Jun 02, 2021 at 09:04:15AM -0500, Brijesh Singh wrote:
+>  arch/x86/include/asm/sev.h      |  12 +++
+>  arch/x86/include/uapi/asm/svm.h |   2 +
+>  arch/x86/kernel/sev.c           | 176 ++++++++++++++++++++++++++++++++
+>  arch/x86/platform/efi/efi.c     |   2 +
+>  include/linux/efi.h             |   1 +
+>  include/linux/sev-guest.h       |  76 ++++++++++++++
+>  6 files changed, 269 insertions(+)
+>  create mode 100644 include/linux/sev-guest.h
 
-The driver needs PM, otherwise clock and resets are never set.
-So make it depends on PM to fix this warning.
+This patch is at least three patches in one:
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-Suggested-by: LABBE Corentin <clabbe@baylibre.com>
----
-v2: Using depends on PM instead of #ifdef macro
+1. EFI changes
+2. SNP_GUEST_REQUEST struct etc definitions
+3. Add the functionality.
 
- drivers/crypto/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+Please split it this way before I take a look.
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 99b090790178..6f14f39d32e3 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -273,6 +273,7 @@ config CRYPTO_DEV_SL3516
- 	select CRYPTO_ECB
- 	select CRYPTO_AES
- 	select HW_RANDOM
-+	depends on PM
- 	help
- 	  This option allows you to have support for SL3516 crypto offloader.
- 
+Thx.
+
 -- 
-2.17.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
