@@ -2,85 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7AD2C48BDF
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 15:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DEE0C48BE8
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 18:02:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F48D613BA
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 15:05:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35FEF613EE
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 18:02:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232704AbhFRPHy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Jun 2021 11:07:54 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:55038 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229550AbhFRPHx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Jun 2021 11:07:53 -0400
-Received: from zn.tnic (p200300ec2f0dd800f1d29af1870b9e89.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:d800:f1d2:9af1:870b:9e89])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E16551EC0529;
-        Fri, 18 Jun 2021 17:05:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1624028743;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=DAkmjtSEjAQW5/oSQSGY2SJZEOQXFtsl+lpahSbt7CM=;
-        b=Ol1RhoAL2zOpnn55wSrncRMqg5PShyikP6yN9Dd9Spb+mo2L1xWn7DUx8YDT6MBohBRh4j
-        r4JUcLI0Bq1CtLIQIkucqpI/IRSrlQ8P5Qg6k9hoOVYEc08pew3bLadc5ekrVfBLtZef1X
-        N+VDfH4YnAnzuSIy9dUDc4cKbLo9mC4=
-Date:   Fri, 18 Jun 2021 17:05:28 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
- address to setup_header
-Message-ID: <YMy2OGwsRzrR5bwD@zn.tnic>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-21-brijesh.singh@amd.com>
- <YMw4UZn6AujpPSZO@zn.tnic>
- <15568c80-c9a9-5602-d940-264af87bed98@amd.com>
+        id S233942AbhFRSEX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Jun 2021 14:04:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37076 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230512AbhFRSEX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jun 2021 14:04:23 -0400
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73EDBC061574
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Jun 2021 11:02:13 -0700 (PDT)
+Received: by mail-ot1-x334.google.com with SMTP id v22-20020a0568301416b029044e2d8e855eso1306271otp.8
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Jun 2021 11:02:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gm6MYYB9NnNxdkRuQyLBTfy2a1l9+kymVbo6dLCaxp8=;
+        b=IX/TeFICHe0M9eY2FgHiWrn+tdb/q5XFgD8uXsgjTWA8ccYLhwkhmj5LVksZqDuyP/
+         WO98d4+EqUEGVeNVRkwGXvDR2KFUUsjHgWYsSZNspeMbY0pyo5tCDjX5g3a0S5zJVn5J
+         VVQVThsNKNWwgywn+UIOieUM+TDA8ZHnfFAZ0UJx9g4jXc4QSs4THTGKFETKMbtCQOhC
+         oohAmV/ouLnwljoWkk30lA1Ew7AeSHyL7YWAUXHRppPW6exwVxxl6v4oWTx8GoKtepVU
+         0FuNut9qWjAnX/+VsjdAfRTl/lf12Qwyt/IudALVfQNQswOIeBJ2fnVR25hgKkqCacht
+         +gLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gm6MYYB9NnNxdkRuQyLBTfy2a1l9+kymVbo6dLCaxp8=;
+        b=HlMmUfKNs8+Swz0UBeiFH8rP9I3QHBh0taFDuEKD3Nxkn8SXfejYtK3T9GPpR8lt4G
+         NkxXasDJjVk6+8svK/4NrnUWS0kcIN5sycsH/SLLN0H62bXjDyyKSSF34ooVS1jjuuDC
+         /15aDxcgDn3o+fOD4vPUhm/K4+NRJYZImlETEh8BGWc3MuRFxdfBIdCUQH1+sFXOHcSc
+         DFKH443N1SbHDfJscTjGwCpDWiqoWqYbA6iK6FbDCmO8HLid9ywjl/mOSnEzV9KQTd4X
+         QgS0ZgluBKmrINH7uTiVA/BLJwpm7R8KYWKqsAWRDFWf9KebmcwHdlqCixxCOYXZ0nJr
+         4ecQ==
+X-Gm-Message-State: AOAM531IsQtnMZ5y09PRn/en+VmNs782L24e0VQVg2EHJWc4SsyPWeck
+        54c2xkGOd1xXpufy3vhuXpeFlyg2PYC0yg+j8KQCzg==
+X-Google-Smtp-Source: ABdhPJzDjg2IGcepCwb5aVYpL0iyoVlRw7VwKmnVSWke5phSkT/PVMVrc8WMy+XMkfj6Q5UajD7a40VUOZZuPPBY+Tc=
+X-Received: by 2002:a9d:1b41:: with SMTP id l59mr10406630otl.8.1624039332635;
+ Fri, 18 Jun 2021 11:02:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <15568c80-c9a9-5602-d940-264af87bed98@amd.com>
+References: <YDkbCHHBUOmfI59K@Konrads-MacBook-Pro.local> <YL7XXNOnbaDgmTB9@atmark-techno.com>
+ <2e899de2-4b69-c4b6-33a6-09fb8949d2fd@nxp.com> <20210611062153.GA30906@lst.de>
+ <YMM8Ua0HMmErLIQg@0xbeefdead.lan> <CAMGD6P1v2JoJoxSuAYL8UjdtCaLCc4K_7xzVkumspeb0qn=LBQ@mail.gmail.com>
+ <YMqW+/gQvM+uWUTw@fedora> <YMqZswFnSNKk4Z7B@atmark-techno.com>
+ <20210617051232.GB27192@lst.de> <YMrfWBLsJxCRhX5U@atmark-techno.com>
+In-Reply-To: <YMrfWBLsJxCRhX5U@atmark-techno.com>
+From:   Jianxiong Gao <jxgao@google.com>
+Date:   Fri, 18 Jun 2021 11:01:59 -0700
+Message-ID: <CAMGD6P0=9RE1-q1WHkwR1jymK5jyvN6QgypQ2KgdvBQn0CUTHw@mail.gmail.com>
+Subject: Re: swiotlb/caamjr regression (Was: [GIT PULL] (swiotlb) stable/for-linus-5.12)
+To:     Dominique MARTINET <dominique.martinet@atmark-techno.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Konrad Rzeszutek Wilk <konrad@darnok.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Lukas Hartmann <lukas@mntmn.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Marc Orr <marcorr@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Peter Gonda <pgonda@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 18, 2021 at 08:57:12AM -0500, Brijesh Singh wrote:
-> Don't have any strong reason to keep it separate, I can define a new
-> type and use the setup_data to pass this information.
+> Jianxiong Gao, before spending more time on this, could you also try
+> Chanho Park's patch?
+> https://lore.kernel.org/linux-iommu/20210510091816.GA2084@lst.de/T/#m0d0df6490350a08dcc24c9086c8edc165b402d6f
+>
+I have tested Chanho Parks's patch and it works for us.
+The NVMe driver performs correctly with the patch.
 
-setup_data is exactly for use cases like that - pass a bunch of data
-to the kernel. So there's no need for a separate thing. Also see that
-kernel_info thing which got added recently for read_only data.
-
-Thx.
+I have teste the patch on 06af8679449d
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Jianxiong Gao
