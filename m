@@ -2,190 +2,304 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC49C2B9F4
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 23:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F23CC2B9F4
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 02:09:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B850C61249
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Jun 2021 23:41:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDA27613BD
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jun 2021 02:09:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232398AbhFQXoF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Jun 2021 19:44:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45954 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230447AbhFQXoF (ORCPT
+        id S231536AbhFRCL2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Jun 2021 22:11:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25418 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231289AbhFRCL2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jun 2021 19:44:05 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFDC6C061574
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Jun 2021 16:41:55 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id k15so1085915pfp.6
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Jun 2021 16:41:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=K+fJ72/SIYHOrqzX5FH87X9YXV2avJmC8rzhC9oBgfk=;
-        b=nbOwUSrQFLLBKHTyOdWHnaFscRFE1PeAv60TJ0I8QTGK4tp7PaWOZAtm23L1rzJ/gO
-         VQLBeJSnwf11UpXvi/4T6qNOrK2Tv++e71GAJzDSptzIer2RXEGWsr4KbY82ZLnK4CJk
-         UOhE3iFISC9Gbxmjmh5mjMEaTuYYRxyQAA+q+TmnY0TDaxcUo8/hjaidsthl5E3bupdw
-         +Vd1zZTSSqC9P58GzDH50uwBvKcprhLqHApn6Rv7AUshPC4jyKGj7ZYYV53HC28jj1aH
-         prMCKPbPCtE0pySMd4UzwVFlNkEvifcCDyKCVtWMdBJi4/9nQjA+iZHFrZW3VyadrDx2
-         0Owg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=K+fJ72/SIYHOrqzX5FH87X9YXV2avJmC8rzhC9oBgfk=;
-        b=swKcerkQXr/HSa55+ALuB7s1vqQ+zzbX7H3dAdZgdBPv/QrBsBSC0K8ANFf7V1cDqF
-         t59IpTjSGcIi5PGNHopL6VAl0VNSNndbIIzwRk6tHNeM3sJtX6wW5Bq+aWv+lApt3fpY
-         xEyB35urp12t4NbhEOvPYcLsugYOawIkicwKftwPqTW6dBcHzh+1xLfX/92PRXKVonQ7
-         ooItbABU+9J8f5jibSan73JHqjos5LgBRhB4Vmjtaxs3Rbs/4rBm/+NaNGTiI909VUz0
-         aiMCKcLpMPvbNU9T1SZMZOVihRXsPPG9uG8eWQJieIyEJJCDxySXKEf77eHgA9rjIU0a
-         bNnw==
-X-Gm-Message-State: AOAM532om9S5X+z0+dK1Td8BpqtN8zfFTv6CAq3P5K9zFHhKc08j9wcB
-        y7T5zgOXWbTLZjzTHJv+BPJKZ3AuDjs=
-X-Google-Smtp-Source: ABdhPJzv+5cSku/txUzCCO5gjQEuu+w4sOq/rwxt90OzixWKfAwshRWuenOeW6LPcdsGpPqNdN1dXw==
-X-Received: by 2002:a62:1b91:0:b029:2fd:2904:938a with SMTP id b139-20020a621b910000b02902fd2904938amr2112334pfb.18.1623973315453;
-        Thu, 17 Jun 2021 16:41:55 -0700 (PDT)
-Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
-        by smtp.gmail.com with ESMTPSA id x2sm6196593pfp.155.2021.06.17.16.41.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jun 2021 16:41:55 -0700 (PDT)
-Date:   Fri, 18 Jun 2021 09:41:49 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v6 16/17] crypto/nx: Add sysfs interface to export NX
- capabilities
-To:     Haren Myneni <haren@linux.ibm.com>, herbert@gondor.apana.org.au,
+        Thu, 17 Jun 2021 22:11:28 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15I23PoW122777;
+        Thu, 17 Jun 2021 22:09:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=CDvDUJ9lGuEW5fVkMiSdllq6N5HsFkKaefCea8olEq8=;
+ b=eL+S4PBN1iQsweJKQ9bBAubz64WXn0nRrVI3/IgR97s7k3kwiEzgskakNT2mSQlE1HCS
+ XSgbkYavYxMjDL7mNS2FyvT5FWUk/b0OlvBhW52+HAFuE+lfG5cd9z8c3EN/tFQGkwpX
+ u88W3e89hgPxHAec1u0botmY5W2edhMgTtN7GSjmrQQmqxFEGhVjYqIpgz8U9Mlvufjc
+ cKVJRd4zxfzlKh6q7+cBmeA4ZgDARl3eIvthtMf7MAan4CE5/A4IVKQ1+8BIfUXoXj41
+ UqeZnl1uWEPES6fMl43HWQGxb0bmQzWziEJ3JNYuXnH8RgeWFhUwLHmGlGruVcwKrg6R Kw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 398gy0a5c8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Jun 2021 22:09:08 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15I23mQo124028;
+        Thu, 17 Jun 2021 22:09:07 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 398gy0a5bw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Jun 2021 22:09:07 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15I21nZk010160;
+        Fri, 18 Jun 2021 02:09:06 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma03dal.us.ibm.com with ESMTP id 394mjah2kp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Jun 2021 02:09:06 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15I295Hf24641942
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 18 Jun 2021 02:09:05 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8FBF313605D;
+        Fri, 18 Jun 2021 02:09:05 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47907136055;
+        Fri, 18 Jun 2021 02:09:04 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.160.180.39])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 18 Jun 2021 02:09:04 +0000 (GMT)
+Message-ID: <a19e7839316c9ec4f7901e97b551fcf4219de82f.camel@linux.ibm.com>
+Subject: Re: [PATCH v6 13/17] powerpc/pseries/vas: Setup IRQ and fault
+ handling
+From:   Haren Myneni <haren@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         mpe@ellerman.id.au
 Cc:     haren@us.ibm.com, hbabu@us.ibm.com
+Date:   Thu, 17 Jun 2021 19:09:01 -0700
+In-Reply-To: <1623972635.u8jj6g26re.astroid@bobo.none>
 References: <827bf56dce09620ebecd8a00a5f97105187a6205.camel@linux.ibm.com>
-        <510da86abbd904878d5f13d74aba72603c37d783.camel@linux.ibm.com>
-In-Reply-To: <510da86abbd904878d5f13d74aba72603c37d783.camel@linux.ibm.com>
+         <b8fc66dcb783d06a099a303e5cfc69087bb3357a.camel@linux.ibm.com>
+         <1623972635.u8jj6g26re.astroid@bobo.none>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
 MIME-Version: 1.0
-Message-Id: <1623972971.4k5lhowaxz.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: PzkMWa4scMM60VapGycZCKD4jBky2VXF
+X-Proofpoint-GUID: L-6EETqXBBZPgrS1ivjT0QnKbUva0FnR
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-17_17:2021-06-15,2021-06-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ spamscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501 phishscore=0
+ malwarescore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106180008
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Excerpts from Haren Myneni's message of June 18, 2021 6:39 am:
->=20
-> Export NX-GZIP capabilities to usrespace in sysfs
-> /sys/devices/vio/ibm,compression-v1/nx_gzip_caps directory.
-> These are queried by userspace accelerator libraries to set
-> minimum length heuristics and maximum limits on request sizes.
->=20
-> NX-GZIP capabilities:
-> min_compress_len  /*Recommended minimum compress length in bytes*/
-> min_decompress_len /*Recommended minimum decompress length in bytes*/
-> req_max_processed_len /* Maximum number of bytes processed in one
-> 			request */
->=20
-> NX will return RMA_Reject if the request buffer size is greater
-> than req_max_processed_len.
->=20
-> Signed-off-by: Haren Myneni <haren@linux.ibm.com>
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+On Fri, 2021-06-18 at 09:34 +1000, Nicholas Piggin wrote:
+> Excerpts from Haren Myneni's message of June 18, 2021 6:37 am:
+> > NX generates an interrupt when sees a fault on the user space
+> > buffer and the hypervisor forwards that interrupt to OS. Then
+> > the kernel handles the interrupt by issuing H_GET_NX_FAULT hcall
+> > to retrieve the fault CRB information.
+> > 
+> > This patch also adds changes to setup and free IRQ per each
+> > window and also handles the fault by updating the CSB.
+> 
+> In as much as this pretty well corresponds to the PowerNV code
+> AFAIKS,
+> it looks okay to me.
+> 
+> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+> 
+> Could you have an irq handler in your ops vector and have 
+> the core code set up the irq and call your handler, so the Linux irq
+> handling is in one place? Not something for this series, I was just
+> wondering.
 
-Again, if you could just move those ^^ C style comments into the
-code. Possibly have a small comment with the sysfs stuff saying that=20
-it's ABI which userspace code queries when using the accelerator (or
-if you have an ABI documentation somewhere, point the comments to that).
+Not possible to have common core code for IRQ  setup. 
 
-sysfs is ABI, but some bits are more ABI than others, it would just be
-good to be clear that it is actually used, and can't be changed.
+PowerNV: Every VAS instance will be having IRQ and this setup will be
+done during initialization (system boot). A fault FIFO will be assigned
+for each instance and registered to VAS so that VAS/NX writes fault CRB
+into this FIFO.  
 
-Aside from that,
+PowerVM: Each window will have an IRQ and the setup will be done during
+window open. 
 
-Acked-by: Nicholas Piggin <npiggin@gmail.com>
+Thanks
+Haren
 
-Thanks,
-Nick
+> 
+> Thanks,
+> Nick
+> 
+> > Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+> > ---
+> >  arch/powerpc/platforms/pseries/vas.c | 102
+> > +++++++++++++++++++++++++++
+> >  1 file changed, 102 insertions(+)
+> > 
+> > diff --git a/arch/powerpc/platforms/pseries/vas.c
+> > b/arch/powerpc/platforms/pseries/vas.c
+> > index f5a44f2f0e99..3385b5400cc6 100644
+> > --- a/arch/powerpc/platforms/pseries/vas.c
+> > +++ b/arch/powerpc/platforms/pseries/vas.c
+> > @@ -11,6 +11,7 @@
+> >  #include <linux/types.h>
+> >  #include <linux/delay.h>
+> >  #include <linux/slab.h>
+> > +#include <linux/interrupt.h>
+> >  #include <asm/machdep.h>
+> >  #include <asm/hvcall.h>
+> >  #include <asm/plpar_wrappers.h>
+> > @@ -155,6 +156,50 @@ int h_query_vas_capabilities(const u64 hcall,
+> > u8 query_type, u64 result)
+> >  }
+> >  EXPORT_SYMBOL_GPL(h_query_vas_capabilities);
+> >  
+> > +/*
+> > + * hcall to get fault CRB from the hypervisor.
+> > + */
+> > +static int h_get_nx_fault(u32 winid, u64 buffer)
+> > +{
+> > +	long rc;
+> > +
+> > +	rc = plpar_hcall_norets(H_GET_NX_FAULT, winid, buffer);
+> > +
+> > +	if (rc == H_SUCCESS)
+> > +		return 0;
+> > +
+> > +	pr_err("H_GET_NX_FAULT error: %ld, winid %u, buffer 0x%llx\n",
+> > +		rc, winid, buffer);
+> > +	return -EIO;
+> > +
+> > +}
+> > +
+> > +/*
+> > + * Handle the fault interrupt.
+> > + * When the fault interrupt is received for each window, query the
+> > + * hypervisor to get the fault CRB on the specific fault. Then
+> > + * process the CRB by updating CSB or send signal if the user
+> > space
+> > + * CSB is invalid.
+> > + * Note: The hypervisor forwards an interrupt for each fault
+> > request.
+> > + *	So one fault CRB to process for each H_GET_NX_FAULT hcall.
+> > + */
+> > +irqreturn_t pseries_vas_fault_thread_fn(int irq, void *data)
+> > +{
+> > +	struct pseries_vas_window *txwin = data;
+> > +	struct coprocessor_request_block crb;
+> > +	struct vas_user_win_ref *tsk_ref;
+> > +	int rc;
+> > +
+> > +	rc = h_get_nx_fault(txwin->vas_win.winid,
+> > (u64)virt_to_phys(&crb));
+> > +	if (!rc) {
+> > +		tsk_ref = &txwin->vas_win.task_ref;
+> > +		vas_dump_crb(&crb);
+> > +		vas_update_csb(&crb, tsk_ref);
+> > +	}
+> > +
+> > +	return IRQ_HANDLED;
+> > +}
+> > +
+> >  /*
+> >   * Allocate window and setup IRQ mapping.
+> >   */
+> > @@ -166,10 +211,51 @@ static int allocate_setup_window(struct
+> > pseries_vas_window *txwin,
+> >  	rc = h_allocate_vas_window(txwin, domain, wintype,
+> > DEF_WIN_CREDS);
+> >  	if (rc)
+> >  		return rc;
+> > +	/*
+> > +	 * On PowerVM, the hypervisor setup and forwards the fault
+> > +	 * interrupt per window. So the IRQ setup and fault handling
+> > +	 * will be done for each open window separately.
+> > +	 */
+> > +	txwin->fault_virq = irq_create_mapping(NULL, txwin->fault_irq);
+> > +	if (!txwin->fault_virq) {
+> > +		pr_err("Failed irq mapping %d\n", txwin->fault_irq);
+> > +		rc = -EINVAL;
+> > +		goto out_win;
+> > +	}
+> > +
+> > +	txwin->name = kasprintf(GFP_KERNEL, "vas-win-%d",
+> > +				txwin->vas_win.winid);
+> > +	if (!txwin->name) {
+> > +		rc = -ENOMEM;
+> > +		goto out_irq;
+> > +	}
+> > +
+> > +	rc = request_threaded_irq(txwin->fault_virq, NULL,
+> > +				  pseries_vas_fault_thread_fn,
+> > IRQF_ONESHOT,
+> > +				  txwin->name, txwin);
+> > +	if (rc) {
+> > +		pr_err("VAS-Window[%d]: Request IRQ(%u) failed with
+> > %d\n",
+> > +		       txwin->vas_win.winid, txwin->fault_virq, rc);
+> > +		goto out_free;
+> > +	}
+> >  
+> >  	txwin->vas_win.wcreds_max = DEF_WIN_CREDS;
+> >  
+> >  	return 0;
+> > +out_free:
+> > +	kfree(txwin->name);
+> > +out_irq:
+> > +	irq_dispose_mapping(txwin->fault_virq);
+> > +out_win:
+> > +	h_deallocate_vas_window(txwin->vas_win.winid);
+> > +	return rc;
+> > +}
+> > +
+> > +static inline void free_irq_setup(struct pseries_vas_window
+> > *txwin)
+> > +{
+> > +	free_irq(txwin->fault_virq, txwin);
+> > +	kfree(txwin->name);
+> > +	irq_dispose_mapping(txwin->fault_virq);
+> >  }
+> >  
+> >  static struct vas_window *vas_allocate_window(int vas_id, u64
+> > flags,
+> > @@ -284,6 +370,11 @@ static struct vas_window
+> > *vas_allocate_window(int vas_id, u64 flags,
+> >  	return &txwin->vas_win;
+> >  
+> >  out_free:
+> > +	/*
+> > +	 * Window is not operational. Free IRQ before closing
+> > +	 * window so that do not have to hold mutex.
+> > +	 */
+> > +	free_irq_setup(txwin);
+> >  	h_deallocate_vas_window(txwin->vas_win.winid);
+> >  out:
+> >  	atomic_dec(&cop_feat_caps->used_lpar_creds);
+> > @@ -303,7 +394,18 @@ static int deallocate_free_window(struct
+> > pseries_vas_window *win)
+> >  {
+> >  	int rc = 0;
+> >  
+> > +	/*
+> > +	 * The hypervisor waits for all requests including faults
+> > +	 * are processed before closing the window - Means all
+> > +	 * credits have to be returned. In the case of fault
+> > +	 * request, a credit is returned after OS issues
+> > +	 * H_GET_NX_FAULT hcall.
+> > +	 * So free IRQ after executing H_DEALLOCATE_VAS_WINDOW
+> > +	 * hcall.
+> > +	 */
+> >  	rc = h_deallocate_vas_window(win->vas_win.winid);
+> > +	if (!rc)
+> > +		free_irq_setup(win);
+> >  
+> >  	return rc;
+> >  }
+> > -- 
+> > 2.18.2
+> > 
+> > 
+> > 
 
-> ---
->  drivers/crypto/nx/nx-common-pseries.c | 43 +++++++++++++++++++++++++++
->  1 file changed, 43 insertions(+)
->=20
-> diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx=
--common-pseries.c
-> index 9fc2abb56019..f51a50d40504 100644
-> --- a/drivers/crypto/nx/nx-common-pseries.c
-> +++ b/drivers/crypto/nx/nx-common-pseries.c
-> @@ -967,6 +967,36 @@ static struct attribute_group nx842_attribute_group =
-=3D {
->  	.attrs =3D nx842_sysfs_entries,
->  };
-> =20
-> +#define	nxcop_caps_read(_name)						\
-> +static ssize_t nxcop_##_name##_show(struct device *dev,			\
-> +			struct device_attribute *attr, char *buf)	\
-> +{									\
-> +	return sprintf(buf, "%lld\n", nx_cop_caps._name);		\
-> +}
-> +
-> +#define NXCT_ATTR_RO(_name)						\
-> +	nxcop_caps_read(_name);						\
-> +	static struct device_attribute dev_attr_##_name =3D __ATTR(_name,	\
-> +						0444,			\
-> +						nxcop_##_name##_show,	\
-> +						NULL);
-> +
-> +NXCT_ATTR_RO(req_max_processed_len);
-> +NXCT_ATTR_RO(min_compress_len);
-> +NXCT_ATTR_RO(min_decompress_len);
-> +
-> +static struct attribute *nxcop_caps_sysfs_entries[] =3D {
-> +	&dev_attr_req_max_processed_len.attr,
-> +	&dev_attr_min_compress_len.attr,
-> +	&dev_attr_min_decompress_len.attr,
-> +	NULL,
-> +};
-> +
-> +static struct attribute_group nxcop_caps_attr_group =3D {
-> +	.name	=3D	"nx_gzip_caps",
-> +	.attrs	=3D	nxcop_caps_sysfs_entries,
-> +};
-> +
->  static struct nx842_driver nx842_pseries_driver =3D {
->  	.name =3D		KBUILD_MODNAME,
->  	.owner =3D	THIS_MODULE,
-> @@ -1056,6 +1086,16 @@ static int nx842_probe(struct vio_dev *viodev,
->  		goto error;
->  	}
-> =20
-> +	if (caps_feat) {
-> +		if (sysfs_create_group(&viodev->dev.kobj,
-> +					&nxcop_caps_attr_group)) {
-> +			dev_err(&viodev->dev,
-> +				"Could not create sysfs NX capability entries\n");
-> +			ret =3D -1;
-> +			goto error;
-> +		}
-> +	}
-> +
->  	return 0;
-> =20
->  error_unlock:
-> @@ -1075,6 +1115,9 @@ static void nx842_remove(struct vio_dev *viodev)
->  	pr_info("Removing IBM Power 842 compression device\n");
->  	sysfs_remove_group(&viodev->dev.kobj, &nx842_attribute_group);
-> =20
-> +	if (caps_feat)
-> +		sysfs_remove_group(&viodev->dev.kobj, &nxcop_caps_attr_group);
-> +
->  	crypto_unregister_alg(&nx842_pseries_alg);
-> =20
->  	spin_lock_irqsave(&devdata_mutex, flags);
-> --=20
-> 2.18.2
->=20
->=20
->=20
