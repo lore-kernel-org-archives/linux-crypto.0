@@ -2,211 +2,183 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 146F8C48BDF
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jun 2021 12:45:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99F20C49EA2
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jun 2021 13:43:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EFF4E6135D
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jun 2021 12:45:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DD3F61353
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jun 2021 13:43:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231153AbhFVMsG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Jun 2021 08:48:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50008 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231717AbhFVMsG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Jun 2021 08:48:06 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B13D2C061574
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Jun 2021 05:45:50 -0700 (PDT)
-Received: from dude.hi.pengutronix.de ([2001:67c:670:100:1d::7])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <afa@pengutronix.de>)
-        id 1lvfma-0002yw-65; Tue, 22 Jun 2021 14:45:36 +0200
-Received: from afa by dude.hi.pengutronix.de with local (Exim 4.92)
-        (envelope-from <afa@pengutronix.de>)
-        id 1lvfmY-0000ic-Hs; Tue, 22 Jun 2021 14:45:34 +0200
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-To:     James Bottomley <jejb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     kernel@pengutronix.de, Jan Luebbe <jlu@pengutronix.de>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        James Morris <jmorris@namei.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Richard Weinberger <richard@nod.at>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: [PATCH v2 2/6] KEYS: trusted: Allow import from existing key material for development
-Date:   Tue, 22 Jun 2021 14:45:19 +0200
-Message-Id: <342fe12286b5582b11e8c899bd9a63db2d4bf61c.1624365751.git-series.a.fatoum@pengutronix.de>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <cover.0e5d15050ce7cbc93b9b2f950cbd035bffc655fd.1624365751.git-series.a.fatoum@pengutronix.de>
-References: <cover.0e5d15050ce7cbc93b9b2f950cbd035bffc655fd.1624365751.git-series.a.fatoum@pengutronix.de>
+        id S230103AbhFVNqK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Jun 2021 09:46:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37118 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229988AbhFVNqJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Jun 2021 09:46:09 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BC2F861353;
+        Tue, 22 Jun 2021 13:43:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1624369432;
+        bh=NqFXh1RzaIB7T3yUivBhV+3jLDLAyj/zzCtWY0JA0SQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=n2C4l95B/w+7fm3Hy/W1ls3BjWTgUnPkeMWPcJwuHNhjALViq36NSNRvf1J+UxXwT
+         W1of8Zg2OiipKGz+JaQJVEN0Rymz9BqpYAiOBzmrtdT5/mgiDbEVBsHlr3gDk+TOBO
+         Fe7qpiKq+UgUir5JlR9fsJDRZtySIEJhB36NWX9yf5t0mO64+Z1mYCq7ew8ZAwg0KI
+         F5hwQr8sPPDgEGs9UTcylTzkdsRMaQyTccf/acpKJhxDJxKtULLFNQYEsUOGj4MJxK
+         B3a0hJqzs9FjH4X1uUrkMDUidT5NSByby5xfUTkfYV6nW2261SSjbz6fXsdgEAv5QU
+         qCbHec6qB4IfA==
+Received: by mail-ed1-f48.google.com with SMTP id t3so23726766edc.7;
+        Tue, 22 Jun 2021 06:43:52 -0700 (PDT)
+X-Gm-Message-State: AOAM530naL8j0CKzvJfrllBmASUFsX2bsI1GjGzC0mAXDpPnd7e/OVpX
+        4EDZT2wnXe4JGzDS7JIUEAN3Ta5uIGiYDz5J5Q==
+X-Google-Smtp-Source: ABdhPJzR0Ub3ZgSNkr3MEhjSHq6x9DynzmvMX7quMzOS1boijoDJs7nsAsYPAJuJ3rupM/aSXMVZuLXS4ayPZR+vCGA=
+X-Received: by 2002:a05:6402:ca2:: with SMTP id cn2mr2897976edb.62.1624369431373;
+ Tue, 22 Jun 2021 06:43:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::7
-X-SA-Exim-Mail-From: afa@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+References: <20210615191543.1043414-1-robh@kernel.org> <CAMuHMdUGXu8yj3JWKwM8mt7axkrzGMiowC1t0PHrbpxRCBME3w@mail.gmail.com>
+In-Reply-To: <CAMuHMdUGXu8yj3JWKwM8mt7axkrzGMiowC1t0PHrbpxRCBME3w@mail.gmail.com>
+From:   Rob Herring <robh@kernel.org>
+Date:   Tue, 22 Jun 2021 07:43:37 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJ8jjkufTAmoFHuqpWB0bMUfCCkUR-pFFa2MoyeGzgBvA@mail.gmail.com>
+Message-ID: <CAL_JsqJ8jjkufTAmoFHuqpWB0bMUfCCkUR-pFFa2MoyeGzgBvA@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: Drop redundant minItems/maxItems
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
+        <linux-ide@vger.kernel.org>, linux-clk <linux-clk@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        dmaengine <dmaengine@vger.kernel.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        "open list:IIO SUBSYSTEM AND DRIVERS" <linux-iio@vger.kernel.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Linux IOMMU <iommu@lists.linux-foundation.org>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>, linux-can@vger.kernel.org,
+        linux-pci <linux-pci@vger.kernel.org>,
+        linux-phy@lists.infradead.org,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        "open list:REMOTE PROCESSOR (REMOTEPROC) SUBSYSTEM" 
+        <linux-remoteproc@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        "open list:REAL TIME CLOCK (RTC) SUBSYSTEM" 
+        <linux-rtc@vger.kernel.org>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        Linux Watchdog Mailing List <linux-watchdog@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Stephen Boyd <sboyd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>, Vinod Koul <vkoul@kernel.org>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A key aspect of trusted keys is that they are never disclosed to
-userspace in plain text. For development and debugging, it can be still
-useful to be able to supply a key in plain text from userspace.
+On Tue, Jun 22, 2021 at 2:17 AM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+>
+> Hi Rob,
+>
+> On Tue, Jun 15, 2021 at 9:16 PM Rob Herring <robh@kernel.org> wrote:
+> > If a property has an 'items' list, then a 'minItems' or 'maxItems' with the
+> > same size as the list is redundant and can be dropped. Note that is DT
+> > schema specific behavior and not standard json-schema behavior. The tooling
+> > will fixup the final schema adding any unspecified minItems/maxItems.
+> >
+> > This condition is partially checked with the meta-schema already, but
+> > only if both 'minItems' and 'maxItems' are equal to the 'items' length.
+> > An improved meta-schema is pending.
+>
+> > Signed-off-by: Rob Herring <robh@kernel.org>
+>
+> > --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> > +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> > @@ -46,7 +46,6 @@ properties:
+> >
+> >    clocks:
+> >      minItems: 3
+> > -    maxItems: 5
+> >      items:
+> >        - description: GMAC main clock
+> >        - description: MAC TX clock
+>
+> While resolving the conflict with commit fea99822914039c6
+> ("dt-bindings: net: document ptp_ref clk in dwmac") in soc/for-next,
+> I noticed the following construct for clock-names:
+>
+>   clock-names:
+>     minItems: 3
+>     maxItems: 6
+>     contains:
+>       enum:
+>         - stmmaceth
+>         - mac-clk-tx
+>         - mac-clk-rx
+>         - ethstp
+>         - eth-ck
+>         - ptp_ref
+>
+> Should this use items instead of enum, and drop maxItems, or is this
+> a valid construct to support specifying the clocks in random order?
+> If the latter, it does mean that the order of clock-names may not
+> match the order of the clock descriptions.
 
-Implement an optional knob to support this according to the semantics
-Jan and Mimi had agreed on here[1].
+'contains' is true if one or more entries match the strings. So it is
+really saying one of these is required. That's not really much of a
+constraint. There's 'minContains' and 'maxContains' in newer
+json-schema versions (not yet supported) that could add some
+constraints if there has to be at least N entries from contains. An
+'items' schema (as opposed to a list) would say all items have to
+match one of the strings. I'm sure that's too strict.
 
-[1] https://lore.kernel.org/linux-integrity/e8f149cddce55a4e4615396108e4c900cbec75a8.camel@pengutronix.de/
+TLDR: clocks for this binding are a mess and the above is probably all
+we can do here.
 
-Suggested-by: Jan Luebbe <jlu@pengutronix.de>
-Cc: Mimi Zohar <zohar@linux.ibm.com>
-Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
----
-Manual resend.
-
-To: James Bottomley <jejb@linux.ibm.com>
-To: Jarkko Sakkinen <jarkko@kernel.org>
-To: Mimi Zohar <zohar@linux.ibm.com>
-To: David Howells <dhowells@redhat.com>
-Cc: James Morris <jmorris@namei.org>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: "Serge E. Hallyn" <serge@hallyn.com>
-Cc: "Horia Geantă" <horia.geanta@nxp.com>
-Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc: Udit Agarwal <udit.agarwal@nxp.com>
-Cc: Jan Luebbe <j.luebbe@pengutronix.de>
-Cc: David Gstir <david@sigma-star.at>
-Cc: Richard Weinberger <richard@nod.at>
-Cc: Franck LENORMAND <franck.lenormand@nxp.com>
-Cc: Sumit Garg <sumit.garg@linaro.org>
-Cc: keyrings@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-integrity@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org
----
- Documentation/security/keys/trusted-encrypted.rst | 14 +++++++++++-
- security/keys/trusted-keys/Kconfig                | 15 +++++++++++-
- security/keys/trusted-keys/trusted_core.c         | 21 ++++++++++++++--
- 3 files changed, 48 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/security/keys/trusted-encrypted.rst b/Documentation/security/keys/trusted-encrypted.rst
-index 80d5a5af62a1..cc2e677b3bb6 100644
---- a/Documentation/security/keys/trusted-encrypted.rst
-+++ b/Documentation/security/keys/trusted-encrypted.rst
-@@ -188,6 +188,20 @@ Usage::
- specific to TEE device implementation.  The key length for new keys is always
- in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
- 
-+Trusted Keys: import plain-text key for development
-+---------------------------------------------------
-+
-+Usage::
-+
-+    keyctl add trusted name "import hex_key_material" ring
-+
-+For kernels built with ``CONFIG_TRUSTED_KEYS_DEVELOPMENT_IMPORT=y``, new
-+trusted keys can be created from existing key material supplied by userspace,
-+instead of using random numbers. Once defined, as with random trusted keys,
-+userspace cannot extract the plain-text key material again and will only
-+ever see encrypted blobs. This option should *not* be enabled for production
-+kernels.
-+
- Encrypted Keys usage
- --------------------
- 
-diff --git a/security/keys/trusted-keys/Kconfig b/security/keys/trusted-keys/Kconfig
-index 24af4aaceebf..8bd69b252bf9 100644
---- a/security/keys/trusted-keys/Kconfig
-+++ b/security/keys/trusted-keys/Kconfig
-@@ -23,3 +23,18 @@ config TRUSTED_KEYS_TEE
- if !TRUSTED_KEYS_TPM && !TRUSTED_KEYS_TEE
- comment "No trust source selected!"
- endif
-+
-+config TRUSTED_KEYS_DEVELOPMENT_IMPORT
-+        bool "Allow creating TRUSTED KEYS from existing key material for development"
-+        help
-+          This option adds support for creating new trusted keys from
-+          existing key material supplied by userspace, instead of using
-+          random numbers. Once defined,  as with random trusted keys,
-+          userspace cannot extract the plain-text key material again
-+          and will only ever see encrypted blobs.
-+
-+          This option should *only* be enabled for debugging/development.
-+          Also, consider using 'keyctl padd' instead of 'keyctl add' to
-+          avoid exposing the plain-text key on the process command line.
-+
-+          If you are unsure as to whether this is required, answer N.
-diff --git a/security/keys/trusted-keys/trusted_core.c b/security/keys/trusted-keys/trusted_core.c
-index 8cab69e5d0da..2223e11c8bb5 100644
---- a/security/keys/trusted-keys/trusted_core.c
-+++ b/security/keys/trusted-keys/trusted_core.c
-@@ -46,12 +46,13 @@ static unsigned char migratable;
- 
- enum {
- 	Opt_err,
--	Opt_new, Opt_load, Opt_update,
-+	Opt_new, Opt_load, Opt_import, Opt_update,
- };
- 
- static const match_table_t key_tokens = {
- 	{Opt_new, "new"},
- 	{Opt_load, "load"},
-+	{Opt_import, "import"},
- 	{Opt_update, "update"},
- 	{Opt_err, NULL}
- };
-@@ -100,6 +101,21 @@ static int datablob_parse(char **datablob, struct trusted_key_payload *p)
- 			return -EINVAL;
- 		ret = Opt_load;
- 		break;
-+	case Opt_import:
-+		if (!IS_ENABLED(CONFIG_TRUSTED_KEYS_DEVELOPMENT_IMPORT))
-+			return -EINVAL;
-+		/* first argument is unsealed blob */
-+		c = strsep(datablob, " \t");
-+		if (!c)
-+			return -EINVAL;
-+		p->key_len = strlen(c) / 2;
-+		if (p->key_len < MIN_KEY_SIZE || p->key_len > MAX_KEY_SIZE)
-+			return -EINVAL;
-+		ret = hex2bin(p->key, c, p->key_len);
-+		if (ret < 0)
-+			return -EINVAL;
-+		ret = Opt_import;
-+		break;
- 	case Opt_update:
- 		ret = Opt_update;
- 		break;
-@@ -187,7 +203,8 @@ static int trusted_instantiate(struct key *key,
- 			ret = -EIO;
- 			goto out;
- 		}
--
-+		fallthrough;
-+	case Opt_import:
- 		ret = static_call(trusted_key_seal)(payload, datablob);
- 		if (ret < 0)
- 			pr_info("key_seal failed (%d)\n", ret);
--- 
-git-series 0.9.1
+Rob
