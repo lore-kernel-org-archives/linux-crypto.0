@@ -2,135 +2,177 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B55F5C2B9F4
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jun 2021 07:48:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 050BBC49EA5
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jun 2021 08:17:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99E596128A
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jun 2021 07:48:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1E0561358
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jun 2021 08:17:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229890AbhFVHu4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Jun 2021 03:50:56 -0400
-Received: from gw2.atmark-techno.com ([35.74.137.57]:60098 "EHLO
-        gw2.atmark-techno.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229574AbhFVHuz (ORCPT
+        id S229954AbhFVIT7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Jun 2021 04:19:59 -0400
+Received: from mail-vs1-f54.google.com ([209.85.217.54]:46782 "EHLO
+        mail-vs1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229844AbhFVIT7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Jun 2021 03:50:55 -0400
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
-        by gw2.atmark-techno.com (Postfix) with ESMTPS id 8BC9020D0B
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Jun 2021 16:48:39 +0900 (JST)
-Received: by mail-pj1-f72.google.com with SMTP id 15-20020a17090a0f0fb029016ad0f32fd0so5024857pjy.6
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Jun 2021 00:48:39 -0700 (PDT)
+        Tue, 22 Jun 2021 04:19:59 -0400
+Received: by mail-vs1-f54.google.com with SMTP id z15so10758892vsn.13;
+        Tue, 22 Jun 2021 01:17:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=K2/PCim2TgrlrpWsUBXXxC0v9+AUPcQxYb8PsC1cUMs=;
-        b=mGuauHMQ6rIYAF59vm4Eiw4oVj9i9gkuL2AYzV5jp29IRFIqOUYYJCcRUjCRN7um7J
-         mJ/Uifnluokyg1167EZIGDM5SFUqBEQA3VUVVCZuX4JsseDoOUFOX4RkW6PnvVFJ9R9M
-         F2oZzsLtY/t9DFTnYu1dXlqaFk9M1jmomoG9+eGRSARg++1culVKBD9cMTifzfEds3uB
-         rZZYfS3t5m9bcskVIKQR+N1028/1jmwlXFXg+mY48PW0L8+0J7wF7k49e3ZXabgPXs8b
-         h5mnGQDNYfyuRvDtz/Cu74Z19ZXi8/fCKZlKb3gXG29IcCTfymDCQwAi4mGvX0dLjE/r
-         Ks1g==
-X-Gm-Message-State: AOAM533/rfmjPO63S/SweJIfaAZD7lJDZX/17DNskfIl0aTEI3El9EbJ
-        lD9kK7DmVH/uP8YeJ23TCaoQDCz8ATF5drowntIpBddhVOqHp39SGnPIWBvwHQsnluxyx2s7qEr
-        sABwPH3SLDmxUxUEA++sTTi3z5A==
-X-Received: by 2002:a17:90a:4812:: with SMTP id a18mr2670006pjh.40.1624348118681;
-        Tue, 22 Jun 2021 00:48:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwfgoRVVp6JmSP2/8H6vwINnTVMm7MriWlKRzk6O1jIIF/9JeL5ZPHTpSyHUlltCbzyiAQDkQ==
-X-Received: by 2002:a17:90a:4812:: with SMTP id a18mr2669988pjh.40.1624348118458;
-        Tue, 22 Jun 2021 00:48:38 -0700 (PDT)
-Received: from pc-0115 (178.101.200.35.bc.googleusercontent.com. [35.200.101.178])
-        by smtp.gmail.com with ESMTPSA id n12sm7972919pfu.5.2021.06.22.00.48.37
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 22 Jun 2021 00:48:37 -0700 (PDT)
-Received: from martinet by pc-0115 with local (Exim 4.94.2)
-        (envelope-from <martinet@pc-0115>)
-        id 1lvb98-002Mj2-Pa; Tue, 22 Jun 2021 16:48:34 +0900
-Date:   Tue, 22 Jun 2021 16:48:24 +0900
-From:   'Dominique MARTINET' <dominique.martinet@atmark-techno.com>
-To:     Konrad Rzeszutek Wilk <konrad@darnok.org>
-Cc:     Chanho Park <chanho61.park@samsung.com>,
-        'Jianxiong Gao' <jxgao@google.com>,
-        'Christoph Hellwig' <hch@lst.de>,
-        'Konrad Rzeszutek Wilk' <konrad.wilk@oracle.com>,
-        'Linus Torvalds' <torvalds@linux-foundation.org>,
-        'Horia =?utf-8?Q?Geant=C4=83'?= <horia.geanta@nxp.com>,
-        linux-kernel@vger.kernel.org, 'Lukas Hartmann' <lukas@mntmn.com>,
-        'Aymen Sghaier' <aymen.sghaier@nxp.com>,
-        'Herbert Xu' <herbert@gondor.apana.org.au>,
-        "'David S. Miller'" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        'Marc Orr' <marcorr@google.com>,
-        'Erdem Aktas' <erdemaktas@google.com>,
-        'Peter Gonda' <pgonda@google.com>,
-        'Bumyong Lee' <bumyong.lee@samsung.com>
-Subject: Re: swiotlb/caamjr regression (Was: [GIT PULL] (swiotlb)
- stable/for-linus-5.12)
-Message-ID: <YNGVyOyD+CAMmPos@atmark-techno.com>
-References: <YMqW+/gQvM+uWUTw@fedora>
- <YMqZswFnSNKk4Z7B@atmark-techno.com>
- <20210617051232.GB27192@lst.de>
- <YMrfWBLsJxCRhX5U@atmark-techno.com>
- <CAMGD6P0=9RE1-q1WHkwR1jymK5jyvN6QgypQ2KgdvBQn0CUTHw@mail.gmail.com>
- <CGME20210621020328epcas2p207e9fa2df119730ceb993543621437d8@epcas2p2.samsung.com>
- <YM/zWyZlk1bzHWgI@atmark-techno.com>
- <2038148563.21624247281621.JavaMail.epsvc@epcpadp4>
- <YNASOEGsDxhFC8qJ@atmark-techno.com>
- <YNCROxI328u7IKdQ@fedora>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=s0hVMlLFV5eIwzuXXBEJWEV7FxMfuDBGtQwv1PuAfDc=;
+        b=Yc8JShUBMH1dnjUYyQ4i3CS2+y2GF6q1YtRwv/bRUTq4JGwOzFH8jz0/QYnr8ZuDpr
+         HcEesiBUGFsp/umSzAQ1ucxKn54tANWqVfYyhNDVX62VWxoC03W6vKFzSWDS1INIUujo
+         EfpD0ZvANCW00iJ41ZnsyYqUYQ7WKnBJFLN0taGCgErNoNfbEbrJRexR6AwIwIKT2Knb
+         /0emor8cfQJbNOnIXhfpVS1iQMsX9FEwTZTkt2w2NsDGz2POO5RqhJxIgP7TG7ACSbj/
+         GkkcJgg3HdSB+eNLe7DKVV3GNyEiHob+PVe9RVIKAdqt1PMr45YhOFebl4O9XRmtiOlY
+         SQDQ==
+X-Gm-Message-State: AOAM530BLNzCLpsQ3ZsdxG/iSlElsnvEgk5f19JQOeLC0TziQs7pI7vp
+        kFMx7YZsKONrP5YDTSXRni3TndxcwI12ri99DDk=
+X-Google-Smtp-Source: ABdhPJz3clw2O8tsVFk5F4OGcaBfo9Z8eHqvoF8LwYXAPGollSTCOREHx1S0f08A9nsiznMjaM5G5srL4UVXlJSotsU=
+X-Received: by 2002:a05:6102:2011:: with SMTP id p17mr21421376vsr.40.1624349860512;
+ Tue, 22 Jun 2021 01:17:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YNCROxI328u7IKdQ@fedora>
+References: <20210615191543.1043414-1-robh@kernel.org>
+In-Reply-To: <20210615191543.1043414-1-robh@kernel.org>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Tue, 22 Jun 2021 10:17:28 +0200
+Message-ID: <CAMuHMdUGXu8yj3JWKwM8mt7axkrzGMiowC1t0PHrbpxRCBME3w@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: Drop redundant minItems/maxItems
+To:     Rob Herring <robh@kernel.org>
+Cc:     "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-ide@vger.kernel.org, linux-clk <linux-clk@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        dmaengine <dmaengine@vger.kernel.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        linux-iio@vger.kernel.org,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Linux IOMMU <iommu@lists.linux-foundation.org>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>, linux-can@vger.kernel.org,
+        linux-pci <linux-pci@vger.kernel.org>,
+        linux-phy@lists.infradead.org,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        "open list:REMOTE PROCESSOR (REMOTEPROC) SUBSYSTEM" 
+        <linux-remoteproc@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        linux-rtc@vger.kernel.org,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        Linux Watchdog Mailing List <linux-watchdog@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Stephen Boyd <sboyd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>, Vinod Koul <vkoul@kernel.org>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Konrad Rzeszutek Wilk wrote on Mon, Jun 21, 2021 at 09:16:43AM -0400:
-> The beaty of 'devel' and 'linux-next' is that they can be reshuffled and
-> mangled. I pushed them original patch from Bumyong there and will let
-> it sit for a day and then create a stable branch and give it to Linus.
+Hi Rob,
 
-Thanks, that should be good.
+On Tue, Jun 15, 2021 at 9:16 PM Rob Herring <robh@kernel.org> wrote:
+> If a property has an 'items' list, then a 'minItems' or 'maxItems' with the
+> same size as the list is redundant and can be dropped. Note that is DT
+> schema specific behavior and not standard json-schema behavior. The tooling
+> will fixup the final schema adding any unspecified minItems/maxItems.
+>
+> This condition is partially checked with the meta-schema already, but
+> only if both 'minItems' and 'maxItems' are equal to the 'items' length.
+> An improved meta-schema is pending.
 
-Do you want me to send a follow-up patch with the two extra checks
-(tlb_addr & (IO_TLB_SIZE -1)) > swiotlb_align_offset(dev, orig_addr)
-tlb_offset < alloc_size
+> Signed-off-by: Rob Herring <robh@kernel.org>
 
-or are we certain this can't ever happen?
-(I didn't see any hit in dmesg when I ran with these, but my opinion is
-better safe than sorry...)
+> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> @@ -46,7 +46,6 @@ properties:
+>
+>    clocks:
+>      minItems: 3
+> -    maxItems: 5
+>      items:
+>        - description: GMAC main clock
+>        - description: MAC TX clock
+
+While resolving the conflict with commit fea99822914039c6
+("dt-bindings: net: document ptp_ref clk in dwmac") in soc/for-next,
+I noticed the following construct for clock-names:
+
+  clock-names:
+    minItems: 3
+    maxItems: 6
+    contains:
+      enum:
+        - stmmaceth
+        - mac-clk-tx
+        - mac-clk-rx
+        - ethstp
+        - eth-ck
+        - ptp_ref
+
+Should this use items instead of enum, and drop maxItems, or is this
+a valid construct to support specifying the clocks in random order?
+If the latter, it does mean that the order of clock-names may not
+match the order of the clock descriptions.
+
+Gr{oetje,eeting}s,
+
+                        Geert
 
 
-> Then I need to expand the test-regression bucket so that this does not
-> happen again. Dominique, how easy would it be to purchase one of those
-> devices?
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-My company is making such a device, but it's not on the market yet
-(was planned for august, with some delay in approvisionning it'll
-probably be a bit late), and would mean buying from Japan so I'm not
-sure how convenient that would be...
-
-These are originally NXP devices so I assume Horia would have better
-suggestions, if you would?
-
-
-> I was originally thinking to create a crypto device in QEMU to simulate
-> this but that may take longer to write than just getting the real thing.
-> 
-> Or I could create some fake devices with weird offsets and write a driver
-> for it to exercise this.. like this one I had done some time ago that
-> needs some brushing off.
-
-Just a fake device with fake offsets as a test is probably good enough,
-ideally would need to exerce both failures we've seen (offset in
-dma_sync_single_for_device like caam does and in the original mapping (I
-assume?) like the NVMe driver does), but that sounds possible :)
-
-
-Thanks again!
--- 
-Dominique
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
