@@ -2,151 +2,242 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E41DC4743C
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jun 2021 10:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A59CC4743C
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jun 2021 12:18:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4781560BD3
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jun 2021 10:22:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CC106100A
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jun 2021 12:18:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230083AbhFWKYw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Jun 2021 06:24:52 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:45846 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229833AbhFWKYv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Jun 2021 06:24:51 -0400
-Received: from zn.tnic (p200300ec2f114b00a4a414805e84bac1.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:4b00:a4a4:1480:5e84:bac1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1F7B01EC0501;
-        Wed, 23 Jun 2021 12:22:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1624443752;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=p5+c5VpLnVkRT8GmtkDspNcjMFF7W/ui62AD9LCqlPk=;
-        b=e2LuFJNezzgau+25vW0IJH4CjrNtDoAaSBLURhPLxyMyrRAds/jOnXt78I5xC77knVEKvq
-        baJZP/TmTVV21d+sc0U45cY5tY1aI6z5eCV+axHmCLAaoAhEo9UqtSrSgRlXHKCYtdphid
-        1muhFRjcmYp9jP5yPnJw3C7F3KP/mR8=
-Date:   Wed, 23 Jun 2021 12:22:23 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>,
-        "Kuppuswamy, Sathyanarayanan" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
- address to setup_header
-Message-ID: <YNMLX6fbB3PQwSpv@zn.tnic>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-21-brijesh.singh@amd.com>
- <YMw4UZn6AujpPSZO@zn.tnic>
- <15568c80-c9a9-5602-d940-264af87bed98@amd.com>
- <YMy2OGwsRzrR5bwD@zn.tnic>
- <162442264313.98837.16983159316116149849@amd.com>
+        id S230306AbhFWMUp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Jun 2021 08:20:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57820 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230019AbhFWMUp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Jun 2021 08:20:45 -0400
+X-Greylist: delayed 599 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 23 Jun 2021 05:18:27 PDT
+Received: from smtp-bc0b.mail.infomaniak.ch (smtp-bc0b.mail.infomaniak.ch [IPv6:2001:1600:3:17::bc0b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC6F7C061574
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Jun 2021 05:18:27 -0700 (PDT)
+Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4G92934tY5zMqKM9;
+        Wed, 23 Jun 2021 14:08:23 +0200 (CEST)
+Received: from localhost (unknown [23.97.221.149])
+        by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4G92923gCQzlh8Tm;
+        Wed, 23 Jun 2021 14:08:22 +0200 (CEST)
+From:   =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+To:     David Miller <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+        James Morris <jamorris@linux.microsoft.com>,
+        John Haxby <john.haxby@oracle.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Simo Sorce <simo@redhat.com>,
+        =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@linux.microsoft.com>
+Subject: [PATCH v1] crypto: Make the DRBG compliant with NIST SP800-90A rev1
+Date:   Wed, 23 Jun 2021 14:07:51 +0200
+Message-Id: <20210623120751.3033390-1-mic@digikod.net>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <162442264313.98837.16983159316116149849@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 22, 2021 at 11:30:43PM -0500, Michael Roth wrote:
-> Quoting Borislav Petkov (2021-06-18 10:05:28)
-> > On Fri, Jun 18, 2021 at 08:57:12AM -0500, Brijesh Singh wrote:
-> > > Don't have any strong reason to keep it separate, I can define a new
-> > > type and use the setup_data to pass this information.
-> > 
-> > setup_data is exactly for use cases like that - pass a bunch of data
-> > to the kernel. So there's no need for a separate thing. Also see that
-> > kernel_info thing which got added recently for read_only data.
-> 
-> Hi Boris,
-> 
-> There's one side-effect to this change WRT the CPUID page (which I think
-> we're hoping to include in RFC v4).
-> 
-> With CPUID page we need to access it very early in boot, for both
-> boot/compressed kernel, and the uncompressed kernel. At first this was
-> implemented by moving the early EFI table parsing code from
-> arch/x86/kernel/boot/compressed/acpi.c into a little library to handle early
-> EFI table parsing to fetch the Confidential Computing blob to get the CPUID
-> page address.
-> 
-> This was a bit messy since we needed to share that library between
-> boot/compressed and uncompressed, and at that early stage things like
-> fixup_pointer() are needed in some places, else even basic things like
-> accessing EFI64_LOADER_SIGNATURE and various EFI helper functions could crash
-> in uncompressed otherwise, so the library code needed to be fixed up
-> accordingly.
-> 
-> To simplify things we ended up simply keeping the early EFI table parsing in
-> boot/compressed, and then having boot/compressed initialize
-> setup_data.cc_blob_address so that the uncompressed kernel could access it
-> from there (acpi does something similar with rdsp address).
+From: Mickaël Salaün <mic@linux.microsoft.com>
 
-Yes, except the rsdp address is not vendor-specific but an x86 ACPI
-thing, so pretty much omnipresent.
+Starting from November 2020, the first revision of NIST SP800-90A (June
+2015) is required for FIPS 140-2.  One of the changes brought by this
+first revision is that nonces used for seeding (instantiation) and
+re-seeding must come from entropy sources compliant with NIST SP800-90B
+(cf. NIST SP800-90A rev1, section 8.6.7).  However, this seeding is
+currently done with the Linux RNG (i.e. in-kernel /dev/urandom) that
+uses ChaCha20, a non-approved algorithm.
+Cf. https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90Ar1.pdf
 
-Also, acpi_rsdp_addr is part of boot_params and that struct is full
-of padding holes and obsolete members so reusing a u32 there is a lot
-"easier" than changing the setup_header. So can you put that address in
-boot_params instead?
+These changes replace the use of the Linux RNG with the Jitter RNG,
+which is NIST SP800-90B compliant, to get a proper entropy input and a
+nonce as defined by FIPS.
 
-> Now that we're moving it to setup_data, this becomes a bit more awkward,
-> since we need to reserve memory in boot/compressed to store the setup_data
-> entry, then add it to the linked list to pass along to uncompressed kernel.
-> In turn that also means we need to add an identity mapping for this in
-> ident_map_64.c, so I'm not sure that's the best approach.
-> 
-> So just trying to pin what the best approach is:
-> 
-> a) move cc_blob to setup_data, and do the above-described to pass
->    cc_blob_address from boot/compressed to uncompressed to avoid early
->    EFI parsing in uncompressed
-> b) move cc_blob to setup_data, and do the EFI table parsing in both
->    boot/compressed. leave setup_data allocation/init for BIOS/bootloader
-> c) keep storing cc_blob_address in setup_header.cc_blob_address
-> d) something else?
+However, only using the Jitter RNG may not provide adequate security as
+it could be possible for an attacker to know the state of the CPU and
+predict this RNG output.  To avoid this threat, we are making this both
+FIPS compliant and secure thanks to the use of Linux RNG as a random
+source (but not entropy per se) for the personalization string
+(instantiation) and the additional input (re-seeding).  These extra
+inputs have a length equal to the DRBG strength.  The original
+user-supplied personalization string and additional input are still used
+but potentially truncated to fit with the 2**35 limit (cf. NIST
+SP800-90A rev1, table 2 and 3).
 
-Leaving in the whole text for newly CCed TDX folks in case they're going
-to need something like that.
+This new DRBG uses the same random and entropy sources as the current
+version but in a way that makes is compliant with FIPS 140-2.
 
-And if so, then both vendors should even share the field definition.
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: James Morris <jamorris@linux.microsoft.com>
+Cc: John Haxby <john.haxby@oracle.com>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Simo Sorce <simo@redhat.com>
+Cc: Stephan Müller <smueller@chronox.de>
+Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
+Link: https://lore.kernel.org/r/20210623120751.3033390-1-mic@digikod.net
+---
 
-Dave, Sathya, you can find the whole subthread here:
+Do you prefer to truncate the user-supplied personalization string and
+the additional input, or to return an error if they are greater than
+2**27 (instead of 2**35)?
 
-https://lkml.kernel.org/r/20210602140416.23573-21-brijesh.singh@amd.com
+Another solution to avoid truncating the personalization string and the
+additional input would be to hash them with SHA-512 and concatenate the
+resulting fixed-size buffers.
+---
+ crypto/drbg.c         | 77 ++++++++++++++++++++++++++++++++-----------
+ include/crypto/drbg.h |  2 +-
+ 2 files changed, 58 insertions(+), 21 deletions(-)
 
-in case you need background info on the topic at hand.
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 1b4587e0ddad..b817a831815e 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1119,9 +1119,10 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 		     bool reseed)
+ {
+ 	int ret;
+-	unsigned char entropy[((32 + 16) * 2)];
+-	unsigned int entropylen = drbg_sec_strength(drbg->core->flags);
+-	struct drbg_string data1;
++	unsigned char entropy[((32 * 2) + 16)];
++	const unsigned int strength = drbg_sec_strength(drbg->core->flags);
++	unsigned int entropylen = strength;
++	struct drbg_string data1, data2;
+ 	LIST_HEAD(seedlist);
+ 
+ 	/* 9.1 / 9.2 / 9.3.1 step 3 */
+@@ -1147,21 +1148,32 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 		BUG_ON(!entropylen);
+ 		if (!reseed)
+ 			entropylen = ((entropylen + 1) / 2) * 3;
+-		BUG_ON((entropylen * 2) > sizeof(entropy));
+-
+-		/* Get seed from in-kernel /dev/urandom */
+-		ret = drbg_get_random_bytes(drbg, entropy, entropylen);
+-		if (ret)
+-			goto out;
++		/*
++		 * Check that a minimal automatic personalization string
++		 * (instantiation) or additional input (re-seeding) of strength
++		 * length fits in.
++		 */
++		BUG_ON((entropylen + strength) > sizeof(entropy));
+ 
+ 		if (!drbg->jent) {
+-			drbg_string_fill(&data1, entropy, entropylen);
+-			pr_devel("DRBG: (re)seeding with %u bytes of entropy\n",
+-				 entropylen);
++			/*
++			 * Get entropy, nonce, personalization string or
++			 * additional input from in-kernel /dev/urandom
++			 */
++			ret = drbg_get_random_bytes(drbg, entropy, entropylen + strength);
++			if (ret)
++				goto out;
++
++			drbg_string_fill(&data1, entropy, entropylen + strength);
++			pr_devel("DRBG: (re)seeding with %u bytes of random\n",
++				 entropylen + strength);
+ 		} else {
+-			/* Get seed from Jitter RNG */
+-			ret = crypto_rng_get_bytes(drbg->jent,
+-						   entropy + entropylen,
++			/*
++			 * Get entropy (strength length), concatenated with a
++			 * nonce (half strength length) when instantiating,
++			 * both from the SP800-90B compliant Jitter RNG.
++			 */
++			ret = crypto_rng_get_bytes(drbg->jent, entropy,
+ 						   entropylen);
+ 			if (ret) {
+ 				pr_devel("DRBG: jent failed with %d\n", ret);
+@@ -1184,9 +1196,25 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 					goto out;
+ 			}
+ 
+-			drbg_string_fill(&data1, entropy, entropylen * 2);
+-			pr_devel("DRBG: (re)seeding with %u bytes of entropy\n",
+-				 entropylen * 2);
++			/*
++			 * To improve security while still be compliant with
++			 * SP800-90A rev1, automatically append a minimal
++			 * personalization string (instantiation) or additional
++			 * input (re-seeding) of strength length from in-kernel
++			 * /dev/urandom (random source).  This may then replace
++			 * a (small) part of the supplied pers according to
++			 * drbg_max_addtl().
++			 */
++			ret = drbg_get_random_bytes(drbg, entropy + entropylen,
++						    strength);
++			if (ret)
++				goto out;
++
++			drbg_string_fill(&data1, entropy, entropylen + strength);
++
++			pr_devel("DRBG: (re)seeding with %u bytes of entropy "
++				 "and %u bytes of random\n", entropylen,
++				 strength);
+ 		}
+ 	}
+ 	list_add_tail(&data1.list, &seedlist);
+@@ -1197,7 +1225,16 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 	 * contents whether it is appropriate
+ 	 */
+ 	if (pers && pers->buf && 0 < pers->len) {
+-		list_add_tail(&pers->list, &seedlist);
++		const size_t available = drbg_max_addtl(drbg) - pers->len;
++
++		data2 = *pers;
++		/*
++		 * Make sure that the drbg_max_addtl() limit is still respected
++		 * according to the automatically appended random values.
++		 */
++		if (available < strength)
++			data2.len -= strength - available;
++		list_add_tail(&data2.list, &seedlist);
+ 		pr_devel("DRBG: using personalization string\n");
+ 	}
+ 
+@@ -1209,7 +1246,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 	ret = __drbg_seed(drbg, &seedlist, reseed);
+ 
+ out:
+-	memzero_explicit(entropy, entropylen * 2);
++	memzero_explicit(entropy, sizeof(entropy));
+ 
+ 	return ret;
+ }
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index c4165126937e..7fcff8d2289e 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -168,7 +168,7 @@ static inline size_t drbg_max_request_bytes(struct drbg_state *drbg)
+ 
+ static inline size_t drbg_max_addtl(struct drbg_state *drbg)
+ {
+-	/* SP800-90A requires 2**35 bytes additional info str / pers str */
++	/* SP800-90A requires 2**35 bits of additional info str / pers str */
+ #if (__BITS_PER_LONG == 32)
+ 	/*
+ 	 * SP800-90A allows smaller maximum numbers to be returned -- we
 
-Thx.
-
+base-commit: 13311e74253fe64329390df80bed3f07314ddd61
 -- 
-Regards/Gruss,
-    Boris.
+2.32.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
