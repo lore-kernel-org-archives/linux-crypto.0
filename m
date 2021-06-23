@@ -2,116 +2,151 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D358C48BE5
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jun 2021 23:04:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E41DC4743C
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jun 2021 10:22:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D0776115A
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jun 2021 23:04:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4781560BD3
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jun 2021 10:22:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbhFVXGn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Jun 2021 19:06:43 -0400
-Received: from gw2.atmark-techno.com ([35.74.137.57]:38358 "EHLO
-        gw2.atmark-techno.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229775AbhFVXGl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Jun 2021 19:06:41 -0400
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-        by gw2.atmark-techno.com (Postfix) with ESMTPS id 46DB320CB3
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Jun 2021 08:04:23 +0900 (JST)
-Received: by mail-pl1-f197.google.com with SMTP id l10-20020a17090270cab029011dbfb3981aso8713plt.22
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Jun 2021 16:04:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Zi+YumSK8qJAN2mxkpNMysen7VAorvJsTi6oKg7UA3c=;
-        b=FbD+uxUl5LrJvPffeRVs4Og59ge5eSz1hymjjgTliKy+9RVDmetT9GE+yva0KFLLud
-         prmFtD8VUACcEN8qeHSWCjsxQCOY3WUsSjwYiCajZPZAuRUlFs0BNR12UsjUJ6eKi7Lu
-         zk51yIxcIjrxhw+OTYyPyZhfNxF0wNCvpE6Dn0IXQ42JpPZbITmLrP6nLSmWL/xFtoc6
-         jYqAriBkNCFInr1y+WujYbx+b6nOiJaIdMpDMjYv/s6FtssqhbUhqLm4S35WyIsv0Hy9
-         IIfuHtmcmszBkpeKo6qWflHej7Rv9z5tby9M3T7+N95/MAIwD9Dob5txQoAqmFOKKRL8
-         W5ag==
-X-Gm-Message-State: AOAM533YfY0imAdXvIun+kLUles8/Vg9uqLClV27v26J5sws2iHINbOo
-        ONdWTOgbVM1DRv5Roap3RMZOTTAFJS4gVB6ehd8b0CoaYxVQAh4EK+0LLDUjrHx9ETEjasEoRxp
-        Iv0/rS0SZwIDfs1v/mhYPEOnGyw==
-X-Received: by 2002:a63:f4b:: with SMTP id 11mr931666pgp.250.1624403062419;
-        Tue, 22 Jun 2021 16:04:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy1DPt62WJkfxA5t0B59dYOyebgMR0VQB3YdAJXalVVOArvyr9AtZ9hq+qnqQudOs5PrJkKPw==
-X-Received: by 2002:a63:f4b:: with SMTP id 11mr931650pgp.250.1624403062198;
-        Tue, 22 Jun 2021 16:04:22 -0700 (PDT)
-Received: from pc-0115 (178.101.200.35.bc.googleusercontent.com. [35.200.101.178])
-        by smtp.gmail.com with ESMTPSA id 206sm326731pfv.108.2021.06.22.16.04.21
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 22 Jun 2021 16:04:21 -0700 (PDT)
-Received: from martinet by pc-0115 with local (Exim 4.94.2)
-        (envelope-from <martinet@pc-0115>)
-        id 1lvpRM-002Ue5-4i; Wed, 23 Jun 2021 08:04:20 +0900
-Date:   Wed, 23 Jun 2021 08:04:10 +0900
-From:   'Dominique MARTINET' <dominique.martinet@atmark-techno.com>
-To:     Konrad Rzeszutek Wilk <konrad@darnok.org>
-Cc:     Chanho Park <chanho61.park@samsung.com>,
-        'Jianxiong Gao' <jxgao@google.com>,
-        'Christoph Hellwig' <hch@lst.de>,
-        'Konrad Rzeszutek Wilk' <konrad.wilk@oracle.com>,
-        'Linus Torvalds' <torvalds@linux-foundation.org>,
-        'Horia =?utf-8?Q?Geant=C4=83'?= <horia.geanta@nxp.com>,
-        linux-kernel@vger.kernel.org, 'Lukas Hartmann' <lukas@mntmn.com>,
-        'Aymen Sghaier' <aymen.sghaier@nxp.com>,
-        'Herbert Xu' <herbert@gondor.apana.org.au>,
-        "'David S. Miller'" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        'Marc Orr' <marcorr@google.com>,
-        'Erdem Aktas' <erdemaktas@google.com>,
-        'Peter Gonda' <pgonda@google.com>,
-        'Bumyong Lee' <bumyong.lee@samsung.com>
-Subject: Re: swiotlb/caamjr regression (Was: [GIT PULL] (swiotlb)
- stable/for-linus-5.12)
-Message-ID: <YNJsar/EYmCeTO3S@atmark-techno.com>
-References: <20210617051232.GB27192@lst.de>
- <YMrfWBLsJxCRhX5U@atmark-techno.com>
- <CAMGD6P0=9RE1-q1WHkwR1jymK5jyvN6QgypQ2KgdvBQn0CUTHw@mail.gmail.com>
- <CGME20210621020328epcas2p207e9fa2df119730ceb993543621437d8@epcas2p2.samsung.com>
- <YM/zWyZlk1bzHWgI@atmark-techno.com>
- <2038148563.21624247281621.JavaMail.epsvc@epcpadp4>
- <YNASOEGsDxhFC8qJ@atmark-techno.com>
- <YNCROxI328u7IKdQ@fedora>
- <YNGVyOyD+CAMmPos@atmark-techno.com>
- <YNJc9qxeIjy6VuLt@fedora>
+        id S230083AbhFWKYw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Jun 2021 06:24:52 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:45846 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229833AbhFWKYv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Jun 2021 06:24:51 -0400
+Received: from zn.tnic (p200300ec2f114b00a4a414805e84bac1.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:4b00:a4a4:1480:5e84:bac1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1F7B01EC0501;
+        Wed, 23 Jun 2021 12:22:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1624443752;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=p5+c5VpLnVkRT8GmtkDspNcjMFF7W/ui62AD9LCqlPk=;
+        b=e2LuFJNezzgau+25vW0IJH4CjrNtDoAaSBLURhPLxyMyrRAds/jOnXt78I5xC77knVEKvq
+        baJZP/TmTVV21d+sc0U45cY5tY1aI6z5eCV+axHmCLAaoAhEo9UqtSrSgRlXHKCYtdphid
+        1muhFRjcmYp9jP5yPnJw3C7F3KP/mR8=
+Date:   Wed, 23 Jun 2021 12:22:23 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>,
+        "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
+ address to setup_header
+Message-ID: <YNMLX6fbB3PQwSpv@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-21-brijesh.singh@amd.com>
+ <YMw4UZn6AujpPSZO@zn.tnic>
+ <15568c80-c9a9-5602-d940-264af87bed98@amd.com>
+ <YMy2OGwsRzrR5bwD@zn.tnic>
+ <162442264313.98837.16983159316116149849@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YNJc9qxeIjy6VuLt@fedora>
+In-Reply-To: <162442264313.98837.16983159316116149849@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Konrad Rzeszutek Wilk wrote on Tue, Jun 22, 2021 at 05:58:14PM -0400:
-> On Tue, Jun 22, 2021 at 04:48:24PM +0900, 'Dominique MARTINET' wrote:
-> > Thanks, that should be good.
+On Tue, Jun 22, 2021 at 11:30:43PM -0500, Michael Roth wrote:
+> Quoting Borislav Petkov (2021-06-18 10:05:28)
+> > On Fri, Jun 18, 2021 at 08:57:12AM -0500, Brijesh Singh wrote:
+> > > Don't have any strong reason to keep it separate, I can define a new
+> > > type and use the setup_data to pass this information.
 > > 
-> > Do you want me to send a follow-up patch with the two extra checks
-> > (tlb_addr & (IO_TLB_SIZE -1)) > swiotlb_align_offset(dev, orig_addr)
-> > tlb_offset < alloc_size
-> > 
-> > or are we certain this can't ever happen?
+> > setup_data is exactly for use cases like that - pass a bunch of data
+> > to the kernel. So there's no need for a separate thing. Also see that
+> > kernel_info thing which got added recently for read_only data.
 > 
-> I would love more patches and I saw the previous one you posted.
+> Hi Boris,
 > 
-> But we only got two (or one) weeks before the next merge window opens
-> so I am sending to Linus the one that was tested with NVMe and crypto
-> (see above).
+> There's one side-effect to this change WRT the CPUID page (which I think
+> we're hoping to include in RFC v4).
 > 
-> That is the
-> https://git.kernel.org/pub/scm/linux/kernel/git/konrad/swiotlb.git/commit/?h=stable/for-linus-5.14
+> With CPUID page we need to access it very early in boot, for both
+> boot/compressed kernel, and the uncompressed kernel. At first this was
+> implemented by moving the early EFI table parsing code from
+> arch/x86/kernel/boot/compressed/acpi.c into a little library to handle early
+> EFI table parsing to fetch the Confidential Computing blob to get the CPUID
+> page address.
 > 
-> And then after Linus releases the 5.14 - I would love to take your
-> cleanup on top of that and test it?
+> This was a bit messy since we needed to share that library between
+> boot/compressed and uncompressed, and at that early stage things like
+> fixup_pointer() are needed in some places, else even basic things like
+> accessing EFI64_LOADER_SIGNATURE and various EFI helper functions could crash
+> in uncompressed otherwise, so the library code needed to be fixed up
+> accordingly.
+> 
+> To simplify things we ended up simply keeping the early EFI table parsing in
+> boot/compressed, and then having boot/compressed initialize
+> setup_data.cc_blob_address so that the uncompressed kernel could access it
+> from there (acpi does something similar with rdsp address).
 
-That sounds good to me, will send with proper formatting after release.
+Yes, except the rsdp address is not vendor-specific but an x86 ACPI
+thing, so pretty much omnipresent.
+
+Also, acpi_rsdp_addr is part of boot_params and that struct is full
+of padding holes and obsolete members so reusing a u32 there is a lot
+"easier" than changing the setup_header. So can you put that address in
+boot_params instead?
+
+> Now that we're moving it to setup_data, this becomes a bit more awkward,
+> since we need to reserve memory in boot/compressed to store the setup_data
+> entry, then add it to the linked list to pass along to uncompressed kernel.
+> In turn that also means we need to add an identity mapping for this in
+> ident_map_64.c, so I'm not sure that's the best approach.
+> 
+> So just trying to pin what the best approach is:
+> 
+> a) move cc_blob to setup_data, and do the above-described to pass
+>    cc_blob_address from boot/compressed to uncompressed to avoid early
+>    EFI parsing in uncompressed
+> b) move cc_blob to setup_data, and do the EFI table parsing in both
+>    boot/compressed. leave setup_data allocation/init for BIOS/bootloader
+> c) keep storing cc_blob_address in setup_header.cc_blob_address
+> d) something else?
+
+Leaving in the whole text for newly CCed TDX folks in case they're going
+to need something like that.
+
+And if so, then both vendors should even share the field definition.
+
+Dave, Sathya, you can find the whole subthread here:
+
+https://lkml.kernel.org/r/20210602140416.23573-21-brijesh.singh@amd.com
+
+in case you need background info on the topic at hand.
+
+Thx.
 
 -- 
-Dominique
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
