@@ -5,60 +5,56 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ED2DC49EA6
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 07:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ADDEC48BDF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 07:37:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 382AC613EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 07:36:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 242B6613B0
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 07:37:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231638AbhFXHjJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Jun 2021 03:39:09 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:50846 "EHLO deadmen.hmeau.com"
+        id S231703AbhFXHjT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Jun 2021 03:39:19 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50848 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231659AbhFXHjJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Jun 2021 03:39:09 -0400
+        id S231659AbhFXHjT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Jun 2021 03:39:19 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lwJud-0006Fi-MC; Thu, 24 Jun 2021 15:36:35 +0800
+        id 1lwJv1-0006Hk-Kc; Thu, 24 Jun 2021 15:36:59 +0800
 Received: from herbert by gondobar with local (Exim 4.92)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lwJuV-0004gc-1b; Thu, 24 Jun 2021 15:36:27 +0800
-Date:   Thu, 24 Jun 2021 15:36:27 +0800
+        id 1lwJv1-0004hz-8u; Thu, 24 Jun 2021 15:36:59 +0800
+Date:   Thu, 24 Jun 2021 15:36:59 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     stable@vger.kernel.org,
-        Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] crypto: nx: Fix memcpy() over-reading in nonce
-Message-ID: <20210624073626.GC17892@gondor.apana.org.au>
-References: <20210616203459.1248036-1-keescook@chromium.org>
+To:     Wenkai Lin <linwenkai6@hisilicon.com>
+Cc:     davem@davemloft.net, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, prime.zeng@hisilicon.com,
+        wangzhou1@hisilicon.com
+Subject: Re: [PATCH] crypto: hisilicon/qm - implement for querying hardware
+ tasks status.
+Message-ID: <20210624073659.GF17892@gondor.apana.org.au>
+References: <1624008966-1395-1-git-send-email-linwenkai6@hisilicon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210616203459.1248036-1-keescook@chromium.org>
+In-Reply-To: <1624008966-1395-1-git-send-email-linwenkai6@hisilicon.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 16, 2021 at 01:34:59PM -0700, Kees Cook wrote:
-> Fix typo in memcpy() where size should be CTR_RFC3686_NONCE_SIZE.
+On Fri, Jun 18, 2021 at 05:36:06PM +0800, Wenkai Lin wrote:
+> This patch adds a function hisi_qm_is_q_updated to
+> check if the task is ready in hardware queue when
+> user polls an UACCE queue.This prevents users from
+> repeatedly querying whether the accelerator has
+> completed tasks, which wastes CPU resources.
 > 
-> Fixes: 030f4e968741 ("crypto: nx - Fix reentrancy bugs")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
 > ---
->  drivers/crypto/nx/nx-aes-ctr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/crypto/hisilicon/qm.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 
 Patch applied.  Thanks.
 -- 
