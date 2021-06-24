@@ -7,59 +7,51 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D769C49EA6
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 07:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B1CBC48BDF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 07:37:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 63744613B0
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 07:37:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D4B26100A
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 07:37:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231706AbhFXHjT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Jun 2021 03:39:19 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:50850 "EHLO deadmen.hmeau.com"
+        id S231717AbhFXHjf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Jun 2021 03:39:35 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50852 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231666AbhFXHjT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Jun 2021 03:39:19 -0400
+        id S231754AbhFXHjc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Jun 2021 03:39:32 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lwJut-0006H1-0t; Thu, 24 Jun 2021 15:36:51 +0800
+        id 1lwJvB-0006I2-QA; Thu, 24 Jun 2021 15:37:09 +0800
 Received: from herbert by gondobar with local (Exim 4.92)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lwJus-0004ha-2i; Thu, 24 Jun 2021 15:36:50 +0800
-Date:   Thu, 24 Jun 2021 15:36:50 +0800
+        id 1lwJvB-0004iL-Mc; Thu, 24 Jun 2021 15:37:09 +0800
+Date:   Thu, 24 Jun 2021 15:37:09 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     YueHaibing <yuehaibing@huawei.com>
-Cc:     ulli.kroll@googlemail.com, linus.walleij@linaro.org,
-        clabbe@baylibre.com, davem@davemloft.net,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 -next] crypto: sl3516 - Fix build warning without
- CONFIG_PM
-Message-ID: <20210624073650.GE17892@gondor.apana.org.au>
-References: <20210618093551.23748-1-yuehaibing@huawei.com>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     davem@davemloft.net, linus.walleij@linaro.org,
+        ulli.kroll@googlemail.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        lkp@intel.com
+Subject: Re: [PATCH] crypto: sl3516: depends on HAS_IOMEM
+Message-ID: <20210624073709.GG17892@gondor.apana.org.au>
+References: <20210621185926.4181785-1-clabbe@baylibre.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210618093551.23748-1-yuehaibing@huawei.com>
+In-Reply-To: <20210621185926.4181785-1-clabbe@baylibre.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 18, 2021 at 05:35:51PM +0800, YueHaibing wrote:
-> drivers/crypto/gemini/sl3516-ce-core.c:345:12:
->  warning: ‘sl3516_ce_pm_resume’ defined but not used [-Wunused-function]
->  static int sl3516_ce_pm_resume(struct device *dev)
->             ^~~~~~~~~~~~~~~~~~~
+On Mon, Jun 21, 2021 at 06:59:26PM +0000, Corentin Labbe wrote:
+> The sl3516 driver need to depend on HAS_IOMEM.
+> This fixes a build error:
+> ERROR: modpost: "devm_platform_ioremap_resource" [drivers/crypto/gemini/sl3516-ce.ko] undefined!
 > 
-> The driver needs PM, otherwise clock and resets are never set.
-> So make it depends on PM to fix this warning.
-> 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> Suggested-by: LABBE Corentin <clabbe@baylibre.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 > ---
-> v2: Using depends on PM instead of #ifdef macro
-> 
 >  drivers/crypto/Kconfig | 1 +
 >  1 file changed, 1 insertion(+)
 
