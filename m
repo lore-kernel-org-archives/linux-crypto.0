@@ -3,27 +3,27 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD866C49EA5
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 08:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E2FC49EA7
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 08:09:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB746613C7
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 08:09:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E7DD613C7
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 08:09:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231788AbhFXILd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Jun 2021 04:11:33 -0400
-Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:38050 "EHLO
-        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231879AbhFXIL0 (ORCPT
+        id S231875AbhFXILf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Jun 2021 04:11:35 -0400
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:62302 "EHLO
+        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231904AbhFXILb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Jun 2021 04:11:26 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R621e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0UdVPZ34_1624522138;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UdVPZ34_1624522138)
+        Thu, 24 Jun 2021 04:11:31 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0UdVYH6Z_1624522137;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UdVYH6Z_1624522137)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 24 Jun 2021 16:08:59 +0800
+          Thu, 24 Jun 2021 16:08:58 +0800
 From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -43,222 +43,84 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Jia Zhang <zhang.jia@linux.alibaba.com>,
         "YiLin . Li" <YiLin.Li@linux.alibaba.com>
 Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH v2 2/4] crypto: arm64/sm4-ce - Make dependent on sm4 library instead of sm4-generic
-Date:   Thu, 24 Jun 2021 16:08:55 +0800
-Message-Id: <20210624080857.126660-3-tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v2 0/4] Introduce x86 assembler accelerated implementation for SM4 algorithm
+Date:   Thu, 24 Jun 2021 16:08:53 +0800
+Message-Id: <20210624080857.126660-1-tianjia.zhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.19.1.3.ge56e4f7
-In-Reply-To: <20210624080857.126660-1-tianjia.zhang@linux.alibaba.com>
-References: <20210624080857.126660-1-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SM4 library is abstracted from sm4-generic algorithm, sm4-ce can depend on
-the SM4 library instead of sm4-generic, and some functions in sm4-generic
-do not need to be exported.
+This patchset extracts the public SM4 algorithm as a separate library,
+At the same time, the acceleration implementation of SM4 in arm64 was
+adjusted to adapt to this SM4 library. Then introduces an accelerated
+implementation of the instruction set on x86.
 
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+This optimization supports the four modes of SM4, ECB, CBC, CFB, and
+CTR. Since CBC and CFB do not support multiple block parallel
+encryption, the optimization effect is not obvious. And all selftests
+have passed already.
+
+The main algorithm implementation comes from SM4 AES-NI work by
+libgcrypt and Markku-Juhani O. Saarinen at:
+https://github.com/mjosaarinen/sm4ni
+
+Benchmark on Intel Xeon Cascadelake, the data comes from the mode 218
+and mode 518 of tcrypt. The abscissas are blocks of different lengths.
+The data is tabulated and the unit is Mb/s:
+
+sm4-generic   |    16      64     128     256    1024    1420    4096
+      ECB enc | 40.99   46.50   48.05   48.41   49.20   49.25   49.28
+      ECB dec | 41.07   46.99   48.15   48.67   49.20   49.25   49.29
+      CBC enc | 37.71   45.28   46.77   47.60   48.32   48.37   48.40
+      CBC dec | 36.48   44.82   46.43   47.45   48.23   48.30   48.36
+      CFB enc | 37.94   44.84   46.12   46.94   47.57   47.46   47.68
+      CFB dec | 37.50   42.84   43.74   44.37   44.85   44.80   44.96
+      CTR enc | 39.20   45.63   46.75   47.49   48.09   47.85   48.08
+      CTR dec | 39.64   45.70   46.72   47.47   47.98   47.88   48.06
+sm4-aesni-avx
+      ECB enc | 33.75  134.47  221.64  243.43  264.05  251.58  258.13
+      ECB dec | 34.02  134.92  223.11  245.14  264.12  251.04  258.33
+      CBC enc | 38.85   46.18   47.67   48.34   49.00   48.96   49.14
+      CBC dec | 33.54  131.29  223.88  245.27  265.50  252.41  263.78
+      CFB enc | 38.70   46.10   47.58   48.29   49.01   48.94   49.19
+      CFB dec | 32.79  128.40  223.23  244.87  265.77  253.31  262.79
+      CTR enc | 32.58  122.23  220.29  241.16  259.57  248.32  256.69
+      CTR dec | 32.81  122.47  218.99  241.54  258.42  248.58  256.61
+
 ---
- arch/arm64/crypto/Kconfig       |  2 +-
- arch/arm64/crypto/sm4-ce-glue.c | 20 ++++++++++++++------
- crypto/sm4_generic.c            | 27 ++++++++++++---------------
- include/crypto/sm4.h            |  9 ++-------
- lib/crypto/sm4.c                |  2 +-
- 5 files changed, 30 insertions(+), 30 deletions(-)
+v2 changes:
+  * SM4 library functions use "sm4_" prefix instead of "crypto_" prefix
+  * sm4-aesni-avx supports accelerated implementation of four specific modes
+  * tcrypt benchmark supports sm4-aesni-avx
+  * fixes of other reviews
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index b8eb0453123d..55f19450091b 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -51,7 +51,7 @@ config CRYPTO_SM4_ARM64_CE
- 	tristate "SM4 symmetric cipher (ARMv8.2 Crypto Extensions)"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_ALGAPI
--	select CRYPTO_SM4
-+	select CRYPTO_LIB_SM4
- 
- config CRYPTO_GHASH_ARM64_CE
- 	tristate "GHASH/AES-GCM using ARMv8 Crypto Extensions"
-diff --git a/arch/arm64/crypto/sm4-ce-glue.c b/arch/arm64/crypto/sm4-ce-glue.c
-index 2754c875d39c..361824bb2c2f 100644
---- a/arch/arm64/crypto/sm4-ce-glue.c
-+++ b/arch/arm64/crypto/sm4-ce-glue.c
-@@ -17,12 +17,20 @@ MODULE_LICENSE("GPL v2");
- 
- asmlinkage void sm4_ce_do_crypt(const u32 *rk, void *out, const void *in);
- 
-+int sm4_ce_setkey(struct crypto_tfm *tfm, const u8 *in_key,
-+		       unsigned int key_len)
-+{
-+	struct sm4_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return sm4_expandkey(ctx, in_key, key_len);
-+}
-+
- static void sm4_ce_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
--	const struct crypto_sm4_ctx *ctx = crypto_tfm_ctx(tfm);
-+	const struct sm4_ctx *ctx = crypto_tfm_ctx(tfm);
- 
- 	if (!crypto_simd_usable()) {
--		crypto_sm4_encrypt(tfm, out, in);
-+		sm4_crypt_block(ctx->rkey_enc, out, in);
- 	} else {
- 		kernel_neon_begin();
- 		sm4_ce_do_crypt(ctx->rkey_enc, out, in);
-@@ -32,10 +40,10 @@ static void sm4_ce_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- 
- static void sm4_ce_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
--	const struct crypto_sm4_ctx *ctx = crypto_tfm_ctx(tfm);
-+	const struct sm4_ctx *ctx = crypto_tfm_ctx(tfm);
- 
- 	if (!crypto_simd_usable()) {
--		crypto_sm4_decrypt(tfm, out, in);
-+		sm4_crypt_block(ctx->rkey_dec, out, in);
- 	} else {
- 		kernel_neon_begin();
- 		sm4_ce_do_crypt(ctx->rkey_dec, out, in);
-@@ -49,12 +57,12 @@ static struct crypto_alg sm4_ce_alg = {
- 	.cra_priority			= 200,
- 	.cra_flags			= CRYPTO_ALG_TYPE_CIPHER,
- 	.cra_blocksize			= SM4_BLOCK_SIZE,
--	.cra_ctxsize			= sizeof(struct crypto_sm4_ctx),
-+	.cra_ctxsize			= sizeof(struct sm4_ctx),
- 	.cra_module			= THIS_MODULE,
- 	.cra_u.cipher = {
- 		.cia_min_keysize	= SM4_KEY_SIZE,
- 		.cia_max_keysize	= SM4_KEY_SIZE,
--		.cia_setkey		= crypto_sm4_set_key,
-+		.cia_setkey		= sm4_ce_setkey,
- 		.cia_encrypt		= sm4_ce_encrypt,
- 		.cia_decrypt		= sm4_ce_decrypt
- 	}
-diff --git a/crypto/sm4_generic.c b/crypto/sm4_generic.c
-index d19d01f852a9..4a6480a27fee 100644
---- a/crypto/sm4_generic.c
-+++ b/crypto/sm4_generic.c
-@@ -17,45 +17,42 @@
- #include <asm/unaligned.h>
- 
- /**
-- * crypto_sm4_set_key - Set the SM4 key.
-+ * sm4_setkey - Set the SM4 key.
-  * @tfm:	The %crypto_tfm that is used in the context.
-  * @in_key:	The input key.
-  * @key_len:	The size of the key.
-  *
-  * This function uses sm4_expandkey() to expand the key.
-- * &crypto_sm4_ctx _must_ be the private data embedded in @tfm which is
-+ * &sm4_ctx _must_ be the private data embedded in @tfm which is
-  * retrieved with crypto_tfm_ctx().
-  *
-  * Return: 0 on success; -EINVAL on failure (only happens for bad key lengths)
-  */
--int crypto_sm4_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-+static int sm4_setkey(struct crypto_tfm *tfm, const u8 *in_key,
- 		       unsigned int key_len)
- {
--	struct crypto_sm4_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct sm4_ctx *ctx = crypto_tfm_ctx(tfm);
- 
- 	return sm4_expandkey(ctx, in_key, key_len);
- }
--EXPORT_SYMBOL_GPL(crypto_sm4_set_key);
- 
- /* encrypt a block of text */
- 
--void crypto_sm4_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+static void sm4_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
--	const struct crypto_sm4_ctx *ctx = crypto_tfm_ctx(tfm);
-+	const struct sm4_ctx *ctx = crypto_tfm_ctx(tfm);
- 
- 	sm4_crypt_block(ctx->rkey_enc, out, in);
- }
--EXPORT_SYMBOL_GPL(crypto_sm4_encrypt);
- 
- /* decrypt a block of text */
- 
--void crypto_sm4_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+static void sm4_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
--	const struct crypto_sm4_ctx *ctx = crypto_tfm_ctx(tfm);
-+	const struct sm4_ctx *ctx = crypto_tfm_ctx(tfm);
- 
- 	sm4_crypt_block(ctx->rkey_dec, out, in);
- }
--EXPORT_SYMBOL_GPL(crypto_sm4_decrypt);
- 
- static struct crypto_alg sm4_alg = {
- 	.cra_name		=	"sm4",
-@@ -63,15 +60,15 @@ static struct crypto_alg sm4_alg = {
- 	.cra_priority		=	100,
- 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
- 	.cra_blocksize		=	SM4_BLOCK_SIZE,
--	.cra_ctxsize		=	sizeof(struct crypto_sm4_ctx),
-+	.cra_ctxsize		=	sizeof(struct sm4_ctx),
- 	.cra_module		=	THIS_MODULE,
- 	.cra_u			=	{
- 		.cipher = {
- 			.cia_min_keysize	=	SM4_KEY_SIZE,
- 			.cia_max_keysize	=	SM4_KEY_SIZE,
--			.cia_setkey		=	crypto_sm4_set_key,
--			.cia_encrypt		=	crypto_sm4_encrypt,
--			.cia_decrypt		=	crypto_sm4_decrypt
-+			.cia_setkey		=	sm4_setkey,
-+			.cia_encrypt		=	sm4_encrypt,
-+			.cia_decrypt		=	sm4_decrypt
- 		}
- 	}
- };
-diff --git a/include/crypto/sm4.h b/include/crypto/sm4.h
-index bef92bcb286c..49f183776f1c 100644
---- a/include/crypto/sm4.h
-+++ b/include/crypto/sm4.h
-@@ -16,7 +16,7 @@
- #define SM4_BLOCK_SIZE	16
- #define SM4_RKEY_WORDS	32
- 
--struct crypto_sm4_ctx {
-+struct sm4_ctx {
- 	u32 rkey_enc[SM4_RKEY_WORDS];
- 	u32 rkey_dec[SM4_RKEY_WORDS];
- };
-@@ -34,7 +34,7 @@ extern const u8 sm4_sbox[];
-  * Returns 0 on success. The function fails only if an invalid key size (or
-  * pointer) is supplied.
-  */
--int sm4_expandkey(struct crypto_sm4_ctx *ctx, const u8 *in_key,
-+int sm4_expandkey(struct sm4_ctx *ctx, const u8 *in_key,
- 			  unsigned int key_len);
- 
- /**
-@@ -45,9 +45,4 @@ int sm4_expandkey(struct crypto_sm4_ctx *ctx, const u8 *in_key,
-  */
- void sm4_crypt_block(const u32 *rk, u8 *out, const u8 *in);
- 
--int crypto_sm4_set_key(struct crypto_tfm *tfm, const u8 *in_key,
--		       unsigned int key_len);
--void crypto_sm4_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in);
--void crypto_sm4_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in);
--
- #endif
-diff --git a/lib/crypto/sm4.c b/lib/crypto/sm4.c
-index b2ade92bc4db..183df2f149fd 100644
---- a/lib/crypto/sm4.c
-+++ b/lib/crypto/sm4.c
-@@ -116,7 +116,7 @@ static inline u32 sm4_round(u32 x0, u32 x1, u32 x2, u32 x3, u32 rk)
-  * Returns 0 on success. The function fails only if an invalid key size (or
-  * pointer) is supplied.
-  */
--int sm4_expandkey(struct crypto_sm4_ctx *ctx, const u8 *in_key,
-+int sm4_expandkey(struct sm4_ctx *ctx, const u8 *in_key,
- 			  unsigned int key_len)
- {
- 	u32 rk[4];
+Tianjia Zhang (4):
+  crypto: sm4 - create SM4 library based on sm4 generic code
+  crypto: arm64/sm4-ce - Make dependent on sm4 library instead of
+    sm4-generic
+  crypto: x86/sm4 - add AES-NI/AVX/x86_64 implementation
+  crypto: tcrypt - add the asynchronous speed test for SM4
+
+ arch/arm64/crypto/Kconfig              |   2 +-
+ arch/arm64/crypto/sm4-ce-glue.c        |  20 +-
+ arch/x86/crypto/Makefile               |   3 +
+ arch/x86/crypto/sm4-aesni-avx-asm_64.S | 684 +++++++++++++++++++++++++
+ arch/x86/crypto/sm4_aesni_avx_glue.c   | 537 +++++++++++++++++++
+ crypto/Kconfig                         |  22 +
+ crypto/sm4_generic.c                   | 180 +------
+ crypto/tcrypt.c                        |  26 +-
+ include/crypto/sm4.h                   |  29 +-
+ lib/crypto/Kconfig                     |   3 +
+ lib/crypto/Makefile                    |   3 +
+ lib/crypto/sm4.c                       | 184 +++++++
+ 12 files changed, 1515 insertions(+), 178 deletions(-)
+ create mode 100644 arch/x86/crypto/sm4-aesni-avx-asm_64.S
+ create mode 100644 arch/x86/crypto/sm4_aesni_avx_glue.c
+ create mode 100644 lib/crypto/sm4.c
+
 -- 
 2.19.1.3.ge56e4f7
 
