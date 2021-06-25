@@ -2,87 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 354A4C49EA5
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 21:13:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F81BC49EA6
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 00:17:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 13FBD613D6
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jun 2021 21:13:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5896D613B9
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 00:17:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232614AbhFXVQO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Jun 2021 17:16:14 -0400
-Received: from mail-il1-f182.google.com ([209.85.166.182]:34497 "EHLO
-        mail-il1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232591AbhFXVQN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Jun 2021 17:16:13 -0400
-Received: by mail-il1-f182.google.com with SMTP id s19so7775390ilj.1;
-        Thu, 24 Jun 2021 14:13:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=47hUBuaqzfJJncm6RtEipODGGyZplZhj4icIYj/zpRs=;
-        b=gjOdURXYCoOytvAT38Bv/PhoQ7AQNnRoJx436mOPFhfvzNTMwIqovZlL+6opfR4zT5
-         afGTx6PwbTIxj8NtRArzoFne3/TkVp0le6iXGUEGNndq2Wqpj1QD5t863m/hgo49As6i
-         ljnjJfikmMY6VHZNtMj/ttBSfPA9WB0AInX5DFKDVSDJMp9nHzAJy4nMnpbmqzDWm38J
-         Jc7KvHfXNW9rwYGRK+AebYaYK0WbbMnZQ5jvPTW1gOaNphRCc0Y09eFWwsJAizOce9Xb
-         KvdBZfEV/VtEnRyVh94moSsVRbOS3GqWo+dJ8/VDSl9eg6xxpIAsMsorJ9fYf6aiCNIC
-         Ldaw==
-X-Gm-Message-State: AOAM53229kVi4pzqFQF40mva1LJPp7p6Ivqs9Sry55GdM1jJmbG+hbGF
-        DOifqZT0u/dC/GJ7NuesVg==
-X-Google-Smtp-Source: ABdhPJzXf/oo5u3B5EKv4LYB8gPOkFme6FZjtb+ncnezHDcwNH7+HV0lE+tkL+Dii4TAQiGhxLJC7A==
-X-Received: by 2002:a92:6509:: with SMTP id z9mr5007087ilb.184.1624569232997;
-        Thu, 24 Jun 2021 14:13:52 -0700 (PDT)
-Received: from robh.at.kernel.org ([64.188.179.248])
-        by smtp.gmail.com with ESMTPSA id r8sm2398602iln.35.2021.06.24.14.13.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jun 2021 14:13:52 -0700 (PDT)
-Received: (nullmailer pid 1996913 invoked by uid 1000);
-        Thu, 24 Jun 2021 21:13:48 -0000
-Date:   Thu, 24 Jun 2021 15:13:48 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Geert Uytterhoeven <geert+renesas@glider.be>
-Cc:     Rob Herring <robh+dt@kernel.org>, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        id S233053AbhFYAT2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Jun 2021 20:19:28 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50874 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232930AbhFYATJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Jun 2021 20:19:09 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1lwZWa-0008Ee-A5; Fri, 25 Jun 2021 08:16:48 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1lwZWT-0006Dx-1P; Fri, 25 Jun 2021 08:16:41 +0800
+Date:   Fri, 25 Jun 2021 08:16:41 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Sean Anderson <sean.anderson@seco.com>
+Cc:     linux-crypto@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>,
-        linux-renesas-soc@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH] dt-bindings: crypto: ccree: Convert to json-schema
-Message-ID: <20210624211348.GA1991366@robh.at.kernel.org>
-References: <ab361a862755e281f5fef67b3f678d66ae201781.1623413974.git.geert+renesas@glider.be>
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-arm-kernel@lists.infradead.org, Marek Vasut <marex@denx.de>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH 2/2] crypto: mxs_dcp: Use sg_mapping_iter to copy data
+Message-ID: <20210625001640.GA23887@gondor.apana.org.au>
+References: <20210618211411.1167726-1-sean.anderson@seco.com>
+ <20210618211411.1167726-2-sean.anderson@seco.com>
+ <20210624065644.GA7826@gondor.apana.org.au>
+ <dfe6dc8d-8e26-643e-1e29-6bf05611e9db@seco.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ab361a862755e281f5fef67b3f678d66ae201781.1623413974.git.geert+renesas@glider.be>
+In-Reply-To: <dfe6dc8d-8e26-643e-1e29-6bf05611e9db@seco.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 11 Jun 2021 14:20:17 +0200, Geert Uytterhoeven wrote:
-> Convert the Arm TrustZone CryptoCell cryptographic engine Device Tree
-> binding documentation to json-schema.
-> 
-> Document missing properties.
-> Update the example to match reality.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
->  .../bindings/crypto/arm,cryptocell.yaml       | 53 +++++++++++++++++++
->  .../bindings/crypto/arm-cryptocell.txt        | 25 ---------
->  2 files changed, 53 insertions(+), 25 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/arm,cryptocell.yaml
->  delete mode 100644 Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
-> 
+On Thu, Jun 24, 2021 at 10:58:48AM -0400, Sean Anderson wrote:
+>
+> What exactly is the warning here? dst_iter.length is a size_t, and
+> actx->fill is a u32. So fill will be converted to a size_t before the
+> comparison, which is lossless.
 
-I'm applying this version which is dual licensed as that is the 
-preference of my employeer, Arm, who is the copyright holder here. I'll 
-sort this out internally with Gilad.
+It's just the way min works.  If you want to shut it up, you can
+either use a cast or min_t.
 
-Besides, for the bulk of the new file Geert is the copyright holder.
-
-Rob
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
