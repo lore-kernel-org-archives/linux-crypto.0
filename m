@@ -6,171 +6,139 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8906C2B9F4
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 13:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F2C3C48BC2
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 14:49:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A064D60241
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 13:50:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB4AF6196C
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 14:49:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229831AbhFYNwt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Jun 2021 09:52:49 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.51]:29864 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbhFYNws (ORCPT
+        id S230235AbhFYOvU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Jun 2021 10:51:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33680 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229940AbhFYOvU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Jun 2021 09:52:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1624629012;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=x4gsdNJd27Ic7pqfG23li2Pk3MOjsnuCu+ukPna2cdE=;
-    b=Ltv+GN64/kwrI+zbcLj15uMhsvHadzfSch0ceyLmFPR2er4ECZDhRNRClkPpTTmB07
-    z4sovjPM8j/DM6K4ALuJdta16UMgCpjA4vEOAo4L1OrYVpRZk8XmdxqwSLVubKPo49ux
-    /r6i2nFLQoyxYm4MOnNq7O+sauGWHgF2iBGZllVXWjLyR192ShQYNfXw51oXOkQyecvk
-    8kA8SozxzB65/OWC4wma5yhT2h1BfrkZADCI5WxHkjfQbBVpIRRUhjGEO+Gu8uvu0YHD
-    tWZx4qXz+bbFvQecgoqUEoIbxxvk2KCE7XgW9RUhFJlsB2zKploolnauwjjzSbfJmiVd
-    qLRA==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbJPSYC7Q="
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-    by smtp.strato.de (RZmta 47.27.5 DYNA|AUTH)
-    with ESMTPSA id L04113x5PDoAAUL
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Fri, 25 Jun 2021 15:50:10 +0200 (CEST)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     James Morris <jamorris@linux.microsoft.com>,
-        =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc:     David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        John Haxby <john.haxby@oracle.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Simo Sorce <simo@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
-        hpa@zytor.com, tytso@mit.edu
-Subject: Re: [PATCH v1] crypto: Make the DRBG compliant with NIST SP800-90A rev1
-Date:   Fri, 25 Jun 2021 15:50:09 +0200
-Message-ID: <3789849.nkhAASfZ5y@positron.chronox.de>
-In-Reply-To: <248b1aae-effc-f511-03af-65a71f176cf1@digikod.net>
-References: <20210623120751.3033390-1-mic@digikod.net> <9590fe0e9482e212f2a3223ffae872104659cc4b.camel@chronox.de> <248b1aae-effc-f511-03af-65a71f176cf1@digikod.net>
+        Fri, 25 Jun 2021 10:51:20 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A4BBC061574;
+        Fri, 25 Jun 2021 07:48:59 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0dae0049fb297996de39ad.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:ae00:49fb:2979:96de:39ad])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C72C91EC0595;
+        Fri, 25 Jun 2021 16:48:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1624632537;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=ENHDjrvHsrLVlBAdGgAmMkR2KuwDaPAvXCPilbbBf7A=;
+        b=LSXOwsdhUEbhG7vaRlM3tlHXlIL2v/KBN+RiZWsEAiLf8BjJ9w+dKv3EgevZlFNctBQ91L
+        kihWVCGWyB74ZmIbVG0UFqLQZu5TOOgdIAz2KLjcURGT5bgtWTYQC9esnD34CSJRSM4rZm
+        Ez3S06oseaAAUrkfLls9v8mOe0j+Sqk=
+Date:   Fri, 25 Jun 2021 16:48:53 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
+ address to setup_header
+Message-ID: <YNXs1XRu31dFiR2Z@zn.tnic>
+References: <YMw4UZn6AujpPSZO@zn.tnic>
+ <15568c80-c9a9-5602-d940-264af87bed98@amd.com>
+ <YMy2OGwsRzrR5bwD@zn.tnic>
+ <162442264313.98837.16983159316116149849@amd.com>
+ <YNMLX6fbB3PQwSpv@zn.tnic>
+ <20210624031911.eznpkbgjt4e445xj@amd.com>
+ <YNQz7ZxEaSWjcjO2@zn.tnic>
+ <20210624123447.zbfkohbtdusey66w@amd.com>
+ <YNSAlJnXMjigpqu1@zn.tnic>
+ <20210624141111.pzvb6gk5lzfelx26@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210624141111.pzvb6gk5lzfelx26@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, 25. Juni 2021, 13:09:26 CEST schrieb Micka=C3=ABl Sala=C3=BCn:
+On Thu, Jun 24, 2021 at 09:11:11AM -0500, Michael Roth wrote:
+>   We don't need anything in setup_data/setup_header. We can access the
+>   CC blob table via EFI config table. However, parsing EFI config table
+>   early in uncompressed/proper kernel has the complications I mentioned in my
+>   initial response.
 
-Hi Micka=C3=ABl,
+So since you want to parse the EFI table in the boot stage, that tells
+me that you need the blob in the early, boot kernel too, correct?
 
-[...]
->=20
-> > - applies an entropy_input len of 512 bits during initial seeding
-> >=20
-> > - applies a nonce of 128 bits during initial seeding
-> >=20
-> > entropy_input =3D=3D <384 bits get_random_bytes> || <256 bits Jitter RN=
-G>
->=20
-> We think that using "<384 bits get_random_bytes> || " makes this DRBG
-> non-compliant with SP800-90A rev1 because get_random_bytes doesn't use a
-> vetted conditioning component (but ChaCha20 instead):
->=20
-> SP800-90Ar1, section 8.6.5 says "A DRBG mechanism requires an approved
-> randomness source during instantiation and reseeding [...]. An approved
-> randomness source is an entropy source that conforms to [SP 800-90B], or
-> an RBG that conforms to [SP 800-90C] =E2=88=92 either a DRBG or an NRBG".
-> The FIPS 140-2 Implementation Guidance
-> (https://csrc.nist.gov/csrc/media/projects/cryptographic-module-validatio=
-n-p
-> rogram/documents/fips140-2/fips1402ig.pdf), section 7.19 says "As of
-> November 7, 2020, all newly submitted modules requiring an entropy
-> evaluation must demonstrate compliance to SP 800-90B". In resolution 3 it
-> says "all processing of the raw data output from the noise sources that
-> happens before it is ultimately output from the entropy source *shall*
-> occur within a conditioning chain". Data from get_random_bytes may come
-> from multiple noise sources, but they are hashed with ChaCha20.
-> In resolution 6 it says "a vetted conditioning component may optionally
-> take a finite amount of supplemental data [...] in addition to the data
-> from the primary noise source", which would be OK if get_random_bytes
-> used a vetted algorithm, but it is not the case for now.
+> This is where using a new boot_params field comes into
+>   play (similar to acpi_rsdp_addr), so boot/compressed can pass
+>   uncompressed/proper kernel a pointer to the pre-parsed CC blob so it doesn't
+>   need to re-parse EFI config table during early boot.
 
-You cite the right references, I think the interpretation is too strict.
+Ack.
 
-The specifications require that
+> For non-EFI case:
+> 
+>   We need a "proper" mechanism that bootloaders can use. My
+>   understanding is this would generally be via setup_data or
+>   setup_header, and that a direct boot_params field would be frowned
+>   upon.
 
-a) The DRBG must be seeded by a 90B entropy source
+So, you need to pass only an address, right?
 
-b) The DRBG must be initially seeded with 256 bits of entropy plus some 128=
-=20
-bit nonce
+How workable would it be if you had a cmdline option:
 
-We cover a) with the Jitter RNG and b) by pulling 384 bits from it.
+	cc_blob_address=0xb1a
 
-The standard does not forbit:
+with which you tell the kernel where that thing is?
 
-c) the entropy string may contain data from another origin or it contains a=
-=20
-larger buffer
+Because then you can use this in both cases - EFI and !EFI.
 
-d) the actual entropy distribution in the entropy string being not an=20
-equidistribution over the entire entropy string
+Or is this blob platform-dependent and the EFI table contains it and
+something needs to get it out of there, even if it were a user to
+type in the cmdline cc_blob_address or some script when it comes to
+containers...?
 
-Bullet d) implies that it is perfectly fine to have entropy distribution be=
-gin=20
-loopsided in the entropy string.
+In any case, setup_data is kinda the generic way to pass arbitrary data
+to the kernel so in this case, you can prioritize the EFI table in the
+EFI case and fall back to setup_data if there's no EFI table...
 
-Bullet c) implies that other data can be provided with the entropy string.
+> So your understanding of the situation seems correct.
+> 
+> By bringing up the non-EFI case I only meant to point out that by using a
+> field in setup_header, we could re-use that field for the EFI case as well,
+> and wouldn't need a seperate boot_params field to handle the
+> boot/compressed->uncompressed passing of the pre-parsed CC blob address
+> in the EFI case. But I don't think it makes a big difference as far as
+> my stuff goes at least. Maybe for TDX though this needs more thought.
 
-With that, to be 90A/B compliant, you interpret that the Jitter RNG provide=
-s=20
-all entropy you need and credit the entropy from get_random_bytes with zero=
-=20
-bits of entropy.
+Yah, let's see what requirements they'd come back with.
 
+Thx.
 
-Note, if you look into the implementation of the DRBG seeding, the differen=
-t=20
-input strings like entropy string or data without entropy like personalizat=
-ion=20
-string are simply concatenated and handed to the DRBG. As the Jitter RNG an=
-d=20
-get_random_bytes data is also concatenated, it follows the concepts of 90A.
+-- 
+Regards/Gruss,
+    Boris.
 
-If you look into the draft 90C standard, it explicitly allows concatenation=
- of=20
-data from an entropy source that you credit with entropy and data without=20
-entropy - see the crediting of entropy of multiple entropy sources defined=
-=20
-with "Method 1" and "Method 2" in the current 90C draft.
-
-This ultimately allows us to have an entropy string that is concatenated fr=
-om=20
-different entropy sources. If you have an entropy source that is not 90B=20
-compliant, you have to credit it with zero bits of entropy in the entropy=20
-analysis. Thus, only the entropy source(s) compliant to 90B must provide th=
-e=20
-entire entropy as mandated by 90A.
-
-After having several discussions with the Entropy Working group sponsored b=
-y=20
-NIST that included also representatives from the NIST crypto technology gro=
-up,=20
-there was no concern regarding such approach.
-
-This approach you see in the current DRBG seeding code is now taken for=20
-different FIPS validations including FIPS validations that I work on as a F=
-IPS=20
-tester as part of my duties working for a FIPS lab. My colleagues have=20
-reviewed the current kernel DRBG seeding strategy and approved of it for ot=
-her=20
-=46IPS validations.
-
-Ciao
-Stephan
-
-
+https://people.kernel.org/tglx/notes-about-netiquette
