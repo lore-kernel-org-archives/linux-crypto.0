@@ -2,108 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9AB8C49EAB
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 13:12:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE180C2B9F4
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 13:27:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B29B56195C
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 13:12:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86FFA6197B
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 13:27:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231492AbhFYNOy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Jun 2021 09:14:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40164 "EHLO
+        id S231492AbhFYN3x (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Jun 2021 09:29:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbhFYNOx (ORCPT
+        with ESMTP id S231501AbhFYN3v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Jun 2021 09:14:53 -0400
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A2F4C061574;
-        Fri, 25 Jun 2021 06:12:32 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id c23so18952509qkc.10;
-        Fri, 25 Jun 2021 06:12:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EtH+YaguYetgfT8kdoojx9dl0VFAOn0Yx63g1VXsJew=;
-        b=ibebuR7OhuuvKztdC31VfGhCLFYwF5mP1pV/+hJ3huZCAhmuaKBvXpB1tjgs9IIMr9
-         kTpQ++d8sLN88ao1wBevONYfKDcD/mCLTqaTEEQhvwrAgQ6MhQJ66epchgndDQjHyVh5
-         Z+Jmv6umAuv435h93xu44fqA9IkyadeNoFp9G+XwLX2Yjil+8Y+IY3CRxsEvxggMxW7D
-         JyeF3c2fUUFPtgYf0vfL3g18kIHJRNdH+wSRaileVeU715wrAIbj7N50gz5J9LsMHEPJ
-         IYYVngXW/9d46V1Zn8Uqe1SSGNgswJ0er2+QI/NfBav9egxI0h+kZ3RgR2yGNCxjQPDt
-         w3DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EtH+YaguYetgfT8kdoojx9dl0VFAOn0Yx63g1VXsJew=;
-        b=U6s6QHm0iM95vfCwde4UlhuLxEAgr20xrNVk+aTStvskBk03xe7Y7t4OhhwIyX7BYk
-         0q7FL+TWFYwJ6EylRJ0Uq7eMwzPXZezi9AOoBoMe2RDDpFfvrozpnROLt1+OvSOzNIoV
-         MTjCaFs5m2ZsNkdYJ7I12lZdhicbSZ+3s974Hk37g70coQS+laG5+ClW6cmzqhgWcItW
-         N9p/Tufvf2C+iqFXAD3pBiIs+t15SNSBmSlKZvYmNoCyFP8QmKht6Bx16+3vpDtX7k5f
-         4aDoYklSfSUfVSYJBPquwco+z/gBeavrNLyWOrEK8x0XOk91NYfF7b5+GkVwijSKAQh1
-         k6yA==
-X-Gm-Message-State: AOAM532riY9QBMDTOnE/JXVi1h29bbBVfBR7ISSWXjlaPiZKASiFFeET
-        FJiXs1HoyX7jRIWXJAscgImxEm2uP2po1uv7sFQ=
-X-Google-Smtp-Source: ABdhPJwtcJBfZh6+UIt9Kg9D23mEveqk6UdDJLrv+I1aDYiyVGB7RwiNeAuD+xRyfZcD0pFjoPQMpri+pbEPlM5lJ0o=
-X-Received: by 2002:a37:e110:: with SMTP id c16mr11117736qkm.237.1624626751519;
- Fri, 25 Jun 2021 06:12:31 -0700 (PDT)
+        Fri, 25 Jun 2021 09:29:51 -0400
+Received: from laurent.telenet-ops.be (laurent.telenet-ops.be [IPv6:2a02:1800:110:4::f00:19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D07CC061766
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Jun 2021 06:27:30 -0700 (PDT)
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed20:1476:ce84:e216:add8])
+        by laurent.telenet-ops.be with bizsmtp
+        id MRTT250012B1U9901RTTh0; Fri, 25 Jun 2021 15:27:28 +0200
+Received: from rox.of.borg ([192.168.97.57])
+        by ramsan.of.borg with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1lwlri-003Ts2-H9; Fri, 25 Jun 2021 15:27:26 +0200
+Received: from geert by rox.of.borg with local (Exim 4.93)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1lwlri-004tGU-1e; Fri, 25 Jun 2021 15:27:26 +0200
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+To:     Corentin Labbe <clabbe@baylibre.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+        Linus Walleij <linus.walleij@linaro.org>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH 1/2] crypto: Typo s/Stormlink/Storlink/
+Date:   Fri, 25 Jun 2021 15:27:23 +0200
+Message-Id: <20210625132724.1165706-1-geert@linux-m68k.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20210614201620.30451-1-richard@nod.at> <20210614201620.30451-2-richard@nod.at>
- <CAFLxGvyyybqsgXOQ2f2BmpTCnC=7UdWhwnCpGfZMxYuK-AQ-_w@mail.gmail.com> <20210625122848.GA26048@gondor.apana.org.au>
-In-Reply-To: <20210625122848.GA26048@gondor.apana.org.au>
-From:   Richard Weinberger <richard.weinberger@gmail.com>
-Date:   Fri, 25 Jun 2021 15:12:20 +0200
-Message-ID: <CAFLxGvyFy-BWjLF5z2=TaQ+MPEh+Djj3-PSAMArMoquekLWgBQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] crypto: mxs-dcp: Add support for hardware provided keys
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     keyrings@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        David Howells <dhowells@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Fabio Estevam <festevam@gmail.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        James Morris <jmorris@namei.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        LSM <linux-security-module@vger.kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Shawn Guo <shawnguo@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert,
+From: Geert Uytterhoeven <geert+renesas@glider.be>
 
-On Fri, Jun 25, 2021 at 2:29 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > This patch was judged as not applicable in your patchwork.
-> > Is something missing? How can we proceed?
->
-> I'm happy to take this patch.  I marked it as not applicable
-> mainly because the other two patches didn't have acks and I'm
-> not sure if they were meant for the crypto tree or not.
+According to Documentation/devicetree/bindings/arm/gemini.txt, the
+company was originally named "Storlink Semiconductor", and later renamed
+to "Storm Semiconductor".
 
-Maybe we have a chicken/egg situation and integrity folks wait for you. ;-)
+Fixes: 46c5338db7bd45b2 ("crypto: sl3516 - Add sl3516 crypto engine")
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+ drivers/crypto/Kconfig                   | 2 +-
+ drivers/crypto/gemini/sl3516-ce-cipher.c | 2 +-
+ drivers/crypto/gemini/sl3516-ce-core.c   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-> Would you like me to take just the first patch?
-
-IMHO all three patches should go through the integrity tree.
-Given that you're fine with the first patch, can you please ack it?
-
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index ebcec460c045734f..8796ddf37cb5bfde 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -267,7 +267,7 @@ config CRYPTO_DEV_NIAGARA2
+ 	  checksumming, and raw copies.
+ 
+ config CRYPTO_DEV_SL3516
+-	tristate "Stormlink SL3516 crypto offloader"
++	tristate "Storlink SL3516 crypto offloader"
+ 	depends on HAS_IOMEM
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_ENGINE
+diff --git a/drivers/crypto/gemini/sl3516-ce-cipher.c b/drivers/crypto/gemini/sl3516-ce-cipher.c
+index b41c2f5fc495a856..c1c2b1d866639149 100644
+--- a/drivers/crypto/gemini/sl3516-ce-cipher.c
++++ b/drivers/crypto/gemini/sl3516-ce-cipher.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*
+- * sl3516-ce-cipher.c - hardware cryptographic offloader for Stormlink SL3516 SoC
++ * sl3516-ce-cipher.c - hardware cryptographic offloader for Storlink SL3516 SoC
+  *
+  * Copyright (C) 2021 Corentin LABBE <clabbe@baylibre.com>
+  *
+diff --git a/drivers/crypto/gemini/sl3516-ce-core.c b/drivers/crypto/gemini/sl3516-ce-core.c
+index da6cd529a6c01ff4..b7524b649068e980 100644
+--- a/drivers/crypto/gemini/sl3516-ce-core.c
++++ b/drivers/crypto/gemini/sl3516-ce-core.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*
+- * sl3516-ce-core.c - hardware cryptographic offloader for Stormlink SL3516 SoC
++ * sl3516-ce-core.c - hardware cryptographic offloader for Storlink SL3516 SoC
+  *
+  * Copyright (C) 2021 Corentin Labbe <clabbe@baylibre.com>
+  *
 -- 
-Thanks,
-//richard
+2.25.1
+
