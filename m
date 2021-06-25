@@ -2,164 +2,184 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC76C2B9F4
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 14:53:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F748C49EA7
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 15:24:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B7FB6196C
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 14:53:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F91861976
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jun 2021 15:24:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230235AbhFYOzo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Jun 2021 10:55:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34656 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229782AbhFYOzn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Jun 2021 10:55:43 -0400
-Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [IPv6:2001:1600:4:17::bc08])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 906E5C061766
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Jun 2021 07:53:22 -0700 (PDT)
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4GBKkP0Fn6zMpnhh;
-        Fri, 25 Jun 2021 16:53:17 +0200 (CEST)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4GBKkF6p13zlh8TS;
-        Fri, 25 Jun 2021 16:53:09 +0200 (CEST)
-Subject: Re: [PATCH v1] crypto: Make the DRBG compliant with NIST SP800-90A
- rev1
-To:     =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>,
-        James Morris <jamorris@linux.microsoft.com>
-Cc:     David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        John Haxby <john.haxby@oracle.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Simo Sorce <simo@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
-        hpa@zytor.com, tytso@mit.edu
-References: <20210623120751.3033390-1-mic@digikod.net>
- <9590fe0e9482e212f2a3223ffae872104659cc4b.camel@chronox.de>
- <248b1aae-effc-f511-03af-65a71f176cf1@digikod.net>
- <3789849.nkhAASfZ5y@positron.chronox.de>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-Message-ID: <43710a75-bd5d-2e23-7783-299470490ff0@digikod.net>
-Date:   Fri, 25 Jun 2021 16:53:27 +0200
-User-Agent: 
-MIME-Version: 1.0
-In-Reply-To: <3789849.nkhAASfZ5y@positron.chronox.de>
+        id S229630AbhFYP0b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Jun 2021 11:26:31 -0400
+Received: from mail-dm6nam11on2069.outbound.protection.outlook.com ([40.107.223.69]:40096
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229445AbhFYP0b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Jun 2021 11:26:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hEhiGSn1hbwaWWdE9gCiJOSV38LKRiiVcNs71PXz0NrVQnST7YbreyjahC/2QbrboFL4XeJEDzf5eKdC2lLEYhLoeo3PCQEygw4qkNfwFI8wZ4v3VYq9p13voGPMvOWlSz/1E0xjbSZMSH9NbTa27gePCywZJ5NZUcOkcI5u+gtCNTeLchT4Q+5WWjlaRVeUWk9KtYbKKThDRjdtHYX0l3juOpVFvkGgot806eLMoDkZt9qZmIA1pSNIfx9oOt5cIhi0UezCgctCHzpuR9kjtLTAU2fXHj43v5rW78hO9Hhsp34dFCDfkoi3bfrmcnU7AV1Cv5SnwnMU6s3VMcZyWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kCT/WEI2tnuui5H5cnSBt74NZ+EI44YlTu4BSMm8JOo=;
+ b=MISsC3f/FrU+z0H8O1X6OmXzoLtB3h4dq1M9J7kWDr7rrEPlOAor436jR1juyNidQqRdNd5yDIPkE2Yk9cbVAbtXuMBLI+xwKZ2yGzz91PoxuYOBViPn1vqZUktTBeOiHmAGqqIgD0ZIob5+cPMrLU4Hnybxgj2EZ8YAtcS2D2CLb+bu+pD4IyPauhM4IhQSgJHgZKEyfC7qZ3uqX4cmGSYoLApZqN0Uzs/XALSurLIXsmAp/psOGnZx+CgPJIBHr31rsvsnocw4mgPLO+x7EYM0R0I6DPBHTTROzwiG3MxsBS+dTtDOZvgxdSOk8Ar0XDUBq0XHTBUw3lFBPR0yMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kCT/WEI2tnuui5H5cnSBt74NZ+EI44YlTu4BSMm8JOo=;
+ b=OJr06ydFSzZm0lzRqNumKoblctRdyrzpP3gdrT1TTD+0QMqi15H7W3hq30fh+ODM0xh02wW1JiBuATrcg10F+RBcmzIxOgXE2x+khFKqJ5jFqalO2P5VKtWVM/10QraVV8XNUdnNg6jxcMt6ysQm8z2Bv/tTSPZ6934u8ri4czA=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2714.namprd12.prod.outlook.com (2603:10b6:5:42::18) by
+ DM6PR12MB2924.namprd12.prod.outlook.com (2603:10b6:5:183::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4264.23; Fri, 25 Jun 2021 15:24:07 +0000
+Received: from DM6PR12MB2714.namprd12.prod.outlook.com
+ ([fe80::7df8:b0cd:fe1b:ae7b]) by DM6PR12MB2714.namprd12.prod.outlook.com
+ ([fe80::7df8:b0cd:fe1b:ae7b%5]) with mapi id 15.20.4242.023; Fri, 25 Jun 2021
+ 15:24:07 +0000
+Cc:     brijesh.singh@amd.com,
+        "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
+ address to setup_header
+To:     Borislav Petkov <bp@alien8.de>, Michael Roth <michael.roth@amd.com>
+References: <YMw4UZn6AujpPSZO@zn.tnic>
+ <15568c80-c9a9-5602-d940-264af87bed98@amd.com> <YMy2OGwsRzrR5bwD@zn.tnic>
+ <162442264313.98837.16983159316116149849@amd.com> <YNMLX6fbB3PQwSpv@zn.tnic>
+ <20210624031911.eznpkbgjt4e445xj@amd.com> <YNQz7ZxEaSWjcjO2@zn.tnic>
+ <20210624123447.zbfkohbtdusey66w@amd.com> <YNSAlJnXMjigpqu1@zn.tnic>
+ <20210624141111.pzvb6gk5lzfelx26@amd.com> <YNXs1XRu31dFiR2Z@zn.tnic>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <8faad91a-f229-dee3-0e1f-0b613596db17@amd.com>
+Date:   Fri, 25 Jun 2021 10:24:01 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <YNXs1XRu31dFiR2Z@zn.tnic>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [165.204.84.11]
+X-ClientProxiedBy: BLAP220CA0012.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:208:32c::17) To DM6PR12MB2714.namprd12.prod.outlook.com
+ (2603:10b6:5:42::18)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.254.35.102] (165.204.84.11) by BLAP220CA0012.NAMP220.PROD.OUTLOOK.COM (2603:10b6:208:32c::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.18 via Frontend Transport; Fri, 25 Jun 2021 15:24:03 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c86b0849-49b0-4304-d93e-08d937ed4608
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2924:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB29246DCC2EE08A62A25343A7E5069@DM6PR12MB2924.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ePLoVwLB88PLosNOduGp2J49H/F28Enk8Oz91J4ZV2l6WUMG/TEXuQvSVU5JFMxJ4JK9b+aeVSEjHsfCFiLKYLV/6apQyqKH7N7k2WCGw3DN5sQfqxrWTjQvoZEcCd8ZoJnCYTh/YbYqYxc79Qw2GD5Vx7xo3eEZzLm+yCRvbKYY3vJmSiuyzfunX5wtlcQQhmaSXa2F8+YssOmmkBx5cPmFJAFa9xW9+4ch3XKFBFeQWv2hYYYHVFstZxyMjfvpMO6x2BRufHeZME7Y8jSt9CwPHctc6BEBYbStfLfrfqhxCR2kP1cYUQnoY9wZjTon2rUnSOFR4IOZMIfvS95flSRNj/gBtMLxaSeQkwI1hFJamCnGEi9Rve2NDhH7eYlJrpnmdTc9/Ta1ALwxhatkw+h8CaKQ2FiXIFvcdQLJAa6okAET521CBwADkZo63aBVLD3rE3r8jd8JUqRL47j007DmiCoIphX0FLakFZU0K172nMNiDUZhKDUwV6YC7j9LWR1PHVBQe0XlTOn4yI8WH+6YGGiy5VhMy8EEwzH2/PeVFnt5kepTOdkP9LTqY60CYOspy3615aRxp6bdnm11mDbqbgnuwxhu2mdu35elfuBw/q73VQJ918OGof1RPdkB7OcRlCAW1l/wUDIzRZEBsgO1estE0vNwLj5zzTDKDweCL5zwWo/vHQuPQ49EOb5olF3ZGrm7cD3vD/ynhvX0KA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2714.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(376002)(136003)(396003)(346002)(31686004)(31696002)(38100700002)(38350700002)(956004)(7416002)(478600001)(52116002)(8936002)(8676002)(2616005)(44832011)(5660300002)(4326008)(16526019)(86362001)(66556008)(66476007)(53546011)(6636002)(26005)(66946007)(316002)(36756003)(54906003)(6486002)(186003)(2906002)(16576012)(110136005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NTFDNi9iUmJLWWhleTJ0UWtreDM5dEovTkU3NGs5RHBlSy9rbUJTc1JxSDVs?=
+ =?utf-8?B?OWtyb0Nadm9XODZrQlM2cThodjNwNE90TjZleFF2STVpS05FZlhvZXVGODBl?=
+ =?utf-8?B?MHJleTlWbE5ha2xlVHc0SWVTL1g2NHVleUpmUGVvMDBCdWVUaGEzUWl3VnZm?=
+ =?utf-8?B?OXJEcW1FdXFvb3h6SkZMQkh0RkRNYk5rM3dkREgySUVrZkljYy91bGxweWhu?=
+ =?utf-8?B?YlY5ZmlvVEVzUjdYN3dwS05UV0E3MVJzQkFQMVVOWXRkNi9LQWltSUZZd2lm?=
+ =?utf-8?B?dkVJRkdaZmhPOXQ5VHpBOW1wblFFZmFUajlpdGFFRFdsdUJ5UmhHSDNOdDlr?=
+ =?utf-8?B?b1hZTnROM2g4ZHNsZVlteFF4ekdQaGF1cFc0cGd3OFhmbk5FWXdFTGFjRHg2?=
+ =?utf-8?B?YmYxZ3NXSUdYZUFxdXlqaWRyYng5YWN0c0lWR3BXTWdqdThBYzdYZnhZR2dx?=
+ =?utf-8?B?cW1IRzlQaXNmbmk4YkFFTkx5QWlVSzBOODhJaU9CaGtSdUFqUHA2MjJIaE5l?=
+ =?utf-8?B?bERqYnR1RjRVcTJpZFlXQ1dsQ0pRTWhCQjVQQWo3NzU3aWlTQ1FQeFBBVk44?=
+ =?utf-8?B?SGladm5mQVdGMlhVdjhrbkdsZFVWZ2d6bWVrTHhXM2pxS29rc0hzQkFNbWZK?=
+ =?utf-8?B?dGdvckE3dUtOZHJ3KzR3S3l5c1BTcG5scjROYURQSkk1T0tRZGU0TXQ3U29J?=
+ =?utf-8?B?eW1BMG5WcjR3SUlDMnV5RHNqcXkvOEVGMTB6NjR1MXY3RmU2WnpoV3RxVGlZ?=
+ =?utf-8?B?dFhBTG91eG9KZlY0aWNqa29pVnQzaGlqMFRtdlFONDczcWRML3dUMk9JRVdB?=
+ =?utf-8?B?dURUSUVVVVFiUnB1aVk4UjZJN0lmS1ByRW1wWjdOSlEzUjExTWdmR1diMFNo?=
+ =?utf-8?B?NFVBMHlrUTMweGtSdm4yUUE1aGxJVnd0eGZIT1Fsa1gyRS9OYUJxTGJPVGhZ?=
+ =?utf-8?B?T253UElkRklkRk80aFZHU3JpOTByWVlrRnNITFQvQ2ZqYUdnQSs2K2tKb0E0?=
+ =?utf-8?B?T01pL2pvc09vYk5VYzJCM1dQRVdDeG1aQUVVYXZwTE91WFN3Zk5XQzdtZElX?=
+ =?utf-8?B?R0tOTUpXajU0T25SQUx2SGlpNTZnT0RDUVU5cGNaZ0t1UFZqcFR0dE1DYWFH?=
+ =?utf-8?B?TlZWdVo3NkJYZU5tVDVOcFVGdk5IUnpvZ2duWCtNY0RMTWtGN0ZyQ1lCSWts?=
+ =?utf-8?B?ZjBHOWxzd1dqVFIrdnJEYmJvcVlGY0NMem1maXljdHl0Y0xpVzU4ZWlZM3hz?=
+ =?utf-8?B?WElFZ1hjZ1doREpMZm5yNlJaYzEwZDIxekpJOHkzN0p5aU9wOWVjMW9HTEVM?=
+ =?utf-8?B?ckV1UjN2VXJ3elpLenpHR1JZQWhCajdyMllQUjVvczdCclQ1MkIweUhoSjRY?=
+ =?utf-8?B?dUNDQ0RPbm5XbHBWUU96bE9EWFhadzh6YVlrMUhQUi81ZStDZVNUU0E1NUZI?=
+ =?utf-8?B?bGJoVlpGZVlSaThMeTRYYlEwVTJOdjJHMitONFB4bWFsOVVuTTMwajdLc2pt?=
+ =?utf-8?B?cGh2d2RpRlJBRGt5M2tyOU5lTko4N0h4VyttWjZxSitZbEZqOVpTL3dXMFgz?=
+ =?utf-8?B?dHBCYXBsYWgrbTlpUUlVUnBuaGlIV2ovcDAweUZhVGwxUFhReDFJd2VOTU9R?=
+ =?utf-8?B?b24rZ0wvRGU4NkJOdG9xMzdXOERkL1lOdWNrMERPYTJoTFEyUjM5RzMyc3Fx?=
+ =?utf-8?B?WUUvYndoUXF0VEVyUGxwak16SURQbjRmUVdsbHZqZFIyZUJicHFXNmpFR1FN?=
+ =?utf-8?Q?bhCG4gtoIvx5QxR2Ks795XTyekv7WJJ+LrlUydW?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c86b0849-49b0-4304-d93e-08d937ed4608
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2714.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2021 15:24:07.7074
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mjZf/mwXrACXExbwfQd5u/OE+izECV2R7LsevK89dcNbXVqsFQaFdXmOPJY6tL/kWj63XWwRE4a/G82z8WVNPw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2924
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-On 25/06/2021 15:50, Stephan Müller wrote:
-> Am Freitag, 25. Juni 2021, 13:09:26 CEST schrieb Mickaël Salaün:
-> 
-> Hi Mickaël,
-> 
-> [...]
+
+On 6/25/2021 9:48 AM, Borislav Petkov wrote:
+>> For non-EFI case:
 >>
->>> - applies an entropy_input len of 512 bits during initial seeding
->>>
->>> - applies a nonce of 128 bits during initial seeding
->>>
->>> entropy_input == <384 bits get_random_bytes> || <256 bits Jitter RNG>
->>
->> We think that using "<384 bits get_random_bytes> || " makes this DRBG
->> non-compliant with SP800-90A rev1 because get_random_bytes doesn't use a
->> vetted conditioning component (but ChaCha20 instead):
->>
->> SP800-90Ar1, section 8.6.5 says "A DRBG mechanism requires an approved
->> randomness source during instantiation and reseeding [...]. An approved
->> randomness source is an entropy source that conforms to [SP 800-90B], or
->> an RBG that conforms to [SP 800-90C] − either a DRBG or an NRBG".
->> The FIPS 140-2 Implementation Guidance
->> (https://csrc.nist.gov/csrc/media/projects/cryptographic-module-validation-p
->> rogram/documents/fips140-2/fips1402ig.pdf), section 7.19 says "As of
->> November 7, 2020, all newly submitted modules requiring an entropy
->> evaluation must demonstrate compliance to SP 800-90B". In resolution 3 it
->> says "all processing of the raw data output from the noise sources that
->> happens before it is ultimately output from the entropy source *shall*
->> occur within a conditioning chain". Data from get_random_bytes may come
->> from multiple noise sources, but they are hashed with ChaCha20.
->> In resolution 6 it says "a vetted conditioning component may optionally
->> take a finite amount of supplemental data [...] in addition to the data
->> from the primary noise source", which would be OK if get_random_bytes
->> used a vetted algorithm, but it is not the case for now.
+>>   We need a "proper" mechanism that bootloaders can use. My
+>>   understanding is this would generally be via setup_data or
+>>   setup_header, and that a direct boot_params field would be frowned
+>>   upon.
 > 
-> You cite the right references, I think the interpretation is too strict.
+> So, you need to pass only an address, right?
 > 
-> The specifications require that
+> How workable would it be if you had a cmdline option:
 > 
-> a) The DRBG must be seeded by a 90B entropy source
+> 	cc_blob_address=0xb1a
 > 
-> b) The DRBG must be initially seeded with 256 bits of entropy plus some 128 
-> bit nonce
+> with which you tell the kernel where that thing is?
 > 
-> We cover a) with the Jitter RNG and b) by pulling 384 bits from it.
+> Because then you can use this in both cases - EFI and !EFI.
 > 
-> The standard does not forbit:
-> 
-> c) the entropy string may contain data from another origin or it contains a 
-> larger buffer
-> 
-> d) the actual entropy distribution in the entropy string being not an 
-> equidistribution over the entire entropy string
-> 
-> Bullet d) implies that it is perfectly fine to have entropy distribution begin 
-> loopsided in the entropy string.
-> 
-> Bullet c) implies that other data can be provided with the entropy string.
-> 
-> With that, to be 90A/B compliant, you interpret that the Jitter RNG provides 
-> all entropy you need and credit the entropy from get_random_bytes with zero 
-> bits of entropy.
-> 
-> 
-> Note, if you look into the implementation of the DRBG seeding, the different 
-> input strings like entropy string or data without entropy like personalization 
-> string are simply concatenated and handed to the DRBG. As the Jitter RNG and 
-> get_random_bytes data is also concatenated, it follows the concepts of 90A.
-> 
-> If you look into the draft 90C standard, it explicitly allows concatenation of 
-> data from an entropy source that you credit with entropy and data without 
-> entropy - see the crediting of entropy of multiple entropy sources defined 
-> with "Method 1" and "Method 2" in the current 90C draft.
-> 
-> This ultimately allows us to have an entropy string that is concatenated from 
-> different entropy sources. If you have an entropy source that is not 90B 
-> compliant, you have to credit it with zero bits of entropy in the entropy 
-> analysis. Thus, only the entropy source(s) compliant to 90B must provide the 
-> entire entropy as mandated by 90A.
 
-Thanks for your detailed explanation Stephan. We agree that data from
-get_random_bytes is not accounted as entropy, but the question is: is it
-still in line with the specification because it uses an algorithm not
-compliant to SP800-90B (i.e. ChaCha20 is not a vetted conditioning
-component)? Cf. IG 7.19 resolution 6 from 08/28/2020 and IG 7.20 from
-05/04/2021.
+In the case of EFI, the CC blob structure is dynamically allocated
+and passed through the EFI configuration table. The grub will not
+know what value to pass in the cmdline unless we improve it to read
+the EFI configuration table and rebuild the cmdline.
 
+
+> Or is this blob platform-dependent and the EFI table contains it and
+> something needs to get it out of there, even if it were a user to
+> type in the cmdline cc_blob_address or some script when it comes to
+> containers...?
 > 
-> After having several discussions with the Entropy Working group sponsored by 
-> NIST that included also representatives from the NIST crypto technology group, 
-> there was no concern regarding such approach.
+> In any case, setup_data is kinda the generic way to pass arbitrary data
+> to the kernel so in this case, you can prioritize the EFI table in the
+> EFI case and fall back to setup_data if there's no EFI table...
 > 
-> This approach you see in the current DRBG seeding code is now taken for 
-> different FIPS validations including FIPS validations that I work on as a FIPS 
-> tester as part of my duties working for a FIPS lab. My colleagues have 
-> reviewed the current kernel DRBG seeding strategy and approved of it for other 
-> FIPS validations.
-
-Good to know. We are worried that a new FIPS validation (started after
-November 7, 2020) could failed because of the new SP800-90B requirement.
-This issue was pointed out by a lab. It seems that the specification is
-still open to different interpretations.
-
-Regards,
- Mickaël
