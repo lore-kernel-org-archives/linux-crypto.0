@@ -2,79 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56124C2B9F4
-	for <linux-crypto@archiver.kernel.org>; Sat, 26 Jun 2021 02:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06D0FC2B9F4
+	for <linux-crypto@archiver.kernel.org>; Sat, 26 Jun 2021 03:01:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 27E8B61864
-	for <linux-crypto@archiver.kernel.org>; Sat, 26 Jun 2021 02:51:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC13661946
+	for <linux-crypto@archiver.kernel.org>; Sat, 26 Jun 2021 03:01:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229915AbhFZCxY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Jun 2021 22:53:24 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:5082 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229782AbhFZCxY (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Jun 2021 22:53:24 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GBdXV6bHlzXhxP;
-        Sat, 26 Jun 2021 10:45:46 +0800 (CST)
-Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Sat, 26 Jun 2021 10:51:00 +0800
-Received: from huawei.com (10.69.192.56) by dggpeml500012.china.huawei.com
- (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Sat, 26 Jun
- 2021 10:51:00 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH] crypto: hisilicon/sec - fix the process of disabling sva prefetching
-Date:   Sat, 26 Jun 2021 10:50:33 +0800
-Message-ID: <1624675833-20107-1-git-send-email-yekai13@huawei.com>
-X-Mailer: git-send-email 2.7.4
+        id S229873AbhFZDDU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Jun 2021 23:03:20 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50888 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229782AbhFZDDT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Jun 2021 23:03:19 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1lwyYz-0004dF-AE; Sat, 26 Jun 2021 11:00:57 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1lwyYs-0007fP-Gz; Sat, 26 Jun 2021 11:00:50 +0800
+Date:   Sat, 26 Jun 2021 11:00:50 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Sean Anderson <sean.anderson@seco.com>
+Cc:     linux-crypto@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-arm-kernel@lists.infradead.org, Marek Vasut <marex@denx.de>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH 2/2] crypto: mxs_dcp: Use sg_mapping_iter to copy data
+Message-ID: <20210626030050.GC29383@gondor.apana.org.au>
+References: <20210618211411.1167726-1-sean.anderson@seco.com>
+ <20210618211411.1167726-2-sean.anderson@seco.com>
+ <20210624065644.GA7826@gondor.apana.org.au>
+ <dfe6dc8d-8e26-643e-1e29-6bf05611e9db@seco.com>
+ <20210625001640.GA23887@gondor.apana.org.au>
+ <f3117c42-7918-3d32-059e-4e6c338a781a@seco.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500012.china.huawei.com (7.185.36.15)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f3117c42-7918-3d32-059e-4e6c338a781a@seco.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The open interface of the sva prefetching function is distinguish the chip
-version. But the close interface of the sva prefetching function doesn't
-distinguish the chip version. As a result, the sva prefetching close
-operation is also performed on Kunpeng920, those registers are important
-on Kunpeng920, which eventually leads to abnormal hardware problems. So
-need to fix it immediately.
+On Fri, Jun 25, 2021 at 10:49:08AM -0400, Sean Anderson wrote:
+>
+> What version of sparse are you using? With sparse 0.6.2, gcc 9.3.0, and
+> with C=1 and W=2 I don't see this warning.
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
----
- drivers/crypto/hisilicon/sec2/sec_main.c | 3 +++
- 1 file changed, 3 insertions(+)
+Oh it could be my sparse being out-of-date, I'll get it another go.
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 8ab4e67..710ea8d 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -363,6 +363,9 @@ static void sec_close_sva_prefetch(struct hisi_qm *qm)
- 	u32 val;
- 	int ret;
- 
-+	if (qm->ver < QM_HW_V3)
-+		return;
-+
- 	val = readl_relaxed(qm->io_base + SEC_PREFETCH_CFG);
- 	val |= SEC_PREFETCH_DISABLE;
- 	writel(val, qm->io_base + SEC_PREFETCH_CFG);
+Thanks,
 -- 
-2.7.4
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
