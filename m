@@ -2,69 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97EA8C11F64
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jun 2021 23:36:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 015D0C11F66
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jun 2021 11:48:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7797661D13
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jun 2021 23:36:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0DD061D2B
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jun 2021 11:48:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233909AbhF1XjL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Jun 2021 19:39:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47554 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234006AbhF1XjD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Jun 2021 19:39:03 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 66F5361D01;
-        Mon, 28 Jun 2021 23:36:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1624923393;
-        bh=8k9BSM3HfvGzsZN2PP3OKgrs+Ng4erZQPnJYcV1Nhd0=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Vzj9LySSy0od8q6100vWWfg8Wa0h0xD43VX7EedqcAy1144zx8hLED8p1iBYD3VQh
-         W8/6fUNU4Lcqs1FhTVZu7pf7PnexTOnhJd3TTAfeNJ15//WWXjWjJ8O9PRyiuJVKih
-         G6C3P5f44i0elIIj9mIulK8QhtFZu2c/q1eRPMrkaHwujluByGVs2+nGpeyIpD5y6U
-         iWWXOm5e8qje+yn9rKJhC0OhAkLBCrD+YIXAt0uWGfm3738++EakVFaH3h0hDTvyVs
-         RDs91wb6COr6VDt366ZFKCcQOf3wc9R5hEQMi9eXQyjb3AXSH79j6m1+NQYehkSbD+
-         mfBOg0+kYFxYQ==
-Subject: Re: [GIT PULL] Crypto Update for 5.14
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20210628110050.GA12162@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20201012033249.GA25179@gondor.apana.org.au>
- <20201214055515.GA14196@gondor.apana.org.au>
- <20210215024721.GA20593@gondor.apana.org.au>
- <20210426123200.kgbyk6ayey4l4lrw@gondor.apana.org.au> <20210628110050.GA12162@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20210628110050.GA12162@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 9f38b678ffc4e2ccf167a1131c0403dc4f5e1bb7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 6159c49e12284b4880fd60e0575a71a40556a67e
-Message-Id: <162492339339.13806.13049196174989684467.pr-tracker-bot@kernel.org>
-Date:   Mon, 28 Jun 2021 23:36:33 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        id S232790AbhF2Lua (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 29 Jun 2021 07:50:30 -0400
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:16114 "EHLO
+        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232664AbhF2Lua (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 29 Jun 2021 07:50:30 -0400
+X-IronPort-AV: E=Sophos;i="5.83,308,1616454000"; 
+   d="scan'208";a="517260400"
+Received: from 173.121.68.85.rev.sfr.net (HELO hadrien) ([85.68.121.173])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Jun 2021 13:48:01 +0200
+Date:   Tue, 29 Jun 2021 13:48:01 +0200 (CEST)
+From:   Julia Lawall <julia.lawall@inria.fr>
+X-X-Sender: jll@hadrien
+To:     Megha Dey <megha.dey@intel.com>
+cc:     labuser <labuser@ssp-romleySNB-cdi172.jf.intel.com>,
+        Tomasz Kantecki <tomasz.kantecki@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, kbuild-all@lists.01.org
+Subject: [PATCH] crypto: fix flexible_array.cocci warnings 
+Message-ID: <alpine.DEB.2.22.394.2106291346290.4909@hadrien>
+User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Mon, 28 Jun 2021 19:00:51 +0800:
+From: kernel test robot <lkp@intel.com>
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+Zero-length and one-element arrays are deprecated, see
+Documentation/process/deprecated.rst
+Flexible-array members should be used instead.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/6159c49e12284b4880fd60e0575a71a40556a67e
+Generated by: scripts/coccinelle/misc/flexible_array.cocci
 
-Thank you!
+Fixes: 7540b2861e52 ("crypto: aesni - AVX512 version of AESNI-GCM using VPCLMULQDQ")
+CC: Megha Dey <megha.dey@intel.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Julia Lawall <julia.lawall@inria.fr>
+---
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+tree:   https://github.com/meghadey/crypto for_crypto_avx512
+head:   a89c5880f0d6260dd593bf579df26f2a2d56ac32
+commit: 7540b2861e5292b5993f8e693fc69510b2a7277a [5/6] crypto: aesni - AVX512 version of AESNI-GCM using VPCLMULQDQ
+:::::: branch date: 7 hours ago
+:::::: commit date: 7 hours ago
+
+ aesni-intel_glue.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -87,7 +87,7 @@ struct gcm_context_data {
+ 	u64 partial_block_len;
+ 	u64 unused;
+ 	/* Allocate space for hash_keys later */
+-	u8 hash_keys[0];
++	u8 hash_keys[];
+ };
+
+ asmlinkage int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
