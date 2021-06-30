@@ -2,135 +2,474 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 460CDC11F65
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 12:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F92CC11F68
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 13:35:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21A9161623
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 12:37:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31DBD613DD
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 13:35:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234606AbhF3Mj4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Jun 2021 08:39:56 -0400
-Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:48524 "EHLO
-        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234583AbhF3Mj4 (ORCPT
+        id S234768AbhF3NiM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Jun 2021 09:38:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42852 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234723AbhF3NiL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Jun 2021 08:39:56 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0UeAu494_1625056642;
-Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UeAu494_1625056642)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 30 Jun 2021 20:37:23 +0800
-Subject: Re: [PATCH v2 0/4] Introduce x86 assembler accelerated implementation
- for SM4 algorithm
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "Markku-Juhani O . Saarinen" <mjos@iki.fi>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        Jia Zhang <zhang.jia@linux.alibaba.com>,
-        "YiLin . Li" <YiLin.Li@linux.alibaba.com>
-References: <20210624080857.126660-1-tianjia.zhang@linux.alibaba.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <46fbbc81-d8c5-fd97-fd4f-71dd96c2c522@linux.alibaba.com>
-Date:   Wed, 30 Jun 2021 20:37:22 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        Wed, 30 Jun 2021 09:38:11 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E23D6C061756;
+        Wed, 30 Jun 2021 06:35:42 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f12c300d5c967e0b00ce97c.dip0.t-ipconnect.de [IPv6:2003:ec:2f12:c300:d5c9:67e0:b00c:e97c])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E006F1EC046E;
+        Wed, 30 Jun 2021 15:35:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1625060141;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=wPPCQp4f4RUBchaxZp4/uDs+S7WG+9WZBgFuIygun4Y=;
+        b=Qs0HTTFiFAa90rUyUBxepT0u0N2z+f59oFvbyO82BqhoqE/Gbv+Tw8E/F7ocjZDitIlU00
+        53xqBC1vnJL82h158EqaU70gt8t1kjb6bO4/Fzjs7CIOgdV2ag1iGwU7XtpsbRKKC1hdPh
+        DoropWwCO0f3PMQwTceqlWuVZAeqR5U=
+Date:   Wed, 30 Jun 2021 15:35:35 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 22/22] virt: Add SEV-SNP guest driver
+Message-ID: <YNxzJ2I3ZumTELLb@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-23-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20210624080857.126660-1-tianjia.zhang@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210602140416.23573-23-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
-
-Any comment?
-
-Cheers,
-Tianjia
-
-On 6/24/21 4:08 PM, Tianjia Zhang wrote:
-> This patchset extracts the public SM4 algorithm as a separate library,
-> At the same time, the acceleration implementation of SM4 in arm64 was
-> adjusted to adapt to this SM4 library. Then introduces an accelerated
-> implementation of the instruction set on x86.
+On Wed, Jun 02, 2021 at 09:04:16AM -0500, Brijesh Singh wrote:
+> SEV-SNP specification provides the guest a mechanism to communicate with
+> the PSP without risk from a malicious hypervisor who wishes to read, alter,
+> drop or replay the messages sent. The driver uses snp_issue_guest_request()
+> to issue GHCB SNP_GUEST_REQUEST NAE event. This command constructs a
+> trusted channel between the guest and the PSP firmware.
 > 
-> This optimization supports the four modes of SM4, ECB, CBC, CFB, and
-> CTR. Since CBC and CFB do not support multiple block parallel
-> encryption, the optimization effect is not obvious. And all selftests
-> have passed already.
+> The userspace can use the following ioctls provided by the driver:
 > 
-> The main algorithm implementation comes from SM4 AES-NI work by
-> libgcrypt and Markku-Juhani O. Saarinen at:
-> https://github.com/mjosaarinen/sm4ni
+> 1. Request an attestation report that can be used to assume the identity
+>    and security configuration of the guest.
+> 2. Ask the firmware to provide a key derived from a root key.
 > 
-> Benchmark on Intel Xeon Cascadelake, the data comes from the mode 218
-> and mode 518 of tcrypt. The abscissas are blocks of different lengths.
-> The data is tabulated and the unit is Mb/s:
+> See SEV-SNP spec section Guest Messages for more details.
 > 
-> sm4-generic   |    16      64     128     256    1024    1420    4096
->        ECB enc | 40.99   46.50   48.05   48.41   49.20   49.25   49.28
->        ECB dec | 41.07   46.99   48.15   48.67   49.20   49.25   49.29
->        CBC enc | 37.71   45.28   46.77   47.60   48.32   48.37   48.40
->        CBC dec | 36.48   44.82   46.43   47.45   48.23   48.30   48.36
->        CFB enc | 37.94   44.84   46.12   46.94   47.57   47.46   47.68
->        CFB dec | 37.50   42.84   43.74   44.37   44.85   44.80   44.96
->        CTR enc | 39.20   45.63   46.75   47.49   48.09   47.85   48.08
->        CTR dec | 39.64   45.70   46.72   47.47   47.98   47.88   48.06
-> sm4-aesni-avx
->        ECB enc | 33.75  134.47  221.64  243.43  264.05  251.58  258.13
->        ECB dec | 34.02  134.92  223.11  245.14  264.12  251.04  258.33
->        CBC enc | 38.85   46.18   47.67   48.34   49.00   48.96   49.14
->        CBC dec | 33.54  131.29  223.88  245.27  265.50  252.41  263.78
->        CFB enc | 38.70   46.10   47.58   48.29   49.01   48.94   49.19
->        CFB dec | 32.79  128.40  223.23  244.87  265.77  253.31  262.79
->        CTR enc | 32.58  122.23  220.29  241.16  259.57  248.32  256.69
->        CTR dec | 32.81  122.47  218.99  241.54  258.42  248.58  256.61
-> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
-> v2 changes:
->    * SM4 library functions use "sm4_" prefix instead of "crypto_" prefix
->    * sm4-aesni-avx supports accelerated implementation of four specific modes
->    * tcrypt benchmark supports sm4-aesni-avx
->    * fixes of other reviews
+>  drivers/virt/Kconfig           |   3 +
+>  drivers/virt/Makefile          |   1 +
+>  drivers/virt/sevguest/Kconfig  |  10 +
+>  drivers/virt/sevguest/Makefile |   4 +
+>  drivers/virt/sevguest/snp.c    | 448 +++++++++++++++++++++++++++++++++
+>  drivers/virt/sevguest/snp.h    |  63 +++++
+>  include/uapi/linux/sev-guest.h |  56 +++++
+>  7 files changed, 585 insertions(+)
+>  create mode 100644 drivers/virt/sevguest/Kconfig
+>  create mode 100644 drivers/virt/sevguest/Makefile
+>  create mode 100644 drivers/virt/sevguest/snp.c
+>  create mode 100644 drivers/virt/sevguest/snp.h
+>  create mode 100644 include/uapi/linux/sev-guest.h
+
+Seeing how there are a bunch of such driver things for SEV stuff, I'd
+say to put it under:
+
+	drivers/virt/coco/
+
+where we can collect all those confidential computing supporting
+drivers.
+
 > 
-> Tianjia Zhang (4):
->    crypto: sm4 - create SM4 library based on sm4 generic code
->    crypto: arm64/sm4-ce - Make dependent on sm4 library instead of
->      sm4-generic
->    crypto: x86/sm4 - add AES-NI/AVX/x86_64 implementation
->    crypto: tcrypt - add the asynchronous speed test for SM4
-> 
->   arch/arm64/crypto/Kconfig              |   2 +-
->   arch/arm64/crypto/sm4-ce-glue.c        |  20 +-
->   arch/x86/crypto/Makefile               |   3 +
->   arch/x86/crypto/sm4-aesni-avx-asm_64.S | 684 +++++++++++++++++++++++++
->   arch/x86/crypto/sm4_aesni_avx_glue.c   | 537 +++++++++++++++++++
->   crypto/Kconfig                         |  22 +
->   crypto/sm4_generic.c                   | 180 +------
->   crypto/tcrypt.c                        |  26 +-
->   include/crypto/sm4.h                   |  29 +-
->   lib/crypto/Kconfig                     |   3 +
->   lib/crypto/Makefile                    |   3 +
->   lib/crypto/sm4.c                       | 184 +++++++
->   12 files changed, 1515 insertions(+), 178 deletions(-)
->   create mode 100644 arch/x86/crypto/sm4-aesni-avx-asm_64.S
->   create mode 100644 arch/x86/crypto/sm4_aesni_avx_glue.c
->   create mode 100644 lib/crypto/sm4.c
-> 
+> diff --git a/drivers/virt/Kconfig b/drivers/virt/Kconfig
+> index 8061e8ef449f..4de714c5ee9a 100644
+> --- a/drivers/virt/Kconfig
+> +++ b/drivers/virt/Kconfig
+> @@ -36,4 +36,7 @@ source "drivers/virt/vboxguest/Kconfig"
+>  source "drivers/virt/nitro_enclaves/Kconfig"
+>  
+>  source "drivers/virt/acrn/Kconfig"
+> +
+> +source "drivers/virt/sevguest/Kconfig"
+> +
+>  endif
+> diff --git a/drivers/virt/Makefile b/drivers/virt/Makefile
+> index 3e272ea60cd9..b2d1a8131c90 100644
+> --- a/drivers/virt/Makefile
+> +++ b/drivers/virt/Makefile
+> @@ -8,3 +8,4 @@ obj-y				+= vboxguest/
+>  
+>  obj-$(CONFIG_NITRO_ENCLAVES)	+= nitro_enclaves/
+>  obj-$(CONFIG_ACRN_HSM)		+= acrn/
+> +obj-$(CONFIG_SEV_GUEST)		+= sevguest/
+> diff --git a/drivers/virt/sevguest/Kconfig b/drivers/virt/sevguest/Kconfig
+> new file mode 100644
+> index 000000000000..e88a85527bf6
+> --- /dev/null
+> +++ b/drivers/virt/sevguest/Kconfig
+> @@ -0,0 +1,10 @@
+> +config SEV_GUEST
+> +	tristate "AMD SEV Guest driver"
+> +	default y
+> +	depends on AMD_MEM_ENCRYPT
+> +	help
+> +	  Provides AMD SNP guest request driver. The driver can be used by the
+
+s/Provides AMD SNP guest request driver. //
+
+> +	  guest to communicate with the hypervisor to request the attestation report
+
+to communicate with the PSP, I thought, not the hypervisor?
+
+> +	  and more.
+> +
+> +	  If you choose 'M' here, this module will be called sevguest.
+> diff --git a/drivers/virt/sevguest/Makefile b/drivers/virt/sevguest/Makefile
+> new file mode 100644
+> index 000000000000..1505df437682
+> --- /dev/null
+> +++ b/drivers/virt/sevguest/Makefile
+> @@ -0,0 +1,4 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +sevguest-y := snp.o
+
+What's that for?
+
+Why isn't the filename simply called:
+
+drivers/virt/coco/sevguest.c
+
+?
+
+Or is more coming?
+
+And below there's
+
+	.name = "snp-guest",
+
+so you need to get the naming in order here.
+
+> +obj-$(CONFIG_SEV_GUEST) += sevguest.o
+> diff --git a/drivers/virt/sevguest/snp.c b/drivers/virt/sevguest/snp.c
+> new file mode 100644
+> index 000000000000..00d8e8fddf2c
+> --- /dev/null
+> +++ b/drivers/virt/sevguest/snp.c
+> @@ -0,0 +1,448 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * AMD Secure Encrypted Virtualization Nested Paging (SEV-SNP) guest request interface
+> + *
+> + * Copyright (C) 2021 Advanced Micro Devices, Inc.
+> + *
+> + * Author: Brijesh Singh <brijesh.singh@amd.com>
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/kernel.h>
+> +#include <linux/types.h>
+> +#include <linux/mutex.h>
+> +#include <linux/io.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/miscdevice.h>
+> +#include <linux/set_memory.h>
+> +#include <linux/fs.h>
+> +#include <crypto/aead.h>
+> +#include <linux/scatterlist.h>
+> +#include <linux/sev-guest.h>
+> +#include <uapi/linux/sev-guest.h>
+> +
+> +#include "snp.h"
+> +
+> +#define DEVICE_NAME	"sev-guest"
+> +#define AAD_LEN		48
+> +#define MSG_HDR_VER	1
+> +
+> +struct snp_guest_crypto {
+> +	struct crypto_aead *tfm;
+> +	uint8_t *iv, *authtag;
+> +	int iv_len, a_len;
+> +};
+> +
+> +struct snp_guest_dev {
+> +	struct device *dev;
+> +	struct miscdevice misc;
+> +
+> +	struct snp_guest_crypto *crypto;
+> +	struct snp_guest_msg *request, *response;
+> +};
+> +
+> +static DEFINE_MUTEX(snp_cmd_mutex);
+> +
+> +static inline struct snp_guest_dev *to_snp_dev(struct file *file)
+> +{
+> +	struct miscdevice *dev = file->private_data;
+> +
+> +	return container_of(dev, struct snp_guest_dev, misc);
+> +}
+> +
+> +static struct snp_guest_crypto *init_crypto(struct snp_guest_dev *snp_dev, uint8_t *key,
+> +					    size_t keylen)
+> +{
+> +	struct snp_guest_crypto *crypto;
+> +
+> +	crypto = kzalloc(sizeof(*crypto), GFP_KERNEL_ACCOUNT);
+> +	if (!crypto)
+> +		return NULL;
+> +
+> +	crypto->tfm = crypto_alloc_aead("gcm(aes)", 0, 0);
+
+I know that it is hard to unselect CONFIG_CRYPTO_AEAD2 which provides
+this but you better depend on it in the Makefile so that some random
+config still builds.
+
+> +	if (IS_ERR(crypto->tfm))
+> +		goto e_free;
+> +
+> +	if (crypto_aead_setkey(crypto->tfm, key, keylen))
+> +		goto e_free_crypto;
+> +
+> +	crypto->iv_len = crypto_aead_ivsize(crypto->tfm);
+> +	if (crypto->iv_len < 12) {
+> +		dev_err(snp_dev->dev, "IV length is less than 12.\n");
+> +		goto e_free_crypto;
+> +	}
+> +
+> +	crypto->iv = kmalloc(crypto->iv_len, GFP_KERNEL_ACCOUNT);
+> +	if (!crypto->iv)
+> +		goto e_free_crypto;
+> +
+> +	if (crypto_aead_authsize(crypto->tfm) > MAX_AUTHTAG_LEN) {
+> +		if (crypto_aead_setauthsize(crypto->tfm, MAX_AUTHTAG_LEN)) {
+> +			dev_err(snp_dev->dev, "failed to set authsize to %d\n", MAX_AUTHTAG_LEN);
+> +			goto e_free_crypto;
+> +		}
+> +	}
+> +
+> +	crypto->a_len = crypto_aead_authsize(crypto->tfm);
+> +	crypto->authtag = kmalloc(crypto->a_len, GFP_KERNEL_ACCOUNT);
+> +	if (!crypto->authtag)
+> +		goto e_free_crypto;
+> +
+> +	return crypto;
+> +
+> +e_free_crypto:
+> +	crypto_free_aead(crypto->tfm);
+> +e_free:
+> +	kfree(crypto->iv);
+> +	kfree(crypto->authtag);
+> +	kfree(crypto);
+> +
+> +	return NULL;
+> +}
+
+...
+
+> +static int handle_guest_request(struct snp_guest_dev *snp_dev, int msg_type,
+> +				struct snp_user_guest_request *input, void *req_buf,
+> +				size_t req_len, void __user *resp_buf, size_t resp_len)
+> +{
+> +	struct snp_guest_crypto *crypto = snp_dev->crypto;
+> +	struct page *page;
+> +	size_t msg_len;
+> +	int ret;
+> +
+> +	/* Allocate the buffer to hold response */
+> +	resp_len += crypto->a_len;
+> +	page = alloc_pages(GFP_KERNEL_ACCOUNT, get_order(resp_len));
+> +	if (!page)
+> +		return -ENOMEM;
+> +
+> +	ret = __handle_guest_request(snp_dev, msg_type, input, req_buf, req_len,
+> +			page_address(page), resp_len, &msg_len);
+
+Align arguments on the opening brace.
+
+Check the whole patch too for other similar cases.
+
+> +	if (ret)
+> +		goto e_free;
+> +
+> +	if (copy_to_user(resp_buf, page_address(page), msg_len))
+> +		ret = -EFAULT;
+> +
+> +e_free:
+> +	__free_pages(page, get_order(resp_len));
+> +
+> +	return ret;
+> +}
+> +
+> +static int get_report(struct snp_guest_dev *snp_dev, struct snp_user_guest_request *input)
+> +{
+> +	struct snp_user_report __user *report = (struct snp_user_report *)input->data;
+> +	struct snp_user_report_req req;
+> +
+> +	if (copy_from_user(&req, &report->req, sizeof(req)))
+
+What guarantees that that __user report thing is valid and is not going
+to trick the kernel into doing a NULL pointer access in the ->req access
+here?
+
+IOW, you need to verify all your user data being passed through before
+using it.
+
+> +		return -EFAULT;
+> +
+> +	return handle_guest_request(snp_dev, SNP_MSG_REPORT_REQ, input, &req.user_data,
+> +			sizeof(req.user_data), report->response, sizeof(report->response));
+> +}
+> +
+> +static int derive_key(struct snp_guest_dev *snp_dev, struct snp_user_guest_request *input)
+> +{
+> +	struct snp_user_derive_key __user *key = (struct snp_user_derive_key *)input->data;
+> +	struct snp_user_derive_key_req req;
+> +
+> +	if (copy_from_user(&req, &key->req, sizeof(req)))
+> +		return -EFAULT;
+> +
+> +	return handle_guest_request(snp_dev, SNP_MSG_KEY_REQ, input, &req, sizeof(req),
+> +			key->response, sizeof(key->response));
+> +}
+> +
+> +static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+> +{
+> +	struct snp_guest_dev *snp_dev = to_snp_dev(file);
+> +	struct snp_user_guest_request input;
+> +	void __user *argp = (void __user *)arg;
+> +	int ret = -ENOTTY;
+> +
+> +	if (copy_from_user(&input, argp, sizeof(input)))
+> +		return -EFAULT;
+> +
+> +	mutex_lock(&snp_cmd_mutex);
+> +	switch (ioctl) {
+> +	case SNP_GET_REPORT: {
+> +		ret = get_report(snp_dev, &input);
+> +		break;
+> +	}
+> +	case SNP_DERIVE_KEY: {
+> +		ret = derive_key(snp_dev, &input);
+> +		break;
+> +	}
+> +	default:
+> +		break;
+> +	}
+
+If only two ioctls, you don't need the switch-case thing.
+
+> +
+> +	mutex_unlock(&snp_cmd_mutex);
+> +
+> +	if (copy_to_user(argp, &input, sizeof(input)))
+> +		return -EFAULT;
+> +
+> +	return ret;
+> +}
+
+...
+
+> diff --git a/include/uapi/linux/sev-guest.h b/include/uapi/linux/sev-guest.h
+> new file mode 100644
+> index 000000000000..0a8454631605
+> --- /dev/null
+> +++ b/include/uapi/linux/sev-guest.h
+> @@ -0,0 +1,56 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
+> +/*
+> + * Userspace interface for AMD SEV and SEV-SNP guest driver.
+> + *
+> + * Copyright (C) 2021 Advanced Micro Devices, Inc.
+> + *
+> + * Author: Brijesh Singh <brijesh.singh@amd.com>
+> + *
+> + * SEV-SNP API specification is available at: https://developer.amd.com/sev/
+> + */
+> +
+> +#ifndef __UAPI_LINUX_SEV_GUEST_H_
+> +#define __UAPI_LINUX_SEV_GUEST_H_
+> +
+> +#include <linux/types.h>
+> +
+> +struct snp_user_report_req {
+> +	__u8 user_data[64];
+> +};
+> +
+> +struct snp_user_report {
+> +	struct snp_user_report_req req;
+> +
+> +	/* see SEV-SNP spec for the response format */
+> +	__u8 response[4000];
+> +};
+> +
+> +struct snp_user_derive_key_req {
+> +	__u8 root_key_select;
+> +	__u64 guest_field_select;
+> +	__u32 vmpl;
+> +	__u32 guest_svn;
+> +	__u64 tcb_version;
+> +};
+> +
+> +struct snp_user_derive_key {
+> +	struct snp_user_derive_key_req req;
+> +
+> +	/* see SEV-SNP spec for the response format */
+> +	__u8 response[64];
+> +};
+> +
+> +struct snp_user_guest_request {
+> +	/* Message version number (must be non-zero) */
+> +	__u8 msg_version;
+> +	__u64 data;
+> +
+> +	/* firmware error code on failure (see psp-sev.h) */
+> +	__u32 fw_err;
+> +};
+
+All those struct names have a "snp_user" prefix. It seems to me that
+that "user" is superfluous.
+
+> +
+> +#define SNP_GUEST_REQ_IOC_TYPE	'S'
+> +#define SNP_GET_REPORT _IOWR(SNP_GUEST_REQ_IOC_TYPE, 0x0, struct snp_user_guest_request)
+> +#define SNP_DERIVE_KEY _IOWR(SNP_GUEST_REQ_IOC_TYPE, 0x1, struct snp_user_guest_request)
+
+Where are those ioctls documented so that userspace can know how to use
+them?
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
