@@ -2,77 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 015D0C11F66
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jun 2021 11:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 415E3C11F65
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 07:38:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0DD061D2B
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jun 2021 11:48:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21AD261D03
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 07:38:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232790AbhF2Lua (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Jun 2021 07:50:30 -0400
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:16114 "EHLO
-        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232664AbhF2Lua (ORCPT
+        id S232788AbhF3Hki (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Jun 2021 03:40:38 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12134 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232785AbhF3Hki (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Jun 2021 07:50:30 -0400
-X-IronPort-AV: E=Sophos;i="5.83,308,1616454000"; 
-   d="scan'208";a="517260400"
-Received: from 173.121.68.85.rev.sfr.net (HELO hadrien) ([85.68.121.173])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Jun 2021 13:48:01 +0200
-Date:   Tue, 29 Jun 2021 13:48:01 +0200 (CEST)
-From:   Julia Lawall <julia.lawall@inria.fr>
-X-X-Sender: jll@hadrien
-To:     Megha Dey <megha.dey@intel.com>
-cc:     labuser <labuser@ssp-romleySNB-cdi172.jf.intel.com>,
-        Tomasz Kantecki <tomasz.kantecki@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, kbuild-all@lists.01.org
-Subject: [PATCH] crypto: fix flexible_array.cocci warnings 
-Message-ID: <alpine.DEB.2.22.394.2106291346290.4909@hadrien>
-User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        Wed, 30 Jun 2021 03:40:38 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15U7Xdal011668;
+        Wed, 30 Jun 2021 03:38:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : content-type :
+ content-transfer-encoding : mime-version : subject : message-id : date :
+ cc : to; s=pp1; bh=Mdl64loD7I/KZKBDCpNO0zTN0oJBO+ZQUeC5V3W0tVc=;
+ b=bAgfi6v4pDF9u3ZO5aeG+6WmDn8YkJ6ZxX2gYGiCiGce/LrydyOXqeHqCU7c7SWoCiS9
+ Cm1/ckCF3hmI46B+JlDKqIborCLB0EPvtHzhzqT59p3yvGWzkEKBSMou10cgoD6gj4XP
+ VQ2DihpeGz0bE1J/Z9aBCdXZwhiU5ZTLNXBzLGVSEg/T6ogqsApae3jrAWOUwEQ5xIIk
+ QAyrhDjjEQvxKaClwyAWPsfPBwpvazh1MeKffPOdX7fDWQNzmsHv6M8dh+3k7bNnd34X
+ 9JWZxfNbyXXD5IqZ8yob1OuKPINKTA8IBzGJJT6d1w96Itqa52wiOnQ/ggQ6fT/iWItI KQ== 
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39gfc272j0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Jun 2021 03:38:02 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15U7c1MQ009937;
+        Wed, 30 Jun 2021 07:38:01 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma05fra.de.ibm.com with ESMTP id 39ft8era31-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Jun 2021 07:38:00 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15U7aNDY36700418
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Jun 2021 07:36:23 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4FC5D5207D;
+        Wed, 30 Jun 2021 07:37:58 +0000 (GMT)
+Received: from smtpclient.apple (unknown [9.85.88.152])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A84AA5206C;
+        Wed, 30 Jun 2021 07:37:57 +0000 (GMT)
+From:   Sachin Sant <sachinp@linux.vnet.ibm.com>
+Content-Type: text/plain;
+        charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
+Subject: [powerpc][5.13.0-next20210629] Kernel WARN crypto/testmgr.c:5653
+ during boot
+Message-Id: <73D2DF91-CC7A-46CD-8D48-63FFB1857D24@linux.vnet.ibm.com>
+Date:   Wed, 30 Jun 2021 13:07:56 +0530
+Cc:     linuxppc-dev@lists.ozlabs.org, smueller@chronox.de
+To:     linux-crypto@vger.kernel.org
+X-Mailer: Apple Mail (2.3654.100.0.2.22)
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: yzP7B1Xmk-8PsB1OPuGf7mvuhX2HbQVE
+X-Proofpoint-ORIG-GUID: yzP7B1Xmk-8PsB1OPuGf7mvuhX2HbQVE
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-30_01:2021-06-29,2021-06-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ bulkscore=0 lowpriorityscore=0 mlxlogscore=999 spamscore=0 suspectscore=0
+ phishscore=0 malwarescore=0 impostorscore=0 priorityscore=1501
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106300049
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: kernel test robot <lkp@intel.com>
+While booting 5.13.0-next20210629 on a Power server, following
+warning is seen:
 
-Zero-length and one-element arrays are deprecated, see
-Documentation/process/deprecated.rst
-Flexible-array members should be used instead.
+[    0.076955] DRBG: could not allocate digest TFM handle: hmac(sha512)
+[    0.076960] alg: drbg: Failed to reset rng
+[    0.076963] alg: drbg: Test 0 failed for drbg_nopr_hmac_sha512
+[    0.076967] ------------[ cut here ]------------
+[    0.076970] alg: self-tests for drbg_nopr_hmac_sha512 (stdrng) failed =
+(rc=3D-22)
+[    0.076977] WARNING: CPU: 10 PID: 153 at crypto/testmgr.c:5653 =
+alg_test+0x484/0x860
+[    0.076989] Modules linked in:
+[    0.076993] CPU: 10 PID: 153 Comm: cryptomgr_test Not tainted =
+5.13.0-next-20210629 #1
+[    0.076998] NIP:  c00000000063ea44 LR: c00000000063ea40 CTR: =
+c000000000730b40
+[    0.077003] REGS: c00000000e7ff960 TRAP: 0700   Not tainted  =
+(5.13.0-next-20210629)
+[    0.077007] MSR:  8000000000029033 <SF,EE,ME,IR,DR,RI,LE>  CR: =
+28008222  XER: 20040005
+[    0.077018] CFAR: c000000000150a00 IRQMASK: 0=20
+[    0.077018] GPR00: c00000000063ea40 c00000000e7ffc00 c0000000029bc300 =
+0000000000000042=20
+[    0.077018] GPR04: 00000000ffff7fff c00000000e7ff8c0 c00000000e7ff8b8 =
+0000000000000000=20
+[    0.077018] GPR08: 00000009f98e0000 c0000000024f66f0 c0000000024f66f0 =
+c000000002876838=20
+[    0.077018] GPR12: 0000000000008000 c00000001ec7a280 c00000000018ce88 =
+c000000003b300c0=20
+[    0.077018] GPR16: 0000000000000000 0000000000000000 0000000000000000 =
+0000000000000000=20
+[    0.077018] GPR20: 0000000000000000 0000000000000000 c000000002a9ab20 =
+c000000000fb5278=20
+[    0.077018] GPR24: c000000010a85200 c000000000d61fa8 c000000010a85280 =
+0000000000000400=20
+[    0.077018] GPR28: c000000010a85200 000000000000000c c000000002ccf230 =
+ffffffffffffffea=20
+[    0.077072] NIP [c00000000063ea44] alg_test+0x484/0x860
+[    0.077077] LR [c00000000063ea40] alg_test+0x480/0x860
+[    0.077082] Call Trace:
+[    0.077085] [c00000000e7ffc00] [c00000000063ea40] =
+alg_test+0x480/0x860 (unreliable)
+[    0.077091] [c00000000e7ffd70] [c00000000063ca60] =
+cryptomgr_test+0x40/0x70
+[    0.077097] [c00000000e7ffda0] [c00000000018d014] kthread+0x194/0x1a0
+[    0.077103] [c00000000e7ffe10] [c00000000000c750] =
+ret_from_kernel_thread+0x5c/0x6c
+[    0.077110] Instruction dump:
+[    0.077113] 409e0298 3d220031 89292f56 2f890000 409e0288 3c62fe63 =
+7f45d378 7f84e378=20
+[    0.077121] 7fe6fb78 38633260 4bb11f5d 60000000 <0fe00000> e8010180 =
+eb210138 7c0803a6=20
+[    0.077131] ---[ end trace a1cc3999f90f0962 ]---
+[    0.077585] iommu: Default domain type: Translated=20
 
-Generated by: scripts/coccinelle/misc/flexible_array.cocci
+This new self test was introduced with
+commit 8833272d876e
+         crypto: drbg - self test for HMAC(SHA-512)
 
-Fixes: 7540b2861e52 ("crypto: aesni - AVX512 version of AESNI-GCM using VPCLMULQDQ")
-CC: Megha Dey <megha.dey@intel.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Julia Lawall <julia.lawall@inria.fr>
----
+Thanks
+-Sachin
 
-tree:   https://github.com/meghadey/crypto for_crypto_avx512
-head:   a89c5880f0d6260dd593bf579df26f2a2d56ac32
-commit: 7540b2861e5292b5993f8e693fc69510b2a7277a [5/6] crypto: aesni - AVX512 version of AESNI-GCM using VPCLMULQDQ
-:::::: branch date: 7 hours ago
-:::::: commit date: 7 hours ago
-
- aesni-intel_glue.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -87,7 +87,7 @@ struct gcm_context_data {
- 	u64 partial_block_len;
- 	u64 unused;
- 	/* Allocate space for hash_keys later */
--	u8 hash_keys[0];
-+	u8 hash_keys[];
- };
-
- asmlinkage int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
