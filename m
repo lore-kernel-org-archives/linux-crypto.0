@@ -2,140 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 415E3C11F65
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 07:38:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F432C11F65
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 10:33:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21AD261D03
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 07:38:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 015C3619BE
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 10:33:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232788AbhF3Hki (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Jun 2021 03:40:38 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12134 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232785AbhF3Hki (ORCPT
+        id S232904AbhF3Kfd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Jun 2021 06:35:33 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.221]:19405 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229882AbhF3Kfd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Jun 2021 03:40:38 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15U7Xdal011668;
-        Wed, 30 Jun 2021 03:38:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : content-type :
- content-transfer-encoding : mime-version : subject : message-id : date :
- cc : to; s=pp1; bh=Mdl64loD7I/KZKBDCpNO0zTN0oJBO+ZQUeC5V3W0tVc=;
- b=bAgfi6v4pDF9u3ZO5aeG+6WmDn8YkJ6ZxX2gYGiCiGce/LrydyOXqeHqCU7c7SWoCiS9
- Cm1/ckCF3hmI46B+JlDKqIborCLB0EPvtHzhzqT59p3yvGWzkEKBSMou10cgoD6gj4XP
- VQ2DihpeGz0bE1J/Z9aBCdXZwhiU5ZTLNXBzLGVSEg/T6ogqsApae3jrAWOUwEQ5xIIk
- QAyrhDjjEQvxKaClwyAWPsfPBwpvazh1MeKffPOdX7fDWQNzmsHv6M8dh+3k7bNnd34X
- 9JWZxfNbyXXD5IqZ8yob1OuKPINKTA8IBzGJJT6d1w96Itqa52wiOnQ/ggQ6fT/iWItI KQ== 
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39gfc272j0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Jun 2021 03:38:02 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15U7c1MQ009937;
-        Wed, 30 Jun 2021 07:38:01 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 39ft8era31-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Jun 2021 07:38:00 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15U7aNDY36700418
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 30 Jun 2021 07:36:23 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FC5D5207D;
-        Wed, 30 Jun 2021 07:37:58 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.85.88.152])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A84AA5206C;
-        Wed, 30 Jun 2021 07:37:57 +0000 (GMT)
-From:   Sachin Sant <sachinp@linux.vnet.ibm.com>
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: [powerpc][5.13.0-next20210629] Kernel WARN crypto/testmgr.c:5653
- during boot
-Message-Id: <73D2DF91-CC7A-46CD-8D48-63FFB1857D24@linux.vnet.ibm.com>
-Date:   Wed, 30 Jun 2021 13:07:56 +0530
-Cc:     linuxppc-dev@lists.ozlabs.org, smueller@chronox.de
-To:     linux-crypto@vger.kernel.org
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: yzP7B1Xmk-8PsB1OPuGf7mvuhX2HbQVE
-X-Proofpoint-ORIG-GUID: yzP7B1Xmk-8PsB1OPuGf7mvuhX2HbQVE
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-30_01:2021-06-29,2021-06-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- bulkscore=0 lowpriorityscore=0 mlxlogscore=999 spamscore=0 suspectscore=0
- phishscore=0 malwarescore=0 impostorscore=0 priorityscore=1501
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106300049
+        Wed, 30 Jun 2021 06:35:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1625049173;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=zrELvurilohi17VMVTv19kjVdyfbFWDqfvMOj6MTPRU=;
+    b=Pvsq6rKPcZhmpytH6ZY8J1FlsnG5uaIc1QHQUPMS/4IBGqVxL2P8fSr38kZAU7rhay
+    /3vN8YimMXlmSaklR9qUtBhHC3C7QUT5vwTlsarM6qiHRYiI1RIrsKnsgC1xZptoU0qL
+    zXIW9s2h6yBf31r09oWHMnGdIThojUeWT2v6ADnv8NIWoSufC2wKAMH0C4o5Ui4tw2kU
+    HeB4Us0ZlQtGxOT7N+sXvPCQ4dayOkYs6ysOm/acRPYcHdYmshrM0CkteYv1IGoAT4Ho
+    fbbijfjZwcxQWMl+Os19wwC+hs7R9Cu4ONz9td6vYPM8QX4HxTaFtM+/Ra1ZMo3IngWK
+    NQ/w==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNzyCzy1Sfr67uExK884PCF2aGHC1nvBRG6qaFpQl"
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+    by smtp.strato.de (RZmta 47.27.7 AUTH)
+    with ESMTPSA id d01c2ax5UAWq0yP
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Wed, 30 Jun 2021 12:32:52 +0200 (CEST)
+Message-ID: <304ee0376383d9ceecddbfd216c035215bbff861.camel@chronox.de>
+Subject: [PATCH] crypto: DRBG - select SHA512
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Sachin Sant <sachinp@linux.vnet.ibm.com>,
+        linux-crypto@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org
+Date:   Wed, 30 Jun 2021 12:32:52 +0200
+In-Reply-To: <73D2DF91-CC7A-46CD-8D48-63FFB1857D24@linux.vnet.ibm.com>
+References: <73D2DF91-CC7A-46CD-8D48-63FFB1857D24@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-While booting 5.13.0-next20210629 on a Power server, following
-warning is seen:
+With the swtich to use HMAC(SHA-512) as the default DRBG type, the
+configuration must now also select SHA-512.
 
-[    0.076955] DRBG: could not allocate digest TFM handle: hmac(sha512)
-[    0.076960] alg: drbg: Failed to reset rng
-[    0.076963] alg: drbg: Test 0 failed for drbg_nopr_hmac_sha512
-[    0.076967] ------------[ cut here ]------------
-[    0.076970] alg: self-tests for drbg_nopr_hmac_sha512 (stdrng) failed =
-(rc=3D-22)
-[    0.076977] WARNING: CPU: 10 PID: 153 at crypto/testmgr.c:5653 =
-alg_test+0x484/0x860
-[    0.076989] Modules linked in:
-[    0.076993] CPU: 10 PID: 153 Comm: cryptomgr_test Not tainted =
-5.13.0-next-20210629 #1
-[    0.076998] NIP:  c00000000063ea44 LR: c00000000063ea40 CTR: =
-c000000000730b40
-[    0.077003] REGS: c00000000e7ff960 TRAP: 0700   Not tainted  =
-(5.13.0-next-20210629)
-[    0.077007] MSR:  8000000000029033 <SF,EE,ME,IR,DR,RI,LE>  CR: =
-28008222  XER: 20040005
-[    0.077018] CFAR: c000000000150a00 IRQMASK: 0=20
-[    0.077018] GPR00: c00000000063ea40 c00000000e7ffc00 c0000000029bc300 =
-0000000000000042=20
-[    0.077018] GPR04: 00000000ffff7fff c00000000e7ff8c0 c00000000e7ff8b8 =
-0000000000000000=20
-[    0.077018] GPR08: 00000009f98e0000 c0000000024f66f0 c0000000024f66f0 =
-c000000002876838=20
-[    0.077018] GPR12: 0000000000008000 c00000001ec7a280 c00000000018ce88 =
-c000000003b300c0=20
-[    0.077018] GPR16: 0000000000000000 0000000000000000 0000000000000000 =
-0000000000000000=20
-[    0.077018] GPR20: 0000000000000000 0000000000000000 c000000002a9ab20 =
-c000000000fb5278=20
-[    0.077018] GPR24: c000000010a85200 c000000000d61fa8 c000000010a85280 =
-0000000000000400=20
-[    0.077018] GPR28: c000000010a85200 000000000000000c c000000002ccf230 =
-ffffffffffffffea=20
-[    0.077072] NIP [c00000000063ea44] alg_test+0x484/0x860
-[    0.077077] LR [c00000000063ea40] alg_test+0x480/0x860
-[    0.077082] Call Trace:
-[    0.077085] [c00000000e7ffc00] [c00000000063ea40] =
-alg_test+0x480/0x860 (unreliable)
-[    0.077091] [c00000000e7ffd70] [c00000000063ca60] =
-cryptomgr_test+0x40/0x70
-[    0.077097] [c00000000e7ffda0] [c00000000018d014] kthread+0x194/0x1a0
-[    0.077103] [c00000000e7ffe10] [c00000000000c750] =
-ret_from_kernel_thread+0x5c/0x6c
-[    0.077110] Instruction dump:
-[    0.077113] 409e0298 3d220031 89292f56 2f890000 409e0288 3c62fe63 =
-7f45d378 7f84e378=20
-[    0.077121] 7fe6fb78 38633260 4bb11f5d 60000000 <0fe00000> e8010180 =
-eb210138 7c0803a6=20
-[    0.077131] ---[ end trace a1cc3999f90f0962 ]---
-[    0.077585] iommu: Default domain type: Translated=20
+Fixes: 9b7b94683a9b "crypto: DRBG - switch to HMAC SHA512 DRBG as default
+DRBG"
+Reported-by: Sachin Sant <sachinp@linux.vnet.ibm.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.com>
+---
+ crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This new self test was introduced with
-commit 8833272d876e
-         crypto: drbg - self test for HMAC(SHA-512)
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index ca3b02dcbbfa..64b772c5d1c9 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1768,7 +1768,7 @@ config CRYPTO_DRBG_HMAC
+ 	bool
+ 	default y
+ 	select CRYPTO_HMAC
+-	select CRYPTO_SHA256
++	select CRYPTO_SHA512
+ 
+ config CRYPTO_DRBG_HASH
+ 	bool "Enable Hash DRBG"
+-- 
+2.31.1
 
-Thanks
--Sachin
+
 
