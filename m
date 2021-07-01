@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 799F3C11F64
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 19:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 445E2C11F64
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 19:59:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5639D61410
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 19:59:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C2D361406
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 19:59:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230014AbhGAUBg convert rfc822-to-8bit (ORCPT
+        id S230139AbhGAUBp convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jul 2021 16:01:36 -0400
-Received: from lithops.sigma-star.at ([195.201.40.130]:50588 "EHLO
+        Thu, 1 Jul 2021 16:01:45 -0400
+Received: from lithops.sigma-star.at ([195.201.40.130]:50622 "EHLO
         lithops.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229894AbhGAUBg (ORCPT
+        with ESMTP id S229894AbhGAUBo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jul 2021 16:01:36 -0400
+        Thu, 1 Jul 2021 16:01:44 -0400
 Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 3B9176108476;
-        Thu,  1 Jul 2021 21:59:04 +0200 (CEST)
+        by lithops.sigma-star.at (Postfix) with ESMTP id 1942460A59C3;
+        Thu,  1 Jul 2021 21:59:13 +0200 (CEST)
 Received: from lithops.sigma-star.at ([127.0.0.1])
         by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id Szag2gsOxhr4; Thu,  1 Jul 2021 21:59:03 +0200 (CEST)
+        with ESMTP id FoQFlT8xppKX; Thu,  1 Jul 2021 21:59:12 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 6B18F6083273;
-        Thu,  1 Jul 2021 21:59:03 +0200 (CEST)
+        by lithops.sigma-star.at (Postfix) with ESMTP id 805066108478;
+        Thu,  1 Jul 2021 21:59:12 +0200 (CEST)
 Received: from lithops.sigma-star.at ([127.0.0.1])
         by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id J1fDMrE6PDep; Thu,  1 Jul 2021 21:59:03 +0200 (CEST)
+        with ESMTP id f_EY7arTg1CS; Thu,  1 Jul 2021 21:59:12 +0200 (CEST)
 Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 366E3610846D;
-        Thu,  1 Jul 2021 21:59:03 +0200 (CEST)
-Date:   Thu, 1 Jul 2021 21:59:03 +0200 (CEST)
+        by lithops.sigma-star.at (Postfix) with ESMTP id 633BC610846D;
+        Thu,  1 Jul 2021 21:59:12 +0200 (CEST)
+Date:   Thu, 1 Jul 2021 21:59:12 +0200 (CEST)
 From:   Richard Weinberger <richard@nod.at>
 To:     Sean Anderson <sean.anderson@seco.com>
 Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
@@ -44,19 +44,18 @@ Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         davem <davem@davemloft.net>, horia geanta <horia.geanta@nxp.com>,
         aymen sghaier <aymen.sghaier@nxp.com>,
         linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Marek Vasut <marex@denx.de>, david <david@sigma-star.at>
-Message-ID: <1382866497.13280.1625169542979.JavaMail.zimbra@nod.at>
-In-Reply-To: <20210701185638.3437487-3-sean.anderson@seco.com>
-References: <20210701185638.3437487-1-sean.anderson@seco.com> <20210701185638.3437487-3-sean.anderson@seco.com>
-Subject: Re: [PATCH v2 2/2] crypto: mxs_dcp: Use sg_mapping_iter to copy
- data
+        Marek Vasut <marex@denx.de>
+Message-ID: <668688914.13281.1625169552349.JavaMail.zimbra@nod.at>
+In-Reply-To: <20210701185638.3437487-2-sean.anderson@seco.com>
+References: <20210701185638.3437487-1-sean.anderson@seco.com> <20210701185638.3437487-2-sean.anderson@seco.com>
+Subject: Re: [PATCH v2 1/2] crypto: mxs-dcp: Check for DMA mapping errors
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8BIT
 X-Originating-IP: [195.201.40.130]
 X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF78 (Linux)/8.8.12_GA_3809)
-Thread-Topic: crypto: mxs_dcp: Use sg_mapping_iter to copy data
-Thread-Index: aSs59U4orgMqgMDdkjos50LXYOppwA==
+Thread-Topic: crypto: mxs-dcp: Check for DMA mapping errors
+Thread-Index: Frt7LHYmwPo69SYeE5SlEF4En5NW4w==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -68,168 +67,132 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 > CC: "horia geanta" <horia.geanta@nxp.com>, "aymen sghaier" <aymen.sghaier@nxp.com>, "richard" <richard@nod.at>,
 > "linux-arm-kernel" <linux-arm-kernel@lists.infradead.org>, "Marek Vasut" <marex@denx.de>, "Sean Anderson"
 > <sean.anderson@seco.com>
-> Gesendet: Donnerstag, 1. Juli 2021 20:56:38
-> Betreff: [PATCH v2 2/2] crypto: mxs_dcp: Use sg_mapping_iter to copy data
+> Gesendet: Donnerstag, 1. Juli 2021 20:56:37
+> Betreff: [PATCH v2 1/2] crypto: mxs-dcp: Check for DMA mapping errors
 
-> This uses the sg_miter_*() functions to copy data, instead of doing it
-> ourselves. Using sg_copy_buffer() would be better, but this way we don't
-> have to keep traversing the beginning of the scatterlist every time we
-> do another copy.
-
-Huh? This does not match the code.
-You use sg_pcopy_from_buffer() which is just a wrapper around sg_copy_buffer().
-
-Did you forget to update the commit message? :-)
-
-> In addition to reducing code size, this fixes the following oops
-> resulting from failing to kmap the page:
+> After calling dma_map_single(), we must also call dma_mapping_error().
+> This fixes the following warning when compiling with CONFIG_DMA_API_DEBUG:
 > 
-> [   68.896381] Unable to handle kernel NULL pointer dereference at virtual
-> address 00000ab8
-> [   68.904539] pgd = 3561adb3
-> [   68.907475] [00000ab8] *pgd=00000000
-> [   68.911153] Internal error: Oops: 805 [#1] ARM
-> [   68.915618] Modules linked in: cfg80211 rfkill des_generic libdes arc4
-> libarc4 cbc ecb algif_skcipher sha256_generic libsha256 sha1_generic hmac
-> aes_generic libaes cmac sha512_generic md5 md4 algif_hash af_alg i2c_imx
-> i2c_core ci_hdrc_imx ci_hdrc mxs_dcp ulpi roles udc_core imx_sdma usbmisc_imx
-> usb_common firmware_class virt_dma phy_mxs_usb nf_tables nfnetlink ip_tables
-> x_tables ipv6 autofs4
-> [   68.950741] CPU: 0 PID: 139 Comm: mxs_dcp_chan/ae Not tainted 5.10.34 #296
-> [   68.958501] Hardware name: Freescale i.MX6 Ultralite (Device Tree)
-> [   68.964710] PC is at memcpy+0xa8/0x330
-> [   68.968479] LR is at 0xd7b2bc9d
-> [   68.971638] pc : [<c053e7c8>]    lr : [<d7b2bc9d>]    psr: 000f0013
-> [   68.977920] sp : c2cbbee4  ip : 00000010  fp : 00000010
-> [   68.983159] r10: 00000000  r9 : c3283a40  r8 : 1a5a6f08
-> [   68.988402] r7 : 4bfe0ecc  r6 : 76d8a220  r5 : c32f9050  r4 : 00000001
-> [   68.994945] r3 : 00000ab8  r2 : fffffff0  r1 : c32f9050  r0 : 00000ab8
-> [   69.001492] Flags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
-> [   69.008646] Control: 10c53c7d  Table: 83664059  DAC: 00000051
-> [   69.014414] Process mxs_dcp_chan/ae (pid: 139, stack limit = 0x667b57ab)
-> [   69.021133] Stack: (0xc2cbbee4 to 0xc2cbc000)
-> [   69.025519] bee0:          c32f9050 c3235408 00000010 00000010 00000ab8
-> 00000001 bf10406c
-> [   69.033720] bf00: 00000000 00000000 00000010 00000000 c32355d0 832fb080
-> 00000000 c13de2fc
-> [   69.041921] bf20: c3628010 00000010 c33d5780 00000ab8 bf1067e8 00000002
-> c21e5010 c2cba000
-> [   69.050125] bf40: c32f8040 00000000 bf106a40 c32f9040 c3283a80 00000001
-> bf105240 c3234040
-> [   69.058327] bf60: ffffe000 c3204100 c2c69800 c2cba000 00000000 bf103b84
-> 00000000 c2eddc54
-> [   69.066530] bf80: c3204144 c0140d1c c2cba000 c2c69800 c0140be8 00000000
-> 00000000 00000000
-> [   69.074730] bfa0: 00000000 00000000 00000000 c0100114 00000000 00000000
-> 00000000 00000000
-> [   69.082932] bfc0: 00000000 00000000 00000000 00000000 00000000 00000000
-> 00000000 00000000
-> [   69.091131] bfe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> 00000000 00000000
-> [   69.099364] [<c053e7c8>] (memcpy) from [<bf10406c>]
-> (dcp_chan_thread_aes+0x4e8/0x840 [mxs_dcp])
-> [   69.108117] [<bf10406c>] (dcp_chan_thread_aes [mxs_dcp]) from [<c0140d1c>]
-> (kthread+0x134/0x160)
-> [   69.116941] [<c0140d1c>] (kthread) from [<c0100114>]
-> (ret_from_fork+0x14/0x20)
-> [   69.124178] Exception stack(0xc2cbbfb0 to 0xc2cbbff8)
-> [   69.129250] bfa0:                                     00000000 00000000
-> 00000000 00000000
-> [   69.137450] bfc0: 00000000 00000000 00000000 00000000 00000000 00000000
-> 00000000 00000000
-> [   69.145648] bfe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> [   69.152289] Code: e320f000 e4803004 e4804004 e4805004 (e4806004)
+> [  311.241478] WARNING: CPU: 0 PID: 428 at kernel/dma/debug.c:1027
+> check_unmap+0x79c/0x96c
+> [  311.249547] DMA-API: mxs-dcp 2280000.crypto: device driver failed to check
+> map error[device address=0x00000000860cb080] [size=32 bytes] [mapped as single]
 > 
 > Signed-off-by: Sean Anderson <sean.anderson@seco.com>
 > ---
 > 
-> Changes in v2:
-> - Fix warning when taking the minimum of a u32 and a size_t
-> - Use sg_pcopy_from_buffer to properly deal with partial reads.
+> (no changes since v1)
 > 
-> drivers/crypto/mxs-dcp.c | 36 +++++++++---------------------------
-> 1 file changed, 9 insertions(+), 27 deletions(-)
+> drivers/crypto/mxs-dcp.c | 45 +++++++++++++++++++++++++++++++---------
+> 1 file changed, 35 insertions(+), 10 deletions(-)
 > 
 > diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-> index f397cc5bf102..d19e5ffb5104 100644
+> index d6a7784d2988..f397cc5bf102 100644
 > --- a/drivers/crypto/mxs-dcp.c
 > +++ b/drivers/crypto/mxs-dcp.c
-> @@ -300,21 +300,20 @@ static int mxs_dcp_aes_block_crypt(struct
-> crypto_async_request *arq)
+> @@ -170,15 +170,19 @@ static struct dcp *global_sdcp;
 > 
-> 	struct scatterlist *dst = req->dst;
-> 	struct scatterlist *src = req->src;
-> -	const int nents = sg_nents(req->src);
-> +	int dst_nents = sg_nents(dst);
+> static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
+> {
+> +	int dma_err;
+> 	struct dcp *sdcp = global_sdcp;
+> 	const int chan = actx->chan;
+> 	uint32_t stat;
+> 	unsigned long ret;
+> 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+> -
+> 	dma_addr_t desc_phys = dma_map_single(sdcp->dev, desc, sizeof(*desc),
+> 					      DMA_TO_DEVICE);
 > 
-> 	const int out_off = DCP_BUF_SZ;
-> 	uint8_t *in_buf = sdcp->coh->aes_in_buf;
-> 	uint8_t *out_buf = sdcp->coh->aes_out_buf;
+> +	dma_err = dma_mapping_error(sdcp->dev, desc_phys);
+> +	if (dma_err)
+> +		return dma_err;
+> +
+
+Minor nit, you don't need to propagate the return code from dma_mapping_error().
+It just returns 0 for success and -ENOMEM on failure.
+So treating it as boolean function is fine, IMHO and keeps the code simpler.
+But it is a matter of taste. :-)
+
+> 	reinit_completion(&sdcp->completion[chan]);
 > 
-> -	uint8_t *out_tmp, *src_buf, *dst_buf = NULL;
-> 	uint32_t dst_off = 0;
-> +	uint8_t *src_buf = NULL;
-> 	uint32_t last_out_len = 0;
+> 	/* Clear status register. */
+> @@ -216,18 +220,29 @@ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
+> static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+> 			   struct skcipher_request *req, int init)
+> {
+> +	dma_addr_t key_phys, src_phys, dst_phys;
+> 	struct dcp *sdcp = global_sdcp;
+> 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+> 	struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
+> 	int ret;
 > 
-> 	uint8_t *key = sdcp->coh->aes_key;
+> -	dma_addr_t key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
+> -					     2 * AES_KEYSIZE_128,
+> -					     DMA_TO_DEVICE);
+> -	dma_addr_t src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
+> -					     DCP_BUF_SZ, DMA_TO_DEVICE);
+> -	dma_addr_t dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
+> -					     DCP_BUF_SZ, DMA_FROM_DEVICE);
+> +	key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
+> +				  2 * AES_KEYSIZE_128, DMA_TO_DEVICE);
+> +	ret = dma_mapping_error(sdcp->dev, key_phys);
+> +	if (ret)
+> +		return ret;
+> +
+> +	src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
+> +				  DCP_BUF_SZ, DMA_TO_DEVICE);
+> +	ret = dma_mapping_error(sdcp->dev, src_phys);
+> +	if (ret)
+> +		goto err_src;
+> +
+> +	dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
+> +				  DCP_BUF_SZ, DMA_FROM_DEVICE);
+> +	ret = dma_mapping_error(sdcp->dev, dst_phys);
+> +	if (ret)
+> +		goto err_dst;
 > 
-> 	int ret = 0;
-> -	int split = 0;
-> -	unsigned int i, len, clen, rem = 0, tlen = 0;
-> +	unsigned int i, len, clen, tlen = 0;
-> 	int init = 0;
-> 	bool limit_hit = false;
+> 	if (actx->fill % AES_BLOCK_SIZE) {
+> 		dev_err(sdcp->dev, "Invalid block size!\n");
+> @@ -265,10 +280,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+> 	ret = mxs_dcp_start_dma(actx);
 > 
-> @@ -332,7 +331,7 @@ static int mxs_dcp_aes_block_crypt(struct
-> crypto_async_request *arq)
-> 		memset(key + AES_KEYSIZE_128, 0, AES_KEYSIZE_128);
+> aes_done_run:
+> +	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
+> +err_dst:
+> +	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+> +err_src:
+> 	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
+> 			 DMA_TO_DEVICE);
+> -	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+> -	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
+> 
+> 	return ret;
+> }
+> @@ -557,6 +574,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
+> 	dma_addr_t buf_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_in_buf,
+> 					     DCP_BUF_SZ, DMA_TO_DEVICE);
+> 
+> +	ret = dma_mapping_error(sdcp->dev, buf_phys);
+> +	if (ret)
+> +		return ret;
+> +
+> 	/* Fill in the DMA descriptor. */
+> 	desc->control0 = MXS_DCP_CONTROL0_DECR_SEMAPHORE |
+> 		    MXS_DCP_CONTROL0_INTERRUPT |
+> @@ -589,6 +610,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
+> 	if (rctx->fini) {
+> 		digest_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_out_buf,
+> 					     DCP_SHA_PAY_SZ, DMA_FROM_DEVICE);
+> +		ret = dma_mapping_error(sdcp->dev, digest_phys);
+> +		if (ret)
+> +			goto done_run;
+> +
+> 		desc->control0 |= MXS_DCP_CONTROL0_HASH_TERM;
+> 		desc->payload = digest_phys;
 > 	}
-> 
-> -	for_each_sg(req->src, src, nents, i) {
-> +	for_each_sg(req->src, src, sg_nents(src), i) {
-> 		src_buf = sg_virt(src);
-> 		len = sg_dma_len(src);
-> 		tlen += len;
-> @@ -357,34 +356,17 @@ static int mxs_dcp_aes_block_crypt(struct
-> crypto_async_request *arq)
-> 			 * submit the buffer.
-> 			 */
-> 			if (actx->fill == out_off || sg_is_last(src) ||
-> -				limit_hit) {
-> +			    limit_hit) {
-> 				ret = mxs_dcp_run_aes(actx, req, init);
-> 				if (ret)
-> 					return ret;
-> 				init = 0;
-> 
-> -				out_tmp = out_buf;
-> +				sg_pcopy_from_buffer(dst, dst_nents, out_buf,
-> +						     actx->fill, dst_off);
-> +				dst_off += actx->fill;
-> 				last_out_len = actx->fill;
-> -				while (dst && actx->fill) {
-> -					if (!split) {
-> -						dst_buf = sg_virt(dst);
-> -						dst_off = 0;
-> -					}
-> -					rem = min(sg_dma_len(dst) - dst_off,
-> -						  actx->fill);
-> -
-> -					memcpy(dst_buf + dst_off, out_tmp, rem);
-> -					out_tmp += rem;
-> -					dst_off += rem;
-> -					actx->fill -= rem;
-> -
-> -					if (dst_off == sg_dma_len(dst)) {
-> -						dst = sg_next(dst);
-> -						split = 0;
-> -					} else {
-> -						split = 1;
-> -					}
-> -				}
-> +				actx->fill = 0;
-> 			}
-> 		} while (len);
-> 
-> --
-> 2.25.1
+
+Reviewed-by: Richard Weinberger <richard@nod.at>
+
+Thanks,
+//richard
