@@ -2,85 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F537C11F66
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 00:00:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFBBC11F67
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 18:04:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 155E661447
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 00:00:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D1B06141A
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 18:04:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238098AbhGAADM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Jun 2021 20:03:12 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:51072 "EHLO deadmen.hmeau.com"
+        id S229999AbhGASGd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jul 2021 14:06:33 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:44848 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229864AbhGAADM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Jun 2021 20:03:12 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1lyk80-0004mk-P0; Thu, 01 Jul 2021 08:00:24 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1lyk7j-0007TU-Df; Thu, 01 Jul 2021 08:00:07 +0800
-Date:   Thu, 1 Jul 2021 08:00:07 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     syzbot <syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com>
-Cc:     ardb@kernel.org, bp@alien8.de, dave.hansen@intel.com,
-        davem@davemloft.net, hpa@zytor.com, jpa@git.mail.kapsi.fi,
-        kan.liang@linux.intel.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luto@kernel.org, mingo@redhat.com,
-        netdev@vger.kernel.org, peterz@infradead.org,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Subject: Re: [syzbot] BUG: scheduling while atomic: syz-executor/ADDR
-Message-ID: <20210701000007.GA28683@gondor.apana.org.au>
-References: <000000000000459ea305c6000318@google.com>
+        id S229967AbhGASGc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Jul 2021 14:06:32 -0400
+Received: from zn.tnic (p200300ec2f129e0080cb4010141c3d3f.dip0.t-ipconnect.de [IPv6:2003:ec:2f12:9e00:80cb:4010:141c:3d3f])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7547E1EC054E;
+        Thu,  1 Jul 2021 20:04:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1625162640;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=pA5qidpGRMz4iB462uPn953XJs14KjqFbjDwTnvDnKg=;
+        b=OHT4NlQL9fVtGHXge2xZSd0T4EtBcQOmHUNmaE2UC612fKA/8lwfY5w8HH19skwww6/STE
+        w59gY7ILIMMe0ZyN6jwbgjjR4zWs30kvUfgtbeBw73IN/ywKqCl1h2D8vx+XtIEcdzKNGg
+        kS/Fvml/488FUBEJyM1T7mfITHlUCSg=
+Date:   Thu, 1 Jul 2021 20:03:55 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com, Dov Murik <dovmurik@linux.ibm.com>
+Subject: Re: [PATCH Part1 RFC v3 22/22] virt: Add SEV-SNP guest driver
+Message-ID: <YN4DixahyShxyyCv@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-23-brijesh.singh@amd.com>
+ <YNxzJ2I3ZumTELLb@zn.tnic>
+ <46499161-0106-3ae9-9688-0afd9076b28b@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <000000000000459ea305c6000318@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <46499161-0106-3ae9-9688-0afd9076b28b@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 30, 2021 at 11:37:20AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    ff8744b5 Merge branch '100GbE' of git://git.kernel.org/pub..
-> git tree:       net-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=163cc5dc300000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=7cf9abab1592f017
-> dashboard link: https://syzkaller.appspot.com/bug?extid=20191dc583eff8602d2d
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14a81190300000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1417f5bfd00000
-> 
-> The issue was bisected to:
-> 
-> commit 2481104fe98d5b016fdd95d649b1235f21e491ba
-> Author: Ard Biesheuvel <ardb@kernel.org>
-> Date:   Thu Dec 31 16:41:55 2020 +0000
-> 
->     crypto: x86/aes-ni-xts - rewrite and drop indirections via glue helper
+On Wed, Jun 30, 2021 at 11:26:46AM -0500, Brijesh Singh wrote:
+> As you have noticed that Dov is submitting the SEV specific driver.
 
-Hi Ard:
+Well, reportedly that driver is generic-ish as it only handles the
+EFI-provided sekrits and is not SEV-specific - the SEV use is only
+exemplary.
 
-This looks like the same issue we discussed yesterday.
-
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=164ee60c300000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=154ee60c300000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=114ee60c300000
+> I was thinking that it will be nice if we have one driver that covers
+> both the SEV and SEV-SNP. That driver can be called "sevguest". The
+> kernel will install the appropriate platform device. The sevguest
+> driver can probe for both the "sev-guest" and "snp-guest" and delegate
+> the ioctl handling accordingly.
+>
+> In the kernel the directory structure may look like this:
+>
+> virt/coco/sevguest
+>   sevguest.c       // common code
+>   snp.c            // SNP specific ioctl implementation
+>   sev.c            // SEV specific ioctl or sysfs implementation
 > 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
-> Fixes: 2481104fe98d ("crypto: x86/aes-ni-xts - rewrite and drop indirections via glue helper")
+> Thoughts ?
 
-Thanks,
+Sure, but I'd call it sevguest.c and will have it deal with both SEV and
+SNP ioctls depending on what has been detected in the hardware. Or is
+there some special reason for having snp.c and sev.c separate?
+
+> I followed the naming convension you recommended during the initial SEV driver
+> developement. IIRC, the main reason for us having to add "user" in it because
+> we wanted to distinguious that this structure is not exactly same as the what
+> is defined in the SEV-SNP firmware spec.
+
+I most definitely have forgotten about this. Can you point me to the
+details of that discussion and why there's a need to distinguish?
+
+> Good question, I am not able to find a generic place to document it. Should we
+> create a documentation "Documentation/virt/coco/sevguest-api.rst" for it ? I am
+> open to other suggestions.
+
+Well, grepping the tree for "ioctl" I see:
+
+Documentation/driver-api/ioctl.rst
+Documentation/process/botching-up-ioctls.rst
+Documentation/userspace-api/ioctl/cdrom.rst
+Documentation/userspace-api/ioctl/hdio.rst
+Documentation/userspace-api/ioctl/index.rst
+Documentation/userspace-api/ioctl/ioctl-decoding.rst
+Documentation/userspace-api/ioctl/ioctl-number.rst
+Documentation/userspace-api/media/cec/cec-func-ioctl.rst
+Documentation/userspace-api/media/mediactl/media-func-ioctl.rst
+Documentation/userspace-api/media/mediactl/request-func-ioctl.rst
+Documentation/userspace-api/media/v4l/func-ioctl.rst
+
+and there's some good info as to what to do.
+
+In any case, Documentation/virt/coco/sevguest-api.rst doesn't sound too
+bad either, actually, as it collects everything under virt/
+
+Thx.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
