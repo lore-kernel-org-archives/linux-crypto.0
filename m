@@ -2,133 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E30DC11F65
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 18:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F537C11F66
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 00:00:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4608961419
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jun 2021 18:37:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 155E661447
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 00:00:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233516AbhF3Sju (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Jun 2021 14:39:50 -0400
-Received: from mail-io1-f72.google.com ([209.85.166.72]:55122 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233152AbhF3Sju (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Jun 2021 14:39:50 -0400
-Received: by mail-io1-f72.google.com with SMTP id m14-20020a5d898e0000b02904f7957d92b5so2456342iol.21
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Jun 2021 11:37:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=/AVs9oHqf5mp42OqIZCGa4M29OQT9RBw7MUMCFsEQn0=;
-        b=O5s0zWeAECzM9vz73aGfkge0oJPp9ot4K3yoMQgS7lL+G0JIbPvL2Qii/N2nT2RA1/
-         haM5htqWFKALdcQxuc7z66ngHfLfsJtRR7Dnjb3yQ8FimUMaJcPmEwpu4KCewIsl/lWe
-         PyenFfCEglHHXZsZ3j1SIx86tHNI3ysyV386BF1zL0PYTjPcWa4yEiqz6FwvDvErscA1
-         SK7NnK7J9rUokxdKxjem1QGp+L1FM+lI0ubEj2lll9fkB2pPtIQkj4JbFLaK9DIo8wbK
-         cShdUUTuo0KT19I1qvfc74BArFlxwGxSm8TIoyAfqr+nzR8qLnjshpxgb1MVUEHsAtaM
-         9nOA==
-X-Gm-Message-State: AOAM530iDeJ1ZmpTtmKjOgR7lwTSfJmAWYrQ+shVIDonqvF6s6vyNbDe
-        CIehrQGPPc3VfgOHfWagFjj8j5OzfYr1yalhf7c547GwOYNL
-X-Google-Smtp-Source: ABdhPJzZvR0NYGpXS3+SeZggX9oRZCqPAvFkSzttmjiRa4KtvdZZePDccoA3EO2tRxLo/siE0QTBhoKRFS4/qqnOhrXt1qFzLRvy
+        id S238098AbhGAADM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Jun 2021 20:03:12 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:51072 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229864AbhGAADM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 30 Jun 2021 20:03:12 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1lyk80-0004mk-P0; Thu, 01 Jul 2021 08:00:24 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1lyk7j-0007TU-Df; Thu, 01 Jul 2021 08:00:07 +0800
+Date:   Thu, 1 Jul 2021 08:00:07 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     syzbot <syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com>
+Cc:     ardb@kernel.org, bp@alien8.de, dave.hansen@intel.com,
+        davem@davemloft.net, hpa@zytor.com, jpa@git.mail.kapsi.fi,
+        kan.liang@linux.intel.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luto@kernel.org, mingo@redhat.com,
+        netdev@vger.kernel.org, peterz@infradead.org,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Subject: Re: [syzbot] BUG: scheduling while atomic: syz-executor/ADDR
+Message-ID: <20210701000007.GA28683@gondor.apana.org.au>
+References: <000000000000459ea305c6000318@google.com>
 MIME-Version: 1.0
-X-Received: by 2002:a5d:8d16:: with SMTP id p22mr8920953ioj.90.1625078240745;
- Wed, 30 Jun 2021 11:37:20 -0700 (PDT)
-Date:   Wed, 30 Jun 2021 11:37:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000459ea305c6000318@google.com>
-Subject: [syzbot] BUG: scheduling while atomic: syz-executor/ADDR
-From:   syzbot <syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com>
-To:     ardb@kernel.org, bp@alien8.de, dave.hansen@intel.com,
-        davem@davemloft.net, herbert@gondor.apana.org.au, hpa@zytor.com,
-        jpa@git.mail.kapsi.fi, kan.liang@linux.intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luto@kernel.org, mingo@redhat.com, netdev@vger.kernel.org,
-        peterz@infradead.org, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <000000000000459ea305c6000318@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+On Wed, Jun 30, 2021 at 11:37:20AM -0700, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    ff8744b5 Merge branch '100GbE' of git://git.kernel.org/pub..
+> git tree:       net-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=163cc5dc300000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=7cf9abab1592f017
+> dashboard link: https://syzkaller.appspot.com/bug?extid=20191dc583eff8602d2d
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14a81190300000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1417f5bfd00000
+> 
+> The issue was bisected to:
+> 
+> commit 2481104fe98d5b016fdd95d649b1235f21e491ba
+> Author: Ard Biesheuvel <ardb@kernel.org>
+> Date:   Thu Dec 31 16:41:55 2020 +0000
+> 
+>     crypto: x86/aes-ni-xts - rewrite and drop indirections via glue helper
 
-syzbot found the following issue on:
+Hi Ard:
 
-HEAD commit:    ff8744b5 Merge branch '100GbE' of git://git.kernel.org/pub..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=163cc5dc300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7cf9abab1592f017
-dashboard link: https://syzkaller.appspot.com/bug?extid=20191dc583eff8602d2d
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14a81190300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1417f5bfd00000
+This looks like the same issue we discussed yesterday.
 
-The issue was bisected to:
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=164ee60c300000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=154ee60c300000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=114ee60c300000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
+> Fixes: 2481104fe98d ("crypto: x86/aes-ni-xts - rewrite and drop indirections via glue helper")
 
-commit 2481104fe98d5b016fdd95d649b1235f21e491ba
-Author: Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu Dec 31 16:41:55 2020 +0000
-
-    crypto: x86/aes-ni-xts - rewrite and drop indirections via glue helper
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=164ee60c300000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=154ee60c300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=114ee60c300000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
-Fixes: 2481104fe98d ("crypto: x86/aes-ni-xts - rewrite and drop indirections via glue helper")
-
-RBP: 00007ffd23488340 R08: 0000000000000000 R09: 00007ffd234884c8
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000005
-R13: 0000000000000000 R14: 00000000004ae018 R15: 0000000000400488
-syz-executor607[8444]: segfault at 4b0e48 ip 0000000000408e15 sp 00007ffd234882e0 error 7 in syz-executor607098311[401000+82000]
-Code: 0a 00 00 74 08 84 c9 0f 85 46 02 00 00 45 31 e4 0f 1f 44 00 00 64 8b 04 25 18 00 00 00 ba 01 00 00 00 85 c0 0f 85 d5 01 00 00 <0f> b1 15 2c 80 0a 00 4c 8b 33 4d 85 f6 75 3b e9 72 01 00 00 0f 1f
-BUG: scheduling while atomic: syz-executor607/8444/0x00000002
-no locks held by syz-executor607/8444.
-Modules linked in:
-Preemption disabled at:
-[<ffffffff812aa3e4>] kernel_fpu_begin_mask+0x64/0x260 arch/x86/kernel/fpu/core.c:126
-Kernel panic - not syncing: scheduling while atomic
-CPU: 1 PID: 8444 Comm: syz-executor607 Not tainted 5.13.0-rc6-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x141/0x1d7 lib/dump_stack.c:120
- panic+0x306/0x73d kernel/panic.c:231
- __schedule_bug.cold+0x10c/0x143 kernel/sched/core.c:4880
- schedule_debug kernel/sched/core.c:4909 [inline]
- __schedule+0x19df/0x23e0 kernel/sched/core.c:5038
- schedule+0xcf/0x270 kernel/sched/core.c:5226
- exit_to_user_mode_loop kernel/entry/common.c:163 [inline]
- exit_to_user_mode_prepare+0x14d/0x290 kernel/entry/common.c:209
- irqentry_exit_to_user_mode+0x5/0x40 kernel/entry/common.c:315
- exc_page_fault+0xc6/0x180 arch/x86/mm/fault.c:1534
- asm_exc_page_fault+0x1e/0x30 arch/x86/include/asm/idtentry.h:577
-RIP: 0033:0x408e15
-Code: 0a 00 00 74 08 84 c9 0f 85 46 02 00 00 45 31 e4 0f 1f 44 00 00 64 8b 04 25 18 00 00 00 ba 01 00 00 00 85 c0 0f 85 d5 01 00 00 <0f> b1 15 2c 80 0a 00 4c 8b 33 4d 85 f6 75 3b e9 72 01 00 00 0f 1f
-RSP: 002b:00007ffd234882e0 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 00000000004ae108 RCX: 0000000000000001
-RDX: 0000000000000001 RSI: 00000000004ae108 RDI: 0000000000000001
-RBP: 0000000000000001 R08: 0000000000000000 R09: 00007ffd234884c8
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000001 R14: 00000000004ae018 R15: 0000000000400488
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
