@@ -2,126 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9359FC11F6A
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jul 2021 12:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92FC6C11F68
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jul 2021 14:40:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 760F261413
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jul 2021 12:34:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B493613FE
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jul 2021 14:40:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232590AbhGBMgm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Jul 2021 08:36:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44180 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232594AbhGBMgh (ORCPT
+        id S231782AbhGBOma (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Jul 2021 10:42:30 -0400
+Received: from vmicros1.altlinux.org ([194.107.17.57]:50824 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231134AbhGBOma (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Jul 2021 08:36:37 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D96F9C061762
-        for <linux-crypto@vger.kernel.org>; Fri,  2 Jul 2021 05:34:05 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[127.0.0.1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1lzIMq-0003K9-Jc; Fri, 02 Jul 2021 14:34:00 +0200
-Subject: Re: [PATCH v2 6/6] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-To:     Richard Weinberger <richard@nod.at>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        kernel <kernel@pengutronix.de>, James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        horia geanta <horia.geanta@nxp.com>,
-        aymen sghaier <aymen.sghaier@nxp.com>,
+        Fri, 2 Jul 2021 10:42:30 -0400
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id C611172C8B4;
+        Fri,  2 Jul 2021 17:39:56 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+        by imap.altlinux.org (Postfix) with ESMTPSA id 96A5B4A46ED;
+        Fri,  2 Jul 2021 17:39:56 +0300 (MSK)
+Date:   Fri, 2 Jul 2021 17:39:56 +0300
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        davem <davem@davemloft.net>, Udit Agarwal <udit.agarwal@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
         Eric Biggers <ebiggers@kernel.org>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        david <david@sigma-star.at>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        "open list, ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        LSM <linux-security-module@vger.kernel.org>
-References: <cover.1dfbb73645d917b3c76d01290804a3410bd9932e.1624364386.git-series.a.fatoum@pengutronix.de>
- <39e6d65ca5d2a0a35fb71d6c1f85add8ee489a19.1624364386.git-series.a.fatoum@pengutronix.de>
- <1850833581.13438.1625172175436.JavaMail.zimbra@nod.at>
- <2f608e5a-5a12-6db1-b9bd-a2cd9e3e3671@pengutronix.de>
- <783613027.15909.1625223222889.JavaMail.zimbra@nod.at>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-Message-ID: <ac8ef66f-4d57-ead0-d1b3-e97220463241@pengutronix.de>
-Date:   Fri, 2 Jul 2021 14:33:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        linux-crypto@vger.kernel.org,
+        Jia Zhang <zhang.jia@linux.alibaba.com>,
+        Elvira Khabirova <e.khabirova@omp.ru>
+Subject: Re: [PATCH v3] pkcs7: make parser enable SM2 and SM3 algorithms
+ combination
+Message-ID: <20210702143956.h3d55suhw5ekbag4@altlinux.org>
+References: <20210624094705.48673-1-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <783613027.15909.1625223222889.JavaMail.zimbra@nod.at>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
+In-Reply-To: <20210624094705.48673-1-tianjia.zhang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 02.07.21 12:53, Richard Weinberger wrote:
-> Ahmad,
+On Thu, Jun 24, 2021 at 05:47:05PM +0800, Tianjia Zhang wrote:
+> Support parsing the message signature of the SM2 and SM3 algorithm
+> combination. This group of algorithms has been well supported. One
+> of the main users is module signature verification.
 > 
-> ----- Ursprüngliche Mail -----
->> Von: "Ahmad Fatoum" <a.fatoum@pengutronix.de>
->>> I'm still think that hard coding the key modifier is not wise.
->>> As I said[0], there are folks out there that want to provide their own modifier,
->>> so it is not only about being binary compatible with other CAAM blob patches in
->>> the wild.
->>
->> I don't think the characterization as a salt is accurate. AFAIU it's more
->> of a namespace, so blobs being loaded are "type-checked" against the modifier.
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+
+This will conflict with the patch of Elvira Khabirova adding the same
+for streebog/ecrdsa. Otherwise,
+
+Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
+
+Thanks,
+
+> ---
+>  crypto/asymmetric_keys/pkcs7_parser.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> Well, the CAAM programmer's reference manual states that the blob key is a 128 bit modifier
-> and has two purposes:
-> 1. It can be used as tag to provide separation between blobs to detect accidental replacement of blobs.
-> 2. But it can also be treated as secret to provide additional protection. Because the blob encryption
-> key derivation includes the key modifier.
-> 
-> While you have case 1 in mind, I care about case 2. :-)
-
-Ah, using the key modifier as a passphrase didn't occur to me.
-
->>> I'll happily implement that feature after your patches got merged but IMHO we
->>> should first agree on an interface.
->>> How about allowing another optional parameter to Opt_new and Opt_load
->>
->> Sound good to me. pcrlock for TPM trusted keys has the same interface.
->>
->> I'd prefer the new option to accept strings, not hex though.
-> 
-> Both is possible. If the string starts with "0x" it needs to be decoded to a
-> 128 bit key. Otherwise it has to be a up to 16 byte string.
-
-Fine by me. Looking forward to your patches. :-)
-
-
-Cheers,
-Ahmad
-
-> 
-> Thanks,
-> //richard
-> 
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
+> index 967329e0a07b..6cf6c4552c11 100644
+> --- a/crypto/asymmetric_keys/pkcs7_parser.c
+> +++ b/crypto/asymmetric_keys/pkcs7_parser.c
+> @@ -248,6 +248,9 @@ int pkcs7_sig_note_digest_algo(void *context, size_t hdrlen,
+>  	case OID_sha224:
+>  		ctx->sinfo->sig->hash_algo = "sha224";
+>  		break;
+> +	case OID_sm3:
+> +		ctx->sinfo->sig->hash_algo = "sm3";
+> +		break;
+>  	default:
+>  		printk("Unsupported digest algo: %u\n", ctx->last_oid);
+>  		return -ENOPKG;
+> @@ -269,6 +272,10 @@ int pkcs7_sig_note_pkey_algo(void *context, size_t hdrlen,
+>  		ctx->sinfo->sig->pkey_algo = "rsa";
+>  		ctx->sinfo->sig->encoding = "pkcs1";
+>  		break;
+> +	case OID_SM2_with_SM3:
+> +		ctx->sinfo->sig->pkey_algo = "sm2";
+> +		ctx->sinfo->sig->encoding = "raw";
+> +		break;
+>  	default:
+>  		printk("Unsupported pkey algo: %u\n", ctx->last_oid);
+>  		return -ENOPKG;
+> -- 
+> 2.19.1.3.ge56e4f7
