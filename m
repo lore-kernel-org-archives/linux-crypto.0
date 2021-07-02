@@ -2,197 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17270C11F67
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 21:32:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3CF6C11F6B
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jul 2021 08:00:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E64F361416
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jul 2021 21:32:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C000F61411
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jul 2021 08:00:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234123AbhGAVfE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jul 2021 17:35:04 -0400
-Received: from mail-dm6nam10on2050.outbound.protection.outlook.com ([40.107.93.50]:27393
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229934AbhGAVfE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jul 2021 17:35:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i5l9TtX8cO71NOG44/WRVL+jDBTYZyS5Rf5T0paajjCbVKxsTQfQ7+0YyF1qnDJ2cX78ouh9K0/sncFBcx7/AAmeF6WeJJdxBTBOuGCmd5eecKB1wok7An24OTpe1sLxNoZo0p5HkAvulWVVHzsTxekaUwed9ViqWxfrIKtIr5gvQ/1hPMiB6E7kt+OzuSFzEA9666v/RSlPGfcHO9T8dvM/1rB0syKFe/OtuwilwlRszuO042hVulMLnr7ANTCzmSneOuzguJFoWoxLNBpfEa9UPM9tTeh0NCfEEmvZQC6/BkbsR5e00ph74rPgkx/z/QmuM+ERxZ7Iw01NbK+SLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aLb+DQNtdNhY8DyDlt6JZO25i1CVWLje6cwrD5uew04=;
- b=fJaYzPv16RI7TNw1a4fU2En/vEzdc/vJCJ/ZG8aRPn+mR3At2z5PgGX6iq3Z1VLQqSKWulR3BEfkS6bfXsLC014iVEGIJ8EeDhjPdx3bxDvn5MpozfIqoxeojsT4Z0/Qxac7tej39qHkaAet20f+9oj4Lz5JlSiWa1uVpL7AxfUuzkM+Y4EEJlL5GMTQPcGLyr3hgqZulxu7yKY+izd0qO6r76J/zal7F2Z9KT0M0F2jAyXmmAaqDg/aY3v3uKTWzyj3+J4v2i8KngWtQnsqxv/EhV3ONm8kxxpfB4ldvBipiDPMtHaAfeMGOJDO69cV0zG5wPA8RZRuOaWzrEQ2KQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aLb+DQNtdNhY8DyDlt6JZO25i1CVWLje6cwrD5uew04=;
- b=5rCo+4YnIqseUCQmKmZ9uDBiFb5ntJCwVmpGNvVr6biO0smMdy6BprqvI3uNKjNfqqZGq85pOLU1VJ0L8dJ+Mz/mopdJAfTs1EqH/jxhKOAeC8P5/+avAQRI9FXiqhTYO8I+tP0gZt+KlSDdSCC89+oHs/AghnvS0SGOJ9yXZQA=
-Authentication-Results: linux.ibm.com; dkim=none (message not signed)
- header.d=none;linux.ibm.com; dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2714.namprd12.prod.outlook.com (2603:10b6:5:42::18) by
- DM5PR12MB1513.namprd12.prod.outlook.com (2603:10b6:4:d::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4264.23; Thu, 1 Jul 2021 21:32:30 +0000
-Received: from DM6PR12MB2714.namprd12.prod.outlook.com
- ([fe80::7df8:b0cd:fe1b:ae7b]) by DM6PR12MB2714.namprd12.prod.outlook.com
- ([fe80::7df8:b0cd:fe1b:ae7b%5]) with mapi id 15.20.4264.026; Thu, 1 Jul 2021
- 21:32:30 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com, Dov Murik <dovmurik@linux.ibm.com>
-Subject: Re: [PATCH Part1 RFC v3 22/22] virt: Add SEV-SNP guest driver
-To:     Borislav Petkov <bp@alien8.de>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-23-brijesh.singh@amd.com> <YNxzJ2I3ZumTELLb@zn.tnic>
- <46499161-0106-3ae9-9688-0afd9076b28b@amd.com> <YN4DixahyShxyyCv@zn.tnic>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <5b4d20db-3013-4411-03b9-708dd18dbe64@amd.com>
-Date:   Thu, 1 Jul 2021 16:32:25 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+        id S230236AbhGBIC5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Jul 2021 04:02:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39188 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230234AbhGBICy (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Jul 2021 04:02:54 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35907C061765
+        for <linux-crypto@vger.kernel.org>; Fri,  2 Jul 2021 01:00:22 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1lzE5x-0007GU-04; Fri, 02 Jul 2021 10:00:17 +0200
+Subject: Re: [PATCH v2 6/6] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+To:     Richard Weinberger <richard@nod.at>
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        kernel <kernel@pengutronix.de>, James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        horia geanta <horia.geanta@nxp.com>,
+        aymen sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        davem <davem@davemloft.net>, Udit Agarwal <udit.agarwal@nxp.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        david <david@sigma-star.at>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        "open list, ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        LSM <linux-security-module@vger.kernel.org>
+References: <cover.1dfbb73645d917b3c76d01290804a3410bd9932e.1624364386.git-series.a.fatoum@pengutronix.de>
+ <39e6d65ca5d2a0a35fb71d6c1f85add8ee489a19.1624364386.git-series.a.fatoum@pengutronix.de>
+ <1850833581.13438.1625172175436.JavaMail.zimbra@nod.at>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+Message-ID: <2f608e5a-5a12-6db1-b9bd-a2cd9e3e3671@pengutronix.de>
+Date:   Fri, 2 Jul 2021 10:00:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
-In-Reply-To: <YN4DixahyShxyyCv@zn.tnic>
+MIME-Version: 1.0
+In-Reply-To: <1850833581.13438.1625172175436.JavaMail.zimbra@nod.at>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [165.204.78.25]
-X-ClientProxiedBy: SA0PR11CA0206.namprd11.prod.outlook.com
- (2603:10b6:806:1bc::31) To DM6PR12MB2714.namprd12.prod.outlook.com
- (2603:10b6:5:42::18)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.31.130.124] (165.204.78.25) by SA0PR11CA0206.namprd11.prod.outlook.com (2603:10b6:806:1bc::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.22 via Frontend Transport; Thu, 1 Jul 2021 21:32:26 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2f689bc1-73c6-4e7b-026e-08d93cd7bafc
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1513:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1513C55B2C7FE8D4568E132FE5009@DM5PR12MB1513.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6hIa4N0XaaiNvRcz8of1xKf1JULnfGRZzzVTEQGQRGShmrNG5HjJfbrf1JvGtMsGxBFkkfzu2KlX62i9g39HbceGjViJ8QOdUUXbLISh4jy3DHQZE7/2jDIsUxVI50SNuBkehG7t0TQjbUB48FXjevglPMPh3TCi0uwBBmwKeoQN8JlcSD+ebO4ktUuAtsy85FMUG9ZviPo47Ty1toLHzNvWOUfXZhpvhC3DTYCuhyX3S7BHtZm1bp6ACqMOhUYVRoXNDbK1RjPYwFVWSRJmKO8NSzUGu1hz2vuoFTgu/UUois21eVZVKklsYrPXVRdKcVVXVDy8iMr8l7D2oV5z3dg0y9UcLeHvrzWONC9CDeC/LAiadk0fqoLkMk4sU8+BGworC+lRG5c5DR4G1vmooGc9QUAPrhAWQ5lIMOSoheei/ePI7sGhHxuk8vWKM3Bv4qKxeSQE4bVR3fsRa4c8Ohk97043UTgKPQQKNad3X87gat2Q7pPx/MDPBe+XAh0FAHDvW3Ov2yZSjOhmPkmk8zErz29FdsttC6HPFB264ZlVBULr9Vy/BSfxtW2WFCRHFVflLibE8PSLo/Iob6i0KMZ0GjO/FIDZJEu/zzOLXWMn1x2/HVbZJP/Io9BreH4heYQr9i9jUKJymHWqtJcB0Cyisz7l8P4GsyV20pkaTEDllqQibKWS+zp/s+J2Y0/tQd+n/yuFc4G7OMMHet2LOdauJqvmxV+FjpubHwXkFK/rBigZFKAPbWjtuYE2Wnny17obTqIgPw/+6RlXIFjPqw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2714.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(366004)(346002)(396003)(376002)(2616005)(66556008)(956004)(7416002)(66476007)(5660300002)(6916009)(36756003)(44832011)(16526019)(38100700002)(38350700002)(478600001)(31696002)(26005)(186003)(86362001)(53546011)(4326008)(2906002)(31686004)(66946007)(52116002)(16576012)(316002)(83380400001)(6486002)(8676002)(8936002)(54906003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UHA2VTVZNHJBS2V2QlBrZi85cXhwc1p0QyszZm5OS3JBNlR2eXEzUDF1enFD?=
- =?utf-8?B?UDdZYXRUMGwrR0FWMHlld2c2ZzA4RURYUFpqa0ZNdGNzM0MzTWJTZ1B0WDRj?=
- =?utf-8?B?TlJBV1NWSm1ON0p2TjRTV1JBdThmWUZkUDNnOVZqNnFiOHJwOEx0cHc1L29S?=
- =?utf-8?B?OGZLcGVXcEF3bE5IdjJJdzZSdUVmV2wzcUducTExRWp1eHlXSFNSVVY0R1c2?=
- =?utf-8?B?d0RPeUNBRkdwcHhiNUlKTTZTVW55MjFSRjlLVjVxcDZLcXYzY0w3OFhmMFNO?=
- =?utf-8?B?aU5yTnFDZ0Fvc2ZGY3AvbjJCTDZMb0dIcC9ha0llaXgvTHZod2FPNTJaSkV1?=
- =?utf-8?B?QUR5dmkrVENRYVl6U1JZYk5URlVUR2wzOExiTEd0UTZJa1ZrcmdaRVk0Mmh6?=
- =?utf-8?B?ZEdjK2dkRVMxeVloWFNhdWZVRHRYb011eGU2bWZvZHdVTXdXbFhNQnpLTVBz?=
- =?utf-8?B?czc3Ky9DL0UrVk1FeTVmaXNMUFMwQTVYQmdFRkFJM2NzOUxwWnVvK0JvaHFh?=
- =?utf-8?B?NGhoWEpoQ3hpWEZneTBVWHBmTEVYYTFkY01xZkFsQ3ZjaFAwY0NXcTFYcTFr?=
- =?utf-8?B?anI5RnhQTDZJZUFVaXdLZTJYanc5a0lrdHFyMTlUanhiblVpdkR1V1drVlJV?=
- =?utf-8?B?cmFXeWlvaG5nOXlZYkp6cXZWaEFXZW53QTNoS0U3QkkyS2o0Z2ZyMFVzeGNX?=
- =?utf-8?B?eCtRbUFPUGVYWEJIQXl0MjgyTlZmTnUvM0UrYmVRVzdXVkhGY0lKdGx2dkNO?=
- =?utf-8?B?TEJzbTJ2a2pSNzRHSUplRFNvcTY3Slc1R2NqRVVSKzVVMkhiWWpyTGJ4VDFq?=
- =?utf-8?B?ank1ZVhneTNIUUV5Q1R1VGh4SGtUZkhmMHNWQ205dDRKcVZQMGdHbVczMURh?=
- =?utf-8?B?Ym00aG5uMDJ6QmowM1VuQm9hbWw3WUtQK2pQRVA1QWxDNnR5R3Eya296Z29i?=
- =?utf-8?B?d0F3aXVxa0NzUDBScDZXN3o3VGc1N3lhWGJDL3ZKbXQxZldjSElKQmpYQjBm?=
- =?utf-8?B?TU45djdieXM4UUlCcVdkL1JqYU5LRTBWWFpmNHRLaC95bjBTaThreHUrcFFq?=
- =?utf-8?B?TERFK2Z4NVhPSHpCWGRtakEydjNCb0hoTG1zdVZXN2xheEtVejkxQ3FNVW9Z?=
- =?utf-8?B?NlBHQ3pKd3F0aVk1NXhOSThLT3JRcHFtTHVWMTVWUnJqTndDaEtXSm5pelhy?=
- =?utf-8?B?Q1FuTzNabEl4R0kwK2hnRUkxRjNVMFlrMlc4UUthRGtENWNvUGtEWmhGQi9h?=
- =?utf-8?B?c0piVncrZnZHcUhEMXp0UkEzVVB5Wk9hMFNWeVpKakY4Z3dQaVRQb3hNYzZs?=
- =?utf-8?B?dXdqWG41Vk15TExZUWVtMTVqV1ZmY1ZYbkF4VWtnczZrdVRXZ2p6VmNReTdF?=
- =?utf-8?B?K2JEdDdWNlZaVGx5YWVnNE5PejBUVUsrcTZ0NE1xczhnS1FENTkvZVFqc2hL?=
- =?utf-8?B?eFg0SGxiMHZibFdjbjFTUWNHUEtrN2RROHNsaUFzVDdDNlZkc1pzbkpIdXgz?=
- =?utf-8?B?RWNlN2Q1cmhXb0tkVU5EcFpwQVAxSiswbmRyM3ExWG1lRlI3aUlERFZrUHpu?=
- =?utf-8?B?V0VUbGRMcHQwRlpXaW1xWjRndW1KaFN2ME5objR5dmZFdWZIVzJNVkNtQ2h2?=
- =?utf-8?B?QU43bVRjMitldzNNQUlLNGNHMDdySDdMRC9RR1RyUjRGL0xNcUZPZ0N0V09u?=
- =?utf-8?B?K0xpN3puTlEzck1hcEU5VjVoaW53aitOWGNYWkovK1hwRnZQY2RhNyt4dDdB?=
- =?utf-8?Q?yVLi35T6LCeSQYbPzYwUPtKevRgGfYzxU0t/MAh?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f689bc1-73c6-4e7b-026e-08d93cd7bafc
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2714.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2021 21:32:30.8025
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: s2L/qNovLXFgRDvKUGuzFnBW4hEgK0jZHLDK5jK0H4cOSC66f80lxehFOszQK+LoGNo4BHRQMG/isVtRSvOjcA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1513
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hello Richard,
 
-
-On 7/1/2021 1:03 PM, Borislav Petkov wrote:
+On 01.07.21 22:42, Richard Weinberger wrote:
+> Ahmad,
 > 
-> Sure, but I'd call it sevguest.c and will have it deal with both SEV and
-> SNP ioctls depending on what has been detected in the hardware. Or is
-> there some special reason for having snp.c and sev.c separate?
+> ----- Ursprüngliche Mail -----
+>> Von: "Ahmad Fatoum" <a.fatoum@pengutronix.de>
+>> +static struct caam_blob_priv *blobifier;
+>> +
+>> +#define KEYMOD "kernel:trusted"
+> 
+> I'm still think that hard coding the key modifier is not wise.
+> As I said[0], there are folks out there that want to provide their own modifier,
+> so it is not only about being binary compatible with other CAAM blob patches in the wild.
+
+I don't think the characterization as a salt is accurate. AFAIU it's more
+of a namespace, so blobs being loaded are "type-checked" against the modifier.
+
+> I'll happily implement that feature after your patches got merged but IMHO we should first agree on an interface.
+> How about allowing another optional parameter to Opt_new and Opt_load
+
+Sound good to me. pcrlock for TPM trusted keys has the same interface.
+
+I'd prefer the new option to accept strings, not hex though.
+
+
+> and having a key modifier per struct trusted_key_payload instance?
+
+Ye, possibly a void *backend_data, which other trust sources could leverage
+as well. But that should be separate discussion.
+
+
+Cheers,
+Ahmad
+
+> 
+> Thanks,
+> //richard
+> 
+> [0]
+> https://patchwork.kernel.org/project/linux-crypto/patch/319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de/#24085397
+> 
 > 
 
-I don't have any strong reason. I am okay to begin putting all the SNP
-stuff in the sevguest.c.
-
-
->> I followed the naming convension you recommended during the initial SEV driver
->> developement. IIRC, the main reason for us having to add "user" in it because
->> we wanted to distinguious that this structure is not exactly same as the what
->> is defined in the SEV-SNP firmware spec.
-> 
-> I most definitely have forgotten about this. Can you point me to the
-> details of that discussion and why there's a need to distinguish?
-> 
->> Good question, I am not able to find a generic place to document it. Should we
->> create a documentation "Documentation/virt/coco/sevguest-api.rst" for it ? I am
->> open to other suggestions.
-> 
-
-The spec definition is present in include/linux/psp-sev.h but sometime we don't
-expose the spec defs as-is to userspace. Several SEV/SEV-SNP does not need to
-be exposed to the userspace, those which need to be expose we provide a bit
-modified Linux uapi for it, and for SEV drivers we choose "_user" prefix.
-
-e.g
-a spec definition for the PEK import in include/linux/psp-sev.h is:
-struct sev_data_pek_cert_import {
-	u64 pdh_cert_address;  /* system physical address */
-	u32 pdh_cert_len;
-	u32 reserved;
-	...
-};
-
-But its corresponding userspace structure def in include/uapi/linux/psp-sev.h is:
-struct sev_user_data_pek_cert_import {
-	__u64 pek_cert_uaddr; /* userspace address */
-	__u32 pek_cert_len;
-	...
-};
-
-The ioctl handling takes care of mapping from uaddr to pa and other things as required.
-So, I took similar approach for the SEV-SNP guest ioctl. In this particular case the
-guest request structure defined in the spec contains multiple field but many of
-those fields are managed internally by the kernel (e.g seqno, IV, etc etc).
-
--Brijesh
-
--Brijesh
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
