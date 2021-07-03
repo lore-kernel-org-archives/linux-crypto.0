@@ -2,103 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 060B2C07E98
-	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jul 2021 02:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D8CC07E9A
+	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jul 2021 16:19:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE6D26142B
-	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jul 2021 02:07:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AF5D613E2
+	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jul 2021 16:19:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230118AbhGCCJo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Jul 2021 22:09:44 -0400
-Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:54486 "EHLO
-        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230094AbhGCCJo (ORCPT
+        id S229561AbhGCQWa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 3 Jul 2021 12:22:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40824 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229497AbhGCQWa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Jul 2021 22:09:44 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R551e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UeWX25L_1625278028;
-Received: from 30.25.251.73(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UeWX25L_1625278028)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Sat, 03 Jul 2021 10:07:09 +0800
-Subject: Re: [PATCH] pkcs7: support EC-RDSA/streebog in SignerInfo
-To:     Elvira Khabirova <e.khabirova@omp.ru>, keyrings@vger.kernel.org,
-        Vitaly Chikunov <vt@altlinux.org>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
-        dhowells@redhat.com, vt@altlinux.org
-References: <20210511174744.4f3c6c59@msk1wst204>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <0091ddbc-a32d-848a-4f18-37b041a048f4@linux.alibaba.com>
-Date:   Sat, 3 Jul 2021 10:07:08 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        Sat, 3 Jul 2021 12:22:30 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4AECC061762;
+        Sat,  3 Jul 2021 09:19:56 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f289e0085c7d3fefeb66b8e.dip0.t-ipconnect.de [IPv6:2003:ec:2f28:9e00:85c7:d3fe:feb6:6b8e])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1282F1EC047F;
+        Sat,  3 Jul 2021 18:19:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1625329195;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=upKFgpUh0zZ782nZABcY/RNBj8bd/OadOyw5te8iHZc=;
+        b=NudzYXsG646/+XcrvCCfobxDIXDqoINAGQsj0E1AkwVZlvZjqXEC4Q/LmnHdK/BN54pmaw
+        JFsqB2fy+zUTz07NLLpEzLpX8tb+BSpe+VA0CqnOJO8wCl7siWJe7RndUF0FD5wSiMEe/r
+        qnuIbLGmBy99uqaqdSvureQd8IDQa2A=
+Date:   Sat, 3 Jul 2021 18:19:47 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com, Dov Murik <dovmurik@linux.ibm.com>
+Subject: Re: [PATCH Part1 RFC v3 22/22] virt: Add SEV-SNP guest driver
+Message-ID: <YOCOIy1AW5RUfbx4@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-23-brijesh.singh@amd.com>
+ <YNxzJ2I3ZumTELLb@zn.tnic>
+ <46499161-0106-3ae9-9688-0afd9076b28b@amd.com>
+ <YN4DixahyShxyyCv@zn.tnic>
+ <5b4d20db-3013-4411-03b9-708dd18dbe64@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20210511174744.4f3c6c59@msk1wst204>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5b4d20db-3013-4411-03b9-708dd18dbe64@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Elvira,
+On Thu, Jul 01, 2021 at 04:32:25PM -0500, Brijesh Singh wrote:
+> The spec definition is present in include/linux/psp-sev.h but sometime
+> we don't expose the spec defs as-is to userspace.
 
-On 5/11/21 10:47 PM, Elvira Khabirova wrote:
-> Allow using EC-RDSA/streebog in pkcs7 certificates in a similar way
-> to how it's done in the x509 parser.
+Why?
+
+Having such undocumented and maybe unwarranted differences - I still
+don't see a clear reason why - is calling for additional and unnecessary
+confusion.
+
+> Several SEV/SEV-SNP does not need to be exposed to the userspace,
+> those which need to be expose we provide a bit modified Linux uapi for
+> it, and for SEV drivers we choose "_user" prefix.
+
+Is that documented somewhere?
+
+Because "user" doesn't tell me it is a modified structure which is
+different from the spec.
+
+> e.g
+> a spec definition for the PEK import in include/linux/psp-sev.h is:
+> struct sev_data_pek_cert_import {
+> 	u64 pdh_cert_address;  /* system physical address */
+> 	u32 pdh_cert_len;
+> 	u32 reserved;
+> 	...
+> };
 > 
-> This is needed e.g. for loading kernel modules signed with EC-RDSA.
-> 
-> Signed-off-by: Elvira Khabirova <e.khabirova@omp.ru>
+> But its corresponding userspace structure def in include/uapi/linux/psp-sev.h is:
+> struct sev_user_data_pek_cert_import {
+> 	__u64 pek_cert_uaddr; /* userspace address */
+> 	__u32 pek_cert_len;
+> 	...
+> };
 
-Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+And the difference is a single "u32 reserved"?
 
-I sent a similar patch to support the SM2/3 algorithm combination, which 
-happened to conflict with your patch.
+Dunno, from where I'm standing this looks like unnecessary confusion to
+me.
 
-https://lkml.org/lkml/2021/6/24/248
+> The ioctl handling takes care of mapping from uaddr to pa and other
+> things as required. So, I took similar approach for the SEV-SNP guest
+> ioctl. In this particular case the guest request structure defined in
+> the spec contains multiple field but many of those fields are managed
+> internally by the kernel (e.g seqno, IV, etc etc).
 
-If possible and you agree, I will put these two patches in a series and 
-then resend.
+Ok, multiple fields sounds like you wanna save on the data that is
+shovelled between kernel and user space and then some of the fields
+don't mean a thing for the user API. Ok.
 
-Cheers,
-Tianjia
+But again, where is this documented and stated clear so that people are
+aware?
 
-> ---
->   crypto/asymmetric_keys/pkcs7_parser.c | 11 +++++++++++
->   1 file changed, 11 insertions(+)
-> 
-> diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
-> index 967329e0a07b..39c260a04167 100644
-> --- a/crypto/asymmetric_keys/pkcs7_parser.c
-> +++ b/crypto/asymmetric_keys/pkcs7_parser.c
-> @@ -248,6 +248,12 @@ int pkcs7_sig_note_digest_algo(void *context, size_t hdrlen,
->   	case OID_sha224:
->   		ctx->sinfo->sig->hash_algo = "sha224";
->   		break;
-> +	case OID_gost2012Digest256:
-> +		ctx->sinfo->sig->hash_algo = "streebog256";
-> +		break;
-> +	case OID_gost2012Digest512:
-> +		ctx->sinfo->sig->hash_algo = "streebog512";
-> +		break;
->   	default:
->   		printk("Unsupported digest algo: %u\n", ctx->last_oid);
->   		return -ENOPKG;
-> @@ -269,6 +275,11 @@ int pkcs7_sig_note_pkey_algo(void *context, size_t hdrlen,
->   		ctx->sinfo->sig->pkey_algo = "rsa";
->   		ctx->sinfo->sig->encoding = "pkcs1";
->   		break;
-> +	case OID_gost2012PKey256:
-> +	case OID_gost2012PKey512:
-> +		ctx->sinfo->sig->pkey_algo = "ecrdsa";
-> +		ctx->sinfo->sig->encoding = "raw";
-> +		break;
->   	default:
->   		printk("Unsupported pkey algo: %u\n", ctx->last_oid);
->   		return -ENOPKG;
-> 
+Or are you assuming that since the user counterparts are in
+
+include/uapi/linux/psp-sev.h
+	^^^^
+
+and it being an uapi header, then that should state that?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
