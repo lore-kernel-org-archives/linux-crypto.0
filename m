@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 560DEC11F69
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:10:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC7CBC11F68
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:10:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3ED5E619B6
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:10:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6FF3613E5
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:10:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232070AbhGDXNA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:13:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48840 "EHLO mail.kernel.org"
+        id S232707AbhGDXNR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:13:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47420 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231380AbhGDXJn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:09:43 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EBF5061946;
-        Sun,  4 Jul 2021 23:06:58 +0000 (UTC)
+        id S230417AbhGDXMU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:12:20 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C3CCA613F7;
+        Sun,  4 Jul 2021 23:08:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625440020;
-        bh=FzXwPdNNUN1+bbWVulgsQZBbjZaP73QD17PYhjK13DA=;
+        s=k20201202; t=1625440124;
+        bh=StU3+YxyCMgAjgU/RgVVZ0TNoIT68/UIFVHvrc/DOuU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TiJ7YI/oZ18avvZpZE+aS+TJFHpnYRsJiANyFrgS5Uc4i85rvSgZuoJXwV/m6Is6b
-         matMeWi7aFGwnH0vTdUJf0jXWu+er6KwEkJAZA999TJC3+AxW0nbfQrIvI2+O84OO3
-         LaRpFUFYQr4jDxwNyO4qVb2NnDLdSsn3ZjNS2kWxJBT2mCpYeTJOBDNwsVPK1DnlVs
-         ST5/3PCn1Dl9yYsHWaQOtxc7s+ZyDvIo5BZ6puAqenGzew/roECtE0mJeb2uJ40gOD
-         ic9Sgv+itu5jq3wONnDfTKOZkWTqzDK+EevoCzpQoqVD/dqItdwWGo4fFqRFfKOXz5
-         H+yK1+3TeWvtw==
+        b=pMUuuCuWMN2DL1aatQW22F2UMDyw5+1AwUfZvxwHcAKNNI3n32J141BpFSlVjV78w
+         LHVJS71YGeZ/lCfkQXy7UUrb/XArVTnmZHsAZNgvAuGKyagtq4W9jj43gSQGf6kicZ
+         NDljOhmv68KYziyAGtM+uo1DmvO09TjlVKhk++RdqsDUIP6C/tCcqylsWpnQFkKjlF
+         gJIw4aIk1Pk2PQ9ACpLMoaNrWj5jNjidA4JH4eAr0SVeyDMfXcLExxctZPJgBNJvuj
+         ETjmd9rWbwf40CM6SBZ7zdtC3liXzEAO66u7iMzysWyEOBcVMIap3XxO3yu2cFTkt1
+         2osVzYqNa+Olw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Jack Xu <jack.xu@intel.com>, Zhehui Xiang <zhehui.xiang@intel.com>,
@@ -38,12 +38,12 @@ Cc:     Jack Xu <jack.xu@intel.com>, Zhehui Xiang <zhehui.xiang@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
         linux-crypto@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH AUTOSEL 5.12 31/80] crypto: qat - check return code of qat_hal_rd_rel_reg()
-Date:   Sun,  4 Jul 2021 19:05:27 -0400
-Message-Id: <20210704230616.1489200-31-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 29/70] crypto: qat - check return code of qat_hal_rd_rel_reg()
+Date:   Sun,  4 Jul 2021 19:07:22 -0400
+Message-Id: <20210704230804.1490078-29-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210704230616.1489200-1-sashal@kernel.org>
-References: <20210704230616.1489200-1-sashal@kernel.org>
+In-Reply-To: <20210704230804.1490078-1-sashal@kernel.org>
+References: <20210704230804.1490078-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -75,10 +75,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
-index bd3028126cbe..069f51621f0e 100644
+index 52ef80efeddc..b40e81e0088f 100644
 --- a/drivers/crypto/qat/qat_common/qat_hal.c
 +++ b/drivers/crypto/qat/qat_common/qat_hal.c
-@@ -1417,7 +1417,11 @@ static int qat_hal_put_rel_wr_xfer(struct icp_qat_fw_loader_handle *handle,
+@@ -1213,7 +1213,11 @@ static int qat_hal_put_rel_wr_xfer(struct icp_qat_fw_loader_handle *handle,
  		pr_err("QAT: bad xfrAddr=0x%x\n", xfr_addr);
  		return -EINVAL;
  	}
