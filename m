@@ -7,39 +7,40 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E713C07E95
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55814C07E96
 	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B87561363
+	by mail.kernel.org (Postfix) with ESMTP id 40CAD61378
 	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233427AbhGDXRm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:17:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50502 "EHLO mail.kernel.org"
+        id S233406AbhGDXRq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:17:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50590 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234163AbhGDXO4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:14:56 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 991BA619C0;
-        Sun,  4 Jul 2021 23:11:30 +0000 (UTC)
+        id S234216AbhGDXO5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:14:57 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DFBF3613F9;
+        Sun,  4 Jul 2021 23:11:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625440291;
-        bh=xNZHQJvcgNRFaQ8eiwggEpWrLCEadieOmm+NlS87DBc=;
+        s=k20201202; t=1625440296;
+        bh=akcR7Pm/E7YJgiGct8FsuxZrYv4JOGAcsaYKBK4XVC4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GXluS7/vAt9uC69IU+0z9zoKC8FVneJzzKsrz4wNjWeabMmooDBJgDps1XEaB5yB6
-         flT3AXmStxoVH7xPz8yI5mUohMN4QCISdJ3JBTXIqC3y1sg4RdhnsR0HDbgL2Id1rk
-         WL3adEewj/r4A4LhjWlH3jSMMKwCYO+vqQ+iad9+rx1is+hPihU+MGSg1aP97nOLXu
-         y9AtDluYoNyPArL/mmjPDfljKIlfE2csT/+N8qldXUNLh7p58gOGVpSyLvrFdXn8rN
-         gKcD21/8nXi6O1gh0P92OZpV+2Lt3+uVlOR0TUPuKoOucTQUyzx+KmemridH2lIvDM
-         ilc6DMlvfLLhA==
+        b=Kasf3JE6+aUdICQriiAQ3+YhYu7hE6tLwiCI1xNB+Ax0YiUuRa2xYSAXG19g9EJk8
+         BXIFGd+qvkMRirsmZZY+YwvxMCFytWH9sx6jZQJNDb7pSlv47dxIu+LKCh/wUNtqk4
+         UywubCfqww1cPz3v/wyu5SxQH7Z1nO6oylRH5pmRUNwhlG2wuHQfXpkOsD4aTfCg+z
+         kyILViSfzRjoQ2XHfG4DWhXAXPSbAr29pDTkfz8nWEesWDWe32ZQTvBe/0doFiYU4d
+         kUjGTE4ES7rgiHDphW9YXvWF+C0KeIgAfTZ8NPIFgRqMv4XdL2ae4vl2bPz187vJiP
+         ygOGOeAQE7m1Q==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Bixuan Cui <cuibixuan@huawei.com>, Hulk Robot <hulkci@huawei.com>,
+Cc:     Jack Xu <jack.xu@intel.com>, Zhehui Xiang <zhehui.xiang@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 4.14 06/25] crypto: nx - add missing MODULE_DEVICE_TABLE
-Date:   Sun,  4 Jul 2021 19:11:04 -0400
-Message-Id: <20210704231123.1491517-6-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 4.14 10/25] crypto: qat - check return code of qat_hal_rd_rel_reg()
+Date:   Sun,  4 Jul 2021 19:11:08 -0400
+Message-Id: <20210704231123.1491517-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210704231123.1491517-1-sashal@kernel.org>
 References: <20210704231123.1491517-1-sashal@kernel.org>
@@ -51,34 +52,45 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Bixuan Cui <cuibixuan@huawei.com>
+From: Jack Xu <jack.xu@intel.com>
 
-[ Upstream commit 06676aa1f455c74e3ad1624cea3acb9ed2ef71ae ]
+[ Upstream commit 96b57229209490c8bca4335b01a426a96173dc56 ]
 
-This patch adds missing MODULE_DEVICE_TABLE definition which generates
-correct modalias for automatic loading of this driver when it is built
-as an external module.
+Check the return code of the function qat_hal_rd_rel_reg() and return it
+to the caller.
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Bixuan Cui <cuibixuan@huawei.com>
+This is to fix the following warning when compiling the driver with
+clang scan-build:
+
+    drivers/crypto/qat/qat_common/qat_hal.c:1436:2: warning: 6th function call argument is an uninitialized value
+
+Signed-off-by: Jack Xu <jack.xu@intel.com>
+Co-developed-by: Zhehui Xiang <zhehui.xiang@intel.com>
+Signed-off-by: Zhehui Xiang <zhehui.xiang@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/nx/nx-842-pseries.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/qat/qat_common/qat_hal.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
-index cddc6d8b55d9..2e5b4004f0ee 100644
---- a/drivers/crypto/nx/nx-842-pseries.c
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -1086,6 +1086,7 @@ static struct vio_device_id nx842_vio_driver_ids[] = {
- 	{"ibm,compression-v1", "ibm,compression"},
- 	{"", ""},
- };
-+MODULE_DEVICE_TABLE(vio, nx842_vio_driver_ids);
- 
- static struct vio_driver nx842_vio_driver = {
- 	.name = KBUILD_MODNAME,
+diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
+index 8c4fd255a601..cdf80c16a033 100644
+--- a/drivers/crypto/qat/qat_common/qat_hal.c
++++ b/drivers/crypto/qat/qat_common/qat_hal.c
+@@ -1255,7 +1255,11 @@ static int qat_hal_put_rel_wr_xfer(struct icp_qat_fw_loader_handle *handle,
+ 		pr_err("QAT: bad xfrAddr=0x%x\n", xfr_addr);
+ 		return -EINVAL;
+ 	}
+-	qat_hal_rd_rel_reg(handle, ae, ctx, ICP_GPB_REL, gprnum, &gprval);
++	status = qat_hal_rd_rel_reg(handle, ae, ctx, ICP_GPB_REL, gprnum, &gprval);
++	if (status) {
++		pr_err("QAT: failed to read register");
++		return status;
++	}
+ 	gpr_addr = qat_hal_get_reg_addr(ICP_GPB_REL, gprnum);
+ 	data16low = 0xffff & data;
+ 	data16hi = 0xffff & (data >> 0x10);
 -- 
 2.30.2
 
