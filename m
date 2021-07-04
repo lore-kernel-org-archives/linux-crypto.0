@@ -2,44 +2,45 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C014C11F6C
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:04:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 746FEC07E9E
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:05:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 36C5C6141C
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:04:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F27A6135D
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:05:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229753AbhGDXHa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:07:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45726 "EHLO mail.kernel.org"
+        id S230313AbhGDXHr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:07:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46166 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230137AbhGDXH2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:07:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9F6DE613E9;
-        Sun,  4 Jul 2021 23:04:51 +0000 (UTC)
+        id S230304AbhGDXHl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:07:41 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BCC26611ED;
+        Sun,  4 Jul 2021 23:05:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625439892;
-        bh=vKftHj88RLYECuwHY64g8MmF5WQxGF4qF+Dprtnl6OE=;
+        s=k20201202; t=1625439905;
+        bh=TSvhwjjIRCuy4ZF5RtOACoeAoEzRBrwReraD+c3BIGQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TTWBbwIRfuk3S33Rv3VnILe8h6AoMJl51wOdbpp8kjOZJSca28BZ4TCTk58Q90nM5
-         LucunG/s2u9TXfKv1ItGdKqkcuptK4k2V1F3u3K9gHjC9kuRn3xyilIQ9BHINogKDp
-         Soh5/SNvFtV044HxqKyeBbmMVqeX8Hg9P/eRwdo9jWMsqgDlCvGgG8GsQ3Sumbzqkn
-         6hRaatS2gLIom9ZxRabTIuacJwuZw/WjXlF5Fz50CcYyl/j9w86/26NG5igEAP6oiw
-         jZMjwfHCKiH88+n6ecztCxzX3k5fshTaofQGXENw81U6p8VLG/hvycMSP+3iJOekqZ
-         Tbtq6lqoyqlzQ==
+        b=XcY+jHCTZ9EkNwpO6AqplAtuW6bQWbkf+mKatC5F3v3CLBXmu/eN1pMVzZ4ZYz24j
+         LKG3InvKCAzyHpUtzcXOVs7EoGvqge5MpqotRo32alC+kYEbLBVellT3oZ8gmWb12Q
+         CnldksdmgHsgzeg9dNaA3aysJpYnVPOciDIc0FfJdiMPPSmYe452QU6qmviTwALPpl
+         Q+be/qVthqJxrWk22lEiBDR4Z3gDBQ+5w84UzjbTngLpEKFN+UkIY+A/jCyR0PMYHJ
+         n8poBxEumIl2UFMiXLLeoGwsPmKLZRMy4rjnsqBkyS4vq41Ol7m+/3nEMJBMmCENHl
+         8vG6LviuISQ2g==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Bixuan Cui <cuibixuan@huawei.com>, Hulk Robot <hulkci@huawei.com>,
+Cc:     Jack Xu <jack.xu@intel.com>, Zhehui Xiang <zhehui.xiang@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 5.13 22/85] crypto: nx - add missing MODULE_DEVICE_TABLE
-Date:   Sun,  4 Jul 2021 19:03:17 -0400
-Message-Id: <20210704230420.1488358-22-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 5.13 32/85] crypto: qat - remove unused macro in FW loader
+Date:   Sun,  4 Jul 2021 19:03:27 -0400
+Message-Id: <20210704230420.1488358-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210704230420.1488358-1-sashal@kernel.org>
 References: <20210704230420.1488358-1-sashal@kernel.org>
@@ -51,34 +52,40 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Bixuan Cui <cuibixuan@huawei.com>
+From: Jack Xu <jack.xu@intel.com>
 
-[ Upstream commit 06676aa1f455c74e3ad1624cea3acb9ed2ef71ae ]
+[ Upstream commit 9afe77cf25d9670e61b489fd52cc6f75fd7f6803 ]
 
-This patch adds missing MODULE_DEVICE_TABLE definition which generates
-correct modalias for automatic loading of this driver when it is built
-as an external module.
+Remove the unused macro ICP_DH895XCC_PESRAM_BAR_SIZE in the firmware
+loader.
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Bixuan Cui <cuibixuan@huawei.com>
+This is to fix the following warning when compiling the driver using the
+clang compiler with CC=clang W=2:
+
+    drivers/crypto/qat/qat_common/qat_uclo.c:345:9: warning: macro is not used [-Wunused-macros]
+
+Signed-off-by: Jack Xu <jack.xu@intel.com>
+Co-developed-by: Zhehui Xiang <zhehui.xiang@intel.com>
+Signed-off-by: Zhehui Xiang <zhehui.xiang@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/nx/nx-842-pseries.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/qat/qat_common/qat_uclo.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
-index cc8dd3072b8b..8ee547ee378e 100644
---- a/drivers/crypto/nx/nx-842-pseries.c
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -1069,6 +1069,7 @@ static const struct vio_device_id nx842_vio_driver_ids[] = {
- 	{"ibm,compression-v1", "ibm,compression"},
- 	{"", ""},
- };
-+MODULE_DEVICE_TABLE(vio, nx842_vio_driver_ids);
+diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
+index 1fb5fc852f6b..6d95160e451e 100644
+--- a/drivers/crypto/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/qat/qat_common/qat_uclo.c
+@@ -342,7 +342,6 @@ static int qat_uclo_init_umem_seg(struct icp_qat_fw_loader_handle *handle,
+ 	return 0;
+ }
  
- static struct vio_driver nx842_vio_driver = {
- 	.name = KBUILD_MODNAME,
+-#define ICP_DH895XCC_PESRAM_BAR_SIZE 0x80000
+ static int qat_uclo_init_ae_memory(struct icp_qat_fw_loader_handle *handle,
+ 				   struct icp_qat_uof_initmem *init_mem)
+ {
 -- 
 2.30.2
 
