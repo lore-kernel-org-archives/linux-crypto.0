@@ -2,43 +2,45 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D698C07E95
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D9DC07E9B
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:10:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA11761956
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:08:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 802416194E
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:10:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232523AbhGDXKp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:10:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47684 "EHLO mail.kernel.org"
+        id S231998AbhGDXMn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:12:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48260 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232135AbhGDXKD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:10:03 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6EA9B613F1;
-        Sun,  4 Jul 2021 23:07:17 +0000 (UTC)
+        id S231976AbhGDXJn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:09:43 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7B44A613D2;
+        Sun,  4 Jul 2021 23:07:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625440038;
-        bh=k6FFS/KA2Q+CKN1NE/2N+LNS14D2bJG97qZEbgZw+dQ=;
+        s=k20201202; t=1625440021;
+        bh=TSvhwjjIRCuy4ZF5RtOACoeAoEzRBrwReraD+c3BIGQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DQrRbOn9fTMl1p78Iem2abPI6Zpg12mp0ans5mpH9exQcYPNDSIwVHWoecVK54/lK
-         aTFexB87Jv1rLr0petFhK73oHVHouGfIwWbxiBsnDsEYHVddRg248CQKB7zlEUA54/
-         WkGV6rFwlVPtOtcIHe3sOHHSVrEAwlgZTuAqz4zdXpVv9fyTjFC9cHGW6Y26HG1ZPz
-         3K1bZUM8XB+MIVkghlDfbb+G61sGgJ1XlXq1SrI7nllWqMpXAn9gUiV/xSqEe5b1rs
-         XgkxbkSkw9bBAyWL/qnTjBlfWvFG8BFVNcFvPbvR9MfJbjdrIzKn2U4M+W+eM/XLdi
-         4cLBIGyo4+DNQ==
+        b=dzisoAQa0RGotAquflVuOnGu1NCwNceClXCQg7nyU5/m3254WQCJZXcwyfWR5ZzMK
+         l0E4J2F6hRr/l8OACzzqM2wV+L2tJ+guOFcdK0eUMIUDoiphES2yCWAiwoMR7HSAd5
+         BQ90BoVrRdfNfONh/3yRkOGNtrFUW+Oz64ztZra5m8rri1zg4WsSWXf+rNqotYijzq
+         osbTJhqniHXfVCoven4vaUxnAMc87JuPhMfeaIk64cPcVAblLfvTMCoEJSZXMNno35
+         LejeT3NOTl0e7kc3dg/roBDHrTq9K70BmUy5Dtkk917H2uxENPcgoh+X3pW1e1VRfa
+         u2TizaUrCGJHg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Kai Ye <yekai13@huawei.com>,
+Cc:     Jack Xu <jack.xu@intel.com>, Zhehui Xiang <zhehui.xiang@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.12 45/80] crypto: hisilicon/sec - fixup 3des minimum key size declaration
-Date:   Sun,  4 Jul 2021 19:05:41 -0400
-Message-Id: <20210704230616.1489200-45-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 5.12 32/80] crypto: qat - remove unused macro in FW loader
+Date:   Sun,  4 Jul 2021 19:05:28 -0400
+Message-Id: <20210704230616.1489200-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210704230616.1489200-1-sashal@kernel.org>
 References: <20210704230616.1489200-1-sashal@kernel.org>
@@ -50,37 +52,40 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Kai Ye <yekai13@huawei.com>
+From: Jack Xu <jack.xu@intel.com>
 
-[ Upstream commit 6161f40c630bd7ced5f236cd5fbabec06e47afae ]
+[ Upstream commit 9afe77cf25d9670e61b489fd52cc6f75fd7f6803 ]
 
-Fixup the 3des algorithm  minimum key size declaration.
+Remove the unused macro ICP_DH895XCC_PESRAM_BAR_SIZE in the firmware
+loader.
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
+This is to fix the following warning when compiling the driver using the
+clang compiler with CC=clang W=2:
+
+    drivers/crypto/qat/qat_common/qat_uclo.c:345:9: warning: macro is not used [-Wunused-macros]
+
+Signed-off-by: Jack Xu <jack.xu@intel.com>
+Co-developed-by: Zhehui Xiang <zhehui.xiang@intel.com>
+Signed-off-by: Zhehui Xiang <zhehui.xiang@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/qat/qat_common/qat_uclo.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 8adcbb327126..c86b01abd0a6 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -1513,11 +1513,11 @@ static struct skcipher_alg sec_skciphers[] = {
- 			 AES_BLOCK_SIZE, AES_BLOCK_SIZE)
+diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
+index 1fb5fc852f6b..6d95160e451e 100644
+--- a/drivers/crypto/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/qat/qat_common/qat_uclo.c
+@@ -342,7 +342,6 @@ static int qat_uclo_init_umem_seg(struct icp_qat_fw_loader_handle *handle,
+ 	return 0;
+ }
  
- 	SEC_SKCIPHER_ALG("ecb(des3_ede)", sec_setkey_3des_ecb,
--			 SEC_DES3_2KEY_SIZE, SEC_DES3_3KEY_SIZE,
-+			 SEC_DES3_3KEY_SIZE, SEC_DES3_3KEY_SIZE,
- 			 DES3_EDE_BLOCK_SIZE, 0)
- 
- 	SEC_SKCIPHER_ALG("cbc(des3_ede)", sec_setkey_3des_cbc,
--			 SEC_DES3_2KEY_SIZE, SEC_DES3_3KEY_SIZE,
-+			 SEC_DES3_3KEY_SIZE, SEC_DES3_3KEY_SIZE,
- 			 DES3_EDE_BLOCK_SIZE, DES3_EDE_BLOCK_SIZE)
- 
- 	SEC_SKCIPHER_ALG("xts(sm4)", sec_setkey_sm4_xts,
+-#define ICP_DH895XCC_PESRAM_BAR_SIZE 0x80000
+ static int qat_uclo_init_ae_memory(struct icp_qat_fw_loader_handle *handle,
+ 				   struct icp_qat_uof_initmem *init_mem)
+ {
 -- 
 2.30.2
 
