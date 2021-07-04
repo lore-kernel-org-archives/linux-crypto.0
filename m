@@ -7,38 +7,41 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D2E8C07E95
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:14:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02767C07E9A
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:14:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B6836135D
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:14:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0AB86135D
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:14:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233057AbhGDXR3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:17:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50600 "EHLO mail.kernel.org"
+        id S233094AbhGDXRa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:17:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55624 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229614AbhGDXNP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:13:15 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9754461960;
-        Sun,  4 Jul 2021 23:09:00 +0000 (UTC)
+        id S232704AbhGDXNR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:13:17 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AA83961976;
+        Sun,  4 Jul 2021 23:09:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625440141;
-        bh=EwONuDiDclzvsM2MjoctyHGHG0D1+bQenust0cxuNPo=;
+        s=k20201202; t=1625440151;
+        bh=wDNvjMGxrpeAQg0xXJVXW97Rx7+AUJ9+PX7Q1PWNhRI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LS4fREZ8njo9A+TcWCwZ/hCNGwrQzswmbKgaCof9dVjmq3MX4K3plZd8r9VqM1R3q
-         Mt2CYp+EDUeDDSF8DjKwulRN6GHSG9GSJ+AJ0suPSACBmmIX1PNzJyQWA3g7nZyGtP
-         EtZAzja+ppg+QYY0wSUGL/qqu9VyBpgqEJRBOysgWOm+S4Lpo00A2eg5ozP9yT+Ppj
-         ZilVB3V6u/F2SWsFhdaPbxbo64DtU1VdnMSNjCC6L9lQHS3I8Ciwtdb3PkIfKze/pZ
-         frDGR8lS4BjAEgL27JnfQol30VukP3YWvQTcHGIV1sbXPGXizWmPTDe9LCu/jif7hq
-         0mXbkLLti6Ktw==
+        b=mItvR5QxHRJ9WbZfUb63PIZZTQBO53B74YveCo4D/noUhW0km7vAnolRbj/OglnrR
+         sxGLSFwRC3lj++bEx5TuJpeZ7AUpc35esVLHj/ZgM57QhZ8xixolFw/fYjgq3g0ijE
+         kDSUNRrTbWCQTXLGzkkuTYTjFP+7ZsD3j5uEoi2iUKBoEvc0IaClt5yF+fJg767r7u
+         M4DjBZwllw5ZxMLRYsKlAUOuZmHN9OEMGY/EeMq40RglpjoUBBuIUR+jms6xt5l5eN
+         6gZJMZlDGsjrNWHTuXOJ0jJMJXduhjRB8KjbYy/uWaJ/ooRCEbB4KY1yxOplsBxBmh
+         sEyC+5O26ZlFg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Kai Ye <yekai13@huawei.com>,
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 42/70] crypto: hisilicon/sec - fixup 3des minimum key size declaration
-Date:   Sun,  4 Jul 2021 19:07:35 -0400
-Message-Id: <20210704230804.1490078-42-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 50/70] crypto: shash - avoid comparing pointers to exported functions under CFI
+Date:   Sun,  4 Jul 2021 19:07:43 -0400
+Message-Id: <20210704230804.1490078-50-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210704230804.1490078-1-sashal@kernel.org>
 References: <20210704230804.1490078-1-sashal@kernel.org>
@@ -50,37 +53,85 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Kai Ye <yekai13@huawei.com>
+From: Ard Biesheuvel <ardb@kernel.org>
 
-[ Upstream commit 6161f40c630bd7ced5f236cd5fbabec06e47afae ]
+[ Upstream commit 22ca9f4aaf431a9413dcc115dd590123307f274f ]
 
-Fixup the 3des algorithm  minimum key size declaration.
+crypto_shash_alg_has_setkey() is implemented by testing whether the
+.setkey() member of a struct shash_alg points to the default version,
+called shash_no_setkey(). As crypto_shash_alg_has_setkey() is a static
+inline, this requires shash_no_setkey() to be exported to modules.
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
+Unfortunately, when building with CFI, function pointers are routed
+via CFI stubs which are private to each module (or to the kernel proper)
+and so this function pointer comparison may fail spuriously.
+
+Let's fix this by turning crypto_shash_alg_has_setkey() into an out of
+line function.
+
+Cc: Sami Tolvanen <samitolvanen@google.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Reviewed-by: Eric Biggers <ebiggers@google.com>
+Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ crypto/shash.c                 | 18 +++++++++++++++---
+ include/crypto/internal/hash.h |  8 +-------
+ 2 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 41f1fcacb280..630dcb59ad56 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -1515,11 +1515,11 @@ static struct skcipher_alg sec_skciphers[] = {
- 			 AES_BLOCK_SIZE, AES_BLOCK_SIZE)
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 2e3433ad9762..0a0a50cb694f 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -20,12 +20,24 @@
  
- 	SEC_SKCIPHER_ALG("ecb(des3_ede)", sec_setkey_3des_ecb,
--			 SEC_DES3_2KEY_SIZE, SEC_DES3_3KEY_SIZE,
-+			 SEC_DES3_3KEY_SIZE, SEC_DES3_3KEY_SIZE,
- 			 DES3_EDE_BLOCK_SIZE, 0)
+ static const struct crypto_type crypto_shash_type;
  
- 	SEC_SKCIPHER_ALG("cbc(des3_ede)", sec_setkey_3des_cbc,
--			 SEC_DES3_2KEY_SIZE, SEC_DES3_3KEY_SIZE,
-+			 SEC_DES3_3KEY_SIZE, SEC_DES3_3KEY_SIZE,
- 			 DES3_EDE_BLOCK_SIZE, DES3_EDE_BLOCK_SIZE)
+-int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
+-		    unsigned int keylen)
++static int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
++			   unsigned int keylen)
+ {
+ 	return -ENOSYS;
+ }
+-EXPORT_SYMBOL_GPL(shash_no_setkey);
++
++/*
++ * Check whether an shash algorithm has a setkey function.
++ *
++ * For CFI compatibility, this must not be an inline function.  This is because
++ * when CFI is enabled, modules won't get the same address for shash_no_setkey
++ * (if it were exported, which inlining would require) as the core kernel will.
++ */
++bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
++{
++	return alg->setkey != shash_no_setkey;
++}
++EXPORT_SYMBOL_GPL(crypto_shash_alg_has_setkey);
  
- 	SEC_SKCIPHER_ALG("xts(sm4)", sec_setkey_sm4_xts,
+ static int shash_setkey_unaligned(struct crypto_shash *tfm, const u8 *key,
+ 				  unsigned int keylen)
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 0a288dddcf5b..25806141db59 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -75,13 +75,7 @@ void crypto_unregister_ahashes(struct ahash_alg *algs, int count);
+ int ahash_register_instance(struct crypto_template *tmpl,
+ 			    struct ahash_instance *inst);
+ 
+-int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
+-		    unsigned int keylen);
+-
+-static inline bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
+-{
+-	return alg->setkey != shash_no_setkey;
+-}
++bool crypto_shash_alg_has_setkey(struct shash_alg *alg);
+ 
+ static inline bool crypto_shash_alg_needs_key(struct shash_alg *alg)
+ {
 -- 
 2.30.2
 
