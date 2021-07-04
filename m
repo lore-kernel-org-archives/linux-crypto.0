@@ -7,43 +7,44 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2170BC07E9C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CF0C07E96
 	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E64761370
+	by mail.kernel.org (Postfix) with ESMTP id 4CC4F61370
 	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232663AbhGDXRx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:17:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50590 "EHLO mail.kernel.org"
+        id S231521AbhGDXRv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:17:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56966 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234399AbhGDXPG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:15:06 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D260A6135A;
-        Sun,  4 Jul 2021 23:12:29 +0000 (UTC)
+        id S234337AbhGDXPE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:15:04 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 9047261941;
+        Sun,  4 Jul 2021 23:12:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625440350;
-        bh=sIpER712sv6eBtjFWmg3Kr1E2xDX5xxB6GI1FCCgIyY=;
+        s=k20201202; t=1625440334;
+        bh=y4GEIzLLKPd2XuowFaDqQ4Di0Kdcwbjx00e4A6CjEw4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=dc0ahz1sYJBr7zOK3+rfEnJp7LJcJiuS4GvNqaZV3DmXVv7vGH0KkjQnQCmH8S74Y
-         85UVSHgZK6mdBkz0ZuhTSpPMpBburA78bi3QnZ1cDb+HElzLxegWg6bgWsS/itaqf4
-         yZKKGUaS7Amh6lySh5a5J83gyg0R+jHhn5s6orB7WYcUT5IcGRequKBtFYXwF/19kZ
-         C6JulG4ggAj5h+Y9jzAydoyHvmZz/uu30cqt3E6RaoZFKaWczkj+3NH1LfFYlfa5ux
-         IWYIkJAX7ErznCQZO34bSDIsUk2yYbII4BFRAVxtFYH6qPo4lBRiKS0TedS5uOtjr5
-         BDNZaKgyM/CGQ==
+        b=lTPT0WunPKa+DWlQWyp+iV8teXfZcJccaH1EQh9hXnzVc7dOmzY/ohVJ5m7WATUD/
+         LI1x551EEE+n9k7OdA1VitbIj45rzHR0js6ydXhdQAEDOhL4kZWJB+qCdTgBbz4xHw
+         LvOTg1HH9MnJP53zbrtesAoKnO8lxiiRmDJ10lsy/poyvWr58aN70KZLayznBE9uMI
+         yFoMMeTZOFOAi7FPi+2aP4iCfaCJn919PSds1LOG/DRhO7ag5ZZX0qVUrj22W0T9Ah
+         cXLOHSAX6MgsLPdz7Z6Sgok72ryl7fiLSN6jpjmLSd3oab7LTmXiqKKvw+wkAMb3LF
+         MoHbwgpqRMo7w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jack Xu <jack.xu@intel.com>, Zhehui Xiang <zhehui.xiang@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH AUTOSEL 4.4 06/15] crypto: qat - check return code of qat_hal_rd_rel_reg()
-Date:   Sun,  4 Jul 2021 19:12:12 -0400
-Message-Id: <20210704231222.1492037-6-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.9 14/20] crypto: shash - avoid comparing pointers to exported functions under CFI
+Date:   Sun,  4 Jul 2021 19:11:49 -0400
+Message-Id: <20210704231155.1491795-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210704231222.1492037-1-sashal@kernel.org>
-References: <20210704231222.1492037-1-sashal@kernel.org>
+In-Reply-To: <20210704231155.1491795-1-sashal@kernel.org>
+References: <20210704231155.1491795-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -52,45 +53,85 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Jack Xu <jack.xu@intel.com>
+From: Ard Biesheuvel <ardb@kernel.org>
 
-[ Upstream commit 96b57229209490c8bca4335b01a426a96173dc56 ]
+[ Upstream commit 22ca9f4aaf431a9413dcc115dd590123307f274f ]
 
-Check the return code of the function qat_hal_rd_rel_reg() and return it
-to the caller.
+crypto_shash_alg_has_setkey() is implemented by testing whether the
+.setkey() member of a struct shash_alg points to the default version,
+called shash_no_setkey(). As crypto_shash_alg_has_setkey() is a static
+inline, this requires shash_no_setkey() to be exported to modules.
 
-This is to fix the following warning when compiling the driver with
-clang scan-build:
+Unfortunately, when building with CFI, function pointers are routed
+via CFI stubs which are private to each module (or to the kernel proper)
+and so this function pointer comparison may fail spuriously.
 
-    drivers/crypto/qat/qat_common/qat_hal.c:1436:2: warning: 6th function call argument is an uninitialized value
+Let's fix this by turning crypto_shash_alg_has_setkey() into an out of
+line function.
 
-Signed-off-by: Jack Xu <jack.xu@intel.com>
-Co-developed-by: Zhehui Xiang <zhehui.xiang@intel.com>
-Signed-off-by: Zhehui Xiang <zhehui.xiang@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Sami Tolvanen <samitolvanen@google.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Reviewed-by: Eric Biggers <ebiggers@google.com>
+Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/qat/qat_common/qat_hal.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ crypto/shash.c                 | 18 +++++++++++++++---
+ include/crypto/internal/hash.h |  8 +-------
+ 2 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
-index 380e761801a7..5e5003379281 100644
---- a/drivers/crypto/qat/qat_common/qat_hal.c
-+++ b/drivers/crypto/qat/qat_common/qat_hal.c
-@@ -1210,7 +1210,11 @@ static int qat_hal_put_rel_wr_xfer(struct icp_qat_fw_loader_handle *handle,
- 		pr_err("QAT: bad xfrAddr=0x%x\n", xfr_addr);
- 		return -EINVAL;
- 	}
--	qat_hal_rd_rel_reg(handle, ae, ctx, ICP_GPB_REL, gprnum, &gprval);
-+	status = qat_hal_rd_rel_reg(handle, ae, ctx, ICP_GPB_REL, gprnum, &gprval);
-+	if (status) {
-+		pr_err("QAT: failed to read register");
-+		return status;
-+	}
- 	gpr_addr = qat_hal_get_reg_addr(ICP_GPB_REL, gprnum);
- 	data16low = 0xffff & data;
- 	data16hi = 0xffff & (data >> 0x10);
+diff --git a/crypto/shash.c b/crypto/shash.c
+index a1c7609578ea..7eebf3cde7b7 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -24,12 +24,24 @@
+ 
+ static const struct crypto_type crypto_shash_type;
+ 
+-int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
+-		    unsigned int keylen)
++static int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
++			   unsigned int keylen)
+ {
+ 	return -ENOSYS;
+ }
+-EXPORT_SYMBOL_GPL(shash_no_setkey);
++
++/*
++ * Check whether an shash algorithm has a setkey function.
++ *
++ * For CFI compatibility, this must not be an inline function.  This is because
++ * when CFI is enabled, modules won't get the same address for shash_no_setkey
++ * (if it were exported, which inlining would require) as the core kernel will.
++ */
++bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
++{
++	return alg->setkey != shash_no_setkey;
++}
++EXPORT_SYMBOL_GPL(crypto_shash_alg_has_setkey);
+ 
+ static int shash_setkey_unaligned(struct crypto_shash *tfm, const u8 *key,
+ 				  unsigned int keylen)
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 5203560f992e..000c049a75f7 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -80,13 +80,7 @@ int ahash_register_instance(struct crypto_template *tmpl,
+ 			    struct ahash_instance *inst);
+ void ahash_free_instance(struct crypto_instance *inst);
+ 
+-int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
+-		    unsigned int keylen);
+-
+-static inline bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
+-{
+-	return alg->setkey != shash_no_setkey;
+-}
++bool crypto_shash_alg_has_setkey(struct shash_alg *alg);
+ 
+ bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg);
+ 
 -- 
 2.30.2
 
