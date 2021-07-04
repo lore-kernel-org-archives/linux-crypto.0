@@ -5,45 +5,48 @@ X-Spam-Level:
 X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E923C07E9C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE967C07E9B
 	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:11:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4BFBA619BF
+	by mail.kernel.org (Postfix) with ESMTP id DEF51619B1
 	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:11:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230234AbhGDXNx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:13:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49312 "EHLO mail.kernel.org"
+        id S231975AbhGDXNy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:13:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49270 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230470AbhGDXJX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:09:23 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9CAF8613F7;
-        Sun,  4 Jul 2021 23:06:46 +0000 (UTC)
+        id S231533AbhGDXJW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:09:22 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 536706145D;
+        Sun,  4 Jul 2021 23:06:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625440007;
-        bh=vKftHj88RLYECuwHY64g8MmF5WQxGF4qF+Dprtnl6OE=;
+        s=k20201202; t=1625440006;
+        bh=g7YZHIXlmpzIxBwyRILjn1eXvxCLTK1iVgAuIElkdJQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BBUa2+nkM/T9w6DbCgAyVVf6lsaTeylzKTfW2a9O58yHz761UvKkBeTiPhTYs5/m5
-         AbedNNE2+AAZodxnzcg+27FIZIBu4kiRveJY6XyaPx+3VL7kbAAcqPreMxlIUNt3xJ
-         LxqVsOPkGOCbRXU2bNvv3lDgTIHA8ilL1FHepHb+I2zLDDlSD6mofcnGUhqhFeg3UB
-         oeKCSNgDx5nIjzvKXHDjhplYe6+7yd1ysCXtL7q+lP6gwtiEOOgUt/RSOmoKP68UjW
-         pdAJB81MyMaDG8NoadqolKKRTtxFspFDEEM6to4e8h4rf5VAONygH2TT+vpCSmnRUy
-         4d605hsTLa8vA==
+        b=Vo4TP+zxRKGFSQQrYfezHaW537ypc7Bm5BqAY5ETuE81SunGIq/zNHAFtaFHbrQIU
+         GvSL0v/ykuCwKei87loUoHCSOE5JsetgZ78yW0nlWvuNGK/IOYlHY/VXveh2nUrcfa
+         q3nNoHotPtTd5sOPtjDE94n+2dEJm5x1YVzUTheaPa9MasnlyGSNBFVfwM/Ti+RpMr
+         R0u7MyoFltxPWxxrSI07C/hsOJ8TxV3Q2pXLlB+qMhmyqiOytHYIKOsc2imVXI3jf6
+         YH6OXCDB+HIbT/I+/IArisFb+xO6ogSIknHZ1uVhhaNvB8W0iMADOI/fpCXNn0URSq
+         gO1JZW/fcEclA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Bixuan Cui <cuibixuan@huawei.com>, Hulk Robot <hulkci@huawei.com>,
+Cc:     =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 5.12 22/80] crypto: nx - add missing MODULE_DEVICE_TABLE
-Date:   Sun,  4 Jul 2021 19:05:18 -0400
-Message-Id: <20210704230616.1489200-22-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.12 21/80] hwrng: exynos - Fix runtime PM imbalance on error
+Date:   Sun,  4 Jul 2021 19:05:17 -0400
+Message-Id: <20210704230616.1489200-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210704230616.1489200-1-sashal@kernel.org>
 References: <20210704230616.1489200-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -51,34 +54,44 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Bixuan Cui <cuibixuan@huawei.com>
+From: Łukasz Stelmach <l.stelmach@samsung.com>
 
-[ Upstream commit 06676aa1f455c74e3ad1624cea3acb9ed2ef71ae ]
+[ Upstream commit 0cdbabf8bb7a6147f5adf37dbc251e92a1bbc2c7 ]
 
-This patch adds missing MODULE_DEVICE_TABLE definition which generates
-correct modalias for automatic loading of this driver when it is built
-as an external module.
+pm_runtime_resume_and_get() wraps around pm_runtime_get_sync() and
+decrements the runtime PM usage counter in case the latter function
+fails and keeps the counter balanced.
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Bixuan Cui <cuibixuan@huawei.com>
+Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/nx/nx-842-pseries.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/char/hw_random/exynos-trng.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
-index cc8dd3072b8b..8ee547ee378e 100644
---- a/drivers/crypto/nx/nx-842-pseries.c
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -1069,6 +1069,7 @@ static const struct vio_device_id nx842_vio_driver_ids[] = {
- 	{"ibm,compression-v1", "ibm,compression"},
- 	{"", ""},
- };
-+MODULE_DEVICE_TABLE(vio, nx842_vio_driver_ids);
+diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+index 8e1fe3f8dd2d..c8db62bc5ff7 100644
+--- a/drivers/char/hw_random/exynos-trng.c
++++ b/drivers/char/hw_random/exynos-trng.c
+@@ -132,7 +132,7 @@ static int exynos_trng_probe(struct platform_device *pdev)
+ 		return PTR_ERR(trng->mem);
  
- static struct vio_driver nx842_vio_driver = {
- 	.name = KBUILD_MODNAME,
+ 	pm_runtime_enable(&pdev->dev);
+-	ret = pm_runtime_get_sync(&pdev->dev);
++	ret = pm_runtime_resume_and_get(&pdev->dev);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "Could not get runtime PM.\n");
+ 		goto err_pm_get;
+@@ -165,7 +165,7 @@ static int exynos_trng_probe(struct platform_device *pdev)
+ 	clk_disable_unprepare(trng->clk);
+ 
+ err_clock:
+-	pm_runtime_put_sync(&pdev->dev);
++	pm_runtime_put_noidle(&pdev->dev);
+ 
+ err_pm_get:
+ 	pm_runtime_disable(&pdev->dev);
 -- 
 2.30.2
 
