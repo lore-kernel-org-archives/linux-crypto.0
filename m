@@ -7,46 +7,44 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F14E6C07E96
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19655C07E9C
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DCEE661375
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0F946135D
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233115AbhGDXRc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:17:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50660 "EHLO mail.kernel.org"
+        id S233135AbhGDXRf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:17:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56966 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233486AbhGDXO2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:14:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7B4C961879;
-        Sun,  4 Jul 2021 23:09:54 +0000 (UTC)
+        id S233528AbhGDXOb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:14:31 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 42D3A6197E;
+        Sun,  4 Jul 2021 23:10:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625440195;
-        bh=B7Wh/CS+PMPEZxeICZXWEXE0uHQWIBnNfbcEupVdeGs=;
+        s=k20201202; t=1625440206;
+        bh=YNE87x3dW6Wqycoe5tTp/rWbfZKiosqjDcU+YXDRDSE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Ue0L+AZ+P75n70juni6B6ZdF1u3BruERHAqDj1pOlWBz+ji5XVjzzm1wOvBzyjVpr
-         SOR0GnIuMirCdlZaHr5miEgggpqA12A1armZtGA3GQKNPakFrS4l3F9ur13oTqwqrG
-         fscqU3mXQ6bruZs3xkr6J2RhUqlIdggCftqRvDHmZ/ZIOKkiCq37oyXojffIrqSZWd
-         4gvF4YwlVkmOlicTjTVL7fxvtaDeIAkTBLK90jMCjlh/0XvcYwJjqPZRYgSeZJRvyr
-         21fr+BBW7geDcSmcoUO9RQQ+F2tOX4miugNuChyImM3S0jWTqaTLfIFPIYmrL0Yk4x
-         45YpeosOX9UFg==
+        b=nmi6SjBkE2V5I3eQSNOYQk5rOLPS21UH7Jx2X4Xe5tvRCLg1U9IxA2APp0w2wp8a3
+         Nm57AQVsz8EVQhI3JUGAq2qtXujylyfs73GflO3ClArGcv85XEXODFZUco80fOryOl
+         UGOY6wNqBXfWOxt5W+/gT6BIwaS0cCT7CqlF+nubPfi3zpm1ajZEd8jT0goft9FwSs
+         /WbkmMTUdTotV/NAhBoOce8H420y5DBjAucWz6NgqKQ4kPpx7In8UFU8mO4hGRTKiz
+         mpXyO86D50p7e3hmlD9s+g2jqkqVRH9DBIJuliilzM+mOJAPYptXwsYfw4SUCoy2hM
+         nvRvEnr1O0Rzg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+Cc:     Jack Xu <jack.xu@intel.com>, Zhehui Xiang <zhehui.xiang@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>,
-        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.4 13/50] hwrng: exynos - Fix runtime PM imbalance on error
-Date:   Sun,  4 Jul 2021 19:09:01 -0400
-Message-Id: <20210704230938.1490742-13-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 5.4 21/50] crypto: qat - remove unused macro in FW loader
+Date:   Sun,  4 Jul 2021 19:09:09 -0400
+Message-Id: <20210704230938.1490742-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210704230938.1490742-1-sashal@kernel.org>
 References: <20210704230938.1490742-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -54,44 +52,40 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Łukasz Stelmach <l.stelmach@samsung.com>
+From: Jack Xu <jack.xu@intel.com>
 
-[ Upstream commit 0cdbabf8bb7a6147f5adf37dbc251e92a1bbc2c7 ]
+[ Upstream commit 9afe77cf25d9670e61b489fd52cc6f75fd7f6803 ]
 
-pm_runtime_resume_and_get() wraps around pm_runtime_get_sync() and
-decrements the runtime PM usage counter in case the latter function
-fails and keeps the counter balanced.
+Remove the unused macro ICP_DH895XCC_PESRAM_BAR_SIZE in the firmware
+loader.
 
-Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+This is to fix the following warning when compiling the driver using the
+clang compiler with CC=clang W=2:
+
+    drivers/crypto/qat/qat_common/qat_uclo.c:345:9: warning: macro is not used [-Wunused-macros]
+
+Signed-off-by: Jack Xu <jack.xu@intel.com>
+Co-developed-by: Zhehui Xiang <zhehui.xiang@intel.com>
+Signed-off-by: Zhehui Xiang <zhehui.xiang@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/char/hw_random/exynos-trng.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/qat/qat_common/qat_uclo.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
-index b4b52ab23b6b..b4e931dbff66 100644
---- a/drivers/char/hw_random/exynos-trng.c
-+++ b/drivers/char/hw_random/exynos-trng.c
-@@ -134,7 +134,7 @@ static int exynos_trng_probe(struct platform_device *pdev)
- 		return PTR_ERR(trng->mem);
+diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
+index aeb03081415c..9542423bb7ca 100644
+--- a/drivers/crypto/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/qat/qat_common/qat_uclo.c
+@@ -385,7 +385,6 @@ static int qat_uclo_init_umem_seg(struct icp_qat_fw_loader_handle *handle,
+ 	return 0;
+ }
  
- 	pm_runtime_enable(&pdev->dev);
--	ret = pm_runtime_get_sync(&pdev->dev);
-+	ret = pm_runtime_resume_and_get(&pdev->dev);
- 	if (ret < 0) {
- 		dev_err(&pdev->dev, "Could not get runtime PM.\n");
- 		goto err_pm_get;
-@@ -167,7 +167,7 @@ static int exynos_trng_probe(struct platform_device *pdev)
- 	clk_disable_unprepare(trng->clk);
- 
- err_clock:
--	pm_runtime_put_sync(&pdev->dev);
-+	pm_runtime_put_noidle(&pdev->dev);
- 
- err_pm_get:
- 	pm_runtime_disable(&pdev->dev);
+-#define ICP_DH895XCC_PESRAM_BAR_SIZE 0x80000
+ static int qat_uclo_init_ae_memory(struct icp_qat_fw_loader_handle *handle,
+ 				   struct icp_qat_uof_initmem *init_mem)
+ {
 -- 
 2.30.2
 
