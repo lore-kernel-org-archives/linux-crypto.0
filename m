@@ -7,40 +7,39 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B872DC07E9C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21E88C11F68
 	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:05:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C3606192B
+	by mail.kernel.org (Postfix) with ESMTP id 0DD4B61936
 	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:05:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230377AbhGDXHs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:07:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45944 "EHLO mail.kernel.org"
+        id S230293AbhGDXHr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:07:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46184 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230288AbhGDXHk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:07:40 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4319B61452;
-        Sun,  4 Jul 2021 23:05:03 +0000 (UTC)
+        id S230309AbhGDXHn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:07:43 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 45F8F6135D;
+        Sun,  4 Jul 2021 23:05:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625439904;
-        bh=FzXwPdNNUN1+bbWVulgsQZBbjZaP73QD17PYhjK13DA=;
+        s=k20201202; t=1625439907;
+        bh=sFpWLh59XEW/L2ThVMuQX65C/0NRjUggW0zKEKMo3Nw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BzQRkW0XLvS9DoUmNxpCAKNHmFnCx0w8ro4ru1V5OY1nRRZNeBja9jpT0I3goT5p4
-         c4Zk2ii0NmQr00F54sdH1L5AF3B7YPhK0lU2trPp2Ro54BUFh2WMxdg1LdGBfKFpn+
-         cGr0DeAPq78+EXtACrttn4hxj01M5LwViknFE6BRUf6CUHLerlaohiJZUPp6nRn4/+
-         vqMN/7hCive/yJD/Dg4aoWC3r5Dj+RWQpflx6zDbGvWgRGmG9xrJWsUegDDFswlYlz
-         8Hyu5yhZzxICVblRQXkGv8cy695h4veDXwsakQAoUoATCLdm6yrzQs8kfCJ3C2q2CK
-         vtcaQ1OuP0XvA==
+        b=juk1reujd792tcqPvRS9VhGFrCnU24N63wSXwr0+BHHMiKC4NBgqjTtn796VyTk7R
+         ckjvPmwRFWvVf7U7eDu3WBWZTfNE1Z008xJKaO1KZS2KItdGOL60cG8MbEFvvZQd1d
+         RTsMk5WFN7XUBBe4AtXnYn0izoqPtnyJWOoM4gX+BHb8zfzNMmjQJMxNbpsPJVHR4H
+         GMEihOOrJ0HxElmJWGh+rzpT2968HebPBsgRQUt1IpfRNBaX45R64gRdH8l9ZWSHkM
+         gF+y1Isq9/vvYWp9EJ2kj68oOwxkRRmyK9DN6ktm2Z8w6Vb72x0SonlrmnjdTUwwqp
+         BKDbewR8FWFVQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jack Xu <jack.xu@intel.com>, Zhehui Xiang <zhehui.xiang@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+Cc:     Thara Gopinath <thara.gopinath@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH AUTOSEL 5.13 31/85] crypto: qat - check return code of qat_hal_rd_rel_reg()
-Date:   Sun,  4 Jul 2021 19:03:26 -0400
-Message-Id: <20210704230420.1488358-31-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.13 33/85] crypto: qce: skcipher: Fix incorrect sg count for dma transfers
+Date:   Sun,  4 Jul 2021 19:03:28 -0400
+Message-Id: <20210704230420.1488358-33-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210704230420.1488358-1-sashal@kernel.org>
 References: <20210704230420.1488358-1-sashal@kernel.org>
@@ -52,45 +51,68 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Jack Xu <jack.xu@intel.com>
+From: Thara Gopinath <thara.gopinath@linaro.org>
 
-[ Upstream commit 96b57229209490c8bca4335b01a426a96173dc56 ]
+[ Upstream commit 1339a7c3ba05137a2d2fe75f602311bbfc6fab33 ]
 
-Check the return code of the function qat_hal_rd_rel_reg() and return it
-to the caller.
+Use the sg count returned by dma_map_sg to call into
+dmaengine_prep_slave_sg rather than using the original sg count. dma_map_sg
+can merge consecutive sglist entries, thus making the original sg count
+wrong. This is a fix for memory coruption issues observed while testing
+encryption/decryption of large messages using libkcapi framework.
 
-This is to fix the following warning when compiling the driver with
-clang scan-build:
+Patch has been tested further by running full suite of tcrypt.ko tests
+including fuzz tests.
 
-    drivers/crypto/qat/qat_common/qat_hal.c:1436:2: warning: 6th function call argument is an uninitialized value
-
-Signed-off-by: Jack Xu <jack.xu@intel.com>
-Co-developed-by: Zhehui Xiang <zhehui.xiang@intel.com>
-Signed-off-by: Zhehui Xiang <zhehui.xiang@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/qat/qat_common/qat_hal.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/crypto/qce/skcipher.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
-index bd3028126cbe..069f51621f0e 100644
---- a/drivers/crypto/qat/qat_common/qat_hal.c
-+++ b/drivers/crypto/qat/qat_common/qat_hal.c
-@@ -1417,7 +1417,11 @@ static int qat_hal_put_rel_wr_xfer(struct icp_qat_fw_loader_handle *handle,
- 		pr_err("QAT: bad xfrAddr=0x%x\n", xfr_addr);
- 		return -EINVAL;
+diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
+index c0a0d8c4fce1..259418479227 100644
+--- a/drivers/crypto/qce/skcipher.c
++++ b/drivers/crypto/qce/skcipher.c
+@@ -72,7 +72,7 @@ qce_skcipher_async_req_handle(struct crypto_async_request *async_req)
+ 	struct scatterlist *sg;
+ 	bool diff_dst;
+ 	gfp_t gfp;
+-	int ret;
++	int dst_nents, src_nents, ret;
+ 
+ 	rctx->iv = req->iv;
+ 	rctx->ivsize = crypto_skcipher_ivsize(skcipher);
+@@ -123,21 +123,22 @@ qce_skcipher_async_req_handle(struct crypto_async_request *async_req)
+ 	sg_mark_end(sg);
+ 	rctx->dst_sg = rctx->dst_tbl.sgl;
+ 
+-	ret = dma_map_sg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst);
+-	if (ret < 0)
++	dst_nents = dma_map_sg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst);
++	if (dst_nents < 0)
+ 		goto error_free;
+ 
+ 	if (diff_dst) {
+-		ret = dma_map_sg(qce->dev, req->src, rctx->src_nents, dir_src);
+-		if (ret < 0)
++		src_nents = dma_map_sg(qce->dev, req->src, rctx->src_nents, dir_src);
++		if (src_nents < 0)
+ 			goto error_unmap_dst;
+ 		rctx->src_sg = req->src;
+ 	} else {
+ 		rctx->src_sg = rctx->dst_sg;
++		src_nents = dst_nents - 1;
  	}
--	qat_hal_rd_rel_reg(handle, ae, ctx, ICP_GPB_REL, gprnum, &gprval);
-+	status = qat_hal_rd_rel_reg(handle, ae, ctx, ICP_GPB_REL, gprnum, &gprval);
-+	if (status) {
-+		pr_err("QAT: failed to read register");
-+		return status;
-+	}
- 	gpr_addr = qat_hal_get_reg_addr(ICP_GPB_REL, gprnum);
- 	data16low = 0xffff & data;
- 	data16hi = 0xffff & (data >> 0x10);
+ 
+-	ret = qce_dma_prep_sgs(&qce->dma, rctx->src_sg, rctx->src_nents,
+-			       rctx->dst_sg, rctx->dst_nents,
++	ret = qce_dma_prep_sgs(&qce->dma, rctx->src_sg, src_nents,
++			       rctx->dst_sg, dst_nents,
+ 			       qce_skcipher_done, async_req);
+ 	if (ret)
+ 		goto error_unmap_src;
 -- 
 2.30.2
 
