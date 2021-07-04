@@ -7,44 +7,42 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D99C11F66
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34EF3C11F68
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E34ED61363
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D9676135D
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233550AbhGDXRr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:17:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50832 "EHLO mail.kernel.org"
+        id S233591AbhGDXRs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:17:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57092 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234237AbhGDXO6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:14:58 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 340796194A;
-        Sun,  4 Jul 2021 23:11:46 +0000 (UTC)
+        id S234289AbhGDXO7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:14:59 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 353B661375;
+        Sun,  4 Jul 2021 23:12:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625440307;
-        bh=4ZnzUUKSz85sl/IAufS0xM2QhkVjHpaSanDIfksVdXA=;
+        s=k20201202; t=1625440321;
+        bh=xNZHQJvcgNRFaQ8eiwggEpWrLCEadieOmm+NlS87DBc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jv0xdTI/tBji96EaJSGZKudb4T/b2BgJAVT7fE3sM+JHDZvLgRYsl8uJACCdOT1+M
-         319N6gTfJOlF1yP53QpliLn45MOne0hdzRRT3zEXNCwMvh+MAxWKSKi3IyGSVsTx/P
-         lfp7ndonuVLNYmqMT6M9HAqDLj7cOLtUWJJRCx9gvwh3qmgpOzmGRCI9DLt1NW8ii4
-         T2f5w8zvys6lnB444+cZKZwnZBLqQqi73qBP/epb30z8wnbXJkc/PpE2yygD3w12GG
-         /fLWtYLIAqSM+ZHZomgmKy0c9i01rsD5Jzr8syJBPOB7WLPB/ipgFJufUPw0o5Qpys
-         TUlTMSzUu83RQ==
+        b=QULguvyZPxA82Z+hbArm95IH3ck1+A+Pvh1JFaq0k3fuFLTYppOmFFPXPdQVVDWnk
+         7bCMqZkUgW75CzhxuYzKRGtgDaDq8doytpTfqgVnWp08/azx4kLawWhTjqggRT6zgU
+         LF3+rDBjW/rDErOfZ4GKLUblAS6Wnk8+kwrAYSLSyNUCZWfPIRGm2zTlnwhgjYS3BQ
+         X6uDwkirCP08Zp+3gjJ6JAoGRSrxBJaToOuv3QYWFtXLvDkqyrnlWXflhSyv7CJ5q0
+         0rTC5Tu2dwkwSZSuWsWERzNwWMB8UMGyDaErZbJCJgz/pRdwmHzIYTagCYqH2uO8se
+         bOoRTPFX57ZLQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
+Cc:     Bixuan Cui <cuibixuan@huawei.com>, Hulk Robot <hulkci@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 18/25] crypto: shash - avoid comparing pointers to exported functions under CFI
-Date:   Sun,  4 Jul 2021 19:11:16 -0400
-Message-Id: <20210704231123.1491517-18-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH AUTOSEL 4.9 04/20] crypto: nx - add missing MODULE_DEVICE_TABLE
+Date:   Sun,  4 Jul 2021 19:11:39 -0400
+Message-Id: <20210704231155.1491795-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210704231123.1491517-1-sashal@kernel.org>
-References: <20210704231123.1491517-1-sashal@kernel.org>
+In-Reply-To: <20210704231155.1491795-1-sashal@kernel.org>
+References: <20210704231155.1491795-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -53,85 +51,34 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Ard Biesheuvel <ardb@kernel.org>
+From: Bixuan Cui <cuibixuan@huawei.com>
 
-[ Upstream commit 22ca9f4aaf431a9413dcc115dd590123307f274f ]
+[ Upstream commit 06676aa1f455c74e3ad1624cea3acb9ed2ef71ae ]
 
-crypto_shash_alg_has_setkey() is implemented by testing whether the
-.setkey() member of a struct shash_alg points to the default version,
-called shash_no_setkey(). As crypto_shash_alg_has_setkey() is a static
-inline, this requires shash_no_setkey() to be exported to modules.
+This patch adds missing MODULE_DEVICE_TABLE definition which generates
+correct modalias for automatic loading of this driver when it is built
+as an external module.
 
-Unfortunately, when building with CFI, function pointers are routed
-via CFI stubs which are private to each module (or to the kernel proper)
-and so this function pointer comparison may fail spuriously.
-
-Let's fix this by turning crypto_shash_alg_has_setkey() into an out of
-line function.
-
-Cc: Sami Tolvanen <samitolvanen@google.com>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-Reviewed-by: Eric Biggers <ebiggers@google.com>
-Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Bixuan Cui <cuibixuan@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/shash.c                 | 18 +++++++++++++++---
- include/crypto/internal/hash.h |  8 +-------
- 2 files changed, 16 insertions(+), 10 deletions(-)
+ drivers/crypto/nx/nx-842-pseries.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index a04145e5306a..55e7a2f63b34 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -25,12 +25,24 @@
+diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
+index cddc6d8b55d9..2e5b4004f0ee 100644
+--- a/drivers/crypto/nx/nx-842-pseries.c
++++ b/drivers/crypto/nx/nx-842-pseries.c
+@@ -1086,6 +1086,7 @@ static struct vio_device_id nx842_vio_driver_ids[] = {
+ 	{"ibm,compression-v1", "ibm,compression"},
+ 	{"", ""},
+ };
++MODULE_DEVICE_TABLE(vio, nx842_vio_driver_ids);
  
- static const struct crypto_type crypto_shash_type;
- 
--int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
--		    unsigned int keylen)
-+static int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
-+			   unsigned int keylen)
- {
- 	return -ENOSYS;
- }
--EXPORT_SYMBOL_GPL(shash_no_setkey);
-+
-+/*
-+ * Check whether an shash algorithm has a setkey function.
-+ *
-+ * For CFI compatibility, this must not be an inline function.  This is because
-+ * when CFI is enabled, modules won't get the same address for shash_no_setkey
-+ * (if it were exported, which inlining would require) as the core kernel will.
-+ */
-+bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
-+{
-+	return alg->setkey != shash_no_setkey;
-+}
-+EXPORT_SYMBOL_GPL(crypto_shash_alg_has_setkey);
- 
- static int shash_setkey_unaligned(struct crypto_shash *tfm, const u8 *key,
- 				  unsigned int keylen)
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index 27040a46d50a..556b40fee2d1 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -82,13 +82,7 @@ int ahash_register_instance(struct crypto_template *tmpl,
- 			    struct ahash_instance *inst);
- void ahash_free_instance(struct crypto_instance *inst);
- 
--int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
--		    unsigned int keylen);
--
--static inline bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
--{
--	return alg->setkey != shash_no_setkey;
--}
-+bool crypto_shash_alg_has_setkey(struct shash_alg *alg);
- 
- bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg);
- 
+ static struct vio_driver nx842_vio_driver = {
+ 	.name = KBUILD_MODNAME,
 -- 
 2.30.2
 
