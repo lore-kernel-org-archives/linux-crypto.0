@@ -7,44 +7,43 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CF0C07E96
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68DB8C11F68
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4CC4F61370
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48DEB61363
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:15:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231521AbhGDXRv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:17:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56966 "EHLO mail.kernel.org"
+        id S233242AbhGDXRy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:17:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50862 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234337AbhGDXPE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:15:04 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9047261941;
-        Sun,  4 Jul 2021 23:12:13 +0000 (UTC)
+        id S234437AbhGDXPI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:15:08 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 518D0613D2;
+        Sun,  4 Jul 2021 23:12:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625440334;
-        bh=y4GEIzLLKPd2XuowFaDqQ4Di0Kdcwbjx00e4A6CjEw4=;
+        s=k20201202; t=1625440352;
+        bh=WeMnDraM7T103alnbGAvN8eaYx0y/ydJ1naFAKo6x0I=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lTPT0WunPKa+DWlQWyp+iV8teXfZcJccaH1EQh9hXnzVc7dOmzY/ohVJ5m7WATUD/
-         LI1x551EEE+n9k7OdA1VitbIj45rzHR0js6ydXhdQAEDOhL4kZWJB+qCdTgBbz4xHw
-         LvOTg1HH9MnJP53zbrtesAoKnO8lxiiRmDJ10lsy/poyvWr58aN70KZLayznBE9uMI
-         yFoMMeTZOFOAi7FPi+2aP4iCfaCJn919PSds1LOG/DRhO7ag5ZZX0qVUrj22W0T9Ah
-         cXLOHSAX6MgsLPdz7Z6Sgok72ryl7fiLSN6jpjmLSd3oab7LTmXiqKKvw+wkAMb3LF
-         MoHbwgpqRMo7w==
+        b=kITmCfJ6V65TQgLdiS7ROSRA9ZRwWRsOZK/mCVc9Xb8Z9OZa4oCuG/69ayRtFLxM0
+         xLA02acBYrGtr/MkyfXuYpoz6uBBVb5/pMbAUJrsNoYHI1cJ1t8CpXOXtAdFIlhjF5
+         5huzrkPrO6qoGwm5+2yK4DprjqFGSRbpsFKOuYVlFQaLv8Vyy4Fnfb9k5GCNDd6xmH
+         MK+Xxk34Zeu12xLe20V1g9p33XERJgwoiB2CY3EXXWh0e0zci9AUa7BMtd5hqm0Ulb
+         hj3AjurUfdt1zDIxz5gOSdLIo5pxpYKXqNbHMfRvNHSbRa2vG9gkqQvCGw+cRvyV1K
+         QQa9qIfr7Lh+g==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
+Cc:     Jack Xu <jack.xu@intel.com>, Zhehui Xiang <zhehui.xiang@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 14/20] crypto: shash - avoid comparing pointers to exported functions under CFI
-Date:   Sun,  4 Jul 2021 19:11:49 -0400
-Message-Id: <20210704231155.1491795-14-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 4.4 07/15] crypto: qat - remove unused macro in FW loader
+Date:   Sun,  4 Jul 2021 19:12:13 -0400
+Message-Id: <20210704231222.1492037-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210704231155.1491795-1-sashal@kernel.org>
-References: <20210704231155.1491795-1-sashal@kernel.org>
+In-Reply-To: <20210704231222.1492037-1-sashal@kernel.org>
+References: <20210704231222.1492037-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -53,85 +52,40 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Ard Biesheuvel <ardb@kernel.org>
+From: Jack Xu <jack.xu@intel.com>
 
-[ Upstream commit 22ca9f4aaf431a9413dcc115dd590123307f274f ]
+[ Upstream commit 9afe77cf25d9670e61b489fd52cc6f75fd7f6803 ]
 
-crypto_shash_alg_has_setkey() is implemented by testing whether the
-.setkey() member of a struct shash_alg points to the default version,
-called shash_no_setkey(). As crypto_shash_alg_has_setkey() is a static
-inline, this requires shash_no_setkey() to be exported to modules.
+Remove the unused macro ICP_DH895XCC_PESRAM_BAR_SIZE in the firmware
+loader.
 
-Unfortunately, when building with CFI, function pointers are routed
-via CFI stubs which are private to each module (or to the kernel proper)
-and so this function pointer comparison may fail spuriously.
+This is to fix the following warning when compiling the driver using the
+clang compiler with CC=clang W=2:
 
-Let's fix this by turning crypto_shash_alg_has_setkey() into an out of
-line function.
+    drivers/crypto/qat/qat_common/qat_uclo.c:345:9: warning: macro is not used [-Wunused-macros]
 
-Cc: Sami Tolvanen <samitolvanen@google.com>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-Reviewed-by: Eric Biggers <ebiggers@google.com>
-Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
+Signed-off-by: Jack Xu <jack.xu@intel.com>
+Co-developed-by: Zhehui Xiang <zhehui.xiang@intel.com>
+Signed-off-by: Zhehui Xiang <zhehui.xiang@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/shash.c                 | 18 +++++++++++++++---
- include/crypto/internal/hash.h |  8 +-------
- 2 files changed, 16 insertions(+), 10 deletions(-)
+ drivers/crypto/qat/qat_common/qat_uclo.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index a1c7609578ea..7eebf3cde7b7 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -24,12 +24,24 @@
- 
- static const struct crypto_type crypto_shash_type;
- 
--int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
--		    unsigned int keylen)
-+static int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
-+			   unsigned int keylen)
- {
- 	return -ENOSYS;
+diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
+index 923bb1988973..28e642959a9a 100644
+--- a/drivers/crypto/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/qat/qat_common/qat_uclo.c
+@@ -360,7 +360,6 @@ static int qat_uclo_init_umem_seg(struct icp_qat_fw_loader_handle *handle,
+ 	return 0;
  }
--EXPORT_SYMBOL_GPL(shash_no_setkey);
-+
-+/*
-+ * Check whether an shash algorithm has a setkey function.
-+ *
-+ * For CFI compatibility, this must not be an inline function.  This is because
-+ * when CFI is enabled, modules won't get the same address for shash_no_setkey
-+ * (if it were exported, which inlining would require) as the core kernel will.
-+ */
-+bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
-+{
-+	return alg->setkey != shash_no_setkey;
-+}
-+EXPORT_SYMBOL_GPL(crypto_shash_alg_has_setkey);
  
- static int shash_setkey_unaligned(struct crypto_shash *tfm, const u8 *key,
- 				  unsigned int keylen)
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index 5203560f992e..000c049a75f7 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -80,13 +80,7 @@ int ahash_register_instance(struct crypto_template *tmpl,
- 			    struct ahash_instance *inst);
- void ahash_free_instance(struct crypto_instance *inst);
- 
--int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
--		    unsigned int keylen);
--
--static inline bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
--{
--	return alg->setkey != shash_no_setkey;
--}
-+bool crypto_shash_alg_has_setkey(struct shash_alg *alg);
- 
- bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg);
- 
+-#define ICP_DH895XCC_PESRAM_BAR_SIZE 0x80000
+ static int qat_uclo_init_ae_memory(struct icp_qat_fw_loader_handle *handle,
+ 				   struct icp_qat_uof_initmem *init_mem)
+ {
 -- 
 2.30.2
 
