@@ -2,122 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA5A1C07E95
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 06:43:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D676AC07E95
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 07:03:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA6E8613D0
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 06:43:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC28261412
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 07:03:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229502AbhGDGpn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 02:45:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57206 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbhGDGpm (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 02:45:42 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF719C061762
-        for <linux-crypto@vger.kernel.org>; Sat,  3 Jul 2021 23:43:06 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id g10so3371630wmh.2
-        for <linux-crypto@vger.kernel.org>; Sat, 03 Jul 2021 23:43:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=IuRMdF3AUX9V4pecQXQtrwKpIB8Qm5JMXD3no5oFrJs=;
-        b=e9yKfObL86tUw0Q8MzG+PMjZB/x+MAn27u2pGI1m5PN5bkcintsYfherPwu8GMqcpv
-         pGpEL64cFAJa3MvG5J49E/JMh6cu+GXLo1GHUiCRbGBWumvfo3VSLjWn1Bfi3rlqTtyQ
-         28x0oOiB0GgctfiARoOMdJ7S07V8boJXLgdVyax2oz89/r5SHpo0wQG3BWeCTDuOhF7E
-         JbC3KIeDgpTjRNZVxbiHJ3G6NDs2tF4zn22xsZ9Syjo2bFF5K1vPEchZe5waSCVunjIn
-         QXzi1NnWQJRgOigzwpVniCiA9oXfZN8owmqxcITNarZQO5yYNYd/z4A7xFnUqzMxdu/E
-         CB9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=IuRMdF3AUX9V4pecQXQtrwKpIB8Qm5JMXD3no5oFrJs=;
-        b=IwPfo3SIsFmAn55V+bh0UFcynplgbhQhDUxTGUERTfKIPeDfdWmek11V/MZaravgBu
-         kZfNGcikG49ggPsV1U7qte1EXYfFsNnSDQ6ApJhakh3aDLlTiBtvepJP+XqAx7n+LFSM
-         2WQNoR19pRTobdBw8ffG4ryNTignyVmVD2q3A1/ghwJv4OXXOvuFjNyqCOdfzt5rErux
-         WklL4XeKvhAXHNx3jjzRguUzNXjxZjpnOMi4TuvMorS1eGH9l2tKz+0AZXSRgkgZpJSg
-         vvW3BCwuBKgy1atb1EJNd1SKWsr8LCIG6gxJiO79UCkZI0rGDIvpKnNmxtrShBMBgLBY
-         fYQg==
-X-Gm-Message-State: AOAM530sz4FrplFI3wAGnQ0T7L0kD5EBnVIe+iReoXpwVl8ku3vYeoe9
-        mfs7HajVJTtVR5tzhw69TJZ3HMrUVi9ZmD0/R8Vmnw27AlY=
-X-Google-Smtp-Source: ABdhPJz0g7078sm7kBnhpLtiix9WbLE6n97jVal7nEGQTUGJ6sqTMokdpB9x+YbVt7G8J/2qPUAXa+TGvfdbMxYmX1Q=
-X-Received: by 2002:a05:600c:5110:: with SMTP id o16mr8610563wms.24.1625380985216;
- Sat, 03 Jul 2021 23:43:05 -0700 (PDT)
+        id S229502AbhGDHGW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 03:06:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39302 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229476AbhGDHGV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 03:06:21 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DEA4D61410;
+        Sun,  4 Jul 2021 07:03:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1625382226;
+        bh=b8XVHGyZOCv+C7LBpwt09ABzteCGstaAK7JZyHp9rtg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dD44pccav971s0KZD7H/ju5q1Cj2Sr3P2hJs/LCj3/DrF9P+6vAfRieF6FTGlJbks
+         6Oe3p9s/yMrvyK0UTFtfZipXkRDq8bdkEm0faVpFo41soJjQqTg+xfXXK412RbIId5
+         4pG5T6C1uGjl0oz31n5Y8AEtiZ1ZvDfYI1w+Y7hJpoisU3BQAVmASs7j7Z2RNzcG76
+         BVOuN2QLP32kWh0WHyxGk7ubqvIKbwah38cLKL1dZL4kao2ngIbOYfEkZLHT8w4tyE
+         8rdCQP52Y98w/gMlsEzB/6MU2nYb415owoORHRrEkBkYnNq7/iSgXAc3zO/TRQtTuC
+         0wSfPrw6TJ+1Q==
+Date:   Sun, 4 Jul 2021 10:03:42 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, alex.williamson@redhat.com,
+        jgg@nvidia.com, mgurtovoy@nvidia.com, linuxarm@huawei.com,
+        liulongfang@huawei.com, prime.zeng@hisilicon.com,
+        yuzenghui@huawei.com, jonathan.cameron@huawei.com,
+        wangzhou1@hisilicon.com
+Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for
+ HiSilicon ACC devices
+Message-ID: <YOFdTnlkcDZzw4b/@unreal>
+References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
+ <20210702095849.1610-2-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Sun, 4 Jul 2021 14:42:53 +0800
-Message-ID: <CACXcFmkg9socPcQzWapcYx+faAa+Km6RncYsuBpdH0BEbsXE9A@mail.gmail.com>
-Subject: random(4) thoughts
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Ted Ts'o" <tytso@mit.edu>, John Denker <jsd@av8n.com>,
-        Stephan Mueller <smueller@chronox.de>, m@ib.tc
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210702095849.1610-2-shameerali.kolothum.thodi@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I strongly suspect there are systems, mainly low-powered embedded
-ones, where what I am about to suggest does not apply. I think,
-though, that it will work in many of today's Linux environments.
+On Fri, Jul 02, 2021 at 10:58:46AM +0100, Shameer Kolothum wrote:
+> Add a vendor-specific vfio_pci driver for HiSilicon ACC devices.
+> This will be extended in follow-up patches to add support for
+> vfio live migration feature.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  drivers/vfio/pci/Kconfig             |   9 +++
+>  drivers/vfio/pci/Makefile            |   2 +
+>  drivers/vfio/pci/hisi_acc_vfio_pci.c | 100 +++++++++++++++++++++++++++
+>  3 files changed, 111 insertions(+)
+>  create mode 100644 drivers/vfio/pci/hisi_acc_vfio_pci.c
 
-Perhaps we might end up with two versions, one that does it the hard
-way (roughly, the current driver) & another that goes the easy way
-when the resources are available. I think the second one could be made
-quite a bit simpler & faster.
+<...>
 
-Quoting an earlier post of mine in another thread:
+> +static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+> +	.name		= "hisi-acc-vfio-pci",
+> +	.open		= hisi_acc_vfio_pci_open,
+> +	.release	= vfio_pci_core_release,
+> +	.ioctl		= vfio_pci_core_ioctl,
+> +	.read		= vfio_pci_core_read,
+> +	.write		= vfio_pci_core_write,
+> +	.mmap		= vfio_pci_core_mmap,
+> +	.request	= vfio_pci_core_request,
+> +	.match		= vfio_pci_core_match,
+> +	.reflck_attach	= vfio_pci_core_reflck_attach,
 
-> Many CPUs, e,g. Intel, have an instruction that gives random numbers. Som=
-e systems have another hardware RNG. Some can add one using a USB device or=
- Denker's Turbid (https://www.av8n.com/turbid/). Many Linux instances run o=
-n VMs so they have an emulated HWRNG using the host's /dev/random.
+I don't remember what was proposed in vfio-pci-core conversion patches,
+but would expect that default behaviour is to fallback to vfio_pci_core_* API
+if ".release/.ioctl/e.t.c" are not redefined.
 
-There may be other choices. Stephan has proposed one, Havege have one & so =
-on.
-
-> None of those is necessarily 100% trustworthy, though the published analy=
-sis for Turbid & for (one version of) the Intel device seem adequate to me.=
- However, if you use any of them to scribble over the entire 4k-bit input p=
-ool and/or
-a 512-bit Salsa context during initialisation, then it seems almost
-certain you'll get enough entropy to block attacks.
-
-> They are all dirt cheap so doing that, and using them again later for inc=
-remental squirts of randomness, looks reasonable.
-
-Assuming you can inilialise with 4k or more reasonably random bits and
-throw in more of those bits as required (perhaps 640 whenever you
-extract 512?), you no longer need any run-time entropy estimation. The
-driver gets simpler.& faster.
-
-Analysis gets easier too; given that we have plausible input entropy,
-all the driver needs to be is an adequate mixer. Given that we are
-both hashing with SHA and mixing with Salsa, it seems obvious that it
-is.
-
-The big problem then is evaluating the sources to ensure they are
-indeed "reasonably random". The criteria need not be remarkably
-stringent, though. It would take an amazingly bad (deliberately
-compromised?) source to give 4k of "random" data without enough
-entropy for security.
-
-You do still need the code to extract entropy from interrupts, if only
-to make an attack by someone who has compromised a source harder (NSA
-getting to Intel's designers, Chinese Intelligence in their factories,
-etc.) This does not need run-time entropy estimation either, just
-design-time analysis.
-
-Mike has suggested getting rid of the locks in the driver, again
-making it faster & simpler. I'm not at all certain that would be a
-good idea in the current driver. In the simplified one suggested here,
-though, it would seem to make sense.
+Thanks
