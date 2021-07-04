@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A39C11F6C
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7943C07E9A
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:08:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB1336145D
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:05:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D31216194E
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Jul 2021 23:08:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229898AbhGDXIb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Jul 2021 19:08:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46340 "EHLO mail.kernel.org"
+        id S231376AbhGDXKi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Jul 2021 19:10:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48966 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231210AbhGDXIQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:08:16 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D2B55613F6;
-        Sun,  4 Jul 2021 23:05:39 +0000 (UTC)
+        id S232238AbhGDXKH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:10:07 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 426BF61364;
+        Sun,  4 Jul 2021 23:07:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625439940;
+        s=k20201202; t=1625440051;
         bh=wDNvjMGxrpeAQg0xXJVXW97Rx7+AUJ9+PX7Q1PWNhRI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lR0H2jeZjqskfOhUCSeahKgRjNvgT6Mm/hdGGJC+COLOsprkoy1fTQtf5hmIJXivE
-         x7cnS4tBOSIleft12OryB7cTwtcL6uZ/XRbAS+PiHsDqBFLXeH5NRwEcgUYIrZ+BYG
-         h8nPO+1PGhjORerFcNju7jIq2U4OCLRjr41hFph231/8rm+p4/SrC0M5Qa+5tinfmL
-         naZiHKuNg0lZYlGOLspjY2hNa6pwicZ7u4KCviOBNe7iptsyvoQ9kMjLE2fK0B+0mB
-         9gpLOY5TivMU9EBSGK40DYrrAJU7Fk4G1ogR8SBHfFm/GIypSYqntJBGusEOn894io
-         CowbA3amTmQdA==
+        b=ERGiiv98Iuz/00b0F3DFwQvxHHFSqt0yLafH8TiHuNkJPAPO5t9SQCRc3jNBMTMKE
+         Y9Fpw+RFTy75SkVE6BHphKsIMWpiM9CgqVfVxmkG+Q5UfwOgvP0mSm5OiWVeLU1nv1
+         0ZU7ikEXXtt6rYpkNOEn85YJ2ApLIfGWkkoNzlxZ0od+Ug0MngA7RAVs7nOtusDh/Q
+         fxf5kkngtRZO1xQb4uRnCpfcJXKWWGL5E7b78SDJJHWmQBZA3lzMa0I5rb0GrkCx93
+         44KSRGNDRvpCO9SzWmosNXWBCRlHgiJx4dlXQbOtsuKnfqWQAZxBv0Phf/lo8AREKa
+         WCi0wZ1j70HLQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
@@ -39,12 +39,12 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Eric Biggers <ebiggers@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 58/85] crypto: shash - avoid comparing pointers to exported functions under CFI
-Date:   Sun,  4 Jul 2021 19:03:53 -0400
-Message-Id: <20210704230420.1488358-58-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.12 55/80] crypto: shash - avoid comparing pointers to exported functions under CFI
+Date:   Sun,  4 Jul 2021 19:05:51 -0400
+Message-Id: <20210704230616.1489200-55-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210704230420.1488358-1-sashal@kernel.org>
-References: <20210704230420.1488358-1-sashal@kernel.org>
+In-Reply-To: <20210704230616.1489200-1-sashal@kernel.org>
+References: <20210704230616.1489200-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
