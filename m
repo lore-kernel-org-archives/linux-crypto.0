@@ -2,177 +2,180 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A37C07E9A
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Jul 2021 09:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C260C07E98
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Jul 2021 09:41:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D3A2613C8
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Jul 2021 09:39:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A537613BD
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Jul 2021 09:41:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230521AbhGEJl6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Jul 2021 05:41:58 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:43802 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230508AbhGEJlw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Jul 2021 05:41:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1625477954;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TY5EkOc9okoLZd/wY+wEHiildtLYbg/afKDcRCDbWtg=;
-        b=AI/0WeQJzm28AqQoncoOcA7CBjJemj1hYt5Xeaq5Ln0HfrR8oP202LOVz9G1AMnguHpuQg
-        Ja8bAQfm8BtQrrS1fXg4884VaHfL1pmsKuwa8vbsrgxwCr0hdZgHwf6DXGXo50SaitfCEN
-        DNMOnWhirRu6SZyMj9HXtZF3WcmnueE=
-Received: from EUR02-VE1-obe.outbound.protection.outlook.com
- (mail-ve1eur02lp2050.outbound.protection.outlook.com [104.47.6.50]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-25-evL8Y2SMPl6Rx_8c2bufvg-1; Mon, 05 Jul 2021 11:39:13 +0200
-X-MC-Unique: evL8Y2SMPl6Rx_8c2bufvg-1
+        id S230323AbhGEJoR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Jul 2021 05:44:17 -0400
+Received: from mail-sn1anam02on2053.outbound.protection.outlook.com ([40.107.96.53]:3687
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230000AbhGEJoQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Jul 2021 05:44:16 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bYSnJtDEcTMUDBtZ25zwcO7MrYdFm+0VBkIYcfSlawqlVugHt5Fn4CGi6y2lxwKPjHbV++b/YKHyjEK/mF2asClInVT2sHQgFk1fpk6v0cI18l2YQWtyLUSpN7BpaAqJeMtnaPXU9ALKZYxFk4pY2mdYRgraGW5BOJmchfhHurKUR4H5NyGHwbQjI7JtUwLikuvFvJZBRTjl3YDwDkNtEZYcgf8yoyF/XDMBROL5wUzmRpjX4BXwBbuNmrHM8fpuHnLAc4fAn17mdiC1aj4oEvl2sbDlsVGRVvg6A9QzwtMkmVvIeo5FHhC4iQgC25VI1EWlvlAHe+qBoxyTHWbfxw==
+ b=b7u3KRA7mxZV9yuqzmCA3T/pxGIod8DthexWMLAb1uzFmShE19xovBknbqKAe3KJHgdkPBdqtBUgFwsyMNcQxHZLJF6001g/G29ahWnWaLq0+eaRkgQ5N2cYG1GenZBBMraqwP+KZPF+aEr5eVWi3LScMSXwU1BhRvcQW23I+zHH6zHq8B6OJCH+756MGixjxRyfYXOXjkXipffXzW6TCHo4HIq8AnHjUyziaw6jQY0mcVlPwCo8FXyqpWhct5SunYi6b00EdgjQci+2LLwjbT+3OVpu4kiEgqbA7CgW8QwPCHFboGBAq/QuHFKaTW+McHvbK1rFrYRjM/dmthHLnw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lglnIG06rXl/GMh5LxzDacerLqpLD8ueThLbPWDR4UM=;
- b=F6vNyuiLDWGFHnPk5d8/sKNMeTaMikwelVVzpP1GjYU8NymznxACojmqTvliEYy7/ZT612p8jUTvHdXBIXP+2QgoAwRFowqBjoTP46xRo/r4ITucPhXHa6XqUeMd7QR/FsWQQ490lZIBBHsgA1UXYRdMRIRRczVMi3MMPU22uphlOGnVh5pm2owanPbVztszEBYFb+565jkRsJl1EXhDh4HCucBCq4emKam+7W6roR08iZVfQP5iISbYX89e5FLNOGzpFbX/81gQR7W1a1B0f/yADlZsBUiiOQ5kRy6HIGddkG6jfdm9umNtbYWrr9M6X1mMkBHr/c5bh6KaDBHU7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=suse.com;
-Received: from AM0PR04MB5650.eurprd04.prod.outlook.com (2603:10a6:208:128::18)
- by AM0PR0402MB3730.eurprd04.prod.outlook.com (2603:10a6:208:12::16) with
+ bh=gbn8syCm8gctlvWh0rG7DiclEAaAGJgKoIFeHS1z0j4=;
+ b=d+j4OuXPVqJMQ/bCIz3x4dRaTKKZG1CZ1JHkQjcX/n32NUIQkAk8+84spexRspPNtvhKa6Tx4zUSJzugdrzS4pj6c3MU0eTKpSJsmCqhxpoYvFq3GNggQDhtEe1ctRjgLx3MS9ABMK2q9Lur3R1ynQVt+3cXmYhoXLy4Nte+nabgkDhbxa62AWC1TexHhtoHVxTY11rN1jGaozCu5GT1OIghOeg4+TDpRvnp8gIpmX4gtnolgreNNfXbUEbLvLfuhwkhy78AiJXaPCz/BtEjQ2yoduKlmVYVIghQm2xLfH2JN4wr2G4fT8JYvuuB8lov9LEroG3cXuqLAedHePsMow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gbn8syCm8gctlvWh0rG7DiclEAaAGJgKoIFeHS1z0j4=;
+ b=UV12jDBkShjJas7IOJwtkw/6ov+6rnKC8wgawoiBlFU7MjTqUzh1hQlA5kwCxdOR+B0AXwFjjlX8PgjGn3ndSBiq+SdqstzD6dGhisMnGWtUeuTIz/Q4qHq/Bm4ITTpdd8wHcg3aNeuMODLwRTUoVE2EGV8bIiLlcO/zaDdMcxUyVOvO8Jp80Xx+5EUf/PVzyQXSFe39usmzRQgcHExobhaZQz1RYg6H3JQufLM5WGgvD7Uo8CTNXW13pehV+jEneSqy4lUXr6JpWSeGEl2hIKDVGUIXI5ahXzi20vAMDS0YvqWRkojKnM8tWDBPiy4Tz6ogbHt9E+lkwW/0ronDXw==
+Received: from BN9PR03CA0682.namprd03.prod.outlook.com (2603:10b6:408:10e::27)
+ by MW2PR12MB2457.namprd12.prod.outlook.com (2603:10b6:907:10::31) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.23; Mon, 5 Jul
- 2021 09:39:12 +0000
-Received: from AM0PR04MB5650.eurprd04.prod.outlook.com
- ([fe80::55a8:3faa:c572:5e98]) by AM0PR04MB5650.eurprd04.prod.outlook.com
- ([fe80::55a8:3faa:c572:5e98%7]) with mapi id 15.20.4287.033; Mon, 5 Jul 2021
- 09:39:12 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     linux-crypto@vger.kernel.org, dhowells@redhat.com,
-        davem@davemloft.net, vt@altlinux.org,
-        tianjia.zhang@linux.alibaba.com, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jarkko@kernel.org
-References: <20210420114124.9684-1-varad.gautam@suse.com>
- <20210420114124.9684-14-varad.gautam@suse.com>
- <20210514104535.q4zjtshxroruvoz3@gondor.apana.org.au>
-From:   Varad Gautam <varad.gautam@suse.com>
-Subject: Re: [PATCH v3 13/18] crypto: rsa-psspad: Get signature parameters
- from a given signature
-Message-ID: <9af846ac-ad96-f59e-d89e-0c75bb75416c@suse.com>
-Date:   Mon, 5 Jul 2021 11:39:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-In-Reply-To: <20210514104535.q4zjtshxroruvoz3@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [95.90.166.153]
-X-ClientProxiedBy: AM9P192CA0009.EURP192.PROD.OUTLOOK.COM
- (2603:10a6:20b:21d::14) To AM0PR04MB5650.eurprd04.prod.outlook.com
- (2603:10a6:208:128::18)
+ 2021 09:41:37 +0000
+Received: from BN8NAM11FT062.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:10e:cafe::a1) by BN9PR03CA0682.outlook.office365.com
+ (2603:10b6:408:10e::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.23 via Frontend
+ Transport; Mon, 5 Jul 2021 09:41:37 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT062.mail.protection.outlook.com (10.13.177.34) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4287.22 via Frontend Transport; Mon, 5 Jul 2021 09:41:37 +0000
+Received: from [172.27.15.98] (172.20.187.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 5 Jul
+ 2021 09:41:33 +0000
+Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for
+ HiSilicon ACC devices
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        "Leon Romanovsky" <leon@kernel.org>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>, Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
+ <20210702095849.1610-2-shameerali.kolothum.thodi@huawei.com>
+ <YOFdTnlkcDZzw4b/@unreal> <fc9d6b0b82254fbdb1cc96365b5bdef3@huawei.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <d02dff3a-8035-ced1-7fc3-fcff791f9203@nvidia.com>
+Date:   Mon, 5 Jul 2021 12:41:30 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.77.52] (95.90.166.153) by AM9P192CA0009.EURP192.PROD.OUTLOOK.COM (2603:10a6:20b:21d::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.23 via Frontend Transport; Mon, 5 Jul 2021 09:39:11 +0000
+In-Reply-To: <fc9d6b0b82254fbdb1cc96365b5bdef3@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ace4eef7-f159-4a68-047d-08d93f98bea5
-X-MS-TrafficTypeDiagnostic: AM0PR0402MB3730:
-X-Microsoft-Antispam-PRVS: <AM0PR0402MB3730BFBE4C4F4DC9253211F1E01C9@AM0PR0402MB3730.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2582;
+X-MS-Office365-Filtering-Correlation-Id: 7ac479fa-e0bc-4dde-d63f-08d93f991578
+X-MS-TrafficTypeDiagnostic: MW2PR12MB2457:
+X-Microsoft-Antispam-PRVS: <MW2PR12MB24572C1F08D267BDA4D6B82EDE1C9@MW2PR12MB2457.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2WhTkvQ3q+Y2tma8JQw7MZmhiOQzDsuIWtG0n+k+v5VCjUa8g4BgoPVmsgjaLVilISffJN8T+z9tOonHhJsXTpBgNjNTpIjb7eV65aTYx9U8rs/A2ocdDjDB8hSYjESOi6XAwOisltPQBXlX8JsQXA9+2ffqpYL+1kbYV765ek5ES/B1yF5v22Z41BLKlXFDzFVUl6F+Y0s4QiiVln/Nct5ESf2bdX5fHnIpYIM99uNHwWRObNq1+I7bMKiDcKFkyJFG943o72VsY70riUAqRWf/+v86aDd7pJTQCzeveYfkI2xsFkV8JSbBkQTokDaiwNrOVnTggu8OuZNKkvsPDLyysG+MYi0ff20mmLrGFGwkPTT/f6zIPWk2yvFsUmBCOQ5eAKospRqU20Mot4f2TIIi/I89rLAWLMEGCugYm50PSjZlfBDW+yK6xswQSmKnRTwkKGgXw8jAunJ6b6WRpECS08v3Eh5jMlRHRoGM/BJzV0ZWpBg3CPwj/i1pydiTXQFR6bsy8ISSAfIQf4Irrfuw0GoFGJR1E9P6keo5NcR1u9Zyf2IUw0QmW72k9yWqnlOZ/WWxbK3JGcsSbOZRR6qYRnI9VfgR8q89sirUcey3SuAy09OJ97LK0EaZtLoCvJyKMEXJnR7WyRGtc0yf24A1fbhLNxuIMdyK8ZDasWCWTqjMgCNd37VKl+W0dMdIkmTDvct5OwPQct3HXoRLHAmf92TbmyH0TW7jQIyZX5M=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5650.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(376002)(396003)(346002)(366004)(39860400002)(31686004)(2906002)(44832011)(66476007)(66946007)(38100700002)(186003)(16526019)(36756003)(66556008)(86362001)(5660300002)(83380400001)(8676002)(8936002)(53546011)(16576012)(6916009)(316002)(4326008)(26005)(31696002)(66574015)(478600001)(6486002)(2616005)(956004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tBBjqR1AXbYPzkwCN5YkXMNrfXRxW0R1Vej1SSNx7qa8q2m0ylf/48bLqGrO?=
- =?us-ascii?Q?So1bqBVxyPcFDHJ5byhu1tE6CpqvIuBljfJCk6djalhQ+FpOmRbHX1j/wAV8?=
- =?us-ascii?Q?30SZUOw93/D5zIyfCtMgmME7XpEfHGUpsNK1ddiGVGyB9eXHN7zLXmsrJurN?=
- =?us-ascii?Q?16aZNGvQ41EOfYbV1PCOUpHuufAeiSlE1SpD87vdYZqcpXpRjbleCSvl3twl?=
- =?us-ascii?Q?qe0Lpa3fxmXmjVWoVM0B2vKAW9mchp4ZULwhdSP2xFRQWCaGM3jjPoHtj0tJ?=
- =?us-ascii?Q?OJ2lkBHDkn3i7mzKCxdbMl0KIsbbUFRRq8Lh0IsVNDSoTxYRf9ZSasUt8qEz?=
- =?us-ascii?Q?mRkUGWLm7mKUQPL9Tb2HdIMUmQhTcPmsFZpjGubtus7ag2BDC3fudFZ/AVoI?=
- =?us-ascii?Q?rwBnm+aRsuDLE2AWSAeimjJLarW+0Yt9flCV1L4xR2TRkndA6PeG9ajwRV+u?=
- =?us-ascii?Q?BfGQs6MYW4EmvxStgaGePWwc73VrypbFbUFJ1xKFh8K7u+/ftqOb7M0lBZiC?=
- =?us-ascii?Q?e1m0gwSzaTkuUfGYXlxII0vRtZsshR/gx4JVLT+IV1fp2qgB+nv8vvZ/mRNj?=
- =?us-ascii?Q?Watr7mvqMsw0+iu8ZCHPlBGyNv6qIy1kfsRw7o/5hVBNsdhBmVX64mN0uSKj?=
- =?us-ascii?Q?6U50Ii0waXu+A5RrmXWh54NiqyhbahjzZxPh3FXiGOn5o0ABG5BooQgAj4LN?=
- =?us-ascii?Q?9aH/KBUaCtM5HVNYNRF2WXz2b60wY+VoiKeAmI8gSrFY64lpvT4hC8lzTz/N?=
- =?us-ascii?Q?CIZZ9XHM0EkZBBVJjDswzhmO4YtV0qCxNET74zpSwgl34tSI8oPkzQY6MNNv?=
- =?us-ascii?Q?SVXsXVeoRsjO//s2e321esUiZIxDJQALOyepZ6/KKGWwQN8GdnPiq/wDl1q+?=
- =?us-ascii?Q?mlBH6Cj/RdsTlzZxnBSGPXpi7pY7FcuWdkPmCLsk8FW32AZ2RblUiEdomqA5?=
- =?us-ascii?Q?6RzFmltI4dEIt7AXsgQGuPjEKU9rRr8YaovKNSavgjD2xIkwzHnnmLFbjoMJ?=
- =?us-ascii?Q?tWTff7/OMqz3ix9L989QiAV78d0usWd2LGp+OMsmLNszkPVxBDs1qgpUoyeF?=
- =?us-ascii?Q?0iDc9Y1o/FAlJ5PRJVv44yKKGgQ7cVGEY4tkLgtAdTqbi6VzhuxmIHfQmVA0?=
- =?us-ascii?Q?OiYyHZI5YZAOMOK4IFZpiWbxVaiCYHoZp9zCFnxmeKh9zZPsxx/Tu+aFRLjY?=
- =?us-ascii?Q?WSTaxEurbprqxh+s64Nd5cfv3rvaWnU88n9TiLTalgDVrrhFhyqm4iLOt+el?=
- =?us-ascii?Q?pRlRs1imrOUrCWAvhevgRZti0I6ZAVZebTqCJFARAEB6sC4lvihtPfrpm9ic?=
- =?us-ascii?Q?HR0yr+vDPrbsYvgVW0vpaJOt?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ace4eef7-f159-4a68-047d-08d93f98bea5
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5650.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2021 09:39:11.8518
+X-Microsoft-Antispam-Message-Info: Knc6HUGR9p2H/f+QrSJyLTT0YUEr69EONq0+7vnO88KRQ9EYFWgT8bk6liZp/rzKt59k/IA+c81p44aEn3J6X60iHLI+w4cwbe3BYUF0TYbG4ihU49FqFYHmKV5ZPZGcg3lFS80f/p8KS/Ph4xW+Hk4fBkiW/+RVkOeL9YVcXgu52XOt1dYENlrRwXg+zun3PgYMuL7ZOfbhd/XoVKAH6FkXkJIbmj9Hb3bTO956wy21mvKriWbOQyxSwlFZgNSkLzMirN59JPu4xphJmix1lp+sKBzKTcwdB5Y5XUX03L73zZ8gaLS0s+bvVTaMmodF5FNn40C49QBWByyT+xpie86+jWPKe8IyBLOAbgADDrIprzJdLfQJAcNqtFebz+PUMtQr28Xzv6NjK9tIBt954mkaUihjPskvs63weWCpIDYq+/2ham5fImGyb5Jq7lgQFwWLUfGt5tEt7Rkn5yZj8z80HIivQ8+ez8T7nV5kRoacPX1CMVpyhvBGOvQrKXjhM4E3WvvB+3hLMNcRihDXEorAaHvygM4F0nQnoLQxUBwb4jUV/zo2aviClgq40UR5zq9g3N8N9Z7LuKT6uJ74c6I12mVT7vPdNkXPZ6gSiHmksmARX9p+MGd0n8EI2cBJM6e56BUnYUQf8gbsweoACTJKDfjIadgaqFGifEnrZgu7bxuN/5Hny7Wd2awFHQjylBaw84blSEGxJ7810J4lbWmE0PvGwTFjBuUs6OSZE30=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(6029001)(4636009)(136003)(39860400002)(396003)(346002)(376002)(46966006)(36840700001)(36756003)(7416002)(47076005)(31696002)(70206006)(53546011)(70586007)(186003)(26005)(4326008)(16526019)(36860700001)(82310400003)(110136005)(54906003)(82740400003)(5660300002)(478600001)(8936002)(356005)(16576012)(86362001)(316002)(36906005)(8676002)(7636003)(336012)(2906002)(426003)(2616005)(83380400001)(31686004)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2021 09:41:37.0014
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VevZiQgIXTs5dhK89M8JcLGvzNfm1XdyccHPSUN2sqRH+NX3Bidht5rcImfUNTvu6i+ZK3lYBIVJpdp65JH8jA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR0402MB3730
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ac479fa-e0bc-4dde-d63f-08d93f991578
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT062.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR12MB2457
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
 
-On 5/14/21 12:45 PM, Herbert Xu wrote:
-> On Tue, Apr 20, 2021 at 01:41:18PM +0200, Varad Gautam wrote:
+On 7/5/2021 11:47 AM, Shameerali Kolothum Thodi wrote:
+>
+>> -----Original Message-----
+>> From: Leon Romanovsky [mailto:leon@kernel.org]
+>> Sent: 04 July 2021 08:04
+>> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+>> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+>> linux-crypto@vger.kernel.org; alex.williamson@redhat.com; jgg@nvidia.com;
+>> mgurtovoy@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
+>> <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
+>> yuzenghui <yuzenghui@huawei.com>; Jonathan Cameron
+>> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+>> Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for HiSilicon
+>> ACC devices
 >>
->> +static int psspad_set_sig_params(struct crypto_akcipher *tfm,
->> +				 const void *sig,
->> +				 unsigned int siglen)
->> +{
->> +	struct akcipher_instance *inst =3D akcipher_alg_instance(tfm);
->> +	struct rsapad_inst_ctx *ictx =3D akcipher_instance_ctx(inst);
->> +	const struct public_key_signature *s =3D sig;
->> +
->> +	if (!sig)
->> +		return -EINVAL;
->> +
->> +	ictx->salt_len =3D s->salt_length;
->> +	ictx->mgf_hash_algo =3D s->mgf_hash_algo;
->=20
-> Is there any reason why this couldn't be embedded into the key
-> instead?
+>> On Fri, Jul 02, 2021 at 10:58:46AM +0100, Shameer Kolothum wrote:
+>>> Add a vendor-specific vfio_pci driver for HiSilicon ACC devices.
+>>> This will be extended in follow-up patches to add support for
+>>> vfio live migration feature.
+>>>
+>>> Signed-off-by: Shameer Kolothum
+>> <shameerali.kolothum.thodi@huawei.com>
+>>> ---
+>>>   drivers/vfio/pci/Kconfig             |   9 +++
+>>>   drivers/vfio/pci/Makefile            |   2 +
+>>>   drivers/vfio/pci/hisi_acc_vfio_pci.c | 100 +++++++++++++++++++++++++++
+>>>   3 files changed, 111 insertions(+)
+>>>   create mode 100644 drivers/vfio/pci/hisi_acc_vfio_pci.c
+>> <...>
+>>
+>>> +static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+>>> +	.name		= "hisi-acc-vfio-pci",
+>>> +	.open		= hisi_acc_vfio_pci_open,
+>>> +	.release	= vfio_pci_core_release,
+>>> +	.ioctl		= vfio_pci_core_ioctl,
+>>> +	.read		= vfio_pci_core_read,
+>>> +	.write		= vfio_pci_core_write,
+>>> +	.mmap		= vfio_pci_core_mmap,
+>>> +	.request	= vfio_pci_core_request,
+>>> +	.match		= vfio_pci_core_match,
+>>> +	.reflck_attach	= vfio_pci_core_reflck_attach,
+>> I don't remember what was proposed in vfio-pci-core conversion patches,
+>> but would expect that default behaviour is to fallback to vfio_pci_core_* API
+>> if ".release/.ioctl/e.t.c" are not redefined.
+> Yes, that would be nice, but don't think it does that in latest(v4).
+>
+> Hi Max,
+> Could we please consider fall back to the core defaults, may be check and assign defaults
+> in vfio_pci_core_register_device() ?
 
-Sorry about the delay, do you mean setting these as part of
-rsapad_set_pub_key()?=20
+I don't see why we should do this.
 
-The same pubkey can be used to verify both PSS and PKCSv1.5 style signature=
-s,
-so I don't see the signature params (salt length / mgf hash) being a part
-of the pkey state.
+vfio_pci_core.ko is just a library driver. It shouldn't decide for the 
+vendor driver ops.
 
-Thanks,
-Varad
+If a vendor driver would like to use its helper functions - great.
 
->=20
+If it wants to override it - great.
+
+If it wants to leave some op as NULL - it can do it also.
+
+
+>
 > Thanks,
->=20
-
---=20
-SUSE Software Solutions Germany GmbH
-Maxfeldstr. 5
-90409 N=C3=BCrnberg
-Germany
-
-HRB 36809, AG N=C3=BCrnberg
-Gesch=C3=A4ftsf=C3=BChrer: Felix Imend=C3=B6rffer
-
+> Shameer
