@@ -2,67 +2,41 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C260C07E98
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Jul 2021 09:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA018C07E99
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Jul 2021 10:19:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A537613BD
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Jul 2021 09:41:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C33B561416
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Jul 2021 10:19:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230323AbhGEJoR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Jul 2021 05:44:17 -0400
-Received: from mail-sn1anam02on2053.outbound.protection.outlook.com ([40.107.96.53]:3687
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230000AbhGEJoQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Jul 2021 05:44:16 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b7u3KRA7mxZV9yuqzmCA3T/pxGIod8DthexWMLAb1uzFmShE19xovBknbqKAe3KJHgdkPBdqtBUgFwsyMNcQxHZLJF6001g/G29ahWnWaLq0+eaRkgQ5N2cYG1GenZBBMraqwP+KZPF+aEr5eVWi3LScMSXwU1BhRvcQW23I+zHH6zHq8B6OJCH+756MGixjxRyfYXOXjkXipffXzW6TCHo4HIq8AnHjUyziaw6jQY0mcVlPwCo8FXyqpWhct5SunYi6b00EdgjQci+2LLwjbT+3OVpu4kiEgqbA7CgW8QwPCHFboGBAq/QuHFKaTW+McHvbK1rFrYRjM/dmthHLnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gbn8syCm8gctlvWh0rG7DiclEAaAGJgKoIFeHS1z0j4=;
- b=d+j4OuXPVqJMQ/bCIz3x4dRaTKKZG1CZ1JHkQjcX/n32NUIQkAk8+84spexRspPNtvhKa6Tx4zUSJzugdrzS4pj6c3MU0eTKpSJsmCqhxpoYvFq3GNggQDhtEe1ctRjgLx3MS9ABMK2q9Lur3R1ynQVt+3cXmYhoXLy4Nte+nabgkDhbxa62AWC1TexHhtoHVxTY11rN1jGaozCu5GT1OIghOeg4+TDpRvnp8gIpmX4gtnolgreNNfXbUEbLvLfuhwkhy78AiJXaPCz/BtEjQ2yoduKlmVYVIghQm2xLfH2JN4wr2G4fT8JYvuuB8lov9LEroG3cXuqLAedHePsMow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gbn8syCm8gctlvWh0rG7DiclEAaAGJgKoIFeHS1z0j4=;
- b=UV12jDBkShjJas7IOJwtkw/6ov+6rnKC8wgawoiBlFU7MjTqUzh1hQlA5kwCxdOR+B0AXwFjjlX8PgjGn3ndSBiq+SdqstzD6dGhisMnGWtUeuTIz/Q4qHq/Bm4ITTpdd8wHcg3aNeuMODLwRTUoVE2EGV8bIiLlcO/zaDdMcxUyVOvO8Jp80Xx+5EUf/PVzyQXSFe39usmzRQgcHExobhaZQz1RYg6H3JQufLM5WGgvD7Uo8CTNXW13pehV+jEneSqy4lUXr6JpWSeGEl2hIKDVGUIXI5ahXzi20vAMDS0YvqWRkojKnM8tWDBPiy4Tz6ogbHt9E+lkwW/0ronDXw==
-Received: from BN9PR03CA0682.namprd03.prod.outlook.com (2603:10b6:408:10e::27)
- by MW2PR12MB2457.namprd12.prod.outlook.com (2603:10b6:907:10::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.23; Mon, 5 Jul
- 2021 09:41:37 +0000
-Received: from BN8NAM11FT062.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:10e:cafe::a1) by BN9PR03CA0682.outlook.office365.com
- (2603:10b6:408:10e::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.23 via Frontend
- Transport; Mon, 5 Jul 2021 09:41:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- BN8NAM11FT062.mail.protection.outlook.com (10.13.177.34) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4287.22 via Frontend Transport; Mon, 5 Jul 2021 09:41:37 +0000
-Received: from [172.27.15.98] (172.20.187.6) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 5 Jul
- 2021 09:41:33 +0000
-Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for
- HiSilicon ACC devices
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        "Leon Romanovsky" <leon@kernel.org>
+        id S230512AbhGEKVk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Jul 2021 06:21:40 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3361 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230355AbhGEKVj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Jul 2021 06:21:39 -0400
+Received: from fraeml704-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4GJM036r5xz6G8CN;
+        Mon,  5 Jul 2021 18:10:59 +0800 (CST)
+Received: from lhreml713-chm.china.huawei.com (10.201.108.64) by
+ fraeml704-chm.china.huawei.com (10.206.15.53) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Mon, 5 Jul 2021 12:19:00 +0200
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml713-chm.china.huawei.com (10.201.108.64) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Mon, 5 Jul 2021 11:19:00 +0100
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2176.012; Mon, 5 Jul 2021 11:19:00 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>
 CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
@@ -73,109 +47,98 @@ CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         yuzenghui <yuzenghui@huawei.com>,
         Jonathan Cameron <jonathan.cameron@huawei.com>,
         "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for
+ HiSilicon ACC devices
+Thread-Topic: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for
+ HiSilicon ACC devices
+Thread-Index: AQHXbyjyY32E69+qSUOJDcpRvpWsY6syVlwAgAGohwCAABXkAIAAGLOw
+Date:   Mon, 5 Jul 2021 10:18:59 +0000
+Message-ID: <834a009bba0d4db1b7a1c32e8f20611d@huawei.com>
 References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
  <20210702095849.1610-2-shameerali.kolothum.thodi@huawei.com>
  <YOFdTnlkcDZzw4b/@unreal> <fc9d6b0b82254fbdb1cc96365b5bdef3@huawei.com>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <d02dff3a-8035-ced1-7fc3-fcff791f9203@nvidia.com>
-Date:   Mon, 5 Jul 2021 12:41:30 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <fc9d6b0b82254fbdb1cc96365b5bdef3@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+ <d02dff3a-8035-ced1-7fc3-fcff791f9203@nvidia.com>
+In-Reply-To: <d02dff3a-8035-ced1-7fc3-fcff791f9203@nvidia.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-X-Originating-IP: [172.20.187.6]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7ac479fa-e0bc-4dde-d63f-08d93f991578
-X-MS-TrafficTypeDiagnostic: MW2PR12MB2457:
-X-Microsoft-Antispam-PRVS: <MW2PR12MB24572C1F08D267BDA4D6B82EDE1C9@MW2PR12MB2457.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Knc6HUGR9p2H/f+QrSJyLTT0YUEr69EONq0+7vnO88KRQ9EYFWgT8bk6liZp/rzKt59k/IA+c81p44aEn3J6X60iHLI+w4cwbe3BYUF0TYbG4ihU49FqFYHmKV5ZPZGcg3lFS80f/p8KS/Ph4xW+Hk4fBkiW/+RVkOeL9YVcXgu52XOt1dYENlrRwXg+zun3PgYMuL7ZOfbhd/XoVKAH6FkXkJIbmj9Hb3bTO956wy21mvKriWbOQyxSwlFZgNSkLzMirN59JPu4xphJmix1lp+sKBzKTcwdB5Y5XUX03L73zZ8gaLS0s+bvVTaMmodF5FNn40C49QBWByyT+xpie86+jWPKe8IyBLOAbgADDrIprzJdLfQJAcNqtFebz+PUMtQr28Xzv6NjK9tIBt954mkaUihjPskvs63weWCpIDYq+/2ham5fImGyb5Jq7lgQFwWLUfGt5tEt7Rkn5yZj8z80HIivQ8+ez8T7nV5kRoacPX1CMVpyhvBGOvQrKXjhM4E3WvvB+3hLMNcRihDXEorAaHvygM4F0nQnoLQxUBwb4jUV/zo2aviClgq40UR5zq9g3N8N9Z7LuKT6uJ74c6I12mVT7vPdNkXPZ6gSiHmksmARX9p+MGd0n8EI2cBJM6e56BUnYUQf8gbsweoACTJKDfjIadgaqFGifEnrZgu7bxuN/5Hny7Wd2awFHQjylBaw84blSEGxJ7810J4lbWmE0PvGwTFjBuUs6OSZE30=
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(6029001)(4636009)(136003)(39860400002)(396003)(346002)(376002)(46966006)(36840700001)(36756003)(7416002)(47076005)(31696002)(70206006)(53546011)(70586007)(186003)(26005)(4326008)(16526019)(36860700001)(82310400003)(110136005)(54906003)(82740400003)(5660300002)(478600001)(8936002)(356005)(16576012)(86362001)(316002)(36906005)(8676002)(7636003)(336012)(2906002)(426003)(2616005)(83380400001)(31686004)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2021 09:41:37.0014
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ac479fa-e0bc-4dde-d63f-08d93f991578
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT062.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR12MB2457
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.83.49]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-On 7/5/2021 11:47 AM, Shameerali Kolothum Thodi wrote:
->
->> -----Original Message-----
->> From: Leon Romanovsky [mailto:leon@kernel.org]
->> Sent: 04 July 2021 08:04
->> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
->> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
->> linux-crypto@vger.kernel.org; alex.williamson@redhat.com; jgg@nvidia.com;
->> mgurtovoy@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
->> <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
->> yuzenghui <yuzenghui@huawei.com>; Jonathan Cameron
->> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
->> Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for HiSilicon
->> ACC devices
->>
->> On Fri, Jul 02, 2021 at 10:58:46AM +0100, Shameer Kolothum wrote:
->>> Add a vendor-specific vfio_pci driver for HiSilicon ACC devices.
->>> This will be extended in follow-up patches to add support for
->>> vfio live migration feature.
->>>
->>> Signed-off-by: Shameer Kolothum
->> <shameerali.kolothum.thodi@huawei.com>
->>> ---
->>>   drivers/vfio/pci/Kconfig             |   9 +++
->>>   drivers/vfio/pci/Makefile            |   2 +
->>>   drivers/vfio/pci/hisi_acc_vfio_pci.c | 100 +++++++++++++++++++++++++++
->>>   3 files changed, 111 insertions(+)
->>>   create mode 100644 drivers/vfio/pci/hisi_acc_vfio_pci.c
->> <...>
->>
->>> +static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
->>> +	.name		= "hisi-acc-vfio-pci",
->>> +	.open		= hisi_acc_vfio_pci_open,
->>> +	.release	= vfio_pci_core_release,
->>> +	.ioctl		= vfio_pci_core_ioctl,
->>> +	.read		= vfio_pci_core_read,
->>> +	.write		= vfio_pci_core_write,
->>> +	.mmap		= vfio_pci_core_mmap,
->>> +	.request	= vfio_pci_core_request,
->>> +	.match		= vfio_pci_core_match,
->>> +	.reflck_attach	= vfio_pci_core_reflck_attach,
->> I don't remember what was proposed in vfio-pci-core conversion patches,
->> but would expect that default behaviour is to fallback to vfio_pci_core_* API
->> if ".release/.ioctl/e.t.c" are not redefined.
-> Yes, that would be nice, but don't think it does that in latest(v4).
->
-> Hi Max,
-> Could we please consider fall back to the core defaults, may be check and assign defaults
-> in vfio_pci_core_register_device() ?
-
-I don't see why we should do this.
-
-vfio_pci_core.ko is just a library driver. It shouldn't decide for the 
-vendor driver ops.
-
-If a vendor driver would like to use its helper functions - great.
-
-If it wants to override it - great.
-
-If it wants to leave some op as NULL - it can do it also.
-
-
->
-> Thanks,
-> Shameer
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWF4IEd1cnRvdm95IFtt
+YWlsdG86bWd1cnRvdm95QG52aWRpYS5jb21dDQo+IFNlbnQ6IDA1IEp1bHkgMjAyMSAxMDo0Mg0K
+PiBUbzogU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaSA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9k
+aUBodWF3ZWkuY29tPjsNCj4gTGVvbiBSb21hbm92c2t5IDxsZW9uQGtlcm5lbC5vcmc+DQo+IENj
+OiBrdm1Admdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOw0KPiBs
+aW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsg
+amdnQG52aWRpYS5jb207DQo+IExpbnV4YXJtIDxsaW51eGFybUBodWF3ZWkuY29tPjsgbGl1bG9u
+Z2ZhbmcgPGxpdWxvbmdmYW5nQGh1YXdlaS5jb20+Ow0KPiBaZW5ndGFvIChCKSA8cHJpbWUuemVu
+Z0BoaXNpbGljb24uY29tPjsgeXV6ZW5naHVpDQo+IDx5dXplbmdodWlAaHVhd2VpLmNvbT47IEpv
+bmF0aGFuIENhbWVyb24NCj4gPGpvbmF0aGFuLmNhbWVyb25AaHVhd2VpLmNvbT47IFdhbmd6aG91
+IChCKSA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUkZDIHYyIDEv
+NF0gaGlzaS1hY2MtdmZpby1wY2k6IGFkZCBuZXcgdmZpb19wY2kgZHJpdmVyIGZvciBIaVNpbGlj
+b24NCj4gQUNDIGRldmljZXMNCj4gDQo+IA0KPiBPbiA3LzUvMjAyMSAxMTo0NyBBTSwgU2hhbWVl
+cmFsaSBLb2xvdGh1bSBUaG9kaSB3cm90ZToNCj4gPg0KPiA+PiAtLS0tLU9yaWdpbmFsIE1lc3Nh
+Z2UtLS0tLQ0KPiA+PiBGcm9tOiBMZW9uIFJvbWFub3Zza3kgW21haWx0bzpsZW9uQGtlcm5lbC5v
+cmddDQo+ID4+IFNlbnQ6IDA0IEp1bHkgMjAyMSAwODowNA0KPiA+PiBUbzogU2hhbWVlcmFsaSBL
+b2xvdGh1bSBUaG9kaSA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPg0KPiA+
+PiBDYzoga3ZtQHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsN
+Cj4gPj4gbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsgYWxleC53aWxsaWFtc29uQHJlZGhh
+dC5jb207DQo+IGpnZ0BudmlkaWEuY29tOw0KPiA+PiBtZ3VydG92b3lAbnZpZGlhLmNvbTsgTGlu
+dXhhcm0gPGxpbnV4YXJtQGh1YXdlaS5jb20+OyBsaXVsb25nZmFuZw0KPiA+PiA8bGl1bG9uZ2Zh
+bmdAaHVhd2VpLmNvbT47IFplbmd0YW8gKEIpIDxwcmltZS56ZW5nQGhpc2lsaWNvbi5jb20+Ow0K
+PiA+PiB5dXplbmdodWkgPHl1emVuZ2h1aUBodWF3ZWkuY29tPjsgSm9uYXRoYW4gQ2FtZXJvbg0K
+PiA+PiA8am9uYXRoYW4uY2FtZXJvbkBodWF3ZWkuY29tPjsgV2FuZ3pob3UgKEIpDQo+IDx3YW5n
+emhvdTFAaGlzaWxpY29uLmNvbT4NCj4gPj4gU3ViamVjdDogUmU6IFtSRkMgdjIgMS80XSBoaXNp
+LWFjYy12ZmlvLXBjaTogYWRkIG5ldyB2ZmlvX3BjaSBkcml2ZXIgZm9yDQo+IEhpU2lsaWNvbg0K
+PiA+PiBBQ0MgZGV2aWNlcw0KPiA+Pg0KPiA+PiBPbiBGcmksIEp1bCAwMiwgMjAyMSBhdCAxMDo1
+ODo0NkFNICswMTAwLCBTaGFtZWVyIEtvbG90aHVtIHdyb3RlOg0KPiA+Pj4gQWRkIGEgdmVuZG9y
+LXNwZWNpZmljIHZmaW9fcGNpIGRyaXZlciBmb3IgSGlTaWxpY29uIEFDQyBkZXZpY2VzLg0KPiA+
+Pj4gVGhpcyB3aWxsIGJlIGV4dGVuZGVkIGluIGZvbGxvdy11cCBwYXRjaGVzIHRvIGFkZCBzdXBw
+b3J0IGZvcg0KPiA+Pj4gdmZpbyBsaXZlIG1pZ3JhdGlvbiBmZWF0dXJlLg0KPiA+Pj4NCj4gPj4+
+IFNpZ25lZC1vZmYtYnk6IFNoYW1lZXIgS29sb3RodW0NCj4gPj4gPHNoYW1lZXJhbGkua29sb3Ro
+dW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gPj4+IC0tLQ0KPiA+Pj4gICBkcml2ZXJzL3ZmaW8vcGNp
+L0tjb25maWcgICAgICAgICAgICAgfCAgIDkgKysrDQo+ID4+PiAgIGRyaXZlcnMvdmZpby9wY2kv
+TWFrZWZpbGUgICAgICAgICAgICB8ICAgMiArDQo+ID4+PiAgIGRyaXZlcnMvdmZpby9wY2kvaGlz
+aV9hY2NfdmZpb19wY2kuYyB8IDEwMA0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4g
+Pj4+ICAgMyBmaWxlcyBjaGFuZ2VkLCAxMTEgaW5zZXJ0aW9ucygrKQ0KPiA+Pj4gICBjcmVhdGUg
+bW9kZSAxMDA2NDQgZHJpdmVycy92ZmlvL3BjaS9oaXNpX2FjY192ZmlvX3BjaS5jDQo+ID4+IDwu
+Li4+DQo+ID4+DQo+ID4+PiArc3RhdGljIGNvbnN0IHN0cnVjdCB2ZmlvX2RldmljZV9vcHMgaGlz
+aV9hY2NfdmZpb19wY2lfb3BzID0gew0KPiA+Pj4gKwkubmFtZQkJPSAiaGlzaS1hY2MtdmZpby1w
+Y2kiLA0KPiA+Pj4gKwkub3BlbgkJPSBoaXNpX2FjY192ZmlvX3BjaV9vcGVuLA0KPiA+Pj4gKwku
+cmVsZWFzZQk9IHZmaW9fcGNpX2NvcmVfcmVsZWFzZSwNCj4gPj4+ICsJLmlvY3RsCQk9IHZmaW9f
+cGNpX2NvcmVfaW9jdGwsDQo+ID4+PiArCS5yZWFkCQk9IHZmaW9fcGNpX2NvcmVfcmVhZCwNCj4g
+Pj4+ICsJLndyaXRlCQk9IHZmaW9fcGNpX2NvcmVfd3JpdGUsDQo+ID4+PiArCS5tbWFwCQk9IHZm
+aW9fcGNpX2NvcmVfbW1hcCwNCj4gPj4+ICsJLnJlcXVlc3QJPSB2ZmlvX3BjaV9jb3JlX3JlcXVl
+c3QsDQo+ID4+PiArCS5tYXRjaAkJPSB2ZmlvX3BjaV9jb3JlX21hdGNoLA0KPiA+Pj4gKwkucmVm
+bGNrX2F0dGFjaAk9IHZmaW9fcGNpX2NvcmVfcmVmbGNrX2F0dGFjaCwNCj4gPj4gSSBkb24ndCBy
+ZW1lbWJlciB3aGF0IHdhcyBwcm9wb3NlZCBpbiB2ZmlvLXBjaS1jb3JlIGNvbnZlcnNpb24gcGF0
+Y2hlcywNCj4gPj4gYnV0IHdvdWxkIGV4cGVjdCB0aGF0IGRlZmF1bHQgYmVoYXZpb3VyIGlzIHRv
+IGZhbGxiYWNrIHRvIHZmaW9fcGNpX2NvcmVfKg0KPiBBUEkNCj4gPj4gaWYgIi5yZWxlYXNlLy5p
+b2N0bC9lLnQuYyIgYXJlIG5vdCByZWRlZmluZWQuDQo+ID4gWWVzLCB0aGF0IHdvdWxkIGJlIG5p
+Y2UsIGJ1dCBkb24ndCB0aGluayBpdCBkb2VzIHRoYXQgaW4gbGF0ZXN0KHY0KS4NCj4gPg0KPiA+
+IEhpIE1heCwNCj4gPiBDb3VsZCB3ZSBwbGVhc2UgY29uc2lkZXIgZmFsbCBiYWNrIHRvIHRoZSBj
+b3JlIGRlZmF1bHRzLCBtYXkgYmUgY2hlY2sgYW5kDQo+IGFzc2lnbiBkZWZhdWx0cw0KPiA+IGlu
+IHZmaW9fcGNpX2NvcmVfcmVnaXN0ZXJfZGV2aWNlKCkgPw0KPiANCj4gSSBkb24ndCBzZWUgd2h5
+IHdlIHNob3VsZCBkbyB0aGlzLg0KPiANCj4gdmZpb19wY2lfY29yZS5rbyBpcyBqdXN0IGEgbGli
+cmFyeSBkcml2ZXIuIEl0IHNob3VsZG4ndCBkZWNpZGUgZm9yIHRoZQ0KPiB2ZW5kb3IgZHJpdmVy
+IG9wcy4NCj4gDQo+IElmIGEgdmVuZG9yIGRyaXZlciB3b3VsZCBsaWtlIHRvIHVzZSBpdHMgaGVs
+cGVyIGZ1bmN0aW9ucyAtIGdyZWF0Lg0KPiANCj4gSWYgaXQgd2FudHMgdG8gb3ZlcnJpZGUgaXQg
+LSBncmVhdC4NCj4gDQo+IElmIGl0IHdhbnRzIHRvIGxlYXZlIHNvbWUgb3AgYXMgTlVMTCAtIGl0
+IGNhbiBkbyBpdCBhbHNvLg0KDQpCYXNlZCBvbiB0aGUgZG9jdW1lbnRhdGlvbiBvZiB0aGUgdmZp
+b19kZXZpY2Vfb3BzIGNhbGxiYWNrcywNCkl0IGxvb2tzIGxpa2Ugd2UgYWxyZWFkeSBoYXZlIGEg
+cHJlY2VkZW5jZSBpbiB0aGUgY2FzZSBvZiByZWZsY2tfYXR0YWNoDQpjYWxsYmFjayB3aGVyZSBp
+dCB1c2VzIHRoZSB2ZmlvIGNvcmUgZGVmYXVsdCBvbmUsIGlmIGl0IGlzIG5vdCBpbXBsZW1lbnRl
+ZC4NCg0KQWxzbyBJIHdvdWxkIGltYWdpbmUgdGhhdCBpbiBtYWpvcml0eSB1c2UgY2FzZXMgdGhl
+IHZlbmRvciBkcml2ZXJzIHdpbGwgYmUNCmRlZmF1bHRpbmcgdG8gY29yZSBmdW5jdGlvbnMuIA0K
+DQpJIHRoaW5rLCBpbiBhbnkgY2FzZSwgaXQgd291bGQgYmUgZ29vZCB0byB1cGRhdGUgdGhlIERv
+Y3VtZW50YXRpb24gYmFzZWQgb24NCndoaWNoIHdheSB3ZSBlbmQgdXAgZG9pbmcgdGhpcy4NCg0K
+VGhhbmtzLA0KU2hhbWVlciANCg0KIA0KPiANCj4gDQo+ID4NCj4gPiBUaGFua3MsDQo+ID4gU2hh
+bWVlcg0K
