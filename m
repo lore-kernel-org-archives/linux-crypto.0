@@ -5,46 +5,46 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95C79C07E9C
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 18:15:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 299EEC11F66
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 18:15:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77AB561C83
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 18:15:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10A3D61C6D
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 18:15:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231494AbhGGSS2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Jul 2021 14:18:28 -0400
-Received: from mail-mw2nam10on2082.outbound.protection.outlook.com ([40.107.94.82]:20064
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        id S231533AbhGGSSa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Jul 2021 14:18:30 -0400
+Received: from mail-bn8nam11on2061.outbound.protection.outlook.com ([40.107.236.61]:62945
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231440AbhGGSSX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jul 2021 14:18:23 -0400
+        id S231479AbhGGSS0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Jul 2021 14:18:26 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fqxEOjLLFJ0nxma/ApIQAVG757LCr68GfpjpkIdDOXfs8SSoiWbm34JC7eKsG+ePwbgeJuJnVXQI4HYcrfyVW5rbc+MsL4w/XM1Rrn0Seny1xrhkFaBxdWevCA9zX0k6n/Yb98J7/4RnxM3QxpmZqj6lDZ6C54va8V+GBcyNFFfSCxD8OIwmzmIyWhOs1fIl1T2/zds9aRsFXp2LZCjzaClw8quT30diFiWS3FqA7WMkMo9xbpfvHtMtvf58miwDkn6mLOF15ej1jntpGOyVbM/5shwFzTyyJLvEZ2ot7zPf8eNz3YjDESMBnQTHPnzMKWpQxC7yfDztqypdDHxD0w==
+ b=VyXJqZZGjhpxt3ZsZvd7kHnXfnPjbkZUq/p05tbOOCWLtpbypjxZKuFB0LwTnMgt9qQFRHiyCTiQEe+0B1LsBirY3wqWZkTOSXM5Ic8G6ULI/Fsbb7IXtm98c5Wi/rnmKfuVv2vR0H14oMXbcyFgJTe6zw7bmSiEyyw8BiC+YKZpgxMvVywLQyyhEr6oWUHBP2wcRa8TNfzirR6iALV64jitdCUmXwkUFpmwEB8+/lpYid1S5Ia3wnkJdSStvYVrq2ZpHT/VDTTJ1G/pCu7PSIVgG0Gj4ZhgtGC9TnK9tMjdWPNaOF7dogtfTreXEXw9GcXt7ZdKb5va9RCOx2oUTg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=chVykgN7bZcIuvfIEO5C/ybi4gNYMSU5TQGwpDsi530=;
- b=kCrFp106JMgVcyldsLANks+s3z7UH/rvPDeMy11jbI1CaLrRvHlOyvhlxFvRkCxP3EqSr25cR5V58DHnjfInlFyQHGarr2rVkqntKoWsKoFtcQpj409aqacX7Lk+g/zU4ESkwOhhXszOwW4xTunmA9kNQvm+ydI37xN6bKKXcX0+Uvr67/T2ZhSJTjSMlxxDoXJDz4RzotK4WPMhznDkMDOb4KTVX0dm4cAxn2ejA5TCwQhO1tsStVx2IYcgcQxHjwjcY0ZO0J9huuAze1m63kkBtlODuWpA6fDfSrwtSF9v9PbuvKjYv+g0JUG6QPM16ueq3RfGiUfd8HjCzoSaKg==
+ bh=RtNhJC0W4p6xNKQnWOKJN8mlkiNi8O2qF5UIBoVBVOw=;
+ b=YfZyVHshPuMYAFWPcuLL39lVIOdp2zOkk3GRF8NkZBlZT/qhbDZ5LhmHqVxysHFVNCdEgPezazXhPfhxce/i5i0fA4YI9fRyvgecR3Lh2sQFujagm49Ype2i1vIQQMD9k4dRLcq15kGnn84TX68WMhfkTt8JSK6GvVoVQLXum2tchbuexHqkN7toLyiPhAY5LwlvtK8cVnNTkRhLVmF5tXxCeIAXhoxRH3TAQZRxbn1avvsof2NRnul2dwA13Mm7HG8snhbcQHubW/THLBPo0nbpDgBn/BgqCByMY+o+NLA/bew6wkZh+rzpZTrsf0Zw/Nq/tlLcyUnYSmtLuLiFyg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=chVykgN7bZcIuvfIEO5C/ybi4gNYMSU5TQGwpDsi530=;
- b=kCdwlzgcrYyrqjAA4mCSt8sMdBpADkDdCQ0mqBQySLgEe/z0v1VieEQFlm+plnIEfLqx9G1hhsTb0wM+UkuRV/svT6rxaQVnCLw3hZeKaHV8BVhbyj3fCCYZPoH1ImCwIPvd/T8bO1GgdpZ9fNYn2uDLAURVAsb+l/SfmMK4i/4=
+ bh=RtNhJC0W4p6xNKQnWOKJN8mlkiNi8O2qF5UIBoVBVOw=;
+ b=lEUk/druT9eH4skeR68qo7sABFX7YAuTBqBS1HE94YBtTKXlxIjC8/M1Wv0D0tzTHFZh7kiS3zAhaKmlr18nOYTjp205KnUwTpOMaVopKezR+xM1ipFGYTtLXYihrNVdYrKavQPdLdS3fIB6yr/77P1yrI+tn/ZWPstrwrjvCj0=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from BYAPR12MB2711.namprd12.prod.outlook.com (2603:10b6:a03:63::10)
- by BY5PR12MB4644.namprd12.prod.outlook.com (2603:10b6:a03:1f9::11) with
+ by BY5PR12MB3939.namprd12.prod.outlook.com (2603:10b6:a03:1a5::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.19; Wed, 7 Jul
- 2021 18:15:36 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.21; Wed, 7 Jul
+ 2021 18:15:41 +0000
 Received: from BYAPR12MB2711.namprd12.prod.outlook.com
  ([fe80::40e3:aade:9549:4bed]) by BYAPR12MB2711.namprd12.prod.outlook.com
  ([fe80::40e3:aade:9549:4bed%7]) with mapi id 15.20.4287.033; Wed, 7 Jul 2021
- 18:15:36 +0000
+ 18:15:41 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
@@ -72,9 +72,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
         npmccallum@redhat.com, brijesh.ksingh@gmail.com,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part1 RFC v4 04/36] x86/mm: Add sev_feature_enabled() helper
-Date:   Wed,  7 Jul 2021 13:14:34 -0500
-Message-Id: <20210707181506.30489-5-brijesh.singh@amd.com>
+Subject: [PATCH Part1 RFC v4 06/36] x86/sev: check SEV-SNP features support
+Date:   Wed,  7 Jul 2021 13:14:36 -0500
+Message-Id: <20210707181506.30489-7-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210707181506.30489-1-brijesh.singh@amd.com>
 References: <20210707181506.30489-1-brijesh.singh@amd.com>
@@ -84,146 +84,178 @@ X-ClientProxiedBy: SA0PR11CA0104.namprd11.prod.outlook.com
  (2603:10b6:a03:63::10)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0104.namprd11.prod.outlook.com (2603:10b6:806:d1::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.19 via Frontend Transport; Wed, 7 Jul 2021 18:15:33 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0104.namprd11.prod.outlook.com (2603:10b6:806:d1::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.19 via Frontend Transport; Wed, 7 Jul 2021 18:15:39 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7a9a7a80-2fd8-4038-a3d6-08d941733786
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4644:
+X-MS-Office365-Filtering-Correlation-Id: 3075f44e-757b-4c3e-c487-08d941733ace
+X-MS-TrafficTypeDiagnostic: BY5PR12MB3939:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BY5PR12MB4644F18221B986BC7E8129F0E51A9@BY5PR12MB4644.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-Microsoft-Antispam-PRVS: <BY5PR12MB3939EA259CBD9838193DA9BFE51A9@BY5PR12MB3939.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4vL7jpgjaCQiSQjw33IB0m62v+iMoxlxMxb1qjzXbe/ccun64EGdcs6U9fUn5tE/O7sgCQ9U6tzlUX3lrRbMA6laGONLbBaIvnC/JGF7iDf5ZrmFQZN/dKiXEzFYt2sB3l81lSmGvw/aEWM/lkXPn2iUGUzAapEoYaM8vEnH0qf1F6TAXkY9nf9dMDDSjEJBmPPlVVBDc2XcalpN7dVz+z3s2OFUSAhuvCcTQJWy21tX5rypqZIUaOsoVogwA+O1UpcVwaysjRZo8fY48EQ13b4woQHA3hdxgoxuhvqxskYjqEqIb30cLbcIonB0v6MFL6m9nJn0L957rOkqGJ+LUcUZCg6vIWHDlsGkVt+Tf2Gz6xIyyqshT7OuIiqJHXhgRzOhMZOH8Q458zVA2+243JijtfUOIbZSiIMhTs41a3kmyq7bScv0lP0j6vyI46jN6smsNsVWbv84iIKzesZSrcZjTLhgb+JgFWsQC+nWnV/XixC9UnnbS8PhT90PIdZ8EM/NIpguJHfEWLZNB/rms3rmpxtWDvsMET4Mpks03QuLKBBePDtFUNlAiGHUpoyVon1jQg2PxujltczCLOwwksLoSQTzc7nqridVg41qANrgFcPIeFxKdv+1nC0hZr3GVdt3fRrsOyefvkf2ajJR9plRs3JCUQ5HMJ/z5pHc/HDhG3GXSDxvkvPoqeK8YsG+
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2711.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(366004)(396003)(39860400002)(376002)(186003)(2906002)(1076003)(4326008)(316002)(6486002)(7406005)(26005)(52116002)(7416002)(66556008)(8936002)(38350700002)(5660300002)(956004)(36756003)(38100700002)(478600001)(66476007)(44832011)(7696005)(2616005)(8676002)(66946007)(86362001)(54906003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: wSgaYhYKlprjJJQgh7EtryRyCLCSgHUm8S8QQe0b1h97bp22AWclV4xD9ph9y5q/CdS6xnTMkD1HAoDfGqsL1n9Ui1nEBqYiwrROEX42kMIR48b+FS2uq/0ubdC3XbLc5uMZGG6l2lnqwCrGif1JLnaqfYYdhISb10h0aJUHx41emKS9P0qYlOm+avCgIUh1nhKBkoxkwc2wNUXQcDbLHilmlhKxqAdgY6k5c97x4Zq8VzqDPyJ7gXXdh4/z0caTI8d8HYclqHuiWbzHyUfmonSSJABifQmZUUE6DrWGMKAsAdcf1JaSD4QrubZsAJeBP8gJNYtBbz+6zR/pxpYDFguo216u6KU/OtqEPuS7Uxl4h49S3ZTQRDKU+dnCIn+9kAaVvP3XYcufPd1S9FsMTZw0zq1cd67MmUltDg6Ab0YPppFZoN0utr4V2MM55YVFXtv/WXgV8tXjN2gpDQmndNv7ngyqcaob/Oa6gkJ5ZRnGNLrOaSK6hX6Dm1cS1wHj+r1JtPkPZZixssczcPD6cBI+HzO+0WcGx4yF/d0PQysK7jr4i/cZMKgU7Ag0EE2hCMS8dl8yaRG9BfS2neP6q4HvLUEo8Mu9zX2S8MYeKTEDnvTWv/6TLOsPyb1EpIs7HYGwP/DE7ozWfFzB+wtfl3uzR7zgkA39AINki7R9A6txPJShpbKzppBgMBr6LuysQuqo3SJIKlyWAXPlPwaVhg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2711.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(396003)(39860400002)(366004)(376002)(136003)(44832011)(66556008)(38100700002)(38350700002)(66946007)(186003)(66476007)(2906002)(1076003)(26005)(52116002)(8936002)(2616005)(6486002)(7696005)(6666004)(5660300002)(8676002)(956004)(7406005)(7416002)(478600001)(83380400001)(316002)(54906003)(86362001)(36756003)(4326008);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZxrjAMQHzds+IZhsfdFM9KBi+LCxGWeo51qFQgjzP+Pq6cyeBYUh1sjdbE+9?=
- =?us-ascii?Q?ogSXD2xL8bBSpfGQ7yeskOFoKTHn/65KTkwjn9dIwixGYuYJpdGnzdwnlLTx?=
- =?us-ascii?Q?C2YP2po9nMtr3wRqCRYCvGHXlmwXY/ofVy4YfSwH/FBtO0K3D3Cj1YeJhFBi?=
- =?us-ascii?Q?YLr94VExfPr0zLGcvCGotLvKmAe8a9Apq9TBNWlp/ieEfJ18bvRSBQJrYyom?=
- =?us-ascii?Q?8nbKDW8IYsOQjLtZT7dYW0u7cnoeJZtUMnVGEr1QRd78S6Uwh2gP22o+wsPo?=
- =?us-ascii?Q?ej+riC3fuev9bL46Pqgcde9mBsutN7Uf9bB4ZVVVY687OsoAhRAT+9zp9jAR?=
- =?us-ascii?Q?rxjwsfly/4QrpO9BVoFFnB2HCZp0knXLu7eVoxLMZv1vpa6re6xhtidiDrQ+?=
- =?us-ascii?Q?ML+x+ciQ8GfkVoJR3qciWIjE5f3WE/KXdjGUcQ+adL79lu1VBA4ZNWl6ytSO?=
- =?us-ascii?Q?Vw7Av9OXP7RIP98Vdg2P4AvLWcHcUiJRcXshnQe/bDobYJu3j7zSB5NimWKj?=
- =?us-ascii?Q?bF9xgEvG5acEySYjBM68aNcSW5n9U2m9S2gM5t2loERl2Nh3zSjxpa6wsqrf?=
- =?us-ascii?Q?3t8TGIOrvzkn1yWPR39Yh2XpX/7kgVmw1ueW118IucYFEfjhO+nHDOtpZES4?=
- =?us-ascii?Q?d2/2WnQE0AW/ylGoYu3iNY3wzp3c2UvGp5++pZkC+QHuTebLpkKbNGIi/gOm?=
- =?us-ascii?Q?LedLhifdK6JJFexTQZoUC8fZk0CKTPbClekzcV4Icqk5o06A2au8lcldMRGz?=
- =?us-ascii?Q?i3azelViuWnwU/OjYnCwc9VmlUfexIEIMTPrFFYoOPRSM8TFes7WFi+SaTiR?=
- =?us-ascii?Q?oyLQ5KBZCuapUJZX5eKL06C0R9Au5GHrYhCP9fSx/cvJdaZKS+0hlYIVxmW3?=
- =?us-ascii?Q?y6o+g1La25wQjf2gcBMGamON9iqTX4nA6uWPnRQ1lAIlCcMe5yuNDeKG96W0?=
- =?us-ascii?Q?Dsruy9PG68Oy/Vu+Vdy2dgYgHfEq1W5c1IkQAOgjUfJgO1NCh1SE5z758Cap?=
- =?us-ascii?Q?igU2NgNDCVA7fM1fihZbdm+C6nutrGLhqhrjVmv0TrGWvH++cPPMeBEo34uX?=
- =?us-ascii?Q?O0i2ICXsWsSQGtyt+0xVfEdJ1dk1vPBjmr8SF0AWgyYfqIdchQzH3aVFuaTu?=
- =?us-ascii?Q?uEsSTfjbY5hdOiTe1o5VHa93Wanf+cg6ne3nM2R4Da19ZwR0dS5WGN1FjeM0?=
- =?us-ascii?Q?v3duvjWcHWLckCbsHeI2KxhGXpypnJlSEorBaYBdtu3hSLmJDQD7PmFgsZQH?=
- =?us-ascii?Q?fSNia3yA+3+Pmoxoi+WGj8d/pMPka07TJg2pMrAovxUz1a0plh0iPWCphoGH?=
- =?us-ascii?Q?0JD7EGKdmZ5AA1lfssw9K58+?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tp7BpiXfDPSUwmkmzMkIRLZdbcXlTl0f0G4p6ElpOHdbg/gHWVlwrdPCMGJQ?=
+ =?us-ascii?Q?O/F7cnEO3rOSAG0xxe1ynIaC0PIHFi8zSofmzaYxg5RS7o0fO9p9hhqxqlaV?=
+ =?us-ascii?Q?92ydK7N2eV25oNEiMAkIn+2AH0/y2zsnohHK6S0F0OMvL3G94RYJrS29TXPC?=
+ =?us-ascii?Q?ZZt1kFpsLrK7WPsKwDgxTwoB4+UmiIDfTngnuByV8fFu8l78JPddvQTWRW19?=
+ =?us-ascii?Q?YMDWbLYI6qSuWLL3nJZdIjeDOl7zmH6qGRv8BR7BvUi3Ng+lJ8ubt6nM09mI?=
+ =?us-ascii?Q?JnT+3A99QxFIK1XbnqsOT7EywKGlnUluIYHxFrtrqb5rf+pC1utPus6NXtMC?=
+ =?us-ascii?Q?1u39iVf2q5MxqCmqhEZ62jxdrXZKIApPQ7e2vnq4sb3E8fXAR/a0n1UvsPYX?=
+ =?us-ascii?Q?WPqFCPyFokEjOxDBVgZ5oZP41T8cvmD9skXwXE2wih1aRnh/YOshNcdPLCN+?=
+ =?us-ascii?Q?spY277N/pa2sxf3GN1lFzp12xQNRyazlUeYP1NC6/qA3qdcj2ykUGDIsiSoO?=
+ =?us-ascii?Q?0tSaV5AvBMfAzMNFYz4ZiHGASDn5pQC71JpBXIFv6MILa59OM0EausT2ilql?=
+ =?us-ascii?Q?G0WrtZoJ2TnqBk2u+kk5AjU7D7GdzQPysKLZwybfLNWe1Pjqeraqskbm1Q96?=
+ =?us-ascii?Q?afhd/9zeg1xJYhBlKAMDM0E8TT2Qf6tsIH1p1u0w8/E2UhPxnYWTkCDr7Ycc?=
+ =?us-ascii?Q?JpQB1eRznbk22kb0qY20akEWkaTCefs9gAvTmXkYVyYUBll8lGmN/vgmBrHT?=
+ =?us-ascii?Q?RT7YqSIyPTno15UeRrlNd3E8jOzpRncoRbvFMe4zVkSF20jc96TCFYh6QHpb?=
+ =?us-ascii?Q?Ajvq3+9gsFRSahpjQh29hyMDyLwPugc15m0r5ACb2TdmtP7I5Kc1dk9/AWim?=
+ =?us-ascii?Q?Z1Y/I3yX5ILGR5vNUbz4mgt9AzQeUndySjddK49tiZuW2/jSLzKVLkN5U/A6?=
+ =?us-ascii?Q?fHD1yU4BQmfoXRCK7tdIAwL3jWMn5LbORHtOgxNW6fctVYHW8YlsOJl7PRUa?=
+ =?us-ascii?Q?m4diK9UUGYmQb5PyrXVaMbA33irLrp/B2ljgx8gO4JjXjxWU5GhghPHQoMu8?=
+ =?us-ascii?Q?a9OjHxsjvzpp6cakyi+4vhI+rAW+Q1Zti14xaxAklXky9yYYravwW9O/LcMx?=
+ =?us-ascii?Q?rfN6romZ+osfOxq+Bs3oKT/YP4dlFJslZ2vhmxKGiZss/I4cE5pBFk8eSLDs?=
+ =?us-ascii?Q?qZ6Qfg8lKM46zKYD7MDmUNP+F3yfmBZZyE2RksxSAkAb1T59jnuKs2+XjUOt?=
+ =?us-ascii?Q?k4QDVGJcWhKBy4RrxNu1tG/eV8Bq62FjuLXVShr3tLOXd2yEPEh4gLBmhGx7?=
+ =?us-ascii?Q?zQ/kdll7DcP1XxLpmabBgedy?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a9a7a80-2fd8-4038-a3d6-08d941733786
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3075f44e-757b-4c3e-c487-08d941733ace
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2711.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2021 18:15:35.9959
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2021 18:15:41.5388
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3bX1NihS9hXEggFpTR94wrRk6HNEfJOsZqKUl0TKH0yvCzMPxXhYnHPvpdd63M31qCTsls4qIVLHYKew5FFCQA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4644
+X-MS-Exchange-CrossTenant-UserPrincipalName: B8uyJ/Ne8+jJJhDRvsw68E9+fz7+Hmqd+5PGpw22jj/cj/BMNdvtZOYbjj7m3ur9qHvtYvljwUW//flwpjz1Ag==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB3939
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The sev_feature_enabled() helper can be used by the guest to query whether
-the SNP - Secure Nested Paging feature is active.
+Version 2 of the GHCB specification added the advertisement of features
+that are supported by the hypervisor. If hypervisor supports the SEV-SNP
+then it must set the SEV-SNP features bit to indicate that the base
+SEV-SNP is supported.
+
+Check the SEV-SNP feature while establishing the GHCB, if failed,
+terminate the guest.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/mem_encrypt.h |  8 ++++++++
- arch/x86/include/asm/msr-index.h   |  2 ++
- arch/x86/mm/mem_encrypt.c          | 14 ++++++++++++++
- 3 files changed, 24 insertions(+)
+ arch/x86/boot/compressed/sev.c    | 26 ++++++++++++++++++++++++--
+ arch/x86/include/asm/sev-common.h |  3 +++
+ arch/x86/kernel/sev.c             |  8 ++++++--
+ 3 files changed, 33 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/mem_encrypt.h
-index 8cc2fd308f65..fb857f2e72cb 100644
---- a/arch/x86/include/asm/mem_encrypt.h
-+++ b/arch/x86/include/asm/mem_encrypt.h
-@@ -16,6 +16,12 @@
+diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
+index 7760959fe96d..7be325d9b09f 100644
+--- a/arch/x86/boot/compressed/sev.c
++++ b/arch/x86/boot/compressed/sev.c
+@@ -25,6 +25,7 @@
  
- #include <asm/bootparam.h>
+ struct ghcb boot_ghcb_page __aligned(PAGE_SIZE);
+ struct ghcb *boot_ghcb;
++static u64 msr_sev_status;
  
-+enum sev_feature_type {
-+	SEV,
-+	SEV_ES,
-+	SEV_SNP
-+};
-+
- #ifdef CONFIG_AMD_MEM_ENCRYPT
+ /*
+  * Copy a version of this function here - insn-eval.c can't be used in
+@@ -119,11 +120,32 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
+ /* Include code for early handlers */
+ #include "../../kernel/sev-shared.c"
  
- extern u64 sme_me_mask;
-@@ -54,6 +60,7 @@ void __init sev_es_init_vc_handling(void);
- bool sme_active(void);
- bool sev_active(void);
- bool sev_es_active(void);
-+bool sev_feature_enabled(unsigned int feature_type);
- 
- #define __bss_decrypted __section(".bss..decrypted")
- 
-@@ -87,6 +94,7 @@ static inline int __init
- early_set_memory_encrypted(unsigned long vaddr, unsigned long size) { return 0; }
- 
- static inline void mem_encrypt_free_decrypted_mem(void) { }
-+static bool sev_feature_enabled(unsigned int feature_type) { return false; }
- 
- #define __bss_decrypted
- 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index a7c413432b33..37589da0282e 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -481,8 +481,10 @@
- #define MSR_AMD64_SEV			0xc0010131
- #define MSR_AMD64_SEV_ENABLED_BIT	0
- #define MSR_AMD64_SEV_ES_ENABLED_BIT	1
-+#define MSR_AMD64_SEV_SNP_ENABLED_BIT	2
- #define MSR_AMD64_SEV_ENABLED		BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
- #define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
-+#define MSR_AMD64_SEV_SNP_ENABLED	BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
- 
- #define MSR_AMD64_VIRT_SPEC_CTRL	0xc001011f
- 
-diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-index ff08dc463634..63e7799a9a86 100644
---- a/arch/x86/mm/mem_encrypt.c
-+++ b/arch/x86/mm/mem_encrypt.c
-@@ -389,6 +389,16 @@ bool noinstr sev_es_active(void)
- 	return sev_status & MSR_AMD64_SEV_ES_ENABLED;
- }
- 
-+bool sev_feature_enabled(unsigned int type)
+-static bool early_setup_sev_es(void)
++static inline bool sev_snp_enabled(void)
 +{
-+	switch (type) {
-+	case SEV: return sev_status & MSR_AMD64_SEV_ENABLED;
-+	case SEV_ES: return sev_status & MSR_AMD64_SEV_ES_ENABLED;
-+	case SEV_SNP: return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
-+	default: return false;
++	unsigned long low, high;
++
++	if (!msr_sev_status) {
++		asm volatile("rdmsr\n"
++			     : "=a" (low), "=d" (high)
++			     : "c" (MSR_AMD64_SEV));
++		msr_sev_status = (high << 32) | low;
 +	}
++
++	return msr_sev_status & MSR_AMD64_SEV_SNP_ENABLED;
 +}
 +
- /* Override for DMA direct allocation check - ARCH_HAS_FORCE_DMA_UNENCRYPTED */
- bool force_dma_unencrypted(struct device *dev)
++static bool do_early_sev_setup(void)
  {
-@@ -461,6 +471,10 @@ static void print_mem_encrypt_feature_info(void)
- 	if (sev_es_active())
- 		pr_cont(" SEV-ES");
+ 	if (!sev_es_negotiate_protocol())
+ 		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SEV_ES_PROT_UNSUPPORTED);
  
-+	/* Secure Nested Paging */
-+	if (sev_feature_enabled(SEV_SNP))
-+		pr_cont(" SEV-SNP");
++	/*
++	 * If SEV-SNP is enabled, then check if the hypervisor supports the SEV-SNP
++	 * features.
++	 */
++	if (sev_snp_enabled() && !(sev_hv_features & GHCB_HV_FT_SNP))
++		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_UNSUPPORTED);
 +
- 	pr_cont("\n");
- }
+ 	if (set_page_decrypted((unsigned long)&boot_ghcb_page))
+ 		return false;
  
+@@ -174,7 +196,7 @@ void do_boot_stage2_vc(struct pt_regs *regs, unsigned long exit_code)
+ 	struct es_em_ctxt ctxt;
+ 	enum es_result result;
+ 
+-	if (!boot_ghcb && !early_setup_sev_es())
++	if (!boot_ghcb && !do_early_sev_setup())
+ 		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SEV_ES_GEN_REQ);
+ 
+ 	vc_ghcb_invalidate(boot_ghcb);
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+index e75e29c05f59..8abc5eb7ca3d 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -54,6 +54,8 @@
+ #define GHCB_MSR_HV_FT_RESP_VAL(v)	\
+ 	(((unsigned long)((v) >> GHCB_MSR_HV_FT_POS) & GHCB_MSR_HV_FT_MASK))
+ 
++#define GHCB_HV_FT_SNP			BIT_ULL(0)
++
+ #define GHCB_MSR_TERM_REQ		0x100
+ #define GHCB_MSR_TERM_REASON_SET_POS	12
+ #define GHCB_MSR_TERM_REASON_SET_MASK	0xf
+@@ -67,6 +69,7 @@
+ #define SEV_TERM_SET_GEN		0
+ #define GHCB_SEV_ES_GEN_REQ		0
+ #define GHCB_SEV_ES_PROT_UNSUPPORTED	1
++#define GHCB_SNP_UNSUPPORTED		2
+ 
+ #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
+ 
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index 0245fe986615..504169f1966b 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -665,12 +665,16 @@ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+  * This function runs on the first #VC exception after the kernel
+  * switched to virtual addresses.
+  */
+-static bool __init sev_es_setup_ghcb(void)
++static bool __init setup_ghcb(void)
+ {
+ 	/* First make sure the hypervisor talks a supported protocol. */
+ 	if (!sev_es_negotiate_protocol())
+ 		return false;
+ 
++	/* If SNP is active, make sure that hypervisor supports the feature. */
++	if (sev_feature_enabled(SEV_SNP) && !(sev_hv_features & GHCB_HV_FT_SNP))
++		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_UNSUPPORTED);
++
+ 	/*
+ 	 * Clear the boot_ghcb. The first exception comes in before the bss
+ 	 * section is cleared.
+@@ -1479,7 +1483,7 @@ bool __init handle_vc_boot_ghcb(struct pt_regs *regs)
+ 	enum es_result result;
+ 
+ 	/* Do initial setup or terminate the guest */
+-	if (unlikely(boot_ghcb == NULL && !sev_es_setup_ghcb()))
++	if (unlikely(boot_ghcb == NULL && !setup_ghcb()))
+ 		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SEV_ES_GEN_REQ);
+ 
+ 	vc_ghcb_invalidate(boot_ghcb);
 -- 
 2.17.1
 
