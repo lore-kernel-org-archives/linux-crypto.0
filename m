@@ -5,46 +5,46 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70245C07E9C
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 18:16:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B726C11F68
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 18:16:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55D3461CCE
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 18:16:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A6DB61CCA
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 18:16:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231966AbhGGSTV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Jul 2021 14:19:21 -0400
-Received: from mail-bn8nam12on2057.outbound.protection.outlook.com ([40.107.237.57]:41568
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        id S231556AbhGGST3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Jul 2021 14:19:29 -0400
+Received: from mail-bn8nam08on2041.outbound.protection.outlook.com ([40.107.100.41]:45792
+        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231852AbhGGSTI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jul 2021 14:19:08 -0400
+        id S231643AbhGGSTR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Jul 2021 14:19:17 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PMpYYW/7hIy1JvaQr/V18OwzkizWzsGSXtbMoj6JUS3zMSQtieOm+yWeOUaP8an8AQTR/fUeH6JAlxx+MUxiZIhBmiZKLiYYnTVwvPLIysIOwzrh1RxQteifxyAHBNtPdikon95E5cvrvLXKdeq7KlcPZ7IhQM3JTSeQJZKjgkHx9vQHgg5oZnhR78mIZl+Gm6gNKn0Hp9i0pnOhFFKDv+LbgnK3nc8ayATYWrs6T3aEfE3hv2b4Pg0+/40TsQBZ6v3t00huGuBh+Zy0IWId5m0rSUbGBlpCq+UzrPzBKL8hSe1/pZH1zcYYPVRooFhxR/odDnIMx/Xx0YrfoZV5wg==
+ b=PF/lgwCRw3TZc+NKvIZYNxgVY7AN9dcGoGXwK+jLI8OxbYumUD/K3xRszTQKEtrY5Q0vEoIqHygteCnzgnHCEtBdhtgrUfdoWMwURSMcafdu8UXZLl8n1ZaezpaNvi7G3rE1Ey9WGQgIKoHAEZhkCtdflkYsmCVfk1MUoSHoWkEbzNNhFCy/N6jaOetmKHGGQNwideIztehOGwrMO13o9gX83LbzwbIJiWOQyfCXgkvqUy+OKn1xeZEmhPRZv6MzlQCo5QfYiD2mQJk7J9roMiR2QvTjerES9vBpg6rhQL5Fuk5kIO35uiH5fG54lN6A+QCJe0LnquQIP141X7lm7Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+GAj0n/mh4HxIHmd8pu1nVhyIj/Ean9oCwoFOmBwMJ4=;
- b=QZDNAd8tCQjcm/zLruYyjQa24/Bo1wwKs3o2Dy1Cwwa9DyyKiGoIYGYnQMfttvQMZIlycv++4fVqGSo+u8B3TpLX283CK39HC4zYGxaPHcpLSj2lZprWyb8staYcpsbqyx5ox2a66aD1t2jz+nwvkKYUjmaIJjUff+iG1Ak/X890MWnUezF07v7S8Lbs+6Xd88ojmJ/G4j3UzUucK5dTMLAWZ1Jax6Y/YNbmWKuqGKyEvyXLvGY1OH//bfB2tr3/JWQrG9mtKxU8GdNf5xF0RoxdKSYrBn5IUYBZfqcf3UL2UmukAUmg7+33DJBk7XuoToSpQJDY7mE71UvsKKcpyQ==
+ bh=GiUqerpB9vjzA1VWp+uR5Yl+kyR8h9OKCLWLo/DJvek=;
+ b=Bj5FGSWSWV/VuD6b68SMLUJ5SltR8mD6Ub6XzlRRaUAQY4j2qshUR8cf4ArE2N8Nn2Q7TbN7bX/E2+7LNOr5G/gziRh8hEzaMFFeAq36q4rE8+nL07/N7kKsCywnuEKCNgu3BJ/+NvVJiWGRx2+08aTXbPf6fEX+bKkEaO4PNms5AbAKumAPXzxIoBrPTapuP/yzU8UhJppEv1/si6D0bmKFvuuPDQAVq7o0Whcd3WfTSwrFX2M+/no61DelABW9coQTmY5l0E2TTKZgLW8PNpKt2iasz2qpTZzYTM4dt1g/U6Qgf/z5wDT+/gD1RdMdAXay34m9hMihb9Nq1rOJug==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+GAj0n/mh4HxIHmd8pu1nVhyIj/Ean9oCwoFOmBwMJ4=;
- b=5RHnVb78UBKrSMlIKp60JbFxI5m0avGO2ETkiNk6cocqafWzILc9vVMufIKvl2Twzgrc2eBG10HSVmITSCAY1T2B/3JNUCOoDUtPJwSymHXOst7DL5ILTTn7rD80IfuXnqbQU9PNr0UNTA4lAlNL/+v/DvLhgKuhWzpSuFV6pAQ=
+ bh=GiUqerpB9vjzA1VWp+uR5Yl+kyR8h9OKCLWLo/DJvek=;
+ b=dWWovH9GBQMrAiIOwaCL7qorkuYuPLFa+fcEHy6jCRrdxzwj70upBkeWv2KW0djoWwCf2ztrj+i71g8JAL3exkKvjasiHhLj2w+lOidATwbt1qaAx+bNdTDwkTom84DPWNIooFuNJZ9z31G70WQBIscMrdaivRVJCzEIndAU2Kg=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from BYAPR12MB2711.namprd12.prod.outlook.com (2603:10b6:a03:63::10)
- by BY5PR12MB5016.namprd12.prod.outlook.com (2603:10b6:a03:1c5::20) with
+ by BY5PR12MB3683.namprd12.prod.outlook.com (2603:10b6:a03:1a5::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20; Wed, 7 Jul
- 2021 18:16:03 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.27; Wed, 7 Jul
+ 2021 18:16:33 +0000
 Received: from BYAPR12MB2711.namprd12.prod.outlook.com
  ([fe80::40e3:aade:9549:4bed]) by BYAPR12MB2711.namprd12.prod.outlook.com
  ([fe80::40e3:aade:9549:4bed%7]) with mapi id 15.20.4287.033; Wed, 7 Jul 2021
- 18:16:02 +0000
+ 18:16:32 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
@@ -72,9 +72,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
         npmccallum@redhat.com, brijesh.ksingh@gmail.com,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part1 RFC v4 14/36] x86/kernel: Validate rom memory before accessing when SEV-SNP is active
-Date:   Wed,  7 Jul 2021 13:14:44 -0500
-Message-Id: <20210707181506.30489-15-brijesh.singh@amd.com>
+Subject: [PATCH Part1 RFC v4 25/36] x86/boot: Add Confidential Computing type to setup_data
+Date:   Wed,  7 Jul 2021 13:14:55 -0500
+Message-Id: <20210707181506.30489-26-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210707181506.30489-1-brijesh.singh@amd.com>
 References: <20210707181506.30489-1-brijesh.singh@amd.com>
@@ -84,107 +84,131 @@ X-ClientProxiedBy: SA0PR11CA0104.namprd11.prod.outlook.com
  (2603:10b6:a03:63::10)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0104.namprd11.prod.outlook.com (2603:10b6:806:d1::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.19 via Frontend Transport; Wed, 7 Jul 2021 18:16:00 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0104.namprd11.prod.outlook.com (2603:10b6:806:d1::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.19 via Frontend Transport; Wed, 7 Jul 2021 18:16:30 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d6c17605-d6ad-47b6-7608-08d941734783
-X-MS-TrafficTypeDiagnostic: BY5PR12MB5016:
+X-MS-Office365-Filtering-Correlation-Id: 52d29a9f-0353-4d48-64e1-08d941735953
+X-MS-TrafficTypeDiagnostic: BY5PR12MB3683:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BY5PR12MB50164DE2EF6044E506BFD111E51A9@BY5PR12MB5016.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-Microsoft-Antispam-PRVS: <BY5PR12MB3683D90852A49ECDFACCFC59E51A9@BY5PR12MB3683.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: a7vv3yFO3nB310cMkrqtD7Tvvoc/7evptrBTo1/FbTeYU+cjI+ctkUAVbPKH6oa2KBiY8UUJGHLNCs6KVcwDadxR7ARF4liJf9PPucoQ3x1movXfYWom6A1y3B+Ed0fst/BYRvPBzuaJssYw8a5z7QWpcODyNd/y63HoUm/xUYMuZWxPC2b5W84AEsUAuBDzzdHdXe8zMIUQStvwIHMAFx/wXLaUj5jSGW8G8mJQagwV72YlozWM79xf0fBe+2d9Jlf9GHSdDey5TSsA9Tz4Lh/+lyOS8zFj0wFprT8SezXMBLEe/WNtR7aY4iPvd0LpRqxsyCV5x3Wm3nlRHOBXpU58oNp1KrG2Sz3O19AMoL1wXAG9ZUA2XeJpE7uLGA2ZW8ctIzy0wX4uwMahd2e4g8NdAWmrVOuaE2OTHYgs34CLSvInw6ykSqnoimuGfeggci+4u/+ChYtSOwfx8YHzyIo5M/vbo1c6i5PxXO9X0/zqibdDG9I2ZHIDdq2euZFpTATjLBgzivsbbRMe+LwwM7+820YfEuhtNbLfrTSpiKBRVVADJ4gly/UVQjGUYs6TGcBXLUQ/hhvcOFqy96gSXMlhpudJ4D938rWckb0HTeGT0QNJi7KHy2SXsS7vbK8GBEbbCwf2h8LdORvnXFAiKjj0VtYxd1fLdjq1WUx+POrCBf/0tPBxLKZagwutpZcVOMDP+13tSKGPCgPLA7So5w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2711.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(396003)(376002)(366004)(39860400002)(136003)(66556008)(66476007)(186003)(7416002)(52116002)(15650500001)(86362001)(26005)(956004)(8936002)(478600001)(7406005)(7696005)(8676002)(83380400001)(5660300002)(2616005)(38350700002)(38100700002)(44832011)(2906002)(1076003)(54906003)(6666004)(66946007)(316002)(4326008)(36756003)(6486002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: TyW23MbKhxUc6nBezNiwIm6LFU0etLhpU0ol1CjPOxyKJWUS4ao7MmBXAcBx7HzxUpj/zj4jFvEKf0P1B0Q2fEULyfsgCCxul9vUmu6TA/YZ0QyfTATtQHnNAaGJ7f8tRkaRlrO6t3cb0zvTonIb+Uqet5mwa2/TeynL/rxiSeEMBbsZ2vMAqYLmrH+fY3p1bAiFkXxsQaY9tp5wx2ELI92CgfNoMjlvMtxkLDtDTMou8JF5MJ40nkpbRtviwLs8eNQqLLL0CZzGA3KQCWoHRLRAWe96i0LLdj8I472qVUUf+fkQ3SyypIvGKVzp02yurQU6CKr8Y3TLFDBZWGQ0yOV0aSOtF/k8at7aySEnj5KLYdQffQpvavDEy11ou1eSI+t/A/oX3emdugxG0bLYxbqZzup54rGQwOgwxSoNqGvOPUsG6Zh0aonlDS3t6v2WgsmcHnXv9oxJTGxeRafk+1qD/DwIlmOUUvNwYtgNntONDAUsnZR346OIsD9aJDFvWo7QGeVGOTVPmHL99bYbntjKqEvBJyEe7iOZ3GO5mQQ/GOGgcK7txRf5VZYc06E/NFOfyO1qpVHlq6z5WZjUA17x5sP3rzni5BtvFvpwxd+DkRvDfQwjI4tx//BjxbI433dHzp1KyPC8AXqz8pu2LK4eALP+wKSZP76CBfmnbfQt2X254f2ZixE+RxG3iarpjbCQy/n43FEOp2bvV8CCOg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2711.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(136003)(346002)(376002)(396003)(5660300002)(8936002)(2616005)(44832011)(956004)(38350700002)(26005)(6666004)(7406005)(7416002)(1076003)(66946007)(4326008)(54906003)(66476007)(8676002)(66556008)(2906002)(36756003)(38100700002)(52116002)(186003)(6486002)(7696005)(478600001)(86362001)(316002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?R/yRKhMEE+J12SNMMPueZRiIJbxEv/x0HAQl1rVMoKtd8zfyC6eCH7W94qnb?=
- =?us-ascii?Q?RDs7UsBLQ8W5eJCxIxSaA/+ZSjGzfJ8dEsJdP9qVC1byKK29xcGlFwQ9rpp3?=
- =?us-ascii?Q?Zd4Lrnph131b2+GeQDLU9kvB3OvEUr8inIpKB9Q8pNqRQnZSVUNwJ/LPIsJA?=
- =?us-ascii?Q?GypzXGUpFwajfdaDkVvz/sD8IVhmtD/BjY4wp+1PG/n+KdP/IQ7xXqtaP6uD?=
- =?us-ascii?Q?nfEZ4Jth8KupkBS2H9hj3seh8BkAOmYDdyHcJwiUsV4qPq8HtaUko6USv7lI?=
- =?us-ascii?Q?izds4HzGBoZ2pf+ZXgqdrt1/uYSKtOzU6Pv2Y/DGgvJ5Nl4mWsPdGUJO4kVO?=
- =?us-ascii?Q?T+DLg6l9lKESKEYlYe6k7xnkxjp1u/wSfIY5c+N5tglnyrLkJzUlPuLxYLm+?=
- =?us-ascii?Q?viu1PupL3JvFtfgGXyhYmZmx9/AKnP/3m9B9CXAjo3oL/Niqu0s8GgAbqAMg?=
- =?us-ascii?Q?x+Wu42KIr0WTkK7s7SLFhHU+cmXrMHchgzWi9aX4dRuq205iRc03ZFlHsCAx?=
- =?us-ascii?Q?VIwWeeaV8r6ItbO3/9a17T/IzSwvKVlEyLaxIKa17I2Hvvejdn1/6kV9tS8J?=
- =?us-ascii?Q?OholRSMEwSzqyiNL/ZtD0xMXQ9YUpxwgAzwWZQjT2K0U6oKJ+F2M2YPachqz?=
- =?us-ascii?Q?azjc7vJEbZ7qV7BkMIdSpY9JfxSDeAafHoo8nSyb/ttOWFVww0iXXDVkFGnf?=
- =?us-ascii?Q?umossHb1HeS3wyYepu9soR19iGhUtT31VVdjJsAuPfbLaHeZrMMBGeVbk/dd?=
- =?us-ascii?Q?kyxiTwzYEceHIoVS+hmsHutJVRTqDalygD5N3aNmXxk9AJoL5R/16Umfk2+n?=
- =?us-ascii?Q?yhuRjTNlTbU3poscYacFJ643UN1cPaHfXYbueZRfswe09rLgIJu8jyG3ElnN?=
- =?us-ascii?Q?+OJcHEwHX1O+W6VNamkEICuClH06fYLTf6uj15UkDDv6C9+uPTZdrNqYrAWF?=
- =?us-ascii?Q?uwOQExL7F6lPgJlTFdqcVeQ+nQhMufJDPqvKoVUl4KZDOBAHD8ApODjQYfaP?=
- =?us-ascii?Q?odsf3oBQQ7ggosfE2gh3x2xDkt6R10E7CGiUYAAY8hlOdNvzGRUtqZ6uOtsb?=
- =?us-ascii?Q?uxLGG4fglqkQCtq5WWPl7UR3y4csuDpHiOVcBSJne56ucen4B/Kgjv3JP716?=
- =?us-ascii?Q?GOSF3oWfFvSD6H8V/kGrdZ6vIwvRAs0IdzmJKs81z48LIgwvcXx1CaSaEdle?=
- =?us-ascii?Q?GFb8H8hAWGIzlCKSnz0xpOQjXaxtKD5/nKQsBwpnLA4CKG1JUesVcyXtDm+p?=
- =?us-ascii?Q?F6eqYCfzENMmO8iBJnK0thoFjqYVIPvFWIO0QMDlC9WsdHraw0wuu5MTj7ay?=
- =?us-ascii?Q?OLEA+f8B1wAufWYisZbPw6B6?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?HEAOp9HCNFe5cDkdM2bbRFcacJDzNKREs/9inZO2XYpJAENATJu8V4Mp3IIx?=
+ =?us-ascii?Q?VJJXct+0v+BO080/vEvoRvGvsTXpkltIyjwn3DXvGOBXvKqiWxjE0oKFyBDQ?=
+ =?us-ascii?Q?oRQB0YxiuRKv5LWPC8Jn18AI8JyjI5QqWYL6LEg2/KDvhvbNIju5UqKor9wI?=
+ =?us-ascii?Q?2FTN8VDPEsibUZ389Lq2FQGWZAihIxLDbJcI01Tn1McCSVLUAhycEalqtYLM?=
+ =?us-ascii?Q?W4KNkjEY0yHEvq6CY+QglmGXTzDrMF9WaXYqh42X72NdlR+3TEEMowMn4YFM?=
+ =?us-ascii?Q?ax8nByrC/NI1kdl2Q/+0965SMEX/0gdOKa9s+ieSW+dOSMOfi92uikQbg7ok?=
+ =?us-ascii?Q?wEG8LMLklwh+A113tWvKXF6RqYZ0nIn/ikq2XtfXpBSWH3eXYvUAF8e196Gh?=
+ =?us-ascii?Q?Co/35MbuA54r2T+LvECOyiq1XN0iNSXVGDLRlM1Pz8yXSIQsabMceEygLChq?=
+ =?us-ascii?Q?DAzUADjWrWzxPJtWxTqqNRRPStcvEX485hCuuR8PJEKJNgTpO58Mk492shMQ?=
+ =?us-ascii?Q?rX62IMaztD2+myoWBCVKjPzIm5qrFq2rajmMEnuVtIWD+/sVlPIlmBV87bWs?=
+ =?us-ascii?Q?P/xjjTyoxbWfFufXniLHCrN6HMO3kTAzhJwZk5xvXs0txMs+iSb8lNBamDkB?=
+ =?us-ascii?Q?Ds1Nf1wJIrlAW3VqT6LYQhOKPXSeFJf7xwsuhU4Xqfg26QqFlxRi9n8werVV?=
+ =?us-ascii?Q?bAuk2xidnjju7TDwBrf9L7wz6sJcVL6bmRAMYZ/Ly5sq4W6/s7skWLrl97Ox?=
+ =?us-ascii?Q?CLUxl2zHPx6yik/LiqoX6qK9zWTzdPXP7vrmSOldBh66esC5imMtL5GByWQt?=
+ =?us-ascii?Q?G3hBVYTMIh73TUf9ovd4JMlHlPDGzxvUPp3/0dDv85uwB09Ytpi/Z4pdlpC0?=
+ =?us-ascii?Q?LqP1ud2yvbhWG+is3fssuhJiqd2KFeTJyx+mQ7dp6hebdhu/uMyGSPsO4izn?=
+ =?us-ascii?Q?GvMcsfqfihNiHFptXs1GlXpevw3HoKD//Jwj+SflvIYRCff8FE0E31J6HeJj?=
+ =?us-ascii?Q?DLiwsUaN3/L4qxGTIECrgQYxoIpDlpy8KD43Lee4KZHL2A9FxAdOZulGUEGL?=
+ =?us-ascii?Q?w6pFsvRJsKdM+yVFWJLYqZsZtvAdonksn5oM7bzMqUemUn9dIQ8Zi6sFTohI?=
+ =?us-ascii?Q?MVBUFztBSrVHxuN8zqNhOWQAeyFlCrTP49EKg/SJGBPwoqA5W7BPrIc5ijQM?=
+ =?us-ascii?Q?dkjv/N/NKsiz2SBWkIAHdyKHYZCvfa1QgHDWEbnsPHLzA6MEKxcSTB/agmtI?=
+ =?us-ascii?Q?t0Rm1CZ4PeG4CEhV9rA31vVsubpuwY1I5V/5SvsaLAq5KiGAj2FuVIc2u4fL?=
+ =?us-ascii?Q?PKj6aHmU8zOr5X1I/IkRJfaP?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d6c17605-d6ad-47b6-7608-08d941734783
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52d29a9f-0353-4d48-64e1-08d941735953
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2711.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2021 18:16:02.8167
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2021 18:16:32.7066
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bTRMRBhlR2P3C9VixrNNYfNEPVCwKtKvR/E+Z1MtOAntDLHJGA34Kfqie/MCJSipK37ub0vfPM877CYW/JsgrQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB5016
+X-MS-Exchange-CrossTenant-UserPrincipalName: IwZ9Vikw2AAiJFsspTcYPUiDDdzcwGcH7raiYjCfMkPATyVblQIG7Zfwfltr418KZL92qS1RSTJesDMUAIQBSg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB3683
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The probe_roms() access the memory range (0xc0000 - 0x10000) to probe
-various ROMs. The memory range is not part of the E820 system RAM
-range. The memory range is mapped as private (i.e encrypted) in page
-table.
+While launching the encrypted guests, the hypervisor may need to provide
+some additional information during the guest boot. When booting under the
+EFI based BIOS, the EFI configuration table contains an entry for the
+confidential computing blob that contains the required information.
 
-When SEV-SNP is active, all the private memory must be validated before
-the access. The ROM range was not part of E820 map, so the guest BIOS
-did not validate it. An access to invalidated memory will cause a VC
-exception. The guest does not support handling not-validated VC exception
-yet, so validate the ROM memory regions before it is accessed.
+To support booting encrypted guests on non-EFI VM, the hypervisor needs to
+pass this additional information to the kernel with a different method.
+
+For this purpose, introduce SETUP_CC_BLOB type in setup_data to hold the
+physical address of the confidential computing blob location. The boot
+loader or hypervisor may choose to use this method instead of EFI
+configuration table. The CC blob location scanning should give preference
+to setup_data data over the EFI configuration table.
+
+In AMD SEV-SNP, the CC blob contains the address of the secrets and CPUID
+pages. The secrets page includes information such as a VM to PSP
+communication key and CPUID page contains PSP filtered CPUID values.
+Define the AMD SEV confidential computing blob structure.
+
+While at it, define the EFI GUID for the confidential computing blob.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/kernel/probe_roms.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/sev.h            | 12 ++++++++++++
+ arch/x86/include/uapi/asm/bootparam.h |  1 +
+ include/linux/efi.h                   |  1 +
+ 3 files changed, 14 insertions(+)
 
-diff --git a/arch/x86/kernel/probe_roms.c b/arch/x86/kernel/probe_roms.c
-index 9e1def3744f2..9c09df86d167 100644
---- a/arch/x86/kernel/probe_roms.c
-+++ b/arch/x86/kernel/probe_roms.c
-@@ -21,6 +21,7 @@
- #include <asm/sections.h>
- #include <asm/io.h>
- #include <asm/setup_arch.h>
-+#include <asm/sev.h>
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index f68c9e2c3851..e41bd55dba5d 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -44,6 +44,18 @@ struct es_em_ctxt {
  
- static struct resource system_rom_resource = {
- 	.name	= "System ROM",
-@@ -197,11 +198,21 @@ static int __init romchecksum(const unsigned char *rom, unsigned long length)
+ void do_vc_no_ghcb(struct pt_regs *regs, unsigned long exit_code);
  
- void __init probe_roms(void)
- {
--	const unsigned char *rom;
- 	unsigned long start, length, upper;
-+	const unsigned char *rom;
- 	unsigned char c;
- 	int i;
- 
-+	/*
-+	 * The ROM memory is not part of the E820 system RAM and is not pre-validated
-+	 * by the BIOS. The kernel page table maps the ROM region as encrypted memory,
-+	 * the SEV-SNP requires the encrypted memory must be validated before the
-+	 * access. Validate the ROM before accessing it.
-+	 */
-+	snp_prep_memory(video_rom_resource.start,
-+			((system_rom_resource.end + 1) - video_rom_resource.start),
-+			SNP_PAGE_STATE_PRIVATE);
++/* AMD SEV Confidential computing blob structure */
++#define CC_BLOB_SEV_HDR_MAGIC	0x45444d41
++struct cc_blob_sev_info {
++	u32 magic;
++	u16 version;
++	u16 reserved;
++	u64 secrets_phys;
++	u32 secrets_len;
++	u64 cpuid_phys;
++	u32 cpuid_len;
++};
 +
- 	/* video rom */
- 	upper = adapter_rom_resources[0].start;
- 	for (start = video_rom_resource.start; start < upper; start += 2048) {
+ static inline u64 lower_bits(u64 val, unsigned int bits)
+ {
+ 	u64 mask = (1ULL << bits) - 1;
+diff --git a/arch/x86/include/uapi/asm/bootparam.h b/arch/x86/include/uapi/asm/bootparam.h
+index b25d3f82c2f3..1ac5acca72ce 100644
+--- a/arch/x86/include/uapi/asm/bootparam.h
++++ b/arch/x86/include/uapi/asm/bootparam.h
+@@ -10,6 +10,7 @@
+ #define SETUP_EFI			4
+ #define SETUP_APPLE_PROPERTIES		5
+ #define SETUP_JAILHOUSE			6
++#define SETUP_CC_BLOB			7
+ 
+ #define SETUP_INDIRECT			(1<<31)
+ 
+diff --git a/include/linux/efi.h b/include/linux/efi.h
+index 6b5d36babfcc..75aeb2a56888 100644
+--- a/include/linux/efi.h
++++ b/include/linux/efi.h
+@@ -344,6 +344,7 @@ void efi_native_runtime_setup(void);
+ #define EFI_CERT_SHA256_GUID			EFI_GUID(0xc1c41626, 0x504c, 0x4092, 0xac, 0xa9, 0x41, 0xf9, 0x36, 0x93, 0x43, 0x28)
+ #define EFI_CERT_X509_GUID			EFI_GUID(0xa5c059a1, 0x94e4, 0x4aa7, 0x87, 0xb5, 0xab, 0x15, 0x5c, 0x2b, 0xf0, 0x72)
+ #define EFI_CERT_X509_SHA256_GUID		EFI_GUID(0x3bd2a492, 0x96c0, 0x4079, 0xb4, 0x20, 0xfc, 0xf9, 0x8e, 0xf1, 0x03, 0xed)
++#define EFI_CC_BLOB_GUID			EFI_GUID(0x067b1f5f, 0xcf26, 0x44c5, 0x85, 0x54, 0x93, 0xd7, 0x77, 0x91, 0x2d, 0x42)
+ 
+ /*
+  * This GUID is used to pass to the kernel proper the struct screen_info
 -- 
 2.17.1
 
