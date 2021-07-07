@@ -2,171 +2,223 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C48C07E96
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 00:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2FEEC07E9C
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 02:45:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD2F661CAA
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 00:58:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C38961CB2
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 02:45:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230074AbhGGBA6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Jul 2021 21:00:58 -0400
-Received: from mail-io1-f70.google.com ([209.85.166.70]:38779 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbhGGBA5 (ORCPT
+        id S229975AbhGGCrx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Jul 2021 22:47:53 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:59838 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229894AbhGGCrw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jul 2021 21:00:57 -0400
-Received: by mail-io1-f70.google.com with SMTP id y8-20020a5e87080000b029050cfd126a26so488723ioj.5
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Jul 2021 17:58:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=vZf3B/GjtO0uXvqJJFjh6duuRg13nY/82mtz/5bn2eg=;
-        b=MwrPQb/s1JIWylYZPJ/ibrFz1u0CReCqT5K80R7rtAPQA9xNdfcXXYwr5QYs6vRgyr
-         KmB1d6J2FgzLgOMHu76WR9ONQ1vRaSySCcnq1NLUz2iYWU7x0L3++LJRo3DWzfKILxLN
-         K1W4OJNswujoH3RLhB8mU101cdNZI4kmDAdCSCXHIGhgCfkAamOAYysj2C2hxmHEAZEt
-         aL0ac1kjhmL7KQ4jTRhNmd0XMlyQIOFUIm0lLpnDJXcpBSIljQoHZqplMdd2mRnVqYb0
-         7DT+xPLunA7693Elz41glrdvOvdj2RBo5I3vsrYjcRtliHOwyue+XMCrhdnr62P4YV0q
-         9+MQ==
-X-Gm-Message-State: AOAM531EUl09XZwH1TT17Veu4WSy3pPERDIlVrtkCJO02Pe9XVJI+lre
-        nud3FtpMTdYH4wGhPt7Dizeqg7TufExW4ZQcBI0mamqdsmru
-X-Google-Smtp-Source: ABdhPJwm2ePla3rrFtaa4iOlr2iUMjHQkWvskTQkD18HW6EikIG57prs40cLm6Y/FzoM9vD86lMI0gFmYpxwWR59rZ000J861lFA
+        Tue, 6 Jul 2021 22:47:52 -0400
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1672aKj7004673;
+        Wed, 7 Jul 2021 02:44:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : content-type :
+ mime-version; s=corp-2020-01-29;
+ bh=zHV6mIOdL0wBvrgQOW8vMNFAB8zdE3I/osIowexbogU=;
+ b=nW4aK3GUP382Wr3b5VoGn/3JiX+UF1jdEJ8cNrpydfTxiQ0k3pjVuDmlArXOdec2rQjC
+ a3Rp19tKNE3rZD8jyPu1yij7K/I9g7D2vn7gr7qpYkmHbU7W1v6CDCNeQnDEhBqtJsiL
+ 7/ZIV6rZhTIu25PEhsGmyAGFXDvM52J2yp+RnvEJkh/ZPAg9bTmweKL06Bvei6ZahD39
+ CgOvK51AhsclrYvYxFbAsWoxKUw9bjtI9fsU5I3v7UruHFZs3WPu37eVlqAvVcco7hfh
+ xJzccyvWrjWAKHP0oL3N2fQWDPO77X8LTaitXQbEby0dIiOFc2YvHEzKXbxrmqJ43C3M sA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by mx0b-00069f02.pphosted.com with ESMTP id 39m3mhb2ud-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 07 Jul 2021 02:44:32 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1672aUVJ193064;
+        Wed, 7 Jul 2021 02:44:30 GMT
+Received: from nam04-mw2-obe.outbound.protection.outlook.com (mail-mw2nam08lp2172.outbound.protection.outlook.com [104.47.73.172])
+        by aserp3030.oracle.com with ESMTP id 39jdxjaahd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 07 Jul 2021 02:44:30 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WUInn5ecEygorVzm2KJQ3Q5v78w3n9Y7EIBMf2VaEy2TC63UkP1qULQC0Zbs+HFMR7GoBs3wVUdcc0tb2hN5brCcdkcOgVjnVT0gcXZKEq7XEdByFBMoVRqAzh74ScWmOcJ/fmmiNi8q+qzl+COoQ4iX9HWlTeYN+InjZatJZA0KFe6DavenUKKrsropHDlQn81SgnXbWcTPrFCeG9ks0QWz9SvzITxmfyal7JZlecLSQPih744FmApjrJlc0KEqa5uWOUnV8U0q43Psnk8J/QlsRYXEKfU2UxgXP4H/SagRlm7CfuhpkLJuZb2hszbnwuXO4Bw9LJmI6/gKMRJROw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zHV6mIOdL0wBvrgQOW8vMNFAB8zdE3I/osIowexbogU=;
+ b=UjC8N7KU/SlAn9a0ZlLF4h6s57Putqk3x9W8/ZkzZrPiwoqhuW9L3+cRhRRmu3yx6y/pm1wzPgkCF+43flDLyyF90smHt5TcHLfOybkpVfmGVc8a1wPIHhESeNH7Tr6M/HtEwjZdNFsb9UEJxuWpqhgT33+6Xhke0IU3o89JWCotSXLK9Gvp/JZwcNZ4mnKXnNIdPAEXG8nN2bhLb9mSHxHfBcaTdKgN3VFyveFr14V8shMUkXdudDHIXUkfZvE5N5IERcXx4fMx31nzveREV1a+0K0J8LXmUXEFrVoDT00749GbvCVdnYHnB81GKtnPrByh3HXDEy18v0WvK0votg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zHV6mIOdL0wBvrgQOW8vMNFAB8zdE3I/osIowexbogU=;
+ b=arPQO0jL0TqLUk/9LWtm3AFzvEU6qiSb1JHt8J8pqDDf9LJbWeMexVcGMaI5lfkyfNnfmcDVOjQP6JkdOLecig52b0q0tzt+HR/NNhW7CAHOw6ZyGGrHqho6PR2xeRIaT/8/z932UlijDahxsYmZSlTgYrbh/ofqLEzMpFNKs2A=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
+Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
+ by CH2PR10MB3863.namprd10.prod.outlook.com (2603:10b6:610:c::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.24; Wed, 7 Jul
+ 2021 02:44:28 +0000
+Received: from CH2PR10MB4150.namprd10.prod.outlook.com
+ ([fe80::a890:e571:de3a:7197]) by CH2PR10MB4150.namprd10.prod.outlook.com
+ ([fe80::a890:e571:de3a:7197%8]) with mapi id 15.20.4287.027; Wed, 7 Jul 2021
+ 02:44:28 +0000
+From:   Eric Snowberg <eric.snowberg@oracle.com>
+To:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        zohar@linux.ibm.com, dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jarkko@kernel.org, jmorris@namei.org, serge@hallyn.com
+Cc:     eric.snowberg@oracle.com, keescook@chromium.org,
+        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
+        scott.branden@broadcom.com, weiyongjun1@huawei.com,
+        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
+        nramas@linux.microsoft.com, lszubowi@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        glin@suse.com, konrad.wilk@oracle.com
+Subject: [PATCH RFC 02/12] KEYS: Allow unrestricted keys to be moved to the secondary keyring
+Date:   Tue,  6 Jul 2021 22:43:53 -0400
+Message-Id: <20210707024403.1083977-3-eric.snowberg@oracle.com>
+X-Mailer: git-send-email 2.18.4
+In-Reply-To: <20210707024403.1083977-1-eric.snowberg@oracle.com>
+References: <20210707024403.1083977-1-eric.snowberg@oracle.com>
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR03CA0245.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a0::10) To CH2PR10MB4150.namprd10.prod.outlook.com
+ (2603:10b6:610:ac::13)
 MIME-Version: 1.0
-X-Received: by 2002:a92:db4b:: with SMTP id w11mr16165638ilq.194.1625619497084;
- Tue, 06 Jul 2021 17:58:17 -0700 (PDT)
-Date:   Tue, 06 Jul 2021 17:58:17 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a9ed6205c67e08c6@google.com>
-Subject: [syzbot] INFO: task hung in set_current_rng
-From:   syzbot <syzbot+681da20be7291be15dca@syzkaller.appspotmail.com>
-To:     colin.king@canonical.com, f.fangjian@huawei.com,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mpm@selenic.com,
-        syzkaller-bugs@googlegroups.com, tangzihao1@hisilicon.com,
-        yuehaibing@huawei.com, zhangshaokun@hisilicon.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.us.oracle.com (148.87.23.5) by SJ0PR03CA0245.namprd03.prod.outlook.com (2603:10b6:a03:3a0::10) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20 via Frontend Transport; Wed, 7 Jul 2021 02:44:26 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d4f55a56-db4a-481d-500b-08d940f123c9
+X-MS-TrafficTypeDiagnostic: CH2PR10MB3863:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CH2PR10MB3863936205222E0FBD685D37871A9@CH2PR10MB3863.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SByp2sc3Pk6id8t38p8I6eeu0TsN+OgIvSQ+ZN71f5FBnO32jb75ZBcroMxSVG7MMGoGSnxxQN0YXkintDgh76d6lGSUpxw/1OAWYtTaCQ8kObeDswEQZz4xhF+uX9o03/ZQ4FS9iuHsDrWFG+tATKT0JXEks6lckt5glEv67WfCoUr6dZZ6/9Ksdox8H6LuKyqjHy8Sx25V4Z9iNzMoges34xxVqpABVqVVj6d85o21XDo7oaAKZ9Z9DVhgDZ425QVYf+Zy49i/frWse+b1RKY69PDf0Av8uTxt31r9NSd3tVuShn7vWojbniPPbS9d60nM3wNyGevGx6VUg00XfWihy6g/t25nsJHIgJarpeb03VpcjZq42Y1P9XDxXSMq4LnHZZ1QkxD4OhIHu0csaDxw9EEZ9N3SQWQgBagwd8kF52T8YXtYn9n1hLOSS0CQMM3j8Qzg6/mX+hXPCPUtc2M0ft78H3TPdFlRTdQNF2+aFEjJtGy0S6OBTB5VOMadJ4Ymbd5xdj02oUDCDBTnvDYAkFtFYQJVcre0hk7Zi8J0EocZv5AuNV+voU1EoOWEmA+mhQBSaWEaBoilpQu90/Cvgkc+brxHO28TNZBsLY4fEbbPwiqqmYl11QDPvTuBDsr/WxaY56IIVKwOG2MtUFthIYGZVOgB4XtlmCVAk6Tgs21b/WfzaFq1hkbl3nsHLBUFXbZOEKE06oWcoFNQEPfQBBDT/kUfydUIUH5YEyo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(136003)(366004)(346002)(396003)(376002)(921005)(107886003)(6486002)(7696005)(316002)(66946007)(1076003)(44832011)(86362001)(38350700002)(6666004)(36756003)(83380400001)(186003)(4326008)(956004)(26005)(7416002)(8676002)(52116002)(2906002)(38100700002)(2616005)(8936002)(66476007)(5660300002)(478600001)(66556008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qzKPd+2GL7/0APMSH4Z/DojXVOamHwErvRtggDgmBPb/jSW2eBFQaUjzhG+7?=
+ =?us-ascii?Q?chEUMpAVf3nLC4MRn/ZYp/1B3fIggw2CYtRRmKWudsxsM/U/3Jl6ZfO+FuOv?=
+ =?us-ascii?Q?Fz+7sdT1Ycf0uj653ETeeIHMgHLCCv5TIbwRNHHHLjoM0cCpcWWKACdPkFMv?=
+ =?us-ascii?Q?bC9sCPnZ9LWF0sOqV9305lqvOW4AwJUI/XIpFfQg+CCnnQxWorNh9L1NEVdd?=
+ =?us-ascii?Q?o6JznpnzkYbNsc0Wh8iZ//Td7X9xxAE2U2+R8E4YXmbYh9gy2QavFAnUu2OW?=
+ =?us-ascii?Q?f1yzxwGDCHRvrHjvoVlbRiC4+c+CFF8xGZe1BKO5PIL87bNeyBY0sW0rzS9l?=
+ =?us-ascii?Q?qS6BehYzrusT1Jds+Gk1jB7qkTy7eO2ypLcPEIw6nz9vsLv0of0Fwiv6tMTt?=
+ =?us-ascii?Q?Q9Nn/HFnuJJ/cF/bxdnnZTk/GjoOY3zbGRYbo90XXEPcSmU7RPye31BowK4g?=
+ =?us-ascii?Q?aqA19+6Y50f0tC0OgKTsnFo9j4bYXASg+wKiDM90yp790Pd5HD9C12oozx3a?=
+ =?us-ascii?Q?CBHEq2bS7cUjXePXGrhjLjH5zpgtQ/9HsraiJyLM3Sl/YEfy9KPj0lWaSB2Z?=
+ =?us-ascii?Q?scDZ2q9O8eGN2io4NIuGlR6sRbXxxsaXb7+APwNG2gCMsNZStMNmNwNWS0pF?=
+ =?us-ascii?Q?kSe3W9y/Q+b9Idqdt90SM/y8oM/QbfY7/hh1YBdTx5oZq4PK4FvzYX+o5Jdb?=
+ =?us-ascii?Q?tsZIxOiQP+ntITMEJBibBgq+EEGqoa6mgBPX41R53DpiUiuU+Byd1OBZhuLb?=
+ =?us-ascii?Q?yqb1vwnO0F1sH15WVZaHVFcWEejUmkk5Dyk210Mlue9Tv/S0sATHJ6c5IODS?=
+ =?us-ascii?Q?2bUsa3uqDaSg4v72NbGWBoNIA04FcEMIBiSXy2u7d3oj1ZvZ+8DniftqoekV?=
+ =?us-ascii?Q?DijGHqhD2Fd9Q8lwLwVMfnrP8iK3icggriHkntEXQ3ZZTl15GZtUsAk8GbPo?=
+ =?us-ascii?Q?72/IqCR/PMPoUOI9Lz82joQzt2SLeXKMa4xghpHRLfi8gEoXltxWQp6GD46b?=
+ =?us-ascii?Q?AjEWZ54ntQd+JSDSVy47GHDQh2RK+3Nk8KoaMgI59nc/s8nWwR+6BwWPwCij?=
+ =?us-ascii?Q?baBEXW8eef7LxOOj76FXIKkSJoE4cf/TzkbWhp0KDFl9LPUsS9z4kJ/jrfQ3?=
+ =?us-ascii?Q?BuSQsZ6bNtR80MK2gkv/W2jPui1dyI4JceWa4pe1t772gq6bQmv2ffA0wSJT?=
+ =?us-ascii?Q?YloGFQe/3EESTfPrWy2BphSlO7cad+yfnXmKdSS/Gb8AhcF9vPGhDJOTA3RG?=
+ =?us-ascii?Q?YT0pVEV5pkY5hLA1kQKvETBK4X+DH6amLznUc56IWcB2M1pqNeZtoqG0xikR?=
+ =?us-ascii?Q?ypIPn+8wY6wawzndpaUkHdps?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4f55a56-db4a-481d-500b-08d940f123c9
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2021 02:44:28.3328
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fcHN3yTIp/gpZDt5NY8/dm+YNEG/mFc3p7Ry9xSqVSLsdXW3fVTuYXSpxxV74T7xUZ1sgfcZhxL0gBHF5Dl5lcrWF4OxKaMykJegednsCDM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB3863
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10037 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=0
+ spamscore=0 adultscore=0 malwarescore=0 mlxscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107070012
+X-Proofpoint-GUID: NG63G9Q4TQQM4Qz2RIm2cz838Jqzt2ME
+X-Proofpoint-ORIG-GUID: NG63G9Q4TQQM4Qz2RIm2cz838Jqzt2ME
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+Allow keys to be moved into the secondary keyring without checking its
+trust chain.  This is available only during kernel initialization.
 
-syzbot found the following issue on:
+This will allow keys in the MOK list to be added during boot.
 
-HEAD commit:    3dbdb38e Merge branch 'for-5.14' of git://git.kernel.org/p..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=145c4c9c300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1700b0b2b41cd52c
-dashboard link: https://syzkaller.appspot.com/bug?extid=681da20be7291be15dca
-compiler:       Debian clang version 11.0.1-2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15a472e4300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15c51a28300000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+681da20be7291be15dca@syzkaller.appspotmail.com
-
-INFO: task kworker/1:0:20 blocked for more than 143 seconds.
-      Tainted: G        W         5.13.0-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/1:0     state:D stack:22328 pid:   20 ppid:     2 flags:0x00004000
-Workqueue: usb_hub_wq hub_event
-Call Trace:
- context_switch kernel/sched/core.c:4683 [inline]
- __schedule+0xc07/0x11f0 kernel/sched/core.c:5940
- schedule+0x14b/0x210 kernel/sched/core.c:6019
- schedule_timeout+0x98/0x2f0 kernel/time/timer.c:1868
- do_wait_for_common+0x2da/0x480 kernel/sched/completion.c:85
- __wait_for_common kernel/sched/completion.c:106 [inline]
- wait_for_common kernel/sched/completion.c:117 [inline]
- wait_for_completion+0x48/0x60 kernel/sched/completion.c:138
- cleanup_rng drivers/char/hw_random/core.c:81 [inline]
- kref_put include/linux/kref.h:65 [inline]
- drop_current_rng drivers/char/hw_random/core.c:109 [inline]
- set_current_rng+0x421/0x610 drivers/char/hw_random/core.c:96
- hwrng_register+0x38f/0x720 drivers/char/hw_random/core.c:499
- chaoskey_probe+0x755/0xb30 drivers/usb/misc/chaoskey.c:205
- usb_probe_interface+0x633/0xb40 drivers/usb/core/driver.c:396
- really_probe+0x3cb/0x1020 drivers/base/dd.c:580
- driver_probe_device+0x175/0x340 drivers/base/dd.c:763
- bus_for_each_drv+0x16a/0x1f0 drivers/base/bus.c:431
- __device_attach+0x301/0x560 drivers/base/dd.c:938
- bus_probe_device+0xb8/0x1f0 drivers/base/bus.c:491
- device_add+0x11fc/0x1670 drivers/base/core.c:3324
- usb_set_configuration+0x1a86/0x2100 drivers/usb/core/message.c:2164
- usb_generic_driver_probe+0x83/0x140 drivers/usb/core/generic.c:238
- usb_probe_device+0x13a/0x260 drivers/usb/core/driver.c:293
- really_probe+0x3cb/0x1020 drivers/base/dd.c:580
- driver_probe_device+0x175/0x340 drivers/base/dd.c:763
- bus_for_each_drv+0x16a/0x1f0 drivers/base/bus.c:431
- __device_attach+0x301/0x560 drivers/base/dd.c:938
- bus_probe_device+0xb8/0x1f0 drivers/base/bus.c:491
- device_add+0x11fc/0x1670 drivers/base/core.c:3324
- usb_new_device+0xd45/0x1790 drivers/usb/core/hub.c:2558
- hub_port_connect+0x1055/0x27a0 drivers/usb/core/hub.c:5278
- hub_port_connect_change+0x5d0/0xbf0 drivers/usb/core/hub.c:5418
- port_event+0xaee/0x1140 drivers/usb/core/hub.c:5564
- hub_event+0x48d/0xd80 drivers/usb/core/hub.c:5646
- process_one_work+0x833/0x10c0 kernel/workqueue.c:2276
- worker_thread+0xac1/0x1320 kernel/workqueue.c:2422
- kthread+0x453/0x480 kernel/kthread.c:319
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-INFO: lockdep is turned off.
-NMI backtrace for cpu 0
-CPU: 0 PID: 1638 Comm: khungtaskd Tainted: G        W         5.13.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack_lvl+0x1d3/0x29f lib/dump_stack.c:96
- nmi_cpu_backtrace+0x16c/0x190 lib/nmi_backtrace.c:105
- nmi_trigger_cpumask_backtrace+0x191/0x2f0 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:209 [inline]
- watchdog+0xd06/0xd50 kernel/hung_task.c:294
- kthread+0x453/0x480 kernel/kthread.c:319
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 PID: 4857 Comm: systemd-journal Tainted: G        W         5.13.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:__seccomp_filter+0x551/0x1f90 kernel/seccomp.c:1208
-Code: 80 3c 28 00 74 08 48 89 df e8 eb 6e 48 00 4c 89 33 4c 89 e7 4c 8b 74 24 38 e9 bf 10 00 00 81 fb 00 00 f0 7f 0f 84 3c 02 00 00 <81> fb 00 00 fc 7f 0f 85 c5 03 00 00 8b 1d 6d 31 75 0b 89 de 83 e6
-RSP: 0018:ffffc9000af4fbc0 EFLAGS: 00000206
-RAX: 0000000000000000 RBX: 000000007fff0000 RCX: 0000000000000003
-RDX: 0000000000000006 RSI: ffffffff8cf558e0 RDI: 000000007fff0000
-RBP: ffffc9000af4fee8 R08: 0000000000000005 R09: ffffffff81802512
-R10: 0000000000000006 R11: ffff888017249c40 R12: ffffc9000af4fdc0
-R13: dffffc0000000000 R14: 0000000000000000 R15: ffffc9000af4fde0
-FS:  00007fb81e94f8c0(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fb81bd45018 CR3: 00000000163fa000 CR4: 00000000001506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- syscall_trace_enter kernel/entry/common.c:68 [inline]
- __syscall_enter_from_user_work kernel/entry/common.c:90 [inline]
- syscall_enter_from_user_mode+0xf0/0x1b0 kernel/entry/common.c:108
- do_syscall_64+0x1e/0xb0 arch/x86/entry/common.c:76
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7fb81dbe7f17
-Code: ff ff ff 48 8b 4d a0 0f b7 51 fe 48 8b 4d a8 66 89 54 08 fe e9 1a ff ff ff 66 2e 0f 1f 84 00 00 00 00 00 b8 27 00 00 00 0f 05 <c3> 0f 1f 84 00 00 00 00 00 b8 6e 00 00 00 0f 05 c3 0f 1f 84 00 00
-RSP: 002b:00007ffce70946e8 EFLAGS: 00000202 ORIG_RAX: 0000000000000027
-RAX: ffffffffffffffda RBX: 00005601e1e091e0 RCX: 00007fb81dbe7f17
-RDX: 0000000000000000 RSI: 00007ffce7094800 RDI: 00005601e1e091e0
-RBP: 00007ffce7094800 R08: 82fc88903cbe97aa R09: 0000000000000010
-R10: 0000000000000000 R11: 0000000000000202 R12: 00000000000012f9
-R13: 00007ffce70947a8 R14: 00007ffce7094800 R15: 00007ffce7094d98
-
-
+Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ certs/system_keyring.c        | 25 +++++++++++++++++++++++++
+ include/keys/system_keyring.h |  7 +++++++
+ 2 files changed, 32 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+index 692365dee2bd..f02bc5832684 100644
+--- a/certs/system_keyring.c
++++ b/certs/system_keyring.c
+@@ -90,6 +90,31 @@ static __init struct key_restriction *get_builtin_and_secondary_restriction(void
+ 
+ 	return restriction;
+ }
++
++/**
++ * move_to_trusted_secondary_keyring - Move to the secondary trusted
++ * keyring with no validation.
++ * @key: The key to add to the secondary trusted keyring
++ * @from_keyring: The keyring containing the key to move from
++ *
++ * Move key to the secondary keyring without checking its trust chain.  This
++ * is available only during kernel initialization.
++ */
++__init int move_to_trusted_secondary_keyring(struct key *key, struct key *from_keyring)
++{
++	int ret;
++
++	ret = key_move(key, from_keyring, secondary_trusted_keys,
++		       KEY_ALLOC_BYPASS_RESTRICTION);
++
++	if (ret)
++		pr_err("Problem loading X.509 certificate %d\n", ret);
++	else
++		pr_notice("Loaded X.509 cert '%s' linked to secondary sys keyring\n",
++			  key->description);
++
++	return ret;
++}
+ #endif
+ 
+ /*
+diff --git a/include/keys/system_keyring.h b/include/keys/system_keyring.h
+index 6acd3cf13a18..f40837026d6d 100644
+--- a/include/keys/system_keyring.h
++++ b/include/keys/system_keyring.h
+@@ -34,8 +34,15 @@ extern int restrict_link_by_builtin_and_secondary_trusted(
+ 	const struct key_type *type,
+ 	const union key_payload *payload,
+ 	struct key *restriction_key);
++extern __init int move_to_trusted_secondary_keyring(struct key *key,
++						    struct key *from_keyring);
+ #else
+ #define restrict_link_by_builtin_and_secondary_trusted restrict_link_by_builtin_trusted
++static inline __init int move_to_trusted_secondary_keyring(struct key *key,
++							   struct key *from_keyring)
++{
++	return -EKEYREVOKED;
++}
+ #endif
+ 
+ extern struct pkcs7_message *pkcs7;
+-- 
+2.18.4
+
