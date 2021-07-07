@@ -2,78 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82BE1C07E9C
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 19:31:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8480FC07E9E
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 21:26:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69EC361C6D
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 19:31:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C32F61CA2
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 21:26:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232051AbhGGTed (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Jul 2021 15:34:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52608 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbhGGTec (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jul 2021 15:34:32 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1607FC06175F
-        for <linux-crypto@vger.kernel.org>; Wed,  7 Jul 2021 12:31:52 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id f13so6995490lfh.6
-        for <linux-crypto@vger.kernel.org>; Wed, 07 Jul 2021 12:31:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DPg1H7me9qbdg7UVxK09AOFutkX6+2jjmGZLpP+9rFE=;
-        b=Gk8b0Lglm9tXpIUGTSA+BdAdYFO01tU4/ih0LElLxUv84iB5oXNSeu91aDRJ/CLOd2
-         hJCmRSTZ03TY7odHpSknbfl7YLtvbiU4e0ZAVnWMlHzlY4eKn29VkADWqWGvZgDIUHS2
-         qr8tUuOReXID4F77MCK1ebc5hdK98+Fqzg0GQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DPg1H7me9qbdg7UVxK09AOFutkX6+2jjmGZLpP+9rFE=;
-        b=ENal+IOR4jUs/2XoaeUqjpWH7fgVJIoMqWYTuPAhgi1zUUGwIkoVnIG/N4tVVlsR8m
-         0erE3OAnY198+115oqezOk34+Ahs8AsSO/WQJZm+fi1kpLPGaEOjet/bEKskEvmF7vvr
-         26cLx6DcGtoUZrS8lxwPfhl4BYYeuB7KWgjFIEAvT4jOqoD5ZchzEPTuA4xDFc8bRVKK
-         PEigZIrecnj5+xDlRLtzKY4CY4tD3QyyMkoU3orEsFqVT3oAh8NEckdo9QBA+/iJvGcC
-         k077TkhuhZ1TM78AKjOhO/gRIZtih3fk8APqni89QU+HxlucBSkhPyDYGuDOytxG4DiO
-         HRcw==
-X-Gm-Message-State: AOAM5335l6QUkjaQmwzF8Mw+kQBAqe8krHy9jKBhK53qcuMxYxSKUEK0
-        /icmXy5end0I419JQjPq7f6AT3CjPHljeakqrcU=
-X-Google-Smtp-Source: ABdhPJwVhaF7QL6UlUYysjeaQKP66zV/x8agWhgCzdWCZHtLrvS+sBqT0wK/jCpFIYigAVQu5z2YHQ==
-X-Received: by 2002:a19:f110:: with SMTP id p16mr14215136lfh.584.1625686310346;
-        Wed, 07 Jul 2021 12:31:50 -0700 (PDT)
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com. [209.85.167.46])
-        by smtp.gmail.com with ESMTPSA id bq36sm1779267lfb.96.2021.07.07.12.31.50
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jul 2021 12:31:50 -0700 (PDT)
-Received: by mail-lf1-f46.google.com with SMTP id p16so7043161lfc.5
-        for <linux-crypto@vger.kernel.org>; Wed, 07 Jul 2021 12:31:50 -0700 (PDT)
-X-Received: by 2002:a2e:b55b:: with SMTP id a27mr9830494ljn.251.1625686299582;
- Wed, 07 Jul 2021 12:31:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210707024403.1083977-1-eric.snowberg@oracle.com> <20210707024403.1083977-6-eric.snowberg@oracle.com>
-In-Reply-To: <20210707024403.1083977-6-eric.snowberg@oracle.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 7 Jul 2021 12:31:23 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgEncBgRdv0FZjmZGQP5tzcdYA0XJrxmBEOevi06dimtw@mail.gmail.com>
-Message-ID: <CAHk-=wgEncBgRdv0FZjmZGQP5tzcdYA0XJrxmBEOevi06dimtw@mail.gmail.com>
-Subject: Re: [PATCH RFC 05/12] integrity: Introduce mok keyring
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     keyrings@vger.kernel.org,
+        id S232603AbhGGV2y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Jul 2021 17:28:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42636 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230312AbhGGV2y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Jul 2021 17:28:54 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2606D619CB;
+        Wed,  7 Jul 2021 21:26:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1625693173;
+        bh=/pVy166dfy+UrmpILZTvgIelpcvDiZkfwT6maygMI/s=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tbKfcOA64mpmf+AGiUavBt1B1NVDwqFMS6+zQUbbhUqwGaoOGsOJ/Ok5fCMXIUbgy
+         7YSLAzBg/uu7pkeLxWnHmRHpyldzZK/D9MmS53D0vZjCxEuBk+eNGlFKFcMWIOAAJ7
+         eOqYIKKWJ4r7zfKeQWUVn+DN3T67mYzZrzVwRFdH98KkmjFs4SERirmFaAgHYPQYj+
+         3XdjnGjrQ5AYqGhXHHMwX+wXH1W7PuLap8pIB2lU/t6XLK9hfDvHygvpRqW5hBEkMv
+         /rK9GWJHE1ySC3pOPXX6mcAaose2oadoQWgtB0kAxMahQo32o5wVza3rs/HK52ThDT
+         1RNdJyn4LWSDg==
+Date:   Thu, 8 Jul 2021 00:26:11 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Eric Snowberg <eric.snowberg@oracle.com>, keyrings@vger.kernel.org,
         linux-integrity <linux-integrity@vger.kernel.org>,
         Mimi Zohar <zohar@linux.ibm.com>,
         David Howells <dhowells@redhat.com>,
         David Woodhouse <dwmw2@infradead.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         David Miller <davem@davemloft.net>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
         James Morris James Morris <jmorris@namei.org>,
         "Serge E. Hallyn" <serge@hallyn.com>,
         Kees Cook <keescook@chromium.org>,
@@ -89,26 +55,45 @@ Cc:     keyrings@vger.kernel.org,
         James Bottomley <James.Bottomley@hansenpartnership.com>,
         Peter Jones <pjones@redhat.com>, Gary Lin <glin@suse.com>,
         Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH RFC 05/12] integrity: Introduce mok keyring
+Message-ID: <20210707212611.pdkmkxhqomkf4ngg@kernel.org>
+References: <20210707024403.1083977-1-eric.snowberg@oracle.com>
+ <20210707024403.1083977-6-eric.snowberg@oracle.com>
+ <CAHk-=wgEncBgRdv0FZjmZGQP5tzcdYA0XJrxmBEOevi06dimtw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wgEncBgRdv0FZjmZGQP5tzcdYA0XJrxmBEOevi06dimtw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 6, 2021 at 7:45 PM Eric Snowberg <eric.snowberg@oracle.com> wrote:
->
-> Introduce a new keyring called mok.  This keyring will be used during
-> boot. Afterwards it will be destroyed.
+On Wed, Jul 07, 2021 at 12:31:23PM -0700, Linus Torvalds wrote:
+> On Tue, Jul 6, 2021 at 7:45 PM Eric Snowberg <eric.snowberg@oracle.com> wrote:
+> >
+> > Introduce a new keyring called mok.  This keyring will be used during
+> > boot. Afterwards it will be destroyed.
+> 
+> Already discussed elsewhere, but yeah, when using TLA's, unless they
+> are universally understood (like "CPU" or "TLB" or whatever), please
+> spell them out somewhere for people who don't have the background.
+> 
+> I saw that you said elsewhere that MOK is "Machine Owner Key", but
+> please let's just have that in the sources and commit messages at
+> least for the original new code cases.
+> 
+> Maybe it becomes obvious over time as there is more history to the
+> code, but when you literally introduce a new concept, please spell it
+> out.
+> 
+>            Linus
+> 
+I'd suggest for the short summary:
 
-Already discussed elsewhere, but yeah, when using TLA's, unless they
-are universally understood (like "CPU" or "TLB" or whatever), please
-spell them out somewhere for people who don't have the background.
+"integrity: Introduce a Linux keyring for the Machine Owner Key (MOK)"
 
-I saw that you said elsewhere that MOK is "Machine Owner Key", but
-please let's just have that in the sources and commit messages at
-least for the original new code cases.
+Given that "keyring" is such a saturated and ambiguous word, and this not a
+subsystem patch for keyring itself, it should be explicit what is meant by
+a keyring.
 
-Maybe it becomes obvious over time as there is more history to the
-code, but when you literally introduce a new concept, please spell it
-out.
-
-           Linus
+/Jarkko
