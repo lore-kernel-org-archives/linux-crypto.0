@@ -2,51 +2,36 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F1EC07E95
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 18:41:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF7CCC07E95
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 19:21:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1891161CC8
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 18:41:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA5A661CBE
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jul 2021 19:21:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232963AbhGGSns (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Jul 2021 14:43:48 -0400
-Received: from mail-mw2nam10on2061.outbound.protection.outlook.com ([40.107.94.61]:10336
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232867AbhGGSmy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jul 2021 14:42:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cOQbHHlb/F1rJCnfKG3ph+Cc/k7lVv7m946llgNdws3fjrbJkQ2RMLqQTu+zZ0pIgTwfvJ0uHX8N43pBPbtvd/h7AZUNprEzXm18EH+paEMLEiGSYRx3Q4w12pVR0AK9yCLZf3lQd2bNM16pFUl9zMcpx0B7xZfMqE36/LGolp/VCyYsDjlJFBztOJHQlQFjizNiP2/C9hZ6PhKFiHrSXaVfvniGwa0DCRIbALLjesgXn/bFzfMKjZ2p3RzmqJHjFu43VseWV8tnXp9DlfEizOw+9QAbXe9Mua/UTYRVVofqW1gz51RwS+8thG2UNLcNsB6o5UrmpJ9MRE304P5ZJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/s1VSgNXt99nVhtkV72vJN7zG51DtFbnprBMZTQx5QU=;
- b=djlClkt4OnxeSu/fnR85ok7XI5ACkQkTqP6ILvG0cdlqDkDDfzuaU3Lshx9kKDWralertAiiOcgcTsxkd++/Fw/6OaexqKbA9zvGaBOwLcTKEyz2uqjHHXpFOYeuvfhcYG4nk29mDlEjDtaE0/nG3WfYMQpuWnL2s+rWrZXG2iHb0uiij3wPXX93+48rA83BHfokh3LDMbBVG/Th7L0mrUimCiFrgYpL1laFPPmUXx8HunDZJo1fHuWaVj7g44dOSCI6HL/srN2o7NXGmFfO6OMx3Hbk//YRzFuWpa8Sm40JJmy9zaJfhvNZSPyNOO61TtbSrg8SkDWMEPsZM0gCDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/s1VSgNXt99nVhtkV72vJN7zG51DtFbnprBMZTQx5QU=;
- b=i1jec8cs8sD/nC5b3hdUHZx7bJE3Jgffw37BPpfDbXDV8CnDeSeJOEN/eCB1OEzqMqA9wEzrA/TM7Ard64Nk79gkmyAQWaaHyrngTHJgmhIFXt1NgYkmp7hbNkn+3V+78BYgcDosfHkLCI+71tnZ6Y9bEg/GqlTBb8L04JZRT8o=
-Authentication-Results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from BYAPR12MB2711.namprd12.prod.outlook.com (2603:10b6:a03:63::10)
- by BY5PR12MB4099.namprd12.prod.outlook.com (2603:10b6:a03:20f::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20; Wed, 7 Jul
- 2021 18:38:36 +0000
-Received: from BYAPR12MB2711.namprd12.prod.outlook.com
- ([fe80::40e3:aade:9549:4bed]) by BYAPR12MB2711.namprd12.prod.outlook.com
- ([fe80::40e3:aade:9549:4bed%7]) with mapi id 15.20.4287.033; Wed, 7 Jul 2021
- 18:38:36 +0000
-From:   Brijesh Singh <brijesh.singh@amd.com>
-To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        id S231440AbhGGTYB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Jul 2021 15:24:01 -0400
+Received: from mga07.intel.com ([134.134.136.100]:54024 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231438AbhGGTYA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Jul 2021 15:24:00 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10037"; a="273211328"
+X-IronPort-AV: E=Sophos;i="5.84,221,1620716400"; 
+   d="scan'208";a="273211328"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2021 12:21:18 -0700
+X-IronPort-AV: E=Sophos;i="5.84,221,1620716400"; 
+   d="scan'208";a="457592392"
+Received: from lpbeverl-mobl.amr.corp.intel.com (HELO [10.212.176.148]) ([10.212.176.148])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2021 12:21:17 -0700
+Subject: Re: [PATCH Part2 RFC v4 09/40] x86/fault: Add support to dump RMP
+ entry on fault
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
         linux-crypto@vger.kernel.org
@@ -70,136 +55,204 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Borislav Petkov <bp@alien8.de>,
         Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 RFC v4 39/40] KVM: SVM: Use a VMSA physical address variable for populating VMCB
-Date:   Wed,  7 Jul 2021 13:36:15 -0500
-Message-Id: <20210707183616.5620-40-brijesh.singh@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210707183616.5620-1-brijesh.singh@amd.com>
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
 References: <20210707183616.5620-1-brijesh.singh@amd.com>
-Content-Type: text/plain
-X-ClientProxiedBy: SN6PR04CA0078.namprd04.prod.outlook.com
- (2603:10b6:805:f2::19) To BYAPR12MB2711.namprd12.prod.outlook.com
- (2603:10b6:a03:63::10)
+ <20210707183616.5620-10-brijesh.singh@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <cb9e3890-9642-f254-2fe7-30621e686844@intel.com>
+Date:   Wed, 7 Jul 2021 12:21:14 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN6PR04CA0078.namprd04.prod.outlook.com (2603:10b6:805:f2::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20 via Frontend Transport; Wed, 7 Jul 2021 18:38:33 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 04b77c44-bfc1-4115-e4a8-08d941766e38
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4099:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BY5PR12MB40993991232F13769D7BEB1BE51A9@BY5PR12MB4099.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2xuyADU9eUbe/Yf8tDPv95GyeHCgb99H4rjbtQvY+Ef7QqVlyTJ2qePjaefkca9F7MYRQrhLhgG1qCjY5k4L01lZCoB39C8b/9INC/3LbNVQaT8waLxIGeOX71nktqWqVf7gkco53eQ1QFUCilOLropEhQIMvBGpKh2JFXtORjfX4tyqmkhAYZATuKfJssyAWU+s7gJ9yJtNkPFnu0QtYE6W+mj9ASk5qG7GXoB4WEL4lPPi0vRB6EwJZpZQo/nHpl0dC7E+eq+EjXOXTv0A1vzOL86tu2k5iVGJIbhv0j5JjrF5V600T3cFtd9o9Ze4J94iK2ap0FF7UVp+GQKYya0Z1d189DmcL8wk6akXze2LwQiW4Ip4fPVOOVN2FQRblAjIyApixkk6MPpIDXBBUVWNW9HVX2Vt5I4EJO5kMDs3Vt/Ga25ncLSqTGqecbgrwA9TL8SV/TxHhTce9A9EQKA44nOpFMZ6C8IqEKvIQuGk2arNIYLm0cLO/tp1Z4FfLGNOA4PfnPaHgd2GIOTmG9SehK+r6id7GkoWtsKj0Fwt3Dl/N8/cUoVZO/d5RSLWDPcq+1VmZjC7psRU6CamI+OZjvBg983nttd7jZHWqWlNf0XBcXuuTSlYTqhHfq6oU14FNTVcHtxau557p7wTtQQnt+P03aT9/ezRwI210ZX5HOPb06jILAgMMREMHXa1OHW591rprV8mLHNZbTB1bw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2711.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(366004)(39860400002)(376002)(346002)(7696005)(54906003)(2906002)(36756003)(52116002)(8676002)(7406005)(7416002)(6666004)(38100700002)(38350700002)(4326008)(316002)(66946007)(1076003)(44832011)(6486002)(26005)(2616005)(5660300002)(478600001)(186003)(86362001)(956004)(8936002)(66476007)(66556008)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Gm5eQNaG35w9Eum+2+4gK9R2+YcrzI9V6v4iszEy8SquCFqlPuhjUUZJNHjg?=
- =?us-ascii?Q?qmzJyPWfMH1959CXia+NBrTq69WaTpPYf7dV55kmqRk00Ve8Wzrz6O1G3PxB?=
- =?us-ascii?Q?8l1w9UL/dGo8zy1BLEkFzwwe01VkIZbWuexVwoxBgbEtgD1/B4MfvfHOJ3E3?=
- =?us-ascii?Q?7fEfEQZqIUOF4PAi+kfHqQz/xBUtxHVxSI5HSRzCUaTci/8CQaxUU+34gRqI?=
- =?us-ascii?Q?ExrnTr5C0dz0NLzTfVtEblUkiPJK/wnP3y0No/tvSazKGKKeMg30u3Kk23MX?=
- =?us-ascii?Q?r1kdoEVHC+ixEa7LvcY3XiRN8a8GpIerelEjMMsok3tqdgddDHYF325ZY5sW?=
- =?us-ascii?Q?nwxDip1CsNWMvmKdodz2DmiI/3krrT6JvuSMNzmm824LL1aYVT5uCgedWp8Z?=
- =?us-ascii?Q?OsR2cSHQdKFI0KcLvOyS/m1yvoqHqmpeyAOhxhdD2je2CsODi8uxv/2r7hQV?=
- =?us-ascii?Q?TA6COKEZFJ1VT7fRyOI8JeKRrLHYQyahCf70wCf0j1aILVRImuvXqroGumgn?=
- =?us-ascii?Q?P1RhK40YS0yrrff0N0YgcUf1nWW2muttaexLC3XdA/hX4ed/l4i7GDOpcXQL?=
- =?us-ascii?Q?3cp3Svqf0FHh0ecZj6NZ+zQt+oCA6lM9hSXPH+9vYJ7VOFGlSTv2zsH1KVO1?=
- =?us-ascii?Q?OnWavd4hEY3WWRjUxOd00Mg6XnTCV0MwE89fWz+0mxD2hNY4WvLz97L5TnKb?=
- =?us-ascii?Q?PTc2EDO8xzvnjwj42PxKvwQw4nDMueRR0kXz9G9KhhNpd99XJzcSd9XkHc/w?=
- =?us-ascii?Q?x8swPRGI7fI0m53hEPHfKfc4haI1mIalB1DVq5ylZQOpLNcoPrOa8Vp/hsX3?=
- =?us-ascii?Q?tj0aS82tNB9JSWR4mtM8y3BMUcoBe0jlggjkeCE2TzQCMMZdh5a/I4rXs0Hm?=
- =?us-ascii?Q?m3d7Ls1QqYTo0+J9l8oKqWZ9QG12otDAPWnJXVeO7xTl1SDdCN9p/f5K1xV3?=
- =?us-ascii?Q?wUvOo+Z5t/VWrvqdfJ5h5X1ckYCZYJwPqdLOnw8K9B+jfDkJul11m6Vuf60l?=
- =?us-ascii?Q?oUfTX9uuWlWNE8Anc3D9mknnNDy/TPm4uOjC94ezglY8CEMQRF40KG8QN54L?=
- =?us-ascii?Q?VaJidnTcixKBYaCLkOS+zR9DlC9EjaXwl58fPCnTh8nAF6zbQ946P1FW1VDp?=
- =?us-ascii?Q?a3mdlQTbRdKx7V/jJfqu1ds6/ULLWy0njx1bQEtE2KdVX7WbW48Res0MOlVq?=
- =?us-ascii?Q?JzsOUVay+8EyjQqf0pQebmI+aVzktP8Dn39DFfIVz2d0fQuwLA8IrQTDXlk/?=
- =?us-ascii?Q?zrC6ZhDKjlMr2SqQM0GIUaKEyUJ1GI8nKfvbFgc4vbVoQPrM2Nrt2uJcoB4Z?=
- =?us-ascii?Q?yMtN3mu/1TLFl5Hw3lzANTBc?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 04b77c44-bfc1-4115-e4a8-08d941766e38
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2711.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2021 18:38:36.3183
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SEkcLtqSpLH+JvEh7uvjN5BRSQOhbhIrxWBYA/5rQNfW21eC9CznzhU3gmWvMBFyMB6paAWFudjG2927l5EmvA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4099
+In-Reply-To: <20210707183616.5620-10-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+> @@ -502,6 +503,81 @@ static void show_ldttss(const struct desc_ptr *gdt, const char *name, u16 index)
+>  		 name, index, addr, (desc.limit0 | (desc.limit1 << 16)));
+>  }
+>  
+> +static void dump_rmpentry(unsigned long address)
+> +{
 
-In preparation to support SEV-SNP AP Creation, use a variable that holds
-the VMSA physical address rather than converting the virtual address.
-This will allow SEV-SNP AP Creation to set the new physical address that
-will be used should the vCPU reset path be taken.
+A comment on this sucker would be nice.  I *think* this must be a kernel
+virtual address.  Reflecting that into the naming or a comment would be
+nice.
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
- arch/x86/kvm/svm/sev.c | 5 ++---
- arch/x86/kvm/svm/svm.c | 9 ++++++++-
- arch/x86/kvm/svm/svm.h | 1 +
- 3 files changed, 11 insertions(+), 4 deletions(-)
+> +	struct rmpentry *e;
+> +	unsigned long pfn;
+> +	pgd_t *pgd;
+> +	pte_t *pte;
+> +	int level;
+> +
+> +	pgd = __va(read_cr3_pa());
+> +	pgd += pgd_index(address);
+> +
+> +	pte = lookup_address_in_pgd(pgd, address, &level);
+> +	if (unlikely(!pte))
+> +		return;
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 4cb4c1d7e444..d8ad6dd58c87 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3553,10 +3553,9 @@ void sev_es_init_vmcb(struct vcpu_svm *svm)
- 
- 	/*
- 	 * An SEV-ES guest requires a VMSA area that is a separate from the
--	 * VMCB page. Do not include the encryption mask on the VMSA physical
--	 * address since hardware will access it using the guest key.
-+	 * VMCB page.
- 	 */
--	svm->vmcb->control.vmsa_pa = __pa(svm->vmsa);
-+	svm->vmcb->control.vmsa_pa = svm->vmsa_pa;
- 
- 	/* Can't intercept CR register access, HV can't modify CR registers */
- 	svm_clr_intercept(svm, INTERCEPT_CR0_READ);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 32e35d396508..74bc635c9608 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1379,9 +1379,16 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 	svm->vmcb01.ptr = page_address(vmcb01_page);
- 	svm->vmcb01.pa = __sme_set(page_to_pfn(vmcb01_page) << PAGE_SHIFT);
- 
--	if (vmsa_page)
-+	if (vmsa_page) {
- 		svm->vmsa = page_address(vmsa_page);
- 
-+		/*
-+		 * Do not include the encryption mask on the VMSA physical
-+		 * address since hardware will access it using the guest key.
-+		 */
-+		svm->vmsa_pa = __pa(svm->vmsa);
-+	}
-+
- 	svm->guest_state_loaded = false;
- 
- 	svm_switch_vmcb(svm, &svm->vmcb01);
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 9fcfc0a51737..285d9b97b4d2 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -177,6 +177,7 @@ struct vcpu_svm {
- 
- 	/* SEV-ES support */
- 	struct sev_es_save_area *vmsa;
-+	hpa_t vmsa_pa;
- 	struct ghcb *ghcb;
- 	struct kvm_host_map ghcb_map;
- 	bool received_first_sipi;
--- 
-2.17.1
+It's a little annoying this is doing *another* separate page walk.
+Don't we already do this for dumping the page tables themselves at oops
+time?
+
+Also, please get rid of all of the likely/unlikely()s in your patches.
+They are pure noise unless you have specific knowledge of the compiler
+getting something so horribly wrong that it affects real-world performance.
+
+> +	switch (level) {
+> +	case PG_LEVEL_4K: {
+> +		pfn = pte_pfn(*pte);
+> +		break;
+> +	}
+
+These superfluous brackets are really strange looking.  Could you remove
+them, please?
+
+> +	case PG_LEVEL_2M: {
+> +		pfn = pmd_pfn(*(pmd_t *)pte);
+> +		break;
+> +	}
+> +	case PG_LEVEL_1G: {
+> +		pfn = pud_pfn(*(pud_t *)pte);
+> +		break;
+> +	}
+> +	case PG_LEVEL_512G: {
+> +		pfn = p4d_pfn(*(p4d_t *)pte);
+> +		break;
+> +	}
+> +	default:
+> +		return;
+> +	}
+> +
+> +	e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &level);
+
+So, lookup_address_in_pgd() looks to me like it will return pretty
+random page table entries as long as the entry isn't
+p{gd,4d,ud,md,te}_none().  It can certainly return !p*_present()
+entries.  Those are *NOT* safe to call pfn_to_page() on.
+
+> +	if (unlikely(!e))
+> +		return;
+> +
+> +	/*
+> +	 * If the RMP entry at the faulting address was not assigned, then
+> +	 * dump may not provide any useful debug information. Iterate
+> +	 * through the entire 2MB region, and dump the RMP entries if one
+> +	 * of the bit in the RMP entry is set.
+> +	 */
+
+Some of this comment should be moved down to the loop itself.
+
+> +	if (rmpentry_assigned(e)) {
+> +		pr_alert("RMPEntry paddr 0x%lx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx"
+> +			" asid=%d vmsa=%d validated=%d]\n", pfn << PAGE_SHIFT,
+> +			rmpentry_assigned(e), rmpentry_immutable(e), rmpentry_pagesize(e),
+> +			rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
+> +			rmpentry_validated(e));
+> +
+> +		pr_alert("RMPEntry paddr 0x%lx %016llx %016llx\n", pfn << PAGE_SHIFT,
+> +			e->high, e->low);
+
+Could you please include an entire oops in the changelog that also
+includes this information?  It would be really nice if this was at least
+consistent in style to the stuff around it.
+
+Also, how much of this stuff like rmpentry_asid() is duplicated in the
+"raw" dump of e->high and e->low?
+
+> +	} else {
+> +		unsigned long pfn_end;
+> +
+> +		pfn = pfn & ~0x1ff;
+
+There's a nice magic number.  Why not:
+
+	pfn = pfn & ~(PTRS_PER_PMD-1);
+
+?
+
+This also needs a comment about *WHY* this case is looking at a 2MB region.
+
+> +		pfn_end = pfn + PTRS_PER_PMD;
+> +
+> +		while (pfn < pfn_end) {
+> +			e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &level);
+> +
+> +			if (unlikely(!e))
+> +				return;
+> +
+> +			if (e->low || e->high)
+> +				pr_alert("RMPEntry paddr 0x%lx: %016llx %016llx\n",
+> +					pfn << PAGE_SHIFT, e->high, e->low);
+
+Why does this dump "raw" RMP entries while the above stuff filters them
+through a bunch of helper macros?
+
+> +			pfn++;
+> +		}
+> +	}
+> +}
+> +
+>  static void
+>  show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long address)
+>  {
+> @@ -578,6 +654,9 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
+>  	}
+>  
+>  	dump_pagetable(address);
+> +
+> +	if (error_code & X86_PF_RMP)
+> +		dump_rmpentry(address);
+>  }
+>  
+>  static noinline void
+> 
 
