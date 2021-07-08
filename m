@@ -2,150 +2,371 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE5D8C07E9E
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 17:15:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C322FC07E96
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 18:00:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B84CD611F1
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 17:15:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A61AF613AE
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 18:00:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbhGHRSO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Jul 2021 13:18:14 -0400
-Received: from mga02.intel.com ([134.134.136.20]:47365 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229489AbhGHRSN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Jul 2021 13:18:13 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10039"; a="196726294"
-X-IronPort-AV: E=Sophos;i="5.84,224,1620716400"; 
-   d="scan'208";a="196726294"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2021 10:15:28 -0700
-X-IronPort-AV: E=Sophos;i="5.84,224,1620716400"; 
-   d="scan'208";a="645980585"
-Received: from kezheong-mobl.gar.corp.intel.com (HELO [10.212.152.178]) ([10.212.152.178])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2021 10:15:27 -0700
-Subject: Re: [PATCH Part2 RFC v4 09/40] x86/fault: Add support to dump RMP
- entry on fault
-To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-10-brijesh.singh@amd.com>
- <cb9e3890-9642-f254-2fe7-30621e686844@intel.com>
- <0d19eb84-f2b7-aa24-2fe9-19035b49fbd6@amd.com>
- <15d5e954-0383-fe0e-e8c1-3e9f8b0ef8ff@intel.com>
- <23dbe0da-581e-2444-7126-428e79514614@amd.com>
- <8c4852e4-8f57-354b-630d-cea8176fc026@intel.com>
- <5861dd0a-7e46-af3d-3d0e-28b41ca17e1e@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <e98cf66a-472d-e322-5f7d-01661fd98ab2@intel.com>
-Date:   Thu, 8 Jul 2021 10:15:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <5861dd0a-7e46-af3d-3d0e-28b41ca17e1e@amd.com>
+        id S229875AbhGHSDb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jul 2021 14:03:31 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:33526 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229580AbhGHSDb (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Jul 2021 14:03:31 -0400
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 168HqUwR018681;
+        Thu, 8 Jul 2021 17:59:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ subject : from : in-reply-to : date : cc : content-transfer-encoding :
+ message-id : references : to : mime-version; s=corp-2020-01-29;
+ bh=UadNw7rJyK30QxW+PsWBQ0jqqCIKfsfBZ5hEjzPqBH4=;
+ b=J0pbkwnJ5DRyNl0AVKL76RYhXl8/kX0Mp+4eBz7QAjnIyi7eOT0IjgtUydqKgSJ0KiSv
+ myZcF3CZcfvDBdF+XXHjPA7OFmRNgm18CIRr74nHP/hjr+eOOWenwtd9MAjv0ZrlFvaW
+ gIQ+huCoVxa4Vy7A6Eh+v0TP0zoqyBID8jOR04kQLRyuIEoOFYfgJqz67yLVhWZFK+3x
+ GFfMwOtCr2NOth7ZwJ8RjRkg1ZzKZVB1EqurUw2TwmqU7TpVyoIjQUsRbv9uf94+n00h
+ FWHeyTKpWvs/oJul5LJGb/F9hrWHuzgjwaqa6Zr6aK4+UXKC8vqeOuFXasCzX7BAzGPq Pw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by mx0b-00069f02.pphosted.com with ESMTP id 39n4yd3r6h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 08 Jul 2021 17:59:58 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 168Hub9R073913;
+        Thu, 8 Jul 2021 17:59:56 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2177.outbound.protection.outlook.com [104.47.55.177])
+        by userp3020.oracle.com with ESMTP id 39k1p1024m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 08 Jul 2021 17:59:56 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LyG40AaszNifIuiHrN+WwWPJ/ecrJ8P/jQyJZBC+Zc7mI5nTyPTnIHNfIC3J+vtDarE8ycpRk0m95g06tQrGFZIcuwVQSZLKbyyObskcQxLEhHEn1YCHErZQXPpEs/7qqiMvFUC866IOECwyRObqr8TgOMyH1kD5mHeIanX8LpkMXezazTh0TMNrmmqn8zFScHutFEIDxsbyhFlTzXrdrUfLcBzJ5gzUMS8kxx7Tj5/EQuXBJxMvhUledSUrb777NAh+gc6AhbpCHNnQ8mhKoL1nklpUbb2bkJMwLDdkUF+DsV61A+inBuavuWcQ9xNj9Unp659rdySD8OX94GPZpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UadNw7rJyK30QxW+PsWBQ0jqqCIKfsfBZ5hEjzPqBH4=;
+ b=Z/D+32qzcNAK9AWmJ+hAV3d6lbamOl7U2Psh/9cLMcjyaNqEpJtT69GXJuquZVUs9545p8q5TJvf7vtv390c433Ok/nPGcecWziG54ZFijMboUwhHTZJ7CH3Vw4ZKt8nJnMyJxV8JRFIST79t3kuTK32H803vNtNZKLsQVgX5/HUhCWvU6Atzbz8iiG+uNDd8dxycR0YLC9qBHdg4wV/H8vFM05rFp5BTxr/spOZI4XV2tW1w+WsAXBJOpgQpzXl0Tmn0MlJK/zCvxCU0PSZEhzbie7VpI236vKaO3+BvddX8pVXa8XiaefKG2fitwn9uhPETj2qvp6uCzZ7BXIuPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UadNw7rJyK30QxW+PsWBQ0jqqCIKfsfBZ5hEjzPqBH4=;
+ b=Ao6zEen9YVWJ+2xVjAcUzKI40728ZHBZpi8nedq95jK3SCD8nERXaj3W3EwRQDepasdx2THc0WNqC9lq6FVhi2DSD2X8xAwLFxLr3sp5B/PJ0Hvas/EwiV4otNQzGV4SYmS7Z/quZg3eDF2TJAp6Y4kaeDFZbIbyCydZzCkWiNQ=
+Authentication-Results: linux.ibm.com; dkim=none (message not signed)
+ header.d=none;linux.ibm.com; dmarc=none action=none header.from=oracle.com;
+Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
+ by CH2PR10MB3944.namprd10.prod.outlook.com (2603:10b6:610:f::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.22; Thu, 8 Jul
+ 2021 17:59:53 +0000
+Received: from CH2PR10MB4150.namprd10.prod.outlook.com
+ ([fe80::a890:e571:de3a:7197]) by CH2PR10MB4150.namprd10.prod.outlook.com
+ ([fe80::a890:e571:de3a:7197%8]) with mapi id 15.20.4287.027; Thu, 8 Jul 2021
+ 17:59:53 +0000
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RFC 00/12] Enroll kernel keys thru MOK
+From:   Eric Snowberg <eric.snowberg@oracle.com>
+In-Reply-To: <c0cf7f883a9252c17427f1f992e4973e78481304.camel@linux.ibm.com>
+Date:   Thu, 8 Jul 2021 11:59:45 -0600
+Cc:     keyrings@vger.kernel.org,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
+        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
+        scott.branden@broadcom.com, weiyongjun1@huawei.com,
+        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
+        nramas@linux.microsoft.com, lszubowi@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        glin@suse.com, "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <21EFCB58-2D89-4D30-8DA2-B952A7E1B1BD@oracle.com>
+References: <20210707024403.1083977-1-eric.snowberg@oracle.com>
+ <42b787dd3a20fe37c4de60daf75db06e409cfb6d.camel@linux.ibm.com>
+ <5BFB3C52-36D4-47A5-B1B8-977717C555A0@oracle.com>
+ <886f30dcf7b3d48644289acc3601c2f0207b19b6.camel@linux.ibm.com>
+ <D34A6328-91CA-4E1E-845C-FAC9B424819B@oracle.com>
+ <c0cf7f883a9252c17427f1f992e4973e78481304.camel@linux.ibm.com>
+To:     Mimi Zohar <zohar@linux.ibm.com>
+X-Mailer: Apple Mail (2.3273)
+X-ClientProxiedBy: BYAPR02CA0019.namprd02.prod.outlook.com
+ (2603:10b6:a02:ee::32) To CH2PR10MB4150.namprd10.prod.outlook.com
+ (2603:10b6:610:ac::13)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.177.128] (184.60.195.210) by BYAPR02CA0019.namprd02.prod.outlook.com (2603:10b6:a02:ee::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20 via Frontend Transport; Thu, 8 Jul 2021 17:59:50 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 063b2f31-574f-45f5-d264-08d9423a2ff5
+X-MS-TrafficTypeDiagnostic: CH2PR10MB3944:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CH2PR10MB3944EF795CBBD19DC278FB1287199@CH2PR10MB3944.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Xb6HxJEqjJRg0P7AiakVLKRNdaaqPw9cmB+vbbOPtfVlJl08jqvkjdMSs54OqQ8h1Ehm8nAlbnvPvdc5xatvRGsY8kSOruY74zSnc5e40SeBdQb3HBfhykYiNjZSolw51xegCrGErvAm7x6X2U8oSoGSWJdcVAe2rYJt2c3hz1Pa7KWi8tZwA4atGcvt/cm0yzv36BNM8cM2g2Bx+rjAFCGfHGorMGzKZH/Re81FJvfWZ1aoF6fZbe2jcrwvlxPIC5nrwvgl9hvCvKuBAkKfJBqduNAKARStVbVLQrTyP3lLABJTu9trZdVeLUzTJxSpkbzgwUH3mIyuszXbtDjPQmtAplgAMcbgWL2gcCYW6IwuRNz4GfPDL82WBNa1a8ZClrwAz6S/yhWYZNu4xOjjWhz84eeahJQTihBQOQykSLMU2Ytj6BI97VBflJa0VxVH9zwMLjjnBJvlb/fWxRCJUovC9JzYfwD1zg+AkBd7Wz/mBIdNls7h4GOdiGKqATVCIzkVJs61hjiuyrjlnTEan3YEhEFntofRq3USdMGDogI1blbOF5CwteuaANZe0yyTjrzjTekDKdrPmZ/BwScgj2idhGs90vOb/vaRDdzPpJ3cKS13XCSyoXVGKACn0H+iylM4VZ5YQFkAMpwjApkyg6qyJY3CCvJt/qRlI+IicJ7tTnsmaQcmgoGuLdb/kM6AE0WIUBIQByZYtaARz7jyMtOjZUNw9VQzRGnTWns0iU4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(346002)(376002)(136003)(39860400002)(396003)(6486002)(7416002)(86362001)(6916009)(316002)(16576012)(36756003)(52116002)(33656002)(8936002)(8676002)(2616005)(83380400001)(44832011)(956004)(107886003)(54906003)(66946007)(26005)(186003)(478600001)(5660300002)(66476007)(66556008)(4326008)(6666004)(2906002)(53546011)(38100700002)(38350700002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QjNyektzdjRZSjZaTVhZelNXekd0dmNncDJsOGRndC9kdXhOYkZud2xaTG9m?=
+ =?utf-8?B?RWNaWXl2M2xwV0l4MUJlQVo3ZWtQYTBpZU11Y1lIZ2E1Y1psdCtLcUtPbjFE?=
+ =?utf-8?B?K25QS0J0aGI1aVZnaDRkd01DaTBjMHNpK2JLemxEbThvbmNkMzAyYUdQZGE1?=
+ =?utf-8?B?UVlKTUd2Mng5UWRnSjVBVG5SMk5qb29kY2ZlUDdkMGloNllQUDhDYkVDNzVy?=
+ =?utf-8?B?RU5RWm1oNWg5dVJ1KzAreFhlS0RybVY4czdKMzVDR1FqcVlEam1PVnY1WFFt?=
+ =?utf-8?B?N1VKT2tobVpMT1ZTSHJCVWJ1VEt6SkJFUWYrWVFTOHJYb3h0LyswbzhGZmhC?=
+ =?utf-8?B?VUp1UGh0QnMwN1VCYW9JWlZiN1lLTDBmYndOVHBIZWhkWDRpNlFIUGR2SGNx?=
+ =?utf-8?B?NTlGaUZmS0V0dHViRXhNZVB6U3RTMzJuZmk4UldMMy9hR2x0RVp1bFhBelNa?=
+ =?utf-8?B?VEpiTExjZG5OSk1zOVhCWlhVUHFWK3JKcW5KUUlwZFZQN3IrUjVlbVVvMmF1?=
+ =?utf-8?B?eldlelZpcmF4b1RCQ21HMXhrMXFIbGhteXJPT2NONjhOMlAyeFlOUEdiVXE2?=
+ =?utf-8?B?UUphbW00Z1U1WlV4aVA3dSttZ3IwU0RiU3NqcWlyQWNVRFVtNjgwc0lHN2Fn?=
+ =?utf-8?B?RzFiTnNyaEtjMUpmbjFLOGEzdFV1bXZvMEVqcGVoSGsvcjhEbWUvdFhrdHQ1?=
+ =?utf-8?B?UkF6bks3aG9oZkg2UFJTdEZUSVBXOS8xWHZBU1VYbW5ZUGRSTFhEN09zL1pn?=
+ =?utf-8?B?TnZrcTU4T1ZPeW8vb1RkMzQ2cHg4RVRNVFpWWTdrOU15TWl4RlIxdXFYei9X?=
+ =?utf-8?B?UkNhZkVpdWoyN3lDS0hIY1M4dWNXNE5DR1llZy9CbVAraGVRUFQ1dm9IZC9Y?=
+ =?utf-8?B?TlhjeC9hS2tCQUpwWEIxYXJkV0w0cVlER3dPTHpOcWdPMFNNRVdFUlo2Qnl4?=
+ =?utf-8?B?RVhwd2FMbEFQMzh3M2ZKZHgzS3NYb0ZUSk1GTzU5NXdFL3kxUWFQRHhnaTRu?=
+ =?utf-8?B?eFBUZU1UeHYwam15U0lSMXRJbmx5N3YzaWxna0RZKzBoZWM1VGtZSjNDOTJh?=
+ =?utf-8?B?ZVp3R0p2MDRBdXZwTTkrbFNmcmFaeVpaOVdUVTFmbGRHTExsbkJML2FBZmE3?=
+ =?utf-8?B?QmpRZ2Q2a2tabGZWcVY3N1RIWUhHZEp4MTRucDc1UlBpSkFRTXo0REFQNHJI?=
+ =?utf-8?B?ZFF6cGV4eTJFRUFRSjk1bmdKMDlsNk5ZRTYyb0pxYzZEV3JVcCtyWFRVQk5G?=
+ =?utf-8?B?Y3lSUXh2d1RDS3BIZmlLdmUxWml4bno0LytaVVBTRWpQTk9ybEdYNkZJZUd4?=
+ =?utf-8?B?WHFaQ2YvdWRXSVF5VEpFMTBmZHZkWkNXWU9LYUlnQmJqdUhaOXVHSGR5b1A4?=
+ =?utf-8?B?czlKZXh6bk4wMS9XZjNXWmtkMVJYeGZyQkExRnIyVDdhcXNZbndGay9seG4y?=
+ =?utf-8?B?YVdPdzNuV2Ivb3RLQzhScXQ2emRvczVNVXRzQ2c4cU1oOGlydndoNURDTVpC?=
+ =?utf-8?B?a3ZpTkx6eHgzUXVXS2NzaXVta3Z0eFo1ZGRweGU2dXo0YWhEQjdMakxwU0s0?=
+ =?utf-8?B?MjRkOHppU3FiR0NKN3FTZEdtaVJ6ZEU0aWVsbjcrYWJUUjFiR1J5R1lxR0dy?=
+ =?utf-8?B?Vjg5WStDa1I1MnRqVklDdjJzQ3BmR3lVaGFmUnluQnRBSGtXNkdRQkFwVGl0?=
+ =?utf-8?B?KzJBZDh2aFU2cXdwR1JkdW4zMTRzdlE3VjA4NFVDM2U4RUppVWpWNTVpdERO?=
+ =?utf-8?Q?O484SHGr6rhJhG3W1fvai/7MeZe5qKLZ3KFg9rG?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 063b2f31-574f-45f5-d264-08d9423a2ff5
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2021 17:59:53.1982
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dOig/FUEeXjB3ugcTdjhgxaUMWV3NZKCTKjXha4OY6fh4Ve5kGpJbXrNKsfoKALyaXhyAXWKq9IOkh8CJPveupge2WMOIQs7epC99yQdFh4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB3944
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10039 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 phishscore=0
+ adultscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2107080094
+X-Proofpoint-GUID: 6ESc9fiosqOk1adra_VU3efpFLe0G353
+X-Proofpoint-ORIG-GUID: 6ESc9fiosqOk1adra_VU3efpFLe0G353
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/8/21 10:11 AM, Brijesh Singh wrote:
-> On 7/8/21 11:58 AM, Dave Hansen wrote:>> Logically its going to be
-> tricky to figure out which exact entry caused
->>> the fault, hence I dump any non-zero entry. I understand it may dump
->>> some useless.
->>
->> What's tricky about it?
->>
->> Sure, there's a possibility that more than one entry could contribute to
->> a fault.  But, you always know *IF* an entry could contribute to a fault.
->>
->> I'm fine if you run through the logic, don't find a known reason
->> (specific RMP entry) for the fault, and dump the whole table in that
->> case.  But, unconditionally polluting the kernel log with noise isn't
->> very nice for debugging.
-> 
-> The tricky part is to determine which undocumented bit to check to know
-> that we should stop dump. I can go with your suggestion that first try
-> with the known reasons and fallback to dump whole table for unknown
-> reasons only.
 
-You *can't* stop because of undocumented bits.  Fundamentally.  You
-literally don't know if the bit means "this caused a fault" versus "this
-definitely couldn't cause a fault".
+> On Jul 8, 2021, at 7:56 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
+>=20
+> On Wed, 2021-07-07 at 16:10 -0600, Eric Snowberg wrote:
+>>> On Jul 7, 2021, at 11:00 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
+>>>=20
+>>> On Wed, 2021-07-07 at 10:28 -0600, Eric Snowberg wrote:
+>>>>> On Jul 7, 2021, at 6:39 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
+>>>>>=20
+>>>>> On Tue, 2021-07-06 at 22:43 -0400, Eric Snowberg wrote:
+>>>>>> This is a follow up to the "Add additional MOK vars" [1] series I=20
+>>>>>> previously sent.  This series incorporates the feedback given=20
+>>>>>> both publicly on the mailing list and privately from Mimi. This=20
+>>>>>> series just focuses on getting end-user keys into the kernel trust=20
+>>>>>> boundary.
+>>>>>>=20
+>>>>>> Currently, pre-boot keys are not trusted within the Linux boundary [=
+2].
+>>>>>> Pre-boot keys include UEFI Secure Boot DB keys and MOKList keys. The=
+se
+>>>>>> keys are loaded into the platform keyring and can only be used for k=
+exec.
+>>>>>> If an end-user wants to use their own key within the Linux trust
+>>>>>> boundary, they must either compile it into the kernel themselves or =
+use
+>>>>>> the insert-sys-cert script. Both options present a problem. Many
+>>>>>> end-users do not want to compile their own kernels. With the
+>>>>>> insert-sys-cert option, there are missing upstream changes [3].  Als=
+o,
+>>>>>> with the insert-sys-cert option, the end-user must re-sign their ker=
+nel
+>>>>>> again with their own key, and then insert that key into the MOK db.
+>>>>>> Another problem with insert-sys-cert is that only a single key can b=
+e
+>>>>>> inserted into a compressed kernel.
+>>>>>>=20
+>>>>>> Having the ability to insert a key into the Linux trust boundary ope=
+ns
+>>>>>> up various possibilities.  The end-user can use a pre-built kernel a=
+nd
+>>>>>> sign their own kernel modules.  It also opens up the ability for an
+>>>>>> end-user to more easily use digital signature based IMA-appraisal.  =
+To
+>>>>>> get a key into the ima keyring, it must be signed by a key within th=
+e
+>>>>>> Linux trust boundary.
+>>>>>>=20
+>>>>>> Downstream Linux distros try to have a single signed kernel for each
+>>>>>> architecture.  Each end-user may use this kernel in entirely differe=
+nt
+>>>>>> ways.  Some downstream kernels have chosen to always trust platform =
+keys
+>>>>>> within the Linux trust boundary for kernel module signing.  These
+>>>>>> kernels have no way of using digital signature base IMA appraisal.=20
+>>>>>>=20
+>>>>>> This series adds a new MOK variable to shim.  This variable allows t=
+he
+>>>>>> end-user to decide if they want to trust keys enrolled in the MOK wi=
+thin
+>>>>>> the Linux trust boundary.  By default, nothing changes; MOK keys are
+>>>>>> not trusted within the Linux kernel.  They are only trusted after th=
+e=20
+>>>>>> end-user makes the decision themselves.  The end-user would set this
+>>>>>> through mokutil using a new --trust-mok option [4]. This would work
+>>>>>> similar to how the kernel uses MOK variable to enable/disable signat=
+ure
+>>>>>> validation as well as use/ignore the db.
+>>>>>>=20
+>>>>>> When shim boots, it mirrors the new MokTML Boot Services variable to=
+ a new
+>>>>>> MokListTrustedRT Runtime Services variable and extends PCR14.=20
+>>>>>> MokListTrustedRT is written without EFI_VARIABLE_NON_VOLATILE set,
+>>>>>> preventing an end-user from setting it after booting and doing a kex=
+ec.
+>>>>>>=20
+>>>>>> When the kernel boots, if MokListTrustedRT is set and
+>>>>>> EFI_VARIABLE_NON_VOLATILE is not set, the MokListRT is loaded into t=
+he
+>>>>>> secondary trusted keyring instead of the platform keyring. Mimi has
+>>>>>> suggested that only CA keys or keys that can be vouched for by other
+>>>>>> kernel keys be loaded. All other certs will load into the platform
+>>>>>> keyring instead.
+>>>>>=20
+>>>>> Loading MOK CA keys onto the "secondary" keyring would need to be an
+>>>>> exception.   Once CA keys are loaded onto the "secondary" keyring,  a=
+ny
+>>>>> certificates signed by those CA keys may be loaded normally, without
+>>>>> needing an exception, onto the "secondary" keyring.  The kernel MAY
+>>>>> load those keys onto the "secondary" keyring, but really doesn't need
+>>>>> to be involved.
+>>>>>=20
+>>>>> Loading ALL of the MOK db keys onto either the "secondary" or
+>>>>> "platform" keyrings makes the code a lot more complicated.  Is it
+>>>>> really necessary?
+>>>>=20
+>>>> Today all keys are loaded into the platform keyring. For kexec_file_lo=
+ad,=20
+>>>> the platform and secondary keys are trusted the same.  If this series =
+were=20
+>>>> not to load them all into either keyring, it would be a kexec_file_loa=
+d=20
+>>>> regression, since keys that previously loaded into the platform keyrin=
+g=20
+>>>> could be missing. The complexity arises from the CA key restriction. =
+=20
+>>>> If that requirement was removed, this series would be much smaller.
+>>>=20
+>>> To prevent the regression, allow the the existing firmware/UEFI keys to
+>>> continue to be loaded on the platform keyring, as it is currently being
+>>> done.  The new code would load just the MOK db CA keys onto the
+>>> secondary keyring, based on the new UEFI variable.  This is the only
+>>> code that would require a
+>>> "restrict_link_by_builtin_and_secondary_trusted" exemption.  The code
+>>> duplication would be minimal in comparison to the complexity being
+>>> introduced.
+>>=20
+>> This series was written with the following three requirements in mind:
+>>=20
+>> 1. Only CA keys that were originally bound for the platform keyring=20
+>> can enter the secondary keyring.
+>>=20
+>> 2. No key in the UEFI Secure Boot DB, CA or not, may enter the=20
+>> secondary keyring, only MOKList keys may be trusted.
+>>=20
+>> 3. A new MOK variable is added to signify the user wants to trust=20
+>> MOKList keys.
+>=20
+> Sounds good!
+>=20
+>>=20
+>> Given these requirements, I started down the path I think you are=20
+>> suggesting.  However I found it to be more complex.  If we load all=20
+>> keys into the platform keyring first and later try to load only CA keys,=
+=20
+>> we don=E2=80=99t have a way of knowing where the platform key came from.=
+ =20
+>> Platform keys can originate from the UEFI Secure Boot DB or the MOKList.=
+=20
+>> This would violate the second requirement. This caused me to need to=20
+>> create a new keyring handler. [PATCH RFC 10/12] integrity: add new=20
+>> keyring handler.
+>=20
+> To prevent the regression you mentioned, I was suggesting reading the
+> MOK DB twice.  One time loading all the keys onto the platform keyring.
+> The other time loading only the CA keys onto the secondary keyring.
+>=20
+>>=20
+>> To satisfy the first requirement a new restriction is required.  This=20
+>> is contained in [PATCH RFC 03/12] KEYS: CA link restriction.
+>>=20
+>> To satisfy the third requirement, we must read the new MOK var.  This=20
+>> is contained in [PATCH RFC 06/12] integrity: Trust mok keys if=20
+>> MokListTrustedRT found.
+>>=20
+>> The patches above make up a majority of the new code. =20
+>>=20
+>> The remaining code of creating a new .mok keyring was done with code=20
+>> reuse in mind. Many of the required functions necessary to add this=20
+>> capability is already contained in integrity_ functions.  If the=20
+>> operation was done directly on the secondary keyring, similar code=20
+>> would need to be added to certs/system_keyring.c. Just like how the=20
+>> platform keyring is created within integrity code, the mok keyring=20
+>> is created in the same fashion.  When the platform keyring has=20
+>> completed initialization and loaded all its keys, the keyring is set=20
+>> into system_keyring code using set_platform_trusted_keys.  Instead of=20
+>> setting the mok keyring, I=E2=80=99m moving the keys directly into the s=
+econdary=20
+>> keyring, while bypassing the current restriction placed on this keyring.
+>> Basically I'm trying to follow the same design pattern.=20
+>>=20
+>> If requirements #1, #2 or both (#1 and #2) could be dropped, most of=20
+>> this series would not be necessary.
+>=20
+> But without these requirements, the source of trust is unclear.
+>=20
+> Is there a reason why the MOK keyring is temporary? =20
 
-Basically, if we get to the point of dumping the whole table, we should
-also spit out an error message saying that the kernel is dazed and
-confused and can't figure out why the hardware caused a fault.  Then,
-dump out the whole table so that the "hardware" folks can have a look.
+I suppose it doesn't have to be temporary.  I was trying not to introduce
+another keyring within system_keyring code.
+
+>  Asumming a
+> function similar to "restrict_link_by_builtin_and_secondary_trusted" is
+> defined to include the MOK keyring, the CA keys in the MOK db would be
+> loaded onto the MOK keyring, the other keys that meet the secondary
+> keyring restriction would be loaded directly onto the secondary
+> keyring[1], and as you currently have, the remaining keys onto the
+> platform keyring.
+>=20
+> This eliminates the exemption needed for loading keys onto the
+> secondary keyring.  The MOK keyring, containing just CA keys, becomes a
+> new trust source.
+
+I just want to make sure I understand. If we kept the .mok keyring around,=
+=20
+we would store it into the system_keyring code, just like the platform=20
+keyring is stored.  This would allow the move exemption code to be removed.
+If the mok keyring is a new trust source, whenever the secondary keyring=20
+is referenced in verify_ code, the mok keyring will be checked too.  If=20
+I have this right, let me know and I=E2=80=99ll work on a v2.  Thanks.
+
