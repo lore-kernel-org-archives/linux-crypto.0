@@ -2,105 +2,127 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C67C07E95
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 03:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C1EC07E96
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 04:34:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54D7161CD8
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 03:09:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E0B461CDD
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 04:34:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230314AbhGHDMC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Jul 2021 23:12:02 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:51178 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230244AbhGHDMC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jul 2021 23:12:02 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1m1KPd-00060d-FZ; Thu, 08 Jul 2021 11:09:17 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1m1KPZ-0008Mp-Mj; Thu, 08 Jul 2021 11:09:13 +0800
-Date:   Thu, 8 Jul 2021 11:09:13 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 5.14
-Message-ID: <20210708030913.GA32097@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20200830223304.GA16882@gondor.apana.org.au>
- <20201026011159.GA2428@gondor.apana.org.au>
- <20201227113221.GA28744@gondor.apana.org.au>
- <20210108035450.GA6191@gondor.apana.org.au>
+        id S229541AbhGHEhE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jul 2021 00:37:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58266 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229482AbhGHEhE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Jul 2021 00:37:04 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35851C061574;
+        Wed,  7 Jul 2021 21:34:23 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id b2so7166918ejg.8;
+        Wed, 07 Jul 2021 21:34:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=DZpADzPkllhB2f2eevjE66dy2/DnKutR4bBIj2mC0zE=;
+        b=HJ07gHdCtEklVmkp4xRYgIPUAD1HZjREgIW3OpJHgt4qXJpC5lFaYD8Ws1nxl82O5t
+         v+y2PCjnxaCmhCXhyDcryaFWrUajiTKSJIl/VIPLcpNHBUULHgfShO101pFa0wZmridA
+         h78fPgrFXJQ+2f8AwVKD/DIDdmECtjJpoPDmQdztLiHHI7eOT3s9Cacqr8BdZQyZoF4L
+         qNzftyyDdT0fBg+eSuJ0VNf5v6saBnI4k3iVC9vAEKXmW10KQQh94LY1gI6dQaBVbHZR
+         RxMKoBfID8csPYIXn+512I/Yt+qGGzF702arAv/fUMLqIrLOEQo665o9OquAWkUkEJMM
+         jndA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=DZpADzPkllhB2f2eevjE66dy2/DnKutR4bBIj2mC0zE=;
+        b=EsHRFWP46FONEJbQafzMXsXIc3dfCIAiSuuRAsAO1Gi5Bfe7DnZ7T8dNMBdhSESC3N
+         dm17sjySRkTvy9MaEI/DOiiMXrPkLKFUhZqKQD5ekJ38/dg1WAc+3dbmpjcBmNFrpID+
+         nLOsm04FbvE6HK1hm1DV0NFaQcsbtomMtgAgIGn+60lQX4XNBQgrO8h34Mdco89mGuXb
+         8z6O+/5EcsZJWMcOi8Tnwg/Eovv9FbmoB8avc/Khv2w3mi3bhtrKlmON8drteRdLEY4h
+         vPeHKilom4uF5tPZdVViRyxrlSm0CgJd7NOR9m36MtxtqrIL3TBxfslMMKEtd9EUr/cR
+         ltqQ==
+X-Gm-Message-State: AOAM533zYdDj7h4f7v42D6K0Zce2bAnd/wvWu5slurWc2V8lkuOhKy6R
+        doFB3IH/EwWJ0Bjyl4lqWcAXqSisJC4WeJtX9Q5d4SzhZY+fWK76
+X-Google-Smtp-Source: ABdhPJzssqKIKBytGh1QuCXAmejrZd+4ZlIpiWHBYBOqgXdru/TvdJxgKsfMyuHooVJ4FOFPDIFjx5btkZqfgludPPs=
+X-Received: by 2002:a17:906:3699:: with SMTP id a25mr22145621ejc.452.1625718861821;
+ Wed, 07 Jul 2021 21:34:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210108035450.GA6191@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+From:   iLifetruth <yixiaonn@gmail.com>
+Date:   Thu, 8 Jul 2021 12:33:47 +0800
+Message-ID: <CABv53a8jyUXns9yu3xyd71_R+nNerU+Xj4i7a4rcZUH0bd52kw@mail.gmail.com>
+Subject: crypto: prefix additional module autoloading with "crypto-"
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Qiang Liu <cyruscyliu@gmail.com>, yajin@vm-kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+Hi, in the latest version of linux kernel, we may have found some
+additional incomplete fixed crypto-related modules related to
+CVE-2013-7421.
 
-This push contains the following fixes and changes:
+==========
+The upstream commit 5d26a105b5a7 ("crypto: prefix module autoloading
+with "crypto-"")  provided the fixing patch for CVE-2013-7421 about 7
+years ago on 2014-11-24.
 
-- Regression in drbg due to missing self-test for new default algorithm.
-- Add ratelimit on user-triggerable message in qat.
-- Build failure due to missing dependency in sl3516.
-- Remove obsolete PageSlab checks.
-- Bogus hardware register writes on Kunpeng920 in hisilicon/sec.
+This patch changed the automatic module loading when requesting crypto
+algorithms to prefix all module requests with "crypto-", so we can
+never run the risk of exposing module auto-loading to userspace via a
+crypto API, as demonstrated by Mathias Krause:
+        https://lkml.org/lkml/2013/3/4/70
 
-The following changes since commit 9f38b678ffc4e2ccf167a1131c0403dc4f5e1bb7:
+=========
+And the common fix pattern we found in each crypto-related module is as follows:
+1. linux/drivers/crypto/padlock-aes.c
+       -MODULE_ALIAS("aes");
+       +MODULE_ALIAS_CRYPTO("aes");
 
-  crypto: sl3516 - depends on HAS_IOMEM (2021-06-24 14:57:28 +0800)
+or in another module:
 
-are available in the Git repository at:
+2. linux/drivers/crypto/qat/qat_common/adf_ctl_drv.c
+      -MODULE_ALIAS("intel_qat");
+      +MODULE_ALIAS_CRYPTO("intel_qat");
+...
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+==========
+Even though commit 5d26a105b5a7 added those aliases for a large number
+of modules,  it is still missing some newly added crypto-related
+modules.
+For example:
+1. for file linux/drivers/crypto/amcc/crypto4xx_trng.c in line 129,
+Module_ALIAS is used instead of MODULE_ALIAS_CRYPTO
+           MODULE_ALIAS("ppc4xx_rng");
+     In fact, ppc4xx-rng was integrated into crypto4xx on 2016-04-18
+by commit 5343e674f32fb8, which was committed about 2 years later than
+the security bug fixing patch(5d26a105b5a7) committed on 2014-11-24
 
-for you to fetch changes up to 66192b2e3fd8ab97ed518d6c0240e26655a20b4b:
+More modules that may not have been fixed are as follows:
+2. linux/crypto/crypto_user_base.c
+        MODULE_ALIAS("net-pf-16-proto-21");
+3. linux/drivers/crypto/mxs-dcp.c
+        MODULE_ALIAS("platform:mxs-dcp");
+4. linux/drivers/crypto/omap-sham.c
+        MODULE_ALIAS("platform:omap-sham");
+5. linux/drivers/crypto/qcom-rng.c
+        MODULE_ALIAS("platform:" KBUILD_MODNAME);
+6. linux/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+        MODULE_ALIAS("platform:sun4i-ss");
+7. linux/drivers/crypto/marvell/cesa/cesa.c
+        MODULE_ALIAS("platform:mv_crypto");
+8. linux/drivers/crypto/qce/core.c
+        MODULE_ALIAS("platform:" KBUILD_MODNAME);
 
-  crypto: hisilicon/sec - fix the process of disabling sva prefetching (2021-06-28 11:28:09 +0800)
+==========
+Now, shall we port the fix pattern to these modules from the patch of
+CVE-2013-7421?
+We would like to contact you to confirm this problem.
 
-----------------------------------------------------------------
-Colin Ian King (1):
-      crypto: qat - ratelimit invalid ioctl message and print the invalid cmd
-
-Geert Uytterhoeven (2):
-      crypto: sl3516 - Typo s/Stormlink/Storlink/
-      crypto: sl3516 - Add dependency on ARCH_GEMINI
-
-Herbert Xu (2):
-      crypto: scatterwalk - Remove obsolete PageSlab check
-      crypto: omap - Drop obsolete PageSlab check
-
-Kai Ye (1):
-      crypto: hisilicon/sec - fix the process of disabling sva prefetching
-
-Stephan Müller (1):
-      crypto: drbg - self test for HMAC(SHA-512)
-
- crypto/testmgr.c                            |  5 ++-
- crypto/testmgr.h                            | 49 +++++++++++++++++++++++++++++
- drivers/crypto/Kconfig                      |  6 ++--
- drivers/crypto/gemini/sl3516-ce-cipher.c    |  2 +-
- drivers/crypto/gemini/sl3516-ce-core.c      |  2 +-
- drivers/crypto/hisilicon/sec2/sec_main.c    |  3 ++
- drivers/crypto/omap-crypto.c                |  3 +-
- drivers/crypto/qat/qat_common/adf_ctl_drv.c |  2 +-
- include/crypto/scatterwalk.h                |  7 +----
- 9 files changed, 64 insertions(+), 15 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thank you!
