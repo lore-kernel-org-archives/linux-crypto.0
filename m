@@ -2,271 +2,343 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF1CC07E9E
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 13:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F9AC07E9C
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 15:02:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2865361459
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 13:57:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 597BB6147D
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 15:02:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231749AbhGHOAO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Jul 2021 10:00:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18458 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231485AbhGHOAO (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Jul 2021 10:00:14 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 168DXd3u144912;
-        Thu, 8 Jul 2021 09:56:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=+clPLLZTo0GHr3TARtG5M+niMrD2xIYIzfX7kUTjkM4=;
- b=kMv8e2ZYgwr9SIXWvJ4yENSF9HYztbBIqpH0y4dJLXtiPkIcRzrPd5cxUTPRrQcPHCXN
- rajwlpS52+/ep3Smksijnsmg5ip2nQ4euk0XjddVvrzr7yfw7AzSNzToI6sfeFsLlblu
- yk3d89OAqbhqfnh5kb9a1BsUjqZh0x4By97SYk7M8E7nsd/ZMAvCIQx4OYZwRnNTTXzv
- DUPeJBe4Czjgr5lc7rBveiLRJFmbVD4qk9m20Q8m6+wJyWWMtTpLBZ/Z22ra9jDWrCKR
- KOBBsReA83xUTeFLeIdGuyPsfRZJX4bKPgnXZGiuc6aIEM6+pANL52DVAFZgBlrO5RPA og== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39nhcb41qn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 09:56:55 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 168DXgaB145241;
-        Thu, 8 Jul 2021 09:56:54 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39nhcb41pa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 09:56:54 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 168DpgeH008469;
-        Thu, 8 Jul 2021 13:56:51 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 39jf5ha84w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 13:56:51 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 168Dunrj36110806
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 8 Jul 2021 13:56:49 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 16E88A405B;
-        Thu,  8 Jul 2021 13:56:49 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1B222A405E;
-        Thu,  8 Jul 2021 13:56:44 +0000 (GMT)
-Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.92.57])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  8 Jul 2021 13:56:43 +0000 (GMT)
-Message-ID: <c0cf7f883a9252c17427f1f992e4973e78481304.camel@linux.ibm.com>
-Subject: Re: [PATCH RFC 00/12] Enroll kernel keys thru MOK
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     keyrings@vger.kernel.org,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
-        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
-        scott.branden@broadcom.com, weiyongjun1@huawei.com,
-        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
-        nramas@linux.microsoft.com, lszubowi@redhat.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
-        glin@suse.com, "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>
-Date:   Thu, 08 Jul 2021 09:56:43 -0400
-In-Reply-To: <D34A6328-91CA-4E1E-845C-FAC9B424819B@oracle.com>
-References: <20210707024403.1083977-1-eric.snowberg@oracle.com>
-         <42b787dd3a20fe37c4de60daf75db06e409cfb6d.camel@linux.ibm.com>
-         <5BFB3C52-36D4-47A5-B1B8-977717C555A0@oracle.com>
-         <886f30dcf7b3d48644289acc3601c2f0207b19b6.camel@linux.ibm.com>
-         <D34A6328-91CA-4E1E-845C-FAC9B424819B@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Rmx51EWYKw7nv6rYbZhkVfqnBL1ggZE-
-X-Proofpoint-GUID: e8qQ2TfThkgAUAEfda4mMDwXmCLDzy_F
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-08_06:2021-07-08,2021-07-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 phishscore=0 mlxlogscore=999 mlxscore=0 spamscore=0
- clxscore=1015 impostorscore=0 priorityscore=1501 adultscore=0
- suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107080074
+        id S232008AbhGHPEy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jul 2021 11:04:54 -0400
+Received: from mail-mw2nam08on2076.outbound.protection.outlook.com ([40.107.101.76]:31809
+        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231708AbhGHPEx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Jul 2021 11:04:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U82LR4d5BK5DyhhB2IelzTUB+5HQ2B8WI18kRf54f97gUWhdvkpKpF0P9OZC7+hsuBG70EnXk9XtjZ2HDKcOIIh3UkBUQhO3DQJr2dyaW2fdSrb1d2gauZl8/Ik/6vTdjCeQwiID2yy9G9qEIjH1zsnQXxXIvyvYzNkIy1sl5eyMBC6Om7WhCCbxeiDq5B8baSIonL9oAYaZrG5p+SERQo2iVO+YxxMk4EeWikKOB8HG1sSe132cGqCjwg8gdbnfLGVDqCKRk8L2saMn+W80/AXf0CM0wFIDZpWHR7tydXK/QCw9YaMjlJkkD6S3iIKjLPvqUuL4+oYUI/d57lB70A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SMAXVBYMdEBmB6tRHJbSAjDzuqyy1kEtEiuWSb9ZoMI=;
+ b=iZ5IFYOqD6CkG3oN8OaJj24ivH1E4ZHLGwBk2f2yzcg1XTjQpVuuMihdGkIjFVujIM5ISvACWgspq8q97VHtOVPh1aoHojBDrU++ahaMKmWId5+8JtEEs9/Jr+OVR76WmbJcwyUn15uGuqkdDz/j1qCbFwotguC7wcXw1Gm9NmWrvE82hSq7JSABLcv+vl+u/xDiVHJdUqmxv9gS4OvxqtEgRY6Xi5js80wLls9M8SQTuuOjXr3yostSKTa1bJBoMd9DOuDHeHVjmKGZjpxBaETznTNl1GBGbQwi+QdCpsHtO8zxxY0tVuOSPRRuAUprMyix2e/+/WmM+/eo5H6Lew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SMAXVBYMdEBmB6tRHJbSAjDzuqyy1kEtEiuWSb9ZoMI=;
+ b=r3Imie368jRUPK+L5MnGTphLVulRaTjhmmHxLQ2yJiT2QdvBsV428ib1cnYkyNy3temRHu55pXkva2+05URs9v0QcgJcwtVRv5JfLXrxEBoEiMCXR9NlSJ0tgJ+yu16PWQa8I2Ta4BAf/CUKpGBJZmy73YfYLbkJ320sYHBOo1s=
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4557.namprd12.prod.outlook.com (2603:10b6:806:9d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20; Thu, 8 Jul
+ 2021 15:02:08 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4308.022; Thu, 8 Jul 2021
+ 15:02:08 +0000
+Cc:     brijesh.singh@amd.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 09/40] x86/fault: Add support to dump RMP
+ entry on fault
+To:     Dave Hansen <dave.hansen@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-10-brijesh.singh@amd.com>
+ <cb9e3890-9642-f254-2fe7-30621e686844@intel.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <0d19eb84-f2b7-aa24-2fe9-19035b49fbd6@amd.com>
+Date:   Thu, 8 Jul 2021 10:02:04 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <cb9e3890-9642-f254-2fe7-30621e686844@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9P221CA0014.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:806:25::19) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.95] (165.204.77.1) by SA9P221CA0014.NAMP221.PROD.OUTLOOK.COM (2603:10b6:806:25::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.21 via Frontend Transport; Thu, 8 Jul 2021 15:02:06 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c8e847d5-d7b5-424c-17fb-08d942215afd
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4557:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB455779163AA4BCEE6409C994E5199@SA0PR12MB4557.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9bfBF3q9N3YRfwlTV9Wkgn/vs3h+07cO0N5tSXSui9IB5DKIzb7RS+N5Dc/C9zZrCuL2f3zcA4dWb1Qfmy22MWbMfM2NuFcLKwTTp2VeskptO9Q0TRvUP5Pd0Cz4O/w4gZhnxGU+0zR0WV1JMP09PFhwDAkYT39nXIN9zuj49G5xqj1Iwh8MC0sAIkcvKdqzrHzO3205+nRoamV38Hz3I0+f1iRJPl+FiKNUdkREYNkjPcCfi/ebceXV1QNf91Cxm+7aBL3xL8fqNkMkZkRDBYPvDpDprSjpOGaPMWb50C28962jvb1xIKJSU07YVPjjO/FKxx80CszHI2D+l/485BJWCMC4J0zlQZcsmFBqzD1+TSZL103gPjdiGqqBvqsLXAh3UrnRH8Ml/tP1LIcbUEfDuqvg4DqA7cVcQOPaMUPsPeOcOU36yGSCx3WP8wYXtqUe5eDSd1XRSpyC9LVZtOC12X5544vV0NAvkcoYey2JhaTFmZa4YBfK5PGkI1TW2mCwTGVlFWaeKAspEg5ceHCw3QMUwuvVvHTFT1uPeQEQVcbNeTtWTtCHDimMMV7K7udKmOMQBTqNjI7RaKvxibA6NW6XVPvwGSHsmrS0YubMx2G1CnUcMds336BS9YlTjfAIRgryuDpQdtOIhfzMYBVR1lRK7nGKOtQQQrWYt7e4PpfrPXK2xJE0CbMGbwxM0YI9N/5mncNJEa4LPCqQveNr7JNdVvFdTtpvcJ9fVtmQd+ZWh8ZLehPjy0UimmKOkdHOds7/bHKMxzyhZ6Qybqs8Fqg6vdFrSejnmBSk9EE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(136003)(376002)(346002)(396003)(31696002)(8676002)(2906002)(7406005)(7416002)(66476007)(8936002)(956004)(44832011)(53546011)(26005)(66556008)(52116002)(2616005)(36756003)(186003)(6486002)(83380400001)(16576012)(86362001)(54906003)(5660300002)(4326008)(31686004)(316002)(66946007)(478600001)(38100700002)(38350700002)(21314003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OWZnTTZaS2ViZ1I3NFIyKzlwa1g0YWZyd3BjLzRnVWFsVjlLNVdWOURiMVhK?=
+ =?utf-8?B?M0ZXTVc3cGZMNFRtRWxET1BkRU1ZZ091NXFNenVOTVA1QmNCYWhPcUdCTCtN?=
+ =?utf-8?B?N0lWNnYxZzRrZWVLYzRDUzRSckxyaE5KTWh4QnBQZlJNbG9aTk1QczcyRy9t?=
+ =?utf-8?B?OGNXYmF3V1Rnc0Y0d3RLQTFkQXlFZVVPOEliaHFUNE41L1NRM0wzekVRYlAz?=
+ =?utf-8?B?bHhYTUU1NlkxRkJtY05FYUZYcVA5TjNvTEpFNHovejZCbFg5c0ZRa3hlcUJu?=
+ =?utf-8?B?VjN6ZVZoeFJMR3RqWXZacldidFhhTWFqZjhxTVZ6VHB2cFloR2hGdXVGY3k2?=
+ =?utf-8?B?RkpmNWJVWW9BdXcyNUVUL25LeGcwdUsxNTNWR0YwK0I4dGhnKzVKTk5zZGRo?=
+ =?utf-8?B?UTQveGpjUlB5V0svSGtpK0s4Q256TnJXUmhBR2thSk1JTHBHbis5anArcmhi?=
+ =?utf-8?B?OXFJeTU2RW40c3NweFRNZGtFZC94OUNkd05xQVJ0aU9xcXZGYlZFdDg0TDM0?=
+ =?utf-8?B?d1crZlVMY2FqeU9IS1NmcytobGQ0U1RsUHRveTR6c1FFN1RyR1Y5bXVMNEJG?=
+ =?utf-8?B?eTFJcXQ4QWd2dHJiNEVEUVVjWDdQTzlrelNZbFdrKytVcVdMM3ZZNWczNVNs?=
+ =?utf-8?B?SXp5T1NpOWM1T2xxRGZXSUdkdWZSUnZvRFBtTUM0Rnl0UkxJRjBiL3RxOE5M?=
+ =?utf-8?B?Z3ZYSW95WWpSOGdQUEpxTDA2Z09WZVR6VGFHSkxOY3NsR295SlY3RUN3dkpG?=
+ =?utf-8?B?ODNEQk1ta0VXdFkvWEN3ZnQ3QktvMUFlUjdiQXFZaktDWjdmYm0zOUN5MW9k?=
+ =?utf-8?B?a3dpaE9jVE9LQlVkN1pSNW93MEtGWW1lcCtFenl6SG11N0VJTWt2aDNvY0xk?=
+ =?utf-8?B?SUk1RHgyL2MvTzBCejZScmt2QW1iS3hOSmhRWjRZOUNKZlVaZGpjS2VsaURP?=
+ =?utf-8?B?YmJCRDVIcXhscFRWR2k2OW9UcGFaSExiSFQ5cnhpYWNuSU5ZSys4ejhkbWxo?=
+ =?utf-8?B?NlVUN01rSEFJUzhQVmtCdEJ5Y0VpSXM4aUlSd2pndDZRVklRcDY5b1U4U1J6?=
+ =?utf-8?B?UUsyNFJoU05VeGxHUkwvSVhkMUxlUVdydUlCMjl0SWFTOWVqMnc3dm1VVmdQ?=
+ =?utf-8?B?cmdZTG1vQy8rZjlSdEZJeGplQTk3MDF1VzlscUlNdTNRTkFhY2w5a0QrSXZJ?=
+ =?utf-8?B?a0xOamVhQW40U2kveGxxdWorTmN5ampkTWtVd2xGTzBCRGRHVFM0Uk4zd21r?=
+ =?utf-8?B?b1JzZWo5SUk0YmNsYVNHcW9YQjQxTTdZTktLWlVOYk9nT1pCYXJyOXpqS2Fp?=
+ =?utf-8?B?NXNNV1JiOXJDeXF5TWFDOHUzTnJJcitOYkpmSCtUdVlVQm52U0V1bmM2QzA5?=
+ =?utf-8?B?Y05aa0pickE1QkNyVFlKS2R1TU53bCtKSHplVjNabzJQMUdZOHFGSVE1aE5k?=
+ =?utf-8?B?N0RxZFY0ck5VQmZ5Um1vVlRKYVVUYzNkMTdpUTR1RXdNb08rL0QzcG1rVENR?=
+ =?utf-8?B?VzhvaEd1Z05HSUJYMXVVQlJWUEtMQ0lDL0UyYXBsTElxL2tRcHZ4QkV0dW9v?=
+ =?utf-8?B?cmx6MnJ0Mlk0WGdOTEUzcVQwOGFxNWtydnNOT0F2S0RYWTcvWjVUZVdHNVNn?=
+ =?utf-8?B?cE1UdlFxWCtSWEczTlRMbUZVaGR4dmRMVHRRS09QbTdUeGJKdFF5ZmhMbmlC?=
+ =?utf-8?B?OW9SRmlEZWZQVVA2cFdvNk5BZ3NTZDdNWjZ3cVp1d1Y5Y0poZXBhSDZHL3pL?=
+ =?utf-8?Q?5ta+Kw3A1HN01aYBOmBcrwWTQRTJct5Jt445ys3?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c8e847d5-d7b5-424c-17fb-08d942215afd
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2021 15:02:07.9824
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aJbGrOB7KDFmeXsyUkbHHRfYTL4aJBEvk2qwFAfzxUIOFtOmuRCoGBtwwzMoTTCHfxs6rXHiYeicsXofG9Zk0g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4557
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2021-07-07 at 16:10 -0600, Eric Snowberg wrote:
-> > On Jul 7, 2021, at 11:00 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
-> > 
-> > On Wed, 2021-07-07 at 10:28 -0600, Eric Snowberg wrote:
-> >>> On Jul 7, 2021, at 6:39 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
-> >>> 
-> >>> On Tue, 2021-07-06 at 22:43 -0400, Eric Snowberg wrote:
-> >>>> This is a follow up to the "Add additional MOK vars" [1] series I 
-> >>>> previously sent.  This series incorporates the feedback given 
-> >>>> both publicly on the mailing list and privately from Mimi. This 
-> >>>> series just focuses on getting end-user keys into the kernel trust 
-> >>>> boundary.
-> >>>> 
-> >>>> Currently, pre-boot keys are not trusted within the Linux boundary [2].
-> >>>> Pre-boot keys include UEFI Secure Boot DB keys and MOKList keys. These
-> >>>> keys are loaded into the platform keyring and can only be used for kexec.
-> >>>> If an end-user wants to use their own key within the Linux trust
-> >>>> boundary, they must either compile it into the kernel themselves or use
-> >>>> the insert-sys-cert script. Both options present a problem. Many
-> >>>> end-users do not want to compile their own kernels. With the
-> >>>> insert-sys-cert option, there are missing upstream changes [3].  Also,
-> >>>> with the insert-sys-cert option, the end-user must re-sign their kernel
-> >>>> again with their own key, and then insert that key into the MOK db.
-> >>>> Another problem with insert-sys-cert is that only a single key can be
-> >>>> inserted into a compressed kernel.
-> >>>> 
-> >>>> Having the ability to insert a key into the Linux trust boundary opens
-> >>>> up various possibilities.  The end-user can use a pre-built kernel and
-> >>>> sign their own kernel modules.  It also opens up the ability for an
-> >>>> end-user to more easily use digital signature based IMA-appraisal.  To
-> >>>> get a key into the ima keyring, it must be signed by a key within the
-> >>>> Linux trust boundary.
-> >>>> 
-> >>>> Downstream Linux distros try to have a single signed kernel for each
-> >>>> architecture.  Each end-user may use this kernel in entirely different
-> >>>> ways.  Some downstream kernels have chosen to always trust platform keys
-> >>>> within the Linux trust boundary for kernel module signing.  These
-> >>>> kernels have no way of using digital signature base IMA appraisal. 
-> >>>> 
-> >>>> This series adds a new MOK variable to shim.  This variable allows the
-> >>>> end-user to decide if they want to trust keys enrolled in the MOK within
-> >>>> the Linux trust boundary.  By default, nothing changes; MOK keys are
-> >>>> not trusted within the Linux kernel.  They are only trusted after the 
-> >>>> end-user makes the decision themselves.  The end-user would set this
-> >>>> through mokutil using a new --trust-mok option [4]. This would work
-> >>>> similar to how the kernel uses MOK variable to enable/disable signature
-> >>>> validation as well as use/ignore the db.
-> >>>> 
-> >>>> When shim boots, it mirrors the new MokTML Boot Services variable to a new
-> >>>> MokListTrustedRT Runtime Services variable and extends PCR14. 
-> >>>> MokListTrustedRT is written without EFI_VARIABLE_NON_VOLATILE set,
-> >>>> preventing an end-user from setting it after booting and doing a kexec.
-> >>>> 
-> >>>> When the kernel boots, if MokListTrustedRT is set and
-> >>>> EFI_VARIABLE_NON_VOLATILE is not set, the MokListRT is loaded into the
-> >>>> secondary trusted keyring instead of the platform keyring. Mimi has
-> >>>> suggested that only CA keys or keys that can be vouched for by other
-> >>>> kernel keys be loaded. All other certs will load into the platform
-> >>>> keyring instead.
-> >>> 
-> >>> Loading MOK CA keys onto the "secondary" keyring would need to be an
-> >>> exception.   Once CA keys are loaded onto the "secondary" keyring,  any
-> >>> certificates signed by those CA keys may be loaded normally, without
-> >>> needing an exception, onto the "secondary" keyring.  The kernel MAY
-> >>> load those keys onto the "secondary" keyring, but really doesn't need
-> >>> to be involved.
-> >>> 
-> >>> Loading ALL of the MOK db keys onto either the "secondary" or
-> >>> "platform" keyrings makes the code a lot more complicated.  Is it
-> >>> really necessary?
-> >> 
-> >> Today all keys are loaded into the platform keyring. For kexec_file_load, 
-> >> the platform and secondary keys are trusted the same.  If this series were 
-> >> not to load them all into either keyring, it would be a kexec_file_load 
-> >> regression, since keys that previously loaded into the platform keyring 
-> >> could be missing. The complexity arises from the CA key restriction.  
-> >> If that requirement was removed, this series would be much smaller.
-> > 
-> > To prevent the regression, allow the the existing firmware/UEFI keys to
-> > continue to be loaded on the platform keyring, as it is currently being
-> > done.  The new code would load just the MOK db CA keys onto the
-> > secondary keyring, based on the new UEFI variable.  This is the only
-> > code that would require a
-> > "restrict_link_by_builtin_and_secondary_trusted" exemption.  The code
-> > duplication would be minimal in comparison to the complexity being
-> > introduced.
-> 
-> This series was written with the following three requirements in mind:
-> 
-> 1. Only CA keys that were originally bound for the platform keyring 
-> can enter the secondary keyring.
-> 
-> 2. No key in the UEFI Secure Boot DB, CA or not, may enter the 
-> secondary keyring, only MOKList keys may be trusted.
-> 
-> 3. A new MOK variable is added to signify the user wants to trust 
-> MOKList keys.
+Hi Dave,
 
-Sounds good!
+
+On 7/7/21 2:21 PM, Dave Hansen wrote:
+>> @@ -502,6 +503,81 @@ static void show_ldttss(const struct desc_ptr *gdt, const char *name, u16 index)
+>>   		 name, index, addr, (desc.limit0 | (desc.limit1 << 16)));
+>>   }
+>>   
+>> +static void dump_rmpentry(unsigned long address)
+>> +{
+> 
+> A comment on this sucker would be nice.  I *think* this must be a kernel
+> virtual address.  Reflecting that into the naming or a comment would be
+> nice.
+
+Ack, I will add some comment.
 
 > 
-> Given these requirements, I started down the path I think you are 
-> suggesting.  However I found it to be more complex.  If we load all 
-> keys into the platform keyring first and later try to load only CA keys, 
-> we don’t have a way of knowing where the platform key came from.  
-> Platform keys can originate from the UEFI Secure Boot DB or the MOKList. 
-> This would violate the second requirement. This caused me to need to 
-> create a new keyring handler. [PATCH RFC 10/12] integrity: add new 
-> keyring handler.
+>> +	struct rmpentry *e;
+>> +	unsigned long pfn;
+>> +	pgd_t *pgd;
+>> +	pte_t *pte;
+>> +	int level;
+>> +
+>> +	pgd = __va(read_cr3_pa());
+>> +	pgd += pgd_index(address);
+>> +
+>> +	pte = lookup_address_in_pgd(pgd, address, &level);
+>> +	if (unlikely(!pte))
+>> +		return;
+> 
+> It's a little annoying this is doing *another* separate page walk.
+> Don't we already do this for dumping the page tables themselves at oops
+> time?
+> 
 
-To prevent the regression you mentioned, I was suggesting reading the
-MOK DB twice.  One time loading all the keys onto the platform keyring.
-The other time loading only the CA keys onto the secondary keyring.
+Yes, we already do the walk in oops function, I'll extend the 
+dump_rmpentry() to use the level from the oops to avoid the duplicate walk.
+
+
+> Also, please get rid of all of the likely/unlikely()s in your patches.
+> They are pure noise unless you have specific knowledge of the compiler
+> getting something so horribly wrong that it affects real-world performance.
+> 
+>> +	switch (level) {
+>> +	case PG_LEVEL_4K: {
+>> +		pfn = pte_pfn(*pte);
+>> +		break;
+>> +	}
+> 
+> These superfluous brackets are really strange looking.  Could you remove
+> them, please?
+
+Noted.
 
 > 
-> To satisfy the first requirement a new restriction is required.  This 
-> is contained in [PATCH RFC 03/12] KEYS: CA link restriction.
+>> +	case PG_LEVEL_2M: {
+>> +		pfn = pmd_pfn(*(pmd_t *)pte);
+>> +		break;
+>> +	}
+>> +	case PG_LEVEL_1G: {
+>> +		pfn = pud_pfn(*(pud_t *)pte);
+>> +		break;
+>> +	}
+>> +	case PG_LEVEL_512G: {
+>> +		pfn = p4d_pfn(*(p4d_t *)pte);
+>> +		break;
+>> +	}
+>> +	default:
+>> +		return;
+>> +	}
+>> +
+>> +	e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &level);
 > 
-> To satisfy the third requirement, we must read the new MOK var.  This 
-> is contained in [PATCH RFC 06/12] integrity: Trust mok keys if 
-> MokListTrustedRT found.
+> So, lookup_address_in_pgd() looks to me like it will return pretty
+> random page table entries as long as the entry isn't
+> p{gd,4d,ud,md,te}_none().  It can certainly return !p*_present()
+> entries.  Those are *NOT* safe to call pfn_to_page() on.
 > 
-> The patches above make up a majority of the new code.  
+
+I will add some checks to make sure that we are accessing only safe pfn's.
+
+>> +	if (unlikely(!e))
+>> +		return;
+>> +
+>> +	/*
+>> +	 * If the RMP entry at the faulting address was not assigned, then
+>> +	 * dump may not provide any useful debug information. Iterate
+>> +	 * through the entire 2MB region, and dump the RMP entries if one
+>> +	 * of the bit in the RMP entry is set.
+>> +	 */
 > 
-> The remaining code of creating a new .mok keyring was done with code 
-> reuse in mind. Many of the required functions necessary to add this 
-> capability is already contained in integrity_ functions.  If the 
-> operation was done directly on the secondary keyring, similar code 
-> would need to be added to certs/system_keyring.c. Just like how the 
-> platform keyring is created within integrity code, the mok keyring 
-> is created in the same fashion.  When the platform keyring has 
-> completed initialization and loaded all its keys, the keyring is set 
-> into system_keyring code using set_platform_trusted_keys.  Instead of 
-> setting the mok keyring, I’m moving the keys directly into the secondary 
-> keyring, while bypassing the current restriction placed on this keyring.
-> Basically I'm trying to follow the same design pattern. 
+> Some of this comment should be moved down to the loop itself.
+
+Noted.
+
 > 
-> If requirements #1, #2 or both (#1 and #2) could be dropped, most of 
-> this series would not be necessary.
+>> +	if (rmpentry_assigned(e)) {
+>> +		pr_alert("RMPEntry paddr 0x%lx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx"
+>> +			" asid=%d vmsa=%d validated=%d]\n", pfn << PAGE_SHIFT,
+>> +			rmpentry_assigned(e), rmpentry_immutable(e), rmpentry_pagesize(e),
+>> +			rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
+>> +			rmpentry_validated(e));
+>> +
+>> +		pr_alert("RMPEntry paddr 0x%lx %016llx %016llx\n", pfn << PAGE_SHIFT,
+>> +			e->high, e->low);
+> 
+> Could you please include an entire oops in the changelog that also
+> includes this information?  It would be really nice if this was at least
+> consistent in style to the stuff around it.
 
-But without these requirements, the source of trust is unclear.
+Here is one example: (in this case page was immutable and HV attempted 
+to write to it).
 
-Is there a reason why the MOK keyring is temporary?   Asumming a
-function similar to "restrict_link_by_builtin_and_secondary_trusted" is
-defined to include the MOK keyring, the CA keys in the MOK db would be
-loaded onto the MOK keyring, the other keys that meet the secondary
-keyring restriction would be loaded directly onto the secondary
-keyring[1], and as you currently have, the remaining keys onto the
-platform keyring.
+BUG: unable to handle page fault for address: ffff98c78ee00000
+#PF: supervisor write access in kernel mode
+#PF: error_code(0x80000003) - rmp violation
+PGD 304b201067 P4D 304b201067 PUD 20c7f06063 PMD 20c8976063 PTE 
+80000020cee00163
+RMPEntry paddr 0x20cee00000 [assigned=1 immutable=1 pagesize=0 gpa=0x0 
+asid=0 vmsa=0 validated=0]
+RMPEntry paddr 0x20cee00000 000000000000000f 8000000000000ffd
 
-This eliminates the exemption needed for loading keys onto the
-secondary keyring.  The MOK keyring, containing just CA keys, becomes a
-new trust source.
 
-thanks,
+> 
+> Also, how much of this stuff like rmpentry_asid() is duplicated in the
+> "raw" dump of e->high and e->low?
+> 
 
-Mimi
+Most of the rmpentry_xxx assessors read the e->low. The RMP entry is a 
+16-bytes. AMD APM defines only a few bits and keeps everything else 
+reserved. We are in the process of updating APM to document few more 
+bits. I am not adding assessors for the undocumented fields. Until then, 
+we dump the entire 16-bytes.
 
-[1] Refer to the comment in
-restrict_link_by_builtin_and_secondary_trusted() on linking the builtin
-keyring to the secondary keyring.
+I agree that we are duplicating the information. I can live with just a 
+raw dump. That means anyone who is debugging the crash will look at the 
+APM to decode the fields.
 
+
+>> +	} else {
+>> +		unsigned long pfn_end;
+>> +
+>> +		pfn = pfn & ~0x1ff;
+> 
+> There's a nice magic number.  Why not:
+> 
+> 	pfn = pfn & ~(PTRS_PER_PMD-1);
+> 
+> ?
+
+Noted.
+
+> 
+> This also needs a comment about *WHY* this case is looking at a 2MB region.
+> 
+
+Actually the comment above says why we are looking for the 2MB region. 
+Let me rearrange the comment block so that its more clear.
+
+The reason for iterating through 2MB region is; if the faulting address 
+is not assigned in the RMP table, and page table walk level is 2MB then 
+one of entry within the large page is the root cause of the fault. Since 
+we don't know which entry hence I dump all the non-zero entries.
+
+
+>> +		pfn_end = pfn + PTRS_PER_PMD;
+>> +
+>> +		while (pfn < pfn_end) {
+>> +			e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &level);
+>> +
+>> +			if (unlikely(!e))
+>> +				return;
+>> +
+>> +			if (e->low || e->high)
+>> +				pr_alert("RMPEntry paddr 0x%lx: %016llx %016llx\n",
+>> +					pfn << PAGE_SHIFT, e->high, e->low);
+> 
+> Why does this dump "raw" RMP entries while the above stuff filters them
+> through a bunch of helper macros?
+> 
+
+There are two cases which we need to consider:
+
+1) the faulting page is a guest private (aka assigned)
+2) the faulting page is a hypervisor (aka shared)
+
+We will be primarily seeing #1. In this case, we know its a assigned 
+page, and we can decode the fields.
+
+The #2 will happen in rare conditions, if it happens, one of the 
+undocumented bit in the RMP entry can provide us some useful information 
+hence we dump the raw values.
+
+-Brijesh
