@@ -2,248 +2,166 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE478C11F66
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 18:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EBA1C07E9C
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 19:31:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AD9461874
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 18:56:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BEBB61629
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jul 2021 19:31:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230159AbhGHS7U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Jul 2021 14:59:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24778 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229650AbhGHS7T (ORCPT
+        id S229566AbhGHTef (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jul 2021 15:34:35 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22128 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229497AbhGHTee (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Jul 2021 14:59:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625770596;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1va5nv4AZF0iU5FnZEUJ2+LCm5h8PaUbvUsoxAiHxDY=;
-        b=SnoPYTLQ2uxAUwAg0q7Z1p5+m/rGSe+DRm71vbsaEZIaRLOxwPE/ZUcnI/OdCLFmc7xjzB
-        LSWieuRvIo58pZkq0aFkM23E3ArKEKZ3e9cVXL8JGp5rhd46LctdvoCaM7Bmf9Ptedcj93
-        3A3KiM/FZ25MEndxO/erXVqT/a2tZbQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-W_ixXPBvP32YL13Ste93Hg-1; Thu, 08 Jul 2021 14:56:35 -0400
-X-MC-Unique: W_ixXPBvP32YL13Ste93Hg-1
-Received: by mail-wm1-f70.google.com with SMTP id k8-20020a05600c1c88b02901b7134fb829so1289281wms.5
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Jul 2021 11:56:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=1va5nv4AZF0iU5FnZEUJ2+LCm5h8PaUbvUsoxAiHxDY=;
-        b=XQ9JhgHxbRwW5SJdPMY11pcCPUTz7Gv8et4MCwsASa3882bVvuYt6rHXSP8pzsdwK9
-         DVjqMFIqC1an5fmRbLHNa14d7GCCVDUZtcjtV4PjC/dSmPB48OVOOiiSDYzICyWsS0zr
-         4r6wqQOTYjZxpBuX4EQbW+5SGov/XpIWbLTs1iAITViF8PW+KYGg8OW0P9sUTGJmlHhA
-         SXV/JqU6QT8INWL0sAlbx6ZiYkvW2nXYA3oyjUlaNp0YGg1/UL4QWUYhwiBZ/YvcgGBy
-         a1ac7ztt4YG25rK75oufOA3J2FuSHgvkQWvqXVV8SRqZheAMS4UXiWN2efJhDMeWcI6c
-         XmvQ==
-X-Gm-Message-State: AOAM532M2zJMDR64tnf+m4Rq8+6iFlCU4WKJL40yR2EXqu9MLRGqm5Fs
-        6i+bFRg9yM0RMjiAR6mH2BDv2aFQ17OZ9nqACefGMfDG536xhofmfcTe2n4qHA5IfcO77hP1+qX
-        id4a1hFoAbiFBcbw/BeXj7y7G
-X-Received: by 2002:a05:6000:1361:: with SMTP id q1mr35672353wrz.179.1625770594511;
-        Thu, 08 Jul 2021 11:56:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwhquME75eUWVHFrrZ+V9pwudJ25ehwm0sVcMEMSNcf4tH+Xhq/bHqTeFabCsx2g8CMjSfcTw==
-X-Received: by 2002:a05:6000:1361:: with SMTP id q1mr35672310wrz.179.1625770594307;
-        Thu, 08 Jul 2021 11:56:34 -0700 (PDT)
-Received: from work-vm (cpc109021-salf6-2-0-cust453.10-2.cable.virginm.net. [82.29.237.198])
-        by smtp.gmail.com with ESMTPSA id o11sm10760305wmc.2.2021.07.08.11.56.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jul 2021 11:56:33 -0700 (PDT)
-Date:   Thu, 8 Jul 2021 19:56:31 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 14/40] crypto:ccp: Provide APIs to issue
- SEV-SNP commands
-Message-ID: <YOdKX/3cTytIiGYM@work-vm>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-15-brijesh.singh@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210707183616.5620-15-brijesh.singh@amd.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
+        Thu, 8 Jul 2021 15:34:34 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 168J2tTl170332;
+        Thu, 8 Jul 2021 15:31:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=ZzzOZykbO5QMdxGLhuT6hx8FDb0c0UjkV/9s7AfHQLQ=;
+ b=Sw+aHGRn21aswTCdI20LxnX2frLNJicCucWHY/Jbzm30Q0e27vXltma0WYEsaUkM2/pZ
+ yh4A50daDGe7uQaZp57VN4yqR7e1WWBVa1ZRYFWrpFxmXXP4n12armrSQ/abNTzylfI0
+ +gY6A22a58Fws0i1ylGERGXsxDxD+JnvtypALj7USBy/dqnbPQzw5tGwWj5c5A98SrWF
+ 39yv+VHNdf5b1ej/AjbqCqUOrkXVGXm5HGlwO/PQHFAuvmrgAuotUysdgAUjyRWMQ8om
+ ULcJ/iY87fZDqHXCCUrIKS+w4X9csH7K7RxPkL8ohnFTOoDmSI+iBaKZvsjilcXnb0Z3 xQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39p1y5m90p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Jul 2021 15:31:21 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 168J38F3170861;
+        Thu, 8 Jul 2021 15:31:21 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39p1y5m901-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Jul 2021 15:31:20 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 168JEObG025826;
+        Thu, 8 Jul 2021 19:31:19 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 39jf5habhw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Jul 2021 19:31:19 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 168JVGQZ28377532
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 8 Jul 2021 19:31:17 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DB60FAE045;
+        Thu,  8 Jul 2021 19:31:16 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5081BAE04D;
+        Thu,  8 Jul 2021 19:31:11 +0000 (GMT)
+Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.121.73])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  8 Jul 2021 19:31:11 +0000 (GMT)
+Message-ID: <490941a5197bf4bcf0d6f95610085ee4d46ed9bb.camel@linux.ibm.com>
+Subject: Re: [PATCH RFC 00/12] Enroll kernel keys thru MOK
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Eric Snowberg <eric.snowberg@oracle.com>
+Cc:     keyrings@vger.kernel.org,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
+        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
+        scott.branden@broadcom.com, weiyongjun1@huawei.com,
+        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
+        nramas@linux.microsoft.com, lszubowi@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        glin@suse.com, "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>
+Date:   Thu, 08 Jul 2021 15:31:10 -0400
+In-Reply-To: <21EFCB58-2D89-4D30-8DA2-B952A7E1B1BD@oracle.com>
+References: <20210707024403.1083977-1-eric.snowberg@oracle.com>
+         <42b787dd3a20fe37c4de60daf75db06e409cfb6d.camel@linux.ibm.com>
+         <5BFB3C52-36D4-47A5-B1B8-977717C555A0@oracle.com>
+         <886f30dcf7b3d48644289acc3601c2f0207b19b6.camel@linux.ibm.com>
+         <D34A6328-91CA-4E1E-845C-FAC9B424819B@oracle.com>
+         <c0cf7f883a9252c17427f1f992e4973e78481304.camel@linux.ibm.com>
+         <21EFCB58-2D89-4D30-8DA2-B952A7E1B1BD@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: aggJvet0yOt-ImSnGQ0anKTGvo1Pu3_V
+X-Proofpoint-GUID: nzOHRzEqfJNWiGRgDl2PnNQs2Gmz1T0Z
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-08_11:2021-07-08,2021-07-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 priorityscore=1501 malwarescore=0 bulkscore=0 spamscore=0
+ mlxscore=0 mlxlogscore=999 adultscore=0 phishscore=0 impostorscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107080097
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-* Brijesh Singh (brijesh.singh@amd.com) wrote:
-> Provide the APIs for the hypervisor to manage an SEV-SNP guest. The
-> commands for SEV-SNP is defined in the SEV-SNP firmware specification.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  drivers/crypto/ccp/sev-dev.c | 24 ++++++++++++
->  include/linux/psp-sev.h      | 74 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 98 insertions(+)
-> 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 84c91bab00bd..ad9a0c8111e0 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1017,6 +1017,30 @@ int sev_guest_df_flush(int *error)
->  }
->  EXPORT_SYMBOL_GPL(sev_guest_df_flush);
->  
-> +int snp_guest_decommission(struct sev_data_snp_decommission *data, int *error)
-> +{
-> +	return sev_do_cmd(SEV_CMD_SNP_DECOMMISSION, data, error);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_guest_decommission);
-> +
-> +int snp_guest_df_flush(int *error)
-> +{
-> +	return sev_do_cmd(SEV_CMD_SNP_DF_FLUSH, NULL, error);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_guest_df_flush);
-> +
-> +int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error)
-> +{
-> +	return sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, data, error);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_guest_page_reclaim);
-> +
-> +int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
-> +{
-> +	return sev_do_cmd(SEV_CMD_SNP_DBG_DECRYPT, data, error);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt);
-> +
->  static void sev_exit(struct kref *ref)
->  {
->  	misc_deregister(&misc_dev->misc);
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index 1b53e8782250..63ef766cbd7a 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -860,6 +860,65 @@ int sev_guest_df_flush(int *error);
->   */
->  int sev_guest_decommission(struct sev_data_decommission *data, int *error);
->  
-> +/**
-> + * snp_guest_df_flush - perform SNP DF_FLUSH command
-> + *
-> + * @sev_ret: sev command return code
-> + *
-> + * Returns:
-> + * 0 if the sev successfully processed the command
-> + * -%ENODEV    if the sev device is not available
-> + * -%ENOTSUPP  if the sev does not support SEV
+Hi Eric,
 
-Weird wording.
+On Thu, 2021-07-08 at 11:59 -0600, Eric Snowberg wrote:
+> 
+> >  Asumming a
+> > function similar to "restrict_link_by_builtin_and_secondary_trusted" is
+> > defined to include the MOK keyring, the CA keys in the MOK db would be
+> > loaded onto the MOK keyring, the other keys that meet the secondary
+> > keyring restriction would be loaded directly onto the secondary
+> > keyring[1], and as you currently have, the remaining keys onto the
+> > platform keyring.
+> > 
+> > This eliminates the exemption needed for loading keys onto the
+> > secondary keyring.  The MOK keyring, containing just CA keys, becomes a
+> > new trust source.
+> 
+> I just want to make sure I understand. If we kept the .mok keyring around, 
+> we would store it into the system_keyring code, just like the platform 
+> keyring is stored.  This would allow the move exemption code to be removed.
+> If the mok keyring is a new trust source, whenever the secondary keyring 
+> is referenced in verify_ code, the mok keyring will be checked too.  If 
+> I have this right, let me know and I’ll work on a v2.  Thanks.
 
-> + * -%ETIMEDOUT if the sev command timed out
-> + * -%EIO       if the sev returned a non-zero return code
-> + */
-> +int snp_guest_df_flush(int *error);
-> +
-> +/**
-> + * snp_guest_decommission - perform SNP_DECOMMISSION command
-> + *
-> + * @decommission: sev_data_decommission structure to be processed
-> + * @sev_ret: sev command return code
-> + *
-> + * Returns:
-> + * 0 if the sev successfully processed the command
-> + * -%ENODEV    if the sev device is not available
-> + * -%ENOTSUPP  if the sev does not support SEV
-> + * -%ETIMEDOUT if the sev command timed out
-> + * -%EIO       if the sev returned a non-zero return code
-> + */
-> +int snp_guest_decommission(struct sev_data_snp_decommission *data, int *error);
-> +
-> +/**
-> + * snp_guest_page_reclaim - perform SNP_PAGE_RECLAIM command
-> + *
-> + * @decommission: sev_snp_page_reclaim structure to be processed
-> + * @sev_ret: sev command return code
-> + *
-> + * Returns:
-> + * 0 if the sev successfully processed the command
-> + * -%ENODEV    if the sev device is not available
-> + * -%ENOTSUPP  if the sev does not support SEV
-> + * -%ETIMEDOUT if the sev command timed out
-> + * -%EIO       if the sev returned a non-zero return code
-> + */
-> +int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error);
-> +
-> +/**
-> + * snp_guest_dbg_decrypt - perform SEV SNP_DBG_DECRYPT command
-> + *
-> + * @sev_ret: sev command return code
-> + *
-> + * Returns:
-> + * 0 if the sev successfully processed the command
-> + * -%ENODEV    if the sev device is not available
-> + * -%ENOTSUPP  if the sev does not support SEV
-> + * -%ETIMEDOUT if the sev command timed out
-> + * -%EIO       if the sev returned a non-zero return code
-> + */
-> +int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error);
-> +
-> +
->  void *psp_copy_user_blob(u64 uaddr, u32 len);
->  
->  #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
-> @@ -887,6 +946,21 @@ sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int
->  
->  static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_PTR(-EINVAL); }
->  
-> +static inline int
-> +snp_guest_decommission(struct sev_data_snp_decommission *data, int *error) { return -ENODEV; }
-> +
-> +static inline int snp_guest_df_flush(int *error) { return -ENODEV; }
-> +
-> +static inline int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error)
-> +{
-> +	return -ENODEV;
-> +}
-> +
-> +static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
-> +{
-> +	return -ENODEV;
-> +}
-> +
->  #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
->  
->  #endif	/* __PSP_SEV_H__ */
-> -- 
-> 2.17.1
-> 
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+All the firmware keys are loaded onto the "platform" keyring, without
+any restriction.  Your reference point should be the "builtin" and
+"secondary" keyrings, not the "platform" keyring.
+
+Changes:
+- defining a new keyring restriction which only allows CA keys to be
+loaded onto the MOK keyring.
+- defining a new keyring restriction something along the lines of
+"restrict_link_by_builtin_mok_and_secondary_trusted()".
+
+In the case of "restrict_link_by_builtin_and_secondary_trusted()", it's
+based on a build time option.  In the case of MOK, it might be both a
+build time and runtime firmware variable option.  There are quite a few
+permutations that will somehow need to be addressed:  secondary keyring
+not defined, but MOK keyring defined, and the reverse.
+
+Once all the CA keys in the MOK db are loaded onto the MOK keyring,
+there will be no need for moving keys to the secondary keyring.  The
+secondary keyring restriction will just work.  The main question is
+whether there will need to be two passes.   One pass to first load all
+the CA keys onto the MOK keyring.  A second pass to load the keys onto
+the secondary keyring, based on the keyring restriction, and the
+remaining ones onto the "platform" keyring to avoid the regression.
+
+[Once the CA keys are loaded onto the MOK keyring, userspace will be
+able to load certificates, signed by a key on the MOK keyring, onto the
+secondary keyring.]
+
+thanks,
+
+Mimi
 
