@@ -2,130 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27575C07E9C
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jul 2021 01:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB78C07E96
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jul 2021 02:17:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BF246145E
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jul 2021 01:11:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A9B061469
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jul 2021 02:17:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbhGIBOI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Jul 2021 21:14:08 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29998 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229637AbhGIBOG (ORCPT
+        id S230375AbhGICUj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jul 2021 22:20:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37058 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229875AbhGICUj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Jul 2021 21:14:06 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16913lvR179385;
-        Thu, 8 Jul 2021 21:11:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=FI1qzW9vg11HTR0gAlwlHCY0vo4meaCwC4bF1sUyszc=;
- b=QX3q5U2wrRa+C87k+scNfpcRlsHOkg2p1NA7GtPj0rSkVkL/b1Zbw4mmGBK+LVzItuPd
- izMijkJWK+3UAAMGLpHj1PUXcdB00EZOVNBjPDDdt+KmL0XhBNZGpM5i+PdJSfZxdY14
- hpR6WG8oD7FLbYgOs/B4Zjic/JkEiAq7ZoZwGvoShjHA7cau8sPoM2bjgaZwJ2WsaSaF
- n1vtYQ1BB8KIvri+xM8dUh/le70HXj1FLP0lgsNdlMTInUBlg6jY+OFuPAd+Ox5qNOYK
- MtOdJnWOx+gcCtpzxQOTvg2ndWFrV/bugKfeXhEu0wLPD1yLD88ixNYlNbCOCD2+qc5D 7g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39n287x0cy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 21:11:00 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16919xLj196388;
-        Thu, 8 Jul 2021 21:10:59 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39n287x0ca-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 21:10:59 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1691Av0W032007;
-        Fri, 9 Jul 2021 01:10:57 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 39jfh8h9ys-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Jul 2021 01:10:56 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1691AsJB31326546
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 9 Jul 2021 01:10:54 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4F4A642041;
-        Fri,  9 Jul 2021 01:10:54 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8C8C74203F;
-        Fri,  9 Jul 2021 01:10:48 +0000 (GMT)
-Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.81.156])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  9 Jul 2021 01:10:48 +0000 (GMT)
-Message-ID: <ef480c8f83780eea4ff8fdcd35c6208760b5e1d7.camel@linux.ibm.com>
-Subject: Re: [PATCH RFC 00/12] Enroll kernel keys thru MOK
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     keyrings@vger.kernel.org,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
+        Thu, 8 Jul 2021 22:20:39 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB446C061574;
+        Thu,  8 Jul 2021 19:17:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=Ep9SfC7/Ynwl3BgyBMLme/h0/tBd0UyBTX7M2kcAoJE=; b=Sx7g5Hj1ylzSFnfbdHGFcWdsY5
+        kkmBqvIvhGUCBg+k+HGby30LlED/ptI7tKMQi8WgkwAz2CZnxCRxOilTaM8WIOVTiXswWg5oc7MUu
+        DMVjnptiCY+FU23LQit80+jAf5UIY73/1XvaC1wwQodLoDHPGTGldi40lZ9Su0DjUrjp9sYHcGGT2
+        cV5ffQJbTcR+ioERVCiV93HeoHLHzVG0nbcZWH0tlIMn6yeZYFGDlsbS4HGb18agPO/IfZb0fI9wo
+        cnNKIgn0PAfOHPX+4T9FGeCoh5HGtassgxW7VSLUTMfBtqGB1YV+bqKgA3JcKWScwvdmWDGhkR5Jq
+        tpTUonVQ==;
+Received: from [2601:1c0:6280:3f0::aefb] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m1g5S-000Wlc-Ha; Fri, 09 Jul 2021 02:17:54 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Russell King <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andres Salomon <dilinger@queued.net>,
+        linux-geode@lists.infradead.org, Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
-        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
-        scott.branden@broadcom.com, weiyongjun1@huawei.com,
-        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
-        nramas@linux.microsoft.com, lszubowi@redhat.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
-        glin@suse.com, "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>
-Date:   Thu, 08 Jul 2021 21:10:47 -0400
-In-Reply-To: <839EF700-7A2C-4282-AF97-768FAD1A9957@oracle.com>
-References: <20210707024403.1083977-1-eric.snowberg@oracle.com>
-         <42b787dd3a20fe37c4de60daf75db06e409cfb6d.camel@linux.ibm.com>
-         <5BFB3C52-36D4-47A5-B1B8-977717C555A0@oracle.com>
-         <886f30dcf7b3d48644289acc3601c2f0207b19b6.camel@linux.ibm.com>
-         <D34A6328-91CA-4E1E-845C-FAC9B424819B@oracle.com>
-         <c0cf7f883a9252c17427f1f992e4973e78481304.camel@linux.ibm.com>
-         <21EFCB58-2D89-4D30-8DA2-B952A7E1B1BD@oracle.com>
-         <490941a5197bf4bcf0d6f95610085ee4d46ed9bb.camel@linux.ibm.com>
-         <839EF700-7A2C-4282-AF97-768FAD1A9957@oracle.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: FMn_hX5NZ_CCLtfcgqQvPGUn7SHHsF0z
-X-Proofpoint-ORIG-GUID: CZDy5YSAnV3UvrlJeOGW1sSUTSKHEugt
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-08_14:2021-07-08,2021-07-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- mlxscore=0 priorityscore=1501 malwarescore=0 suspectscore=0 spamscore=0
- phishscore=0 lowpriorityscore=0 mlxlogscore=999 adultscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2107090003
+        linux-crypto@vger.kernel.org,
+        Christian Gromm <christian.gromm@microchip.com>,
+        Krzysztof Halasa <khc@pm.waw.pl>, netdev@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Martin Schiller <ms@dev.tdt.de>, linux-x25@vger.kernel.org,
+        wireguard@lists.zx2c4.com
+Subject: [PATCH 6/6] net: wireguard: rename 'mod_init' & 'mod_exit' functions to be module-specific
+Date:   Thu,  8 Jul 2021 19:17:47 -0700
+Message-Id: <20210709021747.32737-7-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210709021747.32737-1-rdunlap@infradead.org>
+References: <20210709021747.32737-1-rdunlap@infradead.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 2021-07-08 at 17:17 -0600, Eric Snowberg wrote:
-> > Once all the CA keys in the MOK db are loaded onto the MOK keyring,
-> 
-> To avoid confusion with the new keyring name, would it be more appropriate 
-> to change what we are calling the .mok keyring to the .trusted_platform 
-> keyring instead? Or just leave it as .mok?
+Rename module_init & module_exit functions that are named
+"mod_init" and "mod_exit" so that they are unique in both the
+System.map file and in initcall_debug output instead of showing
+up as almost anonymous "mod_init".
 
-Definitely not ".trusted_platform" keyring, as it would be too
-confusing with the existing "trusted" key type [1].  At least for now,
-leave it as ".mok".
+This is helpful for debugging and in determining how long certain
+module_init calls take to execute.
 
-thanks,
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: wireguard@lists.zx2c4.com
+Cc: netdev@vger.kernel.org
+---
+ drivers/net/wireguard/main.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Mimi
-
-[1] Documentation/security/keys/trusted-encrypted.rst
-
+--- linux-next-20210708.orig/drivers/net/wireguard/main.c
++++ linux-next-20210708/drivers/net/wireguard/main.c
+@@ -17,7 +17,7 @@
+ #include <linux/genetlink.h>
+ #include <net/rtnetlink.h>
+ 
+-static int __init mod_init(void)
++static int __init wireguard_init(void)
+ {
+ 	int ret;
+ 
+@@ -60,7 +60,7 @@ err_allowedips:
+ 	return ret;
+ }
+ 
+-static void __exit mod_exit(void)
++static void __exit wireguard_exit(void)
+ {
+ 	wg_genetlink_uninit();
+ 	wg_device_uninit();
+@@ -68,8 +68,8 @@ static void __exit mod_exit(void)
+ 	wg_allowedips_slab_uninit();
+ }
+ 
+-module_init(mod_init);
+-module_exit(mod_exit);
++module_init(wireguard_init);
++module_exit(wireguard_exit);
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("WireGuard secure network tunnel");
+ MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
