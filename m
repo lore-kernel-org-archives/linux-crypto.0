@@ -5,37 +5,37 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97BCAC07E96
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jul 2021 02:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE3D5C11F6F
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jul 2021 02:18:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F6B7613C3
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jul 2021 02:18:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B224961584
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jul 2021 02:18:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230447AbhGICUo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Jul 2021 22:20:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37074 "EHLO
+        id S230494AbhGICUp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jul 2021 22:20:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230323AbhGICUj (ORCPT
+        with ESMTP id S230351AbhGICUj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 8 Jul 2021 22:20:39 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C352AC061765;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3605C061766;
         Thu,  8 Jul 2021 19:17:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=2lXgoFdlw0nj3Z9RK3rE4yOZJUJiPD5izsxaIDhtFBc=; b=dzsf762Xi3yNrvBt9U1hN4Nd9s
-        O1xhAYaj+ggfy7hDzTzOUOP40xChZ9QbTFa5unyEL3E+jbIdo/raDJuWmNmJhWHXRcLsrRjXM2zPi
-        r5t/T1euH6N4OmxpM4ktkQoTyUSz5upz61bZ+hMpEpIBJBIkBW4wOEN+p/vVDT0S6WH5otvTZS4L7
-        W527yvZWp1rmCX6yo2RJy/QjHPz9E3bNX3o2lyqhdW+mn58HTRngwy1EL8+/OMQjz9TnurthN6Ztf
-        bmGf2fY7E2YCtbqqwZMFDza2vHdHslpCgGblA/uyK1qYjVuDfMCOwgHH4nMEd4PzUYZLN4BuWJApA
-        oRagfV5w==;
+        bh=d+8/yiZu3L6P8B8KGhlE8N/aoGjld+tQjqmLrEW8N7I=; b=2upCU0SvCtNVlT5M+Ewo4m8Xk7
+        w3Tc6jfNlf9YWdPluWHekPTO6s0p3hgDWxCG19jcsqNLu6SbLdiFBSpvqQGltufSQNIxLgNcS2WlM
+        rgM6IAakdgAgHU7ZHoo/oqyfz9ocgEG+MF7r45nScZP9cXFBHAHfDkJIdsHxkMJpHNb5sYjpc2MbM
+        QraSo4ox+vT07/iJiZECgNAkT6VZwNgq+eAmW714EW1sA4f06itWeCS8ALaIn/3wc9U3bhaRek5Ta
+        g9jNFDz+nB9qcPjV3bzdhE0HZFzTPEdU5RG/lcg7nS5IwBM3aYlfeuLlcYmG3E/RYYlWfrwp3PEJe
+        rJj174cA==;
 Received: from [2601:1c0:6280:3f0::aefb] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m1g5R-000Wlc-Nh; Fri, 09 Jul 2021 02:17:53 +0000
+        id 1m1g5Q-000Wlc-3d; Fri, 09 Jul 2021 02:17:52 +0000
 From:   Randy Dunlap <rdunlap@infradead.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Randy Dunlap <rdunlap@infradead.org>,
@@ -54,9 +54,9 @@ Cc:     Randy Dunlap <rdunlap@infradead.org>,
         Jakub Kicinski <kuba@kernel.org>,
         Martin Schiller <ms@dev.tdt.de>, linux-x25@vger.kernel.org,
         wireguard@lists.zx2c4.com
-Subject: [PATCH 5/6] net: hdlc: rename 'mod_init' & 'mod_exit' functions to be module-specific
-Date:   Thu,  8 Jul 2021 19:17:46 -0700
-Message-Id: <20210709021747.32737-6-rdunlap@infradead.org>
+Subject: [PATCH 3/6] lib: crypto: rename 'mod_init' & 'mod_exit' functions to be module-specific
+Date:   Thu,  8 Jul 2021 19:17:44 -0700
+Message-Id: <20210709021747.32737-4-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210709021747.32737-1-rdunlap@infradead.org>
 References: <20210709021747.32737-1-rdunlap@infradead.org>
@@ -75,181 +75,94 @@ This is helpful for debugging and in determining how long certain
 module_init calls take to execute.
 
 Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Krzysztof Halasa <khc@pm.waw.pl>
-Cc: netdev@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Martin Schiller <ms@dev.tdt.de>
-Cc: linux-x25@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/net/wan/hdlc_cisco.c   |    8 ++++----
- drivers/net/wan/hdlc_fr.c      |    8 ++++----
- drivers/net/wan/hdlc_ppp.c     |    8 ++++----
- drivers/net/wan/hdlc_raw.c     |    8 ++++----
- drivers/net/wan/hdlc_raw_eth.c |    8 ++++----
- drivers/net/wan/hdlc_x25.c     |    8 ++++----
- 6 files changed, 24 insertions(+), 24 deletions(-)
+ lib/crypto/blake2s.c          |    8 ++++----
+ lib/crypto/chacha20poly1305.c |    8 ++++----
+ lib/crypto/curve25519.c       |    8 ++++----
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
---- linux-next-20210708.orig/drivers/net/wan/hdlc_cisco.c
-+++ linux-next-20210708/drivers/net/wan/hdlc_cisco.c
-@@ -364,19 +364,19 @@ static int cisco_ioctl(struct net_device
- 	return -EINVAL;
+--- linux-next-20210708.orig/lib/crypto/blake2s.c
++++ linux-next-20210708/lib/crypto/blake2s.c
+@@ -73,7 +73,7 @@ void blake2s256_hmac(u8 *out, const u8 *
  }
+ EXPORT_SYMBOL(blake2s256_hmac);
  
 -static int __init mod_init(void)
-+static int __init hdlc_cisco_init(void)
++static int __init blake2s_mod_init(void)
  {
- 	register_hdlc_protocol(&proto);
+ 	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
+ 	    WARN_ON(!blake2s_selftest()))
+@@ -81,12 +81,12 @@ static int __init mod_init(void)
  	return 0;
  }
  
 -static void __exit mod_exit(void)
-+static void __exit hdlc_cisco_exit(void)
++static void __exit blake2s_mod_exit(void)
  {
- 	unregister_hdlc_protocol(&proto);
  }
  
 -module_init(mod_init);
 -module_exit(mod_exit);
-+module_init(hdlc_cisco_init);
-+module_exit(hdlc_cisco_exit);
- 
- MODULE_AUTHOR("Krzysztof Halasa <khc@pm.waw.pl>");
- MODULE_DESCRIPTION("Cisco HDLC protocol support for generic HDLC");
---- linux-next-20210708.orig/drivers/net/wan/hdlc_fr.c
-+++ linux-next-20210708/drivers/net/wan/hdlc_fr.c
-@@ -1279,19 +1279,19 @@ static int fr_ioctl(struct net_device *d
- 	return -EINVAL;
++module_init(blake2s_mod_init);
++module_exit(blake2s_mod_exit);
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("BLAKE2s hash function");
+ MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+--- linux-next-20210708.orig/lib/crypto/chacha20poly1305.c
++++ linux-next-20210708/lib/crypto/chacha20poly1305.c
+@@ -354,7 +354,7 @@ bool chacha20poly1305_decrypt_sg_inplace
  }
+ EXPORT_SYMBOL(chacha20poly1305_decrypt_sg_inplace);
  
 -static int __init mod_init(void)
-+static int __init hdlc_fr_init(void)
++static int __init chacha20poly1305_init(void)
  {
- 	register_hdlc_protocol(&proto);
+ 	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
+ 	    WARN_ON(!chacha20poly1305_selftest()))
+@@ -362,12 +362,12 @@ static int __init mod_init(void)
  	return 0;
  }
  
 -static void __exit mod_exit(void)
-+static void __exit hdlc_fr_exit(void)
++static void __exit chacha20poly1305_exit(void)
  {
- 	unregister_hdlc_protocol(&proto);
  }
  
 -module_init(mod_init);
 -module_exit(mod_exit);
-+module_init(hdlc_fr_init);
-+module_exit(hdlc_fr_exit);
- 
- MODULE_AUTHOR("Krzysztof Halasa <khc@pm.waw.pl>");
- MODULE_DESCRIPTION("Frame-Relay protocol support for generic HDLC");
---- linux-next-20210708.orig/drivers/net/wan/hdlc_ppp.c
-+++ linux-next-20210708/drivers/net/wan/hdlc_ppp.c
-@@ -705,20 +705,20 @@ static int ppp_ioctl(struct net_device *
- 	return -EINVAL;
- }
++module_init(chacha20poly1305_init);
++module_exit(chacha20poly1305_exit);
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("ChaCha20Poly1305 AEAD construction");
+ MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+--- linux-next-20210708.orig/lib/crypto/curve25519.c
++++ linux-next-20210708/lib/crypto/curve25519.c
+@@ -13,7 +13,7 @@
+ #include <linux/module.h>
+ #include <linux/init.h>
  
 -static int __init mod_init(void)
-+static int __init hdlc_ppp_init(void)
++static int __init curve25519_init(void)
  {
- 	skb_queue_head_init(&tx_queue);
- 	register_hdlc_protocol(&proto);
+ 	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
+ 	    WARN_ON(!curve25519_selftest()))
+@@ -21,12 +21,12 @@ static int __init mod_init(void)
  	return 0;
  }
  
 -static void __exit mod_exit(void)
-+static void __exit hdlc_ppp_exit(void)
++static void __exit curve25519_exit(void)
  {
- 	unregister_hdlc_protocol(&proto);
  }
  
 -module_init(mod_init);
 -module_exit(mod_exit);
-+module_init(hdlc_ppp_init);
-+module_exit(hdlc_ppp_exit);
++module_init(curve25519_init);
++module_exit(curve25519_exit);
  
- MODULE_AUTHOR("Krzysztof Halasa <khc@pm.waw.pl>");
- MODULE_DESCRIPTION("PPP protocol support for generic HDLC");
---- linux-next-20210708.orig/drivers/net/wan/hdlc_raw.c
-+++ linux-next-20210708/drivers/net/wan/hdlc_raw.c
-@@ -90,7 +90,7 @@ static int raw_ioctl(struct net_device *
- }
- 
- 
--static int __init mod_init(void)
-+static int __init hdlc_raw_init(void)
- {
- 	register_hdlc_protocol(&proto);
- 	return 0;
-@@ -98,14 +98,14 @@ static int __init mod_init(void)
- 
- 
- 
--static void __exit mod_exit(void)
-+static void __exit hdlc_raw_exit(void)
- {
- 	unregister_hdlc_protocol(&proto);
- }
- 
- 
--module_init(mod_init);
--module_exit(mod_exit);
-+module_init(hdlc_raw_init);
-+module_exit(hdlc_raw_exit);
- 
- MODULE_AUTHOR("Krzysztof Halasa <khc@pm.waw.pl>");
- MODULE_DESCRIPTION("Raw HDLC protocol support for generic HDLC");
---- linux-next-20210708.orig/drivers/net/wan/hdlc_raw_eth.c
-+++ linux-next-20210708/drivers/net/wan/hdlc_raw_eth.c
-@@ -110,7 +110,7 @@ static int raw_eth_ioctl(struct net_devi
- }
- 
- 
--static int __init mod_init(void)
-+static int __init hdlc_eth_init(void)
- {
- 	register_hdlc_protocol(&proto);
- 	return 0;
-@@ -118,14 +118,14 @@ static int __init mod_init(void)
- 
- 
- 
--static void __exit mod_exit(void)
-+static void __exit hdlc_eth_exit(void)
- {
- 	unregister_hdlc_protocol(&proto);
- }
- 
- 
--module_init(mod_init);
--module_exit(mod_exit);
-+module_init(hdlc_eth_init);
-+module_exit(hdlc_eth_exit);
- 
- MODULE_AUTHOR("Krzysztof Halasa <khc@pm.waw.pl>");
- MODULE_DESCRIPTION("Ethernet encapsulation support for generic HDLC");
---- linux-next-20210708.orig/drivers/net/wan/hdlc_x25.c
-+++ linux-next-20210708/drivers/net/wan/hdlc_x25.c
-@@ -365,19 +365,19 @@ static int x25_ioctl(struct net_device *
- 	return -EINVAL;
- }
- 
--static int __init mod_init(void)
-+static int __init hdlc_x25_init(void)
- {
- 	register_hdlc_protocol(&proto);
- 	return 0;
- }
- 
--static void __exit mod_exit(void)
-+static void __exit hdlc_x25_exit(void)
- {
- 	unregister_hdlc_protocol(&proto);
- }
- 
--module_init(mod_init);
--module_exit(mod_exit);
-+module_init(hdlc_x25_init);
-+module_exit(hdlc_x25_exit);
- 
- MODULE_AUTHOR("Krzysztof Halasa <khc@pm.waw.pl>");
- MODULE_DESCRIPTION("X.25 protocol support for generic HDLC");
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("Curve25519 scalar multiplication");
