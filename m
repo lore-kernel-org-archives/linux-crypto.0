@@ -2,242 +2,169 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31798C07E96
-	for <linux-crypto@archiver.kernel.org>; Sun, 11 Jul 2021 06:20:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0050C07E96
+	for <linux-crypto@archiver.kernel.org>; Sun, 11 Jul 2021 22:31:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03FC361351
-	for <linux-crypto@archiver.kernel.org>; Sun, 11 Jul 2021 06:20:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9F8F60FE6
+	for <linux-crypto@archiver.kernel.org>; Sun, 11 Jul 2021 22:31:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbhGKGXi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 11 Jul 2021 02:23:38 -0400
-Received: from out05.smtpout.orange.fr ([193.252.22.214]:50338 "EHLO
-        out.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbhGKGXi (ORCPT
+        id S230386AbhGKWen (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 11 Jul 2021 18:34:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34476 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229544AbhGKWem (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Jul 2021 02:23:38 -0400
-X-Greylist: delayed 450 seconds by postgrey-1.27 at vger.kernel.org; Sun, 11 Jul 2021 02:23:37 EDT
-Received: from localhost.localdomain ([86.243.172.93])
-        by mwinf5d42 with ME
-        id TiDL2500221Fzsu03iDLkq; Sun, 11 Jul 2021 08:13:20 +0200
-X-ME-Helo: localhost.localdomain
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 11 Jul 2021 08:13:20 +0200
-X-ME-IP: 86.243.172.93
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     giovanni.cabiddu@intel.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, tomaszx.kowalik@intel.com,
-        marco.chiappero@intel.com, andriy.shevchenko@linux.intel.com,
-        fiona.trahe@intel.com, wojciech.ziemba@intel.com,
-        ztong0001@gmail.com, qat-linux@intel.com
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH 1/3] crypto: qat - Simplify code and axe the use of a deprecated API
-Date:   Sun, 11 Jul 2021 08:13:18 +0200
-Message-Id: <7283306389ffa7fe230e2a40f7328f064b872757.1625983602.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <cover.1625983602.git.christophe.jaillet@wanadoo.fr>
-References: <cover.1625983602.git.christophe.jaillet@wanadoo.fr>
+        Sun, 11 Jul 2021 18:34:42 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B4B4C0613DD;
+        Sun, 11 Jul 2021 15:31:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=H7RHC9PAGo7nFqGD22lHzISKCO3dCV+vM/OnCERLMj0=; b=0tg9x+gIqCAtRRWK4CGLvarT1M
+        FwzOnutPg7Isls3CQeaHSgUlMGUH768rgd+x6J/sKo2k+cA/CpXJmoAwhxchiBY17ZPBYBIEoq+Q0
+        2FxMAVdvtYvkFu3urD+szA6LmlFn+3RYeoLqPw+ciReHsPbXWE9ZEFULxMDgCDgPJtrGiaB+bmgGk
+        q6dAXvzyJvTi/JCucxpK7meGmk9n6/oNUcL028PlBl+PZn0opSdYUGGBHx76tYZo1YjPMvuJoMQ1V
+        Xhqko7QjQcExEKk50ttJ1ME+t1lucqDoujFAGH4Smgr+BO1fG5Q+dVNKqb5SLP3fp7siUsI9Fe4mT
+        IFJzp0jw==;
+Received: from [2601:1c0:6280:3f0::aefb] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m2hzN-005U4u-1u; Sun, 11 Jul 2021 22:31:53 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Russell King <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andres Salomon <dilinger@queued.net>,
+        linux-geode@lists.infradead.org, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org,
+        Christian Gromm <christian.gromm@microchip.com>,
+        Krzysztof Halasa <khc@pm.waw.pl>, netdev@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Martin Schiller <ms@dev.tdt.de>, linux-x25@vger.kernel.org,
+        wireguard@lists.zx2c4.com
+Subject: [PATCH 3/6 v2] lib: crypto: rename 'mod_init' & 'mod_exit' functions to be module-specific
+Date:   Sun, 11 Jul 2021 15:31:45 -0700
+Message-Id: <20210711223148.5250-4-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210711223148.5250-1-rdunlap@infradead.org>
+References: <20210711223148.5250-1-rdunlap@infradead.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The wrappers in include/linux/pci-dma-compat.h should go away.
+Rename module_init & module_exit functions that are named
+"mod_init" and "mod_exit" so that they are unique in both the
+System.map file and in initcall_debug output instead of showing
+up as almost anonymous "mod_init".
 
-Replace 'pci_set_dma_mask/pci_set_consistent_dma_mask' by an equivalent
-and less verbose 'dma_set_mask_and_coherent()' call.
+This is helpful for debugging and in determining how long certain
+module_init calls take to execute.
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
-If needed, see post from Christoph Hellwig on the kernel-janitors ML:
-   https://marc.info/?l=kernel-janitors&m=158745678307186&w=4
+v2: no change
 
-We could also reduce indentation by merging the 2 'if' together. If this
-is the preferred style, I'll send a v2.
----
- drivers/crypto/qat/qat_4xxx/adf_drv.c       | 8 ++------
- drivers/crypto/qat/qat_c3xxx/adf_drv.c      | 9 ++-------
- drivers/crypto/qat/qat_c3xxxvf/adf_drv.c    | 9 ++-------
- drivers/crypto/qat/qat_c62x/adf_drv.c       | 9 ++-------
- drivers/crypto/qat/qat_c62xvf/adf_drv.c     | 9 ++-------
- drivers/crypto/qat/qat_dh895xcc/adf_drv.c   | 9 ++-------
- drivers/crypto/qat/qat_dh895xccvf/adf_drv.c | 9 ++-------
- 7 files changed, 14 insertions(+), 48 deletions(-)
+ lib/crypto/blake2s.c          |    8 ++++----
+ lib/crypto/chacha20poly1305.c |    8 ++++----
+ lib/crypto/curve25519.c       |    8 ++++----
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-index a8805c815d16..f2b6c0ca039a 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
-+++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-@@ -221,16 +221,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
+--- linux-next-20210708.orig/lib/crypto/blake2s.c
++++ linux-next-20210708/lib/crypto/blake2s.c
+@@ -73,7 +73,7 @@ void blake2s256_hmac(u8 *out, const u8 *
+ }
+ EXPORT_SYMBOL(blake2s256_hmac);
  
- 	/* Set DMA identifier */
--	if (pci_set_dma_mask(pdev, DMA_BIT_MASK(64))) {
--		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(32)))) {
-+	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
-+		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
- 			dev_err(&pdev->dev, "No usable DMA configuration.\n");
- 			ret = -EFAULT;
- 			goto out_err;
--		} else {
--			pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32));
- 		}
--	} else {
--		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
- 	}
+-static int __init mod_init(void)
++static int __init blake2s_mod_init(void)
+ {
+ 	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
+ 	    WARN_ON(!blake2s_selftest()))
+@@ -81,12 +81,12 @@ static int __init mod_init(void)
+ 	return 0;
+ }
  
- 	/* Get accelerator capabilities mask */
-diff --git a/drivers/crypto/qat/qat_c3xxx/adf_drv.c b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-index 7fb3343ae8b0..cc4ed61478a8 100644
---- a/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-@@ -159,17 +159,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
+-static void __exit mod_exit(void)
++static void __exit blake2s_mod_exit(void)
+ {
+ }
  
- 	/* set dma identifier */
--	if (pci_set_dma_mask(pdev, DMA_BIT_MASK(64))) {
--		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(32)))) {
-+	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
-+		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
- 			dev_err(&pdev->dev, "No usable DMA configuration\n");
- 			ret = -EFAULT;
- 			goto out_err_disable;
--		} else {
--			pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32));
- 		}
--
--	} else {
--		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
- 	}
+-module_init(mod_init);
+-module_exit(mod_exit);
++module_init(blake2s_mod_init);
++module_exit(blake2s_mod_exit);
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("BLAKE2s hash function");
+ MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+--- linux-next-20210708.orig/lib/crypto/chacha20poly1305.c
++++ linux-next-20210708/lib/crypto/chacha20poly1305.c
+@@ -354,7 +354,7 @@ bool chacha20poly1305_decrypt_sg_inplace
+ }
+ EXPORT_SYMBOL(chacha20poly1305_decrypt_sg_inplace);
  
- 	if (pci_request_regions(pdev, ADF_C3XXX_DEVICE_NAME)) {
-diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-index 067ca5e17d38..e271da064266 100644
---- a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-@@ -141,17 +141,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
+-static int __init mod_init(void)
++static int __init chacha20poly1305_init(void)
+ {
+ 	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
+ 	    WARN_ON(!chacha20poly1305_selftest()))
+@@ -362,12 +362,12 @@ static int __init mod_init(void)
+ 	return 0;
+ }
  
- 	/* set dma identifier */
--	if (pci_set_dma_mask(pdev, DMA_BIT_MASK(64))) {
--		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(32)))) {
-+	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
-+		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
- 			dev_err(&pdev->dev, "No usable DMA configuration\n");
- 			ret = -EFAULT;
- 			goto out_err_disable;
--		} else {
--			pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32));
- 		}
--
--	} else {
--		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
- 	}
+-static void __exit mod_exit(void)
++static void __exit chacha20poly1305_exit(void)
+ {
+ }
  
- 	if (pci_request_regions(pdev, ADF_C3XXXVF_DEVICE_NAME)) {
-diff --git a/drivers/crypto/qat/qat_c62x/adf_drv.c b/drivers/crypto/qat/qat_c62x/adf_drv.c
-index 1f5de442e1e6..5e2fc0c1a759 100644
---- a/drivers/crypto/qat/qat_c62x/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62x/adf_drv.c
-@@ -159,17 +159,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
+-module_init(mod_init);
+-module_exit(mod_exit);
++module_init(chacha20poly1305_init);
++module_exit(chacha20poly1305_exit);
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("ChaCha20Poly1305 AEAD construction");
+ MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+--- linux-next-20210708.orig/lib/crypto/curve25519.c
++++ linux-next-20210708/lib/crypto/curve25519.c
+@@ -13,7 +13,7 @@
+ #include <linux/module.h>
+ #include <linux/init.h>
  
- 	/* set dma identifier */
--	if (pci_set_dma_mask(pdev, DMA_BIT_MASK(64))) {
--		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(32)))) {
-+	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
-+		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
- 			dev_err(&pdev->dev, "No usable DMA configuration\n");
- 			ret = -EFAULT;
- 			goto out_err_disable;
--		} else {
--			pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32));
- 		}
--
--	} else {
--		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
- 	}
+-static int __init mod_init(void)
++static int __init curve25519_init(void)
+ {
+ 	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
+ 	    WARN_ON(!curve25519_selftest()))
+@@ -21,12 +21,12 @@ static int __init mod_init(void)
+ 	return 0;
+ }
  
- 	if (pci_request_regions(pdev, ADF_C62X_DEVICE_NAME)) {
-diff --git a/drivers/crypto/qat/qat_c62xvf/adf_drv.c b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-index 51ea88c0b17d..8fa5660fe654 100644
---- a/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-@@ -141,17 +141,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
+-static void __exit mod_exit(void)
++static void __exit curve25519_exit(void)
+ {
+ }
  
- 	/* set dma identifier */
--	if (pci_set_dma_mask(pdev, DMA_BIT_MASK(64))) {
--		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(32)))) {
-+	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
-+		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
- 			dev_err(&pdev->dev, "No usable DMA configuration\n");
- 			ret = -EFAULT;
- 			goto out_err_disable;
--		} else {
--			pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32));
- 		}
--
--	} else {
--		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
- 	}
+-module_init(mod_init);
+-module_exit(mod_exit);
++module_init(curve25519_init);
++module_exit(curve25519_exit);
  
- 	if (pci_request_regions(pdev, ADF_C62XVF_DEVICE_NAME)) {
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-index a9ec4357144c..d0bd18e65104 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-@@ -159,17 +159,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
- 
- 	/* set dma identifier */
--	if (pci_set_dma_mask(pdev, DMA_BIT_MASK(64))) {
--		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(32)))) {
-+	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
-+		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
- 			dev_err(&pdev->dev, "No usable DMA configuration\n");
- 			ret = -EFAULT;
- 			goto out_err_disable;
--		} else {
--			pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32));
- 		}
--
--	} else {
--		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
- 	}
- 
- 	if (pci_request_regions(pdev, ADF_DH895XCC_DEVICE_NAME)) {
-diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-index 29999da716cc..ce5eab45218e 100644
---- a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-@@ -141,17 +141,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
- 
- 	/* set dma identifier */
--	if (pci_set_dma_mask(pdev, DMA_BIT_MASK(64))) {
--		if ((pci_set_dma_mask(pdev, DMA_BIT_MASK(32)))) {
-+	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
-+		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
- 			dev_err(&pdev->dev, "No usable DMA configuration\n");
- 			ret = -EFAULT;
- 			goto out_err_disable;
--		} else {
--			pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32));
- 		}
--
--	} else {
--		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
- 	}
- 
- 	if (pci_request_regions(pdev, ADF_DH895XCCVF_DEVICE_NAME)) {
--- 
-2.30.2
-
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("Curve25519 scalar multiplication");
