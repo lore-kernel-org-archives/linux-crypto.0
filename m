@@ -2,77 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E01DC11F67
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jul 2021 08:15:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7B6C07E99
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jul 2021 10:21:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 738BF6142B
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jul 2021 08:15:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A84060C40
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jul 2021 10:21:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349159AbhGLISe (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Jul 2021 04:18:34 -0400
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:50900 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1356737AbhGLIQo (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Jul 2021 04:16:44 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0UfVJpuB_1626077632;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UfVJpuB_1626077632)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 12 Jul 2021 16:13:53 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        "Gilad Ben-Yossef" <gilad@benyossef.com>,
-        Pascal van Leeuwen <pvanleeuwen@rambus.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jia Zhang <zhang.jia@linux.alibaba.com>,
-        "YiLin . Li" <YiLin.Li@linux.alibaba.com>
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH] X.509: Support parsing certificate using SM2 algorithm
-Date:   Mon, 12 Jul 2021 16:13:52 +0800
-Message-Id: <20210712081352.23692-1-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.19.1.3.ge56e4f7
+        id S231536AbhGLKXz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Jul 2021 06:23:55 -0400
+Received: from mga18.intel.com ([134.134.136.126]:9365 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229725AbhGLKXz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Jul 2021 06:23:55 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10042"; a="197229058"
+X-IronPort-AV: E=Sophos;i="5.84,232,1620716400"; 
+   d="scan'208";a="197229058"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 03:21:06 -0700
+X-IronPort-AV: E=Sophos;i="5.84,232,1620716400"; 
+   d="scan'208";a="493361350"
+Received: from smile.fi.intel.com (HELO smile) ([10.237.68.40])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 03:21:03 -0700
+Received: from andy by smile with local (Exim 4.94.2)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1m2t3Z-00BytJ-Gy; Mon, 12 Jul 2021 13:20:57 +0300
+Date:   Mon, 12 Jul 2021 13:20:57 +0300
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc:     giovanni.cabiddu@intel.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, tomaszx.kowalik@intel.com,
+        marco.chiappero@intel.com, fiona.trahe@intel.com,
+        wojciech.ziemba@intel.com, ztong0001@gmail.com,
+        qat-linux@intel.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH 1/3] crypto: qat - Simplify code and axe the use of a
+ deprecated API
+Message-ID: <YOwXiQP5I+rNXK2O@smile.fi.intel.com>
+References: <cover.1625983602.git.christophe.jaillet@wanadoo.fr>
+ <7283306389ffa7fe230e2a40f7328f064b872757.1625983602.git.christophe.jaillet@wanadoo.fr>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7283306389ffa7fe230e2a40f7328f064b872757.1625983602.git.christophe.jaillet@wanadoo.fr>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The SM2-with-SM3 certificate generated by latest openssl no longer
-reuses the OID_id_ecPublicKey, but directly uses OID_sm2. This patch
-supports this type of x509 certificate parsing.
+On Sun, Jul 11, 2021 at 08:13:18AM +0200, Christophe JAILLET wrote:
+> The wrappers in include/linux/pci-dma-compat.h should go away.
+> 
+> Replace 'pci_set_dma_mask/pci_set_consistent_dma_mask' by an equivalent
+> and less verbose 'dma_set_mask_and_coherent()' call.
 
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
----
- crypto/asymmetric_keys/x509_cert_parser.c | 3 +++
- 1 file changed, 3 insertions(+)
+> If needed, see post from Christoph Hellwig on the kernel-janitors ML:
+>    https://marc.info/?l=kernel-janitors&m=158745678307186&w=4
 
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index 6d003096b5bc..6a945a6ce787 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -496,6 +496,9 @@ int x509_extract_key_data(void *context, size_t hdrlen,
- 	case OID_gost2012PKey512:
- 		ctx->cert->pub->pkey_algo = "ecrdsa";
- 		break;
-+	case OID_sm2:
-+		ctx->cert->pub->pkey_algo = "sm2";
-+		break;
- 	case OID_id_ecPublicKey:
- 		if (parse_OID(ctx->params, ctx->params_size, &oid) != 0)
- 			return -EBADMSG;
+See his another (recent) mail here: https://www.spinics.net/lists/kernel/msg3967232.html...
+
+> +	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
+
+> +		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
+
+...and drop this part from all entries completely.
+
+> +	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
+> +		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
+
+> +	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
+> +		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
+
+> +	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
+> +		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
+
+> +	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
+> +		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
+
+> +	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
+> +		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
+
+> +	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
+> +		if ((dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))) {
+
 -- 
-2.19.1.3.ge56e4f7
+With Best Regards,
+Andy Shevchenko
+
 
