@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D8FCC11F66
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FF7C07E9A
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E00AB613BF
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2939B613C2
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237968AbhGNFy5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jul 2021 01:54:57 -0400
-Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.177]:35287 "EHLO
-        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237964AbhGNFy5 (ORCPT
+        id S238016AbhGNFzD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jul 2021 01:55:03 -0400
+Received: from mo4-p03-ob.smtp.rzone.de ([85.215.255.100]:20899 "EHLO
+        mo4-p03-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237802AbhGNFy7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jul 2021 01:54:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626241854;
+        Wed, 14 Jul 2021 01:54:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626241851;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=gRTNvlutjOqfuqg9ZsX/qmwwi8ZKDLBhTPs41vQ58ms=;
-    b=XUgb6z+ciT4MjibhvIlBLhs6u2wr6yByzyKlaqKifrDIhBgj1E4YuvtLs/BPmtpRB6
-    XfMnzn1ahs/1mcOa5SsCuZM+TQY4yCBjxAVJnSuyHoIq2ASW7OV/FNDPZJWfrQKVbCt0
-    NRuhHHZ8Hd51bYafNuKf6tN4+laJywnZf6WR4KbsUGLbRVpCc/gyVRruHpP6wZNg2S5g
-    M+g1HnrOSw8BNeNWcEGWi9ut02M8PszOKD8A+9aNUlbki7YLwPf/fxqrju4aC7b3pSXx
-    PMC1zISdZ362BHbTflOETAkz/m626+DdGeKA3+XVRBzr4ukgPJ17u5eSYXSQFxh+t2ZW
-    L/FA==
+    bh=vGpsMEri1IrX7pwOUjPrqS1OZLMl4EyI4NKlKBfVD3Y=;
+    b=PLjwXMdVlTbO1R8gsd4/1cwsxpou+G05gq6Afiert24/6fX5TlhZi2i2Fz7XUS5Lm/
+    ScVZ/nor8OXT0k9kT1wloFzNIiGFqH+3lksh8+Hb0ZddqkaqqH4qfSA4SbGMxsU273aN
+    /AhxUi4SXVU49W2V6Veb4qBvfpb6kVHB0SiyBMOZjYdeo0MBm5oY+3Q+rDb+6tiMYnSQ
+    IDrjy2cOjB/Fjl2IortUzELKyl47JKLAsAA1RyWCGWPQKPnZTw2y8RxToSw/Fr5dqm1A
+    rUIPHKvGT8nUqQ05puAwtL9JXbECu3bl8cleVcF9dLZtNHbEkH7amtEJgdVfgY3EepZy
+    WTiw==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXPSI/SaRQ=="
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.28.1 DYNA|AUTH)
-    with ESMTPSA id N0753fx6E5orwyW
+    with ESMTPSA id N0753fx6E5oowyT
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Wed, 14 Jul 2021 07:50:53 +0200 (CEST)
+    Wed, 14 Jul 2021 07:50:50 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
@@ -71,34 +71,24 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         Petr Tesarik <ptesarik@suse.cz>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>
-Subject: [PATCH v41 07/13] LRNG - add SP800-90A DRBG extension
-Date:   Wed, 14 Jul 2021 07:46:41 +0200
-Message-ID: <4521663.sxbhoNBQcn@positron.chronox.de>
+Subject: [PATCH v41 09/13] crypto: provide access to a static Jitter RNG state
+Date:   Wed, 14 Jul 2021 07:47:49 +0200
+Message-ID: <2275613.P25KImRyBb@positron.chronox.de>
 In-Reply-To: <7822794.ITf6fX9eNu@positron.chronox.de>
 References: <7822794.ITf6fX9eNu@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Using the LRNG switchable DRNG support, the SP800-90A DRBG extension is
-implemented.
-
-The DRBG uses the kernel crypto API DRBG implementation. In addition, it
-uses the kernel crypto API SHASH support to provide the hashing
-operation.
-
-The DRBG supports the choice of either a CTR DRBG using AES-256, HMAC
-DRBG with SHA-512 core or Hash DRBG with SHA-512 core. The used core can
-be selected with the module parameter lrng_drbg_type. The default is the
-CTR DRBG.
-
-When compiling the DRBG extension statically, the DRBG is loaded at
-late_initcall stage which implies that with the start of user space, the
-user space interfaces of getrandom(2), /dev/random and /dev/urandom
-provide random data produced by an SP800-90A DRBG.
+To support the LRNG operation which uses the Jitter RNG separately
+from the kernel crypto API, at a time where potentially the regular
+memory management is not yet initialized, the Jitter RNG needs to
+provide a state whose memory is defined at compile time. As only once
+instance will ever be needed by the LRNG, define once static memory
+block which is solely to be used by the LRNG.
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -119,251 +109,97 @@ CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
 CC: Alexander Lobakin <alobakin@mailbox.org>
 Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
+Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- drivers/char/lrng/Kconfig     |  10 ++
- drivers/char/lrng/Makefile    |   1 +
- drivers/char/lrng/lrng_drbg.c | 198 ++++++++++++++++++++++++++++++++++
- 3 files changed, 209 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_drbg.c
+=2D--
+ crypto/jitterentropy-kcapi.c                  |  3 +-
+ crypto/jitterentropy.c                        | 31 ++++++++++++++++++-
+ .../crypto/internal}/jitterentropy.h          |  3 ++
+ 3 files changed, 34 insertions(+), 3 deletions(-)
+ rename {crypto =3D> include/crypto/internal}/jitterentropy.h (84%)
 
-diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index ab17c45a356b..aa611363b97e 100644
---- a/drivers/char/lrng/Kconfig
-+++ b/drivers/char/lrng/Kconfig
-@@ -215,6 +215,16 @@ config LRNG_KCAPI_HASH
- 	bool
- 	select CRYPTO_HASH
- 
-+config LRNG_DRBG
-+	tristate "SP800-90A support for the LRNG"
-+	depends on CRYPTO
-+	select CRYPTO_DRBG_MENU
-+	select CRYPTO_SHA512
-+	select LRNG_KCAPI_HASH
-+	help
-+	  Enable the SP800-90A DRBG support for the LRNG. Once the
-+	  module is loaded, output from /dev/random, /dev/urandom,
-+	  getrandom(2), or get_random_bytes_full is provided by a DRBG.
- endif # LRNG_DRNG_SWITCH
- 
- endif # LRNG
-diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 40f8826edeeb..6ebd252db12f 100644
---- a/drivers/char/lrng/Makefile
-+++ b/drivers/char/lrng/Makefile
-@@ -12,3 +12,4 @@ obj-$(CONFIG_NUMA)		+= lrng_numa.o
- obj-$(CONFIG_SYSCTL)		+= lrng_proc.o
- obj-$(CONFIG_LRNG_DRNG_SWITCH)	+= lrng_switch.o
- obj-$(CONFIG_LRNG_KCAPI_HASH)	+= lrng_kcapi_hash.o
-+obj-$(CONFIG_LRNG_DRBG)		+= lrng_drbg.o
-diff --git a/drivers/char/lrng/lrng_drbg.c b/drivers/char/lrng/lrng_drbg.c
-new file mode 100644
-index 000000000000..6ca6b05eccf4
---- /dev/null
-+++ b/drivers/char/lrng/lrng_drbg.c
-@@ -0,0 +1,198 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
-+/*
-+ * Backend for the LRNG providing the cryptographic primitives using the
-+ * kernel crypto API and its DRBG.
-+ *
-+ * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
-+ */
+diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+index e8a4165a1874..c90e60910827 100644
+=2D-- a/crypto/jitterentropy-kcapi.c
++++ b/crypto/jitterentropy-kcapi.c
+@@ -43,8 +43,7 @@
+ #include <linux/fips.h>
+ #include <linux/time.h>
+ #include <crypto/internal/rng.h>
+=2D
+=2D#include "jitterentropy.h"
++#include <crypto/internal/jitterentropy.h>
+=20
+ /*************************************************************************=
+**
+  * Helper function
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index a11b3208760f..ca7e70dab163 100644
+=2D-- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -117,7 +117,7 @@ struct rand_data {
+ #define JENT_EHEALTH		9 /* Health test failed during initialization */
+ #define JENT_ERCT		10 /* RCT failed during initialization */
+=20
+=2D#include "jitterentropy.h"
++#include <crypto/internal/jitterentropy.h>
+=20
+ /*************************************************************************=
+**
+  * Adaptive Proportion Test
+@@ -854,3 +854,32 @@ int jent_entropy_init(void)
+=20
+ 	return 0;
+ }
 +
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <crypto/drbg.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/lrng.h>
-+
-+#include "lrng_kcapi_hash.h"
-+
-+/*
-+ * Define a DRBG plus a hash / MAC used to extract data from the entropy pool.
-+ * For LRNG_HASH_NAME you can use a hash or a MAC (HMAC or CMAC) of your choice
-+ * (Note, you should use the suggested selections below -- using SHA-1 or MD5
-+ * is not wise). The idea is that the used cipher primitive can be selected to
-+ * be the same as used for the DRBG. I.e. the LRNG only uses one cipher
-+ * primitive using the same cipher implementation with the options offered in
-+ * the following. This means, if the CTR DRBG is selected and AES-NI is present,
-+ * both the CTR DRBG and the selected cmac(aes) use AES-NI.
-+ *
-+ * The security strengths of the DRBGs are all 256 bits according to
-+ * SP800-57 section 5.6.1.
-+ *
-+ * This definition is allowed to be changed.
-+ */
-+#ifdef CONFIG_CRYPTO_DRBG_CTR
-+static unsigned int lrng_drbg_type = 0;
-+#elif defined CONFIG_CRYPTO_DRBG_HMAC
-+static unsigned int lrng_drbg_type = 1;
-+#elif defined CONFIG_CRYPTO_DRBG_HASH
-+static unsigned int lrng_drbg_type = 2;
-+#else
-+#error "Unknown DRBG in use"
-+#endif
-+
-+/* The parameter must be r/o in sysfs as otherwise races appear. */
-+module_param(lrng_drbg_type, uint, 0444);
-+MODULE_PARM_DESC(lrng_drbg_type, "DRBG type used for LRNG (0->CTR_DRBG, 1->HMAC_DRBG, 2->Hash_DRBG)");
-+
-+struct lrng_drbg {
-+	const char *hash_name;
-+	const char *drbg_core;
-+};
-+
-+static const struct lrng_drbg lrng_drbg_types[] = {
-+	{	/* CTR_DRBG with AES-256 using derivation function */
-+		.hash_name = "sha512",
-+		.drbg_core = "drbg_nopr_ctr_aes256",
-+	}, {	/* HMAC_DRBG with SHA-512 */
-+		.hash_name = "sha512",
-+		.drbg_core = "drbg_nopr_hmac_sha512",
-+	}, {	/* Hash_DRBG with SHA-512 using derivation function */
-+		.hash_name = "sha512",
-+		.drbg_core = "drbg_nopr_sha512"
-+	}
-+};
-+
-+static int lrng_drbg_drng_seed_helper(void *drng, const u8 *inbuf, u32 inbuflen)
++struct rand_data *jent_lrng_entropy_collector(void)
 +{
-+	struct drbg_state *drbg = (struct drbg_state *)drng;
-+	LIST_HEAD(seedlist);
-+	struct drbg_string data;
-+	int ret;
++	static unsigned char lrng_jent_mem[JENT_MEMORY_SIZE];
++	static struct rand_data lrng_jent_state =3D {
++		.data		=3D 0,
++		.old_data	=3D 0,
++		.prev_time	=3D 0,
++		.last_delta	=3D 0,
++		.last_delta2	=3D 0,
++		.osr		=3D 1,
++		.mem		=3D lrng_jent_mem,
++		.memlocation	=3D 0,
++		.memblocks	=3D JENT_MEMORY_BLOCKSIZE,
++		.memblocksize	=3D JENT_MEMORY_BLOCKS,
++		.memaccessloops	=3D JENT_MEMORY_ACCESSLOOPS,
++		.rct_count	=3D 0,
++		.apt_observations =3D 0,
++		.apt_count	=3D 0,
++		.apt_base	=3D 0,
++		.apt_base_set	=3D 0,
++		.health_failure =3D 0
++	};
 +
-+	drbg_string_fill(&data, inbuf, inbuflen);
-+	list_add_tail(&data.list, &seedlist);
-+	ret = drbg->d_ops->update(drbg, &seedlist, drbg->seeded);
++	if (jent_entropy_init())
++		return NULL;
 +
-+	if (ret >= 0)
-+		drbg->seeded = true;
-+
-+	return ret;
++	return &lrng_jent_state;
 +}
+diff --git a/crypto/jitterentropy.h b/include/crypto/internal/jitterentropy=
+=2Eh
+similarity index 84%
+rename from crypto/jitterentropy.h
+rename to include/crypto/internal/jitterentropy.h
+index c83fff32d130..6e07d86eac82 100644
+=2D-- a/crypto/jitterentropy.h
++++ b/include/crypto/internal/jitterentropy.h
+@@ -15,3 +15,6 @@ extern int jent_read_entropy(struct rand_data *ec, unsign=
+ed char *data,
+ extern struct rand_data *jent_entropy_collector_alloc(unsigned int osr,
+ 						      unsigned int flags);
+ extern void jent_entropy_collector_free(struct rand_data *entropy_collecto=
+r);
 +
-+static int lrng_drbg_drng_generate_helper(void *drng, u8 *outbuf, u32 outbuflen)
-+{
-+	struct drbg_state *drbg = (struct drbg_state *)drng;
-+
-+	return drbg->d_ops->generate(drbg, outbuf, outbuflen, NULL);
-+}
-+
-+static void *lrng_drbg_drng_alloc(u32 sec_strength)
-+{
-+	struct drbg_state *drbg;
-+	int coreref = -1;
-+	bool pr = false;
-+	int ret;
-+
-+	drbg_convert_tfm_core(lrng_drbg_types[lrng_drbg_type].drbg_core,
-+			      &coreref, &pr);
-+	if (coreref < 0)
-+		return ERR_PTR(-EFAULT);
-+
-+	drbg = kzalloc(sizeof(struct drbg_state), GFP_KERNEL);
-+	if (!drbg)
-+		return ERR_PTR(-ENOMEM);
-+
-+	drbg->core = &drbg_cores[coreref];
-+	drbg->seeded = false;
-+	ret = drbg_alloc_state(drbg);
-+	if (ret)
-+		goto err;
-+
-+	if (sec_strength > drbg_sec_strength(drbg->core->flags)) {
-+		pr_err("Security strength of DRBG (%u bits) lower than requested by LRNG (%u bits)\n",
-+			drbg_sec_strength(drbg->core->flags) * 8,
-+			sec_strength * 8);
-+		goto dealloc;
-+	}
-+
-+	if (sec_strength < drbg_sec_strength(drbg->core->flags))
-+		pr_warn("Security strength of DRBG (%u bits) higher than requested by LRNG (%u bits)\n",
-+			drbg_sec_strength(drbg->core->flags) * 8,
-+			sec_strength * 8);
-+
-+	pr_info("DRBG with %s core allocated\n", drbg->core->backend_cra_name);
-+
-+	return drbg;
-+
-+dealloc:
-+	if (drbg->d_ops)
-+		drbg->d_ops->crypto_fini(drbg);
-+	drbg_dealloc_state(drbg);
-+err:
-+	kfree(drbg);
-+	return ERR_PTR(-EINVAL);
-+}
-+
-+static void lrng_drbg_drng_dealloc(void *drng)
-+{
-+	struct drbg_state *drbg = (struct drbg_state *)drng;
-+
-+	if (drbg && drbg->d_ops)
-+		drbg->d_ops->crypto_fini(drbg);
-+	drbg_dealloc_state(drbg);
-+	kfree_sensitive(drbg);
-+	pr_info("DRBG deallocated\n");
-+}
-+
-+static void *lrng_drbg_hash_alloc(void)
-+{
-+	return lrng_kcapi_hash_alloc(lrng_drbg_types[lrng_drbg_type].hash_name);
-+}
-+
-+static const char *lrng_drbg_name(void)
-+{
-+	return lrng_drbg_types[lrng_drbg_type].drbg_core;
-+}
-+
-+static const char *lrng_hash_name(void)
-+{
-+	return lrng_drbg_types[lrng_drbg_type].hash_name;
-+}
-+
-+static const struct lrng_crypto_cb lrng_drbg_crypto_cb = {
-+	.lrng_drng_name			= lrng_drbg_name,
-+	.lrng_hash_name			= lrng_hash_name,
-+	.lrng_drng_alloc		= lrng_drbg_drng_alloc,
-+	.lrng_drng_dealloc		= lrng_drbg_drng_dealloc,
-+	.lrng_drng_seed_helper		= lrng_drbg_drng_seed_helper,
-+	.lrng_drng_generate_helper	= lrng_drbg_drng_generate_helper,
-+	.lrng_hash_alloc		= lrng_drbg_hash_alloc,
-+	.lrng_hash_dealloc		= lrng_kcapi_hash_dealloc,
-+	.lrng_hash_digestsize		= lrng_kcapi_hash_digestsize,
-+	.lrng_hash_init			= lrng_kcapi_hash_init,
-+	.lrng_hash_update		= lrng_kcapi_hash_update,
-+	.lrng_hash_final		= lrng_kcapi_hash_final,
-+	.lrng_hash_desc_zero		= lrng_kcapi_hash_zero,
-+};
-+
-+static int __init lrng_drbg_init(void)
-+{
-+	if (lrng_drbg_type >= ARRAY_SIZE(lrng_drbg_types)) {
-+		pr_err("lrng_drbg_type parameter too large (given %u - max: %lu)",
-+		       lrng_drbg_type,
-+		       (unsigned long)ARRAY_SIZE(lrng_drbg_types) - 1);
-+		return -EAGAIN;
-+	}
-+	return lrng_set_drng_cb(&lrng_drbg_crypto_cb);
-+}
-+
-+static void __exit lrng_drbg_exit(void)
-+{
-+	lrng_set_drng_cb(NULL);
-+}
-+
-+late_initcall(lrng_drbg_init);
-+module_exit(lrng_drbg_exit);
-+MODULE_LICENSE("Dual BSD/GPL");
-+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-+MODULE_DESCRIPTION("Linux Random Number Generator - SP800-90A DRBG backend");
--- 
++/* Access to statically allocated Jitter RNG instance */
++extern struct rand_data *jent_lrng_entropy_collector(void);
+=2D-=20
 2.31.1
 
 
