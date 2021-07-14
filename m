@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2355BC12002
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 20:17:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E074C47E48
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 20:37:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BABC613B5
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 20:17:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F36E4613A9
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 20:37:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238186AbhGNUU1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jul 2021 16:20:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57102 "EHLO
+        id S230385AbhGNUkC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jul 2021 16:40:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238546AbhGNUU0 (ORCPT
+        with ESMTP id S230341AbhGNUkC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jul 2021 16:20:26 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A508C061760
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Jul 2021 13:17:34 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id h4so3684907pgp.5
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Jul 2021 13:17:34 -0700 (PDT)
+        Wed, 14 Jul 2021 16:40:02 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EC80C061764
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jul 2021 13:37:10 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id p4-20020a17090a9304b029016f3020d867so2533697pjo.3
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jul 2021 13:37:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=gI+EA8/Nf0J6cK0TpEGVYGTiyDY2bGvR4CfRf7LwiKE=;
-        b=g5d0iCWIXzMtG9uTu4/WlfhcZDBDTSjF3SH5HB9h4kkyFWdS7ZFPeo0oNtlcStWvtn
-         OANE7EZVNP4nmKgWq8tgYnWAvrvGJWebyAdeeXhf96uLFGMcFQsamzdhmuuzVPYGOyb8
-         O5RDhJG8U68pCLJi5ASJNrLwnUrnkZNoF7FD6XOsrw74H2NswKJvPvJgBvUDCkLvprwV
-         NLId20507N3qid+yv8cijIDtEser1wyOco2oH3TW+xXgGAo00hgYD3DO+d60Or3VkQeb
-         Wx27yxaXGRcyWXv3NnYcW7bUilesUtohyflmFOm3jAn7bgNguf6V8uYVWOpKM14JokT9
-         aPoQ==
+        bh=ZVoghOGzFUo2g1EHO3svD45q6oPjKQ3+d8OVWxkKeFs=;
+        b=JiU2GbbPqJEfjdLSrQJtgYY3oWalcHVF5itcoxrvKNVRdaiNBcHkThvP5a13TSbF/F
+         975P58r0yXUBYucj06Qebr86YNALTQ+WyrW8dwDAzxB5rRtElAwzRA5OLP/QBpJbUPw0
+         EXbFkofXnP6BHr0opiIKPx1G6cbmQMXpNY2Ft4SImg1JUU9x0QpEdd9rY9la8Lc6KI6Q
+         /tBVkTIXZpTN14WonkOF+PsfWoFfhZeFXuH3VW2oazKiJSWXyLBV7BAcC3wIrR+eR9oF
+         M6re8cCcSA0q47xQspQh2x4zNkVDMuZ8Fmn8Z59RpcGleVkcOUjcm7nBPQLI7V+hGLzL
+         eMSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=gI+EA8/Nf0J6cK0TpEGVYGTiyDY2bGvR4CfRf7LwiKE=;
-        b=W7IqxDJbl5/VwMT/Cck986dzKHLIPGeAGsTA8Gd2TzIcq3DOIhjg9Z1ZeTe7ywKmIL
-         PlHWhdevHvYqMfXg1sWCXRJbRExoV8mQiFBgQ7f9273tev2y4Xo6JwXwgHr6k+gAcMkT
-         1rvGomMrOxFRDxGtZmqfjizr1wGjAeaAOkC7SU73U3cHF3CK83pe7RyWVyf4IHYF27Tl
-         Mk/DnI96qJkpkVULegJIrXZz6ys+HiiDcXYs5A6cfy+AOMEXNAA6f1pcCWkwGMDJyxND
-         K3kLd/Zy5aW2TMpbT7ViV/AfaCxP04vrhz0Ks6xOwRESTEO61sQd3igys5PSzbhWRHB8
-         9AqQ==
-X-Gm-Message-State: AOAM530EnDI2l1fcs8MTGX97vTdOwQUisJns065U33FdMCO/KZEZZhHW
-        4iLasmiKUiQVFDUHZSeOTQvysQ==
-X-Google-Smtp-Source: ABdhPJxZmb+DhcGTDT/5mCgrCU1UlHYl4NvPyzbchWS9bE34G11Vek+44z/cDUPxjy/753noD0t2Cw==
-X-Received: by 2002:a63:471b:: with SMTP id u27mr11470643pga.301.1626293853407;
-        Wed, 14 Jul 2021 13:17:33 -0700 (PDT)
+        bh=ZVoghOGzFUo2g1EHO3svD45q6oPjKQ3+d8OVWxkKeFs=;
+        b=SIig21lyOPTAGN6t4c2sbWzxuolSyeTJPINEoul8SJxRlAF6qMpAWq9Kp/FfV0L0gl
+         iis/q3O7SOByK4XZFjAqnNWeH/QDDlymL6493VWOnzS9297fBLO8GbyQ1so8hUuB/68E
+         Aw7dP7NdFB1eCgYQxXexscg7yEJEhCBXo/RzWHKDsThf3JMBg3DyeU2REIDFo0CtYtr2
+         gqIwAy9B3W/irYjBKuGcvsKbxfkUtOvpiA5EuZjzDF7jIYiCtYzWH2B76J/sRujIppIQ
+         M+BL0SUXmKBgK5YemTmT+d/MueuhxlbbZy6EDeIM1ZQXMGITutcmbRWYKamdvsh60FZ5
+         rHyg==
+X-Gm-Message-State: AOAM5321kIuc30tKMIiqFRL/eXmqMQbHx6lmIv0qN5XfzOLjSNcEGZtm
+        QVb1UiCooitwyDwUaryINf1XJg==
+X-Google-Smtp-Source: ABdhPJwUL+v46lDMA+LqJ5QvGmnIpHnxv/opqwJmq3pJ98w6lIS+a2sQ5Xiu1judhEtQf2xwoOjymw==
+X-Received: by 2002:a17:90b:b88:: with SMTP id bd8mr5383285pjb.26.1626295029550;
+        Wed, 14 Jul 2021 13:37:09 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p1sm3784881pfp.137.2021.07.14.13.17.32
+        by smtp.gmail.com with ESMTPSA id t37sm3942693pfg.14.2021.07.14.13.37.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jul 2021 13:17:32 -0700 (PDT)
-Date:   Wed, 14 Jul 2021 20:17:29 +0000
+        Wed, 14 Jul 2021 13:37:08 -0700 (PDT)
+Date:   Wed, 14 Jul 2021 20:37:05 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Brijesh Singh <brijesh.singh@amd.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -83,161 +83,55 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
         npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 01/40] KVM: SVM: Add support to handle AP
- reset MSR protocol
-Message-ID: <YO9GWVsZmfXJ4BRl@google.com>
+Subject: Re: [PATCH Part2 RFC v4 02/40] KVM: SVM: Provide the Hypervisor
+ Feature support VMGEXIT
+Message-ID: <YO9K8akh1CdY1kjd@google.com>
 References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-2-brijesh.singh@amd.com>
+ <20210707183616.5620-3-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707183616.5620-2-brijesh.singh@amd.com>
+In-Reply-To: <20210707183616.5620-3-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
+> Version 2 of the GHCB specification introduced advertisement of features
+> that are supported by the Hypervisor.
 > 
-> Add support for AP Reset Hold being invoked using the GHCB MSR protocol,
-> available in version 2 of the GHCB specification.
+> Now that KVM supports version 2 of the GHCB specification, bump the
+> maximum supported protocol version.
 
-Please provide a brief overview of the protocol, and why it's needed.  I assume
-it's to allow AP wakeup without a shared GHCB?
+Heh, the changelog doesn't actually state that it's adding support for said
+advertisement of features.  It took me a few seconds to figure out what the
+patch was doing, even though it's quite trivial in the end.
 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
-
-...
-
->  static u8 sev_enc_bit;
->  static DECLARE_RWSEM(sev_deactivate_lock);
->  static DEFINE_MUTEX(sev_bitmap_lock);
-> @@ -2199,6 +2203,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
->  
->  void sev_es_unmap_ghcb(struct vcpu_svm *svm)
->  {
-> +	/* Clear any indication that the vCPU is in a type of AP Reset Hold */
-> +	svm->ap_reset_hold_type = AP_RESET_HOLD_NONE;
-> +
->  	if (!svm->ghcb)
->  		return;
->  
-> @@ -2404,6 +2411,22 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
->  				  GHCB_MSR_INFO_POS);
->  		break;
->  	}
-> +	case GHCB_MSR_AP_RESET_HOLD_REQ:
-> +		svm->ap_reset_hold_type = AP_RESET_HOLD_MSR_PROTO;
-> +		ret = kvm_emulate_ap_reset_hold(&svm->vcpu);
-
-The hold type feels like it should be a param to kvm_emulate_ap_reset_hold().
-
-> +
-> +		/*
-> +		 * Preset the result to a non-SIPI return and then only set
-> +		 * the result to non-zero when delivering a SIPI.
-> +		 */
-> +		set_ghcb_msr_bits(svm, 0,
-> +				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
-> +				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
-> +
-> +		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
-> +				  GHCB_MSR_INFO_MASK,
-> +				  GHCB_MSR_INFO_POS);
-
-It looks like all uses set an arbitrary value and then the response.  I think
-folding the response into the helper would improve both readability and robustness.
-I also suspect the helper needs to do WRITE_ONCE() to guarantee the guest sees
-what it's supposed to see, though memory ordering is not my strong suit.
-
-Might even be able to squeeze in a build-time assertion.
-
-Also, do the guest-provided contents actually need to be preserved?  That seems
-somewhat odd.
-
-E.g. can it be
-
-static void set_ghcb_msr_response(struct vcpu_svm *svm, u64 response, u64 value,
-				  u64 mask, unsigned int pos)
-{
-	u64 val = (response << GHCB_MSR_INFO_POS) | (val << pos);
-
-	WRITE_ONCE(svm->vmcb->control.ghcb_gpa |= (value & mask) << pos;
-}
-
-and
-
-		set_ghcb_msr_response(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
-				      GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
-				      GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
-
-> +		break;
->  	case GHCB_MSR_TERM_REQ: {
->  		u64 reason_set, reason_code;
->  
-> @@ -2491,6 +2514,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->  		ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
->  		break;
->  	case SVM_VMGEXIT_AP_HLT_LOOP:
-> +		svm->ap_reset_hold_type = AP_RESET_HOLD_NAE_EVENT;
->  		ret = kvm_emulate_ap_reset_hold(vcpu);
->  		break;
->  	case SVM_VMGEXIT_AP_JUMP_TABLE: {
-> @@ -2628,13 +2652,29 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
->  		return;
->  	}
->  
-> -	/*
-> -	 * Subsequent SIPI: Return from an AP Reset Hold VMGEXIT, where
-> -	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
-> -	 * non-zero value.
-> -	 */
-> -	if (!svm->ghcb)
-> -		return;
-> +	/* Subsequent SIPI */
-> +	switch (svm->ap_reset_hold_type) {
-> +	case AP_RESET_HOLD_NAE_EVENT:
-> +		/*
-> +		 * Return from an AP Reset Hold VMGEXIT, where the guest will
-> +		 * set the CS and RIP. Set SW_EXIT_INFO_2 to a non-zero value.
-> +		 */
-> +		ghcb_set_sw_exit_info_2(svm->ghcb, 1);
-> +		break;
-> +	case AP_RESET_HOLD_MSR_PROTO:
-> +		/*
-> +		 * Return from an AP Reset Hold VMGEXIT, where the guest will
-> +		 * set the CS and RIP. Set GHCB data field to a non-zero value.
-> +		 */
-> +		set_ghcb_msr_bits(svm, 1,
-> +				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
-> +				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
->  
-> -	ghcb_set_sw_exit_info_2(svm->ghcb, 1);
-> +		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
-> +				  GHCB_MSR_INFO_MASK,
-> +				  GHCB_MSR_INFO_POS);
-> +		break;
-> +	default:
-> +		break;
-> +	}
->  }
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 0b89aee51b74..ad12ca26b2d8 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -174,6 +174,7 @@ struct vcpu_svm {
->  	struct ghcb *ghcb;
->  	struct kvm_host_map ghcb_map;
->  	bool received_first_sipi;
-> +	unsigned int ap_reset_hold_type;
-
-Can't this be a u8?
-
->  
->  	/* SEV-ES scratch area support */
->  	void *ghcb_sa;
-> -- 
-> 2.17.1
+>  arch/x86/include/uapi/asm/svm.h |  4 ++--
+>  arch/x86/kvm/svm/sev.c          | 14 ++++++++++++++
+>  arch/x86/kvm/svm/svm.h          |  3 ++-
+>  3 files changed, 18 insertions(+), 3 deletions(-)
 > 
+> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
+> index 9aaf0ab386ef..ba4137abf012 100644
+> --- a/arch/x86/include/uapi/asm/svm.h
+> +++ b/arch/x86/include/uapi/asm/svm.h
+> @@ -115,7 +115,7 @@
+>  #define SVM_VMGEXIT_AP_CREATE_ON_INIT		0
+>  #define SVM_VMGEXIT_AP_CREATE			1
+>  #define SVM_VMGEXIT_AP_DESTROY			2
+> -#define SVM_VMGEXIT_HYPERVISOR_FEATURES		0x8000fffd
+> +#define SVM_VMGEXIT_HV_FT			0x8000fffd
+
+This is fixing up commit 3 from Part1, though I think it can and should be
+omitted from that patch entirely since it's not relevant to the guest, only to
+KVM.
+
+And FWIW, I like the verbose name, though it looks like Boris requested the
+shorter names for the guest.  Can we keep the verbose form for KVM-only VMEGXIT
+name?  Hyper-V has mostly laid claim to "HV", and feature is not the first thing
+that comes to mind for "FT".
+
+>  #define SVM_VMGEXIT_UNSUPPORTED_EVENT		0x8000ffff
