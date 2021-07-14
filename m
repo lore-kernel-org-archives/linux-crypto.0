@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2207BC11F67
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D8FCC11F66
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B5BB613B9
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E00AB613BF
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237980AbhGNFy6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jul 2021 01:54:58 -0400
-Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.223]:13894 "EHLO
+        id S237968AbhGNFy5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jul 2021 01:54:57 -0400
+Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.177]:35287 "EHLO
         mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237957AbhGNFy5 (ORCPT
+        with ESMTP id S237964AbhGNFy5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 14 Jul 2021 01:54:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626241857;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626241854;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=kIn18Gl5jJH4Qdjhpwk/B77xDmu22AE5ZZyc01lwBWU=;
-    b=dlKtEsaKCju2aKn8wTYqlt3fydAvh0U7DKx1ZOMm0kfyF3b6+/C4M6omw+GL8NMD8l
-    +hTK1PNgTkWxr1/2Ad7xOG6RSNOQvUrJ1RPlYk0dcWxwbygIqzvT/ZeuEg3ssqSPYAXL
-    kbprzolGu/bCp0FjItI2NSHGN7Ne3I7AWKzZJRCmXqp08dhMcW9DETAkpWfNGdbvVB5N
-    AT7q+9RJ+xSxshYwr+UuO4kBm2nPhyYr28xfKmfzpW/L9Fg6/Pmy2W/7yzsDkH30mI/C
-    2/ZSCTXwdqqShOQfXMPJvisPG0iRzN8ywSSMvu74KqwkcuS2jMHExGWd43OX8KxEYPfN
-    L2nQ==
+    bh=gRTNvlutjOqfuqg9ZsX/qmwwi8ZKDLBhTPs41vQ58ms=;
+    b=XUgb6z+ciT4MjibhvIlBLhs6u2wr6yByzyKlaqKifrDIhBgj1E4YuvtLs/BPmtpRB6
+    XfMnzn1ahs/1mcOa5SsCuZM+TQY4yCBjxAVJnSuyHoIq2ASW7OV/FNDPZJWfrQKVbCt0
+    NRuhHHZ8Hd51bYafNuKf6tN4+laJywnZf6WR4KbsUGLbRVpCc/gyVRruHpP6wZNg2S5g
+    M+g1HnrOSw8BNeNWcEGWi9ut02M8PszOKD8A+9aNUlbki7YLwPf/fxqrju4aC7b3pSXx
+    PMC1zISdZ362BHbTflOETAkz/m626+DdGeKA3+XVRBzr4ukgPJ17u5eSYXSQFxh+t2ZW
+    L/FA==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXPSI/SaRQ=="
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.28.1 DYNA|AUTH)
-    with ESMTPSA id N0753fx6E5ouwyZ
+    with ESMTPSA id N0753fx6E5orwyW
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Wed, 14 Jul 2021 07:50:56 +0200 (CEST)
+    Wed, 14 Jul 2021 07:50:53 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
@@ -71,9 +71,9 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         Petr Tesarik <ptesarik@suse.cz>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>
-Subject: [PATCH v41 05/13] LRNG - add common generic hash support
-Date:   Wed, 14 Jul 2021 07:45:48 +0200
-Message-ID: <2460884.q7F22EL2Vm@positron.chronox.de>
+Subject: [PATCH v41 07/13] LRNG - add SP800-90A DRBG extension
+Date:   Wed, 14 Jul 2021 07:46:41 +0200
+Message-ID: <4521663.sxbhoNBQcn@positron.chronox.de>
 In-Reply-To: <7822794.ITf6fX9eNu@positron.chronox.de>
 References: <7822794.ITf6fX9eNu@positron.chronox.de>
 MIME-Version: 1.0
@@ -83,16 +83,22 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The LRNG switchable DRNG support also allows the replacement of the hash
-implementation used as conditioning component. The common generic hash
-support code provides the required callbacks using the synchronous hash
-implementations of the kernel crypto API.
+Using the LRNG switchable DRNG support, the SP800-90A DRBG extension is
+implemented.
 
-All synchronous hash implementations supported by the kernel crypto API
-can be used as part of the LRNG with this generic support.
+The DRBG uses the kernel crypto API DRBG implementation. In addition, it
+uses the kernel crypto API SHASH support to provide the hashing
+operation.
 
-The generic support is intended to be configured by separate switchable
-DRNG backends.
+The DRBG supports the choice of either a CTR DRBG using AES-256, HMAC
+DRBG with SHA-512 core or Hash DRBG with SHA-512 core. The used core can
+be selected with the module parameter lrng_drbg_type. The default is the
+CTR DRBG.
+
+When compiling the DRBG extension statically, the DRBG is loaded at
+late_initcall stage which implies that with the start of user space, the
+user space interfaces of getrandom(2), /dev/random and /dev/urandom
+provide random data produced by an SP800-90A DRBG.
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -112,180 +118,251 @@ CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
 CC: Alexander Lobakin <alobakin@mailbox.org>
-CC: "Peter, Matthias" <matthias.peter@bsi.bund.de>
-CC: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-CC: Neil Horman <nhorman@redhat.com>
+Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
+Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/char/lrng/Kconfig           |   8 +++
- drivers/char/lrng/Makefile          |   1 +
- drivers/char/lrng/lrng_kcapi_hash.c | 103 ++++++++++++++++++++++++++++
- drivers/char/lrng/lrng_kcapi_hash.h |  20 ++++++
- 4 files changed, 132 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_kcapi_hash.c
- create mode 100644 drivers/char/lrng/lrng_kcapi_hash.h
+ drivers/char/lrng/Kconfig     |  10 ++
+ drivers/char/lrng/Makefile    |   1 +
+ drivers/char/lrng/lrng_drbg.c | 198 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 209 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_drbg.c
 
 diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index c10a0c3f2015..ab17c45a356b 100644
+index ab17c45a356b..aa611363b97e 100644
 --- a/drivers/char/lrng/Kconfig
 +++ b/drivers/char/lrng/Kconfig
-@@ -209,4 +209,12 @@ menuconfig LRNG_DRNG_SWITCH
- 	  accessible via the external interfaces. With this configuration
- 	  option other DRNGs can be selected and loaded at runtime.
+@@ -215,6 +215,16 @@ config LRNG_KCAPI_HASH
+ 	bool
+ 	select CRYPTO_HASH
  
-+if LRNG_DRNG_SWITCH
-+
-+config LRNG_KCAPI_HASH
-+	bool
-+	select CRYPTO_HASH
-+
-+endif # LRNG_DRNG_SWITCH
-+
++config LRNG_DRBG
++	tristate "SP800-90A support for the LRNG"
++	depends on CRYPTO
++	select CRYPTO_DRBG_MENU
++	select CRYPTO_SHA512
++	select LRNG_KCAPI_HASH
++	help
++	  Enable the SP800-90A DRBG support for the LRNG. Once the
++	  module is loaded, output from /dev/random, /dev/urandom,
++	  getrandom(2), or get_random_bytes_full is provided by a DRBG.
+ endif # LRNG_DRNG_SWITCH
+ 
  endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 0eb4a6849c88..40f8826edeeb 100644
+index 40f8826edeeb..6ebd252db12f 100644
 --- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -11,3 +11,4 @@ obj-y				+= lrng_pool.o lrng_aux.o \
- obj-$(CONFIG_NUMA)		+= lrng_numa.o
+@@ -12,3 +12,4 @@ obj-$(CONFIG_NUMA)		+= lrng_numa.o
  obj-$(CONFIG_SYSCTL)		+= lrng_proc.o
  obj-$(CONFIG_LRNG_DRNG_SWITCH)	+= lrng_switch.o
-+obj-$(CONFIG_LRNG_KCAPI_HASH)	+= lrng_kcapi_hash.o
-diff --git a/drivers/char/lrng/lrng_kcapi_hash.c b/drivers/char/lrng/lrng_kcapi_hash.c
+ obj-$(CONFIG_LRNG_KCAPI_HASH)	+= lrng_kcapi_hash.o
++obj-$(CONFIG_LRNG_DRBG)		+= lrng_drbg.o
+diff --git a/drivers/char/lrng/lrng_drbg.c b/drivers/char/lrng/lrng_drbg.c
 new file mode 100644
-index 000000000000..9647d980e468
+index 000000000000..6ca6b05eccf4
 --- /dev/null
-+++ b/drivers/char/lrng/lrng_kcapi_hash.c
-@@ -0,0 +1,103 @@
++++ b/drivers/char/lrng/lrng_drbg.c
+@@ -0,0 +1,198 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * Backend for providing the hash primitive using the kernel crypto API.
++ * Backend for the LRNG providing the cryptographic primitives using the
++ * kernel crypto API and its DRBG.
 + *
-+ * Copyright (C) 2021, Stephan Mueller <smueller@chronox.de>
++ * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
 + */
 +
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <crypto/hash.h>
++#include <crypto/drbg.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/lrng.h>
 +
 +#include "lrng_kcapi_hash.h"
 +
-+struct lrng_hash_info {
-+	struct crypto_shash *tfm;
++/*
++ * Define a DRBG plus a hash / MAC used to extract data from the entropy pool.
++ * For LRNG_HASH_NAME you can use a hash or a MAC (HMAC or CMAC) of your choice
++ * (Note, you should use the suggested selections below -- using SHA-1 or MD5
++ * is not wise). The idea is that the used cipher primitive can be selected to
++ * be the same as used for the DRBG. I.e. the LRNG only uses one cipher
++ * primitive using the same cipher implementation with the options offered in
++ * the following. This means, if the CTR DRBG is selected and AES-NI is present,
++ * both the CTR DRBG and the selected cmac(aes) use AES-NI.
++ *
++ * The security strengths of the DRBGs are all 256 bits according to
++ * SP800-57 section 5.6.1.
++ *
++ * This definition is allowed to be changed.
++ */
++#ifdef CONFIG_CRYPTO_DRBG_CTR
++static unsigned int lrng_drbg_type = 0;
++#elif defined CONFIG_CRYPTO_DRBG_HMAC
++static unsigned int lrng_drbg_type = 1;
++#elif defined CONFIG_CRYPTO_DRBG_HASH
++static unsigned int lrng_drbg_type = 2;
++#else
++#error "Unknown DRBG in use"
++#endif
++
++/* The parameter must be r/o in sysfs as otherwise races appear. */
++module_param(lrng_drbg_type, uint, 0444);
++MODULE_PARM_DESC(lrng_drbg_type, "DRBG type used for LRNG (0->CTR_DRBG, 1->HMAC_DRBG, 2->Hash_DRBG)");
++
++struct lrng_drbg {
++	const char *hash_name;
++	const char *drbg_core;
 +};
 +
-+static inline void _lrng_kcapi_hash_free(struct lrng_hash_info *lrng_hash)
-+{
-+	struct crypto_shash *tfm = lrng_hash->tfm;
++static const struct lrng_drbg lrng_drbg_types[] = {
++	{	/* CTR_DRBG with AES-256 using derivation function */
++		.hash_name = "sha512",
++		.drbg_core = "drbg_nopr_ctr_aes256",
++	}, {	/* HMAC_DRBG with SHA-512 */
++		.hash_name = "sha512",
++		.drbg_core = "drbg_nopr_hmac_sha512",
++	}, {	/* Hash_DRBG with SHA-512 using derivation function */
++		.hash_name = "sha512",
++		.drbg_core = "drbg_nopr_sha512"
++	}
++};
 +
-+	crypto_free_shash(tfm);
-+	kfree(lrng_hash);
-+}
-+
-+void *lrng_kcapi_hash_alloc(const char *name)
++static int lrng_drbg_drng_seed_helper(void *drng, const u8 *inbuf, u32 inbuflen)
 +{
-+	struct lrng_hash_info *lrng_hash;
-+	struct crypto_shash *tfm;
++	struct drbg_state *drbg = (struct drbg_state *)drng;
++	LIST_HEAD(seedlist);
++	struct drbg_string data;
 +	int ret;
 +
-+	if (!name) {
-+		pr_err("Hash name missing\n");
-+		return ERR_PTR(-EINVAL);
-+	}
++	drbg_string_fill(&data, inbuf, inbuflen);
++	list_add_tail(&data.list, &seedlist);
++	ret = drbg->d_ops->update(drbg, &seedlist, drbg->seeded);
 +
-+	tfm = crypto_alloc_shash(name, 0, 0);
-+	if (IS_ERR(tfm)) {
-+		pr_err("could not allocate hash %s\n", name);
-+		return ERR_CAST(tfm);
-+	}
++	if (ret >= 0)
++		drbg->seeded = true;
 +
-+	ret = sizeof(struct lrng_hash_info);
-+	lrng_hash = kmalloc(ret, GFP_KERNEL);
-+	if (!lrng_hash) {
-+		crypto_free_shash(tfm);
++	return ret;
++}
++
++static int lrng_drbg_drng_generate_helper(void *drng, u8 *outbuf, u32 outbuflen)
++{
++	struct drbg_state *drbg = (struct drbg_state *)drng;
++
++	return drbg->d_ops->generate(drbg, outbuf, outbuflen, NULL);
++}
++
++static void *lrng_drbg_drng_alloc(u32 sec_strength)
++{
++	struct drbg_state *drbg;
++	int coreref = -1;
++	bool pr = false;
++	int ret;
++
++	drbg_convert_tfm_core(lrng_drbg_types[lrng_drbg_type].drbg_core,
++			      &coreref, &pr);
++	if (coreref < 0)
++		return ERR_PTR(-EFAULT);
++
++	drbg = kzalloc(sizeof(struct drbg_state), GFP_KERNEL);
++	if (!drbg)
 +		return ERR_PTR(-ENOMEM);
++
++	drbg->core = &drbg_cores[coreref];
++	drbg->seeded = false;
++	ret = drbg_alloc_state(drbg);
++	if (ret)
++		goto err;
++
++	if (sec_strength > drbg_sec_strength(drbg->core->flags)) {
++		pr_err("Security strength of DRBG (%u bits) lower than requested by LRNG (%u bits)\n",
++			drbg_sec_strength(drbg->core->flags) * 8,
++			sec_strength * 8);
++		goto dealloc;
 +	}
 +
-+	lrng_hash->tfm = tfm;
++	if (sec_strength < drbg_sec_strength(drbg->core->flags))
++		pr_warn("Security strength of DRBG (%u bits) higher than requested by LRNG (%u bits)\n",
++			drbg_sec_strength(drbg->core->flags) * 8,
++			sec_strength * 8);
 +
-+	pr_info("Hash %s allocated\n", name);
++	pr_info("DRBG with %s core allocated\n", drbg->core->backend_cra_name);
 +
-+	return lrng_hash;
++	return drbg;
++
++dealloc:
++	if (drbg->d_ops)
++		drbg->d_ops->crypto_fini(drbg);
++	drbg_dealloc_state(drbg);
++err:
++	kfree(drbg);
++	return ERR_PTR(-EINVAL);
 +}
-+EXPORT_SYMBOL(lrng_kcapi_hash_alloc);
 +
-+u32 lrng_kcapi_hash_digestsize(void *hash)
++static void lrng_drbg_drng_dealloc(void *drng)
 +{
-+	struct lrng_hash_info *lrng_hash = (struct lrng_hash_info *)hash;
-+	struct crypto_shash *tfm = lrng_hash->tfm;
++	struct drbg_state *drbg = (struct drbg_state *)drng;
 +
-+	return crypto_shash_digestsize(tfm);
++	if (drbg && drbg->d_ops)
++		drbg->d_ops->crypto_fini(drbg);
++	drbg_dealloc_state(drbg);
++	kfree_sensitive(drbg);
++	pr_info("DRBG deallocated\n");
 +}
-+EXPORT_SYMBOL(lrng_kcapi_hash_digestsize);
 +
-+void lrng_kcapi_hash_dealloc(void *hash)
++static void *lrng_drbg_hash_alloc(void)
 +{
-+	struct lrng_hash_info *lrng_hash = (struct lrng_hash_info *)hash;
-+
-+	_lrng_kcapi_hash_free(lrng_hash);
-+	pr_info("Hash deallocated\n");
++	return lrng_kcapi_hash_alloc(lrng_drbg_types[lrng_drbg_type].hash_name);
 +}
-+EXPORT_SYMBOL(lrng_kcapi_hash_dealloc);
 +
-+int lrng_kcapi_hash_init(struct shash_desc *shash, void *hash)
++static const char *lrng_drbg_name(void)
 +{
-+	struct lrng_hash_info *lrng_hash = (struct lrng_hash_info *)hash;
-+	struct crypto_shash *tfm = lrng_hash->tfm;
-+
-+	shash->tfm = tfm;
-+	return crypto_shash_init(shash);
++	return lrng_drbg_types[lrng_drbg_type].drbg_core;
 +}
-+EXPORT_SYMBOL(lrng_kcapi_hash_init);
 +
-+int lrng_kcapi_hash_update(struct shash_desc *shash, const u8 *inbuf,
-+			   u32 inbuflen)
++static const char *lrng_hash_name(void)
 +{
-+	return crypto_shash_update(shash, inbuf, inbuflen);
++	return lrng_drbg_types[lrng_drbg_type].hash_name;
 +}
-+EXPORT_SYMBOL(lrng_kcapi_hash_update);
 +
-+int lrng_kcapi_hash_final(struct shash_desc *shash, u8 *digest)
++static const struct lrng_crypto_cb lrng_drbg_crypto_cb = {
++	.lrng_drng_name			= lrng_drbg_name,
++	.lrng_hash_name			= lrng_hash_name,
++	.lrng_drng_alloc		= lrng_drbg_drng_alloc,
++	.lrng_drng_dealloc		= lrng_drbg_drng_dealloc,
++	.lrng_drng_seed_helper		= lrng_drbg_drng_seed_helper,
++	.lrng_drng_generate_helper	= lrng_drbg_drng_generate_helper,
++	.lrng_hash_alloc		= lrng_drbg_hash_alloc,
++	.lrng_hash_dealloc		= lrng_kcapi_hash_dealloc,
++	.lrng_hash_digestsize		= lrng_kcapi_hash_digestsize,
++	.lrng_hash_init			= lrng_kcapi_hash_init,
++	.lrng_hash_update		= lrng_kcapi_hash_update,
++	.lrng_hash_final		= lrng_kcapi_hash_final,
++	.lrng_hash_desc_zero		= lrng_kcapi_hash_zero,
++};
++
++static int __init lrng_drbg_init(void)
 +{
-+	return crypto_shash_final(shash, digest);
++	if (lrng_drbg_type >= ARRAY_SIZE(lrng_drbg_types)) {
++		pr_err("lrng_drbg_type parameter too large (given %u - max: %lu)",
++		       lrng_drbg_type,
++		       (unsigned long)ARRAY_SIZE(lrng_drbg_types) - 1);
++		return -EAGAIN;
++	}
++	return lrng_set_drng_cb(&lrng_drbg_crypto_cb);
 +}
-+EXPORT_SYMBOL(lrng_kcapi_hash_final);
 +
-+void lrng_kcapi_hash_zero(struct shash_desc *shash)
++static void __exit lrng_drbg_exit(void)
 +{
-+	shash_desc_zero(shash);
++	lrng_set_drng_cb(NULL);
 +}
-+EXPORT_SYMBOL(lrng_kcapi_hash_zero);
-diff --git a/drivers/char/lrng/lrng_kcapi_hash.h b/drivers/char/lrng/lrng_kcapi_hash.h
-new file mode 100644
-index 000000000000..2f94558d2dd6
---- /dev/null
-+++ b/drivers/char/lrng/lrng_kcapi_hash.h
-@@ -0,0 +1,20 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause */
-+/*
-+ * Copyright (C) 2020 - 2021, Stephan Mueller <smueller@chronox.de>
-+ */
 +
-+#ifndef _LRNG_KCAPI_HASH_H
-+#define _LRNG_KCAPI_HASH_H
-+
-+#include <linux/module.h>
-+
-+void *lrng_kcapi_hash_alloc(const char *name);
-+u32 lrng_kcapi_hash_digestsize(void *hash);
-+void lrng_kcapi_hash_dealloc(void *hash);
-+int lrng_kcapi_hash_init(struct shash_desc *shash, void *hash);
-+int lrng_kcapi_hash_update(struct shash_desc *shash, const u8 *inbuf,
-+			   u32 inbuflen);
-+int lrng_kcapi_hash_final(struct shash_desc *shash, u8 *digest);
-+void lrng_kcapi_hash_zero(struct shash_desc *shash);
-+
-+#endif /* _LRNG_KCAPI_HASH_H */
++late_initcall(lrng_drbg_init);
++module_exit(lrng_drbg_exit);
++MODULE_LICENSE("Dual BSD/GPL");
++MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
++MODULE_DESCRIPTION("Linux Random Number Generator - SP800-90A DRBG backend");
 -- 
 2.31.1
 
