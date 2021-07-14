@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F50EC11F69
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD18C11F6B
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D14D613BF
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8312F613BF
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237997AbhGNFzI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jul 2021 01:55:08 -0400
-Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.124]:31838 "EHLO
-        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237961AbhGNFzB (ORCPT
+        id S238058AbhGNFzJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jul 2021 01:55:09 -0400
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.80]:21226 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238014AbhGNFzF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jul 2021 01:55:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626241852;
+        Wed, 14 Jul 2021 01:55:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626241844;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=IZ8KjijW1mIr25nhzjejINqXuWbZxr88u0yvk7w5cPY=;
-    b=atjQ8ND0O3hlesE3gKl4ldhLC4fSBzr78s525BXIfGFsegMu++0wuHiWJPN3DPkSUI
-    EGMMPyVVXd7gUvX4eRBAvGnFnJ/FSD3IIDPDQDWh/+lECTfQJ/cddnvmxKEnij+HzVPJ
-    Gr+CLG6qLU77tifveAejpfcuQZeKM6HgVnZgQGP4gxkNd+ChlNs527hyUYAyEwUdKthi
-    02DuWx3AOD+kQYnmFobfs6UzCB4iIoCsCwqCvd3ZHIKGS/RiirXLGWP7inY9uDH56nzF
-    EuN0ud1VZ4q8ie/rsgurIXF8D84vaIVcUYKud9a2kNPpMOexOLURXvoi6rbTlE3l7VYO
-    wOhA==
+    bh=Zq3DHNFXR+LZijCs7bSXLXFb1th+P0eg4yd7f4KnlJA=;
+    b=nPi7a49CnEIjWWRzkZVRGafJn5am7d80iEnLaTkqqbY5n0Mw9cwcfHqekbFDlg7Fsx
+    /1x+2K+7h8Akn7utYiHzpB2zapTPfl6H82EfrPasdz+IvM3i01H0+IY4VsMCaF+Z7Iue
+    UR2Kt1rP6GF0l2/dSwe2YDoiUtS/WbQ7GeHnGa3uuG+UvHnLJuFTAi6Me84qUgqJYbaR
+    WSdIoDtmr3RfGKP5+obmE3kuuxiwbChip9McBA+k+nCW4RKMfwUJb/gsUlsxj/2hSNl/
+    ak4at3IuAxQdPaTNRgoR/4no0pLypEOLmEAkT0Ht7hUA5PMerAhmexKKVhEytS1LZwNF
+    WnDQ==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXPSI/SaRQ=="
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.28.1 DYNA|AUTH)
-    with ESMTPSA id N0753fx6E5opwyU
+    with ESMTPSA id N0753fx6E5ofwyO
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Wed, 14 Jul 2021 07:50:51 +0200 (CEST)
+    Wed, 14 Jul 2021 07:50:41 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
@@ -71,9 +71,9 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         Petr Tesarik <ptesarik@suse.cz>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>
-Subject: [PATCH v41 08/13] LRNG - add kernel crypto API PRNG extension
-Date:   Wed, 14 Jul 2021 07:47:10 +0200
-Message-ID: <7232066.jEVAn04Smx@positron.chronox.de>
+Subject: [PATCH v41 13/13] LRNG - add power-on and runtime self-tests
+Date:   Wed, 14 Jul 2021 07:50:06 +0200
+Message-ID: <2350995.xqDELF4lyy@positron.chronox.de>
 In-Reply-To: <7822794.ITf6fX9eNu@positron.chronox.de>
 References: <7822794.ITf6fX9eNu@positron.chronox.de>
 MIME-Version: 1.0
@@ -83,18 +83,47 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add runtime-pluggable support for all PRNGs that are accessible via
-the kernel crypto API, including hardware PRNGs. The PRNG is selected
-with the module parameter drng_name where the name must be one that the
-kernel crypto API can resolve into an RNG.
+Parts of the LRNG are already covered by self-tests, including:
 
-This allows using of the kernel crypto API PRNG implementations that
-provide an interface to hardware PRNGs. Using this extension,
-the LRNG uses the hardware PRNGs to generate random numbers. An
-example is the S390 CPACF support providing such a PRNG.
+* Self-test of SP800-90A DRBG provided by the Linux kernel crypto API.
 
-The hash is provided by a kernel crypto API SHASH whose digest size
-complies with the seedsize of the PRNG.
+* Self-test of the PRNG provided by the Linux kernel crypto API.
+
+* Raw noise source data testing including SP800-90B compliant
+  tests when enabling CONFIG_LRNG_HEALTH_TESTS
+
+This patch adds the self-tests for the remaining critical functions of
+the LRNG that are essential to maintain entropy and provide
+cryptographic strong random numbers. The following self-tests are
+implemented:
+
+* Self-test of the time array maintenance. This test verifies whether
+the time stamp array management to store multiple values in one integer
+implements a concatenation of the data.
+
+* Self-test of the software hash implementation ensures that this
+function operates compliant to the FIPS 180-4 specification. The
+self-test performs a hash operation of a zeroized per-CPU data array.
+
+* Self-test of the ChaCha20 DRNG is based on the self-tests that are
+already present and implemented with the stand-alone user space
+ChaCha20 DRNG implementation available at [1]. The self-tests cover
+different use cases of the DRNG seeded with known seed data.
+
+The status of the LRNG self-tests is provided with the selftest_status
+SysFS file. If the file contains a zero, the self-tests passed. The
+value 0xffffffff means that the self-tests were not executed. Any other
+value indicates a self-test failure.
+
+The self-test may be compiled to panic the system if the self-test
+fails.
+
+All self-tests operate on private state data structures. This implies
+that none of the self-tests have any impact on the regular LRNG
+operations. This allows the self-tests to be repeated at runtime by
+writing anything into the selftest_status SysFS file.
+
+[1] https://www.chronox.de/chacha20.html
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -113,285 +142,443 @@ CC: Andy Lutomirski <luto@kernel.org>
 CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
+CC: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+CC: Neil Horman <nhorman@redhat.com>
 CC: Alexander Lobakin <alobakin@mailbox.org>
-Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
-Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/char/lrng/Kconfig      |  13 ++
- drivers/char/lrng/Makefile     |   1 +
- drivers/char/lrng/lrng_kcapi.c | 227 +++++++++++++++++++++++++++++++++
- 3 files changed, 241 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_kcapi.c
+ drivers/char/lrng/Kconfig         |  43 +++-
+ drivers/char/lrng/Makefile        |   1 +
+ drivers/char/lrng/lrng_selftest.c | 351 ++++++++++++++++++++++++++++++
+ 3 files changed, 387 insertions(+), 8 deletions(-)
+ create mode 100644 drivers/char/lrng/lrng_selftest.c
 
 diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index aa611363b97e..ffd2df43f2d4 100644
+index 379e89e7fa53..0c654f4db5e1 100644
 --- a/drivers/char/lrng/Kconfig
 +++ b/drivers/char/lrng/Kconfig
-@@ -225,6 +225,19 @@ config LRNG_DRBG
- 	  Enable the SP800-90A DRBG support for the LRNG. Once the
- 	  module is loaded, output from /dev/random, /dev/urandom,
- 	  getrandom(2), or get_random_bytes_full is provided by a DRBG.
-+
-+config LRNG_KCAPI
-+	tristate "Kernel Crypto API support for the LRNG"
-+	depends on CRYPTO
-+	depends on !LRNG_DRBG
-+	select CRYPTO_RNG
-+	select LRNG_KCAPI_HASH
-+	help
-+	  Enable the support for generic pseudo-random number
-+	  generators offered by the kernel crypto API with the
-+	  LRNG. Once the module is loaded, output from /dev/random,
-+	  /dev/urandom, getrandom(2), or get_random_bytes is
-+	  provided by the selected kernel crypto API RNG.
- endif # LRNG_DRNG_SWITCH
+@@ -165,15 +165,16 @@ config LRNG_COLLECTION_SIZE
+ 	default 8192 if LRNG_COLLECTION_SIZE_8192
  
+ config LRNG_HEALTH_TESTS
+-	bool "Enable noise source online health tests"
++	bool "Enable interrupt entropy source online health tests"
+ 	help
+-	  The online health tests validate the noise source at
+-	  runtime for fatal errors. These tests include SP800-90B
+-	  compliant tests which are invoked if the system is booted
+-	  with fips=1. In case of fatal errors during active
+-	  SP800-90B tests, the issue is logged and the noise
+-	  data is discarded. These tests are required for full
+-	  compliance with SP800-90B.
++	  The online health tests applied to the interrupt entropy
++	  source validate the noise source at runtime for fatal
++	  errors. These tests include SP800-90B compliant tests
++	  which are invoked if the system is booted with fips=1.
++	  In case of fatal errors during active SP800-90B tests,
++	  the issue is logged and the noise data is discarded.
++	  These tests are required for full compliance of the
++	  interrupt entropy source with SP800-90B.
+ 
+ 	  If unsure, say Y.
+ 
+@@ -485,4 +486,30 @@ config LRNG_TESTING
+ 
+ endif #LRNG_TESTING_MENU
+ 
++config LRNG_SELFTEST
++	bool "Enable power-on and on-demand self-tests"
++	help
++	  The power-on self-tests are executed during boot time
++	  covering the ChaCha20 DRNG, the hash operation used for
++	  processing the entropy pools and the auxiliary pool, and
++	  the time stamp management of the LRNG.
++
++	  The on-demand self-tests are triggered by writing any
++	  value into the SysFS file selftest_status. At the same
++	  time, when reading this file, the test status is
++	  returned. A zero indicates that all tests were executed
++	  successfully.
++
++	  If unsure, say Y.
++
++if LRNG_SELFTEST
++
++config LRNG_SELFTEST_PANIC
++	bool "Panic the kernel upon self-test failure"
++	help
++	  If the option is enabled, the kernel is terminated if an
++	  LRNG power-on self-test failure is detected.
++
++endif # LRNG_SELFTEST
++
  endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 6ebd252db12f..97d2b13d3227 100644
+index 532501b38a00..a633638af991 100644
 --- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -13,3 +13,4 @@ obj-$(CONFIG_SYSCTL)		+= lrng_proc.o
- obj-$(CONFIG_LRNG_DRNG_SWITCH)	+= lrng_switch.o
- obj-$(CONFIG_LRNG_KCAPI_HASH)	+= lrng_kcapi_hash.o
- obj-$(CONFIG_LRNG_DRBG)		+= lrng_drbg.o
-+obj-$(CONFIG_LRNG_KCAPI)	+= lrng_kcapi.o
-diff --git a/drivers/char/lrng/lrng_kcapi.c b/drivers/char/lrng/lrng_kcapi.c
+@@ -17,3 +17,4 @@ obj-$(CONFIG_LRNG_KCAPI)	+= lrng_kcapi.o
+ obj-$(CONFIG_LRNG_JENT)		+= lrng_jent.o
+ obj-$(CONFIG_LRNG_HEALTH_TESTS)	+= lrng_health.o
+ obj-$(CONFIG_LRNG_TESTING)	+= lrng_testing.o
++obj-$(CONFIG_LRNG_SELFTEST)	+= lrng_selftest.o
+diff --git a/drivers/char/lrng/lrng_selftest.c b/drivers/char/lrng/lrng_selftest.c
 new file mode 100644
-index 000000000000..b06449cb2365
+index 000000000000..cd2b64184f01
 --- /dev/null
-+++ b/drivers/char/lrng/lrng_kcapi.c
-@@ -0,0 +1,227 @@
++++ b/drivers/char/lrng/lrng_selftest.c
+@@ -0,0 +1,351 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * Backend for the LRNG providing the cryptographic primitives using the
-+ * kernel crypto API.
++ * LRNG power-on and on-demand self-test
 + *
-+ * Copyright (C) 2018 - 2021, Stephan Mueller <smueller@chronox.de>
++ * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
++ */
++
++/*
++ * In addition to the self-tests below, the following LRNG components
++ * are covered with self-tests during regular operation:
++ *
++ * * power-on self-test: SP800-90A DRBG provided by the Linux kernel crypto API
++ * * power-on self-test: PRNG provided by the Linux kernel crypto API
++ * * runtime test: Raw noise source data testing including SP800-90B compliant
++ *		   tests when enabling CONFIG_LRNG_HEALTH_TESTS
++ *
++ * Additional developer tests present with LRNG code:
++ * * SP800-90B APT and RCT test enforcement validation when enabling
++ *   CONFIG_LRNG_APT_BROKEN or CONFIG_LRNG_RCT_BROKEN.
++ * * Collection of raw entropy from the interrupt noise source when enabling
++ *   CONFIG_LRNG_TESTING and pulling the data from the kernel with the provided
++ *   interface.
 + */
 +
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <crypto/hash.h>
-+#include <crypto/rng.h>
-+#include <linux/init.h>
 +#include <linux/module.h>
 +#include <linux/lrng.h>
++#include <linux/slab.h>
 +
-+#include "lrng_kcapi_hash.h"
++#include "lrng_chacha20.h"
++#include "lrng_internal.h"
++#include "lrng_sw_noise.h"
 +
-+static char *drng_name = NULL;
-+module_param(drng_name, charp, 0444);
-+MODULE_PARM_DESC(drng_name, "Kernel crypto API name of DRNG");
++#define LRNG_SELFTEST_PASSED		0
++#define LRNG_SEFLTEST_ERROR_TIME	(1 << 0)
++#define LRNG_SEFLTEST_ERROR_CHACHA20	(1 << 1)
++#define LRNG_SEFLTEST_ERROR_HASH	(1 << 2)
++#define LRNG_SELFTEST_NOT_EXECUTED	0xffffffff
 +
-+static char *pool_hash = "sha512";
-+module_param(pool_hash, charp, 0444);
-+MODULE_PARM_DESC(pool_hash,
-+		 "Kernel crypto API name of hash or keyed message digest to read the entropy pool");
++static u32 lrng_data_selftest_ptr = 0;
++static u32 lrng_data_selftest[LRNG_DATA_ARRAY_SIZE];
 +
-+static char *seed_hash = NULL;
-+module_param(seed_hash, charp, 0444);
-+MODULE_PARM_DESC(seed_hash,
-+		 "Kernel crypto API name of hash with output size equal to seedsize of DRNG to bring seed string to the size required by the DRNG");
++static unsigned int lrng_selftest_status = LRNG_SELFTEST_NOT_EXECUTED;
 +
-+struct lrng_drng_info {
-+	struct crypto_rng *kcapi_rng;
-+	void *lrng_hash;
-+};
-+
-+static void *lrng_kcapi_drng_hash_alloc(void)
++static inline void lrng_selftest_bswap32(u32 *ptr, u32 words)
 +{
-+	return lrng_kcapi_hash_alloc(pool_hash);
++	u32 i;
++
++	/* Byte-swap data which is an LE representation */
++	for (i = 0; i < words; i++) {
++		__le32 *p = (__le32 *)ptr;
++
++		*p = cpu_to_le32(*ptr);
++		ptr++;
++	}
 +}
 +
-+static int lrng_kcapi_drng_seed_helper(void *drng, const u8 *inbuf,
-+				       u32 inbuflen)
++static inline void lrng_data_process_selftest_insert(u32 time)
++{
++	u32 ptr = lrng_data_selftest_ptr++ & LRNG_DATA_WORD_MASK;
++	unsigned int array = lrng_data_idx2array(ptr);
++	unsigned int slot = lrng_data_idx2slot(ptr);
++
++	/* zeroization of slot to ensure the following OR adds the data */
++	lrng_data_selftest[array] &=
++		~(lrng_data_slot_val(0xffffffff & LRNG_DATA_SLOTSIZE_MASK,
++				     slot));
++	lrng_data_selftest[array] |=
++		lrng_data_slot_val(time & LRNG_DATA_SLOTSIZE_MASK, slot);
++}
++
++static inline void lrng_data_process_selftest_u32(u32 data)
++{
++	u32 pre_ptr, ptr, mask;
++	unsigned int pre_array;
++
++	/* Increment pointer by number of slots taken for input value */
++	lrng_data_selftest_ptr += LRNG_DATA_SLOTS_PER_UINT;
++
++	/* ptr to current unit */
++	ptr = lrng_data_selftest_ptr;
++
++	lrng_pcpu_split_u32(&ptr, &pre_ptr, &mask);
++
++	/* MSB of data go into previous unit */
++	pre_array = lrng_data_idx2array(pre_ptr);
++	/* zeroization of slot to ensure the following OR adds the data */
++	lrng_data_selftest[pre_array] &= ~(0xffffffff &~ mask);
++	lrng_data_selftest[pre_array] |= data & ~mask;
++
++	/* LSB of data go into current unit */
++	lrng_data_selftest[lrng_data_idx2array(ptr)] = data & mask;
++}
++
++static unsigned int lrng_data_process_selftest(void)
++{
++	u32 time;
++	u32 idx_zero_compare = (0 << 0) | (1 << 8) | (2 << 16) | (3 << 24);
++	u32 idx_one_compare  = (4 << 0) | (5 << 8) | (6 << 16) | (7 << 24);
++	u32 idx_last_compare =
++		(((LRNG_DATA_NUM_VALUES - 4) & LRNG_DATA_SLOTSIZE_MASK) << 0)  |
++		(((LRNG_DATA_NUM_VALUES - 3) & LRNG_DATA_SLOTSIZE_MASK) << 8)  |
++		(((LRNG_DATA_NUM_VALUES - 2) & LRNG_DATA_SLOTSIZE_MASK) << 16) |
++		(((LRNG_DATA_NUM_VALUES - 1) & LRNG_DATA_SLOTSIZE_MASK) << 24);
++
++	(void)idx_one_compare;
++
++	/* "poison" the array to verify the operation of the zeroization */
++	lrng_data_selftest[0] = 0xffffffff;
++	lrng_data_selftest[1] = 0xffffffff;
++
++	lrng_data_process_selftest_insert(0);
++	/*
++	 * Note, when using lrng_data_process_u32() on unaligned ptr,
++	 * the first slots will go into next word, and the last slots go
++	 * into the previous word.
++	 */
++	lrng_data_process_selftest_u32((4 << 0) | (1 << 8) | (2 << 16) |
++				       (3 << 24));
++	lrng_data_process_selftest_insert(5);
++	lrng_data_process_selftest_insert(6);
++	lrng_data_process_selftest_insert(7);
++
++	if ((lrng_data_selftest[0] != idx_zero_compare) ||
++	    (lrng_data_selftest[1] != idx_one_compare))
++		goto err;
++
++	/* Reset for next test */
++	lrng_data_selftest[0] = 0;
++	lrng_data_selftest[1] = 0;
++	lrng_data_selftest_ptr = 0;
++
++	for (time = 0; time < LRNG_DATA_NUM_VALUES; time++)
++		lrng_data_process_selftest_insert(time);
++
++	if ((lrng_data_selftest[0] != idx_zero_compare) ||
++	    (lrng_data_selftest[1] != idx_one_compare)  ||
++	    (lrng_data_selftest[LRNG_DATA_ARRAY_SIZE - 1] != idx_last_compare))
++		goto err;
++
++	return LRNG_SELFTEST_PASSED;
++
++err:
++	pr_err("LRNG data array self-test FAILED\n");
++	return LRNG_SEFLTEST_ERROR_TIME;
++}
++
++/* The test vectors are taken from crypto/testmgr.h */
++static unsigned int lrng_hash_selftest(void)
 +{
 +	SHASH_DESC_ON_STACK(shash, NULL);
-+	struct lrng_drng_info *lrng_drng_info = (struct lrng_drng_info *)drng;
-+	struct crypto_rng *kcapi_rng = lrng_drng_info->kcapi_rng;
-+	void *hash = lrng_drng_info->lrng_hash;
-+	u32 digestsize = lrng_kcapi_hash_digestsize(hash);
-+	u8 digest[64] __aligned(8);
++	const struct lrng_crypto_cb *crypto_cb = &lrng_cc20_crypto_cb;
++	static const u8 lrng_hash_selftest_result[] =
++#ifdef CONFIG_CRYPTO_LIB_SHA256
++		{ 0xba, 0x78, 0x16, 0xbf, 0x8f, 0x01, 0xcf, 0xea,
++		  0x41, 0x41, 0x40, 0xde, 0x5d, 0xae, 0x22, 0x23,
++		  0xb0, 0x03, 0x61, 0xa3, 0x96, 0x17, 0x7a, 0x9c,
++		  0xb4, 0x10, 0xff, 0x61, 0xf2, 0x00, 0x15, 0xad };
++#else /* CONFIG_CRYPTO_LIB_SHA256 */
++		{ 0xa9, 0x99, 0x3e, 0x36, 0x47, 0x06, 0x81, 0x6a, 0xba, 0x3e,
++		  0x25, 0x71, 0x78, 0x50, 0xc2, 0x6c, 0x9c, 0xd0, 0xd8, 0x9d };
++#endif /* CONFIG_CRYPTO_LIB_SHA256 */
++	static const u8 hash_input[] = { 0x61, 0x62, 0x63 }; /* "abc" */
++	u8 digest[sizeof(lrng_hash_selftest_result)] __aligned(sizeof(u32));
++
++	BUG_ON(sizeof(digest) != crypto_cb->lrng_hash_digestsize(NULL));
++
++	if (!crypto_cb->lrng_hash_init(shash, NULL) &&
++	    !crypto_cb->lrng_hash_update(shash, hash_input,
++					 sizeof(hash_input)) &&
++	    !crypto_cb->lrng_hash_final(shash, digest) &&
++	    !memcmp(digest, lrng_hash_selftest_result, sizeof(digest)))
++		return 0;
++
++	pr_err("LRNG %s Hash self-test FAILED\n", crypto_cb->lrng_hash_name());
++	return LRNG_SEFLTEST_ERROR_HASH;
++}
++
++/*
++ * The test vectors were generated using the ChaCha20 DRNG from
++ * https://www.chronox.de/chacha20.html
++ */
++static unsigned int lrng_chacha20_drng_selftest(void)
++{
++	const struct lrng_crypto_cb *crypto_cb = &lrng_cc20_crypto_cb;
++	u8 seed[CHACHA_KEY_SIZE * 2] = {
++		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
++		0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
++		0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
++		0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
++		0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
++		0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
++	};
++	struct chacha20_block chacha20;
 +	int ret;
++	u8 outbuf[CHACHA_KEY_SIZE * 2] __aligned(sizeof(u32));
 +
-+	if (!hash)
-+		return crypto_rng_reset(kcapi_rng, inbuf, inbuflen);
++	/*
++	 * Expected result when ChaCha20 DRNG state is zero:
++	 *	* constants are set to "expand 32-byte k"
++	 *	* remaining state is 0
++	 * and pulling one half ChaCha20 DRNG block.
++	 */
++	static const u8 expected_halfblock[CHACHA_KEY_SIZE] = {
++		0x76, 0xb8, 0xe0, 0xad, 0xa0, 0xf1, 0x3d, 0x90,
++		0x40, 0x5d, 0x6a, 0xe5, 0x53, 0x86, 0xbd, 0x28,
++		0xbd, 0xd2, 0x19, 0xb8, 0xa0, 0x8d, 0xed, 0x1a,
++		0xa8, 0x36, 0xef, 0xcc, 0x8b, 0x77, 0x0d, 0xc7 };
 +
-+	BUG_ON(digestsize > sizeof(digest));
++	/*
++	 * Expected result when ChaCha20 DRNG state is zero:
++	 *	* constants are set to "expand 32-byte k"
++	 *	* remaining state is 0
++	 * followed by a reseed with two keyblocks
++	 *	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++	 *	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++	 *	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
++	 *	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
++	 *	0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
++	 *	0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
++	 *	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
++	 *	0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f
++	 * and pulling one ChaCha20 DRNG block.
++	 */
++	static const u8 expected_oneblock[CHACHA_KEY_SIZE * 2] = {
++		0xe3, 0xb0, 0x8a, 0xcc, 0x34, 0xc3, 0x17, 0x0e,
++		0xc3, 0xd8, 0xc3, 0x40, 0xe7, 0x73, 0xe9, 0x0d,
++		0xd1, 0x62, 0xa3, 0x5d, 0x7d, 0xf2, 0xf1, 0x4a,
++		0x24, 0x42, 0xb7, 0x1e, 0xb0, 0x05, 0x17, 0x07,
++		0xb9, 0x35, 0x10, 0x69, 0x8b, 0x46, 0xfb, 0x51,
++		0xe9, 0x91, 0x3f, 0x46, 0xf2, 0x4d, 0xea, 0xd0,
++		0x81, 0xc1, 0x1b, 0xa9, 0x5d, 0x52, 0x91, 0x5f,
++		0xcd, 0xdc, 0xc6, 0xd6, 0xc3, 0x7c, 0x50, 0x23 };
 +
-+	ret = lrng_kcapi_hash_init(shash, hash) ?:
-+	      lrng_kcapi_hash_update(shash, inbuf, inbuflen) ?:
-+	      lrng_kcapi_hash_final(shash, digest);
-+	lrng_kcapi_hash_zero(shash);
-+	if (ret)
-+		return ret;
++	/*
++	 * Expected result when ChaCha20 DRNG state is zero:
++	 *	* constants are set to "expand 32-byte k"
++	 *	* remaining state is 0
++	 * followed by a reseed with one key block plus one byte
++	 *	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++	 *	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++	 *	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
++	 *	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
++	 *	0x20
++	 * and pulling less than one ChaCha20 DRNG block.
++	 */
++	static const u8 expected_block_nonalinged[CHACHA_KEY_SIZE + 4] = {
++		0x9c, 0xfc, 0x5e, 0x31, 0x21, 0x62, 0x11, 0x85,
++		0xd3, 0x77, 0xd3, 0x69, 0x0f, 0xa8, 0x16, 0x55,
++		0xb4, 0x4c, 0xf6, 0x52, 0xf3, 0xa8, 0x37, 0x99,
++		0x38, 0x76, 0xa0, 0x66, 0xec, 0xbb, 0xce, 0xa9,
++		0x9c, 0x95, 0xa1, 0xfd };
 +
-+	ret = crypto_rng_reset(kcapi_rng, digest, digestsize);
-+	if (ret)
-+		return ret;
++	BUILD_BUG_ON(sizeof(seed) % sizeof(u32));
 +
-+	memzero_explicit(digest, digestsize);
++	memset(&chacha20, 0, sizeof(chacha20));
++	lrng_cc20_init_rfc7539(&chacha20);
++	lrng_selftest_bswap32((u32 *)seed, sizeof(seed) / sizeof(u32));
++
++	/* Generate with zero state */
++	ret = crypto_cb->lrng_drng_generate_helper(&chacha20, outbuf,
++						   sizeof(expected_halfblock));
++	if (ret != sizeof(expected_halfblock))
++		goto err;
++	if (memcmp(outbuf, expected_halfblock, sizeof(expected_halfblock)))
++		goto err;
++
++	/* Clear state of DRNG */
++	memset(&chacha20.key.u[0], 0, 48);
++
++	/* Reseed with 2 key blocks */
++	ret = crypto_cb->lrng_drng_seed_helper(&chacha20, seed,
++					       sizeof(expected_oneblock));
++	if (ret < 0)
++		goto err;
++	ret = crypto_cb->lrng_drng_generate_helper(&chacha20, outbuf,
++						   sizeof(expected_oneblock));
++	if (ret != sizeof(expected_oneblock))
++		goto err;
++	if (memcmp(outbuf, expected_oneblock, sizeof(expected_oneblock)))
++		goto err;
++
++	/* Clear state of DRNG */
++	memset(&chacha20.key.u[0], 0, 48);
++
++	/* Reseed with 1 key block and one byte */
++	ret = crypto_cb->lrng_drng_seed_helper(&chacha20, seed,
++					sizeof(expected_block_nonalinged));
++	if (ret < 0)
++		goto err;
++	ret = crypto_cb->lrng_drng_generate_helper(&chacha20, outbuf,
++					sizeof(expected_block_nonalinged));
++	if (ret != sizeof(expected_block_nonalinged))
++		goto err;
++	if (memcmp(outbuf, expected_block_nonalinged,
++		   sizeof(expected_block_nonalinged)))
++		goto err;
++
++	return LRNG_SELFTEST_PASSED;
++
++err:
++	pr_err("LRNG ChaCha20 DRNG self-test FAILED\n");
++	return LRNG_SEFLTEST_ERROR_CHACHA20;
++}
++
++static int lrng_selftest(void)
++{
++	unsigned int ret = lrng_data_process_selftest();
++
++	ret |= lrng_chacha20_drng_selftest();
++	ret |= lrng_hash_selftest();
++
++	if (ret) {
++		if (IS_ENABLED(CONFIG_LRNG_SELFTEST_PANIC))
++			panic("LRNG self-tests failed: %u\n", ret);
++	} else {
++		pr_info("LRNG self-tests passed\n");
++	}
++
++	lrng_selftest_status = ret;
++
++	if (lrng_selftest_status)
++		return -EFAULT;
 +	return 0;
 +}
 +
-+static int lrng_kcapi_drng_generate_helper(void *drng, u8 *outbuf,
-+					   u32 outbuflen)
++#ifdef CONFIG_SYSFS
++/* Re-perform self-test when any value is written to the sysfs file. */
++static int lrng_selftest_sysfs_set(const char *val,
++				   const struct kernel_param *kp)
 +{
-+	struct lrng_drng_info *lrng_drng_info = (struct lrng_drng_info *)drng;
-+	struct crypto_rng *kcapi_rng = lrng_drng_info->kcapi_rng;
-+	int ret = crypto_rng_get_bytes(kcapi_rng, outbuf, outbuflen);
-+
-+	if (ret < 0)
-+		return ret;
-+
-+	return outbuflen;
++	return lrng_selftest();
 +}
 +
-+static void *lrng_kcapi_drng_alloc(u32 sec_strength)
-+{
-+	struct lrng_drng_info *lrng_drng_info;
-+	struct crypto_rng *kcapi_rng;
-+	int seedsize;
-+	void *ret =  ERR_PTR(-ENOMEM);
-+
-+	if (!drng_name) {
-+		pr_err("DRNG name missing\n");
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	if (!memcmp(drng_name, "drbg", 4) ||
-+	    !memcmp(drng_name, "stdrng", 6) ||
-+	    !memcmp(drng_name, "jitterentropy_rng", 17)) {
-+		pr_err("Refusing to load the requested random number generator\n");
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	lrng_drng_info = kmalloc(sizeof(*lrng_drng_info), GFP_KERNEL);
-+	if (!lrng_drng_info)
-+		return ERR_PTR(-ENOMEM);
-+
-+	kcapi_rng = crypto_alloc_rng(drng_name, 0, 0);
-+	if (IS_ERR(kcapi_rng)) {
-+		pr_err("DRNG %s cannot be allocated\n", drng_name);
-+		ret = ERR_CAST(kcapi_rng);
-+		goto free;
-+	}
-+	lrng_drng_info->kcapi_rng = kcapi_rng;
-+
-+	seedsize =  crypto_rng_seedsize(kcapi_rng);
-+
-+	if (sec_strength > seedsize)
-+		pr_info("Seedsize DRNG (%u bits) lower than security strength of LRNG noise source (%u bits)\n",
-+			crypto_rng_seedsize(kcapi_rng) * 8, sec_strength * 8);
-+
-+	if (seedsize) {
-+		void *lrng_hash;
-+
-+		if (!seed_hash) {
-+			switch (seedsize) {
-+			case 32:
-+				seed_hash = "sha256";
-+				break;
-+			case 48:
-+				seed_hash = "sha384";
-+				break;
-+			case 64:
-+				seed_hash = "sha512";
-+				break;
-+			default:
-+				pr_err("Seed size %d cannot be processed\n",
-+				       seedsize);
-+				goto dealloc;
-+			}
-+		}
-+
-+		lrng_hash = lrng_kcapi_hash_alloc(seed_hash);
-+		if (IS_ERR(lrng_hash)) {
-+			ret = ERR_CAST(lrng_hash);
-+			goto dealloc;
-+		}
-+
-+		if (seedsize != lrng_kcapi_hash_digestsize(lrng_hash)) {
-+			pr_err("Seed hash output size not equal to DRNG seed size\n");
-+			lrng_kcapi_hash_dealloc(lrng_hash);
-+			ret = ERR_PTR(-EINVAL);
-+			goto dealloc;
-+		}
-+
-+		lrng_drng_info->lrng_hash = lrng_hash;
-+
-+		pr_info("Seed hash %s allocated\n", seed_hash);
-+	} else {
-+		lrng_drng_info->lrng_hash = NULL;
-+	}
-+
-+	pr_info("Kernel crypto API DRNG %s allocated\n", drng_name);
-+
-+	return lrng_drng_info;
-+
-+dealloc:
-+	crypto_free_rng(kcapi_rng);
-+free:
-+	kfree(lrng_drng_info);
-+	return ret;
-+}
-+
-+static void lrng_kcapi_drng_dealloc(void *drng)
-+{
-+	struct lrng_drng_info *lrng_drng_info = (struct lrng_drng_info *)drng;
-+	struct crypto_rng *kcapi_rng = lrng_drng_info->kcapi_rng;
-+
-+	crypto_free_rng(kcapi_rng);
-+	if (lrng_drng_info->lrng_hash)
-+		lrng_kcapi_hash_dealloc(lrng_drng_info->lrng_hash);
-+	kfree(lrng_drng_info);
-+	pr_info("DRNG %s deallocated\n", drng_name);
-+}
-+
-+static const char *lrng_kcapi_drng_name(void)
-+{
-+	return drng_name;
-+}
-+
-+static const char *lrng_kcapi_pool_hash(void)
-+{
-+	return pool_hash;
-+}
-+
-+static const struct lrng_crypto_cb lrng_kcapi_crypto_cb = {
-+	.lrng_drng_name			= lrng_kcapi_drng_name,
-+	.lrng_hash_name			= lrng_kcapi_pool_hash,
-+	.lrng_drng_alloc		= lrng_kcapi_drng_alloc,
-+	.lrng_drng_dealloc		= lrng_kcapi_drng_dealloc,
-+	.lrng_drng_seed_helper		= lrng_kcapi_drng_seed_helper,
-+	.lrng_drng_generate_helper	= lrng_kcapi_drng_generate_helper,
-+	.lrng_hash_alloc		= lrng_kcapi_drng_hash_alloc,
-+	.lrng_hash_dealloc		= lrng_kcapi_hash_dealloc,
-+	.lrng_hash_digestsize		= lrng_kcapi_hash_digestsize,
-+	.lrng_hash_init			= lrng_kcapi_hash_init,
-+	.lrng_hash_update		= lrng_kcapi_hash_update,
-+	.lrng_hash_final		= lrng_kcapi_hash_final,
-+	.lrng_hash_desc_zero		= lrng_kcapi_hash_zero,
++static const struct kernel_param_ops lrng_selftest_sysfs = {
++	.set = lrng_selftest_sysfs_set,
++	.get = param_get_uint,
 +};
++module_param_cb(selftest_status, &lrng_selftest_sysfs, &lrng_selftest_status,
++		0644);
++#endif	/* CONFIG_SYSFS */
 +
-+static int __init lrng_kcapi_init(void)
++static int __init lrng_selftest_init(void)
 +{
-+	return lrng_set_drng_cb(&lrng_kcapi_crypto_cb);
-+}
-+static void __exit lrng_kcapi_exit(void)
-+{
-+	lrng_set_drng_cb(NULL);
++	return lrng_selftest();
 +}
 +
-+late_initcall(lrng_kcapi_init);
-+module_exit(lrng_kcapi_exit);
-+MODULE_LICENSE("Dual BSD/GPL");
-+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-+MODULE_DESCRIPTION("Linux Random Number Generator - kernel crypto API DRNG backend");
++module_init(lrng_selftest_init);
 -- 
 2.31.1
 
