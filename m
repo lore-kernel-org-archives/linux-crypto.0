@@ -2,450 +2,394 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C61C07E9A
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 11:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86805C11F67
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 13:22:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DD50161289
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 11:54:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 677CD613B6
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 13:22:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231265AbhGNL5g (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jul 2021 07:57:36 -0400
-Received: from mail-40134.protonmail.ch ([185.70.40.134]:18378 "EHLO
-        mail-40134.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231218AbhGNL5f (ORCPT
+        id S239284AbhGNNZk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jul 2021 09:25:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45898 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239422AbhGNNZk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jul 2021 07:57:35 -0400
-Date:   Wed, 14 Jul 2021 11:54:31 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me; s=protonmail;
-        t=1626263682; bh=W6oIrQApLdrSmMQFHKamkdW9ZDd4hCN36b/x5/dul/Q=;
-        h=Date:To:From:Cc:Reply-To:Subject:In-Reply-To:References:From;
-        b=GbmfLW15oil9g/Goli3/ALDaNs36L7hLpsKkoC3lrR8kf6R+3eofGuvGUFsVlhKoE
-         9V0YQyqUeDpRgMJU7wJBhLdeMfpJrl7oVRmji+a2/H8vfKe1C0yZ+MDD+Z2nTY61hx
-         PC1OKpVm0fguRhHAH4AhBrkw1lCPKyObs2/55Xex9iyOnWno3Lj9mkRctUZ3xLxPlA
-         N2krxYzJraA/VqNh6Q+/BbM2m8lVNf0xUixA1FiFLAfeOj0r2sBJboCuImFvfcYNWZ
-         j79HuXmMukLfLLSbEOJfcjxivH6iTBY6BFcjsOwtHBiXpIoVECmvWbsfboNO7kMhDD
-         mvzewbipkj7lg==
-To:     =?utf-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
-From:   Alexander Lobakin <alobakin@pm.me>
-Cc:     Alexander Lobakin <alobakin@pm.me>, Tso Ted <tytso@mit.edu>,
-        linux-crypto@vger.kernel.org, Willy Tarreau <w@1wt.eu>,
-        Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Peter Matthias <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Andy Lavr <andy.lavr@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Petr Tesarik <ptesarik@suse.cz>,
-        John Haxby <john.haxby@oracle.com>
-Reply-To: Alexander Lobakin <alobakin@pm.me>
-Subject: Re: [PATCH v41 00/13] /dev/random - a new approach
-Message-ID: <20210714114656.24948-1-alobakin@pm.me>
-In-Reply-To: <7822794.ITf6fX9eNu@positron.chronox.de>
-References: <7822794.ITf6fX9eNu@positron.chronox.de>
+        Wed, 14 Jul 2021 09:25:40 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6C40C061764
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jul 2021 06:22:47 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id g12so1826062qtb.2
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jul 2021 06:22:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8WaQzYZeQ7Li+6RRsoQKD67iI4SEvRFGh30cooQVpZw=;
+        b=ALZqB1qoxrXn+jAy7RQaf+A7TkxQvjq4ulZG5YO0uUIcybxnZKm0rpHD53EIfe8Jk/
+         YpGITna9ARYShBitncZbkmgkFksLsZIy/+ZdAoeYLBTDx8C1DKoohAJPaBYnRKyySVGc
+         ITV+cFCVYK57U2R6VkGW5CEThNcTLrXhcqZ3U/43GLOYRV5ZCgoQENAK9PMCgKrnE4Bx
+         RHXyl1CDuy68G1JGKqXbsBkwwZFSyQIkgTYpbX3O1ZpSJIeE/kExE2YJ4ajcd9qm2a80
+         xOkPSt+FopxTdx7Z1GVBLUUUa3y0DyeLiL1Gd0HkNb5dMY0ayoba9xVy0Kz+ZAL5/J4w
+         3PIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8WaQzYZeQ7Li+6RRsoQKD67iI4SEvRFGh30cooQVpZw=;
+        b=F1mfUEoeWB7jMLT7MDsqkPuApuLD7NHpgIz3oPKWMpCx4ylsQoqsIEfRU7khmxE7lO
+         VL0Z/EsNJhnAL1LYGk9mKwM/4s5RNS2HcuwKccTS0GCTQ/JbgSoPck4BihFeshP5SfzP
+         TorvPjcikmcXlAJOn9LKYlzt0fggm58Olob15IwwOoHbfpaR/Fn4bhqLLE72Mj4M4OMI
+         1QXg1Jto/vuxJ62w6RJlqvGRyOTPGKkjC2UjWTy0yPsp82aPyT3IInDRyora4lCOLutF
+         vezjyRf3xfFm5tdfwnHRpIM0iTdGTYUJLI8jcT2x79rdubwj8hkKJBD8JG7bsf95PTTO
+         Hizw==
+X-Gm-Message-State: AOAM531PJbDACf5a9U41oqkwX9XHOzr7tN/hUOAAFEiitpoyhe6cDI0r
+        3XHmS0qSplkWOxQbudenlkeSllwjTS+sY8eLmV8iFw==
+X-Google-Smtp-Source: ABdhPJzUq99VHUKVJMfZn1C5QDzWePBXid78b3kd93+UIASO5flvGLThImwDSEJuQzURM3cOVvnjCPX/f4O4MxrE6VA=
+X-Received: by 2002:a05:622a:409:: with SMTP id n9mr9315541qtx.261.1626268966412;
+ Wed, 14 Jul 2021 06:22:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20210707183616.5620-1-brijesh.singh@amd.com> <20210707183616.5620-16-brijesh.singh@amd.com>
+In-Reply-To: <20210707183616.5620-16-brijesh.singh@amd.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Wed, 14 Jul 2021 06:22:35 -0700
+Message-ID: <CAA03e5HA_vjhOtTPL-vKFJvPxseLRMs5=s90ffUwDWQxtG7aCQ@mail.gmail.com>
+Subject: Re: [PATCH Part2 RFC v4 15/40] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        kvm list <kvm@vger.kernel.org>, linux-efi@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com,
+        Alper Gun <alpergun@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Wed, Jul 7, 2021 at 11:37 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+> The behavior and requirement for the SEV-legacy command is altered when
+> the SNP firmware is in the INIT state. See SEV-SNP firmware specification
+> for more details.
+>
+> When SNP is INIT state, all the SEV-legacy commands that cause the
+> firmware to write memory must be in the firmware state. The TMR memory
+> is allocated by the host but updated by the firmware, so, it must be
+> in the firmware state.  Additionally, the TMR memory must be a 2MB aligned
+> instead of the 1MB, and the TMR length need to be 2MB instead of 1MB.
+> The helper __snp_{alloc,free}_firmware_pages() can be used for allocating
+> and freeing the memory used by the firmware.
+>
+> While at it, provide API that can be used by others to allocate a page
+> that can be used by the firmware. The immediate user for this API will
+> be the KVM driver. The KVM driver to need to allocate a firmware context
+> page during the guest creation. The context page need to be updated
+> by the firmware. See the SEV-SNP specification for further details.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 144 +++++++++++++++++++++++++++++++----
+>  include/linux/psp-sev.h      |  11 +++
+>  2 files changed, 142 insertions(+), 13 deletions(-)
+>
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index ad9a0c8111e0..bb07c68834a6 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -54,6 +54,14 @@ static int psp_timeout;
+>  #define SEV_ES_TMR_SIZE                (1024 * 1024)
+>  static void *sev_es_tmr;
+>
+> +/* When SEV-SNP is enabled the TMR need to be 2MB aligned and 2MB size. */
 
-From: Stephan M=C3=BCller <smueller@chronox.de>
-Date: Wed, 14 Jul 2021 07:43:20 +0200
+nit: "the TMR need" -> "the TMR needs"
 
-> Hi,
->
-> The following patch set provides a different approach to /dev/random whic=
-h
-> is called Linux Random Number Generator (LRNG) to collect entropy within
-> the Linux kernel. It provides the same API and ABI and can be used as a
-> drop-in replacement. A general overview is given with [6].
->
-> The LRNG implements at least all features of the existing /dev/random suc=
-h as
-> NUMA-node-local DRNGs. Patches 1 through 3 provide the code that is featu=
-re-
-> identical. The following advantages compared to the existing /dev/random
-> implementation are present:
->
-> * Sole use of crypto for data processing:
->
->  - Exclusive use of a hash operation for conditioning entropy data with
->    a clear mathematical description as given in [2] section 2.2 -
->    non-cryptographic operations like LFSR are not used.
->
->  - The LRNG uses only properly defined and implemented cryptographic
->    algorithms unlike the use of the SHA-1 transformation in the existing
->    /dev/random implementation.
->
->  - Hash operations use NUMA-node-local hash instances to benefit large
->    parallel systems.
->
->  - LRNG uses limited number of data post-processing steps as documented i=
-n
->    [2] section 2.2 compared to the large variation of different
->    post-processing steps in the existing /dev/random implementation that
->    have no apparent mathematical description (see [2] section 4.5).
->
-> * Performance
->
->  - Faster by up to 130% in the critical code path of the interrupt handle=
-r
->    depending on data collection size configurable at kernel compile time =
--
->    the default is now set such that the highest performance is achieved a=
-s
->    outlined in [2] section 4.2.
->
->  - Configurable data collection sizes to accommodate small environments
->    and big environments via CONFIG_LRNG_COLLECTION_SIZE.
->
->  - Entropy collection using an almost never contended lock to benefit
->    large parallel systems =E2=80=93 worst case rate of contention is the =
-number
->    of DRNG reseeds, usually the number of potential contentions per 10
->    minutes is equal to number of NUMA nodes.
->
->  - ChaCha20 DRNG is significantly faster as implemented in the existing
->    /dev/random as demonstrated with [2] table 2.
->
->  - Faster entropy collection during boot time to reach fully seeded
->    level, including on virtual systems or systems with SSDs as outlined
->    in [2] section 4.1.
->
->  - Faster processing of external data added to LRNG via /dev/random
->    or add_hwgenerator_randomness.
->
-> * Testing
->
->  - Availability of run-time health tests of the raw unconditioned
->    noise source to identify degradation of the available entropy as
->    documented in [2] section 2.5.4. Such health tests are important
->    today due to virtual machine monitors reducing the resolution of
->    or disabling the high-resolution timer.
->
->  - Heuristic entropy estimation is based on quantitative measurements
->    and analysis following SP800-90B and not on coincidental
->    underestimation of entropy applied by the existing /dev/random as
->    outlined in [4] section 4.4.
->
->  - Power-on self tests for critical deterministic components (ChaCha20
->    DRNG, software hash implementation, and entropy collection logic)
->    not already covered by power-up tests of the kernel crypto API as
->    documented in [2] section 2.14.
->
->  - Availability of test interfaces for all operational stages of the
->    LRNG including boot-time raw entropy event data sampling as outlined
->    in [2] section 2.15.
->
->  - Fully testable ChaCha20 DRNG via a userspace ChaCha20 DRNG
->    implementation [3].
->
->  - In case of using the kernel crypto API SHASH hash implementation, it
->    is fully testable and tested via the NIST ACVP test framework, for
->    example certificates A734, A737, and A738.
->
->  - The LRNG offers a test interface to validate the used software hash
->    implementation and in particular that the LRNG invokes the hash
->    correctly, allowing a NIST ACVP-compliant test cycle - see [2]
->    section 2.15.
->
->  - Availability of stress testing covering the different code paths for
->    data and mechanism (de)allocations and code paths covered with locks.
->
->  - Availability of regression tests verifying the different options provi=
-ded
->    with the LRNG.
->
-> * Entropy collection
->
->  - The LRNG is shipped with test tools allowing the collection of
->    raw unconditioned entropy during runtime and boot time available at
->    [1].
->
->  - Full entropy assessment and description is provided with [2] chapter 3=
-,
->    specifically section 3.2.6.
->
->  - Guarantee that entropy events are not credited with entropy twice
->    (the existing /dev/random implementation credits HID/disk and
->    interrupt events with entropy which are a derivative of each other).
->
-> * Configurable
->
->  - LRNG kernel configuration allows configuration that is functionally
->    equivalent to the existing /dev/random. Non-compiled additional code
->    is folded into no-ops.
->
->  - The following additional functions are compile-time selectable
->    independent of each other:
->
->   + Enabling of switchable cryptographic implementation support. This
->     allows enabling an SP800-90A DRBG.
->
->   + Enabling of using Jitter RNG noise source.
->
->   + Enabling of noise source health tests.
->
->   + Enabling of test interface allowing to enable each test interface
->     individually.
->
->   + Enabling of the power-up self test.
->
->  - At boot-time, the SP800-90B health tests can be enabled as outlined
->    in [2] section 2.5.4.
->
->  - At boot-time, the entropy rate used to credit the external CPU-based
->    noise source and Jitter RNG noise source can be configured including
->    setting an entropy rate of zero or full entropy - see [2] sections
->    2.5.2 and 2.5.3.
->
-> * Run-time pluggable cryptographic implementations used for all data
->   processing steps specified in [2] section 2.2
->
->  - The DRNG can be replaced with a different implementation allowing
->    any type of DRNG to provide data via the output interfaces. The LRNG
->    provides the following types of DRNG implementations:
->
->   + ChaCha20-based software implementation that is used per default.
->
->   + SP800-90A DRBG using accelerated cryptographic implementations that
->     may sleep.
->
->   + Any DRNG that is accessible via the kernel crypto API RNG subsystem.
->
->  - The hash component can be replaced with any other hash implementation
->    provided the implementation does not sleep. The LRNG provides the
->    access to the following types of non-sleeping hash implementations:
->
->   + SHA-256 software implementation that is used per default. Due to
->     kernel build system inconsistencies, the software SHA-1 implementatio=
-n
->     is used if the kernel crypto API is not compiled.
->
->   + SHA-512 hash using the fastest hash implementation available via the
->     kernel crypto API SHASH subsystem.
->
-> * Code structure
->
->  - The LRNG source code is available for current upstream Linux kernel
->    separate to the existing /dev/random which means that users who are
->    conservative can use the unchanged existing /dev/random implementation=
-.
->
->  - Back-port patches are available at [5] to apply the LRNG to Linux
->    kernel versions of 5.10, 5.8, 5.4, 4.19, 4.14, 4.12, 4.10, and 4.4. Pa=
-tches
->    for other kernel versions are easily derived from the existing ones.
->
-> Booting the patch with the kernel command line option
-> "dyndbg=3Dfile drivers/char/lrng/* +p" generates logs indicating the
-> operation of the LRNG. Each log is pre-pended with "lrng".
->
-> An entropy analysis is performed on the following systems - details
-> are given in [2] appendix C:
->
-> * x86 KVM virtualized guest 32 and 64 bit systems
->
-> * x86 bare metal
->
-> * older and newer ARMv7 system
->
-> * ARM64
->
-> * POWER7 LE and POWER 8 BE
->
-> * IBM Z System mainframe
->
-> * old MIPS embedded device
->
-> * testing with GCC and Clang
->
-> [1] https://www.chronox.de/lrng.html - If the patch is accepted, I would
-> be volunteering to convert the documentation into RST format and
-> contribute it to the Linux kernel documentation directory.
->
-> [2] https://www.chronox.de/lrng/doc/lrng.pdf
->
-> [3] https://www.chronox.de/chacha20_drng.html
->
-> [4] https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Stud=
-ies/LinuxRNG/LinuxRNG_EN_V4_1.pdf
->
-> [5] https://github.com/smuellerDD/lrng/tree/master/backports
->
-> [6] https://www.chronox.de/lrng/doc/lrng_presentation_v41.pdf
->
-> Changes (compared to the previous patch set) - individual patches
-> are visible at https://github.com/smuellerDD/lrng/commits/master:
->
-> - update seeding threshold when loading DRNG only if min seeded
->
-> - insert bootloader entropy directly into the aux pool
->
-> - RNDADDTOENTCNT - entropy estmate update of aux pool
->
-> - cleanup of initial seeding
->
-> - use work queue after initialization only
->
-> - add_random_ready_callback ping after full initialization
->
-> - zeroize seed buffer
->
-> - invoke processing of ready_list only if fully seeded
->
-> - invoke invalidate_batched_entropy after initialization
->
-> - always fill in the time stamp into seed buffer
->
-> - initialize entropy value if insufficient entropy available
->
-> - signal end of boot cycle in non-NUMA configuration
->
-> - set NUMA node online flag in proper condition
->
-> - harden entropy source configuration
->
-> - significantly enhance performance of aux pool
->
-> - fix LRNG reseed locking
->
-> - set LRNG to non-operational for 90C compliance
->
-> - fix increment of ChaCha20 nonce
->
-> - make switch functions a noop if switching is disabled
->
-> CC: Torsten Duwe <duwe@lst.de>
-> CC: "Eric W. Biederman" <ebiederm@xmission.com>
-> CC: "Alexander E. Patrakov" <patrakov@gmail.com>
-> CC: "Ahmed S. Darwish" <darwish.07@gmail.com>
-> CC: "Theodore Y. Ts'o" <tytso@mit.edu>
-> CC: Willy Tarreau <w@1wt.eu>
-> CC: Matthew Garrett <mjg59@srcf.ucam.org>
-> CC: Vito Caputo <vcaputo@pengaru.com>
-> CC: Andreas Dilger <adilger.kernel@dilger.ca>
-> CC: Jan Kara <jack@suse.cz>
-> CC: Ray Strode <rstrode@redhat.com>
-> CC: William Jon McCann <mccann@jhu.edu>
-> CC: zhangjs <zachary@baishancloud.com>
-> CC: Andy Lutomirski <luto@kernel.org>
-> CC: Florian Weimer <fweimer@redhat.com>
-> CC: Lennart Poettering <mzxreary@0pointer.de>
-> CC: Nicolai Stange <nstange@suse.de>
-> CC: Eric Biggers <ebiggers@kernel.org>
-> CC: Alexander Lobakin <alobakin@pm.me>
+> +#define SEV_SNP_ES_TMR_SIZE    (2 * 1024 * 1024)
+> +
+> +static size_t sev_es_tmr_size = SEV_ES_TMR_SIZE;
+> +
+> +static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
+> +static int sev_do_cmd(int cmd, void *data, int *psp_ret);
+> +
+>  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+>  {
+>         struct sev_device *sev = psp_master->sev_data;
+> @@ -151,6 +159,112 @@ static int sev_cmd_buffer_len(int cmd)
+>         return 0;
+>  }
+>
+> +static int snp_reclaim_page(struct page *page, bool locked)
+> +{
+> +       struct sev_data_snp_page_reclaim data = {};
 
-For the series:
+Hmmm.. according to some things I read online, an empty initializer
+list is not legal in C. For example:
+https://stackoverflow.com/questions/17589533/is-an-empty-initializer-list-valid-c-code
+I'm sure this is compiling. Should we change this to `{0}`, which I
+believe will initialize all fields in this struct to zero, according
+to: https://stackoverflow.com/questions/11152160/initializing-a-struct-to-0?
 
-Reviewed-by: Alexander Lobakin <alobakin@pm.me>
-Tested-by: Alexander Lobakin <alobakin@pm.me>
+> +       int ret, err;
+> +
+> +       data.paddr = page_to_pfn(page) << PAGE_SHIFT;
+> +
+> +       if (locked)
+> +               ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
+> +       else
+> +               ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
+> +
+> +       return ret;
+> +}
+> +
+> +static int snp_set_rmptable_state(unsigned long paddr, int npages,
+> +                                 struct rmpupdate *val, bool locked, bool need_reclaim)
+> +{
+> +       unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
+> +       unsigned long pfn_end = pfn + npages;
+> +       struct psp_device *psp = psp_master;
+> +       struct sev_device *sev;
+> +       int rc;
+> +
+> +       if (!psp || !psp->sev_data)
+> +               return 0;
 
-> Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Should this return a non-zero value -- maybe `-ENODEV`? Otherwise, the
+`snp_alloc_firmware_page()` API will return a page that the caller
+believes is suitable to use with FW. My concern is that someone
+decides to use this API to stash a page very early on during kernel
+boot and that page becomes a time bomb.
+
+If we initialize `rc` to `-ENODEV` (or something similar), then every
+return in this function can be `return rc`.
+
+> +
+> +       /* If SEV-SNP is initialized then add the page in RMP table. */
+> +       sev = psp->sev_data;
+> +       if (!sev->snp_inited)
+> +               return 0;
+
+Ditto. Should this turn a non-zero value?
+
+> +
+> +       while (pfn < pfn_end) {
+> +               if (need_reclaim)
+> +                       if (snp_reclaim_page(pfn_to_page(pfn), locked))
+> +                               return -EFAULT;
+> +
+> +               rc = rmpupdate(pfn_to_page(pfn), val);
+> +               if (rc)
+> +                       return rc;
+> +
+> +               pfn++;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order, bool locked)
+> +{
+> +       struct rmpupdate val = {};
+
+`{}` -> `{0}`? (Not sure, see my previous comment.)
+
+> +       unsigned long paddr;
+> +       struct page *page;
+> +
+> +       page = alloc_pages(gfp_mask, order);
+> +       if (!page)
+> +               return NULL;
+> +
+> +       val.assigned = 1;
+> +       val.immutable = 1;
+> +       paddr = __pa((unsigned long)page_address(page));
+> +
+> +       if (snp_set_rmptable_state(paddr, 1 << order, &val, locked, false)) {
+> +               pr_warn("Failed to set page state (leaking it)\n");
+
+Maybe `WARN_ONCE` instead of `pr_warn`? It's both a big attention
+grabber and also rate limited.
+
+> +               return NULL;
+> +       }
+> +
+> +       return page;
+> +}
+> +
+> +void *snp_alloc_firmware_page(gfp_t gfp_mask)
+> +{
+> +       struct page *page;
+> +
+> +       page = __snp_alloc_firmware_pages(gfp_mask, 0, false);
+> +
+> +       return page ? page_address(page) : NULL;
+> +}
+> +EXPORT_SYMBOL_GPL(snp_alloc_firmware_page);
 >
-> Stephan Mueller (13):
->   Linux Random Number Generator
->   LRNG - allocate one DRNG instance per NUMA node
->   LRNG - sysctls and /proc interface
->   LRNG - add switchable DRNG support
->   LRNG - add common generic hash support
->   crypto: DRBG - externalize DRBG functions for LRNG
->   LRNG - add SP800-90A DRBG extension
->   LRNG - add kernel crypto API PRNG extension
->   crypto: provide access to a static Jitter RNG state
->   LRNG - add Jitter RNG fast noise source
->   LRNG - add SP800-90B compliant health tests
->   LRNG - add interface for gathering of raw entropy
->   LRNG - add power-on and runtime self-tests
+> +static void __snp_free_firmware_pages(struct page *page, int order, bool locked)
+> +{
+> +       struct rmpupdate val = {};
+
+`{}` -> `{0}`? (Not sure, see my previous comment.)
+
+> +       unsigned long paddr;
+> +
+> +       if (!page)
+> +               return;
+> +
+> +       paddr = __pa((unsigned long)page_address(page));
+> +
+> +       if (snp_set_rmptable_state(paddr, 1 << order, &val, locked, true)) {
+> +               pr_warn("Failed to set page state (leaking it)\n");
+
+WARN_ONCE?
+
+> +               return;
+> +       }
+> +
+> +       __free_pages(page, order);
+> +}
+> +
+> +void snp_free_firmware_page(void *addr)
+> +{
+> +       if (!addr)
+> +               return;
+> +
+> +       __snp_free_firmware_pages(virt_to_page(addr), 0, false);
+> +}
+> +EXPORT_SYMBOL(snp_free_firmware_page);
+> +
+>  static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+>  {
+>         struct psp_device *psp = psp_master;
+> @@ -273,7 +387,7 @@ static int __sev_platform_init_locked(int *error)
 >
->  MAINTAINERS                                   |   7 +
->  crypto/drbg.c                                 |  16 +-
->  crypto/jitterentropy-kcapi.c                  |   3 +-
->  crypto/jitterentropy.c                        |  31 +-
->  drivers/char/Kconfig                          |   2 +
->  drivers/char/Makefile                         |   9 +-
->  drivers/char/lrng/Kconfig                     | 515 +++++++++++++
->  drivers/char/lrng/Makefile                    |  20 +
->  drivers/char/lrng/lrng_archrandom.c           |  91 +++
->  drivers/char/lrng/lrng_aux.c                  | 136 ++++
->  drivers/char/lrng/lrng_chacha20.c             | 321 ++++++++
->  drivers/char/lrng/lrng_chacha20.h             |  29 +
->  drivers/char/lrng/lrng_drbg.c                 | 198 +++++
->  drivers/char/lrng/lrng_drng.c                 | 422 +++++++++++
->  drivers/char/lrng/lrng_health.c               | 410 ++++++++++
->  drivers/char/lrng/lrng_interfaces.c           | 648 ++++++++++++++++
->  drivers/char/lrng/lrng_internal.h             | 425 +++++++++++
->  drivers/char/lrng/lrng_jent.c                 |  90 +++
->  drivers/char/lrng/lrng_kcapi.c                | 227 ++++++
->  drivers/char/lrng/lrng_kcapi_hash.c           | 103 +++
->  drivers/char/lrng/lrng_kcapi_hash.h           |  20 +
->  drivers/char/lrng/lrng_numa.c                 | 122 +++
->  drivers/char/lrng/lrng_pool.c                 | 622 ++++++++++++++++
->  drivers/char/lrng/lrng_proc.c                 | 185 +++++
->  drivers/char/lrng/lrng_selftest.c             | 351 +++++++++
->  drivers/char/lrng/lrng_sw_noise.c             | 702 ++++++++++++++++++
->  drivers/char/lrng/lrng_sw_noise.h             |  71 ++
->  drivers/char/lrng/lrng_switch.c               | 231 ++++++
->  drivers/char/lrng/lrng_testing.c              | 689 +++++++++++++++++
->  include/crypto/drbg.h                         |   7 +
->  .../crypto/internal}/jitterentropy.h          |   3 +
->  include/linux/lrng.h                          |  81 ++
->  32 files changed, 6777 insertions(+), 10 deletions(-)
->  create mode 100644 drivers/char/lrng/Kconfig
->  create mode 100644 drivers/char/lrng/Makefile
->  create mode 100644 drivers/char/lrng/lrng_archrandom.c
->  create mode 100644 drivers/char/lrng/lrng_aux.c
->  create mode 100644 drivers/char/lrng/lrng_chacha20.c
->  create mode 100644 drivers/char/lrng/lrng_chacha20.h
->  create mode 100644 drivers/char/lrng/lrng_drbg.c
->  create mode 100644 drivers/char/lrng/lrng_drng.c
->  create mode 100644 drivers/char/lrng/lrng_health.c
->  create mode 100644 drivers/char/lrng/lrng_interfaces.c
->  create mode 100644 drivers/char/lrng/lrng_internal.h
->  create mode 100644 drivers/char/lrng/lrng_jent.c
->  create mode 100644 drivers/char/lrng/lrng_kcapi.c
->  create mode 100644 drivers/char/lrng/lrng_kcapi_hash.c
->  create mode 100644 drivers/char/lrng/lrng_kcapi_hash.h
->  create mode 100644 drivers/char/lrng/lrng_numa.c
->  create mode 100644 drivers/char/lrng/lrng_pool.c
->  create mode 100644 drivers/char/lrng/lrng_proc.c
->  create mode 100644 drivers/char/lrng/lrng_selftest.c
->  create mode 100644 drivers/char/lrng/lrng_sw_noise.c
->  create mode 100644 drivers/char/lrng/lrng_sw_noise.h
->  create mode 100644 drivers/char/lrng/lrng_switch.c
->  create mode 100644 drivers/char/lrng/lrng_testing.c
->  rename {crypto =3D> include/crypto/internal}/jitterentropy.h (84%)
->  create mode 100644 include/linux/lrng.h
+>                 data.flags |= SEV_INIT_FLAGS_SEV_ES;
+>                 data.tmr_address = tmr_pa;
+> -               data.tmr_len = SEV_ES_TMR_SIZE;
+> +               data.tmr_len = sev_es_tmr_size;
+>         }
 >
+>         rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> @@ -630,6 +744,8 @@ static int __sev_snp_init_locked(int *error)
+>         sev->snp_inited = true;
+>         dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
+>
+> +       sev_es_tmr_size = SEV_SNP_ES_TMR_SIZE;
+> +
+>         return rc;
+>  }
+>
+> @@ -1153,8 +1269,10 @@ static void sev_firmware_shutdown(struct sev_device *sev)
+>                 /* The TMR area was encrypted, flush it from the cache */
+>                 wbinvd_on_all_cpus();
+>
+> -               free_pages((unsigned long)sev_es_tmr,
+> -                          get_order(SEV_ES_TMR_SIZE));
+> +
+> +               __snp_free_firmware_pages(virt_to_page(sev_es_tmr),
+> +                                         get_order(sev_es_tmr_size),
+> +                                         false);
+>                 sev_es_tmr = NULL;
+>         }
+>
+> @@ -1204,16 +1322,6 @@ void sev_pci_init(void)
+>             sev_update_firmware(sev->dev) == 0)
+>                 sev_get_api_version();
+>
+> -       /* Obtain the TMR memory area for SEV-ES use */
+> -       tmr_page = alloc_pages(GFP_KERNEL, get_order(SEV_ES_TMR_SIZE));
+> -       if (tmr_page) {
+> -               sev_es_tmr = page_address(tmr_page);
+> -       } else {
+> -               sev_es_tmr = NULL;
+> -               dev_warn(sev->dev,
+> -                        "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+> -       }
+> -
+>         /*
+>          * If boot CPU supports the SNP, then first attempt to initialize
+>          * the SNP firmware.
+> @@ -1229,6 +1337,16 @@ void sev_pci_init(void)
+>                 }
+>         }
+>
+> +       /* Obtain the TMR memory area for SEV-ES use */
+> +       tmr_page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(sev_es_tmr_size), false);
+> +       if (tmr_page) {
+> +               sev_es_tmr = page_address(tmr_page);
+> +       } else {
+> +               sev_es_tmr = NULL;
+> +               dev_warn(sev->dev,
+> +                        "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+> +       }
+> +
+>         /* Initialize the platform */
+>         rc = sev_platform_init(&error);
+>         if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 63ef766cbd7a..b72a74f6a4e9 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -12,6 +12,8 @@
+>  #ifndef __PSP_SEV_H__
+>  #define __PSP_SEV_H__
+>
+> +#include <linux/sev.h>
+> +
+>  #include <uapi/linux/psp-sev.h>
+>
+>  #ifdef CONFIG_X86
+> @@ -920,6 +922,8 @@ int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error);
+>
+>
+>  void *psp_copy_user_blob(u64 uaddr, u32 len);
+> +void *snp_alloc_firmware_page(gfp_t mask);
+> +void snp_free_firmware_page(void *addr);
+>
+>  #else  /* !CONFIG_CRYPTO_DEV_SP_PSP */
+>
+> @@ -961,6 +965,13 @@ static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *erro
+>         return -ENODEV;
+>  }
+>
+> +static inline void *snp_alloc_firmware_page(gfp_t mask)
+> +{
+> +       return NULL;
+> +}
+> +
+> +static inline void snp_free_firmware_page(void *addr) { }
+> +
+>  #endif /* CONFIG_CRYPTO_DEV_SP_PSP */
+>
+>  #endif /* __PSP_SEV_H__ */
 > --
-> 2.31.1
-
-Thanks,
-Al
-
+> 2.17.1
+>
+>
