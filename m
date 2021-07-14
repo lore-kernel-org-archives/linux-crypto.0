@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54C9CC11F67
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F19C11F68
 	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3EFDB613C1
+	by mail.kernel.org (Postfix) with ESMTP id C3C9F613B6
 	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238002AbhGNFzN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jul 2021 01:55:13 -0400
-Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.176]:18507 "EHLO
-        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237994AbhGNFzB (ORCPT
+        id S237998AbhGNFzO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jul 2021 01:55:14 -0400
+Received: from mo4-p03-ob.smtp.rzone.de ([81.169.146.174]:11883 "EHLO
+        mo4-p03-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237959AbhGNFzA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jul 2021 01:55:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626241861;
+        Wed, 14 Jul 2021 01:55:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626241849;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=3WK6H2fpRmP/YlCMJIdKkgw08xqhXzw/z/731pibt1g=;
-    b=lg8YMLSKK6fkSRQGZCkaoEWwRFLPNCBAf2ShaFnTR9SJasNYjvSBf6ESvP8Uq2/TD0
-    GWSmEEQ9ZIkOS0YclnVzpGxd/Shr2SSiWVrk0S3O7r4yscVHgBMTBmKQdmn/1TKASWpZ
-    oHAbEKRV5VJQ/aBT6gXtKNmmqQarcbwZ1C9A/H1VCHg4Rp0KGeboDnS7CRVhzRxJgmAU
-    BfvYrvJrFxe0L5RAYMvi+caaKZtqE8EceTqA3YPbvom+5Ey0msnEgfud7zxTsjUuePC2
-    H3j5ZrW8y3ti9FhuOcyVYtFyFUpaVnPzFxep4jPpUfD4HGshkefgsF483X/rRvH8maXT
-    wJ5g==
+    bh=QPS7OuH3DnMGYhAOAdZFeI9eRAvYhooyGueRH9+3eaQ=;
+    b=tEngVz1KJa+q1P8czzuUJP5st33/XIHV0R43TV83p/+U5xLNfbnJ0Z1kW0OWrk2Cr4
+    ObyT/BT+bA5PtqQQhMOTpHb15R6jMihZZin24es9DR+ApwJASzHPYPwAV8JsZOPV/Hj4
+    VqUy8R2f2q/Pz5YzEwN7BT6ac9J1CzMqlKyRfyT4a8GQFsXbqv0vy8IMtKgY8VVYWrpv
+    St/IwWl4l+Rc9I5RPT0PovE/L+rNuuemnk0fO058BDuvtgXB4bnDL6lJQScS4wp7yYMq
+    sdScOGit/Ffvvo/aA5GfGwMRMQA1/x0ZDb+PCuDykPZe6aKSMUbXNa3Pe0VfOvZMttnx
+    h1yg==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXPSI/SaRQ=="
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.28.1 DYNA|AUTH)
-    with ESMTPSA id N0753fx6E5p0wye
+    with ESMTPSA id N0753fx6E5omwyS
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Wed, 14 Jul 2021 07:51:00 +0200 (CEST)
+    Wed, 14 Jul 2021 07:50:48 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
@@ -71,9 +71,9 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         Petr Tesarik <ptesarik@suse.cz>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>
-Subject: [PATCH v41 02/13] LRNG - allocate one DRNG instance per NUMA node
-Date:   Wed, 14 Jul 2021 07:44:30 +0200
-Message-ID: <2175542.7Y6Tdn48eY@positron.chronox.de>
+Subject: [PATCH v41 10/13] LRNG - add Jitter RNG fast noise source
+Date:   Wed, 14 Jul 2021 07:48:40 +0200
+Message-ID: <8015368.FPDjnrgga5@positron.chronox.de>
 In-Reply-To: <7822794.ITf6fX9eNu@positron.chronox.de>
 References: <7822794.ITf6fX9eNu@positron.chronox.de>
 MIME-Version: 1.0
@@ -83,21 +83,9 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to improve NUMA-locality when serving getrandom(2) requests,
-allocate one DRNG instance per node.
-
-The DRNG instance that is present right from the start of the kernel is
-reused as the first per-NUMA-node DRNG. For all remaining online NUMA
-nodes a new DRNG instance is allocated.
-
-During boot time, the multiple DRNG instances are seeded sequentially.
-With this, the first DRNG instance (referenced as the initial DRNG
-in the code) is completely seeded with 256 bits of entropy before the
-next DRNG instance is completely seeded.
-
-When random numbers are requested, the NUMA-node-local DRNG is checked
-whether it has been already fully seeded. If this is not the case, the
-initial DRNG is used to serve the request.
+The Jitter RNG fast noise source implemented as part of the kernel
+crypto API is queried for 256 bits of entropy at the time the seed
+buffer managed by the LRNG is about to be filled.
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -116,175 +104,160 @@ CC: Andy Lutomirski <luto@kernel.org>
 CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
-CC: Eric Biggers <ebiggers@kernel.org>
 CC: Alexander Lobakin <alobakin@mailbox.org>
 Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/char/lrng/Makefile        |   2 +
- drivers/char/lrng/lrng_internal.h |   5 ++
- drivers/char/lrng/lrng_numa.c     | 122 ++++++++++++++++++++++++++++++
- 3 files changed, 129 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_numa.c
+ drivers/char/lrng/Kconfig     | 27 +++++++++++
+ drivers/char/lrng/Makefile    |  1 +
+ drivers/char/lrng/lrng_jent.c | 90 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 118 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_jent.c
 
+diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
+index ffd2df43f2d4..e622b8532e2b 100644
+--- a/drivers/char/lrng/Kconfig
++++ b/drivers/char/lrng/Kconfig
+@@ -182,6 +182,33 @@ config LRNG_IRQ_ENTROPY_RATE
+ 	  interrupt entropy source will still deliver data but without
+ 	  being credited with entropy.
+ 
++comment "Jitter RNG Entropy Source"
++
++config LRNG_JENT
++	bool "Enable Jitter RNG as LRNG Seed Source"
++	depends on CRYPTO
++	select CRYPTO_JITTERENTROPY
++	help
++	  The Linux RNG may use the Jitter RNG as noise source. Enabling
++	  this option enables the use of the Jitter RNG. Its default
++	  entropy level is 16 bits of entropy per 256 data bits delivered
++	  by the Jitter RNG. This entropy level can be changed at boot
++	  time or at runtime with the lrng_base.jitterrng configuration
++	  variable.
++
++config LRNG_JENT_ENTROPY_RATE
++	int "Jitter RNG Entropy Source Entropy Rate"
++	range 0 256
++	default 16
++	help
++	  The option defines the amount of entropy the LRNG applies to 256
++	  bits of data obtained from the Jitter RNG entropy source. The
++	  LRNG enforces the limit that this value must be in the range
++	  between 0 and 256.
++
++	  In order to disable the Jitter RNG entropy source, the option
++	  has to be set to 0.
++
+ comment "CPU Entropy Source"
+ 
+ config LRNG_CPU_ENTROPY_RATE
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index e72e01c15bb9..29724c65287d 100644
+index 97d2b13d3227..6be88156010a 100644
 --- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -7,3 +7,5 @@ obj-y				+= lrng_pool.o lrng_aux.o \
- 				   lrng_sw_noise.o lrng_archrandom.o \
- 				   lrng_drng.o lrng_chacha20.o \
- 				   lrng_interfaces.o
-+
-+obj-$(CONFIG_NUMA)		+= lrng_numa.o
-diff --git a/drivers/char/lrng/lrng_internal.h b/drivers/char/lrng/lrng_internal.h
-index 5f0d3602412e..e1d83c888894 100644
---- a/drivers/char/lrng/lrng_internal.h
-+++ b/drivers/char/lrng/lrng_internal.h
-@@ -254,8 +254,13 @@ int lrng_drng_get_sleep(u8 *outbuf, u32 outbuflen);
- void lrng_drng_force_reseed(void);
- void lrng_drng_seed_work(struct work_struct *dummy);
- 
-+#ifdef CONFIG_NUMA
-+struct lrng_drng **lrng_drng_instances(void);
-+void lrng_drngs_numa_alloc(void);
-+#else	/* CONFIG_NUMA */
- static inline struct lrng_drng **lrng_drng_instances(void) { return NULL; }
- static inline void lrng_drngs_numa_alloc(void) { return; }
-+#endif /* CONFIG_NUMA */
- 
- /************************* Entropy sources management *************************/
- 
-diff --git a/drivers/char/lrng/lrng_numa.c b/drivers/char/lrng/lrng_numa.c
+@@ -14,3 +14,4 @@ obj-$(CONFIG_LRNG_DRNG_SWITCH)	+= lrng_switch.o
+ obj-$(CONFIG_LRNG_KCAPI_HASH)	+= lrng_kcapi_hash.o
+ obj-$(CONFIG_LRNG_DRBG)		+= lrng_drbg.o
+ obj-$(CONFIG_LRNG_KCAPI)	+= lrng_kcapi.o
++obj-$(CONFIG_LRNG_JENT)		+= lrng_jent.o
+diff --git a/drivers/char/lrng/lrng_jent.c b/drivers/char/lrng/lrng_jent.c
 new file mode 100644
-index 000000000000..fbfb40a5fb8d
+index 000000000000..2599ab9352b6
 --- /dev/null
-+++ b/drivers/char/lrng/lrng_numa.c
-@@ -0,0 +1,122 @@
++++ b/drivers/char/lrng/lrng_jent.c
+@@ -0,0 +1,90 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * LRNG NUMA support
++ * LRNG Fast Entropy Source: Jitter RNG
 + *
 + * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
 + */
 +
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <linux/lrng.h>
-+#include <linux/slab.h>
++#include <linux/types.h>
++#include <crypto/internal/jitterentropy.h>
 +
 +#include "lrng_internal.h"
 +
-+static struct lrng_drng **lrng_drng __read_mostly = NULL;
++/*
++ * Estimated entropy of data is a 16th of LRNG_DRNG_SECURITY_STRENGTH_BITS.
++ * Albeit a full entropy assessment is provided for the noise source indicating
++ * that it provides high entropy rates and considering that it deactivates
++ * when it detects insufficient hardware, the chosen under estimation of
++ * entropy is considered to be acceptable to all reviewers.
++ */
++static u32 jitterrng = CONFIG_LRNG_JENT_ENTROPY_RATE;
++#ifdef CONFIG_LRNG_RUNTIME_ES_CONFIG
++module_param(jitterrng, uint, 0644);
++MODULE_PARM_DESC(jitterrng, "Entropy in bits of 256 data bits from Jitter RNG noise source");
++#endif
 +
-+struct lrng_drng **lrng_drng_instances(void)
++static bool lrng_jent_initialized = false;
++static struct rand_data *lrng_jent_state;
++
++static int __init lrng_jent_initialize(void)
 +{
-+	return smp_load_acquire(&lrng_drng);
++	/* Initialize the Jitter RNG after the clocksources are initialized. */
++	lrng_jent_state = jent_lrng_entropy_collector();
++	if (!lrng_jent_state) {
++		jitterrng = 0;
++		pr_info("Jitter RNG unusable on current system\n");
++		return 0;
++	}
++	lrng_jent_initialized = true;
++	lrng_pool_add_entropy();
++	pr_debug("Jitter RNG working on current system\n");
++
++	return 0;
++}
++device_initcall(lrng_jent_initialize);
++
++/**
++ * lrng_get_jent() - Get Jitter RNG entropy
++ *
++ * @outbuf: buffer to store entropy
++ * @outbuflen: length of buffer
++ *
++ * Return:
++ * * > 0 on success where value provides the added entropy in bits
++ * * 0 if no fast source was available
++ */
++u32 lrng_get_jent(u8 *outbuf, u32 requested_bits)
++{
++	int ret;
++	u32 ent_bits = lrng_jent_entropylevel(requested_bits);
++	unsigned long flags;
++	static DEFINE_SPINLOCK(lrng_jent_lock);
++
++	spin_lock_irqsave(&lrng_jent_lock, flags);
++
++	if (!ent_bits || !lrng_jent_initialized) {
++		spin_unlock_irqrestore(&lrng_jent_lock, flags);
++		return 0;
++	}
++
++	ret = jent_read_entropy(lrng_jent_state, outbuf, requested_bits >> 3);
++	spin_unlock_irqrestore(&lrng_jent_lock, flags);
++
++	if (ret) {
++		pr_debug("Jitter RNG failed with %d\n", ret);
++		return 0;
++	}
++
++	pr_debug("obtained %u bits of entropy from Jitter RNG noise source\n",
++		 ent_bits);
++
++	return ent_bits;
 +}
 +
-+/* Allocate the data structures for the per-NUMA node DRNGs */
-+static void _lrng_drngs_numa_alloc(struct work_struct *work)
++u32 lrng_jent_entropylevel(u32 requested_bits)
 +{
-+	struct lrng_drng **drngs;
-+	struct lrng_drng *lrng_drng_init = lrng_drng_init_instance();
-+	u32 node;
-+	bool init_drng_used = false;
-+
-+	mutex_lock(&lrng_crypto_cb_update);
-+
-+	/* per-NUMA-node DRNGs are already present */
-+	if (lrng_drng)
-+		goto unlock;
-+
-+	drngs = kcalloc(nr_node_ids, sizeof(void *), GFP_KERNEL|__GFP_NOFAIL);
-+	for_each_online_node(node) {
-+		struct lrng_drng *drng;
-+
-+		if (!init_drng_used) {
-+			drngs[node] = lrng_drng_init;
-+			init_drng_used = true;
-+			continue;
-+		}
-+
-+		drng = kmalloc_node(sizeof(struct lrng_drng),
-+				     GFP_KERNEL|__GFP_NOFAIL, node);
-+		memset(drng, 0, sizeof(lrng_drng));
-+
-+		drng->crypto_cb = lrng_drng_init->crypto_cb;
-+		drng->drng = drng->crypto_cb->lrng_drng_alloc(
-+					LRNG_DRNG_SECURITY_STRENGTH_BYTES);
-+		if (IS_ERR(drng->drng)) {
-+			kfree(drng);
-+			goto err;
-+		}
-+
-+		drng->hash = drng->crypto_cb->lrng_hash_alloc();
-+		if (IS_ERR(drng->hash)) {
-+			drng->crypto_cb->lrng_drng_dealloc(drng->drng);
-+			kfree(drng);
-+			goto err;
-+		}
-+
-+		mutex_init(&drng->lock);
-+		spin_lock_init(&drng->spin_lock);
-+		rwlock_init(&drng->hash_lock);
-+
-+		/*
-+		 * Switch the hash used by the per-CPU pool.
-+		 * We do not need to lock the new hash as it is not usable yet
-+		 * due to **drngs not yet being initialized.
-+		 */
-+		if (lrng_pcpu_switch_hash(node, drng->crypto_cb, drng->hash,
-+					  &lrng_cc20_crypto_cb))
-+			goto err;
-+
-+		/*
-+		 * No reseeding of NUMA DRNGs from previous DRNGs as this
-+		 * would complicate the code. Let it simply reseed.
-+		 */
-+		lrng_drng_reset(drng);
-+		drngs[node] = drng;
-+
-+		lrng_pool_inc_numa_node();
-+		pr_info("DRNG and entropy pool read hash for NUMA node %d allocated\n",
-+			node);
-+	}
-+
-+	/* counterpart to smp_load_acquire in lrng_drng_instances */
-+	if (!cmpxchg_release(&lrng_drng, NULL, drngs)) {
-+		lrng_pool_all_numa_nodes_seeded(false);
-+		goto unlock;
-+	}
-+
-+err:
-+	for_each_online_node(node) {
-+		struct lrng_drng *drng = drngs[node];
-+
-+		if (drng == lrng_drng_init)
-+			continue;
-+
-+		if (drng) {
-+			lrng_pcpu_switch_hash(node, &lrng_cc20_crypto_cb, NULL,
-+					      drng->crypto_cb);
-+			drng->crypto_cb->lrng_hash_dealloc(drng->hash);
-+			drng->crypto_cb->lrng_drng_dealloc(drng->drng);
-+			kfree(drng);
-+		}
-+	}
-+	kfree(drngs);
-+
-+unlock:
-+	mutex_unlock(&lrng_crypto_cb_update);
-+}
-+
-+static DECLARE_WORK(lrng_drngs_numa_alloc_work, _lrng_drngs_numa_alloc);
-+
-+void lrng_drngs_numa_alloc(void)
-+{
-+	schedule_work(&lrng_drngs_numa_alloc_work);
++	return lrng_fast_noise_entropylevel((lrng_jent_initialized) ?
++					    jitterrng : 0, requested_bits);
 +}
 -- 
 2.31.1
