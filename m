@@ -7,43 +7,42 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B45C11F66
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 529DBC07E9C
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E1F8613C1
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B05F613BF
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jul 2021 05:52:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237974AbhGNFzN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jul 2021 01:55:13 -0400
-Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.80]:9001 "EHLO
-        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238029AbhGNFzH (ORCPT
+        id S238049AbhGNFzP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jul 2021 01:55:15 -0400
+Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.121]:33704 "EHLO
+        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237960AbhGNFzA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jul 2021 01:55:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626241846;
+        Wed, 14 Jul 2021 01:55:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626241858;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=xX74Jly5iCMZNSaFhvncUe8a3E3Oqut1EVea8GfQpiE=;
-    b=GxPJ/sxrwqsL1kXenqaOYiI2M6/OZs6C+6I8Fvmcke11mywh83XM2lH0NPeb0z+I+7
-    dGaVIVnKEk+Zm457bsdlejpHgR1WJeHPplvDokVv6rSSFYc3XJUmQQhLa2OqtmG8lWYL
-    DnR9CxNp06suV3YLpVKzE47SEAb6eLBFI9RziQLqrKPgzN6PD3hfvBLCStXqntP3FMLw
-    Z67mH6z5xk+7X/1mqOSO6Dsf4s+Was3fTo2kPpsOwFER2ACKpvE2UWSM+yzI56EENbek
-    XFeEZvALMUMPHFwCzalNrNeSParVtGViCPyYp5juac4puPUHsh0DbT4aLpxm6isszLIr
-    q20w==
+    bh=X378qQdSxBYvlYM61lwkLudIP+ZUjtLb2NOspEk7d2s=;
+    b=I7RjSIzowu7APpSru6OJtWG2xO9liO8KQlDhVKbSnq8iip83dzjilGlEPRhlAhvmmN
+    8mH1SdHWD/YUQxlXSH0Su60p1lOG7TwwEqZ15XFMwsa9ZY+6yYA3eUzYRdwbZmAKF7e0
+    kELKInTU73CYTZZvJbZvvWtv01iUfs82acumGZf66id3pZzmGMfdebdcKwG6kEp34rFw
+    GDMdLjr+g9vd17MOcQGI2SaOPdb4tDUwagw6rWWvQJhcNy0zx6NOdDEXL432QaZFkSCI
+    34z6FIUyM5oQNjOdmx9g8XHkSpcnJczzvtCdZCZUdbOSgcSU+FdhicUKo2Svuzm3o3U3
+    DWIA==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXPSI/SaRQ=="
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.28.1 DYNA|AUTH)
-    with ESMTPSA id N0753fx6E5ojwyQ
+    with ESMTPSA id N0753fx6E5ovwyb
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Wed, 14 Jul 2021 07:50:45 +0200 (CEST)
+    Wed, 14 Jul 2021 07:50:57 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org,
-        John Haxby <john.haxby@oracle.com>
+To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         LKML <linux-kernel@vger.kernel.org>,
         Arnd Bergmann <arnd@arndb.de>,
@@ -70,10 +69,11 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         Eric Biggers <ebiggers@kernel.org>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>
-Subject: [PATCH v41 12/13] LRNG - add interface for gathering of raw entropy
-Date:   Wed, 14 Jul 2021 07:49:42 +0200
-Message-ID: <1852328.sdA2qtPa8b@positron.chronox.de>
+Subject: [PATCH v41 04/13] LRNG - add switchable DRNG support
+Date:   Wed, 14 Jul 2021 07:45:22 +0200
+Message-ID: <5750762.BcOUJiyQPM@positron.chronox.de>
 In-Reply-To: <7822794.ITf6fX9eNu@positron.chronox.de>
 References: <7822794.ITf6fX9eNu@positron.chronox.de>
 MIME-Version: 1.0
@@ -83,59 +83,41 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The test interface allows a privileged process to capture the raw
-unconditioned noise that is collected by the LRNG for statistical
-analysis. Such testing allows the analysis how much entropy
-the interrupt noise source provides on a given platform.
-Extracted noise data is not used to seed the LRNG. This
-is a test interface and not appropriate for production systems.
-Yet, the interface is considered to be sufficiently secured for
-production systems.
+The DRNG switch support allows replacing the DRNG mechanism of the
+LRNG. The switching support rests on the interface definition of
+include/linux/lrng.h. A new DRNG is implemented by filling in the
+interface defined in this header file.
 
-Access to the data is given through the lrng_raw debugfs file. The
-data buffer should be multiples of sizeof(u32) to fill the entire
-buffer. Using the option lrng_testing.boot_test=1 the raw noise of
-the first 1000 entropy events since boot can be sampled.
+In addition to the DRNG, the extension also has to provide a hash
+implementation that is used to hash the entropy pool for random number
+extraction.
 
-This test interface allows generating the data required for
-analysis whether the LRNG is in compliance with SP800-90B
-sections 3.1.3 and 3.1.4.
+Note: It is permissible to implement a DRNG whose operations may sleep.
+However, the hash function must not sleep.
 
-In addition, the test interface allows gathering of the concatenated raw
-entropy data to verify that the concatenation works appropriately.
-This includes sampling of the following raw data:
+The switchable DRNG support allows replacing the DRNG at runtime.
+However, only one DRNG extension is allowed to be loaded at any given
+time. Before replacing it with another DRNG implementation, the possibly
+existing DRNG extension must be unloaded.
 
-* high-resolution time stamp
+The switchable DRNG extension activates the new DRNG during load time.
+It is expected, however, that such a DRNG switch would be done only once
+by an administrator to load the intended DRNG implementation.
 
-* Jiffies
+It is permissible to compile DRNG extensions either as kernel modules or
+statically. The initialization of the DRNG extension should be performed
+with a late_initcall to ensure the extension is available when user
+space starts but after all other initialization completed.
+The initialization is performed by registering the function call data
+structure with the lrng_set_drng_cb function. In order to unload the
+DRNG extension, lrng_set_drng_cb must be invoked with the NULL
+parameter.
 
-* IRQ number
+The DRNG extension should always provide a security strength that is at
+least as strong as LRNG_DRNG_SECURITY_STRENGTH_BITS.
 
-* IRQ flags
-
-* return instruction pointer
-
-* interrupt register state
-
-* array logic batching the high-resolution time stamp
-
-* enabling the runtime configuration of entropy source entropy rates
-
-Also, a testing interface to support ACVT of the hash implementation
-is provided. The reason why only hash testing is supported (as
-opposed to also provide testing for the DRNG) is the fact that the
-LRNG software hash implementation contains glue code that may
-warrant testing in addition to the testing of the software ciphers
-via the kernel crypto API. Also, for testing the CTR-DRBG, the
-underlying AES implementation would need to be tested. However,
-such AES test interface cannot be provided by the LRNG as it has no
-means to access the AES operation.
-
-Finally, the execution duration for processing a time stamp can be
-obtained with the LRNG raw entropy interface.
-
-If a test interface is not compiled, its code is a noop which has no
-impact on the performance.
+The hash extension must not sleep and must not maintain a separate
+state.
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -155,892 +137,280 @@ CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
 CC: Alexander Lobakin <alobakin@mailbox.org>
+Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/char/lrng/Kconfig        | 162 ++++++++
- drivers/char/lrng/Makefile       |   1 +
- drivers/char/lrng/lrng_testing.c | 689 +++++++++++++++++++++++++++++++
- 3 files changed, 852 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_testing.c
+ drivers/char/lrng/Kconfig       |   7 +
+ drivers/char/lrng/Makefile      |   1 +
+ drivers/char/lrng/lrng_switch.c | 231 ++++++++++++++++++++++++++++++++
+ 3 files changed, 239 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_switch.c
 
 diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index 931959f75a83..379e89e7fa53 100644
+index 1cb2f55666ac..c10a0c3f2015 100644
 --- a/drivers/char/lrng/Kconfig
 +++ b/drivers/char/lrng/Kconfig
-@@ -323,4 +323,166 @@ config LRNG_KCAPI
- 	  provided by the selected kernel crypto API RNG.
- endif # LRNG_DRNG_SWITCH
+@@ -202,4 +202,11 @@ config LRNG_CPU_ENTROPY_RATE
  
-+menuconfig LRNG_TESTING_MENU
-+	bool "LRNG testing interfaces"
-+	depends on DEBUG_FS
+ endmenu # "Entropy Source Configuration"
+ 
++menuconfig LRNG_DRNG_SWITCH
++	bool "Support DRNG runtime switching"
 +	help
-+	  Enable one or more of the following test interfaces.
-+
-+	  If unsure, say N.
-+
-+if LRNG_TESTING_MENU
-+
-+config LRNG_RAW_HIRES_ENTROPY
-+	bool "Enable entropy test interface to hires timer noise source"
-+	default y
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned high resolution time stamp noise that
-+	  is collected by the LRNG for statistical analysis. Extracted
-+	  noise data is not used to seed the LRNG.
-+
-+	  The raw noise data can be obtained using the lrng_raw_hires
-+	  debugfs file. Using the option lrng_testing.boot_raw_hires_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_RAW_JIFFIES_ENTROPY
-+	bool "Enable entropy test interface to Jiffies noise source"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned Jiffies that is collected by
-+	  the LRNG for statistical analysis. This data is used for
-+	  seeding the LRNG if a high-resolution time stamp is not
-+	  available. If a high-resolution time stamp is detected,
-+	  the Jiffies value is not collected by the LRNG and no
-+	  data is provided via the test interface. Extracted noise
-+	  data is not used to seed the random number generator.
-+
-+	  The raw noise data can be obtained using the lrng_raw_jiffies
-+	  debugfs file. Using the option lrng_testing.boot_raw_jiffies_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_RAW_IRQ_ENTROPY
-+	bool "Enable entropy test interface to IRQ number noise source"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned interrupt number that is collected by
-+	  the LRNG for statistical analysis. This data is used for
-+	  seeding the random32 PRNG external to the LRNG if a
-+	  high-resolution time stamp is available or it will be used to
-+	  seed the LRNG otherwise. Extracted noise data is not used to
-+	  seed the random number generator.
-+
-+	  The raw noise data can be obtained using the lrng_raw_irq
-+	  debugfs file. Using the option lrng_testing.boot_raw_irq_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_RAW_IRQFLAGS_ENTROPY
-+	bool "Enable entropy test interface to IRQ flags noise source"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned interrupt flags that is collected by
-+	  the LRNG for statistical analysis. This data is used for
-+	  seeding the random32 PRNG external to the LRNG if a
-+	  high-resolution time stamp is available or it will be used to
-+	  seed the LRNG otherwise. Extracted noise data is not used to
-+	  seed the random number generator.
-+
-+	  The raw noise data can be obtained using the lrng_raw_irqflags
-+	  debugfs file. Using the option lrng_testing.boot_raw_irqflags_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_RAW_RETIP_ENTROPY
-+	bool "Enable entropy test interface to RETIP value noise source"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned return instruction pointer value
-+	  that is collected by the LRNG for statistical analysis.
-+	  This data is used for seeding the random32 PRNG external
-+	  to the LRNG if a high-resolution time stamp is available or
-+	  it will be used to seed the LRNG otherwise. Extracted noise
-+	  data is not used to seed the random number generator.
-+
-+	  The raw noise data can be obtained using the lrng_raw_retip
-+	  debugfs file. Using the option lrng_testing.boot_raw_retip_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_RAW_REGS_ENTROPY
-+	bool "Enable entropy test interface to IRQ register value noise source"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned interrupt register value that is
-+	  collected by the LRNG for statistical analysis. Extracted noise
-+	  data is not used to seed the random number generator.
-+
-+	  The raw noise data can be obtained using the lrng_raw_regs
-+	  debugfs file. Using the option lrng_testing.boot_raw_regs_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_RAW_ARRAY
-+	bool "Enable test interface to LRNG raw entropy storage array"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw noise data that is collected by the LRNG
-+	  in the per-CPU array for statistical analysis. The purpose
-+	  of this interface is to verify that the array handling code
-+	  truly only concatenates data and provides the same entropy
-+	  rate as the raw unconditioned noise source when assessing
-+	  the collected data byte-wise.
-+
-+	  The data can be obtained using the lrng_raw_array debugfs
-+	  file. Using the option lrng_testing.boot_raw_array=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_IRQ_PERF
-+	bool "Enable LRNG interrupt performance monitor"
-+	help
-+	  With this option, the performance monitor of the LRNG
-+	  interrupt handling code is enabled. The file provides
-+	  the execution time of the interrupt handler in
-+	  cycles.
-+
-+	  The interrupt performance data can be obtained using
-+	  the lrng_irq_perf debugfs file. Using the option
-+	  lrng_testing.boot_irq_perf=1 the performance data of
-+	  the first 1000 entropy events since boot can be sampled.
-+
-+config LRNG_ACVT_HASH
-+	bool "Enable LRNG ACVT Hash interface"
-+	help
-+	  With this option, the LRNG built-in hash function used for
-+	  auxiliary pool management and prior to switching the
-+	  cryptographic backends is made available for ACVT. The
-+	  interface allows writing of the data to be hashed
-+	  into the interface. The read operation triggers the hash
-+	  operation to generate message digest.
-+
-+	  The ACVT interface is available with the lrng_acvt_hash
-+	  debugfs file.
-+
-+config LRNG_RUNTIME_ES_CONFIG
-+	bool "Enable runtime configuration of entropy sources"
-+	help
-+	  When enabling this option, the LRNG provides the mechanism
-+	  allowing to alter the entropy rate of each entropy source
-+	  during boot time and runtime.
-+
-+	  The following interfaces are available:
-+	  lrng_archrandom.archrandom for the CPU entropy source,
-+	  lrng_jent.jitterrng for the Jitter RNG entropy source, and
-+	  lrng_sw_noise.irq_entropy for the interrupt entropy source.
-+
-+config LRNG_TESTING
-+	bool
-+	default y if (LRNG_RAW_HIRES_ENTROPY || LRNG_RAW_JIFFIES_ENTROPY ||LRNG_RAW_IRQ_ENTROPY || LRNG_RAW_IRQFLAGS_ENTROPY || LRNG_RAW_RETIP_ENTROPY || LRNG_RAW_REGS_ENTROPY || LRNG_RAW_ARRAY || LRNG_IRQ_PERF || LRNG_ACVT_HASH)
-+
-+endif #LRNG_TESTING_MENU
++	  The Linux RNG per default uses a ChaCha20 DRNG that is
++	  accessible via the external interfaces. With this configuration
++	  option other DRNGs can be selected and loaded at runtime.
 +
  endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 3c8637befb42..532501b38a00 100644
+index ac97f0b11cb7..0eb4a6849c88 100644
 --- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -16,3 +16,4 @@ obj-$(CONFIG_LRNG_DRBG)		+= lrng_drbg.o
- obj-$(CONFIG_LRNG_KCAPI)	+= lrng_kcapi.o
- obj-$(CONFIG_LRNG_JENT)		+= lrng_jent.o
- obj-$(CONFIG_LRNG_HEALTH_TESTS)	+= lrng_health.o
-+obj-$(CONFIG_LRNG_TESTING)	+= lrng_testing.o
-diff --git a/drivers/char/lrng/lrng_testing.c b/drivers/char/lrng/lrng_testing.c
+@@ -10,3 +10,4 @@ obj-y				+= lrng_pool.o lrng_aux.o \
+ 
+ obj-$(CONFIG_NUMA)		+= lrng_numa.o
+ obj-$(CONFIG_SYSCTL)		+= lrng_proc.o
++obj-$(CONFIG_LRNG_DRNG_SWITCH)	+= lrng_switch.o
+diff --git a/drivers/char/lrng/lrng_switch.c b/drivers/char/lrng/lrng_switch.c
 new file mode 100644
-index 000000000000..99cc35abf45c
+index 000000000000..23390674012b
 --- /dev/null
-+++ b/drivers/char/lrng/lrng_testing.c
-@@ -0,0 +1,689 @@
++++ b/drivers/char/lrng/lrng_switch.c
+@@ -0,0 +1,231 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * Linux Random Number Generator (LRNG) testing interfaces
++ * LRNG DRNG switching support
 + *
-+ * Copyright (C) 2019 - 2021, Stephan Mueller <smueller@chronox.de>
++ * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
 + */
 +
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <linux/atomic.h>
-+#include <linux/bug.h>
-+#include <linux/debugfs.h>
 +#include <linux/lrng.h>
-+#include <linux/module.h>
-+#include <linux/sched.h>
-+#include <linux/sched/signal.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/types.h>
-+#include <linux/uaccess.h>
-+#include <linux/workqueue.h>
-+#include <asm/errno.h>
 +
 +#include "lrng_internal.h"
 +
-+#define LRNG_TESTING_RINGBUFFER_SIZE	1024
-+#define LRNG_TESTING_RINGBUFFER_MASK	(LRNG_TESTING_RINGBUFFER_SIZE - 1)
-+
-+struct lrng_testing {
-+	u32 lrng_testing_rb[LRNG_TESTING_RINGBUFFER_SIZE];
-+	u32 rb_reader;
-+	u32 rb_writer;
-+	atomic_t lrng_testing_enabled;
-+	spinlock_t lock;
-+	wait_queue_head_t read_wait;
-+};
-+
-+/*************************** Generic Data Handling ****************************/
-+
-+/*
-+ * boot variable:
-+ * 0 ==> No boot test, gathering of runtime data allowed
-+ * 1 ==> Boot test enabled and ready for collecting data, gathering runtime
-+ *	 data is disabled
-+ * 2 ==> Boot test completed and disabled, gathering of runtime data is
-+ *	 disabled
-+ */
-+
-+static inline void lrng_testing_reset(struct lrng_testing *data)
++static int lrng_drng_switch(struct lrng_drng *drng_store,
++			    const struct lrng_crypto_cb *cb, int node)
 +{
-+	unsigned long flags;
++	const struct lrng_crypto_cb *old_cb;
++	unsigned long flags = 0, flags2 = 0;
++	int ret;
++	u8 seed[LRNG_DRNG_SECURITY_STRENGTH_BYTES];
++	void *new_drng = cb->lrng_drng_alloc(LRNG_DRNG_SECURITY_STRENGTH_BYTES);
++	void *old_drng, *new_hash, *old_hash;
++	u32 current_security_strength;
++	bool sl = false, reset_drng = !lrng_get_available();
 +
-+	spin_lock_irqsave(&data->lock, flags);
-+	data->rb_reader = 0;
-+	data->rb_writer = 0;
-+	spin_unlock_irqrestore(&data->lock, flags);
-+}
-+
-+static inline void lrng_testing_init(struct lrng_testing *data, u32 boot)
-+{
-+	/*
-+	 * The boot time testing implies we have a running test. If the
-+	 * caller wants to clear it, he has to unset the boot_test flag
-+	 * at runtime via sysfs to enable regular runtime testing
-+	 */
-+	if (boot)
-+		return;
-+
-+	lrng_testing_reset(data);
-+	atomic_set(&data->lrng_testing_enabled, 1);
-+	pr_warn("Enabling data collection\n");
-+}
-+
-+static inline void lrng_testing_fini(struct lrng_testing *data, u32 boot)
-+{
-+	/* If we have boot data, we do not reset yet to allow data to be read */
-+	if (boot)
-+		return;
-+
-+	atomic_set(&data->lrng_testing_enabled, 0);
-+	lrng_testing_reset(data);
-+	pr_warn("Disabling data collection\n");
-+}
-+
-+static inline bool lrng_testing_store(struct lrng_testing *data, u32 value,
-+				      u32 *boot)
-+{
-+	unsigned long flags;
-+
-+	if (!atomic_read(&data->lrng_testing_enabled) && (*boot != 1))
-+		return false;
-+
-+	spin_lock_irqsave(&data->lock, flags);
-+
-+	/*
-+	 * Disable entropy testing for boot time testing after ring buffer
-+	 * is filled.
-+	 */
-+	if (*boot) {
-+		if (data->rb_writer > LRNG_TESTING_RINGBUFFER_SIZE) {
-+			*boot = 2;
-+			pr_warn_once("One time data collection test disabled\n");
-+			spin_unlock_irqrestore(&data->lock, flags);
-+			return false;
-+		}
-+
-+		if (data->rb_writer == 1)
-+			pr_warn("One time data collection test enabled\n");
++	if (IS_ERR(new_drng)) {
++		pr_warn("could not allocate new DRNG for NUMA node %d (%ld)\n",
++			node, PTR_ERR(new_drng));
++		return PTR_ERR(new_drng);
 +	}
 +
-+	data->lrng_testing_rb[data->rb_writer & LRNG_TESTING_RINGBUFFER_MASK] =
-+									value;
-+	data->rb_writer++;
-+
-+	spin_unlock_irqrestore(&data->lock, flags);
-+
-+	if (wq_has_sleeper(&data->read_wait))
-+		wake_up_interruptible(&data->read_wait);
-+
-+	return true;
-+}
-+
-+static inline bool lrng_testing_have_data(struct lrng_testing *data)
-+{
-+	return ((data->rb_writer & LRNG_TESTING_RINGBUFFER_MASK) !=
-+		 (data->rb_reader & LRNG_TESTING_RINGBUFFER_MASK));
-+}
-+
-+static inline int lrng_testing_reader(struct lrng_testing *data, u32 *boot,
-+				      u8 *outbuf, u32 outbuflen)
-+{
-+	unsigned long flags;
-+	int collected_data = 0;
-+
-+	lrng_testing_init(data, *boot);
-+
-+	while (outbuflen) {
-+		spin_lock_irqsave(&data->lock, flags);
-+
-+		/* We have no data or reached the writer. */
-+		if (!data->rb_writer ||
-+		    (data->rb_writer == data->rb_reader)) {
-+
-+			spin_unlock_irqrestore(&data->lock, flags);
-+
-+			/*
-+			 * Now we gathered all boot data, enable regular data
-+			 * collection.
-+			 */
-+			if (*boot) {
-+				*boot = 0;
-+				goto out;
-+			}
-+
-+			wait_event_interruptible(data->read_wait,
-+						 lrng_testing_have_data(data));
-+			if (signal_pending(current)) {
-+				collected_data = -ERESTARTSYS;
-+				goto out;
-+			}
-+
-+			continue;
-+		}
-+
-+		/* We copy out word-wise */
-+		if (outbuflen < sizeof(u32)) {
-+			spin_unlock_irqrestore(&data->lock, flags);
-+			goto out;
-+		}
-+
-+		memcpy(outbuf, &data->lrng_testing_rb[data->rb_reader],
-+		       sizeof(u32));
-+		data->rb_reader++;
-+
-+		spin_unlock_irqrestore(&data->lock, flags);
-+
-+		outbuf += sizeof(u32);
-+		outbuflen -= sizeof(u32);
-+		collected_data += sizeof(u32);
++	new_hash = cb->lrng_hash_alloc();
++	if (IS_ERR(new_hash)) {
++		pr_warn("could not allocate new LRNG pool hash (%ld)\n",
++			PTR_ERR(new_hash));
++		cb->lrng_drng_dealloc(new_drng);
++		return PTR_ERR(new_hash);
 +	}
 +
-+out:
-+	lrng_testing_fini(data, *boot);
-+	return collected_data;
-+}
++	if (cb->lrng_hash_digestsize(new_hash) > LRNG_MAX_DIGESTSIZE) {
++		pr_warn("digest size of newly requested hash too large\n");
++		cb->lrng_hash_dealloc(new_hash);
++		cb->lrng_drng_dealloc(new_drng);
++		return -EINVAL;
++	}
 +
-+static int lrng_testing_extract_user(struct file *file, char __user *buf,
-+				     size_t nbytes, loff_t *ppos,
-+				     int (*reader)(u8 *outbuf, u32 outbuflen))
-+{
-+	u8 *tmp, *tmp_aligned;
-+	int ret = 0, large_request = (nbytes > 256);
-+
-+	if (!nbytes)
-+		return 0;
++	current_security_strength = lrng_security_strength();
++	lrng_drng_lock(drng_store, &flags);
 +
 +	/*
-+	 * The intention of this interface is for collecting at least
-+	 * 1000 samples due to the SP800-90B requirements. So, we make no
-+	 * effort in avoiding allocating more memory that actually needed
-+	 * by the user. Hence, we allocate sufficient memory to always hold
-+	 * that amount of data.
++	 * Pull from existing DRNG to seed new DRNG regardless of seed status
++	 * of old DRNG -- the entropy state for the DRNG is left unchanged which
++	 * implies that als the new DRNG is reseeded when deemed necessary. This
++	 * seeding of the new DRNG shall only ensure that the new DRNG has the
++	 * same entropy as the old DRNG.
 +	 */
-+	tmp = kmalloc(LRNG_TESTING_RINGBUFFER_SIZE + sizeof(u32), GFP_KERNEL);
-+	if (!tmp)
-+		return -ENOMEM;
++	ret = drng_store->crypto_cb->lrng_drng_generate_helper(
++				drng_store->drng, seed, sizeof(seed));
++	lrng_drng_unlock(drng_store, &flags);
 +
-+	tmp_aligned = PTR_ALIGN(tmp, sizeof(u32));
-+
-+	while (nbytes) {
-+		int i;
-+
-+		if (large_request && need_resched()) {
-+			if (signal_pending(current)) {
-+				if (ret == 0)
-+					ret = -ERESTARTSYS;
-+				break;
-+			}
-+			schedule();
++	if (ret < 0) {
++		reset_drng = true;
++		pr_warn("getting random data from DRNG failed for NUMA node %d (%d)\n",
++			node, ret);
++	} else {
++		/* seed new DRNG with data */
++		ret = cb->lrng_drng_seed_helper(new_drng, seed, ret);
++		memzero_explicit(seed, sizeof(seed));
++		if (ret < 0) {
++			reset_drng = true;
++			pr_warn("seeding of new DRNG failed for NUMA node %d (%d)\n",
++				node, ret);
++		} else {
++			pr_debug("seeded new DRNG of NUMA node %d instance from old DRNG instance\n",
++				 node);
 +		}
-+
-+		i = min_t(int, nbytes, LRNG_TESTING_RINGBUFFER_SIZE);
-+		i = reader(tmp_aligned, i);
-+		if (i <= 0) {
-+			if (i < 0)
-+				ret = i;
-+			break;
-+		}
-+		if (copy_to_user(buf, tmp_aligned, i)) {
-+			ret = -EFAULT;
-+			break;
-+		}
-+
-+		nbytes -= i;
-+		buf += i;
-+		ret += i;
 +	}
 +
-+	kfree_sensitive(tmp);
++	mutex_lock(&drng_store->lock);
++	write_lock_irqsave(&drng_store->hash_lock, flags2);
++	/*
++	 * If we switch the DRNG from the initial ChaCha20 DRNG to something
++	 * else, there is a lock transition from spin lock to mutex (see
++	 * lrng_drng_is_atomic and how the lock is taken in lrng_drng_lock).
++	 * Thus, we need to take both locks during the transition phase.
++	 */
++	if (lrng_drng_is_atomic(drng_store)) {
++		spin_lock_irqsave(&drng_store->spin_lock, flags);
++		sl = true;
++	} else {
++		__acquire(&drng_store->spin_lock);
++	}
 +
-+	if (ret > 0)
-+		*ppos += ret;
++	/* Trigger the switch of the aux entropy pool for current node. */
++	if (drng_store == lrng_drng_init_instance()) {
++		ret = lrng_aux_switch_hash(cb, new_hash, drng_store->crypto_cb);
++		if (ret)
++			goto err;
++	}
++
++	/* Trigger the switch of the per-CPU entropy pools for current node. */
++	ret = lrng_pcpu_switch_hash(node, cb, new_hash, drng_store->crypto_cb);
++	if (ret) {
++		/* Switch the crypto operation back to be consistent */
++		WARN_ON(lrng_aux_switch_hash(drng_store->crypto_cb,
++					     drng_store->hash, cb));
++	} else {
++		if (reset_drng)
++			lrng_drng_reset(drng_store);
++
++		old_drng = drng_store->drng;
++		old_cb = drng_store->crypto_cb;
++		drng_store->drng = new_drng;
++		drng_store->crypto_cb = cb;
++
++		old_hash = drng_store->hash;
++		drng_store->hash = new_hash;
++		pr_info("Entropy pool read-hash allocated for DRNG for NUMA node %d\n",
++			node);
++
++		if (lrng_state_min_seeded())
++			lrng_set_entropy_thresh(lrng_get_seed_entropy_osr());
++
++		/* Reseed if previous LRNG security strength was insufficient */
++		if (current_security_strength < lrng_security_strength())
++			drng_store->force_reseed = true;
++
++		/* Force oversampling seeding as we initialize DRNG */
++		if (IS_ENABLED(CONFIG_LRNG_OVERSAMPLE_ENTROPY_SOURCES)) {
++			drng_store->force_reseed = true;
++			drng_store->fully_seeded = false;
++
++			/* Block output interfaces until again fully seeded */
++			if (drng_store == lrng_drng_init_instance())
++				lrng_unset_operational();
++		}
++
++		/* ChaCha20 serves as atomic instance left untouched. */
++		if (old_drng != &chacha20) {
++			old_cb->lrng_drng_dealloc(old_drng);
++			old_cb->lrng_hash_dealloc(old_hash);
++		}
++
++		pr_info("DRNG of NUMA node %d switched\n", node);
++	}
++
++err:
++	if (sl)
++		spin_unlock_irqrestore(&drng_store->spin_lock, flags);
++	else
++		__release(&drng_store->spin_lock);
++	write_unlock_irqrestore(&drng_store->hash_lock, flags2);
++	mutex_unlock(&drng_store->lock);
 +
 +	return ret;
 +}
 +
-+/************** Raw High-Resolution Timer Entropy Data Handling ***************/
-+
-+#ifdef CONFIG_LRNG_RAW_HIRES_ENTROPY
-+
-+static u32 boot_raw_hires_test = 0;
-+module_param(boot_raw_hires_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_hires_test, "Enable gathering boot time high resolution timer entropy of the first entropy events");
-+
-+static struct lrng_testing lrng_raw_hires = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_hires.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_hires.read_wait)
-+};
-+
-+bool lrng_raw_hires_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_hires, value, &boot_raw_hires_test);
-+}
-+
-+static int lrng_raw_hires_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_hires, &boot_raw_hires_test,
-+				   outbuf, outbuflen);
-+}
-+
-+static ssize_t lrng_raw_hires_read(struct file *file, char __user *to,
-+				   size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_hires_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_hires_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_hires_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_HIRES_ENTROPY */
-+
-+/********************* Raw Jiffies Entropy Data Handling **********************/
-+
-+#ifdef CONFIG_LRNG_RAW_JIFFIES_ENTROPY
-+
-+static u32 boot_raw_jiffies_test = 0;
-+module_param(boot_raw_jiffies_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_jiffies_test, "Enable gathering boot time high resolution timer entropy of the first entropy events");
-+
-+static struct lrng_testing lrng_raw_jiffies = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_jiffies.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_jiffies.read_wait)
-+};
-+
-+bool lrng_raw_jiffies_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_jiffies, value,
-+				  &boot_raw_jiffies_test);
-+}
-+
-+static int lrng_raw_jiffies_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_jiffies, &boot_raw_jiffies_test,
-+				   outbuf, outbuflen);
-+}
-+
-+static ssize_t lrng_raw_jiffies_read(struct file *file, char __user *to,
-+				   size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_jiffies_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_jiffies_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_jiffies_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_JIFFIES_ENTROPY */
-+
-+/************************** Raw IRQ Data Handling ****************************/
-+
-+#ifdef CONFIG_LRNG_RAW_IRQ_ENTROPY
-+
-+static u32 boot_raw_irq_test = 0;
-+module_param(boot_raw_irq_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_irq_test, "Enable gathering boot time entropy of the first IRQ entropy events");
-+
-+static struct lrng_testing lrng_raw_irq = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_irq.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_irq.read_wait)
-+};
-+
-+bool lrng_raw_irq_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_irq, value, &boot_raw_irq_test);
-+}
-+
-+static int lrng_raw_irq_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_irq, &boot_raw_irq_test, outbuf,
-+				   outbuflen);
-+}
-+
-+static ssize_t lrng_raw_irq_read(struct file *file, char __user *to,
-+				 size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_irq_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_irq_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_irq_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_IRQ_ENTROPY */
-+
-+/************************ Raw IRQFLAGS Data Handling **************************/
-+
-+#ifdef CONFIG_LRNG_RAW_IRQFLAGS_ENTROPY
-+
-+static u32 boot_raw_irqflags_test = 0;
-+module_param(boot_raw_irqflags_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_irqflags_test, "Enable gathering boot time entropy of the first IRQ flags entropy events");
-+
-+static struct lrng_testing lrng_raw_irqflags = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_irqflags.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_irqflags.read_wait)
-+};
-+
-+bool lrng_raw_irqflags_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_irqflags, value,
-+				  &boot_raw_irqflags_test);
-+}
-+
-+static int lrng_raw_irqflags_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_irqflags, &boot_raw_irqflags_test,
-+				   outbuf, outbuflen);
-+}
-+
-+static ssize_t lrng_raw_irqflags_read(struct file *file, char __user *to,
-+				      size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_irqflags_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_irqflags_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_irqflags_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_IRQFLAGS_ENTROPY */
-+
-+/************************ Raw _RET_IP_ Data Handling **************************/
-+
-+#ifdef CONFIG_LRNG_RAW_RETIP_ENTROPY
-+
-+static u32 boot_raw_retip_test = 0;
-+module_param(boot_raw_retip_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_retip_test, "Enable gathering boot time entropy of the first return instruction pointer entropy events");
-+
-+static struct lrng_testing lrng_raw_retip = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_retip.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_retip.read_wait)
-+};
-+
-+bool lrng_raw_retip_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_retip, value, &boot_raw_retip_test);
-+}
-+
-+static int lrng_raw_retip_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_retip, &boot_raw_retip_test,
-+				   outbuf, outbuflen);
-+}
-+
-+static ssize_t lrng_raw_retip_read(struct file *file, char __user *to,
-+				   size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_retip_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_retip_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_retip_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_RETIP_ENTROPY */
-+
-+/********************** Raw IRQ register Data Handling ************************/
-+
-+#ifdef CONFIG_LRNG_RAW_REGS_ENTROPY
-+
-+static u32 boot_raw_regs_test = 0;
-+module_param(boot_raw_regs_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_regs_test, "Enable gathering boot time entropy of the first interrupt register entropy events");
-+
-+static struct lrng_testing lrng_raw_regs = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_regs.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_regs.read_wait)
-+};
-+
-+bool lrng_raw_regs_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_regs, value, &boot_raw_regs_test);
-+}
-+
-+static int lrng_raw_regs_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_regs, &boot_raw_regs_test,
-+				   outbuf, outbuflen);
-+}
-+
-+static ssize_t lrng_raw_regs_read(struct file *file, char __user *to,
-+				  size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_regs_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_regs_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_regs_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_REGS_ENTROPY */
-+
-+/********************** Raw Entropy Array Data Handling ***********************/
-+
-+#ifdef CONFIG_LRNG_RAW_ARRAY
-+
-+static u32 boot_raw_array = 0;
-+module_param(boot_raw_array, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_array, "Enable gathering boot time raw noise array data of the first entropy events");
-+
-+static struct lrng_testing lrng_raw_array = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_array.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_array.read_wait)
-+};
-+
-+bool lrng_raw_array_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_array, value, &boot_raw_array);
-+}
-+
-+static int lrng_raw_array_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_array, &boot_raw_array, outbuf,
-+				   outbuflen);
-+}
-+
-+static ssize_t lrng_raw_array_read(struct file *file, char __user *to,
-+				   size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_array_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_array_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_array_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_ARRAY */
-+
-+/******************** Interrupt Performance Data Handling *********************/
-+
-+#ifdef CONFIG_LRNG_IRQ_PERF
-+
-+static u32 boot_irq_perf = 0;
-+module_param(boot_irq_perf, uint, 0644);
-+MODULE_PARM_DESC(boot_irq_perf, "Enable gathering boot time interrupt performance data of the first entropy events");
-+
-+static struct lrng_testing lrng_irq_perf = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_irq_perf.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_irq_perf.read_wait)
-+};
-+
-+bool lrng_perf_time(u32 start)
-+{
-+	return lrng_testing_store(&lrng_irq_perf, random_get_entropy() - start,
-+				  &boot_irq_perf);
-+}
-+
-+static int lrng_irq_perf_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_irq_perf, &boot_irq_perf, outbuf,
-+				   outbuflen);
-+}
-+
-+static ssize_t lrng_irq_perf_read(struct file *file, char __user *to,
-+				  size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_irq_perf_reader);
-+}
-+
-+static const struct file_operations lrng_irq_perf_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_irq_perf_read,
-+};
-+
-+#endif /* CONFIG_LRNG_IRQ_PERF */
-+
-+/*********************************** ACVT ************************************/
-+
-+#ifdef CONFIG_LRNG_ACVT_HASH
-+
-+/* maximum amount of data to be hashed as defined by ACVP */
-+#define LRNG_ACVT_MAX_SHA_MSG	(65536 >> 3)
-+
 +/*
-+ * As we use static variables to store the data, it is clear that the
-+ * test interface is only able to handle single threaded testing. This is
-+ * considered to be sufficient for testing. If multi-threaded use of the
-+ * ACVT test interface would be performed, the caller would get garbage
-+ * but the kernel operation is unaffected by this.
++ * Switch the existing DRNG instances with new using the new crypto callbacks.
++ * The caller must hold the lrng_crypto_cb_update lock.
 + */
-+static u8 lrng_acvt_hash_data[LRNG_ACVT_MAX_SHA_MSG]
-+						__aligned(LRNG_KCAPI_ALIGN);
-+static atomic_t lrng_acvt_hash_data_size = ATOMIC_INIT(0);
-+static u8 lrng_acvt_hash_digest[LRNG_ATOMIC_DIGEST_SIZE];
-+
-+static ssize_t lrng_acvt_hash_write(struct file *file, const char __user *buf,
-+				    size_t nbytes, loff_t *ppos)
++static int lrng_drngs_switch(const struct lrng_crypto_cb *cb)
 +{
-+	if (nbytes > LRNG_ACVT_MAX_SHA_MSG)
-+		return -EINVAL;
++	struct lrng_drng **lrng_drng = lrng_drng_instances();
++	struct lrng_drng *lrng_drng_init = lrng_drng_init_instance();
++	int ret = 0;
 +
-+	atomic_set(&lrng_acvt_hash_data_size, (int)nbytes);
++	/* Update DRNG */
++	if (lrng_drng) {
++		u32 node;
 +
-+	return simple_write_to_buffer(lrng_acvt_hash_data,
-+				      LRNG_ACVT_MAX_SHA_MSG, ppos, buf, nbytes);
-+}
++		for_each_online_node(node) {
++			if (lrng_drng[node])
++				ret = lrng_drng_switch(lrng_drng[node], cb,
++						       node);
++		}
++	} else {
++		ret = lrng_drng_switch(lrng_drng_init, cb, 0);
++	}
 +
-+static ssize_t lrng_acvt_hash_read(struct file *file, char __user *to,
-+				   size_t count, loff_t *ppos)
-+{
-+	SHASH_DESC_ON_STACK(shash, NULL);
-+	const struct lrng_crypto_cb *crypto_cb = &lrng_cc20_crypto_cb;
-+	ssize_t ret;
-+
-+	if (count > LRNG_ATOMIC_DIGEST_SIZE)
-+		return -EINVAL;
-+
-+	ret = crypto_cb->lrng_hash_init(shash, NULL) ?:
-+	      crypto_cb->lrng_hash_update(shash, lrng_acvt_hash_data,
-+				atomic_read_u32(&lrng_acvt_hash_data_size)) ?:
-+	      crypto_cb->lrng_hash_final(shash, lrng_acvt_hash_digest);
-+	if (ret)
-+		return ret;
-+
-+	return simple_read_from_buffer(to, count, ppos, lrng_acvt_hash_digest,
-+				       sizeof(lrng_acvt_hash_digest));
-+}
-+
-+static const struct file_operations lrng_acvt_hash_fops = {
-+	.owner = THIS_MODULE,
-+	.open = simple_open,
-+	.llseek = default_llseek,
-+	.read = lrng_acvt_hash_read,
-+	.write = lrng_acvt_hash_write,
-+};
-+
-+#endif /* CONFIG_LRNG_ACVT_DRNG */
-+
-+/**************************************************************************
-+ * Debugfs interface
-+ **************************************************************************/
-+
-+static int __init lrng_raw_init(void)
-+{
-+	struct dentry *lrng_raw_debugfs_root;
-+
-+	lrng_raw_debugfs_root = debugfs_create_dir(KBUILD_MODNAME, NULL);
-+
-+#ifdef CONFIG_LRNG_RAW_HIRES_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_hires", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_hires_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_JIFFIES_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_jiffies", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_jiffies_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_IRQ_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_irq", 0400, lrng_raw_debugfs_root,
-+				   NULL, &lrng_raw_irq_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_IRQFLAGS_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_irqflags", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_irqflags_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_RETIP_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_retip", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_retip_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_REGS_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_regs", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_regs_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_ARRAY
-+	debugfs_create_file_unsafe("lrng_raw_array", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_array_fops);
-+#endif
-+#ifdef CONFIG_LRNG_IRQ_PERF
-+	debugfs_create_file_unsafe("lrng_irq_perf", 0400, lrng_raw_debugfs_root,
-+				   NULL, &lrng_irq_perf_fops);
-+#endif
-+#ifdef CONFIG_LRNG_ACVT_HASH
-+	debugfs_create_file_unsafe("lrng_acvt_hash", 0600,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_acvt_hash_fops);
-+#endif
++	if (!ret)
++		lrng_set_available();
 +
 +	return 0;
 +}
 +
-+module_init(lrng_raw_init);
++/**
++ * lrng_set_drng_cb - Register new cryptographic callback functions for DRNG
++ * The registering implies that all old DRNG states are replaced with new
++ * DRNG states.
++ *
++ * @cb: Callback functions to be registered -- if NULL, use the default
++ *	callbacks pointing to the ChaCha20 DRNG.
++ *
++ * Return:
++ * * 0 on success
++ * * < 0 on error
++ */
++int lrng_set_drng_cb(const struct lrng_crypto_cb *cb)
++{
++	struct lrng_drng *lrng_drng_init = lrng_drng_init_instance();
++	int ret;
++
++	if (!cb)
++		cb = &lrng_cc20_crypto_cb;
++
++	mutex_lock(&lrng_crypto_cb_update);
++
++	/*
++	 * If a callback other than the default is set, allow it only to be
++	 * set back to the default callback. This ensures that multiple
++	 * different callbacks can be registered at the same time. If a
++	 * callback different from the current callback and the default
++	 * callback shall be set, the current callback must be deregistered
++	 * (e.g. the kernel module providing it must be unloaded) and the new
++	 * implementation can be registered.
++	 */
++	if ((cb != &lrng_cc20_crypto_cb) &&
++	    (lrng_drng_init->crypto_cb != &lrng_cc20_crypto_cb)) {
++		pr_warn("disallow setting new cipher callbacks, unload the old callbacks first!\n");
++		ret = -EINVAL;
++		goto out;
++	}
++
++	ret = lrng_drngs_switch(cb);
++
++out:
++	mutex_unlock(&lrng_crypto_cb_update);
++	return ret;
++}
++EXPORT_SYMBOL(lrng_set_drng_cb);
 -- 
 2.31.1
 
