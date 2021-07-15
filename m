@@ -6,110 +6,113 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A77DC07E96
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jul 2021 05:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 185C6C47E4D
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jul 2021 07:40:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 70AB66136E
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jul 2021 05:25:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 066A76128B
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jul 2021 07:40:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231718AbhGOF2g (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Jul 2021 01:28:36 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.167]:19389 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbhGOF2g (ORCPT
+        id S235393AbhGOHm5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Jul 2021 03:42:57 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:50280 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232345AbhGOHm4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jul 2021 01:28:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626326694;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=YvOvb7F9+bANpwvucgDOlOa9eGWo3BPDkvFZuhPIXrY=;
-    b=jLsq06flzzaEXx/DputCqkaJwAU4avvqYoqEfIyhNkmfoLNUo1f1G0NyOEvr8/faWe
-    odramQov7akwq71vQN9j8xfRtD6/3z+P7QuL8S0zUNiZh+pkowFdPNZ71vvusAwPqeBH
-    Di8UTVUIHt2bpW5rpzSCHqUF1IU+t1EPUrLTdffXJFU5CtZSo9oNxKwFUvHIlmiOek/j
-    M7TvyHVTNKFJE9EW5MhCuFe3lLdGjSuknPM6DUo4z2c4IxMNWtpPxS/moyvEyx31bpsC
-    w+CFFX7rdzbLHmKUDFqeTfZEr58dtYAJeQKjoKo9HXYnqTl6AjenMgKp7c3lL7ZTsACN
-    B5rQ==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaLvSd940="
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-    by smtp.strato.de (RZmta 47.28.1 DYNA|AUTH)
-    with ESMTPSA id 9043bbx6F5Oq1F8
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Thu, 15 Jul 2021 07:24:52 +0200 (CEST)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org,
-        kernel test robot <lkp@intel.com>
-Cc:     kbuild-all@lists.01.org, Willy Tarreau <w@1wt.eu>,
-        Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>
-Subject: Re: [PATCH v41 01/13] Linux Random Number Generator
-Date:   Thu, 15 Jul 2021 07:24:52 +0200
-Message-ID: <2681052.7KKukIsK80@positron.chronox.de>
-In-Reply-To: <202107150632.Yy6v9Pmq-lkp@intel.com>
-References: <1944948.TYRkL7eqjW@positron.chronox.de> <202107150632.Yy6v9Pmq-lkp@intel.com>
+        Thu, 15 Jul 2021 03:42:56 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id A07AC2279C;
+        Thu, 15 Jul 2021 07:40:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1626334801; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5JMBVUc1fC80+7deLYH6ZLQZq/uUCL7N+S0Ckg+qtbI=;
+        b=Twb6x088Ds05jfTu5/IB5porBtTYCy7ypb/AOBkBIcuTOW8D+d7upMLB1l3nohEF7iPW/p
+        8deiq9K1vIvBrAZjm5PrzzYiClmYOaPP+BfxFaSOoAZgjQKRVJE/jYn3GYYxV/6Wzn5j3A
+        OCFRqAN5FYIib3+LRrkkcU505ZTakD0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1626334801;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5JMBVUc1fC80+7deLYH6ZLQZq/uUCL7N+S0Ckg+qtbI=;
+        b=iCqY9l43TypCWFiyhhci4MfAifGCRh3LrqaNuvVgpKgYxC55KpqRWrvVubNKGrttlJ8kft
+        DVVygz62vy0zvcDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7FEF413C2C;
+        Thu, 15 Jul 2021 07:40:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id teNrHVDm72BeZwAAMHmgww
+        (envelope-from <jroedel@suse.de>); Thu, 15 Jul 2021 07:40:00 +0000
+Date:   Thu, 15 Jul 2021 09:39:58 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 01/40] KVM: SVM: Add support to handle AP
+ reset MSR protocol
+Message-ID: <YO/mTtzslwrAxuxz@suse.de>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-2-brijesh.singh@amd.com>
+ <YO9GWVsZmfXJ4BRl@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YO9GWVsZmfXJ4BRl@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Donnerstag, 15. Juli 2021, 00:55:23 CEST schrieb kernel test robot:
-
-Hi,
-
-> All errors (new ones prefixed by >>):
-> >> drivers/char/lrng/lrng_chacha20.c:32:8: error: structure variable
-> >> 'chacha20' with 'latent_entropy' attribute has a non-integer field
-> >> 'block'
->       32 | struct chacha20_state chacha20 __latent_entropy;
+On Wed, Jul 14, 2021 at 08:17:29PM +0000, Sean Christopherson wrote:
+> On Wed, Jul 07, 2021, Brijesh Singh wrote:
+> > From: Tom Lendacky <thomas.lendacky@amd.com>
+> > 
+> > Add support for AP Reset Hold being invoked using the GHCB MSR protocol,
+> > available in version 2 of the GHCB specification.
 > 
->          |        ^~~~~~~~~~~~~~
-> 
-> vim +32 drivers/char/lrng/lrng_chacha20.c
-> 
->     26
->     27	/*
->     28	 * Have a static memory blocks for the ChaCha20 DRNG instance to
-> avoid calling 29	 * kmalloc too early in the boot cycle. For subsequent
-> allocation requests, 30	 * such as per-NUMA-node DRNG instances, kmalloc
-> will be used. 31	 */
-> 
->   > 32	struct chacha20_state chacha20 __latent_entropy;
-> 
->     33
+> Please provide a brief overview of the protocol, and why it's needed.  I assume
+> it's to allow AP wakeup without a shared GHCB?
 
-Thanks for the notification.
+Yes, this is needed for SEV-ES kexec support to park APs without the
+need for memory that will be owned by the new kernel when APs are woken
+up.
 
-I think this is a false-positive discussed before. __latent_entropy is 
-seemingly allowed for an entire linear buffer as seen in the declaration of 
-the variable input_pool_data in driver/char/random.c which is an array of u32.
+You can have a look into my SEV-ES kexec/kdump patch-set for details:
 
-The struct chacha20_state is a linear buffer of u32 words. 
+	https://lore.kernel.org/lkml/20210705082443.14721-1-joro@8bytes.org/
 
-struct chacha20_block {
-        u32 constants[4];
-        union {
-                u32 u[CHACHA_KEY_SIZE_WORDS];
-                u8  b[CHACHA_KEY_SIZE];
-        } key;
-        u32 counter;
-        u32 nonce[3];
-};
+I also sent this patch separatly earlier this week to enable GHCB
+protocol version 2 support in KVM.
 
-Therefore it should be identical to the aforementioned example. The 
-__latent_entropy marker therefore seems to be appropriate for this structure.
+Regards,
 
-Ciao
-Stephan
-
-
+	Joerg
