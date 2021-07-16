@@ -2,198 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E65C1C636C9
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jul 2021 23:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BC5C07E95
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jul 2021 07:26:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C38886128D
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jul 2021 23:48:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5758B613E9
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jul 2021 07:26:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232437AbhGOXvS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Jul 2021 19:51:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41708 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232427AbhGOXvS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jul 2021 19:51:18 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66599C061764
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jul 2021 16:48:24 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id 37so8260116pgq.0
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jul 2021 16:48:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=5OQMDn6Hx/yHVRBDOLcOoarZgTpJ6ou0lJ0Voq0OG4M=;
-        b=Xerp+3Ma+7CKr4/78JI541G8uYD8//jwvClMOF/fOO7QmiQm8HAEUnu6NpDbBLMH1q
-         bZGV9qTn+NrOGGYaOzCjTB7B/aPpvd5It43hKuUVskOmztUVNBp7D+395FsS2sQvlrxq
-         xVAo8FpFCDhowTVg4hGaiMCdbGyqn6qUNM0miSvgPCaSI49UBGL5vj48ibmF6+Rb17X0
-         w7C8AuBB8wkZlc1aeNQ5K9KigBlX9jYvbv1ccsercnerPpuW03IdweX4DvdjBnQR82bX
-         e0jajjskDBGjMsxL7Fj/B+zCTGGj135zbVxs9kViMAV8ZYC/Kcwbxlf9wsPPlckGHHm4
-         ds+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5OQMDn6Hx/yHVRBDOLcOoarZgTpJ6ou0lJ0Voq0OG4M=;
-        b=EBUlcDuqe3peUVRjLjk/Jk6LFGJbeNZaqpo7oFVzfR+ye/mlgqYWe9UUrncM9dz7T4
-         mIwSK3V5EuWdpsoGhm9zFWp5uiyMu4hQkkWezhpaksQY7mu5D370PT83w7HwcxIT/8rV
-         6sE8ryST77hHsbzzgUA9VyxKpeoOHBx9+rEdV9jWzZiNRxRIGoBxz9vZTJVFjr/Aks2i
-         gnvqbZZU45HXOGVapvXWshwqCkl3XX1srgjuQEhudyrOwWZvaqZntOc/uxPwNamujy/Z
-         wSlF9Osb6cNoc5AaL0QVYvvlQt4Qt853Ochb2TTNE7Bm4RCPXA/nF2t5LbR39Eji5Hd+
-         yTqg==
-X-Gm-Message-State: AOAM533gU/MaxHvFoyBl53Le5ejEsfQgu7nlbxynIAohwVQp3nJXrcpK
-        nf7cglYG40483tglTPZadYDrRA==
-X-Google-Smtp-Source: ABdhPJzB/aLwcMzRnzgFsmskaKhCj/u4SogoqFPq9x0TyUcwapKqqebbwl1vM0o7pXaHZ6NJDfrs4g==
-X-Received: by 2002:a63:4e5d:: with SMTP id o29mr275121pgl.379.1626392903572;
-        Thu, 15 Jul 2021 16:48:23 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o184sm8719553pga.18.2021.07.15.16.48.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jul 2021 16:48:22 -0700 (PDT)
-Date:   Thu, 15 Jul 2021 23:48:19 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 15/40] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-Message-ID: <YPDJQ0uumar8j22y@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-16-brijesh.singh@amd.com>
+        id S235441AbhGPH33 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Jul 2021 03:29:29 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:51394 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231737AbhGPH32 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Jul 2021 03:29:28 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1m4IEu-0004op-4f; Fri, 16 Jul 2021 15:26:28 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1m4IEn-0001yK-8D; Fri, 16 Jul 2021 15:26:21 +0800
+Date:   Fri, 16 Jul 2021 15:26:21 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Julia Lawall <julia.lawall@inria.fr>
+Cc:     Megha Dey <megha.dey@intel.com>,
+        labuser <labuser@ssp-romleySNB-cdi172.jf.intel.com>,
+        Tomasz Kantecki <tomasz.kantecki@intel.com>,
+        linux-crypto@vger.kernel.org, kbuild-all@lists.01.org
+Subject: Re: [PATCH] crypto: fix flexible_array.cocci warnings
+Message-ID: <20210716072621.GA7555@gondor.apana.org.au>
+References: <alpine.DEB.2.22.394.2106291346290.4909@hadrien>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707183616.5620-16-brijesh.singh@amd.com>
+In-Reply-To: <alpine.DEB.2.22.394.2106291346290.4909@hadrien>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> The behavior and requirement for the SEV-legacy command is altered when
-> the SNP firmware is in the INIT state. See SEV-SNP firmware specification
-> for more details.
+On Tue, Jun 29, 2021 at 01:48:01PM +0200, Julia Lawall wrote:
+> From: kernel test robot <lkp@intel.com>
 > 
-> When SNP is INIT state, all the SEV-legacy commands that cause the
-> firmware to write memory must be in the firmware state. The TMR memory
+> Zero-length and one-element arrays are deprecated, see
+> Documentation/process/deprecated.rst
+> Flexible-array members should be used instead.
+> 
+> Generated by: scripts/coccinelle/misc/flexible_array.cocci
+> 
+> Fixes: 7540b2861e52 ("crypto: aesni - AVX512 version of AESNI-GCM using VPCLMULQDQ")
+> CC: Megha Dey <megha.dey@intel.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Julia Lawall <julia.lawall@inria.fr>
+> ---
+> 
+> tree:   https://github.com/meghadey/crypto for_crypto_avx512
+> head:   a89c5880f0d6260dd593bf579df26f2a2d56ac32
+> commit: 7540b2861e5292b5993f8e693fc69510b2a7277a [5/6] crypto: aesni - AVX512 version of AESNI-GCM using VPCLMULQDQ
+> :::::: branch date: 7 hours ago
+> :::::: commit date: 7 hours ago
+> 
+>  aesni-intel_glue.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -87,7 +87,7 @@ struct gcm_context_data {
+>  	u64 partial_block_len;
+>  	u64 unused;
+>  	/* Allocate space for hash_keys later */
+> -	u8 hash_keys[0];
+> +	u8 hash_keys[];
 
-It'd be helpful to spell out Trusted Memory Region, I hadn't seen that
-term before and for some reason my brain immediately thought "xAPIC register!".
+Unfortunately this patch doesn't apply to the current crypto tree.
+But the good news is that the current tree no longer has a zero-
+length array in that struct.
 
-> is allocated by the host but updated by the firmware, so, it must be
-> in the firmware state.  Additionally, the TMR memory must be a 2MB aligned
-> instead of the 1MB, and the TMR length need to be 2MB instead of 1MB.
-> The helper __snp_{alloc,free}_firmware_pages() can be used for allocating
-> and freeing the memory used by the firmware.
-
-None of this actually states what the patch does, e.g. it's not clear whether
-all allocations are being converted to 2mb or just the SNP.  Looks like it's
-just SNP.  Something like this?
-
-  Allocate the Trusted Memory Region (TMR) as a 2mb sized/aligned region when
-  SNP is enabled to satisfy new requirements for SNP.  Continue allocating a
-  1mb region for !SNP configuration.
-
-> While at it, provide API that can be used by others to allocate a page
-> that can be used by the firmware. The immediate user for this API will
-> be the KVM driver. The KVM driver to need to allocate a firmware context
-> page during the guest creation. The context page need to be updated
-> by the firmware. See the SEV-SNP specification for further details.
-
-...
-
-> @@ -1153,8 +1269,10 @@ static void sev_firmware_shutdown(struct sev_device *sev)
->  		/* The TMR area was encrypted, flush it from the cache */
->  		wbinvd_on_all_cpus();
->  
-> -		free_pages((unsigned long)sev_es_tmr,
-> -			   get_order(SEV_ES_TMR_SIZE));
-> +
-> +		__snp_free_firmware_pages(virt_to_page(sev_es_tmr),
-> +					  get_order(sev_es_tmr_size),
-> +					  false);
->  		sev_es_tmr = NULL;
->  	}
->  
-> @@ -1204,16 +1322,6 @@ void sev_pci_init(void)
->  	    sev_update_firmware(sev->dev) == 0)
->  		sev_get_api_version();
->  
-> -	/* Obtain the TMR memory area for SEV-ES use */
-> -	tmr_page = alloc_pages(GFP_KERNEL, get_order(SEV_ES_TMR_SIZE));
-> -	if (tmr_page) {
-> -		sev_es_tmr = page_address(tmr_page);
-> -	} else {
-> -		sev_es_tmr = NULL;
-> -		dev_warn(sev->dev,
-> -			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
-> -	}
-> -
->  	/*
->  	 * If boot CPU supports the SNP, then first attempt to initialize
->  	 * the SNP firmware.
-> @@ -1229,6 +1337,16 @@ void sev_pci_init(void)
->  		}
->  	}
->  
-> +	/* Obtain the TMR memory area for SEV-ES use */
-> +	tmr_page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(sev_es_tmr_size), false);
-> +	if (tmr_page) {
-> +		sev_es_tmr = page_address(tmr_page);
-> +	} else {
-> +		sev_es_tmr = NULL;
-> +		dev_warn(sev->dev,
-> +			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
-> +	}
-
-I think your patch ordering got a bit wonky.  AFAICT, the chunk that added
-sev_snp_init() and friends in the previous patch 14 should have landed above
-the TMR allocation, i.e. the code movement here should be unnecessary.
-
->  	/* Initialize the platform */
->  	rc = sev_platform_init(&error);
->  	if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
-
-...
-
-> @@ -961,6 +965,13 @@ static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *erro
->  	return -ENODEV;
->  }
->  
-> +static inline void *snp_alloc_firmware_page(gfp_t mask)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static inline void snp_free_firmware_page(void *addr) { }
-
-Hmm, I think we should probably bite the bullet and #ifdef and/or stub out large
-swaths of svm/sev.c before adding SNP support.  sev.c is getting quite massive,
-and we're accumulating more and more stubs outside of KVM because its SEV code
-is compiled unconditionally.
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
