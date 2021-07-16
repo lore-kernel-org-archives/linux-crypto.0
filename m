@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6940CC12002
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jul 2021 20:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1856AC12002
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jul 2021 20:26:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 48594611F1
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jul 2021 20:23:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE1CD6120A
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jul 2021 20:26:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230172AbhGPU0B (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Jul 2021 16:26:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38164 "EHLO
+        id S233529AbhGPU3A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Jul 2021 16:29:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232524AbhGPU0A (ORCPT
+        with ESMTP id S232172AbhGPU27 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jul 2021 16:26:00 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D72CC061765
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Jul 2021 13:23:04 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id w15so11028119pgk.13
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Jul 2021 13:23:04 -0700 (PDT)
+        Fri, 16 Jul 2021 16:28:59 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7686EC061760
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Jul 2021 13:26:03 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d1so5901665plg.0
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Jul 2021 13:26:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=x85rFiYKbp37maDQJOeVsTrROe6NzpgrCb0rCmLZT5M=;
-        b=A3iaz5afAQGHEMb5dAx2xN1+E/Jkl1exglVeIMNRgB04QPj2THSJNWjFHH4urOC4dj
-         azzuyrfh/0lup7t52U45wwGHGx8zncavC+7HwrEL3oJwy/PeRI46jUEK0qujvYADefKM
-         ArovxtIPS/UAgoxpNVVFKG1HXyvqmh/SOMk3r2oZmO0lj0BNXSOSYxiq86oLWGpzEqzx
-         KFUbSDnqnzAODG1aEbYMh+kDC3D+M6SXrMy0/MM0ejw2dka6jMwj5/ZiAjC+QAPQ0dBB
-         tZ2XeFnfbp2L4X1kFk+q9un5p8BAkl8dwzio2EB2PCFjXW8QMJqBrsIbUOddU2P4I+C3
-         O5Pg==
+        bh=8tvSxeWjAmiPV1ecaOaeAqaw4ZJnCIRGxkWGCmBjbA8=;
+        b=jIlbt7ooesOkOpbmts5nBhgs9jIU/SiAau352QIY0Hgeubf1kEbT+OcR/XjVd4kT+v
+         3fD8lV4szvIhxFXyM+uYYrQGWrg5wBxeuQ2S0VFf48AH+i4/ScDMvZ/wpqxl8XaLtWB1
+         5sBw774M3CLXtT+Vj+GS9UQahjyyarePM6P/ZXZBxsr54dQm0m5kpkcDppT69Py56TWs
+         57gCQFY57LOuhVvwhFAZTfqiyYlRvDo2aFfrRtqAV3Gj+D7CgmOqL2nfkKqI7gWSNwWP
+         Evl25i5YTmPuqDf/s9LZtr9s03mx1pQcAG1vJ40a1kDU8OqGPXFnRlemxj0KkvtmTLYB
+         bqPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=x85rFiYKbp37maDQJOeVsTrROe6NzpgrCb0rCmLZT5M=;
-        b=YKKiSnWSrSnwLcziyuGRm0kZhSb/wyJHqLZhl81DZzzZKPYV2VXBYZlVisD+sQp7+E
-         jMrW0yqXX0rifb2WmhqB5cqG9QdMxC6+sMkKA7qPZpEcH16v+gWtJpBLE6ICLWONxfbq
-         q5IhJ5jvG9FsgyAADINWW0I41wQFflPYj0d+x5vReQmoUKONkD4VUx65fTCbglynjV47
-         YKirf6QRSuLCvCiPCPbdxm/zuvKTo4G1Va83xmVRj3NYTrvDmTo5EIQMVZsTDSEBf7bC
-         kTodLpQRTwYh4t0Hm99Ebd0hHUlZYvkUO7pzH18EUad+OYpntcD5eQY20YT38hAFNOX9
-         7SEg==
-X-Gm-Message-State: AOAM531rLgFYsq6J1dt1UwGJZ6N7NAABwfJGRjtdcQlkCZlwFj+Ukbpx
-        YPnynpdGQEDj6vCypJDn2XkQpw==
-X-Google-Smtp-Source: ABdhPJxWNEVP2UwoOT65EqEX3Q4hJT3FKuvSXbD5nsfxrItaCDkJFf10AIQZc6tNG7uEGWx3oLscpg==
-X-Received: by 2002:a63:1e59:: with SMTP id p25mr11432905pgm.110.1626466983659;
-        Fri, 16 Jul 2021 13:23:03 -0700 (PDT)
+        bh=8tvSxeWjAmiPV1ecaOaeAqaw4ZJnCIRGxkWGCmBjbA8=;
+        b=B7h13IwZOF0gNGyRsIHlmh+aku7Bx3l3GawGxRoxRiyjuC3OIRQ2V1JIMkH51WRl3G
+         WjWJwX7Mq2rV3cXcMGo5Qjybe2RFdma9DAxnildhkZZW53HuCG5IIpbP/Fbge9dlhsiG
+         A2DxajiqF/SasoQ88p/pzORl57NryKf57S/Ah4cge9CprG1P6buFYRJetXD9v0GgOasb
+         fFXdreZ6owJsuzm2trBSZYpkWvtOix32MeHI2VoPIxgHJ5LeT8F1aXIyhSWLTlH6gv97
+         yjt55q+WCpzjYWfSFLyGbyVVoj3e0vlYE6CXlMhFRjXcb0PixosTFtXrfv/TsZA2ZX0J
+         4zoQ==
+X-Gm-Message-State: AOAM531XpYDjWgZvLV5dlFFNr+Kh7OOsYpQ1MinI6fU2QQMfLYmFuCIz
+        azMEjGpHQ1UP0QEkP04yZ+WJGA==
+X-Google-Smtp-Source: ABdhPJyV16kybEQiRhFSioiQewGBf027oKkuUbSPAPg4nYD34PcD9PtL9JdNgcXLrSoQ1Ly4eisLjQ==
+X-Received: by 2002:a17:90a:4893:: with SMTP id b19mr11380703pjh.45.1626467162727;
+        Fri, 16 Jul 2021 13:26:02 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o134sm11534516pfg.62.2021.07.16.13.23.02
+        by smtp.gmail.com with ESMTPSA id b15sm11895147pgm.15.2021.07.16.13.26.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jul 2021 13:23:03 -0700 (PDT)
-Date:   Fri, 16 Jul 2021 20:22:59 +0000
+        Fri, 16 Jul 2021 13:26:02 -0700 (PDT)
+Date:   Fri, 16 Jul 2021 20:25:58 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Brijesh Singh <brijesh.singh@amd.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -82,30 +82,28 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
         npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 30/40] KVM: X86: Define new RMP check
- related #NPF error bits
-Message-ID: <YPHqo+KefHLrAclx@google.com>
+Subject: Re: [PATCH Part2 RFC v4 31/40] KVM: X86: update page-fault trace to
+ log the 64-bit error code
+Message-ID: <YPHrVkFJwRsMm9V2@google.com>
 References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-31-brijesh.singh@amd.com>
+ <20210707183616.5620-32-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707183616.5620-31-brijesh.singh@amd.com>
+In-Reply-To: <20210707183616.5620-32-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Nit, please use "KVM: x86:" for the shortlogs.  And ubernit, the "new" part is
-redundant and/or misleading, e.g. implies that more error code bits are being
-added to existing SNP/RMP checks.  E.g.
-
-  KVM: x86: Define RMP page fault error code bits for #NPT
-
 On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> When SEV-SNP is enabled globally, the hardware places restrictions on all
-> memory accesses based on the RMP entry, whether the hyperviso or a VM,
+> The page-fault error code is a 64-bit value, but the trace prints only
 
-Another typo.
+It's worth clarifying that #NPT has a 64-bit error code, and so KVM also passes
+around a 64-bit PFEC.  E.g. the above statement is wrong for legacy #PF.
 
-> performs the accesses. When hardware encounters an RMP access violation
-> during a guest access, it will cause a #VMEXIT(NPF).
+> the lower 32-bits. Some of the SEV-SNP RMP fault error codes are
+> available in the upper 32-bits.
+
+Can you send this separately with Cc: stable@?  And I guess tweak the changelog
+to replace "SEV-SNP RMP" with a reference to e.g. PFERR_GUEST_FINAL_MASK.  KVM
+already has error codes that can set the upper bits.
