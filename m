@@ -2,61 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D352BC12002
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jul 2021 18:00:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F03C12002
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jul 2021 18:15:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1835613F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jul 2021 18:00:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77F4D613F7
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jul 2021 18:15:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231535AbhGPSD2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Jul 2021 14:03:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33842 "EHLO
+        id S231728AbhGPSSC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Jul 2021 14:18:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231700AbhGPSD0 (ORCPT
+        with ESMTP id S231640AbhGPSSC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jul 2021 14:03:26 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AB08C061766
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Jul 2021 11:00:31 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id 62so10725756pgf.1
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Jul 2021 11:00:31 -0700 (PDT)
+        Fri, 16 Jul 2021 14:18:02 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1672FC061764
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Jul 2021 11:15:07 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id y4so10701367pgl.10
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Jul 2021 11:15:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=JJT3j10iJIIOsPHEEnbNQuVLTw5JnzSQ/acvTlgZAJ8=;
-        b=GwzdfStOFnu5bUYpHJmW5qaywa/s2A2QUEultL+m1JqZOp4yK+grRGfNrwTW9gYDni
-         UqvwTqYFLACzmBr+3+oAJUIEDDk0SfGX3M+dkfZq23+XWfGrzkVviYu0lCuiXM9PkmfN
-         VnO3DYxEBTHGP7EBr9YSyyvciKgdSDS/ekdvhUo9MHlz9j6dStUSGQcBD0oB8sHJKH3U
-         gWA5LIEuf9cVeVGn0fTk3/vs6U082z3MZAKK3zm+d4QRce0q2sMrV2JKMM+i6LkRQuyQ
-         6PU1WFaWteTtKwq+nAD46Kkt1uKcDZ7ZIHdLOQiNxLErn0Ufz5tdxfui9LCKHwLL6ctE
-         vBnA==
+        bh=wVN/iDIudUuTtvffNdHVJek4W2vj0jwmUlaVHOVcX6g=;
+        b=k5qWLNHzSnnWN0UAxjp03hvk7WlSuNe7oMs/qkUkZqoD+Gh+CjdDdFA5IriWV0hLXc
+         St1QHeoPM6fZ3bDQT70Et/jissBJZoORHIo/zH6SP5BK7LLS/HGEI5LUnlAn3Kx4P72B
+         CvCxJ7wDGFaawPhPzbVHO5mJ9ka40eSz+E3wwCB4hbNr+m38+X8VxlrKd3Z9QEe52f9z
+         y8lMZUeY3UOdsXfE7aCDTt47ep3SpBzp5pE4RgxW3jl76KgTaRDPdeQYBD7MArSGDC1a
+         tH4v2gktiah865XZOC00Z3Yk7yp+iyIFok/BsUV0/mfjqR0xGbA7YikRaIKzJsmi4jTX
+         u2uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=JJT3j10iJIIOsPHEEnbNQuVLTw5JnzSQ/acvTlgZAJ8=;
-        b=NUrkQI10lHTP3Vo0b7z1EgzIL8IfY5Zf6Ilubpqf15EVMVMCuxZ3WSfw+9amB/zQqQ
-         X1Sm5VhvCKCos6S+rD4OdWGf/g/BD6qBsaG+wG9WD2tkfHAJ+AvjcDBaSZcJV3rOp/0+
-         M4iSPPR7k18TaTFSHapjrIGmy6dEGsqL2TDwGXo+lR9NC7BSCk0ZEFgTSVGvGstTDUZ1
-         emyfD+jVKic5uccMLv39QKMqe+LTfsyEpRcpOfzYf7LLwT9mOr7vT/dg05FenfOx6ohV
-         6fqZtqeqyg8vYjAaEBnvgYvK7bJSsIkG035Vtu1zpn44NcsqGDybQAN/G9hOpt4Uks0J
-         iODQ==
-X-Gm-Message-State: AOAM531tdN9/Zv3fnv+gi0DlwO/HgJpj5IeTUgAnM7zJEao85X9RxPWc
-        nAIj6jJfg4R02sFTIfgx3kxrPw==
-X-Google-Smtp-Source: ABdhPJyJxNSW4W+lQGEGZFuQKmM6xXoN4SsZLj1WhAcFQMeACiCuwpzphldu3fpnqiStbul1Zx/cQA==
-X-Received: by 2002:a65:6118:: with SMTP id z24mr11085274pgu.325.1626458430711;
-        Fri, 16 Jul 2021 11:00:30 -0700 (PDT)
+        bh=wVN/iDIudUuTtvffNdHVJek4W2vj0jwmUlaVHOVcX6g=;
+        b=EiNGdMejn0GuLovHBid+iiUOQUIcqf59exmyHsIGz9kDOITKmJySwwc9qXWaNJWwDh
+         MI6PMsfNwaUjhHquW6B6Cb/jY6I/kQPY2/mMrOYOo6+kwgWcmUtM4P8RYyoFV6JhFCJZ
+         5kGE9+Ke/JTyntT2bHGOg7Vj/hUnj93lpXC3sRUD9NsUBO9+Ey60kz2Bm6HckcR0ppbg
+         U3DcxTCge3PIpApQStlu0+ly3JTa9njfEXlNpk2oSk67fqo4Lj0R5vgws5HDOcy00Y4B
+         FJK2ACTCXYhticDKS666i3M5mcHdDp4ro+fBykas/QX5lKSGhT+/K35izJigTLQC/LOl
+         rz2A==
+X-Gm-Message-State: AOAM532gm7Rk+QZ0bRURUJ8Wnm2zo04g8NUGElvpsEcsXkPYcdID7Bc1
+        90ULrrUKhli1M0+LihTISXsbgA==
+X-Google-Smtp-Source: ABdhPJwqkeRsF0AqS7WZlEi3YZgikjlqMKKoxNpFJjn1zdkxP4d6bPR7B7wmtTWFz4cDReGQ2fcWdA==
+X-Received: by 2002:a63:4302:: with SMTP id q2mr11128659pga.428.1626459306182;
+        Fri, 16 Jul 2021 11:15:06 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id cx4sm12694608pjb.53.2021.07.16.11.00.29
+        by smtp.gmail.com with ESMTPSA id k8sm2825228pfu.116.2021.07.16.11.15.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jul 2021 11:00:30 -0700 (PDT)
-Date:   Fri, 16 Jul 2021 18:00:26 +0000
+        Fri, 16 Jul 2021 11:15:05 -0700 (PDT)
+Date:   Fri, 16 Jul 2021 18:15:01 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Brijesh Singh <brijesh.singh@amd.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -82,133 +82,64 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
         npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 21/40] KVM: SVM: Add initial SEV-SNP support
-Message-ID: <YPHJOmUOR65QY+YY@google.com>
+Subject: Re: [PATCH Part2 RFC v4 28/40] KVM: X86: Introduce
+ kvm_mmu_map_tdp_page() for use by SEV
+Message-ID: <YPHMpep+AqGQg6sX@google.com>
 References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-22-brijesh.singh@amd.com>
+ <20210707183616.5620-29-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707183616.5620-22-brijesh.singh@amd.com>
+In-Reply-To: <20210707183616.5620-29-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 411ed72f63af..abca2b9dee83 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -52,9 +52,14 @@ module_param_named(sev, sev_enabled, bool, 0444);
->  /* enable/disable SEV-ES support */
->  static bool sev_es_enabled = true;
->  module_param_named(sev_es, sev_es_enabled, bool, 0444);
-> +
-> +/* enable/disable SEV-SNP support */
-> +static bool sev_snp_enabled = true;
-
-Is it safe to incrementally introduce SNP support?  Or should the module param
-be hidden until all support is in place?  E.g. what will happen when KVM allows
-userspace to create SNP guests but doesn't yet have the RMP management added?
-
-> +module_param_named(sev_snp, sev_snp_enabled, bool, 0444);
->  #else
->  #define sev_enabled false
->  #define sev_es_enabled false
-> +#define sev_snp_enabled  false
->  #endif /* CONFIG_KVM_AMD_SEV */
->  
->  #define AP_RESET_HOLD_NONE		0
-> @@ -1825,6 +1830,7 @@ void __init sev_hardware_setup(void)
->  {
->  #ifdef CONFIG_KVM_AMD_SEV
->  	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
-> +	bool sev_snp_supported = false;
->  	bool sev_es_supported = false;
->  	bool sev_supported = false;
->  
-> @@ -1888,9 +1894,21 @@ void __init sev_hardware_setup(void)
->  	pr_info("SEV-ES supported: %u ASIDs\n", sev_es_asid_count);
->  	sev_es_supported = true;
->  
-> +	/* SEV-SNP support requested? */
-> +	if (!sev_snp_enabled)
-> +		goto out;
-> +
-> +	/* Is SEV-SNP enabled? */
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-
-Random question, why use cpu_feature_enabled?  Did something change in cpufeatures
-that prevents using boot_cpu_has() here?
-
-> +		goto out;
-> +
-> +	pr_info("SEV-SNP supported: %u ASIDs\n", min_sev_asid - 1);
-
-Use sev_es_asid_count instead of manually recomputing the same; the latter
-obfuscates the fact that ES and SNP share the same ASID pool.
-
-Even better would be to report ES+SNP together, otherwise the user could easily
-interpret ES and SNP having separate ASID pools.  And IMO the gotos for SNP are
-overkill, e.g.
-
-	sev_es_supported = true;
-	sev_snp_supported = sev_snp_enabled &&
-			    cpu_feature_enabled(X86_FEATURE_SEV_SNP);
-
-	pr_info("SEV-ES %ssupported: %u ASIDs\n",
-		sev_snp_supported ? "and SEV-SNP " : "", sev_es_asid_count);
-
-
-> +	sev_snp_supported = true;
-> +
->  out:
->  	sev_enabled = sev_supported;
->  	sev_es_enabled = sev_es_supported;
-> +	sev_snp_enabled = sev_snp_supported;
->  #endif
->  }
->  
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 1175edb02d33..b9ea99f8579e 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -58,6 +58,7 @@ enum {
->  struct kvm_sev_info {
->  	bool active;		/* SEV enabled guest */
->  	bool es_active;		/* SEV-ES enabled guest */
-> +	bool snp_active;	/* SEV-SNP enabled guest */
->  	unsigned int asid;	/* ASID used for this guest */
->  	unsigned int handle;	/* SEV firmware handle */
->  	int fd;			/* SEV device fd */
-> @@ -232,6 +233,17 @@ static inline bool sev_es_guest(struct kvm *kvm)
->  #endif
->  }
->  
-> +static inline bool sev_snp_guest(struct kvm *kvm)
+> +int kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code, int max_level)
 > +{
-> +#ifdef CONFIG_KVM_AMD_SEV
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	int r;
 > +
-> +	return sev_es_guest(kvm) && sev->snp_active;
+> +	/*
+> +	 * Loop on the page fault path to handle the case where an mmu_notifier
+> +	 * invalidation triggers RET_PF_RETRY.  In the normal page fault path,
+> +	 * KVM needs to resume the guest in case the invalidation changed any
+> +	 * of the page fault properties, i.e. the gpa or error code.  For this
+> +	 * path, the gpa and error code are fixed by the caller, and the caller
+> +	 * expects failure if and only if the page fault can't be fixed.
+> +	 */
+> +	do {
+> +		r = direct_page_fault(vcpu, gpa, error_code, false, max_level, true);
+> +	} while (r == RET_PF_RETRY);
+> +
+> +	return r;
 
-Can't this be reduced to:
+This implementation is completely broken, which in turn means that the page state
+change code is not well tested.  The mess is likely masked to some extent because
+the call is bookendeda by calls to kvm_mmu_get_tdp_walk(), i.e. most of the time
+it's not called, and when it is called, the bugs are hidden by the second walk
+detecting that the mapping was not installed.
 
-	return to_kvm_svm(kvm)->sev_info.snp_active;
+  1. direct_page_fault() does not return a pfn, it returns the action that should
+     be taken by the caller.
+  2. The while() can be optimized to bail on no_slot PFNs.
+  3. mmu_topup_memory_caches() needs to be called here, otherwise @pfn will be
+     uninitialized.  The alternative would be to set @pfn when that fails in
+     direct_page_fault().
+  4. The 'int' return value is wrong, it needs to be kvm_pfn_t.
 
-KVM should never set snp_active without also setting es_active.
+A correct implementation can be found in the TDX series, the easiest thing would
+be to suck in those patches.
 
-Side topic, I think it would also be worthwhile to add to_sev (or maybe to_kvm_sev)
-given the frequency of the "&to_kvm_svm(kvm)->sev_info" pattern.
+https://lore.kernel.org/kvm/ceffc7ef0746c6064330ef5c30bc0bb5994a1928.1625186503.git.isaku.yamahata@intel.com/
+https://lore.kernel.org/kvm/a7e7602375e1f63b32eda19cb8011f11794ebe28.1625186503.git.isaku.yamahata@intel.com/
 
-> +#else
-> +	return false;
-> +#endif
 > +}
+> +EXPORT_SYMBOL_GPL(kvm_mmu_map_tdp_page);
 > +
->  static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
+>  static void nonpaging_init_context(struct kvm_vcpu *vcpu,
+>  				   struct kvm_mmu *context)
 >  {
->  	vmcb->control.clean = 0;
 > -- 
 > 2.17.1
 > 
