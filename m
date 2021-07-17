@@ -2,104 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13123C636CA
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 14:20:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFB4DC636C9
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 15:03:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DDE1C611BE
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 14:20:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8FCB6115B
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 15:03:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233766AbhGQOXu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 17 Jul 2021 10:23:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47980 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230003AbhGQOXu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Jul 2021 10:23:50 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 27913613C4;
-        Sat, 17 Jul 2021 14:20:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626531653;
-        bh=wSCwVuuSnJ3NHowIjdatyUb2d30WxXzTltY3f8AipVM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Rxuhin9VHzrkiynQVLE/oSC9N/P4q1XmBS+mIzFysTyr1Ytfcq2t1wqtjw7rtwWK1
-         1LrEhEqRiWHgroZSStVvKHAc766HKyzUFjtvOSoje9CngpjYOx+olsKeVpS5DoOnYs
-         gDOdwt2qgGOFcROCRdRi2tOlvy4yTJyRq44RcgYLJ8Gaee3BBUXJDqB4FkxoX+0ggy
-         FyPL4oAeRMZvp7A3ReSNLLFRz5zW2i1rd2oxaHFsLpD7H2BELAQXUaF9yI6PHIjfgM
-         F0rr9zfs5T4uqV1g/zuQ5YKEAJ1jqZPHhMUQFfxDW/zuA04cPOJKFdC9tVs58nWjay
-         p9lIAmrMfJyYw==
-Date:   Sat, 17 Jul 2021 09:20:51 -0500
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        id S234614AbhGQPGa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 17 Jul 2021 11:06:30 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.167]:10413 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234582AbhGQPG3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 17 Jul 2021 11:06:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626534208;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=7WJUP7CO371Ox38MLS3F6Pu/++9FjOfLN9lRQi3hrS0=;
+    b=fhIgSQhlyEv7Y3ASIp1IWSiIQDJz/w3kvFQNMjYiIClN7mSXQ6Y3gerLG6EIwtE5fq
+    qUVrDtGMi0JvXlWKv32dUiUYMD3w98w5Gwm7u7xkDqUi42JfnoL1M5u/cuQjYm9ll/em
+    82TigQ4h3N4Ls1DczcSqUPpfm0wBacohxrgLSSFhH1KMLaKvweWESlwSHur2zXoToMGg
+    zRz2gRqEARmPaW0N455fFi18wTC/ZnC5uzMXsIbf+qvzVl8c1BK0QyDsAvJ/69pGcfPF
+    MoxB21fEeozwV9BzqefRtCgtus6jCIUaUBtOCg/ksoUvggI+VKn/fLRk06Vyf2IInURe
+    ywRA==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIvSZEqc="
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 47.28.1 DYNA|AUTH)
+    with ESMTPSA id 9043bbx6HF3RC9v
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Sat, 17 Jul 2021 17:03:27 +0200 (CEST)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>
+Cc:     Sagi Grimberg <sagi@grimberg.me>,
         Keith Busch <keith.busch@wdc.com>,
         linux-nvme@lists.infradead.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 04/11] lib/base64: RFC4648-compliant base64 encoding
-Message-ID: <YPLnQ1iyCQaEcnCq@quark.localdomain>
-References: <20210716110428.9727-1-hare@suse.de>
- <20210716110428.9727-5-hare@suse.de>
+        linux-crypto@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 03/11] crypto/ffdhe: Finite Field DH Ephemeral Parameters
+Date:   Sat, 17 Jul 2021 17:03:26 +0200
+Message-ID: <29491463.gfxVf8N7Et@positron.chronox.de>
+In-Reply-To: <20210716110428.9727-4-hare@suse.de>
+References: <20210716110428.9727-1-hare@suse.de> <20210716110428.9727-4-hare@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210716110428.9727-5-hare@suse.de>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 16, 2021 at 01:04:21PM +0200, Hannes Reinecke wrote:
-> +/**
-> + * base64_decode() - base64-decode some bytes
-> + * @src: the base64-encoded string to decode
-> + * @len: number of bytes to decode
-> + * @dst: (output) the decoded bytes.
-> + *
-> + * Decodes the base64-encoded bytes @src according to RFC 4648.
-> + *
-> + * Return: number of decoded bytes
+Am Freitag, 16. Juli 2021, 13:04:20 CEST schrieb Hannes Reinecke:
+
+Hi Hannes,
+
+> +#include <linux/module.h>
+> +#include <crypto/internal/kpp.h>
+> +#include <crypto/kpp.h>
+> +#include <crypto/dh.h>
+> +#include <linux/mpi.h>
+> +
+> +/*
+> + * ffdhe2048 generator (g), modulus (p) and group size (q)
 > + */
-> +int base64_decode(const char *src, int len, u8 *dst)
-> +{
-> +        int i, bits = 0, pad = 0;
-> +        u32 ac = 0;
-> +        size_t dst_len = 0;
-> +
-> +        for (i = 0; i < len; i++) {
-> +                int c, p = -1;
-> +
-> +                if (src[i] == '=') {
-> +                        pad++;
-> +                        if (i + 1 < len && src[i + 1] == '=')
-> +                                pad++;
-> +                        break;
-> +                }
-> +                for (c = 0; c < strlen(lookup_table); c++) {
-> +                        if (src[i] == lookup_table[c]) {
-> +                                p = c;
-> +                                break;
-> +                        }
-> +                }
-> +                if (p < 0)
-> +                        break;
-> +                ac = (ac << 6) | p;
-> +                bits += 6;
-> +                if (bits < 24)
-> +                        continue;
-> +                while (bits) {
-> +                        bits -= 8;
-> +                        dst[dst_len++] = (ac >> bits) & 0xff;
-> +                }
-> +                ac = 0;
-> +        }
-> +        dst_len -= pad;
-> +        return dst_len;
-> +}
-> +EXPORT_SYMBOL_GPL(base64_decode);
+> +const u8 ffdhe2048_g[] = { 0x02 };
 
-This should return an error if the input isn't valid base64.
+What about using static const here (and for all the following groups)?
 
-- Eric
+Ciao
+Stephan
+
+
