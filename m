@@ -2,221 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74202C636CA
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 16:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D765C636CD
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 21:26:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52CD561159
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 16:50:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6BC561151
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 21:26:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231642AbhGQQxS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 17 Jul 2021 12:53:18 -0400
-Received: from mo4-p02-ob.smtp.rzone.de ([81.169.146.169]:34008 "EHLO
-        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231346AbhGQQxR (ORCPT
+        id S233721AbhGQV3e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 17 Jul 2021 17:29:34 -0400
+Received: from mail-vk1-f173.google.com ([209.85.221.173]:35534 "EHLO
+        mail-vk1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231542AbhGQV3d (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Jul 2021 12:53:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626540620;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=2R0vXTMKc6AYjXYRU1JuVsQ4yz/qAiQDIe8e879Vn/A=;
-    b=Qv77EewXZXS1fe2K6dggAgUNj3D7ViEM2XZSWCzhKsvo8e43v6M2iOryovuAkMSSvM
-    hvHS8Kk60NkbGXRuKF6aJ3wYKpuHPg0MvSg9MHoOZECDSq/cbIvSdH7qSy3Bxq9bgqWI
-    qYVSLmq1mxaLYHRHvJTZu//1WNV0mrHNcl1f78kc7LkZfiAvytxDLYLzEqeAD6nd8Tbc
-    mU2uu79tsfZzaTADzjAuDkcmzbCzasOQLCLDetI+lIM6a6TiUqWmoRuqdRRJtSoitmFH
-    AnVMG/lnp+vhNm8FDZtj4IlZ9MPfvumH9JyHJYY9tCjeAedrZfa4M/1grKxIkhM/zjI+
-    qUCQ==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIvSZEqc="
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-    by smtp.strato.de (RZmta 47.28.1 DYNA|AUTH)
-    with ESMTPSA id 9043bbx6HGoJCKL
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Sat, 17 Jul 2021 18:50:19 +0200 (CEST)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 11/11] nvme: add non-standard ECDH and curve25517 algorithms
-Date:   Sat, 17 Jul 2021 18:50:19 +0200
-Message-ID: <2097520.Z47m7augs3@positron.chronox.de>
-In-Reply-To: <20210716110428.9727-12-hare@suse.de>
-References: <20210716110428.9727-1-hare@suse.de> <20210716110428.9727-12-hare@suse.de>
+        Sat, 17 Jul 2021 17:29:33 -0400
+Received: by mail-vk1-f173.google.com with SMTP id d7so2969850vkf.2;
+        Sat, 17 Jul 2021 14:26:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5XAK7+Gzh6ieUWzhfnNuMlvI9N6Gdn2a7QuEsKGdrmI=;
+        b=WOhJ54ThX1910pZdfOoOLLltmo4c2ABqT73CgoA0dJ2bzOf6G5nQVecaJwzXnb2WdC
+         eQ99IX6ZWhHHxEhda18VjUD4gNgx6jFugS9Bt2AUOj1mrjXiKVMTQbAcgvogqCWrsxCv
+         2uMURxKoKnNF8FUu+aQPCeybWTXUkV9AgwFNxdNwHqZQwv9MIRqO8g4janiG9YKroa+J
+         GQUl52T/mC/JmvAyTs5L+yilGjcSt8AkRP5X1lo4jPJvK0uLjQBojXOljFvsNFLpBHHT
+         e1uawz3n/zEnC+pKcEBmKj0GG4o/IphI9vgGjWT3yOzRHb4uClFZBMRie4OXflA8I1Ms
+         jdTA==
+X-Gm-Message-State: AOAM531Me8zXKY1Ab469L1D8O3dPr4kj466c4kEpRRQ4gMUCHw9NyeMd
+        jYsL+8C5upXPkRGaWLKisHZKsx955Y5YFs0hLb8=
+X-Google-Smtp-Source: ABdhPJxKtXqo7qX7mahoa3XiRLqE8QXZHw2p1elWbvQVbW2yxP2VBcyH4F+ae1VpHCI1QWGOlvgIFuopgxhAvZh4mhc=
+X-Received: by 2002:a05:6122:a12:: with SMTP id 18mr18049497vkn.1.1626557195307;
+ Sat, 17 Jul 2021 14:26:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+References: <20201210200315.2965567-1-robh@kernel.org> <20201210200315.2965567-5-robh@kernel.org>
+In-Reply-To: <20201210200315.2965567-5-robh@kernel.org>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Sat, 17 Jul 2021 23:26:24 +0200
+Message-ID: <CAMuHMdU7f_zhHfnSNmY03bfBN5Kd2mO2N=yi5XTYwDNsd2XBFA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] dt-bindings: Remove PicoXcell bindings
+To:     Rob Herring <robh@kernel.org>
+List-Id: <soc.lore.kernel.org>
+Cc:     Jamie Iles <jamie@jamieiles.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, arm-soc <soc@kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, 16. Juli 2021, 13:04:28 CEST schrieb Hannes Reinecke:
+Hi Rob,
 
-Hi Hannes,
+(replying to an old patch that was applied a while ago)
 
-> TLS 1.3 specifies ECDH and curve25517 in addition to the FFDHE
+On Thu, Dec 10, 2020 at 9:06 PM Rob Herring <robh@kernel.org> wrote:
+> PicoXcell has had nothing but treewide cleanups for at least the last 8
+> years and no signs of activity. The most recent activity is a yocto vendor
+> kernel based on v3.0 in 2015.
+>
+> Cc: Jamie Iles <jamie@jamieiles.com>
+> Cc: linux-crypto@vger.kernel.org
+> Signed-off-by: Rob Herring <robh@kernel.org>
 
-curve25519?
+> --- a/Documentation/devicetree/bindings/net/macb.txt
+> +++ b/Documentation/devicetree/bindings/net/macb.txt
+> @@ -7,8 +7,6 @@ Required properties:
+>    Use "cdns,sam9x60-macb" for Microchip sam9x60 SoC.
+>    Use "cdns,np4-macb" for NP4 SoC devices.
+>    Use "cdns,at32ap7000-macb" for other 10/100 usage or use the generic form: "cdns,macb".
+> -  Use "cdns,pc302-gem" for Picochip picoXcell pc302 and later devices based on
+> -  the Cadence GEM, or the generic form: "cdns,gem".
 
-> groups, and these are already implemented in the kernel.
-> So add support for these non-standard groups for NVMe in-band
-> authentication to validate the augmented challenge implementation.
-> 
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> ---
->  drivers/nvme/host/auth.c   | 38 +++++++++++++++++++++++++++++++++++++-
->  drivers/nvme/target/auth.c | 23 +++++++++++++++++++++++
->  include/linux/nvme.h       |  2 ++
->  3 files changed, 62 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/nvme/host/auth.c b/drivers/nvme/host/auth.c
-> index 754343aced19..d0dd63b455ef 100644
-> --- a/drivers/nvme/host/auth.c
-> +++ b/drivers/nvme/host/auth.c
-> @@ -10,6 +10,8 @@
->  #include <crypto/kpp.h>
->  #include <crypto/dh.h>
->  #include <crypto/ffdhe.h>
-> +#include <crypto/ecdh.h>
-> +#include <crypto/curve25519.h>
->  #include "nvme.h"
->  #include "fabrics.h"
->  #include "auth.h"
-> @@ -67,6 +69,13 @@ struct nvme_auth_dhgroup_map {
->  	{ .id = NVME_AUTH_DHCHAP_DHGROUP_8192,
->  	  .name = "ffdhe8192", .kpp = "dh",
->  	  .privkey_size = 1024, .pubkey_size = 1024 },
-> +	{ .id = NVME_AUTH_DHCHAP_DHGROUP_ECDH,
-> +	  .name = "ecdh", .kpp = "ecdh-nist-p256",
-> +	  .privkey_size = 32, .pubkey_size = 64 },
-> +	{ .id = NVME_AUTH_DHCHAP_DHGROUP_25519,
-> +	  .name = "curve25519", .kpp = "curve25519",
-> +	  .privkey_size = CURVE25519_KEY_SIZE,
-> +	  .pubkey_size = CURVE25519_KEY_SIZE },
->  };
-> 
->  const char *nvme_auth_dhgroup_name(int dhgroup_id)
-> @@ -337,7 +346,7 @@ static int nvme_auth_dhchap_negotiate(struct nvme_ctrl
-> *ctrl, data->napd = 1;
->  	data->auth_protocol[0].dhchap.authid = NVME_AUTH_DHCHAP_AUTH_ID;
->  	data->auth_protocol[0].dhchap.halen = 3;
-> -	data->auth_protocol[0].dhchap.dhlen = 6;
-> +	data->auth_protocol[0].dhchap.dhlen = 8;
->  	data->auth_protocol[0].dhchap.idlist[0] = NVME_AUTH_DHCHAP_HASH_SHA256;
->  	data->auth_protocol[0].dhchap.idlist[1] = NVME_AUTH_DHCHAP_HASH_SHA384;
->  	data->auth_protocol[0].dhchap.idlist[2] = NVME_AUTH_DHCHAP_HASH_SHA512;
-> @@ -347,6 +356,8 @@ static int nvme_auth_dhchap_negotiate(struct nvme_ctrl
-> *ctrl, data->auth_protocol[0].dhchap.idlist[6] =
-> NVME_AUTH_DHCHAP_DHGROUP_4096; data->auth_protocol[0].dhchap.idlist[7] =
-> NVME_AUTH_DHCHAP_DHGROUP_6144; data->auth_protocol[0].dhchap.idlist[8] =
-> NVME_AUTH_DHCHAP_DHGROUP_8192; +	data->auth_protocol[0].dhchap.idlist[9] 
-=
-> NVME_AUTH_DHCHAP_DHGROUP_ECDH; +	data->auth_protocol[0].dhchap.idlist[10] 
-=
-> NVME_AUTH_DHCHAP_DHGROUP_25519;
-> 
->  	return size;
->  }
-> @@ -889,6 +900,31 @@ static int nvme_auth_dhchap_exponential(struct
-> nvme_ctrl *ctrl, }
->  		chap->host_key_len = pubkey_size;
->  		chap->sess_key_len = pubkey_size;
-> +	} else if (chap->dhgroup_id == NVME_AUTH_DHCHAP_DHGROUP_ECDH) {
-> +		struct ecdh p = {0};
-> +
-> +		pkey_len = crypto_ecdh_key_len(&p);
-> +		pkey = kzalloc(pkey_len, GFP_KERNEL);
-> +		if (!pkey)
-> +			return -ENOMEM;
-> +
-> +		get_random_bytes(pkey, pkey_len);
-> +		ret = crypto_ecdh_encode_key(pkey, pkey_len, &p);
-> +		if (ret) {
-> +			dev_dbg(ctrl->device,
-> +				"failed to encode pkey, error %d\n", ret);
-> +			kfree(pkey);
-> +			return ret;
-> +		}
-> +		chap->host_key_len = 64;
-> +		chap->sess_key_len = 32;
-> +	} else if (chap->dhgroup_id == NVME_AUTH_DHCHAP_DHGROUP_25519) {
-> +		pkey_len = CURVE25519_KEY_SIZE;
-> +		pkey = kzalloc(pkey_len, GFP_KERNEL);
-> +		if (!pkey)
-> +			return -ENOMEM;
-> +		get_random_bytes(pkey, pkey_len);
-> +		chap->host_key_len = chap->sess_key_len = CURVE25519_KEY_SIZE;
->  	} else {
->  		dev_warn(ctrl->device, "Invalid DH group id %d\n",
->  			 chap->dhgroup_id);
-> diff --git a/drivers/nvme/target/auth.c b/drivers/nvme/target/auth.c
-> index cc7f12a7c8bf..7e3b613cb08b 100644
-> --- a/drivers/nvme/target/auth.c
-> +++ b/drivers/nvme/target/auth.c
-> @@ -13,6 +13,8 @@
->  #include <crypto/kpp.h>
->  #include <crypto/dh.h>
->  #include <crypto/ffdhe.h>
-> +#include <crypto/ecdh.h>
-> +#include <crypto/curve25519.h>
->  #include <linux/crc32.h>
->  #include <linux/base64.h>
->  #include <linux/ctype.h>
-> @@ -498,6 +500,27 @@ int nvmet_auth_ctrl_exponential(struct nvmet_req *req,
->  				 ret);
->  			goto out;
->  		}
-> +	} else if (ctrl->dh_gid == NVME_AUTH_DHCHAP_DHGROUP_ECDH) {
-> +		struct ecdh p = {0};
-> +
-> +		pkey_len = crypto_ecdh_key_len(&p);
-> +		pkey = kmalloc(pkey_len, GFP_KERNEL);
-> +		if (!pkey)
-> +			return -ENOMEM;
-> +
-> +		get_random_bytes(pkey, pkey_len);
-> +		ret = crypto_ecdh_encode_key(pkey, pkey_len, &p);
-> +		if (ret) {
-> +			pr_debug("failed to encode private key, error %d\n",
-> +				 ret);
-> +			goto out;
-> +		}
-> +	} else if (ctrl->dh_gid == NVME_AUTH_DHCHAP_DHGROUP_25519) {
-> +		pkey_len = CURVE25519_KEY_SIZE;
-> +		pkey = kmalloc(pkey_len, GFP_KERNEL);
-> +		if (!pkey)
-> +			return -ENOMEM;
-> +		get_random_bytes(pkey, pkey_len);
->  	} else {
->  		pr_warn("invalid dh group %d\n", ctrl->dh_gid);
->  		return -EINVAL;
-> diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-> index 7b94abacfd08..75b638adbca1 100644
-> --- a/include/linux/nvme.h
-> +++ b/include/linux/nvme.h
-> @@ -1476,6 +1476,8 @@ enum {
->  	NVME_AUTH_DHCHAP_DHGROUP_4096	= 0x03,
->  	NVME_AUTH_DHCHAP_DHGROUP_6144	= 0x04,
->  	NVME_AUTH_DHCHAP_DHGROUP_8192	= 0x05,
-> +	NVME_AUTH_DHCHAP_DHGROUP_ECDH   = 0x0e,
-> +	NVME_AUTH_DHCHAP_DHGROUP_25519  = 0x0f,
->  };
-> 
->  union nvmf_auth_protocol {
+Note that (a) the generic form is still used as the sole compatible
+value in arch/arm64/boot/dts/lg/lg131[23].dtsi, and the Linux driver
+matches against it, and (b) arch/arm/boot/dts/zynq-7000.dtsi uses
+the generic form as a secondary compatible value.
+
+Gr{oetje,eeting}s,
+
+                        Geert
 
 
-Ciao
-Stephan
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
