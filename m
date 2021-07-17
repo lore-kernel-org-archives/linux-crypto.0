@@ -2,195 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11CA3C636CD
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 00:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE8FDC636CA
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 06:06:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EEA19613EB
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 00:46:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 743F0613D8
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Jul 2021 06:06:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233055AbhGQAtg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Jul 2021 20:49:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40502 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230348AbhGQAtf (ORCPT
+        id S229982AbhGQGJk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 17 Jul 2021 02:09:40 -0400
+Received: from mail-pj1-f42.google.com ([209.85.216.42]:42928 "EHLO
+        mail-pj1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229969AbhGQGJk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jul 2021 20:49:35 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24025C061760
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Jul 2021 17:46:39 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id gp5-20020a17090adf05b0290175c085e7a5so2705839pjb.0
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Jul 2021 17:46:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=u/IsvU1kqurQZC76XNFVOghfUpyMawBFCFuK0AQGEPM=;
-        b=NuCt8dbb8sG/61BzzDfSqZdk1jTtBf3jihYSLd2BtQD1axvderSNU/SgNFmdYw9yVF
-         CPsb6YE00bicpuzx4V/RNNSkWuQ1sd0VhHol83yyNvPkrQGOlnbPs9ITEow4f49hdw9z
-         YDYlNHFx5vt+MgN/Y51hhSiDu9BrX8ZWKnI4AtF1f5OkN/gldMEAGVZppOMdp4rQv5IA
-         +wJ170ZMv1RCOwHSztImvpX9LKSn0tHn/B9uhbFcDdIwyXrMfIJfHUANecYKm2exm1QQ
-         7WySfTfcqN7JP8GUbUmnvRv3aGtutSGWprJDzeeeRiXmCJ3HOgNfyphJ5fDz6kf7hTSz
-         RPCg==
+        Sat, 17 Jul 2021 02:09:40 -0400
+Received: by mail-pj1-f42.google.com with SMTP id i16-20020a17090acf90b02901736d9d2218so8331428pju.1
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Jul 2021 23:06:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=u/IsvU1kqurQZC76XNFVOghfUpyMawBFCFuK0AQGEPM=;
-        b=kHFORILzIeoyXtCY6Ojm6Ip1GXxA9N9AtbSmX8tvi6tq/9E3/zEcDUuafEGVebLdep
-         DdiFQxZEXOoETfbjT0sqbXu9b8AfdXHYg51wOAvVGUSgb4ZxznVCBUZaTMKf/UcFmZ1d
-         nf2d+eCZHWM7ecQ2xjO41w/fvJ8bjWUbweHKyp5zWYWZYJn2g9zHQ9IeN2pIibbgReJ/
-         XdeWBzfrknnsGhVahvNrH9utMyFwcU1D7o82GiiHrTAx33YEQ4qnjVcR3/V3zotveu0R
-         tlZI8hvIJQFC5lIdfkLCzbsMoLgSK4bibXwc4bcAWFyxyRSDoknT10GEeA2Mb3HHiZjp
-         Bzbw==
-X-Gm-Message-State: AOAM531upBznJtE0SE1UKS/QQxFG5odCNxE8DTzSA1MTiY/CPDwZpl2z
-        3ppP08NEEOrC9ZuATwmtbfgVrw==
-X-Google-Smtp-Source: ABdhPJxrswPajbOgVL6Nn4Vj+gROMrISPPW53TbQlFyRjN5Y9ZDDm/vzxRO3O2TefotPh/hbXLdwIA==
-X-Received: by 2002:a17:902:9890:b029:120:1299:678e with SMTP id s16-20020a1709029890b02901201299678emr9822840plp.32.1626482798329;
-        Fri, 16 Jul 2021 17:46:38 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j2sm11921868pfb.53.2021.07.16.17.46.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jul 2021 17:46:37 -0700 (PDT)
-Date:   Sat, 17 Jul 2021 00:46:34 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 25/40] KVM: SVM: Reclaim the guest pages
- when SEV-SNP VM terminates
-Message-ID: <YPIoaoDCjNVzn2ZM@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-26-brijesh.singh@amd.com>
- <YPHnb5pW9IoTcwWU@google.com>
- <2711d9f9-21a0-7baa-d0ff-2c0f69ca6949@amd.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=iecH09b7HqGULzKRar6QvP6MSKtrjyPzZdrhashSeis=;
+        b=ndoti6DiRvE+KcvcQIpqizdBVwP9SufbWmadKjOl+t84GZMQ4R1F0pEKG3OhXJi/b4
+         +jZ5sSaCyFyUDmPdo6RppEE8pdNJTeOnhf52xza3ICipjT+NvTsSvpOapvVgrcLJd2oG
+         Re/bJnuB4LAK9hTg+dmMXqP+1KGOEIY3Tz2JhlDCG1gljVCrWLTzGd9s9I9gBSFXAuok
+         8+IQYP67H75Q1EA+PJ1mFIO5qKEvKmFWxAqFaOpd3Oi8hUigUgjL4JHaQyLL3J8eQaGy
+         w3IcjAU3jATzumEpwgdv2o1ncrZpea7TGrV9t2XvMAbBHsmxZRZ+ERozUlcQcPoHHQ9Z
+         jEKg==
+X-Gm-Message-State: AOAM531V/3pNx46cnfxuxZsyy92n+XIJjP4tiXUcr3zcOTX+LZWfK2kO
+        K/isDvQYBhqjnVYszuSCd6I7f1WLOHw=
+X-Google-Smtp-Source: ABdhPJyVeqq48WLZr9OvVk5En15/bxWx6SqptqJJP7c2a8W5YwU+1ppbmHvvGq3jE5ISGqtGX7r9Ag==
+X-Received: by 2002:a17:90a:6d82:: with SMTP id a2mr13433583pjk.150.1626502003218;
+        Fri, 16 Jul 2021 23:06:43 -0700 (PDT)
+Received: from [10.0.0.146] ([162.211.128.122])
+        by smtp.gmail.com with ESMTPSA id y1sm13263460pgr.70.2021.07.16.23.06.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Jul 2021 23:06:42 -0700 (PDT)
+Subject: Re: [RFC PATCH 00/11] nvme: In-band authentication support
+To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+Cc:     Keith Busch <keith.busch@wdc.com>, linux-nvme@lists.infradead.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+References: <20210716110428.9727-1-hare@suse.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <64771d4b-38e6-6081-dadf-cae0de44c591@grimberg.me>
+Date:   Fri, 16 Jul 2021 23:06:46 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2711d9f9-21a0-7baa-d0ff-2c0f69ca6949@amd.com>
+In-Reply-To: <20210716110428.9727-1-hare@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 16, 2021, Brijesh Singh wrote:
-> 
-> On 7/16/21 3:09 PM, Sean Christopherson wrote:
-> > On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> >> +			e = snp_lookup_page_in_rmptable(region->pages[i], &level);
-> >> +			if (unlikely(!e))
-> >> +				continue;
-> >> +
-> >> +			/* If its not a guest assigned page then skip it. */
-> >> +			if (!rmpentry_assigned(e))
-> >> +				continue;
-> >> +
-> >> +			/* Is the page part of a 2MB RMP entry? */
-> >> +			if (level == PG_LEVEL_2M) {
-> >> +				val.pagesize = RMP_PG_SIZE_2M;
-> >> +				pfn &= ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
-> >> +			} else {
-> >> +				val.pagesize = RMP_PG_SIZE_4K;
-> > This raises yet more questions (for me) as to the interaction between Page-Size
-> > and Hyperivsor-Owned flags in the RMP.  It also raises questions on the correctness
-> > of zeroing the RMP entry if KVM_SEV_SNP_LAUNCH_START (in the previous patch).
-> 
-> I assume you mean the LAUNCH_UPDATE because that's when we need to
-> perform the RMPUPDATE.
 
-Doh, yes.
+> Hi all,
 
-> The hypervisor owned means all zero in the RMP entry.
+Hey Hannes, nice progress. This is definitely
+a step in the right direction.
 
-Figured out where I went wrong after reading the RMPUDPATE pseudocode.  RMPUPDATE
-takes the page size as a parameter even though it unconditionally zeros the page
-size flag in the RMP entry for unassigned pages.
+> recent updates to the NVMe spec have added definitions for in-band
+> authentication, and seeing that it provides some real benefit especially
+> for NVMe-TCP here's an attempt to implement it.
 
-A wrapper around rmpupdate() would definitely help, e.g. (though level might need
-to be an "int" to avoid a bunch of casts).
+Please call out the TP 8006 specifically so people can look
+into it.
 
-  int rmp_make_shared(u64 pfn, enum pg_level level);
+> Tricky bit here is that the specification orients itself on TLS 1.3,
+> but supports only the FFDHE groups. Which of course the kernel doesn't
+> support. I've been able to come up with a patch for this, but as this
+> is my first attempt to fix anything in the crypto area I would invite
+> people more familiar with these matters to have a look.
 
-Wrappers for "private" and "firmware" would probably be helpful too.  And if you
-do that, I think you can bury both "struct rmpupdate", rmpupdate(), and
-X86_TO_RMP_PG_LEVEL() in arch/x86/kernel/sev.c.  snp_set_rmptable_state() might
-need some refactoring to avoid three booleans, but I guess maybe that could be
-an exception?  Not sure.  Anyways, was thinking something like:
+Glad to see this turned out to be very simple!
 
-  int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid);
-  int rmp_make_firmware(u64 pfn);
+> Also note that this is just for in-band authentication. Secure concatenation
+> (ie starting TLS with the negotiated parameters) is not implemented; one would
+> need to update the kernel TLS implementation for this, which at this time is
+> beyond scope.
 
-It would consolidate a bit of code, and more importantly it would give visual
-cues to the reader, e.g. it's easy to overlook "val = {0}" meaning "make shared".
+TLS is an additional effort, as discussed, inband auth alone
+has merits and we should not lock it down to NVMe/TCP-TLS.
 
-Side topic, what happens if a firmware entry is configured with page_size=1?
+> As usual, comments and reviews are welcome.
 
-And one architectural question: what prevents a malicious VMM from punching a 4k
-shared page into a 2mb private page?  E.g.
-
-  rmpupdate(1 << 20, [private, 2mb]);
-  rmpupdate(1 << 20 + 4096, [shared, 4kb]);
-
-I don't see any checks in the pseudocode that will detect this, and presumably the
-whole point of a 2mb private RMP entry is to not have to go walk the individual
-4kb entries on a private access.
-
-  NEW_RMP = READ_MEM.o [NEW_RMP_PTR]
-
-  IF ((NEW_RMP.PAGE_SIZE == 2MB) && (SYSTEM_PA[20:12] != 0))  <-- not taken, 4kb entry
-          EAX = FAIL_INPUT
-          EXIT
-
-  IF (!NEW_RMP.ASSIGNED && (NEW_RMP.IMMUTABLE || (NEW_RMP.ASID != 0))  <-- not taken, new entry valid
-          EAX = FAIL_INPUT
-          EXIT
-
-  RMP_ENTRY_PA = RMP_BASE + 0x4000 + (SYSTEM_PA / 0x1000) * 16
-  IF (RMP_ENTRY_PA > RMP_END)
-          EAX = FAIL_INPUT
-          EXIT
-
-  // System address must have an RMP entry
-  OLD_RMP = READ_MEM_PA.o [RMP_ENTRY_PA]
-  IF (OLD_RMP.IMMUTABLE) <-- passes, private entry not immutable
-          EAX = FAIL_PERMISSION
-          EXIT
-
-  IF (NEW_RMP.PAGE_SIZE == 4KB)
-          IF ((SYSTEM_PA[20:12] == 0) && (OLD_RMP.PAGE_SIZE == 2MB)) <- not taken, PA[12] == 1
-                  EAX = FAIL_OVERLAP
-                  EXIT
-  ELSE
-          IF (Any 4KB RMP entry with (RMP.ASSIGNED == 1) exists in 2MB region)
-                  EAX = FAIL_OVERLAP
-                  EXIT
-          ELSE
-                  FOR (I = 1; I < 512, I++) {
-                          temp_RMP = 0
-                          temp_RMP.ASSIGNED = NEW_RMP.ASSIGNED
-                          WRITE_MEM.o [RMP_ENTRY_PA + I * 16] = temp_RMP;
-                  }
+Having another look into this now...
