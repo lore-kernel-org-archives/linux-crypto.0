@@ -2,69 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 960C4C636C8
-	for <linux-crypto@archiver.kernel.org>; Sun, 18 Jul 2021 13:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C82BC636CA
+	for <linux-crypto@archiver.kernel.org>; Sun, 18 Jul 2021 22:13:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 647FA6108B
-	for <linux-crypto@archiver.kernel.org>; Sun, 18 Jul 2021 13:27:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6091360BD3
+	for <linux-crypto@archiver.kernel.org>; Sun, 18 Jul 2021 22:13:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233666AbhGRNaJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 18 Jul 2021 09:30:09 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:51438 "EHLO deadmen.hmeau.com"
+        id S229853AbhGRWQX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 18 Jul 2021 18:16:23 -0400
+Received: from ozlabs.org ([203.11.71.1]:36407 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232859AbhGRNaJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 18 Jul 2021 09:30:09 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1m56om-0003cS-3J; Sun, 18 Jul 2021 21:26:52 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1m56ob-0003CV-F6; Sun, 18 Jul 2021 21:26:41 +0800
-Date:   Sun, 18 Jul 2021 21:26:41 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 09/11] nvmet: Implement basic In-Band Authentication
-Message-ID: <20210718132641.GA12275@gondor.apana.org.au>
-References: <20210716110428.9727-1-hare@suse.de>
- <20210716110428.9727-10-hare@suse.de>
- <2510347.locV8n3378@positron.chronox.de>
- <a4d4bda0-2bc8-0d0c-3e81-55adecd6ce52@suse.de>
+        id S229585AbhGRWQW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 18 Jul 2021 18:16:22 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4GSfPY3jcQz9sRf;
+        Mon, 19 Jul 2021 08:13:21 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1626646402;
+        bh=76JJ6B/S6eIHUIE32siXxhCH89n+pV1CtCnbUm403lI=;
+        h=Date:From:To:Cc:Subject:From;
+        b=op9EhBvAWlv+qwBaV5k6Kyg/bjCLlQr8+e1YWO8NOeYEGReSZILxeiu6CHUDWMbsq
+         A29KGaC7NnjYkFVgAIrApvT+5/RSsm1LyNlVQM7yVIBxTlkOyt5EELP64BKcZL4b26
+         SAppMJOVxvAPmNWBZ2GJ07RzI+YuFtWY7TTSFr0Z7qbgiRFZ4JBJZBlk75LV4rp+j+
+         U+pNazZLadO4MMj2ZwusaUfOHHCk5AMCZC2tCcHNs7iVnbR+5GTDUfsz/PgVuYfWyw
+         yrBzsWPHoidmYSCSHvQia3XnhMx8KYcpqf9Ey4y/XgiT5k5ToXsQUaZ2WLNoJKbE2T
+         i3kRMOhxFfR4g==
+Date:   Mon, 19 Jul 2021 08:13:20 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Stephan Mueller <smueller@chronox.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the crypto tree
+Message-ID: <20210719081320.1d205c98@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a4d4bda0-2bc8-0d0c-3e81-55adecd6ce52@suse.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: multipart/signed; boundary="Sig_/7u=v7OJOCpMjm9K.1gh1z1W";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Jul 18, 2021 at 02:37:34PM +0200, Hannes Reinecke wrote:
->
-> > > +	response = kmalloc(data->hl, GFP_KERNEL);
-> > 
-> > Again, align to CRYPTO_MINALIGN_ATTR?
-> 
-> Ah, _that_ alignment.
-> Wasn't aware that I need to align to anything.
-> But if that's required, sure, I'll be fixing it.
+--Sig_/7u=v7OJOCpMjm9K.1gh1z1W
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Memory returned by kmalloc is guaranteed to be aligned to
-CRYPTO_MINALIGN_ATTR, in fact that's the whole point of that
-attribute.
+Hi all,
 
+In commit
+
+  5261cdf457ce ("crypto: drbg - select SHA512")
+
+Fixes tag
+
+  Fixes: 9b7b94683a9b "crypto: DRBG - switch to HMAC SHA512 DRBG as default
+
+has these problem(s):
+
+  - Subject has leading but no trailing quotes
+
+Please do not split Fixes tags over more than one line.
+
+--=20
 Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Stephen Rothwell
+
+--Sig_/7u=v7OJOCpMjm9K.1gh1z1W
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmD0p4AACgkQAVBC80lX
+0Gx1jggAlfLGtProRJIvMM7OnVh2SE7C24yyYONis9zMbMWCtBeQj/C7NawDtSg0
+BMuIkUUV8RIe85guMMdWGJiLWDL+fxLg8Zf/sImB1buLKLtuf+Rk+4Jve9wrsFKC
+kGGMwTcDQbh8/nngdUrWwbD+j1rv99raf0Xwn2xe5eLkB6EmNaXN5feg41mynsMm
+rDHvbn8iQFSLZDozK3PbF1LKGkwAyBXYr6icP1jX9j7SpShG4DLYiUjmAZ558Jnw
+0KZfq5DOAr1kixOOAWyVOM6U1BnlEZ743GO5Wld0vK0DC/8mlir4apmXDNJthnDn
+Tk3IoGGH0JEAInJ965IdvXjBcXWf2Q==
+=6IQD
+-----END PGP SIGNATURE-----
+
+--Sig_/7u=v7OJOCpMjm9K.1gh1z1W--
