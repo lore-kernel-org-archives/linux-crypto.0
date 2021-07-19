@@ -2,76 +2,151 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76D9CC12002
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 09:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CDBAC6377B
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 09:28:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E0C36108B
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 09:23:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F1656108B
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 09:28:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234826AbhGSImp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jul 2021 04:42:45 -0400
-Received: from mail-pf1-f175.google.com ([209.85.210.175]:39656 "EHLO
-        mail-pf1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235882AbhGSImp (ORCPT
+        id S235253AbhGSIrW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jul 2021 04:47:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34548 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235336AbhGSIrO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jul 2021 04:42:45 -0400
-Received: by mail-pf1-f175.google.com with SMTP id b12so15934874pfv.6
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 02:23:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=puHlGDARRKbSpOH7EGqRKL60GpYMbcmkXPxSTYDDiuw=;
-        b=YEatLa6HWxyXV/9Q38RMdijuM8Z7hGl3fGt6MbIFKq5yTj1Dy8A+ozdmAJPB5WFYq9
-         2dc3EdTlgs73j9InnL2CqSCG1ATW+lXz1uGLTgOr0CaA4V1Ahng9LVaju6Ms+lDjjY/3
-         Q0yP6vplPcbNOAV8foMhPqne5w5BDweYl5W3sAcziITbhs4b14NW0Sbh6Yp2g6q89lfk
-         2tdA28ilhakRfNQ3RXs/KDGu47FW2gHT9QDTF92pN7AvIonOpMP9j2W42cuqh2Bnak5v
-         TkYe+sbJoZWFlXpVVnJDuU8HD3bCVzmuAIbWJJCtHo33+iu4ZbiLvH0xSTuIqm7If286
-         WpAw==
-X-Gm-Message-State: AOAM533NHQ8hBg6oZ7ZLrQoY1+/O5sX7VKGsXhESJn/M68dAwIcIYdV1
-        b8VFdIzI4Sj75wHVzv3LCV3GgJYYGrE=
-X-Google-Smtp-Source: ABdhPJxjn+oa7V92P0qr18bpUnLbzboWRXrQE8pmhZpsJ3xLgnGfDN0qpo5rVoFrh0tQLM9mWoaWYg==
-X-Received: by 2002:a05:6a00:a8a:b029:30c:a10b:3e3f with SMTP id b10-20020a056a000a8ab029030ca10b3e3fmr24830768pfl.40.1626686604790;
-        Mon, 19 Jul 2021 02:23:24 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:2ce3:950:ff23:e549? ([2601:647:4802:9070:2ce3:950:ff23:e549])
-        by smtp.gmail.com with ESMTPSA id l6sm19238862pff.74.2021.07.19.02.23.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Jul 2021 02:23:24 -0700 (PDT)
-Subject: Re: [PATCH 11/11] nvme: add non-standard ECDH and curve25517
- algorithms
-To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <keith.busch@wdc.com>, linux-nvme@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-References: <20210716110428.9727-1-hare@suse.de>
- <20210716110428.9727-12-hare@suse.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <9ac44322-5c89-da94-b540-6086d2a32bc2@grimberg.me>
-Date:   Mon, 19 Jul 2021 02:23:22 -0700
+        Mon, 19 Jul 2021 04:47:14 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EE50C0613DB
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 01:29:02 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1m5PHJ-0006Ck-GR; Mon, 19 Jul 2021 11:09:33 +0200
+Subject: Re: [PATCH v2 1/6] KEYS: trusted: allow use of TEE as backend without
+ TCG_TPM support
+To:     Sumit Garg <sumit.garg@linaro.org>
+Cc:     James Bottomley <jejb@linux.ibm.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>,
+        kernel <kernel@pengutronix.de>, James Morris <jmorris@namei.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:SECURITY SUBSYSTEM" 
+        <linux-security-module@vger.kernel.org>,
+        Andreas Rammhold <andreas@rammhold.de>
+References: <cover.1dfbb73645d917b3c76d01290804a3410bd9932e.1624364386.git-series.a.fatoum@pengutronix.de>
+ <f8285eb0135ba30c9d846cf9dd395d1f5f8b1efc.1624364386.git-series.a.fatoum@pengutronix.de>
+ <CAFA6WYMJp5u_+3bNc0ykFzveakOS4nqJfPvSoaFGQApFctL47A@mail.gmail.com>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+Message-ID: <6003f9a3-1588-c317-4eeb-889d8e6c40e3@pengutronix.de>
+Date:   Mon, 19 Jul 2021 11:09:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210716110428.9727-12-hare@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFA6WYMJp5u_+3bNc0ykFzveakOS4nqJfPvSoaFGQApFctL47A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hello Sumit,
 
-> TLS 1.3 specifies ECDH and curve25517 in addition to the FFDHE
-> groups, and these are already implemented in the kernel.
+On 19.07.21 10:04, Sumit Garg wrote:
+> Hi Ahmad,
+> 
+> On Tue, 22 Jun 2021 at 18:08, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>>
+>> With recent rework, trusted keys are no longer limited to TPM as trust
+>> source. The Kconfig symbol is unchanged however leading to a few issues:
+>>
+>>  - TCG_TPM is required, even if only TEE is to be used
+>>  - Enabling TCG_TPM, but excluding it from available trusted sources
+>>    is not possible
+>>  - TEE=m && TRUSTED_KEYS=y will lead to TEE support being silently
+>>    dropped, which is not the best user experience
+>>
+>> Remedy these issues by introducing two new Kconfig symbols:
+>> TRUSTED_KEYS_TPM and TRUSTED_KEYS_TEE with the appropriate
+>> dependencies.
+>>
+> 
+> This should include a fixes tag to the rework commit.
 
-So?
+Yes. I wasn't aware of the regression that Andreas (CC'd) recently
+reported. Knowing, it now indeed warrants a backport. Will add in v2.
 
-> So add support for these non-standard groups for NVMe in-band
-> authentication to validate the augmented challenge implementation.
+>> diff --git a/security/keys/Kconfig b/security/keys/Kconfig
+>> index 64b81abd087e..6fdb953b319f 100644
+>> --- a/security/keys/Kconfig
+>> +++ b/security/keys/Kconfig
+>> @@ -70,23 +70,23 @@ config BIG_KEYS
+>>
+>>  config TRUSTED_KEYS
+>>         tristate "TRUSTED KEYS"
+>> -       depends on KEYS && TCG_TPM
+>> +       depends on KEYS
+> 
+>>         select CRYPTO
+>>         select CRYPTO_HMAC
+>>         select CRYPTO_SHA1
+>>         select CRYPTO_HASH_INFO
+> 
+> Should move these as well to TRUSTED_KEYS_TPM as the core code doesn't
+> mandate their need.
 
-Why? why should users come to expect controllers to support it?
+Ok, will test and change appropriately.
+
+> 
+>> -       select ASN1_ENCODER
+>> -       select OID_REGISTRY
+>> -       select ASN1
+
+>>  $(obj)/trusted_tpm2.o: $(obj)/tpm2key.asn1.h
+>> -trusted-y += trusted_tpm2.o
+>> -trusted-y += tpm2key.asn1.o
+>> +trusted-$(CONFIG_TRUSTED_KEYS_TPM) += trusted_tpm2.o
+>> +trusted-$(CONFIG_TRUSTED_KEYS_TPM) += tpm2key.asn1.o
+>> +
+>> +trusted-$(CONFIG_TRUSTED_KEYS_TEE) += trusted_tee.o
+>>
+>>  trusted-$(CONFIG_TEE) += trusted_tee.o
+> 
+> This should be dropped.
+
+Right..
+
+Thanks for the review. I'll isolate this patch for v2.
+
+Cheers,
+Ahmad
+
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
