@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FDEC636C9
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 21:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 938E3C07E9D
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 21:20:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E2E6060FF0
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 21:20:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C9FB60FF0
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 21:20:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354250AbhGSUar (ORCPT
+        id S1358099AbhGSUca (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jul 2021 16:30:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60226 "EHLO
+        Mon, 19 Jul 2021 16:32:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1383889AbhGSSPV (ORCPT
+        with ESMTP id S1384784AbhGSSgq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jul 2021 14:15:21 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38410C061766
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 11:44:35 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d12so17294200pfj.2
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 11:55:59 -0700 (PDT)
+        Mon, 19 Jul 2021 14:36:46 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AECAC0613E7
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 12:04:27 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id o4so15391769pgs.6
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 12:14:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=lOc5+rloDVdT/oQx00DjmvvmSON6OrGGoIPjsiSNP8Y=;
-        b=g4AlSOFhPm6hVf/7SR105tRah3Aea3+9KqN56Ke/OvVzbLLxQa+2FEdnRI5yCBDV+U
-         4E04weFnBKUQ3efnvzdPhRQY+2+Od5nqIyCKNKgiFX0wtkQXrweRsh5bUaswhmgDdflh
-         twIaMTzdSaq840Cc7sDRoqigwkJn4mAzbH3OXS7gdeaYNQPustFoljMzhp71Jz/EDIPl
-         iQ0u6pB02qRWEy9NOKHisJRFVf53eOgb0bPRjLegKpAPXdgUt4CSFJjUZQnOg29L//qi
-         bWnnKN93uYWfM5tgm7e4zrwTJ+oo8OaLK8lCgwcR4sL6wlqDO3MXhRGr9K/4lw9CfxuI
-         K3uA==
+        bh=2XllpOUOhhdBvpd5Av+f2na/9hRxJV/QURDHxqubmW8=;
+        b=TAK2LJLZI6u4VHRX2CtOxDwgftlqvQHU1lzhdQy0LcCcpbcr9ralpKcma3Fe1DAXVB
+         YEbBG2X95V7PcYiO0NGfbsi3Mq0cpEE3BWadst6/qrqSI45eUiSf3Qjvvs6crWGL9pAk
+         f2S4uAxDH1tnD8dXBw6emsJHGIQpk2eykj7mExtMmKVHuA7Vr+eL6Oey1hzAPDg0oa7c
+         OqiF98AMx5gJrcAFkQlYE7iIsV7JKMNqh9RKqeBFp/4OqS+g0z1Kqo7z2BDexEgHIRFG
+         OcCF2FjqNIBEhh9hv1V9N0corxEGyzsVRPh6ngPwFo0wqMpY3VZZiMwxPSWpMijKQ4qA
+         4xYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=lOc5+rloDVdT/oQx00DjmvvmSON6OrGGoIPjsiSNP8Y=;
-        b=qrhvGHszUkeQQOXQi+h4I/UHpIszmP0HcPEil9aaLRI/LsjMffdkAvRVZ3d9DWrgft
-         3ae+t/vmIwQYRr2t6IXP2jrmvcOLb+QWLJGvEz4O7XXFdgW9LclkV6nG6HYVSx8TCLzT
-         /zpLnzug1jklttlZ+yeAH8GaGSsADKaJArOIdlnXQr0iU8zcc/5hCEzNJq/tJPRqCaQc
-         ncWJ54e51PjTjvpjjKCyELTUV70vlhtgh00mvIporKGLiHr915xIym63QIsbhJk0Nehq
-         v/LIEY6dKUf7sxwmIfQXWxy3RCYG6a5wbFt2vIvTN/g4VwqIG/DJBV1dShak8P9w+Eaq
-         XkfA==
-X-Gm-Message-State: AOAM53077ytsu7pIlyWpIaC9njxJBg9wHGKKgMX7apFrmNHSiFmWCBGv
-        CjKVuM1I+T3T6kupDnW4KmlVBw==
-X-Google-Smtp-Source: ABdhPJxmSOu7+O2DfzTj7tTZcm5PtaeD09Hlmp3Y4R1m0EFLmxzdwqmHKXKDHGBPl5X7i0P9uc4f5A==
-X-Received: by 2002:a05:6a00:1951:b029:333:64d3:e1f1 with SMTP id s17-20020a056a001951b029033364d3e1f1mr24076104pfk.43.1626720959003;
-        Mon, 19 Jul 2021 11:55:59 -0700 (PDT)
+        bh=2XllpOUOhhdBvpd5Av+f2na/9hRxJV/QURDHxqubmW8=;
+        b=cKD3HlgYZOeIo4ilv72RkcTH6CeqApoEKHK+aP6MPdxbnb+vS+G6VwE3chqPuR78Zt
+         4ik/DUV0pyiaYnizVmRxMWKbzCcWc+P94bKJuNWQJ/dcU3HhR/21gOueohiLZFk4PDhI
+         Qn3f5P0KiZqWWH1B+wV1uAxwivDCtkpN/ftHxrYeZn0hk3CAyU7fvhrKWIGKpX+bqZ0b
+         b8a/Xz2CJxcVLObxiCd8uWKbUiNxVsicCCLbCjg6l1jPr917TvojeUrkKqWHLYd23Qmn
+         u+iBd9idCIDUC9RdbhHOMZB0guvhkyfhiwzcNCF9uB6yISu29S84TLzAxuFZwSvTcRod
+         AYIw==
+X-Gm-Message-State: AOAM5307ucmrqsgn8rzYoKWlbgYQQ/hirGtxTNj5mk1bTgi0u5v+ll0A
+        UAuSHE3fRoInFU+hMiICRVLZqA==
+X-Google-Smtp-Source: ABdhPJx+EzDcqa/llq3nQF6Vq0NHWvv5j8Tkv3O31Pzz7AmNV8hJdli78mh1Sa+ATMQeYmFd5XN3Uw==
+X-Received: by 2002:a63:5059:: with SMTP id q25mr26911779pgl.9.1626722059360;
+        Mon, 19 Jul 2021 12:14:19 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q17sm24643642pgd.39.2021.07.19.11.55.58
+        by smtp.gmail.com with ESMTPSA id u24sm22109816pfm.141.2021.07.19.12.14.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jul 2021 11:55:58 -0700 (PDT)
-Date:   Mon, 19 Jul 2021 18:55:54 +0000
+        Mon, 19 Jul 2021 12:14:18 -0700 (PDT)
+Date:   Mon, 19 Jul 2021 19:14:15 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Brijesh Singh <brijesh.singh@amd.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -83,80 +83,58 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
         npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 33/40] KVM: SVM: Add support to handle MSR
- based Page State Change VMGEXIT
-Message-ID: <YPXKuiRCjod8Wn2n@google.com>
+Subject: Re: [PATCH Part2 RFC v4 25/40] KVM: SVM: Reclaim the guest pages
+ when SEV-SNP VM terminates
+Message-ID: <YPXPB1WMW8WY9cZ7@google.com>
 References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-34-brijesh.singh@amd.com>
- <YPHzcstus9mS8hOm@google.com>
- <b9527f12-f3ad-c6b9-2967-5d708d69d937@amd.com>
+ <20210707183616.5620-26-brijesh.singh@amd.com>
+ <YPHnb5pW9IoTcwWU@google.com>
+ <2711d9f9-21a0-7baa-d0ff-2c0f69ca6949@amd.com>
+ <YPIoaoDCjNVzn2ZM@google.com>
+ <e1cc1e21-e7b7-5930-1c01-8f4bb6e43b3a@amd.com>
+ <YPWz6YwjDZcla5/+@google.com>
+ <912c929c-06ba-a391-36bb-050384907d81@amd.com>
+ <YPXMas+9O1Y5910b@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b9527f12-f3ad-c6b9-2967-5d708d69d937@amd.com>
+In-Reply-To: <YPXMas+9O1Y5910b@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 19, 2021, Brijesh Singh wrote:
-> 
-> On 7/16/21 4:00 PM, Sean Christopherson wrote:
-> > On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> > > +static int __snp_handle_psc(struct kvm_vcpu *vcpu, int op, gpa_t gpa, int level)
+On Mon, Jul 19, 2021, Sean Christopherson wrote:
+> On Mon, Jul 19, 2021, Brijesh Singh wrote:
 > > 
-> > I can live with e.g. GHCB_MSR_PSC_REQ, but I'd strongly prefer to spell this out,
-> > e.g. __snp_handle_page_state_change() or whatever.  I had a hell of a time figuring
-> > out what PSC was the first time I saw it in some random context.
-> 
-> Based on the previous review feedback I renamed from
-> __snp_handle_page_state_change to __snp_handle_psc(). I will see what others
-> say and based on that will rename accordingly.
-
-I've no objection to using PSC for enums and whatnot, and I'll happily defer to
-Boris for functions in the core kernel and guest, but for KVM I'd really like to
-spell out the name for the two or so main handler functions.
-
-> > > +	while (gpa < gpa_end) {
-> > > +		/*
-> > > +		 * Get the pfn and level for the gpa from the nested page table.
-> > > +		 *
-> > > +		 * If the TDP walk failed, then its safe to say that we don't have a valid
-> > > +		 * mapping for the gpa in the nested page table. Create a fault to map the
-> > > +		 * page is nested page table.
-> > > +		 */
-> > > +		if (!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &tdp_level)) {
-> > > +			pfn = kvm_mmu_map_tdp_page(vcpu, gpa, PFERR_USER_MASK, level);
-> > > +			if (is_error_noslot_pfn(pfn))
-> > > +				goto out;
-> > > +
-> > > +			if (!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &tdp_level))
-> > > +				goto out;
-> > > +		}
-> > > +
-> > > +		/* Adjust the level so that we don't go higher than the backing page level */
-> > > +		level = min_t(size_t, level, tdp_level);
-> > > +
-> > > +		write_lock(&kvm->mmu_lock);
+> > On 7/19/21 12:18 PM, Sean Christopherson wrote:
+> > > > 
+> > > > Okay, I will add helper to make things easier. One case where we will
+> > > > need to directly call the rmpupdate() is during the LAUNCH_UPDATE
+> > > > command. In that case the page is private and its immutable bit is also
+> > > > set. This is because the firmware makes change to the page, and we are
+> > > > required to set the immutable bit before the call.
+> > > 
+> > > Or do "int rmp_make_firmware(u64 pfn, bool immutable)"?
 > > 
-> > Retrieving the PFN and level outside of mmu_lock is not correct.  Because the
-> > pages are pinned and the VMM is not malicious, it will function as intended, but
-> > it is far from correct.
-> 
-> Good point, I should have retrieved the pfn and level inside the lock.
-> 
-> > The overall approach also feels wrong, e.g. a guest won't be able to convert a
-> > 2mb chunk back to a 2mb large page if KVM mapped the GPA as a 4kb page in the
-> > past (from a different conversion).
+> > That's not what we need.
 > > 
+> > We need 'rmp_make_private() + immutable' all in one RMPUPDATE.  Here is the
+> > snippet from SNP_LAUNCH_UPDATE.
 > 
-> Maybe I am missing something, I am not able to follow 'guest won't be able
-> to convert a 2mb chunk back to a 2mb large page'. The page-size used inside
-> the guest have to relationship with the RMP/NPT page-size. e.g, a guest can
-> validate the page range as a 4k and still map the page range as a 2mb or 1gb
-> in its pagetable.
+> Ah, not firmwrare, gotcha.  But we can still use a helper, e.g. an inner
+> double-underscore helper, __rmp_make_private().
 
-The proposed code walks KVM's TDP and adjusts the RMP level to be the min of the
-guest+host levels.  Once KVM has installed a 4kb TDP SPTE, that walk will find
-the 4kb TDP SPTE and thus operate on the RMP at a 4kb granularity.  To allow full
-restoration of 2mb PTE+SPTE+RMP, KVM needs to zap the 4kb SPTE(s) at some point
-to allow rebuilding a 2mb SPTE.
+Hmm, looking at it again, I think I also got confused by the comment for the VMSA
+page:
+
+	/* Transition the VMSA page to a firmware state. */
+ 	e.assigned = 1;
+	e.immutable = 1;
+	e.asid = sev->asid;
+	e.gpa = -1;
+	e.pagesize = RMP_PG_SIZE_4K;
+
+Unlike __snp_alloc_firmware_pages() in the CCP code, the VMSA is associated with
+the guest's ASID, just not a GPA.  I.e. the VMSA is more of a specialized guest
+private page, as opposed to a dedicated firmware page.  I.e. a __rmp_make_private()
+and/or rmp_make_private_immutable() definitely seems like a good idea.
