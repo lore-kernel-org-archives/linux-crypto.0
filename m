@@ -2,167 +2,265 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56406C07E95
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D083C12002
 	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 23:58:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3881061107
+	by mail.kernel.org (Postfix) with ESMTP id 5778761165
 	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 23:58:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343788AbhGSXRy (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jul 2021 19:17:54 -0400
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:61294 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241258AbhGSVG3 (ORCPT
+        id S236136AbhGSXSA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jul 2021 19:18:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58478 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1441885AbhGSWOD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jul 2021 17:06:29 -0400
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16JLkT8j002422;
-        Mon, 19 Jul 2021 21:46:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2021-07-09;
- bh=uWX2del9LAdqMZp61F/zFDiA2wiy6vrpMneqq7c41kU=;
- b=j3ts4MeG+bpc+mkuQmSmvqnmtc8e8S1JPNuHPloPZ6JipQnAAvJI14c6tQxD4AR9rTPv
- kwC3uKus7xzTCWj7krKY2QF78jQ4RTV2AkLx9wBbV2//ZuqopKFGQCE7I3MeUPR8g80Z
- fHjuNnqP4VsyRuD/hIkd3l0Rjm4P4j36m8vJJJqg52A/aB4q6Xt29RloF1Hfrjai1j2P
- q9HjFL+i9q6yPhzgVi7CxJMfC81mTasRMtJyCymXCac1kgThoZJK17O9prCnHcdaTCL8
- tYs8HX+vkuoZH7GmTjzwD5QSfrCIsGReGixSZjaXq3qkPnpWHpMMpUEYEeVGDCraKiWX EA== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2020-01-29;
- bh=uWX2del9LAdqMZp61F/zFDiA2wiy6vrpMneqq7c41kU=;
- b=OkgP+T9heTj8Krku4PSbxKeNeImgJZsVUKpOibCCr6/UggKoT9DNCszW14HB/EI5ziHe
- N4TDgKkSiQipK8YIY5W44qnJVfyj9eJ8prMe6LbwJIyR9UiMR4ibj9g639Y1UlcChP3H
- EtzujKLC4cstU2OpeGoBFbiF7JbZ0pKic6JD4wdcrr4PpQA4J0GwsgLwjJB8q9H/N7e8
- LPRUIXhKUWRK0M29g3vVbeODVw8FR4LhnaoESASezCgOfpTuuK5OaIEH8PR4vWJNrK/E
- Gt89ZOSvERCZs1RsKLcE6Xgr7R96EABGH2UuNWR4bp2BIld95yKBz2Kw8ocV+4ic0y0t Pg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by mx0b-00069f02.pphosted.com with ESMTP id 39w8p0s8p9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 19 Jul 2021 21:46:56 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 16JLkP9a101841;
-        Mon, 19 Jul 2021 21:46:55 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2042.outbound.protection.outlook.com [104.47.57.42])
-        by userp3030.oracle.com with ESMTP id 39umaxt1q5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 19 Jul 2021 21:46:55 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BFK3cB8xLKeWCQBT2bdaVwFG/phHgKcPnatAafAwtL/9oPy66Tza5RUYN5oy9+4zK6HRfHA3IVbXkhKr8szgNIPmL8H75IMgxzWLdtMfrSlsVfplQWkR0BSxa4LV4jrAKHikPSSaWL5UzHgwANDFah/iv+Edc4HX57j4it7MwNKoFn5Y7GTaEZJsg7w8dsK5McMcKAdxPmgoM5xi8cuPCYkTwG4mPCKqfEDX31Gum8lICoxpBC+YHOXzqzxYhcCJXYwEPIAA/+RcY3vjFxMwDdb+RKMA35Zfq2HHeESG7Bk7HJ0pyE8bff6kXecU9XMoDPUxagmlQc9gK/lcDp+n1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uWX2del9LAdqMZp61F/zFDiA2wiy6vrpMneqq7c41kU=;
- b=WR+ba9jFxjR0ceXTVzoJzlgLazOziS7/d4sH+ctHbWbRaZae5ZiB1XiPpGzwDBOj9g7MslT7KKGpt+kO/byf0J6/wH6wye55r+4kDpGbt5eYLItWFm0gU1qBwEKvptx8h5BJk02O/Lenr1l9CefIqjYhBEC15arnXrPo1jFelwvqXbPx9Cnm90qnwR77TNmB7hfdKvS8c8pkFPjvNPdi+eST0BlUw/fnKeqUxZF2MAS+wTlotfwfsWuMwLseF4vmB/0g8lbUkLhgQY1dViqh0kKs3fQS/OtHFfvVHOs6BUSxMWwFasljt1w/QVQDOpWMKXaEjEALQc7UAspkdfjGIQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        Mon, 19 Jul 2021 18:14:03 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2013C0613B8
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 15:50:07 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id p36so17956976pfw.11
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 15:50:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uWX2del9LAdqMZp61F/zFDiA2wiy6vrpMneqq7c41kU=;
- b=OFq5sGLYesNy7wAOaHEvE47vnUkSpcWUfxyq6xKfvVoinxLvLS2ospvbfCe41plE/WmLZqsZysffNBnMMZAPutEDva1bgC0acPA812QGuK/Fl+B3QQmoZ2uwKuRmsvdb98bL5XHAy/w1vtvwvucfDTm8wcKlLyZ52s1zMWpXo6o=
-Authentication-Results: fudan.edu.cn; dkim=none (message not signed)
- header.d=none;fudan.edu.cn; dmarc=none action=none header.from=oracle.com;
-Received: from BYAPR10MB2966.namprd10.prod.outlook.com (2603:10b6:a03:8c::27)
- by BYAPR10MB2790.namprd10.prod.outlook.com (2603:10b6:a03:89::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.29; Mon, 19 Jul
- 2021 21:46:54 +0000
-Received: from BYAPR10MB2966.namprd10.prod.outlook.com
- ([fe80::9478:368e:93b4:6b48]) by BYAPR10MB2966.namprd10.prod.outlook.com
- ([fe80::9478:368e:93b4:6b48%4]) with mapi id 15.20.4331.032; Mon, 19 Jul 2021
- 21:46:54 +0000
-Date:   Mon, 19 Jul 2021 17:46:49 -0400
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Xiyu Yang <xiyuyang19@fudan.edu.cn>
-Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yuanxzhang@fudan.edu.cn, Xin Tan <tanxin.ctf@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] padata: Convert from atomic_t to refcount_t on
- parallel_data->refcnt
-Message-ID: <20210719214649.w65ifdp2hriryrsc@oracle.com>
-References: <1626683853-64734-1-git-send-email-xiyuyang19@fudan.edu.cn>
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/KQZ/og+MMwG7+gZQy+I2ifIZbW2sC3CrysTm6RWo48=;
+        b=TrC6uyzelR+/+DuhHGkQhT8ZilBSns6EN6zr6R3GsDzwt1A0B1ob14VfGLKbKtyYHf
+         UnePiDR4FpHICi6z5QS4Br4KOWkHIgLEeR8gx7IzpIzQOJFTLlF7+NNZycoVeKnxYD6h
+         HbjmZ/PaBHV0V8e+cfLnxBcowZivtCrjpWnTV8c2ZjABFcunj+ENtzWsgGQLyJbKIFv/
+         VR+A8muZqP5sibfw7uvl/qPo2Ty2GVOGxwdOKplp/U4hoGQCi7nhVUCLUrGwfAlFMGnd
+         p98tI4Tr+xvCXIgbQNI2AJDXVbX1JKOsFuuzRo2sS//yKyLQdg5uMFTMCUas9NSy8J5b
+         Frtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/KQZ/og+MMwG7+gZQy+I2ifIZbW2sC3CrysTm6RWo48=;
+        b=D1G7loB5yR6jBaIDH+/IxQo5fg4uI8J7spOcO19pSdbSmjXYpfYKJ09Q5RB4th1bDT
+         o/csoMVseBfCLRygla9Y8V2fjg4vd9iKHZy/0neOLqxP99QWM5ywCj3GhBpkVzIYUCZ1
+         1S8FmVzFvvgeS1dCuTERKe3BbAuMPL0i0lhi7oQqeH0TFqM7nh9su8aOrIDvXsoVsbNB
+         MgftfSjRx8b0XKq+lt92U2ZY4HDS2qkUzFBwc6Y2k6HWgjZcCipxCyBxCVaBDkwiIZbN
+         x7eVf48yt8dgEDkmRHc1d/4FqOzQjyiokZHLHSf5DYFPjJZc51cQdzooVNAnZbfPfeA7
+         Jing==
+X-Gm-Message-State: AOAM532x+4mqvTHHkP04W8ZDYOQbI7A6rr+XJFPOqIVVIJEQKeOKnybU
+        w1BQD20j//ZrK+zwm/FrQDQehw==
+X-Google-Smtp-Source: ABdhPJy/imUID7VPk45W7GZdlhJTj17s4zd4R4dZUGmjWKYmnjQB23dmeWQOvmtu+8kvlA6P6vSXfw==
+X-Received: by 2002:a63:a558:: with SMTP id r24mr12070616pgu.438.1626735006916;
+        Mon, 19 Jul 2021 15:50:06 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p33sm21208412pfw.40.2021.07.19.15.50.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jul 2021 15:50:06 -0700 (PDT)
+Date:   Mon, 19 Jul 2021 22:50:02 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 38/40] KVM: SVM: Provide support for
+ SNP_GUEST_REQUEST NAE event
+Message-ID: <YPYBmlCuERUIO5+M@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-39-brijesh.singh@amd.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1626683853-64734-1-git-send-email-xiyuyang19@fudan.edu.cn>
-X-ClientProxiedBy: BL1PR13CA0294.namprd13.prod.outlook.com
- (2603:10b6:208:2bc::29) To BYAPR10MB2966.namprd10.prod.outlook.com
- (2603:10b6:a03:8c::27)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from oracle.com (98.229.125.203) by BL1PR13CA0294.namprd13.prod.outlook.com (2603:10b6:208:2bc::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.9 via Frontend Transport; Mon, 19 Jul 2021 21:46:52 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b51b3b1d-7ba5-47e6-017c-08d94afeb92f
-X-MS-TrafficTypeDiagnostic: BYAPR10MB2790:
-X-Microsoft-Antispam-PRVS: <BYAPR10MB2790B73D206E3BFF3D60B1B1D9E19@BYAPR10MB2790.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9EAxGuOwJfr79JtFCz/bqwhr6imPHQ96li5IMk9Rqdp3DDvoZJGphqe3q6D0EFGjFcqgAIRuRNvdZfG3v3uZnfpPgtJLPBa9AnGzKN+dPDu/FTV21kODTMIDpCbM3gFXFyx/hEvMIDKD5S7buoTLLL+6ql3vNcFm09Ytg3jR7En6tkDtWlTX3WG9MPDCgz/gQ5DKJIlZFIXv5Zo6IJZVqf62cTIrejsHFGuayV8oJ4uh4z7J4qykAmf9Hdh/2hLHvXFB6QFszDCZJRCULEIrq7PsC+E0pdeCM345DAh4WsS+O3BR9EjVorA7Y3n/j8PQGhXBUAN81F+tQSJar7ZkI2+tUPkv2zMa3s+aL8jxyjoQ+SHFTAyO7JLKt/RRLQvtWaRt8SEpgtFOqEZFMtLn5tZ4yxFzVyKh/xBQUFBUbXVFPQr3RiYaPJDg/AMdpbPN2an9iIUhZZ9MAKDpQZAk4bZjXXKfVC/CQXxh1CYNc2Ji4hROedX09X7l4ZgUuvb0fmdEziOz0PA04xnhSWhYOcovd+YNehPUgg7n+zI8W5mqwuBrI1xjQW7Dm4No5400XBby3eAffDBqkU9WQNiegNEj2t3B1lqNU34AbJBBhX41rrdUV96PqwHoeu+03YzTNqqF09/VTyWtamC+rSckZj72TBvJymr9u3YKsnLnEpVPban9nzut/EWTRkJp+OmDVriyFEBPChXO0TOZFF60Tg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2966.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(36756003)(52116002)(7696005)(8886007)(186003)(2906002)(86362001)(8936002)(316002)(8676002)(4744005)(6916009)(54906003)(38350700002)(2616005)(55016002)(1076003)(5660300002)(6666004)(66946007)(26005)(4326008)(508600001)(66556008)(956004)(66476007)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GILSx7+G1r0AaVhEDDvgih4telNixF7htEg7w9SoLuwSgRrHgTfg4NYyAqeP?=
- =?us-ascii?Q?msNr6kF95KQvvdT+IDFQJe89dJsb9DEkQVCaRkG7Po49YNFy3vihbConjF1f?=
- =?us-ascii?Q?yFDgkOtPOIZVsVCWjIkCC3D6GCE8wZR8b4HOKaV17uaeb/hMeHmEmqNPoi9G?=
- =?us-ascii?Q?kXx0CcTuII4GqdTwVQlhG/h3i9IRIYRIgdo6K4ln+OsixOw+KsigLFgoE7Ie?=
- =?us-ascii?Q?C0+I0dKPQSoU6kmZByDt9d/+R2QZMZ6yhLLFDsgT2z09p37gHfJQwnmgbuwX?=
- =?us-ascii?Q?2KeNvghah6ZsHK3vLdgY2NT0TwtXdet9P2YIxR4R78VH8vgGVJoEP6CN4AAl?=
- =?us-ascii?Q?7bi1WmlsnUftZfHer5MjDIwEG62eNGp1OT4mJCqp6ycIFY2ZiFiv93Oedtu0?=
- =?us-ascii?Q?CAQhwJlPTzVCY6HOiPfJ8APJRu5vq5TbLPldcouF1337+dArfZwh1jZuwCpP?=
- =?us-ascii?Q?u8wviKBydh08uWijMxy2BgPXXteB4L+3bxt5ocSxNPXiu929WXYJ7ydMGcC9?=
- =?us-ascii?Q?h4K5KRKmpzsV/vFSNPVEhbNDQ7HTKc2ByLNxM+RJcDi7XhmC6MRBTJbbkp42?=
- =?us-ascii?Q?XTfsgVjI+UayYwuV7TyqHO6X3/oHdMiU8E2VaT2gI2GuW/UxRwgS+MtiINqK?=
- =?us-ascii?Q?vAvYXfBlLIIS++HVVGZFCj+jiIbVhijPYWV5+Y+j9mcu83/YGiuPysl3g/Co?=
- =?us-ascii?Q?LpwFCwCsFcBqEQyji1xwCBxhkIeSsW2jx8MJifzteCU++cvJGsKkP/BK3BuB?=
- =?us-ascii?Q?9AuB9OsTdoJGJnUCeyDPuNWGWlwww0NO00TpW2O+8qt67p+8ZkgitxpIfKXV?=
- =?us-ascii?Q?Uu6wmbxt95uawjEQXjOP7k9dNDLZFAIBIn6cm7FtR80ZNdKWfbX+uxEyDQNs?=
- =?us-ascii?Q?w4B0DIkmxbY2y1gPsJO6xa4TKZ5AaT+tbqr2cA0e40Y49GiQa1TX/fQhohtV?=
- =?us-ascii?Q?5J99fAM5s+GdtY6MhwCm7aWJJNizkCaoLDnQV+WNUb94Q4epVuKdzQw+s3Hj?=
- =?us-ascii?Q?scgoi7TgJYXu1CUTZItFdC41jPF/seeoSDufSqypnKBTnhjpVDRJmFWNcCbY?=
- =?us-ascii?Q?1DLU9HHjCz9O+bwg/Wnyt/s9dUg1OpkttFPaM4WKXx079mO7YbMrkInKKAX3?=
- =?us-ascii?Q?V3P2UQVRUz0PCQx43+WKiZ8z6JF7Lyn+cLiafkT64G5ivdoHFgIbRjKMY2HH?=
- =?us-ascii?Q?qWNo2zTx+oQLLLo8XuJbk2aDQvbwmg7dUyLPwH3/w6HUqwFM/j5N3rYTMK2v?=
- =?us-ascii?Q?ebnte4g/folDDu/u5XIzLrCLyn0ZSFJ8LE/eMER5K8uQXyxLFatelXcZU6HD?=
- =?us-ascii?Q?yiVueX1R7Nsfofd8I8gvnihS?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b51b3b1d-7ba5-47e6-017c-08d94afeb92f
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2966.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2021 21:46:54.1958
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jqL9Av9DVttJGx3sipiVLRksIJLDSWJSCasDjbTC+9cbxQhmQXtKu0TazmrYbSe4Zm+dLqGDfyA+UH53Bh0Bf1OrUU6GH59aBKq6UNahEaU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR10MB2790
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10050 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0 spamscore=0
- mlxscore=0 adultscore=0 mlxlogscore=915 suspectscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2107190125
-X-Proofpoint-GUID: n_5PneGdJLQJ7c-9PZ7UFwOkekUA1D1o
-X-Proofpoint-ORIG-GUID: n_5PneGdJLQJ7c-9PZ7UFwOkekUA1D1o
+In-Reply-To: <20210707183616.5620-39-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 04:37:33PM +0800, Xiyu Yang wrote:
-> refcount_t type and corresponding API can protect refcounters from
-> accidental underflow and overflow and further use-after-free situations.
-> 
-> Signed-off-by: Xiyu Yang <xiyuyang19@fudan.edu.cn>
-> Signed-off-by: Xin Tan <tanxin.ctf@gmail.com>
+On Wed, Jul 07, 2021, Brijesh Singh wrote:
+> Version 2 of GHCB specification added the support two SNP Guest Request
+> Message NAE event. The events allows for an SEV-SNP guest to make request
+> to the SEV-SNP firmware through hypervisor using the SNP_GUEST_REQUEST
+> API define in the SEV-SNP firmware specification.
 
-This patch run on a big server didn't turn up anything, but it's
-probably useful to have the extra checking.
+IIUC, this snippet in the spec means KVM can't restrict what requests are made
+by the guests.  If so, that makes it difficult to detect/ratelimit a misbehaving
+guest, and also limits our options if there are firmware issues (hopefully there
+aren't).  E.g. ratelimiting a guest after KVM has explicitly requested it to
+migrate is not exactly desirable.
 
-Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+  The hypervisor cannot alter the messages without detection nor read the
+  plaintext of the messages.
+
+> The SNP_GUEST_REQUEST requires two unique pages, one page for the request
+> and one page for the response. The response page need to be in the firmware
+> state. The GHCB specification says that both the pages need to be in the
+> hypervisor state but before executing the SEV-SNP command the response page
+> need to be in the firmware state.
+ 
+...
+
+> Now that KVM supports all the VMGEXIT NAEs required for the base SEV-SNP
+> feature, set the hypervisor feature to advertise it.
+
+It would helpful if this changelog listed the Guest Requests that are required
+for "base" SNP, e.g. to provide some insight as to why we care about guest
+requests.
+
+>  static int snp_bind_asid(struct kvm *kvm, int *error)
+> @@ -1618,6 +1631,12 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	if (rc)
+>  		goto e_free_context;
+>  
+> +	/* Used for rate limiting SNP guest message request, use the default settings */
+> +	ratelimit_default_init(&sev->snp_guest_msg_rs);
+
+Is this exposed to userspace in any way?  This feels very much like a knob that
+needs to be configurable per-VM.
+
+Also, what are the estimated latencies of a guest request?  If the worst case
+latency is >200ms, a default ratelimit frequency of 5hz isn't going to do a whole
+lot.
+
+> +static void snp_handle_guest_request(struct vcpu_svm *svm, struct ghcb *ghcb,
+> +				     gpa_t req_gpa, gpa_t resp_gpa)
+> +{
+> +	struct sev_data_snp_guest_request data = {};
+> +	struct kvm_vcpu *vcpu = &svm->vcpu;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct kvm_sev_info *sev;
+> +	int rc, err = 0;
+> +
+> +	if (!sev_snp_guest(vcpu->kvm)) {
+> +		rc = -ENODEV;
+> +		goto e_fail;
+> +	}
+> +
+> +	sev = &to_kvm_svm(kvm)->sev_info;
+> +
+> +	if (!__ratelimit(&sev->snp_guest_msg_rs)) {
+> +		pr_info_ratelimited("svm: too many guest message requests\n");
+> +		rc = -EAGAIN;
+
+What guarantee do we have that the guest actually understands -EAGAIN?  Ditto
+for -EINVAL returned by snp_build_guest_buf().  AFAICT, our options are to return
+one of the error codes defined in "Table 95. Status Codes for SNP_GUEST_REQUEST"
+of the firmware ABI, kill the guest, or ratelimit the guest without returning
+control to the guest.
+
+> +		goto e_fail;
+> +	}
+> +
+> +	rc = snp_build_guest_buf(svm, &data, req_gpa, resp_gpa);
+> +	if (rc)
+> +		goto e_fail;
+> +
+> +	sev = &to_kvm_svm(kvm)->sev_info;
+> +
+> +	mutex_lock(&kvm->lock);
+
+Question on the VMPCK sequences.  The firmware ABI says:
+
+   Each guest has four VMPCKs ... Each message contains a sequence number per
+   VMPCK. The sequence number is incremented with each message sent. Messages
+   sent by the guest to the firmware and by the firmware to the guest must be
+   delivered in order. If not, the firmware will reject subsequent messages ...
+
+Does that mean there are four independent sequences, i.e. four streams the guest
+can use "concurrently", or does it mean the overall freshess/integrity check is
+composed from four VMPCK sequences, all of which must be correct for the message
+to be valid?
+
+If it's the latter, then a traditional mutex isn't really necessary because the
+guest must implement its own serialization, e.g. it's own mutex or whatever, to
+ensure there is at most one request in-flight at any given time.  And on the KVM
+side it means KVM can simpy reject requests if there is already an in-flight
+request.  It might also give us more/better options for ratelimiting?
+
+> +	rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, &err);
+> +	if (rc) {
+> +		mutex_unlock(&kvm->lock);
+
+I suspect you reused this pattern from other, more complex code, but here it's
+overkill.  E.g.
+
+	if (!rc)
+		rc = kvm_write_guest(kvm, resp_gpa, sev->snp_resp_page, PAGE_SIZE);
+	else if (err)
+		rc = err;
+
+	mutex_unlock(&kvm->lock);
+
+	ghcb_set_sw_exit_info_2(ghcb, rc);
+
+> +		/* If we have a firmware error code then use it. */
+> +		if (err)
+> +			rc = err;
+> +
+> +		goto e_fail;
+> +	}
+> +
+> +	/* Copy the response after the firmware returns success. */
+> +	rc = kvm_write_guest(kvm, resp_gpa, sev->snp_resp_page, PAGE_SIZE);
+> +
+> +	mutex_unlock(&kvm->lock);
+> +
+> +e_fail:
+> +	ghcb_set_sw_exit_info_2(ghcb, rc);
+> +}
+> +
+> +static void snp_handle_ext_guest_request(struct vcpu_svm *svm, struct ghcb *ghcb,
+> +					 gpa_t req_gpa, gpa_t resp_gpa)
+> +{
+> +	struct sev_data_snp_guest_request req = {};
+> +	struct kvm_vcpu *vcpu = &svm->vcpu;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	unsigned long data_npages;
+> +	struct kvm_sev_info *sev;
+> +	unsigned long err;
+> +	u64 data_gpa;
+> +	int rc;
+> +
+> +	if (!sev_snp_guest(vcpu->kvm)) {
+> +		rc = -ENODEV;
+> +		goto e_fail;
+> +	}
+> +
+> +	sev = &to_kvm_svm(kvm)->sev_info;
+> +
+> +	if (!__ratelimit(&sev->snp_guest_msg_rs)) {
+> +		pr_info_ratelimited("svm: too many guest message requests\n");
+> +		rc = -EAGAIN;
+> +		goto e_fail;
+> +	}
+> +
+> +	if (!sev->snp_certs_data) {
+> +		pr_err("svm: certs data memory is not allocated\n");
+> +		rc = -EFAULT;
+
+Another instance where the kernel's error numbers will not suffice.
+
+> +		goto e_fail;
+> +	}
+> +
+> +	data_gpa = ghcb_get_rax(ghcb);
+> +	data_npages = ghcb_get_rbx(ghcb);
