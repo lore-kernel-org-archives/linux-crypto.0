@@ -2,62 +2,63 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-21.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB14C07E9B
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 00:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDAD5C636CE
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 02:42:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF4C361165
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 00:59:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF4FE610FB
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 02:42:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240095AbhGTASs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jul 2021 20:18:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47914 "EHLO
+        id S1345373AbhGTCBb (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jul 2021 22:01:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378415AbhGSXhL (ORCPT
+        with ESMTP id S1442265AbhGSWxd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jul 2021 19:37:11 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F2C3C08EA3C
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 17:10:40 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id b12so18133832pfv.6
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 17:10:40 -0700 (PDT)
+        Mon, 19 Jul 2021 18:53:33 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4680C06127E
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 16:30:31 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d12so18067330pfj.2
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 16:30:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=AK7Am28M2zvc87KGZLscBYou7JeqfY9AoMRwA8Z1is0=;
-        b=kOJz/QU/yH26H5nk02wvJPuP7I15H5DyQmeaxzTCZy4nge9IPwiNMKHI7U3dCKd+z9
-         VC46tces4DPjfyQd6/7DoXA8J0G8oMlGEvEwNHxh8zAiKv4xlhDbHdbn7UTq6cU0emJX
-         bXtDSYyPOi2ynMErJTUKqEjXAR575c7xvzK3Q2zaohOoMkCX3bqOSYvttDkw34YdWZoW
-         UE0rNfvMHAczrp8ll5j1fxv/l7Y9beXzNf5dJ/pjBhVIxzpMgE/gLBA9qQHOdS4CIRbN
-         tPqP556jUWGYKfSbaAIj2nWSdziw0T1MJUhOJWd5mlT+jpq+wQgyLLVdbRUU7Xe1WZ0c
-         kv3w==
+        bh=ml3Q/kTxZiD4jac4rsa9z6q3oqgw/koE0r8JlYAWEoE=;
+        b=sMaBLc6xZX7zehQ8U1kn7T2/C76fdCJIRBEmJcwUdtN+Ur6xNDVNIA4wnj+n5MAgrI
+         fRKop8qSFfB5cJj5Qd7DEJPBG9n2V1DApSvIFOjQinvQRz7V6ozyOBexcCug8btYPM+J
+         MMZqkMfsPwKR7hJ8KfXCbL9q5j/u8ILTW+OotIbqxzJ+akWq3OX+Rux7DSgW64emjSxx
+         /G3uagHiW/9cKFWa857nddfAl6IcWtZDkPwv7s7H35o+5FI3X0D2AEhUoR4OdKHktGMB
+         5lpjpv8BqF9q2yg/iuIW7lEANMTukouIkKW+oDuuhgdavYXnIqR/tPR7p66hSzMduya7
+         pthQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=AK7Am28M2zvc87KGZLscBYou7JeqfY9AoMRwA8Z1is0=;
-        b=azi1ZDdtI09MonCczp3PsLFoBdrFJcghHwru6MP+4qzvPZbTBf2/jsO10Qy0oDVK7Q
-         CDJfcNZcjiJRq0PKvvPjdHsFBzcJQVMbUbU1atAINZqmpnRVFcS2Rnk2ty2CZeJaITBW
-         KjBgCjVJF4Thb9tHRujHWTvNZZ9u9MJLG8VqdQGAKliaREeYLUENuVrLzOuQzDxavq/Q
-         OHkff4gnCqZGQDXZC5PkiQkZskETJ8bBts7GeO/hBOCeFzeCLa1ZG7Ax2e4k1olHC3aw
-         RphmQ2ximxwBHZ6Yg8ySiy5D4kJ4IP8i6ndUTajazmkKnIMFMiW441lutdH4MAgbnqk3
-         xx1g==
-X-Gm-Message-State: AOAM53274PSe6OFILsqzzIzXdbM7tlHet67iT/yauyY4nkZ2W5/7AlQm
-        lFadmo88cLu3fMobMkejeTmyag==
-X-Google-Smtp-Source: ABdhPJwXXNzz6kdDJ2LYdi7Q+ws13YMDHqvdk1hUvnOwKNdrC60c1ezx7UMJv5UI1Q2z1WInzxdE0g==
-X-Received: by 2002:a62:684:0:b029:330:2fe:28ef with SMTP id 126-20020a6206840000b029033002fe28efmr28679143pfg.21.1626739839808;
-        Mon, 19 Jul 2021 17:10:39 -0700 (PDT)
+        bh=ml3Q/kTxZiD4jac4rsa9z6q3oqgw/koE0r8JlYAWEoE=;
+        b=DaMrpqu+bOoiQP6WLvejr7hvDaEd2/OAYdutPrt5OcDwbYk+6+9jXrtbm92uZAoyGh
+         sdZAolvVhb5cn5kYtyQFYuZB46SgCNc8d2wwoCG3kNz1xA/1iuvMR/+k5LgR9N1nU9Rc
+         r5xUt4RFVX69mO07BrdLYFYmUsq8WTg9/MOuucVXPno5JGCl9cHdtfHOhwKtErgBnf3m
+         7eZLCi6i5NptFjHl/0ilc5iD+HDPlpnRDyinKr9Gak5Q+0ldYkPYpyqB7bYPfw6TWZ/3
+         KAWGuissJnJMSbEyqlDL524jw8wHhQ8/jIHv+t/wTCmsxbnwd2NSOXD5I4/QOxhZ1YFw
+         6c+A==
+X-Gm-Message-State: AOAM533QmBxuv7ledIv01s+m82p4FDJa43jSf4nHYQKe+VL3RHk1bq04
+        vW9x8To2OUk8Ato7Wqgb1mLrKA==
+X-Google-Smtp-Source: ABdhPJxkrxZk/0Zz1bAor5ysJ9w0e2+YW2IaG8snr9Fl4r2Iz1JNpsaNu5NP3/nbL6PnRtlutO5udg==
+X-Received: by 2002:a62:4e0f:0:b029:329:20be:287a with SMTP id c15-20020a624e0f0000b029032920be287amr28021297pfb.55.1626737431050;
+        Mon, 19 Jul 2021 16:30:31 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d191sm24218090pga.27.2021.07.19.17.10.39
+        by smtp.gmail.com with ESMTPSA id bt17sm571551pjb.40.2021.07.19.16.30.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jul 2021 17:10:39 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 00:10:35 +0000
+        Mon, 19 Jul 2021 16:30:30 -0700 (PDT)
+Date:   Mon, 19 Jul 2021 23:30:26 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Brijesh Singh <brijesh.singh@amd.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -83,170 +84,115 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
         npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 37/40] KVM: SVM: Add support to handle the
- RMP nested page fault
-Message-ID: <YPYUe8hAz5/c7IW9@google.com>
+Subject: Re: [PATCH Part2 RFC v4 35/40] KVM: Add arch hooks to track the host
+ write to guest memory
+Message-ID: <YPYLEksyzOWHZwpA@google.com>
 References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-38-brijesh.singh@amd.com>
+ <20210707183616.5620-36-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707183616.5620-38-brijesh.singh@amd.com>
+In-Reply-To: <20210707183616.5620-36-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> Follow the recommendation from APM2 section 15.36.10 and 15.36.11 to
-> resolve the RMP violation encountered during the NPT table walk.
+> The kvm_write_guest{_page} and kvm_vcpu_write_guest{_page} are used by
+> the hypevisor to write to the guest memory. The kvm_vcpu_map() and
+> kvm_map_gfn() are used by the hypervisor to map the guest memory and
+> and access it later.
+> 
+> When SEV-SNP is enabled in the guest VM, the guest memory pages can
+> either be a private or shared. A write from the hypervisor goes through
+> the RMP checks. If hardware sees that hypervisor is attempting to write
+> to a guest private page, then it triggers an RMP violation (i.e, #PF with
+> RMP bit set).
+> 
+> Enhance the KVM guest write helpers to invoke an architecture specific
+> hooks (kvm_arch_write_gfn_{begin,end}) to track the write access from the
+> hypervisor.
+> 
+> When SEV-SNP is enabled, the guest uses the PAGE_STATE vmgexit to ask the
+> hypervisor to change the page state from shared to private or vice versa.
+> While changing the page state to private, use the
+> kvm_host_write_track_is_active() to check whether the page is being
+> tracked for the host write access (i.e either mapped or kvm_write_guest
+> is in progress). If its tracked, then do not change the page state.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
 
-Heh, please elaborate on exactly what that recommendation is.  A recommendation
-isn't exactly architectural, i.e. is subject to change :-)
+...
 
-And, do we have to follow the APM's recommendation?  Specifically, can KVM treat
-#NPF RMP violations as guest errors, or is that not allowed by the GHCB spec?
-I.e. can we mandate accesses be preceded by page state change requests?  It would
-simplify KVM (albeit not much of a simplificiation) and would also make debugging
-easier since transitions would require an explicit guest request and guest bugs
-would result in errors instead of random corruption/weirdness.
-
-> index 46323af09995..117e2e08d7ed 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1399,6 +1399,9 @@ struct kvm_x86_ops {
+> @@ -3468,3 +3489,33 @@ int sev_get_tdp_max_page_level(struct kvm_vcpu *vcpu, gpa_t gpa, int max_level)
 >  
->  	void (*write_page_begin)(struct kvm *kvm, struct kvm_memory_slot *slot, gfn_t gfn);
->  	void (*write_page_end)(struct kvm *kvm, struct kvm_memory_slot *slot, gfn_t gfn);
-> +
-> +	int (*handle_rmp_page_fault)(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t pfn,
-> +			int level, u64 error_code);
->  };
->  
->  struct kvm_x86_nested_ops {
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e60f54455cdc..b6a676ba1862 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5096,6 +5096,18 @@ static void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
->  	write_unlock(&vcpu->kvm->mmu_lock);
->  }
->  
-> +static int handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
-> +{
-> +	kvm_pfn_t pfn;
-> +	int level;
-> +
-> +	if (unlikely(!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &level)))
-> +		return RET_PF_RETRY;
-> +
-> +	kvm_x86_ops.handle_rmp_page_fault(vcpu, gpa, pfn, level, error_code);
-> +	return RET_PF_RETRY;
-> +}
-> +
->  int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
->  		       void *insn, int insn_len)
->  {
-> @@ -5112,6 +5124,14 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
->  			goto emulate;
->  	}
->  
-> +	if (unlikely(error_code & PFERR_GUEST_RMP_MASK)) {
-> +		r = handle_rmp_page_fault(vcpu, cr2_or_gpa, error_code);
-
-Adding a kvm_x86_ops hook is silly, there's literally one path, npf_interception()
-that can encounter RMP violations.  Just invoke snp_handle_rmp_page_fault() from
-there.  That works even if kvm_mmu_get_tdp_walk() stays around since it was
-exported earlier.
-
-> +		if (r == RET_PF_RETRY)
-> +			return 1;
-> +		else
-> +			return r;
-> +	}
-> +
->  	if (r == RET_PF_INVALID) {
->  		r = kvm_mmu_do_page_fault(vcpu, cr2_or_gpa,
->  					  lower_32_bits(error_code), false);
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 839cf321c6dd..53a60edc810e 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3519,3 +3519,60 @@ void sev_snp_write_page_begin(struct kvm *kvm, struct kvm_memory_slot *slot, gfn
->  		BUG_ON(rc != 0);
->  	}
+>  	return min_t(uint32_t, level, max_level);
 >  }
 > +
-> +int snp_handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t pfn,
-> +			      int level, u64 error_code)
+> +void sev_snp_write_page_begin(struct kvm *kvm, struct kvm_memory_slot *slot, gfn_t gfn)
 > +{
 > +	struct rmpentry *e;
-> +	int rlevel, rc = 0;
-> +	bool private;
-> +	gfn_t gfn;
+> +	int level, rc;
+> +	kvm_pfn_t pfn;
 > +
-> +	e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &rlevel);
-> +	if (!e)
-> +		return 1;
+> +	if (!sev_snp_guest(kvm))
+> +		return;
 > +
-> +	private = !!(error_code & PFERR_GUEST_ENC_MASK);
+> +	pfn = gfn_to_pfn(kvm, gfn);
+> +	if (is_error_noslot_pfn(pfn))
+> +		return;
+> +
+> +	e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &level);
+> +	if (unlikely(!e))
+> +		return;
 > +
 > +	/*
-> +	 * See APM section 15.36.11 on how to handle the RMP fault for the large pages.
+> +	 * A hypervisor should never write to the guest private page. A write to the
+> +	 * guest private will cause an RMP violation. If the guest page is private,
+> +	 * then make it shared.
 
-Please do not punt the reader to the APM for things like this.  It's ok when there
-are gory details about CPU behavior that aren't worth commenting, but under no
-circumstance should KVM's software implementation be "documented" in a CPU spec.
+NAK on converting RMP entries in response to guest accesses.  Corrupting guest
+data (due to dropping the "validated" flag) on a rogue/incorrect guest emulation
+request or misconfigured PV feature is double ungood.  The potential kernel panic
+below isn't much better.
 
-> +	 *
-> +	 *  npt	     rmp    access      action
-> +	 *  --------------------------------------------------
-> +	 *  4k       2M     C=1       psmash
-> +	 *  x        x      C=1       if page is not private then add a new RMP entry
-> +	 *  x        x      C=0       if page is private then make it shared
-> +	 *  2M       4k     C=x       zap
+And I also don't think we need this heavyweight flow for user access, e.g.
+__copy_to_user(), just eat the RMP violation #PF like all other #PFs and exit
+to userspace with -EFAULT.
+
+kvm_vcpu_map() and friends might need the manual lookup, at least initially, but
+in an ideal world that would be naturally handled by gup(), e.g. by unmapping
+guest private memory or whatever approach TDX ends up employing to avoid #MCs.
+
 > +	 */
-> +	if ((error_code & PFERR_GUEST_SIZEM_MASK) ||
-> +	    ((level == PG_LEVEL_4K) && (rlevel == PG_LEVEL_2M) && private)) {
-> +		rc = snp_rmptable_psmash(vcpu, pfn);
-> +		goto zap_gfn;
+> +	if (rmpentry_assigned(e)) {
+> +		pr_err("SEV-SNP: write to guest private gfn %llx\n", gfn);
+> +		rc = snp_make_page_shared(kvm_get_vcpu(kvm, 0),
+> +				gfn << PAGE_SHIFT, pfn, PG_LEVEL_4K);
+> +		BUG_ON(rc != 0);
 > +	}
-> +
-> +	/*
-> +	 * If it's a private access, and the page is not assigned in the RMP table, create a
-> +	 * new private RMP entry.
-> +	 */
-> +	if (!rmpentry_assigned(e) && private) {
-> +		rc = snp_make_page_private(vcpu, gpa, pfn, PG_LEVEL_4K);
-> +		goto zap_gfn;
-> +	}
-> +
-> +	/*
-> +	 * If it's a shared access, then make the page shared in the RMP table.
-> +	 */
-> +	if (rmpentry_assigned(e) && !private)
-> +		rc = snp_make_page_shared(vcpu, gpa, pfn, PG_LEVEL_4K);
+> +}
 
-Hrm, this really feels like it needs to be protected by mmu_lock.  Functionally,
-it might all work out in the end after enough RMP violations, but it's extremely
-difficult to reason about and probably even more difficult if multiple vCPUs end
-up fighting over a gfn.
+...
 
-My gut reaction is that this is also backwards, i.e. KVM should update the RMP
-to match its TDP SPTEs, not the other way around.
+> +void kvm_arch_write_gfn_begin(struct kvm *kvm, struct kvm_memory_slot *slot, gfn_t gfn)
+> +{
+> +	update_gfn_track(slot, gfn, KVM_PAGE_TRACK_WRITE, 1);
 
-The one big complication is that the TDP MMU only takes mmu_lock for read.  A few
-options come to mind but none of them are all that pretty.  I'll wait to hear back
-on whether or not we can make PSC request mandatory before thinking too hard on
-this one.
+Tracking only writes isn't correct, as KVM reads to guest private memory will
+return garbage.  Pulling the rug out from under KVM reads won't fail as
+spectacularly as writes (at least not right away), but they'll still fail.  I'm
+actually ok reading garbage if the guest screws up, but KVM needs consistent
+semantics.
 
-> +zap_gfn:
-> +	/*
-> +	 * Now that we have updated the RMP pagesize, zap the existing rmaps for
-> +	 * large entry ranges so that nested page table gets rebuilt with the updated RMP
-> +	 * pagesize.
-> +	 */
-> +	gfn = gpa_to_gfn(gpa) & ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
-> +	kvm_zap_gfn_range(vcpu->kvm, gfn, gfn + 512);
-> +
-> +	return 0;
+Good news is that per-gfn tracking is probably overkill anyways.  As mentioned
+above, user access don't need extra magic, they either fail or they don't.
+
+For kvm_vcpu_map(), one thought would be to add a "short-term" map variant that
+is not allowed to be retained across VM-Entry, and then use e.g. SRCU to block
+PSC requests until there are no consumers.
+
+> +	if (kvm_x86_ops.write_page_begin)
+> +		kvm_x86_ops.write_page_begin(kvm, slot, gfn);
 > +}
