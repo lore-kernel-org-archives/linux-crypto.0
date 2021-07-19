@@ -2,58 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21ED1C636CB
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 05:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55448C636CD
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 05:52:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0488F60E0C
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 05:46:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E71F61182
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 05:52:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234271AbhGSFt1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jul 2021 01:49:27 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:51444 "EHLO deadmen.hmeau.com"
+        id S234419AbhGSFza (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jul 2021 01:55:30 -0400
+Received: from ni.piap.pl ([195.187.100.5]:59386 "EHLO ni.piap.pl"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229906AbhGSFt1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jul 2021 01:49:27 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1m5M6e-0004bd-W8; Mon, 19 Jul 2021 13:46:21 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1m5M6a-0004OP-Po; Mon, 19 Jul 2021 13:46:16 +0800
-Date:   Mon, 19 Jul 2021 13:46:16 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Stephan Mueller <smueller@chronox.de>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: Fixes tag needs some work in the crypto tree
-Message-ID: <20210719054616.GA16860@gondor.apana.org.au>
-References: <20210719081320.1d205c98@canb.auug.org.au>
- <6604f8be7a73f727cbfae7f93a74da706e46befc.camel@chronox.de>
+        id S234437AbhGSFz2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Jul 2021 01:55:28 -0400
+X-Greylist: delayed 419 seconds by postgrey-1.27 at vger.kernel.org; Mon, 19 Jul 2021 01:55:26 EDT
+Received: from t19.piap.pl (OSB1819.piap.pl [10.0.9.19])
+        by ni.piap.pl (Postfix) with ESMTPSA id 795F4C3F2A51;
+        Mon, 19 Jul 2021 07:45:21 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ni.piap.pl 795F4C3F2A51
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=piap.pl; s=mail;
+        t=1626673524; bh=xH3yU1unl5seSQwdZbQWwx5A9ON1+nGOmgWR8IFn5r8=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=L7U05iMv3oK92oCUuG5CTlxppqcc0E6eKg9JErEbxAKkTlJL107YThmaj1R9//agf
+         ujEHiof3dy3tIle/ZvOryphYwiEfqEPiMWKwlENA/Tzv3jq7JttbBCzB0lDDauFBMk
+         lA27aWd7d+osdxmPHbr2zUAKGu54dYjmQaG1nnxk=
+From:   =?utf-8?Q?Krzysztof_Ha=C5=82asa?= <khalasa@piap.pl>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Russell King <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andres Salomon <dilinger@queued.net>,
+        linux-geode@lists.infradead.org, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org,
+        Christian Gromm <christian.gromm@microchip.com>,
+        Krzysztof Halasa <khc@pm.waw.pl>, netdev@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Martin Schiller <ms@dev.tdt.de>, linux-x25@vger.kernel.org,
+        wireguard@lists.zx2c4.com
+Subject: Re: [PATCH 5/6 v2] net: hdlc: rename 'mod_init' & 'mod_exit'
+ functions to be module-specific
+References: <20210711223148.5250-1-rdunlap@infradead.org>
+        <20210711223148.5250-6-rdunlap@infradead.org>
+Sender: khalasa@piap.pl
+Date:   Mon, 19 Jul 2021 07:45:21 +0200
+In-Reply-To: <20210711223148.5250-6-rdunlap@infradead.org> (Randy Dunlap's
+        message of "Sun, 11 Jul 2021 15:31:47 -0700")
+Message-ID: <m3y2a2zwjy.fsf@t19.piap.pl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6604f8be7a73f727cbfae7f93a74da706e46befc.camel@chronox.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-KLMS-Rule-ID: 1
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Lua-Profiles: 165067 [Jul 18 2021]
+X-KLMS-AntiSpam-Version: 5.9.20.0
+X-KLMS-AntiSpam-Envelope-From: khalasa@piap.pl
+X-KLMS-AntiSpam-Rate: 0
+X-KLMS-AntiSpam-Status: not_detected
+X-KLMS-AntiSpam-Method: none
+X-KLMS-AntiSpam-Auth: dkim=pass header.d=piap.pl
+X-KLMS-AntiSpam-Info: LuaCore: 448 448 71fb1b37213ce9a885768d4012c46ac449c77b17, {Tracking_from_exist}, {Tracking_Text_ENG_RU_Has_Extended_Latin_Letters, eng}, {Tracking_marketers, three}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;piap.pl:7.1.1;t19.piap.pl:7.1.1;127.0.0.199:7.1.2
+X-MS-Exchange-Organization-SCL: -1
+X-KLMS-AntiSpam-Interceptor-Info: scan successful
+X-KLMS-AntiPhishing: Clean, bases: 2021/07/19 04:42:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/07/19 00:49:00 #16924188
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 07:43:29AM +0200, Stephan Mueller wrote:
->
-> Herbert, how do we go about this fix? I can surely prepare another patch. But
-> considering that the old patch is already in the git tree, are you considering
-> to revert it?
+Hi Randy,
 
-I think we should keep this in mind for future submissions.
+Randy Dunlap <rdunlap@infradead.org> writes:
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Rename module_init & module_exit functions that are named
+> "mod_init" and "mod_exit" so that they are unique in both the
+> System.map file and in initcall_debug output instead of showing
+> up as almost anonymous "mod_init".
+
+>  drivers/net/wan/hdlc_cisco.c   |    8 ++++----
+>  drivers/net/wan/hdlc_fr.c      |    8 ++++----
+>  drivers/net/wan/hdlc_ppp.c     |    8 ++++----
+>  drivers/net/wan/hdlc_raw.c     |    8 ++++----
+>  drivers/net/wan/hdlc_raw_eth.c |    8 ++++----
+>  drivers/net/wan/hdlc_x25.c     |    8 ++++----
+
+Sorry for the delay.
+
+Acked-by: Krzysztof Halasa <khalasa@piap.pl>
+--=20
+Krzysztof Ha=C5=82asa
+
+Sie=C4=87 Badawcza =C5=81ukasiewicz
+Przemys=C5=82owy Instytut Automatyki i Pomiar=C3=B3w PIAP
+Al. Jerozolimskie 202, 02-486 Warszawa
