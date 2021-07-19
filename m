@@ -2,225 +2,678 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-25.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FE90C12002
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 14:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC89C07E9B
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 16:10:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77D8A60FE9
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 14:24:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CAF261413
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 16:10:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240367AbhGSNnl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jul 2021 09:43:41 -0400
-Received: from mail-mw2nam12on2089.outbound.protection.outlook.com ([40.107.244.89]:2113
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231789AbhGSNnk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jul 2021 09:43:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gqPHyHIiddxKlYth22ZMxGC8bIk3pcNB8wxttj1ALLYPMpZxVCNvH0aWnt1N1KXpRH8CeN1QiSWGkGnoc72e2szg1vJm/PQRUFG56pZ2bKvUv31hKOJa26epm+50RwutdhPI/UjUF4nrYdOorgD6BiicidbApNizPVyzMNKHYKP2Ny6dhHHQk4VO+fzKNvNFmom9XWDP2IC/T+5O2/YiwBPmhMF+2jjCwPoeQVs+Z+aFqTf3E6kxfiuj8B4Bo/0WFf2TK6uiBUsVPV9KQz0qgwLcJGR7z8YjdP1bnLLiAOMu+viVWHkZ5V8I/1DfGU+jy754Y70C85J8zGtoXzKt2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5GKURgwHZLy/+xuETOoszdBBmBI1n4sbyuDE24jxkm0=;
- b=XQpguF2BAJ1QRuhmzXM9MXfU0zbF8TEB0c7R5COhsy+4+YoCSbXRxEVT0rbdwc7FC+LdUNfm+G5aA7xCB6Cx1bPtb9PCsvv958PPoBKTAtAe9k1xiYXS5UOr407CuInTpNcPdWG8JgMcTQf1DuFA4BpCtIGVYsZ8Z/+d8buZB55VhRXjaPw0pRC+osB380wLjBdkpkVkT+cCAaMZsuJLGNjp9sMnQIbQqXf28Mymt8OLc3aV8ymUGH6i4Y7Pj8K118/QmHwmfY11ZiBPuC6Y6v/FoHpo16xZivBxKgGOCuQjPlqpupuZJ9iPG6qAsO6p1FqtzV3sHxSeUYoxOBoZXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5GKURgwHZLy/+xuETOoszdBBmBI1n4sbyuDE24jxkm0=;
- b=mL6rrmVg0l1SQrFUC3IenluUYdMb8kjkLTLlPVsVx4/j+Mum+u2sJfCYeERhOsF282V286bpWbp8nm68Ku0QWDGS5idq2rDI6bLBoDOgZUIuxAy91XKFSBWhRaKTiZOpTQWSn4jWuPfsqGzdRb3H5/YiP5A9r5zgBy9Pkacjp54=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4592.namprd12.prod.outlook.com (2603:10b6:806:9b::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.23; Mon, 19 Jul
- 2021 14:24:18 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.033; Mon, 19 Jul 2021
- 14:24:18 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 34/40] KVM: SVM: Add support to handle Page
- State Change VMGEXIT
-To:     Sean Christopherson <seanjc@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-35-brijesh.singh@amd.com> <YPH2qRkkG6m0FT2X@google.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <54f916af-1d10-4a8e-1e14-cd261d407dd2@amd.com>
-Date:   Mon, 19 Jul 2021 09:24:15 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YPH2qRkkG6m0FT2X@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0801CA0003.namprd08.prod.outlook.com
- (2603:10b6:803:29::13) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S1347765AbhGSP3h (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jul 2021 11:29:37 -0400
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:35546 "EHLO
+        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1347756AbhGSPUj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Jul 2021 11:20:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.jp; i=@amazon.co.jp; q=dns/txt;
+  s=amazon201209; t=1626710480; x=1658246480;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Uaa+9IHlkakLivclHv7pranwhZxaxEm4Ly5vzcPZ1NI=;
+  b=rzcWBMBGrAfZHjBP2tq9CPrGBUdRMe/xETa85+qmNV4h+nGTVkgnjB0w
+   9S6WtXTywRMQiYETrEksqbOxOfwezMedRa8Rk13mXIRVJ31RO99y0aXcS
+   Jcx7aM9AmFfBzaXko+Pn81MMw/NPrOIDFvyuzmRa5vR+NynzVfpn0i2uu
+   U=;
+X-IronPort-AV: E=Sophos;i="5.84,252,1620691200"; 
+   d="scan'208";a="127822409"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-474bcd9f.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 19 Jul 2021 16:01:16 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1d-474bcd9f.us-east-1.amazon.com (Postfix) with ESMTPS id 1FDCAA1CDB;
+        Mon, 19 Jul 2021 16:01:10 +0000 (UTC)
+Received: from EX13D04ANC001.ant.amazon.com (10.43.157.89) by
+ EX13MTAUWB001.ant.amazon.com (10.43.161.249) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.23; Mon, 19 Jul 2021 16:01:08 +0000
+Received: from 88665a182662.ant.amazon.com (10.43.160.55) by
+ EX13D04ANC001.ant.amazon.com (10.43.157.89) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.23; Mon, 19 Jul 2021 16:00:55 +0000
+From:   Kuniyuki Iwashima <kuniyu@amazon.co.jp>
+To:     <cdleonard@gmail.com>
+CC:     <colona@arista.com>, <cpaasch@apple.com>, <davem@davemloft.net>,
+        <dong.menglong@zte.com.cn>, <dsahern@kernel.org>,
+        <edumazet@google.com>, <herbert@gondor.apana.org.au>,
+        <kuba@kernel.org>, <kuniyu@amazon.co.jp>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <mathew.j.martineau@linux.intel.com>, <netdev@vger.kernel.org>,
+        <priyarjha@google.com>, <ycheng@google.com>,
+        <yoshfuji@linux-ipv6.org>
+Subject: Re: [RFC] tcp: Initial support for RFC5925 auth option
+Date:   Tue, 20 Jul 2021 01:00:51 +0900
+Message-ID: <20210719160051.59046-1-kuniyu@amazon.co.jp>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <01383a8751e97ef826ef2adf93bfde3a08195a43.1626693859.git.cdleonard@gmail.com>
+References: <01383a8751e97ef826ef2adf93bfde3a08195a43.1626693859.git.cdleonard@gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.95] (165.204.77.1) by SN4PR0801CA0003.namprd08.prod.outlook.com (2603:10b6:803:29::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Mon, 19 Jul 2021 14:24:16 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 715e5e0c-ae4c-4a34-b2a4-08d94ac0e473
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4592:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4592B12177F676540CFCA995E5E19@SA0PR12MB4592.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1snQXtS4NjZluEU7Vku0RCtK1GJZmPoCjr66FSIGsKBFIUht7C0HCicVFlDKtC6U2xdZFkDI5lmdEyIWonQgV9edvWb4YtpTohSsng4by6N2T4eCKorV9BhGCs8DvuZW0NL0mH+m0p8qVHAvjxKZRNiJnHj2n9lnWYe5vkYtfhBufA33hTTsPv3UwXEihfrtyv81pqcsyObqLSV1XhhrhnmBLOj6e6gt5F659IdtxvyhclSt4ZrlwgdZuphPMLHcub9K3u7F1YSzcCqpyS+1x6eP57aui0fQSBDsw4YVfPN2lcIp/RlC9HtNgn4jyLyTJWAqHjerPWd9gYeCkqlJAWcxzEh7PvuDF8CmjzaOfm6beE3UR1eEXcMoqreE5n3s4iOmKI4rH0YmusJwrGwrd6zhTUz4SD8a4LRXe5piqZOxIKw6wtze4e6b7Mm/m7Y6VXIqr5LwDyyJEpMUU+AUufPQQW9SisGpzwjZYsTz/LsHyKh1PzvCxKJFNhaoeESXJTsOiYCqRd0go4Eg+rQEQT/Gj2K8FbcDqaMqKlCdjK2Igh6mfan3M6Sd6qOP/XNtbNAXAB7NlnkxGCSf+B/T7alJO+ivBWGvgSYEbIqLAqWChA2PYEM/E9jfiDNeimU/R+CdiC1wIX+44hDStKtC1g/i5NCmwTtcTeIDhZykaHYJ6d+CFR8/N9SCW/iJ8sEI/llt6XgvWm3FCKaZhY41iTHeIxBxQHa77+02IBsIPFalVJH7fznxGWoSlRwrSb9or3/pGMdEuimKBxZsPD9tAA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(376002)(396003)(136003)(346002)(8936002)(6486002)(8676002)(38350700002)(38100700002)(956004)(66556008)(66946007)(5660300002)(66476007)(2906002)(44832011)(31686004)(2616005)(31696002)(478600001)(36756003)(26005)(6916009)(16576012)(316002)(4326008)(54906003)(83380400001)(53546011)(186003)(52116002)(86362001)(7406005)(7416002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dXNVdzYrMEk1aU0vVHk1bjZKWUxMMEprOUdQLzlzUDRldDFKMG5uNUEzckhv?=
- =?utf-8?B?TGlyZFhHcS9ubytEUitFdnpXbFNhS1hqTFJqWXdFM3l0VjN3eUVWRFZYVFBs?=
- =?utf-8?B?cEcxTDR6Q3QxVlNuaXJVOWIvZVdZc3pVVTF0MVErZHJXNFR5emhZV1JzL1RT?=
- =?utf-8?B?RElKTXIrdnZIdlhKMUVnbFJjK3VWRXFzUWNXbGxxQkZwbk5UcGwrZk83U2tG?=
- =?utf-8?B?WldiVFZhVW93M0RCK0JZKy9qc1publhJc3dLMzltODF0cy8ycTVydDgxcmx2?=
- =?utf-8?B?SmZqbTJkUks5cFIzNzNzK09oOHRWVmZ5ajVwTnVlc200OW9La283a1lnNEh1?=
- =?utf-8?B?VUdCbnRXOGloRDZldTBRREdQb2RidXlrME1HNGlvdDhtL2xZd05ON293K1VY?=
- =?utf-8?B?UnBoZm0rODdnb2tOQ1J1Ty9ZVFdWa0p1eDl4QXlIZ3RVL3NyUUpOREszQ3Yw?=
- =?utf-8?B?QnNWRnFMcnB0d3VOMWN2cFZWblhGbnJGckJqZ0h2cXlJdkpDSkFJaGp4V3hr?=
- =?utf-8?B?TTREazdpZU5xaHRsMkZVa0xGR3FrT0Q4RStSb09UaVpkVTdmWG5aNWswVDNJ?=
- =?utf-8?B?ZUt5blIyTCt5Uzd2ZDJ4OHJwL1gzRnFzbnl1R0Y5QVpZOVBpK2ZWZ2FhV2ky?=
- =?utf-8?B?eHkxMnVvTnk4Mk5IOTQyNTZFRHBkREx2Ui9LZ3BRMEdMamZxWXY4TC8yblJI?=
- =?utf-8?B?aGw4bFJRME0wVmswVndxUHZYYWRvYWVTdkVsZGFOR0U1Q3N5L0dJUEZNK3l5?=
- =?utf-8?B?R1VrWmkvS3BVVHRkWkNuRjJCeUo0M1lMQlRVa2VVR0FLalpiUWNFUE15ai9N?=
- =?utf-8?B?S0VTM29FUSt5RnZXSXBtYkI4WjhBOHczdFQ5Z21Kckhkcm9XMGdyYVdzc1k5?=
- =?utf-8?B?dGxVQ05rQ045bXhJRkczRFh5L3owaG8yaVdzZHp4MGZPTEVLNk5TN3lGdEw4?=
- =?utf-8?B?VkxzMTIwczlqdXN4eWNEYXZ6eEVzcmdaUWtRbUxxcjhsS3VLai9xWE85Zzly?=
- =?utf-8?B?b1JjQUJ6SzNjckZ4aTE3SG82djJHNTBTbEgvQzJ0RmdyL2VnUy9teGdVUmlY?=
- =?utf-8?B?YzRVVU9TdHMrZGJKT3orOEZFS1UyS2d0akhSZ3E2enA4bFJkQWhtNjRjR1Qw?=
- =?utf-8?B?NW40ZXNHckZVWVArZldLWm1wTFQzcHYydHRMeWlBdW90WVBnSmYvQmdVeFpH?=
- =?utf-8?B?clVxWGY2RkswcE5EQzIrM25pdmFiZXlId1RzMmlxSGNEMll0UTNTYzMxSy96?=
- =?utf-8?B?VnhxalMyeFBFM1NJTWN1dVVvbzJmTGZwUVdENEY3NXlDSXBaYjd5TXA0N0dO?=
- =?utf-8?B?bkx2QlA3VkFyZHZIRWR3YlZjTDYxM3FZNW5VTldyM3pNSnd3eHQ0c0lhOFhr?=
- =?utf-8?B?bXR0SjJCeW1sV3NBRjRTYjFJWTd0Rit0ZFJiVWlGLzhGQWltZjRBK3FQdnVq?=
- =?utf-8?B?Q2hPTVlra0h6NTZSeEc5U000bWppMVlKWUlEdFg5WnlPdTQzalBrTkFhWkQz?=
- =?utf-8?B?VW5RVWYrek5wTjczUHcwMU44OHdGZkJWc2R2WVNaVEFtQy9CWTVPRmx2cDNY?=
- =?utf-8?B?MTBZNEdxY3VDQ0E0azlyNXAwVmM4QWV0UXFYTFVwQXloK0x4Z1NpeWcvbVpW?=
- =?utf-8?B?Y1dFWjJYRHQ5bE5aYlBLR2xyTWJsZ0NYSzlhTDBzZmVIUE5XOWYrUDRaL3V3?=
- =?utf-8?B?U21oRTRBOFFBOW1HNTJqYlNlblk2T2x3Z3djUUJMc0xBSmdEUHlldlpkamhi?=
- =?utf-8?Q?+PkUGv2ihQbwK7rVCjrB0beIA4f2bPPWhKFUgpI?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 715e5e0c-ae4c-4a34-b2a4-08d94ac0e473
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2021 14:24:17.9997
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LcBxFMluTgAXFeoe+pyLR9zsheARIare/i/jnldP1Wk2VVdwZWxJRhqM8cTDtmdcnsGmlfbHmXVXyXuLkLTwoQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4592
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.43.160.55]
+X-ClientProxiedBy: EX13D30UWC001.ant.amazon.com (10.43.162.128) To
+ EX13D04ANC001.ant.amazon.com (10.43.157.89)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+From:   Leonard Crestez <cdleonard@gmail.com>
+Date:   Mon, 19 Jul 2021 14:24:46 +0300
+> This is similar to TCP MD5 in functionality but it's sufficiently
+> different that userspace interface and wire formats are incompatible.
+> Compared to TCP-MD5 more algorithms are supported and multiple keys can
+> be used on the same connection but there is still no negotiation
+> mechanism.
+> 
+> Expected use-case is protecting long-duration BGP/LDP connections
+> between routers using pre-shared keys.
+> 
+> This is an early version which focuses on getting the correct
+> signature bits on the wire in a way that can interoperate with other
+> implementations. Major issues still need to be solved:
+> 
+>  * Lockdep warnings (incorrect context for initializing shash)
+>  * Support for aes-128-cmac-96
+>  * Binding keys to addresses and/or interfaces similar to md5
+>  * Sequence Number Extension
+> 
+> A small test suite is here: https://github.com/cdleonard/tcp-authopt-test
+> The tests work by establishing loopback TCP connections, capturing
+> packets with scapy and validating signatures.
+> 
+> Changes for yabgp are here:
+> https://github.com/cdleonard/yabgp/commits/tcp_authopt
+> The patched version of yabgp can establish a BGP session protected by
+> TCP Authentication Option with a Cisco IOS-XR router.
+> 
+> I'm especially interested in feedback regarding ABI and testing.
+> 
+> Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
+> 
+> ---
+> 
+> Allocating shash requires user context but holding a struct tfm in
+> tcp_authopt_key_info allocated by tcp_set_authopt_key doesn't work
+> because when a server handshake is succesful the server socket needs to
+> copy the keys of the listen socket in softirq context.
+> 
+> Sharing the crypto_shash tfm between listen and server sockets doesn't
+> work well either because keys for each connection (and each syn packet)
+> are different and the hmac or cmac key is per-tfm rather than per
+> shash_desc. The server sockets would need locking to access their shared
+> tfm.
+> 
+> Simplest solution would be to allocate one shash for each CPU and borrow
+> it for each hashing operation. TCP-MD5 allocates one ahash globally but
+> that can't work for hmac/cmac because of setkey.
+> 
+> Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
+> ---
+>  include/linux/tcp.h       |   6 +
+>  include/net/tcp.h         |   1 +
+>  include/net/tcp_authopt.h | 103 ++++++
+>  include/uapi/linux/snmp.h |   1 +
+>  include/uapi/linux/tcp.h  |  40 +++
+>  net/ipv4/Kconfig          |  14 +
+>  net/ipv4/Makefile         |   1 +
+>  net/ipv4/proc.c           |   1 +
+>  net/ipv4/tcp.c            |   7 +
+>  net/ipv4/tcp_authopt.c    | 718 ++++++++++++++++++++++++++++++++++++++
+>  net/ipv4/tcp_input.c      |  17 +
+>  net/ipv4/tcp_ipv4.c       |   5 +
+>  net/ipv4/tcp_minisocks.c  |   2 +
+>  net/ipv4/tcp_output.c     |  65 +++-
+>  14 files changed, 980 insertions(+), 1 deletion(-)
+>  create mode 100644 include/net/tcp_authopt.h
+>  create mode 100644 net/ipv4/tcp_authopt.c
+> 
+> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+> index 48d8a363319e..cfddfc720b00 100644
+> --- a/include/linux/tcp.h
+> +++ b/include/linux/tcp.h
+> @@ -140,10 +140,12 @@ struct tcp_request_sock {
+>  static inline struct tcp_request_sock *tcp_rsk(const struct request_sock *req)
+>  {
+>  	return (struct tcp_request_sock *)req;
+>  }
+>  
+> +struct tcp_authopt_info;
+> +
+>  struct tcp_sock {
+>  	/* inet_connection_sock has to be the first member of tcp_sock */
+>  	struct inet_connection_sock	inet_conn;
+>  	u16	tcp_header_len;	/* Bytes of tcp header to send		*/
+>  	u16	gso_segs;	/* Max number of segs per GSO packet	*/
+> @@ -403,10 +405,14 @@ struct tcp_sock {
+>  
+>  /* TCP MD5 Signature Option information */
+>  	struct tcp_md5sig_info	__rcu *md5sig_info;
+>  #endif
+>  
+> +#ifdef CONFIG_TCP_AUTHOPT
+> +	struct tcp_authopt_info	__rcu *authopt_info;
+> +#endif
+> +
+>  /* TCP fastopen related information */
+>  	struct tcp_fastopen_request *fastopen_req;
+>  	/* fastopen_rsk points to request_sock that resulted in this big
+>  	 * socket. Used to retransmit SYNACKs etc.
+>  	 */
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index 17df9b047ee4..767611fd5ec3 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -182,10 +182,11 @@ void tcp_time_wait(struct sock *sk, int state, int timeo);
+>  #define TCPOPT_WINDOW		3	/* Window scaling */
+>  #define TCPOPT_SACK_PERM        4       /* SACK Permitted */
+>  #define TCPOPT_SACK             5       /* SACK Block */
+>  #define TCPOPT_TIMESTAMP	8	/* Better RTT estimations/PAWS */
+>  #define TCPOPT_MD5SIG		19	/* MD5 Signature (RFC2385) */
+> +#define TCPOPT_AUTHOPT		29	/* Auth Option (RFC5925) */
+>  #define TCPOPT_MPTCP		30	/* Multipath TCP (RFC6824) */
+>  #define TCPOPT_FASTOPEN		34	/* Fast open (RFC7413) */
+>  #define TCPOPT_EXP		254	/* Experimental */
+>  /* Magic number to be after the option value for sharing TCP
+>   * experimental options. See draft-ietf-tcpm-experimental-options-00.txt
+> diff --git a/include/net/tcp_authopt.h b/include/net/tcp_authopt.h
+> new file mode 100644
+> index 000000000000..aaab5c955984
+> --- /dev/null
+> +++ b/include/net/tcp_authopt.h
+> @@ -0,0 +1,103 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +#ifndef _LINUX_TCP_AUTHOPT_H
+> +#define _LINUX_TCP_AUTHOPT_H
+> +
+> +#include <uapi/linux/tcp.h>
+> +
+> +/* Representation of a Master Key Tuple as per RFC5925 */
+> +struct tcp_authopt_key_info {
+> +	struct hlist_node node;
+> +	/* Local identifier */
+> +	u32 local_id;
+> +	u32 flags;
+> +	/* Wire identifiers */
+> +	u8 send_id, recv_id;
+> +	u8 alg;
+> +	u8 keylen;
+> +	u8 key[TCP_AUTHOPT_MAXKEYLEN];
+> +	u8 maclen;
+> +	u8 traffic_key_len;
+> +	struct rcu_head rcu;
+> +};
+> +
+> +/* Per-socket information regarding tcp_authopt */
+> +struct tcp_authopt_info {
+> +	struct hlist_head head;
+> +	u32 local_send_id;
+> +	u32 src_isn;
+> +	u32 dst_isn;
+> +	u8 rnextkeyid;
+> +	struct rcu_head rcu;
+> +};
+> +
+> +#ifdef CONFIG_TCP_AUTHOPT
+> +struct tcp_authopt_key_info *tcp_authopt_key_info_lookup(struct sock *sk, int key_id);
+> +void tcp_authopt_clear(struct sock *sk);
+> +int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen);
+> +int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen);
+> +int tcp_authopt_hash(
+> +		char *hash_location,
+> +		struct tcp_authopt_key_info *key,
+> +		struct sock *sk, struct sk_buff *skb);
+> +int __tcp_authopt_openreq(struct sock *newsk, const struct sock *oldsk, struct request_sock *req);
+> +static inline int tcp_authopt_openreq(
+> +		struct sock *newsk,
+> +		const struct sock *oldsk,
+> +		struct request_sock *req)
+> +{
+> +	if (!rcu_dereference(tcp_sk(oldsk)->authopt_info))
+
+s/rcu_dereference/rcu_access_pointer/
 
 
-On 7/16/21 4:14 PM, Sean Christopherson wrote:
-> On Wed, Jul 07, 2021, Brijesh Singh wrote:
->> +static unsigned long snp_handle_psc(struct vcpu_svm *svm, struct ghcb *ghcb)
->> +{
->> +	struct kvm_vcpu *vcpu = &svm->vcpu;
->> +	int level, op, rc = PSC_UNDEF_ERR;
->> +	struct snp_psc_desc *info;
->> +	struct psc_entry *entry;
->> +	gpa_t gpa;
->> +
->> +	if (!sev_snp_guest(vcpu->kvm))
->> +		goto out;
->> +
->> +	if (!setup_vmgexit_scratch(svm, true, sizeof(ghcb->save.sw_scratch))) {
->> +		pr_err("vmgexit: scratch area is not setup.\n");
->> +		rc = PSC_INVALID_HDR;
->> +		goto out;
->> +	}
->> +
->> +	info = (struct snp_psc_desc *)svm->ghcb_sa;
->> +	entry = &info->entries[info->hdr.cur_entry];
-> 
-> Grabbing "entry" here is unnecessary and confusing.
+> +		return 0;
+> +	else
+> +		return __tcp_authopt_openreq(newsk, oldsk, req);
 
-Noted.
-
-> 
->> +
->> +	if ((info->hdr.cur_entry >= VMGEXIT_PSC_MAX_ENTRY) ||
->> +	    (info->hdr.end_entry >= VMGEXIT_PSC_MAX_ENTRY) ||
->> +	    (info->hdr.cur_entry > info->hdr.end_entry)) {
-> 
-> There's a TOCTOU bug here if the guest uses the GHCB instead of a scratch area.
-> If the guest uses the scratch area, then KVM makes a full copy into kernel memory.
-> But if the guest uses the GHCB, then KVM maps the GHCB into kernel address space
-> but doesn't make a full copy, i.e. the guest can modify the data while it's being
-> processed by KVM.
-> 
-Sure, I can make a full copy of the page-state change buffer.
+nit: 'else' can be removed.
 
 
-> IIRC, Peter and I discussed the sketchiness of the GHCB mapping offline a few
-> times, but determined that there were no existing SEV-ES bugs because the guest
-> could only submarine its own emulation request.  But here, it could coerce KVM
-> into running off the end of a buffer.
-> 
-> I think you can get away with capturing cur_entry/end_entry locally, though
-> copying the GHCB would be more robust.  That would also make the code a bit
-> prettier, e.g.
-> 
-> 	cur = info->hdr.cur_entry;
-> 	end = info->hdr.end_entry;
-> 
->> +		rc = PSC_INVALID_ENTRY;
->> +		goto out;
->> +	}
->> +
->> +	while (info->hdr.cur_entry <= info->hdr.end_entry) {
-> 
-> Make this a for loop?
+> +}
+> +int __tcp_authopt_inbound_check(
+> +		struct sock *sk,
+> +		struct sk_buff *skb,
+> +		struct tcp_authopt_info *info);
+> +static inline int tcp_authopt_inbound_check(struct sock *sk, struct sk_buff *skb)
+> +{
+> +	struct tcp_authopt_info *info = rcu_dereference(tcp_sk(sk)->authopt_info);
+> +
+> +	if (info)
+> +		return __tcp_authopt_inbound_check(sk, skb, info);
+> +	else
+> +		return 0;
 
-Sure, I can use the for loop. IIRC, in previous review feedbacks I got 
-the feeling that while() was preferred in the part1 so I used the 
-similar approach here.
+Same with the above and can be formatted like:
 
-> 
-> 	for ( ; cur_entry < end_entry; cur_entry++)
-> 
->> +		entry = &info->entries[info->hdr.cur_entry];
-> 
-> Does this need array_index_nospec() treatment?
-> 
+	if (!info)
+		return 0;
 
-I don't think so.
+	return __tcp_authopt_inbound_check(sk, skb, info);
 
-thanks
+
+> +}
+> +#else
+> +static inline struct tcp_authopt_key_info *tcp_authopt_key_info_lookup(
+> +		struct sock *sk,
+> +		int key_id)
+> +{
+> +	return NULL;
+> +}
+> +static inline int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> +{
+> +	return -ENOPROTOOPT;
+> +}
+> +static inline void tcp_authopt_clear(struct sock *sk)
+> +{
+> +}
+> +static inline int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> +{
+> +	return -ENOPROTOOPT;
+> +}
+> +static inline int tcp_authopt_hash(
+> +		char *hash_location,
+> +		struct tcp_authopt_key_info *key,
+> +		struct sock *sk, struct sk_buff *skb)
+> +{
+> +	return -EINVAL;
+> +}
+> +static inline int tcp_authopt_openreq(struct sock *newsk,
+> +				      const struct sock *oldsk,
+> +				      struct request_sock *req)
+> +{
+> +	return 0;
+> +}
+> +static inline int tcp_authopt_inbound_check(struct sock *sk, struct sk_buff *skb)
+> +{
+> +	return 0;
+> +}
+> +#endif
+> +
+> +#endif /* _LINUX_TCP_AUTHOPT_H */
+> diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
+> index 904909d020e2..1d96030889a1 100644
+> --- a/include/uapi/linux/snmp.h
+> +++ b/include/uapi/linux/snmp.h
+> @@ -290,10 +290,11 @@ enum
+>  	LINUX_MIB_TCPDUPLICATEDATAREHASH,	/* TCPDuplicateDataRehash */
+>  	LINUX_MIB_TCPDSACKRECVSEGS,		/* TCPDSACKRecvSegs */
+>  	LINUX_MIB_TCPDSACKIGNOREDDUBIOUS,	/* TCPDSACKIgnoredDubious */
+>  	LINUX_MIB_TCPMIGRATEREQSUCCESS,		/* TCPMigrateReqSuccess */
+>  	LINUX_MIB_TCPMIGRATEREQFAILURE,		/* TCPMigrateReqFailure */
+> +	LINUX_MIB_TCPAUTHOPTFAILURE,		/* TCPAuthOptFailure */
+>  	__LINUX_MIB_MAX
+>  };
+>  
+>  /* linux Xfrm mib definitions */
+>  enum
+> diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
+> index 8fc09e8638b3..30b8ad769871 100644
+> --- a/include/uapi/linux/tcp.h
+> +++ b/include/uapi/linux/tcp.h
+> @@ -126,10 +126,12 @@ enum {
+>  #define TCP_INQ			36	/* Notify bytes available to read as a cmsg on read */
+>  
+>  #define TCP_CM_INQ		TCP_INQ
+>  
+>  #define TCP_TX_DELAY		37	/* delay outgoing packets by XX usec */
+> +#define TCP_AUTHOPT			38	/* TCP Authentication Option (RFC2385) */
+> +#define TCP_AUTHOPT_KEY		39	/* TCP Authentication Option update key (RFC2385) */
+>  
+>  
+>  #define TCP_REPAIR_ON		1
+>  #define TCP_REPAIR_OFF		0
+>  #define TCP_REPAIR_OFF_NO_WP	-1	/* Turn off without window probes */
+> @@ -340,10 +342,48 @@ struct tcp_diag_md5sig {
+>  	__u16	tcpm_keylen;
+>  	__be32	tcpm_addr[4];
+>  	__u8	tcpm_key[TCP_MD5SIG_MAXKEYLEN];
+>  };
+>  
+> +/* for TCP_AUTHOPT socket option */
+> +#define TCP_AUTHOPT_MAXKEYLEN	80
+> +
+> +#define TCP_AUTHOPT_ALG_HMAC_SHA_1_96		1
+> +#define TCP_AUTHOPT_ALG_AES_128_CMAC_96		2
+> +
+> +/* Per-socket options */
+> +struct tcp_authopt {
+> +	/* No flags currently defined */
+> +	__u32	flags;
+> +	/* local_id of preferred output key */
+> +	__u32	local_send_id;
+> +};
+> +
+> +/* Delete the key by local_id and ignore all fields */
+> +#define TCP_AUTHOPT_KEY_DEL		(1 << 0)
+> +/* Exclude TCP options from signature */
+> +#define TCP_AUTHOPT_KEY_EXCLUDE_OPTS	(1 << 1)
+> +
+> +/* Per-key options
+> + * Each key is identified by a non-zero local_id which is managed by the application.
+> + */
+> +struct tcp_authopt_key {
+> +	/* Mix of TCP_AUTHOPT_KEY_ flags */
+> +	__u32	flags;
+> +	/* Local identifier */
+> +	__u32	local_id;
+> +	/* SendID on the network */
+> +	__u8	send_id;
+> +	/* RecvID on the network */
+> +	__u8	recv_id;
+> +	/* One of the TCP_AUTHOPT_ALG_* constant */
+> +	__u8	alg;
+> +	/* Length of the key buffer */
+> +	__u8	keylen;
+> +	__u8	key[TCP_AUTHOPT_MAXKEYLEN];
+> +};
+> +
+>  /* setsockopt(fd, IPPROTO_TCP, TCP_ZEROCOPY_RECEIVE, ...) */
+>  
+>  #define TCP_RECEIVE_ZEROCOPY_FLAG_TLB_CLEAN_HINT 0x1
+>  struct tcp_zerocopy_receive {
+>  	__u64 address;		/* in: address of mapping */
+> diff --git a/net/ipv4/Kconfig b/net/ipv4/Kconfig
+> index 87983e70f03f..6459f4ea6f1d 100644
+> --- a/net/ipv4/Kconfig
+> +++ b/net/ipv4/Kconfig
+> @@ -740,5 +740,19 @@ config TCP_MD5SIG
+>  	  RFC2385 specifies a method of giving MD5 protection to TCP sessions.
+>  	  Its main (only?) use is to protect BGP sessions between core routers
+>  	  on the Internet.
+>  
+>  	  If unsure, say N.
+> +
+> +config TCP_AUTHOPT
+> +	bool "TCP: Authentication Option support (RFC5925)"
+> +	select CRYPTO
+> +	select CRYPTO_SHA1
+> +	select CRYPTO_HMAC
+> +	select CRYPTO_AES
+> +	select CRYPTO_CMAC
+> +	help
+> +	  RFC5925 specifies a new method of giving protection to TCP sessions.
+> +	  Its intended use is to protect BGP sessions between core routers
+> +	  on the Internet. It obsoletes TCP MD5 (RFC2385) but is incompatible.
+> +
+> +	  If unsure, say N.
+> diff --git a/net/ipv4/Makefile b/net/ipv4/Makefile
+> index bbdd9c44f14e..d336f32ce177 100644
+> --- a/net/ipv4/Makefile
+> +++ b/net/ipv4/Makefile
+> @@ -59,10 +59,11 @@ obj-$(CONFIG_TCP_CONG_NV) += tcp_nv.o
+>  obj-$(CONFIG_TCP_CONG_VENO) += tcp_veno.o
+>  obj-$(CONFIG_TCP_CONG_SCALABLE) += tcp_scalable.o
+>  obj-$(CONFIG_TCP_CONG_LP) += tcp_lp.o
+>  obj-$(CONFIG_TCP_CONG_YEAH) += tcp_yeah.o
+>  obj-$(CONFIG_TCP_CONG_ILLINOIS) += tcp_illinois.o
+> +obj-$(CONFIG_TCP_AUTHOPT) += tcp_authopt.o
+>  obj-$(CONFIG_NET_SOCK_MSG) += tcp_bpf.o
+>  obj-$(CONFIG_BPF_SYSCALL) += udp_bpf.o
+>  obj-$(CONFIG_NETLABEL) += cipso_ipv4.o
+>  
+>  obj-$(CONFIG_XFRM) += xfrm4_policy.o xfrm4_state.o xfrm4_input.o \
+> diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
+> index b0d3a09dc84e..61dd06f8389c 100644
+> --- a/net/ipv4/proc.c
+> +++ b/net/ipv4/proc.c
+> @@ -295,10 +295,11 @@ static const struct snmp_mib snmp4_net_list[] = {
+>  	SNMP_MIB_ITEM("TcpDuplicateDataRehash", LINUX_MIB_TCPDUPLICATEDATAREHASH),
+>  	SNMP_MIB_ITEM("TCPDSACKRecvSegs", LINUX_MIB_TCPDSACKRECVSEGS),
+>  	SNMP_MIB_ITEM("TCPDSACKIgnoredDubious", LINUX_MIB_TCPDSACKIGNOREDDUBIOUS),
+>  	SNMP_MIB_ITEM("TCPMigrateReqSuccess", LINUX_MIB_TCPMIGRATEREQSUCCESS),
+>  	SNMP_MIB_ITEM("TCPMigrateReqFailure", LINUX_MIB_TCPMIGRATEREQFAILURE),
+> +	SNMP_MIB_ITEM("TCPAuthOptFailure", LINUX_MIB_TCPAUTHOPTFAILURE),
+>  	SNMP_MIB_SENTINEL
+>  };
+>  
+>  static void icmpmsg_put_line(struct seq_file *seq, unsigned long *vals,
+>  			     unsigned short *type, int count)
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 8cb44040ec68..3c29bb579d27 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -271,10 +271,11 @@
+>  
+>  #include <net/icmp.h>
+>  #include <net/inet_common.h>
+>  #include <net/tcp.h>
+>  #include <net/mptcp.h>
+> +#include <net/tcp_authopt.h>
+>  #include <net/xfrm.h>
+>  #include <net/ip.h>
+>  #include <net/sock.h>
+>  
+>  #include <linux/uaccess.h>
+> @@ -3573,10 +3574,16 @@ static int do_tcp_setsockopt(struct sock *sk, int level, int optname,
+>  	case TCP_MD5SIG:
+>  	case TCP_MD5SIG_EXT:
+>  		err = tp->af_specific->md5_parse(sk, optname, optval, optlen);
+>  		break;
+>  #endif
+> +	case TCP_AUTHOPT:
+> +		err = tcp_set_authopt(sk, optval, optlen);
+> +		break;
+> +	case TCP_AUTHOPT_KEY:
+> +		err = tcp_set_authopt_key(sk, optval, optlen);
+> +		break;
+>  	case TCP_USER_TIMEOUT:
+>  		/* Cap the max time in ms TCP will retry or probe the window
+>  		 * before giving up and aborting (ETIMEDOUT) a connection.
+>  		 */
+>  		if (val < 0)
+> diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
+> new file mode 100644
+> index 000000000000..40ee83fc0afe
+> --- /dev/null
+> +++ b/net/ipv4/tcp_authopt.c
+> @@ -0,0 +1,718 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +
+> +#include <linux/kernel.h>
+> +#include <net/tcp.h>
+> +#include <net/tcp_authopt.h>
+> +#include <crypto/hash.h>
+> +#include <trace/events/tcp.h>
+> +
+> +/* All current algorithms have a mac length of 12 but crypto API digestsize can be larger */
+> +#define TCP_AUTHOPT_MAXMACBUF	20
+> +#define TCP_AUTHOPT_MAX_TRAFFIC_KEY_LEN	20
+> +
+> +struct tcp_authopt_key_info *__tcp_authopt_key_info_lookup(struct sock *sk,
+> +							   struct tcp_authopt_info *info,
+> +							   int key_id)
+> +{
+> +	struct tcp_authopt_key_info *key;
+> +
+> +	hlist_for_each_entry_rcu(key, &info->head, node, lockdep_sock_is_held(sk))
+> +		if (key->local_id == key_id)
+> +			return key;
+> +
+> +	return NULL;
+> +}
+> +
+> +struct tcp_authopt_key_info *tcp_authopt_key_info_lookup(struct sock *sk, int key_id)
+> +{
+> +	struct tcp_authopt_info *info;
+> +	struct tcp_authopt_key_info *key;
+> +
+> +	info = rcu_dereference_check(tcp_sk(sk)->authopt_info, lockdep_sock_is_held(sk));
+> +	if (!info)
+> +		return NULL;
+> +
+> +	hlist_for_each_entry_rcu(key, &info->head, node, lockdep_sock_is_held(sk))
+> +		if (key->local_id == key_id)
+> +			return key;
+> +
+> +	return NULL;
+
+The loop and 'return' can be replaced by
+
+	return __tcp_authopt_key_info_lookup(sk, info, key_id);
+
+
+> +}
+> +
+> +int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> +{
+> +	struct tcp_sock *tp = tcp_sk(sk);
+> +	struct tcp_authopt opt;
+> +	struct tcp_authopt_info *info;
+> +
+> +	if (optlen < sizeof(opt))
+> +		return -EINVAL;
+> +
+> +	WARN_ON(!lockdep_sock_is_held(sk));
+> +	if (copy_from_sockptr(&opt, optval, sizeof(opt)))
+> +		return -EFAULT;
+> +
+> +	info = rcu_dereference_check(tp->authopt_info, lockdep_sock_is_held(sk));
+> +	if (!info) {
+> +		info = kmalloc(sizeof(*info), GFP_KERNEL | __GFP_ZERO);
+> +		if (!info)
+> +			return -ENOMEM;
+> +
+> +		sk_nocaps_add(sk, NETIF_F_GSO_MASK);
+> +		INIT_HLIST_HEAD(&info->head);
+> +		rcu_assign_pointer(tp->authopt_info, info);
+> +	}
+
+	info->flags = opt.flags;
+
+In case we forget to add this in the future.
+
+
+> +	info->local_send_id = opt.local_send_id;
+> +
+> +	return 0;
+> +}
+> +
+> +static void tcp_authopt_key_del(struct sock *sk, struct tcp_authopt_key_info *key)
+> +{
+> +	hlist_del_rcu(&key->node);
+> +	atomic_sub(sizeof(*key), &sk->sk_omem_alloc);
+
+Should this be done after actually freeing the key?
+
+
+> +	kfree_rcu(key, rcu);
+> +}
+> +
+> +/* free info and keys but don't touch tp->authopt_info */
+> +void __tcp_authopt_info_free(struct sock *sk, struct tcp_authopt_info *info)
+> +{
+> +	struct hlist_node *n;
+> +	struct tcp_authopt_key_info *key;
+> +
+> +	hlist_for_each_entry_safe(key, n, &info->head, node)
+> +		tcp_authopt_key_del(sk, key);
+> +	kfree_rcu(info, rcu);
+> +}
+> +
+> +/* free everything and clear tcp_sock.authopt_info to NULL */
+> +void tcp_authopt_clear(struct sock *sk)
+> +{
+> +	struct tcp_authopt_info *info;
+> +
+> +	info = rcu_dereference_protected(tcp_sk(sk)->authopt_info, lockdep_sock_is_held(sk));
+> +	if (info) {
+> +		__tcp_authopt_info_free(sk, info);
+> +		tcp_sk(sk)->authopt_info = NULL;
+> +	}
+> +}
+> +
+> +int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> +{
+> +	struct tcp_authopt_key opt;
+> +	struct tcp_authopt_info *info;
+> +	struct tcp_authopt_key_info *key_info;
+> +	u8 traffic_key_len, maclen;
+> +
+> +	if (optlen < sizeof(opt))
+> +		return -EINVAL;
+> +
+> +	if (copy_from_sockptr(&opt, optval, sizeof(opt)))
+> +		return -EFAULT;
+> +
+> +	if (opt.keylen > TCP_AUTHOPT_MAXKEYLEN)
+> +		return -EINVAL;
+> +
+> +	if (opt.local_id == 0)
+> +		return -EINVAL;
+> +
+> +	/* must set authopt before setting keys */
+> +	info = rcu_dereference_protected(tcp_sk(sk)->authopt_info, lockdep_sock_is_held(sk));
+> +	if (!info)
+> +		return -EINVAL;
+> +
+> +	if (opt.flags & TCP_AUTHOPT_KEY_DEL) {
+> +		key_info = __tcp_authopt_key_info_lookup(sk, info, opt.local_id);
+> +		if (!key_info)
+> +			return -ENOENT;
+> +		tcp_authopt_key_del(sk, key_info);
+> +		return 0;
+> +	}
+> +
+> +	/* check the algorithm */
+> +	if (opt.alg == TCP_AUTHOPT_ALG_HMAC_SHA_1_96) {
+> +		traffic_key_len = 20;
+> +		maclen = 12;
+> +	} else if (opt.alg == TCP_AUTHOPT_ALG_AES_128_CMAC_96) {
+> +		traffic_key_len = 16;
+> +		maclen = 12;
+> +	} else {
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* If an old value exists for same local_id it is deleted */
+> +	key_info = __tcp_authopt_key_info_lookup(sk, info, opt.local_id);
+> +	if (key_info)
+> +		tcp_authopt_key_del(sk, key_info);
+> +	key_info = sock_kmalloc(sk, sizeof(*key_info), GFP_KERNEL | __GFP_ZERO);
+> +	if (!key_info)
+> +		return -ENOMEM;
+> +	key_info->local_id = opt.local_id;
+> +	key_info->flags = opt.flags & TCP_AUTHOPT_KEY_EXCLUDE_OPTS;
+> +	key_info->send_id = opt.send_id;
+> +	key_info->recv_id = opt.recv_id;
+> +	key_info->alg = opt.alg;
+> +	key_info->keylen = opt.keylen;
+> +	memcpy(key_info->key, opt.key, opt.keylen);
+> +	key_info->maclen = maclen;
+> +	key_info->traffic_key_len = traffic_key_len;
+> +	hlist_add_head_rcu(&key_info->node, &info->head);
+> +
+> +	return 0;
+> +}
+
+I have looked up to here and will continue tomorrow.
+
+BTW, this patch seems a bit large to me, so splitting it will make it
+easier to read.
+
+Kuniyuki
