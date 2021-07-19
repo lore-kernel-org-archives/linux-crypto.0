@@ -2,144 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A87EC636C9
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 09:57:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75296C07E9B
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 10:02:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D97F61175
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 09:57:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58152610D2
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 10:02:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235134AbhGSJQ2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jul 2021 05:16:28 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:53136 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231928AbhGSJQ2 (ORCPT
+        id S235217AbhGSJWC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jul 2021 05:22:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44141 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235172AbhGSJWC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jul 2021 05:16:28 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 58EB522211;
-        Mon, 19 Jul 2021 09:57:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1626688627; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        Mon, 19 Jul 2021 05:22:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626688962;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hm0zebaLB1hjuy5JvbxVdPV/pSPvr5dtUW8IyF6POIw=;
-        b=yTP5pKNoCyI7Jjy4ptxGgMmsdn8+gFd9uPryJOgL9cozn/N81BRGJzcrjgEeFM2YpgKDFg
-        FclstTKBeA/eUCVoqA2ymDNDeLHF/Mya/UXiiBJPNrY4NNZZBdIDW1/2k5FkYPKhoTDqbC
-        kR/deS+NQw5ZahK41LQN2s5Re0e193A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1626688627;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hm0zebaLB1hjuy5JvbxVdPV/pSPvr5dtUW8IyF6POIw=;
-        b=GDN7uLNmt7P8pyASVwy1uZF2gyMwKA7nG4gR3IWm2c90DUxBiXdNKt174lEHyi7+rEdtqd
-        1OxpoPGePQfGwODg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3F21C13CA7;
-        Mon, 19 Jul 2021 09:57:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Gr41D3NM9WDWMwAAMHmgww
-        (envelope-from <hare@suse.de>); Mon, 19 Jul 2021 09:57:07 +0000
-To:     Stephan Mueller <smueller@chronox.de>,
-        Christoph Hellwig <hch@lst.de>
+        bh=LIArJd668+DITQakrkSuaSzmxBEQaYwP9nAIeL820XM=;
+        b=OviGc9ExzUopEFKYfBIZx4b41OLkTF7KZLZiTg8ucavtLi6poq1VGoOJGw17yIv8SdtsxH
+        OK0DpX0r6JWTX+oblAr6HQXAt9UbvWynUc+eJRq4IbO8LuqwlF8pTt0la1928msaTG6OCA
+        vPzqGSi4MmwP+GtwEwzPJiRBibw/qbU=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-S858lTQ9NpSqnk6rNdUH6g-1; Mon, 19 Jul 2021 06:02:40 -0400
+X-MC-Unique: S858lTQ9NpSqnk6rNdUH6g-1
+Received: by mail-ej1-f71.google.com with SMTP id r10-20020a170906350ab02904f12f4a8c69so5170959eja.12
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 03:02:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:organization:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=LIArJd668+DITQakrkSuaSzmxBEQaYwP9nAIeL820XM=;
+        b=ZpOB/GKdu7Dxz8jaf91TSIjWCaROhoyYX4GBVQSJ/tsBjiZyD+YAUYvUwuIFEI074h
+         4trXHV4s8bgSZI2ItYBr7VG5O5puy43F27ocxsMv91An5Kd4m8wd+D8mrK9PvgNz/tBz
+         c5vqchz0jDotPLwSdSs99YtMXDmruQRg/Wp2yuJ7aX2QwUKwTpzYjkt9Us27zSyf6KLH
+         QvRkUKrxO1a0Wh3eCBXBIoSqFYsB6W41I0INnm0u9HVsAN8VHZ47L/TQfG71bOBIkhL0
+         76ck1TUIRWkDQ0ui3oD+1u0Lb/B32GvTUAm3tN9/hSpWfazHzNVtL4hW/FKXfH6L15Xq
+         +g7A==
+X-Gm-Message-State: AOAM532Hi3ql4OdsMj+TdAzFjq59WXWEF2pvjioZDua8JptH1mDenRyS
+        IMYUA0t/Zo5eMFRkW6cGUIOz2zVzkA1f3+VNd2hAH/A2H6gUsbnVOT4iKEadrpgSHWFj6TrPJ0K
+        /B/PuY+VC4TUkFh4WiqJjKL0O
+X-Received: by 2002:a05:6402:22c6:: with SMTP id dm6mr33660107edb.228.1626688959519;
+        Mon, 19 Jul 2021 03:02:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzf7AlHivCiHIxTEU+yzlNocceBxfAEdg+F908CY6q9MgpA1ztNfyNzGn8lRI1RGkddChsXfw==
+X-Received: by 2002:a05:6402:22c6:: with SMTP id dm6mr33660085edb.228.1626688959306;
+        Mon, 19 Jul 2021 03:02:39 -0700 (PDT)
+Received: from m8.users.ipa.redhat.com ([93.56.160.10])
+        by smtp.gmail.com with ESMTPSA id d3sm7602270edp.11.2021.07.19.03.02.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jul 2021 03:02:38 -0700 (PDT)
+Message-ID: <fce7efe2a5f1047e9f4ab93eedf5ace1946d308c.camel@redhat.com>
+Subject: Re: [RFC PATCH 00/11] nvme: In-band authentication support
+From:   Simo Sorce <simo@redhat.com>
+To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
 Cc:     Sagi Grimberg <sagi@grimberg.me>,
         Keith Busch <keith.busch@wdc.com>,
         linux-nvme@lists.infradead.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org
+Date:   Mon, 19 Jul 2021 06:02:38 -0400
+In-Reply-To: <20210716110428.9727-1-hare@suse.de>
 References: <20210716110428.9727-1-hare@suse.de>
- <2510347.locV8n3378@positron.chronox.de>
- <a4d4bda0-2bc8-0d0c-3e81-55adecd6ce52@suse.de>
- <6538288.aohFRl0Q45@positron.chronox.de>
- <59695981-9edc-6b7a-480a-94cca95a0b8c@suse.de>
- <463a191b9896dd708015645cfc125988cd5deaef.camel@chronox.de>
-From:   Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 09/11] nvmet: Implement basic In-Band Authentication
-Message-ID: <2af95a8e-50d9-7e2d-a556-696e9404fee4@suse.de>
-Date:   Mon, 19 Jul 2021 11:57:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.2 (3.40.2-1.fc34) 
 MIME-Version: 1.0
-In-Reply-To: <463a191b9896dd708015645cfc125988cd5deaef.camel@chronox.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/19/21 10:51 AM, Stephan Mueller wrote:
-> Am Montag, dem 19.07.2021 um 10:15 +0200 schrieb Hannes Reinecke:
->> On 7/18/21 2:56 PM, Stephan Müller wrote:
->>> Am Sonntag, 18. Juli 2021, 14:37:34 CEST schrieb Hannes Reinecke:
+On Fri, 2021-07-16 at 13:04 +0200, Hannes Reinecke wrote:
+> Hi all,
 > 
->>>> The key is also used when using the ffdhe algorithm.
->>>> Note: I _think_ that I need to use this key for the ffdhe algorithm,
->>>> because the implementation I came up with is essentially plain DH with
->>>> pre-defined 'p', 'q' and 'g' values. But the DH implementation also
->>>> requires a 'key', and for that I'm using this key here.
->>>>
->>>> It might be that I'm completely off, and don't need to use a key for our
->>>> DH implementation. In that case you are correct.
->>>> (And that's why I said I'll need a review of the FFDHE implementation).
->>>> But for now I'll need the key for FFDHE.
->>>
->>> Do I understand you correctly that the dhchap_key is used as the input to
->>> the 
->>> DH - i.e. it is the remote public key then? It looks strange that this is
->>> used 
->>> for DH but then it is changed here by hashing it together with something
->>> else 
->>> to form a new dhchap_key. Maybe that is what the protocol says. But it
->>> sounds 
->>> strange to me, especially when you think that dhchap_key would be, say,
->>> 2048 
->>> bits if it is truly the remote public key and then after the hashing it is
->>> 256 
->>> this dhchap_key cannot be used for FFC-DH.
->>>
->>> Or are you using the dhchap_key for two different purposes?
->>>
->>> It seems I miss something here.
->>>
->> No, not entirely. It's me who buggered it up.
->> I got carried away by the fact that there is a crypto_dh_encode_key()
->> function, and thought I need to use it here.
+> recent updates to the NVMe spec have added definitions for in-band
+> authentication, and seeing that it provides some real benefit especially
+> for NVMe-TCP here's an attempt to implement it.
 > 
-> Thank you for clarifying that. It sounds to me that there is no defined
-> protocol (or if there, I would be wondering how the code would have worked
-> with a different implementation). Would it make sense to first specify a
-> protocol for authentication and have it discussed? I personally think it is a
-> bit difficult to fully understand the protocol from the code and discuss
-> protocol-level items based on the code.
+> Tricky bit here is that the specification orients itself on TLS 1.3,
+> but supports only the FFDHE groups. Which of course the kernel doesn't
+> support. I've been able to come up with a patch for this, but as this
+> is my first attempt to fix anything in the crypto area I would invite
+> people more familiar with these matters to have a look.
 > 
-Oh, the protocol _is_ specified:
+> Also note that this is just for in-band authentication. Secure concatenation
+> (ie starting TLS with the negotiated parameters) is not implemented; one would
+> need to update the kernel TLS implementation for this, which at this time is
+> beyond scope.
+> 
+> As usual, comments and reviews are welcome.
 
-https://nvmexpress.org/wp-content/uploads/NVM-Express-Base-Specification-2_0-2021.06.02-Ratified-5.pdf
+Hi Hannes,
+could you please reference the specific standards that describe the
+NVMe authentication protocols?
 
-It's just that I have issues translating that spec onto what the kernel
-provides.
+Thanks,
+Simo.
 
-Cheers,
-
-Hannes
 -- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+Simo Sorce
+RHEL Crypto Team
+Red Hat, Inc
+
+
+
+
