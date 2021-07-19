@@ -2,66 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C053AC12002
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C08CAC636C9
 	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 21:20:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F2D260FF0
+	by mail.kernel.org (Postfix) with ESMTP id AFD2F6113C
 	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jul 2021 21:20:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358133AbhGSUcj (ORCPT
+        id S1358980AbhGSUdR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jul 2021 16:32:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36810 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384811AbhGSShB (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jul 2021 14:37:01 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05119C061786
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 12:05:03 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id q10so17301137pfj.12
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jul 2021 12:14:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=tQHel7KfmZotRt+JL+tikCTH8i4jvKerKwX4Ykhe458=;
-        b=XzM+UTgoPg+XkDOQ81Qyu9Aj1IHESyBIMhh/NFuqluTQUx/dfqwUh9CfJ7hyZrzFOq
-         98OBWEJ8SBib/jcg/gWXAgVqsGzmGzVmU1OUdWlfXwZp6TOhQz8JOPY/LhU0HLup5t60
-         MG09uBh/EZAN80GUdXbWAIzfSVF8OpL6KrxKsnW7KZT5qxtMjdXlgfFYJCVMyibNrxap
-         bI8rESzefHOSN3QAHId4wLC6/nFzqtJ5ez4iL6x1w8/BsoenbhCPqleRFd2divXFsxNi
-         r/lz770w0+7cZ8LA1ahJas+30qW/2CSV1uocE/OAPLcIqktisM8VvyTh0xw7f/nc4gbi
-         Wsfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tQHel7KfmZotRt+JL+tikCTH8i4jvKerKwX4Ykhe458=;
-        b=ApErk+q7dip/HMghqwADMMQG0dGeoHpDzlkDqVjH8TMJ6Mj00l3klsO+L7WphwC1FJ
-         SWXepN3vt3a5ApMj72c80GRpV/HiSIwM7KURtGFpzebNiKfZdfnMqEpNYrCLfySHgZvf
-         uXG3K8CNZEpHwipkWXn+fcOYz/akXs6PbxaGerw3uPRnYpWdM9kPViRDouDnce2D6cma
-         wq8vA8vMzomkagEBzBfa6IX5mnEhU/D/r0MDkJcIOLYeZDCryqpuWlb38EPPQi/+nkG5
-         eyeP//RR4wnqdjRuULiffq6Y7uWLCOCjC9u38JnR8NYUEBCz2DkaW8gPbr06sutSIEaZ
-         wrIA==
-X-Gm-Message-State: AOAM532+IBJ22n1il4DnZgx1NFzNmbBY+333V4tz8werkmVcTnjcOZEl
-        02vbWTUyIhP0WK12WlbpBKgGAg==
-X-Google-Smtp-Source: ABdhPJwrFVVD96rnIFIK2jlY/ieHH+6lfcSv1ywrpxxBKG4B8nAAH7dSYEIACsmYQwT8smdf5ajGig==
-X-Received: by 2002:a65:5bc6:: with SMTP id o6mr3241244pgr.43.1626722092334;
-        Mon, 19 Jul 2021 12:14:52 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x10sm22140073pgj.73.2021.07.19.12.14.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jul 2021 12:14:51 -0700 (PDT)
-Date:   Mon, 19 Jul 2021 19:14:48 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Mon, 19 Jul 2021 16:33:17 -0400
+Received: from mail-dm6nam10on2070.outbound.protection.outlook.com ([40.107.93.70]:13537
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1385308AbhGSS5A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Jul 2021 14:57:00 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WEyNQSeZgtuwFSRnUJ1aaAedIRZVFQ8Gl/QgCSbKUvo+YBKRjFw3vL+53VkDtalxWtVu6/ckakLp8F7lxTzgCwz2waQc2DwWrBmONWf0nNTp+9sxV5dmSZD2iiGdtZv7Jz6fm34w+LzCsweMglpGxDRE2iV2SpyXu+jCjb60fNlsGCmaL9RvdX2VhTvrsZCSMjDYOnZeBLlHZlSGanc8GtKHb/W7pxdKL7ivs1ZSIYIQ7kblvThoA9jE6gLseTRFplbgBJkZgvYVp4leE1aTogS3KTIODi4VAXNSaklr/+q4afmrkwptJ74JwEGXb1dYRDvccE/W6dw2qKHTZYZ+ag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4wMvZTV5rPjCUuUZAYdwVG8LX3dNsIAM4G9dWOGLqt0=;
+ b=O4ZGkFbJlEarAiHI9sJwyk+xybJFgtjxcA0TUK+9ZRzRT8lNILL40+28qgzdQXlNwXCoCKuN1eKWMjRPBzEmF4d5UQ0uhKulupH90Iwrz9SRQbPJs4oqmJVXCyz6f22GqqaB6vyQkU9NTlvlye+IK/PcmB7dGB3KipA6TeygtGycLhWDZiwnEWAtHJn3EV1CKUM/aW9fPbifbidTXMwwgukutBobUO9lpiMlQ6UghHx3I76GM6Ih4AFBe5zayMwLLTqKvW/X5Ncor9RoSrZoakrpeHD54ampjLyw1g3wjKw++5Bjh9vF1EXvT5+nPUEBtZbbIVVuuzn2BUCg0zcNPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4wMvZTV5rPjCUuUZAYdwVG8LX3dNsIAM4G9dWOGLqt0=;
+ b=Q5XBNuIqwYaN8ZRIqVV3a+IovD3akwVFEQtep/dkbTIHeUk/ACQMPn/gNltj4pc1/BtYnKyREaESaGmuwL4gY0HIEOX229gMlQIcE0sJl5SWK+7ps/8RDNsXuVC2Fn2D7IvzlziLvbRvVHWKNdvYm8SYe6y5DVHTYcTJhE9C3Ms=
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4510.namprd12.prod.outlook.com (2603:10b6:806:94::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.24; Mon, 19 Jul
+ 2021 19:37:08 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.033; Mon, 19 Jul 2021
+ 19:37:08 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
         linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
@@ -84,71 +70,124 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
         npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 26/40] KVM: SVM: Add
- KVM_SEV_SNP_LAUNCH_FINISH command
-Message-ID: <YPXPKLW8DvqK7yak@google.com>
+Subject: Re: [PATCH Part2 RFC v4 25/40] KVM: SVM: Reclaim the guest pages when
+ SEV-SNP VM terminates
+To:     Sean Christopherson <seanjc@google.com>
 References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-27-brijesh.singh@amd.com>
- <YPHpk3RFSmE13ZXz@google.com>
- <9ee5a991-3e43-3489-5ee1-ff8c66cfabc1@amd.com>
- <YPWuVY+rKU2/DVUS@google.com>
- <379fd4da-3ca9-3205-535b-8d1891b3a75a@amd.com>
+ <20210707183616.5620-26-brijesh.singh@amd.com> <YPHnb5pW9IoTcwWU@google.com>
+ <2711d9f9-21a0-7baa-d0ff-2c0f69ca6949@amd.com> <YPIoaoDCjNVzn2ZM@google.com>
+ <e1cc1e21-e7b7-5930-1c01-8f4bb6e43b3a@amd.com> <YPWz6YwjDZcla5/+@google.com>
+ <912c929c-06ba-a391-36bb-050384907d81@amd.com> <YPXMas+9O1Y5910b@google.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <96154428-4c18-9e5f-3742-d0446a8d9848@amd.com>
+Date:   Mon, 19 Jul 2021 14:37:06 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <YPXMas+9O1Y5910b@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0801CA0021.namprd08.prod.outlook.com
+ (2603:10b6:803:29::31) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <379fd4da-3ca9-3205-535b-8d1891b3a75a@amd.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.95] (165.204.77.1) by SN4PR0801CA0021.namprd08.prod.outlook.com (2603:10b6:803:29::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.22 via Frontend Transport; Mon, 19 Jul 2021 19:37:07 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f3abf014-8626-465f-5c03-08d94aec9891
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4510:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4510E8325701D2072FC0D877E5E19@SA0PR12MB4510.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zOTrrlGNp3jmUiXs1U23F1cd8W5L36eWlyngAmjAJ7FYrWMpmaLF25kUpH6+ouFpiDMHTXYp67IN8TH7N/ToGBLDiF8M+tF8SUPzEn5s255nU3/pWBA6wpWhUBbd9JOuG/XhXTArLx/Hl5IdQZ9B0/RL4bKW0CTlSpshxWmcNL0pO5mj9QufUyg/89byThyOpovIRbGEWc1j5aIcq6CeBNhvTnlbK6okUa6YWog01fSPwp0+JOPVaBltrb5JAt4Ymcc02J8rMFwmuTOZUtGNYp58ANdFAcPaINZtyOhtEbB1FLXR8jMq8+QwwC7LTAetmjFQ4knqFMltR8cfMDv2AdxSjVGdIrmcA5SmvtuCrYFd2ckuGFXr13W/9Xk6Xf3Wt23UJeSlXvrgo+a+jJM8aeFDIfRZLPmoQj+4071YF2eJ7FQ55PQ25IT6e5L1/lfZhJPp/axC53ifX66uuY6SkopIbXQ9ct6w1lGbWW6lc2DGce0Ok7N71Eic3bbyH1mAXl8t2or2U4smW628GmQJMvgFcJxeDAAXcCnPdrRSafwHYhgIJzkznPQLrgEBkIrwhkZ004b8nabOakf06zy+B+06RZoe4EnE8G3JCGIU2dAEBg6OzrE6qG6rCOzMI+wH1xFLRAwK5ZBWAdsS33Pev0yhJvEYzRjH/ZNjDe2hsDX/OrUyEft1JSs75D7E/8q6X3F0PZ08Jp6zhxtM0a3pXhWOSyEK7cwil6gkXmHPAeLsbXNyiWhy5gO6EKcm8ONzH/6L/baFuExnZ9tSeTGS9g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(31696002)(186003)(5660300002)(4326008)(36756003)(26005)(16576012)(38100700002)(508600001)(86362001)(2906002)(316002)(38350700002)(6916009)(2616005)(7416002)(53546011)(66476007)(66556008)(52116002)(66946007)(7406005)(956004)(8676002)(31686004)(8936002)(44832011)(6486002)(83380400001)(54906003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QlI1MUVEOFNid3ROOVF1eTZrM0RvUlZ5bHJCZTRtMWRudjdnd1JuUWkwVVR5?=
+ =?utf-8?B?Um9acHpaRXVHUHBYZjlnU3pRc0sraXk1am1ndmpOL2hTd0txWFN1NGRMaFdS?=
+ =?utf-8?B?SDZBcm1qSjgyM05LbTlCOVRtSEhydHR0Y0pxOTcrbExGZGJvSUZBYnpCYlN3?=
+ =?utf-8?B?ZFc0d3VETldMVzNxeC8rejJDaWxvWUIyV051a25MNWVrNlhkbmdRS2JRUy8z?=
+ =?utf-8?B?WlFKRkVsUEFJTlloazBrN1RzRGovc2xXbDZKa2JTQlprY2FrVXV6MUVkWkhT?=
+ =?utf-8?B?NDM2emR0bTdmRmNxQUhranlMbkM5RmZKeUx0QXNpSkRaRnl3ZmlHRmNhMzZl?=
+ =?utf-8?B?QVRRZkwvTFFZVTFWNHExemJzQzZiZkJLOE4zUGJYUVUrdlZhMWFRelJ6TGlB?=
+ =?utf-8?B?NGY1emxtUDhnazJqZWZlRHduclo4R2l4dnlNdzZRSXlXZk80VjR3WGxmUG9l?=
+ =?utf-8?B?ZHlSZU5mMi9jYUFSUjk1TmN0ekU4QzBJRDFTdFRtazJoZHNjbTFOQjlQS0Np?=
+ =?utf-8?B?M2szN2RSb2lzUVJaNmhJWkdDSllqQzN6cFNyUHdBQTY0UkxhalovTDVxM3RP?=
+ =?utf-8?B?b0dUcVR6MXFLbHAxV0N2U3BZcUJ2WHZUTjhuaytWN1lMc3VKR05aLzlqcUZ2?=
+ =?utf-8?B?Rnc0T3hGSVV1UGVaYU4wTExpY1F2WE5Ld1p6cExqL2hDamVmcVFmSFhFT1lB?=
+ =?utf-8?B?aVJxR2k2eFJ5cXJtK3N5eVNpbi9KM3JnZXdBMzNWSFdqcWV5YjNzV0lkTlhX?=
+ =?utf-8?B?bExlS2ZKdWVPSlQ3QzNUbnRVZnZybG40NWFKUkpmT2V2WWh5b29ubkdNOEFk?=
+ =?utf-8?B?UmhDMmxKaTVYL0tGOEMwRWtEREs4YXNEaEdHN0xUbWlYTW56VUVnY01tcDRI?=
+ =?utf-8?B?L1lWZTByU00yVHVkOFFEL1A3VUNiTmRLSGxjSUhOUWFKekZ2V0N0TnhjTHBS?=
+ =?utf-8?B?bTVEcnJ6SEt1NmJycm5tcEhyNGpxTFkrN3JtZDltWG1ySkFFV3B0UmVhZUVY?=
+ =?utf-8?B?YWlBYUhUZk5aS3cwSm00aEZYcXBlUkExRU00NmVEUVFkSHU4M08wN2JnZ29p?=
+ =?utf-8?B?UFdoaWxsakpSZ0Y3TGEra0dkcjgwZCtlZWJ2ZGFyZHBvRHZrUlFabjljMnFi?=
+ =?utf-8?B?RXJjdnBXNndOMXlPa3F4ZXora3FJSFQ3N1lQUFZCQ1VtL3VMSjdjai96L1li?=
+ =?utf-8?B?cGNTbk82Zkt5U2JyQnQ2QmV6QU5KR0UxbGRhdWczWVlFZHFJdlJjSTFGWmRV?=
+ =?utf-8?B?TzNaZElhUGhLdTM2MTdBbzF4SEZZNHRaSUJvT1hLZSt4QjBVYlc1WTU1QVBx?=
+ =?utf-8?B?cFVKMmNoemxYeHUzRTJZN2xNQzRQc0pqbTNyd1BJcHZjMmRJQ3VCbkhlL3g5?=
+ =?utf-8?B?OWI2Y253NXJQOHBMM3F2b2M3MklLd2RXN1hPdjJGa2xIZWwyZjQvTHI0TlZW?=
+ =?utf-8?B?QkdkS1pJemtlR01ncmJYSGkwSTdtSCt1S0pDSm5xU1NqZFdFQ2UyS29lWVF3?=
+ =?utf-8?B?M3VFY05lWEhqU1kxeE9wdEl4eEduR2ZPa1BmTnpTdW90U0dKRS9mUEhYWWhw?=
+ =?utf-8?B?SEtCWU9idkIxbmJEV3ZVaVhBUm5KblVxZ2w3cEExNjdBaVZvaVdiSm5yYmNt?=
+ =?utf-8?B?UVN5OXQzTmVpWTNEeXR2ei81dU1rc1p2NE1OdzNTak1yOXFMbmhsYzNhOUpx?=
+ =?utf-8?B?U3lKalNwSXVPZHQwbnB2d3N6dkRqWHhZOEhwOWNRb2k2dTByTHc4ZkRRQWdq?=
+ =?utf-8?Q?GMGLAnHjBG1kU35YzuVyBTm6hVbT9BfWCekUirr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3abf014-8626-465f-5c03-08d94aec9891
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2021 19:37:08.4814
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Wrc/7VncIRCsrkmJ1ENQKaaTauxr97qriORKcf3W7CiXRQFibDrecXueoUB3WLNR7dusfFP5B+NmNlKEZmnyhw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4510
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 19, 2021, Brijesh Singh wrote:
+
+
+On 7/19/21 2:03 PM, Sean Christopherson wrote:
+> On Mon, Jul 19, 2021, Brijesh Singh wrote:
+>>
+>> On 7/19/21 12:18 PM, Sean Christopherson wrote:
+>>>>
+>>>> Okay, I will add helper to make things easier. One case where we will
+>>>> need to directly call the rmpupdate() is during the LAUNCH_UPDATE
+>>>> command. In that case the page is private and its immutable bit is also
+>>>> set. This is because the firmware makes change to the page, and we are
+>>>> required to set the immutable bit before the call.
+>>>
+>>> Or do "int rmp_make_firmware(u64 pfn, bool immutable)"?
+>>
+>> That's not what we need.
+>>
+>> We need 'rmp_make_private() + immutable' all in one RMPUPDATE.  Here is the
+>> snippet from SNP_LAUNCH_UPDATE.
 > 
+> Ah, not firmwrare, gotcha.  But we can still use a helper, e.g. an inner
+> double-underscore helper, __rmp_make_private().
 > 
-> On 7/19/21 11:54 AM, Sean Christopherson wrote:
-> > > As I said in previous comments that by default all the memory is in the
-> > > hypervisor state. if the rmpupdate() failed that means nothing is changed in
-> > > the RMP and there is no need to reclaim. The reclaim is required only if the
-> > > pages are assigned in the RMP table.
-> > 
-> > I wasn't referring to RMPUPDATE failing here (or anywhere).  This is the vCPU free
-> > path, which I think means the svm->vmsa page was successfully updated in the RMP
-> > during LAUNCH_UPDATE.  snp_launch_update_vmsa() goes through snp_page_reclaim()
-> > on LAUNCH_UPDATE failure, whereas this happy path does not.  Is there some other
-> > transition during teardown that obviastes the need for reclaim?  If so, a comment
-> > to explain that would be very helpful.
-> > 
-> 
-> In this patch, the sev_free_vcpu() hunk takes care of reclaiming the vmsa
-> pages before releasing it. I think it will make it more obvious after I add
-> a helper so that we don't depend on user reading the comment block to see
-> what its doing.
 
-Where?  I feel like I'm missing something.  The only change to sev_free_vcpu() I
-see is that addition of the rmpupdate(), I don't see any reclaim path.
+In that case we are basically passing the all the fields defined in the 
+'struct rmpupdate' as individual arguments. How about something like this:
 
-@@ -2346,8 +2454,25 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+* core kernel exports the rmpupdate()
+* the include/linux/sev.h header file defines the helper functions
 
-        if (vcpu->arch.guest_state_protected)
-                sev_flush_guest_memory(svm, svm->vmsa, PAGE_SIZE);
-+
-+       /*
-+        * If its an SNP guest, then VMSA was added in the RMP entry as a guest owned page.
-+        * Transition the page to hyperivosr state before releasing it back to the system.
-+        */
-+       if (sev_snp_guest(vcpu->kvm)) {
-+               struct rmpupdate e = {};
-+               int rc;
-+
-+               rc = rmpupdate(virt_to_page(svm->vmsa), &e);
-+               if (rc) {
-+                       pr_err("Failed to release SNP guest VMSA page (rc %d), leaking it\n", rc);
-+                       goto skip_vmsa_free;
-+               }
-+       }
-+
-        __free_page(virt_to_page(svm->vmsa));
+   int rmp_make_private(u64 pfn, u64 gpa, int psize, int asid)
+   int rmp_make_firmware(u64 pfn, int psize);
+   int rmp_make_shared(u64 pfn, int psize);
 
-+skip_vmsa_free:
-        if (svm->ghcb_sa_free)
-                kfree(svm->ghcb_sa);
- }
+In most of the case above 3 helpers are good. If driver finds that the 
+above helper does not fit its need (such as SNP_LAUNCH_UPDATE) then call 
+the rmpupdate() without going through the helper.
+
+-Brijesh
+
+
