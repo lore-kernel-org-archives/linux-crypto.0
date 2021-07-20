@@ -2,85 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A90C07E95
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9153C636C8
 	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:51:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8437B60FF3
+	by mail.kernel.org (Postfix) with ESMTP id C76556108B
 	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:51:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236435AbhGTUI6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 16:08:58 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:38999 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237168AbhGTTrn (ORCPT
+        id S236716AbhGTUJF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jul 2021 16:09:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41324 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237970AbhGTT5d (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 15:47:43 -0400
-Received: from [192.168.0.113] ([178.252.67.224]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.163]) with ESMTPSA (Nemesis) id
- 1MderZ-1lWbRq3WwD-00ZgwV; Tue, 20 Jul 2021 22:27:15 +0200
-Subject: Re: [PATCH 05/11] nvme: add definitions for NVMe In-Band
- authentication
-To:     Hannes Reinecke <hare@suse.de>, Sagi Grimberg <sagi@grimberg.me>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <keith.busch@wdc.com>, linux-nvme@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-References: <20210716110428.9727-1-hare@suse.de>
- <20210716110428.9727-6-hare@suse.de>
- <affd7d4a-6eb5-20b4-fcb3-7e8a0767d7a2@grimberg.me>
- <2eebe51b-7ca0-c2cf-0949-18fb88a0395b@suse.de>
-From:   Vladislav Bolkhovitin <vst@vlnb.net>
-Message-ID: <2bc945e4-c1a7-f537-aa74-a4fdc81f9d12@vlnb.net>
-Date:   Tue, 20 Jul 2021 23:26:56 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        Tue, 20 Jul 2021 15:57:33 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B608CC061574;
+        Tue, 20 Jul 2021 13:38:09 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id w26so469531qto.9;
+        Tue, 20 Jul 2021 13:38:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=uhJDEodH1yw/K8SgUN/yQPj6QfswnQRoLXT9NJLX4jQ=;
+        b=sRFWu2X/37KyrIRC/Ee0whTh60sAZvseALcf/YWuo+qRJbIthIIrxIXqGT8/Cg/ZPf
+         Fdw1KpIYtcigTQbIeHtX3E4CZ5OEUhgAL115aD6/u7h+aPe8V5p9UHEbGP4rs2kDFEd4
+         mRocR57sdxdxUmYfo6sCpFbtrgezBweI4aXMEN5cb4xZk4sQuanotjRMJeZvbTLvhw0m
+         gL3qYm3ArSrHC9/JWsF904LfdMaJdMIe3VzDDNvNfs+i70jQ9vVbcnZQwcwehn+zyAZw
+         QCRljqBwgDSyDS856mlCE9N52P37ao2PIAEd7st+zclyVQ6zz+KfQ3H55fxKEGvO129M
+         U0Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=uhJDEodH1yw/K8SgUN/yQPj6QfswnQRoLXT9NJLX4jQ=;
+        b=DJcYDemQgTRbOiLvhKqbQWw6sGyxLsw6qLmWXnmh6PVbTrlOanrLPLcUfsDgtxLBeo
+         1Uqgii54RvQ+weldo1FXkaCbkvkgwX6ka6IChmjrwJNRW4AmY1Gepgi+jLTvfBCB1Bbt
+         aI0gqPAG8rcpoNo+UYsq7IlCx/QZoBjqk80/He8YeJi8Zmvfu1qq3kJ5+SQxEKfma1hx
+         lEYss5rZCRkx9OuOxgj9D+tI+Hadkza2P3aBpSuTfzgPTFIkCxnwJltBEK7WZ2TZvgJi
+         Vx9tHL6Kxpr76ZqW5oh+XGhFJ0pr4LUXI8NqcllBoOJ+5XCb/vOzSH6Z6dBed61m7lo7
+         Q3Qw==
+X-Gm-Message-State: AOAM530aYt9F773KuV6XjA6xVZ7AC0Us4BdGXEr9VW2Qr1ic+BY9D7RD
+        hpYs2vBPH6TPD1F5VkymUK34BXD4wIpxGbkjcr0=
+X-Google-Smtp-Source: ABdhPJzKbzRuSFMwsIcAKjxgt66Cj/VfmkGl8d6QZc7DgNNxohAaGjry2ZWWegKWeNBoHA+LaSsjHwDAOBK07Fm95Fc=
+X-Received: by 2002:a05:622a:138d:: with SMTP id o13mr28072669qtk.245.1626813488854;
+ Tue, 20 Jul 2021 13:38:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <2eebe51b-7ca0-c2cf-0949-18fb88a0395b@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:iWPJ2DwRbNoWBzOqSvRw156UUCsO5gFEUpS7ar/9SVweYVuST7p
- Am2uZD6MyxopWUHQNral4DOMBbCSZSvKuub6fifMSq7F43g44IvOTv2HMYCuAt612PZ890T
- 1S8ydKiuB2J2KVfhDRfmRTKRZmxr3SMCANYcUnOQuALB++dh6dqxbgDUH4D/eMaKc77uxac
- 1CqEnTbsvTMsH0MnGKPnw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:O2VJ8bYgfpw=:UHN7I/4vSf4bZQjLCP3E3H
- 6qDLCbTVCXUbxueU9MyrBcATZJNJ9OYAsd8qp+Ui4tG2wWlY0/vc38M3jSYAjI7Mk0OPd0s8G
- qPCaPTKzzzU45QFGSH8HWrWQPJOk+Q5AlaeMFw2hnCrz8Rpa4164yYWnXK7h02cId7oK31H/N
- cy++ac+4506ssAYzmyo4M6Pzztpb6rA8vPrVb9N+SF9oLEqBm/nhKs6On5lo+DFFiOmxufJxv
- Fscof6WBPu//MlHuTUTgJqB9SXOfUHPG4sGWIjcdNdyU+1YITD04dXj71q6HgYUZLelMlrwdR
- OCZciTJSFVdQG6K/4/nYbseTM/gX9kZBKewSxRvO5jwO9fxefJ9GeNWO1zVqJ7Bx9bPr9VbIl
- 1EgCrkNu9UZMMjUbmV9DeJ1uT20v2pEdDRHEBXAxt0OBCbfh3Yr+NCT3OcfKi2tsOxRpCfujK
- bKiryFWXH9hCv3wVk8sHZZlIgmh2KQBayDjLy5Ns9H4QEANjr/9qziaDY/zSfFhN6KJMVMiew
- bJzf6fJaQf+Mzrzo7Q+vjcEffyOXflpPuYUyZToxX4L8XuNDaS0T6E/bbdWDdc5r3MI5w+raM
- WY5UQEb561M8WazvW2gz9Bg1o645RUgJd+JpmMXOU1ArHTxUAtL8Jea0shHQuGGEF3ji83r/O
- P9BTY1ACrpaKISgYKk865c7ZCo0Pjz0u7ENd9C49YhBqeNYhML7QI/w3a1pRyiWkLZ55e97Xt
- k2Ewf3cBkRGP7mgdRIJDJMEuwKeifd7F9ymOzAuoznXIegjqo23hf61OmybLJ35RdARJyFP2w
- 9mt+0dTUbbeg90psEgnLcSdlPFT4CpP/dhnGqEU2iqZ4ddf7g2P5xMQm+JCXiXDIhaWWOUE
+References: <cover.1dfbb73645d917b3c76d01290804a3410bd9932e.1624364386.git-series.a.fatoum@pengutronix.de>
+ <39e6d65ca5d2a0a35fb71d6c1f85add8ee489a19.1624364386.git-series.a.fatoum@pengutronix.de>
+ <1850833581.13438.1625172175436.JavaMail.zimbra@nod.at> <2f608e5a-5a12-6db1-b9bd-a2cd9e3e3671@pengutronix.de>
+ <783613027.15909.1625223222889.JavaMail.zimbra@nod.at> <ac8ef66f-4d57-ead0-d1b3-e97220463241@pengutronix.de>
+ <CAFLxGvxr94apP2jaT0tB6JRDtv_ivrguXK2Ykd3zer_4xtJ+2w@mail.gmail.com> <40e167cca7b59fc4e11f45ba807486e11eade419.camel@linux.ibm.com>
+In-Reply-To: <40e167cca7b59fc4e11f45ba807486e11eade419.camel@linux.ibm.com>
+From:   Richard Weinberger <richard.weinberger@gmail.com>
+Date:   Tue, 20 Jul 2021 22:37:57 +0200
+Message-ID: <CAFLxGvyiWLwH30XnD5GxqYX2WduxLC-kK7Non5O5N=up6RswGg@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+To:     Mimi Zohar <zohar@linux.ibm.com>
+Cc:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Richard Weinberger <richard@nod.at>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        kernel <kernel@pengutronix.de>, James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        horia geanta <horia.geanta@nxp.com>,
+        aymen sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        davem <davem@davemloft.net>, Udit Agarwal <udit.agarwal@nxp.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        david <david@sigma-star.at>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        "open list, ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        LSM <linux-security-module@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Jul 20, 2021 at 10:24 PM Mimi Zohar <zohar@linux.ibm.com> wrote:
+> > I'm not sure how to proceed.  Should I base my changes on this series
+> > or do you plan to send an updated
+> > version soon?
+> > Maybe it makes also sense to base my DCP patch set on yours.
+> >
+> > Trusted Keys maintainers, what do you prefer?
+>
+> Jarkko sent an email saying he is on vacation for 2 weeks.   James was
+> on vacation as well.   If there is something that needs immediate
+> attention, please let me know.
 
-On 7/17/21 5:04 PM, Hannes Reinecke wrote:
-> On 7/17/21 8:30 AM, Sagi Grimberg wrote:
+Oh, let them enjoy their well deserved vacation.
+There no need to hurry. :-)
 
-[...]
-
->>> +
->>> +enum {
->>> +    NVME_AUTH_DHCHAP_HASH_SHA256    = 0x01,
->>
->> Maybe s/HASH/HF/ (stands for hash function, which is
->> a better description).
-> 
-> Or HMAC, as this is what it's used for...
-
-I would better do just NVME_AUTH_DHCHAP_SHA256. "HASH" is redundant
-here. Better to keep it shorter.
-
-Vlad
+-- 
+Thanks,
+//richard
