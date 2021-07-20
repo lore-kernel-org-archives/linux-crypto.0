@@ -6,23 +6,24 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF61C07E9B
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:50:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A90C07E95
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:51:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B530861019
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:50:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8437B60FF3
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:51:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236630AbhGTUJE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 16:09:04 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:38157 "EHLO
+        id S236435AbhGTUI6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jul 2021 16:08:58 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:38999 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237286AbhGTTsx (ORCPT
+        with ESMTP id S237168AbhGTTrn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 15:48:53 -0400
+        Tue, 20 Jul 2021 15:47:43 -0400
 Received: from [192.168.0.113] ([178.252.67.224]) by mrelayeu.kundenserver.de
- (mreue012 [212.227.15.163]) with ESMTPSA (Nemesis) id
- 1M6YEz-1m3SJE2PNp-0070ir; Tue, 20 Jul 2021 22:28:41 +0200
-Subject: Re: [PATCH 06/11] nvme: Implement In-Band authentication
+ (mreue011 [212.227.15.163]) with ESMTPSA (Nemesis) id
+ 1MderZ-1lWbRq3WwD-00ZgwV; Tue, 20 Jul 2021 22:27:15 +0200
+Subject: Re: [PATCH 05/11] nvme: add definitions for NVMe In-Band
+ authentication
 To:     Hannes Reinecke <hare@suse.de>, Sagi Grimberg <sagi@grimberg.me>,
         Christoph Hellwig <hch@lst.de>
 Cc:     Keith Busch <keith.busch@wdc.com>, linux-nvme@lists.infradead.org,
@@ -30,111 +31,56 @@ Cc:     Keith Busch <keith.busch@wdc.com>, linux-nvme@lists.infradead.org,
         "David S . Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org
 References: <20210716110428.9727-1-hare@suse.de>
- <20210716110428.9727-7-hare@suse.de>
- <bd588839-8acc-91cf-5946-f702007b0c7d@grimberg.me>
- <d74c29b8-1c64-e439-9015-6c424baad3d3@suse.de>
+ <20210716110428.9727-6-hare@suse.de>
+ <affd7d4a-6eb5-20b4-fcb3-7e8a0767d7a2@grimberg.me>
+ <2eebe51b-7ca0-c2cf-0949-18fb88a0395b@suse.de>
 From:   Vladislav Bolkhovitin <vst@vlnb.net>
-Message-ID: <a3098fb2-2127-6f81-97e9-ab5de503508e@vlnb.net>
-Date:   Tue, 20 Jul 2021 23:28:21 +0300
+Message-ID: <2bc945e4-c1a7-f537-aa74-a4fdc81f9d12@vlnb.net>
+Date:   Tue, 20 Jul 2021 23:26:56 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <d74c29b8-1c64-e439-9015-6c424baad3d3@suse.de>
+In-Reply-To: <2eebe51b-7ca0-c2cf-0949-18fb88a0395b@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:PbE+rqglmpjeNnT05S+5EUIqm2w3pEbGcHIffWpSRXX9biz2QeV
- tyUB8AS6Qo55qo8uqL+5neAoyx0kl4F3UmzVph2ILPwNpFPn0VjNwYyIoz5/1Dt8xFXgonN
- 2eJvzYyQvpQ/1FVMyjYrmTAs1csH0ukTHK/n28AF12USDkhfH7DhVKWbtOxBL8UfwJoyPcS
- AZxLVpm0hqpr96iosFLjg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9Mgyzmns+BA=:iubR+6YagoGNIqn9YX1i2M
- g5kcs/ivnzTG88BCmuhVAbgXGL1XZsCdN2brkgZQ4WZGYJWivoQB4r66CkhvIZUW4QhD5uxMz
- hRUgUXg5cdqR9MHXse/8HSMDle+iiYrVYt7iE7jIBsEszu1O1QxO+fwXDhJLxJXDjcEyvqkgb
- dh6HcshaaUNE3pSBLHG6oudBeMJv0RQxfgwl9jA2vYvQddB911nURptWKOIlM4zT72/8Ncoh1
- LcCmC7YPCZyVN3z22fuLe/97QJAYY6Gc80fH5X2r4hV22CPIFl1/q0oVfmfbe7t8T49tGk8J4
- hhze9qKix37cXVKsdyEuzAIeLmzfPW4UdXIbiVmE0B9AVaB2Q1o9BxCgIuw+utWIjnqAB8Lln
- yFpbdf2IG+x4Oy8NB0uYgk59TXqaxW2icuaB4Ldas+t5fS/WYmOuwvk+eaJfS3pjY4m3lyMqP
- 2WyOkcund5irMV/dqpkbvWfOckEqrR1kcQtCu6a3vjhAk9dYY53MwE5oMSBTvTGiXRjY6vOlb
- XkoNFCP2LofC842BjZuHqO8j0WCZuj7MOCJ0fAkcH1u+FRhB1VGYoyA217CCLRmDGcX8AdEuX
- L3pnZpSUQvHt+iASgepTP1ESghteGyzTl7Afp2gTprRkDqe60qk2j2vov84bYho+A7MP7tG66
- J2EKPpUXMF61RzTWbj2v32q5F52txiS4mUXRkjF+uLdu/VUbgzMoq2//clb4C2XKgFjMB1F8+
- fKXCG8119kWQTz9ts+6gT/bZ+3yUHOmr4XUVaJH274qrsVbKaxEZ5ajwDiqeP0kEeBuZiYsTL
- dRrp9v0kPMzGnIEWOg7trNguI+fQ3TNTvuozpwhA3UfmlRc/DdaaXwh36fy8obUsvbuuXiw
+X-Provags-ID: V03:K1:iWPJ2DwRbNoWBzOqSvRw156UUCsO5gFEUpS7ar/9SVweYVuST7p
+ Am2uZD6MyxopWUHQNral4DOMBbCSZSvKuub6fifMSq7F43g44IvOTv2HMYCuAt612PZ890T
+ 1S8ydKiuB2J2KVfhDRfmRTKRZmxr3SMCANYcUnOQuALB++dh6dqxbgDUH4D/eMaKc77uxac
+ 1CqEnTbsvTMsH0MnGKPnw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:O2VJ8bYgfpw=:UHN7I/4vSf4bZQjLCP3E3H
+ 6qDLCbTVCXUbxueU9MyrBcATZJNJ9OYAsd8qp+Ui4tG2wWlY0/vc38M3jSYAjI7Mk0OPd0s8G
+ qPCaPTKzzzU45QFGSH8HWrWQPJOk+Q5AlaeMFw2hnCrz8Rpa4164yYWnXK7h02cId7oK31H/N
+ cy++ac+4506ssAYzmyo4M6Pzztpb6rA8vPrVb9N+SF9oLEqBm/nhKs6On5lo+DFFiOmxufJxv
+ Fscof6WBPu//MlHuTUTgJqB9SXOfUHPG4sGWIjcdNdyU+1YITD04dXj71q6HgYUZLelMlrwdR
+ OCZciTJSFVdQG6K/4/nYbseTM/gX9kZBKewSxRvO5jwO9fxefJ9GeNWO1zVqJ7Bx9bPr9VbIl
+ 1EgCrkNu9UZMMjUbmV9DeJ1uT20v2pEdDRHEBXAxt0OBCbfh3Yr+NCT3OcfKi2tsOxRpCfujK
+ bKiryFWXH9hCv3wVk8sHZZlIgmh2KQBayDjLy5Ns9H4QEANjr/9qziaDY/zSfFhN6KJMVMiew
+ bJzf6fJaQf+Mzrzo7Q+vjcEffyOXflpPuYUyZToxX4L8XuNDaS0T6E/bbdWDdc5r3MI5w+raM
+ WY5UQEb561M8WazvW2gz9Bg1o645RUgJd+JpmMXOU1ArHTxUAtL8Jea0shHQuGGEF3ji83r/O
+ P9BTY1ACrpaKISgYKk865c7ZCo0Pjz0u7ENd9C49YhBqeNYhML7QI/w3a1pRyiWkLZ55e97Xt
+ k2Ewf3cBkRGP7mgdRIJDJMEuwKeifd7F9ymOzAuoznXIegjqo23hf61OmybLJ35RdARJyFP2w
+ 9mt+0dTUbbeg90psEgnLcSdlPFT4CpP/dhnGqEU2iqZ4ddf7g2P5xMQm+JCXiXDIhaWWOUE
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-On 7/18/21 3:21 PM, Hannes Reinecke wrote:
-> On 7/17/21 9:22 AM, Sagi Grimberg wrote:
->>> Implement NVMe-oF In-Band authentication. This patch adds two new
->>> fabric options 'dhchap_key' to specify the PSK
->>
->> pre-shared-key.
->>
->> Also, we need a sysfs knob to rotate the key that will trigger
->> re-authentication or even a simple controller(s-plural) reset, so this
->> should go beyond just the connection string.
->>
-> 
-> Yeah, re-authentication currently is not implemented. I first wanted to
-> get this patchset out such that we can settle on the userspace interface
-> (both from host and target).
-> I'll have to think on how we should handle authentication; one of the
-> really interesting cases would be when one malicious admin will _just_
-> send a 'negotiate' command to the controller. As per spec the controller
-> will be waiting for an 'authentication receive' command to send a
-> 'challenge' payload back to the host. But that will never come, so as it
-> stands currently the controller is required to abort the connection.
-> Not very nice.
-
-Yes, in this case after some reasonable timeout (I would suggest 10-15
-seconds) the controller expected to abort connection and clean up all
-allocated resources.
-
-To handle DoS possibility to make too many such "orphan" negotiations,
-hence consume all controller memory, some additional handling is needed.
-For simplicity as a first step I would suggest to have a global limit on
-number of currently being authenticated connections.
+On 7/17/21 5:04 PM, Hannes Reinecke wrote:
+> On 7/17/21 8:30 AM, Sagi Grimberg wrote:
 
 [...]
 
->>> +    chap->key = nvme_auth_extract_secret(ctrl->opts->dhchap_secret,
->>> +                         &chap->key_len);
->>> +    if (IS_ERR(chap->key)) {
->>> +        ret = PTR_ERR(chap->key);
->>> +        chap->key = NULL;
->>> +        return ret;
->>> +    }
 >>> +
->>> +    if (key_hash == 0)
->>> +        return 0;
->>> +
->>> +    hmac_name = nvme_auth_hmac_name(key_hash);
->>> +    if (!hmac_name) {
->>> +        pr_debug("Invalid key hash id %d\n", key_hash);
->>> +        return -EKEYREJECTED;
->>> +    }
+>>> +enum {
+>>> +    NVME_AUTH_DHCHAP_HASH_SHA256    = 0x01,
 >>
->> Why does the user influence the hmac used? isn't that is driven
->> by the susbsystem?
->>
->> I don't think that the user should choose in this level.
->>
+>> Maybe s/HASH/HF/ (stands for hash function, which is
+>> a better description).
 > 
-> That is another weirdness of the spec.
-> The _secret_ will be hashed with a specific function, and that function
-> is stated in the transport representation.
-> (Cf section "DH-HMAC-CHAP Security Requirements").
-> This is _not_ the hash function used by the authentication itself, which
-> will be selected by the protocol.
-> So it's not the user here, but rather the transport specification of the
-> key which selects the hash algorithm.
+> Or HMAC, as this is what it's used for...
 
-Yes, good catch. It looks as a minor errata material to specify that
-hash function here is implementation specific.
-
-I would suggest to just hardcode SHA512 here. Users don't have to be
-confused by this.
+I would better do just NVME_AUTH_DHCHAP_SHA256. "HASH" is redundant
+here. Better to keep it shorter.
 
 Vlad
