@@ -2,200 +2,139 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B493C636C8
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF61C07E9B
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:50:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4367461019
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B530861019
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235573AbhGTUIx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 16:08:53 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:36725 "EHLO
+        id S236630AbhGTUJE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jul 2021 16:09:04 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:38157 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237133AbhGTTr3 (ORCPT
+        with ESMTP id S237286AbhGTTsx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 15:47:29 -0400
+        Tue, 20 Jul 2021 15:48:53 -0400
 Received: from [192.168.0.113] ([178.252.67.224]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.163]) with ESMTPSA (Nemesis) id
- 1N7Qgn-1l2w370noT-017lIO; Tue, 20 Jul 2021 22:27:00 +0200
-Subject: Re: [RFC PATCH 00/11] nvme: In-band authentication support
-To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org,
+ (mreue012 [212.227.15.163]) with ESMTPSA (Nemesis) id
+ 1M6YEz-1m3SJE2PNp-0070ir; Tue, 20 Jul 2021 22:28:41 +0200
+Subject: Re: [PATCH 06/11] nvme: Implement In-Band authentication
+To:     Hannes Reinecke <hare@suse.de>, Sagi Grimberg <sagi@grimberg.me>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Keith Busch <keith.busch@wdc.com>, linux-nvme@lists.infradead.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org
 References: <20210716110428.9727-1-hare@suse.de>
+ <20210716110428.9727-7-hare@suse.de>
+ <bd588839-8acc-91cf-5946-f702007b0c7d@grimberg.me>
+ <d74c29b8-1c64-e439-9015-6c424baad3d3@suse.de>
 From:   Vladislav Bolkhovitin <vst@vlnb.net>
-Message-ID: <66b3b869-02bd-9dee-fadc-8538c6aad57a@vlnb.net>
-Date:   Tue, 20 Jul 2021 23:26:37 +0300
+Message-ID: <a3098fb2-2127-6f81-97e9-ab5de503508e@vlnb.net>
+Date:   Tue, 20 Jul 2021 23:28:21 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20210716110428.9727-1-hare@suse.de>
+In-Reply-To: <d74c29b8-1c64-e439-9015-6c424baad3d3@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:C+RFXPti1OtFpeySbbdTGDoG6HjjVzlMsUSbWdqc2G9TDwqgBF2
- +jx3Xta9ZLFtOURu1xlbdl1MDHUkiFA6IAe8c5C/egpw0fcgYVx01ep63GE7oZzIIOtmAJu
- PkULJW+6MqXSH/ePb02jfymaKIAjCohmZzoeWM6Gw6akIlmjmbDHQoAIlo8205VzvP7f1P+
- Sa4xEPr9W2sDFNcDcUz4A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:pYwAjRlTAq0=:5wPmRJUct811TLss1SELLD
- KI6e4hZYGbwVyy7TJPMNWLtnKWUeDAcUPeh9FtSr4/cXdCzPDh1/w+vMXyfBgDiOZjOyQZlup
- BlZlJWZeYgY3rFK4HcB5KHIpn6Dpkcf6SzBTP1W7u9xqQHEu/9Jd838thy+aQAwsWyWotc0xF
- 7wUUmWSo8EZhnnHfn7Pg/r2PALkQrOrjoFjZ/ANzc5XTWbGvl/xxSNzXQwQenJdWMcZToK7i1
- n+mpjWOdBIe6ullcYAy+L3nAfHxijGR5KGPr24N3A3xg+RL9cuyxI2q351wliqAoniU8exg9i
- N4NZ0vL1DecUx8ZE8Rt5QgnHa8eOUA0pXT1I9WClWF6k0LypDnkSS6tXPoWDcNV5kq+zn996P
- XL+PuKY8ZYs1Ung8CXqydBopp34Sl3fpvMM0p8AcAHd0TtFu/8KQ/0cguv0bLCxQumW/D+qCY
- 3JYZM9cPOuJpfjvOyHlmGLxmQCtSYACahW0/EeE8RNMQSOhk5WMDXsPQmTaLT5yguPqEpIxCD
- EfnUw9hLpz8dWd53Q1ht/6ohNd5IEmWO3JzT2ORDN1T0Bylj9PvIFmsnaO7QzCo9vymBSsjRk
- /ESwp1ZwH5XBREizPVhGWfGPJItDa/gP7XktpWHilwlD+uZTTaRqMd2M2LqqPsPjQs1tClYsI
- XWqd1pSMrVVM0BegNsgIKmnY0k7LBItMRef5F73XWzInB6c86tIiyemUVAJ4+jNWLzgWQ6rYy
- iaXtZwfMAnjk/q6lbzUFJPrqT2orjBAG2Yy7mauB8tYB921koNahKsfRkEtsgM2I7exvb+mSr
- MNR/OwE89XTZGLAMgMjd9x90M0i/f1MaV85y5/04OhV/WwYGPNLXSWeSFH/hqiX7Qz3IA5s
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:PbE+rqglmpjeNnT05S+5EUIqm2w3pEbGcHIffWpSRXX9biz2QeV
+ tyUB8AS6Qo55qo8uqL+5neAoyx0kl4F3UmzVph2ILPwNpFPn0VjNwYyIoz5/1Dt8xFXgonN
+ 2eJvzYyQvpQ/1FVMyjYrmTAs1csH0ukTHK/n28AF12USDkhfH7DhVKWbtOxBL8UfwJoyPcS
+ AZxLVpm0hqpr96iosFLjg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:9Mgyzmns+BA=:iubR+6YagoGNIqn9YX1i2M
+ g5kcs/ivnzTG88BCmuhVAbgXGL1XZsCdN2brkgZQ4WZGYJWivoQB4r66CkhvIZUW4QhD5uxMz
+ hRUgUXg5cdqR9MHXse/8HSMDle+iiYrVYt7iE7jIBsEszu1O1QxO+fwXDhJLxJXDjcEyvqkgb
+ dh6HcshaaUNE3pSBLHG6oudBeMJv0RQxfgwl9jA2vYvQddB911nURptWKOIlM4zT72/8Ncoh1
+ LcCmC7YPCZyVN3z22fuLe/97QJAYY6Gc80fH5X2r4hV22CPIFl1/q0oVfmfbe7t8T49tGk8J4
+ hhze9qKix37cXVKsdyEuzAIeLmzfPW4UdXIbiVmE0B9AVaB2Q1o9BxCgIuw+utWIjnqAB8Lln
+ yFpbdf2IG+x4Oy8NB0uYgk59TXqaxW2icuaB4Ldas+t5fS/WYmOuwvk+eaJfS3pjY4m3lyMqP
+ 2WyOkcund5irMV/dqpkbvWfOckEqrR1kcQtCu6a3vjhAk9dYY53MwE5oMSBTvTGiXRjY6vOlb
+ XkoNFCP2LofC842BjZuHqO8j0WCZuj7MOCJ0fAkcH1u+FRhB1VGYoyA217CCLRmDGcX8AdEuX
+ L3pnZpSUQvHt+iASgepTP1ESghteGyzTl7Afp2gTprRkDqe60qk2j2vov84bYho+A7MP7tG66
+ J2EKPpUXMF61RzTWbj2v32q5F52txiS4mUXRkjF+uLdu/VUbgzMoq2//clb4C2XKgFjMB1F8+
+ fKXCG8119kWQTz9ts+6gT/bZ+3yUHOmr4XUVaJH274qrsVbKaxEZ5ajwDiqeP0kEeBuZiYsTL
+ dRrp9v0kPMzGnIEWOg7trNguI+fQ3TNTvuozpwhA3UfmlRc/DdaaXwh36fy8obUsvbuuXiw
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
 
-Great to see those patches coming! After some review, they look to be
-very well done. Some comments/suggestions below.
+On 7/18/21 3:21 PM, Hannes Reinecke wrote:
+> On 7/17/21 9:22 AM, Sagi Grimberg wrote:
+>>> Implement NVMe-oF In-Band authentication. This patch adds two new
+>>> fabric options 'dhchap_key' to specify the PSK
+>>
+>> pre-shared-key.
+>>
+>> Also, we need a sysfs knob to rotate the key that will trigger
+>> re-authentication or even a simple controller(s-plural) reset, so this
+>> should go beyond just the connection string.
+>>
+> 
+> Yeah, re-authentication currently is not implemented. I first wanted to
+> get this patchset out such that we can settle on the userspace interface
+> (both from host and target).
+> I'll have to think on how we should handle authentication; one of the
+> really interesting cases would be when one malicious admin will _just_
+> send a 'negotiate' command to the controller. As per spec the controller
+> will be waiting for an 'authentication receive' command to send a
+> 'challenge' payload back to the host. But that will never come, so as it
+> stands currently the controller is required to abort the connection.
+> Not very nice.
 
-1. I strongly recommend to implement DH exponentials reuse (g x mod p /
-g y mod p as well as g xy mod p) as specified in section 8.13.5.7
-"DH-HMAC-CHAP Security Requirements". When I was working on TP 8006 I
-had a prototype that demonstrated that DH math has quite significant
-latency, something like (as far as I remember) 30ms for 4K group and few
-hundreds of ms for 8K group. For single connection it is not a big deal,
-but imagine AMD EPYC with 128 cores. Since all connections are created
-sequentially, even with 30 ms per connection time to complete full
-remote device connection would become 128*30 => almost 4 seconds. With
-8K group it might be more than 10 seconds. Users are unlikely going to
-be happy with this, especially in cases, when connecting multiple of
-NVMe-oF devices is a part of a server or VM boot sequence.
+Yes, in this case after some reasonable timeout (I would suggest 10-15
+seconds) the controller expected to abort connection and clean up all
+allocated resources.
 
-If DH exponential reuse implemented, for all subsequent connections the
-DH math is excluded, so authentication overhead becomes pretty much
-negligible.
+To handle DoS possibility to make too many such "orphan" negotiations,
+hence consume all controller memory, some additional handling is needed.
+For simplicity as a first step I would suggest to have a global limit on
+number of currently being authenticated connections.
 
-In my prototype I implemented DH exponential reuse as a simple
-per-host/target cache that keeps DH exponentials (including g xy mod p)
-for up to 10 seconds. Simple and sufficient.
+[...]
 
-Another, might be ever more significant reason why DH exponential reuse
-is important is that without it x (or y on the host side) must always be
-randomly generated each time a new connection is established. Which
-means, for instance, for 8K groups for each connection 1KB of random
-bytes must be taken from the random pool. With 128 connections it is now
-128KB. Quite a big pressure on the random pool that DH exponential reuse
-mostly avoids.
+>>> +    chap->key = nvme_auth_extract_secret(ctrl->opts->dhchap_secret,
+>>> +                         &chap->key_len);
+>>> +    if (IS_ERR(chap->key)) {
+>>> +        ret = PTR_ERR(chap->key);
+>>> +        chap->key = NULL;
+>>> +        return ret;
+>>> +    }
+>>> +
+>>> +    if (key_hash == 0)
+>>> +        return 0;
+>>> +
+>>> +    hmac_name = nvme_auth_hmac_name(key_hash);
+>>> +    if (!hmac_name) {
+>>> +        pr_debug("Invalid key hash id %d\n", key_hash);
+>>> +        return -EKEYREJECTED;
+>>> +    }
+>>
+>> Why does the user influence the hmac used? isn't that is driven
+>> by the susbsystem?
+>>
+>> I don't think that the user should choose in this level.
+>>
+> 
+> That is another weirdness of the spec.
+> The _secret_ will be hashed with a specific function, and that function
+> is stated in the transport representation.
+> (Cf section "DH-HMAC-CHAP Security Requirements").
+> This is _not_ the hash function used by the authentication itself, which
+> will be selected by the protocol.
+> So it's not the user here, but rather the transport specification of the
+> key which selects the hash algorithm.
 
-Those are the 2 reasons why we added this DH exponential reuse sentence
-in the spec. In the original TP 8006 there was a small informative piece
-explaining reasonings behind that, but for some reasons it was removed
-from the final version.
+Yes, good catch. It looks as a minor errata material to specify that
+hash function here is implementation specific.
 
-2. What is the status of this code from perspective of stability in face
-of malicious host behavior? Seems implementation is carefully done, but,
-for instance, at the first look I was not able to find a code to clean
-up if host in not acting for too long in the middle of exchange. Other
-observation is that in nvmet_execute_auth_send()
-nvmet_check_transfer_len() does not check if tl size is reasonable,
-i.e., for instance, not 1GB.
-
-For sure, we don't want to allow remote hosts to hang or crash target.
-For instance, because of OOM conditions that happened, because malicious
-host asked target to allocate too much memory or open to many being
-authenticated connections in which the host is not going to reply in the
-middle of exchange.
-
-Asking, because don't want to go in my review too far ahead from the
-author ;)
-
-In this regard, it would be great if you add in your test application
-ability to perform authentication with random parameters and randomly
-stop responding. Overnight running of such test would give us good
-degree of confidence that it will always work as expected.
+I would suggest to just hardcode SHA512 here. Users don't have to be
+confused by this.
 
 Vlad
-
-On 7/16/21 2:04 PM, Hannes Reinecke wrote:
-> Hi all,
-> 
-> recent updates to the NVMe spec have added definitions for in-band
-> authentication, and seeing that it provides some real benefit especially
-> for NVMe-TCP here's an attempt to implement it.
-> 
-> Tricky bit here is that the specification orients itself on TLS 1.3,
-> but supports only the FFDHE groups. Which of course the kernel doesn't
-> support. I've been able to come up with a patch for this, but as this
-> is my first attempt to fix anything in the crypto area I would invite
-> people more familiar with these matters to have a look.
-> 
-> Also note that this is just for in-band authentication. Secure concatenation
-> (ie starting TLS with the negotiated parameters) is not implemented; one would
-> need to update the kernel TLS implementation for this, which at this time is
-> beyond scope.
-> 
-> As usual, comments and reviews are welcome.
-> 
-> Hannes Reinecke (11):
->   crypto: add crypto_has_shash()
->   crypto: add crypto_has_kpp()
->   crypto/ffdhe: Finite Field DH Ephemeral Parameters
->   lib/base64: RFC4648-compliant base64 encoding
->   nvme: add definitions for NVMe In-Band authentication
->   nvme: Implement In-Band authentication
->   nvme-auth: augmented challenge support
->   nvmet: Parse fabrics commands on all queues
->   nvmet: Implement basic In-Band Authentication
->   nvmet-auth: implement support for augmented challenge
->   nvme: add non-standard ECDH and curve25517 algorithms
-> 
->  crypto/Kconfig                         |    8 +
->  crypto/Makefile                        |    1 +
->  crypto/ffdhe_helper.c                  |  877 +++++++++++++++++
->  crypto/kpp.c                           |    6 +
->  crypto/shash.c                         |    6 +
->  drivers/nvme/host/Kconfig              |   11 +
->  drivers/nvme/host/Makefile             |    1 +
->  drivers/nvme/host/auth.c               | 1188 ++++++++++++++++++++++++
->  drivers/nvme/host/auth.h               |   23 +
->  drivers/nvme/host/core.c               |   77 +-
->  drivers/nvme/host/fabrics.c            |   65 +-
->  drivers/nvme/host/fabrics.h            |    8 +
->  drivers/nvme/host/nvme.h               |   15 +
->  drivers/nvme/host/trace.c              |   32 +
->  drivers/nvme/target/Kconfig            |   10 +
->  drivers/nvme/target/Makefile           |    1 +
->  drivers/nvme/target/admin-cmd.c        |    4 +
->  drivers/nvme/target/auth.c             |  608 ++++++++++++
->  drivers/nvme/target/configfs.c         |  102 +-
->  drivers/nvme/target/core.c             |   10 +
->  drivers/nvme/target/fabrics-cmd-auth.c |  472 ++++++++++
->  drivers/nvme/target/fabrics-cmd.c      |   30 +-
->  drivers/nvme/target/nvmet.h            |   71 ++
->  include/crypto/ffdhe.h                 |   24 +
->  include/crypto/hash.h                  |    2 +
->  include/crypto/kpp.h                   |    2 +
->  include/linux/base64.h                 |   16 +
->  include/linux/nvme.h                   |  187 +++-
->  lib/Makefile                           |    2 +-
->  lib/base64.c                           |  111 +++
->  30 files changed, 3961 insertions(+), 9 deletions(-)
->  create mode 100644 crypto/ffdhe_helper.c
->  create mode 100644 drivers/nvme/host/auth.c
->  create mode 100644 drivers/nvme/host/auth.h
->  create mode 100644 drivers/nvme/target/auth.c
->  create mode 100644 drivers/nvme/target/fabrics-cmd-auth.c
->  create mode 100644 include/crypto/ffdhe.h
->  create mode 100644 include/linux/base64.h
->  create mode 100644 lib/base64.c
-> 
