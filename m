@@ -2,235 +2,240 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5147C07E95
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AD7BC6377E
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:45:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3471610FB
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:03:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 125F76124B
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:45:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239902AbhGTOVn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 10:21:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49425 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239618AbhGTOOp (ORCPT
+        id S238163AbhGTPDx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jul 2021 11:03:53 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:48472 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240289AbhGTOZI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 10:14:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626792910;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hfTy+/pS/KzMBH2y9VMJnUs0qvlciTECo+EvOT9Ucu0=;
-        b=N4+jj7bjV8aPf1pY1kl3lXFXTz7Gl05JAyjuLo/3IfDh5KpguP5VWQzo1dQ6SB31CMBGs7
-        jQm05ONXLPWW3A23RayD5fY8w7mvxICy4sMk/JyE6b1Nm1P3JBh49ZKKbke8FRVAXX8mKK
-        ZSyFmAUTgXn6atoHTexhi+5lqLulI+Y=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-CUM2eDbiOaWgwS1P2Oq0aw-1; Tue, 20 Jul 2021 10:45:01 -0400
-X-MC-Unique: CUM2eDbiOaWgwS1P2Oq0aw-1
-Received: by mail-ed1-f72.google.com with SMTP id g23-20020aa7c8570000b02903954c05c938so5391149edt.3
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jul 2021 07:45:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:organization:user-agent:mime-version
-         :content-transfer-encoding;
-        bh=hfTy+/pS/KzMBH2y9VMJnUs0qvlciTECo+EvOT9Ucu0=;
-        b=jI42ql+RmxBSOOqYhv5lXpPmNQywBNZ+7Xgj+USC5SmptCpqWt3L5OM/B+j3lpayPu
-         G4QRLztDlMNAMjrb4Og3ZSO+UZpSjXaSvV5jZT5Wp68ghUlowa0kNYfmpxVYFh0vZaiN
-         QhVzK+ptJt/uSHMoATKh8wXEb/bdP4lkUHlPoC3u3lJYLu5wSxrkYLc6VAoz0TnwV1C5
-         N6BA/ekdVEcJFFvBM36x+6o+mepf2Jqlw5l137sb79BmwbsFasDDW8ae3fBCrr/fIiOK
-         f6emYb7cAk0TbE0i+PfiZEHs7XWDlPW84HFJ5nHblseF505RXtrJhFPMl9K3xICYHSWM
-         ifsg==
-X-Gm-Message-State: AOAM531cUeERpDYeGTVFWJ/z9VP9en3H4C3hW2P0nSdOwKMQfTjpBQWB
-        Wu1omoi7oujACJjS51R4fYunRf7rGlDrTq9eRKy92hwWZzFj1ISIqI6lbr2Hw4gR8Hd3QYG/2r+
-        Mg5C8ZOc/akMD5ECdvlYl5P+c
-X-Received: by 2002:a05:6402:1a25:: with SMTP id be5mr41478456edb.123.1626792299931;
-        Tue, 20 Jul 2021 07:44:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwwZb2w4R3+PQAgLZhB4esRR1ex3IgU8wV7HFBjL/IETvaJklgYg1N8nXPDCD9YqDnDyM5jgQ==
-X-Received: by 2002:a05:6402:1a25:: with SMTP id be5mr41478431edb.123.1626792299801;
-        Tue, 20 Jul 2021 07:44:59 -0700 (PDT)
-Received: from m8.users.ipa.redhat.com ([93.56.160.10])
-        by smtp.gmail.com with ESMTPSA id r17sm9395099edt.33.2021.07.20.07.44.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 07:44:59 -0700 (PDT)
-Message-ID: <5ec6c8d5a0259a2d632589c154093ebfbbcdb47b.camel@redhat.com>
-Subject: Re: [PATCH 09/11] nvmet: Implement basic In-Band Authentication
-From:   Simo Sorce <simo@redhat.com>
-To:     Hannes Reinecke <hare@suse.de>,
-        Stephan Mueller <smueller@chronox.de>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Date:   Tue, 20 Jul 2021 10:44:58 -0400
-In-Reply-To: <4cd673a8-a503-c29a-85f6-3c2703558181@suse.de>
-References: <20210716110428.9727-1-hare@suse.de>
-         <2510347.locV8n3378@positron.chronox.de>
-         <a4d4bda0-2bc8-0d0c-3e81-55adecd6ce52@suse.de>
-         <6538288.aohFRl0Q45@positron.chronox.de>
-         <59695981-9edc-6b7a-480a-94cca95a0b8c@suse.de>
-         <463a191b9896dd708015645cfc125988cd5deaef.camel@chronox.de>
-         <2af95a8e-50d9-7e2d-a556-696e9404fee4@suse.de>
-         <740af9f7334c294ce879bef33985dfab6d0523b3.camel@chronox.de>
-         <1eab1472-3b7b-307b-62ae-8bed39603b96@suse.de>
-         <24d115c9b68ca98a3cf363e1cfcb961cc6b38069.camel@chronox.de>
-         <aac9448e-29e9-6d03-1077-148be3c10f50@suse.de>
-         <11ab4001f580a6b2c3cce959282259c1f9095f63.camel@redhat.com>
-         <4cd673a8-a503-c29a-85f6-3c2703558181@suse.de>
-Organization: Red Hat
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.2 (3.40.2-1.fc34) 
+        Tue, 20 Jul 2021 10:25:08 -0400
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16KF2Ajn013562;
+        Tue, 20 Jul 2021 15:05:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references :
+ content-transfer-encoding : content-type : mime-version;
+ s=corp-2021-07-09; bh=XHmxsUl9g+d7dhLrYyAFS4aNyiQgF+jZz2NOvT7dDs4=;
+ b=bvyyLFfNGsKod+QzS/Pg4c91w+wd+wbfH+kQLt6kLOehxXUjUiAkfnyVgE3DncH4Az+K
+ ToayeLU9LcjYV57xe33RrwtsNWxJ+RnzjdYKTNwE4KuSlIeH0vcE/cq37LrtQh1E/rFQ
+ rUzH1RtVVp/VGG9zB8+Lk7lYO/kG7r5wPqXmtoeagoz/Bo6cqRhOYNWpKsqpJjQB9s87
+ j5OBE7KtKj6ILxktyma/luJJMkzLUaPqHeofEEvs0k4Cotij/T/59g+SuD6T+5O9IABF
+ CGorXauKR8IT3eO+R1WoF3ErZuRBtWdgWwLLnaJnDX9e7AWrV/MNcG87aQ+XyBZhm9Uv hQ== 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references :
+ content-transfer-encoding : content-type : mime-version;
+ s=corp-2020-01-29; bh=XHmxsUl9g+d7dhLrYyAFS4aNyiQgF+jZz2NOvT7dDs4=;
+ b=PVfKLftiUU4dUdoEAGSlzdi7zftSWHbleiqSN3sk/KYKWxiEfitbKGcKg+F+0smSobTh
+ ZzpUyFnMxnwzlNgpJPQIxUNmhQh6VHPJP7FLpdg36O1FHokjrguyR9OdvUlIRLZE3zxl
+ aWai/4MpiJZi1DS4FvoNwRDA4VHVLlt+/vCg7Csgdj2sDflZINtjWx3CZHG3mdusMcDQ
+ dNGBJbQQ4E+vWuqonfWv+XdfHbDRlS7eemc1sGHUcZPiiUvCDmgulcGef9cHkBNcwSI1
+ b55LtiEJ/ebtcCzA4PWWmn2E+dReg0/dQOzB9yT3y0bMBcAXTpZqtWXLXCW9i2O7aoE0 wQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by mx0b-00069f02.pphosted.com with ESMTP id 39w9hftyf3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Jul 2021 15:05:28 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 16KEtKSE001151;
+        Tue, 20 Jul 2021 15:05:27 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2175.outbound.protection.outlook.com [104.47.55.175])
+        by aserp3030.oracle.com with ESMTP id 39wunhudv1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Jul 2021 15:05:26 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AcY1v33n8FeOFd5UQqgDGQkkLSMI5K3B1aRvJf1c4sw6C40aCEMhgfePKHsjviTX0eK3/IiC7cuJHYro5YBCvDpumo1snPUNhHU0XajiMrjDXQoPWvxW5Q/SHviHiISy6jbuhiyrQfrtL+3Bc4HjjInZaOvxTumKenoFT1dkSSDyGyr7gs5TB4GmMnHLwf5HUfelGyPjsGETglXJ94piVT5S95SbZfocgDqq1mx/0TNqY0275GXMHHVjrSHau7EQXzqgkAoHz96Y126akElLEh6s1HG2Vj4I/E7xyHF1DBq8g5ZkdBjQA/3pS3Us0/7urgHFNLPCg7u8g0gbppi6Gg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XHmxsUl9g+d7dhLrYyAFS4aNyiQgF+jZz2NOvT7dDs4=;
+ b=R/diZlQ9+wKU3NZAIwbfd+dnxdviaNpG4+3yvFKw9Bp4yfLAI8LzppmM4r9e8MQNVTs+SpsHCa4xZeA63nlRdgUNKdW2j2CT6a8rLHhhgqbtZvKtUQC8cWUVJq+FDVU+0r5xlaGwP7TARv8pUgpIgiu8VxjFtYYHYJkPdUqVZRkLO9PuYJNWCZLbycoPVcqRk+kmBjeMppBee1/HCguAN9URG+H+eL3sZ5yFIQ1Y5/ZNAB04rP8rEu29OW6rN5MLBovui+Y54NcWaQU9qyBvZ+5SsES4Hc2erQMHwY7OJAWLpDuIwZeg2cKeUQ2AX+TfWciHixkAzTt961s4BNSs0Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XHmxsUl9g+d7dhLrYyAFS4aNyiQgF+jZz2NOvT7dDs4=;
+ b=mCTMWSjn8CAoRaPQuytzo9Ve4B32MpwY6vLIPpG0GH4aZBOC/1Myfn0AklqEnpm2BwmL/MFLrbLmrSk7r+YcNBSpO9l1SPS4eLLoLEFzQZZJCAWTYMCHnP0CeIeq2NUyEOwXxIIyn2KPo8VVwWccGJfl7NOR3BMwsIv34vMpyTI=
+Authentication-Results: gondor.apana.org.au; dkim=none (message not signed)
+ header.d=none;gondor.apana.org.au; dmarc=none action=none
+ header.from=oracle.com;
+Received: from BYAPR10MB2966.namprd10.prod.outlook.com (2603:10b6:a03:8c::27)
+ by SJ0PR10MB4653.namprd10.prod.outlook.com (2603:10b6:a03:2d7::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.22; Tue, 20 Jul
+ 2021 15:05:25 +0000
+Received: from BYAPR10MB2966.namprd10.prod.outlook.com
+ ([fe80::9478:368e:93b4:6b48]) by BYAPR10MB2966.namprd10.prod.outlook.com
+ ([fe80::9478:368e:93b4:6b48%4]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
+ 15:05:25 +0000
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     Xiyu Yang <xiyuyang19@fudan.edu.cn>, yuanxzhang@fudan.edu.cn,
+        Xin Tan <tanxin.ctf@gmail.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] padata: Convert from atomic_t to refcount_t on parallel_data->refcnt
+Date:   Tue, 20 Jul 2021 11:05:11 -0400
+Message-Id: <20210720150511.877668-1-daniel.m.jordan@oracle.com>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20210719214649.w65ifdp2hriryrsc@oracle.com>
+References: <20210719214649.w65ifdp2hriryrsc@oracle.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BL1PR13CA0403.namprd13.prod.outlook.com
+ (2603:10b6:208:2c2::18) To BYAPR10MB2966.namprd10.prod.outlook.com
+ (2603:10b6:a03:8c::27)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (98.229.125.203) by BL1PR13CA0403.namprd13.prod.outlook.com (2603:10b6:208:2c2::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.11 via Frontend Transport; Tue, 20 Jul 2021 15:05:23 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7f77071e-77af-46fa-0e4f-08d94b8fcd66
+X-MS-TrafficTypeDiagnostic: SJ0PR10MB4653:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SJ0PR10MB46535EEC477AAF5EEF5F6906D9E29@SJ0PR10MB4653.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6BVk6xCMa3WUOOIXDelPIMad+N224aKM1HJq6RMaZBV2zlD81C0eB+uTtIy+KOIELMTkae7xoNkk9RwJRTdboOUKqa1qaz+l9Nd2XexhqZsSF1Lr0RGSWa9o37lca5cGhJ5JF+GmHhPxIR+Eqjg7h6z8yNCXcS4NsD+/Ip+/nD11IR/Hi83sE0JQnuGAGxF8xPlEZ/+0XaYeh1cCv/pj2khelVbhLYI5LJKeOyPla6InLMc4dpJWymJDSZH1hgHfEJSdBQO30oX/xVHbg6SPgeT/BvTVMrylaORKOy6NG72bx/CkEt/B4MUZEUZvJ4uw4SuJfSPUYFdT6Ivucv1lYKji68Bt0IqVA2J0YZHWPc7Es0lRlflAEzgiNbI1439La+2uJK8dbkrljKMut9eXfgkEzFivBJxhK2opU7pSt4OsIpm8TjbfA/iHkC9EFImTUJOjBGcbBueS4jy5MjHqNlsxDOhO0htA2rC35+cpHxNKJKeyk49RShO89j2f6zGADMlnxD/gLxRERWu5D8EVVW/oHxR1qv1J2H+Mrac752PO63iXUN4P6L/GFq1MvuBtl6dC8+BEZg0bOY63/FmRd1YG7xKhyuFKQKsqhK6rUsxHv69J9jguacUBLjo/htJJDy5MPoqi9SjO9kGqftulmBtdq7fkbbxO58KFNWuXtVpUqa4emyOM9fJhGJxP2qAL438nYo3PGfK1q4YVpwqcKA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2966.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(6486002)(54906003)(52116002)(6506007)(186003)(2616005)(38350700002)(6512007)(1076003)(38100700002)(2906002)(110136005)(316002)(86362001)(66556008)(66946007)(66476007)(26005)(508600001)(5660300002)(8936002)(6666004)(8676002)(4326008)(83380400001)(36756003)(7049001)(956004)(103116003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WQhbIkW3qayHM0pxG3bly4vU2X7Bh8/Bu0TPjctKNf173mB4a0u5hDjXIw49?=
+ =?us-ascii?Q?UfwUTkDuLxRrqPlaQgdIKQG/xUOKW4WGz+Ap05YzJfzBRQxAl2JMheiG8bWv?=
+ =?us-ascii?Q?EwYo940PUGzGKTgUSo3C5xoQt/x7UpNaSM42ouHzhLal1QqeW4msyGjVtyKB?=
+ =?us-ascii?Q?BH5IX2VUwhMyVx3Z28QlMIej4KViNmJerxcTOaYo+lbi4cL0X+xR4XGNu8Ro?=
+ =?us-ascii?Q?31ceQSIAPOqzAHDGQDkJd80LkbZI7wc0QSaFmBp944qWFoLCRX1PcVveWvIp?=
+ =?us-ascii?Q?pdBPn2aPdUyxEF49H8+DzqaCzY812dVYudpXfOpOjZvXxiEXjcYVN2kZ1lTp?=
+ =?us-ascii?Q?E/GvAkGCmFNCwU7T1qXTX/RAVY0IIWMOgE8M47yQdYZwgUxq9mu3pgC8Dqif?=
+ =?us-ascii?Q?xnRUid8zRX4gek1UoJDVMGdUVfTOYv6hCwrCdK27437Iv/Z61hla1D7Qyght?=
+ =?us-ascii?Q?inyy0PHg0nq8b4ZNnRammi8L6SmnJr78UFIPvgaaW/6PprEt9uswHm3nwOI6?=
+ =?us-ascii?Q?5AAII6/Z1fAO68OwTdZK3l7bexpO5X7RNT0sUioiJ1bvN6UyotLXpoF9OfE8?=
+ =?us-ascii?Q?nS5Q2lICvzzElQf7ZwKCsGivvIWxAIAT/0BI6UeRDAdCa6dtDKUBcm+lwN7f?=
+ =?us-ascii?Q?Dg+jZ+hzU7ZFE3hDUVTy+yukgp7Ympq5Q5vAFYeqs0THwtRb/UHwyykqojjK?=
+ =?us-ascii?Q?QESb63lqArB1baTBEfCp/I8Loev/VN7fdgRi6j/t9CVoBIgaAtli1vA3hGrA?=
+ =?us-ascii?Q?DuVh+DSRfx9X9YPGfTTJOKudJIbMk8BDnBRON6Fc3K5fKJfQ3hjYepuCGAJP?=
+ =?us-ascii?Q?/AQREmtxGH8TZ/0zzTGfYGI3PH7+FruZk5oRE/pwi8vcvjGXsBglxEtnm2Sq?=
+ =?us-ascii?Q?Hf/4n6DevWUj5RW9zEciiwlz2VLcHt8crnPbovThmWxEAUFvx3vNbsLfNe71?=
+ =?us-ascii?Q?OOAEihyb0VmkaEubS5p7AdzTWa2D7dAWOCtebhSGo1oOJwKDwt3057aQhkDV?=
+ =?us-ascii?Q?jDVHub0Js383xCNrLh7kZ6JjEZU7143n9XuiwvK2XOrrHWpb/vWzoPHoauLt?=
+ =?us-ascii?Q?9SN9odR9LkhJFWu8N06aVW2PeAxlaLyJr0hxyI/pvj40SO+gRL2oTILbMO0J?=
+ =?us-ascii?Q?rmDbD61sKfoJh3QbWPLSZ9c6ICo55mE/2LOd9mbqxgNeH5COLMaQymsNWUvC?=
+ =?us-ascii?Q?arERPlpRw5I6/ZMByrh+CbY/oH6kxc14YuP+KHrkyL1MRAX3CO3k96utwyWx?=
+ =?us-ascii?Q?eOD86c4TXZ3Y69PwjGO+M4f2cscpfv+sg71B2ztxiZeAkQkIgD+IBg8hyu6U?=
+ =?us-ascii?Q?gbqNuHrmb0w94R5G41XscF/F?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f77071e-77af-46fa-0e4f-08d94b8fcd66
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2966.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 15:05:24.9818
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rlN9UAfEZDAsiUMnGuIZ0x/vaN2OUEYZQ9kPzy4I9tL6ldcjtZjvilXlbuETbAJWj6jByWzOMPLsNtqyBDsnWSirjmldUM6bFcqTy5XlPXo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4653
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10050 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0 spamscore=0
+ bulkscore=0 mlxlogscore=999 adultscore=0 malwarescore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2107200094
+X-Proofpoint-GUID: S65owtAH7k3jY1Js-usTE2VOSZusxDef
+X-Proofpoint-ORIG-GUID: S65owtAH7k3jY1Js-usTE2VOSZusxDef
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2021-07-20 at 13:31 +0200, Hannes Reinecke wrote:
-> On 7/20/21 12:49 PM, Simo Sorce wrote:
-> > On Tue, 2021-07-20 at 12:14 +0200, Hannes Reinecke wrote:
-> > > On 7/19/21 1:52 PM, Stephan Mueller wrote:
-> > > > Am Montag, dem 19.07.2021 um 13:10 +0200 schrieb Hannes Reinecke:
-> > > > > On 7/19/21 12:19 PM, Stephan Mueller wrote:
-> > > > > > Am Montag, dem 19.07.2021 um 11:57 +0200 schrieb Hannes Reinecke:
-> > > > > > > On 7/19/21 10:51 AM, Stephan Mueller wrote:
-> > > [ .. ]
-> > > > > > > > 
-> > > > > > > > Thank you for clarifying that. It sounds to me that there is no
-> > > > > > > > defined protocol (or if there, I would be wondering how the code would have
-> > > > > > > > worked
-> > > > > > > > with a different implementation). Would it make sense to first specify
-> > > > > > > > a protocol for authentication and have it discussed? I personally think
-> > > > > > > > it is a bit difficult to fully understand the protocol from the code and
-> > > > > > > > discuss protocol-level items based on the code.
-> > > > > > > > 
-> > > > > > > Oh, the protocol _is_ specified:
-> > > > > > > 
-> > > > > > >  
-> > > > > > > https://nvmexpress.org/wp-content/uploads/NVM-Express-Base-Specification-2_0-2021.06.02-Ratified-5.pdf
-> > > > > > > 
-> > > > > > > It's just that I have issues translating that spec onto what the kernel
-> > > > > > > provides.
-> > > > > > 
-> > > > > > according to the naming conventions there in figures 447 and following:
-> > > > > > 
-> > > > > > - x and y: DH private key (kernel calls it secret set with dh_set_secret
-> > > > > > or
-> > > > > > encoded into param.key)
-> > > > > > 
-> > > > > 
-> > > > > But that's were I got confused; one needs a private key here, but there
-> > > > > is no obvious candidate for it. But reading it more closely I guess the
-> > > > > private key is just a random number (cf the spec: g^y mod p, where y is
-> > > > > a random number selected by the host that shall be at least 256 bits
-> > > > > long). So I'll fix it up with the next round.
-> > > > 
-> > > > Here comes the crux: the kernel has an ECC private key generation function
-> > > > ecdh_set_secret triggered with crypto_kpp_set_secret using a NULL key, but it
-> > > > has no FFC-DH counterpart.
-> > > > 
-> > > > That said, generating a random number is the most obvious choice, but not the
-> > > > right one.
-> > > > 
-> > > > The correct one would be following SP800-56A rev 3 and here either section
-> > > > 5.6.1.1.3 or 5.6.1.1.4.
-> > > > 
-> > > Hmm. Okay. But after having read section 5.6.1.1.4, I still do have some
-> > > questions.
-> > > 
-> > > Assume we will be using a bit length of 512 for FFDHE, then we will
-> > > trivially pass Step 2 for all supported FFDHE groups (the maximum
-> > > symmetric-equivalent strength for ffdhe8192 is 192 bits).
-> > 
-> > N = 512 is not a good choice, minimum length these days for DH should
-> > be 2048 or more.
-> > 
-> 
-> According to RFC7919:
-> Peers using ffdhe8192 that want to optimize their key exchange with a
-> short exponent (Section 5.2) should choose a secret key of at least
-> 400 bits.
-> 
-> So what is wrong with 512 bits?
+From: Xiyu Yang <xiyuyang19@fudan.edu.cn>
 
+refcount_t type and corresponding API can protect refcounters from
+accidental underflow and overflow and further use-after-free situations.
 
-RFC7519 is TLS Specific.
-I do not know if short-exponents are safe to use in all use cases.
+Signed-off-by: Xiyu Yang <xiyuyang19@fudan.edu.cn>
+Signed-off-by: Xin Tan <tanxin.ctf@gmail.com>
+Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+---
 
-If it is safe, your choice is fine and your arguments will follow, but
-then a comment that explains the choice and warns about key checks if
-it is changed would be a good idea.
+This seems not to have made it to the lists even though they were
+originally cc'd.  Reposting.
 
-Otherwise the default should be to use N = len(q), which implies the
-proper checks need to be applied.
+ include/linux/padata.h | 3 ++-
+ kernel/padata.c        | 8 ++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-Simo.
-
-> > > From my understanding, the random number generator will fill out all
-> > > available bytes in the string (and nothing more), so we trivially
-> > > satisfy step 3 and 4.
-> > > 
-> > > And as q is always larger than the random number, step 6 reduces to
-> > > 'if (c > 2^N - 2)',
-> > 
-> > Where is this coming from ?
-> > It seem you assume M = 2^N but M = min(2^N, q)
-> > 
-> > The point here is to make sure the number X you return is:
-> > 0 < X < (q-1)
-> > 
-> 
-> Which is what I've tried to argue. For 512 bits private key and the
-> smallest possible FFDHE group (which has 2048 bits, with the top bit
-> non-zero) 2^N is always smaller than (q - 1).
-> As the other FFHDE groups are using even larger 'q' values, this is true
-> for all FFHDE groups.
-> 
-> > >  ie we just need to check if the random number is a
-> > > string of 0xff characters. Which hardly is a random number at all, so
-> > > it'll be impossible to get this.
-> > > 
-> > > Which then would mean that our 'x' is simply the random number + 1,
-> > 
-> > This is an artifact due to the random number being 0 <= c < 2^N - 1,
-> > therefore 1 needs to be added to make sure you never return 0.
-> > 
-> 
-> And my argument here is that all zeros (and all ones) are not a value I
-> would expect from our RNG.
-> 
-> > > which arguably is slightly pointless (one more than a random number is
-> > > as random as the number itself), so I do feel justified with just
-> > > returning a random number here.
-> > > 
-> > > Am I wrong with that reasoning?
-> > 
-> > Looks to me you are not accounting for the fact that N = 512 is too
-> > small and a random number falling in the interval (q - 2) < X < 2^N is
-> > unsuitable?
-> > 
-> 
-> Only if (q - 2) < 2^N. And my point is that it's not.
-> 
-> Cheers,
-> 
-> Hannes
-
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index a433f13fc4bf..495b16b6b4d7 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -12,6 +12,7 @@
+ #ifndef PADATA_H
+ #define PADATA_H
+ 
++#include <linux/refcount.h>
+ #include <linux/compiler_types.h>
+ #include <linux/workqueue.h>
+ #include <linux/spinlock.h>
+@@ -96,7 +97,7 @@ struct parallel_data {
+ 	struct padata_shell		*ps;
+ 	struct padata_list		__percpu *reorder_list;
+ 	struct padata_serial_queue	__percpu *squeue;
+-	atomic_t			refcnt;
++	refcount_t			refcnt;
+ 	unsigned int			seq_nr;
+ 	unsigned int			processed;
+ 	int				cpu;
+diff --git a/kernel/padata.c b/kernel/padata.c
+index d4d3ba6e1728..378c36080781 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -211,7 +211,7 @@ int padata_do_parallel(struct padata_shell *ps,
+ 	if ((pinst->flags & PADATA_RESET))
+ 		goto out;
+ 
+-	atomic_inc(&pd->refcnt);
++	refcount_inc(&pd->refcnt);
+ 	padata->pd = pd;
+ 	padata->cb_cpu = *cb_cpu;
+ 
+@@ -383,7 +383,7 @@ static void padata_serial_worker(struct work_struct *serial_work)
+ 	}
+ 	local_bh_enable();
+ 
+-	if (atomic_sub_and_test(cnt, &pd->refcnt))
++	if (refcount_sub_and_test(cnt, &pd->refcnt))
+ 		padata_free_pd(pd);
+ }
+ 
+@@ -593,7 +593,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_shell *ps)
+ 	padata_init_reorder_list(pd);
+ 	padata_init_squeues(pd);
+ 	pd->seq_nr = -1;
+-	atomic_set(&pd->refcnt, 1);
++	refcount_set(&pd->refcnt, 1);
+ 	spin_lock_init(&pd->lock);
+ 	pd->cpu = cpumask_first(pd->cpumask.pcpu);
+ 	INIT_WORK(&pd->reorder_work, invoke_padata_reorder);
+@@ -667,7 +667,7 @@ static int padata_replace(struct padata_instance *pinst)
+ 	synchronize_rcu();
+ 
+ 	list_for_each_entry_continue_reverse(ps, &pinst->pslist, list)
+-		if (atomic_dec_and_test(&ps->opd->refcnt))
++		if (refcount_dec_and_test(&ps->opd->refcnt))
+ 			padata_free_pd(ps->opd);
+ 
+ 	pinst->flags &= ~PADATA_RESET;
 -- 
-Simo Sorce
-RHEL Crypto Team
-Red Hat, Inc
-
-
-
+2.32.0
 
