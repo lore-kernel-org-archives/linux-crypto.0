@@ -2,481 +2,275 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 706EBC07E95
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 13:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B7EC07E9B
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:02:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57689610CC
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 13:12:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C37561221
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:02:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235973AbhGTMb5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 08:31:57 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:55918 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235863AbhGTMbz (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 08:31:55 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 6F1A122300;
-        Tue, 20 Jul 2021 13:12:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1626786750; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9eR+WjSdcBoT6zbG81ii390OkQNDDG/K2eBr8xtCknA=;
-        b=N/3Io942/jaoWfNfL6yD2Uez7MS2tM4wPqPQ9KVwFaBVvm0KGUZV085GYTYNbSPNq7+UV5
-        wCxlZfkZnjeJWbc/2xBpL337QtWIMZAoN7J27CS6h91wbAnXdNGcwDADtLMNY8MEIoIyS5
-        WyVe01GqhZLwreu3DhK6s+bU92+BBNM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1626786750;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9eR+WjSdcBoT6zbG81ii390OkQNDDG/K2eBr8xtCknA=;
-        b=/kovbmeO54PgzSsLmTqdyC5Zxsfw8yrRI/LEhpk2U6N8s2uYGvI1tR4dFbnaxPeyJrvI+Y
-        K8cmTxdOFn1jvhAw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5E48313D68;
-        Tue, 20 Jul 2021 13:12:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 9cjFFr7L9mA4dQAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 20 Jul 2021 13:12:30 +0000
-To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <keith.busch@wdc.com>, linux-nvme@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-References: <20210716110428.9727-1-hare@suse.de>
- <20210716110428.9727-8-hare@suse.de>
- <3681598b-436a-5f25-f61f-f09c6ec077a3@grimberg.me>
-From:   Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 07/11] nvme-auth: augmented challenge support
-Message-ID: <7aacc3ea-fad5-78c6-1bd5-22fec11ee32e@suse.de>
-Date:   Tue, 20 Jul 2021 15:12:30 +0200
+        id S234968AbhGTOVT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jul 2021 10:21:19 -0400
+Received: from mail-dm6nam10on2055.outbound.protection.outlook.com ([40.107.93.55]:48993
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S237295AbhGTN47 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Jul 2021 09:56:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YDk+0tb7xKDPU+voWehSMCUto4hkbRHaTDXp9LOVl3xWfxJkY61a+j5YGByoZlu6VJUiEApLRYEzjaajF3B5WN2ZrW/Wq8xmyK506R284RzSByg6QrBH/Jz9TLJT0RRvPLirZboRxfWUYp5g3+GouAwB79W1ynFMeHrdSLEW/kSwOS2h1XIRY18h06iLrjHOwLJsJDLbuAYM6iCglds/4aJsg9ZLYGGtZs5kNk7KwjLRWbYKfJRW67JCdQmdnbbZq05OfPjyq+FpkUrqLIFef22WgRzUSMj8TY/CR2HVO8qPJ77C/6QjY3ULBNJOaMa1bMGUGzm5cCTRYtFXgJFCPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uH7ehnnxhRu0ahip1dqwYRc3YAk259GorxYGnDSTluo=;
+ b=lU0i6dDE4geeX/+i1x3nthGxkqBtEZkY23TceA8qWMHUafTot/x9n4NhIsEvTUENJcO/u2mqZdp0DOirv7+Y71+hvl+q4CB6jmA4EUwHoNVKZea3OyurFSKYBg2Js6Z3abJrEMYV9aU4+AisctNT2gV/rO6ZS0ARAQlXeYO9fHhCr4OUPZCsZZy9xhJqgeCLm04Af6AzZ+RrJnJ/4Y8O6xHcaqvO1s+G9pG3zgRyN2zoEqfwagBUyUc7KxUw0pq6jglG30q1EIzMSkMVhdVjsaHYB9bceETSG/LcJi+DTbhesBzg6/klU3RRK6oby4jiqmNEy3+M/AkxZaiEvoqrzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uH7ehnnxhRu0ahip1dqwYRc3YAk259GorxYGnDSTluo=;
+ b=mnBjvHi9+uZEAN9U92dS1W9pkp2wDLO3InIN85YuETbjtKQb/76m5heZCh1UUDllG6+KhkzPSzpHjDcOiIPmVerVSN6RoBiOmpwVjVO7j1tcRukfN9QrTWqDhJN/2QSRhXVqezN/ui80O0L1y4JfaxUQocuAlNdsE3WvmKNaxFM=
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4446.namprd12.prod.outlook.com (2603:10b6:806:71::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.23; Tue, 20 Jul
+ 2021 14:37:34 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
+ 14:37:34 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 38/40] KVM: SVM: Provide support for
+ SNP_GUEST_REQUEST NAE event
+To:     Sean Christopherson <seanjc@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-39-brijesh.singh@amd.com> <YPYBmlCuERUIO5+M@google.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <68ea014c-51bc-6ed4-a77e-dd7ce1a09aaf@amd.com>
+Date:   Tue, 20 Jul 2021 09:37:32 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <3681598b-436a-5f25-f61f-f09c6ec077a3@grimberg.me>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <YPYBmlCuERUIO5+M@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN1PR12CA0086.namprd12.prod.outlook.com
+ (2603:10b6:802:21::21) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.95] (165.204.77.1) by SN1PR12CA0086.namprd12.prod.outlook.com (2603:10b6:802:21::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Tue, 20 Jul 2021 14:37:33 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 40068fd9-7cab-44ac-bb4d-08d94b8be99f
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4446:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4446C4833E76099E761CBB4BE5E29@SA0PR12MB4446.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ckiEHNeE1FfvR1tfWJeEkYkL9Rnk1WQXc8baSA7AXESsMwE54P3xHfhuvXdx7WwIVF258yk+Wh6/02keVzyL9XMhJ0tbFCw9+F1VkTxI/FoPrYypkKzZJ2NyXF7Oi7KXtFRJ6nSm6UdRAnqCBnx65MU2L90DpCOCjrjtX3rLpccwRbTRvdAjj9O+r2bSD+7HtQMxL3jhPTOPkFLCS9GJ4j6cJXQRRzzJOw/c0rDsG0v78R1q3Zypf9vO9T2/xdvM9agK+l7hxStDeTSxghUuCxzUCficFZd0weRZJVHQ9DDk+gH23PFx3p0rD47p4ocUkjwEWqVSqBB3821sStGqMKrc9INnop7lWYu+STEbozUB2tLzEIc7YZtBpBJfeFYJNHL9qTqObADNV3srp+pMHOSoyInDgvi7+s4ItLDwhAQIVgZ7pSHfInUl1jHDwFH1cCJmoGJaWXU83gabbTaoemUadpYL/JAQ1sHo6M243AxlKC9QgLJE+mbCbm51sf+rzdLwbjbeuJOUGBowzR6o6Jpr8SByM+Wt9M8uaXq45UFFQMsvThEvlSv6JEjjBgEaL1U5SzoiepxT9HWR4sPnRqBYY1TT+hcRmwwUjFsDeMd2MNdM1Hw/tvrwbofJTlg6cNzyC+0w0rroTTB+KTNUE6eEJQU9GtvVZ7cJf83bIJPwb0Cwsj4C5OHV6pEvmuuAeDXyE1ROVgnUBMoy9qWugkAmbWj1tHlNcxNT2N1uBbl6ic+h6ivYMaefzMCBaWeJ6QdeBi0TYejcx+XRt/Iv2Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(376002)(39860400002)(346002)(396003)(36756003)(31696002)(83380400001)(44832011)(53546011)(86362001)(38350700002)(31686004)(66476007)(16576012)(66946007)(54906003)(956004)(2616005)(66556008)(38100700002)(316002)(186003)(2906002)(6916009)(8676002)(6486002)(7406005)(4326008)(5660300002)(7416002)(8936002)(52116002)(26005)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NkpGZTB5ZVQ3TjIzSm42N2hJV1VMRGFKdElvM0hsQXNXbVNydU0rdFp1VmNv?=
+ =?utf-8?B?ODBERWk5bTB5TEs4Z3J5K2lLTllzaVQ2WXNVZDlCWXpJR0xwVUQzazJvSktU?=
+ =?utf-8?B?eXdaZ25KMWsxODdKd1pOQkczejIzaWFXc3R6TDArQ3l0UnE4VlJBWDB1dW9y?=
+ =?utf-8?B?VTV0QzdZczVySE5QeUFERlozMGNoNVdCVHFJRyt6NlpjTFdyY0FhTmFVRHNm?=
+ =?utf-8?B?UGVKRjBwU1ZUZXZxelhyWTFrRjN5L1I1M2lSYzZpWU14V2trTUoySk11Uyt6?=
+ =?utf-8?B?REYxeTJTWGtKUGlYSjJGNGFEaUxpSDJ6RnBqSFcvRmRLQVplNStnaXozbUwz?=
+ =?utf-8?B?R0lOMU5GZDNtbTFLZ3BaY0xmTWxCMmJkU2EzTmhMaGpuSUF5ZndXRzV3QS9L?=
+ =?utf-8?B?RmV4UytMYjJZSjZzVzNNVElFRlJmZXdNZ2s1NzNySGl2YzI4N1RLV0dEbXRz?=
+ =?utf-8?B?NEE1SjdLaXpFQWdkRnFraDVzY0lISEpCRFVWT05oclQ2b0E3SWRWOWhoUUlE?=
+ =?utf-8?B?anFOWC9ORWppejhIdThHK3dmclJQZWMyQVhGL0k0RDl5U0NlRk0zUExYVTFQ?=
+ =?utf-8?B?ZVMxNHQ4cnRZWWNIdzIrUjlGM0FEVXNqZkVzY2lobU83MitoNk9JTTNiNys0?=
+ =?utf-8?B?R212MTducGhwbm84Ry9kVkxtYlpuTi9QeTE2d2k2QlVpYjQ1VTZMS3lhMGVy?=
+ =?utf-8?B?OTRQK2QrcUdiZkRLRWd2WHF1MnVJYU1XYzBvMFFzYTBWOVI4cUlLbzBxTGEx?=
+ =?utf-8?B?V1R4Q0tVbFc3WWEyb1BGckw4Um1iaVJ0Qm1YWEZCTUdRaU9DR3FhdTJrSlVG?=
+ =?utf-8?B?SzJBQ1R1K05TMFZETUFQdFd2Ylg0UVIxWldBRXRneEMwVVpKTC92eUhtR3hX?=
+ =?utf-8?B?bFhWLzd0c3J3RzF4L3ZGVUJYSGcybDlTcW9xb0lXdUtoVU1sMnMrL2dTL0E1?=
+ =?utf-8?B?d3BlYmRRcklVQTcxUG5SK0p5RjZYdzR2dE02OHM4dU02QnJ6TTRub0J3b0tB?=
+ =?utf-8?B?bjhCSnNtWUg3S2RGWnZEbUJ0dnRCVHcvUkhrSGM3anVlRkNMbDIrcXR4dXFa?=
+ =?utf-8?B?bDhNNFNodk9jWlhGZ3FYMEhjZVp3bnJWWmVTUDNTR1NzbnRQVGNCcEJxUGU1?=
+ =?utf-8?B?bWdNZXUraTNBbG9JRVFVV0xHbEp1cDFuZENoVjdTamU4ekZOSG5nUXpJK3Yz?=
+ =?utf-8?B?VkpkcjhjbHpFUG16SDVXRU1pejFxMEppcmtYRzBIQldvSmhtQ3VBNXRGVVNV?=
+ =?utf-8?B?Ti9vNHE2TlB6VHNCdXovK2VLNDdTZ05WRXF1T1lSWVdrdWhveWhMbTlnS0xK?=
+ =?utf-8?B?K2J6VGxaWmRxd3lIYzRzdXc1RmY1ZkpxaHRIaytmcm5lWHZwOEJCdDNvVC9H?=
+ =?utf-8?B?UndxYmdxY1J1OWxpaHZpeUt2YVoxMGpSQUpmaTUvdHZoQmowTFpENjNlRmRS?=
+ =?utf-8?B?bFFQWjB4TWlaRU10cnZlVlpvMXNJblRxakttM21LUFowbHpHNmo4ZFVhdWZz?=
+ =?utf-8?B?OVRUR21tVGlKSXZOZzBXREc0bGlnNVpLNDJGazhmRHlDcGVwbmc3WHVoOGhI?=
+ =?utf-8?B?RmFrNlNvL20xZkVTbi95RCtMdTQzR2RVOTI3bG50TVdyeXg1NTNSZTB2bjVW?=
+ =?utf-8?B?TlhnTHVnMUxucU4yWXR6WkFKSCtLR2V5eW5kcVNQUU5iS2k3RTU5eFF0Yk9p?=
+ =?utf-8?B?QUtUQ2t0R3RUcjUvWGN6RUFSaVNHV3ZFdzdtZmF0MUs0UnpoTmxWY1I3Nkc2?=
+ =?utf-8?Q?YrmyJ9eC40pVoSNDSCz00vFcewOPGB0bZOkr/Pa?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40068fd9-7cab-44ac-bb4d-08d94b8be99f
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 14:37:34.4421
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Zs+QjrXg6Im9cAn5s1YOTWyCiqGpNhQhYcOnK/gGtLW6iK4Sql0W46mwICrrtlh+K/pxsbDSNFzvtrzBaw+meQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4446
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/19/21 11:21 AM, Sagi Grimberg wrote:
-> 
-> 
-> On 7/16/21 4:04 AM, Hannes Reinecke wrote:
->> Implement support for augmented challenge using FFDHE groups.
-> 
-> Please some more info for the change log...
-> 
->>
->> Signed-off-by: Hannes Reinecke <hare@suse.de>
->> ---
->>   drivers/nvme/host/auth.c | 403 +++++++++++++++++++++++++++++++++++----
->>   1 file changed, 371 insertions(+), 32 deletions(-)
->>
->> diff --git a/drivers/nvme/host/auth.c b/drivers/nvme/host/auth.c
->> index 448a3adebea6..754343aced19 100644
->> --- a/drivers/nvme/host/auth.c
->> +++ b/drivers/nvme/host/auth.c
-[ .. ]
->> @@ -290,10 +382,24 @@ static int nvme_auth_dhchap_challenge(struct
->> nvme_ctrl *ctrl,
->>           return -EPROTO;
->>       }
->>       if (data->dhgid != NVME_AUTH_DHCHAP_DHGROUP_NULL) {
->> -        chap->status = NVME_AUTH_DHCHAP_FAILURE_DHGROUP_UNUSABLE;
->> -        return -EPROTO;
->> -    }
->> -    if (data->dhgid == NVME_AUTH_DHCHAP_DHGROUP_NULL && data->dhvlen
->> != 0) {
->> +        if (data->dhvlen == 0) {
->> +            dev_warn(ctrl->device,
->> +                 "qid %d: DH-HMAC-CHAP: empty DH value\n",
->> +                 chap->qid);
->> +            chap->status = NVME_AUTH_DHCHAP_FAILURE_DHGROUP_UNUSABLE;
->> +            return -EPROTO;
->> +        }
->> +        chap->dh_tfm = crypto_alloc_kpp(gid_name, 0, 0);
->> +        if (IS_ERR(chap->dh_tfm)) {
->> +            dev_warn(ctrl->device,
->> +                 "qid %d: DH-HMAC-CHAP: failed to initialize %s\n",
->> +                 chap->qid, gid_name);
->> +            chap->status = NVME_AUTH_DHCHAP_FAILURE_DHGROUP_UNUSABLE;
->> +            chap->dh_tfm = NULL;
->> +            return -EPROTO;
-> 
-> Why not propogate the error?
-> 
-
-Will be doing so.
-
->> +        }
->> +        chap->dhgroup_id = data->dhgid;
->> +    } else if (data->dhvlen != 0) {
->>           dev_warn(ctrl->device,
->>                "qid %d: DH-HMAC-CHAP: invalid DH value for NULL DH\n",
->>               chap->qid);
->> @@ -313,6 +419,16 @@ static int nvme_auth_dhchap_challenge(struct
->> nvme_ctrl *ctrl,
->>       chap->hash_len = data->hl;
->>       chap->s1 = le32_to_cpu(data->seqnum);
->>       memcpy(chap->c1, data->cval, chap->hash_len);
->> +    if (data->dhvlen) {
->> +        chap->ctrl_key = kmalloc(data->dhvlen, GFP_KERNEL);
->> +        if (!chap->ctrl_key)
->> +            return -ENOMEM;
->> +        chap->ctrl_key_len = data->dhvlen;
->> +        memcpy(chap->ctrl_key, data->cval + chap->hash_len,
->> +               data->dhvlen);
->> +        dev_dbg(ctrl->device, "ctrl public key %*ph\n",
->> +             (int)chap->ctrl_key_len, chap->ctrl_key);
->> +    }
->>         return 0;
->>   }
->> @@ -353,10 +469,13 @@ static int nvme_auth_dhchap_reply(struct
->> nvme_ctrl *ctrl,
->>           memcpy(data->rval + chap->hash_len, chap->c2,
->>                  chap->hash_len);
->>       }
->> -    if (chap->host_key_len)
->> +    if (chap->host_key_len) {
->> +        dev_dbg(ctrl->device, "%s: qid %d host public key %*ph\n",
->> +            __func__, chap->qid,
->> +            chap->host_key_len, chap->host_key);
->>           memcpy(data->rval + 2 * chap->hash_len, chap->host_key,
->>                  chap->host_key_len);
->> -
->> +    }
-> 
-> Is this change only adding the debug print?
-> 
-
-Might. I'll check.
-
->>       return size;
->>   }
->>   @@ -440,23 +559,10 @@ static int nvme_auth_dhchap_failure2(struct
->> nvme_ctrl *ctrl,
->>   int nvme_auth_select_hash(struct nvme_ctrl *ctrl,
->>                 struct nvme_dhchap_context *chap)
->>   {
->> -    char *hash_name;
->> +    const char *hash_name, *digest_name;
->>       int ret;
->>   -    switch (chap->hash_id) {
->> -    case NVME_AUTH_DHCHAP_HASH_SHA256:
->> -        hash_name = "hmac(sha256)";
->> -        break;
->> -    case NVME_AUTH_DHCHAP_HASH_SHA384:
->> -        hash_name = "hmac(sha384)";
->> -        break;
->> -    case NVME_AUTH_DHCHAP_HASH_SHA512:
->> -        hash_name = "hmac(sha512)";
->> -        break;
->> -    default:
->> -        hash_name = NULL;
->> -        break;
->> -    }
->> +    hash_name = nvme_auth_hmac_name(chap->hash_id);
->>       if (!hash_name) {
->>           chap->status = NVME_AUTH_DHCHAP_FAILURE_NOT_USABLE;
->>           return -EPROTO;
->> @@ -468,26 +574,100 @@ int nvme_auth_select_hash(struct nvme_ctrl *ctrl,
->>           chap->shash_tfm = NULL;
->>           return -EPROTO;
->>       }
->> +    digest_name = nvme_auth_digest_name(chap->hash_id);
->> +    if (!digest_name) {
->> +        crypto_free_shash(chap->shash_tfm);
->> +        chap->shash_tfm = NULL;
->> +        return -EPROTO;
->> +    }
->> +    chap->digest_tfm = crypto_alloc_shash(digest_name, 0, 0);
->> +    if (IS_ERR(chap->digest_tfm)) {
->> +        chap->status = NVME_AUTH_DHCHAP_FAILURE_NOT_USABLE;
->> +        crypto_free_shash(chap->shash_tfm);
->> +        chap->shash_tfm = NULL;
->> +        chap->digest_tfm = NULL;
->> +        return -EPROTO;
->> +    }
->>       if (!chap->key) {
->>           dev_warn(ctrl->device, "qid %d: cannot select hash, no key\n",
->>                chap->qid);
->>           chap->status = NVME_AUTH_DHCHAP_FAILURE_NOT_USABLE;
->> +        crypto_free_shash(chap->digest_tfm);
->>           crypto_free_shash(chap->shash_tfm);
->>           chap->shash_tfm = NULL;
->> +        chap->digest_tfm = NULL;
->>           return -EINVAL;
-> 
-> Please have a structured goto targets in reverse order, this repeated
-> cleanup is a mess...
-> 
-
-Already done.
-
->>       }
->>       ret = crypto_shash_setkey(chap->shash_tfm, chap->key,
->> chap->key_len);
->>       if (ret) {
->>           chap->status = NVME_AUTH_DHCHAP_FAILURE_NOT_USABLE;
->> +        crypto_free_shash(chap->digest_tfm);
->>           crypto_free_shash(chap->shash_tfm);
->>           chap->shash_tfm = NULL;
->> +        chap->digest_tfm = NULL;
->>           return ret;
->>       }
->> -    dev_info(ctrl->device, "qid %d: DH-HMAC_CHAP: selected hash %s\n",
->> -         chap->qid, hash_name);
->> +    dev_dbg(ctrl->device, "qid %d: DH-HMAC_CHAP: selected hash %s\n",
->> +        chap->qid, hash_name);
->>       return 0;
->>   }
->>   +static int nvme_auth_augmented_challenge(struct nvme_dhchap_context
->> *chap,
->> +                     u8 *challenge, u8 *aug)
->> +{
->> +    struct crypto_shash *tfm;
->> +    struct shash_desc *desc;
->> +    u8 *hashed_key;
->> +    const char *hash_name;
->> +    int ret;
->> +
->> +    hashed_key = kmalloc(chap->hash_len, GFP_KERNEL);
->> +    if (!hashed_key)
->> +        return -ENOMEM;
->> +
->> +    ret = crypto_shash_tfm_digest(chap->digest_tfm, chap->sess_key,
->> +                      chap->sess_key_len, hashed_key);
->> +    if (ret < 0) {
->> +        pr_debug("failed to hash session key, err %d\n", ret);
->> +        kfree(hashed_key);
-> 
-> Same here...
-> 
->> +        return ret;
->> +    }
-> 
-> Spaces between if conditions please?
-> 
->> +    hash_name = crypto_shash_alg_name(chap->shash_tfm);
->> +    if (!hash_name) {
->> +        pr_debug("Invalid hash algoritm\n");
->> +        return -EINVAL;
->> +    }
->> +    tfm = crypto_alloc_shash(hash_name, 0, 0);
->> +    if (IS_ERR(tfm)) {
->> +        ret = PTR_ERR(tfm);
->> +        goto out_free_key;
->> +    }
->> +    desc = kmalloc(sizeof(struct shash_desc) +
->> crypto_shash_descsize(tfm),
->> +               GFP_KERNEL);
->> +    if (!desc) {
->> +        ret = -ENOMEM;
->> +        goto out_free_hash;
->> +    }
->> +    desc->tfm = tfm;
->> +
->> +    ret = crypto_shash_setkey(tfm, hashed_key, chap->hash_len);
->> +    if (ret)
->> +        goto out_free_desc;
->> +    ret = crypto_shash_init(desc);
->> +    if (ret)
->> +        goto out_free_desc;
->> +    crypto_shash_update(desc, challenge, chap->hash_len);
->> +    crypto_shash_final(desc, aug);
->> +
->> +out_free_desc:
->> +    kfree_sensitive(desc);
->> +out_free_hash:
->> +    crypto_free_shash(tfm);
->> +out_free_key:
->> +    kfree(hashed_key);
->> +    return ret;
->> +}
->> +
->>   static int nvme_auth_dhchap_host_response(struct nvme_ctrl *ctrl,
->>                         struct nvme_dhchap_context *chap)
->>   {
->> @@ -497,6 +677,16 @@ static int nvme_auth_dhchap_host_response(struct
->> nvme_ctrl *ctrl,
->>         dev_dbg(ctrl->device, "%s: qid %d host response seq %d
->> transaction %d\n",
->>           __func__, chap->qid, chap->s1, chap->transaction);
->> +    if (chap->dh_tfm) {
->> +        challenge = kmalloc(chap->hash_len, GFP_KERNEL);
->> +        if (!challenge) {
->> +            ret = -ENOMEM;
->> +            goto out;
->> +        }
->> +        ret = nvme_auth_augmented_challenge(chap, chap->c1, challenge);
->> +        if (ret)
->> +            goto out;
->> +    }
->>       shash->tfm = chap->shash_tfm;
->>       ret = crypto_shash_init(shash);
->>       if (ret)
->> @@ -532,6 +722,8 @@ static int nvme_auth_dhchap_host_response(struct
->> nvme_ctrl *ctrl,
->>           goto out;
->>       ret = crypto_shash_final(shash, chap->response);
->>   out:
->> +    if (challenge != chap->c1)
->> +        kfree(challenge);
->>       return ret;
->>   }
->>   @@ -542,6 +734,17 @@ static int
->> nvme_auth_dhchap_ctrl_response(struct nvme_ctrl *ctrl,
->>       u8 buf[4], *challenge = chap->c2;
->>       int ret;
->>   +    if (chap->dh_tfm) {
->> +        challenge = kmalloc(chap->hash_len, GFP_KERNEL);
->> +        if (!challenge) {
->> +            ret = -ENOMEM;
->> +            goto out;
->> +        }
->> +        ret = nvme_auth_augmented_challenge(chap, chap->c2,
->> +                            challenge);
->> +        if (ret)
->> +            goto out;
->> +    }
->>       dev_dbg(ctrl->device, "%s: qid %d host response seq %d
->> transaction %d\n",
->>           __func__, chap->qid, chap->s2, chap->transaction);
->>       dev_dbg(ctrl->device, "%s: qid %d challenge %*ph\n",
->> @@ -585,6 +788,8 @@ static int nvme_auth_dhchap_ctrl_response(struct
->> nvme_ctrl *ctrl,
->>           goto out;
->>       ret = crypto_shash_final(shash, chap->response);
->>   out:
->> +    if (challenge != chap->c2)
->> +        kfree(challenge);
-> 
-> Just free ?! what about failing?
-> 
-
-This is not an error condition, but rather the case when we need to
-construct an augmented challenge; in that case we'll allocate a
-temporary buffer in 'challenge', and copy it over into 'c2'.
-
->>       return ret;
->>   }
->>   @@ -644,10 +849,134 @@ int nvme_auth_generate_key(struct nvme_ctrl
->> *ctrl,
->>       return 0;
->>   }
->>   +static int nvme_auth_dhchap_exponential(struct nvme_ctrl *ctrl,
->> +                    struct nvme_dhchap_context *chap)
->> +{
->> +    struct kpp_request *req;
->> +    struct crypto_wait wait;
->> +    struct scatterlist src, dst;
->> +    u8 *pkey;
->> +    int ret, pkey_len;
->> +
->> +    if (chap->dhgroup_id == NVME_AUTH_DHCHAP_DHGROUP_2048 ||
->> +        chap->dhgroup_id == NVME_AUTH_DHCHAP_DHGROUP_3072 ||
->> +        chap->dhgroup_id == NVME_AUTH_DHCHAP_DHGROUP_4096 ||
->> +        chap->dhgroup_id == NVME_AUTH_DHCHAP_DHGROUP_6144 ||
->> +        chap->dhgroup_id == NVME_AUTH_DHCHAP_DHGROUP_8192) {
->> +        struct dh p = {0};
->> +        int pubkey_size =
->> nvme_auth_dhgroup_pubkey_size(chap->dhgroup_id);
->> +
->> +        ret = crypto_ffdhe_params(&p, pubkey_size << 3);
->> +        if (ret) {
->> +            dev_dbg(ctrl->device,
->> +                "failed to generate ffdhe params, error %d\n",
->> +                ret);
->> +            return ret;
->> +        }
->> +        p.key = chap->key;
->> +        p.key_size = chap->key_len;
->> +
->> +        pkey_len = crypto_dh_key_len(&p);
->> +        pkey = kzalloc(pkey_len, GFP_KERNEL);
->> +
->> +        get_random_bytes(pkey, pkey_len);
->> +        ret = crypto_dh_encode_key(pkey, pkey_len, &p);
->> +        if (ret) {
->> +            dev_dbg(ctrl->device,
->> +                "failed to encode pkey, error %d\n", ret);
->> +            kfree(pkey);
->> +            return ret;
->> +        }
->> +        chap->host_key_len = pubkey_size;
->> +        chap->sess_key_len = pubkey_size;
->> +    } else {
->> +        dev_warn(ctrl->device, "Invalid DH group id %d\n",
->> +             chap->dhgroup_id);
->> +        chap->status = NVME_AUTH_DHCHAP_FAILURE_INVALID_PAYLOAD;
->> +        return -EINVAL;
->> +    }
->> +
->> +    ret = crypto_kpp_set_secret(chap->dh_tfm, pkey, pkey_len);
->> +    if (ret) {
->> +        dev_dbg(ctrl->dev, "failed to set secret, error %d\n", ret);
->> +        kfree(pkey);
->> +        return ret;
->> +    }
->> +    req = kpp_request_alloc(chap->dh_tfm, GFP_KERNEL);
->> +    if (!req) {
->> +        ret = -ENOMEM;
->> +        goto out_free_exp;
->> +    }
->> +
->> +    chap->host_key = kzalloc(chap->host_key_len, GFP_KERNEL);
->> +    if (!chap->host_key) {
->> +        ret = -ENOMEM;
->> +        goto out_free_req;
->> +    }
->> +    crypto_init_wait(&wait);
->> +    kpp_request_set_input(req, NULL, 0);
->> +    sg_init_one(&dst, chap->host_key, chap->host_key_len);
->> +    kpp_request_set_output(req, &dst, chap->host_key_len);
->> +    kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
->> +                 crypto_req_done, &wait);
->> +
->> +    ret = crypto_wait_req(crypto_kpp_generate_public_key(req), &wait);
->> +    if (ret == -EOVERFLOW) {
->> +        dev_dbg(ctrl->dev,
->> +            "public key buffer too small, wants %d is %d\n",
->> +            crypto_kpp_maxsize(chap->dh_tfm), chap->host_key_len);
->> +        goto out_free_host;
-> 
-> Is this a specific retcode of intereset? Why did you specifically add
-> special casing here?
-> 
-
-Because that's the specific error code from the DH code, indicating that
-the length isn't correct. And I needed that during development of the
-FFDHE code.
-But yeah, it can be removed.
 
 
-Cheers,
+On 7/19/21 5:50 PM, Sean Christopherson wrote:
+...
+> 
+> IIUC, this snippet in the spec means KVM can't restrict what requests are made
+> by the guests.  If so, that makes it difficult to detect/ratelimit a misbehaving
+> guest, and also limits our options if there are firmware issues (hopefully there
+> aren't).  E.g. ratelimiting a guest after KVM has explicitly requested it to
+> migrate is not exactly desirable.
+> 
 
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+The guest message page contains a message header followed by the 
+encrypted payload. So, technically KVM can peek into the message header 
+format to determine the message request type. If needed, we can 
+ratelimit based on the message type.
+
+In the current series we don't support migration etc so I decided to 
+ratelimit unconditionally.
+
+...
+> 
+>> Now that KVM supports all the VMGEXIT NAEs required for the base SEV-SNP
+>> feature, set the hypervisor feature to advertise it.
+> 
+> It would helpful if this changelog listed the Guest Requests that are required
+> for "base" SNP, e.g. to provide some insight as to why we care about guest
+> requests.
+> 
+
+Sure, I'll add more.
+
+
+>>   static int snp_bind_asid(struct kvm *kvm, int *error)
+>> @@ -1618,6 +1631,12 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>   	if (rc)
+>>   		goto e_free_context;
+>>   
+>> +	/* Used for rate limiting SNP guest message request, use the default settings */
+>> +	ratelimit_default_init(&sev->snp_guest_msg_rs);
+> 
+> Is this exposed to userspace in any way?  This feels very much like a knob that
+> needs to be configurable per-VM.
+> 
+
+It's not exposed to the userspace and I am not sure if userspace care 
+about this knob.
+
+
+> Also, what are the estimated latencies of a guest request?  If the worst case
+> latency is >200ms, a default ratelimit frequency of 5hz isn't going to do a whole
+> lot.
+> 
+
+The latency will depend on what else is going in the system at the time 
+the request comes to the hypervisor. Access to the PSP is serialized so 
+other parallel PSP command execution will contribute to the latency.
+
+...
+>> +
+>> +	if (!__ratelimit(&sev->snp_guest_msg_rs)) {
+>> +		pr_info_ratelimited("svm: too many guest message requests\n");
+>> +		rc = -EAGAIN;
+> 
+> What guarantee do we have that the guest actually understands -EAGAIN?  Ditto
+> for -EINVAL returned by snp_build_guest_buf().  AFAICT, our options are to return
+> one of the error codes defined in "Table 95. Status Codes for SNP_GUEST_REQUEST"
+> of the firmware ABI, kill the guest, or ratelimit the guest without returning
+> control to the guest.
+> 
+
+Yes, let me look into passing one of the status code defined in the spec.
+
+>> +		goto e_fail;
+>> +	}
+>> +
+>> +	rc = snp_build_guest_buf(svm, &data, req_gpa, resp_gpa);
+>> +	if (rc)
+>> +		goto e_fail;
+>> +
+>> +	sev = &to_kvm_svm(kvm)->sev_info;
+>> +
+>> +	mutex_lock(&kvm->lock);
+> 
+> Question on the VMPCK sequences.  The firmware ABI says:
+> 
+>     Each guest has four VMPCKs ... Each message contains a sequence number per
+>     VMPCK. The sequence number is incremented with each message sent. Messages
+>     sent by the guest to the firmware and by the firmware to the guest must be
+>     delivered in order. If not, the firmware will reject subsequent messages ...
+> 
+> Does that mean there are four independent sequences, i.e. four streams the guest
+> can use "concurrently", or does it mean the overall freshess/integrity check is
+> composed from four VMPCK sequences, all of which must be correct for the message
+> to be valid?
+> 
+
+There are four independent sequence counter and in theory guest can use 
+them concurrently. But the access to the PSP must be serialized. 
+Currently, the guest driver uses the VMPCK0 key to communicate with the PSP.
+
+
+> If it's the latter, then a traditional mutex isn't really necessary because the
+> guest must implement its own serialization, e.g. it's own mutex or whatever, to
+> ensure there is at most one request in-flight at any given time.  
+
+The guest driver uses the its own serialization to ensure that there is 
+*exactly* one request in-flight.
+
+The mutex used here is to protect the KVM's internal firmware response 
+buffer.
+
+
+And on the KVM
+> side it means KVM can simpy reject requests if there is already an in-flight
+> request.  It might also give us more/better options for ratelimiting?
+> 
+
+I don't think we should be running into this scenario unless there is a 
+bug in the guest kernel. The guest kernel support and CCP driver both 
+ensure that request to the PSP is serialized.
+
+In normal operation we may see 1 to 2 quest requests for the entire 
+guest lifetime. I am thinking first request maybe for the attestation 
+report and second maybe to derive keys etc. It may change slightly when 
+we add the migration command; I have not looked into a great detail yet.
+
+thanks
