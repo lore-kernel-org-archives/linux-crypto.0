@@ -2,329 +2,251 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94754C636C8
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 16:24:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31988C636C8
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 16:30:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C10F61004
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 16:24:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11502610FB
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 16:30:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232131AbhGTPmE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 11:42:04 -0400
-Received: from foss.arm.com ([217.140.110.172]:34170 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235347AbhGTPge (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 11:36:34 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0BFCF31B;
-        Tue, 20 Jul 2021 09:17:09 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 69F973F694;
-        Tue, 20 Jul 2021 09:17:07 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 17:16:31 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
-        Ali Saidi <alisaidi@amazon.com>,
-        Jon Nettleton <jon@solid-run.com>
-Subject: Re: [PATCH v2] hwrng: Add Arm SMCCC TRNG based driver
-Message-ID: <20210720171631.071f84f5@slackpad.fritz.box>
-In-Reply-To: <CAMj1kXEW7DT3P3FuV+poFykf6wwm4FTJuV6emGSWabCp7UZX9A@mail.gmail.com>
-References: <20210720152158.31804-1-andre.przywara@arm.com>
-        <CAMj1kXEW7DT3P3FuV+poFykf6wwm4FTJuV6emGSWabCp7UZX9A@mail.gmail.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S230177AbhGTPtB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jul 2021 11:49:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41492 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232375AbhGTPsZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Jul 2021 11:48:25 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7A19C0613DE
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jul 2021 09:29:02 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id h6-20020a17090a6486b029017613554465so2749378pjj.4
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jul 2021 09:29:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5BH3R6Avka1nQpq+/eM8bvTfGscM9D0ho6TsiS6Akvo=;
+        b=aSu+zS46PGf/WuVBEqvyZ3YlJH7UpgN7b7W55IBVQfm+nRT8TnxJpUy085DLjvw2OO
+         f8ZqvaOXbjfbEgb5gDz9C81NKjhq0Q3tWLCyTwqLgROT6kmsDrpjqaF+WcZn3VUeTi1F
+         c6NPte8/92ZnB/pvUIh6L8cq5aU84BK8G4VIhr+QbdRTZgs4BS4djKUHt5F7ggk5sYmf
+         0aCJCVM7OKC+nORGR3v0q/mVmnbXfTUkIcNRSGMjiVurYAnML24JrtNzDjGOP1Glm214
+         ieLZLBxWJWIR1WMAJZSv6ETDq5cLF3+g0WdMwV3dVwux3n05hX4GLOX3qsbKfVxV6+gD
+         3PAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5BH3R6Avka1nQpq+/eM8bvTfGscM9D0ho6TsiS6Akvo=;
+        b=JxstpzQFXeUrNUB4zUAiC1ZqKpqUzlo5XludpEFZbl8CMZh2r80SSuD3Z/0w6+4p3E
+         zU5OowX4mo7u9j2cQbwpqktSa1EhLsqT8+YVBFH+kwKGyS6hVFLWJXuFvVop32ojFDAu
+         g5lyA7SWljtSjYRBNMPEZLed7iegFShp2Wr5s3rbVnYrkdxPQ/UQaka+uF+LPGZCG2y/
+         2sZfejGb5VPO7BBJLgnRzB436526rp3pLOwgrXSs92LWSR1xs27lbW9CJj/QNFC8c0SJ
+         rb7PjHwukdQBUVg+N2isfsKXZts1clJzl+jzDyR1VjAQ9PbIanrLvDKZB4L6Sm3lk4a8
+         Aekw==
+X-Gm-Message-State: AOAM531P6Ox5BJkyvr0P6v5tGGFRzCnNDy4lKROCEQFzb3v+DnD/JpNo
+        hOoN3HPnzjhtndk5rllfWFvivQ==
+X-Google-Smtp-Source: ABdhPJyBMjFHfdhrrQYz6sljADtLM0FyBdqBN9AsTvuwzS0vivWnLCYQIoLuo5sdH5eRngpRMsyuHg==
+X-Received: by 2002:a17:90a:5b04:: with SMTP id o4mr31185589pji.210.1626798541972;
+        Tue, 20 Jul 2021 09:29:01 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id l1sm135113pjq.1.2021.07.20.09.29.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jul 2021 09:29:01 -0700 (PDT)
+Date:   Tue, 20 Jul 2021 16:28:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 38/40] KVM: SVM: Provide support for
+ SNP_GUEST_REQUEST NAE event
+Message-ID: <YPb5yfKEyJjvDbOl@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-39-brijesh.singh@amd.com>
+ <YPYBmlCuERUIO5+M@google.com>
+ <68ea014c-51bc-6ed4-a77e-dd7ce1a09aaf@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <68ea014c-51bc-6ed4-a77e-dd7ce1a09aaf@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 20 Jul 2021 18:03:37 +0200
-Ard Biesheuvel <ardb@kernel.org> wrote:
+On Tue, Jul 20, 2021, Brijesh Singh wrote:
+> 
+> On 7/19/21 5:50 PM, Sean Christopherson wrote:
+> ...
+> > 
+> > IIUC, this snippet in the spec means KVM can't restrict what requests are made
+> > by the guests.  If so, that makes it difficult to detect/ratelimit a misbehaving
+> > guest, and also limits our options if there are firmware issues (hopefully there
+> > aren't).  E.g. ratelimiting a guest after KVM has explicitly requested it to
+> > migrate is not exactly desirable.
+> > 
+> 
+> The guest message page contains a message header followed by the encrypted
+> payload. So, technically KVM can peek into the message header format to
+> determine the message request type. If needed, we can ratelimit based on the
+> message type.
 
-Hi Ard,
+Ah, I got confused by this code in snp_build_guest_buf():
 
-> On Tue, 20 Jul 2021 at 17:22, Andre Przywara <andre.przywara@arm.com> wrote:
-> >
-> > The "Arm True Random Number Generator Firmware Interface"[1] provides
-> > an SMCCC based interface to a true hardware random number generator.
-> > So far we are using that in arch_get_random_seed(), but it might be
-> > useful to expose the entropy through the /dev/hwrng device as well. This
-> > allows to assess the quality of the implementation, by using "rngtest"
-> > from the rng-tools package, for example.
-> >
-> > Add a simple platform driver implementing the hw_random interface.
-> > We unconditionally instantiate the platform device in the driver file,
-> > then probe for the existence of the SMCCC TRNG implementation in the
-> > driver's probe routine.
-> > Since the firmware takes care about serialisation, this can happily
-> > coexist with the arch_get_random_seed() bits.
-> >
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> >
-> > [1] https://developer.arm.com/documentation/den0098/latest/
-> > ---
-> > Changelog v1 ... v2:
-> > - fix building as a module
-> > - de-register device upon exit
-> > - mention module name in Kconfig
-> >
-> >  drivers/char/hw_random/Kconfig          |  14 ++
-> >  drivers/char/hw_random/Makefile         |   1 +
-> >  drivers/char/hw_random/arm_smccc_trng.c | 171 ++++++++++++++++++++++++
-> >  3 files changed, 186 insertions(+)
-> >  create mode 100644 drivers/char/hw_random/arm_smccc_trng.c
-> >
-> > diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> > index 3f166c8a4099..239eca4d6805 100644
-> > --- a/drivers/char/hw_random/Kconfig
-> > +++ b/drivers/char/hw_random/Kconfig
-> > @@ -524,6 +524,20 @@ config HW_RANDOM_XIPHERA
-> >           To compile this driver as a module, choose M here: the
-> >           module will be called xiphera-trng.
-> >
-> > +config HW_RANDOM_ARM_SMCCC_TRNG
-> > +       tristate "Arm SMCCC TRNG firmware interface support"
-> > +       depends on HAVE_ARM_SMCCC_DISCOVERY
-> > +       default HW_RANDOM
-> > +       help
-> > +         Say 'Y' to enable the True Random Number Generator driver using
-> > +         the Arm SMCCC TRNG firmware interface. This reads entropy from
-> > +         higher exception levels (firmware, hypervisor). Uses SMCCC for
-> > +         communicating with the firmware:
-> > +         https://developer.arm.com/documentation/den0098/latest/
-> > +
-> > +         To compile this driver as a module, choose M here: the
-> > +         module will be called arm_smccc_trng.
-> > +
-> >  endif # HW_RANDOM
-> >
-> >  config UML_RANDOM
-> > diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-> > index 8933fada74f2..a5a1c765a394 100644
-> > --- a/drivers/char/hw_random/Makefile
-> > +++ b/drivers/char/hw_random/Makefile
-> > @@ -45,3 +45,4 @@ obj-$(CONFIG_HW_RANDOM_OPTEE) += optee-rng.o
-> >  obj-$(CONFIG_HW_RANDOM_NPCM) += npcm-rng.o
-> >  obj-$(CONFIG_HW_RANDOM_CCTRNG) += cctrng.o
-> >  obj-$(CONFIG_HW_RANDOM_XIPHERA) += xiphera-trng.o
-> > +obj-$(CONFIG_HW_RANDOM_ARM_SMCCC_TRNG) += arm_smccc_trng.o
-> > diff --git a/drivers/char/hw_random/arm_smccc_trng.c b/drivers/char/hw_random/arm_smccc_trng.c
-> > new file mode 100644
-> > index 000000000000..3bd510a98882
-> > --- /dev/null
-> > +++ b/drivers/char/hw_random/arm_smccc_trng.c
-> > @@ -0,0 +1,171 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Randomness driver for the ARM SMCCC TRNG Firmware Interface
-> > + * https://developer.arm.com/documentation/den0098/latest/
-> > + *
-> > + *  Copyright (C) 2020 Arm Ltd.
-> > + *
-> > + * The ARM TRNG firmware interface specifies a protocol to read entropy
-> > + * from a higher exception level, to abstract from any machine specific
-> > + * implemenations and allow easier use in hypervisors.
-> > + *
-> > + * The firmware interface is realised using the SMCCC specification.
-> > + */
-> > +
-> > +#include <linux/bits.h>
-> > +#include <linux/device.h>
-> > +#include <linux/hw_random.h>
-> > +#include <linux/module.h>
-> > +#include <linux/platform_device.h>
-> > +#include <linux/arm-smccc.h>
-> > +
-> > +#ifdef CONFIG_ARM64
-> > +#define ARM_SMCCC_TRNG_RND     ARM_SMCCC_TRNG_RND64
-> > +#define MAX_BITS_PER_CALL      (3 * 64UL)
-> > +#else
-> > +#define ARM_SMCCC_TRNG_RND     ARM_SMCCC_TRNG_RND32
-> > +#define MAX_BITS_PER_CALL      (3 * 32UL)
-> > +#endif
-> > +
-> > +/* We don't want to allow the firmware to stall us forever. */
-> > +#define SMCCC_TRNG_MAX_TRIES   20
-> > +
-> > +#define SMCCC_RET_TRNG_INVALID_PARAMETER       -2
-> > +#define SMCCC_RET_TRNG_NO_ENTROPY              -3
-> > +
-> > +static struct platform_device *smccc_trng_pdev;
-> > +  
-> 
-> Can we split the platform device and the platform driver? The platform
-> device should be registered by the core code once it discovers the
-> SMCCC TRNG availabily. The platform driver can then use ordinary
-> module alias autoloading etc based on the platform device availabilty.
+	data->req_paddr = __sme_set(req_pfn << PAGE_SHIFT);
 
-Yes, a similar idea was already brought up before. I think there is even
-the potential for something like an artificial SMCCC "bus", where those
-services presentable as devices could be auto-detected (by checking
-known function IDs), the respective drivers would then probe
-automatically?
+I was thinking that setting the C-bit meant the memory was guest private, but
+that's setting the C-bit for the HPA, which is correct since KVM installs guest
+memory with C-bit=1 in the NPT, i.e. encrypts shared memory with the host key.
 
-I will try to implement your approach first, to see what it looks like.
+Tangetially related question, is it correct to say that the host can _read_ memory
+from a page that is assigned=1, but has asid=0?  I.e. KVM can read the response
+page in order to copy it into the guest, even though it is a firmware page?
 
-Cheers,
-Andre
+	/* Copy the response after the firmware returns success. */
+	rc = kvm_write_guest(kvm, resp_gpa, sev->snp_resp_page, PAGE_SIZE);
 
+> In the current series we don't support migration etc so I decided to
+> ratelimit unconditionally.
+
+Since KVM can peek at the request header, KVM should flat out disallow requests
+that KVM doesn't explicitly support.  E.g. migration requests should not be sent
+to the PSP.
+
+One concern though: How does the guest query what requests are supported?  This
+snippet implies there's some form of enumeration:
+
+  Note: This guest message may be removed in future versions as it is redundant
+  with the CPUID page in SNP_LAUNCH_UPDATE (see Section 8.14).
+
+But all I can find is a "Message Version" in "Table 94. Message Type Encodings",
+which implies that request support is all or nothing for a given version.  That
+would be rather unfortunate as KVM has no way to tell the guest that something
+is unsupported :-(
+
+> > Is this exposed to userspace in any way?  This feels very much like a knob that
+> > needs to be configurable per-VM.
 > 
-> This requires the following to be added though
+> It's not exposed to the userspace and I am not sure if userspace care about
+> this knob.
+
+Userspace definitely cares, otherwise the system would need to be rebooted just to
+tune the ratelimiting.  And userspace may want to disable ratelimiting entirely,
+e.g. if the entire system is dedicated to a single VM.
+
+> > Also, what are the estimated latencies of a guest request?  If the worst case
+> > latency is >200ms, a default ratelimit frequency of 5hz isn't going to do a whole
+> > lot.
+> > 
 > 
-> MODULE_ALIAS("platform: smccc_trng")
+> The latency will depend on what else is going in the system at the time the
+> request comes to the hypervisor. Access to the PSP is serialized so other
+> parallel PSP command execution will contribute to the latency.
+
+I get that it will be variable, but what are some ballpark latencies?  E.g. what's
+the latency of the slowest command without PSP contention?
+
+> > Question on the VMPCK sequences.  The firmware ABI says:
+> > 
+> >     Each guest has four VMPCKs ... Each message contains a sequence number per
+> >     VMPCK. The sequence number is incremented with each message sent. Messages
+> >     sent by the guest to the firmware and by the firmware to the guest must be
+> >     delivered in order. If not, the firmware will reject subsequent messages ...
+> > 
+> > Does that mean there are four independent sequences, i.e. four streams the guest
+> > can use "concurrently", or does it mean the overall freshess/integrity check is
+> > composed from four VMPCK sequences, all of which must be correct for the message
+> > to be valid?
+> > 
 > 
-> but all the smccc calls could be dropped from the probe function in that case.
+> There are four independent sequence counter and in theory guest can use them
+> concurrently. But the access to the PSP must be serialized.
+
+Technically that's not required from the guest's perspective, correct?  The guest
+only cares about the sequence numbers for a given VMPCK, e.g. it can have one
+in-flight request per VMPCK and expect that to work, even without fully serializing
+its own requests.
+
+Out of curiosity, why 4 VMPCKs?  It seems completely arbitrary.
+
+> Currently, the guest driver uses the VMPCK0 key to communicate with the PSP.
 > 
 > 
+> > If it's the latter, then a traditional mutex isn't really necessary because the
+> > guest must implement its own serialization, e.g. it's own mutex or whatever, to
+> > ensure there is at most one request in-flight at any given time.
 > 
-> > +static int smccc_trng_init(struct hwrng *rng)
-> > +{
-> > +       return 0;
-> > +}
-> > +
-> > +static int copy_from_registers(char *buf, struct arm_smccc_res *res,
-> > +                              size_t bytes)
-> > +{
-> > +       unsigned int chunk, copied;
-> > +
-> > +       if (bytes == 0)
-> > +               return 0;
-> > +
-> > +       chunk = min(bytes, sizeof(long));
-> > +       memcpy(buf, &res->a3, chunk);
-> > +       copied = chunk;
-> > +       if (copied >= bytes)
-> > +               return copied;
-> > +
-> > +       chunk = min((bytes - copied), sizeof(long));
-> > +       memcpy(&buf[copied], &res->a2, chunk);
-> > +       copied += chunk;
-> > +       if (copied >= bytes)
-> > +               return copied;
-> > +
-> > +       chunk = min((bytes - copied), sizeof(long));
-> > +       memcpy(&buf[copied], &res->a1, chunk);
-> > +
-> > +       return copied + chunk;
-> > +}
-> > +
-> > +static int smccc_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-> > +{
-> > +       struct arm_smccc_res res;
-> > +       u8 *buf = data;
-> > +       unsigned int copied = 0;
-> > +       int tries = 0;
-> > +
-> > +       while (copied < max) {
-> > +               size_t bits = min_t(size_t, (max - copied) * BITS_PER_BYTE,
-> > +                                 MAX_BITS_PER_CALL);
-> > +
-> > +               arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND, bits, &res);
-> > +               if ((int)res.a0 < 0)
-> > +                       return (int)res.a0;
-> > +
-> > +               switch ((int)res.a0) {
-> > +               case SMCCC_RET_SUCCESS:
-> > +                       copied += copy_from_registers(buf + copied, &res,
-> > +                                                     bits / BITS_PER_BYTE);
-> > +                       tries = 0;
-> > +                       break;
-> > +               case SMCCC_RET_TRNG_NO_ENTROPY:
-> > +                       if (!wait)
-> > +                               return copied;
-> > +                       tries++;
-> > +                       if (tries >= SMCCC_TRNG_MAX_TRIES)
-> > +                               return copied;
-> > +                       cond_resched();
-> > +                       break;
-> > +               }
-> > +       }
-> > +
-> > +       return copied;
-> > +}
-> > +
-> > +static int smccc_trng_probe(struct platform_device *pdev)
-> > +{
-> > +       struct arm_smccc_res res;
-> > +       struct hwrng *trng;
-> > +       u32 version;
-> > +       int ret;
-> > +
-> > +       /* We need ARM SMCCC v1.1, with its autodetection feature. */
-> > +       if (arm_smccc_get_version() < ARM_SMCCC_VERSION_1_1)
-> > +               return -ENODEV;
-> > +
-> > +       arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_VERSION, &res);
-> > +       if ((int)res.a0 < 0)
-> > +               return -ENODEV;
-> > +       version = res.a0;
-> > +
-> > +       arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_FEATURES,
-> > +                            ARM_SMCCC_TRNG_RND, &res);
-> > +       if ((int)res.a0 < 0)
-> > +               return -ENODEV;
-> > +
-> > +       trng = devm_kzalloc(&pdev->dev, sizeof(*trng), GFP_KERNEL);
-> > +       if (!trng)
-> > +               return -ENOMEM;
-> > +
-> > +       trng->name = "smccc_trng";
-> > +       trng->init = smccc_trng_init;
-> > +       trng->read = smccc_trng_read;
-> > +
-> > +       platform_set_drvdata(pdev, trng);
-> > +       ret = devm_hwrng_register(&pdev->dev, trng);
-> > +       if (ret)
-> > +               return -ENOENT;
-> > +
-> > +       dev_info(&pdev->dev,
-> > +                "ARM SMCCC TRNG firmware random number generator v%d.%d\n",
-> > +                version >> 16, version & 0xffff);
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +static struct platform_driver smccc_trng_driver = {
-> > +       .driver = {
-> > +               .name           = "smccc_trng",
-> > +       },
-> > +       .probe          = smccc_trng_probe,
-> > +};
-> > +
-> > +static int __init smccc_trng_driver_init(void)
-> > +{
-> > +       smccc_trng_pdev = platform_device_register_simple("smccc_trng",
-> > +                                                         -1, NULL, 0);
-> > +       if (IS_ERR(smccc_trng_pdev))
-> > +               return PTR_ERR(smccc_trng_pdev);
-> > +
-> > +       return platform_driver_register(&smccc_trng_driver);
-> > +}
-> > +module_init(smccc_trng_driver_init);
-> > +
-> > +static void __exit smccc_trng_driver_exit(void)
-> > +{
-> > +       platform_driver_unregister(&smccc_trng_driver);
-> > +       platform_device_unregister(smccc_trng_pdev);
-> > +}
-> > +module_exit(smccc_trng_driver_exit);
-> > +
-> > +MODULE_AUTHOR("Andre Przywara");
-> > +MODULE_LICENSE("GPL");
-> > --
-> > 2.17.6
-> >  
+> The guest driver uses the its own serialization to ensure that there is
+> *exactly* one request in-flight.
+
+But KVM can't rely on that because it doesn't control the guest, e.g. it may be
+running a non-Linux guest.
+
+> The mutex used here is to protect the KVM's internal firmware response
+> buffer.
+
+Ya, where I was going with my question was that if the guest was architecturally
+restricted to a single in-flight request, then KVM could do something like this
+instead of taking kvm->lock (bad pseudocode):
+
+	if (test_and_set(sev->guest_request)) {
+		rc = AEAD_OFLOW;
+		goto fail;
+	}
+
+	<do request>
+
+	clear_bit(...)
+
+I.e. multiple in-flight requests can't work because the guest can guarantee
+ordering between vCPUs.  But, because the guest can theoretically have up to four
+in-flight requests, it's not that simple.
+
+The reason I'm going down this path is that taking kvm->lock inside vcpu->mutex
+violates KVM's locking rules, i.e. is susceptibl to deadlocks.  Per kvm/locking.rst,
+
+  - kvm->lock is taken outside vcpu->mutex
+
+That means a different mutex is needed to protect the guest request pages.
+
+	
+> > And on the KVM side it means KVM can simpy reject requests if there is
+> > already an in-flight request.  It might also give us more/better options
+> > for ratelimiting?
+> 
+> I don't think we should be running into this scenario unless there is a bug
+> in the guest kernel. The guest kernel support and CCP driver both ensure
+> that request to the PSP is serialized.
+
+Again, what the Linux kernel does is irrelevant.  What matters is what is
+architecturally allowed.
+
+> In normal operation we may see 1 to 2 quest requests for the entire guest
+> lifetime. I am thinking first request maybe for the attestation report and
+> second maybe to derive keys etc. It may change slightly when we add the
+> migration command; I have not looked into a great detail yet.
+
 
