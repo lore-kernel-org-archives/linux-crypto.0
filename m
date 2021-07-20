@@ -2,275 +2,233 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B7EC07E9B
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD997C07E95
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:02:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C37561221
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:02:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4EC3610F7
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:02:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234968AbhGTOVT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 10:21:19 -0400
-Received: from mail-dm6nam10on2055.outbound.protection.outlook.com ([40.107.93.55]:48993
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S237295AbhGTN47 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 09:56:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YDk+0tb7xKDPU+voWehSMCUto4hkbRHaTDXp9LOVl3xWfxJkY61a+j5YGByoZlu6VJUiEApLRYEzjaajF3B5WN2ZrW/Wq8xmyK506R284RzSByg6QrBH/Jz9TLJT0RRvPLirZboRxfWUYp5g3+GouAwB79W1ynFMeHrdSLEW/kSwOS2h1XIRY18h06iLrjHOwLJsJDLbuAYM6iCglds/4aJsg9ZLYGGtZs5kNk7KwjLRWbYKfJRW67JCdQmdnbbZq05OfPjyq+FpkUrqLIFef22WgRzUSMj8TY/CR2HVO8qPJ77C/6QjY3ULBNJOaMa1bMGUGzm5cCTRYtFXgJFCPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uH7ehnnxhRu0ahip1dqwYRc3YAk259GorxYGnDSTluo=;
- b=lU0i6dDE4geeX/+i1x3nthGxkqBtEZkY23TceA8qWMHUafTot/x9n4NhIsEvTUENJcO/u2mqZdp0DOirv7+Y71+hvl+q4CB6jmA4EUwHoNVKZea3OyurFSKYBg2Js6Z3abJrEMYV9aU4+AisctNT2gV/rO6ZS0ARAQlXeYO9fHhCr4OUPZCsZZy9xhJqgeCLm04Af6AzZ+RrJnJ/4Y8O6xHcaqvO1s+G9pG3zgRyN2zoEqfwagBUyUc7KxUw0pq6jglG30q1EIzMSkMVhdVjsaHYB9bceETSG/LcJi+DTbhesBzg6/klU3RRK6oby4jiqmNEy3+M/AkxZaiEvoqrzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uH7ehnnxhRu0ahip1dqwYRc3YAk259GorxYGnDSTluo=;
- b=mnBjvHi9+uZEAN9U92dS1W9pkp2wDLO3InIN85YuETbjtKQb/76m5heZCh1UUDllG6+KhkzPSzpHjDcOiIPmVerVSN6RoBiOmpwVjVO7j1tcRukfN9QrTWqDhJN/2QSRhXVqezN/ui80O0L1y4JfaxUQocuAlNdsE3WvmKNaxFM=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4446.namprd12.prod.outlook.com (2603:10b6:806:71::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.23; Tue, 20 Jul
- 2021 14:37:34 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
- 14:37:34 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 38/40] KVM: SVM: Provide support for
- SNP_GUEST_REQUEST NAE event
-To:     Sean Christopherson <seanjc@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-39-brijesh.singh@amd.com> <YPYBmlCuERUIO5+M@google.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <68ea014c-51bc-6ed4-a77e-dd7ce1a09aaf@amd.com>
-Date:   Tue, 20 Jul 2021 09:37:32 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YPYBmlCuERUIO5+M@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN1PR12CA0086.namprd12.prod.outlook.com
- (2603:10b6:802:21::21) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S238813AbhGTOVc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jul 2021 10:21:32 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.50]:21240 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238419AbhGTOMl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Jul 2021 10:12:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1626792422;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=2ext2HbZCebivrUEfPaefJ7YkT8e3f+S3d0yax4+EMM=;
+    b=mH5se4Db7wwSUq2HqPvlciYkQCP4NwGSehtiMD3a13xZBnZgLnGQHd9pYpBSYvHYJA
+    DOzdMjyfNg4yldQbb3+8JZ8kjXMI9qAbApoE5Hjgzi9xG8pHm2UFJTWkNxJUnlV1lawI
+    qJ2zOCdc+zV/Z57n1W/T2RiMhs3j+yv6QGfeI7knGB1FdHI61kkIXldPEbXFKt8J4URC
+    Hv6jonONBwOC1NmvjBaIt6ONAUKROQtcVFPfr2g/hbL0qyw55b0ofHcopNtDrSUGr44m
+    h3+KALsgjDjuKu3Gvxrz7ldbsGASSrAQUKyeLtgSWaqJJHJRaHIQ93FgUVXZVSayarLO
+    i2+Q==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNzyCzy1Sfr67uExK884EC0GFGHavLS5ZjMVaXg=="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+    by smtp.strato.de (RZmta 47.28.1 DYNA|AUTH)
+    with ESMTPSA id 9043bbx6KEl1NUn
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Tue, 20 Jul 2021 16:47:01 +0200 (CEST)
+Message-ID: <d170c0cfcb8bbeb4fe4bed367cd4689a522ae469.camel@chronox.de>
+Subject: Re: [PATCH 09/11] nvmet: Implement basic In-Band Authentication
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Simo Sorce <simo@redhat.com>, Hannes Reinecke <hare@suse.de>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@wdc.com>,
+        linux-nvme@lists.infradead.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Date:   Tue, 20 Jul 2021 16:47:00 +0200
+In-Reply-To: <5ec6c8d5a0259a2d632589c154093ebfbbcdb47b.camel@redhat.com>
+References: <20210716110428.9727-1-hare@suse.de>
+         <2510347.locV8n3378@positron.chronox.de>
+         <a4d4bda0-2bc8-0d0c-3e81-55adecd6ce52@suse.de>
+         <6538288.aohFRl0Q45@positron.chronox.de>
+         <59695981-9edc-6b7a-480a-94cca95a0b8c@suse.de>
+         <463a191b9896dd708015645cfc125988cd5deaef.camel@chronox.de>
+         <2af95a8e-50d9-7e2d-a556-696e9404fee4@suse.de>
+         <740af9f7334c294ce879bef33985dfab6d0523b3.camel@chronox.de>
+         <1eab1472-3b7b-307b-62ae-8bed39603b96@suse.de>
+         <24d115c9b68ca98a3cf363e1cfcb961cc6b38069.camel@chronox.de>
+         <aac9448e-29e9-6d03-1077-148be3c10f50@suse.de>
+         <11ab4001f580a6b2c3cce959282259c1f9095f63.camel@redhat.com>
+         <4cd673a8-a503-c29a-85f6-3c2703558181@suse.de>
+         <5ec6c8d5a0259a2d632589c154093ebfbbcdb47b.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.95] (165.204.77.1) by SN1PR12CA0086.namprd12.prod.outlook.com (2603:10b6:802:21::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Tue, 20 Jul 2021 14:37:33 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 40068fd9-7cab-44ac-bb4d-08d94b8be99f
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4446:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4446C4833E76099E761CBB4BE5E29@SA0PR12MB4446.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ckiEHNeE1FfvR1tfWJeEkYkL9Rnk1WQXc8baSA7AXESsMwE54P3xHfhuvXdx7WwIVF258yk+Wh6/02keVzyL9XMhJ0tbFCw9+F1VkTxI/FoPrYypkKzZJ2NyXF7Oi7KXtFRJ6nSm6UdRAnqCBnx65MU2L90DpCOCjrjtX3rLpccwRbTRvdAjj9O+r2bSD+7HtQMxL3jhPTOPkFLCS9GJ4j6cJXQRRzzJOw/c0rDsG0v78R1q3Zypf9vO9T2/xdvM9agK+l7hxStDeTSxghUuCxzUCficFZd0weRZJVHQ9DDk+gH23PFx3p0rD47p4ocUkjwEWqVSqBB3821sStGqMKrc9INnop7lWYu+STEbozUB2tLzEIc7YZtBpBJfeFYJNHL9qTqObADNV3srp+pMHOSoyInDgvi7+s4ItLDwhAQIVgZ7pSHfInUl1jHDwFH1cCJmoGJaWXU83gabbTaoemUadpYL/JAQ1sHo6M243AxlKC9QgLJE+mbCbm51sf+rzdLwbjbeuJOUGBowzR6o6Jpr8SByM+Wt9M8uaXq45UFFQMsvThEvlSv6JEjjBgEaL1U5SzoiepxT9HWR4sPnRqBYY1TT+hcRmwwUjFsDeMd2MNdM1Hw/tvrwbofJTlg6cNzyC+0w0rroTTB+KTNUE6eEJQU9GtvVZ7cJf83bIJPwb0Cwsj4C5OHV6pEvmuuAeDXyE1ROVgnUBMoy9qWugkAmbWj1tHlNcxNT2N1uBbl6ic+h6ivYMaefzMCBaWeJ6QdeBi0TYejcx+XRt/Iv2Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(376002)(39860400002)(346002)(396003)(36756003)(31696002)(83380400001)(44832011)(53546011)(86362001)(38350700002)(31686004)(66476007)(16576012)(66946007)(54906003)(956004)(2616005)(66556008)(38100700002)(316002)(186003)(2906002)(6916009)(8676002)(6486002)(7406005)(4326008)(5660300002)(7416002)(8936002)(52116002)(26005)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NkpGZTB5ZVQ3TjIzSm42N2hJV1VMRGFKdElvM0hsQXNXbVNydU0rdFp1VmNv?=
- =?utf-8?B?ODBERWk5bTB5TEs4Z3J5K2lLTllzaVQ2WXNVZDlCWXpJR0xwVUQzazJvSktU?=
- =?utf-8?B?eXdaZ25KMWsxODdKd1pOQkczejIzaWFXc3R6TDArQ3l0UnE4VlJBWDB1dW9y?=
- =?utf-8?B?VTV0QzdZczVySE5QeUFERlozMGNoNVdCVHFJRyt6NlpjTFdyY0FhTmFVRHNm?=
- =?utf-8?B?UGVKRjBwU1ZUZXZxelhyWTFrRjN5L1I1M2lSYzZpWU14V2trTUoySk11Uyt6?=
- =?utf-8?B?REYxeTJTWGtKUGlYSjJGNGFEaUxpSDJ6RnBqSFcvRmRLQVplNStnaXozbUwz?=
- =?utf-8?B?R0lOMU5GZDNtbTFLZ3BaY0xmTWxCMmJkU2EzTmhMaGpuSUF5ZndXRzV3QS9L?=
- =?utf-8?B?RmV4UytMYjJZSjZzVzNNVElFRlJmZXdNZ2s1NzNySGl2YzI4N1RLV0dEbXRz?=
- =?utf-8?B?NEE1SjdLaXpFQWdkRnFraDVzY0lISEpCRFVWT05oclQ2b0E3SWRWOWhoUUlE?=
- =?utf-8?B?anFOWC9ORWppejhIdThHK3dmclJQZWMyQVhGL0k0RDl5U0NlRk0zUExYVTFQ?=
- =?utf-8?B?ZVMxNHQ4cnRZWWNIdzIrUjlGM0FEVXNqZkVzY2lobU83MitoNk9JTTNiNys0?=
- =?utf-8?B?R212MTducGhwbm84Ry9kVkxtYlpuTi9QeTE2d2k2QlVpYjQ1VTZMS3lhMGVy?=
- =?utf-8?B?OTRQK2QrcUdiZkRLRWd2WHF1MnVJYU1XYzBvMFFzYTBWOVI4cUlLbzBxTGEx?=
- =?utf-8?B?V1R4Q0tVbFc3WWEyb1BGckw4Um1iaVJ0Qm1YWEZCTUdRaU9DR3FhdTJrSlVG?=
- =?utf-8?B?SzJBQ1R1K05TMFZETUFQdFd2Ylg0UVIxWldBRXRneEMwVVpKTC92eUhtR3hX?=
- =?utf-8?B?bFhWLzd0c3J3RzF4L3ZGVUJYSGcybDlTcW9xb0lXdUtoVU1sMnMrL2dTL0E1?=
- =?utf-8?B?d3BlYmRRcklVQTcxUG5SK0p5RjZYdzR2dE02OHM4dU02QnJ6TTRub0J3b0tB?=
- =?utf-8?B?bjhCSnNtWUg3S2RGWnZEbUJ0dnRCVHcvUkhrSGM3anVlRkNMbDIrcXR4dXFa?=
- =?utf-8?B?bDhNNFNodk9jWlhGZ3FYMEhjZVp3bnJWWmVTUDNTR1NzbnRQVGNCcEJxUGU1?=
- =?utf-8?B?bWdNZXUraTNBbG9JRVFVV0xHbEp1cDFuZENoVjdTamU4ekZOSG5nUXpJK3Yz?=
- =?utf-8?B?VkpkcjhjbHpFUG16SDVXRU1pejFxMEppcmtYRzBIQldvSmhtQ3VBNXRGVVNV?=
- =?utf-8?B?Ti9vNHE2TlB6VHNCdXovK2VLNDdTZ05WRXF1T1lSWVdrdWhveWhMbTlnS0xK?=
- =?utf-8?B?K2J6VGxaWmRxd3lIYzRzdXc1RmY1ZkpxaHRIaytmcm5lWHZwOEJCdDNvVC9H?=
- =?utf-8?B?UndxYmdxY1J1OWxpaHZpeUt2YVoxMGpSQUpmaTUvdHZoQmowTFpENjNlRmRS?=
- =?utf-8?B?bFFQWjB4TWlaRU10cnZlVlpvMXNJblRxakttM21LUFowbHpHNmo4ZFVhdWZz?=
- =?utf-8?B?OVRUR21tVGlKSXZOZzBXREc0bGlnNVpLNDJGazhmRHlDcGVwbmc3WHVoOGhI?=
- =?utf-8?B?RmFrNlNvL20xZkVTbi95RCtMdTQzR2RVOTI3bG50TVdyeXg1NTNSZTB2bjVW?=
- =?utf-8?B?TlhnTHVnMUxucU4yWXR6WkFKSCtLR2V5eW5kcVNQUU5iS2k3RTU5eFF0Yk9p?=
- =?utf-8?B?QUtUQ2t0R3RUcjUvWGN6RUFSaVNHV3ZFdzdtZmF0MUs0UnpoTmxWY1I3Nkc2?=
- =?utf-8?Q?YrmyJ9eC40pVoSNDSCz00vFcewOPGB0bZOkr/Pa?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40068fd9-7cab-44ac-bb4d-08d94b8be99f
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 14:37:34.4421
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Zs+QjrXg6Im9cAn5s1YOTWyCiqGpNhQhYcOnK/gGtLW6iK4Sql0W46mwICrrtlh+K/pxsbDSNFzvtrzBaw+meQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4446
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 7/19/21 5:50 PM, Sean Christopherson wrote:
-...
+Am Dienstag, dem 20.07.2021 um 10:44 -0400 schrieb Simo Sorce:
+> On Tue, 2021-07-20 at 13:31 +0200, Hannes Reinecke wrote:
+> > On 7/20/21 12:49 PM, Simo Sorce wrote:
+> > > On Tue, 2021-07-20 at 12:14 +0200, Hannes Reinecke wrote:
+> > > > On 7/19/21 1:52 PM, Stephan Mueller wrote:
+> > > > > Am Montag, dem 19.07.2021 um 13:10 +0200 schrieb Hannes Reinecke:
+> > > > > > On 7/19/21 12:19 PM, Stephan Mueller wrote:
+> > > > > > > Am Montag, dem 19.07.2021 um 11:57 +0200 schrieb Hannes
+> > > > > > > Reinecke:
+> > > > > > > > On 7/19/21 10:51 AM, Stephan Mueller wrote:
+> > > > [ .. ]
+> > > > > > > > > 
+> > > > > > > > > Thank you for clarifying that. It sounds to me that there is
+> > > > > > > > > no
+> > > > > > > > > defined protocol (or if there, I would be wondering how the
+> > > > > > > > > code would have
+> > > > > > > > > worked
+> > > > > > > > > with a different implementation). Would it make sense to
+> > > > > > > > > first specify
+> > > > > > > > > a protocol for authentication and have it discussed? I
+> > > > > > > > > personally think
+> > > > > > > > > it is a bit difficult to fully understand the protocol from
+> > > > > > > > > the code and
+> > > > > > > > > discuss protocol-level items based on the code.
+> > > > > > > > > 
+> > > > > > > > Oh, the protocol _is_ specified:
+> > > > > > > > 
+> > > > > > > >  
+> > > > > > > > https://nvmexpress.org/wp-content/uploads/NVM-Express-Base-Specification-2_0-2021.06.02-Ratified-5.pdf
+> > > > > > > > 
+> > > > > > > > It's just that I have issues translating that spec onto what
+> > > > > > > > the kernel
+> > > > > > > > provides.
+> > > > > > > 
+> > > > > > > according to the naming conventions there in figures 447 and
+> > > > > > > following:
+> > > > > > > 
+> > > > > > > - x and y: DH private key (kernel calls it secret set with
+> > > > > > > dh_set_secret
+> > > > > > > or
+> > > > > > > encoded into param.key)
+> > > > > > > 
+> > > > > > 
+> > > > > > But that's were I got confused; one needs a private key here, but
+> > > > > > there
+> > > > > > is no obvious candidate for it. But reading it more closely I
+> > > > > > guess the
+> > > > > > private key is just a random number (cf the spec: g^y mod p, where
+> > > > > > y is
+> > > > > > a random number selected by the host that shall be at least 256
+> > > > > > bits
+> > > > > > long). So I'll fix it up with the next round.
+> > > > > 
+> > > > > Here comes the crux: the kernel has an ECC private key generation
+> > > > > function
+> > > > > ecdh_set_secret triggered with crypto_kpp_set_secret using a NULL
+> > > > > key, but it
+> > > > > has no FFC-DH counterpart.
+> > > > > 
+> > > > > That said, generating a random number is the most obvious choice,
+> > > > > but not the
+> > > > > right one.
+> > > > > 
+> > > > > The correct one would be following SP800-56A rev 3 and here either
+> > > > > section
+> > > > > 5.6.1.1.3 or 5.6.1.1.4.
+> > > > > 
+> > > > Hmm. Okay. But after having read section 5.6.1.1.4, I still do have
+> > > > some
+> > > > questions.
+> > > > 
+> > > > Assume we will be using a bit length of 512 for FFDHE, then we will
+> > > > trivially pass Step 2 for all supported FFDHE groups (the maximum
+> > > > symmetric-equivalent strength for ffdhe8192 is 192 bits).
+> > > 
+> > > N = 512 is not a good choice, minimum length these days for DH should
+> > > be 2048 or more.
+> > > 
+> > 
+> > According to RFC7919:
+> > Peers using ffdhe8192 that want to optimize their key exchange with a
+> > short exponent (Section 5.2) should choose a secret key of at least
+> > 400 bits.
+> > 
+> > So what is wrong with 512 bits?
 > 
-> IIUC, this snippet in the spec means KVM can't restrict what requests are made
-> by the guests.  If so, that makes it difficult to detect/ratelimit a misbehaving
-> guest, and also limits our options if there are firmware issues (hopefully there
-> aren't).  E.g. ratelimiting a guest after KVM has explicitly requested it to
-> migrate is not exactly desirable.
+> 
+> RFC7519 is TLS Specific.
+> I do not know if short-exponents are safe to use in all use cases.
+> 
+> If it is safe, your choice is fine and your arguments will follow, but
+> then a comment that explains the choice and warns about key checks if
+> it is changed would be a good idea.
+> 
+> Otherwise the default should be to use N = len(q), which implies the
+> proper checks need to be applied.
+
+Agreed.
+
+Ciao
+Stephan
+> 
+> Simo.
+> 
+> > > > From my understanding, the random number generator will fill out all
+> > > > available bytes in the string (and nothing more), so we trivially
+> > > > satisfy step 3 and 4.
+> > > > 
+> > > > And as q is always larger than the random number, step 6 reduces to
+> > > > 'if (c > 2^N - 2)',
+> > > 
+> > > Where is this coming from ?
+> > > It seem you assume M = 2^N but M = min(2^N, q)
+> > > 
+> > > The point here is to make sure the number X you return is:
+> > > 0 < X < (q-1)
+> > > 
+> > 
+> > Which is what I've tried to argue. For 512 bits private key and the
+> > smallest possible FFDHE group (which has 2048 bits, with the top bit
+> > non-zero) 2^N is always smaller than (q - 1).
+> > As the other FFHDE groups are using even larger 'q' values, this is true
+> > for all FFHDE groups.
+> > 
+> > > >  ie we just need to check if the random number is a
+> > > > string of 0xff characters. Which hardly is a random number at all, so
+> > > > it'll be impossible to get this.
+> > > > 
+> > > > Which then would mean that our 'x' is simply the random number + 1,
+> > > 
+> > > This is an artifact due to the random number being 0 <= c < 2^N - 1,
+> > > therefore 1 needs to be added to make sure you never return 0.
+> > > 
+> > 
+> > And my argument here is that all zeros (and all ones) are not a value I
+> > would expect from our RNG.
+> > 
+> > > > which arguably is slightly pointless (one more than a random number is
+> > > > as random as the number itself), so I do feel justified with just
+> > > > returning a random number here.
+> > > > 
+> > > > Am I wrong with that reasoning?
+> > > 
+> > > Looks to me you are not accounting for the fact that N = 512 is too
+> > > small and a random number falling in the interval (q - 2) < X < 2^N is
+> > > unsuitable?
+> > > 
+> > 
+> > Only if (q - 2) < 2^N. And my point is that it's not.
+> > 
+> > Cheers,
+> > 
+> > Hannes
 > 
 
-The guest message page contains a message header followed by the 
-encrypted payload. So, technically KVM can peek into the message header 
-format to determine the message request type. If needed, we can 
-ratelimit based on the message type.
 
-In the current series we don't support migration etc so I decided to 
-ratelimit unconditionally.
-
-...
-> 
->> Now that KVM supports all the VMGEXIT NAEs required for the base SEV-SNP
->> feature, set the hypervisor feature to advertise it.
-> 
-> It would helpful if this changelog listed the Guest Requests that are required
-> for "base" SNP, e.g. to provide some insight as to why we care about guest
-> requests.
-> 
-
-Sure, I'll add more.
-
-
->>   static int snp_bind_asid(struct kvm *kvm, int *error)
->> @@ -1618,6 +1631,12 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>   	if (rc)
->>   		goto e_free_context;
->>   
->> +	/* Used for rate limiting SNP guest message request, use the default settings */
->> +	ratelimit_default_init(&sev->snp_guest_msg_rs);
-> 
-> Is this exposed to userspace in any way?  This feels very much like a knob that
-> needs to be configurable per-VM.
-> 
-
-It's not exposed to the userspace and I am not sure if userspace care 
-about this knob.
-
-
-> Also, what are the estimated latencies of a guest request?  If the worst case
-> latency is >200ms, a default ratelimit frequency of 5hz isn't going to do a whole
-> lot.
-> 
-
-The latency will depend on what else is going in the system at the time 
-the request comes to the hypervisor. Access to the PSP is serialized so 
-other parallel PSP command execution will contribute to the latency.
-
-...
->> +
->> +	if (!__ratelimit(&sev->snp_guest_msg_rs)) {
->> +		pr_info_ratelimited("svm: too many guest message requests\n");
->> +		rc = -EAGAIN;
-> 
-> What guarantee do we have that the guest actually understands -EAGAIN?  Ditto
-> for -EINVAL returned by snp_build_guest_buf().  AFAICT, our options are to return
-> one of the error codes defined in "Table 95. Status Codes for SNP_GUEST_REQUEST"
-> of the firmware ABI, kill the guest, or ratelimit the guest without returning
-> control to the guest.
-> 
-
-Yes, let me look into passing one of the status code defined in the spec.
-
->> +		goto e_fail;
->> +	}
->> +
->> +	rc = snp_build_guest_buf(svm, &data, req_gpa, resp_gpa);
->> +	if (rc)
->> +		goto e_fail;
->> +
->> +	sev = &to_kvm_svm(kvm)->sev_info;
->> +
->> +	mutex_lock(&kvm->lock);
-> 
-> Question on the VMPCK sequences.  The firmware ABI says:
-> 
->     Each guest has four VMPCKs ... Each message contains a sequence number per
->     VMPCK. The sequence number is incremented with each message sent. Messages
->     sent by the guest to the firmware and by the firmware to the guest must be
->     delivered in order. If not, the firmware will reject subsequent messages ...
-> 
-> Does that mean there are four independent sequences, i.e. four streams the guest
-> can use "concurrently", or does it mean the overall freshess/integrity check is
-> composed from four VMPCK sequences, all of which must be correct for the message
-> to be valid?
-> 
-
-There are four independent sequence counter and in theory guest can use 
-them concurrently. But the access to the PSP must be serialized. 
-Currently, the guest driver uses the VMPCK0 key to communicate with the PSP.
-
-
-> If it's the latter, then a traditional mutex isn't really necessary because the
-> guest must implement its own serialization, e.g. it's own mutex or whatever, to
-> ensure there is at most one request in-flight at any given time.  
-
-The guest driver uses the its own serialization to ensure that there is 
-*exactly* one request in-flight.
-
-The mutex used here is to protect the KVM's internal firmware response 
-buffer.
-
-
-And on the KVM
-> side it means KVM can simpy reject requests if there is already an in-flight
-> request.  It might also give us more/better options for ratelimiting?
-> 
-
-I don't think we should be running into this scenario unless there is a 
-bug in the guest kernel. The guest kernel support and CCP driver both 
-ensure that request to the PSP is serialized.
-
-In normal operation we may see 1 to 2 quest requests for the entire 
-guest lifetime. I am thinking first request maybe for the attestation 
-report and second maybe to derive keys etc. It may change slightly when 
-we add the migration command; I have not looked into a great detail yet.
-
-thanks
