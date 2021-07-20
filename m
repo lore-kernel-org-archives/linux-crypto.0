@@ -2,144 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A37C636C8
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:49:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F6DEC636C9
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:49:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9CC9060FEA
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:49:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58C896100C
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:49:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235378AbhGTUIm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 16:08:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55974 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236896AbhGTTpQ (ORCPT
+        id S236525AbhGTUJC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jul 2021 16:09:02 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:35357 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237202AbhGTTsD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 15:45:16 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16KK4bK2023434;
-        Tue, 20 Jul 2021 16:24:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=6d0AvtuBA/mdM+Xm+jajpNkrlEgOYj7D9PlUbi2xZB4=;
- b=V4zOHp+W0kVwdjd25UFD8InNd5+irwbyCnzI9y3RmjFPUQ12T41Kpwozn5isTwnh7pQq
- +ra/ibOqCusdT8/wYLkkUMjdk1cAOuBfLcuD6F+q7iS/Mwpr9alu4WiMU7QmFVH5Cjpx
- V8Vc9lCAQ/gkzrB3regmEONyJjMZVbeAMpyAK7jBq1hCbWWEpdjesgO9C2KqZRHx2uik
- oacNlYSIedCv5ldJqIqOIE3C72zhbuCy/hfm4/Zn0nEowT+iKHg6d4XPWcW/duPwUQcz
- 3Bbt1pHc/Cvo4bJIBsnxHu0udqNeYNW/tdB3o3X7JvAD2JjrquSAoKWJ3Yc6994l+mRT 0Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39wy71wjmh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 20 Jul 2021 16:24:59 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16KK6Adj032512;
-        Tue, 20 Jul 2021 16:24:58 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39wy71wjkw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 20 Jul 2021 16:24:58 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16KKCqSp012806;
-        Tue, 20 Jul 2021 20:24:56 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 39vng714qm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 20 Jul 2021 20:24:55 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16KKOrF527066780
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 20 Jul 2021 20:24:53 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F24BA42047;
-        Tue, 20 Jul 2021 20:24:52 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A1E5D42042;
-        Tue, 20 Jul 2021 20:24:47 +0000 (GMT)
-Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.68.252])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 20 Jul 2021 20:24:47 +0000 (GMT)
-Message-ID: <40e167cca7b59fc4e11f45ba807486e11eade419.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 6/6] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Richard Weinberger <richard.weinberger@gmail.com>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Bottomley <jejb@linux.ibm.com>,
-        kernel <kernel@pengutronix.de>, James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        horia geanta <horia.geanta@nxp.com>,
-        aymen sghaier <aymen.sghaier@nxp.com>,
+        Tue, 20 Jul 2021 15:48:03 -0400
+Received: from [192.168.0.113] ([178.252.67.224]) by mrelayeu.kundenserver.de
+ (mreue009 [212.227.15.163]) with ESMTPSA (Nemesis) id
+ 1M26iv-1m7s9U1YhV-002aGq; Tue, 20 Jul 2021 22:27:49 +0200
+Subject: Re: [PATCH 06/11] nvme: Implement In-Band authentication
+To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+Cc:     Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@wdc.com>,
+        linux-nvme@lists.infradead.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        davem <davem@davemloft.net>, Udit Agarwal <udit.agarwal@nxp.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        david <david@sigma-star.at>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        "open list, ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        LSM <linux-security-module@vger.kernel.org>
-Date:   Tue, 20 Jul 2021 16:24:46 -0400
-In-Reply-To: <CAFLxGvxr94apP2jaT0tB6JRDtv_ivrguXK2Ykd3zer_4xtJ+2w@mail.gmail.com>
-References: <cover.1dfbb73645d917b3c76d01290804a3410bd9932e.1624364386.git-series.a.fatoum@pengutronix.de>
-         <39e6d65ca5d2a0a35fb71d6c1f85add8ee489a19.1624364386.git-series.a.fatoum@pengutronix.de>
-         <1850833581.13438.1625172175436.JavaMail.zimbra@nod.at>
-         <2f608e5a-5a12-6db1-b9bd-a2cd9e3e3671@pengutronix.de>
-         <783613027.15909.1625223222889.JavaMail.zimbra@nod.at>
-         <ac8ef66f-4d57-ead0-d1b3-e97220463241@pengutronix.de>
-         <CAFLxGvxr94apP2jaT0tB6JRDtv_ivrguXK2Ykd3zer_4xtJ+2w@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+References: <20210716110428.9727-1-hare@suse.de>
+ <20210716110428.9727-7-hare@suse.de>
+From:   Vladislav Bolkhovitin <vst@vlnb.net>
+Message-ID: <2946f3ff-bfa5-2487-4d91-c5286e3a7189@vlnb.net>
+Date:   Tue, 20 Jul 2021 23:27:26 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
+MIME-Version: 1.0
+In-Reply-To: <20210716110428.9727-7-hare@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: IEFJRJOHfvwOngpKt1XIsPonFtReajLI
-X-Proofpoint-ORIG-GUID: wkYED_fW-_xDkCD6flgnu-e43ZxxTkI5
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-20_13:2021-07-19,2021-07-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 clxscore=1011 suspectscore=0 mlxlogscore=999
- spamscore=0 mlxscore=0 malwarescore=0 adultscore=0 phishscore=0
- impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2104190000 definitions=main-2107200128
+X-Provags-ID: V03:K1:dV4jZRVKUd80jgKdUBVpml2f835ViidI6XcAZn8BhG3MNtWLP2Q
+ f0nt3S6gKnEZywn1Q2PE04M5RZ4hU/RLIBKqBZCXo7U1F3Gi/gv50xCWOCOS/bZP7BApTkc
+ G7TnqruzRNjD3dDL9DN3VGAjsL6WnHMb+BeNqjwKPjxu3VLsIv9KLABTVBMkiOeKKt1On0j
+ DwvrM1+0f51OGxKS4g9xA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/6Y1UxJomSU=:RyE9yXts4luQ9BIQMHPL8N
+ P5Ku7iHEKWgWY8Bka+p86GcUcWxCnrlKJ9g7NaxEUf9tEOW8yGcM3z0H7tnVGaLIY6kPtwfEk
+ RptMvMocpxI1pXCUAlyhrSFTZgbfErf+gTG0DumntrzUpDVb0NpfnBae/zoWWIvQjxF3W3PmB
+ BD3zOW4dbhM79iZt9VSHGMMDtK12dTkR0sqQeQm59c6j+EzV9ngbMHmwiRezUJhZ2UGKHrwVf
+ tUe7yc+m9gvz6fpZGeHcZKEL/uOttbGJUY0hzOdk+6Cw1qURKeDYH3ZpxPq6yeK/RBLHyeBuF
+ NLqLTuZc6qjolJufzxGSMB5SheNrKZ3qftLZMhgJFJO5pZxC0fWZXQcu2YPB91DVzGBFBZh22
+ SyVmMrCmvKCizsLMJ0RZVMu/Jq5jijvOe5ZbBtb/n3ZjoZTPXhIkOd4ZVane9pN4LFil+YSL0
+ YKKQj0TJIwhGfOvULBv+YzVmU1zj9NYiWWoiBhjiLhYvyct6Q6/Yk1gjKRlDh8bQHPubv5P9b
+ fjYxOkD+lCbNwSg3PNVUvIdwlNC1PoKrVUqqIuXIZWktKrFTJE+dmBiTKuNE9estkhCkOANff
+ z7qMERmY2D0Ad5vpmFIg/SsD/TBeQ3k8kAQxtH5U7+REzvWMvhQ4VqUxqYFqIPIFfFsXCtet6
+ WxQH/XgEAlF1JEs/DojmKgT7CueCXEp45ST8gJQJHH3Zd6xfKBwfcVkKpBpffwpU7HXjoU6IC
+ mPtLmdITVqLAdA92lBY5DoBdr0sUpm8+bgeRo5MOdlah84btKZXjlSeCxwudMJd068SegzVgE
+ PgsRiVK4U+e0rt9IjdWjMf8e9CxhF6ALZ6cShw0Byr91Dq/R9OtJKruGFS754hYtRhVc8e5
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-HI -
 
-On Tue, 2021-07-20 at 21:19 +0200, Richard Weinberger wrote:
-> On Fri, Jul 2, 2021 at 2:37 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> > > Both is possible. If the string starts with "0x" it needs to be decoded to a
-> > > 128 bit key. Otherwise it has to be a up to 16 byte string.
-> >
-> > Fine by me. Looking forward to your patches. :-)
-> 
-> I'm not sure how to proceed.  Should I base my changes on this series
-> or do you plan to send an updated
-> version soon?
-> Maybe it makes also sense to base my DCP patch set on yours.
-> 
-> Trusted Keys maintainers, what do you prefer?
+On 7/16/21 2:04 PM, Hannes Reinecke wrote:
 
-Jarkko sent an email saying he is on vacation for 2 weeks.   James was
-on vacation as well.   If there is something that needs immediate
-attention, please let me know.
+[...]
 
-thanks,
+> +struct nvmet_dhchap_hash_map {
+> +	int id;
+> +	int hash_len;
+> +	const char hmac[15];
+> +	const char digest[15];
+> +} hash_map[] = {
+> +	{.id = NVME_AUTH_DHCHAP_HASH_SHA256,
+> +	 .hash_len = 32,
+> +	 .hmac = "hmac(sha256)", .digest = "sha256" },
+> +	{.id = NVME_AUTH_DHCHAP_HASH_SHA384,
+> +	 .hash_len = 48,
+> +	 .hmac = "hmac(sha384)", .digest = "sha384" },
+> +	{.id = NVME_AUTH_DHCHAP_HASH_SHA512,
+> +	 .hash_len = 64,
+> +	 .hmac = "hmac(sha512)", .digest = "sha512" },
+> +};
 
-Mimi
+"hmac()" is always here, so why not to just auto-generate hmac(sha512)
+from sha512?
 
+Vlad
