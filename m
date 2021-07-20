@@ -2,217 +2,321 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CB2C07E9B
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E536EC07E95
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 16:12:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D4B4610CC
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 15:45:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5D186023D
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 16:12:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238960AbhGTPEh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 11:04:37 -0400
-Received: from mail-dm6nam10on2052.outbound.protection.outlook.com ([40.107.93.52]:50465
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S239888AbhGTOeo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 10:34:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YQqVsdyN5qA/gsfIBdVV1+zpx7q5KN0vnlrYNHpWMJLehiScu40UAuxlDDKS1bPvLwB0F9uLheYrHF6adKYH5TBLrLCyJni/dCdLOr1lWSCcMfnq9SlZYTLMgwmwL8X4b8rdhFXfZz3mAJmMF7LCbDTo1FV16Gnay6fFQ6PTvoUlaN/XMSsW3ixGAlhumI6SKo6pyJxk2WOXdQzwx7RLDD3P1OUrQyRKix+ASsA3bCITmT2BGkOji8I96n1WanGyWQhhDgkEmWV36ZRLOs25p1uGTLhl8MCWBpEz54BixpBY/ghSj1pjvS3M/nIw2VbK4DJ9qkJeoGMFkpahkyw06A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sTgst8U5HGd8fa4h78KgvbfawLz9emEzbOPzAeE0J38=;
- b=YWrjoacL/UtMlXo8LoiRQnGP+yZ20CuGQ5KgOiljGMrhlCdipib6BZbRqahVH1ER0Fo0FBfTp1j+4tgjtSYdTJnJs4SrKHL487KecQhAeGN+TyccKGfZXRIuyj7pQa3KI5CmkcJTQ+OpbkY76ZZCfhm1J0qKq9O6tUEZK0AX3rdmBTIN5w7c90wPt28abm5zrgxXrLh6D1TNlQBCJRVBcnhwNOq5ZmZQ9sAPp3HVl05+Koa6dcuRWoJuaZlXMsXO4+9KXKBd6w5qQpPF3BwGYAuzSfk4b8OIkr8uhHbbhJ7EfNXh6+uS0U1bGcWHHAh5mv2OroSfcoqsghThSzAiHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sTgst8U5HGd8fa4h78KgvbfawLz9emEzbOPzAeE0J38=;
- b=LcPF5x2OsDjTrRrvcru25gE4Ui2HVQSqxLUde6uVbCh6OMMz/5ms4+1/DpOuT/6JyXJmfnscbpkvGsFFWB654UDJCfgWfgmztrWV/6kU150dWSQlMb+s9ti9iRuVQJj/252fFMnqILtT2m9equzFYVRkHqKBCGXib7I9idNkBuc=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4592.namprd12.prod.outlook.com (2603:10b6:806:9b::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.23; Tue, 20 Jul
- 2021 15:15:20 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
- 15:15:19 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 35/40] KVM: Add arch hooks to track the host
- write to guest memory
-To:     Sean Christopherson <seanjc@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-36-brijesh.singh@amd.com> <YPYLEksyzOWHZwpA@google.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <1f65ccb2-a627-8631-7638-d02186f7e1bc@amd.com>
-Date:   Tue, 20 Jul 2021 10:15:17 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YPYLEksyzOWHZwpA@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0170.namprd11.prod.outlook.com
- (2603:10b6:806:1bb::25) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S229761AbhGTPbe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jul 2021 11:31:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51232 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238910AbhGTPYG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Jul 2021 11:24:06 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 37FD9611F2;
+        Tue, 20 Jul 2021 16:03:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1626797029;
+        bh=RexYduiDyrByGI4q6reTkJMpr04SvMZQpUi8H7SBH+o=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=QiO4CnaqE9D2HYAyNkK8eZ+GZx4c+yijYGdskzyMM9yTni00bXUHbj3nkg0gmUBMJ
+         /8fL2Q2nVzrY61xHPkgFnRBojIdsjGid34rLtlc9GaSmHmbvVyxtanzq+Vj8lRpVCD
+         fiE3EVD3bF01UEIngsiW42jKFCbuGLh1/blQdm3DHPe5Q/bR8i/fIAJyEK+AtTXk/l
+         e2SjX87ah54hWBZA+TXbEAUvST/HpVHtfJKuXsiHrlwAyimRCSKwiDAhHgahLauWd+
+         bxuROpQGl4jwmjCrELjl55v4x8aw39oby3nlL3Cc/glxqx4u1HhmDuqIqbDsqjITNh
+         TphhSdN15te7A==
+Received: by mail-ot1-f54.google.com with SMTP id t4-20020a05683014c4b02904cd671b911bso13921343otq.1;
+        Tue, 20 Jul 2021 09:03:49 -0700 (PDT)
+X-Gm-Message-State: AOAM5332+b1FH126FAK2/v42D3jl2inC4BsDujTfEk1+PeoHp70h/7gU
+        02kWHbXjBnwPMvPOj4NNNhXJL9R+5S6FmhceDuc=
+X-Google-Smtp-Source: ABdhPJzRNqdOIoGbkEPrqqfA+1oR7N57WveTD+UPP5rN3Wm3eqyw7ggW6+PXoHkDHlZVVIM+uifkV39I7ABzS3BfQFI=
+X-Received: by 2002:a9d:2625:: with SMTP id a34mr17608761otb.77.1626797028466;
+ Tue, 20 Jul 2021 09:03:48 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.95] (165.204.77.1) by SA0PR11CA0170.namprd11.prod.outlook.com (2603:10b6:806:1bb::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.22 via Frontend Transport; Tue, 20 Jul 2021 15:15:18 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: eed7d445-ca15-452d-8aec-08d94b912fdc
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4592:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4592F514E01D86926B4DBB06E5E29@SA0PR12MB4592.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KqkfqpO4QiGdrTulybgw/CCbYjcDaSzlksB0B3geox8MuOn436W2krgRPDUNlh8XcluquGx4iyXb9fl1qcPaqPA2PxDYVkUXqmGiDOfz8mm67zwOMtCaKPcWXeFnZEm/t25nYkY5CYMDwINLeZrd7SBYpn55muVberaWNfLfkeoR2AlHgvKGfCPLxVVIxIspz6q/YlvXVecEQ6i+vm9+YSGriSK0yUKkQkHOVt9JjDAt7Nxu3KMSWDlet5vPy3B2ySN86aZe3IwSwPaen9vWTQ+LRsVGPSwYOYmWhyqlCrhM1ByD38wMctEMyxYVqeoyEGL01vLLm/ZpbDag2flVNkappeIDz94BCN3W2r31OR3j9AHu2+7ltp79KDj8NxCa7Co8icnYvPRaSNdj0mg83KxQj27brB6YMT8FrqKl+Rtjc7TOkGGy6WD8Xqd0a/HDyeIUYwTxDuwEjho7A1yN4iJt/9a8nqAs8vKNjEIsvLxJqxjLizzkntbBbcbZr2S8yEiby6MgD9G9RkuP998D17c6sBDPd7/n99ebuz9+mfq9c9xw0nAYePTHIrsVFaR0AJk+eR/EfHYZVT29vQnMRKTluE2Ydy+vT2GjUGWqCO7c/8Pab2zh1qOWHigTNqG0yT+jzmOupMqfPhrds8sFGeM5G6sw44hA7u+LT9ATSPRGXYrl/xyaPtLBBvufbTNVSZgFLkcQyRu3fBsM2lLrOENUoa9o2Swl8CkoKROSdgTuvIXvTQD3wY+e3qGf7+I+
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(396003)(376002)(366004)(136003)(31686004)(66946007)(7416002)(956004)(2616005)(54906003)(6916009)(5660300002)(52116002)(478600001)(53546011)(4326008)(7406005)(66556008)(66476007)(8676002)(86362001)(2906002)(16576012)(316002)(186003)(8936002)(83380400001)(36756003)(38350700002)(38100700002)(26005)(31696002)(6486002)(44832011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TktCUlVMTHovNmNwcnhTUERxU1JSK1Rjd1h1UWRYRjdlM1lESlBJdndHOVY5?=
- =?utf-8?B?Q2NyTDFqZUNPNW85MFYzbGdFemZwdkQ3RHNWNkxkSzZlTEZyWkpMbEtseFA0?=
- =?utf-8?B?ZGxlVjRHS0h4eXovb2lVd2l3V0F1c1hycHRaa1d4MGRlNkhkOXplSEh3TzBF?=
- =?utf-8?B?LzRRT2l1VnVadXhlbkV3WUtRUkdXQnRIWkNMN0gwamIrRU1PaDNPUjQrN0Ja?=
- =?utf-8?B?bEsxNXN2b1NvTTJJcWU2MloxK1ZSbjYrRlNzL1MvU3VtWUhTdHVQZTN5S3Az?=
- =?utf-8?B?QzdlSFhCZWd3M0hNcnlrRFMxN0ZXa3VlYmo3S1pSem5aZEF0ZDVqeTcyTkxQ?=
- =?utf-8?B?NXlRNGNtblI0U3BNSFd4S0xXc2VTd1NlRDVKdWN1UllYTjZmcG1QZk8wVS9M?=
- =?utf-8?B?UzJZem5rb3JhS1pUcHVqYmRqOEQ4MUFJZllCZnFRcmowSU90alJTVUJTTlZn?=
- =?utf-8?B?NXlremRiWGx1K3V6OTBRMXd2aFgxM3ZQZjIreHlIUTlkRkpIMDA0WXMwNVN0?=
- =?utf-8?B?Qlp5bWIyRnNKSUU5cUl1TVh0ZzZtMUl2OTVvb2MvU2xiZ0Rob0RXV2tQL2hN?=
- =?utf-8?B?U3VIdDl5VVB3d3VwNzJPSTgvVTBTQzIwQWtJQUZMdGRqSGlRZEZBcmJrQnM5?=
- =?utf-8?B?M0lWeTRLM203ejlVMnFVdlFENVlNcGRocmhZeStUTXltUUlsdjRMM2tlRkEr?=
- =?utf-8?B?WHBNRnJwb2Ixd0FRclVWcWpmZ1hKcGtYWFV5eGw5VjM0RHByMUxJOXVMYWs2?=
- =?utf-8?B?bDQrUGs2K0MvOEFwY21PU001bkpadGRBOGF0VHdUbmNtSngvTy8weGdpTUs2?=
- =?utf-8?B?QXp1dWlMaTlYUEJUeDlhNkI0bzJHbHlleGR6TldBTEp2SzBSdnZXYno5b2RX?=
- =?utf-8?B?WCt5c0dra2JRUWoyZVFXZUN1bDVOQ3RRb3RwYndsMVdvN0xvaFdVVkZMMkl0?=
- =?utf-8?B?SVIvNm1lWmZIdEZxdTd0em0ySTducWNrVnpKbFRRdEFWY1pIdDhITmZFWU1Q?=
- =?utf-8?B?V0ZRTHl6UDBxaE1FOTdqVXkzT2NBU1JPbGdPdVovWVBWQm5VejZIdWZKVG9W?=
- =?utf-8?B?dHRLallXM1dHY0M1b2dZNnh1aW91ZzQvZVQyMEFUeTdaaGZnM1VMSkdjR1pB?=
- =?utf-8?B?eDlPM1EzT0g3aGF0dGZGZWFlR0Qybk5GVFNvZGVtUmpzUDJaZks4cFRSK1I1?=
- =?utf-8?B?cHYxVWFEcWpxT29VUmMxZ1gxcyt3SytyV1FJaER6ckcvTFphb0dRZ3pnaWRt?=
- =?utf-8?B?QzBrWmlrdjZ1Q2hVd2Z2TktWMnVITUJvT1JoVnhid0hhNEJpNVkwTWl2bU1H?=
- =?utf-8?B?OEpRNkUzaXN4WTE2c2laSmFaWEszUXcwY2hOSXZRR0k1bVF2b1IwUnN4VXd3?=
- =?utf-8?B?TitSZW9BQzNhZkRVY2V4a0FBOGlndFU3aU1VZERSWUtFTnhhMzdQbGQrWWdj?=
- =?utf-8?B?Zm1nZXBkWlVqM3VQSDJVNmY1MDlQMnhBWlVCSHl6aW9idjUvQXdDVGVhV2p4?=
- =?utf-8?B?R2JFUjFlTUNJcjdVaHpyd3AzTGxqWVMvMzd2R1RNRlhWWkNsU1BYM2JudHBB?=
- =?utf-8?B?d3puMnpYSzNzdXhLRDFoTkFGWUlSUzZmQ1JTbjQ0RFdCL1NycmdqRCtSWXNt?=
- =?utf-8?B?bGJiRGtGUG5BZW0vSXVDSU9kNVk3SFZJbkRYdFc2RFFBVEZzeVJPc1dLUGlK?=
- =?utf-8?B?N1B1Sm5nRTNnTmQ1UWl2dE1JaklvVGkvKzY0M0hQYlA1Q1MxOW85RUtNdjJr?=
- =?utf-8?Q?zgprbwhv0F+AGBLNgRyjdsrpSVCQL1I6yPB99dk?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eed7d445-ca15-452d-8aec-08d94b912fdc
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 15:15:19.7807
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yOJWzogUwb3x2Jr0DcuWXwk8tm7R+PWjcPKt8yGLpX37pycvJmYx7EdlDiXZInH/STGHFp+3AOkN61oSvSGzxQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4592
+References: <20210720152158.31804-1-andre.przywara@arm.com>
+In-Reply-To: <20210720152158.31804-1-andre.przywara@arm.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 20 Jul 2021 18:03:37 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEW7DT3P3FuV+poFykf6wwm4FTJuV6emGSWabCp7UZX9A@mail.gmail.com>
+Message-ID: <CAMj1kXEW7DT3P3FuV+poFykf6wwm4FTJuV6emGSWabCp7UZX9A@mail.gmail.com>
+Subject: Re: [PATCH v2] hwrng: Add Arm SMCCC TRNG based driver
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
+        Ali Saidi <alisaidi@amazon.com>,
+        Jon Nettleton <jon@solid-run.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 7/19/21 6:30 PM, Sean Christopherson wrote:
-...>
-> NAK on converting RMP entries in response to guest accesses.  Corrupting guest
-> data (due to dropping the "validated" flag) on a rogue/incorrect guest emulation
-> request or misconfigured PV feature is double ungood.  The potential kernel panic
-> below isn't much better.
-> 
-
-I also debated myself whether its okay to transition the page state to 
-shared to complete the write operation. I am good with removing the 
-converting RMP entries from the patch, and that will also remove the 
-kernel panic code.
-
-
-> And I also don't think we need this heavyweight flow for user access, e.g.
-> __copy_to_user(), just eat the RMP violation #PF like all other #PFs and exit
-> to userspace with -EFAULT.
+On Tue, 20 Jul 2021 at 17:22, Andre Przywara <andre.przywara@arm.com> wrote:
 >
+> The "Arm True Random Number Generator Firmware Interface"[1] provides
+> an SMCCC based interface to a true hardware random number generator.
+> So far we are using that in arch_get_random_seed(), but it might be
+> useful to expose the entropy through the /dev/hwrng device as well. This
+> allows to assess the quality of the implementation, by using "rngtest"
+> from the rng-tools package, for example.
+>
+> Add a simple platform driver implementing the hw_random interface.
+> We unconditionally instantiate the platform device in the driver file,
+> then probe for the existence of the SMCCC TRNG implementation in the
+> driver's probe routine.
+> Since the firmware takes care about serialisation, this can happily
+> coexist with the arch_get_random_seed() bits.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>
+> [1] https://developer.arm.com/documentation/den0098/latest/
+> ---
+> Changelog v1 ... v2:
+> - fix building as a module
+> - de-register device upon exit
+> - mention module name in Kconfig
+>
+>  drivers/char/hw_random/Kconfig          |  14 ++
+>  drivers/char/hw_random/Makefile         |   1 +
+>  drivers/char/hw_random/arm_smccc_trng.c | 171 ++++++++++++++++++++++++
+>  3 files changed, 186 insertions(+)
+>  create mode 100644 drivers/char/hw_random/arm_smccc_trng.c
+>
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> index 3f166c8a4099..239eca4d6805 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -524,6 +524,20 @@ config HW_RANDOM_XIPHERA
+>           To compile this driver as a module, choose M here: the
+>           module will be called xiphera-trng.
+>
+> +config HW_RANDOM_ARM_SMCCC_TRNG
+> +       tristate "Arm SMCCC TRNG firmware interface support"
+> +       depends on HAVE_ARM_SMCCC_DISCOVERY
+> +       default HW_RANDOM
+> +       help
+> +         Say 'Y' to enable the True Random Number Generator driver using
+> +         the Arm SMCCC TRNG firmware interface. This reads entropy from
+> +         higher exception levels (firmware, hypervisor). Uses SMCCC for
+> +         communicating with the firmware:
+> +         https://developer.arm.com/documentation/den0098/latest/
+> +
+> +         To compile this driver as a module, choose M here: the
+> +         module will be called arm_smccc_trng.
+> +
+>  endif # HW_RANDOM
+>
+>  config UML_RANDOM
+> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+> index 8933fada74f2..a5a1c765a394 100644
+> --- a/drivers/char/hw_random/Makefile
+> +++ b/drivers/char/hw_random/Makefile
+> @@ -45,3 +45,4 @@ obj-$(CONFIG_HW_RANDOM_OPTEE) += optee-rng.o
+>  obj-$(CONFIG_HW_RANDOM_NPCM) += npcm-rng.o
+>  obj-$(CONFIG_HW_RANDOM_CCTRNG) += cctrng.o
+>  obj-$(CONFIG_HW_RANDOM_XIPHERA) += xiphera-trng.o
+> +obj-$(CONFIG_HW_RANDOM_ARM_SMCCC_TRNG) += arm_smccc_trng.o
+> diff --git a/drivers/char/hw_random/arm_smccc_trng.c b/drivers/char/hw_random/arm_smccc_trng.c
+> new file mode 100644
+> index 000000000000..3bd510a98882
+> --- /dev/null
+> +++ b/drivers/char/hw_random/arm_smccc_trng.c
+> @@ -0,0 +1,171 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Randomness driver for the ARM SMCCC TRNG Firmware Interface
+> + * https://developer.arm.com/documentation/den0098/latest/
+> + *
+> + *  Copyright (C) 2020 Arm Ltd.
+> + *
+> + * The ARM TRNG firmware interface specifies a protocol to read entropy
+> + * from a higher exception level, to abstract from any machine specific
+> + * implemenations and allow easier use in hypervisors.
+> + *
+> + * The firmware interface is realised using the SMCCC specification.
+> + */
+> +
+> +#include <linux/bits.h>
+> +#include <linux/device.h>
+> +#include <linux/hw_random.h>
+> +#include <linux/module.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/arm-smccc.h>
+> +
+> +#ifdef CONFIG_ARM64
+> +#define ARM_SMCCC_TRNG_RND     ARM_SMCCC_TRNG_RND64
+> +#define MAX_BITS_PER_CALL      (3 * 64UL)
+> +#else
+> +#define ARM_SMCCC_TRNG_RND     ARM_SMCCC_TRNG_RND32
+> +#define MAX_BITS_PER_CALL      (3 * 32UL)
+> +#endif
+> +
+> +/* We don't want to allow the firmware to stall us forever. */
+> +#define SMCCC_TRNG_MAX_TRIES   20
+> +
+> +#define SMCCC_RET_TRNG_INVALID_PARAMETER       -2
+> +#define SMCCC_RET_TRNG_NO_ENTROPY              -3
+> +
+> +static struct platform_device *smccc_trng_pdev;
+> +
 
-Yes, we could improve the __copy_to_user() to eat the RMP violation. I 
-was tempted to go on that path but struggled to find a strong reason for 
-it and was not sure if that accepted. I can add that support in next rev.
+Can we split the platform device and the platform driver? The platform
+device should be registered by the core code once it discovers the
+SMCCC TRNG availabily. The platform driver can then use ordinary
+module alias autoloading etc based on the platform device availabilty.
+
+This requires the following to be added though
+
+MODULE_ALIAS("platform: smccc_trng")
+
+but all the smccc calls could be dropped from the probe function in that case.
 
 
 
-> kvm_vcpu_map() and friends might need the manual lookup, at least initially, 
-
-Yes, the enhancement to the __copy_to_user() does not solve this problem 
-and for it we need to do the manually lookup.
-
-
-but
-> in an ideal world that would be naturally handled by gup(), e.g. by unmapping
-> guest private memory or whatever approach TDX ends up employing to avoid #MCs.
-
-> 
->> +	 */
->> +	if (rmpentry_assigned(e)) {
->> +		pr_err("SEV-SNP: write to guest private gfn %llx\n", gfn);
->> +		rc = snp_make_page_shared(kvm_get_vcpu(kvm, 0),
->> +				gfn << PAGE_SHIFT, pfn, PG_LEVEL_4K);
->> +		BUG_ON(rc != 0);
->> +	}
->> +}
-> 
-> ...
-> 
->> +void kvm_arch_write_gfn_begin(struct kvm *kvm, struct kvm_memory_slot *slot, gfn_t gfn)
->> +{
->> +	update_gfn_track(slot, gfn, KVM_PAGE_TRACK_WRITE, 1);
-> 
-> Tracking only writes isn't correct, as KVM reads to guest private memory will
-> return garbage.  Pulling the rug out from under KVM reads won't fail as
-> spectacularly as writes (at least not right away), but they'll still fail.  I'm
-> actually ok reading garbage if the guest screws up, but KVM needs consistent
-> semantics.
-> 
-> Good news is that per-gfn tracking is probably overkill anyways.  As mentioned
-> above, user access don't need extra magic, they either fail or they don't.
-> 
-> For kvm_vcpu_map(), one thought would be to add a "short-term" map variant that
-> is not allowed to be retained across VM-Entry, and then use e.g. SRCU to block
-> PSC requests until there are no consumers.
-> 
-
-Sounds good to me, i will add the support in the next rev.
-
-thanks
+> +static int smccc_trng_init(struct hwrng *rng)
+> +{
+> +       return 0;
+> +}
+> +
+> +static int copy_from_registers(char *buf, struct arm_smccc_res *res,
+> +                              size_t bytes)
+> +{
+> +       unsigned int chunk, copied;
+> +
+> +       if (bytes == 0)
+> +               return 0;
+> +
+> +       chunk = min(bytes, sizeof(long));
+> +       memcpy(buf, &res->a3, chunk);
+> +       copied = chunk;
+> +       if (copied >= bytes)
+> +               return copied;
+> +
+> +       chunk = min((bytes - copied), sizeof(long));
+> +       memcpy(&buf[copied], &res->a2, chunk);
+> +       copied += chunk;
+> +       if (copied >= bytes)
+> +               return copied;
+> +
+> +       chunk = min((bytes - copied), sizeof(long));
+> +       memcpy(&buf[copied], &res->a1, chunk);
+> +
+> +       return copied + chunk;
+> +}
+> +
+> +static int smccc_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+> +{
+> +       struct arm_smccc_res res;
+> +       u8 *buf = data;
+> +       unsigned int copied = 0;
+> +       int tries = 0;
+> +
+> +       while (copied < max) {
+> +               size_t bits = min_t(size_t, (max - copied) * BITS_PER_BYTE,
+> +                                 MAX_BITS_PER_CALL);
+> +
+> +               arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND, bits, &res);
+> +               if ((int)res.a0 < 0)
+> +                       return (int)res.a0;
+> +
+> +               switch ((int)res.a0) {
+> +               case SMCCC_RET_SUCCESS:
+> +                       copied += copy_from_registers(buf + copied, &res,
+> +                                                     bits / BITS_PER_BYTE);
+> +                       tries = 0;
+> +                       break;
+> +               case SMCCC_RET_TRNG_NO_ENTROPY:
+> +                       if (!wait)
+> +                               return copied;
+> +                       tries++;
+> +                       if (tries >= SMCCC_TRNG_MAX_TRIES)
+> +                               return copied;
+> +                       cond_resched();
+> +                       break;
+> +               }
+> +       }
+> +
+> +       return copied;
+> +}
+> +
+> +static int smccc_trng_probe(struct platform_device *pdev)
+> +{
+> +       struct arm_smccc_res res;
+> +       struct hwrng *trng;
+> +       u32 version;
+> +       int ret;
+> +
+> +       /* We need ARM SMCCC v1.1, with its autodetection feature. */
+> +       if (arm_smccc_get_version() < ARM_SMCCC_VERSION_1_1)
+> +               return -ENODEV;
+> +
+> +       arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_VERSION, &res);
+> +       if ((int)res.a0 < 0)
+> +               return -ENODEV;
+> +       version = res.a0;
+> +
+> +       arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_FEATURES,
+> +                            ARM_SMCCC_TRNG_RND, &res);
+> +       if ((int)res.a0 < 0)
+> +               return -ENODEV;
+> +
+> +       trng = devm_kzalloc(&pdev->dev, sizeof(*trng), GFP_KERNEL);
+> +       if (!trng)
+> +               return -ENOMEM;
+> +
+> +       trng->name = "smccc_trng";
+> +       trng->init = smccc_trng_init;
+> +       trng->read = smccc_trng_read;
+> +
+> +       platform_set_drvdata(pdev, trng);
+> +       ret = devm_hwrng_register(&pdev->dev, trng);
+> +       if (ret)
+> +               return -ENOENT;
+> +
+> +       dev_info(&pdev->dev,
+> +                "ARM SMCCC TRNG firmware random number generator v%d.%d\n",
+> +                version >> 16, version & 0xffff);
+> +
+> +       return 0;
+> +}
+> +
+> +static struct platform_driver smccc_trng_driver = {
+> +       .driver = {
+> +               .name           = "smccc_trng",
+> +       },
+> +       .probe          = smccc_trng_probe,
+> +};
+> +
+> +static int __init smccc_trng_driver_init(void)
+> +{
+> +       smccc_trng_pdev = platform_device_register_simple("smccc_trng",
+> +                                                         -1, NULL, 0);
+> +       if (IS_ERR(smccc_trng_pdev))
+> +               return PTR_ERR(smccc_trng_pdev);
+> +
+> +       return platform_driver_register(&smccc_trng_driver);
+> +}
+> +module_init(smccc_trng_driver_init);
+> +
+> +static void __exit smccc_trng_driver_exit(void)
+> +{
+> +       platform_driver_unregister(&smccc_trng_driver);
+> +       platform_device_unregister(smccc_trng_pdev);
+> +}
+> +module_exit(smccc_trng_driver_exit);
+> +
+> +MODULE_AUTHOR("Andre Przywara");
+> +MODULE_LICENSE("GPL");
+> --
+> 2.17.6
+>
