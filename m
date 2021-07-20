@@ -2,171 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F20C07E95
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 22:06:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F449C07E95
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 22:08:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 412BB61019
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 22:06:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5808561009
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 22:08:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229866AbhGTVZz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 17:25:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32976 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229818AbhGTVZy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 17:25:54 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64591C061762
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jul 2021 15:06:29 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id g6-20020a17090adac6b029015d1a9a6f1aso2566735pjx.1
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jul 2021 15:06:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=BB0NGsGv3epWhxiQYCc03cLFHcDOFlK36/5xOhr9iGo=;
-        b=G60QHWuyRH6eWtLou5HaWRxEN7Yq6nKV9T1iAIqyAq6fVrq1WWQgHIEV53g1ohgNc9
-         EQohQSGMoRnwcSERx2WtsFUY2oBHP2L7o6RLWdjM/8DnxS/jS2gR62e2ZdzQzsD/Cfqi
-         t26NKDlXSIHcL8jfXQ4F7qrg5pPOvQuoI2mBqA5sqIxf4jaH3gQ080WBkK8r5zzKZj6Q
-         G/9z8dSeMgvga8DzcwvEltKCTyVWefclmiDtlzTovNTWLqmL4Y7wltkF8n7JL2lbJV27
-         Rqq2Y/zqOcIZ3UnQEC1ynwVVGlNk1MtMr3wIXyYacV1olaGdhCMiOjk/TQIOvra62SgO
-         XgXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=BB0NGsGv3epWhxiQYCc03cLFHcDOFlK36/5xOhr9iGo=;
-        b=QUkEXVLlkPFXzBe70+W4dMjgKzVyAVCWEpLqhigB9zDxn6+ptcYCIn3iNBPR0oZ23c
-         gpMa3zUNpFdIA2kJ1EKKrQcin3gyKEeEIBjeLwO0qMx7puQY9bAgBJQcH5TQPMmEu/UD
-         0N8F7fLPYQixZysbLQAkHGHOyodOPInY2WJLXr8H04oTCIGWBdk5TGcui1OnGD+aGMjV
-         TexBQ5JGe6T3vOPJ6anuTC/Ng4lH9lqglPunDjmD0wpJ44aAChF/A9gbCGibxoGrqWU7
-         fXjuKdN98+Yz+UChXvTaPzybI9kVgKjMhQb4viWDF0lzHZkAVrv8/8NJpyEDI+2rW09L
-         VG1Q==
-X-Gm-Message-State: AOAM533FPZggFzy/Cb/VlLG/HyLOdmUdYUWopg36bNKy3VQ8IqYRkrUR
-        G8W4B9vVLsM9Bq8hAe3rl6hRHQ==
-X-Google-Smtp-Source: ABdhPJwDD9+zuJ6DYICNGOinctEj1Edxq+hD2yj+AdZXjLWVr+ao/12i42Q3S8W5xw+1pKf5QwmK4Q==
-X-Received: by 2002:a17:90a:4295:: with SMTP id p21mr30863822pjg.149.1626818788641;
-        Tue, 20 Jul 2021 15:06:28 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id w184sm419793pfw.85.2021.07.20.15.06.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 15:06:27 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 22:06:24 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 05/40] x86/sev: Add RMP entry lookup helpers
-Message-ID: <YPdI4JLrJJdPxy7e@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-6-brijesh.singh@amd.com>
- <YPCAZaROOHNskGlO@google.com>
- <437a5230-64fc-64ab-9378-612c34e1b641@amd.com>
- <39be0f79-e8e4-fd4a-5c4a-47731c61740d@amd.com>
+        id S230351AbhGTV1C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jul 2021 17:27:02 -0400
+Received: from gate.crashing.org ([63.228.1.57]:54531 "EHLO gate.crashing.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230123AbhGTV0l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Jul 2021 17:26:41 -0400
+Received: from ip6-localhost (localhost.localdomain [127.0.0.1])
+        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 16KM2gSN032638;
+        Tue, 20 Jul 2021 17:02:43 -0500
+Message-ID: <e494866f38e9dcd2834971d3867244fb1d7e6ceb.camel@kernel.crashing.org>
+Subject: Re: [PATCH v2] hwrng: Add Arm SMCCC TRNG based driver
+From:   Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Cc:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
+        Ali Saidi <alisaidi@amazon.com>,
+        Jon Nettleton <jon@solid-run.com>
+Date:   Wed, 21 Jul 2021 08:02:42 +1000
+In-Reply-To: <20210720171631.071f84f5@slackpad.fritz.box>
+References: <20210720152158.31804-1-andre.przywara@arm.com>
+         <CAMj1kXEW7DT3P3FuV+poFykf6wwm4FTJuV6emGSWabCp7UZX9A@mail.gmail.com>
+         <20210720171631.071f84f5@slackpad.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <39be0f79-e8e4-fd4a-5c4a-47731c61740d@amd.com>
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 16, 2021, Brijesh Singh wrote:
-> 
-> On 7/15/21 2:28 PM, Brijesh Singh wrote:
-> >> Looking at the future patches, dump_rmpentry() is the only power user,
-> >> e.g.  everything else mostly looks at "assigned" and "level" (and one
-> >> ratelimited warn on "validated" in snp_make_page_shared(), but I suspect
-> >> that particular check can and should be dropped).
-> >
-> > Yes, we need "assigned" and "level" and other entries are mainly for
-> > the debug purposes.
-> >
-> For the debug purposes, we would like to dump additional RMP entries. If
-> we go with your proposed function then how do we get those information
-> in the dump_rmpentry()?
+On Tue, 2021-07-20 at 17:16 +0100, Andre Przywara wrote:
+> Yes, a similar idea was already brought up before. I think there is even
+> the potential for something like an artificial SMCCC "bus", where those
+> services presentable as devices could be auto-detected (by checking
+> known function IDs), the respective drivers would then probe
+> automatically?
 
-As suggested below, move dump_rmpentry() into sev.c so that it can use the
-microarchitectural version.  For debug, I'm pretty that's what we'll want anyways,
-e.g. dump the raw value along with the meaning of various bits.
+Sounds like a boot time killer... can we instead describe them in DT
+and/or ACPI ?
 
-> How about if we provide two functions; the first
-> function provides architectural format and second provides the raw
-> values which can be used by the dump_rmpentry() helper.
-> 
-> struct rmpentry *snp_lookup_rmpentry(unsigned long paddr, int *level);
-> 
-> The 'struct rmpentry' uses the format defined in APM Table 15-36.
-> 
-> struct _rmpentry *_snp_lookup_rmpentry(unsigned long paddr, int *level);
-> 
-> The 'struct _rmpentry' will use include the PPR definition (basically
-> what we have today in this patch).
-> 
-> Thoughts ?
+Cheers,
+Ben.
 
-Why define an architectural "struct rmpentry"?  IIUC, there isn't a true
-architectural RMP entry; the APM defines architectural fields but doesn't define
-a layout.  Functionally, making up our own struct isn't a problem, I just don't
-see the point since all use cases only care about Assigned and Page-Size, and
-we can do them a favor by translating Page-Size to X86_PG_LEVEL.
 
-> >> /*
-> >>   * Returns 1 if the RMP entry is assigned, 0 if it exists but is not
-> >>   * assigned, and -errno if there is no corresponding RMP entry.
-> >>   */
-> >> int snp_lookup_rmpentry(struct page *page, int *level)
-> >> {
-> >>     unsigned long phys = page_to_pfn(page) << PAGE_SHIFT;
-> >>     struct rmpentry *entry, *large_entry;
-> >>     unsigned long vaddr;
-> >>
-> >>     if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> >>         return -ENXIO;
-> >>
-> >>     vaddr = rmptable_start + rmptable_page_offset(phys);
-> >>     if (unlikely(vaddr > rmptable_end))
-> >>         return -EXNIO;
-> >>
-> >>     entry = (struct rmpentry *)vaddr;
-> >>
-> >>     /* Read a large RMP entry to get the correct page level used in
-> >> RMP entry. */
-> >>     vaddr = rmptable_start + rmptable_page_offset(phys & PMD_MASK);
-> >>     large_entry = (struct rmpentry *)vaddr;
-> >>     *level = RMP_TO_X86_PG_LEVEL(rmpentry_pagesize(large_entry));
-> >>
-> >>     return !!entry->assigned;
-> >> }
-> >>
-> >>
-> >> And then move dump_rmpentry() (or add a helper) in sev.c so that "struct
-> >> rmpentry" can be declared in sev.c.
