@@ -2,188 +2,144 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04402C07E95
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A37C636C8
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:49:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D565461165
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:06:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CC9060FEA
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jul 2021 20:49:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229627AbhGTTZi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 15:25:38 -0400
-Received: from mail-mw2nam10on2043.outbound.protection.outlook.com ([40.107.94.43]:60768
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229554AbhGTTZ1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 15:25:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a2Tg41tTwexHWhLxvgT1KuurmLIe+BeOdHRbtCvhYqzS5MHP6FIYexuQcGjYszmlud0vODK4e9l/bgiIhaF8Mwmr1mgsYIP1IqVnuv+PT/ZDGvidjunBjk4aA1JTJtJKiDk75kLz+zUVYGvMkluvRc0nG7rM1ixBCE+X+N9mOs2JdZoB3AXPc9KmyGGKEXunBZ1DIGI1KkP7QKa3GbubKZmaLBLDNqErq450fmHQZQA2Vi1RMahj0tFyHALhoM6mPLpiCQhL6wcBjz9Mdf3iIT/npdu74ijVw34QaTn8EXtGKL8jG2igSu/Q+QoAcuDUjF16bnFBo0Z0A5eBsqPt9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q+SeTQNPSG5lVB6kD2qA1GHg+mKjGMSM1+9wnMYn2Fg=;
- b=bJQxPeg4vM4bFVaonrgMtnqmiyXwjjH3tKiV5stSGc86x1TAwtVozbVmcq+9qeJdKbJWWP2OtzoTmutJLm1FveB0Y+VT4DVMpEvY70DF1Q1uoLv1hVijqnO8mSkYoXwvpdEP6rgmb/jjb7mDroWuh2C+pYIkR5jLEr0ohj5y6nV7G7C8sqJM1N1JYLoSLDdM8Mo/FSgAIBN09j/oNMALDad9drQdgs0DHXS6kxWnxSLYP4POkg/FUdD+bqPA/Tqb2d1E1/jKq+9JEjQW0F/3GxvBCMUrIdhsLM/Lq+KPhXjLSllKlnJzyukDg5jDNsLpU7eik2W4joDZmzIE7Umtpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q+SeTQNPSG5lVB6kD2qA1GHg+mKjGMSM1+9wnMYn2Fg=;
- b=UREJsggq2CgYH8wJI1SeBPEJvB6Jjg3fEyPuRvZgRXs+7QP1lUjDWvot31rIU6kijmYK2o0kfE8e62/q4fBRzLubgJMBXsaoolJkeajOHm2LYQZQAcxD9Mwz2ilU0LrXQNBoJwfv/CsGh/XGLE+WgFKEOkYL/m1SIvhex4jC1aE=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN1PR12MB2368.namprd12.prod.outlook.com (2603:10b6:802:32::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21; Tue, 20 Jul
- 2021 20:06:02 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
- 20:06:02 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 27/40] KVM: X86: Add kvm_x86_ops to get the
- max page level for the TDP
-To:     Sean Christopherson <seanjc@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-28-brijesh.singh@amd.com> <YPHbxAVbuFk6Xtkj@google.com>
- <1ed3c439-a02c-7182-b140-32cddd5e4f34@amd.com> <YPcmJuKHFYjCgpqd@google.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <afa7bd42-ce18-c89e-3f54-cbf197143678@amd.com>
-Date:   Tue, 20 Jul 2021 15:06:00 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YPcmJuKHFYjCgpqd@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+        id S235378AbhGTUIm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jul 2021 16:08:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55974 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236896AbhGTTpQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Jul 2021 15:45:16 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16KK4bK2023434;
+        Tue, 20 Jul 2021 16:24:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=6d0AvtuBA/mdM+Xm+jajpNkrlEgOYj7D9PlUbi2xZB4=;
+ b=V4zOHp+W0kVwdjd25UFD8InNd5+irwbyCnzI9y3RmjFPUQ12T41Kpwozn5isTwnh7pQq
+ +ra/ibOqCusdT8/wYLkkUMjdk1cAOuBfLcuD6F+q7iS/Mwpr9alu4WiMU7QmFVH5Cjpx
+ V8Vc9lCAQ/gkzrB3regmEONyJjMZVbeAMpyAK7jBq1hCbWWEpdjesgO9C2KqZRHx2uik
+ oacNlYSIedCv5ldJqIqOIE3C72zhbuCy/hfm4/Zn0nEowT+iKHg6d4XPWcW/duPwUQcz
+ 3Bbt1pHc/Cvo4bJIBsnxHu0udqNeYNW/tdB3o3X7JvAD2JjrquSAoKWJ3Yc6994l+mRT 0Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39wy71wjmh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Jul 2021 16:24:59 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16KK6Adj032512;
+        Tue, 20 Jul 2021 16:24:58 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39wy71wjkw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Jul 2021 16:24:58 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16KKCqSp012806;
+        Tue, 20 Jul 2021 20:24:56 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 39vng714qm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Jul 2021 20:24:55 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16KKOrF527066780
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Jul 2021 20:24:53 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F24BA42047;
+        Tue, 20 Jul 2021 20:24:52 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A1E5D42042;
+        Tue, 20 Jul 2021 20:24:47 +0000 (GMT)
+Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.68.252])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 20 Jul 2021 20:24:47 +0000 (GMT)
+Message-ID: <40e167cca7b59fc4e11f45ba807486e11eade419.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 6/6] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Richard Weinberger <richard.weinberger@gmail.com>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc:     Richard Weinberger <richard@nod.at>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        kernel <kernel@pengutronix.de>, James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        horia geanta <horia.geanta@nxp.com>,
+        aymen sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        davem <davem@davemloft.net>, Udit Agarwal <udit.agarwal@nxp.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        david <david@sigma-star.at>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        "open list, ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        LSM <linux-security-module@vger.kernel.org>
+Date:   Tue, 20 Jul 2021 16:24:46 -0400
+In-Reply-To: <CAFLxGvxr94apP2jaT0tB6JRDtv_ivrguXK2Ykd3zer_4xtJ+2w@mail.gmail.com>
+References: <cover.1dfbb73645d917b3c76d01290804a3410bd9932e.1624364386.git-series.a.fatoum@pengutronix.de>
+         <39e6d65ca5d2a0a35fb71d6c1f85add8ee489a19.1624364386.git-series.a.fatoum@pengutronix.de>
+         <1850833581.13438.1625172175436.JavaMail.zimbra@nod.at>
+         <2f608e5a-5a12-6db1-b9bd-a2cd9e3e3671@pengutronix.de>
+         <783613027.15909.1625223222889.JavaMail.zimbra@nod.at>
+         <ac8ef66f-4d57-ead0-d1b3-e97220463241@pengutronix.de>
+         <CAFLxGvxr94apP2jaT0tB6JRDtv_ivrguXK2Ykd3zer_4xtJ+2w@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR11CA0017.namprd11.prod.outlook.com
- (2603:10b6:806:6e::22) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.95] (165.204.77.1) by SA9PR11CA0017.namprd11.prod.outlook.com (2603:10b6:806:6e::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Tue, 20 Jul 2021 20:06:01 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 59c0da7f-26e9-45e8-b7ba-08d94bb9cc76
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2368:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2368AA507D75DABEBFAE8349E5E29@SN1PR12MB2368.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fqtE5AB1POCPOaQZ3bFRMae/5mC+yByn6wrfaMoZ+19Hqe+orM3RXC6kn8JlEosucKFttdTmBVT2YmvMT8kKIJNf3n+vrv641YQfZjSQrHUia0cEpfiK5PS69k3MRVLL52mtsGJYvNbcJJebTqg1CJ9EW4sTtG27DJfsgmazEYoYMUZtnc+xAOoLqzcIRu3bhZelesqY+9pV1+HRxKay4RxXhY/OWWIad/fZx5kV5V1tyQuxywOF8DwRE+rLwK3IZNUAla8uwtIPj44mrYyLRVzKrpY6yO3KnP5C1z734hzILKnWu1+TVreq0NPfkgOoKAdupo6Dz+lMPtgj8JapAlMJ3AdHi5WMT/0LHTdMuVYhOhnXVPPA/bTvP0mkJn+H66UMpZdMi9iZS4VwmcRw5iGpqe0HGvBnhkMkX1z45pfYYxL77VrebyBFVQ3UMjcQdZ2XEoNL8YE1/8xVz8isu2IzZuFFiDXGBs25CGQZzDutuM0PIqRlPAaz5rB+M3ZJHUgWU8C0DWDNBluTRbRMCHgTOMKVwsw0MakPdu/k9ok5SwnT9f4gBGWpzBiG/jfOzx8qXmIRi2AE/xAShtBFH5GiKp51cHUL+7+H3jW/OOAVnogQ2dRG6jp6nMUxeCrYm08D3pyXwIQcL2VnelcrhJ4qpJEjqLegZaniFjMhuDAssnb3P/xMm9mOercgkbTv8o2Z1lUfr5EEErfJCCvSmoxYKlWnQrkqVirFXrq7sDyvthWxj6nQEd4lnh1z7AdN/RkoUf8ohhdUJOaOTbxtoB9udvmhxCHNjxyAQenwMkQ0Dip1KGZXAhyYLpE7LcX383knreUWnFK1x1/Efub8dULhk1cNVWQC9+ShemjOssENZxV7dxZr65/hk4zse0Ub
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(346002)(396003)(366004)(136003)(54906003)(31686004)(956004)(186003)(26005)(66556008)(86362001)(44832011)(66476007)(7406005)(31696002)(66946007)(8676002)(966005)(52116002)(2616005)(53546011)(7416002)(6486002)(4326008)(478600001)(16576012)(83380400001)(36756003)(38100700002)(5660300002)(316002)(45080400002)(2906002)(8936002)(38350700002)(6916009)(15583001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R3dyUHBmdWJBTWE2Wkk3SEU2djZOVzZNd0FxSitJVkpZR3g4azB1STFhRlRP?=
- =?utf-8?B?OUdDVDIyUldmbXZIOVhzVUFQbUcyTFlrakhUa0Y4bVVIOW1iZ2FEcEdxbW85?=
- =?utf-8?B?S0UySmxNeXYwVWptNDFIQ2hibG9tYm1qZlBEaEFmS1RZVExzbE55RGliOENU?=
- =?utf-8?B?L2xlaXBHa3RtazBVd3ZyamViWjAya2oxRmRCTkF0RUdoTzlhUjZEYjV2ZXZZ?=
- =?utf-8?B?SVZHODVCREwyNXNyanVqVzdvR3NoSXJlQnBvUkRSMmlWOEFOL2NyWk9GVWFM?=
- =?utf-8?B?Y2xlYzBXOVVSbm0rb1QrVHRCazVIbEs4b3dub0dTOFEwMG9UZndFWE5Yc0h0?=
- =?utf-8?B?MTd6WTcrbk1RcEUyRmJhK3ZCVGgwTkxKZ3ZuaWpGYkx5d1FaRlg5RmxFVVRF?=
- =?utf-8?B?a3ByWUhITEJXbGRPTjJ5YURvMVFncXJXM3F1Wkl5NDEzNDZPK2tBdHZTNDFU?=
- =?utf-8?B?ZmJaaG1kcGY3N0dOc1RHNHh6SjJrb2E1R3c5TW4xdmx6SExrOGNUd2laakEy?=
- =?utf-8?B?QXlrcW5YcHQ2a0x3VkJWbjhVZUhwTTZranhYVkdJSFhYeVZUOTdoNTJoQ29n?=
- =?utf-8?B?dEFSb0NYZjdrVWZhTWM3bHJmdEx1SFlIakM5RkQ1dmhZWVBZeHg2dFNYd2dk?=
- =?utf-8?B?bDkxMm1kODZldW5uUG5DaUdMdFFzdktuSExOMVVCSEtBTS95cnFhbXVza1Z4?=
- =?utf-8?B?RU1hRzJSdDE0VFBwWEthZ21IY3hCakwwSHF6NzZPU1RjaTU2ekpOc1FiVXM5?=
- =?utf-8?B?Wkdzb042OFJwd0grekJ0d00rd3IzbTBsQzV3aFpUS1B5VEZWWjZ4TVdkRFZP?=
- =?utf-8?B?Y1dSUmFycFgzRVBSdmhpczVxUUIxWHplWTJIMVUzZ2VXdUFqOGpIRFI3UWNx?=
- =?utf-8?B?TEd4TDFhTHhPSGxKVTFYaGdWeWswTTdEQzdzRjBWREdSWjNUSkdXL0tBSHlq?=
- =?utf-8?B?aVJYVVFyVnphcjk4S3VpVWZwZHBjS0grVWVxbjRJTkdXcHB4YWFBN0ZrRmlS?=
- =?utf-8?B?ZHNBaGlCeG9MdHhQcTEvOWRLWHdJYmhyTmtKV2txK2JBZEhIaVJGSnJYZFF6?=
- =?utf-8?B?ajRGNXkvay9xOTFudHVZQTRTMFlVYVpmclJXTmdHcEJBZWxTTGttUDZGVnU2?=
- =?utf-8?B?ZE1Wcy9mV2Zmbzd1YXBVTlBRRWhFa0NFSXFieVhLOXNvb25iUWVUMXRqdUM2?=
- =?utf-8?B?OUdlNFowaGJ3NTM1T0xod1dSRldobmVlRVdFekhNZ1dpQkVUSUNxL2NXU0w1?=
- =?utf-8?B?U0pxNG9aZFl6TkxFZkdQRmpVZ0sxZm1UWjQxdlRZTVpQa3J3bVE3SHJLMzVv?=
- =?utf-8?B?OW9LV2ZtVVo5aitDRHlGUDVjZEVuMEZKNlZPRTNuM01mVG1NUWlMcGZuU0lK?=
- =?utf-8?B?K1U1U2w3M2gxVXl1MzBCWXlrSzIzRnozQVRPM1UybWNXVUlXQzV6UUw4VGEy?=
- =?utf-8?B?Ull1WXdMTEhKV0JMbWRVWWRwdVZYR3BBOWNlQTg4Y2dEYmM4ZWMza21NL2xl?=
- =?utf-8?B?REczVklxZitnL2d2UEg4RTIzODExZXI5SFdnYVlDUEF5UVhZeFJVS2hQNU5T?=
- =?utf-8?B?U0hzZUs0ZlBaUktsa1Y1WWNsQnl4UVNBVjVkaW1RZ3A3aUtQSHJaZ29PYlRC?=
- =?utf-8?B?ZmtyanRiQVhBZU85M1kzaUV2Um1hTXc0MDhVVi9JcVo2YzBWTnZpTlJRQ0E2?=
- =?utf-8?B?ZUdpMVpMekR1ZXladWlWdW9ON1ZQWWlsZUc1SUh4SCtGd2l6c3RDSDZJMUhm?=
- =?utf-8?Q?qRM1v3YMvGKcqifWHzBa5yQ0i2sHO1WG/cSKc7P?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 59c0da7f-26e9-45e8-b7ba-08d94bb9cc76
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 20:06:02.4539
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dQxtMvWqoHP6oU+UcxhCsHxlE2b7XCgXXQo6SAmkw02/YWQrUKqdJs6lJjBZNDdjcCcvkWTjRwSa4uRvCVioeg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2368
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IEFJRJOHfvwOngpKt1XIsPonFtReajLI
+X-Proofpoint-ORIG-GUID: wkYED_fW-_xDkCD6flgnu-e43ZxxTkI5
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-20_13:2021-07-19,2021-07-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 clxscore=1011 suspectscore=0 mlxlogscore=999
+ spamscore=0 mlxscore=0 malwarescore=0 adultscore=0 phishscore=0
+ impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104190000 definitions=main-2107200128
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+HI -
 
-
-On 7/20/21 2:38 PM, Sean Christopherson wrote:
-...
-
+On Tue, 2021-07-20 at 21:19 +0200, Richard Weinberger wrote:
+> On Fri, Jul 2, 2021 at 2:37 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> > > Both is possible. If the string starts with "0x" it needs to be decoded to a
+> > > 128 bit key. Otherwise it has to be a up to 16 byte string.
+> >
+> > Fine by me. Looking forward to your patches. :-)
 > 
-> The other option is to use vm_type, which TDX is already planning on leveraging.
-> Paolo raised the question of whether or not the TDX type could be reused for SNP.
-> We should definitely sort that out before merging either series.  I'm personally
-> in favor of separating TDX and SNP, it seems inevitable that common code will
-> want to differentiate between the two.
-
-Yes, I did saw that and it seems much better.
-
+> I'm not sure how to proceed.  Should I base my changes on this series
+> or do you plan to send an updated
+> version soon?
+> Maybe it makes also sense to base my DCP patch set on yours.
 > 
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flkml.kernel.org%2Fr%2F8eb87cd52a89d957af03f93a9ece5634426a7757.1625186503.git.isaku.yamahata%40intel.com&amp;data=04%7C01%7Cbrijesh.singh%40amd.com%7Cb658fcf339234fd9030d08d94bb5edf1%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637624067039647374%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=tdVALNsQGer0Z69%2FyYaRqWYZvH27k%2BmgHdslQlJ7qlU%3D&amp;reserved=0
-> 
+> Trusted Keys maintainers, what do you prefer?
 
-...
+Jarkko sent an email saying he is on vacation for 2 weeks.   James was
+on vacation as well.   If there is something that needs immediate
+attention, please let me know.
 
->>
->> There is yet another reason why we can't avoid the PSMASH after doing
->> everything to ensure that NPT and RMP are in sync. e.g if NPT and RMP
->> are programmed with 2mb size but the guest tries to PVALIDATE the page
->> as a 4k. In that case, we will see #NPF with page size mismatch and have
->> to perform psmash.
-> 
-> Boo, there's no way to communicate to the guest that it's doing PVALIDATE wrong
-> is there?
-> 
+thanks,
 
-if the guest chooses smaller page-size then we don't have any means to 
-notify the guest; the hardware will cause an #NPF and its up to the 
-hypervisor to resolve the fault.
+Mimi
 
-However, if the guest attempts to validate with the larger page-level 
-(e.g guest using 2mb and RMP entry was 4k) then PVALIDATE will return 
-SIZEMISMATCH error to the guest.
-
-thanks
