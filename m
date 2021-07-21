@@ -2,140 +2,267 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65604C636C9
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 12:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D05D0C636CA
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 16:05:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4639E6120E
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 12:11:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B07ED60FF3
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 16:05:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236787AbhGULac (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Jul 2021 07:30:32 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:36375 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234243AbhGULab (ORCPT
+        id S230164AbhGUPYj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Jul 2021 11:24:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50034 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230079AbhGUPYi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jul 2021 07:30:31 -0400
-Received: from [192.168.0.113] ([178.252.67.224]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.163]) with ESMTPSA (Nemesis) id
- 1MK3FW-1lo5Ap3rpu-00LRrJ; Wed, 21 Jul 2021 14:10:38 +0200
-Subject: Re: [RFC PATCH 00/11] nvme: In-band authentication support
-To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org,
+        Wed, 21 Jul 2021 11:24:38 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F332DC061575
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Jul 2021 09:05:14 -0700 (PDT)
+Received: from dude.hi.pengutronix.de ([2001:67c:670:100:1d::7])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <afa@pengutronix.de>)
+        id 1m6Ei2-0007F5-OS; Wed, 21 Jul 2021 18:04:34 +0200
+Received: from afa by dude.hi.pengutronix.de with local (Exim 4.92)
+        (envelope-from <afa@pengutronix.de>)
+        id 1m6Ehw-0004VU-OE; Wed, 21 Jul 2021 18:04:28 +0200
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-References: <20210716110428.9727-1-hare@suse.de>
- <66b3b869-02bd-9dee-fadc-8538c6aad57a@vlnb.net>
- <e339e6e7-fc32-2480-ca99-516547105776@suse.de>
-From:   Vladislav Bolkhovitin <vst@vlnb.net>
-Message-ID: <833cfd62-1e1f-1dca-2e38-ff07b3a5e8fb@vlnb.net>
-Date:   Wed, 21 Jul 2021 15:10:17 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        "David S. Miller" <davem@davemloft.net>
+Cc:     kernel@pengutronix.de, Andreas Rammhold <andreas@rammhold.de>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Richard Weinberger <richard@nod.at>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Subject: [PATCH v2] KEYS: trusted: fix use as module when CONFIG_TCG_TPM=m
+Date:   Wed, 21 Jul 2021 18:02:59 +0200
+Message-Id: <20210721160258.7024-1-a.fatoum@pengutronix.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <e339e6e7-fc32-2480-ca99-516547105776@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:zbM9u+v9ZDUik8JpLNXsF0h3y9Y2NPHI/N8c7/Lq5bR/vSdJKcp
- UZrccZ5qijLT8pbjYGo99G2jl0cbo2Aqoyd7CoiZPwrLkpJxwE5yYobTiSE1iJ61MbBjbQm
- s5NvnnGCmAbV4PxAULDCThn0tlG7Wg/rpCTEl8Gx42rQOIkLZ6bIKdnb9VdvRVUy3lYMGDq
- MEKPfG0Xp2DTJdrbdjsMw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hDe7GysI62M=:FkCpEmbyBNAb/Hb1GlBvwN
- x69T+n5bwvlFeX2EbCRLfKQwfD+DEiNO6x6Gefrb2xzzVZ/w7+g52mkNe1pCDhJT7iaODtMeY
- K6Ov6NWgBFAhstWKkUBxQvzen61UR7togP+R7iCtgBzT0rjLNlx3WVH9wgrNCvZbT6EOzmOlZ
- whJDnjDB2f7qaqti3kg9xoazzYugJYnzoBHuCruMJkTjKiKZVm4YgulK8g/OkyeYK6eNvbuVA
- FoObD2/a+HctvDXsLaGy0ZU1Pg/qAbeqAjqR7akfRXr0LNPirCs+XAK4EtVX1D8hiF4CRW8vH
- i20DhWH+Ari6EvLwnCwUurQW5ElcWwZ37zEAXX86yTXb7T4U5D/ocz8kGwS/TH4pncS5hHT/7
- QJU643kS2jgdn6p8//nW+ZpQhFHqer3I6gX8pWwsLWa9QyJH/Rn2YDXMpRHidTRaV9m1rYMgL
- I64NUts2JaBEdzq0AMlzEf7C7JHxZPO25wRjtJtT1MWWwhtvx/XOmFVDnmT+TLltlCuSgZ5db
- 4mWPKQCVK2D1fBjNylawiATxFHyDhrLsIqKJ42AEI26PLnx5BR8w7J1oFpEvhrtqTClkMSxIK
- +ZNrWsSkZNQV+uFyE4j81kNlY/zSGMtU9vRHm60VfCz1gf+zJs5cqIOzfBlngDhYao22XYOql
- JJF4vlfNcFSOb24jN5Fye2h6GL2kbiALACFbXYsR9mVDX/1YY8lcC0VUfmXTbV/gPG8hr4qA7
- KGEt+f3WKY7t2bpCaS6uZE9mKiH3EejhnkoBF4Bp3B7IL0hb8pOlcqP2r96Ja34hAcbWf9Hoy
- E/6Wifo9PElo/PyM6JhKGpZtfOD0WAMwZIN6UDlHNyV495kGtrGPnduCl3MEu2swUdOXrve
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::7
+X-SA-Exim-Mail-From: afa@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Since commit 5d0682be3189 ("KEYS: trusted: Add generic trusted keys
+framework"), trusted.ko built with CONFIG_TCG_TPM=CONFIG_TRUSTED_KEYS=m
+will not register the TPM trusted key type at runtime.
 
-On 7/21/21 9:06 AM, Hannes Reinecke wrote:
-> On 7/20/21 10:26 PM, Vladislav Bolkhovitin wrote:
->> Hi,
->>
->> Great to see those patches coming! After some review, they look to be
->> very well done. Some comments/suggestions below.
->>
->> 1. I strongly recommend to implement DH exponentials reuse (g x mod p /
->> g y mod p as well as g xy mod p) as specified in section 8.13.5.7
->> "DH-HMAC-CHAP Security Requirements". When I was working on TP 8006 I
->> had a prototype that demonstrated that DH math has quite significant
->> latency, something like (as far as I remember) 30ms for 4K group and few
->> hundreds of ms for 8K group. For single connection it is not a big deal,
->> but imagine AMD EPYC with 128 cores. Since all connections are created
->> sequentially, even with 30 ms per connection time to complete full
->> remote device connection would become 128*30 => almost 4 seconds. With
->> 8K group it might be more than 10 seconds. Users are unlikely going to
->> be happy with this, especially in cases, when connecting multiple of
->> NVMe-oF devices is a part of a server or VM boot sequence.
->>
-> Oh, indeed, I can confirm that. FFDHE calculations are quite time-consuming.
-> But incidentally, ECDH and curve25519 are reasonably fast,
+This is because, after that rework, CONFIG_DEPENDENCY of the TPM
+and TEE backends were checked with #ifdef, but that's only true
+when they're built-in.
 
-Yes, EC calculations are very fast, this is why EC cryptography is
-gaining more and more popularity.
+Fix this by introducing two new boolean Kconfig symbols:
+TRUSTED_KEYS_TPM and TRUSTED_KEYS_TEE with the appropriate
+dependencies and use them to check which backends are available.
 
-> so maybe
-> there _is_ a value in having a TPAR asking for them to be specified, too ...
+This also has a positive effect on user experience:
 
-There's too much politics and procedures involved here. Even in the
-current scope it took more, than 2 years to get the spec officially done
-(I started proposing it early 2018). Maybe, in future, if someone comes
-in the the committee with the corresponding proposal and value
-justification.
+ - It's now possible to use TEE trusted keys without CONFIG_TCG_TPM
+ - It's now possible to enable CONFIG_TCG_TPM, but exclude TPM from
+   available trust sources
+ - TEE=m && TRUSTED_KEYS=y no longer leads to TEE support
+   being silently dropped
 
-Although, frankly speaking, with DH exponentials reuse I personally
-don't see much value in ECDH in this application. Maybe, only for very
-small embedded devices with really limited computational capabilities.
+Any code depending on the TPM trusted key backend or symbols exported
+by it will now need to explicitly state that it
 
->> If DH exponential reuse implemented, for all subsequent connections the
->> DH math is excluded, so authentication overhead becomes pretty much
->> negligible.
->>
->> In my prototype I implemented DH exponential reuse as a simple
->> per-host/target cache that keeps DH exponentials (including g xy mod p)
->> for up to 10 seconds. Simple and sufficient.
->>
-> 
-> Frankly, I hadn't looked at exponential reuse; this implementation
-> really is just a first step to get feedback from people if this is a
-> direction they want to go.
+  depends on TRUSTED_KEYS && TRUSTED_KEYS_TPM
 
-Sure, I understand.
+The latter to ensure the dependency is built and the former to ensure
+it's reachable for module builds. This currently only affects
+CONFIG_ASYMMETRIC_TPM_KEY_SUBTYPE, so it's fixed up here as well.
 
->> Another, might be ever more significant reason why DH exponential reuse
->> is important is that without it x (or y on the host side) must always be
->> randomly generated each time a new connection is established. Which
->> means, for instance, for 8K groups for each connection 1KB of random
->> bytes must be taken from the random pool. With 128 connections it is now
->> 128KB. Quite a big pressure on the random pool that DH exponential reuse
->> mostly avoids.
->>
->> Those are the 2 reasons why we added this DH exponential reuse sentence
->> in the spec. In the original TP 8006 there was a small informative piece
->> explaining reasonings behind that, but for some reasons it was removed
->> from the final version.
->>
-> 
-> Thanks for the hint. I'll be adding exponential reuse to the code.
+Reported-by: Andreas Rammhold <andreas@rammhold.de>
+Fixes: 5d0682be3189 ("KEYS: trusted: Add generic trusted keys framework")
+Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+---
 
-Yes, please. Otherwise, people might start talking that Linux NVMe-oF
-authentication is too bad and slow.
+(Implicit) v1 was as a preparatory patch for CAAM trusted keys[1] with the
+goal of fixing the Kconfig inflexibility after the TEE trusted key rework.
 
-Vlad
+Unbeknownst to me, it also fixes a regression, which was later
+reported by Andreas[2] along with a patch.
+
+I split out the fix from the CAAM series and adjusted the commit
+message to explain the regression.
+
+v1 -> v2:
+  - Move rest of TPM-related selects from TRUSTED_KEYS to
+    TRUSTED_KEYS_TPM (Sumit)
+  - Remove left-over line in Makefile (Sumit)
+  - added Fixes: tag
+  - adjust commit message to reference the regression reported
+    by Andreas
+  - have ASYMMETRIC_TPM_KEY_SUBTYPE depend on TRUSTED_KEYS_TPM,
+    because it references global symbols that are exported
+    by the trusted key TPM backend.
+
+[1]: https://lore.kernel.org/linux-integrity/f8285eb0135ba30c9d846cf9dd395d1f5f8b1efc.1624364386.git-series.a.fatoum@pengutronix.de/
+[2]: https://lore.kernel.org/linux-integrity/20210719091335.vwfebcpkf4pag3wm@wrt/T/#t
+
+To: Jarkko Sakkinen <jarkko@kernel.org>
+To: James Morris <jmorris@namei.org>
+To: "Serge E. Hallyn" <serge@hallyn.com>
+To: James Bottomley <jejb@linux.ibm.com>
+To: Mimi Zohar <zohar@linux.ibm.com>
+To: Sumit Garg <sumit.garg@linaro.org>
+To: David Howells <dhowells@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: David Gstir <david@sigma-star.at>
+Cc: Richard Weinberger <richard@nod.at>
+Cc: keyrings@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org
+Cc: linux-integrity@vger.kernel.org
+---
+ crypto/asymmetric_keys/Kconfig            |  2 +-
+ security/keys/Kconfig                     | 18 ++++++--------
+ security/keys/trusted-keys/Kconfig        | 29 +++++++++++++++++++++++
+ security/keys/trusted-keys/Makefile       |  8 +++----
+ security/keys/trusted-keys/trusted_core.c |  4 ++--
+ 5 files changed, 43 insertions(+), 18 deletions(-)
+ create mode 100644 security/keys/trusted-keys/Kconfig
+
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 1f1f004dc757..8886eddbf881 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -25,7 +25,7 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+ config ASYMMETRIC_TPM_KEY_SUBTYPE
+ 	tristate "Asymmetric TPM backed private key subtype"
+ 	depends on TCG_TPM
+-	depends on TRUSTED_KEYS
++	depends on TRUSTED_KEYS && TRUSTED_KEYS_TPM
+ 	select CRYPTO_HMAC
+ 	select CRYPTO_SHA1
+ 	select CRYPTO_HASH_INFO
+diff --git a/security/keys/Kconfig b/security/keys/Kconfig
+index 64b81abd087e..9ec302962fe2 100644
+--- a/security/keys/Kconfig
++++ b/security/keys/Kconfig
+@@ -70,23 +70,19 @@ config BIG_KEYS
+ 
+ config TRUSTED_KEYS
+ 	tristate "TRUSTED KEYS"
+-	depends on KEYS && TCG_TPM
+-	select CRYPTO
+-	select CRYPTO_HMAC
+-	select CRYPTO_SHA1
+-	select CRYPTO_HASH_INFO
+-	select ASN1_ENCODER
+-	select OID_REGISTRY
+-	select ASN1
++	depends on KEYS
+ 	help
+ 	  This option provides support for creating, sealing, and unsealing
+ 	  keys in the kernel. Trusted keys are random number symmetric keys,
+-	  generated and RSA-sealed by the TPM. The TPM only unseals the keys,
+-	  if the boot PCRs and other criteria match.  Userspace will only ever
+-	  see encrypted blobs.
++	  generated and sealed by a trust source selected at kernel boot-time.
++	  Userspace will only ever see encrypted blobs.
+ 
+ 	  If you are unsure as to whether this is required, answer N.
+ 
++if TRUSTED_KEYS
++source "security/keys/trusted-keys/Kconfig"
++endif
++
+ config ENCRYPTED_KEYS
+ 	tristate "ENCRYPTED KEYS"
+ 	depends on KEYS
+diff --git a/security/keys/trusted-keys/Kconfig b/security/keys/trusted-keys/Kconfig
+new file mode 100644
+index 000000000000..c163cfeedff6
+--- /dev/null
++++ b/security/keys/trusted-keys/Kconfig
+@@ -0,0 +1,29 @@
++config TRUSTED_KEYS_TPM
++	bool "TPM-based trusted keys"
++	depends on TCG_TPM >= TRUSTED_KEYS
++	default y
++	select CRYPTO
++	select CRYPTO_HMAC
++	select CRYPTO_SHA1
++	select CRYPTO_HASH_INFO
++	select ASN1_ENCODER
++	select OID_REGISTRY
++	select ASN1
++	help
++	  Enable use of the Trusted Platform Module (TPM) as trusted key
++	  backend. Trusted keys are are random number symmetric keys,
++	  which will be generated and RSA-sealed by the TPM.
++	  The TPM only unseals the keys, if the boot PCRs and other
++	  criteria match.
++
++config TRUSTED_KEYS_TEE
++	bool "TEE-based trusted keys"
++	depends on TEE >= TRUSTED_KEYS
++	default y
++	help
++	  Enable use of the Trusted Execution Environment (TEE) as trusted
++	  key backend.
++
++if !TRUSTED_KEYS_TPM && !TRUSTED_KEYS_TEE
++comment "No trust source selected!"
++endif
+diff --git a/security/keys/trusted-keys/Makefile b/security/keys/trusted-keys/Makefile
+index feb8b6c3cc79..2e2371eae4d5 100644
+--- a/security/keys/trusted-keys/Makefile
++++ b/security/keys/trusted-keys/Makefile
+@@ -5,10 +5,10 @@
+ 
+ obj-$(CONFIG_TRUSTED_KEYS) += trusted.o
+ trusted-y += trusted_core.o
+-trusted-y += trusted_tpm1.o
++trusted-$(CONFIG_TRUSTED_KEYS_TPM) += trusted_tpm1.o
+ 
+ $(obj)/trusted_tpm2.o: $(obj)/tpm2key.asn1.h
+-trusted-y += trusted_tpm2.o
+-trusted-y += tpm2key.asn1.o
++trusted-$(CONFIG_TRUSTED_KEYS_TPM) += trusted_tpm2.o
++trusted-$(CONFIG_TRUSTED_KEYS_TPM) += tpm2key.asn1.o
+ 
+-trusted-$(CONFIG_TEE) += trusted_tee.o
++trusted-$(CONFIG_TRUSTED_KEYS_TEE) += trusted_tee.o
+diff --git a/security/keys/trusted-keys/trusted_core.c b/security/keys/trusted-keys/trusted_core.c
+index d5c891d8d353..8cab69e5d0da 100644
+--- a/security/keys/trusted-keys/trusted_core.c
++++ b/security/keys/trusted-keys/trusted_core.c
+@@ -27,10 +27,10 @@ module_param_named(source, trusted_key_source, charp, 0);
+ MODULE_PARM_DESC(source, "Select trusted keys source (tpm or tee)");
+ 
+ static const struct trusted_key_source trusted_key_sources[] = {
+-#if defined(CONFIG_TCG_TPM)
++#if defined(CONFIG_TRUSTED_KEYS_TPM)
+ 	{ "tpm", &trusted_key_tpm_ops },
+ #endif
+-#if defined(CONFIG_TEE)
++#if defined(CONFIG_TRUSTED_KEYS_TEE)
+ 	{ "tee", &trusted_key_tee_ops },
+ #endif
+ };
+-- 
+2.30.2
+
