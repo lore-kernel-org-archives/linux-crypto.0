@@ -2,183 +2,175 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48FA3C636C9
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 00:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A0EC07E9B
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 06:07:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2FA196101B
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 00:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C7FE6024A
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 06:07:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232402AbhGTXj7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jul 2021 19:39:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34696 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232263AbhGTXj4 (ORCPT
+        id S233337AbhGUF00 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Jul 2021 01:26:26 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:47316 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233356AbhGUF0Z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jul 2021 19:39:56 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D73FC061574
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jul 2021 17:20:33 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id m83so954587pfd.0
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jul 2021 17:20:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xsx3HQqSw4EPyNMxM9oP5SdyJb+SogTu3w/uAOd0oLk=;
-        b=cEWuOuugvVGVQn+IaenjLryO1wWgCOjt/YM2Kg9/wQVM/wZQZ67OtRnHOVJkUn4p5+
-         oXecvk/lXVdHh5LgWt0w/g64Drk8tZZrJGD28T9y5cC0Nxnod7L1qvnYcKAi27ZQ3j8G
-         PNlEydF9bXaF2opSpKep2gvoKiZNU1CTeGtx5BFMxWuEJTugu7AhwYkFG+gR2NFCnXEu
-         gSUJUqH4RNkeO8OwkSc4fB/7oLySNbXLE6lFafYRtyEGXXCxnBhE4xrtCtHPS0BAGR2J
-         N5AyGxEJnyZyZLgTRs/GS6tmRf+pUGoyQaNOObjf1/wqesnkxLshoNKWErNj+qhUi3+E
-         imUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xsx3HQqSw4EPyNMxM9oP5SdyJb+SogTu3w/uAOd0oLk=;
-        b=fm7ILkmPvLo9gH2ewnVVxd/BcmOjCexihxv91lp2W0k3+cHXGAyUFGv4Y2hJ8Xq3og
-         wsJNzb/MEKDqbWu46gpM+kaxKeXLDJZI1I311FyYXKpdErc1rbxbBVQ2UMuCLxizbqfh
-         ceTuo9Xt6DTymsDLyZ3NhSStlih/Dqer71sdFjMZyrfKOFg4EXfOyLgOjcl5up/2voqR
-         W9adDmYEUpYoTfHqPGwaiiWedLcyTMCO6AZP9ez1YJ6j2jfWKEs8JNlDqw3Cqy6N1Eyo
-         uERZQ5vXku8bPoSHOxz9zHuCo2KOBw3l8CrEk/5Ft2ucIlL65FdDYjNa7T5K1amHiTd8
-         iipA==
-X-Gm-Message-State: AOAM532o6eYeTjFq3O9LjvpbnvzIsN4kGzlEfx4wxBVZQweyLJTO318Q
-        WxR+Zaifk163Qo+pHs9f4BB0Eg==
-X-Google-Smtp-Source: ABdhPJzO5a2tT2MSUn4GuU8F1gVkASk2rMMQW40YjFMKpseRmAH4meFchXyU//CEhkz6SKp8BznOpQ==
-X-Received: by 2002:a63:5c04:: with SMTP id q4mr32924434pgb.127.1626826832684;
-        Tue, 20 Jul 2021 17:20:32 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f11sm28627430pga.61.2021.07.20.17.20.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 17:20:32 -0700 (PDT)
-Date:   Wed, 21 Jul 2021 00:20:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 39/40] KVM: SVM: Use a VMSA physical address
- variable for populating VMCB
-Message-ID: <YPdoTK9V3anPZe7C@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-40-brijesh.singh@amd.com>
+        Wed, 21 Jul 2021 01:26:25 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 9BBE020309;
+        Wed, 21 Jul 2021 06:06:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1626847618; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pDKjmwZBzuhTX/zXo42Os5PnZWO5pbPwuwZBvd9jOh4=;
+        b=XbhmW09AKmdYLULB6qyPFcfQc2B1beut3E6UMGFeLiyNO4xpuPNUVhbhCAe5xD1bbUfur3
+        8fRGqrlQ9miQLX/Y2zYwRcXH00Hwo6XLpRepw8BSUWlYs889Bhyk0oS/T2Bl5aHpbu9ZD3
+        2/BINIwyQzLsH/Kw0vAwdICNwOjlfM4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1626847618;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pDKjmwZBzuhTX/zXo42Os5PnZWO5pbPwuwZBvd9jOh4=;
+        b=FwGkorSMBKo8lHB2XOpELu9ooXOxP32bYCHC7fwdizpWNGcsscnAIqS+lBxbpcUtoAWzmj
+        PchIEgHo2xe98WBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8A67C133D1;
+        Wed, 21 Jul 2021 06:06:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id wAOCIYK592CTbAAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 21 Jul 2021 06:06:58 +0000
+To:     Vladislav Bolkhovitin <vst@vlnb.net>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@wdc.com>,
+        linux-nvme@lists.infradead.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+References: <20210716110428.9727-1-hare@suse.de>
+ <66b3b869-02bd-9dee-fadc-8538c6aad57a@vlnb.net>
+From:   Hannes Reinecke <hare@suse.de>
+Subject: Re: [RFC PATCH 00/11] nvme: In-band authentication support
+Message-ID: <e339e6e7-fc32-2480-ca99-516547105776@suse.de>
+Date:   Wed, 21 Jul 2021 08:06:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210707183616.5620-40-brijesh.singh@amd.com>
+In-Reply-To: <66b3b869-02bd-9dee-fadc-8538c6aad57a@vlnb.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
+On 7/20/21 10:26 PM, Vladislav Bolkhovitin wrote:
+> Hi,
 > 
-> In preparation to support SEV-SNP AP Creation, use a variable that holds
-> the VMSA physical address rather than converting the virtual address.
-> This will allow SEV-SNP AP Creation to set the new physical address that
-> will be used should the vCPU reset path be taken.
-
-I'm pretty sure adding vmsa_pa is unnecessary.  The next patch sets svm->vmsa_pa
-and vmcb->control.vmsa_pa as a pair.  And for the existing code, my proposed
-patch to emulate INIT on shutdown would eliminate the one path that zeros the
-VMCB[1].  That series patch also drops the init_vmcb() in svm_create_vcpu()[2].
-
-Assuming there are no VMCB shenanigans I'm missing, sev_es_init_vmcb() can do
-
-	if (!init_event)
-		svm->vmcb->control.vmsa_pa = __pa(svm->vmsa);
-
-And while I'm thinking of it, the next patch should ideally free svm->vmsa when
-the the guest configures a new VMSA for the vCPU.
-
-[1] https://lkml.kernel.org/r/20210713163324.627647-45-seanjc@google.com
-[2] https://lkml.kernel.org/r/20210713163324.627647-10-seanjc@google.com
-
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 5 ++---
->  arch/x86/kvm/svm/svm.c | 9 ++++++++-
->  arch/x86/kvm/svm/svm.h | 1 +
->  3 files changed, 11 insertions(+), 4 deletions(-)
+> Great to see those patches coming! After some review, they look to be
+> very well done. Some comments/suggestions below.
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 4cb4c1d7e444..d8ad6dd58c87 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3553,10 +3553,9 @@ void sev_es_init_vmcb(struct vcpu_svm *svm)
->  
->  	/*
->  	 * An SEV-ES guest requires a VMSA area that is a separate from the
-> -	 * VMCB page. Do not include the encryption mask on the VMSA physical
-> -	 * address since hardware will access it using the guest key.
-> +	 * VMCB page.
->  	 */
-> -	svm->vmcb->control.vmsa_pa = __pa(svm->vmsa);
-> +	svm->vmcb->control.vmsa_pa = svm->vmsa_pa;
->  
->  	/* Can't intercept CR register access, HV can't modify CR registers */
->  	svm_clr_intercept(svm, INTERCEPT_CR0_READ);
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 32e35d396508..74bc635c9608 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1379,9 +1379,16 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
->  	svm->vmcb01.ptr = page_address(vmcb01_page);
->  	svm->vmcb01.pa = __sme_set(page_to_pfn(vmcb01_page) << PAGE_SHIFT);
->  
-> -	if (vmsa_page)
-> +	if (vmsa_page) {
->  		svm->vmsa = page_address(vmsa_page);
->  
-> +		/*
-> +		 * Do not include the encryption mask on the VMSA physical
-> +		 * address since hardware will access it using the guest key.
-> +		 */
-> +		svm->vmsa_pa = __pa(svm->vmsa);
-> +	}
-> +
->  	svm->guest_state_loaded = false;
->  
->  	svm_switch_vmcb(svm, &svm->vmcb01);
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 9fcfc0a51737..285d9b97b4d2 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -177,6 +177,7 @@ struct vcpu_svm {
->  
->  	/* SEV-ES support */
->  	struct sev_es_save_area *vmsa;
-> +	hpa_t vmsa_pa;
->  	struct ghcb *ghcb;
->  	struct kvm_host_map ghcb_map;
->  	bool received_first_sipi;
-> -- 
-> 2.17.1
+> 1. I strongly recommend to implement DH exponentials reuse (g x mod p /
+> g y mod p as well as g xy mod p) as specified in section 8.13.5.7
+> "DH-HMAC-CHAP Security Requirements". When I was working on TP 8006 I
+> had a prototype that demonstrated that DH math has quite significant
+> latency, something like (as far as I remember) 30ms for 4K group and few
+> hundreds of ms for 8K group. For single connection it is not a big deal,
+> but imagine AMD EPYC with 128 cores. Since all connections are created
+> sequentially, even with 30 ms per connection time to complete full
+> remote device connection would become 128*30 => almost 4 seconds. With
+> 8K group it might be more than 10 seconds. Users are unlikely going to
+> be happy with this, especially in cases, when connecting multiple of
+> NVMe-oF devices is a part of a server or VM boot sequence.
 > 
+Oh, indeed, I can confirm that. FFDHE calculations are quite time-consuming.
+But incidentally, ECDH and curve25519 are reasonably fast, so maybe
+there _is_ a value in having a TPAR asking for them to be specified, too ...
+
+> If DH exponential reuse implemented, for all subsequent connections the
+> DH math is excluded, so authentication overhead becomes pretty much
+> negligible.
+> 
+> In my prototype I implemented DH exponential reuse as a simple
+> per-host/target cache that keeps DH exponentials (including g xy mod p)
+> for up to 10 seconds. Simple and sufficient.
+> 
+
+Frankly, I hadn't looked at exponential reuse; this implementation
+really is just a first step to get feedback from people if this is a
+direction they want to go.
+
+> Another, might be ever more significant reason why DH exponential reuse
+> is important is that without it x (or y on the host side) must always be
+> randomly generated each time a new connection is established. Which
+> means, for instance, for 8K groups for each connection 1KB of random
+> bytes must be taken from the random pool. With 128 connections it is now
+> 128KB. Quite a big pressure on the random pool that DH exponential reuse
+> mostly avoids.
+> 
+> Those are the 2 reasons why we added this DH exponential reuse sentence
+> in the spec. In the original TP 8006 there was a small informative piece
+> explaining reasonings behind that, but for some reasons it was removed
+> from the final version.
+> 
+
+Thanks for the hint. I'll be adding exponential reuse to the code.
+
+> 2. What is the status of this code from perspective of stability in face
+> of malicious host behavior? Seems implementation is carefully done, but,
+> for instance, at the first look I was not able to find a code to clean
+> up if host in not acting for too long in the middle of exchange. Other
+> observation is that in nvmet_execute_auth_send()
+> nvmet_check_transfer_len() does not check if tl size is reasonable,
+> i.e., for instance, not 1GB.
+> 
+
+That is true; exchange timeouts are missing. Will be adding them, of
+course. And haven't thought of checking for tl size overflows; will be
+adding them, too.
+
+> For sure, we don't want to allow remote hosts to hang or crash target.
+> For instance, because of OOM conditions that happened, because malicious
+> host asked target to allocate too much memory or open to many being
+> authenticated connections in which the host is not going to reply in the
+> middle of exchange.
+> 
+This is something I'll need to look at, anyway. What we do not want is a
+userspace application chipping in and send a 'negotiate' command without
+any subsequent steps, thereby invalidating the existing authentication.
+
+> Asking, because don't want to go in my review too far ahead from the
+> author ;)
+> 
+> In this regard, it would be great if you add in your test application
+> ability to perform authentication with random parameters and randomly
+> stop responding. Overnight running of such test would give us good
+> degree of confidence that it will always work as expected.
+> 
+
+That indeed would be good; let me think on how something like that can
+be implemented.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
