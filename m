@@ -2,144 +2,301 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2033C6377E
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 20:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E77C6377A
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 20:17:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AD99961241
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 20:15:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECD306124C
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 20:17:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231764AbhGUTeu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Jul 2021 15:34:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51170 "EHLO
+        id S232890AbhGUTg6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Jul 2021 15:36:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231997AbhGUTer (ORCPT
+        with ESMTP id S232484AbhGUTg5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jul 2021 15:34:47 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A752C0613D3
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Jul 2021 13:15:22 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id i16-20020a17090acf90b02901736d9d2218so2006107pju.1
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Jul 2021 13:15:22 -0700 (PDT)
+        Wed, 21 Jul 2021 15:36:57 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52704C0613D3
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Jul 2021 13:17:33 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id c17so2025584wmb.5
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Jul 2021 13:17:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=rammhold-de.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=JYgF6/pkTp1ByHMaAngGJCR/bmJodLde5csRbzkM0r4=;
-        b=UhVUzEOtC4uWKpgp+8WrUnRj1KkG0NU0qXSw6K31wuPNQzTvnMNYXNk0eEmIJ/deHp
-         4urTjpJN9QlonhLvFzYlpUnuaGRNEo+n8pboDfPEBiftxqMsxcSi9fVEIq95RLJ4G1C5
-         epEUNX99hjz9o/cShG6PGS+S/7maU+ahD19VoTNjj9dlslgE/D3EzMiMs21uwSzAIjt+
-         6lsdpmyaBa04q38/Faqo8JjVQP6rzU+ED4+vprLPalQdgDC/HYqfMyRd5NW9hxUEdkTZ
-         Tky/uifJKxgKmBQfc46OSY7qMfNDkxQJ/Jz78Z2rYwL7c8D3jJXBrrRWMuAjkEO6jZIo
-         3NLQ==
+        bh=RzWGiaagIa+Q7L2PhhLkZOLjGFlmYMVy3i21G4oii0o=;
+        b=hg9bf8bp9/+oVytTPNZGNsGpXsfhP+ltQcQdOeOos2S+DC/+obEuyCd+EksdGKgcNr
+         qhNFia8tV4FqlF7A8TqgO9XYoKpVEkKU2tRCxLc7wFViPR8ptgVyscc9u7PpRegocJ1o
+         V1WtAw+qHxrdToqhCz1RYE2WN3JuJboxvzWLaJC7AP8NA9fLYeOLmhDL4wc5zBdOvd3X
+         OqUqlh2JG34l9mI5DcappLDSv23u0dlBPcIeqiKzo2Uwe/m145vJC8lOAucKyMLwpQdc
+         N5z0H+wnrbS+daMOjH7VzrwgqjNrWK88O8XtP2Vt4MIr4qZkmyjPBmC86O2AAeVvsIwR
+         IqKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=JYgF6/pkTp1ByHMaAngGJCR/bmJodLde5csRbzkM0r4=;
-        b=gCJPlFWd/BgGvKB9orXElik4PcRQ4w66xvM40Q5GAtK2NAlEAqVCT6CGgb6urXV+hS
-         Pg20uEPe+L9kmICsaTtnxWpFetGtHmt7XgG1i8O0vwqsCQpdvDmR2noOb51IuT/0sBwL
-         /pTNEHnbmYXV7/jhOtTPAGwe9c5ukSPZ/WzFZAgUlEHDaLYkVOBu9be+s377XHAGAsdu
-         +U6HgSA9eySK+m/JgIzTWNBdTPXk8+xX6/GVuMQcqG6y3YjTkLeWeUlMNTzC4di16BMW
-         18TJ2W8MqXtU1MPPTnVFV9Inj7n4NtOthmAxuX3mkBkbxdRNAXYJyN1tEDxZgS0fZT/Q
-         h0SA==
-X-Gm-Message-State: AOAM533wXvQz4W0K9s3nBtt2MFYpXP/y2hWaZe1OTcrGcCz0z6HiMxmW
-        hcSzmTXUQiwJj4TeRV2KMJNoZQ==
-X-Google-Smtp-Source: ABdhPJwl1I+ugWhiFqcmskmLa+S1KfP1gCUBBWpNkdILi0W0UrSnBIhERqyC8NYVuMxc+aNo5sruIA==
-X-Received: by 2002:a05:6a00:d53:b029:32a:2db6:1be3 with SMTP id n19-20020a056a000d53b029032a2db61be3mr37731045pfv.71.1626898521394;
-        Wed, 21 Jul 2021 13:15:21 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q18sm27746006pfj.178.2021.07.21.13.15.20
+        bh=RzWGiaagIa+Q7L2PhhLkZOLjGFlmYMVy3i21G4oii0o=;
+        b=t14owbT9rfog39RJK3XqlpqxA8jdtgYNP8tgtCrqdfjFsLd4YTW+F2JE5da8pKiv6l
+         k2VOptLl+gNeUdvXWe/hHjYXQklNrBfgRQDZYOPWf4ixvKEAfT3V/Xe6Z9a/qzxNjliG
+         q/TdcwjxRkydf7GnXnzvh8lh9/T9qLS5huzLzjLkQVSNzXe27tslLb9DGVp6BISFF93K
+         TNtduaFz0pf8Ndex4FZmDREQf6NXJ5GumVZg3oAaX+rGqyhM8V15BxzItq0TakMVhMpr
+         W1xSk7Ac/qEtJfevUfnM2+h7zq2ptStqVTo5Zg6McT9y0iOggR9AsJKCKYrYqBGfIkKR
+         hAgw==
+X-Gm-Message-State: AOAM531wr88OvisJSzuZ94/7QMrA1V/JNNU/eLwWrorpcef5IFsbcmtz
+        KaC3oiaTUiRF9yhCL5KVn62fug==
+X-Google-Smtp-Source: ABdhPJyLmFvWnbZv8MzcPJRWHhABrM7/gVLkhAvmGtqmhfzW4ZIBsFWlIsrc4dsI50VxqrB1aEks7Q==
+X-Received: by 2002:a1c:f414:: with SMTP id z20mr5920081wma.94.1626898651823;
+        Wed, 21 Jul 2021 13:17:31 -0700 (PDT)
+Received: from localhost ([2a00:e67:5c9:a:74ac:453c:5f76:676a])
+        by smtp.gmail.com with ESMTPSA id s4sm26200835wmh.41.2021.07.21.13.17.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 13:15:20 -0700 (PDT)
-Date:   Wed, 21 Jul 2021 20:15:16 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 37/40] KVM: SVM: Add support to handle the
- RMP nested page fault
-Message-ID: <YPiAVEuAuDS3neyx@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-38-brijesh.singh@amd.com>
- <YPYUe8hAz5/c7IW9@google.com>
- <bff43050-aed7-011c-89e5-9899bd1df414@amd.com>
- <YPdOxrIA6o3uymq2@google.com>
- <03f42d61-fa32-38d0-7e14-17ee6f1d7dad@amd.com>
+        Wed, 21 Jul 2021 13:17:31 -0700 (PDT)
+Date:   Wed, 21 Jul 2021 22:17:30 +0200
+From:   Andreas Rammhold <andreas@rammhold.de>
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, kernel@pengutronix.de,
+        Andreas Rammhold <andreas@rammhold.de>,
+        David Gstir <david@sigma-star.at>,
+        Richard Weinberger <richard@nod.at>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Subject: Re: [PATCH v2] KEYS: trusted: fix use as module when CONFIG_TCG_TPM=m
+Message-ID: <20210721201730.ht75blv5pd7qgyep@wrt>
+References: <20210721160258.7024-1-a.fatoum@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <03f42d61-fa32-38d0-7e14-17ee6f1d7dad@amd.com>
+In-Reply-To: <20210721160258.7024-1-a.fatoum@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 20, 2021, Brijesh Singh wrote:
+On 18:02 21.07.21, Ahmad Fatoum wrote:
+> Since commit 5d0682be3189 ("KEYS: trusted: Add generic trusted keys
+> framework"), trusted.ko built with CONFIG_TCG_TPM=CONFIG_TRUSTED_KEYS=m
+> will not register the TPM trusted key type at runtime.
 > 
-> On 7/20/21 5:31 PM, Sean Christopherson wrote:
-> ...
-> >> This is a good question, the GHCB spec does not enforce that a guest *must*
-> >> use page state. If the page state changes is not done by the guest then it
-> >> will cause #NPF and its up to the hypervisor to decide on what it wants to
-> >> do.
-> > Drat.  Is there any hope of pushing through a GHCB change to require the guest
-> > to use PSC?
+> This is because, after that rework, CONFIG_DEPENDENCY of the TPM
+> and TEE backends were checked with #ifdef, but that's only true
+> when they're built-in.
 > 
-> Well, I am not sure if we can push it through GHCB. Other hypervisor
-> also need to agree to it. We need to define them some architectural way
-> for hypervisor to detect the violation and notify guest about it.
+> Fix this by introducing two new boolean Kconfig symbols:
+> TRUSTED_KEYS_TPM and TRUSTED_KEYS_TEE with the appropriate
+> dependencies and use them to check which backends are available.
+> 
+> This also has a positive effect on user experience:
+> 
+>  - It's now possible to use TEE trusted keys without CONFIG_TCG_TPM
+>  - It's now possible to enable CONFIG_TCG_TPM, but exclude TPM from
+>    available trust sources
+>  - TEE=m && TRUSTED_KEYS=y no longer leads to TEE support
+>    being silently dropped
+> 
+> Any code depending on the TPM trusted key backend or symbols exported
+> by it will now need to explicitly state that it
+> 
+>   depends on TRUSTED_KEYS && TRUSTED_KEYS_TPM
+> 
+> The latter to ensure the dependency is built and the former to ensure
+> it's reachable for module builds. This currently only affects
+> CONFIG_ASYMMETRIC_TPM_KEY_SUBTYPE, so it's fixed up here as well.
+> 
+> Reported-by: Andreas Rammhold <andreas@rammhold.de>
+> Fixes: 5d0682be3189 ("KEYS: trusted: Add generic trusted keys framework")
+> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+> ---
+> 
+> (Implicit) v1 was as a preparatory patch for CAAM trusted keys[1] with the
+> goal of fixing the Kconfig inflexibility after the TEE trusted key rework.
+> 
+> Unbeknownst to me, it also fixes a regression, which was later
+> reported by Andreas[2] along with a patch.
+> 
+> I split out the fix from the CAAM series and adjusted the commit
+> message to explain the regression.
+> 
+> v1 -> v2:
+>   - Move rest of TPM-related selects from TRUSTED_KEYS to
+>     TRUSTED_KEYS_TPM (Sumit)
+>   - Remove left-over line in Makefile (Sumit)
+>   - added Fixes: tag
+>   - adjust commit message to reference the regression reported
+>     by Andreas
+>   - have ASYMMETRIC_TPM_KEY_SUBTYPE depend on TRUSTED_KEYS_TPM,
+>     because it references global symbols that are exported
+>     by the trusted key TPM backend.
+> 
+> [1]: https://lore.kernel.org/linux-integrity/f8285eb0135ba30c9d846cf9dd395d1f5f8b1efc.1624364386.git-series.a.fatoum@pengutronix.de/
+> [2]: https://lore.kernel.org/linux-integrity/20210719091335.vwfebcpkf4pag3wm@wrt/T/#t
+> 
+> To: Jarkko Sakkinen <jarkko@kernel.org>
+> To: James Morris <jmorris@namei.org>
+> To: "Serge E. Hallyn" <serge@hallyn.com>
+> To: James Bottomley <jejb@linux.ibm.com>
+> To: Mimi Zohar <zohar@linux.ibm.com>
+> To: Sumit Garg <sumit.garg@linaro.org>
+> To: David Howells <dhowells@redhat.com>
+> To: Herbert Xu <herbert@gondor.apana.org.au>
+> To: "David S. Miller" <davem@davemloft.net>
+> Cc: David Gstir <david@sigma-star.at>
+> Cc: Richard Weinberger <richard@nod.at>
+> Cc: keyrings@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-security-module@vger.kernel.org
+> Cc: linux-integrity@vger.kernel.org
+> ---
+>  crypto/asymmetric_keys/Kconfig            |  2 +-
+>  security/keys/Kconfig                     | 18 ++++++--------
+>  security/keys/trusted-keys/Kconfig        | 29 +++++++++++++++++++++++
+>  security/keys/trusted-keys/Makefile       |  8 +++----
+>  security/keys/trusted-keys/trusted_core.c |  4 ++--
+>  5 files changed, 43 insertions(+), 18 deletions(-)
+>  create mode 100644 security/keys/trusted-keys/Kconfig
+> 
+> diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+> index 1f1f004dc757..8886eddbf881 100644
+> --- a/crypto/asymmetric_keys/Kconfig
+> +++ b/crypto/asymmetric_keys/Kconfig
+> @@ -25,7 +25,7 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+>  config ASYMMETRIC_TPM_KEY_SUBTYPE
+>  	tristate "Asymmetric TPM backed private key subtype"
+>  	depends on TCG_TPM
+> -	depends on TRUSTED_KEYS
+> +	depends on TRUSTED_KEYS && TRUSTED_KEYS_TPM
+>  	select CRYPTO_HMAC
+>  	select CRYPTO_SHA1
+>  	select CRYPTO_HASH_INFO
+> diff --git a/security/keys/Kconfig b/security/keys/Kconfig
+> index 64b81abd087e..9ec302962fe2 100644
+> --- a/security/keys/Kconfig
+> +++ b/security/keys/Kconfig
+> @@ -70,23 +70,19 @@ config BIG_KEYS
+>  
+>  config TRUSTED_KEYS
+>  	tristate "TRUSTED KEYS"
+> -	depends on KEYS && TCG_TPM
+> -	select CRYPTO
+> -	select CRYPTO_HMAC
+> -	select CRYPTO_SHA1
+> -	select CRYPTO_HASH_INFO
+> -	select ASN1_ENCODER
+> -	select OID_REGISTRY
+> -	select ASN1
+> +	depends on KEYS
+>  	help
+>  	  This option provides support for creating, sealing, and unsealing
+>  	  keys in the kernel. Trusted keys are random number symmetric keys,
+> -	  generated and RSA-sealed by the TPM. The TPM only unseals the keys,
+> -	  if the boot PCRs and other criteria match.  Userspace will only ever
+> -	  see encrypted blobs.
+> +	  generated and sealed by a trust source selected at kernel boot-time.
+> +	  Userspace will only ever see encrypted blobs.
+>  
+>  	  If you are unsure as to whether this is required, answer N.
+>  
+> +if TRUSTED_KEYS
+> +source "security/keys/trusted-keys/Kconfig"
+> +endif
+> +
+>  config ENCRYPTED_KEYS
+>  	tristate "ENCRYPTED KEYS"
+>  	depends on KEYS
+> diff --git a/security/keys/trusted-keys/Kconfig b/security/keys/trusted-keys/Kconfig
+> new file mode 100644
+> index 000000000000..c163cfeedff6
+> --- /dev/null
+> +++ b/security/keys/trusted-keys/Kconfig
+> @@ -0,0 +1,29 @@
+> +config TRUSTED_KEYS_TPM
+> +	bool "TPM-based trusted keys"
+> +	depends on TCG_TPM >= TRUSTED_KEYS
+> +	default y
+> +	select CRYPTO
+> +	select CRYPTO_HMAC
+> +	select CRYPTO_SHA1
+> +	select CRYPTO_HASH_INFO
+> +	select ASN1_ENCODER
+> +	select OID_REGISTRY
+> +	select ASN1
+> +	help
+> +	  Enable use of the Trusted Platform Module (TPM) as trusted key
+> +	  backend. Trusted keys are are random number symmetric keys,
+> +	  which will be generated and RSA-sealed by the TPM.
+> +	  The TPM only unseals the keys, if the boot PCRs and other
+> +	  criteria match.
+> +
+> +config TRUSTED_KEYS_TEE
+> +	bool "TEE-based trusted keys"
+> +	depends on TEE >= TRUSTED_KEYS
+> +	default y
+> +	help
+> +	  Enable use of the Trusted Execution Environment (TEE) as trusted
+> +	  key backend.
+> +
+> +if !TRUSTED_KEYS_TPM && !TRUSTED_KEYS_TEE
+> +comment "No trust source selected!"
+> +endif
+> diff --git a/security/keys/trusted-keys/Makefile b/security/keys/trusted-keys/Makefile
+> index feb8b6c3cc79..2e2371eae4d5 100644
+> --- a/security/keys/trusted-keys/Makefile
+> +++ b/security/keys/trusted-keys/Makefile
+> @@ -5,10 +5,10 @@
+>  
+>  obj-$(CONFIG_TRUSTED_KEYS) += trusted.o
+>  trusted-y += trusted_core.o
+> -trusted-y += trusted_tpm1.o
+> +trusted-$(CONFIG_TRUSTED_KEYS_TPM) += trusted_tpm1.o
+>  
+>  $(obj)/trusted_tpm2.o: $(obj)/tpm2key.asn1.h
+> -trusted-y += trusted_tpm2.o
+> -trusted-y += tpm2key.asn1.o
+> +trusted-$(CONFIG_TRUSTED_KEYS_TPM) += trusted_tpm2.o
+> +trusted-$(CONFIG_TRUSTED_KEYS_TPM) += tpm2key.asn1.o
+>  
+> -trusted-$(CONFIG_TEE) += trusted_tee.o
+> +trusted-$(CONFIG_TRUSTED_KEYS_TEE) += trusted_tee.o
+> diff --git a/security/keys/trusted-keys/trusted_core.c b/security/keys/trusted-keys/trusted_core.c
+> index d5c891d8d353..8cab69e5d0da 100644
+> --- a/security/keys/trusted-keys/trusted_core.c
+> +++ b/security/keys/trusted-keys/trusted_core.c
+> @@ -27,10 +27,10 @@ module_param_named(source, trusted_key_source, charp, 0);
+>  MODULE_PARM_DESC(source, "Select trusted keys source (tpm or tee)");
+>  
+>  static const struct trusted_key_source trusted_key_sources[] = {
+> -#if defined(CONFIG_TCG_TPM)
+> +#if defined(CONFIG_TRUSTED_KEYS_TPM)
+>  	{ "tpm", &trusted_key_tpm_ops },
+>  #endif
+> -#if defined(CONFIG_TEE)
+> +#if defined(CONFIG_TRUSTED_KEYS_TEE)
+>  	{ "tee", &trusted_key_tee_ops },
+>  #endif
+>  };
+> -- 
+> 2.30.2
+> 
 
-And other guest's, too :-/
+Works like a charm here. The key type was registered even thought I
+built the kernel with CONFIG_TRUSTED_KEYS=m.
 
-> >>> It would simplify KVM (albeit not much of a simplificiation) and would also
-> >>> make debugging easier since transitions would require an explicit guest
-> >>> request and guest bugs would result in errors instead of random
-> >>> corruption/weirdness.
-> >> I am good with enforcing this from the KVM. But the question is, what fault
-> >> we should inject in the guest when KVM detects that guest has issued the
-> >> page state change.
-> > Injecting a fault, at least from KVM, isn't an option since there's no architectural
-> > behavior we can leverage.  E.g. a guest that isn't enlightened enough to properly
-> > use PSC isn't going to do anything useful with a #MC or #VC.
-> >
-> > Sadly, as is I think our only options are to either automatically convert RMP
-> > entries as need, or to punt the exit to userspace.  Maybe we could do both, e.g.
-> > have a module param to control the behavior?  The problem with punting to userspace
-> > is that KVM would also need a way for userspace to fix the issue, otherwise we're
-> > just taking longer to kill the guest :-/
-> >
-> I think we should automatically convert the RMP entries at time, its
-> possible that non Linux guest may access the page without going through
-> the PSC.
+I've not actually tested if that key type works (as I've not progressed
+that far in my toy project just yet).
 
-Agreed.  I don't love that KVM will disallow automatic conversions when the host
-is accessing guest memory, but not when the guest is accessing memory.  On the
-other hand, auto-converting when accessing from the host is far, far worse.
+Feel free to add my Test-By.
 
-And FWIW, IIRC this is also aligns with the expected/proposed TDX behavior, so
-that's a plus.
+Tested-By: Andreas Rammhold <andreas@rammhold.de>
