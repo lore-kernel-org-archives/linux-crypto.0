@@ -2,73 +2,69 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD88C12002
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 17:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0107AC6377D
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 19:53:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 756006124C
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 17:53:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFEB961221
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jul 2021 19:53:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231224AbhGURM6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Jul 2021 13:12:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47176 "EHLO
+        id S239638AbhGUTM1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Jul 2021 15:12:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230004AbhGURM6 (ORCPT
+        with ESMTP id S239624AbhGUTM0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jul 2021 13:12:58 -0400
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B27EEC0613CF
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Jul 2021 10:53:34 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id c68so2850690qkf.9
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Jul 2021 10:53:34 -0700 (PDT)
+        Wed, 21 Jul 2021 15:12:26 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6314DC061575
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Jul 2021 12:53:01 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id c15so1610537pls.13
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Jul 2021 12:53:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6yFvLCK83EARCEJW2USL66XPk2Snwg9rOn4V8eQnKq4=;
-        b=LmYH4vBpP8tsrP/2QQX/a4c4LvuM1+b4/24JikG+Eg3ffRRWq1sLdvVWqmdZSpffFs
-         zYMHn1k1Y7JSxueTKglktRFPafjcur+BGgT8Ux3LXzZB1CNjBqPF55WMoTS3UHR/naUy
-         5HN4fHlgHkJlsYXgo1YafStP4kmIs1l/2txFBajcHQd5DgvTLQTHypzSg1u2dEsyWtNa
-         1Gnt5R/qqXAZ4zGACvt2zRiwgMwtDzYJEII9SZ5Ev6ztWv9+tg0z29/yQFcibOFahdej
-         SPDfQhV5wiSgG/WdTlqfqtvyXLh0cVDvfnKvx7ZZJF7FSQsGy43aezRKof8MJZkcTPGM
-         o0VQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=1ZFdogakN+U+D6SX6LhX2SwuYGYaPQsFnYtn2JJoTak=;
+        b=tvsyIWhNU3cg/xV3WaOgqDwBpspmMJ50HUSKczTQOHxoia0Gf97fLeNPk6repjxMxU
+         5jlQjcRGy7FAvAeYmsOGOEYiTkvB0EteJixLlWUNljGhhG0PxH0M7Jr0YMrWsiBC+SVB
+         pIOpLAoFAx54KbgFB0OJI2cv1cLaVXjySbSkqcTiKacy5Jiswx7XbaxYaezXwq5abeO8
+         d9qYtq/rp/48EjBy9Fe3JmA2tU0HXYTEFUlhqjbmenaY06xhIi59kAojLPYzjgdIIkUG
+         pwhusBBAxUzr7N/6g9a8yVt99NfLdGGQmtyY79jbo2dQWDvQacDkC6QpUzuye67Hh0CG
+         pWSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6yFvLCK83EARCEJW2USL66XPk2Snwg9rOn4V8eQnKq4=;
-        b=LaRIokKicXCHfUtx7C4ezuq/w8PW8/2y/Et2u36CNXqmVmfDqZWxn0SVolvpD8PG78
-         JpVKyF0D1UTcxsk6llBCDt9RNS6IBaXuA2ww7cIf3y1GzYR9gPLCk+rgEPDU3iXXGpIG
-         lkGwZndC8K9eF7BdQxhdqE6AdSVR6BpLyVg3kcbjQcP42py426uPqFOBdQ3pyZyw1GYM
-         WtRzgVAYYzLe48P8qxtB0AIQq3gHzHtTdZ/cKxNG6yDNr6Fiv5NcDk/HDEWphoTeG09P
-         MhO2fO6eHRNoREZU3Ooj6biN985jRALT+fG7EhKi6+q/pys8tygyggwDSTWAxF9edWmT
-         3W/w==
-X-Gm-Message-State: AOAM532WQxThdgeJpClY2nKfzrlAdTcA+iBjWugydLu/qTIE32E9gwhu
-        g1rNyuno4wA/BXw2GkQ9JknqD4Mjvdg5ASGWhKKOwg==
-X-Google-Smtp-Source: ABdhPJzkyyOAFQakNLKPpJl5joOFjae/AcNTO5l2I8TPcjJJXSsAIKXc+xGIz33Gsbm9HQbKLCjKhxqfB9nnHVogi3Y=
-X-Received: by 2002:a37:8044:: with SMTP id b65mr22312539qkd.150.1626890013396;
- Wed, 21 Jul 2021 10:53:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210707183616.5620-1-brijesh.singh@amd.com> <20210707183616.5620-27-brijesh.singh@amd.com>
- <YPHpk3RFSmE13ZXz@google.com> <9ee5a991-3e43-3489-5ee1-ff8c66cfabc1@amd.com> <YPWuVY+rKU2/DVUS@google.com>
-In-Reply-To: <YPWuVY+rKU2/DVUS@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Wed, 21 Jul 2021 10:53:22 -0700
-Message-ID: <CAA03e5EW1HUZW7xWbMyYMC1Q+A18G=91qfKT-ew=X0XNGHbVtg@mail.gmail.com>
-Subject: Re: [PATCH Part2 RFC v4 26/40] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH
- command
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=1ZFdogakN+U+D6SX6LhX2SwuYGYaPQsFnYtn2JJoTak=;
+        b=iDeuZQdgOY8Cb0OGDY3StfqGAV0iUR+RMz9Td4PzzE5bthQhsvecRC8jZANnbn1Xxa
+         ApNM1i1GSngtjv4VzqG/g6xJwbMOyPFiRiqqT6Vp6kP7waW3WnYBe2NfNSjvhLQ0TYsE
+         0HZmMF6CwfvvF1kcgwuO50VWbSLPboFECZ19bmGooEtAVkRECEA//HHwePZvGQG0mOfE
+         qO76wEkiwsMs8TJ509mGQaRMD6Q64qJ0eA5u0oehhXo0L5d9XYBChYgpzi+UvHFdX1lt
+         Tku5MHY11bBg0dCm4VeRpooLt4u/IvE8yEFIo0/g+2+OGT8cZKMlCxiazMpL0mXuASSZ
+         WKjg==
+X-Gm-Message-State: AOAM532iRv2vS3iMsPw+Egn7Lo5hI9izUqse3MLRlYx1GMRlxTnvGBVL
+        0zxWIRydg3fXfRppB6wrXn3K2g==
+X-Google-Smtp-Source: ABdhPJx0SNXBSozA1zqonbwhhcSmrLxNop72v66ohRghPV4r836hvfWk3fIwfoZPziXuNwE9t9Hl/Q==
+X-Received: by 2002:a17:90b:2382:: with SMTP id mr2mr5315994pjb.169.1626897180725;
+        Wed, 21 Jul 2021 12:53:00 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id 5sm31461466pgv.25.2021.07.21.12.52.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jul 2021 12:52:59 -0700 (PDT)
+Date:   Wed, 21 Jul 2021 19:52:55 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
 Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
         linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
         "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -86,42 +82,118 @@ Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
         Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
         npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH Part2 RFC v4 40/40] KVM: SVM: Support SEV-SNP AP Creation
+ NAE event
+Message-ID: <YPh7F2talucL7FQ9@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-41-brijesh.singh@amd.com>
+ <YPdjvca28JaWPZRb@google.com>
+ <c007821a-3a79-d270-07af-eb7d4c2d0862@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c007821a-3a79-d270-07af-eb7d4c2d0862@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 9:54 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Jul 16, 2021, Brijesh Singh wrote:
-> >
-> > On 7/16/21 3:18 PM, Sean Christopherson wrote:
-> > > On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> > >> +  data->gctx_paddr = __psp_pa(sev->snp_context);
-> > >> +  ret = sev_issue_cmd(kvm, SEV_CMD_SNP_LAUNCH_FINISH, data, &argp->error);
-> > > Shouldn't KVM unwind everything it did if LAUNCH_FINISH fails?  And if that's
-> > > not possible, take steps to make the VM unusable?
-> >
-> > Well, I am not sure if VM need to unwind. If the command fail but VMM decide
-> > to ignore the error then VMRUN will probably fail and user will get the KVM
-> > shutdown event. The LAUNCH_FINISH command finalizes the VM launch process,
-> > the firmware will probably not load the memory encryption keys until it moves
-> > to the running state.
->
-> Within reason, KVM needs to provide consistent, deterministic behavior.  Yes, more
-> than likely failure at this point will be fatal to the VM, but that doesn't justify
-> leaving the VM in a random/bogus state.  In addition to being a poor ABI, it also
-> makes it more difficult to reason about what is/isn't possible in KVM.
+On Wed, Jul 21, 2021, Tom Lendacky wrote:
+> On 7/20/21 7:01 PM, Sean Christopherson wrote:
+> > On Wed, Jul 07, 2021, Brijesh Singh wrote:
+> >> From: Tom Lendacky <thomas.lendacky@amd.com>
+> >> +
+> >> +		svm->snp_vmsa_pfn = pfn;
+> >> +
+> >> +		/* Use the new VMSA in the sev_es_init_vmcb() path */
+> >> +		svm->vmsa_pa = pfn_to_hpa(pfn);
+> >> +		svm->vmcb->control.vmsa_pa = svm->vmsa_pa;
+> >> +
+> >> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+> >> +	} else {
+> >> +		vcpu->arch.pv.pv_unhalted = false;
+> > 
+> > Shouldn't the RUNNABLE path also clear pv_unhalted?
+> 
+> If anything it should set it, since it will be "unhalted" now. But, I
+> looked through the code to try and understand if there was a need to set
+> it and didn't really see any reason. It is only ever set (at least
+> directly) in one place and is cleared everywhere else. It was odd to me.
 
-+1 to Sean's feedback to unwind everything here properly here.
-Comments of the nature of "XYZ should happen" -- without a test (e.g.,
-selftest or kvm-unit-test) to ensure the XYZ _does_ happen -- are a
-time bomb waiting to happen.
+pv_unhalted is specifically used for a "magic" IPI (KVM hijacked a defunct
+IPI type) in the context of PV spinlocks.  The idea is that a vCPU that's releasing
+a spinlock can kick the next vCPU in the queue, and KVM will directly yield to the
+vCPU being kicked so that the guest can efficiently make forward progress.
 
-Also, I wonder if we leave pages, RMPUPDATE'd to immutable in previous
-loop iterations, is it possible for them to remain as immutable and be
-reused later on (after this guest is destroyed)? And if this happens,
-will we get an RMP violation? Even if the answer is no -- go read this
-code 2,000 lines away -- it handles this case. That's still not a very
-satisfying answer. I'd rather see things cleaned up ASAP as soon as
-the code starts to go off the rails.
+So it's not wrong to leave pv_unhalted as is, but it's odd to clear it in the
+DESTROY case but not CREATE_INIT case.  It should be a moot point, as a sane
+implementation should make it impossible to get to CREATE with pv_unhalted=1.
+
+> >> +		vcpu->arch.mp_state = KVM_MP_STATE_UNINITIALIZED;
+> > 
+> > What happens if userspace calls kvm_arch_vcpu_ioctl_set_mpstate, or even worse
+> > the guest sends INIT-SIPI?  Unless I'm mistaken, either case will cause KVM to
+> > run the vCPU with vmcb->control.vmsa_pa==0.
+> 
+> Using the INVALID_PAGE value now (and even when it was 0), you'll get a
+> VMRUN failure.
+> 
+> The AP CREATE_ON_INIT is meant to be used with INIT-SIPI, so if the guest
+> hasn't done the right thing, then it will fail on VMRUN.
+> 
+> > 
+> > My initial reaction is that the "offline" case needs a new mp_state, or maybe
+> > just use KVM_MP_STATE_STOPPED.
+> 
+> I'll look at KVM_MP_STATE_STOPPED. Qemu doesn't reference that state at
+> all in the i386 support, though, which is why I went with UNINITIALIZED.
+
+Ya, it'd effectively be a new feature.  My concern with UNINITIALIZED is that it
+be impossible for KVM to differentiate between "never run" and "destroyed and may
+have an invalid VMSA" without looking at the VMSA.
+
+> >> +	mutex_lock(&target_svm->snp_vmsa_mutex);
+> > 
+> > This seems like it's missing a big pile of sanity checks.  E.g. KVM should reject
+> > SVM_VMGEXIT_AP_CREATE if the target vCPU is already "created", including the case
+> > where it was "created_on_init" but hasn't yet received INIT-SIPI.
+> 
+> Why? If the guest wants to call it multiple times I guess I don't see a
+> reason that it would need to call DESTROY first and then CREATE. I don't
+> know why a guest would want to do that, but I don't think we should
+> prevent it.
+
+Because "creating" a vCPU that already exists is non-sensical.  Ditto for
+onlining a vCPU that is already onlined.  E.g. from the guest's perspective, I
+would fully expect a SVM_VMGEXIT_AP_CREATE to fail, not effectively send the vCPU
+to an arbitrary state.
+
+Any ambiguity as to the legality of CREATE/DESTROY absolutely needs to be clarified
+in the GHCB.
+
+> >> +
+> >> +	target_svm->snp_vmsa_gpa = 0;
+> >> +	target_svm->snp_vmsa_update_on_init = false;
+> >> +
+> >> +	/* Interrupt injection mode shouldn't change for AP creation */
+> >> +	if (request < SVM_VMGEXIT_AP_DESTROY) {
+> >> +		u64 sev_features;
+> >> +
+> >> +		sev_features = vcpu->arch.regs[VCPU_REGS_RAX];
+> >> +		sev_features ^= sev->sev_features;
+> >> +		if (sev_features & SVM_SEV_FEATURES_INT_INJ_MODES) {
+> > 
+> > Why is only INT_INJ_MODES checked?  The new comment in sev_es_sync_vmsa() explicitly
+> > states that sev_features are the same for all vCPUs, but that's not enforced here.
+> > At a bare minimum I would expect this to sanity check SVM_SEV_FEATURES_SNP_ACTIVE.
+> 
+> That's because we can't really enforce it. The SEV_FEATURES value is part
+> of the VMSA, of which the hypervisor has no insight into (its encrypted).
+> 
+> The interrupt injection mechanism was specifically requested as a sanity
+> check type of thing during the GHCB review, and as there were no
+> objections, it was added (see the end of section 4.1.9).
+> 
+> I can definitely add the check for the SNP_ACTIVE bit, but it isn't required.
+
+I'm confused.  If we've no insight into what the guest is actually using, what's
+the point of the INT_INJ_MODES check?
