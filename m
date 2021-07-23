@@ -2,91 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7798C4338F
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jul 2021 10:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C9CC4338F
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jul 2021 16:20:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BED78608FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jul 2021 10:13:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A864A60EB5
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jul 2021 16:20:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231754AbhGWJdT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Jul 2021 05:33:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33100 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230025AbhGWJdT (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jul 2021 05:33:19 -0400
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D00C6C061575
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Jul 2021 03:13:52 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id c18so884669qke.2
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Jul 2021 03:13:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=ztFrdeKS6YAJ7D5SqhTw5S3JxKf0OcDAtcpZaltM+o0=;
-        b=hDS150YQ3YzkQE0H637H8Vj2dF0gS6QCZ4yWYcdgAz8zjextcal9EM0ZkBjlPrxURh
-         C0xYftJzVFPjt6YLSGuU5VSgOxQvYOsm9tdzDHtEYG84NNNTUUASDf1/hmBR/0HA/H1/
-         eqCUJz9uQOfFYLoHh61biklPp39RwrJt0Dmj+jfBxr8g9DDF1dm+tZ5Qf1wZdgm+/yD3
-         iuGQfWCv5ZOHNVwQPQ/r/ViKWSBB0Zk9hvPOWrTHiF7z04aeuPO7/vCbkYw9LOyZVQKV
-         7qLrjaIfXQUHO6kyL1I4OOdxoc+kUpGXezSjgbyYPnPhMer5IGp/4T2Efsfer37WsAWO
-         zubQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=ztFrdeKS6YAJ7D5SqhTw5S3JxKf0OcDAtcpZaltM+o0=;
-        b=Xgq61f914kA+0zt6mtNrAJT2DxtoBt7unoaU5EmvqMymvXQgk8EzT5PFIM7wi135Gx
-         2vekgKLOdhx7ImqzIEn/aihuMGGroIYEMBmMIKTJL9dMkYnYfH9xm7f/yUM/cCetPCzG
-         1Zs50oT0gK0MSaSRkU6xlkeYyJ4pSi6aD0kIYMQeQWwjyl9xidAhuF/7tol0Eg1L8tEt
-         YUwpdv+GijldfImrTttF6JTFbAc3Hq54GkiEpcB0BidhZ1dPz0AqF4hPOhXNI4U+Z4uT
-         WsROdWDx/2uUKvIkTcwlC/5kXtzaOkR7myq2KWiIAgQ3la2jYmkUmTbsOKAjIv05u8fX
-         evyQ==
-X-Gm-Message-State: AOAM532NLChni5riiy1dsIbz8mJJ78ynC/KpOcrgofo5BO2KQAfnfLXo
-        JX3aoP5RjJJ4ZrJqjq8llkCbeYwmgXDD6A==
-X-Google-Smtp-Source: ABdhPJzjJTSnf85huoYr/fMTApdyV3Lf0fPe5s3iLztcBGUtOCKHVJVrg5+OWDdTPPlHoy0ByILSsQ==
-X-Received: by 2002:a05:620a:49e:: with SMTP id 30mr3807494qkr.230.1627035231542;
-        Fri, 23 Jul 2021 03:13:51 -0700 (PDT)
-Received: from [192.168.1.93] (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.gmail.com with ESMTPSA id w185sm14281806qkd.30.2021.07.23.03.13.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Jul 2021 03:13:51 -0700 (PDT)
-From:   Thara Gopinath <thara.gopinath@linaro.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Extending CRYPTO_ALG_OPTIONAL_KEY for cipher algorithms
-Message-ID: <f04c8f1d-db85-c9e1-1717-4ca98b7c8c35@linaro.org>
-Date:   Fri, 23 Jul 2021 06:13:50 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S229698AbhGWPjy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Jul 2021 11:39:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58146 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230190AbhGWPjx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Jul 2021 11:39:53 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E1BCE60E0C;
+        Fri, 23 Jul 2021 16:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1627057227;
+        bh=BSKEbzYJ66nESAtFQf4aOIwr905oWBJvxJpIr0z1g3s=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=GVmllpAWocCrBtift0p+Xav1Nur5S1QohOppiS7Il6MoIUre++paxiWkznrF62hYn
+         +wSEWuTuSGzJqjtZ56EPJQJIDZaNmFy+9Wq6/N9ggn7gdVUdzBSBUQs1iXXKT3u8wO
+         HsPzGynBBgFcFw0kahkmTNiPeITH2JcJkeEdJN+3fYyksdsHhOXCia1nh11VCbWSSJ
+         4ylfhErQrIcOBJ8jPQbu7Vit9VAvwz34LTHyO4u7p3F0R/AqlBVNwJFg3aS40VlGaL
+         5+5YIBZ4Pefa9peotRTAoCgpO0nv5EZ4SODH++VDGe/vFN7TYhHX6ifufw42vBitw/
+         zZ74xSs4vqApw==
+Date:   Fri, 23 Jul 2021 09:20:25 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Thara Gopinath <thara.gopinath@linaro.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Subject: Re: Extending CRYPTO_ALG_OPTIONAL_KEY for cipher algorithms
+Message-ID: <YPrsScKf/YlKmNfU@gmail.com>
+References: <f04c8f1d-db85-c9e1-1717-4ca98b7c8c35@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f04c8f1d-db85-c9e1-1717-4ca98b7c8c35@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi
+On Fri, Jul 23, 2021 at 06:13:50AM -0400, Thara Gopinath wrote:
+> Hi
+> 
+> I have a requirement where the keys for the crypto cipher algorithms are
+> already programmed in the h/w pipes/channels and thus the ->encrypt()
+> and ->decrypt() can be called without set_key being called first.
+> I see that CRYPTO_ALG_OPTIONAL_KEY has been added to take care of
+> such requirements for CRC-32. My question is can the usage of this flag
+> be extended for cipher and other crypto algorithms as well. Can setting of
+> this flag indicate that the algorithm can be used without calling set_key
+> first and then the individual drivers can handle cases where
+> both h/w keys and s/w keys need to be supported.
 
-I have a requirement where the keys for the crypto cipher algorithms are 
-already programmed in the h/w pipes/channels and thus the ->encrypt()
-and ->decrypt() can be called without set_key being called first.
-I see that CRYPTO_ALG_OPTIONAL_KEY has been added to take care of
-such requirements for CRC-32. My question is can the usage of this flag
-be extended for cipher and other crypto algorithms as well. Can setting 
-of this flag indicate that the algorithm can be used without calling 
-set_key first and then the individual drivers can handle cases where
-both h/w keys and s/w keys need to be supported.
+CRYPTO_ALG_OPTIONAL_KEY isn't meant for this use case, but rather for algorithms
+that have both keyed and unkeyed versions such as BLAKE2b and BLAKE2s, and also
+for algorithms where the "key" isn't actually a key but rather is an initial
+value that has a default value, such as CRC-32 and xxHash.
 
+It appears that that the case you're asking about is handled by using a
+different algorithm name, e.g. see the "paes" algorithms in
+drivers/crypto/ccree/cc_cipher.c.
 
-
--- 
-Warm Regards
-Thara (She/Her/Hers)
+- Eric
