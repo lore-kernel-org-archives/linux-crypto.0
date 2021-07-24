@@ -2,114 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D86C4338F
-	for <linux-crypto@archiver.kernel.org>; Sat, 24 Jul 2021 09:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 870AFC4338F
+	for <linux-crypto@archiver.kernel.org>; Sat, 24 Jul 2021 11:17:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 154F260E9C
-	for <linux-crypto@archiver.kernel.org>; Sat, 24 Jul 2021 09:42:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5CCFE60E9C
+	for <linux-crypto@archiver.kernel.org>; Sat, 24 Jul 2021 11:17:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234970AbhGXJCA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 24 Jul 2021 05:02:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37838 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234867AbhGXJCA (ORCPT
+        id S234162AbhGXKhE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 24 Jul 2021 06:37:04 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:54486 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232233AbhGXKhD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 24 Jul 2021 05:02:00 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61689C061575
-        for <linux-crypto@vger.kernel.org>; Sat, 24 Jul 2021 02:42:32 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id x192so6284894ybe.0
-        for <linux-crypto@vger.kernel.org>; Sat, 24 Jul 2021 02:42:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=7tYxS44DZXuUv9URTnjvq6oxZimO6tOjzUCMqYf4ByY=;
-        b=fS94OPaO2ncoYyCIikIVmo/sZkwMtFLOXKzOsUeLanL8BITBYDCV1YILRWwTMksCkw
-         TfoQNU6Cr0HCQzEoJgYcZQiyjuzNCY5xLT7Bo51gwX9+i2KqkyHTklQpzbSv1luio/LY
-         NQtmI9nstTxQPLbOFLSkcNs0l3uw6EwEcNxz5egdnGmmeOiP7JqTUOfmaTDXRo3KJpaE
-         TnoVUJnu628/L2ObJezJNRlL9ZoU5LPwCId7ZRWYbAYUFU2yInkLA2wbPzn9W6HmXyYw
-         0q1AWGIlnEHpHfybo9xJpQGZl/MNwyAMbsUq5G1LIp95dUFGNrNkYyNYNcsrz0vWd6R1
-         VWJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=7tYxS44DZXuUv9URTnjvq6oxZimO6tOjzUCMqYf4ByY=;
-        b=bTn5J6tTZ+QhmXLv9/Bbv6QfhfXhPGZRoc//4pzQTBty4Zi707FZ16rncS0xR9CSYT
-         5ufXEZZNAkCMzeTiIARw83KyalsLoCzUo1Zwn5w1b1puhia8o6dhYK2A+gW4LG6wkoK8
-         Tjc3vUEag4jPTQqeTwnO38VHcg3VbHZ6kFsAvJ00J61QgBqgUUUEgNj4RxTOUK2HQ+l2
-         9YJi2VL3ROIfu/3z5JgYV+PWl7ap/p3KdPxi9aRVYzVyh9U+XY+aZBBngraCy8M5AIHr
-         Oxr1ejZUXLTPc42BR5dXashFTmbLtDEJmJ0qXoR4uhsyxt+n0bVnCZtHpitDczzYOQvs
-         Se2g==
-X-Gm-Message-State: AOAM5324sNcITSFoIv8oGdAZDv7MXxIh2YN+RPVDly+Hr8xXdd1JF4/i
-        q6iEoDTuyb2B/ZDUDS2tyKuqIC5RXzMpQ6JNSgOM4Q==
-X-Google-Smtp-Source: ABdhPJxlu2XSyoavrBrcCO/jf574yf29ouOmE8PgWlEqn3nya/k/X3GIlDMuG6vUT/nNrzp81FVxpP713F/IJOv3reY=
-X-Received: by 2002:a5b:7c4:: with SMTP id t4mr11530643ybq.509.1627119750875;
- Sat, 24 Jul 2021 02:42:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <f04c8f1d-db85-c9e1-1717-4ca98b7c8c35@linaro.org> <YPrsScKf/YlKmNfU@gmail.com>
-In-Reply-To: <YPrsScKf/YlKmNfU@gmail.com>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Sat, 24 Jul 2021 12:42:20 +0300
-Message-ID: <CAOtvUMfwbBr44qOCma4RaH_RoC35x00N=O1Ejaxc+5EPGY8rUw@mail.gmail.com>
-Subject: Re: Extending CRYPTO_ALG_OPTIONAL_KEY for cipher algorithms
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Thara Gopinath <thara.gopinath@linaro.org>,
+        Sat, 24 Jul 2021 06:37:03 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 0768D2004F;
+        Sat, 24 Jul 2021 11:17:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1627125455; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NkVWf78L+AoJgvAxJsjn66EGaBxm+SYMwkmixM6XH9I=;
+        b=D8UWHPr3nT8G3QJl8mOWyoyMkloqPk3c7kb+geAfYRVSHj2uqsK/DKUI3YuO2ndyTHp555
+        fv1hh0zaWK+0TLORtjKYvRkY2y1RBJIUfYdAm1k1m07anhFUQVlMs7un5A1uWl9pZisRGh
+        EMrkXbqJRvkckeTr14T8LK6Pi+i/x/s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1627125455;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NkVWf78L+AoJgvAxJsjn66EGaBxm+SYMwkmixM6XH9I=;
+        b=5ucQesTJjyzpPjf6QKPaWWrFKbny+4STqzMvso07sLVjN8IqMLu94xhLINjuZ72kjZubTI
+        Dro8otJtwriqO+Cw==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id D104F13982;
+        Sat, 24 Jul 2021 11:17:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id FmmlMc72+2DpYgAAGKfGzw
+        (envelope-from <hare@suse.de>); Sat, 24 Jul 2021 11:17:34 +0000
+Subject: Re: [RFC PATCH 00/11] nvme: In-band authentication support
+To:     Vladislav Bolkhovitin <vst@vlnb.net>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@wdc.com>,
+        linux-nvme@lists.infradead.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+References: <20210716110428.9727-1-hare@suse.de>
+ <66b3b869-02bd-9dee-fadc-8538c6aad57a@vlnb.net>
+ <e339e6e7-fc32-2480-ca99-516547105776@suse.de>
+ <833cfd62-1e1f-1dca-2e38-ff07b3a5e8fb@vlnb.net>
+ <2f241490-3bfd-2151-9d76-970e0d6bfd68@vlnb.net>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <d1ca46ef-4615-9385-f30b-281b6c39ac8a@suse.de>
+Date:   Sat, 24 Jul 2021 13:17:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <2f241490-3bfd-2151-9d76-970e0d6bfd68@vlnb.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 23, 2021 at 7:20 PM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Fri, Jul 23, 2021 at 06:13:50AM -0400, Thara Gopinath wrote:
-> > Hi
-> >
-> > I have a requirement where the keys for the crypto cipher algorithms ar=
-e
-> > already programmed in the h/w pipes/channels and thus the ->encrypt()
-> > and ->decrypt() can be called without set_key being called first.
-> > I see that CRYPTO_ALG_OPTIONAL_KEY has been added to take care of
-> > such requirements for CRC-32. My question is can the usage of this flag
-> > be extended for cipher and other crypto algorithms as well. Can setting=
- of
-> > this flag indicate that the algorithm can be used without calling set_k=
-ey
-> > first and then the individual drivers can handle cases where
-> > both h/w keys and s/w keys need to be supported.
->
-> CRYPTO_ALG_OPTIONAL_KEY isn't meant for this use case, but rather for alg=
-orithms
-> that have both keyed and unkeyed versions such as BLAKE2b and BLAKE2s, an=
-d also
-> for algorithms where the "key" isn't actually a key but rather is an init=
-ial
-> value that has a default value, such as CRC-32 and xxHash.
->
-> It appears that that the case you're asking about is handled by using a
-> different algorithm name, e.g. see the "paes" algorithms in
-> drivers/crypto/ccree/cc_cipher.c.
-
-Yeap, seems like another use case for "protected keys" like CryptoCell
-and the IBM mainframe.
-I gave a talk about this you might find useful -
-https://www.youtube.com/watch?v=3DGbcpwUBFGDw
-
-Feel free to contact me if you have questions.
+On 7/23/21 10:02 PM, Vladislav Bolkhovitin wrote:
+> Another comment is that better to perform CRC check of dhchap_secret and
+> generation of dhchap_key right where the secret was specified (e.g.,
+> nvmet_auth_set_host_key() on the target side).
+> 
+> No need to do it every time for every connection and by that increase
+> authentication latency. As I wrote in the other comment, it might be 128
+> or more connections established during connecting to a single NVMe-oF
+> device.
+> 
+And this is something I did deliberately.
+The primary issue here is that the user might want/need to change the 
+PSK for re-authentication. But for that he might need to check what the 
+original/current PSK is, so I think we need to keep the original PSK as 
+passed in from the user.
+And I found it a waste of space to store the decoded secret in addition 
+to the original one, seeing that it can be derived from the original one.
+But your argument about the many connections required for a single NVMe 
+association is certainly true, to it would make sense to keep the decode 
+one around, too, just to speed up computation.
+Will be updating the patchset.
 
 Cheers,
-Gilad
 
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
