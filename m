@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD06BC4320A
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 09:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7AB3C4338F
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 15:25:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C520B60E0C
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 09:56:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC17460F59
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 15:25:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232834AbhGZJPg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Jul 2021 05:15:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51106 "EHLO
+        id S235110AbhGZOpV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Jul 2021 10:45:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232156AbhGZJPf (ORCPT
+        with ESMTP id S234823AbhGZOpU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Jul 2021 05:15:35 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2357C061757;
-        Mon, 26 Jul 2021 02:56:03 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id gv20-20020a17090b11d4b0290173b9578f1cso12705668pjb.0;
-        Mon, 26 Jul 2021 02:56:03 -0700 (PDT)
+        Mon, 26 Jul 2021 10:45:20 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DEB7C061757;
+        Mon, 26 Jul 2021 08:25:48 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id a20so12258651plm.0;
+        Mon, 26 Jul 2021 08:25:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=8hq1iwo5Hm1g8aqgoAxXS/EpDF9ENodl1JxcIEWdESM=;
-        b=Px3S4BKiazxPjW1E/yyznc3VnwcyyEkBrD1s0NbkzNsa/LlsIyxNSi/IfJUFzOwT+5
-         yCNPZdmz0z642AmSQ/YTdyMEGViAedy1Vg6KcM3OeIn7xZT9D4pN6hrA9//BgA4XY3Ma
-         LgXK1gXy3Q5pk7BO1oknmAC2kpXmLG27plvFchrn+dljf5CfyalatDyDGkEh8gzDtV7M
-         4oxMznO1xd78rIX+qdcHvm7S5IyQWASK5Sdfc+pbhXn+9RdERMIZBOgHSltbXIQ1TPle
-         XQDPiJbJUZfeeH0+CHDhs42LnYiC3jjUtvhNxQv96Ucoqcd+dThTCn/Z9VsmHoRy7s15
-         b3uw==
+        bh=YJ2wiacers242b03J1VtREz0S4EVBe3CkaiVWqJ9kVg=;
+        b=hXQPIflR8ZhFX0feKPijERYg/69KAJPHtc16bQXnx5lGj90ised38lKMXuA3isoLjo
+         Fb50Xww5eEsA1wFlnsHLSziCczZE1Jagx9Y8YNEElKJ9qPA88sVm8K8dfT0dnWRS5BBa
+         aKK94+bXmAgSdIIza7k3+8Q8vrqK9rKc9OgqYH99Irpn8FwFP0USqQxAefNFiJKtKq4F
+         zJw47BcDpvQR/nqjoY9oFLkizYEnsh3ERrDltT3NvLQp2Ma9Bo5Da4ob/Pwme5++Q4ZM
+         Zju/5+OCgF0Po3B1EDRpC/L+DU14X7eIbPkPGtbo5VxH3GW7U79ANkpwjL3SAgv1qHnB
+         VkRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=8hq1iwo5Hm1g8aqgoAxXS/EpDF9ENodl1JxcIEWdESM=;
-        b=VPSoKwAknb7b5czz7Iz8TUt1ZhVJd90Rn9sKY4dPKChB4lBRPClIujO7MqvXsvsIR/
-         lH+QRYypbsAAkkbj5El3JCBjAJov4k1L+zP9cAbXVYXp9GK79GvH5KddJcYPZyHdnFHo
-         bNHIFL0u7E0xVgM7nnyo2hkKjbPHkeGvlJddIriUVMz377DkLmHbWk8vMa0kzCSh7Vdj
-         cTtZ+lVdDw276GfjJxEuFjGrTEPsjLMyMfNK+eafkpyPZ1eIiOY85KVhVm3YH0UicDQz
-         j9MgPAASQJ5BKPnAipYXIqczwpOSEX/x2mOSh9RnJNIeDpRnaydeG6pqA7GHzNNFh3U+
-         BMew==
-X-Gm-Message-State: AOAM533n6fTw13Jm2zgXb/X6riZoDuy0lQ0n3gyrTaVCWbc5qNzDg7ub
-        dqWPTeAKfbGP2jiv4QfcCsc=
-X-Google-Smtp-Source: ABdhPJzCKM9r4O0HketpP2tZvU8A7c4NgYZXDFv335Gdxhn9JWdsPxJ6xFTlZodmsTONsRKS13lm5A==
-X-Received: by 2002:a17:90b:212:: with SMTP id fy18mr5411891pjb.52.1627293363106;
-        Mon, 26 Jul 2021 02:56:03 -0700 (PDT)
+        bh=YJ2wiacers242b03J1VtREz0S4EVBe3CkaiVWqJ9kVg=;
+        b=g5Zo1hf3Y11Cu9sLfjQ7xxrPgtiGJtytUmKXPB8ypxr1xG8BUTJ6X+kCkWXHshqEDX
+         HIeAGrxBy0aXhqpn735HoiHec3hwjnhQWX9fqYNibo6Wg0FtQAOSf6CS04+C+nQJhqx1
+         XcMdOjPFdyCKO1fpgG0+pymzGaGWHCPOQarHpFkrnmp7ZWej4K7McTK6s7UVOprvQIz9
+         PMk6zOLFYmQsZODeTRTrYDSQOntCXrpJcaPGcNwymOt9iRkU2omG1GVVCmJxjJAcAjds
+         dZCj8x5NXvGv8bwgGjrJ6TGrjIjfc0F61SaMtepMIYuVVnMkUAGHJSLb8uBnt59K0jEy
+         K/ZA==
+X-Gm-Message-State: AOAM530KsU6lGxy4NIeNXEjAxCcSj+7UiVelT8zz7RHJjGl7cKcW/rOu
+        OX6h5IjSStbIx97B6dImGg0=
+X-Google-Smtp-Source: ABdhPJz9jcD2Df8C8OTsG5zvot3I4VXhYSaUTGjdkxXuICoBM5u5IMzBo9TCZcXaWwQ1mgTN5C2Ltw==
+X-Received: by 2002:aa7:9541:0:b029:32c:cefa:123f with SMTP id w1-20020aa795410000b029032ccefa123fmr18103572pfq.24.1627313147752;
+        Mon, 26 Jul 2021 08:25:47 -0700 (PDT)
 Received: from localhost.localdomain ([154.16.166.171])
-        by smtp.gmail.com with ESMTPSA id r7sm10268304pga.44.2021.07.26.02.55.58
+        by smtp.gmail.com with ESMTPSA id x14sm307079pfu.200.2021.07.26.08.25.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jul 2021 02:56:02 -0700 (PDT)
+        Mon, 26 Jul 2021 08:25:47 -0700 (PDT)
 From:   Dongliang Mu <mudongliangabcd@gmail.com>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -69,12 +69,11 @@ To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Eric Biggers <ebiggers@google.com>,
         Dongliang Mu <mudongliangabcd@gmail.com>,
         Colin Ian King <colin.king@canonical.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: [PATCH v3] crypto: sun8i-ce: fix memory leak and return value of sun8i_ce_hash_run
-Date:   Mon, 26 Jul 2021 17:55:13 +0800
-Message-Id: <20210726095536.2251860-1-mudongliangabcd@gmail.com>
+Subject: [PATCH v4] crypto: sun8i-ss: fix multiple memory leaks in sun8i_ss_hash_run
+Date:   Mon, 26 Jul 2021 23:25:21 +0800
+Message-Id: <20210726152533.2281139-1-mudongliangabcd@gmail.com>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -82,7 +81,7 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In sun8i_ce_hash_run, all the dma_mmap_sg/single will cause memory leak
+In sun8i_ss_hash_run, all the dma_mmap_sg/single will cause memory leak
 due to no corresponding unmap operation if errors happen.
 
 Fix this by adding error handling part for all the dma_mmap_sg/single.
@@ -93,7 +92,8 @@ Signed-off-by: Dongliang Mu <mudongliangabcd@gmail.com>
 v1->v2: move crypto_finalize_hash_request to the end of function; move
 the memcpy after the dma_mmap_sg/single functions.
 v2->v3: remove some unrelated code changes; delete the fix of return value
-since there is no corresponding handling code 
+since there is no corresponding handling code
+v3->v4: change sun8i_ce to sun8i_ss
  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c | 15 ++++++++-------
  1 file changed, 8 insertions(+), 7 deletions(-)
 
