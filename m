@@ -2,80 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F0BC4338F
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 17:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D5CC4338F
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 17:56:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E56A960F44
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 17:19:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7F7F60F6C
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 17:56:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234818AbhGZQjP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Jul 2021 12:39:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57230 "EHLO mail.kernel.org"
+        id S231455AbhGZRQZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Jul 2021 13:16:25 -0400
+Received: from foss.arm.com ([217.140.110.172]:57140 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241616AbhGZQiU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Jul 2021 12:38:20 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6FCDF60F44;
-        Mon, 26 Jul 2021 17:18:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627319928;
-        bh=+CcyGlBerMfsxhJmCjzpCHhYPHtnbheE5VAiT7m0sD8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cMdXdUt+CvBSYxDSnrQorpRVcY1ZNvej7RshO7wd1QCv16CHs3y6qAKft2Ovg700A
-         xI7OKeDepoOpQ4QwY6N8GW//KuH04x6HPkhBsqItB1deTenz7JDrvEKyPgiFAh7xAD
-         r+3N0XVKXcElx7j5z48ex2fx83WND6c7ZpnG0jHgRsIWh8vGzioT1YdYFQ7eNw1/Vd
-         6HXDDpftr3orjRkCyNfIdkRjezZRQRFTcMyg3bBOrQRb0zQjW0oX5W716bpJYu25CK
-         eaKZ4CSEIbfOSwVUQl/D7f2mzFLxWjNdOszJ7+Dlo/AcdzH3an/hZ0DmE6YHNLItk5
-         oiflbICyt7+Aw==
-Date:   Mon, 26 Jul 2021 10:18:47 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jordy Zomer <jordy@pwning.systems>
-Cc:     netdev@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        id S231207AbhGZRQY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Jul 2021 13:16:24 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A8CB51FB;
+        Mon, 26 Jul 2021 10:56:52 -0700 (PDT)
+Received: from localhost.localdomain (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8E1673F66F;
+        Mon, 26 Jul 2021 10:56:50 -0700 (PDT)
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: ccm - avoid negative wrapping of integers
-Message-ID: <YP7udzoj4vVQHlYv@gmail.com>
-References: <20210726170120.410705-1-jordy@pwning.systems>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210726170120.410705-1-jordy@pwning.systems>
+        Mark Rutland <mark.rutland@arm.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
+        Ali Saidi <alisaidi@amazon.com>,
+        Jon Nettleton <jon@solid-run.com>
+Subject: [PATCH v3 0/2] hwrng: Add Arm SMCCC TRNG based driver
+Date:   Mon, 26 Jul 2021 18:56:08 +0100
+Message-Id: <20210726175610.3311-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.14.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 26, 2021 at 07:01:20PM +0200, Jordy Zomer wrote:
-> Set csize to unsigned int to avoid it from wrapping as a negative number (since format input sends an unsigned integer to this function). This would also result in undefined behavior in the left shift when msg len is checked, potentially resulting in a buffer overflow in the memcpy call.
-> 
-> Signed-off-by: Jordy Zomer <jordy@pwning.systems>
-> ---
-> To address was corrected, and ccm was added to the topic to indicate that this is just for ccm.
-> 
->  crypto/ccm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/crypto/ccm.c b/crypto/ccm.c
-> index 6b815ece51c6..e14201edf9db 100644
-> --- a/crypto/ccm.c
-> +++ b/crypto/ccm.c
-> @@ -66,7 +66,7 @@ static inline struct crypto_ccm_req_priv_ctx *crypto_ccm_reqctx(
->  	return (void *)PTR_ALIGN((u8 *)aead_request_ctx(req), align + 1);
->  }
->  
-> -static int set_msg_len(u8 *block, unsigned int msglen, int csize)
-> +static int set_msg_len(u8 *block, unsigned int msglen, unsigned int csize)
->  {
->  	__be32 data;
+The "Arm True Random Number Generator Firmware Interface"[1] provides
+an SMCCC based interface to a true hardware random number generator.
+So far we are using that in arch_get_random_seed(), but it might be
+useful to expose the entropy through the /dev/hwrng device as well. This
+allows to assess the quality of the implementation, by using "rngtest"
+from the rng-tools package, for example.
 
-This isn't necessarily a bad change, but the value of csize is clearly in
-[1, 256] if you read format_input(), and in fact is in [2, 8] if you read the
-whole file, so please don't claim this is actually fixing anything, as it's not.
-Also please line wrap your commit message.
+Patch 1 creates a platform device, triggered by the previous discovery
+of the SMCCC TRNG service.
+Patch 2 implements a hw_random platform driver, which is instantiated
+through this said platform device.
 
-- Eric
+The driver can be loaded as module, or built into the kernel.
+
+[1] https://developer.arm.com/documentation/den0098/latest/
+
+Changelog v2 ... v3:
+- split platform device and driver
+
+Changelog v1 ... v2:
+- fix building as a module
+- de-register device upon exit
+- mention module name in Kconfig
+
+Andre Przywara (2):
+  firmware: smccc: Register smccc_trng platform device
+  hwrng: Add Arm SMCCC TRNG based driver
+
+ drivers/char/hw_random/Kconfig          |  14 +++
+ drivers/char/hw_random/Makefile         |   1 +
+ drivers/char/hw_random/arm_smccc_trng.c | 134 ++++++++++++++++++++++++
+ drivers/firmware/smccc/smccc.c          |  17 +++
+ 4 files changed, 166 insertions(+)
+ create mode 100644 drivers/char/hw_random/arm_smccc_trng.c
+
+-- 
+2.17.6
+
