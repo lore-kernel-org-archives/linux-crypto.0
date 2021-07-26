@@ -2,371 +2,180 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A3EC4320E
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 07:18:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4FB2C432BE
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 08:02:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4BFA60FA0
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 07:18:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCD9760F37
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 08:02:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232711AbhGZGhl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Jul 2021 02:37:41 -0400
-Received: from mailgw02.mediatek.com ([210.61.82.184]:57662 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S232585AbhGZGh2 (ORCPT
+        id S232815AbhGZHWW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Jul 2021 03:22:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53066 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232888AbhGZHWT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Jul 2021 02:37:28 -0400
-X-UUID: 15cf67d2c12848109e833f98c2dbbfef-20210726
-X-UUID: 15cf67d2c12848109e833f98c2dbbfef-20210726
-Received: from mtkexhb02.mediatek.inc [(172.21.101.103)] by mailgw02.mediatek.com
-        (envelope-from <sam.shih@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 197119199; Mon, 26 Jul 2021 15:17:54 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by
- mtkmbs01n1.mediatek.inc (172.21.101.68) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Mon, 26 Jul 2021 15:17:52 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Mon, 26 Jul 2021 15:17:52 +0800
-From:   Sam Shih <sam.shih@mediatek.com>
-To:     Rob Herring <robh+dt@kernel.org>, Sean Wang <sean.wang@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
+        Mon, 26 Jul 2021 03:22:19 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEB03C061757;
+        Mon, 26 Jul 2021 01:02:34 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id c16so5027488plh.7;
+        Mon, 26 Jul 2021 01:02:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TztOQrqAi1WWdC8KOhyOiu1dKlM5nvZj+oiQ3YMyM5Q=;
+        b=ZGB5+21luOnAKkD/7A35U+OjiJZK9c+9pwkHP9A018dW/F2AD0w9H/5V18yWp1G7UQ
+         wpol1BciVR1o+Q31GnZR6Z3ePGJGKRuflhZxDlO4Te5Gma0D45BhIIlhQbwHPUk3bPtw
+         DabraqMSH/M/kFGi+fnyAlpbyWf/Wmwn7KRsWJdXhTOocQEV5VtKD4VAHD9sovSPSniD
+         1soqFwySa83YNflTn00pgF0ueAFriFz7BLs2ZfjP41bAl3j1o5X7TivslDQ+izLspg7f
+         dho1VdM9SN+hzLDiJ7sSxtSoK6NCwsNyhrfAt//nDLm25qUv5HQeFQBF6yHdCSZDmU9L
+         sB/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TztOQrqAi1WWdC8KOhyOiu1dKlM5nvZj+oiQ3YMyM5Q=;
+        b=Qc9srNIoL8UUG7d9pdz9a/gqod4s3dK4VTaJ6UTX1Er8vYPbJ14DW1W0kBKBbRlU10
+         DBIpl2ZWozkX/OzoJSXSMoRq3dda5uTWiltcqvZTmqBS7dZNxKUtphJGV3vuVUUzfooy
+         cybNtnU2jIbK5Y6wjQdJrrQ0szLAlJhp2gbNSgu4w/32pGNmLm1AfVjBFabSRhsDVNTu
+         WiKvADmBfOhM4eNUjAAQuxNB/6caU+aYqCQ2/+7eRD2bhZ5jc/HY4ktP8C/TwolbnNQ5
+         ZQIFF383yO2KGlwJavnBfJwLzbxx9P6aKtrO3yivDuQ8l7PiZ81XAzpKmvAobrXZunG8
+         WGpA==
+X-Gm-Message-State: AOAM533XVJJKBk2WZ+2sPZ+mijTe2LNUjeeD+3tP+T4Z3PPq/OiO2bIM
+        +Ow1ebyu8OU6CTmFosmwPx8=
+X-Google-Smtp-Source: ABdhPJw4BP6wmZ6TTj7ePOuCck8LQRGI4lRD7w4VozOPSq+TdQxz/BRrTzLDjSn5gi9RqPGgkHgbyA==
+X-Received: by 2002:a17:902:d916:b029:11e:3249:4a17 with SMTP id c22-20020a170902d916b029011e32494a17mr13666778plz.0.1627286554161;
+        Mon, 26 Jul 2021 01:02:34 -0700 (PDT)
+Received: from localhost.localdomain ([154.16.166.171])
+        by smtp.gmail.com with ESMTPSA id 78sm34049460pfw.189.2021.07.26.01.02.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jul 2021 01:02:33 -0700 (PDT)
+From:   Dongliang Mu <mudongliangabcd@gmail.com>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Hsin-Yi Wang <hsinyi@chromium.org>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        Fabien Parent <fparent@baylibre.com>,
-        Seiya Wang <seiya.wang@mediatek.com>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>, <linux-gpio@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-crypto@vger.kernel.org>, <linux-serial@vger.kernel.org>,
-        <linux-watchdog@vger.kernel.org>, <linux-clk@vger.kernel.org>
-CC:     John Crispin <john@phrozen.org>,
-        Ryder Lee <Ryder.Lee@mediatek.com>,
-        Sam Shih <sam.shih@mediatek.com>
-Subject: [PATCH 12/12] arm64: dts: mediatek: add mt7986b support
-Date:   Mon, 26 Jul 2021 15:14:39 +0800
-Message-ID: <20210726071439.14248-13-sam.shih@mediatek.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20210726071439.14248-1-sam.shih@mediatek.com>
-References: <20210726071439.14248-1-sam.shih@mediatek.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Dongliang Mu <mudongliangabcd@gmail.com>,
+        Xiang Chen <chenxiang66@hisilicon.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2] crypto: sun8i-ce: fix memory leak and return value of sun8i_ce_hash_run
+Date:   Mon, 26 Jul 2021 15:59:36 +0800
+Message-Id: <20210726075957.2231287-1-mudongliangabcd@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add basic chip support for Mediatek mt7986b, include
-uart nodes with correct clocks, rng node with correct clock,
-watchdog node and mt7986b pinctrl node.
+This patch fixes some memory leak caused by dma_mmap_sg/single
+in the error handling code. In addition, it fixes the return value
+when errors related with dma_mmap_sg/single occur.
 
-Add cpu node, timer node, gic node, psci and reserved-memory node
-for ARM Trusted Firmware,
-
-Add clock controller nodes, include 40M clock source, topckgen, infracfg,
-infracfg_ao (always on), apmixedsys and ethernet subsystem.
-
-Signed-off-by: Sam Shih <sam.shih@mediatek.com>
+Reported-by: Dongliang Mu <mudongliangabcd@gmail.com>
+Fixes: 732b764099f65 ("crypto: sun8i-ce - fix two error path's memory leak")
+Signed-off-by: Dongliang Mu <mudongliangabcd@gmail.com>
 ---
- arch/arm64/boot/dts/mediatek/Makefile        |   1 +
- arch/arm64/boot/dts/mediatek/mt7986b-rfb.dts |  21 ++
- arch/arm64/boot/dts/mediatek/mt7986b.dtsi    | 235 +++++++++++++++++++
- 3 files changed, 257 insertions(+)
- create mode 100644 arch/arm64/boot/dts/mediatek/mt7986b-rfb.dts
- create mode 100644 arch/arm64/boot/dts/mediatek/mt7986b.dtsi
+v1->v2: move crypto_finalize_hash_request to the end of function; move
+the memcpy after the dma_mmap_sg/single functions. 
+ .../crypto/allwinner/sun8i-ss/sun8i-ss-hash.c | 28 +++++++++----------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/mediatek/Makefile b/arch/arm64/boot/dts/mediatek/Makefile
-index e6c3a73b9e4a..d555e43d1ccc 100644
---- a/arch/arm64/boot/dts/mediatek/Makefile
-+++ b/arch/arm64/boot/dts/mediatek/Makefile
-@@ -8,6 +8,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += mt6797-x20-dev.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7622-rfb1.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7622-bananapi-bpi-r64.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-rfb.dtb
-+dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986b-rfb.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt8167-pumpkin.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt8173-elm.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt8173-elm-hana.dtb
-diff --git a/arch/arm64/boot/dts/mediatek/mt7986b-rfb.dts b/arch/arm64/boot/dts/mediatek/mt7986b-rfb.dts
-new file mode 100644
-index 000000000000..8296f1d27e77
---- /dev/null
-+++ b/arch/arm64/boot/dts/mediatek/mt7986b-rfb.dts
-@@ -0,0 +1,21 @@
-+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
-+/*
-+ * Copyright (C) 2021 MediaTek Inc.
-+ * Author: Sam.Shih <sam.shih@mediatek.com>
-+ */
-+
-+/dts-v1/;
-+#include "mt7986b.dtsi"
-+
-+/ {
-+	model = "MediaTek MT7986b RFB";
-+	compatible = "mediatek,mt7986b-rfb";
-+	chosen {
-+		bootargs = "console=ttyS0,115200n1 loglevel=8  \
-+				earlycon=uart8250,mmio32,0x11002000";
-+	};
-+};
-+
-+&uart0 {
-+	status = "okay";
-+};
-diff --git a/arch/arm64/boot/dts/mediatek/mt7986b.dtsi b/arch/arm64/boot/dts/mediatek/mt7986b.dtsi
-new file mode 100644
-index 000000000000..4b001729b50e
---- /dev/null
-+++ b/arch/arm64/boot/dts/mediatek/mt7986b.dtsi
-@@ -0,0 +1,235 @@
-+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
-+/*
-+ * Copyright (C) 2021 MediaTek Inc.
-+ * Author: Sam.Shih <sam.shih@mediatek.com>
-+ */
-+
-+#include <dt-bindings/interrupt-controller/irq.h>
-+#include <dt-bindings/interrupt-controller/arm-gic.h>
-+#include <dt-bindings/clock/mt7986-clk.h>
-+
-+/ {
-+	compatible = "mediatek,mt7986b";
-+	interrupt-parent = <&gic>;
-+	#address-cells = <2>;
-+	#size-cells = <2>;
-+
-+	clk40m: oscillator@0 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <40000000>;
-+		clock-output-names = "clkxtal";
-+	};
-+
-+	cpus {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		cpu0: cpu@0 {
-+			device_type = "cpu";
-+			compatible = "arm,cortex-a53";
-+			enable-method = "psci";
-+			reg = <0x0>;
-+			#cooling-cells = <2>;
-+		};
-+
-+		cpu1: cpu@1 {
-+			device_type = "cpu";
-+			compatible = "arm,cortex-a53";
-+			enable-method = "psci";
-+			reg = <0x1>;
-+			#cooling-cells = <2>;
-+		};
-+
-+		cpu2: cpu@2 {
-+			device_type = "cpu";
-+			compatible = "arm,cortex-a53";
-+			enable-method = "psci";
-+			reg = <0x2>;
-+			#cooling-cells = <2>;
-+		};
-+
-+		cpu3: cpu@3 {
-+			device_type = "cpu";
-+			enable-method = "psci";
-+			compatible = "arm,cortex-a53";
-+			reg = <0x3>;
-+			#cooling-cells = <2>;
-+		};
-+	};
-+
-+	psci {
-+		compatible  = "arm,psci-0.2";
-+		method      = "smc";
-+	};
-+
-+	reserved-memory {
-+		#address-cells = <2>;
-+		#size-cells = <2>;
-+		ranges;
-+		/* 192 KiB reserved for ARM Trusted Firmware (BL31) */
-+		secmon_reserved: secmon@43000000 {
-+			reg = <0 0x43000000 0 0x30000>;
-+			no-map;
-+		};
-+	};
-+
-+	timer {
-+		compatible = "arm,armv8-timer";
-+		interrupt-parent = <&gic>;
-+		clock-frequency = <13000000>;
-+		interrupts = <GIC_PPI 13 IRQ_TYPE_LEVEL_LOW>,
-+			     <GIC_PPI 14 IRQ_TYPE_LEVEL_LOW>,
-+			     <GIC_PPI 11 IRQ_TYPE_LEVEL_LOW>,
-+			     <GIC_PPI 10 IRQ_TYPE_LEVEL_LOW>;
-+	};
-+
-+	soc {
-+		#address-cells = <2>;
-+		#size-cells = <2>;
-+		compatible = "simple-bus";
-+		ranges;
-+
-+		gic: interrupt-controller@c000000 {
-+			compatible = "arm,gic-v3";
-+			#interrupt-cells = <3>;
-+			interrupt-parent = <&gic>;
-+			interrupt-controller;
-+			reg = <0 0x0c000000 0 0x40000>,
-+			      <0 0x0c080000 0 0x200000>;
-+			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
-+		};
-+
-+		infracfg_ao: infracfg_ao@10001000 {
-+			compatible = "mediatek,mt7986-infracfg_ao", "syscon";
-+			reg = <0 0x10001000 0 0x68>;
-+			#clock-cells = <1>;
-+		};
-+
-+		infracfg: infracfg@10001040 {
-+			compatible = "mediatek,mt7986-infracfg", "syscon";
-+			reg = <0 0x1000106c 0 0x1000>;
-+			#clock-cells = <1>;
-+		};
-+
-+		topckgen: topckgen@1001b000 {
-+			compatible = "mediatek,mt7986-topckgen", "syscon";
-+			reg = <0 0x1001B000 0 0x1000>;
-+			#clock-cells = <1>;
-+		};
-+
-+		watchdog: watchdog@1001c000 {
-+			compatible = "mediatek,mt7986-wdt",
-+				     "mediatek,mt6589-wdt";
-+			reg = <0 0x1001c000 0 0x1000>;
-+			interrupts = <GIC_SPI 110 IRQ_TYPE_LEVEL_HIGH>;
-+			#reset-cells = <1>;
-+			status = "disabled";
-+		};
-+
-+		apmixedsys: apmixedsys@1001e000 {
-+			compatible = "mediatek,mt7986-apmixedsys";
-+			reg = <0 0x1001E000 0 0x1000>;
-+			#clock-cells = <1>;
-+		};
-+
-+		pio: pinctrl@1001f000 {
-+			compatible = "mediatek,mt7986b-pinctrl";
-+			reg = <0 0x1001f000 0 0x1000>,
-+			      <0 0x11c30000 0 0x1000>,
-+			      <0 0x11c40000 0 0x1000>,
-+			      <0 0x11e20000 0 0x1000>,
-+			      <0 0x11e30000 0 0x1000>,
-+			      <0 0x11f00000 0 0x1000>,
-+			      <0 0x11f10000 0 0x1000>,
-+			      <0 0x1000b000 0 0x1000>;
-+			reg-names = "gpio_base", "iocfg_rt_base", "iocfg_rb_base",
-+				    "iocfg_lt_base", "iocfg_lb_base", "iocfg_tr_base",
-+				    "iocfg_tl_base", "eint";
-+			gpio-controller;
-+			#gpio-cells = <2>;
-+			gpio-ranges = <&pio 0 0 41>, <&pio 66 66 35>;
-+			interrupt-controller;
-+			interrupts = <GIC_SPI 225 IRQ_TYPE_LEVEL_HIGH>;
-+			interrupt-parent = <&gic>;
-+			#interrupt-cells = <2>;
-+		};
-+
-+		sgmiisys0: syscon@10060000 {
-+			compatible = "mediatek,mt7986-sgmiisys",
-+				     "mediatek,mt7986-sgmiisys_0",
-+				     "syscon";
-+			reg = <0 0x10060000 0 0x1000>;
-+			#clock-cells = <1>;
-+		};
-+
-+		sgmiisys1: syscon@10070000 {
-+			compatible = "mediatek,mt7986-sgmiisys",
-+				     "mediatek,mt7986-sgmiisys_1",
-+				     "syscon";
-+			reg = <0 0x10070000 0 0x1000>;
-+			#clock-cells = <1>;
-+		};
-+
-+		trng: trng@1020f000 {
-+			compatible = "mediatek,mt7986-rng",
-+				     "mediatek,mt7623-rng";
-+			reg = <0 0x1020f000 0 0x100>;
-+			clocks = <&infracfg_ao CK_INFRA_TRNG_CK>;
-+			clock-names = "rng";
-+			status = "disabled";
-+		};
-+
-+		uart0: serial@11002000 {
-+			compatible = "mediatek,mt7986-uart",
-+				     "mediatek,mt6577-uart";
-+			reg = <0 0x11002000 0 0x400>;
-+			interrupts = <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&infracfg_ao CK_INFRA_UART0_SEL>,
-+				 <&infracfg_ao CK_INFRA_UART0_CK>;
-+			clock-names = "baud", "bus";
-+			assigned-clocks = <&topckgen CK_TOP_UART_SEL>,
-+					  <&infracfg_ao CK_INFRA_UART0_SEL>;
-+			assigned-clock-parents = <&topckgen CK_TOP_CB_CKSQ_40M>,
-+						 <&infracfg CK_INFRA_UART>;
-+			status = "disabled";
-+		};
-+
-+		uart1: serial@11003000 {
-+			compatible = "mediatek,mt7986-uart",
-+				     "mediatek,mt6577-uart";
-+			reg = <0 0x11003000 0 0x400>;
-+			interrupts = <GIC_SPI 124 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&infracfg_ao CK_INFRA_UART1_SEL>,
-+				 <&infracfg_ao CK_INFRA_UART1_CK>;
-+			clock-names = "baud", "bus";
-+			assigned-clocks = <&infracfg_ao CK_INFRA_UART1_SEL>;
-+			assigned-clock-parents = <&infracfg CK_INFRA_CK_F26M>;
-+			status = "disabled";
-+		};
-+
-+		uart2: serial@11004000 {
-+			compatible = "mediatek,mt7986-uart",
-+				     "mediatek,mt6577-uart";
-+			reg = <0 0x11004000 0 0x400>;
-+			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&infracfg_ao CK_INFRA_UART2_SEL>,
-+				 <&infracfg_ao CK_INFRA_UART2_CK>;
-+			clock-names = "baud", "bus";
-+			assigned-clocks = <&infracfg_ao CK_INFRA_UART2_SEL>;
-+			assigned-clock-parents = <&infracfg CK_INFRA_CK_F26M>;
-+			status = "disabled";
-+		};
-+
-+		ethsys: syscon@15000000 {
-+			 #address-cells = <1>;
-+			 #size-cells = <1>;
-+			 compatible = "mediatek,mt7986-ethsys",
-+				      "syscon";
-+			 reg = <0 0x15000000 0 0x1000>;
-+			 #clock-cells = <1>;
-+			 #reset-cells = <1>;
-+		};
-+
-+	};
-+
-+};
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
+index 3c073eb3db03..fe5db3c84754 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
+@@ -324,11 +324,10 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
+ 	struct sun8i_ss_alg_template *algt;
+ 	struct sun8i_ss_dev *ss;
+ 	struct scatterlist *sg;
+-	int nr_sgs, err, digestsize;
++	int j, i, todo, nr_sgs, digestsize, err;
+ 	unsigned int len;
+ 	u64 fill, min_fill, byte_count;
+ 	void *pad, *result;
+-	int j, i, todo;
+ 	__be64 *bebits;
+ 	__le64 *lebits;
+ 	dma_addr_t addr_res, addr_pad;
+@@ -368,14 +367,14 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
+ 	if (nr_sgs <= 0 || nr_sgs > MAX_SG) {
+ 		dev_err(ss->dev, "Invalid sg number %d\n", nr_sgs);
+ 		err = -EINVAL;
+-		goto theend;
++		goto err_result;
+ 	}
+ 
+ 	addr_res = dma_map_single(ss->dev, result, digestsize, DMA_FROM_DEVICE);
+ 	if (dma_mapping_error(ss->dev, addr_res)) {
+ 		dev_err(ss->dev, "DMA map dest\n");
+ 		err = -EINVAL;
+-		goto theend;
++		goto err_unmap_sg;
+ 	}
+ 
+ 	len = areq->nbytes;
+@@ -390,7 +389,7 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
+ 	if (len > 0) {
+ 		dev_err(ss->dev, "remaining len %d\n", len);
+ 		err = -EINVAL;
+-		goto theend;
++		goto err_addr_res;
+ 	}
+ 
+ 	byte_count = areq->nbytes;
+@@ -421,27 +420,28 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
+ 	}
+ 
+ 	addr_pad = dma_map_single(ss->dev, pad, j * 4, DMA_TO_DEVICE);
+-	rctx->t_src[i].addr = addr_pad;
+-	rctx->t_src[i].len = j;
+-	rctx->t_dst[i].addr = addr_res;
+-	rctx->t_dst[i].len = digestsize / 4;
+ 	if (dma_mapping_error(ss->dev, addr_pad)) {
+ 		dev_err(ss->dev, "DMA error on padding SG\n");
+ 		err = -EINVAL;
+-		goto theend;
++		goto err_addr_res;
+ 	}
++	rctx->t_src[i].addr = addr_pad;
++	rctx->t_src[i].len = j;
++	rctx->t_dst[i].addr = addr_res;
++	rctx->t_dst[i].len = digestsize / 4;
+ 
+ 	err = sun8i_ss_run_hash_task(ss, rctx, crypto_tfm_alg_name(areq->base.tfm));
+ 
+ 	dma_unmap_single(ss->dev, addr_pad, j * 4, DMA_TO_DEVICE);
++err_addr_res:
++	dma_unmap_single(ss->dev, addr_res, digestsize, DMA_FROM_DEVICE);
++err_unmap_sg:
+ 	dma_unmap_sg(ss->dev, areq->src, sg_nents(areq->src),
+ 		     DMA_TO_DEVICE);
+-	dma_unmap_single(ss->dev, addr_res, digestsize, DMA_FROM_DEVICE);
+-
+ 	memcpy(areq->result, result, algt->alg.hash.halg.digestsize);
+-theend:
++err_result:
+ 	kfree(pad);
+ 	kfree(result);
+ 	crypto_finalize_hash_request(engine, breq, err);
+-	return 0;
++	return err;
+ }
 -- 
-2.29.2
+2.25.1
 
