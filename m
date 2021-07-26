@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7AB3C4338F
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 15:25:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90184C4338F
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 15:27:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC17460F59
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 15:25:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7350860F6B
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jul 2021 15:27:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235110AbhGZOpV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Jul 2021 10:45:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42348 "EHLO
+        id S234661AbhGZOrL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Jul 2021 10:47:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234823AbhGZOpU (ORCPT
+        with ESMTP id S234546AbhGZOrL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Jul 2021 10:45:20 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DEB7C061757;
-        Mon, 26 Jul 2021 08:25:48 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id a20so12258651plm.0;
-        Mon, 26 Jul 2021 08:25:48 -0700 (PDT)
+        Mon, 26 Jul 2021 10:47:11 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02C49C061757;
+        Mon, 26 Jul 2021 08:27:40 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id a4-20020a17090aa504b0290176a0d2b67aso11826774pjq.2;
+        Mon, 26 Jul 2021 08:27:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=YJ2wiacers242b03J1VtREz0S4EVBe3CkaiVWqJ9kVg=;
-        b=hXQPIflR8ZhFX0feKPijERYg/69KAJPHtc16bQXnx5lGj90ised38lKMXuA3isoLjo
-         Fb50Xww5eEsA1wFlnsHLSziCczZE1Jagx9Y8YNEElKJ9qPA88sVm8K8dfT0dnWRS5BBa
-         aKK94+bXmAgSdIIza7k3+8Q8vrqK9rKc9OgqYH99Irpn8FwFP0USqQxAefNFiJKtKq4F
-         zJw47BcDpvQR/nqjoY9oFLkizYEnsh3ERrDltT3NvLQp2Ma9Bo5Da4ob/Pwme5++Q4ZM
-         Zju/5+OCgF0Po3B1EDRpC/L+DU14X7eIbPkPGtbo5VxH3GW7U79ANkpwjL3SAgv1qHnB
-         VkRw==
+        bh=dCTh5U/iGuKWRcR2nhzuD0tyEm/pZKUN9sg890BPhTU=;
+        b=TdhyHBmbYPMzpz/G0ui1idg6UMmMpm0Cd+SFfazSJcZNMYwttYcWMgvtBShHreHymz
+         NLog1TPOoSJD2q8jR2kcCNWntyPC9fUzHkxRRFWa7istFiSOFKfWVriHGGBBzAanJJes
+         Ixrc6DUH2J6Io8LYo+kop5vFChAgIG3nMq3KHK998MPNo6N4V27iLJpyPTSMsKt7yjaR
+         3EJTO1xGuEggaD5SVIdcW9vBswR3k2bj2dbAEAF2Ww7y7fVYO0cfOj0atAUBL7fktyto
+         7fA6v9f/YU9+DRhMKQR3uW4ipzfJX0u5H2H1NnqMk57Qq8wXHWyHH/O+QUDHh/hT1BMF
+         tiTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=YJ2wiacers242b03J1VtREz0S4EVBe3CkaiVWqJ9kVg=;
-        b=g5Zo1hf3Y11Cu9sLfjQ7xxrPgtiGJtytUmKXPB8ypxr1xG8BUTJ6X+kCkWXHshqEDX
-         HIeAGrxBy0aXhqpn735HoiHec3hwjnhQWX9fqYNibo6Wg0FtQAOSf6CS04+C+nQJhqx1
-         XcMdOjPFdyCKO1fpgG0+pymzGaGWHCPOQarHpFkrnmp7ZWej4K7McTK6s7UVOprvQIz9
-         PMk6zOLFYmQsZODeTRTrYDSQOntCXrpJcaPGcNwymOt9iRkU2omG1GVVCmJxjJAcAjds
-         dZCj8x5NXvGv8bwgGjrJ6TGrjIjfc0F61SaMtepMIYuVVnMkUAGHJSLb8uBnt59K0jEy
-         K/ZA==
-X-Gm-Message-State: AOAM530KsU6lGxy4NIeNXEjAxCcSj+7UiVelT8zz7RHJjGl7cKcW/rOu
-        OX6h5IjSStbIx97B6dImGg0=
-X-Google-Smtp-Source: ABdhPJz9jcD2Df8C8OTsG5zvot3I4VXhYSaUTGjdkxXuICoBM5u5IMzBo9TCZcXaWwQ1mgTN5C2Ltw==
-X-Received: by 2002:aa7:9541:0:b029:32c:cefa:123f with SMTP id w1-20020aa795410000b029032ccefa123fmr18103572pfq.24.1627313147752;
-        Mon, 26 Jul 2021 08:25:47 -0700 (PDT)
+        bh=dCTh5U/iGuKWRcR2nhzuD0tyEm/pZKUN9sg890BPhTU=;
+        b=NVXKtYn5FxDF1/m0rn0EiahysCLNY/KftIp+hqF/HjUVPrBDTD6Ng3DeUqlpn3NDvg
+         PZQideaj7UqoKh22AhoIA0haR94Kw3Sk71sifDGe4dV0IUSykWoFjdvaP77z8cTGL9yd
+         MC9IL2yiF9hP2kmwpAAIYmqftVvhTmisVX87qf2lfm1mAzba1Ntkf2iq4mIbg1ljZyLq
+         Z2CjU94WoL93PDRrR9RYO2Jm/hB+SeUYUzJVadwVqgIusSHJvySjuzGxJcp9ojAfMYBK
+         z8mhzJRYTCH3PJNUZqbLqJTa1xCNCeDbtyO0lR0fqP2zWMsNeC33Ht8mOAb6eG5eDZpc
+         60AQ==
+X-Gm-Message-State: AOAM5328Jca78fEN/TF/+6x7nMK5j7Z1+irRvjtt9H1goLhtBmZmRsfL
+        Bn4PhUMqvkDOJOa5cJcvK8s=
+X-Google-Smtp-Source: ABdhPJz1vgJ/+fGv+lsImtB0jkdmaRIz+oOMbuajZVC4n/Pvyn866Ie5Zy9FlQKNUd1lplRvpY8l7Q==
+X-Received: by 2002:a63:1e57:: with SMTP id p23mr18603279pgm.41.1627313259385;
+        Mon, 26 Jul 2021 08:27:39 -0700 (PDT)
 Received: from localhost.localdomain ([154.16.166.171])
-        by smtp.gmail.com with ESMTPSA id x14sm307079pfu.200.2021.07.26.08.25.43
+        by smtp.gmail.com with ESMTPSA id b3sm335525pfi.179.2021.07.26.08.27.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jul 2021 08:25:47 -0700 (PDT)
+        Mon, 26 Jul 2021 08:27:38 -0700 (PDT)
 From:   Dongliang Mu <mudongliangabcd@gmail.com>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -65,15 +65,18 @@ To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Chen-Yu Tsai <wens@csie.org>,
         Jernej Skrabec <jernej.skrabec@gmail.com>,
         Ard Biesheuvel <ardb@kernel.org>,
-        Xiang Chen <chenxiang66@hisilicon.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Eric Biggers <ebiggers@google.com>,
-        Dongliang Mu <mudongliangabcd@gmail.com>,
-        Colin Ian King <colin.king@canonical.com>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Xiang Chen <chenxiang66@hisilicon.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Dongliang Mu <mudongliangabcd@gmail.com>,
+        Corentin Labbe <clabbe@baylibre.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: [PATCH v4] crypto: sun8i-ss: fix multiple memory leaks in sun8i_ss_hash_run
-Date:   Mon, 26 Jul 2021 23:25:21 +0800
-Message-Id: <20210726152533.2281139-1-mudongliangabcd@gmail.com>
+Subject: [PATCH] crypto: sun8i-ce: fix multiple memory leaks in sun8i_ce_hash_run
+Date:   Mon, 26 Jul 2021 23:27:12 +0800
+Message-Id: <20210726152724.2281408-1-mudongliangabcd@gmail.com>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -81,76 +84,99 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In sun8i_ss_hash_run, all the dma_mmap_sg/single will cause memory leak
+In sun8i_ce_hash_run, all the dma_mmap_sg/single will cause memory leak
 due to no corresponding unmap operation if errors happen.
 
 Fix this by adding error handling part for all the dma_mmap_sg/single.
 
-Fixes: d9b45418a917 ("crypto: sun8i-ss - support hash algorithms")
+Fixes: 56f6d5aee88d ("crypto: sun8i-ce - support hash algorithms")
 Signed-off-by: Dongliang Mu <mudongliangabcd@gmail.com>
 ---
-v1->v2: move crypto_finalize_hash_request to the end of function; move
-the memcpy after the dma_mmap_sg/single functions.
-v2->v3: remove some unrelated code changes; delete the fix of return value
-since there is no corresponding handling code
-v3->v4: change sun8i_ce to sun8i_ss
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 28 +++++++++----------
+ 1 file changed, 13 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-index 3c073eb3db03..5448705e8ae1 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-@@ -368,14 +368,14 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+index 88194718a806..d454ad99deee 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+@@ -286,16 +286,14 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 
+ 	/* the padding could be up to two block. */
+ 	buf = kzalloc(bs * 2, GFP_KERNEL | GFP_DMA);
+-	if (!buf) {
+-		err = -ENOMEM;
+-		goto theend;
+-	}
++	if (!buf)
++		return -ENOMEM;
+ 	bf = (__le32 *)buf;
+ 
+ 	result = kzalloc(digestsize, GFP_KERNEL | GFP_DMA);
+ 	if (!result) {
+-		err = -ENOMEM;
+-		goto theend;
++		kfree(buf);
++		return -ENOMEM;
+ 	}
+ 
+ 	flow = rctx->flow;
+@@ -321,7 +319,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
  	if (nr_sgs <= 0 || nr_sgs > MAX_SG) {
- 		dev_err(ss->dev, "Invalid sg number %d\n", nr_sgs);
+ 		dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
  		err = -EINVAL;
 -		goto theend;
 +		goto err_result;
  	}
  
- 	addr_res = dma_map_single(ss->dev, result, digestsize, DMA_FROM_DEVICE);
- 	if (dma_mapping_error(ss->dev, addr_res)) {
- 		dev_err(ss->dev, "DMA map dest\n");
+ 	len = areq->nbytes;
+@@ -334,7 +332,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 	if (len > 0) {
+ 		dev_err(ce->dev, "remaining len %d\n", len);
+ 		err = -EINVAL;
+-		goto theend;
++		goto err_unmap_sg;
+ 	}
+ 	addr_res = dma_map_single(ce->dev, result, digestsize, DMA_FROM_DEVICE);
+ 	cet->t_dst[0].addr = cpu_to_le32(addr_res);
+@@ -342,7 +340,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 	if (dma_mapping_error(ce->dev, addr_res)) {
+ 		dev_err(ce->dev, "DMA map dest\n");
  		err = -EINVAL;
 -		goto theend;
 +		goto err_unmap_sg;
  	}
  
- 	len = areq->nbytes;
-@@ -390,7 +390,7 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
- 	if (len > 0) {
- 		dev_err(ss->dev, "remaining len %d\n", len);
- 		err = -EINVAL;
--		goto theend;
-+		goto err_addr_res;
- 	}
- 
  	byte_count = areq->nbytes;
-@@ -428,18 +428,19 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
- 	if (dma_mapping_error(ss->dev, addr_pad)) {
- 		dev_err(ss->dev, "DMA error on padding SG\n");
+@@ -392,7 +390,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 	if (dma_mapping_error(ce->dev, addr_pad)) {
+ 		dev_err(ce->dev, "DMA error on padding SG\n");
  		err = -EINVAL;
 -		goto theend;
 +		goto err_addr_res;
  	}
  
- 	err = sun8i_ss_run_hash_task(ss, rctx, crypto_tfm_alg_name(areq->base.tfm));
+ 	if (ce->variant->hash_t_dlen_in_bits)
+@@ -405,15 +403,15 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 	err = sun8i_ce_run_task(ce, flow, crypto_tfm_alg_name(areq->base.tfm));
  
- 	dma_unmap_single(ss->dev, addr_pad, j * 4, DMA_TO_DEVICE);
+ 	dma_unmap_single(ce->dev, addr_pad, j * 4, DMA_TO_DEVICE);
 +err_addr_res:
-+	dma_unmap_single(ss->dev, addr_res, digestsize, DMA_FROM_DEVICE);
++	dma_unmap_single(ce->dev, addr_res, digestsize, DMA_FROM_DEVICE);
 +err_unmap_sg:
- 	dma_unmap_sg(ss->dev, areq->src, sg_nents(areq->src),
+ 	dma_unmap_sg(ce->dev, areq->src, sg_nents(areq->src),
  		     DMA_TO_DEVICE);
--	dma_unmap_single(ss->dev, addr_res, digestsize, DMA_FROM_DEVICE);
+-	dma_unmap_single(ce->dev, addr_res, digestsize, DMA_FROM_DEVICE);
+-
 -
  	memcpy(areq->result, result, algt->alg.hash.halg.digestsize);
 -theend:
+-	kfree(buf);
 +err_result:
- 	kfree(pad);
  	kfree(result);
++	kfree(buf);
  	crypto_finalize_hash_request(engine, breq, err);
+ 	return 0;
+ }
 -- 
 2.25.1
 
