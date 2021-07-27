@@ -2,103 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB52DC4320A
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 04:25:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F0CC4338F
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 05:37:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE245610A0
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 04:25:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DF53610E5
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 05:37:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231842AbhG0EZD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Jul 2021 00:25:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51060 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbhG0EZC (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Jul 2021 00:25:02 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A0F5C061760
-        for <linux-crypto@vger.kernel.org>; Mon, 26 Jul 2021 21:25:03 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[127.0.0.1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1m8EeJ-00047E-E9; Tue, 27 Jul 2021 06:24:59 +0200
-Subject: Re: [PATCH v2] KEYS: trusted: fix use as module when CONFIG_TCG_TPM=m
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        David Howells <dhowells@redhat.com>,
+        id S234997AbhG0FhB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 27 Jul 2021 01:37:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47774 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234867AbhG0FhA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 27 Jul 2021 01:37:00 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D4A6A60F90;
+        Tue, 27 Jul 2021 05:36:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1627364219;
+        bh=jKzvWPkfAb5WuJ+G+O/MkNwGWFDdzaWqwH/aj0q3pLY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KV5v64dIM/ubl9YEgS5klpW6aX+UNPdQNMevrLRrkfsqlgrEZVIFH0L3i1GvEtuc8
+         o15JBE9O1SliTbYPwIBIMvURoGru1Val0sZaKlef6mwOurjg5FNGkZ18US6j09tIHU
+         8f2qjFaahvc0gO0CP5vgEjcZm9fV1Vc+8nZekfMM=
+Date:   Tue, 27 Jul 2021 07:36:56 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Jordy Zomer <jordy@pwning.systems>, netdev@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, kernel@pengutronix.de,
-        Andreas Rammhold <andreas@rammhold.de>,
-        David Gstir <david@sigma-star.at>,
-        Richard Weinberger <richard@nod.at>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-References: <20210721160258.7024-1-a.fatoum@pengutronix.de>
- <20210727030433.3dwod2elwtdkhwsc@kernel.org>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-Message-ID: <fe39a449-88df-766b-a13a-290f4847d43e@pengutronix.de>
-Date:   Tue, 27 Jul 2021 06:24:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: ccm - avoid negative wrapping of integers
+Message-ID: <YP+beE4NGUCDIQHR@kroah.com>
+References: <20210726170120.410705-1-jordy@pwning.systems>
+ <YP7udzoj4vVQHlYv@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210727030433.3dwod2elwtdkhwsc@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YP7udzoj4vVQHlYv@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 27.07.21 05:04, Jarkko Sakkinen wrote:
->> Reported-by: Andreas Rammhold <andreas@rammhold.de>
->> Fixes: 5d0682be3189 ("KEYS: trusted: Add generic trusted keys framework")
->> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+On Mon, Jul 26, 2021 at 10:18:47AM -0700, Eric Biggers wrote:
+> On Mon, Jul 26, 2021 at 07:01:20PM +0200, Jordy Zomer wrote:
+> > Set csize to unsigned int to avoid it from wrapping as a negative number (since format input sends an unsigned integer to this function). This would also result in undefined behavior in the left shift when msg len is checked, potentially resulting in a buffer overflow in the memcpy call.
+> > 
+> > Signed-off-by: Jordy Zomer <jordy@pwning.systems>
+> > ---
+> > To address was corrected, and ccm was added to the topic to indicate that this is just for ccm.
+> > 
+> >  crypto/ccm.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/crypto/ccm.c b/crypto/ccm.c
+> > index 6b815ece51c6..e14201edf9db 100644
+> > --- a/crypto/ccm.c
+> > +++ b/crypto/ccm.c
+> > @@ -66,7 +66,7 @@ static inline struct crypto_ccm_req_priv_ctx *crypto_ccm_reqctx(
+> >  	return (void *)PTR_ALIGN((u8 *)aead_request_ctx(req), align + 1);
+> >  }
+> >  
+> > -static int set_msg_len(u8 *block, unsigned int msglen, int csize)
+> > +static int set_msg_len(u8 *block, unsigned int msglen, unsigned int csize)
+> >  {
+> >  	__be32 data;
 > 
-> Is it absolutely need to do all this *just* to fix the bug?
-> 
-> For a pure bug fix the most essential thing is to be able the backport
-> it to stable kernels.
+> This isn't necessarily a bad change, but the value of csize is clearly in
+> [1, 256] if you read format_input(), and in fact is in [2, 8] if you read the
+> whole file, so please don't claim this is actually fixing anything, as it's not.
 
-Not much happened in-between, so a backport should be trivial.
-I can provide these if needed.
+Oh that was not obvious at all, I looked at that for a long time and
+missed the place where this was checked earlier.  Perhaps just make
+csize here a u8 and that would take away all question about what is
+happening?
 
-> I don't really care at all about extra niceties ("it's now possible
-> stuff).
-> 
-> This looks like a bug fix and improvements bundle into a single patch.
+thanks,
 
-You can replace the #ifdefs with #if IS_REACHABLE in trusted_core.c to fix the
-intermediate breakage and then throw that away again to fix the remaining
-dependency of trusted keys on TCG_TPM.
-
-If you prefer that, Andreas perhaps could respin his series with
-s/IS_ENABLED/IS_REACHABLE/?
-
-Cheers,
-Ahmad
-
-
-> 
-> /Jarkko
-> 
-
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+greg k-h
