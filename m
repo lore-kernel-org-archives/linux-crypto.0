@@ -2,91 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 678B6C4338F
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 05:38:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9599AC4320A
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 10:23:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 43887610E5
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 05:38:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84F0F61989
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 10:23:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234867AbhG0FiM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Jul 2021 01:38:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48140 "EHLO mail.kernel.org"
+        id S236209AbhG0KXt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 27 Jul 2021 06:23:49 -0400
+Received: from muru.com ([72.249.23.125]:55798 "EHLO muru.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233553AbhG0FiL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Jul 2021 01:38:11 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9FCFD60F90;
-        Tue, 27 Jul 2021 05:38:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1627364291;
-        bh=0xAVsd9KoCyr0o32NIcttnw+73Jww45a9+0ilFQnBo4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Nr2s3avoudRdZw6pIh6+FVRyYJgPJB9ClyqAW+z/cHX9sMt++Uk2m+G/PiTFaQrLc
-         jw2kY/dRimZEB+mekWwfmob3yawuAIG2Puy/Wy0cl3OrLcrt6vXXfQyXHHAJGl59r9
-         LHQDQkirMaZlg7DdXJI24DvU+/71Gx3856YPX4dc=
-Date:   Tue, 27 Jul 2021 07:38:09 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Jordy Zomer <jordy@pwning.systems>, netdev@vger.kernel.org,
+        id S236110AbhG0KXq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 27 Jul 2021 06:23:46 -0400
+Received: from hillo.muru.com (localhost [127.0.0.1])
+        by muru.com (Postfix) with ESMTP id 13D8180F0;
+        Tue, 27 Jul 2021 10:24:02 +0000 (UTC)
+From:   Tony Lindgren <tony@atomide.com>
+To:     "David S . Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: ccm - avoid negative wrapping of integers
-Message-ID: <YP+bwR/Nt/NRYeDz@kroah.com>
-References: <20210726170120.410705-1-jordy@pwning.systems>
- <YP7udzoj4vVQHlYv@gmail.com>
- <YP+beE4NGUCDIQHR@kroah.com>
+        linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org
+Cc:     linux-crypto@vger.kernel.org, Lokesh Vutla <lokeshvutla@ti.com>,
+        Tero Kristo <kristo@kernel.org>
+Subject: [PATCH 1/6] crypto: omap-sham - clear dma flags only after omap_sham_update_dma_stop()
+Date:   Tue, 27 Jul 2021 13:23:34 +0300
+Message-Id: <20210727102339.49141-1-tony@atomide.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YP+beE4NGUCDIQHR@kroah.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 27, 2021 at 07:36:56AM +0200, Greg Kroah-Hartman wrote:
-> On Mon, Jul 26, 2021 at 10:18:47AM -0700, Eric Biggers wrote:
-> > On Mon, Jul 26, 2021 at 07:01:20PM +0200, Jordy Zomer wrote:
-> > > Set csize to unsigned int to avoid it from wrapping as a negative number (since format input sends an unsigned integer to this function). This would also result in undefined behavior in the left shift when msg len is checked, potentially resulting in a buffer overflow in the memcpy call.
-> > > 
-> > > Signed-off-by: Jordy Zomer <jordy@pwning.systems>
-> > > ---
-> > > To address was corrected, and ccm was added to the topic to indicate that this is just for ccm.
-> > > 
-> > >  crypto/ccm.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/crypto/ccm.c b/crypto/ccm.c
-> > > index 6b815ece51c6..e14201edf9db 100644
-> > > --- a/crypto/ccm.c
-> > > +++ b/crypto/ccm.c
-> > > @@ -66,7 +66,7 @@ static inline struct crypto_ccm_req_priv_ctx *crypto_ccm_reqctx(
-> > >  	return (void *)PTR_ALIGN((u8 *)aead_request_ctx(req), align + 1);
-> > >  }
-> > >  
-> > > -static int set_msg_len(u8 *block, unsigned int msglen, int csize)
-> > > +static int set_msg_len(u8 *block, unsigned int msglen, unsigned int csize)
-> > >  {
-> > >  	__be32 data;
-> > 
-> > This isn't necessarily a bad change, but the value of csize is clearly in
-> > [1, 256] if you read format_input(), and in fact is in [2, 8] if you read the
-> > whole file, so please don't claim this is actually fixing anything, as it's not.
-> 
-> Oh that was not obvious at all, I looked at that for a long time and
-> missed the place where this was checked earlier.  Perhaps just make
-> csize here a u8 and that would take away all question about what is
-> happening?
+We should not clear FLAGS_DMA_ACTIVE before omap_sham_update_dma_stop() is
+done calling dma_unmap_sg(). We already clear FLAGS_DMA_ACTIVE at the
+end of omap_sham_update_dma_stop().
 
-And part of this effort is to make it obvious that there is no overflow
-happening, to allow tools to check this type of thing.  When you have to
-work backwards long long ways like this, it makes automatic auditing
-almost impossible, along with manual auditing like I tried to do :)
+The early clearing of FLAGS_DMA_ACTIVE is not causing issues as we do not
+need to defer anything based on FLAGS_DMA_ACTIVE currently. So this can be
+applied as clean-up.
 
-thanks,
+Cc: Lokesh Vutla <lokeshvutla@ti.com>
+Cc: Tero Kristo <kristo@kernel.org>
+Signed-off-by: Tony Lindgren <tony@atomide.com>
+---
+ drivers/crypto/omap-sham.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-greg k-h
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1736,7 +1736,7 @@ static void omap_sham_done_task(unsigned long data)
+ 		if (test_and_clear_bit(FLAGS_OUTPUT_READY, &dd->flags))
+ 			goto finish;
+ 	} else if (test_bit(FLAGS_DMA_READY, &dd->flags)) {
+-		if (test_and_clear_bit(FLAGS_DMA_ACTIVE, &dd->flags)) {
++		if (test_bit(FLAGS_DMA_ACTIVE, &dd->flags)) {
+ 			omap_sham_update_dma_stop(dd);
+ 			if (dd->err) {
+ 				err = dd->err;
+-- 
+2.32.0
