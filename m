@@ -2,65 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16E08C4338F
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 18:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC59DC4338F
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 20:24:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E353660F0F
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 18:06:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90C6E60C3E
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jul 2021 20:24:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbhG0SGE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Jul 2021 14:06:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42740 "EHLO
+        id S231414AbhG0UYC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 27 Jul 2021 16:24:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229593AbhG0SGE (ORCPT
+        with ESMTP id S230425AbhG0UYC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Jul 2021 14:06:04 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFFA5C061757;
-        Tue, 27 Jul 2021 11:06:03 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id oz16so162928ejc.7;
-        Tue, 27 Jul 2021 11:06:03 -0700 (PDT)
+        Tue, 27 Jul 2021 16:24:02 -0400
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 185ACC061764
+        for <linux-crypto@vger.kernel.org>; Tue, 27 Jul 2021 13:24:01 -0700 (PDT)
+Received: by mail-qk1-x736.google.com with SMTP id 184so57037qkh.1
+        for <linux-crypto@vger.kernel.org>; Tue, 27 Jul 2021 13:24:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=rwwf0c1WwkkBjj8WtFWGbxOV7DMDAbh7hJuruUjtujE=;
-        b=JfMhkmT0N/1OhAwQx0Hiktr2EeyzLPBSdxwW+GgPhcqSJFSDDcdhmzx7x67pEaDt2k
-         e+bBgRm7uSA4btD5RwW+ZmMO4pl8z95w/tR6shdm2yvOay93Pt5ymP0hDVRO1TzqyXiK
-         ghtm41uNzeGeFExTw2ECgG9NvcImVNMw+cB946qE+C1AT2pIreE82aPtzaqhAqQEo3ON
-         9VJpVMqjldqMBBU6zydcknhiVE3ZzQLD1BrKWsl5yuIeotZerCHndeNpQQ4jXxJWiibc
-         V0f3/CodRt2NtHYUA/T1XERGdu7ow3qK+EAxXEC9J1JCAv5eUXhm1xzh/GliXxGhU/gk
-         4eDg==
+        d=arista.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QfPPqr+n6W+oUQ7/MwzdsdcC0Gicejjjwi/Du2DCqTA=;
+        b=XpHI84232rdkuSzMsqVAF5iRv/K72DtUpS3KizlTGfOTGPOR07J64LnHUfNMUT75RW
+         DM4VtVHZDDeO1oxnzj2xw56fwkcNgfxt1zMlRtwrguhO2W2/Y8aALY97r3yWI1YDb6PS
+         3J2GUeYNY3GGMz1xLOgX4UB8AFl2Y9WM2ChVE9FGwvGv4UFkDUu99xWkvHU+cHsLMUVt
+         +uuxH67j6CAG/T5hXzjyqbIDpbegkFL8SgxES+xOMWrmyeBYih/xKWqHXi19zI3TEGfc
+         /O94F5ISztNiyqQoh9O9PdHi+13ZsvZLick/uyq0fXsCn1ppP6cyo/6iqXOno/AdItjJ
+         lc4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rwwf0c1WwkkBjj8WtFWGbxOV7DMDAbh7hJuruUjtujE=;
-        b=tnCs6nW7joqaqaD38hdX89OG0oQLGreUXiEEXRu6Y5VjjtgJjDOpmX+EDfAYP6pHEY
-         bIlgreQPLmyTSjMUppBc84Xqo7q71FLLqmA5riM31GD/EH++CQxiX0AsYZN7g3V4GWrc
-         rUG/vPuEAJZ5vgLq7a94lxfu9FiZ5cQbo7lqRqqYbkAsh42iV/zR+iQ9JJFyxknpIiZl
-         MZpRsLty7RPglr5Bm2iYy30SxKREOtUDBfpwTQwirP3efrp0ogsOTxgricFHsQq26IxG
-         iu8sHPRoR6sK2nNZ7dauWqbfVkMJfQ0cqAOrQ3SY4+Lc2qh+2SjfTdB6i1lAQaejoKT4
-         OW7A==
-X-Gm-Message-State: AOAM531XbowP+C7bOvXjMup2oKGchmgy67Fe1dSVU6ZvvJzxciHu9Tbb
-        6ULw+unBy3XWuWVABp3Mc1E=
-X-Google-Smtp-Source: ABdhPJyKgOighLlX16nMbxbkIu/SqKmCEyI4327xZ9rTr9FOolDDZ2NI8JTWzAWLWvpDSvN+dDRYXw==
-X-Received: by 2002:a17:906:384c:: with SMTP id w12mr22919007ejc.445.1627409162463;
-        Tue, 27 Jul 2021 11:06:02 -0700 (PDT)
-Received: from ?IPv6:2a04:241e:502:1d80:e420:4472:3e7:c78d? ([2a04:241e:502:1d80:e420:4472:3e7:c78d])
-        by smtp.gmail.com with ESMTPSA id gx11sm1146001ejc.33.2021.07.27.11.06.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jul 2021 11:06:01 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QfPPqr+n6W+oUQ7/MwzdsdcC0Gicejjjwi/Du2DCqTA=;
+        b=iZPKLPkc9hRjac7D1zJTtIGyRud0jntnGyS2rHwuviFddetRXpAG/beGOfcbL8n6Lt
+         zB8agOV37e8nOjvE7y3rzhL/FahKCNdTB7yzMi8G0DBcsWX+8xsKIwb3eXsyMgnwlVYP
+         VNlAPkZmyI3wVGv7fwaFvEQyypdsq9geiJYfmWlF53p1+DjWBkrHxieG6RmqawGvySBG
+         gJ4yQUChZ9L0RErGIS8T5kdrgnKvhv56IsJrWL400NYuJOPFJ0rkD6E4SE/FNdvbseWS
+         hs5x4/FpAML0cmiEGIBzTwFgxaVXBL0SSXgvG0A/6esM31PUVeR/gS9iE2UKGhFxqMwi
+         MpxQ==
+X-Gm-Message-State: AOAM533oixWV8lZiwgNEWOT/DqGgJzcKrmx+y8P27CHyrVbKfUiIpGTi
+        6ElaVqZLhgFkz8yeKSZTZbNs3JD6pzH7fjnrouzu0w==
+X-Google-Smtp-Source: ABdhPJziICUuoZA7coSdlp5SMWI078kDN24e/pjIHCqcPMNTNC+4Q2ifhW+pIQTgetZDn2GLvcqPzUrSPsbQ5BkpmxM=
+X-Received: by 2002:a37:46d0:: with SMTP id t199mr14173981qka.416.1627417440209;
+ Tue, 27 Jul 2021 13:24:00 -0700 (PDT)
+MIME-Version: 1.0
+References: <01383a8751e97ef826ef2adf93bfde3a08195a43.1626693859.git.cdleonard@gmail.com>
+ <e2215577-2dc5-9669-20b8-91c7700fa987@gmail.com> <CA+HUmGhtPHbT=aBLS_Ny_t802s3RWaE+tupd4T8U9x50eW3JXg@mail.gmail.com>
+ <3afe618a-e848-83c3-2cc5-6ad66f3ef44b@gmail.com>
+In-Reply-To: <3afe618a-e848-83c3-2cc5-6ad66f3ef44b@gmail.com>
+From:   Francesco Ruggeri <fruggeri@arista.com>
+Date:   Tue, 27 Jul 2021 13:23:49 -0700
+Message-ID: <CA+HUmGgwvn7uPfoKqy1extwEksAXOcTf2trDX8dcYGtdeppebQ@mail.gmail.com>
 Subject: Re: [RFC] tcp: Initial support for RFC5925 auth option
-To:     Francesco Ruggeri <fruggeri@arista.com>,
-        David Ahern <dsahern@gmail.com>
-Cc:     Eric Dumazet <edumazet@google.com>,
+To:     Leonard Crestez <cdleonard@gmail.com>
+Cc:     David Ahern <dsahern@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
@@ -77,61 +80,63 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         Salam Noureddine <noureddine@arista.com>,
         Bob Gilligan <gilligan@arista.com>,
         Dmitry Safonov <dima@arista.com>
-References: <01383a8751e97ef826ef2adf93bfde3a08195a43.1626693859.git.cdleonard@gmail.com>
- <e2215577-2dc5-9669-20b8-91c7700fa987@gmail.com>
- <CA+HUmGhtPHbT=aBLS_Ny_t802s3RWaE+tupd4T8U9x50eW3JXg@mail.gmail.com>
-From:   Leonard Crestez <cdleonard@gmail.com>
-Message-ID: <3afe618a-e848-83c3-2cc5-6ad66f3ef44b@gmail.com>
-Date:   Tue, 27 Jul 2021 21:05:59 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <CA+HUmGhtPHbT=aBLS_Ny_t802s3RWaE+tupd4T8U9x50eW3JXg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Jul 27, 2021 at 11:06 AM Leonard Crestez <cdleonard@gmail.com> wrote:
+>
+>
+>
+> On 7/27/21 6:05 AM, Francesco Ruggeri wrote:
+> > Hi Leonard,
+> >
+> > thanks for taking on this task!
+> >
+> >> I'm especially interested in feedback regarding ABI and testing.
+> >
+> > I noticed that the TCP connection identifier is not part of the
+> > representation of the MKT (tcp_authopt_key_info).
+> > This could cause some issues if, for example 2 MKTs with different
+> > <remote IP, remote TCP port> in the TCP connection identifier but same
+> > KeyID (recv_id) are installed on a socket. In that case
+> > tcp_authopt_inbound_key_lookup() may not pick the correct MKT for the
+> > connection. Matching incoming segments only based on recv_id may not
+> > comply with the RFC.
+> > I think there may be other cases where TCP connection identifiers may
+> > be needed to resolve conflicts, but I have to look at your patch in
+> > more detail.
+>
+> The RFC doesn't specify what the "tcp connection identifier" needs to
+> contains so for this first version nothing was implemented.
+>
+> Looking at MD5 support in linux the initial commit only supported
+> binding keys to addresses and only relatively support was added for
+> address prefixes and interfaces. Remote ports still have no effect.
+>
+> I think adding explicit address binding for TCP-AO would be sufficient,
+> this can be enhanced later. The most typical usecase for TCP auth is to
+> connect with a BGP peer with a fixed IP address.
+>
+> As far as I understand this only actually matters for SYN packets where
+> you want a single listen socket to accept client using overlapping
+> keyids. For an active connection userspace can only add keys for the
+> upcoming destination.
 
-
-On 7/27/21 6:05 AM, Francesco Ruggeri wrote:
-> Hi Leonard,
-> 
-> thanks for taking on this task!
-> 
->> I'm especially interested in feedback regarding ABI and testing.
-> 
-> I noticed that the TCP connection identifier is not part of the
-> representation of the MKT (tcp_authopt_key_info).
-> This could cause some issues if, for example 2 MKTs with different
-> <remote IP, remote TCP port> in the TCP connection identifier but same
-> KeyID (recv_id) are installed on a socket. In that case
-> tcp_authopt_inbound_key_lookup() may not pick the correct MKT for the
-> connection. Matching incoming segments only based on recv_id may not
-> comply with the RFC.
-> I think there may be other cases where TCP connection identifiers may
-> be needed to resolve conflicts, but I have to look at your patch in
-> more detail.
-
-The RFC doesn't specify what the "tcp connection identifier" needs to 
-contains so for this first version nothing was implemented.
-
-Looking at MD5 support in linux the initial commit only supported 
-binding keys to addresses and only relatively support was added for 
-address prefixes and interfaces. Remote ports still have no effect.
-
-I think adding explicit address binding for TCP-AO would be sufficient, 
-this can be enhanced later. The most typical usecase for TCP auth is to 
-connect with a BGP peer with a fixed IP address.
-
-As far as I understand this only actually matters for SYN packets where 
-you want a single listen socket to accept client using overlapping 
-keyids. For an active connection userspace can only add keys for the 
-upcoming destination.
-
-> It would be helpful if you could split your patch into smaller
-> incremental chunks.
-
-OK
+The RFC does not seem to put any restrictions on the MKTs used with a
+TCP connection, except that every segment must match at most one MKT,
+where the matching is done on the socket pair and for incoming
+segments on the KeyID, and for outgoing segments by designating a
+desired MKT.
+If I understand what you suggest for the initial commit, socket pair
+matching would not be done, and user level (together with out-of-band
+coordination between peers) would be responsible for making sure that
+the segments' socket pairs are consistent with the implied socket
+pairs of the MKTs on the socket. Failure to do that would be
+considered a misconfiguration and would result in undefined behavior.
+Is that correct?
+Even if the MKT's socket pair is not used in the initial commit, would
+it help having it in the API, to avoid future incompatibilities with
+user level? Or would it be understood that user level code using the
+initial commit may have to change with future commits?
