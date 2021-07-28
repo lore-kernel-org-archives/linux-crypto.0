@@ -2,176 +2,207 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95282C4338F
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jul 2021 06:50:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5449EC43214
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jul 2021 08:51:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E69D60EBB
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jul 2021 06:50:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3882460F59
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jul 2021 08:51:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234122AbhG1GuC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Jul 2021 02:50:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45398 "EHLO
+        id S235298AbhG1IvD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Jul 2021 04:51:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234930AbhG1GuA (ORCPT
+        with ESMTP id S235333AbhG1Iu5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Jul 2021 02:50:00 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1177C061757;
-        Tue, 27 Jul 2021 23:49:17 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id b9so1126508wrx.12;
-        Tue, 27 Jul 2021 23:49:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=4QAhzd/W0r8TJvQ/tpkZasgmlrwwDur43nPhrGFrRIA=;
-        b=pyzMPjnpqh3TLRmWRVavu271u1CyT3f5MOJE+UznBFg6IY1mrVCqsx+lG6YhkOzobg
-         0aLRr9cMLbK675LA3c3mke+hrsbK6nUE1VQzyjBZiQw/j/UooMA2AtjR8M0riPgwkZBG
-         aaAsY5TbuSLFjCJ1Bsx+g7Yrm8ag2ffq42OnNN30W/nuz/g/y5CmMnmJn18Zhb9WNhjI
-         vGFTYCq4P8iCW+xzjHgjwvmG0vbwOBHBLjunmtnVY+brR+5So/oya/k4g41IEkYp/ZGk
-         z8L8MhEe62BFPUYA/rZvCrNG2kL6eXNg58rkl0xz1WK0Jy7g++FhyHYI6KY0KXe0xfDj
-         KIQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4QAhzd/W0r8TJvQ/tpkZasgmlrwwDur43nPhrGFrRIA=;
-        b=QjKoI0nDpJdFWLZaIHpqg3mXIaW+FpYKH3xsjV7WJSHLG9qUKZnPk/fUx80zflfV9J
-         TAiRl3lcQY3a6uXpgq6G/ROzMjBGPc61tvnRl1tcaNS3LN4a6y5YEceiMG9IPSsMNduX
-         kUJ4Mj6bSi/w0r5TLdYuIfLfZfS1bjBuGD0/bEBsOxhzgSZkOiigSi6EejF5xvAUuRc3
-         E6ErpCSlMB24KhDOQo6bZlaS64lnCOEfYsHzkIWE+6cJTavCWjggWDiyE1jhLyjYNgCK
-         pCr7Do3Dx+Z3znN1JAYIVbeH6icifRDc0kF55Hrm3LB7Srrfpv/EKPt15Y5fh7W6j+Vp
-         IZwg==
-X-Gm-Message-State: AOAM531QIT2oj43KM7XO25WeKMKDOVIvocu/yvIVSGdy2QE5qr6tf9FQ
-        HtY31LSVkKQXGH3x7/gtBw8=
-X-Google-Smtp-Source: ABdhPJwJpMNzVJpwqpGUESN/5Co8gxCcqD1N306uZYlkH7VRPncRr+WmEINitJRNk7nilX4rzwSinw==
-X-Received: by 2002:adf:cd86:: with SMTP id q6mr27839488wrj.422.1627454956496;
-        Tue, 27 Jul 2021 23:49:16 -0700 (PDT)
-Received: from [10.30.0.16] ([188.241.83.98])
-        by smtp.gmail.com with ESMTPSA id k6sm4495714wrm.10.2021.07.27.23.49.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jul 2021 23:49:15 -0700 (PDT)
-Subject: Re: [RFC] tcp: Initial support for RFC5925 auth option
-To:     Francesco Ruggeri <fruggeri@arista.com>
-Cc:     David Ahern <dsahern@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        David Ahern <dsahern@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Priyaranjan Jha <priyarjha@google.com>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Menglong Dong <dong.menglong@zte.com.cn>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        Salam Noureddine <noureddine@arista.com>,
-        Bob Gilligan <gilligan@arista.com>,
-        Dmitry Safonov <dima@arista.com>
-References: <01383a8751e97ef826ef2adf93bfde3a08195a43.1626693859.git.cdleonard@gmail.com>
- <e2215577-2dc5-9669-20b8-91c7700fa987@gmail.com>
- <CA+HUmGhtPHbT=aBLS_Ny_t802s3RWaE+tupd4T8U9x50eW3JXg@mail.gmail.com>
- <3afe618a-e848-83c3-2cc5-6ad66f3ef44b@gmail.com>
- <CA+HUmGgwvn7uPfoKqy1extwEksAXOcTf2trDX8dcYGtdeppebQ@mail.gmail.com>
-From:   Leonard Crestez <cdleonard@gmail.com>
-Message-ID: <d21b8b0a-fe9b-e5d1-674a-4f2ad6d0543e@gmail.com>
-Date:   Wed, 28 Jul 2021 09:49:10 +0300
+        Wed, 28 Jul 2021 04:50:57 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DB02C0613D3
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Jul 2021 01:50:55 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1m8fH5-00087o-36; Wed, 28 Jul 2021 10:50:47 +0200
+Subject: Re: [RFC PATCH v1] fscrypt: support encrypted and trusted keys
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        David Howells <dhowells@redhat.com>,
+        linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org, git@andred.net,
+        Omar Sandoval <osandov@osandov.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>
+References: <20210727144349.11215-1-a.fatoum@pengutronix.de>
+ <YQA2fHPwH6EsH9BR@sol.localdomain>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+Message-ID: <367ea5bb-76cf-6020-cb99-91b5ca82d679@pengutronix.de>
+Date:   Wed, 28 Jul 2021 10:50:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <CA+HUmGgwvn7uPfoKqy1extwEksAXOcTf2trDX8dcYGtdeppebQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <YQA2fHPwH6EsH9BR@sol.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hello Eric,
 
-
-On 7/27/21 11:23 PM, Francesco Ruggeri wrote:
-> On Tue, Jul 27, 2021 at 11:06 AM Leonard Crestez <cdleonard@gmail.com> wrote:
-
->> On 7/27/21 6:05 AM, Francesco Ruggeri wrote:
->>> Hi Leonard,
->>>
->>> thanks for taking on this task!
->>>
->>>> I'm especially interested in feedback regarding ABI and testing.
->>>
->>> I noticed that the TCP connection identifier is not part of the
->>> representation of the MKT (tcp_authopt_key_info).
->>> This could cause some issues if, for example 2 MKTs with different
->>> <remote IP, remote TCP port> in the TCP connection identifier but same
->>> KeyID (recv_id) are installed on a socket. In that case
->>> tcp_authopt_inbound_key_lookup() may not pick the correct MKT for the
->>> connection. Matching incoming segments only based on recv_id may not
->>> comply with the RFC.
->>> I think there may be other cases where TCP connection identifiers may
->>> be needed to resolve conflicts, but I have to look at your patch in
->>> more detail.
+On 27.07.21 18:38, Eric Biggers wrote:
+> On Tue, Jul 27, 2021 at 04:43:49PM +0200, Ahmad Fatoum wrote:
+>> For both v1 and v2 key setup mechanisms, userspace supplies the raw key
+>> material to the kernel after which it is never again disclosed to
+>> userspace.
 >>
->> The RFC doesn't specify what the "tcp connection identifier" needs to
->> contains so for this first version nothing was implemented.
->>
->> Looking at MD5 support in linux the initial commit only supported
->> binding keys to addresses and only relatively support was added for
->> address prefixes and interfaces. Remote ports still have no effect.
->>
->> I think adding explicit address binding for TCP-AO would be sufficient,
->> this can be enhanced later. The most typical usecase for TCP auth is to
->> connect with a BGP peer with a fixed IP address.
->>
->> As far as I understand this only actually matters for SYN packets where
->> you want a single listen socket to accept client using overlapping
->> keyids. For an active connection userspace can only add keys for the
->> upcoming destination.
+>> Use of encrypted and trusted keys offers stronger guarantees:
+>> The key material is generated within the kernel and is never disclosed to
+>> userspace in clear text and, in the case of trusted keys, can be
+>> directly rooted to a trust source like a TPM chip.
 > 
-> The RFC does not seem to put any restrictions on the MKTs used with a
-> TCP connection, except that every segment must match at most one MKT,
-> where the matching is done on the socket pair and for incoming
-> segments on the KeyID, and for outgoing segments by designating a
-> desired MKT.
-> If I understand what you suggest for the initial commit, socket pair
-> matching would not be done, and user level (together with out-of-band
-> coordination between peers) would be responsible for making sure that
-> the segments' socket pairs are consistent with the implied socket
-> pairs of the MKTs on the socket. Failure to do that would be
-> considered a misconfiguration and would result in undefined behavior.
-> Is that correct?
+> Please include a proper justification for this feature
 
-All MKTs are assigned to individual sockets via setsockopt, there is no 
-sharing of keys. For an established connection the socket is already 
-determined by linux TCP stack based on addr/port so no further matching 
-on per-key address needs to be done.
+I've patches pending for extending trusted keys to wrap the key sealing
+functionality of the CAAM IP on NXP SoCs[1]. I want the kernel to
+generate key material in the factory, have the CAAM encrypt it using its
+undisclosed unique key and pass it to userspace as encrypted blob that is
+persisted to an unencrypted volume. The intention is to thwart offline
+decryption of an encrypted file system in an embedded system, where a
+passphrase can't be supplied by an end user.
 
-The only interesting cases are:
+Employing TPM and TEE trusted keys with this is already possible with
+dm-crypt, but I'd like this to be possible out-of-the-box with
+ubifs + fscrypt as well.
 
-1) Keys in SYN packets are possibly ambiguous. Current limitation is 
-that a server socket needs all key ids to be different and this is 
-indeed bad.
-2) User is currently allowed to configure same keyid multiple times. RFC 
-does not allow this and behavior is undefined.
+> and update the relevant
+> sections of Documentation/filesystems/fscrypt.rst to explain why someone would
+> want to use this feature and what it accomplishes.
 
-> Even if the MKT's socket pair is not used in the initial commit, would
-> it help having it in the API, to avoid future incompatibilities with
-> user level? Or would it be understood that user level code using the
-> initial commit may have to change with future commits?
+How about:
 
-The rules used to distinguish keys in SYN packets can be further 
-elaborated by extending the uapi tcp_authopt_key structure. Increasing 
-the size of a structure doesn't break ABI if you're careful with length 
-checks.
+-  type "fscrypt-provisioning" whose payload is
++  type "fscrypt-provisioning" or "trusted":
++  "fscrypt-provisioning" keys have a payload of
+   struct fscrypt_provisioning_key_payload whose ``raw`` field contains
+   the raw key and whose ``type`` field matches ``key_spec.type``.
+   Since ``raw`` is variable-length, the total size of this key's
+   payload must be ``sizeof(struct fscrypt_provisioning_key_payload)``
+-  plus the raw key size.  The process must have Search permission on
+-  this key.
++  plus the raw key size.
++  For "trusted" keys, the payload is directly taken as the raw key.
 
---
-Regards,
-Leonard
++  The process must have Search permission on this key.
+
+-  Most users should leave this 0 and specify the raw key directly.
+
++  Most users leave this 0 and specify the raw key directly.
+-  The support for specifying a Linux keyring key is intended mainly to
+
+-  allow re-adding keys after a filesystem is unmounted and re-mounted,
++  "trusted" keys are useful to leverage kernel support for sealing and
++  unsealing key material. Sealed keys can be persisted to unencrypted
++  storage and later used to decrypt the file system without requiring
++  userspace to know the raw key material.
++  "fscrypt-provisioning" key support is intended mainly to allow
++  re-adding keys after a filesystem is unmounted and re-mounted,
+
+> As-is, this feature doesn't seem to have a very strong justification.  Please
+> also see previous threads where this feature was discussed/requested:
+> https://lkml.kernel.org/linux-fscrypt/20180110124418.24385-1-git@andred.net/T/#u,
+> https://lkml.kernel.org/linux-fscrypt/20180118131359.8365-1-git@andred.net/T/#u,
+> https://lkml.kernel.org/linux-fscrypt/20200116193228.GA266386@vader/T/#u
+
+Thanks. I wasn't aware of the last one. I (re-)read them now. I hope
+this mail manages to address the concerns.
+
+(Also added original authors of these mail threads to CC)
+
+> Note that there are several design flaws with the encrypted and trusted key
+> types:
+> 
+> - By default, trusted keys are generated using the TPM's RNG rather than the
+>   kernel's RNG, which places all trust in an unauditable black box.
+
+Patch to fix that awaits feedback on linux-integrity[2].
+
+> - trusted and encrypted keys aren't restricted to specific uses in the kernel
+>   (like the fscrypt-provisioning key type is) but rather are general-purpose.
+>   Hence, it may be possible to leak their contents to userspace by requesting
+>   their use for certain algorithms/features, e.g. to encrypt a dm-crypt target
+>   using a weak cipher that is vulnerable to key recovery attacks.
+
+The footgun is already there by allowing users to specify their own
+
+raw key. Users can already use $keyid for dm-crypt and then do
+
+  $ keyctl pipe $keyid | fscryptctl add_key /mnt
+
+The responsibility to not reuse key material already lies with the users,
+regardless if they handle the raw key material directly or indirectly via
+a trusted key description/ID.
+
+> - "encrypted" keys that use a master key of type "user" are supported, despite
+>   these being easily obtainable in the clear by userspace providing their own
+>   master key.  This violates one of the main design goals of "encrypted" keys.
+
+I care for trusted keys foremost, so I've no problems dropping the encrypted
+key support.
+
+> Also, using the "trusted" key type isn't necessary to achieve TPM-bound
+> encryption, as TPM binding can be handled in userspace instead.
+
+Trusted keys support TEE and hopefully CAAM soon as well. I don't want my
+userspace directly poking a DMA master.
+> So I really would like to see a proper justification for this feature, and have
+> it be properly documented.
+
+In light of the extended justification above, do you want me to respin with
+the proposed changes?
+
+> One comment on the UAPI below.
+
+> Why not just allow the key_id field to specify a "trusted" or "encrypted" key?
+> Why is it necessary for FS_IOC_ADD_ENCRYPTION_KEY to support two different ways
+> of looking up keyring keys -- by ID and by description?  Looking up by ID works
+> fine for "fscrypt-provisioning" keys; why are "trusted" and "encrypted" keys
+> different in this regard?
+
+Mixture of reading emails predating key_id and misunderstanding the API.
+key_id would be much cleaner indeed. I can change this for v2.
+
+Thanks for your review.
+
+[1]: https://lore.kernel.org/linux-integrity/655aab117f922320e2123815afb5bf3daeb7b8b3.1626885907.git-series.a.fatoum@pengutronix.de/
+[2]: https://lore.kernel.org/linux-integrity/cover.9fc9298fd9d63553491871d043a18affc2dbc8a8.1626885907.git-series.a.fatoum@pengutronix.de/T/#meaefcdc9ac091944ddadaebe0410c2325af0032e
+
+Cheers,
+Ahmad
+
+> 
+> - Eric
+> 
+
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
