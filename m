@@ -2,128 +2,152 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC80C43214
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 08:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2D4EC4320A
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 11:31:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 913AB60F5C
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 08:06:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9566C6101C
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 11:31:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238029AbhG3IGx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jul 2021 04:06:53 -0400
-Received: from mga03.intel.com ([134.134.136.65]:13027 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230422AbhG3IGs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jul 2021 04:06:48 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10060"; a="213084655"
-X-IronPort-AV: E=Sophos;i="5.84,281,1620716400"; 
-   d="scan'208";a="213084655"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2021 01:06:43 -0700
-X-IronPort-AV: E=Sophos;i="5.84,281,1620716400"; 
-   d="scan'208";a="635393118"
-Received: from smile.fi.intel.com (HELO smile) ([10.237.68.40])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2021 01:06:29 -0700
-Received: from andy by smile with local (Exim 4.94.2)
-        (envelope-from <andriy.shevchenko@intel.com>)
-        id 1m9NXA-003JSv-6T; Fri, 30 Jul 2021 11:06:20 +0300
-Date:   Fri, 30 Jul 2021 11:06:20 +0300
-From:   Andy Shevchenko <andriy.shevchenko@intel.com>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Bjorn Helgaas <bhelgaas@google.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        kernel@pengutronix.de,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-pci@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Russell Currey <ruscur@russell.cc>,
-        Oliver O'Halloran <oohall@gmail.com>,
+        id S238703AbhG3LbJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Jul 2021 07:31:09 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:52158 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238678AbhG3LbJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 30 Jul 2021 07:31:09 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 771822232B;
+        Fri, 30 Jul 2021 11:31:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1627644663; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0i5/8P81wWKC2EpiUP3Ejs7q4Xz+ybvx8UrMU1RwVW8=;
+        b=1FG7TknlogbuGPp4BV8k+OVpjRdWs6/5v+ZJjlXdVE5gwj2C9cp5faC+4VpbgtPWlat/MM
+        VUKr1OKF/PgOmuuPuXlA+xJ+XkaUTE+bz1ATzIUWIUMAnD9WGrh2U042Dmaw5+f0pCwKgf
+        5KYrqgQDu9YkmB6KYmh/9daaOeAhNuQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1627644663;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0i5/8P81wWKC2EpiUP3Ejs7q4Xz+ybvx8UrMU1RwVW8=;
+        b=E6W9oaolIYJXsCXJWlD8cjTCtV5D8TbX4yudUeAx58zz5GaoZmkpGX2HAOjgxsWnoY19Lb
+        QAATd1d6oY41C5AQ==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 0D9A7137C2;
+        Fri, 30 Jul 2021 11:31:03 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id z+f8AffiA2FYRgAAGKfGzw
+        (envelope-from <vbabka@suse.cz>); Fri, 30 Jul 2021 11:31:03 +0000
+Subject: Re: [PATCH Part2 RFC v4 07/40] x86/sev: Split the physmap when adding
+ the page in RMP table
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Vadym Kochan <vkochan@marvell.com>,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Jiri Pirko <jiri@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Michael Buesch <m@bues.ch>,
-        Mathias Nyman <mathias.nyman@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
-        netdev@vger.kernel.org, oss-drivers@corigine.com,
-        xen-devel@lists.xenproject.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH v1 0/5] PCI: Drop duplicated tracking of a pci_dev's
- bound driver
-Message-ID: <YQOy/OTvY66igEoe@smile.fi.intel.com>
-References: <20210729203740.1377045-1-u.kleine-koenig@pengutronix.de>
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-8-brijesh.singh@amd.com> <YO9kP1v0TAFXISHD@google.com>
+ <d486a008-8340-66b0-9667-11c8a50974e4@amd.com> <YPB1n0+G+0EoyEvE@google.com>
+ <41f83ddf-a8a5-daf3-dc77-15fc164f77c6@amd.com> <YPCA0A+Z3RKfdsa3@google.com>
+ <8da808d6-162f-bbaf-fa15-683f8636694f@amd.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+Message-ID: <b6793038-c24b-a65b-1ca4-ed581b254ff4@suse.cz>
+Date:   Fri, 30 Jul 2021 13:31:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <8da808d6-162f-bbaf-fa15-683f8636694f@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210729203740.1377045-1-u.kleine-koenig@pengutronix.de>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jul 29, 2021 at 10:37:35PM +0200, Uwe Kleine-K�nig wrote:
-> Hello,
+On 7/15/21 9:38 PM, Brijesh Singh wrote:
 > 
-> struct pci_dev tracks the bound pci driver twice. This series is about
-> removing this duplication.
 > 
-> The first two patches are just cleanups. The third patch introduces a
-> wrapper that abstracts access to struct pci_dev->driver. In the next
-> patch (hopefully) all users are converted to use the new wrapper and
-> finally the fifth patch removes the duplication.
+> On 7/15/21 1:39 PM, Sean Christopherson wrote:
+>> On Thu, Jul 15, 2021, Brijesh Singh wrote:
+>>> The memfd_secrets uses the set_direct_map_{invalid,default}_noflush() and it
+>>> is designed to remove/add the present bit in the direct map. We can't use
+>>> them, because in our case the page may get accessed by the KVM (e.g
+>>> kvm_guest_write, kvm_guest_map etc).
+>>
+>> But KVM should never access a guest private page, i.e. the direct map should
+>> always be restored to PRESENT before KVM attempts to access the page.
+>>
 > 
-> Note this series is only build tested (allmodconfig on several
-> architectures).
-> 
-> I'm open to restructure this series if this simplifies things. E.g. the
-> use of the new wrapper in drivers/pci could be squashed into the patch
-> introducing the wrapper. Patch 4 could be split by maintainer tree or
-> squashed into patch 3 completely.
+> Yes, KVM should *never* access the guest private pages. So, we could potentially
+> enhance the RMPUPDATE() to check for the assigned and act accordingly.
 
-I see only patch 4 and this cover letter...
+I think I'm not the first one suggesting it, but IMHO the best solution would be
+to leave direct map alone (except maybe in some debugging/development mode where
+you could do the unmapping to catch unexpected host accesses), and once there's
+a situation with host accessing a shared page of the guest, it would temporarily
+kmap() it outside of the direct map. Shouldn't these situations be rare enough,
+and already recognizable due to the need to set up the page sharing in the first
+place, that this approach would be feasible?
 
--- 
-With Best Regards,
-Andy Shevchenko
-
+> Are you thinking something along the line of this:
+> 
+> int rmpupdate(struct page *page, struct rmpupdate *val)
+> {
+>     ...
+>     
+>     /*
+>      * If page is getting assigned in the RMP entry then unmap
+>      * it from the direct map before its added in the RMP table.
+>      */
+>     if (val.assigned)
+>         set_direct_map_invalid_noflush(page_to_virt(page), 1);
+> 
+>     ...
+> 
+>     /*
+>      * If the page is getting unassigned then restore the mapping
+>      * in the direct map after its removed from the RMP table.
+>      */
+>     if (!val.assigned)
+>         set_direct_map_default_noflush(page_to_virt(page), 1);
+>     
+>     ...
+> }
+> 
+> thanks
 
