@@ -2,152 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2D4EC4320A
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 11:31:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBD7CC4338F
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 13:42:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9566C6101C
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 11:31:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B129E60F5E
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 13:42:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238703AbhG3LbJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jul 2021 07:31:09 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:52158 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238678AbhG3LbJ (ORCPT
+        id S231177AbhG3NmK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Jul 2021 09:42:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56466 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231139AbhG3NmJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jul 2021 07:31:09 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 771822232B;
-        Fri, 30 Jul 2021 11:31:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1627644663; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0i5/8P81wWKC2EpiUP3Ejs7q4Xz+ybvx8UrMU1RwVW8=;
-        b=1FG7TknlogbuGPp4BV8k+OVpjRdWs6/5v+ZJjlXdVE5gwj2C9cp5faC+4VpbgtPWlat/MM
-        VUKr1OKF/PgOmuuPuXlA+xJ+XkaUTE+bz1ATzIUWIUMAnD9WGrh2U042Dmaw5+f0pCwKgf
-        5KYrqgQDu9YkmB6KYmh/9daaOeAhNuQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1627644663;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0i5/8P81wWKC2EpiUP3Ejs7q4Xz+ybvx8UrMU1RwVW8=;
-        b=E6W9oaolIYJXsCXJWlD8cjTCtV5D8TbX4yudUeAx58zz5GaoZmkpGX2HAOjgxsWnoY19Lb
-        QAATd1d6oY41C5AQ==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 0D9A7137C2;
-        Fri, 30 Jul 2021 11:31:03 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id z+f8AffiA2FYRgAAGKfGzw
-        (envelope-from <vbabka@suse.cz>); Fri, 30 Jul 2021 11:31:03 +0000
-Subject: Re: [PATCH Part2 RFC v4 07/40] x86/sev: Split the physmap when adding
- the page in RMP table
-To:     Brijesh Singh <brijesh.singh@amd.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-8-brijesh.singh@amd.com> <YO9kP1v0TAFXISHD@google.com>
- <d486a008-8340-66b0-9667-11c8a50974e4@amd.com> <YPB1n0+G+0EoyEvE@google.com>
- <41f83ddf-a8a5-daf3-dc77-15fc164f77c6@amd.com> <YPCA0A+Z3RKfdsa3@google.com>
- <8da808d6-162f-bbaf-fa15-683f8636694f@amd.com>
-From:   Vlastimil Babka <vbabka@suse.cz>
-Message-ID: <b6793038-c24b-a65b-1ca4-ed581b254ff4@suse.cz>
-Date:   Fri, 30 Jul 2021 13:31:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Fri, 30 Jul 2021 09:42:09 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 670EEC06175F;
+        Fri, 30 Jul 2021 06:42:04 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id e21so11135820pla.5;
+        Fri, 30 Jul 2021 06:42:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Z+UTgWp+zpv9uq3n8GwXOFwx+FHu79iX7o0OWQdHhjs=;
+        b=Fyip1ATb2rFxi2IRFfNqc3Rp9q8MpYQhoKqPhz+cUWvKRIrbPjBlNo8ksvNHZcSSyA
+         7w0qcPeYLvmu+WKHtURXVpZNFu19fGN6SU9VqZHnPJEl4jEGnGxbL9KXBi63zHNBaeH/
+         LIhyHYgoTv0hvHRpaRe9uTGA1aOCFYoV7e4fEIghn1BLHbuiNqJHEqU1j4uBAklG10Wi
+         J1aDZKDbmt9iNDNdRGyxCRPIhZ1Oy10pxYMRwzG98naage6qzU2sxvhKK8rBY4gQSiqw
+         3xf4t6QeBm/Niy6BP2RqgNuQiU/iwjuFXvhfBW64FfBKWzUv/foc0uZiilBE8CQ/zFe3
+         HFFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Z+UTgWp+zpv9uq3n8GwXOFwx+FHu79iX7o0OWQdHhjs=;
+        b=EawqQXuSwpe93zP452UNfkOpZjcCNOOzUDTAUjeJBSuALN7nt7BP88A/NDdj10XUcX
+         3U3vuyekQ2yaTnCK+Yh3OwTrgyWsd9sJptXUa1PyO5Y1iQ29MZJoSkGAJAwrdCTdhQy2
+         rF6SpAo0J+ys9Jc+AQrsFFCSO+sA8BZG0PshjABu2sO1CfTQQWy+a0gqZ3wDLA1EAZ73
+         MDBGIhBBEb8wSfVOzE4LRoPiFG8mzTXDUlhXRCpPrJceRFM7peZ998C8Uei5MD1Y7dz4
+         qGRIiFQwGYHPvNmAY9F16sWp1jQPqy1Tlu4mw7jjPGe2tafHObjSEmkkUtIdyZvh4Rkn
+         17gQ==
+X-Gm-Message-State: AOAM533n3+TU7UCfzFJMF00g0Ba/O0M2fHRlbtcBNcuHzFolPBIEni1C
+        swj5NtwmaZGsyHoud2l9lgs=
+X-Google-Smtp-Source: ABdhPJxBM8keu1unzD/GluhY0ROU1+97tKmo2Yp4H+Bl941FJpfzGqDhGI3Jf/lO34gqqBGZTBKAag==
+X-Received: by 2002:a17:902:b493:b029:12b:aed5:ce06 with SMTP id y19-20020a170902b493b029012baed5ce06mr2572207plr.18.1627652523873;
+        Fri, 30 Jul 2021 06:42:03 -0700 (PDT)
+Received: from fedora.. ([49.36.215.73])
+        by smtp.googlemail.com with ESMTPSA id j13sm2517789pjl.1.2021.07.30.06.41.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jul 2021 06:42:03 -0700 (PDT)
+From:   Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com
+Cc:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
+Subject: [PATCH] crypto: add missing kernel_fpu_end() call
+Date:   Fri, 30 Jul 2021 19:11:55 +0530
+Message-Id: <20210730134155.1005358-1-chouhan.shreyansh630@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <8da808d6-162f-bbaf-fa15-683f8636694f@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/15/21 9:38 PM, Brijesh Singh wrote:
-> 
-> 
-> On 7/15/21 1:39 PM, Sean Christopherson wrote:
->> On Thu, Jul 15, 2021, Brijesh Singh wrote:
->>> The memfd_secrets uses the set_direct_map_{invalid,default}_noflush() and it
->>> is designed to remove/add the present bit in the direct map. We can't use
->>> them, because in our case the page may get accessed by the KVM (e.g
->>> kvm_guest_write, kvm_guest_map etc).
->>
->> But KVM should never access a guest private page, i.e. the direct map should
->> always be restored to PRESENT before KVM attempts to access the page.
->>
-> 
-> Yes, KVM should *never* access the guest private pages. So, we could potentially
-> enhance the RMPUPDATE() to check for the assigned and act accordingly.
+xts_crypt() code doesn't call kernel_fpu_end() after calling
+kernel_fpu_begin() if walk.nbytes is 0. Add a call to kernel_fpu_end()
+for this case.
 
-I think I'm not the first one suggesting it, but IMHO the best solution would be
-to leave direct map alone (except maybe in some debugging/development mode where
-you could do the unmapping to catch unexpected host accesses), and once there's
-a situation with host accessing a shared page of the guest, it would temporarily
-kmap() it outside of the direct map. Shouldn't these situations be rare enough,
-and already recognizable due to the need to set up the page sharing in the first
-place, that this approach would be feasible?
+Reported-by: syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
+Signed-off-by: Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
+---
+ arch/x86/crypto/aesni-intel_glue.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> Are you thinking something along the line of this:
-> 
-> int rmpupdate(struct page *page, struct rmpupdate *val)
-> {
->     ...
->     
->     /*
->      * If page is getting assigned in the RMP entry then unmap
->      * it from the direct map before its added in the RMP table.
->      */
->     if (val.assigned)
->         set_direct_map_invalid_noflush(page_to_virt(page), 1);
-> 
->     ...
-> 
->     /*
->      * If the page is getting unassigned then restore the mapping
->      * in the direct map after its removed from the RMP table.
->      */
->     if (!val.assigned)
->         set_direct_map_default_noflush(page_to_virt(page), 1);
->     
->     ...
-> }
-> 
-> thanks
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 2144e54a6c89..bd55a0cd7bde 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -894,6 +894,9 @@ static int xts_crypt(struct skcipher_request *req, bool encrypt)
+ 			kernel_fpu_begin();
+ 	}
+ 
++	if (walk.nbytes == 0)
++		kernel_fpu_end();
++
+ 	if (unlikely(tail > 0 && !err)) {
+ 		struct scatterlist sg_src[2], sg_dst[2];
+ 		struct scatterlist *src, *dst;
+-- 
+2.31.1
 
