@@ -2,102 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBD7CC4338F
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 13:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF652C432BE
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 16:00:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B129E60F5E
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 13:42:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7F6160524
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 16:00:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231177AbhG3NmK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jul 2021 09:42:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56466 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231139AbhG3NmJ (ORCPT
+        id S231905AbhG3QAW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Jul 2021 12:00:22 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:35436 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229773AbhG3QAV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jul 2021 09:42:09 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 670EEC06175F;
-        Fri, 30 Jul 2021 06:42:04 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id e21so11135820pla.5;
-        Fri, 30 Jul 2021 06:42:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Z+UTgWp+zpv9uq3n8GwXOFwx+FHu79iX7o0OWQdHhjs=;
-        b=Fyip1ATb2rFxi2IRFfNqc3Rp9q8MpYQhoKqPhz+cUWvKRIrbPjBlNo8ksvNHZcSSyA
-         7w0qcPeYLvmu+WKHtURXVpZNFu19fGN6SU9VqZHnPJEl4jEGnGxbL9KXBi63zHNBaeH/
-         LIhyHYgoTv0hvHRpaRe9uTGA1aOCFYoV7e4fEIghn1BLHbuiNqJHEqU1j4uBAklG10Wi
-         J1aDZKDbmt9iNDNdRGyxCRPIhZ1Oy10pxYMRwzG98naage6qzU2sxvhKK8rBY4gQSiqw
-         3xf4t6QeBm/Niy6BP2RqgNuQiU/iwjuFXvhfBW64FfBKWzUv/foc0uZiilBE8CQ/zFe3
-         HFFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Z+UTgWp+zpv9uq3n8GwXOFwx+FHu79iX7o0OWQdHhjs=;
-        b=EawqQXuSwpe93zP452UNfkOpZjcCNOOzUDTAUjeJBSuALN7nt7BP88A/NDdj10XUcX
-         3U3vuyekQ2yaTnCK+Yh3OwTrgyWsd9sJptXUa1PyO5Y1iQ29MZJoSkGAJAwrdCTdhQy2
-         rF6SpAo0J+ys9Jc+AQrsFFCSO+sA8BZG0PshjABu2sO1CfTQQWy+a0gqZ3wDLA1EAZ73
-         MDBGIhBBEb8wSfVOzE4LRoPiFG8mzTXDUlhXRCpPrJceRFM7peZ998C8Uei5MD1Y7dz4
-         qGRIiFQwGYHPvNmAY9F16sWp1jQPqy1Tlu4mw7jjPGe2tafHObjSEmkkUtIdyZvh4Rkn
-         17gQ==
-X-Gm-Message-State: AOAM533n3+TU7UCfzFJMF00g0Ba/O0M2fHRlbtcBNcuHzFolPBIEni1C
-        swj5NtwmaZGsyHoud2l9lgs=
-X-Google-Smtp-Source: ABdhPJxBM8keu1unzD/GluhY0ROU1+97tKmo2Yp4H+Bl941FJpfzGqDhGI3Jf/lO34gqqBGZTBKAag==
-X-Received: by 2002:a17:902:b493:b029:12b:aed5:ce06 with SMTP id y19-20020a170902b493b029012baed5ce06mr2572207plr.18.1627652523873;
-        Fri, 30 Jul 2021 06:42:03 -0700 (PDT)
-Received: from fedora.. ([49.36.215.73])
-        by smtp.googlemail.com with ESMTPSA id j13sm2517789pjl.1.2021.07.30.06.41.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jul 2021 06:42:03 -0700 (PDT)
-From:   Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com
-Cc:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
-Subject: [PATCH] crypto: add missing kernel_fpu_end() call
-Date:   Fri, 30 Jul 2021 19:11:55 +0530
-Message-Id: <20210730134155.1005358-1-chouhan.shreyansh630@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        Fri, 30 Jul 2021 12:00:21 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 4368C22428;
+        Fri, 30 Jul 2021 16:00:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1627660815; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kw6stp8k72daDKN6GtjAkWV2DdxxOIrOovtdOiv+Lbo=;
+        b=VWJLSUNx/UXqcLjpye1h9LwuHPVOsgkM7hkJQ8ymPmqpgoEeIKlw+m0VGitoXHpsIrIbbZ
+        bUZLrnYuwlKrcsDcZ+nhoBTkUCfS5FepMiIkmw2GCMfaQkDhntNXYp8dkb+1SdLgjnqXfi
+        Dus9D5j3zqWexTfrbcdpU+pK15yvxH0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1627660815;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kw6stp8k72daDKN6GtjAkWV2DdxxOIrOovtdOiv+Lbo=;
+        b=5ZGpDrmFl/crYJnLVvuY6F74NkKit4pZoyVsypvoNjwAIHc+o4K5kJd0pkfMDOSYtIZDTq
+        +zu4zbkiiVKEFIDQ==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id CF57D134B1;
+        Fri, 30 Jul 2021 16:00:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id vSnqMQ4iBGG1EgAAGKfGzw
+        (envelope-from <vbabka@suse.cz>); Fri, 30 Jul 2021 16:00:14 +0000
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-11-brijesh.singh@amd.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH Part2 RFC v4 10/40] x86/fault: Add support to handle the
+ RMP fault for user address
+Message-ID: <95a27dfd-bb41-cf32-acd3-f6fdf3780d15@suse.cz>
+Date:   Fri, 30 Jul 2021 18:00:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
+In-Reply-To: <20210707183616.5620-11-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-xts_crypt() code doesn't call kernel_fpu_end() after calling
-kernel_fpu_begin() if walk.nbytes is 0. Add a call to kernel_fpu_end()
-for this case.
+On 7/7/21 8:35 PM, Brijesh Singh wrote:
+> --- a/mm/memory.c
+> +++ b/mm/memory.c
+> @@ -4407,6 +4407,15 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
+>  	return 0;
+>  }
+>  
+> +static int handle_split_page_fault(struct vm_fault *vmf)
+> +{
+> +	if (!IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT))
+> +		return VM_FAULT_SIGBUS;
+> +
+> +	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
+> +	return 0;
+> +}
+> +
 
-Reported-by: syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
-Signed-off-by: Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
----
- arch/x86/crypto/aesni-intel_glue.c | 3 +++
- 1 file changed, 3 insertions(+)
+I think back in v1 Dave asked if khugepaged will just coalesce this back, and it
+wasn't ever answered AFAICS.
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 2144e54a6c89..bd55a0cd7bde 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -894,6 +894,9 @@ static int xts_crypt(struct skcipher_request *req, bool encrypt)
- 			kernel_fpu_begin();
- 	}
- 
-+	if (walk.nbytes == 0)
-+		kernel_fpu_end();
-+
- 	if (unlikely(tail > 0 && !err)) {
- 		struct scatterlist sg_src[2], sg_dst[2];
- 		struct scatterlist *src, *dst;
--- 
-2.31.1
+I've checked the code and I think the answer is: no. Khugepaged isn't designed
+to coalesce a pte-mapped hugepage back to pmd in place. And the usual way (copy
+to a new huge page) I think will not succeed because IIRC the page is also
+FOLL_PIN pinned and  khugepaged_scan_pmd() will see the elevated refcounts via
+is_refcount_suitable() and give up.
 
+So the lack of coalescing (in case the sub-page leading to split becomes guest
+private again later) is somewhat suboptimal, but not critical.
