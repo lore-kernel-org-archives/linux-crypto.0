@@ -2,133 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE8CEC4320A
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 05:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A1CEC432BE
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 05:34:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D728460F6B
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 05:15:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D0BB60F46
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jul 2021 05:34:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236590AbhG3FPI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jul 2021 01:15:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47414 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234928AbhG3FPH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jul 2021 01:15:07 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6AAA660F9B;
-        Fri, 30 Jul 2021 05:14:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1627622098;
-        bh=Rd0qV6oPrMRK9x5RQHEA0i4kdEU0U+RcVzNm4XOeux8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=T6hObKQmOk4AFgIpQT4y2Zsi4Q75SgNjFNnS8pRLR4KFvnEyagvEfbTCdxstRLsYG
-         rjTcpLBlDG/oVJ8lnaqbcwXAZTVT9l8C6Cy6bhh3Fo+ilPrCNthbqlfZm24+7rNODV
-         PAMI7xMjSKfCoNPXlo3uccVRt1pE46rn5PvW/dE4=
-Date:   Fri, 30 Jul 2021 07:14:55 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Bjorn Helgaas <bhelgaas@google.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        kernel@pengutronix.de, linux-pci@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Russell Currey <ruscur@russell.cc>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Vadym Kochan <vkochan@marvell.com>,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Jiri Pirko <jiri@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Michael Buesch <m@bues.ch>,
-        Mathias Nyman <mathias.nyman@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
-        netdev@vger.kernel.org, oss-drivers@corigine.com,
-        xen-devel@lists.xenproject.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH v1 0/5] PCI: Drop duplicated tracking of a pci_dev's
- bound driver
-Message-ID: <YQOKz0l6aaU8PGLV@kroah.com>
-References: <20210729203740.1377045-1-u.kleine-koenig@pengutronix.de>
+        id S236597AbhG3FeF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Jul 2021 01:34:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49224 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233424AbhG3FeE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 30 Jul 2021 01:34:04 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46A50C0613C1
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Jul 2021 22:33:59 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id l11-20020a7bcf0b0000b0290253545c2997so5541378wmg.4
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Jul 2021 22:33:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=C1WY5v0DZXHTp8X+jU1XBLMpyZKc7p/7Jj3rqiqH4LA=;
+        b=lSscHTftFvVptU0RS+B9xY4/Kl/vKO0fmd8RJGUtS0QJ7Cr+HIxgoDwzNcHLV2KcRq
+         yaT6keM0oGDXc3g8ZUrvahCgeQ8zhc0bV9uDYtmXoO/w4FeCIKbeGql0cmwWkc9uMWNp
+         7J4wlepD4tHdJAgjt3sIf2nWEEpOnAVnSd3s25CSzaItqfe23aRogMnFmjUcQ0H8SVhj
+         Qao+bSdulih83AGQIt98is8fwF9t6zY8EyA301QW4G1xdTWL5faEh+ATQZax/v91wtpJ
+         fKK/bm2q5IXTx0xCN7WDvo7cKg67B0PK75se07A5oWQyPOfJLPWKax5F6WtOFWWqgXxO
+         KjIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=C1WY5v0DZXHTp8X+jU1XBLMpyZKc7p/7Jj3rqiqH4LA=;
+        b=R5SClkzqzLeFyc4D2tR6bZSmtr9bwSMxgb2FZHjgFbm9DHMNswVoA7Rrpxb2NNsMEt
+         G2b0fVYYKkrzir+QKUnkeBmzTPL03q+Hi8K8+Xj0IoEK2QZR1Xp7C5B/4848jlBG+wtn
+         8CyUbI3eHFkuNiUwW3JwHqCyRIGxsRvis6l20Ac833BprG3nqB0wXDl5jjVsW3FeU5Es
+         fY75X0AEY7G3M/u4niRTV5IXvDZJPR29Pmypd+k2DMF0SfPsdEXgkj2moYgAHPy6Z7Tt
+         cuX8bh5HCEmZgUIFYBcavHHU7aCsD2cYqn5VeuW5nwSnx9WyXynpBvdIHxijyjdLAPCw
+         GtIA==
+X-Gm-Message-State: AOAM530YarQ9mLGlJwFiJb+inQqnwhSyAFn/DNmiB17yeN03clCpASgT
+        YurtGxcD301469xtxOHMpUbphUohWcOeNQ+ha06dmGkVuP+xgg==
+X-Google-Smtp-Source: ABdhPJy99kphmNZI2cUkbVS6HIZYZEcjuxBuzxR25itmrpo9gyztj1XHxGHYctWdO87pV6jxujWlnPyusuvuvlFn3Fw=
+X-Received: by 2002:a1c:1dcf:: with SMTP id d198mr981162wmd.103.1627623237784;
+ Thu, 29 Jul 2021 22:33:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210729203740.1377045-1-u.kleine-koenig@pengutronix.de>
+References: <20210715213138.1363079-1-dlatypov@google.com> <20210715213138.1363079-2-dlatypov@google.com>
+ <20210723064328.GA7986@gondor.apana.org.au> <CAGS_qxqOD+Bcvy7xti7_eg8+H1cJcfp94BtnRhuzijDcaGF_uA@mail.gmail.com>
+ <20210730025544.GA12781@gondor.apana.org.au>
+In-Reply-To: <20210730025544.GA12781@gondor.apana.org.au>
+From:   David Gow <davidgow@google.com>
+Date:   Fri, 30 Jul 2021 13:33:46 +0800
+Message-ID: <CABVgOSnde5VmF8TLfF=B4Nbvo7C5GUJ91OY9Rct-ksyPaTtpcw@mail.gmail.com>
+Subject: Re: [RFC v1 1/2] crypto: tcrypt: minimal conversion to run under KUnit
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Daniel Latypov <dlatypov@google.com>, davem@davemloft.net,
+        linux-crypto@vger.kernel.org,
+        Brendan Higgins <brendanhiggins@google.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KUnit Development <kunit-dev@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jul 29, 2021 at 10:37:35PM +0200, Uwe Kleine-König wrote:
-> Hello,
-> 
-> struct pci_dev tracks the bound pci driver twice. This series is about
-> removing this duplication.
-> 
-> The first two patches are just cleanups. The third patch introduces a
-> wrapper that abstracts access to struct pci_dev->driver. In the next
-> patch (hopefully) all users are converted to use the new wrapper and
-> finally the fifth patch removes the duplication.
-> 
-> Note this series is only build tested (allmodconfig on several
-> architectures).
-> 
-> I'm open to restructure this series if this simplifies things. E.g. the
-> use of the new wrapper in drivers/pci could be squashed into the patch
-> introducing the wrapper. Patch 4 could be split by maintainer tree or
-> squashed into patch 3 completely.
-> 
-> Best regards
-> Uwe
-> 
-> Uwe Kleine-König (5):
->   PCI: Simplify pci_device_remove()
->   PCI: Drop useless check from pci_device_probe()
->   PCI: Provide wrapper to access a pci_dev's bound driver
->   PCI: Adapt all code locations to not use struct pci_dev::driver
->     directly
->   PCI: Drop duplicated tracking of a pci_dev's bound driver
+On Fri, Jul 30, 2021 at 10:55 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Fri, Jul 23, 2021 at 12:31:28PM -0700, Daniel Latypov wrote:
+> >
+> > Thanks, that makes a lot of sense.
+> > In that case, how useful would `kunit.py run` be? I.e. Do people
+> > mostly want to see numbers on bare metal?
+>
+> I think it's a mix of both.  As in performance on bare metal and
+> under virtualisation may be of interest.  I don't think you're going
+> to be going through kunit for the speed tests though, because you
+> need to supply module parameters for tcrypt to do that.
 
-Other than my objection to patch 5/5 lack of changelog, looks sane to
-me:
+FYI, there is a patch for kunit_tool which will allow kernel
+parameters to be passed through:
+https://patchwork.kernel.org/project/linux-kselftest/patch/20210715160819.1107685-1-dlatypov@google.com/
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+That being said, no-one's ever used any of the KUnit tooling for
+performance testing before, as far as I know, so whether or not it
+turns out to be useful or not remains to be seen. With this patch,
+it'd at least be an option if you wanted to try it.
+
+-- David
