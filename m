@@ -2,164 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D45A1C4320A
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Jul 2021 12:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F39CFC4338F
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Jul 2021 20:49:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B999B60F94
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Jul 2021 12:10:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA54060EEA
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Jul 2021 20:49:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232507AbhGaMKX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 31 Jul 2021 08:10:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49754 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232919AbhGaMKV (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 31 Jul 2021 08:10:21 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB80C0613D3
-        for <linux-crypto@vger.kernel.org>; Sat, 31 Jul 2021 05:10:15 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1m9nnU-0007Ot-05; Sat, 31 Jul 2021 14:08:56 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1m9nnD-0007eB-Mm; Sat, 31 Jul 2021 14:08:39 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1m9nnD-0001LE-Jt; Sat, 31 Jul 2021 14:08:39 +0200
-Date:   Sat, 31 Jul 2021 14:08:36 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Cc:     Bjorn Helgaas <bhelgaas@google.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
-        Russell Currey <ruscur@russell.cc>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        oss-drivers@corigine.com, Oliver O'Halloran <oohall@gmail.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jiri Olsa <jolsa@redhat.com>,
-        linux-perf-users@vger.kernel.org,
-        Stefano Stabellini <sstabellini@kernel.org>,
+        id S230312AbhGaUtj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 31 Jul 2021 16:49:39 -0400
+Received: from foss.arm.com ([217.140.110.172]:52358 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229958AbhGaUti (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 31 Jul 2021 16:49:38 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C095ED6E;
+        Sat, 31 Jul 2021 13:49:31 -0700 (PDT)
+Received: from localhost.localdomain (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 979383F70D;
+        Sat, 31 Jul 2021 13:49:29 -0700 (PDT)
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-scsi@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
-        Ido Schimmel <idosch@nvidia.com>, x86@kernel.org,
-        qat-linux@intel.com,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        linux-wireless@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        Mathias Nyman <mathias.nyman@intel.com>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Borislav Petkov <bp@alien8.de>, Michael Buesch <m@bues.ch>,
-        Jiri Pirko <jiri@nvidia.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        xen-devel@lists.xenproject.org, Vadym Kochan <vkochan@marvell.com>,
-        MPT-FusionLinux.pdl@broadcom.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-usb@vger.kernel.org,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        linux-kernel@vger.kernel.org, Taras Chornyi <tchornyi@marvell.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        netdev@vger.kernel.org, Frederic Barrat <fbarrat@linux.ibm.com>,
-        Paul Mackerras <paulus@samba.org>,
-        linuxppc-dev@lists.ozlabs.org,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v1 4/5] PCI: Adapt all code locations to not use struct
- pci_dev::driver directly
-Message-ID: <20210731120836.vegno6voijvlflws@pengutronix.de>
-References: <20210729203740.1377045-1-u.kleine-koenig@pengutronix.de>
- <20210729203740.1377045-5-u.kleine-koenig@pengutronix.de>
- <2b5e8cb5-fac2-5da2-f87b-d287d2c5ea81@oracle.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="rawlqk3jhoxts24y"
-Content-Disposition: inline
-In-Reply-To: <2b5e8cb5-fac2-5da2-f87b-d287d2c5ea81@oracle.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+        Ard Biesheuvel <ardb@kernel.org>,
+        Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
+        Ali Saidi <alisaidi@amazon.com>,
+        Jon Nettleton <jon@solid-run.com>
+Subject: [PATCH v4 0/2] hwrng: Add Arm SMCCC TRNG based driver
+Date:   Sat, 31 Jul 2021 21:48:43 +0100
+Message-Id: <20210731204845.21196-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.14.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+The "Arm True Random Number Generator Firmware Interface"[1] provides
+an SMCCC based interface to a true hardware random number generator.
+So far we are using that in arch_get_random_seed(), but it might be
+useful to expose the entropy through the /dev/hwrng device as well. This
+allows to assess the quality of the implementation, by using "rngtest"
+from the rng-tools package, for example.
 
---rawlqk3jhoxts24y
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Patch 1 creates a platform device, triggered by the previous discovery
+of the SMCCC TRNG service.
+Patch 2 implements a hw_random platform driver, which is instantiated
+through this said platform device.
 
-Hello Boris,
+The driver can be loaded as module, or built into the kernel.
 
-On Fri, Jul 30, 2021 at 04:37:31PM -0400, Boris Ostrovsky wrote:
-> On 7/29/21 4:37 PM, Uwe Kleine-K=F6nig wrote:
-> > --- a/drivers/pci/xen-pcifront.c
-> > +++ b/drivers/pci/xen-pcifront.c
-> > @@ -599,12 +599,12 @@ static pci_ers_result_t pcifront_common_process(i=
-nt cmd,
-> >  	result =3D PCI_ERS_RESULT_NONE;
-> > =20
-> >  	pcidev =3D pci_get_domain_bus_and_slot(domain, bus, devfn);
-> > -	if (!pcidev || !pcidev->driver) {
-> > +	pdrv =3D pci_driver_of_dev(pcidev);
-> > +	if (!pcidev || !pdrv) {
->=20
-> If pcidev is NULL we are dead by the time we reach 'if' statement.
+[1] https://developer.arm.com/documentation/den0098/latest/
 
-Oh, you're right. So this needs something like:
+Changelog v3 ... v4:
+- drop pointless driver loading message
+- drop unneeded init() routine
 
-	if (!pcidev || !(pdrv =3D pci_driver_of_dev(pcidev)))
+Changelog v2 ... v3:
+- split platform device and driver
 
-or repeating the call to pci_driver_of_dev for each previous usage of
-pdev->driver.
+Changelog v1 ... v2:
+- fix building as a module
+- de-register device upon exit
+- mention module name in Kconfig
 
-If there are no other preferences I'd got with the first approach for
-v2.
+Andre Przywara (2):
+  firmware: smccc: Register smccc_trng platform device
+  hwrng: Add Arm SMCCC TRNG based driver
 
-Best regards and thanks for catching,
-Uwe
+ drivers/char/hw_random/Kconfig          |  14 +++
+ drivers/char/hw_random/Makefile         |   1 +
+ drivers/char/hw_random/arm_smccc_trng.c | 123 ++++++++++++++++++++++++
+ drivers/firmware/smccc/smccc.c          |  17 ++++
+ 4 files changed, 155 insertions(+)
+ create mode 100644 drivers/char/hw_random/arm_smccc_trng.c
 
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+-- 
+2.17.6
 
---rawlqk3jhoxts24y
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmEFPUEACgkQwfwUeK3K
-7AlQoAgAidQUuX/L2YhXMvP0F+SSjym4ILhKdbRYnWojo/QbFUE8WbOQueAZA76q
-NW0vq2X07i0bUwTfbZoOgqSFvMfXJiETcN9R48epPUGWS2IT17NE8EgtH+/srht0
-sGGI7bia2a1L++nruccUllCf1qMfngKRQUhatVOPYqIs2dX3ijjjpSAxHh8L+gjC
-nOMgWu7lZm7QQawBjQGfirpYGBUFdAh3odwm/JHN7+cZKC6dbhLYGm2WS8db1bCI
-4k4EO2RpSeuZb9XaFPq9DEWy1exgtgjnmKt3Szrp31/xWizjhMEOrZVWfWD1bjUa
-rWcmnDR4bm4Fz/MdVFhjJq2XJQoIDw==
-=2o5y
------END PGP SIGNATURE-----
-
---rawlqk3jhoxts24y--
