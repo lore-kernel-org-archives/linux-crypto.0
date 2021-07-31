@@ -2,106 +2,164 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF9A7C432BE
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Jul 2021 03:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D45A1C4320A
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Jul 2021 12:10:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBB5F60F35
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Jul 2021 03:27:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B999B60F94
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Jul 2021 12:10:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236952AbhGaD1q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jul 2021 23:27:46 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:7906 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235623AbhGaD1k (ORCPT
+        id S232507AbhGaMKX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 31 Jul 2021 08:10:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49754 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232919AbhGaMKV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jul 2021 23:27:40 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Gc8kB3ddgz82PD;
-        Sat, 31 Jul 2021 11:23:46 +0800 (CST)
-Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Sat, 31 Jul 2021 11:27:30 +0800
-Received: from huawei.com (10.69.192.56) by dggpeml500012.china.huawei.com
- (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Sat, 31 Jul
- 2021 11:27:29 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH 4/5] crypto: hisilicon/sec - fix the CTR mode BD configuration
-Date:   Sat, 31 Jul 2021 11:26:35 +0800
-Message-ID: <1627701996-4589-5-git-send-email-yekai13@huawei.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1627701996-4589-1-git-send-email-yekai13@huawei.com>
-References: <1627701996-4589-1-git-send-email-yekai13@huawei.com>
+        Sat, 31 Jul 2021 08:10:21 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB80C0613D3
+        for <linux-crypto@vger.kernel.org>; Sat, 31 Jul 2021 05:10:15 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1m9nnU-0007Ot-05; Sat, 31 Jul 2021 14:08:56 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1m9nnD-0007eB-Mm; Sat, 31 Jul 2021 14:08:39 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1m9nnD-0001LE-Jt; Sat, 31 Jul 2021 14:08:39 +0200
+Date:   Sat, 31 Jul 2021 14:08:36 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc:     Bjorn Helgaas <bhelgaas@google.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
+        Russell Currey <ruscur@russell.cc>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        oss-drivers@corigine.com, Oliver O'Halloran <oohall@gmail.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Jiri Olsa <jolsa@redhat.com>,
+        linux-perf-users@vger.kernel.org,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-scsi@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
+        Ido Schimmel <idosch@nvidia.com>, x86@kernel.org,
+        qat-linux@intel.com,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linux-wireless@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        Mathias Nyman <mathias.nyman@intel.com>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Simon Horman <simon.horman@corigine.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Borislav Petkov <bp@alien8.de>, Michael Buesch <m@bues.ch>,
+        Jiri Pirko <jiri@nvidia.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@intel.com>,
+        Juergen Gross <jgross@suse.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        xen-devel@lists.xenproject.org, Vadym Kochan <vkochan@marvell.com>,
+        MPT-FusionLinux.pdl@broadcom.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-usb@vger.kernel.org,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        linux-kernel@vger.kernel.org, Taras Chornyi <tchornyi@marvell.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        netdev@vger.kernel.org, Frederic Barrat <fbarrat@linux.ibm.com>,
+        Paul Mackerras <paulus@samba.org>,
+        linuxppc-dev@lists.ozlabs.org,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH v1 4/5] PCI: Adapt all code locations to not use struct
+ pci_dev::driver directly
+Message-ID: <20210731120836.vegno6voijvlflws@pengutronix.de>
+References: <20210729203740.1377045-1-u.kleine-koenig@pengutronix.de>
+ <20210729203740.1377045-5-u.kleine-koenig@pengutronix.de>
+ <2b5e8cb5-fac2-5da2-f87b-d287d2c5ea81@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500012.china.huawei.com (7.185.36.15)
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="rawlqk3jhoxts24y"
+Content-Disposition: inline
+In-Reply-To: <2b5e8cb5-fac2-5da2-f87b-d287d2c5ea81@oracle.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The CTR counter is 32bit rollover default on the BD.
-But the NIST standard is 128bit rollover. it cause the
-testing failed, so need to fix the BD configuration.
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
----
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 6 ++++++
- drivers/crypto/hisilicon/sec2/sec_crypto.h | 6 ++++--
- 2 files changed, 10 insertions(+), 2 deletions(-)
+--rawlqk3jhoxts24y
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 010bde9..3b698ad 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -42,6 +42,8 @@
- #define SEC_DE_OFFSET_V3		9
- #define SEC_SCENE_OFFSET_V3	5
- #define SEC_CKEY_OFFSET_V3	13
-+#define SEC_CTR_CNT_OFFSET	25
-+#define SEC_CTR_CNT_ROLLOVER	2
- #define SEC_SRC_SGL_OFFSET_V3	11
- #define SEC_DST_SGL_OFFSET_V3	14
- #define SEC_CALG_OFFSET_V3	4
-@@ -1301,6 +1303,10 @@ static int sec_skcipher_bd_fill_v3(struct sec_ctx *ctx, struct sec_req *req)
- 		cipher = SEC_CIPHER_DEC;
- 	sec_sqe3->c_icv_key |= cpu_to_le16(cipher);
- 
-+	/* Set the CTR counter mode is 128bit rollover */
-+	sec_sqe3->auth_mac_key = cpu_to_le32((u32)SEC_CTR_CNT_ROLLOVER <<
-+					SEC_CTR_CNT_OFFSET);
-+
- 	if (req->use_pbuf) {
- 		bd_param |= SEC_PBUF << SEC_SRC_SGL_OFFSET_V3;
- 		bd_param |= SEC_PBUF << SEC_DST_SGL_OFFSET_V3;
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-index 9f71c35..5e039b5 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-@@ -354,8 +354,10 @@ struct sec_sqe3 {
- 	 * akey_len: 9~14 bits
- 	 * a_alg: 15~20 bits
- 	 * key_sel: 21~24 bits
--	 * updata_key: 25 bits
--	 * reserved: 26~31 bits
-+	 * ctr_count_mode/sm4_xts: 25~26 bits
-+	 * sva_prefetch: 27 bits
-+	 * key_wrap_num: 28~30 bits
-+	 * update_key: 31 bits
- 	 */
- 	__le32 auth_mac_key;
- 	__le32 salt;
--- 
-2.7.4
+Hello Boris,
 
+On Fri, Jul 30, 2021 at 04:37:31PM -0400, Boris Ostrovsky wrote:
+> On 7/29/21 4:37 PM, Uwe Kleine-K=F6nig wrote:
+> > --- a/drivers/pci/xen-pcifront.c
+> > +++ b/drivers/pci/xen-pcifront.c
+> > @@ -599,12 +599,12 @@ static pci_ers_result_t pcifront_common_process(i=
+nt cmd,
+> >  	result =3D PCI_ERS_RESULT_NONE;
+> > =20
+> >  	pcidev =3D pci_get_domain_bus_and_slot(domain, bus, devfn);
+> > -	if (!pcidev || !pcidev->driver) {
+> > +	pdrv =3D pci_driver_of_dev(pcidev);
+> > +	if (!pcidev || !pdrv) {
+>=20
+> If pcidev is NULL we are dead by the time we reach 'if' statement.
+
+Oh, you're right. So this needs something like:
+
+	if (!pcidev || !(pdrv =3D pci_driver_of_dev(pcidev)))
+
+or repeating the call to pci_driver_of_dev for each previous usage of
+pdev->driver.
+
+If there are no other preferences I'd got with the first approach for
+v2.
+
+Best regards and thanks for catching,
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--rawlqk3jhoxts24y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmEFPUEACgkQwfwUeK3K
+7AlQoAgAidQUuX/L2YhXMvP0F+SSjym4ILhKdbRYnWojo/QbFUE8WbOQueAZA76q
+NW0vq2X07i0bUwTfbZoOgqSFvMfXJiETcN9R48epPUGWS2IT17NE8EgtH+/srht0
+sGGI7bia2a1L++nruccUllCf1qMfngKRQUhatVOPYqIs2dX3ijjjpSAxHh8L+gjC
+nOMgWu7lZm7QQawBjQGfirpYGBUFdAh3odwm/JHN7+cZKC6dbhLYGm2WS8db1bCI
+4k4EO2RpSeuZb9XaFPq9DEWy1exgtgjnmKt3Szrp31/xWizjhMEOrZVWfWD1bjUa
+rWcmnDR4bm4Fz/MdVFhjJq2XJQoIDw==
+=2o5y
+-----END PGP SIGNATURE-----
+
+--rawlqk3jhoxts24y--
