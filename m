@@ -2,147 +2,124 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E17DBC4320E
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 16:10:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92963C4320E
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 17:02:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CEE6261078
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 16:10:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7981261029
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 17:02:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231875AbhHCQKv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Aug 2021 12:10:51 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:58112 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231688AbhHCQKv (ORCPT
+        id S237408AbhHCRC7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Aug 2021 13:02:59 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39956 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234313AbhHCRCy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Aug 2021 12:10:51 -0400
-Date:   Tue, 3 Aug 2021 18:10:33 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1628007036;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZhCR89X1oG7iNKpxBHqwK160maOrSQVKgeomxdN0wRc=;
-        b=LwdXqV6TEL+jelWYIVu/L1AwkukJUhfDeR6fxf6HaCffMyf5pGalG64DdzD6SrFbnK74/x
-        PVNjb7a8JiALCQD3CJBVmxfKVnGPRCXtU70BUFy11admR5LtOLT9dQeI/ENtXdJ/CkhTdc
-        pZNvsYTpT+QPzjRhgzvNT0CjgoFJhxwmycapteSubpDkPSBjZ+FP8bxnvUSWW30Gz0Y7dW
-        1ffy1Rr5tDaLDwQ1cWTtCeME4yw92tE3YUaDago5Lw9pEtw1H1L8au8do+a32W2/sN3gs0
-        btcFKclunpFVufnMA6+fMpSDPoeRfMtyi+RFwzALyjj/jtaWzgKiRMXG8gO4tg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1628007036;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZhCR89X1oG7iNKpxBHqwK160maOrSQVKgeomxdN0wRc=;
-        b=CjGblo5JavDHAEsakSWenCqJ60bnDYFeC+TGn7n/YdarB5rRq+iJbcWjrVSzA5F0n0kDM4
-        Vc1wmHGVCRR8DGCA==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Hans de Goede <hdegoede@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, tglx@linutronix.de,
-        Peter Zijlstra <peterz@infradead.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Amit Kucheria <amitk@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Ben Segall <bsegall@google.com>,
-        Borislav Petkov <bp@alien8.de>, cgroups@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        coresight@lists.linaro.org,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Gonglei <arei.gonglei@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean Delvare <jdelvare@suse.com>,
-        Jiri Kosina <jikos@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Julian Wiedmann <jwi@linux.ibm.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Karol Herbst <karolherbst@gmail.com>,
-        Karsten Graul <kgraul@linux.ibm.com>, kvm-ppc@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Len Brown <lenb@kernel.org>, Len Brown <len.brown@intel.com>,
-        Leo Yan <leo.yan@linaro.org>, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-edac@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-mips@vger.kernel.org,
-        linux-mm@kvack.org, linux-pm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-raid@vger.kernel.org,
-        linux-s390@vger.kernel.org, live-patching@vger.kernel.org,
-        Mark Gross <mgross@linux.intel.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Mel Gorman <mgorman@suse.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Mike Leach <mike.leach@linaro.org>,
-        Mike Travis <mike.travis@hpe.com>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Namhyung Kim <namhyung@kernel.org>, netdev@vger.kernel.org,
-        nouveau@lists.freedesktop.org,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Paul Mackerras <paulus@samba.org>, Pavel Machek <pavel@ucw.cz>,
-        Pekka Paalanen <ppaalanen@gmail.com>,
-        Petr Mladek <pmladek@suse.com>,
-        platform-driver-x86@vger.kernel.org,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>, rcu@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, x86@kernel.org
-Subject: Re: [PATCH 00/38] Replace deprecated CPU-hotplug
-Message-ID: <20210803161033.vp3o34meyw3ek43z@linutronix.de>
-References: <20210803141621.780504-1-bigeasy@linutronix.de>
- <83dc5dfd-1ed0-f428-826f-fb819911fc89@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <83dc5dfd-1ed0-f428-826f-fb819911fc89@redhat.com>
+        Tue, 3 Aug 2021 13:02:54 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 173GeB6r050725;
+        Tue, 3 Aug 2021 13:01:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=MDBxIUawbm49JyOfQS1cf24GJsUXapOiLraOXIEq5J8=;
+ b=bpMsecEPcjRYfjsg28xplQ4jl24je6dsDt6kvmVh8gAdPfMUDcEjiZtPgc9evxufZylZ
+ 2WLsjUvF700/c94KGUNoSsxmINmWbVRrFc8I2N6PHa5krWtMyNSi/V/4EQ5e7oCmh+4d
+ Lqc4zkdBH6HT01k3RWdDm+9O1xkHzrysWrZZGZEhtdnqbVRjncdUc7Ijb0beLW2z+aL9
+ 0NN/uOXHnB23JcV7MEMrcWPvzH0p0KCxF4bp1uiV3ToSEWs2qs+d5ZtC/Aux0P1NAyM8
+ SuERmMVVYRWPgkrd1YsArem/ZBj8Kv/ovBzfYUB5bouWoCTdtCZOEP3ZJvPkgznxCX0P DA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a76auqc0j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 03 Aug 2021 13:01:37 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 173GeGDA050936;
+        Tue, 3 Aug 2021 13:01:36 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a76auqbyj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 03 Aug 2021 13:01:36 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 173GvZR6004197;
+        Tue, 3 Aug 2021 17:01:33 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 3a4x58psfp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 03 Aug 2021 17:01:33 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 173H1VZV55640356
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 3 Aug 2021 17:01:31 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2BA415204E;
+        Tue,  3 Aug 2021 17:01:31 +0000 (GMT)
+Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.88.204])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A48B952054;
+        Tue,  3 Aug 2021 17:01:25 +0000 (GMT)
+Message-ID: <820cd72cd77c4716bff2bf344c64d7bcb59fc4d3.camel@linux.ibm.com>
+Subject: Re: [PATCH RFC v2 00/12] Enroll kernel keys thru MOK
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Eric Snowberg <eric.snowberg@oracle.com>, keyrings@vger.kernel.org,
+        linux-integrity@vger.kernel.org, dhowells@redhat.com,
+        dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, jarkko@kernel.org, jmorris@namei.org,
+        serge@hallyn.com
+Cc:     keescook@chromium.org, gregkh@linuxfoundation.org,
+        torvalds@linux-foundation.org, scott.branden@broadcom.com,
+        weiyongjun1@huawei.com, nayna@linux.ibm.com, ebiggers@google.com,
+        ardb@kernel.org, nramas@linux.microsoft.com, lszubowi@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        glin@suse.com, konrad.wilk@oracle.com
+Date:   Tue, 03 Aug 2021 13:01:24 -0400
+In-Reply-To: <20210726171319.3133879-1-eric.snowberg@oracle.com>
+References: <20210726171319.3133879-1-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: jDB4OEcti4Hsw9NPjhd4mwZjq4CRGf-A
+X-Proofpoint-ORIG-GUID: bK1hKs2bUBz3pY1FYqq74SJ5nMcq0C3Y
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-03_05:2021-08-03,2021-08-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
+ mlxlogscore=999 clxscore=1011 lowpriorityscore=0 suspectscore=0 mlxscore=0
+ bulkscore=0 spamscore=0 impostorscore=0 malwarescore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108030108
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2021-08-03 17:30:40 [+0200], Hans de Goede wrote:
-> Hi Sebastien,
-Hi Hans,
+Hi Eric,
 
-> On 8/3/21 4:15 PM, Sebastian Andrzej Siewior wrote:
-> > This is a tree wide replacement of the deprecated CPU hotplug functions
-> > which are only wrappers around the actual functions.
-> > 
-> > Each patch is independent and can be picked up by the relevant maintainer.
-> 
-> Ok; and I take it that then also is the plan for merging these ?
-> 
-> FWIW I'm fine with the drivers/platform/x86 patch going upstream
-> through some other tree if its easier to keep the set together ...
+On Mon, 2021-07-26 at 13:13 -0400, Eric Snowberg wrote:
 
-There is no need to keep that set together since each patch is
-independent. Please merge it through your tree.
+> When the kernel boots, if MokListTrustedRT is set and
+> EFI_VARIABLE_NON_VOLATILE is not set, the MokListRT is loaded into the
+> mok keyring instead of the platform keyring. Mimi has suggested that
+> only CA keys or keys that can be vouched for by other kernel keys be
+> loaded into this keyring. All other certs will load into the platform
+> keyring instead.
 
-> Regards,
-> 
-> Hans
+I suggested only loading the CA keys stored in the MOK db onto the MOK
+keyring.  Like the builtin trusted keyring, the MOK keyring would also
+be linked to the secondary keyring.   Assuming the secondary keyring is
+defined, all other properly signed MOK db keys  - signed by keys on the
+builtin, secondary or MOK keyring - would be loaded onto the secondary
+keyring.
 
-Sebastian
+As previously discussed, this might require reading the MOK db twice -
+once to load the CA keys on the MOK keyring, a second time to load the
+remaining properly signed keys onto the secondary keyring.
+
+
+thanks,
+
+Mimi
+
