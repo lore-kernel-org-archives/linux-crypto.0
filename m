@@ -4,170 +4,115 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29B52C19F31
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 12:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4BBC4338F
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 13:06:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 115E760F58
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 12:47:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A992D60F8F
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 13:06:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236145AbhHCMrO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Aug 2021 08:47:14 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:16038 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236107AbhHCMrM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Aug 2021 08:47:12 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GfF0Z5VF9zZwLc;
-        Tue,  3 Aug 2021 20:43:26 +0800 (CST)
-Received: from dggpeml500017.china.huawei.com (7.185.36.243) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Tue, 3 Aug 2021 20:46:59 +0800
-Received: from huawei.com (10.175.103.91) by dggpeml500017.china.huawei.com
- (7.185.36.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Tue, 3 Aug 2021
- 20:46:59 +0800
-From:   Yang Yingliang <yangyingliang@huawei.com>
-To:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <stable@vger.kernel.org>
-CC:     <steffen.klassert@secunet.com>, <daniel.m.jordan@oracle.com>,
-        <herbert@gondor.apana.org.au>, <gregkh@linuxfoundation.org>,
-        <sashal@kernel.org>
-Subject: [PATCH 4.19 2/2] padata: add separate cpuhp node for CPUHP_PADATA_DEAD
-Date:   Tue, 3 Aug 2021 20:53:01 +0800
-Message-ID: <20210803125301.77629-3-yangyingliang@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210803125301.77629-1-yangyingliang@huawei.com>
-References: <20210803125301.77629-1-yangyingliang@huawei.com>
+        id S235982AbhHCNHA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Aug 2021 09:07:00 -0400
+Received: from smtpbg587.qq.com ([113.96.223.105]:39324 "EHLO smtpbg587.qq.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235975AbhHCNHA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Aug 2021 09:07:00 -0400
+X-Greylist: delayed 538 seconds by postgrey-1.27 at vger.kernel.org; Tue, 03 Aug 2021 09:07:00 EDT
+X-QQ-mid: bizesmtp37t1627995332t0z35aya
+Received: from localhost.localdomain (unknown [125.69.40.136])
+        by esmtp6.qq.com (ESMTP) with 
+        id ; Tue, 03 Aug 2021 20:55:30 +0800 (CST)
+X-QQ-SSF: 01000000002000B0C000B00A0000000
+X-QQ-FEAT: FsG0r2mBeltZwXHsnSFyQIVXmyMoeC5BD2c5iGCpiLDw2FB21T+BluHr2+WdJ
+        oph6RdKQTsSFUCzmZUnpNtkvp7eRJJ7u4igpOBS3y1HdKXXsaVO7JQf5TGooeEoSctgHhA8
+        OXl9EoQ04EBtRvwL3HqP+UCbpDMWLeVkuWP3fiXqES3NnB44Hyo5mQ1OoJemMhdsRwVPFxE
+        Qn3LIQsc1dHzAB5VHQ7o+h4EE1wdh7/PGW+rcJmy8JOO3AagTdn8xhSW26L620rIClOA0LB
+        JmUxJ0S/Cx2RsqipiQbq1yD67gbfWKBZTBJy0J4LL1wFz+stATLDWWpOxFfU/SGyz+ZJYmL
+        k/6kLXzErmCrW71M+Y=
+X-QQ-GoodBg: 0
+From:   Jason Wang <wangborong@cdjrlc.com>
+To:     herbert@gondor.apana.org.au
+Cc:     clabbe.montjoie@gmail.com, davem@davemloft.net, mripard@kernel.org,
+        wens@csie.org, jernej.skrabec@gmail.com, wangborong@cdjrlc.com,
+        mchehab+huawei@kernel.org, corbet@lwn.net, baijiaju1990@gmail.com,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: sun8i-ce - use kfree_sensitive to clear and free sensitive data
+Date:   Tue,  3 Aug 2021 20:55:25 +0800
+Message-Id: <20210803125525.72603-1-wangborong@cdjrlc.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.103.91]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500017.china.huawei.com (7.185.36.243)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:cdjrlc.com:qybgspam:qybgspam3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Daniel Jordan <daniel.m.jordan@oracle.com>
+The kfree_sensitive is a kernel API to clear sensitive information
+that should not be leaked to other future users of the same memory
+objects and free the memory. Its function is the same as the
+combination  of memzero_explicit and kfree. Thus, we can replace the
+combination APIs with the single kfree_sensitive API.
 
-[ Upstream commit 3c2214b6027ff37945799de717c417212e1a8c54 ]
-
-Removing the pcrypt module triggers this:
-
-  general protection fault, probably for non-canonical
-    address 0xdead000000000122
-  CPU: 5 PID: 264 Comm: modprobe Not tainted 5.6.0+ #2
-  Hardware name: QEMU Standard PC
-  RIP: 0010:__cpuhp_state_remove_instance+0xcc/0x120
-  Call Trace:
-   padata_sysfs_release+0x74/0xce
-   kobject_put+0x81/0xd0
-   padata_free+0x12/0x20
-   pcrypt_exit+0x43/0x8ee [pcrypt]
-
-padata instances wrongly use the same hlist node for the online and dead
-states, so __padata_free()'s second cpuhp remove call chokes on the node
-that the first poisoned.
-
-cpuhp multi-instance callbacks only walk forward in cpuhp_step->list and
-the same node is linked in both the online and dead lists, so the list
-corruption that results from padata_alloc() adding the node to a second
-list without removing it from the first doesn't cause problems as long
-as no instances are freed.
-
-Avoid the issue by giving each state its own node.
-
-Fixes: 894c9ef9780c ("padata: validate cpumask without removed CPU during offline")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org # v5.4+
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+Signed-off-by: Jason Wang <wangborong@cdjrlc.com>
 ---
- include/linux/padata.h |  6 ++++--
- kernel/padata.c        | 14 ++++++++------
- 2 files changed, 12 insertions(+), 8 deletions(-)
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c | 9 +++------
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c | 3 +--
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index d803397a28f70..8c9827cc63747 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -138,7 +138,8 @@ struct parallel_data {
- /**
-  * struct padata_instance - The overall control structure.
-  *
-- * @cpu_notifier: cpu hotplug notifier.
-+ * @cpu_online_node: Linkage for CPU online callback.
-+ * @cpu_dead_node: Linkage for CPU offline callback.
-  * @wq: The workqueue in use.
-  * @pd: The internal control structure.
-  * @cpumask: User supplied cpumasks for parallel and serial works.
-@@ -150,7 +151,8 @@ struct parallel_data {
-  * @flags: padata flags.
-  */
- struct padata_instance {
--	struct hlist_node		 node;
-+	struct hlist_node		cpu_online_node;
-+	struct hlist_node		cpu_dead_node;
- 	struct workqueue_struct		*wq;
- 	struct parallel_data		*pd;
- 	struct padata_cpumask		cpumask;
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 4401b4f13d0be..7f2b6d369fd47 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -748,7 +748,7 @@ static int padata_cpu_online(unsigned int cpu, struct hlist_node *node)
- 	struct padata_instance *pinst;
- 	int ret;
- 
--	pinst = hlist_entry_safe(node, struct padata_instance, node);
-+	pinst = hlist_entry_safe(node, struct padata_instance, cpu_online_node);
- 	if (!pinst_has_cpu(pinst, cpu))
- 		return 0;
- 
-@@ -763,7 +763,7 @@ static int padata_cpu_dead(unsigned int cpu, struct hlist_node *node)
- 	struct padata_instance *pinst;
- 	int ret;
- 
--	pinst = hlist_entry_safe(node, struct padata_instance, node);
-+	pinst = hlist_entry_safe(node, struct padata_instance, cpu_dead_node);
- 	if (!pinst_has_cpu(pinst, cpu))
- 		return 0;
- 
-@@ -779,8 +779,9 @@ static enum cpuhp_state hp_online;
- static void __padata_free(struct padata_instance *pinst)
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
+index cd1baee424a1..b3a9bbfb8831 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
+@@ -26,8 +26,7 @@ void sun8i_ce_prng_exit(struct crypto_tfm *tfm)
  {
- #ifdef CONFIG_HOTPLUG_CPU
--	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD, &pinst->node);
--	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->node);
-+	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD,
-+					    &pinst->cpu_dead_node);
-+	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->cpu_online_node);
- #endif
+ 	struct sun8i_ce_rng_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
  
- 	padata_stop(pinst);
-@@ -964,9 +965,10 @@ static struct padata_instance *padata_alloc(struct workqueue_struct *wq,
- 	mutex_init(&pinst->lock);
+-	memzero_explicit(ctx->seed, ctx->slen);
+-	kfree(ctx->seed);
++	kfree_sensitive(ctx->seed);
+ 	ctx->seed = NULL;
+ 	ctx->slen = 0;
+ }
+@@ -38,8 +37,7 @@ int sun8i_ce_prng_seed(struct crypto_rng *tfm, const u8 *seed,
+ 	struct sun8i_ce_rng_tfm_ctx *ctx = crypto_rng_ctx(tfm);
  
- #ifdef CONFIG_HOTPLUG_CPU
--	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online, &pinst->node);
-+	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online,
-+						    &pinst->cpu_online_node);
- 	cpuhp_state_add_instance_nocalls_cpuslocked(CPUHP_PADATA_DEAD,
--						    &pinst->node);
-+						    &pinst->cpu_dead_node);
- #endif
- 	return pinst;
+ 	if (ctx->seed && ctx->slen != slen) {
+-		memzero_explicit(ctx->seed, ctx->slen);
+-		kfree(ctx->seed);
++		kfree_sensitive(ctx->seed);
+ 		ctx->slen = 0;
+ 		ctx->seed = NULL;
+ 	}
+@@ -157,9 +155,8 @@ int sun8i_ce_prng_generate(struct crypto_rng *tfm, const u8 *src,
+ 		memcpy(dst, d, dlen);
+ 		memcpy(ctx->seed, d + dlen, ctx->slen);
+ 	}
+-	memzero_explicit(d, todo);
+ err_iv:
+-	kfree(d);
++	kfree_sensitive(d);
+ err_mem:
+ 	return err;
+ }
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
+index 5b7af4498bd5..19cd2e52f89d 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
+@@ -95,9 +95,8 @@ static int sun8i_ce_trng_read(struct hwrng *rng, void *data, size_t max, bool wa
+ 		memcpy(data, d, max);
+ 		err = max;
+ 	}
+-	memzero_explicit(d, todo);
+ err_dst:
+-	kfree(d);
++	kfree_sensitive(d);
+ 	return err;
+ }
  
 -- 
-2.25.1
+2.32.0
 
