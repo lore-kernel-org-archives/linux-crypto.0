@@ -2,179 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4557AC4338F
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 10:06:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52BC9C4320A
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 12:47:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 293C860E09
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 10:06:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35C9B60FC2
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 12:47:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235201AbhHCKGT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Aug 2021 06:06:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48914 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235388AbhHCKEL (ORCPT
+        id S236109AbhHCMrM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Aug 2021 08:47:12 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:12441 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236022AbhHCMrL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Aug 2021 06:04:11 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C235C06175F
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Aug 2021 03:04:01 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mArFM-0002yN-C1; Tue, 03 Aug 2021 12:02:04 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mArFD-0006FL-MW; Tue, 03 Aug 2021 12:01:55 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mArFC-0002oK-Il; Tue, 03 Aug 2021 12:01:54 +0200
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Bjorn Helgaas <bhelgaas@google.com>
-Cc:     kernel@pengutronix.de,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-pci@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Russell Currey <ruscur@russell.cc>,
-        "Oliver O'Halloran" <oohall@gmail.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Vadym Kochan <vkochan@marvell.com>,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Jiri Pirko <jiri@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Michael Buesch <m@bues.ch>,
-        Mathias Nyman <mathias.nyman@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
-        netdev@vger.kernel.org, oss-drivers@corigine.com,
-        xen-devel@lists.xenproject.org, linux-usb@vger.kernel.org
-Subject: [PATCH v2 6/6] PCI: Drop duplicated tracking of a pci_dev's bound driver
-Date:   Tue,  3 Aug 2021 12:01:50 +0200
-Message-Id: <20210803100150.1543597-7-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210803100150.1543597-1-u.kleine-koenig@pengutronix.de>
-References: <20210803100150.1543597-1-u.kleine-koenig@pengutronix.de>
+        Tue, 3 Aug 2021 08:47:11 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GfF0Y4gFnzck3K;
+        Tue,  3 Aug 2021 20:43:25 +0800 (CST)
+Received: from dggpeml500017.china.huawei.com (7.185.36.243) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Tue, 3 Aug 2021 20:46:58 +0800
+Received: from huawei.com (10.175.103.91) by dggpeml500017.china.huawei.com
+ (7.185.36.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Tue, 3 Aug 2021
+ 20:46:58 +0800
+From:   Yang Yingliang <yangyingliang@huawei.com>
+To:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <stable@vger.kernel.org>
+CC:     <steffen.klassert@secunet.com>, <daniel.m.jordan@oracle.com>,
+        <herbert@gondor.apana.org.au>, <gregkh@linuxfoundation.org>,
+        <sashal@kernel.org>
+Subject: [PATCH 4.19 0/2] fix divide zero error in padata_do_parallel()
+Date:   Tue, 3 Aug 2021 20:52:59 +0800
+Message-ID: <20210803125301.77629-1-yangyingliang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Patch-Hashes: v=1; h=sha256; i=yGEodBYjARp1eJPqP9/n/KpfKo6ALJzXr+t0LDtBUZM=; m=JRVTmu6nPliiiBslnXnYAnMTr94GnCwSSGQey1Vdrcw=; p=VXwrm6IwhM33tInq/RiiFiTf7eEJSweS+vvs0hZjA4Y=; g=dfdf1d247df87fe752d1cd93dee47b352d54b9dc
-X-Patch-Sig: m=pgp; i=u.kleine-koenig@pengutronix.de; s=0x0D2511F322BFAB1C1580266BE2DCDD9132669BD6; b=iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmEJFAcACgkQwfwUeK3K7AlY4QgAoQ1 tszu0I41Zf6v0DKUasmGS98o7Yfn0OAkexq7Ntd7+GO5Lwc/dR4OcqooMePO5FWdYTzhGFWsTXAAD LGujFGBNIwdOZY7PsRSHFlhr8DoTUgXyHh0WvMo6wsFShQYS62Ay8MgAU36nYDzrGR94CrNoCANwS h+SL7+g+mtMAbQlS/p+3RSIYxyZ7XVHTUqkYWvnbsQpiqJVjtySAaBAdOsmo1ks0PezNBWORDnTZx oiJmCi1ZKOwWmWW0oqRhmNELiPQJzEh2XFGYcJCfDILAltZ8JK14Akc3BKVCwfr8+rcyFeI1PC7hB WPmvafaXTQnzw47uX9Cc5oG6/RB92PA==
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500017.china.huawei.com (7.185.36.243)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently it's tracked twice which driver is bound to a given pci
-device. Now that all users of the pci specific one (struct
-pci_dev::driver) are updated to use an access macro
-(pci_driver_of_dev()), change the macro to use the information from the
-driver core and remove the driver member from struct pci_dev.
+It can reproduced by the following commands:
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/pci/pci-driver.c | 4 ----
- include/linux/pci.h      | 3 +--
- 2 files changed, 1 insertion(+), 6 deletions(-)
+  # modprobe pcrypt
+  # echo 2 > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
+  # echo 0 > /sys/devices/system/cpu/cpu1/online
+  # modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
 
-diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
-index 740d5bf5d411..5d950eb476e2 100644
---- a/drivers/pci/pci-driver.c
-+++ b/drivers/pci/pci-driver.c
-@@ -305,12 +305,10 @@ static long local_pci_probe(void *_ddi)
- 	 * its remove routine.
- 	 */
- 	pm_runtime_get_sync(dev);
--	pci_dev->driver = pci_drv;
- 	rc = pci_drv->probe(pci_dev, ddi->id);
- 	if (!rc)
- 		return rc;
- 	if (rc < 0) {
--		pci_dev->driver = NULL;
- 		pm_runtime_put_sync(dev);
- 		return rc;
- 	}
-@@ -376,7 +374,6 @@ static int pci_call_probe(struct pci_driver *drv, struct pci_dev *dev,
-  * @pci_dev: PCI device being probed
-  *
-  * returns 0 on success, else error.
-- * side-effect: pci_dev->driver is set to drv when drv claims pci_dev.
-  */
- static int __pci_device_probe(struct pci_driver *drv, struct pci_dev *pci_dev)
- {
-@@ -451,7 +448,6 @@ static int pci_device_remove(struct device *dev)
- 		pm_runtime_put_noidle(dev);
- 	}
- 	pcibios_free_irq(pci_dev);
--	pci_dev->driver = NULL;
- 	pci_iov_remove(pci_dev);
- 
- 	/* Undo the runtime PM settings in local_pci_probe() */
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 778f3b5e6f23..f44ab76e216f 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -342,7 +342,6 @@ struct pci_dev {
- 	u16		pcie_flags_reg;	/* Cached PCIe Capabilities Register */
- 	unsigned long	*dma_alias_mask;/* Mask of enabled devfn aliases */
- 
--	struct pci_driver *driver;	/* Driver bound to this device */
- 	u64		dma_mask;	/* Mask of the bits of bus address this
- 					   device implements.  Normally this is
- 					   0xffffffff.  You only need to change
-@@ -887,7 +886,7 @@ struct pci_driver {
- };
- 
- #define	to_pci_driver(drv) container_of(drv, struct pci_driver, driver)
--#define pci_driver_of_dev(pdev) ((pdev)->driver)
-+#define pci_driver_of_dev(pdev) ((pdev)->dev.driver ? to_pci_driver((pdev)->dev.driver) : NULL)
- 
- /**
-  * PCI_DEVICE - macro used to describe a specific PCI device
+[  229.549005] divide error: 0000 [#1] SMP PTI
+[  229.549130] CPU: 32 PID: 9565 Comm: cryptomgr_test Kdump: loaded Not tainted 4.19.200 #3
+[  229.549381] Hardware name: Huawei 2288H V5/BC11SPSCB0, BIOS 0.68 05/03/2018
+[  229.549607] RIP: 0010:padata_do_parallel+0x96/0x150
+[  229.549750] Code: 5e 10 89 56 18 f0 0f c1 6b 20 8b 35 78 b1 24 01 48 8b 7b 28 e8 eb d6 20 00 89 c1 8d 45 01 31 d2 8b 35 62 b1 24 01 48 8b 7b 28 <f7> f1 41 89 d7 e8 d0 45 21 00 45 85 ff 41 89 c4 7e 19 31 ed 48 8b
+[  229.550335] RSP: 0018:ffffa48b8e1cbbc8 EFLAGS: 00010246
+[  229.550498] RAX: 0000000000000000 RBX: ffff964940883bc0 RCX: 0000000000000000
+[  229.550720] RDX: 0000000000000000 RSI: 0000000000000038 RDI: ffff9687b6e45650
+[  229.550943] RBP: 00000000ffffffff R08: 0000000000000000 R09: ffff96c7af6f6200
+[  229.551165] R10: ffff9687b6e45650 R11: ffff968839629000 R12: 0000000000000010
+[  229.551388] R13: ffff9687b6997f50 R14: ffff96c7ad84d700 R15: ffffffff9287a220
+[  229.551610] FS:  0000000000000000(0000) GS:ffff9687bfc80000(0000) knlGS:0000000000000000
+[  229.551863] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  229.552044] CR2: 00007fad13d47564 CR3: 000000759480a004 CR4: 00000000007606e0
+[  229.552265] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[  229.552488] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[  229.552710] PKRU: 55555554
+[  229.552796] Call Trace:
+[  229.552878]  pcrypt_aead_encrypt+0xbb/0xc7 [pcrypt]
+[  229.553028]  __test_aead+0x654/0x15d0
+[  229.553139]  ? _cond_resched+0x15/0x40
+[  229.553257]  ? crypto_create_tfm+0x4e/0xe0
+[  229.553385]  ? crypto_spawn_tfm2+0x2e/0x50
+[  229.553513]  ? _cond_resched+0x15/0x40
+[  229.553632]  ? crypto_acomp_scomp_free_ctx+0x30/0x30
+[  229.553786]  test_aead+0x21/0xa0
+[  229.553889]  alg_test_aead+0x3f/0xa0
+[  229.554001]  alg_test.part.15+0x178/0x380
+[  229.554127]  ? __switch_to+0x8c/0x400
+[  229.554239]  ? __switch_to_asm+0x41/0x70
+[  229.554362]  ? __switch_to_asm+0x35/0x70
+[  229.554486]  ? __schedule+0x25d/0x850
+[  229.554602]  ? __wake_up_common+0x76/0x170
+[  229.554727]  ? crypto_acomp_scomp_free_ctx+0x30/0x30
+[  229.554884]  cryptomgr_test+0x40/0x50
+[  229.554999]  kthread+0x113/0x130
+[  229.555099]  ? kthread_create_worker_on_cpu+0x70/0x70
+[  229.555255]  ret_from_fork+0x35/0x40
+
+
+Daniel Jordan (2):
+  padata: validate cpumask without removed CPU during offline
+  padata: add separate cpuhp node for CPUHP_PADATA_DEAD
+
+ include/linux/cpuhotplug.h |  1 +
+ include/linux/padata.h     |  6 ++++--
+ kernel/padata.c            | 28 ++++++++++++++++++++--------
+ 3 files changed, 25 insertions(+), 10 deletions(-)
+
 -- 
-2.30.2
+2.25.1
 
