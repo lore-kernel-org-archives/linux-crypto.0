@@ -2,157 +2,277 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_RED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0027FC4338F
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 14:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FF8C19F38
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 15:30:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6EFA6023E
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 14:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 650D361037
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Aug 2021 15:30:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236502AbhHCO4P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Aug 2021 10:56:15 -0400
-Received: from new1-smtp.messagingengine.com ([66.111.4.221]:55025 "EHLO
-        new1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235527AbhHCO4N (ORCPT
+        id S236842AbhHCPbC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Aug 2021 11:31:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26641 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236880AbhHCPa5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Aug 2021 10:56:13 -0400
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailnew.nyi.internal (Postfix) with ESMTP id EBF245806A0;
-        Tue,  3 Aug 2021 10:46:16 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Tue, 03 Aug 2021 10:46:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:content-type
-        :date:from:in-reply-to:message-id:mime-version:references
-        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; bh=ZhhzKAcbp08j/zLplXp7CUKlTW+9yQngYwV71xLLU
-        uk=; b=F/09aFygJQYV2RtiZgmhk7lrEY/SgDHVCp9GLx/945GbshDofvqnTjhPv
-        MdQvU0XkuXuw8J+MuhKrJ5gR1GZcomEdsTK6ZD7aIFtguwONkYK584aL0vB3+uOi
-        1cZ7en9ladrjw6Am+2BpbC6fRp8uuoZu3LuWznvdmPAybGSJD4k6LsC2dgve+Rgl
-        7lVDmmuL7y/jEYsgA56vScY1S21u5F3TLg4OLHZRv4+oQDdiQgC7TWc+gnXL5h4w
-        2rvrqIo0t83pmPMDPPc41jSJk9WPHxdOeJIBVx4KzCnsejQeB77xOjaT3gfaZ5ud
-        PQwuZWkKpupEjh03t9vkMNG6BzFeQ==
-X-ME-Sender: <xms:slYJYT6kZeAR_u8nmIhOwwTdbdSTNZDG6YV26ZSH5RAkJpiwDMEecg>
-    <xme:slYJYY6-9FEu98HWO-uZSzE-IqI3ADKc0IPE-fH4fhb6O37ZXlqSYAoGH26C6xR_Y
-    3AnO0EnJ1_HFrI>
-X-ME-Received: <xmr:slYJYacOsY7ys2tiGj1OcG6XygrXSWg4xrc9GnX_-fPcsyrhgEjtC7VnWYQEv5nVsTuIg9N7CZQZGuQjxh2ppRV9AbXp_w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrieeggdejjecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggugfgjsehtkeertddttddunecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvffevkeefieeiueeitedufeekveekuefhueeiudduteekgeelfedvgeehjeeh
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:slYJYUKzZG3Xz6r6LaeXad3wYy6LOTbk81cO0cMnwYXwbSFEc7wHjQ>
-    <xmx:slYJYXJjCcb3nZi9UnC0Hz6_YYtYtVnj1jBbwCxXsrsAsiMMX5tIkw>
-    <xmx:slYJYdxfVsvKDxmjEDddhWRd4PUJmS19TokpDNA-XT3HSimKkg7Dwg>
-    <xmx:uFYJYVgEB2oEZs8RPQxAloMFD7GNawFrzXmXD3USqGR6p1WsqWraOg>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 3 Aug 2021 10:46:09 -0400 (EDT)
-Date:   Tue, 3 Aug 2021 17:46:05 +0300
-From:   Ido Schimmel <idosch@idosch.org>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Bjorn Helgaas <bhelgaas@google.com>, kernel@pengutronix.de,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-pci@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Russell Currey <ruscur@russell.cc>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
+        Tue, 3 Aug 2021 11:30:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628004645;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ef5H/YzWjPRhpmEEex0YbOyxkXYC0ZJIajn0GIxKBlE=;
+        b=Ge5aL2LJYyL7SFUN4/8+uzVsGUyeqEYdDDb48hSvxnjfaSV82T+lIm94FU1RWi9k4TmkFi
+        Cs8tbhGOKi50b6b+XPumM34mHUbCBvRQ2i7U9Zg/fQuoHjG5K2Bb7Wurot1WjYUL9jGlRW
+        00bOvdsFE1cOQxZqw/DPYEXJd+bACuA=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-lIc15GWwPuOaRgO36hs9yw-1; Tue, 03 Aug 2021 11:30:44 -0400
+X-MC-Unique: lIc15GWwPuOaRgO36hs9yw-1
+Received: by mail-ed1-f70.google.com with SMTP id y19-20020a0564021713b02903bbfec89ebcso10567059edu.16
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Aug 2021 08:30:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Ef5H/YzWjPRhpmEEex0YbOyxkXYC0ZJIajn0GIxKBlE=;
+        b=mhLbM4GKhJGncSyictJECbRYvWnqnAYrGXFQpMQQVSHIaTbUys1g3Uf0k5devl23P0
+         ExI9k0aOO0K16gFGh4dMQicj3wLj0uojbcVUQen83O89wg7Qc0j42g23GTuS7UiYkFNr
+         YaYhZQj3Z8/aT5RqLtspQqeqNQYDTuNX7u1YM6vD2MPlDpWpF4AzG6YNhaPHmYqqHWbX
+         YrE01+bBE8toqatjYxd/hLXkf9x2xgBFDdOjTVecq+PotvAm6tiS9726jcok5/8yQj0A
+         ALUoTilyAYY7n0ol+whH6p2FasPoTNuLxOCIB2X6eMW1R+fX8EGW3tYeKb7t/voQUpNp
+         h5jA==
+X-Gm-Message-State: AOAM530So2vmi4q7F938UmHec9Xd2cmrQolmQAWlZRwVveK+0iMk94ry
+        hGeVBXIqVwXx0emTT5PLWQ8P5k2ws9H2AM1vmPkksjgL6LCXEXQd9tjvoaObvgLtC0n3VslQp0r
+        QJdMlyMRlN7nV0I1X2532EJGU
+X-Received: by 2002:a17:906:1da1:: with SMTP id u1mr20660492ejh.307.1628004643416;
+        Tue, 03 Aug 2021 08:30:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxf6rV1ZatT2GQ6a3+XcXIUCr6rut+vBVs6RfI7E2ACDBMkrHwlwXE3OZTZ7a4m4dn8RViNBQ==
+X-Received: by 2002:a17:906:1da1:: with SMTP id u1mr20660382ejh.307.1628004643075;
+        Tue, 03 Aug 2021 08:30:43 -0700 (PDT)
+Received: from x1.localdomain (2001-1c00-0c1e-bf00-1054-9d19-e0f0-8214.cable.dynamic.v6.ziggo.nl. [2001:1c00:c1e:bf00:1054:9d19:e0f0:8214])
+        by smtp.gmail.com with ESMTPSA id b17sm4094598edd.27.2021.08.03.08.30.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Aug 2021 08:30:42 -0700 (PDT)
+Subject: Re: [PATCH 00/38] Replace deprecated CPU-hotplug
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        linux-kernel@vger.kernel.org
+Cc:     tglx@linutronix.de, Peter Zijlstra <peterz@infradead.org>,
         Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
+        Amit Kucheria <amitk@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
         Arnd Bergmann <arnd@arndb.de>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Ben Segall <bsegall@google.com>,
+        Borislav Petkov <bp@alien8.de>, cgroups@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        coresight@lists.linaro.org,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Gonglei <arei.gonglei@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Vadym Kochan <vkochan@marvell.com>,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Jiri Pirko <jiri@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Michael Buesch <m@bues.ch>,
-        Mathias Nyman <mathias.nyman@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
-        netdev@vger.kernel.org, oss-drivers@corigine.com,
-        xen-devel@lists.xenproject.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH v2 5/6] PCI: Adapt all code locations to not use struct
- pci_dev::driver directly
-Message-ID: <YQlWrcCY3X01eNJJ@shredder>
-References: <20210803100150.1543597-1-u.kleine-koenig@pengutronix.de>
- <20210803100150.1543597-6-u.kleine-koenig@pengutronix.de>
+        Jason Wang <jasowang@redhat.com>,
+        Jean Delvare <jdelvare@suse.com>,
+        Jiri Kosina <jikos@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Julian Wiedmann <jwi@linux.ibm.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Karol Herbst <karolherbst@gmail.com>,
+        Karsten Graul <kgraul@linux.ibm.com>, kvm-ppc@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Len Brown <lenb@kernel.org>, Len Brown <len.brown@intel.com>,
+        Leo Yan <leo.yan@linaro.org>, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-edac@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-mm@kvack.org, linux-pm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, live-patching@vger.kernel.org,
+        Mark Gross <mgross@linux.intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Mel Gorman <mgorman@suse.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Mike Leach <mike.leach@linaro.org>,
+        Mike Travis <mike.travis@hpe.com>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Namhyung Kim <namhyung@kernel.org>, netdev@vger.kernel.org,
+        nouveau@lists.freedesktop.org,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Paul Mackerras <paulus@samba.org>, Pavel Machek <pavel@ucw.cz>,
+        Pekka Paalanen <ppaalanen@gmail.com>,
+        Petr Mladek <pmladek@suse.com>,
+        platform-driver-x86@vger.kernel.org,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>, rcu@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org
+References: <20210803141621.780504-1-bigeasy@linutronix.de>
+From:   Hans de Goede <hdegoede@redhat.com>
+Message-ID: <83dc5dfd-1ed0-f428-826f-fb819911fc89@redhat.com>
+Date:   Tue, 3 Aug 2021 17:30:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210803100150.1543597-6-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20210803141621.780504-1-bigeasy@linutronix.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 03, 2021 at 12:01:49PM +0200, Uwe Kleine-König wrote:
-> This prepares removing the driver member of struct pci_dev which holds the
-> same information than struct pci_dev::dev->driver.
+Hi Sebastien,
+
+On 8/3/21 4:15 PM, Sebastian Andrzej Siewior wrote:
+> This is a tree wide replacement of the deprecated CPU hotplug functions
+> which are only wrappers around the actual functions.
 > 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> ---
->  arch/powerpc/include/asm/ppc-pci.h            |  3 +-
->  arch/powerpc/kernel/eeh_driver.c              | 12 ++++---
->  arch/x86/events/intel/uncore.c                |  2 +-
->  arch/x86/kernel/probe_roms.c                  |  2 +-
->  drivers/bcma/host_pci.c                       |  6 ++--
->  drivers/crypto/hisilicon/qm.c                 |  2 +-
->  drivers/crypto/qat/qat_common/adf_aer.c       |  2 +-
->  drivers/message/fusion/mptbase.c              |  4 +--
->  drivers/misc/cxl/guest.c                      | 21 +++++------
->  drivers/misc/cxl/pci.c                        | 25 +++++++------
->  .../ethernet/hisilicon/hns3/hns3_ethtool.c    |  2 +-
->  .../ethernet/marvell/prestera/prestera_pci.c  |  2 +-
->  drivers/net/ethernet/mellanox/mlxsw/pci.c     |  2 +-
->  .../ethernet/netronome/nfp/nfp_net_ethtool.c  |  2 +-
->  drivers/pci/iov.c                             | 23 +++++++-----
->  drivers/pci/pci-driver.c                      | 28 ++++++++-------
->  drivers/pci/pci.c                             | 10 +++---
->  drivers/pci/pcie/err.c                        | 35 ++++++++++---------
->  drivers/pci/xen-pcifront.c                    |  3 +-
->  drivers/ssb/pcihost_wrapper.c                 |  7 ++--
->  drivers/usb/host/xhci-pci.c                   |  3 +-
->  21 files changed, 112 insertions(+), 84 deletions(-)
+> Each patch is independent and can be picked up by the relevant maintainer.
 
-For mlxsw:
+Ok; and I take it that then also is the plan for merging these ?
 
-Tested-by: Ido Schimmel <idosch@nvidia.com>
+FWIW I'm fine with the drivers/platform/x86 patch going upstream
+through some other tree if its easier to keep the set together ...
+
+Regards,
+
+Hans
+
+
+
+> 
+> Cc: Alexander Shishkin <alexander.shishkin@linux.intel.com>
+> Cc: Amit Kucheria <amitk@kernel.org>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Arnaldo Carvalho de Melo <acme@kernel.org>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Ben Segall <bsegall@google.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: cgroups@vger.kernel.org
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: coresight@lists.linaro.org
+> Cc: Daniel Bristot de Oliveira <bristot@redhat.com>
+> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Davidlohr Bueso <dave@stgolabs.net>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Dietmar Eggemann <dietmar.eggemann@arm.com>
+> Cc: Gonglei <arei.gonglei@huawei.com>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Guenter Roeck <linux@roeck-us.net>
+> Cc: Hans de Goede <hdegoede@redhat.com>
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Ingo Molnar <mingo@kernel.org>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Jean Delvare <jdelvare@suse.com>
+> Cc: Jiri Kosina <jikos@kernel.org>
+> Cc: Jiri Olsa <jolsa@redhat.com>
+> Cc: Joe Lawrence <joe.lawrence@redhat.com>
+> Cc: Joel Fernandes <joel@joelfernandes.org>
+> Cc: Johannes Weiner <hannes@cmpxchg.org>
+> Cc: John Stultz <john.stultz@linaro.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+> Cc: Josh Triplett <josh@joshtriplett.org>
+> Cc: Julian Wiedmann <jwi@linux.ibm.com>
+> Cc: Juri Lelli <juri.lelli@redhat.com>
+> Cc: Karol Herbst <karolherbst@gmail.com>
+> Cc: Karsten Graul <kgraul@linux.ibm.com>
+> Cc: kvm-ppc@vger.kernel.org
+> Cc: Lai Jiangshan <jiangshanlai@gmail.com>
+> Cc: Len Brown <lenb@kernel.org>
+> Cc: Len Brown <len.brown@intel.com>
+> Cc: Leo Yan <leo.yan@linaro.org>
+> Cc: linux-acpi@vger.kernel.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-doc@vger.kernel.org
+> Cc: linux-edac@vger.kernel.org
+> Cc: linux-hwmon@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-mips@vger.kernel.org
+> Cc: linux-mm@kvack.org
+> Cc: linux-pm@vger.kernel.org
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Cc: linux-raid@vger.kernel.org
+> Cc: linux-s390@vger.kernel.org
+> Cc: live-patching@vger.kernel.org
+> Cc: Mark Gross <mgross@linux.intel.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+> Cc: Mathieu Poirier <mathieu.poirier@linaro.org>
+> Cc: Mel Gorman <mgorman@suse.de>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Mike Leach <mike.leach@linaro.org>
+> Cc: Mike Travis <mike.travis@hpe.com>
+> Cc: Miroslav Benes <mbenes@suse.cz>
+> Cc: Namhyung Kim <namhyung@kernel.org>
+> Cc: netdev@vger.kernel.org
+> Cc: nouveau@lists.freedesktop.org
+> Cc: "Paul E. McKenney" <paulmck@kernel.org>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Cc: Pavel Machek <pavel@ucw.cz>
+> Cc: Pekka Paalanen <ppaalanen@gmail.com>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Petr Mladek <pmladek@suse.com>
+> Cc: platform-driver-x86@vger.kernel.org
+> Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+> Cc: rcu@vger.kernel.org
+> Cc: Robin Holt <robinmholt@gmail.com>
+> Cc: Song Liu <song@kernel.org>
+> Cc: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Cc: Stephen Boyd <sboyd@kernel.org>
+> Cc: Steven Rostedt <rostedt@goodmis.org>
+> Cc: Steve Wahl <steve.wahl@hpe.com>
+> Cc: Stuart Hayes <stuart.w.hayes@gmail.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Tony Luck <tony.luck@intel.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Vincent Guittot <vincent.guittot@linaro.org>
+> Cc: Viresh Kumar <viresh.kumar@linaro.org>
+> Cc: virtualization@lists.linux-foundation.org
+> Cc: x86@kernel.org
+> Cc: Zefan Li <lizefan.x@bytedance.com>
+> Cc: Zhang Rui <rui.zhang@intel.com>
+> 
+> Sebastian
+> 
+
