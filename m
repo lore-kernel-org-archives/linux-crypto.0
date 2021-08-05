@@ -2,216 +2,156 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 041EEC43214
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Aug 2021 14:00:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C332C4320A
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Aug 2021 15:09:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DFBB36113C
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Aug 2021 14:00:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0562861158
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Aug 2021 15:09:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241822AbhHEOBH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Aug 2021 10:01:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12732 "EHLO
+        id S241505AbhHEPKH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 Aug 2021 11:10:07 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61096 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238069AbhHEOBH (ORCPT
+        by vger.kernel.org with ESMTP id S233201AbhHEPKH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Aug 2021 10:01:07 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 175DZAVU064983;
-        Thu, 5 Aug 2021 10:00:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=wouwzQZTCNlnpx1DBk0AV8sywz7PyVmLvpTAhdYJBxY=;
- b=eZvtyKD7C82YMCP1szP4BSGOtS3u6aONh02QNEaBc8W2rAZ3iRRBZtCEDZEoY9u1tu3B
- UIwVvNjDS2/QXYB3wYL9oBFNKXEA9xTdc0kNUTIahpySOgMmHjbfFDo53fwxm8nIL8cQ
- uE+2iRT1ZhhNehcVshwaX4lSLELzTvdKF6kcOqck+DlF5MyKyvczMrsJhI3mc4nWh2wo
- 3i6I2qbQwYjhvrLCeHt0MW3uG/rBtnUlvCLFa/ae0eUUqVNyr3v11MD9dug+ZfjItLcG
- G5OUepNpaxnVsb5wBlTvkJcMyrw1WgAAL5RtPJIDH0+XEjeJBBpylN8AoeF7sU6b6OQ3 XA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a897nn8dg-1
+        Thu, 5 Aug 2021 11:10:07 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 175F4E62005940;
+        Thu, 5 Aug 2021 11:09:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=PYHeUHL0ZH8GoGa/stFMWsqDkOKMwYpeVYQU+PRHDys=;
+ b=kWCQrWA8FO5KjMsKJYhTjzMslbexR3lrUnigXsdYDtzPndt3N6OUvoEdkVx9002xs7lj
+ 0Agjq9pZ+7AHBWChrwjltOA5lzXp4B5IF3Ghn4zNbly1JArc+EARvIUVX8FL+8qEMZJ7
+ A8Db7/fGPv9ocXDf3uZwSmBFRyPaCA1UYaWMB5VML1ZmzhbOU9ZkeGYNFxm7hwmmrQdO
+ OjeQWLkTR1qVQzb3vbrghmADqt0LrDt+b3ardW94BLZUQODxLYQvY1hqylCDIzHc6qoD
+ UXsjpxAIhvrAtuRnuQwMMzpTl5+36Prhqr6y6VaWwVWHT3/2j4xQ1zzlsCjkbkNQpJdx 1w== 
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a88599e7f-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Aug 2021 10:00:31 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 175DnlYK136073;
-        Thu, 5 Aug 2021 10:00:30 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a897nn8b6-1
+        Thu, 05 Aug 2021 11:09:50 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 175F7awO005818;
+        Thu, 5 Aug 2021 15:09:47 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 3a4x58t824-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Aug 2021 10:00:30 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 175Dwrtt024086;
-        Thu, 5 Aug 2021 14:00:27 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma02fra.de.ibm.com with ESMTP id 3a4x58t51y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Aug 2021 14:00:27 +0000
+        Thu, 05 Aug 2021 15:09:47 +0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 175DvQvg31588654
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 175F9i5Q52494834
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 Aug 2021 13:57:26 GMT
+        Thu, 5 Aug 2021 15:09:44 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 45C1FAE05A;
-        Thu,  5 Aug 2021 14:00:24 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id B5FF9AE086;
+        Thu,  5 Aug 2021 15:09:44 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 349D1AE0A6;
-        Thu,  5 Aug 2021 14:00:19 +0000 (GMT)
-Received: from sig-9-65-205-127.ibm.com (unknown [9.65.205.127])
+        by IMSVA (Postfix) with ESMTP id 6AFFCAE085;
+        Thu,  5 Aug 2021 15:09:44 +0000 (GMT)
+Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  5 Aug 2021 14:00:18 +0000 (GMT)
-Message-ID: <456fea5f63f14a342791388e6e8d34605ef13eb5.camel@linux.ibm.com>
-Subject: Re: [PATCH RFC v2 02/12] KEYS: CA link restriction
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>, keyrings@vger.kernel.org,
-        linux-integrity@vger.kernel.org, dhowells@redhat.com,
-        dwmw2@infradead.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, jarkko@kernel.org, jmorris@namei.org,
-        serge@hallyn.com
-Cc:     keescook@chromium.org, gregkh@linuxfoundation.org,
-        torvalds@linux-foundation.org, scott.branden@broadcom.com,
-        weiyongjun1@huawei.com, nayna@linux.ibm.com, ebiggers@google.com,
-        ardb@kernel.org, nramas@linux.microsoft.com, lszubowi@redhat.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
-        glin@suse.com, konrad.wilk@oracle.com
-Date:   Thu, 05 Aug 2021 10:00:18 -0400
-In-Reply-To: <20210726171319.3133879-3-eric.snowberg@oracle.com>
-References: <20210726171319.3133879-1-eric.snowberg@oracle.com>
-         <20210726171319.3133879-3-eric.snowberg@oracle.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Thu,  5 Aug 2021 15:09:44 +0000 (GMT)
+Received: from [9.206.171.115] (unknown [9.206.171.115])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by ozlabs.au.ibm.com (Postfix) with ESMTPSA id D69DE600B2;
+        Fri,  6 Aug 2021 01:09:19 +1000 (AEST)
+Subject: Re: [PATCH v2 5/6] PCI: Adapt all code locations to not use struct
+ pci_dev::driver directly
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Bjorn Helgaas <bhelgaas@google.com>
+Cc:     kernel@pengutronix.de,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-pci@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Russell Currey <ruscur@russell.cc>,
+        "Oliver O'Halloran" <oohall@gmail.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Frederic Barrat <fbarrat@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Vadym Kochan <vkochan@marvell.com>,
+        Taras Chornyi <tchornyi@marvell.com>,
+        Jiri Pirko <jiri@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
+        Simon Horman <simon.horman@corigine.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Michael Buesch <m@bues.ch>,
+        Mathias Nyman <mathias.nyman@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
+        Andy Shevchenko <andriy.shevchenko@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        Alexander Duyck <alexanderduyck@fb.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+        netdev@vger.kernel.org, oss-drivers@corigine.com,
+        xen-devel@lists.xenproject.org, linux-usb@vger.kernel.org
+References: <20210803100150.1543597-1-u.kleine-koenig@pengutronix.de>
+ <20210803100150.1543597-6-u.kleine-koenig@pengutronix.de>
+From:   Andrew Donnellan <ajd@linux.ibm.com>
+Message-ID: <4b8d26d5-443c-600f-78a9-de5214c80452@linux.ibm.com>
+Date:   Fri, 6 Aug 2021 01:09:08 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
+MIME-Version: 1.0
+In-Reply-To: <20210803100150.1543597-6-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: H3nh4gAsq6mDfpVhyljeEIsVgs87D9JY
-X-Proofpoint-GUID: sHb-rYluSo52uSCH5PQ8YjaifqQNNbBa
+X-Proofpoint-GUID: 0KMfkEwjd362vKzVXydvfKA8x7XTgBGG
+X-Proofpoint-ORIG-GUID: 0KMfkEwjd362vKzVXydvfKA8x7XTgBGG
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-05_04:2021-08-05,2021-08-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 mlxscore=0 spamscore=0 malwarescore=0
- priorityscore=1501 mlxlogscore=999 phishscore=0 suspectscore=0 bulkscore=0
- adultscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108050082
+ definitions=2021-08-05_05:2021-08-05,2021-08-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 malwarescore=0 mlxlogscore=615 mlxscore=0 bulkscore=0
+ adultscore=0 impostorscore=0 clxscore=1011 suspectscore=0
+ priorityscore=1501 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2107140000 definitions=main-2108050092
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2021-07-26 at 13:13 -0400, Eric Snowberg wrote:
-> Add a new link restriction.  Restrict the addition of keys in a keyring
-> based on the key to be added being a CA (self-signed) or by being
-> vouched for by a key in either the built-in or the secondary trusted
-> keyrings.
+On 3/8/21 8:01 pm, Uwe Kleine-König wrote:
+> This prepares removing the driver member of struct pci_dev which holds the
+> same information than struct pci_dev::dev->driver.
 > 
-> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-As discussed, please remove "or by being vouched for by a key in
-either the built-in or the secondary trusted keyrings."
+cxl hunks look alright.
 
-If these keys were to be loaded onto a keyring other than the platform
-keyring, they should be loaded onto the secondary keyring.  The
-secondary restriction currently allows certificates signed by keys on
-either the builtin or the secondary keyring, to be loaded onto the
-secondary keyring.   A new restriction would also allow certificates
-signed by keys on the ".mok" keyring.
+Acked-by: Andrew Donnellan <ajd@linux.ibm.com> # cxl
 
-> +/**
-> + * restrict_link_by_ca - Restrict additions to a ring of public keys
-> + * based on it being a CA
-> + * @dest_keyring: Keyring being linked to.
-> + * @type: The type of key being added.
-> + * @payload: The payload of the new key.
-> + * @trusted: A key or ring of keys that can be used to vouch for the new cert.
-> + *
-> + * Check if the new certificate is a CA or if they key can be vouched for
-> + * by keys already linked in the destination keyring or the trusted
-> + * keyring.  If one of those is the signing key or it is self signed, then
-> + * mark the new certificate as being ok to link.
-> + *
-> + * Returns 0 if the new certificate was accepted, -ENOKEY if we could not find
-> + * a matching parent certificate in the trusted list.  -ENOPKG if the signature
-> + * uses unsupported crypto, or some other error if there is a matching
-> + * certificate  but the signature check cannot be performed.
-> + */
-
-Please update the function description as discussed, removing "or if they
-key can be vouched for by keys already linked in the destination
-keyring or the trusted keyring."
-
-The kernel doc "Brief description of function" should not wrap.  The
-variable definition shouldn't be suffixed with a period.  Please refer
-to Documentation/doc-guide/kernel-doc.rst.
-
-> +int restrict_link_by_ca(struct key *dest_keyring,
-
-The UEFI db CA keys should only be loaded on boot.  Should this be
-annotated as __init?
-
-> +			const struct key_type *type,
-> +			const union key_payload *payload,
-> +			struct key *trust_keyring)
-> +{
-> +	const struct public_key_signature *sig;
-> +	const struct public_key *pkey;
-> +	struct key *key;
-> +	int ret;
-> +
-> +	if (type != &key_type_asymmetric)
-> +		return -EOPNOTSUPP;
-> +
-> +	sig = payload->data[asym_auth];
-> +	if (!sig)
-> +		return -ENOPKG;
-> +
-> +	if (!sig->auth_ids[0] && !sig->auth_ids[1])
-> +		return -ENOKEY;
-> +
-> +	pkey = payload->data[asym_crypto];
-> +	if (!pkey)
-> +		return -ENOPKG;
-> +
-> +	ret = public_key_verify_signature(pkey, sig);
-> +	if (!ret)
-> +		return 0;
-> +
-> +	if (!trust_keyring)
-> +		return -ENOKEY;
-> +
-> +	key = find_asymmetric_key(trust_keyring,
-> +				  sig->auth_ids[0], sig->auth_ids[1],
-> +				  false);
-> +	if (IS_ERR(key))
-> +		return -ENOKEY;
-> +
-> +	ret = verify_signature(key, sig);
-> +	key_put(key);
-> +	return ret;
-> +}
-> +
->  static bool match_either_id(const struct asymmetric_key_ids *pair,
->  			    const struct asymmetric_key_id *single)
->  {
-
-
-> +extern int restrict_link_by_system_trusted_or_ca(
-> +	struct key *dest_keyring,
-> +	const struct key_type *type,
-> +	const union key_payload *payload,
-> +	struct key *restrict_key);
-
-After the discussed change, this shouldn't be needed.
-
-thanks,
-
-Mimi
-
-> +
->  #ifdef CONFIG_SECONDARY_TRUSTED_KEYRING
->  extern int restrict_link_by_builtin_and_secondary_trusted(
->  	struct key *keyring,
-
-
+-- 
+Andrew Donnellan              OzLabs, ADL Canberra
+ajd@linux.ibm.com             IBM Australia Limited
