@@ -2,182 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F006C4320A
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 03:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29B8AC4320A
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 06:43:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4BB1610E7
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 03:20:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B620611C6
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 06:43:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242140AbhHFDUg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Aug 2021 23:20:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7578 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229458AbhHFDUf (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Aug 2021 23:20:35 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17634Xxv030791;
-        Thu, 5 Aug 2021 23:19:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=Gv92TnluNfUfdqlDXrvWyiTsnjlFwKv1kG7Zm7PMzvs=;
- b=K4oo7G8zvdE/YQCikwRlomxctcy21Ku/ilde1iOXnApfhJwUEJIqOStF/d2v1iI+AUH2
- GNeNUzXZ3sDMfoe+/20dSC2l22N4H5ADMeE65UBZ4IioRCPl2JJRV2GBSytT3PCP4ZZR
- rAW66jwj1oEbya15PxRgYjkpFJDE7+cLHwqkK1wFvVJgVSyVY9GH3PWXlhZUDewLO8Na
- 9k1htYkGEKrtgU37eoouxyWO+0v8Q7yBYt7Yg9/NIQHklf2T/9Mb/MH/UJUHk0m7Z47B
- RtvysEljDIt3mUaJ/4gSG65yh8vbuu7NBHx0vVjdQg79JetXMANZQsi5CZmzrs8kOEff 2Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a8q2yy4gv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Aug 2021 23:19:52 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17634cMj031358;
-        Thu, 5 Aug 2021 23:19:52 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a8q2yy4ge-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Aug 2021 23:19:51 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1763E5Hk032178;
-        Fri, 6 Aug 2021 03:19:49 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 3a4x594crh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Aug 2021 03:19:49 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1763Jkij50987374
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 6 Aug 2021 03:19:47 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D9BA011C052;
-        Fri,  6 Aug 2021 03:19:46 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E0A0611C058;
-        Fri,  6 Aug 2021 03:19:40 +0000 (GMT)
-Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.26.150])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  6 Aug 2021 03:19:40 +0000 (GMT)
-Message-ID: <d85bfe88bb4abd06e47a36743f53d0610da0a259.camel@linux.ibm.com>
-Subject: Re: [PATCH RFC v2 10/12] KEYS: link system_trusted_keys to
- mok_trusted_keys
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     keyrings@vger.kernel.org,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
-        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
-        scott.branden@broadcom.com, weiyongjun1@huawei.com,
-        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
-        nramas@linux.microsoft.com, lszubowi@redhat.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
-        glin@suse.com, "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>
-Date:   Thu, 05 Aug 2021 23:19:39 -0400
-In-Reply-To: <44ADB68B-4310-462B-96A8-2F69759BA2D8@oracle.com>
-References: <20210726171319.3133879-1-eric.snowberg@oracle.com>
-         <20210726171319.3133879-11-eric.snowberg@oracle.com>
-         <6c751dadf4ce7385d0391ea26f1c7e4e910219e0.camel@linux.ibm.com>
-         <44ADB68B-4310-462B-96A8-2F69759BA2D8@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: DK3h-KN9gjkjfQ6rFdX3uWqOg8XJydjB
-X-Proofpoint-ORIG-GUID: chi8FZeyI1ijZTb-eFW33FRARzMP7ZLz
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-06_01:2021-08-05,2021-08-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 mlxscore=0 mlxlogscore=846 spamscore=0 malwarescore=0
- clxscore=1015 adultscore=0 bulkscore=0 impostorscore=0 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108060017
+        id S232947AbhHFGnw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Aug 2021 02:43:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39482 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232382AbhHFGnw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Aug 2021 02:43:52 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 20C3A611C5;
+        Fri,  6 Aug 2021 06:43:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1628232215;
+        bh=h+Rb1Q5xB7nCmla3XprXg4fmKFXpU+drkAfgr8FZnA0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kJtowNA2ISDGfYL3W/9jlXnGY2/R4G/e7NXjSsndonZyMdvXp70hEtBnpF4DNcZkD
+         LBIQGbHGvoX5hq1AwyUpMMc5yIelB+iGMzYnAw0mQVvp6rK9jpll0FCert3Q4pG3xP
+         dSMiVBdd4tOtweEmHQ17Cg4o7b9IzJg0FBYi1930=
+Date:   Fri, 6 Aug 2021 08:43:32 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Yang Yingliang <yangyingliang@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        stable@vger.kernel.org, steffen.klassert@secunet.com,
+        daniel.m.jordan@oracle.com, herbert@gondor.apana.org.au,
+        sashal@kernel.org
+Subject: Re: [PATCH 4.19 0/2] fix divide zero error in padata_do_parallel()
+Message-ID: <YQzaFHAAwr/8SEgD@kroah.com>
+References: <20210803125301.77629-1-yangyingliang@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210803125301.77629-1-yangyingliang@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 2021-08-05 at 19:29 -0600, Eric Snowberg wrote:
+On Tue, Aug 03, 2021 at 08:52:59PM +0800, Yang Yingliang wrote:
+> It can reproduced by the following commands:
+> 
+>   # modprobe pcrypt
+>   # echo 2 > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
+>   # echo 0 > /sys/devices/system/cpu/cpu1/online
+>   # modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
+> 
+> [  229.549005] divide error: 0000 [#1] SMP PTI
+> [  229.549130] CPU: 32 PID: 9565 Comm: cryptomgr_test Kdump: loaded Not tainted 4.19.200 #3
+> [  229.549381] Hardware name: Huawei 2288H V5/BC11SPSCB0, BIOS 0.68 05/03/2018
+> [  229.549607] RIP: 0010:padata_do_parallel+0x96/0x150
+> [  229.549750] Code: 5e 10 89 56 18 f0 0f c1 6b 20 8b 35 78 b1 24 01 48 8b 7b 28 e8 eb d6 20 00 89 c1 8d 45 01 31 d2 8b 35 62 b1 24 01 48 8b 7b 28 <f7> f1 41 89 d7 e8 d0 45 21 00 45 85 ff 41 89 c4 7e 19 31 ed 48 8b
+> [  229.550335] RSP: 0018:ffffa48b8e1cbbc8 EFLAGS: 00010246
+> [  229.550498] RAX: 0000000000000000 RBX: ffff964940883bc0 RCX: 0000000000000000
+> [  229.550720] RDX: 0000000000000000 RSI: 0000000000000038 RDI: ffff9687b6e45650
+> [  229.550943] RBP: 00000000ffffffff R08: 0000000000000000 R09: ffff96c7af6f6200
+> [  229.551165] R10: ffff9687b6e45650 R11: ffff968839629000 R12: 0000000000000010
+> [  229.551388] R13: ffff9687b6997f50 R14: ffff96c7ad84d700 R15: ffffffff9287a220
+> [  229.551610] FS:  0000000000000000(0000) GS:ffff9687bfc80000(0000) knlGS:0000000000000000
+> [  229.551863] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  229.552044] CR2: 00007fad13d47564 CR3: 000000759480a004 CR4: 00000000007606e0
+> [  229.552265] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [  229.552488] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [  229.552710] PKRU: 55555554
+> [  229.552796] Call Trace:
+> [  229.552878]  pcrypt_aead_encrypt+0xbb/0xc7 [pcrypt]
+> [  229.553028]  __test_aead+0x654/0x15d0
+> [  229.553139]  ? _cond_resched+0x15/0x40
+> [  229.553257]  ? crypto_create_tfm+0x4e/0xe0
+> [  229.553385]  ? crypto_spawn_tfm2+0x2e/0x50
+> [  229.553513]  ? _cond_resched+0x15/0x40
+> [  229.553632]  ? crypto_acomp_scomp_free_ctx+0x30/0x30
+> [  229.553786]  test_aead+0x21/0xa0
+> [  229.553889]  alg_test_aead+0x3f/0xa0
+> [  229.554001]  alg_test.part.15+0x178/0x380
+> [  229.554127]  ? __switch_to+0x8c/0x400
+> [  229.554239]  ? __switch_to_asm+0x41/0x70
+> [  229.554362]  ? __switch_to_asm+0x35/0x70
+> [  229.554486]  ? __schedule+0x25d/0x850
+> [  229.554602]  ? __wake_up_common+0x76/0x170
+> [  229.554727]  ? crypto_acomp_scomp_free_ctx+0x30/0x30
+> [  229.554884]  cryptomgr_test+0x40/0x50
+> [  229.554999]  kthread+0x113/0x130
+> [  229.555099]  ? kthread_create_worker_on_cpu+0x70/0x70
+> [  229.555255]  ret_from_fork+0x35/0x40
+> 
+> 
+> Daniel Jordan (2):
+>   padata: validate cpumask without removed CPU during offline
+>   padata: add separate cpuhp node for CPUHP_PADATA_DEAD
+> 
+>  include/linux/cpuhotplug.h |  1 +
+>  include/linux/padata.h     |  6 ++++--
+>  kernel/padata.c            | 28 ++++++++++++++++++++--------
+>  3 files changed, 25 insertions(+), 10 deletions(-)
 
-> > From the thread discussion on 00/12:
-> > 
-> > Only the builtin keys should ever be on the builtin keyring.  The
-> > builtin keyring would need to be linked to the mok keyring.  But in the
-> > secondary keyring case, the mok keyring would be linked to the
-> > secondary keyring, similar to how the builtin keyring is linked to the
-> > secondary keyring.
-> > 
-> >        if (key_link(secondary_trusted_keys, builtin_trusted_keys) < 0)
-> >                panic("Can't link trusted keyrings\n");
-> 
-> 
-> This part is confusing me though.
-> 
-> Here are some of the tests I’m performing with the current series:
-> 
-> Initial setup:
-> Create and enroll my own key into the MOK.
-> Sign a kernel, kernel module and IMA key with my new CA key.
-> Boot with lockdown enabled (to enforce sig validation).
-> 
-> Kernel built with CONFIG_SECONDARY_TRUSTED_KEYRING=y
-> 
-> $ keyctl show %:.secondary_trusted_keys
-> Keyring
->  530463486 ---lswrv      0     0  keyring: .secondary_trusted_keys
->  411466727 ---lswrv      0     0   \_ keyring: .builtin_trusted_keys
->  979167715 ---lswrv      0     0   |   \_ asymmetric: Build time autogenerated kernel key: 07a56e29cfa1e21379aff2c522efff7d1963202a
->  534573591 ---lswrv      0     0   |   \_ asymmetric: Oracle-CA: Oracle certificate signing key: aeefb4bfde095cacaabff81dd266974b1b4e23b8
->  968109018 ---lswrv      0     0   \_ keyring: .mok
->  857795115 ---lswrv      0     0       \_ asymmetric: Erics-CA: UEK signing key: 9bfa6860483aa46bd83f7fa1289d9fc35799e93b
-> 
-> With this setup I can:
-> * load a kernel module signed with my CA key
-> * run "kexec -ls" with the kernel signed with my CA key
-> * run "kexec -ls" with a kernel signed by a key in the platform keyring
-> * load another key into the secondary trusted keyring that is signed by my CA key
-> * load a key into the ima keyring, signed by my CA key
-> 
-> Kernel built without CONFIG_SECONDARY_TRUSTED_KEYRING defined
-> 
-> $ keyctl show %:.builtin_trusted_keys
-> Keyring
->  812785375 ---lswrv      0     0  keyring: .builtin_trusted_keys
->  455418681 ---lswrv      0     0   \_ keyring: .mok
->  910809006 ---lswrv      0     0   |   \_ asymmetric: Erics-CA: UEK signing key: 9bfa6860483aa46bd83f7fa1289d9fc35799e93b
->  115345009 ---lswrv      0     0   \_ asymmetric: Oracle-CA: Oracle certificate signing key: aeefb4bfde095cacaabff81dd266974b1b4e23b8
->  513131506 ---lswrv      0     0   \_ asymmetric: Build time autogenerated kernel key: 22353509f203b55b84f15d0aadeddc134b646185
-> 
-> With this setup I can:
-> * load a kernel module signed with my CA key
-> * run "kexec -ls" with the kernel signed with my CA key
-> * run "kexec -ls" with a kernel signed by a key in the platform keyring
-> * load a key into the ima keyring, signed by my CA key
-> 
-> So why would the linking need to be switched?  Is there a test I’m
-> missing?  Thanks.
+All now queued up, thanks!
 
-It's a question of semantics.  The builtin keyring name is self
-describing.  It should only contain the keys compiled into the kernel
-or inserted post build into the reserved memory.  Not only the kernel
-uses the builtin keyring, but userspace may as well[1].  Other users of
-the builtin keyring might not want to trust the mok keyring as well.
-
-thanks,
-
-Mimi
-
-[1] Refer to Mat Martineau's LSS 2019 talk titled "Using and
-Implementing Keyring Restrictions in Userspace". 
-
+greg k-h
