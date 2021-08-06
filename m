@@ -2,165 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8158BC43214
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 08:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C77C4320E
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 08:24:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 66D92611EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 08:17:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F644606A5
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 08:24:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243919AbhHFISD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Aug 2021 04:18:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46830 "EHLO mail.kernel.org"
+        id S244127AbhHFIYw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Aug 2021 04:24:52 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:51742 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243998AbhHFIQk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Aug 2021 04:16:40 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4A80F61205;
-        Fri,  6 Aug 2021 08:16:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1628237776;
-        bh=5Abe2X7deOpV8qBiC/8PkTAVKIbX3prv6qZg1VjtK3c=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cj2/I7uev1BNNOEE4n2WQdONbrN0bsCNSiCIXCZE+iGvFu2gRmG5BLzMfyV2RPapQ
-         hjkREHMTO4bJ4WEXy/pU4HQwBkoZSZzxbw8jcCGY3BK6d0X30OFqswiEy2kZfC2Efv
-         VSyNeOHM9rjbz0qQnAvhISf1Tl1x1V9HU19gZ7Xk=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org,
-        Yang Yingliang <yangyingliang@huawei.com>
-Subject: [PATCH 4.19 16/16] padata: add separate cpuhp node for CPUHP_PADATA_DEAD
-Date:   Fri,  6 Aug 2021 10:15:07 +0200
-Message-Id: <20210806081111.662287213@linuxfoundation.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210806081111.144943357@linuxfoundation.org>
-References: <20210806081111.144943357@linuxfoundation.org>
-User-Agent: quilt/0.66
+        id S244184AbhHFIYE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Aug 2021 04:24:04 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1mBv8a-00072w-9c; Fri, 06 Aug 2021 16:23:28 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1mBv8S-0003PT-Tn; Fri, 06 Aug 2021 16:23:20 +0800
+Date:   Fri, 6 Aug 2021 16:23:20 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Cc:     davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
+Subject: Re: [PATCH] crypto: add missing kernel_fpu_end() call
+Message-ID: <20210806082320.GA12731@gondor.apana.org.au>
+References: <20210730134155.1005358-1-chouhan.shreyansh630@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210730134155.1005358-1-chouhan.shreyansh630@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Daniel Jordan <daniel.m.jordan@oracle.com>
+On Fri, Jul 30, 2021 at 07:11:55PM +0530, Shreyansh Chouhan wrote:
+> xts_crypt() code doesn't call kernel_fpu_end() after calling
+> kernel_fpu_begin() if walk.nbytes is 0. Add a call to kernel_fpu_end()
+> for this case.
+> 
+> Reported-by: syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
+> Signed-off-by: Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
+> ---
+>  arch/x86/crypto/aesni-intel_glue.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-commit 3c2214b6027ff37945799de717c417212e1a8c54 upstream.
+Ard?
 
-Removing the pcrypt module triggers this:
+> diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+> index 2144e54a6c89..bd55a0cd7bde 100644
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -894,6 +894,9 @@ static int xts_crypt(struct skcipher_request *req, bool encrypt)
+>  			kernel_fpu_begin();
+>  	}
+>  
+> +	if (walk.nbytes == 0)
+> +		kernel_fpu_end();
+> +
+>  	if (unlikely(tail > 0 && !err)) {
+>  		struct scatterlist sg_src[2], sg_dst[2];
+>  		struct scatterlist *src, *dst;
+> -- 
+> 2.31.1
 
-  general protection fault, probably for non-canonical
-    address 0xdead000000000122
-  CPU: 5 PID: 264 Comm: modprobe Not tainted 5.6.0+ #2
-  Hardware name: QEMU Standard PC
-  RIP: 0010:__cpuhp_state_remove_instance+0xcc/0x120
-  Call Trace:
-   padata_sysfs_release+0x74/0xce
-   kobject_put+0x81/0xd0
-   padata_free+0x12/0x20
-   pcrypt_exit+0x43/0x8ee [pcrypt]
-
-padata instances wrongly use the same hlist node for the online and dead
-states, so __padata_free()'s second cpuhp remove call chokes on the node
-that the first poisoned.
-
-cpuhp multi-instance callbacks only walk forward in cpuhp_step->list and
-the same node is linked in both the online and dead lists, so the list
-corruption that results from padata_alloc() adding the node to a second
-list without removing it from the first doesn't cause problems as long
-as no instances are freed.
-
-Avoid the issue by giving each state its own node.
-
-Fixes: 894c9ef9780c ("padata: validate cpumask without removed CPU during offline")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org # v5.4+
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- include/linux/padata.h |    6 ++++--
- kernel/padata.c        |   14 ++++++++------
- 2 files changed, 12 insertions(+), 8 deletions(-)
-
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -138,7 +138,8 @@ struct parallel_data {
- /**
-  * struct padata_instance - The overall control structure.
-  *
-- * @cpu_notifier: cpu hotplug notifier.
-+ * @cpu_online_node: Linkage for CPU online callback.
-+ * @cpu_dead_node: Linkage for CPU offline callback.
-  * @wq: The workqueue in use.
-  * @pd: The internal control structure.
-  * @cpumask: User supplied cpumasks for parallel and serial works.
-@@ -150,7 +151,8 @@ struct parallel_data {
-  * @flags: padata flags.
-  */
- struct padata_instance {
--	struct hlist_node		 node;
-+	struct hlist_node		cpu_online_node;
-+	struct hlist_node		cpu_dead_node;
- 	struct workqueue_struct		*wq;
- 	struct parallel_data		*pd;
- 	struct padata_cpumask		cpumask;
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -748,7 +748,7 @@ static int padata_cpu_online(unsigned in
- 	struct padata_instance *pinst;
- 	int ret;
- 
--	pinst = hlist_entry_safe(node, struct padata_instance, node);
-+	pinst = hlist_entry_safe(node, struct padata_instance, cpu_online_node);
- 	if (!pinst_has_cpu(pinst, cpu))
- 		return 0;
- 
-@@ -763,7 +763,7 @@ static int padata_cpu_dead(unsigned int
- 	struct padata_instance *pinst;
- 	int ret;
- 
--	pinst = hlist_entry_safe(node, struct padata_instance, node);
-+	pinst = hlist_entry_safe(node, struct padata_instance, cpu_dead_node);
- 	if (!pinst_has_cpu(pinst, cpu))
- 		return 0;
- 
-@@ -779,8 +779,9 @@ static enum cpuhp_state hp_online;
- static void __padata_free(struct padata_instance *pinst)
- {
- #ifdef CONFIG_HOTPLUG_CPU
--	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD, &pinst->node);
--	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->node);
-+	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD,
-+					    &pinst->cpu_dead_node);
-+	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->cpu_online_node);
- #endif
- 
- 	padata_stop(pinst);
-@@ -964,9 +965,10 @@ static struct padata_instance *padata_al
- 	mutex_init(&pinst->lock);
- 
- #ifdef CONFIG_HOTPLUG_CPU
--	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online, &pinst->node);
-+	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online,
-+						    &pinst->cpu_online_node);
- 	cpuhp_state_add_instance_nocalls_cpuslocked(CPUHP_PADATA_DEAD,
--						    &pinst->node);
-+						    &pinst->cpu_dead_node);
- #endif
- 	return pinst;
- 
-
-
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
