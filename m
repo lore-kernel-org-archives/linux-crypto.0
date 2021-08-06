@@ -2,25 +2,26 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B76ECC4320A
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 09:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F5ECC43214
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 09:59:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97E376115C
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 09:59:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 013CC60ED6
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Aug 2021 09:59:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244778AbhHFJ7t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Aug 2021 05:59:49 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:7799 "EHLO
+        id S244784AbhHFJ7u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Aug 2021 05:59:50 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:7800 "EHLO
         szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242882AbhHFJ7t (ORCPT
+        with ESMTP id S244706AbhHFJ7t (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 6 Aug 2021 05:59:49 -0400
 Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Gh1Cv3p1czYlm0;
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Gh1Cv41p4zYlmM;
         Fri,  6 Aug 2021 17:59:23 +0800 (CST)
 Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
  dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
@@ -34,10 +35,12 @@ From:   Kai Ye <yekai13@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH 0/2] crypto: hisilicon - some misc bugfix for SEC engine
-Date:   Fri, 6 Aug 2021 17:58:32 +0800
-Message-ID: <1628243914-33224-1-git-send-email-yekai13@huawei.com>
+Subject: [PATCH 1/2] crypto: hisilicon/sec - fix the abnormal exiting process
+Date:   Fri, 6 Aug 2021 17:58:33 +0800
+Message-ID: <1628243914-33224-2-git-send-email-yekai13@huawei.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1628243914-33224-1-git-send-email-yekai13@huawei.com>
+References: <1628243914-33224-1-git-send-email-yekai13@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.69.192.56]
@@ -48,16 +51,28 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-some misc bugfix for SEC engine.
+Because the algs registration process has added a judgment.
+So need to add the judgment for the abnormal exiting process.
 
-Kai Ye (2):
-  crypto: hisilicon/sec - fix the abnormal exiting process
-  crypto: hisilicon/sec - modify the hardware endian configuration
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+---
+ drivers/crypto/hisilicon/sec2/sec_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- drivers/crypto/hisilicon/sec2/sec.h      |  5 -----
- drivers/crypto/hisilicon/sec2/sec_main.c | 38 +++++++++++---------------------
- 2 files changed, 13 insertions(+), 30 deletions(-)
-
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 490db7b..8addbd7 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -984,7 +984,8 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	return 0;
+ 
+ err_alg_unregister:
+-	hisi_qm_alg_unregister(qm, &sec_devices);
++	if (qm->qp_num >= ctx_q_num)
++		hisi_qm_alg_unregister(qm, &sec_devices);
+ err_qm_stop:
+ 	sec_debugfs_exit(qm);
+ 	hisi_qm_stop(qm, QM_NORMAL);
 -- 
 2.7.4
 
