@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99037C4320E
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 21:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80928C4338F
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 21:36:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 816CE6023B
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 21:36:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 613F860EB2
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 21:36:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236612AbhHIVgf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Aug 2021 17:36:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58604 "EHLO
+        id S236680AbhHIVgt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 Aug 2021 17:36:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236431AbhHIVgU (ORCPT
+        with ESMTP id S236517AbhHIVgY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Aug 2021 17:36:20 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE604C0617A0;
-        Mon,  9 Aug 2021 14:35:58 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id cf5so26817612edb.2;
-        Mon, 09 Aug 2021 14:35:58 -0700 (PDT)
+        Mon, 9 Aug 2021 17:36:24 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F10ABC0617A4;
+        Mon,  9 Aug 2021 14:36:00 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id f13so26778619edq.13;
+        Mon, 09 Aug 2021 14:36:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=PUqAlLNH4YeN3rVIdjP870cOs6LUxkdfXIiMuoP0+Is=;
-        b=oWevK1wL/j6cgww4o6hyzrDD8dQCrAS/y+o0EtOyWjOY7BDIMroOQybLqmpJOB8SCf
-         a9asCYzcjAq6uS2WqwsIzMnnyIO6ahqNwb9f2BiNthsZOMfu5oZbIp/lpkT7nRUb1xW/
-         4Kmdw/kGfNzGR4XdKbUy/XgfWkAE5BfgpP0HmQHllzau+CPx/ZE+ZuK4DNyvAahdxZlN
-         oOyARjtNX/ux7Tp2G43J8CLgJw29JtoQJHtzGFre/nxsdu/jg294EwN5zVX2ZJ5VLrl+
-         qXAYw9Yh4RwHcdqW8B+oGwrvbHUon6FB1aeJvXSLXm1ukET7z00unSqf3zWjgFZy0CRe
-         PhaQ==
+        bh=uG3oHTASBquJceLiOdEfcWQQkF/eH5moDohL/r9HsUw=;
+        b=rcgmuQw6H5q2JM/IgIbadWTq3WVWGRiwykKjM/MnB18T5J2L2R+Vj9MAujuT+uedO4
+         ChMLLu1nKya6brD5LiIMGPVoTNpTnC6UnxzfgJNq7tRuwYL5RFDxzJq79BglW8BHVpke
+         avUQEeUQ0pb2pCJKp9UNjJ79KaXeusdkw7zSTsg9aMYKYyKKhiqgnOTINpfn98U7uR6M
+         PCd8RDtZv9CgUijpeT0MO3KaVsXy4casrSuZbz0EtZfS65SuV/KvXWkEJ5Boce4BTK9a
+         2VEWY+px19NfwLPo3qOkJQcoeJgFA1QKpOD8WHi3cSeEoijMOEpOyKETPyBDzYjFLt2g
+         JVBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=PUqAlLNH4YeN3rVIdjP870cOs6LUxkdfXIiMuoP0+Is=;
-        b=QGebICGeRXc1NGwEK056vCjPuOp/ZQWp35kbeNk7qNCIoIZMwbY/bIxwycEY3RzANJ
-         IDNcPC86FJ13IdWwTDriRy74LwoL0bzkHHY47RPa9+z+mELY2JubsEqpl4T2x0D2FvB1
-         HULTrLkGEcCqQHhk9vGVNgW85PSJPKP8IP6Q3fg/kplpZOV5gxb5Hf8+tT2SS41cnHzG
-         zYJ/78+s1vKl+KX06z+1/XK261NRYiSwtc4n4w9stDK7oLkn+wZyNptw03attuU2GMa7
-         udRtSoghKzSA6Ee7lj3/95hKuO10KWZaVWKpuAc0BG6L9g4E1CVvWpV+rzbJjtXOMHp8
-         6ofw==
-X-Gm-Message-State: AOAM5308O0FekEM2QBWR505SLVvcR7EsriSJri+7EMIGKDRcL5/btLVf
-        Ele6ZrH4nj2SZU3G3gswtvE=
-X-Google-Smtp-Source: ABdhPJxs98lcTKdbiwlj5KLON0kuBiZw2trNEBqNZK3t2eFbjUMnnmEgPj3MFH5bCJ5rRCoh7EWN3A==
-X-Received: by 2002:a05:6402:424c:: with SMTP id g12mr446165edb.121.1628544956484;
-        Mon, 09 Aug 2021 14:35:56 -0700 (PDT)
+        bh=uG3oHTASBquJceLiOdEfcWQQkF/eH5moDohL/r9HsUw=;
+        b=Q5F0mK/EzZR6oRs89SsCMA7uJ6u0bCWCVdMgS5wvEL+gTV2mdbCNa069hQ5DA5B0x3
+         45MN4RMqO/eLxBusrRqi2YMJB/0HHqTjEIZaRE1UXYwWmd2GMgOHg4y5pf6qLgj7ulMq
+         0yPAXxjhl6PrNHorPF8aCz6LHiGXM+8pskGrb3tqpmYZsMJ14sn1rEFwhKSNF1no9wJ9
+         kDQAAAMmyrwN5KivT7gMJCUqGGWXedwEdWafQeez/65j76jCRO37T2ETpcvTxNC+esXM
+         aN/vDKvexvr6RY4nJieoTsqj9mMuE/IhVooJm3SVzlb/b8V0gbqQLBF6Yg0e//Gs5XeP
+         97Ug==
+X-Gm-Message-State: AOAM53206pcGKAh95sYarvCALHeQ3FsPNrMhvGsYq0qpUQt3xsbObCoh
+        lGxL6F+aWcAxFZ+lnWR6l0M=
+X-Google-Smtp-Source: ABdhPJztgoQQKUJPRwBdJwQhSt0StxMgyBLPlqwpdUm4g094eDhkMGxjkrGSRVLyk0L48ZyioC3LCQ==
+X-Received: by 2002:a50:ac82:: with SMTP id x2mr461232edc.350.1628544959642;
+        Mon, 09 Aug 2021 14:35:59 -0700 (PDT)
 Received: from localhost.localdomain ([2a04:241e:502:1d80:688d:23e:82c6:84aa])
-        by smtp.gmail.com with ESMTPSA id v24sm5542932edt.41.2021.08.09.14.35.54
+        by smtp.gmail.com with ESMTPSA id v24sm5542932edt.41.2021.08.09.14.35.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Aug 2021 14:35:56 -0700 (PDT)
+        Mon, 09 Aug 2021 14:35:59 -0700 (PDT)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     Eric Dumazet <edumazet@google.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -74,9 +74,9 @@ Cc:     Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
         Menglong Dong <dong.menglong@zte.com.cn>,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [RFCv2 6/9] tcp: authopt: Add key selection controls
-Date:   Tue, 10 Aug 2021 00:35:35 +0300
-Message-Id: <a9b759f952e548cdde5720ab99781c6d35e5931f.1628544649.git.cdleonard@gmail.com>
+Subject: [RFCv2 8/9] selftests: Initial TCP-AO support for nettest
+Date:   Tue, 10 Aug 2021 00:35:37 +0300
+Message-Id: <909135b0313fc7b4bb8dbbd7686770483887ccc1.1628544649.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1628544649.git.cdleonard@gmail.com>
 References: <cover.1628544649.git.cdleonard@gmail.com>
@@ -86,286 +86,135 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The RFC requires that TCP can report the keyid and rnextkeyid values
-being sent or received, implement this via getsockopt values.
-
-The RFC also requires that user can select the sending key and that the
-sending key is automatically switched based on rnextkeyid. These
-requirements can conflict so we implement both and add a flag which
-specifies if user or peer request takes priority.
-
-Also add an option to control rnextkeyid explicitly from userspace.
-
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- Documentation/networking/tcp_authopt.rst | 25 +++++++++++
- include/net/tcp_authopt.h                |  8 ++++
- include/uapi/linux/tcp.h                 | 31 +++++++++++++
- net/ipv4/tcp_authopt.c                   | 57 ++++++++++++++++++++++--
- 4 files changed, 117 insertions(+), 4 deletions(-)
+ tools/testing/selftests/net/nettest.c | 43 ++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/networking/tcp_authopt.rst b/Documentation/networking/tcp_authopt.rst
-index 484f66f41ad5..cded87a70d05 100644
---- a/Documentation/networking/tcp_authopt.rst
-+++ b/Documentation/networking/tcp_authopt.rst
-@@ -35,10 +35,35 @@ Keys can be bound to remote addresses in a way that is similar to TCP_MD5.
+diff --git a/tools/testing/selftests/net/nettest.c b/tools/testing/selftests/net/nettest.c
+index bd6288302094..48d8f3a6eb27 100644
+--- a/tools/testing/selftests/net/nettest.c
++++ b/tools/testing/selftests/net/nettest.c
+@@ -100,10 +100,12 @@ struct sock_args {
+ 		struct sockaddr_in v4;
+ 		struct sockaddr_in6 v6;
+ 	} md5_prefix;
+ 	unsigned int prefix_len;
  
- RFC5925 requires that key ids do not overlap when tcp identifiers (addr/port)
- overlap. This is not enforced by linux, configuring ambiguous keys will result
- in packet drops and lost connections.
- 
-+Key selection
-+-------------
++	const char *authopt_password;
 +
-+On getsockopt(TCP_AUTHOPT) information is provided about keyid/rnextkeyid in
-+the last send packet and about the keyid/rnextkeyd in the last valid received
-+packet.
-+
-+By default the sending keyid is selected to match the "rnextkeyid" value sent
-+by the remote side. If that keyid is not available (or for new connections) a
-+random matching key is selected.
-+
-+If the `TCP_AUTHOPT_LOCK_KEYID` is set then the sending key is selected by the
-+`tcp_authopt.send_local_id` field and rnextkeyid is ignored. If no key with
-+local_id == send_local_id is configured then a random matching key is
-+selected.
-+
-+The current sending key is cached in the socket and will not change unless
-+requested by remote rnextkeyid or by setsockopt.
-+
-+The rnextkeyid value sent on the wire is usually the recv_id of the current
-+key used for sending. If the TCP_AUTHOPT_LOCK_RNEXTKEY flag is set in
-+`tcp_authopt.flags` the value of `tcp_authopt.send_rnextkeyid` is send
-+instead.  This can be used to implement smooth rollover: the peer will switch
-+its keyid to the received rnextkeyid when it is available.
-+
- ABI Reference
- =============
+ 	/* expected addresses and device index for connection */
+ 	const char *expected_dev;
+ 	const char *expected_server_dev;
+ 	int expected_ifindex;
  
- .. kernel-doc:: include/uapi/linux/tcp.h
-    :identifiers: tcp_authopt tcp_authopt_flag tcp_authopt_key tcp_authopt_key_flag tcp_authopt_alg
-diff --git a/include/net/tcp_authopt.h b/include/net/tcp_authopt.h
-index 28ebc77473a4..759635346874 100644
---- a/include/net/tcp_authopt.h
-+++ b/include/net/tcp_authopt.h
-@@ -25,11 +25,19 @@ struct tcp_authopt_key_info {
+@@ -250,10 +252,36 @@ static int switch_ns(const char *ns)
+ 	close(fd);
  
- /* Per-socket information regarding tcp_authopt */
- struct tcp_authopt_info {
- 	/* List of tcp_authopt_key_info */
- 	struct hlist_head head;
-+	/* Current send_key, cached.
-+	 * Once a key is found it only changes by user or remote request.
-+	 */
-+	struct tcp_authopt_key_info *send_key;
- 	u32 flags;
-+	u32 local_send_id;
-+	u8 send_rnextkeyid;
-+	u8 recv_keyid;
-+	u8 recv_rnextkeyid;
- 	u32 src_isn;
- 	u32 dst_isn;
- 	struct rcu_head rcu;
- };
+ 	return ret;
+ }
  
-diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-index bc47664156eb..c04f5166ab33 100644
---- a/include/uapi/linux/tcp.h
-+++ b/include/uapi/linux/tcp.h
-@@ -346,10 +346,24 @@ struct tcp_diag_md5sig {
- 
- /**
-  * enum tcp_authopt_flag - flags for `tcp_authopt.flags`
-  */
- enum tcp_authopt_flag {
-+	/**
-+	 * @TCP_AUTHOPT_FLAG_LOCK_KEYID: keyid controlled by sockopt
-+	 *
-+	 * If this is set `tcp_authopt.local_send_id` is used to determined sending
-+	 * key. Otherwise a key with send_id == recv_rnextkeyid is preferred.
-+	 */
-+	TCP_AUTHOPT_FLAG_LOCK_KEYID = (1 << 0),
-+	/**
-+	 * @TCP_AUTHOPT_FLAG_LOCK_RNEXTKEYID: Override rnextkeyid from userspace
-+	 *
-+	 * If this is set then `tcp_authopt.send_rnextkeyid` is sent on outbound
-+	 * packets. Other the recv_id of the current sending key is sent.
-+	 */
-+	TCP_AUTHOPT_FLAG_LOCK_RNEXTKEYID = (1 << 1),
- 	/**
- 	 * @TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED:
- 	 *	Configure behavior of segments with TCP-AO coming from hosts for which no
- 	 *	key is configured. The default recommended by RFC is to silently accept
- 	 *	such connections.
-@@ -361,10 +375,27 @@ enum tcp_authopt_flag {
-  * struct tcp_authopt - Per-socket options related to TCP Authentication Option
-  */
- struct tcp_authopt {
- 	/** @flags: Combination of &enum tcp_authopt_flag */
- 	__u32	flags;
-+	/**
-+	 * @local_send_id: `tcp_authopt_key.local_id` of preferred send key
-+	 *
-+	 * This is only used if `TCP_AUTHOPT_FLAG_LOCK_KEYID` is set
-+	 */
-+	__u32	local_send_id;
-+	/**
-+	 * @send_rnextkeyid: The rnextkeyid to send in packets
-+	 *
-+	 * This is controlled by the user iff TCP_AUTHOPT_FLAG_LOCK_RNEXTKEYID is
-+	 * set. Otherwise rnextkeyid is the recv_id of the current key
-+	 */
-+	__u8	send_rnextkeyid;
-+	/** @recv_keyid: A recently-received keyid value. Only for getsockopt. */
-+	__u8	recv_keyid;
-+	/** @recv_rnextkeyid: A recently-received rnextkeyid value. Only for getsockopt. */
-+	__u8	recv_rnextkeyid;
- };
- 
- /**
-  * enum tcp_authopt_key_flag - flags for `tcp_authopt.flags`
-  *
-diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
-index 493461e46460..40412d9ea04e 100644
---- a/net/ipv4/tcp_authopt.c
-+++ b/net/ipv4/tcp_authopt.c
-@@ -215,17 +215,44 @@ struct tcp_authopt_key_info *tcp_authopt_lookup_send(struct tcp_authopt_info *in
-  */
- struct tcp_authopt_key_info *tcp_authopt_select_key(const struct sock *sk,
- 						    const struct sock *addr_sk,
- 						    u8 *rnextkeyid)
++static int tcp_set_authopt(int sd, struct sock_args *args)
++{
++	struct tcp_authopt info;
++	struct tcp_authopt_key key;
++	int rc;
++
++	memset(&info, 0, sizeof(info));
++	info.local_send_id = 1;
++
++	rc = setsockopt(sd, IPPROTO_TCP, TCP_AUTHOPT, &info, sizeof(info));
++	if (rc < 0)
++		log_err_errno("setsockopt(TCP_AUHTOPT_KEY)");
++
++	memset(&key, 0, sizeof(key));
++	strcpy((char *)key.key, args->authopt_password);
++	key.keylen = strlen(args->authopt_password);
++	key.alg = TCP_AUTHOPT_ALG_HMAC_SHA_1_96;
++	key.local_id = 1;
++
++	rc = setsockopt(sd, IPPROTO_TCP, TCP_AUTHOPT_KEY, &key, sizeof(key));
++	if (rc < 0)
++		log_err_errno("setsockopt(TCP_AUHTOPT_KEY)");
++
++	return rc;
++}
++
+ static int tcp_md5sig(int sd, void *addr, socklen_t alen, struct sock_args *args)
  {
-+	struct tcp_authopt_key_info *key, *new_key;
- 	struct tcp_authopt_info *info;
- 
- 	info = rcu_dereference(tcp_sk(sk)->authopt_info);
- 	if (!info)
- 		return NULL;
- 
--	return tcp_authopt_lookup_send(info, addr_sk, -1);
-+	key = info->send_key;
-+	if (info->flags & TCP_AUTHOPT_FLAG_LOCK_KEYID) {
-+		int local_send_id = info->local_send_id;
-+
-+		if (local_send_id && (!key || key->local_id != local_send_id))
-+			new_key = __tcp_authopt_key_info_lookup(sk, info, local_send_id);
-+	} else {
-+		if (!key || key->send_id != info->recv_rnextkeyid)
-+			new_key = tcp_authopt_lookup_send(info, addr_sk, info->recv_rnextkeyid);
-+	}
-+	if (!key && !new_key)
-+		new_key = tcp_authopt_lookup_send(info, addr_sk, -1);
-+
-+	// Change current key.
-+	if (key != new_key && new_key) {
-+		key = new_key;
-+		info->send_key = key;
-+	}
-+
-+	if (key) {
-+		if (info->flags & TCP_AUTHOPT_FLAG_LOCK_RNEXTKEYID)
-+			*rnextkeyid = info->send_rnextkeyid;
-+		else
-+			*rnextkeyid = info->send_rnextkeyid = key->recv_id;
-+	}
-+
-+	return key;
- }
- 
- static struct tcp_authopt_info *__tcp_authopt_info_get_or_create(struct sock *sk)
- {
- 	struct tcp_sock *tp = tcp_sk(sk);
-@@ -262,11 +289,17 @@ int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
- 
- 	info = __tcp_authopt_info_get_or_create(sk);
- 	if (IS_ERR(info))
- 		return PTR_ERR(info);
- 
--	info->flags = opt.flags & TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED);
-+	info->flags = opt.flags &
-+		(TCP_AUTHOPT_FLAG_LOCK_KEYID |
-+		TCP_AUTHOPT_FLAG_LOCK_RNEXTKEYID |
-+		TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED);
-+	info->local_send_id = opt.local_send_id;
-+	if (opt.flags & TCP_AUTHOPT_FLAG_LOCK_RNEXTKEYID)
-+		info->send_rnextkeyid = opt.send_rnextkeyid;
- 
- 	return 0;
- }
- 
- int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
-@@ -277,11 +310,17 @@ int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
- 	WARN_ON(!lockdep_sock_is_held(sk));
- 	memset(opt, 0, sizeof(*opt));
- 	info = rcu_dereference_check(tp->authopt_info, lockdep_sock_is_held(sk));
- 	if (!info)
- 		return -EINVAL;
--	opt->flags = info->flags & TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED;
-+	if (info->send_key)
-+		opt->local_send_id = info->send_key->local_id;
-+	else
-+		opt->local_send_id = 0;
-+	opt->send_rnextkeyid = info->send_rnextkeyid;
-+	opt->recv_keyid = info->recv_keyid;
-+	opt->recv_rnextkeyid = info->recv_rnextkeyid;
- 
- 	return 0;
- }
- 
- static void tcp_authopt_key_free_rcu(struct rcu_head *rcu)
-@@ -295,10 +334,12 @@ static void tcp_authopt_key_free_rcu(struct rcu_head *rcu)
- static void tcp_authopt_key_del(struct sock *sk,
- 				struct tcp_authopt_info *info,
- 				struct tcp_authopt_key_info *key)
- {
- 	hlist_del_rcu(&key->node);
-+	if (info->send_key == key)
-+		info->send_key = NULL;
- 	atomic_sub(sizeof(*key), &sk->sk_omem_alloc);
- 	call_rcu(&key->rcu, tcp_authopt_key_free_rcu);
- }
- 
- /* free info and keys but don't touch tp->authopt_info */
-@@ -440,10 +481,11 @@ int __tcp_authopt_openreq(struct sock *newsk, const struct sock *oldsk, struct r
- 		return -ENOMEM;
- 
- 	sk_nocaps_add(newsk, NETIF_F_GSO_MASK);
- 	new_info->src_isn = tcp_rsk(req)->snt_isn;
- 	new_info->dst_isn = tcp_rsk(req)->rcv_isn;
-+	new_info->local_send_id = old_info->local_send_id;
- 	INIT_HLIST_HEAD(&new_info->head);
- 	err = tcp_authopt_clone_keys(newsk, oldsk, new_info, old_info);
- 	if (err) {
- 		__tcp_authopt_info_free(newsk, new_info);
- 		return err;
-@@ -1016,11 +1058,11 @@ int __tcp_authopt_inbound_check(struct sock *sk, struct sk_buff *skb, struct tcp
- 		if (info->flags & TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED) {
- 			net_info_ratelimited("TCP Authentication Unexpected: Rejected\n");
- 			return -EINVAL;
- 		} else {
- 			net_info_ratelimited("TCP Authentication Unexpected: Accepted\n");
--			return 0;
-+			goto accept;
- 		}
+ 	int keylen = strlen(args->password);
+ 	struct tcp_md5sig md5sig = {};
+ 	int opt = TCP_MD5SIG;
+@@ -1508,10 +1536,15 @@ static int do_server(struct sock_args *args, int ipc_fd)
+ 	if (args->password && tcp_md5_remote(lsd, args)) {
+ 		close(lsd);
+ 		goto err_exit;
  	}
  
- 	/* bad inbound key len */
- 	if (key->maclen + 4 != opt->len)
-@@ -1033,7 +1075,14 @@ int __tcp_authopt_inbound_check(struct sock *sk, struct sk_buff *skb, struct tcp
- 	if (memcmp(macbuf, opt->mac, key->maclen)) {
- 		net_info_ratelimited("TCP Authentication Failed\n");
- 		return -EINVAL;
- 	}
- 
-+accept:
-+	/* Doing this for all valid packets will results in keyids temporarily
-+	 * flipping back and forth if packets are reordered or retransmitted.
-+	 */
-+	info->recv_keyid = opt->keyid;
-+	info->recv_rnextkeyid = opt->rnextkeyid;
++	if (args->authopt_password && tcp_set_authopt(lsd, args)) {
++		close(lsd);
++		goto err_exit;
++	}
 +
- 	return 0;
+ 	ipc_write(ipc_fd, 1);
+ 	while (1) {
+ 		log_msg("waiting for client connection.\n");
+ 		FD_ZERO(&rfds);
+ 		FD_SET(lsd, &rfds);
+@@ -1630,10 +1663,13 @@ static int connectsock(void *addr, socklen_t alen, struct sock_args *args)
+ 		goto out;
+ 
+ 	if (args->password && tcp_md5sig(sd, addr, alen, args))
+ 		goto err;
+ 
++	if (args->authopt_password && tcp_set_authopt(sd, args))
++		goto err;
++
+ 	if (args->bind_test_only)
+ 		goto out;
+ 
+ 	if (connect(sd, addr, alen) < 0) {
+ 		if (errno != EINPROGRESS) {
+@@ -1819,11 +1855,11 @@ static int ipc_parent(int cpid, int fd, struct sock_args *args)
+ 
+ 	wait(&status);
+ 	return client_status;
  }
+ 
+-#define GETOPT_STR  "sr:l:c:p:t:g:P:DRn:M:X:m:d:I:BN:O:SCi6xL:0:1:2:3:Fbq"
++#define GETOPT_STR  "sr:l:c:p:t:g:P:DRn:M:X:m:A:d:I:BN:O:SCi6xL:0:1:2:3:Fbq"
+ 
+ static void print_usage(char *prog)
+ {
+ 	printf(
+ 	"usage: %s OPTS\n"
+@@ -1856,10 +1892,12 @@ static void print_usage(char *prog)
+ 	"    -n num        number of times to send message\n"
+ 	"\n"
+ 	"    -M password   use MD5 sum protection\n"
+ 	"    -X password   MD5 password for client mode\n"
+ 	"    -m prefix/len prefix and length to use for MD5 key\n"
++	"    -A password   use RFC5925 TCP Authentication option\n"
++	"\n"
+ 	"    -g grp        multicast group (e.g., 239.1.1.1)\n"
+ 	"    -i            interactive mode (default is echo and terminate)\n"
+ 	"\n"
+ 	"    -0 addr       Expected local address\n"
+ 	"    -1 addr       Expected remote address\n"
+@@ -1970,10 +2008,13 @@ int main(int argc, char *argv[])
+ 			args.client_pw = optarg;
+ 			break;
+ 		case 'm':
+ 			args.md5_prefix_str = optarg;
+ 			break;
++		case 'A':
++			args.authopt_password = optarg;
++			break;
+ 		case 'S':
+ 			args.use_setsockopt = 1;
+ 			break;
+ 		case 'C':
+ 			args.use_cmsg = 1;
 -- 
 2.25.1
 
