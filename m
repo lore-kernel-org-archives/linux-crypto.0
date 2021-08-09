@@ -2,170 +2,176 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C155EC4320E
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 21:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95EC5C4338F
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 21:35:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7A9461040
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 21:24:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AFD360EE7
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 21:35:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236445AbhHIVYs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Aug 2021 17:24:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49690 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236441AbhHIVYq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Aug 2021 17:24:46 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 203B860EB9;
-        Mon,  9 Aug 2021 21:24:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628544264;
-        bh=D2aOWPkZRvo4FPeQiqOYNBi8S+9DKShgichgczsHHWo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=iZLhpA+/gitAAaAEJQa+SuwtTRtdWqNg6KiI+uJ7wTvD3Slz3f1q3M9eNHEFeRye0
-         skvrWsmpZpvzteGIgxz4pTEpOgAipWgy9d7eUlNX8TSLP79IWGFGwweo0PtzzXd7OB
-         AEZsAAVVZ292uDGutkHjSqtKaODj/EDag/I63+6go3rh+dCs85LjWzbrvCixe8fofF
-         dgyiqfDqJVa2wzIudk1PTzSFI5sW3HaAMH3j/iQ+w7cgz2z0y4fJVAo4aRdc/zM6FO
-         /bYKoXwAhjmPGJpABv1eqcLcp3CKE5y689yJhJ/+5zZVIW9+Yy4Zn2AvdCx12kotWk
-         fG+pgXQ5/og3w==
-Date:   Mon, 9 Aug 2021 14:24:22 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, kernel@pengutronix.de,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        David Howells <dhowells@redhat.com>,
-        linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] fscrypt: support trusted keys
-Message-ID: <YRGdBiJQ3xqZAT4w@gmail.com>
-References: <20210806150928.27857-1-a.fatoum@pengutronix.de>
+        id S233898AbhHIVgJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 Aug 2021 17:36:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58570 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232334AbhHIVgJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 9 Aug 2021 17:36:09 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0655EC0613D3;
+        Mon,  9 Aug 2021 14:35:47 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id i6so26848384edu.1;
+        Mon, 09 Aug 2021 14:35:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oov78986EG0HSkPUbFnP2N923dA5GdFIRRnoEpZTjxs=;
+        b=VIGZwio8Va+ADneopNaDgHhUeOXbD8xX1skMLq7uX8kLnoHZt04XygNIV4+wCJLZCx
+         HuPs8QNC9p7yXhfde6fYNUO3vpnAyYeBjRQFMSmtaeMRMbc43pHRvGtbU4jLFol3yQBM
+         AhqyAmjEKDIGPNxLO2a4vsaP0vI0qqgKHo+s7228vHagQ89PMjAJdILrea2EOZ4Dtpcq
+         F4vH5lSDgGBRTVEFZRvVtqNsdYwYWxHT9iZYchBR6uaDMGJjwOTI5fQBMCc60wT/wNKc
+         ABcYvGuPDGBt8ZLaYZ9f5yNa1uga1O1avdXNTCottLdSUjpBbIiOwPGq34K65j9LZYdo
+         97Vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oov78986EG0HSkPUbFnP2N923dA5GdFIRRnoEpZTjxs=;
+        b=Vs7xTypPhpdh7tkmLfkAdee/gZGwnwXSB6zrgLtBvIRvKQrBbjnfAU5Em02N9uaHUz
+         /BAT1xWRY3wBQzZPQuxLfNmivKeDdS9YolXaGcXFQN2TygVbpJmC/zuL3bXJMiyFntoz
+         xH3cdz4PORqvYWsUvrbyxXMk2syIvSr71YZWv0U5MNgSuQyXqUJJ2tJF57ySOGVsNJBy
+         XN43rJzs2hg8iamdok1/yUqsp8/OYCFwDCiZzdbTGpL2SZPkdRGqg0vuioyvN/UIPvOx
+         Qwhlis6DQoa26h5x/yIzdzhOEk68JSM2El+05rnmRzHahMRCRc6w1oRfFUMczbfw4bO8
+         bqCw==
+X-Gm-Message-State: AOAM532YJeVO4OnAt47tLFpUUGRxDHog3ujuv/K0bSBx2BIHOwpHIsju
+        RzaJD9GhhmsSZhzFCgvc8bg=
+X-Google-Smtp-Source: ABdhPJxxhRu6xfmDS5OtZm2eAikpQU0cAAj6zF4dEIKzg69KhpcSNJ5IEXyN7ohKVX3RzZrHdIOsrw==
+X-Received: by 2002:a50:f1c2:: with SMTP id y2mr496240edl.64.1628544946517;
+        Mon, 09 Aug 2021 14:35:46 -0700 (PDT)
+Received: from localhost.localdomain ([2a04:241e:502:1d80:688d:23e:82c6:84aa])
+        by smtp.gmail.com with ESMTPSA id v24sm5542932edt.41.2021.08.09.14.35.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Aug 2021 14:35:45 -0700 (PDT)
+From:   Leonard Crestez <cdleonard@gmail.com>
+To:     Eric Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        David Ahern <dsahern@kernel.org>
+Cc:     Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Priyaranjan Jha <priyarjha@google.com>,
+        Menglong Dong <dong.menglong@zte.com.cn>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [RFCv2 0/9] tcp: Initial support for RFC5925 auth option
+Date:   Tue, 10 Aug 2021 00:35:29 +0300
+Message-Id: <cover.1628544649.git.cdleonard@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210806150928.27857-1-a.fatoum@pengutronix.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ahmad,
+This is similar to TCP MD5 in functionality but it's sufficiently
+different that userspace interface and wire formats are incompatible.
+Compared to TCP-MD5 more algorithms are supported and multiple keys can
+be used on the same connection but there is still no negotiation
+mechanism. Expected use-case is protecting long-duration BGP/LDP
+connections between routers using pre-shared keys.
 
-This generally looks okay, but I have some comments below.
+This version is mostly functional though more testing is required. Many
+obvious optimizations were skipped in favor of adding functionality.
+Here are several flaws:
 
-On Fri, Aug 06, 2021 at 05:09:28PM +0200, Ahmad Fatoum wrote:
-> Kernel trusted keys don't require userspace knowledge of the raw key
-> material and instead export a sealed blob, which can be persisted to
-> unencrypted storage. Userspace can then load this blob into the kernel,
-> where it's unsealed and from there on usable for kernel crypto.
+* RST and TIMEWAIT are mostly unhandled
+* A lock might be required for tcp_authopt
+* Sequence Number Extension not implemented
+* User is responsible for ensuring keys do not overlap (could be fine)
+* Traffic key is not cached (reducing performance)
 
-Please be explicit about where and how the keys get generated in this case.
+Test suite used during development is here: https://github.com/cdleonard/tcp-authopt-test
+Tests are written in python using pytest and scapy and check the API in
+detail and validate packet captures.
 
-> This is incompatible with fscrypt, where userspace is supposed to supply
-> the raw key material. For TPMs, a work around is to do key unsealing in
-> userspace, but this may not be feasible for other trusted key backends.
+Limited kselftest support for tcp_authopt in nettest/fcnal-test.sh is
+also included in this series. Those tests are slow and cover very
+little.
 
-As far as I can see, "Key unsealing in userspace" actually is the preferred way
-to implement TPM-bound encryption.  So it doesn't seem fair to call it a "work
-around".
+Changes for yabgp are here:
+https://github.com/cdleonard/yabgp/commits/tcp_authopt
+The patched version of yabgp can establish a BGP session protected by
+TCP Authentication Option with a Cisco IOS-XR router.
 
-> +  Most users leave this 0 and specify the raw key directly.
-> +  "trusted" keys are useful to leverage kernel support for sealing
-> +  and unsealing key material. Sealed keys can be persisted to
-> +  unencrypted storage and later be used to decrypt the file system
-> +  without requiring userspace to have knowledge of the raw key
-> +  material.
-> +  "fscrypt-provisioning" key support is intended mainly to allow
-> +  re-adding keys after a filesystem is unmounted and re-mounted,
->    without having to store the raw keys in userspace memory.
->  
->  - ``raw`` is a variable-length field which must contain the actual
->    key, ``raw_size`` bytes long.  Alternatively, if ``key_id`` is
->    nonzero, then this field is unused.
->  
-> +.. note::
-> +
-> +   Users should take care not to reuse the fscrypt key material with
-> +   different ciphers or in multiple contexts as this may make it
-> +   easier to deduce the key.
-> +   This also applies when the key material is supplied indirectly
-> +   via a kernel trusted key. In this case, the trusted key should
-> +   perferably be used only in a single context.
+Changes since RFC:
+* Split into per-topic commits for ease of review. The intermediate
+commits compile with a few "unused function" warnings and don't do
+anything useful by themselves.
+* Add ABI documention including kernel-doc on uapi
+* Fix lockdep warnings from crypto by creating pools with one shash for
+each cpu
+* Accept short options to setsockopt by padding with zeros; this
+approach allows increasing the size of the structs in the future.
+* Support for aes-128-cmac-96
+* Support for binding addresses to keys in a way similar to old tcp_md5
+* Add support for retrieving received keyid/rnextkeyid and controling
+the keyid/rnextkeyid being sent.
 
-Again, please be explicit about key generation.  Note that key generation is
-already discussed in a different section, "Master Keys".  There should be a
-mention of trusted keys there.  The above note about not reusing keys probably
-belongs there too.  (The section you're editing here is
-"FS_IOC_ADD_ENCRYPTION_KEY", which is primarily intended to just document the
-ioctl, so it's not necessarily the best place for this type of information.)
+The key control support is not based on the requirements of any
+particular app (a routing daemon) but rather the recommendations of
+RFC5925. Several vendors implement key chain management similar to
+RFC8177 but this belongs in userspace.
 
-> @@ -577,28 +578,44 @@ static int get_keyring_key(u32 key_id, u32 type,
->  	key_ref_t ref;
->  	struct key *key;
->  	const struct fscrypt_provisioning_key_payload *payload;
-> -	int err;
-> +	int err = 0;
->  
->  	ref = lookup_user_key(key_id, 0, KEY_NEED_SEARCH);
->  	if (IS_ERR(ref))
->  		return PTR_ERR(ref);
->  	key = key_ref_to_ptr(ref);
->  
-> -	if (key->type != &key_type_fscrypt_provisioning)
-> -		goto bad_key;
-> -	payload = key->payload.data[0];
-> +	if (key->type == &key_type_fscrypt_provisioning) {
+Previously: https://lore.kernel.org/netdev/01383a8751e97ef826ef2adf93bfde3a08195a43.1626693859.git.cdleonard@gmail.com/
 
-This function is getting long; it probably should be broken this up into several
-functions.  E.g.:
+Leonard Crestez (9):
+  tcp: authopt: Initial support and key management
+  docs: Add user documentation for tcp_authopt
+  tcp: authopt: Add crypto initialization
+  tcp: authopt: Compute packet signatures
+  tcp: authopt: Hook into tcp core
+  tcp: authopt: Add key selection controls
+  tcp: authopt: Add snmp counters
+  selftests: Initial TCP-AO support for nettest
+  selftests: Initial TCP-AO support for fcnal-test
 
-static int get_keyring_key(u32 key_id, u32 type,
-                           struct fscrypt_master_key_secret *secret)
-{
-        key_ref_t ref;
-        struct key *key;
-        int err;
+ Documentation/networking/index.rst        |    1 +
+ Documentation/networking/tcp_authopt.rst  |   69 ++
+ include/linux/tcp.h                       |    6 +
+ include/net/tcp.h                         |    1 +
+ include/net/tcp_authopt.h                 |  121 +++
+ include/uapi/linux/snmp.h                 |    1 +
+ include/uapi/linux/tcp.h                  |  103 ++
+ net/ipv4/Kconfig                          |   14 +
+ net/ipv4/Makefile                         |    1 +
+ net/ipv4/proc.c                           |    1 +
+ net/ipv4/tcp.c                            |   27 +
+ net/ipv4/tcp_authopt.c                    | 1091 +++++++++++++++++++++
+ net/ipv4/tcp_input.c                      |   17 +
+ net/ipv4/tcp_ipv4.c                       |    5 +
+ net/ipv4/tcp_minisocks.c                  |    2 +
+ net/ipv4/tcp_output.c                     |   56 +-
+ net/ipv6/tcp_ipv6.c                       |    4 +
+ tools/testing/selftests/net/fcnal-test.sh |   22 +
+ tools/testing/selftests/net/nettest.c     |   43 +-
+ 19 files changed, 1583 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/networking/tcp_authopt.rst
+ create mode 100644 include/net/tcp_authopt.h
+ create mode 100644 net/ipv4/tcp_authopt.c
 
-        ref = lookup_user_key(key_id, 0, KEY_NEED_SEARCH);
-        if (IS_ERR(ref))
-                return PTR_ERR(ref);
-        key = key_ref_to_ptr(ref);
 
-        if (key->type == &key_type_fscrypt_provisioning) {
-                err = fscrypt_get_provisioning_key(key, type, secret);
-        } else if (IS_REACHABLE(CONFIG_TRUSTED_KEYS) &&
-                   key->type == &key_type_trusted) {
-                err = fscrypt_get_trusted_key(key, secret);
-        } else {
-                err = -EKEYREJECTED;
-        }
-        key_ref_put(ref);
-        return err;
-}
+base-commit: 2a2b6e3640c43a808dcb5226963e2cc0669294b1
+-- 
+2.25.1
 
-> +		/* Don't allow fscrypt v1 keys to be used as v2 keys and vice versa. */
-
-Please avoid overly-long lines.
-
-> +		tkp = key->payload.data[0];
-> +		if (!tkp || tkp->key_len < FSCRYPT_MIN_KEY_SIZE ||
-> +		    tkp->key_len > FSCRYPT_MAX_KEY_SIZE) {
-> +			up_read(&key->sem);
-> +			err = -EINVAL;
-> +			goto out_put;
-> +		}
-
-What does the !tkp case mean?  For "user" and "logon" keys it means "key
-revoked", but the "trusted" key type doesn't implement revoke.  Is this included
-just to be safe?  That might be reasonable, but perhaps the error code in that
-case (but not the invalid length cases) should be -EKEYREVOKED instead?
-
-- Eric
