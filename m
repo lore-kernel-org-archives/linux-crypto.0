@@ -2,122 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFCC8C4320A
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 10:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83ADEC4338F
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 14:10:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A22C360F25
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 10:17:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F5CE60E52
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Aug 2021 14:10:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234615AbhHIKRU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Aug 2021 06:17:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43722 "EHLO
+        id S234389AbhHIOK5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 Aug 2021 10:10:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233393AbhHIKRS (ORCPT
+        with ESMTP id S233795AbhHIOK5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Aug 2021 06:17:18 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1193AC061796
-        for <linux-crypto@vger.kernel.org>; Mon,  9 Aug 2021 03:16:58 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[127.0.0.1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1mD2L1-0006Uv-IB; Mon, 09 Aug 2021 12:16:55 +0200
-Subject: Re: [PATCH 0/4] KEYS: trusted: Introduce support for NXP CAAM-based
- trusted keys
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        David Gstir <david@sigma-star.at>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Richard Weinberger <richard@nod.at>,
-        James Morris <jmorris@namei.org>, linux-kernel@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        linux-integrity@vger.kernel.org,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-References: <cover.9fc9298fd9d63553491871d043a18affc2dbc8a8.1626885907.git-series.a.fatoum@pengutronix.de>
- <b9e44f8e-84a0-90be-6cfc-d3a0bde12178@pengutronix.de>
- <20210809093519.er32rmspuvkrww45@kernel.org>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-Message-ID: <8321cac9-350b-1325-4b7e-390f4f292070@pengutronix.de>
-Date:   Mon, 9 Aug 2021 12:16:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Mon, 9 Aug 2021 10:10:57 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19979C0613D3;
+        Mon,  9 Aug 2021 07:10:37 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id t7-20020a17090a5d87b029017807007f23so31608394pji.5;
+        Mon, 09 Aug 2021 07:10:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=MUFNVlpNdlRwJoHqLGAZnu3q9EuzmxJ1VBkQMu2Z0H4=;
+        b=f6mvq4ui2kWc0N6EALaDC8ssLCvnvtkvKy/P95WQ1nivu/AcJkT3bRlsK5ayCJddpb
+         gdPpCb25NwZNBWcEHlLjZMU8yELiwt5nuswOPx9+HeXY9mCgf6CfmZgqaYbnIL3LfLMq
+         GYMWsdE9Q2yDriL13wKIF3JX1IDLqHUkjMUIuN75yx30/YwN7BO909Jz/eN2qHamC793
+         Sim30bCUv57QdSZErsEr7v34HNwdB04ODzTT6wf25IyW/cGSVTUYH1S2oT+LNkx61ABX
+         sFDAvqNxUFddyqqEwTNjnEcAOimOgEjEMlEhTwBBs+M5RdboRh0oLIydbZCVcXSHrppu
+         sCGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=MUFNVlpNdlRwJoHqLGAZnu3q9EuzmxJ1VBkQMu2Z0H4=;
+        b=g8Y3Db9fRNDdEi5+qcURreZqLw9yxyCFhyC1/FSDGhZeZrL3/LIS1LI9lG2/7QcbOc
+         5//w0lg15lo27qSu6/Flp9xH7EI35VSAxIGaBUAlza4d4H2XwGucw0BFReY7NraWgyhd
+         9nrmHvz5ui8XDCAB2TJBZK+XWlCCo2rAYPCmadmOA68H3S5seMmmWdWken2baegvFvTm
+         S4WBaU4sJ+gGM5UAYeZICc49a4LCDhrR9+P/WWcwHwMVIdlfnHA4OYHeLufzQ2HkH4Ze
+         zddcWWt4GKEO22S1mPA7YJ9brXSInEpjveFHRHQYWWldl/MdRG8cCwWU9rH5CSkrRVBE
+         r6YQ==
+X-Gm-Message-State: AOAM530v5xbE78qr1WYnVJX7seyB9cyHzC5FN9rq9WVJNxX94lLW502k
+        gNjqms4V8MArq+Ql9Do1mOY=
+X-Google-Smtp-Source: ABdhPJw7uIFi2b2Q6gjI2GPARWEmnnM1MxiiZJN+wFz9CDDFStnpfUdNCBDI36LTrAzrpSApLWsabg==
+X-Received: by 2002:a17:90a:150d:: with SMTP id l13mr25476491pja.93.1628518236573;
+        Mon, 09 Aug 2021 07:10:36 -0700 (PDT)
+Received: from fedora.. ([2405:201:6008:6ce2:9fb0:9db:90a4:39e2])
+        by smtp.googlemail.com with ESMTPSA id 136sm24551417pge.77.2021.08.09.07.10.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Aug 2021 07:10:36 -0700 (PDT)
+From:   Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, ardb@kernel.org
+Cc:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
+Subject: [PATCH] crypto: xts_crypt() return if walk.nbytes is 0
+Date:   Mon,  9 Aug 2021 19:40:27 +0530
+Message-Id: <20210809141027.860850-1-chouhan.shreyansh630@gmail.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <YQ0Qm+Xs1g/7Eant@fedora>
+References: <YQ0Qm+Xs1g/7Eant@fedora>
 MIME-Version: 1.0
-In-Reply-To: <20210809093519.er32rmspuvkrww45@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 09.08.21 11:35, Jarkko Sakkinen wrote:
-> On Fri, Aug 06, 2021 at 05:12:19PM +0200, Ahmad Fatoum wrote:
->> Dear trusted key maintainers,
->>
->> On 21.07.21 18:48, Ahmad Fatoum wrote:
->>> Series applies on top of
->>> https://lore.kernel.org/linux-integrity/20210721160258.7024-1-a.fatoum@pengutronix.de/T/#u
->>>
->>> v2 -> v3:
->>>  - Split off first Kconfig preparation patch. It fixes a regression,
->>>    so sent that out, so it can be applied separately (Sumit)
->>>  - Split off second key import patch. I'll send that out separately
->>>    as it's a development aid and not required within the CAAM series
->>>  - add MAINTAINERS entry
->>
->> Gentle ping. I'd appreciate feedback on this series.
-> 
-> Simple question: what is fscrypt?
+xts_crypt() code doesn't call kernel_fpu_end() after calling
+kernel_fpu_begin() if walk.nbytes is 0. The correct behavior should be
+not calling kernel_fpu_begin() if walk.nbytes is 0.
 
-For supported file systems, fscrypt[1] allows you to encrypt at a directory level.
-It has no trusted key integration yet, which is something I am trying to upstream
-in parallel to this series, so I eventually can use fscrypt together with CAAM-backed
-trusted keys on an unpatched kernel.
+Reported-by: syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
+Signed-off-by: Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
+---
+ arch/x86/crypto/aesni-intel_glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If it interests you, I described[2] my CAAM+ubifs+fscrypt use case in the
-discussion thread on my fscrypt-trusted-keys v1. Jan, a colleague of mine, held a
-talk[3] on the different solutions for authenticated and encrypted storage, which
-you may want to check out.
-
-I'd really appreciate feedback here on the the CAAM parts of this series, so this can
-eventually go mainline.
-
-Thanks,
-Ahmad
-
-
-[1]: https://www.kernel.org/doc/html/v5.13/filesystems/fscrypt.html
-[2]: https://lore.kernel.org/linux-fscrypt/367ea5bb-76cf-6020-cb99-91b5ca82d679@pengutronix.de/
-[3]: https://www.youtube.com/watch?v=z_y84v9076c
-
-> 
-> /Jarkko
-> 
-
-
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 388643ca2177..ec6eac57c493 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -849,7 +849,7 @@ static int xts_crypt(struct skcipher_request *req, bool encrypt)
+ 		return -EINVAL;
+ 
+ 	err = skcipher_walk_virt(&walk, req, false);
+-	if (err)
++	if (err || !walk.nbytes)
+ 		return err;
+ 
+ 	if (unlikely(tail > 0 && walk.nbytes < walk.total)) {
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.31.1
+
