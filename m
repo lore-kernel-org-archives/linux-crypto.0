@@ -2,95 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 273EAC432BE
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 18:46:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF9AC4338F
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 19:13:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A35260EC0
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 18:46:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5308661052
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 19:13:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231301AbhHJSrP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Aug 2021 14:47:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60310 "EHLO mail.kernel.org"
+        id S231324AbhHJTOE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Aug 2021 15:14:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38850 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231221AbhHJSrP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Aug 2021 14:47:15 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 669DC60EB9;
-        Tue, 10 Aug 2021 18:46:51 +0000 (UTC)
+        id S230295AbhHJTOE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Aug 2021 15:14:04 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BE7F261019;
+        Tue, 10 Aug 2021 19:13:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628621211;
-        bh=ZerG9ye3QrY9ea4A77UJpFKD2UzPAh9muW0NUHyjOAw=;
+        s=k20201202; t=1628622822;
+        bh=3rE5qc+iJNNSvC4ekgPf62m2QsbfzCpL6SJxL+syab8=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=l1Rt9QxHC6wZEhya68OxA5XzIdmNieElZTJLUGQucOgjQEU5wyP3DkbEQEwzVqrB9
-         DEvPrkxIx8u1VURhaRjYSBXGAleiEZihH/xyU1UN9+JDhgTFVyycVo20+dDeCke2It
-         ng0JMSA4ZwCoGBpSNMG1DmQNukqBNhT4CQey1LTQUs1cqSEDvRgJ8NIgkcR2rawF2e
-         nel2oiBZNdFq9I+LhT/7QwvL3Thi9reuBL82YyStIi026qQ0fIpfPcI3TPLJETIvxt
-         8uS5i+pyOeHAbaQ9mAwGEAcsuJtzcULNYfSIzG2Sz3/08L1ozoWG31MKKSQo9TNFcm
-         j3IgBKAwXhU6g==
-Date:   Tue, 10 Aug 2021 11:46:49 -0700
+        b=ZQC0NEk0Him79x8hhE3+Sr+z7EPYmUxL8PTeYH/CjZGvf4FrabhG8oPj/dhV15wp9
+         bM0E6Zb3ZtrKA/55nDzFReeOSLZs2MDcZ5Jx6FlungZ+C+lrN9hH7gY9VyNACyRvS+
+         jU/O6+Wzzt8CtrpVTelrqQvpOLxSLPaKxbPMGZp3q0xK72zRV+qU8YkdRUpkWHoF+G
+         uHv8MCo6c3pHEq90IVKsjmQcSvf4Ctu3fECrFTuNySU3qLZSvlgGv3Lx2tqqUtYtH/
+         gyHADC9n6cHisQamSGltETg5lyyE9Ap1yi8YmBiGU5swo57pTX4Cc8RJn0N0JNCqPO
+         0TB1Iqe4arR8A==
+Date:   Tue, 10 Aug 2021 12:13:40 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, kernel@pengutronix.de,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        David Howells <dhowells@redhat.com>,
-        linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] fscrypt: support trusted keys
-Message-ID: <YRLJmaafp941uOdA@gmail.com>
-References: <20210806150928.27857-1-a.fatoum@pengutronix.de>
- <20210809094408.4iqwsx77u64usfx6@kernel.org>
- <YRGVcaquAJiuc8bp@gmail.com>
- <20210810180636.vqwaeftv7alsodgn@kernel.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@wdc.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 04/13] lib/base64: RFC4648-compliant base64 encoding
+Message-ID: <YRLP5JuQrF/SJPBt@gmail.com>
+References: <20210810124230.12161-1-hare@suse.de>
+ <20210810124230.12161-5-hare@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210810180636.vqwaeftv7alsodgn@kernel.org>
+In-Reply-To: <20210810124230.12161-5-hare@suse.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 09:06:36PM +0300, Jarkko Sakkinen wrote:
-> > > 
-> > > I don't think this is right, or at least it does not follow the pattern
-> > > in [*]. I.e. you should rather use trusted key to seal your fscrypt key.
-> > 
-> > What's the benefit of the extra layer of indirection over just using a "trusted"
-> > key directly?  The use case for "encrypted" keys is not at all clear to me.
+On Tue, Aug 10, 2021 at 02:42:21PM +0200, Hannes Reinecke wrote:
+> Add RFC4648-compliant base64 encoding and decoding routines.
 > 
-> Because it is more robust to be able to use small amount of trusted keys,
-> which are not entirely software based.
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
+> ---
+>  include/linux/base64.h |  16 ++++++
+>  lib/Makefile           |   2 +-
+>  lib/base64.c           | 115 +++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 132 insertions(+), 1 deletion(-)
+>  create mode 100644 include/linux/base64.h
+>  create mode 100644 lib/base64.c
 > 
-> And since it's also a pattern on existing kernel features utilizing trusted
-> keys, the pressure here to explain why break the pattern, should be on the
-> side of the one who breaks it.
+> diff --git a/include/linux/base64.h b/include/linux/base64.h
+> new file mode 100644
+> index 000000000000..660d4cb1ef31
+> --- /dev/null
+> +++ b/include/linux/base64.h
+> @@ -0,0 +1,16 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * base64 encoding, lifted from fs/crypto/fname.c.
+> + */
 
-This is a new feature, so it's on the person proposing the feature to explain
-why it's useful.  The purpose of "encrypted" keys is not at all clear, and the
-documentation for them is heavily misleading.  E.g.:
+As I mentioned previously, please make it very clear which variant of Base64 it
+is (including whether padding is included and required or not), and update all
+the comments accordingly.  I've done so in fs/crypto/fname.c with
+https://lkml.kernel.org/r/20210718000125.59701-1-ebiggers@kernel.org.  It would
+probably be best to start over with a copy of that and modify it accordingly to
+implement the desired variant of Base64.
 
-    "user space sees, stores, and loads only encrypted blobs"
-    (Not necessarily true, as I've explained previously.)
+> +/**
+> + * base64_decode() - base64-decode some bytes
+> + * @src: the base64-encoded string to decode
+> + * @len: number of bytes to decode
+> + * @dst: (output) the decoded bytes.
 
-    "Encrypted keys do not depend on a trust source" ...  "The main disadvantage
-    of encrypted keys is that if they are not rooted in a trusted key"
-    (Not necessarily true, and in fact it seems they're only useful when they
-    *do* depend on a trust source.  At least that's the use case that is being
-    proposed here, IIUC.)
+"@len: number of bytes to decode" is ambiguous as it could refer to either @src
+or @dst.  I've fixed this in the fs/crypto/fname.c version.
 
-I do see a possible use for the layer of indirection that "encrypted" keys are,
-which is that it would reduce the overhead of having lots of keys be directly
-encrypted by the TPM/TEE/CAAM.  Is this the use case?  If so, it needs to be
-explained.
+> + *
+> + * Decodes the base64-encoded bytes @src according to RFC 4648.
+> + *
+> + * Return: number of decoded bytes
+> + */
+
+Shouldn't this return an error if the string is invalid?  Again, see the latest
+fs/crypto/fname.c version.
+
+> +int base64_decode(const char *src, int len, u8 *dst)
+> +{
+> +        int i, bits = 0, pad = 0;
+> +        u32 ac = 0;
+> +        size_t dst_len = 0;
+> +
+> +        for (i = 0; i < len; i++) {
+> +                int c, p = -1;
+> +
+> +                if (src[i] == '=') {
+> +                        pad++;
+> +                        if (i + 1 < len && src[i + 1] == '=')
+> +                                pad++;
+> +                        break;
+> +                }
+> +                for (c = 0; c < strlen(lookup_table); c++) {
+
+strlen() shouldn't be used in a loop condition like this.
 
 - Eric
