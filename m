@@ -2,109 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75F8AC4320A
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 21:27:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88B7EC432BE
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 21:51:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52EDD61077
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 21:27:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67FD660EE9
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 21:51:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234531AbhHJV14 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Aug 2021 17:27:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43948 "EHLO mail.kernel.org"
+        id S234997AbhHJVwO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Aug 2021 17:52:14 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:53452 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233968AbhHJV1w (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Aug 2021 17:27:52 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A87D061019;
-        Tue, 10 Aug 2021 21:27:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628630846;
-        bh=mjloMTiIdTRuQibK5edGwphq2JrQh540Z20LUrsqdPo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VGuJpX+XfmOQoRt/Z+ROdsbw47SJelREzPoqRjL8ak10G0aAanUW0x4ixMkmgh3LF
-         REkjaE+noiZ2oAGLK3t1Dn/PvsrdIlylne3+omQVNFoexbRLXgs5r5EfpvY1efuUZp
-         swc91rXKmS1s+kOSeo0dB8YjlDd03c8KhP0YymmmjDlaGy6KBCpDal6CYQlUNaQ3gw
-         wRMlrxdaJmxvZi96/3b1sGfClbJbtKt62m3FpDFja7Gh8AqeS9MwvNHzJPHxgr7xqx
-         5zA+PAuRxtBj1ge3DqIM8sSfLiPHsr5VDwkfq/nkUm1qCmMyWQ5TMwUteiomQjr8Xg
-         cxU3UDalnpsJg==
-Date:   Tue, 10 Aug 2021 14:27:24 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, kernel@pengutronix.de,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        David Howells <dhowells@redhat.com>,
-        linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] fscrypt: support trusted keys
-Message-ID: <YRLvPJehAeMiYb2Z@gmail.com>
-References: <20210806150928.27857-1-a.fatoum@pengutronix.de>
- <20210809094408.4iqwsx77u64usfx6@kernel.org>
- <YRGVcaquAJiuc8bp@gmail.com>
- <20210810180636.vqwaeftv7alsodgn@kernel.org>
- <YRLJmaafp941uOdA@gmail.com>
- <20210810212140.sdq5dq2wy5uaj7h7@kernel.org>
+        id S234545AbhHJVwN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Aug 2021 17:52:13 -0400
+Received: from zn.tnic (p200300ec2f0d6500329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:6500:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 95C511EC0347;
+        Tue, 10 Aug 2021 23:51:45 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1628632305;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=bhrvSWnua4QgXGDLToC7m7WROlxA3VPxoYeGWv6d9b4=;
+        b=p7oMu+RhNEK0R7x19i+M996JIz9jAolp9gSi95HKMhewjNccujQhOtGEXBac5xmuyWnoQ8
+        VtNpb/aUb4bne0yLrWo++9p6EawNSD7KAttCXyDPqb0UwUAg1MTrP2eFAOM1Zm3RyuHGj4
+        2kVcVvuDB8EtlmSykCB6fmc5ev+4LKM=
+Date:   Tue, 10 Aug 2021 23:52:25 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 05/36] x86/sev: Define the Linux specific
+ guest termination reasons
+Message-ID: <YRL1GSmdJhoUCXZv@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-6-brijesh.singh@amd.com>
+ <YRJkDhcbUi9xQemM@zn.tnic>
+ <955b4f50-5a7b-8c60-d31e-864bc29638f5@amd.com>
+ <65c53556-94e1-b372-7fb1-64bb78c7ae15@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210810212140.sdq5dq2wy5uaj7h7@kernel.org>
+In-Reply-To: <65c53556-94e1-b372-7fb1-64bb78c7ae15@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 11, 2021 at 12:21:40AM +0300, Jarkko Sakkinen wrote:
-> On Tue, Aug 10, 2021 at 11:46:49AM -0700, Eric Biggers wrote:
-> > On Tue, Aug 10, 2021 at 09:06:36PM +0300, Jarkko Sakkinen wrote:
-> > > > > 
-> > > > > I don't think this is right, or at least it does not follow the pattern
-> > > > > in [*]. I.e. you should rather use trusted key to seal your fscrypt key.
-> > > > 
-> > > > What's the benefit of the extra layer of indirection over just using a "trusted"
-> > > > key directly?  The use case for "encrypted" keys is not at all clear to me.
-> > > 
-> > > Because it is more robust to be able to use small amount of trusted keys,
-> > > which are not entirely software based.
-> > > 
-> > > And since it's also a pattern on existing kernel features utilizing trusted
-> > > keys, the pressure here to explain why break the pattern, should be on the
-> > > side of the one who breaks it.
-> > 
-> > This is a new feature, so it's on the person proposing the feature to explain
-> > why it's useful.  The purpose of "encrypted" keys is not at all clear, and the
-> > documentation for them is heavily misleading.  E.g.:
-> > 
-> >     "user space sees, stores, and loads only encrypted blobs"
-> >     (Not necessarily true, as I've explained previously.)
-> > 
-> >     "Encrypted keys do not depend on a trust source" ...  "The main disadvantage
-> >     of encrypted keys is that if they are not rooted in a trusted key"
-> >     (Not necessarily true, and in fact it seems they're only useful when they
-> >     *do* depend on a trust source.  At least that's the use case that is being
-> >     proposed here, IIUC.)
-> > 
-> > I do see a possible use for the layer of indirection that "encrypted" keys are,
-> > which is that it would reduce the overhead of having lots of keys be directly
-> > encrypted by the TPM/TEE/CAAM.  Is this the use case?  If so, it needs to be
-> > explained.
+On Tue, Aug 10, 2021 at 02:30:44PM -0500, Tom Lendacky wrote:
+> IIRC, during the review of the first GHCB version there was discussion
+> about assigning reason sets outside of 0 within the spec and the overall
+> feeling was to not do that as part of the spec.
 > 
-> If trusted keys are used directly, it's an introduction of a bottleneck.
-> If they are used indirectly, you can still choose to have one trusted
-> key per fscrypt key.
-> 
-> Thus, it's obviously a bad idea to use them directly.
-> 
+> We can re-open that discussion for the next version of the GHCB document.
 
-So actually explain that in the documentation.  It's not obvious at all.  And
-does this imply that the support for trusted keys in dm-crypt is a mistake?
+My worry is that if nothing documents which sets are allocated to which
+vendor, it'll become a mess.
 
-- Eric
+Imagine a Linux SNP guest and a windoze one, both running on a KVM
+hypervisor (is that even possible?) and both using the same termination
+reason set with conflicting reason numbers.
+
+Unneeded confusion.
+
+Unless the spec says, "reason set 1 is allocated to Linux, set 2 to
+windoze, etc"
+
+Then all know which is which.
+
+And so on...
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
