@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC2BCC4338F
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 12:42:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69212C4320E
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 12:42:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 98790604DC
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 12:42:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4565360EFF
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 12:42:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240728AbhHJMnP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Aug 2021 08:43:15 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:43618 "EHLO
+        id S240735AbhHJMnQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Aug 2021 08:43:16 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:43674 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239087AbhHJMnP (ORCPT
+        with ESMTP id S240726AbhHJMnP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 10 Aug 2021 08:43:15 -0400
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 19401200AE;
+        by smtp-out2.suse.de (Postfix) with ESMTP id 25EDF200AF;
         Tue, 10 Aug 2021 12:42:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1628599372; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zrhwWEeGhqBzwG4fO6ATjJUgff+ThHnR+gJis2gc95M=;
-        b=yxIPTQ8BhCO9PRyFK4yOHK/grPX91BMKnConxNCMejtQKLoDidxlWhNYYCfo+e9n8s28Ks
-        60uwFkLeh+f5LtbPvucy7Q+oQfEwPLnf/hwzUXeCGix0pY9jGjBQT+LTwelh3U6Bxqgqz5
-        /5NTV0yWmjTDgjrtA/vhPtV5GEGkAyg=
+        bh=9pA854x4+NZnK9VsYLRuDw6BPzTZncgGJA2I5lFQbIk=;
+        b=tDyFqzBxgDKd2DFbOzjkhY95b2eBQFxhl6ed0Q3kHc9fTqRIY+7Yc77rMJc+qFysb5cc26
+        SiqhwennuCHDtBgwvYwk05dl4JXM+WCVr2Nukq/b0kl/wBzIkP0jE0SdLSTA/x1dn90lEL
+        dzIE0/yV93B7MGFtEoumAmbo+dhyQUQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1628599372;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zrhwWEeGhqBzwG4fO6ATjJUgff+ThHnR+gJis2gc95M=;
-        b=c1Vm88cQXKcvAGAuw5PTfUDYfqVe8rro2hftSFHTiC3zK6cV8kSgC6SwQ16+XSMQx2Psck
-        kl1Ga2ObVSZeAGCw==
+        bh=9pA854x4+NZnK9VsYLRuDw6BPzTZncgGJA2I5lFQbIk=;
+        b=x13LCBSmggHYxOcOCCspJjfUwH5EWVpI4cCxnInx2OgRGivQjopuqxseSxTHXbwhd6ugPy
+        C46AB6MZdmwPtxDg==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id 94600A3B88;
-        Tue, 10 Aug 2021 12:42:50 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id 1862BA3B8E;
+        Tue, 10 Aug 2021 12:42:52 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 544EA518C542; Tue, 10 Aug 2021 14:42:50 +0200 (CEST)
+        id 7E75C518C552; Tue, 10 Aug 2021 14:42:50 +0200 (CEST)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Sagi Grimberg <sagi@grimberg.me>,
@@ -54,9 +54,9 @@ Cc:     Sagi Grimberg <sagi@grimberg.me>,
         "David S . Miller" <davem@davemloft.net>,
         linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 01/13] crypto: add crypto_has_shash()
-Date:   Tue, 10 Aug 2021 14:42:18 +0200
-Message-Id: <20210810124230.12161-2-hare@suse.de>
+Subject: [PATCH 09/13] nvmet: Parse fabrics commands on all queues
+Date:   Tue, 10 Aug 2021 14:42:26 +0200
+Message-Id: <20210810124230.12161-10-hare@suse.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210810124230.12161-1-hare@suse.de>
 References: <20210810124230.12161-1-hare@suse.de>
@@ -66,44 +66,26 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add helper function to determine if a given synchronous hash is supported.
+Fabrics commands might be sent to all queues, not just the admin one.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- crypto/shash.c        | 6 ++++++
- include/crypto/hash.h | 2 ++
- 2 files changed, 8 insertions(+)
+ drivers/nvme/target/core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 0a0a50cb694f..4c88e63b3350 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -521,6 +521,12 @@ struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
- }
- EXPORT_SYMBOL_GPL(crypto_alloc_shash);
- 
-+int crypto_has_shash(const char *alg_name, u32 type, u32 mask)
-+{
-+	return crypto_type_has_alg(alg_name, &crypto_shash_type, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_has_shash);
-+
- static int shash_prepare_alg(struct shash_alg *alg)
- {
- 	struct crypto_alg *base = &alg->base;
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index f140e4643949..f5841992dc9b 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -718,6 +718,8 @@ static inline void ahash_request_set_crypt(struct ahash_request *req,
- struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
- 					u32 mask);
- 
-+int crypto_has_shash(const char *alg_name, u32 type, u32 mask);
-+
- static inline struct crypto_tfm *crypto_shash_tfm(struct crypto_shash *tfm)
- {
- 	return &tfm->base;
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index ac7210a3ea1c..163f7dc1a929 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -942,6 +942,8 @@ bool nvmet_req_init(struct nvmet_req *req, struct nvmet_cq *cq,
+ 	if (unlikely(!req->sq->ctrl))
+ 		/* will return an error for any non-connect command: */
+ 		status = nvmet_parse_connect_cmd(req);
++	else if (nvme_is_fabrics(req->cmd))
++		status = nvmet_parse_fabrics_cmd(req);
+ 	else if (likely(req->sq->qid != 0))
+ 		status = nvmet_parse_io_cmd(req);
+ 	else
 -- 
 2.29.2
 
