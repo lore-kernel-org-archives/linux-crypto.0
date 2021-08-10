@@ -2,173 +2,332 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6441C43214
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 19:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0DBC4338F
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 20:42:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1F5B61076
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 19:30:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB3A760FC4
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 20:42:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232550AbhHJTbN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Aug 2021 15:31:13 -0400
-Received: from mail-bn8nam12on2085.outbound.protection.outlook.com ([40.107.237.85]:30720
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231143AbhHJTbM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Aug 2021 15:31:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LrBVr4Dfk7xdOaBcdMzTsucfUZEwjNar2FApXMbOki289lvbtSW7QLXWU/k1IXHQ0PMcJ/nv6xg5zvFXvqklOusoEhj48KMmiIazkej9unv55EZHAAikP0DDM/fxNQHEkFcd+xxxnBZJz/MvbIq10djTpWArY+COyjnMJfsFSsn7QXvlAWDCr1QyqJ9fuoPtJbqUJV0bEq6FzQeJa0vHRmYz1+d1AIr3Uw/COnjQV79hHFuL39XIz7Tj774asYHucejpukSjfNtnPpbi6IiNA9umGxibTeCXwvNKfGjXKE2ibMV+nKQMVgahMnkEqVJ37CXQ0AR7IvbhKtPqVPXpKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0/vwKdo7nCnvZ3Sigjv3Oe8WfrMUkLmaHShADKEGHNI=;
- b=Opr+AdQAqWXZORtI/Ynl7At41H+VXOLteFGA1PILK2VUQD1WKxg+cQPQPi+j71clIkZLU7H78Lo36pUyGTGy0P0kR9Fc2w7cJzrtYazb+sJZ0Bk5thlr13csDVP6YEuInH8Ub0iwJ5mV31sg3GjohTL5RfkHHYufet0C+FkU56iCFQrhP861lUg5s1KM1AUOqKeQmGZO2XRq+4rb80Hea1DudGdxMCFySBPHD+i4sw9nOQiFQS6iPf5q/amjPe5hqagRAuPOI4uxpNHDVZNy8ob0OtyeUhj/jX9VP0iq4ABXSytQ6xglMuqMXNz4fCrkDageSjwWRD0RtQXBlgrt3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0/vwKdo7nCnvZ3Sigjv3Oe8WfrMUkLmaHShADKEGHNI=;
- b=Mow5tRojVWp2Ey1cWPIRhlriW4A4uPq0PsMA3JAIPxytbgS59RdXoVeMT4VrWO788XlpF3NSsdlNeuQADmSHR8qv1uvIJ4NKSCpQKIYWYgKwK1BbJTTeEmJ2D90B6OKhhgWkVlySUMZ9uuFO7Gh7gZFsDMNqBuB+Hs1z6Kc/tHM=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM4PR12MB5215.namprd12.prod.outlook.com (2603:10b6:5:397::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.14; Tue, 10 Aug
- 2021 19:30:48 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::73:2581:970b:3208]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::73:2581:970b:3208%3]) with mapi id 15.20.4394.023; Tue, 10 Aug 2021
- 19:30:48 +0000
-Subject: Re: [PATCH Part1 RFC v4 05/36] x86/sev: Define the Linux specific
- guest termination reasons
-To:     Brijesh Singh <brijesh.singh@amd.com>,
-        Borislav Petkov <bp@alien8.de>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        brijesh.ksingh@gmail.com
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-6-brijesh.singh@amd.com> <YRJkDhcbUi9xQemM@zn.tnic>
- <955b4f50-5a7b-8c60-d31e-864bc29638f5@amd.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <65c53556-94e1-b372-7fb1-64bb78c7ae15@amd.com>
-Date:   Tue, 10 Aug 2021 14:30:44 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <955b4f50-5a7b-8c60-d31e-864bc29638f5@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SN7PR04CA0187.namprd04.prod.outlook.com
- (2603:10b6:806:126::12) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        id S230338AbhHJUmV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Aug 2021 16:42:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37966 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230181AbhHJUmV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Aug 2021 16:42:21 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1485C0613C1;
+        Tue, 10 Aug 2021 13:41:58 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id p38so653230lfa.0;
+        Tue, 10 Aug 2021 13:41:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nKhLAb4umTTJACgLUcsJlhO3k1D9regGXKa5BGSl818=;
+        b=fgOF1ZMev8Y0rP0BhpVW3dsHB7/Tw0AGgkkBJY46myYp9c8bSH1HMExPbdSqodaKzE
+         hm4QPMVka4g9g3DPkiJIVqTQayKk6AjNJKCR5YEzlTtobAEbcLCSthGcQEYeHbL+J7+f
+         d+PDFaqe1u3JwiULmi3ZT4QFNxkoeEdbSDhauQ+BuGeuEBHUKjeyvQaRDIM9gytgvKGT
+         Fatop+t+LhP87dkfZCff2xRiXwvLQ2WCHGc1xG3KAJPTBpNkd5cECREJ4HrG2QqzzeNK
+         YgdTNVcsQiHaWoCCUh9UTHlHKDFt4OpS7vYuwecX6vpRX4jXWz5kfy2rB6a7tAvnQ14Q
+         nTPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nKhLAb4umTTJACgLUcsJlhO3k1D9regGXKa5BGSl818=;
+        b=AAoM1nLEH12lG9U+OnUnbtwc/v+CqZhFDSZpKZHjlx8uEWlv05v43aWd+VjTnw51Gu
+         3OjRnYyr1mk3M24ZyjqQLKavnxk4ku9tq5ZP+FU976Gv1EOv+DxBDznQAniik+QgBRqt
+         WABEpvAJzqjsuWah1QLq36Z9jmt5XiykQMfVLfu77VLPS8h4D1fN27Hmi1DpsSlMw/5R
+         nkG4WL1L9yriUMcowptSrAiJhUmhB6qPUp8dWduaj8onTUU23HgBVZB8q7d5EpduEGWP
+         jmlyAhQc3+Z8wdYpSG9lbI+bnxMhsePpCQnnMAGApTi+I0jGg/rfduoDYLQtQ7G3KTLP
+         p9XA==
+X-Gm-Message-State: AOAM530d43j9bbF0dCCCaaPyURtuRBU0Vlt8TovjjzmskCjYLEIA8flh
+        F27OHezRwFly+ANIrhnnL8SnC0zHIPJaSLJBepM=
+X-Google-Smtp-Source: ABdhPJys95T5j3RjzdvwwJQyFj9EE1L20fkOTA9YCx84H4R4EPuwZLnhlLK926/ReioWEsZuEqLKbIzxpAfhQCvrFps=
+X-Received: by 2002:a05:6512:1148:: with SMTP id m8mr22563882lfg.53.1628628117045;
+ Tue, 10 Aug 2021 13:41:57 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.241] (165.204.77.1) by SN7PR04CA0187.namprd04.prod.outlook.com (2603:10b6:806:126::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.17 via Frontend Transport; Tue, 10 Aug 2021 19:30:46 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5a5b3df5-c635-4cf4-b4bf-08d95c355adf
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5215:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM4PR12MB5215551D1B342E17626837AEECF79@DM4PR12MB5215.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EJDBEl1zdL6D0eKFCgs7IFWXtDaMHYAauz6YJItuMPJ5h8at/Ybkk35b47tF7NretVcDhA7NgJHsIRbX/MuiJdacSOO1RMNwpKq7PFCUlM1PEQjYlEFD04BY7Pcm8MAWABwL+7ll1okDYIJ+hzNC5ZkNak6vL8GGEtsmJB6M5WTJ5vRypi5+rC2DBbAX8Fr//b98j6uMFX7aeGS4BOqziNDpvJ5dTZXHLU4mWGWgfOGvNlp0AyUvVsRTeqgfzsOcXwq70Vc0eLu3XFqOwDnGnKx41yY79bsLgUTs8nMJOgmghow+0ypdAhjJTyfgyjJonZ1k4iW0FjgeLxQKGnHi4CiOUhgWE70Fg+NLFJ25qiamxBnNlMs/rX/ZUGpR9ZWb7sHAbgnw6RCth2hEjYGtN6VGuWAjvK+JRg+nIwmPO/Hq7i3SkEBPc2+6kiD+FTbfO+5eApONzZl3o/mhqYfFOpAtvmSHTWE5YIPTQ4JK8V5S/R001zq8rYX8qUsx7ex7MWyXV3dKimOUJJfQu4F8C7RNVKLpQslTltMUJl3DyaOsFm2L5qNXpWOTGLsvCuJuakFEoayfAhxAYco/elsfkWH+x5uobma3ZtWwDZqqntD1H1qywdPmgIdBe8m2gFD17Qx6igxfguypUtMrCYllEDWieqSQZGwGvfFOAO62vLF13/1taqUnQgjjGrszeTCu5p2P6A2aRZFilvG4yzZC3mLkP6VmkhC31R15ChDWXA0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(4326008)(31686004)(8676002)(956004)(6486002)(5660300002)(36756003)(7406005)(7416002)(53546011)(66556008)(110136005)(66476007)(66946007)(16576012)(4744005)(38100700002)(2906002)(54906003)(508600001)(86362001)(31696002)(316002)(8936002)(2616005)(83380400001)(186003)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NElpMDFvM0ZqYXVjVEhUWEN6RmpBUy8yMURQaWlyN3M3UzlhbGNvVk5GSHJl?=
- =?utf-8?B?TEdQYWFBa05nRWhiazBiKzlZQktZODU2VzdWNlhWTnBhMUZVQU54bWdXZlYw?=
- =?utf-8?B?TytFczZxaHNsRU9ZVFB4VVVrUWlISjBQRUFHS24wRk05ck1NOFFEWW9nN2Ur?=
- =?utf-8?B?SnM0eDFENVVKRDdxSDVablZIb2FyL3BBZ09vSjEzcXRnN3VzRG4wNFdhcEh6?=
- =?utf-8?B?WURZbURDZHd1WHEzODhrUEU3bjRzZ0kxY0dycUR6TS9qRkNRVDU5OUJxemRW?=
- =?utf-8?B?bytLRkVMYTRIUno1NEFGSFlHL2lYbFFmcTZQSVlHVmEyY21SajZaQWxmZFdm?=
- =?utf-8?B?Q3Q1Y1ZUODRUS3kvTThuN3R0c0dHeUxKOG9VZjJPVzg3R0IvSXNZSG8zVkRR?=
- =?utf-8?B?akU4MlZZdll5TG9kZUYxUStUZjhrT1VBM3FGclJhdDRuUTdsN1Q1aEt5QkhK?=
- =?utf-8?B?SXpTa0tJdHh5S0hNNE42NGdOL2pLVEE2OVR3NjI2d0RjQ2lXTWJsMXNjMFpp?=
- =?utf-8?B?aTBVR2EvUVFGMkR4Y294SzhHNWxXd2lVaS80RVQzQXljM1o1bzA0TTBZU2dW?=
- =?utf-8?B?T3hrNDduWlVRVVhXY3FMZlRod2NwU2J3YkltbGNSalVKZVh1bWQ3ZFFwMmNm?=
- =?utf-8?B?VUoreUYyejJCaTQvRTVObDNWbkxMdXYzWW9jVGh6RWFxak5nUkFyeVhJMUZU?=
- =?utf-8?B?N2tRNCtoYThoV0pobnA4U1V4UVFpbEJmTEtDZExubDNYbG5HVzVCbU1qeElN?=
- =?utf-8?B?WGNLclZndGlsTUhRaklHcDNWaFdicU8yVURERW1EQUw1eHdLVGo4MnhYU0o1?=
- =?utf-8?B?K2s0U3lRV3NpbUZ4SU9uTHBlWnc1YjB1MDh4TEpNM3ZIZ2krMHRTb2QwSHhN?=
- =?utf-8?B?NEFCWWZTUkhCU3E1MnE2UkN5WEgzSVhPY1JyMVJ3UVpzMkhaOFFhL2dDMlN0?=
- =?utf-8?B?OFNMY3VkcmJTcWZCbmVGTnYvMkpzSnRhSlMxb084VFRqQ3BuVCtpM1VNanF4?=
- =?utf-8?B?T2t4RGdSZExCNS8xZWx5VWIwMDJlQzlWemlRL0dvRmNJRDRnKzRmNFg2UnM2?=
- =?utf-8?B?T01yRkNzRmN5cVVEN3ROamEwb0wvUXBNZ040eE93ZmhaVGdYaThxRmNiNE5u?=
- =?utf-8?B?QysxSEo2WUFJbUt1dms5UDVIVXIxc2U5U1FpMHdIMUVwdnJWS2puV2MrOWMy?=
- =?utf-8?B?K2V0Z1BrUmtmMjVGczFNeUdhR1JIUjVBUHcyVkNZTkk2NDR4QzFIMktHOUxO?=
- =?utf-8?B?ZFBWRkNEZERjZU1XcnRYVWZQa1ltaGI1d0RvQ01Ta21DS0twU1lWbW5reEVi?=
- =?utf-8?B?VVp0S21SQ3RYSTFKcmtJTFFqVnMrd3pxSGttaXhRYTNlbk94OTBKd2RkUUFR?=
- =?utf-8?B?a2drVjlXRUdwSUxaRmJJTCtLMHo3VnNqOG1NQU1zL1FmUm4zR3NZKzQ2MDJP?=
- =?utf-8?B?czE1Yml1aUM1TEpSRy9JYThvMVhoYjhpMnFCNlo0T3BDR1dScHJ6cGY2SWFm?=
- =?utf-8?B?VHBDVFRDQnl4WHJuTUlyMVpJVVVEdnErOWx2RTZDTldvL2tDTmZBK3gzYVYx?=
- =?utf-8?B?OGFIelNudktvRjg3dXV6NWRHcHMwenFGdUpUSHNxSVFCaW04QnpXbVBqbmpu?=
- =?utf-8?B?SXNTcEhNNjNCeDk0UGZvcGtqT0p3SWFWSFNtaTV5dk5qeC9nWHhrTlBTQVc1?=
- =?utf-8?B?TFdVQ1NvaTEwTm1GelZsYU9MbXVXbkdYNVk5L1EvdUlNNFlTdFpXcG1qK1Z2?=
- =?utf-8?Q?bfO73/QHCvuF3lDPi3ZH5/C31aWsPTjfrC6yuSR?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a5b3df5-c635-4cf4-b4bf-08d95c355adf
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2021 19:30:47.9826
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BonaRp1Fh0b7MweUGFaHqjVf8cUTEOiXIbeGxmrdIPHOEvhj7hniwniSXYb3FWqi0mNx3xLrMS7BJQGXOjOhdw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5215
+References: <cover.1628544649.git.cdleonard@gmail.com> <67c1471683200188b96a3f712dd2e8def7978462.1628544649.git.cdleonard@gmail.com>
+In-Reply-To: <67c1471683200188b96a3f712dd2e8def7978462.1628544649.git.cdleonard@gmail.com>
+From:   Dmitry Safonov <0x7f454c46@gmail.com>
+Date:   Tue, 10 Aug 2021 21:41:46 +0100
+Message-ID: <CAJwJo6aicw_KGQSM5U1=0X11QfuNf2dMATErSymytmpf75W=tA@mail.gmail.com>
+Subject: Re: [RFCv2 1/9] tcp: authopt: Initial support and key management
+To:     Leonard Crestez <cdleonard@gmail.com>
+Cc:     Eric Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        David Ahern <dsahern@kernel.org>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Priyaranjan Jha <priyarjha@google.com>,
+        Menglong Dong <dong.menglong@zte.com.cn>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>,
+        Dmitry Safonov <dima@arista.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/10/21 9:59 AM, Brijesh Singh wrote:
-> On 8/10/21 6:33 AM, Borislav Petkov wrote:
->> On Wed, Jul 07, 2021 at 01:14:35PM -0500, Brijesh Singh wrote:
+Hi Leonard,
 
->>> +#define SEV_TERM_SET_LINUX        1
->>
->> GHCB doc says:
->>
->> "This document defines and owns reason code set 0x0"
->>
->> Should it also say, reason code set 1 is allocated for Linux guest use?
->> I don't see why not...
->>  > Tom?
->>
-> 
-> If Tom is okay with it then maybe in next version of the GHCB doc can add
-> this text.
+On Tue, 10 Aug 2021 at 02:50, Leonard Crestez <cdleonard@gmail.com> wrote:
+[..]
+> +/* Representation of a Master Key Tuple as per RFC5925 */
+> +struct tcp_authopt_key_info {
+> +       struct hlist_node node;
+> +       /* Local identifier */
+> +       u32 local_id;
 
-IIRC, during the review of the first GHCB version there was discussion
-about assigning reason sets outside of 0 within the spec and the overall
-feeling was to not do that as part of the spec.
+There is no local_id in RFC5925, what's that?
+An MKT is identified by (send_id, recv_id), together with
+(src_addr/src_port, dst_addr/dst_port).
+Why introducing something new to already complicated RFC?
 
-We can re-open that discussion for the next version of the GHCB document.
+> +       u32 flags;
+> +       /* Wire identifiers */
+> +       u8 send_id, recv_id;
+> +       u8 alg_id;
+> +       u8 keylen;
+> +       u8 key[TCP_AUTHOPT_MAXKEYLEN];
+> +       struct rcu_head rcu;
+
+This is unaligned and will add padding.
+I wonder if it's also worth saving some bytes by something like
+struct tcp_ao_key *key;
+
+With
+struct tcp_ao_key {
+      u8 keylen;
+      u8 key[0];
+};
+
+Hmm?
+
+> +       struct sockaddr_storage addr;
+> +};
+> +
+> +/* Per-socket information regarding tcp_authopt */
+> +struct tcp_authopt_info {
+> +       /* List of tcp_authopt_key_info */
+> +       struct hlist_head head;
+> +       u32 flags;
+> +       u32 src_isn;
+> +       u32 dst_isn;
+> +       struct rcu_head rcu;
+
+Ditto, adds padding on 64-bit.
+
+[..]
+> +++ b/include/uapi/linux/tcp.h
+> @@ -126,10 +126,12 @@ enum {
+>  #define TCP_INQ                        36      /* Notify bytes available to read as a cmsg on read */
+>
+>  #define TCP_CM_INQ             TCP_INQ
+>
+>  #define TCP_TX_DELAY           37      /* delay outgoing packets by XX usec */
+> +#define TCP_AUTHOPT                    38      /* TCP Authentication Option (RFC2385) */
+> +#define TCP_AUTHOPT_KEY                39      /* TCP Authentication Option update key (RFC2385) */
+
+RFC2385 is md5 one.
+Also, should there be TCP_AUTHOPT_ADD_KEY, TCP_AUTHOPT_DELTE_KEY
+instead of using flags inside setsocketopt()? (no hard feelings)
+
+[..]
+> +/**
+> + * enum tcp_authopt_flag - flags for `tcp_authopt.flags`
+> + */
+> +enum tcp_authopt_flag {
+> +       /**
+> +        * @TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED:
+> +        *      Configure behavior of segments with TCP-AO coming from hosts for which no
+> +        *      key is configured. The default recommended by RFC is to silently accept
+> +        *      such connections.
+> +        */
+> +       TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED = (1 << 2),
+> +};
+> +
+> +/**
+> + * struct tcp_authopt - Per-socket options related to TCP Authentication Option
+> + */
+> +struct tcp_authopt {
+> +       /** @flags: Combination of &enum tcp_authopt_flag */
+> +       __u32   flags;
+> +};
+
+I'm not sure what's the use of enum here, probably:
+#define TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED BIT(2)
+
+[..]
+> +struct tcp_authopt_key {
+> +       /** @flags: Combination of &enum tcp_authopt_key_flag */
+> +       __u32   flags;
+> +       /** @local_id: Local identifier */
+> +       __u32   local_id;
+> +       /** @send_id: keyid value for send */
+> +       __u8    send_id;
+> +       /** @recv_id: keyid value for receive */
+> +       __u8    recv_id;
+> +       /** @alg: One of &enum tcp_authopt_alg */
+> +       __u8    alg;
+> +       /** @keylen: Length of the key buffer */
+> +       __u8    keylen;
+> +       /** @key: Secret key */
+> +       __u8    key[TCP_AUTHOPT_MAXKEYLEN];
+> +       /**
+> +        * @addr: Key is only valid for this address
+> +        *
+> +        * Ignored unless TCP_AUTHOPT_KEY_ADDR_BIND flag is set
+> +        */
+> +       struct __kernel_sockaddr_storage addr;
+> +};
+
+It'll be an ABI if this is accepted. As it is - it can't support RFC5925 fully.
+Extending syscall ABI is painful. I think, even the initial ABI *must* support
+all possible features of the RFC.
+In other words, there must be src_addr, src_port, dst_addr and dst_port.
+I can see from docs you've written you don't want to support a mix of different
+addr/port MKTs, so you can return -EINVAL or -ENOTSUPP for any value
+but zero.
+This will create an ABI that can be later extended to fully support RFC.
+
+The same is about key: I don't think you need to define/use tcp_authopt_alg.
+Just use algo name - that way TCP-AO will automatically be able to use
+any algo supported by crypto engine.
+See how xfrm does it, e.g.:
+struct xfrm_algo_auth {
+    char        alg_name[64];
+    unsigned int    alg_key_len;    /* in bits */
+    unsigned int    alg_trunc_len;  /* in bits */
+    char        alg_key[0];
+};
+
+So you can let a user chose maclen instead of hard-coding it.
+Much more extendable than what you propose.
+
+[..]
+> +#ifdef CONFIG_TCP_AUTHOPT
+> +       case TCP_AUTHOPT: {
+> +               struct tcp_authopt info;
+> +
+> +               if (get_user(len, optlen))
+> +                       return -EFAULT;
+> +
+> +               lock_sock(sk);
+> +               tcp_get_authopt_val(sk, &info);
+> +               release_sock(sk);
+> +
+> +               len = min_t(unsigned int, len, sizeof(info));
+> +               if (put_user(len, optlen))
+> +                       return -EFAULT;
+> +               if (copy_to_user(optval, &info, len))
+> +                       return -EFAULT;
+> +               return 0;
+> +       }
+
+I'm pretty sure it's not a good choice to write partly tcp_authopt.
+And a user has no way to check what's the correct len on this kernel.
+Instead of len = min_t(unsigned int, len, sizeof(info)), it should be
+if (len != sizeof(info))
+    return -EINVAL;
+
+[..]
+> +int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> +{
+> +       struct tcp_authopt opt;
+> +       struct tcp_authopt_info *info;
+> +
+> +       WARN_ON(!lockdep_sock_is_held(sk));
+
+sock_owned_by_me(sk)
+
+> +
+> +       /* If userspace optlen is too short fill the rest with zeros */
+> +       if (optlen > sizeof(opt))
+> +               return -EINVAL;
+> +       memset(&opt, 0, sizeof(opt));
+
+it's 4 bytes, why not just (optlen != sizeof(opt))?
+
+[..]
+> +int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
+> +{
+> +       struct tcp_sock *tp = tcp_sk(sk);
+> +       struct tcp_authopt_info *info;
+> +
+> +       WARN_ON(!lockdep_sock_is_held(sk));
+
+sock_owned_by_me(sk)
+
+[..]
+> +int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> +{
+> +       struct tcp_authopt_key opt;
+> +       struct tcp_authopt_info *info;
+> +       struct tcp_authopt_key_info *key_info;
+> +
+> +       /* If userspace optlen is too short fill the rest with zeros */
+> +       if (optlen > sizeof(opt))
+> +               return -EINVAL;
+> +       memset(&opt, 0, sizeof(opt));
+> +       if (copy_from_sockptr(&opt, optval, optlen))
+> +               return -EFAULT;
+
+Again, not a good practice to zero-extend struct. Enforce proper size
+with -EINVAL.
+
+[..]
+> +       /* Initialize tcp_authopt_info if not already set */
+> +       info = __tcp_authopt_info_get_or_create(sk);
+> +       if (IS_ERR(info))
+> +               return PTR_ERR(info);
+> +
+> +       /* check key family */
+> +       if (opt.flags & TCP_AUTHOPT_KEY_ADDR_BIND) {
+> +               if (sk->sk_family != opt.addr.ss_family)
+> +                       return -EINVAL;
+> +       }
+
+Probably, can be in the reverse order, so that
+__tcp_authopt_info_get_or_create()
+won't allocate memory.
+
+> +       /* If an old value exists for same local_id it is deleted */
+> +       key_info = __tcp_authopt_key_info_lookup(sk, info, opt.local_id);
+> +       if (key_info)
+> +               tcp_authopt_key_del(sk, info, key_info);
+> +       key_info = sock_kmalloc(sk, sizeof(*key_info), GFP_KERNEL | __GFP_ZERO);
+> +       if (!key_info)
+> +               return -ENOMEM;
+
+1. You don't need sock_kmalloc() together with tcp_authopt_key_del().
+    It just frees the memory and allocates it back straight away - no
+sense in doing that.
+2. I think RFC says you must not allow a user to change an existing key:
+> MKT parameters are not changed. Instead, new MKTs can be installed, and a connection
+> can change which MKT it uses.
+
+IIUC, it means that one can't just change an existing MKT, but one can
+remove and later
+add MKT with the same (send_id, recv_id, src_addr/port, dst_addr/port).
+
+So, a reasonable thing to do:
+if (key_info)
+    return -EEXIST.
 
 Thanks,
-Tom
+             Dmitry
