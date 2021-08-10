@@ -2,233 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAE7C432BE
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 07:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57BB7C4320E
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 09:16:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3371C604AC
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 07:41:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D72161019
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Aug 2021 09:16:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229827AbhHJHl7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Aug 2021 03:41:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52558 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236592AbhHJHl7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Aug 2021 03:41:59 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECBE2C0613D3
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Aug 2021 00:41:36 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1mDMO4-0005bc-BD; Tue, 10 Aug 2021 09:41:24 +0200
-Subject: Re: [PATCH v2] fscrypt: support trusted keys
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, kernel@pengutronix.de,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        David Howells <dhowells@redhat.com>,
-        linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210806150928.27857-1-a.fatoum@pengutronix.de>
- <YRGdBiJQ3xqZAT4w@gmail.com>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-Message-ID: <2bc19003-82a1-0d2d-4548-3315686d77b4@pengutronix.de>
-Date:   Tue, 10 Aug 2021 09:41:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S238785AbhHJJRE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Aug 2021 05:17:04 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:51294 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238777AbhHJJQ7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Aug 2021 05:16:59 -0400
+Received: from zn.tnic (p200300ec2f0d65002f77173b43e63b63.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:6500:2f77:173b:43e6:3b63])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 32D221EC01B7;
+        Tue, 10 Aug 2021 11:16:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1628586988;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=7e+HGcOHJ96LFGWVJDME/h9ZcJWYWo7cdlDC8qUJl3Y=;
+        b=Hyiz6S9AveiAXpd7wTU8ZQM3+2JzRq/DaHuPlGM6Ou7O3jgv8sL12UwwrJ4VIDwUeR4O4e
+        8rTFGfeQxlxvrrg48r/pEYoZKC6y5SNfI3wKzdZhG+F/3Q644VAtkWyXNFnTR31GmiYIKZ
+        EGsiOkk1vDviIZy1rZDkLdz0L+2ypxY=
+Date:   Tue, 10 Aug 2021 11:17:07 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 02/36] x86/sev: Save the negotiated GHCB
+ version
+Message-ID: <YRJEE6C/NC3Epa8G@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-3-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <YRGdBiJQ3xqZAT4w@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <20210707181506.30489-3-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Eric,
+On Wed, Jul 07, 2021 at 01:14:32PM -0500, Brijesh Singh wrote:
+> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
+> index 114f62fe2529..19c2306ac02d 100644
+> --- a/arch/x86/kernel/sev-shared.c
+> +++ b/arch/x86/kernel/sev-shared.c
+> @@ -14,6 +14,15 @@
+>  #define has_cpuflag(f)	boot_cpu_has(f)
+>  #endif
+>  
+> +/*
+> + * Since feature negotiation related variables are set early in the boot
+> + * process they must reside in the .data section so as not to be zeroed
+> + * out when the .bss section is later cleared.
+> + *
+> + * GHCB protocol version negotiated with the hypervisor.
+> + */
+> +static u16 ghcb_version __section(".data..ro_after_init");
 
-On 09.08.21 23:24, Eric Biggers wrote:
-> Hi Ahmad,
-> 
-> This generally looks okay, but I have some comments below.
-> 
-> On Fri, Aug 06, 2021 at 05:09:28PM +0200, Ahmad Fatoum wrote:
->> Kernel trusted keys don't require userspace knowledge of the raw key
->> material and instead export a sealed blob, which can be persisted to
->> unencrypted storage. Userspace can then load this blob into the kernel,
->> where it's unsealed and from there on usable for kernel crypto.
-> 
-> Please be explicit about where and how the keys get generated in this case.
-
-I intentionally avoided talking about this. You see, the trusted key documentation[1]
-phrases it as "all keys are created in the kernel", but you consider
-"'The key material is generated
- within the kernel' [a] misleading claim'. [2]
-
-Also, I hope patches to force kernel RNG and CAAM support (using kernel RNG as
-default) will soon be accepted, which would invalidate any further claims in the
-commit message without a means to correct them.
-
-I thus restricted my commit message to the necessary bit that are needed to
-understand the patch, which is: userspace knowledge of the key material is
-not required. If you disagree, could you provide me the text you'd prefer?
-
->> This is incompatible with fscrypt, where userspace is supposed to supply
->> the raw key material. For TPMs, a work around is to do key unsealing in
->> userspace, but this may not be feasible for other trusted key backends.
-> 
-> As far as I can see, "Key unsealing in userspace" actually is the preferred way
-> to implement TPM-bound encryption.  So it doesn't seem fair to call it a "work
-> around".
-
-In the context of *kernel trusted keys*, direct interaction with the TPM
-outside the kernel to decrypt a kernel-encrypted blob is surely not the
-preferred way.
-
-For TPM-bound encryption completely in userspace? Maybe. But that's not
-what this patch is about. It's about kernel trusted keys and offloading
-part of its functionality to userspace to _work around_ lack of kernel-side
-integration is exactly that: a _work around_.
-
->> +  Most users leave this 0 and specify the raw key directly.
->> +  "trusted" keys are useful to leverage kernel support for sealing
->> +  and unsealing key material. Sealed keys can be persisted to
->> +  unencrypted storage and later be used to decrypt the file system
->> +  without requiring userspace to have knowledge of the raw key
->> +  material.
->> +  "fscrypt-provisioning" key support is intended mainly to allow
->> +  re-adding keys after a filesystem is unmounted and re-mounted,
->>    without having to store the raw keys in userspace memory.
->>  
->>  - ``raw`` is a variable-length field which must contain the actual
->>    key, ``raw_size`` bytes long.  Alternatively, if ``key_id`` is
->>    nonzero, then this field is unused.
->>  
->> +.. note::
->> +
->> +   Users should take care not to reuse the fscrypt key material with
->> +   different ciphers or in multiple contexts as this may make it
->> +   easier to deduce the key.
->> +   This also applies when the key material is supplied indirectly
->> +   via a kernel trusted key. In this case, the trusted key should
->> +   perferably be used only in a single context.
-> 
-> Again, please be explicit about key generation.  Note that key generation is
-> already discussed in a different section, "Master Keys".  There should be a
-> mention of trusted keys there.  The above note about not reusing keys probably
-> belongs there too.  (The section you're editing here is
-> "FS_IOC_ADD_ENCRYPTION_KEY", which is primarily intended to just document the
-> ioctl, so it's not necessarily the best place for this type of information.)
-
-Yes. The content of the note is more appropriate there.
-
->> @@ -577,28 +578,44 @@ static int get_keyring_key(u32 key_id, u32 type,
->>  	key_ref_t ref;
->>  	struct key *key;
->>  	const struct fscrypt_provisioning_key_payload *payload;
->> -	int err;
->> +	int err = 0;
->>  
->>  	ref = lookup_user_key(key_id, 0, KEY_NEED_SEARCH);
->>  	if (IS_ERR(ref))
->>  		return PTR_ERR(ref);
->>  	key = key_ref_to_ptr(ref);
->>  
->> -	if (key->type != &key_type_fscrypt_provisioning)
->> -		goto bad_key;
->> -	payload = key->payload.data[0];
->> +	if (key->type == &key_type_fscrypt_provisioning) {
-> 
-> This function is getting long; it probably should be broken this up into several
-> functions.  E.g.:
-
-Will do for v3.
-
-> static int get_keyring_key(u32 key_id, u32 type,
->                            struct fscrypt_master_key_secret *secret)
-> {
->         key_ref_t ref;
->         struct key *key;
->         int err;
-> 
->         ref = lookup_user_key(key_id, 0, KEY_NEED_SEARCH);
->         if (IS_ERR(ref))
->                 return PTR_ERR(ref);
->         key = key_ref_to_ptr(ref);
-> 
->         if (key->type == &key_type_fscrypt_provisioning) {
->                 err = fscrypt_get_provisioning_key(key, type, secret);
->         } else if (IS_REACHABLE(CONFIG_TRUSTED_KEYS) &&
->                    key->type == &key_type_trusted) {
->                 err = fscrypt_get_trusted_key(key, secret);
->         } else {
->                 err = -EKEYREJECTED;
->         }
->         key_ref_put(ref);
->         return err;
-> }
-> 
->> +		/* Don't allow fscrypt v1 keys to be used as v2 keys and vice versa. */
-> 
-> Please avoid overly-long lines.
-
-For v3 with helper functions, there will be one indentation level less,
-so this will be less 79 again instead of 87.
-
-> 
->> +		tkp = key->payload.data[0];
->> +		if (!tkp || tkp->key_len < FSCRYPT_MIN_KEY_SIZE ||
->> +		    tkp->key_len > FSCRYPT_MAX_KEY_SIZE) {
->> +			up_read(&key->sem);
->> +			err = -EINVAL;
->> +			goto out_put;
->> +		}
-> 
-> What does the !tkp case mean?  For "user" and "logon" keys it means "key
-> revoked", but the "trusted" key type doesn't implement revoke.  Is this included
-> just to be safe?
-
-Oh, good point. I think I cargo-culted it off encrypted key support for
-eCryptfs and dm-crypt. Encrypted keys don't support revoke either..
-
-That might be reasonable, but perhaps the error code in that
-> case (but not the invalid length cases) should be -EKEYREVOKED instead?
-
-Yes. It was like this for v1, but I missed it when dropping the
-dependency on the key_extract_material patch. Will fix for v3.
-
-[1]: https://www.kernel.org/doc/html/v5.14-rc5/security/keys/trusted-encrypted.html
-[2]: https://lore.kernel.org/linux-fscrypt/YQLzOwnPF1434kUk@gmail.com/
-
-
-Cheers and thanks for the review,
-Ahmad
-
-
-> 
-> - Eric
-> 
-
+There's a define for that section specifier: __ro_after_init
 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
