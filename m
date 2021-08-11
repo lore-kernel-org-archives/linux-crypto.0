@@ -2,66 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D36EEC4338F
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 19:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15ADEC4338F
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 20:12:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A78D860F21
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 19:11:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6DEB60EB5
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 20:12:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229802AbhHKTLg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Aug 2021 15:11:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39004 "EHLO
+        id S231377AbhHKUNI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Aug 2021 16:13:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbhHKTLf (ORCPT
+        with ESMTP id S229655AbhHKUNI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Aug 2021 15:11:35 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEE87C061765;
-        Wed, 11 Aug 2021 12:11:11 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id k9so5296509edr.10;
-        Wed, 11 Aug 2021 12:11:11 -0700 (PDT)
+        Wed, 11 Aug 2021 16:13:08 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FB46C061765;
+        Wed, 11 Aug 2021 13:12:44 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id n32so1962815wms.2;
+        Wed, 11 Aug 2021 13:12:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:subject:to:cc:references:message-id:date:user-agent
+        h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lAVdRx8rVAjw15yYg5jd7VMToET9O633GZgFgh52dVg=;
-        b=DA9mbXuBxYWj7+ua8E6uQ5C8JSMI+m5xoTojHyv1T/gvnw5jeFQVk8YOJgB8B2NpUe
-         Ux/Xj9alDzEqcloFr2+aTKhrXSsG7YY05pncG7dPd+i9RswdvSz2mwEQsQY/tafyfcVP
-         DcNDRztzG7Ifj/wc9nS7XeUnU1wqS8lPxA5xFKT3xewLTaBSSwOyxAL3VyDtuecjtndJ
-         1W0fpw3/OEM1G4LUFlS1JUj9LXHV8iEgl7Zo2r24l1j9GM101q9P4BLEc5Me2OXe0P31
-         M4TN6HDa7tjKV3kSDXvj8wmJwBg00i4FDks8g4NoqQKDlad8YtOaN94w6grjPd75EqdH
-         e0AQ==
+        bh=qtbH24sys0A+E+TreCMzv6nq61b8pVYX9klQznBRbB8=;
+        b=HYQhInI2mDD9u/AjCPBMCdwFVimviA3NE3D3JSF80rJugdwzsE6lq0df+NfkWF7ymU
+         Q79lulXSORu8Ju7M+Vl+5BC6lUitS/Q+TenH4YirRnAlFE47jWbExccqcVuBJ9IP4Qyw
+         ZG6wnTvrEj/D3LHRein7jgFUbwqM6Z3GkEoXCEw8Gn79TNCkei7S8B40LU6IATtv8Up2
+         qI4tb1Z59ftvNSynMzardm5k8Amyvi48Upv4j+tISO6K3QsRgp40LGxglLCtfcpfzRLJ
+         hArJcfivS35drmmsDQfHiiVDZHYT35Uw84i+zpsVEsn4HO5OfzVHzE8abhJ7yVZEY3EF
+         hGfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=lAVdRx8rVAjw15yYg5jd7VMToET9O633GZgFgh52dVg=;
-        b=sWK9YvpIdsQDqV5h6wPo+/TgEjLMkNiReivwCkZbu3sS8wLdCbE9pszOCvxPVJVmwu
-         TJH1zN0aUHbeAhc5ZRNgTK8ftzbRCNjViiFnnKqEvQaHltu8uyF7oieKBtWoOdMJbBwQ
-         YPX03iGQgdibVSKPpNX4FL78ftmSrZ2h9A3ALsViBRK7jf8oa2LrZvGQBSCHNLLHrwZI
-         6pCe8wFrWOqLipX+lHN5hTEftUURUQnh1iaNFtPoerWGGO/KvN7JTRYI5ZUNBG2PX6ID
-         N6s2fJY1RoLQo4tTcpVLhp1nigggL+IHCdsEIqtlHw7GXV750L9ka5JwjImCY+F5DfOj
-         yRQg==
-X-Gm-Message-State: AOAM532GH/CFmWUs7QPRRedydS556dZCMTOIADagUrzaWtAYe1h0Xt82
-        6ZteLPZU3b4yQo3oe/9tghk=
-X-Google-Smtp-Source: ABdhPJxsc3ca7mnoHqKpnNSxclnTyX85FrZpIgAy3sJ2UVM9yLWlN0i30DxTjiefb1gBBDbOMcR0Kw==
-X-Received: by 2002:a05:6402:184b:: with SMTP id v11mr478907edy.267.1628709070407;
-        Wed, 11 Aug 2021 12:11:10 -0700 (PDT)
-Received: from ?IPv6:2a04:241e:502:1d80:48ac:8fee:19a2:adc6? ([2a04:241e:502:1d80:48ac:8fee:19a2:adc6])
-        by smtp.gmail.com with ESMTPSA id u2sm94423ejc.61.2021.08.11.12.11.08
+        bh=qtbH24sys0A+E+TreCMzv6nq61b8pVYX9klQznBRbB8=;
+        b=OAq+AIZviMSH55/e2daOWR89VQoEfxsob6y9VHVscEL7EgOuT008NH1v2KCfxu2yTx
+         GxJUvV4UFtr0+WEGa8g49Y9eihpYKZp/+ADcI4l5GGfUrb+QBhfLqq8VMJOz4UnI/4K1
+         g8fvpIEKySsO0jUpW36upYI5GGUFjWjJpUuR1Xv7bUrtPHYPhhICcAH7esJaYGRSyarg
+         UNb9Y/E5phl2CkQzrPd7sAd5fBcjFSbNqKqf6DwQPG30/udISS1K0MIGl4ZxasLQv0jH
+         sly5jdI4EbpOhn9DgZJsSyjuhWlme7xJ1hojf/uuv7dqKsSxZm3RphgsS5pUFdn6z1/8
+         elHw==
+X-Gm-Message-State: AOAM533RuEV3kI/zhjEy4mxlfP2TOZ/LEwyzhQ2gk+y+EkTeD19v/DNd
+        w/SvYZYtoUuafXPCSnRk2eY=
+X-Google-Smtp-Source: ABdhPJy0lnP4+OJ/68HRlO5b+lZtYimvhGFmZartwqv30KJ6RNjGNFvMjYCS73wNAFax5o9eiNQjMw==
+X-Received: by 2002:a05:600c:20f:: with SMTP id 15mr303065wmi.176.1628712762677;
+        Wed, 11 Aug 2021 13:12:42 -0700 (PDT)
+Received: from ?IPv6:2a02:8084:e84:2480:228:f8ff:fe6f:83a8? ([2a02:8084:e84:2480:228:f8ff:fe6f:83a8])
+        by smtp.gmail.com with ESMTPSA id n30sm448596wra.1.2021.08.11.13.12.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Aug 2021 12:11:09 -0700 (PDT)
-From:   Leonard Crestez <cdleonard@gmail.com>
+        Wed, 11 Aug 2021 13:12:42 -0700 (PDT)
 Subject: Re: [RFCv2 1/9] tcp: authopt: Initial support and key management
 To:     David Ahern <dsahern@gmail.com>,
-        Leonard Crestez <cdleonard@gmail.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>
+        Leonard Crestez <cdleonard@gmail.com>
 Cc:     Eric Dumazet <edumazet@google.com>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -84,63 +83,96 @@ References: <cover.1628544649.git.cdleonard@gmail.com>
  <67c1471683200188b96a3f712dd2e8def7978462.1628544649.git.cdleonard@gmail.com>
  <CAJwJo6aicw_KGQSM5U1=0X11QfuNf2dMATErSymytmpf75W=tA@mail.gmail.com>
  <1e2848fb-1538-94aa-0431-636fa314a36d@gmail.com>
- <8d656f85-6f66-6c40-c4af-b05c6639b9ab@gmail.com>
-Message-ID: <18235a42-72ad-8471-c940-c70b476cf0e0@gmail.com>
-Date:   Wed, 11 Aug 2021 22:11:08 +0300
+ <68749e37-8e29-7a51-2186-7692f5fd6a79@gmail.com>
+ <ac911d47-eef7-c97b-9a77-f386546b56e8@gmail.com>
+From:   Dmitry Safonov <0x7f454c46@gmail.com>
+Message-ID: <2c39e02b-1da5-7a62-512e-67f008fe15fc@gmail.com>
+Date:   Wed, 11 Aug 2021 21:12:41 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <8d656f85-6f66-6c40-c4af-b05c6639b9ab@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+In-Reply-To: <ac911d47-eef7-c97b-9a77-f386546b56e8@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11.08.2021 16:42, David Ahern wrote:
-> On 8/11/21 2:29 AM, Leonard Crestez wrote:
->> On 8/10/21 11:41 PM, Dmitry Safonov wrote:
->>> Hi Leonard,
+Hi David,
+
+On 8/11/21 6:15 PM, David Ahern wrote:
+> On 8/11/21 8:31 AM, Dmitry Safonov wrote:
+>> On 8/11/21 9:29 AM, Leonard Crestez wrote:
+>>> On 8/10/21 11:41 PM, Dmitry Safonov wrote:
+[..]
+>>>> I'm pretty sure it's not a good choice to write partly tcp_authopt.
+>>>> And a user has no way to check what's the correct len on this kernel.
+>>>> Instead of len = min_t(unsigned int, len, sizeof(info)), it should be
+>>>> if (len != sizeof(info))
+>>>>      return -EINVAL;
 >>>
->>> On Tue, 10 Aug 2021 at 02:50, Leonard Crestez <cdleonard@gmail.com>
->>> wrote:
->>> [..]
->>>> +/* Representation of a Master Key Tuple as per RFC5925 */
->>>> +struct tcp_authopt_key_info {
->>>> +       struct hlist_node node;
->>>> +       /* Local identifier */
->>>> +       u32 local_id;
->>>
->>> There is no local_id in RFC5925, what's that?
->>> An MKT is identified by (send_id, recv_id), together with
->>> (src_addr/src_port, dst_addr/dst_port).
->>> Why introducing something new to already complicated RFC?
+>>> Purpose is to allow sockopts to grow as md5 has grown.
 >>
->> It was there to simplify user interface and initial implementation.
+>> md5 has not grown. See above.
+> 
+> MD5 uapi has - e.g., 8917a777be3ba and  6b102db50cdde. We want similar
+> capabilities for growth with this API.
+
+So, you mean adding a new setsockopt when the struct has to be extended?
+Like TCP_AUTHOPT_EXT?
+
+It can work, but sounds like adding a new syscall every time the old one
+can't be extended. I can see that with current limitations on TCP-AO RFC
+the ABI in these patches will have to be extended.
+
+The second commit started using new cmd.tcpm_flags, where unknown flags
+are still at this moment silently ignored by the kernel. So 6b102db50cdd
+could have introduced a regression in userspace. By luck and by reason
+that md5 isn't probably frequently used it didn't.
+Not nice at all example for newer APIs.
+
+>> Another issue with your approach
 >>
->> But it seems that BGP listeners already needs to support multiple
->> keychains for different peers so identifying the key by (send_id,
->> recv_id, binding) is easier for userspace to work with. Otherwise they
->> need to create their own local_id mapping internally.
+>> +       /* If userspace optlen is too short fill the rest with zeros */
+>> +       if (optlen > sizeof(opt))
+>> +               return -EINVAL;
+>> +       memset(&opt, 0, sizeof(opt));
+>> +       if (copy_from_sockptr(&opt, optval, optlen))
+>> +               return -EFAULT;
+>>
+>> is that userspace compiled with updated/grew structure will fail on
+>> older kernel. So, no extension without breaking something is possible.
+>> Which also reminds me that currently you don't validate (opt.flags) for
+>> unknown by kernel flags.
+>>
+>> Extending syscalls is impossible without breaking userspace if ABI is
+>> not designed with extensibility in mind. That was quite a big problem,
+>> and still is. Please, read this carefully:
+>> https://lwn.net/Articles/830666/
+>>
+>> That is why I'm suggesting you all those changes that will be harder to
+>> fix when/if your patches get accepted.
+>> As an example how it should work see in copy_clone_args_from_user().
 >>
 > 
-> any proposed simplification needs to be well explained and how it
-> relates to the RFC spec.
+> Look at how TCP_ZEROCOPY_RECEIVE has grown over releases as an example
+> of how to properly handle this.
 
-The local_id only exists between userspace and kernel so it's not really 
-covered by the RFC.
+Exactly.
 
-There are objections to this and it seems to be unhelpful for userspace 
-zo I will replace it with match by binding.
+: switch (len) {
+:		case offsetofend(...)
+:		case offsetofend(...)
 
-BTW: another somewhat dubious simplification is that I offloaded the RFC 
-requirement to never add overlapping keys to userspace. So if userspace 
-adds keys with same recvid that match the same TCP 4-tuple then 
-connections will just start failing.
+And than also:
+:		if (unlikely(len > sizeof(zc))) {
+:			err = check_zeroed_user(optval + sizeof(zc),
+:						len - sizeof(zc));
 
-It's arguably fine to allow userspace misconfiguration to cause failures.
+Does it sound similar to what I've written in my ABI review?
+And what the LWN article has in it.
+Please, look again at the patch I replied to.
 
---
-Regards,
-Leonard
+Thanks,
+         Dmitry
