@@ -2,151 +2,196 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F257C4338F
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 20:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C76C3C4338F
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 21:34:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB9016054F
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 20:26:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A964A6105A
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 21:34:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231893AbhHKU0o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Aug 2021 16:26:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56524 "EHLO
+        id S232168AbhHKVfN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Aug 2021 17:35:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231898AbhHKU0n (ORCPT
+        with ESMTP id S232166AbhHKVfN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Aug 2021 16:26:43 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 676E4C061798;
-        Wed, 11 Aug 2021 13:26:19 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id e13-20020a9d63cd0000b02904fa42f9d275so4907078otl.1;
-        Wed, 11 Aug 2021 13:26:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=atRMPRk585kmp44EvPA3njvOqwijO8Eqicy1Yu6AAtQ=;
-        b=Q97XczwR/juRLDn9dwsMuPhyHXhXU0rvySK5IWGPhmUxJ4qSMK7LuQPOom4f7rGpHO
-         +25MIyMB5aLbcGhCfKhdya07r2jMdCb0lCk66o61c4yMiCUKOy5fQzjXdhf+uT8txTlx
-         UGS7kszAbFCtVkyRDbTzDOT9aVhQH+CXxJ0d+WhFJ3Cs9Aju3WKdNcebCSM9Z4zk3oTG
-         RUqetLF9CmOZmB840TXmbQpbORSeXhc629ZOmqmyQ/mBRnuG9xLk/IbsIeHRoBIoXd3g
-         li3ZULq2luitfh90XD43tNXyHRoPzpRHTpPWkRu4AX/pwKXYhIeR66pxBIpLE5NKG56R
-         ldfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=atRMPRk585kmp44EvPA3njvOqwijO8Eqicy1Yu6AAtQ=;
-        b=qGomJlXc2Nxyvzf0YmTyJAMsRvlcxirsXtrc8b9/1VDKvA5OCsHehc8YWOXPi07s2M
-         iGqyUoYFKHsQUll0ahRU76BHHD/xUAO8dL6OD6btOA54/IBF7qT2kDv9lkjd2Cb6k9bU
-         xBlJ09mZ80jDl4JtVjAKNYFllXp1lUqoV2i6XEoLlWUJ4ez8bCaenVfodvvItQyuSDIj
-         p1RPOimYPAB6k//J+JHHqTwmscn+6lRLL5CGZyLpChf7zXvz/Rk/Gzr0bKB0BkzcD5hS
-         8j+DMxJ1v4uvrBirDpzDOtCIh2uf05ALKgltkDlrRIuYskLeQG6x2rYMOmwi5IOvSWiN
-         nJMQ==
-X-Gm-Message-State: AOAM530qaKkXCgAG1dzIVJOWEbFqDjHSYaxbftN939SGwcHOv9G429UN
-        jGwL91qRajJIjBv9KXEJPCk=
-X-Google-Smtp-Source: ABdhPJxsJ2wTOZZoyxVZgWNPbr2iVGNKDqDKvoq9Kv4gQWd/CTC0v3dXn2SEbTBkZA8S9BezlSsNxQ==
-X-Received: by 2002:a9d:1c85:: with SMTP id l5mr607195ota.5.1628713578770;
-        Wed, 11 Aug 2021 13:26:18 -0700 (PDT)
-Received: from Davids-MacBook-Pro.local ([8.48.134.45])
-        by smtp.googlemail.com with ESMTPSA id t1sm48279ooa.42.2021.08.11.13.26.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Aug 2021 13:26:18 -0700 (PDT)
-Subject: Re: [RFCv2 1/9] tcp: authopt: Initial support and key management
-To:     Leonard Crestez <cdleonard@gmail.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>
-Cc:     Eric Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
+        Wed, 11 Aug 2021 17:35:13 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C252C061765
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Aug 2021 14:34:49 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mDvs3-0005CZ-9n; Wed, 11 Aug 2021 23:34:43 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mDvrx-0001l9-Om; Wed, 11 Aug 2021 23:34:37 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mDvrx-00056u-N4; Wed, 11 Aug 2021 23:34:37 +0200
+Date:   Wed, 11 Aug 2021 23:34:05 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     Fiona Trahe <fiona.trahe@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        David Ahern <dsahern@kernel.org>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Priyaranjan Jha <priyarjha@google.com>,
-        Menglong Dong <dong.menglong@zte.com.cn>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Network Development <netdev@vger.kernel.org>,
-        Dmitry Safonov <dima@arista.com>
-References: <cover.1628544649.git.cdleonard@gmail.com>
- <67c1471683200188b96a3f712dd2e8def7978462.1628544649.git.cdleonard@gmail.com>
- <CAJwJo6aicw_KGQSM5U1=0X11QfuNf2dMATErSymytmpf75W=tA@mail.gmail.com>
- <1e2848fb-1538-94aa-0431-636fa314a36d@gmail.com>
- <8d656f85-6f66-6c40-c4af-b05c6639b9ab@gmail.com>
- <18235a42-72ad-8471-c940-c70b476cf0e0@gmail.com>
-From:   David Ahern <dsahern@gmail.com>
-Message-ID: <c268842b-c699-8d83-6b48-a2205fbf8f21@gmail.com>
-Date:   Wed, 11 Aug 2021 14:26:16 -0600
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.12.0
+        Marco Chiappero <marco.chiappero@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        qat-linux@intel.com, Bjorn Helgaas <helgaas@kernel.org>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        linux-pci@vger.kernel.org, Jack Xu <jack.xu@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH v3 6/8] crypto: qat - simplify adf_enable_aer()
+Message-ID: <20210811213405.avihazo33irdjxic@pengutronix.de>
+References: <20210811080637.2596434-1-u.kleine-koenig@pengutronix.de>
+ <20210811080637.2596434-7-u.kleine-koenig@pengutronix.de>
+ <YRO69xL+F/6Paj+I@silpixa00400314>
 MIME-Version: 1.0
-In-Reply-To: <18235a42-72ad-8471-c940-c70b476cf0e0@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="nru7sdu6ylpnbz6f"
+Content-Disposition: inline
+In-Reply-To: <YRO69xL+F/6Paj+I@silpixa00400314>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/11/21 1:11 PM, Leonard Crestez wrote:
-> On 11.08.2021 16:42, David Ahern wrote:
->> On 8/11/21 2:29 AM, Leonard Crestez wrote:
->>> On 8/10/21 11:41 PM, Dmitry Safonov wrote:
->>>> Hi Leonard,
->>>>
->>>> On Tue, 10 Aug 2021 at 02:50, Leonard Crestez <cdleonard@gmail.com>
->>>> wrote:
->>>> [..]
->>>>> +/* Representation of a Master Key Tuple as per RFC5925 */
->>>>> +struct tcp_authopt_key_info {
->>>>> +       struct hlist_node node;
->>>>> +       /* Local identifier */
->>>>> +       u32 local_id;
->>>>
->>>> There is no local_id in RFC5925, what's that?
->>>> An MKT is identified by (send_id, recv_id), together with
->>>> (src_addr/src_port, dst_addr/dst_port).
->>>> Why introducing something new to already complicated RFC?
->>>
->>> It was there to simplify user interface and initial implementation.
->>>
->>> But it seems that BGP listeners already needs to support multiple
->>> keychains for different peers so identifying the key by (send_id,
->>> recv_id, binding) is easier for userspace to work with. Otherwise they
->>> need to create their own local_id mapping internally.
->>>
->>
->> any proposed simplification needs to be well explained and how it
->> relates to the RFC spec.
-> 
-> The local_id only exists between userspace and kernel so it's not really
-> covered by the RFC.
 
-My point is that you need to document the uapi (however it ends up) and
-how it is used to achieve the intent of the RFC.
+--nru7sdu6ylpnbz6f
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> There are objections to this and it seems to be unhelpful for userspace
-> zo I will replace it with match by binding.
-> 
-> BTW: another somewhat dubious simplification is that I offloaded the RFC
-> requirement to never add overlapping keys to userspace. So if userspace
-> adds keys with same recvid that match the same TCP 4-tuple then
-> connections will just start failing.
-> 
-> It's arguably fine to allow userspace misconfiguration to cause failures.
-> 
-> -- 
-> Regards,
-> Leonard
+On Wed, Aug 11, 2021 at 12:56:39PM +0100, Giovanni Cabiddu wrote:
+> On Wed, Aug 11, 2021 at 10:06:35AM +0200, Uwe Kleine-K=C3=B6nig wrote:
+> > A struct pci_driver is supposed to be constant and assigning .err_handl=
+er
+> > once per bound device isn't really sensible. Also as the function retur=
+ns
+> > zero unconditionally let it return no value instead and simplify the
+> > callers accordingly.
+> >=20
+> > As a side effect this removes one user of struct pci_dev::driver. This
+> > member is planned to be removed.
+> >=20
+> > Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
+> Thanks Uwe for the rework.
+>=20
+> > ---
+> >  drivers/crypto/qat/qat_4xxx/adf_drv.c          |  7 ++-----
+> >  drivers/crypto/qat/qat_c3xxx/adf_drv.c         |  7 ++-----
+> >  drivers/crypto/qat/qat_c62x/adf_drv.c          |  7 ++-----
+> >  drivers/crypto/qat/qat_common/adf_aer.c        | 10 +++-------
+> >  drivers/crypto/qat/qat_common/adf_common_drv.h |  2 +-
+> >  drivers/crypto/qat/qat_dh895xcc/adf_drv.c      |  7 ++-----
+> >  6 files changed, 12 insertions(+), 28 deletions(-)
+> >=20
+> > diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat=
+/qat_4xxx/adf_drv.c
+> > index a8805c815d16..1620281a9ed8 100644
+> > --- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
+> > +++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+> > @@ -253,11 +253,7 @@ static int adf_probe(struct pci_dev *pdev, const s=
+truct pci_device_id *ent)
+> > =20
+> >  	pci_set_master(pdev);
+> > =20
+> > -	if (adf_enable_aer(accel_dev)) {
+> > -		dev_err(&pdev->dev, "Failed to enable aer.\n");
+> > -		ret =3D -EFAULT;
+> > -		goto out_err;
+> > -	}
+> > +	adf_enable_aer(accel_dev);
+> After seeing your patch, I'm thinking to get rid of both adf_enable_aer()
+> (and adf_disable_aer()) and call directly pci_enable_pcie_error_reporting=
+()
+> here.
+>=20
+> There is another patch around this area that I reworked (but not sent
+> yet - https://patchwork.kernel.org/project/linux-crypto/patch/a19132d07a6=
+5dbef5e818f84b2bc971f26cc3805.1625983602.git.christophe.jaillet@wanadoo.fr/=
+).
+> Would you mind if your patch goes through Herbert's tree?
+> If you want I can also send a reworked version.
 
+As patch #8 of my series depends on this one I think the best option is
+to create a tag and pull that into both, the pci and the crypto tree?!
+
+@Bjorn: Would you agree to this procedure? There has to be a v4, if it
+helps I can provide a signed tag for pulling?! Just tell me what would
+be helpful here.
+
+> >  	if (pci_save_state(pdev)) {
+> >  		dev_err(&pdev->dev, "Failed to save pci state.\n");
+> > @@ -310,6 +306,7 @@ static struct pci_driver adf_driver =3D {
+> >  	.probe =3D adf_probe,
+> >  	.remove =3D adf_remove,
+> >  	.sriov_configure =3D adf_sriov_configure,
+> > +	.err_handler =3D adf_err_handler,
+> Compilation fails here:
+>     drivers/crypto/qat/qat_4xxx/adf_drv.c:309:24: error: =E2=80=98adf_err=
+_handler=E2=80=99 undeclared here (not in a function)
+>       309 |         .err_handler =3D adf_err_handler,
+>           |                        ^~~~~~~~~~~~~~~
+>=20
+> Were you thinking to change it this way?
+>=20
+> 	--- a/drivers/crypto/qat/qat_common/adf_common_drv.h
+> 	+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
+> 	@@ -95,8 +95,11 @@ void adf_ae_fw_release(struct adf_accel_dev *accel_de=
+v);
+> 	 int adf_ae_start(struct adf_accel_dev *accel_dev);
+> 	 int adf_ae_stop(struct adf_accel_dev *accel_dev);
+>=20
+> 	+extern const struct pci_error_handlers adf_err_handler;
+>=20
+> 	--- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
+> 	+++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+> 	@@ -306,7 +306,7 @@ static struct pci_driver adf_driver =3D {
+> 		.probe =3D adf_probe,
+> 		.remove =3D adf_remove,
+> 		.sriov_configure =3D adf_sriov_configure,
+> 	-       .err_handler =3D adf_err_handler,
+> 	+       .err_handler =3D &adf_err_handler,
+> 	 };
+
+Yeah, the other three drivers need an adaption, too. I will send a v4 in
+the next few days. The current state is available at
+
+	https://git.pengutronix.de/git/ukl/linux pci-dedup
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=C3=B6nig         =
+   |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--nru7sdu6ylpnbz6f
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmEUQioACgkQwfwUeK3K
+7Anz8Af/SM6mdzhAVZbGFRqcWvlCSsJe3IKHavBmbozr+PbkfmOULWuZXj3pogJC
+fWz09VVMMi8XlJy2P/qmFoTsoNrQK5bKPsinvTj9jQk7lywLFXooSHoEveB7Q7eI
+VhZUw3DUZvYDliq0l5VGcAhNkQ2pjrW6D0o1AjR8o5mYArKA8o/j5pHjNqot2TC7
+QN+UFsxKCoXCiZcX1g7XT3VS25QGVMUyrgz+5JT2809GJr6cE6qC7SX2Vo5A+Bfg
+MGv/U6G4b7ZPkI55NXF8PMIrSDsNikN7R48nuaF3xqWYykt/AhkocY3jStrApO/9
+yPk4hbE6+SqYkrfNlnzXwWXbbPqnWA==
+=iuNF
+-----END PGP SIGNATURE-----
+
+--nru7sdu6ylpnbz6f--
