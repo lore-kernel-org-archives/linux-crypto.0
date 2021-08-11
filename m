@@ -2,144 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12830C4338F
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 11:56:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FE6C4338F
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 13:42:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E482860F56
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 11:56:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D21260FA0
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 13:42:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236100AbhHKL5Q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Aug 2021 07:57:16 -0400
-Received: from mga07.intel.com ([134.134.136.100]:47942 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231893AbhHKL5Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Aug 2021 07:57:16 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10072"; a="278854321"
-X-IronPort-AV: E=Sophos;i="5.84,311,1620716400"; 
-   d="scan'208";a="278854321"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2021 04:56:52 -0700
-X-IronPort-AV: E=Sophos;i="5.84,311,1620716400"; 
-   d="scan'208";a="526908984"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2021 04:56:46 -0700
-Date:   Wed, 11 Aug 2021 12:56:39 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-pci@vger.kernel.org, kernel@pengutronix.de,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        id S230360AbhHKNmo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Aug 2021 09:42:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46810 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230030AbhHKNmo (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Aug 2021 09:42:44 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0237C0613D5;
+        Wed, 11 Aug 2021 06:42:20 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id e13-20020a9d63cd0000b02904fa42f9d275so3393549otl.1;
+        Wed, 11 Aug 2021 06:42:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=hz+p4gP3lCXrc+gD0f6i+2Jz++hhSm2TSQk8dx4ur28=;
+        b=nZ2UF4T4GhHt2s2B7v/GSlVVwtT+DjhKHTiV6Wn3U8mXrGGvoY3UYvf35wcy1CCp9l
+         CxCibh/b01vnsLBIbmODsBKNO/kDYZQyopXPOilGmcf+kyAK1xbuWRjMpzQ7/gsQaWgd
+         KQ/Bm7CQsdrQpmEimCF0gRtnO9/0JD+xQEurbh8r7r76Q/ABcO3rF+WrUqNRX0lHojCQ
+         PSkm9Tq0jn4YkwyIXWOTk8AP12kJOqKxvwexxWuD3qeShQ5HkJgJr1jBAd+7JdCykhaQ
+         1N1hzET8J+mWn+F/lgrSReg0eBM9vva0ogAjQ37ZpDhe0uxvDCTtJslDu5Z4+M6Isbwe
+         oS7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=hz+p4gP3lCXrc+gD0f6i+2Jz++hhSm2TSQk8dx4ur28=;
+        b=fCYomNCdG6aOGecLPvht7ZdH9eYkiW7hLHh8W8UBHp5lklggMYKuAQM4SyU7gezOV1
+         ZlNRbLQ+Ocy1ocwuVmM1Y6VmQyWoP7ANr6bAqrVU/AwqSpnAn1SWMIBw7lTqdO7AWDFd
+         orV5ZNiDtqf3yrGF3OeDqw5X96a1fHOASOaPQpz02JfXhUVagJ6e1o07kTA+BVecqB1t
+         M7wkxeO7QlWL2KjCk/epD+GbAfO/fnUNksxg35pNReo6EXB3P/lP3sTGeePSilGN/+6Z
+         ejpGh5l1q5XqEvBGEXcYhGrT6DKUQRl9Qk8up1IP9Z+FIVQQLrliefiGJBLeM1vu7TGD
+         SysA==
+X-Gm-Message-State: AOAM532zRAPhyrw8OysCnwllvVy8kvkJaJgrO/P4bgC+NI4zxgtp0Rws
+        QdZSh9aSEdngDpAbHzz1KRM=
+X-Google-Smtp-Source: ABdhPJxdODF9OoSlnIa5RL/vRy5NZLti/s0RzpXrEpOHVCNgHsyK/KkpSQPBtALY6NwdtYHGK6Z5Sw==
+X-Received: by 2002:a9d:a72:: with SMTP id 105mr23573290otg.99.1628689340070;
+        Wed, 11 Aug 2021 06:42:20 -0700 (PDT)
+Received: from Davids-MacBook-Pro.local ([8.48.134.45])
+        by smtp.googlemail.com with ESMTPSA id w13sm2730559otl.41.2021.08.11.06.42.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Aug 2021 06:42:19 -0700 (PDT)
+Subject: Re: [RFCv2 1/9] tcp: authopt: Initial support and key management
+To:     Leonard Crestez <cdleonard@gmail.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>
+Cc:     Eric Dumazet <edumazet@google.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Jack Xu <jack.xu@intel.com>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 6/8] crypto: qat - simplify adf_enable_aer()
-Message-ID: <YRO69xL+F/6Paj+I@silpixa00400314>
-References: <20210811080637.2596434-1-u.kleine-koenig@pengutronix.de>
- <20210811080637.2596434-7-u.kleine-koenig@pengutronix.de>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        David Ahern <dsahern@kernel.org>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Priyaranjan Jha <priyarjha@google.com>,
+        Menglong Dong <dong.menglong@zte.com.cn>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>,
+        Dmitry Safonov <dima@arista.com>
+References: <cover.1628544649.git.cdleonard@gmail.com>
+ <67c1471683200188b96a3f712dd2e8def7978462.1628544649.git.cdleonard@gmail.com>
+ <CAJwJo6aicw_KGQSM5U1=0X11QfuNf2dMATErSymytmpf75W=tA@mail.gmail.com>
+ <1e2848fb-1538-94aa-0431-636fa314a36d@gmail.com>
+From:   David Ahern <dsahern@gmail.com>
+Message-ID: <8d656f85-6f66-6c40-c4af-b05c6639b9ab@gmail.com>
+Date:   Wed, 11 Aug 2021 07:42:17 -0600
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.12.0
 MIME-Version: 1.0
+In-Reply-To: <1e2848fb-1538-94aa-0431-636fa314a36d@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210811080637.2596434-7-u.kleine-koenig@pengutronix.de>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 11, 2021 at 10:06:35AM +0200, Uwe Kleine-König wrote:
-> A struct pci_driver is supposed to be constant and assigning .err_handler
-> once per bound device isn't really sensible. Also as the function returns
-> zero unconditionally let it return no value instead and simplify the
-> callers accordingly.
+On 8/11/21 2:29 AM, Leonard Crestez wrote:
+> On 8/10/21 11:41 PM, Dmitry Safonov wrote:
+>> Hi Leonard,
+>>
+>> On Tue, 10 Aug 2021 at 02:50, Leonard Crestez <cdleonard@gmail.com>
+>> wrote:
+>> [..]
+>>> +/* Representation of a Master Key Tuple as per RFC5925 */
+>>> +struct tcp_authopt_key_info {
+>>> +       struct hlist_node node;
+>>> +       /* Local identifier */
+>>> +       u32 local_id;
+>>
+>> There is no local_id in RFC5925, what's that?
+>> An MKT is identified by (send_id, recv_id), together with
+>> (src_addr/src_port, dst_addr/dst_port).
+>> Why introducing something new to already complicated RFC?
 > 
-> As a side effect this removes one user of struct pci_dev::driver. This
-> member is planned to be removed.
+> It was there to simplify user interface and initial implementation.
 > 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-Thanks Uwe for the rework.
-
-> ---
->  drivers/crypto/qat/qat_4xxx/adf_drv.c          |  7 ++-----
->  drivers/crypto/qat/qat_c3xxx/adf_drv.c         |  7 ++-----
->  drivers/crypto/qat/qat_c62x/adf_drv.c          |  7 ++-----
->  drivers/crypto/qat/qat_common/adf_aer.c        | 10 +++-------
->  drivers/crypto/qat/qat_common/adf_common_drv.h |  2 +-
->  drivers/crypto/qat/qat_dh895xcc/adf_drv.c      |  7 ++-----
->  6 files changed, 12 insertions(+), 28 deletions(-)
+> But it seems that BGP listeners already needs to support multiple
+> keychains for different peers so identifying the key by (send_id,
+> recv_id, binding) is easier for userspace to work with. Otherwise they
+> need to create their own local_id mapping internally.
 > 
-> diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-> index a8805c815d16..1620281a9ed8 100644
-> --- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
-> +++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-> @@ -253,11 +253,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  
->  	pci_set_master(pdev);
->  
-> -	if (adf_enable_aer(accel_dev)) {
-> -		dev_err(&pdev->dev, "Failed to enable aer.\n");
-> -		ret = -EFAULT;
-> -		goto out_err;
-> -	}
-> +	adf_enable_aer(accel_dev);
-After seeing your patch, I'm thinking to get rid of both adf_enable_aer()
-(and adf_disable_aer()) and call directly pci_enable_pcie_error_reporting()
-here.
 
-There is another patch around this area that I reworked (but not sent
-yet - https://patchwork.kernel.org/project/linux-crypto/patch/a19132d07a65dbef5e818f84b2bc971f26cc3805.1625983602.git.christophe.jaillet@wanadoo.fr/).
-Would you mind if your patch goes through Herbert's tree?
-If you want I can also send a reworked version.
+any proposed simplification needs to be well explained and how it
+relates to the RFC spec.
 
->  	if (pci_save_state(pdev)) {
->  		dev_err(&pdev->dev, "Failed to save pci state.\n");
-> @@ -310,6 +306,7 @@ static struct pci_driver adf_driver = {
->  	.probe = adf_probe,
->  	.remove = adf_remove,
->  	.sriov_configure = adf_sriov_configure,
-> +	.err_handler = adf_err_handler,
-Compilation fails here:
-    drivers/crypto/qat/qat_4xxx/adf_drv.c:309:24: error: ‘adf_err_handler’ undeclared here (not in a function)
-      309 |         .err_handler = adf_err_handler,
-          |                        ^~~~~~~~~~~~~~~
-
-Were you thinking to change it this way?
-
-	--- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-	+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-	@@ -95,8 +95,11 @@ void adf_ae_fw_release(struct adf_accel_dev *accel_dev);
-	 int adf_ae_start(struct adf_accel_dev *accel_dev);
-	 int adf_ae_stop(struct adf_accel_dev *accel_dev);
-
-	+extern const struct pci_error_handlers adf_err_handler;
-
-	--- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
-	+++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-	@@ -306,7 +306,7 @@ static struct pci_driver adf_driver = {
-		.probe = adf_probe,
-		.remove = adf_remove,
-		.sriov_configure = adf_sriov_configure,
-	-       .err_handler = adf_err_handler,
-	+       .err_handler = &adf_err_handler,
-	 };
-
-I think the main reason why the driver was dereferencing the pci_driver
-in adf_enable_aer() was to avoid that extern struct in adf_common_drv.h.
-I am ok with that. Any objections from others?
-
-Regards,
-
--- 
-Giovanni
