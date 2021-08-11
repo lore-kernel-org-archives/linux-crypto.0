@@ -2,116 +2,165 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0889BC4320A
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 00:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36DD8C4338F
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 05:57:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAFDB61019
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 00:17:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1578960F22
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 05:57:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235698AbhHKASJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Aug 2021 20:18:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34146 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235680AbhHKASI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Aug 2021 20:18:08 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3A02360FD9;
-        Wed, 11 Aug 2021 00:17:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628641065;
-        bh=vS0O2G4UqYCFp5XbO0UvX+Z3o0P/EBLHkKPuQEwAbYc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=m90I8MFYojVSKUZbGrXDKIJU8CpLr0ZkbA+yZJ31ujVzplnqw+lVK5V/WFofFfbtY
-         YJl9Jd8kVgfFQCL9hbNlX9aweGNOlBnrqZIJ9e4oC+6oIVBy1U/VedMB5GddqhD3LM
-         cln6DPrUnDQhiyi5vhboXLklmcr7o5JtK2kL7kOfy0PeZSNFlhfb9Re4Gf4Vihz9mv
-         lHRW2GirAxlHKqUc/U3nW1jlQjlQpWkfZslp8ai02bxlodrclzFuu6nWxKjArgLu7y
-         zDLZrBbiQgbtJxOd4J3SbyVFFzZXbcQASgAcBjkavW6dgY3w08MWp3qldid9INCFEL
-         aFjN4yuBuj1TQ==
-Date:   Wed, 11 Aug 2021 03:17:43 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
+        id S234530AbhHKF6A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Aug 2021 01:58:00 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:36784 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234443AbhHKF6A (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Aug 2021 01:58:00 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id DB69B20107;
+        Wed, 11 Aug 2021 05:57:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1628661454; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3oVlfmojhP1VKbUc1oJoNsFUWAdYnTN2i6sVfH7jUz0=;
+        b=hd3+O3kSdPcSNYP4w9t3VogbYZB23QtnFEnyhGj+qNZUKBc1nzq9/vXNy0STKyjItZ+bv2
+        9PxbkX7KDaWHUn+ep5uey8ieS/x+0AVkLvc03DpEjYlD3CnPHlVv2zG8wtYIcSh6pGzZiU
+        ED11s29jZZpsh5k5q7pnw10KixMPHtw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1628661454;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3oVlfmojhP1VKbUc1oJoNsFUWAdYnTN2i6sVfH7jUz0=;
+        b=JSkV3FFcnOtD9EdLnT74bkcchYXL9SCc5lWjc3+U6YFbzNkDyIkU/O3SlwG3ZmmAGjHoFD
+        oQfMPjzKrn7clTBw==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 62D74137DA;
+        Wed, 11 Aug 2021 05:57:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id x0N8Fs5mE2GoTgAAGKfGzw
+        (envelope-from <hare@suse.de>); Wed, 11 Aug 2021 05:57:34 +0000
+Subject: Re: [PATCH 04/13] lib/base64: RFC4648-compliant base64 encoding
 To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, kernel@pengutronix.de,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        David Howells <dhowells@redhat.com>,
-        linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] fscrypt: support trusted keys
-Message-ID: <20210811001743.ofzkwdwa6rcjsf4d@kernel.org>
-References: <20210806150928.27857-1-a.fatoum@pengutronix.de>
- <20210809094408.4iqwsx77u64usfx6@kernel.org>
- <YRGVcaquAJiuc8bp@gmail.com>
- <20210810180636.vqwaeftv7alsodgn@kernel.org>
- <YRLJmaafp941uOdA@gmail.com>
- <20210810212140.sdq5dq2wy5uaj7h7@kernel.org>
- <YRLvPJehAeMiYb2Z@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@wdc.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
+References: <20210810124230.12161-1-hare@suse.de>
+ <20210810124230.12161-5-hare@suse.de> <YRLP5JuQrF/SJPBt@gmail.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <f3fc5af2-835c-4cb4-4715-9c95a359002c@suse.de>
+Date:   Wed, 11 Aug 2021 07:57:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YRLvPJehAeMiYb2Z@gmail.com>
+In-Reply-To: <YRLP5JuQrF/SJPBt@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 02:27:24PM -0700, Eric Biggers wrote:
-> On Wed, Aug 11, 2021 at 12:21:40AM +0300, Jarkko Sakkinen wrote:
-> > On Tue, Aug 10, 2021 at 11:46:49AM -0700, Eric Biggers wrote:
-> > > On Tue, Aug 10, 2021 at 09:06:36PM +0300, Jarkko Sakkinen wrote:
-> > > > > > 
-> > > > > > I don't think this is right, or at least it does not follow the pattern
-> > > > > > in [*]. I.e. you should rather use trusted key to seal your fscrypt key.
-> > > > > 
-> > > > > What's the benefit of the extra layer of indirection over just using a "trusted"
-> > > > > key directly?  The use case for "encrypted" keys is not at all clear to me.
-> > > > 
-> > > > Because it is more robust to be able to use small amount of trusted keys,
-> > > > which are not entirely software based.
-> > > > 
-> > > > And since it's also a pattern on existing kernel features utilizing trusted
-> > > > keys, the pressure here to explain why break the pattern, should be on the
-> > > > side of the one who breaks it.
-> > > 
-> > > This is a new feature, so it's on the person proposing the feature to explain
-> > > why it's useful.  The purpose of "encrypted" keys is not at all clear, and the
-> > > documentation for them is heavily misleading.  E.g.:
-> > > 
-> > >     "user space sees, stores, and loads only encrypted blobs"
-> > >     (Not necessarily true, as I've explained previously.)
-> > > 
-> > >     "Encrypted keys do not depend on a trust source" ...  "The main disadvantage
-> > >     of encrypted keys is that if they are not rooted in a trusted key"
-> > >     (Not necessarily true, and in fact it seems they're only useful when they
-> > >     *do* depend on a trust source.  At least that's the use case that is being
-> > >     proposed here, IIUC.)
-> > > 
-> > > I do see a possible use for the layer of indirection that "encrypted" keys are,
-> > > which is that it would reduce the overhead of having lots of keys be directly
-> > > encrypted by the TPM/TEE/CAAM.  Is this the use case?  If so, it needs to be
-> > > explained.
-> > 
-> > If trusted keys are used directly, it's an introduction of a bottleneck.
-> > If they are used indirectly, you can still choose to have one trusted
-> > key per fscrypt key.
-> > 
-> > Thus, it's obviously a bad idea to use them directly.
-> > 
+On 8/10/21 9:13 PM, Eric Biggers wrote:
+> On Tue, Aug 10, 2021 at 02:42:21PM +0200, Hannes Reinecke wrote:
+>> Add RFC4648-compliant base64 encoding and decoding routines.
+>>
+>> Signed-off-by: Hannes Reinecke <hare@suse.de>
+>> ---
+>>   include/linux/base64.h |  16 ++++++
+>>   lib/Makefile           |   2 +-
+>>   lib/base64.c           | 115 +++++++++++++++++++++++++++++++++++++++++
+>>   3 files changed, 132 insertions(+), 1 deletion(-)
+>>   create mode 100644 include/linux/base64.h
+>>   create mode 100644 lib/base64.c
+>>
+>> diff --git a/include/linux/base64.h b/include/linux/base64.h
+>> new file mode 100644
+>> index 000000000000..660d4cb1ef31
+>> --- /dev/null
+>> +++ b/include/linux/base64.h
+>> @@ -0,0 +1,16 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * base64 encoding, lifted from fs/crypto/fname.c.
+>> + */
 > 
-> So actually explain that in the documentation.  It's not obvious at all.  And
-> does this imply that the support for trusted keys in dm-crypt is a mistake?
+> As I mentioned previously, please make it very clear which variant of Base64 it
+> is (including whether padding is included and required or not), and update all
+> the comments accordingly.  I've done so in fs/crypto/fname.c with
+> https://lkml.kernel.org/r/20210718000125.59701-1-ebiggers@kernel.org.  It would
+> probably be best to start over with a copy of that and modify it accordingly to
+> implement the desired variant of Base64.
+> 
+Hmm. Looking into it.
 
-Looking at dm-crypt implementation, you can choose to use 'encrypted' key
-type, which you can seal with a trusted key.
+>> +/**
+>> + * base64_decode() - base64-decode some bytes
+>> + * @src: the base64-encoded string to decode
+>> + * @len: number of bytes to decode
+>> + * @dst: (output) the decoded bytes.
+> 
+> "@len: number of bytes to decode" is ambiguous as it could refer to either @src
+> or @dst.  I've fixed this in the fs/crypto/fname.c version.
+> 
 
-Note: I have not been involved when the feature was added to dm-crypt.
+Ok, will be updating.
 
-/Jarkko
+>> + *
+>> + * Decodes the base64-encoded bytes @src according to RFC 4648.
+>> + *
+>> + * Return: number of decoded bytes
+>> + */
+> 
+> Shouldn't this return an error if the string is invalid?  Again, see the latest
+> fs/crypto/fname.c version.
+> 
+
+Indeed, it should. Will be fixing it up.
+
+>> +int base64_decode(const char *src, int len, u8 *dst)
+>> +{
+>> +        int i, bits = 0, pad = 0;
+>> +        u32 ac = 0;
+>> +        size_t dst_len = 0;
+>> +
+>> +        for (i = 0; i < len; i++) {
+>> +                int c, p = -1;
+>> +
+>> +                if (src[i] == '=') {
+>> +                        pad++;
+>> +                        if (i + 1 < len && src[i + 1] == '=')
+>> +                                pad++;
+>> +                        break;
+>> +                }
+>> +                for (c = 0; c < strlen(lookup_table); c++) {
+> 
+> strlen() shouldn't be used in a loop condition like this.
+> 
+Why not?
+'lookup_table' is pretty much static, so where't the problem?
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
