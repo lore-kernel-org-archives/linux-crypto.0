@@ -2,135 +2,332 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0820AC4320E
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 17:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E3D1C4338F
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 19:09:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F05BB61073
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 17:16:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72D1D60F21
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 19:09:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231215AbhHKRQe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Aug 2021 13:16:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57480 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231264AbhHKRQ3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Aug 2021 13:16:29 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A77F760720;
-        Wed, 11 Aug 2021 17:16:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628702165;
-        bh=9h03uKGoS94D5joA0oQ8vjBfh49XzjEF5chJiZqRUSM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=R4lANRmD7F79aJk1QwsPA2lv4OQqEB1kpG2XjTPtoXxx6kuKdityhC7zcwKDhreDm
-         XsJtAmOJwSddjxQ448+ktoeI/eZG+BkVyc8KFEo9igVGQiUXZozh4ciYpL3BBkmy/C
-         MSYHY5jOe/mKDm+DeplA7idJPn7uEyxVgcHpr/tEE0XIP51hv1ElOHYW1uwu9jfjA+
-         5YH/uPw3qKgSzzl5x8Ds9Ib4uFTwfnJNyYHvdvJQ8gOhgKZnARoeLVfV4/WPn2nr8T
-         BtQn83YSoqFY/rAzopncT84KP1iFL+r8KclwjGHTrQL7ZQQK11C+VpuZ4WRpn9JLly
-         baVtflrGpwJlA==
-Date:   Wed, 11 Aug 2021 10:16:03 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Mimi Zohar <zohar@linux.ibm.com>
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, kernel@pengutronix.de,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        David Howells <dhowells@redhat.com>,
-        linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] fscrypt: support trusted keys
-Message-ID: <YRQF09f8st95yrFZ@gmail.com>
-References: <20210806150928.27857-1-a.fatoum@pengutronix.de>
- <20210809094408.4iqwsx77u64usfx6@kernel.org>
- <YRGVcaquAJiuc8bp@gmail.com>
- <20210810180636.vqwaeftv7alsodgn@kernel.org>
- <YRLJmaafp941uOdA@gmail.com>
- <20210810212140.sdq5dq2wy5uaj7h7@kernel.org>
- <YRLvPJehAeMiYb2Z@gmail.com>
- <20210811001743.ofzkwdwa6rcjsf4d@kernel.org>
- <d4f5c2593380c82ceebae2c8782a1c440b35f165.camel@linux.ibm.com>
+        id S229946AbhHKTJ1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Aug 2021 15:09:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38484 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229655AbhHKTJ0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Aug 2021 15:09:26 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63194C061765;
+        Wed, 11 Aug 2021 12:09:02 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id bo19so5294655edb.9;
+        Wed, 11 Aug 2021 12:09:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:subject:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=/kx99l4AFREz6kWtSe9Q0SS4hFkwUFel+RKAC9QtMoo=;
+        b=FraEamM/2irn/3FwdHRonPpAyqpBozB2aShfvrFtpJgDVkgT0jP742F/xL1whVNt8+
+         +hEnpthv1sdtAbZ4wxtXoaSrYeIjHwMO/94o8SYzZr6NEs1gPYvTDkGRkN3SqV9BJlay
+         k37WwgYRCiUry6CY5SkJehxa/LYyIvFTiHOB27EtMekizRwv8Vz8bjsmbAnPW8T16TZ3
+         /BW5c2hn260Y6GeR9OAwAOS8kCDV2muCgWdP14sskdK8MPPW7z6QDHSkDK7i/uhgMbjF
+         YIMwApRYJZQfsd8J1OOzkBPFOyG0DUWT6szlnRWKBwL2qS6qdsecyd2664KRHbwEK0BM
+         3xkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/kx99l4AFREz6kWtSe9Q0SS4hFkwUFel+RKAC9QtMoo=;
+        b=rGH7HIrQXRMF4/coQ/BS5WikKbyD7u1Lp5PTi8TTQcRfCoyYfOdpR0HXIiBpdprxeH
+         PYiT+eP3ohnNlAZanUJ3BKoNqd+VRDBtSbxWYZHvbxfE6VfzxSybsr/KQ6Tg+YOa01pH
+         VgSa7P5QKvEq8vHAVrvETJcecGuXUFeK08jd0MKVydAHrRQiqF4HcEYqKoCTkq0vElfn
+         P5hRmwCUOaU2sqmZqaqO+eRVeZ30aAAmHZZI5PGMsM64lCwpyTsG6x/l1QfY12ecUJJ8
+         2jhV43czbFgbf9xLOC+Z7TyvIVcvh2VmCJnBwEMVTrQkg3xrybbPjIEhMv+d6+qCtLUo
+         GptA==
+X-Gm-Message-State: AOAM533chReNKlj2QZGTQa9iyUaRMTdRig8NgSqxlyVsoKTcu9NYYqeI
+        266VQflk8vHu0rJ1Kif+iYA=
+X-Google-Smtp-Source: ABdhPJxiLXCb7e9rw5zJfAOg0IgJGT1m8l2QjGXe1StGYsjdZc6FYZznaZTEVN7VjSI9Od9COnyUpg==
+X-Received: by 2002:a05:6402:202:: with SMTP id t2mr529833edv.116.1628708940905;
+        Wed, 11 Aug 2021 12:09:00 -0700 (PDT)
+Received: from ?IPv6:2a04:241e:502:1d80:48ac:8fee:19a2:adc6? ([2a04:241e:502:1d80:48ac:8fee:19a2:adc6])
+        by smtp.gmail.com with ESMTPSA id p3sm100314ejy.20.2021.08.11.12.08.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Aug 2021 12:09:00 -0700 (PDT)
+From:   Leonard Crestez <cdleonard@gmail.com>
+Subject: Re: [RFCv2 1/9] tcp: authopt: Initial support and key management
+To:     Dmitry Safonov <0x7f454c46@gmail.com>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        David Ahern <dsahern@kernel.org>
+Cc:     Eric Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Priyaranjan Jha <priyarjha@google.com>,
+        Menglong Dong <dong.menglong@zte.com.cn>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>,
+        Dmitry Safonov <dima@arista.com>
+References: <cover.1628544649.git.cdleonard@gmail.com>
+ <67c1471683200188b96a3f712dd2e8def7978462.1628544649.git.cdleonard@gmail.com>
+ <CAJwJo6aicw_KGQSM5U1=0X11QfuNf2dMATErSymytmpf75W=tA@mail.gmail.com>
+ <1e2848fb-1538-94aa-0431-636fa314a36d@gmail.com>
+ <68749e37-8e29-7a51-2186-7692f5fd6a79@gmail.com>
+Message-ID: <44e5ae2b-0a9c-b5bc-19d2-f037de061944@gmail.com>
+Date:   Wed, 11 Aug 2021 22:08:57 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4f5c2593380c82ceebae2c8782a1c440b35f165.camel@linux.ibm.com>
+In-Reply-To: <68749e37-8e29-7a51-2186-7692f5fd6a79@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 11, 2021 at 07:34:18AM -0400, Mimi Zohar wrote:
-> On Wed, 2021-08-11 at 03:17 +0300, Jarkko Sakkinen wrote:
-> > On Tue, Aug 10, 2021 at 02:27:24PM -0700, Eric Biggers wrote:
-> > > On Wed, Aug 11, 2021 at 12:21:40AM +0300, Jarkko Sakkinen wrote:
-> > > > On Tue, Aug 10, 2021 at 11:46:49AM -0700, Eric Biggers wrote:
-> > > > > On Tue, Aug 10, 2021 at 09:06:36PM +0300, Jarkko Sakkinen wrote:
-> > > > > > > > 
-> > > > > > > > I don't think this is right, or at least it does not follow the pattern
-> > > > > > > > in [*]. I.e. you should rather use trusted key to seal your fscrypt key.
-> > > > > > > 
-> > > > > > > What's the benefit of the extra layer of indirection over just using a "trusted"
-> > > > > > > key directly?  The use case for "encrypted" keys is not at all clear to me.
-> > > > > > 
-> > > > > > Because it is more robust to be able to use small amount of trusted keys,
-> > > > > > which are not entirely software based.
-> > > > > > 
-> > > > > > And since it's also a pattern on existing kernel features utilizing trusted
-> > > > > > keys, the pressure here to explain why break the pattern, should be on the
-> > > > > > side of the one who breaks it.
-> > > > > 
-> > > > > This is a new feature, so it's on the person proposing the feature to explain
-> > > > > why it's useful.  The purpose of "encrypted" keys is not at all clear, and the
-> > > > > documentation for them is heavily misleading.  E.g.:
-> > > > > 
-> > > > >     "user space sees, stores, and loads only encrypted blobs"
-> > > > >     (Not necessarily true, as I've explained previously.)
-> > > > > 
-> > > > >     "Encrypted keys do not depend on a trust source" ...  "The main disadvantage
-> > > > >     of encrypted keys is that if they are not rooted in a trusted key"
-> > > > >     (Not necessarily true, and in fact it seems they're only useful when they
-> > > > >     *do* depend on a trust source.  At least that's the use case that is being
-> > > > >     proposed here, IIUC.)
-> > > > > 
-> > > > > I do see a possible use for the layer of indirection that "encrypted" keys are,
-> > > > > which is that it would reduce the overhead of having lots of keys be directly
-> > > > > encrypted by the TPM/TEE/CAAM.  Is this the use case?  If so, it needs to be
-> > > > > explained.
-> > > > 
-> > > > If trusted keys are used directly, it's an introduction of a bottleneck.
-> > > > If they are used indirectly, you can still choose to have one trusted
-> > > > key per fscrypt key.
-> > > > 
-> > > > Thus, it's obviously a bad idea to use them directly.
-> > > 
-> > > So actually explain that in the documentation.  It's not obvious at all.  And
-> > > does this imply that the support for trusted keys in dm-crypt is a mistake?
-> > 
-> > Looking at dm-crypt implementation, you can choose to use 'encrypted' key
-> > type, which you can seal with a trusted key.
-> > 
-> > Note: I have not been involved when the feature was added to dm-crypt.
+On 11.08.2021 17:31, Dmitry Safonov wrote:
+> On 8/11/21 9:29 AM, Leonard Crestez wrote:
+>> On 8/10/21 11:41 PM, Dmitry Safonov wrote:
+>>> I wonder if it's also worth saving some bytes by something like
+>>> struct tcp_ao_key *key;
+>>>
+>>> With
+>>> struct tcp_ao_key {
+>>>         u8 keylen;
+>>>         u8 key[0];
+>>> };
+>>>
+>>> Hmm?
+>>
+>> This increases memory management complexity for very minor gains. Very
+>> few tcp_authopt_key will ever be created.
 > 
-> At least for TPM 1.2,  "trusted" keys may be sealed to a PCR and then
-> extended to prevent subsequent usage.  For example, in the initramfs
-> all of the "encrypted" keys could be decrypted by a single "trusted"
-> key, before extending the PCR.
+> The change doesn't seem to be big, like:
+> --- a/net/ipv4/tcp_authopt.c
+> +++ b/net/ipv4/tcp_authopt.c
+> @@ -422,8 +422,16 @@ int tcp_set_authopt_key(struct sock *sk, sockptr_t
+> optval, unsig>
+>          key_info = __tcp_authopt_key_info_lookup(sk, info, opt.local_id);
+>          if (key_info)
+>                  tcp_authopt_key_del(sk, info, key_info);
+> +
+> +       key = sock_kmalloc(sk, sizeof(*key) + opt.keylen, GFP_KERNEL |
+> __GFP_ZERO);
+> +       if (!key) {
+> +               tcp_authopt_alg_release(alg);
+> +               return -ENOMEM;
+> +       }
+> +
+>          key_info = sock_kmalloc(sk, sizeof(*key_info), GFP_KERNEL |
+> __GFP_ZERO);
+>          if (!key_info) {
+> +               sock_kfree_s(sk, key, sizeof(*key) + opt.keylen);
+>                  tcp_authopt_alg_release(alg);
+>                  return -ENOMEM;
+>          }
 > 
-> Mimi
-> 
+> I don't know, probably it'll be enough for every user to limit their
+> keys by length of 80, but if one day it won't be enough - this ABI will
+> be painful to extend.
 
-Neither of you actually answered my question, which is whether the support for
-trusted keys in dm-crypt is a mistake.  I think you're saying that it is?  That
-would imply that fscrypt shouldn't support trusted keys, but rather encrypted
-keys -- which conflicts with Ahmad's patch which is adding support for trusted
-keys.  Note that your reasoning for this is not documented at all in the
-trusted-encrypted keys documentation; it needs to be (email threads don't really
-matter), otherwise how would anyone know when/how to use this feature?
+struct tcp_authopt_key also needs to be modified and a separate 
+copy_from_user is required. It's not very complicated but not very 
+useful either.
 
-- Eric
+>>>> +struct tcp_authopt_key {
+>>>> +       /** @flags: Combination of &enum tcp_authopt_key_flag */
+>>>> +       __u32   flags;
+>>>> +       /** @local_id: Local identifier */
+>>>> +       __u32   local_id;
+>>>> +       /** @send_id: keyid value for send */
+>>>> +       __u8    send_id;
+>>>> +       /** @recv_id: keyid value for receive */
+>>>> +       __u8    recv_id;
+>>>> +       /** @alg: One of &enum tcp_authopt_alg */
+>>>> +       __u8    alg;
+>>>> +       /** @keylen: Length of the key buffer */
+>>>> +       __u8    keylen;
+>>>> +       /** @key: Secret key */
+>>>> +       __u8    key[TCP_AUTHOPT_MAXKEYLEN];
+>>>> +       /**
+>>>> +        * @addr: Key is only valid for this address
+>>>> +        *
+>>>> +        * Ignored unless TCP_AUTHOPT_KEY_ADDR_BIND flag is set
+>>>> +        */
+>>>> +       struct __kernel_sockaddr_storage addr;
+>>>> +};
+>>>
+>>> It'll be an ABI if this is accepted. As it is - it can't support
+>>> RFC5925 fully.
+>>> Extending syscall ABI is painful. I think, even the initial ABI *must*
+>>> support
+>>> all possible features of the RFC.
+>>> In other words, there must be src_addr, src_port, dst_addr and dst_port.
+>>> I can see from docs you've written you don't want to support a mix of
+>>> different
+>>> addr/port MKTs, so you can return -EINVAL or -ENOTSUPP for any value
+>>> but zero.
+>>> This will create an ABI that can be later extended to fully support RFC.
+>>
+>> RFC states that MKT connection identifiers can be specified using ranges
+>> and wildcards and the details are up to the implementation. Keys are
+>> *NOT* just bound to a classical TCP 4-tuple.
+>>
+>> * src_addr and src_port is implicit in socket binding. Maybe in theory
+>> src_addr they could apply for a server socket bound to 0.0.0.0:PORT but
+>> userspace can just open more sockets.
+>> * dst_port is not supported by MD5 and I can't think of any useful
+>> usecase. This is either well known (179 for BGP) or auto-allocated.
+>> * tcp_md5 was recently enhanced allow a "prefixlen" for addr and
+>> "l3mdev" ifindex binding.
+>>
+>> This last point shows that the binding features people require can't be
+>> easily predicted in advance so it's better to allow the rules to be
+>> extended.
+> 
+> Yeah, I see both changes you mention went on easy way as they reused
+> existing paddings in the ABI structures.
+> Ok, if you don't want to reserve src_addr/src_port/dst_addr/dst_port,
+> than how about reserving some space for those instead?
+
+My idea was that each additional binding featurs can be added as a new 
+bit flag in tcp_authopt_key_flag and the structure extended. Older 
+applications won't pass the flag and kernel will silently accept the 
+shorter optval and you get compatibility.
+
+As far as I can tell MD5 supports binding in 3 ways:
+
+1) By dst ip address
+2) By dst ip address and prefixlen
+3) By ifindex for vrfs
+
+Current version of tcp_authopt only supports (1) but I think adding the 
+other methods isn't actually difficult at all.
+
+I'd rather not guess at future features by adding unused fields.
+
+>>> The same is about key: I don't think you need to define/use
+>>> tcp_authopt_alg.
+>>> Just use algo name - that way TCP-AO will automatically be able to use
+>>> any algo supported by crypto engine.
+>>> See how xfrm does it, e.g.:
+>>> struct xfrm_algo_auth {
+>>>       char        alg_name[64];
+>>>       unsigned int    alg_key_len;    /* in bits */
+>>>       unsigned int    alg_trunc_len;  /* in bits */
+>>>       char        alg_key[0];
+>>> };
+>>>
+>>> So you can let a user chose maclen instead of hard-coding it.
+>>> Much more extendable than what you propose.
+>>
+>> This complicates ABI and implementation with features that are not
+>> needed. I'd much rather only expose an enum of real-world tcp-ao
+>> algorithms.
+> 
+> I see it exactly the opposite way: a new enum unnecessary complicates
+> ABI, instead of passing alg_name[] to crypto engine. No need to add any
+> support in tcp-ao as the algorithms are already provided by kernel.
+> That is how it transparently works for ipsec, why not for tcp-ao?
+
+The TCP Authentication Option standard has been out there for many many 
+years now and alternative algorithms are not widely used. I think cisco 
+has a third algorithm? What you're asking for is a large extension of 
+the IETF standard.
+
+If you look at the rest of this series I had a lot of trouble with 
+crypto tfm allocation context so I had to create per-cpu pool, similar 
+to tcp-md5. Should I potentially create a pool for each alg known to 
+crypto-api?
+
+Letting use control algorithms and traffickey and mac lengths creates 
+new potential avenues for privilege escalation that need to be checked.
+
+As much as possible I would like to avoid exposing the linux crypto api 
+through TCP sockopts.
+
+I was also thinking of having a non-namespaced sysctl to disable 
+tcp_authopt by default for security reasons. Unless you're running a 
+router you should never let userspace touch these options.
+
+>>> [..]
+>>>> +#ifdef CONFIG_TCP_AUTHOPT
+>>>> +       case TCP_AUTHOPT: {
+>>>> +               struct tcp_authopt info;
+>>>> +
+>>>> +               if (get_user(len, optlen))
+>>>> +                       return -EFAULT;
+>>>> +
+>>>> +               lock_sock(sk);
+>>>> +               tcp_get_authopt_val(sk, &info);
+>>>> +               release_sock(sk);
+>>>> +
+>>>> +               len = min_t(unsigned int, len, sizeof(info));
+>>>> +               if (put_user(len, optlen))
+>>>> +                       return -EFAULT;
+>>>> +               if (copy_to_user(optval, &info, len))
+>>>> +                       return -EFAULT;
+>>>> +               return 0;
+>>>> +       }
+>>>
+>>> I'm pretty sure it's not a good choice to write partly tcp_authopt.
+>>> And a user has no way to check what's the correct len on this kernel.
+>>> Instead of len = min_t(unsigned int, len, sizeof(info)), it should be
+>>> if (len != sizeof(info))
+>>>       return -EINVAL;
+>>
+>> Purpose is to allow sockopts to grow as md5 has grown.
+> 
+> md5 has not grown. See above.
+> 
+> Another issue with your approach
+> 
+> +       /* If userspace optlen is too short fill the rest with zeros */
+> +       if (optlen > sizeof(opt))
+> +               return -EINVAL;
+> +       memset(&opt, 0, sizeof(opt));
+> +       if (copy_from_sockptr(&opt, optval, optlen))
+> +               return -EFAULT;
+> 
+> is that userspace compiled with updated/grew structure will fail on
+> older kernel. So, no extension without breaking something is possible.
+
+Userspace that needs new features and also compatibility with older 
+kernels could check something like uname.
+
+I think this is already a problem with md5: passing 
+TCP_MD5SIG_FLAG_PREFIX on an old kernel simply won't take effect and 
+that's fine.
+
+The bigger concern is to ensure that old binaries work without changes.
+
+> Which also reminds me that currently you don't validate (opt.flags) for
+> unknown by kernel flags.
+
+Not sure what you mean, it is explicitly only known flags that are 
+copied from userspace. I can make setsockopt return an error on unknown 
+flags, this will make new apps fail more explicitly on old kernels.
+
+> Extending syscalls is impossible without breaking userspace if ABI is
+> not designed with extensibility in mind. That was quite a big problem,
+> and still is. Please, read this carefully:
+> https://lwn.net/Articles/830666/
+> 
+> That is why I'm suggesting you all those changes that will be harder to
+> fix when/if your patches get accepted.
+
+Both of the sockopt structs have a "flags" field and structure expansion 
+will be accompanied by new flags. Is this not sufficient for compatibility?
