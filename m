@@ -2,188 +2,184 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6251FC4320A
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 08:44:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E97C4320A
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 10:23:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A9DC61058
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 08:44:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00A9460F41
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 10:23:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236354AbhHKIor (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Aug 2021 04:44:47 -0400
-Received: from smtp-relay-canonical-1.canonical.com ([185.125.188.121]:45764
-        "EHLO smtp-relay-canonical-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236279AbhHKIof (ORCPT
+        id S237058AbhHKKXY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Aug 2021 06:23:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55296 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237042AbhHKKXX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Aug 2021 04:44:35 -0400
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPS id 230A340652
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Aug 2021 08:44:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1628671451;
-        bh=xfBIY5y7ayvXi13bXMhUcn2KK8OyGJ2/oFr8yDw2Ddk=;
-        h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-         MIME-Version:Content-Type;
-        b=uuNIIdAn6dh1T2wWXHtUeUZG3IoVILxdJbF7vaQA7dkdRfrMNXWkRZZ2/mvklU5+s
-         wojyzPkvQI7i9MepKTGf8I5AeDI3qEFBCPoEURlJNb8OVcQJCz4Pq+4ZrTZBL00NLF
-         oxoLcbFh59vtGvzPkneSLlO5ndnHqHsALgy+xHzKCw4/JQa5n3KqEuLhrHQXycmNPX
-         O37AnHn5rc9/J+jp8r1W5YS2PsmZ9MO4wMES+uejA9Oh5DLLlkPNxFwV6sjpTAQc99
-         NJXOmCeDMq0V2lbTry030/4Wu+r7OzHXBUeQ+weK8hyhUD9xKyr7cQBCiJhFhBQ1B8
-         HUdeDJRS1lz3g==
-Received: by mail-ej1-f71.google.com with SMTP id qf6-20020a1709077f06b029057e66b6665aso396164ejc.18
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Aug 2021 01:44:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=xfBIY5y7ayvXi13bXMhUcn2KK8OyGJ2/oFr8yDw2Ddk=;
-        b=ECefs2OgWzqODSlUNm3s0kc0Z2SWAEdmCPclmAguw1E+VYrnYj42GcRoMLBGZ8uyVQ
-         PlbJpBou7zBsDkyzcXRg9/MQ0lkUCgWCNMYNUsLlhYx2p6wTxZwQf/XgogFdE85itzYe
-         Bv13eiFkZxndJmnjf9ETAuU8eDirMZZU4BXFw43BFxUP4RsAigTIvrM7ihFUn3x2Xojk
-         FaKqD/fdnOhDvbj8eBhynJJJSjAYWW59ez17E/e0yqN7P3y/L7i5OjlcZDE1VHOD6dpC
-         hDWwFddx6JDOVndbTNWdpyZSPq080M8cMxtalBnzFHbFhBAJ3MCHR4G5rv2fa/aw/Xc/
-         a/IQ==
-X-Gm-Message-State: AOAM532XfU3IdqmyFXf90H5FD2pY1pc1y1q5Hg1AFw78Ep+i0912pmZW
-        RdN+p64m+4R519mFpDpuTXI7fQrQ+5YyVBNtqivDYVuk3rj7yVGuzhRm4qrBdp0QfelUyZVa2KT
-        LYGz0EboOUrRcmrGGpShId9/4FNprFEvUc22zNEV9zw==
-X-Received: by 2002:a17:907:b09:: with SMTP id h9mr2622123ejl.278.1628671450761;
-        Wed, 11 Aug 2021 01:44:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwv7TUIBok7XHuyD2Zd18YzZSSYWehpsmAnvm6xQwKtN6nkWJ6/okvCpUEsBx3DOW3xQGbMhw==
-X-Received: by 2002:a17:907:b09:: with SMTP id h9mr2622106ejl.278.1628671450546;
-        Wed, 11 Aug 2021 01:44:10 -0700 (PDT)
-Received: from localhost.localdomain ([86.32.42.198])
-        by smtp.gmail.com with ESMTPSA id kk14sm2429708ejc.29.2021.08.11.01.44.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 01:44:10 -0700 (PDT)
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Matt Mackall <mpm@selenic.com>,
+        Wed, 11 Aug 2021 06:23:23 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AE18C061765
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Aug 2021 03:23:00 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1mDlNw-0005uA-OH; Wed, 11 Aug 2021 12:22:56 +0200
+Subject: Re: [PATCH 3/4] crypto: caam - add in-kernel interface for blob
+ generator
+To:     David Gstir <david@sigma-star.at>
+Cc:     =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
-        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH 2/2] dt-bindings: rng: convert Samsung Exynos TRNG to dtschema
-Date:   Wed, 11 Aug 2021 10:43:06 +0200
-Message-Id: <20210811084306.28740-2-krzysztof.kozlowski@canonical.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210811084306.28740-1-krzysztof.kozlowski@canonical.com>
-References: <20210811084306.28740-1-krzysztof.kozlowski@canonical.com>
+        "David S. Miller" <davem@davemloft.net>, kernel@pengutronix.de,
+        James Bottomley <jejb@linux.ibm.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+References: <cover.9fc9298fd9d63553491871d043a18affc2dbc8a8.1626885907.git-series.a.fatoum@pengutronix.de>
+ <4078060ab2e44114af8204b4defea4f3d4b9e285.1626885907.git-series.a.fatoum@pengutronix.de>
+ <796E18E6-1329-40D6-B12F-4CE6C90DD988@sigma-star.at>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+Message-ID: <7cc83edd-dc39-ee7e-d18c-30b2492247ea@pengutronix.de>
+Date:   Wed, 11 Aug 2021 12:22:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <796E18E6-1329-40D6-B12F-4CE6C90DD988@sigma-star.at>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert Samsung Exynos SoC True Random Number Generator bindings to DT
-schema format using json-schema.
+On 10.08.21 13:29, David Gstir wrote:
+> Hi Ahmad,
+> 
+>> On 21.07.2021, at 18:48, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> 
+> 
+> [...]
+> 
+>> diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blob_gen.c
+>> new file mode 100644
+>> index 000000000000..513d3f90e438
+>> --- /dev/null
+>> +++ b/drivers/crypto/caam/blob_gen.c
+>> @@ -0,0 +1,230 @@
+> 
+> [...]
+> 
+>> +
+>> +int caam_encap_blob(struct caam_blob_priv *priv, const char *keymod,
+>> +		    void *input, void *output, size_t length)
+>> +{
+>> +	u32 *desc;
+>> +	struct device *jrdev = &priv->jrdev;
+>> +	dma_addr_t dma_in, dma_out;
+>> +	struct caam_blob_job_result testres;
+>> +	size_t keymod_len = strlen(keymod);
+>> +	int ret;
+>> +
+>> +	if (length <= CAAM_BLOB_OVERHEAD || keymod_len > CAAM_BLOB_KEYMOD_LENGTH)
+> 
+> The docs for this function mention the length <= CAAM_BLOB_MAX_LEN
+> restriction. This is not checked here. Is this intended?
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
----
- .../bindings/rng/samsung,exynos5250-trng.txt  | 17 -------
- .../bindings/rng/samsung,exynos5250-trng.yaml | 44 +++++++++++++++++++
- MAINTAINERS                                   |  2 +-
- 3 files changed, 45 insertions(+), 18 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
- create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+Yes.
 
-diff --git a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
-deleted file mode 100644
-index 5a613a4ec780..000000000000
---- a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
-+++ /dev/null
-@@ -1,17 +0,0 @@
--Exynos True Random Number Generator
--
--Required properties:
--
--- compatible  : Should be "samsung,exynos5250-trng".
--- reg         : Specifies base physical address and size of the registers map.
--- clocks      : Phandle to clock-controller plus clock-specifier pair.
--- clock-names : "secss" as a clock name.
--
--Example:
--
--	rng@10830600 {
--		compatible = "samsung,exynos5250-trng";
--		reg = <0x10830600 0x100>;
--		clocks = <&clock CLK_SSS>;
--		clock-names = "secss";
--	};
-diff --git a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
-new file mode 100644
-index 000000000000..a50c34d5d199
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
-@@ -0,0 +1,44 @@
-+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/rng/samsung,exynos5250-trng.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Samsung Exynos SoC True Random Number Generator
-+
-+maintainers:
-+  - Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-+  - Łukasz Stelmach <l.stelmach@samsung.com>
-+
-+properties:
-+  compatible:
-+    const: samsung,exynos5250-trng
-+
-+  clocks:
-+    maxItems: 1
-+
-+  clock-names:
-+    items:
-+      - const: secss
-+
-+  reg:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - clocks
-+  - clock-names
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/clock/exynos5250.h>
-+
-+    rng@10830600 {
-+        compatible = "samsung,exynos5250-trng";
-+        reg = <0x10830600 0x100>;
-+        clocks = <&clock CLK_SSS>;
-+        clock-names = "secss";
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4477215ef649..ebdb07a49b02 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16398,7 +16398,7 @@ SAMSUNG EXYNOS TRUE RANDOM NUMBER GENERATOR (TRNG) DRIVER
- M:	Łukasz Stelmach <l.stelmach@samsung.com>
- L:	linux-samsung-soc@vger.kernel.org
- S:	Maintained
--F:	Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
-+F:	Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
- F:	drivers/char/hw_random/exynos-trng.c
- 
- SAMSUNG FRAMEBUFFER DRIVER
+> Since you already assert that MAX_BLOB_SIZE <= CAAM_BLOB_MAX_LEN
+> in security/keys/trusted-keys/trusted_caam.c, this will never
+> be an issue for CAAM-based trusted-keys though.
+I omitted checks in code, which are verified at compile-time.
+Would you prefer a runtime check to be added as well?
+
+>> +		return -EINVAL;
+>> +
+>> +	desc = caam_blob_alloc_desc(keymod_len);
+>> +	if (!desc) {
+>> +		dev_err(jrdev, "unable to allocate desc\n");
+>> +		return -ENOMEM;
+>> +	}
+>> +
+> 
+> [...]
+> 
+>> diff --git a/include/soc/fsl/caam-blob.h b/include/soc/fsl/caam-blob.h
+>> new file mode 100644
+>> index 000000000000..aebbc9335f64
+>> --- /dev/null
+>> +++ b/include/soc/fsl/caam-blob.h
+>> @@ -0,0 +1,56 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * Copyright (C) 2020 Pengutronix, Ahmad Fatoum <kernel@pengutronix.de>
+>> + */
+>> +
+>> +#ifndef __CAAM_BLOB_GEN
+>> +#define __CAAM_BLOB_GEN
+>> +
+>> +#include <linux/types.h>
+>> +
+>> +#define CAAM_BLOB_KEYMOD_LENGTH		16
+>> +#define CAAM_BLOB_OVERHEAD		(32 + 16)
+>> +#define CAAM_BLOB_MAX_LEN		4096
+>> +
+>> +struct caam_blob_priv;
+>> +
+>> +/** caam_blob_gen_init - initialize blob generation
+>> + *
+>> + * returns either pointer to new caam_blob_priv instance
+>> + * or error pointer
+>> + */
+>> +struct caam_blob_priv *caam_blob_gen_init(void);
+>> +
+>> +/** caam_blob_gen_init - free blob generation resources
+> 
+> s/init/exit/
+
+Oh, thanks for catching.
+
+>> + *
+>> + * @priv: instance returned by caam_blob_gen_init
+>> + */
+>> +void caam_blob_gen_exit(struct caam_blob_priv *priv);
+> 
+> 
+> Except these minor things, I noticed no issues with this whole series:
+> 
+> Reviewed-by: David Gstir <david@sigma-star.at>
+
+Thanks! Will include it with the next iteration.
+
+Cheers,
+Ahmad 
+
+
+> 
+> 
+> 
+
+
 -- 
-2.30.2
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
