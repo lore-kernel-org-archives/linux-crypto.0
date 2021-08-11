@@ -7,65 +7,64 @@ X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FE6C4338F
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 13:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36EE6C4320A
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 13:46:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D21260FA0
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 13:42:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11BBF60FDA
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Aug 2021 13:46:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230360AbhHKNmo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Aug 2021 09:42:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46810 "EHLO
+        id S231760AbhHKNrF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Aug 2021 09:47:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230030AbhHKNmo (ORCPT
+        with ESMTP id S231778AbhHKNrA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Aug 2021 09:42:44 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0237C0613D5;
-        Wed, 11 Aug 2021 06:42:20 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id e13-20020a9d63cd0000b02904fa42f9d275so3393549otl.1;
-        Wed, 11 Aug 2021 06:42:20 -0700 (PDT)
+        Wed, 11 Aug 2021 09:47:00 -0400
+Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA02C0613D5;
+        Wed, 11 Aug 2021 06:46:36 -0700 (PDT)
+Received: by mail-oi1-x22c.google.com with SMTP id y18so4650945oiv.3;
+        Wed, 11 Aug 2021 06:46:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=hz+p4gP3lCXrc+gD0f6i+2Jz++hhSm2TSQk8dx4ur28=;
-        b=nZ2UF4T4GhHt2s2B7v/GSlVVwtT+DjhKHTiV6Wn3U8mXrGGvoY3UYvf35wcy1CCp9l
-         CxCibh/b01vnsLBIbmODsBKNO/kDYZQyopXPOilGmcf+kyAK1xbuWRjMpzQ7/gsQaWgd
-         KQ/Bm7CQsdrQpmEimCF0gRtnO9/0JD+xQEurbh8r7r76Q/ABcO3rF+WrUqNRX0lHojCQ
-         PSkm9Tq0jn4YkwyIXWOTk8AP12kJOqKxvwexxWuD3qeShQ5HkJgJr1jBAd+7JdCykhaQ
-         1N1hzET8J+mWn+F/lgrSReg0eBM9vva0ogAjQ37ZpDhe0uxvDCTtJslDu5Z4+M6Isbwe
-         oS7A==
+        bh=F37GbdbG8x6zZxW7E2S3oSydVR8XSIKpd+BuclgvdbI=;
+        b=SkxDevPBNuYsMKmuMYu+kEpJ6cqAOdNJ0RImVUlmKNthWkAlhNILqnn8DXAGrBDWdQ
+         JBGGhw2htCUCV1BuDdFbj17o/+tR863Z+UvemckllRTjiq1Pe2H/yr0k/3ySZGFIYTqw
+         /aIt9FurFbCfbF+M2fRVp0ge9TWScvH980EUvc48AINQhF0ZuFjPCaQKCZV18ddmMjT6
+         1pfSmIgtTjhxFmqZYmW7Y5vUiSEYCD5aiqZm3L67bArHXYfgyvczcXgJkn/yUcLRn3kd
+         93wlloy6NjfhpDHRfX+KPQ7aakBn0urF0rF0bq5zaBsB4Jyz3CbYsj4RIszCZU5zbiiX
+         rUIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=hz+p4gP3lCXrc+gD0f6i+2Jz++hhSm2TSQk8dx4ur28=;
-        b=fCYomNCdG6aOGecLPvht7ZdH9eYkiW7hLHh8W8UBHp5lklggMYKuAQM4SyU7gezOV1
-         ZlNRbLQ+Ocy1ocwuVmM1Y6VmQyWoP7ANr6bAqrVU/AwqSpnAn1SWMIBw7lTqdO7AWDFd
-         orV5ZNiDtqf3yrGF3OeDqw5X96a1fHOASOaPQpz02JfXhUVagJ6e1o07kTA+BVecqB1t
-         M7wkxeO7QlWL2KjCk/epD+GbAfO/fnUNksxg35pNReo6EXB3P/lP3sTGeePSilGN/+6Z
-         ejpGh5l1q5XqEvBGEXcYhGrT6DKUQRl9Qk8up1IP9Z+FIVQQLrliefiGJBLeM1vu7TGD
-         SysA==
-X-Gm-Message-State: AOAM532zRAPhyrw8OysCnwllvVy8kvkJaJgrO/P4bgC+NI4zxgtp0Rws
-        QdZSh9aSEdngDpAbHzz1KRM=
-X-Google-Smtp-Source: ABdhPJxdODF9OoSlnIa5RL/vRy5NZLti/s0RzpXrEpOHVCNgHsyK/KkpSQPBtALY6NwdtYHGK6Z5Sw==
-X-Received: by 2002:a9d:a72:: with SMTP id 105mr23573290otg.99.1628689340070;
-        Wed, 11 Aug 2021 06:42:20 -0700 (PDT)
+        bh=F37GbdbG8x6zZxW7E2S3oSydVR8XSIKpd+BuclgvdbI=;
+        b=eGTWVw6KiyuuUFdOOBsaJ+pu8kqLcR7Z2EmtIhznHHIwEBC9kkxmF4mo2DQClw/64F
+         0oBV3iHO+97V+4J4EPft86S0hY8pwklHzN6p2551jXGGJ0csu2vdSQwmguBVVWoYxSc+
+         txvn29GZG5cWgV8rvCXGlnaCNOYkYEs1sd3fwu8ssDTUxO/nPoQVQQdeYDk78qVn08JG
+         i3XBdCOWTXleavIb85e6BZWCUjmfuEdj6+Arxk/6ukumfVJ5T5uWvfFBaIL9vXLg5pnM
+         PdYPqQv5GEpVgsf4iDPSdjvED2Mf9jpyJ3mHUZgaAC61FKRbdTljFcLgIeBr6edOn6rz
+         srzQ==
+X-Gm-Message-State: AOAM530sgjBohIFntuj35ArLezOLssMwgnlXGNq0BR5GTnkA03PUQXoZ
+        M60Sr8kVF9eOCMxymz/Di8yub8hoVj4=
+X-Google-Smtp-Source: ABdhPJwNaWgAjCJvhVgTSEpjECrVL7hm2bY6OJrVg/EXEj+tg2XnvneMZyOL2PK/LpennKz9IFj1Cw==
+X-Received: by 2002:a05:6808:c4:: with SMTP id t4mr10938837oic.150.1628689595631;
+        Wed, 11 Aug 2021 06:46:35 -0700 (PDT)
 Received: from Davids-MacBook-Pro.local ([8.48.134.45])
-        by smtp.googlemail.com with ESMTPSA id w13sm2730559otl.41.2021.08.11.06.42.18
+        by smtp.googlemail.com with ESMTPSA id q13sm3993576oov.6.2021.08.11.06.46.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Aug 2021 06:42:19 -0700 (PDT)
-Subject: Re: [RFCv2 1/9] tcp: authopt: Initial support and key management
+        Wed, 11 Aug 2021 06:46:35 -0700 (PDT)
+Subject: Re: [RFCv2 9/9] selftests: Initial TCP-AO support for fcnal-test
 To:     Leonard Crestez <cdleonard@gmail.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>
-Cc:     Eric Dumazet <edumazet@google.com>,
+        Eric Dumazet <edumazet@google.com>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        David Ahern <dsahern@kernel.org>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        David Ahern <dsahern@kernel.org>
+Cc:     Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
         Jakub Kicinski <kuba@kernel.org>,
         Yuchung Cheng <ycheng@google.com>,
         Francesco Ruggeri <fruggeri@arista.com>,
@@ -74,54 +73,37 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         Ivan Delalande <colona@arista.com>,
         Priyaranjan Jha <priyarjha@google.com>,
         Menglong Dong <dong.menglong@zte.com.cn>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Network Development <netdev@vger.kernel.org>,
-        Dmitry Safonov <dima@arista.com>
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org
 References: <cover.1628544649.git.cdleonard@gmail.com>
- <67c1471683200188b96a3f712dd2e8def7978462.1628544649.git.cdleonard@gmail.com>
- <CAJwJo6aicw_KGQSM5U1=0X11QfuNf2dMATErSymytmpf75W=tA@mail.gmail.com>
- <1e2848fb-1538-94aa-0431-636fa314a36d@gmail.com>
+ <3f6d654c1c36f489b471e2892c9231d6fa8fad7a.1628544649.git.cdleonard@gmail.com>
 From:   David Ahern <dsahern@gmail.com>
-Message-ID: <8d656f85-6f66-6c40-c4af-b05c6639b9ab@gmail.com>
-Date:   Wed, 11 Aug 2021 07:42:17 -0600
+Message-ID: <57493709-02c0-d77b-0b82-121894b58a49@gmail.com>
+Date:   Wed, 11 Aug 2021 07:46:33 -0600
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <1e2848fb-1538-94aa-0431-636fa314a36d@gmail.com>
+In-Reply-To: <3f6d654c1c36f489b471e2892c9231d6fa8fad7a.1628544649.git.cdleonard@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/11/21 2:29 AM, Leonard Crestez wrote:
-> On 8/10/21 11:41 PM, Dmitry Safonov wrote:
->> Hi Leonard,
->>
->> On Tue, 10 Aug 2021 at 02:50, Leonard Crestez <cdleonard@gmail.com>
->> wrote:
->> [..]
->>> +/* Representation of a Master Key Tuple as per RFC5925 */
->>> +struct tcp_authopt_key_info {
->>> +       struct hlist_node node;
->>> +       /* Local identifier */
->>> +       u32 local_id;
->>
->> There is no local_id in RFC5925, what's that?
->> An MKT is identified by (send_id, recv_id), together with
->> (src_addr/src_port, dst_addr/dst_port).
->> Why introducing something new to already complicated RFC?
-> 
-> It was there to simplify user interface and initial implementation.
-> 
-> But it seems that BGP listeners already needs to support multiple
-> keychains for different peers so identifying the key by (send_id,
-> recv_id, binding) is easier for userspace to work with. Otherwise they
-> need to create their own local_id mapping internally.
+On 8/9/21 3:35 PM, Leonard Crestez wrote:
+> Just test that a correct password is required.
 > 
 
-any proposed simplification needs to be well explained and how it
-relates to the RFC spec.
+This test suite needs to be comprehensive that the UAPI works as
+designed and fails when it should - cleanly and with an extack message
+as to why some config option fails. Tests should cover the datapath -
+that it works properly when it should and fails cleanly when it should
+not. If addresses are involved in the configuration, then the tests need
+to be written for non VRFs, with VRFs and default VRF since addresses
+are relative.
+
+Also, in tree test suites are best for the maintenance of this code
+going forward.
+
 
