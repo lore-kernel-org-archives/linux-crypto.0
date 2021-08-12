@@ -7,38 +7,37 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91657C04FE3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFBF5C4338F
 	for <linux-crypto@archiver.kernel.org>; Thu, 12 Aug 2021 20:22:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DE206103E
+	by mail.kernel.org (Postfix) with ESMTP id D2A4060EB2
 	for <linux-crypto@archiver.kernel.org>; Thu, 12 Aug 2021 20:22:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236922AbhHLUW0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Aug 2021 16:22:26 -0400
+        id S237100AbhHLUW1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Aug 2021 16:22:27 -0400
 Received: from mga03.intel.com ([134.134.136.65]:4154 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237118AbhHLUWY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Aug 2021 16:22:24 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10074"; a="215474034"
+        id S236956AbhHLUWZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Aug 2021 16:22:25 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10074"; a="215474039"
 X-IronPort-AV: E=Sophos;i="5.84,316,1620716400"; 
-   d="scan'208";a="215474034"
+   d="scan'208";a="215474039"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2021 13:21:55 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2021 13:21:58 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.84,316,1620716400"; 
-   d="scan'208";a="517608621"
+   d="scan'208";a="517608642"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by FMSMGA003.fm.intel.com with ESMTP; 12 Aug 2021 13:21:53 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 12 Aug 2021 13:21:57 -0700
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Marco Chiappero <marco.chiappero@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Fiona Trahe <fiona.trahe@intel.com>
-Subject: [PATCH 09/20] crypto: qat - remove intermediate tasklet for vf2pf
-Date:   Thu, 12 Aug 2021 21:21:18 +0100
-Message-Id: <20210812202129.18831-10-giovanni.cabiddu@intel.com>
+Subject: [PATCH 11/20] crypto: qat - move pf2vf interrupt [en|dis]able to adf_vf_isr.c
+Date:   Thu, 12 Aug 2021 21:21:20 +0100
+Message-Id: <20210812202129.18831-12-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210812202129.18831-1-giovanni.cabiddu@intel.com>
 References: <20210812202129.18831-1-giovanni.cabiddu@intel.com>
@@ -49,110 +48,83 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
+From: Marco Chiappero <marco.chiappero@intel.com>
 
-The PF driver uses the tasklet vf2pf_bh_tasklet to schedule a workqueue
-to handle the vf2vf protocol (pf2vf_resp_wq).
-Since the tasklet is only used to schedule the workqueue, this patch
-removes it and schedules the pf2vf_resp_wq workqueue directly for the
-top half.
+Interrupt code to enable interrupts from PF does not belong to the
+protocol code, so move it to the interrupt handling specific file for
+better code organization.
 
-Signed-off-by: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
+Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
 Co-developed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
 Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
 ---
- drivers/crypto/qat/qat_common/adf_accel_devices.h | 1 -
- drivers/crypto/qat/qat_common/adf_common_drv.h    | 1 +
- drivers/crypto/qat/qat_common/adf_isr.c           | 8 +++-----
- drivers/crypto/qat/qat_common/adf_sriov.c         | 8 +-------
- 4 files changed, 5 insertions(+), 13 deletions(-)
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.c | 20 -------------------
+ drivers/crypto/qat/qat_common/adf_vf_isr.c    | 20 +++++++++++++++++++
+ 2 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-index 2ee11b4763cd..180c7dba3ff2 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-@@ -225,7 +225,6 @@ struct adf_fw_loader_data {
+diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+index d42461cb611f..0a927ed91b19 100644
+--- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
++++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+@@ -11,26 +11,6 @@
+ #define ADF_DH895XCC_ERRMSK5	(ADF_DH895XCC_EP_OFFSET + 0xDC)
+ #define ADF_DH895XCC_ERRMSK5_VF2PF_U_MASK(vf_mask) (vf_mask >> 16)
  
- struct adf_accel_vf_info {
- 	struct adf_accel_dev *accel_dev;
--	struct tasklet_struct vf2pf_bh_tasklet;
- 	struct mutex pf2vf_lock; /* protect CSR access for PF2VF messages */
- 	struct ratelimit_state vf2pf_ratelimit;
- 	u32 vf_nr;
-diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
-index c7deca7f0607..bd76b8a86b86 100644
---- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-@@ -197,6 +197,7 @@ void adf_enable_vf2pf_interrupts(struct adf_accel_dev *accel_dev,
- 				 u32 vf_mask);
- void adf_enable_pf2vf_interrupts(struct adf_accel_dev *accel_dev);
- void adf_disable_pf2vf_interrupts(struct adf_accel_dev *accel_dev);
-+void adf_schedule_vf2pf_handler(struct adf_accel_vf_info *vf_info);
- 
- int adf_vf2pf_init(struct adf_accel_dev *accel_dev);
- void adf_vf2pf_shutdown(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/qat/qat_common/adf_isr.c b/drivers/crypto/qat/qat_common/adf_isr.c
-index a25b7845c9d3..2302e43dfaf4 100644
---- a/drivers/crypto/qat/qat_common/adf_isr.c
-+++ b/drivers/crypto/qat/qat_common/adf_isr.c
-@@ -106,9 +106,8 @@ static irqreturn_t adf_msix_isr_ae(int irq, void *dev_ptr)
- 			adf_disable_vf2pf_interrupts(accel_dev, vf_mask);
- 
- 			/*
--			 * Schedule tasklets to handle VF2PF interrupt BHs
--			 * unless the VF is malicious and is attempting to
--			 * flood the host OS with VF2PF interrupts.
-+			 * Handle VF2PF interrupt unless the VF is malicious and
-+			 * is attempting to flood the host OS with VF2PF interrupts.
- 			 */
- 			for_each_set_bit(i, &vf_mask, ADF_MAX_NUM_VFS) {
- 				vf_info = accel_dev->pf.vf_info + i;
-@@ -120,8 +119,7 @@ static irqreturn_t adf_msix_isr_ae(int irq, void *dev_ptr)
- 					continue;
- 				}
- 
--				/* Tasklet will re-enable ints from this VF */
--				tasklet_hi_schedule(&vf_info->vf2pf_bh_tasklet);
-+				adf_schedule_vf2pf_handler(vf_info);
- 				irq_handled = true;
- 			}
- 
-diff --git a/drivers/crypto/qat/qat_common/adf_sriov.c b/drivers/crypto/qat/qat_common/adf_sriov.c
-index 8c822c2861c2..90ec057f9183 100644
---- a/drivers/crypto/qat/qat_common/adf_sriov.c
-+++ b/drivers/crypto/qat/qat_common/adf_sriov.c
-@@ -24,9 +24,8 @@ static void adf_iov_send_resp(struct work_struct *work)
- 	kfree(pf2vf_resp);
- }
- 
--static void adf_vf2pf_bh_handler(void *data)
-+void adf_schedule_vf2pf_handler(struct adf_accel_vf_info *vf_info)
+-void adf_enable_pf2vf_interrupts(struct adf_accel_dev *accel_dev)
+-{
+-	struct adf_accel_pci *pci_info = &accel_dev->accel_pci_dev;
+-	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
+-	void __iomem *pmisc_bar_addr =
+-		pci_info->pci_bars[hw_data->get_misc_bar_id(hw_data)].virt_addr;
+-
+-	ADF_CSR_WR(pmisc_bar_addr, hw_data->get_vintmsk_offset(0), 0x0);
+-}
+-
+-void adf_disable_pf2vf_interrupts(struct adf_accel_dev *accel_dev)
+-{
+-	struct adf_accel_pci *pci_info = &accel_dev->accel_pci_dev;
+-	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
+-	void __iomem *pmisc_bar_addr =
+-		pci_info->pci_bars[hw_data->get_misc_bar_id(hw_data)].virt_addr;
+-
+-	ADF_CSR_WR(pmisc_bar_addr, hw_data->get_vintmsk_offset(0), 0x2);
+-}
+-
+ void adf_enable_vf2pf_interrupts(struct adf_accel_dev *accel_dev,
+ 				 u32 vf_mask)
  {
--	struct adf_accel_vf_info *vf_info = (struct adf_accel_vf_info *)data;
- 	struct adf_pf2vf_resp *pf2vf_resp;
+diff --git a/drivers/crypto/qat/qat_common/adf_vf_isr.c b/drivers/crypto/qat/qat_common/adf_vf_isr.c
+index 4359ca633ea9..aa44e8638fa8 100644
+--- a/drivers/crypto/qat/qat_common/adf_vf_isr.c
++++ b/drivers/crypto/qat/qat_common/adf_vf_isr.c
+@@ -29,6 +29,26 @@ struct adf_vf_stop_data {
+ 	struct work_struct work;
+ };
  
- 	pf2vf_resp = kzalloc(sizeof(*pf2vf_resp), GFP_ATOMIC);
-@@ -52,9 +51,6 @@ static int adf_enable_sriov(struct adf_accel_dev *accel_dev)
- 		vf_info->accel_dev = accel_dev;
- 		vf_info->vf_nr = i;
- 
--		tasklet_init(&vf_info->vf2pf_bh_tasklet,
--			     (void *)adf_vf2pf_bh_handler,
--			     (unsigned long)vf_info);
- 		mutex_init(&vf_info->pf2vf_lock);
- 		ratelimit_state_init(&vf_info->vf2pf_ratelimit,
- 				     DEFAULT_RATELIMIT_INTERVAL,
-@@ -110,8 +106,6 @@ void adf_disable_sriov(struct adf_accel_dev *accel_dev)
- 		hw_data->configure_iov_threads(accel_dev, false);
- 
- 	for (i = 0, vf = accel_dev->pf.vf_info; i < totalvfs; i++, vf++) {
--		tasklet_disable(&vf->vf2pf_bh_tasklet);
--		tasklet_kill(&vf->vf2pf_bh_tasklet);
- 		mutex_destroy(&vf->pf2vf_lock);
- 	}
- 
++void adf_enable_pf2vf_interrupts(struct adf_accel_dev *accel_dev)
++{
++	struct adf_accel_pci *pci_info = &accel_dev->accel_pci_dev;
++	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
++	void __iomem *pmisc_bar_addr =
++		pci_info->pci_bars[hw_data->get_misc_bar_id(hw_data)].virt_addr;
++
++	ADF_CSR_WR(pmisc_bar_addr, hw_data->get_vintmsk_offset(0), 0x0);
++}
++
++void adf_disable_pf2vf_interrupts(struct adf_accel_dev *accel_dev)
++{
++	struct adf_accel_pci *pci_info = &accel_dev->accel_pci_dev;
++	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
++	void __iomem *pmisc_bar_addr =
++		pci_info->pci_bars[hw_data->get_misc_bar_id(hw_data)].virt_addr;
++
++	ADF_CSR_WR(pmisc_bar_addr, hw_data->get_vintmsk_offset(0), 0x2);
++}
++
+ static int adf_enable_msi(struct adf_accel_dev *accel_dev)
+ {
+ 	struct adf_accel_pci *pci_dev_info = &accel_dev->accel_pci_dev;
 -- 
 2.31.1
 
