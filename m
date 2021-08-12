@@ -2,340 +2,165 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C29C4338F
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Aug 2021 14:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14235C4320E
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Aug 2021 18:58:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 117A0610A4
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Aug 2021 14:43:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E75BA610A8
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Aug 2021 18:58:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236596AbhHLOnp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Aug 2021 10:43:45 -0400
-Received: from mga01.intel.com ([192.55.52.88]:47366 "EHLO mga01.intel.com"
+        id S234882AbhHLS7V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Aug 2021 14:59:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58258 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233079AbhHLOno (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Aug 2021 10:43:44 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10074"; a="237399845"
-X-IronPort-AV: E=Sophos;i="5.84,316,1620716400"; 
-   d="scan'208";a="237399845"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2021 07:43:19 -0700
-X-IronPort-AV: E=Sophos;i="5.84,316,1620716400"; 
-   d="scan'208";a="517479659"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2021 07:43:15 -0700
-Date:   Thu, 12 Aug 2021 15:43:09 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Fiona Trahe <fiona.trahe@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        qat-linux@intel.com, Bjorn Helgaas <helgaas@kernel.org>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        linux-pci@vger.kernel.org, Jack Xu <jack.xu@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v3 6/8] crypto: qat - simplify adf_enable_aer()
-Message-ID: <YRUzfQCLOtRmXyCr@silpixa00400314>
-References: <20210811080637.2596434-1-u.kleine-koenig@pengutronix.de>
- <20210811080637.2596434-7-u.kleine-koenig@pengutronix.de>
- <YRO69xL+F/6Paj+I@silpixa00400314>
- <20210811213405.avihazo33irdjxic@pengutronix.de>
+        id S234588AbhHLS7V (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Aug 2021 14:59:21 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 517E660200;
+        Thu, 12 Aug 2021 18:58:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628794735;
+        bh=4j5w1bAhfwL043thWwHbrt8AtOIjqKgMLpSCAvsF/DM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SimV6NQ2HUs2ObVX/JcHfnmJnp/3j54BtO9QUC53vlsO171hYCohgpZ/jyNzVJBx1
+         VB5Q/L0LsqaijM0pdpD0PuRrFY7Ag6RDTneRTCkllRi4SLN5DVdcJ2fx+Oa90AVEmr
+         glaUhxPer2JtidZrhMew0ndS1tXnEOsbJzj4IO+xYGaMGwcDENU9Q1r/NBRpe5qWs2
+         7cMp3wh7kKsiDbBb38rkyL1KG7+w0x49qc+iXeRMZBLfOPuXlNaXwoNFKQALwwMtXp
+         7gLi6TLmntoQF41tS8Z/s8UM7pqNybygnGQXtgqbyi+4jPt9yJTsb5JbtgfRXRIdY3
+         2OIt55S3DsSAw==
+Date:   Thu, 12 Aug 2021 21:58:53 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Snowberg <eric.snowberg@oracle.com>
+Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        zohar@linux.ibm.com, dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jmorris@namei.org, serge@hallyn.com, keescook@chromium.org,
+        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
+        scott.branden@broadcom.com, weiyongjun1@huawei.com,
+        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
+        nramas@linux.microsoft.com, lszubowi@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@hansenpartnership.com, pjones@redhat.com,
+        glin@suse.com, konrad.wilk@oracle.com
+Subject: Re: [PATCH v3 01/14] integrity: Introduce a Linux keyring for the
+ Machine Owner Key (MOK)
+Message-ID: <20210812185853.p5mgsgrftgwvt5fx@kernel.org>
+References: <20210812021855.3083178-1-eric.snowberg@oracle.com>
+ <20210812021855.3083178-2-eric.snowberg@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210811213405.avihazo33irdjxic@pengutronix.de>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+In-Reply-To: <20210812021855.3083178-2-eric.snowberg@oracle.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 11, 2021 at 11:34:05PM +0200, Uwe Kleine-König wrote:
-> On Wed, Aug 11, 2021 at 12:56:39PM +0100, Giovanni Cabiddu wrote:
-> > On Wed, Aug 11, 2021 at 10:06:35AM +0200, Uwe Kleine-König wrote:
-> > > A struct pci_driver is supposed to be constant and assigning .err_handler
-> > > once per bound device isn't really sensible. Also as the function returns
-> > > zero unconditionally let it return no value instead and simplify the
-> > > callers accordingly.
-> > > 
-> > > As a side effect this removes one user of struct pci_dev::driver. This
-> > > member is planned to be removed.
-> > > 
-> > > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> > Thanks Uwe for the rework.
-> > 
-> > > ---
-> > >  drivers/crypto/qat/qat_4xxx/adf_drv.c          |  7 ++-----
-> > >  drivers/crypto/qat/qat_c3xxx/adf_drv.c         |  7 ++-----
-> > >  drivers/crypto/qat/qat_c62x/adf_drv.c          |  7 ++-----
-> > >  drivers/crypto/qat/qat_common/adf_aer.c        | 10 +++-------
-> > >  drivers/crypto/qat/qat_common/adf_common_drv.h |  2 +-
-> > >  drivers/crypto/qat/qat_dh895xcc/adf_drv.c      |  7 ++-----
-> > >  6 files changed, 12 insertions(+), 28 deletions(-)
-> > > 
-> > > diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-> > > index a8805c815d16..1620281a9ed8 100644
-> > > --- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
-> > > +++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-> > > @@ -253,11 +253,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
-> > >  
-> > >  	pci_set_master(pdev);
-> > >  
-> > > -	if (adf_enable_aer(accel_dev)) {
-> > > -		dev_err(&pdev->dev, "Failed to enable aer.\n");
-> > > -		ret = -EFAULT;
-> > > -		goto out_err;
-> > > -	}
-> > > +	adf_enable_aer(accel_dev);
-> > After seeing your patch, I'm thinking to get rid of both adf_enable_aer()
-> > (and adf_disable_aer()) and call directly pci_enable_pcie_error_reporting()
-> > here.
-I'm going to rework this in a subsequent patchset.
-
-> > There is another patch around this area that I reworked (but not sent
-> > yet - https://patchwork.kernel.org/project/linux-crypto/patch/a19132d07a65dbef5e818f84b2bc971f26cc3805.1625983602.git.christophe.jaillet@wanadoo.fr/).
-> > Would you mind if your patch goes through Herbert's tree?
-> > If you want I can also send a reworked version.
+On Wed, Aug 11, 2021 at 10:18:42PM -0400, Eric Snowberg wrote:
+> Many UEFI Linux distributions boot using shim.  The UEFI shim provides
+> what is called Machine Owner Keys (MOK). Shim uses both the UEFI Secure
+> Boot DB and MOK keys to validate the next step in the boot chain.  The
+> MOK facility can be used to import user generated keys.  These keys can
+> be used to sign an end-users development kernel build.  When Linux
+> boots, both UEFI Secure Boot DB and MOK keys get loaded in the Linux
+> .platform keyring.
 > 
-> As patch #8 of my series depends on this one I think the best option is
-> to create a tag and pull that into both, the pci and the crypto tree?!
-Probably there is no need for that.
-Your patch applies cleanly on top of this series:
-https://patchwork.kernel.org/project/linux-crypto/list/?series=530407
+> Add a new Linux keyring called .mok.  This keyring shall contain just
 
+I would consider ".machine" instead. It holds MOK keys but is not a
+MOK key.
+
+> MOK keys and not the remaining keys in the platform keyring. This new
+> .mok keyring will be used in follow on patches.  Unlike keys in the
+> platform keyring, keys contained in the .mok keyring will be trusted
+> within the kernel if the end-user has chosen to do so.
 > 
-> @Bjorn: Would you agree to this procedure? There has to be a v4, if it
-> helps I can provide a signed tag for pulling?! Just tell me what would
-> be helpful here.
+> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+> ---
+> v1: Initial version
+> v2: Removed destory keyring code
+> v3: Unmodified from v2
+> ---
+>  security/integrity/Makefile                   |  3 ++-
+>  security/integrity/digsig.c                   |  1 +
+>  security/integrity/integrity.h                |  3 ++-
+>  .../integrity/platform_certs/mok_keyring.c    | 21 +++++++++++++++++++
+>  4 files changed, 26 insertions(+), 2 deletions(-)
+>  create mode 100644 security/integrity/platform_certs/mok_keyring.c
 > 
-> > >  	if (pci_save_state(pdev)) {
-> > >  		dev_err(&pdev->dev, "Failed to save pci state.\n");
-> > > @@ -310,6 +306,7 @@ static struct pci_driver adf_driver = {
-> > >  	.probe = adf_probe,
-> > >  	.remove = adf_remove,
-> > >  	.sriov_configure = adf_sriov_configure,
-> > > +	.err_handler = adf_err_handler,
-> > Compilation fails here:
-> >     drivers/crypto/qat/qat_4xxx/adf_drv.c:309:24: error: ‘adf_err_handler’ undeclared here (not in a function)
-> >       309 |         .err_handler = adf_err_handler,
-> >           |                        ^~~~~~~~~~~~~~~
-> > 
-> > Were you thinking to change it this way?
-> > 
-> > 	--- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-> > 	+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-> > 	@@ -95,8 +95,11 @@ void adf_ae_fw_release(struct adf_accel_dev *accel_dev);
-> > 	 int adf_ae_start(struct adf_accel_dev *accel_dev);
-> > 	 int adf_ae_stop(struct adf_accel_dev *accel_dev);
-> > 
-> > 	+extern const struct pci_error_handlers adf_err_handler;
-> > 
-> > 	--- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
-> > 	+++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-> > 	@@ -306,7 +306,7 @@ static struct pci_driver adf_driver = {
-> > 		.probe = adf_probe,
-> > 		.remove = adf_remove,
-> > 		.sriov_configure = adf_sriov_configure,
-> > 	-       .err_handler = adf_err_handler,
-> > 	+       .err_handler = &adf_err_handler,
-> > 	 };
+> diff --git a/security/integrity/Makefile b/security/integrity/Makefile
+> index 7ee39d66cf16..8e2e98cba1f6 100644
+> --- a/security/integrity/Makefile
+> +++ b/security/integrity/Makefile
+> @@ -9,7 +9,8 @@ integrity-y := iint.o
+>  integrity-$(CONFIG_INTEGRITY_AUDIT) += integrity_audit.o
+>  integrity-$(CONFIG_INTEGRITY_SIGNATURE) += digsig.o
+>  integrity-$(CONFIG_INTEGRITY_ASYMMETRIC_KEYS) += digsig_asymmetric.o
+> -integrity-$(CONFIG_INTEGRITY_PLATFORM_KEYRING) += platform_certs/platform_keyring.o
+> +integrity-$(CONFIG_INTEGRITY_PLATFORM_KEYRING) += platform_certs/platform_keyring.o \
+> +						  platform_certs/mok_keyring.o
+>  integrity-$(CONFIG_LOAD_UEFI_KEYS) += platform_certs/efi_parser.o \
+>  				      platform_certs/load_uefi.o \
+>  				      platform_certs/keyring_handler.o
+> diff --git a/security/integrity/digsig.c b/security/integrity/digsig.c
+> index 3b06a01bd0fd..e07334504ef1 100644
+> --- a/security/integrity/digsig.c
+> +++ b/security/integrity/digsig.c
+> @@ -30,6 +30,7 @@ static const char * const keyring_name[INTEGRITY_KEYRING_MAX] = {
+>  	".ima",
+>  #endif
+>  	".platform",
+> +	".mok",
+>  };
+>  
+>  #ifdef CONFIG_IMA_KEYRINGS_PERMIT_SIGNED_BY_BUILTIN_OR_SECONDARY
+> diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
+> index 547425c20e11..e0e17ccba2e6 100644
+> --- a/security/integrity/integrity.h
+> +++ b/security/integrity/integrity.h
+> @@ -151,7 +151,8 @@ int integrity_kernel_read(struct file *file, loff_t offset,
+>  #define INTEGRITY_KEYRING_EVM		0
+>  #define INTEGRITY_KEYRING_IMA		1
+>  #define INTEGRITY_KEYRING_PLATFORM	2
+> -#define INTEGRITY_KEYRING_MAX		3
+> +#define INTEGRITY_KEYRING_MOK		3
+> +#define INTEGRITY_KEYRING_MAX		4
+>  
+>  extern struct dentry *integrity_dir;
+>  
+> diff --git a/security/integrity/platform_certs/mok_keyring.c b/security/integrity/platform_certs/mok_keyring.c
+> new file mode 100644
+> index 000000000000..b1ee45b77731
+> --- /dev/null
+> +++ b/security/integrity/platform_certs/mok_keyring.c
+> @@ -0,0 +1,21 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * MOK keyring routines.
+> + *
+> + * Copyright (c) 2021, Oracle and/or its affiliates.
+> + */
+> +
+> +#include "../integrity.h"
+> +
+> +static __init int mok_keyring_init(void)
+> +{
+> +	int rc;
+> +
+> +	rc = integrity_init_keyring(INTEGRITY_KEYRING_MOK);
+> +	if (rc)
+> +		return rc;
+> +
+> +	pr_notice("MOK Keyring initialized\n");
+> +	return 0;
+> +}
+> +device_initcall(mok_keyring_init);
+> -- 
+> 2.18.4
 > 
-> Yeah, the other three drivers need an adaption, too. I will send a v4 in
-> the next few days. The current state is available at
 > 
-> 	https://git.pengutronix.de/git/ukl/linux pci-dedup
-I fixed that and tested on c62x. Here is an updated patch:
 
-----8<----
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-Date: Wed, 11 Aug 2021 10:06:35 +0200
-Subject: [PATCH] crypto: qat - simplify adf_enable_aer()
-
-A struct pci_driver is supposed to be constant and assigning .err_handler
-once per bound device isn't really sensible. Also as the function returns
-zero unconditionally let it return no value instead and simplify the
-callers accordingly.
-
-As a side effect this removes one user of struct pci_dev::driver. This
-member is planned to be removed.
-
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-Co-developed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_4xxx/adf_drv.c          |  7 ++-----
- drivers/crypto/qat/qat_c3xxx/adf_drv.c         |  7 ++-----
- drivers/crypto/qat/qat_c62x/adf_drv.c          |  7 ++-----
- drivers/crypto/qat/qat_common/adf_aer.c        | 10 +++-------
- drivers/crypto/qat/qat_common/adf_common_drv.h |  5 ++++-
- drivers/crypto/qat/qat_dh895xcc/adf_drv.c      |  7 ++-----
- 6 files changed, 15 insertions(+), 28 deletions(-)
-
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-index a8805c815d16..e863f7ac9c44 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
-+++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-@@ -253,11 +253,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	pci_set_master(pdev);
- 
--	if (adf_enable_aer(accel_dev)) {
--		dev_err(&pdev->dev, "Failed to enable aer.\n");
--		ret = -EFAULT;
--		goto out_err;
--	}
-+	adf_enable_aer(accel_dev);
- 
- 	if (pci_save_state(pdev)) {
- 		dev_err(&pdev->dev, "Failed to save pci state.\n");
-@@ -310,6 +306,7 @@ static struct pci_driver adf_driver = {
- 	.probe = adf_probe,
- 	.remove = adf_remove,
- 	.sriov_configure = adf_sriov_configure,
-+	.err_handler = &adf_err_handler,
- };
- 
- module_pci_driver(adf_driver);
-diff --git a/drivers/crypto/qat/qat_c3xxx/adf_drv.c b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-index 7fb3343ae8b0..c62330357e63 100644
---- a/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
- 	.probe = adf_probe,
- 	.remove = adf_remove,
- 	.sriov_configure = adf_sriov_configure,
-+	.err_handler = &adf_err_handler,
- };
- 
- static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
-@@ -199,11 +200,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
- 	pci_set_master(pdev);
- 
--	if (adf_enable_aer(accel_dev)) {
--		dev_err(&pdev->dev, "Failed to enable aer\n");
--		ret = -EFAULT;
--		goto out_err_free_reg;
--	}
-+	adf_enable_aer(accel_dev);
- 
- 	if (pci_save_state(pdev)) {
- 		dev_err(&pdev->dev, "Failed to save pci state\n");
-diff --git a/drivers/crypto/qat/qat_c62x/adf_drv.c b/drivers/crypto/qat/qat_c62x/adf_drv.c
-index 1f5de442e1e6..ad9f18a9eb1d 100644
---- a/drivers/crypto/qat/qat_c62x/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62x/adf_drv.c
-@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
- 	.probe = adf_probe,
- 	.remove = adf_remove,
- 	.sriov_configure = adf_sriov_configure,
-+	.err_handler = &adf_err_handler,
- };
- 
- static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
-@@ -199,11 +200,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
- 	pci_set_master(pdev);
- 
--	if (adf_enable_aer(accel_dev)) {
--		dev_err(&pdev->dev, "Failed to enable aer\n");
--		ret = -EFAULT;
--		goto out_err_free_reg;
--	}
-+	adf_enable_aer(accel_dev);
- 
- 	if (pci_save_state(pdev)) {
- 		dev_err(&pdev->dev, "Failed to save pci state\n");
-diff --git a/drivers/crypto/qat/qat_common/adf_aer.c b/drivers/crypto/qat/qat_common/adf_aer.c
-index d2ae293d0df6..9284d09e3af8 100644
---- a/drivers/crypto/qat/qat_common/adf_aer.c
-+++ b/drivers/crypto/qat/qat_common/adf_aer.c
-@@ -166,11 +166,12 @@ static void adf_resume(struct pci_dev *pdev)
- 	dev_info(&pdev->dev, "Device is up and running\n");
- }
- 
--static const struct pci_error_handlers adf_err_handler = {
-+const struct pci_error_handlers adf_err_handler = {
- 	.error_detected = adf_error_detected,
- 	.slot_reset = adf_slot_reset,
- 	.resume = adf_resume,
- };
-+EXPORT_SYMBOL_GPL(adf_err_handler);
- 
- /**
-  * adf_enable_aer() - Enable Advance Error Reporting for acceleration device
-@@ -179,17 +180,12 @@ static const struct pci_error_handlers adf_err_handler = {
-  * Function enables PCI Advance Error Reporting for the
-  * QAT acceleration device accel_dev.
-  * To be used by QAT device specific drivers.
-- *
-- * Return: 0 on success, error code otherwise.
-  */
--int adf_enable_aer(struct adf_accel_dev *accel_dev)
-+void adf_enable_aer(struct adf_accel_dev *accel_dev)
- {
- 	struct pci_dev *pdev = accel_to_pci_dev(accel_dev);
--	struct pci_driver *pdrv = pdev->driver;
- 
--	pdrv->err_handler = &adf_err_handler;
- 	pci_enable_pcie_error_reporting(pdev);
--	return 0;
- }
- EXPORT_SYMBOL_GPL(adf_enable_aer);
- 
-diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
-index c61476553728..3d7fb9715cf8 100644
---- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-@@ -95,8 +95,11 @@ void adf_ae_fw_release(struct adf_accel_dev *accel_dev);
- int adf_ae_start(struct adf_accel_dev *accel_dev);
- int adf_ae_stop(struct adf_accel_dev *accel_dev);
- 
--int adf_enable_aer(struct adf_accel_dev *accel_dev);
-+extern const struct pci_error_handlers adf_err_handler;
-+
-+void adf_enable_aer(struct adf_accel_dev *accel_dev);
- void adf_disable_aer(struct adf_accel_dev *accel_dev);
-+
- void adf_reset_sbr(struct adf_accel_dev *accel_dev);
- void adf_reset_flr(struct adf_accel_dev *accel_dev);
- void adf_dev_restore(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-index a9ec4357144c..9e9d495271b5 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
- 	.probe = adf_probe,
- 	.remove = adf_remove,
- 	.sriov_configure = adf_sriov_configure,
-+	.err_handler = &adf_err_handler,
- };
- 
- static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
-@@ -199,11 +200,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
- 	pci_set_master(pdev);
- 
--	if (adf_enable_aer(accel_dev)) {
--		dev_err(&pdev->dev, "Failed to enable aer\n");
--		ret = -EFAULT;
--		goto out_err_free_reg;
--	}
-+	adf_enable_aer(accel_dev);
- 
- 	if (pci_save_state(pdev)) {
- 		dev_err(&pdev->dev, "Failed to save pci state\n");
--- 
-2.31.1
-
-
+/Jarkko
