@@ -2,146 +2,143 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0150C4320E
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Aug 2021 19:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FCEC4320A
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Aug 2021 19:46:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90D1D61077
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Aug 2021 19:46:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8219560F57
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Aug 2021 19:46:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232959AbhHLTrR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Aug 2021 15:47:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13726 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229601AbhHLTrR (ORCPT
+        id S235277AbhHLTrT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Aug 2021 15:47:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37418 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235552AbhHLTrS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Aug 2021 15:47:17 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17CJg770073156;
-        Thu, 12 Aug 2021 15:46:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=+b7f8kmyAbEAYIPfbVpueDbEOKVt9EAqfwZVIomWLBs=;
- b=SQbXn9B9a5MiZQGrKoZMT/zWEPAlL5MXC/2k20PvJjujcKWFdKSiZf/g2PLAnP5cWubP
- I/NDYojcGnYGpEhIS8f8apDZEhgLzr7ZpO9mAWphVpqOaGCybeYIHSQVr5AJOod1zhX1
- ChFMFaty27s99dMGkhN2ZEDU3rze+XZi80OolEIr2/w2UA0u99H2FKe4E0wlJI+wDjzL
- Qi/nt5qWv14d8ODKr2Q4YknleALToB80XjVVJ8N/lIsV11ievfuMBRMoD60CNKyJ07M0
- CRJC/LERiVTOtY2/+tULIRxTG2Cbyp2zFh3yBqth2bNIpgw46Th/gwowuwHWYwLAuNOi kQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ad4hxt5n7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 Aug 2021 15:46:17 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17CJgIxR076407;
-        Thu, 12 Aug 2021 15:46:17 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ad4hxt5me-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 Aug 2021 15:46:16 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17CJc5L3017821;
-        Thu, 12 Aug 2021 19:46:15 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3acn76afb9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 Aug 2021 19:46:14 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17CJkCMe48890112
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Aug 2021 19:46:12 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7484442052;
-        Thu, 12 Aug 2021 19:46:12 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9752242047;
-        Thu, 12 Aug 2021 19:46:06 +0000 (GMT)
-Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.76.214])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Aug 2021 19:46:06 +0000 (GMT)
-Message-ID: <58e6e03b69b8fadfb854669086020c633837be88.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 10/14] KEYS: change link restriction for secondary to
- also trust mok
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>, keyrings@vger.kernel.org,
-        linux-integrity@vger.kernel.org, dhowells@redhat.com,
-        dwmw2@infradead.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, jarkko@kernel.org, jmorris@namei.org,
-        serge@hallyn.com
-Cc:     keescook@chromium.org, gregkh@linuxfoundation.org,
-        torvalds@linux-foundation.org, scott.branden@broadcom.com,
-        weiyongjun1@huawei.com, nayna@linux.ibm.com, ebiggers@google.com,
-        ardb@kernel.org, nramas@linux.microsoft.com, lszubowi@redhat.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
-        glin@suse.com, konrad.wilk@oracle.com
-Date:   Thu, 12 Aug 2021 15:46:05 -0400
-In-Reply-To: <20210812021855.3083178-11-eric.snowberg@oracle.com>
-References: <20210812021855.3083178-1-eric.snowberg@oracle.com>
-         <20210812021855.3083178-11-eric.snowberg@oracle.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 4vvybyiNZxsZ3JHqLfIuYe8NXFawec5W
-X-Proofpoint-GUID: p2xhzbzAUj0ugUT-yhXXK5xGCmJBi_tE
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-12_06:2021-08-12,2021-08-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 bulkscore=0 mlxlogscore=999 spamscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 phishscore=0 clxscore=1015 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108120127
+        Thu, 12 Aug 2021 15:47:18 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50888C061756;
+        Thu, 12 Aug 2021 12:46:52 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id o23so13757381ejc.3;
+        Thu, 12 Aug 2021 12:46:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=6XdIleat91/MzDpJVOaU1YmXdU4k0zkjMEY+D2f+xKw=;
+        b=dahg+GkWwhEV28eqPZ3i2PFQsLbWgFaJdtqZjD2IGS0L+hxOi48mD6O8LrKZ4fveXk
+         P0olEAvOB8dyDFW5cQ//s5ei9wn/SATCD9RP3/bmnjI/4YnBnjV4jkKuoBHVg7iX4ghw
+         lbdkP2JUVT2P4FanbFg7f8oeySrP1jJ5gC+D9N34z4l7350VvZWn018q1s5bdHYm3WkD
+         v5AqJwYVJKsK8IWjZmhScMQJAOd7zQQLeo2ZwDy9dG/87bvflKNO8V3dlcObb7Dv89er
+         lqHlKBkiQoqijhT0RLs17rDrCqsWsIYT8vM1hAa5FuaLKHfHbjRIENer+4qTPTrYv92J
+         /8Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6XdIleat91/MzDpJVOaU1YmXdU4k0zkjMEY+D2f+xKw=;
+        b=diSFbtlfg+4y8lynNCXrhHLhoSNrqMqPHYoSPLomaxJ/BUZ1A/Z8Y1G+i7ck3KSkqj
+         CofE7o4Zc32hrJAmRO3W4n1nggr4dFR7OepBGZLkan3dKteDWIIANHWXsGm8fzATeKx6
+         YRyfmWUQ9Efyf5hAnXoAEB/pR/RkMD6zkm8MpB/8TiHsCp2h30EfyxO76trJ8x+zvrHE
+         5BbG0zGzEASIicnt1OkbhZeCjR1PhVedn2ih8PnQ++I0s+ZzPII1+tPeXYqnIJvnO5Ku
+         s2lpFLhl69OOBMTHTQ1TvF5kBEN4/Ve+XVMTycE+wyP+fH++zLqkPCTloGk0lfKR3do9
+         9x7g==
+X-Gm-Message-State: AOAM532nP0ynfaqPj8MbX9qqCo+bgLyE0Bg8zsKQPWasZCXhLLY0DBGH
+        6H+cABXgJL2E2MZdPe8ulqQ=
+X-Google-Smtp-Source: ABdhPJwxasy2FDyr6WDV2CLwLaZmO8zjwsGax0+745qwOTIAVFsE566ZPIVNbpJZ5fiX7nnZSaAh8A==
+X-Received: by 2002:a17:907:9602:: with SMTP id gb2mr5335995ejc.119.1628797610905;
+        Thu, 12 Aug 2021 12:46:50 -0700 (PDT)
+Received: from ?IPv6:2a04:241e:502:1d80:f865:21f3:80af:d6db? ([2a04:241e:502:1d80:f865:21f3:80af:d6db])
+        by smtp.gmail.com with ESMTPSA id b11sm1174848eja.104.2021.08.12.12.46.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Aug 2021 12:46:50 -0700 (PDT)
+Subject: Re: [RFCv2 1/9] tcp: authopt: Initial support and key management
+From:   Leonard Crestez <cdleonard@gmail.com>
+To:     Dmitry Safonov <0x7f454c46@gmail.com>
+Cc:     Eric Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        David Ahern <dsahern@kernel.org>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Priyaranjan Jha <priyarjha@google.com>,
+        Menglong Dong <dong.menglong@zte.com.cn>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>,
+        Dmitry Safonov <dima@arista.com>
+References: <cover.1628544649.git.cdleonard@gmail.com>
+ <67c1471683200188b96a3f712dd2e8def7978462.1628544649.git.cdleonard@gmail.com>
+ <CAJwJo6aicw_KGQSM5U1=0X11QfuNf2dMATErSymytmpf75W=tA@mail.gmail.com>
+ <1e2848fb-1538-94aa-0431-636fa314a36d@gmail.com>
+Message-ID: <785d945e-c0d2-fee5-39d8-99dc06a074f1@gmail.com>
+Date:   Thu, 12 Aug 2021 22:46:48 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <1e2848fb-1538-94aa-0431-636fa314a36d@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
-
-On Wed, 2021-08-11 at 22:18 -0400, Eric Snowberg wrote:
-> With the introduction of the mok keyring, the end-user may choose to
-> trust Machine Owner Keys (MOK) within the kernel. If they have chosen to
-> trust them, the .mok keyring will contain these keys.  If not, the mok
-> keyring will always be empty.  Update the restriction check to allow the
-> secondary trusted keyring to also trust mok keys.
+On 8/11/21 11:29 AM, Leonard Crestez wrote:
+> On 8/10/21 11:41 PM, Dmitry Safonov wrote:
+>> On Tue, 10 Aug 2021 at 02:50, Leonard Crestez <cdleonard@gmail.com> 
+>>> +       /* If an old value exists for same local_id it is deleted */
+>>> +       key_info = __tcp_authopt_key_info_lookup(sk, info, 
+>>> opt.local_id);
+>>> +       if (key_info)
+>>> +               tcp_authopt_key_del(sk, info, key_info);
+>>> +       key_info = sock_kmalloc(sk, sizeof(*key_info), GFP_KERNEL | 
+>>> __GFP_ZERO);
+>>> +       if (!key_info)
+>>> +               return -ENOMEM;
+>>
+>> 1. You don't need sock_kmalloc() together with tcp_authopt_key_del().
+>>      It just frees the memory and allocates it back straight away - no
+>> sense in doing that.
 > 
-> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
-> ---
-> v3: Initial version
-> ---
->  certs/system_keyring.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The list is scanned in multiple places in later commits using nothing 
+> but an rcu_read_lock, this means that keys can't be updated in-place.
 > 
-> diff --git a/certs/system_keyring.c b/certs/system_keyring.c
-> index cb773e09ea67..8cc19a1ff051 100644
-> --- a/certs/system_keyring.c
-> +++ b/certs/system_keyring.c
-> @@ -110,7 +110,7 @@ static __init struct key_restriction *get_builtin_and_secondary_restriction(void
->  	if (!restriction)
->  		panic("Can't allocate secondary trusted keyring restriction\n");
->  
-> -	restriction->check = restrict_link_by_builtin_and_secondary_trusted;
-> +	restriction->check = restrict_link_by_builtin_secondary_and_ca_trusted;
->  
->  	return restriction;
->  }
+>> 2. I think RFC says you must not allow a user to change an existing key:
+>>> MKT parameters are not changed. Instead, new MKTs can be installed, 
+>>> and a connection
+>>> can change which MKT it uses.
+>>
+>> IIUC, it means that one can't just change an existing MKT, but one can
+>> remove and later
+>> add MKT with the same (send_id, recv_id, src_addr/port, dst_addr/port).
+>>
+>> So, a reasonable thing to do:
+>> if (key_info)
+>>      return -EEXIST.
+> 
+> You're right, making the user delete keys explicitly is better.
 
-Not everyone needs to build a generic kernel, like the distros.  As
-previously discussed, not everyone is willing to trust the new MOK
-keyring nor the UEFI variable for enabling it.  For those environments,
-they should be able to totally disable the MOK keyring.
+On a second thought this might be required to mark keys as "send-only" 
+and "recv-only" atomically.
 
-Please define a Kconfig similar to "CONFIG_SECONDARY_TRUSTED_KEYRING"
-for MOK.  The "restriction" would be based on the new Kconfig being
-enabled.
+Separately from RFC5925 some vendors implement a "keychain" model based 
+on RFC8177 where each key has a distinct "accept-lifetime" and a 
+"send-lifetime". This could be implemented by adding flags 
+"expired_for_send" and "expired_for_recv" but requires the ability to 
+set an expiration mark without the key ever being deleted.
 
-thanks,
-
-Mimi
-
+--
+Regards,
+Leonard
