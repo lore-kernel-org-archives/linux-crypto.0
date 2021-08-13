@@ -2,135 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB619C432BE
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 18:27:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D8AC4320A
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 20:19:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91B2160F21
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 18:27:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E6EB6109E
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 20:19:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233046AbhHMS1x (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Aug 2021 14:27:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9620 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232611AbhHMS1w (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Aug 2021 14:27:52 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17DI3jOQ042063;
-        Fri, 13 Aug 2021 14:26:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=j1lczph9q4hxdvWvkJjwrPNCN+2CWHiDAOVh9v5sYiU=;
- b=F1+hlBD2gBPPNoUXcTiipWWtJWpJU6FA9KmkHDnQOfBVoCgwR2Gvxv0+7AkkSRL9NLFb
- IuJ4dAHIwl9hU6p2JZ9DKch49Qulh294Gwyy7a7ilsJyADL90YH1lcmLlXD/4gvvNNwR
- RXvrl+7pTe27FIpzGMwC1DqD22gyKtJU/wF5/gTs6ux1Pxjfe7IVF6mLjqA6Iu53yZ7q
- 5mfElFskMjqkkkLE/zBIazGY6BhvHp6ivganzgDRCP1gPbuBMmL6UOMLP9po7E1W9/lE
- Q+s9FxubEmUypH5IIDwBtCWissidvLRObSxaa7VoV8Ap1VEMey3qVFtynTWRNk6ySgVt CA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3adsf3yww9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 14:26:26 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17DI3lvf042231;
-        Fri, 13 Aug 2021 14:26:26 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3adsf3ywvr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 14:26:26 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17DIJkBu001449;
-        Fri, 13 Aug 2021 18:26:24 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma01dal.us.ibm.com with ESMTP id 3ackhs8q50-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 18:26:24 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17DIQM5i30343530
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Aug 2021 18:26:22 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 38BE8112061;
-        Fri, 13 Aug 2021 18:26:22 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 745E3112062;
-        Fri, 13 Aug 2021 18:26:19 +0000 (GMT)
-Received: from li-4b5937cc-25c4-11b2-a85c-cea3a66903e4.ibm.com (unknown [9.211.76.133])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 13 Aug 2021 18:26:19 +0000 (GMT)
-Subject: Re: [PATCH v3 01/14] integrity: Introduce a Linux keyring for the
- Machine Owner Key (MOK)
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>, dhowells@redhat.com,
-        dwmw2@infradead.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, jmorris@namei.org, serge@hallyn.com,
-        keescook@chromium.org, gregkh@linuxfoundation.org,
-        torvalds@linux-foundation.org, scott.branden@broadcom.com,
-        weiyongjun1@huawei.com, nayna@linux.ibm.com, ebiggers@google.com,
-        ardb@kernel.org, nramas@linux.microsoft.com, lszubowi@redhat.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        James.Bottomley@hansenpartnership.com, pjones@redhat.com,
-        glin@suse.com, konrad.wilk@oracle.com
-References: <20210812021855.3083178-1-eric.snowberg@oracle.com>
- <20210812021855.3083178-2-eric.snowberg@oracle.com>
- <20210812185853.p5mgsgrftgwvt5fx@kernel.org>
-From:   Nayna <nayna@linux.vnet.ibm.com>
-Message-ID: <a3d7ce08-47e8-7287-772d-f7e789c47449@linux.vnet.ibm.com>
-Date:   Fri, 13 Aug 2021 14:26:18 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        id S233905AbhHMUUZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Aug 2021 16:20:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43520 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233743AbhHMUUZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Aug 2021 16:20:25 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0B9AA610CC;
+        Fri, 13 Aug 2021 20:19:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628885998;
+        bh=xcRKD6cavQDiPz0SFq1rvbp5fqwrvQU7hDAgltipPwA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Ml/q/3lXKx7gElVGI2Ljug3HcTmzV+RE0Jhl5ZotLDdseeFGB8RpHh5vepQHXuwXM
+         OF9DT8GUz8L+dJgCzWf9Naq+qmxc/IVklF60cR8GFCorGC4b73ah1zHYE1KQGF0g6p
+         jk4T6aV04j9Sxy8AUWZDpq5MfVDKIIEe8oLpkXwMJAD8qSheHkHibyQff6KVKDs1KA
+         gpRldNf9AGbzSgjEncjqqsOzuCICYp9mFiPwzyXhbP1La0+sRC+GyCrgKh2NKISn1E
+         wCTeZ1OFxYBxAsf6ZEYQuBph7wjFOFf160nGqC47CsRqLhDGf6AmS9bhgK+1Z03dbr
+         k53htSs5eL6lg==
+Date:   Fri, 13 Aug 2021 13:19:56 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        linux-crypto@vger.kernel.org
+Subject: Re: Building cifs.ko without any support for insecure crypto?
+Message-ID: <YRbT7IbSCXo4Dl0u@sol.localdomain>
+References: <YRXlwDBfQql36wJx@sol.localdomain>
+ <CAN05THSm5fEcnLKxcsidKPRUC6PVLCkWMBZUW05KNm4uMJNHWw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210812185853.p5mgsgrftgwvt5fx@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: NtaYsAueNdNnB6kwL7VEQdE3reAq6bwi
-X-Proofpoint-GUID: 33tuCCwIGg_cW1kX4YoburxLjhDz1bfR
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-13_06:2021-08-13,2021-08-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
- mlxlogscore=999 adultscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- priorityscore=1501 phishscore=0 spamscore=0 lowpriorityscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108130107
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAN05THSm5fEcnLKxcsidKPRUC6PVLCkWMBZUW05KNm4uMJNHWw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Fri, Aug 13, 2021 at 02:46:21PM +1000, ronnie sahlberg wrote:
+> On Fri, Aug 13, 2021 at 1:34 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > Hi!
+> >
+> > We should be working to eliminate any uses of insecure crypto algorithms (e.g.
+> > DES, ARC4, MD4, MD5) from the kernel.  In particular, it should be possible to
+> > build a kernel for a modern system without including any such algorithms.
+> >
+> > Currently, CONFIG_CIFS is problematic because it selects all these algorithms
+> > (kconfig options: CONFIG_CRYPTO_LIB_DES, CONFIG_CRYPTO_LIB_ARC4,
+> > CONFIG_CRYPTO_MD4, CONFIG_CRYPTO_MD5).
+> >
+> > It looks like these algorithms might only be used by SMB2.0 and earlier, and the
+> > more modern SMB versions don't use them.  Is that the case?  It mostly looks
+> > like that, but there's one case I'm not sure about -- there's a call chain which
+> > appears to use ARC4 and HMAC-MD5 even with the most recent SMB version:
+> >
+> >     smb311_operations.sess_setup()
+> >       SMB2_sess_setup()
+> >         SMB2_sess_auth_rawntlmssp_authenticate()
+> >           build_ntlmssp_auth_blob()
+> >             setup_ntlmv2_rsp()
+> 
+> md4 and md5 are used with the NTLMSSP authentication for all dialects,
+> including the latest 3.1.1.
 
-On 8/12/21 2:58 PM, Jarkko Sakkinen wrote:
-> On Wed, Aug 11, 2021 at 10:18:42PM -0400, Eric Snowberg wrote:
->> Many UEFI Linux distributions boot using shim.  The UEFI shim provides
->> what is called Machine Owner Keys (MOK). Shim uses both the UEFI Secure
->> Boot DB and MOK keys to validate the next step in the boot chain.  The
->> MOK facility can be used to import user generated keys.  These keys can
->> be used to sign an end-users development kernel build.  When Linux
->> boots, both UEFI Secure Boot DB and MOK keys get loaded in the Linux
->> .platform keyring.
->>
->> Add a new Linux keyring called .mok.  This keyring shall contain just
-> I would consider ".machine" instead. It holds MOK keys but is not a
-> MOK key.
+That's unfortunate.  Surely Microsoft knows that md4 has been severely
+compromised for over 25 years?  And md5 for 15 years.
 
-I agree with changing the name.
+> The only other authentication mechanism for SMB is krb5.
 
-I believe the underlying source from where CA keys are loaded might vary 
-based on the architecture (".mok" is UEFI specific.). The key part is 
-that this new keyring should contain only CA keys which can be later 
-used to vouch for user keys loaded onto IMA or secondary keyring at 
-runtime. It would be good to have a "ca" in the name, like .xxxx-ca, 
-where xxxx can be machine, owner, or system. I prefer .system-ca.
+Is the long-term plan to have everyone migrate to kerberos?  Currently kerberos
+doesn't appear to be the default, so not many people actually use it -- right?
 
-Thanks & Regards,
+> This means that if we build a kernel without md4/md5 then we can no
+> longer use NTLMSSP user/password
+> style authentication, only kerberos.
+>
+> I guess that the use cases where a kernel without these algorithms are
+> present are ok with kerberos as the
+> only authentication mech.
 
-      - Nayna
+Well, maybe.  Even without kerberos, would it still be possible to use SMB with
+a "guest" user only?
 
+> 
+> Afaik arc4 is only used for signing in the smb1 case.
+> 
+> >
+> > Also, there's already an option CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n which
+> > disables support for SMB2.0 and earlier.  However, it doesn't actually compile
+> > out the code but rather just prevents it from being used.  That means that the
+> > DES and ARC4 library interfaces are still depended on at link time, so they
+> > can't be omitted.  Have there been any considerations towards making
+> > CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n compile out the code for SMB2.0 and earlier?
+> 
+> I think initially we just wanted to disable its use. If we want to
+> compile a kernel completely without arc4/md4/md5 I think we would need
+> to:
+> 
+> 1, Change CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n to compile out the code
+> as you suggests.
+> This should remove the dependency for arc4. I think this would be a
+> good thing to do.
+> 
+> 2, Have a different CONFIG_... to compile out the use of NTLMSSP
+> authentication. This must be a different define
+> since md4/md5 are also used for non-legacy dialects.
+> And this should remove the dependency of md4/5.
+> 
+> For the latter, I guess we would need a global, i.e. not
+> cifs-specific, config option for this. I assume other users of
+> rc4/md4/md5
+> would also want this.
+> A new CONFIG_INSECURE_CRYPTO=n ?
+
+There is already an option CRYPTO_USER_API_ENABLE_OBSOLETE that could be
+renamed and reused if we wanted to expand its scope to all insecure crypto.
+
+Although a one-size-fits all kernel-wide option controlling "insecure" crypto
+could be controversial, as there is no consensus whether some crypto algorithms
+are secure or not, and different subsystems have different constraints.
+
+- Eric
