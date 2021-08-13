@@ -2,144 +2,162 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8889CC432BE
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 10:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B970C432BE
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 10:22:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7127360E09
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 10:04:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51D9C610FC
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 10:22:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239207AbhHMKEk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Aug 2021 06:04:40 -0400
-Received: from mail-io1-f72.google.com ([209.85.166.72]:34464 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239619AbhHMKDw (ORCPT
+        id S240024AbhHMKWx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Aug 2021 06:22:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36890 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239357AbhHMKWx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Aug 2021 06:03:52 -0400
-Received: by mail-io1-f72.google.com with SMTP id o8-20020a0566021248b029058d0f91164eso5137462iou.1
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Aug 2021 03:03:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=PwHnua1MRSkM55cL5lJZc/tqOzaEJb9p+ZlZGQxsT/0=;
-        b=iD4e9KTaJJW5HRi9GJSOqJpMUIlbG/Ts0kXcYTcTe/ovZ7Uljxf6QRxZhtH4DZn4Go
-         Q0FlrojEsirsaRnZUKA17fEJL/j04MACd14eyudKjLsQIDd1Mai+g/dJtIka4PBp65eS
-         QgmdS4QlvM037N+jFlwUrGwXppAA3WuPCst+duZiyYx4H6iyDltrUqPhsncH2QkpKURL
-         amnIE9wsTdLOJNNts4FRTzz7lM7CnTWlbaLTK/EPcUqZDWI8cTFqorySeZZQPqF5CPqj
-         gY4h6nbF2g4HTCMbivbKTI5KJGfAz9IDhfcOkd0IJoD1hv/MTM5VmVl1us9FOfW4lPzA
-         1ldg==
-X-Gm-Message-State: AOAM533z9pvgtSqMR8eG7dz8sgV8ShuDarq87fU0srU55HT0rpCJAzIi
-        hbw44YSlVrGkNmNxPW6P07L0lkhIw5peRDqbjDKyHGXrN4Js
-X-Google-Smtp-Source: ABdhPJxI8Q8KjD/NRrrnotWgA7SBp0CNhrx/fugxw5gwc9SHcW7aPk5G9LIwfX0QYP9TaLLrKkL80/fJWfwkYNEk/8xELY8W2qwr
+        Fri, 13 Aug 2021 06:22:53 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD161C0617AD;
+        Fri, 13 Aug 2021 03:22:26 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0a0d0079874d21390dee82.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:d00:7987:4d21:390d:ee82])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 179861EC0390;
+        Fri, 13 Aug 2021 12:22:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1628850141;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=BrEpox4JFTOv//FkK1+++liPSNoSwrYzYIAmzeG1Vvg=;
+        b=rrhY/wFPs01PzwPngi2OvYsBOn3Oj+mOPU4ppqg2QD3QMMpo5HPrRQksILGK2tbPzMNL/P
+        /Z+q2NCpFwOZGLfgdVjlJd5AbybcSaH0RK4p4eLjvedsqwEIBCnfou68aXrXhezqElb99A
+        CyzdpLOPT9knQnU7SkvRJRi/bsKl6e0=
+Date:   Fri, 13 Aug 2021 12:22:59 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 09/36] x86/compressed: Add helper for
+ validating pages in the decompression stage
+Message-ID: <YRZIA+qQ7EpO0zxC@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-10-brijesh.singh@amd.com>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d89:: with SMTP id h9mr1188392ila.46.1628849006091;
- Fri, 13 Aug 2021 03:03:26 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 03:03:26 -0700
-In-Reply-To: <00000000000006e7be05bda1c084@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000066a78105c96df6a3@google.com>
-Subject: Re: [syzbot] general protection fault in scatterwalk_copychunks (4)
-From:   syzbot <syzbot+66e3ea42c4b176748b9c@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210707181506.30489-10-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+On Wed, Jul 07, 2021 at 01:14:39PM -0500, Brijesh Singh wrote:
+> @@ -274,16 +274,31 @@ static int set_clr_page_flags(struct x86_mapping_info *info,
+>  	/*
+>  	 * Changing encryption attributes of a page requires to flush it from
+>  	 * the caches.
+> +	 *
+> +	 * If the encryption attribute is being cleared, then change the page
+> +	 * state to shared in the RMP table.
 
-HEAD commit:    f8fbb47c6e86 Merge branch 'for-v5.14' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11d1a779300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=171d57d5a48c8cad
-dashboard link: https://syzkaller.appspot.com/bug?extid=66e3ea42c4b176748b9c
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13b8db9e300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16c21581300000
+That comment...
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+66e3ea42c4b176748b9c@syzkaller.appspotmail.com
+>  	 */
+> -	if ((set | clr) & _PAGE_ENC)
+> +	if ((set | clr) & _PAGE_ENC) {
+>  		clflush_page(address);
+>  
 
-general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-CPU: 0 PID: 58 Comm: kworker/u4:3 Not tainted 5.14.0-rc5-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: pencrypt_parallel padata_parallel_worker
-RIP: 0010:scatterwalk_start include/crypto/scatterwalk.h:68 [inline]
-RIP: 0010:scatterwalk_pagedone include/crypto/scatterwalk.h:88 [inline]
-RIP: 0010:scatterwalk_pagedone include/crypto/scatterwalk.h:77 [inline]
-RIP: 0010:scatterwalk_copychunks+0x4db/0x6a0 crypto/scatterwalk.c:50
-Code: ff df 80 3c 02 00 0f 85 b4 01 00 00 49 8d 44 24 08 4d 89 26 48 89 c2 48 89 44 24 18 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 04 02 84 c0 74 08 3c 03 0f 8e 77 01 00 00 48 b8 00 00 00 00
-RSP: 0018:ffffc900011d7628 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000001 RSI: ffffffff83d3dc23 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 0000000000000000 R09: ffff88801903a69b
-R10: ffffffff83d3dbd3 R11: 0000000000086088 R12: 0000000000000000
-R13: 0000000000000001 R14: ffffc900011d7888 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000100 CR3: 000000001d355000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- skcipher_next_slow crypto/skcipher.c:278 [inline]
- skcipher_walk_next+0x7af/0x1680 crypto/skcipher.c:363
- skcipher_walk_first+0xf8/0x3c0 crypto/skcipher.c:446
- skcipher_walk_aead_common+0x7a5/0xbc0 crypto/skcipher.c:539
- gcmaes_crypt_by_sg+0x31d/0x890 arch/x86/crypto/aesni-intel_glue.c:658
- gcmaes_encrypt+0xe2/0x230 arch/x86/crypto/aesni-intel_glue.c:722
- generic_gcmaes_encrypt+0x12e/0x190 arch/x86/crypto/aesni-intel_glue.c:1071
- crypto_aead_encrypt+0xaa/0xf0 crypto/aead.c:94
- crypto_aead_encrypt+0xaa/0xf0 crypto/aead.c:94
- pcrypt_aead_enc+0x13/0x70 crypto/pcrypt.c:82
- padata_parallel_worker+0x60/0xb0 kernel/padata.c:157
- process_one_work+0x98d/0x1630 kernel/workqueue.c:2276
- process_scheduled_works kernel/workqueue.c:2338 [inline]
- worker_thread+0x85c/0x11f0 kernel/workqueue.c:2424
- kthread+0x3e5/0x4d0 kernel/kthread.c:319
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-Modules linked in:
----[ end trace d7f7427ae496b704 ]---
-RIP: 0010:scatterwalk_start include/crypto/scatterwalk.h:68 [inline]
-RIP: 0010:scatterwalk_pagedone include/crypto/scatterwalk.h:88 [inline]
-RIP: 0010:scatterwalk_pagedone include/crypto/scatterwalk.h:77 [inline]
-RIP: 0010:scatterwalk_copychunks+0x4db/0x6a0 crypto/scatterwalk.c:50
-Code: ff df 80 3c 02 00 0f 85 b4 01 00 00 49 8d 44 24 08 4d 89 26 48 89 c2 48 89 44 24 18 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 04 02 84 c0 74 08 3c 03 0f 8e 77 01 00 00 48 b8 00 00 00 00
-RSP: 0018:ffffc900011d7628 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000001 RSI: ffffffff83d3dc23 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 0000000000000000 R09: ffff88801903a69b
-R10: ffffffff83d3dbd3 R11: 0000000000086088 R12: 0000000000000000
-R13: 0000000000000001 R14: ffffc900011d7888 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000100 CR3: 000000000b68e000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess), 1 bytes skipped:
-   0:	df 80 3c 02 00 0f    	filds  0xf00023c(%rax)
-   6:	85 b4 01 00 00 49 8d 	test   %esi,-0x72b70000(%rcx,%rax,1)
-   d:	44 24 08             	rex.R and $0x8,%al
-  10:	4d 89 26             	mov    %r12,(%r14)
-  13:	48 89 c2             	mov    %rax,%rdx
-  16:	48 89 44 24 18       	mov    %rax,0x18(%rsp)
-  1b:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  22:	fc ff df 
-  25:	48 c1 ea 03          	shr    $0x3,%rdx
-  29:	0f b6 04 02          	movzbl (%rdx,%rax,1),%eax <-- trapping instruction
-  2d:	84 c0                	test   %al,%al
-  2f:	74 08                	je     0x39
-  31:	3c 03                	cmp    $0x3,%al
-  33:	0f 8e 77 01 00 00    	jle    0x1b0
-  39:	48                   	rex.W
-  3a:	b8 00 00 00 00       	mov    $0x0,%eax
+... goes here:
 
+<---
+
+> +		if (clr)
+> +			snp_set_page_shared(pte_pfn(*ptep) << PAGE_SHIFT);
+> +	}
+> +
+
+...
+
+> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
+> index 2f3081e9c78c..f386d45a57b6 100644
+> --- a/arch/x86/boot/compressed/sev.c
+> +++ b/arch/x86/boot/compressed/sev.c
+> @@ -164,6 +164,47 @@ static bool is_vmpl0(void)
+>  	return true;
+>  }
+>  
+> +static void __page_state_change(unsigned long paddr, int op)
+
+That op should be:
+
+enum psc_op {
+	SNP_PAGE_STATE_SHARED,
+	SNP_PAGE_STATE_PRIVATE,
+};
+
+and have
+
+static void __page_state_change(unsigned long paddr, enum psc_op op)
+
+so that the compiler can check you're at least passing from the correct
+set of defines.
+
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index ea508835ab33..aee07d1bb138 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -45,6 +45,23 @@
+>  		(((unsigned long)reg & GHCB_MSR_CPUID_REG_MASK) << GHCB_MSR_CPUID_REG_POS) | \
+>  		(((unsigned long)fn) << GHCB_MSR_CPUID_FUNC_POS))
+>  
+> +/* SNP Page State Change */
+> +#define GHCB_MSR_PSC_REQ		0x014
+> +#define SNP_PAGE_STATE_PRIVATE		1
+> +#define SNP_PAGE_STATE_SHARED		2
+> +#define GHCB_MSR_PSC_GFN_POS		12
+> +#define GHCB_MSR_PSC_GFN_MASK		GENMASK_ULL(39, 0)
+> +#define GHCB_MSR_PSC_OP_POS		52
+> +#define GHCB_MSR_PSC_OP_MASK		0xf
+> +#define GHCB_MSR_PSC_REQ_GFN(gfn, op)	\
+> +	(((unsigned long)((op) & GHCB_MSR_PSC_OP_MASK) << GHCB_MSR_PSC_OP_POS) | \
+> +	((unsigned long)((gfn) & GHCB_MSR_PSC_GFN_MASK) << GHCB_MSR_PSC_GFN_POS) | \
+> +	GHCB_MSR_PSC_REQ)
+> +
+> +#define GHCB_MSR_PSC_RESP		0x015
+> +#define GHCB_MSR_PSC_ERROR_POS		32
+> +#define GHCB_MSR_PSC_RESP_VAL(val)	((val) >> GHCB_MSR_PSC_ERROR_POS)
+> +
+
+Also get rid of eccessive defines...
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
