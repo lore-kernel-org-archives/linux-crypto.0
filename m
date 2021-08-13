@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 592C7C43214
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F45C432BE
 	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 09:41:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 434DF61151
+	by mail.kernel.org (Postfix) with ESMTP id D0FB360F00
 	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 09:41:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239717AbhHMJl7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S239736AbhHMJl7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 13 Aug 2021 05:41:59 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:8018 "EHLO
+Received: from szxga01-in.huawei.com ([45.249.212.187]:8017 "EHLO
         szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239319AbhHMJl5 (ORCPT
+        with ESMTP id S239312AbhHMJl5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 13 Aug 2021 05:41:57 -0400
 Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GmJTg4fN9zYpBJ;
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GmJTg4S2wzYpB6;
         Fri, 13 Aug 2021 17:41:11 +0800 (CST)
 Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
  dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
@@ -35,9 +35,9 @@ From:   Kai Ye <yekai13@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH 5/5] crypto: hisilicon/sec - add fallback tfm supporting for ahash
-Date:   Fri, 13 Aug 2021 17:40:26 +0800
-Message-ID: <1628847626-24383-6-git-send-email-yekai13@huawei.com>
+Subject: [PATCH 4/5] crypto: hisilicon/sec - ahash adapt to Kunpeng930 SQE
+Date:   Fri, 13 Aug 2021 17:40:25 +0800
+Message-ID: <1628847626-24383-5-git-send-email-yekai13@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1628847626-24383-1-git-send-email-yekai13@huawei.com>
 References: <1628847626-24383-1-git-send-email-yekai13@huawei.com>
@@ -51,195 +51,210 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-1. The Kunpeng920 hardware not support 0 packet size for digest mode.
-2. The hardware only supports 4-byte alignment key inputing.
-Due to the above hardware limitations, So the driver needs
-to setting the soft fallback hash tfm for user.
+The SEC ahash needs to supporting next generation of SEC
+accelerator hardware. So add the new BD filling process.
 
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 ---
- drivers/crypto/hisilicon/sec2/sec.h        |   2 +
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 105 +++++++++++++++++++++++++++++
- 2 files changed, 107 insertions(+)
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 137 ++++++++++++++++++++++++++++-
+ drivers/crypto/hisilicon/sec2/sec_crypto.h |   1 +
+ 2 files changed, 136 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index a68f7a4..7a81dcc 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -129,6 +129,8 @@ struct sec_auth_ctx {
- 	 */
- 	char metamac_idx[SEC_MAX_STREAMS];
- 	struct crypto_shash *hash_tfm;
-+	/* alloc soft hash tfm for not support parameter */
-+	struct crypto_shash *fallback_ahash_tfm;
- 	struct shash_desc *desc;
- 	struct crypto_aead *fallback_aead_tfm;
- };
 diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 85defc1..91853f8 100644
+index 2c6cfa7..85defc1 100644
 --- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
 +++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -1224,6 +1224,17 @@ static int sec_ahash_set_key(struct crypto_ahash *tfm, const u8 *key,
- 	struct crypto_shash *shash_tfm = a_ctx->hash_tfm;
- 	int blocksize, ret, digestsize;
- 
-+	ret = crypto_shash_setkey(a_ctx->fallback_ahash_tfm, key, keylen);
-+	if (ret) {
-+		pr_err("hisi_sec2: fallback shash set key error!\n");
-+		return ret;
-+	}
+@@ -55,6 +55,8 @@
+ #define SEC_AUTH_ALG_OFFSET_V3	15
+ #define SEC_CIPHER_AUTH_V3	0xbf
+ #define SEC_AUTH_CIPHER_V3	0x40
++#define SEC_AI_GEN_OFFSET_V3	2
 +
-+	if (keylen & WORD_ALIGNMENT_MASK) {
-+		a_ctx->fallback = true;
-+		return 0;
-+	}
-+
- 	blocksize = crypto_shash_blocksize(shash_tfm);
- 	digestsize = crypto_shash_digestsize(shash_tfm);
- 	if (keylen > blocksize) {
-@@ -2575,6 +2586,8 @@ static int sec_ahash_req_init(struct ahash_request *req)
- 	int sid;
- 
- 	sreq->ctx = ctx;
-+	if (unlikely(a_ctx->fallback))
-+		return crypto_shash_init(a_ctx->desc);
- 
- 	tfm_alg_name = tfm->base.__crt_alg->cra_name;
- 	a_ctx->mac_len = crypto_ahash_digestsize(tfm);
-@@ -2746,6 +2759,27 @@ static int sec_ahash_process(struct ahash_request *req)
- 	return ctx->req_op->process(ctx, sreq);
+ #define SEC_FLAG_OFFSET		7
+ #define SEC_FLAG_MASK		0x0780
+ #define SEC_TYPE_MASK		0x0F
+@@ -1681,6 +1683,69 @@ static void sec_ahash_stream_bd_fill(struct sec_auth_ctx *actx,
+ 	}
  }
  
-+static int sec_shash_update(struct ahash_request *req, struct sec_auth_ctx *ctx)
++static void sec_ahash_stream_bd_fill_v3(struct sec_auth_ctx *actx,
++					struct sec_req *req,
++					struct sec_sqe3 *sqe3)
 +{
-+	int nents = sg_nents(req->src);
-+	int total_sgl_len = 0;
-+	struct scatterlist *sg;
-+	int ret, i;
++	struct sec_ahash_req *sareq = &req->hash_req;
++	int sid = sareq->sid;
++	char *idx = &actx->metamac_idx[sid];
 +
-+	for_each_sg(req->src, sg, nents, i) {
-+		ret = crypto_shash_update(ctx->desc, sg_virt(sg), sg->length);
-+		if (ret) {
-+			pr_err("ahash use fallback ahash is error!\n");
-+			return ret;
++	 /**
++	  * Mac addr for ahash result
++	  *
++	  * First BD: idx == -1 && sec_ahash_req->op == SEC_OP_UPDATE
++	  * Middle BD: idx != -1 && sec_ahash_req->op == SEC_OP_UPDATE
++	  * End BD: sec_ahash_req->op == SEC_OP_FINAL ||
++	  *              sec_ahash_req->op == SEC_OP_FINUP
++	  * NOT stream BD, idx == -1, && sec_ahash_req->op == SEC_OP_FINAL ||
++	  *              sec_ahash_req->op == SEC_OP_FINUP
++	  */
++	if (*idx != (char)-1) {
++		sqe3->auth_ivin.a_ivin_addr = cpu_to_le64(actx->metamac_dma +
++				(sid + *idx) * SEC_MAX_DIGEST_SZ);
++
++		sqe3->mac_addr = cpu_to_le64(actx->metamac_dma +
++		(sid + ((unsigned char)*idx ^ 0x1)) * SEC_MAX_DIGEST_SZ);
++		/* Middle BD */
++		if (sareq->op == SEC_SHA_UPDATE) {
++			sqe3->auth_mac_key |= cpu_to_le32((u32)AIGEN_NOGEN <<
++							SEC_AI_GEN_OFFSET_V3);
++			sqe3->stream_scene.stream_auth_pad = AUTHPAD_NOPAD;
 +		}
-+		total_sgl_len += sg->length;
-+		if (total_sgl_len == req->nbytes)
-+			break;
++	} else {
++		/* no meta-mac */
++		sqe3->mac_addr = cpu_to_le64(actx->metamac_dma +
++				sid * SEC_MAX_DIGEST_SZ);
++		/* First BD */
++		if (sareq->op == SEC_SHA_UPDATE) {
++			sqe3->auth_mac_key |= cpu_to_le32((u32)AIGEN_GEN <<
++							SEC_AI_GEN_OFFSET_V3);
++			sqe3->stream_scene.stream_auth_pad = AUTHPAD_NOPAD;
++			sareq->is_stream_mode = true;
++		}
 +	}
 +
-+	return 0;
++	/* End BD */
++	if ((sareq->op == SEC_SHA_FINAL || sareq->op == SEC_SHA_FINUP) &&
++	    sareq->is_stream_mode) {
++		sqe3->auth_ivin.a_ivin_addr = cpu_to_le64(actx->metamac_dma +
++					(sid + *idx) * SEC_MAX_DIGEST_SZ);
++
++		sqe3->mac_addr = cpu_to_le64(actx->metamac_dma + (sid +
++			((unsigned char)*idx ^ 0x1)) * SEC_MAX_DIGEST_SZ);
++
++		sqe3->auth_mac_key |= cpu_to_le32((u32)AIGEN_NOGEN <<
++							SEC_AI_GEN_OFFSET_V3);
++		sqe3->stream_scene.stream_auth_pad = AUTHPAD_PAD;
++
++		/* Fill the total hash data length */
++		sqe3->stream_scene.long_a_data_len =
++				cpu_to_le64(sareq->total_data_len << 0x3);
++		sareq->is_stream_mode = false;
++	}
 +}
 +
- static int sec_ahash_update(struct ahash_request *req)
+ static void sec_ahash_data_len_fill(struct sec_ahash_req *sareq,
+ 				    struct sec_sqe *sec_sqe)
  {
- 	struct sec_req *sreq = ahash_request_ctx(req);
-@@ -2757,6 +2791,9 @@ static int sec_ahash_update(struct ahash_request *req)
- 	u32 data_len;
- 	u8 idx;
+@@ -1693,6 +1758,18 @@ static void sec_ahash_data_len_fill(struct sec_ahash_req *sareq,
+ 		sec_sqe->type2.alen_ivllen = cpu_to_le32(sareq->req_data_len);
+ }
  
-+	if (unlikely(a_ctx->fallback))
-+		return sec_shash_update(req, a_ctx);
++static void sec_ahash_data_len_fill_v3(struct sec_ahash_req *sareq,
++				       struct sec_sqe3 *sec_sqe3)
++{
++	if ((sareq->op == SEC_SHA_UPDATE || sareq->op == SEC_SHA_FINAL) &&
++	    sareq->pp_data_len)
++		sec_sqe3->a_len_key = cpu_to_le32(sareq->block_data_len);
++	else if (!sareq->pp_data_len && sareq->op == SEC_SHA_FINAL)
++		sec_sqe3->a_len_key = cpu_to_le32(0);
++	else
++		sec_sqe3->a_len_key = cpu_to_le32(sareq->req_data_len);
++}
 +
- 	if (unlikely(req->nbytes > SEC_HW_MAX_LEN)) {
- 		dev_err_ratelimited(ctx->dev, "too long input for updating!\n");
- 		return -EINVAL;
-@@ -2800,6 +2837,9 @@ static int sec_ahash_final(struct ahash_request *req)
- 	u32 sid = sareq->sid;
- 	u8 idx;
- 
-+	if (unlikely(a_ctx->fallback))
-+		return crypto_shash_final(a_ctx->desc, req->result);
-+
- 	sareq->op = SEC_SHA_FINAL;
- 	if (sareq->is_stream_mode) {
- 		idx = ctx->pingpong_idx[sid];
-@@ -2826,6 +2866,20 @@ static int sec_ahash_finup(struct ahash_request *req)
- 	int i = 0;
- 	int ret;
- 
-+	if (unlikely(a_ctx->fallback)) {
-+		for_each_sg(req->src, sg, nents, i) {
-+			if (i + 1 == sg_nents(req->src))
-+				return crypto_shash_finup(a_ctx->desc, sg_virt(sg),
-+							sg->length, req->result);
-+
-+			ret = crypto_shash_update(a_ctx->desc, sg_virt(sg), sg->length);
-+			if (ret) {
-+				pr_err("ahash use fallback ahash is error!\n");
-+				return ret;
-+			}
-+		}
-+	}
-+
- 	if (sareq->op == SEC_SHA_UPDATE) {
- 		if (unlikely(req->nbytes > SEC_HW_MAX_LEN)) {
- 			dev_err_ratelimited(ctx->dev, "too long input for update+finup!\n");
-@@ -2940,6 +2994,23 @@ static int sec_ahash_digest(struct ahash_request *req)
- 	if (req->nbytes > SEC_HW_MAX_LEN)
- 		return sec_ahash_larger_digest(req);
- 
-+	/* kunpeng 920, digest mode not support input 0 size */
-+	if (unlikely(ctx->type_supported == SEC_BD_TYPE2 && !req->nbytes))
-+		return crypto_shash_digest(a_ctx->desc, sg_virt(req->src), 0,
-+								req->result);
-+
-+	if (unlikely(a_ctx->fallback)) {
-+		for_each_sg(req->src, sg, nents, i) {
-+			ret = crypto_shash_update(a_ctx->desc, sg_virt(sg),
-+						  sg->length);
-+			if (ret) {
-+				pr_err("ahash use fallback ahash is error!\n");
-+				return ret;
-+			}
-+		}
-+
-+		return crypto_shash_final(a_ctx->desc, req->result);
-+	}
- 	sareq->op = SEC_SHA_DIGEST;
- 
- 	return sec_ahash_finup(req);
-@@ -2971,6 +3042,40 @@ static int sec_ahash_import(struct ahash_request *req, const void *in)
+ static int sec_ahash_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
+ {
+ 	struct sec_auth_ctx *actx = &ctx->a_ctx;
+@@ -1733,6 +1810,47 @@ static int sec_ahash_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
  	return 0;
  }
  
-+static void sec_release_fallback_shash(struct crypto_shash *tfm,
-+				       struct shash_desc *desc)
++static int sec_ahash_bd_fill_v3(struct sec_ctx *ctx, struct sec_req *req)
 +{
-+	crypto_free_shash(tfm);
-+	kfree(desc);
-+}
++	struct sec_auth_ctx *actx = &ctx->a_ctx;
++	struct sec_sqe3 *sec_sqe3 = &req->sec_sqe3;
++	struct sec_ahash_req *sareq = &req->hash_req;
++	dma_addr_t pp_dma = sareq->pp_dma;
++	u32 bd_param = 0;
 +
-+static int sec_alloc_fallback_shash(const char *driver,
-+				    struct crypto_shash **tfm_ret,
-+				    struct shash_desc **desc_ret)
-+{
-+	struct crypto_shash *tfm;
-+	struct shash_desc *desc;
-+	int ret;
++	memset(sec_sqe3, 0, sizeof(struct sec_sqe3));
 +
-+	tfm = crypto_alloc_shash(driver, 0, CRYPTO_ALG_NEED_FALLBACK);
-+	if (IS_ERR(tfm)) {
-+		pr_err("ahash driver alloc hmac shash error!\n");
-+		ret = PTR_ERR(tfm);
-+		return ret;
-+	}
-+	desc = kmalloc(sizeof(*desc) + crypto_shash_descsize(tfm), GFP_KERNEL);
-+	if (!desc) {
-+		crypto_free_shash(tfm);
-+		return -ENOMEM;
-+	}
-+	desc->tfm = tfm;
++	bd_param |= SEC_SGL << SEC_SRC_SGL_OFFSET_V3;
++	bd_param |= SEC_STREAM_SCENE << SEC_SCENE_OFFSET_V3;
++	bd_param |= SEC_BD_TYPE3;
++	sec_sqe3->bd_param = cpu_to_le32(bd_param);
 +
-+	*tfm_ret = tfm;
-+	*desc_ret = desc;
++	sec_sqe3->data_src_addr = cpu_to_le64(pp_dma);
++
++	sec_sqe3->a_key_addr = cpu_to_le64(actx->a_key_dma);
++
++	sec_sqe3->auth_mac_key = cpu_to_le32((u32)SEC_AUTH_TYPE1);
++
++	sec_sqe3->auth_mac_key |=
++			cpu_to_le32((u32)(actx->mac_len /
++			SEC_SQE_LEN_RATE) << SEC_MAC_OFFSET_V3);
++
++	sec_sqe3->auth_mac_key |=
++			cpu_to_le32((u32)((actx->a_key_len) /
++			SEC_SQE_LEN_RATE) << SEC_AKEY_OFFSET_V3);
++
++	sec_sqe3->auth_mac_key |=
++			cpu_to_le32((u32)(actx->a_alg) << SEC_AUTH_ALG_OFFSET_V3);
++
++	sec_ahash_data_len_fill_v3(sareq, sec_sqe3);
++
++	sec_ahash_stream_bd_fill_v3(actx, req, sec_sqe3);
++
++	sec_sqe3->tag = cpu_to_le64((unsigned long)(uintptr_t)req);
 +
 +	return 0;
 +}
 +
- static void sec_ahash_tfm_uninit(struct crypto_tfm *tfm)
+ /* increment counter (128-bit int) */
+ static void ctr_iv_inc(__u8 *counter, __u8 bits, __u32 nums)
  {
- 	struct sec_ctx *ctx = crypto_tfm_ctx(tfm);
+@@ -2295,6 +2413,16 @@ static const struct sec_req_op sec_aead_req_ops_v3 = {
+ 	.process	= sec_process,
+ };
+ 
++static const struct sec_req_op sec_ahash_req_ops_v3 = {
++	.buf_map	= sec_ahash_sgl_map,
++	.buf_unmap	= sec_ahash_sgl_unmap,
++	.do_transfer	= sec_ahash_transfer,
++	.bd_fill	= sec_ahash_bd_fill_v3,
++	.bd_send	= sec_bd_send,
++	.callback	= sec_ahash_callback,
++	.process	= sec_process,
++};
++
+ static int sec_skcipher_ctx_init(struct crypto_skcipher *tfm)
+ {
+ 	struct sec_ctx *ctx = crypto_skcipher_ctx(tfm);
+@@ -2875,8 +3003,13 @@ static int sec_ahash_tfm_init(struct crypto_tfm *tfm, const char *ahash_name)
+ 	if (ret)
+ 		goto err_auth_init;
+ 
+-	ctx->type_supported = SEC_BD_TYPE2;
+-	ctx->req_op = &sec_ahash_req_ops;
++	if (ctx->sec->qm.ver < QM_HW_V3) {
++		ctx->type_supported = SEC_BD_TYPE2;
++		ctx->req_op = &sec_ahash_req_ops;
++	} else {
++		ctx->type_supported = SEC_BD_TYPE3;
++		ctx->req_op = &sec_ahash_req_ops_v3;
++	}
+ 
+ 	/* Support 128 streams/threads per TFM, memory for small packets */
+ 	ret = sec_stream_mode_init(ctx);
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+index 2157b98..9f117b5 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+@@ -9,6 +9,7 @@
+ #define SEC_MAX_KEY_SIZE	64
+ #define SEC_COMM_SCENE		0
+ #define SEC_IPSEC_SCENE		1
++#define SEC_STREAM_SCENE	0x7
+ #define SEC_MAX_STREAMS		128
+ #define SEC_SHA1_ALIGN_SZ	64
+ #define SEC_SHA512_ALIGN_SZ	128
 -- 
 2.7.4
 
