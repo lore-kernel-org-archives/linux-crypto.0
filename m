@@ -2,113 +2,148 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 422C8C4338F
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 08:16:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F33E1C4338F
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 09:03:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F4CD60FC3
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 08:16:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB2AD6104F
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 09:03:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239799AbhHMIQ2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Aug 2021 04:16:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36028 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239798AbhHMIQ2 (ORCPT
+        id S239235AbhHMJD4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Aug 2021 05:03:56 -0400
+Received: from vmicros1.altlinux.org ([194.107.17.57]:55968 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238823AbhHMJDz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Aug 2021 04:16:28 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB928C061756
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Aug 2021 01:16:01 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mESM7-0008Fh-LI; Fri, 13 Aug 2021 10:15:55 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mESM3-0004xx-Ej; Fri, 13 Aug 2021 10:15:51 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mESM3-0001fU-DV; Fri, 13 Aug 2021 10:15:51 +0200
-Date:   Fri, 13 Aug 2021 10:15:51 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     Fiona Trahe <fiona.trahe@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        qat-linux@intel.com, Bjorn Helgaas <helgaas@kernel.org>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        linux-pci@vger.kernel.org, Jack Xu <jack.xu@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v3 6/8] crypto: qat - simplify adf_enable_aer()
-Message-ID: <20210813081551.7tmg777dmu34qkqz@pengutronix.de>
-References: <20210811080637.2596434-1-u.kleine-koenig@pengutronix.de>
- <20210811080637.2596434-7-u.kleine-koenig@pengutronix.de>
- <YRO69xL+F/6Paj+I@silpixa00400314>
- <20210811213405.avihazo33irdjxic@pengutronix.de>
- <YRUzfQCLOtRmXyCr@silpixa00400314>
+        Fri, 13 Aug 2021 05:03:55 -0400
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id D879D72C8FB;
+        Fri, 13 Aug 2021 12:03:27 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+        by imap.altlinux.org (Postfix) with ESMTPSA id B63664A46F2;
+        Fri, 13 Aug 2021 12:03:27 +0300 (MSK)
+Date:   Fri, 13 Aug 2021 12:03:27 +0300
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jia Zhang <zhang.jia@linux.alibaba.com>,
+        "YiLin . Li" <YiLin.Li@linux.alibaba.com>
+Subject: Re: [PATCH v2 1/3] crypto: tcrypt - Fix missing return value check
+Message-ID: <20210813090327.g6x5gi2hoale5kjg@altlinux.org>
+References: <20210813075508.98854-1-tianjia.zhang@linux.alibaba.com>
+ <20210813075508.98854-2-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="ex3zxap4roafumc2"
+Content-Type: text/plain; charset=koi8-r
 Content-Disposition: inline
-In-Reply-To: <YRUzfQCLOtRmXyCr@silpixa00400314>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+In-Reply-To: <20210813075508.98854-2-tianjia.zhang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Fri, Aug 13, 2021 at 03:55:06PM +0800, Tianjia Zhang wrote:
+> There are several places where the return value check of crypto_aead_setkey
+> and crypto_aead_setauthsize were lost. It is necessary to add these checks.
+> 
+> At the same time, move the crypto_aead_setauthsize() call out of the loop,
+> and only need to call it once after load transform.
+> 
+> Fixee: 53f52d7aecb4 ("crypto: tcrypt - Added speed tests for AEAD crypto alogrithms in tcrypt test suite")
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 
---ex3zxap4roafumc2
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
 
-Hello Giovanni,
+Thanks,
 
-On Thu, Aug 12, 2021 at 03:43:09PM +0100, Giovanni Cabiddu wrote:
-> On Wed, Aug 11, 2021 at 11:34:05PM +0200, Uwe Kleine-K=F6nig wrote:
-> > Yeah, the other three drivers need an adaption, too. I will send a v4 in
-> > the next few days. The current state is available at
-> >=20
-> > 	https://git.pengutronix.de/git/ukl/linux pci-dedup
->=20
-> I fixed that and tested on c62x. Here is an updated patch:
-
-Apart from ordering in drivers/crypto/qat/qat_common/adf_common_drv.h
-and some whitespace differences there is already an equivalent commit in
-my branch.
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---ex3zxap4roafumc2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmEWKjMACgkQwfwUeK3K
-7AndRgf/cKoQv7/fVI1Jac3BVBv5zRjbb2ti4Havmsg/+TC1QMk6me1V0uJnjyDb
-XW+R229ldw7rn5JfyX/8iYacpsbWQOWozhJtqudZXTUHN8FBbQTnoI6RwQqIcfty
-intHRB9m2b9s1RQRgGSvYH2m34dGVNDjwMyg/1qMXbdoC5CM9zcf4V1f3BEyCJge
-Qkf1dSikH/c7X6eh7zQP/q9VTeNNQy1BR8uHJNThAp4LWukQ/zhpTjvRrFuobKLG
-ZfdjtbLi4rwBfO6HaXbLOOizJpC08QB7rXNEPqR7H1gDcyTmFkcs17mZc3hl8x0B
-Jq+RgGp4pzOt7Y1lmzVwHu116wXjTQ==
-=P/nS
------END PGP SIGNATURE-----
-
---ex3zxap4roafumc2--
+> ---
+>  crypto/tcrypt.c | 29 +++++++++++++++++++----------
+>  1 file changed, 19 insertions(+), 10 deletions(-)
+> 
+> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+> index d73a42fdaa9b..170102e92f7d 100644
+> --- a/crypto/tcrypt.c
+> +++ b/crypto/tcrypt.c
+> @@ -290,6 +290,11 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
+>  	}
+>  
+>  	ret = crypto_aead_setauthsize(tfm, authsize);
+> +	if (ret) {
+> +		pr_err("alg: aead: Failed to setauthsize for %s: %d\n", algo,
+> +		       ret);
+> +		goto out_free_tfm;
+> +	}
+>  
+>  	for (i = 0; i < num_mb; ++i)
+>  		if (testmgr_alloc_buf(data[i].xbuf)) {
+> @@ -315,7 +320,7 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
+>  	for (i = 0; i < num_mb; ++i) {
+>  		data[i].req = aead_request_alloc(tfm, GFP_KERNEL);
+>  		if (!data[i].req) {
+> -			pr_err("alg: skcipher: Failed to allocate request for %s\n",
+> +			pr_err("alg: aead: Failed to allocate request for %s\n",
+>  			       algo);
+>  			while (i--)
+>  				aead_request_free(data[i].req);
+> @@ -567,13 +572,19 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+>  	sgout = &sg[9];
+>  
+>  	tfm = crypto_alloc_aead(algo, 0, 0);
+> -
+>  	if (IS_ERR(tfm)) {
+>  		pr_err("alg: aead: Failed to load transform for %s: %ld\n", algo,
+>  		       PTR_ERR(tfm));
+>  		goto out_notfm;
+>  	}
+>  
+> +	ret = crypto_aead_setauthsize(tfm, authsize);
+> +	if (ret) {
+> +		pr_err("alg: aead: Failed to setauthsize for %s: %d\n", algo,
+> +		       ret);
+> +		goto out_noreq;
+> +	}
+> +
+>  	crypto_init_wait(&wait);
+>  	printk(KERN_INFO "\ntesting speed of %s (%s) %s\n", algo,
+>  			get_driver_name(crypto_aead, tfm), e);
+> @@ -611,8 +622,13 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+>  					break;
+>  				}
+>  			}
+> +
+>  			ret = crypto_aead_setkey(tfm, key, *keysize);
+> -			ret = crypto_aead_setauthsize(tfm, authsize);
+> +			if (ret) {
+> +				pr_err("setkey() failed flags=%x: %d\n",
+> +					crypto_aead_get_flags(tfm), ret);
+> +				goto out;
+> +			}
+>  
+>  			iv_len = crypto_aead_ivsize(tfm);
+>  			if (iv_len)
+> @@ -622,15 +638,8 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+>  			printk(KERN_INFO "test %u (%d bit key, %d byte blocks): ",
+>  					i, *keysize * 8, bs);
+>  
+> -
+>  			memset(tvmem[0], 0xff, PAGE_SIZE);
+>  
+> -			if (ret) {
+> -				pr_err("setkey() failed flags=%x\n",
+> -						crypto_aead_get_flags(tfm));
+> -				goto out;
+> -			}
+> -
+>  			sg_init_aead(sg, xbuf, bs + (enc ? 0 : authsize),
+>  				     assoc, aad_size);
+>  
+> -- 
+> 2.19.1.3.ge56e4f7
