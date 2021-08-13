@@ -2,193 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDBD3C4320E
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 17:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB619C432BE
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 18:27:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C97D661139
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 17:09:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91B2160F21
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 18:27:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232066AbhHMRJt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Aug 2021 13:09:49 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:33428 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231683AbhHMRJs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Aug 2021 13:09:48 -0400
-Received: from zn.tnic (p200300ec2f0a0d00fd43514a4e38f781.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:d00:fd43:514a:4e38:f781])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4622D1EC0502;
-        Fri, 13 Aug 2021 19:09:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1628874551;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=OYDR+bOlD9MQDx8acVKVsEbxOBwDuCkmZLbEzyaj+Rs=;
-        b=AOLEJqQyVT9avPMKrehwNg2854F7QmISBDwpu37rsCOUEDPNyxTi2bE0MsVpYw9uZa7DBF
-        zWQntqK0GpobQ9qnhEivbl5Gr/FUv22Q3WasTXn6VgIvU6yDId2fwJkmxaqQxx3vPULrVJ
-        bYEW/1RBqALROSM3XU1THRatcNZZJ90=
-Date:   Fri, 13 Aug 2021 19:09:50 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 13/36] x86/kernel: Make the bss.decrypted
- section shared in RMP table
-Message-ID: <YRanXmUZCCLjNqDy@zn.tnic>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-14-brijesh.singh@amd.com>
+        id S233046AbhHMS1x (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Aug 2021 14:27:53 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9620 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232611AbhHMS1w (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Aug 2021 14:27:52 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17DI3jOQ042063;
+        Fri, 13 Aug 2021 14:26:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=j1lczph9q4hxdvWvkJjwrPNCN+2CWHiDAOVh9v5sYiU=;
+ b=F1+hlBD2gBPPNoUXcTiipWWtJWpJU6FA9KmkHDnQOfBVoCgwR2Gvxv0+7AkkSRL9NLFb
+ IuJ4dAHIwl9hU6p2JZ9DKch49Qulh294Gwyy7a7ilsJyADL90YH1lcmLlXD/4gvvNNwR
+ RXvrl+7pTe27FIpzGMwC1DqD22gyKtJU/wF5/gTs6ux1Pxjfe7IVF6mLjqA6Iu53yZ7q
+ 5mfElFskMjqkkkLE/zBIazGY6BhvHp6ivganzgDRCP1gPbuBMmL6UOMLP9po7E1W9/lE
+ Q+s9FxubEmUypH5IIDwBtCWissidvLRObSxaa7VoV8Ap1VEMey3qVFtynTWRNk6ySgVt CA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3adsf3yww9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Aug 2021 14:26:26 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17DI3lvf042231;
+        Fri, 13 Aug 2021 14:26:26 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3adsf3ywvr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Aug 2021 14:26:26 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17DIJkBu001449;
+        Fri, 13 Aug 2021 18:26:24 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma01dal.us.ibm.com with ESMTP id 3ackhs8q50-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Aug 2021 18:26:24 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17DIQM5i30343530
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Aug 2021 18:26:22 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 38BE8112061;
+        Fri, 13 Aug 2021 18:26:22 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 745E3112062;
+        Fri, 13 Aug 2021 18:26:19 +0000 (GMT)
+Received: from li-4b5937cc-25c4-11b2-a85c-cea3a66903e4.ibm.com (unknown [9.211.76.133])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 13 Aug 2021 18:26:19 +0000 (GMT)
+Subject: Re: [PATCH v3 01/14] integrity: Introduce a Linux keyring for the
+ Machine Owner Key (MOK)
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Eric Snowberg <eric.snowberg@oracle.com>
+Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>, dhowells@redhat.com,
+        dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, jmorris@namei.org, serge@hallyn.com,
+        keescook@chromium.org, gregkh@linuxfoundation.org,
+        torvalds@linux-foundation.org, scott.branden@broadcom.com,
+        weiyongjun1@huawei.com, nayna@linux.ibm.com, ebiggers@google.com,
+        ardb@kernel.org, nramas@linux.microsoft.com, lszubowi@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@hansenpartnership.com, pjones@redhat.com,
+        glin@suse.com, konrad.wilk@oracle.com
+References: <20210812021855.3083178-1-eric.snowberg@oracle.com>
+ <20210812021855.3083178-2-eric.snowberg@oracle.com>
+ <20210812185853.p5mgsgrftgwvt5fx@kernel.org>
+From:   Nayna <nayna@linux.vnet.ibm.com>
+Message-ID: <a3d7ce08-47e8-7287-772d-f7e789c47449@linux.vnet.ibm.com>
+Date:   Fri, 13 Aug 2021 14:26:18 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210707181506.30489-14-brijesh.singh@amd.com>
+In-Reply-To: <20210812185853.p5mgsgrftgwvt5fx@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: NtaYsAueNdNnB6kwL7VEQdE3reAq6bwi
+X-Proofpoint-GUID: 33tuCCwIGg_cW1kX4YoburxLjhDz1bfR
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-13_06:2021-08-13,2021-08-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
+ mlxlogscore=999 adultscore=0 bulkscore=0 impostorscore=0 malwarescore=0
+ priorityscore=1501 phishscore=0 spamscore=0 lowpriorityscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108130107
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 07, 2021 at 01:14:43PM -0500, Brijesh Singh wrote:
-> The encryption attribute for the bss.decrypted region is cleared in the
-> initial page table build. This is because the section contains the data
-> that need to be shared between the guest and the hypervisor.
-> 
-> When SEV-SNP is active, just clearing the encryption attribute in the
-> page table is not enough. The page state need to be updated in the RMP
-> table.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/kernel/head64.c | 7 +++++++
->  1 file changed, 7 insertions(+)
 
-Please apply this cleanup before this one.
+On 8/12/21 2:58 PM, Jarkko Sakkinen wrote:
+> On Wed, Aug 11, 2021 at 10:18:42PM -0400, Eric Snowberg wrote:
+>> Many UEFI Linux distributions boot using shim.  The UEFI shim provides
+>> what is called Machine Owner Keys (MOK). Shim uses both the UEFI Secure
+>> Boot DB and MOK keys to validate the next step in the boot chain.  The
+>> MOK facility can be used to import user generated keys.  These keys can
+>> be used to sign an end-users development kernel build.  When Linux
+>> boots, both UEFI Secure Boot DB and MOK keys get loaded in the Linux
+>> .platform keyring.
+>>
+>> Add a new Linux keyring called .mok.  This keyring shall contain just
+> I would consider ".machine" instead. It holds MOK keys but is not a
+> MOK key.
 
-Thx.
+I agree with changing the name.
 
----
-From: Borislav Petkov <bp@suse.de>
-Subject: [PATCH] x86/head64: Carve out the guest encryption postprocessing into a helper
+I believe the underlying source from where CA keys are loaded might vary 
+based on the architecture (".mok" is UEFI specific.). The key part is 
+that this new keyring should contain only CA keys which can be later 
+used to vouch for user keys loaded onto IMA or secondary keyring at 
+runtime. It would be good to have a "ca" in the name, like .xxxx-ca, 
+where xxxx can be machine, owner, or system. I prefer .system-ca.
 
-Carve it out so that it is abstracted out of the main boot path. All
-other encrypted guest-relevant processing should be placed in there.
+Thanks & Regards,
 
-No functional changes.
+      - Nayna
 
-Signed-off-by: Borislav Petkov <bp@suse.de>
----
- arch/x86/kernel/head64.c | 55 ++++++++++++++++++++++------------------
- 1 file changed, 31 insertions(+), 24 deletions(-)
-
-diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-index de01903c3735..eee24b427237 100644
---- a/arch/x86/kernel/head64.c
-+++ b/arch/x86/kernel/head64.c
-@@ -126,6 +126,36 @@ static bool __head check_la57_support(unsigned long physaddr)
- }
- #endif
- 
-+static unsigned long sme_postprocess_startup(struct boot_params *bp, pmdval_t *pmd)
-+{
-+	unsigned long vaddr, vaddr_end;
-+	int i;
-+
-+	/* Encrypt the kernel and related (if SME is active) */
-+	sme_encrypt_kernel(bp);
-+
-+	/*
-+	 * Clear the memory encryption mask from the .bss..decrypted section.
-+	 * The bss section will be memset to zero later in the initialization so
-+	 * there is no need to zero it after changing the memory encryption
-+	 * attribute.
-+	 */
-+	if (mem_encrypt_active()) {
-+		vaddr = (unsigned long)__start_bss_decrypted;
-+		vaddr_end = (unsigned long)__end_bss_decrypted;
-+		for (; vaddr < vaddr_end; vaddr += PMD_SIZE) {
-+			i = pmd_index(vaddr);
-+			pmd[i] -= sme_get_me_mask();
-+		}
-+	}
-+
-+	/*
-+	 * Return the SME encryption mask (if SME is active) to be used as a
-+	 * modifier for the initial pgdir entry programmed into CR3.
-+	 */
-+	return sme_get_me_mask();
-+}
-+
- /* Code in __startup_64() can be relocated during execution, but the compiler
-  * doesn't have to generate PC-relative relocations when accessing globals from
-  * that function. Clang actually does not generate them, which leads to
-@@ -135,7 +165,6 @@ static bool __head check_la57_support(unsigned long physaddr)
- unsigned long __head __startup_64(unsigned long physaddr,
- 				  struct boot_params *bp)
- {
--	unsigned long vaddr, vaddr_end;
- 	unsigned long load_delta, *p;
- 	unsigned long pgtable_flags;
- 	pgdval_t *pgd;
-@@ -276,29 +305,7 @@ unsigned long __head __startup_64(unsigned long physaddr,
- 	 */
- 	*fixup_long(&phys_base, physaddr) += load_delta - sme_get_me_mask();
- 
--	/* Encrypt the kernel and related (if SME is active) */
--	sme_encrypt_kernel(bp);
--
--	/*
--	 * Clear the memory encryption mask from the .bss..decrypted section.
--	 * The bss section will be memset to zero later in the initialization so
--	 * there is no need to zero it after changing the memory encryption
--	 * attribute.
--	 */
--	if (mem_encrypt_active()) {
--		vaddr = (unsigned long)__start_bss_decrypted;
--		vaddr_end = (unsigned long)__end_bss_decrypted;
--		for (; vaddr < vaddr_end; vaddr += PMD_SIZE) {
--			i = pmd_index(vaddr);
--			pmd[i] -= sme_get_me_mask();
--		}
--	}
--
--	/*
--	 * Return the SME encryption mask (if SME is active) to be used as a
--	 * modifier for the initial pgdir entry programmed into CR3.
--	 */
--	return sme_get_me_mask();
-+	return sme_postprocess_startup(bp, pmd);
- }
- 
- unsigned long __startup_secondary_64(void)
--- 
-2.29.2
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
