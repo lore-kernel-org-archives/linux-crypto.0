@@ -2,45 +2,41 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05038C432BE
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 16:31:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDBD3C4320E
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 17:09:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D361C60F14
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 16:31:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C97D661139
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 17:09:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235752AbhHMQcS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Aug 2021 12:32:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235688AbhHMQcR (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Aug 2021 12:32:17 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 679CFC061756;
-        Fri, 13 Aug 2021 09:31:50 -0700 (PDT)
+        id S232066AbhHMRJt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Aug 2021 13:09:49 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:33428 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231683AbhHMRJs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Aug 2021 13:09:48 -0400
 Received: from zn.tnic (p200300ec2f0a0d00fd43514a4e38f781.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:d00:fd43:514a:4e38:f781])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4D3041EC01A9;
-        Fri, 13 Aug 2021 18:31:44 +0200 (CEST)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4622D1EC0502;
+        Fri, 13 Aug 2021 19:09:11 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1628872304;
+        t=1628874551;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=NdcAaQ22ajLR1RVBUmtY/+BY0x+jRUM1hOLQmWgEtUs=;
-        b=PyDgosI4i/QB5H11RsoENB8QrV6viOuQxdZz6jMCz6J5QLBtV8lyslxjQ5R8YQC5/Bst2i
-        l5mSrdzRZcTOoBq0b3dpee2je9Id2FcVSPRpTor4k9w4j5ddcW2LE1l8uHcCSR0KhqE/Vf
-        bPxKuiRZ0l//nG4r1Su9bwSs5SsiPqw=
-Date:   Fri, 13 Aug 2021 18:32:23 +0200
+        bh=OYDR+bOlD9MQDx8acVKVsEbxOBwDuCkmZLbEzyaj+Rs=;
+        b=AOLEJqQyVT9avPMKrehwNg2854F7QmISBDwpu37rsCOUEDPNyxTi2bE0MsVpYw9uZa7DBF
+        zWQntqK0GpobQ9qnhEivbl5Gr/FUv22Q3WasTXn6VgIvU6yDId2fwJkmxaqQxx3vPULrVJ
+        bYEW/1RBqALROSM3XU1THRatcNZZJ90=
+Date:   Fri, 13 Aug 2021 19:09:50 +0200
 From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
         linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
@@ -48,6 +44,7 @@ Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
         Tom Lendacky <thomas.lendacky@amd.com>,
         "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -62,61 +59,133 @@ Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
         Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
         npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 33/40] KVM: SVM: Add support to handle MSR
- based Page State Change VMGEXIT
-Message-ID: <YRael/GphmsQk36u@zn.tnic>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-34-brijesh.singh@amd.com>
- <YPHzcstus9mS8hOm@google.com>
- <b9527f12-f3ad-c6b9-2967-5d708d69d937@amd.com>
- <YPXKuiRCjod8Wn2n@google.com>
+Subject: Re: [PATCH Part1 RFC v4 13/36] x86/kernel: Make the bss.decrypted
+ section shared in RMP table
+Message-ID: <YRanXmUZCCLjNqDy@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-14-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YPXKuiRCjod8Wn2n@google.com>
+In-Reply-To: <20210707181506.30489-14-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 06:55:54PM +0000, Sean Christopherson wrote:
-> I've no objection to using PSC for enums and whatnot, and I'll happily
-> defer to Boris for functions in the core kernel and guest, but for KVM
-> I'd really like to spell out the name for the two or so main handler
-> functions.
+On Wed, Jul 07, 2021 at 01:14:43PM -0500, Brijesh Singh wrote:
+> The encryption attribute for the bss.decrypted region is cleared in the
+> initial page table build. This is because the section contains the data
+> that need to be shared between the guest and the hypervisor.
+> 
+> When SEV-SNP is active, just clearing the encryption attribute in the
+> page table is not enough. The page state need to be updated in the RMP
+> table.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/kernel/head64.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 
-Well,
-
-- we abbreviate things in the kernel all the time - this is no
-exception. We don't name it
-
-	secure_nested_paging_handle_page_state_change()
-
-either. :-)
-
-- If you don't know what PSC means, now you do :-P Also, comments above
-the function names help.
-
-- I asked for the shortening because those function names were a
-mouthful and when you see
-
-snp_handle_page_state_change()
-
-I wonder, it is "handling", is it "changing" or what is it doing. And
-the page state change is a thing so the "handle" is important here. Thus
-the
-
-snp_handle_psc()
-
-variant.
-
-Also, shorter function names make the code more readable. I'm sure
-you've read firmware code or other OS code before to understand what I
-mean.
-
-Anyway, I felt I should give my arguments why I requested the
-shortening.
+Please apply this cleanup before this one.
 
 Thx.
+
+---
+From: Borislav Petkov <bp@suse.de>
+Subject: [PATCH] x86/head64: Carve out the guest encryption postprocessing into a helper
+
+Carve it out so that it is abstracted out of the main boot path. All
+other encrypted guest-relevant processing should be placed in there.
+
+No functional changes.
+
+Signed-off-by: Borislav Petkov <bp@suse.de>
+---
+ arch/x86/kernel/head64.c | 55 ++++++++++++++++++++++------------------
+ 1 file changed, 31 insertions(+), 24 deletions(-)
+
+diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+index de01903c3735..eee24b427237 100644
+--- a/arch/x86/kernel/head64.c
++++ b/arch/x86/kernel/head64.c
+@@ -126,6 +126,36 @@ static bool __head check_la57_support(unsigned long physaddr)
+ }
+ #endif
+ 
++static unsigned long sme_postprocess_startup(struct boot_params *bp, pmdval_t *pmd)
++{
++	unsigned long vaddr, vaddr_end;
++	int i;
++
++	/* Encrypt the kernel and related (if SME is active) */
++	sme_encrypt_kernel(bp);
++
++	/*
++	 * Clear the memory encryption mask from the .bss..decrypted section.
++	 * The bss section will be memset to zero later in the initialization so
++	 * there is no need to zero it after changing the memory encryption
++	 * attribute.
++	 */
++	if (mem_encrypt_active()) {
++		vaddr = (unsigned long)__start_bss_decrypted;
++		vaddr_end = (unsigned long)__end_bss_decrypted;
++		for (; vaddr < vaddr_end; vaddr += PMD_SIZE) {
++			i = pmd_index(vaddr);
++			pmd[i] -= sme_get_me_mask();
++		}
++	}
++
++	/*
++	 * Return the SME encryption mask (if SME is active) to be used as a
++	 * modifier for the initial pgdir entry programmed into CR3.
++	 */
++	return sme_get_me_mask();
++}
++
+ /* Code in __startup_64() can be relocated during execution, but the compiler
+  * doesn't have to generate PC-relative relocations when accessing globals from
+  * that function. Clang actually does not generate them, which leads to
+@@ -135,7 +165,6 @@ static bool __head check_la57_support(unsigned long physaddr)
+ unsigned long __head __startup_64(unsigned long physaddr,
+ 				  struct boot_params *bp)
+ {
+-	unsigned long vaddr, vaddr_end;
+ 	unsigned long load_delta, *p;
+ 	unsigned long pgtable_flags;
+ 	pgdval_t *pgd;
+@@ -276,29 +305,7 @@ unsigned long __head __startup_64(unsigned long physaddr,
+ 	 */
+ 	*fixup_long(&phys_base, physaddr) += load_delta - sme_get_me_mask();
+ 
+-	/* Encrypt the kernel and related (if SME is active) */
+-	sme_encrypt_kernel(bp);
+-
+-	/*
+-	 * Clear the memory encryption mask from the .bss..decrypted section.
+-	 * The bss section will be memset to zero later in the initialization so
+-	 * there is no need to zero it after changing the memory encryption
+-	 * attribute.
+-	 */
+-	if (mem_encrypt_active()) {
+-		vaddr = (unsigned long)__start_bss_decrypted;
+-		vaddr_end = (unsigned long)__end_bss_decrypted;
+-		for (; vaddr < vaddr_end; vaddr += PMD_SIZE) {
+-			i = pmd_index(vaddr);
+-			pmd[i] -= sme_get_me_mask();
+-		}
+-	}
+-
+-	/*
+-	 * Return the SME encryption mask (if SME is active) to be used as a
+-	 * modifier for the initial pgdir entry programmed into CR3.
+-	 */
+-	return sme_get_me_mask();
++	return sme_postprocess_startup(bp, pmd);
+ }
+ 
+ unsigned long __startup_secondary_64(void)
+-- 
+2.29.2
 
 -- 
 Regards/Gruss,
