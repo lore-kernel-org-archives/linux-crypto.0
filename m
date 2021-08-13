@@ -2,138 +2,253 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_2
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BACC4320A
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 04:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D43BC432BE
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 05:22:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B70FB610A5
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 04:46:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 233FA60FC0
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Aug 2021 05:22:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236982AbhHMErB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Aug 2021 00:47:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44628 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234019AbhHMErB (ORCPT
+        id S238587AbhHMFWy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Aug 2021 01:22:54 -0400
+Received: from mailgw01.mediatek.com ([60.244.123.138]:51558 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S234013AbhHMFWy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Aug 2021 00:47:01 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38DE7C061756;
-        Thu, 12 Aug 2021 21:46:35 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id d6so13484415edt.7;
-        Thu, 12 Aug 2021 21:46:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Xkxv6+rPgNFYK0bumQmdFxc99xFlqWZ0vPYKbCDn8/k=;
-        b=Kzg19FPkyWXsZFoUcJlKFXqgNZCxjU5l0w2yvoZGadKGRsoud4alyqsDXsDAht79SA
-         vp06uvlACdNppSbFEiUcpjoWf/r2o+KmvRaTSOL7sPC2x+S+qRj94p810QJnm47BMOpy
-         gyKxuDFBmZplr0/Vg0tAkDD1y5Dbf5n26kDj2DSgPNruRc6lr21uaRm7lUCwQEGqlDls
-         SY6cpxc7E/o1nBgrtWAOXpJwPmqi10gMOtG2TYJ/wG8y7shA9n6Tx5b4pow57AywBAlk
-         S2El78ZwtrLideuIQK27S4LpDyUHa9Eulc4QvlJPKQuGYV7hc66a5fSu99nRseEcL3Mg
-         ngcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Xkxv6+rPgNFYK0bumQmdFxc99xFlqWZ0vPYKbCDn8/k=;
-        b=ScA/WLIN9HZxT8/2b/T+VngNOnpXyAd/SrVqXCf4gaTNxMNYyoMNLRXayF0eBJee0K
-         U8HPVFsagf3jS0EQHsbWw3ScqKZUzbjJU1UHXBLmpUQNGSJlyMDwjUTuITP3dX2OJMdK
-         W0JTjnFgHB3pEr+svoJBaF5hvEsGwNZeghkSPSUVDSbwT4qBhgKFm7Sgz2xv2LDcNJwX
-         nrn0JZ6Y2O6jvCmtGoVLhAvuZxNvZ7fqbuzo8Xy3hT5utN2NxWqhJ1feof8ekK0lgcVC
-         /ZpvH16PuCU5Ne4NoXctConN75cuVjeu1ImVQ7x9qyEeda/1isJLxVVJR9ZRBMW/kptC
-         tUaw==
-X-Gm-Message-State: AOAM533ay5DHFm9bvYG54c/dXFD34tsPA2/aWBfaaF2ft5KZ53AES4oD
-        dLbh1lC4FSCF7AmHwkKpJV+ZeiZAw8OaS7ST8mc=
-X-Google-Smtp-Source: ABdhPJz2VhmAjqKpRRUfXVkPaiiPfiNQgQjDqJb79/5r4bZoazl7SM8EcjXa7XtLx9Xcj3mC6RA4Y//JTyRgJUvtKVQ=
-X-Received: by 2002:a05:6402:b7a:: with SMTP id cb26mr634654edb.33.1628829993727;
- Thu, 12 Aug 2021 21:46:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <YRXlwDBfQql36wJx@sol.localdomain>
-In-Reply-To: <YRXlwDBfQql36wJx@sol.localdomain>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 13 Aug 2021 14:46:21 +1000
-Message-ID: <CAN05THSm5fEcnLKxcsidKPRUC6PVLCkWMBZUW05KNm4uMJNHWw@mail.gmail.com>
-Subject: Re: Building cifs.ko without any support for insecure crypto?
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        linux-crypto@vger.kernel.org
+        Fri, 13 Aug 2021 01:22:54 -0400
+X-UUID: 32b21d2b23274a81972bdaf52ff45cc1-20210813
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:CC:To:From:Subject:Message-ID; bh=d1iGUgjfLwkDVNjTYAgUPypY9kTOq21tOcsfabF0x98=;
+        b=ERy9x3MMY7o2CrTyVJiNMWRWDQnb4Pq1STfC6L7QwYcrrY7oijpyYe/XyEGxEhij7XEXjpyQbbL2AbVs32/secXGB8+/WF0BFGghlu8LADZSnzsnOO8ihaA7Q20l0o1Eyd7LedCu35Zci6Q8Pwl1XcE95ek5fSNGWFxK+Wve34E=;
+X-UUID: 32b21d2b23274a81972bdaf52ff45cc1-20210813
+Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
+        (envelope-from <sam.shih@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 1745074859; Fri, 13 Aug 2021 13:22:23 +0800
+Received: from mtkcas07.mediatek.inc (172.21.101.84) by
+ mtkmbs07n1.mediatek.inc (172.21.101.16) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Fri, 13 Aug 2021 13:22:22 +0800
+Received: from mtksdccf07 (172.21.84.99) by mtkcas07.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Fri, 13 Aug 2021 13:22:21 +0800
+Message-ID: <8b14d7a730bd787a9d162d368a2d3aae64256ca6.camel@mediatek.com>
+Subject: Re: [PATCH 01/12] dt-bindings: clock: mediatek: document clk
+ bindings for mediatek mt7986 SoC
+From:   Sam Shih <sam.shih@mediatek.com>
+To:     Chen-Yu Tsai <wenst@chromium.org>
+CC:     Rob Herring <robh+dt@kernel.org>, Sean Wang <sean.wang@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Hsin-Yi Wang <hsinyi@chromium.org>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        Fabien Parent <fparent@baylibre.com>,
+        "Seiya Wang" <seiya.wang@mediatek.com>,
+        Devicetree List <devicetree@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "moderated list:ARM/Mediatek SoC support" 
+        <linux-mediatek@lists.infradead.org>, <linux-gpio@vger.kernel.org>,
+        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-crypto@vger.kernel.org>, <linux-serial@vger.kernel.org>,
+        <linux-watchdog@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        John Crispin <john@phrozen.org>,
+        Ryder Lee <Ryder.Lee@mediatek.com>
+Date:   Fri, 13 Aug 2021 13:22:21 +0800
+In-Reply-To: <CAGXv+5F1tPC8W6FcBqn4TdoOrSmFUr4GWpD3hQC9QsPi3o__=g@mail.gmail.com>
+References: <20210726071439.14248-1-sam.shih@mediatek.com>
+         <20210726071439.14248-2-sam.shih@mediatek.com>
+         <CAGXv+5GeEBAkXKfA=S7XGOLYtCRihP5ov6kSiw+eevPAi74GAQ@mail.gmail.com>
+         <083a0e8fdd07c0f940285dce2dc26cb0f5e798a6.camel@mediatek.com>
+         <CAGXv+5F1tPC8W6FcBqn4TdoOrSmFUr4GWpD3hQC9QsPi3o__=g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+MIME-Version: 1.0
+X-MTK:  N
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 13, 2021 at 1:34 PM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> Hi!
->
-> We should be working to eliminate any uses of insecure crypto algorithms (e.g.
-> DES, ARC4, MD4, MD5) from the kernel.  In particular, it should be possible to
-> build a kernel for a modern system without including any such algorithms.
->
-> Currently, CONFIG_CIFS is problematic because it selects all these algorithms
-> (kconfig options: CONFIG_CRYPTO_LIB_DES, CONFIG_CRYPTO_LIB_ARC4,
-> CONFIG_CRYPTO_MD4, CONFIG_CRYPTO_MD5).
->
-> It looks like these algorithms might only be used by SMB2.0 and earlier, and the
-> more modern SMB versions don't use them.  Is that the case?  It mostly looks
-> like that, but there's one case I'm not sure about -- there's a call chain which
-> appears to use ARC4 and HMAC-MD5 even with the most recent SMB version:
->
->     smb311_operations.sess_setup()
->       SMB2_sess_setup()
->         SMB2_sess_auth_rawntlmssp_authenticate()
->           build_ntlmssp_auth_blob()
->             setup_ntlmv2_rsp()
+SGksDQoNClNvcnJ5IGZvciB0aGUgbGF0ZSByZXBseSxJIGhhdmUgcHJlcGFyZWQgdjIgcGF0Y2hl
+cywgYnV0IGZvciBzb21lIG9mIHlvdXIgc3VnZ2VzdGlvbnMsIEkgdGhpbmsNCml0IGlzIGEgYml0
+IGRpZmZpY3VsdCB0byBhcHBseSB0byBvdXIgZHJpdmVycy4NCg0KDQpPbiBGcmksIDIwMjEtMDct
+MzAgYXQgMTQ6MzAgKzA4MDAsIENoZW4tWXUgVHNhaSB3cm90ZToNCj4gT24gRnJpLCBKdWwgMzAs
+IDIwMjEgYXQgMjowMSBQTSBTYW0gU2hpaCA8c2FtLnNoaWhAbWVkaWF0ZWsuY29tPg0KPiB3cm90
+ZToNCj4gPiANCj4gPiBIaSwNCj4gPiANCj4gPiBPbiBNb24sIDIwMjEtMDctMjYgYXQgMTc6MjAg
+KzA4MDAsIENoZW4tWXUgVHNhaSB3cm90ZToNCj4gPiA+IEZ1cnRoZXJtb3JlLCBiYXNlZCBvbiB0
+aGUgZHJpdmVyIHBhdGNoIGFuZCB0aGUgZmFjdCB0aGF0IHRoZXkNCj4gPiA+IHNoYXJlDQo+ID4g
+PiB0aGUNCj4gPiA+IHNhbWUgY29tcGF0aWJsZSBzdHJpbmcsIGl0IHNlZW1zIHlvdSBzaG91bGRu
+J3QgbmVlZCB0byBoYXZlIHR3bw0KPiA+ID4gY29tcGF0aWJsZQ0KPiA+ID4gc3RyaW5ncyBmb3Ig
+dHdvIGlkZW50aWNhbCBoYXJkd2FyZSBibG9ja3MuIFRoZSBuZWVkIGZvciBzZXBhcmF0ZQ0KPiA+
+ID4gZW50cmllcw0KPiA+ID4gdG8gaGF2ZSBkaWZmZXJlbnQgY2xvY2sgbmFtZXMgaXMgYW4gaW1w
+bGVtZW50YXRpb24gZGV0YWlsLiBQbGVhc2UNCj4gPiA+IGNvbnNpZGVyDQo+ID4gPiB1c2luZyBh
+bmQgc3VwcG9ydGluZyBjbG9jay1vdXRwdXQtbmFtZXMuDQo+ID4gPiANCj4gPiA+IEFsc28sIHBs
+ZWFzZSBjaGVjayBvdXQgdGhlIE1UODE5NSBjbG9jayBkcml2ZXIgc2VyaWVzIFsxXS4gSSdtDQo+
+ID4gPiBndWVzc2luZw0KPiA+ID4gYSBsb3Qgb2YgdGhlIGNvbW1lbnRzIGFwcGx5IHRvIHRoaXMg
+b25lIGFzIHdlbGwuDQo+ID4gPiANCj4gPiA+IFJlZ2FyZHMNCj4gPiA+IENoZW5ZdQ0KPiA+ID4g
+DQo+ID4gPiBbMV0NCj4gPiA+IA0KaHR0cHM6Ly91cmxkZWZlbnNlLmNvbS92My9fX2h0dHBzOi8v
+bG9yZS5rZXJuZWwub3JnL2xpbnV4LW1lZGlhdGVrLzIwMjEwNjE2MjI0NzQzLjUxMDktMS1jaHVu
+LWppZS5jaGVuQG1lZGlhdGVrLmNvbS9ULyp0X187SXchIUNUUk5LQTl3TWcwQVJidyEyOXBiNFRK
+aUdITHZMYllKZ0RCMkRoZjhNcHc1VlU4elYtVzNOck1hbl9SUFFydFdUMkVkUlR5eWpXcHUwblpF
+JA0KPiA+ID4gDQo+ID4gPiANCj4gPiANCj4gPiBJIGhhdmUgb3JnYW5pemVkIHlvdXIgY29tbWVu
+dHMgaW4gIk1lZGlhdGVrIE1UODE5NSBjbG9jayBzdXBwb3J0Ig0KPiA+IHNlcmllcyBpbnRvIHRo
+ZSBmb2xsb3dpbmcgbGlzdCwgcmVwbHkgdG8geW91ciBoZXJlOg0KPiA+IA0KPiA+ID4gZHQtYmlu
+ZGluZzogTW92ZSB0aGUgbm90LXRvLWJlLWV4cG9zZWQgY2xvY2sgdG8gZHJpdmVyIGRpcmVjdG9y
+eQ0KPiA+ID4gb3INCj4gPiA+IHNpbXBseSBsZWZ0IG91dA0KPiA+IA0KPiA+IE9rYXksIHRoYW5r
+cyBmb3IgeW91ciBjb21tZW50LCBJIHdpbGwgdXBkYXRlIHRoaXMgaW4gdGhlIG5leHQgcGF0Y2gN
+Cj4gPiBzZXQNCj4gDQo+IFNlZSB0aGUgZm9sbG93aW5nIGZpbGUgZm9yIGFuIGV4YW1wbGU6DQo+
+IA0KPiANCg0KPiBodHRwczovL3VybGRlZmVuc2UuY29tL3YzL19faHR0cHM6Ly9lbGl4aXIuYm9v
+dGxpbi5jb20vbGludXgvbGF0ZXN0L3NvdXJjZS9kcml2ZXJzL2Nsay9zdW54aS1uZy9jY3Utc3Vu
+NTBpLWE2NC5oX187ISFDVFJOS0E5d01nMEFSYnchMy0tVUVwRkZHZVpfV1RDYVdzal85dmJiYjRT
+U0UxdlBDSUxGbGVUaHpwYTFucTdtdmVGZlFNRHFiYWNkVDVJNiQgDQo+IA0KPiBkcml2ZXJzIHdv
+dWxkIG5vdCBiZSBhYmxlIHRvIHVzZSB0aGUgbm9uLWV4cG9ydGVkIGludGVybWVkaWF0ZQ0KPiBj
+bG9ja3MuDQo+IA0KVGhhbmtzLCBJIHdlbGwgZGVsZXRlIHNvbWUgY2xvY2tzIHRoYXQgYXJlIG5v
+dCBleHBlY3RlZCB0byBiZSB1c2UgaW4NCmRldmljZSB0cmVlLg0KDQo+ID4gPiBkZXNjcmliZSBz
+b21lIG9mIHRoZSBjbG9jayByZWxhdGlvbnMgYmV0d2VlbiB0aGUgdmFyaW91cyBjbG9jaw0KPiA+
+ID4gY29udHJvbGxlcnMNCj4gPiANCj4gPiBJIGhhdmUgY2hlY2tlZCB0aGUgZmlsZXMgaW4NCj4g
+PiAiRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL2FybS9tZWRpYXRlayIsIEl0IHNl
+ZW1zIHRoYXQgYWxsDQo+ID4gTWVkaWFUZWsgU29DIGNsb2NrcyBhcmUgc2ltcGx5IGRlc2NyaWJl
+ZCBieSBlYWNoIGNvbnRyb2xsZXIsIGxpa2UNCj4gPiAibWVkaWF0ZWssaW5mcmFjZmcudHh0IiBh
+bmQgIm1lZGlhdGVrLHRvcGNrZ2VuLnR4dCIsIGFuZCB0aG9zZQ0KPiA+IGRvY3VtZW50DQo+ID4g
+b25seSBpbmNsdWRlIGNvbXBhdGlibGUgc3RyaW5ncyBpbmZvcm1hdGlvbiBhbmQgZXhhbXBsZXMu
+DQo+ID4gQ2FuIHdlIGluc2VydCB0aGUgY2xvY2sgcmVsYXRpb25zaGlwIG9mIE1UNzk4NiBkaXJl
+Y3RsbHkgaW4gY29tbW9uDQo+ID4gZG9jdW1lbnRzPw0KPiANCj4gV2hhdCBJIG1lYW50IHdhcyB0
+aGF0IHNpbmNlIGVhY2ggY2xvY2sgY29udHJvbGxlciBoYXJkd2FyZSBibG9jayBoYXMNCj4gb25l
+IG9yIG1hbnkgY2xvY2sgaW5wdXRzLCB0aGVzZSBzaG91bGQgYmUgZGVzY3JpYmVkIGluIHRoZSBi
+aW5kaW5nDQo+IGFzIHJlcXVpcmVkICJjbG9ja3MiIGFuZCAiY2xvY2stbmFtZXMiIHByb3BlcnRp
+ZXMuDQo+IA0KPiBTbyBpdCdzIG5vdCBhYm91dCBkZXNjcmliaW5nIHRoZSBhY3R1YWwgcmVsYXRp
+b25zaGlwIG9yIGNsb2NrIHRyZWUsDQo+IGJ1dCBqdXN0IGhhdmluZyB0aGUgaW5wdXRzIGFjY3Vy
+YXRlbHkgZGVzY3JpYmVkLg0KPiANCj4gPiBPciB3ZSBzaG91bGQgYWRkIGEgbmV3ICJtZWRpYXRl
+ayxtdDc5ODYtY2xvY2sueWFtbCIgYW5kIG1vdmUNCj4gPiBjb21wYXRpYmxlDQo+ID4gc3RyaW5n
+cyBpbmZvcm1hdGlvbiBhbmQgZXhhbXBsZSB0byB0aGlzIGZpbGUsIGFuZCBpbnNlcnQgY2xvY2sN
+Cj4gPiByZWxhdGlvbnNoaXAgZGVzY3JpcHRpb25zIHRvIHRoaXMgZmlsZT8gV291bGRu4oCZdCBp
+dCBiZSBzdHJhbmdlIHRvDQo+ID4gc2tpcA0KPiA+IGV4aXN0aW5nIGZpbGVzIGFuZCBjcmVhdGUg
+YSBuZXcgb25lPw0KPiANCj4gSSB0aGluayB0aGF0IGlzIGEgcXVlc3Rpb24gZm9yIHRoZSBkZXZp
+Y2UgdHJlZSBiaW5kaW5nIG1haW50YWluZXIsDQo+IFJvYi4NCj4gQXQgbGVhc3QgZm9yIE1lZGlh
+dGVrIHN0dWZmLCB0aGVyZSBzZWVtIHRvIGJlIG1hbnkgc2VwYXJhdGUgZmlsZXMuDQo+IA0KPiA+
+ID4gZXh0ZXJuYWwgb3NjaWxsYXRvcidzIGNhc2UsIHRoZSBvc2NpbGxhdG9yIGlzIGRlc2NyaWJl
+ZCBpbiB0aGUNCj4gPiA+IGRldmljZQ0KPiA+ID4gdHJlZQ0KPiA+IA0KPiA+IFllcywgd2UgaGF2
+ZSAiY2xreHRhbCIgaW4gdGhlIERULCB3aGljaCBzdGFuZHMgZm9yIGV4dGVybmFsDQo+ID4gb3Nj
+aWxsYXRvciwNCj4gPiBBbGwgY2xvY2tzIGluIGFwbWl4ZWRzeXMgdXNlICJjbGt4dGFsIiBhcyB0
+aGUgcGFyZW50IGNsb2NrDQo+IA0KPiBTbyBmb3IgdGhlIGFwbWl4ZWRzeXMgZGV2aWNlIG5vZGUs
+IGl0IHdvdWxkIGF0IGxlYXN0IGhhdmUgc29tZXRoaW5nDQo+IGxpa2U6DQo+IA0KPiAgICAgY2xv
+Y2tzID0gPCZjbGt4dGFsPjsNCj4gICAgIGNsb2NrLW5hbWVzID0gInh0YWwiOw0KPiANCj4gRm9y
+IHRvcGNrZ2VuLCBzaW5jZSBpdCBoYXMgeHRhbCBhbmQgc29tZSBQTExzIGZyb20gYXBtaXhlZHN5
+cyBhcw0KPiBpbnB1dHM6DQo+IA0KPiAgICAgY2xvY2tzID0gPCZjbGt4dGFsPiwgPCZhcG1peGVk
+c3lzIENMS19JRF9QTExYWFg+LCA8JmFwbWl4ZWRzeXMNCj4gQ0xLX0lEX1BMTFlZWT47DQo+ICAg
+ICBjbG9jay1uYW1lcyA9ICJ4dGFsIiwgInBsbFhYWCIsICJwbGxZWVkiDQo+IA0KPiBUaGUgYWJv
+dmUgaXMganVzdCBhbiBleGFtcGxlLiBZb3Ugc2hvdWxkIGFkYXB0IGl0IHRvIGZpdCB5b3VyDQo+
+IGhhcmR3YXJlDQo+IGRlc2NyaXB0aW9uLiBBbmQgdGhlIGJpbmRpbmdzIHNob3VsZCBkZXNjcmli
+ZSB3aGF0IGlzIHJlcXVpcmVkLiBOb3RlDQo+IHRoYXQgdGhlIGNsb2NrIG5hbWVzIHVzZWQgaGVy
+ZSBhcmUgbG9jYWwgdG8gdGhpcyBkZXZpY2Ugbm9kZS4gVGhleSBkbw0KPiBub3QgbmVlZCB0byBt
+YXRjaCB3aGF0IHRoZSBjbG9jayBkcml2ZXIgdXNlcyBmb3IgdGhlIGdsb2JhbCBuYW1lLiBTbw0K
+PiBqdXN0IGdvIHdpdGggc29tZXRoaW5nIGRlc2NyaXB0aXZlLg0KPiANCj4gVGhlIHBvaW50IGlz
+LCBjcm9zcyBoYXJkd2FyZSBibG9jayBkZXBlbmRlbmNpZXMgc2hvdWxkIGJlIGNsZWFybHkNCj4g
+ZGVzY3JpYmVkDQo+IGluIHRoZSBkZXZpY2UgdHJlZSwgaW5zdGVhZCBvZiBpbXBsaWNpdGx5IGJ1
+cmllZCBpbiB0aGUgY2xvY2sNCj4gZHJpdmVycy4NCj4gDQoNCk1ha2UgY3Jvc3MgaGFyZHdhcmUg
+YmxvY2sgZGVwZW5kZW5jaWVzIGNsZWFybHkgZGVzY3JpYmVkIGluIHRoZSBkZXZpY2UNCnRyZWUg
+c2VlbXMgdW5zdWl0YWJsZSBiZXR3ZWVuICJ0b3BjayIgYW5kICJpbmZyYSIgYmxvY2sgb2YgbXQ3
+OTg2Lg0KDQpJbiB5b3VyIGV4YW1wbGUsIHBhc3NpbmcgImNsa3h0YWwiIGZyb20gdGhlIGRldmlj
+ZSB0cmVlIHNlZW1zIG9rLiBFdmVuDQpmb3IgdG9wY2tnZW4sIHBhc3NpbmcgImNsa3h0YWwiLCAi
+cGxsWFhYIiwgInBsbFlZWSIgZnJvbSB0aGUgZGV2aWNlDQp0cmVlIGFuZCB1c2luZyB0aGVzZSBj
+bG9ja3MgYXMgdGhlIHBhcmVudCBjbG9jayBvZiB0b3Bja2dlbiBhbHNvIHNlZW1zDQp0byB3b3Jr
+LiBJdCBpcyBmZWFzaWJsZSBiZWNhdXNlIGl0IGlzIG5vdCBtdWNoIGNsb2NrIGJldHdlZW4gdGhl
+c2UgdHdvDQpoYXJkd2FyZSBibG9ja3MuDQoNCkJ1dCBmb3IgdGhlIGNsb2NrIHJlbGVhdGlvbnNo
+aXAgYmV0d2VlbiAidG9wY2tnIiBhbmQgImluZnJhIiwgdGhleSBhcmUNCnZlcnkgY29tcGxpY2F0
+ZWQgaW4gaGFyZHdhcmUgZGVzaWduLiBUaGVyZSBhcmUgZG96ZW5zIG9mIGNsb2NrcyBhbmQNCmlu
+dGVyYWN0IHdpdGggZWFjaCBvdGhlci4gSWYgd2Ugd2FudCB0byBkZXNjcmliZSB0aGVzZSByZWxh
+dGlvbnNoaXBzIGluDQp0aGUgZGV2aWNlIHRyZWUsIHdlIG5lZWQgdG8gdXNlIGEgYmlnIGFycmF5
+IGluc2lkZSB0aGUgZGV2aWNlIHRyZWUgYW5kDQptYWtlIGRldmljZSB0cmVlIGxvb2tzIHZlcnkg
+bWVzc3kuIFRoZXJlZm9yZSwgb3VyIHByZXZpb3VzIG1ldGhvZCBvZg0Kd3JpdGluZyBhIGNsb2Nr
+IGRyaXZlciBpcyB0byB1c2UgdGhlIGdsb2JhbCBjbG9jayBhbmQgZGVzY3JpcGJlIHRoZQ0KY2xv
+Y2sgcmVsZWF0aW9uc2hpcCBpbnNpZGUgdGhlIGNsb2NrIGRyaXZlci4NCg0KICAgICAgICAgICAg
+ICAgX19fX19fICAgX19fX19fX18gICAgX19fX19fX18NCiAgICBjbGt4dGFsIC0tfCAgICAgIHwg
+IHwgICAgICAgfC54LnwgICAgICAgfA0KICAgICAgICAgICAgICB8YXBtaXgufC0tfCB0b3BjayB8
+LngufCBpbmZyYSB8DQogICAgICAgICAgICAgIHwgICAgICB8LS18ICAgICAgIHwueC58X19fX19f
+X3wNCiAgICAgICAgICAgICAgfCAgICAgIHwgIHwgICAgICAgfCAgIF9fX19fX19fDQogICAgICAg
+ICAgICAgIHxfX19fX198ICB8ICAgICAgIHwtLXwgICAgICAgIHwNCiAgICAgICAgICAgICAgICAg
+ICAgICAgIHwgICAgICAgfC0tfCBldGhzeXMgfA0KICAgICAgICAgICAgICAgICAgICAgICAgfF9f
+X19fX198ICB8X19fX19fX198DQoNCk1heWJlIHdlIHNob3VsZCBrZWVwIHRoZSBjbG9jayByZWxh
+dGlvbnNoaXAgaW4gb3VyIGNsb2NrIGRyaXZlciBsaWtlDQp0aGUgcHJldmlvdXMgbWVkaWF0ZWsg
+Y2xvY2sgZHJpdmVycy4NCg0KDQo+ID4gPiBEdWFsIGxpY2Vuc2UgcGxlYXNlIChhbmQgdGhlIGR0
+cyBmaWxlcykuDQo+ID4gDQo+ID4gT2theSwgdGhhbmtzIGZvciB5b3VyIGNvbW1lbnQsIEkgd2ls
+bCB1cGRhdGUgdGhpcyBpbiB0aGUgbmV4dCBwYXRjaA0KPiA+IHNldA0KPiA+IA0KPiA+ID4gV2h5
+IGFyZSB0aGlzIGFuZCBvdGhlciAxOjEgZmFjdG9yIGNsa3MgbmVlZGVkPyBUaGV5IGxvb2sgbGlr
+ZQ0KPiA+ID4gcGxhY2Vob2xkZXJzLiBQbGVhc2UgcmVtb3ZlIHRoZW0uDQo+ID4gDQo+ID4gT2th
+eSwgdGhhbmtzIGZvciB5b3VyIGNvbW1lbnQsIEkgd2lsbCB1cGRhdGUgdGhpcyBpbiB0aGUgbmV4
+dCBwYXRjaA0KPiA+IHNldA0KPiANCj4gSWRlYWxseSB0aGUgY2xvY2sgZHJpdmVyIHdvdWxkIHVz
+ZSB0aGUgZGV2aWNlIHRyZWUgdG8gZ2V0IGxvY2FsDQo+IHJlZmVyZW5jZXMNCj4gZm9yIHRoaXMs
+IGJ1dCB0aGF0IGlzIGdvaW5nIHRvIHJlcXVpcmUgc29tZSByZXdvcmsgdG8gTWVkaWF0ZWsncw0K
+PiBjb21tb24NCj4gY2xvY2sgY29kZS4NCj4gDQoNClRvIHRyYW5zZmVyIHRoZSBjbG9jayByZWxh
+dGlvbnNoaXAgdGhyb3VnaCB0aGUgZGV2aWNlIHRyZWUsIGl0IGlzDQpuZWNlc3NhcnkgdG8gbWFr
+ZSBtb2RpZmljYXRpb25zIHRvIHRoZSBjb21tb24gcGFydCBvZiB0aGUgbXRrIGNsb2NrDQpkcml2
+ZXIgdGhhdCBoYXMgYmVlbiBtZXJnZWQsIGFuZCBtYXkgYWxzbyBtb2RpZnkgb3RoZXIgbWVkaWF0
+ZWsgY2xvY2sNCmRyaXZlcnMuDQoNCkxldCdzIG1vdmUgdG8gdGhlIHNvdXJjZSBjb2RlOg0KCQ0K
+YXBtaXhlZHN5cyB7DQogICAgLi4uDQp9DQoJDQp0b3Bja2dlbiB7DQogICAgLi4uDQogICAgY2xv
+Y2tzID0gLi4uICwgPCZhcG1peGVkc3lzIE5FVDJQTEw+ICwgLi4uIDsNCiAgICBjbG9jay1uYW1l
+cyA9IC4uLiAsICJuZXQycGxsIiAsIC4uLiA7DQp9DQoNCmNoYXIgKnBhcmVudF9uYW1lOw0KICAg
+IGZvciBlYWNoIGNsayBpbiA8ZGV2aWNlX3RyZWVfbm9kZT46DQogICAgICAgIHBhcmVudF9uYW1l
+ID0gX19jbGtfZ2V0X25hbWUob2ZfY2xrX2dldChucCwgaSkpDQoJDQooYXJtYWRhLTM3eHgtdGJn
+LmMgdXNlIHRoaXMgbWV0aG9kIHRvIGdldCBnbG9iYWwgbmFtZSBvZiBwYXJlbnQgY2xvY2spDQoN
+CklkZWFsbHksIHdlIHNob3VsZCB1c2UgdGhlIHBhcmVudF9uYW1lIHZhcmlhYmxlIGFib3ZlIHRv
+IGNyZWF0ZSBhDQpjbG9jaywgQnV0IG10a19maXhlZF9mYWN0b3IgZXhwZWN0cyBpbnB1dCBjb25z
+dCBzdHJpbmdzDQoJDQp2b2lkIG10a19jbGtfcmVnaXN0ZXJfZmFjdG9ycyhjb25zdCBzdHJ1Y3Qg
+bXRrX2ZpeGVkX2ZhY3RvciAqY2xrcywgLi4uKQ0KCQ0Kc3RydWN0IG10a19maXhlZF9mYWN0b3Ig
+ew0KICAgIC4uLg0KICAgIGNvbnN0IGNoYXIgKm5hbWU7DQogICAgY29uc3QgY2hhciAqcGFyZW50
+Ow0KICAgIC4uLg0KfTsNCg0KU28gd2Ugc3RpbGwgbmVlZCB0byB1c2UgcHJlLWRlZmluZWQgY2xv
+Y2sgbmFtZSBpbiBzdGF0aWMgY29uc3QgY2xvY2sNCnRhYmxlIGV2ZW4gd2UgY2FuIGdldCBjbG9j
+ayBuYW1lIGFzIHZhcmlhYmxlIGZyb20gZGV2aWNlIHRyZWUuDQoNCg0Kc3RhdGljIGNvbnN0IHN0
+cnVjdCBtdGtfZml4ZWRfZmFjdG9yIHRvcF9kaXZzW10gX19pbml0Y29uc3QgPSB7DQogICAgLi4u
+DQogICAgRkFDVE9SKENLX1RPUF9ORVQyX0Q0X0QyLCAibmV0Ml9kNF9kMiIsICJuZXQycGxsIiwg
+MSwgOCksDQogICAgRkFDVE9SKENLX1RPUF9ORVQyX0QzX0QyLCAibmV0Ml9kM19kMiIsICJuZXQy
+cGxsIiwgMSwgMiksDQogICAgLi4uDQp9DQoNCg0KDQo+ID4gPiBNZXJnZSBkdXBsaWNhdGUgcGFy
+ZW50IGluc3RhbmNlcw0KPiA+IA0KPiA+IFdlIGhhdmUgY29uc2lkZXJlZCB0aGlzIGluIHRoZSBN
+VDc5ODYgYmFzaWMgY2xvY2sgZHJpdmVyLCBidXQgSQ0KPiA+IHdpbGwNCj4gPiBjaGVjayBhZ2Fp
+bi4gSWYgY29ycmVjdGlvbnMgYXJlIG5lZWRlZCwgSSB3aWxsIG1ha2UgY2hhbmdlcyBpbiB0aGUN
+Cj4gPiBuZXh0DQo+ID4gcGF0Y2ggc2V0Lg0KPiA+IA0KPiA+ID4gTGVha2luZyBjbGtfZGF0YSBp
+ZiBzb21lIGZ1bmN0aW9uIHJldHVybiBmYWlsDQo+ID4gDQo+ID4gT2theSwgdGhhbmtzIGZvciB5
+b3VyIGNvbW1lbnQsIEkgd2lsbCB1cGRhdGUgdGhpcyBpbiB0aGUgbmV4dCBwYXRjaA0KPiA+IHNl
+dA0KPiA+IA0KPiA+ID4gVGhpcyBmaWxlIGNvbnRhaW5zIGZvdXIgZHJpdmVycy4gVGhleSBkbyBu
+b3QgaGF2ZSBkZXBlbmQgb24gZWFjaA0KPiA+ID4gb3RoZXIsIGFuZCBkbyBub3QgbmVlZCB0byBi
+ZSBpbiB0aGUgc2FtZSBmaWxlLiBQbGVhc2Ugc3BsaXQgdGhlbQ0KPiA+ID4gaW50bw0KPiA+ID4g
+ZGlmZmVyZW4gZmlsZXMgYW5kIHByZWZlcmFibHkgZGlmZmVyZW50IHBhdGNoZXMNCj4gPiANCj4g
+PiBPa2F5LCB0aGFua3MgZm9yIHlvdXIgY29tbWVudCwgSSB3aWxsIHNlcGFyYXRlIHRob3NlIGNs
+b2NrIGRyaXZlcnMNCj4gPiBpbg0KPiA+IHRoZSBuZXh0IHBhdGNoIHNldA0KPiA+IA0KPiA+ID4g
+SXMgdGhlcmUgYW55IHBhcnRpY3VsYXIgcmVhc29uIGZvciBhcmNoX2luaXRjYWxsDQo+ID4gDQo+
+ID4gV2UgaGF2ZSBjb25zaWRlcmVkIHRoaXMgaW4gTVQ3OTg2IGJhc2ljIGNsb2NrIGRyaXZlciwg
+YW5kIHVzZQ0KPiA+IENMS19PRl9ERUNMQVJFIGluc3RlYWQgb2YgYXJjaF9pbml0Y2FsbC4NCj4g
+DQo+IEhhdmluZyB0byBzZXF1ZW5jZSBjbG9jayByZWdpc3RyYXRpb24gbWFudWFsbHkgaXMgbGlr
+ZWx5IGEgc3ltcHRvbSBvZg0KPiBpbmFkZXF1YXRlIGNsb2NrIGRlcGVuZGVuY3kgaGFuZGxpbmcu
+IFNvIGlmIHRoZSBkcml2ZXJzIGFyZSBvbmx5DQo+IHVzaW5nDQo+IGdsb2JhbCBjbG9jayBuYW1l
+cyB0byBkZXNjcmliZSBwYXJlbnRzLCB3aGF0IGhhcHBlbnMgaXMgdGhhdCBldmVuIGlmDQo+IHRo
+ZSBwYXJlbnQgaXNuJ3QgaW4gdGhlIHN5c3RlbSB5ZXQsIHRoZSByZWdpc3RyYXRpb24gaXMgYWxs
+b3dlZCB0bw0KPiBzdWNjZWVkLiBIb3dldmVyIHNpbmNlIHRoZSBwYXJlbnQgY2xvY2sgaXNuJ3Qg
+YXZhaWxhYmxlIHlldCwgYW55DQo+IGNhbGN1bGF0aW9ucyBpbnZvbHZpbmcgaXQsIHN1Y2ggYXMg
+Y2FsY3VsYXRpbmcgY2xvY2sgcmF0ZXMsIHdpbGwNCj4geWllbGQgaW52YWxpZCByZXN1bHRzLCBz
+dWNoIGFzIDAgY2xvY2sgcmF0ZS4NCj4gDQo+ID4gQW5vdGhlciBxdWVzdGlvbjoNCj4gPiBTaG91
+bGQgdGhlIGNsb2NrIHBhdGNoZXMgaW4gIkFkZCBiYXNpYyBTb0Mgc3VwcG9ydCBmb3IgTWVkaWFU
+ZWsNCj4gPiBtdDc5ODYiDQo+ID4gbmVlZCB0byBiZSBzZXBhcmF0ZWQgaW50byBhbm90aGVyIHBh
+dGNoIHNlcmllcywgc3VjaCBhcyBNVDgxOTUNCj4gPiAiTWVkaWF0ZWsgTVQ4MTk1IGNsb2NrIHN1
+cHBvcnQiID8NCj4gDQo+IE5vcGUuIFRoZSBNVDgxOTUgdGVhbSBzZWVtcyB0byBiZSBzcGxpdHRp
+bmcgdGhpbmdzIHVwIGJ5IG1vZHVsZSwgd2l0aA0KPiB0aGUgZGV2aWNlIHRyZWUgYmVpbmcgaXRz
+IG93biBzZXBhcmF0ZSBtb2R1bGUuIElkZWFsbHkgeW91IHdhbnQgdG8NCj4gc2VuZA0KPiBkcml2
+ZXJzIGFsb25nIHdpdGggdGhlIHJlbGF0ZWQgZGV2aWNlIHRyZWUgY2hhbmdlcywgc28gcGVvcGxl
+DQo+IHJldmlld2luZw0KPiBjYW4gZ2V0IGEgc2Vuc2Ugb2YgaG93IHRoaW5ncyB3b3JrLiBBbmQg
+aWYgdGhlIGhhcmR3YXJlIGlzIHB1YmxpY2x5DQo+IGF2YWlsYWJsZSwgcGVvcGxlIGNhbiBhY3R1
+YWxseSB0ZXN0IHRoZSBjaGFuZ2VzLiBXZSBjYW4ndCBkbyB0aGF0IGlmDQo+IHRoZQ0KPiBkZXZp
+Y2UgdHJlZSBjaGFuZ2VzIGFyZW4ndCBidW5kbGVkIHRvZ2V0aGVyLg0KPiANCk9LLCBJIHdpbGwg
+a2VlcCBjbG9jayBwYXRjaGVzIGFuZCBiYXNpYyBwYXJ0IHBhdGNoZXMgaW4gdGhlIHNhbWUgc2Vy
+aWVzDQoocGF0Y2hlcyB2MikNCg0KDQpSZWdhcmRzLA0KU2FtDQpUaGFua3MsIEkgd2lsbCBkZWxl
+dGUgc29tZSBjbG9ja3MgdGhhdCBhcmUgbm90IGV4cGVjdGVkIHRvIGINCg==
 
-md4 and md5 are used with the NTLMSSP authentication for all dialects,
-including the latest 3.1.1.
-The only other authentication mechanism for SMB is krb5.
-
-This means that if we build a kernel without md4/md5 then we can no
-longer use NTLMSSP user/password
-style authentication, only kerberos.
-I guess that the use cases where a kernel without these algorithms are
-present are ok with kerberos as the
-only authentication mech.
-
-Afaik arc4 is only used for signing in the smb1 case.
-
->
-> Also, there's already an option CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n which
-> disables support for SMB2.0 and earlier.  However, it doesn't actually compile
-> out the code but rather just prevents it from being used.  That means that the
-> DES and ARC4 library interfaces are still depended on at link time, so they
-> can't be omitted.  Have there been any considerations towards making
-> CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n compile out the code for SMB2.0 and earlier?
-
-I think initially we just wanted to disable its use. If we want to
-compile a kernel completely without arc4/md4/md5 I think we would need
-to:
-
-1, Change CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n to compile out the code
-as you suggests.
-This should remove the dependency for arc4. I think this would be a
-good thing to do.
-
-2, Have a different CONFIG_... to compile out the use of NTLMSSP
-authentication. This must be a different define
-since md4/md5 are also used for non-legacy dialects.
-And this should remove the dependency of md4/5.
-
-For the latter, I guess we would need a global, i.e. not
-cifs-specific, config option for this. I assume other users of
-rc4/md4/md5
-would also want this.
-A new CONFIG_INSECURE_CRYPTO=n ?
-
-Ronnie Sahlberg
-
->
-> - Eric
