@@ -2,97 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57179C4338F
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 Aug 2021 01:11:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32494C4320A
+	for <linux-crypto@archiver.kernel.org>; Sat, 14 Aug 2021 08:39:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3DD7261101
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 Aug 2021 01:11:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CAD460F36
+	for <linux-crypto@archiver.kernel.org>; Sat, 14 Aug 2021 08:39:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236322AbhHNBLv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Aug 2021 21:11:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42474 "EHLO
+        id S237562AbhHNIkM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 14 Aug 2021 04:40:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236317AbhHNBLu (ORCPT
+        with ESMTP id S237426AbhHNIkJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Aug 2021 21:11:50 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DB46C0617AE;
-        Fri, 13 Aug 2021 18:11:23 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id l11so14219016plk.6;
-        Fri, 13 Aug 2021 18:11:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=q7ftbmGt3dtvIFzhyKs506CMgP9EQiBj0ylWETSYGUU=;
-        b=PfjepnBwOReI1jhsRoFZ/vC6hY6vzzrU3moCz4N4T6rgQrxWJqYaxuXGgPXYi2suJ9
-         Qg26cY5XM6sWKXe1evMcdw98Muq01SWz1Ro33Eo6nXI99Sz1EPY+p5H+gL1SWVb94Apm
-         Nxmz51FWZdbIooz3m51C4dQMyNvs6ziNxbCpmh7Ay7q0efEBGQwsBB05Rvxz55gxo6Hu
-         Kr2tL3X9LOBLy6F8z2m8ol2+OATu1hNSTp7ewrxCZZ8QPPEKHLoH3hh/PshwtzON7dPd
-         fX2iELBox/G/BKrCbU10c1xRBAmbjzTANvEb0hDVhfEAc0xjfqFogxYKdu9DjsrXp8eu
-         S3qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=q7ftbmGt3dtvIFzhyKs506CMgP9EQiBj0ylWETSYGUU=;
-        b=OKbZwWVm7imPCEQ18PCJH9Mnw21c0GAUsunu/f34S65Wwus2veAtKINlRWom9PqTLb
-         VPhMF/jn3eo/h0DPXXCBaON3la8NoNGi3jSw5UFqFGrBXK1ERo8T61lmRE91tvVZ0Oio
-         mYKDbEIh1FNwd6hFVDhCV/0/ABlfkgW+nlGRaHAsSennqjmXaczA9OGrupkgUO5RJOU0
-         D0AmeJE6O7CZoNupOO6hGw8K3OSelyNylfcAHqoyDVwHRDO2mYVDLhg6FoZzGtj5I+fS
-         XHq4CFwYK1dfCuhmzmMwLN2JPJqiujmuFLBJm4Yi2hEU6ZN0BleWmGDldDCtStasHWZo
-         8+Fg==
-X-Gm-Message-State: AOAM53169HF8BHurpMkEJwX/3FKJuXoiwIHZEnHO/44f1YDktpR+Ue47
-        ZGG/sVSWCA7cKGnlGOTbgYs=
-X-Google-Smtp-Source: ABdhPJwKjBgv7YnUfaMkFe3s/Vjd7ZJOK6EP1oHCrED+19jzodYusHhv5U49HcEDcydWmfXiyFmc8g==
-X-Received: by 2002:a17:90b:3903:: with SMTP id ob3mr5109566pjb.44.1628903483065;
-        Fri, 13 Aug 2021 18:11:23 -0700 (PDT)
-Received: from WRT-WX9.. ([141.164.41.4])
-        by smtp.gmail.com with ESMTPSA id o20sm4235448pgv.80.2021.08.13.18.11.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Aug 2021 18:11:22 -0700 (PDT)
-From:   Changbin Du <changbin.du@gmail.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Sat, 14 Aug 2021 04:40:09 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EB31C06175F;
+        Sat, 14 Aug 2021 01:39:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=62Vas8vfgaU4Fg6a79+EgFsfJwf25X3qtqREVjssypo=; b=rpZ/Hf6OytEohJ44VJerrJnY/s
+        TEFsUGwQv3vlbUI/UJ63t6E2YTwPjll3r0wySKJteuhDjjHUkTC891M2EaZAtSmzc/6A7VtDUYdeZ
+        sj04B0bK0q7cXgHrj4BkRf93eUFG3YOvax+SqxiXEMu68HGkPpVwIx3Bxu1nSZfJ9kMUCSzXM+sto
+        M6hSpq59VxPiY/BdGTlq9OS61Y6ZM0kqRjZzvGbgjN7M74UQJlVY3yE+PFufg32Mk50/mGh+9hFnM
+        AZlp+9VpV1p/UVgYqoI5Yt2M0GsKqu2cVVjHNlp2YnwDTFsE9y6r5rwyYuCw4Obj52pcnajsvDSDo
+        yGLfyGTw==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mEpBa-00GXfB-Cb; Sat, 14 Aug 2021 08:38:41 +0000
+Date:   Sat, 14 Aug 2021 09:38:34 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Uwe Kleine-K??nig <u.kleine-koenig@pengutronix.de>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
+        oss-drivers@corigine.com, Paul Mackerras <paulus@samba.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Rafa?? Mi??ecki <zajec5@gmail.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ido Schimmel <idosch@nvidia.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Vadym Kochan <vkochan@marvell.com>, Michael Buesch <m@bues.ch>,
+        Jiri Pirko <jiri@nvidia.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Taras Chornyi <tchornyi@marvell.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        netdev@vger.kernel.org, Simon Horman <simon.horman@corigine.com>,
+        Oliver O'Halloran <oohall@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org,
         "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Changbin Du <changbin.du@gmail.com>
-Subject: [PATCH] crypto: in_irq() cleanup
-Date:   Sat, 14 Aug 2021 09:11:14 +0800
-Message-Id: <20210814011114.4842-1-changbin.du@gmail.com>
-X-Mailer: git-send-email 2.30.2
+Subject: Re: [PATCH v3 4/8] PCI: replace pci_dev::driver usage that gets the
+ driver name
+Message-ID: <YReBCtWxvmDx7Uqg@infradead.org>
+References: <20210811080637.2596434-1-u.kleine-koenig@pengutronix.de>
+ <20210811080637.2596434-5-u.kleine-koenig@pengutronix.de>
+ <YRTIqGm5Dr8du7a7@infradead.org>
+ <20210812081425.7pjy4a25e2ehkr3x@pengutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210812081425.7pjy4a25e2ehkr3x@pengutronix.de>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Replace the obsolete and ambiguos macro in_irq() with new
-macro in_hardirq().
+On Thu, Aug 12, 2021 at 10:14:25AM +0200, Uwe Kleine-K??nig wrote:
+> dev_driver_string() might return "" (via dev_bus_name()). If that happens
+> *drvstr == '\0' becomes true.
+> 
+> Would the following be better?:
+> 
+> 	const char *drvstr;
+> 
+> 	if (pdev)
+> 		return "<null>";
+> 
+> 	drvstr = dev_driver_string(&pdev->dev);
+> 
+> 	if (!strcmp(drvstr, ""))
+> 		return "<null>";
+> 
+> 	return drvstr;
+> 
+> When I thought about this hunk I considered it ugly to have "<null>" in
+> it twice.
 
-Signed-off-by: Changbin Du <changbin.du@gmail.com>
----
- crypto/skcipher.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Well, if you want to avoid that you can do:
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index a15376245416..418211180cee 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -431,7 +431,7 @@ static int skcipher_copy_iv(struct skcipher_walk *walk)
- 
- static int skcipher_walk_first(struct skcipher_walk *walk)
- {
--	if (WARN_ON_ONCE(in_irq()))
-+	if (WARN_ON_ONCE(in_hardirq()))
- 		return -EDEADLK;
- 
- 	walk->buffer = NULL;
--- 
-2.30.2
+	if (pdev) {
+		const char *name = dev_driver_string(&pdev->dev);
 
+		if (strcmp(drvstr, ""))
+			return name;
+	}
+	return "<null>";
+
+Which would be a lot more readable.
