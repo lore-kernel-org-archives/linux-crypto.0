@@ -2,110 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32494C4320A
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 Aug 2021 08:39:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E1EEC4338F
+	for <linux-crypto@archiver.kernel.org>; Sat, 14 Aug 2021 13:07:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CAD460F36
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 Aug 2021 08:39:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A43760F51
+	for <linux-crypto@archiver.kernel.org>; Sat, 14 Aug 2021 13:07:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237562AbhHNIkM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 14 Aug 2021 04:40:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55912 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237426AbhHNIkJ (ORCPT
+        id S238401AbhHNNHf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 14 Aug 2021 09:07:35 -0400
+Received: from mail-il1-f200.google.com ([209.85.166.200]:44586 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233729AbhHNNHd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 14 Aug 2021 04:40:09 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EB31C06175F;
-        Sat, 14 Aug 2021 01:39:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=62Vas8vfgaU4Fg6a79+EgFsfJwf25X3qtqREVjssypo=; b=rpZ/Hf6OytEohJ44VJerrJnY/s
-        TEFsUGwQv3vlbUI/UJ63t6E2YTwPjll3r0wySKJteuhDjjHUkTC891M2EaZAtSmzc/6A7VtDUYdeZ
-        sj04B0bK0q7cXgHrj4BkRf93eUFG3YOvax+SqxiXEMu68HGkPpVwIx3Bxu1nSZfJ9kMUCSzXM+sto
-        M6hSpq59VxPiY/BdGTlq9OS61Y6ZM0kqRjZzvGbgjN7M74UQJlVY3yE+PFufg32Mk50/mGh+9hFnM
-        AZlp+9VpV1p/UVgYqoI5Yt2M0GsKqu2cVVjHNlp2YnwDTFsE9y6r5rwyYuCw4Obj52pcnajsvDSDo
-        yGLfyGTw==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mEpBa-00GXfB-Cb; Sat, 14 Aug 2021 08:38:41 +0000
-Date:   Sat, 14 Aug 2021 09:38:34 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Uwe Kleine-K??nig <u.kleine-koenig@pengutronix.de>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
-        oss-drivers@corigine.com, Paul Mackerras <paulus@samba.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Rafa?? Mi??ecki <zajec5@gmail.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ido Schimmel <idosch@nvidia.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Vadym Kochan <vkochan@marvell.com>, Michael Buesch <m@bues.ch>,
-        Jiri Pirko <jiri@nvidia.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        netdev@vger.kernel.org, Simon Horman <simon.horman@corigine.com>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v3 4/8] PCI: replace pci_dev::driver usage that gets the
- driver name
-Message-ID: <YReBCtWxvmDx7Uqg@infradead.org>
-References: <20210811080637.2596434-1-u.kleine-koenig@pengutronix.de>
- <20210811080637.2596434-5-u.kleine-koenig@pengutronix.de>
- <YRTIqGm5Dr8du7a7@infradead.org>
- <20210812081425.7pjy4a25e2ehkr3x@pengutronix.de>
+        Sat, 14 Aug 2021 09:07:33 -0400
+Received: by mail-il1-f200.google.com with SMTP id y20-20020a056e020f5400b00224400d1c21so4895476ilj.11
+        for <linux-crypto@vger.kernel.org>; Sat, 14 Aug 2021 06:07:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=t5YQUGSZE6EI9BhxfatfxY8kQRFsuaqSI5BxeVjzuZ0=;
+        b=R7j+aPvXLMuOX34RPMtOer+GYK43x4Al25XAfXT7EoIrYIUv0atUD2lZxzhxOwJsOV
+         nF/FBPhehhoU4F2NCWMRDIZwX+DRjm+ZwfZOixPJ3hun9j1XLdkwsoI2LxuWPhnYf/nb
+         TpZmpobjeA6qzhwkDvLYl83k211gP1xn5sPuPoPQINCZqFXab/c3TN2zb9tdmPUgUB2E
+         VcGdIk9dNTxL2TRFCpU/Tu09FSCKFhOPuudUoDjCi7UHcrcuh1UdIsG4Myvl0m2Io8Ao
+         TEPPSXDaDGuQXarlN/dnvaXtaZle5VF5lOlJmMwwy2/nfByDrhE7m0O36OLQlPupOVeu
+         EuwA==
+X-Gm-Message-State: AOAM533QdYHfYnMXoMcdHIJ6G3Xbnt5xk3HMLABGzwtMQYp4BtXWmEH6
+        PcllTnbGDCnqMk45cgGyi6iVshp5ybIYQvTBwTebg2PE5IXM
+X-Google-Smtp-Source: ABdhPJy2AvLguRSMEmfyW87t0JS484ypKZ9GNlz2YX0HW0onFVHA9gtYaOLblHldyW0ZHNRgbBvtlICabAwh4/WuQloazRiOUvWa
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210812081425.7pjy4a25e2ehkr3x@pengutronix.de>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Received: by 2002:a05:6e02:17cf:: with SMTP id z15mr2152427ilu.103.1628946425097;
+ Sat, 14 Aug 2021 06:07:05 -0700 (PDT)
+Date:   Sat, 14 Aug 2021 06:07:05 -0700
+In-Reply-To: <00000000000006e7be05bda1c084@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000006b42305c984a5d3@google.com>
+Subject: Re: [syzbot] general protection fault in scatterwalk_copychunks (4)
+From:   syzbot <syzbot+66e3ea42c4b176748b9c@syzkaller.appspotmail.com>
+To:     aviadye@mellanox.com, borisp@mellanox.com, bp@alien8.de,
+        daniel@iogearbox.net, davem@davemloft.net,
+        herbert@gondor.apana.org.au, hpa@zytor.com,
+        john.fastabend@gmail.com, kuba@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vfedorenko@novek.ru, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 12, 2021 at 10:14:25AM +0200, Uwe Kleine-K??nig wrote:
-> dev_driver_string() might return "" (via dev_bus_name()). If that happens
-> *drvstr == '\0' becomes true.
-> 
-> Would the following be better?:
-> 
-> 	const char *drvstr;
-> 
-> 	if (pdev)
-> 		return "<null>";
-> 
-> 	drvstr = dev_driver_string(&pdev->dev);
-> 
-> 	if (!strcmp(drvstr, ""))
-> 		return "<null>";
-> 
-> 	return drvstr;
-> 
-> When I thought about this hunk I considered it ugly to have "<null>" in
-> it twice.
+syzbot has bisected this issue to:
 
-Well, if you want to avoid that you can do:
+commit 635d9398178659d8ddba79dd061f9451cec0b4d1
+Author: Vadim Fedorenko <vfedorenko@novek.ru>
+Date:   Wed May 20 08:41:44 2020 +0000
 
-	if (pdev) {
-		const char *name = dev_driver_string(&pdev->dev);
+    net/tls: free record only on encryption error
 
-		if (strcmp(drvstr, ""))
-			return name;
-	}
-	return "<null>";
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=144095e6300000
+start commit:   f8fbb47c6e86 Merge branch 'for-v5.14' of git://git.kernel...
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=164095e6300000
+console output: https://syzkaller.appspot.com/x/log.txt?x=124095e6300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=171d57d5a48c8cad
+dashboard link: https://syzkaller.appspot.com/bug?extid=66e3ea42c4b176748b9c
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13b8db9e300000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16c21581300000
 
-Which would be a lot more readable.
+Reported-by: syzbot+66e3ea42c4b176748b9c@syzkaller.appspotmail.com
+Fixes: 635d93981786 ("net/tls: free record only on encryption error")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
