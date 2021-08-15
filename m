@@ -2,116 +2,238 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01359C4338F
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 Aug 2021 16:22:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8386C432BE
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Aug 2021 10:38:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3C1D60F48
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 Aug 2021 16:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1C126103D
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Aug 2021 10:38:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234875AbhHNQXY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 14 Aug 2021 12:23:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45240 "EHLO
+        id S237556AbhHOKjH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 15 Aug 2021 06:39:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229818AbhHNQXY (ORCPT
+        with ESMTP id S237053AbhHOKjG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 14 Aug 2021 12:23:24 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DB22C061764;
-        Sat, 14 Aug 2021 09:22:55 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f1db900ce77af1d85349a0a.dip0.t-ipconnect.de [IPv6:2003:ec:2f1d:b900:ce77:af1d:8534:9a0a])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F29E81EC0570;
-        Sat, 14 Aug 2021 18:22:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1628958168;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=/brh2LY3ZxgqLfUVFe3O+xJ1nWBytl741a1Y0kx+hZ8=;
-        b=b8PJl1yU5zBqaA2/nWRJwh/Y1GFQpGr8U9i00b3uXAK038Jc2Z1POSCalShC5L7ljhom/o
-        fCO7xRLVffdQF0GweIKtmdPFvymLaNoyum8xoYvWOvNqL9K4onwtHo7DlZohuGq0Zs3adS
-        HqvSQaPyaR3nR1KdMycZfdDQxct9Lyg=
-Date:   Sat, 14 Aug 2021 18:23:26 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Stephan Mueller <smueller@chronox.de>, sachinp@linux.vnet.ibm.com,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        lkml <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: DRBG - select SHA512
-Message-ID: <YRft/tuKE6MjHhY7@zn.tnic>
-References: <304ee0376383d9ceecddbfd216c035215bbff861.camel@chronox.de>
- <20210716081411.GA2062@gondor.apana.org.au>
+        Sun, 15 Aug 2021 06:39:06 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF14EC061764;
+        Sun, 15 Aug 2021 03:38:36 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id hs10so26637947ejc.0;
+        Sun, 15 Aug 2021 03:38:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VG0Lf7HiDnwITqIBooUW4XNKiqT3FwlwpEH/ZdKxOzg=;
+        b=jTa1wrW4u/TtPrmR2JT9Wr9z8T2QJ/apXvOvmowce3Qwnn+DkgPbyr4aK3dFYGaUZr
+         tWgwjiQGIJ5FdJMWDLoo5//aL89kyhKMNCZJO9OtRE7QIzDLMxg1uKNhdO7BaygTh0fO
+         3RxCQOB/oZ75OOGfBbvi3vHeSpOcXylbM8i9C85BY0kK6s0q9wJJ1ofWw2EdPZytbsdc
+         GPgdl10EhkNdI3qIWmYnaQnZQcY9ErIQ6hoQPJ98xCGLrGjtJGRrW14yqy5Z1wVc20t4
+         EXgVEN8neGfw2T7F7ggsAJYc+bD9h2dk499XIxjbti2x8YcvumucccLyw6bQEySeYXIQ
+         76QQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VG0Lf7HiDnwITqIBooUW4XNKiqT3FwlwpEH/ZdKxOzg=;
+        b=EMM4S5k0YkpyBfNerpFjhlEbcxQT29jahiHguoFlDm3JM+KsgEtezVgr1Dc+o8fEOB
+         RITAebT0+yT7GoXaddgmX409ZAbVZb8eaF6PmsYAmgK1+XIvdA787OMOPdIkMDypfCVa
+         bLYuICjvTl7QCPtRaedgR1INMXw4nGTJCfQZ7Hzb326+HnnbD8tRDiOTM+WHP9P3MABi
+         bXP3Sk/hkW8EmJrUNNRZSyowEvHEGLJ+KAl/AB16GIImgT864yvhxDJuiisnO8Irz9jy
+         GjeLpZDa9LxejykAbV7HkR4tUalKvkdGreiRuRj0HO81tihQtf3YOJ4NMv+xCjpCnQSM
+         tovQ==
+X-Gm-Message-State: AOAM531T7FXor5Q7C61Vntb2CIsPbvkl08iEGS1iky9MSR1uFhDcTzSA
+        qIq8Vxgt5eoIoXV99IrJ3ML6XdvMaaz9hPmuDww=
+X-Google-Smtp-Source: ABdhPJyY0Qdp1sYGjEF45HzWNzqWI2ke2B6iaq08amYPqNgEOVcifajsJbPsHqC2IwYpCLvxB0hD0qQhjvexR6Aj7Jk=
+X-Received: by 2002:a17:906:22da:: with SMTP id q26mr11050185eja.473.1629023915558;
+ Sun, 15 Aug 2021 03:38:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210716081411.GA2062@gondor.apana.org.au>
+References: <YRXlwDBfQql36wJx@sol.localdomain> <CAN05THSm5fEcnLKxcsidKPRUC6PVLCkWMBZUW05KNm4uMJNHWw@mail.gmail.com>
+ <YRbT7IbSCXo4Dl0u@sol.localdomain>
+In-Reply-To: <YRbT7IbSCXo4Dl0u@sol.localdomain>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Sun, 15 Aug 2021 20:38:23 +1000
+Message-ID: <CAN05THScNOVh5biQnqM8YDOvNid4Dh=wZS=ObczzmSEpv1LpRw@mail.gmail.com>
+Subject: Re: Building cifs.ko without any support for insecure crypto?
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 16, 2021 at 04:14:12PM +0800, Herbert Xu wrote:
-> Stephan Mueller <smueller@chronox.de> wrote:
-> > With the swtich to use HMAC(SHA-512) as the default DRBG type, the
-> > configuration must now also select SHA-512.
-> > 
-> > Fixes: 9b7b94683a9b "crypto: DRBG - switch to HMAC SHA512 DRBG as default
-> > DRBG"
-> > Reported-by: Sachin Sant <sachinp@linux.vnet.ibm.com>
-> > Signed-off-by: Stephan Mueller <smueller@chronox.com>
-> > ---
-> > crypto/Kconfig | 2 +-
-> > 1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> Patch applied.  Thanks.
+On Sat, Aug 14, 2021 at 6:19 AM Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Fri, Aug 13, 2021 at 02:46:21PM +1000, ronnie sahlberg wrote:
+> > On Fri, Aug 13, 2021 at 1:34 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> > >
+> > > Hi!
+> > >
+> > > We should be working to eliminate any uses of insecure crypto algorithms (e.g.
+> > > DES, ARC4, MD4, MD5) from the kernel.  In particular, it should be possible to
+> > > build a kernel for a modern system without including any such algorithms.
+> > >
+> > > Currently, CONFIG_CIFS is problematic because it selects all these algorithms
+> > > (kconfig options: CONFIG_CRYPTO_LIB_DES, CONFIG_CRYPTO_LIB_ARC4,
+> > > CONFIG_CRYPTO_MD4, CONFIG_CRYPTO_MD5).
+> > >
+> > > It looks like these algorithms might only be used by SMB2.0 and earlier, and the
+> > > more modern SMB versions don't use them.  Is that the case?  It mostly looks
+> > > like that, but there's one case I'm not sure about -- there's a call chain which
+> > > appears to use ARC4 and HMAC-MD5 even with the most recent SMB version:
+> > >
+> > >     smb311_operations.sess_setup()
+> > >       SMB2_sess_setup()
+> > >         SMB2_sess_auth_rawntlmssp_authenticate()
+> > >           build_ntlmssp_auth_blob()
+> > >             setup_ntlmv2_rsp()
+> >
+> > md4 and md5 are used with the NTLMSSP authentication for all dialects,
+> > including the latest 3.1.1.
+>
+> That's unfortunate.  Surely Microsoft knows that md4 has been severely
+> compromised for over 25 years?  And md5 for 15 years.
 
-Is that patch going to Linus anytime soon?
+Absolutely, but it is the reality we have to live in.
+It is actually an md4 hash wrapper inside a md5 hash so "better" but still...
 
-I still see it on latest rc5+:
+>
+> > The only other authentication mechanism for SMB is krb5.
+>
+> Is the long-term plan to have everyone migrate to kerberos?  Currently kerberos
+> doesn't appear to be the default, so not many people actually use it -- right?
+>
 
-DRBG: could not allocate digest TFM handle: hmac(sha512)
-alg: drbg: Failed to reset rng
-alg: drbg: Test 0 failed for drbg_nopr_hmac_sha512
-------------[ cut here ]------------
-alg: self-tests for drbg_nopr_hmac_sha512 (stdrng) failed (rc=-22)
-WARNING: CPU: 3 PID: 76 at crypto/testmgr.c:5652 alg_test.part.0+0x132/0x3c0
-Modules linked in:
-CPU: 3 PID: 76 Comm: cryptomgr_test Not tainted 5.14.0-rc5+ #1
-Hardware name: LENOVO 2320CTO/2320CTO, BIOS G2ET86WW (2.06 ) 11/13/2012
-RIP: 0010:alg_test.part.0+0x132/0x3c0
-Code: c0 74 2e 80 3d 7f 61 ad 02 00 0f 85 c0 64 5f 00 44 89 c1 4c 89 f2 4c 89 ee 44 89 44 24 04 48 c7 c7 f8 0a 11 82 e8 8c 57 5e 00 <0f> 0b 44 8b 44 24 04 48 8b 84 24 98 00 00 00 65 48 2b 04 25 28 00
-RSP: 0000:ffffc9000078fe38 EFLAGS: 00010292
-RAX: 0000000000000042 RBX: 00000000ffffffff RCX: 0000000000000000
-RDX: 0000000000000001 RSI: ffffffff810f520f RDI: ffffffff810f520f
-RBP: 0000000000000053 R08: 0000000000000001 R09: 0000000000000001
-R10: ffff888219df9000 R11: 3fffffffffffffff R12: 0000000000000053
-R13: ffff888100c0ee00 R14: ffff888100c0ee80 R15: 00000000000014c0
-FS:  0000000000000000(0000) GS:ffff888211f80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000002412001 CR4: 00000000001706e0
-Call Trace:
- ? lock_is_held_type+0xd5/0x130
- ? find_held_lock+0x2b/0x80
- ? preempt_count_sub+0x9b/0xd0
- ? crypto_acomp_scomp_free_ctx+0x30/0x30
- cryptomgr_test+0x27/0x50
- kthread+0x144/0x170
- ? set_kthread_struct+0x40/0x40
- ret_from_fork+0x22/0x30
-irq event stamp: 411
-hardirqs last  enabled at (419): [<ffffffff810f6972>] console_unlock+0x332/0x570
-hardirqs last disabled at (426): [<ffffffff810f6a1f>] console_unlock+0x3df/0x570
-softirqs last  enabled at (234): [<ffffffff81c00329>] __do_softirq+0x329/0x496
-softirqs last disabled at (151): [<ffffffff8108248d>] irq_exit_rcu+0xdd/0x130
----[ end trace edfdfd51982deb2d ]---
+I have no idea on the plans here.
 
--- 
-Regards/Gruss,
-    Boris.
+Kerberos do require a bit of infrastructure to set up and manage, so a
+keb5 only solution
+would be a no-go for most/all home-nas environments and also all small
+business "that is not
+big enough to justify running a full ActiveDirectory environment."
 
-https://people.kernel.org/tglx/notes-about-netiquette
+For use, I would say that most larger domains and enterprises do use
+AcriveDirectory and thus also Krb5 because of single signon and a
+single account database.
+But ActiveDirectory does require a fair amount of setup and management
+so I think most smaller businesses and all home-NAS
+users just use user/password NTLMSSP authentication.
+
+What are the plans here? To just offer the possibility to disable all
+these old crypto and hashes on a local kernel compile?
+Or is the plan to just outright remove it from the kernel sources?
+
+If the first, I think that could possible be done for cifs. I think a
+lot of the security minded larger enterprises already may be disabling
+both SMB1 and also NTLM on serverside, so they would be fine.
+
+For the latter, I think it would be a no-go since aside from krb5
+there are just no other viable authentication mechs for smb.
+
+
+
+> > This means that if we build a kernel without md4/md5 then we can no
+> > longer use NTLMSSP user/password
+> > style authentication, only kerberos.
+> >
+> > I guess that the use cases where a kernel without these algorithms are
+> > present are ok with kerberos as the
+> > only authentication mech.
+>
+> Well, maybe.  Even without kerberos, would it still be possible to use SMB with
+> a "guest" user only?
+
+Yes and no.
+In smb we actually have two different concepts of guest.
+We have GUEST, where the SERVER decides you are a guest user, based on
+some who-knows-what configuration
+but you still authenticate properly (and have a session key).
+and we have ANONYMOUS/NULL, where the client does not even have any
+credentials at all (and you have no session key).
+
+For the latest and most secure dialect of SMB 3.1.1 the command to
+even map a share : SMB2 TREE_CONNECT
+MUST be signed, and thus you have to have a session key, to sign it.
+So, anonymous/null users can not even map a share without credentials.
+Because they do not have a session key and thus can not
+sign these command.
+
+So in the case of no NTLMSSP, a user would technically be an ANONYMOUS
+user, not a GUEST user.
+The difference is subtle but important.   Technically a GUEST users
+did authenticate properly, and got a SESSION KEY,
+and logged in, but the server said "nah, you are GUEST".  But still,
+the user got a session key.
+
+Another huge drawback with anonymous/null/guest is that without a
+properly authenticated session tied to a user account
+you no longer have any meaningful ACL controls.   Which may be fine
+for a home-NAS but not elsewhere.
+
+There are no good solutions here.
+
+
+
+
+TL;DR
+If NTLMSSP authentication is disabled, there are no other options to
+map a share than using KRB5
+and setting up the krb5 infrastructure. And thus smaller sites will
+not be able to use CIFS :-(
+So while I think it is feasible to add support to cifs.ko to
+conditionally disable features depending in a kernel compile (no SMB1
+if des/rc4 is missing, no NTLM if rc4/md4/md5 is missing)  I don't
+think it is feasible to disable these by default.
+I will work on making it possible to build cifs.ko with limied
+functionality when these algorithms are disabled though.
+
+
+
+>
+> >
+> > Afaik arc4 is only used for signing in the smb1 case.
+> >
+> > >
+> > > Also, there's already an option CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n which
+> > > disables support for SMB2.0 and earlier.  However, it doesn't actually compile
+> > > out the code but rather just prevents it from being used.  That means that the
+> > > DES and ARC4 library interfaces are still depended on at link time, so they
+> > > can't be omitted.  Have there been any considerations towards making
+> > > CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n compile out the code for SMB2.0 and earlier?
+> >
+> > I think initially we just wanted to disable its use. If we want to
+> > compile a kernel completely without arc4/md4/md5 I think we would need
+> > to:
+> >
+> > 1, Change CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n to compile out the code
+> > as you suggests.
+> > This should remove the dependency for arc4. I think this would be a
+> > good thing to do.
+> >
+> > 2, Have a different CONFIG_... to compile out the use of NTLMSSP
+> > authentication. This must be a different define
+> > since md4/md5 are also used for non-legacy dialects.
+> > And this should remove the dependency of md4/5.
+> >
+> > For the latter, I guess we would need a global, i.e. not
+> > cifs-specific, config option for this. I assume other users of
+> > rc4/md4/md5
+> > would also want this.
+> > A new CONFIG_INSECURE_CRYPTO=n ?
+>
+> There is already an option CRYPTO_USER_API_ENABLE_OBSOLETE that could be
+> renamed and reused if we wanted to expand its scope to all insecure crypto.
+>
+> Although a one-size-fits all kernel-wide option controlling "insecure" crypto
+> could be controversial, as there is no consensus whether some crypto algorithms
+> are secure or not, and different subsystems have different constraints.
+>
+> - Eric
