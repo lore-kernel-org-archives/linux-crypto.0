@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B82CC4320A
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 07:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEB5C25AE9
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 07:46:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 428CA60F5E
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 07:46:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F43960EBC
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 07:46:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239169AbhHQHra (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Aug 2021 03:47:30 -0400
-Received: from mailgw02.mediatek.com ([210.61.82.184]:48454 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S231500AbhHQHrM (ORCPT
+        id S239157AbhHQHr2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Aug 2021 03:47:28 -0400
+Received: from mailgw01.mediatek.com ([60.244.123.138]:49608 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S238955AbhHQHrJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Aug 2021 03:47:12 -0400
-X-UUID: 70fb9f4f649a49bf93bf6b839e4a4a5d-20210817
-X-UUID: 70fb9f4f649a49bf93bf6b839e4a4a5d-20210817
-Received: from mtkexhb02.mediatek.inc [(172.21.101.103)] by mailgw02.mediatek.com
+        Tue, 17 Aug 2021 03:47:09 -0400
+X-UUID: 64c792a303cd4805909b423755a85ad9-20210817
+X-UUID: 64c792a303cd4805909b423755a85ad9-20210817
+Received: from mtkexhb01.mediatek.inc [(172.21.101.102)] by mailgw01.mediatek.com
         (envelope-from <sam.shih@mediatek.com>)
         (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1948333543; Tue, 17 Aug 2021 15:46:35 +0800
-Received: from mtkcas11.mediatek.inc (172.21.101.40) by
- mtkmbs07n2.mediatek.inc (172.21.101.141) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Tue, 17 Aug 2021 15:46:33 +0800
+        with ESMTP id 1428143285; Tue, 17 Aug 2021 15:46:31 +0800
+Received: from mtkcas11.mediatek.inc (172.21.101.40) by mtkexhb02.mediatek.inc
+ (172.21.101.103) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 17 Aug
+ 2021 15:46:29 +0800
 Received: from mtksdccf07.mediatek.inc (172.21.84.99) by mtkcas11.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Tue, 17 Aug 2021 15:46:33 +0800
+ Transport; Tue, 17 Aug 2021 15:46:29 +0800
 From:   Sam Shih <sam.shih@mediatek.com>
 To:     Rob Herring <robh+dt@kernel.org>, Sean Wang <sean.wang@kernel.org>,
         Linus Walleij <linus.walleij@linaro.org>,
@@ -55,9 +55,9 @@ To:     Rob Herring <robh+dt@kernel.org>, Sean Wang <sean.wang@kernel.org>,
 CC:     John Crispin <john@phrozen.org>,
         Ryder Lee <Ryder.Lee@mediatek.com>,
         Sam Shih <sam.shih@mediatek.com>
-Subject: [v2,10/12] dt-bindings: watchdog: Add compatible for Mediatek MT7986
-Date:   Tue, 17 Aug 2021 15:45:55 +0800
-Message-ID: <20210817074557.30953-11-sam.shih@mediatek.com>
+Subject: [v2,08/12] dt-bindings: rng: mediatek: add mt7986 to mtk rng binding
+Date:   Tue, 17 Aug 2021 15:45:53 +0800
+Message-ID: <20210817074557.30953-9-sam.shih@mediatek.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20210817074557.30953-1-sam.shih@mediatek.com>
 References: <20210817074557.30953-1-sam.shih@mediatek.com>
@@ -68,32 +68,29 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This commit adds dt-binding documentation of watchdog for Mediatek MT7986
-SoC Platform.
+Add RNG binding for MT7986 SoC.
 
 Signed-off-by: Sam Shih <sam.shih@mediatek.com>
-Acked-by: Rob Herring <robh@kernel.org>
-Reviewed-by: Guenter Roeck <linux@roeck-us.net>
 
 ---
-v2: added an Acked-by tag and a Reviewed-by tag
+v2: patch v1 has been applied
 
 ---
- Documentation/devicetree/bindings/watchdog/mtk-wdt.txt | 1 +
+ Documentation/devicetree/bindings/rng/mtk-rng.yaml | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/watchdog/mtk-wdt.txt b/Documentation/devicetree/bindings/watchdog/mtk-wdt.txt
-index 416d716403f6..a4e31ce96e0e 100644
---- a/Documentation/devicetree/bindings/watchdog/mtk-wdt.txt
-+++ b/Documentation/devicetree/bindings/watchdog/mtk-wdt.txt
-@@ -13,6 +13,7 @@ Required properties:
- 	"mediatek,mt7622-wdt", "mediatek,mt6589-wdt": for MT7622
- 	"mediatek,mt7623-wdt", "mediatek,mt6589-wdt": for MT7623
- 	"mediatek,mt7629-wdt", "mediatek,mt6589-wdt": for MT7629
-+	"mediatek,mt7986-wdt", "mediatek,mt6589-wdt": for MT7986
- 	"mediatek,mt8183-wdt": for MT8183
- 	"mediatek,mt8516-wdt", "mediatek,mt6589-wdt": for MT8516
- 	"mediatek,mt8192-wdt": for MT8192
+diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.yaml b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+index 61888e07bda0..bb32491ee8ae 100644
+--- a/Documentation/devicetree/bindings/rng/mtk-rng.yaml
++++ b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+@@ -21,6 +21,7 @@ properties:
+           - enum:
+               - mediatek,mt7622-rng
+               - mediatek,mt7629-rng
++              - mediatek,mt7986-rng
+               - mediatek,mt8365-rng
+               - mediatek,mt8516-rng
+           - const: mediatek,mt7623-rng
 -- 
 2.29.2
 
