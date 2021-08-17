@@ -2,204 +2,254 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D595C4320A
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 22:14:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB028C432BE
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 22:17:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55DF460EB5
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 22:14:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC8C761058
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 22:17:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235681AbhHQWOg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Aug 2021 18:14:36 -0400
-Received: from mail-dm6nam12on2058.outbound.protection.outlook.com ([40.107.243.58]:43329
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229869AbhHQWOf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Aug 2021 18:14:35 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Wb+1rkb5g3oOjlLyh+tMGerPJwM3vzeUa0yCKA/owBXiSuhw+jb+KM1gPgkd4r8mo0MnENeT8uimHrM/M9sQxyAKk8SQ00KBLr89IApcfRZn7VfrHcYww4C9awbwqRPNcGe8Sy/MeajXu9YgTEHFoiWGZBrx9PpYWD8HPBQDW7AziQa/yXUmXBw+viy3ar6t41EsbrxYCDOqEM+7CBp6ybRMNVMz7O59I8zvH83HMZi3iyLwtU55gXOZxyVcfH0jQTogi1zlrfZYU4wH9dl3yhao1+1mqRTi64z/uHAqDyyR2ggKK44LetmrxmVJsnoTNIv2T2vMqXyIXeTDCb+MOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=35BH7pL4XK1kRjaV3x8R3Am0K0hm3uIKDr9dZ2/L57A=;
- b=XRuxpbi6dK/7QNfviSvpdaioCE7lB3RBuF/1y3wYBMpkFOJYzU7bh8B5PNfRTOkYQ6Y36Gk2D5tWcgqxK+cAH9N5xYCLx25B3FM0XJlFGdeyltSGpX31aOVY6Za67o/TS7h9k3/IiD9i4+qT7l6qNsWiy8cj3OdgN7Wy/SmDxY7ziHb7P3Z4Aiqjt9ggv9+xC9sS3U64q75vTO2wf01cJdAleyVeyDKtlT2BhZOktFEcJR/R6ahtb9TS+prU+Y/p6wFY8LJVXKBrkJazK3I4vnyDlS+g74EcO4KH+6c/Kx7YRWC4DYWmBgzQdjpN7vZwr/Vu1H9iZ960vhbl6FPjJg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=35BH7pL4XK1kRjaV3x8R3Am0K0hm3uIKDr9dZ2/L57A=;
- b=13db37pkehf1lJcWXIzgkC2jotDopyEXXi5dbsUKxknsvJwUBqqAlvPYGut58zshNfL1PFgMHzaI8wrM6PKmio2wEXDmQG4Jsuzk8MQZdeOsyRLLImK/GfSogQpxzHglfBEBdac0L5622v5RY83fx8fIpcSxRk5TjRD/LAsaC/Y=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM4PR12MB5103.namprd12.prod.outlook.com (2603:10b6:5:392::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16; Tue, 17 Aug
- 2021 22:13:58 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418%6]) with mapi id 15.20.4415.024; Tue, 17 Aug 2021
- 22:13:58 +0000
-Subject: Re: [PATCH Part1 RFC v4 20/36] x86/sev: Use SEV-SNP AP creation to
- start secondary CPUs
-To:     Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-21-brijesh.singh@amd.com> <YRwWSizr/xoWXivV@zn.tnic>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <35b57719-5f31-c71a-7a2f-d34f6e239d26@amd.com>
-Date:   Tue, 17 Aug 2021 17:13:54 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YRwWSizr/xoWXivV@zn.tnic>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0201CA0013.namprd02.prod.outlook.com
- (2603:10b6:803:2b::23) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        id S235759AbhHQWSN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Aug 2021 18:18:13 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:43438 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235982AbhHQWSM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Aug 2021 18:18:12 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20210817221736euoutp0166d93e2c4af679f832566249dfbed19b~cN_0mfRwu1132611326euoutp01X;
+        Tue, 17 Aug 2021 22:17:36 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20210817221736euoutp0166d93e2c4af679f832566249dfbed19b~cN_0mfRwu1132611326euoutp01X
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1629238656;
+        bh=GwQKlvwMKsD/B0fRLGlIp0UXKV91TOh0STTb+wrVD4E=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=POkDt5+JBj7JzTIopcNl3ZFkmwT0KFjjKog7DwNopOgltW1e20fZeqxV9TVhZkA45
+         RgjXBk2XLN27+d4gsXH+a1ay9wjs6cN9QAX3rEd8pyJ97/6XVDFOUw66Bgs+CU9mOZ
+         SloAA8H1IPIfdHB7MwXnaSf8My3Pk8a86fWSRnC4=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20210817221735eucas1p20b4a5787717d80fa8a1bfbcca880ae1e~cN_zhuOvU3047830478eucas1p21;
+        Tue, 17 Aug 2021 22:17:35 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 58.D5.42068.F753C116; Tue, 17
+        Aug 2021 23:17:35 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20210817221734eucas1p2e4a0aa41406137b90e49230371b92ac6~cN_yKpj2G3047430474eucas1p2o;
+        Tue, 17 Aug 2021 22:17:34 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210817221734eusmtrp2ea6b1778903918c20574ee7236dc1083~cN_yJfJH-2058720587eusmtrp2P;
+        Tue, 17 Aug 2021 22:17:34 +0000 (GMT)
+X-AuditID: cbfec7f4-c71ff7000002a454-b3-611c357f8cf6
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 84.C6.20981.E753C116; Tue, 17
+        Aug 2021 23:17:34 +0100 (BST)
+Received: from localhost (unknown [106.120.51.46]) by eusmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20210817221733eusmtip27335a602d127a9510a694720437c00f3~cN_x5S2301801418014eusmtip2p;
+        Tue, 17 Aug 2021 22:17:33 +0000 (GMT)
+From:   Lukasz Stelmach <l.stelmach@samsung.com>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 2/2] dt-bindings: rng: convert Samsung Exynos TRNG to
+ dtschema
+Date:   Wed, 18 Aug 2021 00:17:24 +0200
+In-Reply-To: <da43d243-35b0-2cc6-f8a0-a5d02c997301@canonical.com> (Krzysztof
+        Kozlowski's message of "Tue, 17 Aug 2021 16:07:20 +0200")
+Message-ID: <dleftjtujnemx7.fsf%l.stelmach@samsung.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.241] (165.204.77.1) by SN4PR0201CA0013.namprd02.prod.outlook.com (2603:10b6:803:2b::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Tue, 17 Aug 2021 22:13:56 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6ced03bb-ef65-4998-c2db-08d961cc4f69
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5103:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM4PR12MB51037B266727D22E2012F09BECFE9@DM4PR12MB5103.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tyHo0us+7RWYJAqLllr6UUOMbpFcpRTEdfGR5HAfoMHnoM6+GDTKJAgefEJtX6ezVrkMtmJmA1ZoWFaV7F4BwI2IUXhqYFlhwY5hZfSe3DZSY7C2TqukFL8jX3gCeN+NrQblHrqdmmXx6Gf1IRvQzvYKBgaRbEOh7/yRaKSUWrrWxNbGdJzuaWvttegdPyfUo/Izc2T8O2S3/bvNH4zy5vhu5lWAxwRAmTowjDTwUtxXGQ8kCRmjaf3b34awwuNpOkFEGQ7kdpvsbWZ0gTOfzciUbmfDPltlFfdmSngaB3nwIRu5iIxH8NoWtF+wY33kmu0zy4GPA+CD8BTNpqJtDiI6T3dCylfRD+2S/2DAdS3M1/fCWBjvlTbAsL22RkOp4T8IrCSDq63AGEgxfUdzOVpWIhg1brZy9uy5IiAB/RzAjyoVtVTHaoq/DK/tPXNR+hvQgnEHhDZ4ui/rODrbnROL6ZQZt/rLyI8IUxlwmkHiCTOV6N/rt9ONurbuF/EPS61zzcXU9227qfFtaW383VTntUfhajqibT95GpKhHFnct26MdgVXOoRgOgN5hH4K/egluC9zsre+SSdUNA9G0kdXaMJ1vYsmCYFwAjXCTiYppPxgsKaagR4MCimZoDs/tjPXKZgMg10SFFSXhuVysJbeBXS25ftmtk0l/q1jCe5+a69YKxCiGW67ntscEXFqn8sl3K74OjW0H3BrQUzfeYh11923mHPmvQi7pz5nWNw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(396003)(376002)(39860400002)(366004)(54906003)(86362001)(8936002)(5660300002)(478600001)(186003)(26005)(956004)(38100700002)(83380400001)(53546011)(31696002)(7406005)(2616005)(36756003)(6486002)(16576012)(31686004)(6636002)(2906002)(316002)(110136005)(8676002)(66946007)(4326008)(66556008)(66476007)(7416002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cnduMkRuY0dWRWtHcldKd1BKRFRlTFVXUTUwcTN1TVhjdCtmbjhTcjUwZ1NN?=
- =?utf-8?B?TTRjY0ZZRnBOSzJERGtDSjB5S092TllRU1B1dzVieGJkNG02dm1aVXFUcytH?=
- =?utf-8?B?QlVuWmRwT2x2WWJDSFdmb1BVMVVLSHM1eksvRDV2dS9kZldtbzJDNXJYb1ZW?=
- =?utf-8?B?N1JHSWxKemVPTkJMM1RtdGFVWUIxZVBveDluL1FBVmtIN1VPSkRhL01FYWJi?=
- =?utf-8?B?OFBqUFEzdGxrZmlSYktLeGZnK1d1cTdwbHZKMnRjKytFSzRwa3Vna2JqQmdm?=
- =?utf-8?B?eE1aUVFRTU92ZXFrV2RyQWZ0T253aHEvOU5MZW1UaWdNNlgyWkdJdEpTeTBS?=
- =?utf-8?B?SzF4TEZjcFZ5ZnpKYVV1Uit6UldaaSt4Qll5S2FjVk1CUUd0WTJBeHo0NEMx?=
- =?utf-8?B?b0p4MGlCYS9Bb2pQN0hadEs0eVpyYnA3R2pmdVNQaVlxdHNHdDRrZENBMXl2?=
- =?utf-8?B?K1FLMDFkdW0xKytrZTFHTUVzTHVRTFFxN3k2VFdaRFM0YjZkWXJHS2Vralo1?=
- =?utf-8?B?TGJQVFQwUEsvTVJ2ak1hNGl3dnh2ZHcrK0lXaGxuMStVRlMwdDFQVlorWXlP?=
- =?utf-8?B?WjVvM2VPQnlyVklRZTMyZU5kRUdGMTdvWjY2WStwRWZtMnRKT3NOQ2xZYzU5?=
- =?utf-8?B?cWlFdXlLcThzampkRnk0R1lNRDlPemg3bEFSQXhNeHlXVGlhdXFydXduSTRK?=
- =?utf-8?B?SHpVR2ZuRi9sZElvZVJwNTlEUEdoRjVweXlubFZKQjl0TFZvaDFSQmQyRTcx?=
- =?utf-8?B?dW11VWZYTWpWcmZnZStGc3dsbmFneXZsUld5K1VTUUFZYVJaNVdLN1Q3WmVU?=
- =?utf-8?B?TEZFYmxXaWhMQWl0eVFYZHlDOFZCdHBwT28rVkJKWHB6cVozaEtGWXpRWll6?=
- =?utf-8?B?Wm8xd1JqbUJOdE5JSTJlSmxBd29PN1FWMlNzOEV3NjF4OHp6RFROSTRIZGtN?=
- =?utf-8?B?c3BoRUo0R1h5bXJ5WVNNdjJUMTVZbFZPdDE1ZmU4Z1gyWURHZEdKa0ZFWm5q?=
- =?utf-8?B?Qk96SUxtY0JiMGMrWHRSbnd4dzVZZmM2M2JjVlhZeHdXby9qU0xBYk9YdzJi?=
- =?utf-8?B?K2xvWjBWZWpxelJRd1JJeERLWmFvRjFiOEJZRVVQNmowRGxvOXlYK1p0VlZv?=
- =?utf-8?B?UXk0aTA0NUhlTnlIUHk0YnB1RFNEQTl6SU83RUpWMWNXUHhtOWRGaW5xUlVB?=
- =?utf-8?B?aUdHYVJhdXFoYU9BWHk5WmN6WCtZUGVYL0E3bjJpWWFDUlpEVGVMS2lpR1Jv?=
- =?utf-8?B?dlhPbDU0YXY4ZUhNa21mV3ZMTFFiS0xjK2xpbGJpRGJ6cDRpK1JMckhCaDBO?=
- =?utf-8?B?ZEg1OVpmQkR2QWM1R01RbGRwa29KMklMSXlGWkx1SDhtQXZ3eEl1ZERJbXFl?=
- =?utf-8?B?U1Jja3pJZS9jK25pbFgwWjZ4akpnTTZXd2NiVWs4clZybGdMVXAvaXkzL2N5?=
- =?utf-8?B?SElHMlU1NFNnUTBuNnovMGlqaWhJeWkySytaaWowVEVHY1NpM0htZ3Vza3hS?=
- =?utf-8?B?YWQ3U1RkSmVxRG1GWHFoTGY1eThwSlQ4Ti9tVWM1SHJNUGJVdHQ5MDc3NStO?=
- =?utf-8?B?My9xcTdlV21vb3UvdmQ2MzVwSFpPb2tWRWQxSS9DMWV3eXdNLys4VDhFSnZw?=
- =?utf-8?B?cG4vUDgyOTdteXRBb2owVzd3d2N0VW1zbktlTXR6YWE4TGdlSyt5YW1keXZ4?=
- =?utf-8?B?Znc3ODB4Z1oyU0lJdXdTR1B6WWRVdnJmUVZHVXVRelU0OXpQV2lUVXloUnpI?=
- =?utf-8?Q?/vhrUGup+JlTnao5on9baiqP4hT+7t4RYcLu8+Z?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ced03bb-ef65-4998-c2db-08d961cc4f69
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2021 22:13:58.5648
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SP9Vc9TwddUauL86k8aob8dxlc3+3sLHFx1+kRkzizvTDAPTxQyUVjZVpnBL7amVBIhOQLZQvV++rfz+P4oK9w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5103
+Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
+        protocol="application/pgp-signature"
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrHKsWRmVeSWpSXmKPExsWy7djP87r1pjKJBs3L1S3mHznHatH9SsZi
+        49sfTBabHl9jtbh/7yeTxeVdc9gsZpzfx2Sxc85JVosF2/oYLVr3HmG32LxpKrMDt8eshl42
+        j20HVD02repk83h37hy7x+Yl9R59LzcwenzeJBfAHsVlk5Kak1mWWqRvl8CV0bBQuKBLreLh
+        lzdMDYy7FLoYOTgkBEwk9p2I7GLk5BASWMEocaQlqYuRC8j+wigxs38OE4TzmVGi+9ELFpAq
+        kIZNe3eyQiSWM0ocXLOUDcJ5zigxb/onNpCxbAJ6EmvXRoA0iAhYSxzdOp8ZxGYWeMIkca3F
+        AMQWFgiRuD9lElicRUBVYs6zfrA5nAIdjBKru9azgyR4Bcwlrh6bAmaLClhKbHlxHyouKHFy
+        5hMWiKG5EjPPv2EEaZYQmM0p0fHnBCPEqS4S9y/2skPYwhKvjm+BsmUk/u+czwTxf73E5Elm
+        EL09jBLb5vyAetNa4s65X2wQtqPEj9tXoOr5JG68FYTYyycxadt0Zogwr0RHmxBEtYrEuv49
+        UFOkJHpfrWCEKPGQuPaOGRJUUxgl1k5pZZrAqDALyTezkHwzC6iFWUBTYv0ufYiwtsSyha+Z
+        IWxbiXXr3rMsYGRdxSieWlqcm55abJSXWq5XnJhbXJqXrpecn7uJEZjMTv87/mUH4/JXH/UO
+        MTJxMB5iVAFqfrRh9QVGKZa8/LxUJRFedQ6pRCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8SVvW
+        xAsJpCeWpGanphakFsFkmTg4pRqY2B93dHhdu7F7xSGdP0uN5UQynjTmb1Pz33wq9kLv9vkh
+        E+ZlmZ2PUE+OvtJQM30aX+ZnvfiGmUJr8zkii77ujTW/qpze0VGwZXf84tdJXl4rD6dpS/nr
+        /XWZE7aFM+jTRtY/zN135cvNrx2WcVm59YeTx0wLiQedX0uzOwW+Wu4z0Rdyay/LCc6/O/nJ
+        xOR/Vss3/3x1Tekdb4/7Tn7GpsQ9Cfu7U478M1t2RbH8UL62fmuC3ss1czb/OFhV+tDj4FGe
+        6TP1PWZuv/ZLQ+LwQe7PcxTMRGu+LlKz8ubumJCcvUlAIkNtM1NO8gvzKb85zoclGT/46PVv
+        q9SPcOVFTSkMs+4Wicz32XKep6VNiaU4I9FQi7moOBEAZ0QSAuEDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJIsWRmVeSWpSXmKPExsVy+t/xe7p1pjKJBkc/cFjMP3KO1aL7lYzF
+        xrc/mCw2Pb7GanH/3k8mi8u75rBZzDi/j8li55yTrBYLtvUxWrTuPcJusXnTVGYHbo9ZDb1s
+        HtsOqHpsWtXJ5vHu3Dl2j81L6j36Xm5g9Pi8SS6APUrPpii/tCRVISO/uMRWKdrQwkjP0NJC
+        z8jEUs/Q2DzWyshUSd/OJiU1J7MstUjfLkEvo2GhcEGXWsXDL2+YGhh3KXQxcnJICJhIbNq7
+        k7WLkYtDSGApo0TH9i1ADgdQQkpi5dx0iBphiT/Xutggap4ySmyZ9YYJpIZNQE9i7doIkBoR
+        AWuJo1vnM4PUMAvcZZLovLCQDSQhLBAkMWnNWzBbSMBB4s7vF+wgNouAqsScZ/1gQzkFOhgl
+        VnetB0vwCphLXD02BcwWFbCU2PLiPlRcUOLkzCcsIDazQLbE19XPmScwCsxCkpqFJDUL6D5m
+        AU2J9bv0IcLaEssWvmaGsG0l1q17z7KAkXUVo0hqaXFuem6xkV5xYm5xaV66XnJ+7iZGYDxu
+        O/Zzyw7Gla8+6h1iZOJgPMSoAtT5aMPqC4xSLHn5ealKIrzqHFKJQrwpiZVVqUX58UWlOanF
+        hxhNgX6byCwlmpwPTBR5JfGGZgamhiZmlgamlmbGSuK8JkfWxAsJpCeWpGanphakFsH0MXFw
+        SjUwOU/coWPHLd/R08tpLjdXZvEno8PLi9kSnPc/4egrdlkg3e+nF/9mO8MEx6C+X7ealzV+
+        3mcbdG61/yOnxyG1PKGTnOSPaCxaI+9nnqn17cSP06z9s8NZUk8vfz95oX5q0p37NtJzlhib
+        r/W/fOCTSOTc65dfxstrv/7a/vGXaOG+3jOMBtpJ+0z2TZjLYemV9p2Jq6i6Vk02wUDx3pKJ
+        hrkW3wQb3nwWi7a//f+l9BL91z+7tvDUrupZNovlk87rV3ZqHPfO3q6d094+uTjyYLW4Xn6e
+        wlqD/Ov337J93yTS6eQ8S+3+xv3t/s35xtqbI84KWa+fxOspw3zqWHpJStWhRfWWLSpPcnqD
+        S68osRRnJBpqMRcVJwIA6ngBa1wDAAA=
+X-CMS-MailID: 20210817221734eucas1p2e4a0aa41406137b90e49230371b92ac6
+X-Msg-Generator: CA
+X-RootMTR: 20210817221734eucas1p2e4a0aa41406137b90e49230371b92ac6
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20210817221734eucas1p2e4a0aa41406137b90e49230371b92ac6
+References: <da43d243-35b0-2cc6-f8a0-a5d02c997301@canonical.com>
+        <CGME20210817221734eucas1p2e4a0aa41406137b90e49230371b92ac6@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/17/21 3:04 PM, Borislav Petkov wrote:
-> On Wed, Jul 07, 2021 at 01:14:50PM -0500, Brijesh Singh wrote:
->> @@ -854,6 +858,207 @@ void snp_set_memory_private(unsigned long vaddr, unsigned int npages)
->>  	pvalidate_pages(vaddr, npages, 1);
->>  }
->>  
->> +static int vmsa_rmpadjust(void *va, bool vmsa)
-> 
-> I know, I know it gets a bool vmsa param but you can still call it
-> simply rmpadjust() because this is what it does - it is a wrapper around
-> the insn. Just like pvalidate() and so on.
+--=-=-=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Well, yes and no. It really is just setting or clearing the VMSA page
-attribute. It isn't trying to update permissions for the lower VMPLs, so I
-didn't want to mislabel it as a general rmpadjust function. But it's a
-simple enough thing to change and if multiple VMPL levels are ever
-supported it can be evaluated at that time.
-
-> 
+It was <2021-08-17 wto 16:07>, when Krzysztof Kozlowski wrote:
+> On 17/08/2021 14:34, Lukasz Stelmach wrote:
+>> It was <2021-08-17 wto 12:05>, when Krzysztof Kozlowski wrote:
+>>> On 17/08/2021 11:55, Lukasz Stelmach wrote:
+>>>> It was <2021-08-11 =C5=9Bro 10:43>, when Krzysztof Kozlowski wrote:
+>>>>> Convert Samsung Exynos SoC True Random Number Generator bindings to DT
+>>>>> schema format using json-schema.
+>>>>>
+>>>>> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+>>>>> ---
+>>>>>  .../bindings/rng/samsung,exynos5250-trng.txt  | 17 -------
+>>>>>  .../bindings/rng/samsung,exynos5250-trng.yaml | 44 +++++++++++++++++=
+++
+>>>>>  MAINTAINERS                                   |  2 +-
+>>>>>  3 files changed, 45 insertions(+), 18 deletions(-)
+>>>>>  delete mode 100644 Documentation/devicetree/bindings/rng/samsung,exy=
+nos5250-trng.txt
+>>>>>  create mode 100644 Documentation/devicetree/bindings/rng/samsung,exy=
+nos5250-trng.yaml
+>>>>>
+>>>>> diff --git
+>>>>> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>>>>> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>>>>> deleted file mode 100644
+>>>>> index 5a613a4ec780..000000000000
+>>>>> --- a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.t=
+xt
+>>>>> +++ /dev/null
+>>>>> @@ -1,17 +0,0 @@
+>>>>> -Exynos True Random Number Generator
+>>>>> -
+>>>>> -Required properties:
+>>>>> -
+>>>>> -- compatible  : Should be "samsung,exynos5250-trng".
+>>>>> -- reg         : Specifies base physical address and size of the regi=
+sters map.
+>>>>> -- clocks      : Phandle to clock-controller plus clock-specifier pai=
+r.
+>>>>> -- clock-names : "secss" as a clock name.
+>>>>> -
+>>>>> -Example:
+>>>>> -
+>>>>> -	rng@10830600 {
+>>>>> -		compatible =3D "samsung,exynos5250-trng";
+>>>>> -		reg =3D <0x10830600 0x100>;
+>>>>> -		clocks =3D <&clock CLK_SSS>;
+>>>>> -		clock-names =3D "secss";
+>>>>> -	};
+>>>>> diff --git
+>>>>> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+>>>>> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+>>>>> new file mode 100644
+>>>>> index 000000000000..a50c34d5d199
+>>>>> --- /dev/null
+>>>>> +++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.y=
+aml
+>>>>> @@ -0,0 +1,44 @@
+>>>>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+>>>>> +%YAML 1.2
+>>>>> +---
+>>>>> +$id:
+>>>>> https://protect2.fireeye.com/v1/url?k=3Df38ca35b-ac179a0d-f38d2814-0c=
+c47a31ce52-1faa1ecb65482b8a&q=3D1&e=3D8b3490f9-a5fc-4da0-b2ee-7b0aec781403&=
+u=3Dhttp%3A%2F%2Fdevicetree.org%2Fschemas%2Frng%2Fsamsung%2Cexynos5250-trng=
+.yaml%23
+>>>>> +$schema:
+>>>>> https://protect2.fireeye.com/v1/url?k=3D9409519d-cb9268cb-9408dad2-0c=
+c47a31ce52-12394c4409905980&q=3D1&e=3D8b3490f9-a5fc-4da0-b2ee-7b0aec781403&=
+u=3Dhttp%3A%2F%2Fdevicetree.org%2Fmeta-schemas%2Fcore.yaml%23
+>>>>> +
+>>>>> +title: Samsung Exynos SoC True Random Number Generator
+>>>>> +
+>>>>> +maintainers:
+>>>>> +  - Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+>>>>> +  - =C5=81ukasz Stelmach <l.stelmach@samsung.com>
+>>>>> +
+>>>>> +properties:
+>>>>> +  compatible:
+>>>>> +    const: samsung,exynos5250-trng
+>>>>> +
+>>>>> +  clocks:
+>>>>> +    maxItems: 1
+>>>>
+>>>> How about copying description from above into the description: propert=
+y?
+>>>
+>>> But what to copy? There is no description except generic clock bindings.
+>>>
+>>=20
+>> The description that "was" in the txt file.
+>
+> But there was no description of fields except copy&paste of the core
+> schema. Do you describe C code like:
+>
 > ...
-> 
->> +static int wakeup_cpu_via_vmgexit(int apic_id, unsigned long start_ip)
->> +{
->> +	struct sev_es_save_area *cur_vmsa, *vmsa;
->> +	struct ghcb_state state;
->> +	unsigned long flags;
->> +	struct ghcb *ghcb;
->> +	int cpu, err, ret;
->> +	u8 sipi_vector;
->> +	u64 cr4;
->> +
->> +	if ((sev_hv_features & GHCB_HV_FT_SNP_AP_CREATION) != GHCB_HV_FT_SNP_AP_CREATION)
->> +		return -EOPNOTSUPP;
->> +
->> +	/*
->> +	 * Verify the desired start IP against the known trampoline start IP
->> +	 * to catch any future new trampolines that may be introduced that
->> +	 * would require a new protected guest entry point.
->> +	 */
->> +	if (WARN_ONCE(start_ip != real_mode_header->trampoline_start,
->> +		      "unsupported SEV-SNP start_ip: %lx\n", start_ip))
-> 
-> "Unsupported... " - with a capital letter
-
-Will do.
-
-Thanks,
-Tom
-
-> 
->> +		return -EINVAL;
->> +
->> +	/* Override start_ip with known protected guest start IP */
->> +	start_ip = real_mode_header->sev_es_trampoline_start;
->> +
-> 
+> /* unsigned int is a integer number greater or equal 0 */
+> unsigned int i;
 > ...
-> 
+
+I believe having descriptions for reg and clocks
+
+>>>>> -- reg         : Specifies base physical address and size of the regi=
+sters map.
+>>>>> -- clocks      : Phandle to clock-controller plus clock-specifier pai=
+r.
+
+right next to properties' formal definitions is beneficial for anyone
+browsing the YAML file. If you think otherwise, oh well, I am fine with
+that.
+
+=2D-=20
+=C5=81ukasz Stelmach
+Samsung R&D Institute Poland
+Samsung Electronics
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEXpuyqjq9kGEVr9UQsK4enJilgBAFAmEcNXQACgkQsK4enJil
+gBDdVgf/T8FGoSclFmMA0UY0LD4A2cLtKIyg2z2DuF3Qxr3X9rURYRLxXvPf/T37
+kwNa4Jiz4n+v/oDskk6B9u4VhalLpOfW8oCKPSKBwYkurStwdgPxbEQ3/veC+yRE
+Kii4jxX8UF3e0Utx8ZuQ6N6sCWvi9hWTvM2wem8TYhtEcHxxE3u6VPc6yBX6fFtS
+nKKENMHrCjE4eyCNFuyBlm6m5uSqZanClWjhS2UE0RB1UEULToEsToYUfPEpwyV5
+sE1BO1OC4nbexCdyyBAt+hXjOKKL9bYP1q2q7YUInz77SFxooRBnxB3UabItPiDd
+Bvk9LzNArYskZxHv6qpv6zK4ozOmVg==
+=4+0h
+-----END PGP SIGNATURE-----
+--=-=-=--
