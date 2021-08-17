@@ -2,293 +2,282 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9579BC432BE
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 17:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFE4C432BE
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 17:26:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7886960FDA
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 17:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D11E60FE6
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 17:26:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231151AbhHQRY5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Aug 2021 13:24:57 -0400
-Received: from mail-io1-f72.google.com ([209.85.166.72]:34381 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229699AbhHQRY5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Aug 2021 13:24:57 -0400
-Received: by mail-io1-f72.google.com with SMTP id o8-20020a0566021248b029058d0f91164eso11652560iou.1
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Aug 2021 10:24:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=d6VsKnNMPNiA6kqj9t07OA0sYBx7NKuZu8GZpEYHBbw=;
-        b=hQdU9i03ZVaRBg33yHgaaW98LYC0R/VAAS2maqwK5rKSTOq+S9nm6aCRsqWz53kWec
-         Pd6xc5ohnc+vrDW72DjtSEyfl2s/0CZn5OY7tdO101FP0KMOJ1wHAKMDcHzanM00+k80
-         fFsEmkjVk6vqT29klYiC8vJKZ37yLorZsIBFvIuXI9elgo5D44y9WZ6XJ0p6FqgtWQ84
-         SIOhDjuhQfWzQSKsKTMFjBbhD95+0SD4yIelkwgwwOga6hfIvEOe3wxRYNo3T0k84kh5
-         klRyZEIq7q15YAeV76hzJl73FSnl+F1evHYVo9YpnkYPqpchdQlzYeGJDQRphvcbmj1H
-         UCpg==
-X-Gm-Message-State: AOAM530CTNTj9Wl9d9b30Te2Y9l9oEyS3A+GH1lBP/TUCK+dBQhouPcL
-        gzAI5FFrK6GKkuZ5Fc4f7uec38ioR0UcTZrcCyRYEojZ2H+u
-X-Google-Smtp-Source: ABdhPJz9WFV0oravoaPIEYkDVlJncQ8kUDaScxD+osuPNtovL5PBeQ/9lIZ1nz9pXmrWI8bQ7wq1QtglF78Tasbi6w2v//uS5THW
+        id S231416AbhHQR1C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Aug 2021 13:27:02 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:39710 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230311AbhHQR1B (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Aug 2021 13:27:01 -0400
+Received: from zn.tnic (p200300ec2f1175006a73053df3c19379.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:7500:6a73:53d:f3c1:9379])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D659F1EC01B5;
+        Tue, 17 Aug 2021 19:26:22 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1629221183;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=DNJ7vQbeipIQzVqoNzpebqgTcO1JqCy5VA8Wf98/yoc=;
+        b=g1khrBdad75yo8euxQQm3YXRG/lrWYNNavOA/yqhWhFYsf3+kH3fltXo+mjEjOxrwlbahA
+        RK9GLTwIgfvCxq0DaaKZDczWmhZrDoJ9xvCOsd6/ajPMdZM8QuqEalus8YDh1p3DgNhY7s
+        IIh11MTwqipTCOwGaV0F1PgcV7NUGrw=
+Date:   Tue, 17 Aug 2021 19:27:02 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 15/36] x86/mm: Add support to validate
+ memory when changing C-bit
+Message-ID: <YRvxZtLkVNda9xwX@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-16-brijesh.singh@amd.com>
 MIME-Version: 1.0
-X-Received: by 2002:a02:90cb:: with SMTP id c11mr3966300jag.53.1629221064084;
- Tue, 17 Aug 2021 10:24:24 -0700 (PDT)
-Date:   Tue, 17 Aug 2021 10:24:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c910c305c9c4962e@google.com>
-Subject: [syzbot] KASAN: use-after-free Write in null_skcipher_crypt
-From:   syzbot <syzbot+d2c5e6980bfc84513464@syzkaller.appspotmail.com>
-To:     calvin.johnson@oss.nxp.com, davem@davemloft.net,
-        grant.likely@arm.com, herbert@gondor.apana.org.au,
-        ioana.ciornei@nxp.com, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210707181506.30489-16-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+On Wed, Jul 07, 2021 at 01:14:45PM -0500, Brijesh Singh wrote:
+> +struct __packed psc_hdr {
+> +	u16 cur_entry;
+> +	u16 end_entry;
+> +	u32 reserved;
+> +};
+> +
+> +struct __packed psc_entry {
+> +	u64	cur_page	: 12,
+> +		gfn		: 40,
+> +		operation	: 4,
+> +		pagesize	: 1,
+> +		reserved	: 7;
+> +};
+> +
+> +struct __packed snp_psc_desc {
+> +	struct psc_hdr hdr;
+> +	struct psc_entry entries[VMGEXIT_PSC_MAX_ENTRY];
+> +};
 
-syzbot found the following issue on:
+The majority of kernel code puts __packed after the struct definition,
+let's put it there too pls, out of the way.
 
-HEAD commit:    a9a507013a6f Merge tag 'ieee802154-for-davem-2021-08-12' o..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=16647ca1300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=343fd21f6f4da2d6
-dashboard link: https://syzkaller.appspot.com/bug?extid=d2c5e6980bfc84513464
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14989fe9300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12b1a779300000
+...
 
-The issue was bisected to:
+> +static int vmgexit_psc(struct snp_psc_desc *desc)
+> +{
+> +	int cur_entry, end_entry, ret;
+> +	struct snp_psc_desc *data;
+> +	struct ghcb_state state;
+> +	struct ghcb *ghcb;
+> +	struct psc_hdr *hdr;
+> +	unsigned long flags;
+> +
+> +	local_irq_save(flags);
+> +
+> +	ghcb = __sev_get_ghcb(&state);
+> +	if (unlikely(!ghcb))
+> +		panic("SEV-SNP: Failed to get GHCB\n");
+> +
+> +	/* Copy the input desc into GHCB shared buffer */
+> +	data = (struct snp_psc_desc *)ghcb->shared_buffer;
+> +	memcpy(ghcb->shared_buffer, desc, sizeof(*desc));
+> +
+> +	hdr = &data->hdr;
+> +	cur_entry = hdr->cur_entry;
+> +	end_entry = hdr->end_entry;
+> +
+> +	/*
+> +	 * As per the GHCB specification, the hypervisor can resume the guest
+> +	 * before processing all the entries. Checks whether all the entries
+> +	 * are processed. If not, then keep retrying.
+> +	 *
+> +	 * The stragtegy here is to wait for the hypervisor to change the page
+> +	 * state in the RMP table before guest access the memory pages. If the
+> +	 * page state was not successful, then later memory access will result
+> +	 * in the crash.
+> +	 */
+> +	while (hdr->cur_entry <= hdr->end_entry) {
+> +		ghcb_set_sw_scratch(ghcb, (u64)__pa(data));
+> +
+> +		ret = sev_es_ghcb_hv_call(ghcb, NULL, SVM_VMGEXIT_PSC, 0, 0);
+> +
+> +		/*
+> +		 * Page State Change VMGEXIT can pass error code through
+> +		 * exit_info_2.
+> +		 */
+> +		if (WARN(ret || ghcb->save.sw_exit_info_2,
+> +			 "SEV-SNP: page state change failed ret=%d exit_info_2=%llx\n",
+> +			 ret, ghcb->save.sw_exit_info_2))
+> +			return 1;
 
-commit 8d2cb3ad31181f050af4d46d6854cf332d1207a9
-Author: Calvin Johnson <calvin.johnson@oss.nxp.com>
-Date:   Fri Jun 11 10:53:55 2021 +0000
+Yikes, you return here and below with interrupts disabled.
 
-    of: mdio: Refactor of_mdiobus_register_phy()
+All your returns need to be "goto out;" instead where you do
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=106b97d6300000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=126b97d6300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=146b97d6300000
+out:
+        __sev_put_ghcb(&state);
+        local_irq_restore(flags);
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d2c5e6980bfc84513464@syzkaller.appspotmail.com
-Fixes: 8d2cb3ad3118 ("of: mdio: Refactor of_mdiobus_register_phy()")
+Yap, you very likely need to put the GHCB too.
 
-==================================================================
-BUG: KASAN: use-after-free in memcpy include/linux/fortify-string.h:191 [inline]
-BUG: KASAN: use-after-free in null_skcipher_crypt+0xa8/0x120 crypto/crypto_null.c:85
-Write of size 4096 at addr ffff88801c040000 by task syz-executor554/8455
+> +		/*
+> +		 * Lets do some sanity check that entry processing is not going
+> +		 * backward. This will happen only if hypervisor is tricking us.
+> +		 */
+> +		if (WARN((hdr->end_entry > end_entry) || (cur_entry > hdr->cur_entry),
+> +			"SEV-SNP: page state change processing going backward, end_entry "
+> +			"(expected %d got %d) cur_entry (expected %d got %d)\n",
+> +			end_entry, hdr->end_entry, cur_entry, hdr->cur_entry))
+> +			return 1;
 
-CPU: 0 PID: 8455 Comm: syz-executor554 Not tainted 5.14.0-rc4-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:105
- print_address_description.constprop.0.cold+0x6c/0x309 mm/kasan/report.c:233
- __kasan_report mm/kasan/report.c:419 [inline]
- kasan_report.cold+0x83/0xdf mm/kasan/report.c:436
- check_region_inline mm/kasan/generic.c:183 [inline]
- kasan_check_range+0x13d/0x180 mm/kasan/generic.c:189
- memcpy+0x39/0x60 mm/kasan/shadow.c:66
- memcpy include/linux/fortify-string.h:191 [inline]
- null_skcipher_crypt+0xa8/0x120 crypto/crypto_null.c:85
- crypto_skcipher_encrypt+0xaa/0xf0 crypto/skcipher.c:630
- crypto_authenc_encrypt+0x3b4/0x510 crypto/authenc.c:222
- crypto_aead_encrypt+0xaa/0xf0 crypto/aead.c:94
- esp6_output_tail+0x777/0x1a90 net/ipv6/esp6.c:659
- esp6_output+0x4af/0x8a0 net/ipv6/esp6.c:735
- xfrm_output_one net/xfrm/xfrm_output.c:552 [inline]
- xfrm_output_resume+0x2997/0x5ae0 net/xfrm/xfrm_output.c:587
- xfrm_output2 net/xfrm/xfrm_output.c:614 [inline]
- xfrm_output+0x2e7/0xff0 net/xfrm/xfrm_output.c:744
- __xfrm6_output+0x4c3/0x1260 net/ipv6/xfrm6_output.c:87
- NF_HOOK_COND include/linux/netfilter.h:296 [inline]
- xfrm6_output+0x117/0x550 net/ipv6/xfrm6_output.c:92
- dst_output include/net/dst.h:448 [inline]
- ip6_local_out+0xaf/0x1a0 net/ipv6/output_core.c:161
- ip6_send_skb+0xb7/0x340 net/ipv6/ip6_output.c:1935
- ip6_push_pending_frames+0xdd/0x100 net/ipv6/ip6_output.c:1955
- rawv6_push_pending_frames net/ipv6/raw.c:613 [inline]
- rawv6_sendmsg+0x2a87/0x3990 net/ipv6/raw.c:956
- inet_sendmsg+0x99/0xe0 net/ipv4/af_inet.c:821
- sock_sendmsg_nosec net/socket.c:703 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:723
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2392
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2446
- __sys_sendmsg+0xe5/0x1b0 net/socket.c:2475
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x43f4b9
-Code: 1d 01 00 85 c0 b8 00 00 00 00 48 0f 44 c3 5b c3 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc1e9cfff8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000400488 RCX: 000000000043f4b9
-RDX: 0000000000000000 RSI: 0000000020000500 RDI: 0000000000000004
-RBP: 0000000000000005 R08: 6c616b7a79732f2e R09: 6c616b7a79732f2e
-R10: 00000000000000e8 R11: 0000000000000246 R12: 00000000004034b0
-R13: 0000000000000000 R14: 00000000004ad018 R15: 0000000000400488
+WARNING: quoted string split across lines
+#293: FILE: arch/x86/kernel/sev.c:750:
++			"SEV-SNP: page state change processing going backward, end_entry "
++			"(expected %d got %d) cur_entry (expected %d got %d)\n",
 
-Allocated by task 1:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_set_track mm/kasan/common.c:46 [inline]
- set_alloc_info mm/kasan/common.c:434 [inline]
- __kasan_slab_alloc+0x84/0xa0 mm/kasan/common.c:467
- kasan_slab_alloc include/linux/kasan.h:254 [inline]
- slab_post_alloc_hook mm/slab.h:519 [inline]
- slab_alloc_node mm/slub.c:2956 [inline]
- slab_alloc mm/slub.c:2964 [inline]
- kmem_cache_alloc+0x285/0x4a0 mm/slub.c:2969
- getname_flags.part.0+0x50/0x4f0 fs/namei.c:138
- getname_flags fs/namei.c:2747 [inline]
- user_path_at_empty+0xa1/0x100 fs/namei.c:2747
- user_path_at include/linux/namei.h:57 [inline]
- vfs_statx+0x142/0x390 fs/stat.c:203
- vfs_fstatat fs/stat.c:225 [inline]
- vfs_lstat include/linux/fs.h:3386 [inline]
- __do_sys_newlstat+0x91/0x110 fs/stat.c:380
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
+If you're wondering what to do, yes, you can really stretch that string
+and shorten it too:
 
-Freed by task 1:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
- kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:360
- ____kasan_slab_free mm/kasan/common.c:366 [inline]
- ____kasan_slab_free mm/kasan/common.c:328 [inline]
- __kasan_slab_free+0xfb/0x130 mm/kasan/common.c:374
- kasan_slab_free include/linux/kasan.h:230 [inline]
- slab_free_hook mm/slub.c:1625 [inline]
- slab_free_freelist_hook+0xdf/0x240 mm/slub.c:1650
- slab_free mm/slub.c:3210 [inline]
- kmem_cache_free+0x8a/0x5b0 mm/slub.c:3226
- putname+0xe1/0x120 fs/namei.c:259
- filename_lookup+0x3df/0x5b0 fs/namei.c:2477
- user_path_at include/linux/namei.h:57 [inline]
- vfs_statx+0x142/0x390 fs/stat.c:203
- vfs_fstatat fs/stat.c:225 [inline]
- vfs_lstat include/linux/fs.h:3386 [inline]
- __do_sys_newlstat+0x91/0x110 fs/stat.c:380
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
+                if (WARN((hdr->end_entry > end_entry) || (cur_entry > hdr->cur_entry),
+"SEV-SNP: PSC processing going backwards, end_entry %d (got %d) cur_entry: %d (got %d)\n",
+                         end_entry, hdr->end_entry, cur_entry, hdr->cur_entry))
+                        return 1;
 
-The buggy address belongs to the object at ffff88801c040000
- which belongs to the cache names_cache of size 4096
-The buggy address is located 0 bytes inside of
- 4096-byte region [ffff88801c040000, ffff88801c041000)
-The buggy address belongs to the page:
-page:ffffea0000701000 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1c040
-head:ffffea0000701000 order:3 compound_mapcount:0 compound_pincount:0
-flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
-raw: 00fff00000010200 dead000000000100 dead000000000122 ffff8880109c43c0
-raw: 0000000000000000 0000000000070007 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 4994, ts 28153491853, free_ts 28141276199
- prep_new_page mm/page_alloc.c:2436 [inline]
- get_page_from_freelist+0xa72/0x2f80 mm/page_alloc.c:4169
- __alloc_pages+0x1b2/0x500 mm/page_alloc.c:5391
- alloc_pages+0x18c/0x2a0 mm/mempolicy.c:2244
- alloc_slab_page mm/slub.c:1688 [inline]
- allocate_slab+0x32e/0x4b0 mm/slub.c:1828
- new_slab mm/slub.c:1891 [inline]
- new_slab_objects mm/slub.c:2637 [inline]
- ___slab_alloc+0x4ba/0x820 mm/slub.c:2800
- __slab_alloc.constprop.0+0xa7/0xf0 mm/slub.c:2840
- slab_alloc_node mm/slub.c:2922 [inline]
- slab_alloc mm/slub.c:2964 [inline]
- kmem_cache_alloc+0x3e1/0x4a0 mm/slub.c:2969
- getname_flags.part.0+0x50/0x4f0 fs/namei.c:138
- getname_flags fs/namei.c:2747 [inline]
- user_path_at_empty+0xa1/0x100 fs/namei.c:2747
- user_path_at include/linux/namei.h:57 [inline]
- vfs_statx+0x142/0x390 fs/stat.c:203
- vfs_fstatat fs/stat.c:225 [inline]
- vfs_stat include/linux/fs.h:3382 [inline]
- __do_sys_newstat+0x91/0x110 fs/stat.c:367
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-page last free stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1346 [inline]
- free_pcp_prepare+0x2c5/0x780 mm/page_alloc.c:1397
- free_unref_page_prepare mm/page_alloc.c:3332 [inline]
- free_unref_page+0x19/0x690 mm/page_alloc.c:3411
- unfreeze_partials+0x17c/0x1d0 mm/slub.c:2418
- put_cpu_partial+0x13d/0x230 mm/slub.c:2454
- qlink_free mm/kasan/quarantine.c:146 [inline]
- qlist_free_all+0x5a/0xc0 mm/kasan/quarantine.c:165
- kasan_quarantine_reduce+0x180/0x200 mm/kasan/quarantine.c:272
- __kasan_slab_alloc+0x8e/0xa0 mm/kasan/common.c:444
- kasan_slab_alloc include/linux/kasan.h:254 [inline]
- slab_post_alloc_hook mm/slab.h:519 [inline]
- slab_alloc_node mm/slub.c:2956 [inline]
- slab_alloc mm/slub.c:2964 [inline]
- kmem_cache_alloc_trace+0x26d/0x3c0 mm/slub.c:2981
- kmalloc include/linux/slab.h:591 [inline]
- kzalloc include/linux/slab.h:721 [inline]
- call_usermodehelper_setup+0x97/0x340 kernel/umh.c:365
- kobject_uevent_env+0xf73/0x1650 lib/kobject_uevent.c:614
- kobject_synth_uevent+0x701/0x850 lib/kobject_uevent.c:208
- uevent_store+0x42/0x90 drivers/base/bus.c:581
- drv_attr_store+0x6d/0xa0 drivers/base/bus.c:77
- sysfs_kf_write+0x110/0x160 fs/sysfs/file.c:139
- kernfs_fop_write_iter+0x342/0x500 fs/kernfs/file.c:296
- call_write_iter include/linux/fs.h:2114 [inline]
- new_sync_write+0x426/0x650 fs/read_write.c:518
+so that it fits on a single line and grepping can find it.
 
-Memory state around the buggy address:
- ffff88801c03ff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff88801c03ff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffff88801c040000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                   ^
- ffff88801c040080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88801c040100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-----------------
-Code disassembly (best guess):
-   0:	1d 01 00 85 c0       	sbb    $0xc0850001,%eax
-   5:	b8 00 00 00 00       	mov    $0x0,%eax
-   a:	48 0f 44 c3          	cmove  %rbx,%rax
-   e:	5b                   	pop    %rbx
-   f:	c3                   	retq   
-  10:	90                   	nop
-  11:	48 89 f8             	mov    %rdi,%rax
-  14:	48 89 f7             	mov    %rsi,%rdi
-  17:	48 89 d6             	mov    %rdx,%rsi
-  1a:	48 89 ca             	mov    %rcx,%rdx
-  1d:	4d 89 c2             	mov    %r8,%r10
-  20:	4d 89 c8             	mov    %r9,%r8
-  23:	4c 8b 4c 24 08       	mov    0x8(%rsp),%r9
-  28:	0f 05                	syscall 
-  2a:	48 3d 01 f0 ff ff    	cmp    $0xfffffffffffff001,%rax <-- trapping instruction
-  30:	73 01                	jae    0x33
-  32:	c3                   	retq   
-  33:	48 c7 c1 c0 ff ff ff 	mov    $0xffffffffffffffc0,%rcx
-  3a:	f7 d8                	neg    %eax
-  3c:	64 89 01             	mov    %eax,%fs:(%rcx)
-  3f:	48                   	rex.W
+> +		/* Lets verify that reserved bit is not set in the header*/
+> +		if (WARN(hdr->reserved, "Reserved bit is set in the PSC header\n"))
 
+psc_entry has a ->reserved field too and since we're iterating over the
+entries...
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> +			return 1;
+> +	}
+> +
+> +	__sev_put_ghcb(&state);
+> +	local_irq_restore(flags);
+> +
+> +	return 0;
+> +}
+> +
+> +static void __set_page_state(struct snp_psc_desc *data, unsigned long vaddr,
+> +			     unsigned long vaddr_end, int op)
+> +{
+> +	struct psc_hdr *hdr;
+> +	struct psc_entry *e;
+> +	unsigned long pfn;
+> +	int i;
+> +
+> +	hdr = &data->hdr;
+> +	e = data->entries;
+> +
+> +	memset(data, 0, sizeof(*data));
+> +	i = 0;
+> +
+> +	while (vaddr < vaddr_end) {
+> +		if (is_vmalloc_addr((void *)vaddr))
+> +			pfn = vmalloc_to_pfn((void *)vaddr);
+> +		else
+> +			pfn = __pa(vaddr) >> PAGE_SHIFT;
+> +
+> +		e->gfn = pfn;
+> +		e->operation = op;
+> +		hdr->end_entry = i;
+> +
+> +		/*
+> +		 * The GHCB specification provides the flexibility to
+> +		 * use either 4K or 2MB page size in the RMP table.
+> +		 * The current SNP support does not keep track of the
+> +		 * page size used in the RMP table. To avoid the
+> +		 * overlap request, use the 4K page size in the RMP
+> +		 * table.
+> +		 */
+> +		e->pagesize = RMP_PG_SIZE_4K;
+> +
+> +		vaddr = vaddr + PAGE_SIZE;
+> +		e++;
+> +		i++;
+> +	}
+> +
+> +	/* Terminate the guest on page state change failure. */
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+That comment is kinda obvious :)
+
+> +	if (vmgexit_psc(data))
+> +		sev_es_terminate(1, GHCB_TERM_PSC);
+> +}
+> +
+> +static void set_page_state(unsigned long vaddr, unsigned int npages, int op)
+> +{
+> +	unsigned long vaddr_end, next_vaddr;
+> +	struct snp_psc_desc *desc;
+> +
+> +	vaddr = vaddr & PAGE_MASK;
+> +	vaddr_end = vaddr + (npages << PAGE_SHIFT);
+> +
+> +	desc = kmalloc(sizeof(*desc), GFP_KERNEL_ACCOUNT);
+
+kzalloc() so that you don't have to memset() later in
+__set_page_state().
+
+> +	if (!desc)
+> +		panic("failed to allocate memory");
+
+Make that error message more distinctive so that *if* it happens, one
+can pinpoint the place in the code where the panic comes from.
+
+> +	while (vaddr < vaddr_end) {
+> +		/*
+> +		 * Calculate the last vaddr that can be fit in one
+> +		 * struct snp_psc_desc.
+> +		 */
+> +		next_vaddr = min_t(unsigned long, vaddr_end,
+> +				(VMGEXIT_PSC_MAX_ENTRY * PAGE_SIZE) + vaddr);
+> +
+> +		__set_page_state(desc, vaddr, next_vaddr, op);
+> +
+> +		vaddr = next_vaddr;
+> +	}
+> +
+> +	kfree(desc);
+> +}
+> +
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
