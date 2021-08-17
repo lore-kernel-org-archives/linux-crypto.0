@@ -2,282 +2,173 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFE4C432BE
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 17:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1ADCC4320A
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 17:38:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D11E60FE6
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 17:26:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C39CD60FDA
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 17:38:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231416AbhHQR1C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Aug 2021 13:27:02 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:39710 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230311AbhHQR1B (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Aug 2021 13:27:01 -0400
-Received: from zn.tnic (p200300ec2f1175006a73053df3c19379.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:7500:6a73:53d:f3c1:9379])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D659F1EC01B5;
-        Tue, 17 Aug 2021 19:26:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629221183;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=DNJ7vQbeipIQzVqoNzpebqgTcO1JqCy5VA8Wf98/yoc=;
-        b=g1khrBdad75yo8euxQQm3YXRG/lrWYNNavOA/yqhWhFYsf3+kH3fltXo+mjEjOxrwlbahA
-        RK9GLTwIgfvCxq0DaaKZDczWmhZrDoJ9xvCOsd6/ajPMdZM8QuqEalus8YDh1p3DgNhY7s
-        IIh11MTwqipTCOwGaV0F1PgcV7NUGrw=
-Date:   Tue, 17 Aug 2021 19:27:02 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 15/36] x86/mm: Add support to validate
- memory when changing C-bit
-Message-ID: <YRvxZtLkVNda9xwX@zn.tnic>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-16-brijesh.singh@amd.com>
-MIME-Version: 1.0
+        id S231938AbhHQRjV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Aug 2021 13:39:21 -0400
+Received: from mail-eopbgr30135.outbound.protection.outlook.com ([40.107.3.135]:57088
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229716AbhHQRjU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Aug 2021 13:39:20 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LiFSHYXN+rg7VOKGO8eEMGQ7dMCbpvpegz1oDUStfBfb3p46OhwLC/dt7K5u9tAVFZJV/SYg54HDBnT8uP0VkmuOBWq+yQ6bB5C7svwyvv+fosjmoON3ls3mMrOVei4euBtCo5TL6wQs+sBzCMPEsSpVN6Wk/NKdV4v+/OTBza1RFwxXzshxuohkjtCaUI4Q21I56Hm42ZjVikx3eY9+v1aV22plPG2wGFlIFD6RHDx+vsaKvSwpMVLb/QDtAL+4vTtNMDX/ycPN9AfNNIWlbAIeZpHK7IB2zWhiSeAsCo8GzNVOANq7f82xcvItInOG0fzkGwwW8zES8RGKLVL6vw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QKQoNlbI5c5tU77EJKrQ6Ecqkhl0Wb40woRWzg5wqbg=;
+ b=gx2Aaip0wi4Rm8kPMEmHpa0LmVwCq81R+82P/FJQiRe4TGcePfRifQcvpauoOzwtrAPm3w6DrjcPuowSvDM3vCDlTIPIeLU6pIB4mquWAHM0z4Mco9BmVgXLuiPrbXaX+pK32UNZQ+tZGSGbGYL1r1QOvKn9tv1M/I2RhpoE7IsNPcghyTlWbhA3OUlJ5qAZPR3sl5zpczwZwKwpzHD8jM4B3lAQ5eB/bKwRia8k6bC71bY9w44WdjMCh/p9PsQ7VH1Nnq/jXQ0NdrsaOX8ZMlwMpgVJ1L/TOxptuATY+OYOrPIxYI7AMf6IdpNu19C11hhLqLCY9Gj4SxwadmqnDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=kontron.de; dmarc=pass action=none header.from=kontron.de;
+ dkim=pass header.d=kontron.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mysnt.onmicrosoft.com;
+ s=selector2-mysnt-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QKQoNlbI5c5tU77EJKrQ6Ecqkhl0Wb40woRWzg5wqbg=;
+ b=KRnnLJ8BteIGUJEyHpE8IMOY70uUV0tgsZzQXLj5ObxcKr+EkHooMUJ/ETBESAOBUNMFmHzTugt2kziSxS6aZfEtvA5sMmm6kj+aJiwjZnbJJ73cBHvyzMhlYA1LS5k9ncuFWu79XzeNA1o8es4L70S6AGgjmp0KFlsvxaKa9PU=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=kontron.de;
+Received: from AM0PR10MB2963.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:157::14)
+ by AM0PR10MB2243.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:d6::29) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.21; Tue, 17 Aug
+ 2021 17:38:45 +0000
+Received: from AM0PR10MB2963.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::30d6:1ff9:85e4:48d1]) by AM0PR10MB2963.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::30d6:1ff9:85e4:48d1%5]) with mapi id 15.20.4415.024; Tue, 17 Aug 2021
+ 17:38:44 +0000
+Subject: Re: [PATCH v4 4/5] ARM: dts: imx6ull: add rng
+From:   Frieder Schrempf <frieder.schrempf@kontron.de>
+To:     =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     devicetree@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Marco Felsch <m.felsch@pengutronix.de>,
+        linux-kernel@vger.kernel.org,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Martin Kaiser <martin@kaiser.cx>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Fabio Estevam <festevam@gmail.com>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
+References: <20200715152604.10407-1-horia.geanta@nxp.com>
+ <20200715152604.10407-5-horia.geanta@nxp.com>
+ <4f30d822-9db7-4a54-c082-fa9f54982b42@kontron.de>
+Message-ID: <1246c765-0bbe-9143-6214-94b7ebcb6151@kontron.de>
+Date:   Tue, 17 Aug 2021 19:38:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+In-Reply-To: <4f30d822-9db7-4a54-c082-fa9f54982b42@kontron.de>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210707181506.30489-16-brijesh.singh@amd.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AS8PR04CA0060.eurprd04.prod.outlook.com
+ (2603:10a6:20b:312::35) To AM0PR10MB2963.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:157::14)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.10.36] (89.244.183.210) by AS8PR04CA0060.eurprd04.prod.outlook.com (2603:10a6:20b:312::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Tue, 17 Aug 2021 17:38:43 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 071cb961-1d3f-45ff-6045-08d961a5dc6f
+X-MS-TrafficTypeDiagnostic: AM0PR10MB2243:
+X-Microsoft-Antispam-PRVS: <AM0PR10MB22437665E70B644E5AEB0C58E9FE9@AM0PR10MB2243.EURPRD10.PROD.OUTLOOK.COM>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6wFV2reGVfIrmNDlxYxSumfFLxxbXl0tnWMHYtu05dhL6t59wphDie6pQHrrJRcjyH5jPk3uvhp8IUlobYD6ocY4/C5bJZOwsY8irmMY5AZhn1YxOIWbm1oZ1rt88UPo8xbgJS8du0jumCQ5WP+OTmK6H2S5JXR1UVHsCsVzDiF5N1ZtM9KlOaeoZFcG9cEirYHGQpvxyGXP6M6x2rUxgxNyjXh1wpuYgeZR8X9+SPZVtp9mSp9QoBpENSTFT3dWzbcmviwHu2EKWXNptBLsmGw0EEaQ8F3et8BTBaxLEpbUaJCmFV2fBH4UpWLbOqFhlyEXJTHkOcZeqh36+QKeCMQTfvVl6DIMFeKQMQE/bsklf9rtjBWQTYFehlQ06wbiuEsFHPlqHXjn08SOZjnnyb8eMjQq1lwSKS0gV4Jr9wy0HTI3Wfna9U6ZdMiq3SR6EptOSXhPRXPR5R3Pbwrn6JZ6dHowNUv4N3BS0+FG4i6bzo3nuJzC0pzTseTGQlulLNdCIj8RwC83T4V5CBB4s8iJ5CSR1c/6I7FGZNioHdb6O9zeQcnyrfqPYC6vXqBp+QZ0+0CBoD5dJjxjTyFCqrmQbY9bvuXJEZKsdPX3q0X55Mxh4kmpDZNk5Eyo9GVOTxbFIMKvmRta8tc+Mqi1pfRn22NM9108doF/GVXPeLH37OM5jxPxGW9aB11pbEVGB8tkr8Jko/cjSZVnLd2Dq6FbBv2tjcebJ7G6L2KmDmRw7xKfmOvR8io0LqiiOhEKyauXXZmcl/g1+bx9P9ZHCw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR10MB2963.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(4636009)(366004)(38100700002)(4326008)(508600001)(31696002)(6486002)(66556008)(66946007)(66476007)(956004)(186003)(8936002)(54906003)(2616005)(53546011)(110136005)(26005)(5660300002)(44832011)(7416002)(31686004)(316002)(36756003)(16576012)(2906002)(86362001)(83380400001)(8676002)(32563001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?czdpQTltV3NlNjh4NEVoaU5RN1dscDNZOUlKNEFTcnRId29ya1docTRLVmEy?=
+ =?utf-8?B?dmMwV00zMlBsYWlxOFNpRHFpMDZGM2tTWmRaNndsYVdqOWxienh1WlpMRVJs?=
+ =?utf-8?B?Z2JEdW0wV2w1RVgyQm5JaUp3NUFGalFyeGloWVhTeEJyZDZraW01WE1LMkxy?=
+ =?utf-8?B?L3VmRHdQd3cxQVR2eXNBT3pNb2lJWlN4UnY2SjI0YSt1aU95Zm9CQUZHN01S?=
+ =?utf-8?B?YzJlZDgzRmNGTzdCbm4rOVFmbkRuYm04RnB0TkswQzhLaWZyNjhKTFZiVi9R?=
+ =?utf-8?B?bWNUb3J1NFdyV3lJS3RxR0FGaXRPMUVWenQ1UGg5M1VONTkrZXV2L0YyUkdT?=
+ =?utf-8?B?ZXpuOVNYWTRyREhhaXFlMGo0VXRIYi9VcWNVL0lyVUthN20zZDEyVFo0Q3Yx?=
+ =?utf-8?B?eHIvTWdFQThHL0NjQm5raHhTQ1Q2UEw2a2FtVU0vVWoxR0dFRVAvcVBmeHpa?=
+ =?utf-8?B?aFlMeDMwRmZ5UXdDdjdWakhkY0Q0T2dDUWU4aW5KMlRaKzVwMmpZb0xhTVdO?=
+ =?utf-8?B?b3BORFFRcWFQWkUrbzgwd1B6dmM2ZktqQURqUU5hVTVUa3BKbEdzTDgydi8x?=
+ =?utf-8?B?TGplbGUxQUxrNGwvQzBTaUJCSkZ1SkdmT0gyWC9hZ3B0bzNhOUZObXZjVWZh?=
+ =?utf-8?B?ajJraVc5QkJsaTZodmdsbVN6eGFPb2xrRWp1QzVVd24zWGFVUit5c3BZMDJ1?=
+ =?utf-8?B?OXVxMkl6cGFNQVJGZC9UWkpxcC9MQ0t5V2poNzNYcmxQY3RWS3dsSEhMZVZG?=
+ =?utf-8?B?Vmw4eVlseG9sWHNhdkpnTSt6NE5yZlhvK2VTN2ZZUzFLcGE3TTJlcFE4UDI5?=
+ =?utf-8?B?TDhBL2NoYm84QThONFBsNGdMb00xY28zU1dLeG0yYzhsTDNUeit2OHY0d3RG?=
+ =?utf-8?B?ZXg1V0NnUXQvRGJiTlFsWGc5UHNyV21rL0pDWHJsTGczVkplMzd4VElTSkZT?=
+ =?utf-8?B?cVJzZ2RIR3cyRUNiR1ZEZlU0NDd6ZGV3bjNpTTNLTmFzbGs0ZlZaWTZDMlZ1?=
+ =?utf-8?B?ejVsNm50c3BvRHFjam1JWHVtT2JlYmtaVmxnZnRTQjJuRDg2VW1ITTRFVU0r?=
+ =?utf-8?B?d3kwU1RKeXR1RExQdjlXVUJ4eTN4VXNudGhWays4Q042bmRZN1htZW81K1Zl?=
+ =?utf-8?B?eVBaaUVKelpwYmNiekhkeC9wUnNPT2RSYm12LzJRRkQ4UjBQVjR4K0pwTllZ?=
+ =?utf-8?B?b1F2T29jTkZtWm1oQXlCWTlUSkRMakFTdTZZRXZndWdaVXVzVkRRenpaSnU3?=
+ =?utf-8?B?N1J5MS9KanpRdDA2R2FOQjBkbjNGakFhRXdJV2JQQ0VDbTZhZmJWZVlUOS9n?=
+ =?utf-8?B?aVlsbkt6R2ZwVjQvUE4wS1VUZXBJS2hGVksvMEJwZ0VlOG1ZUi9vUWFnSWtG?=
+ =?utf-8?B?VGNYQVVuU3NodGc4SjRhbkpBcVhBbjhSQUZxeXF5eVRxbm1YcFNtT1A1NEQz?=
+ =?utf-8?B?ZzJhenNWMklYUExNVE1KL2F2T3lUWXQ1QzFFK3hWbXp2S1hDWElCQVBkbWNj?=
+ =?utf-8?B?d1BPanFldTZSVGE3YzVmUkNmcHFwZlpRam1sZmNtOTN2bExrNVVyNGx3Z3Vp?=
+ =?utf-8?B?TjM2ZGFYSWRyZHh1OEthS2U5RHRxcXl6czl3NnVoZ1JzNkdNRW04bU8wQU9n?=
+ =?utf-8?B?TG1SckxPRTJGZTVRQjdZZUYxR25OL2pzUXhGNXVWRkp4YTV2cmlCaWZFcU1O?=
+ =?utf-8?B?YW1IYTlIajJLNjJycXpkWHBjZjR6ZkFuMWNKNncwQkdGSFNwQTB1K3lxbzlk?=
+ =?utf-8?Q?AppR+XMrtLD/KlTSWEDqPCr15sJOoMip1oOItGN?=
+X-OriginatorOrg: kontron.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 071cb961-1d3f-45ff-6045-08d961a5dc6f
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR10MB2963.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2021 17:38:44.7429
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8c9d3c97-3fd9-41c8-a2b1-646f3942daf1
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9be03aEXrVd6TMWg3T4ZVyvwk5tgkhL9Rnst228qG66Y0RNFFENXX6uYZgp/fpI2xeFznP0vbABGGZOYK1HqT8aej6S1f2K+ZIeYwN6JKTs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR10MB2243
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 07, 2021 at 01:14:45PM -0500, Brijesh Singh wrote:
-> +struct __packed psc_hdr {
-> +	u16 cur_entry;
-> +	u16 end_entry;
-> +	u32 reserved;
-> +};
-> +
-> +struct __packed psc_entry {
-> +	u64	cur_page	: 12,
-> +		gfn		: 40,
-> +		operation	: 4,
-> +		pagesize	: 1,
-> +		reserved	: 7;
-> +};
-> +
-> +struct __packed snp_psc_desc {
-> +	struct psc_hdr hdr;
-> +	struct psc_entry entries[VMGEXIT_PSC_MAX_ENTRY];
-> +};
+On 17.08.21 17:39, Frieder Schrempf wrote:
+> Hi,
+> 
+> On 15.07.20 17:26, Horia Geantă wrote:
+>> Add node for the RNGB block.
+>>
+>> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+>> Reviewed-by: Marco Felsch <m.felsch@pengutronix.de>
+>> ---
+>>  arch/arm/boot/dts/imx6ull.dtsi | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/arch/arm/boot/dts/imx6ull.dtsi b/arch/arm/boot/dts/imx6ull.dtsi
+>> index fcde7f77ae42..9bf67490ac49 100644
+>> --- a/arch/arm/boot/dts/imx6ull.dtsi
+>> +++ b/arch/arm/boot/dts/imx6ull.dtsi
+>> @@ -68,6 +68,13 @@
+>>  				clock-names = "dcp";
+>>  			};
+>>  
+>> +			rngb: rng@2284000 {
+>> +				compatible = "fsl,imx6ull-rngb", "fsl,imx25-rngb";
+>> +				reg = <0x02284000 0x4000>;
+>> +				interrupts = <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>;
+>> +				clocks = <&clks IMX6UL_CLK_DUMMY>;
+>> +			};
+>> +
+> 
+> My board (imx6ull-kontron-n6411-s.dts) fails to boot since this was added in v5.10-rc1. There is a crash in the RNG probe. Can anyone help?
+> Below is the interesting part of the boot log from v5.14-rc6.
 
-The majority of kernel code puts __packed after the struct definition,
-let's put it there too pls, out of the way.
-
-...
-
-> +static int vmgexit_psc(struct snp_psc_desc *desc)
-> +{
-> +	int cur_entry, end_entry, ret;
-> +	struct snp_psc_desc *data;
-> +	struct ghcb_state state;
-> +	struct ghcb *ghcb;
-> +	struct psc_hdr *hdr;
-> +	unsigned long flags;
-> +
-> +	local_irq_save(flags);
-> +
-> +	ghcb = __sev_get_ghcb(&state);
-> +	if (unlikely(!ghcb))
-> +		panic("SEV-SNP: Failed to get GHCB\n");
-> +
-> +	/* Copy the input desc into GHCB shared buffer */
-> +	data = (struct snp_psc_desc *)ghcb->shared_buffer;
-> +	memcpy(ghcb->shared_buffer, desc, sizeof(*desc));
-> +
-> +	hdr = &data->hdr;
-> +	cur_entry = hdr->cur_entry;
-> +	end_entry = hdr->end_entry;
-> +
-> +	/*
-> +	 * As per the GHCB specification, the hypervisor can resume the guest
-> +	 * before processing all the entries. Checks whether all the entries
-> +	 * are processed. If not, then keep retrying.
-> +	 *
-> +	 * The stragtegy here is to wait for the hypervisor to change the page
-> +	 * state in the RMP table before guest access the memory pages. If the
-> +	 * page state was not successful, then later memory access will result
-> +	 * in the crash.
-> +	 */
-> +	while (hdr->cur_entry <= hdr->end_entry) {
-> +		ghcb_set_sw_scratch(ghcb, (u64)__pa(data));
-> +
-> +		ret = sev_es_ghcb_hv_call(ghcb, NULL, SVM_VMGEXIT_PSC, 0, 0);
-> +
-> +		/*
-> +		 * Page State Change VMGEXIT can pass error code through
-> +		 * exit_info_2.
-> +		 */
-> +		if (WARN(ret || ghcb->save.sw_exit_info_2,
-> +			 "SEV-SNP: page state change failed ret=%d exit_info_2=%llx\n",
-> +			 ret, ghcb->save.sw_exit_info_2))
-> +			return 1;
-
-Yikes, you return here and below with interrupts disabled.
-
-All your returns need to be "goto out;" instead where you do
-
-out:
-        __sev_put_ghcb(&state);
-        local_irq_restore(flags);
-
-Yap, you very likely need to put the GHCB too.
-
-> +		/*
-> +		 * Lets do some sanity check that entry processing is not going
-> +		 * backward. This will happen only if hypervisor is tricking us.
-> +		 */
-> +		if (WARN((hdr->end_entry > end_entry) || (cur_entry > hdr->cur_entry),
-> +			"SEV-SNP: page state change processing going backward, end_entry "
-> +			"(expected %d got %d) cur_entry (expected %d got %d)\n",
-> +			end_entry, hdr->end_entry, cur_entry, hdr->cur_entry))
-> +			return 1;
-
-WARNING: quoted string split across lines
-#293: FILE: arch/x86/kernel/sev.c:750:
-+			"SEV-SNP: page state change processing going backward, end_entry "
-+			"(expected %d got %d) cur_entry (expected %d got %d)\n",
-
-If you're wondering what to do, yes, you can really stretch that string
-and shorten it too:
-
-                if (WARN((hdr->end_entry > end_entry) || (cur_entry > hdr->cur_entry),
-"SEV-SNP: PSC processing going backwards, end_entry %d (got %d) cur_entry: %d (got %d)\n",
-                         end_entry, hdr->end_entry, cur_entry, hdr->cur_entry))
-                        return 1;
-
-so that it fits on a single line and grepping can find it.
-
-> +		/* Lets verify that reserved bit is not set in the header*/
-> +		if (WARN(hdr->reserved, "Reserved bit is set in the PSC header\n"))
-
-psc_entry has a ->reserved field too and since we're iterating over the
-entries...
-
-> +			return 1;
-> +	}
-> +
-> +	__sev_put_ghcb(&state);
-> +	local_irq_restore(flags);
-> +
-> +	return 0;
-> +}
-> +
-> +static void __set_page_state(struct snp_psc_desc *data, unsigned long vaddr,
-> +			     unsigned long vaddr_end, int op)
-> +{
-> +	struct psc_hdr *hdr;
-> +	struct psc_entry *e;
-> +	unsigned long pfn;
-> +	int i;
-> +
-> +	hdr = &data->hdr;
-> +	e = data->entries;
-> +
-> +	memset(data, 0, sizeof(*data));
-> +	i = 0;
-> +
-> +	while (vaddr < vaddr_end) {
-> +		if (is_vmalloc_addr((void *)vaddr))
-> +			pfn = vmalloc_to_pfn((void *)vaddr);
-> +		else
-> +			pfn = __pa(vaddr) >> PAGE_SHIFT;
-> +
-> +		e->gfn = pfn;
-> +		e->operation = op;
-> +		hdr->end_entry = i;
-> +
-> +		/*
-> +		 * The GHCB specification provides the flexibility to
-> +		 * use either 4K or 2MB page size in the RMP table.
-> +		 * The current SNP support does not keep track of the
-> +		 * page size used in the RMP table. To avoid the
-> +		 * overlap request, use the 4K page size in the RMP
-> +		 * table.
-> +		 */
-> +		e->pagesize = RMP_PG_SIZE_4K;
-> +
-> +		vaddr = vaddr + PAGE_SIZE;
-> +		e++;
-> +		i++;
-> +	}
-> +
-> +	/* Terminate the guest on page state change failure. */
-
-That comment is kinda obvious :)
-
-> +	if (vmgexit_psc(data))
-> +		sev_es_terminate(1, GHCB_TERM_PSC);
-> +}
-> +
-> +static void set_page_state(unsigned long vaddr, unsigned int npages, int op)
-> +{
-> +	unsigned long vaddr_end, next_vaddr;
-> +	struct snp_psc_desc *desc;
-> +
-> +	vaddr = vaddr & PAGE_MASK;
-> +	vaddr_end = vaddr + (npages << PAGE_SHIFT);
-> +
-> +	desc = kmalloc(sizeof(*desc), GFP_KERNEL_ACCOUNT);
-
-kzalloc() so that you don't have to memset() later in
-__set_page_state().
-
-> +	if (!desc)
-> +		panic("failed to allocate memory");
-
-Make that error message more distinctive so that *if* it happens, one
-can pinpoint the place in the code where the panic comes from.
-
-> +	while (vaddr < vaddr_end) {
-> +		/*
-> +		 * Calculate the last vaddr that can be fit in one
-> +		 * struct snp_psc_desc.
-> +		 */
-> +		next_vaddr = min_t(unsigned long, vaddr_end,
-> +				(VMGEXIT_PSC_MAX_ENTRY * PAGE_SIZE) + vaddr);
-> +
-> +		__set_page_state(desc, vaddr, next_vaddr, op);
-> +
-> +		vaddr = next_vaddr;
-> +	}
-> +
-> +	kfree(desc);
-> +}
-> +
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+I just found out, that I was trying to boot on an i.MX6UL when I was assuming the board had an i.MX6ULL. That won't work of course. Sorry for the noise!
