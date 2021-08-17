@@ -2,70 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F9E6C4338F
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 10:06:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE138C432BE
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 12:35:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8A0860EFE
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 10:06:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C49060E76
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 12:35:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239515AbhHQKGn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Aug 2021 06:06:43 -0400
-Received: from smtp-relay-canonical-0.canonical.com ([185.125.188.120]:38134
-        "EHLO smtp-relay-canonical-0.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239157AbhHQKF4 (ORCPT
+        id S234866AbhHQMfn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Aug 2021 08:35:43 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:58811 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230354AbhHQMfn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Aug 2021 06:05:56 -0400
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPS id 79CDB40C9C
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Aug 2021 10:05:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1629194722;
-        bh=GOIsTUQ+gJL63rEPiNcOFHz6lWCZ7WtQFp4xSBwe2Ag=;
-        h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-         In-Reply-To:Content-Type;
-        b=rUTrnVSLcvn8D+lLUN1kPdO0WD68yYVAKLO7at8vuuS1uqsyWcezZWCFV66rmY2nD
-         hvHeLzVQn1i/T7labJJu4uvVHT1WHK8hyXvCae/hlcQi5PG8D2GXyxeFtP+JnRrdtA
-         dNmnRIlw66Pdu4C9yofPtHCmnFf31JIQJxTfn6DFrWkuvX4oyTgMRVxK3iKBV9L+62
-         T1jbC4h+XBbc/0GXRSR9A1dMD+y4jsFx6XWniNwVZ53YKnCcGVS5jeT69+fj0oDrWa
-         Z0MaXerNeqwKqlCtJ4GKuUBXtWWBJsqlO6lthauDmIuMF+R+Tfl/hMbpTrm7hULiM4
-         GF1vy34/Kvt6A==
-Received: by mail-ej1-f70.google.com with SMTP id ja25-20020a1709079899b02905b2a2bf1a62so5805423ejc.4
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Aug 2021 03:05:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GOIsTUQ+gJL63rEPiNcOFHz6lWCZ7WtQFp4xSBwe2Ag=;
-        b=fMtUdSfnxl/Aj/ljfpiT3ueflRYXSWFpOcNSCEulyf8pWLuMS+O/iT7JrZl2BLf3+6
-         1+h3bPRu4KZkYASAmc/qgL2FIuaPCsFSreGV4r8lBOFk4RltOYdlr6xlxwh23tzIyoEp
-         DilGt4zB+Knh2zpppEtSVq0qMmRo2GscCLqyBs6el6J5BDvKkS9m3htveMF7SBBV6fVA
-         4ST+n22b2tKzZGdcmGApJxpXR4CZOimGx07eM66Okk+DSJNpdfBt/OOZgavwkOWwfBY1
-         OHLoYo81AZFmB72DMNNNNQ2cTP0pPyoOU0Bmv7s+cmac8I+cpd78leDdEtjZHEZJq4H/
-         QF9g==
-X-Gm-Message-State: AOAM53361lcQ0E5mw06R16Fd3c3JDwe6g96JZ3p0pzw3P+Xzq5E4Fbvi
-        nec0+u5EcWieZOi8LCsGaoDncF4HP6Az+eeEbLpLUINSI/bZa3j4tTwEH4e9fsXmKxvzn4bO91u
-        TKnsmNStYXV+t9ngsgPkb6kcsnLAx4JSyCVrrziccpQ==
-X-Received: by 2002:a05:6402:214d:: with SMTP id bq13mr3229745edb.263.1629194722042;
-        Tue, 17 Aug 2021 03:05:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzC3ptiEqOWsybRDl1sa+LgQ0zWpCdCEsdKyWGPcbPrtTBHxez2xHpr+Za6aNluTlhnkIYe4g==
-X-Received: by 2002:a05:6402:214d:: with SMTP id bq13mr3229732edb.263.1629194721860;
-        Tue, 17 Aug 2021 03:05:21 -0700 (PDT)
-Received: from [192.168.8.102] ([86.32.42.198])
-        by smtp.gmail.com with ESMTPSA id p23sm559903ejc.19.2021.08.17.03.05.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Aug 2021 03:05:21 -0700 (PDT)
-Subject: Re: [PATCH 2/2] dt-bindings: rng: convert Samsung Exynos TRNG to
- dtschema
-To:     Lukasz Stelmach <l.stelmach@samsung.com>
+        Tue, 17 Aug 2021 08:35:43 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20210817123508euoutp024123286ae26f6632e28a16fd970e61c2~cGCQe_p6l2618726187euoutp02Q;
+        Tue, 17 Aug 2021 12:35:08 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20210817123508euoutp024123286ae26f6632e28a16fd970e61c2~cGCQe_p6l2618726187euoutp02Q
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1629203708;
+        bh=I1Lc3QNLRdHMuOOYcM8MCj6OI+Zmefea4cIaC7PS56A=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=bdLvQSnQjR/t66XwqQCKMfspTx8KJ3j8v4j8Z344H3TQWpPF4PM59zoJa4lF39jrW
+         OWQAhEvIjUE10ebZ/+bZa2BSprGDeYibSyJf1tz0L5Xswn7Z1NOBXAdX2PSOLY6Vxd
+         j9r2gsdUQoidzHj3iGqtMa+ZgoXYUNOcEIONMqj4=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20210817123508eucas1p2c93495a4bce52ee192987627a73d3195~cGCQJhrc20206802068eucas1p2N;
+        Tue, 17 Aug 2021 12:35:08 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id C3.27.42068.CFCAB116; Tue, 17
+        Aug 2021 13:35:08 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20210817123507eucas1p120be1e5cc942e20bed39b6d810ccdbd1~cGCPUTBVa3090730907eucas1p1i;
+        Tue, 17 Aug 2021 12:35:07 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20210817123507eusmtrp1cead64abb7ac154b4b1ebd97f352079d~cGCPTN_Ls0499304993eusmtrp1Z;
+        Tue, 17 Aug 2021 12:35:07 +0000 (GMT)
+X-AuditID: cbfec7f4-c89ff7000002a454-ad-611bacfc564e
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 55.00.31287.BFCAB116; Tue, 17
+        Aug 2021 13:35:07 +0100 (BST)
+Received: from localhost (unknown [106.120.51.46]) by eusmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20210817123507eusmtip2cee3d14c4b90be9d235e7a5136e036a4~cGCPFhL2W2877228772eusmtip2N;
+        Tue, 17 Aug 2021 12:35:07 +0000 (GMT)
+From:   Lukasz Stelmach <l.stelmach@samsung.com>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Marc Zyngier <maz@kernel.org>,
         Rob Herring <robh+dt@kernel.org>,
@@ -74,109 +64,186 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
         linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <20210811084306.28740-2-krzysztof.kozlowski@canonical.com>
- <CGME20210817095553eucas1p174e68fc6d7cfad9c2fd34f729272b01a@eucas1p1.samsung.com>
- <dleftjeeasfl9b.fsf%l.stelmach@samsung.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-Message-ID: <c3a1d7d2-7b32-b7eb-4647-f86e22f5e5ff@canonical.com>
-Date:   Tue, 17 Aug 2021 12:05:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+Subject: Re: [PATCH 2/2] dt-bindings: rng: convert Samsung Exynos TRNG to
+ dtschema
+Date:   Tue, 17 Aug 2021 14:34:56 +0200
+In-Reply-To: <c3a1d7d2-7b32-b7eb-4647-f86e22f5e5ff@canonical.com> (Krzysztof
+        Kozlowski's message of "Tue, 17 Aug 2021 12:05:20 +0200")
+Message-ID: <dleftj8s10fdvz.fsf%l.stelmach@samsung.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <dleftjeeasfl9b.fsf%l.stelmach@samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
+        protocol="application/pgp-signature"
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrAKsWRmVeSWpSXmKPExsWy7djP87p/1kgnGhzfwmUx/8g5VovuVzIW
+        G9/+YLLY9Pgaq8X9ez+ZLC7vmsNmMeP8PiaLnXNOslos2NbHaNG69wi7xeZNU5kduD1mNfSy
+        eWw7oOqxaVUnm8e7c+fYPTYvqffoe7mB0ePzJrkA9igum5TUnMyy1CJ9uwSujFlntrAU3FWs
+        OLyzmb2B8bpMFyMnh4SAicT7f2tYuhi5OIQEVjBKrLl0EMr5wijxYtEGJgjnM6PE1G3X2WBa
+        tmyeygyRWM4osWj5DFYI5zmQs/ItUD8HB5uAnsTatREgDSIC1hJHt85nBrGZBZ4wSVxrMQCx
+        hQVCJO5PmQQWZxFQlfh5uJERxOYU6GCUmDEtH8TmFTCXOH93NSuILSpgKbHlxX12iLigxMmZ
+        T1ggZuZKzDz/hhHkBgmB+ZwS+xonQ13qIjF/wQ8WCFtY4tXxLewQtozE6ck9YHdKCNRLTJ5k
+        BtHbwyixbQ5MvbXEnXO/2CBqHCX693NBmHwSN94KQqzlk5i0bTozRJhXoqNNCKJRRWJd/x6o
+        IVISva9WMELYHhIzm+cxQkJqCqPE+m1t7BMYFWYh+WYWkm9mAY1lFtCUWL9LHyKsLbFs4Wtm
+        CNtWYt269ywLGFlXMYqnlhbnpqcWG+WllusVJ+YWl+al6yXn525iBCa00/+Of9nBuPzVR71D
+        jEwcjIcYVYCaH21YfYFRiiUvPy9VSYRXnUMqUYg3JbGyKrUoP76oNCe1+BCjNAeLkjhv0pY1
+        8UIC6YklqdmpqQWpRTBZJg5OqQYmhZvaazYqNteukX4m1fByyutXn+YpdmXfy1dmMraqqTss
+        fWDvp4rZ1nde5Bb+D618aKfybwuP1Oz7syb8VxK/usMio935RKzJnO0Cd2ft1HktvOnWFImL
+        sZULzi2/91/tmOePDwFvrTqXxHnHBVuwfvfvqP7zj73cw+zs9XBnc/P79ta/jfpWlAisM56u
+        VKAUW6NwMU/b5rG5tK7ztbUaNkde/rUr2JvQy2851e31ropD7tmPRaQX+zU9PTfp5kG3/q1/
+        3J7lvX6m/VKT/+TbKcHWUx2FBVNWJQf/t9lXlGHRIHTkafvELwvOzz/t+VvYx0iAoSHXZOJd
+        gYC3TvaMyjtMrA9Ehq79kh7XmqqtxFKckWioxVxUnAgA1DuXLOMDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJIsWRmVeSWpSXmKPExsVy+t/xe7q/10gnGjw5xm8x/8g5VovuVzIW
+        G9/+YLLY9Pgaq8X9ez+ZLC7vmsNmMeP8PiaLnXNOslos2NbHaNG69wi7xeZNU5kduD1mNfSy
+        eWw7oOqxaVUnm8e7c+fYPTYvqffoe7mB0ePzJrkA9ig9m6L80pJUhYz84hJbpWhDCyM9Q0sL
+        PSMTSz1DY/NYKyNTJX07m5TUnMyy1CJ9uwS9jFlntrAU3FWsOLyzmb2B8bpMFyMnh4SAicSW
+        zVOZuxi5OIQEljJKnL7+DMjhAEpISaycmw5RIyzx51oXG0TNU0aJs43LwGrYBPQk1q6NAKkR
+        EbCWOLp1PtgcZoG7TBKdFxaygSSEBYIkJq15C2YLCThI7Fj5kx3EZhFQlfh5uJERxOYU6GCU
+        mDEtH8TmFTCXOH93NSuILSpgKbHlxX12iLigxMmZT1hAbGaBbImvq58zT2AUmIUkNQtJahbQ
+        ecwCmhLrd+lDhLUlli18zQxh20qsW/eeZQEj6ypGkdTS4tz03GJDveLE3OLSvHS95PzcTYzA
+        eNx27OfmHYzzXn3UO8TIxMF4iFEFqPPRhtUXGKVY8vLzUpVEeNU5pBKFeFMSK6tSi/Lji0pz
+        UosPMZoCvTaRWUo0OR+YKPJK4g3NDEwNTcwsDUwtzYyVxHm3zl0TLySQnliSmp2aWpBaBNPH
+        xMEp1cBUuu2zVkTeP8P6JUxsbHldXcs+cfr/u3ysY+a/3x+qpBd+9XBL+Gt61O1OoY90xkX/
+        G7+FlCdpP9lUf3n91Cafz71J1pUH1/gw9IlveOmf+vhkSkqVYx+X/9vZ/SH8sapiFW8vu4ot
+        bF7B+7XrTdNZIf4jF1p/Szzj+3wi9O4Ppqt9a6pSz18RO5JYnri+XM3ywMyFjzK3iF0y6Ehd
+        t6Th/4Ufn2OTNr492lQ67fT1C87x355aHZvlktMjdnivvsay3P23jqyc/GPvuh6hLPHe5yVv
+        P8jr9fguZZnBe1ZeYOJuqd37euL/pzP752loVO7XTTHV/Hw1z+6G0Wfnpujvxxx5VQsOGG5w
+        zHLojG9UYinOSDTUYi4qTgQA3iVTs1wDAAA=
+X-CMS-MailID: 20210817123507eucas1p120be1e5cc942e20bed39b6d810ccdbd1
+X-Msg-Generator: CA
+X-RootMTR: 20210817123507eucas1p120be1e5cc942e20bed39b6d810ccdbd1
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20210817123507eucas1p120be1e5cc942e20bed39b6d810ccdbd1
+References: <c3a1d7d2-7b32-b7eb-4647-f86e22f5e5ff@canonical.com>
+        <CGME20210817123507eucas1p120be1e5cc942e20bed39b6d810ccdbd1@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 17/08/2021 11:55, Lukasz Stelmach wrote:
-> It was <2021-08-11 śro 10:43>, when Krzysztof Kozlowski wrote:
->> Convert Samsung Exynos SoC True Random Number Generator bindings to DT
->> schema format using json-schema.
->>
->> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
->> ---
->>  .../bindings/rng/samsung,exynos5250-trng.txt  | 17 -------
->>  .../bindings/rng/samsung,exynos5250-trng.yaml | 44 +++++++++++++++++++
->>  MAINTAINERS                                   |  2 +-
->>  3 files changed, 45 insertions(+), 18 deletions(-)
->>  delete mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
->>  create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
->>
->> diff --git
->> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
->> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
->> deleted file mode 100644
->> index 5a613a4ec780..000000000000
->> --- a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
->> +++ /dev/null
->> @@ -1,17 +0,0 @@
->> -Exynos True Random Number Generator
->> -
->> -Required properties:
->> -
->> -- compatible  : Should be "samsung,exynos5250-trng".
->> -- reg         : Specifies base physical address and size of the registers map.
->> -- clocks      : Phandle to clock-controller plus clock-specifier pair.
->> -- clock-names : "secss" as a clock name.
->> -
->> -Example:
->> -
->> -	rng@10830600 {
->> -		compatible = "samsung,exynos5250-trng";
->> -		reg = <0x10830600 0x100>;
->> -		clocks = <&clock CLK_SSS>;
->> -		clock-names = "secss";
->> -	};
->> diff --git
->> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
->> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
->> new file mode 100644
->> index 000000000000..a50c34d5d199
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
->> @@ -0,0 +1,44 @@
->> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id:
->> https://protect2.fireeye.com/v1/url?k=f38ca35b-ac179a0d-f38d2814-0cc47a31ce52-1faa1ecb65482b8a&q=1&e=8b3490f9-a5fc-4da0-b2ee-7b0aec781403&u=http%3A%2F%2Fdevicetree.org%2Fschemas%2Frng%2Fsamsung%2Cexynos5250-trng.yaml%23
->> +$schema:
->> https://protect2.fireeye.com/v1/url?k=9409519d-cb9268cb-9408dad2-0cc47a31ce52-12394c4409905980&q=1&e=8b3490f9-a5fc-4da0-b2ee-7b0aec781403&u=http%3A%2F%2Fdevicetree.org%2Fmeta-schemas%2Fcore.yaml%23
->> +
->> +title: Samsung Exynos SoC True Random Number Generator
->> +
->> +maintainers:
->> +  - Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
->> +  - Łukasz Stelmach <l.stelmach@samsung.com>
->> +
->> +properties:
->> +  compatible:
->> +    const: samsung,exynos5250-trng
->> +
->> +  clocks:
->> +    maxItems: 1
-> 
-> How about copying description from above into the description: property?
+--=-=-=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-But what to copy? There is no description except generic clock bindings.
+It was <2021-08-17 wto 12:05>, when Krzysztof Kozlowski wrote:
+> On 17/08/2021 11:55, Lukasz Stelmach wrote:
+>> It was <2021-08-11 =C5=9Bro 10:43>, when Krzysztof Kozlowski wrote:
+>>> Convert Samsung Exynos SoC True Random Number Generator bindings to DT
+>>> schema format using json-schema.
+>>>
+>>> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+>>> ---
+>>>  .../bindings/rng/samsung,exynos5250-trng.txt  | 17 -------
+>>>  .../bindings/rng/samsung,exynos5250-trng.yaml | 44 +++++++++++++++++++
+>>>  MAINTAINERS                                   |  2 +-
+>>>  3 files changed, 45 insertions(+), 18 deletions(-)
+>>>  delete mode 100644 Documentation/devicetree/bindings/rng/samsung,exyno=
+s5250-trng.txt
+>>>  create mode 100644 Documentation/devicetree/bindings/rng/samsung,exyno=
+s5250-trng.yaml
+>>>
+>>> diff --git
+>>> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>>> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>>> deleted file mode 100644
+>>> index 5a613a4ec780..000000000000
+>>> --- a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>>> +++ /dev/null
+>>> @@ -1,17 +0,0 @@
+>>> -Exynos True Random Number Generator
+>>> -
+>>> -Required properties:
+>>> -
+>>> -- compatible  : Should be "samsung,exynos5250-trng".
+>>> -- reg         : Specifies base physical address and size of the regist=
+ers map.
+>>> -- clocks      : Phandle to clock-controller plus clock-specifier pair.
+>>> -- clock-names : "secss" as a clock name.
+>>> -
+>>> -Example:
+>>> -
+>>> -	rng@10830600 {
+>>> -		compatible =3D "samsung,exynos5250-trng";
+>>> -		reg =3D <0x10830600 0x100>;
+>>> -		clocks =3D <&clock CLK_SSS>;
+>>> -		clock-names =3D "secss";
+>>> -	};
+>>> diff --git
+>>> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+>>> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+>>> new file mode 100644
+>>> index 000000000000..a50c34d5d199
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+>>> @@ -0,0 +1,44 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+>>> +%YAML 1.2
+>>> +---
+>>> +$id:
+>>> https://protect2.fireeye.com/v1/url?k=3Df38ca35b-ac179a0d-f38d2814-0cc4=
+7a31ce52-1faa1ecb65482b8a&q=3D1&e=3D8b3490f9-a5fc-4da0-b2ee-7b0aec781403&u=
+=3Dhttp%3A%2F%2Fdevicetree.org%2Fschemas%2Frng%2Fsamsung%2Cexynos5250-trng.=
+yaml%23
+>>> +$schema:
+>>> https://protect2.fireeye.com/v1/url?k=3D9409519d-cb9268cb-9408dad2-0cc4=
+7a31ce52-12394c4409905980&q=3D1&e=3D8b3490f9-a5fc-4da0-b2ee-7b0aec781403&u=
+=3Dhttp%3A%2F%2Fdevicetree.org%2Fmeta-schemas%2Fcore.yaml%23
+>>> +
+>>> +title: Samsung Exynos SoC True Random Number Generator
+>>> +
+>>> +maintainers:
+>>> +  - Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+>>> +  - =C5=81ukasz Stelmach <l.stelmach@samsung.com>
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    const: samsung,exynos5250-trng
+>>> +
+>>> +  clocks:
+>>> +    maxItems: 1
+>>=20
+>> How about copying description from above into the description: property?
+>
+> But what to copy? There is no description except generic clock bindings.
+>
 
-> 
->> +
->> +  clock-names:
->> +    items:
->> +      - const: secss
->> +
->> +  reg:
->> +    maxItems: 1
-> 
-> ditto.
+The description that "was" in the txt file.
 
-The same, I have no clue what to copy. It's obvious that reg contains
-"physical address and size of the registers map".
+>>=20
+>>> +
+>>> +  clock-names:
+>>> +    items:
+>>> +      - const: secss
+>>> +
+>>> +  reg:
+>>> +    maxItems: 1
+>>=20
+>> ditto.
+>
+> The same, I have no clue what to copy. It's obvious that reg contains
+> "physical address and size of the registers map".
+>
+>
+> Best regards,
+> Krzysztof
+>
+>
 
+=2D-=20
+=C5=81ukasz Stelmach
+Samsung R&D Institute Poland
+Samsung Electronics
 
-Best regards,
-Krzysztof
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEXpuyqjq9kGEVr9UQsK4enJilgBAFAmEbrPAACgkQsK4enJil
+gBC5wggAq3vSstvJVjG17xqU5QPzv9fHJejUx5HQRCQcGRHUCQN4knqekli34bhg
+1B1QpfVpFF/fm9jL4HlXCCvgAefpIJf3m3fLOxdK9881M8s5Ekgh3lWSR82wUKZi
+WP6vspLVSpiSa5JZqsChqAdtaeYLhsSbOndVdnlUya6W+DuqNQ4e7On3l6rWCld/
+bKch2tW1uaKY6LXHBRWGAJ4exwzE2jcYPXp9/9Tjd5NZICnnXWRovlajQyaT3DO/
+XlxKNd8F+J5bYph2Wd0XlUugi4aqQfIuNPHsMMSooMyfvixpKr+27iEJ4N/27XXq
+XN4WSjOsNsFvxVfgiblXLNps+OSmdg==
+=wvZL
+-----END PGP SIGNATURE-----
+--=-=-=--
