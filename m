@@ -2,93 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CACB3C4338F
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 14:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63486C4320A
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 14:25:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A2C3160FD8
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 14:19:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4830B60F5C
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 14:25:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230474AbhHQOTj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Aug 2021 10:19:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50432 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230412AbhHQOTj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Aug 2021 10:19:39 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6722A60FD8;
-        Tue, 17 Aug 2021 14:19:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629209946;
-        bh=xV7Ud6jsNiaHGJDoSOkd+YvwcxtdNFwRiqSZbKNtVU0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=sqmlYP+rVNjCRKI7xaSCRPtF7R2hpft0oF8P+6DMLiaKElfqc1gtv8P7vrK6wMseF
-         E0Eu5dO/FDkOen4J3cVvdgb94pEtfIa9dWwx4wEyQADFkGI+cMPVZymrjAUD9JIkxZ
-         4Vbxacc4yfR8UTkfximSzdkL0c9HT0eTwkT5qzX4sPjExdPNDrTT1t9GF/3lQCD+/s
-         793MYXW/Sbg8IgDwLK6uJesi798+XQjC9Gm2JZMjEOea70qQ2vm/1jFb9XNPnxcHNr
-         TSefW4XY0BeQqiVJ0iITgzsRA2mu4QkY9+qBHGkKT9offvXtUR/cL2Os9nUG3tnQZ2
-         Swghz8Act6Ktw==
-Received: by mail-oo1-f49.google.com with SMTP id l12-20020a4a94cc0000b02902618ad2ea55so5965225ooi.4;
-        Tue, 17 Aug 2021 07:19:06 -0700 (PDT)
-X-Gm-Message-State: AOAM531422myRk4aXHG+Bmla2xFbkh279YzrWyULHzouJjx0R/BPlBZO
-        zwtdlyg8TUb3hYgPdznKPKGVWjvhTcVl4wXwTeU=
-X-Google-Smtp-Source: ABdhPJwURPDIQOnNVkl4YBRE5wPJwMQixABKLUk8EX5AHVUdCsAFHaLyfV5HhY/KSgbFCKG5xGJddksDgAO6GMHncdA=
-X-Received: by 2002:a4a:d752:: with SMTP id h18mr2826178oot.13.1629209944714;
- Tue, 17 Aug 2021 07:19:04 -0700 (PDT)
-MIME-Version: 1.0
-References: <YQ0Qm+Xs1g/7Eant@fedora> <20210809141027.860850-1-chouhan.shreyansh630@gmail.com>
-In-Reply-To: <20210809141027.860850-1-chouhan.shreyansh630@gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 17 Aug 2021 16:18:53 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGjY-EfaLc47HKvFz8AKeT=+XTXNRR5kVbQV7s3Hi9C2g@mail.gmail.com>
-Message-ID: <CAMj1kXGjY-EfaLc47HKvFz8AKeT=+XTXNRR5kVbQV7s3Hi9C2g@mail.gmail.com>
-Subject: Re: [PATCH] crypto: xts_crypt() return if walk.nbytes is 0
-To:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+        id S237840AbhHQOZh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Aug 2021 10:25:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7470 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S237854AbhHQOZg (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Aug 2021 10:25:36 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17HE2nBx009940;
+        Tue, 17 Aug 2021 10:24:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=eDv3kgjxlaSuE0h9+1PZ4tl3F4C1OKHijW9CnPDk9k8=;
+ b=aKj9iUZrM4GKwz1Tbmm72txEMeQCVLh2uok0T3tDS1dtqIbCzXlmnjRbIb2qYk0Q3p7E
+ bubrCI3dB/Gb2a3uS4jVsxodl10fmN4SIm/OSSLCq6XeQpYNozot3enr651G+CAfIFJL
+ usaD74JfrQBl5/w61BPlDvpkacBpkg1RQ6X/v2fT33iFVjOPHgb4bJCRldCYIxBGEfUP
+ LYoSSxIwbNz16GVL86yoxkTVffyDEV4MKX3x8O+1A39WxZNYwJqbao5uqb/PAJN2UF31
+ RkMIBIqhLnvGWLFDkbB1VSeQNaplwR6UStOL36yzzKIhhMAc57msUjbyWObCtcsOX6Qc bg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3aeua12vfj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Aug 2021 10:24:55 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17HE30qA011101;
+        Tue, 17 Aug 2021 10:24:54 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3aeua12vew-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Aug 2021 10:24:54 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17HEITAm021494;
+        Tue, 17 Aug 2021 14:24:52 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3ae5f8cc6u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Aug 2021 14:24:52 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17HEOoHk57278726
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Aug 2021 14:24:50 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E504B52063;
+        Tue, 17 Aug 2021 14:24:49 +0000 (GMT)
+Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.53.55])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 003335205F;
+        Tue, 17 Aug 2021 14:24:45 +0000 (GMT)
+Message-ID: <f4264f0a83c1b080ad2a22d63ecf1fcca87dfebb.camel@linux.ibm.com>
+Subject: Re: [PATCH v2] fscrypt: support trusted keys
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, kernel@pengutronix.de,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        David Howells <dhowells@redhat.com>,
+        linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Tue, 17 Aug 2021 10:24:44 -0400
+In-Reply-To: <b77836af-42a1-5aca-9363-d050352bd8aa@pengutronix.de>
+References: <20210806150928.27857-1-a.fatoum@pengutronix.de>
+         <20210809094408.4iqwsx77u64usfx6@kernel.org> <YRGVcaquAJiuc8bp@gmail.com>
+         <20210810180636.vqwaeftv7alsodgn@kernel.org> <YRLJmaafp941uOdA@gmail.com>
+         <20210810212140.sdq5dq2wy5uaj7h7@kernel.org> <YRLvPJehAeMiYb2Z@gmail.com>
+         <20210811001743.ofzkwdwa6rcjsf4d@kernel.org>
+         <d4f5c2593380c82ceebae2c8782a1c440b35f165.camel@linux.ibm.com>
+         <YRQF09f8st95yrFZ@gmail.com>
+         <0e69a0aa394dd20347b06ae4e700aa17d52583ef.camel@linux.ibm.com>
+         <a6eb6f38-b9f4-c59c-4181-2049f181e67d@pengutronix.de>
+         <285cb263d9c1c16f3918c98dd36074ef16568e6d.camel@linux.ibm.com>
+         <b77836af-42a1-5aca-9363-d050352bd8aa@pengutronix.de>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: xx-3ZG3CK2l-ESUkYpLaEF_SRiCGCD25
+X-Proofpoint-ORIG-GUID: OaepDPDCXqjhoaHKWv9ZgqODcHxwi9FW
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-17_04:2021-08-17,2021-08-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 impostorscore=0 adultscore=0 bulkscore=0 malwarescore=0
+ priorityscore=1501 mlxlogscore=998 phishscore=0 spamscore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108170086
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 9 Aug 2021 at 16:10, Shreyansh Chouhan
-<chouhan.shreyansh630@gmail.com> wrote:
->
-> xts_crypt() code doesn't call kernel_fpu_end() after calling
-> kernel_fpu_begin() if walk.nbytes is 0. The correct behavior should be
-> not calling kernel_fpu_begin() if walk.nbytes is 0.
->
-> Reported-by: syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
-> Signed-off-by: Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
+On Tue, 2021-08-17 at 16:13 +0200, Ahmad Fatoum wrote:
+> On 17.08.21 15:55, Mimi Zohar wrote:
+> > I have no opinion as to whether this is/isn't a valid usecase.
+> 
+> So you'd be fine with merging trusted key support as is and leave encrypted
+> key support to someone who has a valid use case and wants to argue
+> in its favor?
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+That decision as to whether it makes sense to support trusted keys
+directly, based on the new trust sources, is a decision left up to the
+maintainer(s) of the new usecase and the new trust sources maintainer
+Jarkko.
 
-> ---
->  arch/x86/crypto/aesni-intel_glue.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-> index 388643ca2177..ec6eac57c493 100644
-> --- a/arch/x86/crypto/aesni-intel_glue.c
-> +++ b/arch/x86/crypto/aesni-intel_glue.c
-> @@ -849,7 +849,7 @@ static int xts_crypt(struct skcipher_request *req, bool encrypt)
->                 return -EINVAL;
->
->         err = skcipher_walk_virt(&walk, req, false);
-> -       if (err)
-> +       if (err || !walk.nbytes)
->                 return err;
->
->         if (unlikely(tail > 0 && walk.nbytes < walk.total)) {
-> --
-> 2.31.1
->
+thanks,
+
+Mimi
+
