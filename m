@@ -4,38 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,UPPERCASE_50_75,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ACC9C4338F
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 07:46:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B12C00143
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 07:46:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16FA960F41
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 07:46:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FDC560FC3
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 07:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238772AbhHQHqu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Aug 2021 03:46:50 -0400
-Received: from mailgw01.mediatek.com ([60.244.123.138]:48760 "EHLO
+        id S238873AbhHQHrA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Aug 2021 03:47:00 -0400
+Received: from mailgw01.mediatek.com ([60.244.123.138]:49108 "EHLO
         mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S238455AbhHQHqs (ORCPT
+        with ESMTP id S238401AbhHQHq5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Aug 2021 03:46:48 -0400
-X-UUID: 2c581d11634145cd82dfc81fdfb32e20-20210817
-X-UUID: 2c581d11634145cd82dfc81fdfb32e20-20210817
-Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw01.mediatek.com
+        Tue, 17 Aug 2021 03:46:57 -0400
+X-UUID: 723d57c8675f4595a3cc522197344b3b-20210817
+X-UUID: 723d57c8675f4595a3cc522197344b3b-20210817
+Received: from mtkexhb02.mediatek.inc [(172.21.101.103)] by mailgw01.mediatek.com
         (envelope-from <sam.shih@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 2092774595; Tue, 17 Aug 2021 15:46:12 +0800
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 1486542070; Tue, 17 Aug 2021 15:46:19 +0800
+Received: from mtkmbs10n1.mediatek.inc (172.21.101.34) by
+ mtkmbs05n1.mediatek.inc (172.21.101.15) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Tue, 17 Aug 2021 15:46:18 +0800
 Received: from mtkcas11.mediatek.inc (172.21.101.40) by
- mtkmbs06n1.mediatek.inc (172.21.101.129) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Tue, 17 Aug 2021 15:46:10 +0800
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.792.15; Tue, 17 Aug 2021 15:46:18 +0800
 Received: from mtksdccf07.mediatek.inc (172.21.84.99) by mtkcas11.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Tue, 17 Aug 2021 15:46:10 +0800
+ Transport; Tue, 17 Aug 2021 15:46:18 +0800
 From:   Sam Shih <sam.shih@mediatek.com>
 To:     Rob Herring <robh+dt@kernel.org>, Sean Wang <sean.wang@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
+        "Linus Walleij" <linus.walleij@linaro.org>,
         Matthias Brugger <matthias.bgg@gmail.com>,
         Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -55,10 +58,10 @@ To:     Rob Herring <robh+dt@kernel.org>, Sean Wang <sean.wang@kernel.org>,
         <linux-watchdog@vger.kernel.org>, <linux-clk@vger.kernel.org>
 CC:     John Crispin <john@phrozen.org>,
         Ryder Lee <Ryder.Lee@mediatek.com>,
-        Sam Shih <sam.shih@mediatek.com>
-Subject: [v2,02/12] clk: mediatek: add mt7986 clock IDs
-Date:   Tue, 17 Aug 2021 15:45:47 +0800
-Message-ID: <20210817074557.30953-3-sam.shih@mediatek.com>
+        "Sam Shih" <sam.shih@mediatek.com>
+Subject: [v2,04/12] pinctrl: mediatek: moore: check if pin_desc is valid before use
+Date:   Tue, 17 Aug 2021 15:45:49 +0800
+Message-ID: <20210817074557.30953-5-sam.shih@mediatek.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20210817074557.30953-1-sam.shih@mediatek.com>
 References: <20210817074557.30953-1-sam.shih@mediatek.com>
@@ -69,197 +72,98 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add MT7986 clock dt-bindings, include topckgen, apmixedsys,
-infracfg, and ethernet subsystem clocks.
+Certain SoC are missing the middle part gpios in consecutive pins,
+it's better to check if mtk_pin_desc is a valid pin for the extensibility
 
 Signed-off-by: Sam Shih <sam.shih@mediatek.com>
 
 ---
-v2: changed to dual licience
-    applied the comment suggested by reviewers:
-    - removed 1:1 factor clock
-    - renamed factor clock for easier to understand
+v2: applied the comment suggested by reviewers:
+    - for the pins not ballout, we can fill .name in struct mtk_pin_desc
+      as NULL and return -ENOTSUPP in gpio/pinconf ops.
 
 ---
- include/dt-bindings/clock/mt7986-clk.h | 169 +++++++++++++++++++++++++
- 1 file changed, 169 insertions(+)
- create mode 100644 include/dt-bindings/clock/mt7986-clk.h
+ drivers/pinctrl/mediatek/pinctrl-moore.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/include/dt-bindings/clock/mt7986-clk.h b/include/dt-bindings/clock/mt7986-clk.h
-new file mode 100644
-index 000000000000..4799007c4755
---- /dev/null
-+++ b/include/dt-bindings/clock/mt7986-clk.h
-@@ -0,0 +1,169 @@
-+/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
-+/*
-+ * Copyright (c) 2021 MediaTek Inc.
-+ * Author: Sam Shih <sam.shih@mediatek.com>
-+ */
-+
-+#ifndef _DT_BINDINGS_CLK_MT7986_H
-+#define _DT_BINDINGS_CLK_MT7986_H
-+
-+/* APMIXEDSYS */
-+
-+#define CLK_APMIXED_ARMPLL		0
-+#define CLK_APMIXED_NET2PLL		1
-+#define CLK_APMIXED_MMPLL		2
-+#define CLK_APMIXED_SGMPLL		3
-+#define CLK_APMIXED_WEDMCUPLL		4
-+#define CLK_APMIXED_NET1PLL		5
-+#define CLK_APMIXED_MPLL		6
-+#define CLK_APMIXED_APLL2		7
-+
-+/* TOPCKGEN */
-+
-+#define CLK_TOP_XTAL			0
-+#define CLK_TOP_XTAL_D2			1
-+#define CLK_TOP_RTC_32K			2
-+#define CLK_TOP_RTC_32P7K		3
-+#define CLK_TOP_MPLL_D2			4
-+#define CLK_TOP_MPLL_D4			5
-+#define CLK_TOP_MPLL_D8			6
-+#define CLK_TOP_MPLL_D8_D2		7
-+#define CLK_TOP_MPLL_D3_D2		8
-+#define CLK_TOP_MMPLL_D2		9
-+#define CLK_TOP_MMPLL_D4		10
-+#define CLK_TOP_MMPLL_D8		11
-+#define CLK_TOP_MMPLL_D8_D2		12
-+#define CLK_TOP_MMPLL_D3_D8		13
-+#define CLK_TOP_MMPLL_U2PHY		14
-+#define CLK_TOP_APLL2_D4		15
-+#define CLK_TOP_NET1PLL_D4		16
-+#define CLK_TOP_NET1PLL_D5		17
-+#define CLK_TOP_NET1PLL_D5_D2		18
-+#define CLK_TOP_NET1PLL_D5_D4		19
-+#define CLK_TOP_NET1PLL_D8_D2		20
-+#define CLK_TOP_NET1PLL_D8_D4		21
-+#define CLK_TOP_NET2PLL_D4		22
-+#define CLK_TOP_NET2PLL_D4_D2		23
-+#define CLK_TOP_NET2PLL_D3_D2		24
-+#define CLK_TOP_WEDMCUPLL_D5_D2		25
-+#define CLK_TOP_NFI1X_SEL		26
-+#define CLK_TOP_SPINFI_SEL		27
-+#define CLK_TOP_SPI_SEL			28
-+#define CLK_TOP_SPIM_MST_SEL		29
-+#define CLK_TOP_UART_SEL		30
-+#define CLK_TOP_PWM_SEL			31
-+#define CLK_TOP_I2C_SEL			32
-+#define CLK_TOP_PEXTP_TL_SEL		33
-+#define CLK_TOP_EMMC_250M_SEL		34
-+#define CLK_TOP_EMMC_416M_SEL		35
-+#define CLK_TOP_F_26M_ADC_SEL		36
-+#define CLK_TOP_DRAMC_SEL		37
-+#define CLK_TOP_DRAMC_MD32_SEL		38
-+#define CLK_TOP_SYSAXI_SEL		39
-+#define CLK_TOP_SYSAPB_SEL		40
-+#define CLK_TOP_ARM_DB_MAIN_SEL		41
-+#define CLK_TOP_ARM_DB_JTSEL		42
-+#define CLK_TOP_NETSYS_SEL		43
-+#define CLK_TOP_NETSYS_500M_SEL		44
-+#define CLK_TOP_NETSYS_MCU_SEL		45
-+#define CLK_TOP_NETSYS_2X_SEL		46
-+#define CLK_TOP_SGM_325M_SEL		47
-+#define CLK_TOP_SGM_REG_SEL		48
-+#define CLK_TOP_A1SYS_SEL		49
-+#define CLK_TOP_CONN_MCUSYS_SEL		50
-+#define CLK_TOP_EIP_B_SEL		51
-+#define CLK_TOP_PCIE_PHY_SEL		52
-+#define CLK_TOP_USB3_PHY_SEL		53
-+#define CLK_TOP_F26M_SEL		54
-+#define CLK_TOP_AUD_L_SEL		55
-+#define CLK_TOP_A_TUNER_SEL		56
-+#define CLK_TOP_U2U3_SEL		57
-+#define CLK_TOP_U2U3_SYS_SEL		58
-+#define CLK_TOP_U2U3_XHCI_SEL		59
-+#define CLK_TOP_DA_U2_REFSEL		60
-+#define CLK_TOP_DA_U2_CK_1P_SEL		61
-+#define CLK_TOP_AP2CNN_HOST_SEL		62
-+#define CLK_TOP_JTAG			63
-+
-+/* INFRACFG */
-+
-+#define CLK_INFRA_SYSAXI_D2		0
-+#define CLK_INFRA_UART0_SEL		1
-+#define CLK_INFRA_UART1_SEL		2
-+#define CLK_INFRA_UART2_SEL		3
-+#define CLK_INFRA_SPI0_SEL		4
-+#define CLK_INFRA_SPI1_SEL		5
-+#define CLK_INFRA_PWM1_SEL		6
-+#define CLK_INFRA_PWM2_SEL		7
-+#define CLK_INFRA_PWM_BSEL		8
-+#define CLK_INFRA_PCIE_SEL		9
-+#define CLK_INFRA_GPT_STA		10
-+#define CLK_INFRA_PWM_HCK		11
-+#define CLK_INFRA_PWM_STA		12
-+#define CLK_INFRA_PWM1_CK		13
-+#define CLK_INFRA_PWM2_CK		14
-+#define CLK_INFRA_CQ_DMA_CK		15
-+#define CLK_INFRA_EIP97_CK		16
-+#define CLK_INFRA_AUD_BUS_CK		17
-+#define CLK_INFRA_AUD_26M_CK		18
-+#define CLK_INFRA_AUD_L_CK		19
-+#define CLK_INFRA_AUD_AUD_CK		20
-+#define CLK_INFRA_AUD_EG2_CK		21
-+#define CLK_INFRA_DRAMC_26M_CK		22
-+#define CLK_INFRA_DBG_CK		23
-+#define CLK_INFRA_AP_DMA_CK		24
-+#define CLK_INFRA_SEJ_CK		25
-+#define CLK_INFRA_SEJ_13M_CK		26
-+#define CLK_INFRA_THERM_CK		27
-+#define CLK_INFRA_I2C0_CK		28
-+#define CLK_INFRA_UART0_CK		29
-+#define CLK_INFRA_UART1_CK		30
-+#define CLK_INFRA_UART2_CK		31
-+#define CLK_INFRA_NFI1_CK		32
-+#define CLK_INFRA_SPINFI1_CK		33
-+#define CLK_INFRA_NFI_HCK_CK		34
-+#define CLK_INFRA_SPI0_CK		35
-+#define CLK_INFRA_SPI1_CK		36
-+#define CLK_INFRA_SPI0_HCK_CK		37
-+#define CLK_INFRA_SPI1_HCK_CK		38
-+#define CLK_INFRA_FRTC_CK		39
-+#define CLK_INFRA_MSDC_CK		40
-+#define CLK_INFRA_MSDC_HCK_CK		41
-+#define CLK_INFRA_MSDC_133M_CK		42
-+#define CLK_INFRA_MSDC_66M_CK		43
-+#define CLK_INFRA_ADC_26M_CK		44
-+#define CLK_INFRA_ADC_FRC_CK		45
-+#define CLK_INFRA_FBIST2FPC_CK		46
-+#define CLK_INFRA_IUSB_133_CK		47
-+#define CLK_INFRA_IUSB_66M_CK		48
-+#define CLK_INFRA_IUSB_SYS_CK		49
-+#define CLK_INFRA_IUSB_CK		50
-+#define CLK_INFRA_IPCIE_CK		51
-+#define CLK_INFRA_IPCIE_PIPE_CK		52
-+#define CLK_INFRA_IPCIER_CK		53
-+#define CLK_INFRA_IPCIEB_CK		54
-+#define CLK_INFRA_TRNG_CK		55
-+
-+/* SGMIISYS_0 */
-+
-+#define CLK_SGMII0_TX250M_EN		0
-+#define CLK_SGMII0_RX250M_EN		1
-+#define CLK_SGMII0_CDR_REF		2
-+#define CLK_SGMII0_CDR_FB		2
-+
-+/* SGMIISYS_1 */
-+
-+#define CLK_SGMII1_TX250M_EN		0
-+#define CLK_SGMII1_RX250M_EN		1
-+#define CLK_SGMII1_CDR_REF		2
-+#define CLK_SGMII1_CDR_FB		2
-+
-+/* ETHSYS */
-+
-+#define CLK_ETH_FE_EN			0
-+#define CLK_ETH_GP2_EN			1
-+#define CLK_ETH_GP1_EN			2
-+#define CLK_ETH_WOCPU1_EN		3
-+#define CLK_ETH_WOCPU0_EN		4
-+
-+#endif /* _DT_BINDINGS_CLK_MT7986_H */
+diff --git a/drivers/pinctrl/mediatek/pinctrl-moore.c b/drivers/pinctrl/mediatek/pinctrl-moore.c
+index 3a4a23c40a71..ad3b67163973 100644
+--- a/drivers/pinctrl/mediatek/pinctrl-moore.c
++++ b/drivers/pinctrl/mediatek/pinctrl-moore.c
+@@ -60,6 +60,8 @@ static int mtk_pinmux_set_mux(struct pinctrl_dev *pctldev,
+ 		int pin = grp->pins[i];
+ 
+ 		desc = (const struct mtk_pin_desc *)&hw->soc->pins[pin];
++		if (!desc->name)
++			return -ENOTSUPP;
+ 
+ 		mtk_hw_set_value(hw, desc, PINCTRL_PIN_REG_MODE,
+ 				 pin_modes[i]);
+@@ -76,6 +78,8 @@ static int mtk_pinmux_gpio_request_enable(struct pinctrl_dev *pctldev,
+ 	const struct mtk_pin_desc *desc;
+ 
+ 	desc = (const struct mtk_pin_desc *)&hw->soc->pins[pin];
++	if (!desc->name)
++		return -ENOTSUPP;
+ 
+ 	return mtk_hw_set_value(hw, desc, PINCTRL_PIN_REG_MODE,
+ 				hw->soc->gpio_m);
+@@ -89,6 +93,8 @@ static int mtk_pinmux_gpio_set_direction(struct pinctrl_dev *pctldev,
+ 	const struct mtk_pin_desc *desc;
+ 
+ 	desc = (const struct mtk_pin_desc *)&hw->soc->pins[pin];
++	if (!desc->name)
++		return -ENOTSUPP;
+ 
+ 	/* hardware would take 0 as input direction */
+ 	return mtk_hw_set_value(hw, desc, PINCTRL_PIN_REG_DIR, !input);
+@@ -103,6 +109,8 @@ static int mtk_pinconf_get(struct pinctrl_dev *pctldev,
+ 	const struct mtk_pin_desc *desc;
+ 
+ 	desc = (const struct mtk_pin_desc *)&hw->soc->pins[pin];
++	if (!desc->name)
++		return -ENOTSUPP;
+ 
+ 	switch (param) {
+ 	case PIN_CONFIG_BIAS_DISABLE:
+@@ -218,6 +226,8 @@ static int mtk_pinconf_set(struct pinctrl_dev *pctldev, unsigned int pin,
+ 	int cfg, err = 0;
+ 
+ 	desc = (const struct mtk_pin_desc *)&hw->soc->pins[pin];
++	if (!desc->name)
++		return -ENOTSUPP;
+ 
+ 	for (cfg = 0; cfg < num_configs; cfg++) {
+ 		param = pinconf_to_config_param(configs[cfg]);
+@@ -435,6 +445,8 @@ static int mtk_gpio_get(struct gpio_chip *chip, unsigned int gpio)
+ 	int value, err;
+ 
+ 	desc = (const struct mtk_pin_desc *)&hw->soc->pins[gpio];
++	if (!desc->name)
++		return -ENOTSUPP;
+ 
+ 	err = mtk_hw_get_value(hw, desc, PINCTRL_PIN_REG_DI, &value);
+ 	if (err)
+@@ -449,6 +461,10 @@ static void mtk_gpio_set(struct gpio_chip *chip, unsigned int gpio, int value)
+ 	const struct mtk_pin_desc *desc;
+ 
+ 	desc = (const struct mtk_pin_desc *)&hw->soc->pins[gpio];
++	if (!desc->name) {
++		dev_err(hw->dev, "Failed to set gpio %d\n", gpio);
++		return;
++	}
+ 
+ 	mtk_hw_set_value(hw, desc, PINCTRL_PIN_REG_DO, !!value);
+ }
+@@ -490,6 +506,8 @@ static int mtk_gpio_set_config(struct gpio_chip *chip, unsigned int offset,
+ 	u32 debounce;
+ 
+ 	desc = (const struct mtk_pin_desc *)&hw->soc->pins[offset];
++	if (!desc->name)
++		return -ENOTSUPP;
+ 
+ 	if (!hw->eint ||
+ 	    pinconf_to_config_param(config) != PIN_CONFIG_INPUT_DEBOUNCE ||
 -- 
 2.29.2
 
