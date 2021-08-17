@@ -2,92 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBADEC4320A
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 20:44:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 295C4C432BE
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 21:13:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD9336023E
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 20:44:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A7A86103A
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 21:13:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233928AbhHQUot (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Aug 2021 16:44:49 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:39396 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229847AbhHQUos (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Aug 2021 16:44:48 -0400
-Received: from zn.tnic (p200300ec2f117500b0ae8110978caeec.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:7500:b0ae:8110:978c:aeec])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 72BF51EC054F;
-        Tue, 17 Aug 2021 22:44:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629233048;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=kGYRnAMSLbjZ/FPl31T/5mLxunyqniOXuhCt9CoiNRU=;
-        b=idhoqaoyNMw69THb+H9A2bvcCKeTLrJJEVDaSQEOLre37KzokOn5QvSNWIaUINNWyKXzfL
-        zFyPuHjYKuUCSBTfF15vmrp6mLt5UlEQXw1zBkbpwbbgFtKjzb2XpHf60liU/yGOXA4AeB
-        oQBWI2rcyv8ZFE0Nkd6kyFS0kkGo3J4=
-Date:   Tue, 17 Aug 2021 22:44:48 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 15/36] x86/mm: Add support to validate
- memory when changing C-bit
-Message-ID: <YRwfwCo4gwjWMbD0@zn.tnic>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-16-brijesh.singh@amd.com>
- <YRvxZtLkVNda9xwX@zn.tnic>
- <d9aabcb8-9db2-838c-74c7-c0e759257d3f@amd.com>
+        id S234545AbhHQVNh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Aug 2021 17:13:37 -0400
+Received: from mail-ot1-f52.google.com ([209.85.210.52]:39534 "EHLO
+        mail-ot1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234110AbhHQVNh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Aug 2021 17:13:37 -0400
+Received: by mail-ot1-f52.google.com with SMTP id m7-20020a9d4c87000000b0051875f56b95so105295otf.6;
+        Tue, 17 Aug 2021 14:13:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=iD6/Uk+6Fgtm+L34Bm4BSVW/la1AEprAZo1sZD8rrKQ=;
+        b=RxjnnSLbnKAoV+wrVNuyyM6Afi/x4XHxDVHS7PRUKtQnvL6n3FLDssAYP2PlQLKl23
+         Ak3eCY0MIT5co3cMQMXEgMmaCUduFLRlp5gyyET58LjySisclWMk8BvilvtimHjoKl+u
+         VbYjP/xcB4p++OQ1dxhlphf9QbeGtxwEXe6shojzaoIz8sJy6MmmBgYbFQDuZotPNjiv
+         gQZrHeQ1URUSK2yinIUxkPwmtrkzuI+ZxmxXCXHWB1XS5mlGbsNo8S9N+qLkRONgnS+r
+         a7zU+2Cdy5v4ue4I0bNeMsgH8C52gUk5qgMgUfgcdEQjgIFoLJ5WsaPRpQrXJgadWQuq
+         qmRQ==
+X-Gm-Message-State: AOAM530GjvzAi9wb66T7CbOFHgJWW7aQ5H2dGJ2BazFYBdrg1229wZfu
+        ZXe/70gCHiL3O48AQmyoag==
+X-Google-Smtp-Source: ABdhPJyciNF5YrkMWNtEJeH7yBdP3fwNjtiB7XkiZ+DDcyxiVdgD/fsEdS/cQc8M4dcI21sJL6A0Ww==
+X-Received: by 2002:a05:6830:418b:: with SMTP id r11mr4087842otu.204.1629234783053;
+        Tue, 17 Aug 2021 14:13:03 -0700 (PDT)
+Received: from robh.at.kernel.org (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id 67sm609455ota.70.2021.08.17.14.13.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Aug 2021 14:13:02 -0700 (PDT)
+Received: (nullmailer pid 849168 invoked by uid 1000);
+        Tue, 17 Aug 2021 21:13:01 -0000
+Date:   Tue, 17 Aug 2021 16:13:01 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+        devicetree@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-samsung-soc@vger.kernel.org
+Subject: Re: [PATCH 1/2] dt-bindings: irqchip: convert Samsung Exynos IRQ
+ combiner to dtschema
+Message-ID: <YRwmXWUzF2AbEhcQ@robh.at.kernel.org>
+References: <20210811084306.28740-1-krzysztof.kozlowski@canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d9aabcb8-9db2-838c-74c7-c0e759257d3f@amd.com>
+In-Reply-To: <20210811084306.28740-1-krzysztof.kozlowski@canonical.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 03:34:41PM -0500, Brijesh Singh wrote:
-> I am not seeing any strong reason to sanity check the reserved bit in the
-> psc_entry. The fields in the psc_entry are input from guest to the
-> hypervisor. The hypervisor cannot trick a guest by changing anything in the
-> psc_entry because guest does not read the hypervisor filled value. I am okay
-> with the psc_hdr because we need to read the current and end entry after the
-> PSC completes to determine whether it was successful and sanity checking PSC
-> header makes much more sense. Let me know if you are okay with it ?
+On Wed, 11 Aug 2021 10:43:05 +0200, Krzysztof Kozlowski wrote:
+> Convert Samsung Exynos SoC Interrupt Combiner Controller bindings to DT
+> schema format using json-schema.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+> ---
+>  .../samsung,exynos4210-combiner.txt           | 50 ----------
+>  .../samsung,exynos4210-combiner.yaml          | 96 +++++++++++++++++++
+>  2 files changed, 96 insertions(+), 50 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/interrupt-controller/samsung,exynos4210-combiner.txt
+>  create mode 100644 Documentation/devicetree/bindings/interrupt-controller/samsung,exynos4210-combiner.yaml
+> 
 
-Ok, fair enough.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Applied, thanks!
