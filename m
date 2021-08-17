@@ -2,99 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8943C4320A
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Aug 2021 22:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A03AC432BE
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 01:36:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D660860F58
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Aug 2021 22:19:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F63960EAF
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 01:36:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232272AbhHPWUZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Aug 2021 18:20:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47836 "EHLO mail.kernel.org"
+        id S233235AbhHQBgl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Aug 2021 21:36:41 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:53146 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232269AbhHPWUY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Aug 2021 18:20:24 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 83934600CD;
-        Mon, 16 Aug 2021 22:19:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629152392;
-        bh=YKbfqveW5N6PrKymvvb2EoK2UYjeEoMZZv9MnO8p2kQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=szs8TgkYPedA6TINs/C8u6K8r+SyUFLyfJlV4SQJ70kIexOLUionxEUm6yxTcTNAK
-         rxCVPu+AYkHBMMsJeOmt2WTNKOnKmC5pr9VBvQGmfJ/IQ5V+peBAVjd6r4Ce+AcHLO
-         +IJCBtOwIi6Y/RNETIRPD/TB71lprU54lVGiPBtE7EhNShb7T7+5XZSEQlE8WnooSL
-         QxCMOp6OlEfRuebhTCUBSsgQHJbt8+6+IfkxlHZ/fynK1Jf0rk+O+A1JvLnKEkIZM3
-         ZpTc47T9/MTA3DsfJmZrcs6OrOYONIxn5Pb9nCzfovh3jWzn+TOxjx3jOCb3q/G8cB
-         7kAd0qqHRiFGw==
-Date:   Mon, 16 Aug 2021 15:19:51 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        linux-crypto@vger.kernel.org
-Subject: Re: Building cifs.ko without any support for insecure crypto?
-Message-ID: <YRrkhzOARiT6TqQA@gmail.com>
-References: <YRXlwDBfQql36wJx@sol.localdomain>
- <CAN05THSm5fEcnLKxcsidKPRUC6PVLCkWMBZUW05KNm4uMJNHWw@mail.gmail.com>
- <YRbT7IbSCXo4Dl0u@sol.localdomain>
- <CAN05THScNOVh5biQnqM8YDOvNid4Dh=wZS=ObczzmSEpv1LpRw@mail.gmail.com>
+        id S233278AbhHQBgl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 16 Aug 2021 21:36:41 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1mFo1M-0005G6-LG; Tue, 17 Aug 2021 09:36:04 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1mFo1J-0003gc-UL; Tue, 17 Aug 2021 09:36:01 +0800
+Date:   Tue, 17 Aug 2021 09:36:01 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 5.14
+Message-ID: <20210817013601.GA14148@gondor.apana.org.au>
+References: <20200803044024.GA6429@gondor.apana.org.au>
+ <20200830223304.GA16882@gondor.apana.org.au>
+ <20201026011159.GA2428@gondor.apana.org.au>
+ <20201227113221.GA28744@gondor.apana.org.au>
+ <20210108035450.GA6191@gondor.apana.org.au>
+ <20210708030913.GA32097@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAN05THScNOVh5biQnqM8YDOvNid4Dh=wZS=ObczzmSEpv1LpRw@mail.gmail.com>
+In-Reply-To: <20210708030913.GA32097@gondor.apana.org.au>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Aug 15, 2021 at 08:38:23PM +1000, ronnie sahlberg wrote:
-> 
-> What are the plans here? To just offer the possibility to disable all
-> these old crypto and hashes on a local kernel compile?
-> Or is the plan to just outright remove it from the kernel sources?
-> 
-> If the first, I think that could possible be done for cifs. I think a
-> lot of the security minded larger enterprises already may be disabling
-> both SMB1 and also NTLM on serverside, so they would be fine.
-> 
-> For the latter, I think it would be a no-go since aside from krb5
-> there are just no other viable authentication mechs for smb.
+Hi Linus:
 
-Removing the code would be best, but allowing it to be compiled out would be the
-next best thing.
+This push contains a fix for a potential boot failure due to
+a missing Kconfig dependency for people upgrading with the DRBG
+enabled.
 
-> TL;DR
-> If NTLMSSP authentication is disabled, there are no other options to
-> map a share than using KRB5
-> and setting up the krb5 infrastructure. And thus smaller sites will
-> not be able to use CIFS :-(
-> So while I think it is feasible to add support to cifs.ko to
-> conditionally disable features depending in a kernel compile (no SMB1
-> if des/rc4 is missing, no NTLM if rc4/md4/md5 is missing)  I don't
-> think it is feasible to disable these by default.
-> I will work on making it possible to build cifs.ko with limied
-> functionality when these algorithms are disabled though.
+The following changes since commit e73f0f0ee7541171d89f2e2491130c7771ba58d3:
 
-FWIW, the way this came up is that the Compatibility Test Suite for Android 11
-verifies that CONFIG_CRYPTO_MD4 isn't set.  The reason that test got added is
-because for a short time, CONFIG_CRYPTO_MD4 had accidentally been enabled in the
-recommended kernel config for Android.  Since "obviously" no one would be using
-a completely broken crypto algorithm from 31 years ago, when fixing that bug we
-decided to go a bit further and just forbid it from the kernel config.
+  Linux 5.14-rc1 (2021-07-11 15:07:40 -0700)
 
-I guess we'll have to remove that test for now (assuming that CONFIG_CIFS is to
-be allowed at all on an Android device, and that the people who want to use it
-don't want to use kerberos which is probably the case).
+are available in the Git repository at:
 
-It is beyond ridiculous that this is even an issue though, given that MD4 has
-been severely compromised for over 25 years.
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus 
 
-One thing which we should seriously consider doing is removing md4 from the
-crypto API and moving it into fs/cifs/.  It isn't a valid crypto algorithm, so
-anyone who wants to use it should have to maintain it themselves.
+for you to fetch changes up to 5261cdf457ce3635bf18d393a3c1991dcfaf9d02:
 
-- Eric
+  crypto: drbg - select SHA512 (2021-07-16 15:49:31 +0800)
+
+----------------------------------------------------------------
+Stephan Mueller (1):
+      crypto: drbg - select SHA512
+
+ crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
