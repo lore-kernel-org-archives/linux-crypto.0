@@ -2,145 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF166C43216
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 14:13:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CACB3C4338F
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 14:19:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AAA8660FD8
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 14:13:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2C3160FD8
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Aug 2021 14:19:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231172AbhHQONz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Aug 2021 10:13:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52816 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240098AbhHQONy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Aug 2021 10:13:54 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 543D2C06179A
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Aug 2021 07:13:21 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1mFzq7-0005xZ-ST; Tue, 17 Aug 2021 16:13:15 +0200
-Subject: Re: [PATCH v2] fscrypt: support trusted keys
-To:     Mimi Zohar <zohar@linux.ibm.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, kernel@pengutronix.de,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        David Howells <dhowells@redhat.com>,
-        linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210806150928.27857-1-a.fatoum@pengutronix.de>
- <20210809094408.4iqwsx77u64usfx6@kernel.org> <YRGVcaquAJiuc8bp@gmail.com>
- <20210810180636.vqwaeftv7alsodgn@kernel.org> <YRLJmaafp941uOdA@gmail.com>
- <20210810212140.sdq5dq2wy5uaj7h7@kernel.org> <YRLvPJehAeMiYb2Z@gmail.com>
- <20210811001743.ofzkwdwa6rcjsf4d@kernel.org>
- <d4f5c2593380c82ceebae2c8782a1c440b35f165.camel@linux.ibm.com>
- <YRQF09f8st95yrFZ@gmail.com>
- <0e69a0aa394dd20347b06ae4e700aa17d52583ef.camel@linux.ibm.com>
- <a6eb6f38-b9f4-c59c-4181-2049f181e67d@pengutronix.de>
- <285cb263d9c1c16f3918c98dd36074ef16568e6d.camel@linux.ibm.com>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-Message-ID: <b77836af-42a1-5aca-9363-d050352bd8aa@pengutronix.de>
-Date:   Tue, 17 Aug 2021 16:13:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S230474AbhHQOTj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Aug 2021 10:19:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50432 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230412AbhHQOTj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Aug 2021 10:19:39 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6722A60FD8;
+        Tue, 17 Aug 2021 14:19:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629209946;
+        bh=xV7Ud6jsNiaHGJDoSOkd+YvwcxtdNFwRiqSZbKNtVU0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=sqmlYP+rVNjCRKI7xaSCRPtF7R2hpft0oF8P+6DMLiaKElfqc1gtv8P7vrK6wMseF
+         E0Eu5dO/FDkOen4J3cVvdgb94pEtfIa9dWwx4wEyQADFkGI+cMPVZymrjAUD9JIkxZ
+         4Vbxacc4yfR8UTkfximSzdkL0c9HT0eTwkT5qzX4sPjExdPNDrTT1t9GF/3lQCD+/s
+         793MYXW/Sbg8IgDwLK6uJesi798+XQjC9Gm2JZMjEOea70qQ2vm/1jFb9XNPnxcHNr
+         TSefW4XY0BeQqiVJ0iITgzsRA2mu4QkY9+qBHGkKT9offvXtUR/cL2Os9nUG3tnQZ2
+         Swghz8Act6Ktw==
+Received: by mail-oo1-f49.google.com with SMTP id l12-20020a4a94cc0000b02902618ad2ea55so5965225ooi.4;
+        Tue, 17 Aug 2021 07:19:06 -0700 (PDT)
+X-Gm-Message-State: AOAM531422myRk4aXHG+Bmla2xFbkh279YzrWyULHzouJjx0R/BPlBZO
+        zwtdlyg8TUb3hYgPdznKPKGVWjvhTcVl4wXwTeU=
+X-Google-Smtp-Source: ABdhPJwURPDIQOnNVkl4YBRE5wPJwMQixABKLUk8EX5AHVUdCsAFHaLyfV5HhY/KSgbFCKG5xGJddksDgAO6GMHncdA=
+X-Received: by 2002:a4a:d752:: with SMTP id h18mr2826178oot.13.1629209944714;
+ Tue, 17 Aug 2021 07:19:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <285cb263d9c1c16f3918c98dd36074ef16568e6d.camel@linux.ibm.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+References: <YQ0Qm+Xs1g/7Eant@fedora> <20210809141027.860850-1-chouhan.shreyansh630@gmail.com>
+In-Reply-To: <20210809141027.860850-1-chouhan.shreyansh630@gmail.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 17 Aug 2021 16:18:53 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGjY-EfaLc47HKvFz8AKeT=+XTXNRR5kVbQV7s3Hi9C2g@mail.gmail.com>
+Message-ID: <CAMj1kXGjY-EfaLc47HKvFz8AKeT=+XTXNRR5kVbQV7s3Hi9C2g@mail.gmail.com>
+Subject: Re: [PATCH] crypto: xts_crypt() return if walk.nbytes is 0
+To:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 17.08.21 15:55, Mimi Zohar wrote:
-> On Tue, 2021-08-17 at 15:04 +0200, Ahmad Fatoum wrote:
->> Hi,
->>
->> On 12.08.21 02:54, Mimi Zohar wrote:
->>> On Wed, 2021-08-11 at 10:16 -0700, Eric Biggers wrote:
->>>
->>>> Neither of you actually answered my question, which is whether the support for
->>>> trusted keys in dm-crypt is a mistake.  I think you're saying that it is?  That
->>>> would imply that fscrypt shouldn't support trusted keys, but rather encrypted
->>>> keys -- which conflicts with Ahmad's patch which is adding support for trusted
->>>> keys.  Note that your reasoning for this is not documented at all in the
->>>> trusted-encrypted keys documentation; it needs to be (email threads don't really
->>>> matter), otherwise how would anyone know when/how to use this feature?
->>>
->>> True, but all of the trusted-encrypted key examples in the
->>> documentation are "encrypted" type keys, encrypted/decrypted based on a
->>> "trusted" type key.  There are no examples of using the "trusted" key
->>> type directly.  Before claiming that adding "trusted" key support in
->>> dm-crypt was a mistake, we should ask Ahmad why he felt dm-crypt needed
->>> to directly support "trusted" type keys.
->>
->> I wanted to persist the dm-crypt key as a sealed blob. With encrypted keys,
->> I would have to persist and unseal two blobs (load trusted key blob, load
->> encrypted key blob rooted to trusted key) with no extra benefit.
->>
->> I thus added direct support for trusted keys. Jarkko even commented on the
->> thread, but didn't voice objection to the approach (or agreement for that
->> matter), so I assumed the approach is fine.
->>
->> I can see the utility of using a single trusted key for TPMs, but for CAAM,
->> I see none and having an encrypted key for every trusted key just makes
->> it more cumbersome.
->>
->> In v1 here, I added encrypted key support as well, but dropped it for v2,
->> because I am not in a position to justify its use. Now that you and Eric
->> discussed it, should I send v3 with support for both encrypted and trusted
->> keys like with dm-crypt or how should we proceed?
-> 
-> With some applications, the indirection is important.   It allows the
-> "encrypted" key type to be updated/re-encypted based on a new "trusted"
-> key, without affecting the on disk encrypted key usage.
+On Mon, 9 Aug 2021 at 16:10, Shreyansh Chouhan
+<chouhan.shreyansh630@gmail.com> wrote:
+>
+> xts_crypt() code doesn't call kernel_fpu_end() after calling
+> kernel_fpu_begin() if walk.nbytes is 0. The correct behavior should be
+> not calling kernel_fpu_begin() if walk.nbytes is 0.
+>
+> Reported-by: syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
+> Signed-off-by: Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
 
-Those applications were already able to use the encrypted key support
-in dm-crypt. For those where re-encryption/PCR-sealing isn't required,
-direct trusted key support offers a simpler way to integrate.
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
-> As much as I expected, directly using "trusted" keys is a result of the
-> new trusted key sources.
-
-More users = more use cases. You make it sound like a negative
-thing.
-
-> I have no opinion as to whether this is/isn't a valid usecase.
-
-So you'd be fine with merging trusted key support as is and leave encrypted
-key support to someone who has a valid use case and wants to argue
-in its favor?
-
-Cheers,
-Ahmad
-
-> 
-> thanks,
-> 
-> Mimi
-> 
-> 
-
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> ---
+>  arch/x86/crypto/aesni-intel_glue.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+> index 388643ca2177..ec6eac57c493 100644
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -849,7 +849,7 @@ static int xts_crypt(struct skcipher_request *req, bool encrypt)
+>                 return -EINVAL;
+>
+>         err = skcipher_walk_virt(&walk, req, false);
+> -       if (err)
+> +       if (err || !walk.nbytes)
+>                 return err;
+>
+>         if (unlikely(tail > 0 && walk.nbytes < walk.total)) {
+> --
+> 2.31.1
+>
