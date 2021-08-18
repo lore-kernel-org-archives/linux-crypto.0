@@ -2,91 +2,153 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CB8C4320A
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 08:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7205C432BE
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 09:57:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D81660C3E
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 08:39:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C099261051
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 09:57:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238705AbhHRIkS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Aug 2021 04:40:18 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:52414 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238656AbhHRIkR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Aug 2021 04:40:17 -0400
-Received: from zn.tnic (p4fed307d.dip0.t-ipconnect.de [79.237.48.125])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 53A0F1EC0345;
-        Wed, 18 Aug 2021 10:39:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629275976;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=VasVNSq4gd8Mrv+rRUUXRrEVEG/zyKOK8zOsDpdUhA8=;
-        b=Yrf4DQSz1/Vx2Gs6IIl5JsuKogIzqVeNQM7uiItJdpRnZBiF1pa9OewR6hash59iHTyvuW
-        NlE3QFjxjGpIundXvTH8IGvM2keM7D/CG56+sCJfBFGVi6HGCnCfl5/XY3BQ1N8M9Tjvy+
-        L9OFtzimJdaNb10F0huQNz0MMJecjlM=
-Date:   Wed, 18 Aug 2021 10:38:04 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 20/36] x86/sev: Use SEV-SNP AP creation to
- start secondary CPUs
-Message-ID: <YRzG7OcnbQpz7uok@zn.tnic>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-21-brijesh.singh@amd.com>
- <YRwWSizr/xoWXivV@zn.tnic>
- <35b57719-5f31-c71a-7a2f-d34f6e239d26@amd.com>
+        id S232954AbhHRJ6Q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 18 Aug 2021 05:58:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42940 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231910AbhHRJ6Q (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 18 Aug 2021 05:58:16 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92A39C061764
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Aug 2021 02:57:41 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=bjornoya.blackshift.org)
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <mkl@pengutronix.de>)
+        id 1mGIJV-0003Ak-CF; Wed, 18 Aug 2021 11:56:49 +0200
+Received: from pengutronix.de (unknown [IPv6:2a02:810a:8940:aa0:ed04:8488:5061:54d4])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        (Authenticated sender: mkl-all@blackshift.org)
+        by smtp.blackshift.org (Postfix) with ESMTPSA id 08E5E669A16;
+        Wed, 18 Aug 2021 09:56:36 +0000 (UTC)
+Date:   Wed, 18 Aug 2021 11:56:35 +0200
+From:   Marc Kleine-Budde <mkl@pengutronix.de>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ayush Sawal <ayush.sawal@chelsio.com>,
+        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
+        Rohit Maheshwari <rohitm@chelsio.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Stanislaw Gruszka <stf_xl@wp.pl>,
+        Luca Coelho <luciano.coelho@intel.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Mordechay Goodstein <mordechay.goodstein@intel.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Arunachalam Santhanam <arunachalam.santhanam@in.bosch.com>,
+        Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+        Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+        linux-crypto@vger.kernel.org, ath10k@lists.infradead.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-can@vger.kernel.org,
+        bpf@vger.kernel.org, clang-built-linux@googlegroups.com,
+        linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 2/5] treewide: Replace open-coded flex arrays in unions
+Message-ID: <20210818095635.tm42ctkm6aydjr6g@pengutronix.de>
+References: <20210818081118.1667663-1-keescook@chromium.org>
+ <20210818081118.1667663-3-keescook@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="h4irlmrxob7c5btq"
 Content-Disposition: inline
-In-Reply-To: <35b57719-5f31-c71a-7a2f-d34f6e239d26@amd.com>
+In-Reply-To: <20210818081118.1667663-3-keescook@chromium.org>
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 05:13:54PM -0500, Tom Lendacky wrote:
-> Well, yes and no. It really is just setting or clearing the VMSA page
-> attribute. It isn't trying to update permissions for the lower VMPLs, so I
-> didn't want to mislabel it as a general rmpadjust function. But it's a
-> simple enough thing to change and if multiple VMPL levels are ever
-> supported it can be evaluated at that time.
 
-You got it - when we need more RMPADJUST functionality, then that should
-be the function that gets the beefing up.
+--h4irlmrxob7c5btq
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-:-)
+On 18.08.2021 01:11:15, Kees Cook wrote:
+> diff --git a/drivers/net/can/usb/etas_es58x/es581_4.h b/drivers/net/can/u=
+sb/etas_es58x/es581_4.h
+> index 4bc60a6df697..8657145dc2a9 100644
+> --- a/drivers/net/can/usb/etas_es58x/es581_4.h
+> +++ b/drivers/net/can/usb/etas_es58x/es581_4.h
+> @@ -192,7 +192,7 @@ struct es581_4_urb_cmd {
+>  		struct es581_4_rx_cmd_ret rx_cmd_ret;
+>  		__le64 timestamp;
+>  		u8 rx_cmd_ret_u8;
+> -		u8 raw_msg[0];
+> +		flex_array(u8 raw_msg);
+>  	} __packed;
+> =20
+>  	__le16 reserved_for_crc16_do_not_use;
+> diff --git a/drivers/net/can/usb/etas_es58x/es58x_fd.h b/drivers/net/can/=
+usb/etas_es58x/es58x_fd.h
+> index ee18a87e40c0..3053e0958132 100644
+> --- a/drivers/net/can/usb/etas_es58x/es58x_fd.h
+> +++ b/drivers/net/can/usb/etas_es58x/es58x_fd.h
+> @@ -228,7 +228,7 @@ struct es58x_fd_urb_cmd {
+>  		struct es58x_fd_tx_ack_msg tx_ack_msg;
+>  		__le64 timestamp;
+>  		__le32 rx_cmd_ret_le32;
+> -		u8 raw_msg[0];
+> +		flex_array(u8 raw_msg[]);
+>  	} __packed;
 
--- 
-Regards/Gruss,
-    Boris.
+This doesn't look consistent, what's preferred?
 
-https://people.kernel.org/tglx/notes-about-netiquette
+u8 raw_msg[0];  -> flex_array(u8 raw_msg);
+ - or-
+                -> flex_array(u8 raw_msg[]);
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde           |
+Embedded Linux                   | https://www.pengutronix.de  |
+Vertretung West/Dortmund         | Phone: +49-231-2826-924     |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-5555 |
+
+--h4irlmrxob7c5btq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEK3kIWJt9yTYMP3ehqclaivrt76kFAmEc2VEACgkQqclaivrt
+76kXUQf/cn+R4mRgon+iBBoNOjSG6Xpa5C1kWsnyfyJAQq9geHgAtcyoTTot+9QH
+bjo6l3vIxXSY85B6NbV+TQFuedtSpFYkRQJgWzMG/eIuwHZ7Buuf8uK5C5MESqwm
+PJDEl2lZpKA7MtM2gMtvmhElNsv1Nr4FqMEOmCHs5LeQQ8ddsbJ0Ab7X7ffQ4SRu
+UgMoqqUUFxReCmF+pmoxDC5uHBbovnw/hYPulDH6AN7jj8ml9/lPLuJKfBnyYGI5
+jYTHTlc4+VnN6a7NJ7V9DhTCncLaFjXVFFxoQBWYgpetIV/eWwu2WwrrYhyrvEK0
+cORmz7LG97TWWd3NSNNy9j7XKs0y+Q==
+=UYoj
+-----END PGP SIGNATURE-----
+
+--h4irlmrxob7c5btq--
