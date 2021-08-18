@@ -2,28 +2,29 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0049C4338F
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 03:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D8CC4338F
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 03:31:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9137F6101A
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 03:31:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85D0460462
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 03:31:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235554AbhHRDby (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Aug 2021 23:31:54 -0400
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:50494 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233901AbhHRDby (ORCPT
+        id S236105AbhHRDb4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Aug 2021 23:31:56 -0400
+Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:54225 "EHLO
+        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234860AbhHRDbz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Aug 2021 23:31:54 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R391e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0UjbK988_1629257477;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UjbK988_1629257477)
+        Tue, 17 Aug 2021 23:31:55 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R521e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0Ujc8IsJ_1629257477;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Ujc8IsJ_1629257477)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 18 Aug 2021 11:31:17 +0800
+          Wed, 18 Aug 2021 11:31:18 +0800
 From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -42,79 +43,280 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Jia Zhang <zhang.jia@linux.alibaba.com>,
         "YiLin . Li" <YiLin.Li@linux.alibaba.com>
 Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH 0/2] add AES-NI/AVX2/x86_64 implementation
-Date:   Wed, 18 Aug 2021 11:31:15 +0800
-Message-Id: <20210818033117.91717-1-tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH 1/2] crypto: x86/sm4 - export reusable AESNI/AVX functions
+Date:   Wed, 18 Aug 2021 11:31:16 +0800
+Message-Id: <20210818033117.91717-2-tianjia.zhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.19.1.3.ge56e4f7
+In-Reply-To: <20210818033117.91717-1-tianjia.zhang@linux.alibaba.com>
+References: <20210818033117.91717-1-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patchsets exported some of the common functions implemented by
-the SM4 AESNI/AVX algorithm, and reused these functions to achieve
-the acceleration of AESNI/AVX2 implementation.
+Export the reusable functions in the SM4 AESNI/AVX implementation,
+mainly public functions, which are used to develop the SM4 AESNI/AVX2
+implementation, and eliminate unnecessary duplication of code.
 
-The main algorithm implementation comes from SM4 AES-NI work by
-libgcrypt and Markku-Juhani O. Saarinen at:
-https://github.com/mjosaarinen/sm4ni
+At the same time, in order to make the public function universal,
+minor fixes was added.
 
-Benchmark on Intel i5-6200U 2.30GHz, performance data of three
-implementation methods, pure software sm4-generic, aesni/avx
-acceleration, and aesni/avx2 acceleration, the data comes from
-the 218 mode and 518 mode of tcrypt. The abscissas are blocks of
-different lengths. The data is tabulated and the unit is Mb/s:
-
-block-size  |    16      64     128     256    1024    1420    4096
-sm4-generic
-    ECB enc | 60.94   70.41   72.27   73.02   73.87   73.58   73.59
-    ECB dec | 61.87   70.53   72.15   73.09   73.89   73.92   73.86
-    CBC enc | 56.71   66.31   68.05   69.84   70.02   70.12   70.24
-    CBC dec | 54.54   65.91   68.22   69.51   70.63   70.79   70.82
-    CFB enc | 57.21   67.24   69.10   70.25   70.73   70.52   71.42
-    CFB dec | 57.22   64.74   66.31   67.24   67.40   67.64   67.58
-    CTR enc | 59.47   68.64   69.91   71.02   71.86   71.61   71.95
-    CTR dec | 59.94   68.77   69.95   71.00   71.84   71.55   71.95
-sm4-aesni-avx
-    ECB enc | 44.95  177.35  292.06  316.98  339.48  322.27  330.59
-    ECB dec | 45.28  178.66  292.31  317.52  339.59  322.52  331.16
-    CBC enc | 57.75   67.68   69.72   70.60   71.48   71.63   71.74
-    CBC dec | 44.32  176.83  284.32  307.24  328.61  312.61  325.82
-    CFB enc | 57.81   67.64   69.63   70.55   71.40   71.35   71.70
-    CFB dec | 43.14  167.78  282.03  307.20  328.35  318.24  325.95
-    CTR enc | 42.35  163.32  279.11  302.93  320.86  310.56  317.93
-    CTR dec | 42.39  162.81  278.49  302.37  321.11  310.33  318.37
-sm4-aesni-avx2
-    ECB enc | 45.19  177.41  292.42  316.12  339.90  322.53  330.54
-    ECB dec | 44.83  178.90  291.45  317.31  339.85  322.55  331.07
-    CBC enc | 57.66   67.62   69.73   70.55   71.58   71.66   71.77
-    CBC dec | 44.34  176.86  286.10  501.68  559.58  483.87  527.46
-    CFB enc | 57.43   67.60   69.61   70.52   71.43   71.28   71.65
-    CFB dec | 43.12  167.75  268.09  499.33  558.35  490.36  524.73
-    CTR enc | 42.42  163.39  256.17  493.95  552.45  481.58  517.19
-    CTR dec | 42.49  163.11  256.36  493.34  552.62  481.49  516.83
-
-From the benchmark data, it can be seen that when the block size is
-1024, compared to AVX acceleration, the performance achieved by AVX2
-has increased by about 70%, it is also 7.7 times of the pure software
-implementation of sm4-generic.
-
-Tianjia Zhang (2):
-  crypto: x86/sm4 - export reusable AESNI/AVX functions
-  crypto: x86/sm4 - add AES-NI/AVX2/x86_64 implementation
-
- arch/x86/crypto/Makefile                |   3 +
- arch/x86/crypto/sm4-aesni-avx2-asm_64.S | 497 ++++++++++++++++++++++++
- arch/x86/crypto/sm4-avx.h               |  24 ++
- arch/x86/crypto/sm4_aesni_avx2_glue.c   | 169 ++++++++
- arch/x86/crypto/sm4_aesni_avx_glue.c    |  92 +++--
- crypto/Kconfig                          |  22 ++
- 6 files changed, 775 insertions(+), 32 deletions(-)
- create mode 100644 arch/x86/crypto/sm4-aesni-avx2-asm_64.S
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ arch/x86/crypto/sm4-avx.h            | 24 ++++++++
+ arch/x86/crypto/sm4_aesni_avx_glue.c | 92 ++++++++++++++++++----------
+ 2 files changed, 84 insertions(+), 32 deletions(-)
  create mode 100644 arch/x86/crypto/sm4-avx.h
- create mode 100644 arch/x86/crypto/sm4_aesni_avx2_glue.c
 
+diff --git a/arch/x86/crypto/sm4-avx.h b/arch/x86/crypto/sm4-avx.h
+new file mode 100644
+index 000000000000..1bceab7516aa
+--- /dev/null
++++ b/arch/x86/crypto/sm4-avx.h
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#ifndef ASM_X86_SM4_AVX_H
++#define ASM_X86_SM4_AVX_H
++
++#include <linux/types.h>
++#include <crypto/sm4.h>
++
++typedef void (*sm4_crypt_func)(const u32 *rk, u8 *dst, const u8 *src, u8 *iv);
++
++int sm4_avx_ecb_encrypt(struct skcipher_request *req);
++int sm4_avx_ecb_decrypt(struct skcipher_request *req);
++
++int sm4_cbc_encrypt(struct skcipher_request *req);
++int sm4_avx_cbc_decrypt(struct skcipher_request *req,
++			unsigned int bsize, sm4_crypt_func func);
++
++int sm4_cfb_encrypt(struct skcipher_request *req);
++int sm4_avx_cfb_decrypt(struct skcipher_request *req,
++			unsigned int bsize, sm4_crypt_func func);
++
++int sm4_avx_ctr_crypt(struct skcipher_request *req,
++			unsigned int bsize, sm4_crypt_func func);
++
++#endif
+diff --git a/arch/x86/crypto/sm4_aesni_avx_glue.c b/arch/x86/crypto/sm4_aesni_avx_glue.c
+index c1f5728efd1d..7800f77d68ad 100644
+--- a/arch/x86/crypto/sm4_aesni_avx_glue.c
++++ b/arch/x86/crypto/sm4_aesni_avx_glue.c
+@@ -15,6 +15,7 @@
+ #include <crypto/internal/simd.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/sm4.h>
++#include "sm4-avx.h"
+ 
+ #define SM4_CRYPT8_BLOCK_SIZE	(SM4_BLOCK_SIZE * 8)
+ 
+@@ -71,23 +72,25 @@ static int ecb_do_crypt(struct skcipher_request *req, const u32 *rkey)
+ 	return err;
+ }
+ 
+-static int ecb_encrypt(struct skcipher_request *req)
++int sm4_avx_ecb_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 
+ 	return ecb_do_crypt(req, ctx->rkey_enc);
+ }
++EXPORT_SYMBOL_GPL(sm4_avx_ecb_encrypt);
+ 
+-static int ecb_decrypt(struct skcipher_request *req)
++int sm4_avx_ecb_decrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 
+ 	return ecb_do_crypt(req, ctx->rkey_dec);
+ }
++EXPORT_SYMBOL_GPL(sm4_avx_ecb_decrypt);
+ 
+-static int cbc_encrypt(struct skcipher_request *req)
++int sm4_cbc_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
+@@ -118,8 +121,10 @@ static int cbc_encrypt(struct skcipher_request *req)
+ 
+ 	return err;
+ }
++EXPORT_SYMBOL_GPL(sm4_cbc_encrypt);
+ 
+-static int cbc_decrypt(struct skcipher_request *req)
++int sm4_avx_cbc_decrypt(struct skcipher_request *req,
++			unsigned int bsize, sm4_crypt_func func)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
+@@ -135,15 +140,14 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 
+ 		kernel_fpu_begin();
+ 
+-		while (nbytes >= SM4_CRYPT8_BLOCK_SIZE) {
+-			sm4_aesni_avx_cbc_dec_blk8(ctx->rkey_dec, dst,
+-						src, walk.iv);
+-			dst += SM4_CRYPT8_BLOCK_SIZE;
+-			src += SM4_CRYPT8_BLOCK_SIZE;
+-			nbytes -= SM4_CRYPT8_BLOCK_SIZE;
++		while (nbytes >= bsize) {
++			func(ctx->rkey_dec, dst, src, walk.iv);
++			dst += bsize;
++			src += bsize;
++			nbytes -= bsize;
+ 		}
+ 
+-		if (nbytes >= SM4_BLOCK_SIZE) {
++		while (nbytes >= SM4_BLOCK_SIZE) {
+ 			u8 keystream[SM4_BLOCK_SIZE * 8];
+ 			u8 iv[SM4_BLOCK_SIZE];
+ 			unsigned int nblocks = min(nbytes >> 4, 8u);
+@@ -165,6 +169,8 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 			}
+ 			crypto_xor_cpy(dst, walk.iv, keystream, SM4_BLOCK_SIZE);
+ 			memcpy(walk.iv, iv, SM4_BLOCK_SIZE);
++			dst += nblocks * SM4_BLOCK_SIZE;
++			src += (nblocks + 1) * SM4_BLOCK_SIZE;
+ 			nbytes -= nblocks * SM4_BLOCK_SIZE;
+ 		}
+ 
+@@ -174,8 +180,15 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 
+ 	return err;
+ }
++EXPORT_SYMBOL_GPL(sm4_avx_cbc_decrypt);
++
++static int cbc_decrypt(struct skcipher_request *req)
++{
++	return sm4_avx_cbc_decrypt(req, SM4_CRYPT8_BLOCK_SIZE,
++				sm4_aesni_avx_cbc_dec_blk8);
++}
+ 
+-static int cfb_encrypt(struct skcipher_request *req)
++int sm4_cfb_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
+@@ -214,8 +227,10 @@ static int cfb_encrypt(struct skcipher_request *req)
+ 
+ 	return err;
+ }
++EXPORT_SYMBOL_GPL(sm4_cfb_encrypt);
+ 
+-static int cfb_decrypt(struct skcipher_request *req)
++int sm4_avx_cfb_decrypt(struct skcipher_request *req,
++			unsigned int bsize, sm4_crypt_func func)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
+@@ -231,15 +246,14 @@ static int cfb_decrypt(struct skcipher_request *req)
+ 
+ 		kernel_fpu_begin();
+ 
+-		while (nbytes >= SM4_CRYPT8_BLOCK_SIZE) {
+-			sm4_aesni_avx_cfb_dec_blk8(ctx->rkey_enc, dst,
+-						src, walk.iv);
+-			dst += SM4_CRYPT8_BLOCK_SIZE;
+-			src += SM4_CRYPT8_BLOCK_SIZE;
+-			nbytes -= SM4_CRYPT8_BLOCK_SIZE;
++		while (nbytes >= bsize) {
++			func(ctx->rkey_enc, dst, src, walk.iv);
++			dst += bsize;
++			src += bsize;
++			nbytes -= bsize;
+ 		}
+ 
+-		if (nbytes >= SM4_BLOCK_SIZE) {
++		while (nbytes >= SM4_BLOCK_SIZE) {
+ 			u8 keystream[SM4_BLOCK_SIZE * 8];
+ 			unsigned int nblocks = min(nbytes >> 4, 8u);
+ 
+@@ -276,8 +290,16 @@ static int cfb_decrypt(struct skcipher_request *req)
+ 
+ 	return err;
+ }
++EXPORT_SYMBOL_GPL(sm4_avx_cfb_decrypt);
+ 
+-static int ctr_crypt(struct skcipher_request *req)
++static int cfb_decrypt(struct skcipher_request *req)
++{
++	return sm4_avx_cfb_decrypt(req, SM4_CRYPT8_BLOCK_SIZE,
++				sm4_aesni_avx_cfb_dec_blk8);
++}
++
++int sm4_avx_ctr_crypt(struct skcipher_request *req,
++			unsigned int bsize, sm4_crypt_func func)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
+@@ -293,15 +315,14 @@ static int ctr_crypt(struct skcipher_request *req)
+ 
+ 		kernel_fpu_begin();
+ 
+-		while (nbytes >= SM4_CRYPT8_BLOCK_SIZE) {
+-			sm4_aesni_avx_ctr_enc_blk8(ctx->rkey_enc, dst,
+-						src, walk.iv);
+-			dst += SM4_CRYPT8_BLOCK_SIZE;
+-			src += SM4_CRYPT8_BLOCK_SIZE;
+-			nbytes -= SM4_CRYPT8_BLOCK_SIZE;
++		while (nbytes >= bsize) {
++			func(ctx->rkey_enc, dst, src, walk.iv);
++			dst += bsize;
++			src += bsize;
++			nbytes -= bsize;
+ 		}
+ 
+-		if (nbytes >= SM4_BLOCK_SIZE) {
++		while (nbytes >= SM4_BLOCK_SIZE) {
+ 			u8 keystream[SM4_BLOCK_SIZE * 8];
+ 			unsigned int nblocks = min(nbytes >> 4, 8u);
+ 			int i;
+@@ -343,6 +364,13 @@ static int ctr_crypt(struct skcipher_request *req)
+ 
+ 	return err;
+ }
++EXPORT_SYMBOL_GPL(sm4_avx_ctr_crypt);
++
++static int ctr_crypt(struct skcipher_request *req)
++{
++	return sm4_avx_ctr_crypt(req, SM4_CRYPT8_BLOCK_SIZE,
++				sm4_aesni_avx_ctr_enc_blk8);
++}
+ 
+ static struct skcipher_alg sm4_aesni_avx_skciphers[] = {
+ 	{
+@@ -359,8 +387,8 @@ static struct skcipher_alg sm4_aesni_avx_skciphers[] = {
+ 		.max_keysize	= SM4_KEY_SIZE,
+ 		.walksize	= 8 * SM4_BLOCK_SIZE,
+ 		.setkey		= sm4_skcipher_setkey,
+-		.encrypt	= ecb_encrypt,
+-		.decrypt	= ecb_decrypt,
++		.encrypt	= sm4_avx_ecb_encrypt,
++		.decrypt	= sm4_avx_ecb_decrypt,
+ 	}, {
+ 		.base = {
+ 			.cra_name		= "__cbc(sm4)",
+@@ -376,7 +404,7 @@ static struct skcipher_alg sm4_aesni_avx_skciphers[] = {
+ 		.ivsize		= SM4_BLOCK_SIZE,
+ 		.walksize	= 8 * SM4_BLOCK_SIZE,
+ 		.setkey		= sm4_skcipher_setkey,
+-		.encrypt	= cbc_encrypt,
++		.encrypt	= sm4_cbc_encrypt,
+ 		.decrypt	= cbc_decrypt,
+ 	}, {
+ 		.base = {
+@@ -394,7 +422,7 @@ static struct skcipher_alg sm4_aesni_avx_skciphers[] = {
+ 		.chunksize	= SM4_BLOCK_SIZE,
+ 		.walksize	= 8 * SM4_BLOCK_SIZE,
+ 		.setkey		= sm4_skcipher_setkey,
+-		.encrypt	= cfb_encrypt,
++		.encrypt	= sm4_cfb_encrypt,
+ 		.decrypt	= cfb_decrypt,
+ 	}, {
+ 		.base = {
 -- 
 2.19.1.3.ge56e4f7
 
