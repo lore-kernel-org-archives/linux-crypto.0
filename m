@@ -2,129 +2,198 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F8B7C4338F
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 05:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F50C4338F
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 06:37:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4CB5261076
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 05:44:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7F3360EFE
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 06:37:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237892AbhHRFpI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Aug 2021 01:45:08 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:50848 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237872AbhHRFpH (ORCPT
+        id S238550AbhHRGht (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:37:49 -0400
+Received: from smtp-relay-canonical-1.canonical.com ([185.125.188.121]:52452
+        "EHLO smtp-relay-canonical-1.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238395AbhHRGhr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Aug 2021 01:45:07 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        Wed, 18 Aug 2021 02:37:47 -0400
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com [209.85.208.70])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id F1B921FF80;
-        Wed, 18 Aug 2021 05:44:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1629265471; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q7gt9xQcpg8cLompgwAs2sgaTiNyRhomg3wa5s6AJxE=;
-        b=GwJqqya4wErklpUfsHhkvceUHxU7++zXRRxL1ZA2tPLDfzCMF+E2KXG3ftzPT01KZL3t0o
-        j/PQx+pkhVSHClamIyhh0/dVCtBOivIv/qn9gB/TU9xckEgKlF0RxeL7tl28HETYm1oSOA
-        x615NaF4YbY/6cWJhs1fmGMznR/8D3k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1629265471;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q7gt9xQcpg8cLompgwAs2sgaTiNyRhomg3wa5s6AJxE=;
-        b=zKV4yycOMmovdQAhULrtF00NIo0gAUBBWL+J9SR27LszChgC1urhm3C1hlkMTV+ATONW8k
-        E0xGU0Re4SI724AQ==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id CC28C13357;
-        Wed, 18 Aug 2021 05:44:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id 1m86MD+eHGEqagAAGKfGzw
-        (envelope-from <hare@suse.de>); Wed, 18 Aug 2021 05:44:31 +0000
-Subject: Re: [PATCHv2 00/13] nvme: In-band authentication support
-To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <keith.busch@wdc.com>,
+        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPS id BA61E3FE71
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Aug 2021 06:37:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1629268632;
+        bh=PDa4Y8NlWc63JAE2k/U+xWg+/z+LRamng9vRqXzkmdA=;
+        h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+         In-Reply-To:Content-Type;
+        b=GTKD0bvz+E+2pVF/NUTjvZkfe0/QWMsZXaXZOrDT+j4kmjo7LsKE7IlLDMQnBcT6h
+         L6+rVMQvwXhXwi4PNoFqtORz4yyJmwElCH9hwkJte2pSuJGh46pghDwGmfwXIWS/AI
+         PWdvcna79GV+Y9LqtKVt6stUlvI3g+/oIYF5MpEw/+Gk+2poOXhpIbMpIltOmQnRcz
+         XQxH3q6AfSOHOJ3foShvd0ctue/J5S0RqylhDkdhhgF2EcBUBA1/y2lx/e8z+J3bg3
+         U1LCeq3UE/cT+cU46Jst5ZT1bdrdB/KMutie2MiBjz44oeXNkBZYvP5OQADFgG9HAq
+         8P47xJzXMIxbQ==
+Received: by mail-ed1-f70.google.com with SMTP id b25-20020a05640202d9b02903be7281a80cso527037edx.3
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Aug 2021 23:37:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PDa4Y8NlWc63JAE2k/U+xWg+/z+LRamng9vRqXzkmdA=;
+        b=AlHWpgwERO5tmGXuffAyJ19ZAYhbJ7kx9pTy95zjSaeBfzBvr1Da81ONgbTQLnPhwN
+         UVS+5512YvlhfFeIQrfWOx+aqdL4ydNf1GzUSpp9OyFD3iSa3rDhfa0ssPU5ZxERux2Q
+         RWsZPOUlfga00rObySFCFw+yhiN/Nv8SA04H4Wjy+tUHAVCQZ0IbAI3AdUYhoDb28G+4
+         eiARjVQcIjLUDfMd1WfjAYw0+R0+jirHKzVSqV82eaElxL3yL01RY2aa2t45TqT+Cx+H
+         0Dn7kE3I9o8XH342NSoNjqACG6483M2kp/FyDMrsmhjl+A6GQC5ghdpdJ3oxjnJR6yIn
+         9cNg==
+X-Gm-Message-State: AOAM533Pc6H9uiRR3Vy5F5UYFyYBUDYfPXU3n5mS4O28S2UvowORY7mm
+        37RIJ6dWRUWSanKGcjvJ/WipZCBkU8bXuolUdIqYXkLf9G2YrPWBqIKh513Qj99GDs9Wng6qjQi
+        Sym8VGT6Z9YOkqn8L0i84TsTMDQz2K9pI5NRxKBVm1Q==
+X-Received: by 2002:a05:6402:754:: with SMTP id p20mr8667970edy.356.1629268632267;
+        Tue, 17 Aug 2021 23:37:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxfg/SuyOcY+aciBZsxSSWL3QxT/qTGK2gv6mTxMsNgzYjn9QNyBuTRbPIgXG6+QZzg4sd8bg==
+X-Received: by 2002:a05:6402:754:: with SMTP id p20mr8667953edy.356.1629268632054;
+        Tue, 17 Aug 2021 23:37:12 -0700 (PDT)
+Received: from [192.168.8.102] ([86.32.42.198])
+        by smtp.gmail.com with ESMTPSA id gl2sm1571286ejb.110.2021.08.17.23.37.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Aug 2021 23:37:11 -0700 (PDT)
+Subject: Re: [PATCH 2/2] dt-bindings: rng: convert Samsung Exynos TRNG to
+ dtschema
+To:     Lukasz Stelmach <l.stelmach@samsung.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
-References: <20210810124230.12161-1-hare@suse.de>
- <5a69187b-cfb1-d09a-87e2-8435e27612a7@grimberg.me>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <dbf2ca1f-32f6-2aff-da08-d3fd2f977fa5@suse.de>
-Date:   Wed, 18 Aug 2021 07:44:30 +0200
+        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <da43d243-35b0-2cc6-f8a0-a5d02c997301@canonical.com>
+ <CGME20210817221734eucas1p2e4a0aa41406137b90e49230371b92ac6@eucas1p2.samsung.com>
+ <dleftjtujnemx7.fsf%l.stelmach@samsung.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+Message-ID: <1960d499-1509-ad42-94d3-f668501fb30b@canonical.com>
+Date:   Wed, 18 Aug 2021 08:37:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <5a69187b-cfb1-d09a-87e2-8435e27612a7@grimberg.me>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <dleftjtujnemx7.fsf%l.stelmach@samsung.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/17/21 11:21 PM, Sagi Grimberg wrote:
-> 
->> Hi all,
+On 18/08/2021 00:17, Lukasz Stelmach wrote:
+> It was <2021-08-17 wto 16:07>, when Krzysztof Kozlowski wrote:
+>> On 17/08/2021 14:34, Lukasz Stelmach wrote:
+>>> It was <2021-08-17 wto 12:05>, when Krzysztof Kozlowski wrote:
+>>>> On 17/08/2021 11:55, Lukasz Stelmach wrote:
+>>>>> It was <2021-08-11 śro 10:43>, when Krzysztof Kozlowski wrote:
+>>>>>> Convert Samsung Exynos SoC True Random Number Generator bindings to DT
+>>>>>> schema format using json-schema.
+>>>>>>
+>>>>>> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+>>>>>> ---
+>>>>>>  .../bindings/rng/samsung,exynos5250-trng.txt  | 17 -------
+>>>>>>  .../bindings/rng/samsung,exynos5250-trng.yaml | 44 +++++++++++++++++++
+>>>>>>  MAINTAINERS                                   |  2 +-
+>>>>>>  3 files changed, 45 insertions(+), 18 deletions(-)
+>>>>>>  delete mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>>>>>>  create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+>>>>>>
+>>>>>> diff --git
+>>>>>> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>>>>>> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>>>>>> deleted file mode 100644
+>>>>>> index 5a613a4ec780..000000000000
+>>>>>> --- a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>>>>>> +++ /dev/null
+>>>>>> @@ -1,17 +0,0 @@
+>>>>>> -Exynos True Random Number Generator
+>>>>>> -
+>>>>>> -Required properties:
+>>>>>> -
+>>>>>> -- compatible  : Should be "samsung,exynos5250-trng".
+>>>>>> -- reg         : Specifies base physical address and size of the registers map.
+>>>>>> -- clocks      : Phandle to clock-controller plus clock-specifier pair.
+>>>>>> -- clock-names : "secss" as a clock name.
+>>>>>> -
+>>>>>> -Example:
+>>>>>> -
+>>>>>> -	rng@10830600 {
+>>>>>> -		compatible = "samsung,exynos5250-trng";
+>>>>>> -		reg = <0x10830600 0x100>;
+>>>>>> -		clocks = <&clock CLK_SSS>;
+>>>>>> -		clock-names = "secss";
+>>>>>> -	};
+>>>>>> diff --git
+>>>>>> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+>>>>>> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+>>>>>> new file mode 100644
+>>>>>> index 000000000000..a50c34d5d199
+>>>>>> --- /dev/null
+>>>>>> +++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
+>>>>>> @@ -0,0 +1,44 @@
+>>>>>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+>>>>>> +%YAML 1.2
+>>>>>> +---
+>>>>>> +$id:
+>>>>>> https://protect2.fireeye.com/v1/url?k=f38ca35b-ac179a0d-f38d2814-0cc47a31ce52-1faa1ecb65482b8a&q=1&e=8b3490f9-a5fc-4da0-b2ee-7b0aec781403&u=http%3A%2F%2Fdevicetree.org%2Fschemas%2Frng%2Fsamsung%2Cexynos5250-trng.yaml%23
+>>>>>> +$schema:
+>>>>>> https://protect2.fireeye.com/v1/url?k=9409519d-cb9268cb-9408dad2-0cc47a31ce52-12394c4409905980&q=1&e=8b3490f9-a5fc-4da0-b2ee-7b0aec781403&u=http%3A%2F%2Fdevicetree.org%2Fmeta-schemas%2Fcore.yaml%23
+>>>>>> +
+>>>>>> +title: Samsung Exynos SoC True Random Number Generator
+>>>>>> +
+>>>>>> +maintainers:
+>>>>>> +  - Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+>>>>>> +  - Łukasz Stelmach <l.stelmach@samsung.com>
+>>>>>> +
+>>>>>> +properties:
+>>>>>> +  compatible:
+>>>>>> +    const: samsung,exynos5250-trng
+>>>>>> +
+>>>>>> +  clocks:
+>>>>>> +    maxItems: 1
+>>>>>
+>>>>> How about copying description from above into the description: property?
+>>>>
+>>>> But what to copy? There is no description except generic clock bindings.
+>>>>
+>>>
+>>> The description that "was" in the txt file.
 >>
->> recent updates to the NVMe spec have added definitions for in-band
->> authentication, and seeing that it provides some real benefit
->> especially for NVMe-TCP here's an attempt to implement it.
+>> But there was no description of fields except copy&paste of the core
+>> schema. Do you describe C code like:
 >>
->> Tricky bit here is that the specification orients itself on TLS 1.3,
->> but supports only the FFDHE groups. Which of course the kernel doesn't
->> support. I've been able to come up with a patch for this, but as this
->> is my first attempt to fix anything in the crypto area I would invite
->> people more familiar with these matters to have a look.
->>
->> Also note that this is just for in-band authentication. Secure
->> concatenation (ie starting TLS with the negotiated parameters) is not
->> implemented; one would need to update the kernel TLS implementation
->> for this, which at this time is beyond scope.
->>
->> As usual, comments and reviews are welcome.
+>> ...
+>> /* unsigned int is a integer number greater or equal 0 */
+>> unsigned int i;
+>> ...
 > 
-> Hey Hannes,
+> I believe having descriptions for reg and clocks
 > 
-> First, can you also send the nvme-cli/nvmetcli bits as well?
+>>>>>> -- reg         : Specifies base physical address and size of the registers map.
+>>>>>> -- clocks      : Phandle to clock-controller plus clock-specifier pair.
 > 
-Yes, will be done with the next round.
-It first required a larger update to libnvme/nvme-cli to get everything 
-in order :-)
+> right next to properties' formal definitions is beneficial for anyone
+> browsing the YAML file. If you think otherwise, oh well, I am fine with
+> that.
 
-> Second, one thing that is not clear to me here is how this
-> works with the discovery log page.
-> 
-> If the user issues a discovery log page to establish connections
-> to the controllers entries, where it picks the appropriate
-> secret?
-> 
-> In other words, when the user runs connect-all, how does it handle
-> the secrets based on the content of the discovery log-page?
+Useful descriptions would be beneficial. Descriptions which are copy of
+schema, therefore equal to explaining unsigned int, are not beneficial.
+Make the document just unnecessarily bigger, are irrelevant and hide
+actual important information. One of the principles is to keep things
+simple. Duplicating description from schema into specific bindings is
+rather the opposite of such approach.
 
-With the latest nvme-cli update I've implemented a json configuration, 
-which allows to store configuration on a per-controller basis.
-This will be updated to hold the dhchap secrets, and we should be able 
-to specify individual secrets for each controller.
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Best regards,
+Krzysztof
