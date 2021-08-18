@@ -2,62 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D732FC43214
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 05:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 590D8C432BE
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 05:39:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF83861076
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 05:39:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 396EB61029
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 05:39:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237672AbhHRFjv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Aug 2021 01:39:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38140 "EHLO
+        id S237618AbhHRFjx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 18 Aug 2021 01:39:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237588AbhHRFju (ORCPT
+        with ESMTP id S237809AbhHRFjv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Aug 2021 01:39:50 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 145F2C061764
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Aug 2021 22:39:16 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id c63-20020a25e5420000b0290580b26e708aso1687694ybh.12
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Aug 2021 22:39:16 -0700 (PDT)
+        Wed, 18 Aug 2021 01:39:51 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FAC5C0613CF
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Aug 2021 22:39:17 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id f64-20020a2538430000b0290593bfc4b046so1703138yba.9
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Aug 2021 22:39:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=EL7jI42wrcLkhbmMyq077rvusMQzj734dq/iBhF+pY4=;
-        b=t1Oy7svnangJBn7uKTFsIDqALT7f36cJQs9eDhJj6+ACeFlU4o7xJas9Oxg0nOtfkM
-         lz1fthLqySQlUaikmUMmxpqvlukB5gBWU7X+yxuTnAT2HcUXrjz/AWk00fd85QErNqh+
-         MXo71I6MNGnf7HcEosKmjcyerhvgTaWpc3T0yaB1wb6jsY0ICBjQLuFYf4L2mvsfst3O
-         EBsNWe+mHZQw+NGaNNTmq5h77lp77JUQWTp84Wovhl+4KOcIq/ozHtldBfmoeBuYza0+
-         dtOSc40y6JczuK/cNtmgRZIfCv5wyTlIN5d4KrMW7b7SJ9wXNq2771EmSJdKXClwZozq
-         WG7Q==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=WiP9HgfFffnWMWhcvdLBuLUWs2FAICpYV6zjCSodstc=;
+        b=P5d31hh5vOF8UCVyLfij5pHCgatyTEnprnjz48lUR/QQ2E7SfxSMCwblt2FHfkDfo+
+         QSTLLUyH2TsfavUcqw89bJCByn9dSp8QrIJxkxVd/lwTZKdD+Y7rjveCSbf4fztCUgca
+         npdHNANe1QbR/obju31jRjMyELrgc+v+IVAcgLdFrOwN6l7zLtgE1GNTuzzf05W1bvDF
+         fY0P4AHor6om6MtzOJuA8e9uQXFTQ8nkXU8FDTfNz7TLrUR9tSUNc6HmgsAiJiEwXxco
+         FUPgbFeE5chpzWIuA+rznzFGsXVr1DdfILy3hnU6fUj3oehSHDHqN0nxyiH5Phmx2WSN
+         oC0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=EL7jI42wrcLkhbmMyq077rvusMQzj734dq/iBhF+pY4=;
-        b=R5fJcN0TlWsWSwaoHdaJwNpXduOOanh1sBhjYShKEZMHZQkdWCKM6TmqQJ6kiBx4Lc
-         TamaslGWdevYkChyCsUN1DT60OodN4QmW5IGfbbSA5jH2drwW/VaBWeqoFO28R6BwrTk
-         FpDeiD6tV3OGN8fYbSjIBuccovZ7Ovi4mTMAUeFAqVmdCnzEWn+ZluZ7iOGLMPcjK+zd
-         vc5SNGHZED3QTpVKbRp5XNKT7n2J3o7UgKUDcipI5RAxd/ELqrU3G7nKJ07H6a2t0gAu
-         kl+W1IBm2VdusVpAMjn6lJSThdg8L81fU4u7Szss5qXPuJnuLVakwmpNrKka1onzYzR1
-         l9Yg==
-X-Gm-Message-State: AOAM532/6H5oy2SIBeu9H5zE3Cly+O/i3ykPVMI9ff51u5wWwdmHq7z7
-        YBiycpXg1hpS9P+muVWjT/PiAxQJ3pY9
-X-Google-Smtp-Source: ABdhPJzGOI7bhhcVw1EL0ejePMf38jIvDPpMHXEsV6CYhN1qr08tJkuKcbW4oDjkqO5s6KHVj+u+uxOoKWKq
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=WiP9HgfFffnWMWhcvdLBuLUWs2FAICpYV6zjCSodstc=;
+        b=TDdGpDQmsQSky68o1Gy/c9G74SR1+LgVpOPDcXKK/MqbpiKn5B90icyZu157G6+l7M
+         fqfuFQHd+AkpHm+hAU292yKEFsAtFCtL4yE67Hyskrg4GIwLb10Ps9zEfCBhwipZfyZB
+         u3QxsQrO2beTkgpuCvOyePNt1wsdgJUq6ktQPU+ghAO96LjfQFk86LRQ8Lfug8q0O98V
+         VLV9EqxTSfr7eJQIC2vNn7ULhgUqZVISW5HN2cXEr/QjvbAyuT4XWw0nerIvBRtH7D4J
+         1Culj8gj21X5/oVQ5Kh1I4w2E6VCfKpmvrrpqGhEPXPxXDeMYJfgtzK7n9geytetzApU
+         CSuw==
+X-Gm-Message-State: AOAM530NxWLPl63yGUVre1CeKbHLe4z6uN+5N2woE6afdpi3cxDGj58D
+        TT1wdA6S1nrMbE3qlL068Rgdttkr3Y+m
+X-Google-Smtp-Source: ABdhPJxCFOFGuoTsOROSCJ1NTKokiUsMORo0yKzUHyO06VSofqt1ILBv+0YQgs0T5mNF+jmcqNxoJCGbjPnJ
 X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a25:a109:: with SMTP id
- z9mr9030673ybh.279.1629265155304; Tue, 17 Aug 2021 22:39:15 -0700 (PDT)
+ (user=mizhang job=sendgmr) by 2002:a5b:7c4:: with SMTP id t4mr9212584ybq.509.1629265156833;
+ Tue, 17 Aug 2021 22:39:16 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Wed, 18 Aug 2021 05:39:04 +0000
-Message-Id: <20210818053908.1907051-1-mizhang@google.com>
+Date:   Wed, 18 Aug 2021 05:39:05 +0000
+In-Reply-To: <20210818053908.1907051-1-mizhang@google.com>
+Message-Id: <20210818053908.1907051-2-mizhang@google.com>
 Mime-Version: 1.0
+References: <20210818053908.1907051-1-mizhang@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v2 0/4] clean up interface between KVM and psp
+Subject: [PATCH v2 1/4] KVM: SVM: fix missing sev_decommission in sev_receive_start
 From:   Mingwei Zhang <mizhang@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
@@ -80,28 +84,56 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch set starts from a minor fix patch by adding sev decommission;
-the rest 3 patches are trying to help make the interface between KVM and
-psp cleaner and simpler. In particular, these patches do the following
-improvements:
- - avoid the requirement of psp data structures for some psp APIs.
- - hide error handling within psp API, eg., using sev_guest_decommission.
- - hide the serialization requirement between DF_FLUSH and DEACTIVATE.
+sev_decommission is needed in the error path of sev_bind_asid. The purpose
+of this function is to clear the firmware context. Missing this step may
+cause subsequent SEV launch failures.
 
-v1 -> v2:
- - split the bug fixing patch as the 1st one.
- - fix the build error. [paolo]
+Although missing sev_decommission issue has previously been found and was
+fixed in sev_launch_start function. It is supposed to be fixed on all
+scenarios where a firmware context needs to be freed. According to the AMD
+SEV API v0.24 Section 1.3.3:
 
-Mingwei Zhang (3):
-  KVM: SVM: move sev_decommission to psp driver
-  KVM: SVM: move sev_bind_asid to psp
-  KVM: SVM: move sev_unbind_asid and DF_FLUSH logic into psp
+"The RECEIVE_START command is the only command other than the LAUNCH_START
+command that generates a new guest context and guest handle."
 
- arch/x86/kvm/svm/sev.c       | 69 ++++--------------------------------
- drivers/crypto/ccp/sev-dev.c | 57 +++++++++++++++++++++++++++--
- include/linux/psp-sev.h      | 44 ++++++++++++++++++++---
- 3 files changed, 102 insertions(+), 68 deletions(-)
+The above indicates that RECEIVE_START command also requires calling
+sev_decommission if ASID binding fails after RECEIVE_START succeeds.
 
---
+So add the sev_decommission function in sev_receive_start.
+
+Cc: Alper Gun <alpergun@google.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: David Rienjes <rientjes@google.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: John Allen <john.allen@amd.com>
+Cc: Peter Gonda <pgonda@google.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Vipin Sharma <vipinsh@google.com>
+
+Fixes: af43cbbf954b ("KVM: SVM: Add support for KVM_SEV_RECEIVE_START command")
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
+---
+ arch/x86/kvm/svm/sev.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 75e0b21ad07c..55d8b9c933c3 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1397,8 +1397,10 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ 	/* Bind ASID to this guest */
+ 	ret = sev_bind_asid(kvm, start.handle, error);
+-	if (ret)
++	if (ret) {
++		sev_decommission(start.handle);
+ 		goto e_free_session;
++	}
+ 
+ 	params.handle = start.handle;
+ 	if (copy_to_user((void __user *)(uintptr_t)argp->data,
+-- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
