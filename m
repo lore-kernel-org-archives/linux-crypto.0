@@ -2,198 +2,432 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F50C4338F
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 06:37:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1FD6C4320A
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 08:11:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7F3360EFE
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 06:37:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBECD60F58
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 08:11:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238550AbhHRGht (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:37:49 -0400
-Received: from smtp-relay-canonical-1.canonical.com ([185.125.188.121]:52452
-        "EHLO smtp-relay-canonical-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238395AbhHRGhr (ORCPT
+        id S240405AbhHRIMF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 18 Aug 2021 04:12:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45696 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240295AbhHRIMC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:37:47 -0400
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com [209.85.208.70])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPS id BA61E3FE71
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Aug 2021 06:37:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1629268632;
-        bh=PDa4Y8NlWc63JAE2k/U+xWg+/z+LRamng9vRqXzkmdA=;
-        h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-         In-Reply-To:Content-Type;
-        b=GTKD0bvz+E+2pVF/NUTjvZkfe0/QWMsZXaXZOrDT+j4kmjo7LsKE7IlLDMQnBcT6h
-         L6+rVMQvwXhXwi4PNoFqtORz4yyJmwElCH9hwkJte2pSuJGh46pghDwGmfwXIWS/AI
-         PWdvcna79GV+Y9LqtKVt6stUlvI3g+/oIYF5MpEw/+Gk+2poOXhpIbMpIltOmQnRcz
-         XQxH3q6AfSOHOJ3foShvd0ctue/J5S0RqylhDkdhhgF2EcBUBA1/y2lx/e8z+J3bg3
-         U1LCeq3UE/cT+cU46Jst5ZT1bdrdB/KMutie2MiBjz44oeXNkBZYvP5OQADFgG9HAq
-         8P47xJzXMIxbQ==
-Received: by mail-ed1-f70.google.com with SMTP id b25-20020a05640202d9b02903be7281a80cso527037edx.3
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Aug 2021 23:37:12 -0700 (PDT)
+        Wed, 18 Aug 2021 04:12:02 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5AEFC061292
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Aug 2021 01:11:23 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id qe12-20020a17090b4f8c00b00179321cbae7so1822369pjb.2
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Aug 2021 01:11:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=GpF0E/FgRi6qGX/LhpbMUwPUICr1VhVyZ7DJ8GUlvVk=;
+        b=WvNev3Oy64pO1VSwJ5tg1EH5fDsgG5exsqM7TIsClrkbN4NJq0UxJBeVt6CBoBXmNE
+         fdSHSypHujJ+KyDwq4QIBIkVE4ohdvyKTklOAT49I0mmqB5Fp6AqHcGioFE9Ks2KGsGr
+         LIYBqO3DsdO5DFjJDd2pcSj/qzz/3rKq6YRQo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PDa4Y8NlWc63JAE2k/U+xWg+/z+LRamng9vRqXzkmdA=;
-        b=AlHWpgwERO5tmGXuffAyJ19ZAYhbJ7kx9pTy95zjSaeBfzBvr1Da81ONgbTQLnPhwN
-         UVS+5512YvlhfFeIQrfWOx+aqdL4ydNf1GzUSpp9OyFD3iSa3rDhfa0ssPU5ZxERux2Q
-         RWsZPOUlfga00rObySFCFw+yhiN/Nv8SA04H4Wjy+tUHAVCQZ0IbAI3AdUYhoDb28G+4
-         eiARjVQcIjLUDfMd1WfjAYw0+R0+jirHKzVSqV82eaElxL3yL01RY2aa2t45TqT+Cx+H
-         0Dn7kE3I9o8XH342NSoNjqACG6483M2kp/FyDMrsmhjl+A6GQC5ghdpdJ3oxjnJR6yIn
-         9cNg==
-X-Gm-Message-State: AOAM533Pc6H9uiRR3Vy5F5UYFyYBUDYfPXU3n5mS4O28S2UvowORY7mm
-        37RIJ6dWRUWSanKGcjvJ/WipZCBkU8bXuolUdIqYXkLf9G2YrPWBqIKh513Qj99GDs9Wng6qjQi
-        Sym8VGT6Z9YOkqn8L0i84TsTMDQz2K9pI5NRxKBVm1Q==
-X-Received: by 2002:a05:6402:754:: with SMTP id p20mr8667970edy.356.1629268632267;
-        Tue, 17 Aug 2021 23:37:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxfg/SuyOcY+aciBZsxSSWL3QxT/qTGK2gv6mTxMsNgzYjn9QNyBuTRbPIgXG6+QZzg4sd8bg==
-X-Received: by 2002:a05:6402:754:: with SMTP id p20mr8667953edy.356.1629268632054;
-        Tue, 17 Aug 2021 23:37:12 -0700 (PDT)
-Received: from [192.168.8.102] ([86.32.42.198])
-        by smtp.gmail.com with ESMTPSA id gl2sm1571286ejb.110.2021.08.17.23.37.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Aug 2021 23:37:11 -0700 (PDT)
-Subject: Re: [PATCH 2/2] dt-bindings: rng: convert Samsung Exynos TRNG to
- dtschema
-To:     Lukasz Stelmach <l.stelmach@samsung.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=GpF0E/FgRi6qGX/LhpbMUwPUICr1VhVyZ7DJ8GUlvVk=;
+        b=Xlq8Jncm5HhggQSt/+qP+nsHMProgWPLIFBbp6OUFbDhZ7dHqg7/COLoxxsunp19Mk
+         WauZkwL8UO0pL7+Nh4QUmd0G492piX6ygcZXSgerDtrpeiOGTxCTSF3LNRhDNIX1Njdy
+         2OFTCFFC6JHxuOedB/RnGninuBpdBxyzYqgGFZGcsaKTUk65LVnmV2cSiAxIPjav+4LH
+         mRnKdVU6E7ebAHcbljOtyJ+BGv066l2XCnIq6SbFXqO+1PJfIa4W3bept/PaOq+2GQHr
+         zxzpAVyKVtW3bUH8JZXM1Y5+E2o3YQQhfTJKjUdcMrbGJfwLu3OFcAhLVM4uoqMDXA2+
+         AysA==
+X-Gm-Message-State: AOAM530g/38CTq8PnIWZ/oASaTm9d82hZPZw8wcudHd/m6qmpXvPCWP3
+        CLqqulsUfXZcyDvJdByk4uF2zw==
+X-Google-Smtp-Source: ABdhPJzA57q+7lV/BgTR8zE9bfaFWDujbp+9gxoVmizaVZbAfhx73JbpI6XIc+bce+b65qnBgrBFDQ==
+X-Received: by 2002:a17:902:d114:b029:12d:4202:655a with SMTP id w20-20020a170902d114b029012d4202655amr6377479plw.0.1629274283306;
+        Wed, 18 Aug 2021 01:11:23 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id c133sm5360276pfb.39.2021.08.18.01.11.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Aug 2021 01:11:21 -0700 (PDT)
+From:   Kees Cook <keescook@chromium.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Kees Cook <keescook@chromium.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ayush Sawal <ayush.sawal@chelsio.com>,
+        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
+        Rohit Maheshwari <rohitm@chelsio.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <da43d243-35b0-2cc6-f8a0-a5d02c997301@canonical.com>
- <CGME20210817221734eucas1p2e4a0aa41406137b90e49230371b92ac6@eucas1p2.samsung.com>
- <dleftjtujnemx7.fsf%l.stelmach@samsung.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-Message-ID: <1960d499-1509-ad42-94d3-f668501fb30b@canonical.com>
-Date:   Wed, 18 Aug 2021 08:37:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        "David S. Miller" <davem@davemloft.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Stanislaw Gruszka <stf_xl@wp.pl>,
+        Luca Coelho <luciano.coelho@intel.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Mordechay Goodstein <mordechay.goodstein@intel.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Arunachalam Santhanam <arunachalam.santhanam@in.bosch.com>,
+        Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+        Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+        linux-crypto@vger.kernel.org, ath10k@lists.infradead.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-can@vger.kernel.org,
+        bpf@vger.kernel.org, clang-built-linux@googlegroups.com,
+        linux-hardening@vger.kernel.org
+Subject: [PATCH 2/5] treewide: Replace open-coded flex arrays in unions
+Date:   Wed, 18 Aug 2021 01:11:15 -0700
+Message-Id: <20210818081118.1667663-3-keescook@chromium.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210818081118.1667663-1-keescook@chromium.org>
+References: <20210818081118.1667663-1-keescook@chromium.org>
 MIME-Version: 1.0
-In-Reply-To: <dleftjtujnemx7.fsf%l.stelmach@samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+X-Developer-Signature: v=1; a=openpgp-sha256; l=12062; h=from:subject; bh=0CCkznI664JYVvRMoE3qzwUtrImx1HNe0LKH8ibyfWs=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHMCkRUrXEgtkRNrsSMCJSduhfGiaBzyFF1NfkOz5 1sgSW+CJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRzApAAKCRCJcvTf3G3AJjS0D/ 0b1LwVuUqze95mS2bSnJ7AH4aPgzU1OO2ZMuzSJFdp54NANtgs8l78GnvlaKS2+1Ucg+9SQedab8yy euPrypenPhGxTSyPMT/BKLX4a7OIafCIZRczkVbcnJs512dcNHXVnwxS+53StYdCJ/utKT9M+ljmPc zSzT3rZfunCmfYjnj0CAZ89VQD43HOQwB7OXXxnsX/Aap/kJkCVs+2vZJEsuXVMD9q2tE/xxXAMpjQ YQY2aKPlJ22s20dcW5jeOlG2uK/ReD6K1+++LZVuzl4L6nd5RKa0BuxfPwr3eGMd4nrVQ5hZzaIOCy H4hhv6MgoNJlTIWKFx8fpsBFYgvzf5xLdi8AoGExlkbYlF4wux4PBJP5NHYYQx1+npbK4+8R42Au1I Q4tBLdisBCZYCoQC9/28MjZOEjQJIKes+scxMlO7PjqQez4p+Bc4zriVjRY6jabxsVBLZnCTcojjVN OzyO87Y9aOvuJf8omcP/8KGnNDzJ7acs5VKkD+fCrj+UEim0wgCof8IdtNtt/dBWEFCOPkCIwAzClV rPM9sLwD1J7Pkck/Q4oBpil6tAoTL2OJ28j4JrFP4tF6IWHCds9bLtt1tgzp+o8uyDjFVR3NvvRNpx ZQsS9C9S0z3P7LvltwiuKbf3UzDoltBxV4HvPDQRGG0MEziUOwhNtB7FxYPQ==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 18/08/2021 00:17, Lukasz Stelmach wrote:
-> It was <2021-08-17 wto 16:07>, when Krzysztof Kozlowski wrote:
->> On 17/08/2021 14:34, Lukasz Stelmach wrote:
->>> It was <2021-08-17 wto 12:05>, when Krzysztof Kozlowski wrote:
->>>> On 17/08/2021 11:55, Lukasz Stelmach wrote:
->>>>> It was <2021-08-11 śro 10:43>, when Krzysztof Kozlowski wrote:
->>>>>> Convert Samsung Exynos SoC True Random Number Generator bindings to DT
->>>>>> schema format using json-schema.
->>>>>>
->>>>>> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
->>>>>> ---
->>>>>>  .../bindings/rng/samsung,exynos5250-trng.txt  | 17 -------
->>>>>>  .../bindings/rng/samsung,exynos5250-trng.yaml | 44 +++++++++++++++++++
->>>>>>  MAINTAINERS                                   |  2 +-
->>>>>>  3 files changed, 45 insertions(+), 18 deletions(-)
->>>>>>  delete mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
->>>>>>  create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
->>>>>>
->>>>>> diff --git
->>>>>> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
->>>>>> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
->>>>>> deleted file mode 100644
->>>>>> index 5a613a4ec780..000000000000
->>>>>> --- a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
->>>>>> +++ /dev/null
->>>>>> @@ -1,17 +0,0 @@
->>>>>> -Exynos True Random Number Generator
->>>>>> -
->>>>>> -Required properties:
->>>>>> -
->>>>>> -- compatible  : Should be "samsung,exynos5250-trng".
->>>>>> -- reg         : Specifies base physical address and size of the registers map.
->>>>>> -- clocks      : Phandle to clock-controller plus clock-specifier pair.
->>>>>> -- clock-names : "secss" as a clock name.
->>>>>> -
->>>>>> -Example:
->>>>>> -
->>>>>> -	rng@10830600 {
->>>>>> -		compatible = "samsung,exynos5250-trng";
->>>>>> -		reg = <0x10830600 0x100>;
->>>>>> -		clocks = <&clock CLK_SSS>;
->>>>>> -		clock-names = "secss";
->>>>>> -	};
->>>>>> diff --git
->>>>>> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
->>>>>> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
->>>>>> new file mode 100644
->>>>>> index 000000000000..a50c34d5d199
->>>>>> --- /dev/null
->>>>>> +++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yaml
->>>>>> @@ -0,0 +1,44 @@
->>>>>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
->>>>>> +%YAML 1.2
->>>>>> +---
->>>>>> +$id:
->>>>>> https://protect2.fireeye.com/v1/url?k=f38ca35b-ac179a0d-f38d2814-0cc47a31ce52-1faa1ecb65482b8a&q=1&e=8b3490f9-a5fc-4da0-b2ee-7b0aec781403&u=http%3A%2F%2Fdevicetree.org%2Fschemas%2Frng%2Fsamsung%2Cexynos5250-trng.yaml%23
->>>>>> +$schema:
->>>>>> https://protect2.fireeye.com/v1/url?k=9409519d-cb9268cb-9408dad2-0cc47a31ce52-12394c4409905980&q=1&e=8b3490f9-a5fc-4da0-b2ee-7b0aec781403&u=http%3A%2F%2Fdevicetree.org%2Fmeta-schemas%2Fcore.yaml%23
->>>>>> +
->>>>>> +title: Samsung Exynos SoC True Random Number Generator
->>>>>> +
->>>>>> +maintainers:
->>>>>> +  - Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
->>>>>> +  - Łukasz Stelmach <l.stelmach@samsung.com>
->>>>>> +
->>>>>> +properties:
->>>>>> +  compatible:
->>>>>> +    const: samsung,exynos5250-trng
->>>>>> +
->>>>>> +  clocks:
->>>>>> +    maxItems: 1
->>>>>
->>>>> How about copying description from above into the description: property?
->>>>
->>>> But what to copy? There is no description except generic clock bindings.
->>>>
->>>
->>> The description that "was" in the txt file.
->>
->> But there was no description of fields except copy&paste of the core
->> schema. Do you describe C code like:
->>
->> ...
->> /* unsigned int is a integer number greater or equal 0 */
->> unsigned int i;
->> ...
-> 
-> I believe having descriptions for reg and clocks
-> 
->>>>>> -- reg         : Specifies base physical address and size of the registers map.
->>>>>> -- clocks      : Phandle to clock-controller plus clock-specifier pair.
-> 
-> right next to properties' formal definitions is beneficial for anyone
-> browsing the YAML file. If you think otherwise, oh well, I am fine with
-> that.
+In support of enabling -Warray-bounds and -Wzero-length-bounds and
+correctly handling run-time memcpy() bounds checking, replace all
+open-coded flexible arrays (i.e. 0-element arrays) in unions with the
+flex_array() helper macro.
 
-Useful descriptions would be beneficial. Descriptions which are copy of
-schema, therefore equal to explaining unsigned int, are not beneficial.
-Make the document just unnecessarily bigger, are irrelevant and hide
-actual important information. One of the principles is to keep things
-simple. Duplicating description from schema into specific bindings is
-rather the opposite of such approach.
+This fixes warnings such as:
 
+fs/hpfs/anode.c: In function 'hpfs_add_sector_to_btree':
+fs/hpfs/anode.c:209:27: warning: array subscript 0 is outside the bounds of an interior zero-length array 'struct bplus_internal_node[0]' [-Wzero-length-bounds]
+  209 |    anode->btree.u.internal[0].down = cpu_to_le32(a);
+      |    ~~~~~~~~~~~~~~~~~~~~~~~^~~
+In file included from fs/hpfs/hpfs_fn.h:26,
+                 from fs/hpfs/anode.c:10:
+fs/hpfs/hpfs.h:412:32: note: while referencing 'internal'
+  412 |     struct bplus_internal_node internal[0]; /* (internal) 2-word entries giving
+      |                                ^~~~~~~~
 
-Best regards,
-Krzysztof
+drivers/net/can/usb/etas_es58x/es58x_fd.c: In function 'es58x_fd_tx_can_msg':
+drivers/net/can/usb/etas_es58x/es58x_fd.c:360:35: warning: array subscript 65535 is outside the bounds of an interior zero-length array 'u8[0]' {aka 'unsigned char[]'} [-Wzero-length-bounds]
+  360 |  tx_can_msg = (typeof(tx_can_msg))&es58x_fd_urb_cmd->raw_msg[msg_len];
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from drivers/net/can/usb/etas_es58x/es58x_core.h:22,
+                 from drivers/net/can/usb/etas_es58x/es58x_fd.c:17:
+drivers/net/can/usb/etas_es58x/es58x_fd.h:231:6: note: while referencing 'raw_msg'
+  231 |   u8 raw_msg[0];
+      |      ^~~~~~~
+
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Ayush Sawal <ayush.sawal@chelsio.com>
+Cc: Vinay Kumar Yadav <vinay.yadav@chelsio.com>
+Cc: Rohit Maheshwari <rohitm@chelsio.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Kalle Valo <kvalo@codeaurora.org>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Stanislaw Gruszka <stf_xl@wp.pl>
+Cc: Luca Coelho <luciano.coelho@intel.com>
+Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Alexei Starovoitov <ast@kernel.org>
+Cc: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Andrii Nakryiko <andrii@kernel.org>
+Cc: Martin KaFai Lau <kafai@fb.com>
+Cc: Song Liu <songliubraving@fb.com>
+Cc: Yonghong Song <yhs@fb.com>
+Cc: John Fastabend <john.fastabend@gmail.com>
+Cc: KP Singh <kpsingh@kernel.org>
+Cc: Johannes Berg <johannes.berg@intel.com>
+Cc: Mordechay Goodstein <mordechay.goodstein@intel.com>
+Cc: Lee Jones <lee.jones@linaro.org>
+Cc: Wolfgang Grandegger <wg@grandegger.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Arunachalam Santhanam <arunachalam.santhanam@in.bosch.com>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>
+Cc: linux-crypto@vger.kernel.org
+Cc: ath10k@lists.infradead.org
+Cc: linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-scsi@vger.kernel.org
+Cc: linux-can@vger.kernel.org
+Cc: bpf@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ drivers/crypto/chelsio/chcr_crypto.h              | 14 +++++++++-----
+ drivers/net/can/usb/etas_es58x/es581_4.h          |  2 +-
+ drivers/net/can/usb/etas_es58x/es58x_fd.h         |  2 +-
+ drivers/net/wireless/ath/ath10k/htt.h             |  7 +++++--
+ drivers/net/wireless/intel/iwlegacy/commands.h    |  6 ++++--
+ drivers/net/wireless/intel/iwlwifi/dvm/commands.h |  6 ++++--
+ drivers/net/wireless/intel/iwlwifi/fw/api/tx.h    |  6 ++++--
+ drivers/scsi/aic94xx/aic94xx_sds.c                |  6 ++++--
+ fs/hpfs/hpfs.h                                    |  8 ++++----
+ include/linux/filter.h                            |  6 ++++--
+ include/scsi/sas.h                                | 12 ++++++++----
+ include/uapi/rdma/rdma_user_rxe.h                 |  6 ++++--
+ include/uapi/sound/asoc.h                         |  6 ++++--
+ 13 files changed, 56 insertions(+), 31 deletions(-)
+
+diff --git a/drivers/crypto/chelsio/chcr_crypto.h b/drivers/crypto/chelsio/chcr_crypto.h
+index e89f9e0094b4..1cadc231c6b0 100644
+--- a/drivers/crypto/chelsio/chcr_crypto.h
++++ b/drivers/crypto/chelsio/chcr_crypto.h
+@@ -222,8 +222,10 @@ struct chcr_authenc_ctx {
+ };
+ 
+ struct __aead_ctx {
+-	struct chcr_gcm_ctx gcm[0];
+-	struct chcr_authenc_ctx authenc[];
++	union {
++		flex_array(struct chcr_gcm_ctx gcm[]);
++		flex_array(struct chcr_authenc_ctx authenc[]);
++	};
+ };
+ 
+ struct chcr_aead_ctx {
+@@ -245,9 +247,11 @@ struct hmac_ctx {
+ };
+ 
+ struct __crypto_ctx {
+-	struct hmac_ctx hmacctx[0];
+-	struct ablk_ctx ablkctx[0];
+-	struct chcr_aead_ctx aeadctx[];
++	union {
++		flex_array(struct hmac_ctx hmacctx[]);
++		flex_array(struct ablk_ctx ablkctx[]);
++		flex_array(struct chcr_aead_ctx aeadctx[]);
++	};
+ };
+ 
+ struct chcr_context {
+diff --git a/drivers/net/can/usb/etas_es58x/es581_4.h b/drivers/net/can/usb/etas_es58x/es581_4.h
+index 4bc60a6df697..8657145dc2a9 100644
+--- a/drivers/net/can/usb/etas_es58x/es581_4.h
++++ b/drivers/net/can/usb/etas_es58x/es581_4.h
+@@ -192,7 +192,7 @@ struct es581_4_urb_cmd {
+ 		struct es581_4_rx_cmd_ret rx_cmd_ret;
+ 		__le64 timestamp;
+ 		u8 rx_cmd_ret_u8;
+-		u8 raw_msg[0];
++		flex_array(u8 raw_msg);
+ 	} __packed;
+ 
+ 	__le16 reserved_for_crc16_do_not_use;
+diff --git a/drivers/net/can/usb/etas_es58x/es58x_fd.h b/drivers/net/can/usb/etas_es58x/es58x_fd.h
+index ee18a87e40c0..3053e0958132 100644
+--- a/drivers/net/can/usb/etas_es58x/es58x_fd.h
++++ b/drivers/net/can/usb/etas_es58x/es58x_fd.h
+@@ -228,7 +228,7 @@ struct es58x_fd_urb_cmd {
+ 		struct es58x_fd_tx_ack_msg tx_ack_msg;
+ 		__le64 timestamp;
+ 		__le32 rx_cmd_ret_le32;
+-		u8 raw_msg[0];
++		flex_array(u8 raw_msg[]);
+ 	} __packed;
+ 
+ 	__le16 reserved_for_crc16_do_not_use;
+diff --git a/drivers/net/wireless/ath/ath10k/htt.h b/drivers/net/wireless/ath/ath10k/htt.h
+index ec689e3ce48a..c0729f882556 100644
+--- a/drivers/net/wireless/ath/ath10k/htt.h
++++ b/drivers/net/wireless/ath/ath10k/htt.h
+@@ -1674,8 +1674,11 @@ struct htt_tx_fetch_ind {
+ 	__le32 token;
+ 	__le16 num_resp_ids;
+ 	__le16 num_records;
+-	__le32 resp_ids[0]; /* ath10k_htt_get_tx_fetch_ind_resp_ids() */
+-	struct htt_tx_fetch_record records[];
++	union {
++		/* ath10k_htt_get_tx_fetch_ind_resp_ids() */
++		flex_array(__le32 resp_ids[]);
++		flex_array(struct htt_tx_fetch_record records[]);
++	};
+ } __packed;
+ 
+ static inline void *
+diff --git a/drivers/net/wireless/intel/iwlegacy/commands.h b/drivers/net/wireless/intel/iwlegacy/commands.h
+index 89c6671b32bc..ec0bc534c503 100644
+--- a/drivers/net/wireless/intel/iwlegacy/commands.h
++++ b/drivers/net/wireless/intel/iwlegacy/commands.h
+@@ -1408,8 +1408,10 @@ struct il3945_tx_cmd {
+ 	 * MAC header goes here, followed by 2 bytes padding if MAC header
+ 	 * length is 26 or 30 bytes, followed by payload data
+ 	 */
+-	u8 payload[0];
+-	struct ieee80211_hdr hdr[];
++	union {
++		flex_array(u8 payload[]);
++		flex_array(struct ieee80211_hdr hdr[]);
++	};
+ } __packed;
+ 
+ /*
+diff --git a/drivers/net/wireless/intel/iwlwifi/dvm/commands.h b/drivers/net/wireless/intel/iwlwifi/dvm/commands.h
+index 235c7a2e3483..efe205929a21 100644
+--- a/drivers/net/wireless/intel/iwlwifi/dvm/commands.h
++++ b/drivers/net/wireless/intel/iwlwifi/dvm/commands.h
+@@ -1251,8 +1251,10 @@ struct iwl_tx_cmd {
+ 	 * MAC header goes here, followed by 2 bytes padding if MAC header
+ 	 * length is 26 or 30 bytes, followed by payload data
+ 	 */
+-	u8 payload[0];
+-	struct ieee80211_hdr hdr[];
++	union {
++		flex_array(u8 payload[]);
++		flex_array(struct ieee80211_hdr hdr[]);
++	};
+ } __packed;
+ 
+ /*
+diff --git a/drivers/net/wireless/intel/iwlwifi/fw/api/tx.h b/drivers/net/wireless/intel/iwlwifi/fw/api/tx.h
+index 24e4a82a55da..d183f4856220 100644
+--- a/drivers/net/wireless/intel/iwlwifi/fw/api/tx.h
++++ b/drivers/net/wireless/intel/iwlwifi/fw/api/tx.h
+@@ -713,8 +713,10 @@ struct iwl_mvm_compressed_ba_notif {
+ 	__le32 tx_rate;
+ 	__le16 tfd_cnt;
+ 	__le16 ra_tid_cnt;
+-	struct iwl_mvm_compressed_ba_ratid ra_tid[0];
+-	struct iwl_mvm_compressed_ba_tfd tfd[];
++	union {
++		flex_array(struct iwl_mvm_compressed_ba_ratid ra_tid[]);
++		flex_array(struct iwl_mvm_compressed_ba_tfd tfd[]);
++	};
+ } __packed; /* COMPRESSED_BA_RES_API_S_VER_4 */
+ 
+ /**
+diff --git a/drivers/scsi/aic94xx/aic94xx_sds.c b/drivers/scsi/aic94xx/aic94xx_sds.c
+index 46815e65f7a4..ae20b855d449 100644
+--- a/drivers/scsi/aic94xx/aic94xx_sds.c
++++ b/drivers/scsi/aic94xx/aic94xx_sds.c
+@@ -517,8 +517,10 @@ struct asd_ms_conn_map {
+ 	u8    num_nodes;
+ 	u8    usage_model_id;
+ 	u32   _resvd;
+-	struct asd_ms_conn_desc conn_desc[0];
+-	struct asd_ms_node_desc node_desc[];
++	union {
++		flex_array(struct asd_ms_conn_desc conn_desc[]);
++		flex_array(struct asd_ms_node_desc node_desc[]);
++	};
+ } __attribute__ ((packed));
+ 
+ struct asd_ctrla_phy_entry {
+diff --git a/fs/hpfs/hpfs.h b/fs/hpfs/hpfs.h
+index d92c4af3e1b4..ee26c85d57a7 100644
+--- a/fs/hpfs/hpfs.h
++++ b/fs/hpfs/hpfs.h
+@@ -409,10 +409,10 @@ struct bplus_header
+   __le16 first_free;			/* offset from start of header to
+ 					   first free node in array */
+   union {
+-    struct bplus_internal_node internal[0]; /* (internal) 2-word entries giving
+-					       subtree pointers */
+-    struct bplus_leaf_node external[0];	    /* (external) 3-word entries giving
+-					       sector runs */
++	/* (internal) 2-word entries giving subtree pointers */
++	flex_array(struct bplus_internal_node internal[]);
++	/* (external) 3-word entries giving sector runs */
++	flex_array(struct bplus_leaf_node external[]);
+   } u;
+ };
+ 
+diff --git a/include/linux/filter.h b/include/linux/filter.h
+index 1797e8506929..6c41c03b791c 100644
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -588,8 +588,10 @@ struct bpf_prog {
+ 	struct bpf_prog_aux	*aux;		/* Auxiliary fields */
+ 	struct sock_fprog_kern	*orig_prog;	/* Original BPF program */
+ 	/* Instructions for interpreter */
+-	struct sock_filter	insns[0];
+-	struct bpf_insn		insnsi[];
++	union {
++		flex_array(struct sock_filter	insns[]);
++		flex_array(struct bpf_insn	insnsi[]);
++	};
+ };
+ 
+ struct sk_filter {
+diff --git a/include/scsi/sas.h b/include/scsi/sas.h
+index 4726c1bbec65..67c63a87602f 100644
+--- a/include/scsi/sas.h
++++ b/include/scsi/sas.h
+@@ -323,8 +323,10 @@ struct ssp_response_iu {
+ 	__be32 sense_data_len;
+ 	__be32 response_data_len;
+ 
+-	u8     resp_data[0];
+-	u8     sense_data[];
++	union {
++		flex_array(u8     resp_data[]);
++		flex_array(u8     sense_data[]);
++	};
+ } __attribute__ ((packed));
+ 
+ struct ssp_command_iu {
+@@ -554,8 +556,10 @@ struct ssp_response_iu {
+ 	__be32 sense_data_len;
+ 	__be32 response_data_len;
+ 
+-	u8     resp_data[0];
+-	u8     sense_data[];
++	union {
++		flex_array(u8     resp_data[]);
++		flex_array(u8     sense_data[]);
++	};
+ } __attribute__ ((packed));
+ 
+ struct ssp_command_iu {
+diff --git a/include/uapi/rdma/rdma_user_rxe.h b/include/uapi/rdma/rdma_user_rxe.h
+index e283c2220aba..fb63de88423b 100644
+--- a/include/uapi/rdma/rdma_user_rxe.h
++++ b/include/uapi/rdma/rdma_user_rxe.h
+@@ -141,8 +141,10 @@ struct rxe_dma_info {
+ 	__u32			sge_offset;
+ 	__u32			reserved;
+ 	union {
+-		__u8		inline_data[0];
+-		struct rxe_sge	sge[0];
++		__flex_array(__fa1,
++			     __u8 inline_data[]);
++		__flex_array(__fa2,
++			     struct rxe_sge sge[]);
+ 	};
+ };
+ 
+diff --git a/include/uapi/sound/asoc.h b/include/uapi/sound/asoc.h
+index da61398b1f8f..aa4e9dd94d29 100644
+--- a/include/uapi/sound/asoc.h
++++ b/include/uapi/sound/asoc.h
+@@ -240,8 +240,10 @@ struct snd_soc_tplg_vendor_array {
+ struct snd_soc_tplg_private {
+ 	__le32 size;	/* in bytes of private data */
+ 	union {
+-		char data[0];
+-		struct snd_soc_tplg_vendor_array array[0];
++		__flex_array(__fa1,
++			     char data[]);
++		__flex_array(__fa2,
++			     struct snd_soc_tplg_vendor_array array[]);
+ 	};
+ } __attribute__((packed));
+ 
+-- 
+2.30.2
+
