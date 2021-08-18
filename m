@@ -2,163 +2,308 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE02C4338F
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 12:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D78E7C4320E
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 14:46:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E75861075
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 12:33:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0649610E8
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Aug 2021 14:46:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235224AbhHRMeK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Aug 2021 08:34:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51326 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231476AbhHRMeK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Aug 2021 08:34:10 -0400
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D632C061764;
-        Wed, 18 Aug 2021 05:33:35 -0700 (PDT)
-Received: from localhost (83-245-197-237.elisa-laajakaista.fi [83.245.197.237])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: jarkko.sakkinen)
-        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id B21AA1B00238;
-        Wed, 18 Aug 2021 15:33:32 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-        t=1629290012;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cLVLGnLYbCvUxyjdE3YudMRN+BuWkjlytgtQCUVJ3/Q=;
-        b=PHeWSyMkmBjd/SVZ9EcBMZq42C8aGCQ2Ydgo5RF7HDcQ+Jdg1c6MOyT65HSXs7BdwWL5LK
-        ++RCbJpBMJbsyrWle8YjtTDsR8BybIB/2xtiEfgxv96ojpil9NYyEB5TCdU1f4Gi7qya/Z
-        l4YLaenIRmRKyZsdwiat37XpJEwG70YNN/hS3p5/yd9mAHe/S1cg82lMibiE+2SHUcfuOc
-        ehQtoMUxc++a1YlrJ3EVXggEEL5pT83hvKX47vsYXLNQvFwtpcIUAk1B+nZIwjlgvDr1mO
-        MF/mmYTjbf9w1vQbdOU6GVRaPNlmSCC4glxDbLxMAbpRl1IRgGqcGVNuwEbcIQ==
-Message-ID: <74aef8a2f2331358371a87931e632287dad9af59.camel@iki.fi>
-Subject: Re: PING: [PATCH] crypto: public_key: fix overflow during implicit
- conversion
-From:   Jarkko Sakkinen <jarkko.sakkinen@iki.fi>
-To:     zhenwei pi <pizhenwei@bytedance.com>, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 18 Aug 2021 15:33:32 +0300
-In-Reply-To: <4dcd4254-030b-4489-d5d3-e320eb2953e7@bytedance.com>
-References: <20210810063954.628244-1-pizhenwei@bytedance.com>
-         <4dcd4254-030b-4489-d5d3-e320eb2953e7@bytedance.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        id S238799AbhHROrP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 18 Aug 2021 10:47:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42946 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239504AbhHROrL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 18 Aug 2021 10:47:11 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C776C610E8;
+        Wed, 18 Aug 2021 14:46:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629297996;
+        bh=dnNq6pJOVqMIA97HptfxlkewvfMJcMfte5he5jYR9nE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=t9cQF9M/rznmq/IZpk1Caz2WuRKx0hHhNursqzQGAieboRfpQCzq4+RHwA9igD88Z
+         ffj8/JRjrotXD/QMJf+Zk6nLK+iITsbiAIWoM4K90d9H81L0OMuyz4Z8YLgSHN7dqB
+         071znGvWl/pnr2fdWmjr0L51e+h4AM7KsFW9/0Ck7+ZKBiFshtrMoz3yJioUFUl5IU
+         4CxvQZQrSYgv07TyAwoRBEbAd5CzwPMxKPl/YEXrRJ/ElEYEkNxDtD9nuuGr96yITZ
+         R22LjQ6ie14cExtBdUFRZLpeRfm4XHh3tQ8fiO6cxG16ozbSGqzjcX1Zn8cl/eiBcQ
+         EAbYyeUXWng2w==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH 1/2] fs/cifs: Incorporate obsolete MD4 crypto code
+Date:   Wed, 18 Aug 2021 16:46:16 +0200
+Message-Id: <20210818144617.110061-2-ardb@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20210818144617.110061-1-ardb@kernel.org>
+References: <20210818144617.110061-1-ardb@kernel.org>
 MIME-Version: 1.0
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=jarkko.sakkinen smtp.mailfrom=jarkko.sakkinen@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=lahtoruutu; t=1629290012;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cLVLGnLYbCvUxyjdE3YudMRN+BuWkjlytgtQCUVJ3/Q=;
-        b=grv2vkdR0EpG4OfPYubwO229q/DyJCWRDh9cd+OCjcn/ptveqhLWD9j+3zfY1lHXDrJ3/s
-        UtaZnSvllDpmEc+Olw+ppBm0IRClvyFIdtRZdL0+MMfF3ZvSyyMnuIQvrCPlJolm/t3O21
-        sXqQTfliki/yaFRL7xAIP7PVX79OEURmWTfU2539LEko1k/5/K1r/DMHbv1gXS8YwKDtYG
-        w7S5L7rg03SA7Ir3C+zQLfue0Sn9whIudy1nA3I5nsDgchURtl+Yr0wbKt5r0XsldgmZfW
-        2Xtba2OMuvVLg5Nj5e9PwmbZyLU5j530q5R4Tn6AuOHbgcu/+zqZd0auGHbJEQ==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1629290012; a=rsa-sha256;
-        cv=none;
-        b=F1EfquNjAXv5npQm9R1f9/7JjcJRWKpQaPwx2AKs1bbRHPsmBesk6ZaQeAAHLdYrCyhfiz
-        1QzC6Du0YPJnBQt2REbrE1QTg+cA9dpgGf0idgVQxXp8VD4//pHJVf8pSN/pkVZtV5OiuY
-        lZ2XoQxdsXROlLv+Ucllu03St5+0bko9PZ9GhxZhBF07kD84h/+VhyCeAP8Itnmag9x8ho
-        ywm3iMvMNmBNYpgKSHeaSTny+M3eNYA9WtAj5LL5yZ/b92SgSBNctNnDv7/ZyCrw+DP5fi
-        TpU/rmnIPfvm+k0RG79aDb9/z0EJgkO4JhIvNr1tb9KMY05gQu+uv9Ey5tVFiQ==
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2021-08-18 at 16:33 +0800, zhenwei pi wrote:
-> PING
+MD4 belongs in a museum, not in a modern OS kernel, but sadly, the
+CIFS code still relies on it, and so we have had to keep it around.
 
-Please, do not top-post.
+So let's move the MD4 implementation back into the CIFS code (where
+it used to reside up until 2003), so that we can drop it from the
+crypto API in a subsequent patch.
 
-You are lacking Herbert Xu:
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ fs/cifs/Kconfig      |   1 -
+ fs/cifs/cifsfs.c     |   1 -
+ fs/cifs/smbencrypt.c | 200 +++++++++++++++++---
+ 3 files changed, 177 insertions(+), 25 deletions(-)
 
-$ scripts/get_maintainer.pl crypto/asymmetric_keys/public_key.c=20
-David Howells <dhowells@redhat.com> (maintainer:ASYMMETRIC KEYS)
-Herbert Xu <herbert@gondor.apana.org.au> (maintainer:CRYPTO API)
-"David S. Miller" <davem@davemloft.net> (maintainer:CRYPTO API)
-keyrings@vger.kernel.org (open list:ASYMMETRIC KEYS)
-linux-crypto@vger.kernel.org (open list:CRYPTO API)
-linux-kernel@vger.kernel.org (open list)
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index 7364950a9ef4..748f4dd3466c 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -4,7 +4,6 @@ config CIFS
+ 	depends on INET
+ 	select NLS
+ 	select CRYPTO
+-	select CRYPTO_MD4
+ 	select CRYPTO_MD5
+ 	select CRYPTO_SHA256
+ 	select CRYPTO_SHA512
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 64b71c4e2a9d..06ce13d274f8 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1755,7 +1755,6 @@ MODULE_DESCRIPTION
+ MODULE_VERSION(CIFS_VERSION);
+ MODULE_SOFTDEP("ecb");
+ MODULE_SOFTDEP("hmac");
+-MODULE_SOFTDEP("md4");
+ MODULE_SOFTDEP("md5");
+ MODULE_SOFTDEP("nls");
+ MODULE_SOFTDEP("aes");
+diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
+index 39a938443e3e..77f720dca86f 100644
+--- a/fs/cifs/smbencrypt.c
++++ b/fs/cifs/smbencrypt.c
+@@ -38,6 +38,177 @@
+ #define SSVALX(buf,pos,val) (CVAL(buf,pos)=(val)&0xFF,CVAL(buf,pos+1)=(val)>>8)
+ #define SSVAL(buf,pos,val) SSVALX((buf),(pos),((__u16)(val)))
+ 
++#define MD4_DIGEST_SIZE		16
++#define MD4_HMAC_BLOCK_SIZE	64
++#define MD4_BLOCK_WORDS		16
++#define MD4_HASH_WORDS		4
++
++struct md4_ctx {
++	u32 hash[MD4_HASH_WORDS];
++	u32 block[MD4_BLOCK_WORDS];
++	u64 byte_count;
++};
++
++static inline u32 lshift(u32 x, unsigned int s)
++{
++	x &= 0xFFFFFFFF;
++	return ((x << s) & 0xFFFFFFFF) | (x >> (32 - s));
++}
++
++static inline u32 F(u32 x, u32 y, u32 z)
++{
++	return (x & y) | ((~x) & z);
++}
++
++static inline u32 G(u32 x, u32 y, u32 z)
++{
++	return (x & y) | (x & z) | (y & z);
++}
++
++static inline u32 H(u32 x, u32 y, u32 z)
++{
++	return x ^ y ^ z;
++}
++
++#define ROUND1(a,b,c,d,k,s) (a = lshift(a + F(b,c,d) + k, s))
++#define ROUND2(a,b,c,d,k,s) (a = lshift(a + G(b,c,d) + k + (u32)0x5A827999,s))
++#define ROUND3(a,b,c,d,k,s) (a = lshift(a + H(b,c,d) + k + (u32)0x6ED9EBA1,s))
++
++static void md4_transform(u32 *hash, u32 const *in)
++{
++	u32 a, b, c, d;
++
++	a = hash[0];
++	b = hash[1];
++	c = hash[2];
++	d = hash[3];
++
++	ROUND1(a, b, c, d, in[0], 3);
++	ROUND1(d, a, b, c, in[1], 7);
++	ROUND1(c, d, a, b, in[2], 11);
++	ROUND1(b, c, d, a, in[3], 19);
++	ROUND1(a, b, c, d, in[4], 3);
++	ROUND1(d, a, b, c, in[5], 7);
++	ROUND1(c, d, a, b, in[6], 11);
++	ROUND1(b, c, d, a, in[7], 19);
++	ROUND1(a, b, c, d, in[8], 3);
++	ROUND1(d, a, b, c, in[9], 7);
++	ROUND1(c, d, a, b, in[10], 11);
++	ROUND1(b, c, d, a, in[11], 19);
++	ROUND1(a, b, c, d, in[12], 3);
++	ROUND1(d, a, b, c, in[13], 7);
++	ROUND1(c, d, a, b, in[14], 11);
++	ROUND1(b, c, d, a, in[15], 19);
++
++	ROUND2(a, b, c, d,in[ 0], 3);
++	ROUND2(d, a, b, c, in[4], 5);
++	ROUND2(c, d, a, b, in[8], 9);
++	ROUND2(b, c, d, a, in[12], 13);
++	ROUND2(a, b, c, d, in[1], 3);
++	ROUND2(d, a, b, c, in[5], 5);
++	ROUND2(c, d, a, b, in[9], 9);
++	ROUND2(b, c, d, a, in[13], 13);
++	ROUND2(a, b, c, d, in[2], 3);
++	ROUND2(d, a, b, c, in[6], 5);
++	ROUND2(c, d, a, b, in[10], 9);
++	ROUND2(b, c, d, a, in[14], 13);
++	ROUND2(a, b, c, d, in[3], 3);
++	ROUND2(d, a, b, c, in[7], 5);
++	ROUND2(c, d, a, b, in[11], 9);
++	ROUND2(b, c, d, a, in[15], 13);
++
++	ROUND3(a, b, c, d,in[ 0], 3);
++	ROUND3(d, a, b, c, in[8], 9);
++	ROUND3(c, d, a, b, in[4], 11);
++	ROUND3(b, c, d, a, in[12], 15);
++	ROUND3(a, b, c, d, in[2], 3);
++	ROUND3(d, a, b, c, in[10], 9);
++	ROUND3(c, d, a, b, in[6], 11);
++	ROUND3(b, c, d, a, in[14], 15);
++	ROUND3(a, b, c, d, in[1], 3);
++	ROUND3(d, a, b, c, in[9], 9);
++	ROUND3(c, d, a, b, in[5], 11);
++	ROUND3(b, c, d, a, in[13], 15);
++	ROUND3(a, b, c, d, in[3], 3);
++	ROUND3(d, a, b, c, in[11], 9);
++	ROUND3(c, d, a, b, in[7], 11);
++	ROUND3(b, c, d, a, in[15], 15);
++
++	hash[0] += a;
++	hash[1] += b;
++	hash[2] += c;
++	hash[3] += d;
++}
++
++static inline void md4_transform_helper(struct md4_ctx *ctx)
++{
++	le32_to_cpu_array(ctx->block, ARRAY_SIZE(ctx->block));
++	md4_transform(ctx->hash, ctx->block);
++}
++
++static void md4_init(struct md4_ctx *mctx)
++{
++	mctx->hash[0] = 0x67452301;
++	mctx->hash[1] = 0xefcdab89;
++	mctx->hash[2] = 0x98badcfe;
++	mctx->hash[3] = 0x10325476;
++	mctx->byte_count = 0;
++}
++
++static void md4_update(struct md4_ctx *mctx, const u8 *data, unsigned int len)
++{
++	const u32 avail = sizeof(mctx->block) - (mctx->byte_count & 0x3f);
++
++	mctx->byte_count += len;
++
++	if (avail > len) {
++		memcpy((char *)mctx->block + (sizeof(mctx->block) - avail),
++		       data, len);
++		return;
++	}
++
++	memcpy((char *)mctx->block + (sizeof(mctx->block) - avail),
++	       data, avail);
++
++	md4_transform_helper(mctx);
++	data += avail;
++	len -= avail;
++
++	while (len >= sizeof(mctx->block)) {
++		memcpy(mctx->block, data, sizeof(mctx->block));
++		md4_transform_helper(mctx);
++		data += sizeof(mctx->block);
++		len -= sizeof(mctx->block);
++	}
++
++	memcpy(mctx->block, data, len);
++}
++
++static void md4_final(struct md4_ctx *mctx, u8 *out)
++{
++	const unsigned int offset = mctx->byte_count & 0x3f;
++	char *p = (char *)mctx->block + offset;
++	int padding = 56 - (offset + 1);
++
++	*p++ = 0x80;
++	if (padding < 0) {
++		memset(p, 0x00, padding + sizeof (u64));
++		md4_transform_helper(mctx);
++		p = (char *)mctx->block;
++		padding = 56;
++	}
++
++	memset(p, 0, padding);
++	mctx->block[14] = mctx->byte_count << 3;
++	mctx->block[15] = mctx->byte_count >> 29;
++	le32_to_cpu_array(mctx->block, (sizeof(mctx->block) -
++	                  sizeof(u64)) / sizeof(u32));
++	md4_transform(mctx->hash, mctx->block);
++	cpu_to_le32_array(mctx->hash, ARRAY_SIZE(mctx->hash));
++	memcpy(out, mctx->hash, sizeof(mctx->hash));
++	memset(mctx, 0, sizeof(*mctx));
++}
++
+ static void
+ str_to_key(unsigned char *str, unsigned char *key)
+ {
+@@ -108,31 +279,14 @@ E_P24(unsigned char *p21, const unsigned char *c8, unsigned char *p24)
+ int
+ mdfour(unsigned char *md4_hash, unsigned char *link_str, int link_len)
+ {
+-	int rc;
+-	struct crypto_shash *md4 = NULL;
+-	struct sdesc *sdescmd4 = NULL;
++	struct md4_ctx md4;
+ 
+-	rc = cifs_alloc_hash("md4", &md4, &sdescmd4);
+-	if (rc)
+-		goto mdfour_err;
+-
+-	rc = crypto_shash_init(&sdescmd4->shash);
+-	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not init md4 shash\n", __func__);
+-		goto mdfour_err;
+-	}
+-	rc = crypto_shash_update(&sdescmd4->shash, link_str, link_len);
+-	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not update with link_str\n", __func__);
+-		goto mdfour_err;
+-	}
+-	rc = crypto_shash_final(&sdescmd4->shash, md4_hash);
+-	if (rc)
+-		cifs_dbg(VFS, "%s: Could not generate md4 hash\n", __func__);
++	md4_init(&md4);
++	md4_update(&md4, link_str, link_len);
++	md4_final(&md4, md4_hash);
+ 
+-mdfour_err:
+-	cifs_free_hash(&md4, &sdescmd4);
+-	return rc;
++	memzero_explicit(&md4, sizeof(md4));
++	return 0;
+ }
+ 
+ /*
+-- 
+2.20.1
 
-> On 8/10/21 2:39 PM, zhenwei pi wrote:
-> > Hit kernel warning like this, it can be reproduced by verifying 256
-> > bytes datafile by keyctl command.
-> >=20
-> >   WARNING: CPU: 5 PID: 344556 at crypto/rsa-pkcs1pad.c:540
-> > pkcs1pad_verify+0x160/0x190
-> >   ...
-> >   Call Trace:
-> >    public_key_verify_signature+0x282/0x380
-> >    ? software_key_query+0x12d/0x180
-> >    ? keyctl_pkey_params_get+0xd6/0x130
-> >    asymmetric_key_verify_signature+0x66/0x80
-> >    keyctl_pkey_verify+0xa5/0x100
-> >    do_syscall_64+0x35/0xb0
-> >    entry_SYSCALL_64_after_hwframe+0x44/0xae
-> >=20
-> > '.digest_size(u8) =3D params->in_len(u32)' leads overflow of an u8
-
-Where is this statement?
-
-> > value,
-> > so use u32 instead of u8 of digest. And reorder struct
-> > public_key_signature, it could save 8 bytes on a 64 bit machine.
-                                                     ~~~~~
-                                                     64-bit
-                                                    =20
-What do you mean by "could"? Does it, or does it
-not?                                                                  =20
-                                       				=09
-	  							=09
-								=09
-	=09
-
-> >=20
-> > Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
-
-Nit: "Firstname Lastname" (first letters capitalized)
-
-> > ---
-> >   include/crypto/public_key.h | 4 ++--
-> >   1 file changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/include/crypto/public_key.h
-> > b/include/crypto/public_key.h
-> > index 47accec68cb0..f603325c0c30 100644
-> > --- a/include/crypto/public_key.h
-> > +++ b/include/crypto/public_key.h
-> > @@ -38,9 +38,9 @@ extern void public_key_free(struct public_key
-> > *key);
-> >   struct public_key_signature {
-> >   	struct asymmetric_key_id *auth_ids[2];
-> >   	u8 *s;			/* Signature */
-> > -	u32 s_size;		/* Number of bytes in signature */
-> >   	u8 *digest;
-> > -	u8 digest_size;		/* Number of bytes in digest */
-> > +	u32 s_size;		/* Number of bytes in signature */
-> > +	u32 digest_size;	/* Number of bytes in digest */
-> >   	const char *pkey_algo;
-> >   	const char *hash_algo;
-> >   	const char *encoding;
-> >=20
-
-/Jarkko
