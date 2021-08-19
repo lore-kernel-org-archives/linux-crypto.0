@@ -2,114 +2,175 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C759C432BE
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 17:09:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7850BC432BE
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 17:10:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B23561053
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 17:09:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F3A1601FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 17:10:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230092AbhHSRJq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Aug 2021 13:09:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53224 "EHLO
+        id S231336AbhHSRLJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Aug 2021 13:11:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229659AbhHSRJp (ORCPT
+        with ESMTP id S230459AbhHSRLI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Aug 2021 13:09:45 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78E1DC061575;
-        Thu, 19 Aug 2021 10:09:09 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0f6a00894cffc8901d9ad3.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:6a00:894c:ffc8:901d:9ad3])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F092D1EC04F3;
-        Thu, 19 Aug 2021 19:09:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629392943;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=5h/pBCa48TpXaDC5k6IrIdMKol2hS7fNRvaR9js1Y0w=;
-        b=Y+o2JyP4Tg1O4OSMYH/GIP8+RzcS0qjXj/JucPGugTCf3iMvd2TXwRWBSklMZvSnsBBjzn
-        fr3Y7u61lMY10cqPUfxz1UkhK57dEAyb8NrVtZid6qA8GMlZphUUqzbVVrsR6nRZEgXn0p
-        Zwnk5rkTl3zqeU7wg2G67ypkiAml6Zw=
-Date:   Thu, 19 Aug 2021 19:09:42 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 24/36] x86/compressed/acpi: move EFI config
- table access to common code
-Message-ID: <YR6QVh3qZUxqsyI+@zn.tnic>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-25-brijesh.singh@amd.com>
- <YR42323cUxsbQo5h@zn.tnic>
- <20210819145831.42uszc4lcsffebzu@amd.com>
+        Thu, 19 Aug 2021 13:11:08 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA92CC061575;
+        Thu, 19 Aug 2021 10:10:31 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id z2so14499901lft.1;
+        Thu, 19 Aug 2021 10:10:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Rt9r8foKOvZ5SSHXtY6wyrnjmVskOSD8TkF1Gg1rNU0=;
+        b=gAJy411CGDX+HFRkV9Ei2t/kwmWFWaHD+xZTKJozq8ZgAhoy9r205hC0gn6uaPmctx
+         X19n6w9YjwM7ZKcADbpS/4PvFoNhAucsZ76nk6gC5snqN2+Q7BOiFnXcrve9Cb74uU8z
+         8hbwgxkpc9ynXrMD+UYpyp/NF0V1K3cEYrBorYLpZlvS4dhWAYMc8giIwTdgBA/jLXFy
+         U4D0DqJddetkAEEA0RajHL++S77wp8fIvwBRlrQTT8LhDL7UCGvIv98cYmg6YuMoOtQE
+         SqnLM2zp2kPm2VcFcm4eeB6bP8X0DmJNziyg0eOFQNu9u+1iuqPMS89LIf3hQsK4ph2o
+         c2aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Rt9r8foKOvZ5SSHXtY6wyrnjmVskOSD8TkF1Gg1rNU0=;
+        b=PojjqovzE8/PUds5gVRoXbQT/c+i0SIqJYVVJOG+Es2Ra2zi5Y9+JPrXTcpqVZa+NZ
+         2o3VMFtELlsODfg88ezdYNxNGji7mxmc0cVzZegDqkeY1DskT3YPG3L5W3V/Tx1ddp4l
+         s8LEgKGZeIPf4X3bGUyAVfCFO5l0FWb1m4/kKvBwDuc9Ow0/uOFBckMjVFREV+V0BFH+
+         u+RO/TjrGGJmfKb4N2hB4nY8LOQlpy/+qTGCtTgAr5FPdQuFlecbGk4mlt8SeznaqPeG
+         eS13TdG2/xVCP6fFN612c5zfaK9NiVWglCmSis50PT6b8HDh2Ld56L1MZsBjhw7NjAYG
+         Vhzg==
+X-Gm-Message-State: AOAM533u4hGqtN051z5niyffs2APet22XRnLhxPEDM+D91oBWmx1ScFd
+        qTdeM8dO/Ovtoj6pB3b3j0/nSBXyamgMVRnODm8=
+X-Google-Smtp-Source: ABdhPJwRmM2SdGcXYA+7pfMJAJ60TZ/eAP/4ZABuOl1fhOc+0mAmvPCgSh8qEW2NeVclfDYVIO8LwcvPMtgsVZZfzps=
+X-Received: by 2002:a19:c796:: with SMTP id x144mr11188920lff.395.1629393030147;
+ Thu, 19 Aug 2021 10:10:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210819145831.42uszc4lcsffebzu@amd.com>
+References: <20210818144617.110061-1-ardb@kernel.org> <946591db-36aa-23db-a5c4-808546eab762@gmail.com>
+ <CAMj1kXEjHojAZ0_DPkogHAbmS6XAOFN3t8-4VB0+zN8ruTPVCg@mail.gmail.com> <1cbfe2bbb46ab48bf6dddee9a15a7c04c99db8f7.camel@kernel.org>
+In-Reply-To: <1cbfe2bbb46ab48bf6dddee9a15a7c04c99db8f7.camel@kernel.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 19 Aug 2021 12:10:19 -0500
+Message-ID: <CAH2r5mv59hrujeJzReUsYtGkTQ7VH01L7FKH5rUpdmJW92HHCA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] crypto: remove MD4 generic shash
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Denis Kenzior <denkenz@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Andrew Bartlett <abartlet@samba.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 19, 2021 at 09:58:31AM -0500, Michael Roth wrote:
-> Not sure what you mean here. All the interfaces introduced here are used
-> by acpi.c. There is another helper added later (efi_bp_find_vendor_table())
-> in "enable SEV-SNP-validated CPUID in #VC handler", since it's not used
-> here by acpi.c.
+On Thu, Aug 19, 2021 at 5:42 AM Jarkko Sakkinen <jarkko@kernel.org> wrote:
+>
+> On Wed, 2021-08-18 at 18:10 +0200, Ard Biesheuvel wrote:
+> > On Wed, 18 Aug 2021 at 16:51, Denis Kenzior <denkenz@gmail.com>
+> > wrote:
+> > > Hi Ard,
+> > >
+> > > On 8/18/21 9:46 AM, Ard Biesheuvel wrote:
+> > > > As discussed on the list [0], MD4 is still being relied upon by
+> > > > the CIFS
+> > > > driver, even though successful attacks on MD4 are as old as Linux
+> > > > itself.
+> > > >
+> > > > So let's move the code into the CIFS driver, and remove it from
+> > > > the
+> > > > crypto API so that it is no longer exposed to other subsystems or
+> > > > to
+> > > > user space via AF_ALG.
+> > > >
+> > >
+> > > Can we please stop removing algorithms from AF_ALG?
+> >
+> > I don't think we can, to be honest. We need to have a deprecation
+> > path
+> > for obsolete and insecure algorithms: the alternative is to keep
+> > supporting a long tail of broken crypto indefinitely.
+>
+> I think you are ignoring the fact that by doing that you might be
+> removing a migration path to more secure algorithms, for some legacy
+> systems.
+>
+> I.e. in some cases this might mean sticking to insecure algorithm *and*
+> old kernel for unnecessary long amount of time because migration is
+> more costly.
+>
+> Perhaps there could be a comman-line parameter or similar to enable
+> legacy crypto?
 
-Maybe I got confused by the amount of changes in a single patch. I'll
-try harder with your v5. :)
+There are.   For example less secure NTLMv1 is disabled in the build.
+On the command line "sec=krb5" will use kerberos, and we can move that
+to be the default,
+or at least autonegotiate it, but will require some minor changes to
+cifs-utils to detect if
+plausible Kerberos ticket is available for this mount before
+requesting krb5 automatically.
 
-> There is the aforementioned efi_bp_find_vendor_table() that does the
-> simple iteration, but I wasn't sure how to build the "find one of these,
-> but this one is preferred" logic into it in a reasonable way.
+But ... we already have parameters to disable SMB1, and in fact if you
+mount with
+"mount -t smb3 ..." we won't let you use SMB1 or SMB2 so we get the
+security advantages
+of preventing man-in-the-middle attacks during negotiation and encryption etc.
+In addition, SMB1 can be disabled completely by simply doing
 
-Instead of efi_foreach_conf_entry() you simply do a bog-down simple
-loop and each time you stop at a table, you examine it and overwrite
-pointers, if you've found something better.
+"echo 1  > /sys/module/cifs/parameters/disable_legacy_dialects"
 
-With "overwrite pointers" I mean you cache the pointers to those conf
-tables you iterate over and dig out so that you don't have to do it a
-second time. That is, *if* you need them a second time. I believe you
-call at least efi_bp_get_conf_table() twice... you get the idea.
+but even without that, to mount insecurely with SMB1 requires
+specifying it (vers=1.0) on the command line.
 
-> I could just call it once for each of these GUIDs though. I was
-> hesitant to do so since it's less efficient than existing code, but if
-> it's worth it for the simplification then I'm all for it.
+In addition requiring the strongest encryption can be set by
 
-Yeah, this is executed once during boot so I don't think you can make it
-more efficient than a single iteration over the config table blobs.
+"echo 1 > /sys/module/parameters/cifs/require_gcm_256"
 
-I hope that makes more sense.
 
--- 
-Regards/Gruss,
-    Boris.
+Although moving to a peer to peer auth solution better than NTLMSSP is
+something important to do ASAP
+(we should follow up e.g. on making sure we work with the "peer to
+peer Kerberos" (which is used by Apple
+for this purpose) see e.g.
+https://discussions-cn-prz.apple.com/en/thread/252949265)
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Andrew Bartlett's note explains the bigger picture well:
+
+"I would echo that, and also just remind folks that MD4 in NTLMSSP is
+used as a compression only, it has no security value.  The security
+would be the same if the password was compressed with MD4, SHA1 or
+SHA256 - the security comes from the complexity of the password and the
+HMAC-MD5 rounds inside NTLMv2.
+
+I'll also mention the use of MD4, which is used to re-encrypt a short-
+term key with the long-term key out of the NTLMv2 scheme.  This
+thankfully is an unchecksumed simple RC4 round of one random value with
+another, so not subject to known-plaintext attacks here. I know neither
+MD4 nor HMAC-MD5 is not flavour of the month any more,
+with good reason, but we would not want to go with way of NFSv4 which
+is, as I understand it, full Kerberos or bust (so folks choose no
+protection)."
+
+"Thankfully only the HMAC-MD5 step in what you mention is
+cryptographically significant, the rest are just very lossy compression
+algorithms."
+
+
+
+--
+Thanks,
+
+Steve
