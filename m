@@ -2,107 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB72C43214
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 10:07:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFFFC4320A
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 10:35:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9059661139
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 10:07:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7491860F39
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 10:35:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238005AbhHSKIA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Aug 2021 06:08:00 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:39222 "EHLO mail.skyhub.de"
+        id S237770AbhHSKgb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Aug 2021 06:36:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50220 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237746AbhHSKH7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Aug 2021 06:07:59 -0400
-Received: from zn.tnic (p200300ec2f0f6a00d82486aa7bad8753.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:6a00:d824:86aa:7bad:8753])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2673C1EC046C;
-        Thu, 19 Aug 2021 12:07:18 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629367638;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=sk5ZD+uyIjjDf0+aatLf0S7xfivyYV6bPrM1F6VipEk=;
-        b=Y6FVeyAYXMeHPizyC5o6zJzLiuV/IhxAjDLo6FCKzcMLEDjVwawaEoZEfI1d09NV3g86Gb
-        /OHjrCMIO3pHa/Hz0SpocJgGnMVprSJh/GXv8fp4B/pnD1yoxoo989RTjkJxcEffrshvM/
-        o18P6GSHp4ATumKPb7v6v2tacColPgw=
-Date:   Thu, 19 Aug 2021 12:07:56 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 23/36] KVM: x86: move lookup of indexed
- CPUID leafs to helper
-Message-ID: <YR4tfIp+wjlaZNI/@zn.tnic>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-24-brijesh.singh@amd.com>
+        id S236149AbhHSKgb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Aug 2021 06:36:31 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A9B516113C;
+        Thu, 19 Aug 2021 10:35:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629369355;
+        bh=0gYRryj8WcD05dNv3C5iWMMOAQxCqY5AJZQHDbt70CM=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=sU+wf523Fhx9pa4dA9UUzGeQLvn1NmWrexhEeM+W79+r6bFT4h08kDualdcJX/cR/
+         KKdvTP0AE3jyDYU0voFEsFLa1xtF+vulKLMh/r+ider7dC707giPUjGbtQC66Oqo7Q
+         PlKT205Fb99WfNYfiMO15yG7Euc+Vz9Xo5Gq6XPw88UXbx5HPcJ4kvxfNbrn8GY9lx
+         j93Z5yAwclYd4D3mtXXrhdknB3+2wRPJroWDt3U8jQ4S2lmJXcDIpQZ5oRRrtI4nSO
+         up0w/GlPyjErtJW6to2SKVObs6aRzEaPfCPLCg9jwNtK4FVz6Y751YPYCs0/WVyPEA
+         Au4J9yVOa13Zg==
+Message-ID: <6db55147350d81ed205d37031d81b03b80f639cc.camel@kernel.org>
+Subject: Re: Re: PING: [PATCH] crypto: public_key: fix overflow during
+ implicit conversion
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     zhenwei pi <pizhenwei@bytedance.com>, dhowells@redhat.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Thu, 19 Aug 2021 13:35:52 +0300
+In-Reply-To: <8bf3a04d-f1a7-cd8c-5c5a-ace3de500b2f@bytedance.com>
+References: <20210810063954.628244-1-pizhenwei@bytedance.com>
+         <4dcd4254-030b-4489-d5d3-e320eb2953e7@bytedance.com>
+         <74aef8a2f2331358371a87931e632287dad9af59.camel@iki.fi>
+         <8bf3a04d-f1a7-cd8c-5c5a-ace3de500b2f@bytedance.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210707181506.30489-24-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 07, 2021 at 01:14:53PM -0500, Brijesh Singh wrote:
-> From: Michael Roth <michael.roth@amd.com>
-> 
-> Determining which CPUID leafs have significant ECX/index values is
-> also needed by guest kernel code when doing SEV-SNP-validated CPUID
-> lookups. Move this to common code to keep future updates in sync.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/cpuid-indexed.h | 26 ++++++++++++++++++++++++++
->  arch/x86/kvm/cpuid.c                 | 17 ++---------------
->  2 files changed, 28 insertions(+), 15 deletions(-)
->  create mode 100644 arch/x86/include/asm/cpuid-indexed.h
-> 
-> diff --git a/arch/x86/include/asm/cpuid-indexed.h b/arch/x86/include/asm/cpuid-indexed.h
-> new file mode 100644
-> index 000000000000..f5ab746f5712
-> --- /dev/null
-> +++ b/arch/x86/include/asm/cpuid-indexed.h
+On Thu, 2021-08-19 at 10:03 +0800, zhenwei pi wrote:
+> On 8/18/21 8:33 PM, Jarkko Sakkinen wrote:
+> > On Wed, 2021-08-18 at 16:33 +0800, zhenwei pi wrote:
+> > > PING
+> >=20
+> > Please, do not top-post.
+> >=20
+> > You are lacking Herbert Xu:
+> >=20
+> > $ scripts/get_maintainer.pl crypto/asymmetric_keys/public_key.c
+> > David Howells <dhowells@redhat.com> (maintainer:ASYMMETRIC KEYS)
+> > Herbert Xu <herbert@gondor.apana.org.au> (maintainer:CRYPTO API)
+> > "David S. Miller" <davem@davemloft.net> (maintainer:CRYPTO API)
+> > keyrings@vger.kernel.org (open list:ASYMMETRIC KEYS)
+> > linux-crypto@vger.kernel.org (open list:CRYPTO API)
+> > linux-kernel@vger.kernel.org (open list)
+> >=20
+> > > On 8/10/21 2:39 PM, zhenwei pi wrote:
+> > > > Hit kernel warning like this, it can be reproduced by verifying
+> > > > 256
+> > > > bytes datafile by keyctl command.
+> > > >=20
+> > > >    WARNING: CPU: 5 PID: 344556 at crypto/rsa-pkcs1pad.c:540
+> > > > pkcs1pad_verify+0x160/0x190
+> > > >    ...
+> > > >    Call Trace:
+> > > >     public_key_verify_signature+0x282/0x380
+> > > >     ? software_key_query+0x12d/0x180
+> > > >     ? keyctl_pkey_params_get+0xd6/0x130
+> > > >     asymmetric_key_verify_signature+0x66/0x80
+> > > >     keyctl_pkey_verify+0xa5/0x100
+> > > >     do_syscall_64+0x35/0xb0
+> > > >     entry_SYSCALL_64_after_hwframe+0x44/0xae
+> > > >=20
+> > > > '.digest_size(u8) =3D params->in_len(u32)' leads overflow of an
+> > > > u8
+> >=20
+> > Where is this statement?
+> >=20
+>=20
+> In function "static int asymmetric_key_verify_signature(struct=20
+> kernel_pkey_params *params, const void *in, const void *in2)"
+>=20
+> > > > value,
+> > > > so use u32 instead of u8 of digest. And reorder struct
+> > > > public_key_signature, it could save 8 bytes on a 64 bit
+> > > > machine.
+> >                                                       ~~~~~
+> >                                                       64-bit
+> >                                                      =20
+> > What do you mean by "could"? Does it, or does it
+> > not?
+> >                                         			=09
+> > =09
+> >=20
+> After reordering struct public_key_signature, sizeof(struct=20
+> public_key_signature) gets smaller than the original version.
 
-Just call it arch/x86/include/asm/cpuid.h
+OK, then just state is as "it saves" instead of "it could save".
 
-And if you feel bored, you can move the cpuid* primitives from
-asm/processor.h to it, in another patch so that processor.h gets
-slimmer.
+Not a requirement but have you been able to trigger this for a
+kernel that does not have this fix?
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+/Jarkko
