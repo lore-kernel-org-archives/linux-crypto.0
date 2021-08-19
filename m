@@ -2,180 +2,294 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E134C4320E
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 13:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D00AC4320E
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 15:15:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6315661101
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 13:11:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 267A360F11
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 15:15:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238261AbhHSNMU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Aug 2021 09:12:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40256 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232821AbhHSNMT (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Aug 2021 09:12:19 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17JD7wsX172461;
-        Thu, 19 Aug 2021 09:11:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=dDGjYsd/CVMSln9MLaU3XeTFt8CR0J2fLgNHz0/y9iU=;
- b=Am1bvbllx4lRnvkAwDYBAi4p9ZSpm9z2zER02tQyzSiDhfObeWIw2Bl/i7EibEuNqhWR
- 1OhlQdRXhXSORwrb52ryW/U6WjzV83PtIqtUwot1aBh/QqbA/rVslIV7nBd2HWDyLCdQ
- zA7Zvwppso6bjh6vB9q7euEVAhCjkkcfTKnqWaq3HSVvEkiMyybWaf4gKfSZr21mxSqP
- b4zlXs0gNI/h88Pl30Fh6WzkjwaiXy8bF+XyaX0BYJUC3GLXODfcygMS556qhHPdeyN7
- XjZO1bBjDXiQ1LTgA0nkCfNBGsgpYbDAAq0apw2oLiOs01JA6St9v4wUoOF/1fHirOPd LQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ahp9x34jb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Aug 2021 09:11:11 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17JD8Cwn173706;
-        Thu, 19 Aug 2021 09:11:10 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ahp9x34gw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Aug 2021 09:11:10 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17JD2YoE010440;
-        Thu, 19 Aug 2021 13:11:07 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06fra.de.ibm.com with ESMTP id 3ae53hf6fm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Aug 2021 13:11:07 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17JD7ZVu59507028
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Aug 2021 13:07:35 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B2549A4060;
-        Thu, 19 Aug 2021 13:11:04 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1D11EA405B;
-        Thu, 19 Aug 2021 13:11:00 +0000 (GMT)
-Received: from sig-9-65-206-165.ibm.com (unknown [9.65.206.165])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Aug 2021 13:10:59 +0000 (GMT)
-Message-ID: <f76fcf41728fbdd65f2b3464df0821f248b2cba0.camel@linux.ibm.com>
-Subject: Re: [PATCH v4 00/12] Enroll kernel keys thru MOK
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
-        dhowells@redhat.com, dwmw2@infradead.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jmorris@namei.org, serge@hallyn.com
-Cc:     keescook@chromium.org, gregkh@linuxfoundation.org,
-        torvalds@linux-foundation.org, scott.branden@broadcom.com,
-        weiyongjun1@huawei.com, nayna@linux.ibm.com, ebiggers@google.com,
-        ardb@kernel.org, nramas@linux.microsoft.com, lszubowi@redhat.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
-        konrad.wilk@oracle.com, Patrick Uiterwijk <patrick@puiterwijk.org>
-Date:   Thu, 19 Aug 2021 09:10:59 -0400
-In-Reply-To: <fcb30226f378ef12cd8bd15938f0af0e1a3977a2.camel@kernel.org>
-References: <20210819002109.534600-1-eric.snowberg@oracle.com>
-         <fcb30226f378ef12cd8bd15938f0af0e1a3977a2.camel@kernel.org>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 2wmwyBdw65ZteOoftq2YdC1DS8zGBpNE
-X-Proofpoint-GUID: Ti_WZG0CEtbe1hd9y9wFkDYPxk2VybxS
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-19_04:2021-08-17,2021-08-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1011
- impostorscore=0 bulkscore=0 adultscore=0 phishscore=0 mlxlogscore=999
- suspectscore=0 priorityscore=1501 mlxscore=0 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108190076
+        id S239450AbhHSPQO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Aug 2021 11:16:14 -0400
+Received: from mail-bn8nam08on2047.outbound.protection.outlook.com ([40.107.100.47]:41184
+        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S239535AbhHSPQM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Aug 2021 11:16:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QRxLz9E93HDVO/a/bQJ+OoJ9Im78ugF1QGJTJ0t8+Gf6Q41WXaNFN66/sTOGn70rSjC4ffYfvj5NTcAYNgcZggMEml1IlOK2/dv7IZDgGtxbmQKYWzFyz7rruNi5q2UDSRGW7Z87XzZnI3Pp229ozC4qGaw8RzSZ1bM20OuQlMLDbTZ6PKQ7wjqU3D4NSiFD14vUidx37hZE339qjWI+jfkLZU8e0F9H7Mr3n+V7g4mjv9PPhKUdG9H/o8cr2VpyYVZZdUqvJ76k04IQXahQMRbZ9ZInkMwkc6dA6IKvCi6pWSemPDiyfR5K4DiFJINSVIi4NdoBUyv5oHcXWr9Gdg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q6Q4aZpTrTrSxMi8jm6gjI8LpAwyQhSTcVk0h0ryq+w=;
+ b=IqyxNcOsjC+9VIkCFhUs/FAseWcd4nSlBEwCyBkQzHgSNPqDoyq+O9PIyyOhgcWcLJYEiBHMOgmMJuSsH1H2NWi4LCTMBOKRTzPuFIPgQYgYYzBC30Re8whJvYbICgTKmnEkG3+TGo7L4xtS6fNff1SZStUhOgpvk2JLF3EFMZC/uCk9MsLMvJZPOTALTSumB9FGGifkEiI6hq67zjpLtn97P5TPsCX7KaBVKy0rJsVYtywHK/eWVwtb5csr+b5RkbTSpcdv3eHjzsSxlDhLvMok2FHOk9gdXvCoV5yJ6rt3llRBm5+RWe3NKESPUJ6FvE6As0CII52ZAEzj6PnGOA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q6Q4aZpTrTrSxMi8jm6gjI8LpAwyQhSTcVk0h0ryq+w=;
+ b=3PxQvRcWD4C1tH/y3H8KMzByXVqvwvcVwazfU2Q778aIdvpZ5eoxLMaP93Fn6g1w9dsJH+3eIbDNAzQHgTfAGSsbxy0/yup00UM7yCjAalpDzmUqG9k+ycayhCDcKAuGuip48TT1b+pv5ZXNt6KXP4bm5JlRRkPoXEtkBl+bD34=
+Authentication-Results: alien8.de; dkim=none (message not signed)
+ header.d=none;alien8.de; dmarc=none action=none header.from=amd.com;
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
+ by CH2PR12MB4859.namprd12.prod.outlook.com (2603:10b6:610:62::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.16; Thu, 19 Aug
+ 2021 15:15:32 +0000
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::d19e:b657:5259:24d0]) by CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::d19e:b657:5259:24d0%8]) with mapi id 15.20.4436.019; Thu, 19 Aug 2021
+ 15:15:32 +0000
+Date:   Thu, 19 Aug 2021 09:58:31 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 24/36] x86/compressed/acpi: move EFI config
+ table access to common code
+Message-ID: <20210819145831.42uszc4lcsffebzu@amd.com>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-25-brijesh.singh@amd.com>
+ <YR42323cUxsbQo5h@zn.tnic>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YR42323cUxsbQo5h@zn.tnic>
+X-ClientProxiedBy: SA9P223CA0012.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:806:26::17) To CH2PR12MB4133.namprd12.prod.outlook.com
+ (2603:10b6:610:7a::13)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (165.204.77.11) by SA9P223CA0012.NAMP223.PROD.OUTLOOK.COM (2603:10b6:806:26::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Thu, 19 Aug 2021 15:15:32 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fc90c317-a1c6-4eb4-abcc-08d963242ff0
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4859:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CH2PR12MB485977827F7A1280C5635C5995C09@CH2PR12MB4859.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BQM1is44vhxsAs0KpkyeyIBuOVMsVP5fl8mxDHCayIf32/kIlfoFBr8++uU+HE2Z1A1qZr0VbTKsOVa4aEwXtzt5rVZgIV5Ufchq6CwXyxMtaHxorBzwgPSQBnN0GZ89TJKkuzWrn1JukUone4Iq/ifj3DLnDuxtS5RK5W6Ipjki8Gz3VMsk0F2G5CCjRMtHiMrkHQ1KJKS6J1Fww5X3eL9Kpu22dW2H3u/gUgB+8x9AzTMt9oYYp/1tL2PsEdONMWLW4CevIa++c65yWVxLq+Qik+SR6qiT35CP1CJHYRGmpQ1PsuaU7A/33E5//zInZNY5bY0COsUEqNtIktVkOhGblkuOPQl/h/tlCkRh4UnWyaLYSgpNSk/Vjt/iQUEo6ZadUppjaTIsIfeSMADuyeMVyJnC82niZlu2FM23HwIeV670TowLOnUAO1SKOOl4EQZwgXh8wQntTtVEj5MPELtnVVRaQn1rBOhBxJuiWDb2b8NyL3UTVSBUqEap+n/HHCSmNQuNfQDw4+DByp71rhqTbTpHj/lZatYTwbgpKB5xIfwe2siYPZimR998zbnVOKXuDqLW6pNhJB3rFhEFC5d/FiOWaM4ELdQpT0QXCWA1mIySDy4KKufl13uQqz6vXwxZvPGQDN2f8uLCRDkAYpugk7XH8kUDeluy24f3WoOLWOJy4lH7uNuItMaqfydmxiaX3PAig9lGOLGVoyKSSVjvCpeFvTFIvmcHsXIFLFwUHxyul/DxZEI8JEPh1AA+t2yUNt9yeAmhcu0JltzUrw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(66946007)(52116002)(186003)(6496006)(66556008)(45080400002)(54906003)(2616005)(66476007)(38350700002)(316002)(4326008)(1076003)(5660300002)(8676002)(8936002)(83380400001)(38100700002)(966005)(6916009)(86362001)(6486002)(2906002)(36756003)(44832011)(7406005)(7416002)(26005)(956004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?j4FR+zn1y4kYy+pxvFi5MseihUj8C6wgQo9FDe4CtOOAcpkRwHo3X9km9bJq?=
+ =?us-ascii?Q?9GyMjKsjqIhOXPwhJoY2+Fncf/f62ifdDPxK8qArZALDxAlcjtz1iWP/34yV?=
+ =?us-ascii?Q?mjyu7NwczYXt0yKEmsv+J+ik+CWoXSGjDkIeHqY3BFgWZuwQrF20FGFUQp2T?=
+ =?us-ascii?Q?ppXViZ8mFB4AHETh2t/jNfJkKLaWDu0yPBryCrz1RLx/qUs+wJsXIzPh5uuj?=
+ =?us-ascii?Q?CDTcfpfktEISlwvCCyYFSEWgmvR24creNHx+/h9S4AdpGVHuBD5UYlz93DX0?=
+ =?us-ascii?Q?TdDknzLRgJfwUUTGfow3j/HbqVs8ArzywaDOmRhn6oOQ6C+/TwJd5LpVITcY?=
+ =?us-ascii?Q?bjtm1c4gSo/7epiLo/lVQvA4Rq5Lnku1ZTNij12XwUpZ6TyNyjy1hYHxH1hL?=
+ =?us-ascii?Q?8z/+IT3+LXhgx02EC2nvq7P/DA+cduCGCne4mAtiQYhgFRIhI114fKx57oxj?=
+ =?us-ascii?Q?1x4uoJSVtQk27+tXjdQFRl39NWYun7Drlsc2mzdBzt0kDaaBWNvPn3Gs92+a?=
+ =?us-ascii?Q?sHXKtJQt/z8hmNfygTDx4DU1zYs1ZB2PARhGFB6jAiyDLFF8ulGywGM3OhdF?=
+ =?us-ascii?Q?WNzhTIbt6gn9QSCy5EbGoxAn9kTB733y73hDnhfUCXm0YxbmS5qA13IvqN4m?=
+ =?us-ascii?Q?tHm/QAQvN5kPppJe2ofUviNP1tZus8/iVMsMHtrgAFkSxBW754ovmyC0zAhB?=
+ =?us-ascii?Q?9FQ6x17rLppWWhwfo1/U8VDCuqBtW/kETRGiv+0b4SiKeksqh5aBqsQ2BokB?=
+ =?us-ascii?Q?6Mdt7JwUdLbDRQkwwwVT5n9KQr0AXndvhq/hY9FJAUVmiw661PBlBsX13sRf?=
+ =?us-ascii?Q?lKWy04P11n3QGq36sBlpQNJV+4PASiP0iPS4ZrvL8dm0XqzvMPt3Uzx+GznS?=
+ =?us-ascii?Q?w0TXZ2PK7cV+8GQ/SWb0705XTDHPvIZND/Dh4sI8jUvLoSeNLu4O0CNy/XVg?=
+ =?us-ascii?Q?HQDaIB3TI/ez4ES1QyBhkoV95OOavO5qw9Xb+yDruzJtZ6jUx6CfB7k/nzJa?=
+ =?us-ascii?Q?NNj/JTgyfIvMgVa8YaL6or00CvDJK/mGzxTblHSCWX6FG/DNBHt5dsH+VhwS?=
+ =?us-ascii?Q?QLuZGpqB/k5keEyXpdMW2jYX7NXizuqchGTUOicTk0y3sqB2DAi0S2EN+jAj?=
+ =?us-ascii?Q?il+2fW6jsuKHwLtR+vxm9lV8jRf2ZmpwNvr4NXDua9Lm+CKuLM3q5j0GovW3?=
+ =?us-ascii?Q?WDwCa8ssfA0DgIEwTkCUdkNCNo3yGwe9ql0doJS+7Z1Yr4g+xSbokXDcqvtw?=
+ =?us-ascii?Q?s7AfcX3h/4CODhuyWhfLAyDac36QQFZ2ao8C0hzg/lSi1Vyi2aW4bo0MvM2E?=
+ =?us-ascii?Q?e+j9klhawesqnbH2Lm321ddD?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc90c317-a1c6-4eb4-abcc-08d963242ff0
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2021 15:15:32.6777
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kIgTykC8Nf6W5bCgtpiHquY1iWnEq000Vlf9HJjcuiePzYAnATYqrtspcl9fYdNOgP+NYT1/MYureReyC0V77A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4859
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 2021-08-19 at 14:38 +0300, Jarkko Sakkinen wrote:
-> On Wed, 2021-08-18 at 20:20 -0400, Eric Snowberg wrote:
-> > Many UEFI Linux distributions boot using shim.  The UEFI shim provides
-> > what is called Machine Owner Keys (MOK).  Shim uses both the UEFI Secure
-> > Boot DB and MOK keys to validate the next step in the boot chain.  The
-> > MOK facility can be used to import user generated keys.  These keys can
-> > be used to sign an end-user development kernel build.  When Linux boots,
-> > pre-boot keys (both UEFI Secure Boot DB and MOK keys) get loaded in the
-> > Linux .platform keyring.  
+On Thu, Aug 19, 2021 at 12:47:59PM +0200, Borislav Petkov wrote:
+> On Wed, Jul 07, 2021 at 01:14:54PM -0500, Brijesh Singh wrote:
+> > From: Michael Roth <michael.roth@amd.com>
 > > 
-> > Currently, pre-boot keys are not trusted within the Linux trust boundary
-> > [1]. These platform keys can only be used for kexec. If an end-user
-> > wants to use their own key within the Linux trust boundary, they must
-> > either compile it into the kernel themselves or use the insert-sys-cert
-> > script. Both options present a problem. Many end-users do not want to
-> > compile their own kernels. With the insert-sys-cert option, there are
-> > missing upstream changes [2].  Also, with the insert-sys-cert option,
-> > the end-user must re-sign their kernel again with their own key, and
-> > then insert that key into the MOK db. Another problem with
-> > insert-sys-cert is that only a single key can be inserted into a
-> > compressed kernel.
+> > Future patches for SEV-SNP-validated CPUID will also require early
+> > parsing of the EFI configuration. Move the related code into a set of
+> > helpers that can be re-used for that purpose.
 > > 
-> > Having the ability to insert a key into the Linux trust boundary opens
-> > up various possibilities.  The end-user can use a pre-built kernel and
-> > sign their own kernel modules.  It also opens up the ability for an
-> > end-user to more easily use digital signature based IMA-appraisal.  To
-> > get a key into the ima keyring, it must be signed by a key within the
-> > Linux trust boundary.
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > ---
+> >  arch/x86/boot/compressed/Makefile           |   1 +
+> >  arch/x86/boot/compressed/acpi.c             | 124 +++++---------
+> >  arch/x86/boot/compressed/efi-config-table.c | 180 ++++++++++++++++++++
+> >  arch/x86/boot/compressed/misc.h             |  50 ++++++
+> >  4 files changed, 272 insertions(+), 83 deletions(-)
+> >  create mode 100644 arch/x86/boot/compressed/efi-config-table.c
 > 
-> As of today, I can use a prebuilt kernel, crate my own MOK key and sign
-> modules. What will be different?
 
-The UEFI db and MOK keys are being loaded onto the .platform keyring,
-which is suppose to be limited to verifying the kexec kernel image
-signature.  With a downstream patch, kernel modules are being verified
-as well.
+Hi Boris,
 
-Initially Patrick Uiterwijk's "[PATCH 0/3] Load keys from TPM2 NV Index
-on IMA keyring" patch set attempted to define a new root of trust based
-on a key stored in the TPM.  This patch set is similarly attempting to
-define a new root of trust based on CA keys stored in the MOK db.
+Thanks for reviewing. Just FYI, Brijesh is prepping v5 to post soon, and I
+will work to get all your comments addressed as part of that, but there has
+also been a change to the CPUID handling in the #VC handlers in case you
+wanted to wait for that to land.
 
-The purpose of this patch set is to define a new, safe trust source
-parallel to the builtin keyring, without relying on a downstream patch.
-With the new root of trust, the end user could sign his own kernel
-modules, sign third party keys, and load keys onto the IMA keyring,
-which can be used for signing the IMA policy and other files.
+> arch/x86/boot/compressed/efi.c
+> 
+> should be good enough.
+> 
+> And in general, this patch is hard to review because it does a bunch of
+> things at the same time. You should split it:
+> 
+> - the first patch sould carve out only the functionality into helpers
+> without adding or changing the existing functionality.
+> 
+> - later ones should add the new functionality, in single logical steps.
+
+Not sure what you mean here. All the interfaces introduced here are used
+by acpi.c. There is another helper added later (efi_bp_find_vendor_table())
+in "enable SEV-SNP-validated CPUID in #VC handler", since it's not used
+here by acpi.c.
 
 > 
-> > Downstream Linux distros try to have a single signed kernel for each
-> > architecture.  Each end-user may use this kernel in entirely different
-> > ways.  Some downstream kernels have chosen to always trust platform keys
-> > within the Linux trust boundary for kernel module signing.  These
-> > kernels have no way of using digital signature base IMA appraisal.
-> > 
-> > This series introduces a new Linux kernel keyring containing the Machine
-> > Owner Keys (MOK) called .mok. It also adds a new MOK variable to shim.
+> Some preliminary comments below as far as I can:
 > 
-> I would name it as ".machine" because it is more "re-usable" name, e.g.
-> could be used for similar things as MOK. ".mok" is a bad name because
-> it binds directly to a single piece of user space software.
+> > diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+> > index 431bf7f846c3..b41aecfda49c 100644
+> > --- a/arch/x86/boot/compressed/Makefile
+> > +++ b/arch/x86/boot/compressed/Makefile
+> > @@ -100,6 +100,7 @@ endif
+> >  vmlinux-objs-$(CONFIG_ACPI) += $(obj)/acpi.o
+> >  
+> >  vmlinux-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_thunk_$(BITS).o
+> > +vmlinux-objs-$(CONFIG_EFI) += $(obj)/efi-config-table.o
+> >  efi-obj-$(CONFIG_EFI_STUB) = $(objtree)/drivers/firmware/efi/libstub/lib.a
+> >  
+> >  $(obj)/vmlinux: $(vmlinux-objs-y) $(efi-obj-y) FORCE
+> > diff --git a/arch/x86/boot/compressed/acpi.c b/arch/x86/boot/compressed/acpi.c
+> > index 8bcbcee54aa1..e087dcaf43b3 100644
+> > --- a/arch/x86/boot/compressed/acpi.c
+> > +++ b/arch/x86/boot/compressed/acpi.c
+> > @@ -24,42 +24,36 @@ struct mem_vector immovable_mem[MAX_NUMNODES*2];
+> >   * Search EFI system tables for RSDP.  If both ACPI_20_TABLE_GUID and
+> >   * ACPI_TABLE_GUID are found, take the former, which has more features.
+> >   */
+> > +#ifdef CONFIG_EFI
+> > +static bool
+> > +rsdp_find_fn(efi_guid_t guid, unsigned long vendor_table, bool efi_64,
+> > +	     void *opaque)
+> > +{
+> > +	acpi_physical_address *rsdp_addr = opaque;
+> > +
+> > +	if (!(efi_guidcmp(guid, ACPI_TABLE_GUID))) {
+> > +		*rsdp_addr = vendor_table;
+> > +	} else if (!(efi_guidcmp(guid, ACPI_20_TABLE_GUID))) {
+> > +		*rsdp_addr = vendor_table;
+> > +		return false;
+> 
+> No "return false" in the ACPI_TABLE_GUID branch above? Maybe this has to
+> do with the preference to ACPI_20_TABLE_GUID.
 
-Nayna previously said,
-   "I believe the underlying source from where CA keys are loaded might vary 
-   based on the architecture (".mok" is UEFI specific.). The key part is 
-   that this new keyring should contain only CA keys which can be later 
-   used to vouch for user keys loaded onto IMA or secondary keyring at 
-   runtime. It would be good to have a "ca" in the name, like .xxxx-ca, 
-   where xxxx can be machine, owner, or system. I prefer .system-ca."
+Right, current acpi.c keeps searching in case the preferred
+ACPI_20_TABLE_GUID is found.
 
-The CA keys on the MOK db is simply the first root of trust being
-defined, but other roots of trust are sure to follow.  For this reason,
-I agree naming the new keyring "mok" should be avoided.
+> 
+> In any case, this looks silly. Please do the iteration simple
+> and stupid without the function pointer and get rid of that
+> efi_foreach_conf_entry() thing - this is not firmware.
 
-thanks,
+There is the aforementioned efi_bp_find_vendor_table() that does the
+simple iteration, but I wasn't sure how to build the "find one of these,
+but this one is preferred" logic into it in a reasonable way.
 
-Mimi
+I could just call it once for each of these GUIDs though. I was hesitant
+to do so since it's less efficient than existing code, but if it's worth
+it for the simplification then I'm all for it.
 
+So I'll pull efi_bp_find_vendor_table() into this patch, rename to
+efi_find_vendor_table(), and drop efi_foreach_conf_entry() in favor
+of it.
+
+> 
+> > diff --git a/arch/x86/boot/compressed/efi-config-table.c b/arch/x86/boot/compressed/efi-config-table.c
+> > new file mode 100644
+> > index 000000000000..d1a34aa7cefd
+> > --- /dev/null
+> > +++ b/arch/x86/boot/compressed/efi-config-table.c
+> 
+> ...
+> 
+> > +/*
+> 
+> If you're going to add proper comments, make them kernel-doc. I.e., it
+> should start with
+> 
+> /**
+> 
+> and then use
+> 
+> ./scripts/kernel-doc -none arch/x86/boot/compressed/efi-config-table.c
+> 
+> to check them all they're proper.
+
+Nice, thanks for the tip.
+
+> 
+> 
+> > + * Given boot_params, retrieve the physical address of EFI system table.
+> > + *
+> > + * @boot_params:        pointer to boot_params
+> > + * @sys_table_pa:       location to store physical address of system table
+> > + * @is_efi_64:          location to store whether using 64-bit EFI or not
+> > + *
+> > + * Returns 0 on success. On error, return params are left unchanged.
+> > + */
+> > +int
+> > +efi_bp_get_system_table(struct boot_params *boot_params,
+> 
+> There's no need for the "_bp_" - just efi_get_system_table(). Ditto for
+> the other naming.
+
+There used to also be an efi_get_conf_table() that did the lookup given
+a direct pointer to systab rather than going through bootparams, so I
+needed some way to differentiate, but looks like I dropped that at some
+point, so I'll rename these as suggested.
+
+> 
+> I'll review the rest properly after you've split it.
+> 
+> Thx.
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7Cmichael.roth%40amd.com%7C5a35d1d920024a99451608d962febc38%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637649668538296788%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=ED6tez8A1ktSULe%2FhJTxeqPlp4LVb0Yt4i44P9gytAw%3D&amp;reserved=0
