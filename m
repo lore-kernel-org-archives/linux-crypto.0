@@ -2,214 +2,198 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B02FC4320E
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 20:55:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F71C432BE
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 03:29:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FCE8610A5
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 20:55:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CD11610D2
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 03:29:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235171AbhHSUzl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Aug 2021 16:55:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49182 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230112AbhHSUzl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Aug 2021 16:55:41 -0400
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F7C1C061575;
-        Thu, 19 Aug 2021 13:55:04 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id i6so10782867edu.1;
-        Thu, 19 Aug 2021 13:55:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Fu4yiy3AdpwUCvHBML2Yz3vXweroU4C9d+Qt5DyD9jw=;
-        b=ErZvoegxJ1AeS50zyQW/bSWsBaIFiMo5EkTIGhIpN605bIY/48tRRFkv3KKdN4LKyL
-         zpkrVwzFpqJeQwTxKOuL7TEBLZw0ibGnZQpLINxHJTrUJlyX7z/nNf42t8YLqJqrHxeK
-         uoaqeB3uM3kCu/AQWn8iBD/ivv3RVNQKOWcBwrcEi9hqgOpj+KGD8qz3T2n2NNyW2Y+d
-         ImNa/mvqoEU+kn7AnlOW2qVXv7W3dXXuWnXnUrsbDPx2+6fPVqBPWxX9FWKx8eS52NNY
-         TK0GULfbJQMA846MjgWTcp98hhr1RAokd1QVtC4FNMLUM76w+A5jjNEAo2p0nqdynt1g
-         Zx+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Fu4yiy3AdpwUCvHBML2Yz3vXweroU4C9d+Qt5DyD9jw=;
-        b=MnC6uoIvzXUN1jw3Ob1NTywNQqk2kNliygQlMtpQg8d9xlw+f+6DKtuGuNwb8X/NF+
-         oN2OEEcHDsi/i2bsH5Be5eno7wePyVtFqklE0tLJgE3LOdtL3f93MK7lLurzejwqduRH
-         UUGf4p6jMuFS2DbiljUsMKV1aSE5tYr+hgIwmlC7lGhQuoO4Tw6n4ZK1hBrBgO10yyrI
-         SfLrP0oJMYCnLNWk4X97dcqQvqcq/9aZM/KWvEnxCd1x0T5sBB8EobTsyxSxYClw8pU3
-         //wON+3EZOlanMwtPFh1RaTjRFQzaIjYgVfqNqDfnW30hojI042s/by/j8uMSDqRd01H
-         U+Sw==
-X-Gm-Message-State: AOAM5324J7WlLvSqtlWPNK3NIEPlLFDaGTGCMfn7OVQpok0SO2SSCweU
-        XYDOankX+IFV//ZKeEvrZu/t9k8e9LFdOR6Z9k4=
-X-Google-Smtp-Source: ABdhPJwrmXHkch9lzr152Aim8ThMHI8tpPrqRQ2ZcNrTi2HimZb860dIBPsTs+4qFo+At9j/9FnpdzrnXI6Rio0AVUc=
-X-Received: by 2002:a05:6402:b7a:: with SMTP id cb26mr18511036edb.33.1629406503028;
- Thu, 19 Aug 2021 13:55:03 -0700 (PDT)
+        id S237998AbhHTDaQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Aug 2021 23:30:16 -0400
+Received: from mail-dm3nam07on2048.outbound.protection.outlook.com ([40.107.95.48]:5601
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S238069AbhHTDaP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Aug 2021 23:30:15 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z/Kpr4EKW5UC0iAIM/EUgPqcxi8lx09nxQP5nu7oN56GVBg/G/BfcJpQxV1aY9g+qljvpl2erwr7IQaeqSqTCmHEtf/eHFdYhXmw1pmULSKJktToHkvROtjA8vblqBv2mz3Moxea3riVyYv+UsZeOwSgSYWuqfU1Sczh/2fMGhNK3T08tg49jCbe8JUZRQORcr1EBf/hRqYgdK2YW3MC9R5c1CEUlgyZXKk6MpPkGWMnRMDtu0Dr+It946hweHV49xl8/RlJ4kggUFweJRhr0bsJmUdCtT9jES7ZgfooVpKUDkHl8li/+jE3kkibvXPhkfymdQkh4N15BMfpWC/OYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gAEepqksv1hZbO8bByQqarnykxMa9JTCMjNo3XGp1r0=;
+ b=ZXZR31fk0Q59J61BZR5UX6agBljKDprVULXSTk/ss3gAz5O1UXx34eEApg2DAlDg1zTGllO6HlOag1g7fP9vwEnDn59Zf0odlmClc+4+95JVo5dmuWJaJzdFLbDXWeOIax3PdALiluGB0VllG0O5i+7R+BtCiU8K56i8RzsK6AWNaZOxuuZM6HyvI2Jo3QfJ/zNM0cbiqZojh2eeDKoVy8U7YTBrJo7jsGleutoKiw7A9OLqBq3+NimolgxCSQ9b3pyLePRpAHg0XFPBgNWTpjtCFtBqfV8VWAYHLMyzCef0sqVETV10h7nh30zaGBakNWDDXkpGD/Hs4LrkYP9Aaw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gAEepqksv1hZbO8bByQqarnykxMa9JTCMjNo3XGp1r0=;
+ b=XaXDDvQD2n7ia11F1PAqn9M5CTWNDOfdXxdDiV3zlwCLXh7+Zxb85K6WtceXbJYSowcHdU/DyVo5FK6iQZWYi0OYRNy/+ttpcIkUrrRYfShbEEmVMzsD8ufD+/+HFOIB32GPnbVv2+MKZbSMaArdNIZOWVXjf9NR/iPGIuym0Ik=
+Authentication-Results: alien8.de; dkim=none (message not signed)
+ header.d=none;alien8.de; dmarc=none action=none header.from=amd.com;
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
+ by CH2PR12MB4005.namprd12.prod.outlook.com (2603:10b6:610:22::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Fri, 20 Aug
+ 2021 03:29:35 +0000
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::d19e:b657:5259:24d0]) by CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::d19e:b657:5259:24d0%8]) with mapi id 15.20.4436.019; Fri, 20 Aug 2021
+ 03:29:35 +0000
+Date:   Thu, 19 Aug 2021 18:42:58 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 24/36] x86/compressed/acpi: move EFI config
+ table access to common code
+Message-ID: <20210819234258.drlyzowk7y3t5wnw@amd.com>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-25-brijesh.singh@amd.com>
+ <YR42323cUxsbQo5h@zn.tnic>
+ <20210819145831.42uszc4lcsffebzu@amd.com>
+ <YR6QVh3qZUxqsyI+@zn.tnic>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YR6QVh3qZUxqsyI+@zn.tnic>
+X-ClientProxiedBy: SN7PR04CA0029.namprd04.prod.outlook.com
+ (2603:10b6:806:f2::34) To CH2PR12MB4133.namprd12.prod.outlook.com
+ (2603:10b6:610:7a::13)
 MIME-Version: 1.0
-References: <20210818144617.110061-1-ardb@kernel.org> <946591db-36aa-23db-a5c4-808546eab762@gmail.com>
- <CAMj1kXEjHojAZ0_DPkogHAbmS6XAOFN3t8-4VB0+zN8ruTPVCg@mail.gmail.com>
- <1cbfe2bbb46ab48bf6dddee9a15a7c04c99db8f7.camel@kernel.org> <CAH2r5mv59hrujeJzReUsYtGkTQ7VH01L7FKH5rUpdmJW92HHCA@mail.gmail.com>
-In-Reply-To: <CAH2r5mv59hrujeJzReUsYtGkTQ7VH01L7FKH5rUpdmJW92HHCA@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 20 Aug 2021 06:54:51 +1000
-Message-ID: <CAN05THTBE6inHnY3JZ6-+HF-wz9You1-iC7PGAJ1=fCoxuVO0g@mail.gmail.com>
-Subject: Re: [PATCH 0/2] crypto: remove MD4 generic shash
-To:     Steve French <smfrench@gmail.com>
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Denis Kenzior <denkenz@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Andrew Bartlett <abartlet@samba.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (165.204.77.11) by SN7PR04CA0029.namprd04.prod.outlook.com (2603:10b6:806:f2::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Fri, 20 Aug 2021 03:29:34 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 72df3fc7-eb2c-4948-b7d8-08d9638abb34
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4005:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CH2PR12MB400520FED0F33BE3A6894A0695C19@CH2PR12MB4005.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wIpLG1cuHuoUZAvFO4GCjJ1e3sq/euyjP9yjvpl6lymCIbZH+y/y6sM3gEnM1hrjuhpOk64gW964D5Qcq3yoCHYfyemJdqjW2xR+aHH5pwCRmCSEwIWHkRVLLGzhls2RiNidkve/O3mC97VqDhKPktsAeDYR3Z30JYNnlhriPMpeZmQofBEBaUpk3BvPPy5zNmRH97NZVxH/ji7pIEi6SdqS0dn2t0/5PI86wGj0A2S5L5SAgVX7W7gGmgQDFdtEPrkKn6otipK4vn4KO6h9PAJaDeg60nlfybkRHkRxSUJ520aCaZp4jT9T55kAJFxO7z9uRxeonP9bHwwa70wZ9nBMmwxpZTKjDQTc/n5N4jnnDsE83gk+7n2IoIbtRd1/2s0ii9MTw0p3kucuvtmyFOzDfymi+7Xb8Sw7FweFatXvLjspjs8jP5iYte7Clwr7izAJ1xbDRixygDpEnFBh7yRM5rHa9+bkyblrgtwcw2ORimy6X3cejhgPe14b/2jrzONXM/lv/egwxnC3j2IpSmFSazPpbw4BOk9dmOvmNTNjK+YkxFjcozILhEfHWLDfn0iylJPCSF8G4vhGSz3DXMPWRxy1QL6z0Mo4mXghsUkriiZiqYKTCON8s+Svbx3FSw9lv7ZN1ckmGQzemvOmT89cfuPDGSxIS0vZDJiK5Coh+zgVHRnkFgUIPLPkW9vil3k+aP00ESth3ePY1fUiApX84yZ+nSoQuhscDYW4tI0e686jgQkNcScFBDSWAgbHyDpnNl+ZiLCDF8Sjvshfqg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(396003)(39860400002)(376002)(136003)(4326008)(54906003)(83380400001)(5660300002)(966005)(36756003)(45080400002)(186003)(66476007)(52116002)(1076003)(6486002)(6496006)(66946007)(478600001)(6666004)(66556008)(26005)(7406005)(8936002)(6916009)(7416002)(8676002)(2616005)(956004)(38350700002)(44832011)(38100700002)(2906002)(86362001)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?vweFfnElvbXHBDMUDyjsmNuz75vS+IeJ23nxMF1ce8c5z9GyzkJeCLIsLSIh?=
+ =?us-ascii?Q?InnLkSMt9tspJOfOIOozUKXh/Xhj6iibmbKyyOVWG1r6EfJx07/YuDjfBnaQ?=
+ =?us-ascii?Q?QG0yErgs1HaClM5pMvqSs3IuYwjiwHscmQdS2PjkJFvqSQfofnlb3bnaCCfe?=
+ =?us-ascii?Q?GnFL1dGJhj7RfSMDwhZOQzKIz5G9xA0H/ViPFt0J0l2Xuy7REUHZVp75OWgz?=
+ =?us-ascii?Q?LItYUi7WIhwxVFUEMPkHAvJwlKZRVCdpN6IQArI0kdnUhSehpXdKUHcHfIET?=
+ =?us-ascii?Q?c605ktmbYlwnYcgYKcA7d4fqDgKhdTblKCBoToB2NZhOQ2tNZb+dFCW4GpBM?=
+ =?us-ascii?Q?05r59An7CGmg4vADrbsXOZeOX2sLBN4EpIpdPVjoPJ15euApxFhXuYcBoU9g?=
+ =?us-ascii?Q?4rqciOstfRFC8FXeeqdtRcmxu4A0w8rVtvB+Qda/PwTgP7koqrG+NMurlEP7?=
+ =?us-ascii?Q?8mr9TkTO5dBbtJsYXBK6KG58Z2ExeCiEkBpyqL7zlx4UnQWRlDyVK+TPhy0O?=
+ =?us-ascii?Q?7pBLoNARAHePoo6W9gvL5PptzKauPujnCTBdE2PqAzGAziTKP5771c+ihche?=
+ =?us-ascii?Q?c38KOs0XYN3ZzdnCiHh/lrt1F7KKEY2konFQSat9ffqnbSz6BCYFuW6GwrLV?=
+ =?us-ascii?Q?Sk8un/QY3OeFabHGf4R8K8vW5NlxO8+RhEBYEosyXIPqpcqdXnxwNs7GmQCY?=
+ =?us-ascii?Q?4wfAcm/8Iah+XjkO984QndTgIZj1nrU+BBmbp1pltgBqjuHiQk1j3kW4gRcF?=
+ =?us-ascii?Q?hOj2M5VjHdJ65cwsWzbKGB5ZREhCMSCsLVIekd2V/5WEaQ1GfjCf6VkhYfy4?=
+ =?us-ascii?Q?Mfk7zsAaUb9bAV0fFanEkul0HwscI57cRpRf8QviMJJREHotBUjGvp8O65Wv?=
+ =?us-ascii?Q?DdrrSBeWfUY+TqGUl9fMSP9vw08kBojTDmZHhhfRTRt8c+BB7uITa+vOZJvj?=
+ =?us-ascii?Q?eKlyFwc2To6R+NEL/yWJjEv9NgyvFt1WooHfS3c7CWhBOKNPy7RG7dEGv+HE?=
+ =?us-ascii?Q?+7Ea6Dh/Q9I+SKXQ37ESkvPwpcHU7y0Rlnurxgc0uAxKlX/mIdw/mRQMa/aj?=
+ =?us-ascii?Q?nvFZkXEB2rY2+uU9g993Z2izzGXbXSA1seI7U+wGOF8wzPiCErhK1j8rGBoj?=
+ =?us-ascii?Q?u2/NBH1LAxgDyhYDoeAoWYuN5XgnYJIqG7+5ZO7z19GZKTbrjwIDr7guRoK2?=
+ =?us-ascii?Q?OBuwoV0C9qgigm+y4j63zBEXk/JIt6qil469+GIV/lhVp9EboWbrMiruzJBh?=
+ =?us-ascii?Q?Jj21knDs8XaehnKhbiue1+pExAgGtyNXdM9+HPwCDSFQbyCUG1e6ZN07BCCj?=
+ =?us-ascii?Q?f48GZMtKJXHJCumpx+lzEAxx?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 72df3fc7-eb2c-4948-b7d8-08d9638abb34
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 03:29:35.6714
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1LoElluitC5lRWD9vh7TZQ595Ap9WWphGMwUVbHA5Iwww2mgjToXchFiTuNb0cwaS61fgTIg8pm52OvNOiAHxQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4005
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 3:10 AM Steve French <smfrench@gmail.com> wrote:
->
-> On Thu, Aug 19, 2021 at 5:42 AM Jarkko Sakkinen <jarkko@kernel.org> wrote:
-> >
-> > On Wed, 2021-08-18 at 18:10 +0200, Ard Biesheuvel wrote:
-> > > On Wed, 18 Aug 2021 at 16:51, Denis Kenzior <denkenz@gmail.com>
-> > > wrote:
-> > > > Hi Ard,
-> > > >
-> > > > On 8/18/21 9:46 AM, Ard Biesheuvel wrote:
-> > > > > As discussed on the list [0], MD4 is still being relied upon by
-> > > > > the CIFS
-> > > > > driver, even though successful attacks on MD4 are as old as Linux
-> > > > > itself.
-> > > > >
-> > > > > So let's move the code into the CIFS driver, and remove it from
-> > > > > the
-> > > > > crypto API so that it is no longer exposed to other subsystems or
-> > > > > to
-> > > > > user space via AF_ALG.
-> > > > >
-> > > >
-> > > > Can we please stop removing algorithms from AF_ALG?
-> > >
-> > > I don't think we can, to be honest. We need to have a deprecation
-> > > path
-> > > for obsolete and insecure algorithms: the alternative is to keep
-> > > supporting a long tail of broken crypto indefinitely.
-> >
-> > I think you are ignoring the fact that by doing that you might be
-> > removing a migration path to more secure algorithms, for some legacy
-> > systems.
-> >
-> > I.e. in some cases this might mean sticking to insecure algorithm *and*
-> > old kernel for unnecessary long amount of time because migration is
-> > more costly.
-> >
-> > Perhaps there could be a comman-line parameter or similar to enable
-> > legacy crypto?
->
-> There are.   For example less secure NTLMv1 is disabled in the build.
-> On the command line "sec=krb5" will use kerberos, and we can move that
-> to be the default,
-> or at least autonegotiate it, but will require some minor changes to
-> cifs-utils to detect if
-> plausible Kerberos ticket is available for this mount before
-> requesting krb5 automatically.
->
-> But ... we already have parameters to disable SMB1, and in fact if you
-> mount with
-> "mount -t smb3 ..." we won't let you use SMB1 or SMB2 so we get the
-> security advantages
-> of preventing man-in-the-middle attacks during negotiation and encryption etc.
-> In addition, SMB1 can be disabled completely by simply doing
->
-> "echo 1  > /sys/module/cifs/parameters/disable_legacy_dialects"
->
-> but even without that, to mount insecurely with SMB1 requires
-> specifying it (vers=1.0) on the command line.
->
-> In addition requiring the strongest encryption can be set by
->
-> "echo 1 > /sys/module/parameters/cifs/require_gcm_256"
->
->
-> Although moving to a peer to peer auth solution better than NTLMSSP is
-> something important to do ASAP
+On Thu, Aug 19, 2021 at 07:09:42PM +0200, Borislav Petkov wrote:
+> On Thu, Aug 19, 2021 at 09:58:31AM -0500, Michael Roth wrote:
+> > Not sure what you mean here. All the interfaces introduced here are used
+> > by acpi.c. There is another helper added later (efi_bp_find_vendor_table())
+> > in "enable SEV-SNP-validated CPUID in #VC handler", since it's not used
+> > here by acpi.c.
+> 
+> Maybe I got confused by the amount of changes in a single patch. I'll
+> try harder with your v5. :)
+> 
+> > There is the aforementioned efi_bp_find_vendor_table() that does the
+> > simple iteration, but I wasn't sure how to build the "find one of these,
+> > but this one is preferred" logic into it in a reasonable way.
+> 
+> Instead of efi_foreach_conf_entry() you simply do a bog-down simple
+> loop and each time you stop at a table, you examine it and overwrite
+> pointers, if you've found something better.
+> 
+> With "overwrite pointers" I mean you cache the pointers to those conf
+> tables you iterate over and dig out so that you don't have to do it a
+> second time. That is, *if* you need them a second time. I believe you
+> call at least efi_bp_get_conf_table() twice... you get the idea.
 
-Agreed. We need a new peer-to-peer authentication mechanism.
-But this is storage so things move slowly and we can't remove a feature
-that hundreds of millions of people depend on and break their environments
-just because "need tickbox".
+Sorry I'm still a little confused on how to determine "something better",
+since it's acpi.c that decides which GUID is preferred, whereas
+efi_find_vendor_table() is a library function with no outside knowledge
+other than its arguments, so to return the preferred pointer it would need
+both/multiple GUIDs passed in as arguments, wouldn't it? (or a callback)
 
-As an example of how long it takes to migrate to a different solution
-in mass deployed storage technologies
-just look at SMB1. The whole industry has been working hard and as
-fast as possible to move away from
-SMB1 since 2006 and we are still NOT at the stage where we can delete
-this functionality.
-Disable it by default for some configurations but delete? No.
+Another alternative is something like what
+drivers/firmware/efi/efi.c:common_tables does, where interesting table
+GUIDs are each associated with a pointer, and all the pointers can then
+be initialized with to the corresponding table address with a single pass.
+But would need to be careful to re-initialize those pointers when BSS gets
+cleared, or declare them in __section(".data"). Is that closer to what
+you were thinking?
 
-Even if we get a new peer-to-peer mechanism today, it will take up to
-20 years before we will be able to delete
-MD4 support in the linux kernel for CIFS.   Unless we want a wildly
-disruptive event where we either
-break storage for hundreds of millions of people   or we force them to
-remain on 5.13 for the next 20 years.
+> 
+> > I could just call it once for each of these GUIDs though. I was
+> > hesitant to do so since it's less efficient than existing code, but if
+> > it's worth it for the simplification then I'm all for it.
+> 
+> Yeah, this is executed once during boot so I don't think you can make it
+> more efficient than a single iteration over the config table blobs.
 
-Storage is not the same as a cell-phone,  or some consumer device
-where you can drop support or break them
-every few years.  The timelines for migrating in storage is measured in decades.
+In v5, I've simplified things to just call efi_find_vendor_table() once
+for ACPI_20_TABLE_GUID, then once for ACPI_TABLE_GUID if that's not
+available. So definitely doesn't sound like what you are suggesting here,
+but does at least simplify code and gets rid of the efi_foreach* stuff. But
+happy to rework things if you had something else in mind.
 
-
-But I guess we will have a loadable module for MD4 in cifs that both
-the cifs client and the cifs server will be able to use.
-Other subsystems that have hard dependency on MD4 and can not just
-break their users can probably also just
-use the cifs_md4 module too if they want to.
-At least we can try to avoid a situation where we will have multiple
-different MD4 implementations for the next decade or two in the
-kernel.
-
-
-> (we should follow up e.g. on making sure we work with the "peer to
-> peer Kerberos" (which is used by Apple
-> for this purpose) see e.g.
-> https://discussions-cn-prz.apple.com/en/thread/252949265)
->
-> Andrew Bartlett's note explains the bigger picture well:
->
-> "I would echo that, and also just remind folks that MD4 in NTLMSSP is
-> used as a compression only, it has no security value.  The security
-> would be the same if the password was compressed with MD4, SHA1 or
-> SHA256 - the security comes from the complexity of the password and the
-> HMAC-MD5 rounds inside NTLMv2.
->
-> I'll also mention the use of MD4, which is used to re-encrypt a short-
-> term key with the long-term key out of the NTLMv2 scheme.  This
-> thankfully is an unchecksumed simple RC4 round of one random value with
-> another, so not subject to known-plaintext attacks here. I know neither
-> MD4 nor HMAC-MD5 is not flavour of the month any more,
-> with good reason, but we would not want to go with way of NFSv4 which
-> is, as I understand it, full Kerberos or bust (so folks choose no
-> protection)."
->
-> "Thankfully only the HMAC-MD5 step in what you mention is
-> cryptographically significant, the rest are just very lossy compression
-> algorithms."
->
->
->
-> --
-> Thanks,
->
-> Steve
+> 
+> I hope that makes more sense.
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7Cmichael.roth%40amd.com%7C2a4304e70b5b4f2137f808d963340eec%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637649897546039774%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=GKDogD%2BOCN0swhmT4RZ2%2B3JmURF3e4qq%2FzgrxxFqJt0%3D&amp;reserved=0
