@@ -2,119 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11E0EC432BE
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 16:56:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C759C432BE
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 17:09:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E707F60F5E
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 16:56:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B23561053
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 17:09:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230062AbhHSQ47 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Aug 2021 12:56:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50090 "EHLO
+        id S230092AbhHSRJq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Aug 2021 13:09:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbhHSQ47 (ORCPT
+        with ESMTP id S229659AbhHSRJp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Aug 2021 12:56:59 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB642C061575;
-        Thu, 19 Aug 2021 09:56:22 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id t35so9322768oiw.9;
-        Thu, 19 Aug 2021 09:56:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=i2gbj7G7HBNjxMMAYhYLQe8DyR1uM3Beytnzkyrqm2w=;
-        b=E5ZdojLIBb5f/jbn9oD7NZCyiGEfL7kcevdndmyg+JVvIzMXCTRZRDV+8GEEMk07Eg
-         AFQGdc6wXOn0uaxcbwVXkWbVCntAzjNmFCi0iXWW4kINejhR2YkQCl0AS5kgb4GQbDuE
-         4ET12KfRmXTgJ/XyKmjSQVR1EwUHYT108DIQeWgEUnTHlpuzF+uDfCWOmhOcTj9Z1sB7
-         JIWhWtV219Jbs2z15DcUsaKVO0t6DfARJaWqon5RvMw1FI3yu7FheCxvCupt9GcbBMes
-         ZjIeBTQPOg9CLivabIZ3evjNFtzdN14TXTuZ/HoPpxkHXE+F6HeV6mPiKfr3Mm+sxU0+
-         a9gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=i2gbj7G7HBNjxMMAYhYLQe8DyR1uM3Beytnzkyrqm2w=;
-        b=t46NE39WdyM58T/NZLZg2HJ3C0ydzXi5Fx8wUgARXG0NldBbWvCOO0BZW9dTsOhzPw
-         VDW+TJO6z2FFSq4Mppj2iK00cwOzAvs7owMvCywRBq4vDnwTq/q9WMH0j2wdJwL2jzSb
-         0sJ7FG0hq1wFfUS8ABlmVkSDn/ckoMqM1A6bOpagEQMG/GvwR3FxiaUN10k5fwIgI9Ki
-         Ma1Qup8jFhkNXRZXLOgIQPIftsk7QRjLkVuF2ICLrgEQyFK8fZT6hrwCKC8ZKwTV6f/D
-         2Ic6xggr22AGga9DsStMzIWEVvcoiE4JcoTcpdpWV2rTBvONHSZivZjQ8u1ec1+YZNpG
-         d1FA==
-X-Gm-Message-State: AOAM533B9uTzUxXTk6Uq5yBYFmoip3tWaSsCvp6j0Yy1sJv4F7McaDJP
-        3KnVJK9E196VRqcSBA//fmxPjcscPts=
-X-Google-Smtp-Source: ABdhPJzmOEAQn8TFcTvrsrE8s6/LmYlIPVWuFWUq5v8j57GKYajgcZdfUybMb5Bxtd8g16QtLbudLg==
-X-Received: by 2002:a05:6808:220c:: with SMTP id bd12mr3485319oib.157.1629392182091;
-        Thu, 19 Aug 2021 09:56:22 -0700 (PDT)
-Received: from [10.0.2.15] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id y138sm758744oie.22.2021.08.19.09.56.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Aug 2021 09:56:21 -0700 (PDT)
-Subject: Re: [PATCH 0/2] crypto: remove MD4 generic shash
-To:     Steve French <smfrench@gmail.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
-References: <20210818144617.110061-1-ardb@kernel.org>
- <946591db-36aa-23db-a5c4-808546eab762@gmail.com>
- <CAMj1kXEjHojAZ0_DPkogHAbmS6XAOFN3t8-4VB0+zN8ruTPVCg@mail.gmail.com>
- <24606605-71ae-f918-b71a-480be7d68e43@gmail.com>
- <CAMj1kXEO8PwLfT8uAYgeFF7T3TznWz4E=R1JArvCdKXk8qiAMQ@mail.gmail.com>
- <e2462d50-57e9-b7d7-bc07-0f365a01d215@gmail.com>
- <CAH2r5muUQT5EX0Z=9MFr=QHGaajF5unwnDwib8CN0hbKP7J4Rw@mail.gmail.com>
-From:   Denis Kenzior <denkenz@gmail.com>
-Message-ID: <a2934f93-e4cf-4cd1-c9c4-fa68dbae9277@gmail.com>
-Date:   Thu, 19 Aug 2021 11:56:20 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Thu, 19 Aug 2021 13:09:45 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78E1DC061575;
+        Thu, 19 Aug 2021 10:09:09 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0f6a00894cffc8901d9ad3.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:6a00:894c:ffc8:901d:9ad3])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F092D1EC04F3;
+        Thu, 19 Aug 2021 19:09:02 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1629392943;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=5h/pBCa48TpXaDC5k6IrIdMKol2hS7fNRvaR9js1Y0w=;
+        b=Y+o2JyP4Tg1O4OSMYH/GIP8+RzcS0qjXj/JucPGugTCf3iMvd2TXwRWBSklMZvSnsBBjzn
+        fr3Y7u61lMY10cqPUfxz1UkhK57dEAyb8NrVtZid6qA8GMlZphUUqzbVVrsR6nRZEgXn0p
+        Zwnk5rkTl3zqeU7wg2G67ypkiAml6Zw=
+Date:   Thu, 19 Aug 2021 19:09:42 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 24/36] x86/compressed/acpi: move EFI config
+ table access to common code
+Message-ID: <YR6QVh3qZUxqsyI+@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-25-brijesh.singh@amd.com>
+ <YR42323cUxsbQo5h@zn.tnic>
+ <20210819145831.42uszc4lcsffebzu@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <CAH2r5muUQT5EX0Z=9MFr=QHGaajF5unwnDwib8CN0hbKP7J4Rw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210819145831.42uszc4lcsffebzu@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Steve,
+On Thu, Aug 19, 2021 at 09:58:31AM -0500, Michael Roth wrote:
+> Not sure what you mean here. All the interfaces introduced here are used
+> by acpi.c. There is another helper added later (efi_bp_find_vendor_table())
+> in "enable SEV-SNP-validated CPUID in #VC handler", since it's not used
+> here by acpi.c.
 
->> But the answer is yes.  Both PEAP and TTLS use MSCHAP or MSCHAPv2 in some form.
->>    These are commonly used for Username/Password based WPA(2|3)-Enterprise
->> authentication.  Think 'eduroam' for example.
-> 
-> Can you give some background here?  IIRC MS-CHAPv2 is much worse than
-> the NTLMSSP case
+Maybe I got confused by the amount of changes in a single patch. I'll
+try harder with your v5. :)
 
-What background are you looking for?  iwd [0] is a wifi management daemon, so we 
-implement various EAP [1] and wifi authentication protocols.
+> There is the aforementioned efi_bp_find_vendor_table() that does the
+> simple iteration, but I wasn't sure how to build the "find one of these,
+> but this one is preferred" logic into it in a reasonable way.
 
-> in cifs.ko (where RC4/MD5 is used narrowly).   Doesn't MS-CHAPv2 depend on DES?
-> 
+Instead of efi_foreach_conf_entry() you simply do a bog-down simple
+loop and each time you stop at a table, you examine it and overwrite
+pointers, if you've found something better.
 
-You are quite correct.  MSCHAPv2 also uses DES for generating the responses. 
-EAP with TTLS+MSCHAPv2 and PEAP+MSCHAPv2 are two of the most deployed variants 
-of WPA-Enterprise authentication using Username + Password.
+With "overwrite pointers" I mean you cache the pointers to those conf
+tables you iterate over and dig out so that you don't have to do it a
+second time. That is, *if* you need them a second time. I believe you
+call at least efi_bp_get_conf_table() twice... you get the idea.
 
-Deprecating MD4, MD5, SHA1 or DES would be quite disruptive for us.  We are 
-using these through AF_ALG userspace API, so if they're removed, some 
-combination of kernel + iwd version will break.  We went through this with ARC4, 
-and while that was justified, I don't think the same justification exists for MD4.
+> I could just call it once for each of these GUIDs though. I was
+> hesitant to do so since it's less efficient than existing code, but if
+> it's worth it for the simplification then I'm all for it.
 
-[0] https://git.kernel.org/pub/scm/network/wireless/iwd.git
-[1] https://en.wikipedia.org/wiki/Extensible_Authentication_Protocol
+Yeah, this is executed once during boot so I don't think you can make it
+more efficient than a single iteration over the config table blobs.
 
-Regards,
--Denis
+I hope that makes more sense.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
