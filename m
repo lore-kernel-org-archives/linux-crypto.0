@@ -2,161 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD910C4338F
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 11:05:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA230C4338F
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 11:38:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B035B61155
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 11:05:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA9A161153
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 11:38:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238505AbhHSLGK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Aug 2021 07:06:10 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:47074 "EHLO mail.skyhub.de"
+        id S238781AbhHSLim (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Aug 2021 07:38:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59800 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238480AbhHSLGI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Aug 2021 07:06:08 -0400
-Received: from zn.tnic (p200300ec2f0f6a00d82486aa7bad8753.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:6a00:d824:86aa:7bad:8753])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D5FDA1EC0493;
-        Thu, 19 Aug 2021 13:05:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629371124;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=qYeEdAdRBAT5O+WdbHDpuPXSfRMndL3DIZs7pWBioVc=;
-        b=q6r7R7vGlQf+ERAX7mscYkzVq0uRzGz45F6etud3utGOg3RinTBSMuc9Xmj+EyMbchdzZO
-        OOVFQf0HdzhwssWUvLfAuwvfVdrZMjXAy6Z/POiHVxuPTMHpHUpzS1w8HmUQYCKCreGb4v
-        cKiOJUGGGE7qp4uR8n7/adWYgLRm8vo=
-Date:   Thu, 19 Aug 2021 13:06:08 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 25/36] x86/boot: Add Confidential Computing
- type to setup_data
-Message-ID: <YR47IEALXIvAGmy8@zn.tnic>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-26-brijesh.singh@amd.com>
+        id S238276AbhHSLim (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Aug 2021 07:38:42 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6B14A61152;
+        Thu, 19 Aug 2021 11:38:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629373085;
+        bh=ztpTlKzDLnuXMkA6oqHi+0cvd0vo10eKEycotaJ9HBo=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=HUowvtbQtFmr68GYqsmFe38XS4JsbnrsAO+F4q2I/tDtZxtgQILgLJgEGc8+f/Cz0
+         uF8Ubu3FSMm8ezSeqFodFen4pHy/m4q7VrYbBct6Y4SEymSKzj6Ufc0u6kb/BloHFa
+         MNKWa+cD49KUeXPOK2WvNvhKTeS4nY7kv459yxcJCmdrIjGQNsbN6JQW9LXGzt7e5x
+         DCqe9yLWhvphgQGYiAXRUF2OM+ATZbvmlXeBM0j6DsYeRI1WNrXDDynv6Y36TLEC73
+         djxJnjdAtPzSGGtrluo65CZd6rhR/zah6L6wG7Bi9S4MCc3W8RtGmGe3gc9AFPs+6B
+         w2BNLl0YwdGqw==
+Message-ID: <fcb30226f378ef12cd8bd15938f0af0e1a3977a2.camel@kernel.org>
+Subject: Re: [PATCH v4 00/12] Enroll kernel keys thru MOK
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Snowberg <eric.snowberg@oracle.com>, keyrings@vger.kernel.org,
+        linux-integrity@vger.kernel.org, zohar@linux.ibm.com,
+        dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jmorris@namei.org, serge@hallyn.com
+Cc:     keescook@chromium.org, gregkh@linuxfoundation.org,
+        torvalds@linux-foundation.org, scott.branden@broadcom.com,
+        weiyongjun1@huawei.com, nayna@linux.ibm.com, ebiggers@google.com,
+        ardb@kernel.org, nramas@linux.microsoft.com, lszubowi@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        konrad.wilk@oracle.com
+Date:   Thu, 19 Aug 2021 14:38:03 +0300
+In-Reply-To: <20210819002109.534600-1-eric.snowberg@oracle.com>
+References: <20210819002109.534600-1-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210707181506.30489-26-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-(Moving Ard to To: for the EFI bits)
+On Wed, 2021-08-18 at 20:20 -0400, Eric Snowberg wrote:
+> Many UEFI Linux distributions boot using shim.  The UEFI shim provides
+> what is called Machine Owner Keys (MOK).  Shim uses both the UEFI Secure
+> Boot DB and MOK keys to validate the next step in the boot chain.  The
+> MOK facility can be used to import user generated keys.  These keys can
+> be used to sign an end-user development kernel build.  When Linux boots,
+> pre-boot keys (both UEFI Secure Boot DB and MOK keys) get loaded in the
+> Linux .platform keyring. =20
+>=20
+> Currently, pre-boot keys are not trusted within the Linux trust boundary
+> [1]. These platform keys can only be used for kexec. If an end-user
+> wants to use their own key within the Linux trust boundary, they must
+> either compile it into the kernel themselves or use the insert-sys-cert
+> script. Both options present a problem. Many end-users do not want to
+> compile their own kernels. With the insert-sys-cert option, there are
+> missing upstream changes [2].  Also, with the insert-sys-cert option,
+> the end-user must re-sign their kernel again with their own key, and
+> then insert that key into the MOK db. Another problem with
+> insert-sys-cert is that only a single key can be inserted into a
+> compressed kernel.
+>=20
+> Having the ability to insert a key into the Linux trust boundary opens
+> up various possibilities.  The end-user can use a pre-built kernel and
+> sign their own kernel modules.  It also opens up the ability for an
+> end-user to more easily use digital signature based IMA-appraisal.  To
+> get a key into the ima keyring, it must be signed by a key within the
+> Linux trust boundary.
 
-On Wed, Jul 07, 2021 at 01:14:55PM -0500, Brijesh Singh wrote:
-> While launching the encrypted guests, the hypervisor may need to provide
-> some additional information during the guest boot. When booting under the
-> EFI based BIOS, the EFI configuration table contains an entry for the
-> confidential computing blob that contains the required information.
-> 
-> To support booting encrypted guests on non-EFI VM, the hypervisor needs to
-> pass this additional information to the kernel with a different method.
-> 
-> For this purpose, introduce SETUP_CC_BLOB type in setup_data to hold the
-> physical address of the confidential computing blob location. The boot
-> loader or hypervisor may choose to use this method instead of EFI
-> configuration table. The CC blob location scanning should give preference
-> to setup_data data over the EFI configuration table.
-> 
-> In AMD SEV-SNP, the CC blob contains the address of the secrets and CPUID
-> pages. The secrets page includes information such as a VM to PSP
-> communication key and CPUID page contains PSP filtered CPUID values.
-> Define the AMD SEV confidential computing blob structure.
-> 
-> While at it, define the EFI GUID for the confidential computing blob.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/sev.h            | 12 ++++++++++++
->  arch/x86/include/uapi/asm/bootparam.h |  1 +
->  include/linux/efi.h                   |  1 +
->  3 files changed, 14 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> index f68c9e2c3851..e41bd55dba5d 100644
-> --- a/arch/x86/include/asm/sev.h
-> +++ b/arch/x86/include/asm/sev.h
-> @@ -44,6 +44,18 @@ struct es_em_ctxt {
->  
->  void do_vc_no_ghcb(struct pt_regs *regs, unsigned long exit_code);
->  
-> +/* AMD SEV Confidential computing blob structure */
-> +#define CC_BLOB_SEV_HDR_MAGIC	0x45444d41
-> +struct cc_blob_sev_info {
-> +	u32 magic;
-> +	u16 version;
-> +	u16 reserved;
-> +	u64 secrets_phys;
-> +	u32 secrets_len;
-> +	u64 cpuid_phys;
-> +	u32 cpuid_len;
-> +};
-> +
->  static inline u64 lower_bits(u64 val, unsigned int bits)
->  {
->  	u64 mask = (1ULL << bits) - 1;
-> diff --git a/arch/x86/include/uapi/asm/bootparam.h b/arch/x86/include/uapi/asm/bootparam.h
-> index b25d3f82c2f3..1ac5acca72ce 100644
-> --- a/arch/x86/include/uapi/asm/bootparam.h
-> +++ b/arch/x86/include/uapi/asm/bootparam.h
-> @@ -10,6 +10,7 @@
->  #define SETUP_EFI			4
->  #define SETUP_APPLE_PROPERTIES		5
->  #define SETUP_JAILHOUSE			6
-> +#define SETUP_CC_BLOB			7
->  
->  #define SETUP_INDIRECT			(1<<31)
->  
-> diff --git a/include/linux/efi.h b/include/linux/efi.h
-> index 6b5d36babfcc..75aeb2a56888 100644
-> --- a/include/linux/efi.h
-> +++ b/include/linux/efi.h
-> @@ -344,6 +344,7 @@ void efi_native_runtime_setup(void);
->  #define EFI_CERT_SHA256_GUID			EFI_GUID(0xc1c41626, 0x504c, 0x4092, 0xac, 0xa9, 0x41, 0xf9, 0x36, 0x93, 0x43, 0x28)
->  #define EFI_CERT_X509_GUID			EFI_GUID(0xa5c059a1, 0x94e4, 0x4aa7, 0x87, 0xb5, 0xab, 0x15, 0x5c, 0x2b, 0xf0, 0x72)
->  #define EFI_CERT_X509_SHA256_GUID		EFI_GUID(0x3bd2a492, 0x96c0, 0x4079, 0xb4, 0x20, 0xfc, 0xf9, 0x8e, 0xf1, 0x03, 0xed)
-> +#define EFI_CC_BLOB_GUID			EFI_GUID(0x067b1f5f, 0xcf26, 0x44c5, 0x85, 0x54, 0x93, 0xd7, 0x77, 0x91, 0x2d, 0x42)
->  
->  /*
->   * This GUID is used to pass to the kernel proper the struct screen_info
-> -- 
-> 2.17.1
-> 
+As of today, I can use a prebuilt kernel, crate my own MOK key and sign
+modules. What will be different?
 
--- 
-Regards/Gruss,
-    Boris.
+> Downstream Linux distros try to have a single signed kernel for each
+> architecture.  Each end-user may use this kernel in entirely different
+> ways.  Some downstream kernels have chosen to always trust platform keys
+> within the Linux trust boundary for kernel module signing.  These
+> kernels have no way of using digital signature base IMA appraisal.
+>=20
+> This series introduces a new Linux kernel keyring containing the Machine
+> Owner Keys (MOK) called .mok. It also adds a new MOK variable to shim.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+I would name it as ".machine" because it is more "re-usable" name, e.g.
+could be used for similar things as MOK. ".mok" is a bad name because
+it binds directly to a single piece of user space software.
+
+/Jarkko
