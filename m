@@ -2,226 +2,172 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 580F0C4338F
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 06:10:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF74C432BE
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 09:33:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 328B9610FF
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 06:10:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5DE961100
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 09:33:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230292AbhHSGLZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Aug 2021 02:11:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39980 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230016AbhHSGLY (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Aug 2021 02:11:24 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACBA6C061756
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Aug 2021 23:10:48 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id x12so7143360wrr.11
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Aug 2021 23:10:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=TWtz3jZxkXS2QduoKRrWmOpOZ9SfqYJHozJE8Ok8xLc=;
-        b=Mdlh4xwsy0KoLHGUNN9YSy/ttHEaXoEe+r4W1h/ECEhPB/qhZiqJSjD8OFQRL9EANK
-         Pq1MijWF1fJPqtRpTvHQhsgqCGBskJhwufm7Sd7GL352MRPkERXS5twyICZyw+r9W1Kw
-         Ta0E/h8mkrqC6Ld2qC929rqaY1A51PtPBlcQZc8RIwSgJqURkBvY3WVWGeDznc2HTaQ2
-         fWQu0CqveEzngluBTD+Wl0C1BpluUUcMxpL5Orwz60qPHnfFUmV8G02kpf0XA1wFhTiH
-         ZylUvc/1hqLnirO2nIAP0tkjlyejMLxEeP2+ORpnWeJRC+1ozF41uAwZyYeD1l4vxssy
-         kizw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=TWtz3jZxkXS2QduoKRrWmOpOZ9SfqYJHozJE8Ok8xLc=;
-        b=tm3GIgewoNjFrbZgdkymttBH8K2MfSSVgEOwQztcjFvtji3U0DhQ7ZJBt3LmnLeVi9
-         B7pkHFZxCkkNpZAZSIr5yk29xCbeWQYeIDk4TGYRKbDffYF8uBMRLxInxuw5S+GrkFv5
-         bKk5uqogKIu1DX68bGpt7sbaCZP4DsliLHm8EojECyeKe337QMOj0q3ky4lVFVg7RnDG
-         b14CGyUhwsk3wlS9aY2SIxX5bxeLPbEY45WjHRnmXPiEjZADFkAOs+W5KBMdFnHv/SMn
-         6igehInQ6iQeXnWKU3MjK3JJ1Zpb/LBqkBDv43J5wTewk2O+LwlXshoPJWJvQ0pCa9I2
-         pWYg==
-X-Gm-Message-State: AOAM53063DTG25+nKgwqKTjII2ZcJ/toj/RPgoK29/GN+81HfZDrDHrH
-        i4fICY3smpV4ggFS5wtiMOtJ2oRs3Ct6zF4BtvlduuQQ
-X-Google-Smtp-Source: ABdhPJwCHodwh3/EdRkkpTMKQ8BHdm+zPMZSWk7ygwnx8jiyisnxVMIsBOwLkuaBRP5xkZJVecrC7jdApJ87GJNSqtg=
-X-Received: by 2002:a5d:6991:: with SMTP id g17mr1612970wru.253.1629353447207;
- Wed, 18 Aug 2021 23:10:47 -0700 (PDT)
+        id S237809AbhHSJeQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Aug 2021 05:34:16 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:33776 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237718AbhHSJeO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Aug 2021 05:34:14 -0400
+Received: from zn.tnic (p200300ec2f0f6a00d82486aa7bad8753.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:6a00:d824:86aa:7bad:8753])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 014621EC046C;
+        Thu, 19 Aug 2021 11:33:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1629365613;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=zpAR8DkWlNwK2/IAwMT7h3TJ9HqSCnXicu19pVWzlYc=;
+        b=G2bH/SHbJouzEX/F6rsZnqxPmMBbSfwvywTH5v71S3WcRjLTQFMQCOw9fTVoi1/IBQwQon
+        20fqwjgBiK/kCW8VrphaxONUtDtgKq/00L9rKAKaXEwnouszTad1kkpM5Sl0yJJsUCHlML
+        h+0ENaaxTxF+fHfPsAynQBUkNjto8fM=
+Date:   Thu, 19 Aug 2021 11:34:12 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 21/36] x86/head/64: set up a startup %gs for
+ stack protector
+Message-ID: <YR4liXhhFv2KiAPS@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-22-brijesh.singh@amd.com>
 MIME-Version: 1.0
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Thu, 19 Aug 2021 14:10:35 +0800
-Message-ID: <CACXcFmn=3k4xP9wkba-BEN2Oqpdy=Y2DZE6ZE3a2QqvZxricnw@mail.gmail.com>
-Subject: Initialising random(4)
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Stephan Mueller <smueller@chronox.de>,
-        John Denker <jsd@av8n.com>, m@ib.tc,
-        "Ted Ts'o" <tytso@mit.edu>, Kees Cook <keescook@chromium.org>,
-        nhorman@tuxdriver.com
-Content-Type: multipart/mixed; boundary="0000000000006f5ad905c9e36921"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210707181506.30489-22-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---0000000000006f5ad905c9e36921
-Content-Type: text/plain; charset="UTF-8"
+On Wed, Jul 07, 2021 at 01:14:51PM -0500, Brijesh Singh wrote:
+> From: Michael Roth <michael.roth@amd.com>
+> 
+> As of commit 103a4908ad4d ("x86/head/64: Disable stack protection for
+> head$(BITS).o") kernel/head64.c is compiled with -fno-stack-protector
+> to allow a call to set_bringup_idt_handler(), which would otherwise
+> have stack protection enabled with CONFIG_STACKPROTECTOR_STRONG. While
+> sufficient for that case, this will still cause issues if we attempt to
 
-This program initialises the pools in random(4) with data from
-/dev/urandom on the machine that does the compile. The output is
-different every time it runs. This is not necessary in many cases, but
-it is cheap, can do no harm, & may block some attacks.
+Who's "we"?
 
-Eventually I'll get around to submitting patches -- add this program
-and do some minor fiddling with random.c and the makefile -- but quite
-likely not soon, so here's the code in the meanwhile. Comment
-solicited.
+Please use passive voice in your text: no "we" or "I", etc.
+Personal pronouns are ambiguous in text, especially with so many
+parties/companies/etc developing the kernel so let's avoid them please.
 
---0000000000006f5ad905c9e36921
-Content-Type: text/x-csrc; charset="US-ASCII"; name="gen_random_init.c"
-Content-Disposition: attachment; filename="gen_random_init.c"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ksiit01p0>
-X-Attachment-Id: f_ksiit01p0
+> call out to any external functions that were compiled with stack
+> protection enabled that in-turn make stack-protected calls, or if the
+> exception handlers set up by set_bringup_idt_handler() make calls to
+> stack-protected functions.
+> 
+> Subsequent patches for SEV-SNP CPUID validation support will introduce
+> both such cases. Attempting to disable stack protection for everything
+> in scope to address that is prohibitive since much of the code, like
+> SEV-ES #VC handler, is shared code that remains in use after boot and
+> could benefit from having stack protection enabled. Attempting to inline
+> calls is brittle and can quickly balloon out to library/helper code
+> where that's not really an option.
+> 
+> Instead, set up %gs to point a buffer that stack protector can use for
+> canary values when needed.
+> 
+> In doing so, it's likely we can stop using -no-stack-protector for
+> head64.c, but that hasn't been tested yet, and head32.c would need a
+> similar solution to be safe, so that is left as a potential follow-up.
 
-LyoKICogUHJvZ3JhbSB0byBzZWxlY3QgcmFuZG9tIG51bWJlcnMgZm9yIGluaXRpYWxpc2luZyB0
-aGluZ3MKICogaW4gdGhlIHJhbmRvbSg0KSBkcml2ZXIuCiAqIAogKiBUaGlzIGZhbGxzIHdlbGwg
-c2hvcnQgb2YgdGhlIGlkZWFsIHNvbHV0aW9uLCB3aGljaAogKiB3b3VsZCBnaXZlIGV2ZXJ5IGlu
-c3RhbGxhdGlvbiAocmF0aGVyIHRoYW4gZXZlcnkgY29tcGlsZWQKICoga2VybmVsKSBhIGRpZmZl
-cmVudCBzZWVkLiBGb3IgdGhhdCwgc2VlIEpvaG4gRGVua2VyJ3MKICogc3VnZ2VzdGlvbnMgYXQ6
-CiAqIGh0dHA6Ly93d3cuYXY4bi5jb20vY29tcHV0ZXIvaHRtL3NlY3VyZS1yYW5kb20uaHRtI3Nl
-Yy1ib290LWltYWdlCiAqIE9uIHRoZSBvdGhlciBoYW5kLCB0aGlzIGlzIGVhc2llciB0byBkby4K
-ICoKICogTmVpdGhlciBzb3J0IG9mIHNlZWQgaXMgbmVjZXNzYXJ5IGlmCiAqICAgIGVpdGhlciAg
-eW91IGhhdmUgYSB0cnVzdHdvcnRoeSBoYXJkd2FyZSBSTkcKICogICAgb3IgICAgICB5b3UgaGF2
-ZSBzZWN1cmUgc3RvcmVkIGRhdGEKICogSW4gdGhvc2UgY2FzZXMsIHRoZSBkZXZpY2UgY2FuIGVh
-c2lseSBiZSBpbml0aWFsaXNlZCB3ZWxsOwogKiB0aGUgb25seSBkaWZmaWN1bHR5IGlzIHRvIGVu
-c3VyZSB0aGF0IGlzIGRvbmUgZWFybHkgZW5vdWdoLgogKiBUaGlzIHByb2dyYW0gaXMgdGhlbiBq
-dXN0IGFub3RoZXIgbGF5ZXIgb2YgYSBkZWZlbnNlIGluIGRlcHRoLgogKiAKICogVGhlIHByb2dy
-YW0gYWtlcyBvbmUgb3B0aW9uYWwgc2luZ2xlLWRpZ2l0IGNvbW1hbmQtbGluZSBvcHRpb24sCiAq
-IGhvdyBtYW55IDUxMi1iaXQgY29udGV4dHMgdG8gaW5pdGlhbGlzZSBpbiBhZGRpdGlvbiB0byB0
-aGUKICogaW5wdXQgcG9vbAogKiAgICAgIG5vIG9wdGlvbiBvciAtMCwganVzdCB0aGUgcG9vbAog
-KiAgICAgIC0xLCBpbml0aWFsaXNlIGEgY29udGV4dCBmb3IgU2Fsc2EgYXMgd2VsbAogKiAgICAg
-ICAgICAodXNlZnVsIHdpdGggY3VycmVudCBkcml2ZXIpCiAqICAgICAgLTIsIFNhbHNhIGNvbnRl
-eHQgcGx1cyBhIDUxMi1iaXQgaGFzaCBjb250ZXh0CiAqICAgICAgICAgIChwb3NzaWJlIGluIGZ1
-dHVyZSBkcml2ZXIpCiAqCiAqIFRoZSBwcm9ncmFtOgogKgogKiAgICAgIGdldHMgaXRzIGRhdGEg
-ZnJvbSAvZGV2L3VyYW5kb20KICogICAgICBwcm9kdWNlcyBkaWZmZXJlbnQgb3V0cHV0IGV2ZXJ5
-IHRpbWUgaXQgcnVucwogKiAgICAgIGxpbWl0cyB0aGUgcmFuZ2Ugb2YgSGFtbWluZyB3ZWlnaHRz
-CiAqICAgICAgZXZlcnkgYnl0ZSBoYXMgYXQgbGVhc3Qgb25lIGJpdCAxLCBvbmUgMAogKiAgICAg
-IG91dHB1dCBmb3JtYXR0ZWQgYXMgYW4gYXJyYXkgZGVjbGFyYXRpb24KICogICAgICBzdWl0YWJs
-ZSBmb3IgaW5jbHVzaW9uIGJ5IHJhbmRvbS5jCiAqICAgICAgd3JpdGVzIHRvIHN0ZG91dCwgZXhw
-ZWN0aW5nIG1ha2VmaWxlIHRvIHJlZGlyZWN0CiAqCiAqIG1ha2VmaWxlIHNob3VsZCBhbHNvIGRl
-bGV0ZSB0aGUgb3V0cHV0IGZpbGUgYWZ0ZXIgaXQgaXMKICogdXNlZCBpbiBjb21waWxhdGlvbiBv
-ZiByYW5kb20uYywgaWRlYWxseSB1c2luZyBhIHNlY3VyZQogKiBkZWxldGlvbiB0b29sIHN1Y2gg
-YXMgc2hyZWQoMSkgc3JtKDEpIG9yIHdpcGUoMSkuIEkgYW0KICogbm90IHN1cmUgd2hpY2ggd291
-bGQgYmUgYmVzdC4KICogCiAqIFRoaXMgaXMgbW9yZSBzZWN1cmU7IGl0IGZvcmNlcyB0aGUgZmls
-ZSB0byBiZSByZWJ1aWx0CiAqIGFuZCBhIG5ldyB2ZXJzaW9uIHVzZWQgaW4gZXZlcnkgY29tcGls
-ZS4gSXQgYWxzbyBwcmV2ZW50cwogKiBhbiBlbmVteSBqdXN0IHJlYWRpbmcgYW4gb3V0cHV0IGZp
-bGUgaW4gdGhlIGJ1aWxkCiAqIGRpcmVjdG9yeSBhbmQgZ2V0dGluZyB0aGUgZGF0YSB0aGF0IGlz
-IGluIHVzZSBpbiB0aGUKICogY3VycmVudCBrZXJuZWwuIFRoaXMgaXMgbm90IGZ1bGwgcHJvdGVj
-dGlvbiBzaW5jZSB0aGV5CiAqIG1pZ2h0IGxvb2sgaW4gdGhlIGtlcm5lbCBpbWFnZSwgYnV0IGl0
-IHNlZW1zIHRvIGJlIHRoZQogKiBiZXN0IHdlIGNhbiBkby4KICoKICogSW5zZXJ0aW5nIHJhbmRv
-bSBkYXRhIGF0IGNvbXBpbGUgdGltZSBjYW4gZG8gbm8gaGFybSBhbmQgd2lsbAogKiBtYWtlIHNv
-bWUgYXR0YWNrcyBjb25zaWRlcmFibHkgaGFyZGVyLiBJdCBpcyBub3QgYW4gaWRlYWwKICogc29s
-dXRpb24sIGFuZCBub3QgZW50aXJlbHkgbmVjZXNzYXJ5LCBidXQgY2hlYXAgYW5kIHByb2JhYmx5
-CiAqIHRoZSBiZXN0IHdlIGNhbiBkbyBkdXJpbmcgdGhlIGJ1aWxkIChyYXRoZXIgdGhhbiBpbnN0
-YWxsKQogKiBwcm9jZXNzLgogKgogKiBUaGlzIGlzIGNlcnRhaW5seSBkb25lIGVhcmx5IGVub3Vn
-aCBhbmQgdGhlIGRhdGEgaXMgcmFuZG9tCiAqIGVub3VnaCwgYnV0IGl0IGlzIG5vdCBuZWNlc3Nh
-cmlseSBzZWNyZXQgZW5vdWdoLgogKgogKiBJbiBzb21lIGNhc2VzIC0tIGZvciBleGFtcGxlLCBh
-IGZpcmV3YWxsIG1hY2hpbmUgdGhhdCBjb21waWxlcwogKiBpdHMgb3duIGtlcm5lbCAtLSB0aGlz
-IGFsb25lIG1pZ2h0IGJlIGVub3VnaCB0byBlbnN1cmUgc2VjdXJlCiAqIGluaXRpYWxpc2F0aW9u
-LCBzaW5jZSBvbmx5IGFuIGVuZW15IHdobyBhbHJlYWR5IGhhcyByb290IGNvdWxkCiAqIGRpc2Nv
-dmVyIHRoaXMgZGF0YS4gT2YgY291cnNlIGV2ZW4gaW4gdGhvc2UgY2FzZXMgaXQgc2hvdWxkIG5v
-dAogKiBiZSB1c2VkIGFsb25lLCBvbmx5IGFzIG9uZSBsYXllciBvZiBhIGRlZmVuc2UgaW4gZGVw
-dGguCiAqCiAqIEluIG90aGVyIGNhc2VzIC0tIGEga2VybmVsIHRoYXQgaXMgY29tcGlsZWQgb25j
-ZSB0aGVuIHVzZWQgaW4KICogYSBMaW51eCBkaXN0cm8gb3IgaW5zdGFsbGVkIG9uIG1hbnkgZGV2
-aWNlcyAtLSB0aGlzIGlzIGxpa2VseQogKiBvZiB2ZXJ5IGxpdHRsZSB2YWx1ZS4gSXQgY29tcGxp
-Y2F0ZXMgYW4gYXR0YWNrIHNvbWV3aGF0LCBhbmQKICogbWlnaHQgZXZlbiBiZSB0b28gbXVjaCBm
-b3Igc29tZSBhdHRhY2tlcnMuIEhvd2V2ZXIgaXQgY2xlYXJseQogKiB3aWxsIG5vdCBzdG9wIGEg
-c2VyaW91cyBhdHRhY2tlciB3aG8gaGFzIGFjY2VzcyB0byBhbm90aGVyIGNvcHkKICogb2YgdGhl
-IGRpc3RybyBvciB0aGUgZGV2aWNlOyBpdCBtYXkgbm90IGV2ZW4gc2xvdyB0aGVtIGRvd24gbXVj
-aC4KICovCgojaW5jbHVkZSA8c3RkaW8uaD4KI2luY2x1ZGUgPHN0ZGxpYi5oPgojaW5jbHVkZSA8
-dW5pc3RkLmg+CiNpbmNsdWRlIDxmY250bC5oPgojaW5jbHVkZSA8c3RkaW50Lmg+CiNpbmNsdWRl
-IDxjdHlwZS5oPgojaW5jbHVkZSA8c3RyaW5nLmg+CiNpbmNsdWRlIDxsaW51eC9yYW5kb20uaD4K
-Cgp0eXBlZGVmIHVpbnQzMl90IHUzMiA7Ci8qCiAqIENvbmZpZ3VyYXRpb24gaW5mb3JtYXRpb24K
-ICovCiNkZWZpbmUgSU5QVVRfUE9PTF9CSVRTIAk0MDk2CiNkZWZpbmUgSU5QVVRfUE9PTF9XT1JE
-UwkoSU5QVVRfUE9PTF9CSVRTID4+IDUpCi8qCiAgICBmb3IgU2Fsc2EsIFNIQTMgb3IgYW5vdGhl
-ciBoYXNoCiovCiNkZWZpbmUgQ09OVEVYVF9CSVRTICAgICAgICA1MTIKI2RlZmluZSBDT05URVhU
-X1dPUkRTICAgICAgIChDT05URVhUX0JJVFMgPj4gNSkKLyoKICAgIGxhcmdlIGVub3VnaCBmb3Ig
-YW55IGV4cGVjdGVkIHVzYWdlCiAgICBtYXkgbm90IGFsbCBiZSB1c2VkCiovCiNkZWZpbmUgTUFY
-X1dPUkRTICAgICAgICAgICAoSU5QVVRfUE9PTF9XT1JEUyArICgyKkNPTlRFWFRfV09SRFMpKQoK
-dTMyIGRhdGFbTUFYX1dPUkRTXSA7CgppbnQgYWNjZXB0KHUzMikgOwppbnQgaGFtbWluZyh1MzIp
-Owp2b2lkIHVzYWdlKHZvaWQpIDsKCmludCB1cmFuZG9tIDsKCmludCBtYWluKGludCBhcmdjLCBj
-aGFyICoqYXJndikKewoJdTMyIGksIHgsICpwLCB0ZW1wLCBsYXN0LCBuX2NvbnRleHRzLCB0b3Rh
-bF93b3JkcywgdG90YWxfYnl0ZXMgOwogICAgY2hhciAqcHRyIDsKCWlmKCAodXJhbmRvbSA9IG9w
-ZW4oIi9kZXYvdXJhbmRvbSIsIE9fUkRPTkxZKSkgPT0gLTEgKSAgewoJCWZwcmludGYoc3RkZXJy
-LCAiZ2VuX3JhbmRvbTogbm8gL2Rldi91cmFuZG9tLCBjYW5ub3QgY29udGludWVcbiIpIDsKCQll
-eGl0KDEpIDsKCX0KCXN3aXRjaChhcmdjKSAgIHsgICAgICAgIAogICAgICAgIGNhc2UgMToKICAg
-ICAgICAgICAgLyoKICAgICAgICAgICAgICAgIGp1c3QgaW5wdXQgcG9vbAogICAgICAgICAgICAq
-LwogICAgICAgICAgICBuX2NvbnRleHRzID0gMCA7CiAgICAgICAgICAgIGJyZWFrIDsKICAgICAg
-ICBjYXNlIDI6CiAgICAgICAgICAgIC8qCiAgICAgICAgICAgICAgICBhbHNvIHNvbWUgNTEyLWJp
-dCBjb250ZXh0cwogICAgICAgICAgICAgICAgb25lIGZvciBzYWxzYQogICAgICAgICAgICAgICAg
-bWF5YmUgYW5vdGhlciBmb3IgNTEyLWJpdCBoYXNoCiAgICAgICAgICAgICovCiAgICAgICAgICAg
-IHB0ciA9IGFyZ3ZbMV0gOwogICAgICAgICAgICBwdHIrKyA7CiAgICAgICAgICAgIG5fY29udGV4
-dHMgPSBhdG9pKCBwdHIgKSA7CiAgICAgICAgICAgIC8vIGZwcmludGYoIHN0ZGVyciwgIm5fY29u
-dGV4dHMgJWRcbiIsIG5fY29udGV4dHMgKSA7CiAgICAgICAgICAgIGJyZWFrIDsKICAgICAgICBk
-ZWZhdWx0OgogICAgICAgICAgICB1c2FnZSgpIDsKICAgICAgICAgICAgYnJlYWsgOwogICAgfQog
-ICAgaWYoIChuX2NvbnRleHRzID4gMikgfHwgKG5fY29udGV4dHMgPCAwKSkgICB7CiAgICAgICAg
-ZnByaW50Ziggc3RkZXJyLCAiVGhpcyB2ZXJzaW9uIG9mIGdlbl9yYW5kb21faW5pdCBzdXBwb3J0
-cyBvbmx5IDAsIDEgb3IgMiBjb250ZXh0c1xuIiApIDsKICAgICAgICB1c2FnZSgpIDsKICAgIH0K
-ICAgIHRvdGFsX3dvcmRzID0gSU5QVVRfUE9PTF9XT1JEUyArIChuX2NvbnRleHRzKkNPTlRFWFRf
-V09SRFMpIDsKICAgIHRvdGFsX2J5dGVzID0gdG90YWxfd29yZHMgPDwgMiA7CgkvKgoJICogSW5p
-dGlhbGlzZSB0aGUgcG9vbHMgd2l0aCByYW5kb20gZGF0YQoJICovCgl4ID0gcmVhZCggdXJhbmRv
-bSwgZGF0YSwgdG90YWxfYnl0ZXMgKSA7CglpZiggeCAhPSB0b3RhbF9ieXRlcyApCXsKCQlmcHJp
-bnRmKHN0ZGVyciwiZ2VuX3JhbmRvbV9pbml0OiBiaWcgcmVhZCgpIGZhaWxlZCwgY2Fubm90IGNv
-bnRpbnVlXG4iKSA7CiAgICAgICAgICAgICAgICBleGl0KDEpIDsKICAgIH0KCS8qCgkgKiBSZXBs
-YWNlIGFueSBhcnJheSBlbnRyaWVzIHRoYXQgZmFpbCBjcml0ZXJpYQoJICoKCSAqIEluIHRoZW9y
-eSwgdGhlIHdoaWxlIGxvb3AgaGVyZSBjb3VsZCBydW4gZm9yIHNvbWUKCSAqIHJpZGljdWxvdXNs
-eSBsb25nIHRpbWUsIG9yIGV2ZW4gZ28gaW5maW5pdGUKCSAqIEluIHByYWN0aWNlLCB0aGlzIGlz
-IGFzdHJvbm9taWNhbGx5IHVubGlrZWx5CgkgKiBnaXZlbiBhbnkgc2Vuc2libGUgZGVmaW5pdGlv
-biBvZiBhY2NlcHQoKSBhbmQKCSAqIGlucHV0IHRoYXQgaXMgYW55d2hlcmUgbmVhciByYW5kb20K
-CSAqLyAKCWZvciggaSA9IDAsIHAgPSBkYXRhIDsgaSA8IHRvdGFsX3dvcmRzIDsgaSsrLCBwKysg
-KQl7CgkJd2hpbGUoICFhY2NlcHQoKnApICkgICAgICB7CgkJCXggPSByZWFkKCB1cmFuZG9tLCAo
-Y2hhciAqKSAmdGVtcCwgNCkgOwogICAgICAgICAgICBpZiggeCAhPSA0ICkJewogICAgICAgICAg
-ICAgICAgZnByaW50ZihzdGRlcnIsImdlbl9yYW5kb21faW5pdDogc21hbGwgcmVhZCgpIGZhaWxl
-ZCwgY2Fubm90IGNvbnRpbnVlXG4iKSA7CiAgICAgICAgICAgICAgICBleGl0KDEpIDsKICAgICAg
-ICAgICAgfQogICAgICAgICAgICAqcCBePSB0ZW1wIDsKICAgICAgICB9CiAgICB9CiAgICAvKgog
-ICAgICAgIHdyaXRlIGEgZmlsZSBzdWl0YWJsZSBmb3IgaW5jbHVzaW9uCiAgICAqLwogICAgbGFz
-dCA9IHRvdGFsX3dvcmRzIC0gMSA7CiAgICBwcmludGYoICJzdGF0aWMgdTMyIHBvb2xzW10gPSB7
-XG4iKSA7CiAgICBmb3IoIGkgPSAwLCBwID0gZGF0YSA7IGkgPCB0b3RhbF93b3JkcyA7IGkrKywg
-cCsrICkJewogICAgICAgIHByaW50ZigiMHglMDh4IiwgKnApIDsKICAgICAgICBpZiggaSA9PSBs
-YXN0ICkKICAgICAgICAgICAgIHByaW50ZigiXG59IDtcbiIpIDsKICAgICAgICBlbHNlICAgIHsK
-ICAgICAgICAgICAgcHV0Y2hhcignLCcpIDsKICAgICAgICAgICAgc3dpdGNoKCBpICUgOCApIHsK
-ICAgICAgICAgICAgICAgIGNhc2UgNzoKICAgICAgICAgICAgICAgICAgICBwdXRjaGFyKCdcbicp
-IDsKICAgICAgICAgICAgICAgICAgICBicmVhayA7CiAgICAgICAgICAgICAgICBkZWZhdWx0Ogog
-ICAgICAgICAgICAgICAgICAgIHB1dGNoYXIoJyAnKSA7CiAgICAgICAgICAgICAgICAgICAgYnJl
-YWsgOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQp9Cgp2b2lkIHVzYWdlKCkKewoJZnBy
-aW50ZihzdGRlcnIsICJ1c2FnZTogZ2VuX3JhbmRvbSBbLTxkaWdpdD5dXG4iKSA7CglleGl0KDEp
-IDsKfQoKLyoKICogVGhlc2UgdGVzdHMgYXJlIG5vdCBzdHJpY3RseSBuZWNlc3NhcnkKICoKICog
-V2UgY291bGQganVzdCB1c2UgdGhlIC9kZXYvdXJhbmRvbSBvdXRwdXQgJiB0YWtlIHdoYXQgY29t
-ZXMKICogQXJndWFibHksIHRoYXQgd291bGQgYmUgdGhlIGJlc3QgY291cnNlOwogKiAiSWYgaXQg
-YWluJ3QgYnJva2UsIGRvbid0IGZpeCBpdC4iCiAqCiAqIEFwcGx5aW5nIGFueSBiaWFzIGhlcmUg
-bWFrZXMgb3V0cHV0IHNvbWV3aGF0IGxlc3MgcmFuZG9tLAogKiBzbyBlYXNpZXIgZm9yIGFuIGVu
-ZW15IHRvIGd1ZXNzLgogKgogKiBIb3dldmVyLCBhIEhhbW1pbmcgd2VpZ2h0IChudW1iZXIgb2Yg
-Yml0cyB0aGF0IGFyZSAxKQogKiBuZWFyIDE2IGdpdmVzIHVzaW5nIG9uZSBvZiB0aGVzZSBudW1i
-ZXJzIGluIGFyaXRobWV0aWMKICogKCssIHhvciBvciB2YXJpb3VzIGZvcm1zIG9mIG11bHRpcGxp
-Y2F0aW9uKSBhIGJldHRlcgogKiBjaGFuY2Ugb2YgY2hhbmdpbmcgdGhlIG91dHB1dCBzaWduaWZp
-Y2FudGx5LiBUaGlzIGlzIGEKICogaGlnaGx5IGRlc2lyYWJsZSBlZmZlY3QuCiAqCiAqIENvbXBy
-b21pc2U6IGFwcGx5IHNvbWUgYmlhcywgYnV0IG5vdCBhIHZlcnkgc3Ryb25nIG9uZQogKi8KCiNk
-ZWZpbmUgTUlOICA2CiNkZWZpbmUgTUFYICgzMi1NSU4pCgppbnQgYWNjZXB0KCB1MzIgdSApCnsK
-ICAgICAgICBpbnQgaCwgaSA7CiAgICAgICAgY2hhciAqcCA7CgogICAgICAgIC8qIHJlamVjdCBs
-b3cgb3IgaGlnaCBIYW1taW5nIHdlaWdodHMgKi8KICAgICAgICBoID0gaGFtbWluZyh1KSA7CiAg
-ICAgICAgaWYoICggaCA8IE1JTiApIHx8ICggaCA+IE1BWCApICkKICAgICAgICAgICAgICAgIHJl
-dHVybigwKSA7CgogICAgICAgIC8qIGF0IGxlYXN0IG9uZSAxIGFuZCBhdCBsZWFzdCBvbmUgMCBp
-biBlYWNoIGJ5dGUgKi8KICAgICAgICBmb3IoIGkgPSAwLCBwID0gKGNoYXIgKikgJnUgOyBpIDwg
-NCA7IGkrKywgcCsrICkgICAgICAgIHsKICAgICAgICAgICAgICAgIHN3aXRjaCgqcCkgICAgICB7
-CiAgICAgICAgICAgICAgICAgICAgICAgIGNhc2UgJ1wwJzoKICAgICAgICAgICAgICAgICAgICAg
-ICAgY2FzZSAnXDI1NSc6CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJuKDAp
-IDsKICAgICAgICAgICAgICAgICAgICAgICAgZGVmYXVsdDoKICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBicmVhayA7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIHJl
-dHVybigxKSA7Cn0KCi8qCiAqIEtlcm5pZ2hhbidzIG1ldGhvZAogKiBodHRwOi8vZ3JhcGhpY3Mu
-c3RhbmZvcmQuZWR1L35zZWFuZGVyL2JpdGhhY2tzLmh0bWwKICovCmludCBoYW1taW5nKCB1MzIg
-eCApCnsKICAgICAgICBpbnQgaCA7CiAgICAgICAgZm9yIChoID0gMCA7IHggOyBoKyspCiAgICAg
-ICAgICB4ICY9ICh4LTEpIDsgLyogY2xlYXIgdGhlIGxlYXN0IHNpZ25pZmljYW50IGJpdCBzZXQg
-Ki8KICAgICAgICByZXR1cm4oaCkgOwp9Cg==
---0000000000006f5ad905c9e36921--
+Well, then fix it properly pls. Remove the -no-stack-protector, test it
+and send it out, even separately if easier to handle. This version looks
+half-baked, just so that it gets you what you need for the SNP stuff but
+we don't do half-baked, sorry.
+
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/kernel/head64.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+> index f4c3e632345a..8615418f98f1 100644
+> --- a/arch/x86/kernel/head64.c
+> +++ b/arch/x86/kernel/head64.c
+> @@ -74,6 +74,9 @@ static struct desc_struct startup_gdt[GDT_ENTRIES] = {
+>  	[GDT_ENTRY_KERNEL_DS]           = GDT_ENTRY_INIT(0xc093, 0, 0xfffff),
+>  };
+>  
+> +/* For use by stack protector code before switching to virtual addresses */
+> +static char startup_gs_area[64];
+
+That needs some CONFIG_STACKPROTECTOR ifdeffery around it, below too.
+
+> +
+>  /*
+>   * Address needs to be set at runtime because it references the startup_gdt
+>   * while the kernel still uses a direct mapping.
+> @@ -598,6 +601,8 @@ void early_setup_idt(void)
+>   */
+>  void __head startup_64_setup_env(unsigned long physbase)
+>  {
+> +	u64 gs_area = (u64)fixup_pointer(startup_gs_area, physbase);
+> +
+>  	/* Load GDT */
+>  	startup_gdt_descr.address = (unsigned long)fixup_pointer(startup_gdt, physbase);
+>  	native_load_gdt(&startup_gdt_descr);
+> @@ -605,7 +610,18 @@ void __head startup_64_setup_env(unsigned long physbase)
+>  	/* New GDT is live - reload data segment registers */
+>  	asm volatile("movl %%eax, %%ds\n"
+>  		     "movl %%eax, %%ss\n"
+> -		     "movl %%eax, %%es\n" : : "a"(__KERNEL_DS) : "memory");
+> +		     "movl %%eax, %%es\n"
+> +		     "movl %%eax, %%gs\n" : : "a"(__KERNEL_DS) : "memory");
+> +
+> +	/*
+> +	 * GCC stack protection needs a place to store canary values. The
+> +	 * default is %gs:0x28, which is what the kernel currently uses.
+> +	 * Point GS base to a buffer that can be used for this purpose.
+> +	 * Note that newer GCCs now allow this location to be configured,
+> +	 * so if we change from the default in the future we need to ensure
+> +	 * that this buffer overlaps whatever address ends up being used.
+> +	 */
+> +	native_wrmsr(MSR_GS_BASE, gs_area, gs_area >> 32);
+>  
+>  	startup_64_load_idt(physbase);
+>  }
+> -- 
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
