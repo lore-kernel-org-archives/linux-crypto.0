@@ -2,193 +2,174 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96A4DC4320E
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 10:47:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A3B4C4320A
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 10:53:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F02D6115B
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 10:47:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D86860462
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Aug 2021 10:53:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238349AbhHSKsD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Aug 2021 06:48:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47524 "EHLO
+        id S238366AbhHSKx6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Aug 2021 06:53:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238318AbhHSKsC (ORCPT
+        with ESMTP id S236149AbhHSKx5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Aug 2021 06:48:02 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A80EC061575;
-        Thu, 19 Aug 2021 03:47:26 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0f6a00d82486aa7bad8753.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:6a00:d824:86aa:7bad:8753])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 078381EC046C;
-        Thu, 19 Aug 2021 12:47:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629370041;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=sMPlIl0Hz40M1f3YPGZe0Jffy/8QBdXGitdWTD9fvQE=;
-        b=Zk5WbWk88Bwd/ar+HuFJKTkOFMbe1OEJlM433bqbt6HY16PKJe3KGAk67rCVcLfsR6fniX
-        hQ/NGyRH0pkk0dkr0ma74JiSWcOdVsGrRqvKUsac0Ud+avXe7gBHEuEI4/X8S5OJDFZhQG
-        CCWIW1u7f+LlC42eHiH2SJEGBHiifOQ=
-Date:   Thu, 19 Aug 2021 12:47:59 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 24/36] x86/compressed/acpi: move EFI config
- table access to common code
-Message-ID: <YR42323cUxsbQo5h@zn.tnic>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-25-brijesh.singh@amd.com>
+        Thu, 19 Aug 2021 06:53:57 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8310FC061756
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Aug 2021 03:53:21 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id w68so5092702pfd.0
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Aug 2021 03:53:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=h4KO30BvVWuiGQptVgC51BO6IaUhsm/PFOqkXub0zOs=;
+        b=qdBDfQ3KQ8bOclGbW+YW5iLXEbXFbaNA2jYCdJxlEmpZDDyTAIGXluu4zcw/lM9Qnp
+         1/8mNapQvN5b9ytb2YRudIEw24n6777t0coWFgvmkWGN2FHxC3DHa2aWBF1FnWldG6hU
+         8Z0+bdamP7zND5vrX4FAtMATsp9a5s1p0D8VH3qYZUPaYwe0j3o86CJ4ZNJDHEzK6hCW
+         mDljIFR6G11Ets0juG53oEfIjZP0GaLW+G/CFrwE6BGZLfyJohGjIglQiyoR+Qta3CLp
+         4lm+1mBE5dVuAQ1LEP63mV6yy9m4EzOxEITeEQ/iySAjNTNsnQ9af/Ayf5obtjJfnUy0
+         ICKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=h4KO30BvVWuiGQptVgC51BO6IaUhsm/PFOqkXub0zOs=;
+        b=fVevXo0C7SGcbCCRzO2RvA/+G1reenY7YPyt+5+KfcKdjw8y5gA/jO6Qt7cpuBWqmO
+         28sc2sfPUP7PDVziE2YDZfgavHl1S/OebozIgoP3FaFghEYt8faew9XjFCGHjvPogHdz
+         04zjgVknoNDggOs6iPqmTb+oujmHnSxJSvlIBu/Qpxc9Bo9gB91krZLMFmp8uZMLt3dp
+         OTQLypebkL3G5pXR4+PIc5KhabMirdk2FaHZBOjQlnjxU+ldVjQeaon1fUrpjs2TKtyc
+         ygfmGk5DeILlRK8y5XllxWpvG5m77GoidmTcsJYT6lULP2jmJxxE0BJhZmv0vd9aS2rY
+         0eSg==
+X-Gm-Message-State: AOAM530q9xXKiep7EvXUNFF8RZrpTlR2d59mFN98E/Cc6UmYKjRUmiIH
+        Hem9G5uHXpC33awx254vw6z0TQ==
+X-Google-Smtp-Source: ABdhPJx7Cx0+w3t1VnEIYAFnOAtwgswFS8P0T8A5W04ehcDbeTPEkzsi01Ezbe2oOvGZB88G9/ekJQ==
+X-Received: by 2002:a65:6805:: with SMTP id l5mr13823371pgt.0.1629370400929;
+        Thu, 19 Aug 2021 03:53:20 -0700 (PDT)
+Received: from [10.2.24.177] ([61.120.150.70])
+        by smtp.gmail.com with ESMTPSA id c196sm3516747pga.92.2021.08.19.03.53.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Aug 2021 03:53:18 -0700 (PDT)
+Subject: Re: Re: Re: PING: [PATCH] crypto: public_key: fix overflow during
+ implicit conversion
+To:     Jarkko Sakkinen <jarkko@kernel.org>, dhowells@redhat.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210810063954.628244-1-pizhenwei@bytedance.com>
+ <4dcd4254-030b-4489-d5d3-e320eb2953e7@bytedance.com>
+ <74aef8a2f2331358371a87931e632287dad9af59.camel@iki.fi>
+ <8bf3a04d-f1a7-cd8c-5c5a-ace3de500b2f@bytedance.com>
+ <6db55147350d81ed205d37031d81b03b80f639cc.camel@kernel.org>
+From:   zhenwei pi <pizhenwei@bytedance.com>
+Message-ID: <7ae0836f-884b-e262-6ade-d0ca6ea0eb93@bytedance.com>
+Date:   Thu, 19 Aug 2021 18:52:23 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210707181506.30489-25-brijesh.singh@amd.com>
+In-Reply-To: <6db55147350d81ed205d37031d81b03b80f639cc.camel@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 07, 2021 at 01:14:54PM -0500, Brijesh Singh wrote:
-> From: Michael Roth <michael.roth@amd.com>
+On 8/19/21 6:35 PM, Jarkko Sakkinen wrote:
+> On Thu, 2021-08-19 at 10:03 +0800, zhenwei pi wrote:
+>> On 8/18/21 8:33 PM, Jarkko Sakkinen wrote:
+>>> On Wed, 2021-08-18 at 16:33 +0800, zhenwei pi wrote:
+>>>> PING
+>>>
+>>> Please, do not top-post.
+>>>
+>>> You are lacking Herbert Xu:
+>>>
+>>> $ scripts/get_maintainer.pl crypto/asymmetric_keys/public_key.c
+>>> David Howells <dhowells@redhat.com> (maintainer:ASYMMETRIC KEYS)
+>>> Herbert Xu <herbert@gondor.apana.org.au> (maintainer:CRYPTO API)
+>>> "David S. Miller" <davem@davemloft.net> (maintainer:CRYPTO API)
+>>> keyrings@vger.kernel.org (open list:ASYMMETRIC KEYS)
+>>> linux-crypto@vger.kernel.org (open list:CRYPTO API)
+>>> linux-kernel@vger.kernel.org (open list)
+>>>
+>>>> On 8/10/21 2:39 PM, zhenwei pi wrote:
+>>>>> Hit kernel warning like this, it can be reproduced by verifying
+>>>>> 256
+>>>>> bytes datafile by keyctl command.
+>>>>>
+>>>>>     WARNING: CPU: 5 PID: 344556 at crypto/rsa-pkcs1pad.c:540
+>>>>> pkcs1pad_verify+0x160/0x190
+>>>>>     ...
+>>>>>     Call Trace:
+>>>>>      public_key_verify_signature+0x282/0x380
+>>>>>      ? software_key_query+0x12d/0x180
+>>>>>      ? keyctl_pkey_params_get+0xd6/0x130
+>>>>>      asymmetric_key_verify_signature+0x66/0x80
+>>>>>      keyctl_pkey_verify+0xa5/0x100
+>>>>>      do_syscall_64+0x35/0xb0
+>>>>>      entry_SYSCALL_64_after_hwframe+0x44/0xae
+>>>>>
+>>>>> '.digest_size(u8) = params->in_len(u32)' leads overflow of an
+>>>>> u8
+>>>
+>>> Where is this statement?
+>>>
+>>
+>> In function "static int asymmetric_key_verify_signature(struct
+>> kernel_pkey_params *params, const void *in, const void *in2)"
+>>
+>>>>> value,
+>>>>> so use u32 instead of u8 of digest. And reorder struct
+>>>>> public_key_signature, it could save 8 bytes on a 64 bit
+>>>>> machine.
+>>>                                                        ~~~~~
+>>>                                                        64-bit
+>>>                                                        
+>>> What do you mean by "could"? Does it, or does it
+>>> not?
+>>>                                          				
+>>> 	
+>>>
+>> After reordering struct public_key_signature, sizeof(struct
+>> public_key_signature) gets smaller than the original version.
 > 
-> Future patches for SEV-SNP-validated CPUID will also require early
-> parsing of the EFI configuration. Move the related code into a set of
-> helpers that can be re-used for that purpose.
+> OK, then just state is as "it saves" instead of "it could save".
 > 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/boot/compressed/Makefile           |   1 +
->  arch/x86/boot/compressed/acpi.c             | 124 +++++---------
->  arch/x86/boot/compressed/efi-config-table.c | 180 ++++++++++++++++++++
->  arch/x86/boot/compressed/misc.h             |  50 ++++++
->  4 files changed, 272 insertions(+), 83 deletions(-)
->  create mode 100644 arch/x86/boot/compressed/efi-config-table.c
+> Not a requirement but have you been able to trigger this for a
+> kernel that does not have this fix?
+> 
+This kernel warning can be reproduced on debian11(Linux-5.10.0-8-amd64) 
+by the following script:
 
-arch/x86/boot/compressed/efi.c
+RAWDATA=rawdata
+SIGDATA=sigdata
 
-should be good enough.
+modprobe pkcs8_key_parser
 
-And in general, this patch is hard to review because it does a bunch of
-things at the same time. You should split it:
+rm -rf *.der *.pem *.pfx
+rm -rf $RAWDATA
+dd if=/dev/random of=$RAWDATA bs=256 count=1
 
-- the first patch sould carve out only the functionality into helpers
-without adding or changing the existing functionality.
+openssl req -nodes -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem 
+-subj "/C=CN/ST=GD/L=SZ/O=vihoo/OU=dev/CN=xx.com/emailAddress=yy@xx.com"
 
-- later ones should add the new functionality, in single logical steps.
+KEY_ID=`openssl pkcs8 -in key.pem -topk8 -nocrypt -outform DER | keyctl 
+padd asymmetric 123 @s`
 
-Some preliminary comments below as far as I can:
-
-> diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-> index 431bf7f846c3..b41aecfda49c 100644
-> --- a/arch/x86/boot/compressed/Makefile
-> +++ b/arch/x86/boot/compressed/Makefile
-> @@ -100,6 +100,7 @@ endif
->  vmlinux-objs-$(CONFIG_ACPI) += $(obj)/acpi.o
->  
->  vmlinux-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_thunk_$(BITS).o
-> +vmlinux-objs-$(CONFIG_EFI) += $(obj)/efi-config-table.o
->  efi-obj-$(CONFIG_EFI_STUB) = $(objtree)/drivers/firmware/efi/libstub/lib.a
->  
->  $(obj)/vmlinux: $(vmlinux-objs-y) $(efi-obj-y) FORCE
-> diff --git a/arch/x86/boot/compressed/acpi.c b/arch/x86/boot/compressed/acpi.c
-> index 8bcbcee54aa1..e087dcaf43b3 100644
-> --- a/arch/x86/boot/compressed/acpi.c
-> +++ b/arch/x86/boot/compressed/acpi.c
-> @@ -24,42 +24,36 @@ struct mem_vector immovable_mem[MAX_NUMNODES*2];
->   * Search EFI system tables for RSDP.  If both ACPI_20_TABLE_GUID and
->   * ACPI_TABLE_GUID are found, take the former, which has more features.
->   */
-> +#ifdef CONFIG_EFI
-> +static bool
-> +rsdp_find_fn(efi_guid_t guid, unsigned long vendor_table, bool efi_64,
-> +	     void *opaque)
-> +{
-> +	acpi_physical_address *rsdp_addr = opaque;
-> +
-> +	if (!(efi_guidcmp(guid, ACPI_TABLE_GUID))) {
-> +		*rsdp_addr = vendor_table;
-> +	} else if (!(efi_guidcmp(guid, ACPI_20_TABLE_GUID))) {
-> +		*rsdp_addr = vendor_table;
-> +		return false;
-
-No "return false" in the ACPI_TABLE_GUID branch above? Maybe this has to
-do with the preference to ACPI_20_TABLE_GUID.
-
-In any case, this looks silly. Please do the iteration simple
-and stupid without the function pointer and get rid of that
-efi_foreach_conf_entry() thing - this is not firmware.
-
-> diff --git a/arch/x86/boot/compressed/efi-config-table.c b/arch/x86/boot/compressed/efi-config-table.c
-> new file mode 100644
-> index 000000000000..d1a34aa7cefd
-> --- /dev/null
-> +++ b/arch/x86/boot/compressed/efi-config-table.c
-
-...
-
-> +/*
-
-If you're going to add proper comments, make them kernel-doc. I.e., it
-should start with
-
-/**
-
-and then use
-
-./scripts/kernel-doc -none arch/x86/boot/compressed/efi-config-table.c
-
-to check them all they're proper.
+keyctl pkey_sign $KEY_ID 0 $RAWDATA enc=pkcs1 hash=sha1 > $SIGDATA
+keyctl pkey_verify $KEY_ID 0 $RAWDATA $SIGDATA enc=pkcs1 hash=sha1
 
 
-> + * Given boot_params, retrieve the physical address of EFI system table.
-> + *
-> + * @boot_params:        pointer to boot_params
-> + * @sys_table_pa:       location to store physical address of system table
-> + * @is_efi_64:          location to store whether using 64-bit EFI or not
-> + *
-> + * Returns 0 on success. On error, return params are left unchanged.
-> + */
-> +int
-> +efi_bp_get_system_table(struct boot_params *boot_params,
-
-There's no need for the "_bp_" - just efi_get_system_table(). Ditto for
-the other naming.
-
-I'll review the rest properly after you've split it.
-
-Thx.
+> /Jarkko
+> 
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+zhenwei pi
