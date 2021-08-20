@@ -8,44 +8,44 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFEB9C4338F
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85CDCC432BE
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:03:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A216D61250
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:03:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 694806128C
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:03:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229563AbhHTQD7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S236767AbhHTQD7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 20 Aug 2021 12:03:59 -0400
-Received: from mail-bn8nam08on2080.outbound.protection.outlook.com ([40.107.100.80]:12305
-        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
+Received: from mail-co1nam11on2067.outbound.protection.outlook.com ([40.107.220.67]:42784
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229952AbhHTQCM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Aug 2021 12:02:12 -0400
+        id S232622AbhHTQCQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Aug 2021 12:02:16 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lsIZCD+/VQzzW8rwM6mXLoPVBKHNNLpNhX2yPumLw0HOo513y/irzDpHu/IH1TvMl8WeUt7wkxf2ntqOoabwlXy7n/hsa0D6uYky4yoSl379WUleVGV/gB6oIN1R2ueMhKudN2qIGl6XZXOzEqyo83US2UjLo8/fXdpM/qJWFo6r7BLVzWhdKAk7dyN5hKi5QNxnFGa/cw8VyEnFC9CVwDkklzJFCFUuJykuXptG90tJeSdQW4nZovkyR/piINXvO6Tse8neUPnUQ8CU89aYFWS4U1pfSPNKAmRlI13B3nyiLGBByieXhwohhEV6eNfgfEtxZhmVdYPAYqAXDYfHNA==
+ b=nQG5HK5vJo/hz7s++BX7T6i6uBnLgLkx/IR/Z7ozJolfzoMuFxisGv0VWoIxbvFtIIQsyzZysETCcXnrwwirPqF+cTn5BIpJAIbejC0Q3YGuxdS0iyM1fr3VIBmmbsYk70gRoax1te97fOi5jrylUPduYa6nCtF9vGfm2Yhq8WTLGB+O5PDcqEnYaUSVoFebz9IaK1+4bN4bNgpmEKPiM0YFle0SL0GXZxWyVEvbfwP27/wO4tLxSa+dhiDxblv6XdQOjDk9meSk6PYGg7VR4ZbbfyLryi+2kjOwjiuRExZU6oyHD5Q+RKCTeXK5ZL0ssOSlYtKI8Pr6tLjzUQ6GRw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L79AFbhiQ6X5AVDBIlBu3i93dO9GaVj+jpDJ+sw1X8E=;
- b=HGGcH2tiPwTi5wouoaisUbGaxmoiKOCvQo1fIna7bzfFw/loBp/gp2xJ70G32MG5fgo5Ew9yiyCHNWgLQpnJd3CFxMJj/us191eocK5QKYPiWcd8gdXK2BxpanrffWsPXW8k38onfCDvgXF9nu2FpTJq8cdYQFhV9UUukZyd0p3++42U5GlhusktPxr8I3QW62lOT1GeBxcMB8MF9QO0chleY+P4VHKSkvLWHK8UKrBxWLAcF+ujXjaLPAMIteLQlTOtZvSlna2CwWwHMRd+ilc/qnuu+e4Z0/dhguxqNXl1aoRKqKPdaQWVoI/tFKiKRP5stxD0xqQmas+Y0HbDDw==
+ bh=Fdd2TDJlrrGVf/MpQ4O8wx2GWeP+/z1Qw8sLPALjGpY=;
+ b=eVY3Fps5pLDQcqPF9qx7HF6OfE0U/OYCJWVLc2iFSUYDC4tAsUGxbgoX2kuirWV4AyoqnzstNekRD7US4UZAACmTAmzMd6d+FGNRevKJw4zet0qqOeFRS6AMH8Gl+vfDFPGJaOkkl0/7TnprZXPgfqmHLxD0+aH5RbViGg7YAjYUCRaKPhB32xvwnUd6uJ7c1bw0EIInO13+NG1PmEfRqjsg1iRCGS+N2PQc6AEpq86OaBE0pJJexcNFtUWwoSTRPV+SjXLsFNqwBuswGKiHHuxBbf7m5Fwnh21enZeHp5WuKySjAE+gqqkxBC/sfu+R3796UrYTm8nXMcGhI7l74A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L79AFbhiQ6X5AVDBIlBu3i93dO9GaVj+jpDJ+sw1X8E=;
- b=WYcaEJmOiEHcJKmtO6zIEjuanib0m4pbaFwo6QUlQmZKdlC2xk31mrfrNv1pSqElm63+mQGoWx35HcIeLgBkVVWuHp2WzuJJAiRvUQGlSBrP2n+mqRdYji7eJIM1z/25LlomWiY2Sb892zGI6Rly7XRh5jhR+Q6Le43I6R/0AtQ=
+ bh=Fdd2TDJlrrGVf/MpQ4O8wx2GWeP+/z1Qw8sLPALjGpY=;
+ b=lmMEEuOb4iCDwsgTqOb+2VSC2IJVejxGycQFwUnrIlMWwNIAwOzjCPQNN1zRcn7QUV37PDThViBxuG1zjUCN+BaPX5OB7wh4vLnqMMWDP3oBWDLVcIsr9/fqXg7RoYTk5f8Q8xQkEV1vVpRC9D0VxZpnfAAMSAB/O8UXx2VBe5I=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4384.namprd12.prod.outlook.com (2603:10b6:806:9f::22) with
+ by SN6PR12MB2685.namprd12.prod.outlook.com (2603:10b6:805:67::33) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Fri, 20 Aug
- 2021 16:00:06 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.21; Fri, 20 Aug
+ 2021 16:00:18 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4436.019; Fri, 20 Aug 2021
- 16:00:06 +0000
+ 16:00:18 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -73,11 +73,10 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
         Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        Brijesh Singh <brijesh.singh@amd.com>, stable@kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH Part2 v5 10/45] crypto: ccp: shutdown SEV firmware on kexec
-Date:   Fri, 20 Aug 2021 10:58:43 -0500
-Message-Id: <20210820155918.7518-11-brijesh.singh@amd.com>
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH Part2 v5 19/45] KVM: SVM: Add support to handle AP reset MSR protocol
+Date:   Fri, 20 Aug 2021 10:58:52 -0500
+Message-Id: <20210820155918.7518-20-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210820155918.7518-1-brijesh.singh@amd.com>
 References: <20210820155918.7518-1-brijesh.singh@amd.com>
@@ -87,200 +86,189 @@ X-ClientProxiedBy: SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.18 via Frontend Transport; Fri, 20 Aug 2021 16:00:05 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.18 via Frontend Transport; Fri, 20 Aug 2021 16:00:17 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c7011ff5-dcaa-4f15-5553-08d963f3942c
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4384:
+X-MS-Office365-Filtering-Correlation-Id: 757d54a3-7da1-4b45-6f77-08d963f39b61
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2685:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB43842697E467CB477C3BE2FBE5C19@SA0PR12MB4384.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:586;
+X-Microsoft-Antispam-PRVS: <SN6PR12MB2685E7C481A71748D07D5FECE5C19@SN6PR12MB2685.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dmLKuSul7jRFTiltDfV3sUjM42pSiAoRlXXafnA0uejri1pmGhbQ69Sf/b8NF2CVi7hXP9e3zIiu0eTMBY1PWqhy1AtmT7huJSdejQpoWOC7Z8ktGrN47QE2i8xdsQQi4oFuV+0SM4dfygIOW4RL7huQMSL58jrcifpU8NUro9Lo+kKorFPs5tqNc+LweXsvBwsG4lu9Tq5lk4cFIholklCM1ec4rXYgwtaBxJd5Cl9OVM7bzV8iKxwNksug8HLnwUxmTB0p83mF/OXN3E/woHlGNsgFVCypjNUVqGlz5uPeGC+PLY7MNzcRtBDkdhOkyx1peRu6oAGDjH84AbSHQIWz/uSiTOVxqHQXlh8ekxdGWGEtUi3kLaPvZsazHfd7tFluVMD1T+qo/HVX+jTClm2pSk+HALHGj63AfWgSyVC0Kb6HMGDRrnBLkbGUcZRBLgwEMZo7hHXtZVCTfJDH75cQptQrjO1lSVB3ORkoTieAs/RePOgfEwN3a5+/DTrxmwJhGfg/K+DButwFMtOoaxtfRMZPGWESWTUg63eLR9N3EZrCsaQTRb+VvijJc2UathHDpF/XvKSneWlbAyhdePcbLLCk/Yswx9APE8qNPHCWePWNb5yNe92+nc31XSptUQXtDVfKFPXDSof6jMFPEm928BKEcuWNyg3H0OfOl32IA6E0aBWlhCc8GGG0/SfdOHNuY/xkVSSbltNPt1BcPA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(396003)(366004)(346002)(136003)(5660300002)(6666004)(52116002)(66946007)(44832011)(36756003)(7416002)(66476007)(7406005)(6486002)(956004)(8936002)(316002)(2906002)(186003)(4326008)(478600001)(86362001)(26005)(54906003)(38100700002)(38350700002)(7696005)(1076003)(8676002)(83380400001)(2616005)(66556008);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: hjbw5IK5uM3esxFr/xxHR03hZtMkSD7vVNELm9kB9rtStMmy5eeFKVR7WRGUoika3I0eOaCP4rg4RnfZd09LBEyW7OvqRyDz7OrzaONG9RmyH5RiJEcaQLM6EBLCgqvFqcKx21pGNmtSX3aAAWh1a6ZPoA3SadcrKTiAx2ejNiMoixU/BCzpiC8NgYDF6cqWevTR5bQayxOkeH4rYWO+UkZDfs8eZGS+1p3mt5JZIwQNxaVMtYoZM/HmMfjkUValM89ZYiMT6wbQJvXoxu2DGCWgLF9LR3XN8ClMu7yuezucJKjpddNu3Y7fBzqRYHOlvyjWBBiC73R8parv46mHFpW2pD/dSisyfZdOvpvU6/A2O9gmG3FGqNz0tKutMsRW+Pcobn30s0KGdp9ewSdoL3YTIuu0UVBm2ltqvE5DhzJDx8nvUw+EOj1FtX2aFMFQLkzcaQ9y2yQTtnjFI03AwcnWE2bwDqhOYYLJ8+rsvAROlWzZWJ09qgYveBaLmP8jDcPnuV1ej4a++ZtpLYheKLN7cqng2Ag1xL/NbWoxexsB3SF7WZ+vlMPkwA/4sHUGni/X8IqN0JRvodBjTz9rSgNTOdGGVLsUm61sO0vFC+yxkhoHxL1AoenVW5Ca+EmWCTLpxqrFlgC1UevU1IDaAV2SeGxtZ/w+mCOkJdjXIsyxOPRzOYohsucVLvafXglVc521gjJu0V95fxnUzZbVAA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(396003)(376002)(346002)(366004)(956004)(186003)(44832011)(2616005)(26005)(83380400001)(66946007)(52116002)(66556008)(66476007)(7696005)(7406005)(6666004)(7416002)(1076003)(2906002)(478600001)(36756003)(316002)(54906003)(8676002)(8936002)(5660300002)(6486002)(38350700002)(4326008)(38100700002)(86362001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9ow0L+vVsnFP50AztoHFCMDxC4zLfK7jsmTxhKUJTIY80rl/vzVRxHOGzeMD?=
- =?us-ascii?Q?yZpIN5XEcqUDZamH7t0HBE3UhP/+dlF9IV50nz5+Lf53LtUT9db2TD6Gck3S?=
- =?us-ascii?Q?47reGo/2zbUk5B2HQw9ByoUfE5r76QpOZGYTXSUNI5USSIQxZ3nKtkDisqGW?=
- =?us-ascii?Q?rq70kRcXQOg5rQGi3XWTMeNI11zyRRqMSL/zENyD5bKDOzQcNKpz6Vpiyd9H?=
- =?us-ascii?Q?CAfbG35dUo4DdtmbwK5lTbh2TXEUhd1qtghdOMo4BGej0+OLfKT4ra396K7X?=
- =?us-ascii?Q?6GmN7klQUBMBy7oXfexo2BT+tAL65XMTNkranYTH9X5Zd6M6XdOg8fLhR7CZ?=
- =?us-ascii?Q?2fXXtyhNCywbXXOnEgTt9k47ksXY7Z0xk9iMoKXpGTKZAK9Epl38VOGplP64?=
- =?us-ascii?Q?/QwB6ZiFRfCCLH8tnUj+btRfzvvIUh8O8OtQuh2+Ej6OHMZ/sC/q147DXEnS?=
- =?us-ascii?Q?egRTUC3PnL+2/URBmdRoYvJWaUfK9NS+daxLm6XCWUVDf+66SA9xU+lzYRLs?=
- =?us-ascii?Q?04jhrtR9+gGNRV9HEl156TpQ2XVWy1bnxcHQ2DSvWj2903xcmHrzefeuGviy?=
- =?us-ascii?Q?/4Tyn4c+PK/YxLAXmMfgZTjVhgb++YgDbzN9AW6xn70ncOdMWVJYmueLW25i?=
- =?us-ascii?Q?TlJxnSY582Ku/W9nJR3BA6P6EIfYEht5tsfgqQD7rVTWAx2SFwukbLp16w/e?=
- =?us-ascii?Q?hiCAe7NzW80bFcfFqDKAtKFTg9Jfv11+v6hvMC/WDaypxeqxtam/btDqN96h?=
- =?us-ascii?Q?qB67l3nnJxSQx9Vhz/CSU12MAIZz9MnRMtCvzsCZ3g60o8rONfMua7nMfDSq?=
- =?us-ascii?Q?R+dB02xVPC2NYJi31f5WXBRWaxH9mUTbT/W4b9nGm1wCModaC+ANAmkUd1mP?=
- =?us-ascii?Q?9KFAcc1Vd08Y+zst/fMKBADZJ8eDTkiLrh+XFVabpu93Zp3y7w3rm5JdhsxR?=
- =?us-ascii?Q?8oAchOxtiZcvj4gGcvwAyGQUldERYdH4P9G1LjtLx8TxGoOBxQA+S7KDDP53?=
- =?us-ascii?Q?Z5pl12VdW3xa9JkDqpjapugmhKqv6WI9RhSS94DZ4hoVeCCY+HZ2T/9tqVF+?=
- =?us-ascii?Q?bd8YSK35NjCkm2P9HEHSTw9vaeqYX7DLBBGBJK1zDZH/eYcSN+fwVvGE/kaA?=
- =?us-ascii?Q?XgTvDZA850czZUBXpQJ4oFnPYtTPS5d9DrYLplsMcd8TKKA+nIZQ9ypQeHVI?=
- =?us-ascii?Q?FIxp8B/ueGvhNGgSPaR6o87nNHy5LWtCObI7hChdLX8tg7Tf7oM4ktRBm2N2?=
- =?us-ascii?Q?z94p+nJ6KaPo+ngxo/nwoEFDAjbE6H2I1DHcztAouZtl6y9aPk5w9ZyLjkvX?=
- =?us-ascii?Q?tX41+CEb5+qI1t4ErcmbwLL/?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?sa5QY3JG6HjzlvAjlNrL/dqrK3jrsAXJBrOmf5c0l4ZO2QLPjep25yixqvOW?=
+ =?us-ascii?Q?CYz3D3EpbpYSb9r/P5IGysL437jvPX2MRS7sAZCZg/TbyB2DauNBJxrk6/JQ?=
+ =?us-ascii?Q?BLNXzLXMqvPRB0jPsE22JAx+yYIeTW6Suw9jzBSKSZjflezwE/tk/Pi6gS5B?=
+ =?us-ascii?Q?6jwj+pYviVyjgBFX7RRTXRyoLstQNB4gnZ/2LBokLXzcU6hl1SsbFsSzb4V6?=
+ =?us-ascii?Q?R4PIYoN8uta8yJAcKZnn2JJsqYyGaAe6FXdrVzOWy6F1jgCmDiz7ZyxjtXO3?=
+ =?us-ascii?Q?MD9qrOMcVfW+YEHYmBspLQbhISpIY/hLfy/l9Jamnh94Ox25NHIm9CZiVvg3?=
+ =?us-ascii?Q?GKL8fLa/9m0tHN/V7zzka5s8f7BUlpec9Rk8yCMnxiwOK60Y7SfAYEHlwsLy?=
+ =?us-ascii?Q?cC4OVq4iXdBvmQ8J2MzEuOw6LVVxRYsI/EERR+iv3dgIGC/c7VUO/mfsJqdz?=
+ =?us-ascii?Q?9NnZzKtlpRm/1AwJOdkRUAZ1T3sBY1RIygllr3Xw0OJH9lFJD+XYzDex9sWm?=
+ =?us-ascii?Q?nk14BYEesnFBJ5tm9U2seWiKoRjpSuRt3mD7d0dCwfg+VNmcRqnyPsRjk5kM?=
+ =?us-ascii?Q?UhrQFYR1xucjAA5Vj19wh6v733IV+u9JAdyfDJbiRxjukC2WElypohA2hxU1?=
+ =?us-ascii?Q?r0WdRcWJwnJAKQTq2NVIypOPM5UZjZ7xcy5oTg3pWSGepcjXu4EMRjPj0HEo?=
+ =?us-ascii?Q?03QnprgHCMs5iYdYE7L0BiNV4bSJtstbQYy+7+1AhX9TZb1ifGzPZ4XTBNMf?=
+ =?us-ascii?Q?YT9hG3ZXZ4p8JgPPxNtpRcU7jMBIk6qsLdMn6fsYJ+kc2dh16kK1jrXxgOn/?=
+ =?us-ascii?Q?qzM6FIAqBm26JXBxZqWo4PQyB1qUbfCcfTwsXVVzCuB63cgm5o21aMlpJk6c?=
+ =?us-ascii?Q?4HEf8Ts3h5Ew7rVmSjUAQV3PpzZ1WFpELxFM4ql7T7M8y8TdyV9DK7ezcsn/?=
+ =?us-ascii?Q?9AVEWPYlLMzYJTXXs8A2ST21yCbIg8AG+V7lYzum2TSbsZvh/HP2TL0yir3e?=
+ =?us-ascii?Q?TqZ1Ner9jI3WfdNmDpo8R44YvpHlBypC8qA2ZILygD9QFcrjVOjLTMkSSERU?=
+ =?us-ascii?Q?arMXFWkNgx2ZcnSH8XAJpHCKtBxJQ+U7ZOS4dizZNiyx1gkSPVpsAPWdx3No?=
+ =?us-ascii?Q?nOfZmU9WsmXbPeNXff6mJT6jMFl9SCcr4DVHxWnJ+TeL6jCmy3zffzi+hyOd?=
+ =?us-ascii?Q?9TJJkmYVNsmVPH6OJroHQb67xMDTTWTK0sfhbxxH1b9EKxYhVoaTYl8IWCcd?=
+ =?us-ascii?Q?tWB0GG3I2Ts3AXmqhhPd9g2yJARmyUocDCVbcVIhNbMQgnNjMt8C2+ivH9VS?=
+ =?us-ascii?Q?4yiQay8i3PCq+V9eJHD2+7Wu?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c7011ff5-dcaa-4f15-5553-08d963f3942c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 757d54a3-7da1-4b45-6f77-08d963f39b61
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 16:00:06.6280
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 16:00:18.6271
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QrQFT4yYjht3O/V3VpGXYU3Ue0d8yTa9FZgqKn+trBLfsnxQ6uCP8VATAQbvIqYh94CPlDGsxafHOvU01RpDSw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4384
+X-MS-Exchange-CrossTenant-UserPrincipalName: PD7hZA4QbXVPAR1TUayaVkOsGZ/EBxdCXt/EZOIeMAt9a15/mJZHClU95qsJtk78qmjnmy8DxZKNVAUNFHfQbg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2685
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The commit 97f9ac3db6612 ("crypto: ccp - Add support for SEV-ES to the
-PSP driver") added support to allocate Trusted Memory Region (TMR)
-used during the SEV-ES firmware initialization. The TMR gets locked
-during the firmware initialization and unlocked during the shutdown.
-While the TMR is locked, access to it is disallowed.
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Currently, the CCP driver does not shutdown the firmware during the
-kexec reboot, leaving the TMR memory locked.
+Add support for AP Reset Hold being invoked using the GHCB MSR protocol,
+available in version 2 of the GHCB specification.
 
-Register a callback to shutdown the SEV firmware on the kexec boot.
-
-Fixes: 97f9ac3db6612 ("crypto: ccp - Add support for SEV-ES to the PSP driver")
-Reported-by: Lucas Nussbaum <lucas.nussbaum@inria.fr>
-Tested-by: Lucas Nussbaum <lucas.nussbaum@inria.fr>
-Cc: <stable@kernel.org>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Joerg Roedel <jroedel@suse.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David Rientjes <rientjes@google.com>
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 49 +++++++++++++++++-------------------
- drivers/crypto/ccp/sp-pci.c  | 12 +++++++++
- 2 files changed, 35 insertions(+), 26 deletions(-)
+ arch/x86/include/asm/sev-common.h |  2 ++
+ arch/x86/kvm/svm/sev.c            | 56 ++++++++++++++++++++++++++-----
+ arch/x86/kvm/svm/svm.h            |  1 +
+ 3 files changed, 51 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 91808402e0bf..2ecb0e1f65d8 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -300,6 +300,9 @@ static int __sev_platform_shutdown_locked(int *error)
- 	struct sev_device *sev = psp_master->sev_data;
- 	int ret;
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+index 5f134c172dbf..d70a19000953 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -56,6 +56,8 @@
+ /* AP Reset Hold */
+ #define GHCB_MSR_AP_RESET_HOLD_REQ	0x006
+ #define GHCB_MSR_AP_RESET_HOLD_RESP	0x007
++#define GHCB_MSR_AP_RESET_HOLD_RESULT_POS	12
++#define GHCB_MSR_AP_RESET_HOLD_RESULT_MASK	GENMASK_ULL(51, 0)
  
-+	if (sev->state == SEV_STATE_UNINIT)
-+		return 0;
-+
- 	ret = __sev_do_cmd_locked(SEV_CMD_SHUTDOWN, NULL, error);
- 	if (ret)
- 		return ret;
-@@ -1019,6 +1022,20 @@ int sev_dev_init(struct psp_device *psp)
- 	return ret;
- }
+ /* GHCB GPA Register */
+ #define GHCB_MSR_REG_GPA_REQ		0x012
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 6ce9bafe768c..0ca5b5b9aeef 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -58,6 +58,10 @@ module_param_named(sev_es, sev_es_enabled, bool, 0444);
+ #define sev_es_enabled false
+ #endif /* CONFIG_KVM_AMD_SEV */
  
-+static void sev_firmware_shutdown(struct sev_device *sev)
-+{
-+	sev_platform_shutdown(NULL);
++#define AP_RESET_HOLD_NONE		0
++#define AP_RESET_HOLD_NAE_EVENT		1
++#define AP_RESET_HOLD_MSR_PROTO		2
 +
-+	if (sev_es_tmr) {
-+		/* The TMR area was encrypted, flush it from the cache */
-+		wbinvd_on_all_cpus();
-+
-+		free_pages((unsigned long)sev_es_tmr,
-+			   get_order(SEV_ES_TMR_SIZE));
-+		sev_es_tmr = NULL;
-+	}
-+}
-+
- void sev_dev_destroy(struct psp_device *psp)
+ static u8 sev_enc_bit;
+ static DECLARE_RWSEM(sev_deactivate_lock);
+ static DEFINE_MUTEX(sev_bitmap_lock);
+@@ -2210,6 +2214,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 
+ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
  {
- 	struct sev_device *sev = psp->sev_data;
-@@ -1026,6 +1043,8 @@ void sev_dev_destroy(struct psp_device *psp)
- 	if (!sev)
++	/* Clear any indication that the vCPU is in a type of AP Reset Hold */
++	svm->ap_reset_hold_type = AP_RESET_HOLD_NONE;
++
+ 	if (!svm->ghcb)
  		return;
  
-+	sev_firmware_shutdown(sev);
+@@ -2415,6 +2422,22 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 				  GHCB_MSR_INFO_POS);
+ 		break;
+ 	}
++	case GHCB_MSR_AP_RESET_HOLD_REQ:
++		svm->ap_reset_hold_type = AP_RESET_HOLD_MSR_PROTO;
++		ret = kvm_emulate_ap_reset_hold(&svm->vcpu);
 +
- 	if (sev->misc)
- 		kref_put(&misc_dev->refcount, sev_exit);
++		/*
++		 * Preset the result to a non-SIPI return and then only set
++		 * the result to non-zero when delivering a SIPI.
++		 */
++		set_ghcb_msr_bits(svm, 0,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
++
++		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
++				  GHCB_MSR_INFO_MASK,
++				  GHCB_MSR_INFO_POS);
++		break;
+ 	case GHCB_MSR_TERM_REQ: {
+ 		u64 reason_set, reason_code;
  
-@@ -1056,21 +1075,6 @@ void sev_pci_init(void)
- 	if (sev_get_api_version())
- 		goto err;
+@@ -2502,6 +2525,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
+ 		break;
+ 	case SVM_VMGEXIT_AP_HLT_LOOP:
++		svm->ap_reset_hold_type = AP_RESET_HOLD_NAE_EVENT;
+ 		ret = kvm_emulate_ap_reset_hold(vcpu);
+ 		break;
+ 	case SVM_VMGEXIT_AP_JUMP_TABLE: {
+@@ -2639,13 +2663,29 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+ 		return;
+ 	}
  
 -	/*
--	 * If platform is not in UNINIT state then firmware upgrade and/or
--	 * platform INIT command will fail. These command require UNINIT state.
--	 *
--	 * In a normal boot we should never run into case where the firmware
--	 * is not in UNINIT state on boot. But in case of kexec boot, a reboot
--	 * may not go through a typical shutdown sequence and may leave the
--	 * firmware in INIT or WORKING state.
+-	 * Subsequent SIPI: Return from an AP Reset Hold VMGEXIT, where
+-	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
+-	 * non-zero value.
 -	 */
--
--	if (sev->state != SEV_STATE_UNINIT) {
--		sev_platform_shutdown(NULL);
--		sev->state = SEV_STATE_UNINIT;
--	}
--
- 	if (sev_version_greater_or_equal(0, 15) &&
- 	    sev_update_firmware(sev->dev) == 0)
- 		sev_get_api_version();
-@@ -1115,17 +1119,10 @@ void sev_pci_init(void)
- 
- void sev_pci_exit(void)
- {
--	if (!psp_master->sev_data)
+-	if (!svm->ghcb)
 -		return;
--
--	sev_platform_shutdown(NULL);
-+	struct sev_device *sev = psp_master->sev_data;
++	/* Subsequent SIPI */
++	switch (svm->ap_reset_hold_type) {
++	case AP_RESET_HOLD_NAE_EVENT:
++		/*
++		 * Return from an AP Reset Hold VMGEXIT, where the guest will
++		 * set the CS and RIP. Set SW_EXIT_INFO_2 to a non-zero value.
++		 */
++		ghcb_set_sw_exit_info_2(svm->ghcb, 1);
++		break;
++	case AP_RESET_HOLD_MSR_PROTO:
++		/*
++		 * Return from an AP Reset Hold VMGEXIT, where the guest will
++		 * set the CS and RIP. Set GHCB data field to a non-zero value.
++		 */
++		set_ghcb_msr_bits(svm, 1,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
  
--	if (sev_es_tmr) {
--		/* The TMR area was encrypted, flush it from the cache */
--		wbinvd_on_all_cpus();
-+	if (!sev)
-+		return;
- 
--		free_pages((unsigned long)sev_es_tmr,
--			   get_order(SEV_ES_TMR_SIZE));
--		sev_es_tmr = NULL;
--	}
-+	sev_firmware_shutdown(sev);
+-	ghcb_set_sw_exit_info_2(svm->ghcb, 1);
++		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
++				  GHCB_MSR_INFO_MASK,
++				  GHCB_MSR_INFO_POS);
++		break;
++	default:
++		break;
++	}
  }
-diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-index 6fb6ba35f89d..9bcc1884c06a 100644
---- a/drivers/crypto/ccp/sp-pci.c
-+++ b/drivers/crypto/ccp/sp-pci.c
-@@ -241,6 +241,17 @@ static int sp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	return ret;
- }
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 8f4cdb98d8ee..5b8d9dec8028 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -188,6 +188,7 @@ struct vcpu_svm {
+ 	struct ghcb *ghcb;
+ 	struct kvm_host_map ghcb_map;
+ 	bool received_first_sipi;
++	unsigned int ap_reset_hold_type;
  
-+static void sp_pci_shutdown(struct pci_dev *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct sp_device *sp = dev_get_drvdata(dev);
-+
-+	if (!sp)
-+		return;
-+
-+	sp_destroy(sp);
-+}
-+
- static void sp_pci_remove(struct pci_dev *pdev)
- {
- 	struct device *dev = &pdev->dev;
-@@ -371,6 +382,7 @@ static struct pci_driver sp_pci_driver = {
- 	.id_table = sp_pci_table,
- 	.probe = sp_pci_probe,
- 	.remove = sp_pci_remove,
-+	.shutdown = sp_pci_shutdown,
- 	.driver.pm = &sp_pci_pm_ops,
- };
- 
+ 	/* SEV-ES scratch area support */
+ 	void *ghcb_sa;
 -- 
 2.17.1
 
