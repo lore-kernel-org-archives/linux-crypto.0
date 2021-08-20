@@ -2,203 +2,316 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D77E8C4320E
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 18:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D857C4338F
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 20:20:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B9F0D61221
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 18:27:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0C10610FF
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 20:20:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230395AbhHTS2b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Aug 2021 14:28:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55648 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229512AbhHTS2b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Aug 2021 14:28:31 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1CCE26124C;
-        Fri, 20 Aug 2021 18:27:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629484073;
-        bh=bKkSyF0cIR7C2YqfM8yKj7Qp9nOnaWZgsyvjnNl53BI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=QDmhDcr5RLG8KteL+FGyHFgWOAWE40/VW5F4h8utD1g+VxmZdTbDF9huphbCCp+Ta
-         FidIR7HZRM+/1ss8nyoryVG9x71BlMsuGJEzOrDAtrlxMmF/LV/YOT5v00Ib46HdOE
-         eUWufuhKaUJUKprf+MogP8oWx/N7rXNrP4xknPuXIPkx8rslUnhxphTKhivhgGIRct
-         m1ozWbRNMnYVCOp8CqCzPD+qzIuqMZCa8BshvzLDonKMTX6BmPzem1XUcABurrXHYl
-         plH8o7pn/7S14BiBjNXQjxHOSbmg5hkjig1RRXNHjHoI4nPq1bRALPpqfHAQj1D6C0
-         HYwR6yAVNiSVg==
-Received: by mail-ej1-f44.google.com with SMTP id d11so21892467eja.8;
-        Fri, 20 Aug 2021 11:27:53 -0700 (PDT)
-X-Gm-Message-State: AOAM533P5cz1oMe4nSAKxtqZFmBRHIr7NsPuUXSBpL36OqWw9Z22ODGu
-        VAgyhw5ncl3kAOvr5TI/w7moEIw3U1YVMADFsw==
-X-Google-Smtp-Source: ABdhPJwOYOWWMI4zSQFJ24B+WJkFRlio9QXgQqVaM4RY0hWlajQIWpruaO0OcC7vKJS6BHduuCFJ2xo7g+YB1b5UJkw=
-X-Received: by 2002:a17:906:25db:: with SMTP id n27mr22606820ejb.108.1629484071600;
- Fri, 20 Aug 2021 11:27:51 -0700 (PDT)
+        id S238891AbhHTUV3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Aug 2021 16:21:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60344 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238862AbhHTUV2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Aug 2021 16:21:28 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31052C061757
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Aug 2021 13:20:50 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id g14so9574793pfm.1
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Aug 2021 13:20:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gateworks-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=90zs5aa37P7zEnS7CuHQxNNBqQQ4S3sRRs1VkdFPZqM=;
+        b=zA8Qvkux1azGsd3++zo4/iy/OVuHoTkPMngPmM4VtfmoWcdeHaC3B+hDR+nAmrcGJm
+         qmyXVTfQtxAXxAr3Aegoe0ZTVz3dDmGoybUfPP1D0Byc0X+uYAe8VS7WDZazdbIVtzKO
+         y6CnX2jyn0djdSrmSgRryoanDJcvOM88gQqTKuUWb2jFE6hEpftcrE/gUD1/Db7BkJno
+         S7M6oVetKv77Cs6TKECdUK/YJb3dNjWpiUgjZiFMtcrsA40edieVsb/GFnvZE2AjvbjQ
+         PvB5OQvgq0x0pqBoTIxjazVOB5wM/AHeMNfH7YNn5t8hy6p8mBlF67H75YCh62PB2WpP
+         nikQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=90zs5aa37P7zEnS7CuHQxNNBqQQ4S3sRRs1VkdFPZqM=;
+        b=Q7gSFjdTJhvwclO2nYuyZNbda/d9jA0j45H8CMEaFDiY2HoMmXpxEFyomtDSuaTLjL
+         RxBqRO99I5G1rsWDdXYtFvhotw6VIKd4tx+Td+Giw2ch2FfqK3yCFVOmhqd/ydvqYcgW
+         Z2LOp2rrcJ33I2zg2dUDcrwTLLRLhbyeUuI28Ap0lWKRTyTw7Sx8692wyy9pihHx3asT
+         KjsxFZapUGgwBEeaYtbFtnw9l7Z5xvaBv/+79K/c0G7FGPmY5EMvOZ3M3Y5y2RU92FU9
+         u82x4FQXuU9EPj+GBqiMkd8P3cjA12oswOMdgtPNU2QcXGJLA+jIVBaGxBnj5A0BEbpe
+         qDuQ==
+X-Gm-Message-State: AOAM532oW1pJW2pTYF/rw66jASZoRJ6OWmlkVZvxjxS9ERM8vKeu0rkQ
+        T7YXF08ZdB6sEDNWiYxwIJtPEkD6lkQyebG3ipn1yg==
+X-Google-Smtp-Source: ABdhPJz8zzpWL7Z1D+zTgor8ZfiKg4yUUpcqc69JLsIJptQKuAv19W3FX1yAgX2IqeJplT7POkctdRg8GKolcohw/98=
+X-Received: by 2002:a63:db4a:: with SMTP id x10mr6433163pgi.30.1629490849582;
+ Fri, 20 Aug 2021 13:20:49 -0700 (PDT)
 MIME-Version: 1.0
-References: <CGME20210817221734eucas1p2e4a0aa41406137b90e49230371b92ac6@eucas1p2.samsung.com>
- <da43d243-35b0-2cc6-f8a0-a5d02c997301@canonical.com> <dleftjtujnemx7.fsf%l.stelmach@samsung.com>
-In-Reply-To: <dleftjtujnemx7.fsf%l.stelmach@samsung.com>
-From:   Rob Herring <robh+dt@kernel.org>
-Date:   Fri, 20 Aug 2021 13:27:39 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqK7MfUL8=0SfaKDoZmtN7qrgejdsZnNFENeEJpJVDuOKw@mail.gmail.com>
-Message-ID: <CAL_JsqK7MfUL8=0SfaKDoZmtN7qrgejdsZnNFENeEJpJVDuOKw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] dt-bindings: rng: convert Samsung Exynos TRNG to dtschema
-To:     Lukasz Stelmach <l.stelmach@samsung.com>
-Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>, Matt Mackall <mpm@selenic.com>,
+References: <cover.9fc9298fd9d63553491871d043a18affc2dbc8a8.1626885907.git-series.a.fatoum@pengutronix.de>
+ <CAJ+vNU23cXPmiqKcKH_WAgD-ea+=pEJzGK+q7zOy=v2o0XU7kA@mail.gmail.com> <2b48a848-d70b-9c43-5ca0-9ab72622ed12@pengutronix.de>
+In-Reply-To: <2b48a848-d70b-9c43-5ca0-9ab72622ed12@pengutronix.de>
+From:   Tim Harvey <tharvey@gateworks.com>
+Date:   Fri, 20 Aug 2021 13:20:38 -0700
+Message-ID: <CAJ+vNU225mgHHg00r67f1L6bEub+_h55hCBAMhCq2rd8kWU-qg@mail.gmail.com>
+Subject: Re: [PATCH 0/4] KEYS: trusted: Introduce support for NXP CAAM-based
+ trusted keys
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     David Gstir <david@sigma-star.at>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>, keyrings@vger.kernel.org,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        linux-security-module@vger.kernel.org,
+        Udit Agarwal <udit.agarwal@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        devicetree@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Richard Weinberger <richard@nod.at>,
+        James Morris <jmorris@namei.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        David Howells <dhowells@redhat.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-crypto@vger.kernel.org, Sascha Hauer <kernel@pengutronix.de>,
+        linux-integrity@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 5:17 PM Lukasz Stelmach <l.stelmach@samsung.com> wr=
-ote:
+On Fri, Aug 20, 2021 at 9:20 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrot=
+e:
 >
-> It was <2021-08-17 wto 16:07>, when Krzysztof Kozlowski wrote:
-> > On 17/08/2021 14:34, Lukasz Stelmach wrote:
-> >> It was <2021-08-17 wto 12:05>, when Krzysztof Kozlowski wrote:
-> >>> On 17/08/2021 11:55, Lukasz Stelmach wrote:
-> >>>> It was <2021-08-11 =C5=9Bro 10:43>, when Krzysztof Kozlowski wrote:
-> >>>>> Convert Samsung Exynos SoC True Random Number Generator bindings to=
- DT
-> >>>>> schema format using json-schema.
-> >>>>>
-> >>>>> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.c=
-om>
-> >>>>> ---
-> >>>>>  .../bindings/rng/samsung,exynos5250-trng.txt  | 17 -------
-> >>>>>  .../bindings/rng/samsung,exynos5250-trng.yaml | 44 +++++++++++++++=
-++++
-> >>>>>  MAINTAINERS                                   |  2 +-
-> >>>>>  3 files changed, 45 insertions(+), 18 deletions(-)
-> >>>>>  delete mode 100644 Documentation/devicetree/bindings/rng/samsung,e=
-xynos5250-trng.txt
-> >>>>>  create mode 100644 Documentation/devicetree/bindings/rng/samsung,e=
-xynos5250-trng.yaml
-> >>>>>
-> >>>>> diff --git
-> >>>>> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
-> >>>>> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
-> >>>>> deleted file mode 100644
-> >>>>> index 5a613a4ec780..000000000000
-> >>>>> --- a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng=
-.txt
-> >>>>> +++ /dev/null
-> >>>>> @@ -1,17 +0,0 @@
-> >>>>> -Exynos True Random Number Generator
-> >>>>> -
-> >>>>> -Required properties:
-> >>>>> -
-> >>>>> -- compatible  : Should be "samsung,exynos5250-trng".
-> >>>>> -- reg         : Specifies base physical address and size of the re=
-gisters map.
-> >>>>> -- clocks      : Phandle to clock-controller plus clock-specifier p=
-air.
-> >>>>> -- clock-names : "secss" as a clock name.
-> >>>>> -
-> >>>>> -Example:
-> >>>>> -
-> >>>>> - rng@10830600 {
-> >>>>> -         compatible =3D "samsung,exynos5250-trng";
-> >>>>> -         reg =3D <0x10830600 0x100>;
-> >>>>> -         clocks =3D <&clock CLK_SSS>;
-> >>>>> -         clock-names =3D "secss";
-> >>>>> - };
-> >>>>> diff --git
-> >>>>> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yam=
-l
-> >>>>> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.yam=
-l
-> >>>>> new file mode 100644
-> >>>>> index 000000000000..a50c34d5d199
-> >>>>> --- /dev/null
-> >>>>> +++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng=
-.yaml
-> >>>>> @@ -0,0 +1,44 @@
-> >>>>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> >>>>> +%YAML 1.2
-> >>>>> +---
-> >>>>> +$id:
-> >>>>> https://protect2.fireeye.com/v1/url?k=3Df38ca35b-ac179a0d-f38d2814-=
-0cc47a31ce52-1faa1ecb65482b8a&q=3D1&e=3D8b3490f9-a5fc-4da0-b2ee-7b0aec78140=
-3&u=3Dhttp%3A%2F%2Fdevicetree.org%2Fschemas%2Frng%2Fsamsung%2Cexynos5250-tr=
-ng.yaml%23
-> >>>>> +$schema:
-> >>>>> https://protect2.fireeye.com/v1/url?k=3D9409519d-cb9268cb-9408dad2-=
-0cc47a31ce52-12394c4409905980&q=3D1&e=3D8b3490f9-a5fc-4da0-b2ee-7b0aec78140=
-3&u=3Dhttp%3A%2F%2Fdevicetree.org%2Fmeta-schemas%2Fcore.yaml%23
-> >>>>> +
-> >>>>> +title: Samsung Exynos SoC True Random Number Generator
-> >>>>> +
-> >>>>> +maintainers:
-> >>>>> +  - Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-> >>>>> +  - =C5=81ukasz Stelmach <l.stelmach@samsung.com>
-> >>>>> +
-> >>>>> +properties:
-> >>>>> +  compatible:
-> >>>>> +    const: samsung,exynos5250-trng
-> >>>>> +
-> >>>>> +  clocks:
-> >>>>> +    maxItems: 1
-> >>>>
-> >>>> How about copying description from above into the description: prope=
-rty?
-> >>>
-> >>> But what to copy? There is no description except generic clock bindin=
-gs.
-> >>>
+> Hello Tim,
+>
+> On 20.08.21 17:39, Tim Harvey wrote:
+> > On Wed, Jul 21, 2021 at 9:49 AM Ahmad Fatoum <a.fatoum@pengutronix.de> =
+wrote:
 > >>
-> >> The description that "was" in the txt file.
+> >> Series applies on top of
+> >> https://lore.kernel.org/linux-integrity/20210721160258.7024-1-a.fatoum=
+@pengutronix.de/T/#u
+> >>
+> >> v2 -> v3:
+> >>  - Split off first Kconfig preparation patch. It fixes a regression,
+> >>    so sent that out, so it can be applied separately (Sumit)
+> >>  - Split off second key import patch. I'll send that out separately
+> >>    as it's a development aid and not required within the CAAM series
+> >>  - add MAINTAINERS entry
+> >>
+> >> v1 -> v2:
+> >>  - Added new commit to make trusted key Kconfig option independent
+> >>    of TPM and added new Kconfig file for trusted keys
+> >>  - Add new commit for importing existing key material
+> >>  - Allow users to force use of kernel RNG (Jarkko)
+> >>  - Enforce maximum keymod size (Horia)
+> >>  - Use append_seq_(in|out)_ptr_intlen instead of append_seq_(in|out)_p=
+tr
+> >>    (Horia)
+> >>  - Make blobifier handle private to CAAM glue code file (Horia)
+> >>  - Extend trusted keys documentation for CAAM
+> >>  - Rebased and updated original cover letter:
+> >>
+> >> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP co=
+re
+> >> built into many newer i.MX and QorIQ SoCs by NXP.
+> >>
+> >> Its blob mechanism can AES encrypt/decrypt user data using a unique
+> >> never-disclosed device-specific key.
+> >>
+> >> There has been multiple discussions on how to represent this within th=
+e kernel:
+> >>
+> >> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP co=
+re
+> >> built into many newer i.MX and QorIQ SoCs by NXP.
+> >>
+> >> Its blob mechanism can AES encrypt/decrypt user data using a unique
+> >> never-disclosed device-specific key. There has been multiple
+> >> discussions on how to represent this within the kernel:
+> >>
+> >>  - [RFC] crypto: caam - add red blobifier
+> >>    Steffen implemented[1] a PoC sysfs driver to start a discussion on =
+how to
+> >>    best integrate the blob mechanism.
+> >>    Mimi suggested that it could be used to implement trusted keys.
+> >>    Trusted keys back then were a TPM-only feature.
+> >>
+> >>  - security/keys/secure_key: Adds the secure key support based on CAAM=
+.
+> >>    Udit added[2] a new "secure" key type with the CAAM as backend. The=
+ key
+> >>    material stays within the kernel only.
+> >>    Mimi and James agreed that this needs a generic interface, not spec=
+ific
+> >>    to CAAM. Mimi suggested trusted keys. Jan noted that this could ser=
+ve as
+> >>    basis for TEE-backed keys.
+> >>
+> >>  - [RFC] drivers: crypto: caam: key: Add caam_tk key type
+> >>    Franck added[3] a new "caam_tk" key type based on Udit's work. This=
+ time
+> >>    it uses CAAM "black blobs" instead of "red blobs", so key material =
+stays
+> >>    within the CAAM and isn't exposed to kernel in plaintext.
+> >>    James voiced the opinion that there should be just one user-facing =
+generic
+> >>    wrap/unwrap key type with multiple possible handlers.
+> >>    David suggested trusted keys.
+> >>
+> >>  - Introduce TEE based Trusted Keys support
+> >>    Sumit reworked[4] trusted keys to support multiple possible backend=
+s with
+> >>    one chosen at boot time and added a new TEE backend along with TPM.
+> >>    This now sits in Jarkko's master branch to be sent out for v5.13
+> >>
+> >> This patch series builds on top of Sumit's rework to have the CAAM as =
+yet another
+> >> trusted key backend.
+> >>
+> >> The CAAM bits are based on Steffen's initial patch from 2015. His work=
+ had been
+> >> used in the field for some years now, so I preferred not to deviate to=
+o much from it.
+> >>
+> >> This series has been tested with dmcrypt[5] on an i.MX6DL.
+> >>
+> >> Looking forward to your feedback.
+> >>
+> >> Cheers,
+> >> Ahmad
+> >>
+> >>  [1]: https://lore.kernel.org/linux-crypto/1447082306-19946-2-git-send=
+-email-s.trumtrar@pengutronix.de/
+> >>  [2]: https://lore.kernel.org/linux-integrity/20180723111432.26830-1-u=
+dit.agarwal@nxp.com/
+> >>  [3]: https://lore.kernel.org/lkml/1551456599-10603-2-git-send-email-f=
+ranck.lenormand@nxp.com/
+> >>  [4]: https://lore.kernel.org/lkml/1604419306-26105-1-git-send-email-s=
+umit.garg@linaro.org/
+> >>  [5]: https://lore.kernel.org/linux-integrity/20210122084321.24012-2-a=
+.fatoum@pengutronix.de/
+> >>
+> >> ---
+> >> To: Jarkko Sakkinen <jarkko@kernel.org>
+> >> To: "Horia Geant=C4=83" <horia.geanta@nxp.com>
+> >> To: Mimi Zohar <zohar@linux.ibm.com>
+> >> To: Aymen Sghaier <aymen.sghaier@nxp.com>
+> >> To: Herbert Xu <herbert@gondor.apana.org.au>
+> >> To: "David S. Miller" <davem@davemloft.net>
+> >> To: James Bottomley <jejb@linux.ibm.com>
+> >> Cc: David Howells <dhowells@redhat.com>
+> >> Cc: James Morris <jmorris@namei.org>
+> >> Cc: "Serge E. Hallyn" <serge@hallyn.com>
+> >> Cc: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> >> Cc: Udit Agarwal <udit.agarwal@nxp.com>
+> >> Cc: Jan Luebbe <j.luebbe@pengutronix.de>
+> >> Cc: David Gstir <david@sigma-star.at>
+> >> Cc: Eric Biggers <ebiggers@kernel.org>
+> >> Cc: Richard Weinberger <richard@nod.at>
+> >> Cc: Franck LENORMAND <franck.lenormand@nxp.com>
+> >> Cc: Sumit Garg <sumit.garg@linaro.org>
+> >> Cc: linux-integrity@vger.kernel.org
+> >> Cc: keyrings@vger.kernel.org
+> >> Cc: linux-crypto@vger.kernel.org
+> >> Cc: linux-kernel@vger.kernel.org
+> >> Cc: linux-security-module@vger.kernel.org
+> >>
+> >> Ahmad Fatoum (4):
+> >>   KEYS: trusted: allow users to use kernel RNG for key material
+> >>   KEYS: trusted: allow trust sources to use kernel RNG for key materia=
+l
+> >>   crypto: caam - add in-kernel interface for blob generator
+> >>   KEYS: trusted: Introduce support for NXP CAAM-based trusted keys
+> >>
+> >>  Documentation/admin-guide/kernel-parameters.txt   |   8 +-
+> >>  Documentation/security/keys/trusted-encrypted.rst |  60 +++-
+> >>  MAINTAINERS                                       |   9 +-
+> >>  drivers/crypto/caam/Kconfig                       |   3 +-
+> >>  drivers/crypto/caam/Makefile                      |   1 +-
+> >>  drivers/crypto/caam/blob_gen.c                    | 230 +++++++++++++=
+++-
+> >>  include/keys/trusted-type.h                       |   2 +-
+> >>  include/keys/trusted_caam.h                       |  11 +-
+> >>  include/soc/fsl/caam-blob.h                       |  56 ++++-
+> >>  security/keys/trusted-keys/Kconfig                |  11 +-
+> >>  security/keys/trusted-keys/Makefile               |   2 +-
+> >>  security/keys/trusted-keys/trusted_caam.c         |  74 +++++-
+> >>  security/keys/trusted-keys/trusted_core.c         |  23 +-
+> >>  13 files changed, 477 insertions(+), 13 deletions(-)
+> >>  create mode 100644 drivers/crypto/caam/blob_gen.c
+> >>  create mode 100644 include/keys/trusted_caam.h
+> >>  create mode 100644 include/soc/fsl/caam-blob.h
+> >>  create mode 100644 security/keys/trusted-keys/trusted_caam.c
+> >>
+> >> base-commit: 97408d81ed533b953326c580ff2c3f1948b3fcee
+> >> --
+> >> git-series 0.9.1
 > >
-> > But there was no description of fields except copy&paste of the core
-> > schema. Do you describe C code like:
+> > Ahmad,
 > >
-> > ...
-> > /* unsigned int is a integer number greater or equal 0 */
-> > unsigned int i;
-> > ...
+> > Thanks for your work!
+> >
+> > I've been asked to integrate the capability of using CAAM to
+> > blob/deblob data to an older 5.4 kernel such as NXP's downstream
+> > vendor kernel does [1] and I'm trying to understand how your series
+> > works. I'm not at all familiar with the Linux Key Management API's or
+> > trusted keys. Can you provide an example of how this can be used for
+> > such a thing?
 >
-> I believe having descriptions for reg and clocks
+> Here's an example with dm-crypt:
 >
-> >>>>> -- reg         : Specifies base physical address and size of the re=
-gisters map.
-> >>>>> -- clocks      : Phandle to clock-controller plus clock-specifier p=
-air.
+>   https://lore.kernel.org/linux-integrity/5d44e50e-4309-830b-79f6-f5d888b=
+1ef69@pengutronix.de/
 >
-> right next to properties' formal definitions is beneficial for anyone
-> browsing the YAML file. If you think otherwise, oh well, I am fine with
-> that.
+> dm-crypt is a bit special at the moment, because it has direct support fo=
+r
+> trusted keys. For interfacing with other parts of the kernel like ecryptf=
+s
+> or EVM, you have to create encrypted keys rooted to the trusted keys and =
+use
+> those. The kernel documentation has an example:
+>
+>   https://www.kernel.org/doc/html/v5.13/security/keys/trusted-encrypted.h=
+tml
+>
+> If you backport this series, you can include the typo fix spotted by Davi=
+d.
+>
+> I'll send out a revised series, but given that a regression fix I want to
+> rebase on hasn't been picked up for 3 weeks now, I am not in a hurry.
+>
 
-We have 2000 schemas currently (and 2300 still to convert). Of the
-~2000, 1646 have 'reg' and 1005 have 'clocks' (I was going to guess
-3/4 and 1/2, respectively, but with a nice uniform, parsable format we
-don't have to guess). Do we need that many copies of variations of the
-same description?
+Ahmad,
 
-What I would like to have is generated documentation from the schemas.
-With that we could either insert a description or a link on all the
-common properties. There are already tools that generate documentation
-out of json-schema, but I don't have the time to investigate them or
-work on any of that.
+Thanks for the reference.
 
-My other idea is some sort of property grepping utility. While grep
-generally works, it would be nice to have some tools aware of the
-schema structure where you could just run 'dt-grep clocks' and have it
-spit out the description. Another example would be to list all the
-valid properties for a given compatible string. Lots of possibilities
-with machine readable bindings.
+I'm still trying to understand the keyctl integration with caam. For
+the 'data' param to keyctl you are using tings like 'new <len>' and
+'load <data>'. Where are these 'commands' identified?
 
-Rob
+I may still be missing something. I'm using 4.14-rc6 with your series
+and seeing the following:
+# cat /proc/cmdline
+trusted.source=3Dcaam
+# keyctl add trusted mykey 'new 32' @s)# create new trusted key named
+'mykey' of 32 bytes in the session keyring
+480104283
+# keyctl print 480104283 # dump the key
+keyctl_read_alloc: Unknown error 126
+^^^ not clear what this is
+
+Best regards,
+
+Tim
