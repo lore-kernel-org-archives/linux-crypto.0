@@ -8,44 +8,44 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A52C4338F
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8480C4320E
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:04:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5AFC661250
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:04:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A301A61250
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:04:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234832AbhHTQFW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Aug 2021 12:05:22 -0400
-Received: from mail-bn8nam12on2046.outbound.protection.outlook.com ([40.107.237.46]:12057
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        id S239564AbhHTQFY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Aug 2021 12:05:24 -0400
+Received: from mail-co1nam11on2049.outbound.protection.outlook.com ([40.107.220.49]:48673
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235123AbhHTQDU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S235950AbhHTQDU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 20 Aug 2021 12:03:20 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=diXJCqWeYf6JU6CrVUB8n4de1eJtdzec1MOvIZk3LhnDt5HaZ+A9ow2Ov18UkNjIt2uOycc9nh56ioIHJqm2JDGJgV1YIdcYtAxPLtJThSu/GD8V1NUgjXKBK2UwNXbt5OgUbBAq+xM+fDuc3caZMspTufaTqJHEQeKLDnX0t0qd6kMsCdYRSMCXOlOe8awsI0NuAHCavANG0ATyePJEJW2XNUTRSfRQFAQ2sJZCsEHHOU4akXU/hPNIen62vJE+EI9Me090qJbJ4KLR3mXmAskGhRztl3cVO/O9JcuPsscZ+oMt93wa3mAHn1ZNuGA9w/zYj/M1h3Y9dA3r7dZwXA==
+ b=lgzhvb4ad6SfD84S8+DidqMk2d97JqJ7f14CEmAi5V9D0twVNPiGvye4506swYhQ2rXfpaJvdsLDd9wJxg1ZRkTXUbHRPnkW57sbHAfvwzBexEhMuUW3I96cNJkFNcQY6Ir10ct8tw0aDsx7KXmaDD1mk2wT7c066A4iGX96LLoHikmxwmVN5o6stM0KSWO4tJWTaXAHV7yWRZosFzmxV1ZQZaHnQ4tLFHUTsbRc/2UKrTpvYkf/kz7lX2WnFCw+VkDFWviSWxpSuzb+HnjpaxFoNedNWMQDGNUkAPCOihpCzf/lb2K0vjGv1Bk5GUbFwb0PtwMSw1EjsNX0hvo9PA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FToI2YrXRrehyRiPEdYSZHUhoues+OdXNzpg7Ok4jrc=;
- b=FlRabT9Bu9fDrxRIbBnL7zYoszeOmhHvv4ZcZOxWxvNVgh5mG9KSkalnK8SwNPvjnVQ8uDlWA1fJE78lLaBhJz8EVQ7rHdGI4zjTdNH+1LTblc6AG8KOTW1B8/WhRZQupXnyCqaO8lRskKv2xOa2slgXFdCEx+WaJzTBpWB06lW2cGqxd0fJwduhKgk9mvYpH6z1kacoLgIAnCp7ZMwd19o22brVE7XQbwo2JZ0iWfGmSQvmU1ZoLhuYM7PKGqdGwAYUfk7J0Bqx2eqSXMuMz1EBZIdejuv8UAzLm7vvOmPEQjzuRfREWP6wKC8JZI7veuY17akgFAkfMnXz+dV4Hg==
+ bh=SskhzyDvqfaIYDs2SMy1p2yCg2F/EtAhJWXlasHkM5E=;
+ b=ALzdBaX4viNV4LGZf1S6j9OsvQz1aKXHl5bWMltLvzmJuOivMtvEuV4kNL4nqzSKOG2wYUxTVOfzONvzt0dXvCDWvxZluYdmgHSMjoM8/KlnRqExj1rH27+s6hLmSw5psqs3JcnELmBjhnuMFhfFXH59qICJGtD6l7s2KAn9scr2CFgHUQiYe982I+wI7PTRTCcqiJP+I+UM96CMIq5lz9K6o5tfFv5d88wP5ucn3rN6GVq1OAZI4pS03kCalr5GtL4zmeMpW6G9MtnLwqz+jJS5vvHEZ7e2rynWL3V6MaRRoML2vJFkBhQRwUhE0CwNr5R6B46tSVI8cqvGMr3hjA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FToI2YrXRrehyRiPEdYSZHUhoues+OdXNzpg7Ok4jrc=;
- b=NOlmfZ0uv9xSPFw8gLmpvpVL9EKtG1xrN2ZE8sLohE/gQJoOTzUJpjXRsHqpI6vkpjJQOQj7jF4etjS4w45uQ4uQdzo+vzHlx91RcbYuk2ZaSV6xGPgLasm/EWeUP7brza7DWjtVJtuzYfmjlFzcta0SMw0LnvSy1azxbDhCa/0=
+ bh=SskhzyDvqfaIYDs2SMy1p2yCg2F/EtAhJWXlasHkM5E=;
+ b=3HD8TXMHIbyZZvjvunI0nMwjSVPVQqhLIni6HIUxM80KyD0Dfk+8bk93cNX3rGo/uhbSgkLgJHdaU3dMT86Y2OX9XwIudD0ZoLALyexCcSpzl/K8GkLYRc8QiX1vCNGCzFR7XN43gpl6E8bPuMA1rLCo1mgEzoHpK/CFOXdzpjE=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4509.namprd12.prod.outlook.com (2603:10b6:806:9e::16) with
+ by SA0PR12MB4574.namprd12.prod.outlook.com (2603:10b6:806:94::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Fri, 20 Aug
- 2021 16:01:09 +0000
+ 2021 16:01:07 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4436.019; Fri, 20 Aug 2021
- 16:01:09 +0000
+ 16:01:07 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -74,9 +74,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 v5 40/45] KVM: x86: Export the kvm_zap_gfn_range() for the SNP use
-Date:   Fri, 20 Aug 2021 10:59:13 -0500
-Message-Id: <20210820155918.7518-41-brijesh.singh@amd.com>
+Subject: [PATCH Part2 v5 34/45] KVM: SVM: Do not use long-lived GHCB map while setting scratch area
+Date:   Fri, 20 Aug 2021 10:59:07 -0500
+Message-Id: <20210820155918.7518-35-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210820155918.7518-1-brijesh.singh@amd.com>
 References: <20210820155918.7518-1-brijesh.singh@amd.com>
@@ -86,111 +86,212 @@ X-ClientProxiedBy: SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.18 via Frontend Transport; Fri, 20 Aug 2021 16:00:44 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.18 via Frontend Transport; Fri, 20 Aug 2021 16:00:36 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0d91976f-9d26-412c-7ee1-08d963f3ab1e
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4509:
+X-MS-Office365-Filtering-Correlation-Id: e04094e7-dc0d-4c42-45d8-08d963f3a6d3
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4574:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB45096C2F515C36F9BE32EF12E5C19@SA0PR12MB4509.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4574B525515FD295B57412E9E5C19@SA0PR12MB4574.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Yt0Cwl9qoESg5yBc37cTqii/arJMEH3ZDkQt17und2KHZFV0y5X0eGG1WiWLUGlYEyDcLk4k9UkXpz8rO3Vq6k7kxQ4aTZoMw704YD2zZdB7578I4rN+RN0Q4WEtBIs7O/o4+kHiTAvhHlpbD3nx2J3Ef3nqRKbJCJRPqC1rw3G8OD8zcET4hcCC2Kjc8W0l3t2MiizzlgHk5gzFQQYx5y1tb1GnnNH6VhdsyMr65FPmzWLqPMp7qST0fyjKpoipWDmHgOIQXTx8zjIzVPX5b5xBQDD/0Rx5izVg/VvHPhLZbvD7/Qpfz2mHvdFAizOxiArisVfGC+d7uxsTIGliQcbLEkRMYxxMwPM6M9Q4r2it+VAswEMGThiZbQVJ3Xf4u3zYJEnRzz4Nwqu/0c/39fefijKCUv9TgJjhgZwWK8JK6MrbK/htrBKYsYvUiyEj5r95Sw62aiAjdozqlh5b3gcIMwL4ho/9N4xMe5jq+P4gpLwHwOLd4DXiHfGy5NiacPDETDrjqjOuMUYzCC923t4iAJt7ofFBU/2U2aD1578l2mU+9dU0khx+J3Zmqv3rXEyoSPOTsKUNAPOM1JP9G69zmcW/ph6Noao9vSKelkTAUibk04tYLXZdkQb7kio2+eiGDkRelAYmnMg9HUCIeIiXlDaKYBAW829KxUQx0UIZFe0mnAPhYYKivhuvm4q7
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(4326008)(36756003)(7416002)(44832011)(54906003)(316002)(66946007)(66556008)(66476007)(86362001)(7406005)(956004)(6486002)(2616005)(2906002)(83380400001)(38350700002)(38100700002)(186003)(5660300002)(8936002)(52116002)(1076003)(7696005)(8676002)(26005)(6666004);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: HAK3Wh9CyLFkNg2OcLyp92LszmoVnaZDYR6yIoLt3Wjjm8nJ9sUuCn1R9DuR7O5KUF/WjRe04IHvRd7/JJMNTVTeQOXKohvzCuFHjmits0bIe8/aGH9DsjvaPk5ZD2+OWuDMzdzfgiXjc+pD4k+czTZEBxPSmFkRxgLB9lNRNFeL9k5y89nFTm1Vo7FWB3ZehgTUlDG5s/TIjT3bKWaYhPGKebe/UCarMT2LPQaSK09tdm9WwKU7kampmU8mAsYQOAnL/R9A4ySHopRHv1PQjj6KHMEkhWq2GU0V+etPuI7QzTsFWPP/4c76nd4IguNeYUBJi7jOl3tSVE/XJC0duNe9Cl2oEyzEii5wp8qVhdkzgGNI7AYjeUacrABRwkmn3kxk2hx0oVQUHwVNcT18IPt1SzbVffPEqgnmPb4d11bndNtE+fqKjkClB3VlKjt0+9t8GhMtOlH+oCnbBrJlYcLhJ531x4aA3NidcfYwo2ZkQ9OzjIQDJpaK3o197GAhbk3rBaoNfjXI9eqMvkD/xQ5tvM40KVq6cD1zaC/QavKS58UxxqiQCjvQzI6oocCPrzM95BYx7FRe8faBmDKmjlwu4/0bX/osGfIXEXb7y4ivodRPklM+Ozf0Zz50bd2U4LMNhkOKHAyznqk1SVzWb0JRrAEsGi0oUa603Up+qE16fhVGijxeUCE0sBGMpwwMFpASmcYysl7CP1fGBFd42g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(396003)(346002)(366004)(39860400002)(1076003)(38100700002)(316002)(38350700002)(5660300002)(26005)(44832011)(4326008)(66556008)(54906003)(7416002)(7406005)(8676002)(66476007)(86362001)(66946007)(6666004)(2616005)(956004)(8936002)(2906002)(36756003)(83380400001)(478600001)(6486002)(7696005)(52116002)(186003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9Nk3IgFQoM+gLCTEJzmI5sH9N1lVHBw2VmzYOvwcireX2eGCT96Gtwht5HOH?=
- =?us-ascii?Q?Q0pE91u5QaiDl8RlzFXhRodzBZbVoriwFhXwACZmT5M57kk9iwhgtfduYWI3?=
- =?us-ascii?Q?0vQlvtc11/kC/j5gaX+436waDotoXSFxd1YuvRKB6jRNbCoUXq6G5jXzhCnP?=
- =?us-ascii?Q?yQaGXl9Aw+v7rGb0OmvM6xIFrY/xOx7zhNwFr+FoW9frPuHlUrFyCl7eJwTD?=
- =?us-ascii?Q?JsCqAV8cG+wVKMeQaTUIVZ5BUMqnZ7V4I9FLOnY1rlohRz4cpW+G5kDX3ryA?=
- =?us-ascii?Q?pdD3AjzObgkR4fsGczbaIWczGLc+O6H8zekfB43jiF9ZeqTOi7TPN2EuqG5h?=
- =?us-ascii?Q?LQbzNYiJnrY6Bn8Kvpb7BzKOZJONgYD7S9NklG6r4JUJZCkw5ng3AxwC2UZp?=
- =?us-ascii?Q?5L/ecl3cmsIoaciXYfmTaNUOnkOwMD+9mItBZo3A/K4XLv7T/HY9yfOED7uB?=
- =?us-ascii?Q?pedItCwWwUQY45eIUFdNKGeaDXaJEM1uuAulQnzdRfPaZfF4zANWwIAwyRY+?=
- =?us-ascii?Q?hu2TwmYJ7w6kZoL9cSlyLw4ukHmUR+GIJmy7oQ05W2WmC8CG25JWUCt6uH7b?=
- =?us-ascii?Q?TDGBLqQzLS4M4plDR1fl9iMe15SvS2gvIPEESNUUrG4A/K31g80Jmk9A6OMC?=
- =?us-ascii?Q?p3t1+FCGLg2eEUUstrqEpNFefEtRCPwW/YCEl9ZI7ZRiCO2wTa+Z6YFwHvwZ?=
- =?us-ascii?Q?P4ixTVFIskwju4Om0bganUDpGcOXoue3k0eKbPxGsOoCU1ZiFXvlRc5ZKpSN?=
- =?us-ascii?Q?h2BGf7kTcgwcijsdRBU+WSnrmyZ9zaZxL/U2LCsTxeNa9uQVbLWOgKvJmw/T?=
- =?us-ascii?Q?emibU4EMESfVmuGQNQSKp1UcIWHi1Ikf9AvcwiHoZILajiDfPFQDgZHk25Wm?=
- =?us-ascii?Q?LsjorkQbONkmkna2IFqUjkpP089pi9UJYugCJoZPL8VeCFZWG/tRXOEg6VVT?=
- =?us-ascii?Q?M/1o6Y0TIi/Lw74S+c8/aQjWe57AtLkuMk6XL7EuDzoAGmZo2sIQTb+vS02j?=
- =?us-ascii?Q?BROuQ7jLwZ2UA+ORX1yeeTORxd1FiuKsWdcpH4BPEYGQLO3AubJBvZZwjSGf?=
- =?us-ascii?Q?+Z7BtkQkcV5OjJn1HcX7D6txTiPbDzToTlr6eyPybIXpNAn1EGWzb9wNjBNH?=
- =?us-ascii?Q?oyhtshUENB1Kxo5NOFw2I8U0++O+sEiAsaF9+eGbQyH0qdcqbDPsDndxxe0K?=
- =?us-ascii?Q?4W9lu6OL3bzv3kWCgzBj9Y/beV4PReVW6Vm0DwgyN+VrI7LiN5XQXMraf09C?=
- =?us-ascii?Q?hYRYuqzTrXsSkCaFzvowXMuUcJcd/6eTFo4uerigSZwd3TP2JH41jF+Cm5TZ?=
- =?us-ascii?Q?TCRhijE33kMPvCrTLrQhU0uq?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GyfbZWUdMaCD1XIxGLxOLk1dgU12r4eux1dhKe6r1cfWbH7nfR2NeBS4DNZV?=
+ =?us-ascii?Q?nIUZ3xP3uh2i0t1VaqLYqKtd++TR3ondBnRPAdgE/MxCIMuI3/u0mQxfywqn?=
+ =?us-ascii?Q?GdTTP8Ixw5vrBHQPhYEhMZYQSWgA354v24snDUjCb3dioWaJ2ASYmZtPSnyi?=
+ =?us-ascii?Q?QNTzkX9+JouYdtvjdvRGZ5Pdgod/SrMTK0K9lZG95LOfNvZmdgFJpULt0P4v?=
+ =?us-ascii?Q?fiR0nMmuVQc8ak9v/HAdPMgG+ANQS8e5TSg7XDtmPMwkYUvQqqNy/vUuSiEr?=
+ =?us-ascii?Q?+pH52uEFkkLgFh5jmmUCxl5fnLClR7cLOhY07HdgjKyOlkMUW5HLOnvi7sRw?=
+ =?us-ascii?Q?JGWFhI0nO0OqBldMV+VwlzNKq8SbgPIL90dDboRAxbv94Zw6CsXyIr6nJeCO?=
+ =?us-ascii?Q?LQxQGFgjNjbzDi17QQgwQ+gM/6dBM7LUbgfSGD1anONrPbUdIZ5spOyZblds?=
+ =?us-ascii?Q?Ck34JvpYb2+hlcT9XsiKouUjzdXTL9PCMXiO3T33shhg4ZG2tzz7shzrPF6K?=
+ =?us-ascii?Q?JQVx32Pze5uQdcozr8ULhZYc8qbLEyuFq0bwhOUQwhzat9dE0itT7kGpjUhk?=
+ =?us-ascii?Q?ut6WuinVuqNwjbhI1bd62lAgGxGglJTdejjWAx9o0AnwTfoXKTUz7nC2OP39?=
+ =?us-ascii?Q?s/t/Mf7fEB5lexwinfG8q3nTy71rX/pS0kXn89UCaNAUkcGAorO8JRreFjlN?=
+ =?us-ascii?Q?OppU3pwmI5XcguMJorNFooFzF/rnrKVt4rc9WUw7dhHoq6z8enuzra6Kptrp?=
+ =?us-ascii?Q?rm1vttrZB9GilNUVcD2SRYmN3RyOiWKJ4Caa4P58H7bVvRJHF5XNLFSO89ie?=
+ =?us-ascii?Q?3S3TMym4Km7m17Wq4kXhnOoMmrLDFg+CvP7pzXn8A97zhR0HgcKiMZuitJ9Q?=
+ =?us-ascii?Q?tpLctuCI/e0ByY5kbdPmqrCzmah7TeewOQv73AuljtBqXXYO1Klih5RPrsla?=
+ =?us-ascii?Q?zqsnX7nLft+EVXpD9giGRgnHw3gZc0PaNL+6BF5XdfSP6wgQ+ww/BeBzrcfQ?=
+ =?us-ascii?Q?heb5xEiZ36FiS6gvsA9z80LuT2ZbHJ/EbFVs7thRB4S6eTTCWKW5YLCiuHGy?=
+ =?us-ascii?Q?tI+YoeMhag6kXbvVD8PZJpRwr+f4JqO1LE1snqDxG+wd3lPTmkLM/vgcaYZo?=
+ =?us-ascii?Q?Tjp8YDwvBCk/CBC6e9l3dNlr6eF0hOheanlkovZyPb/4KKR7vFSyh81eFe5V?=
+ =?us-ascii?Q?9WcZAWml2A0arbwaDRbaomeqj6SWulE5dxLbOcOAvw9f4Fz/n+mboUY1mBdL?=
+ =?us-ascii?Q?05aryUg0jzc6vEX2Om8hrpLYcXhUoqD328/jrmCqtlrRx6ZH886EEmxu0vyV?=
+ =?us-ascii?Q?YLMNlt50Jv/GEPVSdyJyDMuH?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d91976f-9d26-412c-7ee1-08d963f3ab1e
+X-MS-Exchange-CrossTenant-Network-Message-Id: e04094e7-dc0d-4c42-45d8-08d963f3a6d3
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 16:00:45.0789
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 16:00:37.9111
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HPtRTYy3pv+LMFUQXqA/ILyuKmc8QzAbLrv2wP5rziatRIYtOMlnAq/z4yS+hUb0uFyuaw+RePCIrTMf6Vi0JQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4509
+X-MS-Exchange-CrossTenant-UserPrincipalName: rYSjqFPtjRaWkddVj1OoeIavjoj4JGQ05QO22ifMEnIDJJfYnpkgLdikh/1zXMUTGG8tIbAK6r2gN6HOgY/Hrw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4574
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-While resolving the RMP page fault, we may run into cases where the page
-level between the RMP entry and TDP does not match and the 2M RMP entry
-must be split into 4K RMP entries. Or a 2M TDP page need to be broken
-into multiple of 4K pages.
-
-To keep the RMP and TDP page level in sync, we will zap the gfn range
-after splitting the pages in the RMP entry. The zap should force the
-TDP to gets rebuilt with the new page level.
+The setup_vmgexit_scratch() function may rely on a long-lived GHCB
+mapping if the GHCB shared buffer area was used for the scratch area.
+In preparation for eliminating the long-lived GHCB mapping, always
+allocate a buffer for the scratch area so it can be accessed without
+the GHCB mapping.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/kvm_host.h | 2 ++
- arch/x86/kvm/mmu.h              | 2 --
- arch/x86/kvm/mmu/mmu.c          | 1 +
- 3 files changed, 3 insertions(+), 2 deletions(-)
+ arch/x86/kvm/svm/sev.c | 70 +++++++++++++++++++-----------------------
+ arch/x86/kvm/svm/svm.h |  3 +-
+ 2 files changed, 34 insertions(+), 39 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5ac1ff097e8c..8773c1f9e45e 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1561,6 +1561,8 @@ void kvm_mmu_zap_all(struct kvm *kvm);
- void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
- unsigned long kvm_mmu_calculate_default_mmu_pages(struct kvm *kvm);
- void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
-+void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 2ad186d7e7b0..7dfb68e06334 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2490,8 +2490,7 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+ 	__free_page(virt_to_page(svm->vmsa));
+ 
+ skip_vmsa_free:
+-	if (svm->ghcb_sa_free)
+-		kfree(svm->ghcb_sa);
++	kfree(svm->ghcb_sa);
+ }
+ 
+ static void dump_ghcb(struct vcpu_svm *svm)
+@@ -2579,6 +2578,9 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
+ 	control->exit_info_1 = ghcb_get_sw_exit_info_1(ghcb);
+ 	control->exit_info_2 = ghcb_get_sw_exit_info_2(ghcb);
+ 
++	/* Copy the GHCB scratch area GPA */
++	svm->ghcb_sa_gpa = ghcb_get_sw_scratch(ghcb);
 +
- 
- int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3);
- 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 7c4fac53183d..f767a52f9178 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -228,8 +228,6 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 	return -(u32)fault & errcode;
+ 	/* Clear the valid entries fields */
+ 	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
  }
+@@ -2714,22 +2716,12 @@ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
+ 	if (!svm->ghcb)
+ 		return;
  
--void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
+-	if (svm->ghcb_sa_free) {
+-		/*
+-		 * The scratch area lives outside the GHCB, so there is a
+-		 * buffer that, depending on the operation performed, may
+-		 * need to be synced, then freed.
+-		 */
+-		if (svm->ghcb_sa_sync) {
+-			kvm_write_guest(svm->vcpu.kvm,
+-					ghcb_get_sw_scratch(svm->ghcb),
+-					svm->ghcb_sa, svm->ghcb_sa_len);
+-			svm->ghcb_sa_sync = false;
+-		}
 -
- int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
+-		kfree(svm->ghcb_sa);
+-		svm->ghcb_sa = NULL;
+-		svm->ghcb_sa_free = false;
++	 /* Sync the scratch buffer area. */
++	if (svm->ghcb_sa_sync) {
++		kvm_write_guest(svm->vcpu.kvm,
++				ghcb_get_sw_scratch(svm->ghcb),
++				svm->ghcb_sa, svm->ghcb_sa_len);
++		svm->ghcb_sa_sync = false;
+ 	}
  
- int kvm_mmu_post_init_vm(struct kvm *kvm);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index e660d832e235..56a7da49092d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5748,6 +5748,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+ 	trace_kvm_vmgexit_exit(svm->vcpu.vcpu_id, svm->ghcb);
+@@ -2767,12 +2759,11 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
+ static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
+ {
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+-	struct ghcb *ghcb = svm->ghcb;
+ 	u64 ghcb_scratch_beg, ghcb_scratch_end;
+ 	u64 scratch_gpa_beg, scratch_gpa_end;
+ 	void *scratch_va;
  
- 	return need_tlb_flush;
- }
-+EXPORT_SYMBOL_GPL(kvm_zap_gfn_range);
+-	scratch_gpa_beg = ghcb_get_sw_scratch(ghcb);
++	scratch_gpa_beg = svm->ghcb_sa_gpa;
+ 	if (!scratch_gpa_beg) {
+ 		pr_err("vmgexit: scratch gpa not provided\n");
+ 		return false;
+@@ -2802,9 +2793,6 @@ static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
+ 			       scratch_gpa_beg, scratch_gpa_end);
+ 			return false;
+ 		}
+-
+-		scratch_va = (void *)svm->ghcb;
+-		scratch_va += (scratch_gpa_beg - control->ghcb_gpa);
+ 	} else {
+ 		/*
+ 		 * The guest memory must be read into a kernel buffer, so
+@@ -2815,29 +2803,35 @@ static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
+ 			       len, GHCB_SCRATCH_AREA_LIMIT);
+ 			return false;
+ 		}
++	}
++
++	if (svm->ghcb_sa_alloc_len < len) {
+ 		scratch_va = kzalloc(len, GFP_KERNEL_ACCOUNT);
+ 		if (!scratch_va)
+ 			return false;
  
- void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 				   const struct kvm_memory_slot *memslot)
+-		if (kvm_read_guest(svm->vcpu.kvm, scratch_gpa_beg, scratch_va, len)) {
+-			/* Unable to copy scratch area from guest */
+-			pr_err("vmgexit: kvm_read_guest for scratch area failed\n");
+-
+-			kfree(scratch_va);
+-			return false;
+-		}
+-
+ 		/*
+-		 * The scratch area is outside the GHCB. The operation will
+-		 * dictate whether the buffer needs to be synced before running
+-		 * the vCPU next time (i.e. a read was requested so the data
+-		 * must be written back to the guest memory).
++		 * Free the old scratch area and switch to using newly
++		 * allocated.
+ 		 */
+-		svm->ghcb_sa_sync = sync;
+-		svm->ghcb_sa_free = true;
++		kfree(svm->ghcb_sa);
++
++		svm->ghcb_sa_alloc_len = len;
++		svm->ghcb_sa = scratch_va;
+ 	}
+ 
+-	svm->ghcb_sa = scratch_va;
++	if (kvm_read_guest(svm->vcpu.kvm, scratch_gpa_beg, svm->ghcb_sa, len)) {
++		/* Unable to copy scratch area from guest */
++		pr_err("vmgexit: kvm_read_guest for scratch area failed\n");
++		return false;
++	}
++
++	/*
++	 * The operation will dictate whether the buffer needs to be synced
++	 * before running the vCPU next time (i.e. a read was requested so
++	 * the data must be written back to the guest memory).
++	 */
++	svm->ghcb_sa_sync = sync;
+ 	svm->ghcb_sa_len = len;
+ 
+ 	return true;
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 27c0c7b265b8..85c852bb548a 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -199,8 +199,9 @@ struct vcpu_svm {
+ 	/* SEV-ES scratch area support */
+ 	void *ghcb_sa;
+ 	u64 ghcb_sa_len;
++	u64 ghcb_sa_gpa;
++	u32 ghcb_sa_alloc_len;
+ 	bool ghcb_sa_sync;
+-	bool ghcb_sa_free;
+ 
+ 	bool guest_state_loaded;
+ };
 -- 
 2.17.1
 
