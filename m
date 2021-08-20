@@ -2,77 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C91DC4320A
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 08:31:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E395FC4338F
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 10:03:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 008EB6113B
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 08:31:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA24A610CB
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 10:03:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231841AbhHTIcP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Aug 2021 04:32:15 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:53678 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231757AbhHTIcO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Aug 2021 04:32:14 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1mGzvp-00022Y-UW; Fri, 20 Aug 2021 16:31:17 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1mGzvj-0007Py-39; Fri, 20 Aug 2021 16:31:11 +0800
-Date:   Fri, 20 Aug 2021 16:31:11 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
-Cc:     davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, hpa@zytor.com, ardb@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
-Subject: Re: [PATCH] crypto: xts_crypt() return if walk.nbytes is 0
-Message-ID: <20210820083111.GA28484@gondor.apana.org.au>
-References: <YQ0Qm+Xs1g/7Eant@fedora>
- <20210809141027.860850-1-chouhan.shreyansh630@gmail.com>
+        id S238029AbhHTKEQ convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Aug 2021 06:04:16 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.85.151]:34775 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237085AbhHTKEP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Aug 2021 06:04:15 -0400
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-138-08xoD29xPr-TFgjlVjHiyg-1; Fri, 20 Aug 2021 11:03:32 +0100
+X-MC-Unique: 08xoD29xPr-TFgjlVjHiyg-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.23; Fri, 20 Aug 2021 11:03:31 +0100
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.023; Fri, 20 Aug 2021 11:03:31 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Tianjia Zhang' <tianjia.zhang@linux.alibaba.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Eric Biggers <ebiggers@google.com>,
+        "Eric Biggers" <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        "Ard Biesheuvel" <ardb@kernel.org>,
+        "Markku-Juhani O . Saarinen" <mjos@iki.fi>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Jia Zhang <zhang.jia@linux.alibaba.com>,
+        "YiLin . Li" <YiLin.Li@linux.alibaba.com>
+Subject: RE: [PATCH 0/2] add AES-NI/AVX2/x86_64 implementation
+Thread-Topic: [PATCH 0/2] add AES-NI/AVX2/x86_64 implementation
+Thread-Index: AQHXk+GFp5jaKaOaxEa6x1rB2t/aG6t8LFCw
+Date:   Fri, 20 Aug 2021 10:03:31 +0000
+Message-ID: <f7684dd9dc5e4c6081ba8e51f53e0844@AcuMS.aculab.com>
+References: <20210818033117.91717-1-tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <20210818033117.91717-1-tianjia.zhang@linux.alibaba.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210809141027.860850-1-chouhan.shreyansh630@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 09, 2021 at 07:40:27PM +0530, Shreyansh Chouhan wrote:
-> xts_crypt() code doesn't call kernel_fpu_end() after calling
-> kernel_fpu_begin() if walk.nbytes is 0. The correct behavior should be
-> not calling kernel_fpu_begin() if walk.nbytes is 0.
+From: Tianjia Zhang
+> Sent: 18 August 2021 04:31
 > 
-> Reported-by: syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
-> Signed-off-by: Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
-> ---
->  arch/x86/crypto/aesni-intel_glue.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-> index 388643ca2177..ec6eac57c493 100644
-> --- a/arch/x86/crypto/aesni-intel_glue.c
-> +++ b/arch/x86/crypto/aesni-intel_glue.c
-> @@ -849,7 +849,7 @@ static int xts_crypt(struct skcipher_request *req, bool encrypt)
->  		return -EINVAL;
->  
->  	err = skcipher_walk_virt(&walk, req, false);
-> -	if (err)
-> +	if (err || !walk.nbytes)
->  		return err;
+> This patchsets exported some of the common functions implemented by
+> the SM4 AESNI/AVX algorithm, and reused these functions to achieve
+> the acceleration of AESNI/AVX2 implementation.
 
-The err check is now redundant because when there is an error
-nbytes is always zero.
+These functions need bracketing by kernel_fpu_enable()
+(or whatever it is called.)
+That will significantly affect the performance.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Also the functions look pretty big (I don't know how big
+the generic ones are) and will take time to load into the I$
+and will displace other code.
+
+So while a hot-cache benchmark might show improvements
+for repeated calls is isn't obvious that any significant
+gain will be made for real-life calls which could easily
+be of single buffers.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
