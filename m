@@ -8,44 +8,44 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB560C4320E
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:02:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97195C4320A
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:02:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95EA261221
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:02:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D71A61221
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:02:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235168AbhHTQCd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Aug 2021 12:02:33 -0400
-Received: from mail-co1nam11on2064.outbound.protection.outlook.com ([40.107.220.64]:53792
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        id S232769AbhHTQCo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Aug 2021 12:02:44 -0400
+Received: from mail-bn8nam12on2072.outbound.protection.outlook.com ([40.107.237.72]:45024
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233795AbhHTQBl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Aug 2021 12:01:41 -0400
+        id S238236AbhHTQBo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Aug 2021 12:01:44 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CbdQw+gcVbpacfCFut6S7TwBXREGtyTP4T0b+4RhNYh4YuJA6GYUTDT+Oi4aH9MYnFts9HFQVJJpkNiKjoGMShTZD6xTptdcg/zArYgmun78nH9hzLBZtpbZ4LuSx1aSaHvDz2jJsvYQDrf2CPUNcDs52WTg3JqaQHFkkKnz7B1M1JQECD9CxvFKaUHIXqvzndcp+oMy+X8VqmkgXBfYKL+EGgm6pNv59f4rUM7lin2OR5yqQijIbzIHM1XQr0E8iABc9o9SiR+1ySfV96cQTRsFfm37lngPtzsH8q81RO1y5flrW9sSqhnWxXjlkza13j+HNoz4GzaPzCyxJS8hpQ==
+ b=mIDro/KC6Y3I/JQaptr/pLOpoqEhVnP9YmFZ7IIcGY+cGniJwRxVck6hVTQ26CDXQpFppxVySq4k3C4UOoeQ1IfKfA85EsHeBF4vtnp75FUBNm7a7mykrIEMY6xvr/enFXX7hs1PJ4OXZB0pLYBG8JZNsAszuwq1G7tSwgW4bTMcwW2sP2RRCZ1by2FKExLb02uKGdlTS9coSY3yEigxX2iZLLR2WRJ8ncL99bXNa0044fkRRYDjznNei+I2cHSH6y4PplBoxKIdvogQnguMMEUEbMufwJycnBJDszMm4plfXdJdAhZxKD9P1mFnOMMUk+tqLGC4x//2XiVW0cOCTw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I5Hu5DkJ7LdKmBWY1fO8ipCCK/p6x+o4WD5oR1GhaHc=;
- b=HK/4kGXbrpluRyCbPyqSvDW8vLDO9kkuNJQUoUrnGh8izuntPSxiwdIoB7gDsCWKyFeGQ1QfvzN5g28D/mFbJJ4crPJO1CT9w7PFTH85FycPlW14WgMqaEK3yxznbdHPa0wKVtYvbjsDsUhP9HpYkuofFwiVUAvBJjvutuW+nw/P4vHjZJ03651tRpbBJdhpT/epDMSsk1vQR9zHaBiCIni65/Hbyogr8LeEyVK/1atB1Ve1L1sSIzCi2vMMu9p4wopYr9eYdlurrZ0/HGByOYJBnLCkG1peD47HNvgOFjtGIIxkIV4KYicBr0XYJ3ZAntN3d7gYVhD/udeQmSAZUg==
+ bh=ss4ZiIEv6xO6y05eHHgwn5Z4J27VjjFqzE1gAjS/mN8=;
+ b=VMahWh3Se0ntzw+FiGZeW6AwHdP86K6WDH0T2j6wKb6h/du2MWnlQ4/7B3rbmfwiADH7JmHewU7ub4V9H+EnaPl+KY3KQmWAcN1qMOsB7ENRx4KRK/B9NExI5OXS5Ojjy3UEyIXQ3F8g2JAdUYJXcXHq3f5H7XRkzTaTHwcFSiYXNwEgZpU1LP/cye9gitj+u+sDuF7sHSc777uUZ4JGgMAKF2YKQNTtn9/ytj9Cr400yRZYTI5BS9mKN3UyQ1SjKHqG9VECjKR71IM+waXm1AWxLm+gRX/+zylkjlIIrqWimBTPA2piKHEl1ZBrslzmGJCG/fNb81HLSbJBQHrXiA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I5Hu5DkJ7LdKmBWY1fO8ipCCK/p6x+o4WD5oR1GhaHc=;
- b=bKO4LLYuufMpgiiPmvE8jmbEZN5tpzDJpeiLEdCjvd3+mrsA8oPVVu6NqsGheCwpS+pfOprBmUBxH6Ep2wArOCZKZ2wtahrlK0IcTIUuQnm3qgW6t8E/KO9VYifKoY6PYz0KJTlXZyRh3tWRRT5urTA8WQUB7JQTROAttyTMGaU=
+ bh=ss4ZiIEv6xO6y05eHHgwn5Z4J27VjjFqzE1gAjS/mN8=;
+ b=3kvJSLMa5dWlD+w4YxnVmZWFxRZUXROJL9lirB06mHp7m769imv0lbNbu80fk35g/xH/uWcCIkSzf1N1ScjCrUh3BeWK5hyTHc/QPpbANzaidCZqZ4oalpklpDqrB/cfGbHcbrusQubOG8EYhvFqoviWWgT4IAmQl+TVxpSVbOQ=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN6PR12MB2685.namprd12.prod.outlook.com (2603:10b6:805:67::33) with
+ by SA0PR12MB4509.namprd12.prod.outlook.com (2603:10b6:806:9e::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.21; Fri, 20 Aug
- 2021 16:00:17 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Fri, 20 Aug
+ 2021 16:00:34 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4436.019; Fri, 20 Aug 2021
- 16:00:17 +0000
+ 16:00:34 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -74,9 +74,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 v5 18/45] crypto: ccp: Provide APIs to query extended attestation report
-Date:   Fri, 20 Aug 2021 10:58:51 -0500
-Message-Id: <20210820155918.7518-19-brijesh.singh@amd.com>
+Subject: [PATCH Part2 v5 32/45] KVM: x86: Define RMP page fault error bits for #NPF
+Date:   Fri, 20 Aug 2021 10:59:05 -0500
+Message-Id: <20210820155918.7518-33-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210820155918.7518-1-brijesh.singh@amd.com>
 References: <20210820155918.7518-1-brijesh.singh@amd.com>
@@ -86,174 +86,97 @@ X-ClientProxiedBy: SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.18 via Frontend Transport; Fri, 20 Aug 2021 16:00:15 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.18 via Frontend Transport; Fri, 20 Aug 2021 16:00:33 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b98a94fc-dade-4d1c-8796-08d963f39a48
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2685:
+X-MS-Office365-Filtering-Correlation-Id: 63b48cce-01a7-4dfd-5e7d-08d963f3a4fa
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4509:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB2685B465E8C6D427A7E30864E5C19@SN6PR12MB2685.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB45091FB4EA780632E060032CE5C19@SA0PR12MB4509.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8GSUqxIbPmNYsLg+ayXhyKo7b9h2Vb0x5BBuo7/25RQxTd3orTetMJhh5BxNU/W8bZCyvg0tCkFSxmceAEhZKEHp9zzxq5yGQHXP+FjAikvivMmNlOmTSG/9pgq1quvNfYIGIO5JJaecFalhcdRnngkkFN2SaD6XJHrprnZb5vGblkT4oiCQjfVG14/h7VwNQqNsTMgRSIUa7ii60Kt8VJho8DLEuh4E5JrECKBP0gFocxyg5gkWsZa+c+MkFUZ8VH0vcQs3h6LJL00vEUTrSTARj2RFAaTFfzQ+VdKBsb1PStayaB/JqL+JZZd1bax0SyfjA6HFzdjJj19dIYPMfq6S5TAiytLys8xLtkZenGaETYRbJOAQyyB+fUKwIiUQ22hmpk0jtoQucwGE1PRAaZuGWMBlRbJBnfZsekK1OBICTrXuYF367lm3tt/MBrbyPZhpXXenpJJIP0wjskwHnxjCcab4Fi4RZ4mAXR9z66oOp7TpQCNxi+VvCivW9h03B7ccuV7HEuUagWUCRrUPJFiFk/ldnPgLS57LUpeAsfv+z6gajUDZIdDqt2Th0bQneJKKogVeciwggJjpvwu7sHePLg730FoObLW6+zAfaY037PxIqAy7xMCMZJiTgOgOyx8UW6NACPGj8r4IAx9ptkgJx6/Hnxa5A0yoZ4jyVa1XO0DhY/B79WwCS5FVZW0B9aQqdYvJB3bu0ML8BU/Iwg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(396003)(376002)(346002)(366004)(956004)(186003)(44832011)(2616005)(26005)(83380400001)(66946007)(52116002)(66556008)(66476007)(7696005)(7406005)(6666004)(7416002)(1076003)(2906002)(478600001)(36756003)(316002)(54906003)(8676002)(8936002)(5660300002)(6486002)(38350700002)(4326008)(38100700002)(86362001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: L4h4VLMAnN1R8i6hRQFGUp+kA3raKp05IyCIzA0QSLCwLVgOqg7Q2M9Oib+PxOo256irCJdq6d4oCU0TpDAokaKi6EbUoC9zu2wtFzU5vHFnLeylJfBjYoxlvzZShxrEioK6dYFt+2sQZdWua5hgazG2ephSHEdssUKleXf02SDBh1NFkEXTmeoCzdXCX4tMZCHOc7lSeudfKmQNadx1Xoa6vCIQKkLnozfU1GdrgV+My/Z/eGIHp1BqL0mAD0jf1uzyBNFxXWln3oQ7ct6RjE8DKPPj7YjKBwGo2zJZB48DrEmlNP2o78OqYbBnwIVRely5zYeGk9NcnA791Yy+7CimmmXopahddn+O3oVXn515mwTJbecYerKKkEKQaTENzpFW91hTTfjqz23LMc2QQ2UJuXoTkuiK5ivDk2qk1AXuMRCCvJ/okGhsE+cHeB0kq/3yT3u5th9pDuWP47mSNUgoTL2GKo6FGkaWlHPd3FLmehwJY1PMU21pbPS1tNUpm1Sh4TrIJbe/7V7i/1u56/eTJudQ8TJKBOl0lv6PKtEQura7jFTiJ5D3eq8ePVsMn2i3ZdDZi3IGtXFch88HmtDgNATW3aQ49nskkIvuz/LP7dDFWiNRo+J7hoGkKBRfl5zSbr4X8FicMZihDawXNi6RVOSwMjkCSTC+7XRCtV4q/NhCwX1eluqGuKWTtM7c0HsA05FCdXHuk4+uJMjKcw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(4326008)(36756003)(7416002)(44832011)(54906003)(316002)(66946007)(66556008)(66476007)(86362001)(7406005)(956004)(6486002)(2616005)(2906002)(83380400001)(38350700002)(38100700002)(186003)(5660300002)(8936002)(52116002)(1076003)(7696005)(8676002)(26005)(6666004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?k2AZqOYymyEpagRax8lcWz0rQmrOCg5dQML3ZhpQXCza0v8tB9FasWlBjZ2/?=
- =?us-ascii?Q?OioVhWqjCyKJZ6XiRkLuIht7Sjue20fxnJX6kIo2qE6zUBBsMD+ajbBWs41v?=
- =?us-ascii?Q?RW7vQV9qPJIcPFuXCTLYy3pzWpM7Q94LNjQr9SuUgX2Qhg7lvdFM600vWV2L?=
- =?us-ascii?Q?IKWsXPfcsq4+MQjdrPcK8/EPyni75Q+1oAXUcX1pPqHb37GixACqAb7+6IjZ?=
- =?us-ascii?Q?ekvcrAkhcuPN5cBPvYO+aMiiigpS9Cqgw14TC17c3gep+PYh2tKfILqQNkol?=
- =?us-ascii?Q?Wg5jFFsJvUF8TNWOwBSrtvw9+73HmB+Lpbk+qdmK8BrU7ZMl27XCe0xzTW5S?=
- =?us-ascii?Q?w8JM/DeIVvp76uDlE0M6KbPfRDD8JiSzPkoNgiAOj/x7ySM9ppfDaroaNVK1?=
- =?us-ascii?Q?kccyI6f5wSpQuVRm9qB4EfZcT+4AKPOeluGOzFk0fJCbqHgxC+2jkyUkebAz?=
- =?us-ascii?Q?pZ/bGglk2RQvUVVHckOw2bg/XeRYZzrHrcmCBVsKGtFgsiLtG/lvFn4Ia/Sm?=
- =?us-ascii?Q?9n5rH36hkuRrafMtPYYkTiAYsFnOYv0X5r0dXztE2FY8quUorNm3BwlPVaDi?=
- =?us-ascii?Q?E58xzIFHa57Nbisoe8U39UGtx2TOgFqCRQPFIzTTyanvgdXz4nbpJ+rwzo5q?=
- =?us-ascii?Q?ZUErSylXtZndmcuUVFSMcOBRllWYWDorOFmDVvN9aTPsJH04lQvDDPGtN0M1?=
- =?us-ascii?Q?LiuRDuevEi12eN5pf0ZY9r0IbK+yWvIYwR9tNSVC2usAH5z+v9qxT8TtGBEd?=
- =?us-ascii?Q?BlmlL36MHQYzKIYICVAE+bbN2uLK0F4py/HQue7S3DCRw2g+P+lzIxXCSi1S?=
- =?us-ascii?Q?3Q+TYHHFCj4fP6h8ImXfMWpZa/x2SmvsZn8Gq6mKDrooTxdhJLJGx8X/3dKw?=
- =?us-ascii?Q?JQROg528ZEyrZuaesrqYtZgsbQmVDYKqeofCLCeY5lRI8/RugX0Mh+hMW8R8?=
- =?us-ascii?Q?kLVWx8XL4HRJhQKsFtynByipENMCfHxo8XFgRy3PrJ1P8QP7uVmfpR3z/C3b?=
- =?us-ascii?Q?l8bko33sdjWANWFjk35v6xuBdDerW0F/4vHo1chItph3nMHdB+3zalIwyUhz?=
- =?us-ascii?Q?meoHZgtVum/PJdE58mv77W2xAuLSbrjIVBCP3gUiaFqT+WUj5zjP4QCYnYE6?=
- =?us-ascii?Q?8Nqa+kqbg8MzdDNi6d4vu8aiJTYv2/HUM49WEKVqZhZ39tfKOM0MOgUozo+m?=
- =?us-ascii?Q?tzdtY6yKI8vvCg45VhFWqsmvPoArDfqIZsSqOFHJuUfxu9CrHhL6FGSQtQFe?=
- =?us-ascii?Q?qgCTbEL6L3EUmyUgfnZPVmN48PWnZl4GvXlhXdhvy38dcqqMDVzooq00rtUM?=
- =?us-ascii?Q?pqPqF4mlu3am4U5J186iIkgY?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Bp38a1QRVIFgwtw/QCWoWYQ9TrwPHvF5V77xalo1QWurAPjLWvPY/aGb4eFb?=
+ =?us-ascii?Q?h/Upi17Cvi9f+PtiSX61ctLcYidtUbocrrkHFXeoyOaqaccKmLVtYiOJo3eG?=
+ =?us-ascii?Q?RZINEi3lFjzmZTjAncC0IGw3xQN/zPWvXHPzwmGO8611mFQw+Ajl+QHmj/La?=
+ =?us-ascii?Q?+qd+s1spgLzzbACoeorJkJ0v2nNlkBpnlDhOZ1BUqJS/aWol6WPo9FThkSEH?=
+ =?us-ascii?Q?EYeN9edu31ltcDlLGjXVIc9tw8BjosUXKeU+oEbCvS2MbOhnBS0RQxkk3mkb?=
+ =?us-ascii?Q?aiee4hODmG19Jocb9APqzpifkEbWxVy0gyODdt5qPDzYQfwvPLsAuxKnqpln?=
+ =?us-ascii?Q?nQQFu+0hoYeGgjNChFQ0FggvfQAzgQaLb86cV0OshWQ+mE8Q6vnJaDTsN/Sj?=
+ =?us-ascii?Q?zr2sJGkanNuIW44b7o7H7HiVVNwUgpVqnj6KzTDitIBwwE7JVjGKkvosYrkL?=
+ =?us-ascii?Q?AweKJlEUtRZW9VCYcdi5A+J6I6ImNi/jLsgD6Rmn67fPGNkbdB/zAmchPnc9?=
+ =?us-ascii?Q?NaiYLZyLBTrAfoSFt2tW45PMlMoUB0JhCjOa15OF7bdVxDn8ooVH1odsOofP?=
+ =?us-ascii?Q?OSIJzjiaF06VdAsG2gDIt+Pj7S4uMOOwx5ymbR+VmIRuNAkWaHl53OUii+Xo?=
+ =?us-ascii?Q?d/LzoL9iQGvIwoCjU9oBhFAeX5HXkjMZE82uzSrhBhVHGE75bCW9Z9vejvm4?=
+ =?us-ascii?Q?8iCIM/rv0bBxvunUDrrbh+W7iXKk6nLvCdWJjIZvXhaxgsO9l6UXTSFp1O60?=
+ =?us-ascii?Q?IhZkVMZX3thIoonulIhIcHqNuWgZl7Pj19nf5kJqGMzfc/jEnh/zv9MUa4c3?=
+ =?us-ascii?Q?qePnytQHmu5YrsiN2lsuzHVXf9ZN/Gd3H2E0c3PEo/aNEhRre+Tru3dQR60Z?=
+ =?us-ascii?Q?elRGV1HHe49PzKijvL90i/z3LjsHM2OPF4pDgoUMDQl2CDW+pHRtXhsj1Cvi?=
+ =?us-ascii?Q?rU84PygyTYtR+X9vDZEvaQCZ45hbPOWg7PY9lMbpMtiLrLvhyDRj5M3gWWhJ?=
+ =?us-ascii?Q?oNRVSrMcQzaH4+Mfifxy0QVTmlGrBmsaU4xB7VQAzG+WZtmiBy0xffxnylfF?=
+ =?us-ascii?Q?dMo+Kcx2I3iLal0zQZHNRFBzntBMfsqeaqvFFXGu3NNZNpS8H/eFF4IGxX9w?=
+ =?us-ascii?Q?8bbFJhtKdwDYxShAEcXCMy9MNWglOc/iIckelcoeu2IhEct5eKLNC7QQhfZW?=
+ =?us-ascii?Q?yDUupcwF2GIBMIw11p5Tq8rcn2PpcFBV0Xi4ZCHHNuHSimkWC1Xrpk7yphjc?=
+ =?us-ascii?Q?Sx9rEarJ47YHjX1LN76KCx8k1WdXmlxuZ6Y7CuWxcwL1fVhhEWx66PMArkRb?=
+ =?us-ascii?Q?GAZ2EtFNBfPUXv5VoqGDZtZQ?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b98a94fc-dade-4d1c-8796-08d963f39a48
+X-MS-Exchange-CrossTenant-Network-Message-Id: 63b48cce-01a7-4dfd-5e7d-08d963f3a4fa
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 16:00:16.8242
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 16:00:34.7649
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fyFyc5GabL48U6WmtRJTGhOlCKGbpSSiT8DT57hspA5m2mSw5q58RnPcrsTRrNe7wxBMDB1U9s/wgJkyUocj7g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2685
+X-MS-Exchange-CrossTenant-UserPrincipalName: btxH0VHaj8Q58SnThL7T13Hbwt/OV0WynbwEjegM5Cx1j2altdCCAOib6dnhtsqvRM9ClfzJwdAG0kKkOFGgXQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4509
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Version 2 of the GHCB specification defines VMGEXIT that is used to get
-the extended attestation report. The extended attestation report includes
-the certificate blobs provided through the SNP_SET_EXT_CONFIG.
+When SEV-SNP is enabled globally, the hardware places restrictions on all
+memory accesses based on the RMP entry, whether the hypervisor or a VM,
+performs the accesses. When hardware encounters an RMP access violation
+during a guest access, it will cause a #VMEXIT(NPF).
 
-The snp_guest_ext_guest_request() will be used by the hypervisor to get
-the extended attestation report. See the GHCB specification for more
-details.
+See APM2 section 16.36.10 for more details.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 43 ++++++++++++++++++++++++++++++++++++
- include/linux/psp-sev.h      | 24 ++++++++++++++++++++
- 2 files changed, 67 insertions(+)
+ arch/x86/include/asm/kvm_host.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 9ba194acbe85..e2650c3d0d0a 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -22,6 +22,7 @@
- #include <linux/firmware.h>
- #include <linux/gfp.h>
- #include <linux/cpufeature.h>
-+#include <linux/sev-guest.h>
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 109e80167f11..a6e764458f3e 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -239,8 +239,12 @@ enum x86_intercept_stage;
+ #define PFERR_FETCH_BIT 4
+ #define PFERR_PK_BIT 5
+ #define PFERR_SGX_BIT 15
++#define PFERR_GUEST_RMP_BIT 31
+ #define PFERR_GUEST_FINAL_BIT 32
+ #define PFERR_GUEST_PAGE_BIT 33
++#define PFERR_GUEST_ENC_BIT 34
++#define PFERR_GUEST_SIZEM_BIT 35
++#define PFERR_GUEST_VMPL_BIT 36
  
- #include <asm/smp.h>
+ #define PFERR_PRESENT_MASK (1U << PFERR_PRESENT_BIT)
+ #define PFERR_WRITE_MASK (1U << PFERR_WRITE_BIT)
+@@ -251,6 +255,10 @@ enum x86_intercept_stage;
+ #define PFERR_SGX_MASK (1U << PFERR_SGX_BIT)
+ #define PFERR_GUEST_FINAL_MASK (1ULL << PFERR_GUEST_FINAL_BIT)
+ #define PFERR_GUEST_PAGE_MASK (1ULL << PFERR_GUEST_PAGE_BIT)
++#define PFERR_GUEST_RMP_MASK (1ULL << PFERR_GUEST_RMP_BIT)
++#define PFERR_GUEST_ENC_MASK (1ULL << PFERR_GUEST_ENC_BIT)
++#define PFERR_GUEST_SIZEM_MASK (1ULL << PFERR_GUEST_SIZEM_BIT)
++#define PFERR_GUEST_VMPL_MASK (1ULL << PFERR_GUEST_VMPL_BIT)
  
-@@ -1677,6 +1678,48 @@ int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
- }
- EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt);
- 
-+int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-+				unsigned long vaddr, unsigned long *npages, unsigned long *fw_err)
-+{
-+	unsigned long expected_npages;
-+	struct sev_device *sev;
-+	int rc;
-+
-+	if (!psp_master || !psp_master->sev_data)
-+		return -ENODEV;
-+
-+	sev = psp_master->sev_data;
-+
-+	if (!sev->snp_inited)
-+		return -EINVAL;
-+
-+	/*
-+	 * Check if there is enough space to copy the certificate chain. Otherwise
-+	 * return ERROR code defined in the GHCB specification.
-+	 */
-+	expected_npages = sev->snp_certs_len >> PAGE_SHIFT;
-+	if (*npages < expected_npages) {
-+		*npages = expected_npages;
-+		*fw_err = SNP_GUEST_REQ_INVALID_LEN;
-+		return -EINVAL;
-+	}
-+
-+	rc = sev_do_cmd(SEV_CMD_SNP_GUEST_REQUEST, data, (int *)&fw_err);
-+	if (rc)
-+		return rc;
-+
-+	/* Copy the certificate blob */
-+	if (sev->snp_certs_data) {
-+		*npages = expected_npages;
-+		memcpy((void *)vaddr, sev->snp_certs_data, *npages << PAGE_SHIFT);
-+	} else {
-+		*npages = 0;
-+	}
-+
-+	return rc;
-+}
-+EXPORT_SYMBOL_GPL(snp_guest_ext_guest_request);
-+
- static void sev_exit(struct kref *ref)
- {
- 	misc_deregister(&misc_dev->misc);
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 00bd684dc094..ea94ce4d834a 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -924,6 +924,23 @@ void *psp_copy_user_blob(u64 uaddr, u32 len);
- void *snp_alloc_firmware_page(gfp_t mask);
- void snp_free_firmware_page(void *addr);
- 
-+/**
-+ * snp_guest_ext_guest_request - perform the SNP extended guest request command
-+ *  defined in the GHCB specification.
-+ *
-+ * @data: the input guest request structure
-+ * @vaddr: address where the certificate blob need to be copied.
-+ * @npages: number of pages for the certificate blob.
-+ *    If the specified page count is less than the certificate blob size, then the
-+ *    required page count is returned with error code defined in the GHCB spec.
-+ *    If the specified page count is more than the certificate blob size, then
-+ *    page count is updated to reflect the amount of valid data copied in the
-+ *    vaddr.
-+ */
-+int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-+				unsigned long vaddr, unsigned long *npages,
-+				unsigned long *error);
-+
- #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
- 
- static inline int
-@@ -971,6 +988,13 @@ static inline void *snp_alloc_firmware_page(gfp_t mask)
- 
- static inline void snp_free_firmware_page(void *addr) { }
- 
-+static inline int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-+					      unsigned long vaddr, unsigned long *n,
-+					      unsigned long *error)
-+{
-+	return -ENODEV;
-+}
-+
- #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
- 
- #endif	/* __PSP_SEV_H__ */
+ #define PFERR_NESTED_GUEST_PAGE (PFERR_GUEST_PAGE_MASK |	\
+ 				 PFERR_WRITE_MASK |		\
 -- 
 2.17.1
 
