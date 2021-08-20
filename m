@@ -8,44 +8,44 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 721E1C4338F
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD21C432BE
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:01:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5091E61251
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:01:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44A256125F
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 16:01:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233437AbhHTQCR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Aug 2021 12:02:17 -0400
-Received: from mail-bn8nam08on2041.outbound.protection.outlook.com ([40.107.100.41]:41272
-        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
+        id S232602AbhHTQCU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Aug 2021 12:02:20 -0400
+Received: from mail-co1nam11on2046.outbound.protection.outlook.com ([40.107.220.46]:20576
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234115AbhHTQBb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Aug 2021 12:01:31 -0400
+        id S236641AbhHTQBe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Aug 2021 12:01:34 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LZ/3ERwvsg0aSCmcI4O5AiyIYyulCq4niK59itZ1phre7EnpovRyBqk8Xb4yaFqbcg7+H3/XITXLyOEwFUfrt2ropL9I6fQWP9kEtQX+RFvtr+yt78nZl+aFa9yg2AFACPsJMcrrkQck3aajjwtYcEHEYNWxx8Si4nk8x2zb1JCuDLyKhajmxaWuiaUUglgBsJ4RHC7b/Aot1/5RSOg7WciN8XH5B2F52M2vebPFNuEO345vIcZzkL4BEfdmX3+DMcr6dymYtzVAEkfLZOInSNQ/XoNycAJIjeqe6y1bj4UkwvgaVutQaE70+N9BhQoNFRI3XvFczhSNHNrP5Z9+uQ==
+ b=AyJoLW5O1aLGP88kD3Zynk6hgwyRrVINSSHA/dgCdfrrhciCsKjlRpnxnY3Nz1MRQm53Oj8K2AKzWeUxILD5sReqnGyNBoPlWNafaYzoX0fR4a4b42IBBUsttsJMJa11lu9xx6bUvoJ8/54pGP0dUiZilDWzjKi0Ody0vjIu9QZNhmtOHSVQE+CeukFy2V+oPN2vEzTE4YYoIq4qLXKpaGnqz+IwXksEFotKgBlVGRdHVhsswu6Pt0vmv5e8disILZ6Qz+nQVemOX/zEPSe1Bzr0gHSZaOReaTS5qholcTF+IxCg6n+7g2mNDiPkIeyVYHlQ9KHFLaONEqCh2Hjaag==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=98DtS9JM1I+DiexvI/B1gLAoM8L/pKgfG2QGPzZbbGU=;
- b=gscNaqUFJLiosyg5sA4Q83OnBihENS0NSrL+nP2qEgHBji0oGzZ8MlTIf1Sff4aA/B6EXoopsk8WqZ78IXlDkGhfIz2rjmmTU6WDKSz5jOVbBPBmUE7L+Fpoe6vsrHC/8+JChHkuds6Sp7zcv7cUaagQOlRr6u3vWO04RL6hQ/sB+YKRqEy38C2gy+vYvlLboSmU/Ch9sdjgC4EibH4nJP9GdrNLLqzVYpyrhP+ft+q5S0StjSzvFyxcoMaaveoRav8kuoDbzy6KISYRaDoR51adUggdCVMKkGoyY9sw1LieOSy3kVzqIwEhBoqBvWd8MB2epvaanAU+Br6ZXrC29g==
+ bh=xPryMDZPhO3hrlwHpI7SXBuaBntaQGIugY6Hne+e64k=;
+ b=CHcgYCwVteMFmjdbiwLJMF58YCp+tLqEgvOhnH7+SkETvvCEG6gR+dBaF58VmGsCbCIN8lohxV9Yd+Rs3CxD0PHLap05tLXnCjHnMwNapXkNTBXE4R+C3sp2+qygWXAIU5F1LzwI4ZgZ4o48xjhLpcy7hPwOpINGvbEAQMScsNCQXEiCV2gYzCu0R3jIO/gh64Im/8Fz+CKGfPEz3rGA2CpnSv0CdYrPBQ7lkjhonBbazRjXvf0PAqI84+9Zuepzxip0sqaglImzwfwYMTBxEApG2ibCVDaseaL40LW0fs7IfpWSzKAJ08PpR329N1Fg6yaBXblHhIOUqxIp9EH9Xw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=98DtS9JM1I+DiexvI/B1gLAoM8L/pKgfG2QGPzZbbGU=;
- b=qnap4gN5fuJvko/t8b1FiFMrFhn6RY6xHLTVyIJFuYPHACw38QeUpWj0TggUWf526AiDAOZMZadstwidPLvdfh8k4evv28siLAucom8vh41E+TL8sf5VK5Zc/fXPYdaB+6xtMt820hsTC7lYo4v9uMH5R7jcNhwPl6CXlOo5ws8=
+ bh=xPryMDZPhO3hrlwHpI7SXBuaBntaQGIugY6Hne+e64k=;
+ b=2Z222RL77BnhH2MsEN9inZ5VRoXu+qB0WLvXOBGEevKZHIkUCGIU/B/+CTx887J8QYt4iE/MiNsRAS3M3WhTWmm9zszBHNBs3jWb3SBJu9qcUVJUlI5zZ5+whb8XcI26NL4cbr6v14nES1bjNk4Louj2XbNdXha4tknAb/OntGE=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4384.namprd12.prod.outlook.com (2603:10b6:806:9f::22) with
+ by SN6PR12MB2685.namprd12.prod.outlook.com (2603:10b6:805:67::33) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Fri, 20 Aug
- 2021 16:00:04 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.21; Fri, 20 Aug
+ 2021 16:00:15 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4436.019; Fri, 20 Aug 2021
- 16:00:04 +0000
+ 16:00:15 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -74,9 +74,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 v5 08/45] x86/fault: Add support to handle the RMP fault for user address
-Date:   Fri, 20 Aug 2021 10:58:41 -0500
-Message-Id: <20210820155918.7518-9-brijesh.singh@amd.com>
+Subject: [PATCH Part2 v5 17/45] crypto: ccp: Add the SNP_{SET,GET}_EXT_CONFIG command
+Date:   Fri, 20 Aug 2021 10:58:50 -0500
+Message-Id: <20210820155918.7518-18-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210820155918.7518-1-brijesh.singh@amd.com>
 References: <20210820155918.7518-1-brijesh.singh@amd.com>
@@ -86,234 +86,309 @@ X-ClientProxiedBy: SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.18 via Frontend Transport; Fri, 20 Aug 2021 16:00:03 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.18 via Frontend Transport; Fri, 20 Aug 2021 16:00:14 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0a325673-4258-4d4c-63ca-08d963f392a6
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4384:
+X-MS-Office365-Filtering-Correlation-Id: 6f4e2e4a-cb99-447f-3ddb-08d963f3998f
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2685:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4384ABB9CC10756414F58C9AE5C19@SA0PR12MB4384.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Microsoft-Antispam-PRVS: <SN6PR12MB26855823D6CBEDD04F964679E5C19@SN6PR12MB2685.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5L0oN+z4mf2JRn7y/PVPMEKNmK0jHW8TqA0uX0x+/ZOMteWvwt2PSeFY8Ae88vB1Yt7KPShxzwGXN8/Jv92vHoeOYpkSiH9R5GKtxxPA3Tub8xUAjevur2ucomsxcVn5h4ouPDDliKPAwECEpLwfQgTgLXQ/WnoQSDVWdLD15bTOdjPGMnczwAc74E2KuqEi+ScqZv4vK0IT5O0r30WW7sET+Qqt/emSEL1DmzoJJbazHlTvl592a/0821Sj1n3TbO7R590KuaZ6j5x9Tl6LvyAbKvttNAT6ZOxcKr5xTYXm7u+fccqsvRgY41MvYXx3M3GWKRsayAu0MsL56NrA4+kiv3JIEnHUYNQveAMw4ofKy3cTkjF+7ZPtkJPrXTorardvNMQUAcuJR6EOdbV6fxvNQfZZyguZzef3tM5cbEzrut1oTfxcK5k3Ndc6rrfUlNPIj1ShkbCE3kJJuJSH3yoCsudR9vT/j8itNGpdOi+GxDdAmzvneh0ieU0OHfdYnnbuKc/6rruudRzaBIl2SLzUIYuOZX7bdtP3MW+s0tNneRaxozwzt1o0dzI7if6Yhpu0zT0zhSWEaEMEv7aAbEHLy/PLZxaKHURFKshMjsOyCCCbUB9+lHHnnsc7n/3aqgGnA4/7qETsScQnuSQa2tVMM6j/CHnlX5iWitIa8W7amEdcV2viJx7fZFeGNrJH14GYiWhxDXKt27OuYHerVw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(396003)(366004)(346002)(136003)(5660300002)(6666004)(52116002)(66946007)(44832011)(36756003)(7416002)(66476007)(7406005)(6486002)(956004)(8936002)(316002)(2906002)(186003)(4326008)(478600001)(86362001)(26005)(54906003)(38100700002)(38350700002)(7696005)(1076003)(8676002)(83380400001)(2616005)(66556008);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: DK4nXC/nrczRpi2HIgXAbdsX9yu4edu7SVcED1tgp1LNHQ0/7oYAOaeYBeIGt9/msqCuuhPQoakxlbMOsbDZ+R2IIEj5CwqzZiVSlnEhr69r7uV2Ego90u56GpVKnkWr6rVEszxMm6J4X5wIDtH9ly7woCZYGyrIpJqfPpsdr8I911WEzLPnf4OcAjAP+pYDJrmXmg/L9BbGwiKm/ARAgvmpnGNVpTZeHPO6ww+HIjECDSLZRMjgqbOLD7EqbBKWsbqtSf2ldX5ytREHNHPjCOrtUUV5Rss6Sif0NOqb/UUWEO6v2SBHiJ7sEsXIDaJFIw+UUrGZ7rfSO5pOjrg4/DIZVNNNbHSk713Cmp1jJeRfElY1qjmm8OLQP0XQm5hcfEqygZjnUWi4uG6ns4CMOAW2yt1KdwebsO66Uf2uWGAv/H7X2DaKUKdtao1lNgEQ8bnnHoCLWO1RZITvAcWCiIF9hPg4mH8Yppxi11lb+u1DfqKa5oQAzL12AU5ELBFJOgmplpTyOEX5IBlSV35rQLX0xcmZL4qB90qS0ZUeNrgqikvDlaxTGWn5rFamj9eqqgFtHqX53FWhyBmAP9pnmcvvFs8Hl5uErVvzeEthBY27OmIbQqGZGc185czn+otVCIuVXwnwvYXA3SiKuWoZJdtRbFCzReMZeFbhnjVjtrgQg/sGTh9JwYDLZJksj+DOjKWEJ6C1GbEZBMt8fuwmAw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(396003)(376002)(346002)(366004)(956004)(186003)(44832011)(2616005)(26005)(83380400001)(66946007)(52116002)(66556008)(66476007)(7696005)(7406005)(6666004)(7416002)(1076003)(2906002)(478600001)(36756003)(316002)(54906003)(8676002)(8936002)(5660300002)(6486002)(38350700002)(4326008)(38100700002)(86362001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4mVsba6kmmTIbCmbFKDwBpHzwv5kjapO5sc7C+KvZIL+sY8V66ErgXAmYM9v?=
- =?us-ascii?Q?YSscWW20w0QztqLCZnYh5UafcjAQCW0PNEAQwvmi2Q1sgLinu/5M8Dth4x5w?=
- =?us-ascii?Q?ZfwFr7EfN2UjvsRDJKaOzozcmXqh0ABoA4F7756Db1nJ07pV0esl6inI8KMU?=
- =?us-ascii?Q?UpCdxvRmGyLk2WiQarpibLseZMxt+WiHGZydl4ZsH5n2OC+LvkWdst4bsO71?=
- =?us-ascii?Q?DCHp64RcoFqwqR/f2PnkPYDs8k/FmNdaqzfrhBv6efnDE7HyUTH8mcAJuVWm?=
- =?us-ascii?Q?ph6gFxgrdqKxa78mspncMB/ZxdddczNn/wpv4aX0mudZZkyVm2JqoYu+cFtW?=
- =?us-ascii?Q?laj9tXAkFnbyjD0fdqABE2jycRfZZevwVmvYma2YiIgrXFlylHzSpW4V7bKN?=
- =?us-ascii?Q?cOqs3lYcR+qCl+qNEHim4+iazGqRaJebFdPYiR2MPA+0B7GidPhiHWAQhsQB?=
- =?us-ascii?Q?WYpqbnGmPw4hca7R0uQyQ1v4JNlJFbBRskD/qIFFGVctExQCn+FrSUUWgky9?=
- =?us-ascii?Q?pw+y9WB3iuXjcfPRzj2FntD2++M9DENW78RtdqGY4d061rVZKxlVgdGqhBkq?=
- =?us-ascii?Q?duFLKB2vEg5WONPRvHqntcVBRYdPZD/GlA33wK78ZJOBNqc+0yXuAxtC+4go?=
- =?us-ascii?Q?8g6ONXvA4A26Xli/xuK/T1sU4XXjMiQecq88iUh1EW1/34IesDKDoYAlS2KU?=
- =?us-ascii?Q?lDirHnLA1LFplTGChD1igCyUsuK4ulUQsaobdUic3lp3kjc8ZN73AmA2TL5v?=
- =?us-ascii?Q?L24QwD6VawsXvOCNanc6T8XQbapQBJnb2dpOFXHx1j2uRzXMLAFw85FDr/hb?=
- =?us-ascii?Q?f7QX7OvB6tQ2AOx5IWW3D2GZ5wXIpXpqtlbcIs2LnOAUjTt24FpyXK2LoVoV?=
- =?us-ascii?Q?OtqjAYad97I5uk4gd8AgVbzAZRJa9wLRG6eNR4Pe4nfz2XAespf+xtBqcrlL?=
- =?us-ascii?Q?axvpaRVl7p4uEgtP7KDPVW07xvyDSaFtJSr/elJT34owUH67A5Orw+cfSGYC?=
- =?us-ascii?Q?z9IbbHpiZbG1ZPERxjXTEyGmg4Qi4B2n7TG3FSSCCo2Bemv+7BPFZRBIODpX?=
- =?us-ascii?Q?KgUYOTL6IOy18Jz2cQ74qWs3Bw/++/MxJucdBmpFAyasvhe0S9ybDou/gP8W?=
- =?us-ascii?Q?3um5aibEbsSlfz1pf5qJ6uFGv0DTN4pGomsBlfFwsIUNVyZQQOfK98YeBqdo?=
- =?us-ascii?Q?galGpsM1pVxOI+NzCC18AqSMfwnooWpM2EU7honXl8f6oG3jQOXy0J989Nbn?=
- =?us-ascii?Q?Ck7hkaAIfE/DUPqJQth3rX6e58omVDpO9DyU7FbcRVqRNR+HSGPEHKTbnrfQ?=
- =?us-ascii?Q?7dtjYnT+67+YkURG7jJqouCp?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2mPR26Q76+y6D+T1Gngm7zAdWpRTu8NbLl6hSK6me/YmXHaDbKvDa8X74N4T?=
+ =?us-ascii?Q?0T08kfke5OzdaO3NZ6PIlbydKwGsU8Ct4z8KvjVp9g5Vo00stkVP5EbRjzCq?=
+ =?us-ascii?Q?WLgsEJL4Dc0swJBglaUtLyjZAmi4ZC5yQkeXPaefii/QnwuE/FXFSz05lV63?=
+ =?us-ascii?Q?PgnLViZxzyF6yDZ9Def2dA0A9o17+vzKdBE0rVwqmXd2dSrN4Vp6+Tu16aVH?=
+ =?us-ascii?Q?kyP9cdOf314qWprcNcf4+MuWbPKpZAbX3myFs8BDVOhkEjyqPUtOeZLSi7w8?=
+ =?us-ascii?Q?VT5LaM/7Ad0lbh5TQBHtAQWzSncZvNAmR4eJ6nSIywBBE4R+PXkQaB9ksRFu?=
+ =?us-ascii?Q?OZ+Z5zz21OGbJfjqnS009rPFh9LClfC0g87JehQZndqF4C29NzYbFBJVnM6O?=
+ =?us-ascii?Q?DiwIMYyl2dEdXLSpuVR+DBZQ/s2xMAh8YHX28uDZI4b34MqvnaCo+8Od26Cm?=
+ =?us-ascii?Q?2soeCU7fImYryHzxVn32clq+gW08TxP95v3vEktFPFHD4/eagfky1OEhCuo9?=
+ =?us-ascii?Q?+dD0OPlDI1Wj1lCKNHkBO7yEqfh0GK9bIC+nB7A7b/1wGx/1Ges5dT4fXxaT?=
+ =?us-ascii?Q?5ZQzWEjBFy1eYkMXomuZsRQ/M0r191K5qnOZuEvYa1a90TFMV1UAPFLI88RM?=
+ =?us-ascii?Q?4fDjWRkAoTMD94gsG8hjtS7fk3D7mgSsGRyRtrRiFmg2EVRzBxPeHRUOgbhh?=
+ =?us-ascii?Q?4O3VmLIcyD5Sux/EERG7k1tjyq0d5ScrrxnEWbKkjnwYkYw7m8BU1d81wwzi?=
+ =?us-ascii?Q?fDclAm3LOKYf9liWgpvhwmbzgFbwRlmA9xnKNAIAeJBCqNdvDlD1rbItc7kn?=
+ =?us-ascii?Q?t62KgBUT1jJG1PjosBN+Yv1Ed2d2fMK/apkwojdrv4D1UssR4j8FFgD0Wz49?=
+ =?us-ascii?Q?XbDQuO7/bFi8/MgK3ChKjSKo29gS/GUfI5F5zyX4TblAGFypH0j/Y2Q6ujGV?=
+ =?us-ascii?Q?NsZmEaunPScfHuLK7t9Dl4DsScRBDtzijOKnFlEWprCmJ73Nl4AJtJWHoP4N?=
+ =?us-ascii?Q?fyBq6jAO8donKdJgZqMSXhyTI07jQf7GEfDwWDbaGtzk+3Lpr3MKYKEYHNKs?=
+ =?us-ascii?Q?5vd0ICLuklLkR81XpCQ1BruT66tM7/MrdGjNI7yDknGTL8Sh4CgkOn/AeCFQ?=
+ =?us-ascii?Q?TSFfLmkuyTCHlV2ag5N1cSuFNkR4C4Cy4mSwI3u8cCgsIuRpAiJM7pa/DfEp?=
+ =?us-ascii?Q?2Fi+x5HDlehJY+9LGgQqyn/IDyj0DHk0Likwmxun0G1AnUq7r058Tz3DTBr8?=
+ =?us-ascii?Q?68VLBJrjcpj5ZpjWw+1Dz998z57eh5vR83FuyNIzHmwLkA2SDuLzKkIXz3Iu?=
+ =?us-ascii?Q?iV/jgMp+sj4p8tM1AjZSTcSB?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a325673-4258-4d4c-63ca-08d963f392a6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f4e2e4a-cb99-447f-3ddb-08d963f3998f
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 16:00:04.0165
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 16:00:15.6338
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KY3jmId+8kpDY5Eb+Qq/sFL0hgQAlfWT1ArWI4KPKR2JWC4OGxU0FmEgf0y/9IGGaVRij+cakpzRi3XIeMz+UA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4384
+X-MS-Exchange-CrossTenant-UserPrincipalName: hPVCjv9uBVpLnfjXPV2x6AIjA2LiVHnCCYC8furGCRDVYydPKJzyIirCBHzZ++1pIf2tsW8usbF+XnMpASuf8A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2685
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When SEV-SNP is enabled globally, a write from the host goes through the
-RMP check. When the host writes to pages, hardware checks the following
-conditions at the end of page walk:
+The SEV-SNP firmware provides the SNP_CONFIG command used to set the
+system-wide configuration value for SNP guests. The information includes
+the TCB version string to be reported in guest attestation reports.
 
-1. Assigned bit in the RMP table is zero (i.e page is shared).
-2. If the page table entry that gives the sPA indicates that the target
-   page size is a large page, then all RMP entries for the 4KB
-   constituting pages of the target must have the assigned bit 0.
-3. Immutable bit in the RMP table is not zero.
+Version 2 of the GHCB specification adds an NAE (SNP extended guest
+request) that a guest can use to query the reports that include additional
+certificates.
 
-The hardware will raise page fault if one of the above conditions is not
-met. Try resolving the fault instead of taking fault again and again. If
-the host attempts to write to the guest private memory then send the
-SIGBUS signal to kill the process. If the page level between the host and
-RMP entry does not match, then split the address to keep the RMP and host
-page levels in sync.
+In both cases, userspace provided additional data is included in the
+attestation reports. The userspace will use the SNP_SET_EXT_CONFIG
+command to give the certificate blob and the reported TCB version string
+at once. Note that the specification defines certificate blob with a
+specific GUID format; the userspace is responsible for building the
+proper certificate blob. The ioctl treats it an opaque blob.
+
+While it is not defined in the spec, but let's add SNP_GET_EXT_CONFIG
+command that can be used to obtain the data programmed through the
+SNP_SET_EXT_CONFIG.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/mm/fault.c | 66 +++++++++++++++++++++++++++++++++++++++++++++
- include/linux/mm.h  |  6 ++++-
- mm/memory.c         | 13 +++++++++
- 3 files changed, 84 insertions(+), 1 deletion(-)
+ Documentation/virt/coco/sevguest.rst |  28 +++++++
+ drivers/crypto/ccp/sev-dev.c         | 115 +++++++++++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.h         |   3 +
+ include/uapi/linux/psp-sev.h         |  17 ++++
+ 4 files changed, 163 insertions(+)
 
-diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-index 8b7a5757440e..f2d543b92f43 100644
---- a/arch/x86/mm/fault.c
-+++ b/arch/x86/mm/fault.c
-@@ -19,6 +19,7 @@
- #include <linux/uaccess.h>		/* faulthandler_disabled()	*/
- #include <linux/efi.h>			/* efi_crash_gracefully_on_page_fault()*/
- #include <linux/mm_types.h>
-+#include <linux/sev.h>			/* snp_lookup_rmpentry()	*/
+diff --git a/Documentation/virt/coco/sevguest.rst b/Documentation/virt/coco/sevguest.rst
+index 7c51da010039..64a1b5167b33 100644
+--- a/Documentation/virt/coco/sevguest.rst
++++ b/Documentation/virt/coco/sevguest.rst
+@@ -134,3 +134,31 @@ See GHCB specification for further detail on how to parse the certificate blob.
+ The SNP_PLATFORM_STATUS command is used to query the SNP platform status. The
+ status includes API major, minor version and more. See the SEV-SNP
+ specification for further details.
++
++2.4 SNP_SET_EXT_CONFIG
++----------------------
++:Technology: sev-snp
++:Type: hypervisor ioctl cmd
++:Parameters (in): struct sev_data_snp_ext_config
++:Returns (out): 0 on success, -negative on error
++
++The SNP_SET_EXT_CONFIG is used to set the system-wide configuration such as
++reported TCB version in the attestation report. The command is similar to
++SNP_CONFIG command defined in the SEV-SNP spec. The main difference is the
++command also accepts an additional certificate blob defined in the GHCB
++specification.
++
++If the certs_address is zero, then previous certificate blob will deleted.
++For more information on the certificate blob layout, see the GHCB spec
++(extended guest request message).
++
++
++2.4 SNP_GET_EXT_CONFIG
++----------------------
++:Technology: sev-snp
++:Type: hypervisor ioctl cmd
++:Parameters (in): struct sev_data_snp_ext_config
++:Returns (out): 0 on success, -negative on error
++
++The SNP_SET_EXT_CONFIG is used to query the system-wide configuration set
++through the SNP_SET_EXT_CONFIG.
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 16c6df5d412c..9ba194acbe85 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -1132,6 +1132,10 @@ static int __sev_snp_shutdown_locked(int *error)
+ 	if (!sev->snp_inited)
+ 		return 0;
  
- #include <asm/cpufeature.h>		/* boot_cpu_has, ...		*/
- #include <asm/traps.h>			/* dotraplinkage, ...		*/
-@@ -1202,6 +1203,60 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
++	/* Free the memory used for caching the certificate data */
++	kfree(sev->snp_certs_data);
++	sev->snp_certs_data = NULL;
++
+ 	/* SHUTDOWN requires the DF_FLUSH */
+ 	wbinvd_on_all_cpus();
+ 	__sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, NULL);
+@@ -1436,6 +1440,111 @@ static int sev_ioctl_snp_platform_status(struct sev_issue_cmd *argp)
+ 	return ret;
  }
- NOKPROBE_SYMBOL(do_kern_addr_fault);
  
-+static inline size_t pages_per_hpage(int level)
++static int sev_ioctl_snp_get_config(struct sev_issue_cmd *argp)
 +{
-+	return page_level_size(level) / PAGE_SIZE;
++	struct sev_device *sev = psp_master->sev_data;
++	struct sev_user_data_ext_snp_config input;
++	int ret;
++
++	if (!sev->snp_inited || !argp->data)
++		return -EINVAL;
++
++	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
++		return -EFAULT;
++
++	/* Copy the TCB version programmed through the SET_CONFIG to userspace */
++	if (input.config_address) {
++		if (copy_to_user((void * __user)input.config_address,
++				 &sev->snp_config, sizeof(struct sev_user_data_snp_config)))
++			return -EFAULT;
++	}
++
++	/* Copy the extended certs programmed through the SNP_SET_CONFIG */
++	if (input.certs_address && sev->snp_certs_data) {
++		if (input.certs_len < sev->snp_certs_len) {
++			/* Return the certs length to userspace */
++			input.certs_len = sev->snp_certs_len;
++
++			ret = -ENOSR;
++			goto e_done;
++		}
++
++		if (copy_to_user((void * __user)input.certs_address,
++				 sev->snp_certs_data, sev->snp_certs_len))
++			return -EFAULT;
++	}
++
++	ret = 0;
++
++e_done:
++	if (copy_to_user((void __user *)argp->data, &input, sizeof(input)))
++		ret = -EFAULT;
++
++	return ret;
 +}
 +
-+/*
-+ * Return 1 if the caller need to retry, 0 if it the address need to be split
-+ * in order to resolve the fault.
-+ */
-+static int handle_user_rmp_page_fault(struct pt_regs *regs, unsigned long error_code,
-+				      unsigned long address)
++static int sev_ioctl_snp_set_config(struct sev_issue_cmd *argp, bool writable)
 +{
-+	int rmp_level, level;
-+	pte_t *pte;
-+	u64 pfn;
++	struct sev_device *sev = psp_master->sev_data;
++	struct sev_user_data_ext_snp_config input;
++	struct sev_user_data_snp_config config;
++	void *certs = NULL;
++	int ret = 0;
 +
-+	pte = lookup_address_in_mm(current->mm, address, &level);
++	if (!sev->snp_inited || !argp->data)
++		return -EINVAL;
 +
-+	/*
-+	 * It can happen if there was a race between an unmap event and
-+	 * the RMP fault delivery.
-+	 */
-+	if (!pte || !pte_present(*pte))
-+		return 1;
++	if (!writable)
++		return -EPERM;
 +
-+	pfn = pte_pfn(*pte);
++	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
++		return -EFAULT;
 +
-+	/* If its large page then calculte the fault pfn */
-+	if (level > PG_LEVEL_4K) {
-+		unsigned long mask;
++	/* Copy the certs from userspace */
++	if (input.certs_address) {
++		if (!input.certs_len || !IS_ALIGNED(input.certs_len, PAGE_SIZE))
++			return -EINVAL;
 +
-+		mask = pages_per_hpage(level) - pages_per_hpage(level - 1);
-+		pfn |= (address >> PAGE_SHIFT) & mask;
++		certs = psp_copy_user_blob(input.certs_address, input.certs_len);
++		if (IS_ERR(certs))
++			return PTR_ERR(certs);
++	}
++
++	/* Issue the PSP command to update the TCB version using the SNP_CONFIG. */
++	if (input.config_address) {
++		if (copy_from_user(&config,
++				   (void __user *)input.config_address, sizeof(config))) {
++			ret = -EFAULT;
++			goto e_free;
++		}
++
++		ret = __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
++		if (ret)
++			goto e_free;
++
++		memcpy(&sev->snp_config, &config, sizeof(config));
 +	}
 +
 +	/*
-+	 * If its a guest private page, then the fault cannot be resolved.
-+	 * Send a SIGBUS to terminate the process.
++	 * If the new certs are passed then cache it else free the old certs.
 +	 */
-+	if (snp_lookup_rmpentry(pfn, &rmp_level)) {
-+		do_sigbus(regs, error_code, address, VM_FAULT_SIGBUS);
-+		return 1;
++	if (certs) {
++		kfree(sev->snp_certs_data);
++		sev->snp_certs_data = certs;
++		sev->snp_certs_len = input.certs_len;
++	} else {
++		kfree(sev->snp_certs_data);
++		sev->snp_certs_data = NULL;
++		sev->snp_certs_len = 0;
 +	}
 +
-+	/*
-+	 * The backing page level is higher than the RMP page level, request
-+	 * to split the page.
-+	 */
-+	if (level > rmp_level)
-+		return 0;
++	return 0;
 +
-+	return 1;
++e_free:
++	kfree(certs);
++	return ret;
 +}
 +
- /*
-  * Handle faults in the user portion of the address space.  Nothing in here
-  * should check X86_PF_USER without a specific justification: for almost
-@@ -1299,6 +1354,17 @@ void do_user_addr_fault(struct pt_regs *regs,
- 	if (error_code & X86_PF_INSTR)
- 		flags |= FAULT_FLAG_INSTRUCTION;
+ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ {
+ 	void __user *argp = (void __user *)arg;
+@@ -1490,6 +1599,12 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ 	case SNP_PLATFORM_STATUS:
+ 		ret = sev_ioctl_snp_platform_status(&input);
+ 		break;
++	case SNP_SET_EXT_CONFIG:
++		ret = sev_ioctl_snp_set_config(&input, writable);
++		break;
++	case SNP_GET_EXT_CONFIG:
++		ret = sev_ioctl_snp_get_config(&input);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		goto out;
+diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+index fe5d7a3ebace..d2fe1706311a 100644
+--- a/drivers/crypto/ccp/sev-dev.h
++++ b/drivers/crypto/ccp/sev-dev.h
+@@ -66,6 +66,9 @@ struct sev_device {
  
-+	/*
-+	 * If its an RMP violation, try resolving it.
-+	 */
-+	if (error_code & X86_PF_RMP) {
-+		if (handle_user_rmp_page_fault(regs, error_code, address))
-+			return;
-+
-+		/* Ask to split the page */
-+		flags |= FAULT_FLAG_PAGE_SPLIT;
-+	}
-+
- #ifdef CONFIG_X86_64
- 	/*
- 	 * Faults in the vsyscall page might need emulation.  The
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 7ca22e6e694a..74a53c146365 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -447,6 +447,8 @@ extern pgprot_t protection_map[16];
-  * @FAULT_FLAG_REMOTE: The fault is not for current task/mm.
-  * @FAULT_FLAG_INSTRUCTION: The fault was during an instruction fetch.
-  * @FAULT_FLAG_INTERRUPTIBLE: The fault can be interrupted by non-fatal signals.
-+ * @FAULT_FLAG_PAGE_SPLIT: The fault was due page size mismatch, split the
-+ *  region to smaller page size and retry.
-  *
-  * About @FAULT_FLAG_ALLOW_RETRY and @FAULT_FLAG_TRIED: we can specify
-  * whether we would allow page faults to retry by specifying these two
-@@ -478,6 +480,7 @@ enum fault_flag {
- 	FAULT_FLAG_REMOTE =		1 << 7,
- 	FAULT_FLAG_INSTRUCTION =	1 << 8,
- 	FAULT_FLAG_INTERRUPTIBLE =	1 << 9,
-+	FAULT_FLAG_PAGE_SPLIT =		1 << 10,
+ 	bool snp_inited;
+ 	struct snp_host_map snp_host_map[MAX_SNP_HOST_MAP_BUFS];
++	void *snp_certs_data;
++	u32 snp_certs_len;
++	struct sev_user_data_snp_config snp_config;
  };
  
- /*
-@@ -517,7 +520,8 @@ static inline bool fault_flag_allow_retry_first(enum fault_flag flags)
- 	{ FAULT_FLAG_USER,		"USER" }, \
- 	{ FAULT_FLAG_REMOTE,		"REMOTE" }, \
- 	{ FAULT_FLAG_INSTRUCTION,	"INSTRUCTION" }, \
--	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }
-+	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }, \
-+	{ FAULT_FLAG_PAGE_SPLIT,	"PAGESPLIT" }
+ int sev_dev_init(struct psp_device *psp);
+diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+index ffd60e8b0a31..60e7a8d1a18e 100644
+--- a/include/uapi/linux/psp-sev.h
++++ b/include/uapi/linux/psp-sev.h
+@@ -29,6 +29,8 @@ enum {
+ 	SEV_GET_ID,	/* This command is deprecated, use SEV_GET_ID2 */
+ 	SEV_GET_ID2,
+ 	SNP_PLATFORM_STATUS,
++	SNP_SET_EXT_CONFIG,
++	SNP_GET_EXT_CONFIG,
  
- /*
-  * vm_fault is filled by the pagefault handler and passed to the vma's
-diff --git a/mm/memory.c b/mm/memory.c
-index 747a01d495f2..27e6ccec3fc1 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -4589,6 +4589,15 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
- 	return 0;
- }
+ 	SEV_MAX,
+ };
+@@ -190,6 +192,21 @@ struct sev_user_data_snp_config {
+ 	__u8 rsvd[52];
+ } __packed;
  
-+static int handle_split_page_fault(struct vm_fault *vmf)
-+{
-+	if (!IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT))
-+		return VM_FAULT_SIGBUS;
++/**
++ * struct sev_data_snp_ext_config - system wide configuration value for SNP.
++ *
++ * @config_address: address of the struct sev_user_data_snp_config or 0 when
++ *		reported_tcb does not need to be updated.
++ * @certs_address: address of extended guest request certificate chain or
++ *              0 when previous certificate should be removed on SNP_SET_EXT_CONFIG.
++ * @certs_len: length of the certs
++ */
++struct sev_user_data_ext_snp_config {
++	__u64 config_address;		/* In */
++	__u64 certs_address;		/* In */
++	__u32 certs_len;		/* In */
++};
 +
-+	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
-+	return 0;
-+}
-+
- /*
-  * By the time we get here, we already hold the mm semaphore
+ /**
+  * struct sev_issue_cmd - SEV ioctl parameters
   *
-@@ -4666,6 +4675,10 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
- 				pmd_migration_entry_wait(mm, vmf.pmd);
- 			return 0;
- 		}
-+
-+		if (flags & FAULT_FLAG_PAGE_SPLIT)
-+			return handle_split_page_fault(&vmf);
-+
- 		if (pmd_trans_huge(vmf.orig_pmd) || pmd_devmap(vmf.orig_pmd)) {
- 			if (pmd_protnone(vmf.orig_pmd) && vma_is_accessible(vma))
- 				return do_huge_pmd_numa_page(&vmf);
 -- 
 2.17.1
 
