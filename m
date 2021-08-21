@@ -2,167 +2,141 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDF3C432BE
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 21:19:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A832AC4320A
+	for <linux-crypto@archiver.kernel.org>; Sat, 21 Aug 2021 02:12:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 560AE61164
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Aug 2021 21:19:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81868611C7
+	for <linux-crypto@archiver.kernel.org>; Sat, 21 Aug 2021 02:12:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240633AbhHTVU2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Aug 2021 17:20:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45626 "EHLO
+        id S240967AbhHUCMh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Aug 2021 22:12:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240487AbhHTVU2 (ORCPT
+        with ESMTP id S240957AbhHUCMh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Aug 2021 17:20:28 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D15F9C06175F
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Aug 2021 14:19:49 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id 17so10433412pgp.4
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Aug 2021 14:19:49 -0700 (PDT)
+        Fri, 20 Aug 2021 22:12:37 -0400
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50ACC061757
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Aug 2021 19:11:58 -0700 (PDT)
+Received: by mail-qt1-x829.google.com with SMTP id b1so9069443qtx.0
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Aug 2021 19:11:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gateworks-com.20150623.gappssmtp.com; s=20150623;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=xBTMAWGQBBiObCm1jTl9uvsUH1RWm/SH7P0VcEqIt98=;
-        b=Oe4UKgd1fXOxRlRf3wPkglvi1/jg5q68upuxv0zakaw9OzDI+FudmRHI+xn7RoE4Xb
-         tqxIpnDZIgs5xNQE19SP58rJ4IozRaPALfH9vfjcVlrjaNQUIm6IGSZYrdzW8q26UfQH
-         8gLc04P5xB2dQHVWn0YKcfGYsU9j4i9bf/q+AvLE0Mi+rlIdsBI8ZZxfroJlFuHdQ7b5
-         q11PpX5cHPvU/dkEsD/w/GkK1Lf0evUIPRzJHt4BRCAuZ5beNEhf9Vcru5asv034o21C
-         ZNQb65yILae8Uha7B7BA/M6gHRDih42F78ydMsomD+jya70EErQ/jU/wnbaCJsoGTZEx
-         azQQ==
+        bh=2gOO2S7Mv0HOYYeN5193uyMUGfsmPjSlzi2OFU8Y+fo=;
+        b=L8bsYCZr6W6WOVgqBP0nhp9qabhe3vp0nXQEfWFvEEp2V3ftXg/ZVGt48988QCyJSN
+         g25s9q0q+k+UI5gdlyy9fDtxUQoosqOy3QODvoWrq8d0AnMZhf1sxLSuZPst5G6XO6xG
+         2hwDr+08s5ajJotnhZDie1AgvEX74LQd6O7wpL3SXiNZ44td+ePm+EA7aFhW04nhLXm7
+         uXG5PwIm36yZVEfQh3e28iJymNdJctSE/4a3tpCFmkjnzZ3fpIulLnS+f1cVjo0KlD1s
+         Jizp09BdIWghNYDyA/mEQ/CDqEyNTeKUZdu8AFvQ7PyKOUsUIjvlHXPIXPdetrTN/ykm
+         5nEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=xBTMAWGQBBiObCm1jTl9uvsUH1RWm/SH7P0VcEqIt98=;
-        b=Bm9auLuLv8cbcs9nP13Yw+JM64u/fdsLBsUQFLquXr0i91PGH5jui4peG4ksglGrjr
-         UKU9+RXEgOlZr3X24yGGpavhE9jJsg06du4IDRhnw3TsCKJ3CcQ5UIXckHGxciLpyl9L
-         iF/O9PoBwKB6SI4j4tKBs/SR3EWMcf2aLqZ9i94sFQah05qSkTVtVOR9G+3cloLyMB+d
-         jYijLwFp6lIghkDqRKDt1MO96ZVPTMZaVjYbBZv1Ga+lSJIp98Jwn6EH3Y5jy2RFWgol
-         5VMF6e6qKVGftpwFHeN/kMTKOWcwbteBGR3JpciKuw/aedzNnsgZBUOxSAAUH4T2g7Q0
-         8Vxg==
-X-Gm-Message-State: AOAM533A2mJL7bdt0qea29J757GO3gJxJjFPMD1YohjvGtvcSVYJ2p75
-        1I4Ef7kQXUiI2MUJCtcNmvASabdwq9ZXdiFLaVYhkg==
-X-Google-Smtp-Source: ABdhPJzD06fzioZkY4v4ZMjF8wZri1QRL6xum4iAtOOc6AOx8ZTf941G2JYybtFiZ6JLyej0b/tnWBpmrax13726ZzQ=
-X-Received: by 2002:a63:db4a:: with SMTP id x10mr6624779pgi.30.1629494389132;
- Fri, 20 Aug 2021 14:19:49 -0700 (PDT)
+        bh=2gOO2S7Mv0HOYYeN5193uyMUGfsmPjSlzi2OFU8Y+fo=;
+        b=lIOhD7qoAy/k8UP87ywVNq7iJ/jPuXVipc1D/fKsxmxXcdEg8y1hKjwVToPTK7/E3n
+         Jzn7xn2a6GODBxd+DFP+8CtQ2X97kigYwGjOtvkAb96IyaS28Uh0zStHxlP6ji8g1Ffo
+         1pI5YjJ9ujD6QScku9bTPlZLFDnS73sbZy4pHCDCe7SxxiHJzJa0Z5XSvmkLRRTr/uCO
+         nUWA5ibbOTlj+j4zYyPSJBgKiQLjQwZaHgTXHA+iUhBjFWZxtZQAGeZEY9MAcQw/T2HO
+         lhcRNa0rjHzol2wa6w++933W523Z3I89jGU5SU7ygj9r0Dp/l3I9SWg+iiFRh6G+0jdJ
+         efNg==
+X-Gm-Message-State: AOAM532V6odVUzvP/4QGY7TRgA5A6yL9uWKvnz0DhSVf/wKvnciAepN0
+        +NMx5+Eg5BUaxsi6Lxw6EUK60XM3k6KZmUt1NU0OrA==
+X-Google-Smtp-Source: ABdhPJxvczIWQNg+cxCoCUPQp8oANeSbmnqZtLwQvuXY+SvSo6y+6aTdmCOV51JpAiZA3j9p/g2HEN6baPINaTMxVno=
+X-Received: by 2002:a05:622a:488:: with SMTP id p8mr20558647qtx.159.1629511917617;
+ Fri, 20 Aug 2021 19:11:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.9fc9298fd9d63553491871d043a18affc2dbc8a8.1626885907.git-series.a.fatoum@pengutronix.de>
- <CAJ+vNU23cXPmiqKcKH_WAgD-ea+=pEJzGK+q7zOy=v2o0XU7kA@mail.gmail.com>
- <2b48a848-d70b-9c43-5ca0-9ab72622ed12@pengutronix.de> <CAJ+vNU225mgHHg00r67f1L6bEub+_h55hCBAMhCq2rd8kWU-qg@mail.gmail.com>
- <9200d46d-94a2-befd-e9b0-93036e56eb8a@pengutronix.de>
-In-Reply-To: <9200d46d-94a2-befd-e9b0-93036e56eb8a@pengutronix.de>
-From:   Tim Harvey <tharvey@gateworks.com>
-Date:   Fri, 20 Aug 2021 14:19:37 -0700
-Message-ID: <CAJ+vNU19z0syr0oHOrSGxL0cVW+Kjv76kmp6uvGc2akHbtX0Nw@mail.gmail.com>
-Subject: Re: [PATCH 0/4] KEYS: trusted: Introduce support for NXP CAAM-based
- trusted keys
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     David Gstir <david@sigma-star.at>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>, keyrings@vger.kernel.org,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        linux-security-module@vger.kernel.org,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        Richard Weinberger <richard@nod.at>,
-        James Morris <jmorris@namei.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        David Howells <dhowells@redhat.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-crypto@vger.kernel.org, Sascha Hauer <kernel@pengutronix.de>,
-        linux-integrity@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>
+References: <20210818053908.1907051-1-mizhang@google.com> <20210818053908.1907051-2-mizhang@google.com>
+In-Reply-To: <20210818053908.1907051-2-mizhang@google.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Fri, 20 Aug 2021 19:11:46 -0700
+Message-ID: <CAA03e5Ggh4gODFspxcXAU6WRe0aMCvkG794JpwvyBf6ERs_6dA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] KVM: SVM: fix missing sev_decommission in sev_receive_start
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alper Gun <alpergun@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        David Rienjes <rientjes@google.com>,
+        Peter Gonda <pgonda@google.com>,
+        Vipin Sharma <vipinsh@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 1:36 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+On Tue, Aug 17, 2021 at 10:39 PM Mingwei Zhang <mizhang@google.com> wrote:
 >
-> On 20.08.21 22:20, Tim Harvey wrote:
-> > On Fri, Aug 20, 2021 at 9:20 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> >> On 20.08.21 17:39, Tim Harvey wrote:
-> >>> Thanks for your work!
-> >>>
-> >>> I've been asked to integrate the capability of using CAAM to
-> >>> blob/deblob data to an older 5.4 kernel such as NXP's downstream
-> >>> vendor kernel does [1] and I'm trying to understand how your series
-> >>> works. I'm not at all familiar with the Linux Key Management API's or
-> >>> trusted keys. Can you provide an example of how this can be used for
-> >>> such a thing?
-> >>
-> >> Here's an example with dm-crypt:
-> >>
-> >>   https://lore.kernel.org/linux-integrity/5d44e50e-4309-830b-79f6-f5d888b1ef69@pengutronix.de/
-> >>
-> >> dm-crypt is a bit special at the moment, because it has direct support for
-> >> trusted keys. For interfacing with other parts of the kernel like ecryptfs
-> >> or EVM, you have to create encrypted keys rooted to the trusted keys and use
-> >> those. The kernel documentation has an example:
-> >>
-> >>   https://www.kernel.org/doc/html/v5.13/security/keys/trusted-encrypted.html
-> >>
-> >> If you backport this series, you can include the typo fix spotted by David.
-> >>
-> >> I'll send out a revised series, but given that a regression fix I want to
-> >> rebase on hasn't been picked up for 3 weeks now, I am not in a hurry.
-> >>
-> > Thanks for the reference.
-> >
-> > I'm still trying to understand the keyctl integration with caam. For
-> > the 'data' param to keyctl you are using tings like 'new <len>' and
-> > 'load <data>'. Where are these 'commands' identified?
+> sev_decommission is needed in the error path of sev_bind_asid. The purpose
+> of this function is to clear the firmware context. Missing this step may
+> cause subsequent SEV launch failures.
 >
-> Search for match_table_t in security/keys/trusted-keys/trusted_core.c
+> Although missing sev_decommission issue has previously been found and was
+> fixed in sev_launch_start function. It is supposed to be fixed on all
+> scenarios where a firmware context needs to be freed. According to the AMD
+> SEV API v0.24 Section 1.3.3:
 >
-> > I may still be missing something. I'm using 4.14-rc6 with your series
-> > and seeing the following:
+> "The RECEIVE_START command is the only command other than the LAUNCH_START
+> command that generates a new guest context and guest handle."
 >
-> That's an odd version to backport stuff to..
+> The above indicates that RECEIVE_START command also requires calling
+> sev_decommission if ASID binding fails after RECEIVE_START succeeds.
 >
-> > # cat /proc/cmdline
-> > trusted.source=caam
-> > # keyctl add trusted mykey 'new 32' @s)# create new trusted key named
-> > 'mykey' of 32 bytes in the session keyring
-> > 480104283
-> > # keyctl print 480104283 # dump the key
-> > keyctl_read_alloc: Unknown error 126
-> > ^^^ not clear what this is
+> So add the sev_decommission function in sev_receive_start.
 >
-> Not sure what returns -ENOKEY for you. I haven't been using trusted
-> keys on v4.14, but you can try tracing the keyctl syscall.
+> Cc: Alper Gun <alpergun@google.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: David Rienjes <rientjes@google.com>
+> Cc: Marc Orr <marcorr@google.com>
+> Cc: John Allen <john.allen@amd.com>
+> Cc: Peter Gonda <pgonda@google.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Vipin Sharma <vipinsh@google.com>
+>
+> Fixes: af43cbbf954b ("KVM: SVM: Add support for KVM_SEV_RECEIVE_START command")
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 75e0b21ad07c..55d8b9c933c3 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -1397,8 +1397,10 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>
+>         /* Bind ASID to this guest */
+>         ret = sev_bind_asid(kvm, start.handle, error);
+> -       if (ret)
+> +       if (ret) {
+> +               sev_decommission(start.handle);
+>                 goto e_free_session;
+> +       }
+>
+>         params.handle = start.handle;
+>         if (copy_to_user((void __user *)(uintptr_t)argp->data,
+> --
+> 2.33.0.rc1.237.g0d66db33f3-goog
 
-yikes... that would be painful. I typo'd and meant 5.14-rc6 :) I'm
-working with mainline first to make sure I understand everything. If I
-backport this it would be to 5.4 but that looks to be extremely
-painful. It looks like there was a lot of activity around trusted keys
-in 5.13.
+Should this patch have the following Fixes tag?
 
-It works for a user keyring but not a session keyring... does that
-explain anything?
-# keyctl add trusted mykey 'new 32' @u
-941210782
-# keyctl print 941210782
-83b7845cb45216496aead9ee2c6a406f587d64aad47bddc539d8947a247e618798d9306b36398b5dc2722a4c3f220a3a763ee175f6bd64758fdd49ca4db597e8ce328121b60edbba9b8d8d55056be896
-# keyctl add trusted mykey 'new 32' @s
-310571960
-# keyctl print 310571960
-keyctl_read_alloc: Unknown error 126
+Fixes: af43cbbf954b ("KVM: SVM: Add support for KVM_SEV_RECEIVE_START command")
 
-Sorry, I'm still trying to wrap my head around the differences in
-keyrings and trusted vs user keys.
-
-Tim
+Reviewed-by: Marc Orr <marcorr@google.com>
