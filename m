@@ -2,103 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7DA9C4338F
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Aug 2021 03:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D01CDC4338F
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Aug 2021 03:48:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C395861220
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Aug 2021 03:45:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9ECE761250
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Aug 2021 03:48:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232371AbhHVDqE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 21 Aug 2021 23:46:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48130 "EHLO
+        id S232483AbhHVDtY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 21 Aug 2021 23:49:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232192AbhHVDqD (ORCPT
+        with ESMTP id S232276AbhHVDtW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 21 Aug 2021 23:46:03 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F54EC061575;
-        Sat, 21 Aug 2021 20:45:23 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id u15so8170958plg.13;
-        Sat, 21 Aug 2021 20:45:23 -0700 (PDT)
+        Sat, 21 Aug 2021 23:49:22 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90A34C061575;
+        Sat, 21 Aug 2021 20:48:36 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id n12so8225754plf.4;
+        Sat, 21 Aug 2021 20:48:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=nG/fP2q2RAn5VxaTcM/j9eZOvQ9XxbrcfsGXIrq70lU=;
-        b=VQFWPWkfVlHhwXKazmJ6ooYcAEFkIqzti1VOIFMzyPf47ewVLsi3ExQuclIEtSr40M
-         Doo3IsZUIZKYfWoYdqdjleo3uRBXn5eZoMFsV6/NkDGUoYQJk5a7EpCDmJ6mjpTldv9H
-         HmvO0YCsmrYzMej6fbl9hAhoQI84DzI/IdCcl05eE468Kdy+VG9P4SJXqI7xUxAjjtCx
-         Iwmg8SIQRO45/K3CLwbl1mI4+l95q119CCf4fYE40jfj0ad6T4arliFwAgwaUz7oSVKt
-         pKzbtmNRLEFTX2QgBoYWTX5SOAwly72jjF1lydeNLMYBX9s8jh15DlV2EnAPJhcxwJG8
-         GAVQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=AM5YpUjTpEeHgm+rJvNpvLk076ooqk9uZkEnJohDtb4=;
+        b=ZI6BLhg6OvoEyQf76+E49qzmwSdfLQO5faYQA8H1J5am8p1U3/Ir4stV3mFrO4fhng
+         D5B0bbEpWLf9tpuai8sdLvv7QaCdpkugkwzm/enJiqT3tb5ethSjsJ1GW79kFJOkdLZd
+         fLNwdKkBFxmIZBKfb2o5E9fI5/wDgFyQK4ukW32zHW+Zo/e4zzS3WyZSpwVqagn3IBv2
+         5abHlw80X260aBcv0HnoN0peKR6bUOrYmabr1MSljorKnRLDV06Kl5ztrG4NXvuMSTL6
+         jJ/pWp1ozXFT+1q6LkvgAWE+Hag2YktA7oDeqkoxhNGlH/75go+GqLVrVLv6Rs3U0bOY
+         Mf8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=nG/fP2q2RAn5VxaTcM/j9eZOvQ9XxbrcfsGXIrq70lU=;
-        b=KhflycxC6nahAoqKg3QNVSS4CXikzsLl0GrYNoA9fC5Bw+vQpSANVUU8LLXjom+LjC
-         cUiHEkPWP3AMpGCmyTWs+L7uysllR9HkcKRGo3bCwiHWvaovqg/MmEsOT9eDTdmlzCvw
-         hliO47YLa8NKHfX4qO9Gc+LZSZbILKLomAfQTldXU+N5wqXE8kkvIuxgRGAqhxZxcWi0
-         d64tSElIrz1zJUrFbTHK1AvqZOka1R07SM/hlhCGzND52+rTDADIrl3rwHau1HJ4tNoD
-         as2llAvECSO6OGhOyxEdytzglF6EaJ2A1jJsC8lEnG4k7Pe/lChjbd0Rtot/yJeT9ctv
-         uguw==
-X-Gm-Message-State: AOAM530YFCNo4Mc0wWETCgJlUXV46EEAbuTNbluzg4iQsXVqaLSZOdgB
-        7kBU0OptkzWgd2v40Cqs3eY=
-X-Google-Smtp-Source: ABdhPJzKnkkjIzXgi1tDPo+v2f+wHtm5+3VzFCODnn3N+1zpxycHfhGPuHILK2gEze//H3tV8Ornfw==
-X-Received: by 2002:a17:90a:db44:: with SMTP id u4mr12891626pjx.180.1629603922441;
-        Sat, 21 Aug 2021 20:45:22 -0700 (PDT)
-Received: from fedora.. ([2405:201:6008:6ce2:9fb0:9db:90a4:39e2])
-        by smtp.googlemail.com with ESMTPSA id 136sm13841275pge.77.2021.08.21.20.45.17
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=AM5YpUjTpEeHgm+rJvNpvLk076ooqk9uZkEnJohDtb4=;
+        b=Nc8xkA0ivLHUa95O1wYahV0svGva31j3mCqlRmcM13EpRGW/XnKYvbYrY8RUVaNFCl
+         6GGHSc0ujF3BUebxBthQvbdzkyutes1E4TS/SXhm7rSoZmADObSZ9RaK0f+uAld99JrQ
+         x6HGEFnsXtU0Lx/P8Ij3smPp3Pcy8xz3VgUxM4zgh222l29RSuzaa9J5VomO6wdeZU0j
+         uB6zZiRJPTlxBUamFjXR2EFuLloPJMibKoy+uYzoi6IPwaNOReDLihosSMOkRio1Gm//
+         zRd9Bsgg1NxaY7H80ryo7xleZjcDgGG3czSz8eLFLfRdTn6sZ1SD9bhBxxS5Rjp6D6z+
+         X3JQ==
+X-Gm-Message-State: AOAM533+02jrZN3dDurtfnq2AU3Y9nPK4+q1II//INeVptofXzp4PAtM
+        BO6y08KJebcZPhJzmAClHPw=
+X-Google-Smtp-Source: ABdhPJw06kvguYxYsSgkBtFCK7TZAge59CD1QHXq4Pvb9Y946Fq6fjdCxeD5Uer2AYRuq0VvB1A1Ow==
+X-Received: by 2002:a17:902:9a03:b029:12d:72e2:f7a1 with SMTP id v3-20020a1709029a03b029012d72e2f7a1mr22588876plp.49.1629604116020;
+        Sat, 21 Aug 2021 20:48:36 -0700 (PDT)
+Received: from fedora ([2405:201:6008:6ce2:9fb0:9db:90a4:39e2])
+        by smtp.gmail.com with ESMTPSA id y67sm11882425pfg.218.2021.08.21.20.48.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Aug 2021 20:45:22 -0700 (PDT)
+        Sat, 21 Aug 2021 20:48:35 -0700 (PDT)
+Date:   Sun, 22 Aug 2021 09:18:29 +0530
 From:   Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        x86@kernel.org, ardb@kernel.org
-Cc:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
-Subject: [PATCH v2] crypto: xts_crypt() return if walk.nbytes is 0
-Date:   Sun, 22 Aug 2021 09:15:14 +0530
-Message-Id: <20210822034514.926652-1-chouhan.shreyansh630@gmail.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210820125315.GB28484@gondor.apana.org.au>
-References: <20210820125315.GB28484@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: xts_crypt() return if walk.nbytes is 0
+Message-ID: <YSHJDQRE7G+eOnum@fedora>
+References: <YQ0Qm+Xs1g/7Eant@fedora>
+ <20210809141027.860850-1-chouhan.shreyansh630@gmail.com>
+ <20210820083111.GA28484@gondor.apana.org.au>
+ <CAMj1kXGMPimX0_dR_kLuzZjuJK9rM=uCpRDtoJq0UjWq12M10A@mail.gmail.com>
+ <20210820125315.GB28484@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210820125315.GB28484@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-xts_crypt() code doesn't call kernel_fpu_end() after calling
-kernel_fpu_begin() if walk.nbytes is 0. The correct behavior should be
-not calling kernel_fpu_begin() if walk.nbytes is 0.
+Hi,
 
-Reported-by: syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
-Signed-off-by: Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>
----
- arch/x86/crypto/aesni-intel_glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thank you Ard and Herebrt for your reviews. I have sent an updated
+patch. Sorry for the delay.
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 388643ca2177..0fc961bef299 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -849,7 +849,7 @@ static int xts_crypt(struct skcipher_request *req, bool encrypt)
- 		return -EINVAL;
- 
- 	err = skcipher_walk_virt(&walk, req, false);
--	if (err)
-+	if (!walk.nbytes)
- 		return err;
- 
- 	if (unlikely(tail > 0 && walk.nbytes < walk.total)) {
--- 
-2.31.1
-
+Regards,
+Shreyansh
