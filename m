@@ -2,98 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9584EC4338F
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Aug 2021 05:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E772C4320A
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Aug 2021 10:31:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67B386124D
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Aug 2021 05:20:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83E406127B
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Aug 2021 10:31:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229910AbhHVFUz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 22 Aug 2021 01:20:55 -0400
-Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:37839 "EHLO
-        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229611AbhHVFUw (ORCPT
+        id S233193AbhHVKbt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 22 Aug 2021 06:31:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50860 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233001AbhHVKbs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 22 Aug 2021 01:20:52 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0UktxewK_1629609606;
-Received: from 30.27.241.54(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UktxewK_1629609606)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Sun, 22 Aug 2021 13:20:08 +0800
-Subject: Re: [PATCH 0/2] add AES-NI/AVX2/x86_64 implementation
-To:     David Laight <David.Laight@ACULAB.COM>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "Markku-Juhani O . Saarinen" <mjos@iki.fi>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Jia Zhang <zhang.jia@linux.alibaba.com>,
-        "YiLin . Li" <YiLin.Li@linux.alibaba.com>
-References: <20210818033117.91717-1-tianjia.zhang@linux.alibaba.com>
- <f7684dd9dc5e4c6081ba8e51f53e0844@AcuMS.aculab.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <ea63cb91-dba8-9ac6-9ca7-967355e6236f@linux.alibaba.com>
-Date:   Sun, 22 Aug 2021 13:20:06 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.13.0
+        Sun, 22 Aug 2021 06:31:48 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9D7EC061575;
+        Sun, 22 Aug 2021 03:31:07 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id u16so21427319wrn.5;
+        Sun, 22 Aug 2021 03:31:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9X+CpU5/dJXHLe/YiexKZwFlsJapREKfLFd7TDqnCAo=;
+        b=Dzud64GxzJoPF4WnW/eg1gl00gg/M/VV378km3mMmlghjdRVJ/blQROzu5z99N/FxQ
+         zg/0LKphCQVeGgsZ+v7nBypYEoATGRGQGYl4zsENnwbR+H5SrIr7VWbXNjg+C0Uwex4z
+         jIOD3TwJwDPNOvprUCj8QQ8qsVX/E+/j3GHTMpxSi9pg3lrIExmFd8067+glLgdjiSud
+         dx6IEzJMGMekKEnm/Uv0IxWYirf2a74ohwZIDqVbujzdujDIRNrOhNnoQ8/ryCQ1gXor
+         MSUxt5fb/TRrkp/D94i0FpyA7YtExIe40RXFLZ5cO9mKoVNndLbZCCvExLE3vgoeFzsf
+         J93A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9X+CpU5/dJXHLe/YiexKZwFlsJapREKfLFd7TDqnCAo=;
+        b=ljFqNyMcqnxv353If2mo7pcxe2UrdwgNF3MmhtgTsZ5vGBmyBykPeavdjwLQUvzzoz
+         gCDlKJoNrbnvO4T9hB9OXDcl39PB+7yB9Ec9LsrSOwrALRyg82YSWB9xwmuqpMkf1YOd
+         ti5Qw53W6is7WXkUqhGcjOdqzhyDfPl8RCjqh22uJn50N6nIjZqZkC3J3rHIlE8wsX8I
+         6lXr6qIp58N1Q5NM5MCQbL4bDr/sOfyZpbdAJcvFckvtJvn9t1h8+bB93BPuIEYATrTo
+         fuIFCLywLSk/VFf3ySXtp27FFKPWIVp6+lw/qDHfV2aNNti/pzMbmx5aXkxR2Yw7zAsz
+         sf9A==
+X-Gm-Message-State: AOAM533fGhkSi5J5OIq563FqXHRx7rmiof0JZjLyai/xcQ3uDw4seew2
+        Qgp339ApTr6VhCBpa2U6TXg=
+X-Google-Smtp-Source: ABdhPJz9zAKop+9s4/jzr41y325y1a1S02ge9Ac/Ov2i4D84ykpZX+qRgVzn41WjX2BabM+T645EBA==
+X-Received: by 2002:adf:f40d:: with SMTP id g13mr7992982wro.69.1629628266153;
+        Sun, 22 Aug 2021 03:31:06 -0700 (PDT)
+Received: from localhost.localdomain (arl-84-90-178-246.netvisao.pt. [84.90.178.246])
+        by smtp.gmail.com with ESMTPSA id z5sm15389199wmp.26.2021.08.22.03.31.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Aug 2021 03:31:05 -0700 (PDT)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Cc:     Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        clang-built-linux@googlegroups.com,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] crypto: sha512: remove imaginary and mystifying clearing of variables
+Date:   Sun, 22 Aug 2021 12:31:07 +0200
+Message-Id: <20210822103107.28974-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <f7684dd9dc5e4c6081ba8e51f53e0844@AcuMS.aculab.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David,
+The function sha512_transform() assigns all local variables to 0 before
+returning to its caller with the intent to erase sensitive data.
 
-On 8/20/21 6:03 PM, David Laight wrote:
-> From: Tianjia Zhang
->> Sent: 18 August 2021 04:31
->>
->> This patchsets exported some of the common functions implemented by
->> the SM4 AESNI/AVX algorithm, and reused these functions to achieve
->> the acceleration of AESNI/AVX2 implementation.
-> 
-> These functions need bracketing by kernel_fpu_enable()
-> (or whatever it is called.)
-> That will significantly affect the performance.
-> 
-> Also the functions look pretty big (I don't know how big
-> the generic ones are) and will take time to load into the I$
-> and will displace other code.
-> 
-> So while a hot-cache benchmark might show improvements
-> for repeated calls is isn't obvious that any significant
-> gain will be made for real-life calls which could easily
-> be of single buffers.
-> 
-> 	David
-> 
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-> Registration No: 1397386 (Wales)
-> 
+However, make clang-analyzer warns that all these assignments are dead
+stores, and as commit 7a4295f6c9d5 ("crypto: lib/sha256 - Don't clear
+temporary variables") already points out for sha256_transform():
 
-Yes, the functions bracketed by kernel_fpu_begin() do affect 
-performance. It seems that the kernel can only do this, so by processing 
-as much data as possible in a kernel_fpu_begin/end() operation to 
-improve performance. actually do it now.
+  The assignments to clear a through h and t1/t2 are optimized out by the
+  compiler because they are unused after the assignments.
 
-Best regards,
-Tianjia
+  Clearing individual scalar variables is unlikely to be useful, as they
+  may have been assigned to registers, and even if stack spilling was
+  required, there may be compiler-generated temporaries that are
+  impossible to clear in any case.
+
+This applies here again as well. Drop meaningless clearing of local
+variables and avoid this way that the code suggests that data is erased,
+which simply does not happen.
+
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+---
+ crypto/sha512_generic.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
+index c72d72ad828e..be70e76d6d86 100644
+--- a/crypto/sha512_generic.c
++++ b/crypto/sha512_generic.c
+@@ -143,9 +143,6 @@ sha512_transform(u64 *state, const u8 *input)
+ 
+ 	state[0] += a; state[1] += b; state[2] += c; state[3] += d;
+ 	state[4] += e; state[5] += f; state[6] += g; state[7] += h;
+-
+-	/* erase our data */
+-	a = b = c = d = e = f = g = h = t1 = t2 = 0;
+ }
+ 
+ static void sha512_generic_block_fn(struct sha512_state *sst, u8 const *src,
+-- 
+2.26.2
+
