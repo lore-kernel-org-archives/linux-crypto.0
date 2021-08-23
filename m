@@ -2,93 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39122C4320A
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 04:52:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9A1C4338F
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 07:33:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A4E061356
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 04:52:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E99F61356
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 07:33:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229555AbhHWEwy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Aug 2021 00:52:54 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:35574 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229462AbhHWEwx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Aug 2021 00:52:53 -0400
-Received: from zn.tnic (p200300ec2f07d90037f6d6bcf935006e.dip0.t-ipconnect.de [IPv6:2003:ec:2f07:d900:37f6:d6bc:f935:6e])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 457801EC0464;
-        Mon, 23 Aug 2021 06:52:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629694326;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=c1G7QTpcEx3Qr+cJbGLD7TPXvN9RsA/K/gThPK83ye0=;
-        b=Ck+qOI9Ub1piyF92cJ1Rj1I8T2Htrehc2lYwvWMzCZOXfnoaTLDafVfQ1j45Mu4VHpGKye
-        9YOX1vzz2FoSzluNSKhf3WLDYIFyz/XZPlgl9BH5wxwphLSM4OYJTzozTKAZ1PgaidjC+I
-        3z99tbaejNJLEA0DdcbbXothdDMBVyE=
-Date:   Mon, 23 Aug 2021 06:52:47 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 24/36] x86/compressed/acpi: move EFI config
- table access to common code
-Message-ID: <YSMpn14wu/5FsRiM@zn.tnic>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-25-brijesh.singh@amd.com>
- <YR42323cUxsbQo5h@zn.tnic>
- <20210819145831.42uszc4lcsffebzu@amd.com>
- <YR6QVh3qZUxqsyI+@zn.tnic>
- <20210819234258.drlyzowk7y3t5wnw@amd.com>
+        id S234976AbhHWHeH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 23 Aug 2021 03:34:07 -0400
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:53767 "EHLO
+        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234861AbhHWHeG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 23 Aug 2021 03:34:06 -0400
+IronPort-HdrOrdr: =?us-ascii?q?A9a23=3A7eIjsakUEYwYax48EGTddVtgDVTpDfIL3DAb?=
+ =?us-ascii?q?v31ZSRFFG/Fw9vre4cjzuiWVtN98YhwdcJW7Scy9qBDnhOJICOsqTNSftWDd0Q?=
+ =?us-ascii?q?PCRr2Kr7GSoQEIcBeQygcp78Zdmt9FZuEYY2IXsS/S2njeLz57qOP3lpxAzt2u?=
+ =?us-ascii?q?q0uFBTsaEp2Jum9Ce32m+mUffng9OXIRfKDsnvZ6mw=3D=3D?=
+X-IronPort-AV: E=Sophos;i="5.84,326,1620684000"; 
+   d="scan'208";a="524806179"
+Received: from xanadu.blop.info ([178.79.145.134])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Aug 2021 09:33:22 +0200
+Date:   Mon, 23 Aug 2021 09:32:56 +0200
+From:   Lucas Nussbaum <lucas.nussbaum@inria.fr>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        David Rientjes <rientjes@google.com>
+Subject: Re: [PATCH] crypto: ccp: shutdown SEV firmware on kexec
+Message-ID: <YSNPKPPjEFxGT0Dc@xanadu.blop.info>
+References: <20210728151521.5319-1-brijesh.singh@amd.com>
+ <20210806121442.GB25554@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20210819234258.drlyzowk7y3t5wnw@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210806121442.GB25554@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 19, 2021 at 06:42:58PM -0500, Michael Roth wrote:
-> In v5, I've simplified things to just call efi_find_vendor_table() once
-> for ACPI_20_TABLE_GUID, then once for ACPI_TABLE_GUID if that's not
-> available. So definitely doesn't sound like what you are suggesting here,
-> but does at least simplify code and gets rid of the efi_foreach* stuff. But
-> happy to rework things if you had something else in mind.
+On 06/08/21 at 20:14 +0800, Herbert Xu wrote:
+> On Wed, Jul 28, 2021 at 10:15:21AM -0500, Brijesh Singh wrote:
+> > The commit 97f9ac3db6612 ("crypto: ccp - Add support for SEV-ES to the
+> > PSP driver") added support to allocate Trusted Memory Region (TMR)
+> > used during the SEV-ES firmware initialization. The TMR gets locked
+> > during the firmware initialization and unlocked during the shutdown.
+> > While the TMR is locked, access to it is disallowed.
+> > 
+> > Currently, the CCP driver does not shutdown the firmware during the
+> > kexec reboot, leaving the TMR memory locked.
+> > 
+> > Register a callback to shutdown the SEV firmware on the kexec boot.
+> > 
+> > Fixes: 97f9ac3db6612 ("crypto: ccp - Add support for SEV-ES to the PSP driver")
+> > Reported-by: Lucas Nussbaum <lucas.nussbaum@inria.fr>
+> > Tested-by: Lucas Nussbaum <lucas.nussbaum@inria.fr>
+> > Cc: <stable@kernel.org>
+> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> > Cc: Joerg Roedel <jroedel@suse.de>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: David Rientjes <rientjes@google.com>
+> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > ---
+> >  drivers/crypto/ccp/sev-dev.c | 49 +++++++++++++++++-------------------
+> >  drivers/crypto/ccp/sp-pci.c  | 12 +++++++++
+> >  2 files changed, 35 insertions(+), 26 deletions(-)
+> 
+> Patch applied.  Thanks.
 
-Ok, thanks. Lemme get to that version and I'll holler if something's
-still bothering me.
+Could this be backported to 5.10 as well?
 
-Thx.
-
+Thanks
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Lucas Nussbaum   <lucas.nussbaum@inria.fr>   +33 3 54 95 86 19
+Responsable du programme plateformes d'expérimentation
+DDO-SDT - Direction Générale Déléguée à l'Innovation - Inria
