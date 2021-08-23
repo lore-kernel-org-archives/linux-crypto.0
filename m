@@ -2,170 +2,168 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C00C4320E
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 20:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4996DC432BE
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 21:13:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 61E65613A8
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 20:48:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C2BE613A6
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 21:13:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232580AbhHWUt0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Aug 2021 16:49:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58840 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232486AbhHWUt0 (ORCPT
+        id S232712AbhHWVOc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 23 Aug 2021 17:14:32 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:18456 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232710AbhHWVOb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Aug 2021 16:49:26 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17NKXBs2071394;
-        Mon, 23 Aug 2021 16:48:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=GwgTHTWFp+4KtL2BdI3Wl8DT7iBBWIm4W/wc8D4PTzE=;
- b=INslB6mZOffpznEJNq36CgJn68TFeAnnBAFZqt05nXE4MXnxQTyABaAtoLzY02pFuYje
- ApRMLJHgOZWu+sDMo2gfn3hTrgVIlKgy9xkd9obzFIdSwvP7U6K5csDV+ZgdKc+vzcAk
- gglkmB2ymHb8EErZVWm5oBL/S3oOdIaIWI4Y3k5e06ph1vAcPLEt0pi1Ql9K/vJbcBm2
- RHIWKCTVTlHXstoLLU8AUjO7iXuWH0v9qhFm4v5sL1IrHCBXBRy1KZkFB5ZOaUIp0Ag4
- vZBJ3zCfuXkkHaUm09m8kHpvNU30azqVJjMT6h/vtm8ITBm3ADSlOvqeAwxYecaBxgLH kw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3akejb88s1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Aug 2021 16:48:16 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17NKXGWM071753;
-        Mon, 23 Aug 2021 16:48:16 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3akejb88rr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Aug 2021 16:48:16 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17NKhIeQ029476;
-        Mon, 23 Aug 2021 20:48:15 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma01wdc.us.ibm.com with ESMTP id 3ajs4bbten-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Aug 2021 20:48:15 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17NKmDo021037374
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Aug 2021 20:48:13 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9700E136051;
-        Mon, 23 Aug 2021 20:48:13 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 227F6136059;
-        Mon, 23 Aug 2021 20:48:12 +0000 (GMT)
-Received: from li-4b5937cc-25c4-11b2-a85c-cea3a66903e4.ibm.com (unknown [9.211.127.29])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 23 Aug 2021 20:48:11 +0000 (GMT)
-Subject: Re: [PATCH v4 00/12] Enroll kernel keys thru MOK
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     keyrings@vger.kernel.org,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        James Morris <jmorris@namei.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
-        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
-        scott.branden@broadcom.com, weiyongjun1@huawei.com,
-        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        lszubowi@redhat.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        pjones@redhat.com,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        Patrick Uiterwijk <patrick@puiterwijk.org>
-References: <20210819002109.534600-1-eric.snowberg@oracle.com>
- <fcb30226f378ef12cd8bd15938f0af0e1a3977a2.camel@kernel.org>
- <f76fcf41728fbdd65f2b3464df0821f248b2cba0.camel@linux.ibm.com>
- <91B1FE51-C6FC-4ADF-B05A-B1E59E20132E@oracle.com>
- <e7e251000432cf7c475e19c56b0f438b92fec16e.camel@linux.ibm.com>
- <cedc77fefdf22b2cec086f3e0dd9cc698db9bca2.camel@kernel.org>
-From:   Nayna <nayna@linux.vnet.ibm.com>
-Message-ID: <bffb33a3-d5b5-f376-9d7d-706d38357d1a@linux.vnet.ibm.com>
-Date:   Mon, 23 Aug 2021 16:48:11 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Mon, 23 Aug 2021 17:14:31 -0400
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 17NHgqpw010647;
+        Mon, 23 Aug 2021 21:13:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2021-07-09;
+ bh=UVzc4s8Id/HwqtuUqQgnF9rDDucrlWdKgtv0eHFFCXs=;
+ b=jKXsyiTj5BGytpaJo1hzDxKoQ/uFG33hJ3Pdz0q3QfVriSEpN1s2pqkblm2GW71TgimK
+ InGOtuq2jPM+dwfn/Rizf3UtepsWQxD0UT/czban5WlpOoc9sU6wH5CkL3fqUY3Haw+E
+ aumk7flUxNAXo1rW6xZF8VXPJGapnOciW4yflzKIyNk2NoMOGFHnQ4GNTUnbJ9c/wfK4
+ Ex8tyoQJniTgu+OtJ8nJcsWNtrkHWeAVeda4crzimuP7eOUafGIigUiK+rlnYrVmBDPB
+ ur9JJIwHbMOQplpNjNcRmhiSHtUzcXiFMfgXS/QWmYXkFC96pOvPiMhqGcq7FLM1qBwP rQ== 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2020-01-29;
+ bh=UVzc4s8Id/HwqtuUqQgnF9rDDucrlWdKgtv0eHFFCXs=;
+ b=kVAMsf8DNl8z3MPTStuGeUadn4vOXOlggId3g7ue+DJZXtKNvnAuDH5KBPcuJZxq+6As
+ k5acpNSjUEPy9hy9NFTAUFOtzaxNUkCRzXpg+MSB9kJ9m/VT0vEcRxTNpc+EPVmGkfek
+ BAPpjhRskGSh5xBwEarkqnMuK1WHW4FTrrd/2+g6EgUmWtPTsGi9OKisXMTxcyJIS439
+ KLqJh2IjlPilCNJnxMM4hZiXc90vPNs9w5/idUGTq0cTQMlW3u/C9M8LQ83z7wOF67zr
+ LeKlNizUlDl6JLUNPyEhRKl92ZCxb7LAadvgFkHO/kg7O46xrSC6tWSZ9DqnHxq/y9Xs 1g== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3akxreajp3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Aug 2021 21:13:42 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 17NLBCRU092982;
+        Mon, 23 Aug 2021 21:13:42 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2175.outbound.protection.outlook.com [104.47.59.175])
+        by aserp3020.oracle.com with ESMTP id 3ajsa41hrs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Aug 2021 21:13:41 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JA8sJxcwEHGZmu6oHEwKv5BCEIvh0Ooa37vA7x/aNNZiHqRa7oVACnW91xqm+B7BwMbMRuWhFSB+4KAXB80gobfsJxuv8V6DOYy4ni9GeBxNGdzkWFPqkr0c57/debdEJfxXvi9rUBns4JciMYsV7sUMtJpzaSnrlPnRyDbLTCUP93WDB0Zkt34U2ivimZrGNkPmKz2QtAb0zMfnDetISo4fFdssRxYrujC5CsvuK4f6XUWMJ/0dFstN2QlXKWJqlTMo+Md2nWYWWwstNC9y6bFiJdYyuuH5gdQUBcwfsMfKcQf3B6WAAAYpeOGQMtF6ja3NB/o4qF6Kuqcv1ZACHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UVzc4s8Id/HwqtuUqQgnF9rDDucrlWdKgtv0eHFFCXs=;
+ b=gGw+L0Ht4IgHGWIqC5Fd2N2Og9t0pqNzsB5YSoCoa31nYGxAjIuxRIXnn8Sv4Jdz4UW2Fh7CWL01CtcxHfE5EP/9H2le8wBXwgab7iDxVItnADH5M7etTKZB1nYpJ42GVSFxF/E1M2O7kAoJNm7/Lks6UwuCdSi9JpXSmJMiMxkEfJ8FsWcEj/FqJFOdRGUrAzcbyFElcLTXlTnDyoq1SFgPrhVAbS+HqUVM3W7PfkVwV3/tzqGLhHUvUMEDY0Z5/2YIYboJs++ZZofJtIJlOyo20SvzSzEdKBqO43sciiFyx31mNC5kb7PdHNEVje84en9lf6Nwy0xb3odvSwlMIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UVzc4s8Id/HwqtuUqQgnF9rDDucrlWdKgtv0eHFFCXs=;
+ b=rCcMJhfFgMd+YH4y2g5JY8VszkrCQde8UYo+k6ijX8QVY8SOMV0WJ1W6bqW6mGyQSL6TJvq3zSRffNkqLQdUsrm7cwe3IP9G0R8/hWoiPOf5pGyHw2JuUwW56yiGpS30sDf53bhS04QWcvExpFbyfJB8MzqEHHN+K9cPtESCBes=
+Authentication-Results: baidu.com; dkim=none (message not signed)
+ header.d=none;baidu.com; dmarc=none action=none header.from=oracle.com;
+Received: from BYAPR10MB2966.namprd10.prod.outlook.com (2603:10b6:a03:8c::27)
+ by BYAPR10MB2439.namprd10.prod.outlook.com (2603:10b6:a02:ba::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.22; Mon, 23 Aug
+ 2021 21:13:40 +0000
+Received: from BYAPR10MB2966.namprd10.prod.outlook.com
+ ([fe80::203c:7f44:c562:b991]) by BYAPR10MB2966.namprd10.prod.outlook.com
+ ([fe80::203c:7f44:c562:b991%3]) with mapi id 15.20.4436.022; Mon, 23 Aug 2021
+ 21:13:40 +0000
+Date:   Mon, 23 Aug 2021 17:13:36 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Cai Huoqing <caihuoqing@baidu.com>
+Cc:     steffen.klassert@secunet.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] padata: Remove repeated verbose license text
+Message-ID: <20210823211336.yt4lhxtcdozq5cdi@oracle.com>
+References: <20210822022734.1002-1-caihuoqing@baidu.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210822022734.1002-1-caihuoqing@baidu.com>
+X-ClientProxiedBy: MN2PR15CA0013.namprd15.prod.outlook.com
+ (2603:10b6:208:1b4::26) To BYAPR10MB2966.namprd10.prod.outlook.com
+ (2603:10b6:a03:8c::27)
 MIME-Version: 1.0
-In-Reply-To: <cedc77fefdf22b2cec086f3e0dd9cc698db9bca2.camel@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 9OXXfLd94kr_A6N6E9AMIXxONqEE6Oxv
-X-Proofpoint-ORIG-GUID: 58giprlgX9pWVHV4rPlSGeIWkMiItOtP
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-23_04:2021-08-23,2021-08-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
- lowpriorityscore=0 malwarescore=0 adultscore=0 bulkscore=0 mlxscore=0
- impostorscore=0 clxscore=1011 mlxlogscore=999 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108230140
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from oracle.com (98.229.125.203) by MN2PR15CA0013.namprd15.prod.outlook.com (2603:10b6:208:1b4::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Mon, 23 Aug 2021 21:13:39 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 34bdddf6-d4b8-49e9-221d-08d9667ae103
+X-MS-TrafficTypeDiagnostic: BYAPR10MB2439:
+X-Microsoft-Antispam-PRVS: <BYAPR10MB24391F192D5D6746E2CEAF89D9C49@BYAPR10MB2439.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ixoH7jnthIwFJt90zM1aDva0NqwAgUIOVr4I5VwRpdnE4qftDEVTBNq7w3UawMzvgbjrQV9L/23/HpfRD3eNz9TUuerf+tFax+mrdzj01lShna8zpG6bVcC5AlW4PYF2cLhhMh9kWvSwZ7JqQ7OtPZZFUsT6WFGk9qZYeO07lnSO9iHq/VODkioaP4punq2mknOODr5xuecjPTN4zEUbvplHEcgpdNmQNd9ZjP8wGbod3NTthrnkcRaqjANHUC++iZmf7z1n62JdcE6zFszDh/1j4nYyb5XB5o/9x083FjHKYUvsDcyer1TjF1qQS5b31pHa26em54LUvZvoMPCWykF7Z50uv56BgthHhvDp5F2xobtWx2947go44VRBzT/dbft8CTYAIU112FY6w8I4yVR5WoMh/ywuQPchodXXPJ9EGBTlflG5R7DacjPSugmVK0GYe9JBuFEZzTJz0k70xan/FYKzkxKZP0114qdnwzEBn3Ov32dnD9/inka7e8NKBDMlj0eBomkpfPl1kqcX3lJWWGznlm5SPoXJgflt/4zxWjciDrM9M6cSSL4/4M3NrHmCT35ArBOC9zDGyB9ciy/SGCT4zQd/fU/yL4OQSVe5U1HYOTMf5EPnuv4qXXzQO9I1U0fPMw/lVv+6eYYsjMRf33UhkAdURCWORy6W5k752b3iLGLzur82Z/G0X2DqpH1ofjvm5VSDQCrbwGpFL9JWPwh1FdJX0vJti3M4BG0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2966.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(366004)(136003)(396003)(39860400002)(376002)(66476007)(66556008)(86362001)(4326008)(478600001)(5660300002)(1076003)(36756003)(6916009)(38350700002)(38100700002)(2616005)(956004)(6666004)(8886007)(2906002)(55016002)(26005)(8676002)(52116002)(7696005)(316002)(83380400001)(66946007)(8936002)(186003)(2004002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: wTH8NDPzwz4Jjn9pvVXMhHhyK4x/aVaxLmBeKLzrz2tNeYM163qktYboGILTFeWkwcWCWAqX0X4S99jmcCvY3mEDVothCowrc1bTjMvV/nU3W9aFXqLtOfVpvuIrpXWWK91oEoE4xK9SgnmZ88roo2nUN5kfLncFmTkxWUPpAxYO9b1DN0Sj5aqByfBbFLhne64GNf808HzE3X3oGkm8xuU8Vl5In3XU8PU1ToAXyjM8D1vvDUUN3cIh7fgbtv9ol2NbeRPvlMAy7c1VkF61Jkj2MycsSg9GvjpSP6HZwDKVUgnT9v5SKGScuDyKIClAX2TP/4fRT8bvnGYDO9zmB3gfrMk7sX5Y+vOlKVMN2Lc3MtLLLVKuRu+jlrAsFT6LlXBeZqQF7nPErhMwmqLfNAC305bqB+1KqKRW+PTvCvMhxdbfA1KmUBt1lVG3afdSh9ZOPBEpVDURDgHK0uQGx4ztNgLJuSQ02LTr3iwogv14S4tZmcBoX/V+YHpshgBqOpSXcsapIs4l8CrrZJyTyKWKSUgFStpGo8QcEC6uknSA/12g8EqaESBdJBaAMMLfGXeSaiUJ9dbUu7aWjRh8EZpnO3LKQCiA4EtqhugjeLrkEdmuzSL51CSPhxCF1Ru4Ux5XsHhYt3uqYbjDSQ2RXj5oblB41PDQ/xwR9g1rhj0obBDB/yd57mJ4UtDALZ/qZg1btXGhsc0EcIMbsFBXvzCpYsbYLBwJp0FH6cgd3R6aM56Dgr1C7Jd5UCIFUp7i
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 34bdddf6-d4b8-49e9-221d-08d9667ae103
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2966.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2021 21:13:40.2104
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fOiE/itUYmXvlEEeA4zSzDb+Hd3VrtyeSP9TK3+2EymfbSp8Ta+68zkOO/63i8LafFN/KayVkrcyHFGMo2su/gv3YW18lpmXie90wWTvKjk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR10MB2439
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10085 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0
+ mlxlogscore=999 bulkscore=0 mlxscore=0 adultscore=0 malwarescore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108230145
+X-Proofpoint-ORIG-GUID: 6q3vhLupaQcQCkSCPJRJZ9XXxbXuE1Hj
+X-Proofpoint-GUID: 6q3vhLupaQcQCkSCPJRJZ9XXxbXuE1Hj
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Sun, Aug 22, 2021 at 10:27:34AM +0800, Cai Huoqing wrote:
+> remove it because SPDX-License-Identifier is already used
+> 
+> Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
 
-On 8/23/21 1:51 PM, Jarkko Sakkinen wrote:
-> On Thu, 2021-08-19 at 13:32 -0400, Mimi Zohar wrote:
->> On Thu, 2021-08-19 at 09:23 -0600, Eric Snowberg wrote:
->>>> On Aug 19, 2021, at 7:10 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
->>>>
->>>> On Thu, 2021-08-19 at 14:38 +0300, Jarkko Sakkinen wrote:
->>>>> On Wed, 2021-08-18 at 20:20 -0400, Eric Snowberg wrote:
->>>>>> Downstream Linux distros try to have a single signed kernel for each
->>>>>> architecture.  Each end-user may use this kernel in entirely different
->>>>>> ways.  Some downstream kernels have chosen to always trust platform keys
->>>>>> within the Linux trust boundary for kernel module signing.  These
->>>>>> kernels have no way of using digital signature base IMA appraisal.
->>>>>>
->>>>>> This series introduces a new Linux kernel keyring containing the Machine
->>>>>> Owner Keys (MOK) called .mok. It also adds a new MOK variable to shim.
->>>>> I would name it as ".machine" because it is more "re-usable" name, e.g.
->>>>> could be used for similar things as MOK. ".mok" is a bad name because
->>>>> it binds directly to a single piece of user space software.
->>>> Nayna previously said,
->>>>    "I believe the underlying source from where CA keys are loaded might vary
->>>>    based on the architecture (".mok" is UEFI specific.). The key part is
->>>>    that this new keyring should contain only CA keys which can be later
->>>>    used to vouch for user keys loaded onto IMA or secondary keyring at
->>>>    runtime. It would be good to have a "ca" in the name, like .xxxx-ca,
->>>>    where xxxx can be machine, owner, or system. I prefer .system-ca."
->>>>
->>>> The CA keys on the MOK db is simply the first root of trust being
->>>> defined, but other roots of trust are sure to follow.  For this reason,
->>>> I agree naming the new keyring "mok" should be avoided.
->>> As I said previously, I’m open to renaming, I just would like to have an
->>> agreement on the new name before changing everything.  The current proposed
->>> names I have heard are “.machine" and ".system-ca".  Is there a preference
->>> the maintainers feel is appropriate?  If so, please let me know and I’ll
->>> rename it. Thanks.
->>>
->> Jarkko, I think the emphasis should not be on "machine" from Machine
->> Owner Key (MOK), but on "owner".  Whereas Nayna is focusing more on the
->> "_ca" aspect of the name.   Perhaps consider naming it
->> "system_owner_ca" or something along those lines.
-> What do you gain such overly long identifier? Makes no sense. What
-> is "ca aspect of the name" anyway?
+Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 
-As I mentioned previously, the main usage of this new keyring is that it 
-should contain only CA keys which can be later used to vouch for user 
-keys loaded onto secondary or IMA keyring at runtime. Having ca in the 
-name like .xxxx_ca, would make the keyring name self-describing. Since 
-you preferred .system, we can call it .system_ca.
-
-Thanks & Regards,
-
-        - Nayna
-
+> ---
+>  kernel/padata.c | 13 -------------
+>  1 file changed, 13 deletions(-)
+> 
+> diff --git a/kernel/padata.c b/kernel/padata.c
+> index 3258ab89c2a3..18d3a5c699d8 100644
+> --- a/kernel/padata.c
+> +++ b/kernel/padata.c
+> @@ -9,19 +9,6 @@
+>   *
+>   * Copyright (c) 2020 Oracle and/or its affiliates.
+>   * Author: Daniel Jordan <daniel.m.jordan@oracle.com>
+> - *
+> - * This program is free software; you can redistribute it and/or modify it
+> - * under the terms and conditions of the GNU General Public License,
+> - * version 2, as published by the Free Software Foundation.
+> - *
+> - * This program is distributed in the hope it will be useful, but WITHOUT
+> - * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> - * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> - * more details.
+> - *
+> - * You should have received a copy of the GNU General Public License along with
+> - * this program; if not, write to the Free Software Foundation, Inc.,
+> - * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
+>   */
+>  
+>  #include <linux/completion.h>
+> -- 
+> 2.25.1
+> 
