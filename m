@@ -2,84 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB4EC4338F
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Aug 2021 13:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3802C432BE
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 04:49:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B81C360725
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Aug 2021 13:24:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D46EA6135A
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 04:49:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231583AbhHVNYp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 22 Aug 2021 09:24:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48506 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230495AbhHVNYo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 22 Aug 2021 09:24:44 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CB99A61354;
-        Sun, 22 Aug 2021 13:24:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629638643;
-        bh=+0KLb9o630gwsAklksMT+OiAbRBsvMLZHD8SBqtnUus=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=iTpGkQGBW0QaKllQHFS84RT2heM9sXV/6IKcYuEeJcpP02OJpX/7OlimUA8o/bntn
-         z9xstex+4bb0M0IhMs3sEkvM+NKX9/pW8HtJd3rm8e6/jrY7bHWzoOQsz4vDveyQko
-         W/BYR1/Ii6BM78f1eq2XZeuI/BQIz8URji4HTqViv8nOAzMjuw0FMzBYCXn8Q+UZK+
-         79NvwGYIxGRevspoJ/xRpPP0yegpKafCjsAAv+LFzzRlhLEpoN4UIZE6KEOYQb+ZU5
-         bNTBfyPm51Ndu0dybfJtdkmPqEeepwuqUAL2NwZXXGjhkWy0D8aojo0K7kGSPXivf1
-         /LREEZ8gHGi2A==
-Received: by mail-oo1-f54.google.com with SMTP id t2-20020a4ae9a2000000b0028c7144f106so3447283ood.6;
-        Sun, 22 Aug 2021 06:24:03 -0700 (PDT)
-X-Gm-Message-State: AOAM532DqJNXpOm1HCboIupGBctodFbi8Wv0wGek20Q6sR0V2SOmqmNN
-        xpBViYvUi1R9uETBivnuMD8ZJrxSDOg+6p57oFc=
-X-Google-Smtp-Source: ABdhPJyFgHF/pYD3PAz8sWJVS2fTtBUpAQY87RdiATdCa+OOpC4w2u+fSSW6TcgHyDZxt+I7QmDh7PTmPTldhDarXQ4=
-X-Received: by 2002:a4a:dfac:: with SMTP id k12mr22727674ook.41.1629638643184;
- Sun, 22 Aug 2021 06:24:03 -0700 (PDT)
+        id S231189AbhHWEuV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 23 Aug 2021 00:50:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37672 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229462AbhHWEuV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 23 Aug 2021 00:50:21 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2320C061575;
+        Sun, 22 Aug 2021 21:49:38 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f07d90037f6d6bcf935006e.dip0.t-ipconnect.de [IPv6:2003:ec:2f07:d900:37f6:d6bc:f935:6e])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 510D11EC0464;
+        Mon, 23 Aug 2021 06:49:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1629694172;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Wemuc7ifFKY1JG/J29bORf/DK0p/Jh7ow0XTFAR5vaQ=;
+        b=GWFpORbvrZ8l8jHKGAzgi+Cz1txdHdZz8F9sjQY9xBZvlXhqDXf+r0vx5NE81Hj6mQ8dlo
+        +IAvWd5e/mO995J1rlhjfLNvLK6UguEzHzL5ps2RT1YPXRl84mVgESeSiD7AG2hGH8zBHe
+        mNWAN3/Z4gJGd5z3iKn0CHCn+yqr8j0=
+Date:   Mon, 23 Aug 2021 06:50:06 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 22/36] x86/sev: move MSR-based VMGEXITs for
+ CPUID to helper
+Message-ID: <YSMo/stGWxQgqC+Q@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-23-brijesh.singh@amd.com>
+ <YR4oP+PDnmJbvfKR@zn.tnic>
+ <20210819153741.h6yloeihz5vl6hvu@amd.com>
+ <YR6K+BzCB9Tokw85@zn.tnic>
+ <20210820032908.vqnptvjqnp7xxa6i@amd.com>
 MIME-Version: 1.0
-References: <YQ0Qm+Xs1g/7Eant@fedora> <20210809141027.860850-1-chouhan.shreyansh630@gmail.com>
- <20210820083111.GA28484@gondor.apana.org.au> <CAMj1kXGMPimX0_dR_kLuzZjuJK9rM=uCpRDtoJq0UjWq12M10A@mail.gmail.com>
- <20210820125315.GB28484@gondor.apana.org.au>
-In-Reply-To: <20210820125315.GB28484@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sun, 22 Aug 2021 15:23:52 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGCtH2V23S+b=dBj_owxjbhpnarOzZxjfjRM38Wt2XFdg@mail.gmail.com>
-Message-ID: <CAMj1kXGCtH2V23S+b=dBj_owxjbhpnarOzZxjfjRM38Wt2XFdg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: xts_crypt() return if walk.nbytes is 0
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        syzbot+20191dc583eff8602d2d@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210820032908.vqnptvjqnp7xxa6i@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 20 Aug 2021 at 14:53, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Fri, Aug 20, 2021 at 01:14:52PM +0200, Ard Biesheuvel wrote:
-> >
-> > In spite of that, I have a slight preference for this version, given
-> > that it makes it obvious that we bail on two separate conditions:
-> > - an error has occurred
-> > - no error has occurred but the resulting walk is empty
-> >
-> > Testing walk.nbytes only needlessly obfuscates the code, as we need to
-> > return 'err' in the end anyway.
->
-> I disagree, this is how most skcipher walkers are structured, they
-> never explicitly test on err and only terminate the loop when
-> walk->nbytes hits zero, in which case err is returned as is.
->
-> I don't see why this particular skcipher walker should deviate
-> from that paradigm.  In fact it is exactly that deviation that
-> caused the bug in the first instance.
->
+On Thu, Aug 19, 2021 at 10:29:08PM -0500, Michael Roth wrote:
+> The select cases where we still fetch CPUID values from hypervisor in
+> SNP need careful consideration, so for the purposes of auditing the code
+> for security, or just noticing things in patches, I think it's important
+> to make it clear what is the "normal" SNP case (not trusting hypervisor
+> CPUID values) and what are exceptional cases (getting select values from
+> hypervisor). If something got added in the future, I think something
+> like:
+> 
+>   +sev_cpuid_hv(0x8000001f, ...)
+> 
+> would be more likely to raise eyebrows and get more scrutiny than:
+> 
+>   +sev_cpuid(0x8000001f, ...)
+> 
+> where it might get lost in the noise or mistaken as similar to
+> sev_snp_cpuid().
+> 
+> Maybe a bit contrived, and probably not a big deal in practice, but
+> conveying the source it in the naming does seem at least seem slightly
+> better than not doing so.
 
-Fair enough.
+Ok, makes sense.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
