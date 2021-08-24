@@ -5,58 +5,58 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6880FC4320A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A2CFC4320E
 	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 21:36:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 543BE61165
+	by mail.kernel.org (Postfix) with ESMTP id 8248961184
 	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 21:36:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238639AbhHXVgl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Aug 2021 17:36:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35400 "EHLO
+        id S238695AbhHXVgn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 24 Aug 2021 17:36:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237379AbhHXVgc (ORCPT
+        with ESMTP id S235328AbhHXVgb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Aug 2021 17:36:32 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D354C061757;
-        Tue, 24 Aug 2021 14:35:48 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id y5so2955323edp.8;
-        Tue, 24 Aug 2021 14:35:48 -0700 (PDT)
+        Tue, 24 Aug 2021 17:36:31 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 646B3C06179A;
+        Tue, 24 Aug 2021 14:35:46 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id s25so21094307edw.0;
+        Tue, 24 Aug 2021 14:35:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=o1q66kQcIlqRZtVzgdzH7H6flHDFaGUIbY6SHa97BBU=;
-        b=K4Z8KGR+jCa3o6ucKVT/tgVJDZCnlJwv5te6jvvOXoatXdiNpMh0h56jvdO7CnlvQK
-         irydMzE2qSzAOI9ftly8hstALXxmP6duP8v1OivxyEexL0x5QsEDMdxzBAJ1TRevlUus
-         5rQtvv1fQJRNqv9nz1M8OxuvKgkVlzhNqJy57P5gUi+wmPlXYPp/ZIhJTvHNdJ20UutD
-         VA6UOKHuEDUDXwwSMB0/sAQc4mwJNYPKdWrf8UWgLxvt6lUeow/HnZ2jTmTbxEI+eKYu
-         GP59NUmc6mZKXk4IhaOgiNYwZbO0ptmkOgq9D5Zo1briUrMWPTs41P7xanxclJ9ERWkr
-         vFZg==
+        bh=6bd81ZzhYWDXtU8irtzbLufy7NFGe2+2aZRj+xbH9LY=;
+        b=VvpbOLzHuJV0qVGp2TZFFqBj4nOT/cRzpuw5llLiqFVRs4smuJPNtk8wifK6aUeqgf
+         yGS5tkIodOa77+WAjinpDM+FB+t+5d0D9hryEc/ONDRnuSukNzGdp9T08SgpwzQ3GMkd
+         PEi7RHP8mpfb3/5ue7ZXoO2t8zBT6COrlceDfhs9U2942WK6BYZlbO438NEJ1Nlf09xQ
+         cgsGpJ1oRlTylgT2DOdNnDdoNFwyzNm9rGqar4pDM0qtltmu23FPjX2ywk+u3obJteZU
+         xrg03Yi6IdAOZNCGjw62wSb4wtADDOuR6xGOymrdAqWodBglA6pVISxb+XgP2dQsMw69
+         GH4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=o1q66kQcIlqRZtVzgdzH7H6flHDFaGUIbY6SHa97BBU=;
-        b=YEtsvhKs7wphP04LtoyTIEAN46d2GtO41h6H8p5XQr5WoyhEef48+lp+s4JFnARueb
-         TnZqlztLHJjVPgjesOU4bmKFkLKkfIUBNTqMPEDa4P19qZJ3VptQw8MLAbZiYf6YxaqM
-         61EzdvKcYQ4RDiTcIsVTxv7EwAVVcKhNElfAfKcneg0l0EzsRsidZ0DtBJTKM859cv6k
-         fg2pyyS5B8snr8F32h2FbX6AP2cxMAbHlxkfY7BNTC39RKSYhmamctpOyhUw6P2eXIpd
-         oZfowev7qz7jCIiN2ZGE/Bus9yxIoL8u/8rF0ScT6Nj3Sb48xHzIgaSx/VEUqifnRfh4
-         nY9w==
-X-Gm-Message-State: AOAM53193IJapuG2aHY3V2FTZxyNJNOMD63u2Fz7D0IRGo2f6NbBr+4f
-        k7YzU7XQwn7ZKxFmAFyX1xg=
-X-Google-Smtp-Source: ABdhPJzOZx6SF9+0Ap+6abBGpVvSgeuLwpb01+oXC16D7hIRphf5CLmHXX+3/pKROPO1UaI4EpmoiQ==
-X-Received: by 2002:a50:ef11:: with SMTP id m17mr44400009eds.233.1629840946792;
-        Tue, 24 Aug 2021 14:35:46 -0700 (PDT)
+        bh=6bd81ZzhYWDXtU8irtzbLufy7NFGe2+2aZRj+xbH9LY=;
+        b=HKj2zW0DmCtO+nUj762ME5KBPBQEsr67HM7k6BuC6ZTYW1jhGA3k2xRPWLuDidTesm
+         wdEg9kkpEDA5KhYJbY2PTmKpqcrNZxSwdhqIycnroHREA/Quv95tnA6DdYzRL8LvNGVv
+         nBmpDk7NNMvCPWluCoCLs/AR7LD8kxeWWlGiwzE46mRxsNeu9s/Z2o8pjI60NcuRpUzn
+         mc+1xxGZUJOJrSNvhK6EjeHq09ASELfm/YFCKOYZB9o5FFlUxRmG7vZ1du+mM6iCGolV
+         sroGRUNoHer3Vv/ZKWnTOF6QuWNcjEpHBeot1BWbuAdXj1gniR9OQ4HpInDdbLfdt0+a
+         FuvQ==
+X-Gm-Message-State: AOAM5317EcVJqIuvZD4D8pxvUXnIiE44lCh9DPajinGQHK0QAQXtfqCn
+        eUwINneSwVMXc7ZZsJLIXdo=
+X-Google-Smtp-Source: ABdhPJw2h/zsATj/PM2KnkDUUvABR/JO5sAETUzkR9T9OxDhBQtLjlkFgCpjGw8rIdwyD/2Yji1Meg==
+X-Received: by 2002:aa7:c7c2:: with SMTP id o2mr45234701eds.166.1629840945054;
+        Tue, 24 Aug 2021 14:35:45 -0700 (PDT)
 Received: from localhost.localdomain ([2a04:241e:502:1d80:ed0a:7326:fbac:b4c])
-        by smtp.gmail.com with ESMTPSA id d16sm12348357edu.8.2021.08.24.14.35.45
+        by smtp.gmail.com with ESMTPSA id d16sm12348357edu.8.2021.08.24.14.35.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Aug 2021 14:35:46 -0700 (PDT)
+        Tue, 24 Aug 2021 14:35:44 -0700 (PDT)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     Dmitry Safonov <0x7f454c46@gmail.com>,
         David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>
@@ -75,9 +75,9 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         Menglong Dong <dong.menglong@zte.com.cn>,
         netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFCv3 12/15] selftests: Initial tcp_authopt support for fcnal-test
-Date:   Wed, 25 Aug 2021 00:34:45 +0300
-Message-Id: <a87b8c675d7bb0d537e1ca43000925b56d9dcb0e.1629840814.git.cdleonard@gmail.com>
+Subject: [RFCv3 11/15] selftests: Initial tcp_authopt support for nettest
+Date:   Wed, 25 Aug 2021 00:34:44 +0300
+Message-Id: <9d1e6b5f20a09ade3e5110d39353713c8ce210fe.1629840814.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1629840814.git.cdleonard@gmail.com>
 References: <cover.1629840814.git.cdleonard@gmail.com>
@@ -87,62 +87,129 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Just test that a correct password is passed or otherwise a timeout is
-obtained.
+Add support for configuring TCP Authentication Option. Only a single key
+with default options.
 
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- tools/testing/selftests/net/fcnal-test.sh | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ tools/testing/selftests/net/nettest.c | 34 ++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
-index 162e5f1ac36b..ca3b90f6fecb 100755
---- a/tools/testing/selftests/net/fcnal-test.sh
-+++ b/tools/testing/selftests/net/fcnal-test.sh
-@@ -788,10 +788,31 @@ ipv4_ping()
+diff --git a/tools/testing/selftests/net/nettest.c b/tools/testing/selftests/net/nettest.c
+index bd6288302094..f04c6af79129 100644
+--- a/tools/testing/selftests/net/nettest.c
++++ b/tools/testing/selftests/net/nettest.c
+@@ -100,10 +100,12 @@ struct sock_args {
+ 		struct sockaddr_in v4;
+ 		struct sockaddr_in6 v6;
+ 	} md5_prefix;
+ 	unsigned int prefix_len;
+ 
++	const char *authopt_password;
++
+ 	/* expected addresses and device index for connection */
+ 	const char *expected_dev;
+ 	const char *expected_server_dev;
+ 	int expected_ifindex;
+ 
+@@ -250,10 +252,27 @@ static int switch_ns(const char *ns)
+ 	close(fd);
+ 
+ 	return ret;
  }
  
- ################################################################################
- # IPv4 TCP
- 
-+#
-+# TCP Authentication Option Tests
-+#
-+ipv4_tcp_authopt()
++static int tcp_set_authopt(int sd, struct sock_args *args)
 +{
-+	# basic use case
-+	log_start
-+	run_cmd nettest -s -A ${MD5_PW} &
-+	sleep 1
-+	run_cmd_nsb nettest -r ${NSA_IP} -A ${MD5_PW}
-+	log_test $? 0 "AO: Simple password"
++	struct tcp_authopt_key key;
++	int rc;
 +
-+	# wrong password
-+	log_start
-+	show_hint "Should timeout since client uses wrong password"
-+	run_cmd nettest -s -A ${MD5_PW} &
-+	sleep 1
-+	run_cmd_nsb nettest -r ${NSA_IP} -A ${MD5_WRONG_PW}
-+	log_test $? 2 "AO: Client uses wrong password"
++	memset(&key, 0, sizeof(key));
++	strcpy((char *)key.key, args->authopt_password);
++	key.keylen = strlen(args->authopt_password);
++	key.alg = TCP_AUTHOPT_ALG_HMAC_SHA_1_96;
++
++	rc = setsockopt(sd, IPPROTO_TCP, TCP_AUTHOPT_KEY, &key, sizeof(key));
++	if (rc < 0)
++		log_err_errno("setsockopt(TCP_AUTHOPT_KEY)");
++
++	return rc;
 +}
 +
- #
- # MD5 tests without VRF
- #
- ipv4_tcp_md5_novrf()
+ static int tcp_md5sig(int sd, void *addr, socklen_t alen, struct sock_args *args)
  {
-@@ -1119,10 +1140,11 @@ ipv4_tcp_novrf()
- 	show_hint "Should fail 'Connection refused'"
- 	run_cmd nettest -d ${NSA_DEV} -r ${a}
- 	log_test_addr ${a} $? 1 "No server, device client, local conn"
+ 	int keylen = strlen(args->password);
+ 	struct tcp_md5sig md5sig = {};
+ 	int opt = TCP_MD5SIG;
+@@ -1508,10 +1527,15 @@ static int do_server(struct sock_args *args, int ipc_fd)
+ 	if (args->password && tcp_md5_remote(lsd, args)) {
+ 		close(lsd);
+ 		goto err_exit;
+ 	}
  
- 	ipv4_tcp_md5_novrf
-+	ipv4_tcp_authopt
++	if (args->authopt_password && tcp_set_authopt(lsd, args)) {
++		close(lsd);
++		goto err_exit;
++	}
++
+ 	ipc_write(ipc_fd, 1);
+ 	while (1) {
+ 		log_msg("waiting for client connection.\n");
+ 		FD_ZERO(&rfds);
+ 		FD_SET(lsd, &rfds);
+@@ -1630,10 +1654,13 @@ static int connectsock(void *addr, socklen_t alen, struct sock_args *args)
+ 		goto out;
+ 
+ 	if (args->password && tcp_md5sig(sd, addr, alen, args))
+ 		goto err;
+ 
++	if (args->authopt_password && tcp_set_authopt(sd, args))
++		goto err;
++
+ 	if (args->bind_test_only)
+ 		goto out;
+ 
+ 	if (connect(sd, addr, alen) < 0) {
+ 		if (errno != EINPROGRESS) {
+@@ -1819,11 +1846,11 @@ static int ipc_parent(int cpid, int fd, struct sock_args *args)
+ 
+ 	wait(&status);
+ 	return client_status;
  }
  
- ipv4_tcp_vrf()
+-#define GETOPT_STR  "sr:l:c:p:t:g:P:DRn:M:X:m:d:I:BN:O:SCi6xL:0:1:2:3:Fbq"
++#define GETOPT_STR  "sr:l:c:p:t:g:P:DRn:M:X:m:A:d:I:BN:O:SCi6xL:0:1:2:3:Fbq"
+ 
+ static void print_usage(char *prog)
  {
- 	local a
+ 	printf(
+ 	"usage: %s OPTS\n"
+@@ -1856,10 +1883,12 @@ static void print_usage(char *prog)
+ 	"    -n num        number of times to send message\n"
+ 	"\n"
+ 	"    -M password   use MD5 sum protection\n"
+ 	"    -X password   MD5 password for client mode\n"
+ 	"    -m prefix/len prefix and length to use for MD5 key\n"
++	"    -A password   use RFC5925 TCP Authentication option\n"
++	"\n"
+ 	"    -g grp        multicast group (e.g., 239.1.1.1)\n"
+ 	"    -i            interactive mode (default is echo and terminate)\n"
+ 	"\n"
+ 	"    -0 addr       Expected local address\n"
+ 	"    -1 addr       Expected remote address\n"
+@@ -1970,10 +1999,13 @@ int main(int argc, char *argv[])
+ 			args.client_pw = optarg;
+ 			break;
+ 		case 'm':
+ 			args.md5_prefix_str = optarg;
+ 			break;
++		case 'A':
++			args.authopt_password = optarg;
++			break;
+ 		case 'S':
+ 			args.use_setsockopt = 1;
+ 			break;
+ 		case 'C':
+ 			args.use_cmsg = 1;
 -- 
 2.25.1
 
