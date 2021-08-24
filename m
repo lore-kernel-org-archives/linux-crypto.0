@@ -2,108 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD9DFC432BE
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 16:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09DEFC4338F
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 16:42:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93959610E9
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 16:41:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D914E61183
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 16:42:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231292AbhHXQl7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Aug 2021 12:41:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52334 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229896AbhHXQl6 (ORCPT
+        id S229830AbhHXQnc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 24 Aug 2021 12:43:32 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:43402 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229521AbhHXQnb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Aug 2021 12:41:58 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21EE6C061757;
-        Tue, 24 Aug 2021 09:41:14 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id o10so46807599lfr.11;
-        Tue, 24 Aug 2021 09:41:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aSziwwwdyIEOJ4mYpFaEyyynDBylrGdfxWjE78omM94=;
-        b=DCMmJs4FRG79pqa2rFUGIv1mI88LNPFRfH2H3rCOUVKwIzKqHGC+5U1glL5+Yp8/Cu
-         WpqwYj/8GWmDxLMsEyOasYKwMr6QNRYxcOBKYMLJhRwXSnoQ6eRxmfYW3wv1No5d/JBe
-         Uo8pM1XuZ6G33c06ZYp0iZUz5JwzZAMlMjB+ld+DkY4Kk9paDbwS7Pi7JRUgxCmMgqFg
-         slGFdFrgvOXSv/o23LL3YYIe1Y0/yY//9PLZwr0c0PQ5b0yiQPuqEgZ7EwMo/FRC1iN0
-         Tnd6yMAG/hqzagdMGxE4whdKhVAuZKjlXo1R5HQMJDpjOIYWUXux5Y8SZv8iBjpPQmCz
-         DclA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aSziwwwdyIEOJ4mYpFaEyyynDBylrGdfxWjE78omM94=;
-        b=LSZNEowWI438vAkhWHLFvO01p9vDxh+xL+Bk1eKhF9fA8iW+pwgTrSSQ3LAQecfpbC
-         o3TQ8G4CT4UshaVQZFjou1vAVlY5TPfIM8s7ANMC2jPL3ywd9tbCpaJDlUqQQkDbipg3
-         VOj3a6DJYU4byQJiL4Ql0K09XRQG/WfaC6z3FH5PubdvdmcQHdfU73Kjgm/ZEw1VTWuJ
-         aThkNml3zkuvFS9z/1plxCatoleFObIVDRIvx72wqdMt+BDSV61yI4NWNdgUaThRXH6o
-         Wp4AujmcLcySHSLr8o5kY6NBtoao8YLAtskGTIHDhIAUxsvb09gpdX33ONCL/r2+8FB9
-         GmAQ==
-X-Gm-Message-State: AOAM533bQCT6cQYs1U7apx1hQyxSqO915O4186k0Yk81TqlvJJUYERev
-        ccRV8rr5pM/xEaV9/L9gF0yE0QxGX3Td/7/AEXw=
-X-Google-Smtp-Source: ABdhPJx05vOHbejCKOArldt/GrSeSIg5FEQsOgVl5tYNq+RPz63GDpgaJzlNqDIHHaZ38bIfDvCTpAz7z3Edcq+N724=
-X-Received: by 2002:ac2:4561:: with SMTP id k1mr5393956lfm.313.1629823272322;
- Tue, 24 Aug 2021 09:41:12 -0700 (PDT)
+        Tue, 24 Aug 2021 12:43:31 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 205B322135;
+        Tue, 24 Aug 2021 16:42:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1629823366; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=isWYk1M9QNpuXO9FuRvRqheKfZRsPlpGtIepCxZVGoc=;
+        b=ojV0qS4/TobfqUQVIHzqulopYKzhfr7YeAuLUlQffqxwVTww6GuHwASrtXltT8+6v3Q0pX
+        QTNQ7O3sCRnuLsoHbOMB8TE9MZ1z3b0YJzG0s6HAaHv1CcduJDAP8p/I35cJHrOA8fYGLD
+        r/1kkgOAJYUeoAGOAJfQ8DeBYi7/QGM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1629823366;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=isWYk1M9QNpuXO9FuRvRqheKfZRsPlpGtIepCxZVGoc=;
+        b=TSjiA3LU1IdqszN3kR75s+E5wZotvKNo0OTMha2vwKDn84PJgVK827o+24QsOPTan+bn6k
+        KZ45+rhl2dxSssAg==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id E5B1213A5B;
+        Tue, 24 Aug 2021 16:42:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id XsHLNYQhJWFeXQAAGKfGzw
+        (envelope-from <jroedel@suse.de>); Tue, 24 Aug 2021 16:42:44 +0000
+Date:   Tue, 24 Aug 2021 18:42:43 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 08/45] x86/fault: Add support to handle the RMP
+ fault for user address
+Message-ID: <YSUhg/87jZPocLDP@suse.de>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-9-brijesh.singh@amd.com>
+ <f6d778a0-840d-8c9c-392d-5c9ffcc0bdc6@intel.com>
+ <19599ede-9fc5-25e1-dcb3-98aafd8b7e87@amd.com>
+ <3f426ef8-060e-ccc9-71b9-2448f2582a30@intel.com>
 MIME-Version: 1.0
-References: <YRXlwDBfQql36wJx@sol.localdomain> <CAN05THSm5fEcnLKxcsidKPRUC6PVLCkWMBZUW05KNm4uMJNHWw@mail.gmail.com>
- <YRbT7IbSCXo4Dl0u@sol.localdomain> <CAN05THScNOVh5biQnqM8YDOvNid4Dh=wZS=ObczzmSEpv1LpRw@mail.gmail.com>
- <YRrkhzOARiT6TqQA@gmail.com> <CAMj1kXH93HU5SNUDLpn+c0ryJUYWpRKVXeoPK8jPOSwiS3_79A@mail.gmail.com>
- <CAN05THS27h9QFpNuVVQmqz8k8_SKD8V8TbzZVYxco7S86i0zWA@mail.gmail.com> <627872ec0f8cc52a06f8f58598f96b72b5b9645a.camel@redhat.com>
-In-Reply-To: <627872ec0f8cc52a06f8f58598f96b72b5b9645a.camel@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 24 Aug 2021 11:41:01 -0500
-Message-ID: <CAH2r5mtsgYXi2VxQZ5bDLdsAgmgjgJVqeXUxe5Sb1CiA_RyFQA@mail.gmail.com>
-Subject: Re: Building cifs.ko without any support for insecure crypto?
-To:     Simo Sorce <simo@redhat.com>
-Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3f426ef8-060e-ccc9-71b9-2448f2582a30@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 23, 2021 at 5:05 AM Simo Sorce <simo@redhat.com> wrote:
-<snip>
-> Another way to handle this part is to calculate the hash in userspace
-> and handle the kernel just the hashes. This would allow you to remove
-> MD4 from the kernel. I guess it would break putting a password on the
-> kernel command line, but is that really a thing to do? Kernels do not
-> boot from cifs shares so you can always use userspace tools (or pass
-> hexed hashes directly on the command line in a pinch).
+On Mon, Aug 23, 2021 at 07:50:22AM -0700, Dave Hansen wrote:
+> It *has* to be done in KVM, IMNHO.
+> 
+> The core kernel really doesn't know much about SEV.  It *really* doesn't
+> know when its memory is being exposed to a virtualization architecture
+> that doesn't know how to split TLBs like every single one before it.
+> 
+> This essentially *must* be done at the time that the KVM code realizes
+> that it's being asked to shove a non-splittable page mapping into the
+> SEV hardware structures.
+> 
+> The only other alternative is raising a signal from the fault handler
+> when the page can't be split.  That's a *LOT* nastier because it's so
+> much later in the process.
+> 
+> It's either that, or figure out a way to split hugetlbfs (and DAX)
+> mappings in a failsafe way.
 
-We can boot from cifs (and given the security features of SMB3.1.1 it probably
-makes more sense than some of the alternatives) albeit with some POSIX
-restrictions unless booting from ksmbd with POSIX extensions enabled.
-Paulo added the support for booting from cifs.ko in the 5.5 kernel.
+Yes, I agree with that. KVM needs a check to disallow HugeTLB pages in
+SEV-SNP guests, at least as a temporary workaround. When HugeTLBfs
+mappings can be split into smaller pages the check can be removed.
 
+Regards,
 
-> > I have patches for both DES removal and forking ARC4 prepared for linux-cifs.
-> > MD4 will require more work since we use it via the crypto_alloc_hash()
-> > api but we will do that too.
-> >
-> > What about MD5? Is it also scheduled for removal? if so we will need
-> > to fork it too.
->
-> MD5 is still used for a ton of stuff, however it may make sense to
-> consider moving it in /lib and our of /lib/crypto as it is not usable
-> in cryptographic settings anymore anyway.
-
-Seems reasonable
-
--- 
-Thanks,
-
-Steve
+	Joerg
