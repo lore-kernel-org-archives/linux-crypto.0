@@ -2,178 +2,238 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D1DDC4338F
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 21:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D69CDC4338F
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 21:35:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22F5A61220
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 21:05:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA9C561374
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 21:35:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231800AbhHXVGC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Aug 2021 17:06:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56826 "EHLO
+        id S235375AbhHXVgN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 24 Aug 2021 17:36:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231474AbhHXVGC (ORCPT
+        with ESMTP id S235265AbhHXVgJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Aug 2021 17:06:02 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BF11C061757;
-        Tue, 24 Aug 2021 14:05:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=47sgnIoZKep1DRbln9+NTL1J6N65R7OgQCZZ3ODQ1JU=; b=XdIxM4Rp2nAdP6b3OPoUPX1wcl
-        CGgh1FBE2vcOUw38/OhpKrOwanD6szssU48tKUas2UKyOJSUH4peFM3/nAVwRHLQEFrtw+72JyBMo
-        LwHu2cNxj/J8Y2LjRlkSPy/fkZbTOX2j+Sw2DUdKNNBtep/PCyTMzLHe6Q4xzM3yZXnOICbBO4n+d
-        /ELvDWYz2KtyKUfRiyd2i9TR2x+ntfhMrtwq/DHGFstxbYYuylORFsM9ZURkHne/bxERKzG5M7kaQ
-        ukmXkSM+InShYPHlPNTKdTLDoTM2UZCqO7dszR/6WLQIm2oxhvo7Aglv2CV/8eDi2iGqS3FmxgmwP
-        GK6ZwvoQ==;
-Received: from [2601:1c0:6280:3f0::aa0b] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mIdbf-004hpu-F7; Tue, 24 Aug 2021 21:05:15 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Stephan Mueller <smueller@chronox.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        Tue, 24 Aug 2021 17:36:09 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A020AC061757;
+        Tue, 24 Aug 2021 14:35:24 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id z19so9235911edi.9;
+        Tue, 24 Aug 2021 14:35:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=v5KB3TDKU2JZKZBE8m69mrlD1i/Ya5eflODCh/zuQvA=;
+        b=Jyus8ROef22dYWjwXe6vtkBVd8t/6YH+HpofLzFuer5LbL1PI53OdLxzoxXtygawQi
+         LRgvu0+QCJVm7sWHEDCXoJr8d44QS3pGGWpBEG0uLTVGa8HGlrHw+lzNu9fuiO0NEbNx
+         +Lwapsk9AtW5qjVim/7u0zKkfCempDbdpSzmONn9AE1zn2Mu61cDwR9ftA9y36uxmKaq
+         vGfwdqo5ivVYPmqlrtSyW33IqZ9dwPv06X32nTPIsgP2wCD9XuEbgt/KvTSwNRDS51g/
+         R5OznqLENpUI/QY9slKIDv5DTfn2WgBvWuc9a3c2EY0dM2RcYaeT6+36YitPTpdkboF9
+         jNkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=v5KB3TDKU2JZKZBE8m69mrlD1i/Ya5eflODCh/zuQvA=;
+        b=TgZMnxY5G2RdE0f9avqQ3SkrGQeR4o1mcV3pQwz+3a13svY5Pf+da//ydmi289L2Jj
+         fXVPKEn8yZSEmoWCNSsS4I/Tl5RN9b4sG60BfyH+onARZLoiu5byFV3oDNDTfnP+xrhW
+         x4G9z98V+qPMu/q8kYhgmj4N8tggl9mhoVLTjelYFPyjqwuegaP7/8H2ckCQu/tJt0Nb
+         uIHUJsOnyp1jS6pERrtn3P0cc/ahTcWDrmoVPTStSmZRX6ccvaMDbmu9hEpFDjB9eMgL
+         HIL0FFEbdQC0fkiB3Qv8R6bOqXsH0N6N2xsH836fIXr+7DHGK2zqRIHwRgr3qDRla28P
+         DCCA==
+X-Gm-Message-State: AOAM531rrlmKvh7goyfLltx3LjqNNg8gBOZDqCPGjX5jshjHFahW/LHL
+        HL7VKX0WkTvCqNSl7YWEIg2crG/IAIAGT6O+
+X-Google-Smtp-Source: ABdhPJzdLq7IBaoRVFqNaDhK/Q5E4Jafw2rqtP73KSmRneKfKkBwuvt8JDasZi1rXA4JpvJUSWKzHw==
+X-Received: by 2002:a50:eb8a:: with SMTP id y10mr1883448edr.137.1629840923195;
+        Tue, 24 Aug 2021 14:35:23 -0700 (PDT)
+Received: from localhost.localdomain ([2a04:241e:502:1d80:ed0a:7326:fbac:b4c])
+        by smtp.gmail.com with ESMTPSA id d16sm12348357edu.8.2021.08.24.14.35.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Aug 2021 14:35:22 -0700 (PDT)
+From:   Leonard Crestez <cdleonard@gmail.com>
+To:     Dmitry Safonov <0x7f454c46@gmail.com>,
+        David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc:     Eric Dumazet <edumazet@google.com>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: jitterentopy: drop kernel-doc notation
-Date:   Tue, 24 Aug 2021 14:05:13 -0700
-Message-Id: <20210824210513.25503-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.31.1
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Priyaranjan Jha <priyarjha@google.com>,
+        Menglong Dong <dong.menglong@zte.com.cn>,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFCv3 00/15] tcp: Initial support for RFC5925 auth option
+Date:   Wed, 25 Aug 2021 00:34:33 +0300
+Message-Id: <cover.1629840814.git.cdleonard@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+This is similar to TCP MD5 in functionality but it's sufficiently
+different that wire formats are incompatible. Compared to TCP-MD5
+more algorithms are supported and multiple keys can be used on the
+same connection but there is still no negotiation mechanism.
+Expected use-case is protecting long-duration BGP/LDP connections
+between routers using pre-shared keys.
 
-Drop "begin kernel-doc (/**)" entries in jitterentropy.c
-since they are not in kernel-doc format and they cause
-many complaints (warnings) from scripts/kernel-doc.
+This version is mostly functional, it incorporates ABI feedback from
+previous versions and adds tests to kselftests. More discussion and
+testing is required and obvious optimizations were skipped in favor of
+adding functionality. Here are several flaws:
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Stephan Mueller <smueller@chronox.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
----
- crypto/jitterentropy.c |   24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+* RST and TIMEWAIT are mostly unhandled
+* Locking is lockdep-clean but need to be revised
+* Sequence Number Extension not implemented
+* User is responsible for ensuring keys do not overlap
+* Traffic key is not cached (reducing performance)
 
---- linux-next-20210824.orig/crypto/jitterentropy.c
-+++ linux-next-20210824/crypto/jitterentropy.c
-@@ -125,7 +125,7 @@ struct rand_data {
-  * This test complies with SP800-90B section 4.4.2.
-  ***************************************************************************/
+Not all ABI suggestions were incorporated, they can be discussed further.
+However I very much want to avoid supporting algorithms beyond RFC5926.
+
+Test suite was added to tools/selftests/tcp_authopt. Tests are written
+in python using pytest and scapy and check the API in some detail and
+validate packet captures. Python code is already in linux and in
+kselftests but virtualenvs not very much. This test suite uses `tox` to
+create a private virtualenv and hide dependencies. Let me know if this
+is OK or how it can be improved.
+
+Limited testing support is also included in nettest and fcnal-test.sh,
+those tests are slow and cover much less.
+
+Changes for frr: https://github.com/FRRouting/frr/pull/9442
+That PR was made early for ABI feedback, it has many issues.
+
+Changes for yabgp: https://github.com/cdleonard/yabgp/commits/tcp_authopt
+The patched version of yabgp can establish a BGP session protected by
+TCP Authentication Option with a Cisco IOS-XR router. It old now.
+
+Changes since RFCv2:
+* Removed local_id from ABI and match on send_id/recv_id/addr
+* Add all relevant out-of-tree tests to tools/testing/selftests
+* Return an error instead of ignoring unknown flags, hopefully this makes
+it easier to extend.
+* Check sk_family before __tcp_authopt_info_get_or_create in tcp_set_authopt_key
+* Use sock_owned_by_me instead of WARN_ON(!lockdep_sock_is_held(sk))
+* Fix some intermediate build failures reported by kbuild robot
+* Improve documentation
+Link: https://lore.kernel.org/netdev/cover.1628544649.git.cdleonard@gmail.com/
  
--/**
-+/*
-  * Reset the APT counter
-  *
-  * @ec [in] Reference to entropy collector
-@@ -138,7 +138,7 @@ static void jent_apt_reset(struct rand_d
- 	ec->apt_observations = 0;
- }
- 
--/**
-+/*
-  * Insert a new entropy event into APT
-  *
-  * @ec [in] Reference to entropy collector
-@@ -182,7 +182,7 @@ static void jent_apt_insert(struct rand_
-  * the end. The caller of the Jitter RNG is informed with an error code.
-  ***************************************************************************/
- 
--/**
-+/*
-  * Repetition Count Test as defined in SP800-90B section 4.4.1
-  *
-  * @ec [in] Reference to entropy collector
-@@ -223,7 +223,7 @@ static void jent_rct_insert(struct rand_
- 	}
- }
- 
--/**
-+/*
-  * Is there an RCT health test failure?
-  *
-  * @ec [in] Reference to entropy collector
-@@ -246,7 +246,7 @@ static inline __u64 jent_delta(__u64 pre
- 			       (JENT_UINT64_MAX - prev + 1 + next);
- }
- 
--/**
-+/*
-  * Stuck test by checking the:
-  * 	1st derivative of the jitter measurement (time delta)
-  * 	2nd derivative of the jitter measurement (delta of time deltas)
-@@ -288,7 +288,7 @@ static int jent_stuck(struct rand_data *
- 	return 0;
- }
- 
--/**
-+/*
-  * Report any health test failures
-  *
-  * @ec [in] Reference to entropy collector
-@@ -310,7 +310,7 @@ static int jent_health_failure(struct ra
-  * Noise sources
-  ***************************************************************************/
- 
--/**
-+/*
-  * Update of the loop count used for the next round of
-  * an entropy collection.
-  *
-@@ -353,7 +353,7 @@ static __u64 jent_loop_shuffle(struct ra
- 	return (shuffle + (1<<min));
- }
- 
--/**
-+/*
-  * CPU Jitter noise source -- this is the noise source based on the CPU
-  *			      execution time jitter
-  *
-@@ -435,7 +435,7 @@ static void jent_lfsr_time(struct rand_d
- 		ec->data = new;
- }
- 
--/**
-+/*
-  * Memory Access noise source -- this is a noise source based on variations in
-  *				 memory access times
-  *
-@@ -500,7 +500,7 @@ static void jent_memaccess(struct rand_d
- /***************************************************************************
-  * Start of entropy processing logic
-  ***************************************************************************/
--/**
-+/*
-  * This is the heart of the entropy generation: calculate time deltas and
-  * use the CPU jitter in the time deltas. The jitter is injected into the
-  * entropy pool.
-@@ -539,7 +539,7 @@ static int jent_measure_jitter(struct ra
- 	return stuck;
- }
- 
--/**
-+/*
-  * Generator of one 64 bit random number
-  * Function fills rand_data->data
-  *
-@@ -566,7 +566,7 @@ static void jent_gen_entropy(struct rand
- 	}
- }
- 
--/**
-+/*
-  * Entry function: Obtain entropy for the caller.
-  *
-  * This function invokes the entropy gathering logic as often to generate
+Changes since RFC:
+* Split into per-topic commits for ease of review. The intermediate
+commits compile with a few "unused function" warnings and don't do
+anything useful by themselves.
+* Add ABI documention including kernel-doc on uapi
+* Fix lockdep warnings from crypto by creating pools with one shash for
+each cpu
+* Accept short options to setsockopt by padding with zeros; this
+approach allows increasing the size of the structs in the future.
+* Support for aes-128-cmac-96
+* Support for binding addresses to keys in a way similar to old tcp_md5
+* Add support for retrieving received keyid/rnextkeyid and controling
+the keyid/rnextkeyid being sent.
+Link: https://lore.kernel.org/netdev/01383a8751e97ef826ef2adf93bfde3a08195a43.1626693859.git.cdleonard@gmail.com/
+
+Leonard Crestez (15):
+  tcp: authopt: Initial support and key management
+  docs: Add user documentation for tcp_authopt
+  selftests: Initial tcp_authopt test module
+  selftests: tcp_authopt: Initial sockopt manipulation
+  tcp: authopt: Add crypto initialization
+  tcp: authopt: Compute packet signatures
+  tcp: authopt: Hook into tcp core
+  tcp: authopt: Add snmp counters
+  selftests: tcp_authopt: Test key address binding
+  selftests: tcp_authopt: Capture and verify packets
+  selftests: Initial tcp_authopt support for nettest
+  selftests: Initial tcp_authopt support for fcnal-test
+  selftests: Add -t tcp_authopt option for fcnal-test.sh
+  tcp: authopt: Add key selection controls
+  selftests: tcp_authopt: Add tests for rollover
+
+ Documentation/networking/index.rst            |    1 +
+ Documentation/networking/tcp_authopt.rst      |   69 +
+ include/linux/tcp.h                           |    6 +
+ include/net/tcp.h                             |    1 +
+ include/net/tcp_authopt.h                     |  134 ++
+ include/uapi/linux/snmp.h                     |    1 +
+ include/uapi/linux/tcp.h                      |  110 ++
+ net/ipv4/Kconfig                              |   14 +
+ net/ipv4/Makefile                             |    1 +
+ net/ipv4/proc.c                               |    1 +
+ net/ipv4/tcp.c                                |   27 +
+ net/ipv4/tcp_authopt.c                        | 1168 +++++++++++++++++
+ net/ipv4/tcp_input.c                          |   17 +
+ net/ipv4/tcp_ipv4.c                           |    5 +
+ net/ipv4/tcp_minisocks.c                      |    2 +
+ net/ipv4/tcp_output.c                         |   74 +-
+ net/ipv6/tcp_ipv6.c                           |    4 +
+ tools/testing/selftests/net/fcnal-test.sh     |   34 +
+ tools/testing/selftests/net/nettest.c         |   34 +-
+ tools/testing/selftests/tcp_authopt/Makefile  |    5 +
+ .../testing/selftests/tcp_authopt/README.rst  |   15 +
+ tools/testing/selftests/tcp_authopt/config    |    6 +
+ tools/testing/selftests/tcp_authopt/run.sh    |   11 +
+ tools/testing/selftests/tcp_authopt/setup.cfg |   17 +
+ tools/testing/selftests/tcp_authopt/setup.py  |    5 +
+ .../tcp_authopt/tcp_authopt_test/__init__.py  |    0
+ .../tcp_authopt/tcp_authopt_test/conftest.py  |   21 +
+ .../full_tcp_sniff_session.py                 |   53 +
+ .../tcp_authopt_test/linux_tcp_authopt.py     |  198 +++
+ .../tcp_authopt_test/netns_fixture.py         |   63 +
+ .../tcp_authopt/tcp_authopt_test/server.py    |   82 ++
+ .../tcp_authopt/tcp_authopt_test/sockaddr.py  |  101 ++
+ .../tcp_authopt_test/tcp_authopt_alg.py       |  276 ++++
+ .../tcp_authopt/tcp_authopt_test/test_bind.py |  143 ++
+ .../tcp_authopt_test/test_rollover.py         |  181 +++
+ .../tcp_authopt_test/test_sockopt.py          |   74 ++
+ .../tcp_authopt_test/test_vectors.py          |  359 +++++
+ .../tcp_authopt_test/test_verify_capture.py   |  123 ++
+ .../tcp_authopt/tcp_authopt_test/utils.py     |  154 +++
+ .../tcp_authopt/tcp_authopt_test/validator.py |  158 +++
+ 40 files changed, 3746 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/networking/tcp_authopt.rst
+ create mode 100644 include/net/tcp_authopt.h
+ create mode 100644 net/ipv4/tcp_authopt.c
+ create mode 100644 tools/testing/selftests/tcp_authopt/Makefile
+ create mode 100644 tools/testing/selftests/tcp_authopt/README.rst
+ create mode 100644 tools/testing/selftests/tcp_authopt/config
+ create mode 100755 tools/testing/selftests/tcp_authopt/run.sh
+ create mode 100644 tools/testing/selftests/tcp_authopt/setup.cfg
+ create mode 100644 tools/testing/selftests/tcp_authopt/setup.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/__init__.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/conftest.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/full_tcp_sniff_session.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/linux_tcp_authopt.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/netns_fixture.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/server.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/sockaddr.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/tcp_authopt_alg.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_bind.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_rollover.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_sockopt.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_vectors.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_verify_capture.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/utils.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/validator.py
+
+
+base-commit: 3a62c333497b164868fdcd241842a1dd4e331825
+-- 
+2.25.1
+
