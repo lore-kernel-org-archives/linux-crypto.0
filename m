@@ -2,122 +2,178 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09DEFC4338F
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 16:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D1DDC4338F
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 21:05:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D914E61183
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 16:42:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22F5A61220
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 21:05:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbhHXQnc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Aug 2021 12:43:32 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:43402 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbhHXQnb (ORCPT
+        id S231800AbhHXVGC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 24 Aug 2021 17:06:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56826 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231474AbhHXVGC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Aug 2021 12:43:31 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 205B322135;
-        Tue, 24 Aug 2021 16:42:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1629823366; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=isWYk1M9QNpuXO9FuRvRqheKfZRsPlpGtIepCxZVGoc=;
-        b=ojV0qS4/TobfqUQVIHzqulopYKzhfr7YeAuLUlQffqxwVTww6GuHwASrtXltT8+6v3Q0pX
-        QTNQ7O3sCRnuLsoHbOMB8TE9MZ1z3b0YJzG0s6HAaHv1CcduJDAP8p/I35cJHrOA8fYGLD
-        r/1kkgOAJYUeoAGOAJfQ8DeBYi7/QGM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1629823366;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=isWYk1M9QNpuXO9FuRvRqheKfZRsPlpGtIepCxZVGoc=;
-        b=TSjiA3LU1IdqszN3kR75s+E5wZotvKNo0OTMha2vwKDn84PJgVK827o+24QsOPTan+bn6k
-        KZ45+rhl2dxSssAg==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id E5B1213A5B;
-        Tue, 24 Aug 2021 16:42:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id XsHLNYQhJWFeXQAAGKfGzw
-        (envelope-from <jroedel@suse.de>); Tue, 24 Aug 2021 16:42:44 +0000
-Date:   Tue, 24 Aug 2021 18:42:43 +0200
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 08/45] x86/fault: Add support to handle the RMP
- fault for user address
-Message-ID: <YSUhg/87jZPocLDP@suse.de>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-9-brijesh.singh@amd.com>
- <f6d778a0-840d-8c9c-392d-5c9ffcc0bdc6@intel.com>
- <19599ede-9fc5-25e1-dcb3-98aafd8b7e87@amd.com>
- <3f426ef8-060e-ccc9-71b9-2448f2582a30@intel.com>
+        Tue, 24 Aug 2021 17:06:02 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BF11C061757;
+        Tue, 24 Aug 2021 14:05:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=47sgnIoZKep1DRbln9+NTL1J6N65R7OgQCZZ3ODQ1JU=; b=XdIxM4Rp2nAdP6b3OPoUPX1wcl
+        CGgh1FBE2vcOUw38/OhpKrOwanD6szssU48tKUas2UKyOJSUH4peFM3/nAVwRHLQEFrtw+72JyBMo
+        LwHu2cNxj/J8Y2LjRlkSPy/fkZbTOX2j+Sw2DUdKNNBtep/PCyTMzLHe6Q4xzM3yZXnOICbBO4n+d
+        /ELvDWYz2KtyKUfRiyd2i9TR2x+ntfhMrtwq/DHGFstxbYYuylORFsM9ZURkHne/bxERKzG5M7kaQ
+        ukmXkSM+InShYPHlPNTKdTLDoTM2UZCqO7dszR/6WLQIm2oxhvo7Aglv2CV/8eDi2iGqS3FmxgmwP
+        GK6ZwvoQ==;
+Received: from [2601:1c0:6280:3f0::aa0b] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mIdbf-004hpu-F7; Tue, 24 Aug 2021 21:05:15 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Stephan Mueller <smueller@chronox.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: jitterentopy: drop kernel-doc notation
+Date:   Tue, 24 Aug 2021 14:05:13 -0700
+Message-Id: <20210824210513.25503-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3f426ef8-060e-ccc9-71b9-2448f2582a30@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 23, 2021 at 07:50:22AM -0700, Dave Hansen wrote:
-> It *has* to be done in KVM, IMNHO.
-> 
-> The core kernel really doesn't know much about SEV.  It *really* doesn't
-> know when its memory is being exposed to a virtualization architecture
-> that doesn't know how to split TLBs like every single one before it.
-> 
-> This essentially *must* be done at the time that the KVM code realizes
-> that it's being asked to shove a non-splittable page mapping into the
-> SEV hardware structures.
-> 
-> The only other alternative is raising a signal from the fault handler
-> when the page can't be split.  That's a *LOT* nastier because it's so
-> much later in the process.
-> 
-> It's either that, or figure out a way to split hugetlbfs (and DAX)
-> mappings in a failsafe way.
 
-Yes, I agree with that. KVM needs a check to disallow HugeTLB pages in
-SEV-SNP guests, at least as a temporary workaround. When HugeTLBfs
-mappings can be split into smaller pages the check can be removed.
+Drop "begin kernel-doc (/**)" entries in jitterentropy.c
+since they are not in kernel-doc format and they cause
+many complaints (warnings) from scripts/kernel-doc.
 
-Regards,
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Stephan Mueller <smueller@chronox.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+---
+ crypto/jitterentropy.c |   24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-	Joerg
+--- linux-next-20210824.orig/crypto/jitterentropy.c
++++ linux-next-20210824/crypto/jitterentropy.c
+@@ -125,7 +125,7 @@ struct rand_data {
+  * This test complies with SP800-90B section 4.4.2.
+  ***************************************************************************/
+ 
+-/**
++/*
+  * Reset the APT counter
+  *
+  * @ec [in] Reference to entropy collector
+@@ -138,7 +138,7 @@ static void jent_apt_reset(struct rand_d
+ 	ec->apt_observations = 0;
+ }
+ 
+-/**
++/*
+  * Insert a new entropy event into APT
+  *
+  * @ec [in] Reference to entropy collector
+@@ -182,7 +182,7 @@ static void jent_apt_insert(struct rand_
+  * the end. The caller of the Jitter RNG is informed with an error code.
+  ***************************************************************************/
+ 
+-/**
++/*
+  * Repetition Count Test as defined in SP800-90B section 4.4.1
+  *
+  * @ec [in] Reference to entropy collector
+@@ -223,7 +223,7 @@ static void jent_rct_insert(struct rand_
+ 	}
+ }
+ 
+-/**
++/*
+  * Is there an RCT health test failure?
+  *
+  * @ec [in] Reference to entropy collector
+@@ -246,7 +246,7 @@ static inline __u64 jent_delta(__u64 pre
+ 			       (JENT_UINT64_MAX - prev + 1 + next);
+ }
+ 
+-/**
++/*
+  * Stuck test by checking the:
+  * 	1st derivative of the jitter measurement (time delta)
+  * 	2nd derivative of the jitter measurement (delta of time deltas)
+@@ -288,7 +288,7 @@ static int jent_stuck(struct rand_data *
+ 	return 0;
+ }
+ 
+-/**
++/*
+  * Report any health test failures
+  *
+  * @ec [in] Reference to entropy collector
+@@ -310,7 +310,7 @@ static int jent_health_failure(struct ra
+  * Noise sources
+  ***************************************************************************/
+ 
+-/**
++/*
+  * Update of the loop count used for the next round of
+  * an entropy collection.
+  *
+@@ -353,7 +353,7 @@ static __u64 jent_loop_shuffle(struct ra
+ 	return (shuffle + (1<<min));
+ }
+ 
+-/**
++/*
+  * CPU Jitter noise source -- this is the noise source based on the CPU
+  *			      execution time jitter
+  *
+@@ -435,7 +435,7 @@ static void jent_lfsr_time(struct rand_d
+ 		ec->data = new;
+ }
+ 
+-/**
++/*
+  * Memory Access noise source -- this is a noise source based on variations in
+  *				 memory access times
+  *
+@@ -500,7 +500,7 @@ static void jent_memaccess(struct rand_d
+ /***************************************************************************
+  * Start of entropy processing logic
+  ***************************************************************************/
+-/**
++/*
+  * This is the heart of the entropy generation: calculate time deltas and
+  * use the CPU jitter in the time deltas. The jitter is injected into the
+  * entropy pool.
+@@ -539,7 +539,7 @@ static int jent_measure_jitter(struct ra
+ 	return stuck;
+ }
+ 
+-/**
++/*
+  * Generator of one 64 bit random number
+  * Function fills rand_data->data
+  *
+@@ -566,7 +566,7 @@ static void jent_gen_entropy(struct rand
+ 	}
+ }
+ 
+-/**
++/*
+  * Entry function: Obtain entropy for the caller.
+  *
+  * This function invokes the entropy gathering logic as often to generate
