@@ -2,168 +2,132 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4996DC432BE
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 21:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26372C432BE
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 07:33:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C2BE613A6
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Aug 2021 21:13:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00CB561248
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 07:33:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232712AbhHWVOc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Aug 2021 17:14:32 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:18456 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232710AbhHWVOb (ORCPT
+        id S234990AbhHXHeZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 24 Aug 2021 03:34:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36596 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234962AbhHXHeZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Aug 2021 17:14:31 -0400
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 17NHgqpw010647;
-        Mon, 23 Aug 2021 21:13:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2021-07-09;
- bh=UVzc4s8Id/HwqtuUqQgnF9rDDucrlWdKgtv0eHFFCXs=;
- b=jKXsyiTj5BGytpaJo1hzDxKoQ/uFG33hJ3Pdz0q3QfVriSEpN1s2pqkblm2GW71TgimK
- InGOtuq2jPM+dwfn/Rizf3UtepsWQxD0UT/czban5WlpOoc9sU6wH5CkL3fqUY3Haw+E
- aumk7flUxNAXo1rW6xZF8VXPJGapnOciW4yflzKIyNk2NoMOGFHnQ4GNTUnbJ9c/wfK4
- Ex8tyoQJniTgu+OtJ8nJcsWNtrkHWeAVeda4crzimuP7eOUafGIigUiK+rlnYrVmBDPB
- ur9JJIwHbMOQplpNjNcRmhiSHtUzcXiFMfgXS/QWmYXkFC96pOvPiMhqGcq7FLM1qBwP rQ== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2020-01-29;
- bh=UVzc4s8Id/HwqtuUqQgnF9rDDucrlWdKgtv0eHFFCXs=;
- b=kVAMsf8DNl8z3MPTStuGeUadn4vOXOlggId3g7ue+DJZXtKNvnAuDH5KBPcuJZxq+6As
- k5acpNSjUEPy9hy9NFTAUFOtzaxNUkCRzXpg+MSB9kJ9m/VT0vEcRxTNpc+EPVmGkfek
- BAPpjhRskGSh5xBwEarkqnMuK1WHW4FTrrd/2+g6EgUmWtPTsGi9OKisXMTxcyJIS439
- KLqJh2IjlPilCNJnxMM4hZiXc90vPNs9w5/idUGTq0cTQMlW3u/C9M8LQ83z7wOF67zr
- LeKlNizUlDl6JLUNPyEhRKl92ZCxb7LAadvgFkHO/kg7O46xrSC6tWSZ9DqnHxq/y9Xs 1g== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3akxreajp3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Aug 2021 21:13:42 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 17NLBCRU092982;
-        Mon, 23 Aug 2021 21:13:42 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2175.outbound.protection.outlook.com [104.47.59.175])
-        by aserp3020.oracle.com with ESMTP id 3ajsa41hrs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Aug 2021 21:13:41 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JA8sJxcwEHGZmu6oHEwKv5BCEIvh0Ooa37vA7x/aNNZiHqRa7oVACnW91xqm+B7BwMbMRuWhFSB+4KAXB80gobfsJxuv8V6DOYy4ni9GeBxNGdzkWFPqkr0c57/debdEJfxXvi9rUBns4JciMYsV7sUMtJpzaSnrlPnRyDbLTCUP93WDB0Zkt34U2ivimZrGNkPmKz2QtAb0zMfnDetISo4fFdssRxYrujC5CsvuK4f6XUWMJ/0dFstN2QlXKWJqlTMo+Md2nWYWWwstNC9y6bFiJdYyuuH5gdQUBcwfsMfKcQf3B6WAAAYpeOGQMtF6ja3NB/o4qF6Kuqcv1ZACHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UVzc4s8Id/HwqtuUqQgnF9rDDucrlWdKgtv0eHFFCXs=;
- b=gGw+L0Ht4IgHGWIqC5Fd2N2Og9t0pqNzsB5YSoCoa31nYGxAjIuxRIXnn8Sv4Jdz4UW2Fh7CWL01CtcxHfE5EP/9H2le8wBXwgab7iDxVItnADH5M7etTKZB1nYpJ42GVSFxF/E1M2O7kAoJNm7/Lks6UwuCdSi9JpXSmJMiMxkEfJ8FsWcEj/FqJFOdRGUrAzcbyFElcLTXlTnDyoq1SFgPrhVAbS+HqUVM3W7PfkVwV3/tzqGLhHUvUMEDY0Z5/2YIYboJs++ZZofJtIJlOyo20SvzSzEdKBqO43sciiFyx31mNC5kb7PdHNEVje84en9lf6Nwy0xb3odvSwlMIQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UVzc4s8Id/HwqtuUqQgnF9rDDucrlWdKgtv0eHFFCXs=;
- b=rCcMJhfFgMd+YH4y2g5JY8VszkrCQde8UYo+k6ijX8QVY8SOMV0WJ1W6bqW6mGyQSL6TJvq3zSRffNkqLQdUsrm7cwe3IP9G0R8/hWoiPOf5pGyHw2JuUwW56yiGpS30sDf53bhS04QWcvExpFbyfJB8MzqEHHN+K9cPtESCBes=
-Authentication-Results: baidu.com; dkim=none (message not signed)
- header.d=none;baidu.com; dmarc=none action=none header.from=oracle.com;
-Received: from BYAPR10MB2966.namprd10.prod.outlook.com (2603:10b6:a03:8c::27)
- by BYAPR10MB2439.namprd10.prod.outlook.com (2603:10b6:a02:ba::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.22; Mon, 23 Aug
- 2021 21:13:40 +0000
-Received: from BYAPR10MB2966.namprd10.prod.outlook.com
- ([fe80::203c:7f44:c562:b991]) by BYAPR10MB2966.namprd10.prod.outlook.com
- ([fe80::203c:7f44:c562:b991%3]) with mapi id 15.20.4436.022; Mon, 23 Aug 2021
- 21:13:40 +0000
-Date:   Mon, 23 Aug 2021 17:13:36 -0400
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Cai Huoqing <caihuoqing@baidu.com>
-Cc:     steffen.klassert@secunet.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] padata: Remove repeated verbose license text
-Message-ID: <20210823211336.yt4lhxtcdozq5cdi@oracle.com>
-References: <20210822022734.1002-1-caihuoqing@baidu.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210822022734.1002-1-caihuoqing@baidu.com>
-X-ClientProxiedBy: MN2PR15CA0013.namprd15.prod.outlook.com
- (2603:10b6:208:1b4::26) To BYAPR10MB2966.namprd10.prod.outlook.com
- (2603:10b6:a03:8c::27)
+        Tue, 24 Aug 2021 03:34:25 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B761C061575
+        for <linux-crypto@vger.kernel.org>; Tue, 24 Aug 2021 00:33:41 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[127.0.0.1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1mIQwC-0007OI-KS; Tue, 24 Aug 2021 09:33:36 +0200
+Subject: Re: [PATCH 0/4] KEYS: trusted: Introduce support for NXP CAAM-based
+ trusted keys
+To:     Tim Harvey <tharvey@gateworks.com>
+Cc:     David Gstir <david@sigma-star.at>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>, keyrings@vger.kernel.org,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        linux-security-module@vger.kernel.org,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Richard Weinberger <richard@nod.at>,
+        James Morris <jmorris@namei.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        David Howells <dhowells@redhat.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-crypto@vger.kernel.org, Sascha Hauer <kernel@pengutronix.de>,
+        linux-integrity@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>
+References: <cover.9fc9298fd9d63553491871d043a18affc2dbc8a8.1626885907.git-series.a.fatoum@pengutronix.de>
+ <CAJ+vNU23cXPmiqKcKH_WAgD-ea+=pEJzGK+q7zOy=v2o0XU7kA@mail.gmail.com>
+ <2b48a848-d70b-9c43-5ca0-9ab72622ed12@pengutronix.de>
+ <CAJ+vNU225mgHHg00r67f1L6bEub+_h55hCBAMhCq2rd8kWU-qg@mail.gmail.com>
+ <9200d46d-94a2-befd-e9b0-93036e56eb8a@pengutronix.de>
+ <CAJ+vNU19z0syr0oHOrSGxL0cVW+Kjv76kmp6uvGc2akHbtX0Nw@mail.gmail.com>
+ <fa530833-2bb9-f8f3-68c6-99423d29e2ca@pengutronix.de>
+ <CAJ+vNU0iRTagc5_qvsG4jvt=B_wruj=1O2ZRixqWek8JTN=aeg@mail.gmail.com>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+Message-ID: <8b559c9c-a4c0-d335-5e54-40b9acc08707@pengutronix.de>
+Date:   Tue, 24 Aug 2021 09:33:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from oracle.com (98.229.125.203) by MN2PR15CA0013.namprd15.prod.outlook.com (2603:10b6:208:1b4::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Mon, 23 Aug 2021 21:13:39 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 34bdddf6-d4b8-49e9-221d-08d9667ae103
-X-MS-TrafficTypeDiagnostic: BYAPR10MB2439:
-X-Microsoft-Antispam-PRVS: <BYAPR10MB24391F192D5D6746E2CEAF89D9C49@BYAPR10MB2439.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ixoH7jnthIwFJt90zM1aDva0NqwAgUIOVr4I5VwRpdnE4qftDEVTBNq7w3UawMzvgbjrQV9L/23/HpfRD3eNz9TUuerf+tFax+mrdzj01lShna8zpG6bVcC5AlW4PYF2cLhhMh9kWvSwZ7JqQ7OtPZZFUsT6WFGk9qZYeO07lnSO9iHq/VODkioaP4punq2mknOODr5xuecjPTN4zEUbvplHEcgpdNmQNd9ZjP8wGbod3NTthrnkcRaqjANHUC++iZmf7z1n62JdcE6zFszDh/1j4nYyb5XB5o/9x083FjHKYUvsDcyer1TjF1qQS5b31pHa26em54LUvZvoMPCWykF7Z50uv56BgthHhvDp5F2xobtWx2947go44VRBzT/dbft8CTYAIU112FY6w8I4yVR5WoMh/ywuQPchodXXPJ9EGBTlflG5R7DacjPSugmVK0GYe9JBuFEZzTJz0k70xan/FYKzkxKZP0114qdnwzEBn3Ov32dnD9/inka7e8NKBDMlj0eBomkpfPl1kqcX3lJWWGznlm5SPoXJgflt/4zxWjciDrM9M6cSSL4/4M3NrHmCT35ArBOC9zDGyB9ciy/SGCT4zQd/fU/yL4OQSVe5U1HYOTMf5EPnuv4qXXzQO9I1U0fPMw/lVv+6eYYsjMRf33UhkAdURCWORy6W5k752b3iLGLzur82Z/G0X2DqpH1ofjvm5VSDQCrbwGpFL9JWPwh1FdJX0vJti3M4BG0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2966.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(366004)(136003)(396003)(39860400002)(376002)(66476007)(66556008)(86362001)(4326008)(478600001)(5660300002)(1076003)(36756003)(6916009)(38350700002)(38100700002)(2616005)(956004)(6666004)(8886007)(2906002)(55016002)(26005)(8676002)(52116002)(7696005)(316002)(83380400001)(66946007)(8936002)(186003)(2004002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: wTH8NDPzwz4Jjn9pvVXMhHhyK4x/aVaxLmBeKLzrz2tNeYM163qktYboGILTFeWkwcWCWAqX0X4S99jmcCvY3mEDVothCowrc1bTjMvV/nU3W9aFXqLtOfVpvuIrpXWWK91oEoE4xK9SgnmZ88roo2nUN5kfLncFmTkxWUPpAxYO9b1DN0Sj5aqByfBbFLhne64GNf808HzE3X3oGkm8xuU8Vl5In3XU8PU1ToAXyjM8D1vvDUUN3cIh7fgbtv9ol2NbeRPvlMAy7c1VkF61Jkj2MycsSg9GvjpSP6HZwDKVUgnT9v5SKGScuDyKIClAX2TP/4fRT8bvnGYDO9zmB3gfrMk7sX5Y+vOlKVMN2Lc3MtLLLVKuRu+jlrAsFT6LlXBeZqQF7nPErhMwmqLfNAC305bqB+1KqKRW+PTvCvMhxdbfA1KmUBt1lVG3afdSh9ZOPBEpVDURDgHK0uQGx4ztNgLJuSQ02LTr3iwogv14S4tZmcBoX/V+YHpshgBqOpSXcsapIs4l8CrrZJyTyKWKSUgFStpGo8QcEC6uknSA/12g8EqaESBdJBaAMMLfGXeSaiUJ9dbUu7aWjRh8EZpnO3LKQCiA4EtqhugjeLrkEdmuzSL51CSPhxCF1Ru4Ux5XsHhYt3uqYbjDSQ2RXj5oblB41PDQ/xwR9g1rhj0obBDB/yd57mJ4UtDALZ/qZg1btXGhsc0EcIMbsFBXvzCpYsbYLBwJp0FH6cgd3R6aM56Dgr1C7Jd5UCIFUp7i
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 34bdddf6-d4b8-49e9-221d-08d9667ae103
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2966.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2021 21:13:40.2104
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fOiE/itUYmXvlEEeA4zSzDb+Hd3VrtyeSP9TK3+2EymfbSp8Ta+68zkOO/63i8LafFN/KayVkrcyHFGMo2su/gv3YW18lpmXie90wWTvKjk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR10MB2439
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10085 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0
- mlxlogscore=999 bulkscore=0 mlxscore=0 adultscore=0 malwarescore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108230145
-X-Proofpoint-ORIG-GUID: 6q3vhLupaQcQCkSCPJRJZ9XXxbXuE1Hj
-X-Proofpoint-GUID: 6q3vhLupaQcQCkSCPJRJZ9XXxbXuE1Hj
+In-Reply-To: <CAJ+vNU0iRTagc5_qvsG4jvt=B_wruj=1O2ZRixqWek8JTN=aeg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Aug 22, 2021 at 10:27:34AM +0800, Cai Huoqing wrote:
-> remove it because SPDX-License-Identifier is already used
+On 23.08.21 19:50, Tim Harvey wrote:
+> On Mon, Aug 23, 2021 at 6:29 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>> On 20.08.21 23:19, Tim Harvey wrote:
+>>> On Fri, Aug 20, 2021 at 1:36 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>>>> On 20.08.21 22:20, Tim Harvey wrote:
+>>> It works for a user keyring but not a session keyring... does that
+>>> explain anything?
+>>> # keyctl add trusted mykey 'new 32' @u
+>>> 941210782
+>>> # keyctl print 941210782
+>>> 83b7845cb45216496aead9ee2c6a406f587d64aad47bddc539d8947a247e618798d9306b36398b5dc2722a4c3f220a3a763ee175f6bd64758fdd49ca4db597e8ce328121b60edbba9b8d8d55056be896
+>>> # keyctl add trusted mykey 'new 32' @s
+>>> 310571960
+>>> # keyctl print 310571960
+>>> keyctl_read_alloc: Unknown error 126
+>>
+>> Both sequences work for me.
+>>
+>> My getty is started by systemd. I think systemd allocates a new session
+>> keyring for the getty that's inherited by the shell and the commands I run
+>> it in. If you don't do that, each command will get its own session key.
+>>
+>>> Sorry, I'm still trying to wrap my head around the differences in
+>>> keyrings and trusted vs user keys.
+>>
+>> No problem. HTH.
 > 
-> Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
+> Ahmad,
+> 
+> Ok that explains it - my testing is using a very basic buildroot
+> ramdisk rootfs. If I do a 'keyctl new_session' first I can use the
+> system keyring fine as well.
 
-Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Great. Does this mean I can get your Tested-by: ? :)
 
-> ---
->  kernel/padata.c | 13 -------------
->  1 file changed, 13 deletions(-)
+> Thanks - hoping to see this merged soon!
+
+You and me both.
+
+Cheers,
+Ahmad
+
+
 > 
-> diff --git a/kernel/padata.c b/kernel/padata.c
-> index 3258ab89c2a3..18d3a5c699d8 100644
-> --- a/kernel/padata.c
-> +++ b/kernel/padata.c
-> @@ -9,19 +9,6 @@
->   *
->   * Copyright (c) 2020 Oracle and/or its affiliates.
->   * Author: Daniel Jordan <daniel.m.jordan@oracle.com>
-> - *
-> - * This program is free software; you can redistribute it and/or modify it
-> - * under the terms and conditions of the GNU General Public License,
-> - * version 2, as published by the Free Software Foundation.
-> - *
-> - * This program is distributed in the hope it will be useful, but WITHOUT
-> - * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> - * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> - * more details.
-> - *
-> - * You should have received a copy of the GNU General Public License along with
-> - * this program; if not, write to the Free Software Foundation, Inc.,
-> - * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
->   */
->  
->  #include <linux/completion.h>
-> -- 
-> 2.25.1
+> Tim
 > 
+
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
