@@ -2,163 +2,64 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE74C432BE
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 09:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4126CC4338F
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 11:21:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0366E610E9
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 09:34:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16D406113C
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 11:21:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239663AbhHYJez (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Aug 2021 05:34:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56388 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237008AbhHYJez (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Aug 2021 05:34:55 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C312EC061757
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Aug 2021 02:34:09 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1mIpIL-0003oy-7B; Wed, 25 Aug 2021 11:34:05 +0200
-Subject: Re: [PATCH 0/4] KEYS: trusted: Introduce support for NXP CAAM-based
- trusted keys
-To:     Tim Harvey <tharvey@gateworks.com>
-Cc:     David Gstir <david@sigma-star.at>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>, keyrings@vger.kernel.org,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        linux-security-module@vger.kernel.org,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        Richard Weinberger <richard@nod.at>,
-        James Morris <jmorris@namei.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        David Howells <dhowells@redhat.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-crypto@vger.kernel.org, Sascha Hauer <kernel@pengutronix.de>,
-        linux-integrity@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>
-References: <cover.9fc9298fd9d63553491871d043a18affc2dbc8a8.1626885907.git-series.a.fatoum@pengutronix.de>
- <CAJ+vNU23cXPmiqKcKH_WAgD-ea+=pEJzGK+q7zOy=v2o0XU7kA@mail.gmail.com>
- <2b48a848-d70b-9c43-5ca0-9ab72622ed12@pengutronix.de>
- <CAJ+vNU225mgHHg00r67f1L6bEub+_h55hCBAMhCq2rd8kWU-qg@mail.gmail.com>
- <9200d46d-94a2-befd-e9b0-93036e56eb8a@pengutronix.de>
- <CAJ+vNU19z0syr0oHOrSGxL0cVW+Kjv76kmp6uvGc2akHbtX0Nw@mail.gmail.com>
- <fa530833-2bb9-f8f3-68c6-99423d29e2ca@pengutronix.de>
- <CAJ+vNU0iRTagc5_qvsG4jvt=B_wruj=1O2ZRixqWek8JTN=aeg@mail.gmail.com>
- <8b559c9c-a4c0-d335-5e54-40b9acc08707@pengutronix.de>
- <CAJ+vNU2q_KCi8nNv56s0ip7CZaAE=YgObwFUyzuGa_T1Ywp-wQ@mail.gmail.com>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-Message-ID: <2b5b1722-7934-045e-1807-075278041ae7@pengutronix.de>
-Date:   Wed, 25 Aug 2021 11:34:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S240123AbhHYLWm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Aug 2021 07:22:42 -0400
+Received: from mx21.baidu.com ([220.181.3.85]:52146 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S239394AbhHYLWm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 25 Aug 2021 07:22:42 -0400
+Received: from BC-Mail-Ex20.internal.baidu.com (unknown [172.31.51.14])
+        by Forcepoint Email with ESMTPS id DD899E7C4B9B76EDE2D1;
+        Wed, 25 Aug 2021 19:21:54 +0800 (CST)
+Received: from BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) by
+ BC-Mail-Ex20.internal.baidu.com (172.31.51.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2242.12; Wed, 25 Aug 2021 19:21:54 +0800
+Received: from LAPTOP-UKSR4ENP.internal.baidu.com (172.31.63.8) by
+ BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.14; Wed, 25 Aug 2021 19:21:54 +0800
+From:   Cai Huoqing <caihuoqing@baidu.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <mcoquelin.stm32@gmail.com>, <alexandre.torgue@foss.st.com>,
+        <nicolas.toromanoff@st.com>
+CC:     <linux-crypto@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Cai Huoqing <caihuoqing@baidu.com>
+Subject: [PATCH 0/2] crypto: stm32 - Add support of COMPILE_TEST
+Date:   Wed, 25 Aug 2021 19:21:45 +0800
+Message-ID: <20210825112147.2669-1-caihuoqing@baidu.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <CAJ+vNU2q_KCi8nNv56s0ip7CZaAE=YgObwFUyzuGa_T1Ywp-wQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Type: text/plain
+X-Originating-IP: [172.31.63.8]
+X-ClientProxiedBy: BJHW-Mail-Ex14.internal.baidu.com (10.127.64.37) To
+ BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 24.08.21 17:23, Tim Harvey wrote:
-> On Tue, Aug 24, 2021 at 12:33 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->>
->> On 23.08.21 19:50, Tim Harvey wrote:
->>> On Mon, Aug 23, 2021 at 6:29 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->>>> On 20.08.21 23:19, Tim Harvey wrote:
->>>>> On Fri, Aug 20, 2021 at 1:36 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->>>>>> On 20.08.21 22:20, Tim Harvey wrote:
->>>>> It works for a user keyring but not a session keyring... does that
->>>>> explain anything?
->>>>> # keyctl add trusted mykey 'new 32' @u
->>>>> 941210782
->>>>> # keyctl print 941210782
->>>>> 83b7845cb45216496aead9ee2c6a406f587d64aad47bddc539d8947a247e618798d9306b36398b5dc2722a4c3f220a3a763ee175f6bd64758fdd49ca4db597e8ce328121b60edbba9b8d8d55056be896
->>>>> # keyctl add trusted mykey 'new 32' @s
->>>>> 310571960
->>>>> # keyctl print 310571960
->>>>> keyctl_read_alloc: Unknown error 126
->>>>
->>>> Both sequences work for me.
->>>>
->>>> My getty is started by systemd. I think systemd allocates a new session
->>>> keyring for the getty that's inherited by the shell and the commands I run
->>>> it in. If you don't do that, each command will get its own session key.
->>>>
->>>>> Sorry, I'm still trying to wrap my head around the differences in
->>>>> keyrings and trusted vs user keys.
->>>>
->>>> No problem. HTH.
->>>
->>> Ahmad,
->>>
->>> Ok that explains it - my testing is using a very basic buildroot
->>> ramdisk rootfs. If I do a 'keyctl new_session' first I can use the
->>> system keyring fine as well.
->>
->> Great. Does this mean I can get your Tested-by: ? :)
->>
-> 
-> Absolutely,
-> 
-> For the series:
-> 
-> I tested this series on top of v5.14.rc-7 on a Gateworks
-> imx8mm-venice-gw73xx board with kernel param trusted.source=caam and
-> keyutils-1.6:
-> # keyctl new_session
-> 22544757
-> # keyctl add trusted mykey 'new 32' @s
-> 160701809
-> # keyctl print 160701809
-> 990e03aa4515aee420eede17e26a58d0c5568c8bd2c9c2ee2f22a0583181d20d4f65cf9cb1f944a3cc92c0e3184a44a29a7e511f0a55a6af11a70ac2b2924514002475e73ae09820042896b9ee00a5ec
-> 
-> Tested-By: Tim Harvey <tharvey@gateworks.com>
+it's helpful for complie test in other platform(e.g.X86
 
-Thanks. I'll apply it to the whole series then.
+Cai Huoqing (2):
+  crypto: stm32 - Add support of COMPILE_TEST
+  crypto: stm32 - open the configuration for COMPILE_TEST
 
-> One more question: I've got a user that wants to blob/deblob generic
-> data. They can use the caam_encap_blob/caam_decap_blob functions in
-> kernel code but could you give me a suggestion for how they could use
-> this in:
-> a) userspace code (using the keyctl syscall I assume)
-> b) userspace cmdline (via keyutils I assume)
-
-Trusted keys aren't disclosed to userspace in plain text, only in sealed
-form (bar vulnerabilities of course).
-
-Cheers,
-Ahmad
-
-> 
-> Many thanks,
-> 
-> Tim
-> 
-
+ drivers/crypto/Makefile      | 2 +-
+ drivers/crypto/stm32/Kconfig | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.25.1
+
