@@ -2,112 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9223BC4320A
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 23:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FE1BC4338F
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 04:06:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7228561212
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Aug 2021 23:35:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA05B60EE4
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 04:06:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233930AbhHXXfr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Aug 2021 19:35:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34412 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231552AbhHXXfq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Aug 2021 19:35:46 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FBDCC061757;
-        Tue, 24 Aug 2021 16:35:02 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id j2so8807829pll.1;
-        Tue, 24 Aug 2021 16:35:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=rNShSQwThr6gncf6KciCpz1nmilWRZIh2pd8pXlgU2w=;
-        b=qRrg8f3X14HU1hkXdQP2hJUuaFNZYL39Ld42quI9OZKOctN7lNB8oYiHtcPq8o85rx
-         t2LFCX4VxkZx2JodOA7t466wfzDaVrsVEehzkHmXn5oUpa/CTb98rTfUTQAgPfWxlke1
-         Zg7A+78CwG+D5Ai4Yi5a7ZAuReNfUQmP5QrskBruh+QnFy3JBpZhRlSACUjFqFcOcgul
-         yg8QDQj2fv66GheIAi44mofDz6n3AknY1FvLR4shJnVc6r/7LbTNmsv23LydETjW8+kX
-         F7OL7chebPpqAtWv2QThWl4+NLoIscun6D1ZckwTlB0iJhzznRXXog3/zvpazvSGPKsc
-         ZHzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rNShSQwThr6gncf6KciCpz1nmilWRZIh2pd8pXlgU2w=;
-        b=QNkbxae/b5Jfu+BkLx90tRmdrfSSXj5hTgs/syXdFvvHtJsp393K5tACXixztcIivD
-         Q/FE2A4qqGLnRxNEjbL0qepJADN4Xdy/oyx0i/deHvNasTfLxupNP1FyEiL8DspUtGt+
-         fPxb77SAgFfIjNh22TQru3zzaS34a77qcx785DzDKhDbU3D2x9q9/VV89wesDuOBLpLD
-         bFUPebhVRMGLfXmW5AL0UM9XI8Aflmjgtg/tBcCtvNPBGRGG0H4+t92ESlJwUVMwMRFs
-         FdBiJFIENf0AgBeCfxJygrgNe6sNW9UsvNzvbRZGTrNnrhUXp879NDIdpzNqwLp/e4I3
-         MLjw==
-X-Gm-Message-State: AOAM532C8Q6GquVY5OatQphDhmM7vw4F8M4EwocMmleWH+CMbjPRvSKu
-        5DV2haP7OxfNE9XBiZeHtwX6J4IgkCs=
-X-Google-Smtp-Source: ABdhPJzzrItpXBMO6oheDOs/i5nL+4Zw+9CEXaOb5PjyZvwYOOWDy6JTXaNBCCsADY68dt2RtNyvWQ==
-X-Received: by 2002:a17:902:8f97:b0:12f:fff9:bad4 with SMTP id z23-20020a1709028f9700b0012ffff9bad4mr25335111plo.65.1629848101603;
-        Tue, 24 Aug 2021 16:35:01 -0700 (PDT)
-Received: from [192.168.86.235] (c-73-241-150-58.hsd1.ca.comcast.net. [73.241.150.58])
-        by smtp.gmail.com with ESMTPSA id ev12sm3308395pjb.57.2021.08.24.16.34.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Aug 2021 16:35:01 -0700 (PDT)
-Subject: Re: [RFCv3 05/15] tcp: authopt: Add crypto initialization
-To:     Leonard Crestez <cdleonard@gmail.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc:     Eric Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Priyaranjan Jha <priyarjha@google.com>,
-        Menglong Dong <dong.menglong@zte.com.cn>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1629840814.git.cdleonard@gmail.com>
- <abb720b34b9eef1cc52ef68017334e27a2af83c6.1629840814.git.cdleonard@gmail.com>
-From:   Eric Dumazet <eric.dumazet@gmail.com>
-Message-ID: <30f73293-ea03-d18f-d923-0cf499d4b208@gmail.com>
-Date:   Tue, 24 Aug 2021 16:34:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S229899AbhHYEG4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Aug 2021 00:06:56 -0400
+Received: from mx21.baidu.com ([220.181.3.85]:53112 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229826AbhHYEGs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 25 Aug 2021 00:06:48 -0400
+Received: from BJHW-Mail-Ex15.internal.baidu.com (unknown [10.127.64.38])
+        by Forcepoint Email with ESMTPS id 2690E62C50AA80D86CC8;
+        Wed, 25 Aug 2021 12:06:00 +0800 (CST)
+Received: from BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) by
+ BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.14; Wed, 25 Aug 2021 12:05:59 +0800
+Received: from LAPTOP-UKSR4ENP.internal.baidu.com (172.31.63.8) by
+ BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.14; Wed, 25 Aug 2021 12:05:59 +0800
+From:   Cai Huoqing <caihuoqing@baidu.com>
+To:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
+        <broonie@kernel.org>, <zhouyanjie@wanyeetech.com>, <s-anna@ti.com>,
+        <andre.przywara@arm.com>, <chris.obbard@collabora.com>,
+        <qianweili@huawei.com>, <juerg.haefliger@canonical.com>
+CC:     <linux-crypto@vger.kernel.org>, Cai Huoqing <caihuoqing@baidu.com>
+Subject: [PATCH] hwrng: Add helper dependency on COMPILE_TEST
+Date:   Wed, 25 Aug 2021 12:05:52 +0800
+Message-ID: <20210825040552.2265-1-caihuoqing@baidu.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <abb720b34b9eef1cc52ef68017334e27a2af83c6.1629840814.git.cdleonard@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [172.31.63.8]
+X-ClientProxiedBy: BJHW-Mail-Ex08.internal.baidu.com (10.127.64.18) To
+ BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42)
+X-Baidu-BdMsfe-DateCheck: 1_BJHW-Mail-Ex15_2021-08-25 12:06:00:107
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+it's helpful to do a complie test in other platform(e.g.X86)
 
+Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
+---
+ drivers/char/hw_random/Kconfig | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-On 8/24/21 2:34 PM, Leonard Crestez wrote:
-> The crypto_shash API is used in order to compute packet signatures. The
-> API comes with several unfortunate limitations:
-> 
-> 1) Allocating a crypto_shash can sleep and must be done in user context.
-> 2) Packet signatures must be computed in softirq context
-> 3) Packet signatures use dynamic "traffic keys" which require exclusive
-> access to crypto_shash for crypto_setkey.
-> 
-> The solution is to allocate one crypto_shash for each possible cpu for
-> each algorithm at setsockopt time. The per-cpu tfm is then borrowed from
-> softirq context, signatures are computed and the tfm is returned.
-> 
-
-I could not see the per-cpu stuff that you mention in the changelog.
-
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 239eca4d6805..814b3d0ca7b7 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -63,7 +63,7 @@ config HW_RANDOM_AMD
+ 
+ config HW_RANDOM_ATMEL
+ 	tristate "Atmel Random Number Generator support"
+-	depends on ARCH_AT91 && HAVE_CLK && OF
++	depends on (ARCH_AT91 || COMPILE_TEST) && HAVE_CLK && OF
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -87,7 +87,7 @@ config HW_RANDOM_BA431
+ config HW_RANDOM_BCM2835
+ 	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
+ 	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
+-		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC
++		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -100,7 +100,7 @@ config HW_RANDOM_BCM2835
+ 
+ config HW_RANDOM_IPROC_RNG200
+ 	tristate "Broadcom iProc/STB RNG200 support"
+-	depends on ARCH_BCM_IPROC || ARCH_BCM2835 || ARCH_BRCMSTB
++	depends on ARCH_BCM_IPROC || ARCH_BCM2835 || ARCH_BRCMSTB || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the RNG200
+@@ -165,7 +165,7 @@ config HW_RANDOM_IXP4XX
+ 
+ config HW_RANDOM_OMAP
+ 	tristate "OMAP Random Number Generator support"
+-	depends on ARCH_OMAP16XX || ARCH_OMAP2PLUS || ARCH_MVEBU || ARCH_K3
++	depends on ARCH_OMAP16XX || ARCH_OMAP2PLUS || ARCH_MVEBU || ARCH_K3 || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -179,7 +179,7 @@ config HW_RANDOM_OMAP
+ 
+ config HW_RANDOM_OMAP3_ROM
+ 	tristate "OMAP3 ROM Random Number Generator support"
+-	depends on ARCH_OMAP3
++	depends on ARCH_OMAP3 || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -298,7 +298,7 @@ config HW_RANDOM_INGENIC_TRNG
+ 
+ config HW_RANDOM_NOMADIK
+ 	tristate "ST-Ericsson Nomadik Random Number Generator support"
+-	depends on ARCH_NOMADIK
++	depends on ARCH_NOMADIK || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+-- 
+2.25.1
 
