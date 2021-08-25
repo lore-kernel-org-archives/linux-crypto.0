@@ -2,71 +2,72 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EEF0C4320A
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 16:37:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88436C4320A
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 17:56:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3875460F6F
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 16:37:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BD246103B
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 17:56:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231234AbhHYQie (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Aug 2021 12:38:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43618 "EHLO
+        id S229839AbhHYR4s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Aug 2021 13:56:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230490AbhHYQid (ORCPT
+        with ESMTP id S234718AbhHYR4r (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Aug 2021 12:38:33 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1880C061757;
-        Wed, 25 Aug 2021 09:37:47 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id u3so52876744ejz.1;
-        Wed, 25 Aug 2021 09:37:47 -0700 (PDT)
+        Wed, 25 Aug 2021 13:56:47 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E34CCC061757
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Aug 2021 10:56:01 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id n126so522774ybf.6
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Aug 2021 10:56:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:subject:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=1K9N5MpNmrjGAXxPDH6ASnSz5pQKTpuvkicsC84kSJQ=;
-        b=g/6iBX5tJrRFfNspQP63D4yGRv27vOeGfOWrFoh+KDZaMsWO0TvTgvongSC9frZPMO
-         0CtMaRip+gjDHUzTiN3ED4VCKiE+eOXnZV0PADS8PaRFzZ+QLxOf9NIjno9KzEVSKFez
-         tvl7toFz+9dqEoBa/m7i/UkYTK/ym0xJKg/WhpgyOiRy621xbdotMyQmxHhKQ0PoaWDm
-         uM2ChNbe1qc3aORXJGlP2KlEz3DBsEcJ1hapEwuvxUepBtbYHb6d/OuIdMWWwS02+H4h
-         qSTnj8gMKhZRHKjtNG0arkqYh9QiZ1QKOawTbq+TmJ0DSSwTqDOhgs0T+6tayOe30Nqh
-         cApg==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Fx2qkPqDeREwxSopnWcjB1GCzK8MBh8mRC5Q/NQ22aI=;
+        b=O/CUHdrLiJ6O7rxUOG4hBQ7TFTwBLuhTlSrZgBQd5wpnDEAl3/RRINc47fHCxofqDt
+         Gk1K1H+WIWlFbz2x/95RZbZF6zY2T0i0K10hlYkqCy83IiYX0RlWk8FPP860yq5QK/pn
+         AZklAgrLEmCa2VfG+KI9vqFNqhrnccHnKhyXf4jq9OayxTyK9WaPkzlVxRnzzSfoXueo
+         k5CNeeYg3Y4+WhtMXmlXLmzjat1ycxEx2ypsjsku/k9RGzbEk/pQ37JseXFbGiT9hFQz
+         Mx4g7c7OKIoEEzMGooqLVfc0uk/UV0Pp9GTc7fv8CwjlSV4RlZviucdinirrM/SgUwbq
+         qMgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1K9N5MpNmrjGAXxPDH6ASnSz5pQKTpuvkicsC84kSJQ=;
-        b=fH+rmHKZx/FPyCVBunTA/24Lc5z5655vJdqZVjz/cLOdze8TZhH0ntKfiwMSrNamT4
-         3iYLg4/c216eD9yWUJnBd1g6WiGE8Vavk9hk84MfSoYfi5dIcv1Kw3xrznqY8lA8sbXN
-         iEH4qlyDw2zsgDn/IcwvBU319ViDK5PPIkn7RODtfN8hUy82fTzKUZdNAG/MqoEwE1vh
-         lzm3J1cdsjhkYDDaywCbrD6fJvDUSZXxvI61A8XnKMfu264rWmr+H3sbgONX+GD//YYj
-         yN1vbqYFaTyMAjBVUuSRyCfrSVXtzxgOD/tDo8w/sakShiwbR0tXZr4jMSYNeXA5iWtu
-         veVA==
-X-Gm-Message-State: AOAM532eOBJNYcjribeRIg7m05f4Tv33L2rw+bUs/aguQE9mlS7hYBMr
-        yHhdAtDJxqfPUSRNoYqC5jr9jkNqt2p2DQ==
-X-Google-Smtp-Source: ABdhPJxBhRXzymupWy8orO37b7pnDcCkM/RCtXtmKzhqthB7ffqi0rlr2wCJimXkY60VuPmETgJ4oQ==
-X-Received: by 2002:a17:907:1b02:: with SMTP id mp2mr47492298ejc.196.1629909464473;
-        Wed, 25 Aug 2021 09:37:44 -0700 (PDT)
-Received: from ?IPv6:2a04:241e:502:1d80:f02c:a1bd:70b1:fe95? ([2a04:241e:502:1d80:f02c:a1bd:70b1:fe95])
-        by smtp.gmail.com with ESMTPSA id u18sm78992ejf.118.2021.08.25.09.37.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Aug 2021 09:37:43 -0700 (PDT)
-From:   Leonard Crestez <cdleonard@gmail.com>
-Subject: Re: [RFCv3 09/15] selftests: tcp_authopt: Test key address binding
-To:     David Ahern <dsahern@gmail.com>, Shuah Khan <shuah@kernel.org>
-Cc:     Eric Dumazet <edumazet@google.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Fx2qkPqDeREwxSopnWcjB1GCzK8MBh8mRC5Q/NQ22aI=;
+        b=Oyg+Gq6NLwIDfKw1fHmGRTE5eDVLtheiPL0tYB1nF+6ico9gyREU7T1b5rYNmL4wae
+         YBl6RHCMHdKkdFsrpW4wWyKTFFyKB8OQHcSFHtWPBtDFuFPjuBRNaqABdqosut7vlpy3
+         ituTt6paXJTvXTSNwTzpWLva0rww3YF2vjDXtodY/OuRLtVzQqnjp70EYsepyQYScc6y
+         iz+7IdWuY5S22K0X+YRjx2nbHW75eMJ7lYo9ZJTHHO7oI8LrLEg+B/3KMzjuRq8rQHsU
+         rctM1LRm24aw3naI8yeKm8Rn/OiIPk64wymntJSmCN1WYIFbkUeOXfBnX6SD2kZDiB97
+         L+zQ==
+X-Gm-Message-State: AOAM5339ccQ9FyXWu6H5W0w6yvkXRg9jTICJMkZUSTw53hVlglIIOi2L
+        8CxYIJXKwaw3kiyXgO8nMeKSJ72AxT31Q3y1HyXA6w==
+X-Google-Smtp-Source: ABdhPJwKRB3q/uwwiPtTgdHTJ5OwhyTkhxDgLtYRjV02T0AARc/QuUllh7pJ+IPbZoD3iMH+oFK3DfMIjXn26rlEQ2o=
+X-Received: by 2002:a25:afcd:: with SMTP id d13mr57803506ybj.504.1629914160647;
+ Wed, 25 Aug 2021 10:56:00 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1629840814.git.cdleonard@gmail.com> <abb720b34b9eef1cc52ef68017334e27a2af83c6.1629840814.git.cdleonard@gmail.com>
+ <30f73293-ea03-d18f-d923-0cf499d4b208@gmail.com> <27e56f61-3267-de50-0d49-5fcfc59af93c@gmail.com>
+In-Reply-To: <27e56f61-3267-de50-0d49-5fcfc59af93c@gmail.com>
+From:   Eric Dumazet <edumazet@google.com>
+Date:   Wed, 25 Aug 2021 10:55:49 -0700
+Message-ID: <CANn89iJPyQpJTxrDMGszEOrgKwaEdYz1xaRK7vKbS4qj9tV23g@mail.gmail.com>
+Subject: Re: [RFCv3 05/15] tcp: authopt: Add crypto initialization
+To:     Leonard Crestez <cdleonard@gmail.com>
+Cc:     Eric Dumazet <eric.dumazet@gmail.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Yuchung Cheng <ycheng@google.com>,
         Francesco Ruggeri <fruggeri@arista.com>,
@@ -75,68 +76,62 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         Ivan Delalande <colona@arista.com>,
         Priyaranjan Jha <priyarjha@google.com>,
         Menglong Dong <dong.menglong@zte.com.cn>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1629840814.git.cdleonard@gmail.com>
- <09c7cff43f832d0aba8dfad67f56066aeeca8475.1629840814.git.cdleonard@gmail.com>
- <922fe343-c867-62ff-14b8-3d84ed2e1b76@gmail.com>
-Message-ID: <bb3fe6a6-0995-c235-6b58-383481001ef3@gmail.com>
-Date:   Wed, 25 Aug 2021 19:37:42 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <922fe343-c867-62ff-14b8-3d84ed2e1b76@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        netdev <netdev@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Shuah Khan <shuah@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 25.08.2021 08:18, David Ahern wrote:
-> On 8/24/21 2:34 PM, Leonard Crestez wrote:
->> By default TCP-AO keys apply to all possible peers but it's possible to
->> have different keys for different remote hosts.
->>
->> This patch adds initial tests for the behavior behind the
->> TCP_AUTHOPT_KEY_BIND_ADDR flag. Server rejection is tested via client
->> timeout so this can be slightly slow.
->>
->> Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
->> ---
->>   .../tcp_authopt_test/netns_fixture.py         |  63 +++++++
->>   .../tcp_authopt/tcp_authopt_test/server.py    |  82 ++++++++++
->>   .../tcp_authopt/tcp_authopt_test/test_bind.py | 143 ++++++++++++++++
->>   .../tcp_authopt/tcp_authopt_test/utils.py     | 154 ++++++++++++++++++
->>   4 files changed, 442 insertions(+)
->>   create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/netns_fixture.py
->>   create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/server.py
->>   create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_bind.py
->>   create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/utils.py
->>
-> 
-> This should be under selftests/net as a single "tcp_authopt" directory
-> from what I can tell.
+On Wed, Aug 25, 2021 at 9:35 AM Leonard Crestez <cdleonard@gmail.com> wrote:
+>
+> On 25.08.2021 02:34, Eric Dumazet wrote:
+> > On 8/24/21 2:34 PM, Leonard Crestez wrote:
+> >> The crypto_shash API is used in order to compute packet signatures. The
+> >> API comes with several unfortunate limitations:
+> >>
+> >> 1) Allocating a crypto_shash can sleep and must be done in user context.
+> >> 2) Packet signatures must be computed in softirq context
+> >> 3) Packet signatures use dynamic "traffic keys" which require exclusive
+> >> access to crypto_shash for crypto_setkey.
+> >>
+> >> The solution is to allocate one crypto_shash for each possible cpu for
+> >> each algorithm at setsockopt time. The per-cpu tfm is then borrowed from
+> >> softirq context, signatures are computed and the tfm is returned.
+> >>
+> >
+> > I could not see the per-cpu stuff that you mention in the changelog.
+>
+> That's a little embarrasing, I forgot to implement the actual per-cpu
+> stuff. tcp_authopt_alg_imp.tfm is meant to be an array up to NR_CPUS and
+> tcp_authopt_alg_get_tfm needs no locking other than preempt_disable
+> (which should already be the case).
 
-Maybe? I found no clear guidelines for organizing tests by subsystem. I 
-just did a grep for .py in selftests and placed mine next to tc-testing.
+Well, do not use arrays of NR_CPUS and instead use normal per_cpu
+accessors (as in __tcp_alloc_md5sig_pool)
 
-Having a tcp_authopt_test code directory under tcp_authopt is the 
-standard pattern for python packages, otherwise all submodules with 
-utilities of dubious generality are dumped at the global level. Removing 
-the tcp_authopt/tcp_authopt_test structure is awkward in python.
+>
+> The reference counting would still only happen from very few places:
+> setsockopt, close and openreq. This would only impact request/response
+> traffic and relatively little.
 
-One way to deal with this is to add my test code in 
-tools/testing/selftests/net/tcp_authopt and my setup.cfg and similar 
-directly in tools/testing/selftests/net. This would make "net" the root 
-of the package and make it easy to add other networking pytests. This 
-seems close to what you mean.
+What I meant is that __tcp_alloc_md5sig_pool() allocates stuff one time,
+we do not care about tcp_md5sig_pool_populated going back to false.
 
-kselftest itself does not seem to offer any special support for python 
-code, only some for C and shell. Maybe it could offer a "kselftest" 
-package with common utilities that are used by multiple test packages 
-and everything would be installed into a single virtualenv by makefiles.
+Otherwise, a single user application constantly allocating a socket,
+enabling MD5 (or authopt), then closing the socket would incur
+a big cost on hosts with a lot of cpus.
 
---
-Regards,
-Leonard
+>
+> Performance was not a major focus so far. Preventing impact on non-AO
+> connections is important but typical AO usecases are long-lived
+> low-traffic connections.
+>
+> --
+> Regards,
+> Leonard
