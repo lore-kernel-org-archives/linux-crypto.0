@@ -2,150 +2,163 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90CB7C4338F
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 09:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE74C432BE
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 09:34:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DFF8610CD
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 09:17:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0366E610E9
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Aug 2021 09:34:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233287AbhHYJRp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Aug 2021 05:17:45 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:47480 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233272AbhHYJRp (ORCPT
+        id S239663AbhHYJez (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Aug 2021 05:34:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56388 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237008AbhHYJez (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Aug 2021 05:17:45 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 7DC1C22118;
-        Wed, 25 Aug 2021 09:16:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1629883018; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Af1e3tXHfDmT+9DXS/it5aFxSlFxaJjERigjhxDIiFU=;
-        b=afayu3X7kmeLNmWI9HNgB4XgqHLBu/38tnAdiLCX9Wvv9JUPYhhqAUI7a/198WLzrBO1pt
-        MCGZ8/3foZ6/6cl72S53bhKn34JCT2VLupgzf4BlEsi0s1nYVM5CintXUCBgve41+Me+qr
-        Jh5/Hxh5KZt5Sneik0OjP1jblLJRJk4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1629883018;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Af1e3tXHfDmT+9DXS/it5aFxSlFxaJjERigjhxDIiFU=;
-        b=R1a/N7HLX60OgiBSyY2rCXzD3P3OK3BckIgrns05/Noa9UYraEMBisfjXuXabmk6KK8bEd
-        5zhn9vYRNDDzXjBg==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id F0B0C13887;
-        Wed, 25 Aug 2021 09:16:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id QV/vOYkKJmGFAQAAGKfGzw
-        (envelope-from <vbabka@suse.cz>); Wed, 25 Aug 2021 09:16:57 +0000
-Message-ID: <c5a8f7e8-7146-0737-81a1-1faceb6992ab@suse.cz>
-Date:   Wed, 25 Aug 2021 11:16:56 +0200
+        Wed, 25 Aug 2021 05:34:55 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C312EC061757
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Aug 2021 02:34:09 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1mIpIL-0003oy-7B; Wed, 25 Aug 2021 11:34:05 +0200
+Subject: Re: [PATCH 0/4] KEYS: trusted: Introduce support for NXP CAAM-based
+ trusted keys
+To:     Tim Harvey <tharvey@gateworks.com>
+Cc:     David Gstir <david@sigma-star.at>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>, keyrings@vger.kernel.org,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        linux-security-module@vger.kernel.org,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Richard Weinberger <richard@nod.at>,
+        James Morris <jmorris@namei.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        David Howells <dhowells@redhat.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-crypto@vger.kernel.org, Sascha Hauer <kernel@pengutronix.de>,
+        linux-integrity@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>
+References: <cover.9fc9298fd9d63553491871d043a18affc2dbc8a8.1626885907.git-series.a.fatoum@pengutronix.de>
+ <CAJ+vNU23cXPmiqKcKH_WAgD-ea+=pEJzGK+q7zOy=v2o0XU7kA@mail.gmail.com>
+ <2b48a848-d70b-9c43-5ca0-9ab72622ed12@pengutronix.de>
+ <CAJ+vNU225mgHHg00r67f1L6bEub+_h55hCBAMhCq2rd8kWU-qg@mail.gmail.com>
+ <9200d46d-94a2-befd-e9b0-93036e56eb8a@pengutronix.de>
+ <CAJ+vNU19z0syr0oHOrSGxL0cVW+Kjv76kmp6uvGc2akHbtX0Nw@mail.gmail.com>
+ <fa530833-2bb9-f8f3-68c6-99423d29e2ca@pengutronix.de>
+ <CAJ+vNU0iRTagc5_qvsG4jvt=B_wruj=1O2ZRixqWek8JTN=aeg@mail.gmail.com>
+ <8b559c9c-a4c0-d335-5e54-40b9acc08707@pengutronix.de>
+ <CAJ+vNU2q_KCi8nNv56s0ip7CZaAE=YgObwFUyzuGa_T1Ywp-wQ@mail.gmail.com>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+Message-ID: <2b5b1722-7934-045e-1807-075278041ae7@pengutronix.de>
+Date:   Wed, 25 Aug 2021 11:34:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.0.1
+In-Reply-To: <CAJ+vNU2q_KCi8nNv56s0ip7CZaAE=YgObwFUyzuGa_T1Ywp-wQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-To:     Joerg Roedel <jroedel@suse.de>, Dave Hansen <dave.hansen@intel.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        Mike Kravetz <mike.kravetz@oracle.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-9-brijesh.singh@amd.com>
- <f6d778a0-840d-8c9c-392d-5c9ffcc0bdc6@intel.com>
- <19599ede-9fc5-25e1-dcb3-98aafd8b7e87@amd.com>
- <3f426ef8-060e-ccc9-71b9-2448f2582a30@intel.com> <YSUhg/87jZPocLDP@suse.de>
-From:   Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH Part2 v5 08/45] x86/fault: Add support to handle the RMP
- fault for user address
-In-Reply-To: <YSUhg/87jZPocLDP@suse.de>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/24/21 18:42, Joerg Roedel wrote:
-> On Mon, Aug 23, 2021 at 07:50:22AM -0700, Dave Hansen wrote:
->> It *has* to be done in KVM, IMNHO.
->> 
->> The core kernel really doesn't know much about SEV.  It *really* doesn't
->> know when its memory is being exposed to a virtualization architecture
->> that doesn't know how to split TLBs like every single one before it.
->> 
->> This essentially *must* be done at the time that the KVM code realizes
->> that it's being asked to shove a non-splittable page mapping into the
->> SEV hardware structures.
->> 
->> The only other alternative is raising a signal from the fault handler
->> when the page can't be split.  That's a *LOT* nastier because it's so
->> much later in the process.
->> 
->> It's either that, or figure out a way to split hugetlbfs (and DAX)
->> mappings in a failsafe way.
+On 24.08.21 17:23, Tim Harvey wrote:
+> On Tue, Aug 24, 2021 at 12:33 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>>
+>> On 23.08.21 19:50, Tim Harvey wrote:
+>>> On Mon, Aug 23, 2021 at 6:29 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>>>> On 20.08.21 23:19, Tim Harvey wrote:
+>>>>> On Fri, Aug 20, 2021 at 1:36 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>>>>>> On 20.08.21 22:20, Tim Harvey wrote:
+>>>>> It works for a user keyring but not a session keyring... does that
+>>>>> explain anything?
+>>>>> # keyctl add trusted mykey 'new 32' @u
+>>>>> 941210782
+>>>>> # keyctl print 941210782
+>>>>> 83b7845cb45216496aead9ee2c6a406f587d64aad47bddc539d8947a247e618798d9306b36398b5dc2722a4c3f220a3a763ee175f6bd64758fdd49ca4db597e8ce328121b60edbba9b8d8d55056be896
+>>>>> # keyctl add trusted mykey 'new 32' @s
+>>>>> 310571960
+>>>>> # keyctl print 310571960
+>>>>> keyctl_read_alloc: Unknown error 126
+>>>>
+>>>> Both sequences work for me.
+>>>>
+>>>> My getty is started by systemd. I think systemd allocates a new session
+>>>> keyring for the getty that's inherited by the shell and the commands I run
+>>>> it in. If you don't do that, each command will get its own session key.
+>>>>
+>>>>> Sorry, I'm still trying to wrap my head around the differences in
+>>>>> keyrings and trusted vs user keys.
+>>>>
+>>>> No problem. HTH.
+>>>
+>>> Ahmad,
+>>>
+>>> Ok that explains it - my testing is using a very basic buildroot
+>>> ramdisk rootfs. If I do a 'keyctl new_session' first I can use the
+>>> system keyring fine as well.
+>>
+>> Great. Does this mean I can get your Tested-by: ? :)
+>>
 > 
-> Yes, I agree with that. KVM needs a check to disallow HugeTLB pages in
-> SEV-SNP guests, at least as a temporary workaround. When HugeTLBfs
-> mappings can be split into smaller pages the check can be removed.
-
-FTR, this is Sean's reply with concerns in v4:
-https://lore.kernel.org/linux-coco/YPCuTiNET%2FhJHqOY@google.com/
-
-I think there are two main arguments there:
-- it's not KVM business to decide
-- guest may do all page state changes with 2mb granularity so it might be fine
-with hugetlb
-
-The latter might become true, but I think it's more probable that sooner
-hugetlbfs will learn to split the mappings to base pages - I know people plan to
-work on that. At that point qemu will have to recognize if the host kernel is
-the new one that can do this splitting vs older one that can't. Preferably
-without relying on kernel version number, as backports exist. Thus, trying to
-register a hugetlbfs range that either is rejected (kernel can't split) or
-passes (kernel can split) seems like a straightforward way. So I'm also in favor
-of adding that, hopefuly temporary, check.
-
-Vlastimil
-
-> Regards,
+> Absolutely,
 > 
-> 	Joerg
+> For the series:
+> 
+> I tested this series on top of v5.14.rc-7 on a Gateworks
+> imx8mm-venice-gw73xx board with kernel param trusted.source=caam and
+> keyutils-1.6:
+> # keyctl new_session
+> 22544757
+> # keyctl add trusted mykey 'new 32' @s
+> 160701809
+> # keyctl print 160701809
+> 990e03aa4515aee420eede17e26a58d0c5568c8bd2c9c2ee2f22a0583181d20d4f65cf9cb1f944a3cc92c0e3184a44a29a7e511f0a55a6af11a70ac2b2924514002475e73ae09820042896b9ee00a5ec
+> 
+> Tested-By: Tim Harvey <tharvey@gateworks.com>
+
+Thanks. I'll apply it to the whole series then.
+
+> One more question: I've got a user that wants to blob/deblob generic
+> data. They can use the caam_encap_blob/caam_decap_blob functions in
+> kernel code but could you give me a suggestion for how they could use
+> this in:
+> a) userspace code (using the keyctl syscall I assume)
+> b) userspace cmdline (via keyutils I assume)
+
+Trusted keys aren't disclosed to userspace in plain text, only in sealed
+form (bar vulnerabilities of course).
+
+Cheers,
+Ahmad
+
+> 
+> Many thanks,
+> 
+> Tim
 > 
 
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
