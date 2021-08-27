@@ -2,82 +2,165 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C3E1C432BE
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Aug 2021 19:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B81DC43214
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Aug 2021 20:45:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A39360E78
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Aug 2021 19:51:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55C3960E93
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Aug 2021 20:45:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230231AbhH0TwK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Aug 2021 15:52:10 -0400
-Received: from smtprelay0151.hostedemail.com ([216.40.44.151]:53076 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229821AbhH0TwJ (ORCPT
+        id S231603AbhH0UqV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 Aug 2021 16:46:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3742 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231570AbhH0UqU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Aug 2021 15:52:09 -0400
-X-Greylist: delayed 1057 seconds by postgrey-1.27 at vger.kernel.org; Fri, 27 Aug 2021 15:52:09 EDT
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave08.hostedemail.com (Postfix) with ESMTP id 450631814F43A
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Aug 2021 19:33:45 +0000 (UTC)
-Received: from omf08.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay04.hostedemail.com (Postfix) with ESMTP id 345D31814EE9B;
-        Fri, 27 Aug 2021 19:33:42 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf08.hostedemail.com (Postfix) with ESMTPA id 1234C1A29FC;
-        Fri, 27 Aug 2021 19:33:40 +0000 (UTC)
-Message-ID: <e25f996113e08e37dbfbc3c8ef985ce9423e710f.camel@perches.com>
-Subject: Re: crypto: hisilicon - Fix sscanf format signedness
-From:   Joe Perches <joe@perches.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        kernel test robot <lkp@intel.com>
-Cc:     Kai Ye <yekai13@huawei.com>, kbuild-all@lists.01.org,
-        linux-kernel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Date:   Fri, 27 Aug 2021 12:33:39 -0700
-In-Reply-To: <20210827084310.GA21801@gondor.apana.org.au>
-References: <202108220901.8r4gf0hB-lkp@intel.com>
-         <20210827084310.GA21801@gondor.apana.org.au>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.0-1 
+        Fri, 27 Aug 2021 16:46:20 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17RKcwUH175141;
+        Fri, 27 Aug 2021 16:45:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=V4Bn5zvUHai0GK9if0diH+c0ro46+dVK+RJfgxCxnD0=;
+ b=AT0KbGubyPbSknLxtnmiJHDDCRStB0x2euyH7EuqjQW9DcITZSX9RAp9Q2CA1foGcpWf
+ AE4Ar3pHD/i46SeWI4eNCCf8DGB00Sffj0y3usaqjOqQ1nzEhAMApue2rFeuYY54aiLI
+ LkV2hZccwthNMJrasQtwRwvcqSjo12Ak9e70/XYgq4MohAWMNlwpehaSQNadFBrHKe6K
+ lamm+h6XgzpsVHNgVAZH4H9xvub8aobDdr5ZsJxAUzz11hDqQRkBWu87WBMt59mNI/cC
+ Io881OjXqb45MSvsD1f+RbPNwAfb/VjPbuMJIMa+gDbWfoDZr+G/atpLk5dCkoAjELpm qQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3aq68k1pcq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 16:45:00 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17RKfEhP180599;
+        Fri, 27 Aug 2021 16:44:59 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3aq68k1pc7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 16:44:59 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17RKgLf6003118;
+        Fri, 27 Aug 2021 20:44:58 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma03wdc.us.ibm.com with ESMTP id 3ajs4ftd3r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 20:44:58 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17RKivb618219340
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Aug 2021 20:44:57 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AEAFC28059;
+        Fri, 27 Aug 2021 20:44:57 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A866C28058;
+        Fri, 27 Aug 2021 20:44:54 +0000 (GMT)
+Received: from li-4b5937cc-25c4-11b2-a85c-cea3a66903e4.ibm.com (unknown [9.211.72.200])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Aug 2021 20:44:54 +0000 (GMT)
+Subject: Re: [PATCH v4 00/12] Enroll kernel keys thru MOK
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Eric Snowberg <eric.snowberg@oracle.com>,
+        David Howells <dhowells@redhat.com>
+Cc:     keyrings@vger.kernel.org,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
+        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
+        scott.branden@broadcom.com, weiyongjun1@huawei.com,
+        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
+        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
+        lszubowi@redhat.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org, pjones@redhat.com,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        Patrick Uiterwijk <patrick@puiterwijk.org>
+References: <20210819002109.534600-1-eric.snowberg@oracle.com>
+ <fcb30226f378ef12cd8bd15938f0af0e1a3977a2.camel@kernel.org>
+ <f76fcf41728fbdd65f2b3464df0821f248b2cba0.camel@linux.ibm.com>
+ <91B1FE51-C6FC-4ADF-B05A-B1E59E20132E@oracle.com>
+ <e7e251000432cf7c475e19c56b0f438b92fec16e.camel@linux.ibm.com>
+ <cedc77fefdf22b2cec086f3e0dd9cc698db9bca2.camel@kernel.org>
+ <bffb33a3-d5b5-f376-9d7d-706d38357d1a@linux.vnet.ibm.com>
+ <9526a4e0be9579a9e52064dd590a78c6496ee025.camel@linux.ibm.com>
+ <9067ff7142d097698b827f3c1630a751898a76bf.camel@kernel.org>
+ <bc37d1da3ef5aae16e69eeda25d6ce6fe6a51a77.camel@HansenPartnership.com>
+From:   Nayna <nayna@linux.vnet.ibm.com>
+Message-ID: <10bc1017-2b45-43f3-ad91-d09310b24c2c@linux.vnet.ibm.com>
+Date:   Fri, 27 Aug 2021 16:44:53 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
+In-Reply-To: <bc37d1da3ef5aae16e69eeda25d6ce6fe6a51a77.camel@HansenPartnership.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Server: rspamout04
-X-Rspamd-Queue-Id: 1234C1A29FC
-X-Stat-Signature: xneszf1qkphk8kssryz9ngoogkc9dhwx
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX18ke7j3yrhfoFJYnJpufT9DxU+0WKPX+hs=
-X-HE-Tag: 1630092820-89614
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: P8y2vFgMMz6mtKu6ZTA1-OA2iJE_cBk2
+X-Proofpoint-GUID: jmXS99QL71NUcQhSu-DO56SNSiN-arUK
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-27_06:2021-08-27,2021-08-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
+ bulkscore=0 impostorscore=0 spamscore=0 mlxscore=0 clxscore=1015
+ suspectscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2107140000 definitions=main-2108270120
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2021-08-27 at 16:43 +0800, Herbert Xu wrote:
-> The function qm_qos_value_init expects an unsigned integer but
-> is incorrectly supplying a signed format to sscanf.  This patch
-> fixes it.
-[]
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-[]
-> @@ -4191,7 +4191,7 @@ static ssize_t qm_qos_value_init(const char *buf, unsigned long *val)
->  			return -EINVAL;
->  	}
->  
-> 
-> -	ret = sscanf(buf, "%ld", val);
-> +	ret = sscanf(buf, "%lu", val);
->  	if (ret != QM_QOS_VAL_NUM)
->  		return -EINVAL;
 
-QM_QOS_VAL_NUM seems an especially silly define
+On 8/25/21 6:27 PM, James Bottomley wrote:
+> On Thu, 2021-08-26 at 01:21 +0300, Jarkko Sakkinen wrote:
+>> On Tue, 2021-08-24 at 10:34 -0400, Mimi Zohar wrote:
+>>>>>> Jarkko, I think the emphasis should not be on "machine" from
+>>>>>> Machine Owner Key (MOK), but on "owner".  Whereas Nayna is
+>>>>>> focusing more on the "_ca" aspect of the name.   Perhaps
+>>>>>> consider naming it "system_owner_ca" or something along those
+>>>>>> lines.
+>>>>> What do you gain such overly long identifier? Makes no sense.
+>>>>> What is "ca aspect of the name" anyway?
+>>>> As I mentioned previously, the main usage of this new keyring is
+>>>> that it should contain only CA keys which can be later used to
+>>>> vouch for user keys loaded onto secondary or IMA keyring at
+>>>> runtime. Having ca in the  name like .xxxx_ca, would make the
+>>>> keyring name self-describing. Since you preferred .system, we can
+>>>> call it .system_ca.
+>>> Sounds good to me.  Jarkko?
+>>>
+>>> thanks,
+>>>
+>>> Mimi
+>> I just wonder what you exactly gain with "_ca"?
+> Remember, a CA cert is a self signed cert with the CA:TRUE basic
+> constraint.  Pretty much no secure boot key satisfies this (secure boot
+> chose deliberately NOT to use CA certificates, so they're all some type
+> of intermediate or leaf), so the design seems to be only to pick out
+> the CA certificates you put in the MOK keyring.  Adding the _ca suffix
+> may deflect some of the "why aren't all my MOK certificates in the
+> keyring" emails ...
 
-A direct use of 1 would be _far_ better IMO.
 
-$ git grep -w -n QM_QOS_VAL_NUM
-drivers/crypto/hisilicon/qm.c:246:#define QM_QOS_VAL_NUM                        1
-drivers/crypto/hisilicon/qm.c:4189:     if (ret != QM_QOS_VAL_NUM)
+My understanding is the .system_ca keyring should not be restricted only 
+to self-signed CAs (Root CA). Any cert that can qualify as Root or 
+Intermediate CA with Basic Constraints CA:TRUE should be allowed. In 
+fact, the intermediate CA certificates closest to the leaf nodes would 
+be best.
 
+Thanks for bringing up that adding the _ca suffix may deflect some of 
+the "why aren't all my MOK certificates in the keyring" emails.
+
+Thanks & Regards,
+
+ Â Â Â  - Nayna
 
