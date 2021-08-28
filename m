@@ -2,165 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B81DC43214
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Aug 2021 20:45:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 671CCC432BE
+	for <linux-crypto@archiver.kernel.org>; Sat, 28 Aug 2021 03:16:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55C3960E93
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Aug 2021 20:45:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3970460F5B
+	for <linux-crypto@archiver.kernel.org>; Sat, 28 Aug 2021 03:16:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231603AbhH0UqV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Aug 2021 16:46:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3742 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231570AbhH0UqU (ORCPT
+        id S233158AbhH1DRk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 Aug 2021 23:17:40 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:18983 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233117AbhH1DRj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Aug 2021 16:46:20 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17RKcwUH175141;
-        Fri, 27 Aug 2021 16:45:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=V4Bn5zvUHai0GK9if0diH+c0ro46+dVK+RJfgxCxnD0=;
- b=AT0KbGubyPbSknLxtnmiJHDDCRStB0x2euyH7EuqjQW9DcITZSX9RAp9Q2CA1foGcpWf
- AE4Ar3pHD/i46SeWI4eNCCf8DGB00Sffj0y3usaqjOqQ1nzEhAMApue2rFeuYY54aiLI
- LkV2hZccwthNMJrasQtwRwvcqSjo12Ak9e70/XYgq4MohAWMNlwpehaSQNadFBrHKe6K
- lamm+h6XgzpsVHNgVAZH4H9xvub8aobDdr5ZsJxAUzz11hDqQRkBWu87WBMt59mNI/cC
- Io881OjXqb45MSvsD1f+RbPNwAfb/VjPbuMJIMa+gDbWfoDZr+G/atpLk5dCkoAjELpm qQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3aq68k1pcq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Aug 2021 16:45:00 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17RKfEhP180599;
-        Fri, 27 Aug 2021 16:44:59 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3aq68k1pc7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Aug 2021 16:44:59 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17RKgLf6003118;
-        Fri, 27 Aug 2021 20:44:58 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma03wdc.us.ibm.com with ESMTP id 3ajs4ftd3r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Aug 2021 20:44:58 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17RKivb618219340
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Aug 2021 20:44:57 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AEAFC28059;
-        Fri, 27 Aug 2021 20:44:57 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A866C28058;
-        Fri, 27 Aug 2021 20:44:54 +0000 (GMT)
-Received: from li-4b5937cc-25c4-11b2-a85c-cea3a66903e4.ibm.com (unknown [9.211.72.200])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Aug 2021 20:44:54 +0000 (GMT)
-Subject: Re: [PATCH v4 00/12] Enroll kernel keys thru MOK
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     keyrings@vger.kernel.org,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        James Morris <jmorris@namei.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
-        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
-        scott.branden@broadcom.com, weiyongjun1@huawei.com,
-        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        lszubowi@redhat.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org, pjones@redhat.com,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        Patrick Uiterwijk <patrick@puiterwijk.org>
-References: <20210819002109.534600-1-eric.snowberg@oracle.com>
- <fcb30226f378ef12cd8bd15938f0af0e1a3977a2.camel@kernel.org>
- <f76fcf41728fbdd65f2b3464df0821f248b2cba0.camel@linux.ibm.com>
- <91B1FE51-C6FC-4ADF-B05A-B1E59E20132E@oracle.com>
- <e7e251000432cf7c475e19c56b0f438b92fec16e.camel@linux.ibm.com>
- <cedc77fefdf22b2cec086f3e0dd9cc698db9bca2.camel@kernel.org>
- <bffb33a3-d5b5-f376-9d7d-706d38357d1a@linux.vnet.ibm.com>
- <9526a4e0be9579a9e52064dd590a78c6496ee025.camel@linux.ibm.com>
- <9067ff7142d097698b827f3c1630a751898a76bf.camel@kernel.org>
- <bc37d1da3ef5aae16e69eeda25d6ce6fe6a51a77.camel@HansenPartnership.com>
-From:   Nayna <nayna@linux.vnet.ibm.com>
-Message-ID: <10bc1017-2b45-43f3-ad91-d09310b24c2c@linux.vnet.ibm.com>
-Date:   Fri, 27 Aug 2021 16:44:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Fri, 27 Aug 2021 23:17:39 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GxM8l49nzzbhfN
+        for <linux-crypto@vger.kernel.org>; Sat, 28 Aug 2021 11:12:55 +0800 (CST)
+Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Sat, 28 Aug 2021 11:16:47 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml500012.china.huawei.com (7.185.36.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Sat, 28 Aug 2021 11:16:47 +0800
+Subject: Re: [PATCH 2/5] crypto: hisilicon/sec - add ahash alg features for
+ Kunpeng920
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        <wangzhou1@hisilicon.com>, <linux-crypto@vger.kernel.org>
+References: <1628847626-24383-1-git-send-email-yekai13@huawei.com>
+ <1628847626-24383-3-git-send-email-yekai13@huawei.com>
+ <20210821072557.GA31491@gondor.apana.org.au>
+ <bac4d0b8-0dd1-ddeb-8d78-0c20a2d5ecdc@huawei.com>
+ <20210827083652.GD21571@gondor.apana.org.au>
+From:   "yekai(A)" <yekai13@huawei.com>
+Message-ID: <337a3bac-86d4-c66e-9d6a-d4aa6685f83d@huawei.com>
+Date:   Sat, 28 Aug 2021 11:16:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <bc37d1da3ef5aae16e69eeda25d6ce6fe6a51a77.camel@HansenPartnership.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: P8y2vFgMMz6mtKu6ZTA1-OA2iJE_cBk2
-X-Proofpoint-GUID: jmXS99QL71NUcQhSu-DO56SNSiN-arUK
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-27_06:2021-08-27,2021-08-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- malwarescore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
- bulkscore=0 impostorscore=0 spamscore=0 mlxscore=0 clxscore=1015
- suspectscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2107140000 definitions=main-2108270120
+In-Reply-To: <20210827083652.GD21571@gondor.apana.org.au>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml500012.china.huawei.com (7.185.36.15)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-On 8/25/21 6:27 PM, James Bottomley wrote:
-> On Thu, 2021-08-26 at 01:21 +0300, Jarkko Sakkinen wrote:
->> On Tue, 2021-08-24 at 10:34 -0400, Mimi Zohar wrote:
->>>>>> Jarkko, I think the emphasis should not be on "machine" from
->>>>>> Machine Owner Key (MOK), but on "owner".  Whereas Nayna is
->>>>>> focusing more on the "_ca" aspect of the name.   Perhaps
->>>>>> consider naming it "system_owner_ca" or something along those
->>>>>> lines.
->>>>> What do you gain such overly long identifier? Makes no sense.
->>>>> What is "ca aspect of the name" anyway?
->>>> As I mentioned previously, the main usage of this new keyring is
->>>> that it should contain only CA keys which can be later used to
->>>> vouch for user keys loaded onto secondary or IMA keyring at
->>>> runtime. Having ca in the  name like .xxxx_ca, would make the
->>>> keyring name self-describing. Since you preferred .system, we can
->>>> call it .system_ca.
->>> Sounds good to me.  Jarkko?
+
+On 2021/8/27 16:36, Herbert Xu wrote:
+> On Sat, Aug 21, 2021 at 05:07:00PM +0800, yekai(A) wrote:
+>>
+>>
+>> On 2021/8/21 15:25, Herbert Xu wrote:
+>>> On Fri, Aug 13, 2021 at 05:40:23PM +0800, Kai Ye wrote:
+>>>>
+>>>> +static int sec_ahash_import(struct ahash_request *req, const void *in)
+>>>> +{
+>>>> +	/*
+>>>> +	 * Import partial state of the transformation. This function loads the
+>>>> +	 * entire state of the ongoing transformation from a provided block of
+>>>> +	 * data so the transformation can continue from this point onward.
+>>>> +	 */
+>>>> +	struct sec_req *sreq = ahash_request_ctx(req);
+>>>> +
+>>>> +	memcpy(sreq, in, sizeof(struct sec_req));
+>>>> +	return 0;
+>>>> +}
 >>>
->>> thanks,
+>>> Please explain how this works given that you've got pointers in
+>>> struct sec_req?
 >>>
->>> Mimi
->> I just wonder what you exactly gain with "_ca"?
-> Remember, a CA cert is a self signed cert with the CA:TRUE basic
-> constraint.  Pretty much no secure boot key satisfies this (secure boot
-> chose deliberately NOT to use CA certificates, so they're all some type
-> of intermediate or leaf), so the design seems to be only to pick out
-> the CA certificates you put in the MOK keyring.  Adding the _ca suffix
-> may deflect some of the "why aren't all my MOK certificates in the
-> keyring" emails ...
+>>> Thanks,
+>>>
+>> We have set the sec_req size by use the "crypto_ahash_set_reqsize" in ahash
+>> tfm init process. The crypto will allocate memory for the sec_req by
+>> "__ctx[]". And we can got the pointers by use ahash_request. like
+>>
+>> void *temp = ahash_request_ctx(req);
+>> struct sec_req *sreq = (struct sec_req)temp;
+>>
+>> The value of halg.statesize is sizeof(struct sec_req), so the user can get
+>> the statesize.
+>
+> The data you get from the import could be random garbage.  Please
+> explain how you avoid dereferencing random pointers in your code
+> through the import path.
+>
+> Thanks,
+>
 
+I refered to other people's plans. Modify the value of halg.statesize
+is sizeof(struct sec_req) + sizeof(u32), So user can allocate an extra 
+sizeof(u32) memory. The driver will write a tag number to the addr in 
+the export process, then the driver will check the pointers by the tag 
+number through the import path.
+I think this plan can avoid random pointers.
 
-My understanding is the .system_ca keyring should not be restricted only 
-to self-signed CAs (Root CA). Any cert that can qualify as Root or 
-Intermediate CA with Basic Constraints CA:TRUE should be allowed. In 
-fact, the intermediate CA certificates closest to the leaf nodes would 
-be best.
-
-Thanks for bringing up that adding the _ca suffix may deflect some of 
-the "why aren't all my MOK certificates in the keyring" emails.
-
-Thanks & Regards,
-
-     - Nayna
-
+Thanks
+Kai
