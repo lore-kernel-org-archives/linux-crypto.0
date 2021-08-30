@@ -2,234 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48AC3C432BE
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Aug 2021 17:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F90AC432BE
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Aug 2021 20:17:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24CAB60ED4
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Aug 2021 17:57:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AD0660F5B
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Aug 2021 20:17:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238244AbhH3R6E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Aug 2021 13:58:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41390 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238200AbhH3R6E (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Aug 2021 13:58:04 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6308AC06175F
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Aug 2021 10:57:10 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id m28so2680366lfj.6
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Aug 2021 10:57:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=endian-se.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=eTE3MdWDa0ijyIr/n6yzy10jcQzO9lkr6PVD0Y4UoUY=;
-        b=uhp0aHQQuxkAg/lbFvL7BhuO82iq14fvJxGbehkYSmUHAZltMXDCpiemhqLKV4JTQL
-         4Y4+wwnVqGMTFClUtzA8kXbD9BviIpR6Pgup4dTqjKLj7ArRoPwbE+SA9sCAJTkCNCLl
-         T5tsOylKz4vcxwHKfYcESxUYJHWO+sGL+Ri3rwzmrrFBSdXdiOUFMmOEi+n1MCzizohw
-         RBnD1mDxmC8NouJQQ8MsdApGnasXep2FFeQJmfSX2nyZ6bAPOnGhVM09N2Hk4ZlwmjVs
-         ddx2RWiDkNBPTdeGKuNsPvJ6WiPi8/qYgioe+GLMWbA+j54CB3ByOIKNECKuhOOyNflW
-         X+uA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eTE3MdWDa0ijyIr/n6yzy10jcQzO9lkr6PVD0Y4UoUY=;
-        b=m+ecuzRcVrdRVVT/dK9NvKFZ5IP1ZzFxVK5Qn/F/obqsaU+fbxtRq7A/1t7H2FjCKk
-         YEkNhtEeqof12tV1u+zTCXp4vEX2d34pEgb3wHUgtdhKU5xf4oP46snpgyNos03/CSGg
-         m979WE58XtKSO+klzuuMEdS3p60caKJ1YYnafCifnII9f5efaY8sbr9C1TTKQicNRY9H
-         ciOXxN8flUB+QeuGmoW2u61R+Y+gFa6JAb8ys/qyYWTyVTgGNDnFYWA2FAeYRg4paiOu
-         9mDbmFOEh4ZbDH0oZQ3W+FVi7V+vec2DZWWn8hssF0qGL3yqdZMtdjFlJLGTIyRSspLO
-         jf2Q==
-X-Gm-Message-State: AOAM533/PdVromKT/TXedYtVcmJLuPCjFVuPLX0f7Qp65Ka2qkyZBmQy
-        HSWtyYfhl6ococttlOmu41Cmvw==
-X-Google-Smtp-Source: ABdhPJz0uZJmum2UPKKohi4c/bbhh7aFZ6f4xzesF2fyfZTtA345efWueCklemI8QebbsyTAuOEF+Q==
-X-Received: by 2002:a05:6512:2308:: with SMTP id o8mr18245900lfu.546.1630346228687;
-        Mon, 30 Aug 2021 10:57:08 -0700 (PDT)
-Received: from gmail.com ([185.213.154.232])
-        by smtp.gmail.com with ESMTPSA id h9sm1583193lfv.190.2021.08.30.10.57.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Aug 2021 10:57:07 -0700 (PDT)
-Date:   Mon, 30 Aug 2021 19:57:01 +0200
-From:   Fredrik Yhlen <fredrik.yhlen@endian.se>
-To:     Fabio Estevam <festevam@gmail.com>
-Cc:     Horia Geanta Neag <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        id S235080AbhH3USO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Aug 2021 16:18:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50422 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234976AbhH3USN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Aug 2021 16:18:13 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 6B61F60F5E;
+        Mon, 30 Aug 2021 20:17:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630354639;
+        bh=/t0TSDkJOOcku74Y9AdSlvaW55ip04SHLwddz1jbRFE=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=oQxQKIFqj/eJrnAm6trleD7qW/LyQxnYEWWeNKpUdDogVCOijYQfWqbNgtOgobVmA
+         jlBwe0TtcyUC1IVYzQvFoKnSYOuVUKYwAE4YUtZSVgYVjH9M/k1KgL8nZ8O6M49wRk
+         kHr7/Zkfpscgfs0nmIwJGsaGRhuW8CN//hz5imN1vBIuuB8J2afUyO0gu849bgZ+OD
+         Ga3WRtdxMRnl3Ps8GnwqTIW0k1NQuRc2ZpkLdgFBnLJ18LSEnfFOicYdn+Oqtzx79w
+         fYCip57p8p7tzlbz7lnN7lk/0DdLQ87zhmCXBcIVU7iw2Z4ncGU2rUCVOpewn1ui5V
+         xAnBiFa1HJ9Rg==
+Subject: Re: [GIT PULL] Crypto Update for 5.15
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20210830082818.GA30921@gondor.apana.org.au>
+References: <20200803044024.GA6429@gondor.apana.org.au>
+ <20201012033249.GA25179@gondor.apana.org.au>
+ <20201214055515.GA14196@gondor.apana.org.au>
+ <20210215024721.GA20593@gondor.apana.org.au>
+ <20210426123200.kgbyk6ayey4l4lrw@gondor.apana.org.au>
+ <20210628110050.GA12162@gondor.apana.org.au> <20210830082818.GA30921@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20210830082818.GA30921@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: 6ae51ffe5e768d9e25a7f4298e2e7a058472bcc3
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 44a7d4441181d0f2d622dc9bb512d7f5ca13f768
+Message-Id: <163035463940.13905.397191007670186358.pr-tracker-bot@kernel.org>
+Date:   Mon, 30 Aug 2021 20:17:19 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Heiko Schocher <hs@denx.de>
-Subject: Re: HRNG in CAAM isn't working properly on IMX6 SoloX
-Message-ID: <YS0b7ewOB5s/omu/@gmail.com>
-References: <YSy/PFrem+a7npBy@gmail.com>
- <CAOMZO5D0m1xCfgFifKz1H+oYQSfxsfuZp4U39rPMACmzv1fvjQ@mail.gmail.com>
- <YS0HFMtAHFuwkKnY@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YS0HFMtAHFuwkKnY@gmail.com>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+The pull request you sent on Mon, 30 Aug 2021 16:28:18 +0800:
 
-Excuse me, I meant Fabio - brain not with me today. :)
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-Anyway, is anyone with more expertise in this area looking into fixing this?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/44a7d4441181d0f2d622dc9bb512d7f5ca13f768
 
-Best regards,
-Fredrik
+Thank you!
 
-On Mon, Aug 30, 2021 at 06:28:04PM +0200, Fredrik Yhlen wrote:
-> Hi Pablo,
-> 
-> It seems to be working with your suggested change and PR enabled:
-> ```
-> root@xxxx:/dev# dd bs=256 count=10 if=/dev/hwrng of=/dev/null
-> 10+0 records in
-> 10+0 records out
-> 2560 bytes (2.6 kB, 2.5 KiB) copied, 14.5987 s, 0.2 kB/s
-> root@xxxx:/dev#
-> ```
-> 
-> Thanks!
-> 
-> Best regards,
-> Fredrik
-> 
-> On Mon, Aug 30, 2021 at 08:49:25AM -0300, Fabio Estevam wrote:
-> > Hi Fredrik,
-> > 
-> > On Mon, Aug 30, 2021 at 8:22 AM Fredrik Yhlen <fredrik.yhlen@endian.se> wrote:
-> > >
-> > > Hi,
-> > >
-> > > We're having problems with hwrng on a board with imx6sx (soloX) running Linux
-> > > 5.10.x. mainline, and I have tracked it down to this commit
-> > > '358ba762d9f1d4ba99ab31ef12bc28014b22f4c9' as being the culprit.
-> > >
-> > > The caam_jr driver spits out lots of messages when attempting to read from /dev/hwrng:
-> > > ```
-> > > [29717.629041] hwrng: no data available
-> > > [29727.859008] caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
-> > > ```
-> > >
-> > > ```
-> > > caam_jr 2101000.jr0: 2000025b: CCB: desc idx 2: RNG: Hardware error.
-> > > caam_jr 2101000.jr0: 20003c5b: CCB: desc idx 60: RNG: Hardware error.
-> > > caam_jr 2101000.jr0: 20003c5b: CCB: desc idx 60: RNG: Hardware error.
-> > > caam_jr 2101000.jr0: 20003c5b: CCB: desc idx 60: RNG: Hardware error.
-> > > caam_jr 2101000.jr0: 20003c5b: CCB: desc idx 60: RNG: Hardware error.
-> > > caam_jr 2101000.jr0: 20003c5b: CCB: desc idx 60: RNG: Hardware error.
-> > > ```
-> > >
-> > > This also happens on Boundary's Nitrogen6_soloX board when running the same
-> > > kernel, and likewise with their latest Yocto release that uses 5.4.100 linux-imx kernel.
-> > >
-> > > ```
-> > > root@nitrogen6sx:~# dd if=/dev/hwrng of=/tmp/random bs=256 count=10
-> > > [  113.940735] caam_jr 2101000.jr0: 20003c5b: CCB: desc idx 60: RNG: Hardware error
-> > > dd: /dev/hwrng: Invalid argument
-> > > root@nitrogen6sx:~# rm /tmp/random
-> > > root@nitrogen6sx:~# dd if=/dev/hwrng of=/tmp/random bs=256 count=10
-> > > [  125.300823] caam_jr 2101000.jr0: 20003c5b: CCB: desc idx 60: RNG: Hardware error
-> > > dd: /dev/hwrng: Invalid argument
-> > > root@nitrogen6sx:~# du -hs /tmp/random
-> > > 0       /tmp/random
-> > > root@nitrogen6sx:~# ls -l /tmp/random
-> > > -rw-r--r--    1 root     root             0 Dec 16 17:27 /tmp/random
-> > > root@nitrogen6sx:~#
-> > > ```
-> > >
-> > > And then no data is available from /dev/hwrng.
-> > >
-> > > The problem occurs when adding OP_ALG_PR_ON(prediction resistance) when setting up
-> > > job descriptor for reading new random data in caamrng.c. There are also
-> > > some confusing parts about this commit that I'm not too sure about.
-> > >
-> > > 1. It's adding a conditional variable named 'pr_support', but I guess this only
-> > > indicates if the MC(Management Complex) supports prediction resistance,
-> > > since the following check can be bypassed when 'pr_support' is false.
-> > >
-> > >     /*
-> > >      * If SEC has RNG version >= 4 and RNG state handle has not been
-> > >      * already instantiated, do RNG instantiation
-> > >      * In case of SoCs with Management Complex, RNG is managed by MC f/w.
-> > >      */
-> > >     if (!(ctrlpriv->mc_en && pr_support) && rng_vid >= 4) {
-> > >
-> > >
-> > > This will eventually lead to the following chain call: caam_probe() -> instantiate_rng() ->
-> > > build_instantiation_desc(), where OP_ALG_PR_ON will be used through DECO.
-> > >
-> > > static void build_instantiation_desc(u32 *desc, int handle, int do_sk)
-> > > {
-> > >     u32 *jump_cmd, op_flags;
-> > >
-> > >     init_job_desc(desc, 0);
-> > >
-> > >     op_flags = OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
-> > >             (handle << OP_ALG_AAI_SHIFT) | OP_ALG_AS_INIT |
-> > >             OP_ALG_PR_ON;
-> > >     ...
-> > >     ...
-> > >     ...
-> > >
-> > > Shouldn't it be named 'mc_pr_support' instead, or something similar?
-> > >
-> > > 2. PR is unconditionally used in caamrng.c(caam_jr module) when
-> > > reading new RNG data. Should this be the case?
-> > >
-> > > Removing OP_ALG_PR_ON in caam_init_desc() from drivers/crypto/caam/caamrng.c
-> > > seems to fix the problem we're experiencing, here's an example:
-> > > ```
-> > > diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-> > > index 77d048dfe5d0..f085a80b1b3c 100644
-> > > --- a/drivers/crypto/caam/caamrng.c
-> > > +++ b/drivers/crypto/caam/caamrng.c
-> > > @@ -67,8 +67,7 @@ static u32 *caam_init_desc(u32 *desc, dma_addr_t dst_dma)
-> > >  {
-> > >         init_job_desc(desc, 0); /* + 1 cmd_sz */
-> > >         /* Generate random bytes: + 1 cmd_sz */
-> > > -       append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG |
-> > > -                        OP_ALG_PR_ON);
-> > > +       append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG);
-> > >         /* Store bytes: + 1 cmd_sz + caam_ptr_sz  */
-> > >         append_fifo_store(desc, dst_dma,
-> > >                           CAAM_RNG_MAX_FIFO_STORE_SIZE, FIFOST_TYPE_RNGSTORE);
-> > > ```
-> > 
-> > We also observe this issue.
-> > 
-> > Heiko on Cc tried increasing the RTSDCTL_ENT_DLY_MIN value
-> > and this seems to help:
-> > 
-> > diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-> > index af61f3a2c0d4..53c9fa04a24c 100644
-> > --- a/drivers/crypto/caam/regs.h
-> > +++ b/drivers/crypto/caam/regs.h
-> > @@ -513,7 +513,7 @@ struct rng4tst {
-> >   };
-> >  #define RTSDCTL_ENT_DLY_SHIFT 16
-> >  #define RTSDCTL_ENT_DLY_MASK (0xffff << RTSDCTL_ENT_DLY_SHIFT)
-> > -#define RTSDCTL_ENT_DLY_MIN 3200
-> > +#define RTSDCTL_ENT_DLY_MIN 4800
-> >  #define RTSDCTL_ENT_DLY_MAX 12800
-> >   u32 rtsdctl; /* seed control register */
-> >   union {
-> > 
-> > Does this help in your case?
-> > 
-> > Thanks,
-> > 
-> > Fabio Estevam
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
