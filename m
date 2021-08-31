@@ -2,100 +2,274 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0AD1C4320E
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Aug 2021 18:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A31C4320A
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Aug 2021 19:04:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4DF261075
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Aug 2021 18:49:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75EC86108B
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Aug 2021 19:04:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230366AbhHaSuf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Aug 2021 14:50:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58306 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230525AbhHaSuf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Aug 2021 14:50:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4BE116108B;
-        Tue, 31 Aug 2021 18:49:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630435779;
-        bh=s0v10fx2wIM2WlCJsoeN2cxqVtakw414FOy2ZKgaK/k=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lOs8rPbwIvgF2gWdK9LiA+xkJyNXt5fI4N9QI2R6VxAUwYogt/zv92YvmSC5fX8Qg
-         424czAmCyFEF/lUi6/1kGH6Qb/I/M7PITzdzQENh3upsPCwm23NjyqAOjfByGgD/Ub
-         EcvFc1LfhnwLgTNKf8e5DuLp0SPcUbOudppZ2Tr9y80MwduxTdts8AhsUChnacYSt3
-         FI8YgYrbQglRsdq13q8RO7CpLhYXgbEljdg7E4aciDrfoDhAIZ4Z/Ps0aJfLOvgJ6X
-         LoV/k10g1NicZW5K7Vk0xl6ieqGOgTYHIBzY3xC04TYNUfAx+nPX2hf1v/ND57UDM6
-         8euhfydgPVahA==
-Date:   Tue, 31 Aug 2021 11:49:37 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        clang-built-linux@googlegroups.com,
-        kernel-janitors@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: sha512: remove imaginary and mystifying clearing
- of variables
-Message-ID: <YS55wSEVAYhmrtWE@sol.localdomain>
-References: <20210822103107.28974-1-lukas.bulwahn@gmail.com>
- <20210827083842.GF21571@gondor.apana.org.au>
- <CACXcFm=sRBr6cORdyntuOum6n4dJpKv+vTZSi98_JrDWWKF1NQ@mail.gmail.com>
+        id S232291AbhHaTFW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 31 Aug 2021 15:05:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45044 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229982AbhHaTFV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 31 Aug 2021 15:05:21 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD807C061575;
+        Tue, 31 Aug 2021 12:04:23 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id n5so644681wro.12;
+        Tue, 31 Aug 2021 12:04:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=B5uVyKLNWhfX33mRagoPROdJlSl7ZtW8OYmRZysKsaw=;
+        b=Lgq9rCDdjZ00K4U+kAn67iLHwtxXEqmx4jyy5gWT5fP0dWAR1ejoRKTw+J6lkHMVQm
+         Ghho8S0nlhYc63iBeU+nx6kJjUzmxW6lYVYJWij0PWuAexg9j8xIvuzie4CfYCrTkhlv
+         yxeP6sDUpvAbizHd5jFcVB9qKffuNIpMMPnflcUIBT7x3rpifTZenjF84wmKi4tWfpjT
+         8AS9Sg+mxihpAnv4r93AWBeV/yYZ0+0cOcwtvF6WvPY5AeDKAqrTUp/RoG+lhKLMrUQs
+         LKWe8J61dlRzA+bK9Ur+AlqKpJ6U41nrBdSKYx8Ur2FAv7vYstMLKDu/w0HybvGxSoZR
+         zmcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=B5uVyKLNWhfX33mRagoPROdJlSl7ZtW8OYmRZysKsaw=;
+        b=XtMmYvphZIflmrUeAU9tlINULILcxgIdKtIHPA/mZshOIanVAD/789V4uDcTlXoyzM
+         CREsCBCRTqE1hhYPuzgsCvPoGGELAy99+oaYRT3KiTizjuQ4eTnEfMCd//XKLa4sbquN
+         4EN4STO1SkTBuUcLixq7rchIk5bxJvzvmfJSMqu8crkIkk6M72s1lp6M5iPh4mAHrmo8
+         4kJ3seIVtpJLpUkpM9uLJTzk/tBUOU3XzTtshC73RDVZUnDnavXx14D7N4ZQADK8K/bT
+         MXB7aJZsNTcg8U1JGCDfiLEghpARZeHGUgKAfvb655zF6OffnaE0cLzys/nmskuaFHAD
+         A10g==
+X-Gm-Message-State: AOAM531aSS9ald7L6wiBYlUgrNFhSSS4ysZgh3Bivm73PFsdsf+NJE3V
+        uq3Ie89AxvOhS+jTuSaovbU=
+X-Google-Smtp-Source: ABdhPJwb7Vt0bBOnzlKywb3CaKHbdGi9I/NIJDCfk2uELycYcKxnVqd0YHTMSqfsJz9039ylUL8Kkw==
+X-Received: by 2002:a5d:560e:: with SMTP id l14mr19927263wrv.205.1630436662162;
+        Tue, 31 Aug 2021 12:04:22 -0700 (PDT)
+Received: from ?IPv6:2a02:8084:e84:2480:228:f8ff:fe6f:83a8? ([2a02:8084:e84:2480:228:f8ff:fe6f:83a8])
+        by smtp.gmail.com with ESMTPSA id b13sm18408739wrf.86.2021.08.31.12.04.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Aug 2021 12:04:21 -0700 (PDT)
+Subject: Re: [RFCv3 01/15] tcp: authopt: Initial support and key management
+To:     Leonard Crestez <cdleonard@gmail.com>,
+        David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc:     Eric Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Priyaranjan Jha <priyarjha@google.com>,
+        Menglong Dong <dong.menglong@zte.com.cn>,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1629840814.git.cdleonard@gmail.com>
+ <090898ac6f3345ec02999858c65c2ebb8cd274a8.1629840814.git.cdleonard@gmail.com>
+From:   Dmitry Safonov <0x7f454c46@gmail.com>
+Message-ID: <b93d21fa-13aa-20d9-0747-c443ccf2c5d5@gmail.com>
+Date:   Tue, 31 Aug 2021 20:04:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACXcFm=sRBr6cORdyntuOum6n4dJpKv+vTZSi98_JrDWWKF1NQ@mail.gmail.com>
+In-Reply-To: <090898ac6f3345ec02999858c65c2ebb8cd274a8.1629840814.git.cdleonard@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Aug 28, 2021 at 03:46:50PM +0800, Sandy Harris wrote:
-> On Fri, Aug 27, 2021 at 4:40 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > On Sun, Aug 22, 2021 at 12:31:07PM +0200, Lukas Bulwahn wrote:
-> > > The function sha512_transform() assigns all local variables to 0 before
-> > > returning to its caller with the intent to erase sensitive data.
-> > > ....
-> > >
-> > >   The assignments to clear a through h and t1/t2 are optimized out by the
-> > >   compiler because they are unused after the assignments.
-> 
-> Just no.
-> 
-> You are right, there is a problem here. I thank you for pointing it
-> out & I've already fixed it in some of my own code.
-> 
-> However, I think your solution is dead wrong. You are correct that
-> these assignments are useless because the compiler will optimise them
-> out, and that's a problem. However, it is not at all "mistiifying";
-> they are there for an obvious reason, to avoid leaving state that
-> might be useful to an enemy. That is quite a small risk, but then it
-> is a small mitigation, so worth doing.
-> 
-> The correct solution is not to just remove the assignments, but rather
-> to replace them with code that will not be optimised away, force the
-> compiler to do what we need. We already do that for operations that
-> clear various arrays and structures, using memzero_explicit() rather
-> than memset(). Similarly, we should replace the assignments with calls
-> to this macro:
-> 
-> /*
->     clear a variable
->     in a way the compiler will not optimise out
-> */
-> #define clear(x)  memzero_explicit( &x, sizeof(x) )
+Hi Leonard,
 
-Clearing of local variables is never guaranteed to work properly, as the
-compiler can create multiple copies and/or put them in registers.  It's much
-more likely to work for arrays than simple variables though (and not cause the
-variable to be unnecessarily spilled from registers to the stack), so that is
-the only one the kernel really bothers with.
+On 8/24/21 10:34 PM, Leonard Crestez wrote:
+[..]
+> --- /dev/null
+> +++ b/include/net/tcp_authopt.h
+> @@ -0,0 +1,65 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +#ifndef _LINUX_TCP_AUTHOPT_H
+> +#define _LINUX_TCP_AUTHOPT_H
+> +
+> +#include <uapi/linux/tcp.h>
+> +
+> +/**
+> + * struct tcp_authopt_key_info - Representation of a Master Key Tuple as per RFC5925
+> + *
+> + * Key structure lifetime is only protected by RCU so readers needs to hold a
+> + * single rcu_read_lock until they're done with the key.
+> + */
+> +struct tcp_authopt_key_info {
+> +	struct hlist_node node;
+> +	struct rcu_head rcu;
+> +	/* Local identifier */
+> +	u32 local_id;
 
-- Eric
+It's unused now, can be removed.
+
+[..]
+> +
+> +/**
+> + * enum tcp_authopt_key_flag - flags for `tcp_authopt.flags`
+> + *
+> + * @TCP_AUTHOPT_KEY_DEL: Delete the key by local_id and ignore all other fields.
+                                              ^
+By send_id and recv_id.
+Also, tcp_authopt_key_match_exact() seems to check
+TCP_AUTHOPT_KEY_ADDR_BIND. I wounder if that makes sense to relax it in
+case of TCP_AUTHOPT_KEY_DEL to match only send_id/recv_id if addr isn't
+specified (no hard feelings about it, though).
+
+[..]
+> +#ifdef CONFIG_TCP_AUTHOPT
+> +	case TCP_AUTHOPT: {
+> +		struct tcp_authopt info;
+> +
+> +		if (get_user(len, optlen))
+> +			return -EFAULT;
+> +
+> +		lock_sock(sk);
+> +		tcp_get_authopt_val(sk, &info);
+> +		release_sock(sk);
+> +
+> +		len = min_t(unsigned int, len, sizeof(info));
+> +		if (put_user(len, optlen))
+> +			return -EFAULT;
+> +		if (copy_to_user(optval, &info, len))
+> +			return -EFAULT;
+> +		return 0;
+
+Failed tcp_get_authopt_val() lookup in:
+:       if (!info)
+:               return -EINVAL;
+
+will leak uninitialized kernel memory from stack.
+ASLR guys defeated.
+
+[..]
+> +#define TCP_AUTHOPT_KNOWN_FLAGS ( \
+> +	TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED)
+> +
+> +int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> +{
+> +	struct tcp_authopt opt;
+> +	struct tcp_authopt_info *info;
+> +
+> +	sock_owned_by_me(sk);
+> +
+> +	/* If userspace optlen is too short fill the rest with zeros */
+> +	if (optlen > sizeof(opt))
+> +		return -EINVAL;
+
+More like
+:	if (unlikely(len > sizeof(opt))) {
+:		err = check_zeroed_user(optval + sizeof(opt),
+:					len - sizeof(opt));
+:		if (err < 1)
+:			return err == 0 ? -EINVAL : err;
+:		len = sizeof(opt);
+:		if (put_user(len, optlen))
+:			return -EFAULT;
+:	}
+
+> +	memset(&opt, 0, sizeof(opt));
+> +	if (copy_from_sockptr(&opt, optval, optlen))
+> +		return -EFAULT;
+> +
+> +	if (opt.flags & ~TCP_AUTHOPT_KNOWN_FLAGS)
+> +		return -EINVAL;
+> +
+> +	info = __tcp_authopt_info_get_or_create(sk);
+> +	if (IS_ERR(info))
+> +		return PTR_ERR(info);
+> +
+> +	info->flags = opt.flags & TCP_AUTHOPT_KNOWN_FLAGS;
+> +
+> +	return 0;
+> +}
+
+[..]
+> +int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> +{
+> +	struct tcp_authopt_key opt;
+> +	struct tcp_authopt_info *info;
+> +	struct tcp_authopt_key_info *key_info;
+> +
+> +	sock_owned_by_me(sk);
+> +
+> +	/* If userspace optlen is too short fill the rest with zeros */
+> +	if (optlen > sizeof(opt))
+> +		return -EINVAL;
+
+Ditto
+
+> +	memset(&opt, 0, sizeof(opt));
+> +	if (copy_from_sockptr(&opt, optval, optlen))
+> +		return -EFAULT;
+> +
+> +	if (opt.flags & ~TCP_AUTHOPT_KEY_KNOWN_FLAGS)
+> +		return -EINVAL;
+> +
+> +	if (opt.keylen > TCP_AUTHOPT_MAXKEYLEN)
+> +		return -EINVAL;
+> +
+> +	/* Delete is a special case: */
+> +	if (opt.flags & TCP_AUTHOPT_KEY_DEL) {
+> +		info = rcu_dereference_check(tcp_sk(sk)->authopt_info, lockdep_sock_is_held(sk));
+> +		if (!info)
+> +			return -ENOENT;
+> +		key_info = tcp_authopt_key_lookup_exact(sk, info, &opt);
+> +		if (!key_info)
+> +			return -ENOENT;
+> +		tcp_authopt_key_del(sk, info, key_info);
+
+Doesn't seem to be safe together with tcp_authopt_select_key().
+A key can be in use at this moment - you have to add checks for it.
+
+> +		return 0;
+> +	}
+> +
+> +	/* check key family */
+> +	if (opt.flags & TCP_AUTHOPT_KEY_ADDR_BIND) {
+> +		if (sk->sk_family != opt.addr.ss_family)
+> +			return -EINVAL;
+> +	}
+> +
+> +	/* Initialize tcp_authopt_info if not already set */
+> +	info = __tcp_authopt_info_get_or_create(sk);
+> +	if (IS_ERR(info))
+> +		return PTR_ERR(info);
+> +
+> +	/* If an old key exists with exact ID then remove and replace.
+> +	 * RCU-protected readers might observe both and pick any.
+> +	 */
+> +	key_info = tcp_authopt_key_lookup_exact(sk, info, &opt);
+> +	if (key_info)
+> +		tcp_authopt_key_del(sk, info, key_info);
+> +	key_info = sock_kmalloc(sk, sizeof(*key_info), GFP_KERNEL | __GFP_ZERO);
+> +	if (!key_info)
+> +		return -ENOMEM;
+
+So, you may end up without any key.
+Also, replacing a key is not at all safe: you may receive old segments
+which you in turn will discard and reset the connection.
+
+I think the limitation RFC puts on removing keys in use and replacing
+existing keys are actually reasonable. Probably, it'd be better to
+enforce "key in use => desired key is different (or key_outdated flag)
+=> key not in use => key may be removed" life-cycle of MKT.
+
+Thanks,
+            Dmitry
