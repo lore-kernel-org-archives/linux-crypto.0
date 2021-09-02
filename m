@@ -2,176 +2,178 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F88FC432BE
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Sep 2021 10:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C587C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Sep 2021 23:36:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74FF4610C9
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Sep 2021 10:19:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 201AD60E93
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Sep 2021 23:36:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242593AbhIBKUa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Sep 2021 06:20:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45402 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233716AbhIBKU2 (ORCPT
+        id S1345865AbhIBXhZ (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Sep 2021 19:37:25 -0400
+Received: from mail-io1-f72.google.com ([209.85.166.72]:35340 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345858AbhIBXhY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Sep 2021 06:20:28 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 182AGMps189559;
-        Thu, 2 Sep 2021 06:18:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=qJKX3OAaHlW+MwDMgKwO9dzOxTJmQcQS8OEW09vAzkM=;
- b=PzeYjjT5UE7SOybxQLPHr4kSgVYAZOax1uzgwtLaK5AqUbQkLG/fFmnAbfJjOXhf75N3
- ofFyy+Q7xqd4Rt+quJFO/xWpGREMieN9g486/kyN5bMmcZSAPf3qPpRVmb2WiRZRWLPB
- a5/AdTZhoWhzLHwhEkWqj4HW0nYZNtRcwGEOUuWhpis46/f93pahS2NDZri4wdYVYdTr
- vaaUCl//50ZYDE17nQEo6drbmof0H1mAif2VEl5Y/EIe2HngAF3P9HCejTA5nbmdBgQf
- BdD6Bqb9C5zYvllHR2r1a1aahjCJ5bfP7P87Ne/DTqCMAvlrgwnVIv9TcDoyiNVIejdN zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3atvqcg1h1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Sep 2021 06:18:47 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 182AIksm008444;
-        Thu, 2 Sep 2021 06:18:47 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3atvqcg1gc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Sep 2021 06:18:46 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 182ABj4c007335;
-        Thu, 2 Sep 2021 10:18:44 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3atdxsg8be-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Sep 2021 10:18:44 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 182AIfOW38994286
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Sep 2021 10:18:41 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6D38EA405B;
-        Thu,  2 Sep 2021 10:18:41 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7B972A4054;
-        Thu,  2 Sep 2021 10:18:35 +0000 (GMT)
-Received: from sig-9-65-193-241.ibm.com (unknown [9.65.193.241])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Sep 2021 10:18:35 +0000 (GMT)
-Message-ID: <da852592bff4d162a6a1a77fc01df55727199885.camel@linux.ibm.com>
-Subject: Re: [PATCH v4 00/12] Enroll kernel keys thru MOK
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>,
-        Nayna <nayna@linux.vnet.ibm.com>
-Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        James Morris <jmorris@namei.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
-        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
-        scott.branden@broadcom.com, weiyongjun1@huawei.com,
-        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        lszubowi@redhat.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org, pjones@redhat.com,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        Patrick Uiterwijk <patrick@puiterwijk.org>
-Date:   Thu, 02 Sep 2021 06:18:34 -0400
-In-Reply-To: <D5553DD8-7CD4-4D78-A9D6-FC22BA16181B@oracle.com>
-References: <20210819002109.534600-1-eric.snowberg@oracle.com>
-         <fcb30226f378ef12cd8bd15938f0af0e1a3977a2.camel@kernel.org>
-         <f76fcf41728fbdd65f2b3464df0821f248b2cba0.camel@linux.ibm.com>
-         <91B1FE51-C6FC-4ADF-B05A-B1E59E20132E@oracle.com>
-         <e7e251000432cf7c475e19c56b0f438b92fec16e.camel@linux.ibm.com>
-         <cedc77fefdf22b2cec086f3e0dd9cc698db9bca2.camel@kernel.org>
-         <bffb33a3-d5b5-f376-9d7d-706d38357d1a@linux.vnet.ibm.com>
-         <9526a4e0be9579a9e52064dd590a78c6496ee025.camel@linux.ibm.com>
-         <9067ff7142d097698b827f3c1630a751898a76bf.camel@kernel.org>
-         <bc37d1da3ef5aae16e69eeda25d6ce6fe6a51a77.camel@HansenPartnership.com>
-         <10bc1017-2b45-43f3-ad91-d09310b24c2c@linux.vnet.ibm.com>
-         <D07DE64F-FE8B-4020-8EC2-94C3C0F9920A@oracle.com>
-         <89a37802-1423-6b1c-c0ef-6f84e544ac33@linux.vnet.ibm.com>
-         <D5553DD8-7CD4-4D78-A9D6-FC22BA16181B@oracle.com>
+        Thu, 2 Sep 2021 19:37:24 -0400
+Received: by mail-io1-f72.google.com with SMTP id g14-20020a6be60e000000b005b62a0c2a41so2573512ioh.2
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Sep 2021 16:36:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=JOY88l9jkqjrk7r59YqYH4McD3EoA2sjEyU/prp079A=;
+        b=plbqlJLA6j1eoYg2Yoz2+TI/T+mAWa+2kxWyPTmNA/2h3qwiUBc1vZNozh6bRfMhO7
+         DkNW5TpCfDJclXIvSM05pIB4TAmDEf721pniO0jANCjym6K/K0gbxG/Fb8UM0iaomsD/
+         8BBBAdNFiyIx/4GyJSRVV5Qo/8zchxlerknPAOADEmcr2y4PW5xwzXCrO0koOZsMZJEo
+         ctq3XInIY29k6ZE/+pkQmiDWMiilfGnfqnENXk66MJxubOBYyfd0e7s0iK2pAa2XRNcu
+         ZF6QoekiJfSQ+rLjM2AL+ygYrYStd0L5tLkhvPu7vW9u870onirvGIM4DjL2fZgA09tM
+         i9vQ==
+X-Gm-Message-State: AOAM53385xtRvIwMmAy19RO7Jfnq5AP1f+lr2hEPOjeJItS7ovrnU++r
+        5euKpBboWWHpWMISjimHVYVuNBQCxBt73/y7+AYQ91dj8T8u
+X-Google-Smtp-Source: ABdhPJynw0dSR8fm0oeFoXtZmtA9ZBTi0GTjBndFUXc+ukahli/YNsSKuGn5yfApT44UlGuvcOHZZZuxAMk7tn/FQuVt7xI/U0/P
+MIME-Version: 1.0
+X-Received: by 2002:a5d:8715:: with SMTP id u21mr700462iom.1.1630625785511;
+ Thu, 02 Sep 2021 16:36:25 -0700 (PDT)
+Date:   Thu, 02 Sep 2021 16:36:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b503bc05cb0ba623@google.com>
+Subject: [syzbot] KASAN: use-after-free Read in __crypto_xor
+From:   syzbot <syzbot+b187b77c8474f9648fae@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, daniel.m.jordan@oracle.com,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        josh@joshtriplett.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cQVsDurILdUYFQFQw8xB44aL22GCET1q
-X-Proofpoint-ORIG-GUID: zJvOY9nZGAuZDU2Qq7Ca6IuyxegSX9Hs
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-09-02_03:2021-09-01,2021-09-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- spamscore=0 adultscore=0 clxscore=1015 malwarescore=0 priorityscore=1501
- phishscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2108310000
- definitions=main-2109020063
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2021-08-31 at 19:51 -0600, Eric Snowberg wrote:
-> > On Aug 31, 2021, at 6:52 PM, Nayna <nayna@linux.vnet.ibm.com> wrote:
-> > On 8/30/21 1:39 PM, Eric Snowberg wrote:
-> >>> On Aug 27, 2021, at 2:44 PM, Nayna <nayna@linux.vnet.ibm.com> wrote:
-> >>> On 8/25/21 6:27 PM, James Bottomley wrote:
-> >>>> Remember, a CA cert is a self signed cert with the CA:TRUE basic
-> >>>> constraint.  Pretty much no secure boot key satisfies this (secure boot
-> >>>> chose deliberately NOT to use CA certificates, so they're all some type
-> >>>> of intermediate or leaf), so the design seems to be only to pick out
-> >>>> the CA certificates you put in the MOK keyring.  Adding the _ca suffix
-> >>>> may deflect some of the "why aren't all my MOK certificates in the
-> >>>> keyring" emails ...
-> >>> 
-> >>> My understanding is the .system_ca keyring should not be restricted only
-> >>> to self-signed CAs (Root CA). Any cert that can qualify as Root or
-> >>> Intermediate CA with Basic Constraints CA:TRUE should be allowed. In
-> >>> fact, the intermediate CA certificates closest to the leaf nodes would be
-> >>> best.
-> >> With an intermediate containing CA:TRUE, the intermediate cert would not
-> >> be self signed. Just for my clarification, does this mean I should remove
-> >> the check that validates if it is self signed and instead somehow check if
-> >> the CA flag is set?  Wouldn’t this potentially allow improperly signed certs
-> >> into this new keyring?
-> >> 
-> > In this model, we are relying on the admin to ensure the authenticity of the certificate(s) being loaded onto the new keyring. It is similar to trusting the admin to enable the variable and add keys to MOK. Following are the checks that must pass before adding it to .system_ca keyring.
-> > 
-> > 1. Check against revocation_list.
-> > 2. Check Basic Constraints: CA=TRUE.
-> > 3. Check keyUsage = keyCertSign.
-> 
-> Originally I thought the request to only load CA certs into this new keyring 
-> was so root of trust could be validated for the entire chain.  If a portion
-> of the model now relies on the admin to ensure authenticity, and the complete
-> chain is not needed, why not have the admin also check for #2 and #3? Meaning,
-> when the Kconfig option is enabled and the new MokListTrustedRT UEFI is set, 
-> whatever the admin has placed in the MOKList goes into this new keyring.
+Hello,
 
-The root of trust for the new "machine" keyring, at least in the UEFI
-use case, is registering keys in the MOK db, which requires physical
-presence.  So we're trusting the MOK db, which means we're really
-trusting both the admin and UEFI to do the right things.  There is no
-harm in verifying the CA assumption when loading the certs onto the
-"machine" keyring.
+syzbot found the following issue on:
 
-From an IMA perspective, all that is needed to sign an IMA custom
-policy and local code is the ability to load a single self-signed CA
-certificate.  So the self-signed CA restriction is fine.  Obviously
-other use cases are being discussed here.  If the other use cases want
-to relax the self-signed CA restriction to allow intermediary CA's, it
-should be explicitly called out in a separate patch, with its own patch
-description, providing the motivation.
+HEAD commit:    3e12361b6d23 bcm63xx_enet: delete a redundant assignment
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=160cec72300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=63a23a80f42a8989
+dashboard link: https://syzkaller.appspot.com/bug?extid=b187b77c8474f9648fae
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=144d07b6300000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=171b7fca300000
 
-thanks,
+The issue was bisected to:
 
-Mimi
+commit 4611ce22468895acd61fee9ac1da810d60617d9a
+Author: Daniel Jordan <daniel.m.jordan@oracle.com>
+Date:   Wed Jun 3 22:59:39 2020 +0000
 
+    padata: allocate work structures for parallel jobs from a pool
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=118dccae300000
+console output: https://syzkaller.appspot.com/x/log.txt?x=158dccae300000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b187b77c8474f9648fae@syzkaller.appspotmail.com
+Fixes: 4611ce224688 ("padata: allocate work structures for parallel jobs from a pool")
+
+==================================================================
+BUG: KASAN: use-after-free in __crypto_xor+0x376/0x410 crypto/algapi.c:1001
+Read of size 8 at addr ffff88803691a000 by task kworker/u4:1/10
+
+CPU: 1 PID: 10 Comm: kworker/u4:1 Not tainted 5.14.0-rc2-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: pencrypt_parallel padata_parallel_worker
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:105
+ print_address_description.constprop.0.cold+0x6c/0x309 mm/kasan/report.c:233
+ __kasan_report mm/kasan/report.c:419 [inline]
+ kasan_report.cold+0x83/0xdf mm/kasan/report.c:436
+ __crypto_xor+0x376/0x410 crypto/algapi.c:1001
+ crypto_xor include/crypto/algapi.h:160 [inline]
+ crypto_ctr_crypt_segment crypto/ctr.c:60 [inline]
+ crypto_ctr_crypt+0x256/0x550 crypto/ctr.c:114
+ crypto_skcipher_encrypt+0xaa/0xf0 crypto/skcipher.c:630
+ crypto_gcm_encrypt+0x38f/0x4b0 crypto/gcm.c:461
+ crypto_aead_encrypt+0xaa/0xf0 crypto/aead.c:94
+ pcrypt_aead_enc+0x13/0x70 crypto/pcrypt.c:82
+ padata_parallel_worker+0x60/0xb0 kernel/padata.c:157
+ process_one_work+0x98d/0x1630 kernel/workqueue.c:2276
+ worker_thread+0x658/0x11f0 kernel/workqueue.c:2422
+ kthread+0x3e5/0x4d0 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+
+The buggy address belongs to the page:
+page:ffffea0000da4680 refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x3691a
+flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
+raw: 00fff00000000000 ffffea0000dafd48 ffffea0000dad888 0000000000000000
+raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as freed
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x400dc0(GFP_KERNEL_ACCOUNT|__GFP_ZERO), pid 8358, ts 60335781621, free_ts 60341472040
+ prep_new_page mm/page_alloc.c:2433 [inline]
+ get_page_from_freelist+0xa72/0x2f80 mm/page_alloc.c:4166
+ __alloc_pages+0x1b2/0x500 mm/page_alloc.c:5388
+ alloc_pages+0x18c/0x2a0 mm/mempolicy.c:2244
+ __pte_alloc_one include/asm-generic/pgalloc.h:63 [inline]
+ pte_alloc_one+0x16/0x230 arch/x86/mm/pgtable.c:33
+ do_fault_around mm/memory.c:4136 [inline]
+ do_read_fault mm/memory.c:4157 [inline]
+ do_fault mm/memory.c:4291 [inline]
+ handle_pte_fault mm/memory.c:4549 [inline]
+ __handle_mm_fault+0x49de/0x5320 mm/memory.c:4684
+ handle_mm_fault+0x1c8/0x790 mm/memory.c:4782
+ do_user_addr_fault+0x48b/0x11c0 arch/x86/mm/fault.c:1390
+ handle_page_fault arch/x86/mm/fault.c:1475 [inline]
+ exc_page_fault+0x9e/0x180 arch/x86/mm/fault.c:1531
+ asm_exc_page_fault+0x1e/0x30 arch/x86/include/asm/idtentry.h:568
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1343 [inline]
+ free_pcp_prepare+0x2c5/0x780 mm/page_alloc.c:1394
+ free_unref_page_prepare mm/page_alloc.c:3329 [inline]
+ free_unref_page_list+0x1a1/0x1050 mm/page_alloc.c:3445
+ release_pages+0x824/0x20b0 mm/swap.c:972
+ tlb_batch_pages_flush mm/mmu_gather.c:49 [inline]
+ tlb_flush_mmu_free mm/mmu_gather.c:242 [inline]
+ tlb_flush_mmu mm/mmu_gather.c:249 [inline]
+ tlb_finish_mmu+0x165/0x8c0 mm/mmu_gather.c:340
+ exit_mmap+0x1ea/0x620 mm/mmap.c:3203
+ __mmput+0x122/0x470 kernel/fork.c:1101
+ mmput+0x58/0x60 kernel/fork.c:1122
+ exit_mm kernel/exit.c:501 [inline]
+ do_exit+0xae2/0x2a60 kernel/exit.c:812
+ do_group_exit+0x125/0x310 kernel/exit.c:922
+ __do_sys_exit_group kernel/exit.c:933 [inline]
+ __se_sys_exit_group kernel/exit.c:931 [inline]
+ __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:931
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Memory state around the buggy address:
+ ffff888036919f00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff888036919f80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffff88803691a000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                   ^
+ ffff88803691a080: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff88803691a100: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
