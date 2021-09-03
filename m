@@ -2,56 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5AE3C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Sep 2021 04:39:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 550C6C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Sep 2021 06:15:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8859861058
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Sep 2021 04:39:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33A956102A
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Sep 2021 06:15:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232089AbhICEkv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Sep 2021 00:40:51 -0400
-Received: from mail-0201.mail-europe.com ([51.77.79.158]:37199 "EHLO
-        mail-0201.mail-europe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229561AbhICEkv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Sep 2021 00:40:51 -0400
-Date:   Fri, 03 Sep 2021 04:39:44 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail; t=1630643988;
-        bh=truw8BJZrdELtT65gz6fieFBGdARQ7KGnKSO9u0dCtk=;
-        h=Date:To:From:Cc:Reply-To:Subject:From;
-        b=FVO1pxpUfZn0XqXggBQp4TokXkhMemIvcI9j1goMitgIoZrsY+KgqnIBW+2beYKcZ
-         Zg5iJ7QkDwXryf665O0LobrJZesYIG3SIGPPFM5TT3l3zcXr2XsT37V2RB1+1MHZ+o
-         jW0NMj2/akAVyiXR1pO94SShSNiXQq7Bb78cUn08=
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-From:   Jari Ruusu <jariruusu@protonmail.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Reply-To: Jari Ruusu <jariruusu@protonmail.com>
-Subject: Announce loop-AES-v3.7v file/swap crypto package
-Message-ID: <PQplWSwNm79Lk3NFH1VY9N9KAzVUf5MPJ9JyTZ5FE-oqsUB7ZKQzBi4feLDgmWSZMLz8iEbt8JgdBaPfe8eyZ-mOy07SnR6Z1lYBo-llPKI=@protonmail.com>
+        id S243653AbhICGQ1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 3 Sep 2021 02:16:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57924 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229634AbhICGQ0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 Sep 2021 02:16:26 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E117F6102A;
+        Fri,  3 Sep 2021 06:15:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1630649727;
+        bh=aPXE9le7LhtzTxSD68JNBjcrtI6anL9T4lJuDtzffFU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QOMdDzatejgXZ1y1bY+YSAR2LNfwqV1506HLbBhYV3xTTxVaXcmzpVmLnwqa3sfn8
+         EXelluFfjx34DYIjHk3tJlk7kKPxHbxRsbUDbgJXgaFPIhZMvzllbJRv9Sn8P7bg0k
+         z+kUXlH242VZt0S1e0gAbLYiQm91MHp/icK14H8k=
+Date:   Fri, 3 Sep 2021 08:15:24 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Sandy Harris <sandyinchina@gmail.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-hardening@vger.kernel.org
+Subject: Re: memset() in crypto code
+Message-ID: <YTG9fAQTha7ZP/kh@kroah.com>
+References: <CACXcFmnOeHwuu4N=WiGrMB+NNgGer9oCLoG0JAORN03gv1y+HQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACXcFmnOeHwuu4N=WiGrMB+NNgGer9oCLoG0JAORN03gv1y+HQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-loop-AES changes since previous release:
-- Worked around kernel interface changes on 5.14 kernels
+On Fri, Sep 03, 2021 at 09:13:43AM +0800, Sandy Harris wrote:
+> Doing this the crypto directory:
+> grep memset *.c | wc -l
+> I get 137 results.
+> 
+> The compiler may optimise memset() away, subverting the intent of
+> these operations. We have memzero_explicit() to avoid that problem.
+> 
+> Should most or all those memset() calls be replaced?
 
-bzip2 compressed tarball is here:
+The ones that are determined to actually need this, sure, but a simple
+grep like that does not actually show that.  You need to read the code
+itself to determine the need or not, please do so.
 
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7v.tar.bz2
-    md5sum 7fcc61e4b37f62aff5f3bd53d87b6fbd
+good luck!
 
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7v.tar.bz2.sign
-
---
-Jari Ruusu=C2=A0 4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD=C2=A0 ACDF F073 3C=
-80 8132 F189
-
+greg k-h
