@@ -2,318 +2,216 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 339AAC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Sep 2021 14:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 552DAC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Sep 2021 19:38:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0EEC260295
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Sep 2021 14:26:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 37E2760F42
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Sep 2021 19:38:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349252AbhICO1w (ORCPT
+        id S1348939AbhICTjt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Sep 2021 10:27:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37744 "EHLO
+        Fri, 3 Sep 2021 15:39:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235544AbhICO1v (ORCPT
+        with ESMTP id S1349865AbhICTjr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Sep 2021 10:27:51 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA223C061575;
-        Fri,  3 Sep 2021 07:26:51 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id mf2so12432879ejb.9;
-        Fri, 03 Sep 2021 07:26:51 -0700 (PDT)
+        Fri, 3 Sep 2021 15:39:47 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977A6C0613C1
+        for <linux-crypto@vger.kernel.org>; Fri,  3 Sep 2021 12:38:47 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id n13-20020a17090a4e0d00b0017946980d8dso231262pjh.5
+        for <linux-crypto@vger.kernel.org>; Fri, 03 Sep 2021 12:38:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:subject:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=7OhriFlxLT8uxFxwaNtPhetPuz6ZequfBC1lDnC85e4=;
-        b=SeqgDFSqq4pneESQjKI67NFfOjxtiltgyc/1XpP5d9KLWuYPqjAWXeTMyqqhxFm4FQ
-         r94gaSXYBcctEMBOspnFTVtZr3mVP3doOfs+5n2oFWWjOQVdFnntjdW1u9jrp/5Z/ETn
-         c1ZXlQy0qZHBti4zhxXJOStLl0HtOARenkIauJw9U0Jb6E1U8Y40z4uWJIc4ybXpoxlO
-         f+enprTa6EB1DxTXwy03yDEgR/hwPCBSqU4/AeVPnWvtWx544qAAk5yO57KL7AVbnKN4
-         MeqHvQ4fifS7IEsyiOu8WA3YzXkhpCNLy5ftvkoQxTzaOijwiqpZKTfZvb472kn17425
-         bruw==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qzhaz9XxDSm1ugGQAic1jSV4h3dO1CWRqJG/Wa1eKqo=;
+        b=Q4g8O/XPm2u0b/cy1Hw89zcNMj9oiX+bRd+8mJDYqYQ8LqTxTaTrNWdtwP4bLcnUkU
+         eMWjtXHzk5yzQKvQBZz1g+zzocaHQ9MQmA8qY4buy+vaNmp5diQC16nhwre2uxT+p8vV
+         JaPlc6nRsTMCMhGj/qmDvfSk+tKUB6VvKpq9Gv4jj25FmVwK/Bdzgw/LlzdZO6aAJQv5
+         f1EqIV23Wb6apk3n3WO4d0Tzr00atX0sfTt+1Q6zmCti6z/NPft5/mzAJJpR+1wmv7ml
+         Q385PdhiwJginqPZ/Re4d9EE91NU4GLKOycCnmXK4odaYvOj4A5XwF2/tqj8Hh6UoDX4
+         Ku8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=7OhriFlxLT8uxFxwaNtPhetPuz6ZequfBC1lDnC85e4=;
-        b=GtDR+KKtwY3+uMOz36ggrIutTJ0CO4dQOyeyiCeSUyXf0oykShoheTITaiZ8L8wjNY
-         r4+xYM7zvZk3Is68lds9v8nst09UP0LqA1/zRI8cj6q3dsmhNv2xkZ3r8VG0KSySxLhp
-         5AUNLrIlY/xux1mxWJAuuC8p+CYwC/utCPAKWE4VLcXA2et0rKzmo3iEMymiQ/EEK7KJ
-         0QDcKZxPMjMPxnP+5WpkGOHk3m87qEeBgL4ksM0EVyKFh/hg0ZRsc+xFWsCwshcoXTUr
-         PIzS6qDD7K2g9ZKnrAtEL900w8ZPRwTMPyPsTbG+cqZxDfOlqXe8vcEeCyGn/+gBQsdx
-         9DnQ==
-X-Gm-Message-State: AOAM532hwoVer3xnPRzRgV2sWSCU4LnrS/dVdj+DXEpOWBHlt494/7vl
-        eeZEkoTBpuiRTsL7CwZOo9CRfrdMQAhrjO3z
-X-Google-Smtp-Source: ABdhPJw0gN3ZPx1pPTYSJ81JA1JNhNpphg0x7F9WE+zNb69V1QfTH1pQa8Wlxu695RplN+VZBfrVYg==
-X-Received: by 2002:a17:907:ea1:: with SMTP id ho33mr4459523ejc.271.1630679210375;
-        Fri, 03 Sep 2021 07:26:50 -0700 (PDT)
-Received: from ?IPv6:2a04:241e:502:1d80:283d:84d1:f625:2914? ([2a04:241e:502:1d80:283d:84d1:f625:2914])
-        by smtp.gmail.com with ESMTPSA id p23sm3295444edw.94.2021.09.03.07.26.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Sep 2021 07:26:49 -0700 (PDT)
-From:   Leonard Crestez <cdleonard@gmail.com>
-Subject: Re: [RFCv3 01/15] tcp: authopt: Initial support and key management
-To:     Dmitry Safonov <0x7f454c46@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Priyaranjan Jha <priyarjha@google.com>,
-        Menglong Dong <dong.menglong@zte.com.cn>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>
-References: <cover.1629840814.git.cdleonard@gmail.com>
- <090898ac6f3345ec02999858c65c2ebb8cd274a8.1629840814.git.cdleonard@gmail.com>
- <b93d21fa-13aa-20d9-0747-c443ccf2c5d5@gmail.com>
-Message-ID: <5c7dbf82-b176-dd95-4fd4-dd1ee69d962d@gmail.com>
-Date:   Fri, 3 Sep 2021 17:26:47 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qzhaz9XxDSm1ugGQAic1jSV4h3dO1CWRqJG/Wa1eKqo=;
+        b=j8fEZm1A2XBvYkYZtIdxO64gD0MAxTKahxDQODFmuR/0RNWdXe0uQ5cXbv1ea60auZ
+         xYMzf+q5Yp+aJs8aySQ2lSNVfgyPAqpEPC4nOXgRCi1E1C+Fjbj4GMQwtxzUmmdEAKNX
+         OkcXQbLf3smWuiIysD+qg8dc+g05Szme9iIuqCAUQVcXZoPhzXe1fnyh0mjj+wiYDfMS
+         BH/yDg9UtW71C0UC/gsQp9vvrMnhuv0n7GutVCPg+p/Uuu84mB5pBv8WK6dEG1btl9zk
+         XIWQ1QWJBGlYFTVnxjzRT0U3c7DYmORLxqxWblKxGjkpDSpNb5EwDyR2xlL3x1WAyWCT
+         IuVA==
+X-Gm-Message-State: AOAM532NCcJWnUDEFBecqKWobJ/hvdw+TPiPskfJ4vqs6yurtXegAXkN
+        /XnstGS/gFZgeK/PvpUo49dzzQ==
+X-Google-Smtp-Source: ABdhPJxAbMzCuFmt0f4TsCM6x099HH8zwapkycmIw+PDBp1H5EAVUuuq+cobTGIsNH17Vprk8NCwxQ==
+X-Received: by 2002:a17:90b:4b4f:: with SMTP id mi15mr497532pjb.120.1630697926927;
+        Fri, 03 Sep 2021 12:38:46 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q20sm180458pgu.31.2021.09.03.12.38.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Sep 2021 12:38:46 -0700 (PDT)
+Date:   Fri, 3 Sep 2021 19:38:42 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alper Gun <alpergun@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        David Rienjes <rientjes@google.com>,
+        Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
+        Vipin Sharma <vipinsh@google.com>
+Subject: Re: [PATCH v2 3/4] KVM: SVM: move sev_bind_asid to psp
+Message-ID: <YTJ5wjNShaHlDVAp@google.com>
+References: <20210818053908.1907051-1-mizhang@google.com>
+ <20210818053908.1907051-4-mizhang@google.com>
 MIME-Version: 1.0
-In-Reply-To: <b93d21fa-13aa-20d9-0747-c443ccf2c5d5@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210818053908.1907051-4-mizhang@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 31.08.2021 22:04, Dmitry Safonov wrote:
-> Hi Leonard,
-> On 8/24/21 10:34 PM, Leonard Crestez wrote:
->> +/**
->> + * struct tcp_authopt_key_info - Representation of a Master Key Tuple as per RFC5925
->> + *
->> + * Key structure lifetime is only protected by RCU so readers needs to hold a
->> + * single rcu_read_lock until they're done with the key.
->> + */
->> +struct tcp_authopt_key_info {
->> +	struct hlist_node node;
->> +	struct rcu_head rcu;
->> +	/* Local identifier */
->> +	u32 local_id;
-> 
-> It's unused now, can be removed.
+On Wed, Aug 18, 2021, Mingwei Zhang wrote:
+> @@ -336,11 +322,9 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  		goto e_free_session;
+>  
+>  	/* Bind ASID to this guest */
+> -	ret = sev_bind_asid(kvm, start.handle, error);
+> -	if (ret) {
+> -		sev_guest_decommission(start.handle, NULL);
+> +	ret = sev_guest_bind_asid(sev_get_asid(kvm), start.handle, error);
+> +	if (ret)
+>  		goto e_free_session;
+> -	}
+>  
+>  	/* return handle to userspace */
+>  	params.handle = start.handle;
 
-Yes
+...
 
->> +/**
->> + * enum tcp_authopt_key_flag - flags for `tcp_authopt.flags`
->> + *
->> + * @TCP_AUTHOPT_KEY_DEL: Delete the key by local_id and ignore all other fields.
->                                                ^
-> By send_id and recv_id.
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index e2d49bedc0ef..325e79360d9e 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -903,6 +903,21 @@ int sev_guest_activate(struct sev_data_activate *data, int *error)
+>  }
+>  EXPORT_SYMBOL_GPL(sev_guest_activate);
+>  
+> +int sev_guest_bind_asid(int asid, unsigned int handle, int *error)
+> +{
+> +	struct sev_data_activate activate;
+> +	int ret;
+> +
+> +	/* activate ASID on the given handle */
+> +	activate.handle = handle;
+> +	activate.asid   = asid;
+> +	ret = sev_guest_activate(&activate, error);
+> +	if (ret)
+> +		sev_guest_decommission(handle, NULL);
 
-Yes. The identifying fields are documented on struct tcp_authopt_key so 
-I will abbreviate this.
+Hrm, undoing state like this is a bad API.  It assumes the caller is well-behaved,
+e.g. has already done something that requires decommissioning, and it surprises
+the caller, e.g. the KVM side (above) looks like it's missing error handling.
+Something like this would be cleaner overall:
 
-> Also, tcp_authopt_key_match_exact() seems to check
-> TCP_AUTHOPT_KEY_ADDR_BIND. I wounder if that makes sense to relax it in
-> case of TCP_AUTHOPT_KEY_DEL to match only send_id/recv_id if addr isn't
-> specified (no hard feelings about it, though).
+	/* create memory encryption context */
+	ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_RECEIVE_START, &start,
+				error);
+	if (ret)
+		goto e_free_session;
 
-Same send_id/recv_id can overlap between different remote peers.
+	/* Bind ASID to this guest */
+	ret = sev_guest_activate(sev_get_asid(kvm), start.handle, error);
+	if (ret)
+		goto e_decommision;
 
-> [..]
->> +#ifdef CONFIG_TCP_AUTHOPT
->> +	case TCP_AUTHOPT: {
->> +		struct tcp_authopt info;
->> +
->> +		if (get_user(len, optlen))
->> +			return -EFAULT;
->> +
->> +		lock_sock(sk);
->> +		tcp_get_authopt_val(sk, &info);
->> +		release_sock(sk);
->> +
->> +		len = min_t(unsigned int, len, sizeof(info));
->> +		if (put_user(len, optlen))
->> +			return -EFAULT;
->> +		if (copy_to_user(optval, &info, len))
->> +			return -EFAULT;
->> +		return 0;
-> 
-> Failed tcp_get_authopt_val() lookup in:
-> :       if (!info)
-> :               return -EINVAL;
-> 
-> will leak uninitialized kernel memory from stack.
-> ASLR guys defeated.
+	params.handle = start.handle;
+	if (copy_to_user((void __user *)(uintptr_t)argp->data,
+			 &params, sizeof(struct kvm_sev_receive_start))) {
+		ret = -EFAULT;
+		goto e_deactivate;
+	}
 
-tcp_get_authopt_val clears *info before all checks so this will return 
-zeros to userspace.
+    	sev->handle = start.handle;
+	sev->fd = argp->sev_fd;
 
-I do need to propagate the return value from tcp_get_authopt_val.
+e_deactivate:
+	sev_guest_deactivate(sev_get_asid(kvm), start.handle, error);
+e_decommision:
+	sev_guest_decommission(start.handle, error);
+e_free_session:
+	kfree(session_data);
+e_free_pdh:
+	kfree(pdh_data);
 
->> +#define TCP_AUTHOPT_KNOWN_FLAGS ( \
->> +	TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED)
->> +
->> +int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
->> +{
->> +	struct tcp_authopt opt;
->> +	struct tcp_authopt_info *info;
->> +
->> +	sock_owned_by_me(sk);
->> +
->> +	/* If userspace optlen is too short fill the rest with zeros */
->> +	if (optlen > sizeof(opt))
->> +		return -EINVAL;
-> 
-> More like
-> :	if (unlikely(len > sizeof(opt))) {
-> :		err = check_zeroed_user(optval + sizeof(opt),
-> :					len - sizeof(opt));
-> :		if (err < 1)
-> :			return err == 0 ? -EINVAL : err;
-> :		len = sizeof(opt);
-> :		if (put_user(len, optlen))
-> :			return -EFAULT;
-> :	}
 
-If (optlen > sizeof(opt)) means userspace is attempting to use newer 
-ABI. Current behavior is to return an error which seems very reasonable.
+However, I don't know that that's a good level of abstraction, e.g. the struct
+details are abstracted from KVM but the exact sequencing is not, which is odd
+to say the least.
 
-You seem to be suggesting that we check that the rest of option is 
-zeroes and if it is to continue. That seems potentially dangerous but it 
-could work if we forever ensure that zeroes always mean "no effect".
+Which is a good segue into my overarching complaint about the PSP API and what
+made me suggest this change in the first place.  IMO, the API exposed to KVM (and
+others) is too low level, e.g. KVM is practically making direct calls to the PSP
+via sev_issue_cmd_external_user().  Even the partially-abstracted helpers that
+take a "struct sev_data_*" are too low level, KVM really shouldn't need to know
+the hardware-defined structures for an off-CPU device.
 
-This would make it easier for new apps to run on old kernels: unless 
-they specifically use new features they don't need to do anything.
+My intent with the suggestion was to start driving toward a mostly-abstracted API
+across the board, with an end goal of eliminating sev_issue_cmd_external_user()
+and moving all of the sev_data* structs out of psp-sev.h and into a private
+header.  However, I think we should all explicitly agree on the desired level of
+abstraction before shuffling code around.
 
-Also, setsockopt can't report a new length back and there's no 
-getsockopt for keys.
+My personal preference is obviously to work towards an abstracted API.  And if
+we decide to go that route, I think we should be much more aggressive with respect
+to what is abstracted.   Many of the functions will be rather gross due to the
+sheer number of params, but I think the end result will be a net positive in terms
+of readability and separation of concerns.
 
->> +	memset(&opt, 0, sizeof(opt));
->> +	if (copy_from_sockptr(&opt, optval, optlen))
->> +		return -EFAULT;
->> +
->> +	if (opt.flags & ~TCP_AUTHOPT_KNOWN_FLAGS)
->> +		return -EINVAL;
+E.g. get KVM looking like this
 
-Here if the user requests unrecognized flags an error is reported. My 
-intention is that new fields will be accompanied by new flags.
+static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+{
+	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+	struct kvm_sev_receive_start params;
+	int ret;
 
->> +	info = __tcp_authopt_info_get_or_create(sk);
->> +	if (IS_ERR(info))
->> +		return PTR_ERR(info);
->> +
->> +	info->flags = opt.flags & TCP_AUTHOPT_KNOWN_FLAGS;
->> +
->> +	return 0;
->> +}
-> 
-> [..]
->> +int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
->> +{
->> +	struct tcp_authopt_key opt;
->> +	struct tcp_authopt_info *info;
->> +	struct tcp_authopt_key_info *key_info;
->> +
->> +	sock_owned_by_me(sk);
->> +
->> +	/* If userspace optlen is too short fill the rest with zeros */
->> +	if (optlen > sizeof(opt))
->> +		return -EINVAL;
-> 
-> Ditto
-> 
->> +	memset(&opt, 0, sizeof(opt));
->> +	if (copy_from_sockptr(&opt, optval, optlen))
->> +		return -EFAULT;
->> +
->> +	if (opt.flags & ~TCP_AUTHOPT_KEY_KNOWN_FLAGS)
->> +		return -EINVAL;
->> +
->> +	if (opt.keylen > TCP_AUTHOPT_MAXKEYLEN)
->> +		return -EINVAL;
->> +
->> +	/* Delete is a special case: */
->> +	if (opt.flags & TCP_AUTHOPT_KEY_DEL) {
->> +		info = rcu_dereference_check(tcp_sk(sk)->authopt_info, lockdep_sock_is_held(sk));
->> +		if (!info)
->> +			return -ENOENT;
->> +		key_info = tcp_authopt_key_lookup_exact(sk, info, &opt);
->> +		if (!key_info)
->> +			return -ENOENT;
->> +		tcp_authopt_key_del(sk, info, key_info);
-> 
-> Doesn't seem to be safe together with tcp_authopt_select_key().
-> A key can be in use at this moment - you have to add checks for it.
+	if (!sev_guest(kvm))
+		return -ENOTTY;
 
-tcp_authopt_key_del does kfree_rcu. As far as I understand this means 
-that if select_key can see the key it is guaranteed to live until the 
-next grace period, which shouldn't be until after the packet is signed.
+	/* Get parameter from the userspace */
+	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
+			sizeof(struct kvm_sev_receive_start)))
+		return -EFAULT;
 
-I will attempt to document this restriction on tcp_authopt_select_key: 
-you can't do anything with the key except give it to tcp_authopt_hash 
-before an RCU grace period.
+	ret = sev_guest_receive_start(argp->sev_fd, &arpg->error, sev->asid,
+				      &params.handle, params.policy,
+				      params.pdh_uaddr, params.pdh_len,
+				      params.session_uaddr, params.session_len);
+	if (ret)
+		return ret;
 
-I'm not confident this is correct in all cases. It's inspired by what 
-MD5 does but apparently those key lists are protected by a combination 
-of sk_lock and rcu?
+	/* Copy params back to user even on failure, e.g. for error info. */
+	if (copy_to_user((void __user *)(uintptr_t)argp->data,
+			 &params, sizeof(struct kvm_sev_receive_start)))
+		return -EFAULT;
 
->> +		return 0;
->> +	}
->> +
->> +	/* check key family */
->> +	if (opt.flags & TCP_AUTHOPT_KEY_ADDR_BIND) {
->> +		if (sk->sk_family != opt.addr.ss_family)
->> +			return -EINVAL;
->> +	}
->> +
->> +	/* Initialize tcp_authopt_info if not already set */
->> +	info = __tcp_authopt_info_get_or_create(sk);
->> +	if (IS_ERR(info))
->> +		return PTR_ERR(info);
->> +
->> +	/* If an old key exists with exact ID then remove and replace.
->> +	 * RCU-protected readers might observe both and pick any.
->> +	 */
->> +	key_info = tcp_authopt_key_lookup_exact(sk, info, &opt);
->> +	if (key_info)
->> +		tcp_authopt_key_del(sk, info, key_info);
->> +	key_info = sock_kmalloc(sk, sizeof(*key_info), GFP_KERNEL | __GFP_ZERO);
->> +	if (!key_info)
->> +		return -ENOMEM;
-> 
-> So, you may end up without any key.
-
-Moving the sock_kmalloc higher should fix this, there would be no effect 
-on alloc failure.
-
-> Also, replacing a key is not at all safe: you may receive old segments
-> which you in turn will discard and reset the connection. >
-> I think the limitation RFC puts on removing keys in use and replacing
-> existing keys are actually reasonable. Probably, it'd be better to
-> enforce "key in use => desired key is different (or key_outdated flag)
-> => key not in use => key may be removed" life-cycle of MKT.
-
-Userspace breaking its own connections seems fine, it can already do 
-this in many ways.
-
-If the current key is removed the kernel will just switch to another 
-valid key. If no valid keys exist then I expect it will switch to 
-unsigned packets which is possibly quite dangerous.
-
-Maybe it should be possible to insert a "marker" key which just says 
-"don't do any unsigned traffic with this peer"?
-
---
-Regards,
-Leonard
+    	sev->handle = params.handle;
+	sev->fd = argp->sev_fd;
+	return 0;
+}
