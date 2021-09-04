@@ -2,216 +2,189 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 552DAC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Sep 2021 19:38:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC44C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Sep 2021 01:33:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 37E2760F42
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Sep 2021 19:38:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BAFF60EE6
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Sep 2021 01:33:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348939AbhICTjt (ORCPT
+        id S1350844AbhIDBep (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Sep 2021 15:39:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54096 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349865AbhICTjr (ORCPT
+        Fri, 3 Sep 2021 21:34:45 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:39386 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1350649AbhIDBeo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Sep 2021 15:39:47 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977A6C0613C1
-        for <linux-crypto@vger.kernel.org>; Fri,  3 Sep 2021 12:38:47 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id n13-20020a17090a4e0d00b0017946980d8dso231262pjh.5
-        for <linux-crypto@vger.kernel.org>; Fri, 03 Sep 2021 12:38:47 -0700 (PDT)
+        Fri, 3 Sep 2021 21:34:44 -0400
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1840oGo0016825;
+        Sat, 4 Sep 2021 01:33:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2021-07-09;
+ bh=XCXnn4ANUXRpCzgH3TDmKtYu+O5d4AMd90aebSz5Cck=;
+ b=PKqAq9DqCP9oBlx3UgObUsXVtNqon8yqDuqYJs1TCj0HGP2KjKDchkIdlAHQXCPhSx9f
+ C+zdAGyDeWlvS1HhqjoMOmxO+UaJ2g5u9gxMc6wmg6mUAZA66dOnJXHJoIRjcb+2xsiV
+ QyhPYm/MDj5Y2VffZBAxRt78U65kkPAPFJhLXQS5dvAxyRqNduPvo8wWICFk6losiidd
+ 1lFxo5lCUULmUuBiBLjEnULvF+V//myZqikpg97GS1y/Tszfrjttx7nF5vaExYEyEv+X
+ 1ebD3O/sTQIfIax8EipAWCsrzWZWc6DnMUd86P5Bm/UtrgBbiB3r731uxYyHfXqX5ZGy ow== 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2020-01-29;
+ bh=XCXnn4ANUXRpCzgH3TDmKtYu+O5d4AMd90aebSz5Cck=;
+ b=nFEoqknpyPCKbs5hlO3SbZDOMjPUBayfxzmoRgksa9pvNcbnbONQ/kjCqHqpAAZFl8A3
+ BSshDae7bTfHO0LBs/MftS/gzlD6h5Ojra1b8TUFxvuAqs7ypJMnfas5HaY7rC3UjRNQ
+ 3T+JqQchoJV5p81vtuELr0g4r6gt9vRRe4Yr9HaTbB2NpoV7tdsLQdu1aTZXvS4zzcw/
+ bRJ1LPFm4JpDjDbMiclrWL7Um7PFLMikWDAgfdiV2M3ADhZrT1S5PPop746VTOYmtCmA
+ qVJ0LlE/6YcrqO40jAWGLfWAd+DNVDT3fflZr5q8K2fxBQtC/vFRjXLgTroMiJeVDjOW mQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3aug2ptd7d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 04 Sep 2021 01:33:28 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1841KYEE194419;
+        Sat, 4 Sep 2021 01:33:27 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2176.outbound.protection.outlook.com [104.47.59.176])
+        by userp3030.oracle.com with ESMTP id 3auwwsjwe5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 04 Sep 2021 01:33:26 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d1tRYrx00s5znl9hL4INZtY6ncM9HO85YVy13cWgl+qev6Oq7VeQQdRumByTDCfDD5QVkToTZPWEUHnzMYxfc5LiFN4dcRXa0ByrzgZzyQzBdtUe7IcsCxRZk0tLW53i1mlGio/lOFTedT3h0b/tjrpXTs6iJRdlfLPiYKsovU47CKMPRX8auXzETsAmP200aJsqFOD6mRYozhWlI2Ig8CL648T5cZIk9oEQvhlUGqpB0S1QCbOo4lHPFIIst1jzVzDabtISarl2veIem983KWSn69Fdd28+Asls41UjoJjkNW26j2R/C7+cxwoqW075UCfbvajQeJ5YkhaIfs3R9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=XCXnn4ANUXRpCzgH3TDmKtYu+O5d4AMd90aebSz5Cck=;
+ b=W/VfkFbXSOJFS3ZqDh9UdYP1l8xsEkjuZNd9h3kMk/+IKoHRYFv8B9xhwbKfclBnz5xZHj50IDL1G2T8+4C/XIup01qZWCz9XIhXwsPco9auqFEkR0Z4/UDWRwwgHWiEF5gWenq+4aDmU3RhhSV67KDqdfZMsDVoQOMjY7olIwMVpULXoMoMFfQk9rt27Yey4yoA9vm2W+yoHCq+uBc0VXSc7m9ukpPYA42uMSfJBhp/Kz4Au64ATdRaqD7btXJv+KWWdtSHKz5r60POkN4pog6jT3JjE2ZDlDRHG85vHLCPr6iPHihB6fSPI/047ZYNLGE1ueTyzKPLXtHDGEybzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qzhaz9XxDSm1ugGQAic1jSV4h3dO1CWRqJG/Wa1eKqo=;
-        b=Q4g8O/XPm2u0b/cy1Hw89zcNMj9oiX+bRd+8mJDYqYQ8LqTxTaTrNWdtwP4bLcnUkU
-         eMWjtXHzk5yzQKvQBZz1g+zzocaHQ9MQmA8qY4buy+vaNmp5diQC16nhwre2uxT+p8vV
-         JaPlc6nRsTMCMhGj/qmDvfSk+tKUB6VvKpq9Gv4jj25FmVwK/Bdzgw/LlzdZO6aAJQv5
-         f1EqIV23Wb6apk3n3WO4d0Tzr00atX0sfTt+1Q6zmCti6z/NPft5/mzAJJpR+1wmv7ml
-         Q385PdhiwJginqPZ/Re4d9EE91NU4GLKOycCnmXK4odaYvOj4A5XwF2/tqj8Hh6UoDX4
-         Ku8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qzhaz9XxDSm1ugGQAic1jSV4h3dO1CWRqJG/Wa1eKqo=;
-        b=j8fEZm1A2XBvYkYZtIdxO64gD0MAxTKahxDQODFmuR/0RNWdXe0uQ5cXbv1ea60auZ
-         xYMzf+q5Yp+aJs8aySQ2lSNVfgyPAqpEPC4nOXgRCi1E1C+Fjbj4GMQwtxzUmmdEAKNX
-         OkcXQbLf3smWuiIysD+qg8dc+g05Szme9iIuqCAUQVcXZoPhzXe1fnyh0mjj+wiYDfMS
-         BH/yDg9UtW71C0UC/gsQp9vvrMnhuv0n7GutVCPg+p/Uuu84mB5pBv8WK6dEG1btl9zk
-         XIWQ1QWJBGlYFTVnxjzRT0U3c7DYmORLxqxWblKxGjkpDSpNb5EwDyR2xlL3x1WAyWCT
-         IuVA==
-X-Gm-Message-State: AOAM532NCcJWnUDEFBecqKWobJ/hvdw+TPiPskfJ4vqs6yurtXegAXkN
-        /XnstGS/gFZgeK/PvpUo49dzzQ==
-X-Google-Smtp-Source: ABdhPJxAbMzCuFmt0f4TsCM6x099HH8zwapkycmIw+PDBp1H5EAVUuuq+cobTGIsNH17Vprk8NCwxQ==
-X-Received: by 2002:a17:90b:4b4f:: with SMTP id mi15mr497532pjb.120.1630697926927;
-        Fri, 03 Sep 2021 12:38:46 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q20sm180458pgu.31.2021.09.03.12.38.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 12:38:46 -0700 (PDT)
-Date:   Fri, 3 Sep 2021 19:38:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XCXnn4ANUXRpCzgH3TDmKtYu+O5d4AMd90aebSz5Cck=;
+ b=VCk+U8Ko68NUqM2W7z7pPn37aFNoRsJJQkDjSdHwigC6tsntO5ZhtO3Jf+4wAHDx4aLEvsMSg7//NN2HpOFZusZVhhUsEGytQ4DoHhWJpT7HmbhSOSLuDozhzB1rIBq5QLd+P5CdY62l2qqr45JA+dl96eKa3HBzqLFjv5kHddA=
+Authentication-Results: syzkaller.appspotmail.com; dkim=none (message not
+ signed) header.d=none;syzkaller.appspotmail.com; dmarc=none action=none
+ header.from=oracle.com;
+Received: from BYAPR10MB2966.namprd10.prod.outlook.com (2603:10b6:a03:8c::27)
+ by BY5PR10MB4321.namprd10.prod.outlook.com (2603:10b6:a03:202::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.22; Sat, 4 Sep
+ 2021 01:33:24 +0000
+Received: from BYAPR10MB2966.namprd10.prod.outlook.com
+ ([fe80::a01b:c218:566a:d810]) by BYAPR10MB2966.namprd10.prod.outlook.com
+ ([fe80::a01b:c218:566a:d810%7]) with mapi id 15.20.4478.022; Sat, 4 Sep 2021
+ 01:33:24 +0000
+Date:   Fri, 3 Sep 2021 21:33:20 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     syzbot <syzbot+b187b77c8474f9648fae@syzkaller.appspotmail.com>
+Cc:     akpm@linux-foundation.org, davem@davemloft.net,
+        herbert@gondor.apana.org.au, josh@joshtriplett.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alper Gun <alpergun@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        David Rienjes <rientjes@google.com>,
-        Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
-        Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH v2 3/4] KVM: SVM: move sev_bind_asid to psp
-Message-ID: <YTJ5wjNShaHlDVAp@google.com>
-References: <20210818053908.1907051-1-mizhang@google.com>
- <20210818053908.1907051-4-mizhang@google.com>
-MIME-Version: 1.0
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        torvalds@linux-foundation.org
+Subject: Re: [syzbot] KASAN: use-after-free Read in __crypto_xor
+Message-ID: <20210904013320.7nrsz4ybh75vkjij@oracle.com>
+References: <000000000000b503bc05cb0ba623@google.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210818053908.1907051-4-mizhang@google.com>
+In-Reply-To: <000000000000b503bc05cb0ba623@google.com>
+X-ClientProxiedBy: MN2PR19CA0010.namprd19.prod.outlook.com
+ (2603:10b6:208:178::23) To BYAPR10MB2966.namprd10.prod.outlook.com
+ (2603:10b6:a03:8c::27)
+MIME-Version: 1.0
+Received: from oracle.com (98.229.125.203) by MN2PR19CA0010.namprd19.prod.outlook.com (2603:10b6:208:178::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.17 via Frontend Transport; Sat, 4 Sep 2021 01:33:23 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8d2ebf35-536a-49b5-811d-08d96f43fcbe
+X-MS-TrafficTypeDiagnostic: BY5PR10MB4321:
+X-Microsoft-Antispam-PRVS: <BY5PR10MB4321A17B67A33BEE3ECAD6FCD9D09@BY5PR10MB4321.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bM8bSgzOdJBpruSGg9CqstQKAHjcLbKQbwGa67/rWApQyDFVYVzMcgtqxhEUv3kgkcHlw+HOaeuqA57wnlDYhnKPgfWEOuCKAvu8ziN6vOYcON9tc8idQi98VpNIbIQFzd0k3KLAKm7upTOhBtMc6jV8jAV7B30hEcFnsg58CbxYpqfYJU6EqEQwxCSqe+N3xY+Z6RSNWHesyX8QpTI3Tg4QRYW9JKk4Dn5mLjSh5GS3vd32WVmBPGdQF3C1Hfrw5VvJ/qbnkQgjSpIkuPuxweucnyTi9gB0G9MlOaGGSrjHk029SITq2MxbJsJKM6LXuNg6pyw1aHLxbHyB5XqoiwKQd+xjeR4RDUfCt38cdyGnw8aob+0nOwBREoW2HT5+UzIKLSq/JsK+wn2Hb6cQENdzSdgw60e2xhKRyoAHn6xsZp360c3I/Ugi/mfbCe1G03ZvSsx2T5VQwZWHC6I96DCVk1SgAt88e4iZhp/qkCk1QmHAehB9OhmdSCxNxASG7e9/14uO/bVJ5eiZJP87U6FRUdpl+Izp/Y43xGW9MzR9T6WVFCMWqKrtzeh0bwyMVsCTlPgcLDVDxz2gzs8kCEur6ENfYdbU4G04jW5jwOtNps7JIBVNC444d/qvM86UYHM9UWK/lbWmsOaDz97tGGDMbIp0+Ozv7Z6F74vA0uPab2zgl82o3DKWt8LhcUejX7jLV0u8/07shBwCCqzu2C5+2fylbum/u2e+1EJZ6NS7OPKDaPaky4duowTlZsPwecZRFYlhzTpuyzeuOCYA5II/ixyz6VkM+wqcq0YsezLA73wBTr/UPlNMKSAQxh19iVRVMnslj/hzxATaRcjSiy0FmHbNn5480gtRNEpzIvg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2966.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(38100700002)(966005)(38350700002)(508600001)(66476007)(36756003)(66556008)(8886007)(8936002)(66946007)(86362001)(7416002)(8676002)(83380400001)(316002)(52116002)(956004)(4326008)(2906002)(1076003)(55016002)(5660300002)(186003)(2616005)(7696005)(26005)(99710200001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tY+dsqjEf8YF2VQw/yY4S1I+/3tOb9nGESiqQC1RZk02yqLBS6WM7EBzuJeN?=
+ =?us-ascii?Q?pK5kJBxgV59rScI/IzoowgOkxKRgrrxtMFb7FGAQGvtJk36NhmIvOUNmBJS4?=
+ =?us-ascii?Q?KjDVVvaW/XkcF8khWeW3fePtVwhpHFJXPVlxUUJQ2PFbbBstQROAdgX3MtnM?=
+ =?us-ascii?Q?4xqmth/GRAeyYNQfQXfNKEnwnKET3s++j08eusTb9zR9Zw9AhsSChLnLeHiP?=
+ =?us-ascii?Q?OXcrbAbtvNaPmUkTVHO1NnfeLqyt/4eELAM44bMOl9RqiaHzI0vb4IiWyWZk?=
+ =?us-ascii?Q?F/Y0RCqgUINuUCb5iilT/z+X3fBx4uzvtSXM2M1UdM4Ylznt2Cw0kA3Zs7PD?=
+ =?us-ascii?Q?xgjprCG0pL2Zr79oXCcjCGn23c3mLxwELlmyLtG+rS+fMu570LcGs+zS2gq4?=
+ =?us-ascii?Q?jkGMWoi5RWJxpQeH+dkqBjIZmQFOTKh7ilQqP7ex2IbKW3lS+eN9hZ7I44qC?=
+ =?us-ascii?Q?SpzvjhrwHpWhfMRO2apBZwzPsF7CAhHsQoeEonyG0jluYymShDBV/jelwV4d?=
+ =?us-ascii?Q?NXuJzAqXG0iw+z5JG5jJymv0PTq4dL3DgfqnZAebl1D76XEPruQ4+wuvttW1?=
+ =?us-ascii?Q?qaFgYFE4MWpU0mm8bFFX0dU0fLMzfKtzliX6JRzw8awd6pOtilsLo9krhrNi?=
+ =?us-ascii?Q?ZL0xr244TwcAlRwlox8fi13SYINT05sZNgdm8JHxSXZkSb+17JMZlrI69u+k?=
+ =?us-ascii?Q?+7TFf6urZxClmMGyUeS8WLZZZMddKSF+8o+AZlB+EoeJv2PGAd/Hvmtjl0CL?=
+ =?us-ascii?Q?AwD1orDBJwQG6qPtlnld0i9TZieZPZKqPLzXqqxyyqzQwMkk2zW7iOZC18YN?=
+ =?us-ascii?Q?FUz1c4b4Ex3ReV/ohAMZ6GCks/DQuLzpnwKFLDS1fGTubSw4bmOB+B1Xdgm5?=
+ =?us-ascii?Q?ttbuGxN3jbAR66q+dzmBrXMva507iLn7zNUM/KxiJoSyJy/i1rY18LaAEit4?=
+ =?us-ascii?Q?mh5BJHoXQ/eyWAPAr/nNOFlir2QULoNngBUsBvR4gB1rU6OerjfGiX46MfZ3?=
+ =?us-ascii?Q?gM+6G9bd0g1DB2SOTUJD5Bho8n1orGWtGHz3ULx+6eT6tx8n46oIgknkrntm?=
+ =?us-ascii?Q?yhuNdOp0FKMIIUq0vQHAKWSlQOz+ZF7dNdVgjlv94Ng5DTw1rAR1uk32eV52?=
+ =?us-ascii?Q?bfNaM2arbjWQSpfcxrM4CSA5MEuDzKykQ1LJV+VCGCfO4KM2BDnsazYm2G6b?=
+ =?us-ascii?Q?hhOQ5i+A9s3RDcVf1r/3vY5oTeAqoV6/s/fiLO3vV8LbA+Js/NYFa5PTfAe7?=
+ =?us-ascii?Q?kALZ8/vl7kmy78emJOFN+BiiT7MxGfRxpOEPAknmce44SHIQq20r9W3F/Rth?=
+ =?us-ascii?Q?9ogToIqg9+ATdjNCNvC/qIV2?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d2ebf35-536a-49b5-811d-08d96f43fcbe
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2966.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2021 01:33:24.6429
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wZP8PYjxtyv9UEDHmQZQzm8UEhwDXn2TjbxXM9fskIFhT/cTn5UHbxJ7/CL+7TwZ8D1IspkfdtT7GP/HtES7rw8jPF42XYYiT2+GgsTu5VM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4321
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10096 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 mlxlogscore=999
+ adultscore=0 bulkscore=0 suspectscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2108310000
+ definitions=main-2109040007
+X-Proofpoint-ORIG-GUID: BUkGC17EQk-B_mAvJkNFpYwZ8VlPzIQ7
+X-Proofpoint-GUID: BUkGC17EQk-B_mAvJkNFpYwZ8VlPzIQ7
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 18, 2021, Mingwei Zhang wrote:
-> @@ -336,11 +322,9 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  		goto e_free_session;
->  
->  	/* Bind ASID to this guest */
-> -	ret = sev_bind_asid(kvm, start.handle, error);
-> -	if (ret) {
-> -		sev_guest_decommission(start.handle, NULL);
-> +	ret = sev_guest_bind_asid(sev_get_asid(kvm), start.handle, error);
-> +	if (ret)
->  		goto e_free_session;
-> -	}
->  
->  	/* return handle to userspace */
->  	params.handle = start.handle;
+On Thu, Sep 02, 2021 at 04:36:25PM -0700, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    3e12361b6d23 bcm63xx_enet: delete a redundant assignment
+> git tree:       net-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=160cec72300000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=63a23a80f42a8989
+> dashboard link: https://syzkaller.appspot.com/bug?extid=b187b77c8474f9648fae
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=144d07b6300000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=171b7fca300000
+> 
+> The issue was bisected to:
+> 
+> commit 4611ce22468895acd61fee9ac1da810d60617d9a
+> Author: Daniel Jordan <daniel.m.jordan@oracle.com>
+> Date:   Wed Jun 3 22:59:39 2020 +0000
+> 
+>     padata: allocate work structures for parallel jobs from a pool
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=118dccae300000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=158dccae300000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+b187b77c8474f9648fae@syzkaller.appspotmail.com
+> Fixes: 4611ce224688 ("padata: allocate work structures for parallel jobs from a pool")
+> 
+> ==================================================================
+> BUG: KASAN: use-after-free in __crypto_xor+0x376/0x410 crypto/algapi.c:1001
+> Read of size 8 at addr ffff88803691a000 by task kworker/u4:1/10
 
-...
-
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index e2d49bedc0ef..325e79360d9e 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -903,6 +903,21 @@ int sev_guest_activate(struct sev_data_activate *data, int *error)
->  }
->  EXPORT_SYMBOL_GPL(sev_guest_activate);
->  
-> +int sev_guest_bind_asid(int asid, unsigned int handle, int *error)
-> +{
-> +	struct sev_data_activate activate;
-> +	int ret;
-> +
-> +	/* activate ASID on the given handle */
-> +	activate.handle = handle;
-> +	activate.asid   = asid;
-> +	ret = sev_guest_activate(&activate, error);
-> +	if (ret)
-> +		sev_guest_decommission(handle, NULL);
-
-Hrm, undoing state like this is a bad API.  It assumes the caller is well-behaved,
-e.g. has already done something that requires decommissioning, and it surprises
-the caller, e.g. the KVM side (above) looks like it's missing error handling.
-Something like this would be cleaner overall:
-
-	/* create memory encryption context */
-	ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_RECEIVE_START, &start,
-				error);
-	if (ret)
-		goto e_free_session;
-
-	/* Bind ASID to this guest */
-	ret = sev_guest_activate(sev_get_asid(kvm), start.handle, error);
-	if (ret)
-		goto e_decommision;
-
-	params.handle = start.handle;
-	if (copy_to_user((void __user *)(uintptr_t)argp->data,
-			 &params, sizeof(struct kvm_sev_receive_start))) {
-		ret = -EFAULT;
-		goto e_deactivate;
-	}
-
-    	sev->handle = start.handle;
-	sev->fd = argp->sev_fd;
-
-e_deactivate:
-	sev_guest_deactivate(sev_get_asid(kvm), start.handle, error);
-e_decommision:
-	sev_guest_decommission(start.handle, error);
-e_free_session:
-	kfree(session_data);
-e_free_pdh:
-	kfree(pdh_data);
-
-
-However, I don't know that that's a good level of abstraction, e.g. the struct
-details are abstracted from KVM but the exact sequencing is not, which is odd
-to say the least.
-
-Which is a good segue into my overarching complaint about the PSP API and what
-made me suggest this change in the first place.  IMO, the API exposed to KVM (and
-others) is too low level, e.g. KVM is practically making direct calls to the PSP
-via sev_issue_cmd_external_user().  Even the partially-abstracted helpers that
-take a "struct sev_data_*" are too low level, KVM really shouldn't need to know
-the hardware-defined structures for an off-CPU device.
-
-My intent with the suggestion was to start driving toward a mostly-abstracted API
-across the board, with an end goal of eliminating sev_issue_cmd_external_user()
-and moving all of the sev_data* structs out of psp-sev.h and into a private
-header.  However, I think we should all explicitly agree on the desired level of
-abstraction before shuffling code around.
-
-My personal preference is obviously to work towards an abstracted API.  And if
-we decide to go that route, I think we should be much more aggressive with respect
-to what is abstracted.   Many of the functions will be rather gross due to the
-sheer number of params, but I think the end result will be a net positive in terms
-of readability and separation of concerns.
-
-E.g. get KVM looking like this
-
-static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
-{
-	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-	struct kvm_sev_receive_start params;
-	int ret;
-
-	if (!sev_guest(kvm))
-		return -ENOTTY;
-
-	/* Get parameter from the userspace */
-	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-			sizeof(struct kvm_sev_receive_start)))
-		return -EFAULT;
-
-	ret = sev_guest_receive_start(argp->sev_fd, &arpg->error, sev->asid,
-				      &params.handle, params.policy,
-				      params.pdh_uaddr, params.pdh_len,
-				      params.session_uaddr, params.session_len);
-	if (ret)
-		return ret;
-
-	/* Copy params back to user even on failure, e.g. for error info. */
-	if (copy_to_user((void __user *)(uintptr_t)argp->data,
-			 &params, sizeof(struct kvm_sev_receive_start)))
-		return -EFAULT;
-
-    	sev->handle = params.handle;
-	sev->fd = argp->sev_fd;
-	return 0;
-}
+The reproducer hasn't tripped over this yet, but I'll keep trying.
