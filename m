@@ -2,189 +2,339 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC44C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Sep 2021 01:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 932DCC433F5
+	for <linux-crypto@archiver.kernel.org>; Sun,  5 Sep 2021 06:58:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7BAFF60EE6
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Sep 2021 01:33:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 728DD60FC2
+	for <linux-crypto@archiver.kernel.org>; Sun,  5 Sep 2021 06:58:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350844AbhIDBep (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Sep 2021 21:34:45 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:39386 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1350649AbhIDBeo (ORCPT
+        id S231793AbhIEG73 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Sep 2021 02:59:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23294 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230076AbhIEG72 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Sep 2021 21:34:44 -0400
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1840oGo0016825;
-        Sat, 4 Sep 2021 01:33:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2021-07-09;
- bh=XCXnn4ANUXRpCzgH3TDmKtYu+O5d4AMd90aebSz5Cck=;
- b=PKqAq9DqCP9oBlx3UgObUsXVtNqon8yqDuqYJs1TCj0HGP2KjKDchkIdlAHQXCPhSx9f
- C+zdAGyDeWlvS1HhqjoMOmxO+UaJ2g5u9gxMc6wmg6mUAZA66dOnJXHJoIRjcb+2xsiV
- QyhPYm/MDj5Y2VffZBAxRt78U65kkPAPFJhLXQS5dvAxyRqNduPvo8wWICFk6losiidd
- 1lFxo5lCUULmUuBiBLjEnULvF+V//myZqikpg97GS1y/Tszfrjttx7nF5vaExYEyEv+X
- 1ebD3O/sTQIfIax8EipAWCsrzWZWc6DnMUd86P5Bm/UtrgBbiB3r731uxYyHfXqX5ZGy ow== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2020-01-29;
- bh=XCXnn4ANUXRpCzgH3TDmKtYu+O5d4AMd90aebSz5Cck=;
- b=nFEoqknpyPCKbs5hlO3SbZDOMjPUBayfxzmoRgksa9pvNcbnbONQ/kjCqHqpAAZFl8A3
- BSshDae7bTfHO0LBs/MftS/gzlD6h5Ojra1b8TUFxvuAqs7ypJMnfas5HaY7rC3UjRNQ
- 3T+JqQchoJV5p81vtuELr0g4r6gt9vRRe4Yr9HaTbB2NpoV7tdsLQdu1aTZXvS4zzcw/
- bRJ1LPFm4JpDjDbMiclrWL7Um7PFLMikWDAgfdiV2M3ADhZrT1S5PPop746VTOYmtCmA
- qVJ0LlE/6YcrqO40jAWGLfWAd+DNVDT3fflZr5q8K2fxBQtC/vFRjXLgTroMiJeVDjOW mQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3aug2ptd7d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 04 Sep 2021 01:33:28 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1841KYEE194419;
-        Sat, 4 Sep 2021 01:33:27 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2176.outbound.protection.outlook.com [104.47.59.176])
-        by userp3030.oracle.com with ESMTP id 3auwwsjwe5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 04 Sep 2021 01:33:26 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d1tRYrx00s5znl9hL4INZtY6ncM9HO85YVy13cWgl+qev6Oq7VeQQdRumByTDCfDD5QVkToTZPWEUHnzMYxfc5LiFN4dcRXa0ByrzgZzyQzBdtUe7IcsCxRZk0tLW53i1mlGio/lOFTedT3h0b/tjrpXTs6iJRdlfLPiYKsovU47CKMPRX8auXzETsAmP200aJsqFOD6mRYozhWlI2Ig8CL648T5cZIk9oEQvhlUGqpB0S1QCbOo4lHPFIIst1jzVzDabtISarl2veIem983KWSn69Fdd28+Asls41UjoJjkNW26j2R/C7+cxwoqW075UCfbvajQeJ5YkhaIfs3R9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=XCXnn4ANUXRpCzgH3TDmKtYu+O5d4AMd90aebSz5Cck=;
- b=W/VfkFbXSOJFS3ZqDh9UdYP1l8xsEkjuZNd9h3kMk/+IKoHRYFv8B9xhwbKfclBnz5xZHj50IDL1G2T8+4C/XIup01qZWCz9XIhXwsPco9auqFEkR0Z4/UDWRwwgHWiEF5gWenq+4aDmU3RhhSV67KDqdfZMsDVoQOMjY7olIwMVpULXoMoMFfQk9rt27Yey4yoA9vm2W+yoHCq+uBc0VXSc7m9ukpPYA42uMSfJBhp/Kz4Au64ATdRaqD7btXJv+KWWdtSHKz5r60POkN4pog6jT3JjE2ZDlDRHG85vHLCPr6iPHihB6fSPI/047ZYNLGE1ueTyzKPLXtHDGEybzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XCXnn4ANUXRpCzgH3TDmKtYu+O5d4AMd90aebSz5Cck=;
- b=VCk+U8Ko68NUqM2W7z7pPn37aFNoRsJJQkDjSdHwigC6tsntO5ZhtO3Jf+4wAHDx4aLEvsMSg7//NN2HpOFZusZVhhUsEGytQ4DoHhWJpT7HmbhSOSLuDozhzB1rIBq5QLd+P5CdY62l2qqr45JA+dl96eKa3HBzqLFjv5kHddA=
-Authentication-Results: syzkaller.appspotmail.com; dkim=none (message not
- signed) header.d=none;syzkaller.appspotmail.com; dmarc=none action=none
- header.from=oracle.com;
-Received: from BYAPR10MB2966.namprd10.prod.outlook.com (2603:10b6:a03:8c::27)
- by BY5PR10MB4321.namprd10.prod.outlook.com (2603:10b6:a03:202::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.22; Sat, 4 Sep
- 2021 01:33:24 +0000
-Received: from BYAPR10MB2966.namprd10.prod.outlook.com
- ([fe80::a01b:c218:566a:d810]) by BYAPR10MB2966.namprd10.prod.outlook.com
- ([fe80::a01b:c218:566a:d810%7]) with mapi id 15.20.4478.022; Sat, 4 Sep 2021
- 01:33:24 +0000
-Date:   Fri, 3 Sep 2021 21:33:20 -0400
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     syzbot <syzbot+b187b77c8474f9648fae@syzkaller.appspotmail.com>
-Cc:     akpm@linux-foundation.org, davem@davemloft.net,
-        herbert@gondor.apana.org.au, josh@joshtriplett.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        torvalds@linux-foundation.org
-Subject: Re: [syzbot] KASAN: use-after-free Read in __crypto_xor
-Message-ID: <20210904013320.7nrsz4ybh75vkjij@oracle.com>
-References: <000000000000b503bc05cb0ba623@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000000000000b503bc05cb0ba623@google.com>
-X-ClientProxiedBy: MN2PR19CA0010.namprd19.prod.outlook.com
- (2603:10b6:208:178::23) To BYAPR10MB2966.namprd10.prod.outlook.com
- (2603:10b6:a03:8c::27)
+        Sun, 5 Sep 2021 02:59:28 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1856Xomw124685;
+        Sun, 5 Sep 2021 02:57:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=GlhxVH8FDmNBYcDsNTMeDx5O2fgQyE110SKifBhF/Yg=;
+ b=gw4IVCl9B+lgweDkhSFgmJge7MptLV5arjZXU/l8ZhLrdcZAdHNSB4pK2/vaL4Hc8NFz
+ wJgURnb6mNJRXiZ6OkAGVkBsg7ITAbjF0v78n8TmDDvgFhLPjvC4gfNqBWJVnlVRTblz
+ 9VGEpNTdr4mSVxxSAiPEVO7qlrqh3UcBm7/6TKgpgjsGeyMkUL9yd2ZNNlz4N1qsJKbf
+ ugyVZxoYErwNLZ2XjRcj4//J83W5L0XcD7iQlrSVRFTSsi0x+h5HMi5kaOUc/gsdruEg
+ fXKj93NCCcb1+EI10Cv7YrrXkPCR/jdFCiRehGiL0dJeILd/cHASHcMlw/Zb4EGwAz4U Mw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3avpau29w2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 05 Sep 2021 02:57:07 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1856v6WS189406;
+        Sun, 5 Sep 2021 02:57:06 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3avpau29vs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 05 Sep 2021 02:57:06 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1856r8Xk020039;
+        Sun, 5 Sep 2021 06:57:05 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma04dal.us.ibm.com with ESMTP id 3avbhwrx1m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 05 Sep 2021 06:57:05 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1856v4uf35258830
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 5 Sep 2021 06:57:04 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E6DD7C6057;
+        Sun,  5 Sep 2021 06:57:03 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 65AC4C6055;
+        Sun,  5 Sep 2021 06:56:55 +0000 (GMT)
+Received: from [9.65.84.185] (unknown [9.65.84.185])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Sun,  5 Sep 2021 06:56:55 +0000 (GMT)
+Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        Pavan Kumar Paluri <papaluri@amd.com>,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-24-brijesh.singh@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+Message-ID: <66c9694a-bd1a-0a12-8c1d-326d34daaac2@linux.ibm.com>
+Date:   Sun, 5 Sep 2021 09:56:53 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Received: from oracle.com (98.229.125.203) by MN2PR19CA0010.namprd19.prod.outlook.com (2603:10b6:208:178::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.17 via Frontend Transport; Sat, 4 Sep 2021 01:33:23 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8d2ebf35-536a-49b5-811d-08d96f43fcbe
-X-MS-TrafficTypeDiagnostic: BY5PR10MB4321:
-X-Microsoft-Antispam-PRVS: <BY5PR10MB4321A17B67A33BEE3ECAD6FCD9D09@BY5PR10MB4321.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bM8bSgzOdJBpruSGg9CqstQKAHjcLbKQbwGa67/rWApQyDFVYVzMcgtqxhEUv3kgkcHlw+HOaeuqA57wnlDYhnKPgfWEOuCKAvu8ziN6vOYcON9tc8idQi98VpNIbIQFzd0k3KLAKm7upTOhBtMc6jV8jAV7B30hEcFnsg58CbxYpqfYJU6EqEQwxCSqe+N3xY+Z6RSNWHesyX8QpTI3Tg4QRYW9JKk4Dn5mLjSh5GS3vd32WVmBPGdQF3C1Hfrw5VvJ/qbnkQgjSpIkuPuxweucnyTi9gB0G9MlOaGGSrjHk029SITq2MxbJsJKM6LXuNg6pyw1aHLxbHyB5XqoiwKQd+xjeR4RDUfCt38cdyGnw8aob+0nOwBREoW2HT5+UzIKLSq/JsK+wn2Hb6cQENdzSdgw60e2xhKRyoAHn6xsZp360c3I/Ugi/mfbCe1G03ZvSsx2T5VQwZWHC6I96DCVk1SgAt88e4iZhp/qkCk1QmHAehB9OhmdSCxNxASG7e9/14uO/bVJ5eiZJP87U6FRUdpl+Izp/Y43xGW9MzR9T6WVFCMWqKrtzeh0bwyMVsCTlPgcLDVDxz2gzs8kCEur6ENfYdbU4G04jW5jwOtNps7JIBVNC444d/qvM86UYHM9UWK/lbWmsOaDz97tGGDMbIp0+Ozv7Z6F74vA0uPab2zgl82o3DKWt8LhcUejX7jLV0u8/07shBwCCqzu2C5+2fylbum/u2e+1EJZ6NS7OPKDaPaky4duowTlZsPwecZRFYlhzTpuyzeuOCYA5II/ixyz6VkM+wqcq0YsezLA73wBTr/UPlNMKSAQxh19iVRVMnslj/hzxATaRcjSiy0FmHbNn5480gtRNEpzIvg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2966.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(38100700002)(966005)(38350700002)(508600001)(66476007)(36756003)(66556008)(8886007)(8936002)(66946007)(86362001)(7416002)(8676002)(83380400001)(316002)(52116002)(956004)(4326008)(2906002)(1076003)(55016002)(5660300002)(186003)(2616005)(7696005)(26005)(99710200001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tY+dsqjEf8YF2VQw/yY4S1I+/3tOb9nGESiqQC1RZk02yqLBS6WM7EBzuJeN?=
- =?us-ascii?Q?pK5kJBxgV59rScI/IzoowgOkxKRgrrxtMFb7FGAQGvtJk36NhmIvOUNmBJS4?=
- =?us-ascii?Q?KjDVVvaW/XkcF8khWeW3fePtVwhpHFJXPVlxUUJQ2PFbbBstQROAdgX3MtnM?=
- =?us-ascii?Q?4xqmth/GRAeyYNQfQXfNKEnwnKET3s++j08eusTb9zR9Zw9AhsSChLnLeHiP?=
- =?us-ascii?Q?OXcrbAbtvNaPmUkTVHO1NnfeLqyt/4eELAM44bMOl9RqiaHzI0vb4IiWyWZk?=
- =?us-ascii?Q?F/Y0RCqgUINuUCb5iilT/z+X3fBx4uzvtSXM2M1UdM4Ylznt2Cw0kA3Zs7PD?=
- =?us-ascii?Q?xgjprCG0pL2Zr79oXCcjCGn23c3mLxwELlmyLtG+rS+fMu570LcGs+zS2gq4?=
- =?us-ascii?Q?jkGMWoi5RWJxpQeH+dkqBjIZmQFOTKh7ilQqP7ex2IbKW3lS+eN9hZ7I44qC?=
- =?us-ascii?Q?SpzvjhrwHpWhfMRO2apBZwzPsF7CAhHsQoeEonyG0jluYymShDBV/jelwV4d?=
- =?us-ascii?Q?NXuJzAqXG0iw+z5JG5jJymv0PTq4dL3DgfqnZAebl1D76XEPruQ4+wuvttW1?=
- =?us-ascii?Q?qaFgYFE4MWpU0mm8bFFX0dU0fLMzfKtzliX6JRzw8awd6pOtilsLo9krhrNi?=
- =?us-ascii?Q?ZL0xr244TwcAlRwlox8fi13SYINT05sZNgdm8JHxSXZkSb+17JMZlrI69u+k?=
- =?us-ascii?Q?+7TFf6urZxClmMGyUeS8WLZZZMddKSF+8o+AZlB+EoeJv2PGAd/Hvmtjl0CL?=
- =?us-ascii?Q?AwD1orDBJwQG6qPtlnld0i9TZieZPZKqPLzXqqxyyqzQwMkk2zW7iOZC18YN?=
- =?us-ascii?Q?FUz1c4b4Ex3ReV/ohAMZ6GCks/DQuLzpnwKFLDS1fGTubSw4bmOB+B1Xdgm5?=
- =?us-ascii?Q?ttbuGxN3jbAR66q+dzmBrXMva507iLn7zNUM/KxiJoSyJy/i1rY18LaAEit4?=
- =?us-ascii?Q?mh5BJHoXQ/eyWAPAr/nNOFlir2QULoNngBUsBvR4gB1rU6OerjfGiX46MfZ3?=
- =?us-ascii?Q?gM+6G9bd0g1DB2SOTUJD5Bho8n1orGWtGHz3ULx+6eT6tx8n46oIgknkrntm?=
- =?us-ascii?Q?yhuNdOp0FKMIIUq0vQHAKWSlQOz+ZF7dNdVgjlv94Ng5DTw1rAR1uk32eV52?=
- =?us-ascii?Q?bfNaM2arbjWQSpfcxrM4CSA5MEuDzKykQ1LJV+VCGCfO4KM2BDnsazYm2G6b?=
- =?us-ascii?Q?hhOQ5i+A9s3RDcVf1r/3vY5oTeAqoV6/s/fiLO3vV8LbA+Js/NYFa5PTfAe7?=
- =?us-ascii?Q?kALZ8/vl7kmy78emJOFN+BiiT7MxGfRxpOEPAknmce44SHIQq20r9W3F/Rth?=
- =?us-ascii?Q?9ogToIqg9+ATdjNCNvC/qIV2?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8d2ebf35-536a-49b5-811d-08d96f43fcbe
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2966.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2021 01:33:24.6429
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wZP8PYjxtyv9UEDHmQZQzm8UEhwDXn2TjbxXM9fskIFhT/cTn5UHbxJ7/CL+7TwZ8D1IspkfdtT7GP/HtES7rw8jPF42XYYiT2+GgsTu5VM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4321
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10096 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 mlxlogscore=999
- adultscore=0 bulkscore=0 suspectscore=0 malwarescore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2108310000
- definitions=main-2109040007
-X-Proofpoint-ORIG-GUID: BUkGC17EQk-B_mAvJkNFpYwZ8VlPzIQ7
-X-Proofpoint-GUID: BUkGC17EQk-B_mAvJkNFpYwZ8VlPzIQ7
+In-Reply-To: <20210820155918.7518-24-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Dgm_YsXvcRNfZRPdSnasUtiXEjwJZHpX
+X-Proofpoint-ORIG-GUID: 8gJPvro4FJnD_kIYvGsZKe0ZsP5vDfIw
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-04_09:2021-09-03,2021-09-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 mlxscore=0
+ malwarescore=0 spamscore=0 impostorscore=0 lowpriorityscore=0
+ suspectscore=0 priorityscore=1501 bulkscore=0 adultscore=0 mlxlogscore=999
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2108310000 definitions=main-2109050043
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 02, 2021 at 04:36:25PM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    3e12361b6d23 bcm63xx_enet: delete a redundant assignment
-> git tree:       net-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=160cec72300000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=63a23a80f42a8989
-> dashboard link: https://syzkaller.appspot.com/bug?extid=b187b77c8474f9648fae
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=144d07b6300000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=171b7fca300000
-> 
-> The issue was bisected to:
-> 
-> commit 4611ce22468895acd61fee9ac1da810d60617d9a
-> Author: Daniel Jordan <daniel.m.jordan@oracle.com>
-> Date:   Wed Jun 3 22:59:39 2020 +0000
-> 
->     padata: allocate work structures for parallel jobs from a pool
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=118dccae300000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=158dccae300000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+b187b77c8474f9648fae@syzkaller.appspotmail.com
-> Fixes: 4611ce224688 ("padata: allocate work structures for parallel jobs from a pool")
-> 
-> ==================================================================
-> BUG: KASAN: use-after-free in __crypto_xor+0x376/0x410 crypto/algapi.c:1001
-> Read of size 8 at addr ffff88803691a000 by task kworker/u4:1/10
+Hi Brijesh,
 
-The reproducer hasn't tripped over this yet, but I'll keep trying.
+On 20/08/2021 18:58, Brijesh Singh wrote:
+> The KVM_SNP_INIT command is used by the hypervisor to initialize the
+> SEV-SNP platform context. In a typical workflow, this command should be the
+> first command issued. When creating SEV-SNP guest, the VMM must use this
+> command instead of the KVM_SEV_INIT or KVM_SEV_ES_INIT.
+> 
+> The flags value must be zero, it will be extended in future SNP support to
+> communicate the optional features (such as restricted INT injection etc).
+> 
+> Co-developed-by: Pavan Kumar Paluri <papaluri@amd.com>
+> Signed-off-by: Pavan Kumar Paluri <papaluri@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  .../virt/kvm/amd-memory-encryption.rst        | 27 ++++++++++++
+>  arch/x86/include/asm/svm.h                    |  2 +
+>  arch/x86/kvm/svm/sev.c                        | 44 ++++++++++++++++++-
+>  arch/x86/kvm/svm/svm.h                        |  4 ++
+>  include/uapi/linux/kvm.h                      | 13 ++++++
+>  5 files changed, 88 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+> index 5c081c8c7164..7b1d32fb99a8 100644
+> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+> @@ -427,6 +427,33 @@ issued by the hypervisor to make the guest ready for execution.
+>  
+>  Returns: 0 on success, -negative on error
+>  
+> +18. KVM_SNP_INIT
+> +----------------
+> +
+> +The KVM_SNP_INIT command can be used by the hypervisor to initialize SEV-SNP
+> +context. In a typical workflow, this command should be the first command issued.
+> +
+> +Parameters (in/out): struct kvm_snp_init
+> +
+> +Returns: 0 on success, -negative on error
+> +
+> +::
+> +
+> +        struct kvm_snp_init {
+> +                __u64 flags;
+> +        };
+> +
+> +The flags bitmap is defined as::
+> +
+> +   /* enable the restricted injection */
+> +   #define KVM_SEV_SNP_RESTRICTED_INJET   (1<<0)
+> +
+> +   /* enable the restricted injection timer */
+> +   #define KVM_SEV_SNP_RESTRICTED_TIMER_INJET   (1<<1)
+
+Typo in these flags: s/INJET/INJECT/
+
+Also in the actual .h file below.
+
+
+-Dov
+
+
+> +
+> +If the specified flags is not supported then return -EOPNOTSUPP, and the supported
+> +flags are returned.
+> +
+>  References
+>  ==========
+>  
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index 44a3f920f886..a39e31845a33 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -218,6 +218,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+>  #define SVM_NESTED_CTL_SEV_ENABLE	BIT(1)
+>  #define SVM_NESTED_CTL_SEV_ES_ENABLE	BIT(2)
+>  
+> +#define SVM_SEV_FEAT_SNP_ACTIVE		BIT(0)
+> +
+>  struct vmcb_seg {
+>  	u16 selector;
+>  	u16 attrib;
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 50fddbe56981..93da463545ef 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -235,10 +235,30 @@ static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
+>  	sev_decommission(handle);
+>  }
+>  
+> +static int verify_snp_init_flags(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +	struct kvm_snp_init params;
+> +	int ret = 0;
+> +
+> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> +		return -EFAULT;
+> +
+> +	if (params.flags & ~SEV_SNP_SUPPORTED_FLAGS)
+> +		ret = -EOPNOTSUPP;
+> +
+> +	params.flags = SEV_SNP_SUPPORTED_FLAGS;
+> +
+> +	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params)))
+> +		ret = -EFAULT;
+> +
+> +	return ret;
+> +}
+> +
+>  static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> +	bool es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == KVM_SEV_SNP_INIT);
+>  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> -	bool es_active = argp->id == KVM_SEV_ES_INIT;
+> +	bool snp_active = argp->id == KVM_SEV_SNP_INIT;
+>  	int asid, ret;
+>  
+>  	if (kvm->created_vcpus)
+> @@ -249,12 +269,22 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  		return ret;
+>  
+>  	sev->es_active = es_active;
+> +	sev->snp_active = snp_active;
+>  	asid = sev_asid_new(sev);
+>  	if (asid < 0)
+>  		goto e_no_asid;
+>  	sev->asid = asid;
+>  
+> -	ret = sev_platform_init(&argp->error);
+> +	if (snp_active) {
+> +		ret = verify_snp_init_flags(kvm, argp);
+> +		if (ret)
+> +			goto e_free;
+> +
+> +		ret = sev_snp_init(&argp->error);
+> +	} else {
+> +		ret = sev_platform_init(&argp->error);
+> +	}
+> +
+>  	if (ret)
+>  		goto e_free;
+>  
+> @@ -600,6 +630,10 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+>  	save->pkru = svm->vcpu.arch.pkru;
+>  	save->xss  = svm->vcpu.arch.ia32_xss;
+>  
+> +	/* Enable the SEV-SNP feature */
+> +	if (sev_snp_guest(svm->vcpu.kvm))
+> +		save->sev_features |= SVM_SEV_FEAT_SNP_ACTIVE;
+> +
+>  	return 0;
+>  }
+>  
+> @@ -1532,6 +1566,12 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  	}
+>  
+>  	switch (sev_cmd.id) {
+> +	case KVM_SEV_SNP_INIT:
+> +		if (!sev_snp_enabled) {
+> +			r = -ENOTTY;
+> +			goto out;
+> +		}
+> +		fallthrough;
+>  	case KVM_SEV_ES_INIT:
+>  		if (!sev_es_enabled) {
+>  			r = -ENOTTY;
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 01953522097d..57c3c404b0b3 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -69,6 +69,9 @@ enum {
+>  /* TPR and CR2 are always written before VMRUN */
+>  #define VMCB_ALWAYS_DIRTY_MASK	((1U << VMCB_INTR) | (1U << VMCB_CR2))
+>  
+> +/* Supported init feature flags */
+> +#define SEV_SNP_SUPPORTED_FLAGS		0x0
+> +
+>  struct kvm_sev_info {
+>  	bool active;		/* SEV enabled guest */
+>  	bool es_active;		/* SEV-ES enabled guest */
+> @@ -81,6 +84,7 @@ struct kvm_sev_info {
+>  	u64 ap_jump_table;	/* SEV-ES AP Jump Table address */
+>  	struct kvm *enc_context_owner; /* Owner of copied encryption context */
+>  	struct misc_cg *misc_cg; /* For misc cgroup accounting */
+> +	u64 snp_init_flags;
+>  };
+>  
+>  struct kvm_svm {
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index d9e4aabcb31a..944e2bf601fe 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1712,6 +1712,9 @@ enum sev_cmd_id {
+>  	/* Guest Migration Extension */
+>  	KVM_SEV_SEND_CANCEL,
+>  
+> +	/* SNP specific commands */
+> +	KVM_SEV_SNP_INIT,
+> +
+>  	KVM_SEV_NR_MAX,
+>  };
+>  
+> @@ -1808,6 +1811,16 @@ struct kvm_sev_receive_update_data {
+>  	__u32 trans_len;
+>  };
+>  
+> +/* enable the restricted injection */
+> +#define KVM_SEV_SNP_RESTRICTED_INJET   (1 << 0)
+> +
+> +/* enable the restricted injection timer */
+> +#define KVM_SEV_SNP_RESTRICTED_TIMER_INJET   (1 << 1)
+> +
+> +struct kvm_snp_init {
+> +	__u64 flags;
+> +};
+> +
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
+> 
