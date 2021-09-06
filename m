@@ -4,41 +4,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6842C4321E
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:20:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54722C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:21:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C8FBD610F7
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:20:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FD4260F45
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:21:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238662AbhIFBVv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Sep 2021 21:21:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37876 "EHLO mail.kernel.org"
+        id S238883AbhIFBWC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Sep 2021 21:22:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38410 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238912AbhIFBVl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Sep 2021 21:21:41 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 294B661139;
-        Mon,  6 Sep 2021 01:20:36 +0000 (UTC)
+        id S238909AbhIFBVi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 5 Sep 2021 21:21:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 965B361050;
+        Mon,  6 Sep 2021 01:20:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630891236;
-        bh=AayjKb2k5+zVPxEVCcXziF7Kj/gs+4rbeig7KBZivlk=;
+        s=k20201202; t=1630891234;
+        bh=/aeM0nKRuFKXwYv5VlQpAM6LhcfpYnf7ULc5SzJRo+A=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WCi6rNz9iMig1z/ukXgvbOJbbLizt1/5P6oLOAuER0FqvqsUtzRj/XfD/clw5YShZ
-         UzfKnOtsDJhtlWuNqM+PIhzt3le7u3J/GtczzshTaTPLi8oC9ZSPaD8AV0my6oNVvI
-         ugo3nxepmpRdrWuwLwF56oQNXohssboTDiYi5NCt8Kh2RLbBhCmL40dTuW8iDCxTys
-         1S/i21h48/k87Sj77YxSyxLd0qTOyadWaintIuxGIro02877NOCda5yrTQsxfFQ2e2
-         xGyQAqZsO4b+ZS7C79Qq5BKoYuT4sITn8WdTcqbxMjtpe7DNxCQLtCV5/a2lQCbcMm
-         8f3lbuMDCbj6Q==
+        b=gfxVsRCtMrcK6zi0FnsuC8DvORRiF4TvzAqU7e46RZhNszUef7TfwjPN7gXboL8PY
+         tYNLXS5NfQO7JHN7yrhfAKWGtY3LK99BptxLO8hpIJLqSz4SxetNm5VqSE9j13+eQP
+         cIqT8usNJG1T8LMYY0djdt9iQzumXzw550eOBJPoMJ3IchON8zlb9GqDOigNTdHUvW
+         FjV3LzXd3vGpmcXVbFpRQiJXEDoqvmMCnjjlPMvdjwNmzsiWhFIdoGiFuUi1ah1yVI
+         1885rxPKO62xDrjS5cv+rK9kDJJE2tq3r4EG2lSE9/ETfwCBX1RQkGx6j3EtCcfws8
+         x/7dehp74ruuA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Kai Ye <yekai13@huawei.com>,
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.14 36/47] crypto: hisilicon/sec - modify the hardware endian configuration
-Date:   Sun,  5 Sep 2021 21:19:40 -0400
-Message-Id: <20210906011951.928679-36-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.14 34/47] crypto: qat - do not export adf_iov_putmsg()
+Date:   Sun,  5 Sep 2021 21:19:38 -0400
+Message-Id: <20210906011951.928679-34-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210906011951.928679-1-sashal@kernel.org>
 References: <20210906011951.928679-1-sashal@kernel.org>
@@ -50,95 +52,34 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Kai Ye <yekai13@huawei.com>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-[ Upstream commit a52626106d6f7edf3d106c065e13a0313cfeb82f ]
+[ Upstream commit 645ae0af1840199086c33e4f841892ebee73f615 ]
 
-When the endian configuration of the hardware is abnormal, it will
-cause the SEC engine is faulty that reports empty message. And it
-will affect the normal function of the hardware. Currently the soft
-configuration method can't restore the faulty device. The endian
-needs to be configured according to the system properties. So fix it.
+The function adf_iov_putmsg() is only used inside the intel_qat module
+therefore should not be exported.
+Remove EXPORT_SYMBOL for the function adf_iov_putmsg().
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/hisilicon/sec2/sec.h      |  5 ----
- drivers/crypto/hisilicon/sec2/sec_main.c | 31 +++++++-----------------
- 2 files changed, 9 insertions(+), 27 deletions(-)
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 018415b9840a..d97cf02b1df7 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -157,11 +157,6 @@ struct sec_ctx {
- 	struct device *dev;
- };
+diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+index 663638bb5c97..efa4bffb4f60 100644
+--- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
++++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+@@ -186,7 +186,6 @@ int adf_iov_putmsg(struct adf_accel_dev *accel_dev, u32 msg, u8 vf_nr)
  
--enum sec_endian {
--	SEC_LE = 0,
--	SEC_32BE,
--	SEC_64BE
--};
+ 	return ret;
+ }
+-EXPORT_SYMBOL_GPL(adf_iov_putmsg);
  
- enum sec_debug_file_index {
- 	SEC_CLEAR_ENABLE,
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 8addbd7a3339..a0cc46b649a3 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -312,31 +312,20 @@ static const struct pci_device_id sec_dev_ids[] = {
- };
- MODULE_DEVICE_TABLE(pci, sec_dev_ids);
- 
--static u8 sec_get_endian(struct hisi_qm *qm)
-+static void sec_set_endian(struct hisi_qm *qm)
+ void adf_vf2pf_req_hndl(struct adf_accel_vf_info *vf_info)
  {
- 	u32 reg;
- 
--	/*
--	 * As for VF, it is a wrong way to get endian setting by
--	 * reading a register of the engine
--	 */
--	if (qm->pdev->is_virtfn) {
--		dev_err_ratelimited(&qm->pdev->dev,
--				    "cannot access a register in VF!\n");
--		return SEC_LE;
--	}
- 	reg = readl_relaxed(qm->io_base + SEC_CONTROL_REG);
--	/* BD little endian mode */
--	if (!(reg & BIT(0)))
--		return SEC_LE;
-+	reg &= ~(BIT(1) | BIT(0));
-+	if (!IS_ENABLED(CONFIG_64BIT))
-+		reg |= BIT(1);
- 
--	/* BD 32-bits big endian mode */
--	else if (!(reg & BIT(1)))
--		return SEC_32BE;
- 
--	/* BD 64-bits big endian mode */
--	else
--		return SEC_64BE;
-+	if (!IS_ENABLED(CONFIG_CPU_LITTLE_ENDIAN))
-+		reg |= BIT(0);
-+
-+	writel_relaxed(reg, qm->io_base + SEC_CONTROL_REG);
- }
- 
- static void sec_open_sva_prefetch(struct hisi_qm *qm)
-@@ -429,9 +418,7 @@ static int sec_engine_init(struct hisi_qm *qm)
- 		       qm->io_base + SEC_BD_ERR_CHK_EN_REG3);
- 
- 	/* config endian */
--	reg = readl_relaxed(qm->io_base + SEC_CONTROL_REG);
--	reg |= sec_get_endian(qm);
--	writel_relaxed(reg, qm->io_base + SEC_CONTROL_REG);
-+	sec_set_endian(qm);
- 
- 	return 0;
- }
 -- 
 2.30.2
 
