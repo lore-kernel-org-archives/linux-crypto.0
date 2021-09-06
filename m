@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA52C4167B
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E064AC4167D
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C935261039
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D02FA60F22
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240008AbhIFBcF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S239196AbhIFBcF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Sun, 5 Sep 2021 21:32:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47360 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:47506 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241563AbhIFB3Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Sep 2021 21:29:16 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 862BE61131;
-        Mon,  6 Sep 2021 01:23:10 +0000 (UTC)
+        id S241608AbhIFB3R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 5 Sep 2021 21:29:17 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5F10561132;
+        Mon,  6 Sep 2021 01:23:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630891391;
-        bh=6UmB6ykUfxJtqzo3qnDcVnv31GjeZXUQrxUoahVRJAA=;
+        s=k20201202; t=1630891394;
+        bh=3Mmiju3sdqsKuvmqlxTn/k9pgMEyNG4h1nHPX3kcYFM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=piJySY0fD/qvni1b3Vv+b4wIEEIrWqLATvbVstRIEwdkt2cff+umJpBo+6vxh16/P
-         4zXagZx+xbLK7uxe2zTChfxCl72zs5cUOE26yHwKxmUq0NbqaJjPfOkOj2jV2PWH7U
-         CRSp44cvXFB1IlIikg6lIHGUdXZ8GMDcwsPkmp7AHrSvfDuwsHLmK6d0cWAz/g/Ahz
-         CveBJchOL7b0nlwYdh/sRBCaOtatHPM6HCWO0dutnmMoBJCxp2l5Vw7fRLeMDt6d+j
-         /vEfO9/lhWQ4iAWMTzHAWcYtosQAfkwE4P6hPPGCzruSSJ9iMXneG8VLFed5fPZ7Ef
-         7j8z11ccuwdgw==
+        b=e4y+C7QhzaGjaDNi8bwEGUzs3Qzgr0iJkV9OvvRc0KLyWBU3qYhS8XkYx1PsiP2KJ
+         D5Wh3QN0YQaFhAudFR2QvczIlKC3gLx8FudxRJRKHT4OgONA/MHqdgStnQr/I9rZox
+         ilFtwt4ATB90tlPgo7GEy61r0UwYy/8Lm0gGhKiFeA7KAiV73EhFafzQ6tyhWLZUVm
+         25n/vexQ26K16H3pJuprUekhd1pRNrL1W5/DBIPV25QulscjSnPi5KXK8WxuiLZByq
+         YVCfMkNyan8jLlwbLSOPBmQchGAgi/+PDnIlqYQYFdIciC/F8J+Ot0UVtdY6zw2gIR
+         Y/tvz6cGRMvVw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Marco Chiappero <marco.chiappero@intel.com>,
+Cc:     Marco Chiappero <marco.chiappero@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Fiona Trahe <fiona.trahe@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
         linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 22/30] crypto: qat - do not ignore errors from enable_vf2pf_comms()
-Date:   Sun,  5 Sep 2021 21:22:35 -0400
-Message-Id: <20210906012244.930338-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 24/30] crypto: qat - fix reuse of completion variable
+Date:   Sun,  5 Sep 2021 21:22:37 -0400
+Message-Id: <20210906012244.930338-24-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210906012244.930338-1-sashal@kernel.org>
 References: <20210906012244.930338-1-sashal@kernel.org>
@@ -53,49 +53,37 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+From: Marco Chiappero <marco.chiappero@intel.com>
 
-[ Upstream commit 5147f0906d50a9d26f2b8698cd06b5680e9867ff ]
+[ Upstream commit 3d655732b0199562267a05c7ff69ecdd11632939 ]
 
-The function adf_dev_init() ignores the error code reported by
-enable_vf2pf_comms(). If the latter fails, e.g. the VF is not compatible
-with the pf, then the load of the VF driver progresses.
-This patch changes adf_dev_init() so that the error code from
-enable_vf2pf_comms() is returned to the caller.
+Use reinit_completion() to set to a clean state a completion variable,
+used to coordinate the VF to PF request-response flow, before every
+new VF request.
 
+Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
+Co-developed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
 Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/qat/qat_common/adf_init.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_init.c b/drivers/crypto/qat/qat_common/adf_init.c
-index 26556c713049..7a7d43c47534 100644
---- a/drivers/crypto/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/qat/qat_common/adf_init.c
-@@ -105,6 +105,7 @@ int adf_dev_init(struct adf_accel_dev *accel_dev)
- 	struct service_hndl *service;
- 	struct list_head *list_itr;
- 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	int ret;
+diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+index b3875fdf6cd7..9dab2cc11fdf 100644
+--- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
++++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+@@ -361,6 +361,8 @@ static int adf_vf2pf_request_version(struct adf_accel_dev *accel_dev)
+ 	msg |= ADF_PFVF_COMPATIBILITY_VERSION << ADF_VF2PF_COMPAT_VER_REQ_SHIFT;
+ 	BUILD_BUG_ON(ADF_PFVF_COMPATIBILITY_VERSION > 255);
  
- 	if (!hw_data) {
- 		dev_err(&GET_DEV(accel_dev),
-@@ -171,9 +172,9 @@ int adf_dev_init(struct adf_accel_dev *accel_dev)
- 	}
- 
- 	hw_data->enable_error_correction(accel_dev);
--	hw_data->enable_vf2pf_comms(accel_dev);
-+	ret = hw_data->enable_vf2pf_comms(accel_dev);
- 
--	return 0;
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(adf_dev_init);
- 
++	reinit_completion(&accel_dev->vf.iov_msg_completion);
++
+ 	/* Send request from VF to PF */
+ 	ret = adf_iov_putmsg(accel_dev, msg, 0);
+ 	if (ret) {
 -- 
 2.30.2
 
