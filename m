@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A64D0C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96510C43219
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90C0961039
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:27:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82ECA60EBA
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241197AbhIFB2O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Sep 2021 21:28:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38826 "EHLO mail.kernel.org"
+        id S239215AbhIFBcE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Sep 2021 21:32:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47528 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240082AbhIFB0O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Sep 2021 21:26:14 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1D20461178;
-        Mon,  6 Sep 2021 01:22:33 +0000 (UTC)
+        id S239196AbhIFB1i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 5 Sep 2021 21:27:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 48F3E61027;
+        Mon,  6 Sep 2021 01:22:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630891354;
-        bh=SNITxGpC+2r8FKwiaWFb6tHN5Sa63IzCStlGnpXq07k=;
+        s=k20201202; t=1630891372;
+        bh=kfvp6RxnixOZswBUFl3mXIebYjbttY6adhaxG+mPoPw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=snvo8uhM0m9mUn/2vG0dWCsYIkeHNYbrEkh2YR5WnpuKdlBtbPV7DYH7vBHM4AVSD
-         RG7MnaW87IgeE2uGBEadDSHQTTPqhogLhfGn0sMogQviR7L23W7Gs9+zBwyfes1mO/
-         9Mck3m3dfipLJoH8fIqdnoSgoP3Pjz32i+KMH13OsuUYKjDk/yurMqyEQb1AHohAJm
-         CnwsbnYadxXlhRl5HvWHimNAFuDDaelobRwLY8Srye0LnRv81osXlzso+NVH/HlyRi
-         MxO+sxxMwNYvx+oc5+cD87BpwfkFA7L/KojUctH3oolyxgeMnU4pjwy7p/uVOaliJy
-         mmhJnvvmdb9rQ==
+        b=ZV33SirZSwJT9kiqVGp5mkz4O2H0qA8vNtRkSY+hBTwIpTgJ+Jy8EsAPQQ+uTo11m
+         4JUn/+cdzUrs8ao8Dz3FHaKKALdzURj1zSXS/sh+o3+sgc49b0RF+BRPRvSe7+vRdj
+         sdx83l/ZVaeLmSX4/8vPfEq/b6FNOIlU4a/EXaDWBGjULRVHrP/ViYzqoiWiWspsWq
+         WV1swUA1Zn3i6EJitPvPln7wZrYxgidLhZO0GPkix2tJynb6TF+s3qUVspwx9O8b8Z
+         sgSDVFB5QH0QF/D2sknxmwoAlma+bY5JJE7gfkQl1RFw16nXE2VXGp4+pTcblzYaZb
+         GLHfEoRU2aZNw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
+Cc:     Tony Lindgren <tony@atomide.com>,
+        Lokesh Vutla <lokeshvutla@ti.com>,
+        Tero Kristo <kristo@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 32/39] crypto: qat - do not export adf_iov_putmsg()
-Date:   Sun,  5 Sep 2021 21:21:46 -0400
-Message-Id: <20210906012153.929962-32-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 06/30] crypto: omap-sham - clear dma flags only after omap_sham_update_dma_stop()
+Date:   Sun,  5 Sep 2021 21:22:19 -0400
+Message-Id: <20210906012244.930338-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210906012153.929962-1-sashal@kernel.org>
-References: <20210906012153.929962-1-sashal@kernel.org>
+In-Reply-To: <20210906012244.930338-1-sashal@kernel.org>
+References: <20210906012244.930338-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -52,34 +52,40 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+From: Tony Lindgren <tony@atomide.com>
 
-[ Upstream commit 645ae0af1840199086c33e4f841892ebee73f615 ]
+[ Upstream commit fe28140b3393b0ba1eb95cc109f974a7e58b26fd ]
 
-The function adf_iov_putmsg() is only used inside the intel_qat module
-therefore should not be exported.
-Remove EXPORT_SYMBOL for the function adf_iov_putmsg().
+We should not clear FLAGS_DMA_ACTIVE before omap_sham_update_dma_stop() is
+done calling dma_unmap_sg(). We already clear FLAGS_DMA_ACTIVE at the
+end of omap_sham_update_dma_stop().
 
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
+The early clearing of FLAGS_DMA_ACTIVE is not causing issues as we do not
+need to defer anything based on FLAGS_DMA_ACTIVE currently. So this can be
+applied as clean-up.
+
+Cc: Lokesh Vutla <lokeshvutla@ti.com>
+Cc: Tero Kristo <kristo@kernel.org>
+Signed-off-by: Tony Lindgren <tony@atomide.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/qat/qat_common/adf_pf2vf_msg.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/crypto/omap-sham.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
-index 4c39731c51c8..e829c6aaf16f 100644
---- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
-+++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
-@@ -186,7 +186,6 @@ int adf_iov_putmsg(struct adf_accel_dev *accel_dev, u32 msg, u8 vf_nr)
- 
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(adf_iov_putmsg);
- 
- void adf_vf2pf_req_hndl(struct adf_accel_vf_info *vf_info)
- {
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index f80db1eb2994..f8a146554b1f 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1734,7 +1734,7 @@ static void omap_sham_done_task(unsigned long data)
+ 		if (test_and_clear_bit(FLAGS_OUTPUT_READY, &dd->flags))
+ 			goto finish;
+ 	} else if (test_bit(FLAGS_DMA_READY, &dd->flags)) {
+-		if (test_and_clear_bit(FLAGS_DMA_ACTIVE, &dd->flags)) {
++		if (test_bit(FLAGS_DMA_ACTIVE, &dd->flags)) {
+ 			omap_sham_update_dma_stop(dd);
+ 			if (dd->err) {
+ 				err = dd->err;
 -- 
 2.30.2
 
