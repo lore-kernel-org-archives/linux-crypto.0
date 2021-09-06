@@ -4,43 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B32C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA52C4167B
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A683961027
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C935261039
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240551AbhIFBcC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Sep 2021 21:32:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47504 "EHLO mail.kernel.org"
+        id S240008AbhIFBcF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Sep 2021 21:32:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47360 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241060AbhIFB1f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Sep 2021 21:27:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8067E61101;
-        Mon,  6 Sep 2021 01:22:47 +0000 (UTC)
+        id S241563AbhIFB3Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 5 Sep 2021 21:29:16 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 862BE61131;
+        Mon,  6 Sep 2021 01:23:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630891368;
-        bh=WIhAtogWrHU206UCb2vW6PRQGML7LBfLTU1JD9Y1cFI=;
+        s=k20201202; t=1630891391;
+        bh=6UmB6ykUfxJtqzo3qnDcVnv31GjeZXUQrxUoahVRJAA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=M7UETSIDOXraz+VKPOe7ZHMVBckgTYjaKTkKzgDgudb0jhzteaQTGn6Z9rdS8zwoO
-         e3OFI5K1porsAXy/8gDui20I3HLNO48CjrvB4ZuVWI0pyJ4Af/ctfxaC6pCpP3+Fjy
-         bMt9TcUxO5Pd1MPcq6AgmoENXuQ5G63OZKp441YVSe86BnvIHZraiTf8PwvE7otC1g
-         nl9tfWIBFcL5sEV+AlRfr1drPKdrZlIcZRIHxlKOo8c9if2PG8z5mJ9AqJjp/avWtt
-         GobH+UgDrPLmwxbQh4x/KSmSHF852Cdx+ZBBkfrcCw4iQQwUx8C70OEhxdyhRwYqAU
-         haFxUBqpzx8nw==
+        b=piJySY0fD/qvni1b3Vv+b4wIEEIrWqLATvbVstRIEwdkt2cff+umJpBo+6vxh16/P
+         4zXagZx+xbLK7uxe2zTChfxCl72zs5cUOE26yHwKxmUq0NbqaJjPfOkOj2jV2PWH7U
+         CRSp44cvXFB1IlIikg6lIHGUdXZ8GMDcwsPkmp7AHrSvfDuwsHLmK6d0cWAz/g/Ahz
+         CveBJchOL7b0nlwYdh/sRBCaOtatHPM6HCWO0dutnmMoBJCxp2l5Vw7fRLeMDt6d+j
+         /vEfO9/lhWQ4iAWMTzHAWcYtosQAfkwE4P6hPPGCzruSSJ9iMXneG8VLFed5fPZ7Ef
+         7j8z11ccuwdgw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Sean Anderson <sean.anderson@seco.com>,
-        Richard Weinberger <richard@nod.at>,
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Marco Chiappero <marco.chiappero@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.4 03/30] crypto: mxs-dcp - Check for DMA mapping errors
-Date:   Sun,  5 Sep 2021 21:22:16 -0400
-Message-Id: <20210906012244.930338-3-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 22/30] crypto: qat - do not ignore errors from enable_vf2pf_comms()
+Date:   Sun,  5 Sep 2021 21:22:35 -0400
+Message-Id: <20210906012244.930338-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210906012244.930338-1-sashal@kernel.org>
 References: <20210906012244.930338-1-sashal@kernel.org>
@@ -52,123 +53,49 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Sean Anderson <sean.anderson@seco.com>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-[ Upstream commit df6313d707e575a679ada3313358289af24454c0 ]
+[ Upstream commit 5147f0906d50a9d26f2b8698cd06b5680e9867ff ]
 
-After calling dma_map_single(), we must also call dma_mapping_error().
-This fixes the following warning when compiling with CONFIG_DMA_API_DEBUG:
+The function adf_dev_init() ignores the error code reported by
+enable_vf2pf_comms(). If the latter fails, e.g. the VF is not compatible
+with the pf, then the load of the VF driver progresses.
+This patch changes adf_dev_init() so that the error code from
+enable_vf2pf_comms() is returned to the caller.
 
-[  311.241478] WARNING: CPU: 0 PID: 428 at kernel/dma/debug.c:1027 check_unmap+0x79c/0x96c
-[  311.249547] DMA-API: mxs-dcp 2280000.crypto: device driver failed to check map error[device address=0x00000000860cb080] [size=32 bytes] [mapped as single]
-
-Signed-off-by: Sean Anderson <sean.anderson@seco.com>
-Reviewed-by: Richard Weinberger <richard@nod.at>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
+Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/mxs-dcp.c | 45 +++++++++++++++++++++++++++++++---------
- 1 file changed, 35 insertions(+), 10 deletions(-)
+ drivers/crypto/qat/qat_common/adf_init.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index f8a48a84df2a..66fa524b6261 100644
---- a/drivers/crypto/mxs-dcp.c
-+++ b/drivers/crypto/mxs-dcp.c
-@@ -168,15 +168,19 @@ static struct dcp *global_sdcp;
+diff --git a/drivers/crypto/qat/qat_common/adf_init.c b/drivers/crypto/qat/qat_common/adf_init.c
+index 26556c713049..7a7d43c47534 100644
+--- a/drivers/crypto/qat/qat_common/adf_init.c
++++ b/drivers/crypto/qat/qat_common/adf_init.c
+@@ -105,6 +105,7 @@ int adf_dev_init(struct adf_accel_dev *accel_dev)
+ 	struct service_hndl *service;
+ 	struct list_head *list_itr;
+ 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
++	int ret;
  
- static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
- {
-+	int dma_err;
- 	struct dcp *sdcp = global_sdcp;
- 	const int chan = actx->chan;
- 	uint32_t stat;
- 	unsigned long ret;
- 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
--
- 	dma_addr_t desc_phys = dma_map_single(sdcp->dev, desc, sizeof(*desc),
- 					      DMA_TO_DEVICE);
- 
-+	dma_err = dma_mapping_error(sdcp->dev, desc_phys);
-+	if (dma_err)
-+		return dma_err;
-+
- 	reinit_completion(&sdcp->completion[chan]);
- 
- 	/* Clear status register. */
-@@ -214,18 +218,29 @@ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
- static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
- 			   struct ablkcipher_request *req, int init)
- {
-+	dma_addr_t key_phys, src_phys, dst_phys;
- 	struct dcp *sdcp = global_sdcp;
- 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
- 	struct dcp_aes_req_ctx *rctx = ablkcipher_request_ctx(req);
- 	int ret;
- 
--	dma_addr_t key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
--					     2 * AES_KEYSIZE_128,
--					     DMA_TO_DEVICE);
--	dma_addr_t src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
--					     DCP_BUF_SZ, DMA_TO_DEVICE);
--	dma_addr_t dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
--					     DCP_BUF_SZ, DMA_FROM_DEVICE);
-+	key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
-+				  2 * AES_KEYSIZE_128, DMA_TO_DEVICE);
-+	ret = dma_mapping_error(sdcp->dev, key_phys);
-+	if (ret)
-+		return ret;
-+
-+	src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
-+				  DCP_BUF_SZ, DMA_TO_DEVICE);
-+	ret = dma_mapping_error(sdcp->dev, src_phys);
-+	if (ret)
-+		goto err_src;
-+
-+	dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
-+				  DCP_BUF_SZ, DMA_FROM_DEVICE);
-+	ret = dma_mapping_error(sdcp->dev, dst_phys);
-+	if (ret)
-+		goto err_dst;
- 
- 	if (actx->fill % AES_BLOCK_SIZE) {
- 		dev_err(sdcp->dev, "Invalid block size!\n");
-@@ -263,10 +278,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
- 	ret = mxs_dcp_start_dma(actx);
- 
- aes_done_run:
-+	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
-+err_dst:
-+	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
-+err_src:
- 	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
- 			 DMA_TO_DEVICE);
--	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
--	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
- 
- 	return ret;
- }
-@@ -565,6 +582,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
- 	dma_addr_t buf_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_in_buf,
- 					     DCP_BUF_SZ, DMA_TO_DEVICE);
- 
-+	ret = dma_mapping_error(sdcp->dev, buf_phys);
-+	if (ret)
-+		return ret;
-+
- 	/* Fill in the DMA descriptor. */
- 	desc->control0 = MXS_DCP_CONTROL0_DECR_SEMAPHORE |
- 		    MXS_DCP_CONTROL0_INTERRUPT |
-@@ -597,6 +618,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
- 	if (rctx->fini) {
- 		digest_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_out_buf,
- 					     DCP_SHA_PAY_SZ, DMA_FROM_DEVICE);
-+		ret = dma_mapping_error(sdcp->dev, digest_phys);
-+		if (ret)
-+			goto done_run;
-+
- 		desc->control0 |= MXS_DCP_CONTROL0_HASH_TERM;
- 		desc->payload = digest_phys;
+ 	if (!hw_data) {
+ 		dev_err(&GET_DEV(accel_dev),
+@@ -171,9 +172,9 @@ int adf_dev_init(struct adf_accel_dev *accel_dev)
  	}
+ 
+ 	hw_data->enable_error_correction(accel_dev);
+-	hw_data->enable_vf2pf_comms(accel_dev);
++	ret = hw_data->enable_vf2pf_comms(accel_dev);
+ 
+-	return 0;
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(adf_dev_init);
+ 
 -- 
 2.30.2
 
