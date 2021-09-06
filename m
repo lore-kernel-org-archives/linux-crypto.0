@@ -4,42 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F661C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE77C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:21:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24FA1610A2
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:21:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 57F8361101
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:21:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239197AbhIFBWG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Sep 2021 21:22:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38492 "EHLO mail.kernel.org"
+        id S239257AbhIFBWM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Sep 2021 21:22:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38354 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238794AbhIFBVm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Sep 2021 21:21:42 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 53E2261076;
-        Mon,  6 Sep 2021 01:20:37 +0000 (UTC)
+        id S238903AbhIFBVf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 5 Sep 2021 21:21:35 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7EA6E61029;
+        Mon,  6 Sep 2021 01:20:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630891238;
-        bh=HpDrTH5dFqfXuhuMC5F+a3DrZqroMthUZD0oSwhxfGA=;
+        s=k20201202; t=1630891231;
+        bh=GMdO6/NJpyqcf6PL78pSXI3sd5nYENoU1UOu6TmTrkI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=g6KUdQ4FWhoUGBYRMrUynSLupZrxy5HizPxB1tyz6Qyr41yNKpD69JTfhYPki6kd0
-         NtANkBxSUG1u0B+aVJ+YyGFdk/9LHYLUDUBVAUa5AxEOMfo/Jd9pIyDZl2eGYKo7Jn
-         ndZVty/rp5OwwVpP0wwpWk4bQ4ewworJ4LYJ3LMAVfy/QUAXD7aFqRuuEyhCLpNUT3
-         oBDR/pT5OVIEseitNbthQ7P4oXyq4ZEO0ELaq1wc7InzuxlVOzYUIMsPAmUX825PaE
-         YHcJAegjgrWW/7I2MbDhvStaNDGAHbLF7f9AqpB/Oc8KwsqL598paHF0X38jvTCfX9
-         RZYagZz7b/JEA==
+        b=OvqhUNjTGyKY/YzQwxQFZD9ua13zRf8JpiAUrBDwUC2Mo2lOAxm9twZxaVDjc54Pc
+         wlz58hMLU4UTl3QiwQxZ+KxxMN8QT+oArJn7CxNTAyiQ4FiZRv/AV52z3h/eyq5Gxh
+         2y6HHdDy2muVMA9FpBwZhjIiMct+AcTRq3ofbuh6/LW0DPZU651Evo35VZ4YY/7jew
+         oXwGZs1z46BHcf4/uDxZ5JYuKn/Zr37gvCl6d4mn92W5gw36idxKwNPFKRrhtQ5Sdn
+         8YwSeAiS0xOAT+7G0hrZct6N0lPAOhnMbyJFbmu8/5Na7cwBWMDGXS5hN4sD2D2S/Y
+         HPV+iRd47qmRw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
+Cc:     Marco Chiappero <marco.chiappero@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.14 37/47] crypto: tcrypt - Fix missing return value check
-Date:   Sun,  5 Sep 2021 21:19:41 -0400
-Message-Id: <20210906011951.928679-37-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.14 32/47] crypto: qat - fix reuse of completion variable
+Date:   Sun,  5 Sep 2021 21:19:36 -0400
+Message-Id: <20210906011951.928679-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210906011951.928679-1-sashal@kernel.org>
 References: <20210906011951.928679-1-sashal@kernel.org>
@@ -51,102 +53,37 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+From: Marco Chiappero <marco.chiappero@intel.com>
 
-[ Upstream commit 7b3d52683b3a47c0ba1dfd6b5994a3a795b06972 ]
+[ Upstream commit 3d655732b0199562267a05c7ff69ecdd11632939 ]
 
-There are several places where the return value check of crypto_aead_setkey
-and crypto_aead_setauthsize were lost. It is necessary to add these checks.
+Use reinit_completion() to set to a clean state a completion variable,
+used to coordinate the VF to PF request-response flow, before every
+new VF request.
 
-At the same time, move the crypto_aead_setauthsize() call out of the loop,
-and only need to call it once after load transform.
-
-Fixee: 53f52d7aecb4 ("crypto: tcrypt - Added speed tests for AEAD crypto alogrithms in tcrypt test suite")
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
+Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
+Co-developed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/tcrypt.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index f8d06da78e4f..6863e57b088d 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -290,6 +290,11 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
- 	}
+diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+index a1b77bd7a894..663638bb5c97 100644
+--- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
++++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+@@ -316,6 +316,8 @@ static int adf_vf2pf_request_version(struct adf_accel_dev *accel_dev)
+ 	msg |= ADF_PFVF_COMPATIBILITY_VERSION << ADF_VF2PF_COMPAT_VER_REQ_SHIFT;
+ 	BUILD_BUG_ON(ADF_PFVF_COMPATIBILITY_VERSION > 255);
  
- 	ret = crypto_aead_setauthsize(tfm, authsize);
-+	if (ret) {
-+		pr_err("alg: aead: Failed to setauthsize for %s: %d\n", algo,
-+		       ret);
-+		goto out_free_tfm;
-+	}
- 
- 	for (i = 0; i < num_mb; ++i)
- 		if (testmgr_alloc_buf(data[i].xbuf)) {
-@@ -315,7 +320,7 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
- 	for (i = 0; i < num_mb; ++i) {
- 		data[i].req = aead_request_alloc(tfm, GFP_KERNEL);
- 		if (!data[i].req) {
--			pr_err("alg: skcipher: Failed to allocate request for %s\n",
-+			pr_err("alg: aead: Failed to allocate request for %s\n",
- 			       algo);
- 			while (i--)
- 				aead_request_free(data[i].req);
-@@ -567,13 +572,19 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 	sgout = &sg[9];
- 
- 	tfm = crypto_alloc_aead(algo, 0, 0);
--
- 	if (IS_ERR(tfm)) {
- 		pr_err("alg: aead: Failed to load transform for %s: %ld\n", algo,
- 		       PTR_ERR(tfm));
- 		goto out_notfm;
- 	}
- 
-+	ret = crypto_aead_setauthsize(tfm, authsize);
-+	if (ret) {
-+		pr_err("alg: aead: Failed to setauthsize for %s: %d\n", algo,
-+		       ret);
-+		goto out_noreq;
-+	}
++	reinit_completion(&accel_dev->vf.iov_msg_completion);
 +
- 	crypto_init_wait(&wait);
- 	printk(KERN_INFO "\ntesting speed of %s (%s) %s\n", algo,
- 			get_driver_name(crypto_aead, tfm), e);
-@@ -611,8 +622,13 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 					break;
- 				}
- 			}
-+
- 			ret = crypto_aead_setkey(tfm, key, *keysize);
--			ret = crypto_aead_setauthsize(tfm, authsize);
-+			if (ret) {
-+				pr_err("setkey() failed flags=%x: %d\n",
-+					crypto_aead_get_flags(tfm), ret);
-+				goto out;
-+			}
- 
- 			iv_len = crypto_aead_ivsize(tfm);
- 			if (iv_len)
-@@ -622,15 +638,8 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 			printk(KERN_INFO "test %u (%d bit key, %d byte blocks): ",
- 					i, *keysize * 8, bs);
- 
--
- 			memset(tvmem[0], 0xff, PAGE_SIZE);
- 
--			if (ret) {
--				pr_err("setkey() failed flags=%x\n",
--						crypto_aead_get_flags(tfm));
--				goto out;
--			}
--
- 			sg_init_aead(sg, xbuf, bs + (enc ? 0 : authsize),
- 				     assoc, aad_size);
- 
+ 	/* Send request from VF to PF */
+ 	ret = adf_iov_putmsg(accel_dev, msg, 0);
+ 	if (ret) {
 -- 
 2.30.2
 
