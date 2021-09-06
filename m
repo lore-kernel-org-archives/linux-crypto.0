@@ -2,49 +2,48 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04A9EC433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BC0C433FE
 	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E550A61027
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15C9E61051
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:31:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240916AbhIFBck (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Sep 2021 21:32:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47506 "EHLO mail.kernel.org"
+        id S241203AbhIFBcl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Sep 2021 21:32:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47528 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1351844AbhIFBbJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1351849AbhIFBbJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sun, 5 Sep 2021 21:31:09 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E32A361211;
-        Mon,  6 Sep 2021 01:24:30 +0000 (UTC)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6663C6127C;
+        Mon,  6 Sep 2021 01:24:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630891471;
-        bh=Bx6ebCy6IMUhrvLMURL4TkUSCZQW3y4A8HoOQDe80z0=;
+        s=k20201202; t=1630891478;
+        bh=wPiuuRs1GwINMb4+sI5mglAP/2anBVTtPw4O64CAFsc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pfNnHlfgBIZJgvfmN6k2HYQjhYN8PI6jipmI9d1U51r3atJXnXz3wCkF72py/ZWTw
-         CGUICLr6BoAN9vaANclWcmwY7AphWrJhabyIUS5HUSXKOEiMF1DnkZHo/i+PT3ZarE
-         iysMW0nOlulJ4QIQvxnMNbOwB5Ml+qCk2fX2BRmiGX9AAQF6BIWn3RFwrSIw/CmgpF
-         tL/UWDEyDHyhylKCA5o/SC0vWbdv+8bPgOEruJu8TdT7VaEAa7ihfeW1Woxr/2AQSm
-         UAA8e7NyCh1mBjF5UYbTUWUlViCRX5JzLwmOAgojS4uIAnYnwQ+ZdKLfQ2PglkeDJK
-         qX2uPtGEFcT4w==
+        b=XqGhFi2xEzR0+BtRhqv/Gi4UVGXWnfM9XeDyjT9r3Q6upohpkEuJVK5odYqrLs0Ai
+         Lwk+3AuH+cmdq/p0nIicsyB3t3ZnbziII2d1WVb/ftqMyFjeAdN+H0BWgdd89eEp4s
+         unU4y/+Mc44k8VAsAFm5xPTzlQ8iK30Q34G/G2Z6+2gTBh8DJiXDLo0CymQ6z8svx5
+         rF5wvMZ1CoAoPxJongGbnb8EK02w/p0e2aw/mwto8TZPEvIE3OEUhoxjhDfnjRcHCa
+         c66l23pQyI2H2pWPPCHHzdmRSeHgObJ2uswWqAQ7EaU03BcvdsqmzJ53Sje5qb6ylv
+         ggMR1K4QMGMBg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Marco Chiappero <marco.chiappero@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
+Cc:     Sean Anderson <sean.anderson@seco.com>,
+        Richard Weinberger <richard@nod.at>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 12/14] crypto: qat - fix naming for init/shutdown VF to PF notifications
-Date:   Sun,  5 Sep 2021 21:24:13 -0400
-Message-Id: <20210906012415.931147-12-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 4.4 2/9] crypto: mxs-dcp - Check for DMA mapping errors
+Date:   Sun,  5 Sep 2021 21:24:27 -0400
+Message-Id: <20210906012435.931318-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210906012415.931147-1-sashal@kernel.org>
-References: <20210906012415.931147-1-sashal@kernel.org>
+In-Reply-To: <20210906012435.931318-1-sashal@kernel.org>
+References: <20210906012435.931318-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -53,160 +52,123 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Marco Chiappero <marco.chiappero@intel.com>
+From: Sean Anderson <sean.anderson@seco.com>
 
-[ Upstream commit b90c1c4d3fa8cd90f4e8245b13564380fd0bfad1 ]
+[ Upstream commit df6313d707e575a679ada3313358289af24454c0 ]
 
-At start and shutdown, VFs notify the PF about their state. These
-notifications are carried out through a message exchange using the PFVF
-protocol.
+After calling dma_map_single(), we must also call dma_mapping_error().
+This fixes the following warning when compiling with CONFIG_DMA_API_DEBUG:
 
-Function names lead to believe they do perform init or shutdown logic.
-This is to fix the naming to better reflect their purpose.
+[  311.241478] WARNING: CPU: 0 PID: 428 at kernel/dma/debug.c:1027 check_unmap+0x79c/0x96c
+[  311.249547] DMA-API: mxs-dcp 2280000.crypto: device driver failed to check map error[device address=0x00000000860cb080] [size=32 bytes] [mapped as single]
 
-Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
-Co-developed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
+Signed-off-by: Sean Anderson <sean.anderson@seco.com>
+Reviewed-by: Richard Weinberger <richard@nod.at>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c |  4 ++--
- drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c   |  4 ++--
- drivers/crypto/qat/qat_common/adf_common_drv.h       |  8 ++++----
- drivers/crypto/qat/qat_common/adf_vf2pf_msg.c        | 12 ++++++------
- .../qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c      |  4 ++--
- 5 files changed, 16 insertions(+), 16 deletions(-)
+ drivers/crypto/mxs-dcp.c | 45 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 35 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c b/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
-index d2d0ae445fd8..7c7d49a8a403 100644
---- a/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
-+++ b/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
-@@ -123,10 +123,10 @@ void adf_init_hw_data_c3xxxiov(struct adf_hw_device_data *hw_data)
- 	hw_data->enable_error_correction = adf_vf_void_noop;
- 	hw_data->init_admin_comms = adf_vf_int_noop;
- 	hw_data->exit_admin_comms = adf_vf_void_noop;
--	hw_data->send_admin_init = adf_vf2pf_init;
-+	hw_data->send_admin_init = adf_vf2pf_notify_init;
- 	hw_data->init_arb = adf_vf_int_noop;
- 	hw_data->exit_arb = adf_vf_void_noop;
--	hw_data->disable_iov = adf_vf2pf_shutdown;
-+	hw_data->disable_iov = adf_vf2pf_notify_shutdown;
- 	hw_data->get_accel_mask = get_accel_mask;
- 	hw_data->get_ae_mask = get_ae_mask;
- 	hw_data->get_num_accels = get_num_accels;
-diff --git a/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c b/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c
-index 38e4bc04f407..90e8a7564756 100644
---- a/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c
-+++ b/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c
-@@ -123,10 +123,10 @@ void adf_init_hw_data_c62xiov(struct adf_hw_device_data *hw_data)
- 	hw_data->enable_error_correction = adf_vf_void_noop;
- 	hw_data->init_admin_comms = adf_vf_int_noop;
- 	hw_data->exit_admin_comms = adf_vf_void_noop;
--	hw_data->send_admin_init = adf_vf2pf_init;
-+	hw_data->send_admin_init = adf_vf2pf_notify_init;
- 	hw_data->init_arb = adf_vf_int_noop;
- 	hw_data->exit_arb = adf_vf_void_noop;
--	hw_data->disable_iov = adf_vf2pf_shutdown;
-+	hw_data->disable_iov = adf_vf2pf_notify_shutdown;
- 	hw_data->get_accel_mask = get_accel_mask;
- 	hw_data->get_ae_mask = get_ae_mask;
- 	hw_data->get_num_accels = get_num_accels;
-diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
-index 0d596a99f564..88c8831503e4 100644
---- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-@@ -239,8 +239,8 @@ void adf_enable_vf2pf_interrupts(struct adf_accel_dev *accel_dev,
- void adf_enable_pf2vf_interrupts(struct adf_accel_dev *accel_dev);
- void adf_disable_pf2vf_interrupts(struct adf_accel_dev *accel_dev);
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index 1a8dc76e117e..c94db361138d 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -167,15 +167,19 @@ static struct dcp *global_sdcp;
  
--int adf_vf2pf_init(struct adf_accel_dev *accel_dev);
--void adf_vf2pf_shutdown(struct adf_accel_dev *accel_dev);
-+int adf_vf2pf_notify_init(struct adf_accel_dev *accel_dev);
-+void adf_vf2pf_notify_shutdown(struct adf_accel_dev *accel_dev);
- int adf_init_pf_wq(void);
- void adf_exit_pf_wq(void);
- int adf_init_vf_wq(void);
-@@ -263,12 +263,12 @@ static inline void adf_disable_pf2vf_interrupts(struct adf_accel_dev *accel_dev)
+ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
  {
- }
++	int dma_err;
+ 	struct dcp *sdcp = global_sdcp;
+ 	const int chan = actx->chan;
+ 	uint32_t stat;
+ 	unsigned long ret;
+ 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+-
+ 	dma_addr_t desc_phys = dma_map_single(sdcp->dev, desc, sizeof(*desc),
+ 					      DMA_TO_DEVICE);
  
--static inline int adf_vf2pf_init(struct adf_accel_dev *accel_dev)
-+static inline int adf_vf2pf_notify_init(struct adf_accel_dev *accel_dev)
++	dma_err = dma_mapping_error(sdcp->dev, desc_phys);
++	if (dma_err)
++		return dma_err;
++
+ 	reinit_completion(&sdcp->completion[chan]);
+ 
+ 	/* Clear status register. */
+@@ -213,18 +217,29 @@ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
+ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+ 			   struct ablkcipher_request *req, int init)
  {
- 	return 0;
- }
++	dma_addr_t key_phys, src_phys, dst_phys;
+ 	struct dcp *sdcp = global_sdcp;
+ 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+ 	struct dcp_aes_req_ctx *rctx = ablkcipher_request_ctx(req);
+ 	int ret;
  
--static inline void adf_vf2pf_shutdown(struct adf_accel_dev *accel_dev)
-+static inline void adf_vf2pf_notify_shutdown(struct adf_accel_dev *accel_dev)
- {
- }
+-	dma_addr_t key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
+-					     2 * AES_KEYSIZE_128,
+-					     DMA_TO_DEVICE);
+-	dma_addr_t src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
+-					     DCP_BUF_SZ, DMA_TO_DEVICE);
+-	dma_addr_t dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
+-					     DCP_BUF_SZ, DMA_FROM_DEVICE);
++	key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
++				  2 * AES_KEYSIZE_128, DMA_TO_DEVICE);
++	ret = dma_mapping_error(sdcp->dev, key_phys);
++	if (ret)
++		return ret;
++
++	src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
++				  DCP_BUF_SZ, DMA_TO_DEVICE);
++	ret = dma_mapping_error(sdcp->dev, src_phys);
++	if (ret)
++		goto err_src;
++
++	dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
++				  DCP_BUF_SZ, DMA_FROM_DEVICE);
++	ret = dma_mapping_error(sdcp->dev, dst_phys);
++	if (ret)
++		goto err_dst;
  
-diff --git a/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c b/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
-index cd5f37dffe8a..1830194567e8 100644
---- a/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
-+++ b/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
-@@ -49,14 +49,14 @@
- #include "adf_pf2vf_msg.h"
+ 	if (actx->fill % AES_BLOCK_SIZE) {
+ 		dev_err(sdcp->dev, "Invalid block size!\n");
+@@ -262,10 +277,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+ 	ret = mxs_dcp_start_dma(actx);
  
- /**
-- * adf_vf2pf_init() - send init msg to PF
-+ * adf_vf2pf_notify_init() - send init msg to PF
-  * @accel_dev:  Pointer to acceleration VF device.
-  *
-  * Function sends an init messge from the VF to a PF
-  *
-  * Return: 0 on success, error code otherwise.
-  */
--int adf_vf2pf_init(struct adf_accel_dev *accel_dev)
-+int adf_vf2pf_notify_init(struct adf_accel_dev *accel_dev)
- {
- 	u32 msg = (ADF_VF2PF_MSGORIGIN_SYSTEM |
- 		(ADF_VF2PF_MSGTYPE_INIT << ADF_VF2PF_MSGTYPE_SHIFT));
-@@ -69,17 +69,17 @@ int adf_vf2pf_init(struct adf_accel_dev *accel_dev)
- 	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(adf_vf2pf_init);
-+EXPORT_SYMBOL_GPL(adf_vf2pf_notify_init);
+ aes_done_run:
++	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
++err_dst:
++	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
++err_src:
+ 	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
+ 			 DMA_TO_DEVICE);
+-	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+-	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
  
- /**
-- * adf_vf2pf_shutdown() - send shutdown msg to PF
-+ * adf_vf2pf_notify_shutdown() - send shutdown msg to PF
-  * @accel_dev:  Pointer to acceleration VF device.
-  *
-  * Function sends a shutdown messge from the VF to a PF
-  *
-  * Return: void
-  */
--void adf_vf2pf_shutdown(struct adf_accel_dev *accel_dev)
-+void adf_vf2pf_notify_shutdown(struct adf_accel_dev *accel_dev)
- {
- 	u32 msg = (ADF_VF2PF_MSGORIGIN_SYSTEM |
- 	    (ADF_VF2PF_MSGTYPE_SHUTDOWN << ADF_VF2PF_MSGTYPE_SHIFT));
-@@ -89,4 +89,4 @@ void adf_vf2pf_shutdown(struct adf_accel_dev *accel_dev)
- 			dev_err(&GET_DEV(accel_dev),
- 				"Failed to send Shutdown event to PF\n");
+ 	return ret;
  }
--EXPORT_SYMBOL_GPL(adf_vf2pf_shutdown);
-+EXPORT_SYMBOL_GPL(adf_vf2pf_notify_shutdown);
-diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c b/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
-index a3b4dd8099a7..3a8361c83f0b 100644
---- a/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
-+++ b/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
-@@ -123,10 +123,10 @@ void adf_init_hw_data_dh895xcciov(struct adf_hw_device_data *hw_data)
- 	hw_data->enable_error_correction = adf_vf_void_noop;
- 	hw_data->init_admin_comms = adf_vf_int_noop;
- 	hw_data->exit_admin_comms = adf_vf_void_noop;
--	hw_data->send_admin_init = adf_vf2pf_init;
-+	hw_data->send_admin_init = adf_vf2pf_notify_init;
- 	hw_data->init_arb = adf_vf_int_noop;
- 	hw_data->exit_arb = adf_vf_void_noop;
--	hw_data->disable_iov = adf_vf2pf_shutdown;
-+	hw_data->disable_iov = adf_vf2pf_notify_shutdown;
- 	hw_data->get_accel_mask = get_accel_mask;
- 	hw_data->get_ae_mask = get_ae_mask;
- 	hw_data->get_num_accels = get_num_accels;
+@@ -570,6 +587,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
+ 	dma_addr_t buf_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_in_buf,
+ 					     DCP_BUF_SZ, DMA_TO_DEVICE);
+ 
++	ret = dma_mapping_error(sdcp->dev, buf_phys);
++	if (ret)
++		return ret;
++
+ 	/* Fill in the DMA descriptor. */
+ 	desc->control0 = MXS_DCP_CONTROL0_DECR_SEMAPHORE |
+ 		    MXS_DCP_CONTROL0_INTERRUPT |
+@@ -602,6 +623,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
+ 	if (rctx->fini) {
+ 		digest_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_out_buf,
+ 					     DCP_SHA_PAY_SZ, DMA_FROM_DEVICE);
++		ret = dma_mapping_error(sdcp->dev, digest_phys);
++		if (ret)
++			goto done_run;
++
+ 		desc->control0 |= MXS_DCP_CONTROL0_HASH_TERM;
+ 		desc->payload = digest_phys;
+ 	}
 -- 
 2.30.2
 
