@@ -2,45 +2,45 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61CB1C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:24:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DAD4C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:24:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4FC1E6120E
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:24:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E92FE61108
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:24:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240498AbhIFBZl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Sep 2021 21:25:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39168 "EHLO mail.kernel.org"
+        id S239586AbhIFBZn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Sep 2021 21:25:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39352 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239948AbhIFBYI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Sep 2021 21:24:08 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D82AD6113B;
-        Mon,  6 Sep 2021 01:21:57 +0000 (UTC)
+        id S239977AbhIFBYJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 5 Sep 2021 21:24:09 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 763D56103C;
+        Mon,  6 Sep 2021 01:22:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630891318;
-        bh=bF2GIdUb07CWPyAMRv26r5PYGGFNnErox+Z3MFI8mhU=;
+        s=k20201202; t=1630891322;
+        bh=gHOyesAu68sPGrpUkzJYHyLALtuFHcCbITcL8Zix2Fw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Y58kD60k/C2juxPS89GLukCWEMJ3olFvgH1jeKPyM99l6FdHenMCQM7+xz9d8VS+a
-         VZKZ6oP8cOjYSfvno+H8tSwewIeoXiHmC4jGWz5DeT1uS5mXYXq1PLnncqR6bRxlUJ
-         ZGXXAnhTxz5QnyZJ4+1q5lpTUBBqtNDgP01YhhHdv7vnJ85TehOMdbMuzy7WBf3LaQ
-         5aqF73CfRAP+dhGviLw3snUdKjX/5vSVl4hF3eBSMQTcRMX/nHCGWa7325BzCgyppb
-         SGwNR+z2SFBiSWb5vJrGLIchC7Ro8OgFaRgU6g8WcC7XpgXmnlxbPh8suBz7l7NPg4
-         51roYGydWlgrA==
+        b=mmDU6ESXacpJ4lg5fb2QsckipD6SlMQr8FnCYsB1oo5VEvqMCWtJV0K6qze8l8UDh
+         WlkGI/KWgWCfYCOlkpySvLRNPk+t1yJv4+pH5jssM2COTE3GT085EjfKHB0dTlmxmR
+         zeKxUEyOfIfD6Hfm2ZFxFhiQWP/RPh7j0OA/zF+fIjidyAHkwcFpHRNzdPsH9RUWzt
+         hTwW4gWIZMOqtOnH+1ZkQurLTxai9232rNWpiAmQrRNLTXf8GMhI0x9xE8qOGrVy0U
+         h3IWjRdZn9vYebBXiwWX+SN+f+Gkb9pdjvuwYxxIMLgkpNE8o3bXKUZKRbZhnMRrBX
+         kSh79tJUYu0tA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Sean Anderson <sean.anderson@seco.com>,
-        Richard Weinberger <richard@nod.at>,
+Cc:     Tony Lindgren <tony@atomide.com>,
+        Lokesh Vutla <lokeshvutla@ti.com>,
+        Tero Kristo <kristo@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.10 04/39] crypto: mxs-dcp - Check for DMA mapping errors
-Date:   Sun,  5 Sep 2021 21:21:18 -0400
-Message-Id: <20210906012153.929962-4-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.10 07/39] crypto: omap-sham - clear dma flags only after omap_sham_update_dma_stop()
+Date:   Sun,  5 Sep 2021 21:21:21 -0400
+Message-Id: <20210906012153.929962-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210906012153.929962-1-sashal@kernel.org>
 References: <20210906012153.929962-1-sashal@kernel.org>
@@ -52,123 +52,40 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Sean Anderson <sean.anderson@seco.com>
+From: Tony Lindgren <tony@atomide.com>
 
-[ Upstream commit df6313d707e575a679ada3313358289af24454c0 ]
+[ Upstream commit fe28140b3393b0ba1eb95cc109f974a7e58b26fd ]
 
-After calling dma_map_single(), we must also call dma_mapping_error().
-This fixes the following warning when compiling with CONFIG_DMA_API_DEBUG:
+We should not clear FLAGS_DMA_ACTIVE before omap_sham_update_dma_stop() is
+done calling dma_unmap_sg(). We already clear FLAGS_DMA_ACTIVE at the
+end of omap_sham_update_dma_stop().
 
-[  311.241478] WARNING: CPU: 0 PID: 428 at kernel/dma/debug.c:1027 check_unmap+0x79c/0x96c
-[  311.249547] DMA-API: mxs-dcp 2280000.crypto: device driver failed to check map error[device address=0x00000000860cb080] [size=32 bytes] [mapped as single]
+The early clearing of FLAGS_DMA_ACTIVE is not causing issues as we do not
+need to defer anything based on FLAGS_DMA_ACTIVE currently. So this can be
+applied as clean-up.
 
-Signed-off-by: Sean Anderson <sean.anderson@seco.com>
-Reviewed-by: Richard Weinberger <richard@nod.at>
+Cc: Lokesh Vutla <lokeshvutla@ti.com>
+Cc: Tero Kristo <kristo@kernel.org>
+Signed-off-by: Tony Lindgren <tony@atomide.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/mxs-dcp.c | 45 +++++++++++++++++++++++++++++++---------
- 1 file changed, 35 insertions(+), 10 deletions(-)
+ drivers/crypto/omap-sham.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index 909a7eb748e3..7daed8b78ac8 100644
---- a/drivers/crypto/mxs-dcp.c
-+++ b/drivers/crypto/mxs-dcp.c
-@@ -169,15 +169,19 @@ static struct dcp *global_sdcp;
- 
- static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
- {
-+	int dma_err;
- 	struct dcp *sdcp = global_sdcp;
- 	const int chan = actx->chan;
- 	uint32_t stat;
- 	unsigned long ret;
- 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
--
- 	dma_addr_t desc_phys = dma_map_single(sdcp->dev, desc, sizeof(*desc),
- 					      DMA_TO_DEVICE);
- 
-+	dma_err = dma_mapping_error(sdcp->dev, desc_phys);
-+	if (dma_err)
-+		return dma_err;
-+
- 	reinit_completion(&sdcp->completion[chan]);
- 
- 	/* Clear status register. */
-@@ -215,18 +219,29 @@ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
- static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
- 			   struct skcipher_request *req, int init)
- {
-+	dma_addr_t key_phys, src_phys, dst_phys;
- 	struct dcp *sdcp = global_sdcp;
- 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
- 	struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
- 	int ret;
- 
--	dma_addr_t key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
--					     2 * AES_KEYSIZE_128,
--					     DMA_TO_DEVICE);
--	dma_addr_t src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
--					     DCP_BUF_SZ, DMA_TO_DEVICE);
--	dma_addr_t dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
--					     DCP_BUF_SZ, DMA_FROM_DEVICE);
-+	key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
-+				  2 * AES_KEYSIZE_128, DMA_TO_DEVICE);
-+	ret = dma_mapping_error(sdcp->dev, key_phys);
-+	if (ret)
-+		return ret;
-+
-+	src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
-+				  DCP_BUF_SZ, DMA_TO_DEVICE);
-+	ret = dma_mapping_error(sdcp->dev, src_phys);
-+	if (ret)
-+		goto err_src;
-+
-+	dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
-+				  DCP_BUF_SZ, DMA_FROM_DEVICE);
-+	ret = dma_mapping_error(sdcp->dev, dst_phys);
-+	if (ret)
-+		goto err_dst;
- 
- 	if (actx->fill % AES_BLOCK_SIZE) {
- 		dev_err(sdcp->dev, "Invalid block size!\n");
-@@ -264,10 +279,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
- 	ret = mxs_dcp_start_dma(actx);
- 
- aes_done_run:
-+	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
-+err_dst:
-+	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
-+err_src:
- 	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
- 			 DMA_TO_DEVICE);
--	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
--	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
- 
- 	return ret;
- }
-@@ -556,6 +573,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
- 	dma_addr_t buf_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_in_buf,
- 					     DCP_BUF_SZ, DMA_TO_DEVICE);
- 
-+	ret = dma_mapping_error(sdcp->dev, buf_phys);
-+	if (ret)
-+		return ret;
-+
- 	/* Fill in the DMA descriptor. */
- 	desc->control0 = MXS_DCP_CONTROL0_DECR_SEMAPHORE |
- 		    MXS_DCP_CONTROL0_INTERRUPT |
-@@ -588,6 +609,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
- 	if (rctx->fini) {
- 		digest_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_out_buf,
- 					     DCP_SHA_PAY_SZ, DMA_FROM_DEVICE);
-+		ret = dma_mapping_error(sdcp->dev, digest_phys);
-+		if (ret)
-+			goto done_run;
-+
- 		desc->control0 |= MXS_DCP_CONTROL0_HASH_TERM;
- 		desc->payload = digest_phys;
- 	}
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 39d17ed1db2f..f6a8ae8a18c2 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1735,7 +1735,7 @@ static void omap_sham_done_task(unsigned long data)
+ 		if (test_and_clear_bit(FLAGS_OUTPUT_READY, &dd->flags))
+ 			goto finish;
+ 	} else if (test_bit(FLAGS_DMA_READY, &dd->flags)) {
+-		if (test_and_clear_bit(FLAGS_DMA_ACTIVE, &dd->flags)) {
++		if (test_bit(FLAGS_DMA_ACTIVE, &dd->flags)) {
+ 			omap_sham_update_dma_stop(dd);
+ 			if (dd->err) {
+ 				err = dd->err;
 -- 
 2.30.2
 
