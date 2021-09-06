@@ -7,39 +7,38 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3EE9C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10226C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:23:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C2EB9611CA
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:23:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDAEC611C8
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:23:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239375AbhIFBY1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Sep 2021 21:24:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37826 "EHLO mail.kernel.org"
+        id S239326AbhIFBY2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Sep 2021 21:24:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38636 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239362AbhIFBX0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Sep 2021 21:23:26 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C244F6103B;
-        Mon,  6 Sep 2021 01:21:39 +0000 (UTC)
+        id S239323AbhIFBXY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 5 Sep 2021 21:23:24 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6237E610CF;
+        Mon,  6 Sep 2021 01:21:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630891300;
-        bh=ApwTNw57Xn5wd0hDAzN4+R9h7oL8Q3f2/lpZI7iL3iA=;
+        s=k20201202; t=1630891298;
+        bh=RVvqkOD6e+5BgfIzLEczbyRZYoL2Wp6cZwFgx8spkZc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=oGP61KZrrd9FHZS3JGWV8wkEyRFJNjZlvEiVTu6kPNehoN9SIyZk4d0MR9Pe3HvVK
-         7TtC/6X9tPh//voeWuLjJz9xa7QKFP4cEjlHSqsympm5lR3GMSsOUzyG/uXoFRDkhZ
-         bC4cltXKkuGnavSW6cyPpG3E9u35QBN+p+Jf/lAQ3cysOwdpmouOLFN93jE32EuX9R
-         IklfjcYvciSEiVEvhSgA5RRh/vhzG0D9vJMa1OfFFVyNZt1ClM7lX2mi4k5bINxnfr
-         qXHT+GBWWfz0G1QPb0hi0CtAMZtamuEC66+Whnr2TGIZbmrrW97uJwtEQabFAqwn2E
-         ilKFa3LXHQoYA==
+        b=lfvoJi+8XQQYOuAE0tcedYToXskBeGaQiCVZrEBmEqnZ0cUub2fuJM3VJSCgIomEO
+         KsmEuv7kpxkgsGKPcK7H5YOXr9syfhxI568C43LUd4r5F7P4nOTobGDzxDBmUsp+GH
+         Zh7zUFmdUu6+tMgzOu635HqUq1XiTONEPUPK7OtBxXFadmNxGxshFgqvL/8taq2I9E
+         JTBmUxZur/ylEs/JbJOI8hq5fFbxBUkE71oG85iXLMza2BmdcSxqlVDv7vWpYMuC/z
+         FDN6CmevSUi0G/ROBb1RuYuyV4SKXC3TzoGB23y0PRz8pIrwI/5Ysl53DerPyX7VqK
+         URhbi2UqhYi9w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
+Cc:     Kai Ye <yekai13@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 37/46] crypto: tcrypt - Fix missing return value check
-Date:   Sun,  5 Sep 2021 21:20:42 -0400
-Message-Id: <20210906012052.929174-37-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.13 35/46] crypto: hisilicon/sec - fix the abnormal exiting process
+Date:   Sun,  5 Sep 2021 21:20:40 -0400
+Message-Id: <20210906012052.929174-35-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210906012052.929174-1-sashal@kernel.org>
 References: <20210906012052.929174-1-sashal@kernel.org>
@@ -51,102 +50,34 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+From: Kai Ye <yekai13@huawei.com>
 
-[ Upstream commit 7b3d52683b3a47c0ba1dfd6b5994a3a795b06972 ]
+[ Upstream commit 90367a027a22c3a9ca8b8bac15df34d9e859fc11 ]
 
-There are several places where the return value check of crypto_aead_setkey
-and crypto_aead_setauthsize were lost. It is necessary to add these checks.
+Because the algs registration process has added a judgment.
+So need to add the judgment for the abnormal exiting process.
 
-At the same time, move the crypto_aead_setauthsize() call out of the loop,
-and only need to call it once after load transform.
-
-Fixee: 53f52d7aecb4 ("crypto: tcrypt - Added speed tests for AEAD crypto alogrithms in tcrypt test suite")
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
+Signed-off-by: Kai Ye <yekai13@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/tcrypt.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+ drivers/crypto/hisilicon/sec2/sec_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 6b7c158dc508..f9c00875bc0e 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -290,6 +290,11 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
- 	}
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 6f0062d4408c..e682e2a77b70 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -921,7 +921,8 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	return 0;
  
- 	ret = crypto_aead_setauthsize(tfm, authsize);
-+	if (ret) {
-+		pr_err("alg: aead: Failed to setauthsize for %s: %d\n", algo,
-+		       ret);
-+		goto out_free_tfm;
-+	}
- 
- 	for (i = 0; i < num_mb; ++i)
- 		if (testmgr_alloc_buf(data[i].xbuf)) {
-@@ -315,7 +320,7 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
- 	for (i = 0; i < num_mb; ++i) {
- 		data[i].req = aead_request_alloc(tfm, GFP_KERNEL);
- 		if (!data[i].req) {
--			pr_err("alg: skcipher: Failed to allocate request for %s\n",
-+			pr_err("alg: aead: Failed to allocate request for %s\n",
- 			       algo);
- 			while (i--)
- 				aead_request_free(data[i].req);
-@@ -567,13 +572,19 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 	sgout = &sg[9];
- 
- 	tfm = crypto_alloc_aead(algo, 0, 0);
--
- 	if (IS_ERR(tfm)) {
- 		pr_err("alg: aead: Failed to load transform for %s: %ld\n", algo,
- 		       PTR_ERR(tfm));
- 		goto out_notfm;
- 	}
- 
-+	ret = crypto_aead_setauthsize(tfm, authsize);
-+	if (ret) {
-+		pr_err("alg: aead: Failed to setauthsize for %s: %d\n", algo,
-+		       ret);
-+		goto out_noreq;
-+	}
-+
- 	crypto_init_wait(&wait);
- 	printk(KERN_INFO "\ntesting speed of %s (%s) %s\n", algo,
- 			get_driver_name(crypto_aead, tfm), e);
-@@ -611,8 +622,13 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 					break;
- 				}
- 			}
-+
- 			ret = crypto_aead_setkey(tfm, key, *keysize);
--			ret = crypto_aead_setauthsize(tfm, authsize);
-+			if (ret) {
-+				pr_err("setkey() failed flags=%x: %d\n",
-+					crypto_aead_get_flags(tfm), ret);
-+				goto out;
-+			}
- 
- 			iv_len = crypto_aead_ivsize(tfm);
- 			if (iv_len)
-@@ -622,15 +638,8 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 			printk(KERN_INFO "test %u (%d bit key, %d byte blocks): ",
- 					i, *keysize * 8, bs);
- 
--
- 			memset(tvmem[0], 0xff, PAGE_SIZE);
- 
--			if (ret) {
--				pr_err("setkey() failed flags=%x\n",
--						crypto_aead_get_flags(tfm));
--				goto out;
--			}
--
- 			sg_init_aead(sg, xbuf, bs + (enc ? 0 : authsize),
- 				     assoc, aad_size);
- 
+ err_alg_unregister:
+-	hisi_qm_alg_unregister(qm, &sec_devices);
++	if (qm->qp_num >= ctx_q_num)
++		hisi_qm_alg_unregister(qm, &sec_devices);
+ err_qm_stop:
+ 	sec_debugfs_exit(qm);
+ 	hisi_qm_stop(qm, QM_NORMAL);
 -- 
 2.30.2
 
