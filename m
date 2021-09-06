@@ -2,163 +2,173 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EE3C433EF
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Sep 2021 13:59:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFE6C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:20:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC51560F51
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Sep 2021 13:59:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2786C61027
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Sep 2021 01:20:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232542AbhIEOAy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Sep 2021 10:00:54 -0400
-Received: from mail-dm6nam12on2058.outbound.protection.outlook.com ([40.107.243.58]:62273
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232209AbhIEOAy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Sep 2021 10:00:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NG2BPWhG5XbOOcbu/j1PMIIoF3nvkWs0ONV4SlxFVGcMuaQRuYawn0zsU64YXGdA80OEZ4c1J3GXigAvFYVyq+jcfjicb5+OJgU9Xz6Nnms/ehg+L05PxHMf+YzTwHU3FB/jLioLSpnHHzq/W/zPHrgVPXCHy8irow7kG8JjxqPJ1bTMr+CLzxHS83k/Eo0G6+z+/BZUEDLDV+IgtrGLDfkF/QhoYF1NRq/Ys5DwkoYVomSzrJ1c/siP+vba5n88Q8+lDz9QDxbRg7K6SrwETU2n6CQam+vFtuPiKzRAGUVvRNFw3IyTB/vJ8C7upzs603ooOeJXPMqqV2ZPPXzMrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=3ndnraWYtquLoJOxdG/D7wPrtuwjqsxsSBhDtKTV0gY=;
- b=O3wnwe8GqB39HedT9CfSzv+dbYBtp04VybQV16GFF3XGEUuHPkJynZW4t2bvKLWjCBGMYjpcqwOlvq6JVvesbtDYK9DW6/OonXSK6Y0oifKp3JFOIcnNY2yTQALZRDrHNKm95U68lYgbm28WU9vwXH+m/82NTciZiAqbhzIdMzkxzmPO8iqkAXsuLkLTDyEoOaM5AnIBSKWKspQ/No4VxtihcEqnB8BM52k6IJdnnoA3nR3IfDmzm7Q51GgVn9iloK0wPePux0KKLoNYFvW6MNA0bMynBHAGVzwKlXmoJcZmikVTbDIsqrOelA8ZqgUQXFrJsf7IrFTY4/Om6awyYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3ndnraWYtquLoJOxdG/D7wPrtuwjqsxsSBhDtKTV0gY=;
- b=bUCcnTH6GmwpB7inMiZO80NqbGBs+PrSDEH0DoWFSpZEeEtsEL3PIvbx1lYavBDM6g3UY7wA2v4y9coI2rfFfp0VD6FmszW3j/wvVWRw/PLKQKONtEPr6oFScdTA/GGRBcISkW2CtS9rC5FzhpBbacGYOJSrDJjj8cvgn2jUlZg=
-Authentication-Results: amd.com; dkim=none (message not signed)
- header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN6PR12MB2717.namprd12.prod.outlook.com (2603:10b6:805:68::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19; Sun, 5 Sep
- 2021 13:59:45 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4478.025; Sun, 5 Sep 2021
- 13:59:45 +0000
-Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
-To:     Dov Murik <dovmurik@linux.ibm.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        Pavan Kumar Paluri <papaluri@amd.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-24-brijesh.singh@amd.com>
- <66c9694a-bd1a-0a12-8c1d-326d34daaac2@linux.ibm.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <dbc82551-4b10-90ae-3a89-97c418049408@amd.com>
-Date:   Sun, 5 Sep 2021 08:59:42 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.13.0
-In-Reply-To: <66c9694a-bd1a-0a12-8c1d-326d34daaac2@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: SN4PR0501CA0027.namprd05.prod.outlook.com
- (2603:10b6:803:40::40) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S238605AbhIFBVD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Sep 2021 21:21:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37338 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238591AbhIFBVA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 5 Sep 2021 21:21:00 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E07B86101C;
+        Mon,  6 Sep 2021 01:19:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630891196;
+        bh=W9yqL3arC6UNFr/fcNYw4yJx9lC/1tDau6WWaigkSJ0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=diImmS68X8pT7lD7yhehS8W2l8Q6yV7IpzPDjtHU6zDRPVku/XtA7aYiOLHmdM30R
+         +Smptn8gM5ZxMEFHhISOwMdj65ohWDWPESr/1oeGxmalBoowCBiWtAuZzRGCgj6/Ry
+         liehVQS1eqz8D+tUK9gFmttgaMKIJ6d1yxbpJT4rulvJU1iii1ZLMKetCXhZ2CkC+U
+         jTWPbvK6zvlcQA5QqwP95uaO6ZGTxagBPYPQfnDVUZoii03ZBUI5yxTkvTHG42+PK5
+         GocrBDLzqfqPJT7iccI5Q+w+7tD9iHH0T7N4zSLBTqpoF5XZ7+015zMhPAkxFOWBN9
+         MET1OQPAl9d9w==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Sean Anderson <sean.anderson@seco.com>,
+        Richard Weinberger <richard@nod.at>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.14 04/47] crypto: mxs-dcp - Check for DMA mapping errors
+Date:   Sun,  5 Sep 2021 21:19:08 -0400
+Message-Id: <20210906011951.928679-4-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210906011951.928679-1-sashal@kernel.org>
+References: <20210906011951.928679-1-sashal@kernel.org>
 MIME-Version: 1.0
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN4PR0501CA0027.namprd05.prod.outlook.com (2603:10b6:803:40::40) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.9 via Frontend Transport; Sun, 5 Sep 2021 13:59:43 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 71fca138-9d3c-456b-4c37-08d970756a55
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2717:
-X-LD-Processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB271700164E2AF7FF628788B5E5D19@SN6PR12MB2717.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2150;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +2L+0iBvn8VYQVk3bHz+N65i6WG3I7BiMS0FSEV9tyJsrhmYH34iySWqV8yNDnLtDUIU/4vwYIkysSX4e0Gwg5vbeDi6kjTwCxfADIFgxoVd+ymTujxgq2toEzt3XEYFM59ChJ6U2D1FY+KUma+qgIOAGFFyze0HOmhytv9iA94FWxuRZWz+dvSs6r6haQbfSWQ7eNfbGDq1g/OC/sp3MRunRKbU8NLNS2MKLyCFM8i1QX/8unX3Akn6NXTkUHL3BJiXn7xS4cgvuTDvtIoLO7+9p2+JuP87LhRxWe0vdkqyIXHObfOJS9k6yKvwGsSJjzVAFhGysV+q4Hq1PZGEa4VHTPkT8gfq/zbPilccJ8++3T5soSbJn9TuOwNLzonH4AsCLXZB52TpjYyz+DWft9Yj+xyv0GWvLOy0YkAD4G95gL8dZl5rxmiK4AFZgTXl0YBITztXhT/yKNpgmnbRx8EoVjZMKeAN7wcgvRYoCnd2oAQftW/6EiWkb96x2GOge8yXPEsezuizEpSF/GAZQIKPUK+ARmPDUoAzTMqz06cYdbL0hD6rgbWORbSvGiZHRbBaWvK4phc88KTp3NKK/IzqVYiCyYDNqSnF1svrcbW7vStKVMlFQcR6My49hUlM4L7WUz3iiLSxlkfH00ThZQ1d3A/NgfGPnacDizRxevj/7Usosp8ud/iHE6wJfcAi2qB0BNqda8VAJAqDzZ1SRCBNaj3wisasZ0Oxht7veLSMQ5jzwT8Eg2bSs1uqF96I6kioCEQCkP5eLawp4d66WQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(136003)(366004)(39860400002)(396003)(956004)(2616005)(44832011)(54906003)(36756003)(186003)(6512007)(316002)(31686004)(38350700002)(7406005)(7416002)(8936002)(6486002)(86362001)(2906002)(38100700002)(66946007)(26005)(66556008)(6506007)(4744005)(66476007)(31696002)(8676002)(478600001)(53546011)(52116002)(5660300002)(4326008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ajVaaVlBV3lKUlJBVE1ucWhyTXBpa1RpWDZETXhBTFNrVG1jVVVUVm5ndWtS?=
- =?utf-8?B?U05pTG56c2RNMFlBTVhPN2lnOEtUR1Z5TTFlWi9ONlJaTDVvdzRIU01uQTV6?=
- =?utf-8?B?Y1dxNGJhYW9nSWMwOUU2NWN3alJOUWF2bnpzeWhuRjBKbE9HTFc2WDhaMzFj?=
- =?utf-8?B?a093eWpBam91TVZHQ3JpWU5xS3dMbmZUWnkyaDV2NjhKeHZnMlFuL1ZlMzNX?=
- =?utf-8?B?TEl0M0RqL2dmV2tPWFh2Z0hVVWpYNUlKOHQ0Z3NsWmhxcHc3Rk1laFdQU21Z?=
- =?utf-8?B?ZFhjOGNTeFJES3BkQmJ2ditqcmxudXZhcUpmWXgyUHFNSklQVmtxR0g1TVI2?=
- =?utf-8?B?OFhRTHVTZlgzKzROZTRJajM3TWprZ294L0ZJL0trVDJ1MUJZNXlzTU1jNWd5?=
- =?utf-8?B?LzRqZTR3OWJGalBXWVRSQnQrcGo1ZkpXUFVPMGVCci91cTJocEJtNmdWZUJZ?=
- =?utf-8?B?OE5UT2JUSk1IMlIwMm8rQkhQMzJpcjZRUEUxQlZBblJndVN0WDhmTzUzZkdr?=
- =?utf-8?B?Sk5UT3dJa0xhQmhLdWdxa3FvRkdidi9TcU1FN3pPY29OQktLaE9ZeUlCaHNM?=
- =?utf-8?B?clZDdDJlbGFxNjRSbUdhOUN5NVVURUJKTE1zRmVubVAwNHJWc3NGYjZ6TnZ2?=
- =?utf-8?B?YmE3anNwdGxaV2hPMFdxNk95ZUw1Um9nSWMxNGdISncrU3pwbWNNeHVhc0pu?=
- =?utf-8?B?SFA1NStabFBSa3RFNXNCM08yOW1zOTBVTFl0VzdRZ05TSTJ2V1o3Yjh3YWJV?=
- =?utf-8?B?Ni9QYnBMTFZmNUJQODdHU3o3SXJXTlhKMkxJVWF4VG8rSmU2L2hheHJhcUJ0?=
- =?utf-8?B?OWlOM2UvbUQ2djhjMUdkYmlDdGhQKzFrVHFBMzg2UGxpZDlhVXNMVDRkSEkz?=
- =?utf-8?B?Rk9ZWVVNWnZ2cDNPdFhHVVRDdWlaVjZENnF4blE4WHQ2ZTIzOUJ1b1dhQ2VU?=
- =?utf-8?B?S3g2ekhvOWJRd3dOK2t5VUpCZzBBOEduZEtQU0I5NzVvQ2lxUENPRUxPcXl0?=
- =?utf-8?B?QXVGLzBJTjBsWWpRL2FsdnNjQ041RVlvbU9RUW10MFIxMXZqTjdNVFVJUENB?=
- =?utf-8?B?Vm5yd1B0QXVkeWJwOHFvRUxpSHhra2Fqa0w3clFXR1JRbHRqekt4N0l0dWdT?=
- =?utf-8?B?d2dTY3huMzhqZGZHeFozUWpURFlDL1FCRGp1RTVDcE9uMGVLR2RScGtnU0ZB?=
- =?utf-8?B?SWZkY2FkWmFJUHgvMUhIN0RiN0VZMkU2REZEWFRseDhMclRtK3pLbkpVOENY?=
- =?utf-8?B?WVRIemR2Q2FrVXpIWk1EMC9vZU1iRXNIbVZRalNad3RlREhWRDRTYks4b3By?=
- =?utf-8?B?Wktxb0lvbG52dmo3eDd2V0VoRjJJNmprMDgzcndoaktWaHZ5MnIyYVc5U0V4?=
- =?utf-8?B?NUQzNmFZTGljeHR0RjZPNVJwTDhSZTI4YlI1NlF5amI2aDYveTZUMFBJWUpr?=
- =?utf-8?B?UDZ6S21kcCtEMEcxZnR1QXFZNFFwSm4xWlN2enRNeTYweUtZZks5ZVZlQ3Bl?=
- =?utf-8?B?RnYrY3BZYkdnR3grV0cyZnpENVNycWkyQ3hwemNPT1RsRzlidkoyaTVNOVEv?=
- =?utf-8?B?YmR0ZTdRNzRSdVZDUHRINGpBWnZDOVVTcTFVSjZZbTBVSC9aTjVEdjBKckk0?=
- =?utf-8?B?ekp0RjNEMWNmUU1ReUx2VHJwbUdYYzJydk9OYWlpZHdaUmh3MXIzV1Vzd2Fr?=
- =?utf-8?B?QkVpSFZpVUdIVkdIbmZubnpmUWp0TnZxRnl6b0lPZVkvajF1NC80cmx4cE5Y?=
- =?utf-8?Q?gfm8d0alQCeTi0tOxpHDBDFG9k1O8jxcAu36QrB?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 71fca138-9d3c-456b-4c37-08d970756a55
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2021 13:59:44.9573
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RSFC7mtBuKJIdKyKHwl2AMsTZqUYtA0vGw5hSTe3FA6s9OGlHrduqm2HMiZPH+KavhJz0ddLRa/e2r868xrhOw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2717
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Dov,
+From: Sean Anderson <sean.anderson@seco.com>
 
+[ Upstream commit df6313d707e575a679ada3313358289af24454c0 ]
 
-On 9/5/21 1:56 AM, Dov Murik wrote:
-> + /* enable the restricted injection */
->> +   #define KVM_SEV_SNP_RESTRICTED_INJET   (1<<0)
->> +
->> +   /* enable the restricted injection timer */
->> +   #define KVM_SEV_SNP_RESTRICTED_TIMER_INJET   (1<<1)
-> Typo in these flags: s/INJET/INJECT/
->
-> Also in the actual .h file below.
+After calling dma_map_single(), we must also call dma_mapping_error().
+This fixes the following warning when compiling with CONFIG_DMA_API_DEBUG:
 
-Noted. thanks
+[  311.241478] WARNING: CPU: 0 PID: 428 at kernel/dma/debug.c:1027 check_unmap+0x79c/0x96c
+[  311.249547] DMA-API: mxs-dcp 2280000.crypto: device driver failed to check map error[device address=0x00000000860cb080] [size=32 bytes] [mapped as single]
+
+Signed-off-by: Sean Anderson <sean.anderson@seco.com>
+Reviewed-by: Richard Weinberger <richard@nod.at>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/mxs-dcp.c | 45 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 35 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index d6a7784d2988..f397cc5bf102 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -170,15 +170,19 @@ static struct dcp *global_sdcp;
+ 
+ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
+ {
++	int dma_err;
+ 	struct dcp *sdcp = global_sdcp;
+ 	const int chan = actx->chan;
+ 	uint32_t stat;
+ 	unsigned long ret;
+ 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+-
+ 	dma_addr_t desc_phys = dma_map_single(sdcp->dev, desc, sizeof(*desc),
+ 					      DMA_TO_DEVICE);
+ 
++	dma_err = dma_mapping_error(sdcp->dev, desc_phys);
++	if (dma_err)
++		return dma_err;
++
+ 	reinit_completion(&sdcp->completion[chan]);
+ 
+ 	/* Clear status register. */
+@@ -216,18 +220,29 @@ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
+ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+ 			   struct skcipher_request *req, int init)
+ {
++	dma_addr_t key_phys, src_phys, dst_phys;
+ 	struct dcp *sdcp = global_sdcp;
+ 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+ 	struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
+ 	int ret;
+ 
+-	dma_addr_t key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
+-					     2 * AES_KEYSIZE_128,
+-					     DMA_TO_DEVICE);
+-	dma_addr_t src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
+-					     DCP_BUF_SZ, DMA_TO_DEVICE);
+-	dma_addr_t dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
+-					     DCP_BUF_SZ, DMA_FROM_DEVICE);
++	key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
++				  2 * AES_KEYSIZE_128, DMA_TO_DEVICE);
++	ret = dma_mapping_error(sdcp->dev, key_phys);
++	if (ret)
++		return ret;
++
++	src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
++				  DCP_BUF_SZ, DMA_TO_DEVICE);
++	ret = dma_mapping_error(sdcp->dev, src_phys);
++	if (ret)
++		goto err_src;
++
++	dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
++				  DCP_BUF_SZ, DMA_FROM_DEVICE);
++	ret = dma_mapping_error(sdcp->dev, dst_phys);
++	if (ret)
++		goto err_dst;
+ 
+ 	if (actx->fill % AES_BLOCK_SIZE) {
+ 		dev_err(sdcp->dev, "Invalid block size!\n");
+@@ -265,10 +280,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+ 	ret = mxs_dcp_start_dma(actx);
+ 
+ aes_done_run:
++	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
++err_dst:
++	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
++err_src:
+ 	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
+ 			 DMA_TO_DEVICE);
+-	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+-	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
+ 
+ 	return ret;
+ }
+@@ -557,6 +574,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
+ 	dma_addr_t buf_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_in_buf,
+ 					     DCP_BUF_SZ, DMA_TO_DEVICE);
+ 
++	ret = dma_mapping_error(sdcp->dev, buf_phys);
++	if (ret)
++		return ret;
++
+ 	/* Fill in the DMA descriptor. */
+ 	desc->control0 = MXS_DCP_CONTROL0_DECR_SEMAPHORE |
+ 		    MXS_DCP_CONTROL0_INTERRUPT |
+@@ -589,6 +610,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
+ 	if (rctx->fini) {
+ 		digest_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_out_buf,
+ 					     DCP_SHA_PAY_SZ, DMA_FROM_DEVICE);
++		ret = dma_mapping_error(sdcp->dev, digest_phys);
++		if (ret)
++			goto done_run;
++
+ 		desc->control0 |= MXS_DCP_CONTROL0_HASH_TERM;
+ 		desc->payload = digest_phys;
+ 	}
+-- 
+2.30.2
 
