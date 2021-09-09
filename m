@@ -2,85 +2,186 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8506BC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 05:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4957AC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 11:41:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6171A61139
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 05:14:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3106B600AA
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 11:41:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350570AbhIIFQG (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Sep 2021 01:16:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33238 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350662AbhIIFQF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Sep 2021 01:16:05 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1169BC06175F
-        for <linux-crypto@vger.kernel.org>; Wed,  8 Sep 2021 22:14:57 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id z4so643344wrr.6
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Sep 2021 22:14:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0rSslgaT6trl5t/rsmP7qXtX/NEAgmUtRkOyKb2Hba0=;
-        b=l7LVdZyjfwSQqSPhg2I5wAxEorI6MIMR/gnOlvXGAqZgNxvx6wBQfJYVZJcNAK5nlk
-         lkwPgsTQanaxXtKzwwut6UfF/mkyqW1+XrQ3jaJDyHJ2Gctxl/UTgKZH8XNjv/swWFmC
-         59hvO8nxwPSKyVPvdGzUv436Rl1JsgS/DtLCSBkMQ53d/4lWQSA+efgdLsDCJD7GHOEA
-         MZ9KJFbPCT7B0qzzNIJxvOhBGYNfzlJuj7uJW6mj/fpGHc/sBGyecbwSGtnQD6EOr3YN
-         jcZy9MbaaLRhF0vi7WmKQr0UDPkR0hfmC2jLqQYEyLIXv342eJHO7oYQRUSpQCVtwBWa
-         h9dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0rSslgaT6trl5t/rsmP7qXtX/NEAgmUtRkOyKb2Hba0=;
-        b=SbdsT+S2E6mK94Vtg1RlZVcqQb/9x6Weor2bjCmD3EMJqsR53sshnrdiTwEW2zz0Ni
-         iHo9Cjp4x/YdlU28pp6YTFs2+io7eQCN5s45aEn80BP1L4JaxJnvrRlwBvSP/RdJlC6b
-         JVmvpQh8fUv3SlMuJdp7XJXSgSOM01Uqnbu1L2KS6S8KU6MYp0eFIrGKEposjrNOJjpN
-         wWXu5KBvu4A9PWtGPZzPJvTapPByOQQ3583+TCZZNPlDoU67LYtXP/zlXfPE2wlih+FT
-         AJ3tb7kbZlDiuOKIJdmo30lhutk7K7ozyE+n38q/mVxyqrBz85xgOjDLfpsl1V9t9Smo
-         +QWg==
-X-Gm-Message-State: AOAM533Pr2/JKmFJ7859o6YRm0TNzblTb1fpXw1oYK0qwa0LOeNunzxm
-        f/3uVQuaKmyAaODL8D4ESs0VNcpmae9mnbTHd2U=
-X-Google-Smtp-Source: ABdhPJwdjOJM2vt5nmI6MA771k77UXshKjMwzz1HTioFPiPCmtUQX3rwgbDTAyzRvnoc4PZIZ3PYtG2wgL13J6Ola9s=
-X-Received: by 2002:a5d:538e:: with SMTP id d14mr1205386wrv.192.1631164495681;
- Wed, 08 Sep 2021 22:14:55 -0700 (PDT)
+        id S236816AbhIILnB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Sep 2021 07:43:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46202 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236817AbhIILmn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Sep 2021 07:42:43 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6AC25611C2;
+        Thu,  9 Sep 2021 11:41:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1631187693;
+        bh=9dqMjvJJhqY7NqJYkQIh6fgNR1D6JEdW1PhphlFg0jE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=tWMe5C/1Rfsjiys4hCWLA2iiuhu717g21dej/xDRTKKZtc/rik5sciKpgpmwrjs9S
+         ArXY2iUUXZu70MYNMZlq+Ap6Gq5JyD7cTm9Kq17ztA+YZ5h1Ii82FdI7YITlN1aSBv
+         WYzRqokcFw1XvJcu1G4Y9pq2Pk0RjWvBeXrYjlKjmHVWhjRbopujG+5cL2b/uQI3ee
+         ZbcAdMWnkhZSf5NsO61whTaTwqrE9Qx/aijvTw18q03qHCqVJV7mVxoeBFtCmzYe4m
+         9qkQxNb2/PbJ4kpeLR46Lho0zJWvm1x9il4XyM9AL8QBVU0ILM379jY8qjYtLNWCZm
+         u52wfGyP2owiA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Sean Anderson <sean.anderson@seco.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.14 020/252] crypto: mxs-dcp - Use sg_mapping_iter to copy data
+Date:   Thu,  9 Sep 2021 07:37:14 -0400
+Message-Id: <20210909114106.141462-20-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210909114106.141462-1-sashal@kernel.org>
+References: <20210909114106.141462-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <CACXcFmm798P6mPErh9B4thz7uvBG1sUO-eJpa1MB+7ayDyTCvw@mail.gmail.com>
- <YTmCyOTFADDSTdQm@sol.localdomain>
-In-Reply-To: <YTmCyOTFADDSTdQm@sol.localdomain>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Thu, 9 Sep 2021 13:14:42 +0800
-Message-ID: <CACXcFmmpf+bkjr3oiMcABCbXE+LnNQxWXXSiuVk-GMYV09u+Zw@mail.gmail.com>
-Subject: Re: [PATCH] In _extract-crng mix in 64 bits if possible
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Ted Ts'o" <tytso@mit.edu>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 9, 2021 at 11:43 AM Eric Biggers <ebiggers@kernel.org> wrote:
+From: Sean Anderson <sean.anderson@seco.com>
 
-> This patch is corrupted and doesn't apply.
-> ...
-> > -    unsigned long v, flags;
-> > +    unsigned long v, flags, *last;
-> > +    last = (unsigned long *) &crng->state[14] ;
->
-> How do you know that this has the right alignment for an unsigned long?
+[ Upstream commit 2e6d793e1bf07fe5e20cfbbdcec9e1af7e5097eb ]
 
-Good question, thanks. I don't & that's definitely a bug.
+This uses the sg_pcopy_from_buffer to copy data, instead of doing it
+ourselves.
 
-On my version, which includes patches I have not sent yet, it is
-necessarily 64-bit aligned.
+In addition to reducing code size, this fixes the following oops
+resulting from failing to kmap the page:
+
+[   68.896381] Unable to handle kernel NULL pointer dereference at virtual address 00000ab8
+[   68.904539] pgd = 3561adb3
+[   68.907475] [00000ab8] *pgd=00000000
+[   68.911153] Internal error: Oops: 805 [#1] ARM
+[   68.915618] Modules linked in: cfg80211 rfkill des_generic libdes arc4 libarc4 cbc ecb algif_skcipher sha256_generic libsha256 sha1_generic hmac aes_generic libaes cmac sha512_generic md5 md4 algif_hash af_alg i2c_imx i2c_core ci_hdrc_imx ci_hdrc mxs_dcp ulpi roles udc_core imx_sdma usbmisc_imx usb_common firmware_class virt_dma phy_mxs_usb nf_tables nfnetlink ip_tables x_tables ipv6 autofs4
+[   68.950741] CPU: 0 PID: 139 Comm: mxs_dcp_chan/ae Not tainted 5.10.34 #296
+[   68.958501] Hardware name: Freescale i.MX6 Ultralite (Device Tree)
+[   68.964710] PC is at memcpy+0xa8/0x330
+[   68.968479] LR is at 0xd7b2bc9d
+[   68.971638] pc : [<c053e7c8>]    lr : [<d7b2bc9d>]    psr: 000f0013
+[   68.977920] sp : c2cbbee4  ip : 00000010  fp : 00000010
+[   68.983159] r10: 00000000  r9 : c3283a40  r8 : 1a5a6f08
+[   68.988402] r7 : 4bfe0ecc  r6 : 76d8a220  r5 : c32f9050  r4 : 00000001
+[   68.994945] r3 : 00000ab8  r2 : fffffff0  r1 : c32f9050  r0 : 00000ab8
+[   69.001492] Flags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+[   69.008646] Control: 10c53c7d  Table: 83664059  DAC: 00000051
+[   69.014414] Process mxs_dcp_chan/ae (pid: 139, stack limit = 0x667b57ab)
+[   69.021133] Stack: (0xc2cbbee4 to 0xc2cbc000)
+[   69.025519] bee0:          c32f9050 c3235408 00000010 00000010 00000ab8 00000001 bf10406c
+[   69.033720] bf00: 00000000 00000000 00000010 00000000 c32355d0 832fb080 00000000 c13de2fc
+[   69.041921] bf20: c3628010 00000010 c33d5780 00000ab8 bf1067e8 00000002 c21e5010 c2cba000
+[   69.050125] bf40: c32f8040 00000000 bf106a40 c32f9040 c3283a80 00000001 bf105240 c3234040
+[   69.058327] bf60: ffffe000 c3204100 c2c69800 c2cba000 00000000 bf103b84 00000000 c2eddc54
+[   69.066530] bf80: c3204144 c0140d1c c2cba000 c2c69800 c0140be8 00000000 00000000 00000000
+[   69.074730] bfa0: 00000000 00000000 00000000 c0100114 00000000 00000000 00000000 00000000
+[   69.082932] bfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[   69.091131] bfe0: 00000000 00000000 00000000 00000000 00000013 00000000 00000000 00000000
+[   69.099364] [<c053e7c8>] (memcpy) from [<bf10406c>] (dcp_chan_thread_aes+0x4e8/0x840 [mxs_dcp])
+[   69.108117] [<bf10406c>] (dcp_chan_thread_aes [mxs_dcp]) from [<c0140d1c>] (kthread+0x134/0x160)
+[   69.116941] [<c0140d1c>] (kthread) from [<c0100114>] (ret_from_fork+0x14/0x20)
+[   69.124178] Exception stack(0xc2cbbfb0 to 0xc2cbbff8)
+[   69.129250] bfa0:                                     00000000 00000000 00000000 00000000
+[   69.137450] bfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[   69.145648] bfe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[   69.152289] Code: e320f000 e4803004 e4804004 e4805004 (e4806004)
+
+Signed-off-by: Sean Anderson <sean.anderson@seco.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/mxs-dcp.c | 36 +++++++++---------------------------
+ 1 file changed, 9 insertions(+), 27 deletions(-)
+
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index d6a7784d2988..60410f9623f1 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -283,21 +283,20 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 
+ 	struct scatterlist *dst = req->dst;
+ 	struct scatterlist *src = req->src;
+-	const int nents = sg_nents(req->src);
++	int dst_nents = sg_nents(dst);
+ 
+ 	const int out_off = DCP_BUF_SZ;
+ 	uint8_t *in_buf = sdcp->coh->aes_in_buf;
+ 	uint8_t *out_buf = sdcp->coh->aes_out_buf;
+ 
+-	uint8_t *out_tmp, *src_buf, *dst_buf = NULL;
+ 	uint32_t dst_off = 0;
++	uint8_t *src_buf = NULL;
+ 	uint32_t last_out_len = 0;
+ 
+ 	uint8_t *key = sdcp->coh->aes_key;
+ 
+ 	int ret = 0;
+-	int split = 0;
+-	unsigned int i, len, clen, rem = 0, tlen = 0;
++	unsigned int i, len, clen, tlen = 0;
+ 	int init = 0;
+ 	bool limit_hit = false;
+ 
+@@ -315,7 +314,7 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 		memset(key + AES_KEYSIZE_128, 0, AES_KEYSIZE_128);
+ 	}
+ 
+-	for_each_sg(req->src, src, nents, i) {
++	for_each_sg(req->src, src, sg_nents(src), i) {
+ 		src_buf = sg_virt(src);
+ 		len = sg_dma_len(src);
+ 		tlen += len;
+@@ -340,34 +339,17 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 			 * submit the buffer.
+ 			 */
+ 			if (actx->fill == out_off || sg_is_last(src) ||
+-				limit_hit) {
++			    limit_hit) {
+ 				ret = mxs_dcp_run_aes(actx, req, init);
+ 				if (ret)
+ 					return ret;
+ 				init = 0;
+ 
+-				out_tmp = out_buf;
++				sg_pcopy_from_buffer(dst, dst_nents, out_buf,
++						     actx->fill, dst_off);
++				dst_off += actx->fill;
+ 				last_out_len = actx->fill;
+-				while (dst && actx->fill) {
+-					if (!split) {
+-						dst_buf = sg_virt(dst);
+-						dst_off = 0;
+-					}
+-					rem = min(sg_dma_len(dst) - dst_off,
+-						  actx->fill);
+-
+-					memcpy(dst_buf + dst_off, out_tmp, rem);
+-					out_tmp += rem;
+-					dst_off += rem;
+-					actx->fill -= rem;
+-
+-					if (dst_off == sg_dma_len(dst)) {
+-						dst = sg_next(dst);
+-						split = 0;
+-					} else {
+-						split = 1;
+-					}
+-				}
++				actx->fill = 0;
+ 			}
+ 		} while (len);
+ 
+-- 
+2.30.2
+
