@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1605C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 12:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C95C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 13:00:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C078460ED8
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 12:50:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DABE60ED8
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 13:00:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354092AbhIIMv3 (ORCPT
+        id S1349453AbhIINBK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Sep 2021 08:51:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57492 "EHLO mail.kernel.org"
+        Thu, 9 Sep 2021 09:01:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57766 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1355156AbhIIMlo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Sep 2021 08:41:44 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E0CC161BFD;
-        Thu,  9 Sep 2021 11:55:11 +0000 (UTC)
+        id S1355213AbhIIMxL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Sep 2021 08:53:11 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DB22D63243;
+        Thu,  9 Sep 2021 11:57:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631188512;
-        bh=BBBVuYb5CothHTgpADtpSFTe43xfTMplvPkkI+9ff+o=;
+        s=k20201202; t=1631188649;
+        bh=nYQpcdEA1rgzp+X4D33TlLHTSG2DIYTRawIomuT5oGQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cptVaUDtTCJoUDhbUsP8qQRILTlFs7VF46pKU5pisjFzFoLTCDR3WuB3gmAd9YHfF
-         Vvsd3/q6sjZqY+rG9qaVtAYo5RbVsTMgGJStvq05LPSuYOsXj+IndSkk0Oe1GeNUi3
-         UPVp05X50UuH5dOunSHyZNuVrGDEZsn46IbFO+pNvNk6LtuZTYdVsoyqoy4E9C6vYD
-         oToyWD4UuJGHe58wMtvfXk05yw7OBuijPtOwViPgtw2NvT7w/y9Cumv1EFak0d27Ct
-         pTRKBUCh1mJAXd1rkMIHfDXqOz8rZb/b97r+M3SIIju+LdcFISLrwoKpbPHinycDYG
-         1OSOGZYLXqv6A==
+        b=Nkzaq3O6eqEBh18ZdBVw4K1OsOkS17UuKWXLN6OocvqvaLx2nD5S80eMbjl13GjqN
+         89bGM7fiFiWWZkIj7SvQ6TCri1K/WZVw0AxCUfrxmCJ1JRLwK6eBDuLwQ5x2Zv+EVT
+         /gJniZVR6Z/ECfhDTfZWVOmsh7c/91LfSAa584LYuGkuhmV2VnG9qVNWCWH9Dkrxrc
+         xZMNcmlg1LsdASy5NVhpJfebBk/YlgYnmNu6vZZUtBpl+HU1feunI8wkXAL60vOURh
+         k9JF9lCUSmmUqCYqRz6C/aIOKr0Oh/W2VOECLNn4zAWo3xrDUNa6KpiQSxz8j1w2HQ
+         e15P7kaSlN9Cg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sean Anderson <sean.anderson@seco.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.4 004/109] crypto: mxs-dcp - Use sg_mapping_iter to copy data
-Date:   Thu,  9 Sep 2021 07:53:21 -0400
-Message-Id: <20210909115507.147917-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 02/74] crypto: mxs-dcp - Use sg_mapping_iter to copy data
+Date:   Thu,  9 Sep 2021 07:56:14 -0400
+Message-Id: <20210909115726.149004-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210909115507.147917-1-sashal@kernel.org>
-References: <20210909115507.147917-1-sashal@kernel.org>
+In-Reply-To: <20210909115726.149004-1-sashal@kernel.org>
+References: <20210909115726.149004-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -106,10 +106,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 9 insertions(+), 27 deletions(-)
 
 diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index f8a48a84df2a..658a78974a22 100644
+index b0c592073a4a..e4e868364417 100644
 --- a/drivers/crypto/mxs-dcp.c
 +++ b/drivers/crypto/mxs-dcp.c
-@@ -281,21 +281,20 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+@@ -280,21 +280,20 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
  
  	struct scatterlist *dst = req->dst;
  	struct scatterlist *src = req->src;
@@ -134,7 +134,7 @@ index f8a48a84df2a..658a78974a22 100644
  	int init = 0;
  	bool limit_hit = false;
  
-@@ -313,7 +312,7 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+@@ -312,7 +311,7 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
  		memset(key + AES_KEYSIZE_128, 0, AES_KEYSIZE_128);
  	}
  
@@ -143,7 +143,7 @@ index f8a48a84df2a..658a78974a22 100644
  		src_buf = sg_virt(src);
  		len = sg_dma_len(src);
  		tlen += len;
-@@ -338,34 +337,17 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+@@ -337,34 +336,17 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
  			 * submit the buffer.
  			 */
  			if (actx->fill == out_off || sg_is_last(src) ||
