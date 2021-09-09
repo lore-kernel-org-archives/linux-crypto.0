@@ -2,136 +2,132 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9E36C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 18:13:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9282C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 18:20:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA7FE610E9
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 18:13:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8993D610E8
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 18:20:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243824AbhIISOW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Sep 2021 14:14:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40372 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244722AbhIISOT (ORCPT
+        id S237267AbhIISV0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Sep 2021 14:21:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50386 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237172AbhIISV0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Sep 2021 14:14:19 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED97AC061575
-        for <linux-crypto@vger.kernel.org>; Thu,  9 Sep 2021 11:13:09 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id g13-20020a17090a3c8d00b00196286963b9so2128790pjc.3
-        for <linux-crypto@vger.kernel.org>; Thu, 09 Sep 2021 11:13:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=oYzdplyM18KY0Rs8AvP7jRRMtS3fev77XkdskNX9cmc=;
-        b=ZR+lGDI9LQg3dBtisyxTNm+HrbpIznzitrU0/yGTRHNMwChDKiR/owHUXKZTFgn/DW
-         lDK+N+zsp3x/AcjIhqSh64wZcb/Fg4Um1uwRLHAf5ISFDW2KRa9ttt8Z1Rn4hqT9YX5c
-         6J6gFEa93O2XZ3gmgfvfHywZwVUHzwRmdCdHW2malFgfBuBU3FAhksfJZESzKGjpX11g
-         pJmYmOetRt5HuKgC+7I49jLfrUHg5jhqnRw0kiCmjldscemLhWTopFYo1Lbb3M9L7UUC
-         zwa+C/MspbQlDyNCK78koAsA4WHdGMom9cWg+O0zfZKB6oiwtXKK8rSJ/b73ojpVzwah
-         oTvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oYzdplyM18KY0Rs8AvP7jRRMtS3fev77XkdskNX9cmc=;
-        b=3s/5amcyKT+XB9628rMwtsjU3sM6pbvqQ7v0rbW07/jFYi5ntBAowtswbrO0629Scc
-         zC/m3RFtfQiJfrsWTic9znFc0cGg2uPlYpSo5YpEC05LBukgD69W823v2Vw80pwCfvm6
-         EPqVeEx+SiAgtQQzalbG0bwdMqh9WC4gEorCZ+k0f5447gVt3qfsb45sn+N6oLEUxDvb
-         ZtShn0rRD37GGYzim1Uz1p88DeWSFOfkE7mdRlkLakJ6ihLWXzjZKz394fiAcbX+Avop
-         M9fLBKzsBbf5Q19k4O+B18bvpV2GuhcD14Q2ksUcwHYS8AM6AjmphsoDZhdwoQILMwL5
-         VKQA==
-X-Gm-Message-State: AOAM5305IsX346FhlSY0TfUEzllr4O7Wm8ZQ/y3C86+4+RGINlKmh1i+
-        01O0rS7pAiomKryTTKUpYG+Z0A==
-X-Google-Smtp-Source: ABdhPJwjxNZvs52Wb3cW5/9xyK/4w0Xli94hIemVpgz29jXOSyfDxRN91mAeYXb0+lxKj6DstTdWHg==
-X-Received: by 2002:a17:902:7c93:b0:13a:a1e:dd2d with SMTP id y19-20020a1709027c9300b0013a0a1edd2dmr3821810pll.12.1631211189217;
-        Thu, 09 Sep 2021 11:13:09 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h20sm2876865pfn.173.2021.09.09.11.13.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Sep 2021 11:13:08 -0700 (PDT)
-Date:   Thu, 9 Sep 2021 18:13:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     Mingwei Zhang <mizhang@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alper Gun <alpergun@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        David Rienjes <rientjes@google.com>,
-        Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
-        Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH v2 3/4] KVM: SVM: move sev_bind_asid to psp
-Message-ID: <YTpOsUAqHjQ9DDLd@google.com>
-References: <20210818053908.1907051-1-mizhang@google.com>
- <20210818053908.1907051-4-mizhang@google.com>
- <YTJ5wjNShaHlDVAp@google.com>
- <fcb83a85-8150-9617-01e6-c6bcc249c485@amd.com>
- <YTf3udAv1TZzW+xA@google.com>
- <8421f104-34e8-cc68-1066-be95254af625@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8421f104-34e8-cc68-1066-be95254af625@amd.com>
+        Thu, 9 Sep 2021 14:21:26 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 189I2k5a094025;
+        Thu, 9 Sep 2021 14:19:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=2n8QJ1cbL0OO2VSDXilTS1IiYfGfJtcz0GljvG3/16o=;
+ b=P+yQz+O7bULOcKV4ZrP4GuXc8frW3PS4/nByRbbhdjhs9c8rppX9V11WO4zm2qTHYCUw
+ DKsqrfWhg50ImiDUiHAZr7cXvbmhQcn7ToaaXwntu51L1okSgVSarDhbhJ1b/4QJXyA0
+ KiAYeJzwoR71W+jY9fwC82/env0OeOMHiwmSb0CRB/MVlw733kcBERrjai11jChoUdbE
+ 1ol6v/6asKG8A7+O1I17qb+LOke+8WedrhXPOrbd0uH0xz/LJAEsHKsE6vv47695Uq66
+ bVfEcczr5/sdBcWIGc8pqzViXNNj/8uMwgutwFNwEtwAGbAdcDQHLF/7VqliRzo67NlU Bg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aygjvm4bk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Sep 2021 14:19:51 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 189I5Vac107485;
+        Thu, 9 Sep 2021 14:19:50 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aygjvm4ar-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Sep 2021 14:19:50 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 189IIFIM031746;
+        Thu, 9 Sep 2021 18:19:48 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma02fra.de.ibm.com with ESMTP id 3axcnkgd2t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Sep 2021 18:19:47 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 189IJj0m40894928
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Sep 2021 18:19:45 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 42BAF42042;
+        Thu,  9 Sep 2021 18:19:45 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0B0714205C;
+        Thu,  9 Sep 2021 18:19:40 +0000 (GMT)
+Received: from sig-9-65-72-231.ibm.com (unknown [9.65.72.231])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Sep 2021 18:19:39 +0000 (GMT)
+Message-ID: <babee2bb6710de2f26d1695b4ee8bf4c93a3f2ca.camel@linux.ibm.com>
+Subject: Re: [PATCH v5 04/12] integrity: restrict INTEGRITY_KEYRING_MACHINE
+ to restrict_link_by_ca
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Eric Snowberg <eric.snowberg@oracle.com>
+Cc:     keyrings@vger.kernel.org,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
+        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
+        scott.branden@broadcom.com, weiyongjun1@huawei.com,
+        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
+        nramas@linux.microsoft.com, lszubowi@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>
+Date:   Thu, 09 Sep 2021 14:19:38 -0400
+In-Reply-To: <B34345FD-38F9-4722-B046-E250ACBD5B8C@oracle.com>
+References: <20210907160110.2699645-1-eric.snowberg@oracle.com>
+         <20210907160110.2699645-5-eric.snowberg@oracle.com>
+         <c5d8d846cd03a97344700f8ce4f038cdc3e3b8fd.camel@linux.ibm.com>
+         <B34345FD-38F9-4722-B046-E250ACBD5B8C@oracle.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: LS5KTEqwHIoR0uEY6nCUmaD2NdX1mvw-
+X-Proofpoint-ORIG-GUID: bk7B5mYRoc7QSMT92GE7LvAcTgbaJF11
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-09_06:2021-09-09,2021-09-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 bulkscore=0 phishscore=0 spamscore=0 suspectscore=0
+ adultscore=0 clxscore=1011 priorityscore=1501 mlxscore=0 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109090110
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 09, 2021, Brijesh Singh wrote:
+On Thu, 2021-09-09 at 11:53 -0600, Eric Snowberg wrote:
+> > On Sep 9, 2021, at 11:25 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
+> > 
+> > On Tue, 2021-09-07 at 12:01 -0400, Eric Snowberg wrote:
+> >> Set the restriction check for INTEGRITY_KEYRING_MACHINE keys to
+> >> restrict_link_by_ca.  This will only allow CA keys into the machine
+> >> keyring.
+> >> 
+> >> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+> > 
+> > Normally the new function, in this case the restriction, and usage
+> > should be defined together.  Any reason why 3/12 and 4/12 are two
+> > separate patches?  
 > 
-> On 9/7/21 6:37 PM, Sean Christopherson wrote:
-> > On Tue, Sep 07, 2021, Brijesh Singh wrote:
-> > > I have no strong preference for either of the abstraction approaches. The
-> > > sheer number of argument can also make some folks wonder whether such
-> > > abstraction makes it easy to read. e.g send-start may need up to 11.
-> > 
-> > Yeah, that's brutal, but IMO having a few ugly functions is an acceptable cost if
-> > it means the rest of the API is cleaner.  E.g. KVM is not the right place to
-> > implement sev_deactivate_lock, as any coincident DEACTIVATE will be problematic.
-> > The current code "works" because KVM is the only in-tree user, but even that's a
-> > bit of a grey area because sev_guest_deactivate() is exported.
-> > 
-> > If large param lists are problematic, one idea would be to reuse the sev_data_*
-> > structs for the API.  I still don't like the idea of exposing those structs
-> > outside of the PSP driver, and the potential user vs. kernel pointer confusion
-> > is more than a bit ugly.  On the other hand it's not exactly secret info,
-> > e.g. KVM's UAPI structs are already excrutiatingly close to sev_data_* structs.
-> > 
-> > For future ioctls(), KVM could even define UAPI structs that are bit-for-bit
-> > compatible with the hardware structs.  That would allow KVM to copy userspace's
-> > data directly into a "struct sev_data_*" and simply require the handle and any
-> > other KVM-defined params to be zero.  KVM could then hand the whole struct over
-> > to the PSP driver for processing.
-> 
-> Most of the address field in the "struct sev_data_*" are physical
-> addressess. The userspace will not be able to populate those fields.
+> I split them since they cross subsystems.
 
-Yeah, that's my biggest hesitation to using struct sev_data_* in the API, it's
-both confusing and gross.  But it's also why I think these helpers belong in the
-PSP driver, KVM should not need to know the "on-the-wire" format for communicating
-with the PSP.
+That makes sense.
 
-> PSP or KVM may still need to assist filling the final hardware structure.
-> Some of fields in hardware structure must be zero, so we need to add checks
-> for it.
+thanks,
 
-> I can try posting RFC post SNP series and we can see how it all looks.
+Mimi
 
-I'm a bit torn.  I completely understand the desire to get SNP support merged, but
-at the same time KVM has accrued a fair bit of technical debt for SEV and SEV-ES,
-and the lack of tests is also a concern.  I don't exactly love the idea of kicking
-those cans further down the road.
-
-Paolo, any thoughts?
