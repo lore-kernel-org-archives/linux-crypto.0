@@ -2,222 +2,185 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BADACC4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 13:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF89C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 13:10:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A6B71611C3
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 13:10:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18760611B0
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 13:10:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356050AbhIINLv (ORCPT
+        id S1354655AbhIINLy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Sep 2021 09:11:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10226 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1357700AbhIINEd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Sep 2021 09:04:33 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 189CbkCV105296;
-        Thu, 9 Sep 2021 09:02:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=OhUvz1rIDq/zvu3gfwCdqIy5HpuMtMsqaNS5AaNDY5Q=;
- b=YgVGRBvnnz94nX/tfynK/rLc6efTmYsqazPpQx3Q9AuTyv+TjRiOcTwYh3kunq37gM67
- gJLGyB8xAxnaqE2JqFvUB1CNu5uYUweAoCIRdHyqoFpr0fgugnR6A5QHmFrwlcIaJ3Gi
- GaOZ0YpoS5I6UKTS1sMWX1qGVWHG/Gp6pmPYtFkvdrRTz51KWqv29WeXTrvy1EOg2efm
- mI6BRZsjsLM6V4ifz6AQagxrVrQAlbiUBwamEUIu45kh70ExJVLnvdnGLI745kO6Cr4N
- lxaMEW0wNo6Es6IAMt6n3ClqvsaNDXcTlh0afejGnxo/88TEYOZvML1ky2s2r7WcV6Uv FA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ayh0pjr8g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Sep 2021 09:02:51 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 189CpeMa164946;
-        Thu, 9 Sep 2021 09:02:50 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ayh0pjr6x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Sep 2021 09:02:49 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 189CvMtv019188;
-        Thu, 9 Sep 2021 13:02:47 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3axcnnww0s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Sep 2021 13:02:47 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 189D2hLJ45351198
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Sep 2021 13:02:44 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DA0ADA406E;
-        Thu,  9 Sep 2021 13:02:43 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EF7F0A406D;
-        Thu,  9 Sep 2021 13:02:38 +0000 (GMT)
-Received: from sig-9-65-72-231.ibm.com (unknown [9.65.72.231])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Sep 2021 13:02:38 +0000 (GMT)
-Message-ID: <96262181e8e94638866fb63caff58cce97c3dbf6.camel@linux.ibm.com>
-Subject: Re: [PATCH v5 00/12] Enroll kernel keys thru MOK
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     keyrings@vger.kernel.org,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
+        Thu, 9 Sep 2021 09:11:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54042 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1357957AbhIINFn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Sep 2021 09:05:43 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id ECBD863296;
+        Thu,  9 Sep 2021 12:00:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1631188817;
+        bh=PqYxA1XErKodIG2gfBQmD3EO4nheqljctvn59oGugf8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=NQ242gO6RD/zy8EzHIAfS07QdAsVsqii1EYmhdoa3dKK6Vc6tW0qD2eKdbn4HAfOU
+         P2y8okOSUEByD9CDPNsMiWVz9zgmw9pUAWpOdHa3qlFgvlimMfup30EY+L8OTufOha
+         Gu/lDs+HXyW/Mwj6iqhp2TeyQ7ncMj/c/E1zlkTOGx1o+lGgOJNlsBPrPNn8ZIlNHJ
+         YfqsUNsUB9nXfUIPw/IxMCH5uWbzYW6Pz6yp3APucbQyDE8lt6RZeidxf5Q9/l4/Xj
+         TECazEM3p6/TaX7fn2eOlYomUG1Z/HQoCRAsHwLEIZro3GOvynT69zb5MVwqDvl/zI
+         sU8yWW16TIkEQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Sean Anderson <sean.anderson@seco.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        James Morris <jmorris@namei.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
-        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
-        scott.branden@broadcom.com, weiyongjun1@huawei.com,
-        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        lszubowi@redhat.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        pjones@redhat.com,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>
-Date:   Thu, 09 Sep 2021 09:02:38 -0400
-In-Reply-To: <3685CAB2-43EB-47BA-80E8-C830D3339458@oracle.com>
-References: <20210907160110.2699645-1-eric.snowberg@oracle.com>
-         <7f9fb65a4ee20c337646a1fc887cd24365c2c59e.camel@kernel.org>
-         <b44726f2d71960d53b4860ccab71f02186295da9.camel@kernel.org>
-         <3685CAB2-43EB-47BA-80E8-C830D3339458@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: J1WBI8Sks0uyNDryCPgXY9F7m_x_uUQI
-X-Proofpoint-ORIG-GUID: Gg-7vQDukxKaWuD0bo7cP0Yfpq77aDrk
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 4.9 01/48] crypto: mxs-dcp - Use sg_mapping_iter to copy data
+Date:   Thu,  9 Sep 2021 07:59:28 -0400
+Message-Id: <20210909120015.150411-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-09-09_04:2021-09-09,2021-09-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- phishscore=0 mlxlogscore=999 spamscore=0 impostorscore=0 adultscore=0
- bulkscore=0 lowpriorityscore=0 suspectscore=0 clxscore=1015 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109030001
- definitions=main-2109090076
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2021-09-08 at 16:25 -0600, Eric Snowberg wrote:
-> > On Sep 8, 2021, at 10:49 AM, Jarkko Sakkinen <jarkko@kernel.org> wrote:
-> > 
-> > On Wed, 2021-09-08 at 19:03 +0300, Jarkko Sakkinen wrote:
-> >> 
-> >>> Downstream Linux distros try to have a single signed kernel for each
-> >>> architecture.  Each end-user may use this kernel in entirely different
-> >>> ways.  Some downstream kernels have chosen to always trust platform keys
-> >>> within the Linux trust boundary for kernel module signing.  These
-> >>> kernels have no way of using digital signature base IMA appraisal.
-> >>> 
-> >>> This series introduces a new Linux kernel keyring containing the Machine
-> >>> Owner Keys (MOK) called .machine. It also adds a new MOK variable to shim.
-> >>> This variable allows the end-user to decide if they want to trust keys
-> >>> enrolled in the MOK within the Linux trust boundary.  By default,
-> >>> nothing changes; MOK keys are not trusted within the Linux kernel.  They
-> >>> are only trusted after the end-user makes the decision themselves.  The
-> >>> end-user would set this through mokutil using a new --trust-mok option
-> >>> [3]. This would work similar to how the kernel uses MOK variables to
-> >>> enable/disable signature validation as well as use/ignore the db.
-> >> 
-> >> OK, changes are described here (again speaking about trusting tho). The
-> >> motivation part is missing. The text before this is more like confusion
-> >> part. When you describe motivation to do something you should really be in
-> >> grass roots, e.g. "when you have this feature in the kernel, look, I can
-> >> do now this". It's not that hard. E.g. with an usage example it is quite
-> >> quick accomplish this.
-> > 
-> > The code changes overally make sense but this motivotional part is the
-> > problem. E.g. if you do a pull request, it is completely *unusable* in
-> > that context. In that case I would have to write something that should
-> > have been the cover letter. It's 12 patches, so it is perfectly sensible
-> > to ask a better one.
-> 
-> Would this be a more appropriate cover letter that includes a better
-> motivation?
-> 
-> Back in 2013 Linus requested a feature to allow end-users to have the 
-> ability "to add their own keys and sign modules they trust".  This was his 
-> *second* order outlined here [1].  There have been many attempts over the
-> years to solve this problem, all have been rejected.  Many distributions 
-> carry one of these rejected attempts. This series tries to solve this problem 
-> with a solution that takes into account all the problems brought up in the 
-> previous attempts.
+From: Sean Anderson <sean.anderson@seco.com>
 
-Instead of making the reviewer look up the failed attempts, please
-summarize why they failed (e.g. all preboot firmware keys were
-trusted), and then continue, like below, with how this attempt differs.
+[ Upstream commit 2e6d793e1bf07fe5e20cfbbdcec9e1af7e5097eb ]
 
-> 
-> This series introduces a new Linux kernel keyring containing the Machine
-> Owner Keys (MOK) called .machine.
+This uses the sg_pcopy_from_buffer to copy data, instead of doing it
+ourselves.
 
-Other archs will also want to allow loading "end-users" key.  Please
-prefix this paragraph with something like "On UEFI based systems".
+In addition to reducing code size, this fixes the following oops
+resulting from failing to kmap the page:
 
->  It also adds a new MOK variable to shim.
+[   68.896381] Unable to handle kernel NULL pointer dereference at virtual address 00000ab8
+[   68.904539] pgd = 3561adb3
+[   68.907475] [00000ab8] *pgd=00000000
+[   68.911153] Internal error: Oops: 805 [#1] ARM
+[   68.915618] Modules linked in: cfg80211 rfkill des_generic libdes arc4 libarc4 cbc ecb algif_skcipher sha256_generic libsha256 sha1_generic hmac aes_generic libaes cmac sha512_generic md5 md4 algif_hash af_alg i2c_imx i2c_core ci_hdrc_imx ci_hdrc mxs_dcp ulpi roles udc_core imx_sdma usbmisc_imx usb_common firmware_class virt_dma phy_mxs_usb nf_tables nfnetlink ip_tables x_tables ipv6 autofs4
+[   68.950741] CPU: 0 PID: 139 Comm: mxs_dcp_chan/ae Not tainted 5.10.34 #296
+[   68.958501] Hardware name: Freescale i.MX6 Ultralite (Device Tree)
+[   68.964710] PC is at memcpy+0xa8/0x330
+[   68.968479] LR is at 0xd7b2bc9d
+[   68.971638] pc : [<c053e7c8>]    lr : [<d7b2bc9d>]    psr: 000f0013
+[   68.977920] sp : c2cbbee4  ip : 00000010  fp : 00000010
+[   68.983159] r10: 00000000  r9 : c3283a40  r8 : 1a5a6f08
+[   68.988402] r7 : 4bfe0ecc  r6 : 76d8a220  r5 : c32f9050  r4 : 00000001
+[   68.994945] r3 : 00000ab8  r2 : fffffff0  r1 : c32f9050  r0 : 00000ab8
+[   69.001492] Flags: nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+[   69.008646] Control: 10c53c7d  Table: 83664059  DAC: 00000051
+[   69.014414] Process mxs_dcp_chan/ae (pid: 139, stack limit = 0x667b57ab)
+[   69.021133] Stack: (0xc2cbbee4 to 0xc2cbc000)
+[   69.025519] bee0:          c32f9050 c3235408 00000010 00000010 00000ab8 00000001 bf10406c
+[   69.033720] bf00: 00000000 00000000 00000010 00000000 c32355d0 832fb080 00000000 c13de2fc
+[   69.041921] bf20: c3628010 00000010 c33d5780 00000ab8 bf1067e8 00000002 c21e5010 c2cba000
+[   69.050125] bf40: c32f8040 00000000 bf106a40 c32f9040 c3283a80 00000001 bf105240 c3234040
+[   69.058327] bf60: ffffe000 c3204100 c2c69800 c2cba000 00000000 bf103b84 00000000 c2eddc54
+[   69.066530] bf80: c3204144 c0140d1c c2cba000 c2c69800 c0140be8 00000000 00000000 00000000
+[   69.074730] bfa0: 00000000 00000000 00000000 c0100114 00000000 00000000 00000000 00000000
+[   69.082932] bfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[   69.091131] bfe0: 00000000 00000000 00000000 00000000 00000013 00000000 00000000 00000000
+[   69.099364] [<c053e7c8>] (memcpy) from [<bf10406c>] (dcp_chan_thread_aes+0x4e8/0x840 [mxs_dcp])
+[   69.108117] [<bf10406c>] (dcp_chan_thread_aes [mxs_dcp]) from [<c0140d1c>] (kthread+0x134/0x160)
+[   69.116941] [<c0140d1c>] (kthread) from [<c0100114>] (ret_from_fork+0x14/0x20)
+[   69.124178] Exception stack(0xc2cbbfb0 to 0xc2cbbff8)
+[   69.129250] bfa0:                                     00000000 00000000 00000000 00000000
+[   69.137450] bfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[   69.145648] bfe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[   69.152289] Code: e320f000 e4803004 e4804004 e4805004 (e4806004)
 
-Replace "adds" with "defines".
+Signed-off-by: Sean Anderson <sean.anderson@seco.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/mxs-dcp.c | 36 +++++++++---------------------------
+ 1 file changed, 9 insertions(+), 27 deletions(-)
 
-> This variable allows the end-user to decide if they want to load keys
-> enrolled in the MOK within the Linux kernel.  By default, nothing changes; 
-> MOK keys are not loaded within the Linux kernel.  They are only loaded after
-> the end-user makes the decision themselves.  The end-user would set this 
-> through mokutil using a new --trust-mok option [2]. This would work similar 
-> to how the kernel uses MOK variables to enable/disable signature validation 
-> as well as use/ignore the db. Mimi has suggested that only CA keys be loaded 
-> into this keyring. All other certs will load into the platform keyring instead.
-
-Thank you for crediting me for limiting loading only the CA keys stored
-in the MOK db onto the "machine" keyring, but the limitation should be
-better integrated in the paragraph.
-
-> Secure Boot keys will never be loaded.  They will always be loaded into
-> the platform keyring.  If an end-user wanted to load one, they would
-> need to enroll it into the MOK.
-> 
-> Steps required by the end user:
-> 
-> Sign kernel module with user created key:
-> $ /usr/src/kernels/$(uname -r)/scripts/sign-file sha512 signing_key.priv \
->     signing_key.x509 my_module.ko
-> 
-> Import the key into the MOK
-> $ mokutil --import signing_key.x509
-
-To differentiate this "signing_key" from others, perhaps name the file
-"machine_sigining_key" or "local_signing_key".
-
-thanks,
-
-Mimi
-
-> 
-> Setup the kernel to load MOK keys into the .machine keyring
-> $ mokutil —trust-mok
-> 
-> Then reboot, the MokManager will load and ask if you want to trust the MOK 
-> key and enroll the MOK into the MOKList.  Afterwards the signed kernel module 
-> will load.
-> 
-> I have included links to both the mokutil [2] and shim [3] changes I
-> have made to support this new functionality.
-> 
-> [1] https://marc.info/?l=linux-kernel&m=136185386310140&w=2
-> [2] https://github.com/esnowberg/mokutil/tree/0.3.0-mokvars-v2
-> [3] https://github.com/esnowberg/shim/tree/mokvars-v2
-
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index 34839b539207..b85483c491b6 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -280,21 +280,20 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 
+ 	struct scatterlist *dst = req->dst;
+ 	struct scatterlist *src = req->src;
+-	const int nents = sg_nents(req->src);
++	int dst_nents = sg_nents(dst);
+ 
+ 	const int out_off = DCP_BUF_SZ;
+ 	uint8_t *in_buf = sdcp->coh->aes_in_buf;
+ 	uint8_t *out_buf = sdcp->coh->aes_out_buf;
+ 
+-	uint8_t *out_tmp, *src_buf, *dst_buf = NULL;
+ 	uint32_t dst_off = 0;
++	uint8_t *src_buf = NULL;
+ 	uint32_t last_out_len = 0;
+ 
+ 	uint8_t *key = sdcp->coh->aes_key;
+ 
+ 	int ret = 0;
+-	int split = 0;
+-	unsigned int i, len, clen, rem = 0, tlen = 0;
++	unsigned int i, len, clen, tlen = 0;
+ 	int init = 0;
+ 	bool limit_hit = false;
+ 
+@@ -312,7 +311,7 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 		memset(key + AES_KEYSIZE_128, 0, AES_KEYSIZE_128);
+ 	}
+ 
+-	for_each_sg(req->src, src, nents, i) {
++	for_each_sg(req->src, src, sg_nents(src), i) {
+ 		src_buf = sg_virt(src);
+ 		len = sg_dma_len(src);
+ 		tlen += len;
+@@ -337,34 +336,17 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 			 * submit the buffer.
+ 			 */
+ 			if (actx->fill == out_off || sg_is_last(src) ||
+-				limit_hit) {
++			    limit_hit) {
+ 				ret = mxs_dcp_run_aes(actx, req, init);
+ 				if (ret)
+ 					return ret;
+ 				init = 0;
+ 
+-				out_tmp = out_buf;
++				sg_pcopy_from_buffer(dst, dst_nents, out_buf,
++						     actx->fill, dst_off);
++				dst_off += actx->fill;
+ 				last_out_len = actx->fill;
+-				while (dst && actx->fill) {
+-					if (!split) {
+-						dst_buf = sg_virt(dst);
+-						dst_off = 0;
+-					}
+-					rem = min(sg_dma_len(dst) - dst_off,
+-						  actx->fill);
+-
+-					memcpy(dst_buf + dst_off, out_tmp, rem);
+-					out_tmp += rem;
+-					dst_off += rem;
+-					actx->fill -= rem;
+-
+-					if (dst_off == sg_dma_len(dst)) {
+-						dst = sg_next(dst);
+-						split = 0;
+-					} else {
+-						split = 1;
+-					}
+-				}
++				actx->fill = 0;
+ 			}
+ 		} while (len);
+ 
+-- 
+2.30.2
 
