@@ -8,79 +8,94 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43FD5C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 01:53:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE939C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 02:49:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EC6B61167
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 01:53:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3361611B0
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 02:49:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349381AbhIIBzC (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Sep 2021 21:55:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45198 "EHLO
+        id S236151AbhIICul (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Sep 2021 22:50:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242103AbhIIBzC (ORCPT
+        with ESMTP id S231898AbhIICul (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Sep 2021 21:55:02 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90197C061575
-        for <linux-crypto@vger.kernel.org>; Wed,  8 Sep 2021 18:53:53 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id n5so95961wro.12
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Sep 2021 18:53:53 -0700 (PDT)
+        Wed, 8 Sep 2021 22:50:41 -0400
+Received: from mail-vs1-xe35.google.com (mail-vs1-xe35.google.com [IPv6:2607:f8b0:4864:20::e35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CA03C061575
+        for <linux-crypto@vger.kernel.org>; Wed,  8 Sep 2021 19:49:32 -0700 (PDT)
+Received: by mail-vs1-xe35.google.com with SMTP id bf15so371170vsb.0
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Sep 2021 19:49:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:from:date:message-id:subject:to;
-        bh=nDI0lWOvRbTpmXdIynSWkkEMpzU80DIrknHoEneZpEM=;
-        b=Qr3Qn8poEA0yPcd2vxHxZGy2FBd5DQIjZyfHBSteu2GXUC5x/nrGUagWmX5Fgywoxv
-         FyUyRCBxHpd7lLhSxpnt7zYMquFWaq3SA7k3sz5Ig/bJka+90PRlgyZUnc6AYM1EOODW
-         RcSB1Ch3GK5oXGm4LJJrmqnnKTy3H5+E4vtmILEBcr5j0I+mmUiNDB1/Qm36pwEHoBkt
-         p4KhpQKRIOU5qCxeJPEicQvArQHsOW1VaFF5Gz+zAcTe3RuaaRgI588tqyaCZPHyxs5h
-         E/+7LRYsuUXrNae9cz3S9Z3SGaYXGLEGiL0q7xaLgC8Fm99soBW1uN9YkYIhr1175AzU
-         bWkg==
+        bh=CZqyvCLSFUDXa9i9bd/f880aOzgowCzE7gZuzT+ZrF4=;
+        b=QF4TOAjj0q7O7eCbYf2KIvpZC9byTdgQRLjZE6fz1rCGzSVehKt8akh4ELBmnWIuHM
+         niUtS4tF4ly/XfJTA0s8KGDSL6syIzcujK23hwd99q5LRLsE5nOq4nWwN0cJAhW47xkH
+         Wz1k08hFM2YbwNMGnFGGW0WpxkNlHf7t8PG30AD8fZwlBHIB85SL49mXj8wSh/PRRxy+
+         SGYXdSbMwVxRdk85ALsyDdWJgQCq670tyI8xv/hO50c9P1ohH5EmRWPFwrMF9IM+I16c
+         lSmoSDB6gCoARUDjVUu4u2ASck0LoFtHcbttGA6ls6WXHgXtgehLOYlDn++yFu3u1yP1
+         /brg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=nDI0lWOvRbTpmXdIynSWkkEMpzU80DIrknHoEneZpEM=;
-        b=0x1sySnY+tx23ia3gYalp+U7TT+06Q+0VQ84EHx669D1IYUKbIucTO6Gtu7EhT2Ns9
-         HdDAONTAijnkGFvGwgfVxkinnaI161+ZF+eV56pOVcahkLKUSEvG7I2bOAavmzCynVKd
-         jUbOWpa8IKQDhkWYq03Ecz4S7999YY+T96WZblP/IGifSdbsde9G7sDyOlYPxR9q484L
-         2Ykn4EG+558QPF97IPxWLg5pRfryZhjkb4rp06KzmIA4O7sVQKYtSu5+Jzd0iScVCngh
-         jppUgbOI1/kUFrkNg6d3LQ0xGJbVq5nb2gOG03FcgYwpVNR7J2c1bR3H1BEa9HoQvv07
-         C4Wg==
-X-Gm-Message-State: AOAM533PrXybjU8wkfzwEC1dbzNcFOOtPkav+wo8fFfQ14IzVjjMYMhV
-        D63CbpNIrRksnoZTNsCZolLM39MsXCRmzO12BSOKANBVBQE=
-X-Google-Smtp-Source: ABdhPJyAHfd/Mi5pPkMCKy5mUHhb65VXCd9cGphVRkRg6NbOW1e8s51U3DFcFcvjXJmxX8opfvhObKGIZOjicGrbtNI=
-X-Received: by 2002:a05:6000:1c4:: with SMTP id t4mr545395wrx.414.1631152432061;
- Wed, 08 Sep 2021 18:53:52 -0700 (PDT)
+        bh=CZqyvCLSFUDXa9i9bd/f880aOzgowCzE7gZuzT+ZrF4=;
+        b=p/Drz3Fv4+ploGZaxbyWgAVc6Dywwwe7/TJKQBcs10cQflcA29GF7Juh7w5FBJsdSF
+         q9L+ZuqTAXfl43z7ORez4lM2vP0poPyQiAs5tW1rLVnm/K4yETDz7w8YL9y0BNgxFJDy
+         TOHhtJrrBlS+5WxEgPuIhyOED1fJdOBFQ1OgbEdppXteURChgMBmiH0BcJLp5n4y26qk
+         6sxwrhOdJk2xliGwDgMHBaZz7L+ba3kEsumZeoChlWahoNBWzTdE83/BlgqWh3N/3Y+d
+         WnogsOCd67Bb58mEKZkFBxGGCzjhHTPOWqHFZMFm5b+4rYP2aT7EgNwKP8AKTunzFCsc
+         NMMg==
+X-Gm-Message-State: AOAM531x+fUtmld9lZipCrx7txHOhKgtO66KIOczJp8OTscbOcA4uRki
+        AMfIpvudoHBpVCn+8XpVueAxF8z8jlX4DCa4EbnnCp0CVDQ=
+X-Google-Smtp-Source: ABdhPJymVKgd9zgFekE0FHvzHn7cjkFIqXLUcP0FVoCm3wHCi6DwEVVSwqYNLnUd4CT2Ckr5r1YcqC3h3sGKn1X7yEs=
+X-Received: by 2002:a05:6102:9d5:: with SMTP id g21mr191213vsi.11.1631155771654;
+ Wed, 08 Sep 2021 19:49:31 -0700 (PDT)
 MIME-Version: 1.0
 From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Thu, 9 Sep 2021 09:53:40 +0800
-Message-ID: <CACXcFmkigZwbL8TtA7rATWhxGzL=1k6UsyLydVmDgp+PZtq8wA@mail.gmail.com>
-Subject: [PATCH] random.c: Update RFC reference
+Date:   Thu, 9 Sep 2021 10:49:20 +0800
+Message-ID: <CACXcFmm798P6mPErh9B4thz7uvBG1sUO-eJpa1MB+7ayDyTCvw@mail.gmail.com>
+Subject: [PATCH] In _extract-crng mix in 64 bits if possible
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         "Ted Ts'o" <tytso@mit.edu>,
-        Herbert Xu <herbert@gondor.apana.org.au>, trivial@kernel.org
+        Herbert Xu <herbert@gondor.apana.org.au>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RFC 1750 was obsoleted by RFC 4086 from the same authors in 2005.
+On some machines arch_get_random_long() gives 64 bits.
+XORing it into a 32-bit state word uses only half of it.
+This change makes it use it all instead.
 
 Signed-off-by: Sandy Harris <sandyinchina@gmail.com>
 
 ---
- drivers/char/random.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/char/random.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 605969ed0f96..57fe011fb5e4 100644
+index 57fe011fb5e4..fe7f3366b934 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -303,7 +303,7 @@
-  *
-  * Further background information on this topic may be obtained from
-- * RFC 1750, "Randomness Recommendations for Security", by Donald
-+ * RFC 4086, "Randomness Requirements for Security", by Donald
-  * Eastlake, Steve Crocker, and Jeff Schiller.
-  */
+@@ -988,7 +988,8 @@ static void crng_reseed(struct crng_state *crng,
+struct entropy_store *r)
+ static void _extract_crng(struct crng_state *crng,
+               __u8 out[CHACHA_BLOCK_SIZE])
+ {
+-    unsigned long v, flags;
++    unsigned long v, flags, *last;
++    last = (unsigned long *) &crng->state[14] ;
+
+     if (crng_ready() &&
+         (time_after(crng_global_init_time, crng->init_time) ||
+@@ -996,7 +997,7 @@ static void _extract_crng(struct crng_state *crng,
+         crng_reseed(crng, crng == &primary_crng ? &input_pool : NULL);
+     spin_lock_irqsave(&crng->lock, flags);
+     if (arch_get_random_long(&v))
+-        crng->state[14] ^= v;
++        *last ^= v;
+     chacha20_block(&crng->state[0], out);
+     if (crng->state[12] == 0)
+         crng->state[13]++;
+--
