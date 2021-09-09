@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF89C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 13:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D5BC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 13:22:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18760611B0
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 13:10:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E2AF60E94
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Sep 2021 13:22:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354655AbhIINLy (ORCPT
+        id S1356977AbhIINXM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Sep 2021 09:11:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54042 "EHLO mail.kernel.org"
+        Thu, 9 Sep 2021 09:23:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35408 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1357957AbhIINFn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Sep 2021 09:05:43 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id ECBD863296;
-        Thu,  9 Sep 2021 12:00:16 +0000 (UTC)
+        id S1358468AbhIINLR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Sep 2021 09:11:17 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AD946614C8;
+        Thu,  9 Sep 2021 12:01:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631188817;
-        bh=PqYxA1XErKodIG2gfBQmD3EO4nheqljctvn59oGugf8=;
+        s=k20201202; t=1631188878;
+        bh=iGPyawP9lKM8+1uNBuwR8xBjNPGLc8IRR3+Jrsahchk=;
         h=From:To:Cc:Subject:Date:From;
-        b=NQ242gO6RD/zy8EzHIAfS07QdAsVsqii1EYmhdoa3dKK6Vc6tW0qD2eKdbn4HAfOU
-         P2y8okOSUEByD9CDPNsMiWVz9zgmw9pUAWpOdHa3qlFgvlimMfup30EY+L8OTufOha
-         Gu/lDs+HXyW/Mwj6iqhp2TeyQ7ncMj/c/E1zlkTOGx1o+lGgOJNlsBPrPNn8ZIlNHJ
-         YfqsUNsUB9nXfUIPw/IxMCH5uWbzYW6Pz6yp3APucbQyDE8lt6RZeidxf5Q9/l4/Xj
-         TECazEM3p6/TaX7fn2eOlYomUG1Z/HQoCRAsHwLEIZro3GOvynT69zb5MVwqDvl/zI
-         sU8yWW16TIkEQ==
+        b=ntDZiGqEu3F7pXULQuJUKATxydAc4KYHoneRvX2qbAX8acBk79S1dwbwSD0MY8At3
+         P0ZS0XYS7OohGPts78+yCbxmpx6UaEDTVMdwpks5m6Prv3Ek2bF9S3aJZg93w187Yg
+         PdvEIK6Tb8RdVP9fmWLlZ3njrbpCPw9AjdFAugIB0hT3zR1vBebCpF/E3SWs8Wmmg1
+         Hd58jRUYFg4m0I9FoJu31xGp8uZVvuv6PtyWDlPwQ7k8vjbE4x7eExH0SgztTdpGvg
+         xFyfhGoEBzfo24zLjsML2GBm6T5stl/kMmrrKPCR09ei+7afeARvinrjBtf2w7pvFi
+         CuLK5dT+7GbBw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sean Anderson <sean.anderson@seco.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 4.9 01/48] crypto: mxs-dcp - Use sg_mapping_iter to copy data
-Date:   Thu,  9 Sep 2021 07:59:28 -0400
-Message-Id: <20210909120015.150411-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 01/35] crypto: mxs-dcp - Use sg_mapping_iter to copy data
+Date:   Thu,  9 Sep 2021 08:00:42 -0400
+Message-Id: <20210909120116.150912-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 X-stable: review
@@ -104,7 +104,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 9 insertions(+), 27 deletions(-)
 
 diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index 34839b539207..b85483c491b6 100644
+index 1a8dc76e117e..f42d8c852314 100644
 --- a/drivers/crypto/mxs-dcp.c
 +++ b/drivers/crypto/mxs-dcp.c
 @@ -280,21 +280,20 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
