@@ -2,120 +2,230 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F5D3C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Sep 2021 01:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E81B2C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Sep 2021 03:18:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2FBDB61132
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Sep 2021 01:23:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D24A461101
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Sep 2021 03:18:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230046AbhIJBZF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Sep 2021 21:25:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51304 "EHLO
+        id S230001AbhIJDTW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Sep 2021 23:19:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234814AbhIJBY4 (ORCPT
+        with ESMTP id S229993AbhIJDTW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Sep 2021 21:24:56 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6DFCC0613DE
-        for <linux-crypto@vger.kernel.org>; Thu,  9 Sep 2021 18:23:40 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id l16-20020a9d6a90000000b0053b71f7dc83so146192otq.7
-        for <linux-crypto@vger.kernel.org>; Thu, 09 Sep 2021 18:23:40 -0700 (PDT)
+        Thu, 9 Sep 2021 23:19:22 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 474A2C061756
+        for <linux-crypto@vger.kernel.org>; Thu,  9 Sep 2021 20:18:12 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id l7-20020a0568302b0700b0051c0181deebso422649otv.12
+        for <linux-crypto@vger.kernel.org>; Thu, 09 Sep 2021 20:18:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=OAp385IrRyQM0bf2CTn8m6HsT3G2HXxxQxD9bmiIJg4=;
-        b=lXeBnpzgLkHZ7Nnp7RalkiuqX/N3/tdJjiWv7a9ZE7Axa5+ZrA3mAYeZgLrWduclrI
-         Guw2B2fqM+vDktr5tDzNIhkEg4yT6zPys7ac2Sdn00lr0llJYcAY+TDMt2uMWGU1zJJE
-         3jwZpaUwHphGF5I/gOIPUVz1LIItmTrpAgR86qUhOAjXIGY0QiGzbRgl6s93N8QLrLnD
-         2wM59yaEtvkBh5kjslfdytuqhnlhrxu79FLJj0zQfLHYyZffKlfq1TNp3pP8K/JUB3k5
-         3THEZ1kQZ/DPJMWlHjkuRpJq59MFouREYyxoEhXvq6izqXs4YmEcVTTxCyyfkReM6pHT
-         1TsA==
+        bh=qCAr61hpoK6IKG40PpJaKVqIxCQSvqZ6i3qbQqvhygc=;
+        b=XjDL0OYY74Mq3fMUE3D498DEIpvbWZvfPnUKICeBvPjA69xmSRNlHfBckOLkxZJMwq
+         NPjAT1OcacqQuwHsHeUU7ksBviqq06IGCsnQK/0uiY1weBqIzL9NRvGWjgPKazFjFdLg
+         NiS2ExZJlPA2Y6/tj9EvzDAmNW5u/fu7OcEhvZvtiOe1TtV2dY4lYCrVBIZsrefEiRN2
+         h+jRjJA7x//dnjRmX5Xf2vwKNo7wwAqcXO5R2gLkEeyggnEclaNduCo3n8zLy+3An3HZ
+         ZkGrwHWqoKQt7DpLVZc5jOU3SJa6n07Cmmlw0Ez1N0kU8AvFREm9u372nF2GzPUyRtcC
+         /Yyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=OAp385IrRyQM0bf2CTn8m6HsT3G2HXxxQxD9bmiIJg4=;
-        b=Dh4T/nRDybzyHNAZ1iZ9dDjfvnrYQUcJpGMxrrE4/KvCyHxj7opfsg0XPIQr6Ix8Ki
-         mCrgzecv5lxZJL15FTQUsMF3n4A5hsxqHHRhT35OFOsciWbAcZqRRcoKt0D4dKGQmoMt
-         uWwqdpxNGusOhMxF+CavWcilp2IutclUPrNMQ975ZGIcP2LZBrcg0Y1gT/LZ2GqEsdVL
-         g4402+wTXd8Qd14c/bnvkJxUoiDEoDRiivYTED4mwl1pkkamGFgECvsYTkdSxMQjop3m
-         rzIRxits89OeLoQpVC8d9A/4WfahgrOdXQv0OapIeZ50qSJPZ72kTBprVXuhF8rf68TK
-         a7hA==
-X-Gm-Message-State: AOAM530BGBduxkypbVpeT7os1UvhjN7zivqU7Ypt+5snUov+V+W68zAf
-        TxG0F0uPPI5gtmSIrIlVCYOh/54+EB6KoujiR9S7+w==
-X-Google-Smtp-Source: ABdhPJwlQyQUySxRUao6VzWG+GD3ZmsaRhSPVis3onD/48fp6HP6gL6VypDF0fexa+FZ27z2U9sJ/GBqmg5vlkEXAfA=
-X-Received: by 2002:a05:6830:349c:: with SMTP id c28mr2502271otu.35.1631237019961;
- Thu, 09 Sep 2021 18:23:39 -0700 (PDT)
+        bh=qCAr61hpoK6IKG40PpJaKVqIxCQSvqZ6i3qbQqvhygc=;
+        b=NL+S7mZR4Ao68jb75y+tzLETijyw3+7/ljtTdNruwCqKgcZ3tgbymPxowUomMOlnRa
+         wucUoOjub9xjD9Ap6eQzU7G+B3sZdkvHGjFnXHjEwsC7jcuwEJods4jN4SQme2T7pRkN
+         Mdr+CpEpFMeHxFuNLynyuRVvW2HRODf47SvYOSrQFJLWQbyhUiHdOH04xwvlH7nKJ+vs
+         9hq1RbBgxFXBPdjK32E1NYhxhWvb2kr1coZhJpmoz2uH6sKBHllE1OO45ozAIpf47oxs
+         ItcwvHZRhPEZkiQuE7hSXjMGPyFMKT+Twb54Pr5LvqApHb2BuHx0l2WtrtX8XDDNn9jv
+         9uYQ==
+X-Gm-Message-State: AOAM531ycRr6XYpgYuwHcLYrfTLc4BP20WACItcCzCha57KcBDCVMWE0
+        OP5C3HS465SKz7sCBOaapgkJ63JPxPgaij18WrVstuwdhv5GPw==
+X-Google-Smtp-Source: ABdhPJw96FbxjX9u29XaMK2DOTr9bF2gLcfjjJ3BYuB3Zi4eDiySYJk3VPNwLngCcJjsKH98YgYHoDG9VCw9IhvKbPA=
+X-Received: by 2002:a05:6830:349c:: with SMTP id c28mr2849513otu.35.1631243891225;
+ Thu, 09 Sep 2021 20:18:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210818053908.1907051-1-mizhang@google.com> <20210818053908.1907051-4-mizhang@google.com>
- <YTJ5wjNShaHlDVAp@google.com> <fcb83a85-8150-9617-01e6-c6bcc249c485@amd.com>
- <YTf3udAv1TZzW+xA@google.com> <8421f104-34e8-cc68-1066-be95254af625@amd.com>
- <YTpOsUAqHjQ9DDLd@google.com> <CAL715W+u6mt5grwoT6DBhUtzN6xx=OjWPu6M0=p0sxLZ4JTvDg@mail.gmail.com>
- <48af420f-20e3-719a-cf5c-e651a176e7c2@amd.com> <CAL715WL6g3P6QKv1w-zSDvY3jjLVdbfxaqyr2XV_NicnuP2+EQ@mail.gmail.com>
-In-Reply-To: <CAL715WL6g3P6QKv1w-zSDvY3jjLVdbfxaqyr2XV_NicnuP2+EQ@mail.gmail.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-17-brijesh.singh@amd.com>
+In-Reply-To: <20210820155918.7518-17-brijesh.singh@amd.com>
 From:   Marc Orr <marcorr@google.com>
-Date:   Thu, 9 Sep 2021 18:23:29 -0700
-Message-ID: <CAA03e5HK1Qkk0uyZRi_ncFewJ5yStXWGT7REQdYQ2Z1BYHcCew@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] KVM: SVM: move sev_bind_asid to psp
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+Date:   Thu, 9 Sep 2021 20:18:00 -0700
+Message-ID: <CAA03e5EGXiw2dZ-c1-Vugor1d=vZPwrP81K0LmpUxTrLCbc+Xg@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 16/45] crypto: ccp: Add the SNP_PLATFORM_STATUS command
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
         Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Alper Gun <alpergun@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
         Borislav Petkov <bp@alien8.de>,
-        David Rienjes <rientjes@google.com>,
-        Peter Gonda <pgonda@google.com>,
-        Vipin Sharma <vipinsh@google.com>
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 9, 2021 at 6:18 PM Mingwei Zhang <mizhang@google.com> wrote:
+On Fri, Aug 20, 2021 at 9:00 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
 >
-> > I believe once we are done with it, will have 5 functions that will need
-> >  >=8 arguments. I don't know if its acceptable.
-> >
-> > > In addition, having to construct each sev_data_* structure in KVM code
-> > > is also a pain and  consumes a lot of irrelevant lines as well.
-> > >
-> >
-> > Maybe I am missing something, aren't those lines will be moved from KVM
-> > to PSP driver?
-> >
-> > I am in full support for restructuring, but lets look at full set of PSP
-> > APIs before making the final decision.
-> >
-> > thanks
-> >
+> The command can be used by the userspace to query the SNP platform status
+> report. See the SEV-SNP spec for more details.
 >
-> Oh, sorry for the confusion. I think the current feedback I got is
-> that my restructuring patchset was blocked due to the fact that it is
-> a partial one. So, if this patchset got checked in, then the psp-sev.h
-> will have two types of APIs: ones that use sev_data_* structure and
-> ones that do not. So one of the worries is that this would make the
-> situation even worse.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  Documentation/virt/coco/sevguest.rst | 27 +++++++++++++++++
+>  drivers/crypto/ccp/sev-dev.c         | 45 ++++++++++++++++++++++++++++
+>  include/uapi/linux/psp-sev.h         |  1 +
+>  3 files changed, 73 insertions(+)
 >
-> So that's why I am thinking that maybe it is fine to just avoid using
-> sev_data_* for all PSP functions exposed to KVM? I use the number of
-> arguments as the justification. But that might not be a good one.
+> diff --git a/Documentation/virt/coco/sevguest.rst b/Documentation/virt/coco/sevguest.rst
+> index 7acb8696fca4..7c51da010039 100644
+> --- a/Documentation/virt/coco/sevguest.rst
+> +++ b/Documentation/virt/coco/sevguest.rst
+> @@ -52,6 +52,22 @@ to execute due to the firmware error, then fw_err code will be set.
+>                  __u64 fw_err;
+>          };
 >
-> In anycase, I will not rush into any code change before we reach a consensus.
+> +The host ioctl should be called to /dev/sev device. The ioctl accepts command
+> +id and command input structure.
+> +
+> +::
+> +        struct sev_issue_cmd {
+> +                /* Command ID */
+> +                __u32 cmd;
+> +
+> +                /* Command request structure */
+> +                __u64 data;
+> +
+> +                /* firmware error code on failure (see psp-sev.h) */
+> +                __u32 error;
+> +        };
+> +
+> +
+>  2.1 SNP_GET_REPORT
+>  ------------------
+>
+> @@ -107,3 +123,14 @@ length of the blob is lesser than expected then snp_ext_report_req.certs_len wil
+>  be updated with the expected value.
+>
+>  See GHCB specification for further detail on how to parse the certificate blob.
+> +
+> +2.3 SNP_PLATFORM_STATUS
+> +-----------------------
+> +:Technology: sev-snp
+> +:Type: hypervisor ioctl cmd
+> +:Parameters (in): struct sev_data_snp_platform_status
+> +:Returns (out): 0 on success, -negative on error
+> +
+> +The SNP_PLATFORM_STATUS command is used to query the SNP platform status. The
+> +status includes API major, minor version and more. See the SEV-SNP
+> +specification for further details.
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 4cd7d803a624..16c6df5d412c 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1394,6 +1394,48 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>         return ret;
+>  }
+>
+> +static int sev_ioctl_snp_platform_status(struct sev_issue_cmd *argp)
+> +{
+> +       struct sev_device *sev = psp_master->sev_data;
+> +       struct sev_data_snp_platform_status_buf buf;
+> +       struct page *status_page;
+> +       void *data;
+> +       int ret;
+> +
+> +       if (!sev->snp_inited || !argp->data)
+> +               return -EINVAL;
+> +
+> +       status_page = alloc_page(GFP_KERNEL_ACCOUNT);
+> +       if (!status_page)
+> +               return -ENOMEM;
+> +
+> +       data = page_address(status_page);
+> +       if (snp_set_rmp_state(__pa(data), 1, true, true, false)) {
+> +               __free_pages(status_page, 0);
+> +               return -EFAULT;
+> +       }
+> +
+> +       buf.status_paddr = __psp_pa(data);
+> +       ret = __sev_do_cmd_locked(SEV_CMD_SNP_PLATFORM_STATUS, &buf, &argp->error);
+> +
+> +       /* Change the page state before accessing it */
+> +       if (snp_set_rmp_state(__pa(data), 1, false, true, true)) {
+> +               snp_leak_pages(__pa(data) >> PAGE_SHIFT, 1);
 
-Isn't the first patch in this patch set a straight-forward bug fix
-:-)? Assuming others agree, I'd suggest to re-send that one out as a
-single patch on its own, so we can get it merged while the rest of
-this patch set works its way through the process.
+Calling `snp_leak_pages()` here seems wrong, because
+`snp_set_rmp_state()` calls `snp_leak_pages()` when it returns an
+error.
+
+> +               return -EFAULT;
+> +       }
+> +
+> +       if (ret)
+> +               goto cleanup;
+> +
+> +       if (copy_to_user((void __user *)argp->data, data,
+> +                        sizeof(struct sev_user_data_snp_status)))
+> +               ret = -EFAULT;
+> +
+> +cleanup:
+> +       __free_pages(status_page, 0);
+> +       return ret;
+> +}
+> +
+>  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>  {
+>         void __user *argp = (void __user *)arg;
+> @@ -1445,6 +1487,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>         case SEV_GET_ID2:
+>                 ret = sev_ioctl_do_get_id2(&input);
+>                 break;
+> +       case SNP_PLATFORM_STATUS:
+> +               ret = sev_ioctl_snp_platform_status(&input);
+> +               break;
+>         default:
+>                 ret = -EINVAL;
+>                 goto out;
+> diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+> index bed65a891223..ffd60e8b0a31 100644
+> --- a/include/uapi/linux/psp-sev.h
+> +++ b/include/uapi/linux/psp-sev.h
+> @@ -28,6 +28,7 @@ enum {
+>         SEV_PEK_CERT_IMPORT,
+>         SEV_GET_ID,     /* This command is deprecated, use SEV_GET_ID2 */
+>         SEV_GET_ID2,
+> +       SNP_PLATFORM_STATUS,
+>
+>         SEV_MAX,
+>  };
+> --
+> 2.17.1
+>
+>
