@@ -2,181 +2,271 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4653C433F5
-	for <linux-crypto@archiver.kernel.org>; Sun, 12 Sep 2021 06:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7ECC433EF
+	for <linux-crypto@archiver.kernel.org>; Sun, 12 Sep 2021 07:48:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75CE561076
-	for <linux-crypto@archiver.kernel.org>; Sun, 12 Sep 2021 06:45:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 717DD610A6
+	for <linux-crypto@archiver.kernel.org>; Sun, 12 Sep 2021 07:48:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbhILGqu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 12 Sep 2021 02:46:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48808 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229512AbhILGqt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 12 Sep 2021 02:46:49 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 27BCC61076
-        for <linux-crypto@vger.kernel.org>; Sun, 12 Sep 2021 06:45:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631429136;
-        bh=t8JCM2hcLo4uV6LKqr8v2Q69dOsOZEON+XpsKgWA7Uc=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Ro62EyYnMwwBZKw9pbB+eLbCQaxTFuPMUsRg2nxoaOJeDEtFLC3thVHnearQ33fqW
-         Qs6jwmTtCCFKai4Wxyc1k5s+EBi68XTfXuJCnmheRWjyLul3YWWgYzAc8zPFk27cmi
-         ExWlSQ4qj8LEe3DAZbBYH2l8P7eNDif+OjMLOmMjL7YIacTRWmZQi4DnRh4GCg3UoQ
-         On5KKdbVGsm6EEv4LXiOqKRxi56B4uAu68yoUL3e/8dR5AHjqIcgvddzI7c62hGQ1Z
-         YN+7ygENDPbXkjLf3sRQRA2bFVd76TRSr8AUqek5tfowKcaPPIKPn0ok4BAHtnbdcX
-         fnOXDdf9Uyv8Q==
-Received: by mail-oi1-f175.google.com with SMTP id 6so9555353oiy.8
-        for <linux-crypto@vger.kernel.org>; Sat, 11 Sep 2021 23:45:36 -0700 (PDT)
-X-Gm-Message-State: AOAM53012TwKh/qCLFULq4vgVGUXeiBUx+tXMKvB/hwdQ2ipl21A6TJo
-        vzjc2TyCyxemDkuytpitzyB0yLnrz4o0HNpt6sY=
-X-Google-Smtp-Source: ABdhPJx0ZRfQO7TwZnRjgcy5MkH6op+aFYjg2jtUrF5zprLQCVVgKr5RCni7pt/uVcPZtWRjRv89UsB2LQVbHdA6GHk=
-X-Received: by 2002:aca:eb97:: with SMTP id j145mr3808204oih.33.1631429135510;
- Sat, 11 Sep 2021 23:45:35 -0700 (PDT)
+        id S233122AbhILHtT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 12 Sep 2021 03:49:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39216 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233071AbhILHtR (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 12 Sep 2021 03:49:17 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 18C3E0rA013969;
+        Sun, 12 Sep 2021 03:46:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=AbgEci5Ku0ckeMfcoizBo7q6044PcSVA9J4TV9p8xVE=;
+ b=XWvNXO2BH4qDekOrwAPp8NPBt8WAQQasMLGtv2Uqw3IcuTWnJKUDoJ1kDUwkKgAwTdKx
+ jOIM1xWQgoGzXD7kFKIyBG5ch1OYlBud64Q4oiCRmUO/pbEjYGS76NUXnSna6VtSQPm6
+ AOMDMO7vJSCPxiLbNIuQ9YKAeWdSQY+ioeZgzehAvvnqEml7KW+oCLKJMlzafeloJUW+
+ /qGGNq3Cy4RavKgeObK0JNWawChBKbvkHxEKG0yAy72My8YelNqwrihtkH/kGjkIfq7z
+ uT1g8St1eGcpRI91pbQg2Opc5Y/pH0ZfX58/LgHfpY4bTHACglW+A5Iht2K6Z31xrVAx rg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b19fcjncj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 12 Sep 2021 03:46:59 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18C7kwRw023730;
+        Sun, 12 Sep 2021 03:46:58 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b19fcjnc7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 12 Sep 2021 03:46:58 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18C7kk7k019694;
+        Sun, 12 Sep 2021 07:46:57 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma04dal.us.ibm.com with ESMTP id 3b0m390pb7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 12 Sep 2021 07:46:57 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18C7ktIq30212554
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 12 Sep 2021 07:46:55 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7316E13605D;
+        Sun, 12 Sep 2021 07:46:55 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 29538136055;
+        Sun, 12 Sep 2021 07:46:48 +0000 (GMT)
+Received: from [9.65.84.185] (unknown [9.65.84.185])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Sun, 12 Sep 2021 07:46:47 +0000 (GMT)
+Subject: Re: [PATCH Part2 v5 18/45] crypto: ccp: Provide APIs to query
+ extended attestation report
+To:     Marc Orr <marcorr@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-19-brijesh.singh@amd.com>
+ <CAA03e5FMCp7cZLXKPZ53SOUK-cOF+WmGRj256K9=+wivHvTA0Q@mail.gmail.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+Message-ID: <d6fd2456-999b-37eb-64c2-04d33f7a8ffd@linux.ibm.com>
+Date:   Sun, 12 Sep 2021 10:46:46 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-References: <20210908125440.GA6147@kili> <YTt/uJjgy4jTr+GL@fedora>
- <YTuAerH3S78Xf1Jc@fedora> <20210911073232.GS1935@kadam> <CAMj1kXGg_oQQ5qo5Tkq1K=62uWL-1S54VHeQ1BzXTWn81AhfSw@mail.gmail.com>
- <YT2J8BOAXYY2lOIT@fedora>
-In-Reply-To: <YT2J8BOAXYY2lOIT@fedora>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sun, 12 Sep 2021 08:45:24 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXHfXHc5K0sjt7_HM0=jAb9sHPqN_36KyfE6uDCnG6Sa9Q@mail.gmail.com>
-Message-ID: <CAMj1kXHfXHc5K0sjt7_HM0=jAb9sHPqN_36KyfE6uDCnG6Sa9Q@mail.gmail.com>
-Subject: Re: [bug report] crypto: aesni - xts_crypt() return if walk.nbytes is 0
-To:     Shreyansh Chouhan <chouhan.shreyansh630@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAA03e5FMCp7cZLXKPZ53SOUK-cOF+WmGRj256K9=+wivHvTA0Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: _GvBj-xBa9VfD13iv1w1scnHmIZR6Rlk
+X-Proofpoint-GUID: BWjJ6Y36gh4JVUx2Zc6w3fByrpOooEfk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
+ definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ bulkscore=0 phishscore=0 clxscore=1015 malwarescore=0 mlxlogscore=999
+ suspectscore=0 adultscore=0 mlxscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109120023
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 12 Sept 2021 at 07:02, Shreyansh Chouhan
-<chouhan.shreyansh630@gmail.com> wrote:
->
-> On Sat, Sep 11, 2021 at 06:23:04PM +0200, Ard Biesheuvel wrote:
-> > On Sat, 11 Sept 2021 at 09:32, Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> > >
-> > > On Fri, Sep 10, 2021 at 09:27:46PM +0530, Shreyansh Chouhan wrote:
-> > > > On Fri, Sep 10, 2021 at 09:24:37PM +0530, Shreyansh Chouhan wrote:
-> > > > > Hi Dan,
-> > > > >
-> > > > > Sorry for the delay in the response.
-> > > > >
-> > > > > On Wed, Sep 08, 2021 at 03:54:40PM +0300, Dan Carpenter wrote:
-> > > > > > Hello Shreyansh Chouhan,
-> > > > > >
-> > > > > > The patch 72ff2bf04db2: "crypto: aesni - xts_crypt() return if
-> > > > > > walk.nbytes is 0" from Aug 22, 2021, leads to the following
-> > > > > > Smatch static checker warning:
-> > > > > >
-> > > > > >   arch/x86/crypto/aesni-intel_glue.c:915 xts_crypt()
-> > > > > >   warn: possible missing kernel_fpu_end()
-> > > > > >
-> > > > > > arch/x86/crypto/aesni-intel_glue.c
-> > > > > >     839 static int xts_crypt(struct skcipher_request *req, bool encrypt)
-> > > > > >     840 {
-> > > > > >     841         struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> > > > > >     842         struct aesni_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
-> > > > > >     843         int tail = req->cryptlen % AES_BLOCK_SIZE;
-> > > > > >     844         struct skcipher_request subreq;
-> > > > > >     845         struct skcipher_walk walk;
-> > > > > >     846         int err;
-> > > > > >     847
-> > > > > >     848         if (req->cryptlen < AES_BLOCK_SIZE)
-> > > > > >     849                 return -EINVAL;
-> > > > > >     850
-> > > > > >     851         err = skcipher_walk_virt(&walk, req, false);
-> > > > > >     852         if (!walk.nbytes)
-> > > > > >     853                 return err;
-> > > > > >
-> > > > > > The patch adds this check for "walk.nbytes == 0".
-> > > > > >
-> > > > > >     854
-> > > > > >     855         if (unlikely(tail > 0 && walk.nbytes < walk.total)) {
-> > > > > >                                          ^^^^^^^^^^^^^^^^^^^^^^^^
-> > > > > > But Smatch says that "walk.nbytes" can be set to zero inside this
-> > > > > > if statement.
-> > > > > >
-> > > > >
-> > > > > Indeed that is so, I missed it the first time around.
-> > > > >
-> > > > > >     856                 int blocks = DIV_ROUND_UP(req->cryptlen, AES_BLOCK_SIZE) - 2;
-> > > > > >     857
-> > > > > >     858                 skcipher_walk_abort(&walk);
-> > > > > >     859
-> > > > > >     860                 skcipher_request_set_tfm(&subreq, tfm);
-> > > > > >     861                 skcipher_request_set_callback(&subreq,
-> > > > > >     862                                               skcipher_request_flags(req),
-> > > > > >     863                                               NULL, NULL);
-> > > > > >     864                 skcipher_request_set_crypt(&subreq, req->src, req->dst,
-> > > > > >     865                                            blocks * AES_BLOCK_SIZE, req->iv);
-> > > > > >     866                 req = &subreq;
-> > > > > >     867
-> > > > > >     868                 err = skcipher_walk_virt(&walk, req, false);
-> > > > > >     869                 if (err)
-> > > > > >     870                         return err;
-> > > > >
-> > > > > We can replace the above if (err) check with another if
-> > > > > (!walk.nbytes) check.
-> > > > >
-> > > > > >     871         } else {
-> > > > > >     872                 tail = 0;
-> > > > > >     873         }
-> > > > > >     874
-> > > > > >     875         kernel_fpu_begin();
-> > > > > >     876
-> > > > > >     877         /* calculate first value of T */
-> > > > > >     878         aesni_enc(aes_ctx(ctx->raw_tweak_ctx), walk.iv, walk.iv);
-> > > > > >     879
-> > > > > >
-> > > > > > Leading to not entering this loop and so we don't restore kernel_fpu_end().
-> > > > > >
-> > > > > > So maybe the "if (walk.nbytes == 0)" check should be moved to right
-> > > > > > before the call to kernel_fpu_begin()?
-> > > > > >
-> > > > >
-> > > > > Instead of moving the first walk.nbytes check, I think we can have two if
-> > > > > (!walk.nbytes) checks. There was a discussion between Herbert Xu and Ard
-> > > > > Biesheuvel, and Herbert wrote in his email that most skcipher walkers are
-> > > > > not supposed to explicitly check on the err value, and should instead
-> > > > > terminate the loop whenever walk.nbytes is set to 0.
-> > > > >
-> > > > > Here is a link to that discussion:
-> > > > >
-> > > > > https://lore.kernel.org/linux-crypto/20210820125315.GB28484@gondor.apana.org.au/
-> > > > >
-> > > >
-> > > > I can send in a patch that replaces the if (err) check with an if
-> > > > (!walk.nbytes) check if that is fine with you.
-> > > >
-> > >
-> > > Yes, please!
-> > >
-> >
-> > Ehm, how would that patch be any different from the one that you sent
-> > 2+ weeks ago and which was already merged by Herbert and pulled by
-> > Linus?
-> >
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=72ff2bf04db2a48840df93a461b7115900f46c05
->
-> The previous patch that I sent adds a walk.nbytes after the
-> skcipher_walk_virt() call at line 851[1] in the code. There is another
-> call to skcipher_walk_virt() before we call kernel_fpu_begin(), at line
-> 868[2], this patch adds a walk.nbytes check after that function call.
->
 
-Ah, ok. Thanks for pointing that out.
 
-So while the first occurrence can actually be triggered by fuzzing
-(even though having zero length inputs does not make sense for a
-skcipher invocation), this second occurrence can only be triggered if
-the request changes size under our feet, i.e., from >0 to 0.
+On 10/09/2021 6:30, Marc Orr wrote:
+> On Fri, Aug 20, 2021 at 9:00 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>>
+>> Version 2 of the GHCB specification defines VMGEXIT that is used to get
+>> the extended attestation report. The extended attestation report includes
+>> the certificate blobs provided through the SNP_SET_EXT_CONFIG.
+>>
+>> The snp_guest_ext_guest_request() will be used by the hypervisor to get
+>> the extended attestation report. See the GHCB specification for more
+>> details.
+>>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> ---
+>>  drivers/crypto/ccp/sev-dev.c | 43 ++++++++++++++++++++++++++++++++++++
+>>  include/linux/psp-sev.h      | 24 ++++++++++++++++++++
+>>  2 files changed, 67 insertions(+)
+>>
+>> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+>> index 9ba194acbe85..e2650c3d0d0a 100644
+>> --- a/drivers/crypto/ccp/sev-dev.c
+>> +++ b/drivers/crypto/ccp/sev-dev.c
+>> @@ -22,6 +22,7 @@
+>>  #include <linux/firmware.h>
+>>  #include <linux/gfp.h>
+>>  #include <linux/cpufeature.h>
+>> +#include <linux/sev-guest.h>
+>>
+>>  #include <asm/smp.h>
+>>
+>> @@ -1677,6 +1678,48 @@ int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
+>>  }
+>>  EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt);
+>>
+>> +int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+>> +                               unsigned long vaddr, unsigned long *npages, unsigned long *fw_err)
+>> +{
+>> +       unsigned long expected_npages;
+>> +       struct sev_device *sev;
+>> +       int rc;
+>> +
+>> +       if (!psp_master || !psp_master->sev_data)
+>> +               return -ENODEV;
+>> +
+>> +       sev = psp_master->sev_data;
+>> +
+>> +       if (!sev->snp_inited)
+>> +               return -EINVAL;
+>> +
+>> +       /*
+>> +        * Check if there is enough space to copy the certificate chain. Otherwise
+>> +        * return ERROR code defined in the GHCB specification.
+>> +        */
+>> +       expected_npages = sev->snp_certs_len >> PAGE_SHIFT;
+> 
+> Is this calculation for `expected_npages` correct? Assume that
+> `sev->snp_certs_len` is less than a page (e.g., 2000). Then, this
+> calculation will return `0` for `expected_npages`, rather than round
+> up to 1.
+> 
 
-I'll leave it up to Herbert to decide if we want to make this change
-anyway, but IMO, we don't need it.
+In patch 17 in sev_ioctl_snp_set_config there's a check that certs_len
+is aligned to PAGE_SIZE (and this value is later in that function assigned
+to sev->snp_certs_len):
+
++	/* Copy the certs from userspace */
++	if (input.certs_address) {
++		if (!input.certs_len || !IS_ALIGNED(input.certs_len, PAGE_SIZE))
++			return -EINVAL;
+
+but I agree that rounding up (DIV_ROUND_UP) or asserting that
+sev->snp_certs_len is aligned to PAGE_SIZE (and non-zero) makes
+sense here.
+
+
+-Dov
+
+
+>> +       if (*npages < expected_npages) {
+>> +               *npages = expected_npages;
+>> +               *fw_err = SNP_GUEST_REQ_INVALID_LEN;
+>> +               return -EINVAL;
+>> +       }
+>> +
+>> +       rc = sev_do_cmd(SEV_CMD_SNP_GUEST_REQUEST, data, (int *)&fw_err);
+>> +       if (rc)
+>> +               return rc;
+>> +
+>> +       /* Copy the certificate blob */
+>> +       if (sev->snp_certs_data) {
+>> +               *npages = expected_npages;
+>> +               memcpy((void *)vaddr, sev->snp_certs_data, *npages << PAGE_SHIFT);
+>> +       } else {
+>> +               *npages = 0;
+>> +       }
+>> +
+>> +       return rc;
+>> +}
+>> +EXPORT_SYMBOL_GPL(snp_guest_ext_guest_request);
+>> +
+>>  static void sev_exit(struct kref *ref)
+>>  {
+>>         misc_deregister(&misc_dev->misc);
+>> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+>> index 00bd684dc094..ea94ce4d834a 100644
+>> --- a/include/linux/psp-sev.h
+>> +++ b/include/linux/psp-sev.h
+>> @@ -924,6 +924,23 @@ void *psp_copy_user_blob(u64 uaddr, u32 len);
+>>  void *snp_alloc_firmware_page(gfp_t mask);
+>>  void snp_free_firmware_page(void *addr);
+>>
+>> +/**
+>> + * snp_guest_ext_guest_request - perform the SNP extended guest request command
+>> + *  defined in the GHCB specification.
+>> + *
+>> + * @data: the input guest request structure
+>> + * @vaddr: address where the certificate blob need to be copied.
+>> + * @npages: number of pages for the certificate blob.
+>> + *    If the specified page count is less than the certificate blob size, then the
+>> + *    required page count is returned with error code defined in the GHCB spec.
+>> + *    If the specified page count is more than the certificate blob size, then
+>> + *    page count is updated to reflect the amount of valid data copied in the
+>> + *    vaddr.
+>> + */
+>> +int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+>> +                               unsigned long vaddr, unsigned long *npages,
+>> +                               unsigned long *error);
+>> +
+>>  #else  /* !CONFIG_CRYPTO_DEV_SP_PSP */
+>>
+>>  static inline int
+>> @@ -971,6 +988,13 @@ static inline void *snp_alloc_firmware_page(gfp_t mask)
+>>
+>>  static inline void snp_free_firmware_page(void *addr) { }
+>>
+>> +static inline int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+>> +                                             unsigned long vaddr, unsigned long *n,
+>> +                                             unsigned long *error)
+>> +{
+>> +       return -ENODEV;
+>> +}
+>> +
+>>  #endif /* CONFIG_CRYPTO_DEV_SP_PSP */
+>>
+>>  #endif /* __PSP_SEV_H__ */
+>> --
+>> 2.17.1
+>>
