@@ -2,122 +2,150 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E43C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Sep 2021 07:19:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 970FCC4321E
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Sep 2021 08:51:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4BA4B610A6
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Sep 2021 07:19:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 804DE61164
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Sep 2021 08:51:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240614AbhINHVH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Sep 2021 03:21:07 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:46518 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235026AbhINHVG (ORCPT
+        id S229854AbhINIxB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Sep 2021 04:53:01 -0400
+Received: from mailgw01.mediatek.com ([60.244.123.138]:52090 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S229526AbhINIxA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Sep 2021 03:21:06 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 449462003A;
-        Tue, 14 Sep 2021 07:19:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1631603989; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qa6FB0uYQ2RYdrHZTs6vTxf+pqm8aDnKtUrZl6NWqYA=;
-        b=rtxMine2n/wlRj205bVSePa/irX65O6ydD/Qrz5clC1jOBY3u98CAXCI/dBImd5sqD6pnj
-        oM3lyZ99/sBr8Vrh8joXg7kNToYGACEt6c5yxbxeA027GnnBXLKxHj/yTJkxZRCHrDrnDq
-        1+HF17pH+zMKST9SXNxlrq0GxTJgfIo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1631603989;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qa6FB0uYQ2RYdrHZTs6vTxf+pqm8aDnKtUrZl6NWqYA=;
-        b=kaKLN+oGmQWiFnK0soeTOuWWuNA/16eyNkswJsQLXshLpGRk5QkxZ0R0muFhzLRbfH2eg/
-        JTqzn+aVsyU/qQCw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2503B13E55;
-        Tue, 14 Sep 2021 07:19:49 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id NsIJBxVNQGEqfQAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 14 Sep 2021 07:19:49 +0000
-Subject: Re: [PATCH 07/12] nvme: Implement In-Band authentication
-To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <keith.busch@wdc.com>,
+        Tue, 14 Sep 2021 04:53:00 -0400
+X-UUID: 7f06557b76904c329f4018462669b991-20210914
+X-UUID: 7f06557b76904c329f4018462669b991-20210914
+Received: from mtkcas07.mediatek.inc [(172.21.101.84)] by mailgw01.mediatek.com
+        (envelope-from <sam.shih@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 810404935; Tue, 14 Sep 2021 16:51:39 +0800
+Received: from mtkcas07.mediatek.inc (172.21.101.84) by
+ mtkmbs07n2.mediatek.inc (172.21.101.141) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Tue, 14 Sep 2021 16:51:37 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by mtkcas07.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Tue, 14 Sep 2021 16:51:37 +0800
+From:   Sam Shih <sam.shih@mediatek.com>
+To:     Rob Herring <robh+dt@kernel.org>, Sean Wang <sean.wang@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
-References: <20210910064322.67705-1-hare@suse.de>
- <20210910064322.67705-8-hare@suse.de>
- <99cbf790-c276-b3d0-6140-1f5bfa8665eb@grimberg.me>
- <8bff9a88-a5d4-d7bb-8ce9-81d30438bfbb@suse.de>
- <6eeae78a-a4eb-bb18-6cad-273e1a21050a@grimberg.me>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <7ea0e477-be74-80e4-a89b-9e14f5395011@suse.de>
-Date:   Tue, 14 Sep 2021 09:19:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Hsin-Yi Wang <hsinyi@chromium.org>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        Fabien Parent <fparent@baylibre.com>,
+        Seiya Wang <seiya.wang@mediatek.com>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>, <linux-gpio@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-crypto@vger.kernel.org>, <linux-serial@vger.kernel.org>,
+        <linux-watchdog@vger.kernel.org>, <linux-clk@vger.kernel.org>
+CC:     John Crispin <john@phrozen.org>,
+        Ryder Lee <Ryder.Lee@mediatek.com>,
+        Sam Shih <sam.shih@mediatek.com>
+Subject: [v3,1/9] dt-bindings: clock: mediatek: document clk bindings for mediatek mt7986 SoC
+Date:   Tue, 14 Sep 2021 16:51:29 +0800
+Message-ID: <20210914085137.31761-2-sam.shih@mediatek.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20210914085137.31761-1-sam.shih@mediatek.com>
+References: <20210914085137.31761-1-sam.shih@mediatek.com>
 MIME-Version: 1.0
-In-Reply-To: <6eeae78a-a4eb-bb18-6cad-273e1a21050a@grimberg.me>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 9/14/21 9:06 AM, Sagi Grimberg wrote:
->>>> @@ -361,11 +366,13 @@ static inline void nvme_end_req(struct request
->>>> *req)
->>>>      void nvme_complete_rq(struct request *req)
->>>>    {
->>>> +    struct nvme_ctrl *ctrl = nvme_req(req)->ctrl;
->>>> +
->>>>        trace_nvme_complete_rq(req);
->>>>        nvme_cleanup_cmd(req);
->>>>    -    if (nvme_req(req)->ctrl->kas)
->>>> -        nvme_req(req)->ctrl->comp_seen = true;
->>>> +    if (ctrl->kas)
->>>> +        ctrl->comp_seen = true;
->>>>          switch (nvme_decide_disposition(req)) {
->>>>        case COMPLETE:
->>>> @@ -377,6 +384,15 @@ void nvme_complete_rq(struct request *req)
->>>>        case FAILOVER:
->>>>            nvme_failover_req(req);
->>>>            return;
->>>> +    case AUTHENTICATE:
->>>> +#ifdef CONFIG_NVME_AUTH
->>>> +        if (nvme_change_ctrl_state(ctrl, NVME_CTRL_RESETTING))
->>>> +            queue_work(nvme_wq, &ctrl->dhchap_auth_work);
->>>
->>> Why is the state change here and not in nvme_dhchap_auth_work?
->>>
->> Because switching to 'resetting' is an easy way to synchronize with the
->> admin queue.
-> 
-> Maybe fold this into nvme_authenticate_ctrl? in case someone adds/moves
-> this in the future and forgets the ctrl state serialization?
+This patch adds the binding documentation for topckgen, apmixedsys,
+infracfg, and ethernet subsystem clocks.
 
-Yeah; not a bad idea. Will be looking into it.
+Signed-off-by: Sam Shih <sam.shih@mediatek.com>
+Acked-by: Rob Herring <robh@kernel.org>
 
-Cheers,
+---
+v3: Added an Acked-by tag
+v2: remove compatiable string 'mt7986-sgmiisys'
+---
+ .../devicetree/bindings/arm/mediatek/mediatek,apmixedsys.txt    | 1 +
+ .../devicetree/bindings/arm/mediatek/mediatek,ethsys.txt        | 1 +
+ .../devicetree/bindings/arm/mediatek/mediatek,infracfg.txt      | 1 +
+ .../devicetree/bindings/arm/mediatek/mediatek,sgmiisys.txt      | 2 ++
+ .../devicetree/bindings/arm/mediatek/mediatek,topckgen.txt      | 1 +
+ 5 files changed, 6 insertions(+)
 
-Hannes
+diff --git a/Documentation/devicetree/bindings/arm/mediatek/mediatek,apmixedsys.txt b/Documentation/devicetree/bindings/arm/mediatek/mediatek,apmixedsys.txt
+index ea827e8763de..3fa755866528 100644
+--- a/Documentation/devicetree/bindings/arm/mediatek/mediatek,apmixedsys.txt
++++ b/Documentation/devicetree/bindings/arm/mediatek/mediatek,apmixedsys.txt
+@@ -14,6 +14,7 @@ Required Properties:
+ 	- "mediatek,mt7622-apmixedsys"
+ 	- "mediatek,mt7623-apmixedsys", "mediatek,mt2701-apmixedsys"
+ 	- "mediatek,mt7629-apmixedsys"
++	- "mediatek,mt7986-apmixedsys"
+ 	- "mediatek,mt8135-apmixedsys"
+ 	- "mediatek,mt8167-apmixedsys", "syscon"
+ 	- "mediatek,mt8173-apmixedsys"
+diff --git a/Documentation/devicetree/bindings/arm/mediatek/mediatek,ethsys.txt b/Documentation/devicetree/bindings/arm/mediatek/mediatek,ethsys.txt
+index 6b7e8067e7aa..0502db73686b 100644
+--- a/Documentation/devicetree/bindings/arm/mediatek/mediatek,ethsys.txt
++++ b/Documentation/devicetree/bindings/arm/mediatek/mediatek,ethsys.txt
+@@ -10,6 +10,7 @@ Required Properties:
+ 	- "mediatek,mt7622-ethsys", "syscon"
+ 	- "mediatek,mt7623-ethsys", "mediatek,mt2701-ethsys", "syscon"
+ 	- "mediatek,mt7629-ethsys", "syscon"
++	- "mediatek,mt7986-ethsys", "syscon"
+ - #clock-cells: Must be 1
+ - #reset-cells: Must be 1
+ 
+diff --git a/Documentation/devicetree/bindings/arm/mediatek/mediatek,infracfg.txt b/Documentation/devicetree/bindings/arm/mediatek/mediatek,infracfg.txt
+index eb3523c7a7be..f66bd720571d 100644
+--- a/Documentation/devicetree/bindings/arm/mediatek/mediatek,infracfg.txt
++++ b/Documentation/devicetree/bindings/arm/mediatek/mediatek,infracfg.txt
+@@ -15,6 +15,7 @@ Required Properties:
+ 	- "mediatek,mt7622-infracfg", "syscon"
+ 	- "mediatek,mt7623-infracfg", "mediatek,mt2701-infracfg", "syscon"
+ 	- "mediatek,mt7629-infracfg", "syscon"
++	- "mediatek,mt7986-infracfg", "syscon"
+ 	- "mediatek,mt8135-infracfg", "syscon"
+ 	- "mediatek,mt8167-infracfg", "syscon"
+ 	- "mediatek,mt8173-infracfg", "syscon"
+diff --git a/Documentation/devicetree/bindings/arm/mediatek/mediatek,sgmiisys.txt b/Documentation/devicetree/bindings/arm/mediatek/mediatek,sgmiisys.txt
+index 30cb645c0e54..29ca7a10b315 100644
+--- a/Documentation/devicetree/bindings/arm/mediatek/mediatek,sgmiisys.txt
++++ b/Documentation/devicetree/bindings/arm/mediatek/mediatek,sgmiisys.txt
+@@ -8,6 +8,8 @@ Required Properties:
+ - compatible: Should be:
+ 	- "mediatek,mt7622-sgmiisys", "syscon"
+ 	- "mediatek,mt7629-sgmiisys", "syscon"
++	- "mediatek,mt7986-sgmiisys_0", "syscon"
++	- "mediatek,mt7986-sgmiisys_1", "syscon"
+ - #clock-cells: Must be 1
+ 
+ The SGMIISYS controller uses the common clk binding from
+diff --git a/Documentation/devicetree/bindings/arm/mediatek/mediatek,topckgen.txt b/Documentation/devicetree/bindings/arm/mediatek/mediatek,topckgen.txt
+index 5ce7578cf274..b82422bb717f 100644
+--- a/Documentation/devicetree/bindings/arm/mediatek/mediatek,topckgen.txt
++++ b/Documentation/devicetree/bindings/arm/mediatek/mediatek,topckgen.txt
+@@ -14,6 +14,7 @@ Required Properties:
+ 	- "mediatek,mt7622-topckgen"
+ 	- "mediatek,mt7623-topckgen", "mediatek,mt2701-topckgen"
+ 	- "mediatek,mt7629-topckgen"
++	- "mediatek,mt7986-topckgen", "syscon"
+ 	- "mediatek,mt8135-topckgen"
+ 	- "mediatek,mt8167-topckgen", "syscon"
+ 	- "mediatek,mt8173-topckgen"
 -- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+2.29.2
+
