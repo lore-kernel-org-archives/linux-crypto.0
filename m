@@ -2,101 +2,159 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB7DC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Sep 2021 14:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8C6C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Sep 2021 17:55:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 86B256109E
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Sep 2021 14:24:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDF6E610F9
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Sep 2021 17:55:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233693AbhINO0K (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Sep 2021 10:26:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37142 "EHLO
+        id S230008AbhINR4q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Sep 2021 13:56:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233309AbhINO0J (ORCPT
+        with ESMTP id S229785AbhINR4q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Sep 2021 10:26:09 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66519C061574
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Sep 2021 07:24:52 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mQ9Me-0005tr-P1; Tue, 14 Sep 2021 16:24:48 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mQ9MQ-0006Yy-LX; Tue, 14 Sep 2021 16:24:34 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mQ9MQ-0007OM-Jj; Tue, 14 Sep 2021 16:24:34 +0200
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        Kevin Hilman <khilman@baylibre.com>
-Cc:     Jerome Brunet <jbrunet@baylibre.com>,
-        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-amlogic@lists.infradead.org, kernel@pengutronix.de
-Subject: [PATCH] hwrng: meson - Improve error handling for core clock
-Date:   Tue, 14 Sep 2021 16:24:28 +0200
-Message-Id: <20210914142428.57099-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.30.2
+        Tue, 14 Sep 2021 13:56:46 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54F54C061574;
+        Tue, 14 Sep 2021 10:55:28 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id i3so179106wmq.3;
+        Tue, 14 Sep 2021 10:55:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=o4N33InZazxjk2fm8q6vK8YiuSMIHI0rSm1Fto78HVY=;
+        b=Kq6HIns1wxIDQW7wVZGqtPs8Lakk8I2+OcNr4+nPCS8f/mzDXYIWAZxRV8SyM5sUl7
+         KThkCXKwt+hQ2dt63JusPyHaXkRQd/hdG4E/7waUU3CQ460zJKlwL3YYywxYlkQSRipj
+         eG2H/DFdMmgjEnu0ITT0qTmWNjC1TP+FcblWcm4/CiJFBebBVfahFriCoBHSbFSzGGpp
+         r60UtLtehM2QgVDXIgJQAsaNl1kpDPQVKHEzz5aPcMNQXZFOFRb3y3urst5VCx1aRF0k
+         xPfk6JJjY1uTSynF5d8puaV6rOVlAbsQrnhbUZJe+Dh5ke4Fj9YQTYDCZwnlEX32XaFZ
+         YnDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=o4N33InZazxjk2fm8q6vK8YiuSMIHI0rSm1Fto78HVY=;
+        b=PIfq5osUmHw/9xCG6+QgWbwEjpBMUIS8oQskvVn9JaY5M88iV5rgb9smHvxnv1zj0v
+         zHKoyE7kI0tuPpj8OfDEfJob8tMq6oPUHo3OsugGEN4nAGApxeLEmehEAzTeeBD3OXRd
+         NNZkzFmVFiY1YrtUqe7bMOGeKxkOQB3pkNAsxpjdRRa2KEsiA8ZizgNmKkhIWAk2G9Ve
+         yeHtevV9fuNh2gGDrXvf18qBOMdt2TF8FY0chUheXb2Hu1aVeeng8eyy6eHGExWqn1zc
+         n2UFYkU6boJrTjbZiiEkv4EcUBJm/tcrbyns5Cfog3oQ7my7C1lNFHj+kNr7Olbn9etZ
+         bzhA==
+X-Gm-Message-State: AOAM531yEr8nuyGmZL4QLjrC+5DCW+zvknrunfut/juPG3PifT9p6Fco
+        H2/nRUD376Pc8sK+gMShyLs=
+X-Google-Smtp-Source: ABdhPJzUGxuis/ruDJdd5qDR8TPtVsMGxpsuKrk+eTnAx/luvB3WM899gSd766IT/oCv1KftVjMfMQ==
+X-Received: by 2002:a05:600c:3203:: with SMTP id r3mr371006wmp.175.1631642126910;
+        Tue, 14 Sep 2021 10:55:26 -0700 (PDT)
+Received: from [192.168.0.16] ([37.223.140.66])
+        by smtp.gmail.com with ESMTPSA id u16sm1982308wmc.41.2021.09.14.10.55.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Sep 2021 10:55:26 -0700 (PDT)
+Message-ID: <016b501b-a4bf-c74d-9f7f-8145800ca6e0@gmail.com>
+Date:   Tue, 14 Sep 2021 19:55:24 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Patch-Hashes: v=1; h=sha256; i=9tz2phqeN+3GzCEXz8gh5AQWNocdSF32iWo28yTN+xs=; m=cX96ziEeAkJuDb6P9w+CtfXmQzh9pdqI3yrnaxyU0x0=; p=aUBlnzWgqmE/spp/etZnspgE0aeuWMQfhI4MUcyEZ7k=; g=b60f7d99182caa434b62de00dd624961cea91849
-X-Patch-Sig: m=pgp; i=u.kleine-koenig@pengutronix.de; s=0x0D2511F322BFAB1C1580266BE2DCDD9132669BD6; b=iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmFAsJQACgkQwfwUeK3K7AlrTQf8CZp M/xfs12DybnVzDWGfGTbDxvXLsNJ7yMwTHa6A/aUq8y5vEEQd8J1WN+DD18dQpQueEq1BOFg6qkfq 4BL/ETsC4954HMsYibwrFQIBA0pYpJbPuq6iaFJ97g31M4WJmgDv/IouXp9b2EFvcLLan1M6l1UuY LKjJsRPqMPWYmJCADVziMOdCVn+54tH7YPCHTLOMdqHWlzuS+YBwbZGHC1Ve8lwnCFhVtILp1hxt9 PMvFEgEeE0hL73EuJmZzaUb5Ru049iTsgR6ben139Qd7igImWSITtUoRkwbBQMtJgpcQZkQYThM7I M17hZa2EKgpE9YHCQpew2ugSuhi2GsA==
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.0.3
+Subject: Re: [RESEND,v2,8/9] arm64: dts: mediatek: add mt7986a support
+Content-Language: en-US
+To:     Sam Shih <sam.shih@mediatek.com>, Rob Herring <robh+dt@kernel.org>,
+        Sean Wang <sean.wang@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Hsin-Yi Wang <hsinyi@chromium.org>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        Fabien Parent <fparent@baylibre.com>,
+        Seiya Wang <seiya.wang@mediatek.com>,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-gpio@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        linux-clk@vger.kernel.org
+Cc:     John Crispin <john@phrozen.org>, Ryder Lee <Ryder.Lee@mediatek.com>
+References: <20210914085137.31761-1-sam.shih@mediatek.com>
+ <20210914085137.31761-9-sam.shih@mediatek.com>
+From:   Matthias Brugger <matthias.bgg@gmail.com>
+In-Reply-To: <20210914085137.31761-9-sam.shih@mediatek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
--ENOENT (ie. "there is no clock") is fine to ignore for an optional
-clock, other values are not supposed to be ignored and should be
-escalated to the caller (e.g. -EPROBE_DEFER). Ignore -ENOENT by using
-devm_clk_get_optional().
 
-While touching this code also add an error message for the fatal errors.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/char/hw_random/meson-rng.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+On 14/09/2021 10:51, Sam Shih wrote:
+> Add basic chip support for Mediatek mt7986a, include
+> uart nodes with correct clocks, rng node with correct clock,
+> and watchdog node and mt7986a pinctrl node.
+> 
+> Add cpu node, timer node, gic node, psci and reserved-memory node
+> for ARM Trusted Firmware,
+> 
+> Add clock controller nodes, include 40M clock source, topckgen, infracfg,
+> apmixedsys and ethernet subsystem.
+> 
+> Signed-off-by: Sam Shih <sam.shih@mediatek.com>
+> 
+> ---
+> v2: modified clock and uart node due to clock driver updated
+> ---
+>   arch/arm64/boot/dts/mediatek/Makefile        |   1 +
+>   arch/arm64/boot/dts/mediatek/mt7986a-rfb.dts |  49 ++++
+>   arch/arm64/boot/dts/mediatek/mt7986a.dtsi    | 227 +++++++++++++++++++
+>   3 files changed, 277 insertions(+)
+>   create mode 100644 arch/arm64/boot/dts/mediatek/mt7986a-rfb.dts
+>   create mode 100644 arch/arm64/boot/dts/mediatek/mt7986a.dtsi
+> 
+> diff --git a/arch/arm64/boot/dts/mediatek/Makefile b/arch/arm64/boot/dts/mediatek/Makefile
+> index 4f68ebed2e31..e6c3a73b9e4a 100644
+> --- a/arch/arm64/boot/dts/mediatek/Makefile
+> +++ b/arch/arm64/boot/dts/mediatek/Makefile
+> @@ -7,6 +7,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += mt6797-evb.dtb
+>   dtb-$(CONFIG_ARCH_MEDIATEK) += mt6797-x20-dev.dtb
+>   dtb-$(CONFIG_ARCH_MEDIATEK) += mt7622-rfb1.dtb
+>   dtb-$(CONFIG_ARCH_MEDIATEK) += mt7622-bananapi-bpi-r64.dtb
+> +dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-rfb.dtb
+>   dtb-$(CONFIG_ARCH_MEDIATEK) += mt8167-pumpkin.dtb
+>   dtb-$(CONFIG_ARCH_MEDIATEK) += mt8173-elm.dtb
+>   dtb-$(CONFIG_ARCH_MEDIATEK) += mt8173-elm-hana.dtb
+> diff --git a/arch/arm64/boot/dts/mediatek/mt7986a-rfb.dts b/arch/arm64/boot/dts/mediatek/mt7986a-rfb.dts
+> new file mode 100644
+> index 000000000000..a58347c09ab2
+> --- /dev/null
+> +++ b/arch/arm64/boot/dts/mediatek/mt7986a-rfb.dts
+> @@ -0,0 +1,49 @@
+> +// SPDX-License-Identifier: (GPL-2.0 OR MIT)
+> +/*
+> + * Copyright (C) 2021 MediaTek Inc.
+> + * Author: Sam.Shih <sam.shih@mediatek.com>
+> + */
+> +
+> +/dts-v1/;
+> +#include "mt7986a.dtsi"
+> +
+> +/ {
+> +	model = "MediaTek MT7986a RFB";
+> +	compatible = "mediatek,mt7986a-rfb";
+> +	chosen {
+> +		bootargs = "console=ttyS0,115200n1 loglevel=8  \
+> +				earlycon=uart8250,mmio32,0x11002000";
 
-diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
-index e446236e81f2..9f3e2eb8011d 100644
---- a/drivers/char/hw_random/meson-rng.c
-+++ b/drivers/char/hw_random/meson-rng.c
-@@ -54,9 +54,15 @@ static int meson_rng_probe(struct platform_device *pdev)
- 	if (IS_ERR(data->base))
- 		return PTR_ERR(data->base);
- 
--	data->core_clk = devm_clk_get(dev, "core");
--	if (IS_ERR(data->core_clk))
--		data->core_clk = NULL;
-+	data->core_clk = devm_clk_get_optional(dev, "core");
-+	if (IS_ERR(data->core_clk)) {
-+		ret = PTR_ERR(data->core_clk);
-+		if (ret != -EPROBE_DEFER)
-+			dev_err(dev, "Failed to get core clock: %pe\n",
-+				data->core_clk);
-+
-+		return ret;
-+	}
- 
- 	if (data->core_clk) {
- 		ret = clk_prepare_enable(data->core_clk);
--- 
-2.30.2
+We should be able to achieve this by using the stdout-path instead.
 
+Regards,
+Matthias
