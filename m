@@ -2,192 +2,154 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 924CBC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 14:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BAA2C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 15:15:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67DE761248
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 14:46:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E3206124E
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 15:15:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238671AbhIPOrU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Sep 2021 10:47:20 -0400
-Received: from mga04.intel.com ([192.55.52.120]:38515 "EHLO mga04.intel.com"
+        id S239084AbhIPPRN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Sep 2021 11:17:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42136 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237406AbhIPOrT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Sep 2021 10:47:19 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10109"; a="220693494"
-X-IronPort-AV: E=Sophos;i="5.85,298,1624345200"; 
-   d="scan'208";a="220693494"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2021 07:45:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.85,298,1624345200"; 
-   d="scan'208";a="471490258"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by fmsmga007.fm.intel.com with ESMTP; 16 Sep 2021 07:45:57 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>
-Subject: [PATCH] crypto: qat - power up 4xxx device
-Date:   Thu, 16 Sep 2021 15:45:41 +0100
-Message-Id: <20210916144541.56238-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.31.1
+        id S239101AbhIPPRN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Sep 2021 11:17:13 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5D21260296;
+        Thu, 16 Sep 2021 15:15:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1631805352;
+        bh=iOcCI1FHoB0yx/LZeXXa3I2QwmbANkTrrP6vNXsEUw4=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=hxw7DtFO8S32GjJYJC0FktMBCncrxCACfS1q3EoiosYBTPIvVQ690Fg7xYbP0VvQ8
+         VWUqLGv5juTWxi+/FuLFoHxaLXtqpm8ZJtrVvZil5OVmMoEQDDNe5Oluw6Oa/OKrHU
+         Or3HdOnQ41AbTQWipSCnD//Sh74OchHguokf1/063NZn0u4G9q6ihaZrNNYwKS/Epj
+         iyZtkl6TTj7jWNaG1uLykwTEj950NFR9x3/WFso3Cp0eBOdB5/O/4N4l1gSFEtQclU
+         jne8WE3thfzVdZ2gZj1mjfxb/y2u8ipVlEPkKyitLSL2Z93ywFPOMNGjJxjZVipHRG
+         oTJT/egmzLzgQ==
+Message-ID: <f6e2e17cc6c8a3056cc066a7baa4d943eeb47c84.camel@kernel.org>
+Subject: Re: [PATCH v6 00/13] Enroll kernel keys thru MOK
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Snowberg <eric.snowberg@oracle.com>
+Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        zohar@linux.ibm.com, dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jmorris@namei.org, serge@hallyn.com, keescook@chromium.org,
+        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
+        scott.branden@broadcom.com, weiyongjun1@huawei.com,
+        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
+        nramas@linux.microsoft.com, lszubowi@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>
+Date:   Thu, 16 Sep 2021 18:15:50 +0300
+In-Reply-To: <A02EE1DA-12BE-4998-ACE6-2D74FF380297@oracle.com>
+References: <20210914211416.34096-1-eric.snowberg@oracle.com>
+         <bee0ebc354a651ea5b263897f9b155dc604fa7c5.camel@kernel.org>
+         <A02EE1DA-12BE-4998-ACE6-2D74FF380297@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-After reset or boot, QAT 4xxx devices are inactive and require to be
-explicitly activated.
-This is done by writing the DRV_ACTIVE bit in the PM_INTERRUPT register
-and polling the PM_INIT_STATE to make sure that the transaction has
-completed properly.
+On Wed, 2021-09-15 at 15:28 -0600, Eric Snowberg wrote:
+> > On Sep 15, 2021, at 11:57 AM, Jarkko Sakkinen <jarkko@kernel.org> wrote=
+:
+> >=20
+> > On Tue, 2021-09-14 at 17:14 -0400, Eric Snowberg wrote:
+> > > Back in 2013 Linus requested a feature to allow end-users to have the=
+=20
+> > > ability "to add their own keys and sign modules they trust". This was
+> > > his *second* order outlined here [1]. There have been many attempts=
+=20
+> > > over the years to solve this problem, all have been rejected.  Many=
+=20
+> > > of the failed attempts loaded all preboot firmware keys into the kern=
+el,
+> > > including the Secure Boot keys. Many distributions carry one of these=
+=20
+> > > rejected attempts [2], [3], [4]. This series tries to solve this prob=
+lem=20
+> > > with a solution that takes into account all the problems brought up i=
+n=20
+> > > the previous attempts.
+> > >=20
+> > > On UEFI based systems, this series introduces a new Linux kernel keyr=
+ing=20
+> > > containing the Machine Owner Keys (MOK) called machine. It also defin=
+es
+> > > a new MOK variable in shim. This variable allows the end-user to deci=
+de=20
+> > > if they want to load MOK keys into the machine keyring. Mimi has sugg=
+ested=20
+> > > that only CA keys contained within the MOK be loaded into the machine=
+=20
+> > > keyring. All other certs will load into the platform keyring instead.
+> > >=20
+> > > By default, nothing changes; MOK keys are not loaded into the machine
+> > > keyring.  They are only loaded after the end-user makes the decision=
+=20
+> > > themselves.  The end-user would set this through mokutil using a new=
+=20
+> > > --trust-mok option [5]. This would work similar to how the kernel use=
+s=20
+> > > MOK variables to enable/disable signature validation as well as use/i=
+gnore=20
+> > > the db. Any kernel operation that uses either the builtin or secondar=
+y=20
+> > > trusted keys as a trust source shall also reference the new machine=
+=20
+> > > keyring as a trust source.
+> > >=20
+> > > Secure Boot keys will never be loaded into the machine keyring.  They
+> > > will always be loaded into the platform keyring.  If an end-user want=
+ed=20
+> > > to load one, they would need to enroll it into the MOK.
+> > >=20
+> > > Steps required by the end user:
+> > >=20
+> > > Sign kernel module with user created key:
+> > > $ /usr/src/kernels/$(uname -r)/scripts/sign-file sha512 \
+> > >   machine_signing_key.priv machine_signing_key.x509 my_module.ko
+> > >=20
+> > > Import the key into the MOK
+> > > $ mokutil --import machine_signing_key.x509
+> > >=20
+> > > Setup the kernel to load MOK keys into the .machine keyring
+> > > $ mokutil --trust-mok
+> > >=20
+> > > Then reboot, the MokManager will load and ask if you want to trust th=
+e
+> > > MOK key and enroll the MOK into the MOKList.  Afterwards the signed k=
+ernel
+> > > module will load.
+> > >=20
+> > > I have included links to both the mokutil [5] and shim [6] changes I
+> > > have made to support this new functionality.
+> >=20
+> > How hard it is to self-compile shim and boot it with QEMU (I
+> > do not know even the GIT location of Shim)?
+>=20
+> It is not hard, that is the setup I use for my testing.  Upstream shim=
+=20
+> is located here [1].  Or you can use my repo which contains the necessary
+> changes [2].
+>=20
+> [1] https://github.com/rhboot/shim
+> [2] https://github.com/esnowberg/shim/tree/mokvars-v2
+>=20
 
-If this is not done, the driver will fail the initialization sequence
-reporting the following message:
-    [   22.081193] 4xxx 0000:f7:00.0: enabling device (0140 -> 0142)
-    [   22.720285] QAT: AE0 is inactive!!
-    [   22.720287] QAT: failed to get device out of reset
-    [   22.720288] 4xxx 0000:f7:00.0: qat_hal_clr_reset error
-    [   22.720290] 4xxx 0000:f7:00.0: Failed to init the AEs
-    [   22.720290] 4xxx 0000:f7:00.0: Failed to initialise Acceleration Engine
-    [   22.720789] 4xxx 0000:f7:00.0: Resetting device qat_dev0
-    [   22.825099] 4xxx: probe of 0000:f7:00.0 failed with error -14
+So, my 2nd Q would be: which order these should be upstreamed?
 
-The patch also temporarily disables the power management source of
-interrupt, to avoid possible spurious interrupts as the power management
-feature is not fully supported.
+Linux patch set cannot depend on "yet to be upstreamed" things.
 
-The device init function has been added to adf_dev_init(), and not in the
-probe of 4xxx to make sure that the device is re-enabled in case of
-reset.
+Code changes look good enough to me.
 
-Note that the error code reported by hw_data->init_device() in
-adf_dev_init() has been shadowed for consistency with the other calls
-in the same function.
-
-Fixes: 8c8268166e83 ("crypto: qat - add qat_4xxx driver")
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
----
- .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.c    | 31 +++++++++++++++++++
- .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.h    | 10 ++++++
- .../crypto/qat/qat_common/adf_accel_devices.h |  1 +
- drivers/crypto/qat/qat_common/adf_init.c      |  5 +++
- 4 files changed, 47 insertions(+)
-
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-index 33d8e50dcbda..88c0ded411f1 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-+++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -1,5 +1,6 @@
- // SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only)
- /* Copyright(c) 2020 Intel Corporation */
-+#include <linux/iopoll.h>
- #include <adf_accel_devices.h>
- #include <adf_common_drv.h>
- #include <adf_pf2vf_msg.h>
-@@ -161,6 +162,35 @@ static void adf_enable_ints(struct adf_accel_dev *accel_dev)
- 	ADF_CSR_WR(addr, ADF_4XXX_SMIAPF_MASK_OFFSET, 0);
- }
- 
-+static int adf_init_device(struct adf_accel_dev *accel_dev)
-+{
-+	void __iomem *addr;
-+	u32 status;
-+	u32 csr;
-+	int ret;
-+
-+	addr = (&GET_BARS(accel_dev)[ADF_4XXX_PMISC_BAR])->virt_addr;
-+
-+	/* Temporarily mask PM interrupt */
-+	csr = ADF_CSR_RD(addr, ADF_4XXX_ERRMSK2);
-+	csr |= ADF_4XXX_PM_SOU;
-+	ADF_CSR_WR(addr, ADF_4XXX_ERRMSK2, csr);
-+
-+	/* Set DRV_ACTIVE bit to power up the device */
-+	ADF_CSR_WR(addr, ADF_4XXX_PM_INTERRUPT, ADF_4XXX_PM_DRV_ACTIVE);
-+
-+	/* Poll status register to make sure the device is powered up */
-+	ret = read_poll_timeout(ADF_CSR_RD, status,
-+				status & ADF_4XXX_PM_INIT_STATE,
-+				ADF_4XXX_PM_POLL_DELAY_US,
-+				ADF_4XXX_PM_POLL_TIMEOUT_US, true, addr,
-+				ADF_4XXX_PM_STATUS);
-+	if (ret)
-+		dev_err(&GET_DEV(accel_dev), "Failed to power up the device\n");
-+
-+	return ret;
-+}
-+
- static int adf_enable_pf2vf_comms(struct adf_accel_dev *accel_dev)
- {
- 	return 0;
-@@ -215,6 +245,7 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data)
- 	hw_data->exit_arb = adf_exit_arb;
- 	hw_data->get_arb_mapping = adf_get_arbiter_mapping;
- 	hw_data->enable_ints = adf_enable_ints;
-+	hw_data->init_device = adf_init_device;
- 	hw_data->reset_device = adf_reset_flr;
- 	hw_data->admin_ae_mask = ADF_4XXX_ADMIN_AE_MASK;
- 	hw_data->uof_get_num_objs = uof_get_num_objs;
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
-index 4fe2a776293c..924bac6feb37 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
-+++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
-@@ -62,6 +62,16 @@
- #define ADF_4XXX_ADMINMSGLR_OFFSET	(0x500578)
- #define ADF_4XXX_MAILBOX_BASE_OFFSET	(0x600970)
- 
-+/* Power management */
-+#define ADF_4XXX_PM_POLL_DELAY_US	20
-+#define ADF_4XXX_PM_POLL_TIMEOUT_US	USEC_PER_SEC
-+#define ADF_4XXX_PM_STATUS		(0x50A00C)
-+#define ADF_4XXX_PM_INTERRUPT		(0x50A028)
-+#define ADF_4XXX_PM_DRV_ACTIVE		BIT(20)
-+#define ADF_4XXX_PM_INIT_STATE		BIT(21)
-+/* Power management source in ERRSOU2 and ERRMSK2 */
-+#define ADF_4XXX_PM_SOU			BIT(18)
-+
- /* Firmware Binaries */
- #define ADF_4XXX_FW		"qat_4xxx.bin"
- #define ADF_4XXX_MMP		"qat_4xxx_mmp.bin"
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-index e391ca0662bc..2d47b8eaa041 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-@@ -170,6 +170,7 @@ struct adf_hw_device_data {
- 	int (*init_arb)(struct adf_accel_dev *accel_dev);
- 	void (*exit_arb)(struct adf_accel_dev *accel_dev);
- 	const u32 *(*get_arb_mapping)(void);
-+	int (*init_device)(struct adf_accel_dev *accel_dev);
- 	void (*disable_iov)(struct adf_accel_dev *accel_dev);
- 	void (*configure_iov_threads)(struct adf_accel_dev *accel_dev,
- 				      bool enable);
-diff --git a/drivers/crypto/qat/qat_common/adf_init.c b/drivers/crypto/qat/qat_common/adf_init.c
-index 60bc7b991d35..e3749e5817d9 100644
---- a/drivers/crypto/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/qat/qat_common/adf_init.c
-@@ -79,6 +79,11 @@ int adf_dev_init(struct adf_accel_dev *accel_dev)
- 		return -EFAULT;
- 	}
- 
-+	if (hw_data->init_device && hw_data->init_device(accel_dev)) {
-+		dev_err(&GET_DEV(accel_dev), "Failed to initialize device\n");
-+		return -EFAULT;
-+	}
-+
- 	if (hw_data->init_admin_comms && hw_data->init_admin_comms(accel_dev)) {
- 		dev_err(&GET_DEV(accel_dev), "Failed initialize admin comms\n");
- 		return -EFAULT;
--- 
-2.31.1
-
+/Jarkko
