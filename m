@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-14.7 required=3.0 tests=BAYES_00,DATE_IN_PAST_12_24,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A22C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 09:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8D6AC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 09:38:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76B1F60F43
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 09:38:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4A60610A6
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 09:38:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241446AbhIQJjv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Sep 2021 05:39:51 -0400
-Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.223]:28980 "EHLO
+        id S245615AbhIQJj4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Sep 2021 05:39:56 -0400
+Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.121]:34298 "EHLO
         mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245579AbhIQJju (ORCPT
+        with ESMTP id S241403AbhIQJjw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Sep 2021 05:39:50 -0400
-X-Greylist: delayed 301 seconds by postgrey-1.27 at vger.kernel.org; Fri, 17 Sep 2021 05:39:49 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1631871140;
+        Fri, 17 Sep 2021 05:39:52 -0400
+X-Greylist: delayed 302 seconds by postgrey-1.27 at vger.kernel.org; Fri, 17 Sep 2021 05:39:52 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1631871144;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=8uw2uZLhipBOK1q3Cd6NxAzooyNqVVBvjmsZEghs1tk=;
-    b=GF0+b7FoPC9+EwlYPWd7maa6jXJGixibqk+hVEuNrqTcQfrF0rSacohkteq/+Yb+zc
-    mLKBj4lEah6sWCyCjiRMt3mRaUp7+c3AP/Bo2ITbbYj9A5VSUR5ybsmDd9Y5d/mKTMPL
-    V+KRDOzoc037lqTlmfJlKiwLdrKrBFue2GiP0SOD+KSzUZ7daY2m7jz5S6MtUYykWwkA
-    I2xx6S7p3qzGk+xOg/XHsz/k12pPcC1P+J5fkATnTgI5sC/1JDDCSP4TP/LEZY6oP2Hb
-    np2J08xEUh8bRlk9jRfUURl/Q/CCvVnuaqPRIJ9qSdZQo15ftu/Iem5AAXFFC+L1eLPN
-    0O6w==
+    bh=YYVyCa1AKBYWEXJ5Aa0jWO5d0uV4daDcsZ2R9K5cQDM=;
+    b=OSehhtzafoaFw/3/MFNpWPqKeK5Xg6Su5SB7NuTwtX2knT3E3QtX9JKChHszLUH4Us
+    J+LT80OxDX88Rp6H9MjacZyIMJq1Wda7efRsHsGJ1nk4dz6dtO+XzBMT6VD0MoHXfSRV
+    Bo6I8X02GT9aBiM/uR91nGNGbFQOGbmAASockj1MrBvQiDDlNFhpfoXmTvnpg6AUH/+m
+    A9v2YoW9UTM3zmKa0GlhdkTUO3zTS3bXEioxEsrDw52s3rNN5WomuricHNZtY5JdT549
+    Ez5mxXr+QPiz60bjZklxQMZ1+CwWHRlerrIy9W1VHV75JuOO6TlT1VjgPoUlH4PpqWcE
+    VzYw==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXvSOeicf6o="
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.33.3 DYNA|AUTH)
-    with ESMTPSA id f080d4x8H9WKcpb
+    with ESMTPSA id f080d4x8H9WNcpf
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Fri, 17 Sep 2021 11:32:20 +0200 (CEST)
+    Fri, 17 Sep 2021 11:32:23 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
@@ -72,9 +72,9 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         Petr Tesarik <ptesarik@suse.cz>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>
-Subject: [PATCH v42 05/13] LRNG - add common generic hash support
-Date:   Thu, 16 Sep 2021 12:13:20 +0200
-Message-ID: <8548822.rRzsUZFozR@positron.chronox.de>
+Subject: [PATCH v42 02/13] LRNG - allocate one DRNG instance per NUMA node
+Date:   Thu, 16 Sep 2021 12:12:08 +0200
+Message-ID: <8416707.0CM7ZkIBX3@positron.chronox.de>
 In-Reply-To: <2294055.9jK4hKOXjS@positron.chronox.de>
 References: <2294055.9jK4hKOXjS@positron.chronox.de>
 MIME-Version: 1.0
@@ -84,16 +84,21 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The LRNG switchable DRNG support also allows the replacement of the hash
-implementation used as conditioning component. The common generic hash
-support code provides the required callbacks using the synchronous hash
-implementations of the kernel crypto API.
+In order to improve NUMA-locality when serving getrandom(2) requests,
+allocate one DRNG instance per node.
 
-All synchronous hash implementations supported by the kernel crypto API
-can be used as part of the LRNG with this generic support.
+The DRNG instance that is present right from the start of the kernel is
+reused as the first per-NUMA-node DRNG. For all remaining online NUMA
+nodes a new DRNG instance is allocated.
 
-The generic support is intended to be configured by separate switchable
-DRNG backends.
+During boot time, the multiple DRNG instances are seeded sequentially.
+With this, the first DRNG instance (referenced as the initial DRNG
+in the code) is completely seeded with 256 bits of entropy before the
+next DRNG instance is completely seeded.
+
+When random numbers are requested, the NUMA-node-local DRNG is checked
+whether it has been already fully seeded. If this is not the case, the
+initial DRNG is used to serve the request.
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -112,182 +117,158 @@ CC: Andy Lutomirski <luto@kernel.org>
 CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
-CC: "Peter, Matthias" <matthias.peter@bsi.bund.de>
-CC: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-CC: Neil Horman <nhorman@redhat.com>
+CC: Eric Biggers <ebiggers@kernel.org>
 Reviewed-by: Alexander Lobakin <alobakin@pm.me>
 Tested-by: Alexander Lobakin <alobakin@pm.me>
+Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
+Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/char/lrng/Kconfig           |   8 +++
- drivers/char/lrng/Makefile          |   1 +
- drivers/char/lrng/lrng_kcapi_hash.c | 103 ++++++++++++++++++++++++++++
- drivers/char/lrng/lrng_kcapi_hash.h |  20 ++++++
- 4 files changed, 132 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_kcapi_hash.c
- create mode 100644 drivers/char/lrng/lrng_kcapi_hash.h
+ drivers/char/lrng/Makefile    |   2 +
+ drivers/char/lrng/lrng_numa.c | 122 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 124 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_numa.c
 
-diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index c10a0c3f2015..ab17c45a356b 100644
---- a/drivers/char/lrng/Kconfig
-+++ b/drivers/char/lrng/Kconfig
-@@ -209,4 +209,12 @@ menuconfig LRNG_DRNG_SWITCH
- 	  accessible via the external interfaces. With this configuration
- 	  option other DRNGs can be selected and loaded at runtime.
- 
-+if LRNG_DRNG_SWITCH
-+
-+config LRNG_KCAPI_HASH
-+	bool
-+	select CRYPTO_HASH
-+
-+endif # LRNG_DRNG_SWITCH
-+
- endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index dc3ef329b2c4..299715bb0ec2 100644
+index c26f932628d7..80b152059598 100644
 --- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -11,3 +11,4 @@ obj-y				+= lrng_es_mgr.o lrng_aux.o \
- obj-$(CONFIG_NUMA)		+= lrng_numa.o
- obj-$(CONFIG_SYSCTL)		+= lrng_proc.o
- obj-$(CONFIG_LRNG_DRNG_SWITCH)	+= lrng_switch.o
-+obj-$(CONFIG_LRNG_KCAPI_HASH)	+= lrng_kcapi_hash.o
-diff --git a/drivers/char/lrng/lrng_kcapi_hash.c b/drivers/char/lrng/lrng_kcapi_hash.c
+@@ -7,3 +7,5 @@ obj-y				+= lrng_es_mgr.o lrng_aux.o \
+ 				   lrng_es_irq.o lrng_es_archrandom.o \
+ 				   lrng_drng.o lrng_chacha20.o \
+ 				   lrng_interfaces.o lrng_es_aux.o
++
++obj-$(CONFIG_NUMA)		+= lrng_numa.o
+diff --git a/drivers/char/lrng/lrng_numa.c b/drivers/char/lrng/lrng_numa.c
 new file mode 100644
-index 000000000000..9647d980e468
+index 000000000000..fbfb40a5fb8d
 --- /dev/null
-+++ b/drivers/char/lrng/lrng_kcapi_hash.c
-@@ -0,0 +1,103 @@
++++ b/drivers/char/lrng/lrng_numa.c
+@@ -0,0 +1,122 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * Backend for providing the hash primitive using the kernel crypto API.
++ * LRNG NUMA support
 + *
-+ * Copyright (C) 2021, Stephan Mueller <smueller@chronox.de>
++ * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
 + */
 +
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <crypto/hash.h>
++#include <linux/lrng.h>
++#include <linux/slab.h>
 +
-+#include "lrng_kcapi_hash.h"
++#include "lrng_internal.h"
 +
-+struct lrng_hash_info {
-+	struct crypto_shash *tfm;
-+};
++static struct lrng_drng **lrng_drng __read_mostly = NULL;
 +
-+static inline void _lrng_kcapi_hash_free(struct lrng_hash_info *lrng_hash)
++struct lrng_drng **lrng_drng_instances(void)
 +{
-+	struct crypto_shash *tfm = lrng_hash->tfm;
-+
-+	crypto_free_shash(tfm);
-+	kfree(lrng_hash);
++	return smp_load_acquire(&lrng_drng);
 +}
 +
-+void *lrng_kcapi_hash_alloc(const char *name)
++/* Allocate the data structures for the per-NUMA node DRNGs */
++static void _lrng_drngs_numa_alloc(struct work_struct *work)
 +{
-+	struct lrng_hash_info *lrng_hash;
-+	struct crypto_shash *tfm;
-+	int ret;
++	struct lrng_drng **drngs;
++	struct lrng_drng *lrng_drng_init = lrng_drng_init_instance();
++	u32 node;
++	bool init_drng_used = false;
 +
-+	if (!name) {
-+		pr_err("Hash name missing\n");
-+		return ERR_PTR(-EINVAL);
++	mutex_lock(&lrng_crypto_cb_update);
++
++	/* per-NUMA-node DRNGs are already present */
++	if (lrng_drng)
++		goto unlock;
++
++	drngs = kcalloc(nr_node_ids, sizeof(void *), GFP_KERNEL|__GFP_NOFAIL);
++	for_each_online_node(node) {
++		struct lrng_drng *drng;
++
++		if (!init_drng_used) {
++			drngs[node] = lrng_drng_init;
++			init_drng_used = true;
++			continue;
++		}
++
++		drng = kmalloc_node(sizeof(struct lrng_drng),
++				     GFP_KERNEL|__GFP_NOFAIL, node);
++		memset(drng, 0, sizeof(lrng_drng));
++
++		drng->crypto_cb = lrng_drng_init->crypto_cb;
++		drng->drng = drng->crypto_cb->lrng_drng_alloc(
++					LRNG_DRNG_SECURITY_STRENGTH_BYTES);
++		if (IS_ERR(drng->drng)) {
++			kfree(drng);
++			goto err;
++		}
++
++		drng->hash = drng->crypto_cb->lrng_hash_alloc();
++		if (IS_ERR(drng->hash)) {
++			drng->crypto_cb->lrng_drng_dealloc(drng->drng);
++			kfree(drng);
++			goto err;
++		}
++
++		mutex_init(&drng->lock);
++		spin_lock_init(&drng->spin_lock);
++		rwlock_init(&drng->hash_lock);
++
++		/*
++		 * Switch the hash used by the per-CPU pool.
++		 * We do not need to lock the new hash as it is not usable yet
++		 * due to **drngs not yet being initialized.
++		 */
++		if (lrng_pcpu_switch_hash(node, drng->crypto_cb, drng->hash,
++					  &lrng_cc20_crypto_cb))
++			goto err;
++
++		/*
++		 * No reseeding of NUMA DRNGs from previous DRNGs as this
++		 * would complicate the code. Let it simply reseed.
++		 */
++		lrng_drng_reset(drng);
++		drngs[node] = drng;
++
++		lrng_pool_inc_numa_node();
++		pr_info("DRNG and entropy pool read hash for NUMA node %d allocated\n",
++			node);
 +	}
 +
-+	tfm = crypto_alloc_shash(name, 0, 0);
-+	if (IS_ERR(tfm)) {
-+		pr_err("could not allocate hash %s\n", name);
-+		return ERR_CAST(tfm);
++	/* counterpart to smp_load_acquire in lrng_drng_instances */
++	if (!cmpxchg_release(&lrng_drng, NULL, drngs)) {
++		lrng_pool_all_numa_nodes_seeded(false);
++		goto unlock;
 +	}
 +
-+	ret = sizeof(struct lrng_hash_info);
-+	lrng_hash = kmalloc(ret, GFP_KERNEL);
-+	if (!lrng_hash) {
-+		crypto_free_shash(tfm);
-+		return ERR_PTR(-ENOMEM);
++err:
++	for_each_online_node(node) {
++		struct lrng_drng *drng = drngs[node];
++
++		if (drng == lrng_drng_init)
++			continue;
++
++		if (drng) {
++			lrng_pcpu_switch_hash(node, &lrng_cc20_crypto_cb, NULL,
++					      drng->crypto_cb);
++			drng->crypto_cb->lrng_hash_dealloc(drng->hash);
++			drng->crypto_cb->lrng_drng_dealloc(drng->drng);
++			kfree(drng);
++		}
 +	}
++	kfree(drngs);
 +
-+	lrng_hash->tfm = tfm;
-+
-+	pr_info("Hash %s allocated\n", name);
-+
-+	return lrng_hash;
++unlock:
++	mutex_unlock(&lrng_crypto_cb_update);
 +}
-+EXPORT_SYMBOL(lrng_kcapi_hash_alloc);
 +
-+u32 lrng_kcapi_hash_digestsize(void *hash)
++static DECLARE_WORK(lrng_drngs_numa_alloc_work, _lrng_drngs_numa_alloc);
++
++void lrng_drngs_numa_alloc(void)
 +{
-+	struct lrng_hash_info *lrng_hash = (struct lrng_hash_info *)hash;
-+	struct crypto_shash *tfm = lrng_hash->tfm;
-+
-+	return crypto_shash_digestsize(tfm);
++	schedule_work(&lrng_drngs_numa_alloc_work);
 +}
-+EXPORT_SYMBOL(lrng_kcapi_hash_digestsize);
-+
-+void lrng_kcapi_hash_dealloc(void *hash)
-+{
-+	struct lrng_hash_info *lrng_hash = (struct lrng_hash_info *)hash;
-+
-+	_lrng_kcapi_hash_free(lrng_hash);
-+	pr_info("Hash deallocated\n");
-+}
-+EXPORT_SYMBOL(lrng_kcapi_hash_dealloc);
-+
-+int lrng_kcapi_hash_init(struct shash_desc *shash, void *hash)
-+{
-+	struct lrng_hash_info *lrng_hash = (struct lrng_hash_info *)hash;
-+	struct crypto_shash *tfm = lrng_hash->tfm;
-+
-+	shash->tfm = tfm;
-+	return crypto_shash_init(shash);
-+}
-+EXPORT_SYMBOL(lrng_kcapi_hash_init);
-+
-+int lrng_kcapi_hash_update(struct shash_desc *shash, const u8 *inbuf,
-+			   u32 inbuflen)
-+{
-+	return crypto_shash_update(shash, inbuf, inbuflen);
-+}
-+EXPORT_SYMBOL(lrng_kcapi_hash_update);
-+
-+int lrng_kcapi_hash_final(struct shash_desc *shash, u8 *digest)
-+{
-+	return crypto_shash_final(shash, digest);
-+}
-+EXPORT_SYMBOL(lrng_kcapi_hash_final);
-+
-+void lrng_kcapi_hash_zero(struct shash_desc *shash)
-+{
-+	shash_desc_zero(shash);
-+}
-+EXPORT_SYMBOL(lrng_kcapi_hash_zero);
-diff --git a/drivers/char/lrng/lrng_kcapi_hash.h b/drivers/char/lrng/lrng_kcapi_hash.h
-new file mode 100644
-index 000000000000..2f94558d2dd6
---- /dev/null
-+++ b/drivers/char/lrng/lrng_kcapi_hash.h
-@@ -0,0 +1,20 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause */
-+/*
-+ * Copyright (C) 2020 - 2021, Stephan Mueller <smueller@chronox.de>
-+ */
-+
-+#ifndef _LRNG_KCAPI_HASH_H
-+#define _LRNG_KCAPI_HASH_H
-+
-+#include <linux/module.h>
-+
-+void *lrng_kcapi_hash_alloc(const char *name);
-+u32 lrng_kcapi_hash_digestsize(void *hash);
-+void lrng_kcapi_hash_dealloc(void *hash);
-+int lrng_kcapi_hash_init(struct shash_desc *shash, void *hash);
-+int lrng_kcapi_hash_update(struct shash_desc *shash, const u8 *inbuf,
-+			   u32 inbuflen);
-+int lrng_kcapi_hash_final(struct shash_desc *shash, u8 *digest);
-+void lrng_kcapi_hash_zero(struct shash_desc *shash);
-+
-+#endif /* _LRNG_KCAPI_HASH_H */
 -- 
 2.31.1
 
