@@ -2,154 +2,311 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BAA2C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 15:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24878C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 15:50:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E3206124E
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 15:15:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F4F460F51
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 15:50:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239084AbhIPPRN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Sep 2021 11:17:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42136 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239101AbhIPPRN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Sep 2021 11:17:13 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5D21260296;
-        Thu, 16 Sep 2021 15:15:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631805352;
-        bh=iOcCI1FHoB0yx/LZeXXa3I2QwmbANkTrrP6vNXsEUw4=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=hxw7DtFO8S32GjJYJC0FktMBCncrxCACfS1q3EoiosYBTPIvVQ690Fg7xYbP0VvQ8
-         VWUqLGv5juTWxi+/FuLFoHxaLXtqpm8ZJtrVvZil5OVmMoEQDDNe5Oluw6Oa/OKrHU
-         Or3HdOnQ41AbTQWipSCnD//Sh74OchHguokf1/063NZn0u4G9q6ihaZrNNYwKS/Epj
-         iyZtkl6TTj7jWNaG1uLykwTEj950NFR9x3/WFso3Cp0eBOdB5/O/4N4l1gSFEtQclU
-         jne8WE3thfzVdZ2gZj1mjfxb/y2u8ipVlEPkKyitLSL2Z93ywFPOMNGjJxjZVipHRG
-         oTJT/egmzLzgQ==
-Message-ID: <f6e2e17cc6c8a3056cc066a7baa4d943eeb47c84.camel@kernel.org>
-Subject: Re: [PATCH v6 00/13] Enroll kernel keys thru MOK
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
-        zohar@linux.ibm.com, dhowells@redhat.com, dwmw2@infradead.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jmorris@namei.org, serge@hallyn.com, keescook@chromium.org,
-        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
-        scott.branden@broadcom.com, weiyongjun1@huawei.com,
-        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
-        nramas@linux.microsoft.com, lszubowi@redhat.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>
-Date:   Thu, 16 Sep 2021 18:15:50 +0300
-In-Reply-To: <A02EE1DA-12BE-4998-ACE6-2D74FF380297@oracle.com>
-References: <20210914211416.34096-1-eric.snowberg@oracle.com>
-         <bee0ebc354a651ea5b263897f9b155dc604fa7c5.camel@kernel.org>
-         <A02EE1DA-12BE-4998-ACE6-2D74FF380297@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        id S240250AbhIPPwC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Sep 2021 11:52:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39546 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240362AbhIPPv6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Sep 2021 11:51:58 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36B24C061768
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Sep 2021 08:50:37 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id i4so20279000lfv.4
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Sep 2021 08:50:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Zwk6zmApajzib1boNWKTOMdLLReNFGQ/0MpvWS/8P0U=;
+        b=cTjicLSfanCEgGBzAqfvA/IELb8oEJirAV59YnwHnZCeYJhbOCFFWh9vxveldvud4O
+         6I2rLHDC5tXbidvXXSg+vQaOsM7AkJGuJiTe8p6kqdrGfva1CsKkRxCQTK4T3K43hKwR
+         FpW39PhdklEotFvDMpjitCbQiFNYGGDx42EuUjFobfkiEDSsKuhDHIrfXBhFZrQ7URfe
+         dp7KAr8pJHUr5iPQZHREmOTy1NE4VAH28bDxHhiSwGccFyyh1VIVEsFqrupQxwIJU2Z1
+         KZuIUxKiu/hDL1wPVNMeKTRmS9vY1qbs6pI9wq3hpGSwxOWEhW3bpX9qVtv/AFd+gSfe
+         dPxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Zwk6zmApajzib1boNWKTOMdLLReNFGQ/0MpvWS/8P0U=;
+        b=6A8wWANmP59+2nw9Z5bdB7uhXoXlHu8WMGEpS/RqzaornMbVYvAfvVhWS2B8DAlPn4
+         P64Q6WBVm5qeKY+Ea6Nv5xwGEcRrn0HGzyBfvgnikrh+H+fCVLlEpSppRClIDHOVuCU8
+         j0bmd+4DDRXez2V06aMyrkrOKuCJw0EusAT0OKdXsil78vqRFTxPX5e7ernVYVvVNU4F
+         8Zhg9DICyKJOb4KRavY+znBaaNwuCVCeUQ/yKWAzNjt44OIc2FCZPbDHsaKN22TafvJB
+         j5QETqRBS91cTTgGkw21fP6npEIwNPCnDxxsC+jG63UT96HyxDUXWBhjNyiEjR1cu7Ys
+         JRcQ==
+X-Gm-Message-State: AOAM533xcy4JppP+AHXtxpYTCWZpYEWgSE1Q0NrFro7Q8+a3GNmknHiL
+        U73n3nlL/Cfibu/jmYEMoAo0HgthXIMJsb+jQSbBhQ==
+X-Google-Smtp-Source: ABdhPJwkbKSDYLlCX5fkswyKiFZ7bhPlQkzAo8N8dvnrUnSaMNDOKLzUs9c5Fa7H/0tIyMwOD2cTouwiJn3exX/9JP8=
+X-Received: by 2002:a2e:2f02:: with SMTP id v2mr4500745ljv.132.1631807435179;
+ Thu, 16 Sep 2021 08:50:35 -0700 (PDT)
 MIME-Version: 1.0
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-24-brijesh.singh@amd.com>
+In-Reply-To: <20210820155918.7518-24-brijesh.singh@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Thu, 16 Sep 2021 09:50:23 -0600
+Message-ID: <CAMkAt6q9izy0kObMjjHiKuOVR5OXrdFFaeVQiArm0mMA4w8uXw@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        Marc Orr <marcorr@google.com>,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        Pavan Kumar Paluri <papaluri@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2021-09-15 at 15:28 -0600, Eric Snowberg wrote:
-> > On Sep 15, 2021, at 11:57 AM, Jarkko Sakkinen <jarkko@kernel.org> wrote=
-:
-> >=20
-> > On Tue, 2021-09-14 at 17:14 -0400, Eric Snowberg wrote:
-> > > Back in 2013 Linus requested a feature to allow end-users to have the=
-=20
-> > > ability "to add their own keys and sign modules they trust". This was
-> > > his *second* order outlined here [1]. There have been many attempts=
-=20
-> > > over the years to solve this problem, all have been rejected.  Many=
-=20
-> > > of the failed attempts loaded all preboot firmware keys into the kern=
-el,
-> > > including the Secure Boot keys. Many distributions carry one of these=
-=20
-> > > rejected attempts [2], [3], [4]. This series tries to solve this prob=
-lem=20
-> > > with a solution that takes into account all the problems brought up i=
-n=20
-> > > the previous attempts.
-> > >=20
-> > > On UEFI based systems, this series introduces a new Linux kernel keyr=
-ing=20
-> > > containing the Machine Owner Keys (MOK) called machine. It also defin=
-es
-> > > a new MOK variable in shim. This variable allows the end-user to deci=
-de=20
-> > > if they want to load MOK keys into the machine keyring. Mimi has sugg=
-ested=20
-> > > that only CA keys contained within the MOK be loaded into the machine=
-=20
-> > > keyring. All other certs will load into the platform keyring instead.
-> > >=20
-> > > By default, nothing changes; MOK keys are not loaded into the machine
-> > > keyring.  They are only loaded after the end-user makes the decision=
-=20
-> > > themselves.  The end-user would set this through mokutil using a new=
-=20
-> > > --trust-mok option [5]. This would work similar to how the kernel use=
-s=20
-> > > MOK variables to enable/disable signature validation as well as use/i=
-gnore=20
-> > > the db. Any kernel operation that uses either the builtin or secondar=
-y=20
-> > > trusted keys as a trust source shall also reference the new machine=
-=20
-> > > keyring as a trust source.
-> > >=20
-> > > Secure Boot keys will never be loaded into the machine keyring.  They
-> > > will always be loaded into the platform keyring.  If an end-user want=
-ed=20
-> > > to load one, they would need to enroll it into the MOK.
-> > >=20
-> > > Steps required by the end user:
-> > >=20
-> > > Sign kernel module with user created key:
-> > > $ /usr/src/kernels/$(uname -r)/scripts/sign-file sha512 \
-> > >   machine_signing_key.priv machine_signing_key.x509 my_module.ko
-> > >=20
-> > > Import the key into the MOK
-> > > $ mokutil --import machine_signing_key.x509
-> > >=20
-> > > Setup the kernel to load MOK keys into the .machine keyring
-> > > $ mokutil --trust-mok
-> > >=20
-> > > Then reboot, the MokManager will load and ask if you want to trust th=
-e
-> > > MOK key and enroll the MOK into the MOKList.  Afterwards the signed k=
-ernel
-> > > module will load.
-> > >=20
-> > > I have included links to both the mokutil [5] and shim [6] changes I
-> > > have made to support this new functionality.
-> >=20
-> > How hard it is to self-compile shim and boot it with QEMU (I
-> > do not know even the GIT location of Shim)?
->=20
-> It is not hard, that is the setup I use for my testing.  Upstream shim=
-=20
-> is located here [1].  Or you can use my repo which contains the necessary
-> changes [2].
->=20
-> [1] https://github.com/rhboot/shim
-> [2] https://github.com/esnowberg/shim/tree/mokvars-v2
->=20
+On Fri, Aug 20, 2021 at 10:00 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+> The KVM_SNP_INIT command is used by the hypervisor to initialize the
+> SEV-SNP platform context. In a typical workflow, this command should be the
+> first command issued. When creating SEV-SNP guest, the VMM must use this
+> command instead of the KVM_SEV_INIT or KVM_SEV_ES_INIT.
+>
+> The flags value must be zero, it will be extended in future SNP support to
+> communicate the optional features (such as restricted INT injection etc).
+>
+> Co-developed-by: Pavan Kumar Paluri <papaluri@amd.com>
+> Signed-off-by: Pavan Kumar Paluri <papaluri@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  .../virt/kvm/amd-memory-encryption.rst        | 27 ++++++++++++
+>  arch/x86/include/asm/svm.h                    |  2 +
+>  arch/x86/kvm/svm/sev.c                        | 44 ++++++++++++++++++-
+>  arch/x86/kvm/svm/svm.h                        |  4 ++
+>  include/uapi/linux/kvm.h                      | 13 ++++++
+>  5 files changed, 88 insertions(+), 2 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+> index 5c081c8c7164..7b1d32fb99a8 100644
+> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+> @@ -427,6 +427,33 @@ issued by the hypervisor to make the guest ready for execution.
+>
+>  Returns: 0 on success, -negative on error
+>
+> +18. KVM_SNP_INIT
+> +----------------
+> +
+> +The KVM_SNP_INIT command can be used by the hypervisor to initialize SEV-SNP
+> +context. In a typical workflow, this command should be the first command issued.
+> +
+> +Parameters (in/out): struct kvm_snp_init
+> +
+> +Returns: 0 on success, -negative on error
+> +
+> +::
+> +
+> +        struct kvm_snp_init {
+> +                __u64 flags;
+> +        };
+> +
+> +The flags bitmap is defined as::
+> +
+> +   /* enable the restricted injection */
+> +   #define KVM_SEV_SNP_RESTRICTED_INJET   (1<<0)
+> +
+> +   /* enable the restricted injection timer */
+> +   #define KVM_SEV_SNP_RESTRICTED_TIMER_INJET   (1<<1)
+> +
+> +If the specified flags is not supported then return -EOPNOTSUPP, and the supported
+> +flags are returned.
+> +
+>  References
+>  ==========
+>
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index 44a3f920f886..a39e31845a33 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -218,6 +218,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+>  #define SVM_NESTED_CTL_SEV_ENABLE      BIT(1)
+>  #define SVM_NESTED_CTL_SEV_ES_ENABLE   BIT(2)
+>
+> +#define SVM_SEV_FEAT_SNP_ACTIVE                BIT(0)
+> +
+>  struct vmcb_seg {
+>         u16 selector;
+>         u16 attrib;
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 50fddbe56981..93da463545ef 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -235,10 +235,30 @@ static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
+>         sev_decommission(handle);
+>  }
+>
+> +static int verify_snp_init_flags(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +       struct kvm_snp_init params;
+> +       int ret = 0;
+> +
+> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> +               return -EFAULT;
+> +
+> +       if (params.flags & ~SEV_SNP_SUPPORTED_FLAGS)
+> +               ret = -EOPNOTSUPP;
+> +
+> +       params.flags = SEV_SNP_SUPPORTED_FLAGS;
+> +
+> +       if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params)))
+> +               ret = -EFAULT;
+> +
+> +       return ret;
+> +}
+> +
+>  static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> +       bool es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == KVM_SEV_SNP_INIT);
+>         struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> -       bool es_active = argp->id == KVM_SEV_ES_INIT;
+> +       bool snp_active = argp->id == KVM_SEV_SNP_INIT;
+>         int asid, ret;
 
-So, my 2nd Q would be: which order these should be upstreamed?
+Not sure if this is the patch place for this but I think you want to
+disallow svm_vm_copy_asid_from() if snp_active == true.
 
-Linux patch set cannot depend on "yet to be upstreamed" things.
-
-Code changes look good enough to me.
-
-/Jarkko
+>
+>         if (kvm->created_vcpus)
+> @@ -249,12 +269,22 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>                 return ret;
+>
+>         sev->es_active = es_active;
+> +       sev->snp_active = snp_active;
+>         asid = sev_asid_new(sev);
+>         if (asid < 0)
+>                 goto e_no_asid;
+>         sev->asid = asid;
+>
+> -       ret = sev_platform_init(&argp->error);
+> +       if (snp_active) {
+> +               ret = verify_snp_init_flags(kvm, argp);
+> +               if (ret)
+> +                       goto e_free;
+> +
+> +               ret = sev_snp_init(&argp->error);
+> +       } else {
+> +               ret = sev_platform_init(&argp->error);
+> +       }
+> +
+>         if (ret)
+>                 goto e_free;
+>
+> @@ -600,6 +630,10 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+>         save->pkru = svm->vcpu.arch.pkru;
+>         save->xss  = svm->vcpu.arch.ia32_xss;
+>
+> +       /* Enable the SEV-SNP feature */
+> +       if (sev_snp_guest(svm->vcpu.kvm))
+> +               save->sev_features |= SVM_SEV_FEAT_SNP_ACTIVE;
+> +
+>         return 0;
+>  }
+>
+> @@ -1532,6 +1566,12 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>         }
+>
+>         switch (sev_cmd.id) {
+> +       case KVM_SEV_SNP_INIT:
+> +               if (!sev_snp_enabled) {
+> +                       r = -ENOTTY;
+> +                       goto out;
+> +               }
+> +               fallthrough;
+>         case KVM_SEV_ES_INIT:
+>                 if (!sev_es_enabled) {
+>                         r = -ENOTTY;
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 01953522097d..57c3c404b0b3 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -69,6 +69,9 @@ enum {
+>  /* TPR and CR2 are always written before VMRUN */
+>  #define VMCB_ALWAYS_DIRTY_MASK ((1U << VMCB_INTR) | (1U << VMCB_CR2))
+>
+> +/* Supported init feature flags */
+> +#define SEV_SNP_SUPPORTED_FLAGS                0x0
+> +
+>  struct kvm_sev_info {
+>         bool active;            /* SEV enabled guest */
+>         bool es_active;         /* SEV-ES enabled guest */
+> @@ -81,6 +84,7 @@ struct kvm_sev_info {
+>         u64 ap_jump_table;      /* SEV-ES AP Jump Table address */
+>         struct kvm *enc_context_owner; /* Owner of copied encryption context */
+>         struct misc_cg *misc_cg; /* For misc cgroup accounting */
+> +       u64 snp_init_flags;
+>  };
+>
+>  struct kvm_svm {
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index d9e4aabcb31a..944e2bf601fe 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1712,6 +1712,9 @@ enum sev_cmd_id {
+>         /* Guest Migration Extension */
+>         KVM_SEV_SEND_CANCEL,
+>
+> +       /* SNP specific commands */
+> +       KVM_SEV_SNP_INIT,
+> +
+>         KVM_SEV_NR_MAX,
+>  };
+>
+> @@ -1808,6 +1811,16 @@ struct kvm_sev_receive_update_data {
+>         __u32 trans_len;
+>  };
+>
+> +/* enable the restricted injection */
+> +#define KVM_SEV_SNP_RESTRICTED_INJET   (1 << 0)
+> +
+> +/* enable the restricted injection timer */
+> +#define KVM_SEV_SNP_RESTRICTED_TIMER_INJET   (1 << 1)
+> +
+> +struct kvm_snp_init {
+> +       __u64 flags;
+> +};
+> +
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU    (1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3         (1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX       (1 << 2)
+> --
+> 2.17.1
+>
+>
