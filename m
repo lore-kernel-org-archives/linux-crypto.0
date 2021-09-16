@@ -2,184 +2,220 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82FE4C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 17:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 254A6C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 18:54:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B7EF6023D
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 17:37:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 077476058D
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 18:54:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354112AbhIPRij (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Sep 2021 13:38:39 -0400
-Received: from mail-bn8nam12on2075.outbound.protection.outlook.com ([40.107.237.75]:36028
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1348633AbhIPRgf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Sep 2021 13:36:35 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GKRDzvwW3EEpDRHAuTLQLK5YXue2N6Jhbnj07kgKm9NP+Xuth8iIyME3J5ebyoZnPbJbv9EbAoqc0ncW6Np3freYEYLe9fwQ/afQvzIBMLw9RqKdPF1ziPJymGFxJWFGpXdafIFSRUuA7hhnmNSMaOFLP7ejX0bUmKPr/6MIlQcGzmCzK0FdzG9aY523alGS/SZymMxzJHWYuqqJEKYTrXIe3e6ZVNKNDmRLxb+n6DDKQqobbU15/IQtbQr4FWRZY96B9Tvs9GInw0z9Sb35I92xapmEu/Vp5Z1ma0A43nhELyheHGHb8lsHog9gLLHF9APqlvYCZxBQXXYSZKuM0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=KPtpCu7S+Iel4/sIz4JwxHcWtByU5Rl08AFX5CiwhXo=;
- b=OmplTHFhUbK1nVKJqbtK8XqK9E5i20yaU55HiHdT3jbMEq9/1tw6b+ERTL7sO6x9OcQ85I+E7EzRoP60/Ty6r7RpONVDEfxmnArqKk41FJC34tP79o56VlkcG0DPADbVckdn8JE+vGmsKeN11imGyB7P6ztiYr493YWS0WE8kZjI3oCHAY1WNLsMS6yLt2oUAYK4LSbuB8p+t8GJm1If/0q7MxdoNGKhipAu0OllDS0leT7kwy4WaA3DrHPet2xn2H7GsgchInqEpS3xCPBZtzsazcqtWTUpaeniOLZMJCwhOqHWDscoUKQG5rLtYQhPz0uhsI21BnhYrZU+NVcxeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KPtpCu7S+Iel4/sIz4JwxHcWtByU5Rl08AFX5CiwhXo=;
- b=g+sC75gZQwVihqyRrXz05a3VVOxfZXIUnJ3bbcZ+SPVRUZl3OCCNF2eK4aYv6WaBLWCpPL8k3RFaIDuvQO9+WhkLP6jAyg0/HwNrSQOtVuS6mvqodIKNUK8ibRdYyS+0erz71QsTh5tHtLLF3T+D8yKaqI8o/NW9O9tPqpKvJMg=
-Authentication-Results: linux.intel.com; dkim=none (message not signed)
- header.d=none;linux.intel.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN6PR12MB2639.namprd12.prod.outlook.com (2603:10b6:805:75::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.15; Thu, 16 Sep
- 2021 17:35:10 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4500.020; Thu, 16 Sep 2021
- 17:35:10 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 01/45] x86/cpufeatures: Add SEV-SNP CPU feature
-To:     Borislav Petkov <bp@alien8.de>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-2-brijesh.singh@amd.com> <YUN3Nquhsn4OD9S8@zn.tnic>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <2071cff2-9e1c-d4c0-5163-c39132f68d7f@amd.com>
-Date:   Thu, 16 Sep 2021 12:35:07 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-In-Reply-To: <YUN3Nquhsn4OD9S8@zn.tnic>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0501CA0086.namprd05.prod.outlook.com
- (2603:10b6:803:22::24) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S235753AbhIPSzr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Sep 2021 14:55:47 -0400
+Received: from fllv0015.ext.ti.com ([198.47.19.141]:44932 "EHLO
+        fllv0015.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344030AbhIPSzi (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Sep 2021 14:55:38 -0400
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 18GIruAR084558;
+        Thu, 16 Sep 2021 13:53:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1631818436;
+        bh=ofxg2rOoyTHRLO7cygaz8Om7ldfzCv8/JSm+cnOaM94=;
+        h=From:To:CC:Subject:Date;
+        b=LE5/W7o1G+2F8rb9BnFfpVShf9T2XZvugeR7TwgAOldluQwHIEaTODJsGVWeymYvF
+         5I2BTmaivJsgcNdGa7hoOxilmZVT60pkqI+sJsefNVWmKW8FPciuhtZPdVJ5SdJHJo
+         wLEu9rY1t4EGKYdY5zDRjdLIb/+DMFa41Qt3A2HI=
+Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
+        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 18GIrteN098340
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 16 Sep 2021 13:53:56 -0500
+Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Thu, 16
+ Sep 2021 13:53:55 -0500
+Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14 via
+ Frontend Transport; Thu, 16 Sep 2021 13:53:55 -0500
+Received: from localhost (ileax41-snat.itg.ti.com [10.172.224.153])
+        by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 18GIrrJa097516;
+        Thu, 16 Sep 2021 13:53:54 -0500
+From:   Jayesh Choudhary <j-choudhary@ti.com>
+To:     <devicetree@vger.kernel.org>
+CC:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
+        <robh+dt@kernel.org>, <j-choudhary@ti.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] dt-bindings: rng: convert OMAP and Inside-Secure HWRNG to yaml schema
+Date:   Fri, 17 Sep 2021 00:23:52 +0530
+Message-ID: <20210916185352.7919-1-j-choudhary@ti.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Received: from [10.236.31.95] (165.204.77.1) by SN4PR0501CA0086.namprd05.prod.outlook.com (2603:10b6:803:22::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.5 via Frontend Transport; Thu, 16 Sep 2021 17:35:09 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 48f78c24-3a3e-4a48-00f4-08d9793854e8
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2639:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB2639F97A7FA8763ACCBD7D7BE5DC9@SN6PR12MB2639.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2276;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: za0zIMf8k+FrGtda4IrwL/e75nNDo0fbIJnL2mWnc1AkVRmcOuDRXUMVspI+SCgNm0QR8HuqM/oSYKCUPiTJo6Llj1/fTjwmSKvw5pCv5ZPGLoNtgNIBMvT1mC/qOV5LSmCRxtvmQKVC6dHeBHdZA0/4ses15XaO45oyD5hi6JaYL+a7nzNW+51jsw4mFywXHubi/y0hKi+AuNLNr4zdxd9pmT7R0xvUU20wh7nR7uTxYp5D7mIYbBDbZVUYiQ8lroos2I5+E14L8oE+moSFg0saJg04VwM0v4jdFFGj4bHY9fbep769U4VU2YSpw69vKK59TTwyi22Ezt+pO9WBrxo7h+c0espBG0lUVfCtPqyt+P2/Kyf5s2+1KYqU5WXog1GBJEiWxN+K/Cl099NMye50Fo/suz1baLuZwBFFLMyjz+Ukioz0X1ODPJEH5EDyonyzXL1CAyVG9R/wSICGjiVONlXepIZGAnwCDUcx4ZPhYeIdOvHIcBfaRg9BQXjG9JsoFYTX9sv8fDH7uIJlRjuHtNGS4f16qsJEHX+Ifd0Oq00siPkshiQlv6l79wY1z8IU9M0OWvpRDGp/wqakGrT2KYABQsTjGi06cCCe/qpzQ9KQS2S3HR5Z2rqYzoXF/Fe+BpDRjaPaVPZv1v2+IOFivVeJFqswp6Jyj8Y1FpbpFUf/4mxJr3b6uqygdqOgkf2M0qcXS5KEK45A6EDNSSrBO3lkZFWgCzxCXpZtmcYowPtPAWa05DJ1WAHAnYltX/yhNX4hIxFi7l7gRdcVKA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(316002)(38100700002)(38350700002)(36756003)(16576012)(31686004)(52116002)(44832011)(6916009)(53546011)(956004)(2616005)(26005)(2906002)(8676002)(4326008)(31696002)(66476007)(66556008)(83380400001)(66946007)(8936002)(7416002)(5660300002)(186003)(6486002)(54906003)(7406005)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U1hQbGlUMVBCTFgwQW5SYzhMd2NXV0Vvc1dlZ2ZDK0F2VWRqeXVLZHdIWEhK?=
- =?utf-8?B?NzVjR3E2R0gzWk9tUlk1N0p0Qlg1Vy9EUTl5OUMvQmZ3OHJXK2dhSTJFd05j?=
- =?utf-8?B?UXpqR3FaRDRydWc5ejhNSDB0aGlDOG1BdVJLN2hVeWttT3BlSmtYNDEwaURG?=
- =?utf-8?B?NFd0YlkxaDZzVE1aOEowd1NpWkNXRVZoOVZoYlB3WWEwWDRRRFFCVVBwRGQz?=
- =?utf-8?B?ZVhjVEdBTHd3V1YzL0pBbzN4K09PTFAvWUJ3cEszc0lyQmZuWWxScnlmb1BY?=
- =?utf-8?B?OW5OZVg5c0xVUEh4ZkJ1L05HSG5FVjcxRWx4TlFvNXdHR3VlSWNXSDFIODEy?=
- =?utf-8?B?Rmlyd1gxUUpjZS8zc3lJNHpNb2xlbTNOcjczN2VsUGQrZjE0NzdiYkpzdmdQ?=
- =?utf-8?B?VUswUEljbFZYYUxrdzAxb1BXWk0ySmRpYzN5eFVQMFBZZGZHd0lUaVZ3aEJC?=
- =?utf-8?B?U00ybElTNEZiUndBOFl5Yi9ialNEbkg1Vng3cnhYMHgzRm9sTmxOT25pMmQ1?=
- =?utf-8?B?ekpvYVhoUk55MmFyTTlocmE3TVBsdnFmbFhQWmJNSzB4M0J3cW1CWC9ENjB2?=
- =?utf-8?B?YUhkYWNsMnJOQnoxcWtlTXN1cXowcDNxMlpLeGs1Tlc0QlpBcE95aDV3K3Fh?=
- =?utf-8?B?R1luVmE3YUtoQ3pkdEY5SjFEdFc1N1RYSUxRWkQ4S3Bqd1VKbGlsVmhJSE5R?=
- =?utf-8?B?VDdzOFVvT2txK3BnV1dqWUI2TVRSWXRmdm1xVFRrUC90V29sSmtrcXFMZWZJ?=
- =?utf-8?B?UDh6ei9YSHJFUE5PSEk2bGpyRS81OWFxSzQxVGpGUkFobjFKbElzOG5LZXJk?=
- =?utf-8?B?b0x6enVuUHpMVXY3Zm5YR1lIMlRnR1l2SUlrRnNDc0daVmdsQXNkemlDUUdB?=
- =?utf-8?B?bkdTem14V2JCTXcxcDcvTElmWW9pTjg1TnpXY3FXYzEyVXhRVWd1TytDeE1i?=
- =?utf-8?B?VCs3WVpBNGREa01iMmh1YmJrWXdtY3gwSFMzUkFTNnhRNk96M05qMXhlRGMv?=
- =?utf-8?B?R1JmN00rUSs4SThrV3ZXWWdLajZlZWFVKyt3QkU5ZEJrSmNOUVhMaHR2NE5i?=
- =?utf-8?B?UUlKMzlaYkNCYWdxOTBhZ0JjNmhTNUpLcXFUYlc1WjVUcGhKNkZOR21ZQ0V0?=
- =?utf-8?B?bWlQTzIyS1I0dHNnL0lXbDFUYW5iYkFqMHlGN2VTZUlJMHJoMWJJdXE5NFdD?=
- =?utf-8?B?MGtxazh4QkhKSlQ2SjVMYkN4M1ZUVTdzbkxlUUc4SHcvaWpTTnBrRkFWYStJ?=
- =?utf-8?B?UVZ4cDNjT0VLQjI5dzNTM3h3ZDNiTTVyUVlqeG04OXhJTXV5Zk5VdjN6UDJt?=
- =?utf-8?B?dE9GVWpZN1hWOFUzK2Q5Y2xwVG54d3JLZXgxZWlHV0QxNDRnTThId05tK2lW?=
- =?utf-8?B?cHdjZ2dOcVhrcVpXenpnU3lzWmNoZGlhdEpNSjFwQkl0czdKaVpvTHdjYWxj?=
- =?utf-8?B?ay94ditZMXZ1OUFGZythR1hQZEdDSU4vUTZZZFJKcURXWTlGcmhUNFJWV3lR?=
- =?utf-8?B?di8zajVxdUdTbzlBWUhLWUtYWWVkQzRlMHlnYzJYRHF4cWZFejEvUkdod0F6?=
- =?utf-8?B?MUVtTDhwclV4SHNrRG1ESVJ5KzAxKy9jS1hydGEzemJ6UC90SDV3NnFJa0VL?=
- =?utf-8?B?T1FTdXVvamVHY3hLbE9TaTh1THoxV1VlWDRMZXpRQURvNWN4cXVjUGg0K3Zj?=
- =?utf-8?B?MTlSUzkvcWh0WkFYQTRnamJuUWdCUHIvQzdQVzkzWHdvdnF4OWV5QUVqRjVI?=
- =?utf-8?Q?XOtp3VoHqVe/CQMX/FMyV4q6JqOwf8kbYasMAe1?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48f78c24-3a3e-4a48-00f4-08d9793854e8
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2021 17:35:10.1095
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /vCj4Zvg/v+v9pOq3JVretEvyabYe7kenIyB6sRhcdejuBU3xUwjv/lItyBpPvT8B3lJqrw2hck0Toeoe6Ubbw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2639
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Converts the RNG bindings for OMAP SoCs and Inside-Secure
+HWRNG modules to YAML schema.
 
+Signed-off-by: Jayesh Choudhary <j-choudhary@ti.com>
+---
+ .../devicetree/bindings/rng/omap_rng.txt      | 38 --------
+ .../devicetree/bindings/rng/omap_rng.yaml     | 94 +++++++++++++++++++
+ 2 files changed, 94 insertions(+), 38 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rng/omap_rng.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/omap_rng.yaml
 
-On 9/16/21 11:56 AM, Borislav Petkov wrote:
-> On Fri, Aug 20, 2021 at 10:58:34AM -0500, Brijesh Singh wrote:
->> Add CPU feature detection for Secure Encrypted Virtualization with
->> Secure Nested Paging. This feature adds a strong memory integrity
->> protection to help prevent malicious hypervisor-based attacks like
->> data replay, memory re-mapping, and more.
->>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>   arch/x86/include/asm/cpufeatures.h       | 1 +
->>   arch/x86/kernel/cpu/amd.c                | 3 ++-
->>   tools/arch/x86/include/asm/cpufeatures.h | 1 +
->>   3 files changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
->> index d0ce5cfd3ac1..62f458680772 100644
->> --- a/arch/x86/include/asm/cpufeatures.h
->> +++ b/arch/x86/include/asm/cpufeatures.h
->> @@ -398,6 +398,7 @@
->>   #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualization */
->>   #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is supported */
->>   #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
->> +#define X86_FEATURE_SEV_SNP		(19*32+4)  /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
-> 
-> s/AMD Secure Encrypted Virtualization/AMD SEV/g
-> 
-> Bit 1 above already has that string - no need for repeating it
-> everywhere.
-> 
-> Also, note the vertical alignment (space after the '+'):
-> 
-> 					(19*32+ 4)
-> 
+diff --git a/Documentation/devicetree/bindings/rng/omap_rng.txt b/Documentation/devicetree/bindings/rng/omap_rng.txt
+deleted file mode 100644
+index ea434ce50f36..000000000000
+--- a/Documentation/devicetree/bindings/rng/omap_rng.txt
++++ /dev/null
+@@ -1,38 +0,0 @@
+-OMAP SoC and Inside-Secure HWRNG Module
+-
+-Required properties:
+-
+-- compatible : Should contain entries for this and backward compatible
+-  RNG versions:
+-  - "ti,omap2-rng" for OMAP2.
+-  - "ti,omap4-rng" for OMAP4, OMAP5 and AM33XX.
+-  - "inside-secure,safexcel-eip76" for SoCs with EIP76 IP block
+-  Note that these two versions are incompatible.
+-- ti,hwmods: Name of the hwmod associated with the RNG module
+-- reg : Offset and length of the register set for the module
+-- interrupts : the interrupt number for the RNG module.
+-		Used for "ti,omap4-rng" and "inside-secure,safexcel-eip76"
+-- clocks: the trng clock source. Only mandatory for the
+-  "inside-secure,safexcel-eip76" compatible, the second clock is
+-  needed for the Armada 7K/8K SoCs
+-- clock-names: mandatory if there is a second clock, in this case the
+-  name must be "core" for the first clock and "reg" for the second
+-  one
+-
+-
+-Example:
+-/* AM335x */
+-rng: rng@48310000 {
+-	compatible = "ti,omap4-rng";
+-	ti,hwmods = "rng";
+-	reg = <0x48310000 0x2000>;
+-	interrupts = <111>;
+-};
+-
+-/* SafeXcel IP-76 */
+-trng: rng@f2760000 {
+-	compatible = "inside-secure,safexcel-eip76";
+-	reg = <0xf2760000 0x7d>;
+-	interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
+-	clocks = <&cpm_syscon0 1 25>;
+-};
+diff --git a/Documentation/devicetree/bindings/rng/omap_rng.yaml b/Documentation/devicetree/bindings/rng/omap_rng.yaml
+new file mode 100644
+index 000000000000..86bbc2c53e7d
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/omap_rng.yaml
+@@ -0,0 +1,94 @@
++# SPDX-License-Identifier: (GPL-2.0+ OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/rng/omap_rng.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: OMAP SoC and Inside-Secure HWRNG Module
++
++maintainers:
++  - Jayesh Choudhary <j-choudhary@ti.com>
++
++properties:
++  compatible:
++    enum:
++      - ti,omap2-rng
++      - ti,omap4-rng
++      - inside-secure,safexcel-eip76
++
++  ti,hwmods:
++    const: rng
++    deprecated: true
++    description: Name of the hwmod associated with the RNG module
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  clocks:
++    minItems: 1
++    maxItems: 2
++    items:
++      - description: EIP150 gatable clock
++      - description: Main gatable clock
++
++  clock-names:
++    oneOf:
++      - items:
++          - const: core
++          - const: reg
++      - const: core
++
++
++allOf:
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - ti,omap4-rng
++              - inside-secure,safexcel-eip76
++
++    then:
++      required:
++        - interrupts
++
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - inside-secure,safexcel-eip76
++
++    then:
++      required:
++        - clocks
++
++
++required:
++  - compatible
++  - reg
++
++additionalProperties: false
++
++examples:
++  - |
++    /* AM335x */
++    rng: rng@48310000 {
++            compatible = "ti,omap4-rng";
++            ti,hwmods = "rng";
++            reg = <0x48310000 0x2000>;
++            interrupts = <111>;
++    };
++  - |
++    /* SafeXcel IP-76 */
++    trng: rng@f2760000 {
++            compatible = "inside-secure,safexcel-eip76";
++            reg = <0xf2760000 0x7d>;
++            interrupts = <0 59 4>;
++            clocks = <&cpm_syscon0 1 25>;
++    };
++
++...
+-- 
+2.17.1
 
-Noted. I will fix in next rev. thanks
