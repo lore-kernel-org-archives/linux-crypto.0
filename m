@@ -2,105 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFEEC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 17:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 383B7C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 17:29:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 419856120D
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 17:09:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 225266108F
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 17:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345411AbhIPRKs (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Sep 2021 13:10:48 -0400
-Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:59418
-        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1350034AbhIPRIl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Sep 2021 13:08:41 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        id S243658AbhIPRa7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Sep 2021 13:30:59 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:42316 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1352754AbhIPR1j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Sep 2021 13:27:39 -0400
+Received: from zn.tnic (p200300ec2f11c6001e49ea6afe1054f5.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:c600:1e49:ea6a:fe10:54f5])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id B63264026A
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Sep 2021 17:05:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1631811925;
-        bh=2in4Ee9Den/iF6lPr3kqJcbqH/e6c33reOi3jUtDPLA=;
-        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-        b=cs4Y6k44UsGKY91WC/2bdEmpFZWszWV+ItoSne5BQI0xVErDMu611oipjK+3rDUTP
-         vDY/Lbj7zfEYKb9DZCbybjJCWFS14A9ph9jaslbskjnN+Pb8AT8rXgvu/Pe3KJDX5j
-         aJ4tv6PFoUJTe71r3vuvtqi02IfF7DnN72LAe2WZx3XFaN94Emciima4NsT756opz4
-         rF3zAuMw1aUuo2HQEz8yHOOvVbIcF0aimqhsBJ+95EZdlE8eCyWQLsNbrvR/TAf3sd
-         cJJSBsg24oy0miIDmZiGK4bBvuMvt1ILLylDdzERF4Ojkw00hgQ37LudcB9x2BJSdU
-         5k1Kf7xa0FURg==
-Received: by mail-wr1-f71.google.com with SMTP id x7-20020a5d6507000000b0015dada209b1so2681241wru.15
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Sep 2021 10:05:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=2in4Ee9Den/iF6lPr3kqJcbqH/e6c33reOi3jUtDPLA=;
-        b=3kgNkzFJONKPqdDbOwFHGiRmdzkGooBEEHetEIk5Y9ZlprmoX+M+uuXVMzZXC2G149
-         FYatQILZ/KNNi6fCcog6yaav4L0fKhOVDqbC16Z8Yj1Q5dytc48w+/WWEtLBb2NaZNYl
-         FBzf3GQG89i7k7iwj35P052GU9MNQYX5Hxwh8urZCqlvSHj96Uw4sKdGtJ5cVdd+3Cbh
-         OIwoSkVcBCTzxHqZb59zR6JOdpBVqwSre6E7GRg4zbUiGLmk3S8TGMfp3P51zqbCzLFs
-         TKZ74M0tiMwRWURWU0iseVpTPvCoX3d36Wn22GYJdzKJKL9ClmIGpjRg3ZuTJMux5rge
-         mhXA==
-X-Gm-Message-State: AOAM533SJnvUeZFCFBghTIQiDvmTGd96OlEjDc32bZT4+rLQC8oEQxI2
-        MPyxfujvkoERWjik8NMYh6Bv/SzdfPveM9TcKD2KloWgtUYl/A7UGD9UUaj2cOnpiOV+cSY2Yez
-        uBMuYYyCor0RAyT53F9rgQJ27im9LpWmK26Kgn4W4vg==
-X-Received: by 2002:adf:e6c5:: with SMTP id y5mr7232423wrm.198.1631811925488;
-        Thu, 16 Sep 2021 10:05:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJweEXTvdgMrZFo+fiFdqAWkUZFpEa72JKe/21s+Rqw0H5pXNd34exqlivJU2zCzk9x4QzLSQg==
-X-Received: by 2002:adf:e6c5:: with SMTP id y5mr7232394wrm.198.1631811925284;
-        Thu, 16 Sep 2021 10:05:25 -0700 (PDT)
-Received: from kozik-lap.lan (lk.84.20.244.219.dc.cable.static.lj-kabel.net. [84.20.244.219])
-        by smtp.gmail.com with ESMTPSA id f3sm3807850wmj.28.2021.09.16.10.05.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Sep 2021 10:05:24 -0700 (PDT)
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Srujana Challa <schalla@marvell.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: marvell/cesa: drop unneeded MODULE_ALIAS
-Date:   Thu, 16 Sep 2021 19:05:22 +0200
-Message-Id: <20210916170523.138155-1-krzysztof.kozlowski@canonical.com>
-X-Mailer: git-send-email 2.30.2
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5ED201EC01DF;
+        Thu, 16 Sep 2021 19:26:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1631813168;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=oOtmNTM2jr/g9JVg0OexwbFg2/pG+8cff5fWd4oubyk=;
+        b=HA43ImuGZC1WGrvAhfNdFt6SUtTLcSGWTR/UJVK0nwQVPxc+EN+ytuygjgJvsDLf/v619f
+        /mdq87L35kG6yS8syIKPfSYSI0oP8iaQEgeOJlWiTRfBbdN6rLm+JNU+WDuyQBUs5a0bmU
+        GfQ50AjWPdgVTca2lYAIWjSFmICdB2A=
+Date:   Thu, 16 Sep 2021 19:26:07 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 02/45] iommu/amd: Introduce function to check
+ SEV-SNP support
+Message-ID: <YUN+L0dlFMbC3bd4@zn.tnic>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-3-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210820155918.7518-3-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The MODULE_DEVICE_TABLE already creates proper alias for platform
-driver.  Having another MODULE_ALIAS causes the alias to be duplicated.
+On Fri, Aug 20, 2021 at 10:58:35AM -0500, Brijesh Singh wrote:
+> The SEV-SNP support requires that IOMMU must to enabled, see the IOMMU
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
----
- drivers/crypto/marvell/cesa/cesa.c | 1 -
- 1 file changed, 1 deletion(-)
+s/must to/is/
 
-diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
-index f14aac532f53..5cd332880653 100644
---- a/drivers/crypto/marvell/cesa/cesa.c
-+++ b/drivers/crypto/marvell/cesa/cesa.c
-@@ -615,7 +615,6 @@ static struct platform_driver marvell_cesa = {
- };
- module_platform_driver(marvell_cesa);
- 
--MODULE_ALIAS("platform:mv_crypto");
- MODULE_AUTHOR("Boris Brezillon <boris.brezillon@free-electrons.com>");
- MODULE_AUTHOR("Arnaud Ebalard <arno@natisbad.org>");
- MODULE_DESCRIPTION("Support for Marvell's cryptographic engine");
+> spec section 2.12 for further details. If IOMMU is not enabled or the
+> SNPSup extended feature register is not set then the SNP_INIT command
+> (used for initializing firmware) will fail.
+> 
+> The iommu_sev_snp_supported() can be used to check if IOMMU supports the
+
+"can be used"?
+
+Just say what is going to use it.
+
+> SEV-SNP feature.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/iommu/amd/init.c | 30 ++++++++++++++++++++++++++++++
+>  include/linux/iommu.h    |  9 +++++++++
+>  2 files changed, 39 insertions(+)
+> 
+> diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
+> index 46280e6e1535..bd420fb71126 100644
+> --- a/drivers/iommu/amd/init.c
+> +++ b/drivers/iommu/amd/init.c
+> @@ -3320,3 +3320,33 @@ int amd_iommu_pc_set_reg(struct amd_iommu *iommu, u8 bank, u8 cntr, u8 fxn, u64
+>  
+>  	return iommu_pc_get_set_reg(iommu, bank, cntr, fxn, value, true);
+>  }
+> +
+> +bool iommu_sev_snp_supported(void)
+> +{
+> +	struct amd_iommu *iommu;
+> +
+> +	/*
+> +	 * The SEV-SNP support requires that IOMMU must be enabled, and is
+> +	 * not configured in the passthrough mode.
+> +	 */
+> +	if (no_iommu || iommu_default_passthrough()) {
+> +		pr_err("SEV-SNP: IOMMU is either disabled or configured in passthrough mode.\n");
+> +		return false;
+> +	}
+> +
+> +	/*
+> +	 * Iterate through all the IOMMUs and verify the SNPSup feature is
+> +	 * enabled.
+> +	 */
+> +	for_each_iommu(iommu) {
+> +		if (!iommu_feature(iommu, FEATURE_SNP)) {
+> +			pr_err("SNPSup is disabled (devid: %02x:%02x.%x)\n",
+> +			       PCI_BUS_NUM(iommu->devid), PCI_SLOT(iommu->devid),
+> +			       PCI_FUNC(iommu->devid));
+> +			return false;
+> +		}
+> +	}
+> +
+> +	return true;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_sev_snp_supported);
+
+That export is not needed.
+
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 32d448050bf7..269abc17b2c3 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -604,6 +604,12 @@ struct iommu_sva *iommu_sva_bind_device(struct device *dev,
+>  void iommu_sva_unbind_device(struct iommu_sva *handle);
+>  u32 iommu_sva_get_pasid(struct iommu_sva *handle);
+>  
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +bool iommu_sev_snp_supported(void);
+> +#else
+> +static inline bool iommu_sev_snp_supported(void) { return false; }
+> +#endif
+> +
+>  #else /* CONFIG_IOMMU_API */
+>  
+>  struct iommu_ops {};
+> @@ -999,6 +1005,9 @@ static inline struct iommu_fwspec *dev_iommu_fwspec_get(struct device *dev)
+>  {
+>  	return NULL;
+>  }
+> +
+> +static inline bool iommu_sev_snp_supported(void) { return false; }
+> +
+
+Most of those stubs and ifdeffery is not needed if you put the function
+itself in
+
+#ifdef CONFIG_AMD_MEM_ENCRYPT
+
+...
+
+#endif
+
+as it is called by sev.c only, AFAICT, and latter is enabled by
+CONFIG_AMD_MEM_ENCRYPT anyway.
+
+Thx.
+
 -- 
-2.30.2
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
