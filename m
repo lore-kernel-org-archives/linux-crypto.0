@@ -2,105 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A4AC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 10:07:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A62E3C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 13:42:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1AF116120C
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 10:07:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82C0B60F21
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 13:42:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235717AbhIPKJM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Sep 2021 06:09:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43564 "EHLO
+        id S240339AbhIPNnh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Sep 2021 09:43:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236755AbhIPKJL (ORCPT
+        with ESMTP id S240304AbhIPNng (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Sep 2021 06:09:11 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE668C0613C1
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Sep 2021 03:07:50 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id t10so10675817lfd.8
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Sep 2021 03:07:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jUO5tSYLVRile5AWlAafA8DmhpHLLp7fGg/YtJNAKkA=;
-        b=kb18yEmDjFeTISL5Cj3f+OE1reEAL0nH5XmyNUxp+vvOyzUcj+l9m5OworF15vyOXF
-         b8YVBrLmGwq/u0XPPb8fk3JaoNhQe+7Ho6ZKojUxfMsvVZB1S+AXaj2bjkGQpTH2BDMF
-         RFKGzdZkL5STdbXuztAsLUi82lROJaEFce1QQBJQFnJ6BNDzh73ydU6twoHnOf/LFIT6
-         m36gdukOrXppQsBrmuso+yADYfJZDVaWVxIsFzYI2GyA9+KlNEDbRQnmoxutZH37cusb
-         kMvPFWujPGOtbzPt0qbQ8UKq9xhYrz+jKKgOqdrQtVAmzqRwqbisq3ed603uxeTFFJJ1
-         7TrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jUO5tSYLVRile5AWlAafA8DmhpHLLp7fGg/YtJNAKkA=;
-        b=FU4tYdk7MPCw19ct4yU5eNslFp9Br5DuqqR9Nw7i1irQP+LqmJB7KYudj/i8dc74dx
-         RCv5HanALGyyMZs1czI0Gw++dO6vZa9QcPqDB2YHsV7Est7D9fqvVltpvvfRijzRtLvo
-         y4JWjrnIJgSW3esik36V0hP17wOXjFRELwhZAzdEaRwoZ9TYmes4qfBo5FFkAYJh+ICe
-         5LSPVUKSJAPPfUPXDKzpm+sVP+w9FLUgpWWnhZbNRqbppaliMLGRaxQJnGZEcOiVznXM
-         FM/paVMH3DiRyfVmzpG5dDQZbFT23fcaey4gqwx39pS8zoUWnRlSe7WDai5PvCKvY7VC
-         6s9g==
-X-Gm-Message-State: AOAM530POxHDjf3MV6CZ9rY4wOruB94v76jCuI+5mJo7Huoh7UH48Vc+
-        ceoFV0ahsRH16GnPez2rrABaxZz0wlPjrQ95/dq04w==
-X-Google-Smtp-Source: ABdhPJytweAIsY0sxsinkWN7FPbeTdhVCteGXtpk0WGBS/7V1nIDt7Ry+vbrBBnhe783d+4wyWb3AQdWBV5/FDYn/9Q=
-X-Received: by 2002:a05:6512:3096:: with SMTP id z22mr3486963lfd.584.1631786869054;
- Thu, 16 Sep 2021 03:07:49 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210914085137.31761-1-sam.shih@mediatek.com> <20210914085137.31761-5-sam.shih@mediatek.com>
-In-Reply-To: <20210914085137.31761-5-sam.shih@mediatek.com>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Thu, 16 Sep 2021 12:07:38 +0200
-Message-ID: <CACRpkdYkvBS5+MHSGBDhNQtvCxRquef1kPHmCSfzruz2N=VCyw@mail.gmail.com>
-Subject: Re: [RESEND,v3,4/9] pinctrl: mediatek: moore: check if pin_desc is
- valid before use
-To:     Sam Shih <sam.shih@mediatek.com>
-Cc:     Rob Herring <robh+dt@kernel.org>, Sean Wang <sean.wang@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
+        Thu, 16 Sep 2021 09:43:36 -0400
+Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21176C061574
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Sep 2021 06:42:16 -0700 (PDT)
+Received: from tr.lan (ip-89-176-112-137.net.upcbroadband.cz [89.176.112.137])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: marex@denx.de)
+        by phobos.denx.de (Postfix) with ESMTPSA id AA01982DA1;
+        Thu, 16 Sep 2021 15:42:11 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+        s=phobos-20191101; t=1631799732;
+        bh=/vyfvHfygDbIbPm95BDMztXGPHzk1GB38j2+1DC2aU0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=dS5tG391JqaRVPCtWG8q9M6ySM8uLIie53KukjG+b+e2yhByOeNzHOftu1ss2O3ET
+         lpnt2ES+ygNB3W2GSlEJh0pxO6AsJoHx3CMVnjThc/G+6K3GG2RriXX77b7AZGE99S
+         Vm5ilAjqfn+OjWvq4+aSAlA71aKYBl7NmWxUiL2LRo1XmzrAMEQyPAL0EalhpHw8V6
+         hobzabbCRubNw1OFrVbRZPqZc3h+/iXaCSd1j8F5KmZ5Ioc216Jf9jqfv2PmKFxehc
+         VpkmvW8epzNTOV0BD8lNhoQvFPxHVlwOz01QT9jS2UcJOknyGTB/sPhfmgOJlWtB3K
+         qb9oGNGC/hESw==
+From:   Marek Vasut <marex@denx.de>
+To:     linux-crypto@vger.kernel.org
+Cc:     ch@denx.de, Marek Vasut <marex@denx.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Hsin-Yi Wang <hsinyi@chromium.org>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        Fabien Parent <fparent@baylibre.com>,
-        Seiya Wang <seiya.wang@mediatek.com>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        "moderated list:ARM/Mediatek SoC support" 
-        <linux-mediatek@lists.infradead.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
-        LINUXWATCHDOG <linux-watchdog@vger.kernel.org>,
-        linux-clk <linux-clk@vger.kernel.org>,
-        John Crispin <john@phrozen.org>,
-        Ryder Lee <Ryder.Lee@mediatek.com>
-Content-Type: text/plain; charset="UTF-8"
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>
+Subject: [RFC][PATCH] crypto: caam - Add missing MODULE_ALIAS
+Date:   Thu, 16 Sep 2021 15:41:54 +0200
+Message-Id: <20210916134154.8764-1-marex@denx.de>
+X-Mailer: git-send-email 2.33.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.2 at phobos.denx.de
+X-Virus-Status: Clean
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 14, 2021 at 10:52 AM Sam Shih <sam.shih@mediatek.com> wrote:
+Add MODULE_ALIAS for caam and caam_jr modules, so they can be auto-loaded.
 
-> Certain SoC are missing the middle part gpios in consecutive pins,
-> it's better to check if mtk_pin_desc is a valid pin for the extensibility
->
-> Signed-off-by: Sam Shih <sam.shih@mediatek.com>
-> Acked-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Marek Vasut <marex@denx.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Horia Geantă <horia.geanta@nxp.com>
+Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+---
+ drivers/crypto/caam/ctrl.c | 1 +
+ drivers/crypto/caam/jr.c   | 1 +
+ 2 files changed, 2 insertions(+)
 
-This patch applied for v5.16 so we get some stuff merged.
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index ca0361b2dbb07..f4a1babb418dc 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -923,3 +923,4 @@ module_platform_driver(caam_driver);
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("FSL CAAM request backend");
+ MODULE_AUTHOR("Freescale Semiconductor - NMG/STC");
++MODULE_ALIAS("platform:caam");
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 6f669966ba2c1..3b7ea315226aa 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -635,3 +635,4 @@ module_exit(jr_driver_exit);
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("FSL CAAM JR request backend");
+ MODULE_AUTHOR("Freescale Semiconductor - NMG/STC");
++MODULE_ALIAS("platform:caam_jr");
+-- 
+2.33.0
 
-Yours,
-Linus Walleij
