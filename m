@@ -2,220 +2,163 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 254A6C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 18:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48AB3C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 20:05:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 077476058D
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 18:54:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31BB2611F2
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 20:05:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235753AbhIPSzr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Sep 2021 14:55:47 -0400
-Received: from fllv0015.ext.ti.com ([198.47.19.141]:44932 "EHLO
-        fllv0015.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344030AbhIPSzi (ORCPT
+        id S236491AbhIPUGj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Sep 2021 16:06:39 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35396 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S233356AbhIPUGi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Sep 2021 14:55:38 -0400
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 18GIruAR084558;
-        Thu, 16 Sep 2021 13:53:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1631818436;
-        bh=ofxg2rOoyTHRLO7cygaz8Om7ldfzCv8/JSm+cnOaM94=;
-        h=From:To:CC:Subject:Date;
-        b=LE5/W7o1G+2F8rb9BnFfpVShf9T2XZvugeR7TwgAOldluQwHIEaTODJsGVWeymYvF
-         5I2BTmaivJsgcNdGa7hoOxilmZVT60pkqI+sJsefNVWmKW8FPciuhtZPdVJ5SdJHJo
-         wLEu9rY1t4EGKYdY5zDRjdLIb/+DMFa41Qt3A2HI=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 18GIrteN098340
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 16 Sep 2021 13:53:56 -0500
-Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Thu, 16
- Sep 2021 13:53:55 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14 via
- Frontend Transport; Thu, 16 Sep 2021 13:53:55 -0500
-Received: from localhost (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 18GIrrJa097516;
-        Thu, 16 Sep 2021 13:53:54 -0500
-From:   Jayesh Choudhary <j-choudhary@ti.com>
-To:     <devicetree@vger.kernel.org>
-CC:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
-        <robh+dt@kernel.org>, <j-choudhary@ti.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] dt-bindings: rng: convert OMAP and Inside-Secure HWRNG to yaml schema
-Date:   Fri, 17 Sep 2021 00:23:52 +0530
-Message-ID: <20210916185352.7919-1-j-choudhary@ti.com>
-X-Mailer: git-send-email 2.17.1
+        Thu, 16 Sep 2021 16:06:38 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 18GJxfNN008737;
+        Thu, 16 Sep 2021 16:04:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=W35Zz43sd/RpCqOKOqIIhpbRZIipqpXwOFqClt7MSS0=;
+ b=h4GCypqdY9FsjURrrgyJ843a0uEnLG/n9xSVmz8VbyC6ECp8i0wm2A/UpRHqRSV0QTmO
+ nqBh2okEkZ4Qh9A8zS/HG8wbhCYlrvBVRlJW34zmlAHdd/EpP6bBWFfOMeepTMqUZ4jc
+ 0tAtBde/NTU4f6syAR0ojHdGpk75UaSxNc6bA5pcfTIBNqQxxt7QYXf+BOFXTRDoNY4e
+ N8xAi2fHVSeHl6VHUEc8DNYWjKIAq4klowAfaUmBxOP14ffoaGHlYjNa8JWp4VuW9eQk
+ Rsc3UTlF1k8GBG8rxGNPMhGaF5D1n7vxBm0LrS7pCPNWVqtCBNFwlxTjupmTDVp9Oasa DA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3b4cjt83ct-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Sep 2021 16:04:39 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18GK37Bm027877;
+        Thu, 16 Sep 2021 16:04:38 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3b4cjt83c5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Sep 2021 16:04:38 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18GJuwfw017386;
+        Thu, 16 Sep 2021 20:04:37 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma02wdc.us.ibm.com with ESMTP id 3b0m3cu3e7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Sep 2021 20:04:37 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18GK3ZS126870182
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Sep 2021 20:03:36 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 89D316E04E;
+        Thu, 16 Sep 2021 20:03:35 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E54FB6E06B;
+        Thu, 16 Sep 2021 20:03:33 +0000 (GMT)
+Received: from li-4b5937cc-25c4-11b2-a85c-cea3a66903e4.ibm.com (unknown [9.163.30.115])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 16 Sep 2021 20:03:33 +0000 (GMT)
+Subject: Re: [PATCH v6 00/13] Enroll kernel keys thru MOK
+To:     Eric Snowberg <eric.snowberg@oracle.com>, keyrings@vger.kernel.org,
+        linux-integrity@vger.kernel.org, zohar@linux.ibm.com,
+        dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jarkko@kernel.org, jmorris@namei.org, serge@hallyn.com
+Cc:     keescook@chromium.org, gregkh@linuxfoundation.org,
+        torvalds@linux-foundation.org, scott.branden@broadcom.com,
+        weiyongjun1@huawei.com, nayna@linux.ibm.com, ebiggers@google.com,
+        ardb@kernel.org, nramas@linux.microsoft.com, lszubowi@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        konrad.wilk@oracle.com
+References: <20210914211416.34096-1-eric.snowberg@oracle.com>
+From:   Nayna <nayna@linux.vnet.ibm.com>
+Message-ID: <7e83a42f-22ff-350a-2017-d286b1b1b02c@linux.vnet.ibm.com>
+Date:   Thu, 16 Sep 2021 16:03:33 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+In-Reply-To: <20210914211416.34096-1-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Rg5R7nksQBZWN4hyZSmIXKlsCRZ5B095
+X-Proofpoint-ORIG-GUID: k0Jb_UTROZz-utKMJzXNVr1vpX5Ptjv3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
+ definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ malwarescore=0 impostorscore=0 mlxlogscore=999 phishscore=0 adultscore=0
+ clxscore=1011 spamscore=0 priorityscore=1501 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109160113
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Converts the RNG bindings for OMAP SoCs and Inside-Secure
-HWRNG modules to YAML schema.
 
-Signed-off-by: Jayesh Choudhary <j-choudhary@ti.com>
----
- .../devicetree/bindings/rng/omap_rng.txt      | 38 --------
- .../devicetree/bindings/rng/omap_rng.yaml     | 94 +++++++++++++++++++
- 2 files changed, 94 insertions(+), 38 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/rng/omap_rng.txt
- create mode 100644 Documentation/devicetree/bindings/rng/omap_rng.yaml
+On 9/14/21 5:14 PM, Eric Snowberg wrote:
+> Back in 2013 Linus requested a feature to allow end-users to have the
+> ability "to add their own keys and sign modules they trust". This was
+> his *second* order outlined here [1]. There have been many attempts
+> over the years to solve this problem, all have been rejected.  Many
+> of the failed attempts loaded all preboot firmware keys into the kernel,
+> including the Secure Boot keys. Many distributions carry one of these
+> rejected attempts [2], [3], [4]. This series tries to solve this problem
+> with a solution that takes into account all the problems brought up in
+> the previous attempts.
+>
+> On UEFI based systems, this series introduces a new Linux kernel keyring
+> containing the Machine Owner Keys (MOK) called machine. It also defines
+> a new MOK variable in shim. This variable allows the end-user to decide
+> if they want to load MOK keys into the machine keyring. Mimi has suggested
+> that only CA keys contained within the MOK be loaded into the machine
+> keyring. All other certs will load into the platform keyring instead.
+>
+> By default, nothing changes; MOK keys are not loaded into the machine
+> keyring.  They are only loaded after the end-user makes the decision
+> themselves.  The end-user would set this through mokutil using a new
+> --trust-mok option [5]. This would work similar to how the kernel uses
+> MOK variables to enable/disable signature validation as well as use/ignore
+> the db. Any kernel operation that uses either the builtin or secondary
+> trusted keys as a trust source shall also reference the new machine
+> keyring as a trust source.
+>
+> Secure Boot keys will never be loaded into the machine keyring.  They
+> will always be loaded into the platform keyring.  If an end-user wanted
+> to load one, they would need to enroll it into the MOK.
+>
+> Steps required by the end user:
+>
+> Sign kernel module with user created key:
+> $ /usr/src/kernels/$(uname -r)/scripts/sign-file sha512 \
+>     machine_signing_key.priv machine_signing_key.x509 my_module.ko
+>
+> Import the key into the MOK
+> $ mokutil --import machine_signing_key.x509
+>
+> Setup the kernel to load MOK keys into the .machine keyring
+> $ mokutil --trust-mok
+>
+> Then reboot, the MokManager will load and ask if you want to trust the
+> MOK key and enroll the MOK into the MOKList.  Afterwards the signed kernel
+> module will load.
 
-diff --git a/Documentation/devicetree/bindings/rng/omap_rng.txt b/Documentation/devicetree/bindings/rng/omap_rng.txt
-deleted file mode 100644
-index ea434ce50f36..000000000000
---- a/Documentation/devicetree/bindings/rng/omap_rng.txt
-+++ /dev/null
-@@ -1,38 +0,0 @@
--OMAP SoC and Inside-Secure HWRNG Module
--
--Required properties:
--
--- compatible : Should contain entries for this and backward compatible
--  RNG versions:
--  - "ti,omap2-rng" for OMAP2.
--  - "ti,omap4-rng" for OMAP4, OMAP5 and AM33XX.
--  - "inside-secure,safexcel-eip76" for SoCs with EIP76 IP block
--  Note that these two versions are incompatible.
--- ti,hwmods: Name of the hwmod associated with the RNG module
--- reg : Offset and length of the register set for the module
--- interrupts : the interrupt number for the RNG module.
--		Used for "ti,omap4-rng" and "inside-secure,safexcel-eip76"
--- clocks: the trng clock source. Only mandatory for the
--  "inside-secure,safexcel-eip76" compatible, the second clock is
--  needed for the Armada 7K/8K SoCs
--- clock-names: mandatory if there is a second clock, in this case the
--  name must be "core" for the first clock and "reg" for the second
--  one
--
--
--Example:
--/* AM335x */
--rng: rng@48310000 {
--	compatible = "ti,omap4-rng";
--	ti,hwmods = "rng";
--	reg = <0x48310000 0x2000>;
--	interrupts = <111>;
--};
--
--/* SafeXcel IP-76 */
--trng: rng@f2760000 {
--	compatible = "inside-secure,safexcel-eip76";
--	reg = <0xf2760000 0x7d>;
--	interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
--	clocks = <&cpm_syscon0 1 25>;
--};
-diff --git a/Documentation/devicetree/bindings/rng/omap_rng.yaml b/Documentation/devicetree/bindings/rng/omap_rng.yaml
-new file mode 100644
-index 000000000000..86bbc2c53e7d
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/omap_rng.yaml
-@@ -0,0 +1,94 @@
-+# SPDX-License-Identifier: (GPL-2.0+ OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/rng/omap_rng.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: OMAP SoC and Inside-Secure HWRNG Module
-+
-+maintainers:
-+  - Jayesh Choudhary <j-choudhary@ti.com>
-+
-+properties:
-+  compatible:
-+    enum:
-+      - ti,omap2-rng
-+      - ti,omap4-rng
-+      - inside-secure,safexcel-eip76
-+
-+  ti,hwmods:
-+    const: rng
-+    deprecated: true
-+    description: Name of the hwmod associated with the RNG module
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  clocks:
-+    minItems: 1
-+    maxItems: 2
-+    items:
-+      - description: EIP150 gatable clock
-+      - description: Main gatable clock
-+
-+  clock-names:
-+    oneOf:
-+      - items:
-+          - const: core
-+          - const: reg
-+      - const: core
-+
-+
-+allOf:
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - ti,omap4-rng
-+              - inside-secure,safexcel-eip76
-+
-+    then:
-+      required:
-+        - interrupts
-+
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - inside-secure,safexcel-eip76
-+
-+    then:
-+      required:
-+        - clocks
-+
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    /* AM335x */
-+    rng: rng@48310000 {
-+            compatible = "ti,omap4-rng";
-+            ti,hwmods = "rng";
-+            reg = <0x48310000 0x2000>;
-+            interrupts = <111>;
-+    };
-+  - |
-+    /* SafeXcel IP-76 */
-+    trng: rng@f2760000 {
-+            compatible = "inside-secure,safexcel-eip76";
-+            reg = <0xf2760000 0x7d>;
-+            interrupts = <0 59 4>;
-+            clocks = <&cpm_syscon0 1 25>;
-+    };
-+
-+...
--- 
-2.17.1
+machine_signing_key.x509 appears to be a code-signing, self-signed key.  
+It's not a CA key, but the intent of the patchset is to load only CA 
+keys to .machine keyring.
+
+Shouldn't there be two steps: one to load the CA key into MOK, and a 
+second one to load the code-signing key which is signed by this CA ?
+
+Thanks & Regards,
+
+       - Nayna
 
