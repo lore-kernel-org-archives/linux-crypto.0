@@ -2,199 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C54CCC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 13:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F27CC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 13:59:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A964761130
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 13:58:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D7A561242
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Sep 2021 13:59:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235593AbhIPN76 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Sep 2021 09:59:58 -0400
-Received: from mail-mw2nam12on2042.outbound.protection.outlook.com ([40.107.244.42]:6465
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232753AbhIPN75 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Sep 2021 09:59:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UpV/gnKDcobGB6GrvxVl3b62wc9RLB0vArNDaQR00S3mvPDnxtEz6IG8yrIubrMVtiVS8aJNEs91KeLG78b3MJf/FCMJbedV7YBq/A+UZTF1/0Ty69IzhSAjSk/wEw5n4s5b6hdexrDdi6uurKCJxCVU/OtW8XePyX0gEjDr1AMnb5QaizTODyRE2muBavvHYb2PWuP6e0DS+oxYATHNJJywIlWFeT2h2EtCj4y/EpMolyKDqWPmzDSpLP061KoXjAGbLq38IqltJvaGQLiuqOAj01/Q3AvN79/UrjRg8U6NVYeqOEgnU29yS6XOll25ssQt7awP1CKT9vVjEFlWLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=jOKj1pXxm6TK3BhA4iaZ/DrpQRZk2NTT4QSu5qigxDA=;
- b=BzUXhx/lTCapAaO5gbe7lWw+sRdINGtkdNHazjqANWrzSHW8kLO0Tqbm8ewhcJZqU1G8Qsj7w5IEhGf+l86Q45derG5Ww+EC2vBuMxj4GQsD+alYROZyTeh3BE3XNR2PVzjnGYmPYqg0SoNm6jyR6aIk4hulZea++L1QmZSdRuMakQCpS5YABJ5L3eXg9tOW1X41xDWlyaSvaE2+ZWCKkOYstJSCq2hfpvMaXygpChlfgqjv6FOJcoOkkRUhjVv3rQh6df5YxgrmLt1tbU5DjTU7hZCPCgD02w/poMAtjnPPPr5mCdchOKHffGpzuzHUDmFiPCue7/TlEMz5Cc6sZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jOKj1pXxm6TK3BhA4iaZ/DrpQRZk2NTT4QSu5qigxDA=;
- b=fs0RGJzhLOPiiIt/UkxwkVMd8yUggzlBDCvuTPdv5JlKhKC1mCDVKWkbuyg8QSEnYrktcy3oKrKfdmgjBsT9xw9O89R3XXb18OA9BhIOZfSxu6zLJ+K/A3IZYNnatE0cZpdE8ovzW21WzTErPEfUbxy62os5O35W8bd8HJ7W6uyWXzSx+3oHKHodO5qhjGzZU1Q6pj9OmJ8enuZrg8coy7VlU82gYov82f2eZLhGqydkV38tXDIidrlIt++e1iBpT4ohI39+Ehwo0GRhLY6tVOAFjbsuYud9xV3MG7ANyN2Gz3A8H+rpciPstfPcWxnf1IMeohEvLD01y7sceHRyoQ==
-Authentication-Results: huawei.com; dkim=none (message not signed)
- header.d=none;huawei.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5361.namprd12.prod.outlook.com (2603:10b6:208:31f::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14; Thu, 16 Sep
- 2021 13:58:35 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4523.016; Thu, 16 Sep 2021
- 13:58:35 +0000
-Date:   Thu, 16 Sep 2021 10:58:33 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Message-ID: <20210916135833.GB327412@nvidia.com>
-References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
- <20210915095037.1149-7-shameerali.kolothum.thodi@huawei.com>
- <20210915130742.GJ4065468@nvidia.com>
- <fe5d6659e28244da82b7028b403e11ae@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fe5d6659e28244da82b7028b403e11ae@huawei.com>
-X-ClientProxiedBy: YT1PR01CA0139.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:2f::18) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S232753AbhIPOBK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Sep 2021 10:01:10 -0400
+Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:50562
+        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231425AbhIPOBK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Sep 2021 10:01:10 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 7832440264
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Sep 2021 13:59:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1631800788;
+        bh=LEounu6pVpMY/+ETig5QlpJIX0QAhRnRClgXx8ZL36o=;
+        h=To:Cc:References:From:Subject:Message-ID:Date:MIME-Version:
+         In-Reply-To:Content-Type;
+        b=wAosNxHq1/S576khK6LCDoWdk4o8ext7ZYwV6tbx6pytAnKlHyTlPJ6xmgQB1eqPJ
+         pE3az0jzDqVIozlOEOfreU+UUoswlYRktIeVu64pQhMXrAgq+Gc+e1rxXZuptpFAox
+         u8sJCXKzZ6OcFzjWn3FqzCuc01sYh1xOmW5SwJ3tgoHVsCG1tFdD6cUj/C5rAkQque
+         zUrZsCIZOa5KQOv62uc1q46stddrEBrHWs+vaThvQ3hoOt+iNwcwVhPQNzLj0Ubey2
+         m2U0yKODU2qhgMTXhDovn3Jc5kEGwOOuXhibusK2JmV6RcNF0GmIJwwISneWpAXoZM
+         4sHRDUMYPNU4g==
+Received: by mail-wm1-f71.google.com with SMTP id 5-20020a1c00050000b02902e67111d9f0so3177164wma.4
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Sep 2021 06:59:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LEounu6pVpMY/+ETig5QlpJIX0QAhRnRClgXx8ZL36o=;
+        b=M99uAMdXoz9+tX3txTTKxFvLzMp2xV88Ou8vASchJA4fY84r7xAJyP7P0wlXKihCyg
+         295MQBwQFvsVA8OLSZHtOCcoZSFbtvuzDgiMLq04wdoHi+afAEErsSitwm3PianFR0gT
+         O8nZx96SBcTkb6O0QJY3izBiQ3ZWCFS1Baqi0dZjBQhCiKbwUPj/CdnNy8T9e0lfb0zi
+         NdxU0eGoFaOiit3rbjHZl7T3X8GVgXndVgc3qBCcoB2o3GeGFyGV90q+HWKL6Furl4wR
+         ta4jfEAQVrQrKOoI18y0zbGVI+r5g8HFmOJzWJ2S5CDzUpvD8Gsgd+iILeIAP5th8MVI
+         GLtg==
+X-Gm-Message-State: AOAM5329oU4XE/dPTF9mJlXd0/xGFscno0+Tk34/XXdNlPpII6d9395X
+        MlXgIAQ/FJ2ufH7HtF4Ugw+WR/Z5mvZNwkBEsli4oObbBJnlrFGh/CoVI/pYe1MT2NtSLs/mo4S
+        ugmpnoi/foqhjVZdA+xOANgvRjE6nedS+fBNg1YOrlg==
+X-Received: by 2002:adf:f98b:: with SMTP id f11mr6315928wrr.333.1631800787826;
+        Thu, 16 Sep 2021 06:59:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz57pk+Ezv1dNymSc+pH/GxkAI24iTKa42bFu+mfFypmXGv8izqXwHTasFVM49zH4OMsOqrKA==
+X-Received: by 2002:adf:f98b:: with SMTP id f11mr6315914wrr.333.1631800787694;
+        Thu, 16 Sep 2021 06:59:47 -0700 (PDT)
+Received: from [192.168.2.211] (lk.84.20.244.219.dc.cable.static.lj-kabel.net. [84.20.244.219])
+        by smtp.gmail.com with ESMTPSA id q11sm3466001wrn.65.2021.09.16.06.59.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Sep 2021 06:59:46 -0700 (PDT)
+To:     Marek Vasut <marex@denx.de>, linux-crypto@vger.kernel.org
+Cc:     ch@denx.de, Herbert Xu <herbert@gondor.apana.org.au>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+References: <20210916134154.8764-1-marex@denx.de>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+Subject: Re: [RFC][PATCH] crypto: caam - Add missing MODULE_ALIAS
+Message-ID: <441a7e2e-7ac8-5000-72e0-3793ae7e58d5@canonical.com>
+Date:   Thu, 16 Sep 2021 15:59:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (206.223.160.26) by YT1PR01CA0139.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:2f::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14 via Frontend Transport; Thu, 16 Sep 2021 13:58:34 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mQruL-001NeO-Ej; Thu, 16 Sep 2021 10:58:33 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6f2d7184-86cb-4da4-0d2a-08d9791a1334
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5361:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB536143A01A30887F6D272EA4C2DC9@BL1PR12MB5361.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ruwKQwpkmo6itMkvqbUVrqp2lURTj0W2UvwN0Y4bY7gmwsvf5vGnYf5D7MKT/SO4eIfX0F3OF0+hxFhMgxcwPOA4AxKorTR1BweqlcKLQr12g9brtI6vaydt0R7Dx4u0LHd08TaxuurqWeBwXcbY/RIVobPvhnMTcUy99ZCsd8jGtRUlOiKnkPkDKzj0HUmMBRKirwWl9VqJsZ5qGhareXsiCxZpZOzh5BGIJHPsfe26aoFdN54BIeLw/ybngPBPPvUeOmxvvm0O/+yGcBPPawb17CuvA3CvJnnQtVD0Sy9cVn5AQ5Ct82lRPmWNbiFeYpevYrdXP7AypzItVtGhAOiRjORp+y16bffUi8DsMtOTkdikjZ5L9uN3EjgRCOG7EegiHrp613nhqueVG2ZAP56mK+l8EkpiVHWZv56/VbrSoDt6JVOXZuA6oyZJgqKfKFO7Pmi9ih6HSVUN3I38NfEGc3FW1sw0l4CmOfp1J1wkshuSVlHNuR0XUZOH/7PWfJvswPD9rOcc/6JPBvPEq+1qYwr9TNSKvUAR/x5LAPJGy5kDjVMJxAgaUQ2Kwhbm2hmRcZUUeguBSTFOK08OKq3DkYzn+DqyitC33PTSHndHnC+9boyqahqqySWOUNlAJiid4s7zCB9PWpA+DNuzEN6o6UuYwcwGhONZcyftERc2hpaEj5Cab9Q7CShAocWW
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(33656002)(5660300002)(508600001)(9786002)(4326008)(83380400001)(6916009)(8936002)(53546011)(86362001)(66946007)(26005)(1076003)(186003)(54906003)(426003)(2616005)(66556008)(316002)(66476007)(38100700002)(8676002)(36756003)(2906002)(9746002)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c3RvSHlTREllWlJWQzVmSGRGQTlQbmV3RUI5VWpGZUUzZnBRSzg0S3FpM0JU?=
- =?utf-8?B?NWlNYlByMkNVaUZ4bXZtSFN3WlV4MVFrcFFhMk9BUW4yR0Zma2NzRnEzUFVT?=
- =?utf-8?B?aTF6RDl5NC94ZHFUV2xhZXdpUDhuOWZoMC84Z2NmcU83R09PMDRUeVEwd3dX?=
- =?utf-8?B?SHR1azVTQjlBT0VJUWVaYlVRa1B2OFMraE5yR3VuMlM5OFVoN1NwSUpWVk5L?=
- =?utf-8?B?Qm5wOVkrUzZMNGJvQjdVSVNOQmV5N1lUSHoyUUE2L3VDc3I2eXlSTWlXU2x1?=
- =?utf-8?B?Z0RGd0FQU2ZuVTRTdmRuZDl2V2pQWkJvT3FVZmtnQjhLSVA3SVBXM2M0OHNK?=
- =?utf-8?B?d2N1YkdOZzJFWGFhRTQwVFc0NnZSQXQxblFSUFkwZUxCVzRPVWRXTy9sc2Jm?=
- =?utf-8?B?VnErQnc1UnlxWWJUcElzZzVaVVB2OFFPcXQ0aHE0M1hMbDNkZEhTOVVHMU15?=
- =?utf-8?B?ZzhiVlNOb3ZEdTZCOXNESkl1TmZTVGEzOUxPYUEybE9wS3BQdGtxd1dTM1Ja?=
- =?utf-8?B?R055U3RSOWROR09NSzJlV3Q4Wk1VdkR0T2hnT2V5NGNXeUlVZGZhV0lyTFBF?=
- =?utf-8?B?VFVDSWtXZThkNzdacTBRSDcwWUV1amgwVjFlZHcwaHdsWHdBdXBNMjNOMTR4?=
- =?utf-8?B?bFd1d1pkMnRMTTQwUWZmWUJrWmt1TnFnRGJmbkJtcFJyVGZNTHNodnFSWUNE?=
- =?utf-8?B?T21uc3p1SzM4T2ZoVERnWS9KNkRtNjFMRWNSeTVXaktvMWRpYURXdHJCZi9W?=
- =?utf-8?B?Q2VUUzZUb0o1djVTM3FiMytEQ1ovNzRiRExtdTJsSTRHd084UWpuaSs3aGgy?=
- =?utf-8?B?VVd0VlRlOWs0SkRoWHJhdWdyMEF5ZkFIZG9mU210Tk4rQnR2OHNLUnFzaDJ0?=
- =?utf-8?B?MHZBYThPRlhjZlJYYW9sbmlsaStYSUhJVUtFYVBoenVBL202K0wvQ25RMXFJ?=
- =?utf-8?B?b1JuTGdtV2VWZDdiMU5jOFVDUU9lQmp1SXVkSFVhSk5BS3hIZ2IrTndwbWUv?=
- =?utf-8?B?Y0xLR1paa0ErQjZsRGMrOFFod0FoYmRGL08ybnZldEpNaDErcGJZQ2lMc1F4?=
- =?utf-8?B?VlBXOFMvRG9iSlN0aDIvRDY1UEZOQllLTDBONjRzaU1KVlVSMTN4RnZzSENJ?=
- =?utf-8?B?YVFsd2pSVnFvVTh4NEhjdk9MM25tVEFxSnBXdm01K3l0M1Fzek5jbWF5QnFy?=
- =?utf-8?B?OGo2Nk51N2I5elBrVmVhNk5xTTB2WlFUQ0RicWtmeXUzdFg5MENDMEhQZVY3?=
- =?utf-8?B?YXU1Qyt0U01oMCtCY3c3TTI1OGxrczNZcXNUTHhjWUhkUzhxSXFnN1gycktL?=
- =?utf-8?B?emdGa2hxQzVzTDFNNWRiREhqZGNIU3REdExMbzVuYVVrYzdhY253cGhadDBI?=
- =?utf-8?B?SndrYUNsUFpzWlFHRWZQNEZscVRGOFp6MUlscG04MGg3Mnlkb1Z4cFIrTklw?=
- =?utf-8?B?aFpnVDduQmF6UEFRZlVRcnBzbW9iV2NsT2JydHRvYWc1WnpyU05EUi9KU0RR?=
- =?utf-8?B?cEtuSUN2a1N4V0gxVUhPRG5YRjFDQ2NhblFuSlFjSFJwamRsUkhFaE1mMjFk?=
- =?utf-8?B?WXFNL0NhZUplcGowTGFKMnNKczVIcWI1UmcyVi95V2EzaGs0ZE5PWGE0R0lS?=
- =?utf-8?B?RFh4dnFJK25Xdmo4cXRjNDlyakpaY0QrWXg0WDJCeG5OaWZyVzFCT0ZhMlBo?=
- =?utf-8?B?bHFRUTZoUjdSVEFmSnhKc0d3VjBZazBIN2tOLzlOUEJMK0lteWFyTzdZeWpL?=
- =?utf-8?Q?RODLRX45cJ3R3yi20FwGPeFlByjrGcacfW1BAmv?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f2d7184-86cb-4da4-0d2a-08d9791a1334
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2021 13:58:34.9338
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rzrSfNYiMiYxoWo3Dlwwmyawp7qSt9p8xgVLXJ5dKr4Sqgo2duB+VEJbd8ZdO7gL
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5361
+In-Reply-To: <20210916134154.8764-1-marex@denx.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 15, 2021 at 01:28:47PM +0000, Shameerali Kolothum Thodi wrote:
+On 16/09/2021 15:41, Marek Vasut wrote:
+> Add MODULE_ALIAS for caam and caam_jr modules, so they can be auto-loaded.
 > 
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Horia Geantă <horia.geanta@nxp.com>
+> Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
+> Cc: Krzysztof Kozlowski <krzk@kernel.org>
+> ---
+>  drivers/crypto/caam/ctrl.c | 1 +
+>  drivers/crypto/caam/jr.c   | 1 +
+>  2 files changed, 2 insertions(+)
 > 
-> > From: Jason Gunthorpe [mailto:jgg@nvidia.com]
-> > Sent: 15 September 2021 14:08
-> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > linux-crypto@vger.kernel.org; alex.williamson@redhat.com;
-> > mgurtovoy@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
-> > <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
-> > Jonathan Cameron <jonathan.cameron@huawei.com>; Wangzhou (B)
-> > <wangzhou1@hisilicon.com>
-> > Subject: Re: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
-> > migration
-> > 
-> > On Wed, Sep 15, 2021 at 10:50:37AM +0100, Shameer Kolothum wrote:
-> > > +/*
-> > > + * HiSilicon ACC VF dev MMIO space contains both the functional register
-> > > + * space and the migration control register space. We hide the migration
-> > > + * control space from the Guest. But to successfully complete the live
-> > > + * migration, we still need access to the functional MMIO space assigned
-> > > + * to the Guest. To avoid any potential security issues, we need to be
-> > > + * careful not to access this region while the Guest vCPUs are running.
-> > > + *
-> > > + * Hence check the device state before we map the region.
-> > > + */
-> > 
-> > The prior patch prevents mapping this area into the guest at all,
-> > right?
-> 
-> That’s right. It will prevent Guest from mapping this area.
-> 
-> > So why the comment and logic? If the MMIO area isn't mapped then there
-> > is nothing to do, right?
-> > 
-> > The only risk is P2P transactions from devices in the same IOMMU
-> > group, and you might do well to mitigate that by asserting that the
-> > device is in a singleton IOMMU group?
-> 
-> This was added as an extra protection. I will add the singleton check instead.
-> 
-> > > +static int hisi_acc_vfio_pci_init(struct vfio_pci_core_device *vdev)
-> > > +{
-> > > +	struct acc_vf_migration *acc_vf_dev;
-> > > +	struct pci_dev *pdev = vdev->pdev;
-> > > +	struct pci_dev *pf_dev, *vf_dev;
-> > > +	struct hisi_qm *pf_qm;
-> > > +	int vf_id, ret;
-> > > +
-> > > +	pf_dev = pdev->physfn;
-> > > +	vf_dev = pdev;
-> > > +
-> > > +	pf_qm = pci_get_drvdata(pf_dev);
-> > > +	if (!pf_qm) {
-> > > +		pr_err("HiSi ACC qm driver not loaded\n");
-> > > +		return -EINVAL;
-> > > +	}
-> > 
-> > Nope, this is locked wrong and has no lifetime management.
-> 
-> Ok. Holding the device_lock() sufficient here?
 
-You can't hold a hisi_qm pointer with some kind of lifecycle
-management of that pointer. device_lock/etc is necessary to call
-pci_get_drvdata()
+Since you marked it as RFC, let me share a comment - would be nice to
+see here explanation why do you need module alias.
 
-Jason
+Drivers usually do not need module alias to be auto-loaded, unless the
+subsystem/bus reports different alias than one used for binding. Since
+the CAAM can bind only via OF, I wonder what is really missing here. Is
+it a MFD child (it's one of cases this can happen)?
+
+
+Best regards,
+Krzysztof
