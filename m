@@ -2,236 +2,158 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 899B0C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 16:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F935C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 16:21:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7335F611C4
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 16:07:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B01A611C4
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 16:21:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235812AbhIQQI7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Sep 2021 12:08:59 -0400
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:30852 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229890AbhIQQI7 (ORCPT
+        id S235276AbhIQQXO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Sep 2021 12:23:14 -0400
+Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:41432
+        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229979AbhIQQXO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Sep 2021 12:08:59 -0400
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18HFwrHn025129;
-        Fri, 17 Sep 2021 16:07:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- subject : from : in-reply-to : date : cc : content-transfer-encoding :
- message-id : references : to : mime-version; s=corp-2021-07-09;
- bh=FbVt8BaQDfjRRtPCNMYAThbkmliiDw7IGKPVVOmSu6E=;
- b=NwO0qPK60w+TCBMOzrbRnp3CUOYcKOOy5FerhIqtjmPuudDhB13QcLwssLr9Dax0S1EM
- rCRaDou7jZ17uXZyUSSMH5t0gzT2Y3Wk84HQ8d7iqzKA0VLqQbdXJHlctV4vq/fTEvFQ
- 4AxnlN9WhAsSvFJuKZGqL8+CFtn33zTnzIzadk3QYM+RU72bQ6VW+EKBQRCvNfzmp9+3
- wNoY2V93OpE1yGK0sjyUv4lAHQavI2kSIeN35pWu2URiLD/8Oix2gb2bakp87d2foUCg
- OaTSpjCXFUsyUSL5zF63VjbtvJQlzm7PieUA3RPp91xZxyI0GJN1JEXluhVScvqREK7J Iw== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- subject : from : in-reply-to : date : cc : content-transfer-encoding :
- message-id : references : to : mime-version; s=corp-2020-01-29;
- bh=FbVt8BaQDfjRRtPCNMYAThbkmliiDw7IGKPVVOmSu6E=;
- b=gf2cNvDyeDuvrmk/tbi01UuLd2ToTW5dm5WdUdbwp/TQbEvWgGSiUIBuPIpE+YiQECIW
- BZUJQlrlOyi1+7y+2suOOIdhRz3mhdAbe5qt0O4DEcz2ASMEKDVWTXXfS62AQL/SmzwL
- GENMYQz6k/B5rZqoQcIU0UBg9y+YE7pDPA0otoKGqKEH9HrQi05by7piRFs8w+i1tYsO
- kTxgWtvwwZgyzFFkaGJc/klW+7cAs0QZhjN2wdsQqHmu0fU7ZP/JiHjgPUvXWNk9r5jc
- Hg1QhXQoOD5YA3+EEjB89yvBXO34s7HZRCHy9kAZzQEOht7RrxT734oGdwEDO4TvIcIQ ug== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3b4u8srt7r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Sep 2021 16:07:05 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 18HFxjX3165380;
-        Fri, 17 Sep 2021 16:07:04 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2100.outbound.protection.outlook.com [104.47.55.100])
-        by userp3020.oracle.com with ESMTP id 3b167x07jt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Sep 2021 16:07:04 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VMDu+fE3+QZOQxLLxMImhMfmbVb3EW+oDuxFNVqenEUv0LgF4IfEE0Nz+gJn25dM+9bCaF5fKE/zQQjxzFaNjGsdstAk8Usyvbb91JMLlCxqKSYK8hYYf/mCVL+rod1IHczjIHkecLNanNAOQBAjPCGUDCYaGeRaSllXYezYQAR1c42fzKhq/CbyenwqJve9D8oFRiK3uulOo2ZWhhos3Ch8I5DbQb09CoNSXotQudQmqx2eZCksEQwkN6OppZ57xGpGeEnBbgRaZhpA3F0CRCZ1fFxaciHJKxBC0rpzHXzjoXVGIIst8gTOn5iRTcBshJP2LhV0oPZR8VAplmIYGw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=FbVt8BaQDfjRRtPCNMYAThbkmliiDw7IGKPVVOmSu6E=;
- b=Q9g9PEZ80dXK3e4QeGJYvF1DXYKgFn9gcv/7jiY1CMfETE4MXsdNmXzptOBy6h+BIMJE63ujmlG+dHqIbh4bfqyM4GaFupnMriliiZpyNCE4W7HM2ENW5gKyADoQWl//cNOaNauTGAtuA5z8vLpDUO9zX/gXWhfUvqblukxZnZhQ0A5jcjurIfIjxhyiXji5wM6jmj3Xnq60BTTMl78YhRnVSOJKxDsYYOCAGpw2d0c7/t2Pjtd8MBCa9F9eHgzM00vT6z2j+4bs7c63lRbw/3DU/RnwdUjv82oZRtdlAlwh6vzK0lHVhvM2jkq2SqCcWIXXm775pD/1gNukn9P1iQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FbVt8BaQDfjRRtPCNMYAThbkmliiDw7IGKPVVOmSu6E=;
- b=V3LOgDfA3m0X9CVGAI3N+sMairG21hSYwSEyCiv0rKs3qAAPywkyXnU33Xd0pQxqHXzoNlIa8D+heu9Qux3AqMRkR/7ARediqHgkPJOGCGCfLj7wVaBwpIr/GXIW9vZHyKfoxY3zaTY0E7B74mXKWYXnDkjkiazLmseJGcAVdaA=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=oracle.com;
-Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
- by CH0PR10MB5372.namprd10.prod.outlook.com (2603:10b6:610:c2::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14; Fri, 17 Sep
- 2021 16:07:02 +0000
-Received: from CH2PR10MB4150.namprd10.prod.outlook.com
- ([fe80::340c:c4d9:1efa:5bc7]) by CH2PR10MB4150.namprd10.prod.outlook.com
- ([fe80::340c:c4d9:1efa:5bc7%8]) with mapi id 15.20.4523.016; Fri, 17 Sep 2021
- 16:07:02 +0000
-Content-Type: text/plain; charset=utf-8
-Subject: Re: [PATCH v6 12/13] integrity: Trust MOK keys if MokListTrustedRT
- found
-From:   Eric Snowberg <eric.snowberg@oracle.com>
-In-Reply-To: <20210917150332.cakrhyxh655e73jo@redhat.com>
-Date:   Fri, 17 Sep 2021 10:06:56 -0600
-Cc:     keyrings@vger.kernel.org,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
+        Fri, 17 Sep 2021 12:23:14 -0400
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id C62FC402CE
+        for <linux-crypto@vger.kernel.org>; Fri, 17 Sep 2021 16:21:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1631895710;
+        bh=G8QlOu8E9SL6+IICPk34QRa2K7n8iVCHf0hLFCHuieI=;
+        h=To:Cc:References:From:Subject:Message-ID:Date:MIME-Version:
+         In-Reply-To:Content-Type;
+        b=GvJQLG2new4os8v5TlxfgQeSXdhbv551v79YIE+20urBrxxMmyTLHoyjwMEGvgMEY
+         6W3AgS8ATwhk3hh9HW1d+ZdknyH59StWaNSa/oPF2STEPA+YKWmibSgpZ2vGN9FRXJ
+         qFgqpMvNY4FzFXN5LoVQMLF0PJSnpOxhv1kNV65q219Anuz13Rhu7KPqvdPvP7ritL
+         zzyc0JNI58EzQFrC2vXqYGDKvhZhYYHKRF9yN1sZWTScCufIl5zeIybRY/cPm5QgH1
+         mKRPCNOy9icwr1Wj9jsYFOkcmIfLB6xXfqmT/sTVlXXwuKsXfC4twr1XSjVeyvfjke
+         1Zh6mKtt4kBOQ==
+Received: by mail-ed1-f69.google.com with SMTP id r23-20020a50d697000000b003d824845066so1125275edi.8
+        for <linux-crypto@vger.kernel.org>; Fri, 17 Sep 2021 09:21:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=G8QlOu8E9SL6+IICPk34QRa2K7n8iVCHf0hLFCHuieI=;
+        b=PNQuMQC6L2op64YIdpU4JHezqEuyNVqlMsdh5X8+/LvJEb2UBbTxh9av4W8A5kRkPX
+         pRjJ0/whzvx2xMycB6fxskfvTp4UHiQ0zBGqUPVv9cYEXNRUcliC5C+D5okZB/bvatzS
+         gNSIraqjPw2JcuzYfpQjyQXR5/LoeP2vE+y64SEs9tW+0TA6XUYWS9SCi0IcZAOJ9Cfi
+         yBWENSLP+LCOSqtgK2udYsckOoQWtYtCaLX0VUSCiNdoX0puGcIix7GD2XoZPx7YmlRc
+         Rbb48aEhkdzVb2XYZauNnobMvtpKk1m6Vv/RRcHh67ebr+Hd8iR87/WnHAGryooTh3I6
+         1SHA==
+X-Gm-Message-State: AOAM530yY+wzp5i+jcLT0ymi8eaGSrw8YHCLvNBvzAmfFXuuW9BB71bg
+        YcNFqlXgMyY4ozlY7vwvmP1cmCIsgiYlSoP5ZVT2g1dRxRMHpTAWxaHRVGIfF4G51a1FfU3mYEg
+        lB4+ew9DTKK4N81gdlwMT1cLl4Sz2jC8LeBX3YuXlhQ==
+X-Received: by 2002:a05:6402:5163:: with SMTP id d3mr13587781ede.220.1631895709583;
+        Fri, 17 Sep 2021 09:21:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx27XqEfhMwAr3nRZ25ngBqNuAAqdiGsgKx6YxVoDWcoyjDwxvkiwLVAC3bveuBw7iVHtU0jQ==
+X-Received: by 2002:a05:6402:5163:: with SMTP id d3mr13587765ede.220.1631895709380;
+        Fri, 17 Sep 2021 09:21:49 -0700 (PDT)
+Received: from [192.168.0.134] (lk.84.20.244.219.dc.cable.static.lj-kabel.net. [84.20.244.219])
+        by smtp.gmail.com with ESMTPSA id jl12sm2452034ejc.120.2021.09.17.09.21.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Sep 2021 09:21:48 -0700 (PDT)
+To:     =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Marek Vasut <marex@denx.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Cc:     "ch@denx.de" <ch@denx.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
-        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
-        scott.branden@broadcom.com, weiyongjun1@huawei.com,
-        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
-        nramas@linux.microsoft.com, lszubowi@redhat.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        James.Bottomley@HansenPartnership.com,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <354B8A37-28BF-4C2E-9FF6-FF00B39B4D06@oracle.com>
-References: <20210914211416.34096-1-eric.snowberg@oracle.com>
- <20210914211416.34096-13-eric.snowberg@oracle.com>
- <20210916221922.xjplaobua2iss2bn@redhat.com>
- <9C5B2B68-5F03-472F-8B17-E0A716C85CF2@oracle.com>
- <20210917150332.cakrhyxh655e73jo@redhat.com>
-To:     Peter Jones <pjones@redhat.com>
-X-Mailer: Apple Mail (2.3273)
-X-ClientProxiedBy: CH2PR16CA0001.namprd16.prod.outlook.com
- (2603:10b6:610:50::11) To CH2PR10MB4150.namprd10.prod.outlook.com
- (2603:10b6:610:ac::13)
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+References: <20210916134154.8764-1-marex@denx.de>
+ <441a7e2e-7ac8-5000-72e0-3793ae7e58d5@canonical.com>
+ <08afb147-07c7-9fbb-4a0c-8a79717b06b7@denx.de>
+ <ea7e5aae-be43-057a-2710-fbcb57d40ddc@nxp.com>
+ <a8900033-d84d-d741-7d72-b266f973e0d6@canonical.com>
+ <bc94681c-58e5-8c6f-42d3-0e51ddd060c7@nxp.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+Subject: Re: [RFC][PATCH] crypto: caam - Add missing MODULE_ALIAS
+Message-ID: <77467cbf-afad-d7e1-5042-569d5a276c20@canonical.com>
+Date:   Fri, 17 Sep 2021 18:21:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Received: from [172.16.177.128] (184.60.195.210) by CH2PR16CA0001.namprd16.prod.outlook.com (2603:10b6:610:50::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14 via Frontend Transport; Fri, 17 Sep 2021 16:07:00 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 333770a9-dadc-4a42-2e67-08d979f52f35
-X-MS-TrafficTypeDiagnostic: CH0PR10MB5372:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH0PR10MB5372CD11B770D3E190339BF587DD9@CH0PR10MB5372.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DMHTxXUV9uPDKGi2URYIhWd+wSiaqLj7BEHzXVVIQATzqmzElXyFR2dMa7839RHxtcn9pVO/Mg+kqe4/9fNL+6nY0dabTCxNuXBsL2jPipmsCRV7Wmz5IIGUxNDwYqirI+j2ODGxEhpJopBaf0aHpsq4jQpUl0Djtg6VKupzOtaMWFrs4vEWhRLlj6wJqtDUHgv8Bttqmwww8YNE/6EnHgJ666Lovk/WZQWCeYxNzqHPOxohUA6oknRF65hYJLixoPhvQkKcP9UsiNSzPttRtdauSoAZhF2vCj/SNyq8cNfm2+oYUfU630jqY98sDJtN9alcFoqzVuBJkBGXgv9kHJpTzUECJIMFKkw2WOZBiZvLyZUqQ2NGBBGcjfmkx3dSswTTuv+z/rG4yhzDKxklUWeSnbWH/Hu5oQl2PYVv8DYMD/cF9Ui3CBKWfm0VaDr/BWLmBWu4TPgpBlSNs8YN4j/tHPOxVWOT9ZpjbTyXxw8mpeIuKYwDmqi9hCM67LfTsbJx+7j+dShJ7B3lhuyQsvJKqc8yKiiizZjrE7Vv8E2VaEaMLuCn/602CKJ3hLjrRb50cRJNxIUIJqcyqzTTP0zTnc8kUWPVQRpyH8cZb0NTLpYf/3Jcnk/Cz0ss7f2MhkRhOx113JAfHHzw367AQ2hVQFGGpnjG5SGrxxh7W3P22jkFHEvo27N3lzT2QRPIwcHrFra6LHjbwXiHk71pafS4tV8wXJ0oKTYlT7dXyIHuuk15HtaIb8Pv9KIi+jBu4rfqW7frPTw54mREdb+0r521KqpOA8P41kHfQm+qv2tf9YWbMm7uYqQqk0WFpr28
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(136003)(376002)(396003)(39860400002)(366004)(53546011)(6486002)(38100700002)(54906003)(6666004)(2616005)(956004)(36756003)(16576012)(316002)(38350700002)(86362001)(8936002)(7416002)(66556008)(26005)(66946007)(52116002)(966005)(66476007)(5660300002)(478600001)(4326008)(186003)(2906002)(33656002)(83380400001)(8676002)(6916009)(44832011)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a0NZSWNkdDZJUkozRUVxZTlxdGhhUkpyM25idEUwY0s5dWx2MEtTYzRCUGlm?=
- =?utf-8?B?VEVqSkZSWWVXd3RSb0VibVBhQzN1V1VpMlVHdEZYRmxDUmE0NE5aZDlLV2xh?=
- =?utf-8?B?ZDcxT3ZLUkVrVUxyd3p5V3I1MmJYVXo2ajhZcitZUEZEZHhzZTlFTUxpR2Z1?=
- =?utf-8?B?c0VyWUtyeFcwbUd4MEo2VHp6QndRS01rYVNuL0N6eTJEREY3RmxFNzV4ZURm?=
- =?utf-8?B?ak91Z3pqbGRNQXBSUDRDOXpBOGllTTdnU2tLZGJ1NUFpU29Xd3hkbC9hZHBu?=
- =?utf-8?B?ZGM2ZXdTSDZVMnVJQ3RnSWtDc0laUDE3dWs3RTJHOTFSdEFKTlJ6YndKQzUx?=
- =?utf-8?B?a1E0VU41SzVyMDB1Y3ZwRU41VHg4VEJIWXV5UUM5Y0wwT2FvNHBIbWU0Mjls?=
- =?utf-8?B?cUdkYnF0aGFMNXRGM2YxdElxN09IQVlJSHcveTJQR2s4Q28rZVdEdGZXVkw3?=
- =?utf-8?B?ekFwS3dJZktudUtyT2J6RjNFUjhheVplL0NSWkVMZ3M1NTJnWWZLVnI4bWxY?=
- =?utf-8?B?VWZYd2phOUZqc3BDY3h4ZStKNTZsTTN2enc0V09qYnBNaHVXdVdCVlVZTnpK?=
- =?utf-8?B?WEtyN1UxMjdtWHB6ZVFQdHJLcXppbTV2aVMyWVdYUW5IaDV6ZlZRdEJOZE9C?=
- =?utf-8?B?REpVamVsUWRWcWZxV1g1YndVWUFCY2JSaHNDNW10QUllS21RRFo3NW11T2xN?=
- =?utf-8?B?c0ttcGJaeU93VmZiTlBCQ0RJTXR3YmVuU1hSMnhqMitRRnhHYzZXYXl2Vldt?=
- =?utf-8?B?SHhrakxNY29UUi9mVVBURHYxWTZJb1JaWkorSGs5TFA0WXhtY3N5aTlMeDdC?=
- =?utf-8?B?N0U1OFloMTZRaE5zZGxRU1pRdlloNWhDWndSVGhMTjFHSHFJejl1NlBhRndO?=
- =?utf-8?B?enpkVGxHNVlYZFFVNmhkS1ZjNGZyTzRITmt3aVNjRXIyczJiV0ZabUxuOTJv?=
- =?utf-8?B?Zy90NmFwUjliYjdTVUNxbnBWc05Nb2w0R2QrdG1GWC9xNlBJcm0zN3FQSXBx?=
- =?utf-8?B?ZGlxK01lbkF3d2JHaUJyUnE2SWxTMGJKaUFVa0MvcWNrQTZCYjl6dlF2V1RP?=
- =?utf-8?B?Skg4cnNEVTFJaCtTM1Bsc1hwR2RVazJXR0NOeDZOYldIamNNN3krKy9VSUM0?=
- =?utf-8?B?TDZqLzg2aFM5c214VDY1bmdQZ3FXdVdWRVhoV1BNRmJhSXNjMHJMTERkWWFK?=
- =?utf-8?B?VkVsM2VicUJkVGlSV25FWnpkS0pZQmF6SjVsUFh3VUxRQ0E3MG9NamlwaHRM?=
- =?utf-8?B?SHIwS3NpWS9mOC9mSVA4ZGU1N3BuU0ZlbEJjUngxR3U2c3pkREMxZHIwNVli?=
- =?utf-8?B?RnhRNE13K25Ud05XYUNXRGlvcS9pbHVwQXJvRWVKWTRuRW4rM1ZZdVhZeEth?=
- =?utf-8?B?Z1dnQlZXNGgrTkw5cW05V092bjd3d3RCR28ySWJoM0x4bE1LVUtxaWZWNVpr?=
- =?utf-8?B?UXp5RnYxbjJGZUlGRFZHS0JlM0t1S0w5MS9xdW5LUnBzYXl2ZXJSbUVBbk1p?=
- =?utf-8?B?N09odkhGemx6VFg1OVJ3ZFEwYVF6WTFLbmVYRjU5ZVU1ZVFNYzJiNXU3b2M1?=
- =?utf-8?B?RzlZTHIrZnhjbVZ1R1hiOXMzbm1DWVJVNGJlK1pFcCtITG9PbVBYdDVjNmda?=
- =?utf-8?B?a2ZuSTUvNExFaXQvRS82Vi9sM2o0alhGQzdqWGdudXB0cFRTbVY2NGgzTGlq?=
- =?utf-8?B?OVZuUWdHL2N6aWR5b2RvYWMrQVdyT0dxVkp6U0lwYXhtbTNTMDExdE9aM0FU?=
- =?utf-8?Q?2T3j0PknW0hpbYvLquaHqAZY4dM7yaZKdpsRJef?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 333770a9-dadc-4a42-2e67-08d979f52f35
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2021 16:07:01.9182
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jV65e3n6HnyZk9nH+Te+qxhoa7xvCzvuUYVpH916RQoiluQKHOS7oTs3dptgLRIwwOlg+PSuvaa/uqZ2PwhQDySAzb0yn8rOjCgB4+SOTaM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB5372
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10110 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0 suspectscore=0
- phishscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109030001
- definitions=main-2109170098
-X-Proofpoint-ORIG-GUID: dPHUseFi8HFJo1MMPKmlw-5v6rXxuyWv
-X-Proofpoint-GUID: dPHUseFi8HFJo1MMPKmlw-5v6rXxuyWv
+In-Reply-To: <bc94681c-58e5-8c6f-42d3-0e51ddd060c7@nxp.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 17/09/2021 16:44, Horia Geantă wrote:
+> On 9/17/2021 1:33 PM, Krzysztof Kozlowski wrote:
+>> On 17/09/2021 11:51, Horia Geantă wrote:
+>>> On 9/16/2021 5:06 PM, Marek Vasut wrote:
+>>>> On 9/16/21 3:59 PM, Krzysztof Kozlowski wrote:
+>>>>> On 16/09/2021 15:41, Marek Vasut wrote:
+>>>>>> Add MODULE_ALIAS for caam and caam_jr modules, so they can be auto-loaded.
+>>>>>>
+>>>>>> Signed-off-by: Marek Vasut <marex@denx.de>
+>>>>>> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+>>>>>> Cc: Horia Geantă <horia.geanta@nxp.com>
+>>>>>> Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
+>>>>>> Cc: Krzysztof Kozlowski <krzk@kernel.org>
+>>>>>> ---
+>>>>>>   drivers/crypto/caam/ctrl.c | 1 +
+>>>>>>   drivers/crypto/caam/jr.c   | 1 +
+>>>>>>   2 files changed, 2 insertions(+)
+>>>>>>
+>>>>>
+>>>>> Since you marked it as RFC, let me share a comment - would be nice to
+>>>>> see here explanation why do you need module alias.
+>>>>>
+>>>>> Drivers usually do not need module alias to be auto-loaded, unless the
+>>>>> subsystem/bus reports different alias than one used for binding. Since
+>>>>> the CAAM can bind only via OF, I wonder what is really missing here. Is
+>>>>> it a MFD child (it's one of cases this can happen)?
+>>>>
+>>>> I noticed the CAAM is not being auto-loaded on boot, and then I noticed 
+>>>> the MODULE_ALIAS fixes cropping up in the kernel log, but I couldn't 
+>>>> find a good documentation for that MODULE_ALIAS. So I was hoping to get 
+>>>> a feedback on it.
+>>>>
+>>> What platform are you using?
+>>>
+>>> "make modules_install" should take care of adding the proper aliases,
+>>> relying on the MODULE_DEVICE_TABLE() macro in the caam, caam_jr drivers.
+>>>
+>>> modules.alias file should contain:
+>>> alias of:N*T*Cfsl,sec4.0C* caam
+>>> alias of:N*T*Cfsl,sec4.0 caam
+>>> alias of:N*T*Cfsl,sec-v4.0C* caam
+>>> alias of:N*T*Cfsl,sec-v4.0 caam
+>>> alias of:N*T*Cfsl,sec4.0-job-ringC* caam_jr
+>>> alias of:N*T*Cfsl,sec4.0-job-ring caam_jr
+>>> alias of:N*T*Cfsl,sec-v4.0-job-ringC* caam_jr
+>>> alias of:N*T*Cfsl,sec-v4.0-job-ring caam_jr
+>>
+>> Marek added a platform alias which is not present here on the list
+>> (because there are no platform device IDs). The proper question is who
+>> requests this device via a platform match? Who sends such event?
+>>
+> AFAICS the platform bus adds the "platform:" alias to uevent env.
+> in its .uevent callback - platform_uevent().
+> 
+> When caam (platform) device is added, the uevent is generated with this env.,
+> which contains both OF-style and "platform:" modaliases.
 
-> On Sep 17, 2021, at 9:03 AM, Peter Jones <pjones@redhat.com> wrote:
->=20
-> On Thu, Sep 16, 2021 at 08:00:54PM -0600, Eric Snowberg wrote:
->>=20
->>> On Sep 16, 2021, at 4:19 PM, Peter Jones <pjones@redhat.com> wrote:
->>>=20
->>> On Tue, Sep 14, 2021 at 05:14:15PM -0400, Eric Snowberg wrote:
->>>> +/*
->>>> + * Try to load the MokListTrustedRT UEFI variable to see if we should=
- trust
->>>> + * the mok keys within the kernel. It is not an error if this variabl=
-e
->>>> + * does not exist.  If it does not exist, mok keys should not be trus=
-ted
->>>> + * within the machine keyring.
->>>> + */
->>>> +static __init bool uefi_check_trust_mok_keys(void)
->>>> +{
->>>> +	efi_status_t status;
->>>> +	unsigned int mtrust =3D 0;
->>>> +	unsigned long size =3D sizeof(mtrust);
->>>> +	efi_guid_t guid =3D EFI_SHIM_LOCK_GUID;
->>>> +	u32 attr;
->>>> +
->>>> +	status =3D efi.get_variable(L"MokListTrustedRT", &guid, &attr, &size=
-, &mtrust);
->>>=20
->>> This should use efi_mokvar_entry_find("MokListTrustedRT") instead,
->>> similar to how load_moklist_certs() does.  It's a *much* more reliable
->>> mechanism.  We don't even need to fall back to checking for the
->>> variable, as any version of shim that populates this supports the confi=
-g
->>> table method.
->>=20
->> I=E2=80=99ll change this in v7, thanks.
->=20
-> We do also need to figure out a path forward for something like Dimitri
-> Ledkov's MokListX patch[0] from May, though it doesn't necessarily need
-> to hold up this patch set.  It looks like your patches will change the
-> structure of the keyrings it needs to apply to, but I don't see a reason
-> it wouldn't be conditional on the same MokListTrustedRT variable.  Any
-> thoughts?
->=20
-> [0] https://lore.kernel.org/lkml/20210512153100.285169-1-dimitri.ledkov@c=
-anonical.com/
->=20
+I am not saying about theoretical case, I know that platform bus will
+send platform uevent. How did this device end up in platform bus so this
+uevent is being sent? It should be instantiated from OF on for example
+amba bus or directly from OF FDT scanning.
 
-I had a little different approach I was going to send for this problem, but=
- dropped it=20
-after I saw Dimitri=E2=80=99s patch.  Yes, we will need to figure out a way=
- to merge the two. =20
-But I don=E2=80=99t see that being too difficult or them being incompatible=
- with one another.
+Therefore I have the same question - who requests device via a platform
+match? Is it used out-of-tree in different configuration?
 
+Best regards,
+Krzysztof
