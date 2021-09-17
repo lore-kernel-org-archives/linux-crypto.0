@@ -2,182 +2,186 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FA7DC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 17:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69669C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 18:02:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE51D60F21
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 17:30:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 401CA61248
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Sep 2021 18:02:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232954AbhIQRbl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Sep 2021 13:31:41 -0400
-Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:43668
-        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231855AbhIQRbl (ORCPT
+        id S231517AbhIQSEE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Sep 2021 14:04:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47308 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230115AbhIQSED (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Sep 2021 13:31:41 -0400
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 5FCF740267
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Sep 2021 17:30:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1631899816;
-        bh=3S5XrNnYw9mQJ4cjT/e6jDqp9tZbCCKdg1eBLA71yrk=;
-        h=Subject:From:To:Cc:References:Message-ID:Date:MIME-Version:
-         In-Reply-To:Content-Type;
-        b=UVqnVfwwvYwT/zJLKaa+0p2a6PeBRTM39+n+05gVWgCbY6mDdt0oLzN2C1nQ9Oto0
-         HiUlJuUwp9XxwpzHZLrjB4SLnYgAaKsKM+w249drt/Gou3i6rGFzpOm3UkN+RnMixG
-         Zq9KHOAfT/7QjGyEkchayA+UIm5UZJkRI9+cgKWJSm4fErKX6OGv9nNPmN0RzO54XZ
-         O/Vz4C/TugdtFBMWzBPsEQ2ouLDtmfpUgf3tkV6kZa38PQ0dpOEqhAktC1HHy+uFyV
-         TulIteDXOps4962wTqoX1SXaijXwY9TRT5BGfcce2aovc3y2ZVC69t2fvCKAy/V0m6
-         KyzKj2gsM6PdA==
-Received: by mail-ed1-f69.google.com with SMTP id j6-20020aa7de86000000b003d4ddaf2bf9so9730496edv.7
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Sep 2021 10:30:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3S5XrNnYw9mQJ4cjT/e6jDqp9tZbCCKdg1eBLA71yrk=;
-        b=iE7E+ACB2D73LEbLa0W/ablyJl8AxjNir8te+AL/TdRg1eSLjjgHwvZ/almCk0TlgD
-         HQO7cp/eIyXNKxKUgxjLUz2odVq/nUaSematVpNmTkBUKKWq+rfpJ1hUq8XxMWYzp42V
-         p9fbsr30snaBuCmahiJfwKZAMiJ8DSBHGICAnuM0d1DW4WIQrsGKoiSIXetT8VYT5fzP
-         xwEedSSvKrX4qpl+u8bAi87h2XUMhnpA0Lin8ct775E3BrsZeob/l3xKu/UtDqcracrr
-         N9JEFq9dPUC0gcC4FD/J7cNx5S6w4paO8l/RJCFXD5hK7DVF6Wi1J6w6DY1KFD+DJak6
-         AZ0w==
-X-Gm-Message-State: AOAM5328LyUcfHAr48VROS/B43Ad4qT5t9IcpDd1yx+D4Q/9/TmUf9PU
-        CrrYcR5cfggY/Do+g6W2JwVTR0uiw6YDSvek8p/vRL26nF+3Ahm0xNHcMgLcJFGEJpafFvW0Jz3
-        78RY4+vg92K055L1kBBzXY8k4WpHQe9NIK9h+BxZLyw==
-X-Received: by 2002:a17:906:1901:: with SMTP id a1mr13618794eje.129.1631899812917;
-        Fri, 17 Sep 2021 10:30:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy6uxFprEP5pdPGxSMEoP4e68kWfQH6+/pyRv3QCyfNr+QpYMA4KCw6ooFAEX/F6xr37ENCKA==
-X-Received: by 2002:a17:906:1901:: with SMTP id a1mr13618782eje.129.1631899812761;
-        Fri, 17 Sep 2021 10:30:12 -0700 (PDT)
-Received: from [192.168.2.211] (lk.84.20.244.219.dc.cable.static.lj-kabel.net. [84.20.244.219])
-        by smtp.gmail.com with ESMTPSA id n15sm2926625edw.70.2021.09.17.10.30.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Sep 2021 10:30:12 -0700 (PDT)
-Subject: Re: [RFC][PATCH] crypto: caam - Add missing MODULE_ALIAS
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-To:     =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        Marek Vasut <marex@denx.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Cc:     "ch@denx.de" <ch@denx.de>,
+        Fri, 17 Sep 2021 14:04:03 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18HHTsnv017258;
+        Fri, 17 Sep 2021 14:02:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=6dl0XdISYgflLHA8V5h7HYVl7CaFpcLBWAuWqzylDms=;
+ b=sTobmfwgVTNOV/NRtxCApV+FSlmKV5v/M3S9hvq3zHx0OPlo/PhPGm9HnC+1xLNFzOvi
+ p/feHcH57Lf/MUuc9W0liRw7y51JFu1lVsg702HTyHC0qLmNoNQWzLBeKD6Iw7inKIrZ
+ YL+OQN9yInH/Z9+KQmbuSeCrf+4x5fIVJW7ivxOBIw0aJZd2qNmJcbtWuuKZsl/eEH4N
+ jx6Gw6AFwYYU0sG8qGZZF4skO+jGIF9k5lv4GuL03GXIOsqhB+YxVb0vCz6+tazIPWtQ
+ hsvs7jciwTZ3h5kdgHnjD6M7HCDuf9FcmMYv9W5XMdzi306CunRPRfUu4qW1gxPQUI2A 3g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b4yf5gpkj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Sep 2021 14:02:17 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18HHnpBA022627;
+        Fri, 17 Sep 2021 14:02:16 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b4yf5gpj6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Sep 2021 14:02:16 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18HHqYZ4014044;
+        Fri, 17 Sep 2021 18:02:13 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 3b0kqksh93-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Sep 2021 18:02:13 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18HI2BsQ54329800
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Sep 2021 18:02:11 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4403B11C05C;
+        Fri, 17 Sep 2021 18:02:11 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A30BD11C06E;
+        Fri, 17 Sep 2021 18:02:06 +0000 (GMT)
+Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.166.232])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 17 Sep 2021 18:02:06 +0000 (GMT)
+Message-ID: <12efec9ce26b0f372653935379dc8ebfd6086804.camel@linux.ibm.com>
+Subject: Re: [PATCH v6 00/13] Enroll kernel keys thru MOK
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Eric Snowberg <eric.snowberg@oracle.com>,
+        Nayna <nayna@linux.vnet.ibm.com>
+Cc:     keyrings@vger.kernel.org,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-References: <20210916134154.8764-1-marex@denx.de>
- <441a7e2e-7ac8-5000-72e0-3793ae7e58d5@canonical.com>
- <08afb147-07c7-9fbb-4a0c-8a79717b06b7@denx.de>
- <ea7e5aae-be43-057a-2710-fbcb57d40ddc@nxp.com>
- <a8900033-d84d-d741-7d72-b266f973e0d6@canonical.com>
- <bc94681c-58e5-8c6f-42d3-0e51ddd060c7@nxp.com>
- <77467cbf-afad-d7e1-5042-569d5a276c20@canonical.com>
-Message-ID: <b1a68e04-b0ce-9610-9992-6eb2f110d36f@canonical.com>
-Date:   Fri, 17 Sep 2021 19:30:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-MIME-Version: 1.0
-In-Reply-To: <77467cbf-afad-d7e1-5042-569d5a276c20@canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        "David S . Miller" <davem@davemloft.net>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>, keescook@chromium.org,
+        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
+        scott.branden@broadcom.com, weiyongjun1@huawei.com,
+        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
+        nramas@linux.microsoft.com, lszubowi@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>
+Date:   Fri, 17 Sep 2021 14:02:05 -0400
+In-Reply-To: <37D6AC4A-372D-497A-AF97-CEA03EFC9BBA@oracle.com>
+References: <20210914211416.34096-1-eric.snowberg@oracle.com>
+         <7e83a42f-22ff-350a-2017-d286b1b1b02c@linux.vnet.ibm.com>
+         <37D6AC4A-372D-497A-AF97-CEA03EFC9BBA@oracle.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: YXy4Tj_1a00UooTNj6_41O1SpLTr5v-1
+X-Proofpoint-ORIG-GUID: ZrGZZcum32u3kchhxHKbi9J7MPo0oO7l
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-17_07,2021-09-17_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 phishscore=0 priorityscore=1501 adultscore=0 suspectscore=0
+ bulkscore=0 lowpriorityscore=0 mlxscore=0 impostorscore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109170109
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 17/09/2021 18:21, Krzysztof Kozlowski wrote:
-> On 17/09/2021 16:44, Horia Geantă wrote:
->> On 9/17/2021 1:33 PM, Krzysztof Kozlowski wrote:
->>> On 17/09/2021 11:51, Horia Geantă wrote:
->>>> On 9/16/2021 5:06 PM, Marek Vasut wrote:
->>>>> On 9/16/21 3:59 PM, Krzysztof Kozlowski wrote:
->>>>>> On 16/09/2021 15:41, Marek Vasut wrote:
->>>>>>> Add MODULE_ALIAS for caam and caam_jr modules, so they can be auto-loaded.
->>>>>>>
->>>>>>> Signed-off-by: Marek Vasut <marex@denx.de>
->>>>>>> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->>>>>>> Cc: Horia Geantă <horia.geanta@nxp.com>
->>>>>>> Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
->>>>>>> Cc: Krzysztof Kozlowski <krzk@kernel.org>
->>>>>>> ---
->>>>>>>   drivers/crypto/caam/ctrl.c | 1 +
->>>>>>>   drivers/crypto/caam/jr.c   | 1 +
->>>>>>>   2 files changed, 2 insertions(+)
->>>>>>>
->>>>>>
->>>>>> Since you marked it as RFC, let me share a comment - would be nice to
->>>>>> see here explanation why do you need module alias.
->>>>>>
->>>>>> Drivers usually do not need module alias to be auto-loaded, unless the
->>>>>> subsystem/bus reports different alias than one used for binding. Since
->>>>>> the CAAM can bind only via OF, I wonder what is really missing here. Is
->>>>>> it a MFD child (it's one of cases this can happen)?
->>>>>
->>>>> I noticed the CAAM is not being auto-loaded on boot, and then I noticed 
->>>>> the MODULE_ALIAS fixes cropping up in the kernel log, but I couldn't 
->>>>> find a good documentation for that MODULE_ALIAS. So I was hoping to get 
->>>>> a feedback on it.
->>>>>
->>>> What platform are you using?
->>>>
->>>> "make modules_install" should take care of adding the proper aliases,
->>>> relying on the MODULE_DEVICE_TABLE() macro in the caam, caam_jr drivers.
->>>>
->>>> modules.alias file should contain:
->>>> alias of:N*T*Cfsl,sec4.0C* caam
->>>> alias of:N*T*Cfsl,sec4.0 caam
->>>> alias of:N*T*Cfsl,sec-v4.0C* caam
->>>> alias of:N*T*Cfsl,sec-v4.0 caam
->>>> alias of:N*T*Cfsl,sec4.0-job-ringC* caam_jr
->>>> alias of:N*T*Cfsl,sec4.0-job-ring caam_jr
->>>> alias of:N*T*Cfsl,sec-v4.0-job-ringC* caam_jr
->>>> alias of:N*T*Cfsl,sec-v4.0-job-ring caam_jr
->>>
->>> Marek added a platform alias which is not present here on the list
->>> (because there are no platform device IDs). The proper question is who
->>> requests this device via a platform match? Who sends such event?
->>>
->> AFAICS the platform bus adds the "platform:" alias to uevent env.
->> in its .uevent callback - platform_uevent().
->>
->> When caam (platform) device is added, the uevent is generated with this env.,
->> which contains both OF-style and "platform:" modaliases.
+On Thu, 2021-09-16 at 19:55 -0600, Eric Snowberg wrote:
+> > On Sep 16, 2021, at 2:03 PM, Nayna <nayna@linux.vnet.ibm.com> wrote:
+> > 
+> > 
+> > On 9/14/21 5:14 PM, Eric Snowberg wrote:
+> >> Back in 2013 Linus requested a feature to allow end-users to have the
+> >> ability "to add their own keys and sign modules they trust". This was
+> >> his *second* order outlined here [1]. There have been many attempts
+> >> over the years to solve this problem, all have been rejected.  Many
+> >> of the failed attempts loaded all preboot firmware keys into the kernel,
+> >> including the Secure Boot keys. Many distributions carry one of these
+> >> rejected attempts [2], [3], [4]. This series tries to solve this problem
+> >> with a solution that takes into account all the problems brought up in
+> >> the previous attempts.
+> >> 
+> >> On UEFI based systems, this series introduces a new Linux kernel keyring
+> >> containing the Machine Owner Keys (MOK) called machine. It also defines
+> >> a new MOK variable in shim. This variable allows the end-user to decide
+> >> if they want to load MOK keys into the machine keyring. Mimi has suggested
+> >> that only CA keys contained within the MOK be loaded into the machine
+> >> keyring. All other certs will load into the platform keyring instead.
+> >> 
+> >> By default, nothing changes; MOK keys are not loaded into the machine
+> >> keyring.  They are only loaded after the end-user makes the decision
+> >> themselves.  The end-user would set this through mokutil using a new
+> >> --trust-mok option [5]. This would work similar to how the kernel uses
+> >> MOK variables to enable/disable signature validation as well as use/ignore
+> >> the db. Any kernel operation that uses either the builtin or secondary
+> >> trusted keys as a trust source shall also reference the new machine
+> >> keyring as a trust source.
+> >> 
+> >> Secure Boot keys will never be loaded into the machine keyring.  They
+> >> will always be loaded into the platform keyring.  If an end-user wanted
+> >> to load one, they would need to enroll it into the MOK.
+> >> 
+> >> Steps required by the end user:
+> >> 
+> >> Sign kernel module with user created key:
+> >> $ /usr/src/kernels/$(uname -r)/scripts/sign-file sha512 \
+> >>    machine_signing_key.priv machine_signing_key.x509 my_module.ko
+> >> 
+> >> Import the key into the MOK
+> >> $ mokutil --import machine_signing_key.x509
+> >> 
+> >> Setup the kernel to load MOK keys into the .machine keyring
+> >> $ mokutil --trust-mok
+> >> 
+> >> Then reboot, the MokManager will load and ask if you want to trust the
+> >> MOK key and enroll the MOK into the MOKList.  Afterwards the signed kernel
+> >> module will load.
+> > 
+> > machine_signing_key.x509 appears to be a code-signing, self-signed key.  It's not a CA key, but the intent of the patchset is to load only CA keys to .machine keyring.
+> > 
+> > Shouldn't there be two steps: one to load the CA key into MOK, and a second one to load the code-signing key which is signed by this CA ?
 > 
-> I am not saying about theoretical case, I know that platform bus will
-> send platform uevent. How did this device end up in platform bus so this
-> uevent is being sent? It should be instantiated from OF on for example
-> amba bus or directly from OF FDT scanning.
-> 
-> Therefore I have the same question - who requests device via a platform
-> match? Is it used out-of-tree in different configuration?
+> I think that would depend on how the end-user wants to do things. If they 
+> are just looking to quickly self-sign their own kernel module, I doubt they 
+> would go through the effort of having two keys.  This is what I tried to 
+> document in the example above. 
 
-I tried to reproduce such situation in case of a board I have with me
-(Exynos5422). I have a platform_driver only with of_device_id table. The
-driver is built as module. In my DTS the device node is like
-(exynos5.dtsi and device is modified exynos-chipid to be a module):
+Thank you for providing the example.  We've spent quite a bit of time
+discussing CA keys stored in the MOK db being the new root(s) of trust.
+While other certificates signed by the new root(s) of trust would be
+added to the secondary or IMA keyrings.
 
-       soc: soc {
-                compatible = "simple-bus";
-                #address-cells = <1>;
-                #size-cells = <1>;
-                ranges;
+At this point, the patch descriptions, and probably code, are written
+in terms of CA keys stored in the MOK db, which the self signed
+certificate restriction does not require.  With this design, these self
+signed certs may be loaded directly onto the IMA keyring.  That's a
+problem.  To fix the discrepancy between the cover letter, patch
+descriptions and code, all that is needed is to verify that the self-
+signed cert is in fact a CA.
 
-                chipid: chipid@10000000 {
-                        compatible = "samsung,exynos4210-chipid";
-                        reg = <0x10000000 0x100>;
-                };
+thanks,
 
-		...
-	};
+Mimi
 
-The module was properly autoloaded (via OF aliases/events) and device
-was matched.
-
-Best regards,
-Krzysztof
