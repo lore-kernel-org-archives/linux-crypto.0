@@ -2,225 +2,141 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07DACC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 16:17:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB90C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 16:26:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA96160F70
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 16:17:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38CC560FA0
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 16:26:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239661AbhITQTF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Sep 2021 12:19:05 -0400
-Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:47580
-        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239342AbhITQSQ (ORCPT
+        id S231978AbhITQ2E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Sep 2021 12:28:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56024 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229914AbhITQ2D (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Sep 2021 12:18:16 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 494553F31E
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Sep 2021 16:16:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1632154608;
-        bh=03AHy1GXpBpIsBLZI17x4gh1SqLVZT946YWIbxYrchQ=;
-        h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-         In-Reply-To:Content-Type;
-        b=HCiSx2dGTUbX+Tue5Xd+2etzUg/BOLyTcV7v7CcNkxnn9m2P4x12n2t1br/kTxQCr
-         jT+DO8CKVq7DFVwv3RSgXYsRh4DI15NT2xX4+qzofcNXqjrPrJfOTOafWNc80aGPM/
-         wkHsIfgh+RKnMUyJQVTniM1JvOAxKL3M7XoOEEL2wQW0aPyeTNqk37kmS+Lz9Z1f87
-         rID30yDGTdISv8GjbgfVLtQkjHYBw6OB4u0uYdm8cqX4vhxCJNJ4WDhfvMfUlQo28F
-         L/zG8hu6BlcZjyL6KPZxnz+OkOklGkHHybWQVhUIf0mFBNgoTt/53cofnu5qPrkKw9
-         PLaKA1id7eC/Q==
-Received: by mail-wr1-f69.google.com with SMTP id v1-20020adfc401000000b0015e11f71e65so6559938wrf.2
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Sep 2021 09:16:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=03AHy1GXpBpIsBLZI17x4gh1SqLVZT946YWIbxYrchQ=;
-        b=5Akg6isMhi1GsHYU6k9fSCMe3MoKqFnA8QXuWxaVb1De5UtkSvYJL9HmMJrincVUZi
-         mLG9aYdfKfbRwAoom04EDOsKQjTOJhxtbHP9I27+j8Qay37hLJtKsPw/EYENRHTV5vIU
-         FmE5AM6BAElCOXeQb5H0PYI0U/7W8RkClkAGHYtFlZn7u06z0zcCMSGGE6xC9LIUX6Sc
-         3nUl1zNL7QyjHVEMimjTIZtA7+scuG0T3WwI9fPrXOqR2FrKB9GfcvnpoSFW+gjOm3AR
-         tftJBjqhuH7RSOJGyscfHBwzRS/x0KeTZFqlPjnmPnXlKhl4yxG5in+k2sTjZEbduQK0
-         0zKw==
-X-Gm-Message-State: AOAM531H5LP53Tr8FyoDP2oBeCSp5tGYfcK/VxA+bKIz7BVEGN1uWD3Q
-        VJQiUMCUOy8KLxUO99MbxsuPLR+TgCQXsHTMc/94PC96rFtXfrsivQrsSkCweZopE/7yj55G+uC
-        mdIacQaE7g6I77bzdhdiaaBQgb4etdsGgNJAallTglA==
-X-Received: by 2002:adf:f187:: with SMTP id h7mr11447003wro.115.1632154607948;
-        Mon, 20 Sep 2021 09:16:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzchoLAxIYGnIAR3qsuUxFxUHhxjYZWRRPJnjXppSQmgETfziCK3dHRUgdPjXFiLawxrWIg0w==
-X-Received: by 2002:adf:f187:: with SMTP id h7mr11446971wro.115.1632154607727;
-        Mon, 20 Sep 2021 09:16:47 -0700 (PDT)
-Received: from [192.168.2.20] (lk.84.20.244.219.dc.cable.static.lj-kabel.net. [84.20.244.219])
-        by smtp.gmail.com with ESMTPSA id j7sm20461169wrr.27.2021.09.20.09.16.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Sep 2021 09:16:47 -0700 (PDT)
-Subject: Re: [RFC][PATCH] crypto: caam - Add missing MODULE_ALIAS
-To:     Claudius Heine <ch@denx.de>, Marek Vasut <marex@denx.de>,
-        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-References: <20210916134154.8764-1-marex@denx.de>
- <441a7e2e-7ac8-5000-72e0-3793ae7e58d5@canonical.com>
- <08afb147-07c7-9fbb-4a0c-8a79717b06b7@denx.de>
- <ea7e5aae-be43-057a-2710-fbcb57d40ddc@nxp.com>
- <a8900033-d84d-d741-7d72-b266f973e0d6@canonical.com>
- <bc94681c-58e5-8c6f-42d3-0e51ddd060c7@nxp.com>
- <77467cbf-afad-d7e1-5042-569d5a276c20@canonical.com>
- <b1a68e04-b0ce-9610-9992-6eb2f110d36f@canonical.com>
- <04c9705b-9fd8-dde1-33ee-fa58aad96d4a@denx.de>
- <a690721b-072b-203f-3b30-f2d2b8ba6996@denx.de>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-Message-ID: <47078f1a-8314-5c6d-d4e8-dfa400ba35d1@canonical.com>
-Date:   Mon, 20 Sep 2021 18:16:46 +0200
+        Mon, 20 Sep 2021 12:28:03 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18KEqS38015556;
+        Mon, 20 Sep 2021 12:25:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=lpNrgIClxc6uLVdhpRODsqe2CwZ4gaIwdYn9KTYhxjg=;
+ b=bVV+d8fw8Nsko5z3lEo0WjfF0gGd2ah77lwsXtvHiw6F0OBC/kS4Ylbl5AZ2CCjFGXs9
+ GIb3BsRtQW90T9LkKV15pvIKLZILxG0nAwa+rRWiV3JdDWB1UR4WXhueGoQISGhBngo6
+ h/QKWVZWxGa8oaNj6yxFq9tBDVsYn1/hksAJl3gx8UV8pAujaLkKXbvpE9qgvkjJ9y4z
+ fIi/k9KWL+s8D9dmkErl0WNh9phnpdcXZXUYgBKbPGXB2fjxzi8mZD0YZGwG0VSk/WKL
+ xPyLLYmzKNfprZShUWYMmPTzk0Ir0ZrNDBVKjQzL/cIuNoKgjMbHytZHp2kDmbg9nRbI OA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3b5w06yf5j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Sep 2021 12:25:21 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18KEqVOE016056;
+        Mon, 20 Sep 2021 12:25:20 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3b5w06yf53-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Sep 2021 12:25:20 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18KGD58D026265;
+        Mon, 20 Sep 2021 16:25:20 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma01wdc.us.ibm.com with ESMTP id 3b57r9ukv2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 20 Sep 2021 16:25:20 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18KGPJ2D26411338
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Sep 2021 16:25:19 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 24B07136053;
+        Mon, 20 Sep 2021 16:25:19 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 94A2F13606A;
+        Mon, 20 Sep 2021 16:25:18 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon, 20 Sep 2021 16:25:18 +0000 (GMT)
+Subject: Re: [PATCH] crypto: ecc: fix CRYPTO_DEFAULT_RNG dependency
+To:     Arnd Bergmann <arnd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vitaly Chikunov <vt@altlinux.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ardb@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210920100551.1568868-1-arnd@kernel.org>
+From:   Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <599e065b-d4c7-957c-ed54-c88217f9a5af@linux.ibm.com>
+Date:   Mon, 20 Sep 2021 12:25:18 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <a690721b-072b-203f-3b30-f2d2b8ba6996@denx.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210920100551.1568868-1-arnd@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 1XavsnLjDrmIQgQHz4UfxU8VvvwVcUlU
+X-Proofpoint-GUID: CUpOHnl2rtn0oJEaGWLg0fi7N-xIKen-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-20_07,2021-09-20_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 adultscore=0 clxscore=1011 suspectscore=0
+ mlxlogscore=999 mlxscore=0 malwarescore=0 impostorscore=0 spamscore=0
+ phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109200100
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 20/09/2021 18:09, Claudius Heine wrote:
-> Hi,
-> 
-> On 2021-09-20 15:43, Marek Vasut wrote:
->> On 9/17/21 7:30 PM, Krzysztof Kozlowski wrote:
->>> On 17/09/2021 18:21, Krzysztof Kozlowski wrote:
->>>> On 17/09/2021 16:44, Horia Geantă wrote:
->>>>> On 9/17/2021 1:33 PM, Krzysztof Kozlowski wrote:
->>>>>> On 17/09/2021 11:51, Horia Geantă wrote:
->>>>>>> On 9/16/2021 5:06 PM, Marek Vasut wrote:
->>>>>>>> On 9/16/21 3:59 PM, Krzysztof Kozlowski wrote:
->>>>>>>>> On 16/09/2021 15:41, Marek Vasut wrote:
->>>>>>>>>> Add MODULE_ALIAS for caam and caam_jr modules, so they can be 
->>>>>>>>>> auto-loaded.
->>>>>>>>>>
->>>>>>>>>> Signed-off-by: Marek Vasut <marex@denx.de>
->>>>>>>>>> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->>>>>>>>>> Cc: Horia Geantă <horia.geanta@nxp.com>
->>>>>>>>>> Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
->>>>>>>>>> Cc: Krzysztof Kozlowski <krzk@kernel.org>
->>>>>>>>>> ---
->>>>>>>>>>    drivers/crypto/caam/ctrl.c | 1 +
->>>>>>>>>>    drivers/crypto/caam/jr.c   | 1 +
->>>>>>>>>>    2 files changed, 2 insertions(+)
->>>>>>>>>>
->>>>>>>>>
->>>>>>>>> Since you marked it as RFC, let me share a comment - would be 
->>>>>>>>> nice to
->>>>>>>>> see here explanation why do you need module alias.
->>>>>>>>>
->>>>>>>>> Drivers usually do not need module alias to be auto-loaded, 
->>>>>>>>> unless the
->>>>>>>>> subsystem/bus reports different alias than one used for binding. 
->>>>>>>>> Since
->>>>>>>>> the CAAM can bind only via OF, I wonder what is really missing 
->>>>>>>>> here. Is
->>>>>>>>> it a MFD child (it's one of cases this can happen)?
->>>>>>>>
->>>>>>>> I noticed the CAAM is not being auto-loaded on boot, and then I 
->>>>>>>> noticed
->>>>>>>> the MODULE_ALIAS fixes cropping up in the kernel log, but I couldn't
->>>>>>>> find a good documentation for that MODULE_ALIAS. So I was hoping 
->>>>>>>> to get
->>>>>>>> a feedback on it.
->>>>>>>>
->>>>>>> What platform are you using?
->>>>>>>
->>>>>>> "make modules_install" should take care of adding the proper aliases,
->>>>>>> relying on the MODULE_DEVICE_TABLE() macro in the caam, caam_jr 
->>>>>>> drivers.
->>>>>>>
->>>>>>> modules.alias file should contain:
->>>>>>> alias of:N*T*Cfsl,sec4.0C* caam
->>>>>>> alias of:N*T*Cfsl,sec4.0 caam
->>>>>>> alias of:N*T*Cfsl,sec-v4.0C* caam
->>>>>>> alias of:N*T*Cfsl,sec-v4.0 caam
->>>>>>> alias of:N*T*Cfsl,sec4.0-job-ringC* caam_jr
->>>>>>> alias of:N*T*Cfsl,sec4.0-job-ring caam_jr
->>>>>>> alias of:N*T*Cfsl,sec-v4.0-job-ringC* caam_jr
->>>>>>> alias of:N*T*Cfsl,sec-v4.0-job-ring caam_jr
->>>>>>
->>>>>> Marek added a platform alias which is not present here on the list
->>>>>> (because there are no platform device IDs). The proper question is who
->>>>>> requests this device via a platform match? Who sends such event?
->>>>>>
->>>>> AFAICS the platform bus adds the "platform:" alias to uevent env.
->>>>> in its .uevent callback - platform_uevent().
->>>>>
->>>>> When caam (platform) device is added, the uevent is generated with 
->>>>> this env.,
->>>>> which contains both OF-style and "platform:" modaliases.
->>>>
->>>> I am not saying about theoretical case, I know that platform bus will
->>>> send platform uevent. How did this device end up in platform bus so this
->>>> uevent is being sent? It should be instantiated from OF on for example
->>>> amba bus or directly from OF FDT scanning.
->>>>
->>>> Therefore I have the same question - who requests device via a platform
->>>> match? Is it used out-of-tree in different configuration?
->>>
->>> I tried to reproduce such situation in case of a board I have with me
->>> (Exynos5422). I have a platform_driver only with of_device_id table. The
->>> driver is built as module. In my DTS the device node is like
->>> (exynos5.dtsi and device is modified exynos-chipid to be a module):
->>>
->>>         soc: soc {
->>>                  compatible = "simple-bus";
->>>                  #address-cells = <1>;
->>>                  #size-cells = <1>;
->>>                  ranges;
->>>
->>>                  chipid: chipid@10000000 {
->>>                          compatible = "samsung,exynos4210-chipid";
->>>                          reg = <0x10000000 0x100>;
->>>                  };
->>>
->>>         ...
->>>     };
->>>
->>> The module was properly autoloaded (via OF aliases/events) and device
->>> was matched.
->>
->> Please put this on hold for a bit, I need a colleague to check the udev 
->> event on this platform before we can move on any further.
-> 
-> Here are the uevent entries without this RFC patch applied:
-> 
-> ```
-> # udevadm info -q all -p devices/platform/soc@0/30800000.bus/30900000.crypto
-> P: /devices/platform/soc@0/30800000.bus/30900000.crypto
-> L: 0
-> E: DEVPATH=/devices/platform/soc@0/30800000.bus/30900000.crypto
-> E: DRIVER=caam
-> E: OF_NAME=crypto
-> E: OF_FULLNAME=/soc@0/bus@30800000/crypto@30900000
-> E: OF_COMPATIBLE_0=fsl,sec-v4.0
-> E: OF_COMPATIBLE_N=1
-> E: MODALIAS=of:NcryptoT(null)Cfsl,sec-v4.0
-> E: SUBSYSTEM=platform
-> E: USEC_INITIALIZED=4468986
-> E: ID_PATH=platform-30900000.crypto
-> E: ID_PATH_TAG=platform-30900000_crypto
-> ```
+
+On 9/20/21 6:05 AM, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> The ecc.c file started out as part of the ECDH algorithm but got
+> moved out into a standalone module later. It does not build without
+> CRYPTO_DEFAULT_RNG, so now that other modules are using it as well we
+> can run into this link error:
+>
+> aarch64-linux-ld: ecc.c:(.text+0xfc8): undefined reference to `crypto_default_rng'
+> aarch64-linux-ld: ecc.c:(.text+0xff4): undefined reference to `crypto_put_default_rng'
+>
+> Move the 'select CRYPTO_DEFAULT_RNG' statement into the correct symbol.
+>
+> Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
+> Fixes: 4e6602916bc6 ("crypto: ecdsa - Add support for ECDSA signature verification")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
 
-Thanks. There is no platform alias in MODALIAS (as expected). It's
-exactly the same uevent I found in my case of exynos-chipid driver. No
-need for platform module alias. :)
-
-Best regards,
-Krzysztof
+> ---
+>   crypto/Kconfig | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 536df4b6b825..285f82647d2b 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -233,12 +233,12 @@ config CRYPTO_DH
+>   
+>   config CRYPTO_ECC
+>   	tristate
+> +	select CRYPTO_RNG_DEFAULT
+>   
+>   config CRYPTO_ECDH
+>   	tristate "ECDH algorithm"
+>   	select CRYPTO_ECC
+>   	select CRYPTO_KPP
+> -	select CRYPTO_RNG_DEFAULT
+>   	help
+>   	  Generic implementation of the ECDH algorithm
+>   
