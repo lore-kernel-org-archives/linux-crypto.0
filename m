@@ -2,90 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42F1BC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 10:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB0EC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 13:01:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26A7760F9B
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 10:06:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BA8860F5D
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 13:01:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230175AbhITKHZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Sep 2021 06:07:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46228 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231182AbhITKHW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Sep 2021 06:07:22 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6FF5760F5D;
-        Mon, 20 Sep 2021 10:05:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632132356;
-        bh=mEIhB5gFO41gQ3sUmqJQlg/kWWUDHL4ECHOeQmvQpg8=;
-        h=From:To:Cc:Subject:Date:From;
-        b=TWh7aaNP0ht/JZhEtvnli9sWjRSesj7JtMP1fhpkq/Ox6LbM8AIvwD3rMhYAdffZx
-         DflCXf/CEy6LwylZWp8KNf1t21ESsN1wyu9afVi1xJXkb1y2R3+eXuRvGd2GqnprTC
-         IAVp/G8ruQXI2gryAgv4TFgr3cwi3z8ZKMfJAiV1+Gv9fG91wT2WGUmKZ+i4+9DGet
-         RluQGa6j62yzuh21hSnmars9IXYDzPZwP/HGPji3w7pSl1wi7JnOA7/1hvCc5gEn5R
-         hCZA3EPTg4tULLUH/gVasPIZBSqNsEGhqVTTMLga+ZaZDcfhvTW3hB5+M84RRhw/G4
-         0p8mQnqU74Juw==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Stefan Berger <stefanb@linux.ibm.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: ecc: fix CRYPTO_DEFAULT_RNG dependency
-Date:   Mon, 20 Sep 2021 12:05:35 +0200
-Message-Id: <20210920100551.1568868-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.29.2
+        id S236441AbhITNDE convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Sep 2021 09:03:04 -0400
+Received: from mail-vs1-f50.google.com ([209.85.217.50]:46710 "EHLO
+        mail-vs1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229719AbhITNDD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 20 Sep 2021 09:03:03 -0400
+Received: by mail-vs1-f50.google.com with SMTP id x74so3774700vsx.13;
+        Mon, 20 Sep 2021 06:01:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=++i8xJcYeTnDgKmQgi7Yz9d+jrQSAA9oLwPVziAM1C0=;
+        b=rEqF+wnm8T1TYVJBThiUxA6vYY9jRg3YrAHaig0K4mMJC+uZ38c5LXykCyf0dh/puJ
+         EomaPVgN8/SBrjhNQxfUOh4OvVATAkPjx6GOQPFd56Cfx25azpJ8jB7oTm58DsQVWLht
+         5Uei8+lqM8KxiksnAiwA9d14FMbI0THWjikCMixPKJ+SUHx4QjxFHt71T2Df5pMm/Np+
+         GGR34Au4+eAkqqr3VlqdXhODejj6pZzuEMDgxByNYfe4p3uK+gsp47+7s3GB3w0lySlp
+         Eus3bX7rDmPaRS2ZAnh2MqiBMbB2QuwmdvU6Td4gQ4l832CWpNvZ9TWQVd34tf30el2L
+         2XXQ==
+X-Gm-Message-State: AOAM531/sBClvqxQHxs3IC0cDqc6J0p6gjLDXEYGuHRbvp36cMTGG/hN
+        zFGy/Mt4EZs80rj281uMN+k2nvYg4undu6xNvcA=
+X-Google-Smtp-Source: ABdhPJy/M/ANdDNU5+Sl8XEvkvOXVOGmOJk1+6VA+foxZnauYjFVAb9mYIdlMK+bHViTR+fefyC4gnx8Z0vR2afEtWY=
+X-Received: by 2002:a67:f147:: with SMTP id t7mr9708448vsm.41.1632142896269;
+ Mon, 20 Sep 2021 06:01:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210920080635.253826-1-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20210920080635.253826-1-u.kleine-koenig@pengutronix.de>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Mon, 20 Sep 2021 15:01:25 +0200
+Message-ID: <CAMuHMdVAjtF2GKXgHgbmjUnMdWxqSpusKV_EieF2wEWezdqrPQ@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: Remove Matt Mackall as his identity is obsolete
+To:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Paul Gortmaker <paul.gortmaker@windriver.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Linux Embedded <linux-embedded@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Sascha Hauer <kernel@pengutronix.de>,
+        Olivia Mackall <olivia@selenic.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+Hi Uwe,
 
-The ecc.c file started out as part of the ECDH algorithm but got
-moved out into a standalone module later. It does not build without
-CRYPTO_DEFAULT_RNG, so now that other modules are using it as well we
-can run into this link error:
+On Mon, Sep 20, 2021 at 11:52 AM Uwe Kleine-König
+<u.kleine-koenig@pengutronix.de> wrote:
+> The mails I sent to Matt on September 14 and 20 both were refused by the
+> MTA responsible for selenic.com (i.e. waste.org) with:
+>
+>         554 5.7.1 <mpm@selenic.com>: Recipient address rejected: This identity is obsolete
+>
+> Also the most recent commit that involved him (ignoring "Cc: Matt
+> Mackall <mpm@selenic.com>" footers) is commit 330e0a01d54c (MAINTAINERS:
+> Theodore Ts'o is taking over the random driver) where he was removed
+> from the entry for random number drivers in 2012.
+>
+> So drop him completely from the list of maintainers.
+>
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> ---
+>  MAINTAINERS | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index d7b4f32875a9..805630c67a1f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -6812,7 +6812,6 @@ F:        drivers/media/usb/em28xx/
+>
+>  EMBEDDED LINUX
+>  M:     Paul Gortmaker <paul.gortmaker@windriver.com>
+> -M:     Matt Mackall <mpm@selenic.com>
 
-aarch64-linux-ld: ecc.c:(.text+0xfc8): undefined reference to `crypto_default_rng'
-aarch64-linux-ld: ecc.c:(.text+0xff4): undefined reference to `crypto_put_default_rng'
+Perhaps this should be replaced by
+"Olivia Mackall <olivia@selenic.com>" instead?
 
-Move the 'select CRYPTO_DEFAULT_RNG' statement into the correct symbol.
+>  M:     David Woodhouse <dwmw2@infradead.org>
+>  L:     linux-embedded@vger.kernel.org
+>  S:     Maintained
+> @@ -8157,7 +8156,6 @@ F:        include/trace/events/hwmon*.h
+>  K:     (devm_)?hwmon_device_(un)?register(|_with_groups|_with_info)
+>
+>  HARDWARE RANDOM NUMBER GENERATOR CORE
+> -M:     Matt Mackall <mpm@selenic.com>
+>  M:     Herbert Xu <herbert@gondor.apana.org.au>
+>  L:     linux-crypto@vger.kernel.org
+>  S:     Odd fixes
 
-Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
-Fixes: 4e6602916bc6 ("crypto: ecdsa - Add support for ECDSA signature verification")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- crypto/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Gr{oetje,eeting}s,
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 536df4b6b825..285f82647d2b 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -233,12 +233,12 @@ config CRYPTO_DH
- 
- config CRYPTO_ECC
- 	tristate
-+	select CRYPTO_RNG_DEFAULT
- 
- config CRYPTO_ECDH
- 	tristate "ECDH algorithm"
- 	select CRYPTO_ECC
- 	select CRYPTO_KPP
--	select CRYPTO_RNG_DEFAULT
- 	help
- 	  Generic implementation of the ECDH algorithm
- 
+                        Geert
+
 -- 
-2.29.2
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
