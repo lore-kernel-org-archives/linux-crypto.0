@@ -2,141 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB90C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 16:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBC4CC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 18:30:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 38CC560FA0
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 16:26:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CF5B600D4
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Sep 2021 18:30:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231978AbhITQ2E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Sep 2021 12:28:04 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56024 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229914AbhITQ2D (ORCPT
+        id S1378965AbhITScL (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Sep 2021 14:32:11 -0400
+Received: from smtp-relay-canonical-1.canonical.com ([185.125.188.121]:37174
+        "EHLO smtp-relay-canonical-1.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1352646AbhITSaH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Sep 2021 12:28:03 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18KEqS38015556;
-        Mon, 20 Sep 2021 12:25:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=lpNrgIClxc6uLVdhpRODsqe2CwZ4gaIwdYn9KTYhxjg=;
- b=bVV+d8fw8Nsko5z3lEo0WjfF0gGd2ah77lwsXtvHiw6F0OBC/kS4Ylbl5AZ2CCjFGXs9
- GIb3BsRtQW90T9LkKV15pvIKLZILxG0nAwa+rRWiV3JdDWB1UR4WXhueGoQISGhBngo6
- h/QKWVZWxGa8oaNj6yxFq9tBDVsYn1/hksAJl3gx8UV8pAujaLkKXbvpE9qgvkjJ9y4z
- fIi/k9KWL+s8D9dmkErl0WNh9phnpdcXZXUYgBKbPGXB2fjxzi8mZD0YZGwG0VSk/WKL
- xPyLLYmzKNfprZShUWYMmPTzk0Ir0ZrNDBVKjQzL/cIuNoKgjMbHytZHp2kDmbg9nRbI OA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3b5w06yf5j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Sep 2021 12:25:21 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18KEqVOE016056;
-        Mon, 20 Sep 2021 12:25:20 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3b5w06yf53-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Sep 2021 12:25:20 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18KGD58D026265;
-        Mon, 20 Sep 2021 16:25:20 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma01wdc.us.ibm.com with ESMTP id 3b57r9ukv2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Sep 2021 16:25:20 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18KGPJ2D26411338
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 Sep 2021 16:25:19 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 24B07136053;
-        Mon, 20 Sep 2021 16:25:19 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 94A2F13606A;
-        Mon, 20 Sep 2021 16:25:18 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 20 Sep 2021 16:25:18 +0000 (GMT)
-Subject: Re: [PATCH] crypto: ecc: fix CRYPTO_DEFAULT_RNG dependency
-To:     Arnd Bergmann <arnd@kernel.org>,
+        Mon, 20 Sep 2021 14:30:07 -0400
+Received: from localhost (1.general.cking.uk.vpn [10.172.193.212])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id 54A813F328;
+        Mon, 20 Sep 2021 18:28:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1632162518;
+        bh=RZrZe46PibOc6VV+U13ENsWARYzoTyYCxHt8wFyjnVY=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type;
+        b=HutSIyPrh96ZCXYSLHh5fbc4BXZoKkqxTxEyn0XgHY9+qdmgTxjcNgTdN1ytrlRXO
+         t/IoT45as39vaoJ7si2Sjwt++gU1RbHsGIDmgSn4SzBVGlyect26dM9p9RuQwz9rR5
+         aYMbiZaCIDoYLZeY1ct3s0gI+z+TxJ+S3vdAKL/Q/mJp0oUCMEZ1Iq1PcnQcn8Hntr
+         LzJOq9XXWI6w2IzKfr0ft4G6DbiCbSIYdL8A9DtkJbNnmns0MCSEILKWR/kLUrMdLk
+         tZgT8HHxDHAXos/RzC4Dd5fjmjFU/VyyXy13u36adcVDsN8qKbXjUaY5F0DBqgOH0T
+         l2TRfIGnJweQQ==
+From:   Colin King <colin.king@canonical.com>
+To:     Zhou Wang <wangzhou1@hisilicon.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Vitaly Chikunov <vt@altlinux.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210920100551.1568868-1-arnd@kernel.org>
-From:   Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <599e065b-d4c7-957c-ed54-c88217f9a5af@linux.ibm.com>
-Date:   Mon, 20 Sep 2021 12:25:18 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: hisilicon: Fix spelling mistake "COMSUMED" -> "CONSUMED"
+Date:   Mon, 20 Sep 2021 19:28:38 +0100
+Message-Id: <20210920182838.17218-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-In-Reply-To: <20210920100551.1568868-1-arnd@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1XavsnLjDrmIQgQHz4UfxU8VvvwVcUlU
-X-Proofpoint-GUID: CUpOHnl2rtn0oJEaGWLg0fi7N-xIKen-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-20_07,2021-09-20_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 adultscore=0 clxscore=1011 suspectscore=0
- mlxlogscore=999 mlxscore=0 malwarescore=0 impostorscore=0 spamscore=0
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109030001 definitions=main-2109200100
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+From: Colin Ian King <colin.king@canonical.com>
 
-On 9/20/21 6:05 AM, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> The ecc.c file started out as part of the ECDH algorithm but got
-> moved out into a standalone module later. It does not build without
-> CRYPTO_DEFAULT_RNG, so now that other modules are using it as well we
-> can run into this link error:
->
-> aarch64-linux-ld: ecc.c:(.text+0xfc8): undefined reference to `crypto_default_rng'
-> aarch64-linux-ld: ecc.c:(.text+0xff4): undefined reference to `crypto_put_default_rng'
->
-> Move the 'select CRYPTO_DEFAULT_RNG' statement into the correct symbol.
->
-> Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
-> Fixes: 4e6602916bc6 ("crypto: ecdsa - Add support for ECDSA signature verification")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+There is a spelling mistake in a literal string. Fix it.
 
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/crypto/hisilicon/zip/zip_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 7148201ce76e..873971ef9aee 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -218,7 +218,7 @@ static const struct debugfs_reg32 hzip_dfx_regs[] = {
+ 	{"HZIP_AVG_DELAY                 ",  0x28ull},
+ 	{"HZIP_MEM_VISIBLE_DATA          ",  0x30ull},
+ 	{"HZIP_MEM_VISIBLE_ADDR          ",  0x34ull},
+-	{"HZIP_COMSUMED_BYTE             ",  0x38ull},
++	{"HZIP_CONSUMED_BYTE             ",  0x38ull},
+ 	{"HZIP_PRODUCED_BYTE             ",  0x40ull},
+ 	{"HZIP_COMP_INF                  ",  0x70ull},
+ 	{"HZIP_PRE_OUT                   ",  0x78ull},
+-- 
+2.32.0
 
-> ---
->   crypto/Kconfig | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 536df4b6b825..285f82647d2b 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -233,12 +233,12 @@ config CRYPTO_DH
->   
->   config CRYPTO_ECC
->   	tristate
-> +	select CRYPTO_RNG_DEFAULT
->   
->   config CRYPTO_ECDH
->   	tristate "ECDH algorithm"
->   	select CRYPTO_ECC
->   	select CRYPTO_KPP
-> -	select CRYPTO_RNG_DEFAULT
->   	help
->   	  Generic implementation of the ECDH algorithm
->   
