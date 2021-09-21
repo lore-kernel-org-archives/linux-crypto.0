@@ -2,84 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87DBDC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 21:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C3CC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 21:49:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69DF961159
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 21:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB7D660F6B
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 21:49:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232348AbhIUVuc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Sep 2021 17:50:32 -0400
-Received: from 82-65-109-163.subs.proxad.net ([82.65.109.163]:34180 "EHLO
+        id S234138AbhIUVud (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Sep 2021 17:50:33 -0400
+Received: from 82-65-109-163.subs.proxad.net ([82.65.109.163]:34186 "EHLO
         luna.linkmauve.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234138AbhIUVub (ORCPT
+        with ESMTP id S234813AbhIUVub (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 21 Sep 2021 17:50:31 -0400
 Received: by luna.linkmauve.fr (Postfix, from userid 1000)
-        id 88C64F40B68; Tue, 21 Sep 2021 23:39:43 +0200 (CEST)
+        id 0DF10F40B6A; Tue, 21 Sep 2021 23:39:48 +0200 (CEST)
 From:   Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
-To:     linux-crypto@vger.kernel.org
+To:     Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org
 Cc:     Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>,
         Ash Logan <ash@heyquark.com>,
         =?UTF-8?q?Jonathan=20Neusch=C3=A4fer?= <j.ne@posteo.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 0/4] crypto: nintendo-aes - add a new AES driver
-Date:   Tue, 21 Sep 2021 23:39:26 +0200
-Message-Id: <20210921213930.10366-1-linkmauve@linkmauve.fr>
+        Paul Mackerras <paulus@samba.org>,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 2/4] dt-bindings: nintendo-aes: Document the Wii and Wii U AES support
+Date:   Tue, 21 Sep 2021 23:39:28 +0200
+Message-Id: <20210921213930.10366-3-linkmauve@linkmauve.fr>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20210921213930.10366-1-linkmauve@linkmauve.fr>
+References: <20210921213930.10366-1-linkmauve@linkmauve.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This engine implements AES in CBC mode, using 128-bit keys only.  It is
-present on both the Wii and the Wii U, and is apparently identical in
-both consoles.
+Both of these consoles use the exact same AES engine, which only
+supports CBC mode with 128-bit keys.
 
-The hardware is capable of firing an interrupt when the operation is
-done, but this driver currently uses a busy loop, I’m not too sure
-whether it would be preferable to switch, nor how to achieve that.
-
-It also supports a mode where no operation is done, and thus could be
-used as a DMA copy engine, but I don’t know how to expose that to the
-kernel or whether it would even be useful.
-
-In my testing, on a Wii U, this driver reaches 80.7 MiB/s, while the
-aes-generic driver only reaches 30.9 MiB/s, so it is a quite welcome
-speedup.
-
-This driver was written based on reversed documentation, see:
-https://wiibrew.org/wiki/Hardware/AES
-
-Emmanuel Gil Peyrot (4):
-  crypto: nintendo-aes - add a new AES driver
-  dt-bindings: nintendo-aes: Document the Wii and Wii U AES support
-  powerpc: wii.dts: Expose the AES engine on this platform
-  powerpc: wii_defconfig: Enable AES by default
-
- .../bindings/crypto/nintendo-aes.yaml         |  34 +++
- arch/powerpc/boot/dts/wii.dts                 |   7 +
- arch/powerpc/configs/wii_defconfig            |   4 +-
- drivers/crypto/Kconfig                        |  11 +
- drivers/crypto/Makefile                       |   1 +
- drivers/crypto/nintendo-aes.c                 | 273 ++++++++++++++++++
- 6 files changed, 329 insertions(+), 1 deletion(-)
+Signed-off-by: Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
+---
+ .../bindings/crypto/nintendo-aes.yaml         | 34 +++++++++++++++++++
+ 1 file changed, 34 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/crypto/nintendo-aes.yaml
- create mode 100644 drivers/crypto/nintendo-aes.c
 
+diff --git a/Documentation/devicetree/bindings/crypto/nintendo-aes.yaml b/Documentation/devicetree/bindings/crypto/nintendo-aes.yaml
+new file mode 100644
+index 000000000000..e62a2bfc571c
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/nintendo-aes.yaml
+@@ -0,0 +1,34 @@
++# SPDX-License-Identifier: GPL-2.0
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/nintendo-aes.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Nintendo Wii and Wii U AES engine
++
++maintainers:
++  - Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
++
++description: |+
++  The AES engine in the Nintendo Wii and Wii U supports the following:
++  -- Advanced Encryption Standard (AES) in CBC mode, with 128-bit keys
++
++properties:
++  compatible:
++    items:
++      - const: nintendo,hollywood-aes
++      - const: nintendo,latte-aes
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    description: Not supported yet.
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++  - interrupts
++
++additionalProperties: false
 -- 
 2.33.0
 
