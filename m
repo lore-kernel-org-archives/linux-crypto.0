@@ -2,104 +2,76 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF87C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 21:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9D16C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 21:49:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 821D760F38
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 21:07:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97EDC60F4C
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 21:49:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231494AbhIUVJA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Sep 2021 17:09:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38844 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233997AbhIUVI7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Sep 2021 17:08:59 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3E8CE611ED;
-        Tue, 21 Sep 2021 21:07:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632258447;
-        bh=KhqgCOU1H+B4j48XZ2KbxoGsnjCzuiyjcIpFTqCMxxQ=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=mmiDqp8W7ToUmvXUok5eX0WvW7OdVY5wBuyVdo7QuRceEf9R4ND6az8ZVbcx6A26H
-         DZ6BF5ifNm5jmPssa+ZSP8hEkRyUfY9l1FZQxZonSQ8dEtm4ugyAClUDFFM0ZfNrWC
-         r6T7IzSRzasfQ7ZH7y825kviG7Un6PZ1ekGkZHeQukHC/pYMpvk5baTboQ8LJXPMxf
-         FTyv7eQ5w3O02jWNf4EGT5S3awNii4rm5uDKApzaG44U8KivSWMNd6VgIvloWMtChp
-         9vFHOCu0Snks/tbzZbEutpI+Dim10D3DUvfrsXAJ4Acv7TkEkHlPzQ+vnWu3pmS4O+
-         laAo3A1MU4D1Q==
-Message-ID: <6318b58cf9ede0ffcda396cd14572d0143f6a04e.camel@kernel.org>
-Subject: Re: [PATCH] pkcs7: support EC-RDSA/streebog in SignerInfo
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Elvira Khabirova <e.khabirova@omp.ru>, keyrings@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
-        dhowells@redhat.com, vt@altlinux.org
-Date:   Wed, 22 Sep 2021 00:07:25 +0300
-In-Reply-To: <59bf7fdf-b06e-1533-865a-06c612f4a19c@linux.alibaba.com>
-References: <20210511174744.4f3c6c59@msk1wst204>
-         <59bf7fdf-b06e-1533-865a-06c612f4a19c@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        id S235627AbhIUVub (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Sep 2021 17:50:31 -0400
+Received: from 82-65-109-163.subs.proxad.net ([82.65.109.163]:34174 "EHLO
+        luna.linkmauve.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232304AbhIUVua (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 Sep 2021 17:50:30 -0400
+X-Greylist: delayed 555 seconds by postgrey-1.27 at vger.kernel.org; Tue, 21 Sep 2021 17:50:30 EDT
+Received: by luna.linkmauve.fr (Postfix, from userid 1000)
+        id E2F78F40B6B; Tue, 21 Sep 2021 23:39:49 +0200 (CEST)
+From:   Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>,
+        Ash Logan <ash@heyquark.com>,
+        =?UTF-8?q?Jonathan=20Neusch=C3=A4fer?= <j.ne@posteo.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: [PATCH 3/4] powerpc: wii.dts: Expose the AES engine on this platform
+Date:   Tue, 21 Sep 2021 23:39:29 +0200
+Message-Id: <20210921213930.10366-4-linkmauve@linkmauve.fr>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20210921213930.10366-1-linkmauve@linkmauve.fr>
+References: <20210921213930.10366-1-linkmauve@linkmauve.fr>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 2021-09-18 at 10:39 +0800, Tianjia Zhang wrote:
-> ping.
->=20
-> On 5/11/21 10:47 PM, Elvira Khabirova wrote:
-> > Allow using EC-RDSA/streebog in pkcs7 certificates in a similar way
-> > to how it's done in the x509 parser.
-> >=20
-> > This is needed e.g. for loading kernel modules signed with EC-RDSA.
-> >=20
-> > Signed-off-by: Elvira Khabirova <e.khabirova@omp.ru>
-> > ---
-> >   crypto/asymmetric_keys/pkcs7_parser.c | 11 +++++++++++
-> >   1 file changed, 11 insertions(+)
-> >=20
-> > diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_=
-keys/pkcs7_parser.c
-> > index 967329e0a07b..39c260a04167 100644
-> > --- a/crypto/asymmetric_keys/pkcs7_parser.c
-> > +++ b/crypto/asymmetric_keys/pkcs7_parser.c
-> > @@ -248,6 +248,12 @@ int pkcs7_sig_note_digest_algo(void *context, size=
-_t hdrlen,
-> >   	case OID_sha224:
-> >   		ctx->sinfo->sig->hash_algo =3D "sha224";
-> >   		break;
-> > +	case OID_gost2012Digest256:
-> > +		ctx->sinfo->sig->hash_algo =3D "streebog256";
-> > +		break;
-> > +	case OID_gost2012Digest512:
-> > +		ctx->sinfo->sig->hash_algo =3D "streebog512";
-> > +		break;
-> >   	default:
-> >   		printk("Unsupported digest algo: %u\n", ctx->last_oid);
-> >   		return -ENOPKG;
-> > @@ -269,6 +275,11 @@ int pkcs7_sig_note_pkey_algo(void *context, size_t=
- hdrlen,
-> >   		ctx->sinfo->sig->pkey_algo =3D "rsa";
-> >   		ctx->sinfo->sig->encoding =3D "pkcs1";
-> >   		break;
-> > +	case OID_gost2012PKey256:
-> > +	case OID_gost2012PKey512:
-> > +		ctx->sinfo->sig->pkey_algo =3D "ecrdsa";
-> > +		ctx->sinfo->sig->encoding =3D "raw";
-> > +		break;
-> >   	default:
-> >   		printk("Unsupported pkey algo: %u\n", ctx->last_oid);
-> >   		return -ENOPKG;
-> >=20
+This can be used by the newly-added nintendo-aes crypto module.
 
-Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+Signed-off-by: Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
+---
+ arch/powerpc/boot/dts/wii.dts | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-/Jarkko
+diff --git a/arch/powerpc/boot/dts/wii.dts b/arch/powerpc/boot/dts/wii.dts
+index aaa381da1906..c5720fdd0686 100644
+--- a/arch/powerpc/boot/dts/wii.dts
++++ b/arch/powerpc/boot/dts/wii.dts
+@@ -113,6 +113,13 @@ exi@d006800 {
+ 			interrupts = <4>;
+ 		};
+ 
++		aes@d020000 {
++			compatible = "nintendo,hollywood-aes";
++			reg = <0x0d020000 0x14>;
++			interrupts = <2>;
++			interrupt-parent = <&PIC1>;
++		};
++
+ 		usb@d040000 {
+ 			compatible = "nintendo,hollywood-usb-ehci",
+ 					"usb-ehci";
+-- 
+2.33.0
 
