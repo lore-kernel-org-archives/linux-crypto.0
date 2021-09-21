@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F31C43219
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 16:17:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D8CC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 16:17:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5FAA56115A
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 16:17:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B55B961100
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 16:17:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234686AbhIUQS4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Sep 2021 12:18:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33476 "EHLO
+        id S234552AbhIUQTL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Sep 2021 12:19:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234502AbhIUQSh (ORCPT
+        with ESMTP id S234546AbhIUQSm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Sep 2021 12:18:37 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BC18C061574;
-        Tue, 21 Sep 2021 09:17:09 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id v24so76388058eda.3;
-        Tue, 21 Sep 2021 09:17:09 -0700 (PDT)
+        Tue, 21 Sep 2021 12:18:42 -0400
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 681A4C061760;
+        Tue, 21 Sep 2021 09:17:12 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id co2so29799531edb.8;
+        Tue, 21 Sep 2021 09:17:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=6bd81ZzhYWDXtU8irtzbLufy7NFGe2+2aZRj+xbH9LY=;
-        b=Bvtk6TkusVu/JWbLJTdW36xaH1wfyAtjW3rrmH0cNlnOzLvadqo4frlCxmlr28T65L
-         TeK5PDJLIubWVndww7v5yJDnz3fGOaBw9f2T4//w/wk9UnKpKDkiiDRXq438SQ6deqQY
-         YbextJuw7ppg4gvXx7Qo73u5IOvqDzmTNpgwgWyDFe8+NMvTe5Br6gxRWQx6NKSVVqeH
-         Wjm+gMeHFO+7DYkd/JUfSw6C0xAabhcLj01lEWI9LTGo7yE0TmLzJ81UUmt03+wNuSWh
-         TFDGgD4GO80EibVJKvulN43kfhTcYcstt/EG91iTqmflaY7QE+eEzn8ZDVoYSmjooD2g
-         vikw==
+        bh=HG7lO2Auqog9LQbUof/KxwFt3hgNmc5olI0OW6ZVatU=;
+        b=mWPnMa30UuQZFU6f2ypidGLMHP2lLlUxl7seL4ZC3pvb3IahmCoC18SugVCWMKy2dX
+         0mk7JuPTEPJho06rvrZaCKZgNIYEwHe2NDoelsI36XtLjcLG2Egb/DqYCZIQXWiKVAgu
+         fnaZLbjHmuK9oXxc+pgjqbIJ8avquNIhAiEJOjR2pbyrkM6KbAuZKGFnyZXJzEVYP3s6
+         ybSZiONhz3gea+LoSGojAFxaEPE5MUPsWcAcVp86zsW6/m1fK/H5g55VK12N/BA0TBDM
+         HahcGlJhZtVpDUYGot8imeZC0C1WUYqY2zmyxkrTmMUdnckT49Elegy1sYFT8zzDcBdu
+         cvpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=6bd81ZzhYWDXtU8irtzbLufy7NFGe2+2aZRj+xbH9LY=;
-        b=6J5HJAmIQkGeH6tXkXzyZ35bWs7aXuvSv2mgLrv5mxFOX6NVddl56B4+mk/oHymfSG
-         WzN/eb6DbHkqI180HWb50uv6nh1cVgC4tJsH7UYKNKimvzcgoQrCtTWh7OQTyn1zOqZT
-         12NCrnoOh8SP+sfZIhRs7Gb8fHLOXp099hd2zSzOf46N4OHW9jmvaQ+1aV6RXzQVBBSv
-         utfxkB6sinzuUw9YqdroIEYU9Ip0whVDJaJ9K01x3Vo3yfeR00GqV6am4BR1CgKHgZF3
-         pMs5w55+zXfeq0dBgqeaN/udczVkapf+awudbbJA6r5d9ujZSdGtukx38PRmA0vCB/UV
-         EsKQ==
-X-Gm-Message-State: AOAM531xdQSULS6yeg5hdgIsphu90UEWr1Ts3MnpuPMaC3l+lzSyj4Fj
-        VFku2dD4MfpIlZL74bBzZ7A=
-X-Google-Smtp-Source: ABdhPJzR5UVUBua/yTJy+sxqbTjGVDhg8IUpSZuhT9ZOGZlfmKlasoJUJaWZ7q8A3//H7K5W3Eo4HQ==
-X-Received: by 2002:a05:6402:411:: with SMTP id q17mr36360205edv.35.1632240942701;
-        Tue, 21 Sep 2021 09:15:42 -0700 (PDT)
+        bh=HG7lO2Auqog9LQbUof/KxwFt3hgNmc5olI0OW6ZVatU=;
+        b=llV+L7a7DX+YucICVK5iqtPh3O0q0ssehw+QXww2zIf2WMGNRRlQy07BmE54g1uicr
+         NIONheM93b7RwUUYg06E95+I07imeJ+RUnPX6a8mHLLgw+6w0xv+OvkkahedEN0grfrz
+         SwnUpJV5fluYRem7MQBgqfPBZidNUC35sUUgQ69sYPGYM0cXL0aqtMs51BvucIZbuoZ5
+         f4OTLyXl8qCM/OwpSY9QNHRDaDB1Y8BE9xO3HKVD49aKLM2RsUcNss4fe1DbZSMunXK0
+         bbhV/0iANUtAN5pCD6Vo6dEfunee7cbl3bM0qv19W7vORI39NGouacDWUmfbbwv1GxjI
+         ZxFg==
+X-Gm-Message-State: AOAM531qk8LxkyfCFcaZYkJGqMghqz6dNSQ3+z7lt4gez8PEcnU8uDh7
+        GEC6yEzLUh+snX8zk4K1wrQ=
+X-Google-Smtp-Source: ABdhPJwzP4oBIORcv9u/AdUF7zadNt0SEGu2D3IwhLHGlIE446zoe/5qPH3XbXx6k41AsZ/PIuwRZQ==
+X-Received: by 2002:a05:6402:455:: with SMTP id p21mr36203509edw.309.1632240933293;
+        Tue, 21 Sep 2021 09:15:33 -0700 (PDT)
 Received: from pinky.lan ([2a04:241e:502:1df0:b065:9bdf:4016:277])
-        by smtp.gmail.com with ESMTPSA id kx17sm7674075ejc.51.2021.09.21.09.15.41
+        by smtp.gmail.com with ESMTPSA id kx17sm7674075ejc.51.2021.09.21.09.15.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Sep 2021 09:15:42 -0700 (PDT)
+        Tue, 21 Sep 2021 09:15:32 -0700 (PDT)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     Dmitry Safonov <0x7f454c46@gmail.com>,
         David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>
@@ -75,9 +75,9 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         Menglong Dong <dong.menglong@zte.com.cn>,
         netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 15/19] selftests: Initial tcp_authopt support for nettest
-Date:   Tue, 21 Sep 2021 19:14:58 +0300
-Message-Id: <f5478f17eaf8430fe5a0f798d23c06c6090037cd.1632240523.git.cdleonard@gmail.com>
+Subject: [PATCH 10/19] tcp: ipv6: Add AO signing for tcp_v6_send_response
+Date:   Tue, 21 Sep 2021 19:14:53 +0300
+Message-Id: <8e833ab5b18f35909261cbd5c117f739f2611e0d.1632240523.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1632240523.git.cdleonard@gmail.com>
 References: <cover.1632240523.git.cdleonard@gmail.com>
@@ -87,129 +87,78 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add support for configuring TCP Authentication Option. Only a single key
-with default options.
+This is a special code path for acks and resets outside of normal
+connection establishment and closing.
 
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- tools/testing/selftests/net/nettest.c | 34 ++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+ net/ipv6/tcp_ipv6.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/tools/testing/selftests/net/nettest.c b/tools/testing/selftests/net/nettest.c
-index bd6288302094..f04c6af79129 100644
---- a/tools/testing/selftests/net/nettest.c
-+++ b/tools/testing/selftests/net/nettest.c
-@@ -100,10 +100,12 @@ struct sock_args {
- 		struct sockaddr_in v4;
- 		struct sockaddr_in6 v6;
- 	} md5_prefix;
- 	unsigned int prefix_len;
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 724145ddf122..d922219af20e 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -896,13 +896,37 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
+ 	struct sock *ctl_sk = net->ipv6.tcp_sk;
+ 	unsigned int tot_len = sizeof(struct tcphdr);
+ 	__be32 mrst = 0, *topt;
+ 	struct dst_entry *dst;
+ 	__u32 mark = 0;
++#ifdef CONFIG_TCP_AUTHOPT
++	struct tcp_authopt_info *authopt_info = NULL;
++	struct tcp_authopt_key_info *authopt_key_info = NULL;
++	u8 authopt_rnextkeyid;
++#endif
  
-+	const char *authopt_password;
+ 	if (tsecr)
+ 		tot_len += TCPOLEN_TSTAMP_ALIGNED;
++#ifdef CONFIG_TCP_AUTHOPT
++	/* Key lookup before SKB allocation */
++	if (static_branch_unlikely(&tcp_authopt_needed) && sk)
++	{
++		if (sk->sk_state == TCP_TIME_WAIT)
++			authopt_info = tcp_twsk(sk)->tw_authopt_info;
++		else
++			authopt_info = rcu_dereference(tcp_sk(sk)->authopt_info);
 +
- 	/* expected addresses and device index for connection */
- 	const char *expected_dev;
- 	const char *expected_server_dev;
- 	int expected_ifindex;
- 
-@@ -250,10 +252,27 @@ static int switch_ns(const char *ns)
- 	close(fd);
- 
- 	return ret;
- }
- 
-+static int tcp_set_authopt(int sd, struct sock_args *args)
-+{
-+	struct tcp_authopt_key key;
-+	int rc;
-+
-+	memset(&key, 0, sizeof(key));
-+	strcpy((char *)key.key, args->authopt_password);
-+	key.keylen = strlen(args->authopt_password);
-+	key.alg = TCP_AUTHOPT_ALG_HMAC_SHA_1_96;
-+
-+	rc = setsockopt(sd, IPPROTO_TCP, TCP_AUTHOPT_KEY, &key, sizeof(key));
-+	if (rc < 0)
-+		log_err_errno("setsockopt(TCP_AUTHOPT_KEY)");
-+
-+	return rc;
-+}
-+
- static int tcp_md5sig(int sd, void *addr, socklen_t alen, struct sock_args *args)
- {
- 	int keylen = strlen(args->password);
- 	struct tcp_md5sig md5sig = {};
- 	int opt = TCP_MD5SIG;
-@@ -1508,10 +1527,15 @@ static int do_server(struct sock_args *args, int ipc_fd)
- 	if (args->password && tcp_md5_remote(lsd, args)) {
- 		close(lsd);
- 		goto err_exit;
- 	}
- 
-+	if (args->authopt_password && tcp_set_authopt(lsd, args)) {
-+		close(lsd);
-+		goto err_exit;
++		if (authopt_info) {
++			authopt_key_info = __tcp_authopt_select_key(sk, authopt_info, sk, &authopt_rnextkeyid);
++			if (authopt_key_info) {
++				tot_len += TCPOLEN_AUTHOPT_OUTPUT;
++				/* Don't use MD5 */
++				key = NULL;
++			}
++		}
 +	}
-+
- 	ipc_write(ipc_fd, 1);
- 	while (1) {
- 		log_msg("waiting for client connection.\n");
- 		FD_ZERO(&rfds);
- 		FD_SET(lsd, &rfds);
-@@ -1630,10 +1654,13 @@ static int connectsock(void *addr, socklen_t alen, struct sock_args *args)
- 		goto out;
++#endif
+ #ifdef CONFIG_TCP_MD5SIG
+ 	if (key)
+ 		tot_len += TCPOLEN_MD5SIG_ALIGNED;
+ #endif
  
- 	if (args->password && tcp_md5sig(sd, addr, alen, args))
- 		goto err;
+@@ -955,10 +979,21 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
+ 		tcp_v6_md5_hash_hdr((__u8 *)topt, key,
+ 				    &ipv6_hdr(skb)->saddr,
+ 				    &ipv6_hdr(skb)->daddr, t1);
+ 	}
+ #endif
++#ifdef CONFIG_TCP_AUTHOPT
++	/* Compute the TCP-AO mac. Unlike in the ipv4 case we have a real SKB */
++	if (static_branch_unlikely(&tcp_authopt_needed) && authopt_key_info)
++	{
++		*topt++ = htonl((TCPOPT_AUTHOPT << 24) |
++				(TCPOLEN_AUTHOPT_OUTPUT << 16) |
++				(authopt_key_info->send_id << 8) |
++				(authopt_rnextkeyid));
++		tcp_authopt_hash((char*)topt, authopt_key_info, (struct sock*)sk, buff);
++	}
++#endif
  
-+	if (args->authopt_password && tcp_set_authopt(sd, args))
-+		goto err;
-+
- 	if (args->bind_test_only)
- 		goto out;
- 
- 	if (connect(sd, addr, alen) < 0) {
- 		if (errno != EINPROGRESS) {
-@@ -1819,11 +1846,11 @@ static int ipc_parent(int cpid, int fd, struct sock_args *args)
- 
- 	wait(&status);
- 	return client_status;
- }
- 
--#define GETOPT_STR  "sr:l:c:p:t:g:P:DRn:M:X:m:d:I:BN:O:SCi6xL:0:1:2:3:Fbq"
-+#define GETOPT_STR  "sr:l:c:p:t:g:P:DRn:M:X:m:A:d:I:BN:O:SCi6xL:0:1:2:3:Fbq"
- 
- static void print_usage(char *prog)
- {
- 	printf(
- 	"usage: %s OPTS\n"
-@@ -1856,10 +1883,12 @@ static void print_usage(char *prog)
- 	"    -n num        number of times to send message\n"
- 	"\n"
- 	"    -M password   use MD5 sum protection\n"
- 	"    -X password   MD5 password for client mode\n"
- 	"    -m prefix/len prefix and length to use for MD5 key\n"
-+	"    -A password   use RFC5925 TCP Authentication option\n"
-+	"\n"
- 	"    -g grp        multicast group (e.g., 239.1.1.1)\n"
- 	"    -i            interactive mode (default is echo and terminate)\n"
- 	"\n"
- 	"    -0 addr       Expected local address\n"
- 	"    -1 addr       Expected remote address\n"
-@@ -1970,10 +1999,13 @@ int main(int argc, char *argv[])
- 			args.client_pw = optarg;
- 			break;
- 		case 'm':
- 			args.md5_prefix_str = optarg;
- 			break;
-+		case 'A':
-+			args.authopt_password = optarg;
-+			break;
- 		case 'S':
- 			args.use_setsockopt = 1;
- 			break;
- 		case 'C':
- 			args.use_cmsg = 1;
+ 	memset(&fl6, 0, sizeof(fl6));
+ 	fl6.daddr = ipv6_hdr(skb)->saddr;
+ 	fl6.saddr = ipv6_hdr(skb)->daddr;
+ 	fl6.flowlabel = label;
 -- 
 2.25.1
 
