@@ -5,58 +5,58 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A91C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 16:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82171C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 16:17:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D46C60F70
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 16:17:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70F0A60F70
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 16:17:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234484AbhIUQSh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Sep 2021 12:18:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33478 "EHLO
+        id S234558AbhIUQSn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Sep 2021 12:18:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234503AbhIUQSX (ORCPT
+        with ESMTP id S234429AbhIUQS0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Sep 2021 12:18:23 -0400
+        Tue, 21 Sep 2021 12:18:26 -0400
 Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A3BC061574;
-        Tue, 21 Sep 2021 09:16:55 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id u27so4133195edi.9;
-        Tue, 21 Sep 2021 09:16:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F4EAC061760;
+        Tue, 21 Sep 2021 09:16:57 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id bx4so32131111edb.4;
+        Tue, 21 Sep 2021 09:16:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=SFcfoPPel7lTojPt9vUi/iKxjORTRUrzm14vPDBAPlA=;
-        b=okRVqlfk3og9Jtrd65RJID0/aJeYAm8Va0Lr+okgjWMwqTXGx8DVjyHOHkK+b/NiQP
-         q5APFtRbieLYz9xoXUUMkS3abJcj87JDvZ3CQwQF0dUHW3h978iey/xnsoSjfkHFIu1q
-         qCvEreqfh2tG9hwJEelcHFLg11U6WS1xDD5v4UBkbJ0VU4zSPYrql+J8W8Y6JPFNX7wq
-         uQJsPkD8nb9TfyLK7HjKh6LFSY0NnNJkzlzSYbuaHDMGR8f2vo1r/bsUwmpDkoi9fYla
-         MzQvdCiF69MeXRU4RMWIt+P3Gdb5rfgCHot7/VfCJqKs9Hig/A/ZawmpbjumbQcUHRiN
-         im3A==
+        bh=Ic4Q2z9XXXj2OTblSwNtRZqZ4IEMjJyoXrA4GL7zeCA=;
+        b=oWL309mheTHbFytAapxA7GimvOxrITtZmSXKY0g6wYgGOBZ0YpN2eK5NcT7Iandiyf
+         DVltAYHziAlimAEYvQ+iHrct6EhTrZaoTfPccB28eRoANRJVBccrkKtlZ8OxMA35GJsV
+         RgofYY1opsT4NynxO7eaDo+IvkUDR80paAQfH7K8SPn7Phc8w9QTGOIkzIXlbxQTC8A4
+         KjBxUp7+Zf0+eMpRwYUsilcZkysF1KlkYZRIdJixC7fn3LA/lu/hLa9M1ePB0aXKFboU
+         d20sZpEDJr+pfKduZJ4lG3YSax4FYNw1dZcMEZTIXdyAtU5GbCq34DYzRIFIgxXCY1uV
+         gVAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=SFcfoPPel7lTojPt9vUi/iKxjORTRUrzm14vPDBAPlA=;
-        b=mXM9DdlnZm2wIa8N+hgnv/WD5jXEtPBQjs5Nw2JyEH7YmHA4Vd9v7K8ynt0PIy30jF
-         V+N5IvhOdoU4K6xSboozKvdxpR9I0+Rm932uURqF68R9kHx8xOl/ZMdXwiqhA3Nm/uZZ
-         SH+5S/FGKxmwA0Fw1DxAsmnrvd+8WhIj6MEgG1/+mFb4jAOaABtBv7QQsnypRC07CGCA
-         ldv50n0K+YH27z4eQqRwztGeb0sqbapkiON4NBFo+d3rq5hBdf8ZD+Z6lYb5eANpNkuD
-         0khE60BpLeYB2zC07Zo1YS3ylCH/zBZpVfNGSdcJ4CwsfrB5WD0mqvbdhYcDzoFO/cZb
-         Qlxg==
-X-Gm-Message-State: AOAM532vG+c/Z9uQo0H3NpOgn4svNJvyG54ww3dIRkAAFlB/ZqE6223s
-        Uy+re3ExF28cd01J60vILnY=
-X-Google-Smtp-Source: ABdhPJyFtJiRAGfWkAT2Olxg6++rMn+qLhemQeDmBPRpx4WcxDa3mjb5C0+/K4EraLJEu6/zZF8dkg==
-X-Received: by 2002:a17:907:760d:: with SMTP id jx13mr33129121ejc.194.1632240946508;
-        Tue, 21 Sep 2021 09:15:46 -0700 (PDT)
+        bh=Ic4Q2z9XXXj2OTblSwNtRZqZ4IEMjJyoXrA4GL7zeCA=;
+        b=Zg4z/sAJZRQoNm4FFwhGPZVw49nFoLE0MqIQI2HPhAEMDciDlHtMeP8PJrbEqX68GH
+         AmWcMNN8rOli+yc/2xF37hV53FMqmsJe42Z5X1lVW8EBZCGRA1lffKt0VXDEla4cxj/K
+         xnT/gFPNVyRsXVroSAZ7iPkJU7HJu6T6VKq01Lem3QD8CRtIYdEF9erKEXQhWbOBjhK+
+         wIrCL8YG83TocS5+6kAHb0IRXQa4Q3j/io1Ra3ydUddcZGgOFVtqmroZbYOIUtirbZUs
+         W9D1EABmSs1yI8gXFWkT4V0aUb3V6SC+mYlg4QqwflBVGD2Q1E04EtuxG5uK/sjhZFfy
+         Aipg==
+X-Gm-Message-State: AOAM533EEdsWm2dZL+cY4xMFmB0hNjimqc837Xeu0gHhzGi5F7qCLo2y
+        Wa+Ig6wzWM7GiC0zf1RJqgA=
+X-Google-Smtp-Source: ABdhPJw908s/5lTgFu9/PFDjVd1Psu2UWOBiFDtUSTZrDHPATaMq0K6b/ff30xqH3fLmdWLuP/KENQ==
+X-Received: by 2002:a50:d9c5:: with SMTP id x5mr26365664edj.37.1632240929696;
+        Tue, 21 Sep 2021 09:15:29 -0700 (PDT)
 Received: from pinky.lan ([2a04:241e:502:1df0:b065:9bdf:4016:277])
-        by smtp.gmail.com with ESMTPSA id kx17sm7674075ejc.51.2021.09.21.09.15.44
+        by smtp.gmail.com with ESMTPSA id kx17sm7674075ejc.51.2021.09.21.09.15.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Sep 2021 09:15:46 -0700 (PDT)
+        Tue, 21 Sep 2021 09:15:29 -0700 (PDT)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     Dmitry Safonov <0x7f454c46@gmail.com>,
         David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>
@@ -75,9 +75,9 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         Menglong Dong <dong.menglong@zte.com.cn>,
         netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 17/19] selftests: Add -t tcp_authopt option for fcnal-test.sh
-Date:   Tue, 21 Sep 2021 19:15:00 +0300
-Message-Id: <c52733a1cd9a7bd16aea0b6e056fad9dd1cc5aed.1632240523.git.cdleonard@gmail.com>
+Subject: [PATCH 08/19] tcp: authopt: Disable via sysctl by default
+Date:   Tue, 21 Sep 2021 19:14:51 +0300
+Message-Id: <b0abf2b789220708011a862a892c37b0fd76dc25.1632240523.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1632240523.git.cdleonard@gmail.com>
 References: <cover.1632240523.git.cdleonard@gmail.com>
@@ -87,50 +87,154 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This script is otherwise very slow to run!
+This is mainly intended to protect against local privilege escalations
+through a rarely used feature so it is deliberately not namespaced.
+
+Enforcement is only at the setsockopt level, this should be enough to
+ensure that the tcp_authopt_needed static key never turns on.
+
+No effort is made to handle disabling when the feature is already in
+use.
 
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- tools/testing/selftests/net/fcnal-test.sh | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ Documentation/networking/ip-sysctl.rst |  6 ++++++
+ include/net/tcp_authopt.h              |  1 +
+ net/ipv4/sysctl_net_ipv4.c             | 10 ++++++++++
+ net/ipv4/tcp_authopt.c                 | 11 +++++++++++
+ 4 files changed, 28 insertions(+)
 
-diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
-index 74a7580b6bde..484734db708f 100755
---- a/tools/testing/selftests/net/fcnal-test.sh
-+++ b/tools/testing/selftests/net/fcnal-test.sh
-@@ -1331,10 +1331,21 @@ ipv4_tcp()
- 	log_subsection "With VRF"
- 	setup "yes"
- 	ipv4_tcp_vrf
- }
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index d91ab28718d4..16e34268ecb4 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -995,10 +995,16 @@ tcp_rx_skb_cache - BOOLEAN
+ 	on systems with a lot of TCP sockets, since it increases
+ 	memory usage.
  
-+
-+only_tcp_authopt()
-+{
-+	log_section "TCP Authentication"
-+	setup
-+	set_sysctl net.ipv4.tcp_l3mdev_accept=0
-+	log_subsection "IPv4 no VRF"
-+	ipv4_tcp_authopt
-+}
-+
-+
- ################################################################################
- # IPv4 UDP
+ 	Default: 0 (disabled)
  
- ipv4_udp_novrf()
++tcp_authopt - BOOLEAN
++	Enable the TCP Authentication Option (RFC5925), a replacement for TCP
++	MD5 Signatures (RFC2835).
++
++	Default: 0
++
+ UDP variables
+ =============
+ 
+ udp_l3mdev_accept - BOOLEAN
+ 	Enabling this option allows a "global" bound socket to work
+diff --git a/include/net/tcp_authopt.h b/include/net/tcp_authopt.h
+index 263f98c3a1a8..422f0034d32b 100644
+--- a/include/net/tcp_authopt.h
++++ b/include/net/tcp_authopt.h
+@@ -51,10 +51,11 @@ struct tcp_authopt_info {
+ 	u32 src_isn;
+ 	u32 dst_isn;
+ };
+ 
+ #ifdef CONFIG_TCP_AUTHOPT
++extern int sysctl_tcp_authopt;
+ DECLARE_STATIC_KEY_FALSE(tcp_authopt_needed);
+ 
+ void tcp_authopt_free(struct sock *sk, struct tcp_authopt_info *info);
+ void tcp_authopt_clear(struct sock *sk);
+ int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen);
+diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+index 4680268f2e59..365466fbca8b 100644
+--- a/net/ipv4/sysctl_net_ipv4.c
++++ b/net/ipv4/sysctl_net_ipv4.c
+@@ -17,10 +17,11 @@
+ #include <net/udp.h>
+ #include <net/cipso_ipv4.h>
+ #include <net/ping.h>
+ #include <net/protocol.h>
+ #include <net/netevent.h>
++#include <net/tcp_authopt.h>
+ 
+ static int two = 2;
+ static int three __maybe_unused = 3;
+ static int four = 4;
+ static int thousand = 1000;
+@@ -595,10 +596,19 @@ static struct ctl_table ipv4_table[] = {
+ 		.procname	= "tcp_tx_skb_cache",
+ 		.data		= &tcp_tx_skb_cache_key.key,
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_do_static_key,
+ 	},
++#ifdef CONFIG_TCP_AUTHOPT
++	{
++		.procname	= "tcp_authopt",
++		.data		= &sysctl_tcp_authopt,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec,
++	},
++#endif
+ 	{ }
+ };
+ 
+ static struct ctl_table ipv4_net_table[] = {
+ 	{
+diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
+index 0c32b8fb1d41..41f844d5d49a 100644
+--- a/net/ipv4/tcp_authopt.c
++++ b/net/ipv4/tcp_authopt.c
+@@ -3,10 +3,15 @@
+ #include <linux/kernel.h>
+ #include <net/tcp.h>
+ #include <net/tcp_authopt.h>
+ #include <crypto/hash.h>
+ 
++/* This is mainly intended to protect against local privilege escalations through
++ * a rarely used feature so it is deliberately not namespaced.
++ */
++int sysctl_tcp_authopt;
++
+ /* This is enabled when first struct tcp_authopt_info is allocated and never released */
+ DEFINE_STATIC_KEY_FALSE(tcp_authopt_needed);
+ /* only for CONFIG_IPV6=m */
+ EXPORT_SYMBOL(tcp_authopt_needed);
+ 
+@@ -361,10 +366,12 @@ int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
+ 	struct tcp_authopt opt;
+ 	struct tcp_authopt_info *info;
+ 	int err;
+ 
+ 	sock_owned_by_me(sk);
++	if (!sysctl_tcp_authopt)
++		return -EPERM;
+ 
+ 	err = _copy_from_sockptr_tolerant((u8*)&opt, sizeof(opt), optval, optlen);
+ 	if (err)
+ 		return err;
+ 
+@@ -384,10 +391,12 @@ int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
  {
-@@ -4021,10 +4032,11 @@ do
- 	ipv6_bind|bind6) ipv6_addr_bind;;
- 	ipv6_runtime)    ipv6_runtime;;
- 	ipv6_netfilter)  ipv6_netfilter;;
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 	struct tcp_authopt_info *info;
  
- 	use_cases)       use_cases;;
-+	tcp_authopt)     only_tcp_authopt;;
+ 	sock_owned_by_me(sk);
++	if (!sysctl_tcp_authopt)
++		return -EPERM;
  
- 	# setup namespaces and config, but do not run any tests
- 	setup)		 setup; exit 0;;
- 	vrf_setup)	 setup "yes"; exit 0;;
+ 	memset(opt, 0, sizeof(*opt));
+ 	info = rcu_dereference_check(tp->authopt_info, lockdep_sock_is_held(sk));
+ 	if (!info)
+ 		return -ENOENT;
+@@ -452,10 +461,12 @@ int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
+ 	struct tcp_authopt_key_info *key_info, *old_key_info;
+ 	struct tcp_authopt_alg_imp *alg;
+ 	int err;
+ 
+ 	sock_owned_by_me(sk);
++	if (!sysctl_tcp_authopt)
++		return -EPERM;
+ 
+ 	err = _copy_from_sockptr_tolerant((u8*)&opt, sizeof(opt), optval, optlen);
+ 	if (err)
+ 		return err;
  
 -- 
 2.25.1
