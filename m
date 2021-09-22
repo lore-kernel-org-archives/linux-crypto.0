@@ -2,233 +2,221 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F46EC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 23:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C30C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Sep 2021 02:02:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 17F1B61242
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Sep 2021 23:31:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DFDE60EE7
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Sep 2021 02:02:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230227AbhIUXcc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Sep 2021 19:32:32 -0400
-Received: from mail-oi1-f171.google.com ([209.85.167.171]:37676 "EHLO
-        mail-oi1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230233AbhIUXcc (ORCPT
+        id S232688AbhIVCDo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Sep 2021 22:03:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54268 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230302AbhIVCDo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Sep 2021 19:32:32 -0400
-Received: by mail-oi1-f171.google.com with SMTP id w206so1672576oiw.4;
-        Tue, 21 Sep 2021 16:31:03 -0700 (PDT)
+        Tue, 21 Sep 2021 22:03:44 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10CD9C061574;
+        Tue, 21 Sep 2021 19:02:15 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id u21so1280318qtw.8;
+        Tue, 21 Sep 2021 19:02:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jms.id.au; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=mgCRAj8DzBJSfsE3q2tNnkO0IJ8gTb2jzC1NsaR7PCw=;
+        b=e3dJJbTI3j2a4UlsU42Mx8Izjnu4cn+MYwXRcLaBkKq3aPjTwiNdE/uPyyygnCwrYG
+         bEuZbnydfYaCTCaDmWuA6pdxrxvizY4MLLq3DHKqinBfzfhqek0FBVxEVbIg1PpE76c9
+         nhZiucwpaCgFyC1JuKoMYkCnJ4UU8QrWri+pQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=91XjStUm9Mm7b+X7wWYnPdiNJWHmz77cGzi9d45AgQ4=;
-        b=1Qme9P/HFjqzEBthG1iSsPJUdr5sk13kwg9Rl7yLjuyv3IsC/nNGeKxe5WLnanyuxw
-         SVIXErYfVqxSEjAMvRw3DR1qzQheaa6AR5zu9g1GFlfD83gSdgpjfyDAIYpWAkUwuexO
-         k8jv2+Zl6ai2KGAvOckJVT2TzQH/VF6SxROFjWgB84alDZsxsZt5xxQXIFPEa82ya9sM
-         uTvVkEEPynZCRzmc9WlaQwtia1NfMjtL6pJJU8WkGTvGWpzuh1Xw3jKCo0TWO1ClPR0K
-         5koYeKtX/28M5G5RYu4dG/U6mE7lrT0vZGhXZ4QZpQnwW2ntkSQFYemT3L8NUqwvTddx
-         UfMQ==
-X-Gm-Message-State: AOAM531Nid/k8tNqzY63ZSYf3HDoZuiM6kpH5UWh+plTFkh2an5an0zU
-        PhGl3hy+OjOfgJRqrIDcqRs8PZJj/A==
-X-Google-Smtp-Source: ABdhPJwi51R0O2WHxOG1+y7tiXHZwEPtrB0Wn4R5YqLt7MlciaKdW4ovO/cXJhdK8Q3qEq2T82QjoA==
-X-Received: by 2002:aca:2318:: with SMTP id e24mr5910510oie.173.1632267062982;
-        Tue, 21 Sep 2021 16:31:02 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
-        by smtp.gmail.com with ESMTPSA id w14sm110894oth.5.2021.09.21.16.31.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Sep 2021 16:31:02 -0700 (PDT)
-Received: (nullmailer pid 3493875 invoked by uid 1000);
-        Tue, 21 Sep 2021 23:31:01 -0000
-Date:   Tue, 21 Sep 2021 18:31:01 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Jayesh Choudhary <j-choudhary@ti.com>
-Cc:     devicetree@vger.kernel.org, mpm@selenic.com,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: rng: convert OMAP and Inside-Secure HWRNG
- to yaml schema
-Message-ID: <YUprNTzmTdZJOCLY@robh.at.kernel.org>
-References: <20210916185352.7919-1-j-choudhary@ti.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=mgCRAj8DzBJSfsE3q2tNnkO0IJ8gTb2jzC1NsaR7PCw=;
+        b=ks8A2D7HS+zT69Cla222DdhZUYmKXPCMBCsYZ/weFuFcHRcgfNvhP0Jm7jS40t07na
+         gwxv2ktOlHJN3pPB77u9JovXQFQzeRKOyPexjRd08N9gi8ENhXSkZsMSE9l0xoUgqr7e
+         OPRejAbdFZw7v2MsMRVVRkbmYGaFshCFnS4y7ItV/BFXNZI7sDzsmF8/MZru2jbxylOb
+         pBWV0vHPDbqW3yMsMiJrBPkRox/J4/csMoykGFgSOVNtnOFYGwFnwo8INqSBjSJoZXNR
+         Ah4W8Jibb4GY8N4JsVTIJMor1GJXwHxD8sFKo9UbE/41eUQaZicKw2sppE1mXspBxNQx
+         zZpQ==
+X-Gm-Message-State: AOAM5321f6DSSVOQV6QVnutebd5WBKKJhoMG+qWBLFxg/tfjZfiFQjDn
+        4wobrDpyh+p3nB70AP1X1QHAYHEeAGf291ouE9U=
+X-Google-Smtp-Source: ABdhPJzh6A9rX+IW79HZTeRbvve7SXL1Rw0lrxiKHDq8DtkRDywzrL3dBIAPBPhRqTX5kMpZIAcltvjZ6QcdFTZTOGM=
+X-Received: by 2002:ac8:7549:: with SMTP id b9mr22594619qtr.392.1632276134046;
+ Tue, 21 Sep 2021 19:02:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210916185352.7919-1-j-choudhary@ti.com>
+References: <20210921213930.10366-1-linkmauve@linkmauve.fr> <20210921213930.10366-2-linkmauve@linkmauve.fr>
+In-Reply-To: <20210921213930.10366-2-linkmauve@linkmauve.fr>
+From:   Joel Stanley <joel@jms.id.au>
+Date:   Wed, 22 Sep 2021 02:02:01 +0000
+Message-ID: <CACPK8Xc+J0PbCdgheRxJbOVZ=OyyfsCA=cwkneMoboJLzC8TZQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] crypto: nintendo-aes - add a new AES driver
+To:     Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Ash Logan <ash@heyquark.com>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.ne@posteo.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 17, 2021 at 12:23:52AM +0530, Jayesh Choudhary wrote:
-> Converts the RNG bindings for OMAP SoCs and Inside-Secure
-> HWRNG modules to YAML schema.
-> 
-> Signed-off-by: Jayesh Choudhary <j-choudhary@ti.com>
+On Tue, 21 Sept 2021 at 21:47, Emmanuel Gil Peyrot
+<linkmauve@linkmauve.fr> wrote:
+>
+> This engine implements AES in CBC mode, using 128-bit keys only.  It is
+> present on both the Wii and the Wii U, and is apparently identical in
+> both consoles.
+>
+> The hardware is capable of firing an interrupt when the operation is
+> done, but this driver currently uses a busy loop, I=E2=80=99m not too sur=
+e
+> whether it would be preferable to switch, nor how to achieve that.
+>
+> It also supports a mode where no operation is done, and thus could be
+> used as a DMA copy engine, but I don=E2=80=99t know how to expose that to=
+ the
+> kernel or whether it would even be useful.
+>
+> In my testing, on a Wii U, this driver reaches 80.7 MiB/s, while the
+> aes-generic driver only reaches 30.9 MiB/s, so it is a quite welcome
+> speedup.
+>
+> This driver was written based on reversed documentation, see:
+> https://wiibrew.org/wiki/Hardware/AES
+>
+> Signed-off-by: Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
+> Tested-by: Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>  # on Wii U
 > ---
->  .../devicetree/bindings/rng/omap_rng.txt      | 38 --------
->  .../devicetree/bindings/rng/omap_rng.yaml     | 94 +++++++++++++++++++
->  2 files changed, 94 insertions(+), 38 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/rng/omap_rng.txt
->  create mode 100644 Documentation/devicetree/bindings/rng/omap_rng.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/omap_rng.txt b/Documentation/devicetree/bindings/rng/omap_rng.txt
-> deleted file mode 100644
-> index ea434ce50f36..000000000000
-> --- a/Documentation/devicetree/bindings/rng/omap_rng.txt
-> +++ /dev/null
-> @@ -1,38 +0,0 @@
-> -OMAP SoC and Inside-Secure HWRNG Module
-> -
-> -Required properties:
-> -
-> -- compatible : Should contain entries for this and backward compatible
-> -  RNG versions:
-> -  - "ti,omap2-rng" for OMAP2.
-> -  - "ti,omap4-rng" for OMAP4, OMAP5 and AM33XX.
-> -  - "inside-secure,safexcel-eip76" for SoCs with EIP76 IP block
-> -  Note that these two versions are incompatible.
-> -- ti,hwmods: Name of the hwmod associated with the RNG module
-> -- reg : Offset and length of the register set for the module
-> -- interrupts : the interrupt number for the RNG module.
-> -		Used for "ti,omap4-rng" and "inside-secure,safexcel-eip76"
-> -- clocks: the trng clock source. Only mandatory for the
-> -  "inside-secure,safexcel-eip76" compatible, the second clock is
-> -  needed for the Armada 7K/8K SoCs
-> -- clock-names: mandatory if there is a second clock, in this case the
-> -  name must be "core" for the first clock and "reg" for the second
-> -  one
-> -
-> -
-> -Example:
-> -/* AM335x */
-> -rng: rng@48310000 {
-> -	compatible = "ti,omap4-rng";
-> -	ti,hwmods = "rng";
-> -	reg = <0x48310000 0x2000>;
-> -	interrupts = <111>;
-> -};
-> -
-> -/* SafeXcel IP-76 */
-> -trng: rng@f2760000 {
-> -	compatible = "inside-secure,safexcel-eip76";
-> -	reg = <0xf2760000 0x7d>;
-> -	interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
-> -	clocks = <&cpm_syscon0 1 25>;
-> -};
-> diff --git a/Documentation/devicetree/bindings/rng/omap_rng.yaml b/Documentation/devicetree/bindings/rng/omap_rng.yaml
+>  drivers/crypto/Kconfig        |  11 ++
+>  drivers/crypto/Makefile       |   1 +
+>  drivers/crypto/nintendo-aes.c | 273 ++++++++++++++++++++++++++++++++++
+>  3 files changed, 285 insertions(+)
+>  create mode 100644 drivers/crypto/nintendo-aes.c
+>
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 9a4c275a1335..adc94ad7462d 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -871,4 +871,15 @@ config CRYPTO_DEV_SA2UL
+>
+>  source "drivers/crypto/keembay/Kconfig"
+>
+> +config CRYPTO_DEV_NINTENDO
+> +       tristate "Support for the Nintendo Wii U AES engine"
+> +       depends on WII || WIIU || COMPILE_TEST
+
+This current seteup will allow the driver to be compile tested for
+non-powerpc, which will fail on the dcbf instructions.
+
+Perhaps use this instead:
+
+       depends on WII || WIIU || (COMPILE_TEST && PPC)
+
+> +       select CRYPTO_AES
+> +       help
+> +         Say 'Y' here to use the Nintendo Wii or Wii U on-board AES
+> +         engine for the CryptoAPI AES algorithm.
+> +
+> +         To compile this driver as a module, choose M here: the module
+> +         will be called nintendo-aes.
+> +
+>  endif # CRYPTO_HW
+> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+> index fa22cb19e242..004dae7bbf39 100644
+> --- a/drivers/crypto/Makefile
+> +++ b/drivers/crypto/Makefile
+> @@ -22,6 +22,7 @@ obj-$(CONFIG_CRYPTO_DEV_MARVELL) +=3D marvell/
+>  obj-$(CONFIG_CRYPTO_DEV_MXS_DCP) +=3D mxs-dcp.o
+>  obj-$(CONFIG_CRYPTO_DEV_NIAGARA2) +=3D n2_crypto.o
+>  n2_crypto-y :=3D n2_core.o n2_asm.o
+> +obj-$(CONFIG_CRYPTO_DEV_NINTENDO) +=3D nintendo-aes.o
+>  obj-$(CONFIG_CRYPTO_DEV_NX) +=3D nx/
+>  obj-$(CONFIG_CRYPTO_DEV_OMAP) +=3D omap-crypto.o
+>  obj-$(CONFIG_CRYPTO_DEV_OMAP_AES) +=3D omap-aes-driver.o
+> diff --git a/drivers/crypto/nintendo-aes.c b/drivers/crypto/nintendo-aes.=
+c
 > new file mode 100644
-> index 000000000000..86bbc2c53e7d
+> index 000000000000..79ae77500999
 > --- /dev/null
-> +++ b/Documentation/devicetree/bindings/rng/omap_rng.yaml
-> @@ -0,0 +1,94 @@
-> +# SPDX-License-Identifier: (GPL-2.0+ OR BSD-2-Clause)
+> +++ b/drivers/crypto/nintendo-aes.c
+> @@ -0,0 +1,273 @@
+> +/*
+> + * Copyright (C) 2021 Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 and
+> + * only version 2 as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
 
-GPL-2.0-only OR BSD-2-Clause
+The  kernel uses the SDPX header instead of pasting the text.
 
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/rng/omap_rng.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +static int
+> +do_crypt(const void *src, void *dst, u32 len, u32 flags)
+> +{
+> +       u32 blocks =3D ((len >> 4) - 1) & AES_CTRL_BLOCK;
+> +       u32 status;
+> +       u32 counter =3D OP_TIMEOUT;
+> +       u32 i;
 > +
-> +title: OMAP SoC and Inside-Secure HWRNG Module
-> +
-> +maintainers:
-> +  - Jayesh Choudhary <j-choudhary@ti.com>
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - ti,omap2-rng
-> +      - ti,omap4-rng
-> +      - inside-secure,safexcel-eip76
-> +
-> +  ti,hwmods:
-> +    const: rng
-> +    deprecated: true
-> +    description: Name of the hwmod associated with the RNG module
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    minItems: 1
-> +    maxItems: 2
-> +    items:
-> +      - description: EIP150 gatable clock
-> +      - description: Main gatable clock
-> +
-> +  clock-names:
-> +    oneOf:
-> +      - items:
-> +          - const: core
-> +          - const: reg
-> +      - const: core
+> +       /* Flush out all of src, we can=E2=80=99t know whether any of it =
+is in cache */
+> +       for (i =3D 0; i < len; i +=3D 32)
+> +               __asm__("dcbf 0, %0" : : "r" (src + i));
+> +       __asm__("sync" : : : "memory");
 
-This is better expressed as:
-
-minItems: 1
-items:
-  - const: core
-  - const: reg
+This could be flush_dcache_range, from asm/cacheflush.h
 
 > +
+> +       /* Set the addresses for DMA */
+> +       iowrite32be(virt_to_phys((void *)src), base + AES_SRC);
+> +       iowrite32be(virt_to_phys(dst), base + AES_DEST);
 > +
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            enum:
-> +              - ti,omap4-rng
-> +              - inside-secure,safexcel-eip76
+> +       /* Start the operation */
+> +       iowrite32be(flags | blocks, base + AES_CTRL);
 > +
-> +    then:
-> +      required:
-> +        - interrupts
+> +       /* TODO: figure out how to use interrupts here, this will probabl=
+y
+> +        * lower throughput but let the CPU do other things while the AES
+> +        * engine is doing its work. */
+> +       do {
+> +               status =3D ioread32be(base + AES_CTRL);
+> +               cpu_relax();
+> +       } while ((status & AES_CTRL_EXEC) && --counter);
+
+You could add a msleep in here?
+
+Consider using readl_poll_timeout().
+
+Cheers,
+
+Joel
+
 > +
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            enum:
-> +              - inside-secure,safexcel-eip76
+> +       /* Do we ever get called with dst =E2=89=A0 src?  If so we have t=
+o invalidate
+> +        * dst in addition to the earlier flush of src. */
+> +       if (unlikely(dst !=3D src)) {
+> +               for (i =3D 0; i < len; i +=3D 32)
+> +                       __asm__("dcbi 0, %0" : : "r" (dst + i));
+> +               __asm__("sync" : : : "memory");
+> +       }
 > +
-> +    then:
-> +      required:
-> +        - clocks
-> +
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    /* AM335x */
-> +    rng: rng@48310000 {
-> +            compatible = "ti,omap4-rng";
-> +            ti,hwmods = "rng";
-> +            reg = <0x48310000 0x2000>;
-> +            interrupts = <111>;
-> +    };
-> +  - |
-> +    /* SafeXcel IP-76 */
-> +    trng: rng@f2760000 {
-> +            compatible = "inside-secure,safexcel-eip76";
-> +            reg = <0xf2760000 0x7d>;
-> +            interrupts = <0 59 4>;
-> +            clocks = <&cpm_syscon0 1 25>;
-> +    };
-> +
-> +...
-> -- 
-> 2.17.1
-> 
-> 
+> +       return counter ? 0 : 1;
+> +}
