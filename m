@@ -2,123 +2,290 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD57FC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Sep 2021 17:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2354DC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Sep 2021 18:55:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8C7B6115A
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Sep 2021 17:55:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F08B16120E
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Sep 2021 18:55:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236982AbhIVR47 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Sep 2021 13:56:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49102 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236837AbhIVR45 (ORCPT
+        id S237116AbhIVS5N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Sep 2021 14:57:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24267 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237093AbhIVS5M (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Sep 2021 13:56:57 -0400
-Received: from ssl.serverraum.org (ssl.serverraum.org [IPv6:2a01:4f8:151:8464::1:2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90A5FC061574;
-        Wed, 22 Sep 2021 10:55:27 -0700 (PDT)
-Received: from [127.0.0.1] (unknown [185.4.193.222])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by ssl.serverraum.org (Postfix) with ESMTPSA id C1184221E6;
-        Wed, 22 Sep 2021 19:55:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
-        t=1632333324;
+        Wed, 22 Sep 2021 14:57:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632336942;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0THVwF9iAKj4pPRjEVgX91l84SyJxAaaWm9eRVaEVkY=;
-        b=iWnj/83IE4y3KEVOOSn8ejEeL1qvzYRcbCofDpFwmh+h/2EQHtqgtO5+M7Rb9qzsU+4KkF
-        aOnqeYbak/rLpRBi52kxQiO2blw7AiRher2ektMt+u5T8OHqSIaY1xY92keOWW6AsbfgUb
-        +qVA0vfLeR+o3WqxdFKB9/Sc7iIShxk=
-Date:   Wed, 22 Sep 2021 19:55:09 +0200
-From:   Michael Walle <michael@walle.cc>
-To:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Subject: Re: [PATCH] crypto: caam: disable pkc for non-E SoCs
-User-Agent: K-9 Mail for Android
-In-Reply-To: <0b8ae053-698b-2c03-c729-c4c86ba79550@nxp.com>
-References: <20210915220307.3079917-1-michael@walle.cc> <0b8ae053-698b-2c03-c729-c4c86ba79550@nxp.com>
-Message-ID: <936221D6-08D2-4656-86AF-DC921E3CB14A@walle.cc>
+        bh=5cjz37tnSj3P18g8I99+DqVwuBzNML5WhZ/C6tpw5rE=;
+        b=fpT0XLePJx8SCMMtf3To7WZ0du9JvyHcl2J5e09ZYKvcukQTXATikmKzH7RpABA45AATOx
+        JVhMQg0Ww/pOHcbLJ/e0JPzuf/hNn8apL/Xq+wrdNj1BVUWjvkbAwvkFcHlYyk3lVAvJUb
+        Gsk3Q8MXTPPUI+Lr5024uU2LgxCtwK4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-101-KOF7jmivODaJIGQ3Q3SRdQ-1; Wed, 22 Sep 2021 14:55:41 -0400
+X-MC-Unique: KOF7jmivODaJIGQ3Q3SRdQ-1
+Received: by mail-wr1-f69.google.com with SMTP id l9-20020adfc789000000b00160111fd4e8so3005321wrg.17
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Sep 2021 11:55:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=5cjz37tnSj3P18g8I99+DqVwuBzNML5WhZ/C6tpw5rE=;
+        b=WuPHI9w0pGCabE4I+KSNcstPScS1Z3sIniQIMBOB7Y+US0BfFEwcFCROcZ6wZ6Je8q
+         /V8iii5lUczgvF6hlysNTK1PZ17NHPdFVfhCs8GP1fqixdoFtX5HX8h/G+4JDMYa3QWd
+         nh7p81ieyBjXP2x64I3RdxxZRBrkF/fAtHWktINfwz8QQ0mO9JuV56RGxAMwOYQT0Vhr
+         mKCCAkgQuvfX/jBAhEWFPV9uRGX8ayeIfZpFAd0XOz48ibLMFLl8mWjQLPziTiJJbzeF
+         rcWHPPLt4uiPpbEb1RTyLlD0ciu10+ekcwKZMC4gU6jEZZIwo5Qfk+1tArKe/DbxsiaI
+         0ARw==
+X-Gm-Message-State: AOAM533wEBJ3BvRQknGdxqZJdZlxGMYaBGitSWK+Mwv8fjth8APvI+3y
+        iKQ+xq2uewlJRaSF61MFAVkFh33R0/JTLeYNfsqW9aQ74bQ4Kc4leg6GVdICI2zgIhY6HtwXihS
+        aZT+pivZO+MEBbPa+EVtXTTUw
+X-Received: by 2002:a05:600c:2109:: with SMTP id u9mr638720wml.6.1632336939850;
+        Wed, 22 Sep 2021 11:55:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzx++mJlJo8Ud6dJxeU6+JTLQqLX2UZep4XZkQy1hlkTcc2qcI/o0h1c08tRRLAfmQXFgwqFA==
+X-Received: by 2002:a05:600c:2109:: with SMTP id u9mr638703wml.6.1632336939658;
+        Wed, 22 Sep 2021 11:55:39 -0700 (PDT)
+Received: from work-vm (cpc109011-salf6-2-0-cust1562.10-2.cable.virginm.net. [82.29.118.27])
+        by smtp.gmail.com with ESMTPSA id y6sm3004554wrp.46.2021.09.22.11.55.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Sep 2021 11:55:39 -0700 (PDT)
+Date:   Wed, 22 Sep 2021 19:55:36 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 21/45] KVM: SVM: Make AVIC backing, VMSA and
+ VMCB memory allocation SNP safe
+Message-ID: <YUt8KOiwTwwa6xZK@work-vm>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-22-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210820155918.7518-22-brijesh.singh@amd.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am 22=2E September 2021 17:51:23 MESZ schrieb "Horia Geant=C4=83" <horia=2E=
-geanta@nxp=2Ecom>:
->On 9/16/2021 1:03 AM, Michael Walle wrote:
->> On newer CAAM versions, not all accelerators are disabled if the SoC is
->> a non-E variant=2E While the driver checks most of the modules for
->> availability, there is one - PKHA - which sticks out=2E On non-E varian=
-ts
->Currently there's no dedicated support for "partially disabled" non-E
->(export-controlled) parts in Linux kernel caam driver(s)=2E
->
->Up until recently firmware (U-boot) was deleting the "crypto" DT node
->for all non-E parts [1]=2E
->Modifying the f/w indeed triggers changes across the s/w stack=2E
+* Brijesh Singh (brijesh.singh@amd.com) wrote:
+> Implement a workaround for an SNP erratum where the CPU will incorrectly
+> signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
+> RMP entry of a VMCB, VMSA or AVIC backing page.
+> 
+> When SEV-SNP is globally enabled, the CPU marks the VMCB, VMSA, and AVIC
+> backing   pages as "in-use" in the RMP after a successful VMRUN.  This is
+> done for _all_ VMs, not just SNP-Active VMs.
 
-Well, it does check if a module is available or not=2E And this seem to be=
- the only module which have "something in between"=2E I=2Ee=2E the number o=
-f available modules is not zero but it also doesn't work as expected=2E=20
+Can you explain what 'globally enabled' means?
 
->Since you are modifying only the caam code handling PKHA, is it correct
->to assume that everything else is working fine?
+Or more specifically, can we trip this bug on public hardware that has
+the SNP enabled in the bios, but no SNP init in the host OS?
 
-Everything else is skipped because the "number of instances" is zero=2E=20
+Dave
 
->For example: is the number of AES accelerators (AESA_VERSION[AESA_NUM])
->being reported as 0 on non-E parts?=20
-
-yes, see above=2E=20
-
->> it is still reported as available, that is the number of instances is
->> non-zero, but it has limited functionality=2E In particular it doesn't
->> support encryption and decryption, but just signing and verifying=2E Th=
-is
->> is indicated by a bit in the PKHA_MISC field=2E Take this bit into acco=
-unt
->> if we are checking for availablitly=2E
->typo:			 ^ availability
-
-If there is nothing else wrong, could this be fixed while applying?
-
->>=20
->> This will the following error:
->> [    8=2E167817] caam_jr 8020000=2Ejr: 20000b0f: CCB: desc idx 11: : In=
-valid CHA selected=2E
->>=20
->> Tested on an NXP LS1028A (non-E) SoC=2E
->Thanks=2E
->Unfortunately I don't have a non-E part to test on=2E
-
-You can take a look at the ls1028a RM where this bit is=2E described to ve=
-rify what the patch is doing ;)=20
-
-Thanks for taking a look=2E=20
-
--michael=20
-
->
->Horia
->
->[1] https://lore=2Ekernel=2Eorg/u-boot/ff146322-e8c7-2418-ceb1-a3c0d4cee1=
-a1@nxp=2Ecom
->4eecc6f1a104 ("armv8: layerscape: don't remove crypto node if just partia=
-lly disabled")
+> If the hypervisor accesses an in-use page through a writable translation,
+> the CPU will throw an RMP violation #PF.  On early SNP hardware, if an
+> in-use page is 2mb aligned and software accesses any part of the associated
+> 2mb region with a hupage, the CPU will incorrectly treat the entire 2mb
+> region as in-use and signal a spurious RMP violation #PF.
+> 
+> The recommended is to not use the hugepage for the VMCB, VMSA or
+> AVIC backing page. Add a generic allocator that will ensure that the page
+> returns is not hugepage (2mb or 1gb) and is safe to be used when SEV-SNP
+> is enabled.
+> 
+> Co-developed-by: Marc Orr <marcorr@google.com>
+> Signed-off-by: Marc Orr <marcorr@google.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>  arch/x86/include/asm/kvm_host.h    |  1 +
+>  arch/x86/kvm/lapic.c               |  5 ++++-
+>  arch/x86/kvm/svm/sev.c             | 35 ++++++++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.c             | 16 ++++++++++++--
+>  arch/x86/kvm/svm/svm.h             |  1 +
+>  6 files changed, 56 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index a12a4987154e..36a9c23a4b27 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -122,6 +122,7 @@ KVM_X86_OP_NULL(enable_direct_tlbflush)
+>  KVM_X86_OP_NULL(migrate_timers)
+>  KVM_X86_OP(msr_filter_changed)
+>  KVM_X86_OP_NULL(complete_emulated_msr)
+> +KVM_X86_OP(alloc_apic_backing_page)
+>  
+>  #undef KVM_X86_OP
+>  #undef KVM_X86_OP_NULL
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 974cbfb1eefe..5ad6255ff5d5 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1453,6 +1453,7 @@ struct kvm_x86_ops {
+>  	int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
+>  
+>  	void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
+> +	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+>  };
+>  
+>  struct kvm_x86_nested_ops {
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index ba5a27879f1d..05b45747b20b 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2457,7 +2457,10 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
+>  
+>  	vcpu->arch.apic = apic;
+>  
+> -	apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+> +	if (kvm_x86_ops.alloc_apic_backing_page)
+> +		apic->regs = static_call(kvm_x86_alloc_apic_backing_page)(vcpu);
+> +	else
+> +		apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+>  	if (!apic->regs) {
+>  		printk(KERN_ERR "malloc apic regs error for vcpu %x\n",
+>  		       vcpu->vcpu_id);
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 1644da5fc93f..8771b878193f 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2703,3 +2703,38 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+>  		break;
+>  	}
+>  }
+> +
+> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
+> +{
+> +	unsigned long pfn;
+> +	struct page *p;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +
+> +	/*
+> +	 * Allocate an SNP safe page to workaround the SNP erratum where
+> +	 * the CPU will incorrectly signal an RMP violation  #PF if a
+> +	 * hugepage (2mb or 1gb) collides with the RMP entry of VMCB, VMSA
+> +	 * or AVIC backing page. The recommeded workaround is to not use the
+> +	 * hugepage.
+> +	 *
+> +	 * Allocate one extra page, use a page which is not 2mb aligned
+> +	 * and free the other.
+> +	 */
+> +	p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
+> +	if (!p)
+> +		return NULL;
+> +
+> +	split_page(p, 1);
+> +
+> +	pfn = page_to_pfn(p);
+> +	if (IS_ALIGNED(__pfn_to_phys(pfn), PMD_SIZE)) {
+> +		pfn++;
+> +		__free_page(p);
+> +	} else {
+> +		__free_page(pfn_to_page(pfn + 1));
+> +	}
+> +
+> +	return pfn_to_page(pfn);
+> +}
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 25773bf72158..058eea8353c9 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1368,7 +1368,7 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+>  	svm = to_svm(vcpu);
+>  
+>  	err = -ENOMEM;
+> -	vmcb01_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +	vmcb01_page = snp_safe_alloc_page(vcpu);
+>  	if (!vmcb01_page)
+>  		goto out;
+>  
+> @@ -1377,7 +1377,7 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+>  		 * SEV-ES guests require a separate VMSA page used to contain
+>  		 * the encrypted register state of the guest.
+>  		 */
+> -		vmsa_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +		vmsa_page = snp_safe_alloc_page(vcpu);
+>  		if (!vmsa_page)
+>  			goto error_free_vmcb_page;
+>  
+> @@ -4539,6 +4539,16 @@ static int svm_vm_init(struct kvm *kvm)
+>  	return 0;
+>  }
+>  
+> +static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
+> +{
+> +	struct page *page = snp_safe_alloc_page(vcpu);
+> +
+> +	if (!page)
+> +		return NULL;
+> +
+> +	return page_address(page);
+> +}
+> +
+>  static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.hardware_unsetup = svm_hardware_teardown,
+>  	.hardware_enable = svm_hardware_enable,
+> @@ -4667,6 +4677,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.complete_emulated_msr = svm_complete_emulated_msr,
+>  
+>  	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
+> +
+> +	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
+>  };
+>  
+>  static struct kvm_x86_init_ops svm_init_ops __initdata = {
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index d1f1512a4b47..e40800e9c998 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -575,6 +575,7 @@ void sev_es_create_vcpu(struct vcpu_svm *svm);
+>  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+>  void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu);
+>  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
+>  
+>  /* vmenter.S */
+>  
+> -- 
+> 2.17.1
+> 
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
