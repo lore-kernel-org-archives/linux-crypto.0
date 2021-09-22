@@ -2,221 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C30C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Sep 2021 02:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12BBEC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Sep 2021 05:41:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5DFDE60EE7
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Sep 2021 02:02:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBF2B61131
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Sep 2021 05:41:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232688AbhIVCDo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Sep 2021 22:03:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54268 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230302AbhIVCDo (ORCPT
+        id S231908AbhIVFmn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Sep 2021 01:42:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43039 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232258AbhIVFmm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Sep 2021 22:03:44 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10CD9C061574;
-        Tue, 21 Sep 2021 19:02:15 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id u21so1280318qtw.8;
-        Tue, 21 Sep 2021 19:02:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jms.id.au; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=mgCRAj8DzBJSfsE3q2tNnkO0IJ8gTb2jzC1NsaR7PCw=;
-        b=e3dJJbTI3j2a4UlsU42Mx8Izjnu4cn+MYwXRcLaBkKq3aPjTwiNdE/uPyyygnCwrYG
-         bEuZbnydfYaCTCaDmWuA6pdxrxvizY4MLLq3DHKqinBfzfhqek0FBVxEVbIg1PpE76c9
-         nhZiucwpaCgFyC1JuKoMYkCnJ4UU8QrWri+pQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=mgCRAj8DzBJSfsE3q2tNnkO0IJ8gTb2jzC1NsaR7PCw=;
-        b=ks8A2D7HS+zT69Cla222DdhZUYmKXPCMBCsYZ/weFuFcHRcgfNvhP0Jm7jS40t07na
-         gwxv2ktOlHJN3pPB77u9JovXQFQzeRKOyPexjRd08N9gi8ENhXSkZsMSE9l0xoUgqr7e
-         OPRejAbdFZw7v2MsMRVVRkbmYGaFshCFnS4y7ItV/BFXNZI7sDzsmF8/MZru2jbxylOb
-         pBWV0vHPDbqW3yMsMiJrBPkRox/J4/csMoykGFgSOVNtnOFYGwFnwo8INqSBjSJoZXNR
-         Ah4W8Jibb4GY8N4JsVTIJMor1GJXwHxD8sFKo9UbE/41eUQaZicKw2sppE1mXspBxNQx
-         zZpQ==
-X-Gm-Message-State: AOAM5321f6DSSVOQV6QVnutebd5WBKKJhoMG+qWBLFxg/tfjZfiFQjDn
-        4wobrDpyh+p3nB70AP1X1QHAYHEeAGf291ouE9U=
-X-Google-Smtp-Source: ABdhPJzh6A9rX+IW79HZTeRbvve7SXL1Rw0lrxiKHDq8DtkRDywzrL3dBIAPBPhRqTX5kMpZIAcltvjZ6QcdFTZTOGM=
-X-Received: by 2002:ac8:7549:: with SMTP id b9mr22594619qtr.392.1632276134046;
- Tue, 21 Sep 2021 19:02:14 -0700 (PDT)
+        Wed, 22 Sep 2021 01:42:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632289273;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=bJXkEkfWdDJCAURztjziNenOw4qGpHyUiriN1i4JZCM=;
+        b=VXAb6V4/M7LhCnZaCKiWdAdWMKvP/nEx+aeXglE6WiQypc/Vmgefsl4wm4h86zKSjydE+z
+        K9SS9ibewkbg6kAjRa6ChkqtTaZx0ZOy3YP1nDCH7CX94ERIUNLljJX2WMv9yvzCZWrHfW
+        QAAYq4+KKQdplqwHBj2JlXMyoCD41Js=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-220-c52lzspQNBKNg9iKaAsteQ-1; Wed, 22 Sep 2021 01:41:08 -0400
+X-MC-Unique: c52lzspQNBKNg9iKaAsteQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76646BBEE0;
+        Wed, 22 Sep 2021 05:41:07 +0000 (UTC)
+Received: from treble.redhat.com (unknown [10.22.33.188])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9F9E56B544;
+        Wed, 22 Sep 2021 05:41:05 +0000 (UTC)
+From:   Josh Poimboeuf <jpoimboe@redhat.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH] x86/crypto/sm4: Fix frame pointer stack corruption
+Date:   Tue, 21 Sep 2021 22:40:26 -0700
+Message-Id: <2010f60571abe6fe53d89189ab6da7e641cb027b.1632289099.git.jpoimboe@redhat.com>
 MIME-Version: 1.0
-References: <20210921213930.10366-1-linkmauve@linkmauve.fr> <20210921213930.10366-2-linkmauve@linkmauve.fr>
-In-Reply-To: <20210921213930.10366-2-linkmauve@linkmauve.fr>
-From:   Joel Stanley <joel@jms.id.au>
-Date:   Wed, 22 Sep 2021 02:02:01 +0000
-Message-ID: <CACPK8Xc+J0PbCdgheRxJbOVZ=OyyfsCA=cwkneMoboJLzC8TZQ@mail.gmail.com>
-Subject: Re: [PATCH 1/4] crypto: nintendo-aes - add a new AES driver
-To:     Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Ash Logan <ash@heyquark.com>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.ne@posteo.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 21 Sept 2021 at 21:47, Emmanuel Gil Peyrot
-<linkmauve@linkmauve.fr> wrote:
->
-> This engine implements AES in CBC mode, using 128-bit keys only.  It is
-> present on both the Wii and the Wii U, and is apparently identical in
-> both consoles.
->
-> The hardware is capable of firing an interrupt when the operation is
-> done, but this driver currently uses a busy loop, I=E2=80=99m not too sur=
-e
-> whether it would be preferable to switch, nor how to achieve that.
->
-> It also supports a mode where no operation is done, and thus could be
-> used as a DMA copy engine, but I don=E2=80=99t know how to expose that to=
- the
-> kernel or whether it would even be useful.
->
-> In my testing, on a Wii U, this driver reaches 80.7 MiB/s, while the
-> aes-generic driver only reaches 30.9 MiB/s, so it is a quite welcome
-> speedup.
->
-> This driver was written based on reversed documentation, see:
-> https://wiibrew.org/wiki/Hardware/AES
->
-> Signed-off-by: Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
-> Tested-by: Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>  # on Wii U
-> ---
->  drivers/crypto/Kconfig        |  11 ++
->  drivers/crypto/Makefile       |   1 +
->  drivers/crypto/nintendo-aes.c | 273 ++++++++++++++++++++++++++++++++++
->  3 files changed, 285 insertions(+)
->  create mode 100644 drivers/crypto/nintendo-aes.c
->
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 9a4c275a1335..adc94ad7462d 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -871,4 +871,15 @@ config CRYPTO_DEV_SA2UL
->
->  source "drivers/crypto/keembay/Kconfig"
->
-> +config CRYPTO_DEV_NINTENDO
-> +       tristate "Support for the Nintendo Wii U AES engine"
-> +       depends on WII || WIIU || COMPILE_TEST
+sm4_aesni_avx_crypt8() sets up the frame pointer (which includes pushing
+RBP) before doing a conditional sibling call to sm4_aesni_avx_crypt4(),
+which sets up an additional frame pointer.  Things will not go well when
+sm4_aesni_avx_crypt4() pops only the innermost single frame pointer and
+then tries to return to the outermost frame pointer.
 
-This current seteup will allow the driver to be compile tested for
-non-powerpc, which will fail on the dcbf instructions.
+Sibling calls need to occur with an empty stack frame.  Do the
+conditional sibling call *before* setting up the stack pointer.
 
-Perhaps use this instead:
+This fixes the following warning:
 
-       depends on WII || WIIU || (COMPILE_TEST && PPC)
+  arch/x86/crypto/sm4-aesni-avx-asm_64.o: warning: objtool: sm4_aesni_avx_crypt8()+0x8: sibling call from callable instruction with modified stack frame
 
-> +       select CRYPTO_AES
-> +       help
-> +         Say 'Y' here to use the Nintendo Wii or Wii U on-board AES
-> +         engine for the CryptoAPI AES algorithm.
-> +
-> +         To compile this driver as a module, choose M here: the module
-> +         will be called nintendo-aes.
-> +
->  endif # CRYPTO_HW
-> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-> index fa22cb19e242..004dae7bbf39 100644
-> --- a/drivers/crypto/Makefile
-> +++ b/drivers/crypto/Makefile
-> @@ -22,6 +22,7 @@ obj-$(CONFIG_CRYPTO_DEV_MARVELL) +=3D marvell/
->  obj-$(CONFIG_CRYPTO_DEV_MXS_DCP) +=3D mxs-dcp.o
->  obj-$(CONFIG_CRYPTO_DEV_NIAGARA2) +=3D n2_crypto.o
->  n2_crypto-y :=3D n2_core.o n2_asm.o
-> +obj-$(CONFIG_CRYPTO_DEV_NINTENDO) +=3D nintendo-aes.o
->  obj-$(CONFIG_CRYPTO_DEV_NX) +=3D nx/
->  obj-$(CONFIG_CRYPTO_DEV_OMAP) +=3D omap-crypto.o
->  obj-$(CONFIG_CRYPTO_DEV_OMAP_AES) +=3D omap-aes-driver.o
-> diff --git a/drivers/crypto/nintendo-aes.c b/drivers/crypto/nintendo-aes.=
-c
-> new file mode 100644
-> index 000000000000..79ae77500999
-> --- /dev/null
-> +++ b/drivers/crypto/nintendo-aes.c
-> @@ -0,0 +1,273 @@
-> +/*
-> + * Copyright (C) 2021 Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 and
-> + * only version 2 as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
+Fixes: a7ee22ee1445 ("crypto: x86/sm4 - add AES-NI/AVX/x86_64 implementation")
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Arnd Bergmann <arnd@kernel.org>
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
+---
+ arch/x86/crypto/sm4-aesni-avx-asm_64.S | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-The  kernel uses the SDPX header instead of pasting the text.
+diff --git a/arch/x86/crypto/sm4-aesni-avx-asm_64.S b/arch/x86/crypto/sm4-aesni-avx-asm_64.S
+index fa2c3f50aecb..18d2f5199194 100644
+--- a/arch/x86/crypto/sm4-aesni-avx-asm_64.S
++++ b/arch/x86/crypto/sm4-aesni-avx-asm_64.S
+@@ -367,10 +367,11 @@ SYM_FUNC_START(sm4_aesni_avx_crypt8)
+ 	 *	%rdx: src (1..8 blocks)
+ 	 *	%rcx: num blocks (1..8)
+ 	 */
+-	FRAME_BEGIN
+-
+ 	cmpq $5, %rcx;
+ 	jb sm4_aesni_avx_crypt4;
++
++	FRAME_BEGIN
++
+ 	vmovdqu (0 * 16)(%rdx), RA0;
+ 	vmovdqu (1 * 16)(%rdx), RA1;
+ 	vmovdqu (2 * 16)(%rdx), RA2;
+-- 
+2.31.1
 
-> +static int
-> +do_crypt(const void *src, void *dst, u32 len, u32 flags)
-> +{
-> +       u32 blocks =3D ((len >> 4) - 1) & AES_CTRL_BLOCK;
-> +       u32 status;
-> +       u32 counter =3D OP_TIMEOUT;
-> +       u32 i;
-> +
-> +       /* Flush out all of src, we can=E2=80=99t know whether any of it =
-is in cache */
-> +       for (i =3D 0; i < len; i +=3D 32)
-> +               __asm__("dcbf 0, %0" : : "r" (src + i));
-> +       __asm__("sync" : : : "memory");
-
-This could be flush_dcache_range, from asm/cacheflush.h
-
-> +
-> +       /* Set the addresses for DMA */
-> +       iowrite32be(virt_to_phys((void *)src), base + AES_SRC);
-> +       iowrite32be(virt_to_phys(dst), base + AES_DEST);
-> +
-> +       /* Start the operation */
-> +       iowrite32be(flags | blocks, base + AES_CTRL);
-> +
-> +       /* TODO: figure out how to use interrupts here, this will probabl=
-y
-> +        * lower throughput but let the CPU do other things while the AES
-> +        * engine is doing its work. */
-> +       do {
-> +               status =3D ioread32be(base + AES_CTRL);
-> +               cpu_relax();
-> +       } while ((status & AES_CTRL_EXEC) && --counter);
-
-You could add a msleep in here?
-
-Consider using readl_poll_timeout().
-
-Cheers,
-
-Joel
-
-> +
-> +       /* Do we ever get called with dst =E2=89=A0 src?  If so we have t=
-o invalidate
-> +        * dst in addition to the earlier flush of src. */
-> +       if (unlikely(dst !=3D src)) {
-> +               for (i =3D 0; i < len; i +=3D 32)
-> +                       __asm__("dcbi 0, %0" : : "r" (dst + i));
-> +               __asm__("sync" : : : "memory");
-> +       }
-> +
-> +       return counter ? 0 : 1;
-> +}
