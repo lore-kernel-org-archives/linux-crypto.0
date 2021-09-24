@@ -2,188 +2,191 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E91C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Sep 2021 08:18:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D115C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Sep 2021 08:58:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5724361211
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Sep 2021 08:18:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 828AD6124C
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Sep 2021 08:58:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244640AbhIXIU2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Sep 2021 04:20:28 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3853 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244629AbhIXIU2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Sep 2021 04:20:28 -0400
-Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HG4c11nZmz67GQ8;
-        Fri, 24 Sep 2021 16:16:01 +0800 (CST)
-Received: from lhreml716-chm.china.huawei.com (10.201.108.67) by
- fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Fri, 24 Sep 2021 10:18:53 +0200
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml716-chm.china.huawei.com (10.201.108.67) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Fri, 24 Sep 2021 09:18:52 +0100
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.008; Fri, 24 Sep 2021 09:18:52 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: RE: [PATCH v3 3/6] hisi_acc_qm: Move PCI device IDs to common header
-Thread-Topic: [PATCH v3 3/6] hisi_acc_qm: Move PCI device IDs to common header
-Thread-Index: AQHXqhdAyJCzOzD0aEKiWq7RuzmbUquwI0OAgAKxtIA=
-Date:   Fri, 24 Sep 2021 08:18:52 +0000
-Message-ID: <d21236b3bdfc44e698a66de4b1444a85@huawei.com>
-References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
- <20210915095037.1149-4-shameerali.kolothum.thodi@huawei.com>
- <fd1624d5-4661-75e7-6c28-bfbfd877f889@nvidia.com>
-In-Reply-To: <fd1624d5-4661-75e7-6c28-bfbfd877f889@nvidia.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.91.242]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S244762AbhIXI7s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Sep 2021 04:59:48 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:39176 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S244621AbhIXI7r (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Sep 2021 04:59:47 -0400
+Received: from zn.tnic (p200300ec2f0dd600c2485b7778a62ff5.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:d600:c248:5b77:78a6:2ff5])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9AB971EC0301;
+        Fri, 24 Sep 2021 10:58:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1632473889;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=zbrXJ+Aq13n8UVfal2GI8gct0tLpzbzh+GqS6QUuaMw=;
+        b=aFqyiPJTWFX5uUkQhS+kBmP+bUUPiLH8EjyILF4GTVdoFvA6b2u+Fv6jA7UrmTcZtlIX5Q
+        4iumgmzRgLKaqra0iHWdvpo5TmojDNzXZzOw02VdVjtF8sF2j1qAGy4+Xp/2xHgrNCj+d5
+        reS24NO3h3kwUNszgz2e0/+E0rMt9nE=
+Date:   Fri, 24 Sep 2021 10:58:03 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 03/45] x86/sev: Add the host SEV-SNP
+ initialization support
+Message-ID: <YU2TGxrpwMD8QLnk@zn.tnic>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-4-brijesh.singh@amd.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210820155918.7518-4-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWF4IEd1cnRvdm95IFtt
-YWlsdG86bWd1cnRvdm95QG52aWRpYS5jb21dDQo+IFNlbnQ6IDIyIFNlcHRlbWJlciAyMDIxIDE2
-OjExDQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVt
-LnRob2RpQGh1YXdlaS5jb20+Ow0KPiBrdm1Admdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxA
-dmdlci5rZXJuZWwub3JnOw0KPiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnDQo+IENjOiBh
-bGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsgamdnQG52aWRpYS5jb207IExpbnV4YXJtDQo+IDxs
-aW51eGFybUBodWF3ZWkuY29tPjsgbGl1bG9uZ2ZhbmcgPGxpdWxvbmdmYW5nQGh1YXdlaS5jb20+
-OyBaZW5ndGFvIChCKQ0KPiA8cHJpbWUuemVuZ0BoaXNpbGljb24uY29tPjsgSm9uYXRoYW4gQ2Ft
-ZXJvbg0KPiA8am9uYXRoYW4uY2FtZXJvbkBodWF3ZWkuY29tPjsgV2FuZ3pob3UgKEIpIDx3YW5n
-emhvdTFAaGlzaWxpY29uLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MyAzLzZdIGhpc2lf
-YWNjX3FtOiBNb3ZlIFBDSSBkZXZpY2UgSURzIHRvIGNvbW1vbg0KPiBoZWFkZXINCj4gDQo+IA0K
-PiBPbiA5LzE1LzIwMjEgMTI6NTAgUE0sIFNoYW1lZXIgS29sb3RodW0gd3JvdGU6DQo+ID4gTW92
-ZSB0aGUgUENJIERldmljZSBJRHMgb2YgSGlTaWxpY29uIEFDQyBkZXZpY2VzIHRvDQo+ID4gYSBj
-b21tb24gaGVhZGVyIGFuZCB1c2UgYSB1bmlmb3JtIG5hbWluZyBjb252ZW50aW9uLg0KPiA+DQo+
-ID4gVGhpcyB3aWxsIGJlIHVzZWZ1bCB3aGVuIHdlIGludHJvZHVjZSB0aGUgdmZpbyBQQ0kNCj4g
-PiBIaVNpbGljb24gQUNDIGxpdmUgbWlncmF0aW9uIGRyaXZlciBpbiBzdWJzZXF1ZW50IHBhdGNo
-ZXMuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBTaGFtZWVyIEtvbG90aHVtDQo+IDxzaGFtZWVy
-YWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+DQo+ID4gLS0tDQo+ID4gICBkcml2ZXJzL2Ny
-eXB0by9oaXNpbGljb24vaHByZS9ocHJlX21haW4uYyB8IDEyICsrKysrLS0tLS0tLQ0KPiA+ICAg
-ZHJpdmVycy9jcnlwdG8vaGlzaWxpY29uL3NlYzIvc2VjX21haW4uYyAgfCAgMiAtLQ0KPiA+ICAg
-ZHJpdmVycy9jcnlwdG8vaGlzaWxpY29uL3ppcC96aXBfbWFpbi5jICAgfCAxMSArKysrLS0tLS0t
-LQ0KPiA+ICAgaW5jbHVkZS9saW51eC9oaXNpX2FjY19xbS5oICAgICAgICAgICAgICAgfCAgNyAr
-KysrKysrDQo+ID4gICA0IGZpbGVzIGNoYW5nZWQsIDE2IGluc2VydGlvbnMoKyksIDE2IGRlbGV0
-aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9o
-cHJlL2hwcmVfbWFpbi5jDQo+IGIvZHJpdmVycy9jcnlwdG8vaGlzaWxpY29uL2hwcmUvaHByZV9t
-YWluLmMNCj4gPiBpbmRleCA2NWE2NDEzOTZjMDcuLjFkZTY3YjViYWFlMyAxMDA2NDQNCj4gPiAt
-LS0gYS9kcml2ZXJzL2NyeXB0by9oaXNpbGljb24vaHByZS9ocHJlX21haW4uYw0KPiA+ICsrKyBi
-L2RyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9ocHJlL2hwcmVfbWFpbi5jDQo+ID4gQEAgLTY4LDgg
-KzY4LDYgQEANCj4gPiAgICNkZWZpbmUgSFBSRV9SRUdfUkRfSU5UVlJMX1VTCQkxMA0KPiA+ICAg
-I2RlZmluZSBIUFJFX1JFR19SRF9UTU9VVF9VUwkJMTAwMA0KPiA+ICAgI2RlZmluZSBIUFJFX0RC
-R0ZTX1ZBTF9NQVhfTEVOCQkyMA0KPiA+IC0jZGVmaW5lIEhQUkVfUENJX0RFVklDRV9JRAkJMHhh
-MjU4DQo+ID4gLSNkZWZpbmUgSFBSRV9QQ0lfVkZfREVWSUNFX0lECQkweGEyNTkNCj4gPiAgICNk
-ZWZpbmUgSFBSRV9RTV9VU1JfQ0ZHX01BU0sJCUdFTk1BU0soMzEsIDEpDQo+ID4gICAjZGVmaW5l
-IEhQUkVfUU1fQVhJX0NGR19NQVNLCQlHRU5NQVNLKDE1LCAwKQ0KPiA+ICAgI2RlZmluZSBIUFJF
-X1FNX1ZGR19BWF9NQVNLCQlHRU5NQVNLKDcsIDApDQo+ID4gQEAgLTExMSw4ICsxMDksOCBAQA0K
-PiA+ICAgc3RhdGljIGNvbnN0IGNoYXIgaHByZV9uYW1lW10gPSAiaGlzaV9ocHJlIjsNCj4gPiAg
-IHN0YXRpYyBzdHJ1Y3QgZGVudHJ5ICpocHJlX2RlYnVnZnNfcm9vdDsNCj4gPiAgIHN0YXRpYyBj
-b25zdCBzdHJ1Y3QgcGNpX2RldmljZV9pZCBocHJlX2Rldl9pZHNbXSA9IHsNCj4gPiAtCXsgUENJ
-X0RFVklDRShQQ0lfVkVORE9SX0lEX0hVQVdFSSwgSFBSRV9QQ0lfREVWSUNFX0lEKSB9LA0KPiA+
-IC0JeyBQQ0lfREVWSUNFKFBDSV9WRU5ET1JfSURfSFVBV0VJLCBIUFJFX1BDSV9WRl9ERVZJQ0Vf
-SUQpIH0sDQo+ID4gKwl7IFBDSV9ERVZJQ0UoUENJX1ZFTkRPUl9JRF9IVUFXRUksIEhQUkVfUEZf
-UENJX0RFVklDRV9JRCkgfSwNCj4gPiArCXsgUENJX0RFVklDRShQQ0lfVkVORE9SX0lEX0hVQVdF
-SSwgSFBSRV9WRl9QQ0lfREVWSUNFX0lEKSB9LA0KPiA+ICAgCXsgMCwgfQ0KPiA+ICAgfTsNCj4g
-Pg0KPiA+IEBAIC0yNDIsNyArMjQwLDcgQEAgTU9EVUxFX1BBUk1fREVTQyh1YWNjZV9tb2RlLA0K
-PiBVQUNDRV9NT0RFX0RFU0MpOw0KPiA+DQo+ID4gICBzdGF0aWMgaW50IHBmX3FfbnVtX3NldChj
-b25zdCBjaGFyICp2YWwsIGNvbnN0IHN0cnVjdCBrZXJuZWxfcGFyYW0gKmtwKQ0KPiA+ICAgew0K
-PiA+IC0JcmV0dXJuIHFfbnVtX3NldCh2YWwsIGtwLCBIUFJFX1BDSV9ERVZJQ0VfSUQpOw0KPiA+
-ICsJcmV0dXJuIHFfbnVtX3NldCh2YWwsIGtwLCBIUFJFX1BGX1BDSV9ERVZJQ0VfSUQpOw0KPiA+
-ICAgfQ0KPiA+DQo+ID4gICBzdGF0aWMgY29uc3Qgc3RydWN0IGtlcm5lbF9wYXJhbV9vcHMgaHBy
-ZV9wZl9xX251bV9vcHMgPSB7DQo+ID4gQEAgLTkyMSw3ICs5MTksNyBAQCBzdGF0aWMgaW50IGhw
-cmVfZGVidWdmc19pbml0KHN0cnVjdCBoaXNpX3FtICpxbSkNCj4gPiAgIAlxbS0+ZGVidWcuc3Fl
-X21hc2tfbGVuID0gSFBSRV9TUUVfTUFTS19MRU47DQo+ID4gICAJaGlzaV9xbV9kZWJ1Z19pbml0
-KHFtKTsNCj4gPg0KPiA+IC0JaWYgKHFtLT5wZGV2LT5kZXZpY2UgPT0gSFBSRV9QQ0lfREVWSUNF
-X0lEKSB7DQo+ID4gKwlpZiAocW0tPnBkZXYtPmRldmljZSA9PSBIUFJFX1BGX1BDSV9ERVZJQ0Vf
-SUQpIHsNCj4gPiAgIAkJcmV0ID0gaHByZV9jdHJsX2RlYnVnX2luaXQocW0pOw0KPiA+ICAgCQlp
-ZiAocmV0KQ0KPiA+ICAgCQkJZ290byBmYWlsZWRfdG9fY3JlYXRlOw0KPiA+IEBAIC05NTgsNyAr
-OTU2LDcgQEAgc3RhdGljIGludCBocHJlX3FtX2luaXQoc3RydWN0IGhpc2lfcW0gKnFtLCBzdHJ1
-Y3QNCj4gcGNpX2RldiAqcGRldikNCj4gPiAgIAlxbS0+c3FlX3NpemUgPSBIUFJFX1NRRV9TSVpF
-Ow0KPiA+ICAgCXFtLT5kZXZfbmFtZSA9IGhwcmVfbmFtZTsNCj4gPg0KPiA+IC0JcW0tPmZ1bl90
-eXBlID0gKHBkZXYtPmRldmljZSA9PSBIUFJFX1BDSV9ERVZJQ0VfSUQpID8NCj4gPiArCXFtLT5m
-dW5fdHlwZSA9IChwZGV2LT5kZXZpY2UgPT0gSFBSRV9QRl9QQ0lfREVWSUNFX0lEKSA/DQo+ID4g
-ICAJCQlRTV9IV19QRiA6IFFNX0hXX1ZGOw0KPiA+ICAgCWlmIChxbS0+ZnVuX3R5cGUgPT0gUU1f
-SFdfUEYpIHsNCj4gPiAgIAkJcW0tPnFwX2Jhc2UgPSBIUFJFX1BGX0RFRl9RX0JBU0U7DQo+ID4g
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9zZWMyL3NlY19tYWluLmMNCj4g
-Yi9kcml2ZXJzL2NyeXB0by9oaXNpbGljb24vc2VjMi9zZWNfbWFpbi5jDQo+ID4gaW5kZXggOTA1
-NTFiZjM4YjUyLi44OTBmZjZhYjE4ZGQgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9jcnlwdG8v
-aGlzaWxpY29uL3NlYzIvc2VjX21haW4uYw0KPiA+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL2hpc2ls
-aWNvbi9zZWMyL3NlY19tYWluLmMNCj4gPiBAQCAtMjAsOCArMjAsNiBAQA0KPiA+DQo+ID4gICAj
-ZGVmaW5lIFNFQ19WRl9OVU0JCQk2Mw0KPiA+ICAgI2RlZmluZSBTRUNfUVVFVUVfTlVNX1YxCQk0
-MDk2DQo+ID4gLSNkZWZpbmUgU0VDX1BGX1BDSV9ERVZJQ0VfSUQJCTB4YTI1NQ0KPiA+IC0jZGVm
-aW5lIFNFQ19WRl9QQ0lfREVWSUNFX0lECQkweGEyNTYNCj4gPg0KPiA+ICAgI2RlZmluZSBTRUNf
-QkRfRVJSX0NIS19FTjAJCTB4RUZGRkZGRkYNCj4gPiAgICNkZWZpbmUgU0VDX0JEX0VSUl9DSEtf
-RU4xCQkweDdmZmZmN2ZkDQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL2hpc2lsaWNv
-bi96aXAvemlwX21haW4uYw0KPiBiL2RyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi96aXAvemlwX21h
-aW4uYw0KPiA+IGluZGV4IDcxNDgyMDFjZTc2ZS4uZjM1YjhmZDFlY2ZlIDEwMDY0NA0KPiA+IC0t
-LSBhL2RyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi96aXAvemlwX21haW4uYw0KPiA+ICsrKyBiL2Ry
-aXZlcnMvY3J5cHRvL2hpc2lsaWNvbi96aXAvemlwX21haW4uYw0KPiA+IEBAIC0xNSw5ICsxNSw2
-IEBADQo+ID4gICAjaW5jbHVkZSA8bGludXgvdWFjY2UuaD4NCj4gPiAgICNpbmNsdWRlICJ6aXAu
-aCINCj4gPg0KPiA+IC0jZGVmaW5lIFBDSV9ERVZJQ0VfSURfWklQX1BGCQkweGEyNTANCj4gPiAt
-I2RlZmluZSBQQ0lfREVWSUNFX0lEX1pJUF9WRgkJMHhhMjUxDQo+ID4gLQ0KPiA+ICAgI2RlZmlu
-ZSBIWklQX1FVRVVFX05VTV9WMQkJNDA5Ng0KPiA+DQo+ID4gICAjZGVmaW5lIEhaSVBfQ0xPQ0tf
-R0FURV9DVFJMCQkweDMwMTAwNA0KPiA+IEBAIC0yNDYsNyArMjQzLDcgQEAgTU9EVUxFX1BBUk1f
-REVTQyh1YWNjZV9tb2RlLA0KPiBVQUNDRV9NT0RFX0RFU0MpOw0KPiA+DQo+ID4gICBzdGF0aWMg
-aW50IHBmX3FfbnVtX3NldChjb25zdCBjaGFyICp2YWwsIGNvbnN0IHN0cnVjdCBrZXJuZWxfcGFy
-YW0gKmtwKQ0KPiA+ICAgew0KPiA+IC0JcmV0dXJuIHFfbnVtX3NldCh2YWwsIGtwLCBQQ0lfREVW
-SUNFX0lEX1pJUF9QRik7DQo+ID4gKwlyZXR1cm4gcV9udW1fc2V0KHZhbCwga3AsIFpJUF9QRl9Q
-Q0lfREVWSUNFX0lEKTsNCj4gPiAgIH0NCj4gPg0KPiA+ICAgc3RhdGljIGNvbnN0IHN0cnVjdCBr
-ZXJuZWxfcGFyYW1fb3BzIHBmX3FfbnVtX29wcyA9IHsNCj4gPiBAQCAtMjY4LDggKzI2NSw4IEBA
-IG1vZHVsZV9wYXJhbV9jYih2ZnNfbnVtLCAmdmZzX251bV9vcHMsDQo+ICZ2ZnNfbnVtLCAwNDQ0
-KTsNCj4gPiAgIE1PRFVMRV9QQVJNX0RFU0ModmZzX251bSwgIk51bWJlciBvZiBWRnMgdG8gZW5h
-YmxlKDEtNjMpLA0KPiAwKGRlZmF1bHQpIik7DQo+ID4NCj4gPiAgIHN0YXRpYyBjb25zdCBzdHJ1
-Y3QgcGNpX2RldmljZV9pZCBoaXNpX3ppcF9kZXZfaWRzW10gPSB7DQo+ID4gLQl7IFBDSV9ERVZJ
-Q0UoUENJX1ZFTkRPUl9JRF9IVUFXRUksIFBDSV9ERVZJQ0VfSURfWklQX1BGKSB9LA0KPiA+IC0J
-eyBQQ0lfREVWSUNFKFBDSV9WRU5ET1JfSURfSFVBV0VJLCBQQ0lfREVWSUNFX0lEX1pJUF9WRikg
-fSwNCj4gPiArCXsgUENJX0RFVklDRShQQ0lfVkVORE9SX0lEX0hVQVdFSSwgWklQX1BGX1BDSV9E
-RVZJQ0VfSUQpIH0sDQo+ID4gKwl7IFBDSV9ERVZJQ0UoUENJX1ZFTkRPUl9JRF9IVUFXRUksIFpJ
-UF9WRl9QQ0lfREVWSUNFX0lEKSB9LA0KPiA+ICAgCXsgMCwgfQ0KPiA+ICAgfTsNCj4gPiAgIE1P
-RFVMRV9ERVZJQ0VfVEFCTEUocGNpLCBoaXNpX3ppcF9kZXZfaWRzKTsNCj4gPiBAQCAtODM0LDcg
-KzgzMSw3IEBAIHN0YXRpYyBpbnQgaGlzaV96aXBfcW1faW5pdChzdHJ1Y3QgaGlzaV9xbSAqcW0s
-IHN0cnVjdA0KPiBwY2lfZGV2ICpwZGV2KQ0KPiA+ICAgCXFtLT5zcWVfc2l6ZSA9IEhaSVBfU1FF
-X1NJWkU7DQo+ID4gICAJcW0tPmRldl9uYW1lID0gaGlzaV96aXBfbmFtZTsNCj4gPg0KPiA+IC0J
-cW0tPmZ1bl90eXBlID0gKHBkZXYtPmRldmljZSA9PSBQQ0lfREVWSUNFX0lEX1pJUF9QRikgPw0K
-PiA+ICsJcW0tPmZ1bl90eXBlID0gKHBkZXYtPmRldmljZSA9PSBaSVBfUEZfUENJX0RFVklDRV9J
-RCkgPw0KPiA+ICAgCQkJUU1fSFdfUEYgOiBRTV9IV19WRjsNCj4gPiAgIAlpZiAocW0tPmZ1bl90
-eXBlID09IFFNX0hXX1BGKSB7DQo+ID4gICAJCXFtLT5xcF9iYXNlID0gSFpJUF9QRl9ERUZfUV9C
-QVNFOw0KPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2hpc2lfYWNjX3FtLmggYi9pbmNs
-dWRlL2xpbnV4L2hpc2lfYWNjX3FtLmgNCj4gPiBpbmRleCA4YmVmYjU5YzZmYjMuLjJkMjA5YmYx
-NTQxOSAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL2xpbnV4L2hpc2lfYWNjX3FtLmgNCj4gPiAr
-KysgYi9pbmNsdWRlL2xpbnV4L2hpc2lfYWNjX3FtLmgNCj4gPiBAQCAtOSw2ICs5LDEzIEBADQo+
-ID4gICAjaW5jbHVkZSA8bGludXgvbW9kdWxlLmg+DQo+ID4gICAjaW5jbHVkZSA8bGludXgvcGNp
-Lmg+DQo+ID4NCj4gPiArI2RlZmluZSBaSVBfUEZfUENJX0RFVklDRV9JRAkJMHhhMjUwDQo+ID4g
-KyNkZWZpbmUgWklQX1ZGX1BDSV9ERVZJQ0VfSUQJCTB4YTI1MQ0KPiA+ICsjZGVmaW5lIFNFQ19Q
-Rl9QQ0lfREVWSUNFX0lECQkweGEyNTUNCj4gPiArI2RlZmluZSBTRUNfVkZfUENJX0RFVklDRV9J
-RAkJMHhhMjU2DQo+ID4gKyNkZWZpbmUgSFBSRV9QRl9QQ0lfREVWSUNFX0lECQkweGEyNTgNCj4g
-PiArI2RlZmluZSBIUFJFX1ZGX1BDSV9ERVZJQ0VfSUQJCTB4YTI1OQ0KPiA+ICsNCj4gDQo+IG1h
-eWJlIGNhbiBiZSBhZGRlZCB0byBpbmNsdWRlL2xpbnV4L3BjaV9pZHMuaCB1bmRlciB0aGUNCj4g
-UENJX1ZFTkRPUl9JRF9IVUFXRUkgZGVmaW5pdGlvbiA/DQoNCk1ha2Ugc2Vuc2UuIFdpbGwgZG8u
-DQoNClRoYW5rcywNClNoYW1lZXINCiANCj4gDQo+ID4gICAjZGVmaW5lIFFNX1FOVU1fVjEJCQk0
-MDk2DQo+ID4gICAjZGVmaW5lIFFNX1FOVU1fVjIJCQkxMDI0DQo+ID4gICAjZGVmaW5lIFFNX01B
-WF9WRlNfTlVNX1YyCQk2Mw0K
+On Fri, Aug 20, 2021 at 10:58:36AM -0500, Brijesh Singh wrote:
+> @@ -542,6 +544,10 @@
+>  #define MSR_AMD64_SYSCFG		0xc0010010
+>  #define MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT	23
+>  #define MSR_AMD64_SYSCFG_MEM_ENCRYPT	BIT_ULL(MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT)
+> +#define MSR_AMD64_SYSCFG_SNP_EN_BIT		24
+> +#define MSR_AMD64_SYSCFG_SNP_EN		BIT_ULL(MSR_AMD64_SYSCFG_SNP_EN_BIT)
+> +#define MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT	25
+> +#define MSR_AMD64_SYSCFG_SNP_VMPL_EN	BIT_ULL(MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT)
+
+While you're here, move all defines that belong to that MSR which
+we decided it is architectural after all, above the definition of
+MSR_AMD64_NB_CFG above.
+
+>  #define MSR_K8_INT_PENDING_MSG		0xc0010055
+>  /* C1E active bits in int pending message */
+>  #define K8_INTP_C1E_ACTIVE_MASK		0x18000000
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index ab17c93634e9..7936c8139c74 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -24,6 +24,8 @@
+>  #include <linux/sev-guest.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/io.h>
+> +#include <linux/cpumask.h>
+> +#include <linux/iommu.h>
+>  
+>  #include <asm/cpu_entry_area.h>
+>  #include <asm/stacktrace.h>
+> @@ -40,11 +42,19 @@
+>  #include <asm/efi.h>
+>  #include <asm/cpuid.h>
+>  #include <asm/setup.h>
+> +#include <asm/apic.h>
+> +#include <asm/iommu.h>
+>  
+>  #include "sev-internal.h"
+>  
+>  #define DR7_RESET_VALUE        0x400
+>  
+> +/*
+> + * The first 16KB from the RMP_BASE is used by the processor for the
+
+s/for the/for/
+
+> + * bookkeeping, the range need to be added during the RMP entry lookup.
+
+s/need/needs/ ... s/during the/during /
+
+> + */
+> +#define RMPTABLE_CPU_BOOKKEEPING_SZ	0x4000
+
+Too long: just call it RMP_BASE_OFFSET.
+
+> +static bool get_rmptable_info(u64 *start, u64 *len)
+> +{
+> +	u64 calc_rmp_sz, rmp_sz, rmp_base, rmp_end, nr_pages;
+> +
+> +	rdmsrl(MSR_AMD64_RMP_BASE, rmp_base);
+> +	rdmsrl(MSR_AMD64_RMP_END, rmp_end);
+> +
+> +	if (!rmp_base || !rmp_end) {
+> +		pr_info("Memory for the RMP table has not been reserved by BIOS\n");
+> +		return false;
+> +	}
+> +
+> +	rmp_sz = rmp_end - rmp_base + 1;
+> +
+> +	/*
+> +	 * Calculate the amount the memory that must be reserved by the BIOS to
+> +	 * address the full system RAM. The reserved memory should also cover the
+> +	 * RMP table itself.
+> +	 *
+> +	 * See PPR Family 19h Model 01h, Revision B1 section 2.1.5.2 for more
+> +	 * information on memory requirement.
+> +	 */
+> +	nr_pages = totalram_pages();
+> +	calc_rmp_sz = (((rmp_sz >> PAGE_SHIFT) + nr_pages) << 4) + RMPTABLE_CPU_BOOKKEEPING_SZ;
+
+use totalram_pages() directly here - nr_pages is assigned to only once.
+
+> +
+> +	if (calc_rmp_sz > rmp_sz) {
+> +		pr_info("Memory reserved for the RMP table does not cover full system RAM (expected 0x%llx got 0x%llx)\n",
+> +			calc_rmp_sz, rmp_sz);
+> +		return false;
+> +	}
+> +
+> +	*start = rmp_base;
+> +	*len = rmp_sz;
+> +
+> +	pr_info("RMP table physical address 0x%016llx - 0x%016llx\n", rmp_base, rmp_end);
+
+		"RMP table physical address range: [ ... - ... ]\n", ...
+
+...
+
+> +/*
+> + * This must be called after the PCI subsystem. This is because before enabling
+> + * the SNP feature we need to ensure that IOMMU supports the SEV-SNP feature.
+
+"... it needs to be ensured that... "
+
+> + * The iommu_sev_snp_support() is used for checking the feature, and it is
+> + * available after subsys_initcall().
+> + */
+> +fs_initcall(snp_rmptable_init);
+> -- 
+> 2.17.1
+> 
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
