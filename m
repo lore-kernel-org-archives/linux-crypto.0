@@ -2,191 +2,205 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D115C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Sep 2021 08:58:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 842BCC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Sep 2021 09:28:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 828AD6124C
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Sep 2021 08:58:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64A2760FC1
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Sep 2021 09:28:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244762AbhIXI7s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Sep 2021 04:59:48 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:39176 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244621AbhIXI7r (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Sep 2021 04:59:47 -0400
-Received: from zn.tnic (p200300ec2f0dd600c2485b7778a62ff5.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:d600:c248:5b77:78a6:2ff5])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9AB971EC0301;
-        Fri, 24 Sep 2021 10:58:09 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1632473889;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=zbrXJ+Aq13n8UVfal2GI8gct0tLpzbzh+GqS6QUuaMw=;
-        b=aFqyiPJTWFX5uUkQhS+kBmP+bUUPiLH8EjyILF4GTVdoFvA6b2u+Fv6jA7UrmTcZtlIX5Q
-        4iumgmzRgLKaqra0iHWdvpo5TmojDNzXZzOw02VdVjtF8sF2j1qAGy4+Xp/2xHgrNCj+d5
-        reS24NO3h3kwUNszgz2e0/+E0rMt9nE=
-Date:   Fri, 24 Sep 2021 10:58:03 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 03/45] x86/sev: Add the host SEV-SNP
- initialization support
-Message-ID: <YU2TGxrpwMD8QLnk@zn.tnic>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-4-brijesh.singh@amd.com>
+        id S237056AbhIXJaY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Sep 2021 05:30:24 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:16381 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244968AbhIXJaX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Sep 2021 05:30:23 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4HG6764MdSzRPnV;
+        Fri, 24 Sep 2021 17:24:34 +0800 (CST)
+Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Fri, 24 Sep 2021 17:28:47 +0800
+Received: from huawei.com (10.69.192.56) by dggpeml500012.china.huawei.com
+ (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.8; Fri, 24 Sep
+ 2021 17:28:47 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
+Subject: [PATCH v2 1/6] crypto: hisilicon/sec - add ping-pong buffer for ahash
+Date:   Fri, 24 Sep 2021 17:27:11 +0800
+Message-ID: <20210924092716.12848-2-yekai13@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20210924092716.12848-1-yekai13@huawei.com>
+References: <20210924092716.12848-1-yekai13@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210820155918.7518-4-brijesh.singh@amd.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500012.china.huawei.com (7.185.36.15)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 10:58:36AM -0500, Brijesh Singh wrote:
-> @@ -542,6 +544,10 @@
->  #define MSR_AMD64_SYSCFG		0xc0010010
->  #define MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT	23
->  #define MSR_AMD64_SYSCFG_MEM_ENCRYPT	BIT_ULL(MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT)
-> +#define MSR_AMD64_SYSCFG_SNP_EN_BIT		24
-> +#define MSR_AMD64_SYSCFG_SNP_EN		BIT_ULL(MSR_AMD64_SYSCFG_SNP_EN_BIT)
-> +#define MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT	25
-> +#define MSR_AMD64_SYSCFG_SNP_VMPL_EN	BIT_ULL(MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT)
+For stream mode operations, we don't send data into HW everytime.
+We use the pingpong buffer to hold some small packets. The length
+of ping-pong buffer is PAGE_SIZE. As well as one TFM supports maximum of
+128 streams.
 
-While you're here, move all defines that belong to that MSR which
-we decided it is architectural after all, above the definition of
-MSR_AMD64_NB_CFG above.
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+---
+ drivers/crypto/hisilicon/sec2/sec.h        | 10 +++
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 85 ++++++++++++++++++++++
+ drivers/crypto/hisilicon/sec2/sec_crypto.h |  2 +
+ 3 files changed, 97 insertions(+)
 
->  #define MSR_K8_INT_PENDING_MSG		0xc0010055
->  /* C1E active bits in int pending message */
->  #define K8_INTP_C1E_ACTIVE_MASK		0x18000000
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index ab17c93634e9..7936c8139c74 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -24,6 +24,8 @@
->  #include <linux/sev-guest.h>
->  #include <linux/platform_device.h>
->  #include <linux/io.h>
-> +#include <linux/cpumask.h>
-> +#include <linux/iommu.h>
->  
->  #include <asm/cpu_entry_area.h>
->  #include <asm/stacktrace.h>
-> @@ -40,11 +42,19 @@
->  #include <asm/efi.h>
->  #include <asm/cpuid.h>
->  #include <asm/setup.h>
-> +#include <asm/apic.h>
-> +#include <asm/iommu.h>
->  
->  #include "sev-internal.h"
->  
->  #define DR7_RESET_VALUE        0x400
->  
-> +/*
-> + * The first 16KB from the RMP_BASE is used by the processor for the
-
-s/for the/for/
-
-> + * bookkeeping, the range need to be added during the RMP entry lookup.
-
-s/need/needs/ ... s/during the/during /
-
-> + */
-> +#define RMPTABLE_CPU_BOOKKEEPING_SZ	0x4000
-
-Too long: just call it RMP_BASE_OFFSET.
-
-> +static bool get_rmptable_info(u64 *start, u64 *len)
-> +{
-> +	u64 calc_rmp_sz, rmp_sz, rmp_base, rmp_end, nr_pages;
-> +
-> +	rdmsrl(MSR_AMD64_RMP_BASE, rmp_base);
-> +	rdmsrl(MSR_AMD64_RMP_END, rmp_end);
-> +
-> +	if (!rmp_base || !rmp_end) {
-> +		pr_info("Memory for the RMP table has not been reserved by BIOS\n");
-> +		return false;
-> +	}
-> +
-> +	rmp_sz = rmp_end - rmp_base + 1;
-> +
-> +	/*
-> +	 * Calculate the amount the memory that must be reserved by the BIOS to
-> +	 * address the full system RAM. The reserved memory should also cover the
-> +	 * RMP table itself.
-> +	 *
-> +	 * See PPR Family 19h Model 01h, Revision B1 section 2.1.5.2 for more
-> +	 * information on memory requirement.
-> +	 */
-> +	nr_pages = totalram_pages();
-> +	calc_rmp_sz = (((rmp_sz >> PAGE_SHIFT) + nr_pages) << 4) + RMPTABLE_CPU_BOOKKEEPING_SZ;
-
-use totalram_pages() directly here - nr_pages is assigned to only once.
-
-> +
-> +	if (calc_rmp_sz > rmp_sz) {
-> +		pr_info("Memory reserved for the RMP table does not cover full system RAM (expected 0x%llx got 0x%llx)\n",
-> +			calc_rmp_sz, rmp_sz);
-> +		return false;
-> +	}
-> +
-> +	*start = rmp_base;
-> +	*len = rmp_sz;
-> +
-> +	pr_info("RMP table physical address 0x%016llx - 0x%016llx\n", rmp_base, rmp_end);
-
-		"RMP table physical address range: [ ... - ... ]\n", ...
-
-...
-
-> +/*
-> + * This must be called after the PCI subsystem. This is because before enabling
-> + * the SNP feature we need to ensure that IOMMU supports the SEV-SNP feature.
-
-"... it needs to be ensured that... "
-
-> + * The iommu_sev_snp_support() is used for checking the feature, and it is
-> + * available after subsys_initcall().
-> + */
-> +fs_initcall(snp_rmptable_init);
-> -- 
-> 2.17.1
-> 
-
+diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+index d97cf02b1df7..281f38de64e9 100644
+--- a/drivers/crypto/hisilicon/sec2/sec.h
++++ b/drivers/crypto/hisilicon/sec2/sec.h
+@@ -154,6 +154,16 @@ struct sec_ctx {
+ 	struct sec_cipher_ctx c_ctx;
+ 	struct sec_auth_ctx a_ctx;
+ 	u8 type_supported;
++
++	/*
++	 * For stream mode operations, we don't send data into HW everytime.
++	 * now ahash uses this. To avoid multiple copy, use pingpong buffers.
++	 */
++	struct scatterlist pingpong_sg[SEC_MAX_STREAMS][PINGPONG_BUF_NUM];
++	u8 pingpong_idx[SEC_MAX_STREAMS];
++	u32 pp_data_len[SEC_MAX_STREAMS][PINGPONG_BUF_NUM];
++	struct idr stream_idr;
++	struct mutex stream_idr_lock;
+ 	struct device *dev;
+ };
+ 
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 6a45bd23b363..afbe36549e83 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -77,6 +77,8 @@
+ #define SEC_TOTAL_PBUF_SZ	(PAGE_SIZE * SEC_PBUF_PAGE_NUM +	\
+ 			SEC_PBUF_LEFT_SZ)
+ 
++#define SEC_SID_BUF_LEN		(PAGE_SIZE)
++#define SEC_MAX_AD_SG_NENT	8
+ #define SEC_SQE_LEN_RATE	4
+ #define SEC_SQE_CFLAG		2
+ #define SEC_SQE_AEAD_FLAG	3
+@@ -158,6 +160,89 @@ static void sec_free_req_id(struct sec_req *req)
+ 	mutex_unlock(&qp_ctx->req_lock);
+ }
+ 
++static int sec_alloc_stream_id(struct sec_ctx *ctx)
++{
++	int s_id;
++
++	mutex_lock(&ctx->stream_idr_lock);
++
++	s_id = idr_alloc_cyclic(&ctx->stream_idr, NULL,
++				0, SEC_MAX_STREAMS, GFP_ATOMIC);
++
++	mutex_unlock(&ctx->stream_idr_lock);
++	if (unlikely(s_id < 0))
++		dev_err(ctx->dev, "alloc stream id fail!\n");
++
++	return s_id;
++}
++
++static void sec_free_stream_id(struct sec_ctx *ctx, int stream_id)
++{
++	if (unlikely(stream_id < 0 || stream_id >= SEC_MAX_STREAMS)) {
++		dev_err(ctx->dev, "free stream id invalid!\n");
++		return;
++	}
++
++	mutex_lock(&ctx->stream_idr_lock);
++	idr_remove(&ctx->stream_idr, stream_id);
++	mutex_unlock(&ctx->stream_idr_lock);
++}
++
++/* For stream mode, we pre-create buffer to hold some small packets */
++static int sec_stream_mode_init(struct sec_ctx *ctx)
++{
++	u32 buf_len = SEC_MAX_STREAMS * SEC_SID_BUF_LEN * PINGPONG_BUF_NUM;
++	u32 buf_step = SEC_SID_BUF_LEN * PINGPONG_BUF_NUM;
++	struct device *dev = ctx->dev;
++	unsigned int order, i, j;
++	unsigned long buf;
++	void *temp_buf;
++
++	mutex_init(&ctx->stream_idr_lock);
++	idr_init(&ctx->stream_idr);
++
++	order = get_order(buf_len);
++	if (order > MAX_ORDER) {
++		dev_err(dev, "too large order %u for pingpong buf!\n", order);
++		return -ENOMEM;
++	}
++
++	buf = __get_free_pages(GFP_KERNEL, order);
++	if (!buf) {
++		dev_err(dev, "fail to get pingpong pages!\n");
++		return -ENOMEM;
++	}
++
++	/*
++	 * stream 0: | ping buf | pong buf
++	 * stream 1: | ping buf | pong buf
++	 * stream xx: | ping buf | pong buf
++	 * scatterlist ping-pong buffer initiation
++	 */
++	for (j = 0; j < SEC_MAX_STREAMS; j++) {
++		for (i = 0; i < PINGPONG_BUF_NUM; i++) {
++			temp_buf = (void *)(uintptr_t)buf + SEC_SID_BUF_LEN * i;
++
++			sg_init_one(&ctx->pingpong_sg[j][i], temp_buf, SEC_SID_BUF_LEN);
++		}
++		buf = buf + buf_step;
++	}
++
++	return 0;
++}
++
++static void sec_stream_mode_uninit(struct sec_ctx *ctx)
++{
++	struct scatterlist *sgl = &ctx->pingpong_sg[0][0];
++	unsigned int order;
++
++	order = get_order(SEC_SID_BUF_LEN * SEC_MAX_STREAMS * PINGPONG_BUF_NUM);
++
++	free_pages((unsigned long)(uintptr_t)sg_virt(sgl), order);
++
++	idr_destroy(&ctx->stream_idr);
++}
++
+ static u8 pre_parse_finished_bd(struct bd_status *status, void *resp)
+ {
+ 	struct sec_sqe *bd = resp;
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+index 9f71c358a6d3..6efe473660eb 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+@@ -8,6 +8,8 @@
+ #define SEC_IV_SIZE		24
+ #define SEC_MAX_KEY_SIZE	64
+ #define SEC_COMM_SCENE		0
++#define SEC_MAX_STREAMS		128
++#define PINGPONG_BUF_NUM	2
+ #define SEC_MIN_BLOCK_SZ	1
+ 
+ enum sec_calg {
 -- 
-Regards/Gruss,
-    Boris.
+2.33.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
