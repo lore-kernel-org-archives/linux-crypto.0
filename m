@@ -2,134 +2,154 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22525C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 13:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B64C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 15:01:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0913060F39
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 13:46:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 804CC60EE2
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 15:01:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234114AbhI0NsP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Sep 2021 09:48:15 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3881 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234365AbhI0NsM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Sep 2021 09:48:12 -0400
-Received: from fraeml702-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HJ3kV5c1Wz67Zx5;
-        Mon, 27 Sep 2021 21:43:30 +0800 (CST)
-Received: from lhreml711-chm.china.huawei.com (10.201.108.62) by
- fraeml702-chm.china.huawei.com (10.206.15.51) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.8; Mon, 27 Sep 2021 15:46:32 +0200
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml711-chm.china.huawei.com (10.201.108.62) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Mon, 27 Sep 2021 14:46:32 +0100
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.008; Mon, 27 Sep 2021 14:46:32 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        id S234935AbhI0PDD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Sep 2021 11:03:03 -0400
+Received: from mail-dm6nam10on2047.outbound.protection.outlook.com ([40.107.93.47]:45994
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234922AbhI0PDA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Sep 2021 11:03:00 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lMWhlMUJKCsX3NxPDgjZ/XKEETQgrZdFtB1XESOlUFZbtKRGJ3+s8ROOueFOM+lzfMTWS9v6cTzASFKdLCn8dys1H24GcmNmHcZQvSOshGpqE27WZoUWUUzbMdeKk9Y9emJznYZANd8T30HmsSoaCucfsJ4iYkiAFYweB2mb+j8iJ5PTwB25c93ZPWlKH0OwGHmlHHFvsYzdiNxikANgO7Y6OxjBDIcyO/e29sZuK/+ajbi962JJfpIuUeEAoby3Yn3886FE6awMTEAUMJbmkJIs0M5Syd8dDqlyBo+pfHKO7MirAHuUPBAUIEXN7Ee/iKYKi+MZw4LOr8oMz7ZF/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=1aOVUQKK0H7/56/TlRQW2WS+jrmuBZ3dZ8bBey0i47U=;
+ b=el/nw0t3uW/ssrAdgrtefScu8j9MLFn73JpDvZcK7OvOfZyNjnEjpnWBGCBFGMWGL/v7LPwmmdiQeByAK+RKMrKMTpeQrLMRcjzeUB1Cy8XMak/2dq6jDRlF4OBUBRKeyyfOGLu4OS00LNjPBi+cW8ZVRyYDTTS7/6ewPR8ZZqaaGj6CBVSN8Qgz2B4dc6SIuO1OC/vfn4EQ0IslqDCMastAssnlpxpd9QHLmadynCLVlSht/+ock8JAlLX4uCNg93kJJIjrw6Sc0laX/rBn8I+/JeOWaTPBSXQrjgvIkqqhEhXqjnGJwkhagAYYaiy/0Ps6Pe8lH4Fu0ypEG+sMyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1aOVUQKK0H7/56/TlRQW2WS+jrmuBZ3dZ8bBey0i47U=;
+ b=V9MOSZCAiMv/6tKkqWU93WCwiLdQ1jFfKr2NLBhez/F+XGMb8XZAEs6eXIPSeeng5nTIDzCTG2kAEiguNYjzyTrmQDOESAky9Cbpq10Z4n9w7hZ90cqMQTLzag0i0PxVGcUd+ozEFB8KFvhgrCiHoXXDxVMOqNIwVU7ssQGGWFEjWFyP9ZkkujLZHo47RT96Yt8JRNt1GK7yV3BEnUjSfR5Odeckn0AA5qpA60om/AQO/Qd3NRHl1i6yDkz2/QMjIW1+u104+oma2plJEcsVHUYBP1nl/CAxLsp5Gf2evtpWnGfmVg1m8uF+af2yRD4+Ww3SRC6BDrDbS8DAzUiPJw==
+Authentication-Results: huawei.com; dkim=none (message not signed)
+ header.d=none;huawei.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14; Mon, 27 Sep
+ 2021 15:01:21 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4544.021; Mon, 27 Sep 2021
+ 15:01:20 +0000
+Date:   Mon, 27 Sep 2021 12:01:19 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        Leon Romanovsky <leonro@nvidia.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
         liulongfang <liulongfang@huawei.com>,
         "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
         "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: RE: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
+Subject: Re: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
  migration
-Thread-Topic: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Thread-Index: AQHXqhdQM13RiELH60aUjxjG41fnUKulAGMAgAAGK3CAAZpfgIARVJdw
-Date:   Mon, 27 Sep 2021 13:46:31 +0000
-Message-ID: <a440256250c14182b9eefc77d5d399b8@huawei.com>
+Message-ID: <20210927150119.GB964074@nvidia.com>
 References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
  <20210915095037.1149-7-shameerali.kolothum.thodi@huawei.com>
  <20210915130742.GJ4065468@nvidia.com>
  <fe5d6659e28244da82b7028b403e11ae@huawei.com>
  <20210916135833.GB327412@nvidia.com>
-In-Reply-To: <20210916135833.GB327412@nvidia.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.80.194]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <a440256250c14182b9eefc77d5d399b8@huawei.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a440256250c14182b9eefc77d5d399b8@huawei.com>
+X-ClientProxiedBy: BL0PR02CA0082.namprd02.prod.outlook.com
+ (2603:10b6:208:51::23) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Received: from mlx.ziepe.ca (142.162.113.129) by BL0PR02CA0082.namprd02.prod.outlook.com (2603:10b6:208:51::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend Transport; Mon, 27 Sep 2021 15:01:20 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mUs87-006Moh-UI; Mon, 27 Sep 2021 12:01:19 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 598f8267-2adc-41e3-77af-08d981c7aa63
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5304:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5304C48A342873E63D61BDCAC2A79@BL1PR12MB5304.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pxvBRQiUEkCLSywn6Q6bgwQiKgYXrIKnuGRKGndnm3Jy0i6k269ZMXXHOqkNO1veOQuOl8EtesCn33quIbeSTIxOPrIbKmqp0VeihOSxXuDwXV+F64BP9Jt6kjQ2WO3lHy84KchUTVkoWGnfOQH+dSpIzKGvOTDLLZJK2+lK6+1UpU/kFDKa8YUhpzEu7y5F+4QwuV1ykk7qHI2C1N9Lb30xUEbz/OvffMfZZQ46cFvuSss5np1KUFcW/KmU3p1Z0jlN43IOSxB5mBQqngSK11aN/zfWUYXMFyZiJjHUPPFSjVNEFU41iQOc7ZgvJ/7c33q7aEEXsLPK3SOytXKnhOruZ4uVhBh0EekSlkt1rBwEiXYWG7Tq31TP03WCF9iGWDJBOapXL5LX6yfmiHZ4WPit1t+2K6HJowohCZsvJB3S8fhPWHV7S/f7PY3hM1jW5/gJVgW14NwTTc1qkKVFeVvD3tT7gAPG1/DqwQ/saIdgSGNI93YOde3lTVu6I6BHoHYngJZgmsEzgQu1Je5BwnOl+ShTltwZ8KkWIJksPk0im9pyER3JNNtpeOlAB8TsL3z2cvJONBq87B7GGrrF+n//uILmpKP6qDo60D3rXLxZYvWHxTDE1dce/7cjfWeUpx7AEkYoEqUxwrXCrVwZzCo1OKjWb8x7ezDwdpvVpiOmRaSb7iTnsRIM6Rio0fQT
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(26005)(9746002)(54906003)(426003)(6636002)(508600001)(4326008)(36756003)(9786002)(66556008)(86362001)(2616005)(66946007)(66476007)(33656002)(2906002)(38100700002)(5660300002)(8936002)(316002)(1076003)(8676002)(83380400001)(110136005)(186003)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xACYfh3VLm+Yin/0UxqVjr6CAkf5nWukw+yEQPFdF7b2/RSY2itPJeDBkqsV?=
+ =?us-ascii?Q?Cbm0gKp19Ai5dBjWL2mlJK0SM65+JO3SQWZnAKHOuMi5WXsfLjoBP9SQ2wyu?=
+ =?us-ascii?Q?LECPsZ0HumGS7bEqVQeVpBoz8ZLVBud1oy/KHFwKf1Qp3uCEhhFgjymd1wQJ?=
+ =?us-ascii?Q?MSx054aHyGhQo9VpePDf0zOZiFXwtRTv1nWHX1u28EusosV5BHWMOafxKR8S?=
+ =?us-ascii?Q?c+KRfhX7833casUUrBHGDYYsJOzrwJvl12UwZOgJTkoGVLRAuuiJXkOmo1kJ?=
+ =?us-ascii?Q?3F/Sek7tkuetoN4I6wYUNbkcjYBZEhH3x5k4Vf9eSIeuYewt+oja+xj5Col/?=
+ =?us-ascii?Q?uYDvQPOWbpSlzIN6uV9K3q/oiAxCeg40MkposLJOJtfil1Up9hTws3QnoqdX?=
+ =?us-ascii?Q?HCn2PG607QjCHOHUVZRySGUb2lUMsNs0g70MBA4mbk9Bx8sUU32pFVc7SO11?=
+ =?us-ascii?Q?nvavv3V8YE+DgL2TMTC1gg8Bq2ehZam7g4+XQG9QhXwfwqcgqsKx1wFaWfmA?=
+ =?us-ascii?Q?IDAWXZonOxvjFgpDvbBizUC0PdoBWDbf0JmZ0jSMkElyWYQmHdkGipkErrx/?=
+ =?us-ascii?Q?nkxTT6zVw897YvKij9aQIm92w9AZmvFXdfNgAiXj4eEV7nC1tZ5E+cU4VtVH?=
+ =?us-ascii?Q?qzHsaNm5B+A1MsuJvl6cOzHC6cPYEtPoFqKoF0xMlMPr3jLSX2fI7WWoSYQJ?=
+ =?us-ascii?Q?iXiXZGq5yXnTu8+Ch1v799sUlbb9xIdYR2AV+SXG3Z4Zo48Fz3nRLXFjtCsF?=
+ =?us-ascii?Q?UAC69i5/hiV4lXVFdUVs5pwURQpqc5H8vpbqyzhEeDcUmvMs63937dU9QBoo?=
+ =?us-ascii?Q?WYqjDc0qksrJ5VpHj+AL2bn1GwtEZ85dDH6VcOJQ8EFbf42qudpZ6U8rZAvo?=
+ =?us-ascii?Q?fdVsSIqxmZtrB/gHr0prQx3j+BlsiS015iHi0ltGD8p/dxqtsh2B+rEhXwp8?=
+ =?us-ascii?Q?2uLf1ZgLjLdkmwYEQ+m5ID5QvuEoN72WBP4b7Smtk6sRL9SmGJTPM/kdSSYm?=
+ =?us-ascii?Q?k4b8imUs4OcNJHs6rl+bYJhpeER/iW2NukMJJEtVtwJc01SRRAwBreyj6DF0?=
+ =?us-ascii?Q?k9/2Uj9wSYRjZrBPTcsbNH5wRZ5+LxdRNEFiALbEoOA6ZREhOf96sTsbOFfH?=
+ =?us-ascii?Q?+gvmUpyG+SNCdbkGJEPz3KHUOKVlV0Anis3121tnd3qRMrPeexpAASWjU/T5?=
+ =?us-ascii?Q?RXjSHIECARt6krN2L87IhAh/otfCEb0F7Nq2/JK7pYav20duL/RDidinm3WZ?=
+ =?us-ascii?Q?3XeCjQuiEtcsRLZNWMRfSwA3ME+mJZPoHkrAhDkEiI03Q6ik+/RFsKk02Uon?=
+ =?us-ascii?Q?PEccffFhSxqHLE3mH+xzczsJ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 598f8267-2adc-41e3-77af-08d981c7aa63
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2021 15:01:20.8608
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eZv0ReOAmNKwhdELNsCpPiBk0E3ZYi+al6hrvqvmIxSRX+Y3mGZ5/WiAfRA3UHOu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5304
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gR3VudGhvcnBl
-IFttYWlsdG86amdnQG52aWRpYS5jb21dDQo+IFNlbnQ6IDE2IFNlcHRlbWJlciAyMDIxIDE0OjU5
-DQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVtLnRo
-b2RpQGh1YXdlaS5jb20+DQo+IENjOiBrdm1Admdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxA
-dmdlci5rZXJuZWwub3JnOw0KPiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBhbGV4Lndp
-bGxpYW1zb25AcmVkaGF0LmNvbTsNCj4gbWd1cnRvdm95QG52aWRpYS5jb207IGxpdWxvbmdmYW5n
-IDxsaXVsb25nZmFuZ0BodWF3ZWkuY29tPjsgWmVuZ3RhbyAoQikNCj4gPHByaW1lLnplbmdAaGlz
-aWxpY29uLmNvbT47IEpvbmF0aGFuIENhbWVyb24NCj4gPGpvbmF0aGFuLmNhbWVyb25AaHVhd2Vp
-LmNvbT47IFdhbmd6aG91IChCKSA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+DQo+IFN1YmplY3Q6
-IFJlOiBbUEFUQ0ggdjMgNi82XSBoaXNpX2FjY192ZmlvX3BjaTogQWRkIHN1cHBvcnQgZm9yIFZG
-SU8gbGl2ZQ0KPiBtaWdyYXRpb24NCj4gDQo+IE9uIFdlZCwgU2VwIDE1LCAyMDIxIGF0IDAxOjI4
-OjQ3UE0gKzAwMDAsIFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkNCj4gd3JvdGU6DQo+ID4NCj4g
-Pg0KPiA+ID4gRnJvbTogSmFzb24gR3VudGhvcnBlIFttYWlsdG86amdnQG52aWRpYS5jb21dDQo+
-ID4gPiBTZW50OiAxNSBTZXB0ZW1iZXIgMjAyMSAxNDowOA0KPiA+ID4gVG86IFNoYW1lZXJhbGkg
-S29sb3RodW0gVGhvZGkNCj4gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT4N
-Cj4gPiA+IENjOiBrdm1Admdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwu
-b3JnOw0KPiA+ID4gbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsgYWxleC53aWxsaWFtc29u
-QHJlZGhhdC5jb207DQo+ID4gPiBtZ3VydG92b3lAbnZpZGlhLmNvbTsgTGludXhhcm0gPGxpbnV4
-YXJtQGh1YXdlaS5jb20+OyBsaXVsb25nZmFuZw0KPiA+ID4gPGxpdWxvbmdmYW5nQGh1YXdlaS5j
-b20+OyBaZW5ndGFvIChCKSA8cHJpbWUuemVuZ0BoaXNpbGljb24uY29tPjsNCj4gPiA+IEpvbmF0
-aGFuIENhbWVyb24gPGpvbmF0aGFuLmNhbWVyb25AaHVhd2VpLmNvbT47IFdhbmd6aG91IChCKQ0K
-PiA+ID4gPHdhbmd6aG91MUBoaXNpbGljb24uY29tPg0KPiA+ID4gU3ViamVjdDogUmU6IFtQQVRD
-SCB2MyA2LzZdIGhpc2lfYWNjX3ZmaW9fcGNpOiBBZGQgc3VwcG9ydCBmb3IgVkZJTyBsaXZlDQo+
-ID4gPiBtaWdyYXRpb24NCj4gPiA+DQo+ID4gPiBPbiBXZWQsIFNlcCAxNSwgMjAyMSBhdCAxMDo1
-MDozN0FNICswMTAwLCBTaGFtZWVyIEtvbG90aHVtIHdyb3RlOg0KPiA+ID4gPiArLyoNCj4gPiA+
-ID4gKyAqIEhpU2lsaWNvbiBBQ0MgVkYgZGV2wqBNTUlPIHNwYWNlIGNvbnRhaW5zIGJvdGggdGhl
-IGZ1bmN0aW9uYWwNCj4gcmVnaXN0ZXINCj4gPiA+ID4gKyAqIHNwYWNlwqBhbmQgdGhlIG1pZ3Jh
-dGlvbiBjb250cm9sIHJlZ2lzdGVyIHNwYWNlLiBXZSBoaWRlIHRoZQ0KPiBtaWdyYXRpb24NCj4g
-PiA+ID4gKyAqIGNvbnRyb2wgc3BhY2XCoGZyb20gdGhlIEd1ZXN0LiBCdXQgdG8gc3VjY2Vzc2Z1
-bGx5IGNvbXBsZXRlIHRoZSBsaXZlDQo+ID4gPiA+ICsgKiBtaWdyYXRpb24sIHdlIHN0aWxsIG5l
-ZWQgYWNjZXNzIHRvIHRoZSBmdW5jdGlvbmFsIE1NSU8gc3BhY2UgYXNzaWduZWQNCj4gPiA+ID4g
-KyAqIHRvIHRoZSBHdWVzdC4gVG8gYXZvaWQgYW55IHBvdGVudGlhbCBzZWN1cml0eSBpc3N1ZXMs
-IHdlIG5lZWQgdG8gYmUNCj4gPiA+ID4gKyAqIGNhcmVmdWwgbm90IHRvIGFjY2VzcyB0aGlzIHJl
-Z2lvbiB3aGlsZSB0aGUgR3Vlc3QgdkNQVXMgYXJlIHJ1bm5pbmcuDQo+ID4gPiA+ICsgKg0KPiA+
-ID4gPiArICogSGVuY2UgY2hlY2sgdGhlIGRldmljZSBzdGF0ZSBiZWZvcmUgd2UgbWFwIHRoZSBy
-ZWdpb24uDQo+ID4gPiA+ICsgKi8NCj4gPiA+DQo+ID4gPiBUaGUgcHJpb3IgcGF0Y2ggcHJldmVu
-dHMgbWFwcGluZyB0aGlzIGFyZWEgaW50byB0aGUgZ3Vlc3QgYXQgYWxsLA0KPiA+ID4gcmlnaHQ/
-DQo+ID4NCj4gPiBUaGF04oCZcyByaWdodC4gSXQgd2lsbCBwcmV2ZW50IEd1ZXN0IGZyb20gbWFw
-cGluZyB0aGlzIGFyZWEuDQo+ID4NCj4gPiA+IFNvIHdoeSB0aGUgY29tbWVudCBhbmQgbG9naWM/
-IElmIHRoZSBNTUlPIGFyZWEgaXNuJ3QgbWFwcGVkIHRoZW4gdGhlcmUNCj4gPiA+IGlzIG5vdGhp
-bmcgdG8gZG8sIHJpZ2h0Pw0KPiA+ID4NCj4gPiA+IFRoZSBvbmx5IHJpc2sgaXMgUDJQIHRyYW5z
-YWN0aW9ucyBmcm9tIGRldmljZXMgaW4gdGhlIHNhbWUgSU9NTVUNCj4gPiA+IGdyb3VwLCBhbmQg
-eW91IG1pZ2h0IGRvIHdlbGwgdG8gbWl0aWdhdGUgdGhhdCBieSBhc3NlcnRpbmcgdGhhdCB0aGUN
-Cj4gPiA+IGRldmljZSBpcyBpbiBhIHNpbmdsZXRvbiBJT01NVSBncm91cD8NCj4gPg0KPiA+IFRo
-aXMgd2FzIGFkZGVkIGFzIGFuIGV4dHJhIHByb3RlY3Rpb24uIEkgd2lsbCBhZGQgdGhlIHNpbmds
-ZXRvbiBjaGVjayBpbnN0ZWFkLg0KPiA+DQo+ID4gPiA+ICtzdGF0aWMgaW50IGhpc2lfYWNjX3Zm
-aW9fcGNpX2luaXQoc3RydWN0IHZmaW9fcGNpX2NvcmVfZGV2aWNlICp2ZGV2KQ0KPiA+ID4gPiAr
-ew0KPiA+ID4gPiArCXN0cnVjdCBhY2NfdmZfbWlncmF0aW9uICphY2NfdmZfZGV2Ow0KPiA+ID4g
-PiArCXN0cnVjdCBwY2lfZGV2ICpwZGV2ID0gdmRldi0+cGRldjsNCj4gPiA+ID4gKwlzdHJ1Y3Qg
-cGNpX2RldiAqcGZfZGV2LCAqdmZfZGV2Ow0KPiA+ID4gPiArCXN0cnVjdCBoaXNpX3FtICpwZl9x
-bTsNCj4gPiA+ID4gKwlpbnQgdmZfaWQsIHJldDsNCj4gPiA+ID4gKw0KPiA+ID4gPiArCXBmX2Rl
-diA9IHBkZXYtPnBoeXNmbjsNCj4gPiA+ID4gKwl2Zl9kZXYgPSBwZGV2Ow0KPiA+ID4gPiArDQo+
-ID4gPiA+ICsJcGZfcW0gPSBwY2lfZ2V0X2RydmRhdGEocGZfZGV2KTsNCj4gPiA+ID4gKwlpZiAo
-IXBmX3FtKSB7DQo+ID4gPiA+ICsJCXByX2VycigiSGlTaSBBQ0MgcW0gZHJpdmVyIG5vdCBsb2Fk
-ZWRcbiIpOw0KPiA+ID4gPiArCQlyZXR1cm4gLUVJTlZBTDsNCj4gPiA+ID4gKwl9DQo+ID4gPg0K
-PiA+ID4gTm9wZSwgdGhpcyBpcyBsb2NrZWQgd3JvbmcgYW5kIGhhcyBubyBsaWZldGltZSBtYW5h
-Z2VtZW50Lg0KPiA+DQo+ID4gT2suIEhvbGRpbmcgdGhlIGRldmljZV9sb2NrKCkgc3VmZmljaWVu
-dCBoZXJlPw0KPiANCj4gWW91IGNhbid0IGhvbGQgYSBoaXNpX3FtIHBvaW50ZXIgd2l0aCBzb21l
-IGtpbmQgb2YgbGlmZWN5Y2xlDQo+IG1hbmFnZW1lbnQgb2YgdGhhdCBwb2ludGVyLiBkZXZpY2Vf
-bG9jay9ldGMgaXMgbmVjZXNzYXJ5IHRvIGNhbGwNCj4gcGNpX2dldF9kcnZkYXRhKCkNCg0KU2lu
-Y2UgdGhpcyBtaWdyYXRpb24gZHJpdmVyIG9ubHkgc3VwcG9ydHMgVkYgZGV2aWNlcyBhbmQgdGhl
-IFBGDQpkcml2ZXIgd2lsbCBub3QgYmUgcmVtb3ZlZCB1bnRpbCBhbGwgdGhlIFZGIGRldmljZXMg
-Z2V0cyByZW1vdmVkLA0KaXMgdGhlIGxvY2tpbmcgbmVjZXNzYXJ5IGhlcmU/DQoNClRoZSBmbG93
-IGZyb20gUEYgZHJpdmVyIHJlbW92ZSgpIHBhdGggaXMgc29tZXRoaW5nIGxpa2UgdGhpcywNCg0K
-aWYgKHFtLT5mdW5fdHlwZSA9PSBRTV9IV19QRiAmJiBxbS0+dmZzX251bSkNCgkJaGlzaV9xbV9z
-cmlvdl9kaXNhYmxlKHBkZXYsIHRydWUpOw0KICAgICAgICAgIHBjaV9kaXNhYmxlX3NyaW92KHBk
-ZXYpLg0KDQpUaGFua3MsDQpTaGFtZWVyDQoNCg0K
+On Mon, Sep 27, 2021 at 01:46:31PM +0000, Shameerali Kolothum Thodi wrote:
+
+> > > > Nope, this is locked wrong and has no lifetime management.
+> > >
+> > > Ok. Holding the device_lock() sufficient here?
+> > 
+> > You can't hold a hisi_qm pointer with some kind of lifecycle
+> > management of that pointer. device_lock/etc is necessary to call
+> > pci_get_drvdata()
+> 
+> Since this migration driver only supports VF devices and the PF
+> driver will not be removed until all the VF devices gets removed,
+> is the locking necessary here?
+
+Oh.. That is really busted up. pci_sriov_disable() is called under the
+device_lock(pf) and obtains the device_lock(vf).
+
+This means a VF driver can never use the device_lock(pf), otherwise it
+can deadlock itself if PF removal triggers VF removal.
+
+But you can't access these members without using the device_lock(), as
+there really are no safety guarentees..
+
+The mlx5 patches have this same sketchy problem.
+
+We may need a new special function 'pci_get_sriov_pf_devdata()' that
+confirms the vf/pf relationship and explicitly interlocks with the
+pci_sriov_enable/disable instead of using device_lock()
+
+Leon, what do you think?
+
+Jason
