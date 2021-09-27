@@ -2,88 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4228C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 12:18:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A682C43219
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 12:23:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93A5161058
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 12:18:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1003D60F41
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 12:23:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234170AbhI0MTy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Sep 2021 08:19:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43330 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234162AbhI0MTw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Sep 2021 08:19:52 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 634DE6103B;
-        Mon, 27 Sep 2021 12:18:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632745095;
-        bh=Q51NkLhfdP9cqBSlpTRPX/qx56tDI5PJVgL+PG3DiO8=;
-        h=From:To:Cc:Subject:Date:From;
-        b=FGWy3XGVbDh9POAkE0jOMILMxXxn2dHjEaB65vSUN2ibK4GKnnLvO+jDJSa5Y8W5b
-         z+bNFnP4ihkhgUT96JUBije9Jwg7bhNTAsjBQc3tnbJfAHe67NCQzgdNmfwOPgm0Zj
-         uD9uG5dZ+s6sfdZHbknAVtUYf7g+tSCbbxs9gGat9oIJuqMnxe4lz43GYDTm5sZc0S
-         v+L5qFU/E23Zg3XoskoNZgSXDojlrSoRTWnW9S2uOhqoKe5gt2HCosD5bh51KlVDnd
-         flG7waqG00wNJpTPlF1ZIip6TxilRlR7N03SwIQVsx9Kt0MlY0pcUlb651Z1C5X8aS
-         jjTsIv0YG+ZXw==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, YueHaibing <yuehaibing@huawei.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev
-Subject: [PATCH] crypto: ccree - avoid out-of-range warnings from clang
-Date:   Mon, 27 Sep 2021 14:18:03 +0200
-Message-Id: <20210927121811.940899-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.29.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S234242AbhI0MZA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Sep 2021 08:25:00 -0400
+Received: from mail-ot1-f47.google.com ([209.85.210.47]:38909 "EHLO
+        mail-ot1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234181AbhI0MY7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Sep 2021 08:24:59 -0400
+Received: by mail-ot1-f47.google.com with SMTP id c6-20020a9d2786000000b005471981d559so24141917otb.5;
+        Mon, 27 Sep 2021 05:23:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject:date
+         :message-id;
+        bh=M1JxjeIOmKat6HvCouZk2WyJoVDL3ELYlgAx1y+djF4=;
+        b=7Dr0bB4vGoaJvaSBAUBkx9KtKsSxZfB/vn4GVTjzd3CfOSl5Iwqp/Hh5IuMRBL06d+
+         uTcMftoEpr91DfDdp7SVYLnnLLM484w+tDj9V8zrObYSZwSIAsKw0IdSgq5/f0N3BX7l
+         S0/O0Y5/luYHWHqCj8v/e5FNzpbY65175L0QUhY/C5JCjyUU5yFFadzqjtfHuryQahIm
+         7/AcyukH2XgWHg6HqoUFRMjWGKv2st+fUmTng2WHuP2G2WogBgV/QzYqMcKs+orklLg7
+         BuLlDGHtxxhlhnm0wzUxNExE9ymhzOboEXHr35l4Gy1tYNa4/iJzHoPV6ZcQROWKergD
+         VHDQ==
+X-Gm-Message-State: AOAM532DbWgQuNY4xsZ7Yz305Qgr2HmuLmISGFgBArR3tWazJEkdyZR8
+        /88d6n4zDBKM8r/I0B/VXw==
+X-Google-Smtp-Source: ABdhPJxPboMBJ7atlf4V2758iIymolXl+RlULWf5ZVJnB5v+aaNUyKh+KewyhDhEFZ50jt9f77a3wA==
+X-Received: by 2002:a9d:27a4:: with SMTP id c33mr17216398otb.283.1632745401264;
+        Mon, 27 Sep 2021 05:23:21 -0700 (PDT)
+Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
+        by smtp.gmail.com with ESMTPSA id o126sm3844592oig.21.2021.09.27.05.23.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Sep 2021 05:23:20 -0700 (PDT)
+Received: (nullmailer pid 3097152 invoked by uid 1000);
+        Mon, 27 Sep 2021 12:23:19 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     Sam Shih <sam.shih@mediatek.com>
+Cc:     herbert@gondor.apana.org.au, linux-serial@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux@roeck-us.net,
+        linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, hsinyi@chromium.org,
+        mpm@selenic.com, seiya.wang@mediatek.com,
+        enric.balletbo@collabora.com, fparent@baylibre.com,
+        john@phrozen.org, sboyd@kernel.org, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, gregkh@linuxfoundation.org,
+        mturquette@baylibre.com, linux-watchdog@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com,
+        wim@linux-watchdog.org, robh+dt@kernel.org,
+        linus.walleij@linaro.org, sean.wang@kernel.org,
+        Ryder.Lee@mediatek.com
+In-Reply-To: <20210927023419.17994-1-sam.shih@mediatek.com>
+References: <1632491961.645727.1195978.nullmailer@robh.at.kernel.org> <20210927023419.17994-1-sam.shih@mediatek.com>
+Subject: Re: [v5,5/9] dt-bindings: pinctrl: update bindings for MT7986 SoC
+Date:   Mon, 27 Sep 2021 07:23:19 -0500
+Message-Id: <1632745399.256353.3097151.nullmailer@robh.at.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Mon, 27 Sep 2021 10:34:19 +0800, Sam Shih wrote:
+> This updates bindings for MT7986 pinctrl driver. The
+> difference of pinctrl between mt7986a and mt7986b is that pin-41 to pin-65
+> do not exist on mt7986b
+> 
+> Signed-off-by: Sam Shih <sam.shih@mediatek.com>
+> 
+> ---
+> v5 : fixed yamllint warnings/errors
+> v4 : used yaml format instead of txt format document
+> v3 : make mt7986 pinctrl bindings as a separate file
+> v2 : deleted the redundant description of mt7986a/mt7986b
+> ---
+>  .../pinctrl/mediatek,mt7986-pinctrl.yaml      | 353 ++++++++++++++++++
+>  1 file changed, 353 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.yaml
+> 
 
-clang points out inconsistencies in the FIELD_PREP() invocation in
-this driver that result from the 'mask' being a 32-bit value:
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-drivers/crypto/ccree/cc_driver.c:117:18: error: result of comparison of constant 18446744073709551615 with expression of type 'u32' (aka 'unsigned int') is always false [-Werror,-Wtautological-constant-out-of-range-compare]
-        cache_params |= FIELD_PREP(mask, val);
-                        ^~~~~~~~~~~~~~~~~~~~~
-include/linux/bitfield.h:94:3: note: expanded from macro 'FIELD_PREP'
-                __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");    \
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-include/linux/bitfield.h:52:28: note: expanded from macro '__BF_FIELD_CHECK'
-                BUILD_BUG_ON_MSG((_mask) > (typeof(_reg))~0ull,         \
-                ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+yamllint warnings/errors:
 
-This does not happen in other places that just pass a constant here.
+dtschema/dtc warnings/errors:
+Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.example.dts:25.13-32.43: Warning (reg_format): /example-0/soc/pinctrl@1001f000:reg: property has invalid length (128 bytes) (#address-cells == 2, #size-cells == 1)
+Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.example.dt.yaml: Warning (pci_device_reg): Failed prerequisite 'reg_format'
+Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.example.dt.yaml: Warning (pci_device_bus_num): Failed prerequisite 'reg_format'
+Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.example.dt.yaml: Warning (simple_bus_reg): Failed prerequisite 'reg_format'
+Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.example.dt.yaml: Warning (i2c_bus_reg): Failed prerequisite 'reg_format'
+Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.example.dt.yaml: Warning (spi_bus_reg): Failed prerequisite 'reg_format'
+Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.example.dts:23.33-58.13: Warning (avoid_default_addr_size): /example-0/soc/pinctrl@1001f000: Relying on default #address-cells value
+Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.example.dts:23.33-58.13: Warning (avoid_default_addr_size): /example-0/soc/pinctrl@1001f000: Relying on default #size-cells value
+Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.example.dt.yaml: Warning (unique_unit_address): Failed prerequisite 'avoid_default_addr_size'
+/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.example.dt.yaml: pinctrl@1001f000: 'gpio-ranges' does not match any of the regexes: '-[0-9]+$', 'pinctrl-[0-9]+'
+	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.yaml
 
-Work around the warnings by widening the type of the temporary variable.
+doc reference errors (make refcheckdocs):
 
-Fixes: 05c2a705917b ("crypto: ccree - rework cache parameters handling")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/ccree/cc_driver.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+See https://patchwork.ozlabs.org/patch/1533169
 
-diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
-index e599ac6dc162..790fa9058a36 100644
---- a/drivers/crypto/ccree/cc_driver.c
-+++ b/drivers/crypto/ccree/cc_driver.c
-@@ -103,7 +103,8 @@ MODULE_DEVICE_TABLE(of, arm_ccree_dev_of_match);
- static void init_cc_cache_params(struct cc_drvdata *drvdata)
- {
- 	struct device *dev = drvdata_to_dev(drvdata);
--	u32 cache_params, ace_const, val, mask;
-+	u32 cache_params, ace_const, val;
-+	u64 mask;
- 
- 	/* compute CC_AXIM_CACHE_PARAMS */
- 	cache_params = cc_ioread(drvdata, CC_REG(AXIM_CACHE_PARAMS));
--- 
-2.29.2
+This check can fail if there are any dependencies. The base for a patch
+series is generally the most recent rc1.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit.
 
