@@ -2,224 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB242C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 08:28:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF91DC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 11:23:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90B956113D
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 08:28:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F1F260F4F
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 11:23:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233422AbhI0I3s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Sep 2021 04:29:48 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:39156 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233403AbhI0I3r (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Sep 2021 04:29:47 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 677E6200A6;
-        Mon, 27 Sep 2021 08:28:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1632731288; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2IzRpYwg8XT7vqE3k6YtV2nkJvw9ef0chxy96R0/2zc=;
-        b=q2SeJiyoATb/nFqXahyThP6f+tYr9iVAVwI2c3lDR2PUY2S15S8/Ypm9Jxf5t1fXuZNdXu
-        pUPAAn9LWXAm9iH+jFz/OBfZ4WWo7cMXOGzSSQFGuK9bT/dzFTB2VDIpzSLtLXlgktXY5/
-        dtDoXTsunBz2yLUVDZc7eb+k6MRQ8zs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1632731288;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2IzRpYwg8XT7vqE3k6YtV2nkJvw9ef0chxy96R0/2zc=;
-        b=8dGSvjyAhu/5S+MPWY4rT17aVeit96nwuD+ExfHdg0pUPjNnFkQiWgYe4olvYL0zoS0XBb
-        qldZABuxJqXfJ0Ag==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5A0F613A42;
-        Mon, 27 Sep 2021 08:28:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id jGylFZiAUWF8TQAAMHmgww
-        (envelope-from <hare@suse.de>); Mon, 27 Sep 2021 08:28:08 +0000
-Subject: Re: [PATCH 10/12] nvmet: Implement basic In-Band Authentication
-To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <keith.busch@wdc.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
-References: <20210910064322.67705-1-hare@suse.de>
- <20210910064322.67705-11-hare@suse.de>
- <79742bd7-a41c-0abc-e7de-8d222b146d02@grimberg.me>
- <c7739610-6d0b-7740-c339-b35ca5ae34e2@suse.de>
- <a2596777-25b2-f633-4b00-18b1a319c5c2@suse.de>
- <32d8f860-9fdb-606c-62b7-ad89837d8e71@grimberg.me>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <2ccfb62a-d782-7bb2-4d41-6d1152851a4a@suse.de>
-Date:   Mon, 27 Sep 2021 10:28:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S233980AbhI0LZW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Sep 2021 07:25:22 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:55638 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233959AbhI0LZV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Sep 2021 07:25:21 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1mUojW-0004A4-Pj; Mon, 27 Sep 2021 19:23:42 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1mUojW-0005r0-3W; Mon, 27 Sep 2021 19:23:42 +0800
+Date:   Mon, 27 Sep 2021 19:23:42 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-next@vger.kernel.org
+Subject: [PATCH] crypto: api - Export crypto_boot_test_finished
+Message-ID: <20210927112341.GA22483@gondor.apana.org.au>
 MIME-Version: 1.0
-In-Reply-To: <32d8f860-9fdb-606c-62b7-ad89837d8e71@grimberg.me>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210927143229.543749f4@canb.auug.org.au>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+Organization: Core
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 9/27/21 9:55 AM, Sagi Grimberg wrote:
+Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> [-- text/plain, encoding quoted-printable, charset: US-ASCII, 18 lines --]
 > 
+> Hi all,
 > 
-> On 9/27/21 10:17 AM, Hannes Reinecke wrote:
->> On 9/27/21 8:40 AM, Hannes Reinecke wrote:
->>> On 9/27/21 12:51 AM, Sagi Grimberg wrote:
->>>>
->>>>> +void nvmet_execute_auth_send(struct nvmet_req *req)
->>>>> +{
->>>>> +    struct nvmet_ctrl *ctrl = req->sq->ctrl;
->>>>> +    struct nvmf_auth_dhchap_success2_data *data;
->>>>> +    void *d;
->>>>> +    u32 tl;
->>>>> +    u16 status = 0;
->>>>> +
->>>>> +    if (req->cmd->auth_send.secp !=
->>>>> NVME_AUTH_DHCHAP_PROTOCOL_IDENTIFIER) {
->>>>> +        status = NVME_SC_INVALID_FIELD | NVME_SC_DNR;
->>>>> +        req->error_loc =
->>>>> +            offsetof(struct nvmf_auth_send_command, secp);
->>>>> +        goto done;
->>>>> +    }
->>>>> +    if (req->cmd->auth_send.spsp0 != 0x01) {
->>>>> +        status = NVME_SC_INVALID_FIELD | NVME_SC_DNR;
->>>>> +        req->error_loc =
->>>>> +            offsetof(struct nvmf_auth_send_command, spsp0);
->>>>> +        goto done;
->>>>> +    }
->>>>> +    if (req->cmd->auth_send.spsp1 != 0x01) {
->>>>> +        status = NVME_SC_INVALID_FIELD | NVME_SC_DNR;
->>>>> +        req->error_loc =
->>>>> +            offsetof(struct nvmf_auth_send_command, spsp1);
->>>>> +        goto done;
->>>>> +    }
->>>>> +    tl = le32_to_cpu(req->cmd->auth_send.tl);
->>>>> +    if (!tl) {
->>>>> +        status = NVME_SC_INVALID_FIELD | NVME_SC_DNR;
->>>>> +        req->error_loc =
->>>>> +            offsetof(struct nvmf_auth_send_command, tl);
->>>>> +        goto done;
->>>>> +    }
->>>>> +    if (!nvmet_check_transfer_len(req, tl)) {
->>>>> +        pr_debug("%s: transfer length mismatch (%u)\n", __func__,
->>>>> tl);
->>>>> +        return;
->>>>> +    }
->>>>> +
->>>>> +    d = kmalloc(tl, GFP_KERNEL);
->>>>> +    if (!d) {
->>>>> +        status = NVME_SC_INTERNAL;
->>>>> +        goto done;
->>>>> +    }
->>>>> +
->>>>> +    status = nvmet_copy_from_sgl(req, 0, d, tl);
->>>>> +    if (status) {
->>>>> +        kfree(d);
->>>>> +        goto done;
->>>>> +    }
->>>>> +
->>>>> +    data = d;
->>>>> +    pr_debug("%s: ctrl %d qid %d type %d id %d step %x\n", __func__,
->>>>> +         ctrl->cntlid, req->sq->qid, data->auth_type, data->auth_id,
->>>>> +         req->sq->dhchap_step);
->>>>> +    if (data->auth_type != NVME_AUTH_COMMON_MESSAGES &&
->>>>> +        data->auth_type != NVME_AUTH_DHCHAP_MESSAGES)
->>>>> +        goto done_failure1;
->>>>> +    if (data->auth_type == NVME_AUTH_COMMON_MESSAGES) {
->>>>> +        if (data->auth_id == NVME_AUTH_DHCHAP_MESSAGE_NEGOTIATE) {
->>>>> +            /* Restart negotiation */
->>>>> +            pr_debug("%s: ctrl %d qid %d reset negotiation\n",
->>>>> __func__,
->>>>> +                 ctrl->cntlid, req->sq->qid);
->>>>
->>>> This is the point where you need to reset also auth config as this may
->>>> have changed and the host will not create a new controller but rather
->>>> re-authenticate on the existing controller.
->>>>
->>>> i.e.
->>>>
->>>> +                       if (!req->sq->qid) {
->>>> +                               nvmet_destroy_auth(ctrl);
->>>> +                               if (nvmet_setup_auth(ctrl) < 0) {
->>>> +                                       pr_err("Failed to setup
->>>> re-authentication\n");
->>>> +                                       goto done_failure1;
->>>> +                               }
->>>> +                       }
->>>>
->>>>
->>>>
->>>
->>> Not sure. We have two paths how re-authentication can be triggered.
->>> The one is from the host, which sends a 'negotiate' command to the
->>> controller (ie this path).  Then nothing on the controller has
->>> changed, and we just need to ensure that we restart negotiation.
->>> IE we should _not_ reset the authentication (as that would also
->>> remove the controller keys, which haven't changed). We should just
->>> ensure that all ephemeral data is regenerated. But that should be
->>> handled in-line, and I _think_ I have covered all of that.
->>> The other path to trigger re-authentication is when changing values
->>> on the controller via configfs. Then sure we need to reset the
->>> controller data, and trigger reauthentication.
->>> And there I do agree, that path isn't fully implemented / tested.
->>> But should be started whenever the configfs values change.
->>>
->> Actually, having re-read the spec I'm not sure if the second path is
->> correct.
->> As per spec only the _host_ can trigger re-authentication. There is no
->> provision for the controller to trigger re-authentication, and given
->> that re-auth is a soft-state anyway (ie the current authentication
->> stays valid until re-auth enters a final state) I _think_ we should be
->> good with the current implementation, where we can change the
->> controller keys
->> via configfs, but they will only become active once the host triggers
->> re-authentication.
+> After merging the crypto tree, today's linux-next build (powerpc
+> ppc44x_defconfig) failed like this:
 > 
-> Agree, so the proposed addition is good with you?
+> ERROR: modpost: "crypto_boot_test_finished" [crypto/crypto_algapi.ko] undefined!
 > 
-Why would we need it?
-I do agree there's a bit missing for removing the old shash_tfm if there
-is a hash-id mismatch, but why would we need to reset the entire
-authentication?
-The important (ie cryptographically relevant) bits are cleared in
-nvmet_auth_sq_free(), and they are cleared after authentication is
-completed.
-So why would we need to reset keys and TFMs?
+> Caused by commit
+> 
+>  adad556efcdd ("crypto: api - Fix built-in testing dependency failures")
+> 
+> I have reverted that commit for today.
 
->> And indeed, that's the only way how it could work, otherwise it'll be
->> tricky to change keys in a running connection.
->> If we were to force renegotiation when changing controller keys we
->> would immediately fail the connection, as we cannot guarantee that
->> controller _and_ host keys are changed at the same time.
-> 
-> Exactly, changing the hostkey in the controller must not trigger
-> re-auth, the host will remain connected and operational as it
-> authenticated before. As the host re-authenticates or reconnect
-> it needs to authenticate against the new key.
+Oops, does this patch fix the problem?
 
-Right. I'll be adding a comment to the configfs functions to the effect.
+---8<---
+We need to export crypto_boot_test_finished in case api.c is
+built-in while algapi.c is built as a module.
 
-Cheers,
+Fixes: adad556efcdd ("crypto: api - Fix built-in testing dependency failures")
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Hannes
+diff --git a/crypto/api.c b/crypto/api.c
+index 1cf1f03347cc..ee5991fe11f8 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -32,6 +32,7 @@ BLOCKING_NOTIFIER_HEAD(crypto_chain);
+ EXPORT_SYMBOL_GPL(crypto_chain);
+ 
+ DEFINE_STATIC_KEY_FALSE(crypto_boot_test_finished);
++EXPORT_SYMBOL_GPL(crypto_boot_test_finished);
+ 
+ static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg);
+ 
 -- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
