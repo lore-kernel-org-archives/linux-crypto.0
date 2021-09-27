@@ -2,174 +2,448 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79CDCC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 16:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C102C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 16:43:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D0F860FC0
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 16:06:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3B40610FC
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 16:43:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235306AbhI0QII (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Sep 2021 12:08:08 -0400
-Received: from mail-bn1nam07on2049.outbound.protection.outlook.com ([40.107.212.49]:35654
-        "EHLO NAM02-BN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235261AbhI0QIH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Sep 2021 12:08:07 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Mhmtlzk7SUnCxPezt6A5tZpfo/+QYvW96WzXWh+r4OsUVNK+9ha3g191aAUEjxKqWjzdbqzrXBnvH35mjlMxYXP5UENV0qf0dMt34ca2gYRXJ8i5QAjx3VZhX1cZugv7Ywkm7FMNWW0LBgGGlLqD4ktNSpIS4gL/l5gruSOj2DVCsa4t/Ze6b7FfZrFCslX5y2Dmx5OV0hkmqp1RUsTqvSyCmIiZ9+4+iiTK5pDIH636p7ccBh3YAeHnARQGcVL1+T+z9pWDFNvjjh2XzV006rVwwI0BbuJGINNkNAZ/sulTeRuG5uCW1Hl/irCKr1sj+fZmSTkOtdispVbH/90fCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=EwFszWjD3pr9nnHCtHzzznJtJ7AWQfzFznYTHrTRiOs=;
- b=k1myYQRaZGOrDWlHrPjAzuwQXi/OW3nWLzvhzMzcdVMY1kGGiLM9ybK3jZngntr3tv6t/7KmcKnqVu95+cIbdDgNTA7Wk/7QSTKM8S65zr1c0oiRQ23Qdk2I6MCIwddtNGgRjyTfjNs8XkY2irOPVFAUa9+Sb2G8dHIn6wHFaCs7pyy4f2lKPIxX64Ys7YgD+OouM2YqMqjLfeI7mRqVZ3Gn65EDOqOkb8JUbWVpDUGCHCZNWmBHgDLYnOiDLPgdWyi/kkhhgsSwLGr71mWW8BVLccwv9NDDKSI2wxuGfERdryJwH5h5/kmlldBZ7bvmikk5w8vdTHhf8b0gPLd9+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EwFszWjD3pr9nnHCtHzzznJtJ7AWQfzFznYTHrTRiOs=;
- b=WhITwuFR/mvoX5lnFBNH/dUViNgJ1jiSqxO0OdtEFzWEa8CXmKVod00hKTjl7YuFYiTkri/lnLMLI05+HTmm2IeFJTKDpFYnLams2q6eCV1SvmHg4MpkmyiLr58zgl8s7JPa5OIbkhKlGlARKLF/Knwl05NioVxKAoH7PoHBxYUCeTmHfO3f3syaqfuR3Klc5o1nvuUvvXdc9PnU5TOGE4N5yzYFqBO/O/Z7jsumaXg/yhRd+dJerfJNTRKtMhmFMasaL0kfA66hEd1y71RvGtUDrIJ+kLgDENEMqAv0NCMDLR5fLlfO68Mi7kQgEBQsgjxZmyrE8vtdxZWR51KbFA==
-Authentication-Results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5111.namprd12.prod.outlook.com (2603:10b6:208:31b::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.15; Mon, 27 Sep
- 2021 16:06:28 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4544.021; Mon, 27 Sep 2021
- 16:06:28 +0000
-Date:   Mon, 27 Sep 2021 13:06:27 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Leon Romanovsky <leonro@nvidia.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Message-ID: <20210927160627.GC964074@nvidia.com>
-References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
- <20210915095037.1149-7-shameerali.kolothum.thodi@huawei.com>
- <20210915130742.GJ4065468@nvidia.com>
- <fe5d6659e28244da82b7028b403e11ae@huawei.com>
- <20210916135833.GB327412@nvidia.com>
- <a440256250c14182b9eefc77d5d399b8@huawei.com>
- <20210927150119.GB964074@nvidia.com>
- <YVHqlzyIX3099Gtz@unreal>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YVHqlzyIX3099Gtz@unreal>
-X-ClientProxiedBy: BL0PR01CA0023.prod.exchangelabs.com (2603:10b6:208:71::36)
- To BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+        id S235532AbhI0QpA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Sep 2021 12:45:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32784 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235495AbhI0QpA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Sep 2021 12:45:00 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54325C061604
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Sep 2021 09:43:21 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id u8so79077142lff.9
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Sep 2021 09:43:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=l6yovMgBWNTTR56Q7WSV6rzjLweUZFOJVhBOBAp7uko=;
+        b=ICJXF1e6jZoXnOVK6Wj8c8uNVFlJycFej3Z9w9YS/1bsfYNOvS6oQ7issCFG0BAJGX
+         d1jVqzZaX4HzXUZg3/PWF4cK07JMTKeNJ71HSrEUgmUnV7hd3vArCV9KxrS5WyT2++mX
+         FFhukkIi2q7/rzSfQ0uEgmRmInluGicun9T+JL74YNiZhHCmgl9Tshm6DeYMTmzuxeQa
+         Xm73b9Y9FMeQiIqcjk4+68SyAN9FfC8lu2lNqh9d0oxFpD92DWcgLfyzwDPTvw/kA5r2
+         Gjl622IJgz2dvw1OWXA6RzTEDPNdpP6AayNiO3qad7uEdioV6mJ7KwVKgfF5Q/U3+Qm0
+         rZjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=l6yovMgBWNTTR56Q7WSV6rzjLweUZFOJVhBOBAp7uko=;
+        b=XJ2Q54YNvBAekAF1BQGbhfLdQh1+de9BVbCYdiumNypcZLco4Uk3mhUMOnKsJpv56j
+         EGAjvNFokwwEFHG5PzVa0mUXYHQh2BPXxI5Dr0SlfUCkZoVBEaZ6+7Vdm8l6qz6SqsqH
+         OeLU907RCdpkVG+WJq+6TlJN/N0+u9zwNe2+BOn8bm9Ai33t5rf8pVf/g1SiKFHixhxB
+         QECzGIJcp1NQJbzmtMe9iPwuRT9oFN0VLFbTxpmo0eKOWKTDs/TpvFq91nR9FPsicf1r
+         pGZltQo6IDX1jlxpQNevwMojlHSq0bnT3rcW4vS0uDND+i4f7yZpuKjVkvrDUzWOzCRT
+         pYKg==
+X-Gm-Message-State: AOAM533DvgbQcCic0h6Tn+LJnP/WvbzXyG2Otx93a1vBI+6HXSybvHyl
+        bGawKFhVKx+PGgi8JsAjWKBjun2YVIAcZub0EP2zwA==
+X-Google-Smtp-Source: ABdhPJyYEaBxt+1iGUqAOnuV67ELpXWbdyFPo7UdANn1u/AcJTEpom6QjM0mjn0iIsy3VdRkmDd6LmUv1T2rU5/gPas=
+X-Received: by 2002:a2e:87ca:: with SMTP id v10mr808353ljj.369.1632760997896;
+ Mon, 27 Sep 2021 09:43:17 -0700 (PDT)
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by BL0PR01CA0023.prod.exchangelabs.com (2603:10b6:208:71::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend Transport; Mon, 27 Sep 2021 16:06:28 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mUt99-006Ozw-2x; Mon, 27 Sep 2021 13:06:27 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: eacff957-0cac-4240-9c82-08d981d0c361
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5111:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB51112BE4568E9D75ECCF4F24C2A79@BL1PR12MB5111.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WQ+LNTJ9HVpekh7AyJSI0UpvhwKVZNSoMGwMIfffl+tc/aiBfJWaTHv/NV+CdoSuWnJCBgHDuSSo9ajtjVjI8Z286gUjJC4+0wg8Kl6NPI8pyxuevvRCgkp7sXEz0MuMei/pMX091AzeCSIuCAbK7mV/M8O/Qmn6qmMnIZprXA4n/GRSK4AGfO5KGixALaWwwqN/ZGDGtk7nG9YyZZwEtRnflw1sELYom/hxwsRVPHUZf5hTJYTi1B0gYL6YHQ87ukrANyEBIrJx6RMtfP5oEqWTAPxOOmj+uqtRJgIgE8dFhwAQQt2RKlFg7HOOh3SRohA9JmBhfE+YBYtbnJR6wenpVncgT9716junjSA6EYfdS4XyG1g2N8rXkT4hMEsficc3ivxMV9yFB7gBFyBZZKcu3mZC5KM5R7y0EgkKhCtRSDQQUxm2QnBKOkvWUSpBuf2d+RUo6C1UlkeyrBr1mz/1VJ+6+VcdQ9YEUlYYdO3pJyPX42r7EJq7m4FNII6JX642wACiA8LlFPGchTfnYRRDkkAfr43e6RgOiT5oprqkTei7wlCFgvCQsT+bgr48r6v+d3YjW8HBD0HaL4efOF6Wi2NFStSMLwlD8/Ww/6nCM9WTVZ0ghJYn/CACocAWJTaQOMALl2y1KAnHYyclb9VdKQ6sGTT29cy5GDeLX84guaMasf2bsCfNoU/i7iOq
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(5660300002)(37006003)(33656002)(6862004)(66476007)(8676002)(9786002)(426003)(2906002)(9746002)(316002)(66556008)(86362001)(2616005)(83380400001)(38100700002)(36756003)(4326008)(26005)(508600001)(54906003)(6636002)(66946007)(186003)(1076003)(8936002)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?sGOc7ydlgaqsIft1gPvRPkrFkXSzu0SW7RGWXwWIlZvbYqAWv5qdlNWPnuTs?=
- =?us-ascii?Q?GtBwkwKnnkPA+4Jhb0Y1JpiOJgBVbYr4wUv0SKbC4asUvIjDcvedQaA0S0a/?=
- =?us-ascii?Q?VzaA26cqv++4T8okMx62d3iLR6rGfofIR4/wET082BLKnOR59fffnRRsWjuL?=
- =?us-ascii?Q?joRnPWUOKj0DDT/VKGOXX8v3OMKf9UTwFVzr4IxR4jORrSzZcf4OefdeEYaU?=
- =?us-ascii?Q?0Ko0WOD9G5Qc33S0M1wvM96WYzPqJ5BExqwPFSzq3PqzlLnPkAa+5qyijXdT?=
- =?us-ascii?Q?zSx/6qNi+5UGAC42Y8Ovw13L/et8hRQr4YYsReWMCRkPOQVdeE17tVJXMp/4?=
- =?us-ascii?Q?Xksv14F0pAxBQDOvZhMozkhr8rBZGlf8zAi8g9MQnIiWl/K/B5G9xX8mLomE?=
- =?us-ascii?Q?/jR4SeBrprbif77eGATXj4u0QLgaco4OlqiqdGzeSrnark8udsnqwrgpJuZ0?=
- =?us-ascii?Q?X1AaItrLl/7v5zARAGxl3Hj9UBTmxjFGUrbLuCEwAYlvOgU9LRVM9AEN72jS?=
- =?us-ascii?Q?FR7VIMBb1AoO7xDSMwAVlx5nU5tey9Evll/tqjQN+aefn2r9XMj/ZnlXwN1Q?=
- =?us-ascii?Q?0eH/zrGfM47wt1PTcz27bPyPwePb6fu0vnUHhE6Zkpme4RMq5aiojFiJPi5G?=
- =?us-ascii?Q?qhy+9wZNIxWMv3vPfkH608OwY/0eOe2AywqwRdmGPKIv0+AmuaGrwxvCOj1Q?=
- =?us-ascii?Q?NagCfWvEpaPxO4xOfVU9vSONXwuxf+2ULb1btmQajZ+TzryKKgt8H/0LQzcA?=
- =?us-ascii?Q?Mm0cfAGiRjdxIAO6mPyCb49BYkcAoLKDPkrm+oR6ieXrm6Z9xb0QRBhcR99n?=
- =?us-ascii?Q?Rw0UDDvQgvvSQbI7o8o9+ljPR6idbjYG+9aqOSJA9lRqLlDBNn8VrdnprR0V?=
- =?us-ascii?Q?EwVcvMcDW9qpnPux4Q0E67wPtr8ldcSGiezR1T3C4AifzbqW7Jaca4IyHcOD?=
- =?us-ascii?Q?W2+EisWfYBGtp1HDMiE56alt/gtEc8NfvbRBfLETvWN/rYArxK9J1+6QYrMK?=
- =?us-ascii?Q?L0TYflBZ6Rh7myoe69BC2XHKjvBNImB/DTW9+qwIXijW8QqqhDd5MMPUqj15?=
- =?us-ascii?Q?wm+XQKBlmxNxTZjmj+X7OZvr50K3bfEgNKoZczgzN/i9EguomtWi9DHHvkjX?=
- =?us-ascii?Q?YO4+XSyyc/JDQI8AbptRtVG9DWcb1p1RhZmFYVQcL2iLt/mts2KQnH4U65aH?=
- =?us-ascii?Q?rwhD33RZp4KDCtBTPQeW7KcTmmuA+dr7fosWtgs44Z7N9e9VNk4C+A4oPw9X?=
- =?us-ascii?Q?dNVUVyJHU/bD/Osk0S6wZz+IXDUI+BEh2d338o1Q8QBHP35ALtIYpkt5EOfX?=
- =?us-ascii?Q?YLlZSdmma5iDIpeyEfrpon3/?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eacff957-0cac-4240-9c82-08d981d0c361
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2021 16:06:28.2284
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VwuAab6Cplqi6v7PHyKCbSft3gALHrjQBRtgxXVbzDsD9P+7jnSCJpxL+7Xw8FpG
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5111
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-26-brijesh.singh@amd.com>
+In-Reply-To: <20210820155918.7518-26-brijesh.singh@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Mon, 27 Sep 2021 10:43:06 -0600
+Message-ID: <CAMkAt6qsZNJPM97Y6_8b7QmLv=n0MaDs7hThi3thFEee4P10pA@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 25/45] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        Marc Orr <marcorr@google.com>,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 27, 2021 at 07:00:23PM +0300, Leon Romanovsky wrote:
-> On Mon, Sep 27, 2021 at 12:01:19PM -0300, Jason Gunthorpe wrote:
-> > On Mon, Sep 27, 2021 at 01:46:31PM +0000, Shameerali Kolothum Thodi wrote:
-> > 
-> > > > > > Nope, this is locked wrong and has no lifetime management.
-> > > > >
-> > > > > Ok. Holding the device_lock() sufficient here?
-> > > > 
-> > > > You can't hold a hisi_qm pointer with some kind of lifecycle
-> > > > management of that pointer. device_lock/etc is necessary to call
-> > > > pci_get_drvdata()
-> > > 
-> > > Since this migration driver only supports VF devices and the PF
-> > > driver will not be removed until all the VF devices gets removed,
-> > > is the locking necessary here?
-> > 
-> > Oh.. That is really busted up. pci_sriov_disable() is called under the
-> > device_lock(pf) and obtains the device_lock(vf).
-> 
-> Yes, indirectly, but yes.
-> 
-> > 
-> > This means a VF driver can never use the device_lock(pf), otherwise it
-> > can deadlock itself if PF removal triggers VF removal.
-> 
-> VF can use pci_dev_trylock() on PF to prevent PF removal.
+On Fri, Aug 20, 2021 at 10:00 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+> The KVM_SEV_SNP_LAUNCH_UPDATE command can be used to insert data into the
+> guest's memory. The data is encrypted with the cryptographic context
+> created with the KVM_SEV_SNP_LAUNCH_START.
+>
+> In addition to the inserting data, it can insert a two special pages
+> into the guests memory: the secrets page and the CPUID page.
+>
+> While terminating the guest, reclaim the guest pages added in the RMP
+> table. If the reclaim fails, then the page is no longer safe to be
+> released back to the system and leak them.
+>
+> For more information see the SEV-SNP specification.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  .../virt/kvm/amd-memory-encryption.rst        |  29 +++
+>  arch/x86/kvm/svm/sev.c                        | 187 ++++++++++++++++++
+>  include/uapi/linux/kvm.h                      |  19 ++
+>  3 files changed, 235 insertions(+)
+>
+> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+> index 937af3447954..ddcd94e9ffed 100644
+> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+> @@ -478,6 +478,35 @@ Returns: 0 on success, -negative on error
+>
+>  See the SEV-SNP specification for further detail on the launch input.
+>
+> +20. KVM_SNP_LAUNCH_UPDATE
+> +-------------------------
+> +
+> +The KVM_SNP_LAUNCH_UPDATE is used for encrypting a memory region. It also
+> +calculates a measurement of the memory contents. The measurement is a signature
+> +of the memory contents that can be sent to the guest owner as an attestation
+> +that the memory was encrypted correctly by the firmware.
+> +
+> +Parameters (in): struct  kvm_snp_launch_update
+> +
+> +Returns: 0 on success, -negative on error
+> +
+> +::
+> +
+> +        struct kvm_sev_snp_launch_update {
+> +                __u64 start_gfn;        /* Guest page number to start from. */
+> +                __u64 uaddr;            /* userspace address need to be encrypted */
+> +                __u32 len;              /* length of memory region */
+> +                __u8 imi_page;          /* 1 if memory is part of the IMI */
+> +                __u8 page_type;         /* page type */
+> +                __u8 vmpl3_perms;       /* VMPL3 permission mask */
+> +                __u8 vmpl2_perms;       /* VMPL2 permission mask */
+> +                __u8 vmpl1_perms;       /* VMPL1 permission mask */
+> +        };
+> +
+> +See the SEV-SNP spec for further details on how to build the VMPL permission
+> +mask and page type.
+> +
+> +
+>  References
+>  ==========
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index dbf04a52b23d..4b126598b7aa 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/misc_cgroup.h>
+>  #include <linux/processor.h>
+>  #include <linux/trace_events.h>
+> +#include <linux/sev.h>
+>  #include <asm/fpu/internal.h>
+>
+>  #include <asm/pkru.h>
+> @@ -227,6 +228,49 @@ static void sev_decommission(unsigned int handle)
+>         sev_guest_decommission(&decommission, NULL);
+>  }
+>
+> +static inline void snp_leak_pages(u64 pfn, enum pg_level level)
+> +{
+> +       unsigned int npages = page_level_size(level) >> PAGE_SHIFT;
+> +
+> +       WARN(1, "psc failed pfn 0x%llx pages %d (leaking)\n", pfn, npages);
+> +
+> +       while (npages) {
+> +               memory_failure(pfn, 0);
+> +               dump_rmpentry(pfn);
+> +               npages--;
+> +               pfn++;
+> +       }
+> +}
+> +
+> +static int snp_page_reclaim(u64 pfn)
+> +{
+> +       struct sev_data_snp_page_reclaim data = {0};
+> +       int err, rc;
+> +
+> +       data.paddr = __sme_set(pfn << PAGE_SHIFT);
+> +       rc = snp_guest_page_reclaim(&data, &err);
+> +       if (rc) {
+> +               /*
+> +                * If the reclaim failed, then page is no longer safe
+> +                * to use.
+> +                */
+> +               snp_leak_pages(pfn, PG_LEVEL_4K);
+> +       }
+> +
+> +       return rc;
+> +}
+> +
+> +static int host_rmp_make_shared(u64 pfn, enum pg_level level, bool leak)
+> +{
+> +       int rc;
+> +
+> +       rc = rmp_make_shared(pfn, level);
+> +       if (rc && leak)
+> +               snp_leak_pages(pfn, level);
+> +
+> +       return rc;
+> +}
+> +
+>  static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
+>  {
+>         struct sev_data_deactivate deactivate;
+> @@ -1620,6 +1664,123 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>         return rc;
+>  }
+>
+> +static bool is_hva_registered(struct kvm *kvm, hva_t hva, size_t len)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       struct list_head *head = &sev->regions_list;
+> +       struct enc_region *i;
+> +
+> +       lockdep_assert_held(&kvm->lock);
+> +
+> +       list_for_each_entry(i, head, list) {
+> +               u64 start = i->uaddr;
+> +               u64 end = start + i->size;
+> +
+> +               if (start <= hva && end >= (hva + len))
+> +                       return true;
+> +       }
+> +
+> +       return false;
+> +}
 
-no, no here, the device_lock is used in too many places for a trylock
-to be appropriate
+Internally we actually register the guest memory in chunks for various
+reasons. So for our largest SEV VM we have 768 1 GB entries in
+|sev->regions_list|. This was OK before because no look ups were done.
+Now that we are performing a look ups a linked list with linear time
+lookups seems not ideal, could we switch the back data structure here
+to something more conducive too fast lookups?
+> +
+> +static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       struct sev_data_snp_launch_update data = {0};
+> +       struct kvm_sev_snp_launch_update params;
+> +       unsigned long npages, pfn, n = 0;
 
-> > 
-> > But you can't access these members without using the device_lock(), as
-> > there really are no safety guarentees..
-> > 
-> > The mlx5 patches have this same sketchy problem.
-> > 
-> > We may need a new special function 'pci_get_sriov_pf_devdata()' that
-> > confirms the vf/pf relationship and explicitly interlocks with the
-> > pci_sriov_enable/disable instead of using device_lock()
-> > 
-> > Leon, what do you think?
-> 
-> I see pci_dev_lock() and similar functions, they are easier to
-> understand that specific pci_get_sriov_pf_devdata().
+Could we have a slightly more descriptive name for |n|? nprivate
+maybe? Also why not zero in the loop below?
 
-That is just a wrapper for device_lock - it doesnt help anything
+for (i = 0, n = 0; i < npages; ++i)
 
-The point is to all out a different locking regime that relies on the
-sriov enable/disable removing the VF struct devices
+> +       int *error = &argp->error;
+> +       struct page **inpages;
+> +       int ret, i, level;
 
-Jason
+Should |i| be an unsigned long since it can is tracked in a for loop
+with "i < npages" npages being an unsigned long? (|n| too)
+
+> +       u64 gfn;
+> +
+> +       if (!sev_snp_guest(kvm))
+> +               return -ENOTTY;
+> +
+> +       if (!sev->snp_context)
+> +               return -EINVAL;
+> +
+> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> +               return -EFAULT;
+> +
+> +       /* Verify that the specified address range is registered. */
+> +       if (!is_hva_registered(kvm, params.uaddr, params.len))
+> +               return -EINVAL;
+> +
+> +       /*
+> +        * The userspace memory is already locked so technically we don't
+> +        * need to lock it again. Later part of the function needs to know
+> +        * pfn so call the sev_pin_memory() so that we can get the list of
+> +        * pages to iterate through.
+> +        */
+> +       inpages = sev_pin_memory(kvm, params.uaddr, params.len, &npages, 1);
+> +       if (!inpages)
+> +               return -ENOMEM;
+> +
+> +       /*
+> +        * Verify that all the pages are marked shared in the RMP table before
+> +        * going further. This is avoid the cases where the userspace may try
+
+This is *too* avoid cases...
+
+> +        * updating the same page twice.
+> +        */
+> +       for (i = 0; i < npages; i++) {
+> +               if (snp_lookup_rmpentry(page_to_pfn(inpages[i]), &level) != 0) {
+> +                       sev_unpin_memory(kvm, inpages, npages);
+> +                       return -EFAULT;
+> +               }
+> +       }
+> +
+> +       gfn = params.start_gfn;
+> +       level = PG_LEVEL_4K;
+> +       data.gctx_paddr = __psp_pa(sev->snp_context);
+> +
+> +       for (i = 0; i < npages; i++) {
+> +               pfn = page_to_pfn(inpages[i]);
+> +
+> +               ret = rmp_make_private(pfn, gfn << PAGE_SHIFT, level, sev_get_asid(kvm), true);
+> +               if (ret) {
+> +                       ret = -EFAULT;
+> +                       goto e_unpin;
+> +               }
+> +
+> +               n++;
+> +               data.address = __sme_page_pa(inpages[i]);
+> +               data.page_size = X86_TO_RMP_PG_LEVEL(level);
+> +               data.page_type = params.page_type;
+> +               data.vmpl3_perms = params.vmpl3_perms;
+> +               data.vmpl2_perms = params.vmpl2_perms;
+> +               data.vmpl1_perms = params.vmpl1_perms;
+> +               ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_UPDATE, &data, error);
+> +               if (ret) {
+> +                       /*
+> +                        * If the command failed then need to reclaim the page.
+> +                        */
+> +                       snp_page_reclaim(pfn);
+> +                       goto e_unpin;
+> +               }
+
+Hmm if this call fails after the first iteration of this loop it will
+lead to a hard to reproduce LaunchDigest right? Say if we are
+SnpLaunchUpdating just 2 pages A and B. If we first call this ioctl
+and A is SNP_LAUNCH_UPDATED'd but B fails, we then make A shared again
+in the RMP. So we must call the ioctl with 2 pages again, after fixing
+the issue with page B. Now the Launch digest has something like
+Hash(A) then HASH(A & B) right (overly simplified) so A will be
+included twice right? I am not sure if anything better can be done
+here but might be worth documenting IIUC.
+
+> +
+> +               gfn++;
+> +       }
+> +
+> +e_unpin:
+> +       /* Content of memory is updated, mark pages dirty */
+> +       for (i = 0; i < n; i++) {
+> +               set_page_dirty_lock(inpages[i]);
+> +               mark_page_accessed(inpages[i]);
+> +
+> +               /*
+> +                * If its an error, then update RMP entry to change page ownership
+> +                * to the hypervisor.
+> +                */
+> +               if (ret)
+> +                       host_rmp_make_shared(pfn, level, true);
+> +       }
+> +
+> +       /* Unlock the user pages */
+> +       sev_unpin_memory(kvm, inpages, npages);
+> +
+> +       return ret;
+> +}
+> +
+>  int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  {
+>         struct kvm_sev_cmd sev_cmd;
+> @@ -1712,6 +1873,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>         case KVM_SEV_SNP_LAUNCH_START:
+>                 r = snp_launch_start(kvm, &sev_cmd);
+>                 break;
+> +       case KVM_SEV_SNP_LAUNCH_UPDATE:
+> +               r = snp_launch_update(kvm, &sev_cmd);
+> +               break;
+>         default:
+>                 r = -EINVAL;
+>                 goto out;
+> @@ -1794,6 +1958,29 @@ find_enc_region(struct kvm *kvm, struct kvm_enc_region *range)
+>  static void __unregister_enc_region_locked(struct kvm *kvm,
+>                                            struct enc_region *region)
+>  {
+> +       unsigned long i, pfn;
+> +       int level;
+> +
+> +       /*
+> +        * The guest memory pages are assigned in the RMP table. Unassign it
+> +        * before releasing the memory.
+> +        */
+> +       if (sev_snp_guest(kvm)) {
+> +               for (i = 0; i < region->npages; i++) {
+> +                       pfn = page_to_pfn(region->pages[i]);
+> +
+> +                       if (!snp_lookup_rmpentry(pfn, &level))
+> +                               continue;
+> +
+> +                       cond_resched();
+> +
+> +                       if (level > PG_LEVEL_4K)
+> +                               pfn &= ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
+> +
+> +                       host_rmp_make_shared(pfn, level, true);
+> +               }
+> +       }
+> +
+>         sev_unpin_memory(kvm, region->pages, region->npages);
+>         list_del(&region->list);
+>         kfree(region);
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index e6416e58cd9a..0681be4bdfdf 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1715,6 +1715,7 @@ enum sev_cmd_id {
+>         /* SNP specific commands */
+>         KVM_SEV_SNP_INIT,
+>         KVM_SEV_SNP_LAUNCH_START,
+> +       KVM_SEV_SNP_LAUNCH_UPDATE,
+>
+>         KVM_SEV_NR_MAX,
+>  };
+> @@ -1831,6 +1832,24 @@ struct kvm_sev_snp_launch_start {
+>         __u8 pad[6];
+>  };
+>
+> +#define KVM_SEV_SNP_PAGE_TYPE_NORMAL           0x1
+> +#define KVM_SEV_SNP_PAGE_TYPE_VMSA             0x2
+> +#define KVM_SEV_SNP_PAGE_TYPE_ZERO             0x3
+> +#define KVM_SEV_SNP_PAGE_TYPE_UNMEASURED       0x4
+> +#define KVM_SEV_SNP_PAGE_TYPE_SECRETS          0x5
+> +#define KVM_SEV_SNP_PAGE_TYPE_CPUID            0x6
+> +
+> +struct kvm_sev_snp_launch_update {
+> +       __u64 start_gfn;
+> +       __u64 uaddr;
+> +       __u32 len;
+> +       __u8 imi_page;
+> +       __u8 page_type;
+> +       __u8 vmpl3_perms;
+> +       __u8 vmpl2_perms;
+> +       __u8 vmpl1_perms;
+> +};
+> +
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU    (1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3         (1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX       (1 << 2)
+> --
+> 2.17.1
+>
+>
