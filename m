@@ -2,257 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50639C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 17:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8B5C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 18:33:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2846261357
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 17:18:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 502766137B
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 18:33:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241949AbhI1RTk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Sep 2021 13:19:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53518 "EHLO mail.kernel.org"
+        id S230287AbhI1Seh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Sep 2021 14:34:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42330 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233219AbhI1RTk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Sep 2021 13:19:40 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3A06F6128B;
-        Tue, 28 Sep 2021 17:18:00 +0000 (UTC)
+        id S241724AbhI1Sdz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Sep 2021 14:33:55 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4761861246;
+        Tue, 28 Sep 2021 18:32:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632849480;
-        bh=typQyCd3SNK3k7UUCXoQOKeKV93Xkib4KN6PGEcMTdE=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=uGa9mwTlXnwIr5Kf6wCoNyN+BvhLq2l4vkpXGqv/vS/rHf4O+J1eFo/5GtF1QHbkM
-         StGDGaAjkcQ/njgTon/aUGA2HmaHZOHzGTnFrsugbMdHGZvk/8cfeCgN6bfBTzOE9X
-         5GfNMNqfWK1Xpb27EpyY+SBx0vh7SXfN6qkj0NtoYqrWgG4yrCeWDl5UtXg6Tzxl5A
-         hlF8o9dBlHkyHu5hHR0rNqL1fUsfSZt4dX5cvyVVJ95MOdYOrgy27tXHH4e77YHy+o
-         iFOf0sEpA9glBJabKt2NK1cd8+bSQx3yGF/wXpAOBTN3HzjG8lEB84rMRq7qqWicCT
-         XeK5V44uMMx5g==
-Date:   Tue, 28 Sep 2021 12:17:59 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        Russell Currey <ruscur@russell.cc>
-Cc:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>, linux-pci@vger.kernel.org,
-        kernel@pengutronix.de, Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Vadym Kochan <vkochan@marvell.com>,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Jiri Pirko <jiri@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        Michael Buesch <m@bues.ch>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, oss-drivers@corigine.com
-Subject: Re: [PATCH v4 4/8] PCI: replace pci_dev::driver usage that gets the
- driver name
-Message-ID: <20210928171759.GA704204@bhelgaas>
+        s=k20201202; t=1632853933;
+        bh=ITumyMSLVuu7tgo4iRF6EGhJy0N7SHomYPhr6cSr0MI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VaC3EgKSrHGizNtBgdPVNZzinC4iR1U0WSkLghN+fHfbtWd7dYGoUB2w1IZ2nHo0N
+         aR/koF6+R91rbaE36NwCaK7XMe0BkSH8XqyyMdCVV+DMExUCgCzfDAPuTOVWmE3V6R
+         khIyqvTQDIPQ3/HnlHXJV65m902aJ1FY/qapyy+akG7rPX27khZHMPjGSmt1bzAqTN
+         VzW8dccLjOD7BAdqCAFdNZDM0TJ99Hi+/646v67sLa0cGTkF8HkkDPszPSNQRX+1r9
+         Xei6OpzlxS/05iY90x9qK3uCL0LaTetJsInjTyvMyw2/0UeXsu0JtESBhG6rCayGxO
+         uOlMPA9hglGRQ==
+Date:   Tue, 28 Sep 2021 11:32:09 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Vladis Dronov <vdronov@redhat.com>,
+        Simo Sorce <ssorce@redhat.com>,
+        Eric Biggers <ebiggers@kernel.org>, llvm@lists.linux.dev
+Subject: Re: [v2 PATCH] crypto: api - Fix built-in testing dependency failures
+Message-ID: <YVNfqUVJ7w4Z3WXK@archlinux-ax161>
+References: <20210913071251.GA15235@gondor.apana.org.au>
+ <20210917002619.GA6407@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210927204326.612555-5-uwe@kleine-koenig.org>
+In-Reply-To: <20210917002619.GA6407@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[+to Oliver, Russell for eeh_driver_name() question below]
-
-On Mon, Sep 27, 2021 at 10:43:22PM +0200, Uwe Kleine-König wrote:
-> From: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+On Fri, Sep 17, 2021 at 08:26:19AM +0800, Herbert Xu wrote:
+> When complex algorithms that depend on other algorithms are built
+> into the kernel, the order of registration must be done such that
+> the underlying algorithms are ready before the ones on top are
+> registered.  As otherwise they would fail during the self-test
+> which is required during registration.
 > 
-> struct pci_dev::driver holds (apart from a constant offset) the same
-> data as struct pci_dev::dev->driver. With the goal to remove struct
-> pci_dev::driver to get rid of data duplication replace getting the
-> driver name by dev_driver_string() which implicitly makes use of struct
-> pci_dev::dev->driver.
-
-When you repost to fix the build issue, can you capitalize the subject
-line to match the other?
-
-Also, would you mind using "pci_dev.driver" instead of
-"pci_dev::driver"?  AFAIK, the "::" operator is not actually part of
-C, so I think it's more confusing than useful.
-
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> ---
->  arch/powerpc/include/asm/ppc-pci.h                   | 9 ++++++++-
->  drivers/bcma/host_pci.c                              | 7 ++++---
->  drivers/crypto/hisilicon/qm.c                        | 2 +-
->  drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c   | 2 +-
->  drivers/net/ethernet/marvell/prestera/prestera_pci.c | 2 +-
->  drivers/net/ethernet/mellanox/mlxsw/pci.c            | 2 +-
->  drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c | 2 +-
->  drivers/ssb/pcihost_wrapper.c                        | 8 +++++---
->  8 files changed, 22 insertions(+), 12 deletions(-)
+> In the past we have used subsystem initialisation ordering to
+> guarantee this.  The number of such precedence levels are limited
+> and they may cause ripple effects in other subsystems.
 > 
-> diff --git a/arch/powerpc/include/asm/ppc-pci.h b/arch/powerpc/include/asm/ppc-pci.h
-> index 2b9edbf6e929..e8f1795a2acf 100644
-> --- a/arch/powerpc/include/asm/ppc-pci.h
-> +++ b/arch/powerpc/include/asm/ppc-pci.h
-> @@ -57,7 +57,14 @@ void eeh_sysfs_remove_device(struct pci_dev *pdev);
->  
->  static inline const char *eeh_driver_name(struct pci_dev *pdev)
->  {
-> -	return (pdev && pdev->driver) ? pdev->driver->name : "<null>";
-> +	if (pdev) {
-> +		const char *drvstr = dev_driver_string(&pdev->dev);
-> +
-> +		if (strcmp(drvstr, ""))
-> +			return drvstr;
-> +	}
-> +
-> +	return "<null>";
-
-Can we just do this?
-
-  if (pdev)
-    return dev_driver_string(&pdev->dev);
-
-  return "<null>";
-
-I think it's more complicated than it's worth to include a strcmp().
-It's possible this will change those error messages about "Might be
-infinite loop in %s driver", but that doesn't seem like a huge deal.
-
-I moved Oliver to "to:" and added Russell in case they object.
-
->  }
->  
->  #endif /* CONFIG_EEH */
-> diff --git a/drivers/bcma/host_pci.c b/drivers/bcma/host_pci.c
-> index 69c10a7b7c61..0973022d4b13 100644
-> --- a/drivers/bcma/host_pci.c
-> +++ b/drivers/bcma/host_pci.c
-> @@ -175,9 +175,10 @@ static int bcma_host_pci_probe(struct pci_dev *dev,
->  	if (err)
->  		goto err_kfree_bus;
->  
-> -	name = dev_name(&dev->dev);
-> -	if (dev->driver && dev->driver->name)
-> -		name = dev->driver->name;
-> +	name = dev_driver_string(&dev->dev);
-> +	if (!strcmp(name, ""))
-> +		name = dev_name(&dev->dev);
->  	err = pci_request_regions(dev, name);
-
-Again seems more complicated than it's worth to me.  This is in the
-driver's .probe() method, so really_probe() has already set
-"dev->driver = drv", which means dev->driver is always set to
-&bcma_pci_bridge_driver here, and bcma_pci_bridge_driver.name is
-always "bcma-pci-bridge".
-
-Almost all callers of pci_request_regions() just hardcode the driver
-name or use a DRV_NAME #define
-
-So I think we should just do:
-
-  err = pci_request_regions(dev, "bcma-pci-bridge");
-
->  	if (err)
->  		goto err_pci_disable;
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index 369562d34d66..8f361e54e524 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -3085,7 +3085,7 @@ static int qm_alloc_uacce(struct hisi_qm *qm)
->  	};
->  	int ret;
->  
-> -	ret = strscpy(interface.name, pdev->driver->name,
-> +	ret = strscpy(interface.name, dev_driver_string(&pdev->dev),
->  		      sizeof(interface.name));
->  	if (ret < 0)
->  		return -ENAMETOOLONG;
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-> index 7ea511d59e91..f279edfce3f1 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-> @@ -606,7 +606,7 @@ static void hns3_get_drvinfo(struct net_device *netdev,
->  		return;
->  	}
->  
-> -	strncpy(drvinfo->driver, h->pdev->driver->name,
-> +	strncpy(drvinfo->driver, dev_driver_string(&h->pdev->dev),
->  		sizeof(drvinfo->driver));
->  	drvinfo->driver[sizeof(drvinfo->driver) - 1] = '\0';
->  
-> diff --git a/drivers/net/ethernet/marvell/prestera/prestera_pci.c b/drivers/net/ethernet/marvell/prestera/prestera_pci.c
-> index a250d394da38..a8f007f6dad2 100644
-> --- a/drivers/net/ethernet/marvell/prestera/prestera_pci.c
-> +++ b/drivers/net/ethernet/marvell/prestera/prestera_pci.c
-> @@ -720,7 +720,7 @@ static int prestera_fw_load(struct prestera_fw *fw)
->  static int prestera_pci_probe(struct pci_dev *pdev,
->  			      const struct pci_device_id *id)
->  {
-> -	const char *driver_name = pdev->driver->name;
-> +	const char *driver_name = dev_driver_string(&pdev->dev);
->  	struct prestera_fw *fw;
->  	int err;
->  
-> diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-> index 13b0259f7ea6..8f306364f7bf 100644
-> --- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
-> +++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-> @@ -1876,7 +1876,7 @@ static void mlxsw_pci_cmd_fini(struct mlxsw_pci *mlxsw_pci)
->  
->  static int mlxsw_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  {
-> -	const char *driver_name = pdev->driver->name;
-> +	const char *driver_name = dev_driver_string(&pdev->dev);
->  	struct mlxsw_pci *mlxsw_pci;
->  	int err;
->  
-> diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
-> index 0685ece1f155..23dfb599c828 100644
-> --- a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
-> +++ b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
-> @@ -202,7 +202,7 @@ nfp_get_drvinfo(struct nfp_app *app, struct pci_dev *pdev,
->  {
->  	char nsp_version[ETHTOOL_FWVERS_LEN] = {};
->  
-> -	strlcpy(drvinfo->driver, pdev->driver->name, sizeof(drvinfo->driver));
-> +	strlcpy(drvinfo->driver, dev_driver_string(&pdev->dev), sizeof(drvinfo->driver));
->  	nfp_net_get_nspinfo(app, nsp_version);
->  	snprintf(drvinfo->fw_version, sizeof(drvinfo->fw_version),
->  		 "%s %s %s %s", vnic_version, nsp_version,
-> diff --git a/drivers/ssb/pcihost_wrapper.c b/drivers/ssb/pcihost_wrapper.c
-> index 410215c16920..4938ed5cfae5 100644
-> --- a/drivers/ssb/pcihost_wrapper.c
-> +++ b/drivers/ssb/pcihost_wrapper.c
-> @@ -78,9 +78,11 @@ static int ssb_pcihost_probe(struct pci_dev *dev,
->  	err = pci_enable_device(dev);
->  	if (err)
->  		goto err_kfree_ssb;
-> -	name = dev_name(&dev->dev);
-> -	if (dev->driver && dev->driver->name)
-> -		name = dev->driver->name;
-> +
-> +	name = dev_driver_string(&dev->dev);
-> +	if (*name == '\0')
-> +		name = dev_name(&dev->dev);
-> +
->  	err = pci_request_regions(dev, name);
-
-Also seems like more trouble than it's worth.  This one is a little
-strange but is always called for either b43_pci_bridge_driver or
-b44_pci_driver, both of which have .name set, so I think we should
-simply do:
-
-  err = pci_request_regions(dev, dev_driver_string(&dev->dev));
-
->  	if (err)
->  		goto err_pci_disable;
-> -- 
-> 2.30.2
+> This patch solves this problem by delaying all self-tests during
+> boot-up for built-in algorithms.  They will be tested either when
+> something else in the kernel requests for them, or when we have
+> finished registering all built-in algorithms, whichever comes
+> earlier.
 > 
+> Reported-by: Vladis Dronov <vdronov@redhat.com>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+This patch as commit 3cefb01905df ("crypto: api - Fix built-in testing
+dependency failures") in -next (along with the follow up fix) causes the
+following depmod error:
+
+$ make -skj"$(nproc)" ARCH=powerpc CROSS_COMPILE=powerpc-linux- INSTALL_MOD_PATH=rootfs ppc44x_defconfig all modules_install
+depmod: ERROR: Cycle detected: crypto -> crypto_algapi -> crypto
+depmod: ERROR: Found 2 modules in dependency cycles!
+make: *** [Makefile:1946: modules_install] Error 1
+
+Initially reported on our CI:
+
+https://github.com/ClangBuiltLinux/continuous-integration2/runs/3732847295?check_suite_focus=true
+
+Cheers,
+Nathan
