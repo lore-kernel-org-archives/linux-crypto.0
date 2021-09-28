@@ -2,146 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39036C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 21:01:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0E2C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 05:16:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E2EA60F41
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Sep 2021 21:01:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B16C460F0F
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 05:16:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237156AbhI0VDH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Sep 2021 17:03:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37242 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237154AbhI0VDH (ORCPT
+        id S234158AbhI1FSC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Sep 2021 01:18:02 -0400
+Received: from gandalf.ozlabs.org ([150.107.74.76]:51379 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234148AbhI1FSC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Sep 2021 17:03:07 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7CC8C061575
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Sep 2021 14:01:28 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mUxik-0003sZ-Tr; Mon, 27 Sep 2021 22:59:30 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mUxia-0001cX-8M; Mon, 27 Sep 2021 22:59:20 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mUxia-0001SG-3t; Mon, 27 Sep 2021 22:59:20 +0200
-Date:   Mon, 27 Sep 2021 22:59:17 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        Russell Currey <ruscur@russell.cc>, x86@kernel.org,
-        qat-linux@intel.com, oss-drivers@corigine.com,
-        Oliver O'Halloran <oohall@gmail.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jiri Olsa <jolsa@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-scsi@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, linux-pci@vger.kernel.org,
-        linux-wireless@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Ido Schimmel <idosch@nvidia.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Jack Xu <jack.xu@intel.com>, Borislav Petkov <bp@alien8.de>,
-        Michael Buesch <m@bues.ch>, Jiri Pirko <jiri@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        xen-devel@lists.xenproject.org, Vadym Kochan <vkochan@marvell.com>,
-        MPT-FusionLinux.pdl@broadcom.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-usb@vger.kernel.org,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        linux-kernel@vger.kernel.org,
-        Mathias Nyman <mathias.nyman@intel.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        netdev@vger.kernel.org, Frederic Barrat <fbarrat@linux.ibm.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
-        Taras Chornyi <tchornyi@marvell.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-perf-users@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v4 0/8] PCI: Drop duplicated tracking of a pci_dev's
- bound driver
-Message-ID: <20210927205917.e763q5mojkwk6per@pengutronix.de>
-References: <20210927204326.612555-1-uwe@kleine-koenig.org>
+        Tue, 28 Sep 2021 01:18:02 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HJSQs5y2Bz4wgv;
+        Tue, 28 Sep 2021 15:16:21 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1632806181;
+        bh=YayUMtO1Bju7/J5xYvIjpk4bEm82PgnvsAQ8Es0oDGw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=DIhxhTmOKN6bnSSi9ooLdz4StLy/+LdcPv+RkgUv8HzwX+ZLU+1pvFGM0BTMYBtHz
+         DdViYS28cpQlhogYhK04GlzIeErSANZKIoGr7YPwNwYZdhJKhi4KyMp/IqHUHG3ax8
+         7J3i+whBMzZfI3OJtfJ0uSckvYIq3U362ta4NEGpsqxzdcISljK2pI/CT13Uzn0RIM
+         fLOriHEZwZwAYtBU6KJecBzjSGoSJzgSmpGA7G/ge2qFi4YbekPPso5EGH9mVfpXan
+         fm7JqVTsSP+iz9zEPWifWoNGpwBzRDr3odfZjyfVxoTnzb5tMA2PyDFs52yMKMngeL
+         JKeND7WVL9C/Q==
+Date:   Tue, 28 Sep 2021 15:16:21 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-next@vger.kernel.org
+Subject: Re: [PATCH] crypto: api - Export crypto_boot_test_finished
+Message-ID: <20210928151621.7aec3f34@canb.auug.org.au>
+In-Reply-To: <20210927112341.GA22483@gondor.apana.org.au>
+References: <20210927143229.543749f4@canb.auug.org.au>
+        <20210927112341.GA22483@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="upxcpc44c7obtcwt"
-Content-Disposition: inline
-In-Reply-To: <20210927204326.612555-1-uwe@kleine-koenig.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Type: multipart/signed; boundary="Sig_/ClZjcy/bnsPV/jLYuBXNe+7";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
---upxcpc44c7obtcwt
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+--Sig_/ClZjcy/bnsPV/jLYuBXNe+7
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hi Herbert,
 
-On Mon, Sep 27, 2021 at 10:43:18PM +0200, Uwe Kleine-K=F6nig wrote:
-> From: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+On Mon, 27 Sep 2021 19:23:42 +0800 Herbert Xu <herbert@gondor.apana.org.au>=
+ wrote:
+>
+> Oops, does this patch fix the problem?
 
-I sent the series from the wrong email address :-\ I should have used
-the above address as sender. Also I failed to add Christoph Hellwig to
-Cc: (fixed for this mail). I guess I'll have to send a v5, but I will
-wait a bit until the build bots are done with this series.
+Yes, that fixes my build, thanks.
 
-Best regards
-Uwe
+Tested-by: Stephen Rothwell <sfr@canb.auug.org.au> # ppc32 build
 
 --=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+Cheers,
+Stephen Rothwell
 
---upxcpc44c7obtcwt
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/ClZjcy/bnsPV/jLYuBXNe+7
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmFSMKIACgkQwfwUeK3K
-7AnalQgAlpBrfIgHu7fEFcJYkSR/33uv+V4CLZsCsu9MNXsSeds9vT38r8/y0bJl
-rOEKhsH1blIcq3bsV8/AulLrFkmjYRkkih/gA/y9CeoqpbV0/NzhrS4Xo9kMos8z
-n+0f+PzRO1qg1RVWyPL7K4pkXR5cMkqWGoie07ihkt3Y9mVY8ItYl9ny3oDxCRcU
-r8KFjr7Jw0Vo8eI3Kr9lu62KyFZFByf1DDBurR5crF8ZcWM7e9kOezvJrxOQxGPP
-Z82uFafVCkhtIkKaks/6/y9pMmJF9hzDd91ubgKfbkPIMvBjpL7n07Y/Sk4S34vM
-5wdHQGNinogsdgdebn8YdZCULLmXSQ==
-=/nd3
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmFSpSUACgkQAVBC80lX
+0Gz6qwf/Qkt4Kr48KaWj55l97WffRRjsxyBx1TH2ssYLP/OiJz5lekeAbdXGkVut
+2bX32c5vTSgjfoCZ6ZIGKTd/HVIZcoHnaP90uo6bWDrRoQi6KW+4L1r9gbNLUEdy
+T6Hx9joPayWg//XTGFIQ9oPhxIOgUWZ/zCkF//Hi7GnTxQnMk4OjhmB8dP6AnxrM
+OMiKQG35HsazZyDuvtUtJ4TYIrKbEirKXvi2rHZ48DbMopWumKfWwlKH9/r1FQFc
+XAuzjMOnVCqm6stMtfr3KnlxybUcunmd6WqtFuBSx8cZhMTnPxTlBLaRvPT2IGPk
+UdFg/IR2Ayj6RM8o09Yp3QIuc/qvAQ==
+=tTbA
 -----END PGP SIGNATURE-----
 
---upxcpc44c7obtcwt--
+--Sig_/ClZjcy/bnsPV/jLYuBXNe+7--
