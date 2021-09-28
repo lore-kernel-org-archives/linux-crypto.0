@@ -2,142 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCB1C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 11:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7EC0C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 11:44:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 89DC861131
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 11:26:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C22F5610E6
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 11:44:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240326AbhI1L22 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Sep 2021 07:28:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36896 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231202AbhI1L21 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Sep 2021 07:28:27 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74542C061575
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Sep 2021 04:26:48 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mVBFy-0004ZC-OB; Tue, 28 Sep 2021 13:26:42 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mVBFu-0002og-2U; Tue, 28 Sep 2021 13:26:38 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mVBFu-00048M-11; Tue, 28 Sep 2021 13:26:38 +0200
-Date:   Tue, 28 Sep 2021 13:26:37 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        linux-pci@vger.kernel.org, qat-linux@intel.com,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        Jack Xu <jack.xu@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v4 6/8] crypto: qat - simplify adf_enable_aer()
-Message-ID: <20210928112637.kolit6fusme7g2qf@pengutronix.de>
-References: <20210927204326.612555-1-uwe@kleine-koenig.org>
- <20210927204326.612555-7-uwe@kleine-koenig.org>
- <YVL4aoKjUT2kvHip@silpixa00400314>
+        id S240336AbhI1Lqa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Sep 2021 07:46:30 -0400
+Received: from mga07.intel.com ([134.134.136.100]:37909 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231202AbhI1Lqa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Sep 2021 07:46:30 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10120"; a="288339029"
+X-IronPort-AV: E=Sophos;i="5.85,329,1624345200"; 
+   d="scan'208";a="288339029"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2021 04:44:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,329,1624345200"; 
+   d="scan'208";a="562224599"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
+  by fmsmga002.fm.intel.com with ESMTP; 28 Sep 2021 04:44:49 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH 00/12] crypto: qat - PFVF fixes and refactoring
+Date:   Tue, 28 Sep 2021 12:44:28 +0100
+Message-Id: <20210928114440.355368-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="ivfl7y3ed6g54sur"
-Content-Disposition: inline
-In-Reply-To: <YVL4aoKjUT2kvHip@silpixa00400314>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+This set includes few fixes and refactors in the QAT driver, mainly
+related to the PFVF communication mechanism.
 
---ivfl7y3ed6g54sur
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Here is a summary of the changes:
+* Patches #1 and #2 fix a bug in the PFVF protocol related to collision
+  detection;
+* Patch #3 optimizes the PFVF protocol protocol by removing an unnecessary
+  timeout;
+* Patch #4 makes the VF to PF interrupt related logic device specific;
+* Patches #5 and #6 remove duplicated logic across devices and homegrown
+  logic;
+* Patches #7 to #12 are just refactoring of the PFVF code in preparation
+  for updates to the protocol.
 
-Hey Giovanni,
+Giovanni Cabiddu (3):
+  crypto: qat - detect PFVF collision after ACK
+  crypto: qat - disregard spurious PFVF interrupts
+  crypto: qat - use hweight for bit counting
 
-On Tue, Sep 28, 2021 at 12:11:38PM +0100, Giovanni Cabiddu wrote:
-> On Mon, Sep 27, 2021 at 10:43:24PM +0200, Uwe Kleine-K=C3=B6nig wrote:
-> > From: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
-> >=20
-> > A struct pci_driver is supposed to be constant and assigning .err_handl=
-er
-> > once per bound device isn't really sensible. Also as the function retur=
-ns
-> > zero unconditionally let it return no value instead and simplify the
-> > callers accordingly.
-> >=20
-> > As a side effect this removes one user of struct pci_dev::driver. This
-> > member is planned to be removed.
-> >=20
-> > Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
-> > ---
->=20
-> this patch does not build.
->=20
-> drivers/crypto/qat/qat_c3xxx/adf_drv.c:36:24: error: =E2=80=98adf_err_han=
-dler=E2=80=99 undeclared here (not in a function)
->    36 |         .err_handler =3D adf_err_handler,
->       |                        ^~~~~~~~~~~~~~~
-> drivers/crypto/qat/qat_4xxx/adf_drv.c:303:24: error: =E2=80=98adf_err_han=
-dler=E2=80=99 undeclared here (not in a function)
->   303 |         .err_handler =3D adf_err_handler,
->       |                        ^~~~~~~~~~~~~~~
-> drivers/crypto/qat/qat_c62x/adf_drv.c:36:24: error: =E2=80=98adf_err_hand=
-ler=E2=80=99 undeclared here (not in a function)
->    36 |         .err_handler =3D adf_err_handler,
->       |                        ^~~~~~~~~~~~~~~
-> drivers/crypto/qat/qat_dh895xcc/adf_drv.c:36:24: error: =E2=80=98adf_err_=
-handler=E2=80=99 undeclared here (not in a function)
->    36 |         .err_handler =3D adf_err_handler,
->       |                        ^~~~~~~~~~~~~~~
-> make[2]: *** [scripts/Makefile.build:277: drivers/crypto/qat/qat_c3xxx/ad=
-f_drv.o] Error 1
+Marco Chiappero (9):
+  crypto: qat - remove unnecessary collision prevention step in PFVF
+  crypto: qat - fix handling of VF to PF interrupts
+  crypto: qat - remove duplicated logic across GEN2 drivers
+  crypto: qat - make pfvf send message direction agnostic
+  crypto: qat - move pfvf collision detection values
+  crypto: qat - rename pfvf collision constants
+  crypto: qat - add VF and PF wrappers to common send function
+  crypto: qat - extract send and wait from adf_vf2pf_request_version()
+  crypto: qat - share adf_enable_pf2vf_comms() from adf_pf2vf_msg.c
 
-Hmm, I thought that was one of the things I actually tested after
-rebasing. Will recheck.
-=20
-> Below is an updated version of your patch that fixes the issues.
->=20
-> After fixing the patch you can add:
->     Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+ .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.c    |   4 +-
+ .../crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c  |  89 +------
+ .../crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h  |  13 +-
+ .../crypto/qat/qat_c62x/adf_c62x_hw_data.c    |  87 +------
+ .../crypto/qat/qat_c62x/adf_c62x_hw_data.h    |  12 -
+ .../crypto/qat/qat_common/adf_accel_devices.h |   5 +
+ .../crypto/qat/qat_common/adf_common_drv.h    |   9 +-
+ .../crypto/qat/qat_common/adf_gen2_hw_data.c  |  98 ++++++++
+ .../crypto/qat/qat_common/adf_gen2_hw_data.h  |  27 ++
+ drivers/crypto/qat/qat_common/adf_isr.c       |  20 +-
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.c | 238 ++++++++++--------
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.h |   9 -
+ drivers/crypto/qat/qat_common/adf_vf2pf_msg.c |   4 +-
+ drivers/crypto/qat/qat_common/adf_vf_isr.c    |   6 +
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   | 123 ++++-----
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.h   |  14 +-
+ 16 files changed, 361 insertions(+), 397 deletions(-)
 
-Thanks
-Uwe
+-- 
+2.31.1
 
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=C3=B6nig         =
-   |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---ivfl7y3ed6g54sur
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmFS++sACgkQwfwUeK3K
-7AleDwf9F69upmgTsIcwxJlGOkPLBOOUod9wpNHPeC/U99dCqa1cxHbte6dlKPGL
-+yVfoPEduQpgJciGLHKs4wnkRnEAQx2Tfdy9OWlHmcDH1Ts+46RVZ/FODSuBGfob
-LI4EEiWhkgm8Ky2kqvj9YEvcPiV8sm8xSQaMNsSZ9N1LFN27D5zEOxj5ykow434Z
-9LU/BhsBdrCnASrEy3FroVOztTDg4Gaez+csKIpgz8FxkDvwcgPyDSJ74jaS62VM
-en/sPkM+i1xWdCq0ec4A3iJWYQiL7U//qcirE8gXoLctM1Hon9nRrvY4Wh4mQqWF
-LyffBo4d6kb3J+aqaVrAmOG5j8LZ9A==
-=C4HR
------END PGP SIGNATURE-----
-
---ivfl7y3ed6g54sur--
