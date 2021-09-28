@@ -2,289 +2,153 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7C67C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 10:17:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB34C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 10:32:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7ED3260F21
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 10:17:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B780E611C0
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 10:32:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240152AbhI1KSx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Sep 2021 06:18:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36633 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240054AbhI1KSx (ORCPT
+        id S240265AbhI1KeC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Sep 2021 06:34:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52290 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240198AbhI1Kd7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Sep 2021 06:18:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632824233;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=u5uEz0zMzLI3u5SmcZkNM4/r8rAoFXUcwaUNur87ZOg=;
-        b=LkoG9XukneGodjIKelr5XPdaThNAXzYB79P61YrXtUv2ecs1biUbcfYp6rfbpL9SnHpoQM
-        Z8PbbmKpA09GxPoPJNYoIDvmqpfzRKWtLd2wNH0DgZTiZJ4Rh5kh25o0+eooASkMD1zsrS
-        eLgsl1chEjG+MddqIxL99YSnLqMwVaU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-600-Nw6AGKZaPDad64ZOQ95F8g-1; Tue, 28 Sep 2021 06:17:12 -0400
-X-MC-Unique: Nw6AGKZaPDad64ZOQ95F8g-1
-Received: by mail-wm1-f72.google.com with SMTP id k35-20020a05600c1ca300b0030d13cecf46so78756wms.4
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Sep 2021 03:17:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=u5uEz0zMzLI3u5SmcZkNM4/r8rAoFXUcwaUNur87ZOg=;
-        b=Zy1nQgxNGZbRSJ6tnqWkmAvgvxMVAXJNLx7UK2kBGVpBois0Q1jXdQjmmI4/wEZy0Q
-         WQWAcwL8iYHdE7EUXzbuD1rNZwQm3e7vo5rPphtlZveB+TdfBd3Ym2kvDECXwia3wxe0
-         FhV1EHPFJ1o0BsjoufddEc9IbgxHwglXdYDY8EOEqODzeq4E08sRV6iqvYwXdIurMAFd
-         v1PlJKxHBRJgVdcF5KkhuTDnHzp//cjRh7ZWwGgekEv1u74HgKQen5WCyK8IKkLyEePG
-         7yl5+V1ZUQ5yRfgEbqsfzfQJ3xlo+JYfpNtrH4QZSP4tpVgrBFbT4W6mKbjtsHvIm2Qf
-         PKzg==
-X-Gm-Message-State: AOAM5307kWlYvuhA02H/CV1C4dmHrG2fMhS6mEC/fKeJrvlZcQuGhMLs
-        inUnLUUz/AOZOGswejaLpLUKRZqmP6GDAEwWv+fAuvwsaY3tjNFAfKZvL17V2Ok+UwnsO1y1eRV
-        8tDz9bmtPYqppD5B29uwnp/HN
-X-Received: by 2002:adf:a31a:: with SMTP id c26mr5544768wrb.307.1632824230975;
-        Tue, 28 Sep 2021 03:17:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw4oa2QFDFT6mx4r+tUchUFwttcM/2HMYFvdFMw6kKwLAjsy87wwmmIvXC04Mrykyg6n6P2kg==
-X-Received: by 2002:adf:a31a:: with SMTP id c26mr5544717wrb.307.1632824230752;
-        Tue, 28 Sep 2021 03:17:10 -0700 (PDT)
-Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
-        by smtp.gmail.com with ESMTPSA id v17sm9829732wro.34.2021.09.28.03.17.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 03:17:09 -0700 (PDT)
-Date:   Tue, 28 Sep 2021 11:17:07 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 38/45] KVM: SVM: Add support to handle Page
- State Change VMGEXIT
-Message-ID: <YVLro9lWPguN7Wkv@work-vm>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-39-brijesh.singh@amd.com>
+        Tue, 28 Sep 2021 06:33:59 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94710C061575
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Sep 2021 03:32:20 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mVAOh-0007IU-GX; Tue, 28 Sep 2021 12:31:39 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mVAOX-0002lF-WD; Tue, 28 Sep 2021 12:31:30 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mVAOX-0003v8-Tx; Tue, 28 Sep 2021 12:31:29 +0200
+Date:   Tue, 28 Sep 2021 12:31:29 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Simon Horman <simon.horman@corigine.com>
+Cc:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
+        oss-drivers@corigine.com, Paul Mackerras <paulus@samba.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ido Schimmel <idosch@nvidia.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Vadym Kochan <vkochan@marvell.com>, Michael Buesch <m@bues.ch>,
+        Jiri Pirko <jiri@nvidia.com>,
+        Salil Mehta <salil.mehta@huawei.com>, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Taras Chornyi <tchornyi@marvell.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        Oliver O'Halloran <oohall@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH v4 4/8] PCI: replace pci_dev::driver usage that gets the
+ driver name
+Message-ID: <20210928103129.c3gcbnfbarezr3mm@pengutronix.de>
+References: <20210927204326.612555-1-uwe@kleine-koenig.org>
+ <20210927204326.612555-5-uwe@kleine-koenig.org>
+ <20210928100127.GA16801@corigine.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="65t344eghsh2eaox"
 Content-Disposition: inline
-In-Reply-To: <20210820155918.7518-39-brijesh.singh@amd.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
+In-Reply-To: <20210928100127.GA16801@corigine.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-* Brijesh Singh (brijesh.singh@amd.com) wrote:
-> SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
-> table to be private or shared using the Page State Change NAE event
-> as defined in the GHCB specification version 2.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/sev-common.h |  7 +++
->  arch/x86/kvm/svm/sev.c            | 82 +++++++++++++++++++++++++++++--
->  2 files changed, 84 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-> index 4980f77aa1d5..5ee30bb2cdb8 100644
-> --- a/arch/x86/include/asm/sev-common.h
-> +++ b/arch/x86/include/asm/sev-common.h
-> @@ -126,6 +126,13 @@ enum psc_op {
->  /* SNP Page State Change NAE event */
->  #define VMGEXIT_PSC_MAX_ENTRY		253
->  
-> +/* The page state change hdr structure in not valid */
-> +#define PSC_INVALID_HDR			1
-> +/* The hdr.cur_entry or hdr.end_entry is not valid */
-> +#define PSC_INVALID_ENTRY		2
-> +/* Page state change encountered undefined error */
-> +#define PSC_UNDEF_ERR			3
-> +
->  struct psc_hdr {
->  	u16 cur_entry;
->  	u16 end_entry;
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 6d9483ec91ab..0de85ed63e9b 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2731,6 +2731,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm, u64 *exit_code)
->  	case SVM_VMGEXIT_AP_JUMP_TABLE:
->  	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
->  	case SVM_VMGEXIT_HV_FEATURES:
-> +	case SVM_VMGEXIT_PSC:
->  		break;
->  	default:
->  		goto vmgexit_err;
-> @@ -3004,13 +3005,13 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
->  		 */
->  		rc = snp_check_and_build_npt(vcpu, gpa, level);
->  		if (rc)
-> -			return -EINVAL;
-> +			return PSC_UNDEF_ERR;
->  
->  		if (op == SNP_PAGE_STATE_PRIVATE) {
->  			hva_t hva;
->  
->  			if (snp_gpa_to_hva(kvm, gpa, &hva))
-> -				return -EINVAL;
-> +				return PSC_UNDEF_ERR;
->  
->  			/*
->  			 * Verify that the hva range is registered. This enforcement is
-> @@ -3022,7 +3023,7 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
->  			rc = is_hva_registered(kvm, hva, page_level_size(level));
->  			mutex_unlock(&kvm->lock);
->  			if (!rc)
-> -				return -EINVAL;
-> +				return PSC_UNDEF_ERR;
->  
->  			/*
->  			 * Mark the userspace range unmerable before adding the pages
-> @@ -3032,7 +3033,7 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
->  			rc = snp_mark_unmergable(kvm, hva, page_level_size(level));
->  			mmap_write_unlock(kvm->mm);
->  			if (rc)
-> -				return -EINVAL;
-> +				return PSC_UNDEF_ERR;
->  		}
->  
->  		write_lock(&kvm->mmu_lock);
-> @@ -3062,8 +3063,11 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
->  		case SNP_PAGE_STATE_PRIVATE:
->  			rc = rmp_make_private(pfn, gpa, level, sev->asid, false);
->  			break;
-> +		case SNP_PAGE_STATE_PSMASH:
-> +		case SNP_PAGE_STATE_UNSMASH:
-> +			/* TODO: Add support to handle it */
->  		default:
-> -			rc = -EINVAL;
-> +			rc = PSC_INVALID_ENTRY;
->  			break;
->  		}
->  
-> @@ -3081,6 +3085,65 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
->  	return 0;
->  }
->  
-> +static inline unsigned long map_to_psc_vmgexit_code(int rc)
-> +{
-> +	switch (rc) {
-> +	case PSC_INVALID_HDR:
-> +		return ((1ul << 32) | 1);
-> +	case PSC_INVALID_ENTRY:
-> +		return ((1ul << 32) | 2);
-> +	case RMPUPDATE_FAIL_OVERLAP:
-> +		return ((3ul << 32) | 2);
-> +	default: return (4ul << 32);
-> +	}
 
-Are these the values defined in 56421 section 4.1.6 ?
-If so, that says:
-  SW_EXITINFO2[63:32] == 0x00000100
-      The hypervisor encountered some other error situation and was not able to complete the
-      request identified by page_state_change_header.cur_entry. It is left to the guest to decide how
-      to proceed in this situation.
+--65t344eghsh2eaox
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-so it looks like the default should be 0x100 rather than 4?
+On Tue, Sep 28, 2021 at 12:01:28PM +0200, Simon Horman wrote:
+> On Mon, Sep 27, 2021 at 10:43:22PM +0200, Uwe Kleine-K=F6nig wrote:
+> > From: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+> >=20
+> > struct pci_dev::driver holds (apart from a constant offset) the same
+> > data as struct pci_dev::dev->driver. With the goal to remove struct
+> > pci_dev::driver to get rid of data duplication replace getting the
+> > driver name by dev_driver_string() which implicitly makes use of struct
+> > pci_dev::dev->driver.
+> >=20
+> > Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+>=20
+> ...
+>=20
+> > diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c b/dri=
+vers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+> > index 0685ece1f155..23dfb599c828 100644
+> > --- a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+> > +++ b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+> > @@ -202,7 +202,7 @@ nfp_get_drvinfo(struct nfp_app *app, struct pci_dev=
+ *pdev,
+> >  {
+> >  	char nsp_version[ETHTOOL_FWVERS_LEN] =3D {};
+> > =20
+> > -	strlcpy(drvinfo->driver, pdev->driver->name, sizeof(drvinfo->driver));
+> > +	strlcpy(drvinfo->driver, dev_driver_string(&pdev->dev), sizeof(drvinf=
+o->driver));
+>=20
+> I'd slightly prefer to maintain lines under 80 columns wide.
+> But not nearly strongly enough to engage in a long debate about it.
 
-(It's a shame they're all magical constants, it would be nice if the
-standard have them names)
+:-)
 
-Dave
+Looking at the output of
 
+	git grep strlcpy.\*sizeof
 
-> +}
-> +
-> +static unsigned long snp_handle_page_state_change(struct vcpu_svm *svm)
-> +{
-> +	struct kvm_vcpu *vcpu = &svm->vcpu;
-> +	int level, op, rc = PSC_UNDEF_ERR;
-> +	struct snp_psc_desc *info;
-> +	struct psc_entry *entry;
-> +	u16 cur, end;
-> +	gpa_t gpa;
-> +
-> +	if (!sev_snp_guest(vcpu->kvm))
-> +		return PSC_INVALID_HDR;
-> +
-> +	if (!setup_vmgexit_scratch(svm, true, sizeof(*info))) {
-> +		pr_err("vmgexit: scratch area is not setup.\n");
-> +		return PSC_INVALID_HDR;
-> +	}
-> +
-> +	info = (struct snp_psc_desc *)svm->ghcb_sa;
-> +	cur = info->hdr.cur_entry;
-> +	end = info->hdr.end_entry;
-> +
-> +	if (cur >= VMGEXIT_PSC_MAX_ENTRY ||
-> +	    end >= VMGEXIT_PSC_MAX_ENTRY || cur > end)
-> +		return PSC_INVALID_ENTRY;
-> +
-> +	for (; cur <= end; cur++) {
-> +		entry = &info->entries[cur];
-> +		gpa = gfn_to_gpa(entry->gfn);
-> +		level = RMP_TO_X86_PG_LEVEL(entry->pagesize);
-> +		op = entry->operation;
-> +
-> +		if (!IS_ALIGNED(gpa, page_level_size(level))) {
-> +			rc = PSC_INVALID_ENTRY;
-> +			goto out;
-> +		}
-> +
-> +		rc = __snp_handle_page_state_change(vcpu, op, gpa, level);
-> +		if (rc)
-> +			goto out;
-> +	}
-> +
-> +out:
-> +	info->hdr.cur_entry = cur;
-> +	return rc ? map_to_psc_vmgexit_code(rc) : 0;
-> +}
-> +
->  static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
->  {
->  	struct vmcb_control_area *control = &svm->vmcb->control;
-> @@ -3315,6 +3378,15 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->  		ret = 1;
->  		break;
->  	}
-> +	case SVM_VMGEXIT_PSC: {
-> +		unsigned long rc;
-> +
-> +		ret = 1;
-> +
-> +		rc = snp_handle_page_state_change(svm);
-> +		svm_set_ghcb_sw_exit_info_2(vcpu, rc);
-> +		break;
-> +	}
->  	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
->  		vcpu_unimpl(vcpu,
->  			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
-> -- 
-> 2.17.1
-> 
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I wonder if it would be sensible to introduce something like
 
+	#define strlcpy_array(arr, src) (strlcpy(arr, src, sizeof(arr)) + __must_b=
+e_array(arr))
+
+but not sure this is possible without a long debate either (and this
+line is over 80 chars wide, too :-).
+
+> In any case, for the NFP portion of this patch.
+>=20
+> Acked-by: Simon Horman <simon.horman@corigine.com>
+
+Thanks
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--65t344eghsh2eaox
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmFS7v4ACgkQwfwUeK3K
+7Al9pwf+I6TDjUNhtsTqkV/J+f3tcMtnjPMZH0hCqv+jXSkmBqkwvn8wxEQXGFBL
+q6aNbMpy8LUCK3yn4+yes6FhZOK+CkMC6LgAv+Kzr43plzOCOvWTSDTi/nKx8sYf
+JqmAcctxmEA1hkAuort6dCBezIVcHHCpWrnsUuokesFvURNzLkytUGekUAkR5NNj
+g1aF021oqz88PJwyABeyfgrnCgwMSk8VlL39MdNJPUZewreVGija36YlIh/pFUyk
+3TvYaY4JrCgqq7AfYcZbZwiqCpi1AxWWY+ACJOQlG4IDCzQr2I7c8IWI+8yxow5o
+9j9Z8N/LPOHLfPGUNx5Cj8qLUoDiIw==
+=IxWL
+-----END PGP SIGNATURE-----
+
+--65t344eghsh2eaox--
