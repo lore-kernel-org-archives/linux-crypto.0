@@ -2,107 +2,129 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B51CBC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 08:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D691DC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 09:00:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 98436611CB
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 08:28:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9C8A6113E
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 09:00:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239477AbhI1IaV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Sep 2021 04:30:21 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:16148 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239551AbhI1IaV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Sep 2021 04:30:21 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1632817722; h=Content-Transfer-Encoding: Content-Type:
- MIME-Version: Message-ID: In-Reply-To: Date: References: Subject: Cc:
- To: From: Sender; bh=9PDVgapOZw/oYdnBrYiDvF68ra35ENV54w0qR5r1vOQ=; b=GuuIDA8MNRSMzCoN/PQ7CV9TQD8Q20RGrC0zqxPhnXmTg1Y0GpXUAt+wwZ3zoC92STz6kym9
- zZrQ1AC1XfaVLty7aH50ubwa86VO1i7qVMQxlcVokGVTWiy4zXIp4oPWu6bkZWl9MTvGwKwd
- sC8olLTzn5YMAt93MJj8VrgmryU=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyIxNDk3ZSIsICJsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n02.prod.us-west-2.postgun.com with SMTP id
- 6152d22ea5a9bab6e80b8ea9 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 28 Sep 2021 08:28:30
- GMT
-Sender: kvalo=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id B5D56C43616; Tue, 28 Sep 2021 08:28:29 +0000 (UTC)
-Received: from tynnyri.adurom.net (tynnyri.adurom.net [51.15.11.48])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: kvalo)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 216A9C4338F;
-        Tue, 28 Sep 2021 08:28:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 216A9C4338F
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-From:   Kalle Valo <kvalo@codeaurora.org>
-To:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>, linux-pci@vger.kernel.org,
-        kernel@pengutronix.de, Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        =?utf-8?Q?Rafa=C5=82_Mi=C5=82ecki?= <zajec5@gmail.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Vadym Kochan <vkochan@marvell.com>,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Jiri Pirko <jiri@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        Michael Buesch <m@bues.ch>,
-        "Oliver O'Halloran" <oohall@gmail.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, oss-drivers@corigine.com
-Subject: Re: [PATCH v4 4/8] PCI: replace pci_dev::driver usage that gets the driver name
-References: <20210927204326.612555-1-uwe@kleine-koenig.org>
-        <20210927204326.612555-5-uwe@kleine-koenig.org>
-Date:   Tue, 28 Sep 2021 11:28:15 +0300
-In-Reply-To: <20210927204326.612555-5-uwe@kleine-koenig.org> ("Uwe
-        \=\?utf-8\?Q\?Kleine-K\=C3\=B6nig\=22's\?\= message of "Mon, 27 Sep 2021 22:43:22
- +0200")
-Message-ID: <87pmst5ckg.fsf@tynnyri.adurom.net>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S239657AbhI1JCd convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Sep 2021 05:02:33 -0400
+Received: from mail-vs1-f41.google.com ([209.85.217.41]:42737 "EHLO
+        mail-vs1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239254AbhI1JCd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Sep 2021 05:02:33 -0400
+Received: by mail-vs1-f41.google.com with SMTP id z62so21220482vsz.9;
+        Tue, 28 Sep 2021 02:00:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=2LPnGpLh0Z/OFWhJ3bW6nNOAP+i5ywRc/ibvIJ8V0ZU=;
+        b=ahdeUN3md/jKPjRspN5EIUzmln2WJmZ6FR/+5kqTRUNsvnfQPg/pNsXeO5Y5bbF1QF
+         Uans8tcpacTgMKAJUoh/9D/7H8kOwTlelfXceb4JO6u5/UMyR5esuUWpHLEyR/swevrj
+         On7Pvtbu31/0X0L2SUxPYqG+Kpx/A1xW07UT3fMR2TAIceVJVJAC0tl7Zi+RfIiNH8S8
+         LWUwhA3CwW5xv33AWar+B/4o2rEcZCx9vYF1RSM/g4n27rwCc9D0JrHr1senncdtf/N0
+         Yj1jum8BLPZX/EC6lXWv6hS4A5IuSLgzRUJBeFaowbfYhfc/J9h36T6gsoUPR4n+OOsr
+         +IRw==
+X-Gm-Message-State: AOAM531bDE+Ts7qNwEA1+1Lm8wGHekoXU6eDKxwUJrWTNQZGBRNFNDJ0
+        Wdgy4wb9K+/V6pLzllqYcP0KEp0PQSHfl0LOagCH5A3ANic=
+X-Google-Smtp-Source: ABdhPJyKCBGg8b+EUk7301gW1EQMjaY5eqfZE9QEHHk0EcY4l7Xt/v1Rn8gxQbSMp/ewzPBF7MH+2DTbO4Tgqmwiu4Y=
+X-Received: by 2002:a67:cc1c:: with SMTP id q28mr3526995vsl.37.1632819653399;
+ Tue, 28 Sep 2021 02:00:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20210921213930.10366-1-linkmauve@linkmauve.fr>
+ <20210921213930.10366-2-linkmauve@linkmauve.fr> <CACPK8Xc+J0PbCdgheRxJbOVZ=OyyfsCA=cwkneMoboJLzC8TZQ@mail.gmail.com>
+In-Reply-To: <CACPK8Xc+J0PbCdgheRxJbOVZ=OyyfsCA=cwkneMoboJLzC8TZQ@mail.gmail.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Tue, 28 Sep 2021 11:00:41 +0200
+Message-ID: <CAMuHMdURNY5BRc6bfaYxX+k02w7mz2aRLOi9uW-qaoT3oBPFtQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] crypto: nintendo-aes - add a new AES driver
+To:     Joel Stanley <joel@jms.id.au>
+Cc:     Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Ash Logan <ash@heyquark.com>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.ne@posteo.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Uwe Kleine-K=C3=B6nig <uwe@kleine-koenig.org> writes:
-
-> From: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
+On Wed, Sep 22, 2021 at 4:12 AM Joel Stanley <joel@jms.id.au> wrote:
+> On Tue, 21 Sept 2021 at 21:47, Emmanuel Gil Peyrot
+> <linkmauve@linkmauve.fr> wrote:
+> >
+> > This engine implements AES in CBC mode, using 128-bit keys only.  It is
+> > present on both the Wii and the Wii U, and is apparently identical in
+> > both consoles.
+> >
+> > The hardware is capable of firing an interrupt when the operation is
+> > done, but this driver currently uses a busy loop, I’m not too sure
+> > whether it would be preferable to switch, nor how to achieve that.
+> >
+> > It also supports a mode where no operation is done, and thus could be
+> > used as a DMA copy engine, but I don’t know how to expose that to the
+> > kernel or whether it would even be useful.
+> >
+> > In my testing, on a Wii U, this driver reaches 80.7 MiB/s, while the
+> > aes-generic driver only reaches 30.9 MiB/s, so it is a quite welcome
+> > speedup.
+> >
+> > This driver was written based on reversed documentation, see:
+> > https://wiibrew.org/wiki/Hardware/AES
+> >
+> > Signed-off-by: Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>
+> > Tested-by: Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>  # on Wii U
+> > ---
+> >  drivers/crypto/Kconfig        |  11 ++
+> >  drivers/crypto/Makefile       |   1 +
+> >  drivers/crypto/nintendo-aes.c | 273 ++++++++++++++++++++++++++++++++++
+> >  3 files changed, 285 insertions(+)
+> >  create mode 100644 drivers/crypto/nintendo-aes.c
+> >
+> > diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> > index 9a4c275a1335..adc94ad7462d 100644
+> > --- a/drivers/crypto/Kconfig
+> > +++ b/drivers/crypto/Kconfig
+> > @@ -871,4 +871,15 @@ config CRYPTO_DEV_SA2UL
+> >
+> >  source "drivers/crypto/keembay/Kconfig"
+> >
+> > +config CRYPTO_DEV_NINTENDO
+> > +       tristate "Support for the Nintendo Wii U AES engine"
+> > +       depends on WII || WIIU || COMPILE_TEST
 >
-> struct pci_dev::driver holds (apart from a constant offset) the same
-> data as struct pci_dev::dev->driver. With the goal to remove struct
-> pci_dev::driver to get rid of data duplication replace getting the
-> driver name by dev_driver_string() which implicitly makes use of struct
-> pci_dev::dev->driver.
+> This current seteup will allow the driver to be compile tested for
+> non-powerpc, which will fail on the dcbf instructions.
 >
-> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
-> ---
->  arch/powerpc/include/asm/ppc-pci.h                   | 9 ++++++++-
->  drivers/bcma/host_pci.c                              | 7 ++++---
+> Perhaps use this instead:
+>
+>        depends on WII || WIIU || (COMPILE_TEST && PPC)
 
-For bcma:
+Or:
 
-Acked-by: Kalle Valo <kvalo@codeaurora.org>
+    depends on PPC
+    depends on WII || WIIU || COMPILE_TEST
 
---=20
-https://patchwork.kernel.org/project/linux-wireless/list/
+to distinguish between hard and soft dependencies.
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatc=
-hes
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
