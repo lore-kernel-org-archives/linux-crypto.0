@@ -2,335 +2,179 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D150AC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 09:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87CB7C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 10:01:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B92076108E
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 09:56:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68B8361058
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 10:01:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239840AbhI1J6W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Sep 2021 05:58:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50226 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240050AbhI1J6V (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Sep 2021 05:58:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632823002;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1Ac1KzapFbm3DrLpJhS8RPsZYRZpeFigmvf6S+kYg10=;
-        b=eJ5y8nRaNyADvgFwx4dt07Jh58Dij5voS6ZYdygh+PZAwfMYZzEWk1ZfLKfkOu7tlx7Siu
-        Tsn8S4r4VQkbaKodcAnDyDVw3b0yCXVqTwruCmevIHm/wqzHgLYGn+oE+XB1LQXE5M6PjP
-        o2mKSFUakaUsAAXekX3QnFmLGJJ5TVM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-ZdEtvNiUP-u_JLD-Szf8UA-1; Tue, 28 Sep 2021 05:56:40 -0400
-X-MC-Unique: ZdEtvNiUP-u_JLD-Szf8UA-1
-Received: by mail-wm1-f72.google.com with SMTP id r66-20020a1c4445000000b0030cf0c97157so1753250wma.1
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Sep 2021 02:56:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=1Ac1KzapFbm3DrLpJhS8RPsZYRZpeFigmvf6S+kYg10=;
-        b=t0aY8KJNv7k6Fic6KCE1GiOn6tbQblPYen9IRrNalctgDgo071OjEw11yQLQJhY9ps
-         zej/1xa+I95Y/rR9aIp91nYT/q6tlDeaYhss0C0u0GKlUqWUUygnwyBehiR9l0sugS4g
-         j4WjTp1rYbeBQ4LykgcD4GuBASDgic3dk7AGla7MQtOuqJLxRITVXrKH73TMROVKTKi+
-         c0lgDzqPvnDN49d5HbVU2sRU+XuJm7AjUztJhK4kK0XWr0WQYW9UIfpnPHYvgpQsn0nF
-         ZF46CJRNvi8hpvl3e0jKkYB5BdeJO/hZRw6u0CO143Z/5d0W5dw+WnTJEG+bY+/bvCNC
-         pu2A==
-X-Gm-Message-State: AOAM530ctdg9LMdTbt+NR8kGTWfc2MJzsii1ASeM5mtxvfYXQtBD4arS
-        Ngicca2FYJ3jkc298B5jaze+JMcURlSn9n+aDxcc9MnFOXYJhkWw1ABJqz2MjVLyQq9wKf36q1e
-        K8ZxQsUyhI1AX+njshPxqB95n
-X-Received: by 2002:a5d:6343:: with SMTP id b3mr5205736wrw.124.1632822999510;
-        Tue, 28 Sep 2021 02:56:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzLOJkdLvKu+9MFHMG+herne+2M1V/vkdbPksCq7GDCqPbAQQGDN7120pkvAGNUeduom1Kn2w==
-X-Received: by 2002:a5d:6343:: with SMTP id b3mr5205710wrw.124.1632822999284;
-        Tue, 28 Sep 2021 02:56:39 -0700 (PDT)
-Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
-        by smtp.gmail.com with ESMTPSA id l11sm2420077wms.45.2021.09.28.02.56.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 02:56:38 -0700 (PDT)
-Date:   Tue, 28 Sep 2021 10:56:35 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 37/45] KVM: SVM: Add support to handle MSR based
- Page State Change VMGEXIT
-Message-ID: <YVLm0/8F8CDLEPXe@work-vm>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-38-brijesh.singh@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        id S240128AbhI1KDW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Sep 2021 06:03:22 -0400
+Received: from mail-dm6nam10on2126.outbound.protection.outlook.com ([40.107.93.126]:15328
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S240162AbhI1KDT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Sep 2021 06:03:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lSZl6uBiZDdkrVFjVinimQD3QKKSlFbohkXO0W3BXY9j5bUvSWQF3ibv0sU8FRSW3n7kPH6cJz0HsThrwcUqN+Emc5s+lr9kBy0trQMqpKMVmpIE+0Xwo5An/pSiJFASLtPIFmzM1bBO14QiMx6+E3M5kkxZ1tTK2Hnh9kEdpFfE4oBa+FSnKGkSwaNsjuj99ZIT19oqQiW+36toL2/II34eKIoms2HVxOwSyKUdOXWgDpKVwZ410ff+rqGu0KbCikQPPY+FNO6MSyKSSOc/z8gXqRea0q3yibxHHdPqsOmXzc+dXWHlHVet3Jtr7WjGqaySEMSyMgknMRrdwPe10w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yH5vkAI5Px3m4awq6KffP6O/fSPpqgMT8c0Poy2KzA0=;
+ b=Sn7fi+4G2C58dF6B1nkTbONGsLwzQc5RWGRFs/CC5knT5P3BDIHIpFCeuUGNifoCRBrMoQcQsqZsFEPTBV3EQPguvSeoBkkR593JyutfaZ3NPBXdWoXwQt6sIo69AyUotuSiD6P/9rVaH41akC7y2f2nDqAYF0Q+hAj9a7v0+9OPomCiT5ideXNldFzM6BJqaBkRdstU8hp2tMswdLrWUZTlmX8Ehmmg/G2QvVCyCMnp54/oBkEbpWn8bmaKhqglHVj3eUVEh5Z7+QYRjCdTVDn9eGUrkJl/oZz5ltRMbvro7xJtxLpNz1NIm8vqhdguvQoioGkfkkyKCvZubXD1Xg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yH5vkAI5Px3m4awq6KffP6O/fSPpqgMT8c0Poy2KzA0=;
+ b=SyHuixymTOWaU6I+iPScPuCXWMLNOOFJn8goPQuZjjt/Wz4kWz4x/tKXCeMa/lfnzeqTl4m4u7SW4ajn5/D+JePq8PlQGeZvoom+kw5kS/zkIzP8wp0CSF2dbEg3uJZtXPedjmmEsAeBRlZLUjWuB8gILeGp7ALh78btSOo/96I=
+Authentication-Results: kleine-koenig.org; dkim=none (message not signed)
+ header.d=none;kleine-koenig.org; dmarc=none action=none
+ header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by PH0PR13MB4874.namprd13.prod.outlook.com (2603:10b6:510:95::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.10; Tue, 28 Sep
+ 2021 10:01:38 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::e1d9:64d0:cb4f:3e90]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::e1d9:64d0:cb4f:3e90%9]) with mapi id 15.20.4566.014; Tue, 28 Sep 2021
+ 10:01:37 +0000
+Date:   Tue, 28 Sep 2021 12:01:28 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>
+Cc:     Bjorn Helgaas <helgaas@kernel.org>,
+        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>, linux-pci@vger.kernel.org,
+        kernel@pengutronix.de, Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Vadym Kochan <vkochan@marvell.com>,
+        Taras Chornyi <tchornyi@marvell.com>,
+        Jiri Pirko <jiri@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
+        Michael Buesch <m@bues.ch>,
+        Oliver O'Halloran <oohall@gmail.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Alexander Duyck <alexanderduyck@fb.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org, oss-drivers@corigine.com
+Subject: Re: [PATCH v4 4/8] PCI: replace pci_dev::driver usage that gets the
+ driver name
+Message-ID: <20210928100127.GA16801@corigine.com>
+References: <20210927204326.612555-1-uwe@kleine-koenig.org>
+ <20210927204326.612555-5-uwe@kleine-koenig.org>
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210820155918.7518-38-brijesh.singh@amd.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210927204326.612555-5-uwe@kleine-koenig.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-ClientProxiedBy: AM4PR0202CA0014.eurprd02.prod.outlook.com
+ (2603:10a6:200:89::24) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
+MIME-Version: 1.0
+Received: from corigine.com (2001:982:756:703:d63d:7eff:fe99:ac9d) by AM4PR0202CA0014.eurprd02.prod.outlook.com (2603:10a6:200:89::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.14 via Frontend Transport; Tue, 28 Sep 2021 10:01:33 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: da31f8bc-4b43-4aff-f1c6-08d98266f620
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4874:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <PH0PR13MB48742306D04468D083E45271E8A89@PH0PR13MB4874.namprd13.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:935;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qG4AgYxyZuUheIV49HC58vtrbMs1cIO1B5B+ToaBF6etg357VIFB4WhEfdBDYSEGrs0nneydEX9FbYLNXZknentIVi4E5lzE6xert/BMHsiYHlSxQw5BM57F6dkGJvFLLXrF0bPb9czV5CuPg+Frt7hNRE7GSQ6ETdy39sNPJ5nXtCyjDgAHq3Mnjs097B7d0Pii/36DJ5LtUKMr1/Ov3rAeMmnaC1zMr6kdMOXprKUjwF0YYwMzzPTuTkI9fcVuJ0XQo+AnvDrtCry82cOw63mR7rEOywXCbxvRiUQlBREo9Q0wdWTpJiSoaeuIR7ARIy1+Fz1IoSgFsoOLrH9mdPUrLVQcPdDfODnIZURFMXUpcT9SauXvmFR0ldOK9s4qyU07t4c7sndSe3I5bCUP93XO7MidVJBOxXx5/em0bkFE8nLJapT5+lTm0Of1vjQ/wDQhY302x5PgPQlvoLBNA3RMWgRWLT1GD1jxseh7GKgEqrgZ9h8Bj1BCKCeLzlHW620Qa966AQufwp6GKiZFslPnnBta0mkE4N8lZd/V2yVtInHfCVYuICGqG8ns8CfFwe8xb1HCzWQYv7Lk9O2ToXIWQSGU0pi4yAvWPsDBi6NhpHLXtnx8+S21mEbTVx6xkWspeFwadCwC6iJneMfMNw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(366004)(376002)(346002)(136003)(39830400003)(66476007)(55016002)(2906002)(4326008)(1076003)(107886003)(316002)(186003)(66946007)(8936002)(66556008)(33656002)(7416002)(36756003)(38100700002)(44832011)(6666004)(508600001)(54906003)(86362001)(8676002)(8886007)(5660300002)(2616005)(52116002)(6916009)(7696005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dFNVbGVUNFBkMVc2eFdHYzVtRmhtVVl0dUtud05TSUZacWlQQ2d4eXNkelN5?=
+ =?utf-8?B?blZYbndTR1orSVhqamFIRitxeXBQajRNcW13VkVJTk11U0hCaHJOc0hqRVZv?=
+ =?utf-8?B?QVREUHVrRFZXTXRBS08wYUdHTGVmWkNQZmhhSGVFb21PWTEzMG9GRjNKM2ZV?=
+ =?utf-8?B?OHBFWUp6OWhiUE04alNydDdJZm9qZW5QQ0IrWjdTQVRwRUFHV2JJYWsvMk03?=
+ =?utf-8?B?a1BiNXpNYVNXVnVqZmtCRUxNcVVoNXppT2swaTloV0FmNnRPWnFoZzI2Z21a?=
+ =?utf-8?B?ZEhZWWI0b3NEWlUyRWl6SVY0Nmx1NXhaTVhtQmtFbGdLNHZGU1JkV2dPV29N?=
+ =?utf-8?B?dmlkK1plQS91dFJBNDNObDJKN2tTRmthL21JVFZUMm9qejNBN1hRb05ZTDNB?=
+ =?utf-8?B?QWVrOURjbnZ4amd6Z2JLYlJOZTNaeFNVVUd0WXRKaEMrRmlXV2RBSDVXVXFM?=
+ =?utf-8?B?T2F6U0MrSm5VSmFHM0xYR2JyQmJnWVBlR1d0RnhhSXBHWmVoUXVmZFh6OGd0?=
+ =?utf-8?B?Q3NSL1F3TUhSaDhFNmFZb05qS0JNSzdyaWxyZmJ1VkFxQ1FGNkp3UFJCelJI?=
+ =?utf-8?B?bTJGbDlsc1ltcTJMeUhRa1l0UGlyOGE4Rm9aRldlTnA3bnZPeUMvVkZ1SnN4?=
+ =?utf-8?B?dVY0SFQ1T0t4OXk2NjMvK2lJZDBSeFBnTkdheHc5Uy9YMzFRY0hoSmFtM2ZQ?=
+ =?utf-8?B?K0pzMmVvSGRVSHBqREtDSERWZGwvSUxUZHNiYVZBRVJodlJJZ09PYW1VNG1G?=
+ =?utf-8?B?NzBNMEs4RmliOUY2dFVFbHk4WEZFV1V4VFNaa0dndVErUjk1bXFwZU1qclBs?=
+ =?utf-8?B?SDd5YzVJYUJRREt5VE95TGJiTk11VmdZSVFFK1B2YW5iNzBmTlJPdDJWU0Q4?=
+ =?utf-8?B?WlBybTl1K1c5L29kanJ0aG9RSGY4M21lVExaVVNDVjdITnlRdTFtWkFjYlcy?=
+ =?utf-8?B?alZRNkZqQWFxdEh1OU01SlJkZDMxN3FIVnU0QUp6NTdndFZpbnJhKzAvNGh2?=
+ =?utf-8?B?NWdReGdKWWZ5RjZwQlpiMHZFczl1MmIwQ2E1VERrVFJCaWRRN2ZmcndPdlFJ?=
+ =?utf-8?B?Z1hpUThTNlFTbXRIOU9PSmlDUGF1UXRubmRMWjM4UWJ0YXVpS0tZQy8vK2JG?=
+ =?utf-8?B?a0t2ckFnM3Z1bDk1aDVZUFVBcFE0OXUzdFZmT25ldHUxUWh6djlNZjZ4dUtG?=
+ =?utf-8?B?Q1JOWGtrcU5mL1FvOUxCQWlGRm5LWVJ1OHM0TEVWdGNzQVl6TEVQSHllWDlj?=
+ =?utf-8?B?aXJteVRkcHBRQ2tEWmc1WVJvcXFhTzdBV2psSWw3TGRHczlXRDJVNDFtYmgr?=
+ =?utf-8?B?RllkZ3ZwUXkvT2wvMjVPUUpCSmkrczhLQ1ZHaksvM04yaElSZURDclEycVIx?=
+ =?utf-8?B?ZFFXUWN2WWpXK2RvYjZpMm1tajN6b3pUaXNveXBGT0d3eWs1M1h4QzZvaE1q?=
+ =?utf-8?B?enUwblB0QUplSWVsQTF0OGtuNU1oeHlhZWRTVnZ4end2STNWMDJGUkdJVVAx?=
+ =?utf-8?B?YzVYVE9oOGZIaDdjcWxDQ3NYaU1aUytBSnBMQjdRU3BmQjBEUEFCYU1ySTcr?=
+ =?utf-8?B?YXNJeGg4c1RDaWxJQVUvd28yZVpUSnRoUXhjc0c5WUk5cnM3U2VFeWdIcmVV?=
+ =?utf-8?B?cWk1dlgxOTJIRG0zZ0RDbkJQQlp3Ynp3RTlUNUliNzNDNXhFYWxubGllWjNL?=
+ =?utf-8?B?QStadWZ2ZTU5MHFDREZtbG1lNGZ0bnAyaWc5RzZaYTkyK2ExcWF3OHJJUFZO?=
+ =?utf-8?B?cUtZNVRIeXFUalIxT3FkY3QzbGNwVHhnREkwM3JMQWpLNllKWnQxV3BBMGxN?=
+ =?utf-8?B?eVNZSE5DWSt1NWUwRk5SSW82V3RWbm4vMUtKYU10VE5RZEExUHQrU3RLOVFE?=
+ =?utf-8?Q?+lz76RkJCkCL+?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: da31f8bc-4b43-4aff-f1c6-08d98266f620
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2021 10:01:37.8519
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aU5GMswdemP/aKf9Sr4rduTxFNIblbrSz9Dhk0zc5gk+r6UPeGLdxqulZZlW4FMkJPyvZwNph1AnuQFlhsjzrJE84ZE8SGelj8lFdZTd7PA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB4874
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-* Brijesh Singh (brijesh.singh@amd.com) wrote:
-> SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
-> table to be private or shared using the Page State Change MSR protocol
-> as defined in the GHCB specification.
+On Mon, Sep 27, 2021 at 10:43:22PM +0200, Uwe Kleine-König wrote:
+> From: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 > 
-> Before changing the page state in the RMP entry, lookup the page in the
-> NPT to make sure that there is a valid mapping for it. If the mapping
-> exist then try to find a workable page level between the NPT and RMP for
-> the page. If the page is not mapped in the NPT, then create a fault such
-> that it gets mapped before we change the page state in the RMP entry.
+> struct pci_dev::driver holds (apart from a constant offset) the same
+> data as struct pci_dev::dev->driver. With the goal to remove struct
+> pci_dev::driver to get rid of data duplication replace getting the
+> driver name by dev_driver_string() which implicitly makes use of struct
+> pci_dev::dev->driver.
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/sev-common.h |   9 ++
->  arch/x86/kvm/svm/sev.c            | 197 ++++++++++++++++++++++++++++++
->  arch/x86/kvm/trace.h              |  34 ++++++
->  arch/x86/kvm/x86.c                |   1 +
->  4 files changed, 241 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-> index 91089967ab09..4980f77aa1d5 100644
-> --- a/arch/x86/include/asm/sev-common.h
-> +++ b/arch/x86/include/asm/sev-common.h
-> @@ -89,6 +89,10 @@ enum psc_op {
->  };
->  
->  #define GHCB_MSR_PSC_REQ		0x014
-> +#define GHCB_MSR_PSC_GFN_POS		12
-> +#define GHCB_MSR_PSC_GFN_MASK		GENMASK_ULL(39, 0)
-> +#define GHCB_MSR_PSC_OP_POS		52
-> +#define GHCB_MSR_PSC_OP_MASK		0xf
->  #define GHCB_MSR_PSC_REQ_GFN(gfn, op)			\
->  	/* GHCBData[55:52] */				\
->  	(((u64)((op) & 0xf) << 52) |			\
-> @@ -98,6 +102,11 @@ enum psc_op {
->  	GHCB_MSR_PSC_REQ)
->  
->  #define GHCB_MSR_PSC_RESP		0x015
-> +#define GHCB_MSR_PSC_ERROR_POS		32
-> +#define GHCB_MSR_PSC_ERROR_MASK		GENMASK_ULL(31, 0)
-> +#define GHCB_MSR_PSC_ERROR		GENMASK_ULL(31, 0)
-> +#define GHCB_MSR_PSC_RSVD_POS		12
-> +#define GHCB_MSR_PSC_RSVD_MASK		GENMASK_ULL(19, 0)
->  #define GHCB_MSR_PSC_RESP_VAL(val)			\
->  	/* GHCBData[63:32] */				\
->  	(((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 991b8c996fc1..6d9483ec91ab 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -31,6 +31,7 @@
->  #include "svm_ops.h"
->  #include "cpuid.h"
->  #include "trace.h"
-> +#include "mmu.h"
->  
->  #define __ex(x) __kvm_handle_fault_on_reboot(x)
->  
-> @@ -2905,6 +2906,181 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
->  	svm->vmcb->control.ghcb_gpa = value;
->  }
->  
-> +static int snp_rmptable_psmash(struct kvm *kvm, kvm_pfn_t pfn)
-> +{
-> +	pfn = pfn & ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
-> +
-> +	return psmash(pfn);
-> +}
-> +
-> +static int snp_make_page_shared(struct kvm *kvm, gpa_t gpa, kvm_pfn_t pfn, int level)
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-....
+...
 
-> +
-> +			/*
-> +			 * Mark the userspace range unmerable before adding the pages
-
-                                                    ^^^^^^^^^ typo
-
-> +			 * in the RMP table.
-> +			 */
-> +			mmap_write_lock(kvm->mm);
-> +			rc = snp_mark_unmergable(kvm, hva, page_level_size(level));
-> +			mmap_write_unlock(kvm->mm);
-> +			if (rc)
-> +				return -EINVAL;
-> +		}
-> +
-> +		write_lock(&kvm->mmu_lock);
-> +
-> +		rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level);
-> +		if (!rc) {
-> +			/*
-> +			 * This may happen if another vCPU unmapped the page
-> +			 * before we acquire the lock. Retry the PSC.
-> +			 */
-> +			write_unlock(&kvm->mmu_lock);
-> +			return 0;
-> +		}
-> +
-> +		/*
-> +		 * Adjust the level so that we don't go higher than the backing
-> +		 * page level.
-> +		 */
-> +		level = min_t(size_t, level, npt_level);
-> +
-> +		trace_kvm_snp_psc(vcpu->vcpu_id, pfn, gpa, op, level);
-> +
-> +		switch (op) {
-> +		case SNP_PAGE_STATE_SHARED:
-> +			rc = snp_make_page_shared(kvm, gpa, pfn, level);
-> +			break;
-> +		case SNP_PAGE_STATE_PRIVATE:
-> +			rc = rmp_make_private(pfn, gpa, level, sev->asid, false);
-
-Minor nit; it seems a shame that snp_make_page_shared and
-rmp_make_private  both take gpa, pfn, level - in different orders.
-
-Dave
-
-> +			break;
-> +		default:
-> +			rc = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		write_unlock(&kvm->mmu_lock);
-> +
-> +		if (rc) {
-> +			pr_err_ratelimited("Error op %d gpa %llx pfn %llx level %d rc %d\n",
-> +					   op, gpa, pfn, level, rc);
-> +			return rc;
-> +		}
-> +
-> +		gpa = gpa + page_level_size(level);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+> diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+> index 0685ece1f155..23dfb599c828 100644
+> --- a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+> +++ b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+> @@ -202,7 +202,7 @@ nfp_get_drvinfo(struct nfp_app *app, struct pci_dev *pdev,
 >  {
->  	struct vmcb_control_area *control = &svm->vmcb->control;
-> @@ -3005,6 +3181,27 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
->  				  GHCB_MSR_INFO_POS);
->  		break;
->  	}
-> +	case GHCB_MSR_PSC_REQ: {
-> +		gfn_t gfn;
-> +		int ret;
-> +		enum psc_op op;
-> +
-> +		gfn = get_ghcb_msr_bits(svm, GHCB_MSR_PSC_GFN_MASK, GHCB_MSR_PSC_GFN_POS);
-> +		op = get_ghcb_msr_bits(svm, GHCB_MSR_PSC_OP_MASK, GHCB_MSR_PSC_OP_POS);
-> +
-> +		ret = __snp_handle_page_state_change(vcpu, op, gfn_to_gpa(gfn), PG_LEVEL_4K);
-> +
-> +		if (ret)
-> +			set_ghcb_msr_bits(svm, GHCB_MSR_PSC_ERROR,
-> +					  GHCB_MSR_PSC_ERROR_MASK, GHCB_MSR_PSC_ERROR_POS);
-> +		else
-> +			set_ghcb_msr_bits(svm, 0,
-> +					  GHCB_MSR_PSC_ERROR_MASK, GHCB_MSR_PSC_ERROR_POS);
-> +
-> +		set_ghcb_msr_bits(svm, 0, GHCB_MSR_PSC_RSVD_MASK, GHCB_MSR_PSC_RSVD_POS);
-> +		set_ghcb_msr_bits(svm, GHCB_MSR_PSC_RESP, GHCB_MSR_INFO_MASK, GHCB_MSR_INFO_POS);
-> +		break;
-> +	}
->  	case GHCB_MSR_TERM_REQ: {
->  		u64 reason_set, reason_code;
+>  	char nsp_version[ETHTOOL_FWVERS_LEN] = {};
 >  
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index 1c360e07856f..35ca1cf8440a 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -7,6 +7,7 @@
->  #include <asm/svm.h>
->  #include <asm/clocksource.h>
->  #include <asm/pvclock-abi.h>
-> +#include <asm/sev-common.h>
->  
->  #undef TRACE_SYSTEM
->  #define TRACE_SYSTEM kvm
-> @@ -1711,6 +1712,39 @@ TRACE_EVENT(kvm_vmgexit_msr_protocol_exit,
->  		  __entry->vcpu_id, __entry->ghcb_gpa, __entry->result)
->  );
->  
-> +/*
-> + * Tracepoint for the SEV-SNP page state change processing
-> + */
-> +#define psc_operation					\
-> +	{SNP_PAGE_STATE_PRIVATE, "private"},		\
-> +	{SNP_PAGE_STATE_SHARED,  "shared"}		\
-> +
-> +TRACE_EVENT(kvm_snp_psc,
-> +	TP_PROTO(unsigned int vcpu_id, u64 pfn, u64 gpa, u8 op, int level),
-> +	TP_ARGS(vcpu_id, pfn, gpa, op, level),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(int, vcpu_id)
-> +		__field(u64, pfn)
-> +		__field(u64, gpa)
-> +		__field(u8, op)
-> +		__field(int, level)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->vcpu_id = vcpu_id;
-> +		__entry->pfn = pfn;
-> +		__entry->gpa = gpa;
-> +		__entry->op = op;
-> +		__entry->level = level;
-> +	),
-> +
-> +	TP_printk("vcpu %u, pfn %llx, gpa %llx, op %s, level %d",
-> +		  __entry->vcpu_id, __entry->pfn, __entry->gpa,
-> +		  __print_symbolic(__entry->op, psc_operation),
-> +		  __entry->level)
-> +);
-> +
->  #endif /* _TRACE_KVM_H */
->  
->  #undef TRACE_INCLUDE_PATH
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e5d5c5ed7dd4..afcdc75a99f2 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12371,3 +12371,4 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_enter);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_exit);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_enter);
->  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
-> +EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_snp_psc);
-> -- 
-> 2.17.1
-> 
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> -	strlcpy(drvinfo->driver, pdev->driver->name, sizeof(drvinfo->driver));
+> +	strlcpy(drvinfo->driver, dev_driver_string(&pdev->dev), sizeof(drvinfo->driver));
 
+I'd slightly prefer to maintain lines under 80 columns wide.
+But not nearly strongly enough to engage in a long debate about it.
+
+In any case, for the NFP portion of this patch.
+
+Acked-by: Simon Horman <simon.horman@corigine.com>
+
+>  	nfp_net_get_nspinfo(app, nsp_version);
+>  	snprintf(drvinfo->fw_version, sizeof(drvinfo->fw_version),
+>  		 "%s %s %s %s", vnic_version, nsp_version,
+
+...
