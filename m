@@ -2,146 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 545DBC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 13:57:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24819C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 14:02:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3DFD360041
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 13:57:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0877D610A2
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 14:02:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241104AbhI1N6y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Sep 2021 09:58:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44978 "EHLO
+        id S240986AbhI1OD6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Sep 2021 10:03:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241014AbhI1N6y (ORCPT
+        with ESMTP id S240962AbhI1OD5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Sep 2021 09:58:54 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2CFDC06161C
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Sep 2021 06:57:14 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mVDbZ-0006bj-Na; Tue, 28 Sep 2021 15:57:09 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mVDbU-00039U-I2; Tue, 28 Sep 2021 15:57:04 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mVDbU-0004fU-Gf; Tue, 28 Sep 2021 15:57:04 +0200
-Date:   Tue, 28 Sep 2021 15:57:04 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     Fiona Trahe <fiona.trahe@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        linux-pci@vger.kernel.org, qat-linux@intel.com,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        Jack Xu <jack.xu@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v4 6/8] crypto: qat - simplify adf_enable_aer()
-Message-ID: <20210928135704.oqyffwwt4lvmmlx3@pengutronix.de>
-References: <20210927204326.612555-1-uwe@kleine-koenig.org>
- <20210927204326.612555-7-uwe@kleine-koenig.org>
- <YVL4aoKjUT2kvHip@silpixa00400314>
- <20210928112637.kolit6fusme7g2qf@pengutronix.de>
+        Tue, 28 Sep 2021 10:03:57 -0400
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A319C06161C
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Sep 2021 07:02:18 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id r4so31941264ybp.4
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Sep 2021 07:02:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=rqQtIk/6RZp+oHtGBLpGghq9zf27UXMh7gjDqhWItOo=;
+        b=HqVIPg4A0tsJolcMNt2D5+uuLjf75KaCHkCr07E3YcgufntBlKo1+07kC0z/0YS/F4
+         hah88xjBDePVCPFuTVClSxTuhPhVOVJdfG9Ox9nFi/g30cuFRDugQs4+5quByhOu8mow
+         UJrJ+tq9Z53bY/YF0KE07hIAZEreZT4B8DeMV+47OkiBGIGgKWFGsGVYLwL8W/ApAyF3
+         HshGlV6RW50oaacQwrEBusuHbWpgqXPC1MpRznn/lGkNGBaHqK2kYc0LAaZWEJ8QsQm5
+         Y8TmtHB0wGWb6pOb6dpClyudlcfy45MAHy1UyIAIqHPT7xFEUv/NEEklgSv56AWrzMdy
+         PUoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=rqQtIk/6RZp+oHtGBLpGghq9zf27UXMh7gjDqhWItOo=;
+        b=3vzaDGmL6MtzAjrrAU7S9lI/DdmzU2DlElMTyF/oJpgLqMldSZF4HujcQLPY+4vbnN
+         uVpSuJnK2PQe9qmCNg2gpek4v3+X/+FpGYtdCfX6OSKiCIrobMXGY6izXJA8Nm0Oe+kz
+         WEtu1EU1nXkoDTKiMFy9QaERbQyAQdROuLHEZpRG9fM8RCDM5JoZuYpbBqUwRq+XFdF1
+         IKQpHML9oTiYDOU9KkEyhXVwm+jggXRNzJoByyMP0W5o1gnGXh93Sni3FIzcqV5+1uXy
+         LYMlNxTxak353KhnB6+smXJ3DWEKteVt4e7B/rF6tKZ7Qj0SMJJGRJAJZy5++K8Frysm
+         0ncw==
+X-Gm-Message-State: AOAM5324gISBuKE24gzZRSEmbE98NTCrETTUE85LLQavuH/5D5RpDSJz
+        06Jo0TbHhvOYZ28N6I1jca5ftWXQyzqlUnqCvh6O2w==
+X-Google-Smtp-Source: ABdhPJxcWNapNwbSMYpNuoLOZ/mFxsLh85WxLn5ZgLcnaaDmX2gfm0tqgls9grUv0gtjs4QFMD1DwqEBvGlihgmmXlo=
+X-Received: by 2002:a25:188b:: with SMTP id 133mr6630188yby.80.1632837737044;
+ Tue, 28 Sep 2021 07:02:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="apvqrcqw3egzs47r"
-Content-Disposition: inline
-In-Reply-To: <20210928112637.kolit6fusme7g2qf@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+References: <20210927121811.940899-1-arnd@kernel.org>
+In-Reply-To: <20210927121811.940899-1-arnd@kernel.org>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Tue, 28 Sep 2021 17:02:06 +0300
+Message-ID: <CAOtvUMfNYkfKw-Vji7uVWXO=CbwGLj6=+awCKif5=cPCK1P-cQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: ccree - avoid out-of-range warnings from clang
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        YueHaibing <yuehaibing@huawei.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi,
 
---apvqrcqw3egzs47r
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thank you Arnd.
 
-Hello,
+On Mon, Sep 27, 2021 at 3:18 PM Arnd Bergmann <arnd@kernel.org> wrote:
+>
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> clang points out inconsistencies in the FIELD_PREP() invocation in
+> this driver that result from the 'mask' being a 32-bit value:
+>
+> drivers/crypto/ccree/cc_driver.c:117:18: error: result of comparison of c=
+onstant 18446744073709551615 with expression of type 'u32' (aka 'unsigned i=
+nt') is always false [-Werror,-Wtautological-constant-out-of-range-compare]
+>         cache_params |=3D FIELD_PREP(mask, val);
+>                         ^~~~~~~~~~~~~~~~~~~~~
+> include/linux/bitfield.h:94:3: note: expanded from macro 'FIELD_PREP'
+>                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");    \
+>                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> include/linux/bitfield.h:52:28: note: expanded from macro '__BF_FIELD_CHE=
+CK'
+>                 BUILD_BUG_ON_MSG((_mask) > (typeof(_reg))~0ull,         \
+>                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> This does not happen in other places that just pass a constant here.
+>
+> Work around the warnings by widening the type of the temporary variable.
+>
+> Fixes: 05c2a705917b ("crypto: ccree - rework cache parameters handling")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-On Tue, Sep 28, 2021 at 01:26:37PM +0200, Uwe Kleine-K=C3=B6nig wrote:
-> On Tue, Sep 28, 2021 at 12:11:38PM +0100, Giovanni Cabiddu wrote:
-> > On Mon, Sep 27, 2021 at 10:43:24PM +0200, Uwe Kleine-K=C3=B6nig wrote:
-> > > From: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
-> > >=20
-> > > A struct pci_driver is supposed to be constant and assigning .err_han=
-dler
-> > > once per bound device isn't really sensible. Also as the function ret=
-urns
-> > > zero unconditionally let it return no value instead and simplify the
-> > > callers accordingly.
-> > >=20
-> > > As a side effect this removes one user of struct pci_dev::driver. This
-> > > member is planned to be removed.
-> > >=20
-> > > Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
-> > > ---
-> >=20
-> > this patch does not build.
-> >=20
-> > drivers/crypto/qat/qat_c3xxx/adf_drv.c:36:24: error: =E2=80=98adf_err_h=
-andler=E2=80=99 undeclared here (not in a function)
-> >    36 |         .err_handler =3D adf_err_handler,
-> >       |                        ^~~~~~~~~~~~~~~
-> > drivers/crypto/qat/qat_4xxx/adf_drv.c:303:24: error: =E2=80=98adf_err_h=
-andler=E2=80=99 undeclared here (not in a function)
-> >   303 |         .err_handler =3D adf_err_handler,
-> >       |                        ^~~~~~~~~~~~~~~
-> > drivers/crypto/qat/qat_c62x/adf_drv.c:36:24: error: =E2=80=98adf_err_ha=
-ndler=E2=80=99 undeclared here (not in a function)
-> >    36 |         .err_handler =3D adf_err_handler,
-> >       |                        ^~~~~~~~~~~~~~~
-> > drivers/crypto/qat/qat_dh895xcc/adf_drv.c:36:24: error: =E2=80=98adf_er=
-r_handler=E2=80=99 undeclared here (not in a function)
-> >    36 |         .err_handler =3D adf_err_handler,
-> >       |                        ^~~~~~~~~~~~~~~
-> > make[2]: *** [scripts/Makefile.build:277: drivers/crypto/qat/qat_c3xxx/=
-adf_drv.o] Error 1
->=20
-> Hmm, I thought that was one of the things I actually tested after
-> rebasing. Will recheck.
+Acked-by: Gilad ben-Yossef <gilad@benyossef.com>
 
-I fixed it now, comparing with your patch the only thing I did
-differently is ordering in the header file.
+Gilad
 
-I pushed the fixed series to
 
-	https://git.pengutronix.de/git/ukl/linux pci-dedup
-
-Thanks
-Uwe
 
 --=20
-Pengutronix e.K.                           | Uwe Kleine-K=C3=B6nig         =
-   |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+Gilad Ben-Yossef
+Chief Coffee Drinker
 
---apvqrcqw3egzs47r
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmFTHy0ACgkQwfwUeK3K
-7AkFrggAllDiubJuF+ASqh0qKozM8Cz38KFhLmvfAIndUs/P6V5ob4TlWSuAsmzj
-Bml1dlpDGTCEh0ocGFdDaT8RrptIrzwj7LJ9S3VRkuvL9OYlX8JG8HcKegYt8g44
-aYu0Zzb5pklbLRs3juFBZ5gnGOJ6IaaRdRbzF9yM31wQVqYaXLhRae65lFDXmasu
-JF8eJ9rMEIOL6io/WUM8OeocyE4clkw9XgSnrKBHeOAQZNsJoyQONkBkAN72pWeZ
-ZP+pJICLTaBcoPUvOALZ9cWnazKxPHxAYPaF5JZWZs8T+JzfjInDD4DwYFFGjyA+
-x2F7QAmL/BBslfeeDOu6BguemuYzQw==
-=qq0w
------END PGP SIGNATURE-----
-
---apvqrcqw3egzs47r--
+values of =CE=B2 will give rise to dom!
