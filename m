@@ -2,88 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1AEC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 20:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C852C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 21:04:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05A74611BD
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 20:08:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3273F611EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Sep 2021 21:04:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242586AbhI1UJx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Sep 2021 16:09:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39692 "EHLO mail.kernel.org"
+        id S242843AbhI1VFz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Sep 2021 17:05:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39130 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242120AbhI1UJx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Sep 2021 16:09:53 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 13EEA61157;
-        Tue, 28 Sep 2021 20:08:13 +0000 (UTC)
+        id S242829AbhI1VFy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Sep 2021 17:05:54 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DF94B6135D;
+        Tue, 28 Sep 2021 21:04:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632859693;
-        bh=2q54bLyOqMkKWDejBRp+5bRZfTrKTSWJcV2n/WM7O5I=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=SJlILrO3fJ9ue8UvYpapX4ojkALIQWP0IhyvgGUEnmc2bU4/eR9Oz1WHf91TFCvXA
-         +AvaFLotNIk6GNVMTzMiHUmE0SECnG/DaFsMeYfbeJ4HnUD4sgFtdp1R5TXABKq/V5
-         4Gltdrd5KbjraDvTp7Dojw2UaOlvPdW7DYea08nUCxmciYyaMtdgK79OJikk1fI3dS
-         IQxjaLHV0wfoBer0BAfg32is1dAvMuIslQlV94SxW032Uh3Itk0NL7NQX8SiKEicB1
-         kZRIFonoYbzHfn7L/mtYQNU1K3C/vNR3V9ujP6yh2gmx56PtY428rmLhwG6a55K51M
-         NJoYyJGhopiig==
-Date:   Tue, 28 Sep 2021 15:08:11 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        Russell Currey <ruscur@russell.cc>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
-        oss-drivers@corigine.com, Paul Mackerras <paulus@samba.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Ido Schimmel <idosch@nvidia.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Vadym Kochan <vkochan@marvell.com>, Michael Buesch <m@bues.ch>,
-        Jiri Pirko <jiri@nvidia.com>,
-        Salil Mehta <salil.mehta@huawei.com>, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        Simon Horman <simon.horman@corigine.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v4 4/8] PCI: replace pci_dev::driver usage that gets the
- driver name
-Message-ID: <20210928200811.GA724823@bhelgaas>
+        s=k20201202; t=1632863054;
+        bh=dx0ZpQGYPCR29OtNi20oDfVXROdfnahILA1jroXWLp4=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=pOKMzWaHmapYq1YuLdn+RCjcUg7fQ9E4Dl4GTjwC2dhMggB8eUCq8QlQx36upm4hH
+         SnA7CJ+5nFgf2CYkaeLTKAImpCoAvM5ddMBlvngiDusEaRWT3HLdOH1U5suzGgqXit
+         I+NAUgFQKt2SEST7bf6evK/aZWqRw2kgs2+SfPaNfbXKTKocYKA9xuxAfqqXxBGkea
+         3RoOPiIW/6rw4I8sSSawvZwflBJ81tc+/JrnIHSPSuxYE9yhdm4Trhgmxsg56WHBHO
+         S3f9mZkc9oQk3vqj9ilUNSVD+Aabhrb9K/rbf1SO4JqXLqlYPGP7Td7KBB5lJOI3k5
+         eQ2tdu8/dvoKA==
+Received: by mail-oi1-f172.google.com with SMTP id s69so111684oie.13;
+        Tue, 28 Sep 2021 14:04:14 -0700 (PDT)
+X-Gm-Message-State: AOAM531ofdOW8HSfWuk0K11JudaJmP9fYejDdGWvUHI9NOGYRwU1J9rM
+        1SIY9Nxjsy+fApRiIC1rJJrNfr72uI8gyItuSRs=
+X-Google-Smtp-Source: ABdhPJxdBxXgCipUNfiw/6xo0sHrKV/ePM1U43+cxcAchIYhk576pmL5yoJ6HFOq8FRbZ0qhXDy2Qw0TncI7+ViUGJU=
+X-Received: by 2002:a05:6808:1148:: with SMTP id u8mr5129711oiu.33.1632863054165;
+ Tue, 28 Sep 2021 14:04:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210928192936.w5umyzivi4hs6q3r@pengutronix.de>
+References: <20210923063027.166247-1-xiaokang.qian@arm.com> <YVK1u4BgVAa84fMa@sol.localdomain>
+In-Reply-To: <YVK1u4BgVAa84fMa@sol.localdomain>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 28 Sep 2021 23:04:03 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHeJBUAzcLHRNYDbbUDe5vRS7Bxy_LKF5gdRLJca7TNRQ@mail.gmail.com>
+Message-ID: <CAMj1kXHeJBUAzcLHRNYDbbUDe5vRS7Bxy_LKF5gdRLJca7TNRQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm64/gcm-ce - unroll factors to 4-way interleave
+ of aes and ghash
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     XiaokangQian <xiaokang.qian@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, nd <nd@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 28, 2021 at 09:29:36PM +0200, Uwe Kleine-König wrote:
-> On Tue, Sep 28, 2021 at 12:17:59PM -0500, Bjorn Helgaas wrote:
-> > [+to Oliver, Russell for eeh_driver_name() question below]
-> > 
-> > On Mon, Sep 27, 2021 at 10:43:22PM +0200, Uwe Kleine-König wrote:
-> > > From: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> > > 
-> > > struct pci_dev::driver holds (apart from a constant offset) the same
-> > > data as struct pci_dev::dev->driver. With the goal to remove struct
-> > > pci_dev::driver to get rid of data duplication replace getting the
-> > > driver name by dev_driver_string() which implicitly makes use of struct
-> > > pci_dev::dev->driver.
+On Tue, 28 Sept 2021 at 08:27, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Thu, Sep 23, 2021 at 06:30:25AM +0000, XiaokangQian wrote:
+> > To improve performance on cores with deep piplines such as A72,N1,
+> > implement gcm(aes) using a 4-way interleave of aes and ghash (totally
+> > 8 blocks in parallel), which can make full utilize of pipelines rather
+> > than the 4-way interleave we used currently. It can gain about 20% for
+> > big data sizes such that 8k.
+> >
+> > This is a complete new version of the GCM part of the combined GCM/GHASH
+> > driver, it will co-exist with the old driver, only serve for big data
+> > sizes. Instead of interleaving four invocations of AES where each chunk
+> > of 64 bytes is encrypted first and then ghashed, the new version uses a
+> > more coarse grained approach where a chunk of 64 bytes is encrypted and
+> > at the same time, one chunk of 64 bytes is ghashed (or ghashed and
+> > decrypted in the converse case).
+> >
+> > The table below compares the performance of the old driver and the new
+> > one on various micro-architectures and running in various modes with
+> > various data sizes.
+> >
+> >             |     AES-128       |     AES-192       |     AES-256       |
+> >      #bytes | 1024 | 1420 |  8k | 1024 | 1420 |  8k | 1024 | 1420 |  8k |
+> >      -------+------+------+-----+------+------+-----+------+------+-----+
+> >         A72 | 5.5% |  12% | 25% | 2.2% |  9.5%|  23%| -1%  |  6.7%| 19% |
+> >         A57 |-0.5% |  9.3%| 32% | -3%  |  6.3%|  26%| -6%  |  3.3%| 21% |
+> >         N1  | 0.4% |  7.6%|24.5%| -2%  |  5%  |  22%| -4%  |  2.7%| 20% |
+> >
+> > Signed-off-by: XiaokangQian <xiaokang.qian@arm.com>
+>
+> Does this pass the self-tests, including the fuzz tests which are enabled by
+> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
+>
 
-> > Also, would you mind using "pci_dev.driver" instead of
-> > "pci_dev::driver"?  AFAIK, the "::" operator is not actually part of
-> > C, so I think it's more confusing than useful.
-> 
-> pci_dev.driver doesn't work either in C because pci_dev is a type and
-> not a variable.
+Please test both little-endian and big-endian. (Note that you don't
+need a big-endian user space for this - the self tests are executed
+before the rootfs is mounted)
 
-Sure, "pci_dev.driver" is not strictly acceptable C unless you have a
-"struct pci_dev pci_dev", but it's pretty common.
+Also, you will have to rebase this onto the latest cryptodev tree,
+which carries some changes I made recently to this driver.
+
+Finally, I'd like to discuss whether we really need two separate
+drivers here. The 1k data point is not as relevant as the other ones,
+which show a worthwhile speedup for all micro architectures and data
+sizes (although I will give this a spin on TX2 myself when I have the
+chance)
+
+*If* we switch to this implementation completely, I would like to keep
+the improvement I added recently to the decrypt path to compare the
+tag using SIMD code, rather than copying it out and using memcmp().
+Could you look into adopting this for this version as well?
+
+-- 
+Ard.
