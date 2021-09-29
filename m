@@ -2,58 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB6E1C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 21:33:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A36B2C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 22:01:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA1B2613A6
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 21:33:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81478613CE
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 22:01:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346043AbhI2VfC (ORCPT
+        id S1345736AbhI2WCn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Sep 2021 17:35:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57004 "EHLO
+        Wed, 29 Sep 2021 18:02:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244721AbhI2VfC (ORCPT
+        with ESMTP id S1344190AbhI2WCn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Sep 2021 17:35:02 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A7FC061767
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Sep 2021 14:33:20 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id m3so16242686lfu.2
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Sep 2021 14:33:20 -0700 (PDT)
+        Wed, 29 Sep 2021 18:02:43 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B10C061768
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Sep 2021 15:01:01 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id g41so16690985lfv.1
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Sep 2021 15:01:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Db6sq5b/zoZ7Ckw0MsC3401ruyMn9GYqskLXtTDWY1U=;
-        b=YdD0IEPWfMh3400z3lZO/rXLrtkQdQQzT6E5rNYfIx/1o1+K+Sfq8GEGo2o9PK3SVa
-         6ODe3xygpnglVPfJK7LbN0wS38dxtDpecAWVPMXikimHtBJ6+YhqM650fFsJ4+zlyuU6
-         9LdRaIjGBfhkgktm2Zm1XsMhVMBMCExPjVbSkA2RfiB4vFvaKHbIN2Yfy4WmYZIsuTPO
-         t/CXw8yCyg+AjLGDWtdP023ISv/OzvDjJW0JDYwn17qtSF78jWMSGOVPzGSQJetv5aIO
-         KGaP4EhF/uc/epmRf4no4+MwopbE3RlK0tnZh6R9UZgx5fpSGZ5Lpd1gjB1ahUYuUFKz
-         ayaw==
+        bh=rdNmIzWKakz8cj8ZaSAXUzCuWcNLQWisf1ex7FteUGQ=;
+        b=PPso02+776dwkmm8ALWWPxWmz4nRQIbW7M1z8hqb2aLiBvFDgTMd6dJuCtG2yZYkHn
+         Pv4U4mB1oqeQ1BCe8bWDQcMM9m9cXLYQX+NHaz2cEBv+8QbrI46x75oB1M96CXDBw2ke
+         T2Fkkd8TaADsVCHdhEbfwnu3i4KbeWJRNQxmhCQE+7Yks/ariqPEtAMq/fJsoOORfSFs
+         FFITahN0QMQbLYGyNuVN+qYWj1aA9WjCn7FLW23q2L0C2hTwP9EYv/pNbKkFFFntCyWm
+         NZmt+iY3rbqIArYKTHaL1qbv1TiRyfQGRQFvqJ2jvv8LZ7RR732fuk2J3Eo8SG1LCqMM
+         x3Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Db6sq5b/zoZ7Ckw0MsC3401ruyMn9GYqskLXtTDWY1U=;
-        b=0+fj2+dtrTgpVkiXSwBh0Zpp/HL30GmOJnNuvX34o2t4G7E7lXgZlXNYKUictcTkvr
-         TZdHO+omZrNiHDo/8PMzWpyOzMbDbBcLwbM//5zr0rYXCJOHqzePZ/pClz/fL4yuXKJE
-         1w9uuFQE0fUfFAV4VFoa2d2rTj4IDmQ26376+5MCCp9yUIgGzPJxJ3ktTd0cjJ3pC+ss
-         te3g4QgEC+bT4bpzZQ3ZoPhC5aNLXNFymgUB3J5w8P7VTC7tPvLVwFnB4tCBUUA/kLJS
-         tYXNO9DfHKEPuxxm1LqdAhVcy/Od26GYVXKZdzuOvwFjl+PyGEI9g04+zHvaZv0EHpIm
-         sTww==
-X-Gm-Message-State: AOAM531Tppt2S7K9ovfJkQ20b+af2Opcn1YcZClgCgXPvH0zkQUXaRvp
-        RKh6rrdL7jQ7fXONgDV9Fcff8dDzLIrS53f9nfQAtA==
-X-Google-Smtp-Source: ABdhPJzhCoDwFynfAd1TEDbYhSvAM8Evozq3qMnqQMfeskozU8Jk++cf4vW2wdpliQwTatEGUSw7odWrZm7W1h6plVw=
-X-Received: by 2002:a05:651c:3c2:: with SMTP id f2mr2269532ljp.282.1632951198592;
- Wed, 29 Sep 2021 14:33:18 -0700 (PDT)
+        bh=rdNmIzWKakz8cj8ZaSAXUzCuWcNLQWisf1ex7FteUGQ=;
+        b=Zl10kHH1K7kZsTLpeoAM7S+UZ5UDUoMDKOGlwgVjQbQP3GvDe5XbcM8f93cM2LTgiT
+         /TPSIJ/XOY7HRLYRg7k4EninI00yFkOezN3M8cUIHSyM8y7RrP3ej+qjnYB8YHZW0A/f
+         cD46cP3jDC2sObOjcA2f9hs91PjGo2OqaV6iu0luVUvFCA58FdlgVSEY+zm/TnCubVor
+         ojs3MbGxAAIIp554QDV59mzzUh+qrPFQAVyRicufzPwH85Shv+FdxJsTbYhLRyB3/47i
+         Od2F3XgFTzYFSEg4FG7CDjgBFMed+qWXpd7CdhQ+z8H+1pFKa1xPEHv4ZEIWBVwLbjzE
+         nT+w==
+X-Gm-Message-State: AOAM531mCiNAPhpQ49y3+BbmcrIRP0CAs5pDTELR3enkI4K1XjRfamw8
+        NKa/8y4v1TTyWr3z9jtqK6ksbyU0gyHoN0y0F0bK/Q==
+X-Google-Smtp-Source: ABdhPJwQW5OAYUmzDfM22Rl2KwZk2gL0jM5bvoqIaiIHSm1+/37jQlqWK8lQcELmfm3xuQOYXQJVXtek/PNAEPMkpZM=
+X-Received: by 2002:a05:651c:3c2:: with SMTP id f2mr2386774ljp.282.1632952859387;
+ Wed, 29 Sep 2021 15:00:59 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-43-brijesh.singh@amd.com>
 In-Reply-To: <20210820155918.7518-43-brijesh.singh@amd.com>
 From:   Peter Gonda <pgonda@google.com>
-Date:   Wed, 29 Sep 2021 15:33:07 -0600
-Message-ID: <CAMkAt6rzFvscq46CKYrhcf3d8VCGzy3tiM_SycnDRr9gVwXOSA@mail.gmail.com>
+Date:   Wed, 29 Sep 2021 16:00:47 -0600
+Message-ID: <CAMkAt6rZOkLofBNQqfutryGjJ6Mp4wD4EKEOo=fD1gCcT81+=g@mail.gmail.com>
 Subject: Re: [PATCH Part2 v5 42/45] KVM: SVM: Provide support for
  SNP_GUEST_REQUEST NAE event
 To:     Brijesh Singh <brijesh.singh@amd.com>
@@ -317,6 +317,13 @@ On Fri, Aug 20, 2021 at 10:01 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
 > +
 > +       rc = snp_guest_ext_guest_request(&req, (unsigned long)sev->snp_certs_data,
 > +                                        &data_npages, &err);
+
+What's the point of caching the certs from the sev_device in the
+sev_info struct if the snp_guest_ext_guest_request() function always
+seems to re-copy the certs back into |sev->snp_certs_data| on every
+call? I am probably missing something.
+
+
 > +       if (rc) {
 > +               /*
 > +                * If buffer length is small then return the expected
@@ -366,11 +373,6 @@ On Fri, Aug 20, 2021 at 10:01 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
 > +               ret = 1;
 > +               break;
 > +       }
-
-Don't we need some sort of rate limiting here? Since the PSP is a
-shared resource that the host needs access to as well as other guests
-it seems a little dangerous to let the guest spam this interface.
-
 >         case SVM_VMGEXIT_UNSUPPORTED_EVENT:
 >                 vcpu_unimpl(vcpu,
 >                             "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
