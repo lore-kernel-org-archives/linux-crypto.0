@@ -2,104 +2,237 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF2EC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 08:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B87CEC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 08:54:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E2EE613D3
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 08:34:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6801613A6
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 08:54:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244477AbhI2Ig2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Sep 2021 04:36:28 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3887 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244595AbhI2Ig1 (ORCPT
+        id S244919AbhI2Izp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Sep 2021 04:55:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50522 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244927AbhI2Izg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Sep 2021 04:36:27 -0400
-Received: from fraeml744-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HK8jh2QFbz67Lyy;
-        Wed, 29 Sep 2021 16:31:36 +0800 (CST)
-Received: from lhreml719-chm.china.huawei.com (10.201.108.70) by
- fraeml744-chm.china.huawei.com (10.206.15.225) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Wed, 29 Sep 2021 10:34:43 +0200
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml719-chm.china.huawei.com (10.201.108.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Wed, 29 Sep 2021 09:34:43 +0100
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.008; Wed, 29 Sep 2021 09:34:43 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: RE: [PATCH v3 0/6] vfio/hisilicon: add acc live migration driver
-Thread-Topic: [PATCH v3 0/6] vfio/hisilicon: add acc live migration driver
-Thread-Index: AQHXqhcv8rGxctog9kC36bxSe2rONqu6Z2mAgABdanA=
-Date:   Wed, 29 Sep 2021 08:34:42 +0000
-Message-ID: <2e0c062947b044179603ab45989808ff@huawei.com>
-References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
- <BN9PR11MB5433DDA5FD4FC6C5EED62C278CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
-In-Reply-To: <BN9PR11MB5433DDA5FD4FC6C5EED62C278CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.81.239]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wed, 29 Sep 2021 04:55:36 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E0A4C06161C
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Sep 2021 01:53:55 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mVVL5-0001il-KW; Wed, 29 Sep 2021 10:53:19 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mVVL3-0004fs-JV; Wed, 29 Sep 2021 10:53:17 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mVVL3-0000R5-I0; Wed, 29 Sep 2021 10:53:17 +0200
+From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-pci@vger.kernel.org,
+        kernel@pengutronix.de,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
+        Marco Chiappero <marco.chiappero@intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        Jack Xu <jack.xu@intel.com>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v5 09/11] crypto: qat - simplify adf_enable_aer()
+Date:   Wed, 29 Sep 2021 10:53:04 +0200
+Message-Id: <20210929085306.2203850-10-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210929085306.2203850-1-u.kleine-koenig@pengutronix.de>
+References: <20210929085306.2203850-1-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+X-Patch-Hashes: v=1; h=sha256; i=woJ+XG24qLZpRfQYIhuIjBJ10HF9ai4yZDNEgvzBdKs=; m=43Bwh4bgNofseZy3pN98J/xw6T54xBXYb8+EgplqK/c=; p=e0ubWRxaTOxpVVmYaiPGXfH9Fp+aEsg5i7cfFIxLb4w=; g=75d910e3cf936fc2161d0c2f4f099378e2733742
+X-Patch-Sig: m=pgp; i=u.kleine-koenig@pengutronix.de; s=0x0D2511F322BFAB1C1580266BE2DCDD9132669BD6; b=iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmFUKV8ACgkQwfwUeK3K7AkBLQgAiMf lHjrsvdAs+vA2PbvtByAdocSgqQHHSsMjWUdd7oxcamF2iQ+atjNFDs7o0Qq3GH104ghMSLvgV9n5 igdrQMwiR8MJodQ/40sebxuhVUJK5ucx8xIEg0VdJZawEoAaEmSR5OqHgZJk3wMZw8f4tJiEqoVOL wrlajTg3FjP9s/vyzsebuBBpRptaxBXL/sob3XdZ0GCG2Jrze+kz6xHC/zqNwlkXLdv80ytfnMTYN 4kqc0m7dylgnpAP0dt8ZK05veLL3YVBab8RES5AsNt0EW2Fekq+79Qxm0O76a7C6UwBhLnVXkw6OD vylu5lZjBa1dSkEaocJCvh0OHH8dM7g==
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGkgS2V2aW4sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogVGlhbiwg
-S2V2aW4gW21haWx0bzprZXZpbi50aWFuQGludGVsLmNvbV0NCj4gU2VudDogMjkgU2VwdGVtYmVy
-IDIwMjEgMDQ6NTgNCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGku
-a29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT47DQo+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4
-LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmcN
-Cj4gQ2M6IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBqZ2dAbnZpZGlhLmNvbTsgbWd1cnRv
-dm95QG52aWRpYS5jb207DQo+IExpbnV4YXJtIDxsaW51eGFybUBodWF3ZWkuY29tPjsgbGl1bG9u
-Z2ZhbmcgPGxpdWxvbmdmYW5nQGh1YXdlaS5jb20+Ow0KPiBaZW5ndGFvIChCKSA8cHJpbWUuemVu
-Z0BoaXNpbGljb24uY29tPjsgSm9uYXRoYW4gQ2FtZXJvbg0KPiA8am9uYXRoYW4uY2FtZXJvbkBo
-dWF3ZWkuY29tPjsgV2FuZ3pob3UgKEIpDQo+IDx3YW5nemhvdTFAaGlzaWxpY29uLmNvbT47IEhl
-LCBTaGFvcGVuZyA8c2hhb3BlbmcuaGVAaW50ZWwuY29tPjsgWmhhbywNCj4gWWFuIFkgPHlhbi55
-LnpoYW9AaW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSRTogW1BBVENIIHYzIDAvNl0gdmZpby9oaXNp
-bGljb246IGFkZCBhY2MgbGl2ZSBtaWdyYXRpb24gZHJpdmVyDQo+IA0KPiBIaSwgU2hhbWVlciwN
-Cj4gDQo+ID4gRnJvbTogU2hhbWVlciBLb2xvdGh1bSA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9k
-aUBodWF3ZWkuY29tPg0KPiA+IFNlbnQ6IFdlZG5lc2RheSwgU2VwdGVtYmVyIDE1LCAyMDIxIDU6
-NTEgUE0NCj4gPg0KPiA+IEhpLA0KPiA+DQo+ID4gVGhhbmtzIHRvIHRoZSBpbnRyb2R1Y3Rpb24g
-b2YgdmZpb19wY2lfY29yZSBzdWJzeXN0ZW0gZnJhbWV3b3JrWzBdLA0KPiA+IG5vdyBpdCBpcyBw
-b3NzaWJsZSB0byBwcm92aWRlIHZlbmRvciBzcGVjaWZpYyBmdW5jdGlvbmFsaXR5IHRvDQo+ID4g
-dmZpbyBwY2kgZGV2aWNlcy4gVGhpcyBzZXJpZXMgYXR0ZW1wdHMgdG8gYWRkIHZmaW8gbGl2ZSBt
-aWdyYXRpb24NCj4gPiBzdXBwb3J0IGZvciBIaVNpbGljb24gQUNDIFZGIGRldmljZXMgYmFzZWQg
-b24gdGhlIG5ldyBmcmFtZXdvcmsuDQo+ID4NCj4gPiBIaVNpbGljb24gQUNDIFZGIGRldmljZSBN
-TUlPIHNwYWNlIGluY2x1ZGVzIGJvdGggdGhlIGZ1bmN0aW9uYWwNCj4gPiByZWdpc3RlciBzcGFj
-ZSBhbmQgbWlncmF0aW9uIGNvbnRyb2wgcmVnaXN0ZXIgc3BhY2UuIEFzIGRpc2N1c3NlZA0KPiA+
-IGluIFJGQ3YxWzFdLCB0aGlzIG1heSBjcmVhdGUgc2VjdXJpdHkgaXNzdWVzIGFzIHRoZXNlIHJl
-Z2lvbnMgZ2V0DQo+ID4gc2hhcmVkIGJldHdlZW4gdGhlIEd1ZXN0IGRyaXZlciBhbmQgdGhlIG1p
-Z3JhdGlvbiBkcml2ZXIuDQo+ID4gQmFzZWQgb24gdGhlIGZlZWRiYWNrLCB3ZSB0cmllZCB0byBh
-ZGRyZXNzIHRob3NlIGNvbmNlcm5zIGluDQo+ID4gdGhpcyB2ZXJzaW9uLg0KPiANCj4gVGhpcyBz
-ZXJpZXMgZG9lc24ndCBtZW50aW9uIGFueXRoaW5nIHJlbGF0ZWQgdG8gZGlydHkgcGFnZSB0cmFj
-a2luZy4NCj4gQXJlIHlvdSByZWx5IG9uIEtlcWlhbidzIHNlcmllcyBmb3IgdXRpbGl6aW5nIGhh
-cmR3YXJlIGlvbW11IGRpcnR5DQo+IGJpdCAoZS5nLiBTTU1VIEhUVFUpPyANCg0KWWVzLCB0aGlz
-IGRvZXNuJ3QgaGF2ZSBkaXJ0eSBwYWdlIHRyYWNraW5nIGFuZCB0aGUgcGxhbiBpcyB0byBtYWtl
-IHVzZSBvZg0KS2VxaWFuJ3MgU01NVSBIVFRVIHdvcmsgdG8gaW1wcm92ZSBwZXJmb3JtYW5jZS4g
-V2UgaGF2ZSBkb25lIGJhc2ljDQpzYW5pdHkgdGVzdGluZyB3aXRoIHRob3NlIHBhdGNoZXMuICAN
-Cg0KVGhhbmtzLA0KU2hhbWVlcg0KDQpJZiBub3QsIHN1cHBvc2Ugc29tZSBzb2Z0d2FyZSB0cmlj
-ayBpcyBzdGlsbA0KPiByZXF1aXJlZCBlLmcuIGJ5IGR5bmFtaWNhbGx5IG1lZGlhdGluZyBndWVz
-dC1zdWJtaXR0ZWQgZGVzY3JpcHRvcnMNCj4gdG8gY29tcG9zZSB0aGUgZGlydHkgcGFnZSBpbmZv
-cm1hdGlvbiBpbiB0aGUgbWlncmF0aW9uIHBoYXNlLi4uDQo+IA0KPiBUaGFua3MNCj4gS2V2aW4N
-Cg==
+A struct pci_driver is supposed to be constant and assigning .err_handler
+once per bound device isn't really sensible. Also as the function returns
+zero unconditionally let it return no value instead and simplify the
+callers accordingly.
+
+As a side effect this removes one user of struct pci_dev::driver. This
+member is planned to be removed.
+
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ drivers/crypto/qat/qat_4xxx/adf_drv.c          |  7 ++-----
+ drivers/crypto/qat/qat_c3xxx/adf_drv.c         |  7 ++-----
+ drivers/crypto/qat/qat_c62x/adf_drv.c          |  7 ++-----
+ drivers/crypto/qat/qat_common/adf_aer.c        | 10 +++-------
+ drivers/crypto/qat/qat_common/adf_common_drv.h |  3 ++-
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c      |  7 ++-----
+ 6 files changed, 13 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+index 359fb7989dfb..71ef065914b2 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+@@ -247,11 +247,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	pci_set_master(pdev);
+ 
+-	if (adf_enable_aer(accel_dev)) {
+-		dev_err(&pdev->dev, "Failed to enable aer.\n");
+-		ret = -EFAULT;
+-		goto out_err;
+-	}
++	adf_enable_aer(accel_dev);
+ 
+ 	if (pci_save_state(pdev)) {
+ 		dev_err(&pdev->dev, "Failed to save pci state.\n");
+@@ -304,6 +300,7 @@ static struct pci_driver adf_driver = {
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
+ 	.sriov_configure = adf_sriov_configure,
++	.err_handler = &adf_err_handler,
+ };
+ 
+ module_pci_driver(adf_driver);
+diff --git a/drivers/crypto/qat/qat_c3xxx/adf_drv.c b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
+index cc6e75dc60de..2aef0bb791df 100644
+--- a/drivers/crypto/qat/qat_c3xxx/adf_drv.c
++++ b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
+@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
+ 	.sriov_configure = adf_sriov_configure,
++	.err_handler = &adf_err_handler,
+ };
+ 
+ static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
+@@ -192,11 +193,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	}
+ 	pci_set_master(pdev);
+ 
+-	if (adf_enable_aer(accel_dev)) {
+-		dev_err(&pdev->dev, "Failed to enable aer\n");
+-		ret = -EFAULT;
+-		goto out_err_free_reg;
+-	}
++	adf_enable_aer(accel_dev);
+ 
+ 	if (pci_save_state(pdev)) {
+ 		dev_err(&pdev->dev, "Failed to save pci state\n");
+diff --git a/drivers/crypto/qat/qat_c62x/adf_drv.c b/drivers/crypto/qat/qat_c62x/adf_drv.c
+index bf251dfe74b3..56163083f161 100644
+--- a/drivers/crypto/qat/qat_c62x/adf_drv.c
++++ b/drivers/crypto/qat/qat_c62x/adf_drv.c
+@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
+ 	.sriov_configure = adf_sriov_configure,
++	.err_handler = &adf_err_handler,
+ };
+ 
+ static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
+@@ -192,11 +193,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	}
+ 	pci_set_master(pdev);
+ 
+-	if (adf_enable_aer(accel_dev)) {
+-		dev_err(&pdev->dev, "Failed to enable aer\n");
+-		ret = -EFAULT;
+-		goto out_err_free_reg;
+-	}
++	adf_enable_aer(accel_dev);
+ 
+ 	if (pci_save_state(pdev)) {
+ 		dev_err(&pdev->dev, "Failed to save pci state\n");
+diff --git a/drivers/crypto/qat/qat_common/adf_aer.c b/drivers/crypto/qat/qat_common/adf_aer.c
+index ed3e40bc56eb..fe9bb2f3536a 100644
+--- a/drivers/crypto/qat/qat_common/adf_aer.c
++++ b/drivers/crypto/qat/qat_common/adf_aer.c
+@@ -166,11 +166,12 @@ static void adf_resume(struct pci_dev *pdev)
+ 	dev_info(&pdev->dev, "Device is up and running\n");
+ }
+ 
+-static const struct pci_error_handlers adf_err_handler = {
++const struct pci_error_handlers adf_err_handler = {
+ 	.error_detected = adf_error_detected,
+ 	.slot_reset = adf_slot_reset,
+ 	.resume = adf_resume,
+ };
++EXPORT_SYMBOL_GPL(adf_err_handler);
+ 
+ /**
+  * adf_enable_aer() - Enable Advance Error Reporting for acceleration device
+@@ -179,17 +180,12 @@ static const struct pci_error_handlers adf_err_handler = {
+  * Function enables PCI Advance Error Reporting for the
+  * QAT acceleration device accel_dev.
+  * To be used by QAT device specific drivers.
+- *
+- * Return: 0 on success, error code otherwise.
+  */
+-int adf_enable_aer(struct adf_accel_dev *accel_dev)
++void adf_enable_aer(struct adf_accel_dev *accel_dev)
+ {
+ 	struct pci_dev *pdev = accel_to_pci_dev(accel_dev);
+-	struct pci_driver *pdrv = pdev->driver;
+ 
+-	pdrv->err_handler = &adf_err_handler;
+ 	pci_enable_pcie_error_reporting(pdev);
+-	return 0;
+ }
+ EXPORT_SYMBOL_GPL(adf_enable_aer);
+ 
+diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
+index 4261749fae8d..e4c24be212ff 100644
+--- a/drivers/crypto/qat/qat_common/adf_common_drv.h
++++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
+@@ -95,7 +95,8 @@ void adf_ae_fw_release(struct adf_accel_dev *accel_dev);
+ int adf_ae_start(struct adf_accel_dev *accel_dev);
+ int adf_ae_stop(struct adf_accel_dev *accel_dev);
+ 
+-int adf_enable_aer(struct adf_accel_dev *accel_dev);
++extern const struct pci_error_handlers adf_err_handler;
++void adf_enable_aer(struct adf_accel_dev *accel_dev);
+ void adf_disable_aer(struct adf_accel_dev *accel_dev);
+ void adf_reset_sbr(struct adf_accel_dev *accel_dev);
+ void adf_reset_flr(struct adf_accel_dev *accel_dev);
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+index 3976a81bd99b..acca56752aa0 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
+ 	.sriov_configure = adf_sriov_configure,
++	.err_handler = &adf_err_handler,
+ };
+ 
+ static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
+@@ -192,11 +193,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	}
+ 	pci_set_master(pdev);
+ 
+-	if (adf_enable_aer(accel_dev)) {
+-		dev_err(&pdev->dev, "Failed to enable aer\n");
+-		ret = -EFAULT;
+-		goto out_err_free_reg;
+-	}
++	adf_enable_aer(accel_dev);
+ 
+ 	if (pci_save_state(pdev)) {
+ 		dev_err(&pdev->dev, "Failed to save pci state\n");
+-- 
+2.30.2
+
