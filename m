@@ -2,195 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4788C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 09:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12D2BC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 09:06:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99883613D3
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 09:04:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5D04613A6
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 09:06:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244985AbhI2JGZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Sep 2021 05:06:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53006 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244957AbhI2JGY (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Sep 2021 05:06:24 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18C0CC06161C
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Sep 2021 02:04:43 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mVVVX-0003JP-91; Wed, 29 Sep 2021 11:04:07 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mVVVS-0004kK-3w; Wed, 29 Sep 2021 11:04:02 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mVVVS-0000V5-1n; Wed, 29 Sep 2021 11:04:02 +0200
-Date:   Wed, 29 Sep 2021 11:04:01 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Simon Horman <simon.horman@corigine.com>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        oss-drivers@corigine.com, Paul Mackerras <paulus@samba.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Ido Schimmel <idosch@nvidia.com>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>, linux-pci@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>,
-        Vadym Kochan <vkochan@marvell.com>, Michael Buesch <m@bues.ch>,
-        Jiri Pirko <jiri@nvidia.com>,
-        Salil Mehta <salil.mehta@huawei.com>, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        Oliver O'Halloran <oohall@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v4 4/8] PCI: replace pci_dev::driver usage that gets the
- driver name
-Message-ID: <20210929090401.qvpjng3jne76o6kw@pengutronix.de>
-References: <20210927204326.612555-1-uwe@kleine-koenig.org>
- <20210927204326.612555-5-uwe@kleine-koenig.org>
- <20210928100127.GA16801@corigine.com>
- <20210928103129.c3gcbnfbarezr3mm@pengutronix.de>
- <20210929080541.GA13506@corigine.com>
+        id S244922AbhI2JHk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Sep 2021 05:07:40 -0400
+Received: from mga14.intel.com ([192.55.52.115]:49956 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S244800AbhI2JHj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Sep 2021 05:07:39 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10121"; a="224552114"
+X-IronPort-AV: E=Sophos;i="5.85,331,1624345200"; 
+   d="scan'208";a="224552114"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2021 02:05:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,331,1624345200"; 
+   d="scan'208";a="707191996"
+Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
+  by fmsmga006.fm.intel.com with ESMTP; 29 Sep 2021 02:05:58 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Wed, 29 Sep 2021 02:05:57 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12 via Frontend Transport; Wed, 29 Sep 2021 02:05:57 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.107)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.12; Wed, 29 Sep 2021 02:05:57 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RfTvrgMMee8mGv8rZ0VtTp9FbJuDOLlX6+rotyAaKscgTwZSGI5gkeW06ncS4Nf4MJT4S2/aFJakSXyn91NKuS3kxiBmzrXZ6gw9h2nwU+2j0Cl5uqYS5zbgOPPPig6Mfm7rPmGabrmL5icvAMi7ZVMT9x7Mx0RzR1UDjzMbVLQG+eal7xqYdb29K3b/3kegNMd4/RiM0TmZ59KvJdFTlddD8QnGJ8S9kVwasuZVgJgPWVEuyjsh3E7gsVtIWcIiFKPuFBOc0sejTiQVGH76cnQqxEFgatJQRSu5G0hHuoDnqO+3bHg6Xd0QBLY7mt8+2EU+wU7ediZ9RKKQvzjTlw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=C4CqakT9oowe1htYtN8YnRLBmfqNH3bb+X686bytfBc=;
+ b=oOLtSVJfpNKLZ67sPpivTaU3LePW95vh9mrxVV6i4/eVXefzZQhUYO6tRpw6Lp/yeobwwHuQh9aBfyyU2LaP4aGXxsWjJbjHgRldvOStU2yFMMmIi/oucL+Ztj/K7Vfmsi/E0Zkre5M9DLAZAx13XMDA0nKj9H7ZpGMM1WfVyHPauOFyPkpfs9e72JFQ7h6Twy7OHt0FtRMDa2cGEuNPsjpTX3sSfosF4BvFbszU9hqKX9MYUX5WUH2lPpZ3W/EdTCL5I6K2Ak6Z62C91np7hZ79ByGVl6Wj/7BTV/hX4WWF+J698kYxd77X0/Vmv0qvqfSl48ERKgZOMUqOdshpdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C4CqakT9oowe1htYtN8YnRLBmfqNH3bb+X686bytfBc=;
+ b=MUl/J555lfDVTHuyLcudoRGux5Hs3TUfvrt5ldCniD+nCfVvYWd0U81GEwB3gU7DKxIRaljQCyIzH4Cy+2bbHltMbWZKf/pFw6wQT4HzKTwUtXnSh+q3QeVrm8yhxZG8Y26Xzf3pRlpa5L5ycsvq95O8bejbfILYJy7Y35URGBM=
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
+ by BN9PR11MB5417.namprd11.prod.outlook.com (2603:10b6:408:11e::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.14; Wed, 29 Sep
+ 2021 09:05:54 +0000
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ddb7:fa7f:2cc:45df]) by BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ddb7:fa7f:2cc:45df%8]) with mapi id 15.20.4544.021; Wed, 29 Sep 2021
+ 09:05:54 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Subject: RE: [PATCH v3 0/6] vfio/hisilicon: add acc live migration driver
+Thread-Topic: [PATCH v3 0/6] vfio/hisilicon: add acc live migration driver
+Thread-Index: AQHXqhc5lUNcPisp4UyTMpTu0c9BsKu6db8wgABPxQCAAAa9IA==
+Date:   Wed, 29 Sep 2021 09:05:54 +0000
+Message-ID: <BN9PR11MB54338A0821C061FEE018F43E8CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
+References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
+ <BN9PR11MB5433DDA5FD4FC6C5EED62C278CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <2e0c062947b044179603ab45989808ff@huawei.com>
+In-Reply-To: <2e0c062947b044179603ab45989808ff@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: huawei.com; dkim=none (message not signed)
+ header.d=none;huawei.com; dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: bf1777d7-6160-4aa2-66db-08d9832857dc
+x-ms-traffictypediagnostic: BN9PR11MB5417:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BN9PR11MB5417FD51AF558E667E9DE9DD8CA99@BN9PR11MB5417.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Lm5HTaLNMmUe+hUXnZ3Ki9SMqdZhc5l787+l5OSQuKq8gWYX3U9tcZgUZ6LeweaUh4UosWyuF8DFfrGIpzOl1m6Y/l9hVoacx3MGn1+k5QSO4XeOldUKq5Xa8h537OmKEep1HJ+ns5nQgqvJzE+2s3SZ3ky0sWj3N1uXicN/SGT5lFgBUNtwAIp+uiqIfunBBa8asz/KDLYkCxpWlWy5bGRxFzgJbEF8YFb1w6Jv30Wr70czjVpz2Nab3K3dF0fHKQIrSXvYD8wS3ovx9+VjMyg+YRGNyiW48MGI8VlqiuVZOOpGLN9XDiQjr6g6MfkVzgmCwcLQvOPcQNTxZR9uFqyTZH07dEXH6d3xDWHnGR5NnzxWMYWOtCfZOpsm+PcDfCOdEcHMY46OL4qFRhZfclOEof8PnyTpwNNt2mERycBn0CRI6r6dHPMnvnGwO/4sNe/mpp1cyOWZIWeY/g8ZbpQru/u6pG/l7BfZTWX8esgzaiI/pxE2hlM/MhVQxxsfATrNktnEjEDggGVBKv3xvmEwukBaLCa73CuXdjsVVISLP7dWghwfqQ24t0tQM7u1RtFwVhP6PJkOqAp1Q6ock6rKEUISNN9jCfz7hNvjpGxfEIiuXHU8TA4MUcNsAXVEObmOKurxstrGYhT7vcLzuylS8M1W9JfI1ac4tuib9yXMlOK3y0MFXFGe4+IDcO4ExUrJ7tFZbgBk1pBxHM6a+g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(4326008)(8936002)(8676002)(64756008)(7416002)(186003)(52536014)(122000001)(38070700005)(71200400001)(38100700002)(86362001)(66446008)(66556008)(66946007)(33656002)(76116006)(66476007)(83380400001)(55016002)(6506007)(110136005)(26005)(7696005)(54906003)(2906002)(316002)(107886003)(508600001)(9686003)(5660300002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?L2NiS3ZjOGtGbTlYVDJ4T01MYXdCMDdZSC83VU1udDB0ZU55UFRyNCsybWNt?=
+ =?utf-8?B?WlNwdnFLS3FzUEhaNXF0R2VwQU5Fd2M2YlRyZlVhSk1WQmRUWENMRUQrdmpT?=
+ =?utf-8?B?T245MGFZMXUxUWRGR0JEYXZJbEtQeDVqNGdFblhSVmk2aUFBdms3UDA5TC9s?=
+ =?utf-8?B?Q1ZjbnU5TmtZak9vamFjUDMrUFF4V2RhQkNZdW1yN0pZZFhVOVFObUJhY2d2?=
+ =?utf-8?B?R0RDdVAwek9EWE9FNkJKSFBDdzNkajVVSXRKdXBZT2svSkZ2aWFVTlVmVUZp?=
+ =?utf-8?B?KzNMTTlmRnc1V2ovVjJ6bnpXK3lFMVBBNlkwZE5MbXM0THNmVm5ndDh0MXZY?=
+ =?utf-8?B?M1lkWGpHYjFWT2c3cHVRYzloRWdMRWtpSDBhQmRiamZBUWl6K2RaRm9kdUFS?=
+ =?utf-8?B?L203MlVzWGNQRTJuZEg4T21GYVc1czBreE5tbjI1clh6WXlCMjZub3E1aDVD?=
+ =?utf-8?B?U3lvWXB6MjJMNWhxSmVzeTMvck1PU3lBYW9jdzVUWWE5M2J5MEFHY1BYQnR2?=
+ =?utf-8?B?Q3lyMmMxZTB1TEN2dnhGeUQyR2dveUJSV1YwRnE4UmxYaHJvVE42T3Z6Mko3?=
+ =?utf-8?B?dy90aVU0bThPazI3aG5BNWRHbHJJSDl6TDNBSVY2QkxZYU5mSTB1ZTkwZlhx?=
+ =?utf-8?B?U2ZqQmliaExiMG9BOEF3TGdsdVVNYnhSbWVqTmRFWVJZK01tTHUwdDlHRTRL?=
+ =?utf-8?B?N1pSaFpqRjg3d3J1UC9Ha09yZVNxV1l5d1dIZzh5WUFGZ0lIZmF1UGg4Vmxt?=
+ =?utf-8?B?SHI5WEgyam5tcEdLMHp0YWpJcFhwemYramxpSzd2OFV5eUgzZUFpN2JNNG5D?=
+ =?utf-8?B?cGtXclZUaVhtWW41ZXZZMTJ2T09SWmdMdTlmYmdiZXowVVd1TkRYK3k1V0Zp?=
+ =?utf-8?B?eGxtVjFta2pUakNMdkV1dUV1Zk90c05DeDlNM0NPZ29Ga1d6WElobFNzK3JT?=
+ =?utf-8?B?QWtHNm00anlmbkNBNmNrOUw0VGgycjhjVG5IQm5TUnJnc1BlYnJoQ3AzU3Ni?=
+ =?utf-8?B?TzdzbzZiM09JY2xsWDFKM3pNbjU4cHpWT1FQaFMya3pocDdFTDFaUWprRjZK?=
+ =?utf-8?B?U2JueUt3VitORDRZMHFpWlMzYnlRWVhWUHpRQk1HTEZXZWxWcjJ1Z2pIOUpV?=
+ =?utf-8?B?RXNTT0NMeFlibGxWei9haytGblJVejVaeElmUWhab1U3Qno3RDgxcll0b1hC?=
+ =?utf-8?B?TWF1ZDZFWlpMZjFNMWErVEVNd00yZWVaMlZKVjV5NkltQnJldmIzK3RjUCtw?=
+ =?utf-8?B?Q1YrRXVQRko2QXBrRVdQR2ZLbGpoQUxLUlZYWCtGZ1hJQ3F0VVQyelIxWmNE?=
+ =?utf-8?B?UytlVmxYNENwdTJ4VzEySWlUNGptckx2K0NUcHRCdkJaeGxrcEhLZGZSUERW?=
+ =?utf-8?B?dHFIVXR4aWZHd1RvTTRDM0VOQ3VzcDJRSmhJSmpnNUt2NHhKT3hhd1NaT1J5?=
+ =?utf-8?B?eEtqbVNwV0NQVmdkMXVPRVJUNldjK2FwdWV2NjNuUUxTMTZvWmRGdkZlQlJY?=
+ =?utf-8?B?V3FtemxaZHp0ZUtiUHNPelc0NzJDYituck1nTTJScXhiMHg1T21VWEZnWDRI?=
+ =?utf-8?B?RmlMR2ZKYnBUM0VaWEF3azc5TitFWXhqV2d4dHlVUHJQS3RUOFBoa0ZPazF4?=
+ =?utf-8?B?WmRoYkY0Q1JzR1ViR1N4Tmg0dzVjRFRwSzhRSXBXeWswMHhmSC96V05WQzRO?=
+ =?utf-8?B?M2hzT0ZHTUZjbGw0UXI4UE80ZWlTaFg3VWthOVVvWjJaMzcyZTFhVlVkNEN5?=
+ =?utf-8?Q?xBLlsCxe/Kv+sd5ZN6JzQGPGZX1tvoPWPCIx9dq?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="ey4ikhdxthigr5cx"
-Content-Disposition: inline
-In-Reply-To: <20210929080541.GA13506@corigine.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf1777d7-6160-4aa2-66db-08d9832857dc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Sep 2021 09:05:54.4742
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jAC3T2jkEp6ktWqxLhx7r+DvGkDL22md3L/1llG1+2Q7JbGhOTluzS3NHaJMav8PThyGrou7bPDWKoruX7OBlg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5417
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
---ey4ikhdxthigr5cx
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hello Simon,
-
-On Wed, Sep 29, 2021 at 10:05:42AM +0200, Simon Horman wrote:
-> On Tue, Sep 28, 2021 at 12:31:29PM +0200, Uwe Kleine-K=F6nig wrote:
-> > On Tue, Sep 28, 2021 at 12:01:28PM +0200, Simon Horman wrote:
-> > > On Mon, Sep 27, 2021 at 10:43:22PM +0200, Uwe Kleine-K=F6nig wrote:
-> > > > From: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
-> > > >=20
-> > > > struct pci_dev::driver holds (apart from a constant offset) the same
-> > > > data as struct pci_dev::dev->driver. With the goal to remove struct
-> > > > pci_dev::driver to get rid of data duplication replace getting the
-> > > > driver name by dev_driver_string() which implicitly makes use of st=
-ruct
-> > > > pci_dev::dev->driver.
-> > > >=20
-> > > > Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
-> > >=20
-> > > ...
-> > >=20
-> > > > diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c b=
-/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
-> > > > index 0685ece1f155..23dfb599c828 100644
-> > > > --- a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
-> > > > +++ b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
-> > > > @@ -202,7 +202,7 @@ nfp_get_drvinfo(struct nfp_app *app, struct pci=
-_dev *pdev,
-> > > >  {
-> > > >  	char nsp_version[ETHTOOL_FWVERS_LEN] =3D {};
-> > > > =20
-> > > > -	strlcpy(drvinfo->driver, pdev->driver->name, sizeof(drvinfo->driv=
-er));
-> > > > +	strlcpy(drvinfo->driver, dev_driver_string(&pdev->dev), sizeof(dr=
-vinfo->driver));
-> > >=20
-> > > I'd slightly prefer to maintain lines under 80 columns wide.
-> > > But not nearly strongly enough to engage in a long debate about it.
-> >=20
-> > :-)
-> >=20
-> > Looking at the output of
-> >=20
-> > 	git grep strlcpy.\*sizeof
-> >=20
-> > I wonder if it would be sensible to introduce something like
-> >=20
-> > 	#define strlcpy_array(arr, src) (strlcpy(arr, src, sizeof(arr)) + __mu=
-st_be_array(arr))
-> >=20
-> > but not sure this is possible without a long debate either (and this
-> > line is over 80 chars wide, too :-).
->=20
-> My main motivation for the 80 char limit in nfp_net_ethtool.c is
-> not that I think 80 char is universally a good limit (although that is tr=
-ue),
-> but rather that I expect that is the prevailing style in nfp_net_ethtool.=
-c.
-
-I sent out v5 with an additional line break now.
-=20
-> So a macro more than 80 car wide somewhere else is fine by me.
->=20
-> However, when running checkpatch --strict over the patch it told me:
->=20
->     WARNING: Prefer strscpy over strlcpy - see: https://lore.kernel.org/r=
-/CAHk-=3DwgfRnXz0W3D37d01q3JFkr_i_uTL=3DV6A6G1oUZcprmknw@mail.gmail.com/
->     #276: FILE: drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c:205:
->     +	strlcpy(drvinfo->driver, dev_driver_string(&pdev->dev), sizeof(drvi=
-nfo->driver));
->=20
->     total: 0 errors, 1 warnings, 0 checks, 80 lines checked
->=20
-> (Amusingly, more text wider than 80 column, perhaps suggesting the folly =
-of
->  my original comment, but lets move on from that.)
->=20
-> As your patch doesn't introduce the usage of strlcpy() I was considering a
-> follow-up patch to change it to strscpy(). And in general the email at the
-> link above suggests all usages of strlcpy() should do so. So perhaps
-> creating strscpy_array is a better idea?
-
-What I read about strscpy() is that conversions for the sake of the
-conversion are not welcome. When such a conversion comes from someone
-involved with the driver that is also tested this is probably fine.
-=20
-> I have not thought about this much, and probably this just leads us to a
-> deeper part of the rabbit hole.
-
-I assume so, too.
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---ey4ikhdxthigr5cx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmFUK/8ACgkQwfwUeK3K
-7AlkTwf/dkfubvexEL8hKb2Rh3bCdHj1QQgkHxBsDLSNCo4lhj+H8iJlt8IyS3H8
-+XjgTjDp2XDrOSbFVQug/BYE5Wk94BoOdy/6cprREtPJZ4oI3QgdaaikCtG1CdwW
-KzFBUgIiRQlfUsxTM/xz9zGA40xpfydtliziKS7R4Kwn1dqfSB0Cl3hm97kC5DEA
-O42j5CvC58tvuAmEV02PSFRtt8xMb20mgqTN43Q9kzPHM2ziW4g0R9U999fyNqmT
-0vHgrGgXXdRc5+VU3Jd1ZCnrTVzWJMpaKoOCzGZVBO47gcB/7/mH6iFzMVACIYKV
-f5p890vGJmfiOE9WD2VDNGj7w2NU/A==
-=vlM1
------END PGP SIGNATURE-----
-
---ey4ikhdxthigr5cx--
+PiBGcm9tOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpDQo+IDxzaGFtZWVyYWxpLmtvbG90aHVt
+LnRob2RpQGh1YXdlaS5jb20+DQo+IA0KPiBIaSBLZXZpbiwNCj4gDQo+ID4gRnJvbTogVGlhbiwg
+S2V2aW4gW21haWx0bzprZXZpbi50aWFuQGludGVsLmNvbV0NCj4gPiBTZW50OiAyOSBTZXB0ZW1i
+ZXIgMjAyMSAwNDo1OA0KPiA+DQo+ID4gSGksIFNoYW1lZXIsDQo+ID4NCj4gPiA+IEZyb206IFNo
+YW1lZXIgS29sb3RodW0gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT4NCj4g
+PiA+IFNlbnQ6IFdlZG5lc2RheSwgU2VwdGVtYmVyIDE1LCAyMDIxIDU6NTEgUE0NCj4gPiA+DQo+
+ID4gPiBIaSwNCj4gPiA+DQo+ID4gPiBUaGFua3MgdG8gdGhlIGludHJvZHVjdGlvbiBvZiB2Zmlv
+X3BjaV9jb3JlIHN1YnN5c3RlbSBmcmFtZXdvcmtbMF0sDQo+ID4gPiBub3cgaXQgaXMgcG9zc2li
+bGUgdG8gcHJvdmlkZSB2ZW5kb3Igc3BlY2lmaWMgZnVuY3Rpb25hbGl0eSB0bw0KPiA+ID4gdmZp
+byBwY2kgZGV2aWNlcy4gVGhpcyBzZXJpZXMgYXR0ZW1wdHMgdG8gYWRkIHZmaW8gbGl2ZSBtaWdy
+YXRpb24NCj4gPiA+IHN1cHBvcnQgZm9yIEhpU2lsaWNvbiBBQ0MgVkYgZGV2aWNlcyBiYXNlZCBv
+biB0aGUgbmV3IGZyYW1ld29yay4NCj4gPiA+DQo+ID4gPiBIaVNpbGljb24gQUNDIFZGIGRldmlj
+ZSBNTUlPIHNwYWNlIGluY2x1ZGVzIGJvdGggdGhlIGZ1bmN0aW9uYWwNCj4gPiA+IHJlZ2lzdGVy
+IHNwYWNlIGFuZCBtaWdyYXRpb24gY29udHJvbCByZWdpc3RlciBzcGFjZS4gQXMgZGlzY3Vzc2Vk
+DQo+ID4gPiBpbiBSRkN2MVsxXSwgdGhpcyBtYXkgY3JlYXRlIHNlY3VyaXR5IGlzc3VlcyBhcyB0
+aGVzZSByZWdpb25zIGdldA0KPiA+ID4gc2hhcmVkIGJldHdlZW4gdGhlIEd1ZXN0IGRyaXZlciBh
+bmQgdGhlIG1pZ3JhdGlvbiBkcml2ZXIuDQo+ID4gPiBCYXNlZCBvbiB0aGUgZmVlZGJhY2ssIHdl
+IHRyaWVkIHRvIGFkZHJlc3MgdGhvc2UgY29uY2VybnMgaW4NCj4gPiA+IHRoaXMgdmVyc2lvbi4N
+Cj4gPg0KPiA+IFRoaXMgc2VyaWVzIGRvZXNuJ3QgbWVudGlvbiBhbnl0aGluZyByZWxhdGVkIHRv
+IGRpcnR5IHBhZ2UgdHJhY2tpbmcuDQo+ID4gQXJlIHlvdSByZWx5IG9uIEtlcWlhbidzIHNlcmll
+cyBmb3IgdXRpbGl6aW5nIGhhcmR3YXJlIGlvbW11IGRpcnR5DQo+ID4gYml0IChlLmcuIFNNTVUg
+SFRUVSk/DQo+IA0KPiBZZXMsIHRoaXMgZG9lc24ndCBoYXZlIGRpcnR5IHBhZ2UgdHJhY2tpbmcg
+YW5kIHRoZSBwbGFuIGlzIHRvIG1ha2UgdXNlIG9mDQo+IEtlcWlhbidzIFNNTVUgSFRUVSB3b3Jr
+IHRvIGltcHJvdmUgcGVyZm9ybWFuY2UuIFdlIGhhdmUgZG9uZSBiYXNpYw0KPiBzYW5pdHkgdGVz
+dGluZyB3aXRoIHRob3NlIHBhdGNoZXMuDQo+IA0KDQpEbyB5b3UgcGxhbiB0byBzdXBwb3J0IG1p
+Z3JhdGlvbiB3L28gSFRUVSBhcyB0aGUgZmFsbGJhY2sgb3B0aW9uPyANCkdlbmVyYWxseSBvbmUg
+d291bGQgZXhwZWN0IHRoZSBiYXNpYyBmdW5jdGlvbmFsaXR5IHJlYWR5IGJlZm9yZSB0YWxraW5n
+DQphYm91dCBvcHRpbWl6YXRpb24uDQoNCklmIG5vdCwgaG93IGRvZXMgdXNlcnNwYWNlIGtub3cg
+dGhhdCBtaWdyYXRpb24gb2YgYSBnaXZlbiBkZXZpY2UgY2FuIA0KYmUgYWxsb3dlZCBvbmx5IHdo
+ZW4gdGhlIGlvbW11IHN1cHBvcnRzIGhhcmR3YXJlIGRpcnR5IGJpdD8NCg0KVGhhbmtzDQpLZXZp
+bg0K
