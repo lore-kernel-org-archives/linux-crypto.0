@@ -2,164 +2,374 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFA1C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 10:17:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8B5C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 10:37:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 357076135E
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 10:17:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F5446136A
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 10:37:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245458AbhI2KTQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Sep 2021 06:19:16 -0400
-Received: from mail-mw2nam12on2102.outbound.protection.outlook.com ([40.107.244.102]:53985
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S245493AbhI2KS4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Sep 2021 06:18:56 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JHy/HzQLyC5taefBYnRzN5CDLHLEC4wub233PE0dS1csKDdTD4m2aL1yKAk3g0zuyMANYBlldPH62u8gtTUaYskZurrFwcaxXgSjX24iCgJA9/aS863o72TOaVZnoLx9qCKZbzfftBtKqKPv3daDituA18wSfV+hfRIGcjds5r+LzLt43MrI1Xo93gX1YnanWn0SA/MW/qdjm5HiLWdIBk9zvY5fmWFOSlQwisy7tDBawdVGiaY8mz47Us4q6x114ekWSzG9mMKt1usAhJi1n5uf/dKLYHTW7WDi9NSq0QWizeJsNfzEmcsWHs6o9rneV2E0NUI45TpMVgRtJIRw3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jyqPAoKXGoqzpWfcWDQA0QwX4xHbYvKVNyPoyY7h72Q=;
- b=kWg++jg03mMjgRVM+vPlBgD4sjtUMfAwIUJq0JiHvTjQrZssLStA7SHHtCEnWcbyLhIv/6YTMK78xFHR2S/a+GccKEzislngQCzRPuH5AzfMUiB6YC9Aa4gx1ptEWymt18cHCpkapUGDQ0GfjE/RK97znUrmQm2JbPkjl3tNnrjL939lGiaN8efR5SxvEy3YQxzMditmCZGVYm3ROWiTtkPzamLWHGISGtSEG85etwxDAkD3MbhUzTMlNzVrs5/SLBdCZfoE6mpc3nf+n4A2Q2bUJAUd870q/33NKzocn0BVgVg1xpERqj1Ti/NnZNvMsbRnqezmmgr8jD0U5UGnGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jyqPAoKXGoqzpWfcWDQA0QwX4xHbYvKVNyPoyY7h72Q=;
- b=AseZ8Y/f5Q3D2JFsjs3t/qCuRdo5v/ugyaDugSgCGc+6LamTeHB8Cn22eypA3E9Ofe+Pqyu3UNuavFNsLvCXDoA8QB7W98ExunO4ljSq40qYYkVJNgfREtVLQC0Rophu80VzjYLpUjinQQahAkGuDNdt7lg2CsfClvVbR3ivysU=
-Authentication-Results: pengutronix.de; dkim=none (message not signed)
- header.d=none;pengutronix.de; dmarc=none action=none
- header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH0PR13MB4794.namprd13.prod.outlook.com (2603:10b6:510:96::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.8; Wed, 29 Sep
- 2021 10:17:13 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::e1d9:64d0:cb4f:3e90]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::e1d9:64d0:cb4f:3e90%9]) with mapi id 15.20.4566.014; Wed, 29 Sep 2021
- 10:17:13 +0000
-Date:   Wed, 29 Sep 2021 12:17:03 +0200
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        linux-pci@vger.kernel.org, kernel@pengutronix.de,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
+        id S232437AbhI2Kja (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Sep 2021 06:39:30 -0400
+Received: from mail-wr1-f51.google.com ([209.85.221.51]:37514 "EHLO
+        mail-wr1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244380AbhI2Kja (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Sep 2021 06:39:30 -0400
+Received: by mail-wr1-f51.google.com with SMTP id t8so3435725wrq.4
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Sep 2021 03:37:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tEMZqytGXB4USe2l8lsoioRLICGN+lttPpy3xljjIG4=;
+        b=R+AtkNdDSBWo1OXUGPqJMd3I420HOv1FmW58SzYCSjl00/w4X7zosBn/+Bs/aQtObL
+         K9O4tkVT0nue8QZpVfzOZkrY602p1O8/h5D2fRrK1RVlk8Y9WbRVqi+ej/edCYR64h9v
+         67i2h1cDkMSd+Ih1kLOleMTPfqv8gZK9bYlrP5q6Ekyn/LMXi8CDMvyPmnq8xVhqDeSI
+         13HsRl796FcUdo7paKE9D3rq0+QQlENc5hL6FS5cqqFIkiIkYMvGwl9+tROKbWEG+w+M
+         jgPd+g3ajfnajo+xFgiETNrWQf8Z1uqvVxIh8w84ZYdxdmF4Dn6+ujuaIcuNFAASLN6N
+         dznA==
+X-Gm-Message-State: AOAM5312YPIJL4tPmNK8oeYG7HgtTd+gJC4lubD9Ys7lnUKASB5NWZ1W
+        gTwlQYCr7B08RlSXfs5g4Zv9fhUs02Y=
+X-Google-Smtp-Source: ABdhPJxl5pIuTD9H+wxizFMRdGGhI+zzeM5W1asFMQ+0AaLVNesulMMGg7aSItj3E1bKHuktrSpFDw==
+X-Received: by 2002:a05:6000:188d:: with SMTP id a13mr5922553wri.103.1632911868415;
+        Wed, 29 Sep 2021 03:37:48 -0700 (PDT)
+Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id d8sm1972637wrv.80.2021.09.29.03.37.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Sep 2021 03:37:47 -0700 (PDT)
+Subject: Re: [PATCH 10/12] nvmet: Implement basic In-Band Authentication
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Vadym Kochan <vkochan@marvell.com>,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Jiri Pirko <jiri@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-        Michael Buesch <m@bues.ch>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, oss-drivers@corigine.com
-Subject: Re: [PATCH v5 07/11] PCI: Replace pci_dev::driver usage that gets
- the driver name
-Message-ID: <20210929101702.GD13506@corigine.com>
-References: <20210929085306.2203850-1-u.kleine-koenig@pengutronix.de>
- <20210929085306.2203850-8-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210929085306.2203850-8-u.kleine-koenig@pengutronix.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-ClientProxiedBy: AM0PR08CA0026.eurprd08.prod.outlook.com
- (2603:10a6:208:d2::39) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        "David S . Miller" <davem@davemloft.net>,
+        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
+References: <20210928060356.27338-1-hare@suse.de>
+ <20210928060356.27338-11-hare@suse.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <d8827017-f8a7-c1fc-1950-8ac6c5997103@grimberg.me>
+Date:   Wed, 29 Sep 2021 13:37:46 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Received: from corigine.com (2001:982:7ed1:403:201:8eff:fe22:8fea) by AM0PR08CA0026.eurprd08.prod.outlook.com (2603:10a6:208:d2::39) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.14 via Frontend Transport; Wed, 29 Sep 2021 10:17:08 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ae53e499-2baf-4888-966a-08d983324dec
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4794:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <PH0PR13MB4794052F35552891F4D9EA28E8A99@PH0PR13MB4794.namprd13.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:751;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2woKV4HKG64SPX5X09IWvfN9MJjcMKLiccyCSNNbpi5SXBR80DUgmbO3bcGUkNgQsWYyUK7aFq4caJKLKe+uohhUdK+4SsDPipTF1dG9UlV5xiqAHuC2s51WZiYCjvl053pSjl2OcoA66YdXS5gJStSr+TGo/unGtQJ5gOAWxp6PwBLd1IuLW12QwYEbzsUitqUYISrWOdhps+dqK5DqpiqJWQ8+VkRc9L+7p3TMJ2V6hB+tsVSo3zJrJ2/abO4nKuOHi1rX6c0yrn2u7vB+MwRFCWLnnkRR5Kde7tfGCWTdgYyKX+kDsHB3tSsRnFHzbGg7n6j50mDYK92eQsrXFASzJoD7L1QyLpRG/5kIBbqpnBTkOhPPrsBW3tReAgbWunAq8NqJzv8fSLFjjWA7jZr29qRGaI7anpj81ZDZmsiw4yuqJsAdbHdjxHCNh9NPV1wiedg2hmjtIY/D9oygroAgrH7a5ssAdlE5QVK4QBMc57NKKpzA066Hrl2zLbZkCUY86X8Vae7o4bU19hQ6TOWSdWwy1v7CIykDA4U5li8kbzNxKwb9FMgLv3CnyZXqGGoZmjwr41SMu+2YG11sC+dxQHoPjbHbIA4ZCyrMyv0R+DsYJcFsLn4N4c7AJs7Em1/mLdZZ0KAMVIa4PozoRg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(136003)(396003)(39830400003)(366004)(376002)(33656002)(186003)(36756003)(6916009)(44832011)(508600001)(86362001)(38100700002)(5660300002)(8886007)(55016002)(8936002)(52116002)(316002)(83380400001)(7696005)(54906003)(8676002)(2616005)(66556008)(4326008)(6666004)(66476007)(2906002)(66946007)(107886003)(4744005)(1076003)(7416002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Yi9ObWFiUzV6bDdYOFpDMEFXc3Bncm53U3F0M2JWYnNrQWFQZGpXWkhkbkxo?=
- =?utf-8?B?Y3JsUUpDeGczcHQxMGFwSXloMUtOWGRMQzhUd1p2WTVqK1NucmVRblFvSGVx?=
- =?utf-8?B?cmN2RnVJaGVqWjVFYmhnT1FROHUvcmg0OW5OZUFzZ1JRVjlvTGRkOTlCZzUw?=
- =?utf-8?B?Y3VoMDJSQk1pSngwekQvYTE2TlJpclRwWXBoSmFqbXllRzNDS0xHK2VTMEhM?=
- =?utf-8?B?QkZzMTQrV2tJQm1SWjBOc0FKYm5VTW15S1UwcVZyRTBrT0lzS3h0ejE0eDhY?=
- =?utf-8?B?ZndSb3pEMndUL21NSEt4cmg5V1N4WlhzVHc0RlM0clNHRFBiam1GQTREZkRt?=
- =?utf-8?B?R3NmVWtGaXgrTmZ3T2RLbGpobU9uVHhPT0ozY0xIR2VKN3NzWUpSbFJONjhK?=
- =?utf-8?B?V0dIR21lWkZZemJ4RlE3OEY0NkJGbi94L1ZKdVZ2MUNxUm5vZGRZelVVMHdB?=
- =?utf-8?B?RlNkeWZCVVNKMTZ2QTlYOTA5bE9zcVNYcmRIM3hkd00vTWRrWHZJc1QxMlRX?=
- =?utf-8?B?YTVKMmtIUzBnTDl3NDVSVDdGNW15eWNENEVGMWlnNlU4cVd1aGtDT0lLK1l2?=
- =?utf-8?B?ei9oRHkwWVFwYWYxbUZGN2VoZERDMk5zWTZsOXRSTUQrY1ZMeFRqamNWS2ZB?=
- =?utf-8?B?c09nc2hnYjdSbWI5NUlVWUlJK2czd1BncjFibEliOVhuNXRWS3FzMURPaW5s?=
- =?utf-8?B?eFgzZXdTdm9DMWc4T2phaHQyMVVVN3VHaFZVNjZHZ0p2bjhwakZSWHVNRkVP?=
- =?utf-8?B?UlVHT29SZHNPa3hPVFQrRjZzVXY2RXhncE1LSXBqOE9xUWROZnRBQndjMWor?=
- =?utf-8?B?MVB0UVZqN1BTZjZTVG1LYXVMVGRRc3QzVmdsQ1hFZFAwWjR0NFFMNGlBRWE4?=
- =?utf-8?B?SXF1eVNCem91WGpKTExHSlQyREQzRnJjcmJaYnNoOVkrL2d2ZDVYdjJ6M25w?=
- =?utf-8?B?ODBTbTNZZzRsbVZyTlY3NUl4dklHeGhMK1cwWURzQmMxbXprd29EaEx5TGRP?=
- =?utf-8?B?TWlZM2F3NGd6L2ZHSUhkdFlwQktYVk1NeThRM2h2OVdKc3Z3SFlOQ0d2d1Fk?=
- =?utf-8?B?TzBhaldlbVp6TlVSNzJwaDhZSjZXUXpPL2xneG1GcHczRXM4WXJZM08zZHBa?=
- =?utf-8?B?NDdsb3B6ekxxc0ZTZ1ZpN21URk04NnpVTEpPVVBocmtQUzM2a1VHS3cwZURX?=
- =?utf-8?B?MGVFdFg3M0JJR2prcFprMVVqUk1WQTE5OEYwTjdiZlNLZGZkaDQ5THdXMmc5?=
- =?utf-8?B?TW5ZSXpOK2doV2xSZVkrS2c3bmdrSndUT09aMWpUYWErZno1S0w5RHZ2ZWNN?=
- =?utf-8?B?NmQzbThxYXlKOE15aGt5b0pyVGExdEFpdU8vYy9oazBRTTZzdllTUUdsSDJu?=
- =?utf-8?B?OVZBN0t2Mkg0eC9hd0hsdFA3cUdvSUxCVXVlWmx4ZDN6dkRtNWpET2ltaXJI?=
- =?utf-8?B?bldpbVBFRC9kNmloOVlGVmMxQmF0MUFneFFzZXpZWXpzZndoNm0vZTRESkMx?=
- =?utf-8?B?dUZlRzQxZjFFQm9Xcy8vQ3ZzZEFSQzJtNVY5MjF5WUhNOVRlR3MyMng4MHI5?=
- =?utf-8?B?VUtRTFVpQUtHaUY5L2ZZMml5aFM4c292NjVsc2JsMitsZlk0bDZZejF4SDlU?=
- =?utf-8?B?WFkySkJKUjJrbnpsR2RhdFgrM1JQOTR0aDBNT3VZbFkzY1hxT0dOVmh4QUpD?=
- =?utf-8?B?Zy8yRkZLYjEvREJjS3dZWm54TDVmZktCR2ZkMWR6L1lWQk5LcUltdG5wT3g2?=
- =?utf-8?B?UE9Bamhha1dUTFg5bDBGakVWbGI5T3A4M2lHMnYwLzNPM2pxOU9ZRVc5OFpN?=
- =?utf-8?B?eVRRR2xMaHFtcXBLL0c3ZFgwaTJRb3RHTVNwc0o0d2h6RGtQdk5LK2FGbFYz?=
- =?utf-8?Q?H62UPyy2H8Shc?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ae53e499-2baf-4888-966a-08d983324dec
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2021 10:17:13.1546
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 83M4CGyBYqSrVCFUH5E4wuUsm79KJB3+U8Y+LE+7kTxGcmB6HjBddsjB4+LvLnNP36y2wZZYatZg89+LHLjQkk+cPcB2ykuOEbbZDTiAbHo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB4794
+In-Reply-To: <20210928060356.27338-11-hare@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 10:53:02AM +0200, Uwe Kleine-König wrote:
-> struct pci_dev::driver holds (apart from a constant offset) the same
-> data as struct pci_dev::dev->driver. With the goal to remove struct
-> pci_dev::driver to get rid of data duplication replace getting the
-> driver name by dev_driver_string() which implicitly makes use of struct
-> pci_dev::dev->driver.
+
+
+On 9/28/21 9:03 AM, Hannes Reinecke wrote:
+> Implement NVMe-oF In-Band authentication according to NVMe TPAR 8006.
+> This patch adds three additional configfs entries 'dhchap_key', 'dhchap_ctrl_key',
+> and 'dhchap_hash' to the 'host' configfs directory. The 'dhchap_key' and
+> 'dhchap_ctrl_key' entries need to be in the ASCII format as specified in
+> NVMe Base Specification v2.0 section 8.13.5.8 'Secret representation'.
+> 'dhchap_hash' defaults to 'hmac(sha256)', and can be changed to switch to
+> a different HMAC algorithm.
 > 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
 > ---
->  drivers/crypto/hisilicon/qm.c                        | 2 +-
->  drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c   | 2 +-
->  drivers/net/ethernet/marvell/prestera/prestera_pci.c | 2 +-
->  drivers/net/ethernet/mellanox/mlxsw/pci.c            | 2 +-
->  drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c | 3 ++-
->  5 files changed, 6 insertions(+), 5 deletions(-)
+>   drivers/nvme/target/Kconfig            |  11 +
+>   drivers/nvme/target/Makefile           |   1 +
+>   drivers/nvme/target/admin-cmd.c        |   4 +
+>   drivers/nvme/target/auth.c             | 345 ++++++++++++++++++
+>   drivers/nvme/target/configfs.c         | 102 +++++-
+>   drivers/nvme/target/core.c             |   8 +
+>   drivers/nvme/target/fabrics-cmd-auth.c | 466 +++++++++++++++++++++++++
+>   drivers/nvme/target/fabrics-cmd.c      |  30 +-
+>   drivers/nvme/target/nvmet.h            |  67 ++++
+>   9 files changed, 1031 insertions(+), 3 deletions(-)
+>   create mode 100644 drivers/nvme/target/auth.c
+>   create mode 100644 drivers/nvme/target/fabrics-cmd-auth.c
+> 
+> diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
+> index 973561c93888..70f3c385fc9f 100644
+> --- a/drivers/nvme/target/Kconfig
+> +++ b/drivers/nvme/target/Kconfig
+> @@ -83,3 +83,14 @@ config NVME_TARGET_TCP
+>   	  devices over TCP.
+>   
+>   	  If unsure, say N.
+> +
+> +config NVME_TARGET_AUTH
+> +	bool "NVMe over Fabrics In-band Authentication support"
+> +	depends on NVME_TARGET
+> +	select CRYPTO_HMAC
+> +	select CRYPTO_SHA256
+> +	select CRYPTO_SHA512
+> +	help
+> +	  This enables support for NVMe over Fabrics In-band Authentication
+> +
+> +	  If unsure, say N.
+> diff --git a/drivers/nvme/target/Makefile b/drivers/nvme/target/Makefile
+> index 9837e580fa7e..c66820102493 100644
+> --- a/drivers/nvme/target/Makefile
+> +++ b/drivers/nvme/target/Makefile
+> @@ -13,6 +13,7 @@ nvmet-y		+= core.o configfs.o admin-cmd.o fabrics-cmd.o \
+>   			discovery.o io-cmd-file.o io-cmd-bdev.o
+>   nvmet-$(CONFIG_NVME_TARGET_PASSTHRU)	+= passthru.o
+>   nvmet-$(CONFIG_BLK_DEV_ZONED)		+= zns.o
+> +nvmet-$(CONFIG_NVME_TARGET_AUTH)	+= fabrics-cmd-auth.o auth.o
+>   nvme-loop-y	+= loop.o
+>   nvmet-rdma-y	+= rdma.o
+>   nvmet-fc-y	+= fc.o
+> diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
+> index aa6d84d8848e..868d65c869cd 100644
+> --- a/drivers/nvme/target/admin-cmd.c
+> +++ b/drivers/nvme/target/admin-cmd.c
+> @@ -1008,6 +1008,10 @@ u16 nvmet_parse_admin_cmd(struct nvmet_req *req)
+>   
+>   	if (nvme_is_fabrics(cmd))
+>   		return nvmet_parse_fabrics_cmd(req);
+> +
+> +	if (unlikely(!nvmet_check_auth_status(req)))
+> +		return NVME_SC_AUTH_REQUIRED | NVME_SC_DNR;
+> +
+>   	if (nvmet_req_subsys(req)->type == NVME_NQN_DISC)
+>   		return nvmet_parse_discovery_cmd(req);
+>   
+> diff --git a/drivers/nvme/target/auth.c b/drivers/nvme/target/auth.c
+> new file mode 100644
+> index 000000000000..7247a7b97644
+> --- /dev/null
+> +++ b/drivers/nvme/target/auth.c
+> @@ -0,0 +1,345 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * NVMe over Fabrics DH-HMAC-CHAP authentication.
+> + * Copyright (c) 2020 Hannes Reinecke, SUSE Software Solutions.
+> + * All rights reserved.
+> + */
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +#include <linux/module.h>
+> +#include <linux/init.h>
+> +#include <linux/slab.h>
+> +#include <linux/err.h>
+> +#include <crypto/hash.h>
+> +#include <linux/crc32.h>
+> +#include <linux/base64.h>
+> +#include <linux/ctype.h>
+> +#include <linux/random.h>
+> +#include <asm/unaligned.h>
+> +
+> +#include "nvmet.h"
+> +#include "../host/auth.h"
+> +
+> +int nvmet_auth_set_host_key(struct nvmet_host *host, const char *secret)
+> +{
+> +	if (sscanf(secret, "DHHC-1:%hhd:%*s", &host->dhchap_key_hash) != 1)
+> +		return -EINVAL;
+> +	if (host->dhchap_key_hash > 3) {
+> +		pr_warn("Invalid DH-HMAC-CHAP hash id %d\n",
+> +			 host->dhchap_key_hash);
+> +		return -EINVAL;
+> +	}
+> +	if (host->dhchap_key_hash > 0) {
+> +		/* Validate selected hash algorithm */
+> +		const char *hmac = nvme_auth_hmac_name(host->dhchap_key_hash);
+> +
+> +		if (!crypto_has_shash(hmac, 0, 0)) {
+> +			pr_err("DH-HMAC-CHAP hash %s unsupported\n", hmac);
+> +			host->dhchap_key_hash = -1;
+> +			return -ENOTSUPP;
+> +		}
+> +		/* Use this hash as default */
+> +		if (!host->dhchap_hash_id)
+> +			host->dhchap_hash_id = host->dhchap_key_hash;
+> +	}
+> +	host->dhchap_secret = kstrdup(secret, GFP_KERNEL);
+> +	if (!host->dhchap_secret)
+> +		return -ENOMEM;
+> +	/* Default to SHA256 */
+> +	if (!host->dhchap_hash_id)
+> +		host->dhchap_hash_id = NVME_AUTH_DHCHAP_SHA256;
+> +
+> +	pr_debug("Using hash %s\n",
+> +		 nvme_auth_hmac_name(host->dhchap_hash_id));
+> +	return 0;
+> +}
+> +
+> +int nvmet_auth_set_ctrl_key(struct nvmet_host *host, const char *secret)
+> +{
+> +	unsigned char dhchap_key_hash;
+> +
+> +	if (sscanf(secret, "DHHC-1:%hhd:%*s", &dhchap_key_hash) != 1)
+> +		return -EINVAL;
+> +	if (dhchap_key_hash > 3) {
+> +		pr_warn("Invalid DH-HMAC-CHAP hash id %d\n",
+> +			 dhchap_key_hash);
+> +		return -EINVAL;
+> +	}
+> +	if (dhchap_key_hash > 0) {
+> +		/* Validate selected hash algorithm */
+> +		const char *hmac = nvme_auth_hmac_name(dhchap_key_hash);
+> +
+> +		if (!crypto_has_shash(hmac, 0, 0)) {
+> +			pr_err("DH-HMAC-CHAP hash %s unsupported\n", hmac);
+> +			return -ENOTSUPP;
+> +		}
+> +	}
+> +	host->dhchap_ctrl_secret = kstrdup(secret, GFP_KERNEL);
+> +	return host->dhchap_ctrl_secret ? 0 : -ENOMEM;
+> +}
+> +
+> +int nvmet_setup_auth(struct nvmet_ctrl *ctrl)
+> +{
+> +	int ret = 0;
+> +	struct nvmet_host_link *p;
+> +	struct nvmet_host *host = NULL;
+> +	const char *hash_name;
+> +
+> +	down_read(&nvmet_config_sem);
+> +	if (ctrl->subsys->type == NVME_NQN_DISC)
+> +		goto out_unlock;
+> +
+> +	if (ctrl->subsys->allow_any_host)
+> +		goto out_unlock;
+> +
+> +	list_for_each_entry(p, &ctrl->subsys->hosts, entry) {
+> +		pr_debug("check %s\n", nvmet_host_name(p->host));
+> +		if (strcmp(nvmet_host_name(p->host), ctrl->hostnqn))
+> +			continue;
+> +		host = p->host;
+> +		break;
+> +	}
+> +	if (!host) {
+> +		pr_debug("host %s not found\n", ctrl->hostnqn);
+> +		ret = -EPERM;
+> +		goto out_unlock;
+> +	}
+> +	if (!host->dhchap_secret) {
+> +		pr_debug("No authentication provided\n");
+> +		goto out_unlock;
+> +	}
+> +
+> +	if (ctrl->shash_tfm) {
+> +		if (host->dhchap_hash_id == ctrl->shash_id) {
+> +			pr_debug("Re-use existing hash ID %d\n",
+> +				 ctrl->shash_id);
+> +			goto out_unlock;
+> +		}
+> +		crypto_free_shash(ctrl->shash_tfm);
+> +		ctrl->shash_tfm = NULL;
+> +	}
+> +
+> +	hash_name = nvme_auth_hmac_name(host->dhchap_hash_id);
+> +	if (!hash_name) {
+> +		pr_warn("Hash ID %d invalid\n", host->dhchap_hash_id);
+> +		ret = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +	ctrl->shash_tfm = crypto_alloc_shash(hash_name, 0,
+> +					     CRYPTO_ALG_ALLOCATES_MEMORY);
+> +	if (IS_ERR(ctrl->shash_tfm)) {
+> +		pr_err("failed to allocate shash %s\n", hash_name);
+> +		ret = PTR_ERR(ctrl->shash_tfm);
+> +		ctrl->shash_tfm = NULL;
+> +		goto out_unlock;
+> +	}
+> +	ctrl->shash_id = host->dhchap_hash_id;
+> +
+> +	/* Skip the 'DHHC-1:XX:' prefix */
+> +	ctrl->dhchap_key = nvme_auth_extract_secret(host->dhchap_secret + 10,
+> +						    &ctrl->dhchap_key_len);
+> +	if (IS_ERR(ctrl->dhchap_key)) {
+> +		ret = PTR_ERR(ctrl->dhchap_key);
+> +		pr_debug("failed to extract host key, error %d\n", ret);
+> +		ctrl->dhchap_key = NULL;
+> +		goto out_free_hash;
+> +	}
+> +	pr_debug("%s: using key %*ph\n", __func__,
+> +		 (int)ctrl->dhchap_key_len, ctrl->dhchap_key);
+> +
+> +	if (!host->dhchap_ctrl_secret)
+> +		goto out_unlock;
+> +
+> +	ctrl->dhchap_ctrl_key = nvme_auth_extract_secret(host->dhchap_ctrl_secret + 10,
+> +							 &ctrl->dhchap_ctrl_key_len);
+> +	if (IS_ERR(ctrl->dhchap_ctrl_key)) {
+> +		ret = PTR_ERR(ctrl->dhchap_ctrl_key);
+> +		pr_debug("failed to extract ctrl key, error %d\n", ret);
+> +		ctrl->dhchap_ctrl_key = NULL;
+> +	}
+> +
+> +out_free_hash:
+> +	if (ret) {
+> +		if (ctrl->dhchap_key) {
+> +			kfree_sensitive(ctrl->dhchap_key);
+> +			ctrl->dhchap_key = NULL;
+> +		}
+> +		crypto_free_shash(ctrl->shash_tfm);
+> +		ctrl->shash_tfm = NULL;
+> +		ctrl->shash_id = 0;
+> +	}
+> +out_unlock:
+> +	up_read(&nvmet_config_sem);
+> +
+> +	return ret;
+> +}
+> +
+> +void nvmet_auth_sq_free(struct nvmet_sq *sq)
+> +{
+> +	kfree(sq->dhchap_c1);
+> +	sq->dhchap_c1 = NULL;
+> +	kfree(sq->dhchap_c2);
+> +	sq->dhchap_c2 = NULL;
+> +	kfree(sq->dhchap_skey);
+> +	sq->dhchap_skey = NULL;
+> +}
+> +
+> +void nvmet_destroy_auth(struct nvmet_ctrl *ctrl)
+> +{
+> +	if (ctrl->shash_tfm) {
+> +		crypto_free_shash(ctrl->shash_tfm);
+> +		ctrl->shash_tfm = NULL;
+> +		ctrl->shash_id = 0;
+> +	}
+> +	if (ctrl->dhchap_key) {
+> +		kfree_sensitive(ctrl->dhchap_key);
+> +		ctrl->dhchap_key = NULL;
+> +	}
+> +	if (ctrl->dhchap_ctrl_key) {
+> +		kfree_sensitive(ctrl->dhchap_ctrl_key);
+> +		ctrl->dhchap_ctrl_key = NULL;
+> +	}
+> +}
+> +
+> +bool nvmet_check_auth_status(struct nvmet_req *req)
+> +{
+> +	if (req->sq->ctrl->shash_tfm &&
+> +	    !req->sq->authenticated)
+> +		return false;
+> +	return true;
+> +}
+> +
+> +int nvmet_auth_host_hash(struct nvmet_req *req, u8 *response,
+> +			 unsigned int shash_len)
+> +{
+> +	struct nvmet_ctrl *ctrl = req->sq->ctrl;
+> +	SHASH_DESC_ON_STACK(shash, ctrl->shash_tfm);
+> +	u8 *challenge = req->sq->dhchap_c1, *host_response;
+> +	u8 buf[4];
+> +	int ret;
+> +
+> +	if (shash_len != ctrl->dhchap_key_len)
+> +		return -EINVAL;
 
-Thanks Uwe.
+Is this condition correct? the shash_len is sent by the host
+and afaict the host is setting it by what the controller sent
+in the challenge. the ctrl->dhchap_key_len is taken from
+nvme_auth_extract_secret.
 
-For NFP:
+In other words, if the nvmet host is set to use hmac(sha512) then
+authentication fails, regardless of the key.
 
-Acked-by: Simon Horman <simon.horman@corigine.com>
+I think we need a set of blktests to sanity test different hash,
+dh_group, secrect-length, dhchap_key and dhchap_ctrl_key combinations.
 
+The code is not trivial to follow with the different transformations, 
+hashes etc...
