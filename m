@@ -2,59 +2,69 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B87CEC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 08:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 329DDC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 08:54:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A6801613A6
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 08:54:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14254613A6
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Sep 2021 08:54:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244919AbhI2Izp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Sep 2021 04:55:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50522 "EHLO
+        id S244927AbhI2I4Q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Sep 2021 04:56:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244927AbhI2Izg (ORCPT
+        with ESMTP id S244937AbhI2I4P (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Sep 2021 04:55:36 -0400
+        Wed, 29 Sep 2021 04:56:15 -0400
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E0A4C06161C
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Sep 2021 01:53:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C97CC061753
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Sep 2021 01:54:34 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
         by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <ukl@pengutronix.de>)
-        id 1mVVL5-0001il-KW; Wed, 29 Sep 2021 10:53:19 +0200
+        id 1mVVLB-0001rf-2C; Wed, 29 Sep 2021 10:53:25 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
         by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
         (envelope-from <ukl@pengutronix.de>)
-        id 1mVVL3-0004fs-JV; Wed, 29 Sep 2021 10:53:17 +0200
+        id 1mVVLA-0004ip-CK; Wed, 29 Sep 2021 10:53:24 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
         (envelope-from <ukl@pengutronix.de>)
-        id 1mVVL3-0000R5-I0; Wed, 29 Sep 2021 10:53:17 +0200
+        id 1mVVL3-0000Qz-47; Wed, 29 Sep 2021 10:53:17 +0200
 From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
         <u.kleine-koenig@pengutronix.de>
 To:     Bjorn Helgaas <helgaas@kernel.org>
 Cc:     Christoph Hellwig <hch@lst.de>, linux-pci@vger.kernel.org,
-        kernel@pengutronix.de,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        kernel@pengutronix.de, Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Jack Xu <jack.xu@intel.com>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v5 09/11] crypto: qat - simplify adf_enable_aer()
-Date:   Wed, 29 Sep 2021 10:53:04 +0200
-Message-Id: <20210929085306.2203850-10-u.kleine-koenig@pengutronix.de>
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Vadym Kochan <vkochan@marvell.com>,
+        Taras Chornyi <tchornyi@marvell.com>,
+        Jiri Pirko <jiri@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
+        Simon Horman <simon.horman@corigine.com>,
+        Michael Buesch <m@bues.ch>,
+        "Oliver O'Halloran" <oohall@gmail.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Alexander Duyck <alexanderduyck@fb.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org, oss-drivers@corigine.com
+Subject: [PATCH v5 07/11] PCI: Replace pci_dev::driver usage that gets the driver name
+Date:   Wed, 29 Sep 2021 10:53:02 +0200
+Message-Id: <20210929085306.2203850-8-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210929085306.2203850-1-u.kleine-koenig@pengutronix.de>
 References: <20210929085306.2203850-1-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Patch-Hashes: v=1; h=sha256; i=woJ+XG24qLZpRfQYIhuIjBJ10HF9ai4yZDNEgvzBdKs=; m=43Bwh4bgNofseZy3pN98J/xw6T54xBXYb8+EgplqK/c=; p=e0ubWRxaTOxpVVmYaiPGXfH9Fp+aEsg5i7cfFIxLb4w=; g=75d910e3cf936fc2161d0c2f4f099378e2733742
-X-Patch-Sig: m=pgp; i=u.kleine-koenig@pengutronix.de; s=0x0D2511F322BFAB1C1580266BE2DCDD9132669BD6; b=iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmFUKV8ACgkQwfwUeK3K7AkBLQgAiMf lHjrsvdAs+vA2PbvtByAdocSgqQHHSsMjWUdd7oxcamF2iQ+atjNFDs7o0Qq3GH104ghMSLvgV9n5 igdrQMwiR8MJodQ/40sebxuhVUJK5ucx8xIEg0VdJZawEoAaEmSR5OqHgZJk3wMZw8f4tJiEqoVOL wrlajTg3FjP9s/vyzsebuBBpRptaxBXL/sob3XdZ0GCG2Jrze+kz6xHC/zqNwlkXLdv80ytfnMTYN 4kqc0m7dylgnpAP0dt8ZK05veLL3YVBab8RES5AsNt0EW2Fekq+79Qxm0O76a7C6UwBhLnVXkw6OD vylu5lZjBa1dSkEaocJCvh0OHH8dM7g==
+X-Patch-Hashes: v=1; h=sha256; i=x5Y9j5QPtBpKPfcAJK/OT7BRgKvI7pSChd5/rmmq6Xw=; m=uiYraG79NtpzJXVYTkT2krJ2oKsGebV/4PDlvGFyew0=; p=P030KPvGBgn0wACiWmlhwa6Q6u7mafsHSYpCChEQFbg=; g=d855fa8a2569029e17368da8c0bf9fc2e6496586
+X-Patch-Sig: m=pgp; i=u.kleine-koenig@pengutronix.de; s=0x0D2511F322BFAB1C1580266BE2DCDD9132669BD6; b=iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmFUKVkACgkQwfwUeK3K7AnywQf/YyT M2KQv0iVpRpzsG16PpDNiEPC9rdggnY7dQr4kG+ZVuebrIwmozRFQNmzB3qStmdKmTYQNIYAN9aZT N57ua890gfP8RZLIdmzppS+R3scVm4qrAaYlrVQMLOeX1u2eGpoBbCFQhJt59S10BFpDe3yqXTeG7 iZw077F8icBm71e+fBqLbUTd8h46H1Isc4UskBU/VpSKdwyWHMVsmYfUi/f7m69IrYQ1eCV7PlNHH qk3a52EUxda9B6gfEYuy2qbSX57hIL5sXTW4dGuLi0d/xNs9Q/h8x4XpbnUV7b1/8xKnmYiy8qzZq Fx3d9cNhk25gOKOiAcc1UbnVl/xHP7Q==
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
 X-SA-Exim-Mail-From: ukl@pengutronix.de
@@ -64,175 +74,87 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A struct pci_driver is supposed to be constant and assigning .err_handler
-once per bound device isn't really sensible. Also as the function returns
-zero unconditionally let it return no value instead and simplify the
-callers accordingly.
-
-As a side effect this removes one user of struct pci_dev::driver. This
-member is planned to be removed.
+struct pci_dev::driver holds (apart from a constant offset) the same
+data as struct pci_dev::dev->driver. With the goal to remove struct
+pci_dev::driver to get rid of data duplication replace getting the
+driver name by dev_driver_string() which implicitly makes use of struct
+pci_dev::dev->driver.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/crypto/qat/qat_4xxx/adf_drv.c          |  7 ++-----
- drivers/crypto/qat/qat_c3xxx/adf_drv.c         |  7 ++-----
- drivers/crypto/qat/qat_c62x/adf_drv.c          |  7 ++-----
- drivers/crypto/qat/qat_common/adf_aer.c        | 10 +++-------
- drivers/crypto/qat/qat_common/adf_common_drv.h |  3 ++-
- drivers/crypto/qat/qat_dh895xcc/adf_drv.c      |  7 ++-----
- 6 files changed, 13 insertions(+), 28 deletions(-)
+ drivers/crypto/hisilicon/qm.c                        | 2 +-
+ drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c   | 2 +-
+ drivers/net/ethernet/marvell/prestera/prestera_pci.c | 2 +-
+ drivers/net/ethernet/mellanox/mlxsw/pci.c            | 2 +-
+ drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c | 3 ++-
+ 5 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-index 359fb7989dfb..71ef065914b2 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
-+++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-@@ -247,11 +247,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 369562d34d66..8f361e54e524 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -3085,7 +3085,7 @@ static int qm_alloc_uacce(struct hisi_qm *qm)
+ 	};
+ 	int ret;
  
- 	pci_set_master(pdev);
- 
--	if (adf_enable_aer(accel_dev)) {
--		dev_err(&pdev->dev, "Failed to enable aer.\n");
--		ret = -EFAULT;
--		goto out_err;
--	}
-+	adf_enable_aer(accel_dev);
- 
- 	if (pci_save_state(pdev)) {
- 		dev_err(&pdev->dev, "Failed to save pci state.\n");
-@@ -304,6 +300,7 @@ static struct pci_driver adf_driver = {
- 	.probe = adf_probe,
- 	.remove = adf_remove,
- 	.sriov_configure = adf_sriov_configure,
-+	.err_handler = &adf_err_handler,
- };
- 
- module_pci_driver(adf_driver);
-diff --git a/drivers/crypto/qat/qat_c3xxx/adf_drv.c b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-index cc6e75dc60de..2aef0bb791df 100644
---- a/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
- 	.probe = adf_probe,
- 	.remove = adf_remove,
- 	.sriov_configure = adf_sriov_configure,
-+	.err_handler = &adf_err_handler,
- };
- 
- static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
-@@ -192,11 +193,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+-	ret = strscpy(interface.name, pdev->driver->name,
++	ret = strscpy(interface.name, dev_driver_string(&pdev->dev),
+ 		      sizeof(interface.name));
+ 	if (ret < 0)
+ 		return -ENAMETOOLONG;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+index 7ea511d59e91..f279edfce3f1 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+@@ -606,7 +606,7 @@ static void hns3_get_drvinfo(struct net_device *netdev,
+ 		return;
  	}
- 	pci_set_master(pdev);
  
--	if (adf_enable_aer(accel_dev)) {
--		dev_err(&pdev->dev, "Failed to enable aer\n");
--		ret = -EFAULT;
--		goto out_err_free_reg;
--	}
-+	adf_enable_aer(accel_dev);
+-	strncpy(drvinfo->driver, h->pdev->driver->name,
++	strncpy(drvinfo->driver, dev_driver_string(&h->pdev->dev),
+ 		sizeof(drvinfo->driver));
+ 	drvinfo->driver[sizeof(drvinfo->driver) - 1] = '\0';
  
- 	if (pci_save_state(pdev)) {
- 		dev_err(&pdev->dev, "Failed to save pci state\n");
-diff --git a/drivers/crypto/qat/qat_c62x/adf_drv.c b/drivers/crypto/qat/qat_c62x/adf_drv.c
-index bf251dfe74b3..56163083f161 100644
---- a/drivers/crypto/qat/qat_c62x/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62x/adf_drv.c
-@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
- 	.probe = adf_probe,
- 	.remove = adf_remove,
- 	.sriov_configure = adf_sriov_configure,
-+	.err_handler = &adf_err_handler,
- };
- 
- static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
-@@ -192,11 +193,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
- 	pci_set_master(pdev);
- 
--	if (adf_enable_aer(accel_dev)) {
--		dev_err(&pdev->dev, "Failed to enable aer\n");
--		ret = -EFAULT;
--		goto out_err_free_reg;
--	}
-+	adf_enable_aer(accel_dev);
- 
- 	if (pci_save_state(pdev)) {
- 		dev_err(&pdev->dev, "Failed to save pci state\n");
-diff --git a/drivers/crypto/qat/qat_common/adf_aer.c b/drivers/crypto/qat/qat_common/adf_aer.c
-index ed3e40bc56eb..fe9bb2f3536a 100644
---- a/drivers/crypto/qat/qat_common/adf_aer.c
-+++ b/drivers/crypto/qat/qat_common/adf_aer.c
-@@ -166,11 +166,12 @@ static void adf_resume(struct pci_dev *pdev)
- 	dev_info(&pdev->dev, "Device is up and running\n");
- }
- 
--static const struct pci_error_handlers adf_err_handler = {
-+const struct pci_error_handlers adf_err_handler = {
- 	.error_detected = adf_error_detected,
- 	.slot_reset = adf_slot_reset,
- 	.resume = adf_resume,
- };
-+EXPORT_SYMBOL_GPL(adf_err_handler);
- 
- /**
-  * adf_enable_aer() - Enable Advance Error Reporting for acceleration device
-@@ -179,17 +180,12 @@ static const struct pci_error_handlers adf_err_handler = {
-  * Function enables PCI Advance Error Reporting for the
-  * QAT acceleration device accel_dev.
-  * To be used by QAT device specific drivers.
-- *
-- * Return: 0 on success, error code otherwise.
-  */
--int adf_enable_aer(struct adf_accel_dev *accel_dev)
-+void adf_enable_aer(struct adf_accel_dev *accel_dev)
+diff --git a/drivers/net/ethernet/marvell/prestera/prestera_pci.c b/drivers/net/ethernet/marvell/prestera/prestera_pci.c
+index a250d394da38..a8f007f6dad2 100644
+--- a/drivers/net/ethernet/marvell/prestera/prestera_pci.c
++++ b/drivers/net/ethernet/marvell/prestera/prestera_pci.c
+@@ -720,7 +720,7 @@ static int prestera_fw_load(struct prestera_fw *fw)
+ static int prestera_pci_probe(struct pci_dev *pdev,
+ 			      const struct pci_device_id *id)
  {
- 	struct pci_dev *pdev = accel_to_pci_dev(accel_dev);
--	struct pci_driver *pdrv = pdev->driver;
+-	const char *driver_name = pdev->driver->name;
++	const char *driver_name = dev_driver_string(&pdev->dev);
+ 	struct prestera_fw *fw;
+ 	int err;
  
--	pdrv->err_handler = &adf_err_handler;
- 	pci_enable_pcie_error_reporting(pdev);
--	return 0;
- }
- EXPORT_SYMBOL_GPL(adf_enable_aer);
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
+index 13b0259f7ea6..8f306364f7bf 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
+@@ -1876,7 +1876,7 @@ static void mlxsw_pci_cmd_fini(struct mlxsw_pci *mlxsw_pci)
  
-diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
-index 4261749fae8d..e4c24be212ff 100644
---- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-@@ -95,7 +95,8 @@ void adf_ae_fw_release(struct adf_accel_dev *accel_dev);
- int adf_ae_start(struct adf_accel_dev *accel_dev);
- int adf_ae_stop(struct adf_accel_dev *accel_dev);
+ static int mlxsw_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ {
+-	const char *driver_name = pdev->driver->name;
++	const char *driver_name = dev_driver_string(&pdev->dev);
+ 	struct mlxsw_pci *mlxsw_pci;
+ 	int err;
  
--int adf_enable_aer(struct adf_accel_dev *accel_dev);
-+extern const struct pci_error_handlers adf_err_handler;
-+void adf_enable_aer(struct adf_accel_dev *accel_dev);
- void adf_disable_aer(struct adf_accel_dev *accel_dev);
- void adf_reset_sbr(struct adf_accel_dev *accel_dev);
- void adf_reset_flr(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-index 3976a81bd99b..acca56752aa0 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
- 	.probe = adf_probe,
- 	.remove = adf_remove,
- 	.sriov_configure = adf_sriov_configure,
-+	.err_handler = &adf_err_handler,
- };
+diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+index 0685ece1f155..1de076f55740 100644
+--- a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
++++ b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+@@ -202,7 +202,8 @@ nfp_get_drvinfo(struct nfp_app *app, struct pci_dev *pdev,
+ {
+ 	char nsp_version[ETHTOOL_FWVERS_LEN] = {};
  
- static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
-@@ -192,11 +193,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
- 	pci_set_master(pdev);
- 
--	if (adf_enable_aer(accel_dev)) {
--		dev_err(&pdev->dev, "Failed to enable aer\n");
--		ret = -EFAULT;
--		goto out_err_free_reg;
--	}
-+	adf_enable_aer(accel_dev);
- 
- 	if (pci_save_state(pdev)) {
- 		dev_err(&pdev->dev, "Failed to save pci state\n");
+-	strlcpy(drvinfo->driver, pdev->driver->name, sizeof(drvinfo->driver));
++	strlcpy(drvinfo->driver, dev_driver_string(&pdev->dev),
++		sizeof(drvinfo->driver));
+ 	nfp_net_get_nspinfo(app, nsp_version);
+ 	snprintf(drvinfo->fw_version, sizeof(drvinfo->fw_version),
+ 		 "%s %s %s %s", vnic_version, nsp_version,
 -- 
 2.30.2
 
