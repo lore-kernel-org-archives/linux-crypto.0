@@ -2,140 +2,158 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B8AC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Sep 2021 08:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35006C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Sep 2021 14:57:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 80807615A4
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Sep 2021 08:57:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C6E86128E
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Sep 2021 14:57:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349160AbhI3I7G (ORCPT
+        id S1352019AbhI3O7F (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Sep 2021 04:59:06 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:13009 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348225AbhI3I7G (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Sep 2021 04:59:06 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HKnCP5HTrzVfjT;
-        Thu, 30 Sep 2021 16:56:01 +0800 (CST)
-Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Thu, 30 Sep 2021 16:57:22 +0800
-Received: from huawei.com (10.69.192.56) by dggpeml500012.china.huawei.com
- (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.8; Thu, 30 Sep
- 2021 16:57:21 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH] crypto: hisilicon - replace 'smp_processor_id' with 'get_cpu' in preemptible
-Date:   Thu, 30 Sep 2021 16:55:46 +0800
-Message-ID: <20210930085546.54000-1-yekai13@huawei.com>
-X-Mailer: git-send-email 2.33.0
+        Thu, 30 Sep 2021 10:59:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45868 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1352018AbhI3O7E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 Sep 2021 10:59:04 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E18966128E;
+        Thu, 30 Sep 2021 14:57:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1633013841;
+        bh=Ul6eldZNU2CyYIjwQhqq+NM/92KkckTfZvBzAyidh0U=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=qU8OrPaMSytRZUhHLphRmXUU8eJafDbVZdicAkGC6IPTwxIHpPMfnF4bqsgWXNEXn
+         lv4xdKF/dclZfeqCvb9Dx4xCxEGOntmdjjDRAhcyPiwq2yFrpO+S5PsPbFqzxZOOvt
+         ZSBdRCvQej1tY9T+7OYM/c3k1WhoDaJKLQPKCsEuJG5VlJoD9EzLrmoRwp55NGmPqj
+         2G2uGw9BdnWp+iYb7FpjWHxDKH5BJJWV+cptWJMgUvdrrmkbAbsyE34HAmUMY+9nWb
+         F1zLc41Om3yeVXR/dHYY0Pw7M2Po0D4Vybl5GO6RN/qnAlqqHIxbMmdzvM7LlPXBLM
+         XIjFyg/ruuQ/w==
+Received: by mail-oi1-f182.google.com with SMTP id s69so7554699oie.13;
+        Thu, 30 Sep 2021 07:57:21 -0700 (PDT)
+X-Gm-Message-State: AOAM5314oN1eR4Cav+aP7uniNQmPh1/RMyrepz4KqBLR6/HXfC+dgm/2
+        mTdA820sHUVkVzcrb+2xEfN6HOhOpJXYzu5xagE=
+X-Google-Smtp-Source: ABdhPJxa7tQhbO5f833cDMIA7bEkH5e0OAXqjiEZue1VHO80HjU/rF6NrjrxNY3sjNSzuMzQUZw70y41rVMYG0MtyU8=
+X-Received: by 2002:aca:32c2:: with SMTP id y185mr3140111oiy.47.1633013841293;
+ Thu, 30 Sep 2021 07:57:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpeml500012.china.huawei.com (7.185.36.15)
-X-CFilter-Loop: Reflected
+References: <20210923063027.166247-1-xiaokang.qian@arm.com>
+ <YVK1u4BgVAa84fMa@sol.localdomain> <CAMj1kXHeJBUAzcLHRNYDbbUDe5vRS7Bxy_LKF5gdRLJca7TNRQ@mail.gmail.com>
+ <PA4PR08MB60168642B59CCFC91A3F4ABDEEAA9@PA4PR08MB6016.eurprd08.prod.outlook.com>
+In-Reply-To: <PA4PR08MB60168642B59CCFC91A3F4ABDEEAA9@PA4PR08MB6016.eurprd08.prod.outlook.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 30 Sep 2021 16:57:09 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEHOscYf0qxdzAw2u_J+zb2dXfWdK07MkBZUnJZv0Ds0g@mail.gmail.com>
+Message-ID: <CAMj1kXEHOscYf0qxdzAw2u_J+zb2dXfWdK07MkBZUnJZv0Ds0g@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm64/gcm-ce - unroll factors to 4-way interleave
+ of aes and ghash
+To:     Xiaokang Qian <Xiaokang.Qian@arm.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <Catalin.Marinas@arm.com>,
+        Will Deacon <will@kernel.org>, nd <nd@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-smp_processor_id() is unsafe if it's used in a preemption-on critical
-section. It will cause the call trace when the preemption-on and sets the
-CONFIG_DEBUG_PREEMPT. So replace 'smp_processor_id' with 'get_cpu' in
-preemptible to avoid the following call trace:
+On Thu, 30 Sept 2021 at 03:32, Xiaokang Qian <Xiaokang.Qian@arm.com> wrote:
+>
+> Thanks for the review.
+>
+> I will firstly change the decrypt path to compare the tag using SIMD code=
+, and then  pass all of the self tests include fuzz tests(enabled by CONFIG=
+_CRYPTO_MANAGER_EXTRA_TESTS=3Dy), big endian ,little endian tests.
+>
 
-[ 7538.874350] BUG: using smp_processor_id() in preemptible [00000000] code: af_alg06/8438
-[ 7538.874368] caller is debug_smp_processor_id+0x1c/0x28
-[ 7538.874373] CPU: 50 PID: 8438 Comm: af_alg06 Kdump: loaded Not tainted 5.10.0.pc+ #18
-[ 7538.874377] Call trace:
-[ 7538.874387]  dump_backtrace+0x0/0x210
-[ 7538.874389]  show_stack+0x2c/0x38
-[ 7538.874392]  dump_stack+0x110/0x164
-[ 7538.874394]  check_preemption_disabled+0xf4/0x108
-[ 7538.874396]  debug_smp_processor_id+0x1c/0x28
-[ 7538.874406]  sec_create_qps+0x24/0xe8 [hisi_sec2]
-[ 7538.874408]  sec_ctx_base_init+0x20/0x4d8 [hisi_sec2]
-[ 7538.874411]  sec_aead_ctx_init+0x68/0x180 [hisi_sec2]
-[ 7538.874413]  sec_aead_sha256_ctx_init+0x28/0x38 [hisi_sec2]
-[ 7538.874421]  crypto_aead_init_tfm+0x54/0x68
-[ 7538.874423]  crypto_create_tfm_node+0x6c/0x110
-[ 7538.874424]  crypto_alloc_tfm_node+0x74/0x288
-[ 7538.874426]  crypto_alloc_aead+0x40/0x50
-[ 7538.874431]  aead_bind+0x50/0xd0
-[ 7538.874433]  alg_bind+0x94/0x148
-[ 7538.874439]  __sys_bind+0x98/0x118
-[ 7538.874441]  __arm64_sys_bind+0x28/0x38
-[ 7538.874445]  do_el0_svc+0x88/0x258
-[ 7538.874447]  el0_svc+0x1c/0x28
-[ 7538.874449]  el0_sync_handler+0x8c/0xb8
-[ 7538.874452]  el0_sync+0x148/0x180
+OK
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
----
- drivers/crypto/hisilicon/hpre/hpre_main.c | 3 ++-
- drivers/crypto/hisilicon/sec2/sec_main.c  | 3 ++-
- drivers/crypto/hisilicon/zip/zip_main.c   | 6 ++++--
- 3 files changed, 8 insertions(+), 4 deletions(-)
+> About the 1K data point, I just remember that the 1420 bytes packet is co=
+mmonly used in IPSEC.
+>
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 65a641396c07..d1754e7b7a9c 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -277,10 +277,11 @@ static inline int hpre_cluster_core_mask(struct hisi_qm *qm)
- 
- struct hisi_qp *hpre_create_qp(u8 type)
- {
--	int node = cpu_to_node(smp_processor_id());
-+	int node = cpu_to_node(get_cpu());
- 	struct hisi_qp *qp = NULL;
- 	int ret;
- 
-+	put_cpu();
- 	if (type != HPRE_V2_ALG_TYPE && type != HPRE_V3_ECC_ALG_TYPE)
- 		return NULL;
- 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 90551bf38b52..e3a4d4f8637b 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -282,11 +282,12 @@ void sec_destroy_qps(struct hisi_qp **qps, int qp_num)
- 
- struct hisi_qp **sec_create_qps(void)
- {
--	int node = cpu_to_node(smp_processor_id());
-+	int node = cpu_to_node(get_cpu());
- 	u32 ctx_num = ctx_q_num;
- 	struct hisi_qp **qps;
- 	int ret;
- 
-+	put_cpu();
- 	qps = kcalloc(ctx_num, sizeof(struct hisi_qp *), GFP_KERNEL);
- 	if (!qps)
- 		return NULL;
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 7148201ce76e..bdf2eff6d8bd 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -276,8 +276,10 @@ MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
- 
- int zip_create_qps(struct hisi_qp **qps, int qp_num, int node)
- {
--	if (node == NUMA_NO_NODE)
--		node = cpu_to_node(smp_processor_id());
-+	if (node == NUMA_NO_NODE) {
-+		node = cpu_to_node(get_cpu());
-+		put_cpu();
-+	}
- 
- 	return hisi_qm_alloc_qps_node(&zip_devices, qp_num, 0, node, qps);
- }
--- 
-2.33.0
+Yes, but your code is faster than the existing code for 1420 byte
+packets, right? So why should we keep the original code? We don't use
+GCM for block storage, and if IPsec throughput is a key performance
+metric for your system, you are likely to be using the maximum packet
+size so 1420 bytes not 1k.
 
+
+>
+> -----Original Message-----
+> From: Ard Biesheuvel <ardb@kernel.org>
+> Sent: Wednesday, September 29, 2021 5:04 AM
+> To: Eric Biggers <ebiggers@kernel.org>
+> Cc: Xiaokang Qian <Xiaokang.Qian@arm.com>; Herbert Xu <herbert@gondor.apa=
+na.org.au>; David S. Miller <davem@davemloft.net>; Catalin Marinas <Catalin=
+.Marinas@arm.com>; Will Deacon <will@kernel.org>; nd <nd@arm.com>; Linux Cr=
+ypto Mailing List <linux-crypto@vger.kernel.org>; Linux ARM <linux-arm-kern=
+el@lists.infradead.org>; Linux Kernel Mailing List <linux-kernel@vger.kerne=
+l.org>
+> Subject: Re: [PATCH] crypto: arm64/gcm-ce - unroll factors to 4-way inter=
+leave of aes and ghash
+>
+> On Tue, 28 Sept 2021 at 08:27, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > On Thu, Sep 23, 2021 at 06:30:25AM +0000, XiaokangQian wrote:
+> > > To improve performance on cores with deep piplines such as A72,N1,
+> > > implement gcm(aes) using a 4-way interleave of aes and ghash
+> > > (totally
+> > > 8 blocks in parallel), which can make full utilize of pipelines
+> > > rather than the 4-way interleave we used currently. It can gain
+> > > about 20% for big data sizes such that 8k.
+> > >
+> > > This is a complete new version of the GCM part of the combined
+> > > GCM/GHASH driver, it will co-exist with the old driver, only serve
+> > > for big data sizes. Instead of interleaving four invocations of AES
+> > > where each chunk of 64 bytes is encrypted first and then ghashed,
+> > > the new version uses a more coarse grained approach where a chunk of
+> > > 64 bytes is encrypted and at the same time, one chunk of 64 bytes is
+> > > ghashed (or ghashed and decrypted in the converse case).
+> > >
+> > > The table below compares the performance of the old driver and the
+> > > new one on various micro-architectures and running in various modes
+> > > with various data sizes.
+> > >
+> > >             |     AES-128       |     AES-192       |     AES-256    =
+   |
+> > >      #bytes | 1024 | 1420 |  8k | 1024 | 1420 |  8k | 1024 | 1420 |  =
+8k |
+> > >      -------+------+------+-----+------+------+-----+------+------+--=
+---+
+> > >         A72 | 5.5% |  12% | 25% | 2.2% |  9.5%|  23%| -1%  |  6.7%| 1=
+9% |
+> > >         A57 |-0.5% |  9.3%| 32% | -3%  |  6.3%|  26%| -6%  |  3.3%| 2=
+1% |
+> > >         N1  | 0.4% |  7.6%|24.5%| -2%  |  5%  |  22%| -4%  |  2.7%|
+> > > 20% |
+> > >
+> > > Signed-off-by: XiaokangQian <xiaokang.qian@arm.com>
+> >
+> > Does this pass the self-tests, including the fuzz tests which are
+> > enabled by CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=3Dy?
+> >
+>
+> Please test both little-endian and big-endian. (Note that you don't need =
+a big-endian user space for this - the self tests are executed before the r=
+ootfs is mounted)
+>
+> Also, you will have to rebase this onto the latest cryptodev tree, which =
+carries some changes I made recently to this driver.
+>
+> Finally, I'd like to discuss whether we really need two separate drivers =
+here. The 1k data point is not as relevant as the other ones, which show a =
+worthwhile speedup for all micro architectures and data sizes (although I w=
+ill give this a spin on TX2 myself when I have the
+> chance)
+>
+> *If* we switch to this implementation completely, I would like to keep th=
+e improvement I added recently to the decrypt path to compare the tag using=
+ SIMD code, rather than copying it out and using memcmp().
+> Could you look into adopting this for this version as well?
+>
+> --
+> Ard.
