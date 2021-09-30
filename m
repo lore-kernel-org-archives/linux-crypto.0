@@ -2,145 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2D3C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Sep 2021 06:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B8AC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Sep 2021 08:57:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53A8961390
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Sep 2021 06:34:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80807615A4
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Sep 2021 08:57:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348072AbhI3GgU (ORCPT
+        id S1349160AbhI3I7G (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Sep 2021 02:36:20 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3892 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236162AbhI3GgT (ORCPT
+        Thu, 30 Sep 2021 04:59:06 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:13009 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348225AbhI3I7G (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Sep 2021 02:36:19 -0400
-Received: from fraeml701-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HKk1C0VPPz67vpZ;
-        Thu, 30 Sep 2021 14:31:59 +0800 (CST)
-Received: from lhreml712-chm.china.huawei.com (10.201.108.63) by
- fraeml701-chm.china.huawei.com (10.206.15.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.8; Thu, 30 Sep 2021 08:34:34 +0200
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml712-chm.china.huawei.com (10.201.108.63) with Microsoft SMTP Server
+        Thu, 30 Sep 2021 04:59:06 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HKnCP5HTrzVfjT;
+        Thu, 30 Sep 2021 16:56:01 +0800 (CST)
+Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Thu, 30 Sep 2021 07:34:33 +0100
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.008; Thu, 30 Sep 2021 07:34:33 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: RE: [PATCH v3 0/6] vfio/hisilicon: add acc live migration driver
-Thread-Topic: [PATCH v3 0/6] vfio/hisilicon: add acc live migration driver
-Thread-Index: AQHXqhcv8rGxctog9kC36bxSe2rONqu6Z2mAgABdanD///ilAIAAErXQgADy6QCAAGw8QA==
-Date:   Thu, 30 Sep 2021 06:34:33 +0000
-Message-ID: <61274f6497424f039397677fb5d003d0@huawei.com>
-References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
- <BN9PR11MB5433DDA5FD4FC6C5EED62C278CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
- <2e0c062947b044179603ab45989808ff@huawei.com>
- <BN9PR11MB54338A0821C061FEE018F43E8CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
- <a128301751974352a648bcc0f50bc464@huawei.com>
- <BN9PR11MB543384431856FEF80C1AA4C58CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
-In-Reply-To: <BN9PR11MB543384431856FEF80C1AA4C58CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.83.34]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ 15.1.2308.8; Thu, 30 Sep 2021 16:57:22 +0800
+Received: from huawei.com (10.69.192.56) by dggpeml500012.china.huawei.com
+ (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.8; Thu, 30 Sep
+ 2021 16:57:21 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
+Subject: [PATCH] crypto: hisilicon - replace 'smp_processor_id' with 'get_cpu' in preemptible
+Date:   Thu, 30 Sep 2021 16:55:46 +0800
+Message-ID: <20210930085546.54000-1-yekai13@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500012.china.huawei.com (7.185.36.15)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogVGlhbiwgS2V2aW4gW21h
-aWx0bzprZXZpbi50aWFuQGludGVsLmNvbV0NCj4gU2VudDogMzAgU2VwdGVtYmVyIDIwMjEgMDE6
-NDINCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29sb3RodW0u
-dGhvZGlAaHVhd2VpLmNvbT47DQo+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2
-Z2VyLmtlcm5lbC5vcmc7DQo+IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmcNCj4gQ2M6IGFs
-ZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBqZ2dAbnZpZGlhLmNvbTsgbWd1cnRvdm95QG52aWRp
-YS5jb207DQo+IExpbnV4YXJtIDxsaW51eGFybUBodWF3ZWkuY29tPjsgbGl1bG9uZ2ZhbmcgPGxp
-dWxvbmdmYW5nQGh1YXdlaS5jb20+Ow0KPiBaZW5ndGFvIChCKSA8cHJpbWUuemVuZ0BoaXNpbGlj
-b24uY29tPjsgSm9uYXRoYW4gQ2FtZXJvbg0KPiA8am9uYXRoYW4uY2FtZXJvbkBodWF3ZWkuY29t
-PjsgV2FuZ3pob3UgKEIpDQo+IDx3YW5nemhvdTFAaGlzaWxpY29uLmNvbT47IEhlLCBTaGFvcGVu
-ZyA8c2hhb3BlbmcuaGVAaW50ZWwuY29tPjsgWmhhbywNCj4gWWFuIFkgPHlhbi55LnpoYW9AaW50
-ZWwuY29tPg0KPiBTdWJqZWN0OiBSRTogW1BBVENIIHYzIDAvNl0gdmZpby9oaXNpbGljb246IGFk
-ZCBhY2MgbGl2ZSBtaWdyYXRpb24gZHJpdmVyDQo+IA0KPiA+IEZyb206IFNoYW1lZXJhbGkgS29s
-b3RodW0gVGhvZGkNCj4gPiA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPg0K
-PiA+DQo+ID4gPiBGcm9tOiBUaWFuLCBLZXZpbiBbbWFpbHRvOmtldmluLnRpYW5AaW50ZWwuY29t
-XQ0KPiA+ID4gU2VudDogMjkgU2VwdGVtYmVyIDIwMjEgMTA6MDYNCj4gPiA+DQo+ID4gPiA+IEZy
-b206IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkNCj4gPiA+ID4gPHNoYW1lZXJhbGkua29sb3Ro
-dW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gPiA+ID4NCj4gPiA+ID4gSGkgS2V2aW4sDQo+ID4gPiA+
-DQo+ID4gPiA+ID4gRnJvbTogVGlhbiwgS2V2aW4gW21haWx0bzprZXZpbi50aWFuQGludGVsLmNv
-bV0NCj4gPiA+ID4gPiBTZW50OiAyOSBTZXB0ZW1iZXIgMjAyMSAwNDo1OA0KPiA+ID4gPiA+DQo+
-ID4gPiA+ID4gSGksIFNoYW1lZXIsDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiA+IEZyb206IFNoYW1l
-ZXIgS29sb3RodW0gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gPiA+
-ID4gPiA+IFNlbnQ6IFdlZG5lc2RheSwgU2VwdGVtYmVyIDE1LCAyMDIxIDU6NTEgUE0NCj4gPiA+
-ID4gPiA+DQo+ID4gPiA+ID4gPiBIaSwNCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiBUaGFua3Mg
-dG8gdGhlIGludHJvZHVjdGlvbiBvZiB2ZmlvX3BjaV9jb3JlIHN1YnN5c3RlbSBmcmFtZXdvcmtb
-MF0sDQo+ID4gPiA+ID4gPiBub3cgaXQgaXMgcG9zc2libGUgdG8gcHJvdmlkZSB2ZW5kb3Igc3Bl
-Y2lmaWMgZnVuY3Rpb25hbGl0eSB0bw0KPiA+ID4gPiA+ID4gdmZpbyBwY2kgZGV2aWNlcy4gVGhp
-cyBzZXJpZXMgYXR0ZW1wdHMgdG8gYWRkIHZmaW8gbGl2ZSBtaWdyYXRpb24NCj4gPiA+ID4gPiA+
-IHN1cHBvcnQgZm9yIEhpU2lsaWNvbiBBQ0MgVkYgZGV2aWNlcyBiYXNlZCBvbiB0aGUgbmV3IGZy
-YW1ld29yay4NCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiBIaVNpbGljb24gQUNDIFZGIGRldmlj
-ZSBNTUlPIHNwYWNlIGluY2x1ZGVzIGJvdGggdGhlIGZ1bmN0aW9uYWwNCj4gPiA+ID4gPiA+IHJl
-Z2lzdGVyIHNwYWNlIGFuZCBtaWdyYXRpb24gY29udHJvbCByZWdpc3RlciBzcGFjZS4gQXMgZGlz
-Y3Vzc2VkDQo+ID4gPiA+ID4gPiBpbiBSRkN2MVsxXSwgdGhpcyBtYXkgY3JlYXRlIHNlY3VyaXR5
-IGlzc3VlcyBhcyB0aGVzZSByZWdpb25zIGdldA0KPiA+ID4gPiA+ID4gc2hhcmVkIGJldHdlZW4g
-dGhlIEd1ZXN0IGRyaXZlciBhbmQgdGhlIG1pZ3JhdGlvbiBkcml2ZXIuDQo+ID4gPiA+ID4gPiBC
-YXNlZCBvbiB0aGUgZmVlZGJhY2ssIHdlIHRyaWVkIHRvIGFkZHJlc3MgdGhvc2UgY29uY2VybnMg
-aW4NCj4gPiA+ID4gPiA+IHRoaXMgdmVyc2lvbi4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IFRoaXMg
-c2VyaWVzIGRvZXNuJ3QgbWVudGlvbiBhbnl0aGluZyByZWxhdGVkIHRvIGRpcnR5IHBhZ2UgdHJh
-Y2tpbmcuDQo+ID4gPiA+ID4gQXJlIHlvdSByZWx5IG9uIEtlcWlhbidzIHNlcmllcyBmb3IgdXRp
-bGl6aW5nIGhhcmR3YXJlIGlvbW11IGRpcnR5DQo+ID4gPiA+ID4gYml0IChlLmcuIFNNTVUgSFRU
-VSk/DQo+ID4gPiA+DQo+ID4gPiA+IFllcywgdGhpcyBkb2Vzbid0IGhhdmUgZGlydHkgcGFnZSB0
-cmFja2luZyBhbmQgdGhlIHBsYW4gaXMgdG8gbWFrZSB1c2Ugb2YNCj4gPiA+ID4gS2VxaWFuJ3Mg
-U01NVSBIVFRVIHdvcmsgdG8gaW1wcm92ZSBwZXJmb3JtYW5jZS4gV2UgaGF2ZSBkb25lDQo+IGJh
-c2ljDQo+ID4gPiA+IHNhbml0eSB0ZXN0aW5nIHdpdGggdGhvc2UgcGF0Y2hlcy4NCj4gPiA+ID4N
-Cj4gPiA+DQo+ID4gPiBEbyB5b3UgcGxhbiB0byBzdXBwb3J0IG1pZ3JhdGlvbiB3L28gSFRUVSBh
-cyB0aGUgZmFsbGJhY2sgb3B0aW9uPw0KPiA+ID4gR2VuZXJhbGx5IG9uZSB3b3VsZCBleHBlY3Qg
-dGhlIGJhc2ljIGZ1bmN0aW9uYWxpdHkgcmVhZHkgYmVmb3JlIHRhbGtpbmcNCj4gPiA+IGFib3V0
-IG9wdGltaXphdGlvbi4NCj4gPg0KPiA+IFllcywgdGhlIHBsYW4gaXMgdG8gZ2V0IHRoZSBiYXNp
-YyBsaXZlIG1pZ3JhdGlvbiB3b3JraW5nIGFuZCB0aGVuIHdlIGNhbg0KPiA+IG9wdGltaXplDQo+
-ID4gaXQgd2l0aCBTTU1VIEhUVFUgd2hlbiBpdCBpcyBhdmFpbGFibGUuDQo+IA0KPiBUaGUgaW50
-ZXJlc3RpbmcgdGhpbmcgaXMgdGhhdCB3L28gSFRUVSB2ZmlvIHdpbGwganVzdCByZXBvcnQgZXZl
-cnkgcGlubmVkDQo+IHBhZ2UgYXMgZGlydHksIGkuZS4gdGhlIGVudGlyZSBndWVzdCBtZW1vcnkg
-aXMgZGlydHkuIFRoaXMgY29tcGxldGVseSBraWxscw0KPiB0aGUgYmVuZWZpdCBvZiBwcmVjb3B5
-IHBoYXNlIHNpbmNlIFFlbXUgc3RpbGwgbmVlZHMgdG8gdHJhbnNmZXIgdGhlIGVudGlyZQ0KPiBn
-dWVzdCBtZW1vcnkgaW4gdGhlIHN0b3AtY29weSBwaGFzZS4gVGhpcyBpcyBub3QgYSAnd29ya2lu
-ZycgbW9kZWwgZm9yDQo+IGxpdmUgbWlncmF0aW9uLg0KPiANCj4gU28gaXQgbmVlZHMgdG8gYmUg
-Y2xlYXIgd2hldGhlciBIVFRVIGlzIHJlYWxseSBhbiBvcHRpbWl6YXRpb24gb3INCj4gYSBoYXJk
-IGZ1bmN0aW9uYWwtcmVxdWlyZW1lbnQgZm9yIG1pZ3JhdGluZyBzdWNoIGRldmljZS4gSWYgdGhl
-IGxhdHRlcg0KPiB0aGUgbWlncmF0aW9uIHJlZ2lvbiBpbmZvIGlzIG5vdCBhIG5pY2UtdG8taGF2
-ZSB0aGluZy4NCg0KWWVzLCBhZ3JlZSB0aGF0IHdlIGhhdmUgdG8gdHJhbnNmZXIgdGhlIGVudGly
-ZSBHdWVzdCBtZW1vcnkgaW4gdGhpcyBjYXNlLg0KQnV0IGRvbid0IHRoaW5rIHRoYXQgaXMgYSBr
-aWxsZXIgaGVyZSBhcyB3ZSB3b3VsZCBzdGlsbCBsaWtlIHRvIGhhdmUgdGhlIA0KYmFzaWMgbGl2
-ZSBtaWdyYXRpb24gZW5hYmxlZCBvbiB0aGVzZSBwbGF0Zm9ybXMgYW5kIGNhbiBiZSB1c2VkDQp3
-aGVyZSB0aGUgY29uc3RyYWludHMgb2YgbWVtb3J5IHRyYW5zZmVyIGlzIGFjY2VwdGFibGUuDQog
-DQo+IGJ0dyB0aGUgZmFsbGJhY2sgb3B0aW9uIHRoYXQgSSByYWlzZWQgZWFybGllciBpcyBtb3Jl
-IGxpa2Ugc29tZSBzb2Z0d2FyZQ0KPiBtaXRpZ2F0aW9uIGZvciBjb2xsZWN0aW5nIGRpcnR5IHBh
-Z2VzLCBlLmcuIGFuYWx5emluZyB0aGUgcmluZyBkZXNjcmlwdG9ycw0KPiB0byBidWlsZCBzb2Z0
-d2FyZS10cmFja2VkIGRpcnR5IGluZm8gYnkgbWVkaWF0aW5nIHRoZSBjbWQgcG9ydGFsDQo+ICh3
-aGljaCByZXF1aXJlcyBkeW5hbWljYWxseSB1bm1hcHBpbmcgY21kIHBvcnRhbCBmcm9tIHRoZSBm
-YXN0LXBhdGgNCj4gdG8gZW5hYmxlIG1lZGlhdGlvbikuIFdlIGFyZSBsb29raW5nIGludG8gdGhp
-cyBvcHRpb24gZm9yIHNvbWUgcGxhdGZvcm0NCj4gd2hpY2ggbGFja3Mgb2YgSU9NTVUgZGlydHkg
-Yml0IHN1cHBvcnQuDQoNCkludGVyZXN0aW5nLiBJcyB0aGVyZSBhbnl0aGluZyBhdmFpbGFibGUg
-cHVibGljbHkgc28gdGhhdCB3ZSBjYW4gdGFrZSBhIGxvb2s/DQoNClRoYW5rcywNClNoYW1lZXIN
-Cg==
+smp_processor_id() is unsafe if it's used in a preemption-on critical
+section. It will cause the call trace when the preemption-on and sets the
+CONFIG_DEBUG_PREEMPT. So replace 'smp_processor_id' with 'get_cpu' in
+preemptible to avoid the following call trace:
+
+[ 7538.874350] BUG: using smp_processor_id() in preemptible [00000000] code: af_alg06/8438
+[ 7538.874368] caller is debug_smp_processor_id+0x1c/0x28
+[ 7538.874373] CPU: 50 PID: 8438 Comm: af_alg06 Kdump: loaded Not tainted 5.10.0.pc+ #18
+[ 7538.874377] Call trace:
+[ 7538.874387]  dump_backtrace+0x0/0x210
+[ 7538.874389]  show_stack+0x2c/0x38
+[ 7538.874392]  dump_stack+0x110/0x164
+[ 7538.874394]  check_preemption_disabled+0xf4/0x108
+[ 7538.874396]  debug_smp_processor_id+0x1c/0x28
+[ 7538.874406]  sec_create_qps+0x24/0xe8 [hisi_sec2]
+[ 7538.874408]  sec_ctx_base_init+0x20/0x4d8 [hisi_sec2]
+[ 7538.874411]  sec_aead_ctx_init+0x68/0x180 [hisi_sec2]
+[ 7538.874413]  sec_aead_sha256_ctx_init+0x28/0x38 [hisi_sec2]
+[ 7538.874421]  crypto_aead_init_tfm+0x54/0x68
+[ 7538.874423]  crypto_create_tfm_node+0x6c/0x110
+[ 7538.874424]  crypto_alloc_tfm_node+0x74/0x288
+[ 7538.874426]  crypto_alloc_aead+0x40/0x50
+[ 7538.874431]  aead_bind+0x50/0xd0
+[ 7538.874433]  alg_bind+0x94/0x148
+[ 7538.874439]  __sys_bind+0x98/0x118
+[ 7538.874441]  __arm64_sys_bind+0x28/0x38
+[ 7538.874445]  do_el0_svc+0x88/0x258
+[ 7538.874447]  el0_svc+0x1c/0x28
+[ 7538.874449]  el0_sync_handler+0x8c/0xb8
+[ 7538.874452]  el0_sync+0x148/0x180
+
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+---
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 3 ++-
+ drivers/crypto/hisilicon/sec2/sec_main.c  | 3 ++-
+ drivers/crypto/hisilicon/zip/zip_main.c   | 6 ++++--
+ 3 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 65a641396c07..d1754e7b7a9c 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -277,10 +277,11 @@ static inline int hpre_cluster_core_mask(struct hisi_qm *qm)
+ 
+ struct hisi_qp *hpre_create_qp(u8 type)
+ {
+-	int node = cpu_to_node(smp_processor_id());
++	int node = cpu_to_node(get_cpu());
+ 	struct hisi_qp *qp = NULL;
+ 	int ret;
+ 
++	put_cpu();
+ 	if (type != HPRE_V2_ALG_TYPE && type != HPRE_V3_ECC_ALG_TYPE)
+ 		return NULL;
+ 
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 90551bf38b52..e3a4d4f8637b 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -282,11 +282,12 @@ void sec_destroy_qps(struct hisi_qp **qps, int qp_num)
+ 
+ struct hisi_qp **sec_create_qps(void)
+ {
+-	int node = cpu_to_node(smp_processor_id());
++	int node = cpu_to_node(get_cpu());
+ 	u32 ctx_num = ctx_q_num;
+ 	struct hisi_qp **qps;
+ 	int ret;
+ 
++	put_cpu();
+ 	qps = kcalloc(ctx_num, sizeof(struct hisi_qp *), GFP_KERNEL);
+ 	if (!qps)
+ 		return NULL;
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 7148201ce76e..bdf2eff6d8bd 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -276,8 +276,10 @@ MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
+ 
+ int zip_create_qps(struct hisi_qp **qps, int qp_num, int node)
+ {
+-	if (node == NUMA_NO_NODE)
+-		node = cpu_to_node(smp_processor_id());
++	if (node == NUMA_NO_NODE) {
++		node = cpu_to_node(get_cpu());
++		put_cpu();
++	}
+ 
+ 	return hisi_qm_alloc_qps_node(&zip_devices, qp_num, 0, node, qps);
+ }
+-- 
+2.33.0
+
