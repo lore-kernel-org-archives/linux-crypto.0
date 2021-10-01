@@ -2,142 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC7EAC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Sep 2021 23:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A2BC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Oct 2021 05:51:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A57176124D
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Sep 2021 23:42:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 57A636124B
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Oct 2021 05:51:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350336AbhI3Xnt (ORCPT
+        id S1352098AbhJAFwx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Sep 2021 19:43:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50784 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350228AbhI3Xnt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Sep 2021 19:43:49 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31A86C06176D
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Sep 2021 16:42:06 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id u22so9435092oie.5
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Sep 2021 16:42:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Gi00dUKbEnLBBRPaXgkT5o8maxEnkVJlIu1XQkEnZC0=;
-        b=KbzcW1uCfgaHX1R4cGCWYPX7UdNQyYMdI2TaNa0i7HP9MHoSkC/vqAaGCgbin6mB6T
-         se+E7M7c8NwmnlvSAHX5Ie1kV2dQUGPSOdeqqEWF3Lwk2UCXrVLeLlgFqq84wDU9ZO/z
-         y5JKi+oFRhFbmcrebDHwOlzmSssggAwIKOW79O97lnO4uguXxhrzpEcb4eFn8kFc3SBB
-         WMQvnY7IFk8eR6WWepatQtY23RGz9Az/Xqjs9nqtdJONqku7bY6wav7l+I/4l/ILJI+W
-         aMPQGheTvyHDLJc6QYsimS5BjEn4+6tQhaUZjCY5c7157mhO7h89Kblg9SE+vbVy4BwF
-         IkJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Gi00dUKbEnLBBRPaXgkT5o8maxEnkVJlIu1XQkEnZC0=;
-        b=utRXgHsDP2jQb+3I1xwOBVm7IE3B9VJXri0Ivd8Z2UOCR6on8RVRqspH5pf98Cmbx3
-         /hdOaDc5Vxs3hTOTnCRxiTov2QjpBYz2+/iGKKDaCtV2SOpXs2CzY0aPhRX/jloi6x98
-         nkX2fiZcB9rIu99P7X+rxInsw9RLijhICb3japy4Um1nno3qknvD/5yyggyzOjmt0/qK
-         7r6ESCxjaHn2c2tVuJkq26R3jEfS8HhqtnQiVWhMg6EJADYIwJ8vR3AqRyNp471YtYDE
-         4c6F8FIFjSGjhyf+uQeyGgfsSEuXs7UjQb0uiD4tMELszZCrL+5Uq8zTPXt6lD285+ZL
-         qE7Q==
-X-Gm-Message-State: AOAM531j/v4s43FwXjUih7CRgbbvpwJ3OfeS46IOyBrxt9BfJi+QZDgt
-        IIF+cj6tKxEtd3SbV5k+XvrIkLc/l49K9r5Y9e6Qfg==
-X-Google-Smtp-Source: ABdhPJwKPjQgHWUMf0Og0OYmzz1BYvLtSYzI/LiSuuHHPOcmotdMisrFNn74dwe+jncaX/uBBZp37kj5RhHAGMWQhf4=
-X-Received: by 2002:a05:6808:60f:: with SMTP id y15mr1599090oih.15.1633045325230;
- Thu, 30 Sep 2021 16:42:05 -0700 (PDT)
+        Fri, 1 Oct 2021 01:52:53 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:55750 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241958AbhJAFwq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 Oct 2021 01:52:46 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1mWBRk-00065u-FU; Fri, 01 Oct 2021 13:51:00 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1mWBRi-0007qF-UQ; Fri, 01 Oct 2021 13:50:58 +0800
+Date:   Fri, 1 Oct 2021 13:50:58 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Vladis Dronov <vdronov@redhat.com>,
+        Simo Sorce <ssorce@redhat.com>,
+        Eric Biggers <ebiggers@kernel.org>, llvm@lists.linux.dev
+Subject: Re: [v2 PATCH] crypto: api - Fix built-in testing dependency failures
+Message-ID: <20211001055058.GA6081@gondor.apana.org.au>
+References: <20210913071251.GA15235@gondor.apana.org.au>
+ <20210917002619.GA6407@gondor.apana.org.au>
+ <YVNfqUVJ7w4Z3WXK@archlinux-ax161>
 MIME-Version: 1.0
-References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-33-brijesh.singh@amd.com>
-In-Reply-To: <20210820155918.7518-33-brijesh.singh@amd.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Thu, 30 Sep 2021 16:41:54 -0700
-Message-ID: <CAA03e5G-UX761uBAFLS3e1NuYZOh2v8b=UkrX+rZUviegyWVGQ@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 32/45] KVM: x86: Define RMP page fault error bits
- for #NPF
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YVNfqUVJ7w4Z3WXK@archlinux-ax161>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 9:00 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+On Tue, Sep 28, 2021 at 11:32:09AM -0700, Nathan Chancellor wrote:
 >
-> When SEV-SNP is enabled globally, the hardware places restrictions on all
-> memory accesses based on the RMP entry, whether the hypervisor or a VM,
-> performs the accesses. When hardware encounters an RMP access violation
-> during a guest access, it will cause a #VMEXIT(NPF).
->
-> See APM2 section 16.36.10 for more details.
+> This patch as commit 3cefb01905df ("crypto: api - Fix built-in testing
+> dependency failures") in -next (along with the follow up fix) causes the
+> following depmod error:
+> 
+> $ make -skj"$(nproc)" ARCH=powerpc CROSS_COMPILE=powerpc-linux- INSTALL_MOD_PATH=rootfs ppc44x_defconfig all modules_install
+> depmod: ERROR: Cycle detected: crypto -> crypto_algapi -> crypto
+> depmod: ERROR: Found 2 modules in dependency cycles!
+> make: *** [Makefile:1946: modules_install] Error 1
+> 
+> Initially reported on our CI:
+> 
+> https://github.com/ClangBuiltLinux/continuous-integration2/runs/3732847295?check_suite_focus=true
 
-nit: Section # should be 15.36.10 (rather than 16.36.10). Also, is it
-better to put section headings, rather than numbers in the commit logs
-and comments? Someone mentioned to me that the section numbering in
-APM and SDM can move around over time, but the section titles tend to
-be more stable. I'm not sure how true this is, so feel free to
-disregard this comment.
+That's weird, I can't reproduce this.  Where can I find your Kconfig
+file? Alternatively, can you identify exactly what is in algapi that
+is being depended on by crypto?
 
->
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 8 ++++++++
->  1 file changed, 8 insertions(+)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 109e80167f11..a6e764458f3e 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -239,8 +239,12 @@ enum x86_intercept_stage;
->  #define PFERR_FETCH_BIT 4
->  #define PFERR_PK_BIT 5
->  #define PFERR_SGX_BIT 15
-> +#define PFERR_GUEST_RMP_BIT 31
->  #define PFERR_GUEST_FINAL_BIT 32
->  #define PFERR_GUEST_PAGE_BIT 33
-> +#define PFERR_GUEST_ENC_BIT 34
-> +#define PFERR_GUEST_SIZEM_BIT 35
-> +#define PFERR_GUEST_VMPL_BIT 36
->
->  #define PFERR_PRESENT_MASK (1U << PFERR_PRESENT_BIT)
->  #define PFERR_WRITE_MASK (1U << PFERR_WRITE_BIT)
-> @@ -251,6 +255,10 @@ enum x86_intercept_stage;
->  #define PFERR_SGX_MASK (1U << PFERR_SGX_BIT)
->  #define PFERR_GUEST_FINAL_MASK (1ULL << PFERR_GUEST_FINAL_BIT)
->  #define PFERR_GUEST_PAGE_MASK (1ULL << PFERR_GUEST_PAGE_BIT)
-> +#define PFERR_GUEST_RMP_MASK (1ULL << PFERR_GUEST_RMP_BIT)
-> +#define PFERR_GUEST_ENC_MASK (1ULL << PFERR_GUEST_ENC_BIT)
-> +#define PFERR_GUEST_SIZEM_MASK (1ULL << PFERR_GUEST_SIZEM_BIT)
-> +#define PFERR_GUEST_VMPL_MASK (1ULL << PFERR_GUEST_VMPL_BIT)
->
->  #define PFERR_NESTED_GUEST_PAGE (PFERR_GUEST_PAGE_MASK |       \
->                                  PFERR_WRITE_MASK |             \
-> --
-> 2.17.1
->
+The crypto module should be at the very base and there should be no
+depenedencies from it on algapi.  The algapi module is meant to be
+on top of crypto obviously.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
