@@ -2,157 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A95C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Oct 2021 10:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4555C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Oct 2021 11:06:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88FC3613A0
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Oct 2021 10:58:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93D4261A81
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Oct 2021 11:06:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353703AbhJALAP (ORCPT
+        id S1353526AbhJALH7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Oct 2021 07:00:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60608 "EHLO
+        Fri, 1 Oct 2021 07:07:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353421AbhJALAC (ORCPT
+        with ESMTP id S1353454AbhJALH7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Oct 2021 07:00:02 -0400
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F8A8C061775
-        for <linux-crypto@vger.kernel.org>; Fri,  1 Oct 2021 03:58:18 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id bd28so33190321edb.9
-        for <linux-crypto@vger.kernel.org>; Fri, 01 Oct 2021 03:58:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TTPu8WxtNfGWy6R5J1kog5z5I/HdOclpvXu9/TjPYkI=;
-        b=B3n84obtuH7/Si/VlCtf999g8dmTgTCF7dKj2Y+QtfZRj9P/Ei0BDjyll/MPzeBR3p
-         lZKj7iiD5IE4rSJs4rG7VXvz+GVY0hKYusNJf8O6b5RNrLuW+wokveyxAQbBQQem8L7m
-         rUtXTEzLPpQcupg44C/C7i3GCX9fsMZpzN3FJHtxql5SlFo/cIy3VGHGIEBhrmx4B0gQ
-         KD5dLJSr3j+dwPuMFFTNX2rmXmZNWsKx2DapKheI8AsDsbokl8XpH1hxxlfHFB2SCZOk
-         mio1id1dA9aTUJEiWNgbx4vzND9FlZhZJNwVfMoqcNchr8i6vdtbgZw1jQI3wF6GXBoX
-         spUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TTPu8WxtNfGWy6R5J1kog5z5I/HdOclpvXu9/TjPYkI=;
-        b=Ba+WotkIBuFm4IiMX6D/Qu+o4k2TZSxoLd5KB4zxk8V0qCrDVxZ4zKa4D8LXGLkcmg
-         NF7IyYdByE2Bq1KYWVbdyO95qXk6Kt6/QBxhs4xTxEGBP/MN9iaL3mGGVJ6BJoy2LgmU
-         KTJQOVsbhDMpXBWhVQLi65VWLfB7RnQjKBdnjr7Oe3HQRVQ5zUia0IvxduLS51/NazzI
-         slUgdIQvNBPzRADc6Z/JOWJkCUxWz55in4ilXDBrmM+NzF/v5FVOOFehS+KIBYWMQozk
-         CHubtLkm5fmCK5DiD1Z3J4bASqKfu6jgCu3OqtlmmlEuav+gAj31AkRZOgnETGi7+x/L
-         Y4Ow==
-X-Gm-Message-State: AOAM531PCkKoXdKu/9a7kbVmN8j6IHr3gve37YQiPr5PZIlmgoPon4ov
-        XRe5wmT7jaQtmBeAGLj8MdgROdo98GxCnArtvXUg7exk9kVoRQ==
-X-Google-Smtp-Source: ABdhPJwkF1v2pLCEee/7m9lD3UfOJZ8LUK6b8P9lh2U8MQoc3XULSTy6PlmyP5Bwm2WP9Skoc3BaD2s0lMvBcqFqvdM=
-X-Received: by 2002:a17:906:318b:: with SMTP id 11mr5664872ejy.493.1633085896597;
- Fri, 01 Oct 2021 03:58:16 -0700 (PDT)
+        Fri, 1 Oct 2021 07:07:59 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27484C061775;
+        Fri,  1 Oct 2021 04:06:15 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0e8e0006425ffdb1062ac0.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:8e00:642:5ffd:b106:2ac0])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7CBB61EC0419;
+        Fri,  1 Oct 2021 13:06:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1633086372;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JCBAeXE9Fm2/4A8nfF4qlTElC4omNaQJNghTb8YDddM=;
+        b=kTtfe1X/X1Cm8CiF7sqgmxJbnYSVBHwhUxmVIQWx22i7VqsRKC6EEWMxmDVCD+9RF7VzG5
+        QJBTrSVvQeE27As7XeJBpiyoxWoEGP1nFgkKyx5GnB9alDDmJT1lAjv2TqZFpTt2XpnmBK
+        KSzCimg6oBTl41PghKnK15OZssLqRMo=
+Date:   Fri, 1 Oct 2021 13:06:08 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 06/45] x86/sev: Invalid pages from direct map
+ when adding it to RMP table
+Message-ID: <YVbroJ5RGWa5kZ6J@zn.tnic>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-7-brijesh.singh@amd.com>
+ <YVR5cOQOJxy12DcR@zn.tnic>
+ <60d6a70d-22ab-9e17-b243-7f5669b4b70d@amd.com>
 MIME-Version: 1.0
-References: <20210913071251.GA15235@gondor.apana.org.au> <20210917002619.GA6407@gondor.apana.org.au>
- <YVNfqUVJ7w4Z3WXK@archlinux-ax161> <20211001055058.GA6081@gondor.apana.org.au>
-In-Reply-To: <20211001055058.GA6081@gondor.apana.org.au>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Fri, 1 Oct 2021 16:28:05 +0530
-Message-ID: <CA+G9fYvZC3+hfkMXWte1vUmmO9jLnTNnCrVMhHYnJjw15MWzSw@mail.gmail.com>
-Subject: Re: [v2 PATCH] crypto: api - Fix built-in testing dependency failures
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Vladis Dronov <vdronov@redhat.com>,
-        Simo Sorce <ssorce@redhat.com>,
-        Eric Biggers <ebiggers@kernel.org>, llvm@lists.linux.dev,
-        lkft-triage@lists.linaro.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <60d6a70d-22ab-9e17-b243-7f5669b4b70d@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+On Thu, Sep 30, 2021 at 09:19:52AM -0700, Brijesh Singh wrote:
+> . The thought process is if in the future 
+> set_direct_map_default_noflush() is improved to restore the large
+> mapping then it will all work transparently.
 
+That's only scratching the surface of the *why* this is done so please
+explain why this dance is being done in a comment above the code so that
+it is clear.
 
-I do see the reported problem while building modules.
-you may use the steps to reproduce.
+It is not really obvious why that hiding from the direct map is being
+done.
 
-On Fri, 1 Oct 2021 at 11:58, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Tue, Sep 28, 2021 at 11:32:09AM -0700, Nathan Chancellor wrote:
-> >
-> > This patch as commit 3cefb01905df ("crypto: api - Fix built-in testing
-> > dependency failures") in -next (along with the follow up fix) causes the
-> > following depmod error:
-> >
-> > $ make -skj"$(nproc)" ARCH=powerpc CROSS_COMPILE=powerpc-linux- INSTALL_MOD_PATH=rootfs ppc44x_defconfig all modules_install
-> > depmod: ERROR: Cycle detected: crypto -> crypto_algapi -> crypto
-> > depmod: ERROR: Found 2 modules in dependency cycles!
-> > make: *** [Makefile:1946: modules_install] Error 1
-> >
-> > Initially reported on our CI:
-> >
-> > https://github.com/ClangBuiltLinux/continuous-integration2/runs/3732847295?check_suite_focus=true
->
-> That's weird, I can't reproduce this.  Where can I find your Kconfig
-> file? Alternatively, can you identify exactly what is in algapi that
-> is being depended on by crypto?
->
-> The crypto module should be at the very base and there should be no
-> depenedencies from it on algapi.  The algapi module is meant to be
-> on top of crypto obviously.
+Good reason from that memfd_secret mail are:
 
+"* Prevent cross-process secret userspace memory exposures. Once the secret
+memory is allocated, the user can't accidentally pass it into the kernel to
+be transmitted somewhere. The secreremem pages cannot be accessed via the
+direct map and they are disallowed in GUP."
 
-#!/bin/sh
+and in general hiding RMP pages from the direct map is a nice additional
+protection.
 
-# TuxMake is a command line tool and Python library that provides
-# portable and repeatable Linux kernel builds across a variety of
-# architectures, toolchains, kernel configurations, and make targets.
-#
-# TuxMake supports the concept of runtimes.
-# See https://docs.tuxmake.org/runtimes/, for that to work it requires
-# that you install podman or docker on your system.
-#
-# To install tuxmake on your system globally:
-# sudo pip3 install -U tuxmake
-#
-# See https://docs.tuxmake.org/ for complete documentation.
+Thx.
 
+-- 
+Regards/Gruss,
+    Boris.
 
-tuxmake --runtime podman --target-arch mips --toolchain gcc-10
---kconfig rt305x_defconfig
-
-
-# to reproduce this build locally: tuxmake --target-arch=mips
---kconfig=rt305x_defconfig --toolchain=gcc-10 --wrapper=sccache
---environment=KBUILD_BUILD_TIMESTAMP=@1633074287
---environment=KBUILD_BUILD_USER=tuxmake
---environment=KBUILD_BUILD_HOST=tuxmake
---environment=SCCACHE_BUCKET=sccache.tuxbuild.com --runtime=podman
---image=855116176053.dkr.ecr.us-east-1.amazonaws.com/tuxmake/mips_gcc-10
-config default kernel xipkernel modules dtbs dtbs-legacy debugkernel
-headers
-make --silent --keep-going --jobs=8
-O=/home/tuxbuild/.cache/tuxmake/builds/current ARCH=mips
-CROSS_COMPILE=mips-linux-gnu- 'CC=sccache mips-linux-gnu-gcc'
-'HOSTCC=sccache gcc' rt305x_defconfig
-make --silent --keep-going --jobs=8
-O=/home/tuxbuild/.cache/tuxmake/builds/current ARCH=mips
-CROSS_COMPILE=mips-linux-gnu- 'CC=sccache mips-linux-gnu-gcc'
-'HOSTCC=sccache gcc'
-make --silent --keep-going --jobs=8
-O=/home/tuxbuild/.cache/tuxmake/builds/current ARCH=mips
-CROSS_COMPILE=mips-linux-gnu- 'CC=sccache mips-linux-gnu-gcc'
-'HOSTCC=sccache gcc' uImage.gz
-make --silent --keep-going --jobs=8
-O=/home/tuxbuild/.cache/tuxmake/builds/current ARCH=mips
-CROSS_COMPILE=mips-linux-gnu- 'CC=sccache mips-linux-gnu-gcc'
-'HOSTCC=sccache gcc' modules_install INSTALL_MOD_STRIP=1
-INSTALL_MOD_PATH=/home/tuxbuild/.cache/tuxmake/builds/current/modinstall
-depmod: ERROR: Cycle detected: crypto -> crypto_algapi -> crypto
-depmod: ERROR: Found 2 modules in dependency cycles!
-make[1]: *** [/builds/linux/Makefile:1961: modules_install] Error 1
-make: *** [Makefile:226: __sub-make] Error 2
-make: Target 'modules_install' not remade because of errors.
-
-
---
-Linaro LKFT
-https://lkft.linaro.org
+https://people.kernel.org/tglx/notes-about-netiquette
