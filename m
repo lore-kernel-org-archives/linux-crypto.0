@@ -2,63 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32EC4C433EF
-	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 00:28:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A0A7C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 01:43:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BE9061A3A
-	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 00:28:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40A02619E7
+	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 01:43:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234063AbhJCA3u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 Oct 2021 20:29:50 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:55798 "EHLO deadmen.hmeau.com"
+        id S229486AbhJCBor convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 2 Oct 2021 21:44:47 -0400
+Received: from vm1.rngh.net ([50.116.5.249]:60748 "EHLO mail.rngh.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233697AbhJCA3u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 2 Oct 2021 20:29:50 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1mWpMJ-0006pR-3F; Sun, 03 Oct 2021 08:28:03 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1mWpMH-0001QV-I3; Sun, 03 Oct 2021 08:28:01 +0800
-Date:   Sun, 3 Oct 2021 08:28:01 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Vladis Dronov <vdronov@redhat.com>,
-        Simo Sorce <ssorce@redhat.com>,
-        Eric Biggers <ebiggers@kernel.org>, llvm@lists.linux.dev
-Subject: Re: [v2 PATCH] crypto: api - Fix built-in testing dependency failures
-Message-ID: <20211003002801.GA5435@gondor.apana.org.au>
-References: <20210913071251.GA15235@gondor.apana.org.au>
- <20210917002619.GA6407@gondor.apana.org.au>
- <YVNfqUVJ7w4Z3WXK@archlinux-ax161>
- <20211001055058.GA6081@gondor.apana.org.au>
- <YVdNFzs8HUQwHa54@archlinux-ax161>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YVdNFzs8HUQwHa54@archlinux-ax161>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S229469AbhJCBor (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 2 Oct 2021 21:44:47 -0400
+X-Greylist: delayed 485 seconds by postgrey-1.27 at vger.kernel.org; Sat, 02 Oct 2021 21:44:47 EDT
+Received: from [192.168.1.107] (c-73-231-123-62.hsd1.ca.comcast.net [73.231.123.62])
+        by mail.rngh.net (Postfix) with ESMTPSA id 6B93E3DB36;
+        Sun,  3 Oct 2021 01:34:55 +0000 (UTC)
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [Cryptography] [RFC] random: add new pseudorandom number generator
+From:   Ron Garret <ron@flownet.com>
+In-Reply-To: <378733E4-D976-4E2D-BE14-AD900C901CE8@callas.org>
+Date:   Sat, 2 Oct 2021 18:34:54 -0700
+Cc:     Sandy Harris <sandyinchina@gmail.com>, Ted Ts'o <tytso@mit.edu>,
+        Cryptography <cryptography@metzdowd.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <2DAE91DD-D16B-42B2-A34B-E405725048C2@flownet.com>
+References: <CACXcFm=-E_wnDdRPztKJwDo8hvt6ENf84D90iFUXReuw2s0kuQ@mail.gmail.com> <378733E4-D976-4E2D-BE14-AD900C901CE8@callas.org>
+To:     Jon Callas <jon@callas.org>
+X-Mailer: Apple Mail (2.1878.6)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 01, 2021 at 11:01:59AM -0700, Nathan Chancellor wrote:
->
-> I have attached the Kconfig file that I used to reproduce it. It is
-> still reproducible for me at your latest commit in cryptodev
-> (e42dff467ee688fe6b5a083f1837d06e3b27d8c0) with that exact command that
-> I gave you.
+
+On Oct 2, 2021, at 5:08 PM, Jon Callas <jon@callas.org> wrote:
+
 > 
-> It is possible that it could be crypto_boot_test_finished?
+> 
+>> On Sep 16, 2021, at 20:18, Sandy Harris <sandyinchina@gmail.com> wrote:
+>> 
+>> I have a PRNG that I want to use within the Linux random(4) driver. It
+>> looks remarkably strong to me, but analysis from others is needed.
+> 
+> A good block cipher in counter mode makes a pretty-okay PRNG. I say pretty-okay only because I would like my PRNG not to be invertible. Iterated hash functions are better.
 
-I don't think that's the issue because algapi already depends on
-api.  However, the softdep on cryptomgr in api looks suspicious,
-as it would always introduce a loop.  Can you try removing that
-softdep from api.c and see if the problem resolves it self?
+Whatever you use you want to truncate the output, otherwise you won’t get repetitions, which you actually want from a good PRNG.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+rg
+
