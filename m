@@ -2,107 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9169C433EF
-	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 18:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 557B6C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 18:15:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A763861A0A
-	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 18:15:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DEC061A0A
+	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 18:15:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231365AbhJCSQt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 3 Oct 2021 14:16:49 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:38416 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231360AbhJCSQs (ORCPT
+        id S231414AbhJCSQ4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 3 Oct 2021 14:16:56 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:50796 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231296AbhJCSQ4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 3 Oct 2021 14:16:48 -0400
+        Sun, 3 Oct 2021 14:16:56 -0400
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 52C141FFB6;
-        Sun,  3 Oct 2021 18:15:00 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 8694E22188;
+        Sun,  3 Oct 2021 18:15:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1633284900; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=P9I25fWE1JHgtKRx7ZMJwEWzhRPyhbxUL4KSUBb/BwE=;
-        b=g3aTgt4VDonWXHJIa8MSBMy9KXZXpgdIY4difzN0PqPcl+QtTtLkfCqSA8AgnfmM/51PRG
-        2iEP9XvJpOaPKiAPg8rwYGeDttjUf1JL+5E+VAMeLLHFiyKOrpb7YBOAqwPRbkMLRas9ct
-        wk7A1J5n5w9X8k0OpF4K0p4MJEGH0K0=
+        t=1633284907; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y0NsFhX+iG9v6yqRJSdn1Z2f2KeEAmY9udesNCSPze4=;
+        b=v4dQuBfoqmSTqpkMZUOhOsV4qIDJ3Y5ljpmBoms1igjAWc1soBgofdAJen/7vq+uAcTssM
+        a/OR5FZUSFQVYduv0AOErdiSJNGoFggdfI7lMLiO0Mr7FMf1kSRgI6DmSYoxjVl+EBFGi1
+        fIViuoYNy9U0ga5mjbIwMsC0tp9YeRI=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1633284900;
+        s=susede2_ed25519; t=1633284907;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=P9I25fWE1JHgtKRx7ZMJwEWzhRPyhbxUL4KSUBb/BwE=;
-        b=21TixarJCmVufHIlVuP0kGQnm08TBZg7J0dd3u+b6QYLFlcfKRoh/0Fx+kYl0tQxmTBBwY
-        UoHrEDNiakeTj0CA==
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y0NsFhX+iG9v6yqRJSdn1Z2f2KeEAmY9udesNCSPze4=;
+        b=kam+WftdXtX/I9KJz0HzyoTx8LALywNtb2Nqqlz9bqthdBbCzAk9704pMuFBQ1IUjE/+sY
+        AoPqhu8CytwWjvAA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3F11813A09;
-        Sun,  3 Oct 2021 18:15:00 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 73EDA13A09;
+        Sun,  3 Oct 2021 18:15:07 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id Xc8dDiTzWWGIEwAAMHmgww
-        (envelope-from <nstange@suse.de>); Sun, 03 Oct 2021 18:15:00 +0000
+        id L+UJGyvzWWGlEwAAMHmgww
+        (envelope-from <nstange@suse.de>); Sun, 03 Oct 2021 18:15:07 +0000
 From:   Nicolai Stange <nstange@suse.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Torsten Duwe <duwe@suse.de>, Nicolai Stange <nstange@suse.de>
-Subject: [PATCH 0/8] crypto: api - priorize tested algorithms in lookup
-Date:   Sun,  3 Oct 2021 20:14:05 +0200
-Message-Id: <20211003181413.12465-1-nstange@suse.de>
+Subject: [PATCH 1/8] crypto: af_alg - reject requests for untested algorithms
+Date:   Sun,  3 Oct 2021 20:14:06 +0200
+Message-Id: <20211003181413.12465-2-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20211003181413.12465-1-nstange@suse.de>
+References: <20211003181413.12465-1-nstange@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi all,
+Currently it's possible for userspace to specify any combination of
+->salg_feat and ->salg_mask with respect to CRYTPO_ALG_TESTED via the
+af_alg interface.
 
-my initial goal had been to make the algorithm lookup prefer usable
-instances over ones where the tests are still pending. In my first attempt
-I realized that the code in crypto_alg_lookup() became quite convoluted
-and that it could get streamlined somewhat by consolidating
-CRYPTO_ALG_TESTED handling for lookup larvals a bit.
+As these are passed onwards to crypto_larval_lookup() unmodified as
+'mask' and 'type' parameters eventually, this can lead to the creation of
+obscure lookup larvals like e.g. (mask & CRYTPO_ALG_TESTED) but not
+(type & CRYTPO_ALG_TESTED) or the other way around.
 
-This cleanup can be found in [1/8] - [7/8] and might perhaps be worth
-considering on its own, independent of whether or not you deem the
-final [8/8], the patch implementing my original goal of priorizing
-algorithms in working state, suitable for upstream inclusion.
+Userspace should have no business in asking for untested algorithms. Make
+af_alg's alg_bind() reject nonsensical combinations of ->salg_feat and
+->salg_mask with respect to CRYTPO_ALG_TESTED with -EINVAL.
 
-This series is based on current herbert/cryptodev-2.6 master.
+Note that CRYTPO_ALG_TESTED not being set in either of mask and type is
+considered equivalent to that flag being set in both and these two
+combinations are the only ones supported as of now.
 
-All patches have been tested with tcrypt.ko as well as the kernel/crypto
-testcases from LTP.
+Signed-off-by: Nicolai Stange <nstange@suse.de>
+---
+ crypto/af_alg.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Thanks!
-
-Nicolai
-
-Nicolai Stange (8):
-  crypto: af_alg - reject requests for untested algorithms
-  crypto: user - reject requests for untested algorithms
-  crypto: api - only support lookups for specific CRYPTO_ALG_TESTED
-    status
-  crypto: api - don't add larvals for !(type & CRYPTO_ALG_TESTED)
-    lookups
-  crypto: api - always set CRYPTO_ALG_TESTED in lookup larvals'
-    ->mask/type
-  crypto: api - make crypto_alg_lookup() consistently check for failed
-    algos
-  crypto: api - lift common mask + type adjustment to
-    crypto_larval_lookup()
-  crypto: api - make the algorithm lookup priorize non-larvals
-
- crypto/af_alg.c           |  9 +++++++
- crypto/api.c              | 53 ++++++++++++++++++++++++++++++++-------
- crypto/crypto_user_base.c |  3 +++
- 3 files changed, 56 insertions(+), 9 deletions(-)
-
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 8bd288d2b089..83e68f3f71db 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -166,6 +166,15 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 	if ((sa->salg_feat & ~allowed) || (sa->salg_mask & ~allowed))
+ 		return -EINVAL;
+ 
++	/*
++	 * Don't allow requests for untested algorithms, i.e. those
++	 * where the selftests are still in progress or have failed.
++	 * CRYPTO_ALG_TESTED must be set either in none or both of
++	 * type and mask (which is equivalent).
++	 */
++	if ((sa->salg_feat ^ sa->salg_mask) & CRYPTO_ALG_TESTED)
++		return -EINVAL;
++
+ 	sa->salg_type[sizeof(sa->salg_type) - 1] = 0;
+ 	sa->salg_name[addr_len - sizeof(*sa) - 1] = 0;
+ 
 -- 
 2.26.2
 
