@@ -2,130 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35AE9C433EF
-	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 07:05:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9169C433EF
+	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 18:15:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A6DE61B31
-	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 07:05:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A763861A0A
+	for <linux-crypto@archiver.kernel.org>; Sun,  3 Oct 2021 18:15:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbhJCHG6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 3 Oct 2021 03:06:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55714 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229567AbhJCHG5 (ORCPT
+        id S231365AbhJCSQt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 3 Oct 2021 14:16:49 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:38416 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231360AbhJCSQs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 3 Oct 2021 03:06:57 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F3FBC061780
-        for <linux-crypto@vger.kernel.org>; Sun,  3 Oct 2021 00:05:10 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id d26so23873507wrb.6
-        for <linux-crypto@vger.kernel.org>; Sun, 03 Oct 2021 00:05:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=8lu3kFOg7t4FR7CfBL0ZvoqUsjF/kK+A/wTTbRTrjyo=;
-        b=B6wMNsiZBN2UHBXjNfxVjKyT166Q/6N5Je5yCT1t1WUt1bg9nIn7QBkZFuxA4FgNSR
-         wnEO8BnnuHJekKY5iDNbxar+kqRGd1P+5PF4UX3pdOeJ6VhdfM81nIpIom9barw3twIV
-         r2qdAhgKYdhWZE/drw2sbIKEX62OWlBqOOCJAF7wuc79toPHXxJZ9roKYx6ro1q3eh1b
-         n3DhCVBxWk+7+PKQxupVQtUzaDbdJCPiHr+D3ZspFmxFiZtotiMaPHzVVqCumIH/JI4G
-         KZc7L6O+GuawfH/Q6Bnbg5KDPlEOro265B7FDiYcMmNlJt2ARWX2TA50f6JQ+8LfbtEl
-         BR/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=8lu3kFOg7t4FR7CfBL0ZvoqUsjF/kK+A/wTTbRTrjyo=;
-        b=ouBKj0eCO7bQXYWz8UlWfYfC2ZhflJFqTqkoj6RO2fefgELa+pBduhTmlDAu/chzrI
-         aBJCSSoH1LwAidpbQq748ASQ1fhoqYkR+oLLAlFGXHJkf9+d+Pgjph9DAvg6G3ZQIot6
-         hh6c2retUVhZmaC1YPO2jUVjnZEKIu89iQEZ+9tUo+xbC3Gxih6rNa6wBjxNAdj75PEp
-         xpMtLl60y/WbxHozGIugbJCNS01iQidw2Fq/067nPda797NEXF1dd77IQvnc3OHYQGFK
-         HQl7nfJswA1PZ8xg1X3+m3HR4m+Vtrcr6bfHMyBCkL2v1nt9XfK29M42MXDg48YfQ0wz
-         pXAg==
-X-Gm-Message-State: AOAM530isftYilVLjosZu46pyVntZZl3jFsYgmhoBCopZbxsps9URI4B
-        UKK5cTvQz+4XQ3weQgdEZ+enV6EgNr94tcrS6y3YsJBDCsg=
-X-Google-Smtp-Source: ABdhPJwY/FsUgWGNWkXur/QvOHke1Ks9cFiMw78lp+CrV0LjYrWWEZce14l8YjyxqV37MBuaeMTd0QPgiqvNvpWjcU4=
-X-Received: by 2002:a5d:6b46:: with SMTP id x6mr6978093wrw.192.1633244709063;
- Sun, 03 Oct 2021 00:05:09 -0700 (PDT)
+        Sun, 3 Oct 2021 14:16:48 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 52C141FFB6;
+        Sun,  3 Oct 2021 18:15:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1633284900; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=P9I25fWE1JHgtKRx7ZMJwEWzhRPyhbxUL4KSUBb/BwE=;
+        b=g3aTgt4VDonWXHJIa8MSBMy9KXZXpgdIY4difzN0PqPcl+QtTtLkfCqSA8AgnfmM/51PRG
+        2iEP9XvJpOaPKiAPg8rwYGeDttjUf1JL+5E+VAMeLLHFiyKOrpb7YBOAqwPRbkMLRas9ct
+        wk7A1J5n5w9X8k0OpF4K0p4MJEGH0K0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1633284900;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=P9I25fWE1JHgtKRx7ZMJwEWzhRPyhbxUL4KSUBb/BwE=;
+        b=21TixarJCmVufHIlVuP0kGQnm08TBZg7J0dd3u+b6QYLFlcfKRoh/0Fx+kYl0tQxmTBBwY
+        UoHrEDNiakeTj0CA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3F11813A09;
+        Sun,  3 Oct 2021 18:15:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Xc8dDiTzWWGIEwAAMHmgww
+        (envelope-from <nstange@suse.de>); Sun, 03 Oct 2021 18:15:00 +0000
+From:   Nicolai Stange <nstange@suse.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
+        Torsten Duwe <duwe@suse.de>, Nicolai Stange <nstange@suse.de>
+Subject: [PATCH 0/8] crypto: api - priorize tested algorithms in lookup
+Date:   Sun,  3 Oct 2021 20:14:05 +0200
+Message-Id: <20211003181413.12465-1-nstange@suse.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <CACXcFm=-E_wnDdRPztKJwDo8hvt6ENf84D90iFUXReuw2s0kuQ@mail.gmail.com>
- <378733E4-D976-4E2D-BE14-AD900C901CE8@callas.org>
-In-Reply-To: <378733E4-D976-4E2D-BE14-AD900C901CE8@callas.org>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Sun, 3 Oct 2021 15:04:56 +0800
-Message-ID: <CACXcFm=40HCSvhkagsFn0WFnjrjbhk+Ah7Y=3tfFf5xxOW6A8g@mail.gmail.com>
-Subject: Re: [Cryptography] [RFC] random: add new pseudorandom number generator
-To:     Jon Callas <jon@callas.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Cryptography <cryptography@metzdowd.com>,
-        "Ted Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jon Callas <jon@callas.org> wrote:
+Hi all,
 
-> > On Sep 16, 2021, at 20:18, Sandy Harris <sandyinchina@gmail.com> wrote:
-> >
-> > I have a PRNG that I want to use within the Linux random(4) driver. It
-> > looks remarkably strong to me, but analysis from others is needed.
->
-> A good block cipher in counter mode makes a pretty-okay PRNG. I say prett=
-y-okay only because I would like my PRNG not to be invertible.
+my initial goal had been to make the algorithm lookup prefer usable
+instances over ones where the tests are still pending. In my first attempt
+I realized that the code in crypto_alg_lookup() became quite convoluted
+and that it could get streamlined somewhat by consolidating
+CRYPTO_ALG_TESTED handling for lookup larvals a bit.
 
-I'm using counter mode inside an Even-Mansour XOR-permutation-XOR
-structure which, among other things, makes it non-invertible.
+This cleanup can be found in [1/8] - [7/8] and might perhaps be worth
+considering on its own, independent of whether or not you deem the
+final [8/8], the patch implementing my original goal of priorizing
+algorithms in working state, suitable for upstream inclusion.
 
-> Iterated hash functions are better. However, they are slower, and a prope=
-rty you want in a PRNG is that it's fast. I did a system PRNG that was inte=
-ntionally faster than arc4random() and close to linear-congruential because=
- then there's no excuse for not using it. A mildly evil person would replac=
-e both of those with a fast real PRNG. (Mildly evil because if some user kn=
-ew the internals and was counting on it acting the way the internals specif=
-ied, they might be disappointed.)
+This series is based on current herbert/cryptodev-2.6 master.
 
-I'm doing this within the Linux random(4) driver which iterates chacha
-to generate output. This prng will only generate values for internal
-use, like rekeying chacha or dumping data into the input pool. In
-fact, if an instruction like Intel RDRAND or a hardware rng exist the
-code mostly uses those, only injecting xtea output once in a while to
-avoid tructing the other source completely or falling back to xtea if
-the other fails.
+All patches have been tested with tcrypt.ko as well as the kernel/crypto
+testcases from LTP.
 
-> XTEA is an okay block cipher. Not great, okay. Probably good enough for a=
- PRNG.
+Thanks!
 
-With the Even-Mansour construction it seems good enough to me. Code
-includes this comment:
+Nicolai
 
- * Even and Mansour proved proved a lower bound
- * for an XOR-permutation-XOR sequence.
- * S. Even, Y. Mansour, Asiacrypt 1991
- * A Construction of a Cipher From a Single Pseudorandom Permutation
- *
- * For an n-bit cipher and D known or chosen plaintexts,
- * time T to break it is bounded by DT >=3D 2^n.
- *
- * This applies even if the enemy knows the permutation,
- * for a block cipher even if he or she knows the key.
- * All the proof requires is that the permutation be
- * nonlinear.
- *
- * The main calling function does a full rekey (update
- * key, mask and counter) when xtea_iterations >=3D 127
- * We therefore have D ~=3D 2^7 and T >=3D 2^57 to break
- * each sequence of 127 outputs between rekeyings.
- *
- * Assuming proper keying and that the enemy cannot
- * peek into the running kernel, this can be
- * considered effectively unbreakable, even if
- * xtea itself were found to be flawed.
+Nicolai Stange (8):
+  crypto: af_alg - reject requests for untested algorithms
+  crypto: user - reject requests for untested algorithms
+  crypto: api - only support lookups for specific CRYPTO_ALG_TESTED
+    status
+  crypto: api - don't add larvals for !(type & CRYPTO_ALG_TESTED)
+    lookups
+  crypto: api - always set CRYPTO_ALG_TESTED in lookup larvals'
+    ->mask/type
+  crypto: api - make crypto_alg_lookup() consistently check for failed
+    algos
+  crypto: api - lift common mask + type adjustment to
+    crypto_larval_lookup()
+  crypto: api - make the algorithm lookup priorize non-larvals
 
-> But -- why wouldn't you use AES? An obvious answer is that you don't have=
- it in hardware ...
+ crypto/af_alg.c           |  9 +++++++
+ crypto/api.c              | 53 ++++++++++++++++++++++++++++++++-------
+ crypto/crypto_user_base.c |  3 +++
+ 3 files changed, 56 insertions(+), 9 deletions(-)
 
-I wanted something that would be reasonably fast on anything Linux
-runs on & wanted to avoid using kernel memory for the S-box & round
-keys.
+-- 
+2.26.2
+
