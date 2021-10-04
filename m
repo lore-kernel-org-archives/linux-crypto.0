@@ -2,367 +2,236 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 555A3C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Oct 2021 12:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 700EFC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Oct 2021 13:37:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D6EE613A8
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Oct 2021 12:42:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B58860F58
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Oct 2021 13:37:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233233AbhJDMoQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Oct 2021 08:44:16 -0400
-Received: from mailgw01.mediatek.com ([60.244.123.138]:36100 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S233179AbhJDMoP (ORCPT
+        id S234876AbhJDNjN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 4 Oct 2021 09:39:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35622 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238191AbhJDNh2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Oct 2021 08:44:15 -0400
-X-UUID: 0b41f822a1914e3e9b0e0e65c729dad5-20211004
-X-UUID: 0b41f822a1914e3e9b0e0e65c729dad5-20211004
-Received: from mtkcas11.mediatek.inc [(172.21.101.40)] by mailgw01.mediatek.com
-        (envelope-from <sam.shih@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 260975352; Mon, 04 Oct 2021 20:42:20 +0800
-Received: from mtkcas07.mediatek.inc (172.21.101.84) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.792.15; Mon, 4 Oct 2021 20:42:19 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by mtkcas07.mediatek.inc
- (172.21.101.84) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 4 Oct
- 2021 20:42:18 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Mon, 4 Oct 2021 20:42:18 +0800
-From:   Sam Shih <sam.shih@mediatek.com>
-To:     <maz@kernel.org>, <matthias.bgg@gmail.com>
-CC:     <Ryder.Lee@mediatek.com>, <devicetree@vger.kernel.org>,
-        <enric.balletbo@collabora.com>, <fparent@baylibre.com>,
-        <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>,
-        <hsinyi@chromium.org>, <john@phrozen.org>,
-        <linus.walleij@linaro.org>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-clk@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-gpio@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-watchdog@vger.kernel.org>,
-        <linux@roeck-us.net>, <mpm@selenic.com>, <mturquette@baylibre.com>,
-        <robh+dt@kernel.org>, <sam.shih@mediatek.com>, <sboyd@kernel.org>,
-        <sean.wang@kernel.org>, <seiya.wang@mediatek.com>,
-        <wim@linux-watchdog.org>
-Subject: [v5,9/9] arm64: dts: mediatek: add mt7986b support
-Date:   Mon, 4 Oct 2021 20:42:14 +0800
-Message-ID: <20211004124214.1445-1-sam.shih@mediatek.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <39193058d8c206e616d7b179762a7829@kernel.org>
-References: <39193058d8c206e616d7b179762a7829@kernel.org>
+        Mon, 4 Oct 2021 09:37:28 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 480EEC06136C
+        for <linux-crypto@vger.kernel.org>; Mon,  4 Oct 2021 06:00:06 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mXNZN-0005EB-5a; Mon, 04 Oct 2021 14:59:49 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mXNZK-0000Lu-1h; Mon, 04 Oct 2021 14:59:46 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1mXNZG-0000d0-Vc; Mon, 04 Oct 2021 14:59:42 +0200
+From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     linux-pci@vger.kernel.org, kernel@pengutronix.de,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
+        Marco Chiappero <marco.chiappero@intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        Jack Xu <jack.xu@intel.com>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v6 09/11] crypto: qat - simplify adf_enable_aer()
+Date:   Mon,  4 Oct 2021 14:59:33 +0200
+Message-Id: <20211004125935.2300113-10-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20211004125935.2300113-1-u.kleine-koenig@pengutronix.de>
+References: <20211004125935.2300113-1-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+Content-Type: text/plain; charset=UTF-8
+X-Patch-Hashes: v=1; h=sha256; i=woJ+XG24qLZpRfQYIhuIjBJ10HF9ai4yZDNEgvzBdKs=; m=43Bwh4bgNofseZy3pN98J/xw6T54xBXYb8+EgplqK/c=; p=e0ubWRxaTOxpVVmYaiPGXfH9Fp+aEsg5i7cfFIxLb4w=; g=75d910e3cf936fc2161d0c2f4f099378e2733742
+X-Patch-Sig: m=pgp; i=u.kleine-koenig@pengutronix.de; s=0x0D2511F322BFAB1C1580266BE2DCDD9132669BD6; b=iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmFa+qUACgkQwfwUeK3K7AnPogf/eah oJ3UrQN2jf+An7FP3zNu4rS7El07kskIfjiMK5JSBfg28Bxw4A1QVJIiPy31kIxUq10JjMh7qLBvM chciHIPpHlZcTPksJ7F54CPO9sh2xH9BxQaieCa87eOSbkm39O6ht/t5+lG51xpCiBdapbO7Pv+WD qlcJjJXuR5FFT4M6ftq9OBDSQ58U0uOCMuKyONUa/xJt8ZZj58d59LapLofNSEpgGai3CJMFuaUHm l8y2UWlkTg9qR3i0ZnPhw4E6QQI8BiQETNpt2WuMvk1JBCLZzY097UDpPIuDEeAATRVF74Screawk is7yOrtCIY4jVCRN66+/oPUSsSv+S/g==
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add basic chip support for Mediatek mt7986b, include
-uart nodes with correct clocks, rng node with correct clock,
-and watchdog node and mt7986b pinctrl node.
+A struct pci_driver is supposed to be constant and assigning .err_handler
+once per bound device isn't really sensible. Also as the function returns
+zero unconditionally let it return no value instead and simplify the
+callers accordingly.
 
-Add cpu node, timer node, gic node, psci and reserved-memory node
-for ARM Trusted Firmware,
+As a side effect this removes one user of struct pci_dev::driver. This
+member is planned to be removed.
 
-Add clock controller nodes, include 40M clock source, topckgen, infracfg,
-apmixedsys and ethernet subsystem.
-
-Signed-off-by: Sam Shih <sam.shih@mediatek.com>
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
-v5: follow reviewr's comment: removed clock freqency node in timer due to
-    we have set CNTFRQ_EL0 in ATF firmware, and also corrected GICD range
-v4: added missing gic register bases, and fixed range of GICR
-v3: used the stdout-path instead of console=ttyS0
-v2: modified clock and uart node due to clock driver updated
----
- arch/arm64/boot/dts/mediatek/Makefile        |   1 +
- arch/arm64/boot/dts/mediatek/mt7986b-rfb.dts |  26 +++
- arch/arm64/boot/dts/mediatek/mt7986b.dtsi    | 229 +++++++++++++++++++
- 3 files changed, 256 insertions(+)
- create mode 100644 arch/arm64/boot/dts/mediatek/mt7986b-rfb.dts
- create mode 100644 arch/arm64/boot/dts/mediatek/mt7986b.dtsi
+ drivers/crypto/qat/qat_4xxx/adf_drv.c          |  7 ++-----
+ drivers/crypto/qat/qat_c3xxx/adf_drv.c         |  7 ++-----
+ drivers/crypto/qat/qat_c62x/adf_drv.c          |  7 ++-----
+ drivers/crypto/qat/qat_common/adf_aer.c        | 10 +++-------
+ drivers/crypto/qat/qat_common/adf_common_drv.h |  3 ++-
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c      |  7 ++-----
+ 6 files changed, 13 insertions(+), 28 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/mediatek/Makefile b/arch/arm64/boot/dts/mediatek/Makefile
-index e6c3a73b9e4a..d555e43d1ccc 100644
---- a/arch/arm64/boot/dts/mediatek/Makefile
-+++ b/arch/arm64/boot/dts/mediatek/Makefile
-@@ -8,6 +8,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += mt6797-x20-dev.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7622-rfb1.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7622-bananapi-bpi-r64.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-rfb.dtb
-+dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986b-rfb.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt8167-pumpkin.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt8173-elm.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt8173-elm-hana.dtb
-diff --git a/arch/arm64/boot/dts/mediatek/mt7986b-rfb.dts b/arch/arm64/boot/dts/mediatek/mt7986b-rfb.dts
-new file mode 100644
-index 000000000000..95a202505bb2
---- /dev/null
-+++ b/arch/arm64/boot/dts/mediatek/mt7986b-rfb.dts
-@@ -0,0 +1,26 @@
-+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
-+/*
-+ * Copyright (C) 2021 MediaTek Inc.
-+ * Author: Sam.Shih <sam.shih@mediatek.com>
-+ */
-+
-+/dts-v1/;
-+#include "mt7986b.dtsi"
-+
-+/ {
-+	model = "MediaTek MT7986b RFB";
-+	compatible = "mediatek,mt7986b-rfb";
-+
-+	aliases {
-+		serial0 = &uart0;
-+	};
-+
-+	chosen {
-+		stdout-path = "serial0:115200n8";
-+		bootargs = "earlycon=uart8250,mmio32,0x11002000 swiotlb=512";
-+	};
-+};
-+
-+&uart0 {
-+	status = "okay";
-+};
-diff --git a/arch/arm64/boot/dts/mediatek/mt7986b.dtsi b/arch/arm64/boot/dts/mediatek/mt7986b.dtsi
-new file mode 100644
-index 000000000000..318547dde733
---- /dev/null
-+++ b/arch/arm64/boot/dts/mediatek/mt7986b.dtsi
-@@ -0,0 +1,229 @@
-+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
-+/*
-+ * Copyright (C) 2021 MediaTek Inc.
-+ * Author: Sam.Shih <sam.shih@mediatek.com>
-+ */
-+
-+#include <dt-bindings/interrupt-controller/irq.h>
-+#include <dt-bindings/interrupt-controller/arm-gic.h>
-+#include <dt-bindings/clock/mt7986-clk.h>
-+
-+/ {
-+	compatible = "mediatek,mt7986b";
-+	interrupt-parent = <&gic>;
-+	#address-cells = <2>;
-+	#size-cells = <2>;
-+
-+	clk40m: oscillator@0 {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <40000000>;
-+		clock-output-names = "clkxtal";
-+	};
-+
-+	cpus {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		cpu0: cpu@0 {
-+			device_type = "cpu";
-+			compatible = "arm,cortex-a53";
-+			enable-method = "psci";
-+			reg = <0x0>;
-+			#cooling-cells = <2>;
-+		};
-+
-+		cpu1: cpu@1 {
-+			device_type = "cpu";
-+			compatible = "arm,cortex-a53";
-+			enable-method = "psci";
-+			reg = <0x1>;
-+			#cooling-cells = <2>;
-+		};
-+
-+		cpu2: cpu@2 {
-+			device_type = "cpu";
-+			compatible = "arm,cortex-a53";
-+			enable-method = "psci";
-+			reg = <0x2>;
-+			#cooling-cells = <2>;
-+		};
-+
-+		cpu3: cpu@3 {
-+			device_type = "cpu";
-+			enable-method = "psci";
-+			compatible = "arm,cortex-a53";
-+			reg = <0x3>;
-+			#cooling-cells = <2>;
-+		};
-+	};
-+
-+	psci {
-+		compatible  = "arm,psci-0.2";
-+		method      = "smc";
-+	};
-+
-+	reserved-memory {
-+		#address-cells = <2>;
-+		#size-cells = <2>;
-+		ranges;
-+		/* 192 KiB reserved for ARM Trusted Firmware (BL31) */
-+		secmon_reserved: secmon@43000000 {
-+			reg = <0 0x43000000 0 0x30000>;
-+			no-map;
-+		};
-+	};
-+
-+	timer {
-+		compatible = "arm,armv8-timer";
-+		interrupt-parent = <&gic>;
-+		interrupts = <GIC_PPI 13 IRQ_TYPE_LEVEL_LOW>,
-+			     <GIC_PPI 14 IRQ_TYPE_LEVEL_LOW>,
-+			     <GIC_PPI 11 IRQ_TYPE_LEVEL_LOW>,
-+			     <GIC_PPI 10 IRQ_TYPE_LEVEL_LOW>;
-+	};
-+
-+	soc {
-+		#address-cells = <2>;
-+		#size-cells = <2>;
-+		compatible = "simple-bus";
-+		ranges;
-+
-+		gic: interrupt-controller@c000000 {
-+			compatible = "arm,gic-v3";
-+			#interrupt-cells = <3>;
-+			interrupt-parent = <&gic>;
-+			interrupt-controller;
-+			reg = <0 0x0c000000 0 0x10000>,  /* GICD */
-+			      <0 0x0c080000 0 0x80000>,  /* GICR */
-+			      <0 0x0c400000 0 0x2000>,   /* GICC */
-+			      <0 0x0c410000 0 0x1000>,   /* GICH */
-+			      <0 0x0c420000 0 0x2000>;   /* GICV */
-+			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
-+		};
-+
-+		infracfg: infracfg@10001000 {
-+			compatible = "mediatek,mt7986-infracfg", "syscon";
-+			reg = <0 0x10001000 0 0x1000>;
-+			#clock-cells = <1>;
-+		};
-+
-+		topckgen: topckgen@1001b000 {
-+			compatible = "mediatek,mt7986-topckgen", "syscon";
-+			reg = <0 0x1001B000 0 0x1000>;
-+			#clock-cells = <1>;
-+		};
-+
-+		watchdog: watchdog@1001c000 {
-+			compatible = "mediatek,mt7986-wdt",
-+				     "mediatek,mt6589-wdt";
-+			reg = <0 0x1001c000 0 0x1000>;
-+			interrupts = <GIC_SPI 110 IRQ_TYPE_LEVEL_HIGH>;
-+			#reset-cells = <1>;
-+			status = "disabled";
-+		};
-+
-+		apmixedsys: apmixedsys@1001e000 {
-+			compatible = "mediatek,mt7986-apmixedsys";
-+			reg = <0 0x1001E000 0 0x1000>;
-+			#clock-cells = <1>;
-+		};
-+
-+		pio: pinctrl@1001f000 {
-+			compatible = "mediatek,mt7986b-pinctrl";
-+			reg = <0 0x1001f000 0 0x1000>,
-+			      <0 0x11c30000 0 0x1000>,
-+			      <0 0x11c40000 0 0x1000>,
-+			      <0 0x11e20000 0 0x1000>,
-+			      <0 0x11e30000 0 0x1000>,
-+			      <0 0x11f00000 0 0x1000>,
-+			      <0 0x11f10000 0 0x1000>,
-+			      <0 0x1000b000 0 0x1000>;
-+			reg-names = "gpio_base", "iocfg_rt_base", "iocfg_rb_base",
-+				    "iocfg_lt_base", "iocfg_lb_base", "iocfg_tr_base",
-+				    "iocfg_tl_base", "eint";
-+			gpio-controller;
-+			#gpio-cells = <2>;
-+			gpio-ranges = <&pio 0 0 41>, <&pio 66 66 35>;
-+			interrupt-controller;
-+			interrupts = <GIC_SPI 225 IRQ_TYPE_LEVEL_HIGH>;
-+			interrupt-parent = <&gic>;
-+			#interrupt-cells = <2>;
-+		};
-+
-+		sgmiisys0: syscon@10060000 {
-+			compatible = "mediatek,mt7986-sgmiisys_0",
-+				     "syscon";
-+			reg = <0 0x10060000 0 0x1000>;
-+			#clock-cells = <1>;
-+		};
-+
-+		sgmiisys1: syscon@10070000 {
-+			compatible = "mediatek,mt7986-sgmiisys_1",
-+				     "syscon";
-+			reg = <0 0x10070000 0 0x1000>;
-+			#clock-cells = <1>;
-+		};
-+
-+		trng: trng@1020f000 {
-+			compatible = "mediatek,mt7986-rng",
-+				     "mediatek,mt7623-rng";
-+			reg = <0 0x1020f000 0 0x100>;
-+			clocks = <&infracfg CLK_INFRA_TRNG_CK>;
-+			clock-names = "rng";
-+			status = "disabled";
-+		};
-+
-+		uart0: serial@11002000 {
-+			compatible = "mediatek,mt7986-uart",
-+				     "mediatek,mt6577-uart";
-+			reg = <0 0x11002000 0 0x400>;
-+			interrupts = <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&infracfg CLK_INFRA_UART0_SEL>,
-+				 <&infracfg CLK_INFRA_UART0_CK>;
-+			clock-names = "baud", "bus";
-+			assigned-clocks = <&topckgen CLK_TOP_UART_SEL>,
-+					  <&infracfg CLK_INFRA_UART0_SEL>;
-+			assigned-clock-parents = <&topckgen CLK_TOP_XTAL>,
-+						 <&topckgen CLK_TOP_UART_SEL>;
-+			status = "disabled";
-+		};
-+
-+		uart1: serial@11003000 {
-+			compatible = "mediatek,mt7986-uart",
-+				     "mediatek,mt6577-uart";
-+			reg = <0 0x11003000 0 0x400>;
-+			interrupts = <GIC_SPI 124 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&infracfg CLK_INFRA_UART1_SEL>,
-+				 <&infracfg CLK_INFRA_UART1_CK>;
-+			clock-names = "baud", "bus";
-+			assigned-clocks = <&infracfg CLK_INFRA_UART1_SEL>;
-+			assigned-clock-parents = <&topckgen CLK_TOP_F26M_SEL>;
-+			status = "disabled";
-+		};
-+
-+		uart2: serial@11004000 {
-+			compatible = "mediatek,mt7986-uart",
-+				     "mediatek,mt6577-uart";
-+			reg = <0 0x11004000 0 0x400>;
-+			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&infracfg CLK_INFRA_UART2_SEL>,
-+				 <&infracfg CLK_INFRA_UART2_CK>;
-+			clock-names = "baud", "bus";
-+			assigned-clocks = <&infracfg CLK_INFRA_UART2_SEL>;
-+			assigned-clock-parents = <&topckgen CLK_TOP_F26M_SEL>;
-+			status = "disabled";
-+		};
-+
-+		ethsys: syscon@15000000 {
-+			 #address-cells = <1>;
-+			 #size-cells = <1>;
-+			 compatible = "mediatek,mt7986-ethsys",
-+				      "syscon";
-+			 reg = <0 0x15000000 0 0x1000>;
-+			 #clock-cells = <1>;
-+			 #reset-cells = <1>;
-+		};
-+
-+	};
-+
-+};
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+index 359fb7989dfb..71ef065914b2 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+@@ -247,11 +247,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	pci_set_master(pdev);
+ 
+-	if (adf_enable_aer(accel_dev)) {
+-		dev_err(&pdev->dev, "Failed to enable aer.\n");
+-		ret = -EFAULT;
+-		goto out_err;
+-	}
++	adf_enable_aer(accel_dev);
+ 
+ 	if (pci_save_state(pdev)) {
+ 		dev_err(&pdev->dev, "Failed to save pci state.\n");
+@@ -304,6 +300,7 @@ static struct pci_driver adf_driver = {
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
+ 	.sriov_configure = adf_sriov_configure,
++	.err_handler = &adf_err_handler,
+ };
+ 
+ module_pci_driver(adf_driver);
+diff --git a/drivers/crypto/qat/qat_c3xxx/adf_drv.c b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
+index cc6e75dc60de..2aef0bb791df 100644
+--- a/drivers/crypto/qat/qat_c3xxx/adf_drv.c
++++ b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
+@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
+ 	.sriov_configure = adf_sriov_configure,
++	.err_handler = &adf_err_handler,
+ };
+ 
+ static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
+@@ -192,11 +193,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	}
+ 	pci_set_master(pdev);
+ 
+-	if (adf_enable_aer(accel_dev)) {
+-		dev_err(&pdev->dev, "Failed to enable aer\n");
+-		ret = -EFAULT;
+-		goto out_err_free_reg;
+-	}
++	adf_enable_aer(accel_dev);
+ 
+ 	if (pci_save_state(pdev)) {
+ 		dev_err(&pdev->dev, "Failed to save pci state\n");
+diff --git a/drivers/crypto/qat/qat_c62x/adf_drv.c b/drivers/crypto/qat/qat_c62x/adf_drv.c
+index bf251dfe74b3..56163083f161 100644
+--- a/drivers/crypto/qat/qat_c62x/adf_drv.c
++++ b/drivers/crypto/qat/qat_c62x/adf_drv.c
+@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
+ 	.sriov_configure = adf_sriov_configure,
++	.err_handler = &adf_err_handler,
+ };
+ 
+ static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
+@@ -192,11 +193,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	}
+ 	pci_set_master(pdev);
+ 
+-	if (adf_enable_aer(accel_dev)) {
+-		dev_err(&pdev->dev, "Failed to enable aer\n");
+-		ret = -EFAULT;
+-		goto out_err_free_reg;
+-	}
++	adf_enable_aer(accel_dev);
+ 
+ 	if (pci_save_state(pdev)) {
+ 		dev_err(&pdev->dev, "Failed to save pci state\n");
+diff --git a/drivers/crypto/qat/qat_common/adf_aer.c b/drivers/crypto/qat/qat_common/adf_aer.c
+index ed3e40bc56eb..fe9bb2f3536a 100644
+--- a/drivers/crypto/qat/qat_common/adf_aer.c
++++ b/drivers/crypto/qat/qat_common/adf_aer.c
+@@ -166,11 +166,12 @@ static void adf_resume(struct pci_dev *pdev)
+ 	dev_info(&pdev->dev, "Device is up and running\n");
+ }
+ 
+-static const struct pci_error_handlers adf_err_handler = {
++const struct pci_error_handlers adf_err_handler = {
+ 	.error_detected = adf_error_detected,
+ 	.slot_reset = adf_slot_reset,
+ 	.resume = adf_resume,
+ };
++EXPORT_SYMBOL_GPL(adf_err_handler);
+ 
+ /**
+  * adf_enable_aer() - Enable Advance Error Reporting for acceleration device
+@@ -179,17 +180,12 @@ static const struct pci_error_handlers adf_err_handler = {
+  * Function enables PCI Advance Error Reporting for the
+  * QAT acceleration device accel_dev.
+  * To be used by QAT device specific drivers.
+- *
+- * Return: 0 on success, error code otherwise.
+  */
+-int adf_enable_aer(struct adf_accel_dev *accel_dev)
++void adf_enable_aer(struct adf_accel_dev *accel_dev)
+ {
+ 	struct pci_dev *pdev = accel_to_pci_dev(accel_dev);
+-	struct pci_driver *pdrv = pdev->driver;
+ 
+-	pdrv->err_handler = &adf_err_handler;
+ 	pci_enable_pcie_error_reporting(pdev);
+-	return 0;
+ }
+ EXPORT_SYMBOL_GPL(adf_enable_aer);
+ 
+diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
+index 4261749fae8d..e4c24be212ff 100644
+--- a/drivers/crypto/qat/qat_common/adf_common_drv.h
++++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
+@@ -95,7 +95,8 @@ void adf_ae_fw_release(struct adf_accel_dev *accel_dev);
+ int adf_ae_start(struct adf_accel_dev *accel_dev);
+ int adf_ae_stop(struct adf_accel_dev *accel_dev);
+ 
+-int adf_enable_aer(struct adf_accel_dev *accel_dev);
++extern const struct pci_error_handlers adf_err_handler;
++void adf_enable_aer(struct adf_accel_dev *accel_dev);
+ void adf_disable_aer(struct adf_accel_dev *accel_dev);
+ void adf_reset_sbr(struct adf_accel_dev *accel_dev);
+ void adf_reset_flr(struct adf_accel_dev *accel_dev);
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+index 3976a81bd99b..acca56752aa0 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+@@ -33,6 +33,7 @@ static struct pci_driver adf_driver = {
+ 	.probe = adf_probe,
+ 	.remove = adf_remove,
+ 	.sriov_configure = adf_sriov_configure,
++	.err_handler = &adf_err_handler,
+ };
+ 
+ static void adf_cleanup_pci_dev(struct adf_accel_dev *accel_dev)
+@@ -192,11 +193,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	}
+ 	pci_set_master(pdev);
+ 
+-	if (adf_enable_aer(accel_dev)) {
+-		dev_err(&pdev->dev, "Failed to enable aer\n");
+-		ret = -EFAULT;
+-		goto out_err_free_reg;
+-	}
++	adf_enable_aer(accel_dev);
+ 
+ 	if (pci_save_state(pdev)) {
+ 		dev_err(&pdev->dev, "Failed to save pci state\n");
 -- 
-2.29.2
+2.30.2
 
