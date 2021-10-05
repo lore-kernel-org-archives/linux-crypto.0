@@ -2,197 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BDB7C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Oct 2021 03:10:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE981C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Oct 2021 11:40:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26005610A3
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Oct 2021 03:10:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5D52610A2
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Oct 2021 11:40:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230237AbhJEDMi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Oct 2021 23:12:38 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:3232 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229659AbhJEDMh (ORCPT
+        id S233739AbhJELmP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Oct 2021 07:42:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43858 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230500AbhJELmO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Oct 2021 23:12:37 -0400
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 194KwK2Y004130;
-        Mon, 4 Oct 2021 20:10:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=facebook;
- bh=te8vefhy8UVpM+qjoZ1eUPKKiezM/fwuWtikVlzDypI=;
- b=ky3OooHjbmldzsMEFHDDtmMmq/jFJIHIUz8HHURaAUGtn3DPnMglcIUC43VJisUUAo2T
- GCUdTGJ5pw/KuEyDoJJff2lyoXVrV5frHISTQAcRoWfgs8TIO19/4ukOawZFU1asVkWW
- S3+EgY+xd7fOndTCzuGChrfggu8FW1s0spA= 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com with ESMTP id 3bg333ux71-3
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Mon, 04 Oct 2021 20:10:46 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (100.104.98.9) by
- o365-in.thefacebook.com (100.104.94.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.14; Mon, 4 Oct 2021 20:10:44 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WahnNPkF3CfuHc5PHqsQZkw78hGt7IwK5rHEhoQNAjKRDJJwPPNUcNpZD0tdOIJ9wpULZ+px62MGDI2LLJYr77WJSVhT4qUkMpQSOJxeS5ndsYJCMaM6086pjjAN2SqNAcgmdIr3E7X0W38RGLa42edkueXYMNRmWul+LsUpWf8JyRtp63x3N7lD/t+w/LgiljX+wFwOdgn8te6CzSu6wrbx0l7s0iUZO3kKje4GGU2kdOn9ZFHhmZkOiPV3w30ievBaObuTdPkrqtjK0U5dBSFSe+TYr2hBo6O5UXDYBJnWxQ2MEMSOCJ10Cl8sKX+NC2odt7RwVLHwVpPYDxce4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=te8vefhy8UVpM+qjoZ1eUPKKiezM/fwuWtikVlzDypI=;
- b=itPQuPhyjVWTm7XraeyNwSxwAjkZGSdJq6NLXwokHuHva2yztv2xO0CrUGSDAiroAI67mBE/JGq8+3O2zLEv/+jQG6x7keOFjLUaX5UUaJ9XV1pbbBgaZwSajruBgExuSc6bX5QBdOlJspfBhPue8wyYpeszyU5nqRhL3f5lAPPSsfricbm4raHrj+XHiKcuMzRpUV91N91SFsmEKAt8S0+F4zXT/0XKjlrX+e8iKfJj9uZB0+PRFuQDrA6BzJEZNnHvCuQOgM7RnxTYbh/yZdo1xMrucL4viAb+px3A9xTt5J455jasaEjREeDFkVfZ32sz9wra3RyUw0Vrgk7Wxg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
- header.d=fb.com; arc=none
-Received: from CH2PR15MB3672.namprd15.prod.outlook.com (2603:10b6:610:5::14)
- by CH2PR15MB3560.namprd15.prod.outlook.com (2603:10b6:610:f::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.19; Tue, 5 Oct
- 2021 03:10:43 +0000
-Received: from CH2PR15MB3672.namprd15.prod.outlook.com
- ([fe80::1d18:6e02:3723:cd2a]) by CH2PR15MB3672.namprd15.prod.outlook.com
- ([fe80::1d18:6e02:3723:cd2a%5]) with mapi id 15.20.4566.022; Tue, 5 Oct 2021
- 03:10:43 +0000
-From:   Nick Terrell <terrelln@fb.com>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-CC:     Nick Terrell <nickrterrell@gmail.com>,
-        "linux-next@vger.kernel.org" <linux-next@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        "squashfs-devel@lists.sourceforge.net" 
-        <squashfs-devel@lists.sourceforge.net>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Kernel Team <Kernel-team@fb.com>, Chris Mason <clm@fb.com>,
-        Petr Malat <oss@malat.biz>, Yann Collet <cyan@fb.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        David Sterba <dsterba@suse.cz>,
-        "Oleksandr Natalenko" <oleksandr@natalenko.name>,
-        Felix Handte <felixh@fb.com>,
-        "Eric Biggers" <ebiggers@kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        "Paul Jones" <paul@pauljones.id.au>,
-        Tom Seewald <tseewald@gmail.com>
-Subject: Re: [GIT PULL][v12] zstd changes for linux-next
-Thread-Topic: [GIT PULL][v12] zstd changes for linux-next
-Thread-Index: AQHXuYpmReFLKZ4iPE6r0O7TLtSZr6vDrd2AgAAMNwA=
-Date:   Tue, 5 Oct 2021 03:10:43 +0000
-Message-ID: <05728E7C-B0D4-4478-B262-800107AC065D@fb.com>
-References: <20211005014118.3164585-1-nickrterrell@gmail.com>
- <20211005132659.6774f10b@canb.auug.org.au>
-In-Reply-To: <20211005132659.6774f10b@canb.auug.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: canb.auug.org.au; dkim=none (message not signed)
- header.d=none;canb.auug.org.au; dmarc=none action=none header.from=fb.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 84f40b0b-03bf-431c-b011-08d987adb7ee
-x-ms-traffictypediagnostic: CH2PR15MB3560:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CH2PR15MB35601F3620DF1E6C4057088DABAF9@CH2PR15MB3560.namprd15.prod.outlook.com>
-x-fb-source: Internal
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: J0h5QiHb7DecAFkA2Gga6GYBtFjG2dF9j1Szy9LbSrHbFILDrGA415xWzvM1K5m+HzmRf6o+NaC5huRlwEEleJbN1Q6+ZJoQ0FFQje+N5AlpCoKJWTqUWy1fzz3SgBtvnKJIquGYZA2UXsPPQSA0B2ZmILid+2CmgmgBJEH72w7vWlSxXtAOFqZ8bB8dn9EKiU3mjvJ7nrBPmPlyz3pg0BY/QWoYJDd2tSgX84rbT27pqDU6/EsIojU0BUhwUCoShaqaFstW4KgncKXZGn1uILsRfcDKQtTFxs7fU6NYMGdkH+eFS26rQ2J5njhrAIyotmHSWuMHIdEdpihyJExszNK5MUlfzksKU9dwZlOE0tw3MEOMkdSfr1hlQ2VA+kVHlONj87b4TQ15Km62TKiipixFyCrQzNwqq7h0fPaYwsfYg4l8oeo15NPh4bvkqcXxMMoaO1I9qlGZ1XiBF6fHAgm03zCNYYWvDdYr15phgEyAhtSAcPuSVxkmB9YgorNBVVmwjYYyefzH0nlVo3e9rUe1DQqz0ldtRj68vFiVvQ4MOwYGDO6tsQvQo4e59zAcGOXuWpd3k2ELeU43hw67KecRaJpiOY6heEdOMKijndLJvZm46VxgS+48j8a9ZKtxa+jUSBuVVjJhCrHoeQ3oDiA7vZJaaDLt4yjdwNRZ4C/H5hMBYqcXmp4ExKFEnqWxVyBAoFgRgNa9je9HgR5UP7ZKi9BW8a55LE8H/5C3Vn45plG+skWgKJ5Hmk04LTYSnYDw11Ema9mf2twAujyslXondUvpJjnGAaHdoKeORc4Jy7rr2ha831qFTmMaRFzAplNP/8MK5v7SogIyV/V7oA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR15MB3672.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(53546011)(4326008)(186003)(38070700005)(6506007)(54906003)(36756003)(71200400001)(2616005)(5660300002)(7416002)(966005)(26005)(83380400001)(508600001)(6512007)(33656002)(8676002)(122000001)(8936002)(38100700002)(66946007)(76116006)(66476007)(91956017)(66446008)(6486002)(2906002)(6916009)(86362001)(316002)(66556008)(64756008)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZmYxT2cyTXR5WDV4YVRVZGV5VGJrcVhCeEJtRGJFK2NtZkRKY2VTRDVKUU9n?=
- =?utf-8?B?bUNLU3hsdE9iVnU1WUNUeEtKWjRZY1BHc2NYSjZIUEYwTFRiZEJ2c0cxM3Zy?=
- =?utf-8?B?dXFxWXZyZ1BwTmpnSC93WGg2UDFPL3ZpbEpJMzNmOUdVVC85NEc5MlRlSVF0?=
- =?utf-8?B?K2VxSnJMbVphN2pMSGFqUW04YXlXbXdRYjdybFdsZUYvTTd0RnVoR1ZsRjJl?=
- =?utf-8?B?Nzgyb3d3UUc2SHJTZTV1WEd0QW04bDJKaXZQQUFWekRGb2xNUkUrRnZ3WjMv?=
- =?utf-8?B?WHJYcU55ODZPYmw3RmlCZ1dwWmZEdk5wRnBQbGcvejZNSUtqZzU4ZTNqRDBP?=
- =?utf-8?B?TE4ySVJNTU84N0VXWTBweXJCVUo2K212cTlQU3RoUkZsWU1kcXhRNVhzMGJu?=
- =?utf-8?B?bTl2Vk1nZEFJbnNPbGVrQXY2SFUzSGhzL0ZHY1NwREkwdVR0bHlwWVp2THVU?=
- =?utf-8?B?QjdCb212b0JWSi9HSjU1WlB3Smc4Mlo1SUxxNlIyaWdUektTMU9GN2tIWk1Q?=
- =?utf-8?B?MFpuQnhjNTRqYXVYUmVtc2U2UTRjaTJHRTBRdzdXb3ZnclNCaEtYekVaRVFF?=
- =?utf-8?B?alhFOTl0K3llQ1c5YllZU3dhUWh5L0UyMDN3Qk5xUkluVW1XaThIUis1eHQw?=
- =?utf-8?B?S2tRUFRTNUVmeVBCTldFUUxZeWErZTJhZTg1YzFodmdtZDEzQUhhRTBsRUQv?=
- =?utf-8?B?STIzd01SbkpFUWdPQWNVRHpyb3htOUhBcmRtWG9MSThjLzFhSWRuMDNWcjBD?=
- =?utf-8?B?TmJ4UTI1VjczdU1YVUxvYWsxQWV4MzFTTEZ4NU5YRTl4NmNpeHQwQzRDSE1k?=
- =?utf-8?B?b2MrWXdrT3czaEMybDVNWDAydDdvd3RhUVFlMmRjNkJ5bmUyWFM3aEE1U0JC?=
- =?utf-8?B?UGFsRERiMDZHNnlRalR6Vjh4NFlZcDYvK0JIMm5KbjBWQ2l5STNzOCswQkY4?=
- =?utf-8?B?cm1PS0F5WjRIUWI2WGdYb1ZKNTVlUTBwQXBHSWlGcWxVV1Q2bmtrbTA3UENs?=
- =?utf-8?B?WVZwb0RMeGRXMjdSb2VBb2VQOGNJcTZkZHFBaHRzbDdEY3VubzBmbDBmb25L?=
- =?utf-8?B?dXV5VmR0TENwWTBJUHp3MVFmZm9JbGtpeWdBR21PeXBsN29wKzUwVmovVmFY?=
- =?utf-8?B?RnV4d011WWptL3RpQ2M1bVdidHVOSW1QRTJBMGtCVVpWR29zaUJwTUhSaity?=
- =?utf-8?B?RmplYzVRbWdlYTBrellrek13RmwrbGJXNHpsRTFTZnVYVm1oTXkzeGdVNkdH?=
- =?utf-8?B?c1lsTHFiSHp2VDVZYmpGZG5kRi9sSXo2WC93b0NiSjRvTEJDcFQxN2xaVHZ3?=
- =?utf-8?B?QTFHbDJTN3B6ekRPUWN1SEhyZVBxbmFaT2h3NzZ2VXRtQzdnQksyeWpBNUo3?=
- =?utf-8?B?bWN3alo2RGFCQStRREZZcFlLZXZjbzVLdVdSNklOVmprdGdzY0gzRGs4MlNC?=
- =?utf-8?B?OWNKNDV1anhXeU9MakJ2dzVsd3VHRWxUWnFhTWJVNHlyU2x5NW15Z3VtSEk4?=
- =?utf-8?B?bE9HbTlKTzB6NkZldTRkbmdVWitRbzd3V0V3NUkvdjd2RlIxYWNWd0xvMm8z?=
- =?utf-8?B?cmVrTGVYQ3VEQ0p1K215dWRGZEVmRVZpdWpRMUNhQnZlR0p2Qnp4dEszSEpW?=
- =?utf-8?B?T0Y3OElXMHVLQ1ZpZjdoZytmUGlKWTV0Y0xIT0E5K0F3bWptUHhpWVY4VTJ3?=
- =?utf-8?B?eE5CVEdkempqcDNsZG05S3NmM2tUanlnc2habE8zZGN3dnRmWklPU2wxT3lz?=
- =?utf-8?Q?pXmofM0faywouLYkdaNJYDwUbjhVjuCwANayBTs?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2D5C2DF70EFD034FBC14835C5E7CC368@namprd15.prod.outlook.com>
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR15MB3672.namprd15.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 84f40b0b-03bf-431c-b011-08d987adb7ee
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Oct 2021 03:10:43.2372
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: i3O5u9KXcqv9xE+gE07cPo8DOdixPPAYXttsGFQtA4q8n0x7PaAxDIZ12Vl5f+oe
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR15MB3560
-X-OriginatorOrg: fb.com
-X-Proofpoint-GUID: _hxy3K63S23NZ_bCJgtOSBHDLz7kXLEr
-X-Proofpoint-ORIG-GUID: _hxy3K63S23NZ_bCJgtOSBHDLz7kXLEr
-Content-Transfer-Encoding: base64
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Tue, 5 Oct 2021 07:42:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633434024;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5jng+t/KM35rvlrjpFOnhlmQDfLsDuNmByDqJMmcgxQ=;
+        b=Kgq3VI3mG6TPvUhfnt7RXpsaOSwukeO8aWPcZCOtcQXEpN5F/nkGfOeB7E7Jb10Y6/v3E1
+        F2G7lMmgqwW8JQMvGrdD5bKYCDDs1/+1aLRF5PmagkB93ydnyIRR5ln9XgDoB1RBSyI4Ue
+        ++k25W/jZ8gvacf/s00BsEFD4gcTTik=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-Flxz6DGqM8CtA_P3zIv7Ew-1; Tue, 05 Oct 2021 07:40:22 -0400
+X-MC-Unique: Flxz6DGqM8CtA_P3zIv7Ew-1
+Received: by mail-wm1-f69.google.com with SMTP id 129-20020a1c1987000000b0030cd1616fbfso1189481wmz.3
+        for <linux-crypto@vger.kernel.org>; Tue, 05 Oct 2021 04:40:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=5jng+t/KM35rvlrjpFOnhlmQDfLsDuNmByDqJMmcgxQ=;
+        b=hFY/ELYTwMqoLjkJWLopkKRNicOzkNU0fIuk066nBAc1eFSh/a2QUEZB2aU4tS6R/9
+         omrbLliN3SONCAZit4zQnMuBBSOXEuvK1Njxn7qcEg/1c/h1HG0ALLdQwPCm04FDyKNM
+         MDCqhXIXP9tKLY4y/d+JaZmTcRgV0oy+pzxFzt8a3GCFfOmfjwprrKeMy31eqvi+EVvx
+         6T5o1rpy2AUTRqYJWGuaWt7775k/1ST9hw9qkJqp+Yh5z7pf+1r6Y88CUMKh8oKoJAuM
+         ydkgyaFVy28x68BvQjqq0H0fem2k19UPBM4OG6/2OyP+Xw7AdbjzcP/8P967cltob/Z1
+         rtjA==
+X-Gm-Message-State: AOAM5317MDeubZ20lYDv9uIrHNTi+Y9nLLlQfmB0uAPa0cYdEXfrQ1Jg
+        fIxYca4v1lxOq+jkredDoDgGWLD0a0KMWb85PSjg/3KLkpQ+2ItY+tOERwkh9JVxUu2VmhPc4gJ
+        YHp6xEySpsvRWLFyxBRZKuGQC
+X-Received: by 2002:adf:f946:: with SMTP id q6mr20800999wrr.437.1633434021613;
+        Tue, 05 Oct 2021 04:40:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyazp3VBDOnWtSY8G3MjsohPMvzJyMJLtngLNsfvR7sWs6QI+KrltPbhmkHqKDnOIrXSYvmXQ==
+X-Received: by 2002:adf:f946:: with SMTP id q6mr20800984wrr.437.1633434021441;
+        Tue, 05 Oct 2021 04:40:21 -0700 (PDT)
+Received: from [192.168.100.42] ([82.142.3.114])
+        by smtp.gmail.com with ESMTPSA id n14sm1823048wms.0.2021.10.05.04.40.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Oct 2021 04:40:21 -0700 (PDT)
+Message-ID: <637cd2e5-8584-3ef5-6de8-bf43b581d0d6@redhat.com>
+Date:   Tue, 5 Oct 2021 13:40:19 +0200
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-10-04_05,2021-10-04_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 malwarescore=0
- suspectscore=0 phishscore=0 priorityscore=1501 impostorscore=0
- clxscore=1011 spamscore=0 mlxlogscore=999 adultscore=0 bulkscore=0
- mlxscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2109230001 definitions=main-2110050016
-X-FB-Internal: deliver
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH 0/4] hwrng: virtio - add an internal buffer
+Content-Language: en-US
+To:     linux-kernel@vger.kernel.org
+Cc:     Alexander Potapenko <glider@google.com>,
+        linux-crypto@vger.kernel.org, Dmitriy Vyukov <dvyukov@google.com>,
+        rusty@rustcorp.com.au, amit@kernel.org, akong@redhat.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Matt Mackall <mpm@selenic.com>,
+        virtualization@lists.linux-foundation.org
+References: <20210922170903.577801-1-lvivier@redhat.com>
+From:   Laurent Vivier <lvivier@redhat.com>
+In-Reply-To: <20210922170903.577801-1-lvivier@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gT24gT2N0IDQsIDIwMjEsIGF0IDc6MjYgUE0sIFN0ZXBoZW4gUm90aHdlbGwgPHNmckBj
-YW5iLmF1dWcub3JnLmF1PiB3cm90ZToNCj4gDQo+IEhpIE5pY2ssDQo+IA0KPiBPbiBNb24sICA0
-IE9jdCAyMDIxIDE4OjQxOjE4IC0wNzAwIE5pY2sgVGVycmVsbCA8bmlja3J0ZXJyZWxsQGdtYWls
-LmNvbT4gd3JvdGU6DQo+PiANCj4+IEZyb206IE5pY2sgVGVycmVsbCA8dGVycmVsbG5AZmIuY29t
-Pg0KPj4gDQo+PiBUaGUgZm9sbG93aW5nIGNoYW5nZXMgc2luY2UgY29tbWl0IGEyNTAwNmE3NzM0
-OGJhMDZjN2JjOTY1MjBkMzMxY2Q5ZGQzNzA3MTU6DQo+PiANCj4+ICBBZGQgbGludXgtbmV4dCBz
-cGVjaWZpYyBmaWxlcyBmb3IgMjAyMTEwMDEgKDIwMjEtMTAtMDEgMTc6MDc6MzcgKzEwMDApDQo+
-PiANCj4+IGFyZSBhdmFpbGFibGUgaW4gdGhlIEdpdCByZXBvc2l0b3J5IGF0Og0KPj4gDQo+PiAg
-Z2l0QGdpdGh1Yi5jb206dGVycmVsbG4vbGludXguZ2l0IHRhZ3MvdjEyLXpzdGQtMS40LjEwDQo+
-PiANCj4+IGZvciB5b3UgdG8gZmV0Y2ggY2hhbmdlcyB1cCB0byA1MjEwY2EzM2IwOWJlZDVlMDlm
-NzJlOWI0NmEzMjIwZjY0NTk3ZjhjOg0KPj4gDQo+PiAgTUFJTlRBSU5FUlM6IEFkZCBtYWludGFp
-bmVyIGVudHJ5IGZvciB6c3RkICgyMDIxLTEwLTA0IDE4OjE0OjQyIC0wNzAwKQ0KPj4gDQo+PiBJ
-IHdvdWxkIGxpa2UgdG8gbWVyZ2UgdGhpcyBwdWxsIHJlcXVlc3QgaW50byBsaW51eC1uZXh0IHRv
-IGJha2UsIGFuZCB0aGVuIHN1Ym1pdA0KPj4gdGhlIFBSIHRvIExpbnV4IGluIHRoZSA1LjE2IG1l
-cmdlIHdpbmRvdy4gSWYgeW91IGhhdmUgYmVlbiBhIHBhcnQgb2YgdGhlDQo+PiBkaXNjdXNzaW9u
-LCBhcmUgYSBtYWludGFpbmVyIG9mIGEgY2FsbGVyIG9mIHpzdGQsIHRlc3RlZCB0aGlzIGNvZGUs
-IG9yIG90aGVyd2lzZQ0KPj4gYmVlbiBpbnZvbHZlZCwgdGhhbmsgeW91ISBBbmQgY291bGQgeW91
-IHBsZWFzZSByZXNwb25kIGJlbG93IHdpdGggYW4gYXBwcm9waWF0ZQ0KPj4gdGFnLCBzbyBJIGNh
-biBjb2xsZWN0IHN1cHBvcnQgZm9yIHRoZSBQUg0KPiANCj4gU29ycnksIGJ1dCB5b3UgY2FuJ3Qg
-YmFzZSBhIGJyYW5jaCBvbiBsaW51eC1uZXh0IGl0c2VsZiAoc2luY2UNCj4gbGludXgtbmV4dCAt
-IGFuZCBtYW55IG9mIHRoZSB0cmVlcyBpdCBtZXJnZXMgLSByZWJhc2VzIGV2ZXJ5IGRheSkuICBJ
-Zg0KPiB5b3Ugd2FudCBhIGJyYW5jaCBpbmNsdWRlZCBpbiBsaW51eC1uZXh0LCBpdCBuZWVkcyB0
-byBiZSBiYXNlZCBvbiBzb21lDQo+IHN0YWJsZSB0cmVlL2JyYW5jaCwgYWxtb3N0IGFsd2F5cyBM
-aW51cyBUb3J2YWxkJ3MgdHJlZS4NCj4gDQo+IEFsc28sIHdoYXQgSSBuZWVkIGlzIGEgYnJhbmNo
-IHRoYXQgSSBjYW4gZmV0Y2ggZXZlcnkgZGF5IChzbyBpdHMgbmFtZQ0KPiBtdXN0IG5vdCBjaGFu
-Z2UpIGFuZCBhbGwgeW91IGRvIGlzIHVwZGF0ZSB0aGF0IGJyYW5jaCB0byBhbnkgbmV3ZXINCj4g
-dmVyc2lvbiBpZi93aGVuIHlvdSBhcmUgc2F0aXNmaWVkIHRoYXQgaXQgaXMgcmVhZHkgZm9yIG1l
-cmdpbmcuDQoNClRoYW5rcyBmb3IgdGhlIGhlbHAhIEFuZCBzb3JyeSBmb3IgdGhlIG1pc3Rha2Us
-IHRoaXMgaXMgbXkgZmlyc3QgdGltZSBzdWJtaXR0aW5nIGENCmJyYW5jaCBmb3IgbGludXgtbmV4
-dC4gSeKAmWxsIGNyZWF0ZSBhIG5ldyBicmFuY2ggYHpzdGQtMS40LjEwYCBhbmQgcmViYXNlIG9u
-IHRvcCBvZg0KdjUuMTUtcmM0LiBUaGVuIHJlc3VibWl0IHRoZSByZXF1ZXN0Lg0KDQo+IEFsc28s
-IEkgd291bGQgbGlrZSBhIGdpdCBVUkwgdGhhdCBkb2VzIG5vdCByZXF1aXJlIGEgZ2l0aHViIGFj
-Y291bnQgLi4uDQoNClN1cmUsIGRvZXMgdGhlIFVSTCBodHRwczovL2dpdGh1Yi5jb20vdGVycmVs
-bG4vbGludXguZ2l0IHdvcmsgZm9yIHlvdT8NCg0KQmVzdCwNCk5pY2sgVGVycmVsbA0K
+On 22/09/2021 19:08, Laurent Vivier wrote:
+> hwrng core uses two buffers that can be mixed in the virtio-rng queue.
+> 
+> This series fixes the problem by adding an internal buffer in virtio-rng.
+> 
+> Once the internal buffer is added, we can fix two other problems:
+> 
+> - to be able to release the driver without waiting the device releases the
+>    buffer
+> 
+> - actually returns some data when wait=0 as we can have some already
+>    available data
+> 
+> It also tries to improve the performance by always having a buffer in
+> the queue of the device.
+> 
+> Laurent Vivier (4):
+>    hwrng: virtio - add an internal buffer
+>    hwrng: virtio - don't wait on cleanup
+>    hwrng: virtio - don't waste entropy
+>    hwrng: virtio - always add a pending request
+> 
+>   drivers/char/hw_random/virtio-rng.c | 84 +++++++++++++++++++++--------
+>   1 file changed, 63 insertions(+), 21 deletions(-)
+> 
+
+Any comment?
+
+Do we need a v2?
+
+Thanks,
+Laurent
+
