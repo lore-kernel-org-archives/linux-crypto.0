@@ -2,202 +2,356 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6BDCC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Oct 2021 13:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BA9CC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Oct 2021 15:01:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF1D6619E1
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Oct 2021 13:30:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B0EC61186
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Oct 2021 15:01:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234997AbhJENco (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Oct 2021 09:32:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42994 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235037AbhJENcn (ORCPT
+        id S229488AbhJEPDe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Oct 2021 11:03:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52962 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233705AbhJEPDd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Oct 2021 09:32:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633440652;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=n1i8Euern9P25K11N8MWPbpda+LgMAsFjt0OleN5ka4=;
-        b=OgcRnWCVf1b4BaQJizo06sHQTUJjf/KZQ4tqDUmD0eiCkwwnv5OKBwB1Vu3X8URhDgHlk2
-        s6OrY/BUmPCAWMNyoWYiVr8cRHeeGp43AR+UxqYNn3oVD+rqLE2qRhBC9lLa9YTNUcZsQF
-        NUXRi1HclIZdosv6o6s5otnNpdpl268=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-Fx-cby9LOUeFO-UYPj2_wA-1; Tue, 05 Oct 2021 09:30:51 -0400
-X-MC-Unique: Fx-cby9LOUeFO-UYPj2_wA-1
-Received: by mail-wm1-f72.google.com with SMTP id 200-20020a1c00d1000000b0030b3dce20e1so1335644wma.0
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Oct 2021 06:30:50 -0700 (PDT)
+        Tue, 5 Oct 2021 11:03:33 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AE75C06174E
+        for <linux-crypto@vger.kernel.org>; Tue,  5 Oct 2021 08:01:42 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id y26so88071572lfa.11
+        for <linux-crypto@vger.kernel.org>; Tue, 05 Oct 2021 08:01:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=42G3scgpWAbOtgxef+InMFnEa34BVWcCFN53mKIikV0=;
+        b=HaQ73Zp2P266ypuNKElq+jGbVlRIzMQ71XS7qQ2exXnMK2YWPRGvke9i4gh75sOsHE
+         AaUeLPa93afxOCNwDZ4rZXLseWBCcrIfDV+lcMPL8MqJOAs+FWh2d7is2HYq78mBQQgY
+         ZsYMsSpe8OkVrFv2+9XCEJSlWRawQCTaHtx3wCgLF/QdyXZ8UIbGcWs6yj/t+XvrMku9
+         N7Q4tFJpL31ePVP6Ed4OYRuJ0y7Yai1ntz96WQrNjMKAqmokUP+uPW//gqWd7n6iNAgs
+         srNj0nk5DBhe5iGveSfa7mXy7iSJxoZ7n5flMapZuomGAFyxyG0oTyLq+ZCevbABcV4Y
+         K3EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=n1i8Euern9P25K11N8MWPbpda+LgMAsFjt0OleN5ka4=;
-        b=mmU54nTxiEmBMOMK5f6AYDk10qUh9nLMSGyuWI7wIR6vP8W7Mdd5+SSyzFs/zmWLOq
-         9LxVJJZZZTyRcq7YC6jGzqSE28avbx+Gkz/BbeSR92SfQU8e05ZSdL2sgels6sPXLMZi
-         CPEcZHTd5y1BrTi82PDotGg1kG/4ImbTW4xbh6JUqaKA5HX0H6AkK33/oyGlwKqD9iwT
-         mhqxHYeq1VhEBnROmY37GNQzbXBp7FM59fJCwh0SBFnizqeluqcnw5AHJM2GXqD2u2JM
-         1RNNaUQ6d7SZ4EWkW83IOxiT2wSO4p3cGDAArFjFjvU1JdwNYj2NsUonddTharc2gXhS
-         aTjA==
-X-Gm-Message-State: AOAM532E8+403sCzV/jBCpkSp3GMH2Mv7XvAfnvdcQ/qXCBaakYAGUMx
-        +5PUsJciraIWn30ld0ntJsibgItgGjU6UhrUN6TTldGm5OA7oyIUeHAj5+t2svucdDrKd8dSKFf
-        RVVUZdnCFJPeT6qhQsVa8EQ7w
-X-Received: by 2002:adf:f94b:: with SMTP id q11mr21752291wrr.408.1633440649633;
-        Tue, 05 Oct 2021 06:30:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyOOs163cK4VZu3EocaK1ey7lkWDzdoDW8k0yZYvyozSF8o+cLe2SMVDBPk8+nISneLdVSrhQ==
-X-Received: by 2002:adf:f94b:: with SMTP id q11mr21752251wrr.408.1633440649399;
-        Tue, 05 Oct 2021 06:30:49 -0700 (PDT)
-Received: from [192.168.100.42] ([82.142.3.114])
-        by smtp.gmail.com with ESMTPSA id z12sm17751793wrv.31.2021.10.05.06.30.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Oct 2021 06:30:48 -0700 (PDT)
-Message-ID: <40a84813-afc4-049b-2713-8bdad9c4bc20@redhat.com>
-Date:   Tue, 5 Oct 2021 15:30:47 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=42G3scgpWAbOtgxef+InMFnEa34BVWcCFN53mKIikV0=;
+        b=h2fgT7lKoMPMnZPwB22SMpsRBOq0fv0ddGvdjDwAb5v14pCnB7K6tiM8cNHAQGmy6c
+         50nwus5BdszXIuh6sqhsqTc3zWTyNnij3CLrVj+n++zDn0W2/fZj1wn92wkcPnNZ9zay
+         d8GLjkR/OARXx/KLs6iwKc8ZsbGY6UAT1PXffZ/okpUPASdiD3nKQoNUcmDMhfmrznqz
+         io/Y8zk6aL8GzmLD7WA1pPdlRc4KQAJvOKUVNJSG7fXIIcQKa2rdCw4/eN18z0f2FEtA
+         JgtzXrNJLZbkbWcQMijb75B5L4BEaWA61LcU4pYS99Xz6BlyyCrinCcl/AJJIAMRWpVg
+         3QuQ==
+X-Gm-Message-State: AOAM533PPA9iRJGNWqRalIqdKm39j6e/NQldWNLmChZJMqxV4xSC4Sek
+        Gu+iVhKdRGDO22g/8KGiIj3VzEjvf9D3IGEyYvKZWw==
+X-Google-Smtp-Source: ABdhPJwfIVQtcMQUnNx8RT4h/VH+mgd9JIEGGedHljgEqbQmJLD/tT2gzhFnJVT7XW0mk42MFtXlb2TKsV03h7OLuhU=
+X-Received: by 2002:a2e:8787:: with SMTP id n7mr21556614lji.278.1633446087421;
+ Tue, 05 Oct 2021 08:01:27 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH 1/4] hwrng: virtio - add an internal buffer
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Alexander Potapenko <glider@google.com>,
-        linux-crypto@vger.kernel.org, Dmitriy Vyukov <dvyukov@google.com>,
-        rusty@rustcorp.com.au, amit@kernel.org, akong@redhat.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Matt Mackall <mpm@selenic.com>,
-        virtualization@lists.linux-foundation.org
-References: <20210922170903.577801-1-lvivier@redhat.com>
- <20210922170903.577801-2-lvivier@redhat.com>
- <20210922145651-mutt-send-email-mst@kernel.org>
- <0dd338bb-0fbe-b9d5-0962-d47ac2de4c4e@redhat.com>
- <20210923030026-mutt-send-email-mst@kernel.org>
- <fcd17df1-5aed-346b-e7cd-abe4dfb67e69@redhat.com>
- <20211005075433-mutt-send-email-mst@kernel.org>
-From:   Laurent Vivier <lvivier@redhat.com>
-In-Reply-To: <20211005075433-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-26-brijesh.singh@amd.com>
+ <CAMkAt6qsZNJPM97Y6_8b7QmLv=n0MaDs7hThi3thFEee4P10pA@mail.gmail.com> <e5a47417-2f2e-7055-71ad-850b509f3876@amd.com>
+In-Reply-To: <e5a47417-2f2e-7055-71ad-850b509f3876@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 5 Oct 2021 09:01:15 -0600
+Message-ID: <CAMkAt6pJQmgzbpfxbXF_aJobszG8OU=rfVw8Xk9SMqC6050G6g@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 25/45] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        Marc Orr <marcorr@google.com>,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 05/10/2021 13:55, Michael S. Tsirkin wrote:
-> On Thu, Sep 23, 2021 at 09:34:18AM +0200, Laurent Vivier wrote:
->> On 23/09/2021 09:04, Michael S. Tsirkin wrote:
->>> On Thu, Sep 23, 2021 at 08:26:06AM +0200, Laurent Vivier wrote:
->>>> On 22/09/2021 21:02, Michael S. Tsirkin wrote:
->>>>> On Wed, Sep 22, 2021 at 07:09:00PM +0200, Laurent Vivier wrote:
->>>>>> hwrng core uses two buffers that can be mixed in the
->>>>>> virtio-rng queue.
->>>>>>
->>>>>> If the buffer is provided with wait=0 it is enqueued in the
->>>>>> virtio-rng queue but unused by the caller.
->>>>>> On the next call, core provides another buffer but the
->>>>>> first one is filled instead and the new one queued.
->>>>>> And the caller reads the data from the new one that is not
->>>>>> updated, and the data in the first one are lost.
->>>>>>
->>>>>> To avoid this mix, virtio-rng needs to use its own unique
->>>>>> internal buffer at a cost of a data copy to the caller buffer.
->>>>>>
->>>>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->>>>>> ---
->>>>>>     drivers/char/hw_random/virtio-rng.c | 43 ++++++++++++++++++++++-------
->>>>>>     1 file changed, 33 insertions(+), 10 deletions(-)
->>>>>>
->>>>>> diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
->>>>>> index a90001e02bf7..208c547dcac1 100644
->>>>>> --- a/drivers/char/hw_random/virtio-rng.c
->>>>>> +++ b/drivers/char/hw_random/virtio-rng.c
->>>>>> @@ -18,13 +18,20 @@ static DEFINE_IDA(rng_index_ida);
->>>>>>     struct virtrng_info {
->>>>>>     	struct hwrng hwrng;
->>>>>>     	struct virtqueue *vq;
->>>>>> -	struct completion have_data;
->>>>>>     	char name[25];
->>>>>> -	unsigned int data_avail;
->>>>>>     	int index;
->>>>>>     	bool busy;
->>>>>>     	bool hwrng_register_done;
->>>>>>     	bool hwrng_removed;
->>>>>> +	/* data transfer */
->>>>>> +	struct completion have_data;
->>>>>> +	unsigned int data_avail;
->>>>>> +	/* minimal size returned by rng_buffer_size() */
->>>>>> +#if SMP_CACHE_BYTES < 32
->>>>>> +	u8 data[32];
->>>>>> +#else
->>>>>> +	u8 data[SMP_CACHE_BYTES];
->>>>>> +#endif
->>>>>
->>>>> Let's move this logic to a macro in hw_random.h ?
->>>>>
->>>>>>     };
->>>>>>     static void random_recv_done(struct virtqueue *vq)
->>>>>> @@ -39,14 +46,14 @@ static void random_recv_done(struct virtqueue *vq)
->>>>>>     }
->>>>>>     /* The host will fill any buffer we give it with sweet, sweet randomness. */
->>>>>> -static void register_buffer(struct virtrng_info *vi, u8 *buf, size_t size)
->>>>>> +static void register_buffer(struct virtrng_info *vi)
->>>>>>     {
->>>>>>     	struct scatterlist sg;
->>>>>> -	sg_init_one(&sg, buf, size);
->>>>>> +	sg_init_one(&sg, vi->data, sizeof(vi->data));
->>>>>
->>>>> Note that add_early_randomness requests less:
->>>>>            size_t size = min_t(size_t, 16, rng_buffer_size());
->>>>>
->>>>> maybe track how much was requested and grow up to sizeof(data)?
->>>>
->>>> I think this problem is managed by PATCH 3/4 as we reuse unused data of the buffer.
->>>
->>> the issue I'm pointing out is that we are requesting too much
->>> entropy from host - more than guest needs.
->>
->> Yes, guest asks for 16 bytes, but we request SMP_CACHE_BYTES (64 on x86_64),
->> and these 16 bytes are used with add_device_randomness(). With the following
->> patches, the remaining 48 bytes are used rapidly by hwgnd kthread or by the
->> next virtio_read.
->>
->> If there is no enough entropy the call is simply ignored as wait=0.
->>
->> At this patch level the call is always simply ignored (because wait=0) and
->> the data requested here are used by the next read that always asks for a
->> SMP_CACHE_BYTES bytes data size.
->>
->> Moreover in PATCH 4/4 we always have a pending request of size
->> SMP_CACHE_BYTES, so driver always asks a block of this size and the guest
->> takes what it needs.
->>
->> Originally I used a 16 bytes block but performance are divided by 4.
->>
->> Do you propose something else?
->>
->> Thanks,
->> Laurent
-> 
-> Maybe min(size, sizeof(vi->data))?
-> 
-But it means, in the case of mixed buffers, we will ask 16 bytes on the first call, not 
-use it, and  ask SMP_CACHE_BYTES bytes on the next call to get only 16:
+On Mon, Sep 27, 2021 at 1:33 PM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+>
+>
+> On 9/27/21 11:43 AM, Peter Gonda wrote:
+> ...
+> >>
+> >> +static bool is_hva_registered(struct kvm *kvm, hva_t hva, size_t len)
+> >> +{
+> >> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> >> +       struct list_head *head = &sev->regions_list;
+> >> +       struct enc_region *i;
+> >> +
+> >> +       lockdep_assert_held(&kvm->lock);
+> >> +
+> >> +       list_for_each_entry(i, head, list) {
+> >> +               u64 start = i->uaddr;
+> >> +               u64 end = start + i->size;
+> >> +
+> >> +               if (start <= hva && end >= (hva + len))
+> >> +                       return true;
+> >> +       }
+> >> +
+> >> +       return false;
+> >> +}
+> >
+> > Internally we actually register the guest memory in chunks for various
+> > reasons. So for our largest SEV VM we have 768 1 GB entries in
+> > |sev->regions_list|. This was OK before because no look ups were done.
+> > Now that we are performing a look ups a linked list with linear time
+> > lookups seems not ideal, could we switch the back data structure here
+> > to something more conducive too fast lookups?
+> >> +
+>
+> Interesting, for qemu we had very few number of regions so there was no
+> strong reason for me to think something otherwise. Do you have any
+> preference on what data structure you will use ?
 
-- add_early_randomness() asks for 16 bytes but wait = 0 and thus the request is queued but 
-not used. add_early_randomness() is called when we switch from one hw_random backend to 
-another (so generally only once...)
+Chatted offline. I think this is fine for now, we won't want to use
+our userspace demand pinning with SNP yet.
 
-- hwrng_fillfn() and rng_dev_read() always ask rng_buffer_size() (max(32, SMP_CACHE_BYTES)).
+>
+> >> +static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> >> +{
+> >> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> >> +       struct sev_data_snp_launch_update data = {0};
+> >> +       struct kvm_sev_snp_launch_update params;
+> >> +       unsigned long npages, pfn, n = 0;
+> >
+> > Could we have a slightly more descriptive name for |n|? nprivate
+> > maybe? Also why not zero in the loop below?
+> >
+>
+> Sure, I will pick a better name and no need to zero above. I will fix it.
+>
+> > for (i = 0, n = 0; i < npages; ++i)
+> >
+> >> +       int *error = &argp->error;
+> >> +       struct page **inpages;
+> >> +       int ret, i, level;
+> >
+> > Should |i| be an unsigned long since it can is tracked in a for loop
+> > with "i < npages" npages being an unsigned long? (|n| too)
+> >
+>
+> Noted.
+>
+> >> +       u64 gfn;
+> >> +
+> >> +       if (!sev_snp_guest(kvm))
+> >> +               return -ENOTTY;
+> >> +
+> >> +       if (!sev->snp_context)
+> >> +               return -EINVAL;
+> >> +
+> >> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> >> +               return -EFAULT;
+> >> +
+> >> +       /* Verify that the specified address range is registered. */
+> >> +       if (!is_hva_registered(kvm, params.uaddr, params.len))
+> >> +               return -EINVAL;
+> >> +
+> >> +       /*
+> >> +        * The userspace memory is already locked so technically we don't
+> >> +        * need to lock it again. Later part of the function needs to know
+> >> +        * pfn so call the sev_pin_memory() so that we can get the list of
+> >> +        * pages to iterate through.
+> >> +        */
+> >> +       inpages = sev_pin_memory(kvm, params.uaddr, params.len, &npages, 1);
+> >> +       if (!inpages)
+> >> +               return -ENOMEM;
+> >> +
+> >> +       /*
+> >> +        * Verify that all the pages are marked shared in the RMP table before
+> >> +        * going further. This is avoid the cases where the userspace may try
+> >
+> > This is *too* avoid cases...
+> >
+> Noted
+>
+> >> +        * updating the same page twice.
+> >> +        */
+> >> +       for (i = 0; i < npages; i++) {
+> >> +               if (snp_lookup_rmpentry(page_to_pfn(inpages[i]), &level) != 0) {
+> >> +                       sev_unpin_memory(kvm, inpages, npages);
+> >> +                       return -EFAULT;
+> >> +               }
+> >> +       }
+> >> +
+> >> +       gfn = params.start_gfn;
+> >> +       level = PG_LEVEL_4K;
+> >> +       data.gctx_paddr = __psp_pa(sev->snp_context);
+> >> +
+> >> +       for (i = 0; i < npages; i++) {
+> >> +               pfn = page_to_pfn(inpages[i]);
+> >> +
+> >> +               ret = rmp_make_private(pfn, gfn << PAGE_SHIFT, level, sev_get_asid(kvm), true);
+> >> +               if (ret) {
+> >> +                       ret = -EFAULT;
+> >> +                       goto e_unpin;
+> >> +               }
+> >> +
+> >> +               n++;
+> >> +               data.address = __sme_page_pa(inpages[i]);
+> >> +               data.page_size = X86_TO_RMP_PG_LEVEL(level);
+> >> +               data.page_type = params.page_type;
+> >> +               data.vmpl3_perms = params.vmpl3_perms;
+> >> +               data.vmpl2_perms = params.vmpl2_perms;
+> >> +               data.vmpl1_perms = params.vmpl1_perms;
+> >> +               ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_UPDATE, &data, error);
+> >> +               if (ret) {
+> >> +                       /*
+> >> +                        * If the command failed then need to reclaim the page.
+> >> +                        */
+> >> +                       snp_page_reclaim(pfn);
+> >> +                       goto e_unpin;
+> >> +               }
+> >
+> > Hmm if this call fails after the first iteration of this loop it will
+> > lead to a hard to reproduce LaunchDigest right? Say if we are
+> > SnpLaunchUpdating just 2 pages A and B. If we first call this ioctl
+> > and A is SNP_LAUNCH_UPDATED'd but B fails, we then make A shared again
+> > in the RMP. So we must call the ioctl with 2 pages again, after fixing
+> > the issue with page B. Now the Launch digest has something like
+> > Hash(A) then HASH(A & B) right (overly simplified) so A will be
+> > included twice right? I am not sure if anything better can be done
+> > here but might be worth documenting IIUC.
+> >
+>
+> I can add a comment in documentation that if a LAUNCH_UPDATE fails then
+> user need to destroy the existing context and start from the beginning.
+> I am not sure if we want to support the partial update cases. But in
+> case we have two choices a) decommission the context on failure or b)
+> add a new command to destroy the existing context.
+>
 
-So we can say we use SMP_CACHE_BYTES in 99% of the cases.
+Agreed supporting the partial update case seems very tricky.
 
-Moreover, this will be discarded by patch 3 and 4 as we have a loop to ask more data in a 
-fixed size buffer.
-
-I'm not sure it's worth introducing this change in this patch.
-
-Thanks,
-Laurent
-
+>
+> >> +
+> >> +               gfn++;
+> >> +       }
+> >> +
+> >> +e_unpin:
+> >> +       /* Content of memory is updated, mark pages dirty */
+> >> +       for (i = 0; i < n; i++) {
+> >> +               set_page_dirty_lock(inpages[i]);
+> >> +               mark_page_accessed(inpages[i]);
+> >> +
+> >> +               /*
+> >> +                * If its an error, then update RMP entry to change page ownership
+> >> +                * to the hypervisor.
+> >> +                */
+> >> +               if (ret)
+> >> +                       host_rmp_make_shared(pfn, level, true);
+> >> +       }
+> >> +
+> >> +       /* Unlock the user pages */
+> >> +       sev_unpin_memory(kvm, inpages, npages);
+> >> +
+> >> +       return ret;
+> >> +}
+> >> +
+> >>   int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+> >>   {
+> >>          struct kvm_sev_cmd sev_cmd;
+> >> @@ -1712,6 +1873,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+> >>          case KVM_SEV_SNP_LAUNCH_START:
+> >>                  r = snp_launch_start(kvm, &sev_cmd);
+> >>                  break;
+> >> +       case KVM_SEV_SNP_LAUNCH_UPDATE:
+> >> +               r = snp_launch_update(kvm, &sev_cmd);
+> >> +               break;
+> >>          default:
+> >>                  r = -EINVAL;
+> >>                  goto out;
+> >> @@ -1794,6 +1958,29 @@ find_enc_region(struct kvm *kvm, struct kvm_enc_region *range)
+> >>   static void __unregister_enc_region_locked(struct kvm *kvm,
+> >>                                             struct enc_region *region)
+> >>   {
+> >> +       unsigned long i, pfn;
+> >> +       int level;
+> >> +
+> >> +       /*
+> >> +        * The guest memory pages are assigned in the RMP table. Unassign it
+> >> +        * before releasing the memory.
+> >> +        */
+> >> +       if (sev_snp_guest(kvm)) {
+> >> +               for (i = 0; i < region->npages; i++) {
+> >> +                       pfn = page_to_pfn(region->pages[i]);
+> >> +
+> >> +                       if (!snp_lookup_rmpentry(pfn, &level))
+> >> +                               continue;
+> >> +
+> >> +                       cond_resched();
+> >> +
+> >> +                       if (level > PG_LEVEL_4K)
+> >> +                               pfn &= ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
+> >> +
+> >> +                       host_rmp_make_shared(pfn, level, true);
+> >> +               }
+> >> +       }
+> >> +
+> >>          sev_unpin_memory(kvm, region->pages, region->npages);
+> >>          list_del(&region->list);
+> >>          kfree(region);
+> >> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> >> index e6416e58cd9a..0681be4bdfdf 100644
+> >> --- a/include/uapi/linux/kvm.h
+> >> +++ b/include/uapi/linux/kvm.h
+> >> @@ -1715,6 +1715,7 @@ enum sev_cmd_id {
+> >>          /* SNP specific commands */
+> >>          KVM_SEV_SNP_INIT,
+> >>          KVM_SEV_SNP_LAUNCH_START,
+> >> +       KVM_SEV_SNP_LAUNCH_UPDATE,
+> >>
+> >>          KVM_SEV_NR_MAX,
+> >>   };
+> >> @@ -1831,6 +1832,24 @@ struct kvm_sev_snp_launch_start {
+> >>          __u8 pad[6];
+> >>   };
+> >>
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_NORMAL           0x1
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_VMSA             0x2
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_ZERO             0x3
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_UNMEASURED       0x4
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_SECRETS          0x5
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_CPUID            0x6
+> >> +
+> >> +struct kvm_sev_snp_launch_update {
+> >> +       __u64 start_gfn;
+> >> +       __u64 uaddr;
+> >> +       __u32 len;
+> >> +       __u8 imi_page;
+> >> +       __u8 page_type;
+> >> +       __u8 vmpl3_perms;
+> >> +       __u8 vmpl2_perms;
+> >> +       __u8 vmpl1_perms;
+> >> +};
+> >> +
+> >>   #define KVM_DEV_ASSIGN_ENABLE_IOMMU    (1 << 0)
+> >>   #define KVM_DEV_ASSIGN_PCI_2_3         (1 << 1)
+> >>   #define KVM_DEV_ASSIGN_MASK_INTX       (1 << 2)
+> >> --
+> >> 2.17.1
+> >>
+> >>
