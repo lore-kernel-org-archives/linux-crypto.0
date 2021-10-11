@@ -2,55 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 713E4C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Oct 2021 10:03:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 836EFC43217
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Oct 2021 10:03:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D6F561039
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Oct 2021 10:03:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BF5960F21
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Oct 2021 10:03:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235746AbhJKKFM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Oct 2021 06:05:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39166 "EHLO
+        id S235753AbhJKKFO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 11 Oct 2021 06:05:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235745AbhJKKFM (ORCPT
+        with ESMTP id S235750AbhJKKFN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Oct 2021 06:05:12 -0400
+        Mon, 11 Oct 2021 06:05:13 -0400
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C14B8C061570
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Oct 2021 03:03:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 778CCC061762
+        for <linux-crypto@vger.kernel.org>; Mon, 11 Oct 2021 03:03:13 -0700 (PDT)
 Received: from dude.hi.pengutronix.de ([2001:67c:670:100:1d::7])
         by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <afa@pengutronix.de>)
-        id 1mZs8v-0006Sj-Kj; Mon, 11 Oct 2021 12:02:49 +0200
+        id 1mZs8v-0006Sl-Gx; Mon, 11 Oct 2021 12:02:49 +0200
 Received: from afa by dude.hi.pengutronix.de with local (Exim 4.92)
         (envelope-from <afa@pengutronix.de>)
-        id 1mZs8r-0002cg-Rq; Mon, 11 Oct 2021 12:02:45 +0200
+        id 1mZs8r-0002cs-UL; Mon, 11 Oct 2021 12:02:45 +0200
 From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        James Bottomley <jejb@linux.ibm.com>,
+To:     James Bottomley <jejb@linux.ibm.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
         Mimi Zohar <zohar@linux.ibm.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     kernel@pengutronix.de, Andreas Rammhold <andreas@rammhold.de>,
+        David Howells <dhowells@redhat.com>
+Cc:     kernel@pengutronix.de, Sumit Garg <sumit.garg@linaro.org>,
+        David Gstir <david@sigma-star.at>,
         Tim Harvey <tharvey@gateworks.com>,
         Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Richard Weinberger <richard@nod.at>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-Subject: [PATCH v4 1/5] KEYS: trusted: allow use of TEE as backend without TCG_TPM support
-Date:   Mon, 11 Oct 2021 12:02:34 +0200
-Message-Id: <c36b3e3d4d215e790491e1a274a8993dd68e2a39.1633946449.git-series.a.fatoum@pengutronix.de>
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: [PATCH v4 3/5] KEYS: trusted: allow trust sources to use kernel RNG for key material
+Date:   Mon, 11 Oct 2021 12:02:36 +0200
+Message-Id: <9431f31594f9ea693b201cfbfa9e7b221e500e6a.1633946449.git-series.a.fatoum@pengutronix.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <cover.8f40b6d1b93adc80aed2cac29a134f7a7fb5ee98.1633946449.git-series.a.fatoum@pengutronix.de>
 References: <cover.8f40b6d1b93adc80aed2cac29a134f7a7fb5ee98.1633946449.git-series.a.fatoum@pengutronix.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::7
 X-SA-Exim-Mail-From: afa@pengutronix.de
@@ -60,197 +66,78 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-With recent rework, trusted keys are no longer limited to TPM as trust
-source. The Kconfig symbol is unchanged however leading to a few issues:
+The two existing trusted key sources don't make use of the kernel RNG,
+but instead let the hardware that does the sealing/unsealing also
+generate the random key material. While a previous change offers users
+the choice to use the kernel RNG instead for both, new trust sources
+may want to unconditionally use the kernel RNG for generating key
+material, like it's done elsewhere in the kernel.
 
-  - TCG_TPM is required, even if only TEE is to be used
-  - Enabling TCG_TPM, but excluding it from available trusted sources
-    is not possible
-  - TEE=m && TRUSTED_KEYS=y will lead to TEE support being silently
-    dropped, which is not the best user experience
+This is especially prudent for hardware that has proven-in-production
+HWRNG drivers implemented, as otherwise code would have to be duplicated
+only to arrive at a possibly worse result.
 
-Remedy these issues by introducing two new boolean Kconfig symbols:
-TRUSTED_KEYS_TPM and TRUSTED_KEYS_TEE with the appropriate
-dependencies.
+Make this possible by turning struct trusted_key_ops::get_random
+into an optional member. If a driver leaves it NULL, kernel RNG
+will be used instead.
 
-Any code depending on the TPM trusted key backend or symbols exported
-by it will now need to explicitly state that it
-
-  depends on TRUSTED_KEYS && TRUSTED_KEYS_TPM
-
-The latter to ensure the dependency is built and the former to ensure
-it's reachable for module builds. This currently only affects
-CONFIG_ASYMMETRIC_TPM_KEY_SUBTYPE, so it's fixed up here as well.
-
-Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
-Tested-By: Andreas Rammhold <andreas@rammhold.de>
+Acked-by: Sumit Garg <sumit.garg@linaro.org>
+Reviewed-by: David Gstir <david@sigma-star.at>
 Tested-By: Tim Harvey <tharvey@gateworks.com>
 Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
 ---
-v3 -> v4:
-  - rebased on top of Andreas' regression fix and pulled it back
-    into series
-
-v2 -> v3:
-  - factored this patch out as a fix for backporting
-
-v1 -> v2:
-  - Move rest of TPM-related selects from TRUSTED_KEYS to
-    TRUSTED_KEYS_TPM (Sumit)
-  - Remove left-over line in Makefile (Sumit)
-  - added Fixes: tag
-  - adjust commit message to reference the regression reported
-    by Andreas
-  - have ASYMMETRIC_TPM_KEY_SUBTYPE depend on TRUSTED_KEYS_TPM,
-    because it references global symbols that are exported
-    by the trusted key TPM backend.
-
-[1]: https://lore.kernel.org/linux-integrity/f8285eb0135ba30c9d846cf9dd395d1f5f8b1efc.1624364386.git-series.a.fatoum@pengutronix.de/
-[2]: https://lore.kernel.org/linux-integrity/20210719091335.vwfebcpkf4pag3wm@wrt/T/#t
-
-To: Jarkko Sakkinen <jarkko@kernel.org>
-To: James Morris <jmorris@namei.org>
-To: "Serge E. Hallyn" <serge@hallyn.com>
 To: James Bottomley <jejb@linux.ibm.com>
+To: Jarkko Sakkinen <jarkko@kernel.org>
 To: Mimi Zohar <zohar@linux.ibm.com>
-To: Sumit Garg <sumit.garg@linaro.org>
 To: David Howells <dhowells@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-To: "David S. Miller" <davem@davemloft.net>
+Cc: James Morris <jmorris@namei.org>
+Cc: "Serge E. Hallyn" <serge@hallyn.com>
+Cc: "Horia Geantă" <horia.geanta@nxp.com>
+Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Udit Agarwal <udit.agarwal@nxp.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Jan Luebbe <j.luebbe@pengutronix.de>
 Cc: David Gstir <david@sigma-star.at>
 Cc: Richard Weinberger <richard@nod.at>
+Cc: Franck LENORMAND <franck.lenormand@nxp.com>
+Cc: Sumit Garg <sumit.garg@linaro.org>
 Cc: keyrings@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org
+Cc: linux-integrity@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Cc: linux-security-module@vger.kernel.org
-Cc: linux-integrity@vger.kernel.org
 ---
- crypto/asymmetric_keys/Kconfig            |  2 +-
- security/keys/Kconfig                     | 18 +++++----------
- security/keys/trusted-keys/Kconfig        | 29 ++++++++++++++++++++++++-
- security/keys/trusted-keys/Makefile       |  8 +++----
- security/keys/trusted-keys/trusted_core.c |  4 +--
- 5 files changed, 43 insertions(+), 18 deletions(-)
- create mode 100644 security/keys/trusted-keys/Kconfig
+ include/keys/trusted-type.h               | 2 +-
+ security/keys/trusted-keys/trusted_core.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index 1f1f004dc757..8886eddbf881 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -25,7 +25,7 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
- config ASYMMETRIC_TPM_KEY_SUBTYPE
- 	tristate "Asymmetric TPM backed private key subtype"
- 	depends on TCG_TPM
--	depends on TRUSTED_KEYS
-+	depends on TRUSTED_KEYS && TRUSTED_KEYS_TPM
- 	select CRYPTO_HMAC
- 	select CRYPTO_SHA1
- 	select CRYPTO_HASH_INFO
-diff --git a/security/keys/Kconfig b/security/keys/Kconfig
-index 64b81abd087e..9ec302962fe2 100644
---- a/security/keys/Kconfig
-+++ b/security/keys/Kconfig
-@@ -70,23 +70,19 @@ config BIG_KEYS
+diff --git a/include/keys/trusted-type.h b/include/keys/trusted-type.h
+index d89fa2579ac0..4eb64548a74f 100644
+--- a/include/keys/trusted-type.h
++++ b/include/keys/trusted-type.h
+@@ -64,7 +64,7 @@ struct trusted_key_ops {
+ 	/* Unseal a key. */
+ 	int (*unseal)(struct trusted_key_payload *p, char *datablob);
  
- config TRUSTED_KEYS
- 	tristate "TRUSTED KEYS"
--	depends on KEYS && TCG_TPM
--	select CRYPTO
--	select CRYPTO_HMAC
--	select CRYPTO_SHA1
--	select CRYPTO_HASH_INFO
--	select ASN1_ENCODER
--	select OID_REGISTRY
--	select ASN1
-+	depends on KEYS
- 	help
- 	  This option provides support for creating, sealing, and unsealing
- 	  keys in the kernel. Trusted keys are random number symmetric keys,
--	  generated and RSA-sealed by the TPM. The TPM only unseals the keys,
--	  if the boot PCRs and other criteria match.  Userspace will only ever
--	  see encrypted blobs.
-+	  generated and sealed by a trust source selected at kernel boot-time.
-+	  Userspace will only ever see encrypted blobs.
+-	/* Get a randomized key. */
++	/* Optional: Get a randomized key. */
+ 	int (*get_random)(unsigned char *key, size_t key_len);
  
- 	  If you are unsure as to whether this is required, answer N.
- 
-+if TRUSTED_KEYS
-+source "security/keys/trusted-keys/Kconfig"
-+endif
-+
- config ENCRYPTED_KEYS
- 	tristate "ENCRYPTED KEYS"
- 	depends on KEYS
-diff --git a/security/keys/trusted-keys/Kconfig b/security/keys/trusted-keys/Kconfig
-new file mode 100644
-index 000000000000..fc4abd581abb
---- /dev/null
-+++ b/security/keys/trusted-keys/Kconfig
-@@ -0,0 +1,29 @@
-+config TRUSTED_KEYS_TPM
-+	bool "TPM-based trusted keys"
-+	depends on TCG_TPM >= TRUSTED_KEYS
-+	default y
-+	select CRYPTO
-+	select CRYPTO_HMAC
-+	select CRYPTO_SHA1
-+	select CRYPTO_HASH_INFO
-+	select ASN1_ENCODER
-+	select OID_REGISTRY
-+	select ASN1
-+	help
-+	  Enable use of the Trusted Platform Module (TPM) as trusted key
-+	  backend. Trusted keys are random number symmetric keys,
-+	  which will be generated and RSA-sealed by the TPM.
-+	  The TPM only unseals the keys, if the boot PCRs and other
-+	  criteria match.
-+
-+config TRUSTED_KEYS_TEE
-+	bool "TEE-based trusted keys"
-+	depends on TEE >= TRUSTED_KEYS
-+	default y
-+	help
-+	  Enable use of the Trusted Execution Environment (TEE) as trusted
-+	  key backend.
-+
-+if !TRUSTED_KEYS_TPM && !TRUSTED_KEYS_TEE
-+comment "No trust source selected!"
-+endif
-diff --git a/security/keys/trusted-keys/Makefile b/security/keys/trusted-keys/Makefile
-index feb8b6c3cc79..2e2371eae4d5 100644
---- a/security/keys/trusted-keys/Makefile
-+++ b/security/keys/trusted-keys/Makefile
-@@ -5,10 +5,10 @@
- 
- obj-$(CONFIG_TRUSTED_KEYS) += trusted.o
- trusted-y += trusted_core.o
--trusted-y += trusted_tpm1.o
-+trusted-$(CONFIG_TRUSTED_KEYS_TPM) += trusted_tpm1.o
- 
- $(obj)/trusted_tpm2.o: $(obj)/tpm2key.asn1.h
--trusted-y += trusted_tpm2.o
--trusted-y += tpm2key.asn1.o
-+trusted-$(CONFIG_TRUSTED_KEYS_TPM) += trusted_tpm2.o
-+trusted-$(CONFIG_TRUSTED_KEYS_TPM) += tpm2key.asn1.o
- 
--trusted-$(CONFIG_TEE) += trusted_tee.o
-+trusted-$(CONFIG_TRUSTED_KEYS_TEE) += trusted_tee.o
+ 	/* Exit key interface. */
 diff --git a/security/keys/trusted-keys/trusted_core.c b/security/keys/trusted-keys/trusted_core.c
-index 5b35f1b87644..8cab69e5d0da 100644
+index 569af9af8df0..d2b7626cde8b 100644
 --- a/security/keys/trusted-keys/trusted_core.c
 +++ b/security/keys/trusted-keys/trusted_core.c
-@@ -27,10 +27,10 @@ module_param_named(source, trusted_key_source, charp, 0);
- MODULE_PARM_DESC(source, "Select trusted keys source (tpm or tee)");
+@@ -334,7 +334,7 @@ static int __init init_trusted(void)
+ 			continue;
  
- static const struct trusted_key_source trusted_key_sources[] = {
--#if IS_REACHABLE(CONFIG_TCG_TPM)
-+#if defined(CONFIG_TRUSTED_KEYS_TPM)
- 	{ "tpm", &trusted_key_tpm_ops },
- #endif
--#if IS_REACHABLE(CONFIG_TEE)
-+#if defined(CONFIG_TRUSTED_KEYS_TEE)
- 	{ "tee", &trusted_key_tee_ops },
- #endif
- };
+ 		get_random = trusted_key_sources[i].ops->get_random;
+-		if (trusted_kernel_rng)
++		if (trusted_kernel_rng || !get_random)
+ 			get_random = kernel_get_random;
+ 
+ 		static_call_update(trusted_key_init,
 -- 
 git-series 0.9.1
