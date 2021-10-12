@@ -2,448 +2,469 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE4F6C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Oct 2021 10:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A10CC4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 01:26:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9948960F43
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Oct 2021 10:03:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D06E61056
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 01:26:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235824AbhJKKFt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Oct 2021 06:05:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39252 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235840AbhJKKFe (ORCPT
+        id S231969AbhJLB2o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 11 Oct 2021 21:28:44 -0400
+Received: from mail-oi1-f174.google.com ([209.85.167.174]:34561 "EHLO
+        mail-oi1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231751AbhJLB2n (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Oct 2021 06:05:34 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6733C061778
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Oct 2021 03:03:32 -0700 (PDT)
-Received: from dude.hi.pengutronix.de ([2001:67c:670:100:1d::7])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <afa@pengutronix.de>)
-        id 1mZs8v-0006Sm-HC; Mon, 11 Oct 2021 12:02:49 +0200
-Received: from afa by dude.hi.pengutronix.de with local (Exim 4.92)
-        (envelope-from <afa@pengutronix.de>)
-        id 1mZs8r-0002cx-VZ; Mon, 11 Oct 2021 12:02:45 +0200
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-To:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     kernel@pengutronix.de, David Gstir <david@sigma-star.at>,
-        Tim Harvey <tharvey@gateworks.com>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        Richard Weinberger <richard@nod.at>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: [PATCH v4 4/5] crypto: caam - add in-kernel interface for blob generator
-Date:   Mon, 11 Oct 2021 12:02:37 +0200
-Message-Id: <3ea6e5c37559eddfdc51f26c4dff0abbbc894839.1633946449.git-series.a.fatoum@pengutronix.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <cover.8f40b6d1b93adc80aed2cac29a134f7a7fb5ee98.1633946449.git-series.a.fatoum@pengutronix.de>
-References: <cover.8f40b6d1b93adc80aed2cac29a134f7a7fb5ee98.1633946449.git-series.a.fatoum@pengutronix.de>
+        Mon, 11 Oct 2021 21:28:43 -0400
+Received: by mail-oi1-f174.google.com with SMTP id z11so27002037oih.1;
+        Mon, 11 Oct 2021 18:26:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xYWULmZi2gwL6Zs5CDysqFHt9F5WBg3n6QyZkMxdsZg=;
+        b=m6E7AUewflPqPMrk+VhjgfMGSGget/hTMBrl5ezr5L3/NsGPkor6dwAvuojhQCDC16
+         xIkUhN2/jyouoZ28G+9ry5YFlSwBbteSMi4W4O5yX8SO/qWXcXAYK5o3Us0Xx5tE9oyz
+         XKABHXDRSqz88lTU1IqjwLmwKYwNpOPy1SOONXRH6pvfsFLTIlMXifuje3caT7wbvlJX
+         A2Qd5xF5iw0FJHzE1AhRX3Mlodi0Pec/xyhuGb159+HQVBra5IpVaas2OchIPIWLzfDW
+         kV62G/UVTt6k+3zsaFh5zoQDHD3jaYjcCIf0SLKZyPCEUS4Qm5uIgh1uRJcODUoe21+8
+         rSYA==
+X-Gm-Message-State: AOAM530WTsZO0UKEXAumDyWATiZjPFOeKcfhnM670vUblHlltAmx2hIW
+        QB6Ippsz2YfTfdsmtZSs/Q==
+X-Google-Smtp-Source: ABdhPJy3g5tSpc7z/rdo4eBr/EnMTCQPcXwkY4DiMicS1znkv5eJYZS5iW5D5luE/1htopIm91TitA==
+X-Received: by 2002:a05:6808:11c9:: with SMTP id p9mr1677076oiv.169.1634002002089;
+        Mon, 11 Oct 2021 18:26:42 -0700 (PDT)
+Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
+        by smtp.gmail.com with ESMTPSA id h26sm580253oov.28.2021.10.11.18.26.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Oct 2021 18:26:41 -0700 (PDT)
+Received: (nullmailer pid 1543120 invoked by uid 1000);
+        Tue, 12 Oct 2021 01:26:39 -0000
+Date:   Mon, 11 Oct 2021 20:26:39 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Sam Shih <sam.shih@mediatek.com>
+Cc:     Ryder.Lee@mediatek.com, devicetree@vger.kernel.org,
+        enric.balletbo@collabora.com, fparent@baylibre.com,
+        gregkh@linuxfoundation.org, herbert@gondor.apana.org.au,
+        hsinyi@chromium.org, john@phrozen.org, linus.walleij@linaro.org,
+        linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-serial@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        linux@roeck-us.net, matthias.bgg@gmail.com, mpm@selenic.com,
+        mturquette@baylibre.com, sboyd@kernel.org, sean.wang@kernel.org,
+        seiya.wang@mediatek.com, wim@linux-watchdog.org
+Subject: Re: [v6,5/9] dt-bindings: pinctrl: update bindings for MT7986 SoC
+Message-ID: <YWTkT2Oaa5dfnBV6@robh.at.kernel.org>
+References: <1632745399.256353.3097151.nullmailer@robh.at.kernel.org>
+ <20211004094140.32014-1-sam.shih@mediatek.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::7
-X-SA-Exim-Mail-From: afa@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211004094140.32014-1-sam.shih@mediatek.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The CAAM can be used to protect user-defined data across system reboot:
+On Mon, Oct 04, 2021 at 05:41:40PM +0800, Sam Shih wrote:
+> This updates bindings for MT7986 pinctrl driver. The
+> difference of pinctrl between mt7986a and mt7986b is that pin-41 to pin-65
+> do not exist on mt7986b
+> 
+> Signed-off-by: Sam Shih <sam.shih@mediatek.com>
+> 
+> ---
+> v6 : fixed yamllint warnings/errors v2
+> v5 : fixed yamllint warnings/errors v1
+> v4 : used yaml format instead of txt format document
+> v3 : make mt7986 pinctrl bindings as a separate file
+> v2 : deleted the redundant description of mt7986a/mt7986b
+> ---
+>  .../pinctrl/mediatek,mt7986-pinctrl.yaml      | 361 ++++++++++++++++++
+>  1 file changed, 361 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.yaml b/Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.yaml
+> new file mode 100644
+> index 000000000000..cde842d093dc
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/pinctrl/mediatek,mt7986-pinctrl.yaml
+> @@ -0,0 +1,361 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/pinctrl/mediatek,mt7986-pinctrl.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Mediatek MT7986 Pin Controller Device Tree Bindings
+> +
+> +maintainers:
+> +  - Sean Wang <sean.wang@kernel.org>
+> +
+> +description: |+
+> +  The MediaTek's MT7986 Pin controller is used to control SoC pins.
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - mediatek,mt7986a-pinctrl
+> +      - mediatek,mt7986b-pinctrl
+> +
+> +  reg:
+> +    minItems: 8
+> +    maxItems: 8
+> +
+> +  reg-names:
+> +    items:
+> +      - const: gpio_base
+> +      - const: iocfg_rt_base
+> +      - const: iocfg_rb_base
+> +      - const: iocfg_lt_base
+> +      - const: iocfg_lb_base
+> +      - const: iocfg_tr_base
+> +      - const: iocfg_tl_base
 
-  - When the system is fused and boots into secure state, the master
-    key is a unique never-disclosed device-specific key
-  - random key is encrypted by key derived from master key
-  - data is encrypted using the random key
-  - encrypted data and its encrypted random key are stored alongside
-  - This blob can now be safely stored in non-volatile memory
+_base is redundant. Drop.
 
-On next power-on:
-  - blob is loaded into CAAM
-  - CAAM writes decrypted data either into memory or key register
+> +      - const: eint
+> +
+> +  gpio-controller: true
+> +
+> +  "#gpio-cells":
+> +    const: 2
+> +    description: |
+> +      Number of cells in GPIO specifier. Since the generic GPIO
+> +      binding is used, the amount of cells must be specified as 2. See the below
+> +      mentioned gpio binding representation for description of particular cells.
+> +
+> +  gpio-ranges:
+> +    minItems: 1
+> +    maxItems: 5
+> +    description: |
+> +      GPIO valid number range.
+> +
+> +  interrupt-controller: true
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  "#interrupt-cells":
+> +    const: 2
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - reg-names
+> +  - gpio-controller
+> +  - "#gpio-cells"
+> +
+> +patternProperties:
+> +  '-[0-9]+$':
 
-Add functions to realize encrypting and decrypting into memory alongside
-the CAAM driver.
+This could be a bit more specific. Most new bindings use '-pins$' here.
 
-They will be used in a later commit as a source for the trusted key
-seal/unseal mechanism.
+> +    type: object
+> +    additionalProperties: false
+> +
+> +    patternProperties:
+> +      'mux':
 
-Reviewed-by: David Gstir <david@sigma-star.at>
-Tested-By: Tim Harvey <tharvey@gateworks.com>
-Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
----
-To: "Horia Geantă" <horia.geanta@nxp.com>
-To: Aymen Sghaier <aymen.sghaier@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: James Bottomley <jejb@linux.ibm.com>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Mimi Zohar <zohar@linux.ibm.com>
-Cc: David Howells <dhowells@redhat.com>
-Cc: James Morris <jmorris@namei.org>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: "Serge E. Hallyn" <serge@hallyn.com>
-Cc: Udit Agarwal <udit.agarwal@nxp.com>
-Cc: Jan Luebbe <j.luebbe@pengutronix.de>
-Cc: David Gstir <david@sigma-star.at>
-Cc: Richard Weinberger <richard@nod.at>
-Cc: Franck LENORMAND <franck.lenormand@nxp.com>
-Cc: Sumit Garg <sumit.garg@linaro.org>
-Cc: linux-integrity@vger.kernel.org
-Cc: keyrings@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org
----
- drivers/crypto/caam/Kconfig    |   3 +-
- drivers/crypto/caam/Makefile   |   1 +-
- drivers/crypto/caam/blob_gen.c | 230 ++++++++++++++++++++++++++++++++++-
- include/soc/fsl/caam-blob.h    |  56 ++++++++-
- 4 files changed, 290 insertions(+)
- create mode 100644 drivers/crypto/caam/blob_gen.c
- create mode 100644 include/soc/fsl/caam-blob.h
+Do you really mean '.*mux.*' because that's what is allowed here. If the 
+node name is really just 'mux', then this isn't a pattern and should be 
+under 'properties'.
 
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index 84ea7cba5ee5..ea9f8b1ae981 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -151,6 +151,9 @@ config CRYPTO_DEV_FSL_CAAM_RNG_API
- 	  Selecting this will register the SEC4 hardware rng to
- 	  the hw_random API for supplying the kernel entropy pool.
- 
-+config CRYPTO_DEV_FSL_CAAM_BLOB_GEN
-+	bool
-+
- endif # CRYPTO_DEV_FSL_CAAM_JR
- 
- endif # CRYPTO_DEV_FSL_CAAM
-diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
-index 3570286eb9ce..25f7ae5a4642 100644
---- a/drivers/crypto/caam/Makefile
-+++ b/drivers/crypto/caam/Makefile
-@@ -21,6 +21,7 @@ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += caamalg_qi.o
- caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
- caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
- caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) += caampkc.o pkc_desc.o
-+caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_BLOB_GEN) += blob_gen.o
- 
- caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += qi.o
- ifneq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI),)
-diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blob_gen.c
-new file mode 100644
-index 000000000000..513d3f90e438
---- /dev/null
-+++ b/drivers/crypto/caam/blob_gen.c
-@@ -0,0 +1,230 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2015 Pengutronix, Steffen Trumtrar <kernel@pengutronix.de>
-+ * Copyright (C) 2021 Pengutronix, Ahmad Fatoum <kernel@pengutronix.de>
-+ */
-+
-+#include <linux/device.h>
-+#include <soc/fsl/caam-blob.h>
-+
-+#include "compat.h"
-+#include "desc_constr.h"
-+#include "desc.h"
-+#include "error.h"
-+#include "intern.h"
-+#include "jr.h"
-+#include "regs.h"
-+
-+struct caam_blob_priv {
-+	struct device jrdev;
-+};
-+
-+struct caam_blob_job_result {
-+	int err;
-+	struct completion completion;
-+};
-+
-+static void caam_blob_job_done(struct device *dev, u32 *desc, u32 err, void *context)
-+{
-+	struct caam_blob_job_result *res = context;
-+	int ecode = 0;
-+
-+	dev_dbg(dev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
-+
-+	if (err)
-+		ecode = caam_jr_strstatus(dev, err);
-+
-+	res->err = ecode;
-+
-+	/*
-+	 * Upon completion, desc points to a buffer containing a CAAM job
-+	 * descriptor which encapsulates data into an externally-storable
-+	 * blob.
-+	 */
-+	complete(&res->completion);
-+}
-+
-+static u32 *caam_blob_alloc_desc(size_t keymod_len)
-+{
-+	size_t len;
-+
-+	/* header + (key mod immediate) + 2x pointers + op */
-+	len = 4 + (4 + ALIGN(keymod_len, 4)) + 2*(4 + 4 + CAAM_PTR_SZ_MAX) + 4;
-+
-+	if (len > CAAM_DESC_BYTES_MAX)
-+		return NULL;
-+
-+	return kzalloc(len, GFP_KERNEL | GFP_DMA);
-+}
-+
-+int caam_encap_blob(struct caam_blob_priv *priv, const char *keymod,
-+		    void *input, void *output, size_t length)
-+{
-+	u32 *desc;
-+	struct device *jrdev = &priv->jrdev;
-+	dma_addr_t dma_in, dma_out;
-+	struct caam_blob_job_result testres;
-+	size_t keymod_len = strlen(keymod);
-+	int ret;
-+
-+	if (length <= CAAM_BLOB_OVERHEAD || keymod_len > CAAM_BLOB_KEYMOD_LENGTH)
-+		return -EINVAL;
-+
-+	desc = caam_blob_alloc_desc(keymod_len);
-+	if (!desc) {
-+		dev_err(jrdev, "unable to allocate desc\n");
-+		return -ENOMEM;
-+	}
-+
-+	dma_in = dma_map_single(jrdev, input, length - CAAM_BLOB_OVERHEAD, DMA_TO_DEVICE);
-+	if (dma_mapping_error(jrdev, dma_in)) {
-+		dev_err(jrdev, "unable to map input DMA buffer\n");
-+		ret = -ENOMEM;
-+		goto out_free;
-+	}
-+
-+	dma_out = dma_map_single(jrdev, output, length,	DMA_FROM_DEVICE);
-+	if (dma_mapping_error(jrdev, dma_out)) {
-+		dev_err(jrdev, "unable to map output DMA buffer\n");
-+		ret = -ENOMEM;
-+		goto out_unmap_in;
-+	}
-+
-+	/*
-+	 * A data blob is encrypted using a blob key (BK); a random number.
-+	 * The BK is used as an AES-CCM key. The initial block (B0) and the
-+	 * initial counter (Ctr0) are generated automatically and stored in
-+	 * Class 1 Context DWords 0+1+2+3. The random BK is stored in the
-+	 * Class 1 Key Register. Operation Mode is set to AES-CCM.
-+	 */
-+
-+	init_job_desc(desc, 0);
-+	append_key_as_imm(desc, keymod, keymod_len, keymod_len,
-+			  CLASS_2 | KEY_DEST_CLASS_REG);
-+	append_seq_in_ptr_intlen(desc, dma_in, length - CAAM_BLOB_OVERHEAD, 0);
-+	append_seq_out_ptr_intlen(desc, dma_out, length, 0);
-+	append_operation(desc, OP_TYPE_ENCAP_PROTOCOL | OP_PCLID_BLOB);
-+
-+	print_hex_dump_debug("data@"__stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 1, input,
-+			     length - CAAM_BLOB_OVERHEAD, false);
-+	print_hex_dump_debug("jobdesc@"__stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 1, desc,
-+			     desc_bytes(desc), false);
-+
-+	testres.err = 0;
-+	init_completion(&testres.completion);
-+
-+	ret = caam_jr_enqueue(jrdev, desc, caam_blob_job_done, &testres);
-+	if (ret == -EINPROGRESS) {
-+		wait_for_completion(&testres.completion);
-+		ret = testres.err;
-+		print_hex_dump_debug("output@"__stringify(__LINE__)": ",
-+				     DUMP_PREFIX_ADDRESS, 16, 1, output,
-+				     length, false);
-+	}
-+
-+	dma_unmap_single(jrdev, dma_out, length, DMA_FROM_DEVICE);
-+out_unmap_in:
-+	dma_unmap_single(jrdev, dma_in, length - CAAM_BLOB_OVERHEAD, DMA_TO_DEVICE);
-+out_free:
-+	kfree(desc);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(caam_encap_blob);
-+
-+int caam_decap_blob(struct caam_blob_priv *priv, const char *keymod,
-+		    void *input, void *output, size_t length)
-+{
-+	u32 *desc;
-+	struct device *jrdev = &priv->jrdev;
-+	dma_addr_t dma_in, dma_out;
-+	struct caam_blob_job_result testres;
-+	size_t keymod_len = strlen(keymod);
-+	int ret;
-+
-+	if (length <= CAAM_BLOB_OVERHEAD || keymod_len > CAAM_BLOB_KEYMOD_LENGTH)
-+		return -EINVAL;
-+
-+	desc = caam_blob_alloc_desc(keymod_len);
-+	if (!desc) {
-+		dev_err(jrdev, "unable to allocate desc\n");
-+		return -ENOMEM;
-+	}
-+
-+	dma_in = dma_map_single(jrdev, input, length, DMA_TO_DEVICE);
-+	if (dma_mapping_error(jrdev, dma_in)) {
-+		dev_err(jrdev, "unable to map input DMA buffer\n");
-+		ret = -ENOMEM;
-+		goto out_free;
-+	}
-+
-+	dma_out = dma_map_single(jrdev, output, length - CAAM_BLOB_OVERHEAD, DMA_FROM_DEVICE);
-+	if (dma_mapping_error(jrdev, dma_out)) {
-+		dev_err(jrdev, "unable to map output DMA buffer\n");
-+		ret = -ENOMEM;
-+		goto out_unmap_in;
-+	}
-+
-+	/*
-+	 * A data blob is encrypted using a blob key (BK); a random number.
-+	 * The BK is used as an AES-CCM key. The initial block (B0) and the
-+	 * initial counter (Ctr0) are generated automatically and stored in
-+	 * Class 1 Context DWords 0+1+2+3. The random BK is stored in the
-+	 * Class 1 Key Register. Operation Mode is set to AES-CCM.
-+	 */
-+
-+	init_job_desc(desc, 0);
-+	append_key_as_imm(desc, keymod, keymod_len, keymod_len,
-+			  CLASS_2 | KEY_DEST_CLASS_REG);
-+	append_seq_in_ptr(desc, dma_in, length, 0);
-+	append_seq_out_ptr(desc, dma_out, length - CAAM_BLOB_OVERHEAD, 0);
-+	append_operation(desc, OP_TYPE_DECAP_PROTOCOL | OP_PCLID_BLOB);
-+
-+	print_hex_dump_debug("data@"__stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 1, input,
-+			     length, false);
-+	print_hex_dump_debug("jobdesc@"__stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 1, desc,
-+			     desc_bytes(desc), false);
-+
-+	testres.err = 0;
-+	init_completion(&testres.completion);
-+
-+	ret = caam_jr_enqueue(jrdev, desc, caam_blob_job_done, &testres);
-+	if (ret == -EINPROGRESS) {
-+		wait_for_completion(&testres.completion);
-+		ret = testres.err;
-+		print_hex_dump_debug("output@"__stringify(__LINE__)": ",
-+				     DUMP_PREFIX_ADDRESS, 16, 1, output,
-+				     length - CAAM_BLOB_OVERHEAD, false);
-+	}
-+
-+	dma_unmap_single(jrdev, dma_out, length - CAAM_BLOB_OVERHEAD, DMA_FROM_DEVICE);
-+out_unmap_in:
-+	dma_unmap_single(jrdev, dma_in, length, DMA_TO_DEVICE);
-+out_free:
-+	kfree(desc);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(caam_decap_blob);
-+
-+struct caam_blob_priv *caam_blob_gen_init(void)
-+{
-+	struct device *jrdev;
-+
-+	jrdev = caam_jr_alloc();
-+	if (IS_ERR(jrdev))
-+		return ERR_CAST(jrdev);
-+
-+	return container_of(jrdev, struct caam_blob_priv, jrdev);
-+}
-+EXPORT_SYMBOL(caam_blob_gen_init);
-+
-+void caam_blob_gen_exit(struct caam_blob_priv *priv)
-+{
-+	caam_jr_free(&priv->jrdev);
-+}
-+EXPORT_SYMBOL(caam_blob_gen_exit);
-diff --git a/include/soc/fsl/caam-blob.h b/include/soc/fsl/caam-blob.h
-new file mode 100644
-index 000000000000..83fd990ebdce
---- /dev/null
-+++ b/include/soc/fsl/caam-blob.h
-@@ -0,0 +1,56 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2020 Pengutronix, Ahmad Fatoum <kernel@pengutronix.de>
-+ */
-+
-+#ifndef __CAAM_BLOB_GEN
-+#define __CAAM_BLOB_GEN
-+
-+#include <linux/types.h>
-+
-+#define CAAM_BLOB_KEYMOD_LENGTH		16
-+#define CAAM_BLOB_OVERHEAD		(32 + 16)
-+#define CAAM_BLOB_MAX_LEN		4096
-+
-+struct caam_blob_priv;
-+
-+/** caam_blob_gen_init - initialize blob generation
-+ *
-+ * returns either pointer to new caam_blob_priv instance
-+ * or error pointer
-+ */
-+struct caam_blob_priv *caam_blob_gen_init(void);
-+
-+/** caam_blob_gen_exit - free blob generation resources
-+ *
-+ * @priv: instance returned by caam_blob_gen_init
-+ */
-+void caam_blob_gen_exit(struct caam_blob_priv *priv);
-+
-+/** caam_encap_blob - encapsulate blob
-+ *
-+ * @priv:   instance returned by caam_blob_gen_init
-+ * @keymod: string to use as key modifier for blob encapsulation
-+ *	    can't be longer than CAAM_BLOB_KEYMOD_LENGTH
-+ * @input:  buffer which CAAM will DMA from
-+ * @output: buffer which CAAM will DMA to
-+ * @length: buffer length including blob overhead
-+ *          CAAM_BLOB_OVERHEAD < length <= CAAM_BLOB_MAX_LEN
-+ */
-+int caam_encap_blob(struct caam_blob_priv *priv, const char *keymod,
-+		    void *input, void *output, size_t length);
-+
-+/** caam_decap_blob - decapsulate blob
-+ *
-+ * @priv:   instance returned by caam_blob_gen_init
-+ * @keymod: string to use as key modifier for blob decapsulation
-+ *	    can't be longer than CAAM_BLOB_KEYMOD_LENGTH
-+ * @input:  buffer which CAAM will DMA from
-+ * @output: buffer which CAAM will DMA to
-+ * @length: buffer length including blob overhead
-+ *          CAAM_BLOB_OVERHEAD < length <= CAAM_BLOB_MAX_LEN
-+ */
-+int caam_decap_blob(struct caam_blob_priv *priv, const char *keymod,
-+		    void *input, void *output, size_t length);
-+
-+#endif
--- 
-git-series 0.9.1
+> +        type: object
+> +        additionalProperties: false
+> +        description: |
+> +          pinmux configuration nodes.
+> +
+> +          Valid value	      function    pins (in pin#)
+> +          ---------------------------------------------------------------------
+> +          "watchdog"        "watchdog"  0
+> +          "wifi_led"        "led"       1, 2
+> +          "i2c"             "i2c"       3, 4
+> +          "uart1_0"         "uart"      7, 8, 9, 10
+> +          "pcie_clk"        "pcie"      9
+> +          "pcie_wake"       "pcie"      10
+> +          "spi1_0"          "spi"       11, 12, 13, 14
+> +          "pwm1_1"          "pwm"       20,
+> +          "pwm0"            "pwm"       21,
+> +          "pwm1_0"          "pwm"       22,
+> +          "snfi"            "flash"     23, 24, 25, 26, 27, 28
+> +          "spi1_2"          "spi"       29, 30, 31, 32
+> +          "emmc_45"         "emmc"      22, 23, 24, 25, 26, 27, 28, 29, 30,
+> +                                        31, 32
+> +          "spi1_1"          "spi"       23, 24, 25, 26
+> +          "uart1_2"         "uart"      29, 30, 31, 32
+> +          "uart1_1"         "uart"      23, 24, 25, 26
+> +          "uart2_0"         "uart"      29, 30, 31, 32
+> +          "spi0"            "spi"       33, 34, 35, 36
+> +          "spi0_wp_hold"    "spi"       37, 38
+> +          "uart1_3_rx_tx"   "uart"      35, 36
+> +          "uart1_3_cts_rts" "uart"      37, 38
+> +          "uart2_1"         "uart"      33, 34, 35, 36
+> +          "spi1_3"          "spi"       33, 34, 35, 36
+> +          "uart0"           "uart"      39, 40
+> +          "pcie_pereset"    "pcie"      41
+> +          "uart1"           "uart"      42, 43, 44, 45
+> +          "uart2"           "uart"      46, 47, 48, 49
+> +          "emmc_51"         "emmc"      50, 51, 52, 53, 54, 55, 56, 57, 57,
+> +                                        59, 60, 61
+> +          "pcm"             "audio"     62, 63, 64, 65
+> +          "i2s"             "audio"     62, 63, 64, 65
+> +          "switch_int"      "eth"       66
+> +          "mdc_mdio"        "eth"       67
+> +
+> +        $ref: "/schemas/pinctrl/pinmux-node.yaml"
+> +        properties:
+> +          function:
+> +            description: |
+> +              A string containing the name of the function to mux to the group.
+> +              There is no "audio", "pcie" functions on mt7986b, you can only use
+> +              those functions on mt7986a.
+> +            enum: [audio, emmc, eth, i2c, led, flash, pcie, pwm, spi, uart,
+> +                   watchdog, wifi]
+> +          groups:
+> +            description: |
+> +              An array of strings. Each string contains the name of a group.
+> +              There is no "pcie_pereset", "uart1", "uart2" "emmc_51", "pcm",
+> +              and "i2s" groups on mt7986b, you can only use those groups on
+> +              mt7986a.
+> +        required:
+> +          - function
+> +          - groups
+> +
+> +        allOf:
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: audio
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [pcm, i2s]
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: emmc
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [emmc, emmc_rst]
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: eth
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [switch_int, mdc_mdio]
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: i2c
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [i2c]
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: led
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [wifi_led]
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: flash
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [snfi]
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: pcie
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [pcie_clk, pcie_wake, pcie_pereset]
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: pwm
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [pwm0, pwm1_0, pwm1_1]
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: spi
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [spi0, spi0_wp_hold, spi1_0, spi1_1, spi1_2, spi1_3]
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: uart
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [uart1_0, uart1_1, uart1_2, uart1_3_rx_tx,
+> +                         uart1_3_cts_rts, uart2_0, uart2_1, uart0, uart1, uart2]
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: watchdog
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [watchdog]
+> +          - if:
+> +              properties:
+> +                function:
+> +                  const: wifi
+> +            then:
+> +              properties:
+> +                groups:
+> +                  enum: [wf_2g, wf_5g, wf_dbdc]
+> +      'conf':
+
+Same here. pattern or not?
+
+> +        type: object
+> +        additionalProperties: false
+> +        description: |
+> +          pinconf configuration nodes.
+> +        $ref: "/schemas/pinctrl/pincfg-node.yaml"
+> +
+> +        properties:
+> +          pins:
+> +            description: |
+> +              An array of strings. Each string contains the name of a pin.
+> +              There is no PIN 41 to PIN 65 above on mt7686b, you can only use
+> +              those pins on mt7986a.
+> +            enum: [SYS_WATCHDOG, WF2G_LED, WF5G_LED, I2C_SCL, I2C_SDA, GPIO_0,
+> +                   GPIO_1, GPIO_2, GPIO_3, GPIO_4, GPIO_5, GPIO_6, GPIO_7,
+> +                   GPIO_8, GPIO_9, GPIO_10, GPIO_11, GPIO_12, GPIO_13, GPIO_14,
+> +                   GPIO_15, PWM0, PWM1, SPI0_CLK, SPI0_MOSI, SPI0_MISO, SPI0_CS,
+> +                   SPI0_HOLD, SPI0_WP, SPI1_CLK, SPI1_MOSI, SPI1_MISO, SPI1_CS,
+> +                   SPI2_CLK, SPI2_MOSI, SPI2_MISO, SPI2_CS, SPI2_HOLD, SPI2_WP,
+> +                   UART0_RXD, UART0_TXD, PCIE_PERESET_N, UART1_RXD, UART1_TXD,
+> +                   UART1_CTS, UART1_RTS, UART2_RXD, UART2_TXD, UART2_CTS,
+> +                   UART2_RTS, EMMC_DATA_0, EMMC_DATA_1, EMMC_DATA_2,
+> +                   EMMC_DATA_3, EMMC_DATA_4, EMMC_DATA_5, EMMC_DATA_6,
+> +                   EMMC_DATA_7, EMMC_CMD, EMMC_CK, EMMC_DSL, EMMC_RSTB, PCM_DTX,
+> +                   PCM_DRX, PCM_CLK, PCM_FS, MT7531_INT, SMI_MDC, SMI_MDIO,
+> +                   WF0_DIG_RESETB, WF0_CBA_RESETB, WF0_XO_REQ, WF0_TOP_CLK,
+> +                   WF0_TOP_DATA, WF0_HB1, WF0_HB2, WF0_HB3, WF0_HB4, WF0_HB0,
+> +                   WF0_HB0_B, WF0_HB5, WF0_HB6, WF0_HB7, WF0_HB8, WF0_HB9,
+> +                   WF0_HB10, WF1_DIG_RESETB, WF1_CBA_RESETB, WF1_XO_REQ,
+> +                   WF1_TOP_CLK, WF1_TOP_DATA, WF1_HB1, WF1_HB2, WF1_HB3,
+> +                   WF1_HB4, WF1_HB0, WF1_HB0_B, WF1_HB5, WF1_HB6, WF1_HB7,
+> +                   WF1_HB8]
+> +
+> +          bias-disable: true
+> +
+> +          bias-pull-up: true
+> +
+> +          bias-pull-down: true
+> +
+> +          input-enable: true
+> +
+> +          input-disable: true
+> +
+> +          output-enable: true
+> +
+> +          output-low: true
+> +
+> +          output-high: true
+> +
+> +          input-schmitt-enable: true
+> +
+> +          input-schmitt-disable: true
+> +
+> +          drive-strength:
+> +            enum: [2, 4, 6, 8, 10, 12, 14, 16]
+> +
+> +          mediatek,pull-up-adv:
+> +            description: |
+> +              Valid arguments for 'mediatek,pull-up-adv' are '0', '1', '2', '3'
+> +              Pull up setings for 2 pull resistors, R0 and R1. Valid arguments
+> +              are described as below:
+> +              0: (R1, R0) = (0, 0) which means R1 disabled and R0 disabled.
+> +              1: (R1, R0) = (0, 1) which means R1 disabled and R0 enabled.
+> +              2: (R1, R0) = (1, 0) which means R1 enabled and R0 disabled.
+> +              3: (R1, R0) = (1, 1) which means R1 enabled and R0 enabled.
+> +            $ref: /schemas/types.yaml#/definitions/uint32
+> +            enum: [0, 1, 2, 3]
+> +
+> +          mediatek,pull-down-adv:
+> +            description: |
+> +              Valid arguments for 'mediatek,pull-up-adv' are '0', '1', '2', '3'
+> +              Pull down setings for 2 pull resistors, R0 and R1. Valid arguments
+> +              are described as below:
+> +              0: (R1, R0) = (0, 0) which means R1 disabled and R0 disabled.
+> +              1: (R1, R0) = (0, 1) which means R1 disabled and R0 enabled.
+> +              2: (R1, R0) = (1, 0) which means R1 enabled and R0 disabled.
+> +              3: (R1, R0) = (1, 1) which means R1 enabled and R0 enabled.
+> +            $ref: /schemas/types.yaml#/definitions/uint32
+> +            enum: [0, 1, 2, 3]
+> +
+> +        required:
+> +          - pins
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +
+> +    soc {
+> +      #address-cells = <2>;
+> +      #size-cells = <2>;
+> +      pio: pinctrl@1001f000 {
+> +        compatible = "mediatek,mt7986a-pinctrl";
+> +        reg = <0 0x1001f000 0 0x1000>,
+> +              <0 0x11c30000 0 0x1000>,
+> +              <0 0x11c40000 0 0x1000>,
+> +              <0 0x11e20000 0 0x1000>,
+> +              <0 0x11e30000 0 0x1000>,
+> +              <0 0x11f00000 0 0x1000>,
+> +              <0 0x11f10000 0 0x1000>,
+> +              <0 0x1000b000 0 0x1000>;
+> +        reg-names = "gpio_base", "iocfg_rt_base", "iocfg_rb_base",
+> +              "iocfg_lt_base", "iocfg_lb_base", "iocfg_tr_base",
+> +              "iocfg_tl_base", "eint";
+> +        gpio-controller;
+> +        #gpio-cells = <2>;
+> +        gpio-ranges = <&pio 0 0 100>;
+> +        interrupt-controller;
+> +        interrupts = <GIC_SPI 225 IRQ_TYPE_LEVEL_HIGH>;
+> +        interrupt-parent = <&gic>;
+> +        #interrupt-cells = <2>;
+> +
+> +        uart1_pins: uart1-pins-42-to-45 {
+> +          mux {
+> +            function = "uart";
+> +            groups = "uart1";
+> +          };
+> +        };
+> +
+> +        uart2_pins: uart1-pins-46-to-49 {
+> +          mux {
+> +            function = "uart";
+> +            groups = "uart2";
+> +          };
+> +        };
+> +
+> +      };
+> +    };
+> -- 
+> 2.29.2
+> 
+> 
