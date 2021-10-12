@@ -2,53 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8401C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 21:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E67DC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 21:22:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C099360F38
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 21:17:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 103E7600D3
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 21:22:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235391AbhJLVTl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Oct 2021 17:19:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41274 "EHLO
+        id S235383AbhJLVYJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Oct 2021 17:24:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234300AbhJLVTk (ORCPT
+        with ESMTP id S234043AbhJLVYI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Oct 2021 17:19:40 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 705BBC061570
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 14:17:38 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id i3-20020aa79083000000b003efb4fd360dso311457pfa.8
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 14:17:38 -0700 (PDT)
+        Tue, 12 Oct 2021 17:24:08 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64DC0C061570
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 14:22:06 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id g25-20020a05620a219900b0045f31ac2119so267006qka.20
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 14:22:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:message-id:mime-version:subject:from:to:cc;
-        bh=SjtjUn7Dh89Glad70w9JbhCcm7JkioEHX9vtiCQNsAU=;
-        b=oDGorw9A7leJyVXWRO9YZLEV/Q+zBqoSbqpgbA2DFoh73N+NfTbBXQcfcboB/8m4lE
-         /SVQcU2ax9RCjgVnGM/z1G2j1pe21wriWuDm0BEB+cOuiWZUEy3+LC8DqK3Evr46gCD6
-         m6XSb9M4RoT8Hd56Ve7XnqIFSoN1m4FNI/vaxZlMqtoNGq0ReyNb5OU1Zn7abbmBZvt6
-         WlmscQXE03wsCsQ1xMTOPFDhAJGn8ITkCaNF+d3RjWZW54kXakxbBDiR9sWlOsKokpk8
-         gf07MqnDBrEypvRbZ/AvbvXbpKjt/IX+q/BuINxVABs0d/cgh4N+4aIK6zgj3Asqv6xu
-         7prQ==
+        bh=ZV6TjaTmR5m6rKqeJ0Ugf3x95r0PRkvOdsKiB8NimqE=;
+        b=Ef5lOQLGiEGa0Z2iWPKcR4mvQag2AUcnfg5XNHUcgrFTJ5PQYAab+dyrLk3fy+GTby
+         0DzukwOF14jIpcpaKAGFZfrksjW7SmegQNv594JOWhtk4HwtB5P9doeCrD9C0tKj7Jfr
+         K4sy3LIfQBx/1fV3xsEpoJHNv8/gmHaisL0D6krteKedoFF1HRNoRHTimf33Q0YE9X2Y
+         JOIJYjcOpfe8/Ze1C6+M9fOZfBJ+F0pyNB9UbHpZFqYaFO/xusBfAcok4z4KdQAvO7TF
+         xwzi0Lv85LqiXdLW05qpd5jIBx9B9vUgQat4+XsKgwWRzqDSiXMFf7WwxB12dRkHevP4
+         kX0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=SjtjUn7Dh89Glad70w9JbhCcm7JkioEHX9vtiCQNsAU=;
-        b=D4qYji6btzfEB1pE7seYeODqwLz30PFADivTpEQgLRUC8nlzaj2aqHP7okziUIj4vb
-         2OBAa/kz5awLpt+x3QL6ARfE/wkYwn1SivcUH7CIwm4dFMOnF0DpJxb5CFoZbfoO+e3T
-         MH5hPreGND0cECqdyIrVQCxfHr2peko/Bs94g5/YwCNmbM62LdduDbknleYK6BvDTyBS
-         y1U1YLi8gvBxS8uORLnyjEFcCeABaAVPaG/26qZ+PlU/d7l/NIXj2fpafaqSA1s26Cyq
-         GhHGDg7ugNCOyPr/NPakYHLN2vmNoDbuomgZgjL/ueVpcuTqv0no8IjlR9Qj4QVSmaC9
-         hNgA==
-X-Gm-Message-State: AOAM533K1AjTkCWCyFxNgL8CVTP9vHBp3CrZnyeADeYSH7T0bDGUj5Fn
-        q960cVWMttcMEub9AnKc0E/HZN66DcQ=
-X-Google-Smtp-Source: ABdhPJzi5fDaRaOrJgIlxOfL+igJ7z/pbJweO3PW9kzGYRdlTChfPm6U0fzC5jOYabad0ZIZ+gcE8P5z9Ls=
+        bh=ZV6TjaTmR5m6rKqeJ0Ugf3x95r0PRkvOdsKiB8NimqE=;
+        b=BblLJTB0SXO/gZ+lQCMJ1w9ElX/swGxd1AnH8fqitK180oVGGrud9O4DKZPMQtiYu/
+         wAhBS7dx7qcSA/mU/0e00eoRRYEiBHjNmu54AE6alHbnhSv4VFl4muKuxFyV1lNRVpXe
+         dq81Lw8sHPiyfH1IOGEyzsVEmEAAinD+MFNp9TDfMMtiOlajTFgtjrF/q+WZnSHYmFhZ
+         WH0KHvXcQysgZ2uL3X72bpSo5Z+1/G/S5zXpqTQSTJeQu5w9NP3ha1SxoIOcYe8/DXQ4
+         Vxumhir6chq4P7uh3GH2mJuSMe8mXSSJs9mrbQvFbCpdKXsQ84LY6a7unwERNWcnPdhF
+         UVXQ==
+X-Gm-Message-State: AOAM533dReRalJaU4zWOJx61gJTmXByIaVL1MzQlsV6z6XYZdaNiOEHF
+        40vtkCQN213NKL9PlECPbq1G92HPscE=
+X-Google-Smtp-Source: ABdhPJy25y1PabrGp4VcJYZFBCiIf1DG7kBfBJV+PR6+iijk9KJg9RRp2yyzwE+tpnZSV/Nn92hK9YUFKW0=
 X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:bab5:e2c:2623:d2f8])
- (user=pgonda job=sendgmr) by 2002:a62:1d46:0:b0:44d:1a4d:5d03 with SMTP id
- d67-20020a621d46000000b0044d1a4d5d03mr14637056pfd.55.1634073457873; Tue, 12
- Oct 2021 14:17:37 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 14:17:34 -0700
-Message-Id: <20211012211734.3859621-1-pgonda@google.com>
+ (user=pgonda job=sendgmr) by 2002:ac8:7f52:: with SMTP id g18mr24954409qtk.196.1634073725487;
+ Tue, 12 Oct 2021 14:22:05 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 14:22:02 -0700
+Message-Id: <20211012212202.3862372-1-pgonda@google.com>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
 Subject: [PATCH V2] crypto: ccp - Consolidate sev INIT logic
@@ -89,6 +88,7 @@ V2
  * Move calls of sev_init_if_required() into command specific functions
    to remove tedious command_id if statement.
 
+---
  drivers/crypto/ccp/sev-dev.c | 62 +++++++++++++++++-------------------
  1 file changed, 30 insertions(+), 32 deletions(-)
 
