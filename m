@@ -2,147 +2,234 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 434CCC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 20:44:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8401C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 21:17:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 20FBB610CC
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 20:44:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C099360F38
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 21:17:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234822AbhJLUqx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Oct 2021 16:46:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33672 "EHLO
+        id S235391AbhJLVTl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Oct 2021 17:19:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234118AbhJLUqx (ORCPT
+        with ESMTP id S234300AbhJLVTk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Oct 2021 16:46:53 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53FD6C061746
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 13:44:51 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id g5so353699plg.1
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 13:44:51 -0700 (PDT)
+        Tue, 12 Oct 2021 17:19:40 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 705BBC061570
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 14:17:38 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id i3-20020aa79083000000b003efb4fd360dso311457pfa.8
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 14:17:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8ViV5/pFsBw3tEZCSEbQNY/kwVRna/LjOJ8u3cbMomY=;
-        b=IfAyv/ESGEJl3OXMAEkUu+1eEAYJA1DTprmw/n6iHXk1vORtYBH6NWmjsICnrglySW
-         u7p6FjmJtFivP7gXm0vB/abB4I9+1WFQe5HLQ7V6ApO4BHTChuG7TZwTup3PbhpP8ORf
-         s7pIkXdxhoHubE0p2y27bbwtAdXnhW7ucmiFnOoUJVSXDtwTQssYCtr0rcS6WZ0ZELOv
-         nzEycl41/WtD5NbUjilm5cJSac15mm8pJixeptm3CRTrdN+dtG/LP7GPimIBGI0IfkHa
-         y8ld4AZNzIcxoppNzAgiSpotsMxXw8q20/UigY5MJ624DjAJsU+N/ypOQ4SWeJaHz8u0
-         pl/Q==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=SjtjUn7Dh89Glad70w9JbhCcm7JkioEHX9vtiCQNsAU=;
+        b=oDGorw9A7leJyVXWRO9YZLEV/Q+zBqoSbqpgbA2DFoh73N+NfTbBXQcfcboB/8m4lE
+         /SVQcU2ax9RCjgVnGM/z1G2j1pe21wriWuDm0BEB+cOuiWZUEy3+LC8DqK3Evr46gCD6
+         m6XSb9M4RoT8Hd56Ve7XnqIFSoN1m4FNI/vaxZlMqtoNGq0ReyNb5OU1Zn7abbmBZvt6
+         WlmscQXE03wsCsQ1xMTOPFDhAJGn8ITkCaNF+d3RjWZW54kXakxbBDiR9sWlOsKokpk8
+         gf07MqnDBrEypvRbZ/AvbvXbpKjt/IX+q/BuINxVABs0d/cgh4N+4aIK6zgj3Asqv6xu
+         7prQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8ViV5/pFsBw3tEZCSEbQNY/kwVRna/LjOJ8u3cbMomY=;
-        b=axus0lllmfNaof3r9Q3CPmujHa4VQFeN3iGChNlKBS3FhDAmju828f+1bYK4CewcUz
-         6EhnFZu2oKBzdRp0MDgndi0YqLHwjzEpEPOSd0bHch0P4oysU9UQrf7GljEH0zAtWhLB
-         r6KvSapWaPd0MMHbAot0wizf3UivC7fE3gTZwGJ1j5IieuDb3BaqIVIe9wOL92Cdgyjy
-         KsBLVnTQ/DXOzhGqiJjuXPZQehxBvFlkKgqYVANBA7vLVy5L0CUa1YW0lfvxvyTglmbD
-         A0UoPUrwY/hDwoX+Gg49lJfSx9I4kd4ANC7UFvuqLE51Mpu6t4kMO5MDGpRNEWnv3F7s
-         JXCg==
-X-Gm-Message-State: AOAM5337Pi4bESx8fp/Eld7VHgKcONhbBxBMqflmwA3LSKWlsiThCAXu
-        JHBoRPgV4xoldugnhzrRHiSJ1A==
-X-Google-Smtp-Source: ABdhPJxwGw5yVkX9qLympbpNPYa4ihCOPDnJEFbWRsVu8t6dvIwYQRRToQPlei3MyDTRcSYspl6LPA==
-X-Received: by 2002:a17:903:2303:b0:13f:e63:e27d with SMTP id d3-20020a170903230300b0013f0e63e27dmr28278411plh.84.1634071490561;
-        Tue, 12 Oct 2021 13:44:50 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id w17sm10177165pff.191.2021.10.12.13.44.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 13:44:49 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 20:44:46 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=SjtjUn7Dh89Glad70w9JbhCcm7JkioEHX9vtiCQNsAU=;
+        b=D4qYji6btzfEB1pE7seYeODqwLz30PFADivTpEQgLRUC8nlzaj2aqHP7okziUIj4vb
+         2OBAa/kz5awLpt+x3QL6ARfE/wkYwn1SivcUH7CIwm4dFMOnF0DpJxb5CFoZbfoO+e3T
+         MH5hPreGND0cECqdyIrVQCxfHr2peko/Bs94g5/YwCNmbM62LdduDbknleYK6BvDTyBS
+         y1U1YLi8gvBxS8uORLnyjEFcCeABaAVPaG/26qZ+PlU/d7l/NIXj2fpafaqSA1s26Cyq
+         GhHGDg7ugNCOyPr/NPakYHLN2vmNoDbuomgZgjL/ueVpcuTqv0no8IjlR9Qj4QVSmaC9
+         hNgA==
+X-Gm-Message-State: AOAM533K1AjTkCWCyFxNgL8CVTP9vHBp3CrZnyeADeYSH7T0bDGUj5Fn
+        q960cVWMttcMEub9AnKc0E/HZN66DcQ=
+X-Google-Smtp-Source: ABdhPJzi5fDaRaOrJgIlxOfL+igJ7z/pbJweO3PW9kzGYRdlTChfPm6U0fzC5jOYabad0ZIZ+gcE8P5z9Ls=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:bab5:e2c:2623:d2f8])
+ (user=pgonda job=sendgmr) by 2002:a62:1d46:0:b0:44d:1a4d:5d03 with SMTP id
+ d67-20020a621d46000000b0044d1a4d5d03mr14637056pfd.55.1634073457873; Tue, 12
+ Oct 2021 14:17:37 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 14:17:34 -0700
+Message-Id: <20211012211734.3859621-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
+Subject: [PATCH V2] crypto: ccp - Consolidate sev INIT logic
+From:   Peter Gonda <pgonda@google.com>
+To:     thomas.lendacky@amd.com
+Cc:     Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Marc Orr <marcorr@google.com>, Joerg Roedel <jroedel@suse.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 21/45] KVM: SVM: Make AVIC backing, VMSA and
- VMCB memory allocation SNP safe
-Message-ID: <YWXzvhuE9/iCcqxZ@google.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-22-brijesh.singh@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210820155918.7518-22-brijesh.singh@amd.com>
+        John Allen <john.allen@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 20, 2021, Brijesh Singh wrote:
-> Implement a workaround for an SNP erratum where the CPU will incorrectly
-> signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
-> RMP entry of a VMCB, VMSA or AVIC backing page.
+Adds new helper function sev_init_if_required() for use in sev_ioctl().
+The function calls __sev_platform_init_locked() if the command requires
+the PSP's internal state be at least SEV_STATE_INIT. This consolidates
+many checks scattered through out the ioctl delegation functions.
 
-...
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Joerg Roedel <jroedel@suse.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David Rientjes <rientjes@google.com>
+Cc: John Allen <john.allen@amd.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
 
-> @@ -4539,6 +4539,16 @@ static int svm_vm_init(struct kvm *kvm)
->  	return 0;
->  }
->  
-> +static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
-> +{
-> +	struct page *page = snp_safe_alloc_page(vcpu);
-> +
-> +	if (!page)
-> +		return NULL;
-> +
-> +	return page_address(page);
-> +}
-> +
->  static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.hardware_unsetup = svm_hardware_teardown,
->  	.hardware_enable = svm_hardware_enable,
-> @@ -4667,6 +4677,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.complete_emulated_msr = svm_complete_emulated_msr,
->  
->  	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
-> +
-> +	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
+V2
+ * Move calls of sev_init_if_required() into command specific functions
+   to remove tedious command_id if statement.
 
-IMO, this should be guarded by a module param or X86_BUG_* to make it clear that
-this is a bug and not working as intended.
+ drivers/crypto/ccp/sev-dev.c | 62 +++++++++++++++++-------------------
+ 1 file changed, 30 insertions(+), 32 deletions(-)
 
-And doesn't the APIC page need these shenanigans iff AVIC is enabled? (the module
-param, not necessarily in the VM)
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index e09925d86bf3..3f40cc73459c 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -384,26 +384,37 @@ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
+ 	return ret;
+ }
+ 
+-static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool writable)
++static int sev_init_if_required(bool writable, int *error)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
++
++	lockdep_assert_held(&sev_cmd_mutex);
++
++	if (sev->state != SEV_STATE_UNINIT)
++		return 0;
++
++	if (!writable)
++		return -EPERM;
++
++	return __sev_platform_init_locked(error);
++}
++
++static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool writable)
++{
+ 	int rc;
+ 
+ 	if (!writable)
+ 		return -EPERM;
+ 
+-	if (sev->state == SEV_STATE_UNINIT) {
+-		rc = __sev_platform_init_locked(&argp->error);
+-		if (rc)
+-			return rc;
+-	}
++	rc = sev_init_if_required(writable, &argp->error);
++	if (rc)
++		return rc;
+ 
+ 	return __sev_do_cmd_locked(cmd, NULL, &argp->error);
+ }
+ 
+ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ {
+-	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_pek_csr input;
+ 	struct sev_data_pek_csr data;
+ 	void __user *input_address;
+@@ -413,6 +424,10 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 	if (!writable)
+ 		return -EPERM;
+ 
++	ret = sev_init_if_required(writable, &argp->error);
++	if (ret)
++		return ret;
++
+ 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+ 		return -EFAULT;
+ 
+@@ -435,12 +450,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 	data.len = input.length;
+ 
+ cmd:
+-	if (sev->state == SEV_STATE_UNINIT) {
+-		ret = __sev_platform_init_locked(&argp->error);
+-		if (ret)
+-			goto e_free_blob;
+-	}
+-
+ 	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
+ 
+ 	 /* If we query the CSR length, FW responded with expected data. */
+@@ -586,7 +595,6 @@ static int sev_update_firmware(struct device *dev)
+ 
+ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ {
+-	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_pek_cert_import input;
+ 	struct sev_data_pek_cert_import data;
+ 	void *pek_blob, *oca_blob;
+@@ -595,6 +603,10 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ 	if (!writable)
+ 		return -EPERM;
+ 
++	ret = sev_init_if_required(writable, &argp->error);
++	if (ret)
++		return ret;
++
+ 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+ 		return -EFAULT;
+ 
+@@ -617,17 +629,10 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ 	data.oca_cert_address = __psp_pa(oca_blob);
+ 	data.oca_cert_len = input.oca_cert_len;
+ 
+-	/* If platform is not in INIT state then transition it to INIT */
+-	if (sev->state != SEV_STATE_INIT) {
+-		ret = __sev_platform_init_locked(&argp->error);
+-		if (ret)
+-			goto e_free_oca;
+-	}
+-
+ 	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, &argp->error);
+ 
+-e_free_oca:
+ 	kfree(oca_blob);
++
+ e_free_pek:
+ 	kfree(pek_blob);
+ 	return ret;
+@@ -730,7 +735,6 @@ static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
+ 
+ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ {
+-	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_pdh_cert_export input;
+ 	void *pdh_blob = NULL, *cert_blob = NULL;
+ 	struct sev_data_pdh_cert_export data;
+@@ -738,15 +742,9 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	void __user *input_pdh_cert_address;
+ 	int ret;
+ 
+-	/* If platform is not in INIT state then transition it to INIT. */
+-	if (sev->state != SEV_STATE_INIT) {
+-		if (!writable)
+-			return -EPERM;
+-
+-		ret = __sev_platform_init_locked(&argp->error);
+-		if (ret)
+-			return ret;
+-	}
++	ret = sev_init_if_required(writable, &argp->error);
++	if (ret)
++		return ret;
+ 
+ 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+ 		return -EFAULT;
+-- 
+2.33.0.882.g93a45727a2-goog
 
->  };
->  
->  static struct kvm_x86_init_ops svm_init_ops __initdata = {
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index d1f1512a4b47..e40800e9c998 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -575,6 +575,7 @@ void sev_es_create_vcpu(struct vcpu_svm *svm);
->  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
->  void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu);
->  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
-> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
->  
->  /* vmenter.S */
->  
-> -- 
-> 2.17.1
-> 
