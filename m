@@ -2,234 +2,367 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E67DC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 21:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B395CC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 21:48:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 103E7600D3
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 21:22:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 979A76101D
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Oct 2021 21:48:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235383AbhJLVYJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Oct 2021 17:24:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42320 "EHLO
+        id S235653AbhJLVuh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Oct 2021 17:50:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234043AbhJLVYI (ORCPT
+        with ESMTP id S235541AbhJLVuh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Oct 2021 17:24:08 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64DC0C061570
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 14:22:06 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id g25-20020a05620a219900b0045f31ac2119so267006qka.20
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 14:22:06 -0700 (PDT)
+        Tue, 12 Oct 2021 17:50:37 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26520C061746
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 14:48:35 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id m26so678835pff.3
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Oct 2021 14:48:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=ZV6TjaTmR5m6rKqeJ0Ugf3x95r0PRkvOdsKiB8NimqE=;
-        b=Ef5lOQLGiEGa0Z2iWPKcR4mvQag2AUcnfg5XNHUcgrFTJ5PQYAab+dyrLk3fy+GTby
-         0DzukwOF14jIpcpaKAGFZfrksjW7SmegQNv594JOWhtk4HwtB5P9doeCrD9C0tKj7Jfr
-         K4sy3LIfQBx/1fV3xsEpoJHNv8/gmHaisL0D6krteKedoFF1HRNoRHTimf33Q0YE9X2Y
-         JOIJYjcOpfe8/Ze1C6+M9fOZfBJ+F0pyNB9UbHpZFqYaFO/xusBfAcok4z4KdQAvO7TF
-         xwzi0Lv85LqiXdLW05qpd5jIBx9B9vUgQat4+XsKgwWRzqDSiXMFf7WwxB12dRkHevP4
-         kX0w==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=oA9FzDgVqTGdx1czSwXl6ZrYbBDAr0EIMvOhvwuaTdk=;
+        b=CqXvJIe1amTWYFrjVyrniAq7PVrDTlXlO26WSeLMWq3KizYEx/D9ZiWiZyoiyxTFPF
+         h1TIXxH8RiIwsOLn973g0lSt+QPUmJT8wRSn33ndyjy7Z08dshauEfN9CdUNtq84b8Z9
+         TZsxHsXxZvBrON/kvKX9wHpV7hygzzVGzVMsGIM9qvaOoD5X9NHWN+2a6MG+7jKVLq3A
+         EmmeVK7+f+8rxwjcZVkNNs1+/L/dIGHZfJVyP4FVX0fOjMUUCPhOAru4KjMj1wv6mdRv
+         2+8t19Mnpt3sPjbqhyc1y0WnQXGRFJFIn0m0q4b0UmxO7zQ7AJ/13kcXM0VLKU8xqim6
+         dkgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=ZV6TjaTmR5m6rKqeJ0Ugf3x95r0PRkvOdsKiB8NimqE=;
-        b=BblLJTB0SXO/gZ+lQCMJ1w9ElX/swGxd1AnH8fqitK180oVGGrud9O4DKZPMQtiYu/
-         wAhBS7dx7qcSA/mU/0e00eoRRYEiBHjNmu54AE6alHbnhSv4VFl4muKuxFyV1lNRVpXe
-         dq81Lw8sHPiyfH1IOGEyzsVEmEAAinD+MFNp9TDfMMtiOlajTFgtjrF/q+WZnSHYmFhZ
-         WH0KHvXcQysgZ2uL3X72bpSo5Z+1/G/S5zXpqTQSTJeQu5w9NP3ha1SxoIOcYe8/DXQ4
-         Vxumhir6chq4P7uh3GH2mJuSMe8mXSSJs9mrbQvFbCpdKXsQ84LY6a7unwERNWcnPdhF
-         UVXQ==
-X-Gm-Message-State: AOAM533dReRalJaU4zWOJx61gJTmXByIaVL1MzQlsV6z6XYZdaNiOEHF
-        40vtkCQN213NKL9PlECPbq1G92HPscE=
-X-Google-Smtp-Source: ABdhPJy25y1PabrGp4VcJYZFBCiIf1DG7kBfBJV+PR6+iijk9KJg9RRp2yyzwE+tpnZSV/Nn92hK9YUFKW0=
-X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:bab5:e2c:2623:d2f8])
- (user=pgonda job=sendgmr) by 2002:ac8:7f52:: with SMTP id g18mr24954409qtk.196.1634073725487;
- Tue, 12 Oct 2021 14:22:05 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 14:22:02 -0700
-Message-Id: <20211012212202.3862372-1-pgonda@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH V2] crypto: ccp - Consolidate sev INIT logic
-From:   Peter Gonda <pgonda@google.com>
-To:     thomas.lendacky@amd.com
-Cc:     Peter Gonda <pgonda@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Marc Orr <marcorr@google.com>, Joerg Roedel <jroedel@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=oA9FzDgVqTGdx1czSwXl6ZrYbBDAr0EIMvOhvwuaTdk=;
+        b=gEowgA03ZGTcn1BOhSErdypv8dJ9+5uTygaf1RJH0Y9xlIhAqIBdxBcB81ZrKVOZHV
+         1Y501qRfhapAJdcoHFdmEUCNI9paxRdbEY44T0HcTn4SawaP2TbSkgQ9d+3HUmokYdmz
+         NGpF05FVuEV4FMs01KH3Fpt0k9knzBgZZfuGrch3kRw/cLxe7na8XT+r0nSTgRs3ThnH
+         4XxPSg/Xt64b5603TRc6mSm0mYkKC5FaWB93gKvoiqYlEEROb+XsqBLBo/qiAtQJ5NCN
+         kJIHmOOqLf2e5r6ceEnIcpMIN6gewpGelWjyUE2hw2XaHb5hZLOOfstPLL/w1cC9Xlw9
+         qH+A==
+X-Gm-Message-State: AOAM531zUS60XgFAMdJgLkA2JpcMJ/n5/8fmrfXwdVTaFF5X8eW3cF+E
+        UR27X2PITfstgz337q/06jTjMQ==
+X-Google-Smtp-Source: ABdhPJzd5yePVpqBRc8WNbyxjJrkNRvPG8x67xR2B5rO/fbOYFQteZXzaITE7pxN672MCRHF03Ynig==
+X-Received: by 2002:a62:7506:0:b0:44c:efe8:4167 with SMTP id q6-20020a627506000000b0044cefe84167mr22378776pfc.59.1634075314208;
+        Tue, 12 Oct 2021 14:48:34 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id o6sm12062004pfp.79.2021.10.12.14.48.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Oct 2021 14:48:33 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 21:48:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
         David Rientjes <rientjes@google.com>,
-        John Allen <john.allen@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 37/45] KVM: SVM: Add support to handle MSR based
+ Page State Change VMGEXIT
+Message-ID: <YWYCrQX4ZzwUVZCe@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-38-brijesh.singh@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210820155918.7518-38-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Adds new helper function sev_init_if_required() for use in sev_ioctl().
-The function calls __sev_platform_init_locked() if the command requires
-the PSP's internal state be at least SEV_STATE_INIT. This consolidates
-many checks scattered through out the ioctl delegation functions.
+On Fri, Aug 20, 2021, Brijesh Singh wrote:
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 991b8c996fc1..6d9483ec91ab 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -31,6 +31,7 @@
+>  #include "svm_ops.h"
+>  #include "cpuid.h"
+>  #include "trace.h"
+> +#include "mmu.h"
+>  
+>  #define __ex(x) __kvm_handle_fault_on_reboot(x)
+>  
+> @@ -2905,6 +2906,181 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
+>  	svm->vmcb->control.ghcb_gpa = value;
+>  }
+>  
+> +static int snp_rmptable_psmash(struct kvm *kvm, kvm_pfn_t pfn)
+> +{
+> +	pfn = pfn & ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
+> +
+> +	return psmash(pfn);
+> +}
+> +
+> +static int snp_make_page_shared(struct kvm *kvm, gpa_t gpa, kvm_pfn_t pfn, int level)
+> +{
+> +	int rc, rmp_level;
+> +
+> +	rc = snp_lookup_rmpentry(pfn, &rmp_level);
+> +	if (rc < 0)
+> +		return -EINVAL;
+> +
+> +	/* If page is not assigned then do nothing */
+> +	if (!rc)
+> +		return 0;
+> +
+> +	/*
+> +	 * Is the page part of an existing 2MB RMP entry ? Split the 2MB into
+> +	 * multiple of 4K-page before making the memory shared.
+> +	 */
+> +	if (level == PG_LEVEL_4K && rmp_level == PG_LEVEL_2M) {
+> +		rc = snp_rmptable_psmash(kvm, pfn);
+> +		if (rc)
+> +			return rc;
+> +	}
+> +
+> +	return rmp_make_shared(pfn, level);
+> +}
+> +
+> +static int snp_check_and_build_npt(struct kvm_vcpu *vcpu, gpa_t gpa, int level)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	int rc, npt_level;
+> +	kvm_pfn_t pfn;
+> +
+> +	/*
+> +	 * Get the pfn and level for the gpa from the nested page table.
+> +	 *
+> +	 * If the tdp walk fails, then its safe to say that there is no
+> +	 * valid mapping for this gpa. Create a fault to build the map.
+> +	 */
+> +	write_lock(&kvm->mmu_lock);
 
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Marc Orr <marcorr@google.com>
-Cc: Joerg Roedel <jroedel@suse.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David Rientjes <rientjes@google.com>
-Cc: John Allen <john.allen@amd.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
+SEV (or any vendor code for that matter) should not be taking mmu_lock.  All of
+KVM has somewhat fungible borders between the various components, but IMO this
+crosses firmly into "this belongs in the MMU" territory.
 
-V2
- * Move calls of sev_init_if_required() into command specific functions
-   to remove tedious command_id if statement.
+For example, I highly doubt this actually need to take mmu_lock for write.  More
+below.
 
----
- drivers/crypto/ccp/sev-dev.c | 62 +++++++++++++++++-------------------
- 1 file changed, 30 insertions(+), 32 deletions(-)
+> +	rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level);
+> +	write_unlock(&kvm->mmu_lock);
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index e09925d86bf3..3f40cc73459c 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -384,26 +384,37 @@ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
- 	return ret;
- }
- 
--static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool writable)
-+static int sev_init_if_required(bool writable, int *error)
- {
- 	struct sev_device *sev = psp_master->sev_data;
-+
-+	lockdep_assert_held(&sev_cmd_mutex);
-+
-+	if (sev->state != SEV_STATE_UNINIT)
-+		return 0;
-+
-+	if (!writable)
-+		return -EPERM;
-+
-+	return __sev_platform_init_locked(error);
-+}
-+
-+static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool writable)
-+{
- 	int rc;
- 
- 	if (!writable)
- 		return -EPERM;
- 
--	if (sev->state == SEV_STATE_UNINIT) {
--		rc = __sev_platform_init_locked(&argp->error);
--		if (rc)
--			return rc;
--	}
-+	rc = sev_init_if_required(writable, &argp->error);
-+	if (rc)
-+		return rc;
- 
- 	return __sev_do_cmd_locked(cmd, NULL, &argp->error);
- }
- 
- static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
- {
--	struct sev_device *sev = psp_master->sev_data;
- 	struct sev_user_data_pek_csr input;
- 	struct sev_data_pek_csr data;
- 	void __user *input_address;
-@@ -413,6 +424,10 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
- 	if (!writable)
- 		return -EPERM;
- 
-+	ret = sev_init_if_required(writable, &argp->error);
-+	if (ret)
-+		return ret;
-+
- 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
- 		return -EFAULT;
- 
-@@ -435,12 +450,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
- 	data.len = input.length;
- 
- cmd:
--	if (sev->state == SEV_STATE_UNINIT) {
--		ret = __sev_platform_init_locked(&argp->error);
--		if (ret)
--			goto e_free_blob;
--	}
--
- 	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
- 
- 	 /* If we query the CSR length, FW responded with expected data. */
-@@ -586,7 +595,6 @@ static int sev_update_firmware(struct device *dev)
- 
- static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
- {
--	struct sev_device *sev = psp_master->sev_data;
- 	struct sev_user_data_pek_cert_import input;
- 	struct sev_data_pek_cert_import data;
- 	void *pek_blob, *oca_blob;
-@@ -595,6 +603,10 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
- 	if (!writable)
- 		return -EPERM;
- 
-+	ret = sev_init_if_required(writable, &argp->error);
-+	if (ret)
-+		return ret;
-+
- 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
- 		return -EFAULT;
- 
-@@ -617,17 +629,10 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
- 	data.oca_cert_address = __psp_pa(oca_blob);
- 	data.oca_cert_len = input.oca_cert_len;
- 
--	/* If platform is not in INIT state then transition it to INIT */
--	if (sev->state != SEV_STATE_INIT) {
--		ret = __sev_platform_init_locked(&argp->error);
--		if (ret)
--			goto e_free_oca;
--	}
--
- 	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, &argp->error);
- 
--e_free_oca:
- 	kfree(oca_blob);
-+
- e_free_pek:
- 	kfree(pek_blob);
- 	return ret;
-@@ -730,7 +735,6 @@ static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
- 
- static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- {
--	struct sev_device *sev = psp_master->sev_data;
- 	struct sev_user_data_pdh_cert_export input;
- 	void *pdh_blob = NULL, *cert_blob = NULL;
- 	struct sev_data_pdh_cert_export data;
-@@ -738,15 +742,9 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- 	void __user *input_pdh_cert_address;
- 	int ret;
- 
--	/* If platform is not in INIT state then transition it to INIT. */
--	if (sev->state != SEV_STATE_INIT) {
--		if (!writable)
--			return -EPERM;
--
--		ret = __sev_platform_init_locked(&argp->error);
--		if (ret)
--			return ret;
--	}
-+	ret = sev_init_if_required(writable, &argp->error);
-+	if (ret)
-+		return ret;
- 
- 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
- 		return -EFAULT;
--- 
-2.33.0.882.g93a45727a2-goog
+What's the point of this walk?  As soon as mmu_lock is dropped, all bets are off.
+At best this is a strong hint.  It doesn't hurt anything per se, it's just a waste
+of cycles.
 
+> +	if (!rc) {
+> +		pfn = kvm_mmu_map_tdp_page(vcpu, gpa, PFERR_USER_MASK, level);
+
+Same here.
+
+> +		if (is_error_noslot_pfn(pfn))
+> +			return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int snp_gpa_to_hva(struct kvm *kvm, gpa_t gpa, hva_t *hva)
+> +{
+> +	struct kvm_memory_slot *slot;
+> +	gfn_t gfn = gpa_to_gfn(gpa);
+> +	int idx;
+> +
+> +	idx = srcu_read_lock(&kvm->srcu);
+> +	slot = gfn_to_memslot(kvm, gfn);
+> +	if (!slot) {
+> +		srcu_read_unlock(&kvm->srcu, idx);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/*
+> +	 * Note, using the __gfn_to_hva_memslot() is not solely for performance,
+> +	 * it's also necessary to avoid the "writable" check in __gfn_to_hva_many(),
+> +	 * which will always fail on read-only memslots due to gfn_to_hva() assuming
+> +	 * writes.
+> +	 */
+> +	*hva = __gfn_to_hva_memslot(slot, gfn);
+> +	srcu_read_unlock(&kvm->srcu, idx);
+
+*hva is effectively invalidated the instance kvm->srcu is unlocked, e.g. a pending
+memslot update can complete immediately after and delete/move the backing memslot.
+
+> +
+> +	return 0;
+> +}
+> +
+> +static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op, gpa_t gpa,
+> +					  int level)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	int rc, npt_level;
+> +	kvm_pfn_t pfn;
+> +	gpa_t gpa_end;
+> +
+> +	gpa_end = gpa + page_level_size(level);
+> +
+> +	while (gpa < gpa_end) {
+> +		/*
+> +		 * If the gpa is not present in the NPT then build the NPT.
+> +		 */
+> +		rc = snp_check_and_build_npt(vcpu, gpa, level);
+> +		if (rc)
+> +			return -EINVAL;
+> +
+> +		if (op == SNP_PAGE_STATE_PRIVATE) {
+> +			hva_t hva;
+> +
+> +			if (snp_gpa_to_hva(kvm, gpa, &hva))
+> +				return -EINVAL;
+> +
+> +			/*
+> +			 * Verify that the hva range is registered. This enforcement is
+> +			 * required to avoid the cases where a page is marked private
+> +			 * in the RMP table but never gets cleanup during the VM
+> +			 * termination path.
+> +			 */
+> +			mutex_lock(&kvm->lock);
+> +			rc = is_hva_registered(kvm, hva, page_level_size(level));
+
+This will get a false negative if a hva+size spans two contiguous regions.
+
+Also, storing a boolean return in a variable that is an int _and_ was already used
+for the kernel's standard 
+
+> +			mutex_unlock(&kvm->lock);
+
+This is also subject to races, e.g. userspace unregisters the hva immediately
+after this check, before KVM makes whatever conversion it makes below.
+
+A linear walk through a list to find a range is also a bad idea, e.g. pathological
+worst case scenario is that userspace has created tens of thousands of individual
+regions.  There is no restriction on the number of regions, just the number of
+pages that can be pinned.
+
+I dislike the svm_(un)register_enc_region() scheme in general, but at least for
+SEV and SEV-ES the code is isolated, e.g. KVM is little more than a dump pipe to
+let userspace pin pages.  I would like to go the opposite direction and work towards
+eliminating regions_list (or at least making it optional), not build more stuff
+on top.
+
+The more I look at this, the more strongly I feel that private <=> shared conversions
+belong in the MMU, and that KVM's SPTEs should be the single source of truth for
+shared vs. private.  E.g. add a SPTE_TDP_PRIVATE_MASK in the software available bits.
+I believe the only hiccup is the snafu where not zapping _all_ SPTEs on memslot
+deletion breaks QEMU+VFIO+GPU, i.e. KVM would lose its canonical info on unrelated
+memslot deletion.
+
+But that is a solvable problem.  Ideally the bug, wherever it is, would be root
+caused and fixed.  I believe Peter (and Marc?) is going to work on reproducing
+the bug.
+
+If we are unable to root cause and fix the bug, I think a viable workaround would
+be to clear the hardware present bit in unrelated SPTEs, but keep the SPTEs
+themselves.  The idea mostly the same as the ZAPPED_PRIVATE concept from the initial
+TDX RFC.  MMU notifier invalidations, memslot removal, RMP restoration, etc... would
+all continue to work since the SPTEs is still there, and KVM's page fault handler
+could audit any "blocked" SPTE when it's refaulted (I'm pretty sure it'd be
+impossible for the PFN to change, since any PFN change would require a memslot
+update or mmu_notifier invalidation).
+
+The downside to that approach is that it would require walking all SPTEs to do a
+memslot deletion, i.e. we'd lose the "fast zap" behavior.  If that's a performance
+issue, the behavior could be opt-in (but not for SNP/TDX).
+
+> +			if (!rc)
+> +				return -EINVAL;
+> +
+> +			/*
+> +			 * Mark the userspace range unmerable before adding the pages
+> +			 * in the RMP table.
+> +			 */
+> +			mmap_write_lock(kvm->mm);
+> +			rc = snp_mark_unmergable(kvm, hva, page_level_size(level));
+> +			mmap_write_unlock(kvm->mm);
+
+As mentioned in an earlier patch, this simply cannot work.
+
+> +			if (rc)
+> +				return -EINVAL;
+> +		}
+> +
+> +		write_lock(&kvm->mmu_lock);
+> +
+> +		rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level);
+
+Same comment about the bool into int. Though in this case I'd say have
+kvm_mmu_get_tdp_walk() return 0/-errno, not a bool.  Boolean returns for helpers
+without "is_", "test_", etc... are generally confusing.
+
+> +		if (!rc) {
+> +			/*
+> +			 * This may happen if another vCPU unmapped the page
+> +			 * before we acquire the lock. Retry the PSC.
+> +			 */
+> +			write_unlock(&kvm->mmu_lock);
+> +			return 0;
+
+How will the caller (guest?) know to retry the PSC if KVM returns "success"?
+
+> +		}
+> +
+> +		/*
+> +		 * Adjust the level so that we don't go higher than the backing
+> +		 * page level.
+> +		 */
+> +		level = min_t(size_t, level, npt_level);
+> +
+> +		trace_kvm_snp_psc(vcpu->vcpu_id, pfn, gpa, op, level);
+> +
+> +		switch (op) {
+> +		case SNP_PAGE_STATE_SHARED:
+> +			rc = snp_make_page_shared(kvm, gpa, pfn, level);
+> +			break;
+> +		case SNP_PAGE_STATE_PRIVATE:
+> +			rc = rmp_make_private(pfn, gpa, level, sev->asid, false);
+> +			break;
+> +		default:
+> +			rc = -EINVAL;
+
+Not that it really matters, because I don't think the MADV_* approach is viable,
+but this neglects to undo snp_mark_unmergable() on failure.
+
+> +			break;
+> +		}
+> +
+> +		write_unlock(&kvm->mmu_lock);
+> +
+> +		if (rc) {
+> +			pr_err_ratelimited("Error op %d gpa %llx pfn %llx level %d rc %d\n",
+> +					   op, gpa, pfn, level, rc);
+> +			return rc;
+> +		}
+> +
+> +		gpa = gpa + page_level_size(level);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  {
+>  	struct vmcb_control_area *control = &svm->vmcb->control;
