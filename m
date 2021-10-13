@@ -2,64 +2,177 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7AC5C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 15:40:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2BDDC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 15:47:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B9169610CE
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 15:40:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D50A9610A2
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 15:47:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232801AbhJMPmZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Oct 2021 11:42:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46394 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229653AbhJMPmY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Oct 2021 11:42:24 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 24B40610A0;
-        Wed, 13 Oct 2021 15:40:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1634139621;
-        bh=vdmLIATwugYFRxhd0ViKjIyMu7ds79gJzqh8mfaqG1M=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=eGl+RV9H16Qt89nGVCKbFu9Xw6wcHaDjcMmJFOc+kGGuURR1rF8sZsVVoUPuq2bPH
-         Tq1q7m115c/t9kbhmqYTX9G408n99YVLnR2Eesbd5ssu0rSk3HYxNWGQeaUnBWzUcH
-         DnT8aQne4C5WUy2XTiry2RP4O6LrqyT7PkVEvRWDDlBFXZr2NRY2BHJu35nEVZx68A
-         z9vIMa2UnQbT1tD4P4CdKU1AJ0yPQ6i7QexqUzj+f+FNBXIvaQKDotBBTfTMz3O2b5
-         VdAxEBSn3fiHk6K/n/BrO++4+hMsNIhgvP62b3GI1iAMCEBEygU7HMgR8FZb76esTf
-         CHrde3LiZAIWg==
-Date:   Wed, 13 Oct 2021 08:40:20 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Anders Roxell <anders.roxell@linaro.org>
-Cc:     bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
-        sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-        hkelam@marvell.com, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] include: marvell: octeontx2: build error: unknown type
- name 'u64'
-Message-ID: <20211013084020.44352ee0@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20211013135743.3826594-1-anders.roxell@linaro.org>
-References: <20211013135743.3826594-1-anders.roxell@linaro.org>
+        id S234675AbhJMPtN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Oct 2021 11:49:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39850 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234388AbhJMPsO (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Oct 2021 11:48:14 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEFADC061764
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 08:46:10 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id g184so2710326pgc.6
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 08:46:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5P0ocxXM0vPODGkh8na4Mfy39/EYyFv4GMRrvhNNOUo=;
+        b=gfAizaxTiwRe31oPHuSEfCuoU3UyNzjvSGFjRtR0+20ybGnOJHR2SNvIUYXuMY2xpD
+         gjbOwicFvptk+HxbA9gztDS/NFb/B9PCmms4ywTb+W6ZfybGlSGnqIF9BrEyW3lnzugF
+         1xOsRizGgXSxqW3rE2o7H3pOyE6LnVUrXJS6JM8CS2LKu70yomZ+jIXvV9GC/9hEoAdh
+         pZgLdZj46NdkkNldf1y6Zal4VF0OHZO5HByoWBC8S5+MsG5/UJx0h6V+EfRdjNyAV2md
+         QHEhpyLmWUQN/xdLKYedMbdiT11toyum2MbaAnr8R6GfEwVc/Pi4akUF4ElQql0esd+K
+         tzhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5P0ocxXM0vPODGkh8na4Mfy39/EYyFv4GMRrvhNNOUo=;
+        b=Zc59cClUvJMW1UhUZhXc2URM3km183OOGJozrKcaPndGwTWqMJqhg0xyMDrFXYlO2O
+         QoXgauJ3HzCBmO0D8Mf8TqRjWjqreydPe7j1xOidDTO1RwN/uMt/PraqvsgNcA0FaGl9
+         OOn1ivGA9l7G++ybwHxzUXprz8SB5oo1DcORVOJSbVdTLAFVSmt7shLyWK3S3Bu9kBcC
+         WFAOPvPEdbzL2yBFf0yvoJ/HCUJ1rTQKS9IuKIlTG/9nJts5bRVDaT+6lNFVjmDJXKkg
+         zek4pxQBBAOon4VHOB36I1a5qYEec4HfCwIliCvrG83WJu4PdAr6F+5bas31N0mzkGUl
+         m6qg==
+X-Gm-Message-State: AOAM531HlA9YsmniAFbtpijP94O3JhoQY+gzXA9HaM0xwe5d/4fZMVMm
+        bg/uS0GCMHCkwLtqanSqEUjOXQ==
+X-Google-Smtp-Source: ABdhPJxOS97EPwZsGm56NgXmycC48sC/ZWo8Q8DTT9IZBXIVEcdfskLSNijWrQkjT1bVWFJiZLyKew==
+X-Received: by 2002:aa7:949c:0:b0:44c:a0df:2c7f with SMTP id z28-20020aa7949c000000b0044ca0df2c7fmr128668pfk.34.1634139970091;
+        Wed, 13 Oct 2021 08:46:10 -0700 (PDT)
+Received: from p14s (S0106889e681aac74.cg.shawcable.net. [68.147.0.187])
+        by smtp.gmail.com with ESMTPSA id x27sm2452841pfo.90.2021.10.13.08.46.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Oct 2021 08:46:09 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 09:46:04 -0600
+From:   Mathieu Poirier <mathieu.poirier@linaro.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <20211013154604.GB4135908@p14s>
+References: <20211013105226.20225-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 13 Oct 2021 15:57:43 +0200 Anders Roxell wrote:
-> Building an allmodconfig kernel arm64 kernel, the following build error
-> shows up:
+On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
+> This will enable cleanups down the road.
+> The idea is to disable cbs, then add "flush_queued_cbs" callback
+> as a parameter, this way drivers can flush any work
+> queued after callbacks have been disabled.
 > 
-> In file included from drivers/crypto/marvell/octeontx2/cn10k_cpt.c:4:
-> include/linux/soc/marvell/octeontx2/asm.h:38:15: error: unknown type name 'u64'
->    38 | static inline u64 otx2_atomic64_fetch_add(u64 incr, u64 *ptr)
->       |               ^~~
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  arch/um/drivers/virt-pci.c                 | 2 +-
+>  drivers/block/virtio_blk.c                 | 4 ++--
+>  drivers/bluetooth/virtio_bt.c              | 2 +-
+>  drivers/char/hw_random/virtio-rng.c        | 2 +-
+>  drivers/char/virtio_console.c              | 4 ++--
+>  drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
+>  drivers/firmware/arm_scmi/virtio.c         | 2 +-
+>  drivers/gpio/gpio-virtio.c                 | 2 +-
+>  drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
+>  drivers/i2c/busses/i2c-virtio.c            | 2 +-
+>  drivers/iommu/virtio-iommu.c               | 2 +-
+>  drivers/net/caif/caif_virtio.c             | 2 +-
+>  drivers/net/virtio_net.c                   | 4 ++--
+>  drivers/net/wireless/mac80211_hwsim.c      | 2 +-
+>  drivers/nvdimm/virtio_pmem.c               | 2 +-
+>  drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
+>  drivers/scsi/virtio_scsi.c                 | 2 +-
+>  drivers/virtio/virtio.c                    | 5 +++++
+>  drivers/virtio/virtio_balloon.c            | 2 +-
+>  drivers/virtio/virtio_input.c              | 2 +-
+>  drivers/virtio/virtio_mem.c                | 2 +-
+>  fs/fuse/virtio_fs.c                        | 4 ++--
+>  include/linux/virtio.h                     | 1 +
+>  net/9p/trans_virtio.c                      | 2 +-
+>  net/vmw_vsock/virtio_transport.c           | 4 ++--
+>  sound/virtio/virtio_card.c                 | 4 ++--
+>  26 files changed, 39 insertions(+), 33 deletions(-)
 > 
-> Include linux/types.h in asm.h so the compiler knows what the type
-> 'u64' are.
+>  static struct virtio_driver virtio_pmem_driver = {
+> diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
+> index 8e49a3bacfc7..6a11952822df 100644
+> --- a/drivers/rpmsg/virtio_rpmsg_bus.c
+> +++ b/drivers/rpmsg/virtio_rpmsg_bus.c
+> @@ -1015,7 +1015,7 @@ static void rpmsg_remove(struct virtio_device *vdev)
+>  	size_t total_buf_space = vrp->num_bufs * vrp->buf_size;
+>  	int ret;
+>  
+> -	vdev->config->reset(vdev);
+> +	virtio_reset_device(vdev);
 > 
-> Fixes: af3826db74d1 ("octeontx2-pf: Use hardware register for CQE count")
-> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
 
-Yes, please! I've been carrying same patch locally. Any expectations on
-who should apply the patch? I'm gonna send a PR with networking fixes
-to Linus tomorrow, happy to take it via netdev if that's okay.
+Reviewed-by: Mathieu Poirier <mathieu.poirier@linaro.org>
+
+>  	ret = device_for_each_child(&vdev->dev, NULL, rpmsg_remove_device);
+>  	if (ret)
