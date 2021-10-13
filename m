@@ -2,66 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FFDBC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 10:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68282C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 10:57:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32D91604DA
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 10:57:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5546E610A1
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 10:57:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234099AbhJMK7F (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Oct 2021 06:59:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56446 "EHLO
+        id S234700AbhJMK7l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Oct 2021 06:59:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232021AbhJMK6q (ORCPT
+        with ESMTP id S231825AbhJMK65 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Oct 2021 06:58:46 -0400
+        Wed, 13 Oct 2021 06:58:57 -0400
 Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9908AC061777
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 03:56:28 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id t184so1246221pfd.0
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 03:56:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 410B0C0613E5
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 03:56:32 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id t15so2070258pfl.13
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 03:56:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=yw+NaHmS2OviUEGIWWfNtsmzD5nYySB6AIlogP5a/cQ=;
-        b=NHZlgl1GO0cd+Qmy2aII0kIzz8l5igxZ/oBSCb8LIlRTi4oglpg2DHBYrw7iJd6wfj
-         uHiagAUBP7IZCEQPqhL/EfyQtq5igzIaa3ULO8k4gCzyxoQ4dALhJ95/48z2Cyx14+WQ
-         m0GA1f670VwFJju8RMabpf7IKbitlkrWmQgifeFViFFK7MtPKD2gFeZEeUkQOF4GEGGQ
-         DyVWW1B2tlkKzr8Rtoj+04ThkYU95WXfjm1fVVtD9Obw+d/cFcpq/TguTIX1G1jGBRFn
-         WSH7GQ981etr9pv3klieXiMzITqXlpISAleuWF/fTMoP9C3t1bV8i9FMJ/nJTQ5ya/Dj
-         9scw==
+        bh=yng5eTw4n0HbKQV0Xcv/zVYYMU50wsVq8rLsKT3wyb8=;
+        b=szAdfCtZjTXtVtUeM38ldIve5EF5/0Br7s8W9cXxA9prF7ZYrNeqv8KbrhJPl0wM1o
+         gU5pe2tTYCljGIJIf2d6lDfa8pYlMCM3WwHPA0McScpbpHJMLI/cne7dylw83Q5brGiv
+         Liqx0mwINVuSCL+UM0cunoJgEackJehBKyGEs4czcLlSkn9lwfBAAuY2LkenjkpEha5o
+         xsEdKmkLs/vzHhVPRvvjYR7yWUvBBN8vEEZ6lPYZoZwwWFzFtmzKsSdQ5Q++auOH4/wj
+         3nlH7ULPuPiAKzy0LLxS0CHvWfYTM5lfmC1AlM6J42a1a7m9eCIeqBpT8bGNirAMb+SH
+         AHrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=yw+NaHmS2OviUEGIWWfNtsmzD5nYySB6AIlogP5a/cQ=;
-        b=NliFhEe6DkYRhmqmvffSFm8r0W8qrqaXYdww2BadthQlpmFCgnF9n7X66nbVNco3XH
-         H30DjQzw0ntQ8Ro766mu+pIzhEnIX2UZrogRXEadRxvdQC4nU/TTzNNcDBfawg6z8AK0
-         KrNGHyEgstZMpumtLP8ehb3pHfDayiKAlWVSHcBr9zpQdpIX/PSvFbqI5vAXNfREvQjS
-         y10Hr+Qxnpc+gjXknlA8bzQtzmXoPY2Jv9Nea//w4fi4OL73V3YkU3USD+JnD54RrkMO
-         djYUW/5aPdDBfQXC9LB6/rmy41Xuak1db5lbFGMppu4Z5ATYpwL+UN9bTpxraIScdE6v
-         xVZQ==
-X-Gm-Message-State: AOAM531SaxyjAAf4tEOinRZPDn9YUPDjlrivpXgomysGnW8dh9Wz6p9+
-        VHtDgMJ/VOlAFet4BT3liBsgVA==
-X-Google-Smtp-Source: ABdhPJxzqL4Oa7ZbmxyxpW5LGLwTGJW1GLlz9jUKbAzBuQsfjVU/qIuo1CoqarWf7dm+D5vG1hzdSA==
-X-Received: by 2002:a63:f313:: with SMTP id l19mr27316800pgh.40.1634122588092;
-        Wed, 13 Oct 2021 03:56:28 -0700 (PDT)
+        bh=yng5eTw4n0HbKQV0Xcv/zVYYMU50wsVq8rLsKT3wyb8=;
+        b=HuhF1HY5DFhWycxEzvr0aNgBMKoQH/XVuVjTdwDwVbLXON5Gyo7Z3lXUMq+Dq7FBiH
+         9zTcC4XM8qPwiD5Rf1MNHSOH3hDgSCgmT9fJVfDxoYTtzSpyBBWqQpskr2dEkj3Pkf42
+         PMk8yIw5UTjGkromUsthvgEuSJgEhO8RU8emKQ+PaAH5VDoVG16q1fUJb8scsXsSiBM8
+         viutD2HrPoRbocvUvfhXuH9EF80qN44XodBQcJYXSTDrAlzlPRd26PIrk6z6v5MAqGB6
+         yRvXcz7uSi82oYBHM4sKOxcjRKY8Op3gGWf9srUrZ/lEX32N1Q42FNfVNfsupOxCGgPi
+         8t2w==
+X-Gm-Message-State: AOAM531RupDtydujCHnPvZHVIzT/O1KaQafY+EDYbBtHgfSyKnWayXvZ
+        h4yWJjSVDD76mg8nW/tl/9cTcw==
+X-Google-Smtp-Source: ABdhPJwYqosT/5ArpzWpSNWo3I/WZjXdW4f7C8zC1FkxtUmdTuVDdpIyEmleWaacjSPv08d4vT6Fog==
+X-Received: by 2002:aa7:81c7:0:b0:44c:517f:a759 with SMTP id c7-20020aa781c7000000b0044c517fa759mr36699311pfn.3.1634122592461;
+        Wed, 13 Oct 2021 03:56:32 -0700 (PDT)
 Received: from localhost.name ([122.161.48.68])
-        by smtp.gmail.com with ESMTPSA id b13sm6155351pjl.15.2021.10.13.03.56.24
+        by smtp.gmail.com with ESMTPSA id b13sm6155351pjl.15.2021.10.13.03.56.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 03:56:27 -0700 (PDT)
+        Wed, 13 Oct 2021 03:56:32 -0700 (PDT)
 From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
 To:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org
 Cc:     bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
         linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
         robh+dt@kernel.org, agross@kernel.org, herbert@gondor.apana.org.au,
         davem@davemloft.net, Thara Gopinath <thara.gopinath@linaro.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Rob Herring <robh@kernel.org>
-Subject: [PATCH v4 07/20] dt-bindings: qcom-qce: Convert bindings to yaml
-Date:   Wed, 13 Oct 2021 16:25:28 +0530
-Message-Id: <20211013105541.68045-8-bhupesh.sharma@linaro.org>
+        Bjorn Andersson <bjorn.andersson@linaro.org>
+Subject: [PATCH v4 08/20] dt-bindings: qcom-qce: Add 'interconnects' and move 'clocks' to optional properties
+Date:   Wed, 13 Oct 2021 16:25:29 +0530
+Message-Id: <20211013105541.68045-9-bhupesh.sharma@linaro.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211013105541.68045-1-bhupesh.sharma@linaro.org>
 References: <20211013105541.68045-1-bhupesh.sharma@linaro.org>
@@ -71,90 +70,48 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert Qualcomm QCE crypto devicetree binding to YAML.
+Add 'interconnects' and 'interconnect-names' as optional properties
+to the device-tree binding documentation for qcom crypto IP.
+
+These properties describe the interconnect path between crypto and main
+memory and the interconnect type respectively.
 
 Cc: Thara Gopinath <thara.gopinath@linaro.org>
 Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-Reviewed-by: Rob Herring <robh@kernel.org>
+Cc: Rob Herring <robh+dt@kernel.org>
 Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
 ---
- .../devicetree/bindings/crypto/qcom-qce.yaml  | 67 +++++++++++++++++++
- 1 file changed, 67 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+ Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-new file mode 100644
-index 000000000000..b7ae873dc943
---- /dev/null
+index b7ae873dc943..954f762090f3 100644
+--- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
 +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-@@ -0,0 +1,67 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/qcom-qce.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Qualcomm crypto engine driver
-+
-+maintainers:
-+  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
-+
-+description: |
-+  This document defines the binding for the QCE crypto
-+  controller found on Qualcomm parts.
-+
-+properties:
-+  compatible:
-+    const: qcom,crypto-v5.1
-+
-+  reg:
+@@ -32,6 +32,14 @@ properties:
+       - const: bus
+       - const: core
+ 
++  interconnects:
 +    maxItems: 1
++    description: |
++      Interconnect path between qce crypto and main memory.
 +
-+  clocks:
-+    items:
-+      - description: iface clocks register interface.
-+      - description: bus clocks data transfer interface.
-+      - description: core clocks rest of the crypto block.
++  interconnect-names:
++    const: memory
 +
-+  clock-names:
-+    items:
-+      - const: iface
-+      - const: bus
-+      - const: core
-+
-+  dmas:
-+    items:
-+      - description: DMA specifiers for tx dma channel.
-+      - description: DMA specifiers for rx dma channel.
-+
-+  dma-names:
-+    items:
-+      - const: rx
-+      - const: tx
-+
-+required:
-+  - compatible
-+  - reg
-+  - clocks
-+  - clock-names
-+  - dmas
-+  - dma-names
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/clock/qcom,gcc-apq8084.h>
-+    crypto-engine@fd45a000 {
-+        compatible = "qcom,crypto-v5.1";
-+        reg = <0xfd45a000 0x6000>;
-+        clocks = <&gcc GCC_CE2_AHB_CLK>,
-+                 <&gcc GCC_CE2_AXI_CLK>,
-+                 <&gcc GCC_CE2_CLK>;
-+        clock-names = "iface", "bus", "core";
-+        dmas = <&cryptobam 2>, <&cryptobam 3>;
-+        dma-names = "rx", "tx";
-+    };
+   dmas:
+     items:
+       - description: DMA specifiers for tx dma channel.
+@@ -45,8 +53,6 @@ properties:
+ required:
+   - compatible
+   - reg
+-  - clocks
+-  - clock-names
+   - dmas
+   - dma-names
+ 
 -- 
 2.31.1
 
