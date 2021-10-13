@@ -2,584 +2,177 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B8C1C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 10:55:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22852C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 10:56:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6618E60ED4
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 10:55:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C1D860F21
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 10:56:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231171AbhJMK57 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Oct 2021 06:57:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32649 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230460AbhJMK5x (ORCPT
+        id S231644AbhJMK6E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Oct 2021 06:58:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56316 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231495AbhJMK6A (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Oct 2021 06:57:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634122547;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=HOHQBuq5n1jvyoAk83wUOf4Uik9+loiLDFU1S+KWwJc=;
-        b=hDXn7dxErfsJ78eTjG/oMzThekAKgQJxUOkc5wdvzCDwMoLXJt3M+kxyQNo/vCa/erVbtQ
-        f/9XKDhIar/nWgux7Y7nWlHZO685W4Ej/WgTh9rLjCy+PuJvwKktCv6CIhpgpoG4Jb4YrW
-        3jCTB8zZvOmWxzibSNqIjJRbUMJnGQY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-526-rR81XtwzOqKthvOc3_r45g-1; Wed, 13 Oct 2021 06:55:46 -0400
-X-MC-Unique: rR81XtwzOqKthvOc3_r45g-1
-Received: by mail-wr1-f71.google.com with SMTP id c4-20020a5d6cc4000000b00160edc8bb28so1659537wrc.9
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 03:55:46 -0700 (PDT)
+        Wed, 13 Oct 2021 06:58:00 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A2F6C061746
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 03:55:57 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id k23so1946770pji.0
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 03:55:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xbAijj6QaI02gvcAy4f4tAKGg3l2cqTKGjVN7HjQges=;
+        b=fQ7aY8AEbwdT3LQeqkDE/J85tNeDdlbIsT6osfMpW5w9jnmB03akGA8MegjotgZCzJ
+         +bR4FdfJvLIZojey+EdVN9QFdPMmD8KY9L/uyvGk03eqxCIIvkKsD0dMWr6nXLWfTWK4
+         QqTVQtGyK1+xitzNO4W/qD9ojtZ7beCPSfoCLbiqDpealxd5PJn3uHXWqm1VOqnNBwNP
+         eMvaKonKVXstGw4cKhht/rtR62kyTfOwAdpK02oHnZWEAExCppbCEHwTgo4oVyLZOjiW
+         4mY3zaKyoUeyPmctNcORz6R8cAMrX2H8E474lG553AeVqqmTl7GV+QMHeHpCyw6eoBoR
+         wI8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=HOHQBuq5n1jvyoAk83wUOf4Uik9+loiLDFU1S+KWwJc=;
-        b=bDFwluLi6jbrMGdT9DxoourcsV+eKkKjDhyETuA3bpu76xxMYFrd9n4hq4uJ1X89xr
-         8keDTsX73+5t5KTCn8cq8wpnSQ87QIodQlkHSmm3jZBGVz5+x2FeT2+85j5e5swdsCTd
-         A7Lzohq3GtsSRrbpjFUxHOeKRw7MHy5U85UiBQMMbrdxwpu8hEy29nXnCNSOpGyf/rEG
-         5t4o7tBITh4+K4ZEXVjpnyvf3epZhOvzoYALDlj8W1CCnvfR3IH9VsugoAlrm1LG4dQS
-         4ZBeG6jrZ1WaLvE2zffCfzj18Flnc5WFMCUI5o70dMYJDMLjHUdLuj7NWsv483iuCH1X
-         zJww==
-X-Gm-Message-State: AOAM5314Qc8CqubwpsMvb3CpOw3CPAx1bvJTZFNuUoJ8p/Q5n6/jRRdT
-        o3JMGVHR9d7btEICerV7+YKQ8O134iFT1PKJg6sV3a9XR9dmTVk+BZJNbgIIM3RVz3ULFzSFdVr
-        U4UG9lRJKsurdSdnIEyaD/q/+
-X-Received: by 2002:a1c:f216:: with SMTP id s22mr12239196wmc.27.1634122544686;
-        Wed, 13 Oct 2021 03:55:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxIFKVzN3wSeM2Mpi+3ebMvrIe+xpiLg9sofnH/e5wmfza96yWoV1W27PJsbS9IH10+WwuJlw==
-X-Received: by 2002:a1c:f216:: with SMTP id s22mr12239123wmc.27.1634122544323;
-        Wed, 13 Oct 2021 03:55:44 -0700 (PDT)
-Received: from redhat.com ([2.55.30.112])
-        by smtp.gmail.com with ESMTPSA id a81sm5721952wmd.30.2021.10.13.03.55.33
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xbAijj6QaI02gvcAy4f4tAKGg3l2cqTKGjVN7HjQges=;
+        b=YXpmawGXXqz32nWc+Da1eBYizxA1EYJJoPezNFElkP/qOySjlYwt6nUk8GJ4DF0toI
+         /DjZwLc92QQ3ut1aOhOhVTh2fdYgejhs3NKvIuPpG4zpKEHf3IEfQK7qhf2Oc4aTzaj2
+         R3Sij0mEdDEhvDO8tvikcih96ueU1zmBFVFB3WnRFcm+jDK4+AtnTHXiEAEpo4W/8Fi1
+         birQgcQ9Atz2RnGb8biLkkA/3yuUZ0BeLz0aJ71yy9Xm4Av0pqtwO0Vs44s047RHwOwM
+         SRto+qczxaysP12AmXoogi7jkIo7Jw3s7o7b1vtJNMtLuQQMyjVSK0RGZ1RG1fELKkHl
+         LY8Q==
+X-Gm-Message-State: AOAM533vOeZtyjcG1lR7qDCNS9eazt6MVLzwlHZX3YrpksD5uaIUyQXk
+        K34vESlK9FfbgpvWy0+e/1vrwg==
+X-Google-Smtp-Source: ABdhPJyznrmr6OjfULh94pwo6WFj5BKiEuGBJkYn8+rdV5DctaT54a82qvxMRhQvN508YJl2jVSoHg==
+X-Received: by 2002:a17:902:e8ce:b0:132:b140:9540 with SMTP id v14-20020a170902e8ce00b00132b1409540mr35175652plg.28.1634122556807;
+        Wed, 13 Oct 2021 03:55:56 -0700 (PDT)
+Received: from localhost.name ([122.161.48.68])
+        by smtp.gmail.com with ESMTPSA id b13sm6155351pjl.15.2021.10.13.03.55.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 03:55:42 -0700 (PDT)
-Date:   Wed, 13 Oct 2021 06:55:31 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gonglei <arei.gonglei@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        "Enrico Weigelt, metux IT consult" <info@metux.net>,
-        Viresh Kumar <vireshk@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        David Hildenbrand <david@redhat.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
-        alsa-devel@alsa-project.org
-Subject: [PATCH RFC] virtio: wrap config->reset calls
-Message-ID: <20211013105226.20225-1-mst@redhat.com>
+        Wed, 13 Oct 2021 03:55:56 -0700 (PDT)
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+To:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
+        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+        robh+dt@kernel.org, agross@kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, Thara Gopinath <thara.gopinath@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>
+Subject: [PATCH v4 00/20] Enable Qualcomm Crypto Engine on sm8250
+Date:   Wed, 13 Oct 2021 16:25:21 +0530
+Message-Id: <20211013105541.68045-1-bhupesh.sharma@linaro.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This will enable cleanups down the road.
-The idea is to disable cbs, then add "flush_queued_cbs" callback
-as a parameter, this way drivers can flush any work
-queued after callbacks have been disabled.
+Sorry for a delayed v4, but I have been caught up with some other
+patches.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- arch/um/drivers/virt-pci.c                 | 2 +-
- drivers/block/virtio_blk.c                 | 4 ++--
- drivers/bluetooth/virtio_bt.c              | 2 +-
- drivers/char/hw_random/virtio-rng.c        | 2 +-
- drivers/char/virtio_console.c              | 4 ++--
- drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
- drivers/firmware/arm_scmi/virtio.c         | 2 +-
- drivers/gpio/gpio-virtio.c                 | 2 +-
- drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
- drivers/i2c/busses/i2c-virtio.c            | 2 +-
- drivers/iommu/virtio-iommu.c               | 2 +-
- drivers/net/caif/caif_virtio.c             | 2 +-
- drivers/net/virtio_net.c                   | 4 ++--
- drivers/net/wireless/mac80211_hwsim.c      | 2 +-
- drivers/nvdimm/virtio_pmem.c               | 2 +-
- drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
- drivers/scsi/virtio_scsi.c                 | 2 +-
- drivers/virtio/virtio.c                    | 5 +++++
- drivers/virtio/virtio_balloon.c            | 2 +-
- drivers/virtio/virtio_input.c              | 2 +-
- drivers/virtio/virtio_mem.c                | 2 +-
- fs/fuse/virtio_fs.c                        | 4 ++--
- include/linux/virtio.h                     | 1 +
- net/9p/trans_virtio.c                      | 2 +-
- net/vmw_vsock/virtio_transport.c           | 4 ++--
- sound/virtio/virtio_card.c                 | 4 ++--
- 26 files changed, 39 insertions(+), 33 deletions(-)
+Changes since v3:
+=================
+- v3 can be seen here: https://lore.kernel.org/linux-arm-msm/20210519143700.27392-1-bhupesh.sharma@linaro.org/
+- Dropped a couple of patches from v3, on basis of the review comments:
+   ~ [PATCH 13/17] crypto: qce: core: Make clocks optional
+   ~ [PATCH 15/17] crypto: qce: Convert the device found dev_dbg() to dev_info()
+- Addressed review comments from Thara, Rob and Stephan Gerhold.
+- Collect Reviewed-by from Rob and Thara on some of the patches from the
+  v3 patchset.
 
-diff --git a/arch/um/drivers/virt-pci.c b/arch/um/drivers/virt-pci.c
-index c08066633023..22c4d87c9c15 100644
---- a/arch/um/drivers/virt-pci.c
-+++ b/arch/um/drivers/virt-pci.c
-@@ -616,7 +616,7 @@ static void um_pci_virtio_remove(struct virtio_device *vdev)
- 	int i;
- 
-         /* Stop all virtqueues */
--        vdev->config->reset(vdev);
-+        virtio_reset_device(vdev);
-         vdev->config->del_vqs(vdev);
- 
- 	device_set_wakeup_enable(&vdev->dev, false);
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 303caf2d17d0..83d0af3fbf30 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -910,7 +910,7 @@ static void virtblk_remove(struct virtio_device *vdev)
- 	mutex_lock(&vblk->vdev_mutex);
- 
- 	/* Stop all the virtqueues. */
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 
- 	/* Virtqueues are stopped, nothing can use vblk->vdev anymore. */
- 	vblk->vdev = NULL;
-@@ -929,7 +929,7 @@ static int virtblk_freeze(struct virtio_device *vdev)
- 	struct virtio_blk *vblk = vdev->priv;
- 
- 	/* Ensure we don't receive any more interrupts */
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 
- 	/* Make sure no work handler is accessing the device. */
- 	flush_work(&vblk->config_work);
-diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-index 57908ce4fae8..24a9258962fa 100644
---- a/drivers/bluetooth/virtio_bt.c
-+++ b/drivers/bluetooth/virtio_bt.c
-@@ -364,7 +364,7 @@ static void virtbt_remove(struct virtio_device *vdev)
- 	struct hci_dev *hdev = vbt->hdev;
- 
- 	hci_unregister_dev(hdev);
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 
- 	hci_free_dev(hdev);
- 	vbt->hdev = NULL;
-diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
-index a90001e02bf7..95980489514b 100644
---- a/drivers/char/hw_random/virtio-rng.c
-+++ b/drivers/char/hw_random/virtio-rng.c
-@@ -134,7 +134,7 @@ static void remove_common(struct virtio_device *vdev)
- 	vi->hwrng_removed = true;
- 	vi->data_avail = 0;
- 	complete(&vi->have_data);
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	vi->busy = false;
- 	if (vi->hwrng_register_done)
- 		hwrng_unregister(&vi->hwrng);
-diff --git a/drivers/char/virtio_console.c b/drivers/char/virtio_console.c
-index 7eaf303a7a86..08bbd693436f 100644
---- a/drivers/char/virtio_console.c
-+++ b/drivers/char/virtio_console.c
-@@ -1957,7 +1957,7 @@ static void virtcons_remove(struct virtio_device *vdev)
- 	spin_unlock_irq(&pdrvdata_lock);
- 
- 	/* Disable interrupts for vqs */
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	/* Finish up work that's lined up */
- 	if (use_multiport(portdev))
- 		cancel_work_sync(&portdev->control_work);
-@@ -2139,7 +2139,7 @@ static int virtcons_freeze(struct virtio_device *vdev)
- 
- 	portdev = vdev->priv;
- 
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 
- 	if (use_multiport(portdev))
- 		virtqueue_disable_cb(portdev->c_ivq);
-diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
-index e2375d992308..8e977b7627cb 100644
---- a/drivers/crypto/virtio/virtio_crypto_core.c
-+++ b/drivers/crypto/virtio/virtio_crypto_core.c
-@@ -404,7 +404,7 @@ static int virtcrypto_probe(struct virtio_device *vdev)
- free_engines:
- 	virtcrypto_clear_crypto_engines(vcrypto);
- free_vqs:
--	vcrypto->vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	virtcrypto_del_vqs(vcrypto);
- free_dev:
- 	virtcrypto_devmgr_rm_dev(vcrypto);
-@@ -436,7 +436,7 @@ static void virtcrypto_remove(struct virtio_device *vdev)
- 
- 	if (virtcrypto_dev_started(vcrypto))
- 		virtcrypto_dev_stop(vcrypto);
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	virtcrypto_free_unused_reqs(vcrypto);
- 	virtcrypto_clear_crypto_engines(vcrypto);
- 	virtcrypto_del_vqs(vcrypto);
-@@ -456,7 +456,7 @@ static int virtcrypto_freeze(struct virtio_device *vdev)
- {
- 	struct virtio_crypto *vcrypto = vdev->priv;
- 
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	virtcrypto_free_unused_reqs(vcrypto);
- 	if (virtcrypto_dev_started(vcrypto))
- 		virtcrypto_dev_stop(vcrypto);
-@@ -492,7 +492,7 @@ static int virtcrypto_restore(struct virtio_device *vdev)
- free_engines:
- 	virtcrypto_clear_crypto_engines(vcrypto);
- free_vqs:
--	vcrypto->vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	virtcrypto_del_vqs(vcrypto);
- 	return err;
- }
-diff --git a/drivers/firmware/arm_scmi/virtio.c b/drivers/firmware/arm_scmi/virtio.c
-index 11e8efb71375..6b8d93fe8848 100644
---- a/drivers/firmware/arm_scmi/virtio.c
-+++ b/drivers/firmware/arm_scmi/virtio.c
-@@ -452,7 +452,7 @@ static void scmi_vio_remove(struct virtio_device *vdev)
- 	 * outstanding message on any vqueue to be ignored by complete_cb: now
- 	 * we can just stop processing buffers and destroy the vqueues.
- 	 */
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	vdev->config->del_vqs(vdev);
- 	/* Ensure scmi_vdev is visible as NULL */
- 	smp_store_mb(scmi_vdev, NULL);
-diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
-index d24f1c9264bc..5029f01966f4 100644
---- a/drivers/gpio/gpio-virtio.c
-+++ b/drivers/gpio/gpio-virtio.c
-@@ -203,7 +203,7 @@ static void virtio_gpio_request_vq(struct virtqueue *vq)
- 
- static void virtio_gpio_free_vqs(struct virtio_device *vdev)
- {
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	vdev->config->del_vqs(vdev);
- }
- 
-diff --git a/drivers/gpu/drm/virtio/virtgpu_kms.c b/drivers/gpu/drm/virtio/virtgpu_kms.c
-index f3379059f324..6aa605b8d3a1 100644
---- a/drivers/gpu/drm/virtio/virtgpu_kms.c
-+++ b/drivers/gpu/drm/virtio/virtgpu_kms.c
-@@ -257,7 +257,7 @@ void virtio_gpu_deinit(struct drm_device *dev)
- 	flush_work(&vgdev->ctrlq.dequeue_work);
- 	flush_work(&vgdev->cursorq.dequeue_work);
- 	flush_work(&vgdev->config_changed_work);
--	vgdev->vdev->config->reset(vgdev->vdev);
-+	virtio_reset_device(vgdev->vdev);
- 	vgdev->vdev->config->del_vqs(vgdev->vdev);
- }
- 
-diff --git a/drivers/i2c/busses/i2c-virtio.c b/drivers/i2c/busses/i2c-virtio.c
-index f10a603b13fb..eb3261ac64dc 100644
---- a/drivers/i2c/busses/i2c-virtio.c
-+++ b/drivers/i2c/busses/i2c-virtio.c
-@@ -177,7 +177,7 @@ static int virtio_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
- 
- static void virtio_i2c_del_vqs(struct virtio_device *vdev)
- {
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	vdev->config->del_vqs(vdev);
- }
- 
-diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
-index 80930ce04a16..1d4e1e7cf175 100644
---- a/drivers/iommu/virtio-iommu.c
-+++ b/drivers/iommu/virtio-iommu.c
-@@ -1115,7 +1115,7 @@ static void viommu_remove(struct virtio_device *vdev)
- 	iommu_device_unregister(&viommu->iommu);
- 
- 	/* Stop all virtqueues */
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	vdev->config->del_vqs(vdev);
- 
- 	dev_info(&vdev->dev, "device removed\n");
-diff --git a/drivers/net/caif/caif_virtio.c b/drivers/net/caif/caif_virtio.c
-index 91230894692d..444ef6a342f6 100644
---- a/drivers/net/caif/caif_virtio.c
-+++ b/drivers/net/caif/caif_virtio.c
-@@ -754,7 +754,7 @@ static void cfv_remove(struct virtio_device *vdev)
- 	debugfs_remove_recursive(cfv->debugfs);
- 
- 	vringh_kiov_cleanup(&cfv->ctx.riov);
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	vdev->vringh_config->del_vrhs(cfv->vdev);
- 	cfv->vr_rx = NULL;
- 	vdev->config->del_vqs(cfv->vdev);
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 79bd2585ec6b..8c10fcad73a4 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3274,7 +3274,7 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	return 0;
- 
- free_unregister_netdev:
--	vi->vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 
- 	unregister_netdev(dev);
- free_failover:
-@@ -3290,7 +3290,7 @@ static int virtnet_probe(struct virtio_device *vdev)
- 
- static void remove_vq_common(struct virtnet_info *vi)
- {
--	vi->vdev->config->reset(vi->vdev);
-+	virtio_reset_device(vi->vdev);
- 
- 	/* Free unused buffers in both send and recv, if any. */
- 	free_unused_bufs(vi);
-diff --git a/drivers/net/wireless/mac80211_hwsim.c b/drivers/net/wireless/mac80211_hwsim.c
-index 0adae76eb8df..9ee430c1d4a2 100644
---- a/drivers/net/wireless/mac80211_hwsim.c
-+++ b/drivers/net/wireless/mac80211_hwsim.c
-@@ -4369,7 +4369,7 @@ static void remove_vqs(struct virtio_device *vdev)
- {
- 	int i;
- 
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 
- 	for (i = 0; i < ARRAY_SIZE(hwsim_vqs); i++) {
- 		struct virtqueue *vq = hwsim_vqs[i];
-diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-index 726c7354d465..995b6cdc67ed 100644
---- a/drivers/nvdimm/virtio_pmem.c
-+++ b/drivers/nvdimm/virtio_pmem.c
-@@ -105,7 +105,7 @@ static void virtio_pmem_remove(struct virtio_device *vdev)
- 
- 	nvdimm_bus_unregister(nvdimm_bus);
- 	vdev->config->del_vqs(vdev);
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- }
- 
- static struct virtio_driver virtio_pmem_driver = {
-diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
-index 8e49a3bacfc7..6a11952822df 100644
---- a/drivers/rpmsg/virtio_rpmsg_bus.c
-+++ b/drivers/rpmsg/virtio_rpmsg_bus.c
-@@ -1015,7 +1015,7 @@ static void rpmsg_remove(struct virtio_device *vdev)
- 	size_t total_buf_space = vrp->num_bufs * vrp->buf_size;
- 	int ret;
- 
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 
- 	ret = device_for_each_child(&vdev->dev, NULL, rpmsg_remove_device);
- 	if (ret)
-diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-index 07d0250f17c3..f2502a8a5213 100644
---- a/drivers/scsi/virtio_scsi.c
-+++ b/drivers/scsi/virtio_scsi.c
-@@ -778,7 +778,7 @@ static void virtscsi_init_vq(struct virtio_scsi_vq *virtscsi_vq,
- static void virtscsi_remove_vqs(struct virtio_device *vdev)
- {
- 	/* Stop all the virtqueues. */
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	vdev->config->del_vqs(vdev);
- }
- 
-diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-index 0a5b54034d4b..a67dd0eca578 100644
---- a/drivers/virtio/virtio.c
-+++ b/drivers/virtio/virtio.c
-@@ -204,6 +204,11 @@ int virtio_finalize_features(struct virtio_device *dev)
- }
- EXPORT_SYMBOL_GPL(virtio_finalize_features);
- 
-+static void virtio_reset_device(struct virtio_device *dev)
-+{
-+	dev->config->reset(dev);
-+}
-+
- static int virtio_dev_probe(struct device *_d)
- {
- 	int err, i;
-diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-index c22ff0117b46..f4c34a2a6b8e 100644
---- a/drivers/virtio/virtio_balloon.c
-+++ b/drivers/virtio/virtio_balloon.c
-@@ -1056,7 +1056,7 @@ static void remove_common(struct virtio_balloon *vb)
- 		return_free_pages_to_mm(vb, ULONG_MAX);
- 
- 	/* Now we reset the device so we can clean up the queues. */
--	vb->vdev->config->reset(vb->vdev);
-+	virtio_reset_device(vb->vdev);
- 
- 	vb->vdev->config->del_vqs(vb->vdev);
- }
-diff --git a/drivers/virtio/virtio_input.c b/drivers/virtio/virtio_input.c
-index ce51ae165943..3aa46703872d 100644
---- a/drivers/virtio/virtio_input.c
-+++ b/drivers/virtio/virtio_input.c
-@@ -347,7 +347,7 @@ static void virtinput_remove(struct virtio_device *vdev)
- 	spin_unlock_irqrestore(&vi->lock, flags);
- 
- 	input_unregister_device(vi->idev);
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	while ((buf = virtqueue_detach_unused_buf(vi->sts)) != NULL)
- 		kfree(buf);
- 	vdev->config->del_vqs(vdev);
-diff --git a/drivers/virtio/virtio_mem.c b/drivers/virtio/virtio_mem.c
-index bef8ad6bf466..3bab0a625a4b 100644
---- a/drivers/virtio/virtio_mem.c
-+++ b/drivers/virtio/virtio_mem.c
-@@ -2722,7 +2722,7 @@ static void virtio_mem_remove(struct virtio_device *vdev)
- 	}
- 
- 	/* reset the device and cleanup the queues */
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	vdev->config->del_vqs(vdev);
- 
- 	kfree(vm);
-diff --git a/fs/fuse/virtio_fs.c b/fs/fuse/virtio_fs.c
-index 0ad89c6629d7..27c3b74070a2 100644
---- a/fs/fuse/virtio_fs.c
-+++ b/fs/fuse/virtio_fs.c
-@@ -895,7 +895,7 @@ static int virtio_fs_probe(struct virtio_device *vdev)
- 	return 0;
- 
- out_vqs:
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	virtio_fs_cleanup_vqs(vdev, fs);
- 	kfree(fs->vqs);
- 
-@@ -927,7 +927,7 @@ static void virtio_fs_remove(struct virtio_device *vdev)
- 	list_del_init(&fs->list);
- 	virtio_fs_stop_all_queues(fs);
- 	virtio_fs_drain_all_queues_locked(fs);
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	virtio_fs_cleanup_vqs(vdev, fs);
- 
- 	vdev->priv = NULL;
-diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-index 41edbc01ffa4..72292a62cd90 100644
---- a/include/linux/virtio.h
-+++ b/include/linux/virtio.h
-@@ -138,6 +138,7 @@ int virtio_finalize_features(struct virtio_device *dev);
- int virtio_device_freeze(struct virtio_device *dev);
- int virtio_device_restore(struct virtio_device *dev);
- #endif
-+void virtio_reset_device(struct virtio_device *dev);
- 
- size_t virtio_max_dma_size(struct virtio_device *vdev);
- 
-diff --git a/net/9p/trans_virtio.c b/net/9p/trans_virtio.c
-index 490a4c900339..19c69821dd04 100644
---- a/net/9p/trans_virtio.c
-+++ b/net/9p/trans_virtio.c
-@@ -721,7 +721,7 @@ static void p9_virtio_remove(struct virtio_device *vdev)
- 
- 	mutex_unlock(&virtio_9p_lock);
- 
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 	vdev->config->del_vqs(vdev);
- 
- 	sysfs_remove_file(&(vdev->dev.kobj), &dev_attr_mount_tag.attr);
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index 4f7c99dfd16c..fb3302fff627 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -665,7 +665,7 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
- 	vsock_for_each_connected_socket(virtio_vsock_reset_sock);
- 
- 	/* Stop all work handlers to make sure no one is accessing the device,
--	 * so we can safely call vdev->config->reset().
-+	 * so we can safely call virtio_reset_device().
- 	 */
- 	mutex_lock(&vsock->rx_lock);
- 	vsock->rx_run = false;
-@@ -682,7 +682,7 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
- 	/* Flush all device writes and interrupts, device will not use any
- 	 * more buffers.
- 	 */
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 
- 	mutex_lock(&vsock->rx_lock);
- 	while ((pkt = virtqueue_detach_unused_buf(vsock->vqs[VSOCK_VQ_RX])))
-diff --git a/sound/virtio/virtio_card.c b/sound/virtio/virtio_card.c
-index 150ab3e37013..e2847c040f75 100644
---- a/sound/virtio/virtio_card.c
-+++ b/sound/virtio/virtio_card.c
-@@ -350,7 +350,7 @@ static void virtsnd_remove(struct virtio_device *vdev)
- 		snd_card_free(snd->card);
- 
- 	vdev->config->del_vqs(vdev);
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 
- 	for (i = 0; snd->substreams && i < snd->nsubstreams; ++i) {
- 		struct virtio_pcm_substream *vss = &snd->substreams[i];
-@@ -379,7 +379,7 @@ static int virtsnd_freeze(struct virtio_device *vdev)
- 	virtsnd_ctl_msg_cancel_all(snd);
- 
- 	vdev->config->del_vqs(vdev);
--	vdev->config->reset(vdev);
-+	virtio_reset_device(vdev);
- 
- 	for (i = 0; i < snd->nsubstreams; ++i)
- 		cancel_work_sync(&snd->substreams[i].elapsed_period);
+Changes since v2:
+=================
+- v2 can be seen here: https://lore.kernel.org/dmaengine/20210505213731.538612-1-bhupesh.sharma@linaro.org/
+- Drop a couple of patches from v1, which tried to address the defered
+  probing of qce driver in case bam dma driver is not yet probed.
+  Replace it instead with a single (simpler) patch [PATCH 16/17].
+- Convert bam dma and qce crypto dt-bindings to YAML.
+- Addressed review comments from Thara, Bjorn, Vinod and Rob.
+
+Changes since v1:
+=================
+- v1 can be seen here: https://lore.kernel.org/linux-arm-msm/20210310052503.3618486-1-bhupesh.sharma@linaro.org/ 
+- v1 did not work well as reported earlier by Dmitry, so v2 contains the following
+  changes/fixes:
+  ~ Enable the interconnect path b/w BAM DMA and main memory first
+    before trying to access the BAM DMA registers.
+  ~ Enable the interconnect path b/w qce crytpo and main memory first
+    before trying to access the qce crypto registers.
+  ~ Make sure to document the required and optional properties for both
+    BAM DMA and qce crypto drivers.
+  ~ Add a few debug related print messages in case the qce crypto driver
+    passes or fails to probe.
+  ~ Convert the qce crypto driver probe to a defered one in case the BAM DMA
+    or the interconnect driver(s) (needed on specific Qualcomm parts) are not
+    yet probed.
+
+Qualcomm crypto engine is also available on sm8250 SoC.
+It supports hardware accelerated algorithms for encryption
+and authentication. It also provides support for aes, des, 3des
+encryption algorithms and sha1, sha256, hmac(sha1), hmac(sha256)
+authentication algorithms.
+
+Tested the enabled crypto algorithms with cryptsetup test utilities
+on sm8250-mtp and RB5 board (see [1]) and also with crypto self-tests,
+including the fuzz tests (CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y).
+
+Note that this series is rebased on a SMMU related fix from Arnd applied
+on either linus's tip of linux-next's tip (see [2]), without which
+the sm8250 based boards fail to boot with the latest tip.
+
+[1]. https://linux.die.net/man/8/cryptsetup
+[2]. https://lore.kernel.org/linux-arm-kernel/CAA8EJpoD4Th1tdwYQLnZur2oA0xX0LojSrNFLyJqdi6+rnB3YQ@mail.gmail.com/T/
+
+Cc: Thara Gopinath <thara.gopinath@linaro.org>
+Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+Cc: Rob Herring <robh+dt@kernel.org>
+
+Bhupesh Sharma (17):
+  arm64/dts: qcom: Fix 'dma' & 'qcom,controlled-remotely' nodes in dts
+  arm64/dts: qcom: ipq6018: Remove unused 'qcom,config-pipe-trust-reg'
+    property
+  arm64/dts: qcom: ipq6018: Remove unused 'iface_clk' property from
+    dma-controller node
+  dt-bindings: qcom-bam: Convert binding to YAML
+  dt-bindings: qcom-bam: Add 'interconnects' & 'interconnect-names' to
+    optional properties
+  dt-bindings: qcom-bam: Add 'iommus' to optional properties
+  dt-bindings: qcom-qce: Convert bindings to yaml
+  dt-bindings: qcom-qce: Add 'interconnects' and move 'clocks' to
+    optional properties
+  dt-bindings: qcom-qce: Add 'iommus' to optional properties
+  arm64/dts: qcom: sdm845: Use RPMH_CE_CLK macro directly
+  dt-bindings: crypto : Add new compatible strings for qcom-qce
+  arm64/dts: qcom: Use new compatibles for crypto nodes
+  crypto: qce: Add new compatibles for qce crypto driver
+  crypto: qce: Print a failure msg in case probe() fails
+  crypto: qce: Defer probing if BAM dma channel is not yet initialized
+  crypto: qce: Add 'sm8250-qce' compatible string check
+  arm64/dts: qcom: sm8250: Add dt entries to support crypto engine.
+
+Thara Gopinath (3):
+  dma: qcom: bam_dma: Add support to initialize interconnect path
+  crypto: qce: core: Add support to initialize interconnect path
+  crypto: qce: core: Make clocks optional
+
+ .../devicetree/bindings/crypto/qcom-qce.yaml  |  90 +++++++++++++++
+ .../devicetree/bindings/dma/qcom_bam_dma.txt  |  50 --------
+ .../devicetree/bindings/dma/qcom_bam_dma.yaml | 107 ++++++++++++++++++
+ arch/arm64/boot/dts/qcom/ipq6018.dtsi         |  10 +-
+ arch/arm64/boot/dts/qcom/ipq8074.dtsi         |   4 +-
+ arch/arm64/boot/dts/qcom/msm8996.dtsi         |   4 +-
+ arch/arm64/boot/dts/qcom/msm8998.dtsi         |   2 +-
+ arch/arm64/boot/dts/qcom/sdm845.dtsi          |  10 +-
+ arch/arm64/boot/dts/qcom/sm8250.dtsi          |  28 +++++
+ drivers/crypto/qce/core.c                     |  66 +++++++----
+ drivers/crypto/qce/core.h                     |   1 +
+ drivers/dma/qcom/bam_dma.c                    |  16 ++-
+ 12 files changed, 302 insertions(+), 86 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+ delete mode 100644 Documentation/devicetree/bindings/dma/qcom_bam_dma.txt
+ create mode 100644 Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
+
 -- 
-MST
+2.31.1
 
