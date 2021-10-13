@@ -2,101 +2,134 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C19C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 13:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A21C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 14:34:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4ED3960F94
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 13:57:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76830610C8
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 14:34:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234356AbhJMN76 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Oct 2021 09:59:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42136 "EHLO
+        id S234081AbhJMOgz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Oct 2021 10:36:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235902AbhJMN7x (ORCPT
+        with ESMTP id S230076AbhJMOgt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Oct 2021 09:59:53 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99A6EC061769
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 06:57:49 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id y26so12229116lfa.11
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 06:57:49 -0700 (PDT)
+        Wed, 13 Oct 2021 10:36:49 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CD62C061762
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 07:34:42 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id pf6-20020a17090b1d8600b0019fa884ab85so4573956pjb.5
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 07:34:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=oFsM9Ei6gS0+k7pOO8LFkCGjMbL5J05nWd842ORwlvo=;
-        b=bakgxwHfosywcDZp3vMHev/J4RM6bPLRo/dfXh/5UK2leDCo15AUTppvS+39yC7i2N
-         AiNw8D+GTPVeu57Vq9P3qRgiKvzqS9bFOZ2XaYRV8YOnvpiiKV8Io+D8CNGF6WVqOsiv
-         4QDlg156HdyP7ze2ZlmuEs8/yM1BIa2cpkREtlw2dPkrxxTSfId2PEAxbNo5grOAtc2t
-         zez0j6XDWKzYKJ62kpx06yhQ8FYrSCWxhVYKxTUyiJ4RLpgjtnFFBfp6TfsOKbQ3UIV2
-         1L7u5XIHOqf+QVhiJhMTJcDSmuF7dgDY2HfEtvpdZPKSVxLUKIc69qFjhJDjsHBN8FTW
-         olUQ==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=NtWwj0vH7UOJ5LLhXdT42vgomo2Iy/QVg4NPh0ov+mc=;
+        b=i4jHCEDMgA0MeyPQyBueIE183Ak+qcCdarKYGWRPkUbsoFRpR/IIG8+yyWU35jZA8N
+         qt9Gsc06jQoaDSjLFsLCun/odI+PcXwZjX3t/l0tvyRGsZy5eJkHGIaoOYzvlDuYFFlN
+         MIdgOfHGuvy0SL810seRJWQ7DYQjta/zNTMMSmK6c8FQ7aCskR3S+wHNOnfHwVBmn4nC
+         fcO+YFvOPF2nSgSjlcYflMzl45jRp0Mnd8pwsT1TKR4l5J/m6KwuTUFFu8v1BBHaqVgS
+         gJwIcf16TQtrx/rQbdxOOhHx35TR6YwE9FsnuZ0PLGlfrmNm1jT4+585xBMNJDVcMI2F
+         1Q0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=oFsM9Ei6gS0+k7pOO8LFkCGjMbL5J05nWd842ORwlvo=;
-        b=5D8tjBD7sx/1y5SoqdiAiTh+S/0sh8Gw6Ht6TXeVnkNyEfW6CVTx3xXLHZryg5q5lD
-         6If9/knFrBatYVxvqqpSXtkQOF3QModCkvaHCUMUQnQUKpZ/EJF6mdZbp8bcvj1I45e0
-         tpe8486QdYFld5icUNrBQhHqkv+duZwOJBLbPRAXYsCMl6UNbrRSGGiYq+U3jcGMQX5r
-         nih5X7AiZE4BL0CJhOb/3cjoHmdBlIFCNnvrBRDiSl6Xc7BMi6lYn/pOEDk6nliDWghe
-         V2KqL9AagKPjRBMt7Aizx42HYfMGhCnUQ4pAcKt6P5c9yJzk7fbEA78DrjOkbC5yjBO8
-         pRHQ==
-X-Gm-Message-State: AOAM533yoaKjUpFyUgsYjjNmlHsaxAsHkeYisn4Z4/xQOIePrfDQVP04
-        p9F4sB4pzkHZwwtthF7xEjXKnA==
-X-Google-Smtp-Source: ABdhPJwZhc4AfAcz46mBH0bDMlI3rEw082MyBrgaexGv8eU7y2Cw/wy3lYVccAe+lZM0MMzv73xu4g==
-X-Received: by 2002:ac2:4f02:: with SMTP id k2mr39851314lfr.265.1634133467547;
-        Wed, 13 Oct 2021 06:57:47 -0700 (PDT)
-Received: from localhost (c-9b28e555.07-21-73746f28.bbcust.telenor.se. [85.229.40.155])
-        by smtp.gmail.com with ESMTPSA id z20sm1336791lfh.306.2021.10.13.06.57.47
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NtWwj0vH7UOJ5LLhXdT42vgomo2Iy/QVg4NPh0ov+mc=;
+        b=jq1boWFrJEotsG9rBNEa3qUwZr0oZWYHX6L9nl7bsCCJJV62i/7Wo/RZ/zQaj4YpYZ
+         B++3gVh4bc+zfu7AOj5NJMdUw6aB/lFq/V53zyBek1Ms63OwOjCto9X9YVisXkfnrkmd
+         kOAVHgNbkj4/+Qd/v54CkJ7VoHltmP3gDntaU1DWBSy/+pFWstlLNue5T4kbyUZcauwa
+         4wq54J6aYqCZUJJ6xDbUXM6u8wvOZdt5FQLnG06r6XBGayLSuv3shL4lzVgs5cm/i/Ql
+         y3tu8uxl2HmKH2a4F5RMaLtw0nz25KPqTYFLjGLyg4NvpwCRO+7P06tQyKNXnpfiMUt/
+         OrOQ==
+X-Gm-Message-State: AOAM531c0my0eghTF/GBwgbzNKE2StPjl2PF6wBPPwUOBKaHtZEw4QJL
+        4baEyl5a/lVXoqpVkpb6sjVa/g==
+X-Google-Smtp-Source: ABdhPJzXquuTdstXVSZvIV0M6MqLZDQyiQjbvZJVMnoSimk+WNvLh/HqKlBXlRLoKggQChsXsNnzHg==
+X-Received: by 2002:a17:902:8d8c:b0:13d:be20:e279 with SMTP id v12-20020a1709028d8c00b0013dbe20e279mr36053185plo.5.1634135681790;
+        Wed, 13 Oct 2021 07:34:41 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id d60sm6114241pjk.49.2021.10.13.07.34.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 06:57:47 -0700 (PDT)
-From:   Anders Roxell <anders.roxell@linaro.org>
-To:     bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
-        sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-        hkelam@marvell.com
-Cc:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Anders Roxell <anders.roxell@linaro.org>
-Subject: [PATCH] include: marvell: octeontx2: build error: unknown type name 'u64'
-Date:   Wed, 13 Oct 2021 15:57:43 +0200
-Message-Id: <20211013135743.3826594-1-anders.roxell@linaro.org>
-X-Mailer: git-send-email 2.33.0
+        Wed, 13 Oct 2021 07:34:41 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 14:34:37 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 26/45] KVM: SVM: Mark the private vma unmerable
+ for SEV-SNP guests
+Message-ID: <YWbufTl2CKwJ2uzw@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-27-brijesh.singh@amd.com>
+ <YWXYIWuK2T8Kejng@google.com>
+ <2a8bf18e-1413-f884-15c4-0927f34ee3b9@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2a8bf18e-1413-f884-15c4-0927f34ee3b9@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Building an allmodconfig kernel arm64 kernel, the following build error
-shows up:
+On Wed, Oct 13, 2021, Brijesh Singh wrote:
+> 
+> On 10/12/21 11:46 AM, Sean Christopherson wrote:
+> > On Fri, Aug 20, 2021, Brijesh Singh wrote:
+> >> When SEV-SNP is enabled, the guest private pages are added in the RMP
+> >> table; while adding the pages, the rmp_make_private() unmaps the pages
+> >> from the direct map. If KSM attempts to access those unmapped pages then
+> >> it will trigger #PF (page-not-present).
+> >>
+> >> Encrypted guest pages cannot be shared between the process, so an
+> >> userspace should not mark the region mergeable but to be safe, mark the
+> >> process vma unmerable before adding the pages in the RMP table.
+> > To be safe from what?  Does the !PRESENT #PF crash the kernel?
+> 
+> Yes, kernel crashes when KSM attempts to access to an unmaped pfn.
 
-In file included from drivers/crypto/marvell/octeontx2/cn10k_cpt.c:4:
-include/linux/soc/marvell/octeontx2/asm.h:38:15: error: unknown type name 'u64'
-   38 | static inline u64 otx2_atomic64_fetch_add(u64 incr, u64 *ptr)
-      |               ^~~
-
-Include linux/types.h in asm.h so the compiler knows what the type
-'u64' are.
-
-Fixes: af3826db74d1 ("octeontx2-pf: Use hardware register for CQE count")
-Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
----
- include/linux/soc/marvell/octeontx2/asm.h | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/include/linux/soc/marvell/octeontx2/asm.h b/include/linux/soc/marvell/octeontx2/asm.h
-index 0f79fd7f81a1..d683251a0b40 100644
---- a/include/linux/soc/marvell/octeontx2/asm.h
-+++ b/include/linux/soc/marvell/octeontx2/asm.h
-@@ -5,6 +5,7 @@
- #ifndef __SOC_OTX2_ASM_H
- #define __SOC_OTX2_ASM_H
+Is this problem unique to nuking the direct map (patch 05), or would it also be
+a problem (in the form of an RMP violation) if the direct map were demoted to 4k
+pages?
  
-+#include <linux/types.h>
- #if defined(CONFIG_ARM64)
- /*
-  * otx2_lmt_flush is used for LMT store operation.
--- 
-2.33.0
-
+> [...]
+> >> +	mmap_write_lock(kvm->mm);
+> >> +	ret = snp_mark_unmergable(kvm, params.uaddr, params.len);
+> >> +	mmap_write_unlock(kvm->mm);
+> > This does not, and practically speaking cannot, work.  There are multiple TOCTOU
+> > bugs, here and in __snp_handle_page_state_change().  Userspace can madvise() the
+> > range at any later point, munmap()/mmap() the entire range, mess with the memslots
+> > in the PSC case, and so on and so forth.  Relying on MADV_UNMERGEABLE for functional
+> > correctness simply cannot work in KVM, barring mmu_notifier and a big pile of code.
+> 
+> AFAICT, ksm does not exclude the unmapped pfn from its scan list. We
+> need to tell ksm somehow to exclude the unmapped pfn from its scan list.
+> I understand that if userspace is messing with us, we have an issue, but
+> it's a userspace bug ;) To fix it right, we need to enhance ksm to
+> exclude the pfn when it is getting unmapped from the direct map. I
+> believe that work can be done outside of the SNP series. I am okay to
+> drop snp_mark_unmerable(), and until then, we just run with KSM
+> disabled. Thoughts?
+> 
+> thanks
