@@ -2,124 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B8DC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 16:58:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B6A6C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 17:04:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 649D46109E
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 16:58:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DC9761139
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 17:04:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238120AbhJMRBB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Oct 2021 13:01:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57046 "EHLO
+        id S235854AbhJMRGP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Oct 2021 13:06:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238064AbhJMRAw (ORCPT
+        with ESMTP id S234305AbhJMRGP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Oct 2021 13:00:52 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFAB2C061749
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 09:58:48 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id g5so2280894plg.1
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 09:58:48 -0700 (PDT)
+        Wed, 13 Oct 2021 13:06:15 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4968C061749
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 10:04:11 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id y7so3033666pfg.8
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 10:04:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=MUoKrGcGLIv4lsj8yIkvr9z3hdI9OO4fYaXMDY/s9e4=;
-        b=uz3prg1HuUeYXkunN46aUS+v3dYsKILB/foYmwnqhxQoSGnQ++/av9sIDK2iu+bNKr
-         J5PgQBOP4OfuHFfov97yEz0VlI3M1fMqxzOezwO0FjhSS8IULI91ny5FChRop5E5oD2P
-         39TQkFyHtSrjLohYvji+13Nh1eto8GqunP+Lf/Mnli9ef8MHakOSwt0gQkc+oSQ9YWEH
-         DhKeVOXx73cTgUXm/EHql3WUwz0dgyEGS1i6E3MeX3wEOOEqc6Fz9LgwXMXMQg1Quyqu
-         Lh2J1eboJt2lXCPyWFC3m9xB1msPucqzKj2L3oXxqi8JskRpFFv3n6XzxmtdivT4mQqj
-         yevw==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Qs+5DwWD1Rx+vv/W6o07LrnjErzTT76oQHuQLcyI2hw=;
+        b=iyi+jmtEHIugaiDUUT/ucFx2GgoKITe+iiAKP+UeA2kIYn5Oc7iTNmdlUPuAYBXHMg
+         4MLWuzuM3NM9E/XDdI5IuqfCDOcalnolG6fHKtDPlXZ8Jr6+9XOFp293MZv1NgS6A/f0
+         zc02ms2LlZqelekf9K2K6ljGwUddKjxNnQggwQObUWxssXgDrH8JaVVk2pz40U6x+dYp
+         lz3vMXh62wXBRKV7LVxhSV7ojsMuIsJZ6y+S/8cVa8Wgb9Q7PD0wPtaEO9BDYRDOXzDf
+         lgMuF5UjeQkAqK91hdmmxLDRcOnVfze/5wOnvYQ3hxxE/PXEzriR+C244xVX7fATAJtr
+         /41w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=MUoKrGcGLIv4lsj8yIkvr9z3hdI9OO4fYaXMDY/s9e4=;
-        b=KfCJCUiGsIgbV/YhbNLzgHc7qap27iilU10KjyovlrWXUHnt/yE2o3pjv7RH6s69p1
-         l+cuj8r4KZFCuKiOvm0LAsNssg+zE56l9kOL2V4bUiOBniDaF+ip4dPqQGKQnSyAQiqA
-         5Lsr1sIwI/A36c6K+7KwmA0ZobDHXE1ybiNTt2w149289WZZ+Ruhakwclq4n9DnaqCg5
-         pCzwLA9JZ7LN/EnbGSFFQKrU8QlNWEWym2vPKjWoEPVfC1ODQLJOXCSSJEuLA13v/nNu
-         O06Q+YsJsSxJ2HRM9ebAh+w4rrLcjg87UgRwtnNXCE8sUqYeNQhGzGVSjXR30xaYdlgX
-         Fqrw==
-X-Gm-Message-State: AOAM530CNIBLUoNmyBcrx8iums69lCWw53eGE0Dhuwkf4VEHgKajt9L4
-        vWpsaDQsBKvNORC/K9bBuTl3Qg==
-X-Google-Smtp-Source: ABdhPJyK2z8cX7c0EYkxG+jtF4nxOaRP127Xwod0uI/2UUuARE1XdH4NAKcpTeCJhYNS+bIemLT0hQ==
-X-Received: by 2002:a17:90b:4d8e:: with SMTP id oj14mr6111763pjb.237.1634144328439;
-        Wed, 13 Oct 2021 09:58:48 -0700 (PDT)
-Received: from localhost.name ([122.161.48.68])
-        by smtp.gmail.com with ESMTPSA id z11sm6661602pjl.45.2021.10.13.09.58.43
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Qs+5DwWD1Rx+vv/W6o07LrnjErzTT76oQHuQLcyI2hw=;
+        b=lve6K+sHGQ1ym8xzBD6EyB4STLtnyUVbuDO14zIJGQpGnFeA5v+bYH0Nyrisg8nw7E
+         YXhrlLwqjG1wRDccl99KuuiG3/qB2l3o8e135P3Q8dnDe3RKPXw7uMMAzAlCn8BEZhGT
+         pLY8mAchmIlZ1AjIKOcF51/SfVCT+ZpHF7dw2j3PjFVF19NGi680rPbjNXBK0k0YR6vY
+         IhYmH2xsEw7kyXrkxzDje5/4shFlGbIShGlW892UEKbU+4Ibq41TzGqotRvesTHFa0Fe
+         1AUHLpBVsskSarfHan1Bo1GtdZmUXV7rN1l1QYp73ARgKD83F3JsxbL2Tp1cbZBsDtTM
+         tXzw==
+X-Gm-Message-State: AOAM5332AmqLxtGQfgyO/Y1sVq2o08og1c04dJMHVGrw5L6AC59vV/Mi
+        THG2huLyqPrVOpVG/xiLSWApKw==
+X-Google-Smtp-Source: ABdhPJxkQD+smtf/Sn/mUPp5u5h2BWQFhYFmVSmny/8OgT4A9WVg/lMu0U4st4H9LAK0FzKnJt5kJA==
+X-Received: by 2002:a63:1950:: with SMTP id 16mr253698pgz.346.1634144651005;
+        Wed, 13 Oct 2021 10:04:11 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id t14sm6393455pjl.10.2021.10.13.10.04.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 09:58:48 -0700 (PDT)
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-To:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
-        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-        robh+dt@kernel.org, agross@kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, Thara Gopinath <thara.gopinath@linaro.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>
-Subject: [PATCH 2/2] arm64/dts: qcom: sm8150: Add dt entries to support crypto engine.
-Date:   Wed, 13 Oct 2021 22:28:23 +0530
-Message-Id: <20211013165823.88123-3-bhupesh.sharma@linaro.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211013165823.88123-1-bhupesh.sharma@linaro.org>
-References: <20211013165823.88123-1-bhupesh.sharma@linaro.org>
+        Wed, 13 Oct 2021 10:04:10 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 17:04:06 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 37/45] KVM: SVM: Add support to handle MSR based
+ Page State Change VMGEXIT
+Message-ID: <YWcRhrxLUXfHRig7@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-38-brijesh.singh@amd.com>
+ <YWYCrQX4ZzwUVZCe@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YWYCrQX4ZzwUVZCe@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add crypto engine (CE) and CE BAM related nodes and definitions to
-"sm8150.dtsi".
+On Tue, Oct 12, 2021, Sean Christopherson wrote:
+> If we are unable to root cause and fix the bug, I think a viable workaround would
+> be to clear the hardware present bit in unrelated SPTEs, but keep the SPTEs
+> themselves.  The idea mostly the same as the ZAPPED_PRIVATE concept from the initial
+> TDX RFC.  MMU notifier invalidations, memslot removal, RMP restoration, etc... would
+> all continue to work since the SPTEs is still there, and KVM's page fault handler
+> could audit any "blocked" SPTE when it's refaulted (I'm pretty sure it'd be
+> impossible for the PFN to change, since any PFN change would require a memslot
+> update or mmu_notifier invalidation).
+> 
+> The downside to that approach is that it would require walking all SPTEs to do a
+> memslot deletion, i.e. we'd lose the "fast zap" behavior.  If that's a performance
+> issue, the behavior could be opt-in (but not for SNP/TDX).
 
-Cc: Thara Gopinath <thara.gopinath@linaro.org>
-Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-Cc: Rob Herring <robh+dt@kernel.org>
-Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
----
- arch/arm64/boot/dts/qcom/sm8150.dtsi | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/qcom/sm8150.dtsi b/arch/arm64/boot/dts/qcom/sm8150.dtsi
-index ef0232c2cf45..2f7ce1fdad55 100644
---- a/arch/arm64/boot/dts/qcom/sm8150.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm8150.dtsi
-@@ -3549,6 +3549,34 @@ wifi: wifi@18800000 {
- 			iommus = <&apps_smmu 0x0640 0x1>;
- 			status = "disabled";
- 		};
-+
-+		cryptobam: dma-controller@1dc4000 {
-+			compatible = "qcom,bam-v1.7.0";
-+			reg = <0 0x01dc4000 0 0x24000>;
-+			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-+			#dma-cells = <1>;
-+			qcom,ee = <0>;
-+			qcom,controlled-remotely;
-+			iommus = <&apps_smmu 0x504 0x0011>,
-+				 <&apps_smmu 0x506 0x0011>,
-+				 <&apps_smmu 0x514 0x0011>,
-+				 <&apps_smmu 0x516 0x0011>;
-+			interconnects = <&aggre2_noc MASTER_CRYPTO_CORE_0 &mc_virt SLAVE_EBI_CH0>;
-+			interconnect-names = "memory";
-+		};
-+
-+		crypto: crypto@1dfa000 {
-+			compatible = "qcom,sm8150-qce";
-+			reg = <0 0x01dfa000 0 0x6000>;
-+			dmas = <&cryptobam 4>, <&cryptobam 5>;
-+			dma-names = "rx", "tx";
-+			iommus = <&apps_smmu 0x504 0x0011>,
-+				 <&apps_smmu 0x506 0x0011>,
-+				 <&apps_smmu 0x514 0x0011>,
-+				 <&apps_smmu 0x516 0x0011>;
-+			interconnects = <&aggre2_noc MASTER_CRYPTO_CORE_0 &mc_virt SLAVE_EBI_CH0>;
-+			interconnect-names = "memory";
-+		};
- 	};
- 
- 	timer {
--- 
-2.31.1
-
+Another option if we introduce private memslots is to preserve private memslots
+on unrelated deletions.  The argument being that (a) private memslots are a new
+feature so there's no prior uABI to break, and (b) if not zapping private memslot
+SPTEs in response to the guest remapping a BAR somehow breaks GPU pass-through,
+then the bug is all but guaranteed to be somewhere besides KVM's memslot logic.
