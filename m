@@ -2,306 +2,177 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 620AAC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 11:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C98C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 11:46:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 49948610CB
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 11:34:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FFBF61130
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 11:46:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229715AbhJMLgB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Oct 2021 07:36:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43820 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229535AbhJMLgB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Oct 2021 07:36:01 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A11E861056;
-        Wed, 13 Oct 2021 11:33:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1634124838;
-        bh=HQKsM5+JxN3z7fyOH4PY/6KtY66RH98iqwIkPpr7pp4=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=UShiO4p2ZNEqVxTuBk6kFbR2B00UaMlAvlLYQnZahYzzR2pWxODYirJ55Ppvc4wcb
-         TbsHJjV6yBuou71KQ85auBUjZSwjeGda875UjLN7pwgf34k/EH2knu8OabkXl897I6
-         d38KzzByzeedoIWV/dOugDUDl6DilZq//3uEMWjKd9CwvbS4Qozhkn8DshWNKQBTv1
-         2O/FPQuHxfdQqcncfqcRRrj5kN+rqJ+5UArlW1uDTv4ePzGur9CO7NwFRq4T1/KEQq
-         aWFCcH5AR4qBg0rsV6uekaLWSPeuu9SbuPW4oDnE1b1kYx2Q3hiZfUMs5RsbVbgQOk
-         /xhQrHdqpvXyQ==
-Date:   Wed, 13 Oct 2021 06:33:56 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>,
-        linux-pci <linux-pci@vger.kernel.org>,
-        Sascha Hauer <kernel@pengutronix.de>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        id S229571AbhJMLsz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Oct 2021 07:48:55 -0400
+Received: from mail-mw2nam10on2085.outbound.protection.outlook.com ([40.107.94.85]:35169
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232486AbhJMLsr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Oct 2021 07:48:47 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BTpchfUGV1UaEAJyLLLtSRozmCAaMcdFokFWSlnYGHAmeN86IuY3mbPsUNYTkgk0HD0Hj54nLSPhaiZDjNWz/jjzvR4aIXmM/xXcc3py2wCLaDWOXgYUGvyiinARtWePZIysbQ/EbHJOtjRIae/2QsbEpjnebYPeBcJPziJRemfHcwKn8AMbr/RO6SLVbL56ofzBiIvECxdZ8LRqcMdyxhq5M0+hGwMqZ+v5V+yMAjQxVwb5cCq1ljS5hNTiRQQMyTKNwyiWe8NonssqY+pKUKlIlcCubPBPp2pBVGUTzk8+o/ll8HH0w/eZrofXyYH/eKuCZ7a/Jjmqmim2CAwLag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zlL4hUkF7PF0UWQnOh7LuyYVPo/v6vZ5Vc1exUBkw3E=;
+ b=XIwFkXqAqVeFmdKi+ESqRkVuJD4lfbkLJKgVkEre8lXDq/imwtnabn1s/LhTECN9SrvtP/0UUDaC4yjm4KEh8Wd2x+ZkSarxzAiT2cm1r2E1R6AFt9jxXBmSo2KfYuENzzzKtsHxZtKoSgbuT8la6gQFLBKhWmfuJbnVxmoY0V8F1Qwxh+hM/QQET6H+kKTPUx11Y8VgJIrA4TZOIGxHyBAapzHC/xXWu08GNq9JTvbzXYeZ7zI+pMVYCZXjXGZgT8O20qEbFN2V7r2QSSob7ltsS3ZaAG5OvR0BdP2wo9QC5+S6cWnKq8lk3jBo8jecoR4FgyX1yknfvyYxi0JGrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zlL4hUkF7PF0UWQnOh7LuyYVPo/v6vZ5Vc1exUBkw3E=;
+ b=E59xqah+u9Oho9cldUCeddnUj5ID3/T4yiHfvz3AbiPC2gxj9rpjH1YRm+otOq2qf1Y3PuO2oRcSFg6/L4DpfUIfTRYoLcLrsVZZShtBeNEMntvNu/Heva7yNT4y5HJcxgkBhtq5VuCwon9Rl/cduvcT/WVPBu2a8sKUT+9gmds=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SN6PR12MB2782.namprd12.prod.outlook.com (2603:10b6:805:73::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.19; Wed, 13 Oct
+ 2021 11:46:42 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4587.026; Wed, 13 Oct 2021
+ 11:46:42 +0000
+Cc:     brijesh.singh@amd.com,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        Marc Orr <marcorr@google.com>, Joerg Roedel <jroedel@suse.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ido Schimmel <idosch@nvidia.com>,
-        Ingo Molnar <mingo@redhat.com>, Jack Xu <jack.xu@intel.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Jiri Olsa <jolsa@redhat.com>, Jiri Pirko <jiri@nvidia.com>,
-        Juergen Gross <jgross@suse.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Mathias Nyman <mathias.nyman@intel.com>,
-        Michael Buesch <m@bues.ch>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Russell Currey <ruscur@russell.cc>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
-        Vadym Kochan <vkochan@marvell.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-perf-users@vger.kernel.org,
-        "open list:LINUX FOR POWERPC PA SEMI PWRFICIENT" 
-        <linuxppc-dev@lists.ozlabs.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        USB <linux-usb@vger.kernel.org>,
-        "open list:TI WILINK WIRELES..." <linux-wireless@vger.kernel.org>,
-        MPT-FusionLinux.pdl@broadcom.com, netdev <netdev@vger.kernel.org>,
-        oss-drivers@corigine.com, qat-linux@intel.com,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v6 00/11] PCI: Drop duplicated tracking of a pci_dev's
- bound driver
-Message-ID: <20211013113356.GA1891412@bhelgaas>
+        David Rientjes <rientjes@google.com>,
+        John Allen <john.allen@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: ccp - Consolidate sev INIT logic
+To:     Peter Gonda <pgonda@google.com>
+References: <20211005195213.2905030-1-pgonda@google.com>
+ <fdf0c263-38e9-7780-d0ac-943b6d2dd3a3@amd.com>
+ <CAMkAt6piNiJdHDMzSqgm-aQ0o-xxM=ax4qMgn81fKzVuaNukPg@mail.gmail.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <54f66e72-a33a-2f07-fe51-992ba0c7444c@amd.com>
+Date:   Wed, 13 Oct 2021 06:46:39 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.14.0
+In-Reply-To: <CAMkAt6piNiJdHDMzSqgm-aQ0o-xxM=ax4qMgn81fKzVuaNukPg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: SA0PR13CA0023.namprd13.prod.outlook.com
+ (2603:10b6:806:130::28) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHp75Vd0uYEdfB0XaQuUV34V91qJdHR5ARku1hX_TCJLJHEjxQ@mail.gmail.com>
+Received: from Brijeshs-MacBook-Pro.local (165.204.77.11) by SA0PR13CA0023.namprd13.prod.outlook.com (2603:10b6:806:130::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.15 via Frontend Transport; Wed, 13 Oct 2021 11:46:40 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 225d53de-37b4-46f4-5cb5-08d98e3f2003
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2782:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN6PR12MB2782B12A1FBFF430FC23BD3AE5B79@SN6PR12MB2782.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1923;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oi3FSY9ywUCnnBvJOpMrMnsDzyUEjVvcWSrY5xgUfjEwv3+OVqEGkIL2y46LCBQkL9/83uv+zzPMDurmnki1Pt1yqyfucJkSESgPAIYOnfv72/orPNK1IWB67ECeT6j8X91dGMXakvSPvufBYroTNd3uxybudFbOlDR/6tl9TN+NOX5/tklNqcyTJnhWqgFXXStw5/1n/GzmOGm8YZkvc5aF5UaGcYgyl+7KaYzoco4fnLAZGuraaoGanpdZ6bXoUhge3OROToj+bfBmApXa+cjUSyv+0PiNvwsbimtaSc4iDJ/yzEtGGqq51wT3Jzb1XNbMcchwO6TLdM8xVJFNAs5GrFmVlnjnA4LAVIJ98W2cRMsLCc0dJPR90K0BVdITMTrhBZhHkoefU5Sf/vS4r2Mwo9KS3VHft2b3Yk0Z5Llip1alCw9jAhmAN6vBtr8VdB97GqsrGfCz3NJMM7Lg//L++V0V76Nuo3pm/t37/XQZiWPVL/QekgWHVoVPvlp323ci8AWrQdVKJH3RzZ0dQfsQ8JU1GEWh8yjHRv3894O1potrdcwDT03h4xFlQdTaPncUtpc0cEYZa6VCHSV40Gni8PSepsZBUX7KpG9LKZQcLV2Y8kBiWsIERI0qJZB/RR1j8s7EvQxNEKxkI2nfyxWxqFOqx5Fu8mJGCSIzux+DviJJzhpLzlrpp+MUNwUiRSWViLOmg2kx7KJtPK8DfYuqaCi797doRhuYZwAthnB0MQiEtW4r7v0aVK8SX542
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(5660300002)(31686004)(508600001)(38100700002)(31696002)(316002)(26005)(54906003)(2616005)(44832011)(8936002)(956004)(83380400001)(86362001)(2906002)(8676002)(66556008)(66946007)(6506007)(6486002)(66476007)(4326008)(6512007)(36756003)(53546011)(6916009)(186003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OXE2bHZwcmwvWktiNmtVWnhGWHNRQXBScWhqZ1kvUHZsc1NaejhDQy9jYVdn?=
+ =?utf-8?B?bk1WT3pxMS9ZZGxRS1BJNkhOT3RZNlRxL0p4clFsUUZteXlOSm4vZmQ5ekRX?=
+ =?utf-8?B?NHFoUVgwbnVpTEkxM2hvdXdxMi9MTk9NaFB2UzBTbmRkbEI0ZFFleGF2Kzlv?=
+ =?utf-8?B?bjFTNk9POWgxQk9hSktndmpJY2V3Mmk2amtURnVHajhPSGdTbHprVTU2aVVH?=
+ =?utf-8?B?V01KSEVZYnNMZ0VNV1dwZzZmcldNSDhIM0krTm51YXB4Q0F1czNObW02WHl5?=
+ =?utf-8?B?cnF5Nmpad0VoZEtibmJ4UVpuOVN0cTlLQWpLV1NjVUp3TnRSbmNzakg1cXgz?=
+ =?utf-8?B?SDVUQWUxeFNyZElZYmpaTVZOOS9WM0J4SjhHZHgxUHFOR2ozTEF5UXdqUDBz?=
+ =?utf-8?B?bDYxakFWVFp4MFNjd01sUFFWQk5iN0ZhNEhDTEZaaVZWYlVneXVmWWlDM29n?=
+ =?utf-8?B?RnZuRDEyUXkzZys3OGlMWER3NW5wS1RrWXJQSWR4Mm42NTZjMVlBd1kvT3JU?=
+ =?utf-8?B?SUZ5Z1JoTkpxUGMySE9VNGJQUzBrc1U5WVcxd0RhbmpvUGdYUTM4SEx1dHlF?=
+ =?utf-8?B?MEpZZ3lVTkRMbFBRZjlLaUpvVkpnNDFpUnN1MHdTVGMrSDYrVVNIUi9DSUpw?=
+ =?utf-8?B?cU54UGZRdU0xYXdSaVcyQlRYdXZTODk0eEY3Sml1bW00cm03NkVVWmc4Mitm?=
+ =?utf-8?B?UEtzYlZ2TFpJUithbHRSMTBjaFpZTTFPait5YXhTZ2x1TkNRL1pBdC9UV3Y0?=
+ =?utf-8?B?MHY2aHR2TXJxMldQcFd0T1FsTmRZV0taVGIzdC9PNy9rUzZ6Tkp0S0RNKytk?=
+ =?utf-8?B?eVRVcUp5TERvTDByZGoxMnpVei9lTkJhaGZwRENxMkxqbitsOTdJQ29mQURz?=
+ =?utf-8?B?L0ZGdHRkK1pnMTducWRNV1pxTWVDMTJTa3Nwb3lMR28rUlBPTklKQzlTS2Nu?=
+ =?utf-8?B?WDBYZ3gvKy83NWRpQld1dkpwc05QbjBzOVM0eXRvOGZ4NVJHZ3BYMnpOajVI?=
+ =?utf-8?B?MFNmTU1oYTh3ME1kempxeVQ1UEtjSm56RktGdUJzUk5OY00ycGQ1RFBBekZW?=
+ =?utf-8?B?RjJFaDBZMHRrVWFzUGY0QnFoNHI4a21PaE44c0pNQ29RQWl0VUFNUDB4emY3?=
+ =?utf-8?B?TEdsZGhWVnBacU1zbzhkNytpdjVVY245MTNOVUsyVnROZWxzR2RvVzJ3b29F?=
+ =?utf-8?B?WkhjRmJmRzhFWjYrcXY2dXM1QmtCek5icTI2KzNyMWlBQzh1d1MxK1Y5bFZP?=
+ =?utf-8?B?Y1FTQnBtSU5hOW04M3RQTU1HRjB3UHptZkpMVDdDMXdxUzJMRmQxYnlVc0pt?=
+ =?utf-8?B?NmZha0RTODhLR3BNQU9OSUVGSnZkRlltSXVWWVQrODk2YXhkam5ZY2ZUMm56?=
+ =?utf-8?B?cWNPVUhkU0JwaUFaNmdGWHFZdzlML3JxZmIva0ZOYVZvQVZjbVpaVExQZllT?=
+ =?utf-8?B?NDdCdVdGam9hVXdBVEIvR1hQSWxPWGkxL1hWY1pNU0N3NktmVnhkWU5tZkNk?=
+ =?utf-8?B?QXpKY3VEeGcxclZ6TkwyRy80QlB0SzRpSWhDYlJ3SkxNNXQ0YUM0L1A0ZUJ1?=
+ =?utf-8?B?Uzg3TTZWNGdDSXM0d3hlQm9wS1NzVGJsVXZPcFhjR3VzT2dyQ1ZNYk1TeHcx?=
+ =?utf-8?B?QWtUbEx4OWROSHRSc1FUNThpTUN2YWEvNzNIYUl6U0ZSZW1aazU4bS9tNWlh?=
+ =?utf-8?B?RXplRzE5S2tHVEpYTWNrdDVnWmpIbzZCdlJlN09TNUVqMS8yUTFpcG5GNGxQ?=
+ =?utf-8?Q?nhr3WrdsFD7HG+hzdMLP288sfrszUdAIdPtYWNB?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 225d53de-37b4-46f4-5cb5-08d98e3f2003
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2021 11:46:42.1750
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: a6W6pgi+nbBi8zaypZOn7FtvqAneRnojkGqp0T5yHXpCKVtqKxhTxUQRHP6/92Q6EHhf/OFORpjPJtXyzr4/Cg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2782
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 12:26:42PM +0300, Andy Shevchenko wrote:
-> On Wed, Oct 13, 2021 at 2:33 AM Bjorn Helgaas <helgaas@kernel.org> wrote:
-> > On Mon, Oct 04, 2021 at 02:59:24PM +0200, Uwe Kleine-König wrote:
-> 
-> > I split some of the bigger patches apart so they only touched one
-> > driver or subsystem at a time.  I also updated to_pci_driver() so it
-> > returns NULL when given NULL, which makes some of the validations
-> > quite a bit simpler, especially in the PM code in pci-driver.c.
-> 
-> It's a bit unusual. Other to_*_dev() are not NULL-aware IIRC.
 
-It is a little unusual.  I only found three of 77 that are NULL-aware:
+On 10/12/21 7:34 AM, Peter Gonda wrote:
+> On Fri, Oct 8, 2021 at 9:52 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>>
+>> On 10/5/21 12:52 PM, Peter Gonda wrote:
+>>> +static int sev_init_if_required(int cmd_id, bool writable,
+>>> +                             struct sev_issue_cmd *argp)
+>>> +{
+>>> +     struct sev_device *sev = psp_master->sev_data;
+>>> +
+>>> +     lockdep_assert_held(&sev_cmd_mutex);
+>>> +
+>>> +     if (!writable)
+>>> +             return -EPERM;
+>>> +
+>>> +     if (cmd_id == SEV_FACTORY_RESET || cmd_id == SEV_PLATFORM_STATUS ||
+>>> +         cmd_id == SEV_GET_ID || cmd_id == SEV_GET_ID2)
+>>> +             return 0;
+>>> +
+>>> +     if (sev->state == SEV_STATE_UNINIT)
+>>> +             return __sev_platform_init_locked(&argp->error);
+>>> +
+>>> +     return 0;
+>>> +}
+>>> +
+>>>  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>>>  {
+>>>       void __user *argp = (void __user *)arg;
+>>> @@ -840,8 +825,11 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>>>
+>>>       mutex_lock(&sev_cmd_mutex);
+>>>
+>>> -     switch (input.cmd) {
+>>> +     ret = sev_init_if_required(input.cmd, writable, &input);
+>>> +     if (ret)
+>>> +             goto copy_out;
+>> We need to call this function only for the SEV commands (i.e input.cmd
+>>> =0 && input.cmd <= SEV_GET_ID2). Otherwise a invalid command may
+>> trigger SEV_INIT. e.g below sequence:
+>>
+>> 1) SEV_FACTORY_RESET   // this will transition the fw to UNINIT state.
+>>
+>> 2) <INVALID_CMD_ID>   // since fw was in uninit this invalid command
+>> will initialize the fw and then later switch will fail.
+> Good catch, I took Marc's suggested approach for a V2. Does that sound
+> reasonable?
 
-  to_moxtet_driver()
-  to_siox_driver()
-  to_spi_driver()
+Yes, that works.
 
-It seems worthwhile to me because it makes the patch and the resulting
-code significantly cleaner.  Here's one example without the NULL
-check:
+thanks
 
-  @@ -493,12 +493,15 @@ static void pci_device_remove(struct device *dev)
-   static void pci_device_shutdown(struct device *dev)
-   {
-          struct pci_dev *pci_dev = to_pci_dev(dev);
-  -       struct pci_driver *drv = pci_dev->driver;
 
-          pm_runtime_resume(dev);
-
-  -       if (drv && drv->shutdown)
-  -               drv->shutdown(pci_dev);
-  +       if (pci_dev->dev.driver) {
-  +               struct pci_driver *drv = to_pci_driver(pci_dev->dev.driver);
-  +
-  +               if (drv->shutdown)
-  +                       drv->shutdown(pci_dev);
-  +       }
-
-  static void pci_device_shutdown(struct device *dev)
-  {
-    struct pci_dev *pci_dev = to_pci_dev(dev);
-
-    pm_runtime_resume(dev);
-
-    if (pci_dev->dev.driver) {
-      struct pci_driver *drv = to_pci_driver(pci_dev->dev.driver);
-
-      if (drv->shutdown)
-        drv->shutdown(pci_dev);
-    }
-
-and here's the same thing with the NULL check:
-
-  @@ -493,7 +493,7 @@ static void pci_device_remove(struct device *dev)
-   static void pci_device_shutdown(struct device *dev)
-   {
-          struct pci_dev *pci_dev = to_pci_dev(dev);
-  -       struct pci_driver *drv = pci_dev->driver;
-  +       struct pci_driver *drv = to_pci_driver(dev->driver);
-
-  static void pci_device_shutdown(struct device *dev)
-  {
-    struct pci_dev *pci_dev = to_pci_dev(dev);
-    struct pci_driver *drv = to_pci_driver(dev->driver);
-
-    pm_runtime_resume(dev);
-
-    if (drv && drv->shutdown)
-      drv->shutdown(pci_dev);
-
-> >  static bool match_id(struct pci_dev *pdev, unsigned short vendor, unsigned short device)
-> >  {
-> > +       struct pci_driver *drv = to_pci_driver(pdev->dev.driver);
-> >         const struct pci_device_id *id;
-> >
-> >         if (pdev->vendor == vendor && pdev->device == device)
-> >                 return true;
-> 
-> > +       for (id = drv ? drv->id_table : NULL; id && id->vendor; id++)
-> > +               if (id->vendor == vendor && id->device == device)
-> 
-> > +                       break;
-> 
-> return true;
-> 
-> >         return id && id->vendor;
-> 
-> return false;
-
-Good cleanup for a follow-up patch, but doesn't seem directly related
-to the objective here.  The current patch is:
-
-  @@ -80,7 +80,7 @@ static struct resource video_rom_resource = {
-    */
-   static bool match_id(struct pci_dev *pdev, unsigned short vendor, unsigned short device)
-   {
-  -       struct pci_driver *drv = pdev->driver;
-  +       struct pci_driver *drv = to_pci_driver(pdev->dev.driver);
-          const struct pci_device_id *id;
-
-          if (pdev->vendor == vendor && pdev->device == device)
-
-> >         device_lock(&vf_dev->dev);
-> > -       if (vf_dev->dev.driver) {
-> > +       if (to_pci_driver(vf_dev->dev.driver)) {
-> 
-> Hmm...
-
-Yeah, it could be either of:
-
-  if (to_pci_driver(vf_dev->dev.driver))
-  if (vf_dev->dev.driver)
-
-I went back and forth on that and went with to_pci_driver() on the
-theory that we were testing the pci_driver * before and the patch is
-more of a mechanical change and easier to review if we test the
-pci_driver * after.
-
-> > +               if (!pci_dev->state_saved && pci_dev->current_state != PCI_D0
-> 
-> > +                   && pci_dev->current_state != PCI_UNKNOWN) {
-> 
-> Can we keep && on the previous line?
-
-I think this is in pci_legacy_suspend(), and I didn't touch that line.
-It shows up in the interdiff because without the NULL check in
-to_pci_driver(), we had to indent this code another level.  With the
-NULL check, we don't need that extra indentation.
-
-> > +                       pci_WARN_ONCE(pci_dev, pci_dev->current_state != prev,
-> > +                                     "PCI PM: Device state not saved by %pS\n",
-> > +                                     drv->suspend);
-> >                 }
-> 
-> ...
-> 
-> > +       return drv && drv->resume ?
-> > +                       drv->resume(pci_dev) : pci_pm_reenable_device(pci_dev);
-> 
-> One line?
-
-I don't think I touched that line.
-
-> > +       struct pci_driver *drv = to_pci_driver(dev->dev.driver);
-> >         const struct pci_error_handlers *err_handler =
-> > -                       dev->dev.driver ? to_pci_driver(dev->dev.driver)->err_handler : NULL;
-> > +                       drv ? drv->err_handler : NULL;
-> 
-> Isn't dev->driver == to_pci_driver(dev->dev.driver)?
-
-Yes, I think so, but not sure what you're getting at here, can you
-elaborate?
-
-> >         device_lock(&dev->dev);
-> > +       pdrv = to_pci_driver(dev->dev.driver);
-> >         if (!pci_dev_set_io_state(dev, state) ||
-> > -               !dev->dev.driver ||
-> > -               !(pdrv = to_pci_driver(dev->dev.driver))->err_handler ||
-> 
-> > +               !pdrv ||
-> > +               !pdrv->err_handler ||
-> 
-> One line now?
-> 
-> >                 !pdrv->err_handler->error_detected) {
-> 
-> Or this and the previous line?
-
-Could, but the "dev->driver" to "to_pci_driver(dev->dev.driver)"
-changes are the heart of this patch, and I don't like to clutter it
-with unrelated changes.
-
-> > -       result = PCI_ERS_RESULT_NONE;
-> >
-> >         pcidev = pci_get_domain_bus_and_slot(domain, bus, devfn);
-> >         if (!pcidev || !pcidev->dev.driver) {
-> >                 dev_err(&pdev->xdev->dev, "device or AER driver is NULL\n");
-> >                 pci_dev_put(pcidev);
-> > -               return result;
-> > +               return PCI_ERS_RESULT_NONE;
-> >         }
-> >         pdrv = to_pci_driver(pcidev->dev.driver);
-> 
-> What about splitting the conditional to two with clear error message
-> in each and use pci_err() in the second one?
-
-Could possibly be cleaned up.  Felt like feature creep so I didn't.
-
-> >                 default:
-> >                         dev_err(&pdev->xdev->dev,
-> > -                               "bad request in aer recovery "
-> > -                               "operation!\n");
-> > +                               "bad request in AER recovery operation!\n");
-> 
-> Stray change? Or is it in a separate patch in your tree?
-
-Could be skipped.  The string now fits on one line so I combined it to
-make it more greppable.
-
-Bjorn
