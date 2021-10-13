@@ -2,125 +2,141 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D1B4C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 11:00:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42709C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 11:01:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26D90610E5
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 11:00:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F7ED610F8
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 11:01:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234170AbhJMLCa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Oct 2021 07:02:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56402 "EHLO
+        id S231200AbhJMLDU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Oct 2021 07:03:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234207AbhJMLCA (ORCPT
+        with ESMTP id S232206AbhJMLDR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Oct 2021 07:02:00 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44382C0613BD
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 03:57:27 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id g5so1555129plg.1
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 03:57:27 -0700 (PDT)
+        Wed, 13 Oct 2021 07:03:17 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D821C0613AE
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 04:00:15 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id o133so2094780pfg.7
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 04:00:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=05vhPGITK/dB937rYm1EGwoqzkoLVWtPqjC/WL9LiZw=;
-        b=S7V88jjVYtO0IXH6GQgzeyn/ZNIBkw/IeGiok2Aqbs8P0GiGGzyt9qvwqzs7QCrBvz
-         Z08fkLYmeALV/+fwJyo+xUqyllDQBJ+YZVTDu23ToaHzaldpRXvhiSP8QRhxyk0Z+noa
-         0mjgPf8MtRahtooLr2Q4vU1P+VtB8H0XRVA/ig5i9tih2OX2v4haYeu1kTQABafqz7hl
-         n4/qF5qPd7yqlZ8d5rAeKW+OV1qg0MJ7zo/NFgabAf870lbBAI1K0sZY8wuD2aKibKNK
-         Fh8yjgD3mnG99kynyoTG0/9P26LAM2LXd+2drz/Txkr8dv+K3ZNjTF3mZ+xNV93Jgptq
-         e5Tw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=nQQWQUgxuW6Tu+PRvCtkwuIVHgAhZ7y427FiGzCqW1I=;
+        b=zuDceFqPkzhsXg/5Ra0cCOC1bU0nBHOgMC+yisKtXJINh/T8f5KQ5Xk3tN1hEQWy1f
+         fF/5Ti7SlnxHTZ8CRdyv6Jl7qV6+yL697U37ZNkhKajiI+l/0MJiVPCdQ2f0nPB60e3l
+         deL9dfPtSkXLUF1i0K5lBK/jrlNzSLsedO4pErBw8lcHrmTQsFpVw/Kq9PVvZIU+2X3S
+         BjO3inmiQSb4KC3RcJr5s4SFs01LRfMOjiO3Y4IdS3Rj0CRwh+XHIqdFiSxlkBam0yxV
+         rxKuYNPGd/pLOsHpTEsqWBSUGsQm4kgH2TClaSNsf9ya4bJIDlxKTpNOca2+BLM7jp/t
+         D1tA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=05vhPGITK/dB937rYm1EGwoqzkoLVWtPqjC/WL9LiZw=;
-        b=s8l3OE7b8UC4ExFGZWYPHB67Z4SCqprH70+5FRSMfFcTQWqubOI6SExv9FRwwqMxRC
-         HUCrTcVnCzSk+fNh4JX/uxbgNtbFDSb7ozIYHpCQ/P7z0XJTyFudSlW1x/RxeaA94j2O
-         WgJZOFp0aZjkRLuitzfT/8xmfIN13REAHORa37CMcj5LzZ3ZKVOa7OalB5pidsF99mfK
-         dOQty7mgCmQHKSy29t/RRKmRv6TJGOT4uzSAvk9wFfxSM+unC3jxl9auz9Zp5tD12nS+
-         bYVIFTH/Rov44NqFVLXGkmSd4qtnDT7csx3DfOUf/k6CWPOBE44wl6NYCYvflSW+rEMY
-         /x5g==
-X-Gm-Message-State: AOAM532GUfQJ4exeUxDzCoVT+RRkIFkGFF4hbdrW4qvDlkmewFVaRfAb
-        QcNFJorldF76erJZNSa+luCY+A==
-X-Google-Smtp-Source: ABdhPJy7X0JUsQ14mPahK8LxYIB78D5vCGE4viyJztdJsBhPviLXJkoAmf3PKl1cq8YfgDAPbAfZ8g==
-X-Received: by 2002:a17:90a:6a8f:: with SMTP id u15mr12339071pjj.212.1634122646746;
-        Wed, 13 Oct 2021 03:57:26 -0700 (PDT)
-Received: from localhost.name ([122.161.48.68])
-        by smtp.gmail.com with ESMTPSA id b13sm6155351pjl.15.2021.10.13.03.57.22
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=nQQWQUgxuW6Tu+PRvCtkwuIVHgAhZ7y427FiGzCqW1I=;
+        b=GetWJ76FOxwkAbm5wlUdYdrGWHwZkz2vXYqDM9YYESm1G4UhlE7RvLGBir+tpNjfDL
+         1IM630NyVOV31OJgQxCWuQYPKSVo4sKxgacmmOgXxTN96xF2XJ+kqNqszCoYK42td1X/
+         EBReZ+OS/injker1Sjw631E2Ga9p/omkrh2Iol8Vr/n74FM2nDGkPMupMP4fq3QGKe0e
+         vWISj2YkOUt08a9h/IEeek9E6RUeQWvZPyjOAOqsPFr8+ynLvb16nwpoHcqBHIDwLT9A
+         64ZaWJnl3UpaHxKcZp8UedlzFSqeRozbdS2U8TNkLWsHVjIIjfkdUz2IQ0iD/VbFUauR
+         RuJg==
+X-Gm-Message-State: AOAM532SsD4kBeY1Vg55iZkI/YNtNSpeSIGvFlnQejInTkVawqo1dVMi
+        TjHrvY2cC2v3VWn8sBMqh5hKiw==
+X-Google-Smtp-Source: ABdhPJxhzjNSoABq+dGG77CzsRDyX+40KYVEdGsQI8qW5B1JHU6i8UmOJoBqJRMmoCIvhAQ+em8rxg==
+X-Received: by 2002:a63:2dc7:: with SMTP id t190mr27705777pgt.455.1634122814960;
+        Wed, 13 Oct 2021 04:00:14 -0700 (PDT)
+Received: from localhost ([106.201.113.61])
+        by smtp.gmail.com with ESMTPSA id g189sm5284657pfb.75.2021.10.13.04.00.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 03:57:26 -0700 (PDT)
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-To:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
-        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-        robh+dt@kernel.org, agross@kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, Thara Gopinath <thara.gopinath@linaro.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>
-Subject: [PATCH v4 20/20] arm64/dts: qcom: sm8250: Add dt entries to support crypto engine.
-Date:   Wed, 13 Oct 2021 16:25:41 +0530
-Message-Id: <20211013105541.68045-21-bhupesh.sharma@linaro.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211013105541.68045-1-bhupesh.sharma@linaro.org>
-References: <20211013105541.68045-1-bhupesh.sharma@linaro.org>
+        Wed, 13 Oct 2021 04:00:14 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 16:30:12 +0530
+From:   Viresh Kumar <viresh.kumar@linaro.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <20211013110012.3exppbls2wggqfhb@vireshk-i7>
+References: <20211013105226.20225-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
+User-Agent: NeoMutt/20180716-391-311a52
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add crypto engine (CE) and CE BAM related nodes and definitions to
-"sm8250.dtsi".
+On 13-10-21, 06:55, Michael S. Tsirkin wrote:
+> This will enable cleanups down the road.
+> The idea is to disable cbs, then add "flush_queued_cbs" callback
+> as a parameter, this way drivers can flush any work
+> queued after callbacks have been disabled.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/gpio/gpio-virtio.c                 | 2 +-
+>  drivers/i2c/busses/i2c-virtio.c            | 2 +-
 
-Cc: Thara Gopinath <thara.gopinath@linaro.org>
-Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-Cc: Rob Herring <robh+dt@kernel.org>
-Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
----
- arch/arm64/boot/dts/qcom/sm8250.dtsi | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Reviewed-by: Viresh Kumar <viresh.kumar@linaro.org>
 
-diff --git a/arch/arm64/boot/dts/qcom/sm8250.dtsi b/arch/arm64/boot/dts/qcom/sm8250.dtsi
-index 8c15d9fed08f..66cfd0b9c7e3 100644
---- a/arch/arm64/boot/dts/qcom/sm8250.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm8250.dtsi
-@@ -4103,6 +4103,34 @@ cpufreq_hw: cpufreq@18591000 {
- 
- 			#freq-domain-cells = <1>;
- 		};
-+
-+		cryptobam: dma-controller@1dc4000 {
-+			compatible = "qcom,bam-v1.7.0";
-+			reg = <0 0x01dc4000 0 0x24000>;
-+			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-+			#dma-cells = <1>;
-+			qcom,ee = <0>;
-+			qcom,controlled-remotely;
-+			iommus = <&apps_smmu 0x584 0x0011>,
-+				 <&apps_smmu 0x586 0x0011>,
-+				 <&apps_smmu 0x594 0x0011>,
-+				 <&apps_smmu 0x596 0x0011>;
-+			interconnects = <&aggre2_noc MASTER_CRYPTO_CORE_0 &mc_virt SLAVE_EBI_CH0>;
-+			interconnect-names = "memory";
-+		};
-+
-+		crypto: crypto@1dfa000 {
-+			compatible = "qcom,sm8250-qce";
-+			reg = <0 0x01dfa000 0 0x6000>;
-+			dmas = <&cryptobam 4>, <&cryptobam 5>;
-+			dma-names = "rx", "tx";
-+			iommus = <&apps_smmu 0x584 0x0011>,
-+				 <&apps_smmu 0x586 0x0011>,
-+				 <&apps_smmu 0x594 0x0011>,
-+				 <&apps_smmu 0x596 0x0011>;
-+			interconnects = <&aggre2_noc MASTER_CRYPTO_CORE_0 &mc_virt SLAVE_EBI_CH0>;
-+			interconnect-names = "memory";
-+		};
- 	};
- 
- 	timer {
 -- 
-2.31.1
-
+viresh
