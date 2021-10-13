@@ -2,206 +2,251 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C8EC4321E
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 16:00:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75169C43217
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 16:08:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE09460EE9
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 16:00:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58E89610C9
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 16:08:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237139AbhJMQCN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Oct 2021 12:02:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40115 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235119AbhJMQCL (ORCPT
+        id S236390AbhJMQKZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Oct 2021 12:10:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45258 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229514AbhJMQKY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Oct 2021 12:02:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634140808;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QCm5dOclxo0psHU4qKEkJZZeOXU3321uNZD2ahb33xs=;
-        b=BHjATy6fZP8ji4IGupauqNl0WwuhtgEHJ5Uvo41N7C5M7N8Uj7jryss0bo6TNq4OIi4Q4l
-        gDnny4txN/4x+z2INOe6gluUHretukxeipr9wZKzZ3Z2N2Geayq8RKiR7CmF6nQOUFkNta
-        Sqk16wgXDGlTSh4T0aJeS8g4mhBWmaI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-mA8UNxhUMH-mp4pDEwSlBg-1; Wed, 13 Oct 2021 12:00:06 -0400
-X-MC-Unique: mA8UNxhUMH-mp4pDEwSlBg-1
-Received: by mail-wr1-f71.google.com with SMTP id c4-20020a5d6cc4000000b00160edc8bb28so2353574wrc.9
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 09:00:06 -0700 (PDT)
+        Wed, 13 Oct 2021 12:10:24 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 435F5C061570;
+        Wed, 13 Oct 2021 09:08:21 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id u18so10157346wrg.5;
+        Wed, 13 Oct 2021 09:08:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc
+         :references:from:subject:in-reply-to:content-transfer-encoding;
+        bh=eX7yjJefdYC9EkA2tTv7QWyCDc8KjHPONkGSpJrjJ+4=;
+        b=Fh/+e/qKee/OC3Pdz/1y1XxQafvN08plEo51h2csXqSGGDsuhib/3q52O/b2mUKYD5
+         JdebSWNKT6si8Sukw4Qx+8ih9WTKC0gwi3GfkFRbHI6EeyXqJE0FsTGeXUReayK4yE2e
+         TkziOkGTOtRYd4TJa1tLgvOgk9Y6lOsINvu1SdTOMzmCgsASgncB3rl2yUw17BHiX3D3
+         QcRk6HlEJzzMklDt9srpG79X3vXuIGVi1KDfVk/jcoG9zQjuehhUqeZunxOg2qlS6+Hk
+         LfrVu7txywRk6tcN8W9WlMggmH0lj4y0usk1JWUu4Xxcdw+hwptpGNNoa3+H89F21m8B
+         tACg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:subject:in-reply-to
          :content-transfer-encoding;
-        bh=QCm5dOclxo0psHU4qKEkJZZeOXU3321uNZD2ahb33xs=;
-        b=KsSCnuEBiwR0eGYaomRanGtpIpnvel+wuOA2XZxxPxq0nKbxcuHJG1zavXJeuMbMh0
-         B2puWHt7j24pWFoGteYJ5913ewJWwxzf0EUuBXb4udqMV5NA2nqBd1d+Gy3bCc9CEUPW
-         93dQaT968D4QJ7jDTcADhyD+WoDEhp7S6WeISuJSpOplmDf3zzQ6J9W7OzENDMhTmw/G
-         o0NMPEP527hhoqAwmqrH1wHodJ/0oAmzUidGmf/ZtYW51jFovyo/9XWAzYkugDgHygAL
-         wi2hSMG9YI9qvBxXed12GrT0RjTrCu6G/Sx4tz+PokwpHafuakQTbuoTyB08zoJGJQVU
-         L5Yg==
-X-Gm-Message-State: AOAM530rGa4xPSEU2jJGrcJRh1YkeZf0YFYFHm8AQhPWtwJFPbLjVoFe
-        orGOecQjCYpVHJH8t2LFbVYA7uKM0pAYAkxNoYzaAQu1Luuey47Rswn0lVVIQOVZk0v0NILdprd
-        F+2ftlU7FL/k8foJzLI264F9U
-X-Received: by 2002:adf:dc0d:: with SMTP id t13mr9669wri.158.1634140805532;
-        Wed, 13 Oct 2021 09:00:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyItkbAA3kGIqmmHgTgrrpf9fCG54WlJV2+wdefB9WU28Q546eZydpGXWHl2Ou3h6lUqYc/hA==
-X-Received: by 2002:adf:dc0d:: with SMTP id t13mr9603wri.158.1634140805309;
-        Wed, 13 Oct 2021 09:00:05 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c6774.dip0.t-ipconnect.de. [91.12.103.116])
-        by smtp.gmail.com with ESMTPSA id n17sm6521wrq.11.2021.10.13.09.00.02
+        bh=eX7yjJefdYC9EkA2tTv7QWyCDc8KjHPONkGSpJrjJ+4=;
+        b=RamnbcasvGQ4OTXtjwguAGnvvMYtQ3wisL7ulgmwjvZX1obP54QQkOTL0NeP3i9dsY
+         kCy6+ixgCMGc8qe9+wImQoBJrvjHGoSRhojAm80CT7pdF11UwLNYsLpdg2YHYUT4L7NU
+         /0zRr5J5pIAyQS/eoXS6FD5/o3Qps861YJLQNBBBCpLiyumVZUrH7eJbBZaUa/0vC+iP
+         R7fuzhTQUJvDSLeUyQVvpiSUp5TeqdEjvO12q9Z9pKG6fw5Jtv+zu/VZA+cUpjcw5hVq
+         ybDWj67VP4YM3CNu6XGfZbpzCfG+L8aDaghnUohQ3xiEwsnowpMzy8eYSuzM+kNREmsh
+         DjRA==
+X-Gm-Message-State: AOAM5313GtDGsYgmIxSdjmPoBTA3zf8nuwrag9bIHiwObHtbZg2Bgz3I
+        e+yvraAGn/cBczudnyDCBjI=
+X-Google-Smtp-Source: ABdhPJyc2za+pLb2K8Q2vROq1u9HYfBpwC559+1Sp0MAfUmCphOwF4O3hP79hd0gYRqn2x2KDgvh0Q==
+X-Received: by 2002:adf:aadc:: with SMTP id i28mr44424wrc.320.1634141299580;
+        Wed, 13 Oct 2021 09:08:19 -0700 (PDT)
+Received: from ?IPV6:2620:113:80c0:8000:c::779? (nat0.nue.suse.com. [2001:67c:2178:4000::1111])
+        by smtp.gmail.com with ESMTPSA id 25sm5565503wmo.18.2021.10.13.09.08.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Oct 2021 09:00:04 -0700 (PDT)
-Message-ID: <cf511a7f-531f-4555-d7b4-cb171a615fdd@redhat.com>
-Date:   Wed, 13 Oct 2021 18:00:01 +0200
+        Wed, 13 Oct 2021 09:08:18 -0700 (PDT)
+Message-ID: <8348ed3e-c561-ad7e-fe9e-a31ed346d8d0@gmail.com>
+Date:   Wed, 13 Oct 2021 18:08:17 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+ Thunderbird/91.1.2
 Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gonglei <arei.gonglei@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        "Enrico Weigelt, metux IT consult" <info@metux.net>,
-        Viresh Kumar <vireshk@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
-        alsa-devel@alsa-project.org
-References: <20211013105226.20225-1-mst@redhat.com>
- <2060bd96-5884-a1b5-9f29-7fe670dc088d@redhat.com>
- <20211013081632-mutt-send-email-mst@kernel.org>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20211013081632-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To:     Sam Shih <sam.shih@mediatek.com>
+Cc:     Ryder.Lee@mediatek.com, devicetree@vger.kernel.org,
+        enric.balletbo@collabora.com, fparent@baylibre.com,
+        gregkh@linuxfoundation.org, herbert@gondor.apana.org.au,
+        hsinyi@chromium.org, john@phrozen.org, linus.walleij@linaro.org,
+        linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-serial@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        linux@roeck-us.net, mpm@selenic.com, mturquette@baylibre.com,
+        robh+dt@kernel.org, sboyd@kernel.org, sean.wang@kernel.org,
+        seiya.wang@mediatek.com, wim@linux-watchdog.org
+References: <9552b0dc-337f-7edc-2997-50603dfe8bcd@gmail.com>
+ <20210924114046.26070-1-sam.shih@mediatek.com>
+ <bc29d5bc-9ce7-6147-a708-e6304249b600@gmail.com>
+ <315d7823aa108c909a3d36464fe54763b76ab2f4.camel@mediatek.com>
+From:   Matthias Brugger <matthias.bgg@gmail.com>
+Subject: Re: [v3,7/9] dt-bindings: arm64: dts: mediatek: Add mt7986 series
+In-Reply-To: <315d7823aa108c909a3d36464fe54763b76ab2f4.camel@mediatek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 13.10.21 14:17, Michael S. Tsirkin wrote:
-> On Wed, Oct 13, 2021 at 01:03:46PM +0200, David Hildenbrand wrote:
->> On 13.10.21 12:55, Michael S. Tsirkin wrote:
->>> This will enable cleanups down the road.
->>> The idea is to disable cbs, then add "flush_queued_cbs" callback
->>> as a parameter, this way drivers can flush any work
->>> queued after callbacks have been disabled.
->>>
->>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>> ---
->>>   arch/um/drivers/virt-pci.c                 | 2 +-
->>>   drivers/block/virtio_blk.c                 | 4 ++--
->>>   drivers/bluetooth/virtio_bt.c              | 2 +-
->>>   drivers/char/hw_random/virtio-rng.c        | 2 +-
->>>   drivers/char/virtio_console.c              | 4 ++--
->>>   drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
->>>   drivers/firmware/arm_scmi/virtio.c         | 2 +-
->>>   drivers/gpio/gpio-virtio.c                 | 2 +-
->>>   drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
->>>   drivers/i2c/busses/i2c-virtio.c            | 2 +-
->>>   drivers/iommu/virtio-iommu.c               | 2 +-
->>>   drivers/net/caif/caif_virtio.c             | 2 +-
->>>   drivers/net/virtio_net.c                   | 4 ++--
->>>   drivers/net/wireless/mac80211_hwsim.c      | 2 +-
->>>   drivers/nvdimm/virtio_pmem.c               | 2 +-
->>>   drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
->>>   drivers/scsi/virtio_scsi.c                 | 2 +-
->>>   drivers/virtio/virtio.c                    | 5 +++++
->>>   drivers/virtio/virtio_balloon.c            | 2 +-
->>>   drivers/virtio/virtio_input.c              | 2 +-
->>>   drivers/virtio/virtio_mem.c                | 2 +-
->>>   fs/fuse/virtio_fs.c                        | 4 ++--
->>>   include/linux/virtio.h                     | 1 +
->>>   net/9p/trans_virtio.c                      | 2 +-
->>>   net/vmw_vsock/virtio_transport.c           | 4 ++--
->>>   sound/virtio/virtio_card.c                 | 4 ++--
->>>   26 files changed, 39 insertions(+), 33 deletions(-)
->>>
->>> diff --git a/arch/um/drivers/virt-pci.c b/arch/um/drivers/virt-pci.c
->>> index c08066633023..22c4d87c9c15 100644
->>> --- a/arch/um/drivers/virt-pci.c
->>> +++ b/arch/um/drivers/virt-pci.c
->>> @@ -616,7 +616,7 @@ static void um_pci_virtio_remove(struct virtio_device *vdev)
->>>   	int i;
->>>           /* Stop all virtqueues */
->>> -        vdev->config->reset(vdev);
->>> +        virtio_reset_device(vdev);
->>>           vdev->config->del_vqs(vdev);
->>
->> Nit: virtio_device_reset()?
->>
->> Because I see:
->>
->> int virtio_device_freeze(struct virtio_device *dev);
->> int virtio_device_restore(struct virtio_device *dev);
->> void virtio_device_ready(struct virtio_device *dev)
->>
->> But well, there is:
->> void virtio_break_device(struct virtio_device *dev);
+Hi Sam,
+
+On 12/10/2021 12:29, Sam Shih wrote:
+> Hi
 > 
-> Exactly. I don't know what's best, so I opted for plain english :)
+> On Fri, 2021-10-08 at 15:53 +0200, Matthias Brugger wrote:
+>> Hi Sam,
+>>
+>> I'd advise to split this series in parts for:
+>> - basic device support via dts.
+>> - pinctrl driver + dts
+>> - clk driver + dts
+> 
+> Okay, I will split the patches that are still under review into the
+> above patch series.
+> 
+> But I have a dumb question, currently, we have some patches that have
+> been assigned version numbers.
+> If I want to seprate original patch series, and resend 3 new patch
+> series (basic / pinctrl / clock) according to your comment, if I want
+> to keep the preview change log, tags in the patch set:
+> 
+> like:
+> ---
+> v3: changed 'MT7986' to 'MT7986 series' in the commit message
+> v2: added an Acked-by tag
+> ---
+> 
+> Which version number should I use for these new patch series ?
+> 
 
-Fair enough, LGTM
+I'd use v4 keeping the change-log and adding a link with hint to v3 in the cover 
+letter.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+> Does the version number in corver-letter and the version number in each
+> patch need to be the same in the entire patch series ?
+> 
 
+Yes, otherwise the version number doesn't make to much sense.
 
--- 
-Thanks,
+> // (Original patch series/thread, version number is v3)
+> [PATCH v3 0/3] Add basic SoC support for mediatek mt7986
+>    [PATCH v3 1/3] dt-bindings: arm64: dts: mediatek: Add mt7986 series
+>    // (the version number has been updated to v5 previously)
+>    // (basic part only, not include pinctrl and clock nodes)
+>    [PATCH v5 2/3] arm64: dts: mediatek: add mt7986a support
+>    [PATCH v5 3/3] arm64: dts: mediatek: add mt7986b support
 
-David / dhildenb
+use v6 explaining where in the mailing list one can find v5.
 
+> 
+> // (New clock driver patch series)
+> [PATCH 0/3] Add clock driver support for mediatek mt7986
+>    [PATCH v3,1/3] dt-bindings: clock: mediatek: document clk bindings
+> for mediatek mt7986 SoC
+>    // (the version number has been updated to v3 previously)
+>    [PATCH v3 2/3] clk: mediatek: add mt7986 clock IDs
+>    [PATCH v2 3/3] clk: mediatek: add mt7986 clock support
+> 
+
+Same here, use v4.
+
+> // (New pinctrl driver patch series)
+> [PATCH 0/4] Add pinctrl driver support for mediatek mt7986
+>    // (the version number has been updated to v6 previously)
+>    [PATCH v6 1/4] dt-bindings: pinctrl: update bindings for MT7986 SoC
+>    // (the version number has been updated to v2 previously)
+>    [PATCH v2 2/4] pinctrl: mediatek: add support for MT7986 SoC
+>    [PATCH 3/4] arm64: dts: mediatek: add mt7986a pinctrl support
+>    [PATCH 3/4] arm64: dts: mediatek: add mt7986b pinctrl support
+> 
+
+use v7 here.
+
+>>
+>> I would also advise to not send new versions of patches as new
+>> threads and don't
+>> respond in the same thread. At least for me that breaks my workflow
+>> as I use b4.
+> 
+> If I don't respond to the next patch set in the same thread, should I
+> create an entire new patch series ?
+> 
+
+Respond to any review comments in the thread but once you are ready to send a 
+new version of the patch, send the whole series with an incremented
+
+> For example, if I want to update PATCH 2/3 in the bellows patch series,
+> and my PATCH 1/3 has been accepted by reviewer previously
+> 
+> [PATCH v2 0/3] Add basic SoC support for mediatek mt7986
+>    [PATCH v2 1/3] ...   (patch set v1, applied by matainer)
+
+beware: applied != accepted
+reviewer != maintainer
+
+if the patch got applied to some maintainer repo, then in the next version drop 
+that patch (it is already applied) but mention that in the cover letter.
+
+>    [PATCH v2 2/3] ...   (patch set v2, need to be upgrade to v3)
+>    [PATCH v2 3/3] ...   (patch set v1, waiting for review)
+> 
+
+This series would be v3, if 1/3 is applied, drop. 2/3 will have changes and 3/3 
+will be the same as in v2.
+
+> Is this correct to send patch mail to maintaiers for the above
+> situation ?
+> 
+> [PATCH v3 0/2] Add basic SoC support for mediatek mt7986
+>    [PATCH v3 1/2] ...   (patch set v3)
+>    [PATCH v3 2/2] ...   (still patch set v1, waiting for review)
+> 
+
+yes, that's how is expected you send your patches.
+
+Let me know if you have any further questions :)
+
+Regards,
+Matthias
+
+> 
+>>
+>> Regards,
+>> Matthias
+>>
+>>
+>> On 24/09/2021 13:40, Sam Shih wrote:
+>>> MT7986 series is Mediatek's new 4-core SoC, which is mainly for
+>>> wifi-router application. The difference between mt7986a and mt7986b
+>>> is that some pins do not exist on mt7986b.
+>>>
+>>> Signed-off-by: Sam Shih <sam.shih@mediatek.com>
+>>> Acked-by: Rob Herring <robh@kernel.org>
+>>>
+>>> ---
+>>> v3: changed 'MT7986' to 'MT7986 series' in the commit message
+>>> v2: added an Acked-by tag
+>>> ---
+>>>    Documentation/devicetree/bindings/arm/mediatek.yaml | 8 ++++++++
+>>>    1 file changed, 8 insertions(+)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/arm/mediatek.yaml
+>>> b/Documentation/devicetree/bindings/arm/mediatek.yaml
+>>> index 80a05f6fee85..a9a778269684 100644
+>>> --- a/Documentation/devicetree/bindings/arm/mediatek.yaml
+>>> +++ b/Documentation/devicetree/bindings/arm/mediatek.yaml
+>>> @@ -76,6 +76,14 @@ properties:
+>>>              - enum:
+>>>                  - mediatek,mt7629-rfb
+>>>              - const: mediatek,mt7629
+>>> +      - items:
+>>> +          - enum:
+>>> +              - mediatek,mt7986a-rfb
+>>> +          - const: mediatek,mt7986a
+>>> +      - items:
+>>> +          - enum:
+>>> +              - mediatek,mt7986b-rfb
+>>> +          - const: mediatek,mt7986b
+>>>          - items:
+>>>              - enum:
+>>>                  - mediatek,mt8127-moose
+>>>
+> 
+> Thanks,
+> Sam
+> 
