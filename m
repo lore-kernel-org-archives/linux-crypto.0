@@ -2,125 +2,177 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A52EC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 13:11:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83A2FC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 13:16:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2427561105
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 13:11:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BAD9610FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 13:16:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235119AbhJMNNG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Oct 2021 09:13:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60796 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234152AbhJMNNG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Oct 2021 09:13:06 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 75D69610FC;
-        Wed, 13 Oct 2021 13:11:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1634130662;
-        bh=teGcBvjkKcvW58YVaruBcXJovWJTtD1vxXWTSxfLepM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mXPe2vE1fb9Pn6GDKQbsAJEAsUG/rxFjdlElS6D7bjH5kak9/st7J7N15QfVPIlU/
-         jv/fD1vsHF6BENDGR6WV3qft2teF0clFGxJAkT2IrD7m4lQJHh9fGTz5ZJl5kWSqu6
-         iVnt+ASwodVsiaxj0Ex+MLzz8F8/aH5Oc53Xdasg=
-Date:   Wed, 13 Oct 2021 15:11:00 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Vegard Nossum <vegard.nossum@oracle.com>,
-        linux-staging@lists.linux.dev,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
+        id S232528AbhJMNSa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Oct 2021 09:18:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42456 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229535AbhJMNSa (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Oct 2021 09:18:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634130986;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3UweUBspHinuJSQhguEdx6WU40R4nh4wg670z3EQDCs=;
+        b=SE2eHZFv2EYRPciykUvuv3axb7IMWzper0DAABIFt4kpNGY+LNjiufZFUTwYqPW3KwlSp6
+        tnaRT2PPTk8FXujBxyCu3rEdmEwpIi3FOdugnLa6d5HGAY5wLPegbwPWuIFE1qK9/9wNDY
+        xeEcEn5Da35HmArD1DhU4zZs1UWwLKk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-51EXKiPTPNOe2wB9MiFWRQ-1; Wed, 13 Oct 2021 09:16:25 -0400
+X-MC-Unique: 51EXKiPTPNOe2wB9MiFWRQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85FDA100A95A;
+        Wed, 13 Oct 2021 13:16:22 +0000 (UTC)
+Received: from horse.redhat.com (unknown [10.22.33.167])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6603219E7E;
+        Wed, 13 Oct 2021 13:16:20 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id DEFAB22023A; Wed, 13 Oct 2021 09:16:19 -0400 (EDT)
+Date:   Wed, 13 Oct 2021 09:16:19 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
         "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] staging: ks7010: select CRYPTO_HASH/CRYPTO_MICHAEL_MIC
-Message-ID: <YWba5CIZNpFkRKEm@kroah.com>
-References: <20211011152941.12847-1-vegard.nossum@oracle.com>
- <YWbQd51r8R3BprMi@kroah.com>
- <1bfd3945-3487-31ab-5489-9c12c759276b@oracle.com>
- <CAK8P3a05E2muUiy0KcRgzhGef-Xg99_pY3gnDpWt7uHmbTxVGg@mail.gmail.com>
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <YWbcI15YOkhnPh5x@redhat.com>
+References: <20211013105226.20225-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK8P3a05E2muUiy0KcRgzhGef-Xg99_pY3gnDpWt7uHmbTxVGg@mail.gmail.com>
+In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 03:03:41PM +0200, Arnd Bergmann wrote:
-> On Wed, Oct 13, 2021 at 2:51 PM Vegard Nossum <vegard.nossum@oracle.com> wrote:
-> > On 10/13/21 2:26 PM, Greg Kroah-Hartman wrote:
-> > > On Mon, Oct 11, 2021 at 05:29:41PM +0200, Vegard Nossum wrote:
-> > >> Fix the following build/link errors:
-> > >>
-> > >>   ld: drivers/staging/ks7010/ks_hostif.o: in function `michael_mic.constprop.0':
-> > >>   ks_hostif.c:(.text+0x95b): undefined reference to `crypto_alloc_shash'
-> > >>   ld: ks_hostif.c:(.text+0x97a): undefined reference to `crypto_shash_setkey'
-> > >>   ld: ks_hostif.c:(.text+0xa13): undefined reference to `crypto_shash_update'
-> > >>   ld: ks_hostif.c:(.text+0xa28): undefined reference to `crypto_shash_update'
-> > >>   ld: ks_hostif.c:(.text+0xa48): undefined reference to `crypto_shash_finup'
-> > >>   ld: ks_hostif.c:(.text+0xa6d): undefined reference to `crypto_destroy_tfm'
-> > >>
-> > >> Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
-> > >> ---
-> > >>  drivers/staging/ks7010/Kconfig | 3 +++
-> > >>  1 file changed, 3 insertions(+)
-> > >>
-> > >> diff --git a/drivers/staging/ks7010/Kconfig b/drivers/staging/ks7010/Kconfig
-> > >> index 0987fdc2f70db..8ea6c09286798 100644
-> > >> --- a/drivers/staging/ks7010/Kconfig
-> > >> +++ b/drivers/staging/ks7010/Kconfig
-> > >> @@ -5,6 +5,9 @@ config KS7010
-> > >>      select WIRELESS_EXT
-> > >>      select WEXT_PRIV
-> > >>      select FW_LOADER
-> > >> +    select CRYPTO
-> > >> +    select CRYPTO_HASH
-> > >> +    select CRYPTO_MICHAEL_MIC
-> > >
-> > > Let's try to rely on 'depend' and not 'select' please.
-> >
-> > I used 'select' because it seemed to be the established pattern for
-> > these options.
+On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
+> This will enable cleanups down the road.
+> The idea is to disable cbs, then add "flush_queued_cbs" callback
+> as a parameter, this way drivers can flush any work
+> queued after callbacks have been disabled.
 > 
-> Yes, this is the correct way to do it here. In general, using "depends on"
-> is better than "select", especially when crossing subsystem boundaries,
-> however mixing the two is what really hurts because of the circular
-> dependencies you'd get.
-> 
-> The only way we could use 'depends on' here would be to change all
-> the other drivers to do the same.
-> 
-> > Compare:
-> >
-> > $ find -name '*Kconfig*' | xargs git grep 'depends on CRYPTO$' | wc --lines
-> > 1
-> >
-> > $ find -name '*Kconfig*' | xargs git grep 'select CRYPTO$' | wc --lines
-> > 66
-> >
-> > $ find -name '*Kconfig*' | xargs git grep 'depends on CRYPTO' | wc --lines
-> > 87
-> >
-> > $ find -name '*Kconfig*' | xargs git grep 'select CRYPTO' | wc --lines
-> > 1005
-> >
-> > That said, I have found several other cases where CRYPTO_* algorithms
-> > are getting 'select'-ed without also selecting CRYPTO/CRYPTO_HASH, so I
-> > definitely see the problem you're trying to address.
-> >
-> > I've added some more people on Cc to see if there is a consensus on the
-> > best way to do this for the CRYPTO* options going forwards. Thoughts,
-> > anybody?
-> 
-> I don't think there is much point in trying to change the
-> existing pattern for crypto. We might want to change some of those
-> that use 'depends on' at the moment for consistency, though most of
-> those look correct as well.
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  arch/um/drivers/virt-pci.c                 | 2 +-
+>  drivers/block/virtio_blk.c                 | 4 ++--
+>  drivers/bluetooth/virtio_bt.c              | 2 +-
+>  drivers/char/hw_random/virtio-rng.c        | 2 +-
+>  drivers/char/virtio_console.c              | 4 ++--
+>  drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
+>  drivers/firmware/arm_scmi/virtio.c         | 2 +-
+>  drivers/gpio/gpio-virtio.c                 | 2 +-
+>  drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
+>  drivers/i2c/busses/i2c-virtio.c            | 2 +-
+>  drivers/iommu/virtio-iommu.c               | 2 +-
+>  drivers/net/caif/caif_virtio.c             | 2 +-
+>  drivers/net/virtio_net.c                   | 4 ++--
+>  drivers/net/wireless/mac80211_hwsim.c      | 2 +-
+>  drivers/nvdimm/virtio_pmem.c               | 2 +-
+>  drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
+>  drivers/scsi/virtio_scsi.c                 | 2 +-
+>  drivers/virtio/virtio.c                    | 5 +++++
+>  drivers/virtio/virtio_balloon.c            | 2 +-
+>  drivers/virtio/virtio_input.c              | 2 +-
+>  drivers/virtio/virtio_mem.c                | 2 +-
+>  fs/fuse/virtio_fs.c                        | 4 ++--
 
-Ok, I'll take this as-is then.
+fs/fuse/virtio_fs.c changes look good to me.
 
-thanks,
+Reviewed-by: Vivek Goyal <vgoyal@redhat.com>
 
-greg k-h
+Vivek
+
+[..]
+> diff --git a/fs/fuse/virtio_fs.c b/fs/fuse/virtio_fs.c
+> index 0ad89c6629d7..27c3b74070a2 100644
+> --- a/fs/fuse/virtio_fs.c
+> +++ b/fs/fuse/virtio_fs.c
+> @@ -895,7 +895,7 @@ static int virtio_fs_probe(struct virtio_device *vdev)
+>  	return 0;
+>  
+>  out_vqs:
+> -	vdev->config->reset(vdev);
+> +	virtio_reset_device(vdev);
+>  	virtio_fs_cleanup_vqs(vdev, fs);
+>  	kfree(fs->vqs);
+>  
+> @@ -927,7 +927,7 @@ static void virtio_fs_remove(struct virtio_device *vdev)
+>  	list_del_init(&fs->list);
+>  	virtio_fs_stop_all_queues(fs);
+>  	virtio_fs_drain_all_queues_locked(fs);
+> -	vdev->config->reset(vdev);
+> +	virtio_reset_device(vdev);
+>  	virtio_fs_cleanup_vqs(vdev, fs);
+>  
+>  	vdev->priv = NULL;
+
+
+Thanks
+Vivek
+
