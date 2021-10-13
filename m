@@ -2,193 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A126C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 13:23:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C19C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 13:57:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3565B610D0
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 13:23:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4ED3960F94
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 13:57:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233901AbhJMNZd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Oct 2021 09:25:33 -0400
-Received: from mga17.intel.com ([192.55.52.151]:29501 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233226AbhJMNZc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Oct 2021 09:25:32 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10135"; a="208223337"
-X-IronPort-AV: E=Sophos;i="5.85,371,1624345200"; 
-   d="scan'208";a="208223337"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2021 06:23:29 -0700
-X-IronPort-AV: E=Sophos;i="5.85,371,1624345200"; 
-   d="scan'208";a="626341116"
-Received: from smile.fi.intel.com (HELO smile) ([10.237.72.159])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2021 06:23:15 -0700
-Received: from andy by smile with local (Exim 4.95)
-        (envelope-from <andy.shevchenko@gmail.com>)
-        id 1maeDt-000LPO-Od;
-        Wed, 13 Oct 2021 16:23:09 +0300
-Date:   Wed, 13 Oct 2021 16:23:09 +0300
-From:   Andy Shevchenko <andy.shevchenko@gmail.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>,
-        linux-pci <linux-pci@vger.kernel.org>,
-        Sascha Hauer <kernel@pengutronix.de>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ido Schimmel <idosch@nvidia.com>,
-        Ingo Molnar <mingo@redhat.com>, Jack Xu <jack.xu@intel.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Jiri Olsa <jolsa@redhat.com>, Jiri Pirko <jiri@nvidia.com>,
-        Juergen Gross <jgross@suse.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Mathias Nyman <mathias.nyman@intel.com>,
-        Michael Buesch <m@bues.ch>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Russell Currey <ruscur@russell.cc>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
-        Vadym Kochan <vkochan@marvell.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-perf-users@vger.kernel.org,
-        "open list:LINUX FOR POWERPC PA SEMI PWRFICIENT" 
-        <linuxppc-dev@lists.ozlabs.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        USB <linux-usb@vger.kernel.org>,
-        "open list:TI WILINK WIRELES..." <linux-wireless@vger.kernel.org>,
-        MPT-FusionLinux.pdl@broadcom.com, netdev <netdev@vger.kernel.org>,
-        oss-drivers@corigine.com, qat-linux@intel.com,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v6 00/11] PCI: Drop duplicated tracking of a pci_dev's
- bound driver
-Message-ID: <YWbdvc7EWEZLVTHM@smile.fi.intel.com>
-References: <CAHp75Vd0uYEdfB0XaQuUV34V91qJdHR5ARku1hX_TCJLJHEjxQ@mail.gmail.com>
- <20211013113356.GA1891412@bhelgaas>
+        id S234356AbhJMN76 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Oct 2021 09:59:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42136 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235902AbhJMN7x (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Oct 2021 09:59:53 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99A6EC061769
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 06:57:49 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id y26so12229116lfa.11
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 06:57:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oFsM9Ei6gS0+k7pOO8LFkCGjMbL5J05nWd842ORwlvo=;
+        b=bakgxwHfosywcDZp3vMHev/J4RM6bPLRo/dfXh/5UK2leDCo15AUTppvS+39yC7i2N
+         AiNw8D+GTPVeu57Vq9P3qRgiKvzqS9bFOZ2XaYRV8YOnvpiiKV8Io+D8CNGF6WVqOsiv
+         4QDlg156HdyP7ze2ZlmuEs8/yM1BIa2cpkREtlw2dPkrxxTSfId2PEAxbNo5grOAtc2t
+         zez0j6XDWKzYKJ62kpx06yhQ8FYrSCWxhVYKxTUyiJ4RLpgjtnFFBfp6TfsOKbQ3UIV2
+         1L7u5XIHOqf+QVhiJhMTJcDSmuF7dgDY2HfEtvpdZPKSVxLUKIc69qFjhJDjsHBN8FTW
+         olUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oFsM9Ei6gS0+k7pOO8LFkCGjMbL5J05nWd842ORwlvo=;
+        b=5D8tjBD7sx/1y5SoqdiAiTh+S/0sh8Gw6Ht6TXeVnkNyEfW6CVTx3xXLHZryg5q5lD
+         6If9/knFrBatYVxvqqpSXtkQOF3QModCkvaHCUMUQnQUKpZ/EJF6mdZbp8bcvj1I45e0
+         tpe8486QdYFld5icUNrBQhHqkv+duZwOJBLbPRAXYsCMl6UNbrRSGGiYq+U3jcGMQX5r
+         nih5X7AiZE4BL0CJhOb/3cjoHmdBlIFCNnvrBRDiSl6Xc7BMi6lYn/pOEDk6nliDWghe
+         V2KqL9AagKPjRBMt7Aizx42HYfMGhCnUQ4pAcKt6P5c9yJzk7fbEA78DrjOkbC5yjBO8
+         pRHQ==
+X-Gm-Message-State: AOAM533yoaKjUpFyUgsYjjNmlHsaxAsHkeYisn4Z4/xQOIePrfDQVP04
+        p9F4sB4pzkHZwwtthF7xEjXKnA==
+X-Google-Smtp-Source: ABdhPJwZhc4AfAcz46mBH0bDMlI3rEw082MyBrgaexGv8eU7y2Cw/wy3lYVccAe+lZM0MMzv73xu4g==
+X-Received: by 2002:ac2:4f02:: with SMTP id k2mr39851314lfr.265.1634133467547;
+        Wed, 13 Oct 2021 06:57:47 -0700 (PDT)
+Received: from localhost (c-9b28e555.07-21-73746f28.bbcust.telenor.se. [85.229.40.155])
+        by smtp.gmail.com with ESMTPSA id z20sm1336791lfh.306.2021.10.13.06.57.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Oct 2021 06:57:47 -0700 (PDT)
+From:   Anders Roxell <anders.roxell@linaro.org>
+To:     bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+        sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+        hkelam@marvell.com
+Cc:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Anders Roxell <anders.roxell@linaro.org>
+Subject: [PATCH] include: marvell: octeontx2: build error: unknown type name 'u64'
+Date:   Wed, 13 Oct 2021 15:57:43 +0200
+Message-Id: <20211013135743.3826594-1-anders.roxell@linaro.org>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211013113356.GA1891412@bhelgaas>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 06:33:56AM -0500, Bjorn Helgaas wrote:
-> On Wed, Oct 13, 2021 at 12:26:42PM +0300, Andy Shevchenko wrote:
-> > On Wed, Oct 13, 2021 at 2:33 AM Bjorn Helgaas <helgaas@kernel.org> wrote:
-> > > On Mon, Oct 04, 2021 at 02:59:24PM +0200, Uwe Kleine-König wrote:
+Building an allmodconfig kernel arm64 kernel, the following build error
+shows up:
 
-...
+In file included from drivers/crypto/marvell/octeontx2/cn10k_cpt.c:4:
+include/linux/soc/marvell/octeontx2/asm.h:38:15: error: unknown type name 'u64'
+   38 | static inline u64 otx2_atomic64_fetch_add(u64 incr, u64 *ptr)
+      |               ^~~
 
-> > It's a bit unusual. Other to_*_dev() are not NULL-aware IIRC.
-> 
-> It is a little unusual.  I only found three of 77 that are NULL-aware:
-> 
->   to_moxtet_driver()
->   to_siox_driver()
->   to_spi_driver()
-> 
-> It seems worthwhile to me because it makes the patch and the resulting
-> code significantly cleaner.
+Include linux/types.h in asm.h so the compiler knows what the type
+'u64' are.
 
-I'm not objecting the change, just a remark.
+Fixes: af3826db74d1 ("octeontx2-pf: Use hardware register for CQE count")
+Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+---
+ include/linux/soc/marvell/octeontx2/asm.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-...
-
-> > > +       for (id = drv ? drv->id_table : NULL; id && id->vendor; id++)
-> > > +               if (id->vendor == vendor && id->device == device)
-> > 
-> > > +                       break;
-> > 
-> > return true;
-> > 
-> > >         return id && id->vendor;
-> > 
-> > return false;
-> 
-> Good cleanup for a follow-up patch, but doesn't seem directly related
-> to the objective here.
-
-True. Maybe you can bake one while not forgotten?
-
-...
-
-> > > +       return drv && drv->resume ?
-> > > +                       drv->resume(pci_dev) : pci_pm_reenable_device(pci_dev);
-> > 
-> > One line?
-> 
-> I don't think I touched that line.
-
-Then why they are both in + section?
-
-...
-
-> > > +       struct pci_driver *drv = to_pci_driver(dev->dev.driver);
-> > >         const struct pci_error_handlers *err_handler =
-> > > -                       dev->dev.driver ? to_pci_driver(dev->dev.driver)->err_handler : NULL;
-> > > +                       drv ? drv->err_handler : NULL;
-> > 
-> > Isn't dev->driver == to_pci_driver(dev->dev.driver)?
-> 
-> Yes, I think so, but not sure what you're getting at here, can you
-> elaborate?
-
-Getting pointer from another pointer seems waste of resources, why we
-can't simply
-
-	struct pci_driver *drv = dev->driver;
-
-?
-
-...
-
-> > Stray change? Or is it in a separate patch in your tree?
-> 
-> Could be skipped.  The string now fits on one line so I combined it to
-> make it more greppable.
-
-This is inconsistency in your changes, in one case you are objecting of
-doing something close to the changed lines, in the other you are doing
-unrelated change.
-
+diff --git a/include/linux/soc/marvell/octeontx2/asm.h b/include/linux/soc/marvell/octeontx2/asm.h
+index 0f79fd7f81a1..d683251a0b40 100644
+--- a/include/linux/soc/marvell/octeontx2/asm.h
++++ b/include/linux/soc/marvell/octeontx2/asm.h
+@@ -5,6 +5,7 @@
+ #ifndef __SOC_OTX2_ASM_H
+ #define __SOC_OTX2_ASM_H
+ 
++#include <linux/types.h>
+ #if defined(CONFIG_ARM64)
+ /*
+  * otx2_lmt_flush is used for LMT store operation.
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.33.0
 
