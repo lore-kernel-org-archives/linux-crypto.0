@@ -2,145 +2,195 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C51CC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 03:26:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6E3AC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 08:53:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4409A603E8
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 03:26:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE76F610CC
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Oct 2021 08:53:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232411AbhJMD2M (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Oct 2021 23:28:12 -0400
-Received: from mail-eopbgr1320124.outbound.protection.outlook.com ([40.107.132.124]:12464
-        "EHLO APC01-PU1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S237237AbhJMD2M (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Oct 2021 23:28:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oCTRKGYCQuSqGI1Rpzh649lwsp2QXry6Ss5FhByZsx8Ae2MHQ9h5O4HFjsptppa0uPm6mAMSXn/vgdAkN0Ol1w24jarx1+T7k+4GdHQ89uRRDBkGCHja35CcuVlZKiwZDeyPPdvPg/S+a4L1SvoAzxlictx4D7WTbr+eEzkmzH+E65g3Wb6nDSwdkTxsSkCLz68TIYTEPuSIVl5oekznQ7/scZIt75lbjRsBKhp9PVe2jKvTv0cNUrJgMOnL61eFE1zuu4maYJNaFHpVCkc1tdZ/xzlmGTXz8qtSVt6f/e/OzBXAgoE9www1jl/6tUBWn+0aa5Pskh2UeFJ5jqs3cw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CpPnj7WYnnHp38LIZB/JABHaSILI/GDQE0fC/te+acg=;
- b=nM1FXBivPxz0Py8qfyIGyR4WfmtwK+fh5seESksb9UuByOEuWeMBlkCyir0wGvYp+4R+ENVU5Vfrls6ZS7Ix16qf1ZcTrvjLyJNXub0NnS1TszZVZMJ4pwA3BTj3B8SAjGB9HIU49bHxEXnn4oZ8+iPMOONQbIPkQFs6LtgQgtfLVhOr5emKrLzX1kY/4Xs0tpgx3LtLOswYZ6GmbZ8OQY8zCTqb91QhmCq0MOTygp0Z7jeOfRubuorPC9BWVVPihs5Syvv4fzVLo+JuXe0u4DbHb1mpLO4Ew6FDpt3fOHB6mtjCK6RXOrWn2DJhzI/c1WGyvWvqffpk8tUFL8E5yA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo0.onmicrosoft.com;
- s=selector2-vivo0-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CpPnj7WYnnHp38LIZB/JABHaSILI/GDQE0fC/te+acg=;
- b=O4FurDwGOKilIwjE+jnoS1BHUmipOhH3NUBQ0l0V0dIgaGCIEOLwFv3o/nP/2k9zy6HEFtOVVA3p/fSMV084O/Q27PNCM7qT5pg5CL8MmjOJ0DWJF0D4/oCm4GIMz75pjaJ0/S5vY4L1FHy1qwXtf1PsKVpOkbr9MMB/Z0d/HFs=
-Authentication-Results: selenic.com; dkim=none (message not signed)
- header.d=none;selenic.com; dmarc=none action=none header.from=vivo.com;
-Received: from SL2PR06MB3082.apcprd06.prod.outlook.com (2603:1096:100:37::17)
- by SL2PR06MB3243.apcprd06.prod.outlook.com (2603:1096:100:35::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.18; Wed, 13 Oct
- 2021 03:26:07 +0000
-Received: from SL2PR06MB3082.apcprd06.prod.outlook.com
- ([fe80::4c9b:b71f:fb67:6414]) by SL2PR06MB3082.apcprd06.prod.outlook.com
- ([fe80::4c9b:b71f:fb67:6414%6]) with mapi id 15.20.4587.024; Wed, 13 Oct 2021
- 03:26:07 +0000
-From:   Qing Wang <wangqing@vivo.com>
-To:     Matt Mackall <mpm@selenic.com>,
+        id S238960AbhJMIz2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Oct 2021 04:55:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56488 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238885AbhJMIz1 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Oct 2021 04:55:27 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C13DC061570
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Oct 2021 01:53:24 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1maZzE-0007An-3c; Wed, 13 Oct 2021 10:51:44 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1maZz1-0005Il-VI; Wed, 13 Oct 2021 10:51:31 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1maZz1-0006zY-R9; Wed, 13 Oct 2021 10:51:31 +0200
+Date:   Wed, 13 Oct 2021 10:51:31 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
+        Russell Currey <ruscur@russell.cc>, x86@kernel.org,
+        qat-linux@intel.com, oss-drivers@corigine.com,
+        Oliver O'Halloran <oohall@gmail.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Jiri Olsa <jolsa@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marco Chiappero <marco.chiappero@intel.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Qing Wang <wangqing@vivo.com>
-Subject: [PATCH] hw_random: replace snprintf in show functions with sysfs_emit
-Date:   Tue, 12 Oct 2021 20:26:01 -0700
-Message-Id: <1634095561-4030-1-git-send-email-wangqing@vivo.com>
-X-Mailer: git-send-email 2.7.4
-Content-Type: text/plain
-X-ClientProxiedBy: HKAPR03CA0019.apcprd03.prod.outlook.com
- (2603:1096:203:c9::6) To SL2PR06MB3082.apcprd06.prod.outlook.com
- (2603:1096:100:37::17)
+        linux-scsi@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linux-wireless@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Ido Schimmel <idosch@nvidia.com>,
+        Simon Horman <simon.horman@corigine.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Jack Xu <jack.xu@intel.com>, Borislav Petkov <bp@alien8.de>,
+        Michael Buesch <m@bues.ch>, Jiri Pirko <jiri@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Juergen Gross <jgross@suse.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        xen-devel@lists.xenproject.org, Vadym Kochan <vkochan@marvell.com>,
+        MPT-FusionLinux.pdl@broadcom.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-usb@vger.kernel.org,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        linux-kernel@vger.kernel.org,
+        Mathias Nyman <mathias.nyman@intel.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        netdev@vger.kernel.org, Frederic Barrat <fbarrat@linux.ibm.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
+        Taras Chornyi <tchornyi@marvell.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH v6 00/11] PCI: Drop duplicated tracking of a pci_dev's
+ bound driver
+Message-ID: <20211013085131.5htnch5p6zv46mzn@pengutronix.de>
+References: <20211004125935.2300113-1-u.kleine-koenig@pengutronix.de>
+ <20211012233212.GA1806189@bhelgaas>
 MIME-Version: 1.0
-Received: from ubuntu.localdomain (103.220.76.181) by HKAPR03CA0019.apcprd03.prod.outlook.com (2603:1096:203:c9::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.20.4608.4 via Frontend Transport; Wed, 13 Oct 2021 03:26:06 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 43113e44-b58a-422c-a027-08d98df93202
-X-MS-TrafficTypeDiagnostic: SL2PR06MB3243:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SL2PR06MB3243924AA7774BB60C565C80BDB79@SL2PR06MB3243.apcprd06.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:873;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LkG5OxryUO4V1SggFJXKQACsP4eWdU7idqOvpJ+QiUOE8+ouUE9RcQazD7BOFud/Mknd/lbgQmO8Lp7W3PqFTcpd83QBy6R3bQt+dzOqeVEr8dJzdk8Xo/nFvwjnlJN5p9H1BTYO5+e9BYIo6WTJTGY/skha9lFJQWJMyUdl4+bfGA573u4TqcbJ1JI1v8XlejgW4LSXe9jdGWzduVK3W+y7JEQi5Pk8KJeVfvE/vceFa+QAp5VemeVm+CbUKKAVuUR97RQJ6l8j3UdGXG1sBwBCYOt4qaAX0xdw//0AkyY/ZYFJE/zrwOTZ5l+7ICNiL+g3HKybX+E30AXPcE3uJiDHZ1UyzIDpnLAHK5RZtBc2HctucGchfRPSIlmwULRw03gKVDh++QMxn4Jeox06hto2EkvfWOSD5O6tFzbBs+siYfIs0rhLTzIuZaWIOBBIKbwAFkw1tzJSnWGOODnv1MVeOMoZgwOksbmQnrcNeaOnpBBLSLDHNL5LzA0lrA2WtIluM65c3P4uXWxU+K5T5h4mq2ROrsukxKWmecg5TaCrzPYnaoLrjC6y5/iW9BVBDojHJQW9hjafRvCvMpBgl45puR2+reynPYBBD0iqpTN+f5bG3rSG+XzNi+Ab+9yHz7C3JW+M4nQwyEkEodAH7dpUkbdZOCXys6IuSAycxmErS6B6/XbXf2Xmb9DJwF3RWphHwpOKyyQ0NR6i/gorQg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SL2PR06MB3082.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(2906002)(26005)(6512007)(4326008)(66946007)(8676002)(36756003)(66476007)(83380400001)(38100700002)(6666004)(66556008)(38350700002)(107886003)(316002)(52116002)(186003)(8936002)(6486002)(5660300002)(6506007)(110136005)(956004)(2616005)(86362001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?i1cQSPxO38ruCrohtevYQG6TS8ZQdbGet1R3skugTgBoREQniRGkK0dP9ljY?=
- =?us-ascii?Q?GPHT/osaLm7qnrshEASe+hzv0JBRhrDt2DHGK4esZlXgPAMkmzsqU1RAc/VU?=
- =?us-ascii?Q?QaJDXyiucn+E+HAd73bY4lFSmK753mSh+gal/O5B50uL/ddNA5gqUoJVLulG?=
- =?us-ascii?Q?30IwNUqDykZ3NaCqTtTba5UAcqHblz6DOnIlLilJtN8oXqURh8hyl2SLujpP?=
- =?us-ascii?Q?DDARrONo0dhkHbbriP7ScSvjC92akRE5zi5vu9tq71OrR7RsXYwVIygPEhq1?=
- =?us-ascii?Q?W52jKGmv/jh5hA8vpURP1whUERW1RzXsLGe3MqnQBui2zvPXQJBEpgrsGyPn?=
- =?us-ascii?Q?nPtUiiJekStuHW7FkuVqILlBQ2hUwreglfkPQPuSYtVbNKU8fOmRlJLDkwNs?=
- =?us-ascii?Q?9EsD+dWCXHcHE2xCl/1ADAl97//7iTvyQYNcpg6BUjw2BlFa9NeuENigK7pX?=
- =?us-ascii?Q?eYjInVhILjc7aPqPjLChKi3foJPf2Rdnka/Cm2REsy1bs0Iy0EZBPRklBHec?=
- =?us-ascii?Q?YlgBJutSJw7u82k4VlmMiAollb+WnTEkG9faTRrxgXP+JzqfQDVHbLP4Vpcu?=
- =?us-ascii?Q?r74NnTy0b1NaMsbnGXszyZYFh28niadAneFbL+D8qeKoWxdOJiVWHln8XNhk?=
- =?us-ascii?Q?osKK80B9iM6kfypQ5+P3wx+wvbFrtZmcMDtU2kfDPnhsB5RDvV4chEKdfTpJ?=
- =?us-ascii?Q?7DdJ9ZfkCIr3eAqQeBya/D4z6JI1zrcIIsbUVLG3IUSNc2wd40JVJec+7NpZ?=
- =?us-ascii?Q?lOarPTtN6DlAZiEQPwCC1vdJDZIGXncbOma/aI6ejC/1yrUXlJzwqRG2pBpk?=
- =?us-ascii?Q?aYxMu2F0x0zAESjty6VUYG0HhZhzTsKQNiG5onBOeaVLPY7eqwgFu9su9ky/?=
- =?us-ascii?Q?/V8RxmWOkFRjepIQ8JM94SX+g4+tWqmiNZqOzEJAejuzk55Pzc+lDxeK+LC6?=
- =?us-ascii?Q?wI4mD+psn9h7/Pywzmx/N+iMerZVvlcDnOwg+xKtjZugqM6hV+FAenxVdLfn?=
- =?us-ascii?Q?0zFKglgIuOE51KNH/NM2Qzr1qRm9SptIx+Ml2xmZNtqVlx9WPbSc6vMfawbe?=
- =?us-ascii?Q?p5WIlRwZWPCAs7JugmqvStGae279K9H5dpN/A/wWXe+aRoTJfIE+8WsaMWZo?=
- =?us-ascii?Q?4twp0W/ZuRKT4p+uKfdIvpFAYZyboCMu7MNqVeVteBIMycPaAZljqvUeXKD1?=
- =?us-ascii?Q?IDTtRuVh/K8u9pkWhTvRMw3XMICtY7LbZrYlVlGIwU46gOuZa+tkwRkwf8eC?=
- =?us-ascii?Q?JVT0Ecy29zF1TRLnk+hAMCclMKXe0ow71ezfuf0TWre0GDJul/DA5aer8n5T?=
- =?us-ascii?Q?ROESXrmPWllb+wHRd4y/l0Gx?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43113e44-b58a-422c-a027-08d98df93202
-X-MS-Exchange-CrossTenant-AuthSource: SL2PR06MB3082.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2021 03:26:07.6690
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wR3vRZ9oo6SdGV9xdthopQlxl5h3FUUZBemfsSVNsVw+KwuXKQDYjyIBSSMAAp4xAvr2cFFXXpD9X9OkrHJ4bQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SL2PR06MB3243
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="jgo3ssjhgqy54b4n"
+Content-Disposition: inline
+In-Reply-To: <20211012233212.GA1806189@bhelgaas>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-coccicheck complains about the use of snprintf() in sysfs show functions.
 
-Fix the following coccicheck warning:
-drivers/char/hw_random/s390-trng.c:114:8-16: WARNING: use scnprintf or sprintf.
-drivers/char/hw_random/s390-trng.c:122:8-16: WARNING: use scnprintf or sprintf.
+--jgo3ssjhgqy54b4n
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Use sysfs_emit instead of scnprintf or sprintf makes more sense.
+On Tue, Oct 12, 2021 at 06:32:12PM -0500, Bjorn Helgaas wrote:
+> On Mon, Oct 04, 2021 at 02:59:24PM +0200, Uwe Kleine-K=F6nig wrote:
+> > Hello,
+> >=20
+> > this is v6 of the quest to drop the "driver" member from struct pci_dev
+> > which tracks the same data (apart from a constant offset) as dev.driver.
+>=20
+> I like this a lot and applied it to pci/driver for v5.16, thanks!
+>=20
+> I split some of the bigger patches apart so they only touched one
+> driver or subsystem at a time.  I also updated to_pci_driver() so it
+> returns NULL when given NULL, which makes some of the validations
+> quite a bit simpler, especially in the PM code in pci-driver.c.
 
-Signed-off-by: Qing Wang <wangqing@vivo.com>
----
- drivers/char/hw_random/s390-trng.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+OK.
 
-diff --git a/drivers/char/hw_random/s390-trng.c b/drivers/char/hw_random/s390-trng.c
-index 7c673af..2beaa35 100644
---- a/drivers/char/hw_random/s390-trng.c
-+++ b/drivers/char/hw_random/s390-trng.c
-@@ -111,7 +111,7 @@ static ssize_t trng_counter_show(struct device *dev,
- #if IS_ENABLED(CONFIG_ARCH_RANDOM)
- 	u64 arch_counter = atomic64_read(&s390_arch_random_counter);
- 
--	return snprintf(buf, PAGE_SIZE,
-+	return sysfs_emit(buf,
- 			"trng:  %llu\n"
- 			"hwrng: %llu\n"
- 			"arch:  %llu\n"
-@@ -119,7 +119,7 @@ static ssize_t trng_counter_show(struct device *dev,
- 			dev_counter, hwrng_counter, arch_counter,
- 			dev_counter + hwrng_counter + arch_counter);
- #else
--	return snprintf(buf, PAGE_SIZE,
-+	return sysfs_emit(buf,
- 			"trng:  %llu\n"
- 			"hwrng: %llu\n"
- 			"total: %llu\n",
--- 
-2.7.4
+> Full interdiff from this v6 series:
+>=20
+> diff --git a/arch/x86/kernel/probe_roms.c b/arch/x86/kernel/probe_roms.c
+> index deaaef6efe34..36e84d904260 100644
+> --- a/arch/x86/kernel/probe_roms.c
+> +++ b/arch/x86/kernel/probe_roms.c
+> @@ -80,17 +80,15 @@ static struct resource video_rom_resource =3D {
+>   */
+>  static bool match_id(struct pci_dev *pdev, unsigned short vendor, unsign=
+ed short device)
+>  {
+> +	struct pci_driver *drv =3D to_pci_driver(pdev->dev.driver);
+>  	const struct pci_device_id *id;
+> =20
+>  	if (pdev->vendor =3D=3D vendor && pdev->device =3D=3D device)
+>  		return true;
+> =20
+> -	if (pdev->dev.driver) {
+> -		struct pci_driver *drv =3D to_pci_driver(pdev->dev.driver);
+> -		for (id =3D drv->id_table; id && id->vendor; id++)
+> -			if (id->vendor =3D=3D vendor && id->device =3D=3D device)
+> -				break;
+> -	}
+> +	for (id =3D drv ? drv->id_table : NULL; id && id->vendor; id++)
+> +		if (id->vendor =3D=3D vendor && id->device =3D=3D device)
+> +			break;
+> =20
+>  	return id && id->vendor;
+>  }
+> diff --git a/drivers/misc/cxl/guest.c b/drivers/misc/cxl/guest.c
+> index d997c9c3ebb5..7eb3706cf42d 100644
+> --- a/drivers/misc/cxl/guest.c
+> +++ b/drivers/misc/cxl/guest.c
+> @@ -20,38 +20,38 @@ static void pci_error_handlers(struct cxl_afu *afu,
+>  				pci_channel_state_t state)
+>  {
+>  	struct pci_dev *afu_dev;
+> +	struct pci_driver *afu_drv;
+> +	struct pci_error_handlers *err_handler;
 
+These two could be moved into the for loop (where afu_drv was with my
+patch already). This is also possible in a few other drivers.
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--jgo3ssjhgqy54b4n
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmFmng8ACgkQwfwUeK3K
+7AmPuQgAk6Dld3vvwdriW0ibspNDJTGfUcre3doNKax+JiXCiHbUthkO3jZ7kx1f
+rTKn9F/GlIOEH1uZZZPonJEaOLwVQmJz3OF8+BKCx7g1+0AqtNe2WefCf4Jl6ajR
+fuBtbNjjaCmBXFqToERlpAsB8kRfNy8Y5V7a/XqiX7ZDLiXle3V2AbuQVi5Ikmhp
+S72E0TV74YTVv77LeVSAA8275wN0GVI3gVT9F7w9ja0BjrapAALEVsk/s9pAl3Zq
+j9D63evuObSQ8ILnNmMOldPueBNZBIGCrXPD/EWKYWXjfstcmZUQtQqvyF6lK9ww
+AubKoQZ72JnZiuJZzVyJCsmBBRo2Vw==
+=Gp6y
+-----END PGP SIGNATURE-----
+
+--jgo3ssjhgqy54b4n--
