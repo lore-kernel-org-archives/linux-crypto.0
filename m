@@ -2,56 +2,56 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C2BC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 18:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB5F2C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 18:58:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 934836121F
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 18:05:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A46796105A
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 18:58:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242529AbhJOSIA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Oct 2021 14:08:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50348 "EHLO
+        id S241911AbhJOTAv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Oct 2021 15:00:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232557AbhJOSH7 (ORCPT
+        with ESMTP id S238172AbhJOTAu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Oct 2021 14:07:59 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 299D1C061762
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Oct 2021 11:05:53 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id q5so9257293pgr.7
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Oct 2021 11:05:53 -0700 (PDT)
+        Fri, 15 Oct 2021 15:00:50 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6251C061764
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Oct 2021 11:58:43 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id s136so6138309pgs.4
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Oct 2021 11:58:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=6aKaUBfmZ/RDXszMaOimAv4KMW/OyS3sPGtjs8O2E34=;
-        b=GVmzuU15JAJiFkhxCvlybvv8JQ/weN1u6H5X2ykdGO0SbPC2oh+6v6cVgvlO570SQt
-         3GkvfNVzAqWl8zPNWSHbY7njqG6CewmKP4h1XOj6yKnHOyQYUzyjQPvU2OuC15dfq4Hi
-         VN3x/O+P0ilrNaIVGJ68Ygk351wgrsLm7ndELutEZZrw8z+cY1yzXMgBMy/pBci3EOyl
-         ulcHWdF/9vBkEsUgkf7h44ja1u6SEY2tkk+eSi5LWgBg9XB/icMRuY+GRaP+xW3MrzGB
-         XuNyraHQEXo08aqdnameuEFfd5qdBGYdt1wmlmW6lyc7tCbSiQ7jQ3umV9arDxtAw+lt
-         E+OQ==
+        bh=TQM6iseqNr527XMaI35HFwel5PilmxiFDRjsypqPjJY=;
+        b=OWTVpv7FF2Ibi9JFu8PskmJJXobmWCskKm13NYVXbiD1hh6KL51VFSmJ6MbJbWtQA2
+         L3y+YLr3YYr5u1dNm/ZbLKZIYjxIuDeGnTF4yR2kPBwTo98FZNh9lN0vRR6mf4YSGdYg
+         OjKQn7XkYoD1m1UZ1fk8JA2Nvl709DHiWTxtZpbGclYN5l0Lq5XDMVN3rFndlv3X4zdJ
+         Znat97o7ahqtZ3IFR8Znsqs7FR9dYuKbAtSZa9rM4UoKyN7N/HcFoQtLEL6TobpdavVO
+         30UwYM/ReX1Nrybgj4EzVstae47oOfiIo678d3bZiHDwtKtfkklUcguMl56tPWgGAxo9
+         CbBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=6aKaUBfmZ/RDXszMaOimAv4KMW/OyS3sPGtjs8O2E34=;
-        b=e1pAb/0VvDKk3lvgYzcuqx11D6++QjWXGCUC2fqdxo08iGkFU5G1IJPzHHSRKUdufL
-         KLEIqFOyqpL5iGIRnv9aT+KqHspR87FYruAT0Cz5pQVcRfZevJsELLUX7NNRNWDYYINN
-         7w1/98NKCBTwGnDPZ85MFjRhnVA7jqRQUkhu9I0OJdjdBxEhG/o9iladwHHD64vgLdzN
-         P7DtASas1LP6DgO5L2dw8WV9wH6yrkjS6lMC8Wr3xA8sTQRENVQPYPiR3QSRaUdEQ0d8
-         DB/WIT4UxaBnfH4CXkhHr/43Kd+V9xAkQOa715/S8TjOoMrP/Jw4Z977x3kI0uKCkfuB
-         z5lA==
-X-Gm-Message-State: AOAM530SKL80XOgieEOjk4p7S2OfHDW8nLHxsH5za8+l+R6N/OLAGqJh
-        ZzQOMz1wo4Twfys/04o453bfrC8ZBvrXMw==
-X-Google-Smtp-Source: ABdhPJzz3Nh77XlAC6fmajJ34SeI4VWlWS8ZkGOVsmolRrMLTNk0lzHHckKjtlG+93CIt4Ywfy5cfA==
-X-Received: by 2002:a63:6a49:: with SMTP id f70mr7399062pgc.199.1634321152413;
-        Fri, 15 Oct 2021 11:05:52 -0700 (PDT)
+        bh=TQM6iseqNr527XMaI35HFwel5PilmxiFDRjsypqPjJY=;
+        b=VNomgLtVsQd6BKR58b8D/Fz5tV6Z5U90YhaR/I881gKQOLHhI3U0jAOns3OsJ/7e0z
+         xHY55ibTia204AanshyzbprCrpg3fLw41UfdPIwB8j4zt+c2pzouaabdkZpAmfnUH/ob
+         dnaqo272CTNsNhVyDxT708rEBZUcZ9Ha5lFT/qKuxcjYhnUituLKRU1YkwVWZ6Sn9uzG
+         1SI1lQcwzVPJ7T5I0Wh7XOBKpsZnt1IgP2BHSQIS4Jbr56c9yjngHGO0d79dCqVKQ4Cl
+         Bcz3VfDk1q+7bwjd02K/72FsvFDbFS5ro3hGtOl/z+2kscY5HfttiSmhrB9D0xTNOzwV
+         uoaw==
+X-Gm-Message-State: AOAM531WXxXuUqqgDrMDx2lix4xqA+Dp3U/SNZcUrjbgp0vd3CfjeWcC
+        H8yGCn7Oa3wpc5j4Ouw3pT4MWo62jO/sGA==
+X-Google-Smtp-Source: ABdhPJz11NQ8k8O3sx0w8Jmw/mT7h0gCT45pHlT7hh3N0P78+0UiDdOgcHDso4OmHjjXvEL1tZbORQ==
+X-Received: by 2002:a63:3714:: with SMTP id e20mr10506241pga.50.1634324322967;
+        Fri, 15 Oct 2021 11:58:42 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id w15sm5543737pfc.220.2021.10.15.11.05.51
+        by smtp.gmail.com with ESMTPSA id 66sm5517324pfu.185.2021.10.15.11.58.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Oct 2021 11:05:51 -0700 (PDT)
-Date:   Fri, 15 Oct 2021 18:05:47 +0000
+        Fri, 15 Oct 2021 11:58:42 -0700 (PDT)
+Date:   Fri, 15 Oct 2021 18:58:38 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Brijesh Singh <brijesh.singh@amd.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -78,73 +78,73 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
         Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 05/45] x86/sev: Add helper functions for
- RMPUPDATE and PSMASH instruction
-Message-ID: <YWnC++azH3xXrMm6@google.com>
+Subject: Re: [PATCH Part2 v5 43/45] KVM: SVM: Use a VMSA physical address
+ variable for populating VMCB
+Message-ID: <YWnPXmB4BkEO7Yrb@google.com>
 References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-6-brijesh.singh@amd.com>
+ <20210820155918.7518-44-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210820155918.7518-6-brijesh.singh@amd.com>
+In-Reply-To: <20210820155918.7518-44-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Fri, Aug 20, 2021, Brijesh Singh wrote:
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index f383d2a89263..8627c49666c9 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -2419,3 +2419,75 @@ int snp_lookup_rmpentry(u64 pfn, int *level)
->  	return !!rmpentry_assigned(e);
->  }
->  EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
-> +
-> +int psmash(u64 pfn)
-> +{
-> +	unsigned long paddr = pfn << PAGE_SHIFT;
+> From: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> In preparation to support SEV-SNP AP Creation, use a variable that holds
+> the VMSA physical address rather than converting the virtual address.
+> This will allow SEV-SNP AP Creation to set the new physical address that
+> will be used should the vCPU reset path be taken.
 
-Probably better to use __pfn_to_phys()?
+The use of "variable" in the changelog and shortlog is really confusing.  I read
+them multiple times and still didn't fully understand the change until I sussed
+out that the change is to track the PA in vcpu_svm separately from vcpu_svm.vmsa.
 
-> +	int ret;
-> +
-> +	if (!pfn_valid(pfn))
-> +		return -EINVAL;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+It's somewhat of a moot point though, because I think this can and should be
+simplified.
 
-Shouldn't this be a WARN_ON_ONCE()?
+In the SEV-ES case, svm->vmcb->control.vmsa_pa is always __pa(svm->vmsa).  And
+in the SNP case, svm->vmcb->control.vmsa_pa defaults to __pa(svm->vmsa), but is
+not changed on INIT.  Rather than do this crazy 3-way dance, simply don't write
+svm->vmcb->control.vmsa_pa on INIT.  Then SNP can change it at will without having
+an unnecessary and confusing field.
 
-> +		return -ENXIO;
-> +
-> +	/* Binutils version 2.36 supports the PSMASH mnemonic. */
-> +	asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"
-> +		      : "=a"(ret)
-> +		      : "a"(paddr)
-> +		      : "memory", "cc");
-> +
-> +	return ret;
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 1e8b26b93b4f..0bec0b71577e 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2593,13 +2593,6 @@ void sev_es_init_vmcb(struct vcpu_svm *svm)
+        svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ES_ENABLE;
+        svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
 
-I don't like returning the raw result from hardware; it's mostly works because
-hardware also uses '0' for success, but it will cause confusion should hardware
-ever set bit 31.  There are also failures that likely should never happen unless
-there's a kernel bug, e.g. I suspect we can do:
+-       /*
+-        * An SEV-ES guest requires a VMSA area that is a separate from the
+-        * VMCB page. Do not include the encryption mask on the VMSA physical
+-        * address since hardware will access it using the guest key.
+-        */
+-       svm->vmcb->control.vmsa_pa = __pa(svm->vmsa);
+-
+        /* Can't intercept CR register access, HV can't modify CR registers */
+        svm_clr_intercept(svm, INTERCEPT_CR0_READ);
+        svm_clr_intercept(svm, INTERCEPT_CR4_READ);
+@@ -2633,6 +2626,13 @@ void sev_es_init_vmcb(struct vcpu_svm *svm)
 
-	if (WARN_ON_ONCE(ret == FAIL_INPUT))
-		return -EINVAL;
-	if (WARN_ON_ONCE(ret == FAIL_PERMISSION))
-		return -EPERM;
-	
-	....
+ void sev_es_vcpu_reset(struct vcpu_svm *svm)
+ {
++       /*
++        * An SEV-ES guest requires a VMSA area that is a separate from the
++        * VMCB page. Do not include the encryption mask on the VMSA physical
++        * address since hardware will access it using the guest key.
++        */
++       svm->vmcb->control.vmsa_pa = __pa(svm->vmsa);
++
+        /*
+         * Set the GHCB MSR value as per the GHCB specification when emulating
+         * vCPU RESET for an SEV-ES guest.
 
-or if all errors are "impossible"
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-	if (WARN_ON_ONCE(ret))
-		return snp_error_code_to_errno(ret);
-
-FAIL_INUSE and FAIL_OVERLAP also need further discussion.  It's not clear to me
-that two well-behaved callers can't encounter collisions due to the 2mb <=> 4kb
-interactions.  If collisions between well-behaved callers are possible, then this
-helper likely needs some form of serialization.  Either, the concurrency rules
-for RMP access need explicit and lengthy documentation.
+This needs your SoB.
