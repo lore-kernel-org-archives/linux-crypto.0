@@ -2,46 +2,59 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2AC6C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 16:32:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20886C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 16:44:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7BDF60F70
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 16:32:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC50860F6F
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 16:44:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241391AbhJOQeR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Oct 2021 12:34:17 -0400
-Received: from mail-mw2nam12on2055.outbound.protection.outlook.com ([40.107.244.55]:19168
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S237115AbhJOQeL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Oct 2021 12:34:11 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UUsHC+UcCsztXkl8d4mvq7LhPaYyDp6mge+D8iJ1D5g+IO6UCd6HA1rrF4G+E5KhZCsSlGYk/C3IYQTwWL8RhH35CMNcuvmtY2sldG72MaFanZM++p68BuQZsLFjkq3cO63lfICMm24lbq0NVRrVds84La0kUDW61qZ/L6HCKqXsvwpt3isruV0gFLD+V30A2LOlMXSOPF/iDlsTl1K46ZNNXvNP7qU8DKHQNCTN7DREnEvelRv9xeSS52cLJlTsPe/Od5nNkeyrIln9nz1BvmHgwxRowtcNt41GzhlzwIE7JXU1yj2GCcknVRkzCQEBIJ5GvOSujshpVok728etWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vxuCOtAcfaFHPEaVOWMvA4jCBawetXspOGQUlNNhASc=;
- b=a/CAeJWBFCd10EC0sO3/gOeTwvYDHvwHH9ntagOwW56UN8JIJF+BvG2IoWnMu3PvcYdLPHv10g7Sszx3z53FNJwrXnH0Wq6K0Wh4rpZxt0zGbvy9oiOsOWURqMj5U4UqPEfWs6p2WwkQZhur6VurefyK0me7C4IK311x3+xACVsMWVbZHWy6xQic6rGOj3+16TLwIiMKfz3rwAAFffG0hPLGEQY4cRGTAhb26WGL8mDs7daWEHfNjnZrwLt/y9IPmKbeSTyriFjAyrVkGlZFMjbrazWFBiJX1l5MMisvGP6/DbysLjVlaod5bRBfsX5jzer7KZBQtngfafUABOiPFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vxuCOtAcfaFHPEaVOWMvA4jCBawetXspOGQUlNNhASc=;
- b=gGu0H0rlFO7noUWWg81DzpMUWPLmFRrnAoEB4+6WbvrLdE7HduuCGnlyBjSxbogV3Vi7pEQ5nRRxY+oznRXZskQ7elNgkYqlwp07O2499gJfHQZl8MCHmQ948IvKnUDtbjpJEJK4K3IMFzfB0Am+ue/GLpW43nOTarkEcZg8yLM=
-Authentication-Results: linux.intel.com; dkim=none (message not signed)
- header.d=none;linux.intel.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN6PR12MB2782.namprd12.prod.outlook.com (2603:10b6:805:73::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.17; Fri, 15 Oct
- 2021 16:31:58 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4587.032; Fri, 15 Oct 2021
- 16:31:58 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        id S241525AbhJOQqO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Oct 2021 12:46:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59008 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232499AbhJOQqO (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 Oct 2021 12:46:14 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E54C061570
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Oct 2021 09:44:07 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id v8so4697971pfu.11
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Oct 2021 09:44:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zSHOcs5t+6dTQwUxuGH/T7ott4w7EhNYJHh3Z2GocjA=;
+        b=AIhx2i9vMNxJmE3uzyIojUAXtN7O9RaN/DTCaA0s69W6dr/F02lHnP46eAy1BAczkS
+         q/3YYgROnZDdu5KCTulYeoTevurQP6Gw5YJGpPrpkCXsWSaAG/7Dih1O8GYvfBoti6ih
+         kWI3J8o2p5RY4iOXrGsIDYzHDgFP2sUvsa2EIaEjcIgIwtaQ4NTbC8eQrJm1x3x3O5im
+         YMvd241FxnNuepC7dK1eisKKJKQ1BpEAqBI/BIduLf6/9f4tVUulzs16bdEq/8dAKwNO
+         viQuoJJMMY0w+TJ+XEfkw8zNkCYHm85q8evdIoeYwNcXPQO/lnBVnHZmNXVduzKXLEZ2
+         LbIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zSHOcs5t+6dTQwUxuGH/T7ott4w7EhNYJHh3Z2GocjA=;
+        b=1C04Dy/AShK7ybHs52FBSAZjvkgik10OrOf8Igvmw/iQvMPC/2FyZcxhB8t2tnLyLM
+         o1shKHv6LuuFcgf50RKaeyXlrM35+LL2GFsod81qEz7FcBEaiTKiTvTEdwZFY0ZHkly6
+         CciuAhbX2SptWKh/Z87LpTbCg4jvwdudtbvObxiNi8kYCFv1gqo/IqaRFbvdnCOKxRio
+         Wcj1hyT3TPO6Iyf9bYWAf2rOfqjKf03d0qBfOERalZX9nBVd4ZCLbzh4X2Ebay53qnPH
+         QjOXvLvm7V+y5omiKGfwvnrqsKhfZ5YpvcQanqkPMTbOXFVuSwurNkka8vwmKOmdJYLv
+         oiuQ==
+X-Gm-Message-State: AOAM530YHpeeY4OcMp475KnhlMGpE1Qyj/Wrx0Ve4TkclFr7yBf+68y/
+        xJ591/5FTlShZXSraZl2WTeiHO02W2zwag==
+X-Google-Smtp-Source: ABdhPJxtVTeCPQ5dOb7/w00ASS1IRHqKuVloMz2UwAfLuAU9TDr2EVBRJZOlG0vE0DE86rBAGM7T6w==
+X-Received: by 2002:a63:e613:: with SMTP id g19mr10102661pgh.12.1634316246676;
+        Fri, 15 Oct 2021 09:44:06 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id o14sm5451095pfh.84.2021.10.15.09.44.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Oct 2021 09:44:06 -0700 (PDT)
+Date:   Fri, 15 Oct 2021 16:44:02 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
         linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
@@ -65,117 +78,39 @@ Cc:     brijesh.singh@amd.com, x86@kernel.org,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
         Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 39/45] KVM: SVM: Introduce ops for the post gfn
- map and unmap
-To:     Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH Part2 v5 34/45] KVM: SVM: Do not use long-lived GHCB map
+ while setting scratch area
+Message-ID: <YWmv0uerMuujn/Wo@google.com>
 References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-40-brijesh.singh@amd.com> <YWYm/Gw8PbaAKBF0@google.com>
- <YWc+sRwHxEmcZZxB@google.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <4e41dcff-7c7b-cf36-434a-c7732e7e8ff2@amd.com>
-Date:   Fri, 15 Oct 2021 11:31:51 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.14.0
-In-Reply-To: <YWc+sRwHxEmcZZxB@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: BN9PR03CA0660.namprd03.prod.outlook.com
- (2603:10b6:408:13b::35) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+ <20210820155918.7518-35-brijesh.singh@amd.com>
+ <YWdNisk78f5BVNv3@google.com>
+ <fb6e3800-7eaf-868d-365a-9b76665bd06c@amd.com>
 MIME-Version: 1.0
-Received: from Brijeshs-MacBook-Pro.local (165.204.84.11) by BN9PR03CA0660.namprd03.prod.outlook.com (2603:10b6:408:13b::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16 via Frontend Transport; Fri, 15 Oct 2021 16:31:53 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 738e1d62-2503-403f-b1f0-08d98ff94eb2
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2782:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB2782EDCA7BF32E73F2432BA0E5B99@SN6PR12MB2782.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cIGnpq3C0+igaAlZYESG6AIwkMhnssUsSOvp/CX8zkj6s/k881KuvgK9qzxce+qTL3tenrOXHIxf5pyr86noSqQ44ZrgKJ6sPYfsfEKt6Lo5s+5XckPyrAcmK2tQoziZRpyox4OcBJNNcKSF9k5a11jNvh0VgiaClAsqUmWCWXk9m1EXzlscLcSeQpkKFLcVnEyS1T6i+DSuSqd8MMjsbRo2GuAFQWuu9OK3DCihlrsogbeb8cUWjvCzf0JZs60XL9On0mmaX+FaKDpHXGE95bg/6jXCqw3GpgZxl4cuQCH//zAqvlcFwoLQVlExKIYctTRW5smDALlzFBEunhkOXJPhiXWgmt2kejnpwBwKMmwI0CKdg/Rw1fewpJxY0dc/sTioxhpTdCaVlyR+1jOaSOIy30xySKkIxec2FqFdpVJxJeuWFDNB9Vq9WvYx2YZl/b/DZnutVgFxS4s0rj0tsUNJ/0RSAOjxM+hJAMkp1sxBcexQbzK8scA2SLYPcQg/oY/FWS4o0TC+P4AKnbuUJR1gSrRS314YN+ypIAmnR4UQtVy6KxPkLK9fHrJWeWq0DdDXHXskcfc8DONlVfHppXehMLxogR72rstpLSkabbi191Ei04OpLGH/kCqhC9/JGVTjUYJqXblIODqoC9+VRYErNTJtZOBwJ2fbN1RuUJs7U1Mkl87UHGxW9UaHB13O05MQky6nEV/l/pQoH+191dYLnZNUtQb+OADcu4IH3R0gWAN1oNUxmKkciiCLhMidYjNqQpPTeJjJx0ZBwd93Y/jUZOu/fHydJdVzZgV5iNRCb3eIreB7CZI5u+qpvR0nQyM3czf8zMXg8/zb5lGaXw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(186003)(6486002)(26005)(2616005)(66476007)(8676002)(6506007)(53546011)(31686004)(4326008)(966005)(956004)(44832011)(508600001)(5660300002)(2906002)(36756003)(6512007)(54906003)(316002)(83380400001)(31696002)(86362001)(6916009)(66556008)(66946007)(8936002)(7406005)(7416002)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RlF1Y1F4RUM0aWIrcFVxYldxNk84SDU5emtZQ1hXVHlyTGU1N0NFUUJMWmtm?=
- =?utf-8?B?bHUrZk8zck00aWFHU2wyNHhrbjcyQUN5WWVJOURHSm9WQXZlZXBxMC9waGg0?=
- =?utf-8?B?RWFkODFOa0lEVXg5MmFTM2JZUWUxdE82cXNoSG5acDVJV2YzMmJPS0ErV1lO?=
- =?utf-8?B?SXRpSHgySTgzc0tabzI3ZTBDenVtYWY3bHhMZkpwZTlaR2Q2WVBySEVldi82?=
- =?utf-8?B?c1VwYmNScS8xa09qTnROdzdKYzk4T2oyQlp3L09od1U5Q21BNWZzOVltY2px?=
- =?utf-8?B?ZGJoSzlPcG5YOU83YkQ0Y2dtd0Y5QXdpZThEZjdSaGNHYURIcnEwRzJ6cnlN?=
- =?utf-8?B?OHdqK2pRRkFNTk9yYTNPLzhGY1dRNUJydEIvbkNIeERSSGZtRGp0MUZQVk85?=
- =?utf-8?B?NHYxNWM0QVNoTjZmdlB2akU2YlQrWk5kRFhyUTVMQ2hNTWgrRmVGbmlaak8x?=
- =?utf-8?B?cUVlVkUrNEI4aG4zZVNyZlNIRTFHTDFEenlzZ1h2WWk3RGNHOFpOYnc5akNj?=
- =?utf-8?B?S2RGUGw1emd4aTFMSGNSQ0oyWEh5RmxBanhQMFR2VzZxcFU0Y012Q3g4L2Mw?=
- =?utf-8?B?L2FLOFdZZGdSaWlpMUt5WnBMRUdIUk5FczhRSXZERzJlSTZsYThDSVVOenRO?=
- =?utf-8?B?QWFpc1VyMTVneGxkallzSDUwV01kMmd6NXUxM09JQnVSd2F6VnE4Mlg2OFhR?=
- =?utf-8?B?QldoUHN4cW05WmlOelRmeUZmdlM1RDQvKzNnYlJrdk00Y01sVldMemV1UG1m?=
- =?utf-8?B?RVFMbWpKY2g5UjhSTFl2blBMcVR0NE90WHlzUjZackE2NU5xUjdvdG9leE1y?=
- =?utf-8?B?SWw3ZVY2Y0RzVUg4TTBIb1kzOS9VU3JrL2FNM0djdldmNkhMdE5yZFlYZENP?=
- =?utf-8?B?V1liWFExZDRCLzkzMHpObm9YSTNZeENUTmJkNUZydXUxZTJva1lOd0Q4d2VB?=
- =?utf-8?B?dU9xYlkzbERBVkJReXdxYmJPV0Q4WUI5VnpKOGFYZDEyVlhmZTNJdFdCbHE2?=
- =?utf-8?B?SHBKTytXQUkrVEc5RmFLOUpjUDFpMHAzT1lnb0FCSzNoR1RXMlgxRTJXZzNp?=
- =?utf-8?B?dVpycCtJQS9jU1MzYk5LU3ExZitBb0Q3K1JFWlV0V0o1cEpyVllEVzFqcys5?=
- =?utf-8?B?VE5YbUIybjcxQ25LN1ZsUVVOK3VNMnA5N200NHZuSnVWUUg5MjZRYm51RXlP?=
- =?utf-8?B?ZzZreWNjWUhDZithZ0x3ODdGR3poOG5Zb0JCa0ZSdTVRZDNIaHltWUViVFg4?=
- =?utf-8?B?NUl1L01kR0k5RStjcGRIMDkzbVUrRi96SVkzWUo3d09BUG14QlpVM2cxU28w?=
- =?utf-8?B?WWV6KzVLVTdBNEwvZTR6Q1p6bzV5bmEzaEpsM092YWJHbG1kRzA0UlJXNTVz?=
- =?utf-8?B?UWpOcE9ZVFZucmJBbVVVWWhUbkhxWURUbWs3V1J5d3hlVVh1aHdPSjZvOHNv?=
- =?utf-8?B?OUxpeFZ2ZWtnQnoyTEQ5TFRNS1JUZnVVS3Z0d3FwbHNIcndlUDJYemlDeTdX?=
- =?utf-8?B?Q3lxM0xNR0JBR3FMK2hMU3BraDZPZmF6dXNoUmF3dEZCUDlpaDRJWjFhMk9L?=
- =?utf-8?B?dFpWYWdXWTJhLzI1MWRpMUp6amg1SGRqOHRCRjhhd1JQRVdXQnFOOHdvOWts?=
- =?utf-8?B?SXlZWGRJZ0lWMk04UWdHdEpQcDNIanlITEZFcmJ0ZCtObWdDQWNnVWo3Yk1J?=
- =?utf-8?B?M1ppMmpZMHgyMnlqUFNLQXNpblg2YTRONktqOXUrdGtRZUw5aCs4cE5UVE1B?=
- =?utf-8?Q?oKPDUmP7olodOG6X3n023jsPylYEvDwm8Zql7gV?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 738e1d62-2503-403f-b1f0-08d98ff94eb2
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2021 16:31:58.1797
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5obGJbQUraNXgcT74FCk02Tl84SzgJtTIGh82pPEZiyRHE51jelhyLvBcqYaul+QpvA7ipugsrv77CWyBBOuDg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2782
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fb6e3800-7eaf-868d-365a-9b76665bd06c@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Fri, Oct 15, 2021, Brijesh Singh wrote:
+> 
+> On 10/13/21 2:20 PM, Sean Christopherson wrote:
+> > On Fri, Aug 20, 2021, Brijesh Singh wrote:
+> >> The setup_vmgexit_scratch() function may rely on a long-lived GHCB
+> >> mapping if the GHCB shared buffer area was used for the scratch area.
+> >> In preparation for eliminating the long-lived GHCB mapping, always
+> >> allocate a buffer for the scratch area so it can be accessed without
+> >> the GHCB mapping.
+> > Would it make sense to post this patch and the next (Remove the long-lived GHCB
+> > host map) in a separate mini-series?  It's needed for SNP, but AFAICT there's
+> > nothing that depends on SNP.  Getting this merged ahead of time would reduce the
+> > size of the SNP series by a smidge.
+> 
+> While testing with random configs, I am seeing some might_sleep() warns.
+> This is happening mainly because during the vmrun the GHCB is accessed
+> with preempt disabled. The kvm_vcpu_map() -> kmap() reports the warning.
+> I am leaning towards creating a cache on the vmgexit and use that cache
+> instead of the doing a kmap() on every access. Does that sound okay to you ?
 
-On 10/13/21 1:16 PM, Sean Christopherson wrote:
-> On Wed, Oct 13, 2021, Sean Christopherson wrote:
->> On Fri, Aug 20, 2021, Brijesh Singh wrote:
->>> When SEV-SNP is enabled in the guest VM, the guest memory pages can
->>> either be a private or shared. A write from the hypervisor goes through
->>> the RMP checks. If hardware sees that hypervisor is attempting to write
->>> to a guest private page, then it triggers an RMP violation #PF.
->>>
->>> To avoid the RMP violation, add post_{map,unmap}_gfn() ops that can be
->>> used to verify that its safe to map a given guest page. Use the SRCU to
->>> protect against the page state change for existing mapped pages.
->> SRCU isn't protecting anything.  The synchronize_srcu_expedited() in the PSC code
->> forces it to wait for existing maps to go away, but it doesn't prevent new maps
->> from being created while the actual RMP updates are in-flight.  Most telling is
->> that the RMP updates happen _after_ the synchronize_srcu_expedited() call.
-> Argh, another goof on my part.  Rereading prior feedback, I see that I loosely
-> suggested SRCU as a possible solution.  That was a bad, bad suggestion.  I think
-> (hope) I made it offhand without really thinking it through.  SRCU can't work in
-> this case, because the whole premise of Read-Copy-Update is that there can be
-> multiple copies of the data.  That simply can't be true for the RMP as hardware
-> operates on a single table.
->
-> In the future, please don't hesitate to push back on and/or question suggestions,
-> especially those that are made without concrete examples, i.e. are likely off the
-> cuff.  My goal isn't to set you up for failure :-/
-
-What do you think about going back to my initial proposal of per-gfn
-tracking [1] ? We can limit the changes to just for the kvm_vcpu_map()
-and let the copy_to_user() take a fault and return an error (if it
-attempt to write to guest private). If PSC happen while lock is held
-then simplify return and let the guest retry PSC.
-
-[1]
-https://lore.kernel.org/lkml/20210707183616.5620-36-brijesh.singh@amd.com/
-
-
+Since SEV is 64-bit only, it should be ok to add a kvm_vcpu_map_atomic() variant.
