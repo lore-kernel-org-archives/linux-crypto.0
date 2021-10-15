@@ -2,59 +2,50 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19671C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 19:50:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 730EBC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 20:18:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3A0861181
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 19:50:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A51560EE2
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Oct 2021 20:18:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238413AbhJOTwc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Oct 2021 15:52:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45716 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242854AbhJOTwc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Oct 2021 15:52:32 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C31B1C061570
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Oct 2021 12:50:25 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id ls18so7930636pjb.3
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Oct 2021 12:50:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=fpAPb87Hk9o66Grt82T0IufVe0UlC3v7GuLijQHjsuM=;
-        b=s91UAFdZ0ieUkVMi/2y1gV171XFmSagz9DzrdkjBllPoja6oY6pH31eOBDMBpWYX5w
-         7ond1lSxAgtYPO7AzQS55a0Xu7anIxMM0spq0lk55KPDwoxsdRnzN2qF1L6qNoDp2bCE
-         SXX+P3tBGs5Rak0EdqIDzqU0IG8o9HO0LXMkGMMZ5O/3TYk+sfSyOyZoSQDBdAsin+2x
-         IGVIpcWOOn7Fq5839UCSH/bMEiImuB5a9H8wB0Ldj/AMJMR9JiUYDjPywVWM3ZCbaqVy
-         jzOVIPu8q4tuFiYHJjYXUDQM2EG1b6ImUItGu5T32tP1wb+rxesFRBTGDINtJ2ll/4SA
-         PTeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fpAPb87Hk9o66Grt82T0IufVe0UlC3v7GuLijQHjsuM=;
-        b=l/NWJyb5AlzJ43O5ASfWrGVZ3L2BM+NP4BVJGOyRtVcNQaVbefC5y4Tphd0P6chBTI
-         73UvbMsnTCdqiX7rcS7SxuvJCSXuElt2mfp27NP0QpcPNAwyra2ikeeayJjKHw66TAsO
-         OoYYYhItCaR5kGg/qqeQIU8uXOA9mAqRlJsBW1NUA6Ffefd2F8jvTbyfhK48khuSB+Dk
-         igi46MtTf6Mw2/l0wXXwrkr/KIqfKIA6e9892KzJT0rtWm5nuORi3XhDeFEskY876JOm
-         uKGfnP7WvUTZhseU78L/Pdarx/Qzl5Ync7B8rnckUCLgmns9st/yC2OCOWrd7gEcKxos
-         Mhtw==
-X-Gm-Message-State: AOAM530AapQTRBfh7c669caVt9E8BvYV7VJx7psYhNI+kU8jE6QkhtKB
-        mWNE8AQn8UP7qAnNBIxPzRv84g==
-X-Google-Smtp-Source: ABdhPJw2G9y/Z/b0IraYD7/qreyNrdK0v+KRIhDIt2ZDYy6P8l5hjLFaShTRRqYo0lpwUn+42CFScg==
-X-Received: by 2002:a17:90b:17ce:: with SMTP id me14mr15754357pjb.112.1634327424985;
-        Fri, 15 Oct 2021 12:50:24 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f30sm5819571pfq.142.2021.10.15.12.50.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Oct 2021 12:50:24 -0700 (PDT)
-Date:   Fri, 15 Oct 2021 19:50:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        id S238523AbhJOUUd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Oct 2021 16:20:33 -0400
+Received: from mail-dm6nam12on2051.outbound.protection.outlook.com ([40.107.243.51]:23649
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234408AbhJOUUd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 Oct 2021 16:20:33 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PMugwG4TE7aNk2NlT5tyxWFSnNj45m5a+VqdYbD1rPXjGGg6DbG+TWl4oOigpX6hy8IoIy/+G7HXRNDZWt9xqa/+cqGtsZqJJq1zyhiddu9d/cdvX95go+fhTwJYrBP/7eDysbtZJiVX68j0r5ejhAXqRdgEfdj0QFKUpOm5Zyl5m80B/QpZDEHBIYqcfZ1UsonJBqKK/DDD5n52ySgpoVRre1Nzx/XS9ZczjK5zg/bXPQmIk8BcFeITFhQ+q/xkSrhrqt64NPYXez86xAh/++zo5geGEiDL79GiUWWP6bD9K0aHzb50SJP9yCFUGhAYrCyWO8bthyoVMAaN68DvTw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lgaUzbm5yjU/YABuMFY3LciYctTg7ZStrCZVNelewE0=;
+ b=Fc8g/nUa9e4GCdmKCqpFmBrelED67bQZ4xO25uiqBtfKlJauAMTqbrkF/sowm8UnWiXcJ73vtdxy5PiiPwY9Sk5WF2zOSo7xHy4Ni5eC5x1amX2LPDa7uWvbgjM94ry0ELleMCUEp/byLMVmbs9VI53jEe+I4B1ovyxiVSIeaMVqR9U0kk/dMpq3kjTMUXkVOgqR2q/ml7bfNhKrH94UMweUE9DRp7e3eL+R6D+kRQwy7ChlBQqBEPyxBl09xfpqSoVlQM66lJcZDTfCvfS4gBImwc01e5SaAJg+fWuPF9yxuzjDsBkwibX2eGPZbCV8vomn1CFVPwXfxJNBgi0vMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lgaUzbm5yjU/YABuMFY3LciYctTg7ZStrCZVNelewE0=;
+ b=P/KjNCBjMGgIHFDPnP4yKUfsDGuOqrkwf/PFW4jueNhR2LhtHo2l4PhoNqojrgsJSQccwEaFJSTNJPam1f6ZlORBAuDspgwqlpwWrYX1AUT6CnHbbE1X366S5YX5//Y4MJ7Inb5pd49/EwvMTEiOb2DVOdV1ZuuqhRoShCdpui0=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.22; Fri, 15 Oct
+ 2021 20:18:22 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4587.032; Fri, 15 Oct 2021
+ 20:18:22 +0000
+Message-ID: <3fc1b403-73a1-cf2e-2990-66d2c1ecdfa3@amd.com>
+Date:   Fri, 15 Oct 2021 15:18:19 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.2.0
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
         linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
@@ -78,108 +69,157 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
         Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 44/45] KVM: SVM: Support SEV-SNP AP Creation NAE
- event
-Message-ID: <YWnbfCet84Vup6q9@google.com>
+Subject: Re: [PATCH Part2 v5 05/45] x86/sev: Add helper functions for
+ RMPUPDATE and PSMASH instruction
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
 References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-45-brijesh.singh@amd.com>
+ <20210820155918.7518-6-brijesh.singh@amd.com> <YWnC++azH3xXrMm6@google.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+In-Reply-To: <YWnC++azH3xXrMm6@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SN4PR0501CA0140.namprd05.prod.outlook.com
+ (2603:10b6:803:2c::18) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210820155918.7518-45-brijesh.singh@amd.com>
+Received: from [10.0.0.5] (70.112.153.56) by SN4PR0501CA0140.namprd05.prod.outlook.com (2603:10b6:803:2c::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.8 via Frontend Transport; Fri, 15 Oct 2021 20:18:20 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1c4fc950-7fa6-4082-5637-08d99018efa9
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2718:
+X-Microsoft-Antispam-PRVS: <SN6PR12MB2718A13DB2DAD2C839C96951E5B99@SN6PR12MB2718.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: lGxuF9ReK275sH946uvMYwfEnZG34io/LMHq2aDiTFIvY1hhTzYl7xkJkdXkm9OtXDxLkjzDt8ksJkKD9PiCRxKeAuODY2MHJaRLL0YK5ugqAburRm6jcj1bL5ig8bEwLux5vBzUAjlvlRbJOGomyMXUPlCCf1/TQWizcKZWIjreT2RyBdC7U31odeL2+wH57u8YCi5wm/vtaPf08DawX2olz66pakwvzKmdmKvRxYuhyQB+2pYA+MHlEvl+eam2dM5EyFNyNnngm5aYBYj4/fF93/AeEvmfG5jwYdDBOYYosap4TZuHgtAR5OSKqojoISk+OOgCt2G3AJ443alW4PlqAPoyGFJmIMweI+fQCYnceYBA8LK13inJcp/pPIrg8KLi5DGlDnSBXAQ/0frnyTVaOQZyJ+csxukBOo8YzkHKbEno6JIWpL1/FRPxgPf4cIMH1p81VIZk40oFIJir+KjqwQabafLWUq/gKm2mYgDlL2EsGcy75QZ9EOGDwQz+p/TTnfAelF7nJjMeHLtzXOs38a8nt6OQ93f0Z1yId9cd8eC4yVsmDii5NMRFwtTEyLHwgvSiQoK8IutsXZh7xkobLZ/yJRFDdtOwYKqy6WvM4tcill+dC/SCmKQ/wS77ptVBbpeErCiKBYqBNF5yB6H7X5PIBo01S1to5qQYeLghnAPfOlWTR6TRr4sMUOsK6HO9XmPj8cGV8go/JxRsbiZ3mG1evcIjpE23FzSSJ6zX4RlS+gHBMdSJtVD4lumGwZmS96zK2UHse3erg7vO4Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(44832011)(83380400001)(86362001)(54906003)(8936002)(31696002)(38100700002)(508600001)(36756003)(31686004)(66946007)(53546011)(66556008)(66476007)(4326008)(6916009)(956004)(186003)(26005)(8676002)(5660300002)(7406005)(7416002)(2616005)(6486002)(316002)(2906002)(16576012)(43740500002)(45980500001)(309714004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V0ZHeDRNQ01SMTRYckVEaUM2SEpwbXUya3VyYklFMkRBUkswSVFWSlFYMXcr?=
+ =?utf-8?B?bFBzTDZOMFFBdmpDeEFTWC9UYjU0RHRUMmFVYzdERytGSlpPSnRhajRxN2NN?=
+ =?utf-8?B?R1lKZTllYlY4NXI1bWNKNjNjNnFFWUpVdW5yV1pwcTdhbUN1OWRFV2lyNXY0?=
+ =?utf-8?B?akdEZjRzZ1pTTjd3a2xFdDBqQVIvejNHeXZ4dnZ3SDhqZFl6QmZVZ25YRlNa?=
+ =?utf-8?B?Uml4NjJkcUpZN0lqeFdlWjRLWXZ6SzJwSGVqSzdpbUdrL2hQNUx4bnBNSDg5?=
+ =?utf-8?B?ZFdZL0p1S04zQ3NDVkhrR2F6cVEwMVVKM3lJK0tkQlZ6Qld2WGl3SFJXV2RN?=
+ =?utf-8?B?aDYxVWFJcWhzbDJ0RG9QR3UvRDR5NUQ1V2NFK2ErTlBreUlKMlF2cmhoRjlF?=
+ =?utf-8?B?bDY0a0s1b3Z0a1Nld2ZBUDhVN0RXRC9tcHF4akZUeWUwV1g5bEpCRE0wSVhY?=
+ =?utf-8?B?MXcyT05rSU54T2wzaXZvYkxTSUJDWlVCRUUwdTdRRy9YZFdadVFtL2xuTzh6?=
+ =?utf-8?B?d3c2dnNWMXU3a3BaWmtQa3Y4QTRsT0xpNG94T3FibGtQYVI5czIyS1ptczVi?=
+ =?utf-8?B?V3NlaDJpcmlqS0orK2IvR0d1b1pVVElYcXV6ajd6YVF6SjE4RXNKUVJUMCty?=
+ =?utf-8?B?WXRXbnBjQnlIRzUvOTU1YnZ2V253RjE2UE9rRnlYUE9qMkFyQ0dEeGxxdm5p?=
+ =?utf-8?B?VFNJaTNTUnp0amkzVmhPTlZ2RzhwNXNORlFtV2VZWGFMa2VhNlVTYW5oemhv?=
+ =?utf-8?B?UjZZT2w4WmF3amJGSkxZemZYUFJmTjY0Ykt3aExmNnZNL21oRjJpVmpaQW9V?=
+ =?utf-8?B?UERmVjUwdXBHcnAyMHlhRzUyRWdkcXJ6QlJjS1FTVmw1WDVCb0NRZWg4MUlu?=
+ =?utf-8?B?dnUyTVE0ak9seVhIQnhOV1pFYkdsVzNTTUFhVERxSGdrMFlQRXBZa3VnNE5o?=
+ =?utf-8?B?SktkM21aRE5FY0x6YnBtRUd5WWVuTS9vazBJU3RBVWRPTUVvbEUyV1VYdnAr?=
+ =?utf-8?B?S0JiZkFVaFd3WGM5YStoS01UeGNOTUtsbFN4S2tLUk9zSDZ2SmZsUHViVG9z?=
+ =?utf-8?B?NVU0OXNIak9KMUZiSHIwcG9KSHZpNVgxaDZ1bktPSnp1cXYvTVBsQmFDUW1i?=
+ =?utf-8?B?cG96K0ppSWtOZ1R3bXJoUGhiOEw0Z0JKNVZZeXFuKzZsYVEvdEwxRkFRekdX?=
+ =?utf-8?B?eHpvMUpmamc3dW5vcXU4Q0UwOHRPejBwWXNNdUtqd3BYWEU4ZTJaQThabmZG?=
+ =?utf-8?B?bXIwQ1FuU0VEVlJNOC9JRkpnWXZaL3NtbStMZStyOFk5ZkVMWGdEWERTVkp4?=
+ =?utf-8?B?MlNqUklYaXY5b3Z1aXZlaUNZTXduSGg2dGhkMmhzUmY2MENoK2RFSUxxZUZx?=
+ =?utf-8?B?VmRoTUx6OG5VNVB5citBMWFUdGN1UW9YK2FhNjl4aldscXRrbUw2czdGZUdp?=
+ =?utf-8?B?OXV3UEd6MGswbGNYV2JLMStralhuNnBCMXU0R2xaeTQzR0x6T0crTmJhWEJv?=
+ =?utf-8?B?Zkx5eVM1ZUovMnNwdmZFeXlSWXVNcFZSWXlOdHhoYjIvZ1NoUkFYRVBWb1ZZ?=
+ =?utf-8?B?RkRIYnp3UGU2UTJmYjZWbWZOQWpHaWxPcFBTYkZPZVIzTi90NS84M0NHcXdE?=
+ =?utf-8?B?dVBQQWpYRGlWVmw3Nlo5SXZ2T0lvYnNHOG95RVRaS3J3c3N6blBLZks2cUVm?=
+ =?utf-8?B?cWRJZGRSdFNOQjZYbytSUDY5NE16MTM0ZFFnS2RpbWVGWkNQbXQ1Y3gzMmNK?=
+ =?utf-8?Q?G0JQjBRGR05t6IC9umip5nDeMSp0pBj2eBHLZBt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c4fc950-7fa6-4082-5637-08d99018efa9
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2021 20:18:22.6781
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: q7TKxFlk6AbzFsRG56Pd0o7MfYgcA5wMsaOBBzxa91afOmbvKwFty0NAWtMUQRhjoPxyNArS53dYfy8USZvw+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2718
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 20, 2021, Brijesh Singh wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> Add support for the SEV-SNP AP Creation NAE event. This allows SEV-SNP
-> guests to alter the register state of the APs on their own. This allows
-> the guest a way of simulating INIT-SIPI.
-> 
-> A new event, KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, is created and used
-> so as to avoid updating the VMSA pointer while the vCPU is running.
-> 
-> For CREATE
->   The guest supplies the GPA of the VMSA to be used for the vCPU with the
->   specified APIC ID. The GPA is saved in the svm struct of the target
->   vCPU, the KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event is added to the
->   vCPU and then the vCPU is kicked.
-> 
-> For CREATE_ON_INIT:
->   The guest supplies the GPA of the VMSA to be used for the vCPU with the
->   specified APIC ID the next time an INIT is performed. The GPA is saved
->   in the svm struct of the target vCPU.
-> 
-> For DESTROY:
->   The guest indicates it wishes to stop the vCPU. The GPA is cleared from
->   the svm struct, the KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event is added
->   to vCPU and then the vCPU is kicked.
-> 
-> 
-> The KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event handler will be invoked as
-> a result of the event or as a result of an INIT. The handler sets the vCPU
-> to the KVM_MP_STATE_UNINITIALIZED state, so that any errors will leave the
-> vCPU as not runnable. Any previous VMSA pages that were installed as
-> part of an SEV-SNP AP Creation NAE event are un-pinned. If a new VMSA is
-> to be installed, the VMSA guest page is pinned and set as the VMSA in the
-> vCPU VMCB and the vCPU state is set to KVM_MP_STATE_RUNNABLE. If a new
-> VMSA is not to be installed, the VMSA is cleared in the vCPU VMCB and the
-> vCPU state is left as KVM_MP_STATE_UNINITIALIZED to prevent it from being
-> run.
 
-LOL, this part of the GHCB is debatable, though I guess it does say "may"...
+On 10/15/21 1:05 PM, Sean Christopherson wrote:
+> On Fri, Aug 20, 2021, Brijesh Singh wrote:
+>> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+>> index f383d2a89263..8627c49666c9 100644
+>> --- a/arch/x86/kernel/sev.c
+>> +++ b/arch/x86/kernel/sev.c
+>> @@ -2419,3 +2419,75 @@ int snp_lookup_rmpentry(u64 pfn, int *level)
+>>  	return !!rmpentry_assigned(e);
+>>  }
+>>  EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
+>> +
+>> +int psmash(u64 pfn)
+>> +{
+>> +	unsigned long paddr = pfn << PAGE_SHIFT;
+> Probably better to use __pfn_to_phys()?
 
-  Using VMGEXIT SW_EXITCODE 0x8000_0013, an SEV-SNP guest can create or update the
-  vCPU state of an AP, which may allow for a simpler and more secure method of
-                                             ^^^^^^^
-  booting an AP.
+Sure, I can use that instead of direct shift.
 
-> +	if (VALID_PAGE(svm->snp_vmsa_pfn)) {
 
-KVM's VMSA page should be freed on a successful "switch", because AFAICT it's
-incorrect for KVM to ever go back to the original VMSA.
+>
+>> +	int ret;
+>> +
+>> +	if (!pfn_valid(pfn))
+>> +		return -EINVAL;
+>> +
+>> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> Shouldn't this be a WARN_ON_ONCE()?
 
-> +		/*
-> +		 * The snp_vmsa_pfn fields holds the hypervisor physical address
-> +		 * of the about to be replaced VMSA which will no longer be used
-> +		 * or referenced, so un-pin it.
-> +		 */
-> +		kvm_release_pfn_dirty(svm->snp_vmsa_pfn);
-> +		svm->snp_vmsa_pfn = INVALID_PAGE;
-> +	}
-> +
-> +	if (VALID_PAGE(svm->snp_vmsa_gpa)) {
-> +		/*
-> +		 * The VMSA is referenced by the hypervisor physical address,
-> +		 * so retrieve the PFN and pin it.
-> +		 */
-> +		pfn = gfn_to_pfn(vcpu->kvm, gpa_to_gfn(svm->snp_vmsa_gpa));
+Since some of these function are called while handling the PSC so I
+tried to avoid using the WARN -- mainly because if the warn_on_panic=1
+is set on the host then it will result in the kernel panic.
 
-Oh yay, a gfn.  That means that the page is subject to memslot movement.  I don't
-think the code will break per se, but it's a wrinkle that's not handled.
+>
+>> +		return -ENXIO;
+>> +
+>> +	/* Binutils version 2.36 supports the PSMASH mnemonic. */
+>> +	asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"
+>> +		      : "=a"(ret)
+>> +		      : "a"(paddr)
+>> +		      : "memory", "cc");
+>> +
+>> +	return ret;
+> I don't like returning the raw result from hardware; it's mostly works because
+> hardware also uses '0' for success, but it will cause confusion should hardware
+> ever set bit 31.  There are also failures that likely should never happen unless
+> there's a kernel bug, e.g. I suspect we can do:
+>
+> 	if (WARN_ON_ONCE(ret == FAIL_INPUT))
+> 		return -EINVAL;
+> 	if (WARN_ON_ONCE(ret == FAIL_PERMISSION))
+> 		return -EPERM;
+> 	
+> 	....
+>
+> or if all errors are "impossible"
+>
+> 	if (WARN_ON_ONCE(ret))
+> 		return snp_error_code_to_errno(ret);
+>
+> FAIL_INUSE and FAIL_OVERLAP also need further discussion.  It's not clear to me
+> that two well-behaved callers can't encounter collisions due to the 2mb <=> 4kb
+> interactions.  If collisions between well-behaved callers are possible, then this
+> helper likely needs some form of serialization.  Either, the concurrency rules
+> for RMP access need explicit and lengthy documentation.
 
-I'm also pretty sure the page will effectively be leaked, I don't see a
+I don't think we need to serialize the calls. The hardware acquires the
+lock before changing the RMP table, and if another processor tries to
+access the same RMP table entry, the hardware will return FAIL_INUSE or
+#NPF. The FAIL_INUSE will happen on the RMPUPDATE, whereas the #NPF will
+occur if the guest attempts to modify the RMP entry (such as using the
+RMPADJUST).
 
-	kvm_release_pfn_dirty(svm->snp_vmsa_pfn);
+As per the FAIL_OVERLAP is concerns, it's the case where the guest is
+asking to create an invalid situation and hardware detects it.  In other
+words, it is a guest bug. e.g., the guest issued a PSC to add a page as
+2MB and then asked to add the same page (or one of subpage) as a 4K.
+Hardware sees the overlap condition and fails to change the state on the
+second request.
 
-in vCPU teardown.
 
-Furthermore, letting the guest specify the page would open up to exploits of the
-erratum where a spurious RMP violation is signaled if an in-use page, a.k.a. VMSA
-page, is 2mb aligned.  That also means the _guest_ needs to be somehow be aware
-of the erratum.
+thanks
 
-And digging through the guest patches, this gives the guest _full_ control over
-the VMSA contents.  That is bonkers.  At _best_ it gives the guest the ability to
-fuzz VMRUN ucode by stuffing garbage into the VMSA.
-
-Honestly, why should KVM even support guest-provided VMSAs?  It's far, far simpler
-to handle this fully in the guest with a BIOS<=>kernel mailbox; see the MP wakeup
-protocol being added for TDX.  That would allow improving the security for SEV-ES
-as well, though I'm guessing no one actually cares about that in practice.
-
-IIUC, the use case for VMPLs is that VMPL0 would be fully trusted by both the host
-and guest, i.e. attacks via the VMSA are out-of-scope.  That is very much not the
-case here.
