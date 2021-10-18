@@ -2,171 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A460C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Oct 2021 14:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD2E3C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Oct 2021 18:26:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 13F3A610A1
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Oct 2021 14:29:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0D6161357
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Oct 2021 18:26:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232120AbhJROb5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Oct 2021 10:31:57 -0400
-Received: from psionic.psi5.com ([62.113.204.72]:52578 "EHLO psionic.psi5.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232042AbhJRObl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Oct 2021 10:31:41 -0400
-X-Greylist: delayed 419 seconds by postgrey-1.27 at vger.kernel.org; Mon, 18 Oct 2021 10:31:41 EDT
-Received: from simon.ametek.lan (unknown [80.149.237.18])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by psionic.psi5.com (Postfix) with ESMTPSA id 3E287280481;
-        Mon, 18 Oct 2021 16:22:23 +0200 (CEST)
-To:     linux-crypto@vger.kernel.org
-Cc:     linux-mm@kvack.org
-From:   Simon Richter <Simon.Richter@hogyros.de>
-Subject: Shoveling data into and out of the crypto subsystem
-Message-ID: <8d718ae1-06a9-72c2-a3c0-71fd3f7af7b4@hogyros.de>
-Date:   Mon, 18 Oct 2021 16:22:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S232488AbhJRS26 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 18 Oct 2021 14:28:58 -0400
+Received: from mail-oi1-f181.google.com ([209.85.167.181]:35832 "EHLO
+        mail-oi1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229696AbhJRS25 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 18 Oct 2021 14:28:57 -0400
+Received: by mail-oi1-f181.google.com with SMTP id r6so1031769oiw.2;
+        Mon, 18 Oct 2021 11:26:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FouZD7WWAm4FEr44KhGasJDNRL3CwqxudIFUEOILOfM=;
+        b=A9G3a76XjbCSX186/RfONbbj9RCYOnVK8AUjkpLPbWFLMpjaravdXDXfTDXUmpbPR2
+         8Em2epRWlFmcn1UFHgd15ieCuTqByMLw3UnDc4H9wAd9I1+cvphZ52BWTWoeiDcskJtU
+         DZpv9/F5MWTUrLoynzyIfWGHgiAkMKm+wyePnl1XP6xMNDV7xIOwnki5g3UcULT4eizn
+         SyXVP9fW/k3VnYsfQnwJiTkEHJ6sFYZUsF6Xl5pE3cjYTgDekOV0sxzrelurR/my9u9A
+         eEj1aA+CAoyRHfGbflhVlxGzvthB6/iJdULDCQrJ2mcponfoDpixxAMKWWmLJrqxSGUM
+         RGCg==
+X-Gm-Message-State: AOAM530BKPOApE3+DW9un8RbsIBxafklEzvHagovK0OLLE/pexjZ6dhn
+        +bgF424H8YlQRnvpH4LEPQ==
+X-Google-Smtp-Source: ABdhPJzgKEr+ZEnCBB0TINT5L+Hks6jkJRLj6D8d/PeDLfJ1LGueYN1L0xSHwgTaIgOSWvSXUPUdRw==
+X-Received: by 2002:aca:41d5:: with SMTP id o204mr416199oia.41.1634581605651;
+        Mon, 18 Oct 2021 11:26:45 -0700 (PDT)
+Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
+        by smtp.gmail.com with ESMTPSA id g12sm2619925oof.6.2021.10.18.11.26.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Oct 2021 11:26:45 -0700 (PDT)
+Received: (nullmailer pid 2705218 invoked by uid 1000);
+        Mon, 18 Oct 2021 18:26:44 -0000
+Date:   Mon, 18 Oct 2021 13:26:44 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, agross@kernel.org, devicetree@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Thara Gopinath <thara.gopinath@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        robh+dt@kernel.org, bhupesh.linux@gmail.com
+Subject: Re: [PATCH v4 11/20] dt-bindings: crypto : Add new compatible
+ strings for qcom-qce
+Message-ID: <YW28ZIbBj2+mfndy@robh.at.kernel.org>
+References: <20211013105541.68045-1-bhupesh.sharma@linaro.org>
+ <20211013105541.68045-12-bhupesh.sharma@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="kxmil7z8Nei9pLG1fB0Mogj8bu18VZJ6x"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211013105541.68045-12-bhupesh.sharma@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kxmil7z8Nei9pLG1fB0Mogj8bu18VZJ6x
-Content-Type: multipart/mixed; boundary="EHTJfrw2iSYlXRz8FRZkpZUhJPBqmKufJ";
- protected-headers="v1"
-From: Simon Richter <Simon.Richter@hogyros.de>
-To: linux-crypto@vger.kernel.org
-Cc: linux-mm@kvack.org
-Message-ID: <8d718ae1-06a9-72c2-a3c0-71fd3f7af7b4@hogyros.de>
-Subject: Shoveling data into and out of the crypto subsystem
+On Wed, 13 Oct 2021 16:25:32 +0530, Bhupesh Sharma wrote:
+> Newer qcom chips support newer versions of the qce crypto IP, so add
+> soc specific compatible strings for qcom-qce instead of using crypto
+> IP version specific ones.
+> 
+> Keep the old strings for backward-compatibility, but mark them as
+> deprecated.
+> 
+> Cc: Thara Gopinath <thara.gopinath@linaro.org>
+> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Cc: Rob Herring <robh+dt@kernel.org>
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>  Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
 
---EHTJfrw2iSYlXRz8FRZkpZUhJPBqmKufJ
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-Hi,
-
-I'm building a small accelerator card that should provide crypto=20
-primitives, and I'm wondering how large data transfers from and to=20
-userspace are supposed to work -- especially if these are file backed=20
-and larger than available memory.
-
-For testing, I've created an 8GB random file, and used kcapi-dgst on it:
-
-     $ strace kcapi-dgst -c sha256 -i test8G.bin --hex
-     [...]
-     openat(AT_FDCWD, 0x7ffc7e4b5896, O_RDONLY|O_CLOEXEC) =3D 6
-     fstat(6, 0x7ffc7e4a5da0)                =3D 0
-     mmap(NULL, 8589934592, PROT_READ, MAP_SHARED, 6, 0) =3D 0x7f8d911cf0=
-00
-     accept(3, NULL, NULL)                   =3D 7
-     sendmsg(7, 0x7ffc7e4a5ca0, MSG_MORE)    =3D 2147479552
-     vmsplice(5, 0x7ffc7e4a5d00, 1, SPLICE_F_MORE|SPLICE_F_GIFT) =3D 4095=
-
-     splice(4, NULL, 7, NULL, 4095, SPLICE_F_MORE) =3D 4095
-     sendmsg(7, 0x7ffc7e4a5ca0, MSG_MORE)    =3D 2147479552
-     vmsplice(5, 0x7ffc7e4a5d00, 1, SPLICE_F_MORE|SPLICE_F_GIFT) =3D 4095=
-
-     splice(4, NULL, 7, NULL, 4095, SPLICE_F_MORE) =3D 4095
-     sendmsg(7, 0x7ffc7e4a5ca0, MSG_MORE)    =3D 2147479552
-     vmsplice(5, 0x7ffc7e4a5d00, 1, SPLICE_F_MORE|SPLICE_F_GIFT) =3D 4095=
-
-     splice(4, NULL, 7, NULL, 4095, SPLICE_F_MORE) =3D 4095
-     sendmsg(7, 0x7ffc7e4a5ca0, MSG_MORE)    =3D 2147479552
-     vmsplice(5, 0x7ffc7e4a5d00, 1, SPLICE_F_MORE|SPLICE_F_GIFT) =3D 4095=
-
-     splice(4, NULL, 7, NULL, 4095, SPLICE_F_MORE) =3D 4095
-     sendto(7, 0x7f8f911ceffc, 4, MSG_MORE, NULL, 0) =3D 4
-     recvmsg(7, 0x7ffc7e4a5cd0, 0)           =3D 32
-     fstat(1, 0x7ffc7e4a5bc0)                =3D 0
-     munmap(0x7f8d911cf000, 0)               =3D -1 EINVAL (Invalid argum=
-ent)
-
-This seems wrong to me:
-
-  - Every sendmsg call is 2GB - 4kB. That probably makes sense when=20
-trying to keep every transfer page aligned.
-  - The vmsplice()/splice() transfers 4095 bytes -- that would likely=20
-trigger a copy and leave the file pointer unaligned after
-  - The last sendto() call then cleans up the remaining four bytes and=20
-still uses MSG_MORE.
-  - The munmap() call is just confused.
-
-Is that the optimal way to transfer data from disk to an ahash?
-
-Now my PCIe device can operate directly on DMA memory, and the way I've=20
-understood the crypto API is that the "src" scatterlist can be mapped=20
-using dma_map_sg, so somehow the data is in DMA memory at this point,=20
-which makes me suspect that the data was copied several times in between =
-
-as the result of mmap() is unsuitable for DMA.
-
-crypto+mm Questions so far:
-
-  - How does flow control work for the 2GB sendmsg(mmap()) if the data=20
-needs to be made available for DMA -- presumably I can't dma_map_sg()=20
-all of the pages if I have 4 GB physical memory?
-  - Is there a zerocopy path for disk->crypto that can be used with=20
-large data blobs?
-  - Are there suitable paths for crypto->disk (for encryption and=20
-compression)?
-  - If the device implements PCIe Address Translation and Page Request=20
-Interface, can I use the IOMMU to pin pages instead of doing that in a=20
-driver, i.e. can a crypto driver indicate that the scatterlist can refer =
-
-to virtual memory that need not be pinned or even present yet, and can=20
-this be used to avoid copies or partial mappings?
-
-Crypto only questions so far:
-
-  - The ahash interface seems to still expect the result to be filled=20
-out on return, when I kind of expected it to wait for me to send a=20
-callback. Am I missing something, or do I need to suspend the current=20
-thread and wake it up from an interrupt? Can I somehow report completion =
-
-from an interrupt handler? Does it make sense to make interrupts CPU affi=
-ne?
-  - The result pointer for ahash points to vmalloc()ed memory -- is=20
-there a way to get a DMA buffer instead (not that there's a performance=20
-difference here, but space in the result DMA buffer is another resource=20
-I need to track otherwise).
-  - The POWER9 NX driver has a separate interface for gzip=20
-compression/decompression of large blobs, is there a technical reason=20
-why it cannot implement the crypto API?
-
-Basically my goal is to have fast gzip compression and decompression=20
-support with the same interface on both of my workstations, one of which =
-
-has an FPGA card, and the other has two POWER9 CPUs with NX. :)
-
-    Simon
-
-
---EHTJfrw2iSYlXRz8FRZkpZUhJPBqmKufJ--
-
---kxmil7z8Nei9pLG1fB0Mogj8bu18VZJ6x
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEtjuqOJSXmNjSiX3Tfr04e7CZCBEFAmFtgx4ACgkQfr04e7CZ
-CBF5hgf+KP9/sFgcV5Mpos5IX8vFVdD220555Uk5kcZ40INSGX7yOfUVfxe2vWB/
-ptXvBIdH8xnuFi/FVkC5kBxluhJ3P8LB4BaOHNKF8axy4C/NGqAZvoxvp7g7JO3z
-OVyInUsOOFPIq8Jy4YPhqMCxjEMcqBtYlCL3B+ChGL3nBn9UIiuAs8Zl1hQZ8+ma
-jeEPkuUxmOJG0OfZ215srskUkYQ5lUcMMkjba/+UUPYc+eNS0QTyyojDBBt5lXJk
-a7HCpeHJxWvYAFWr7gQIk856x2FAjaHaK6bNPW4SE9CMhH8tEvtEEMpR7woYqwOv
-NEYrVNswINp+rKNDY9OYGkqb2Xb14g==
-=x8Q2
------END PGP SIGNATURE-----
-
---kxmil7z8Nei9pLG1fB0Mogj8bu18VZJ6x--
+Reviewed-by: Rob Herring <robh@kernel.org>
