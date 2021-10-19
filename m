@@ -2,204 +2,139 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 323C7C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Oct 2021 13:28:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F316C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Oct 2021 22:24:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 13FC161038
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Oct 2021 13:28:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5722960FDA
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Oct 2021 22:24:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235763AbhJSNaX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Oct 2021 09:30:23 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:56172 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235788AbhJSNaX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Oct 2021 09:30:23 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1mcp9z-0006Dx-E4; Tue, 19 Oct 2021 21:28:07 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1mcp9u-00046F-8w; Tue, 19 Oct 2021 21:28:02 +0800
-Date:   Tue, 19 Oct 2021 21:28:02 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Vladis Dronov <vdronov@redhat.com>,
-        Simo Sorce <ssorce@redhat.com>,
-        Eric Biggers <ebiggers@kernel.org>, llvm@lists.linux.dev,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH] crypto: api - Do not create test larvals if manager is
- disabled
-Message-ID: <20211019132802.GA14233@gondor.apana.org.au>
-References: <20210913071251.GA15235@gondor.apana.org.au>
- <20210917002619.GA6407@gondor.apana.org.au>
- <YVNfqUVJ7w4Z3WXK@archlinux-ax161>
- <20211001055058.GA6081@gondor.apana.org.au>
- <YVdNFzs8HUQwHa54@archlinux-ax161>
- <20211003002801.GA5435@gondor.apana.org.au>
- <YV0K+EbrAqDdw2vp@archlinux-ax161>
+        id S229879AbhJSW0Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 19 Oct 2021 18:26:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60496 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229845AbhJSW0Y (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 Oct 2021 18:26:24 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8ED4C061749
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Oct 2021 15:24:10 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id g13-20020a17090a3c8d00b00196286963b9so977222pjc.3
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Oct 2021 15:24:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:in-reply-to:references:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=1HjkJ/s77qpPQedlx0RgSf6Pe/gtFpXgvkvC8dCGFU0=;
+        b=BxTLhk9+ebegQi7VeiuJ8gELz4u56+OXRjyqMZBoX0LqA7qfsOxJSz29PFrPQ2a5RY
+         LcxqHlpG5bSgJ3CFC57RhTH/R1HJkTDhjH7E7MLDPRTHfCwF3VUpggNElqDqkUS2LMrz
+         WrNip9ynF/P+x0QTDG0K5z9ZML7kLwU/Wcllgd4JYzKccvn0TPybqUlBx1mDIHh66jJF
+         cahqD9ok9M1Xuk1xeoHgN0qA9CMsGamHAulesB+mv/0r6Qwjtu5IdwmFHnOlMxAZ7Zge
+         8pj6oZJmyZ45JDp8Niu4HYLZB6PLDBK0UzjfbGSLG2hZeMLFKj0odEo1QVoz6EIjCDWe
+         OMuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=1HjkJ/s77qpPQedlx0RgSf6Pe/gtFpXgvkvC8dCGFU0=;
+        b=CS66/Uc0UQb+uuHvNT5a3tA75c0fLpCTSWChJBAZjYWCO4No17FnaijHGNJMFfyXp5
+         n3dPWR/NGv2vk9+COkMKuDmi79iQkjh42InDatjfNivmHigFunqN0DDbu9vDp8wVWQ6X
+         KtD/5C2xWaq6Yl+8YXS/+h2Y/pjRyPeB7u4in5SZWXDnm+NScvknnJtdIk1OpherDBAf
+         Pk1navLtNY8Mf843PeN8sswd0KFIHy1uTJcPfK55qPwjn46hGDA9ptaF18VmHGLQ7AlV
+         vZIQzckIoLmxn+rToi6kImkUKH5PoZnXkdxFASbQrYsC7gW5n5z1hlw7ROI4WwLAiIvx
+         VVAg==
+X-Gm-Message-State: AOAM533FnFqx7iunP19MTK4qOHlQ1NGuQL+OQKsSv9TVTeU/dUYvraqH
+        qCCNb2eewwhgY5ShKnBQgINLfJmtoVIvXC66
+X-Google-Smtp-Source: ABdhPJwLQqa9/353IjPEVTMx7skJRSXdLKW1mf1YwaUVOFV6ydmL3thqxJXuxdriUBbXxED+AQ4PcA==
+X-Received: by 2002:a17:902:7804:b0:13e:d4c6:e701 with SMTP id p4-20020a170902780400b0013ed4c6e701mr35682103pll.66.1634682250190;
+        Tue, 19 Oct 2021 15:24:10 -0700 (PDT)
+Received: from localhost (c-71-197-186-152.hsd1.wa.comcast.net. [71.197.186.152])
+        by smtp.gmail.com with ESMTPSA id z124sm227235pfb.108.2021.10.19.15.24.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Oct 2021 15:24:09 -0700 (PDT)
+From:   Kevin Hilman <khilman@baylibre.com>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Tim Bird <tbird20d@gmail.com>,
+        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Paul Gortmaker <paul.gortmaker@windriver.com>,
+        Linux Embedded <linux-embedded@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Sascha Hauer <kernel@pengutronix.de>,
+        Matt Porter <mporter@konsulko.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Tim Bird <tim.bird@sony.com>
+Subject: Re: [PATCH] MAINTAINERS: Remove Matt Mackall as his identity is
+ obsolete
+In-Reply-To: <CAMuHMdVCrC5_AjNDJN+nwrnn=EVTfD-8ddG=FaFBBh_0UY5acQ@mail.gmail.com>
+References: <20210920080635.253826-1-u.kleine-koenig@pengutronix.de>
+ <CA+bK7J741D=DgZMNeEC5xg9kDDSaJu19QsRunVvXkBGx1mKGnQ@mail.gmail.com>
+ <YW5r61ZQx+E9xfuH@pendragon.ideasonboard.com>
+ <57122a67509bebdf0d1b9f5bc15db116e0124e5d.camel@infradead.org>
+ <YW6UGP10hfGJ2kYy@pendragon.ideasonboard.com>
+ <CAMuHMdVCrC5_AjNDJN+nwrnn=EVTfD-8ddG=FaFBBh_0UY5acQ@mail.gmail.com>
+Date:   Tue, 19 Oct 2021 15:24:08 -0700
+Message-ID: <7hlf2oejqv.fsf@baylibre.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YV0K+EbrAqDdw2vp@archlinux-ax161>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 05, 2021 at 07:33:28PM -0700, Nathan Chancellor wrote:
+Geert Uytterhoeven <geert@linux-m68k.org> writes:
+
+> On Tue, Oct 19, 2021 at 11:48 AM Laurent Pinchart
+> <laurent.pinchart@ideasonboard.com> wrote:
+>> On Tue, Oct 19, 2021 at 10:33:10AM +0100, David Woodhouse wrote:
+>> > On Tue, 2021-10-19 at 09:55 +0300, Laurent Pinchart wrote:
+>> > > On Mon, Oct 18, 2021 at 03:17:22PM -0600, Tim Bird wrote:
+>> > > > I think an overhaul of the "EMBEDDED LINUX" MAINTAINERS entry
+>> > > > is long-overdue.
+>> > > >
+>> > > > No offense to any of the 3 persons listed, but I think the kernel =
+developer
+>> > > > community would be better served by a group of individuals with a =
+more
+>> > > > current active role in embedded linux.  I have a few names I'll
+>> > > > toss out for
+>> > > > candidates: Matt Porter, Kevin Hilman, Thomas Gleixner,  Thomas
+>> > > > Petazonni, Laurent Pinchart, and Uwe Kleine-K=C3=B6nig (and maybe =
+even
+>> > > > myself).
+>> > > >
+>> > > > This entry in the MAINTAINERS file is somewhat special, in that it
+>> > > > covers a "field of endeavor" rather than a specific set of files or
+>> > > > directories.
+>> > > >
+>> > > > Thoughts?
+>> > >
+>> > > Thank you for volunteering me :-)
+>> > >
+>> > > I was indeed wondering about this particular MAINTAINERS entry. As it
+>> > > doesn't cover any particular set of files, directories, drivers,
+>> > > subsystems or architectures, what does being listed here endeavour ?
+>> >
+>> > Basically nothing; I was going to suggest removing it entirely. There's
+>> > certainly no point listing me there any more.
+>> >
+>> > Once upon a time it involved a certain amount of heckling about memory
+>> > usage and "your hash table doesn't need to be that large" but that ship
+>> > sailed a long time ago :)
+>>
+>> Heckling is still an option without a MAINTAINERS entry I suppose :-)
 >
-> I assume this is the diff you mean? This does not resolve the issue. My
-> apologies if I am slow to respond, I am on vacation until the middle of
-> next week.
+> Don't worry, I keep on sailing ;-)
+>
+>> I wouldn't object if we were to remove it.
+>
+> +1
+>
 
-Sorry for the delay.  The kernel robot figured out the problem
-for me.  It's the crypto_alg_tested call that causes api.c to
-depend on algapi.c.  This call is only invoked in the case where
-the crypto manager is turned off.  We could instead simply make
-test larvals disappear in that case.
+Agreed.  Let's just drop this entry.
 
----8<---
-The delayed boot-time testing patch created a dependency loop
-between api.c and algapi.c because it added a crypto_alg_tested
-call to the former when the crypto manager is disabled.
-
-We could instead avoid creating the test larvals if the crypto
-manager is disabled.  This avoids the dependency loop as well
-as saving some unnecessary work, albeit in a very unlikely case.
-
-Reported-by: Nathan Chancellor <nathan@kernel.org>
-Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-Reported-by: kernel test robot <lkp@intel.com>
-Fixes: adad556efcdd ("crypto: api - Fix built-in testing dependency failures")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 422bdca214e1..d379fd91fb7b 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -216,6 +216,32 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
- }
- EXPORT_SYMBOL_GPL(crypto_remove_spawns);
- 
-+static struct crypto_larval *crypto_alloc_test_larval(struct crypto_alg *alg)
-+{
-+	struct crypto_larval *larval;
-+
-+	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER))
-+		return NULL;
-+
-+	larval = crypto_larval_alloc(alg->cra_name,
-+				     alg->cra_flags | CRYPTO_ALG_TESTED, 0);
-+	if (IS_ERR(larval))
-+		return larval;
-+
-+	larval->adult = crypto_mod_get(alg);
-+	if (!larval->adult) {
-+		kfree(larval);
-+		return ERR_PTR(-ENOENT);
-+	}
-+
-+	refcount_set(&larval->alg.cra_refcnt, 1);
-+	memcpy(larval->alg.cra_driver_name, alg->cra_driver_name,
-+	       CRYPTO_MAX_ALG_NAME);
-+	larval->alg.cra_priority = alg->cra_priority;
-+
-+	return larval;
-+}
-+
- static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
- {
- 	struct crypto_alg *q;
-@@ -250,31 +276,20 @@ static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
- 			goto err;
- 	}
- 
--	larval = crypto_larval_alloc(alg->cra_name,
--				     alg->cra_flags | CRYPTO_ALG_TESTED, 0);
-+	larval = crypto_alloc_test_larval(alg);
- 	if (IS_ERR(larval))
- 		goto out;
- 
--	ret = -ENOENT;
--	larval->adult = crypto_mod_get(alg);
--	if (!larval->adult)
--		goto free_larval;
--
--	refcount_set(&larval->alg.cra_refcnt, 1);
--	memcpy(larval->alg.cra_driver_name, alg->cra_driver_name,
--	       CRYPTO_MAX_ALG_NAME);
--	larval->alg.cra_priority = alg->cra_priority;
--
- 	list_add(&alg->cra_list, &crypto_alg_list);
--	list_add(&larval->alg.cra_list, &crypto_alg_list);
-+
-+	if (larval)
-+		list_add(&larval->alg.cra_list, &crypto_alg_list);
- 
- 	crypto_stats_init(alg);
- 
- out:
- 	return larval;
- 
--free_larval:
--	kfree(larval);
- err:
- 	larval = ERR_PTR(ret);
- 	goto out;
-@@ -403,10 +418,11 @@ int crypto_register_alg(struct crypto_alg *alg)
- 	down_write(&crypto_alg_sem);
- 	larval = __crypto_register_alg(alg);
- 	test_started = static_key_enabled(&crypto_boot_test_finished);
--	larval->test_started = test_started;
-+	if (!IS_ERR_OR_NULL(larval))
-+		larval->test_started = test_started;
- 	up_write(&crypto_alg_sem);
- 
--	if (IS_ERR(larval))
-+	if (IS_ERR_OR_NULL(larval))
- 		return PTR_ERR(larval);
- 
- 	if (test_started)
-@@ -616,8 +632,8 @@ int crypto_register_instance(struct crypto_template *tmpl,
- 	larval = __crypto_register_alg(&inst->alg);
- 	if (IS_ERR(larval))
- 		goto unlock;
--
--	larval->test_started = true;
-+	else if (larval)
-+		larval->test_started = true;
- 
- 	hlist_add_head(&inst->list, &tmpl->instances);
- 	inst->tmpl = tmpl;
-@@ -626,7 +642,7 @@ int crypto_register_instance(struct crypto_template *tmpl,
- 	up_write(&crypto_alg_sem);
- 
- 	err = PTR_ERR(larval);
--	if (IS_ERR(larval))
-+	if (IS_ERR_OR_NULL(larval))
- 		goto err;
- 
- 	crypto_wait_for_test(larval);
-diff --git a/crypto/api.c b/crypto/api.c
-index ee5991fe11f8..cf0869dd130b 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -167,11 +167,8 @@ void crypto_wait_for_test(struct crypto_larval *larval)
- 	int err;
- 
- 	err = crypto_probing_notify(CRYPTO_MSG_ALG_REGISTER, larval->adult);
--	if (err != NOTIFY_STOP) {
--		if (WARN_ON(err != NOTIFY_DONE))
--			goto out;
--		crypto_alg_tested(larval->alg.cra_driver_name, 0);
--	}
-+	if (WARN_ON_ONCE(err != NOTIFY_STOP))
-+		goto out;
- 
- 	err = wait_for_completion_killable(&larval->completion);
- 	WARN_ON(err);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Kevin
