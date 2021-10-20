@@ -2,57 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F37C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Oct 2021 14:03:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 594ACC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Oct 2021 14:07:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47E1C61373
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Oct 2021 14:03:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DAA560F8F
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Oct 2021 14:07:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230323AbhJTOFm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Oct 2021 10:05:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45486 "EHLO
+        id S230269AbhJTOJh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 20 Oct 2021 10:09:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230299AbhJTOFl (ORCPT
+        with ESMTP id S230024AbhJTOJg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Oct 2021 10:05:41 -0400
-Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B11AC061746
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Oct 2021 07:03:27 -0700 (PDT)
-Received: by mail-qv1-xf2a.google.com with SMTP id v10so2103859qvb.10
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Oct 2021 07:03:27 -0700 (PDT)
+        Wed, 20 Oct 2021 10:09:36 -0400
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 753EFC06161C
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Oct 2021 07:07:22 -0700 (PDT)
+Received: by mail-qk1-x731.google.com with SMTP id bp7so3147936qkb.12
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Oct 2021 07:07:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=942MFQAdclIgl2KqvslSafCq0ctbJW8Cf7/dgZQUQP8=;
-        b=EOlmUEkhqOZfNg6KCsoSgPe20D8i65c2gn7HuFCH20PX4ITkn0JLz10+cHd1Xj5Kbk
-         QhlE6kJinCShLfJxudqCsJjZKPADTf/E8Q86Cp3Lj3jOakzcCaWbWuGdl8WeZMpgOreR
-         UUpGUeFoSBMdcuOraEa7LxEPIdGdhiM40+wofl6jW0lyL5MNwpHlD+R6FKjtkbjjqAkT
-         HRvLd1TRJtnJ3088Mxn7XtnFnG3ruJIO+9KkI1/TX5c2gG/pf+f43Yd5cVr+os4sQ2SR
-         Xt0ICmHzHR0adsOxDUtjUWUdDQPwrqXWn/YHvBZQ00ipG0+0BaGTNXlR7m3ahQw8N42s
-         NR7A==
+        bh=jgtlFeXdT3Hd6RC5M2SWvFMAen1H/83nOl5HVUgBtrI=;
+        b=sc9i/fjetuLqOZM4ClryvZVwCtDOz6iEdlZj9diZQqB857ABVBaeLMBJBaf7uCp7il
+         /xxNXijVWNSXUGG+x6hRHx/tAUvvWQXn2NJAWx4WYKAm5CRG+13RxBg343Wj9wbGGc+Y
+         EZ5/E25rViC54giVVgDwTx9RILI1trr9/Ax+H+VLq+5siNhUc9JyYFeaqvzzrHghV/Uz
+         Oq0L1Zc9hiKPqIPyqz44QEGFEGJo68Po1nm4I6bRYObW6QR8AjYw6WPBpzCdNQQCdV8I
+         6Q2NsfIFph8frUQX8P/QDFy/aIaqctgcsF2Zb1YMoTpHE5P0y9IvzZ3KSLHbZpwhfp/9
+         U2nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=942MFQAdclIgl2KqvslSafCq0ctbJW8Cf7/dgZQUQP8=;
-        b=XetoI35YlGYwwOeqvcS2WxrGPiDRhPUR+/s9ND8bcgNtklHt0pz7Yx6orQhKLU8uWR
-         1/m49wfbhfJKlXD588/FtQVgTFHFWXA9bwjF46q5eSahQ5HbKn08u4oAN8Rt0UHloXlY
-         uyzybuUZYa4xIEH8wCBqc87vZmq7gjgj1BXKbxPKtaMM9hPDzOSdHTSm5VaZX7zZ0HxX
-         SciWDE970MtuzM2BUh691eNgstqyn23Yjfb3t5JVKd/N/i7Gvd8NFUqgjU7knLG8Y4TG
-         xlyAJIHFL8FruNKi0u0BHbY0n0GVoJ3uJN1ZVq50jcjvUbA691RDyBYFwhIGOtYbp2R+
-         oFxQ==
-X-Gm-Message-State: AOAM5324fYc1JDgW076EGV32FL+ql4W0ynlUt6fmTomRZUBRBqSxynzF
-        vwD7VGvfOHwSq5XxUOPiEhw9Pg==
-X-Google-Smtp-Source: ABdhPJyirz3Cl9goKVtyNv2S9QVWLJkniesMCnKLcEsWPFabxqporpeeqWDuvciZdRcNVpcOXsTzcA==
-X-Received: by 2002:a05:6214:144c:: with SMTP id b12mr6306189qvy.56.1634738606352;
-        Wed, 20 Oct 2021 07:03:26 -0700 (PDT)
+        bh=jgtlFeXdT3Hd6RC5M2SWvFMAen1H/83nOl5HVUgBtrI=;
+        b=xLn3puI258MTnSmHr5iIPXJqGdOfuQGoki++XBDxkYXFO03JnTSRbxIqb3zOtVV8F/
+         l77x/dl0fZWbNQkHgl4RWOvBD0H895BzGew45/mGpvVlRUpgsqO6PCyLhHlOyToW8olm
+         4VG5l5VwXP/VI9kg4uy9Z2kfluNV3HDUpvr4y/7NNPKB2Q+pPbGty54+rTsOJKORffLL
+         x4+4tn/o48g6XT7WyJsHuDlATrmJ87othYr7rRnpx8rzVks/W6fzBWTtA1Wlgb5Va0z2
+         SQT50f50XNbNyuqgtbWfX+wRyHytOOxZXsMBHEVpWrtq1xj7v8ajtl7Vi4ekVxT8SjNK
+         e5sg==
+X-Gm-Message-State: AOAM533SzjRIHmPjbTwp4MaGMs8lSIedQsYvpgTBLJiWlxHpeM8+nw4F
+        uXJaNrTFV4qYCo8KLW2HxO2K6911ji7KdQ==
+X-Google-Smtp-Source: ABdhPJyD1JzrgLozhl3rrIg7tRZDzkqL8hV4xjFIPqgoQogHBmFHJBrQ0i0KIJH9YuYozvlacl1IYg==
+X-Received: by 2002:a37:aac8:: with SMTP id t191mr244715qke.52.1634738841624;
+        Wed, 20 Oct 2021 07:07:21 -0700 (PDT)
 Received: from [192.168.1.93] (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.gmail.com with ESMTPSA id y23sm967873qtv.58.2021.10.20.07.03.25
+        by smtp.gmail.com with ESMTPSA id bq41sm1053610qkb.26.2021.10.20.07.07.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Oct 2021 07:03:25 -0700 (PDT)
-Subject: Re: [PATCH v4 00/20] Enable Qualcomm Crypto Engine on sm8250
+        Wed, 20 Oct 2021 07:07:21 -0700 (PDT)
+Subject: Re: [PATCH v4 15/20] crypto: qce: Add new compatibles for qce crypto
+ driver
 To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
         linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org
 Cc:     bhupesh.linux@gmail.com, linux-kernel@vger.kernel.org,
@@ -60,13 +61,14 @@ Cc:     bhupesh.linux@gmail.com, linux-kernel@vger.kernel.org,
         herbert@gondor.apana.org.au, davem@davemloft.net,
         Bjorn Andersson <bjorn.andersson@linaro.org>
 References: <20211013105541.68045-1-bhupesh.sharma@linaro.org>
+ <20211013105541.68045-16-bhupesh.sharma@linaro.org>
 From:   Thara Gopinath <thara.gopinath@linaro.org>
-Message-ID: <a5927363-5e2f-9af1-7446-2146fd455f36@linaro.org>
-Date:   Wed, 20 Oct 2021 10:03:24 -0400
+Message-ID: <6aecc0aa-6219-d440-0075-39935aec0c7e@linaro.org>
+Date:   Wed, 20 Oct 2021 10:07:20 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20211013105541.68045-1-bhupesh.sharma@linaro.org>
+In-Reply-To: <20211013105541.68045-16-bhupesh.sharma@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,122 +79,44 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 On 10/13/21 6:55 AM, Bhupesh Sharma wrote:
-> Sorry for a delayed v4, but I have been caught up with some other
-> patches.
-
+> Since we decided to use soc specific compatibles for describing
+> the qce crypto IP nodes in the device-trees, adapt the driver
+> now to handle the same.
+> 
+> Cc: Thara Gopinath <thara.gopinath@linaro.org>
+> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Cc: Rob Herring <robh+dt@kernel.org>
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>   drivers/crypto/qce/core.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+> index 033c7278aa5d..2ab0b97d718c 100644
+> --- a/drivers/crypto/qce/core.c
+> +++ b/drivers/crypto/qce/core.c
+> @@ -298,8 +298,8 @@ static int qce_crypto_remove(struct platform_device *pdev)
+>   }
+>   
+>   static const struct of_device_id qce_crypto_of_match[] = {
+> -	{ .compatible = "qcom,crypto-v5.1", },
 Hi Bhupesh,
 
-If possible, please consider splitting this series into 2. One with 
-changes required to support crypto driver on
-sm8250 and other with the generic fixes / fixing the dt-bindings et all.
-It would be easier to review as well
+I think we should keep the qcom,crypto-v5.1 here for backward 
+compatibility. Since v5.4 was added only recently it might be okay to 
+remove it.
 
 -- 
 Warm Regards
 Thara (She/Her/Hers)
 
-> 
-> Changes since v3:
-> =================
-> - v3 can be seen here: https://lore.kernel.org/linux-arm-msm/20210519143700.27392-1-bhupesh.sharma@linaro.org/
-> - Dropped a couple of patches from v3, on basis of the review comments:
->     ~ [PATCH 13/17] crypto: qce: core: Make clocks optional
->     ~ [PATCH 15/17] crypto: qce: Convert the device found dev_dbg() to dev_info()
-> - Addressed review comments from Thara, Rob and Stephan Gerhold.
-> - Collect Reviewed-by from Rob and Thara on some of the patches from the
->    v3 patchset.
-> 
-> Changes since v2:
-> =================
-> - v2 can be seen here: https://lore.kernel.org/dmaengine/20210505213731.538612-1-bhupesh.sharma@linaro.org/
-> - Drop a couple of patches from v1, which tried to address the defered
->    probing of qce driver in case bam dma driver is not yet probed.
->    Replace it instead with a single (simpler) patch [PATCH 16/17].
-> - Convert bam dma and qce crypto dt-bindings to YAML.
-> - Addressed review comments from Thara, Bjorn, Vinod and Rob.
-> 
-> Changes since v1:
-> =================
-> - v1 can be seen here: https://lore.kernel.org/linux-arm-msm/20210310052503.3618486-1-bhupesh.sharma@linaro.org/
-> - v1 did not work well as reported earlier by Dmitry, so v2 contains the following
->    changes/fixes:
->    ~ Enable the interconnect path b/w BAM DMA and main memory first
->      before trying to access the BAM DMA registers.
->    ~ Enable the interconnect path b/w qce crytpo and main memory first
->      before trying to access the qce crypto registers.
->    ~ Make sure to document the required and optional properties for both
->      BAM DMA and qce crypto drivers.
->    ~ Add a few debug related print messages in case the qce crypto driver
->      passes or fails to probe.
->    ~ Convert the qce crypto driver probe to a defered one in case the BAM DMA
->      or the interconnect driver(s) (needed on specific Qualcomm parts) are not
->      yet probed.
-> 
-> Qualcomm crypto engine is also available on sm8250 SoC.
-> It supports hardware accelerated algorithms for encryption
-> and authentication. It also provides support for aes, des, 3des
-> encryption algorithms and sha1, sha256, hmac(sha1), hmac(sha256)
-> authentication algorithms.
-> 
-> Tested the enabled crypto algorithms with cryptsetup test utilities
-> on sm8250-mtp and RB5 board (see [1]) and also with crypto self-tests,
-> including the fuzz tests (CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y).
-> 
-> Note that this series is rebased on a SMMU related fix from Arnd applied
-> on either linus's tip of linux-next's tip (see [2]), without which
-> the sm8250 based boards fail to boot with the latest tip.
-> 
-> [1]. https://linux.die.net/man/8/cryptsetup
-> [2]. https://lore.kernel.org/linux-arm-kernel/CAA8EJpoD4Th1tdwYQLnZur2oA0xX0LojSrNFLyJqdi6+rnB3YQ@mail.gmail.com/T/
-> 
-> Cc: Thara Gopinath <thara.gopinath@linaro.org>
-> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> Cc: Rob Herring <robh+dt@kernel.org>
-> 
-> Bhupesh Sharma (17):
->    arm64/dts: qcom: Fix 'dma' & 'qcom,controlled-remotely' nodes in dts
->    arm64/dts: qcom: ipq6018: Remove unused 'qcom,config-pipe-trust-reg'
->      property
->    arm64/dts: qcom: ipq6018: Remove unused 'iface_clk' property from
->      dma-controller node
->    dt-bindings: qcom-bam: Convert binding to YAML
->    dt-bindings: qcom-bam: Add 'interconnects' & 'interconnect-names' to
->      optional properties
->    dt-bindings: qcom-bam: Add 'iommus' to optional properties
->    dt-bindings: qcom-qce: Convert bindings to yaml
->    dt-bindings: qcom-qce: Add 'interconnects' and move 'clocks' to
->      optional properties
->    dt-bindings: qcom-qce: Add 'iommus' to optional properties
->    arm64/dts: qcom: sdm845: Use RPMH_CE_CLK macro directly
->    dt-bindings: crypto : Add new compatible strings for qcom-qce
->    arm64/dts: qcom: Use new compatibles for crypto nodes
->    crypto: qce: Add new compatibles for qce crypto driver
->    crypto: qce: Print a failure msg in case probe() fails
->    crypto: qce: Defer probing if BAM dma channel is not yet initialized
->    crypto: qce: Add 'sm8250-qce' compatible string check
->    arm64/dts: qcom: sm8250: Add dt entries to support crypto engine.
-> 
-> Thara Gopinath (3):
->    dma: qcom: bam_dma: Add support to initialize interconnect path
->    crypto: qce: core: Add support to initialize interconnect path
->    crypto: qce: core: Make clocks optional
-> 
->   .../devicetree/bindings/crypto/qcom-qce.yaml  |  90 +++++++++++++++
->   .../devicetree/bindings/dma/qcom_bam_dma.txt  |  50 --------
->   .../devicetree/bindings/dma/qcom_bam_dma.yaml | 107 ++++++++++++++++++
->   arch/arm64/boot/dts/qcom/ipq6018.dtsi         |  10 +-
->   arch/arm64/boot/dts/qcom/ipq8074.dtsi         |   4 +-
->   arch/arm64/boot/dts/qcom/msm8996.dtsi         |   4 +-
->   arch/arm64/boot/dts/qcom/msm8998.dtsi         |   2 +-
->   arch/arm64/boot/dts/qcom/sdm845.dtsi          |  10 +-
->   arch/arm64/boot/dts/qcom/sm8250.dtsi          |  28 +++++
->   drivers/crypto/qce/core.c                     |  66 +++++++----
->   drivers/crypto/qce/core.h                     |   1 +
->   drivers/dma/qcom/bam_dma.c                    |  16 ++-
->   12 files changed, 302 insertions(+), 86 deletions(-)
->   create mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.yaml
->   delete mode 100644 Documentation/devicetree/bindings/dma/qcom_bam_dma.txt
->   create mode 100644 Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
+
+> -	{ .compatible = "qcom,crypto-v5.4", },
+> +	{ .compatible = "qcom,ipq6018-qce", },
+> +	{ .compatible = "qcom,sdm845-qce", },
+>   	{}
+>   };
+>   MODULE_DEVICE_TABLE(of, qce_crypto_of_match);
 > 
 
 
