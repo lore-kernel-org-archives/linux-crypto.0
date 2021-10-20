@@ -2,100 +2,154 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD310C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Oct 2021 11:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFB0C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Oct 2021 11:39:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9591B60FD8
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Oct 2021 11:38:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DBD161359
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Oct 2021 11:39:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230202AbhJTLkZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Oct 2021 07:40:25 -0400
-Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:49608
-        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230135AbhJTLkZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Oct 2021 07:40:25 -0400
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com [209.85.208.197])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        id S230117AbhJTLlb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 20 Oct 2021 07:41:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56848 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229941AbhJTLla (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Oct 2021 07:41:30 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 3FB9140002
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Oct 2021 11:38:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1634729889;
-        bh=1bxWxV6xahA2c9N9IIfRQwFpQ4gEUEegrCc5ZiAPUwg=;
-        h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-         In-Reply-To:Content-Type;
-        b=NVWl9BTpCHq2QHQ20Dv01XymvPqXZ/cVcb6/41FC8s8eaz0tyyTB+sOs8jvGouc3i
-         4n7042tQr9ogd3hJTGn91bFyrUdSS6xRxdRNAhzC6dgXPuJZjxaejA0SudxUVWmr47
-         IrJVIc+LevmV4B5UgX8RuhDZ5eLDbMN9jUt7NadinjkPxZnwvd/h8/PajoZ/zJmHrR
-         jNulg0Q7CwehqkFp/RjwBthIhc2Buzjy9s1PBbNa7/bBpAMvPMYQdgPNVxAw5pjUkd
-         a8vdDt9i3Is+0Yy8LVk0OUcPZ81+ZCcRrNCsCXkKICIMDWaOYVEg5Pc9o1W0rbqIAV
-         u+D2RLf4hrZSg==
-Received: by mail-lj1-f197.google.com with SMTP id j13-20020a2e6e0d000000b0021101c034d5so1721596ljc.14
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Oct 2021 04:38:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1bxWxV6xahA2c9N9IIfRQwFpQ4gEUEegrCc5ZiAPUwg=;
-        b=sqo/2Ylh5nPms5fVOhhDnSoFdy4OJSznvrGS2GTtNtbViZ2pvcyRDc5SZjnX1dvP+u
-         ofip0oLgrb1cZ3pP4L52+60YHw+YFpmobra+XjabtmoOhi9TqJg40UhZAgZ+IeRtQR7l
-         zdVap/0+EV2RseP848iZWnJOC4Q8T3OWR6CSz6djOnfywpV5SAK3vOoa1DQcl8XnEVzB
-         CNJ3wzfsZPjLYzVWiPSmyRAYY/Tk6M2rP1hWO5EvOrS7Wt4pA0i+6UHK7S91zM+im2Za
-         kvPSOPUF63Xu1pgSVa5OpeCw6QXI2u299v1HjioebQGZ/zPIR6puJfMXqY6geW4QmWT3
-         LzeQ==
-X-Gm-Message-State: AOAM533Qm/TJEnd+J5bBeUGgwpEjWTWulDxWc4NQclSeJvjZZozUufE9
-        ygS1JZovlB1AyIkRkatTMurRB0gvUuCuZ+VOEk6BPgM7ScHaruXt8LXzUyAX6+KNztyfSuXPRtz
-        x5mvvSnbU0C98v2tpj87AOk1eXVJKgqEZH1Xk7FX5ww==
-X-Received: by 2002:a05:6512:2117:: with SMTP id q23mr11447294lfr.657.1634729888639;
-        Wed, 20 Oct 2021 04:38:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxN5uO9eigZSlgvdW58qAxX9R47x6QiEM9Oi0qiFSPAgUh8dkl1qA3pzN/lXMiIs5LhqKNZHw==
-X-Received: by 2002:a05:6512:2117:: with SMTP id q23mr11447272lfr.657.1634729888424;
-        Wed, 20 Oct 2021 04:38:08 -0700 (PDT)
-Received: from [192.168.3.161] (89-77-68-124.dynamic.chello.pl. [89.77.68.124])
-        by smtp.gmail.com with ESMTPSA id p8sm194267ljo.41.2021.10.20.04.38.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Oct 2021 04:38:07 -0700 (PDT)
-Subject: Re: [PATCH v2] crypto: s5p-sss - Add error handling in
- s5p_aes_probe()
-To:     Tang Bin <tangbin@cmss.chinamobile.com>, vz@mleia.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20211020110624.47696-1-tangbin@cmss.chinamobile.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-Message-ID: <ff261b7b-47a2-0cd8-8dcd-91f18998a482@canonical.com>
-Date:   Wed, 20 Oct 2021 13:38:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-MIME-Version: 1.0
-In-Reply-To: <20211020110624.47696-1-tangbin@cmss.chinamobile.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        by mail.kernel.org (Postfix) with ESMTPSA id 4BCC3611B0;
+        Wed, 20 Oct 2021 11:39:15 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1md9w8-000Q93-UK; Wed, 20 Oct 2021 12:39:13 +0100
+Date:   Wed, 20 Oct 2021 12:39:11 +0100
+Message-ID: <878ryoc4dc.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        patrice.chotard@foss.st.com
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        maxime coquelin <mcoquelin.stm32@gmail.com>,
+        alexandre torgue <alexandre.torgue@foss.st.com>,
+        michael turquette <mturquette@baylibre.com>,
+        stephen boyd <sboyd@kernel.org>,
+        herbert xu <herbert@gondor.apana.org.au>,
+        "david s . miller" <davem@davemloft.net>,
+        david airlie <airlied@linux.ie>,
+        daniel vetter <daniel@ffwll.ch>,
+        thierry reding <thierry.reding@gmail.com>,
+        sam ravnborg <sam@ravnborg.org>,
+        yannick fertre <yannick.fertre@foss.st.com>,
+        philippe cornu <philippe.cornu@foss.st.com>,
+        benjamin gaignard <benjamin.gaignard@linaro.org>,
+        vinod koul <vkoul@kernel.org>,
+        ohad ben-cohen <ohad@wizery.com>,
+        bjorn andersson <bjorn.andersson@linaro.org>,
+        baolin wang <baolin.wang7@gmail.com>,
+        jonathan cameron <jic23@kernel.org>,
+        lars-peter clausen <lars@metafoo.de>,
+        olivier moysan <olivier.moysan@foss.st.com>,
+        arnaud pouliquen <arnaud.pouliquen@foss.st.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Hugues Fruchet <hugues.fruchet@foss.st.com>,
+        Fabrice Gasnier <fabrice.gasnier@foss.st.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Jagan Teki <jagan@amarulasolutions.com>,
+        dillon min <dillon.minfei@gmail.com>,
+        Marek Vasut <marex@denx.de>,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Paul Cercueil <paul@crapouillou.net>,
+        Fabien Dessenne <fabien.dessenne@foss.st.com>,
+        Christophe Roullier <christophe.roullier@foss.st.com>,
+        Gabriel Fernandez <gabriel.fernandez@foss.st.com>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        Amelie Delaunay <amelie.delaunay@foss.st.com>,
+        Pierre-Yves MORDRET <pierre-yves.mordret@foss.st.com>,
+        Ludovic Barre <ludovic.barre@foss.st.com>,
+        Christophe Kerello <christophe.kerello@foss.st.com>,
+        pascal Paillet <p.paillet@foss.st.com>,
+        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Le Ray <erwan.leray@foss.st.com>, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        dmaengine@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-media@vger.kernel.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+        linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org,
+        linux-rtc@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org
+Subject: Re: dt-bindings: treewide: Update @st.com email address to @foss.st.com
+In-Reply-To: <22fb6f19-21eb-dcb5-fa31-bb243d4a7eaf@canonical.com>
+References: <20211020065000.21312-1-patrice.chotard@foss.st.com>
+        <22fb6f19-21eb-dcb5-fa31-bb243d4a7eaf@canonical.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: krzysztof.kozlowski@canonical.com, patrice.chotard@foss.st.com, robh+dt@kernel.org, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, mturquette@baylibre.com, sboyd@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net, airlied@linux.ie, daniel@ffwll.ch, thierry.reding@gmail.com, sam@ravnborg.org, yannick.fertre@foss.st.com, philippe.cornu@foss.st.com, benjamin.gaignard@linaro.org, vkoul@kernel.org, ohad@wizery.com, bjorn.andersson@linaro.org, baolin.wang7@gmail.com, jic23@kernel.org, lars@metafoo.de, olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com, tglx@linutronix.de, jassisinghbrar@gmail.com, mchehab@kernel.org, hugues.fruchet@foss.st.com, fabrice.gasnier@foss.st.com, lee.jones@linaro.org, miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com, kuba@kernel.org, srinivas.kandagatla@linaro.org, kishon@ti.com, linus.walleij@linaro.org, lgirdwood@gmail.com, broonie@kernel.org, mathieu.poirier@linaro.org, mpm@selenic.com, a.zummo@towertech.i
+ t, alexandre.belloni@bootlin.com, gregkh@linuxfoundation.org, rafael@kernel.org, daniel.lezcano@linaro.org, amitk@kernel.org, rui.zhang@intel.com, wim@linux-watchdog.org, linux@roeck-us.net, geert+renesas@glider.be, viresh.kumar@linaro.org, a.fatoum@pengutronix.de, jagan@amarulasolutions.com, dillon.minfei@gmail.com, marex@denx.de, laurent.pinchart@ideasonboard.com, sre@kernel.org, dmitry.torokhov@gmail.com, paul@crapouillou.net, fabien.dessenne@foss.st.com, christophe.roullier@foss.st.com, gabriel.fernandez@foss.st.com, lionel.debieve@foss.st.com, amelie.delaunay@foss.st.com, pierre-yves.mordret@foss.st.com, ludovic.barre@foss.st.com, christophe.kerello@foss.st.com, p.paillet@foss.st.com, peppe.cavallaro@st.com, joabreu@synopsys.com, erwan.leray@foss.st.com, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org,
+  dmaengine@vger.kernel.org, linux-remoteproc@vger.kernel.org, linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org, alsa-devel@alsa-project.org, linux-media@vger.kernel.org, linux-mtd@lists.infradead.org, netdev@vger.kernel.org, linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org, linux-rtc@vger.kernel.org, linux-serial@vger.kernel.org, linux-spi@vger.kernel.org, linux-pm@vger.kernel.org, linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 20/10/2021 13:06, Tang Bin wrote:
-> The function s5p_aes_probe() does not perform sufficient error
-> checking after executing platform_get_resource(), thus fix it.
+On Wed, 20 Oct 2021 08:45:02 +0100,
+Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com> wrote:
 > 
-> Fixes: c2afad6c6105 ("crypto: s5p-sss - Add HASH support for Exynos")
-> Signed-off-by: Tang Bin <tangbin@cmss.chinamobile.com>
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-> ---
-> Changes from v1
->  - add fixed title
-> ---
->  drivers/crypto/s5p-sss.c | 2 ++
->  1 file changed, 2 insertions(+)
+> On 20/10/2021 08:50, patrice.chotard@foss.st.com wrote:
+> > From: Patrice Chotard <patrice.chotard@foss.st.com>
+> > 
+> > Not all @st.com email address are concerned, only people who have
+> > a specific @foss.st.com email will see their entry updated.
+> > For some people, who left the company, remove their email.
+> > 
 > 
+> Please split simple address change from maintainer updates (removal,
+> addition).
+> 
+> Also would be nice to see here explained *why* are you doing this.
 
-You still missed the cc-stable tag. I pasted it last time.
-Cc: <stable@vger.kernel.org>
+And why this can't be done with a single update to .mailmap, like
+anyone else does.
 
-Best regards,
-Krzysztof
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
