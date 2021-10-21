@@ -2,120 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB3AC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Oct 2021 23:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E5ECC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Oct 2021 01:21:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4232161354
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Oct 2021 23:01:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40DD1610E7
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Oct 2021 01:21:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230361AbhJTXDr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Oct 2021 19:03:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56162 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229842AbhJTXDq (ORCPT
+        id S230393AbhJUBXV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 20 Oct 2021 21:23:21 -0400
+Received: from cmccmta2.chinamobile.com ([221.176.66.80]:8461 "EHLO
+        cmccmta2.chinamobile.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230103AbhJUBXV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Oct 2021 19:03:46 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06B4CC06174E
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Oct 2021 16:01:32 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id kk10so3555406pjb.1
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Oct 2021 16:01:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=h+RFC7eotFhOqFJGWOoMWVQg50r4LBG0z2sivzZSrgk=;
-        b=pma9xTPAAozGlLfkB9sflNKGCaUTlYDPKd78LbYcHoBUpBRdiQpZNG/Cc1nZw9vI4s
-         VTSD/474dW5dlNqhL8p1TXmulQIJQRdwQd35Hq/TvTJHLS+D754q5dwalnSMpnNallp6
-         QEE6REP3UMdDQd9t5/eTDAwqCT3kSq7TIRlSMz5dG+F3C0cAQG5Of9T0co/dFDVodtCw
-         LDtGnlp14OoIc4w9aY2VNUN730bG1epxV1fC8y0RW9O5Yzg6agArEPev3CeYeo6QWUHe
-         cjwF0FLqkskp8GARImJVl4T0BDlhURPzNIkeGgRFvjb/C72VmjO4rjSXV0a8d2SsN1L+
-         DK7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=h+RFC7eotFhOqFJGWOoMWVQg50r4LBG0z2sivzZSrgk=;
-        b=fcvHy7gzvkC/6hhx7eTnTgtutfzT0oWrU92Cp/7TCegKxRoH/q7s9nP+JpomCjxT8s
-         jONPPb0scqdh4zuXhwLjVDQh1NXuKO3ov5ZShqacVCDBeC//rdKiQWdY1zpdhR7TV1i4
-         y/AMXX4C/IZ46vN84RbUIsTYMSt45NIoaqr50B1Qf7YJRGLg47ECql/IhyjTj65fY0gQ
-         QjI9QJ6DxogA1cWbemzqyvPzQqI2+WSKRq4VqOgULSwzTe/aHuLdtFCWGMAEpQR8aMmM
-         VKgxSoQlDUTR6if5x6YshooqpwHFFhkVz7rZJLazndPRvbCJ9LUcSDvXsPWNuvxEPdRa
-         +nVA==
-X-Gm-Message-State: AOAM533DI0DIXpgQd1+ODnNOrBMDU6t9jUy93ad0jmeSkP7LPvSaSVou
-        qR8h3L93b74F5RoABMaq6frYRQ==
-X-Google-Smtp-Source: ABdhPJwAYmwtedqpowu2BAnkunIqrQX+jLSp7mbf/jJKomExPMM30rDS5HiPAzzKOhqXTZ7V/PFb/Q==
-X-Received: by 2002:a17:90a:b314:: with SMTP id d20mr2168217pjr.174.1634770891214;
-        Wed, 20 Oct 2021 16:01:31 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k1sm3356698pjj.54.2021.10.20.16.01.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Oct 2021 16:01:30 -0700 (PDT)
-Date:   Wed, 20 Oct 2021 23:01:27 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 44/45] KVM: SVM: Support SEV-SNP AP Creation NAE
- event
-Message-ID: <YXCfxyfQBix8+As+@google.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-45-brijesh.singh@amd.com>
- <YWnbfCet84Vup6q9@google.com>
- <a7944441-f279-a809-8817-2e4b38a0e309@amd.com>
+        Wed, 20 Oct 2021 21:23:21 -0400
+Received: from spf.mail.chinamobile.com (unknown[172.16.121.3]) by rmmx-syy-dmz-app05-12005 (RichMail) with SMTP id 2ee56170c072adc-0f24a; Thu, 21 Oct 2021 09:20:51 +0800 (CST)
+X-RM-TRANSID: 2ee56170c072adc-0f24a
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from [192.168.26.114] (unknown[10.42.68.12])
+        by rmsmtp-syy-appsvr02-12002 (RichMail) with SMTP id 2ee26170c072c15-3fcf0;
+        Thu, 21 Oct 2021 09:20:51 +0800 (CST)
+X-RM-TRANSID: 2ee26170c072c15-3fcf0
+Subject: Re: [PATCH v2] crypto: s5p-sss - Add error handling ins5p_aes_probe()
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        vz@mleia.com, herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20211020110624.47696-1-tangbin@cmss.chinamobile.com>
+ <ff261b7b-47a2-0cd8-8dcd-91f18998a482@canonical.com>
+From:   tangbin <tangbin@cmss.chinamobile.com>
+Message-ID: <f2c152bd-edc5-25ea-816f-092f18549658@cmss.chinamobile.com>
+Date:   Thu, 21 Oct 2021 09:20:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a7944441-f279-a809-8817-2e4b38a0e309@amd.com>
+In-Reply-To: <ff261b7b-47a2-0cd8-8dcd-91f18998a482@canonical.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 20, 2021, Brijesh Singh wrote:
-> 
-> On 10/15/21 2:50 PM, Sean Christopherson wrote:
-> > And digging through the guest patches, this gives the guest _full_ control over
-> > the VMSA contents.  That is bonkers.  At _best_ it gives the guest the ability to
-> > fuzz VMRUN ucode by stuffing garbage into the VMSA.
-> 
-> If guest puts garbage in VMSA then VMRUN will fail. I am sure ucode is
-> doing all kind of sanity checks to ensure that VMSA does not contain
-> invalid value before the run.
+Hi, Krzysztof：
 
-Oh, I'm well aware of the number of sanity checks that are in VM-Enter ucode, and
-that's precisely why I'm of the opinion that letting the guest fuzz VMRUN is a
-non-trivial security risk for the host.  I know of at least at least two VMX bugs
-(one erratum that I could find, one that must have been fixed with a ucode patch?)
-where ucode failed to detect invalid state.  Those were "benign" in that they
-caused a missed VM-Fail but didn't corrupt CPU state, but it's not a stretch to
-imagine a ucode bug that leads to corruption of CPU state and a system crash.
+On 2021/10/20 19:38, Krzysztof Kozlowski wrote:
+> On 20/10/2021 13:06, Tang Bin wrote:
+>> The function s5p_aes_probe() does not perform sufficient error
+>> checking after executing platform_get_resource(), thus fix it.
+>>
+>> Fixes: c2afad6c6105 ("crypto: s5p-sss - Add HASH support for Exynos")
+>> Signed-off-by: Tang Bin <tangbin@cmss.chinamobile.com>
+>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+>> ---
+>> Changes from v1
+>>   - add fixed title
+>> ---
+>>   drivers/crypto/s5p-sss.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+> You still missed the cc-stable tag. I pasted it last time.
+> Cc: <stable@vger.kernel.org>
 
-The sheer number of checks involved, combined with the fact that there likely
-hasn't been much fuzzing of VM-Enter outside of the hardware vendor's own
-validation, means I'm not exactly brimming with confidence that VMRUN's ucode
-is perfect.
+I am deeply sorry for my patch v2，I thought it to cc when use git to 
+send-email.
 
-I fully acknowledge that the host kernel obviously "trusts" CPU ucode to a great
-extent.  My point here is that the design exposes the host to unnecessary risk.
+I am sorry to waste your precious time. I will correct it immediately.
+
+Thanks
+
+Tang Bin
+
+
+
+> Best regards,
+> Krzysztof
+
+
