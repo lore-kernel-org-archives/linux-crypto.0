@@ -2,106 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B312C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Oct 2021 06:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76DD1C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Oct 2021 09:25:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11D936008E
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Oct 2021 06:58:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BD4160F92
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Oct 2021 09:25:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231392AbhJYHAt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Oct 2021 03:00:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49060 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229727AbhJYHAt (ORCPT
+        id S232295AbhJYJ2H (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Oct 2021 05:28:07 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:51726 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230010AbhJYJ2F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Oct 2021 03:00:49 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545BEC061745
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Oct 2021 23:58:26 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id ls14-20020a17090b350e00b001a00e2251c8so7637810pjb.4
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Oct 2021 23:58:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=NtT+Wof4jWQrra1PIt12aFx9JGnHbFl4ORoSxYDOL7A=;
-        b=Lr75rl1N8fb9rmzYIW1MYozI13Nze6A51avkr4Q6P4VQ8P1f+CGuF5DL8UK9dcvTAf
-         KsmI2G9PNaj3bDJgoO/SiqyZd0wKV6FVNiE2CVenEQ18atLKiNoyLh/6o/ewpYSP7j8J
-         QKqqIDDwmIVARrZiSQiaAhhFiJZNQi8i54Nh3jJc7qz4xNoM8Pv7gFidvikMRI4v4tLK
-         pXUvzhRKk4cmHcBIALpZA5+7a08ss792aEUembYRffcZZ9Uoggzm/S5lVUhUfZ5c1lX3
-         qDE7itKEhuewqk9ZC4lb76/yKC1snEmf9dVrV1j+COZkUVR56DtD9iGL3BVgnKrRLAvL
-         vAnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=NtT+Wof4jWQrra1PIt12aFx9JGnHbFl4ORoSxYDOL7A=;
-        b=DfnauxRVXxMyMywRgprzmTbA1klNJrGY7qTdd6xS23tmgMn0A0HY6UB9mqCbIijAYY
-         y06VrwGS7qYdg7OFY2yvF03WUJMOK5XmZgCx5qTG7gcmAZdIjs80/NYxExpI9MBU+VRS
-         idPL+Ku6k214oQNVCBsjgzaxZForPO0Ah0TaWIfrXUwY1JyTGwNFUo98JUFqA1mUgV41
-         u8nvf8CgO7YJ+2PvkXYes5QW3ZISOV1Eggv8UrqjjCdMSXyfQvouhREk0N90zBEzIm4j
-         qUO1Olxm50UWg/UnVXvqWH0z2nxN2j88A+ESXq4fEUJh1Aa74uvH9HHCiFb54of/V7mI
-         7Obg==
-X-Gm-Message-State: AOAM533VuDTTVmHJd0spuWTeWKdUZzSEXmZ3fHpMW08g3IBbW6SHsKnR
-        FJQzDcoVll9csbXUBNykdaayZw==
-X-Google-Smtp-Source: ABdhPJwEVEnSmTwj9187utQ8C28rPaGtAYPI8NTYs2AX1MxbaBZ3nNstBtTe4p6iJM6pwPTFC7y/9g==
-X-Received: by 2002:a17:90a:4283:: with SMTP id p3mr13137115pjg.23.1635145105861;
-        Sun, 24 Oct 2021 23:58:25 -0700 (PDT)
-Received: from FVFDK26JP3YV.bytedance.net ([61.120.150.77])
-        by smtp.gmail.com with ESMTPSA id b8sm18577380pfv.56.2021.10.24.23.58.23
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 24 Oct 2021 23:58:25 -0700 (PDT)
-From:   Lei He <helei.sig11@bytedance.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pizhenwei@bytedance.com, Lei He <helei.sig11@bytedance.com>
-Subject: [PATCH] fix negative modulus in rsa testcases
-Date:   Mon, 25 Oct 2021 14:58:10 +0800
-Message-Id: <20211025065810.87080-1-helei.sig11@bytedance.com>
-X-Mailer: git-send-email 2.29.2
+        Mon, 25 Oct 2021 05:28:05 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id E33311FD36;
+        Mon, 25 Oct 2021 09:25:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1635153942; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=+txo1N1OeQ38VR8c9TVCQxEqQEzX9GrJayemgmeIllU=;
+        b=Wm+ZHDmSVSSS92iuLxV2KS/vGpORdFKIZb6NUBzyWub1dGMMQcQH3Ksr7pSmgMijbkUMV9
+        40BY+nWoBfyWvJNyumHQ3XNGxHIB+prlQLebeKVTK8ZJr9ZSgu4hMo731DosK4dVAq6rn8
+        wmQ4spsxdDEQspWUTktQF94X5wkC9T8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1635153942;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=+txo1N1OeQ38VR8c9TVCQxEqQEzX9GrJayemgmeIllU=;
+        b=mVRSzkkOD1tqwxkSouip2ANVQ5FOOqWHTyHOTaWpIa7gjcv6sV8/qtOqe5ujTwgdF0oco0
+        faf/8G2DRKrEWIDg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CD70E13AAB;
+        Mon, 25 Oct 2021 09:25:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id lJX9MBZ4dmHPSQAAMHmgww
+        (envelope-from <nstange@suse.de>); Mon, 25 Oct 2021 09:25:42 +0000
+From:   Nicolai Stange <nstange@suse.de>
+To:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Torsten Duwe <duwe@suse.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Nicolai Stange <nstange@suse.de>
+Subject: [PATCH 0/6] crypto: DRBG - improve 'nopr' reseeding
+Date:   Mon, 25 Oct 2021 11:25:19 +0200
+Message-Id: <20211025092525.12805-1-nstange@suse.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-according to the BER encoding rules, integer value is encoded as
-two's complement, and if the highest bit of a positive integer
-is 1, should add an leading zero octet.
+Hi all,
 
-this test case will prevent some crypto-drivers that sign sensitive
-from passing self-test.
+this patchset aims at (hopefully) improving the DRBG code related to
+reseeding from get_random_bytes() a bit:
+- Replace the asynchronous random_ready_callback based DRBG reseeding
+  logic with a synchronous solution leveraging rng_is_initialized(). This
+  move simplifies the code IMO and, as a side-effect, would enable DRBG
+  users to rely on wait_for_random_bytes() to sync properly with
+  drbg_generate(), if desired. Implemented by patches 1-5/6.
+- Make the 'nopr' DRBGs to reseed themselves every 5min from
+  get_random_bytes(). This achieves at least kind of a partial prediction
+  resistance over the time domain at almost no extra cost. Implemented
+  by patch 6/6, the preceding patches in this series are a prerequisite
+  for this.
 
-Signed-off-by: Lei He <helei.sig11@bytedance.com>
----
- crypto/testmgr.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Tested with and without fips_enabled in a x86_64 VM, both with
+random.trust_cpu=on and off. As confirmed with a couple of debugging
+printks() (added for testing only, not included in this series), DRBGs
+have been instantiated with and without rng_is_initialized() evaluating
+to true each during my tests and the patched DRBG reseeding code worked as
+intended in either case.
 
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 779720bf9364..a253d66ba1c1 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -257,9 +257,9 @@ static const struct akcipher_testvec rsa_tv_template[] = {
- 	}, {
- #endif
- 	.key =
--	"\x30\x82\x02\x1F" /* sequence of 543 bytes */
-+	"\x30\x82\x02\x20" /* sequence of 544 bytes */
- 	"\x02\x01\x01" /* version - integer of 1 byte */
--	"\x02\x82\x01\x00" /* modulus - integer of 256 bytes */
-+	"\x02\x82\x01\x01\x00" /* modulus - integer of 256 bytes */
- 	"\xDB\x10\x1A\xC2\xA3\xF1\xDC\xFF\x13\x6B\xED\x44\xDF\xF0\x02\x6D"
- 	"\x13\xC7\x88\xDA\x70\x6B\x54\xF1\xE8\x27\xDC\xC3\x0F\x99\x6A\xFA"
- 	"\xC6\x67\xFF\x1D\x1E\x3C\x1D\xC1\xB5\x5F\x6C\xC0\xB2\x07\x3A\x6D"
-@@ -299,7 +299,7 @@ static const struct akcipher_testvec rsa_tv_template[] = {
- 	"\x02\x01\x00" /* exponent1 - integer of 1 byte */
- 	"\x02\x01\x00" /* exponent2 - integer of 1 byte */
- 	"\x02\x01\x00", /* coefficient - integer of 1 byte */
--	.key_len = 547,
-+	.key_len = 548,
- 	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
- 	.c =
- 	"\xb2\x97\x76\xb4\xae\x3e\x38\x3c\x7e\x64\x1f\xcc\xa2\x7f\xf6\xbe"
+Applies to current herbert/cryptodev-2.6.git master.
+
+Many thanks for your comments and remarks!
+
+Nicolai
+
+Nicolai Stange (6):
+  crypto: DRBG - prepare for more fine-grained tracking of seeding state
+  crypto: DRBG - track whether DRBG was seeded with
+    !rng_is_initialized()
+  crypto: DRBG - move dynamic ->reseed_threshold adjustments to
+    __drbg_seed()
+  crypto: DRBG - make reseeding from get_random_bytes() synchronous
+  crypto: DRBG - make drbg_prepare_hrng() handle jent instantiation
+    errors
+  crypto: DRBG - reseed 'nopr' drbgs periodically from
+    get_random_bytes()
+
+ crypto/drbg.c         | 145 +++++++++++++++++++++---------------------
+ include/crypto/drbg.h |  11 +++-
+ 2 files changed, 82 insertions(+), 74 deletions(-)
+
 -- 
-2.11.0
+2.26.2
 
