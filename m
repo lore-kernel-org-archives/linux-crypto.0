@@ -2,90 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25ECFC4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Oct 2021 03:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FB1C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Oct 2021 06:28:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A6FD60F4F
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Oct 2021 03:04:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89F7060EE3
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Oct 2021 06:28:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231912AbhJYDGc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 24 Oct 2021 23:06:32 -0400
-Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:55363 "EHLO
-        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230040AbhJYDGc (ORCPT
+        id S230396AbhJYGax (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Oct 2021 02:30:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230369AbhJYGax (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 24 Oct 2021 23:06:32 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0UtUyMKi_1635131045;
-Received: from 30.240.102.8(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UtUyMKi_1635131045)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 25 Oct 2021 11:04:06 +0800
-Message-ID: <0997d70b-9f28-ba0a-853f-2160922dc722@linux.alibaba.com>
-Date:   Mon, 25 Oct 2021 11:04:02 +0800
+        Mon, 25 Oct 2021 02:30:53 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 794E3C061745;
+        Sun, 24 Oct 2021 23:28:31 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Hd4ld2Lsrz4xbM;
+        Mon, 25 Oct 2021 17:28:28 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1635143309;
+        bh=UO+7LTZTfEH3+SFxoPjM7xKmJkD9pA6Voc4UYPRznJA=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=Ea69VD8965Yuq6XlOPvdP5TkWcECD/6tUkVRjODiIvBnHC2hPrs3MlG+JKEVDBbny
+         +QOnB1UeABzgl3GQDtx9FjA21wd9q6pwEYcScx4bCNcrPF4xXmU56nENQjlhjxQHT8
+         sHid3NV9VpO5lRRVY3pGrPXsnEq4aZtCnR5FjZOVkwgFLygkLqtM09xuRHrAJ1BiQ2
+         lhskJB36QZcrS1EfDHVrTsh6DJ0HrMgbMrlIuWt+k0QyIvxcmmFwV0LQxwlR8TV+Je
+         EeKYK6qUZfN884p2BiowXNIuQhiymzMvsqFB/uU44LqIheDsNSLHR3xBB14ObvKeYz
+         s+6mfoOUuQkkw==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-next@vger.kernel.org
+Subject: Re: [PATCH] crypto: api - Export crypto_boot_test_finished
+In-Reply-To: <20210928151621.7aec3f34@canb.auug.org.au>
+References: <20210927143229.543749f4@canb.auug.org.au>
+ <20210927112341.GA22483@gondor.apana.org.au>
+ <20210928151621.7aec3f34@canb.auug.org.au>
+Date:   Mon, 25 Oct 2021 17:28:24 +1100
+Message-ID: <87sfwpbotz.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.2.0
-Subject: Re: [PATCH v2 1/2] crypto: use SM3 instead of SM3_256
-Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Peter Huewe <peterhuewe@gmx.de>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Jerry Snitselaar <jsnitsel@redhat.com>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
-References: <20211019100423.43615-1-tianjia.zhang@linux.alibaba.com>
- <20211019100423.43615-2-tianjia.zhang@linux.alibaba.com>
- <f5c87a233027c8026ae8574f3e25c9162da3bfff.camel@kernel.org>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-In-Reply-To: <f5c87a233027c8026ae8574f3e25c9162da3bfff.camel@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jarkko,
-
-On 10/23/21 8:48 AM, Jarkko Sakkinen wrote:
-> On Tue, 2021-10-19 at 18:04 +0800, Tianjia Zhang wrote:
->> According to https://tools.ietf.org/id/draft-oscca-cfrg-sm3-01.html,
->> SM3 always produces a 256-bit hash value and there are no plans for
->> other length development, so there is no ambiguity in the name of sm3.
+Stephen Rothwell <sfr@canb.auug.org.au> writes:
+> Hi Herbert,
+>
+> On Mon, 27 Sep 2021 19:23:42 +0800 Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >>
->> Suggested-by: James Bottomley <jejb@linux.ibm.com>
->> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->> ---
->>   Documentation/security/keys/trusted-encrypted.rst | 2 +-
->>   crypto/hash_info.c                                | 4 ++--
->>   drivers/char/tpm/tpm2-cmd.c                       | 2 +-
->>   include/crypto/hash_info.h                        | 2 +-
->>   include/uapi/linux/hash_info.h                    | 3 ++-
->>   security/keys/trusted-keys/trusted_tpm2.c         | 2 +-
->>   6 files changed, 8 insertions(+), 7 deletions(-)
->>
->> diff --git a/Documentation/security/keys/trusted-encrypted.rst b/Documentation/security/keys/trusted-encrypted.rst
->> index 80d5a5af62a1..3292461517f6 100644
->> --- a/Documentation/security/keys/trusted-encrypted.rst
->> +++ b/Documentation/security/keys/trusted-encrypted.rst
->> @@ -162,7 +162,7 @@ Usage::
->>                        default 1 (resealing allowed)
->>          hash=         hash algorithm name as a string. For TPM 1.x the only
->>                        allowed value is sha1. For TPM 2.x the allowed values
->> -                     are sha1, sha256, sha384, sha512 and sm3-256.
->> +                     are sha1, sha256, sha384, sha512 and sm3.
-> 
-> You cannot remove sm3-256 from uapi.
-> 
+>> Oops, does this patch fix the problem?
+>
+> Yes, that fixes my build, thanks.
+>
+> Tested-by: Stephen Rothwell <sfr@canb.auug.org.au> # ppc32 build
 
-Thanks for pointing it out, Maybe this fix is more appropriate in patch 2.
+It fixes the build, but modules_install still fails:
 
-Best regards,
-Tianjia
+  $ git checkout adad556efcdd42a1d9e060cbe5f6161cccf1fa28
+  HEAD is now at adad556efcdd crypto: api - Fix built-in testing dependency failures
+
+  $ git show e42dff467ee6 | patch -p1	# apply fixup patch
+  patching file crypto/api.c
+
+  $ make -s -j $(nproc) modules
+
+  $ make -s modules_install
+  depmod: ERROR: Cycle detected: crypto -> crypto_algapi -> crypto
+  depmod: ERROR: Found 2 modules in dependency cycles!
+  make: *** [Makefile:1801: modules_install] Error 1
+
+cheers
