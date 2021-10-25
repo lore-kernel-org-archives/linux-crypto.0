@@ -2,146 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB679C433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 24 Oct 2021 23:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25ECFC4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Oct 2021 03:04:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC73B61027
-	for <linux-crypto@archiver.kernel.org>; Sun, 24 Oct 2021 23:19:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A6FD60F4F
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Oct 2021 03:04:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232009AbhJXXVk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 24 Oct 2021 19:21:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33034 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229641AbhJXXVk (ORCPT
+        id S231912AbhJYDGc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 24 Oct 2021 23:06:32 -0400
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:55363 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230040AbhJYDGc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 24 Oct 2021 19:21:40 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D433BC061745
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Oct 2021 16:19:18 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id s9so13131141oiw.6
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Oct 2021 16:19:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=pv3yKrebsG4+UvHFA+gEH7kLCAky4RcnNh+s60n1ECg=;
-        b=DRxQ/fjnTpPb4MC72a1IZMfz9ncUBy+xnhuEsFNFoAN+EA5O9dGCsmbZunJx800wLQ
-         exY3higOsh5+ledswU+RuEi/T2mYz1a0ClJLtde2XScVA3eX2rGGZ14HpYrCTsmfiNcq
-         tYRvD0zPaaD2S/An+nWFbP242YCELYg/ZrXJ240iqty7h7NmI5CEaBHVED7w3x4A05NY
-         ihNYA9xxhUbl2ZJfv3Knok5o5lmsI+oQ+0hM8tBSm2ae3UgM6zlg8QH4hSKrvXsaNRo3
-         Yc2STjrtZTz74ptZB4aeI2Hg1l4NeUZkI2dGYTksnHAa9JkWk2qyKwZE+GC6Uei3eHui
-         dXow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=pv3yKrebsG4+UvHFA+gEH7kLCAky4RcnNh+s60n1ECg=;
-        b=3mvbov5Z8yzWx+1IcySf9BrEGw1pkZy+wH1Hc1YnogKTiDvJbMtiri4f42oWC+S/HG
-         uzP8noCmUGRodOK5s+QaeJxFWmdDDe9m99mtRsw2uQIJWYCFzcyRcXngfU/yl2yu5TVU
-         ZD+AfBLl5T9+lWWS/nEBqkJFqm9EUCq8TDL3rzZUwfCtpX+dZjUBfN5jz89myJ90AN+d
-         3MsZnZe0SLIijqGGQ1gkkTQGou4ZmT4gyxrXWVMl2U8JZAoLFAyeCsMjbdu8ningX8TF
-         facAtq0/2KgKjkXGKtnbCFL0ycTuNj7Djm1FhCJe8pG4NCVPNbGqQ9xmr9zVUTBPvUlH
-         HRdA==
-X-Gm-Message-State: AOAM531wMQ28e8Ft+QzMu8ozaxR5Xv5IFaZADaqaasSSr5u6+rAEW3jr
-        QlvwKDYYnQ/DCyFSXH9Mn1XaBQ==
-X-Google-Smtp-Source: ABdhPJy3j3tGjtYGKybCdCNCsXxJC2IRee2Yfy5EcWU7XgHjAUm63VmFrLBW+5NYKewmuEZnl5tv4A==
-X-Received: by 2002:a05:6808:1246:: with SMTP id o6mr9674571oiv.38.1635117557816;
-        Sun, 24 Oct 2021 16:19:17 -0700 (PDT)
-Received: from yoga ([2600:1700:a0:3dc8:40c7:d4ff:fe65:a72c])
-        by smtp.gmail.com with ESMTPSA id a6sm2316967oid.18.2021.10.24.16.19.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Oct 2021 16:19:17 -0700 (PDT)
-Date:   Sun, 24 Oct 2021 18:19:15 -0500
-From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     MSM <linux-arm-msm@vger.kernel.org>, linux-crypto@vger.kernel.org,
-        bhupesh.linux@gmail.com,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Andy Gross <agross@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Thara Gopinath <thara.gopinath@linaro.org>
-Subject: Re: [PATCH 1/2] crypto: qce: Add 'sm8150-qce' compatible string check
-Message-ID: <YXXp80d19dDhYXzA@yoga>
-References: <20211013165823.88123-1-bhupesh.sharma@linaro.org>
- <20211013165823.88123-2-bhupesh.sharma@linaro.org>
- <YXWVYZlCpkSRb7xv@builder.lan>
- <CAH=2NtyHpZa0KV5TRDuvciC+uV6mdO03RmEJSKMXES4HZOg-HA@mail.gmail.com>
+        Sun, 24 Oct 2021 23:06:32 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0UtUyMKi_1635131045;
+Received: from 30.240.102.8(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UtUyMKi_1635131045)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 25 Oct 2021 11:04:06 +0800
+Message-ID: <0997d70b-9f28-ba0a-853f-2160922dc722@linux.alibaba.com>
+Date:   Mon, 25 Oct 2021 11:04:02 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAH=2NtyHpZa0KV5TRDuvciC+uV6mdO03RmEJSKMXES4HZOg-HA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.2.0
+Subject: Re: [PATCH v2 1/2] crypto: use SM3 instead of SM3_256
+Content-Language: en-US
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Jerry Snitselaar <jsnitsel@redhat.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
+References: <20211019100423.43615-1-tianjia.zhang@linux.alibaba.com>
+ <20211019100423.43615-2-tianjia.zhang@linux.alibaba.com>
+ <f5c87a233027c8026ae8574f3e25c9162da3bfff.camel@kernel.org>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <f5c87a233027c8026ae8574f3e25c9162da3bfff.camel@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun 24 Oct 12:59 CDT 2021, Bhupesh Sharma wrote:
+Hi Jarkko,
 
-> Hi Bjorn,
+On 10/23/21 8:48 AM, Jarkko Sakkinen wrote:
+> On Tue, 2021-10-19 at 18:04 +0800, Tianjia Zhang wrote:
+>> According to https://tools.ietf.org/id/draft-oscca-cfrg-sm3-01.html,
+>> SM3 always produces a 256-bit hash value and there are no plans for
+>> other length development, so there is no ambiguity in the name of sm3.
+>>
+>> Suggested-by: James Bottomley <jejb@linux.ibm.com>
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>> ---
+>>   Documentation/security/keys/trusted-encrypted.rst | 2 +-
+>>   crypto/hash_info.c                                | 4 ++--
+>>   drivers/char/tpm/tpm2-cmd.c                       | 2 +-
+>>   include/crypto/hash_info.h                        | 2 +-
+>>   include/uapi/linux/hash_info.h                    | 3 ++-
+>>   security/keys/trusted-keys/trusted_tpm2.c         | 2 +-
+>>   6 files changed, 8 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/Documentation/security/keys/trusted-encrypted.rst b/Documentation/security/keys/trusted-encrypted.rst
+>> index 80d5a5af62a1..3292461517f6 100644
+>> --- a/Documentation/security/keys/trusted-encrypted.rst
+>> +++ b/Documentation/security/keys/trusted-encrypted.rst
+>> @@ -162,7 +162,7 @@ Usage::
+>>                        default 1 (resealing allowed)
+>>          hash=         hash algorithm name as a string. For TPM 1.x the only
+>>                        allowed value is sha1. For TPM 2.x the allowed values
+>> -                     are sha1, sha256, sha384, sha512 and sm3-256.
+>> +                     are sha1, sha256, sha384, sha512 and sm3.
 > 
-> On Sun, 24 Oct 2021 at 22:48, Bjorn Andersson
-> <bjorn.andersson@linaro.org> wrote:
-> >
-> > On Wed 13 Oct 11:58 CDT 2021, Bhupesh Sharma wrote:
-> >
-> > > Add 'sm8150-qce' compatible string check in qce crypto
-> > > driver as we add support for sm8150 crypto device in the
-> > > device-tree in the subsequent patch.
-> > >
-> > > Cc: Thara Gopinath <thara.gopinath@linaro.org>
-> > > Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> > > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> > > ---
-> > >  drivers/crypto/qce/core.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-> > > index 4c55eceb4e7f..ecbe9f7c6c0a 100644
-> > > --- a/drivers/crypto/qce/core.c
-> > > +++ b/drivers/crypto/qce/core.c
-> > > @@ -306,6 +306,7 @@ static int qce_crypto_remove(struct platform_device *pdev)
-> > >  static const struct of_device_id qce_crypto_of_match[] = {
-> > >       { .compatible = "qcom,ipq6018-qce", },
-> > >       { .compatible = "qcom,sdm845-qce", },
-> > > +     { .compatible = "qcom,sm8150-qce", },
-> > >       { .compatible = "qcom,sm8250-qce", },
-> >
-> > When I look at linux-next I see qce_crypto_of_match defined as:
-> >
-> > static const struct of_device_id qce_crypto_of_match[] = {
-> >         { .compatible = "qcom,crypto-v5.1", },
-> >         { .compatible = "qcom,crypto-v5.4", },
-> >         {}
-> > };
-> >
-> > Can you please help me understand what I'm doing wrong?
-> 
-> Oh, you have missed [PATCH 15/20] from the sm8250 qce crypto addition
-> series (see [1])
-> 
-> This series is dependent on the sm8250 qce enablement series, as I
-> noted in the cover letter (see [2]).
+> You cannot remove sm3-256 from uapi.
 > 
 
-Ah, now I see. Thanks for the pointer!
+Thanks for pointing it out, Maybe this fix is more appropriate in patch 2.
 
-> However, Thara and Vladimir pointed out backward compatibility issues
-> with PATCH 15/20 of the first series. So I will send a v5 to fix the
-> same along with other issues pointed in the v4.
-> 
-> Sorry for any confusion caused.
-> 
-
-No worries. Could you include these two patches in v5 of the other
-series, to clarify the dependency?
-
-Thanks,
-Bjorn
-
-> [1]. https://lore.kernel.org/linux-arm-msm/20211013105541.68045-1-bhupesh.sharma@linaro.org/T/#m566546d32d8da7ee94822dfba625e98fd3496d17
-> [2]. https://www.spinics.net/lists/linux-arm-msm/msg96053.html
-> 
-> Regards,
-> Bhupesh
+Best regards,
+Tianjia
