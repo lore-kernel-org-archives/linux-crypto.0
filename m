@@ -2,58 +2,76 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB02C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 04:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8396FC43217
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 07:56:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8063B604DA
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 04:38:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BF9D610C7
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 07:56:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232255AbhJZEku (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Oct 2021 00:40:50 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:56326 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230414AbhJZEks (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Oct 2021 00:40:48 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1mfEE6-00008Q-4e; Tue, 26 Oct 2021 12:38:18 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1mfEE3-0004dn-AT; Tue, 26 Oct 2021 12:38:15 +0800
-Date:   Tue, 26 Oct 2021 12:38:15 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-next@vger.kernel.org
-Subject: Re: [PATCH] crypto: api - Export crypto_boot_test_finished
-Message-ID: <20211026043815.GA17728@gondor.apana.org.au>
-References: <20210927143229.543749f4@canb.auug.org.au>
- <20210927112341.GA22483@gondor.apana.org.au>
- <20210928151621.7aec3f34@canb.auug.org.au>
- <87sfwpbotz.fsf@mpe.ellerman.id.au>
+        id S233722AbhJZH6z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Oct 2021 03:58:55 -0400
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:45046 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232840AbhJZH6y (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 Oct 2021 03:58:54 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R651e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0UtlJeVX_1635234986;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UtlJeVX_1635234986)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 26 Oct 2021 15:56:26 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     James Bottomley <jejb@linux.ibm.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Jerry Snitselaar <jsnitsel@redhat.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v3 0/2] use SM3 instead of SM3_256
+Date:   Tue, 26 Oct 2021 15:56:24 +0800
+Message-Id: <20211026075626.61975-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.3.ge56e4f7
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87sfwpbotz.fsf@mpe.ellerman.id.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 25, 2021 at 05:28:24PM +1100, Michael Ellerman wrote:
->
-> It fixes the build, but modules_install still fails:
-> 
->   $ git checkout adad556efcdd42a1d9e060cbe5f6161cccf1fa28
->   HEAD is now at adad556efcdd crypto: api - Fix built-in testing dependency failures
+According to https://tools.ietf.org/id/draft-oscca-cfrg-sm3-01.html,
+SM3 always produces a 256-bit hash value and there are no plans for
+other length development, so there is no ambiguity in the name of sm3.
 
-Sorry, the fix is in the queue:
+---
+v3 changes:
+ - The fix of document trusted-encrypted.rst is put in patch 2
 
-https://patchwork.kernel.org/project/linux-crypto/patch/20211019132802.GA14233@gondor.apana.org.au/
+v2 changes:
+ - an additional macro with the same value is defined for uapi instead
+   of renaming directly
 
-Cheers,
+Tianjia Zhang (2):
+  crypto: use SM3 instead of SM3_256
+  tpm: use SM3 instead of SM3_256
+
+ Documentation/security/keys/trusted-encrypted.rst | 2 +-
+ crypto/hash_info.c                                | 4 ++--
+ drivers/char/tpm/tpm-sysfs.c                      | 4 ++--
+ drivers/char/tpm/tpm2-cmd.c                       | 2 +-
+ include/crypto/hash_info.h                        | 2 +-
+ include/linux/tpm.h                               | 2 +-
+ include/uapi/linux/hash_info.h                    | 3 ++-
+ security/keys/trusted-keys/trusted_tpm2.c         | 2 +-
+ 8 files changed, 11 insertions(+), 10 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.19.1.3.ge56e4f7
+
