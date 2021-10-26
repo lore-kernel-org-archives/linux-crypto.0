@@ -2,147 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A57F7C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 09:33:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 157A7C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 16:08:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 877AD60F21
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 09:33:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00D9A60527
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 16:08:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232805AbhJZJfh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Oct 2021 05:35:37 -0400
-Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.82]:29047 "EHLO
-        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230226AbhJZJfg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Oct 2021 05:35:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1635240790;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=fGDDsDctVaRMHIggoIoP1bVsbZmKxZfSLPjlDlyrLuY=;
-    b=QHTuOfySLdUKrKb6cge7CabKGKPSH3BJgIHoMwi2dCFV9JtcsbIE2h/OekR2OpNzKv
-    BKALMTupQN4Q7UHYVmImrn9W88UmlaHM0sHvN6r/+TAmQPWXnS87OLpOZ5VfyQFd54sk
-    28C0C3DnsbpiMwJMh/KtLdOCNDapouLpPVtfM3caoYCKimjqMZyw7auzyXQQ/Y9uL/Sj
-    ePjSoALwDVzttnYdnaREZjCJ7Rzy9djsIcwNoeTs0RRcOcFSzZiuL4KnBmIiDmn3/MCT
-    g5wvjz10tzjDoqwbRDG64Yn57Sx3A4jpyDhznXPXALXgqLQwXzyCFih1PpkS/kPjnWrL
-    fEOg==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xm0dNS3JdRcQGaevZhmp"
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-    by smtp.strato.de (RZmta 47.34.1 DYNA|AUTH)
-    with ESMTPSA id n020a8x9Q9X92OF
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Tue, 26 Oct 2021 11:33:09 +0200 (CEST)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolai Stange <nstange@suse.de>
-Cc:     Torsten Duwe <duwe@suse.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Nicolai Stange <nstange@suse.de>
-Subject: Re: [PATCH 6/6] crypto: DRBG - reseed 'nopr' drbgs periodically from get_random_bytes()
-Date:   Tue, 26 Oct 2021 11:33:08 +0200
-Message-ID: <2978329.31agJDbIcV@positron.chronox.de>
-In-Reply-To: <20211025092525.12805-7-nstange@suse.de>
-References: <20211025092525.12805-1-nstange@suse.de> <20211025092525.12805-7-nstange@suse.de>
+        id S234721AbhJZQKs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Oct 2021 12:10:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57570 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234225AbhJZQKq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 Oct 2021 12:10:46 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 785186108B;
+        Tue, 26 Oct 2021 16:08:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1635264502;
+        bh=I9GJJIJ1ciVkNplFB72u5b2bVUSDmxGPxemQZuOwPfQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=kMbVo3kamYq1rArekSB0qLarlRl5J8pWp326TEGhbWDPRk+JpqeP/0hnb94AMUtD9
+         8NevxyVmtsgsdfZKzigqTQoiOgMQrQTXuqobBNpUVF1vPULfvgS5Z45wH0UtUeVmel
+         0FdBL23rXE2Z2WJ8M5SGl1i0zaJmlpBQRZO20/9go6MX47mSvVjr0BgSW8lnHnr7+W
+         pL1qVOxXPA4yJ/kJeZsgvMsW8+UbYeDgU/cWwF/Nj+vLOvnMBbWMxYwWUsUq6hih39
+         FohZnAbzpakkBUaOcYieESjA4scj+s8sOYZ9YG4u1BHxWEhePXH/aWOSSDW4c4XOMR
+         G0EdeoJwdNi7A==
+Received: by mail-oi1-f175.google.com with SMTP id o83so21317425oif.4;
+        Tue, 26 Oct 2021 09:08:22 -0700 (PDT)
+X-Gm-Message-State: AOAM532myRnhy41hUaP0BNuWhKhmHGZ/fB24mHNsljoAFSeKoI2v0DUq
+        IY7auFV4A/Fjvl2n6TsHpJ/bUQ6SMrdC28Baej8=
+X-Google-Smtp-Source: ABdhPJyKuzF2435HA4gQPovRQk2F3CCNzD/7cMKyLJZAXO0i4XInSWHhpsWgmvIwbw0BF3MFRGD5FXz1Eu294qSF3yI=
+X-Received: by 2002:a54:448e:: with SMTP id v14mr3036920oiv.174.1635264501675;
+ Tue, 26 Oct 2021 09:08:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+References: <20211026075626.61975-1-tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <20211026075626.61975-1-tianjia.zhang@linux.alibaba.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 26 Oct 2021 18:08:10 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGiC-LCc-50cfddJxJ-mezO=fcLqhJHiK110CgxKusy9w@mail.gmail.com>
+Message-ID: <CAMj1kXGiC-LCc-50cfddJxJ-mezO=fcLqhJHiK110CgxKusy9w@mail.gmail.com>
+Subject: Re: [PATCH v3 0/2] use SM3 instead of SM3_256
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     James Bottomley <jejb@linux.ibm.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Jerry Snitselaar <jsnitsel@redhat.com>,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        keyrings@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Montag, 25. Oktober 2021, 11:25:25 CEST schrieb Nicolai Stange:
+On Tue, 26 Oct 2021 at 09:56, Tianjia Zhang
+<tianjia.zhang@linux.alibaba.com> wrote:
+>
+> According to https://tools.ietf.org/id/draft-oscca-cfrg-sm3-01.html,
+> SM3 always produces a 256-bit hash value and there are no plans for
+> other length development, so there is no ambiguity in the name of sm3.
+>
 
-Hi Nicolai,
-
-> In contrast to the fully prediction resistant 'pr' DRBGs, the 'nopr'
-> variants get seeded once at boot and reseeded only rarely thereafter,
-> namely only after 2^20 requests have been served each. AFAICT, this
-> reseeding based on the number of requests served is primarily motivated
-> by information theoretic considerations, c.f. NIST SP800-90Ar1,
-> sec. 8.6.8 ("Reseeding").
->=20
-> However, given the relatively large seed lifetime of 2^20 requests, the
-> 'nopr' DRBGs can hardly be considered to provide any prediction resistance
-> whatsoever, i.e. to protect against threats like side channel leaks of the
-> internal DRBG state (think e.g. leaked VM snapshots). This is expected and
-> completely in line with the 'nopr' naming, but as e.g. the
-> "drbg_nopr_hmac_sha512" implementation is potentially being used for
-> providing the "stdrng" and thus, the crypto_default_rng serving the
-> in-kernel crypto, it would certainly be desirable to achieve at least the
-> same level of prediction resistance as get_random_bytes() does.
->=20
-> Note that the chacha20 rngs underlying get_random_bytes() get reseeded
-> every CRNG_RESEED_INTERVAL =3D=3D 5min: the secondary, per-NUMA node rngs=
- from
-> the primary one and the primary rng in turn from the entropy pool, provid=
-ed
-> sufficient entropy is available.
->=20
-> The 'nopr' DRBGs do draw randomness from get_random_bytes() for their
-> initial seed already, so making them to reseed themselves periodically fr=
-om
-> get_random_bytes() in order to let them benefit from the latter's
-> prediction resistance is not such a big change conceptually.
->=20
-> In principle, it would have been also possible to make the 'nopr' DRBGs to
-> periodically invoke a full reseeding operation, i.e. to also consider the
-> jitterentropy source (if enabled) in addition to get_random_bytes() for t=
-he
-> seed value. However, get_random_bytes() is relatively lightweight as
-> compared to the jitterentropy generation process and thus, even though the
-> 'nopr' reseeding is supposed to get invoked infrequently, it's IMO still
-> worthwhile to avoid occasional latency spikes for drbg_generate() and
-> stick to get_random_bytes() only. As an additional remark, note that
-> drawing randomness from the non-SP800-90B-conforming get_random_bytes()
-> only won't adversely affect SP800-90A conformance either: the very same is
-> being done during boot via drbg_seed_from_random() already once
-> rng_is_initialized() flips to true and it follows that if the DRBG
-> implementation does conform to SP800-90A now, it will continue to do so.
->=20
-> Make the 'nopr' DRBGs to reseed themselves periodically from
-> get_random_bytes() every CRNG_RESEED_INTERVAL =3D=3D 5min.
->=20
-> More specifically, introduce a new member ->last_seed_time to struct
-> drbg_state for recording in units of jiffies when the last seeding
-> operation had taken place. Make __drbg_seed() maintain it and let
-> drbg_generate() invoke a reseed from get_random_bytes() via
-> drbg_seed_from_random() if more than 5min have passed by since the last
-> seeding operation. Be careful to not to reseed if in testing mode though,
-> or otherwise the drbg related tests in crypto/testmgr.c would fail to
-> reproduce the expected output.
->=20
-> In order to keep the formatting clean in drbg_generate() wrap the logic
-> for deciding whether or not a reseed is due in a new helper,
-> drbg_nopr_reseed_interval_elapsed().
->=20
-> Signed-off-by: Nicolai Stange <nstange@suse.de>
-
-=46or the code review:
-
-Reviewed-by: Stephan M=FCller <smueller@chronox.de>
-
-But with respect to the overall architecture of the seeding in the entire=20
-kernel, this is insufficient (note, I am not saying that this patch series=
-=20
-should and can fix it though). It is insufficient, because:
-
-=2D reseeding does not happen if new data is received by the kernel entropy=
-=20
-gathering functions like the RNDADDENTROPY IOCTL or add_hwgenerator_randomn=
-ess=20
-=2D i.e. externally provided data lingers without being used in the DRBG
-
-=2D reseeding does not consider the amount of entropy added from the entrop=
-y=20
-sources allowing potential pathological weak reseeding operation
-
-=2E.. and other seeding problems in random.c...
-
-Ciao
-Stephan
+What is the point of these changes? Having '256' in the identifiers is
+merely redundant and not factually incorrect, so why can't we just
+leave these as they are?
 
 
+
+
+> ---
+> v3 changes:
+>  - The fix of document trusted-encrypted.rst is put in patch 2
+>
+> v2 changes:
+>  - an additional macro with the same value is defined for uapi instead
+>    of renaming directly
+>
+> Tianjia Zhang (2):
+>   crypto: use SM3 instead of SM3_256
+>   tpm: use SM3 instead of SM3_256
+>
+>  Documentation/security/keys/trusted-encrypted.rst | 2 +-
+>  crypto/hash_info.c                                | 4 ++--
+>  drivers/char/tpm/tpm-sysfs.c                      | 4 ++--
+>  drivers/char/tpm/tpm2-cmd.c                       | 2 +-
+>  include/crypto/hash_info.h                        | 2 +-
+>  include/linux/tpm.h                               | 2 +-
+>  include/uapi/linux/hash_info.h                    | 3 ++-
+>  security/keys/trusted-keys/trusted_tpm2.c         | 2 +-
+>  8 files changed, 11 insertions(+), 10 deletions(-)
+>
+> --
+> 2.19.1.3.ge56e4f7
+>
