@@ -2,79 +2,134 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24218C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 19:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43713C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 21:03:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B57960F6F
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 19:41:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2874C60230
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Oct 2021 21:03:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236694AbhJZTnc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Oct 2021 15:43:32 -0400
-Received: from mail-oi1-f171.google.com ([209.85.167.171]:39905 "EHLO
-        mail-oi1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238834AbhJZTnG (ORCPT
+        id S239388AbhJZVGK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Oct 2021 17:06:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55552 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239389AbhJZVGJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Oct 2021 15:43:06 -0400
-Received: by mail-oi1-f171.google.com with SMTP id s9so168096oiw.6;
-        Tue, 26 Oct 2021 12:40:42 -0700 (PDT)
+        Tue, 26 Oct 2021 17:06:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635282223;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=K81mj1S6a9jrOkqIwFK+AfGu2TivalPts2hUuqm/A1k=;
+        b=Sqtd4T9ZJU7tdoV8x6XYMayLhmthFOnNKGLvu7htE+d52AuM1AdNdAmUoAcu3djlF/muF3
+        rhigBZf8cb+inJXWNuBQiGD49zOkuuKzH7OzllvAo+ESqwtUet12QV6A0OiiFQJDmaSuiJ
+        QDIQqfq4dk8D0cCNkAvCqxV3HVKgBns=
+Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
+ [209.85.219.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-588-Zf3awfU_NMiarME_thu19Q-1; Tue, 26 Oct 2021 17:03:42 -0400
+X-MC-Unique: Zf3awfU_NMiarME_thu19Q-1
+Received: by mail-yb1-f199.google.com with SMTP id r67-20020a252b46000000b005bea12c4befso458614ybr.19
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Oct 2021 14:03:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=LLULUJj+QNshXgKbuMSNhu7it69eHLrJV5G/+xbvi/o=;
-        b=FAreHhLd9x4Ztnq92E0g4C8a62Ctm0W1W4v913ZAYQLUadxPYksXVb61TT7sCF7ASE
-         NdWncqTqBiH96D1wlUrEY0ARVRqIjCRi0Bb1xHxCzZsfTw7YVqhjQtQLPmrE8OnxaSUA
-         yqAGsbc6TgjXI32Sap7BF2IEBzfkKYx5TKqp0AtHIUS5rMrtvHuN9UK2AOqFH4e9GhtA
-         C0yFuJIW2sQfVDh/KCkDp6k+LYRr/W+aWwIXCjlv4ZOcdAChO7LwDeO5+PwIHeA3IJxR
-         l6I4Lord1uh2sEwN4WPOm6yz96q/zyKJLbAysh8iMrqv6NLslFIkMXSyvkj5wIC+sfd3
-         BGKg==
-X-Gm-Message-State: AOAM531t/TsdpKUFrsw7Y6e9DxyXHNSUJMFsWIbJ9qhiIOb9qm73aKJS
-        1XmmfZ/3CCPVqKtsUMW7Sw==
-X-Google-Smtp-Source: ABdhPJzKSUCOQ7CdAzHTt0kmnPUglC0+sjKpOzmThp5FgVnnSoLSEr3zbfv0D10+APlMxJXZQVGYbw==
-X-Received: by 2002:a05:6808:1a92:: with SMTP id bm18mr594923oib.0.1635277241847;
-        Tue, 26 Oct 2021 12:40:41 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
-        by smtp.gmail.com with ESMTPSA id bk8sm5117784oib.57.2021.10.26.12.40.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 12:40:40 -0700 (PDT)
-Received: (nullmailer pid 3106663 invoked by uid 1000);
-        Tue, 26 Oct 2021 19:40:39 -0000
-Date:   Tue, 26 Oct 2021 14:40:39 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        bhupesh.linux@gmail.com, agross@kernel.org,
-        Thara Gopinath <thara.gopinath@linaro.org>,
-        davem@davemloft.net, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        Bjorn Andersson <bjorn.andersson@linaro.org>
-Subject: Re: [PATCH v4 09/20] dt-bindings: qcom-qce: Add 'iommus' to optional
- properties
-Message-ID: <YXhZtzikw9KTi+h7@robh.at.kernel.org>
-References: <20211013105541.68045-1-bhupesh.sharma@linaro.org>
- <20211013105541.68045-10-bhupesh.sharma@linaro.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=K81mj1S6a9jrOkqIwFK+AfGu2TivalPts2hUuqm/A1k=;
+        b=2Gg2dChy+BaB6CIf74xIT0X6egxOhylIavqzyojZrb306SO5cuNOVMUuxHR9dwaE/i
+         reRasJC/R3KWlyaRxsNA1HNzu6aUGm/dpGh2vMWC63t7rQOVKM/3wyAO80WXNHaloYR7
+         JYkal6IHVbzUnsx+rSFofGZMs60oGcUCGw+hOLlLvDyS6QbjLzAodGnab1zKpMzg6GI+
+         66hTwCyXFQoSZboxD3sgl793BKNE0dQ01OSA8qlv6MG2zKUjcud/NM+TOFoBiQT8dCD5
+         e1AWFO9O7cbSXL5Z5vIkwUwLtNVqdGJ33BK2hQVl6HStA18eR9H4jHfJYELVbgPTHa8z
+         PDnw==
+X-Gm-Message-State: AOAM532AuhciNcsBgZTICyf537D6LiVpavCEAKrxrpp+AA2Hvd7XGci/
+        YBUZxP+7qqhWZViozR1pUCGAFK6uS8B18nJgBG3KbN8twDHjac1YYeTaQmHGdla3S1t/khAjmRn
+        aSWyAvojuyxKgESJf1VLMqzMz0EMFdLlGZNfCVhzm
+X-Received: by 2002:a25:d195:: with SMTP id i143mr4808898ybg.48.1635282221462;
+        Tue, 26 Oct 2021 14:03:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzWwMFjlHJq0k0Co0aHoZkkYIZNNOv5eISkpO+ADXOQe1cuAjV6x7G4ZOzIC7W8w39p9jC1gNevLxc+wu0qbFA=
+X-Received: by 2002:a25:d195:: with SMTP id i143mr4808880ybg.48.1635282221265;
+ Tue, 26 Oct 2021 14:03:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211013105541.68045-10-bhupesh.sharma@linaro.org>
+References: <2645866.lzt4QeR4KX@positron.chronox.de> <202109172238.fNcqoasE-lkp@intel.com>
+ <33c77eb10e91f50c1d39065147b6e085d2fd753c.camel@chronox.de>
+In-Reply-To: <33c77eb10e91f50c1d39065147b6e085d2fd753c.camel@chronox.de>
+From:   Jirka Hladky <jhladky@redhat.com>
+Date:   Tue, 26 Oct 2021 23:03:30 +0200
+Message-ID: <CAE4VaGBDyAed0N9wayR1U_AL2PGnLhp9FYsP7CoCjqWV_pm+zg@mail.gmail.com>
+Subject: Re: [PATCH v42 01/13] Linux Random Number Generator
+To:     Stephan Mueller <smueller@chronox.de>
+Cc:     kernel test robot <lkp@intel.com>, Tso Ted <tytso@mit.edu>,
+        linux-crypto@vger.kernel.org, kbuild-all@lists.01.org,
+        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 13 Oct 2021 16:25:30 +0530, Bhupesh Sharma wrote:
-> Add the missing optional property - 'iommus' to the
-> device-tree binding documentation for qcom-qce crypto IP.
-> 
-> This property describes the phandle(s) to apps_smmu node with sid mask.
-> 
-> Cc: Thara Gopinath <thara.gopinath@linaro.org>
-> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> Cc: Rob Herring <robh+dt@kernel.org>
-> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> ---
->  .../devicetree/bindings/crypto/qcom-qce.yaml          | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
+On Fri, Sep 17, 2021 at 5:18 PM Stephan Mueller <smueller@chronox.de> wrote:
+>
+> Am Freitag, dem 17.09.2021 um 23:02 +0800 schrieb kernel test robot:
+> > Hi "Stephan,
+> >
+> > Thank you for the patch! Perhaps something to improve:
+> >
+> > [auto build test WARNING on herbert-crypto-2.6/master]
+> > [cannot apply to char-misc/char-misc-testing herbert-cryptodev-2.6/master
+> > v5.15-rc1 next-20210917]
+> > [If your patch is applied to the wrong git tree, kindly drop us a note.
+> > And when submitting patch, we suggest to use '--base' as documented in
+> > https://git-scm.com/docs/git-format-patch]
+> >
+> > url:
+> > https://github.com/0day-ci/linux/commits/Stephan-M-ller/dev-random-a-new-approach/20210917-174624
+> > base:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git maste
+> > r
+> > config: nds32-allyesconfig (attached as .config)
+> > compiler: nds32le-linux-gcc (GCC) 11.2.0
+> > reproduce (this is a W=1 build):
+> >         wget
+> > https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O
+> > ~/bin/make.cross
+> >         chmod +x ~/bin/make.cross
+> >         #
+> > https://github.com/0day-ci/linux/commit/335ce64ab466685e61b363a33a405c9c49c7a099
+> >         git remote add linux-review https://github.com/0day-ci/linux
+> >         git fetch --no-tags linux-review Stephan-M-ller/dev-random-a-new-
+> > approach/20210917-174624
+> >         git checkout 335ce64ab466685e61b363a33a405c9c49c7a099
+> >         # save the attached .config to linux build tree
+> >         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross
+> > ARCH=nds32
+> >
+> > If you fix the issue, kindly add following tag as appropriate
+> > Reported-by: kernel test robot <lkp@intel.com>
+> >
+> > All warnings (new ones prefixed by >>):
+> >
+> > > > drivers/char/lrng/lrng_chacha20.c:35: warning: This comment starts with
+> > > > '/**', but isn't a kernel-doc comment. Refer Documentation/doc-
+> > > > guide/kernel-doc.rst
+> >     * Update of the ChaCha20 state by either using an unused buffer part or
+> > by
+>
+> ...
+>
+> All comments will start with '/*' instead of '/**' from now on.
+>
+> Thanks
+> Stephan
+>
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+Tested-by: Jirka Hladky <jhladky@redhat.com>
+Reviewed-by: Jirka Hladky <jhladky@redhat.com>
+
+-- 
+-Jirka
+
