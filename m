@@ -2,175 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1A4C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD2FC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:38:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 71CAA6112E
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:20:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BE0960E09
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:38:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243434AbhJ0SWk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Oct 2021 14:22:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34354 "EHLO
+        id S240316AbhJ0SlO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Oct 2021 14:41:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56551 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240156AbhJ0SWj (ORCPT
+        by vger.kernel.org with ESMTP id S235990AbhJ0SlN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Oct 2021 14:22:39 -0400
+        Wed, 27 Oct 2021 14:41:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635358813;
+        s=mimecast20190719; t=1635359927;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fHL8U/ZQJJWFEflWR8JykfHUlV09wWEBVk/S1a/68vE=;
-        b=YYOZirjkisX39lxhIeMLfYyaKTOxZ+3ji+lBfgu1OAY6Mef7+R50ZvDfX2mYJWW3SC4Bgu
-        RteGhyzvUzOmMMIXxEnJ2m5Y5UqEbjclBDMQW/Uutmf/tXtnYfelQCojsptuJQsVBXeeQg
-        mkKZ0oIbMp0+QoZbP89Fn+t+fcIhlUY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-4xbjn8mOPkSSFhPR9ACwKg-1; Wed, 27 Oct 2021 14:20:11 -0400
-X-MC-Unique: 4xbjn8mOPkSSFhPR9ACwKg-1
-Received: by mail-wm1-f70.google.com with SMTP id i15-20020a05600c354f00b0032cda87b22cso497967wmq.5
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Oct 2021 11:20:11 -0700 (PDT)
+        bh=XMEXe0ICv6BgWp98rw/aHq8v8AFBOl4vDkhRVIL80bM=;
+        b=Cf+eilEk6I/qHCq0VZGva3yy/wcczIeUUS57T79r/dWWkSynzLbB9doLca+UUKOHbaJTfi
+        kz9eJ/xz3lVtKdQNEYv+hgoLZQEDoQqDgP8xlw6xPTr4xWqYmOYySseyhUgMH6AkVEU9Mq
+        CsYH0UA9QTDFBJR31vrgz90H91vIQ8M=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-392-weYbP1l3MO6JyCUfP1tvBA-1; Wed, 27 Oct 2021 14:38:46 -0400
+X-MC-Unique: weYbP1l3MO6JyCUfP1tvBA-1
+Received: by mail-ed1-f71.google.com with SMTP id o22-20020a056402439600b003dd4f228451so3142556edc.16
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Oct 2021 11:38:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=fHL8U/ZQJJWFEflWR8JykfHUlV09wWEBVk/S1a/68vE=;
-        b=KB8TZ87IpPvu6Dvli5TbqyZ0bCzulHrHX+wlAuqGBnsKoNU1wRppBteVwgyHhxAZa5
-         3+MfgqVebzH59qyQBmmB8QVVKkWa4+ySaaq4kgzQpO2KREASYnR/35umvINWnF62h+JV
-         uJXb4Hq9fHPh3Z4E63wrszKhOHaSzDBDANerAVEXbTM5D4dlhnKcCDL2iMjxNX2FtLjS
-         v7hVsEszCcY1k0/k5AeAmMZfEZx1lmwVb0IBVPGJ+9cgTWy4xseKeQ3vcbzlusYgs1D+
-         JeWWK2PA46Wtq84lQwl0r+NK8B7ETgSOezJkUcBHdxyILyEOd7lizVhbOEuOMfu8iEeo
-         Q97w==
-X-Gm-Message-State: AOAM533+GVqmQqWXtA4CzMwBX+pZVl2ckXhE1UZGqMdQ49tU+fuXPtI1
-        1yZJlnc3IVM51VMP3dnZAWyt0pxln8e+KX0aPwDTGYdlLsaOtXlKX6+qdnEjqiXhzJaMxw2yQco
-        n+nN0NygpD5F/iSdtSHtinkas
-X-Received: by 2002:a5d:614d:: with SMTP id y13mr43766544wrt.199.1635358810390;
-        Wed, 27 Oct 2021 11:20:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJywlSOhKpI8SvbmuEboOoMaeDgerhBBvtAQkWnNqvPZZpw6tCGPccHyjl4kAG23JmGd3fU5BA==
-X-Received: by 2002:a5d:614d:: with SMTP id y13mr43766508wrt.199.1635358810124;
-        Wed, 27 Oct 2021 11:20:10 -0700 (PDT)
-Received: from [192.168.100.42] ([82.142.14.190])
-        by smtp.gmail.com with ESMTPSA id p18sm535005wmq.4.2021.10.27.11.20.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Oct 2021 11:20:09 -0700 (PDT)
-Message-ID: <1c0652f7-bb1b-99e1-7e8b-0613cc764ddd@redhat.com>
-Date:   Wed, 27 Oct 2021 20:20:08 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [syzbot] KASAN: slab-out-of-bounds Read in copy_data
-Content-Language: en-US
-From:   Laurent Vivier <lvivier@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Dmitry Vyukov <dvyukov@google.com>
-Cc:     syzbot <syzbot+b86736b5935e0d25b446@syzkaller.appspotmail.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=XMEXe0ICv6BgWp98rw/aHq8v8AFBOl4vDkhRVIL80bM=;
+        b=FE3WJ4WBwFzA4w8PuBMvufi373apd4a5KEeNYJRKVn4LlNDddgFOs5YqakCM5nug/v
+         V238etbiTpwPgDy1HZ78aWaSVRJ1fMbnjGa+7OLf5IKyQ3fn0t8eD19ZvcommROdQgUB
+         1DV9CKPq/MQRb4J3p6FkUBD31FiSYjCZYLfxpHVavE447WC78fAYNvrizaY6TWTewi69
+         lUNp0U9nti8t2yVx4j6LJjgp7TVFjWEWgSN7gT6M646mzloU3++ahhrXtU+ApdvyThvi
+         aIuw2RyQgv30xuNzTonUrQXZGWETHG2Wgciv5Bpm88vq3rQm0zjhxzVNoLXbOglIOctg
+         Nxgg==
+X-Gm-Message-State: AOAM531HejCrYCn1eb+lZU7ZNdYTBTf32/oqv2kmkZbMbycn6rivF/p9
+        2t7SAV0M+UnVlr1l9Z1/12rzKan9nj+krH7vQo7sLWgPhE9d+9ABD5SFnnyoU1hhxk/zcU3cgmz
+        xWGkYVjd8EROze7nWQ5eikNmu
+X-Received: by 2002:a05:6402:55:: with SMTP id f21mr46840909edu.8.1635359924974;
+        Wed, 27 Oct 2021 11:38:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwC2QbEl1fxg0PA8S9t6oT7SWCQwA5E14QqU1vajgt4oMNCvV6kahxQF1AxcAISTiTWcUH4uA==
+X-Received: by 2002:a05:6402:55:: with SMTP id f21mr46840891edu.8.1635359924798;
+        Wed, 27 Oct 2021 11:38:44 -0700 (PDT)
+Received: from redhat.com ([2.55.137.59])
+        by smtp.gmail.com with ESMTPSA id g8sm324197ejt.104.2021.10.27.11.38.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Oct 2021 11:38:44 -0700 (PDT)
+Date:   Wed, 27 Oct 2021 14:38:39 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Laurent Vivier <lvivier@redhat.com>
+Cc:     Dmitry Vyukov <dvyukov@google.com>,
+        syzbot <syzbot+b86736b5935e0d25b446@syzkaller.appspotmail.com>,
         davem@davemloft.net, herbert@gondor.apana.org.au, jiri@nvidia.com,
         kuba@kernel.org, leonro@nvidia.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, mpm@selenic.com,
         netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] KASAN: slab-out-of-bounds Read in copy_data
+Message-ID: <20211027143801-mutt-send-email-mst@kernel.org>
 References: <000000000000a4cd2105cf441e76@google.com>
  <eab57f0e-d3c6-7619-97cc-9bc3a7a07219@redhat.com>
  <CACT4Y+amyT9dk-6iVqru-wQnotmwW=bt4VwaysgzjH9=PkxGww@mail.gmail.com>
  <20211027111300-mutt-send-email-mst@kernel.org>
  <589f86e0-af0e-c172-7ec6-72148ba7b3b0@redhat.com>
  <8b5fb6ae-ab66-607f-b7c8-993c483846ca@redhat.com>
-In-Reply-To: <8b5fb6ae-ab66-607f-b7c8-993c483846ca@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ <1c0652f7-bb1b-99e1-7e8b-0613cc764ddd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <1c0652f7-bb1b-99e1-7e8b-0613cc764ddd@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 27/10/2021 19:03, Laurent Vivier wrote:
-> On 27/10/2021 18:25, Laurent Vivier wrote:
->> On 27/10/2021 17:28, Michael S. Tsirkin wrote:
->>> On Wed, Oct 27, 2021 at 03:36:19PM +0200, Dmitry Vyukov wrote:
->>>> On Wed, 27 Oct 2021 at 15:11, Laurent Vivier <lvivier@redhat.com> wrote:
->>>>>
->>>>> On 26/10/2021 18:39, syzbot wrote:
->>>>>> Hello,
->>>>>>
->>>>>> syzbot found the following issue on:
->>>>>>
->>>>>> HEAD commit:Â Â Â  9ae1fbdeabd3 Add linux-next specific files for 20211025
->>>>>> git tree:Â Â Â Â Â Â  linux-next
->>>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=1331363cb00000
->>>>>> kernel config:Â  https://syzkaller.appspot.com/x/.config?x=aeb17e42bc109064
->>>>>> dashboard link: https://syzkaller.appspot.com/bug?extid=b86736b5935e0d25b446
->>>>>> compiler:Â Â Â Â Â Â  gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for 
->>>>>> Debian) 2.35.2
->>>>>> syz repro:Â Â Â Â Â  https://syzkaller.appspot.com/x/repro.syz?x=116ce954b00000
->>>>>> C reproducer:Â Â  https://syzkaller.appspot.com/x/repro.c?x=132fcf62b00000
->>>>>>
->>>>>> The issue was bisected to:
->>>>>>
->>>>>> commit 22849b5ea5952d853547cc5e0651f34a246b2a4f
->>>>>> Author: Leon Romanovsky <leonro@nvidia.com>
->>>>>> Date:Â Â  Thu Oct 21 14:16:14 2021 +0000
->>>>>>
->>>>>> Â Â Â Â Â  devlink: Remove not-executed trap policer notifications
->>>>>>
->>>>>> bisection log:Â  https://syzkaller.appspot.com/x/bisect.txt?x=137d8bfcb00000
->>>>>> final oops:Â Â Â Â  https://syzkaller.appspot.com/x/report.txt?x=10fd8bfcb00000
->>>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=177d8bfcb00000
->>>>>>
->>>>>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->>>>>> Reported-by: syzbot+b86736b5935e0d25b446@syzkaller.appspotmail.com
->>>>>> Fixes: 22849b5ea595 ("devlink: Remove not-executed trap policer notifications")
->>>>>>
->>>>>> ==================================================================
->>>>>> BUG: KASAN: slab-out-of-bounds in memcpy include/linux/fortify-string.h:225 [inline]
->>>>>> BUG: KASAN: slab-out-of-bounds in copy_data+0xf3/0x2e0 
->>>>>> drivers/char/hw_random/virtio-rng.c:68
->>>>>> Read of size 64 at addr ffff88801a7a1580 by task syz-executor989/6542
->>>>>>
->>>>>
->>>>> I'm not able to reproduce the problem with next-20211026 and the C reproducer.
->>>>>
->>>>> And reviewing the code in copy_data() I don't see any issue.
->>>>>
->>>>> Is it possible to know what it the VM configuration used to test it?
->>>>
->>>> Hi Laurent,
->>>>
->>>> syzbot used e2-standard-2 GCE VM when that happened.
->>>> You can see some info about these VMs under the "VM info" link on the dashboard.
->>>
->>> Could you pls confirm whether reverting
->>> caaf2874ba27b92bca6f0298bf88bad94067ec37 addresses this?
->>>
->>
->> I've restarted the syzbot on top of "hwrng: virtio - don't wait on cleanup" [1] and the 
->> problem has not been triggered.
->>
->> See https://syzkaller.appspot.com/bug?extid=b86736b5935e0d25b446
+On Wed, Oct 27, 2021 at 08:20:08PM +0200, Laurent Vivier wrote:
+> On 27/10/2021 19:03, Laurent Vivier wrote:
+> > On 27/10/2021 18:25, Laurent Vivier wrote:
+> > > On 27/10/2021 17:28, Michael S. Tsirkin wrote:
+> > > > On Wed, Oct 27, 2021 at 03:36:19PM +0200, Dmitry Vyukov wrote:
+> > > > > On Wed, 27 Oct 2021 at 15:11, Laurent Vivier <lvivier@redhat.com> wrote:
+> > > > > > 
+> > > > > > On 26/10/2021 18:39, syzbot wrote:
+> > > > > > > Hello,
+> > > > > > > 
+> > > > > > > syzbot found the following issue on:
+> > > > > > > 
+> > > > > > > HEAD commit:    9ae1fbdeabd3 Add linux-next specific files for 20211025
+> > > > > > > git tree:       linux-next
+> > > > > > > console output: https://syzkaller.appspot.com/x/log.txt?x=1331363cb00000
+> > > > > > > kernel config:  https://syzkaller.appspot.com/x/.config?x=aeb17e42bc109064
+> > > > > > > dashboard link: https://syzkaller.appspot.com/bug?extid=b86736b5935e0d25b446
+> > > > > > > compiler:       gcc (Debian 10.2.1-6) 10.2.1
+> > > > > > > 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> > > > > > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=116ce954b00000
+> > > > > > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=132fcf62b00000
+> > > > > > > 
+> > > > > > > The issue was bisected to:
+> > > > > > > 
+> > > > > > > commit 22849b5ea5952d853547cc5e0651f34a246b2a4f
+> > > > > > > Author: Leon Romanovsky <leonro@nvidia.com>
+> > > > > > > Date:   Thu Oct 21 14:16:14 2021 +0000
+> > > > > > > 
+> > > > > > >       devlink: Remove not-executed trap policer notifications
+> > > > > > > 
+> > > > > > > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=137d8bfcb00000
+> > > > > > > final oops:     https://syzkaller.appspot.com/x/report.txt?x=10fd8bfcb00000
+> > > > > > > console output: https://syzkaller.appspot.com/x/log.txt?x=177d8bfcb00000
+> > > > > > > 
+> > > > > > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > > > > > > Reported-by: syzbot+b86736b5935e0d25b446@syzkaller.appspotmail.com
+> > > > > > > Fixes: 22849b5ea595 ("devlink: Remove not-executed trap policer notifications")
+> > > > > > > 
+> > > > > > > ==================================================================
+> > > > > > > BUG: KASAN: slab-out-of-bounds in memcpy include/linux/fortify-string.h:225 [inline]
+> > > > > > > BUG: KASAN: slab-out-of-bounds in
+> > > > > > > copy_data+0xf3/0x2e0
+> > > > > > > drivers/char/hw_random/virtio-rng.c:68
+> > > > > > > Read of size 64 at addr ffff88801a7a1580 by task syz-executor989/6542
+> > > > > > > 
+> > > > > > 
+> > > > > > I'm not able to reproduce the problem with next-20211026 and the C reproducer.
+> > > > > > 
+> > > > > > And reviewing the code in copy_data() I don't see any issue.
+> > > > > > 
+> > > > > > Is it possible to know what it the VM configuration used to test it?
+> > > > > 
+> > > > > Hi Laurent,
+> > > > > 
+> > > > > syzbot used e2-standard-2 GCE VM when that happened.
+> > > > > You can see some info about these VMs under the "VM info" link on the dashboard.
+> > > > 
+> > > > Could you pls confirm whether reverting
+> > > > caaf2874ba27b92bca6f0298bf88bad94067ec37 addresses this?
+> > > > 
+> > > 
+> > > I've restarted the syzbot on top of "hwrng: virtio - don't wait on
+> > > cleanup" [1] and the problem has not been triggered.
+> > > 
+> > > See https://syzkaller.appspot.com/bug?extid=b86736b5935e0d25b446
+> > 
+> > The problem seems to be introduced by the last patch:
+> > 
+> > "hwrng: virtio - always add a pending request"
 > 
-> The problem seems to be introduced by the last patch:
+> I think I understand the problem.
 > 
-> "hwrng: virtio - always add a pending request"
+> As we check data_avail != 0 before waiting on the completion, we can have a data_idx != 0.
+> 
+> The following change fixes the problem for me:
+> 
+> --- a/drivers/char/hw_random/virtio-rng.c
+> +++ b/drivers/char/hw_random/virtio-rng.c
+> @@ -52,6 +52,8 @@ static void request_entropy(struct virtrng_info *vi)
+>         struct scatterlist sg;
+> 
+>         reinit_completion(&vi->have_data);
+> +       vi->data_avail = 0;
+> +       vi->data_idx = 0;
+> 
+>         sg_init_one(&sg, vi->data, sizeof(vi->data));
+> 
+> 
+> MST, do you update the patch or do you want I send a new version?
+> 
+> Thanks,
+> Laurent
 
-I think I understand the problem.
+New version of the patchset pls, and note in the changelog
+that just this patch changed.
 
-As we check data_avail != 0 before waiting on the completion, we can have a data_idx != 0.
-
-The following change fixes the problem for me:
-
---- a/drivers/char/hw_random/virtio-rng.c
-+++ b/drivers/char/hw_random/virtio-rng.c
-@@ -52,6 +52,8 @@ static void request_entropy(struct virtrng_info *vi)
-         struct scatterlist sg;
-
-         reinit_completion(&vi->have_data);
-+       vi->data_avail = 0;
-+       vi->data_idx = 0;
-
-         sg_init_one(&sg, vi->data, sizeof(vi->data));
-
-
-MST, do you update the patch or do you want I send a new version?
-
-Thanks,
-Laurent
+-- 
+MST
 
