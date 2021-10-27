@@ -2,129 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 723B3C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 08:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34FA4C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 09:13:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51C1861075
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 08:40:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CCC561052
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 09:13:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239450AbhJ0Imk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Oct 2021 04:42:40 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:41484 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239439AbhJ0Imj (ORCPT
+        id S232441AbhJ0JQP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Oct 2021 05:16:15 -0400
+Received: from pv50p00im-ztdg10012101.me.com ([17.58.6.49]:58482 "EHLO
+        pv50p00im-ztdg10012101.me.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232279AbhJ0JQP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Oct 2021 04:42:39 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 7F276218F0;
-        Wed, 27 Oct 2021 08:40:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1635324013; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GMgN2A9bmbMdtRlwQcHYangnfGuiIHJ49tFSvs6PWNU=;
-        b=Jeb72/Mj+bAi+4FBH876ysPMOc8EOW235meNyAYbu2TNosqxTWyPg8OvtWA/XuOIuWYC1h
-        yxTsnV5s26nWKZZyia/D3TiEc4GtGUvKfLYbKRZMCp5X0mXyA6XYg8IqO8DLfOurwA0Vm9
-        /3M7xaE3cNxeLWlW+SUqt5Ll8brNAgg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1635324013;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GMgN2A9bmbMdtRlwQcHYangnfGuiIHJ49tFSvs6PWNU=;
-        b=6HdkBqs9l+N0CGtaF0ZehpcbP7GX36GexBMXr06DOIB+2b6hoZEg4jOXUvcFBTiNsA+iNe
-        s4eAooRPPMM159DA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3806713A2C;
-        Wed, 27 Oct 2021 08:40:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id MUjTC20QeWEMFAAAMHmgww
-        (envelope-from <nstange@suse.de>); Wed, 27 Oct 2021 08:40:13 +0000
-From:   Nicolai Stange <nstange@suse.de>
-To:     Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolai Stange <nstange@suse.de>, Torsten Duwe <duwe@suse.de>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/6] crypto: DRBG - improve 'nopr' reseeding
-References: <20211025092525.12805-1-nstange@suse.de>
-        <2120606.3HGXcN3vsr@positron.chronox.de>
-Date:   Wed, 27 Oct 2021 10:40:12 +0200
-In-Reply-To: <2120606.3HGXcN3vsr@positron.chronox.de> ("Stephan
- \=\?utf-8\?Q\?M\=C3\=BCller\=22's\?\=
-        message of "Tue, 26 Oct 2021 10:33:05 +0200")
-Message-ID: <87zgqurhcj.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
+        Wed, 27 Oct 2021 05:16:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+        s=1a1hai; t=1635326030;
+        bh=skrcpPB4azix386HhjF8VD/37TEUye9lSNg0FDOI+3s=;
+        h=From:To:Subject:Date:Message-Id:MIME-Version;
+        b=CAdzJEi3yqiq6BRs6xNa84s6aYh3vlSYtxA+Fo53QsXdfH+G9nEBqN3Zj/Xx1cALo
+         9dvxhdZcDFjNYicYViKQADkVhXiBKv5B09TF02cTTiE9WUj+xjf4M5ZYmbAxgEFuxa
+         1/lcawL8bPNaKGAcrQ6H0RNmEJYubyTlFWlfoLBtJrKahE4a3j6BCnr+TPPsQy70kp
+         3sXV1gvBnBb3Eoh+VVBwCtRYfHUW+B8lx3KGuCwXg264+CjFIB2rH5ZA8jrr88j1dL
+         R/enIIe0JrpMtdaEAkiafUZpAEU3ApqrSvhKxGTuIL6yn69aRfCtAxWGh0nym5EW5B
+         BYohM0KU4OvEg==
+Received: from debian.lan (dhcp-077-251-223-151.chello.nl [77.251.223.151])
+        by pv50p00im-ztdg10012101.me.com (Postfix) with ESMTPSA id 68701840476;
+        Wed, 27 Oct 2021 09:13:45 +0000 (UTC)
+From:   Richard van Schagen <vschagen@icloud.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        matthias.bgg@gmail.com, robh+dt@kernel.org
+Cc:     linux-crypto@vger.kernel.org,
+        Richard van Schagen <vschagen@icloud.com>
+Subject: [PATCH v3 0/2] Enable the Mediatek EIP-93 crypto engine
+Date:   Wed, 27 Oct 2021 17:13:27 +0800
+Message-Id: <20211027091329.3093641-1-vschagen@icloud.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.425,18.0.790
+ definitions=2021-10-27_02:2021-10-26,2021-10-27 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 clxscore=1011 mlxscore=0
+ mlxlogscore=324 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-2009150000 definitions=main-2110270057
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Stephan,
+This series enable the Mediatek EIP-93 crypto engine as found in the MT7621
 
-first of all, many thanks for your prompt review!
+This engine is capable of AES/DES/3DES ciphers in ECB/CBC and CTR modes,
+hash and hmac(hash) using MD5, SHA1, SHA224 and SHA256. The engine can do
+full authenc(hmac(x), cipher(y)) using mentioned ciphers and hashes.
+The engine also has an ANSI X9.31 PRNG.
 
-Stephan M=C3=BCller <smueller@chronox.de> writes:
+This driver is fully test and passes all the extra tests when selecting:
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
 
-> Am Montag, 25. Oktober 2021, 11:25:19 CEST schrieb Nicolai Stange:
->
->
->> - Replace the asynchronous random_ready_callback based DRBG reseeding
->>   logic with a synchronous solution leveraging rng_is_initialized().
->
-> Could you please help me why replacing an async method with a sync method=
- is=20
-> helpful? Which problems do you see with the async method that are allevia=
-ted=20
-> with the swtich to the sync method? In general, an async method is more=20
-> powerful, though it requires a bit more code.
+For now only simple cipher and authenc are added. In the future I will
+add patches for hash/hmac and the PRNG.
 
-There is no problem with the async method (*), I just don't see any
-advantage over the less complex approach of doing all reseeding
-work synchronously from drbg_generate().
+Richard van Schagen
 
-Before the change, there had been two sites taking care of reseeding:
-the drbg_async_seed() work handler scheduled from the
-random_ready_callback and drbg_generate().
+Changes since V2:
+ - Adding 2 missing "static" which got lost in my editing (sorry)
 
-After the change, all reseeding is handled at a single place only, namely
-drbg_generate(), which, in my opinion, makes it easier to reason about.
-In particular, in preparation for patch 6/6 from this series introducing
-yet another condition for triggering a reseed...
+Changes since V1:
+ - Fix errors found by kernel test robot.
+---
+ .../bindings/crypto/mediatek,mtk-eip93.yaml   | 43 +++++++++++++++++++
+ 1 file changed, 43 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/mediatek,mtk-eip93.yaml
 
-Thanks,
+ drivers/crypto/Kconfig                  |   2 +
+ drivers/crypto/Makefile                 |   1 +
+ drivers/crypto/mtk-eip93/Kconfig        |  49 ++
+ drivers/crypto/mtk-eip93/Makefile       |   7 +
+ drivers/crypto/mtk-eip93/eip93-aead.c   | 767 +++++++++++++++++++++++
+ drivers/crypto/mtk-eip93/eip93-aead.h   |  43 ++
+ drivers/crypto/mtk-eip93/eip93-aes.h    |  15 +
+ drivers/crypto/mtk-eip93/eip93-cipher.c | 399 ++++++++++++
+ drivers/crypto/mtk-eip93/eip93-cipher.h |  62 ++
+ drivers/crypto/mtk-eip93/eip93-common.c | 784 ++++++++++++++++++++++++
+ drivers/crypto/mtk-eip93/eip93-common.h |  34 +
+ drivers/crypto/mtk-eip93/eip93-des.h    |  15 +
+ drivers/crypto/mtk-eip93/eip93-main.c   | 458 ++++++++++++++
+ drivers/crypto/mtk-eip93/eip93-main.h   | 146 +++++
+ drivers/crypto/mtk-eip93/eip93-regs.h   | 382 ++++++++++++
+ 15 files changed, 3164 insertions(+)
+ create mode 100644 drivers/crypto/mtk-eip93/Kconfig
+ create mode 100644 drivers/crypto/mtk-eip93/Makefile
+ create mode 100644 drivers/crypto/mtk-eip93/eip93-aead.c
+ create mode 100644 drivers/crypto/mtk-eip93/eip93-aead.h
+ create mode 100644 drivers/crypto/mtk-eip93/eip93-aes.h
+ create mode 100644 drivers/crypto/mtk-eip93/eip93-cipher.c
+ create mode 100644 drivers/crypto/mtk-eip93/eip93-cipher.h
+ create mode 100644 drivers/crypto/mtk-eip93/eip93-common.c
+ create mode 100644 drivers/crypto/mtk-eip93/eip93-common.h
+ create mode 100644 drivers/crypto/mtk-eip93/eip93-des.h
+ create mode 100644 drivers/crypto/mtk-eip93/eip93-main.c
+ create mode 100644 drivers/crypto/mtk-eip93/eip93-main.h
+ create mode 100644 drivers/crypto/mtk-eip93/eip93-regs.h
 
-Nicolai
-
-(*) Except for that a wait_for_random_bytes() issued by DRBG users won't
-    give any guarantees with respect to a subsequent drbg_generate()
-    operation, c.f. my other mail in reply to your review on 3/6 I'm
-    about to write in a second. As of now, there aren't any DRBG users
-    invoking wait_for_random_bytes(), but one might perhaps consider
-    changing that in the future.
-
->>   This
->>   move simplifies the code IMO and, as a side-effect, would enable DRBG
->>   users to rely on wait_for_random_bytes() to sync properly with
->>   drbg_generate(), if desired. Implemented by patches 1-5/6.
->> - Make the 'nopr' DRBGs to reseed themselves every 5min from
->>   get_random_bytes(). This achieves at least kind of a partial prediction
->>   resistance over the time domain at almost no extra cost. Implemented
->>   by patch 6/6, the preceding patches in this series are a prerequisite
->>   for this.
-
---=20
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, G=
-ermany
-(HRB 36809, AG N=C3=BCrnberg), GF: Felix Imend=C3=B6rffer
