@@ -2,204 +2,175 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 395E6C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1A4C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:20:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15C0E610C7
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:16:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71CAA6112E
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:20:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243466AbhJ0STP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Oct 2021 14:19:15 -0400
-Received: from smtprelay0188.hostedemail.com ([216.40.44.188]:60032 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S243507AbhJ0SSv (ORCPT
+        id S243434AbhJ0SWk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Oct 2021 14:22:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34354 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240156AbhJ0SWj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Oct 2021 14:18:51 -0400
-X-Greylist: delayed 4652 seconds by postgrey-1.27 at vger.kernel.org; Wed, 27 Oct 2021 14:18:42 EDT
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave04.hostedemail.com (Postfix) with ESMTP id D94841811FE43;
-        Wed, 27 Oct 2021 16:58:46 +0000 (UTC)
-Received: from omf01.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay05.hostedemail.com (Postfix) with ESMTP id 88CE218027A8A;
-        Wed, 27 Oct 2021 16:58:41 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf01.hostedemail.com (Postfix) with ESMTPA id 34EC11727C;
-        Wed, 27 Oct 2021 16:57:52 +0000 (UTC)
-Message-ID: <20ffb5604269f9add568b343701d42097c599c89.camel@perches.com>
-Subject: Re: dt-bindings: treewide: Update @st.com email address to
- @foss.st.com
-From:   Joe Perches <joe@perches.com>
-To:     Patrice CHOTARD <patrice.chotard@foss.st.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        maxime coquelin <mcoquelin.stm32@gmail.com>,
-        alexandre torgue <alexandre.torgue@foss.st.com>,
-        michael turquette <mturquette@baylibre.com>,
-        stephen boyd <sboyd@kernel.org>,
-        herbert xu <herbert@gondor.apana.org.au>,
-        "david s . miller" <davem@davemloft.net>,
-        david airlie <airlied@linux.ie>,
-        daniel vetter <daniel@ffwll.ch>,
-        thierry reding <thierry.reding@gmail.com>,
-        sam ravnborg <sam@ravnborg.org>,
-        yannick fertre <yannick.fertre@foss.st.com>,
-        philippe cornu <philippe.cornu@foss.st.com>,
-        benjamin gaignard <benjamin.gaignard@linaro.org>,
-        vinod koul <vkoul@kernel.org>,
-        ohad ben-cohen <ohad@wizery.com>,
-        bjorn andersson <bjorn.andersson@linaro.org>,
-        baolin wang <baolin.wang7@gmail.com>,
-        jonathan cameron <jic23@kernel.org>,
-        lars-peter clausen <lars@metafoo.de>,
-        olivier moysan <olivier.moysan@foss.st.com>,
-        arnaud pouliquen <arnaud.pouliquen@foss.st.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Hugues Fruchet <hugues.fruchet@foss.st.com>,
-        Fabrice Gasnier <fabrice.gasnier@foss.st.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        Jagan Teki <jagan@amarulasolutions.com>,
-        dillon min <dillon.minfei@gmail.com>,
-        Marek Vasut <marex@denx.de>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Paul Cercueil <paul@crapouillou.net>,
-        Fabien Dessenne <fabien.dessenne@foss.st.com>,
-        Christophe Roullier <christophe.roullier@foss.st.com>,
-        Gabriel Fernandez <gabriel.fernandez@foss.st.com>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        Amelie Delaunay <amelie.delaunay@foss.st.com>,
-        Pierre-Yves MORDRET <pierre-yves.mordret@foss.st.com>,
-        Ludovic Barre <ludovic.barre@foss.st.com>,
-        Christophe Kerello <christophe.kerello@foss.st.com>,
-        pascal Paillet <p.paillet@foss.st.com>,
-        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Le Ray <erwan.leray@foss.st.com>, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        dmaengine@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-media@vger.kernel.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-        linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org,
-        linux-rtc@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org
-Date:   Wed, 27 Oct 2021 09:57:50 -0700
-In-Reply-To: <865a4055-5c2f-0793-bdce-9f04eac167d2@foss.st.com>
-References: <20211020065000.21312-1-patrice.chotard@foss.st.com>
-         <22fb6f19-21eb-dcb5-fa31-bb243d4a7eaf@canonical.com>
-         <878ryoc4dc.wl-maz@kernel.org>
-         <82492eb2-5a5e-39a2-a058-5e2ba75323e0@foss.st.com>
-         <865a4055-5c2f-0793-bdce-9f04eac167d2@foss.st.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.4-1 
+        Wed, 27 Oct 2021 14:22:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635358813;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fHL8U/ZQJJWFEflWR8JykfHUlV09wWEBVk/S1a/68vE=;
+        b=YYOZirjkisX39lxhIeMLfYyaKTOxZ+3ji+lBfgu1OAY6Mef7+R50ZvDfX2mYJWW3SC4Bgu
+        RteGhyzvUzOmMMIXxEnJ2m5Y5UqEbjclBDMQW/Uutmf/tXtnYfelQCojsptuJQsVBXeeQg
+        mkKZ0oIbMp0+QoZbP89Fn+t+fcIhlUY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-447-4xbjn8mOPkSSFhPR9ACwKg-1; Wed, 27 Oct 2021 14:20:11 -0400
+X-MC-Unique: 4xbjn8mOPkSSFhPR9ACwKg-1
+Received: by mail-wm1-f70.google.com with SMTP id i15-20020a05600c354f00b0032cda87b22cso497967wmq.5
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Oct 2021 11:20:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:from:to:cc:references:in-reply-to
+         :content-transfer-encoding;
+        bh=fHL8U/ZQJJWFEflWR8JykfHUlV09wWEBVk/S1a/68vE=;
+        b=KB8TZ87IpPvu6Dvli5TbqyZ0bCzulHrHX+wlAuqGBnsKoNU1wRppBteVwgyHhxAZa5
+         3+MfgqVebzH59qyQBmmB8QVVKkWa4+ySaaq4kgzQpO2KREASYnR/35umvINWnF62h+JV
+         uJXb4Hq9fHPh3Z4E63wrszKhOHaSzDBDANerAVEXbTM5D4dlhnKcCDL2iMjxNX2FtLjS
+         v7hVsEszCcY1k0/k5AeAmMZfEZx1lmwVb0IBVPGJ+9cgTWy4xseKeQ3vcbzlusYgs1D+
+         JeWWK2PA46Wtq84lQwl0r+NK8B7ETgSOezJkUcBHdxyILyEOd7lizVhbOEuOMfu8iEeo
+         Q97w==
+X-Gm-Message-State: AOAM533+GVqmQqWXtA4CzMwBX+pZVl2ckXhE1UZGqMdQ49tU+fuXPtI1
+        1yZJlnc3IVM51VMP3dnZAWyt0pxln8e+KX0aPwDTGYdlLsaOtXlKX6+qdnEjqiXhzJaMxw2yQco
+        n+nN0NygpD5F/iSdtSHtinkas
+X-Received: by 2002:a5d:614d:: with SMTP id y13mr43766544wrt.199.1635358810390;
+        Wed, 27 Oct 2021 11:20:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJywlSOhKpI8SvbmuEboOoMaeDgerhBBvtAQkWnNqvPZZpw6tCGPccHyjl4kAG23JmGd3fU5BA==
+X-Received: by 2002:a5d:614d:: with SMTP id y13mr43766508wrt.199.1635358810124;
+        Wed, 27 Oct 2021 11:20:10 -0700 (PDT)
+Received: from [192.168.100.42] ([82.142.14.190])
+        by smtp.gmail.com with ESMTPSA id p18sm535005wmq.4.2021.10.27.11.20.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Oct 2021 11:20:09 -0700 (PDT)
+Message-ID: <1c0652f7-bb1b-99e1-7e8b-0613cc764ddd@redhat.com>
+Date:   Wed, 27 Oct 2021 20:20:08 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [syzbot] KASAN: slab-out-of-bounds Read in copy_data
+Content-Language: en-US
+From:   Laurent Vivier <lvivier@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Dmitry Vyukov <dvyukov@google.com>
+Cc:     syzbot <syzbot+b86736b5935e0d25b446@syzkaller.appspotmail.com>,
+        davem@davemloft.net, herbert@gondor.apana.org.au, jiri@nvidia.com,
+        kuba@kernel.org, leonro@nvidia.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mpm@selenic.com,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <000000000000a4cd2105cf441e76@google.com>
+ <eab57f0e-d3c6-7619-97cc-9bc3a7a07219@redhat.com>
+ <CACT4Y+amyT9dk-6iVqru-wQnotmwW=bt4VwaysgzjH9=PkxGww@mail.gmail.com>
+ <20211027111300-mutt-send-email-mst@kernel.org>
+ <589f86e0-af0e-c172-7ec6-72148ba7b3b0@redhat.com>
+ <8b5fb6ae-ab66-607f-b7c8-993c483846ca@redhat.com>
+In-Reply-To: <8b5fb6ae-ab66-607f-b7c8-993c483846ca@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Stat-Signature: d7f39g9ut4x78f1qzm6ux4u3z7warbny
-X-Rspamd-Server: rspamout02
-X-Rspamd-Queue-Id: 34EC11727C
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX1/mP1yO9Xb7wezovkJWdqP2VR+2BHiCxac=
-X-HE-Tag: 1635353872-396338
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2021-10-27 at 15:56 +0200, Patrice CHOTARD wrote:
-> On 10/27/21 8:11 AM, Patrice CHOTARD wrote:
-> > On 10/20/21 1:39 PM, Marc Zyngier wrote:
-> > > On Wed, 20 Oct 2021 08:45:02 +0100,
-> > > Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com> wrote:
-> > > > On 20/10/2021 08:50, patrice.chotard@foss.st.com wrote:
-> > > > > From: Patrice Chotard <patrice.chotard@foss.st.com>
-> > > > > 
-> > > > > Not all @st.com email address are concerned, only people who have
-> > > > > a specific @foss.st.com email will see their entry updated.
-> > > > > For some people, who left the company, remove their email.
-> > > > Also would be nice to see here explained *why* are you doing this.
-> > > 
-> > > And why this can't be done with a single update to .mailmap, like
-> > > anyone else does.
-> > 
-> > Thanks for the tips, yes, it will be simpler.
+On 27/10/2021 19:03, Laurent Vivier wrote:
+> On 27/10/2021 18:25, Laurent Vivier wrote:
+>> On 27/10/2021 17:28, Michael S. Tsirkin wrote:
+>>> On Wed, Oct 27, 2021 at 03:36:19PM +0200, Dmitry Vyukov wrote:
+>>>> On Wed, 27 Oct 2021 at 15:11, Laurent Vivier <lvivier@redhat.com> wrote:
+>>>>>
+>>>>> On 26/10/2021 18:39, syzbot wrote:
+>>>>>> Hello,
+>>>>>>
+>>>>>> syzbot found the following issue on:
+>>>>>>
+>>>>>> HEAD commit:    9ae1fbdeabd3 Add linux-next specific files for 20211025
+>>>>>> git tree:       linux-next
+>>>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=1331363cb00000
+>>>>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=aeb17e42bc109064
+>>>>>> dashboard link: https://syzkaller.appspot.com/bug?extid=b86736b5935e0d25b446
+>>>>>> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for 
+>>>>>> Debian) 2.35.2
+>>>>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=116ce954b00000
+>>>>>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=132fcf62b00000
+>>>>>>
+>>>>>> The issue was bisected to:
+>>>>>>
+>>>>>> commit 22849b5ea5952d853547cc5e0651f34a246b2a4f
+>>>>>> Author: Leon Romanovsky <leonro@nvidia.com>
+>>>>>> Date:   Thu Oct 21 14:16:14 2021 +0000
+>>>>>>
+>>>>>>       devlink: Remove not-executed trap policer notifications
+>>>>>>
+>>>>>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=137d8bfcb00000
+>>>>>> final oops:     https://syzkaller.appspot.com/x/report.txt?x=10fd8bfcb00000
+>>>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=177d8bfcb00000
+>>>>>>
+>>>>>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>>>>>> Reported-by: syzbot+b86736b5935e0d25b446@syzkaller.appspotmail.com
+>>>>>> Fixes: 22849b5ea595 ("devlink: Remove not-executed trap policer notifications")
+>>>>>>
+>>>>>> ==================================================================
+>>>>>> BUG: KASAN: slab-out-of-bounds in memcpy include/linux/fortify-string.h:225 [inline]
+>>>>>> BUG: KASAN: slab-out-of-bounds in copy_data+0xf3/0x2e0 
+>>>>>> drivers/char/hw_random/virtio-rng.c:68
+>>>>>> Read of size 64 at addr ffff88801a7a1580 by task syz-executor989/6542
+>>>>>>
+>>>>>
+>>>>> I'm not able to reproduce the problem with next-20211026 and the C reproducer.
+>>>>>
+>>>>> And reviewing the code in copy_data() I don't see any issue.
+>>>>>
+>>>>> Is it possible to know what it the VM configuration used to test it?
+>>>>
+>>>> Hi Laurent,
+>>>>
+>>>> syzbot used e2-standard-2 GCE VM when that happened.
+>>>> You can see some info about these VMs under the "VM info" link on the dashboard.
+>>>
+>>> Could you pls confirm whether reverting
+>>> caaf2874ba27b92bca6f0298bf88bad94067ec37 addresses this?
+>>>
+>>
+>> I've restarted the syzbot on top of "hwrng: virtio - don't wait on cleanup" [1] and the 
+>> problem has not been triggered.
+>>
+>> See https://syzkaller.appspot.com/bug?extid=b86736b5935e0d25b446
 > 
-> I made a try by updating .mailmap with adding a new entry with my @foss.st.com email :
+> The problem seems to be introduced by the last patch:
 > 
->  Pali Roh�r <pali@kernel.org> <pali.rohar@gmail.com>
->  Paolo 'Blaisorblade' Giarrusso <blaisorblade@yahoo.it>
-> +Patrice Chotard <patrice.chotard@foss.st.com> <patrice.chotard@st.com>
->  Patrick Mochel <mochel@digitalimplant.org>
->  Paul Burton <paulburton@kernel.org> <paul.burton@imgtec.com>
-> 
-> But when running ./scripts/get_maintainer.pl Documentation/devicetree/bindings/arm/sti.yaml, by old email is still displayed
-> 
-> Rob Herring <robh+dt@kernel.org> (maintainer:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
-> Patrice Chotard <patrice.chotard@st.com> (in file)
-> devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
-> linux-kernel@vger.kernel.org (open list)
-> 
-> By default, the get_maintainer.pl script is using .mailmap file ($email_use_mailmap = 1).
-> 
-> It seems there is an issue with get_maintainer.pl and maintainer name/e-mail found in yaml file ?
+> "hwrng: virtio - always add a pending request"
 
-I'm of two minds whether it's an "issue" actually.
+I think I understand the problem.
 
-get_maintainer is not the only tool used to create email
-address lists.
+As we check data_avail != 0 before waiting on the completion, we can have a data_idx != 0.
 
-Some actually read files like MAINTAINERS or .dts or .yaml
-files directly to find maintainer addresses.
+The following change fixes the problem for me:
 
-So If your name and email address is listed in an source file
-where nominally active email addresses are entered then I
-believe .mailmap should not modify it.
+--- a/drivers/char/hw_random/virtio-rng.c
++++ b/drivers/char/hw_random/virtio-rng.c
+@@ -52,6 +52,8 @@ static void request_entropy(struct virtrng_info *vi)
+         struct scatterlist sg;
 
-So I believe email addresses in each file should be updated
-in preference to using a mailmap entry for nominally active
-email addresses in these files.
+         reinit_completion(&vi->have_data);
++       vi->data_avail = 0;
++       vi->data_idx = 0;
 
----
-
-$ cat Documentation/devicetree/bindings/arm/sti.yaml
-# SPDX-License-Identifier: GPL-2.0
-%YAML 1.2
----
-$id: http://devicetree.org/schemas/arm/sti.yaml#
-$schema: http://devicetree.org/meta-schemas/core.yaml#
-
-title: ST STi Platforms Device Tree Bindings
-
-maintainers:
-  - Patrice Chotard <patrice.chotard@st.com>
+         sg_init_one(&sg, vi->data, sizeof(vi->data));
 
 
+MST, do you update the patch or do you want I send a new version?
+
+Thanks,
+Laurent
 
