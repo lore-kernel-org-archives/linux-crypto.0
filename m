@@ -2,182 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD2FC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C4B3C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:43:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7BE0960E09
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:38:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14B1761039
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Oct 2021 18:43:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240316AbhJ0SlO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Oct 2021 14:41:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56551 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235990AbhJ0SlN (ORCPT
+        id S238604AbhJ0SqO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Oct 2021 14:46:14 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.53]:30097 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238382AbhJ0SqN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Oct 2021 14:41:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635359927;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XMEXe0ICv6BgWp98rw/aHq8v8AFBOl4vDkhRVIL80bM=;
-        b=Cf+eilEk6I/qHCq0VZGva3yy/wcczIeUUS57T79r/dWWkSynzLbB9doLca+UUKOHbaJTfi
-        kz9eJ/xz3lVtKdQNEYv+hgoLZQEDoQqDgP8xlw6xPTr4xWqYmOYySseyhUgMH6AkVEU9Mq
-        CsYH0UA9QTDFBJR31vrgz90H91vIQ8M=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-392-weYbP1l3MO6JyCUfP1tvBA-1; Wed, 27 Oct 2021 14:38:46 -0400
-X-MC-Unique: weYbP1l3MO6JyCUfP1tvBA-1
-Received: by mail-ed1-f71.google.com with SMTP id o22-20020a056402439600b003dd4f228451so3142556edc.16
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Oct 2021 11:38:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=XMEXe0ICv6BgWp98rw/aHq8v8AFBOl4vDkhRVIL80bM=;
-        b=FE3WJ4WBwFzA4w8PuBMvufi373apd4a5KEeNYJRKVn4LlNDddgFOs5YqakCM5nug/v
-         V238etbiTpwPgDy1HZ78aWaSVRJ1fMbnjGa+7OLf5IKyQ3fn0t8eD19ZvcommROdQgUB
-         1DV9CKPq/MQRb4J3p6FkUBD31FiSYjCZYLfxpHVavE447WC78fAYNvrizaY6TWTewi69
-         lUNp0U9nti8t2yVx4j6LJjgp7TVFjWEWgSN7gT6M646mzloU3++ahhrXtU+ApdvyThvi
-         aIuw2RyQgv30xuNzTonUrQXZGWETHG2Wgciv5Bpm88vq3rQm0zjhxzVNoLXbOglIOctg
-         Nxgg==
-X-Gm-Message-State: AOAM531HejCrYCn1eb+lZU7ZNdYTBTf32/oqv2kmkZbMbycn6rivF/p9
-        2t7SAV0M+UnVlr1l9Z1/12rzKan9nj+krH7vQo7sLWgPhE9d+9ABD5SFnnyoU1hhxk/zcU3cgmz
-        xWGkYVjd8EROze7nWQ5eikNmu
-X-Received: by 2002:a05:6402:55:: with SMTP id f21mr46840909edu.8.1635359924974;
-        Wed, 27 Oct 2021 11:38:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwC2QbEl1fxg0PA8S9t6oT7SWCQwA5E14QqU1vajgt4oMNCvV6kahxQF1AxcAISTiTWcUH4uA==
-X-Received: by 2002:a05:6402:55:: with SMTP id f21mr46840891edu.8.1635359924798;
-        Wed, 27 Oct 2021 11:38:44 -0700 (PDT)
-Received: from redhat.com ([2.55.137.59])
-        by smtp.gmail.com with ESMTPSA id g8sm324197ejt.104.2021.10.27.11.38.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 11:38:44 -0700 (PDT)
-Date:   Wed, 27 Oct 2021 14:38:39 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Laurent Vivier <lvivier@redhat.com>
-Cc:     Dmitry Vyukov <dvyukov@google.com>,
-        syzbot <syzbot+b86736b5935e0d25b446@syzkaller.appspotmail.com>,
-        davem@davemloft.net, herbert@gondor.apana.org.au, jiri@nvidia.com,
-        kuba@kernel.org, leonro@nvidia.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mpm@selenic.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] KASAN: slab-out-of-bounds Read in copy_data
-Message-ID: <20211027143801-mutt-send-email-mst@kernel.org>
-References: <000000000000a4cd2105cf441e76@google.com>
- <eab57f0e-d3c6-7619-97cc-9bc3a7a07219@redhat.com>
- <CACT4Y+amyT9dk-6iVqru-wQnotmwW=bt4VwaysgzjH9=PkxGww@mail.gmail.com>
- <20211027111300-mutt-send-email-mst@kernel.org>
- <589f86e0-af0e-c172-7ec6-72148ba7b3b0@redhat.com>
- <8b5fb6ae-ab66-607f-b7c8-993c483846ca@redhat.com>
- <1c0652f7-bb1b-99e1-7e8b-0613cc764ddd@redhat.com>
+        Wed, 27 Oct 2021 14:46:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1635360224;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=8dmzvbAY2zD0jIDT/JUNyjCXUAI+Jsnu1YfCVPC0KNo=;
+    b=db+zZ6Iho1wVd4JUzzFZ0kNn5AYxFHkzuvkDWyOnspxXgNCW/+r5BEsGksSSn7MWQA
+    w/XOIr0bR7wXyIxQxu7T+91xYuvyTZqna0OwcHSafsJZkZu7dFC9Mpa/MpPONphVllMU
+    vs7d3GXSeT6hWDf4m4OjdU2u8/aHNw4uP6i+CopxOe5J97jdtyyJtfnzf5C6tPe/NSRY
+    8ijlXxOxYJjlG7IDO1BV95RohZ1qIuSmbQZ+cGS4rQFKdjXjj7+OOk+OMf4AM401xVpN
+    K7CsXytQotVZW7HBoMdek6xsB7tEDYlzHRFspnuwpmmxao/F5ffVhKPgFgbUdQtowdwt
+    +/0A==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xm0dNS3JdRcQGaevZhmp"
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 47.34.1 DYNA|AUTH)
+    with ESMTPSA id n020a8x9RIhhA1i
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Wed, 27 Oct 2021 20:43:43 +0200 (CEST)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Nicolai Stange <nstange@suse.de>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Nicolai Stange <nstange@suse.de>, Torsten Duwe <duwe@suse.de>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/6] crypto: DRBG - improve 'nopr' reseeding
+Date:   Wed, 27 Oct 2021 20:43:42 +0200
+Message-ID: <2466958.tJBOlap2oN@positron.chronox.de>
+In-Reply-To: <87zgqurhcj.fsf@suse.de>
+References: <20211025092525.12805-1-nstange@suse.de> <2120606.3HGXcN3vsr@positron.chronox.de> <87zgqurhcj.fsf@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1c0652f7-bb1b-99e1-7e8b-0613cc764ddd@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 27, 2021 at 08:20:08PM +0200, Laurent Vivier wrote:
-> On 27/10/2021 19:03, Laurent Vivier wrote:
-> > On 27/10/2021 18:25, Laurent Vivier wrote:
-> > > On 27/10/2021 17:28, Michael S. Tsirkin wrote:
-> > > > On Wed, Oct 27, 2021 at 03:36:19PM +0200, Dmitry Vyukov wrote:
-> > > > > On Wed, 27 Oct 2021 at 15:11, Laurent Vivier <lvivier@redhat.com> wrote:
-> > > > > > 
-> > > > > > On 26/10/2021 18:39, syzbot wrote:
-> > > > > > > Hello,
-> > > > > > > 
-> > > > > > > syzbot found the following issue on:
-> > > > > > > 
-> > > > > > > HEAD commit:    9ae1fbdeabd3 Add linux-next specific files for 20211025
-> > > > > > > git tree:       linux-next
-> > > > > > > console output: https://syzkaller.appspot.com/x/log.txt?x=1331363cb00000
-> > > > > > > kernel config:  https://syzkaller.appspot.com/x/.config?x=aeb17e42bc109064
-> > > > > > > dashboard link: https://syzkaller.appspot.com/bug?extid=b86736b5935e0d25b446
-> > > > > > > compiler:       gcc (Debian 10.2.1-6) 10.2.1
-> > > > > > > 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> > > > > > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=116ce954b00000
-> > > > > > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=132fcf62b00000
-> > > > > > > 
-> > > > > > > The issue was bisected to:
-> > > > > > > 
-> > > > > > > commit 22849b5ea5952d853547cc5e0651f34a246b2a4f
-> > > > > > > Author: Leon Romanovsky <leonro@nvidia.com>
-> > > > > > > Date:   Thu Oct 21 14:16:14 2021 +0000
-> > > > > > > 
-> > > > > > >       devlink: Remove not-executed trap policer notifications
-> > > > > > > 
-> > > > > > > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=137d8bfcb00000
-> > > > > > > final oops:     https://syzkaller.appspot.com/x/report.txt?x=10fd8bfcb00000
-> > > > > > > console output: https://syzkaller.appspot.com/x/log.txt?x=177d8bfcb00000
-> > > > > > > 
-> > > > > > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > > > > > > Reported-by: syzbot+b86736b5935e0d25b446@syzkaller.appspotmail.com
-> > > > > > > Fixes: 22849b5ea595 ("devlink: Remove not-executed trap policer notifications")
-> > > > > > > 
-> > > > > > > ==================================================================
-> > > > > > > BUG: KASAN: slab-out-of-bounds in memcpy include/linux/fortify-string.h:225 [inline]
-> > > > > > > BUG: KASAN: slab-out-of-bounds in
-> > > > > > > copy_data+0xf3/0x2e0
-> > > > > > > drivers/char/hw_random/virtio-rng.c:68
-> > > > > > > Read of size 64 at addr ffff88801a7a1580 by task syz-executor989/6542
-> > > > > > > 
-> > > > > > 
-> > > > > > I'm not able to reproduce the problem with next-20211026 and the C reproducer.
-> > > > > > 
-> > > > > > And reviewing the code in copy_data() I don't see any issue.
-> > > > > > 
-> > > > > > Is it possible to know what it the VM configuration used to test it?
-> > > > > 
-> > > > > Hi Laurent,
-> > > > > 
-> > > > > syzbot used e2-standard-2 GCE VM when that happened.
-> > > > > You can see some info about these VMs under the "VM info" link on the dashboard.
-> > > > 
-> > > > Could you pls confirm whether reverting
-> > > > caaf2874ba27b92bca6f0298bf88bad94067ec37 addresses this?
-> > > > 
-> > > 
-> > > I've restarted the syzbot on top of "hwrng: virtio - don't wait on
-> > > cleanup" [1] and the problem has not been triggered.
-> > > 
-> > > See https://syzkaller.appspot.com/bug?extid=b86736b5935e0d25b446
-> > 
-> > The problem seems to be introduced by the last patch:
-> > 
-> > "hwrng: virtio - always add a pending request"
-> 
-> I think I understand the problem.
-> 
-> As we check data_avail != 0 before waiting on the completion, we can have a data_idx != 0.
-> 
-> The following change fixes the problem for me:
-> 
-> --- a/drivers/char/hw_random/virtio-rng.c
-> +++ b/drivers/char/hw_random/virtio-rng.c
-> @@ -52,6 +52,8 @@ static void request_entropy(struct virtrng_info *vi)
->         struct scatterlist sg;
-> 
->         reinit_completion(&vi->have_data);
-> +       vi->data_avail = 0;
-> +       vi->data_idx = 0;
-> 
->         sg_init_one(&sg, vi->data, sizeof(vi->data));
-> 
-> 
-> MST, do you update the patch or do you want I send a new version?
-> 
+Am Mittwoch, 27. Oktober 2021, 10:40:12 CEST schrieb Nicolai Stange:
+
+Hi Nicolai,
+
+> Hi Stephan,
+>=20
+> first of all, many thanks for your prompt review!
+>=20
+> Stephan M=FCller <smueller@chronox.de> writes:
+> > Am Montag, 25. Oktober 2021, 11:25:19 CEST schrieb Nicolai Stange:
+> >> - Replace the asynchronous random_ready_callback based DRBG reseeding
+> >>=20
+> >>   logic with a synchronous solution leveraging rng_is_initialized().
+> >=20
+> > Could you please help me why replacing an async method with a sync meth=
+od
+> > is helpful? Which problems do you see with the async method that are
+> > alleviated with the swtich to the sync method? In general, an async
+> > method is more powerful, though it requires a bit more code.
+>=20
+> There is no problem with the async method (*), I just don't see any
+> advantage over the less complex approach of doing all reseeding
+> work synchronously from drbg_generate().
+>=20
+> Before the change, there had been two sites taking care of reseeding:
+> the drbg_async_seed() work handler scheduled from the
+> random_ready_callback and drbg_generate().
+>=20
+> After the change, all reseeding is handled at a single place only, namely
+> drbg_generate(), which, in my opinion, makes it easier to reason about.
+> In particular, in preparation for patch 6/6 from this series introducing
+> yet another condition for triggering a reseed...
+
+That makes sense. Thanks for clarifying.
+
+Ciao
+Stephan
+>=20
 > Thanks,
-> Laurent
+>=20
+> Nicolai
+>=20
+> (*) Except for that a wait_for_random_bytes() issued by DRBG users won't
+>     give any guarantees with respect to a subsequent drbg_generate()
+>     operation, c.f. my other mail in reply to your review on 3/6 I'm
+>     about to write in a second. As of now, there aren't any DRBG users
+>     invoking wait_for_random_bytes(), but one might perhaps consider
+>     changing that in the future.
+>=20
+> >>   This
+> >>   move simplifies the code IMO and, as a side-effect, would enable DRBG
+> >>   users to rely on wait_for_random_bytes() to sync properly with
+> >>   drbg_generate(), if desired. Implemented by patches 1-5/6.
+> >>=20
+> >> - Make the 'nopr' DRBGs to reseed themselves every 5min from
+> >>=20
+> >>   get_random_bytes(). This achieves at least kind of a partial predict=
+ion
+> >>   resistance over the time domain at almost no extra cost. Implemented
+> >>   by patch 6/6, the preceding patches in this series are a prerequisite
+> >>   for this.
 
-New version of the patchset pls, and note in the changelog
-that just this patch changed.
 
--- 
-MST
+Ciao
+Stephan
+
 
