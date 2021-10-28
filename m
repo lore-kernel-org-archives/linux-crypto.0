@@ -2,131 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23FBEC43217
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Oct 2021 13:08:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6404BC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Oct 2021 17:57:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 115AA60E8F
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Oct 2021 13:08:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38DC9610D2
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Oct 2021 17:57:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229641AbhJ1NKt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Oct 2021 09:10:49 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59274 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229603AbhJ1NKt (ORCPT
+        id S230258AbhJ1SAW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Oct 2021 14:00:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51626 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229645AbhJ1SAW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Oct 2021 09:10:49 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19SCnGYv016294;
-        Thu, 28 Oct 2021 13:08:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : content-transfer-encoding : mime-version; s=pp1;
- bh=8fiPYKyw0EhWbEal4tnK6baVTfmvbJ8ImkJJsxDI9cM=;
- b=W8DVNNVEqayOpJIMfqMvblEkGSgR3F9Bg8XTzVObqD/Bdjgxn7H/I+MFqCROVRWtayZ/
- iM90MsGJlPf+JhYpQlB04dyDsz9+Oefjc1L8vtmqdI0ld+v7Y7AP/4okzJvyCjj0s707
- AONemM+DNsD3rBdhE+uOc16Bk5qenX4tS3XsKwYwjopXf4tRHFiJY2OiQ2mLOdpClf31
- b2JvOneB3BE3TVbRKhWsSHNVhV46Jq2tHcBhQPlELIO3yO3Tn1zsF0tz3g9xks5pLCSB
- jMbmDfCLMWUHm4zAVxE0M1683kIkgDxY7K2JL4Yq7kiTUjXv4v3/0sfivlze8MZHTvzb Og== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3byv6r0ebr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Oct 2021 13:08:11 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19SCnaA6016537;
-        Thu, 28 Oct 2021 13:08:11 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3byv6r0eb1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Oct 2021 13:08:10 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19SCvNEW020620;
-        Thu, 28 Oct 2021 13:08:09 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma03dal.us.ibm.com with ESMTP id 3bx4fn598y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Oct 2021 13:08:09 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19SD88Pd24183174
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Oct 2021 13:08:08 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 88DC378240;
-        Thu, 28 Oct 2021 13:08:07 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3233D7807C;
-        Thu, 28 Oct 2021 13:07:46 +0000 (GMT)
-Received: from jarvis.int.hansenpartnership.com (unknown [9.163.12.226])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Oct 2021 13:07:45 +0000 (GMT)
-Message-ID: <ff3d1d11291b7e115317b06503f0ec52949122ca.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 0/2] use SM3 instead of SM3_256
-From:   James Bottomley <jejb@linux.ibm.com>
-Reply-To: jejb@linux.ibm.com
-To:     Ard Biesheuvel <ardb@kernel.org>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        Thu, 28 Oct 2021 14:00:22 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB2BBC061570
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Oct 2021 10:57:54 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id s15-20020a170902b18f00b0013fb4449cecso3169414plr.19
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Oct 2021 10:57:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=dGW8Vt2et+rcne6KwVtymqYHCSGlZ53wYldu0Tzg1PY=;
+        b=E41H1VqPdFGwysh2xLCK9BkUQkic8v8Lvz4Hl6GuDateDJxDJJuneXXzgVz0Qm2yIh
+         zgbULIiCiVB5zXuQFDJ+2T8qjFuevalztleL3TBfiUA+w9p2wl+v7A21ox/tqu13Y4Si
+         KU/cUmsSbyBHMwhlbEv8wzhoPW9d2fsor4lsgWoSduvmKNWwf41/WscVWc+rOQomhLNR
+         bYUZin8CpQahy6JIwBAemeXeZ1VEJH9+9EoTqH6jfA4xGEDO0QqQBuJE9yAAJ4kxD1ke
+         TytSg3m82JkgPVOhREYb89fnbfD05rlrY7g68/pyCxyKG/iRpl9Zeq7ijcBPVbIf0s+K
+         Aydw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=dGW8Vt2et+rcne6KwVtymqYHCSGlZ53wYldu0Tzg1PY=;
+        b=Yy3sxg0s+LVTXju96C9XQ+ty4pJJRQWFcdD3Y+5srhQwfkl9dkJtKAXY52UqXP20Y2
+         fCfJu6o05OBYSWjSRkUZjNnmzHSJGkI8VUPa3Oij0F62WbPvkL1v/6wZtIBt5zI+cEEJ
+         y2xBaRE/9LDCwfRj/6olHN/fBgM/0MdUfWi9j6dbsIwx0Z+Dg/kVcyb6ic5d4Nj4d4WN
+         /9WjBSy15SgXj9bhJ2aYSod8Cn7tUs+s1beFnxGLJFUVp3AN36vDMbHQRb+7UTOyZSdX
+         rAkTsCjy+9rCjYUyFlXYUSIxO4qaoPgX110mHa0gQOFwNefNl2Fb5e1V1VcaNFrATKiU
+         3MuA==
+X-Gm-Message-State: AOAM530igFbIqjwG2N0RFEV5dujCMFVNSqIlHSvtAnHNaiJIJ1aNHO0u
+        pn0JIK0YFHLgNUHnHC/N5xcPQC/OYbU=
+X-Google-Smtp-Source: ABdhPJyDkWvwmejANP9IaoW4wvFJbAp5K8gMld+mCamLjkK9txvo/aqdtuPsR+KqRb3G3eEGOfB4yK4oWlk=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:41d0:ac84:3b61:5938])
+ (user=pgonda job=sendgmr) by 2002:a17:90b:60d:: with SMTP id
+ gb13mr85565pjb.0.1635443873897; Thu, 28 Oct 2021 10:57:53 -0700 (PDT)
+Date:   Thu, 28 Oct 2021 10:57:45 -0700
+Message-Id: <20211028175749.1219188-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
+Subject: [PATCH 0/4] Add SEV_INIT_EX support
+From:   Peter Gonda <pgonda@google.com>
+To:     thomas.lendacky@amd.com
+Cc:     Peter Gonda <pgonda@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Marc Orr <marcorr@google.com>, Joerg Roedel <jroedel@suse.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        John Allen <john.allen@amd.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Peter Huewe <peterhuewe@gmx.de>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Jerry Snitselaar <jsnitsel@redhat.com>,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        keyrings@vger.kernel.org,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-security-module@vger.kernel.org
-Date:   Thu, 28 Oct 2021 09:07:43 -0400
-In-Reply-To: <CAMj1kXGiC-LCc-50cfddJxJ-mezO=fcLqhJHiK110CgxKusy9w@mail.gmail.com>
-References: <20211026075626.61975-1-tianjia.zhang@linux.alibaba.com>
-         <CAMj1kXGiC-LCc-50cfddJxJ-mezO=fcLqhJHiK110CgxKusy9w@mail.gmail.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: KOLHtfetbXM2M_5ECkPDVsAXdzorivCz
-X-Proofpoint-GUID: ThYkNwItNh-c7SaFT-nOwuL1brdOArJ_
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-28_01,2021-10-26_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 adultscore=0 mlxscore=0 suspectscore=0 clxscore=1015
- phishscore=0 bulkscore=0 mlxlogscore=999 priorityscore=1501 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2110280073
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2021-10-26 at 18:08 +0200, Ard Biesheuvel wrote:
-> On Tue, 26 Oct 2021 at 09:56, Tianjia Zhang
-> <tianjia.zhang@linux.alibaba.com> wrote:
-> > According to https://tools.ietf.org/id/draft-oscca-cfrg-sm3-01.html
-> > ,
-> > SM3 always produces a 256-bit hash value and there are no plans for
-> > other length development, so there is no ambiguity in the name of
-> > sm3.
-> > 
-> 
-> What is the point of these changes? Having '256' in the identifiers
-> is merely redundant and not factually incorrect, so why can't we just
-> leave these as they are?
+SEV_INIT requires users to unlock their SPI bus for the PSP's non
+volatile (NV) storage. Users may wish to lock their SPI bus for numerous
+reasons, to support this the PSP firmware supports SEV_INIT_EX. INIT_EX
+allows the firmware to use a region of memory for its NV storage leaving
+the kernel responsible for actually storing the data in a persistent
+way. This series adds a new module parameter to ccp allowing users to
+specify a path to a file for use as the PSP's NV storage. The ccp driver
+then reads the file into memory for the PSP to use and is responsible
+for writing the file whenever the PSP modifies the memory region.
 
-Me too on this.  Plus the various standards bodies we follow are still
-using the 256 suffix and it's not clear they'll change.
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Acked-by: David Rientjes <rientjes@google.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Joerg Roedel <jroedel@suse.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David Rientjes <rientjes@google.com>
+Cc: John Allen <john.allen@amd.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com> (
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-Finally, I'm not sure, given the confusion over sha256 and sha3-256,
-that the IETF won't eventually decide that all hash algorithms should
-be designated by <algorithm>-<bitlength> in which case this will get
-churned again ...
+David Rientjes (1):
+  crypto: ccp - Add SEV_INIT_EX support
 
-James
+Peter Gonda (3):
+  crypto: ccp - Fix SEV_INIT error logging on init
+  crypto: ccp - Move SEV_INIT retry for corrupted data
+  crypto: ccp - Refactor out sev_fw_alloc()
 
+ drivers/crypto/ccp/sev-dev.c | 235 ++++++++++++++++++++++++++++++-----
+ include/linux/psp-sev.h      |  21 ++++
+ 2 files changed, 222 insertions(+), 34 deletions(-)
+
+-- 
+2.33.1.1089.g2158813163f-goog
 
