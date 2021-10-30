@@ -2,68 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 920D4C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Oct 2021 18:49:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44055C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Oct 2021 01:06:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81E0760FF2
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Oct 2021 18:49:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18EF660FDA
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Oct 2021 01:06:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230381AbhJ2SwD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Oct 2021 14:52:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46484 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230325AbhJ2SwD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Oct 2021 14:52:03 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 2AC9760F4B;
-        Fri, 29 Oct 2021 18:49:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635533374;
-        bh=dUa5okgW+5K5TjZQub9JUubnjey4B5GhNsqS+9vAB2I=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=lJDRmnl2azRz/dvcy+xz2ltuItHgUn1/OZW20hQXRv5Xd5Qt3DPQYvqKN8lv/OI7n
-         gq0WnB/uoh9rZZBJpEveEl4IMph1chCBS0+zH27PkYLUcVFWL3Vsu0zD4KWsX4GI43
-         AL8WeRpoRdkdhE7sweKQysfP2JQH7kwVJ7XokBC0UyX3ZRJ8cO+vFqjg1hN4DGfSQH
-         PGAYYJSEUkFWKfdkgXYqyLSuZOfc72SoVasFcdI3vocf7NHfWhKAVtL3DqNr5mCpI4
-         gnz2vhOKEE1OIgVYSiA1vDZib0DdV7yiauwvO3sI8+kA2qJY630JbWiitmH3zR1nw4
-         xIZ81DXgxOsag==
-Subject: Re: [GIT PULL] Crypto Fixes for 5.15
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20211029041408.GA3192@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20200830223304.GA16882@gondor.apana.org.au>
- <20201026011159.GA2428@gondor.apana.org.au>
- <20201227113221.GA28744@gondor.apana.org.au>
- <20210108035450.GA6191@gondor.apana.org.au>
- <20210708030913.GA32097@gondor.apana.org.au>
- <20210817013601.GA14148@gondor.apana.org.au>
- <20210929023843.GA28594@gondor.apana.org.au> <20211029041408.GA3192@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20211029041408.GA3192@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: f8690a4b5a1b64f74ae5c4f7c4ea880d8a8e1a0d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 75c7a6c1ca63131875fe869cbfd404c94d0e1944
-Message-Id: <163553337413.6387.6763795889603013861.pr-tracker-bot@kernel.org>
-Date:   Fri, 29 Oct 2021 18:49:34 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        id S229656AbhJ3BIu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 29 Oct 2021 21:08:50 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:26208 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229508AbhJ3BIt (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 Oct 2021 21:08:49 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Hh1Kx18TZz8v0j;
+        Sat, 30 Oct 2021 09:04:53 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Sat, 30 Oct 2021 09:06:15 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Sat, 30 Oct 2021 09:06:15 +0800
+Subject: Re: [PATCH v3 0/6] crypto: hisilicon - supports hash algorithm for
+ SEC engine
+To:     <herbert@gondor.apana.org.au>
+References: <20211022091055.15369-1-yekai13@huawei.com>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
+From:   "yekai(A)" <yekai13@huawei.com>
+Message-ID: <f0f54c23-dec3-f3eb-3283-3ef6478efe33@huawei.com>
+Date:   Sat, 30 Oct 2021 09:06:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
+MIME-Version: 1.0
+In-Reply-To: <20211022091055.15369-1-yekai13@huawei.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Fri, 29 Oct 2021 12:14:09 +0800:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/75c7a6c1ca63131875fe869cbfd404c94d0e1944
+On 2021/10/22 17:10, Kai Ye wrote:
+> The driver adds hash algorithms, sm3, md5, sha1,
+> sha256, sha512. Add fallback tfm supporting. Modify
+> the driver as needed. The fuzzing test has been passed.
+>
+> changes v1->v2:
+> 	1. Modify the process of export and import. Using the ahash_req as
+> 	   hash state. By copying the content of structure sec_ahash_req to
+> 	   avoid dereferencing random pointers from import path. User can
+> 	   export the hash state and then import the hash state, and it
+> 	   still work.
+> 	2. Add sm3/md5 generic selection
+> 	
+> changes v2->v3:
+> 	1. Modify the process of export and import. Export the block of hash
+> 	   state from the mac address, then user can import the existing hash
+> 	   state.
+>
+> Kai Ye (6):
+>   crypto: hisilicon/sec - add ping-pong buffer for ahash
+>   crypto: hisilicon/sec - add ahash alg features for Kunpeng920
+>   crypto: hisilicon/sec - support the larger packets for digest mode
+>   crypto: hisilicon/sec - ahash adapt to Kunpeng930 SQE
+>   crypto: hisilicon/sec - add fallback tfm supporting for ahash
+>   crypto: hisilicon/sec - add sm3/md5 generic selection for ahash
+>
+>  drivers/crypto/hisilicon/Kconfig           |    2 +
+>  drivers/crypto/hisilicon/sec2/sec.h        |   56 +-
+>  drivers/crypto/hisilicon/sec2/sec_crypto.c | 1345 +++++++++++++++++++-
+>  drivers/crypto/hisilicon/sec2/sec_crypto.h |   10 +
+>  4 files changed, 1396 insertions(+), 17 deletions(-)
+>
 
-Thank you!
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Hi Herbert
+
+Could you help to take this patchset?
+
+Thanks
+
+Kai
