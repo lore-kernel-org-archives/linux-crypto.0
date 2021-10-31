@@ -2,93 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44055C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 30 Oct 2021 01:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BBCAC433EF
+	for <linux-crypto@archiver.kernel.org>; Sun, 31 Oct 2021 12:29:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18EF660FDA
-	for <linux-crypto@archiver.kernel.org>; Sat, 30 Oct 2021 01:06:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A46560551
+	for <linux-crypto@archiver.kernel.org>; Sun, 31 Oct 2021 12:29:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229656AbhJ3BIu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Oct 2021 21:08:50 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:26208 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbhJ3BIt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Oct 2021 21:08:49 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Hh1Kx18TZz8v0j;
-        Sat, 30 Oct 2021 09:04:53 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.15; Sat, 30 Oct 2021 09:06:15 +0800
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.15; Sat, 30 Oct 2021 09:06:15 +0800
-Subject: Re: [PATCH v3 0/6] crypto: hisilicon - supports hash algorithm for
- SEC engine
-To:     <herbert@gondor.apana.org.au>
-References: <20211022091055.15369-1-yekai13@huawei.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
-From:   "yekai(A)" <yekai13@huawei.com>
-Message-ID: <f0f54c23-dec3-f3eb-3283-3ef6478efe33@huawei.com>
-Date:   Sat, 30 Oct 2021 09:06:15 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S229863AbhJaMbn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 31 Oct 2021 08:31:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33606 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229798AbhJaMbm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 31 Oct 2021 08:31:42 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F0EEA61039;
+        Sun, 31 Oct 2021 12:29:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1635683351;
+        bh=ph3gBE0UwLAlyx3ipLRKhIarn/rc9a7pyxJUqyXnYE8=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=AlSTPonwsVQTS7e6538bAhrsoddx69iTXWdkrXr6iSt+XpMXlvezHzTCflXQ39yZr
+         OXas2DnW6jbe82k53YFTnhcdR/Dfe1W5dbrmkZWe2AKWyXi39EJd7gs99EG0zrJ4YA
+         Xpev1Vw3s09aDXg61qEWMTVAKFL7NeeehC2vd6sAmYng5egDyFv+BArjzaYVH4JvhM
+         L6tmAnOfiZVT0OSCNoMhPNbUslsbB5DWX/ZZjBNvxpUd/y3ZDgzxu6h22cW/guM3q/
+         vk0rVuybrU/inRfOTAJWpW1Cv2g71dvomxt7Jtv2+PxHX8V1cAiAPNufDxnzzmHZuJ
+         KPWUD7xnP/ECQ==
+Received: by mail-ot1-f42.google.com with SMTP id l16-20020a9d6a90000000b0054e7ab56f27so21208322otq.12;
+        Sun, 31 Oct 2021 05:29:10 -0700 (PDT)
+X-Gm-Message-State: AOAM531Pbo9CzJYU1hAabTxmni2exjSYt4Lo4VA2ewAdEA1daORAheir
+        6TKV5pJHDd77w2XVjpNyYTLkjMR4okkHb6/DpdY=
+X-Google-Smtp-Source: ABdhPJwgPIx5Ajj0S1T2KjyV/1WG7VBWyhFaagI5h0bGfEPDwtYo8G+a8GQ77xOCXiUmzae1g2e9z77AEw4JstfixnE=
+X-Received: by 2002:a05:6830:1d6e:: with SMTP id l14mr16396459oti.147.1635683350134;
+ Sun, 31 Oct 2021 05:29:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20211022091055.15369-1-yekai13@huawei.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+References: <20211029135454.4383-1-nicolas.toromanoff@foss.st.com> <20211029135454.4383-4-nicolas.toromanoff@foss.st.com>
+In-Reply-To: <20211029135454.4383-4-nicolas.toromanoff@foss.st.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Sun, 31 Oct 2021 13:28:58 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXF5_2AnQH8pjgzbeq63iSkdkUVq3wZM_NURotoHj0sJMw@mail.gmail.com>
+Message-ID: <CAMj1kXF5_2AnQH8pjgzbeq63iSkdkUVq3wZM_NURotoHj0sJMw@mail.gmail.com>
+Subject: Re: [PATCH 3/8] crypto: stm32/cryp - fix CTR counter carry
+To:     Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Marek Vasut <marex@denx.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 2021/10/22 17:10, Kai Ye wrote:
-> The driver adds hash algorithms, sm3, md5, sha1,
-> sha256, sha512. Add fallback tfm supporting. Modify
-> the driver as needed. The fuzzing test has been passed.
+On Fri, 29 Oct 2021 at 16:01, Nicolas Toromanoff
+<nicolas.toromanoff@foss.st.com> wrote:
 >
-> changes v1->v2:
-> 	1. Modify the process of export and import. Using the ahash_req as
-> 	   hash state. By copying the content of structure sec_ahash_req to
-> 	   avoid dereferencing random pointers from import path. User can
-> 	   export the hash state and then import the hash state, and it
-> 	   still work.
-> 	2. Add sm3/md5 generic selection
-> 	
-> changes v2->v3:
-> 	1. Modify the process of export and import. Export the block of hash
-> 	   state from the mac address, then user can import the existing hash
-> 	   state.
+> Fix issue in CTR counter overflow, the carry-over is now properly
+> managed.
+> Fixes: bbb2832620ac ("crypto: stm32 - Fix sparse warnings")
 >
-> Kai Ye (6):
->   crypto: hisilicon/sec - add ping-pong buffer for ahash
->   crypto: hisilicon/sec - add ahash alg features for Kunpeng920
->   crypto: hisilicon/sec - support the larger packets for digest mode
->   crypto: hisilicon/sec - ahash adapt to Kunpeng930 SQE
->   crypto: hisilicon/sec - add fallback tfm supporting for ahash
->   crypto: hisilicon/sec - add sm3/md5 generic selection for ahash
+> Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
+> ---
+>  drivers/crypto/stm32/stm32-cryp.c | 19 ++++++++++---------
+>  1 file changed, 10 insertions(+), 9 deletions(-)
 >
->  drivers/crypto/hisilicon/Kconfig           |    2 +
->  drivers/crypto/hisilicon/sec2/sec.h        |   56 +-
->  drivers/crypto/hisilicon/sec2/sec_crypto.c | 1345 +++++++++++++++++++-
->  drivers/crypto/hisilicon/sec2/sec_crypto.h |   10 +
->  4 files changed, 1396 insertions(+), 17 deletions(-)
+> diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
+> index 7b55ad6d2f1a..6eeeca0d70ce 100644
+> --- a/drivers/crypto/stm32/stm32-cryp.c
+> +++ b/drivers/crypto/stm32/stm32-cryp.c
+> @@ -163,7 +163,7 @@ struct stm32_cryp {
+>         struct scatter_walk     in_walk;
+>         struct scatter_walk     out_walk;
+>
+> -       u32                     last_ctr[4];
+> +       __be32                  last_ctr[4];
+>         u32                     gcm_ctr;
+>  };
+>
+> @@ -1219,25 +1219,26 @@ static void stm32_cryp_check_ctr_counter(struct stm32_cryp *cryp)
+>
+>         if (unlikely(cryp->last_ctr[3] == 0xFFFFFFFF)) {
+>                 cryp->last_ctr[3] = 0;
+> -               cryp->last_ctr[2]++;
+> +               cryp->last_ctr[2] = cpu_to_be32(be32_to_cpu(cryp->last_ctr[2]) + 1);
+>                 if (!cryp->last_ctr[2]) {
+> -                       cryp->last_ctr[1]++;
+> +                       cryp->last_ctr[1] = cpu_to_be32(be32_to_cpu(cryp->last_ctr[1]) + 1);
+>                         if (!cryp->last_ctr[1])
+> -                               cryp->last_ctr[0]++;
+> +                               cryp->last_ctr[0] = cpu_to_be32(be32_to_cpu(cryp->last_ctr[0]) + 1);
+>                 }
 >
 
+crypto_inc() ??
 
-Hi Herbert
-
-Could you help to take this patchset?
-
-Thanks
-
-Kai
+>                 cr = stm32_cryp_read(cryp, CRYP_CR);
+>                 stm32_cryp_write(cryp, CRYP_CR, cr & ~CR_CRYPEN);
+>
+> -               stm32_cryp_hw_write_iv(cryp, (__be32 *)cryp->last_ctr);
+> +               stm32_cryp_hw_write_iv(cryp, cryp->last_ctr);
+>
+>                 stm32_cryp_write(cryp, CRYP_CR, cr);
+>         }
+>
+> -       cryp->last_ctr[0] = stm32_cryp_read(cryp, CRYP_IV0LR);
+> -       cryp->last_ctr[1] = stm32_cryp_read(cryp, CRYP_IV0RR);
+> -       cryp->last_ctr[2] = stm32_cryp_read(cryp, CRYP_IV1LR);
+> -       cryp->last_ctr[3] = stm32_cryp_read(cryp, CRYP_IV1RR);
+> +       /* The IV registers are BE  */
+> +       cryp->last_ctr[0] = cpu_to_be32(stm32_cryp_read(cryp, CRYP_IV0LR));
+> +       cryp->last_ctr[1] = cpu_to_be32(stm32_cryp_read(cryp, CRYP_IV0RR));
+> +       cryp->last_ctr[2] = cpu_to_be32(stm32_cryp_read(cryp, CRYP_IV1LR));
+> +       cryp->last_ctr[3] = cpu_to_be32(stm32_cryp_read(cryp, CRYP_IV1RR));
+>  }
+>
+>  static bool stm32_cryp_irq_read_data(struct stm32_cryp *cryp)
+> --
+> 2.17.1
+>
