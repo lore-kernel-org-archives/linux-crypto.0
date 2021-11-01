@@ -2,55 +2,55 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C305EC43217
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14898C433F5
 	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 16:36:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADA9A610FD
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 16:36:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFF9461184
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 16:36:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233282AbhKAQjM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Nov 2021 12:39:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57058 "EHLO
+        id S233258AbhKAQjF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Nov 2021 12:39:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232775AbhKAQiN (ORCPT
+        with ESMTP id S233029AbhKAQic (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Nov 2021 12:38:13 -0400
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4BFAC061714;
-        Mon,  1 Nov 2021 09:35:39 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id w15so66412613edc.9;
-        Mon, 01 Nov 2021 09:35:39 -0700 (PDT)
+        Mon, 1 Nov 2021 12:38:32 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17269C06120B;
+        Mon,  1 Nov 2021 09:35:59 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id r12so66541594edt.6;
+        Mon, 01 Nov 2021 09:35:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=6XjFwTZJAXBS5ig6cJtvUyJCDN7+Qz6UkUJ2uO4/Ktc=;
-        b=mQAHa9q2BVVuhWSh7J9ud3rXccRlUIm6dVcftCbK+fnnCOYJn3YEPdbJP7vkUOXWE3
-         PPk0EZ3u8iday/wRKju2/nWIInKHo08NE+khYut3l54Qz5jqeP/Y70dXz923EIbwpd8b
-         m8J5iWzWKE9TfoCe13ju45PA8aru7C+KbqhNP6l4cYerXg9+XKn2s+B2+bb2dZYVCjet
-         AiEADa8KcjHTCIoTOgKv9GCCWuizQiVT9MNFFa7LG92Eb7pKuYpD36GyF8k9WUOh6wiI
-         t7sKGBUmfvhcESEfxlPl7eV8MO0QwxZa28LORIBqEEYr/QlICUo0CWt7QnflY6JIXu5u
-         eWiQ==
+        bh=B2WrctCyn/He5ee2APqEO63ozLYAdf1lhC/l4cc+WZg=;
+        b=XaUCYPyVb3XGFqvFY+mZK8he0CE+6vz9ZX/4FLUhTudPnaZWUWZZU75zpoPWHvM0/D
+         1VxoBFy3/6mQ3EW7YMZveHIDLiEMK+KyL6UTvzY22957yJggBIG8qLULBfCmEEr73aWr
+         WeexGbRFsNY1QRWGfpl6T8YIvLo0vQhrkCh3wGhz9upizKb0JQmwQjjI9hKw1DDOjngS
+         1iZe+xc8GdkFCIIKOwZYwI2N3zyYD1vJOwx+ehOZr+zMf15R+c0hy2YrVJmCa3Sd8uqp
+         Mp85GASSX/U27ucjnE037nY30+j7aUJ9m5RxUsca5zmngaT8WCa/sH6Rskl0+QfRYwWA
+         ec/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=6XjFwTZJAXBS5ig6cJtvUyJCDN7+Qz6UkUJ2uO4/Ktc=;
-        b=JzORaYfEw+NH4OXfLCV3xgUbJNpZ1d/iHSkch2Xe5XS+/1nEU0b1/90pucKG3EtT7r
-         D1BhuVOk7TiaMm5DbWfUiICftlvoNeyb0eT4VZmXMGn6YGIdtYmIGT2+k/VSYmQIMTnq
-         tL4Z5hLOMylSHwtUVO0vi2NRGD5TbiK+V6cxZnsyNjDASK7X+Gz3L1W+9dn9OFc9RSKH
-         aajBhYJjqXGjN3TLLRna63nPZJcM8Cy9go/nPEUM0dhthsOLos+iq4lwmS35EVmGJxaq
-         mOz9RVq9wmHJyp+MqVGacP2xcwRusW1y9dB7m3Ah3MnzLfcJXEHmhc9FQQk1zZErNDKl
-         2cwQ==
-X-Gm-Message-State: AOAM532dTERnzeIWvXGurJZH7pfKay5RT1viHl78VlEFnxicMy586YNF
-        7dUeBChziQx4p7wOryD5iSI=
-X-Google-Smtp-Source: ABdhPJwHjmEmXN3qss1kGSQ4GY4gy7khpDLdzpsGpXXWRbieZhf04tFxmL8C46Q/Udj0+E7KXGUPZw==
-X-Received: by 2002:a05:6402:158:: with SMTP id s24mr42841743edu.189.1635784538298;
-        Mon, 01 Nov 2021 09:35:38 -0700 (PDT)
+        bh=B2WrctCyn/He5ee2APqEO63ozLYAdf1lhC/l4cc+WZg=;
+        b=CJQ1MrM6IcF1joAnRGfMBDk4WbWDogVYEQCTxkcFMqPB1RNnSQp669WixzRTU+GZcX
+         cqo4SjGZz/MktAJ5+ePlXDQXloRreT+5lEbdAbDI0A1Iby+eay4if9RsxhSX7ZbmREPR
+         9f/VeWpztrqZujz4IFBj93/NW6rKqwF5AOGSfYcSFeXY7SQ8o9bP4oYhRaEOLZRyM6Er
+         3c3bQ6HtsNP9dPI5WUuQskMkMlr5qSMGTueq7ABtMEbsBPJOydJ36kvTl+ef4x1EclVp
+         t6KI+AVT4ukMwgaL1daC34XuNcMJG8AYy7yyFDDRFzHA3aWvbKWjRvr+xdgvRfPZG/zO
+         FWOA==
+X-Gm-Message-State: AOAM532zpjv9qkXWTNIN8NDkm0sbCK6RL9Ni6CvPeohOn7YIOtpttAZ4
+        lYl8AVPxX4RdCV9mqhWW9R4=
+X-Google-Smtp-Source: ABdhPJzc9+Mh/hoEMmg4UbMVYD9tdEBc4ntT0vCOMkWE9eDSy4chZ2Y3Xmtv4HwVxiiPZNcE6KbN7A==
+X-Received: by 2002:aa7:d494:: with SMTP id b20mr599902edr.243.1635784557481;
+        Mon, 01 Nov 2021 09:35:57 -0700 (PDT)
 Received: from ponky.lan ([2a04:241e:501:3870:f5f:2085:7f25:17c])
-        by smtp.gmail.com with ESMTPSA id f25sm4124583edv.90.2021.11.01.09.35.36
+        by smtp.gmail.com with ESMTPSA id f25sm4124583edv.90.2021.11.01.09.35.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Nov 2021 09:35:37 -0700 (PDT)
+        Mon, 01 Nov 2021 09:35:56 -0700 (PDT)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
         Dmitry Safonov <0x7f454c46@gmail.com>,
@@ -68,9 +68,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 06/25] tcp: authopt: Compute packet signatures
-Date:   Mon,  1 Nov 2021 18:34:41 +0200
-Message-Id: <5245f35901015acc6a41d1da92deb96f3e593b7c.1635784253.git.cdleonard@gmail.com>
+Subject: [PATCH v2 17/25] selftests: tcp_authopt: Add packet-level tests
+Date:   Mon,  1 Nov 2021 18:34:52 +0200
+Message-Id: <f0492ff469c9246de9638f0be66254b67e9e3c03.1635784253.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1635784253.git.cdleonard@gmail.com>
 References: <cover.1635784253.git.cdleonard@gmail.com>
@@ -80,549 +80,1273 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Computing tcp authopt packet signatures is a two step process:
+This patch validates that the TCP-AO signatures inserted by linux are
+correct in all algorithm permutations, using scapy.
 
-* traffic key is computed based on tcp 4-tuple, initial sequence numbers
-and the secret key.
-* packet mac is computed based on traffic key and content of individual
-packets.
+It also tests that TCP-AO behaves correctly in a number of corner cases
+such as:
 
-The traffic key could be cached for established sockets but it is not.
+* reset handling
+* timewait
+* syn-recv
+* ipv4-mapped ipv6
+* interaction with tcp-md5
 
-A single code path exists for ipv4/ipv6 and input/output. This keeps the
-code short but slightly slower due to lots of conditionals.
-
-On output we read remote IP address from socket members on output, we
-can't use skb network header because it's computed after TCP options.
-
-On input we read remote IP address from skb network headers, we can't
-use socket binding members because those are not available for SYN.
+This reverts commit 297a301a4f1c3abe41d554a9f6df192257a017b8.
 
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- net/ipv4/tcp_authopt.c | 510 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 510 insertions(+)
+ .../full_tcp_sniff_session.py                 |  91 +++
+ .../tcp_authopt_test/linux_tcp_md5sig.py      | 110 ++++
+ .../tcp_authopt_test/scapy_conntrack.py       | 173 ++++++
+ .../tcp_connection_fixture.py                 | 276 +++++++++
+ .../tcp_authopt_test/test_verify_capture.py   | 559 ++++++++++++++++++
+ 5 files changed, 1209 insertions(+)
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/full_tcp_sniff_session.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/linux_tcp_md5sig.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_conntrack.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/tcp_connection_fixture.py
+ create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_verify_capture.py
 
-diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
-index 5455a9ecfe6b..1fd98d67ec10 100644
---- a/net/ipv4/tcp_authopt.c
-+++ b/net/ipv4/tcp_authopt.c
-@@ -425,5 +425,515 @@ int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
- 	memcpy(&key_info->addr, &opt.addr, sizeof(key_info->addr));
- 	hlist_add_head_rcu(&key_info->node, &info->head);
- 
- 	return 0;
- }
+diff --git a/tools/testing/selftests/tcp_authopt/tcp_authopt_test/full_tcp_sniff_session.py b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/full_tcp_sniff_session.py
+new file mode 100644
+index 000000000000..d37f7d947bcd
+--- /dev/null
++++ b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/full_tcp_sniff_session.py
+@@ -0,0 +1,91 @@
++# SPDX-License-Identifier: GPL-2.0
++import logging
++import threading
++import typing
 +
-+static int tcp_authopt_get_isn(struct sock *sk,
-+			       struct sk_buff *skb,
-+			       int input,
-+			       __be32 *sisn,
-+			       __be32 *disn)
-+{
-+	struct tcp_authopt_info *authopt_info;
-+	struct tcphdr *th = tcp_hdr(skb);
++import scapy.sessions
++from scapy.packet import Packet
 +
-+	/* special cases for SYN and SYN/ACK */
-+	if (th->syn && !th->ack) {
-+		*sisn = th->seq;
-+		*disn = 0;
-+		return 0;
-+	}
-+	if (th->syn && th->ack) {
-+		*sisn = th->seq;
-+		*disn = htonl(ntohl(th->ack_seq) - 1);
-+		return 0;
-+	}
++from .scapy_conntrack import TCPConnectionInfo, TCPConnectionTracker
 +
-+	/* Fetching authopt_info like this should be safe because authopt_info
-+	 * is never released intil the socket is being closed
-+	 *
-+	 * tcp_timewait_sock is handled but not tcp_request_sock.
-+	 * for the synack case sk should be the listen socket.
-+	 */
-+	rcu_read_lock();
-+	if (unlikely(sk->sk_state == TCP_NEW_SYN_RECV)) {
-+		/* should never happen, sk should be the listen socket */
-+		authopt_info = NULL;
-+		WARN_ONCE(1, "TCP-AO can't sign with request sock\n");
-+		return -EINVAL;
-+	} else if (sk->sk_state == TCP_LISTEN) {
-+		/* Signature computation for non-syn packet on a listen
-+		 * socket is not possible because we lack the initial
-+		 * sequence numbers.
-+		 *
-+		 * Input segments that are not matched by any request,
-+		 * established or timewait socket will get here. These
-+		 * are not normally sent by peers.
-+		 *
-+		 * Their signature might be valid but we don't have
-+		 * enough state to determine that. TCP-MD5 can attempt
-+		 * to validate and reply with a signed RST because it
-+		 * doesn't care about ISNs.
-+		 *
-+		 * Reporting an error from signature code causes the
-+		 * packet to be discarded which is good.
-+		 */
-+		if (input) {
-+			/* Assume this is an ACK to a SYN/ACK
-+			 * This will incorrectly report "failed
-+			 * signature" for segments without a connection.
-+			 */
-+			*sisn = htonl(ntohl(th->seq) - 1);
-+			*disn = htonl(ntohl(th->ack_seq) - 1);
-+			rcu_read_unlock();
-+			return 0;
-+		}
-+		/* This would be an internal bug. */
-+		authopt_info = NULL;
-+		WARN_ONCE(1, "TCP-AO can't sign non-syn from TCP_LISTEN sock\n");
-+		return -EINVAL;
-+	} else if (sk->sk_state == TCP_TIME_WAIT) {
-+		authopt_info = tcp_twsk(sk)->tw_authopt_info;
-+	} else {
-+		authopt_info = rcu_dereference(tcp_sk(sk)->authopt_info);
-+	}
-+	if (!authopt_info) {
-+		rcu_read_unlock();
-+		return -EINVAL;
-+	}
-+	/* Initial sequence numbers for ESTABLISHED connections from info */
-+	if (input) {
-+		*sisn = htonl(authopt_info->dst_isn);
-+		*disn = htonl(authopt_info->src_isn);
-+	} else {
-+		*sisn = htonl(authopt_info->src_isn);
-+		*disn = htonl(authopt_info->dst_isn);
-+	}
-+	rcu_read_unlock();
-+	return 0;
-+}
++logger = logging.getLogger(__name__)
 +
-+/* feed traffic key into shash */
-+static int tcp_authopt_shash_traffic_key(struct shash_desc *desc,
-+					 struct sock *sk,
-+					 struct sk_buff *skb,
-+					 bool input,
-+					 bool ipv6)
-+{
-+	struct tcphdr *th = tcp_hdr(skb);
-+	int err;
-+	__be32 sisn, disn;
-+	__be16 digestbits = htons(crypto_shash_digestsize(desc->tfm) * 8);
 +
-+	// RFC5926 section 3.1.1.1
-+	err = crypto_shash_update(desc, "\x01TCP-AO", 7);
-+	if (err)
-+		return err;
++class FullTCPSniffSession(scapy.sessions.DefaultSession):
++    """Implementation of a scapy sniff session that can wait for a full TCP capture
 +
-+	/* Addresses from packet on input and from sk_common on output
-+	 * This is because on output MAC is computed before prepending IP header
-+	 */
-+	if (input) {
-+		if (ipv6)
-+			err = crypto_shash_update(desc, (u8 *)&ipv6_hdr(skb)->saddr, 32);
-+		else
-+			err = crypto_shash_update(desc, (u8 *)&ip_hdr(skb)->saddr, 8);
-+		if (err)
-+			return err;
-+	} else {
-+		if (ipv6) {
-+			err = crypto_shash_update(desc, (u8 *)&sk->sk_v6_rcv_saddr, 16);
-+			if (err)
-+				return err;
-+			err = crypto_shash_update(desc, (u8 *)&sk->sk_v6_daddr, 16);
-+			if (err)
-+				return err;
-+		} else {
-+			err = crypto_shash_update(desc, (u8 *)&sk->sk_rcv_saddr, 4);
-+			if (err)
-+				return err;
-+			err = crypto_shash_update(desc, (u8 *)&sk->sk_daddr, 4);
-+			if (err)
-+				return err;
-+		}
-+	}
++    Allows another thread to wait for a complete FIN handshake without polling or sleep.
++    """
 +
-+	/* TCP ports from header */
-+	err = crypto_shash_update(desc, (u8 *)&th->source, 4);
-+	if (err)
-+		return err;
-+	err = tcp_authopt_get_isn(sk, skb, input, &sisn, &disn);
-+	if (err)
-+		return err;
-+	err = crypto_shash_update(desc, (u8 *)&sisn, 4);
-+	if (err)
-+		return err;
-+	err = crypto_shash_update(desc, (u8 *)&disn, 4);
-+	if (err)
-+		return err;
-+	err = crypto_shash_update(desc, (u8 *)&digestbits, 2);
-+	if (err)
-+		return err;
++    #: Server port used to identify client and server
++    server_port: int
++    #: Connection tracker
++    tracker: TCPConnectionTracker
 +
-+	return 0;
-+}
++    def __init__(self, server_port, **kw):
++        super().__init__(**kw)
++        self.server_port = server_port
++        self.tracker = TCPConnectionTracker()
++        self._close_event = threading.Event()
++        self._init_isn_event = threading.Event()
++        self._client_info = None
++        self._server_info = None
 +
-+/* Convert a variable-length key to a 16-byte fixed-length key for AES-CMAC
-+ * This is described in RFC5926 section 3.1.1.2
-+ */
-+static int aes_setkey_derived(struct crypto_shash *tfm, u8 *key, size_t keylen)
-+{
-+	static const u8 zeros[16] = {0};
-+	u8 derived_key[16];
-+	int err;
++    @property
++    def client_info(self) -> TCPConnectionInfo:
++        if not self._client_info:
++            self._client_info = self.tracker.match_one(dport=self.server_port)
++        return self._client_info
 +
-+	if (WARN_ON_ONCE(crypto_shash_digestsize(tfm) != 16))
-+		return -EINVAL;
-+	err = crypto_shash_setkey(tfm, zeros, sizeof(zeros));
-+	if (err)
-+		return err;
-+	err = crypto_shash_tfm_digest(tfm, key, keylen, derived_key);
-+	if (err)
-+		return err;
-+	return crypto_shash_setkey(tfm, derived_key, sizeof(derived_key));
-+}
++    @property
++    def server_info(self) -> TCPConnectionInfo:
++        if not self._server_info:
++            self._server_info = self.tracker.match_one(sport=self.server_port)
++        return self._server_info
 +
-+static int tcp_authopt_setkey(struct crypto_shash *tfm, struct tcp_authopt_key_info *key)
-+{
-+	if (key->alg_id == TCP_AUTHOPT_ALG_AES_128_CMAC_96 && key->keylen != 16)
-+		return aes_setkey_derived(tfm, key->key, key->keylen);
-+	else
-+		return crypto_shash_setkey(tfm, key->key, key->keylen);
-+}
++    @property
++    def client_isn(self):
++        return self.client_info.sisn
 +
-+static int tcp_authopt_get_traffic_key(struct sock *sk,
-+				       struct sk_buff *skb,
-+				       struct tcp_authopt_key_info *key,
-+				       bool input,
-+				       bool ipv6,
-+				       u8 *traffic_key)
-+{
-+	SHASH_DESC_ON_STACK(desc, kdf_tfm);
-+	struct crypto_shash *kdf_tfm;
-+	int err;
++    @property
++    def server_isn(self):
++        return self.server_info.sisn
 +
-+	kdf_tfm = tcp_authopt_get_kdf_shash(key);
-+	if (IS_ERR(kdf_tfm))
-+		return PTR_ERR(kdf_tfm);
++    def on_packet_received(self, p: Packet):
++        super().on_packet_received(p)
++        self.tracker.handle_packet(p)
 +
-+	err = tcp_authopt_setkey(kdf_tfm, key);
-+	if (err)
-+		goto out;
++        # check events:
++        if self.client_info.sisn is not None and self.client_info.disn is not None:
++            assert (
++                self.client_info.sisn == self.server_info.disn
++                and self.server_info.sisn == self.client_info.disn
++            )
++            self._init_isn_event.set()
++        if self.client_info.found_recv_finack and self.server_info.found_recv_finack:
++            self._close_event.set()
 +
-+	desc->tfm = kdf_tfm;
-+	err = crypto_shash_init(desc);
-+	if (err)
-+		goto out;
++    def reset(self):
++        """Reset known information about client/server"""
++        self.tracker.reset()
++        self._server_info = None
++        self._client_info = None
++        self._close_event.clear()
++        self._init_isn_event.clear()
 +
-+	err = tcp_authopt_shash_traffic_key(desc, sk, skb, input, ipv6);
-+	if (err)
-+		goto out;
++    def wait_close(self, timeout=10):
++        """Wait for a graceful close with FINs acked by both side"""
++        self._close_event.wait(timeout=timeout)
++        if not self._close_event.is_set():
++            raise TimeoutError("Timed out waiting for graceful close")
 +
-+	err = crypto_shash_final(desc, traffic_key);
-+	if (err)
-+		goto out;
++    def wait_init_isn(self, timeout=10):
++        """Wait for both client_isn and server_isn to be determined"""
++        self._init_isn_event.wait(timeout=timeout)
++        if not self._init_isn_event.is_set():
++            raise TimeoutError("Timed out waiting for Initial Sequence Numbers")
 +
-+out:
-+	tcp_authopt_put_kdf_shash(key, kdf_tfm);
-+	return err;
-+}
++    def get_client_server_isn(self, timeout=10) -> typing.Tuple[int, int]:
++        """Return client/server ISN, blocking until they are captured"""
++        self.wait_init_isn(timeout=timeout)
++        return self.client_isn, self.server_isn
+diff --git a/tools/testing/selftests/tcp_authopt/tcp_authopt_test/linux_tcp_md5sig.py b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/linux_tcp_md5sig.py
+new file mode 100644
+index 000000000000..5cfd0428672a
+--- /dev/null
++++ b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/linux_tcp_md5sig.py
+@@ -0,0 +1,110 @@
++# SPDX-License-Identifier: GPL-2.0
++"""Python wrapper around linux TCP_MD5SIG ABI"""
 +
-+static int crypto_shash_update_zero(struct shash_desc *desc, int len)
-+{
-+	u8 zero = 0;
-+	int i, err;
++import socket
++import struct
++import typing
++from dataclasses import dataclass
++from enum import IntFlag
 +
-+	for (i = 0; i < len; ++i) {
-+		err = crypto_shash_update(desc, &zero, 1);
-+		if (err)
-+			return err;
-+	}
++from .sockaddr import sockaddr_convert, sockaddr_unpack
 +
-+	return 0;
-+}
++TCP_MD5SIG = 14
++TCP_MD5SIG_EXT = 32
++TCP_MD5SIG_MAXKEYLEN = 80
 +
-+static int tcp_authopt_hash_tcp4_pseudoheader(struct shash_desc *desc,
-+					      __be32 saddr,
-+					      __be32 daddr,
-+					      int nbytes)
-+{
-+	struct tcp4_pseudohdr phdr = {
-+		.saddr = saddr,
-+		.daddr = daddr,
-+		.pad = 0,
-+		.protocol = IPPROTO_TCP,
-+		.len = htons(nbytes)
-+	};
-+	return crypto_shash_update(desc, (u8 *)&phdr, sizeof(phdr));
-+}
 +
-+static int tcp_authopt_hash_tcp6_pseudoheader(struct shash_desc *desc,
-+					      struct in6_addr *saddr,
-+					      struct in6_addr *daddr,
-+					      u32 plen)
-+{
-+	int err;
-+	__be32 buf[2];
++class TCP_MD5SIG_FLAG(IntFlag):
++    PREFIX = 0x1
++    IFINDEX = 0x2
 +
-+	buf[0] = htonl(plen);
-+	buf[1] = htonl(IPPROTO_TCP);
 +
-+	err = crypto_shash_update(desc, (u8 *)saddr, sizeof(*saddr));
-+	if (err)
-+		return err;
-+	err = crypto_shash_update(desc, (u8 *)daddr, sizeof(*daddr));
-+	if (err)
-+		return err;
-+	return crypto_shash_update(desc, (u8 *)&buf, sizeof(buf));
-+}
++@dataclass
++class tcp_md5sig:
++    """Like linux struct tcp_md5sig"""
 +
-+/* TCP authopt as found in header */
-+struct tcphdr_authopt {
-+	u8 num;
-+	u8 len;
-+	u8 keyid;
-+	u8 rnextkeyid;
-+	u8 mac[0];
-+};
++    addr: typing.Any
++    flags: typing.Optional[int]
++    prefixlen: typing.Optional[int]
++    keylen: typing.Optional[int]
++    ifindex: typing.Optional[int]
++    key: bytes
 +
-+/* Find TCP_AUTHOPT in header.
-+ *
-+ * Returns pointer to TCP_AUTHOPT or NULL if not found.
-+ */
-+static u8 *tcp_authopt_find_option(struct tcphdr *th)
-+{
-+	int length = (th->doff << 2) - sizeof(*th);
-+	u8 *ptr = (u8 *)(th + 1);
++    sizeof = 128 + 88
 +
-+	while (length >= 2) {
-+		int opcode = *ptr++;
-+		int opsize;
++    def __init__(
++        self, addr=None, flags=None, prefixlen=None, keylen=None, ifindex=0, key=bytes()
++    ):
++        self.addr = addr
++        self.flags = flags
++        self.prefixlen = prefixlen
++        self.ifindex = ifindex
++        self.key = key
++        self.keylen = keylen
 +
-+		switch (opcode) {
-+		case TCPOPT_EOL:
-+			return NULL;
-+		case TCPOPT_NOP:
-+			length--;
-+			continue;
-+		default:
-+			if (length < 2)
-+				return NULL;
-+			opsize = *ptr++;
-+			if (opsize < 2)
-+				return NULL;
-+			if (opsize > length)
-+				return NULL;
-+			if (opcode == TCPOPT_AUTHOPT)
-+				return ptr - 2;
-+		}
-+		ptr += opsize - 2;
-+		length -= opsize;
-+	}
-+	return NULL;
-+}
++    def get_auto_flags(self):
++        return (TCP_MD5SIG_FLAG.PREFIX if self.prefixlen is not None else 0) | (
++            TCP_MD5SIG_FLAG.IFINDEX if self.ifindex else 0
++        )
 +
-+/** Hash tcphdr options.
-+ *  If include_options is false then only the TCPOPT_AUTHOPT option itself is hashed
-+ *  Maybe we could skip option parsing by assuming the AUTHOPT header is at hash_location-4?
-+ */
-+static int tcp_authopt_hash_opts(struct shash_desc *desc,
-+				 struct tcphdr *th,
-+				 bool include_options)
-+{
-+	int err;
-+	/* start of options */
-+	u8 *tcp_opts = (u8 *)(th + 1);
-+	/* end of options */
-+	u8 *tcp_data = ((u8 *)th) + th->doff * 4;
-+	/* pointer to TCPOPT_AUTHOPT */
-+	u8 *authopt_ptr = tcp_authopt_find_option(th);
-+	u8 authopt_len;
++    def get_real_flags(self):
++        if self.flags is None:
++            return self.get_auto_flags()
++        else:
++            return self.flags
 +
-+	if (!authopt_ptr)
-+		return -EINVAL;
-+	authopt_len = *(authopt_ptr + 1);
++    def get_addr_bytes(self) -> bytes:
++        if self.addr is None:
++            return b"\0" * 128
++        if self.addr is bytes:
++            assert len(self.addr) == 128
++            return self.addr
++        return sockaddr_convert(self.addr).pack()
 +
-+	if (include_options) {
-+		err = crypto_shash_update(desc, tcp_opts, authopt_ptr - tcp_opts + 4);
-+		if (err)
-+			return err;
-+		err = crypto_shash_update_zero(desc, authopt_len - 4);
-+		if (err)
-+			return err;
-+		err = crypto_shash_update(desc,
-+					  authopt_ptr + authopt_len,
-+					  tcp_data - (authopt_ptr + authopt_len));
-+		if (err)
-+			return err;
-+	} else {
-+		err = crypto_shash_update(desc, authopt_ptr, 4);
-+		if (err)
-+			return err;
-+		err = crypto_shash_update_zero(desc, authopt_len - 4);
-+		if (err)
-+			return err;
-+	}
++    def pack(self) -> bytes:
++        return struct.pack(
++            "128sBBHi80s",
++            self.get_addr_bytes(),
++            self.get_real_flags(),
++            self.prefixlen if self.prefixlen is not None else 0,
++            self.keylen if self.keylen is not None else len(self.key),
++            self.ifindex if self.ifindex is not None else 0,
++            self.key,
++        )
 +
-+	return 0;
-+}
++    def __bytes__(self):
++        return self.pack()
 +
-+static int skb_shash_frags(struct shash_desc *desc,
-+			   struct sk_buff *skb)
-+{
-+	struct sk_buff *frag_iter;
-+	int err, i;
++    @classmethod
++    def unpack(cls, buffer: bytes) -> "tcp_md5sig":
++        tup = struct.unpack("128sBBHi80s", buffer)
++        addr = sockaddr_unpack(tup[0])
++        return cls(addr, *tup[1:])
 +
-+	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
-+		skb_frag_t *f = &skb_shinfo(skb)->frags[i];
-+		u32 p_off, p_len, copied;
-+		struct page *p;
-+		u8 *vaddr;
++    def set_ipv4_addr_all(self):
++        from .sockaddr import sockaddr_in
 +
-+		skb_frag_foreach_page(f, skb_frag_off(f), skb_frag_size(f),
-+				      p, p_off, p_len, copied) {
-+			vaddr = kmap_atomic(p);
-+			err = crypto_shash_update(desc, vaddr + p_off, p_len);
-+			kunmap_atomic(vaddr);
-+			if (err)
-+				return err;
-+		}
-+	}
++        self.addr = sockaddr_in()
++        self.prefixlen = 0
 +
-+	skb_walk_frags(skb, frag_iter) {
-+		err = skb_shash_frags(desc, frag_iter);
-+		if (err)
-+			return err;
-+	}
++    def set_ipv6_addr_all(self):
++        from .sockaddr import sockaddr_in6
 +
-+	return 0;
-+}
++        self.addr = sockaddr_in6()
++        self.prefixlen = 0
 +
-+static int tcp_authopt_hash_packet(struct crypto_shash *tfm,
-+				   struct sock *sk,
-+				   struct sk_buff *skb,
-+				   bool input,
-+				   bool ipv6,
-+				   bool include_options,
-+				   u8 *macbuf)
-+{
-+	struct tcphdr *th = tcp_hdr(skb);
-+	SHASH_DESC_ON_STACK(desc, tfm);
-+	int err;
 +
-+	/* NOTE: SNE unimplemented */
-+	__be32 sne = 0;
++def setsockopt_md5sig(sock, opt: tcp_md5sig):
++    if opt.flags != 0:
++        optname = TCP_MD5SIG_EXT
++    else:
++        optname = TCP_MD5SIG
++    return sock.setsockopt(socket.SOL_TCP, optname, bytes(opt))
 +
-+	desc->tfm = tfm;
-+	err = crypto_shash_init(desc);
-+	if (err)
-+		return err;
 +
-+	err = crypto_shash_update(desc, (u8 *)&sne, 4);
-+	if (err)
-+		return err;
++def setsockopt_md5sig_kwargs(sock, opt: tcp_md5sig = None, **kw):
++    if opt is None:
++        opt = tcp_md5sig()
++    for k, v in kw.items():
++        setattr(opt, k, v)
++    return setsockopt_md5sig(sock, opt)
+diff --git a/tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_conntrack.py b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_conntrack.py
+new file mode 100644
+index 000000000000..0f7cba70a917
+--- /dev/null
++++ b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_conntrack.py
+@@ -0,0 +1,173 @@
++# SPDX-License-Identifier: GPL-2.0
++"""Identify TCP connections inside a capture and collect per-connection information"""
++import typing
++from dataclasses import dataclass
 +
-+	if (ipv6) {
-+		struct in6_addr *saddr;
-+		struct in6_addr *daddr;
++from scapy.layers.inet import TCP
++from scapy.packet import Packet
 +
-+		if (input) {
-+			saddr = &ipv6_hdr(skb)->saddr;
-+			daddr = &ipv6_hdr(skb)->daddr;
-+		} else {
-+			saddr = &sk->sk_v6_rcv_saddr;
-+			daddr = &sk->sk_v6_daddr;
-+		}
-+		err = tcp_authopt_hash_tcp6_pseudoheader(desc, saddr, daddr, skb->len);
-+		if (err)
-+			return err;
-+	} else {
-+		__be32 saddr;
-+		__be32 daddr;
++from .scapy_utils import IPvXAddress, get_packet_ipvx_dst, get_packet_ipvx_src
++from .sne_alg import SequenceNumberExtenderLinux
 +
-+		if (input) {
-+			saddr = ip_hdr(skb)->saddr;
-+			daddr = ip_hdr(skb)->daddr;
-+		} else {
-+			saddr = sk->sk_rcv_saddr;
-+			daddr = sk->sk_daddr;
-+		}
-+		err = tcp_authopt_hash_tcp4_pseudoheader(desc, saddr, daddr, skb->len);
-+		if (err)
-+			return err;
-+	}
 +
-+	// TCP header with checksum set to zero
-+	{
-+		struct tcphdr hashed_th = *th;
++@dataclass(frozen=True)
++class TCPConnectionKey:
++    """TCP connection identification key: standard 4-tuple"""
 +
-+		hashed_th.check = 0;
-+		err = crypto_shash_update(desc, (u8 *)&hashed_th, sizeof(hashed_th));
-+		if (err)
-+			return err;
-+	}
++    saddr: typing.Optional[IPvXAddress] = None
++    daddr: typing.Optional[IPvXAddress] = None
++    sport: int = 0
++    dport: int = 0
 +
-+	// TCP options
-+	err = tcp_authopt_hash_opts(desc, th, include_options);
-+	if (err)
-+		return err;
++    def rev(self) -> "TCPConnectionKey":
++        return TCPConnectionKey(self.daddr, self.saddr, self.dport, self.sport)
 +
-+	// Rest of SKB->data
-+	err = crypto_shash_update(desc, (u8 *)th + th->doff * 4, skb_headlen(skb) - th->doff * 4);
-+	if (err)
-+		return err;
 +
-+	err = skb_shash_frags(desc, skb);
-+	if (err)
-+		return err;
++def get_packet_tcp_connection_key(p: Packet) -> TCPConnectionKey:
++    th = p[TCP]
++    return TCPConnectionKey(
++        get_packet_ipvx_src(p), get_packet_ipvx_dst(p), th.sport, th.dport
++    )
 +
-+	return crypto_shash_final(desc, macbuf);
-+}
 +
-+/* __tcp_authopt_calc_mac - Compute packet MAC using key
-+ *
-+ * The macbuf output buffer must be large enough to fit the digestsize of the
-+ * underlying transform before truncation.
-+ * This means TCP_AUTHOPT_MAXMACBUF, not TCP_AUTHOPT_MACLEN
-+ */
-+static int __tcp_authopt_calc_mac(struct sock *sk,
-+				  struct sk_buff *skb,
-+				  struct tcp_authopt_key_info *key,
-+				  bool input,
-+				  char *macbuf)
-+{
-+	struct crypto_shash *mac_tfm;
-+	u8 traffic_key[TCP_AUTHOPT_MAX_TRAFFIC_KEY_LEN];
-+	int err;
-+	bool ipv6 = (sk->sk_family != AF_INET);
++class TCPConnectionInfo:
++    saddr: typing.Optional[IPvXAddress] = None
++    daddr: typing.Optional[IPvXAddress] = None
++    sport: int = 0
++    dport: int = 0
++    sisn: typing.Optional[int] = None
++    disn: typing.Optional[int] = None
++    rcv_sne: SequenceNumberExtenderLinux
++    snd_sne: SequenceNumberExtenderLinux
 +
-+	if (sk->sk_family != AF_INET && sk->sk_family != AF_INET6)
-+		return -EINVAL;
++    found_syn = False
++    found_synack = False
 +
-+	err = tcp_authopt_get_traffic_key(sk, skb, key, input, ipv6, traffic_key);
-+	if (err)
-+		return err;
++    found_send_fin = False
++    found_send_finack = False
++    found_recv_fin = False
++    found_recv_finack = False
 +
-+	mac_tfm = tcp_authopt_get_mac_shash(key);
-+	if (IS_ERR(mac_tfm))
-+		return PTR_ERR(mac_tfm);
-+	err = crypto_shash_setkey(mac_tfm, traffic_key, key->alg->traffic_key_len);
-+	if (err)
-+		goto out;
++    def __init__(self):
++        self.rcv_sne = SequenceNumberExtenderLinux()
++        self.snd_sne = SequenceNumberExtenderLinux()
 +
-+	err = tcp_authopt_hash_packet(mac_tfm,
-+				      sk,
-+				      skb,
-+				      input,
-+				      ipv6,
-+				      !(key->flags & TCP_AUTHOPT_KEY_EXCLUDE_OPTS),
-+				      macbuf);
++    def get_key(self):
++        return TCPConnectionKey(self.saddr, self.daddr, self.sport, self.dport)
 +
-+out:
-+	tcp_authopt_put_mac_shash(key, mac_tfm);
-+	return err;
-+}
++    @classmethod
++    def from_key(cls, key: TCPConnectionKey) -> "TCPConnectionInfo":
++        obj = cls()
++        obj.saddr = key.saddr
++        obj.daddr = key.daddr
++        obj.sport = key.sport
++        obj.dport = key.dport
++        return obj
++
++    def handle_send(self, p: Packet):
++        th = p[TCP]
++        if self.get_key() != get_packet_tcp_connection_key(p):
++            raise ValueError("Packet not for this connection")
++
++        if th.flags.S and not th.flags.A:
++            assert th.ack == 0
++            self.found_syn = True
++            self.sisn = th.seq
++            self.snd_sne.reset(th.seq)
++        elif th.flags.S and th.flags.A:
++            self.found_synack = True
++            self.sisn = th.seq
++            self.snd_sne.reset(th.seq)
++            assert self.disn == th.ack - 1
++
++        # Should track seq numbers instead
++        if th.flags.F:
++            self.found_send_fin = True
++        if th.flags.A and self.found_recv_fin:
++            self.found_send_finack = True
++
++        # Should only take valid packets into account
++        self.snd_sne.calc(th.seq)
++
++    def handle_recv(self, p: Packet):
++        th = p[TCP]
++        if self.get_key().rev() != get_packet_tcp_connection_key(p):
++            raise ValueError("Packet not for this connection")
++
++        if th.flags.S and not th.flags.A:
++            assert th.ack == 0
++            self.found_syn = True
++            self.disn = th.seq
++            self.rcv_sne.reset(th.seq)
++        elif th.flags.S and th.flags.A:
++            self.found_synack = True
++            self.disn = th.seq
++            self.rcv_sne.reset(th.seq)
++            assert self.sisn == th.ack - 1
++
++        # Should track seq numbers instead
++        if th.flags.F:
++            self.found_recv_fin = True
++        if th.flags.A and self.found_send_fin:
++            self.found_recv_finack = True
++
++        # Should only take valid packets into account
++        self.rcv_sne.calc(th.seq)
++
++
++class TCPConnectionTracker:
++    table: typing.Dict[TCPConnectionKey, TCPConnectionInfo]
++
++    def __init__(self):
++        self.table = {}
++
++    def reset(self):
++        """Forget known connections"""
++        self.table = {}
++
++    def get_or_create(self, key: TCPConnectionKey) -> TCPConnectionInfo:
++        info = self.table.get(key, None)
++        if info is None:
++            info = TCPConnectionInfo.from_key(key)
++            self.table[key] = info
++        return info
++
++    def get(self, key: TCPConnectionKey) -> typing.Optional[TCPConnectionInfo]:
++        return self.table.get(key, None)
++
++    def handle_packet(self, p: Packet):
++        if not p or not TCP in p:
++            return
++        key = get_packet_tcp_connection_key(p)
++        info = self.get_or_create(key)
++        info.handle_send(p)
++        rkey = key.rev()
++        rinfo = self.get_or_create(rkey)
++        rinfo.handle_recv(p)
++
++    def iter_match(self, saddr=None, daddr=None, sport=None, dport=None):
++        def attr_optional_match(obj, name, val) -> bool:
++            if val is None:
++                return True
++            else:
++                return getattr(obj, name) == val
++
++        for key, info in self.table.items():
++            if (
++                attr_optional_match(key, "saddr", saddr)
++                and attr_optional_match(key, "daddr", daddr)
++                and attr_optional_match(key, "sport", sport)
++                and attr_optional_match(key, "dport", dport)
++            ):
++                yield info
++
++    def match_one(
++        self, saddr=None, daddr=None, sport=None, dport=None
++    ) -> typing.Optional[TCPConnectionInfo]:
++        res = list(self.iter_match(saddr, daddr, sport, dport))
++        if len(res) == 1:
++            return res[0]
++        elif len(res) == 0:
++            return None
++        else:
++            raise ValueError("Multiple connection matches")
+diff --git a/tools/testing/selftests/tcp_authopt/tcp_authopt_test/tcp_connection_fixture.py b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/tcp_connection_fixture.py
+new file mode 100644
+index 000000000000..0d14f343c282
+--- /dev/null
++++ b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/tcp_connection_fixture.py
+@@ -0,0 +1,276 @@
++# SPDX-License-Identifier: GPL-2.0
++import logging
++import socket
++import subprocess
++from contextlib import ExitStack
++
++import pytest
++from scapy.data import ETH_P_IP, ETH_P_IPV6
++from scapy.layers.inet import IP, TCP
++from scapy.layers.inet6 import IPv6
++from scapy.layers.l2 import Ether
++from scapy.packet import Packet
++
++from . import linux_tcp_authopt
++from .full_tcp_sniff_session import FullTCPSniffSession
++from .linux_tcp_authopt import set_tcp_authopt_key, tcp_authopt_key
++from .netns_fixture import NamespaceFixture
++from .scapy_utils import (
++    AsyncSnifferContext,
++    create_capture_socket,
++    create_l2socket,
++    scapy_tcp_get_authopt_val,
++    scapy_tcp_get_md5_sig,
++)
++from .server import SimpleServerThread
++from .utils import (
++    DEFAULT_TCP_SERVER_PORT,
++    create_client_socket,
++    create_listen_socket,
++    netns_context,
++    nstat_json,
++)
++
++logger = logging.getLogger(__name__)
++
++
++class TCPConnectionFixture:
++    """Test fixture with an instrumented TCP connection
++
++    Includes:
++    * pair of network namespaces
++    * one listen socket
++    * server thread with echo protocol
++    * one client socket
++    * one async sniffer on the server interface
++    * A `FullTCPSniffSession` examining TCP packets
++    * l2socket allowing packet injection from client
++
++    :ivar tcp_md5_key: Secret key for md5 (addr is implicit)
++    """
++
++    sniffer_session: FullTCPSniffSession
++
++    def __init__(
++        self,
++        address_family=socket.AF_INET,
++        sniffer_kwargs=None,
++        tcp_authopt_key: tcp_authopt_key = None,
++        server_thread_kwargs=None,
++        tcp_md5_key=None,
++    ):
++        self.address_family = address_family
++        self.server_port = DEFAULT_TCP_SERVER_PORT
++        self.client_port = 27972
++        self.sniffer_session = FullTCPSniffSession(DEFAULT_TCP_SERVER_PORT)
++        if sniffer_kwargs is None:
++            sniffer_kwargs = {}
++        self.sniffer_kwargs = sniffer_kwargs
++        self.tcp_authopt_key = tcp_authopt_key
++        self.server_thread = SimpleServerThread(
++            mode="echo", **(server_thread_kwargs or {})
++        )
++        self.tcp_md5_key = tcp_md5_key
++
++    def _set_tcp_md5(self):
++        from . import linux_tcp_md5sig
++        from .sockaddr import sockaddr_convert
++
++        linux_tcp_md5sig.setsockopt_md5sig(
++            self.listen_socket,
++            linux_tcp_md5sig.tcp_md5sig(
++                key=self.tcp_md5_key, addr=sockaddr_convert(self.client_addr)
++            ),
++        )
++        linux_tcp_md5sig.setsockopt_md5sig(
++            self.client_socket,
++            linux_tcp_md5sig.tcp_md5sig(
++                key=self.tcp_md5_key, addr=sockaddr_convert(self.server_addr)
++            ),
++        )
++
++    def create_client_socket(self, bind_port=0):
++        return create_client_socket(
++            ns=self.nsfixture.client_netns_name,
++            family=self.address_family,
++            bind_addr=self.client_addr,
++            bind_port=bind_port,
++        )
++
++    def __enter__(self):
++        if self.tcp_authopt_key and not linux_tcp_authopt.has_tcp_authopt():
++            pytest.skip("Need TCP_AUTHOPT")
++
++        self.exit_stack = ExitStack()
++        self.exit_stack.__enter__()
++
++        self.nsfixture = self.exit_stack.enter_context(NamespaceFixture())
++        self.server_addr = self.nsfixture.get_addr(self.address_family, 1)
++        self.client_addr = self.nsfixture.get_addr(self.address_family, 2)
++
++        self.listen_socket = create_listen_socket(
++            ns=self.nsfixture.server_netns_name,
++            family=self.address_family,
++            bind_addr=self.server_addr,
++            bind_port=self.server_port,
++        )
++        self.exit_stack.enter_context(self.listen_socket)
++        self.client_socket = self.create_client_socket(bind_port=self.client_port)
++        self.exit_stack.enter_context(self.client_socket)
++        self.server_thread.add_listen_socket(self.listen_socket)
++        self.exit_stack.enter_context(self.server_thread)
++
++        if self.tcp_authopt_key:
++            set_tcp_authopt_key(self.listen_socket, self.tcp_authopt_key)
++            set_tcp_authopt_key(self.client_socket, self.tcp_authopt_key)
++
++        if self.tcp_md5_key:
++            self._set_tcp_md5()
++
++        capture_filter = f"tcp port {self.server_port}"
++        self.capture_socket = create_capture_socket(
++            ns=self.nsfixture.server_netns_name, iface="veth0", filter=capture_filter
++        )
++        self.exit_stack.enter_context(self.capture_socket)
++
++        self.sniffer = AsyncSnifferContext(
++            opened_socket=self.capture_socket,
++            session=self.sniffer_session,
++            prn=log_tcp_authopt_packet,
++            **self.sniffer_kwargs,
++        )
++        self.exit_stack.enter_context(self.sniffer)
++
++        self.client_l2socket = create_l2socket(
++            ns=self.nsfixture.client_netns_name, iface="veth0"
++        )
++        self.exit_stack.enter_context(self.client_l2socket)
++        self.server_l2socket = create_l2socket(
++            ns=self.nsfixture.server_netns_name, iface="veth0"
++        )
++        self.exit_stack.enter_context(self.server_l2socket)
++
++    def __exit__(self, *args):
++        self.exit_stack.__exit__(*args)
++
++    @property
++    def ethertype(self):
++        if self.address_family == socket.AF_INET:
++            return ETH_P_IP
++        elif self.address_family == socket.AF_INET6:
++            return ETH_P_IPV6
++        else:
++            raise ValueError("bad address_family={self.address_family}")
++
++    def scapy_iplayer(self):
++        if self.address_family == socket.AF_INET:
++            return IP
++        elif self.address_family == socket.AF_INET6:
++            return IPv6
++        else:
++            raise ValueError("bad address_family={self.address_family}")
++
++    def create_client2server_packet(self) -> Packet:
++        return (
++            Ether(
++                type=self.ethertype,
++                src=self.nsfixture.client_mac_addr,
++                dst=self.nsfixture.server_mac_addr,
++            )
++            / self.scapy_iplayer()(src=str(self.client_addr), dst=str(self.server_addr))
++            / TCP(sport=self.client_port, dport=self.server_port)
++        )
++
++    def create_server2client_packet(self) -> Packet:
++        return (
++            Ether(
++                type=self.ethertype,
++                src=self.nsfixture.server_mac_addr,
++                dst=self.nsfixture.client_mac_addr,
++            )
++            / self.scapy_iplayer()(src=str(self.server_addr), dst=str(self.client_addr))
++            / TCP(sport=self.server_port, dport=self.client_port)
++        )
++
++    @property
++    def server_addr_port(self):
++        return (str(self.server_addr), self.server_port)
++
++    @property
++    def server_netns_name(self):
++        return self.nsfixture.server_netns_name
++
++    @property
++    def client_netns_name(self):
++        return self.nsfixture.client_netns_name
++
++    def client_nstat_json(self):
++        with netns_context(self.client_netns_name):
++            return nstat_json()
++
++    def server_nstat_json(self):
++        with netns_context(self.server_netns_name):
++            return nstat_json()
++
++    def assert_no_snmp_output_failures(self):
++        client_nstat_dict = self.client_nstat_json()
++        assert client_nstat_dict["TcpExtTCPAuthOptFailure"] == 0
++        server_nstat_dict = self.server_nstat_json()
++        assert server_nstat_dict["TcpExtTCPAuthOptFailure"] == 0
++
++    def _get_state_via_ss(self, command_prefix: str):
++        # Every namespace should have at most one socket
++        # the "state connected" filter includes TIME-WAIT but not LISTEN
++        cmd = command_prefix + "ss --numeric --no-header --tcp state connected"
++        out = subprocess.check_output(cmd, text=True, shell=True)
++        lines = out.splitlines()
++        # No socket found usually means "CLOSED". It is distinct from "TIME-WAIT"
++        if len(lines) == 0:
++            return None
++        if len(lines) > 1:
++            raise ValueError("At most one line expected")
++        return lines[0].split()[0]
++
++    def get_client_tcp_state(self):
++        return self._get_state_via_ss(f"ip netns exec {self.client_netns_name} ")
++
++    def get_server_tcp_state(self):
++        return self._get_state_via_ss(f"ip netns exec {self.server_netns_name} ")
++
++
++def format_tcp_authopt_packet(
++    p: Packet, include_ethernet=False, include_seq=False, include_md5=True
++) -> str:
++    """Format a TCP packet in a way that is useful for TCP-AO testing"""
++    if not TCP in p:
++        return p.summary()
++    th = p[TCP]
++    if isinstance(th.underlayer, IP):
++        result = p.sprintf(r"%IP.src%:%TCP.sport% > %IP.dst%:%TCP.dport%")
++    elif isinstance(th.underlayer, IPv6):
++        result = p.sprintf(r"%IPv6.src%:%TCP.sport% > %IPv6.dst%:%TCP.dport%")
++    else:
++        raise ValueError(f"Unknown TCP underlayer {th.underlayer}")
++    result += p.sprintf(r" Flags %-2s,TCP.flags%")
++    if include_ethernet:
++        result = p.sprintf(r"ethertype %Ether.type% ") + result
++        result = p.sprintf(r"%Ether.src% > %Ether.dst% ") + result
++    if include_seq:
++        result += p.sprintf(r" seq %TCP.seq% ack %TCP.ack%")
++        result += f" len {len(p[TCP].payload)}"
++    authopt = scapy_tcp_get_authopt_val(p[TCP])
++    if authopt:
++        result += f" AO keyid={authopt.keyid} rnextkeyid={authopt.rnextkeyid} mac={authopt.mac.hex()}"
++    else:
++        result += " no AO"
++    if include_md5:
++        md5sig = scapy_tcp_get_md5_sig(p[TCP])
++        if md5sig:
++            result += f" MD5 {md5sig.hex()}"
++        else:
++            result += " no MD5"
++    return result
++
++
++def log_tcp_authopt_packet(p):
++    logger.info("sniff %s", format_tcp_authopt_packet(p, include_seq=True))
+diff --git a/tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_verify_capture.py b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_verify_capture.py
+new file mode 100644
+index 000000000000..68d002139974
+--- /dev/null
++++ b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_verify_capture.py
+@@ -0,0 +1,559 @@
++# SPDX-License-Identifier: GPL-2.0
++"""Capture packets with TCP-AO and verify signatures"""
++
++import logging
++import os
++import socket
++import subprocess
++from contextlib import ExitStack, nullcontext
++
++import pytest
++import waiting
++from scapy.layers.inet import TCP
++
++from .conftest import (
++    raises_optional_exception,
++    skipif_cant_capture,
++    skipif_missing_tcp_authopt,
++)
++from .full_tcp_sniff_session import FullTCPSniffSession
++from .linux_tcp_authopt import (
++    TCP_AUTHOPT_ALG,
++    TCP_AUTHOPT_KEY_FLAG,
++    set_tcp_authopt_key,
++    tcp_authopt_key,
++)
++from .netns_fixture import NamespaceFixture
++from .scapy_tcp_authopt import (
++    TcpAuthOptAlg_HMAC_SHA1,
++    add_tcp_authopt_signature,
++    break_tcp_authopt_signature,
++)
++from .scapy_utils import (
++    AsyncSnifferContext,
++    scapy_sniffer_stop,
++    scapy_tcp_get_authopt_val,
++    scapy_tcp_get_md5_sig,
++    tcp_seq_wrap,
++)
++from .server import SimpleServerThread
++from .tcp_connection_fixture import TCPConnectionFixture
++from .utils import (
++    DEFAULT_TCP_SERVER_PORT,
++    check_socket_echo,
++    create_client_socket,
++    create_listen_socket,
++    nstat_json,
++    socket_set_linger,
++)
++from .validator import TcpAuthValidator, TcpAuthValidatorKey
++
++logger = logging.getLogger(__name__)
++pytestmark = [skipif_missing_tcp_authopt, skipif_cant_capture]
++DEFAULT_TCP_AUTHOPT_KEY = tcp_authopt_key(
++    alg=TCP_AUTHOPT_ALG.HMAC_SHA_1_96,
++    key=b"hello",
++)
++
++
++def get_alg_id(alg_name) -> int:
++    if alg_name == "HMAC-SHA-1-96":
++        return TCP_AUTHOPT_ALG.HMAC_SHA_1_96
++    elif alg_name == "AES-128-CMAC-96":
++        return TCP_AUTHOPT_ALG.AES_128_CMAC_96
++    else:
++        raise ValueError()
++
++
++@pytest.mark.parametrize(
++    "address_family,alg_name,include_options,transfer_data",
++    [
++        (socket.AF_INET, "HMAC-SHA-1-96", True, True),
++        (socket.AF_INET, "AES-128-CMAC-96", True, True),
++        (socket.AF_INET, "AES-128-CMAC-96", False, True),
++        (socket.AF_INET6, "HMAC-SHA-1-96", True, True),
++        (socket.AF_INET6, "HMAC-SHA-1-96", False, True),
++        (socket.AF_INET6, "AES-128-CMAC-96", True, True),
++        (socket.AF_INET, "HMAC-SHA-1-96", True, False),
++        (socket.AF_INET6, "AES-128-CMAC-96", False, False),
++    ],
++)
++def test_verify_capture(
++    exit_stack, address_family, alg_name, include_options, transfer_data
++):
++    master_key = b"testvector"
++    alg_id = get_alg_id(alg_name)
++
++    session = FullTCPSniffSession(server_port=DEFAULT_TCP_SERVER_PORT)
++    sniffer = exit_stack.enter_context(
++        AsyncSnifferContext(
++            filter=f"inbound and tcp port {DEFAULT_TCP_SERVER_PORT}",
++            iface="lo",
++            session=session,
++        )
++    )
++
++    listen_socket = create_listen_socket(family=address_family)
++    listen_socket = exit_stack.enter_context(listen_socket)
++    exit_stack.enter_context(SimpleServerThread(listen_socket, mode="echo"))
++
++    client_socket = socket.socket(address_family, socket.SOCK_STREAM)
++    client_socket = exit_stack.push(client_socket)
++
++    key = tcp_authopt_key(alg=alg_id, key=master_key, include_options=include_options)
++    set_tcp_authopt_key(listen_socket, key)
++    set_tcp_authopt_key(client_socket, key)
++
++    # even if one signature is incorrect keep processing the capture
++    old_nstat = nstat_json()
++    valkey = TcpAuthValidatorKey(
++        key=master_key, alg_name=alg_name, include_options=include_options
++    )
++    validator = TcpAuthValidator(keys=[valkey])
++
++    try:
++        client_socket.settimeout(1.0)
++        client_socket.connect(("localhost", DEFAULT_TCP_SERVER_PORT))
++        if transfer_data:
++            for _ in range(5):
++                check_socket_echo(client_socket)
++        client_socket.close()
++        session.wait_close()
++    except socket.timeout:
++        # If invalid packets are sent let the validator run
++        logger.warning("socket timeout", exc_info=True)
++        pass
++
++    sniffer.stop()
++
++    logger.info("capture: %r", sniffer.results)
++    for p in sniffer.results:
++        validator.handle_packet(p)
++    validator.raise_errors()
++
++    new_nstat = nstat_json()
++    assert old_nstat["TcpExtTCPAuthOptFailure"] == new_nstat["TcpExtTCPAuthOptFailure"]
++
++
++@pytest.mark.parametrize(
++    "address_family,use_tcp_authopt,use_tcp_md5sig",
++    [
++        (socket.AF_INET, 0, 0),
++        (socket.AF_INET, 1, 0),
++        (socket.AF_INET, 0, 1),
++        (socket.AF_INET6, 0, 0),
++        (socket.AF_INET6, 1, 0),
++        (socket.AF_INET6, 0, 1),
++        (socket.AF_INET, 1, 1),
++        (socket.AF_INET6, 1, 1),
++    ],
++)
++def test_both_authopt_md5(exit_stack, address_family, use_tcp_authopt, use_tcp_md5sig):
++    """Basic test for interaction between TCP_AUTHOPT and TCP_MD5SIG
++
++    Configuring both on same socket is allowed but RFC5925 doesn't allow both on the
++    same packet or same connection.
++
++    The naive handling of inserting or validation both options is incorrect.
++    """
++    con = TCPConnectionFixture(address_family=address_family)
++    if use_tcp_authopt:
++        con.tcp_authopt_key = DEFAULT_TCP_AUTHOPT_KEY
++    if use_tcp_md5sig:
++        con.tcp_md5_key = b"hello"
++    exit_stack.enter_context(con)
++
++    con.client_socket.connect(con.server_addr_port)
++    check_socket_echo(con.client_socket)
++    check_socket_echo(con.client_socket)
++    check_socket_echo(con.client_socket)
++    con.client_socket.close()
++
++    scapy_sniffer_stop(con.sniffer)
++    fail = False
++    for p in con.sniffer.results:
++        has_tcp_authopt = scapy_tcp_get_authopt_val(p[TCP]) is not None
++        has_tcp_md5sig = scapy_tcp_get_md5_sig(p[TCP]) is not None
++
++        if has_tcp_authopt and has_tcp_md5sig:
++            logger.error("Packet has both AO and MD5: %r", p)
++            fail = False
++
++        if use_tcp_authopt:
++            if not has_tcp_authopt:
++                logger.error("missing AO: %r", p)
++                fail = True
++        elif use_tcp_md5sig:
++            if not has_tcp_md5sig:
++                logger.error("missing MD5: %r", p)
++                fail = True
++        else:
++            if has_tcp_md5sig or has_tcp_authopt:
++                logger.error("unexpected MD5 or AO: %r", p)
++                fail = True
++
++    assert not fail
++
++
++@pytest.mark.parametrize("mode", ["none", "ao", "ao-addrbind", "md5"])
++def test_v4mapv6(exit_stack, mode: str):
++    """Test ipv4 client and ipv6 server with and without TCP-AO
++
++    By default any IPv6 server will also receive packets from IPv4 clients. This
++    is not currently supported by TCP_AUTHOPT but it should fail in an orderly
++    manner.
++    """
++    nsfixture = NamespaceFixture()
++    exit_stack.enter_context(nsfixture)
++    server_ipv4_addr = nsfixture.get_addr(socket.AF_INET, 1)
++
++    listen_socket = create_listen_socket(
++        ns=nsfixture.server_netns_name, family=socket.AF_INET6
++    )
++    listen_socket = exit_stack.enter_context(listen_socket)
++
++    server_thread = SimpleServerThread(listen_socket, mode="echo")
++    exit_stack.enter_context(server_thread)
++
++    client_socket = create_client_socket(
++        ns=nsfixture.client_netns_name,
++        family=socket.AF_INET,
++    )
++    client_socket = exit_stack.push(client_socket)
++
++    if mode == "ao":
++        alg = TCP_AUTHOPT_ALG.HMAC_SHA_1_96
++        key = tcp_authopt_key(alg=alg, key="hello")
++        set_tcp_authopt_key(listen_socket, key)
++        set_tcp_authopt_key(client_socket, key)
++
++    if mode == "ao-addrbind":
++        alg = TCP_AUTHOPT_ALG.HMAC_SHA_1_96
++        client_ipv6_addr = nsfixture.get_addr(socket.AF_INET6, 2)
++        server_key = tcp_authopt_key(alg=alg, key="hello", addr=client_ipv6_addr)
++        server_key.flags = TCP_AUTHOPT_KEY_FLAG.BIND_ADDR
++        set_tcp_authopt_key(listen_socket, server_key)
++
++        client_key = tcp_authopt_key(alg=alg, key="hello")
++        set_tcp_authopt_key(client_socket, client_key)
++
++    if mode == "md5":
++        from . import linux_tcp_md5sig
++
++        server_md5key = linux_tcp_md5sig.tcp_md5sig(key=b"hello")
++        server_md5key.set_ipv6_addr_all()
++        linux_tcp_md5sig.setsockopt_md5sig(listen_socket, server_md5key)
++        client_md5key = linux_tcp_md5sig.tcp_md5sig(key=b"hellx")
++        client_md5key.set_ipv4_addr_all()
++        linux_tcp_md5sig.setsockopt_md5sig(client_socket, client_md5key)
++
++    with raises_optional_exception(socket.timeout if mode != "none" else None):
++        client_socket.connect((str(server_ipv4_addr), DEFAULT_TCP_SERVER_PORT))
++        check_socket_echo(client_socket)
++    client_socket.close()
++
++
++@pytest.mark.parametrize(
++    "address_family,signed",
++    [
++        (socket.AF_INET, True),
++        (socket.AF_INET, False),
++        (socket.AF_INET6, True),
++        (socket.AF_INET6, False),
++    ],
++)
++def test_rst(exit_stack: ExitStack, address_family, signed: bool):
++    """Check that an unsigned RST breaks a normal connection but not one protected by TCP-AO"""
++
++    con = TCPConnectionFixture(address_family=address_family)
++    if signed:
++        con.tcp_authopt_key = DEFAULT_TCP_AUTHOPT_KEY
++    exit_stack.enter_context(con)
++
++    # connect
++    con.client_socket.connect(con.server_addr_port)
++    check_socket_echo(con.client_socket)
++
++    client_isn, server_isn = con.sniffer_session.get_client_server_isn()
++    p = con.create_client2server_packet()
++    p[TCP].flags = "R"
++    p[TCP].seq = tcp_seq_wrap(client_isn + 1001)
++    p[TCP].ack = tcp_seq_wrap(server_isn + 1001)
++    con.client_l2socket.send(p)
++
++    if signed:
++        # When protected by TCP-AO unsigned RSTs are ignored.
++        check_socket_echo(con.client_socket)
++    else:
++        # By default an RST that guesses seq can kill the connection.
++        with pytest.raises(ConnectionResetError):
++            check_socket_echo(con.client_socket)
++
++
++@pytest.mark.parametrize("address_family", [socket.AF_INET, socket.AF_INET6])
++def test_rst_signed_manually(exit_stack: ExitStack, address_family):
++    """Check that an manually signed RST breaks a connection protected by TCP-AO"""
++
++    con = TCPConnectionFixture(address_family=address_family)
++    con.tcp_authopt_key = key = DEFAULT_TCP_AUTHOPT_KEY
++    exit_stack.enter_context(con)
++
++    # connect
++    con.client_socket.connect(con.server_addr_port)
++    check_socket_echo(con.client_socket)
++
++    client_isn, server_isn = con.sniffer_session.get_client_server_isn()
++    p = con.create_client2server_packet()
++    p[TCP].flags = "R"
++    p[TCP].seq = tcp_seq_wrap(client_isn + 1001)
++    p[TCP].ack = tcp_seq_wrap(server_isn + 1001)
++
++    add_tcp_authopt_signature(
++        p, TcpAuthOptAlg_HMAC_SHA1(), key.key, client_isn, server_isn
++    )
++    con.client_l2socket.send(p)
++
++    # The server socket will close in response to RST without a TIME-WAIT
++    # Attempting to send additional packets will result in a timeout because
++    # the signature can't be validated.
++    with pytest.raises(socket.timeout):
++        check_socket_echo(con.client_socket)
++
++
++@pytest.mark.parametrize("address_family", [socket.AF_INET, socket.AF_INET6])
++def test_tw_ack(exit_stack: ExitStack, address_family):
++    """Manually sent a duplicate ACK after FIN and check TWSK signs replies correctly
++
++    Kernel has a custom code path for this
++    """
++
++    con = TCPConnectionFixture(address_family=address_family)
++    con.tcp_authopt_key = key = DEFAULT_TCP_AUTHOPT_KEY
++    exit_stack.enter_context(con)
++
++    # connect and close nicely
++    con.client_socket.connect(con.server_addr_port)
++    check_socket_echo(con.client_socket)
++    assert con.get_client_tcp_state() == "ESTAB"
++    assert con.get_server_tcp_state() == "ESTAB"
++    con.client_socket.close()
++    con.sniffer_session.wait_close()
++
++    assert con.get_client_tcp_state() == "TIME-WAIT"
++    assert con.get_server_tcp_state() is None
++
++    # Sent a duplicate FIN/ACK
++    client_isn, server_isn = con.sniffer_session.get_client_server_isn()
++    p = con.create_server2client_packet()
++    p[TCP].flags = "FA"
++    p[TCP].seq = tcp_seq_wrap(server_isn + 1001)
++    p[TCP].ack = tcp_seq_wrap(client_isn + 1002)
++    add_tcp_authopt_signature(
++        p, TcpAuthOptAlg_HMAC_SHA1(), key.key, server_isn, client_isn
++    )
++    pr = con.server_l2socket.sr1(p)
++    assert pr[TCP].ack == tcp_seq_wrap(server_isn + 1001)
++    assert pr[TCP].seq == tcp_seq_wrap(client_isn + 1001)
++    assert pr[TCP].flags == "A"
++
++    scapy_sniffer_stop(con.sniffer)
++
++    val = TcpAuthValidator()
++    val.keys.append(TcpAuthValidatorKey(key=b"hello", alg_name="HMAC-SHA-1-96"))
++    for p in con.sniffer.results:
++        val.handle_packet(p)
++    val.raise_errors()
++
++    # The server does not have enough state to validate the ACK from TIME-WAIT
++    # so it reports a failure.
++    assert con.server_nstat_json()["TcpExtTCPAuthOptFailure"] == 1
++    assert con.client_nstat_json()["TcpExtTCPAuthOptFailure"] == 0
++
++
++@pytest.mark.parametrize("address_family", [socket.AF_INET, socket.AF_INET6])
++def test_tw_rst(exit_stack: ExitStack, address_family):
++    """Manually sent a signed invalid packet after FIN and check TWSK signs RST correctly
++
++    Kernel has a custom code path for this
++    """
++    key = DEFAULT_TCP_AUTHOPT_KEY
++    con = TCPConnectionFixture(
++        address_family=address_family,
++        tcp_authopt_key=key,
++    )
++    con.server_thread.keep_half_open = True
++    exit_stack.enter_context(con)
++
++    # connect, transfer data and close client nicely
++    con.client_socket.connect(con.server_addr_port)
++    check_socket_echo(con.client_socket)
++    con.client_socket.close()
++
++    # since server keeps connection open client goes to FIN-WAIT-2
++    def check_socket_states():
++        client_tcp_state_name = con.get_client_tcp_state()
++        server_tcp_state_name = con.get_server_tcp_state()
++        logger.info("%s %s", client_tcp_state_name, server_tcp_state_name)
++        return (
++            client_tcp_state_name == "FIN-WAIT-2"
++            and server_tcp_state_name == "CLOSE-WAIT"
++        )
++
++    waiting.wait(check_socket_states)
++
++    # sending a FIN-ACK with incorrect seq makes
++    # tcp_timewait_state_process return a TCP_TW_RST
++    client_isn, server_isn = con.sniffer_session.get_client_server_isn()
++    p = con.create_server2client_packet()
++    p[TCP].flags = "FA"
++    p[TCP].seq = tcp_seq_wrap(server_isn + 1001 + 1)
++    p[TCP].ack = tcp_seq_wrap(client_isn + 1002)
++    add_tcp_authopt_signature(
++        p, TcpAuthOptAlg_HMAC_SHA1(), key.key, server_isn, client_isn
++    )
++    con.server_l2socket.send(p)
++
++    # remove delay by scapy trick?
++    import time
++
++    time.sleep(1)
++    scapy_sniffer_stop(con.sniffer)
++
++    # Check client socket moved from FIN-WAIT-2 to CLOSED
++    assert con.get_client_tcp_state() is None
++
++    # Check some RST was seen
++    def is_tcp_rst(p):
++        return TCP in p and p[TCP].flags.R
++
++    assert any(is_tcp_rst(p) for p in con.sniffer.results)
++
++    # Check everything was valid
++    val = TcpAuthValidator()
++    val.keys.append(TcpAuthValidatorKey(key=b"hello", alg_name="HMAC-SHA-1-96"))
++    for p in con.sniffer.results:
++        val.handle_packet(p)
++    val.raise_errors()
++
++    # Check no snmp failures
++    con.assert_no_snmp_output_failures()
++
++
++def test_rst_linger(exit_stack: ExitStack):
++    """Test RST sent deliberately via SO_LINGER is valid"""
++    con = TCPConnectionFixture(
++        sniffer_kwargs=dict(count=8), tcp_authopt_key=DEFAULT_TCP_AUTHOPT_KEY
++    )
++    exit_stack.enter_context(con)
++
++    con.client_socket.connect(con.server_addr_port)
++    check_socket_echo(con.client_socket)
++    socket_set_linger(con.client_socket, 1, 0)
++    con.client_socket.close()
++
++    con.sniffer.join(timeout=3)
++
++    val = TcpAuthValidator()
++    val.keys.append(TcpAuthValidatorKey(key=b"hello", alg_name="HMAC-SHA-1-96"))
++    for p in con.sniffer.results:
++        val.handle_packet(p)
++    val.raise_errors()
++
++    def is_tcp_rst(p):
++        return TCP in p and p[TCP].flags.R
++
++    assert any(is_tcp_rst(p) for p in con.sniffer.results)
++
++
++@pytest.mark.parametrize(
++    "address_family,mode",
++    [
++        (socket.AF_INET, "goodsign"),
++        (socket.AF_INET, "fakesign"),
++        (socket.AF_INET, "unsigned"),
++        (socket.AF_INET6, "goodsign"),
++        (socket.AF_INET6, "fakesign"),
++        (socket.AF_INET6, "unsigned"),
++    ],
++)
++def test_badack_to_synack(exit_stack, address_family, mode: str):
++    """Test bad ack in response to server to syn/ack.
++
++    This is handled by a minisocket in the TCP_SYN_RECV state on a separate code path
++    """
++    con = TCPConnectionFixture(address_family=address_family)
++    if mode != "unsigned":
++        con.tcp_authopt_key = tcp_authopt_key(
++            alg=TCP_AUTHOPT_ALG.HMAC_SHA_1_96,
++            key=b"hello",
++        )
++    exit_stack.enter_context(con)
++
++    client_l2socket = con.client_l2socket
++    client_isn = 1000
++    server_isn = 0
++
++    def sign(packet):
++        if mode == "unsigned":
++            return
++        add_tcp_authopt_signature(
++            packet,
++            TcpAuthOptAlg_HMAC_SHA1(),
++            con.tcp_authopt_key.key,
++            client_isn,
++            server_isn,
++        )
++
++    # Prevent TCP in client namespace from sending RST
++    # Do this by removing the client address and insert a static ARP on server side
++    client_prefix_length = con.nsfixture.get_prefix_length(address_family)
++    subprocess.run(
++        f"""\
++set -e
++ip netns exec {con.nsfixture.client_netns_name} ip addr del {con.client_addr}/{client_prefix_length} dev veth0
++ip netns exec {con.nsfixture.server_netns_name} ip neigh add {con.client_addr} lladdr {con.nsfixture.client_mac_addr} dev veth0
++""",
++        shell=True,
++        check=True,
++    )
++
++    p1 = con.create_client2server_packet()
++    p1[TCP].flags = "S"
++    p1[TCP].seq = client_isn
++    p1[TCP].ack = 0
++    sign(p1)
++
++    p2 = client_l2socket.sr1(p1, timeout=1)
++    server_isn = p2[TCP].seq
++    assert p2[TCP].ack == client_isn + 1
++    assert p2[TCP].flags == "SA"
++
++    p3 = con.create_client2server_packet()
++    p3[TCP].flags = "A"
++    p3[TCP].seq = client_isn + 1
++    p3[TCP].ack = server_isn + 1
++    sign(p3)
++    if mode == "fakesign":
++        break_tcp_authopt_signature(p3)
++
++    assert con.server_nstat_json()["TcpExtTCPAuthOptFailure"] == 0
++    client_l2socket.send(p3)
++
++    def confirm_good():
++        return len(con.server_thread.server_socket) > 0
++
++    def confirm_fail():
++        return con.server_nstat_json()["TcpExtTCPAuthOptFailure"] == 1
++
++    def wait_good():
++        assert not confirm_fail()
++        return confirm_good()
++
++    def wait_fail():
++        assert not confirm_good()
++        return confirm_fail()
++
++    if mode == "fakesign":
++        waiting.wait(wait_fail, timeout_seconds=5, sleep_seconds=0.1)
++    else:
++        waiting.wait(wait_good, timeout_seconds=5, sleep_seconds=0.1)
 -- 
 2.25.1
 
