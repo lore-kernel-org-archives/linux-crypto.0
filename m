@@ -2,181 +2,464 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F32C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 03:14:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA431C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 08:00:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEA4460240
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 03:14:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E731610D2
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 08:00:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230234AbhKADRE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 31 Oct 2021 23:17:04 -0400
-Received: from mx0a-0064b401.pphosted.com ([205.220.166.238]:50726 "EHLO
-        mx0a-0064b401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230233AbhKADRD (ORCPT
+        id S231133AbhKAID0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Nov 2021 04:03:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52684 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231320AbhKAIDT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 31 Oct 2021 23:17:03 -0400
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-        by mx0a-0064b401.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1A12ioIB027298;
-        Sun, 31 Oct 2021 20:14:19 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com; h=from : to : cc :
- subject : date : message-id : content-type : mime-version; s=PPS06212021;
- bh=hTSkVpsON1Z6qZwZQDleh6cfN1vH9QMviG+IfJ/tuYw=;
- b=buSv4UePk71uylB1BWeUuEvFFKwz7+KsHmTRqvsE1QTNHYH4mr8dXXBehXI7NS8m2SCy
- cwv2AO57NH4h281ZpExa6YxmjEpuOwUGguuP2P03ux+nbf773tPy2kc1zq2T0w+cOAyk
- bF/63l7ZeJV9BrYs4lTmHGUf87SNuWtWm8JWtuEEqC67IhBGQjyliOI6/t7hcx4lgfZQ
- dq4H6nXQlRQ9b3DBzWSc7Dnm+A3lR61oO/JzWVoZbiBAkN7pGvv7/w6enunX3kA5+3ag
- PBxqxtAUbTU0frhKDl/MbfJDf3T6F5adf3rOtFBo3Zvr0noFZUvZ6rhl5RVzIwE/QK3z lg== 
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2172.outbound.protection.outlook.com [104.47.58.172])
-        by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3c1rgx0g2v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 31 Oct 2021 20:14:18 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ATkRFSjF4PZ5Potjms+H0D556/96TC4tRT823Joeimg6+2qbJUKIA0zxgJFZ8awuWhokdI9z7h3ANNTRry8/57UvNNGtB9WQAIzvriJze4NzFtbaS6FIzIDFSMO3t5Xurs5aRyyAKVN3cwQuZpG09hQ9wwNgl4hLDCAqffvmHRCCfOEtAkhjCwcxMAK81uIEDc63c60SPEzVN6dKQGBvhEvd7ZyM7+LmoNqjN28HZkaP/tBASsDIqolWTa2xXgN+HtvK2kq7fBqHh4WF/+WRRWtzFfqAOpfH+zvTeVqPd6DLZi3D7DXESXv1kNM8B50JNr6bhAysisnZOwhAq0QRng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hTSkVpsON1Z6qZwZQDleh6cfN1vH9QMviG+IfJ/tuYw=;
- b=kDIZYqwoTPKoK04QEmz3dHiNjeN5LTaLKkpdXUU6HNsD/NTFpTnF86erREfigB279tVvmGR0R4YJUo5HAgMVptjXDvbGvFQ4oW8gOk3wJ/sxMha4Lc5jzCZvgo2jK0dafgAIsYmdiwOfiCrr2gzyexxUkim/qJ2BgVEEwWHE97N6Lysi0ub6PRbDd6w31ooZZAWEEjbLz1/FlC3VasyjqZhewIIba0URH3mjXxbgnSaI+yCymvpu5QUE/wNGeLUtP3W4H2LuJ0F02cOvuPPCqH+Jq0/7M7lItUocm+UhodWz2/9VfRKg6KVNINS1LJ2AbrMVWO8PJVw+AxGnkZnKDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-Authentication-Results: nxp.com; dkim=none (message not signed)
- header.d=none;nxp.com; dmarc=none action=none header.from=windriver.com;
-Received: from PH0PR11MB5191.namprd11.prod.outlook.com (2603:10b6:510:3e::24)
- by PH7PR11MB5885.namprd11.prod.outlook.com (2603:10b6:510:134::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.15; Mon, 1 Nov
- 2021 03:14:15 +0000
-Received: from PH0PR11MB5191.namprd11.prod.outlook.com
- ([fe80::a090:40db:80ae:f06a]) by PH0PR11MB5191.namprd11.prod.outlook.com
- ([fe80::a090:40db:80ae:f06a%9]) with mapi id 15.20.4649.019; Mon, 1 Nov 2021
- 03:14:15 +0000
-From:   Meng Li <Meng.Li@windriver.com>
-To:     horia.geanta@nxp.com, pankaj.gupta@nxp.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        meng.li@windriver.com
-Subject: [PATCH v2] driver: crypto: caam: replace this_cpu_ptr with raw_cpu_ptr
-Date:   Mon,  1 Nov 2021 11:13:53 +0800
-Message-Id: <20211101031353.2119-1-Meng.Li@windriver.com>
-X-Mailer: git-send-email 2.17.1
-Content-Type: text/plain
-X-ClientProxiedBy: HK2PR04CA0055.apcprd04.prod.outlook.com
- (2603:1096:202:14::23) To PH0PR11MB5191.namprd11.prod.outlook.com
- (2603:10b6:510:3e::24)
+        Mon, 1 Nov 2021 04:03:19 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68AFBC061764
+        for <linux-crypto@vger.kernel.org>; Mon,  1 Nov 2021 01:00:37 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1mhSF7-0005gp-OO; Mon, 01 Nov 2021 09:00:33 +0100
+Subject: Re: [PATCH v4 4/5] crypto: caam - add in-kernel interface for blob
+ generator
+To:     =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     kernel@pengutronix.de, David Gstir <david@sigma-star.at>,
+        Tim Harvey <tharvey@gateworks.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+References: <cover.8f40b6d1b93adc80aed2cac29a134f7a7fb5ee98.1633946449.git-series.a.fatoum@pengutronix.de>
+ <3ea6e5c37559eddfdc51f26c4dff0abbbc894839.1633946449.git-series.a.fatoum@pengutronix.de>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+Message-ID: <41c73628-e687-c72d-9753-b778cb398ddc@pengutronix.de>
+Date:   Mon, 1 Nov 2021 09:00:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Received: from pek-mli1-d2.wrs.com (60.247.85.82) by HK2PR04CA0055.apcprd04.prod.outlook.com (2603:1096:202:14::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.15 via Frontend Transport; Mon, 1 Nov 2021 03:14:13 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f01614ae-d98f-420e-cf04-08d99ce5af1e
-X-MS-TrafficTypeDiagnostic: PH7PR11MB5885:
-X-Microsoft-Antispam-PRVS: <PH7PR11MB5885B61B4C5FA3B184695BE0F18A9@PH7PR11MB5885.namprd11.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:655;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HdIoXXQl4AAM5PA4K2mzeqVRDDuseBnqtG25fBCwt6W5Uibs/E0C7XUEWKNa+2z7EMIdDIG07g9+Q1gCoVhs+9klS4Hkq+gm1LuxF70I2VEejjcRDFkmH4K5TsAwUf+iGe/KmGOmMsBQr7wbHKu8ZWpev6VtWsgApcl+aJPNm+LUSUxru80gMLfG+1WwZSe5UHYZ8Uk23tLJ1g6B7cD55uo3kvirvgtKoNRso0A+nNmODrrgZgeSDUL9lZx2vGoLE2jvU5+p23RCSorgVN8CZ9VpBL+A4V818AHZxqHY8/fYYT6U/OjGsJnT/vqv5IG4+RlePTUCDXlOvcPVDApnp0bWrZsEQ+8+1xXvZJnRoR1EcgsaJDVZpgMitX2+F+TIJ5heVADAYenZ5qBBTU34MM+k6nnhqq/2ksvM+APqnhiURnKnKf82gTzz0GqrxIwMOBC3xIru2/FwfWu6Rlc0XiZkpe6MUTih6/MEsSHISzXeoDQ/1CNT/A9ZPxX0FoVdoympnKlLzv1iKckmNV3YZSmGJAFIl0kq305Ku1YcJmsk0I0A3SqnmVV10/UOuJL4FvLi1TATf95MyZiGhC93Qyi8eA6viq/nvfEXyIW02G/WPXSdaZrplOlekRWOcdywSQVrFhdTl7x/Q4nie3XRBwlBWgLB137BAaciQ/ikPN5OgCQU8bDxBzxaMblDcbBmJDDtcn2Z3jd6oCqUYdynSw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5191.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(38100700002)(8936002)(38350700002)(508600001)(316002)(6666004)(36756003)(1076003)(86362001)(6512007)(4326008)(6486002)(26005)(5660300002)(186003)(2616005)(2906002)(107886003)(6506007)(52116002)(956004)(66476007)(66556008)(66946007)(83380400001)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rVytjFLAPxXRmUTw/ZKMycWciqVFtTPDUNX4mlSSF4DPPaJw2KRlw9Da78Ne?=
- =?us-ascii?Q?Y90DMEbOCt6c5Kxd6gVsDnys5/RgSVl24N+CSII+W7R11JWP6cqFAJXUcREO?=
- =?us-ascii?Q?cy5iqoL0Lh2OxnYGpURdbYwZ8R84huVTVRw0DjL9+wCQIWox8i0/t4WTEqb0?=
- =?us-ascii?Q?dSMKn69hhel0xgTSX5NYYQpSdzegZZ7kdBqWHlPGBKd2x4ufjh/iI7G9kAW3?=
- =?us-ascii?Q?KmxW3KUZZ8kF++Ilh5/AtTBGSZbpPZterA9hUPhCV74G6KycG5tr6QKYmKwQ?=
- =?us-ascii?Q?s1L2DST40wLJ/9vnSMsr/LiAgTZFhm2PlitYeRodrkkX+E15KzmNrCD1MyhL?=
- =?us-ascii?Q?I6+QEIvXLbFc+GR7H8Fldecdr1sm9uEJ2+w3OJ6LJaE17Ry6gV3ZAqrbU85P?=
- =?us-ascii?Q?l1I47qhWRWVtyjaEITz5AiPYXZxOYJYlEWgCQYL7VhO39IT/NC2kxZqmWzxF?=
- =?us-ascii?Q?YrGr8N1FaJrP8h/LdDpCFtQqFbqPBOm3TRmPL+GsgvPttkZ4Bnzrc/rz5r2F?=
- =?us-ascii?Q?yO7YoBrarhzZz/hC/3m/vRbD7+ekVJKSPtf9xpxt/iEkve1TJ770Mvl5jQBD?=
- =?us-ascii?Q?B2n3IC4peaYmAKLjJQzyW3LsrnsbqdKvFgML/ShV+BZx34QqrtBzEEy2kFvl?=
- =?us-ascii?Q?XaKjf+OnDaJeNcXNb4MQjvVPJ6mzjsmSuzLnOdSOUFgjP0PZ9dNpNFy/tyT8?=
- =?us-ascii?Q?WW0uvfSyrur9ZyieCfS2p1R3hB8FJCZABWHa+VWKzAwtsFpPD9EzeDZjIg3S?=
- =?us-ascii?Q?zmFSjxX2EdYA+e5D3o+j/i/PtWcLKdDJ4E5pPI5RPkaubBM511fAB2l4R2Mz?=
- =?us-ascii?Q?avoU9rKDrJ97IzrScOp3TD/lqyWBMQstc68lpuQZfgYFdhBDf6mFaC6P3XWl?=
- =?us-ascii?Q?Z8T+b+wXKoyn+rFFS6AQRt4YXnON1DqDvydAHv2VoHtVQ7onoweEuagvaA3A?=
- =?us-ascii?Q?jmnokCtf+c+pyB0e1HUHfPOpGrfx/3GZaIKmeoxLLJtR7Z4H723vS1lV3j/Z?=
- =?us-ascii?Q?fiW/9FE01Fniz96oVS4VvwvjLmjJwRNhNfnOWi5rS5xtQMMS2ZKS7qFB9uPq?=
- =?us-ascii?Q?MytgjcZbSfubBanqIysCgAg0uI4QzTwpmNjatZy3gs00d3wUJqby1HlgjMiP?=
- =?us-ascii?Q?xac85DkfwHq+qDztgKe2iVUkOlnNRdTXjmApS+QjDpnR9eAqIP3WOZmQaH6N?=
- =?us-ascii?Q?bhYBXXwY7xLTH+EcqmYoN5o4E7QLNfKWCwQ3GV40X3pwE3UQotkPJJqcgBj1?=
- =?us-ascii?Q?+fdnRH5/wMC8TaVV5BYD4TA1HOmUtTqgFijAn1Usv4BRMqPAHnqs8KHiwdaf?=
- =?us-ascii?Q?AeAyL6jRPpQT/VOk7s/6X1TGbrBOhZdPYQ7JVVc5Ti5LtR13qAFc9eQYlGFn?=
- =?us-ascii?Q?1fW5fhVPSXNt+TnJKDyb6qC5mn6q3o3o3sgVBssz6IrMQDFkCFs1CUjvzuIm?=
- =?us-ascii?Q?vRJ48oFex97+Lht1UNXyF2tXcfNb4kwy1CGVUrNn6nABH0omWeJQ81lcdpd9?=
- =?us-ascii?Q?2iNSS1ZxxVLadotvpfqt+mTGoHTuG1yssw3MpOIPpwLR9o4DYoVxwupS3YL1?=
- =?us-ascii?Q?54mckukQ4DGcZV8WB421W9fj4JTnRosoWYo14dIFUcmbW3PBixA7hg0kk6d4?=
- =?us-ascii?Q?jcF0wHla+LuCx/Ne6/85KgQ=3D?=
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f01614ae-d98f-420e-cf04-08d99ce5af1e
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5191.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2021 03:14:15.0993
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: csrYJwjM54EKJtRUepDrOBypcIOg5fy7i0ZPacBMbxpDPAJVBj4FvyFE5oPiB7mBqtSWdc+Np3NUlvtWwwFlQw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5885
-X-Proofpoint-GUID: yTu88RdFAYC0KV2pEJf2BStMR9lmFfGX
-X-Proofpoint-ORIG-GUID: yTu88RdFAYC0KV2pEJf2BStMR9lmFfGX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-31_08,2021-10-29_03,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- clxscore=1015 lowpriorityscore=0 suspectscore=0 malwarescore=0
- adultscore=0 spamscore=0 priorityscore=1501 mlxlogscore=879 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111010017
+In-Reply-To: <3ea6e5c37559eddfdc51f26c4dff0abbbc894839.1633946449.git-series.a.fatoum@pengutronix.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When enable the kernel debug config, there is below calltrace detected:
-BUG: using smp_processor_id() in preemptible [00000000] code: cryptomgr_test/339
-caller is debug_smp_processor_id+0x20/0x30
-CPU: 9 PID: 339 Comm: cryptomgr_test Not tainted 5.10.63-yocto-standard #1
-Hardware name: NXP Layerscape LX2160ARDB (DT)
-Call trace:
- dump_backtrace+0x0/0x1a0
- show_stack+0x24/0x30
- dump_stack+0xf0/0x13c
- check_preemption_disabled+0x100/0x110
- debug_smp_processor_id+0x20/0x30
- dpaa2_caam_enqueue+0x10c/0x25c
- ......
- cryptomgr_test+0x38/0x60
- kthread+0x158/0x164
- ret_from_fork+0x10/0x38
-According to the comment in commit ac5d15b4519f("crypto: caam/qi2
- - use affine DPIOs "), because preemption is no longer disabled
-while trying to enqueue an FQID, it might be possible to run the
-enqueue on a different CPU(due to migration, when in process context),
-however this wouldn't be a functionality issue. But there will be
-above calltrace when enable kernel debug config. So, replace this_cpu_ptr
-with raw_cpu_ptr to avoid above call trace.
+Hello Horia, Aymen,
 
-Fixes: ac5d15b4519f ("crypto: caam/qi2 - use affine DPIOs")
-Cc: stable@vger.kernel.org
-Signed-off-by: Meng Li <Meng.Li@windriver.com>
----
-v2:
+On 11.10.21 12:02, Ahmad Fatoum wrote:
+> The CAAM can be used to protect user-defined data across system reboot:
+> 
+>   - When the system is fused and boots into secure state, the master
+>     key is a unique never-disclosed device-specific key
+>   - random key is encrypted by key derived from master key
+>   - data is encrypted using the random key
+>   - encrypted data and its encrypted random key are stored alongside
+>   - This blob can now be safely stored in non-volatile memory
+> 
+> On next power-on:
+>   - blob is loaded into CAAM
+>   - CAAM writes decrypted data either into memory or key register
+> 
+> Add functions to realize encrypting and decrypting into memory alongside
+> the CAAM driver.
+> 
+> They will be used in a later commit as a source for the trusted key
+> seal/unseal mechanism.
 
-Add comment to describe why the raw_cpu_ptr is safe.
- drivers/crypto/caam/caamalg_qi2.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Did you have time to look at this again?
 
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 8b8ed77d8715..6753f0e6e55d 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -5470,7 +5470,7 @@ int dpaa2_caam_enqueue(struct device *dev, struct caam_request *req)
- 	dpaa2_fd_set_len(&fd, dpaa2_fl_get_len(&req->fd_flt[1]));
- 	dpaa2_fd_set_flc(&fd, req->flc_dma);
+I have incorporated the changes request in v1 and the
+code has since been reviewed and tested by others.
+
+Thanks,
+Ahmad
  
--	ppriv = this_cpu_ptr(priv->ppriv);
-+	ppriv = raw_cpu_ptr(priv->ppriv);
- 	for (i = 0; i < (priv->dpseci_attr.num_tx_queues << 1); i++) {
- 		err = dpaa2_io_service_enqueue_fq(ppriv->dpio, ppriv->req_fqid,
- 						  &fd);
--- 
-2.17.1
+> Reviewed-by: David Gstir <david@sigma-star.at>
+> Tested-By: Tim Harvey <tharvey@gateworks.com>
+> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+> ---
+> To: "Horia Geantă" <horia.geanta@nxp.com>
+> To: Aymen Sghaier <aymen.sghaier@nxp.com>
+> To: Herbert Xu <herbert@gondor.apana.org.au>
+> To: "David S. Miller" <davem@davemloft.net>
+> Cc: James Bottomley <jejb@linux.ibm.com>
+> Cc: Jarkko Sakkinen <jarkko@kernel.org>
+> Cc: Mimi Zohar <zohar@linux.ibm.com>
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: Eric Biggers <ebiggers@kernel.org>
+> Cc: "Serge E. Hallyn" <serge@hallyn.com>
+> Cc: Udit Agarwal <udit.agarwal@nxp.com>
+> Cc: Jan Luebbe <j.luebbe@pengutronix.de>
+> Cc: David Gstir <david@sigma-star.at>
+> Cc: Richard Weinberger <richard@nod.at>
+> Cc: Franck LENORMAND <franck.lenormand@nxp.com>
+> Cc: Sumit Garg <sumit.garg@linaro.org>
+> Cc: linux-integrity@vger.kernel.org
+> Cc: keyrings@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-security-module@vger.kernel.org
+> ---
+>  drivers/crypto/caam/Kconfig    |   3 +-
+>  drivers/crypto/caam/Makefile   |   1 +-
+>  drivers/crypto/caam/blob_gen.c | 230 ++++++++++++++++++++++++++++++++++-
+>  include/soc/fsl/caam-blob.h    |  56 ++++++++-
+>  4 files changed, 290 insertions(+)
+>  create mode 100644 drivers/crypto/caam/blob_gen.c
+>  create mode 100644 include/soc/fsl/caam-blob.h
+> 
+> diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+> index 84ea7cba5ee5..ea9f8b1ae981 100644
+> --- a/drivers/crypto/caam/Kconfig
+> +++ b/drivers/crypto/caam/Kconfig
+> @@ -151,6 +151,9 @@ config CRYPTO_DEV_FSL_CAAM_RNG_API
+>  	  Selecting this will register the SEC4 hardware rng to
+>  	  the hw_random API for supplying the kernel entropy pool.
+>  
+> +config CRYPTO_DEV_FSL_CAAM_BLOB_GEN
+> +	bool
+> +
+>  endif # CRYPTO_DEV_FSL_CAAM_JR
+>  
+>  endif # CRYPTO_DEV_FSL_CAAM
+> diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
+> index 3570286eb9ce..25f7ae5a4642 100644
+> --- a/drivers/crypto/caam/Makefile
+> +++ b/drivers/crypto/caam/Makefile
+> @@ -21,6 +21,7 @@ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += caamalg_qi.o
+>  caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
+>  caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
+>  caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) += caampkc.o pkc_desc.o
+> +caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_BLOB_GEN) += blob_gen.o
+>  
+>  caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += qi.o
+>  ifneq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI),)
+> diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blob_gen.c
+> new file mode 100644
+> index 000000000000..513d3f90e438
+> --- /dev/null
+> +++ b/drivers/crypto/caam/blob_gen.c
+> @@ -0,0 +1,230 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2015 Pengutronix, Steffen Trumtrar <kernel@pengutronix.de>
+> + * Copyright (C) 2021 Pengutronix, Ahmad Fatoum <kernel@pengutronix.de>
+> + */
+> +
+> +#include <linux/device.h>
+> +#include <soc/fsl/caam-blob.h>
+> +
+> +#include "compat.h"
+> +#include "desc_constr.h"
+> +#include "desc.h"
+> +#include "error.h"
+> +#include "intern.h"
+> +#include "jr.h"
+> +#include "regs.h"
+> +
+> +struct caam_blob_priv {
+> +	struct device jrdev;
+> +};
+> +
+> +struct caam_blob_job_result {
+> +	int err;
+> +	struct completion completion;
+> +};
+> +
+> +static void caam_blob_job_done(struct device *dev, u32 *desc, u32 err, void *context)
+> +{
+> +	struct caam_blob_job_result *res = context;
+> +	int ecode = 0;
+> +
+> +	dev_dbg(dev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+> +
+> +	if (err)
+> +		ecode = caam_jr_strstatus(dev, err);
+> +
+> +	res->err = ecode;
+> +
+> +	/*
+> +	 * Upon completion, desc points to a buffer containing a CAAM job
+> +	 * descriptor which encapsulates data into an externally-storable
+> +	 * blob.
+> +	 */
+> +	complete(&res->completion);
+> +}
+> +
+> +static u32 *caam_blob_alloc_desc(size_t keymod_len)
+> +{
+> +	size_t len;
+> +
+> +	/* header + (key mod immediate) + 2x pointers + op */
+> +	len = 4 + (4 + ALIGN(keymod_len, 4)) + 2*(4 + 4 + CAAM_PTR_SZ_MAX) + 4;
+> +
+> +	if (len > CAAM_DESC_BYTES_MAX)
+> +		return NULL;
+> +
+> +	return kzalloc(len, GFP_KERNEL | GFP_DMA);
+> +}
+> +
+> +int caam_encap_blob(struct caam_blob_priv *priv, const char *keymod,
+> +		    void *input, void *output, size_t length)
+> +{
+> +	u32 *desc;
+> +	struct device *jrdev = &priv->jrdev;
+> +	dma_addr_t dma_in, dma_out;
+> +	struct caam_blob_job_result testres;
+> +	size_t keymod_len = strlen(keymod);
+> +	int ret;
+> +
+> +	if (length <= CAAM_BLOB_OVERHEAD || keymod_len > CAAM_BLOB_KEYMOD_LENGTH)
+> +		return -EINVAL;
+> +
+> +	desc = caam_blob_alloc_desc(keymod_len);
+> +	if (!desc) {
+> +		dev_err(jrdev, "unable to allocate desc\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	dma_in = dma_map_single(jrdev, input, length - CAAM_BLOB_OVERHEAD, DMA_TO_DEVICE);
+> +	if (dma_mapping_error(jrdev, dma_in)) {
+> +		dev_err(jrdev, "unable to map input DMA buffer\n");
+> +		ret = -ENOMEM;
+> +		goto out_free;
+> +	}
+> +
+> +	dma_out = dma_map_single(jrdev, output, length,	DMA_FROM_DEVICE);
+> +	if (dma_mapping_error(jrdev, dma_out)) {
+> +		dev_err(jrdev, "unable to map output DMA buffer\n");
+> +		ret = -ENOMEM;
+> +		goto out_unmap_in;
+> +	}
+> +
+> +	/*
+> +	 * A data blob is encrypted using a blob key (BK); a random number.
+> +	 * The BK is used as an AES-CCM key. The initial block (B0) and the
+> +	 * initial counter (Ctr0) are generated automatically and stored in
+> +	 * Class 1 Context DWords 0+1+2+3. The random BK is stored in the
+> +	 * Class 1 Key Register. Operation Mode is set to AES-CCM.
+> +	 */
+> +
+> +	init_job_desc(desc, 0);
+> +	append_key_as_imm(desc, keymod, keymod_len, keymod_len,
+> +			  CLASS_2 | KEY_DEST_CLASS_REG);
+> +	append_seq_in_ptr_intlen(desc, dma_in, length - CAAM_BLOB_OVERHEAD, 0);
+> +	append_seq_out_ptr_intlen(desc, dma_out, length, 0);
+> +	append_operation(desc, OP_TYPE_ENCAP_PROTOCOL | OP_PCLID_BLOB);
+> +
+> +	print_hex_dump_debug("data@"__stringify(__LINE__)": ",
+> +			     DUMP_PREFIX_ADDRESS, 16, 1, input,
+> +			     length - CAAM_BLOB_OVERHEAD, false);
+> +	print_hex_dump_debug("jobdesc@"__stringify(__LINE__)": ",
+> +			     DUMP_PREFIX_ADDRESS, 16, 1, desc,
+> +			     desc_bytes(desc), false);
+> +
+> +	testres.err = 0;
+> +	init_completion(&testres.completion);
+> +
+> +	ret = caam_jr_enqueue(jrdev, desc, caam_blob_job_done, &testres);
+> +	if (ret == -EINPROGRESS) {
+> +		wait_for_completion(&testres.completion);
+> +		ret = testres.err;
+> +		print_hex_dump_debug("output@"__stringify(__LINE__)": ",
+> +				     DUMP_PREFIX_ADDRESS, 16, 1, output,
+> +				     length, false);
+> +	}
+> +
+> +	dma_unmap_single(jrdev, dma_out, length, DMA_FROM_DEVICE);
+> +out_unmap_in:
+> +	dma_unmap_single(jrdev, dma_in, length - CAAM_BLOB_OVERHEAD, DMA_TO_DEVICE);
+> +out_free:
+> +	kfree(desc);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(caam_encap_blob);
+> +
+> +int caam_decap_blob(struct caam_blob_priv *priv, const char *keymod,
+> +		    void *input, void *output, size_t length)
+> +{
+> +	u32 *desc;
+> +	struct device *jrdev = &priv->jrdev;
+> +	dma_addr_t dma_in, dma_out;
+> +	struct caam_blob_job_result testres;
+> +	size_t keymod_len = strlen(keymod);
+> +	int ret;
+> +
+> +	if (length <= CAAM_BLOB_OVERHEAD || keymod_len > CAAM_BLOB_KEYMOD_LENGTH)
+> +		return -EINVAL;
+> +
+> +	desc = caam_blob_alloc_desc(keymod_len);
+> +	if (!desc) {
+> +		dev_err(jrdev, "unable to allocate desc\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	dma_in = dma_map_single(jrdev, input, length, DMA_TO_DEVICE);
+> +	if (dma_mapping_error(jrdev, dma_in)) {
+> +		dev_err(jrdev, "unable to map input DMA buffer\n");
+> +		ret = -ENOMEM;
+> +		goto out_free;
+> +	}
+> +
+> +	dma_out = dma_map_single(jrdev, output, length - CAAM_BLOB_OVERHEAD, DMA_FROM_DEVICE);
+> +	if (dma_mapping_error(jrdev, dma_out)) {
+> +		dev_err(jrdev, "unable to map output DMA buffer\n");
+> +		ret = -ENOMEM;
+> +		goto out_unmap_in;
+> +	}
+> +
+> +	/*
+> +	 * A data blob is encrypted using a blob key (BK); a random number.
+> +	 * The BK is used as an AES-CCM key. The initial block (B0) and the
+> +	 * initial counter (Ctr0) are generated automatically and stored in
+> +	 * Class 1 Context DWords 0+1+2+3. The random BK is stored in the
+> +	 * Class 1 Key Register. Operation Mode is set to AES-CCM.
+> +	 */
+> +
+> +	init_job_desc(desc, 0);
+> +	append_key_as_imm(desc, keymod, keymod_len, keymod_len,
+> +			  CLASS_2 | KEY_DEST_CLASS_REG);
+> +	append_seq_in_ptr(desc, dma_in, length, 0);
+> +	append_seq_out_ptr(desc, dma_out, length - CAAM_BLOB_OVERHEAD, 0);
+> +	append_operation(desc, OP_TYPE_DECAP_PROTOCOL | OP_PCLID_BLOB);
+> +
+> +	print_hex_dump_debug("data@"__stringify(__LINE__)": ",
+> +			     DUMP_PREFIX_ADDRESS, 16, 1, input,
+> +			     length, false);
+> +	print_hex_dump_debug("jobdesc@"__stringify(__LINE__)": ",
+> +			     DUMP_PREFIX_ADDRESS, 16, 1, desc,
+> +			     desc_bytes(desc), false);
+> +
+> +	testres.err = 0;
+> +	init_completion(&testres.completion);
+> +
+> +	ret = caam_jr_enqueue(jrdev, desc, caam_blob_job_done, &testres);
+> +	if (ret == -EINPROGRESS) {
+> +		wait_for_completion(&testres.completion);
+> +		ret = testres.err;
+> +		print_hex_dump_debug("output@"__stringify(__LINE__)": ",
+> +				     DUMP_PREFIX_ADDRESS, 16, 1, output,
+> +				     length - CAAM_BLOB_OVERHEAD, false);
+> +	}
+> +
+> +	dma_unmap_single(jrdev, dma_out, length - CAAM_BLOB_OVERHEAD, DMA_FROM_DEVICE);
+> +out_unmap_in:
+> +	dma_unmap_single(jrdev, dma_in, length, DMA_TO_DEVICE);
+> +out_free:
+> +	kfree(desc);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(caam_decap_blob);
+> +
+> +struct caam_blob_priv *caam_blob_gen_init(void)
+> +{
+> +	struct device *jrdev;
+> +
+> +	jrdev = caam_jr_alloc();
+> +	if (IS_ERR(jrdev))
+> +		return ERR_CAST(jrdev);
+> +
+> +	return container_of(jrdev, struct caam_blob_priv, jrdev);
+> +}
+> +EXPORT_SYMBOL(caam_blob_gen_init);
+> +
+> +void caam_blob_gen_exit(struct caam_blob_priv *priv)
+> +{
+> +	caam_jr_free(&priv->jrdev);
+> +}
+> +EXPORT_SYMBOL(caam_blob_gen_exit);
+> diff --git a/include/soc/fsl/caam-blob.h b/include/soc/fsl/caam-blob.h
+> new file mode 100644
+> index 000000000000..83fd990ebdce
+> --- /dev/null
+> +++ b/include/soc/fsl/caam-blob.h
+> @@ -0,0 +1,56 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2020 Pengutronix, Ahmad Fatoum <kernel@pengutronix.de>
+> + */
+> +
+> +#ifndef __CAAM_BLOB_GEN
+> +#define __CAAM_BLOB_GEN
+> +
+> +#include <linux/types.h>
+> +
+> +#define CAAM_BLOB_KEYMOD_LENGTH		16
+> +#define CAAM_BLOB_OVERHEAD		(32 + 16)
+> +#define CAAM_BLOB_MAX_LEN		4096
+> +
+> +struct caam_blob_priv;
+> +
+> +/** caam_blob_gen_init - initialize blob generation
+> + *
+> + * returns either pointer to new caam_blob_priv instance
+> + * or error pointer
+> + */
+> +struct caam_blob_priv *caam_blob_gen_init(void);
+> +
+> +/** caam_blob_gen_exit - free blob generation resources
+> + *
+> + * @priv: instance returned by caam_blob_gen_init
+> + */
+> +void caam_blob_gen_exit(struct caam_blob_priv *priv);
+> +
+> +/** caam_encap_blob - encapsulate blob
+> + *
+> + * @priv:   instance returned by caam_blob_gen_init
+> + * @keymod: string to use as key modifier for blob encapsulation
+> + *	    can't be longer than CAAM_BLOB_KEYMOD_LENGTH
+> + * @input:  buffer which CAAM will DMA from
+> + * @output: buffer which CAAM will DMA to
+> + * @length: buffer length including blob overhead
+> + *          CAAM_BLOB_OVERHEAD < length <= CAAM_BLOB_MAX_LEN
+> + */
+> +int caam_encap_blob(struct caam_blob_priv *priv, const char *keymod,
+> +		    void *input, void *output, size_t length);
+> +
+> +/** caam_decap_blob - decapsulate blob
+> + *
+> + * @priv:   instance returned by caam_blob_gen_init
+> + * @keymod: string to use as key modifier for blob decapsulation
+> + *	    can't be longer than CAAM_BLOB_KEYMOD_LENGTH
+> + * @input:  buffer which CAAM will DMA from
+> + * @output: buffer which CAAM will DMA to
+> + * @length: buffer length including blob overhead
+> + *          CAAM_BLOB_OVERHEAD < length <= CAAM_BLOB_MAX_LEN
+> + */
+> +int caam_decap_blob(struct caam_blob_priv *priv, const char *keymod,
+> +		    void *input, void *output, size_t length);
+> +
+> +#endif
+> 
 
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
