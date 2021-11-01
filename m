@@ -2,169 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 933CEC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 20:02:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A530C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 20:54:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76AD660E52
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 20:02:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB2296052B
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 20:54:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229931AbhKAUFE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Nov 2021 16:05:04 -0400
-Received: from mail-sn1anam02on2040.outbound.protection.outlook.com ([40.107.96.40]:3981
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229560AbhKAUFA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Nov 2021 16:05:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Dyul4BMt+++LVHseSfMO5iaAKrYSF4QbKeinVw10xtuqYGU53ocXkeaUIRhkn7xjZzt06W2kCWzd7tTe/4bZmy5/iE+Wi/fNglN4bY3Rym0pRnkiWKkGMuMOoyLawXQEhcyNBSJK8I1iVsTz5fnzNGNb+/lFJa2z7BKCNsdE58GH6ktTS6bGDqL+PONe9quVvgW390Z8sueQpyyox0OVpcLBVOBAI1oMxccQ2Cydr+84zzP7yNRpKCL/oo3X7ipgpdiciiXiWxfc9pRsE9HXBcR8URkGcHXi+kbT+yFlk312TR98XSycN6/x0wZVsYxPWxfBzWJcaak6papGPlLE9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RlXDQftmE13hNCqRZSgFu5ycXh7eWH6vrM0T4I9kYFU=;
- b=f1apXeeLd/iGy4A2Uey4KLWLAc/tnlcI/fKQoir9CHZzFnPzelaWg4I1LDoxdILov5ULQ/CG9jZBTngwUwxb7TdUDvHhHA2Hq03KvkaI/27OeIQ3bSupwl+zgR8coibKIMt4KRwp3ro67tUBFWEYchh3cIcEBZ5YQfc/oBxQsNLW5y/rNI1/eHckoKpIvKGxFnPE5MinFPEFWHLXoOIBs5+Cdw7/VWTRPaDtaWwN/b/A/CwmWOo030hky80OFlXrYtvNwbdwQ+Euqj+W2VzJMbUSQrMHpV0aSTCWnrAg4AwG7b2SOWg7R6sBMJypjM9J+WtE9QDbV81eybD5FW2VDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RlXDQftmE13hNCqRZSgFu5ycXh7eWH6vrM0T4I9kYFU=;
- b=Q8B3oewsrp5mDNiQHS8ygcvPvW9ap+E00CDPuJfe+apviv8J9nCeR20Q0XIOz7OP3ayDvaul1GzMTz+YhTRf3je19fm3C9VKS0Ld3pXKmTOStozuqODkYRKAbR/avwgCDsHYcG5FqQ2wNMjY7LuXy4JYf0opF2ZTvoXDrdVoFNw=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM4PR12MB5344.namprd12.prod.outlook.com (2603:10b6:5:39f::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.18; Mon, 1 Nov
- 2021 20:02:25 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::a87d:568d:994f:c5f9]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::a87d:568d:994f:c5f9%8]) with mapi id 15.20.4649.019; Mon, 1 Nov 2021
- 20:02:25 +0000
-Subject: Re: [PATCH V2 4/4] crypto: ccp - Add SEV_INIT_EX support
-To:     Peter Gonda <pgonda@google.com>
-Cc:     David Rientjes <rientjes@google.com>,
-        Marc Orr <marcorr@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <jroedel@suse.de>,
+        id S231356AbhKAU5Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Nov 2021 16:57:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59176 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229501AbhKAU5Y (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Nov 2021 16:57:24 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04D97C061764;
+        Mon,  1 Nov 2021 13:54:50 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id b4so11184112pgh.10;
+        Mon, 01 Nov 2021 13:54:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=pZqr5rTlcaug9563wNJYd77L6h7Hk2gF965+CXNB47w=;
+        b=Ni5w9wTyiPsaYcO7fKFpzBdoI1bm1lqTRPi/F3tDeEc9LRFV4vfZj0qxXTCUmeCbLA
+         X5/63FZkBpzBJWmg+ArJLti1r/FFv1BawCzOKfDmg5CgkL9mm0/sL61K1UJBa32+u/v3
+         HMifwPe2araTOCO8kjvrX1A/FhYW0AlqfwaqmXEKn23xVf+k41Ty+TKhXuN1N2ATRoqh
+         gODj2DgLpz6M2pO0REWlcfr6KahTMab1YX67/x7OWsZxZzZPBrJNYbKcdsJ8sTxnUW5Z
+         O2s2z8E13iE0kN/1SAc1xgFjPfVjj5T/Z5NOkAl+E1dszJzBkuMoRxYOceOfnJQayiq7
+         1iaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pZqr5rTlcaug9563wNJYd77L6h7Hk2gF965+CXNB47w=;
+        b=UG1f2sR3yDmq+ptw1IeoFzVpronyGmxiU31HvKs5LKkhsyZYWsPSBf+CD9P9quMNVl
+         vt0++5Nx2Gl0AVmuxdbmNsSqKSTFzwdRSplMo+Ac+RGFeSgQJq41swQHQ65k8EaD08I/
+         VCLZS6VRK51EWdYwmzSGdMSSfLCFuZd0rWoN/1KH60otO/psdQPfD7ApLG0SKfs0myO5
+         wuV6RkJYJpMcMUgmtTNJ7BsZEtHX4gVFmTI/mkvjEBesIhPzMXfcbKwCmYv9E4AZcJze
+         E52cxBKT7YSJxXYb4Oo9KjrAglWF2uX8so5JTjQ0OIDMYgDiITngXrexT9xMeS2XmL/4
+         X0bg==
+X-Gm-Message-State: AOAM530bmg6kshv8aKfQCSoJ+icLhWmoIKjV1eCelsKQxLxhQ0kGw2Xj
+        KT3pMTvJCJuR+Zoed1qoUwa30UuWrqc=
+X-Google-Smtp-Source: ABdhPJyRqX1y8LIgmxGmLlN6ZqygsWwwckwgCo2+I1Hp5UFPHWWYdV0jTemV/m/Gw5TCgObqByhAQw==
+X-Received: by 2002:a05:6a00:244e:b0:47b:7dbf:e23d with SMTP id d14-20020a056a00244e00b0047b7dbfe23dmr31701851pfj.34.1635800089195;
+        Mon, 01 Nov 2021 13:54:49 -0700 (PDT)
+Received: from [192.168.86.235] (c-73-241-150-58.hsd1.ca.comcast.net. [73.241.150.58])
+        by smtp.gmail.com with ESMTPSA id o19sm11358069pfu.56.2021.11.01.13.54.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Nov 2021 13:54:48 -0700 (PDT)
+Subject: Re: [PATCH v2 11/25] tcp: authopt: Implement Sequence Number
+ Extension
+To:     Leonard Crestez <cdleonard@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Dumazet <edumazet@google.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        John Allen <john.allen@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20211101172127.3060453-1-pgonda@google.com>
- <20211101172127.3060453-5-pgonda@google.com>
- <952fa937-d139-bd90-825c-f7dfca8d8cb9@amd.com>
- <CAMkAt6qdNWP-Ka1N=0d16Q1TrbHPXPEkdLoxC8ndsyid-dqA6Q@mail.gmail.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <d6fc38fa-1caa-289a-ae92-102a96638560@amd.com>
-Date:   Mon, 1 Nov 2021 15:02:22 -0500
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1635784253.git.cdleonard@gmail.com>
+ <6097ec24d87efc55962a1bfac9441132f0fc4206.1635784253.git.cdleonard@gmail.com>
+From:   Eric Dumazet <eric.dumazet@gmail.com>
+Message-ID: <07987e29-87a0-9a09-bdf0-b5e385d9c55f@gmail.com>
+Date:   Mon, 1 Nov 2021 13:54:46 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-In-Reply-To: <CAMkAt6qdNWP-Ka1N=0d16Q1TrbHPXPEkdLoxC8ndsyid-dqA6Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+ Thunderbird/78.14.0
+MIME-Version: 1.0
+In-Reply-To: <6097ec24d87efc55962a1bfac9441132f0fc4206.1635784253.git.cdleonard@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR13CA0030.namprd13.prod.outlook.com
- (2603:10b6:208:160::43) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
-MIME-Version: 1.0
-Received: from [10.236.30.241] (165.204.77.1) by MN2PR13CA0030.namprd13.prod.outlook.com (2603:10b6:208:160::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.6 via Frontend Transport; Mon, 1 Nov 2021 20:02:24 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 59cf16ec-8aaa-41af-8033-08d99d728603
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5344:
-X-Microsoft-Antispam-PRVS: <DM4PR12MB53443434E0BDA7089B987B58EC8A9@DM4PR12MB5344.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hdrSOV6GTbDLv5QFU1Z6z0q2KsCtVkicHPDNdaICI2mlgxLdUIi0YDKOmqBEY8jcaqO/fwRuhdJhUTa3lzEBG4U9YriO47ExPQnFKQb6c211l5c1llbhy0vdiLjR3nL6+l2LerJ0eJWV4cVAxAyKPHPhy2/uJoYu1X67JJfh/Q8Ew7p+pULbX4ITQBJEm2DHOD3XUWVwSFMSuH39alFrMY5Q6Ov9L5a65zwHdIJmXJzEVlG0hDLdf1MOvkHTOvC07n6grOEMaq8OJL/tGF8/BV6JCfDnJ8a5Q+r3yc3RUHEmr1/oaV04/VsGKig19FwvyuJq49UDV107FLu3F/i4NCf6BJSKTVBj0EiOv48L2vJiXA9UJ1RaoTQHjvv+yZeBkkp7g80fJKVhSMk4YUxYYbszBCUHC23gND7k0Zd5Q2H+U2JPDtzJC6Td3AV8XiF4j5PuTyGUbtllcFTwmpnYuS6jlcy0yq0BkMGDep5rApeMszvdPNqaE5ZCGlaX+GclVh7JJJZ6vihynbU3K2192ZllEKWI7gcxaCH6BKXP01wDbRHBUptDVKLak3IIZeuAMHxpCllylutCB1N5ORAr9hsbgLijxWAqeiH2oYfLK4LSt1y4HKZc72Ksx2hsPDDhFNIZUJUebv+Ra/7Jtr6V2d64jg/QGKzcZ5hjqpAqT3FOhutijvL12AyIbTt87kH1pPJP3k+x+IeHZTweQiv/bmhFa1xuAImG2v3k6T6R2k/n++P86349s6z1Sum9ZkZ7
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(5660300002)(54906003)(4744005)(6916009)(186003)(66476007)(66556008)(26005)(508600001)(8676002)(38100700002)(2616005)(6486002)(956004)(83380400001)(4326008)(53546011)(2906002)(86362001)(31696002)(36756003)(66946007)(31686004)(316002)(16576012)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UExvUHpJdnczTFBhcEsyOHpDOFdMY1Y5QXdRMTU0NGRRbVZtNHRhcmVvTmZ4?=
- =?utf-8?B?NUVUbmtRaVdjemlGUTFRcWhaWGN2dzEvNXVOWDhJQVNhSExCcUNBbGsvSzhw?=
- =?utf-8?B?Um82U0VFM2lMb081K0RmcHJGalVoUTRvNUQwb1hCbDhmcWV6VklhVWhET1Np?=
- =?utf-8?B?YkZOWVZQQi94TXZxd0NwZ2lnM2VzaHUwT1ZiZVFPL25TSkRpSXJjNEZDUTdD?=
- =?utf-8?B?RFA2SzBiN1pMY1ZIRC9GcFI4cXpvSzBaL210R0x3bmorQ0docmd2WmxKNFZh?=
- =?utf-8?B?ZDBRS3BiaFYrTVd3WmljK01JcjNaOGVjQWY2azg2Zk1yU3BabVVyclVUN1Ja?=
- =?utf-8?B?aUVjR0ZydE4zblhsN0ZCYTZ4ZFpqdElGeHJIZzJrTHJNTGFTdXJVbk9wTU10?=
- =?utf-8?B?ZmRtTksxbTk2RjBjUVRoNmRVNkoyUnpHcm5xVWwrZDBXVkgxam9JOUMrRG0y?=
- =?utf-8?B?RnVFcE93K2thbHI0Nm9wMkdaZ253UDJDSzdHaE9hbWh1VkpjT2ZWVDYxNjd3?=
- =?utf-8?B?RFphd3UxOGVZSjRHSzNTUHI1WUhKMDZvRFZ3VHpKZTBycWg4cDRBejJRb3VP?=
- =?utf-8?B?OG5KT1BINUtYTzdrOVRpdDB5WXR0cFVjR1ZYM3U5R3IzZ3dnSHhoVkdoR01o?=
- =?utf-8?B?ViszaWd2VkFLRmJSMlp3OTFxajhaWWxpL25PdTIwaDJyZTVIZFhaYUZoa29N?=
- =?utf-8?B?b2JSRlZ5cTZ1aHM5dHJCYjdLblhEUWV1RVBIbllMbGtSVi9sYVhjUE9qai9z?=
- =?utf-8?B?a010dzBEa25GVHp5N04zOUlrc0ZwTmFTSzNWbDN1UEtYTitmUWx4aTF6ckR0?=
- =?utf-8?B?V1JNRFlibitSQVI3MkFqNHhUVTh1bXZYUDkwNGZrUUpMM1NKSW9BaHNFWEJJ?=
- =?utf-8?B?UkFGTzBFSlRSbmlrTlJTUXZFTm9pVmdDK1FnQzBBc2N1OUdQS25EQkI2VCtn?=
- =?utf-8?B?bERqN2JRMmF5eVNTWkdvRnl4c1JmZjhBWDJPQTlnbk9EUWpiK2lZTUlDUjZR?=
- =?utf-8?B?aUVYNHhqWllXQlBkZHlMdE9OeXg0dCszdFNQR082anFwQXM4ZVg4MWlrdmwz?=
- =?utf-8?B?bllscGtXcmFJTS9aRlROckF0ZlI3ZGdxbzRTQzNRUkVvbGhCWWZqZjdDNGFZ?=
- =?utf-8?B?NWVzYk90WHZwdDFMWFVEZngrYXZEZEFWaElRR3JEbkV5dEZLNmVYbHJkbE5D?=
- =?utf-8?B?VTFmSU44NnlTNm1LdnNHU0l5UGxPRm0wUFpxcHlhWHVFbmh4VVR5VmJoL3dC?=
- =?utf-8?B?NTVER1FEbVk5RTFvR1hCdVVoSmhCd3FDMjFZWUk4R05oTHh0eS84NkpLYXN1?=
- =?utf-8?B?N0VwTzREQXllR2J5NU1sK04zcUwxK1I5ZGN0ZzFmSU9aVnpXS3A5YzJmbUJP?=
- =?utf-8?B?SkpzTk5xSWlOeXBTdVJsalhjOVZ1YjVtbkVMUjU1Wm11a2dqSnV2UEg2QVlv?=
- =?utf-8?B?S3NOdmF5TE0wTEppTlg5MEs4QkJ1TE9rb01xRFd4N0kxY2xnZndIS1JwZmlK?=
- =?utf-8?B?TW8zeDFPOTBhL1oyVk1zZzA0cmdwemttZ25tYmk5WENvMUJZdzRDaFpieTYw?=
- =?utf-8?B?V25rSEcza3ViZHQ4bk1DcDNwYmxiYlZSYVlibHZmc2lRUzFZRk5YeXJoMklm?=
- =?utf-8?B?bk9URFREc25FSWxqeDFlTVhnekpCZDZMSTBlZ3BUM0xlK3JsSkFvNnV2azg3?=
- =?utf-8?B?aCt1QnZIMGdwaG04VFBwRmU3MkVZKzI3bHVpVkMwWCtRbTB1VXNVWmxpalRN?=
- =?utf-8?B?VWlUV3NzTCtHditrdVBONThIbHB1ZWc2cmJ4RHF0RjNqS0lkd0R3QlQ0Mzg3?=
- =?utf-8?B?VXVkbHpUYi9uempCelF2UnVSN1pWdFFrYmdzdFlPajZHbUVFZmdsTS90MEFE?=
- =?utf-8?B?S0M3QmhMVExCK0ZPei90MXFyZGp1RGtlU3Z5SHBsVFBJSmNUNThVSUFpcWpV?=
- =?utf-8?B?MmZNbWFJZFgxWURXbFpzUUxOanFQS0IzcjQ2RDNmeU1tRUhXenNQQWRXZXFt?=
- =?utf-8?B?NlNocysycGxlVW84dmhidFFSTmtyTjQ0U3ZwVXozSjNqUWNOc0pRWVpzR0tj?=
- =?utf-8?B?OFJVUkhCQzVCcEhMTTY2VkwxbTk4b1kxaUs2cHhHUWhnUmtZU2ZEejJCajBt?=
- =?utf-8?B?UFFqd2tUTHA1SDJZaFFZR0NOSWZtNWVIZHpDUmJsM2J6YnU2S1RFNFVpS3pE?=
- =?utf-8?Q?JN8EoFbTjs7aC/6EM3N1Qd0=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 59cf16ec-8aaa-41af-8033-08d99d728603
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2021 20:02:25.2104
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m49tgOqkts7hfIy2Y5Cyvi/Fm7EfrETeGTKZJWf/sx946dy2cIn1ZG/Cupbns1kT7t8pYq52knHKbBgNMKtTcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5344
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/1/21 2:18 PM, Peter Gonda wrote:
-> On Mon, Nov 1, 2021 at 12:41 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->> On 11/1/21 12:21 PM, Peter Gonda wrote:
 
-...
 
->>> +
->>> +     fp = filp_open(init_ex_path, O_RDONLY, 0);
->>> +     if (IS_ERR(fp)) {
->>> +             const int ret = PTR_ERR(fp);
->>
->> I don't think you need the "const" here.
-> 
-> Sounds good, removed. I normally default to consting a variable if I
-> don't expect/want it to change. What guidance should I be following
-> here?
+On 11/1/21 9:34 AM, Leonard Crestez wrote:
+> Add a compute_sne function which finds the value of SNE for a certain
+> SEQ given an already known "recent" SNE/SEQ. This is implemented using
+> the standard tcp before/after macro and will work for SEQ values that
+> are without 2^31 of the SEQ for which we know the SNE.
 
-Heh, I don't know... I guess since its in such a short scope it just read 
-easier to me.  But, you're correct, const is appropriate here, so I guess 
-feel free to leave it in if you want.
+>  }
+> +void __tcp_authopt_update_rcv_sne(struct tcp_sock *tp, struct tcp_authopt_info *info, u32 seq);
+> +static inline void tcp_authopt_update_rcv_sne(struct tcp_sock *tp, u32 seq)
+> +{
+> +	struct tcp_authopt_info *info;
+> +
+> +	if (static_branch_unlikely(&tcp_authopt_needed)) {
+> +		rcu_read_lock();
+> +		info = rcu_dereference(tp->authopt_info);
+> +		if (info)
+> +			__tcp_authopt_update_rcv_sne(tp, info, seq);
+> +		rcu_read_unlock();
+> +	}
+> +}
+> +void __tcp_authopt_update_snd_sne(struct tcp_sock *tp, struct tcp_authopt_info *info, u32 seq);
+> +static inline void tcp_authopt_update_snd_sne(struct tcp_sock *tp, u32 seq)
+> +{
+> +	struct tcp_authopt_info *info;
+> +
+> +	if (static_branch_unlikely(&tcp_authopt_needed)) {
+> +		rcu_read_lock();
+> +		info = rcu_dereference(tp->authopt_info);
+> +		if (info)
+> +			__tcp_authopt_update_snd_sne(tp, info, seq);
+> +		rcu_read_unlock();
+> +	}
+> +}
+>
 
-> 
->>
+I would think callers of these helpers own socket lock,
+so no rcu_read_lock()/unlock() should be needed.
 
-...
+Perhaps instead
+rcu_dereference_protected(tp->authopt_info, lockdep_sock_is_held(sk)); 
 
->> "SEV: write successful to NV file\n"
-> 
-> Updated all messages. Should have noted the "SEV: .." format.
 
-It's not like we were very consistent originally, but it would be nice to 
-have the new messages start to maintain a consistency.
-
-Thanks,
-Tom
-
-> 
