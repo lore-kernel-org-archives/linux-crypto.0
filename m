@@ -2,59 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CCC7C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 17:21:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85526C43219
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 17:21:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74CEF60232
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 17:21:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E98360232
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 17:21:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229811AbhKARYJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Nov 2021 13:24:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39214 "EHLO
+        id S231721AbhKARYL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Nov 2021 13:24:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231303AbhKARYI (ORCPT
+        with ESMTP id S231665AbhKARYK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Nov 2021 13:24:08 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B50C0613B9
-        for <linux-crypto@vger.kernel.org>; Mon,  1 Nov 2021 10:21:34 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id z187-20020a6233c4000000b0047c2090f1abso9656104pfz.23
-        for <linux-crypto@vger.kernel.org>; Mon, 01 Nov 2021 10:21:34 -0700 (PDT)
+        Mon, 1 Nov 2021 13:24:10 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA158C061714
+        for <linux-crypto@vger.kernel.org>; Mon,  1 Nov 2021 10:21:36 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id y9-20020a17090a2b4900b001a41086b3e0so7984361pjc.8
+        for <linux-crypto@vger.kernel.org>; Mon, 01 Nov 2021 10:21:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=qXnwABhA26FtcwRiOkwwItakkHsn0lTvM03+FEbDB6Y=;
-        b=cNhKVmN7f088Pu5/9PtjPrttKwVpX3sYKA3eaSdHWr0g6Sk7xmlmyvAD0CQy7Bl1hp
-         FrfufZcZMY8vSmeCHx/y67KRcgj8R+WCNWKpDE8ZcbOzRsLXZqPqg+I26Mv20RmM+f27
-         3IugQqPP560OAxsV1HfKIulYRTcRZCWgdcs/GpX6H3lvO94MayP1zzzGRLv3Cj/kiM9e
-         +phgfDQ+Up0A0ezw9qchJDS60DpudrPSN997Va6tb2h12NHECPDH+2lzduoepwusD02u
-         6mMQuGgJaVxP9rssRmb101hzjdJcVs3FCKrx/8bVGTz1+60ZhrWXt9d9EJRpdZXEVnx4
-         XUoQ==
+        bh=eKW1MHsHQDoXENEgPhRYyUnBRHGSJfmJzWx+eKoMHHI=;
+        b=mbTPTmCqWZ7agTm+pbsSTSzqn6BGOP9/WqBIhceK+w4I0w8YzrPHxWZxrccLQyDE+7
+         13kUZA0UmRR13yb9mGPKk5cLudHd7D12K9P3KNxCYKePe++ylU/Y6RNhO0iKcmEj96mn
+         48AEYjtt+MZT9rrNbHq4UBEf3WD48PhkWhFAqUg8I+XtQyOpSjkX2BzJzGzBYA32/sML
+         sQpatz8kVfPxoHsln/Z6uEv3q61UtiXhNNzddEVP0SYjcA18J/PW70S2MSGFwFOtdpgj
+         iMnlCHt/hqE+2BOj6HU5Lk6jSPOtCMa3Jid07CK/yjeyS2snAEqxTvqQGyoGP97Mygmv
+         7J2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=qXnwABhA26FtcwRiOkwwItakkHsn0lTvM03+FEbDB6Y=;
-        b=xOEp75Am9RGaaA/4k4xn/OZJNpoxeJ7O+4pZmQ6JrQm9KIz7v1yOW9TTR44S/gm2x0
-         a1TuBJZjcvpUrZPVFfX6i99youcibToO5kri8EKybjQqLegxiwXqrR8VQMtBUDaklu2I
-         LQW+nwHvJWvxCgUq9l7MHfX31DiArzu7U7RCOd9rk5kssJXZ1QlqOStxe7jnG9vfPLjo
-         hW/3sWI2xNDvQwdAN7L/P4pQv9lN+hxM0L4rN952BLDvQZvzvHN3/aouOCstkF4+Rj+l
-         9DziZeG0F52p88wbQ1sdLRJzoP0PneOJIJX9Fy1c5PT55D1fWRqsLGokQibmtkLeHNhs
-         jvOg==
-X-Gm-Message-State: AOAM530qSZOeLzAnd0JWApU3j/AZs42q9EyViN/WfaiCLrV0Ni0/+uF4
-        TV2DyXBapAf5fJWxY1l+hY2tZrzN//k=
-X-Google-Smtp-Source: ABdhPJxyqE49wKGj9/2dferzDZJUmxtvqtCDkNm6J1WmIaOTE7WyXbZfmPBVWXsaDjMxR/cjYQVF1SH4DA8=
+        bh=eKW1MHsHQDoXENEgPhRYyUnBRHGSJfmJzWx+eKoMHHI=;
+        b=RRQP7yxW6uD0QIkZdTqL/ZFmisC56laO7xRLPB83ZXxmmpBbKR+bYx9XhkO3mOji5t
+         WrJPO4tYkmk6tIWDlhUBEAeuhAbnGOmq2icDznMTddXUMVsqEHdJQ2DdxSLycG5KzoNx
+         glTdjtj0V1ZxuxEZVes8yNiJzohQ0uytGvWVuelp6eEbv3L5yleRmcZBEoHwVw9YrLqb
+         px8uoHdzsWlJqyGf2u3RFFQ6l0xL15egMn72UzoWie6ujmcX377haz5qWLKO/dMTPzFj
+         sHI5nxebnMQjKIcu1RXhw0Z9fBmJCS4Uv68yxISiSfY777w70cU3HfHTTHtxYroRbQWe
+         qetw==
+X-Gm-Message-State: AOAM532qrrlfINS2EZs5kLTP74BKegW5helYIEcDB3WlsAtDwldD98Db
+        kvsHopGuevryjIgQTIQnIcmEh3eh1NQ=
+X-Google-Smtp-Source: ABdhPJyvfEQVQhP2DYhkvJlM6Tz1Q3bBGVLsgE1iCbf9E32mJIkhTkC2sg3uK68QRIIvV3G+eRKMUV1zIYo=
 X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:98c4:afe5:ed9f:d0db])
- (user=pgonda job=sendgmr) by 2002:a17:90a:974a:: with SMTP id
- i10mr250581pjw.117.1635787294348; Mon, 01 Nov 2021 10:21:34 -0700 (PDT)
-Date:   Mon,  1 Nov 2021 10:21:25 -0700
+ (user=pgonda job=sendgmr) by 2002:a17:902:d395:b0:141:a913:1920 with SMTP id
+ e21-20020a170902d39500b00141a9131920mr20874752pld.81.1635787296342; Mon, 01
+ Nov 2021 10:21:36 -0700 (PDT)
+Date:   Mon,  1 Nov 2021 10:21:26 -0700
 In-Reply-To: <20211101172127.3060453-1-pgonda@google.com>
-Message-Id: <20211101172127.3060453-3-pgonda@google.com>
+Message-Id: <20211101172127.3060453-4-pgonda@google.com>
 Mime-Version: 1.0
 References: <20211101172127.3060453-1-pgonda@google.com>
 X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [PATCH V2 2/4] crypto: ccp - Move SEV_INIT retry for corrupted data
+Subject: [PATCH V2 3/4] crypto: ccp - Refactor out sev_fw_alloc()
 From:   Peter Gonda <pgonda@google.com>
 To:     thomas.lendacky@amd.com
 Cc:     Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
@@ -71,16 +72,14 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This change moves the data corrupted retry of SEV_INIT into the
-__sev_platform_init_locked() function. This is for upcoming INIT_EX
-support as well as helping direct callers of
-__sev_platform_init_locked() which currently do not support the
-retry.
+Creates a helper function sev_fw_alloc() which can be used to allocate
+aligned memory regions for use by the PSP firmware. Currently only used
+for the SEV-ES TMR region but will be used for the SEV_INIT_EX NV memory
+region.
 
 Signed-off-by: Peter Gonda <pgonda@google.com>
 Reviewed-by: Marc Orr <marcorr@google.com>
 Acked-by: David Rientjes <rientjes@google.com>
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: Brijesh Singh <brijesh.singh@amd.com>
 Cc: Marc Orr <marcorr@google.com>
@@ -93,51 +92,56 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/ccp/sev-dev.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index ec89a82ba267..e4bc833949a0 100644
+index e4bc833949a0..00ca74dd7b3c 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -267,6 +267,18 @@ static int __sev_platform_init_locked(int *error)
- 	}
+@@ -141,6 +141,17 @@ static int sev_cmd_buffer_len(int cmd)
+ 	return 0;
+ }
  
- 	rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
-+	if (rc && *error == SEV_RET_SECURE_DATA_INVALID) {
-+		/*
-+		 * INIT command returned an integrity check failure
-+		 * status code, meaning that firmware load and
-+		 * validation of SEV related persistent data has
-+		 * failed and persistent state has been erased.
-+		 * Retrying INIT command here should succeed.
-+		 */
-+		dev_dbg(sev->dev, "SEV: retrying INIT command");
-+		rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
-+	}
++static void *sev_fw_alloc(unsigned long len)
++{
++	struct page *page;
 +
- 	if (rc)
- 		return rc;
++	page = alloc_pages(GFP_KERNEL, get_order(len));
++	if (!page)
++		return NULL;
++
++	return page_address(page);
++}
++
+ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ {
+ 	struct psp_device *psp = psp_master;
+@@ -1076,7 +1087,6 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
+ void sev_pci_init(void)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+-	struct page *tmr_page;
+ 	int error = 0, rc;
  
-@@ -1091,18 +1103,6 @@ void sev_pci_init(void)
+ 	if (!sev)
+@@ -1092,14 +1102,10 @@ void sev_pci_init(void)
+ 		sev_get_api_version();
+ 
+ 	/* Obtain the TMR memory area for SEV-ES use */
+-	tmr_page = alloc_pages(GFP_KERNEL, get_order(SEV_ES_TMR_SIZE));
+-	if (tmr_page) {
+-		sev_es_tmr = page_address(tmr_page);
+-	} else {
+-		sev_es_tmr = NULL;
++	sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
++	if (!sev_es_tmr)
+ 		dev_warn(sev->dev,
+ 			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+-	}
  
  	/* Initialize the platform */
  	rc = sev_platform_init(&error);
--	if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
--		/*
--		 * INIT command returned an integrity check failure
--		 * status code, meaning that firmware load and
--		 * validation of SEV related persistent data has
--		 * failed and persistent state has been erased.
--		 * Retrying INIT command here should succeed.
--		 */
--		dev_dbg(sev->dev, "SEV: retrying INIT command");
--		rc = sev_platform_init(&error);
--	}
--
- 	if (rc) {
- 		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
- 			error, rc);
 -- 
 2.33.1.1089.g2158813163f-goog
 
