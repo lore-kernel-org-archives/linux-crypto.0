@@ -2,55 +2,55 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B908C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 16:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C305EC43217
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 16:36:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7940D61181
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 16:36:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADA9A610FD
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Nov 2021 16:36:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233020AbhKAQjE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Nov 2021 12:39:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57166 "EHLO
+        id S233282AbhKAQjM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Nov 2021 12:39:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233022AbhKAQic (ORCPT
+        with ESMTP id S232775AbhKAQiN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Nov 2021 12:38:32 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5882AC061225;
-        Mon,  1 Nov 2021 09:35:57 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id h7so66902302ede.8;
-        Mon, 01 Nov 2021 09:35:57 -0700 (PDT)
+        Mon, 1 Nov 2021 12:38:13 -0400
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4BFAC061714;
+        Mon,  1 Nov 2021 09:35:39 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id w15so66412613edc.9;
+        Mon, 01 Nov 2021 09:35:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=AcSwc7oHIkdrK0mNNZoUV9SSIjvS3jz31Nb9dXuSJj8=;
-        b=Zlp+eUcPUgyzfGk/bgenduW9vbx/OoBys/bq7aB3I24S4z8+ymJGN/RfF+5/ovBu1t
-         i76obCG84HN2OrJnA+plk8tBx25XQ4uuzeEFGTPi3pGTjDcQgIxljca/iS0UDp4T2bni
-         VIq2U3Y5bww+VPoQksnAa+VXdKsWvyfwbHY1Bg8GO+ImACflIeqQ+JAzPtsyH71vSSh6
-         HpkxP06/7WrBxwr1AHTwx9h8AO2f1IP3mYA9b9G0qedNrTTbMdKJV//nkeXfL6x5SFQS
-         ntV9GS/Mxcq9qokbRL7XWPnrFa3IDDFzFBnaJ/POys8nyhLaaJPQu1C1CUvIWVBYLg0a
-         UoXw==
+        bh=6XjFwTZJAXBS5ig6cJtvUyJCDN7+Qz6UkUJ2uO4/Ktc=;
+        b=mQAHa9q2BVVuhWSh7J9ud3rXccRlUIm6dVcftCbK+fnnCOYJn3YEPdbJP7vkUOXWE3
+         PPk0EZ3u8iday/wRKju2/nWIInKHo08NE+khYut3l54Qz5jqeP/Y70dXz923EIbwpd8b
+         m8J5iWzWKE9TfoCe13ju45PA8aru7C+KbqhNP6l4cYerXg9+XKn2s+B2+bb2dZYVCjet
+         AiEADa8KcjHTCIoTOgKv9GCCWuizQiVT9MNFFa7LG92Eb7pKuYpD36GyF8k9WUOh6wiI
+         t7sKGBUmfvhcESEfxlPl7eV8MO0QwxZa28LORIBqEEYr/QlICUo0CWt7QnflY6JIXu5u
+         eWiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=AcSwc7oHIkdrK0mNNZoUV9SSIjvS3jz31Nb9dXuSJj8=;
-        b=AxjMI49XUDrmEtvnVz+2zrEOwVgStDQ1RxQZ7TGGQAtNviPg2CPqXo+jXLx1YacPM4
-         ksu68upTeDccTrI651mIZfZJGUj0dQmcyOfxI10347H7fE1iQL5BDWc0RDqHD9HR1bLi
-         RwPmCi+OPlDx5NavD+ho+cV8m1SN54oioE7gkbJ4unHtrf3HCJpKR3UDZlFkZC2ZKEF5
-         b5TbFHCTnHRND25lU78/rbWvuFhwwtwIEPOSlH5HHrYhQ8cd2LqF3cKT1jmNv+NSj943
-         txaWk4XJpCNQ9X6kVzAqH9gcXTOMq9Ts/TkwTCrb/Mlb07zEh1A9moOBZbeIjIqg/jkz
-         jNRw==
-X-Gm-Message-State: AOAM5310geDtwTdsv2SbpNRF9g7HtDYTOGVnwcv25aylsoc3mGO4oEOq
-        AnfN6gSFqFLBgN+2wKmpoRw=
-X-Google-Smtp-Source: ABdhPJwpw/eG/vRARhMYqUd7+/Avm6qsn1lrydLepyBK/q0v9aCjSLdOCXYyOJbHSQagNHlZYthtYA==
-X-Received: by 2002:a17:906:1382:: with SMTP id f2mr38593911ejc.144.1635784555647;
-        Mon, 01 Nov 2021 09:35:55 -0700 (PDT)
+        bh=6XjFwTZJAXBS5ig6cJtvUyJCDN7+Qz6UkUJ2uO4/Ktc=;
+        b=JzORaYfEw+NH4OXfLCV3xgUbJNpZ1d/iHSkch2Xe5XS+/1nEU0b1/90pucKG3EtT7r
+         D1BhuVOk7TiaMm5DbWfUiICftlvoNeyb0eT4VZmXMGn6YGIdtYmIGT2+k/VSYmQIMTnq
+         tL4Z5hLOMylSHwtUVO0vi2NRGD5TbiK+V6cxZnsyNjDASK7X+Gz3L1W+9dn9OFc9RSKH
+         aajBhYJjqXGjN3TLLRna63nPZJcM8Cy9go/nPEUM0dhthsOLos+iq4lwmS35EVmGJxaq
+         mOz9RVq9wmHJyp+MqVGacP2xcwRusW1y9dB7m3Ah3MnzLfcJXEHmhc9FQQk1zZErNDKl
+         2cwQ==
+X-Gm-Message-State: AOAM532dTERnzeIWvXGurJZH7pfKay5RT1viHl78VlEFnxicMy586YNF
+        7dUeBChziQx4p7wOryD5iSI=
+X-Google-Smtp-Source: ABdhPJwHjmEmXN3qss1kGSQ4GY4gy7khpDLdzpsGpXXWRbieZhf04tFxmL8C46Q/Udj0+E7KXGUPZw==
+X-Received: by 2002:a05:6402:158:: with SMTP id s24mr42841743edu.189.1635784538298;
+        Mon, 01 Nov 2021 09:35:38 -0700 (PDT)
 Received: from ponky.lan ([2a04:241e:501:3870:f5f:2085:7f25:17c])
-        by smtp.gmail.com with ESMTPSA id f25sm4124583edv.90.2021.11.01.09.35.54
+        by smtp.gmail.com with ESMTPSA id f25sm4124583edv.90.2021.11.01.09.35.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Nov 2021 09:35:55 -0700 (PDT)
+        Mon, 01 Nov 2021 09:35:37 -0700 (PDT)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
         Dmitry Safonov <0x7f454c46@gmail.com>,
@@ -68,9 +68,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 16/25] selftests: tcp_authopt: Add scapy-based packet signing code
-Date:   Mon,  1 Nov 2021 18:34:51 +0200
-Message-Id: <5c08d262949c7aa9690f23f2f6ce6c380dbe5bcc.1635784253.git.cdleonard@gmail.com>
+Subject: [PATCH v2 06/25] tcp: authopt: Compute packet signatures
+Date:   Mon,  1 Nov 2021 18:34:41 +0200
+Message-Id: <5245f35901015acc6a41d1da92deb96f3e593b7c.1635784253.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1635784253.git.cdleonard@gmail.com>
 References: <cover.1635784253.git.cdleonard@gmail.com>
@@ -80,954 +80,549 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Tools like tcpdump and wireshark can parse the TCP Authentication Option
-but there is not yet support to verify correct signatures.
+Computing tcp authopt packet signatures is a two step process:
 
-This patch implements TCP-AO signature verification using scapy and the
-python cryptography package.
+* traffic key is computed based on tcp 4-tuple, initial sequence numbers
+and the secret key.
+* packet mac is computed based on traffic key and content of individual
+packets.
 
-The python code is verified itself with a subset of IETF test vectors
-from this page:
-https://datatracker.ietf.org/doc/html/draft-touch-tcpm-ao-test-vectors-02
+The traffic key could be cached for established sockets but it is not.
 
-The code in this commit is not specific to linux
+A single code path exists for ipv4/ipv6 and input/output. This keeps the
+code short but slightly slower due to lots of conditionals.
+
+On output we read remote IP address from socket members on output, we
+can't use skb network header because it's computed after TCP options.
+
+On input we read remote IP address from skb network headers, we can't
+use socket binding members because those are not available for SYN.
 
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- .../tcp_authopt_test/scapy_tcp_authopt.py     | 220 +++++++++++
- .../tcp_authopt_test/scapy_utils.py           | 177 +++++++++
- .../tcp_authopt_test/test_vectors.py          | 365 ++++++++++++++++++
- .../tcp_authopt/tcp_authopt_test/validator.py | 138 +++++++
- 4 files changed, 900 insertions(+)
- create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_tcp_authopt.py
- create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_utils.py
- create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_vectors.py
- create mode 100644 tools/testing/selftests/tcp_authopt/tcp_authopt_test/validator.py
+ net/ipv4/tcp_authopt.c | 510 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 510 insertions(+)
 
-diff --git a/tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_tcp_authopt.py b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_tcp_authopt.py
-new file mode 100644
-index 000000000000..ce36321b803a
---- /dev/null
-+++ b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_tcp_authopt.py
-@@ -0,0 +1,220 @@
-+# SPDX-License-Identifier: GPL-2.0
-+"""Packet-processing utilities implementing RFC5925 and RFC2926"""
-+
-+import hmac
-+import logging
-+import struct
-+
-+from scapy.layers.inet import TCP
-+from scapy.packet import Packet
-+
-+from .scapy_utils import (
-+    TCPOPT_AUTHOPT,
-+    IPvXAddress,
-+    get_packet_ipvx_dst,
-+    get_packet_ipvx_src,
-+    get_tcp_doff,
-+    get_tcp_pseudoheader,
-+)
-+
-+logger = logging.getLogger(__name__)
-+
-+
-+def _cmac_aes_digest(key: bytes, msg: bytes) -> bytes:
-+    from cryptography.hazmat.backends import default_backend
-+    from cryptography.hazmat.primitives import cmac
-+    from cryptography.hazmat.primitives.ciphers import algorithms
-+
-+    backend = default_backend()
-+    c = cmac.CMAC(algorithms.AES(key), backend=backend)
-+    c.update(bytes(msg))
-+    return c.finalize()
-+
-+
-+class TcpAuthOptAlg:
-+    @classmethod
-+    def kdf(cls, master_key: bytes, context: bytes) -> bytes:
-+        raise NotImplementedError()
-+
-+    @classmethod
-+    def mac(cls, traffic_key: bytes, message: bytes) -> bytes:
-+        raise NotImplementedError()
-+
-+    maclen = -1
-+
-+
-+class TcpAuthOptAlg_HMAC_SHA1(TcpAuthOptAlg):
-+    @classmethod
-+    def kdf(cls, master_key: bytes, context: bytes) -> bytes:
-+        input = b"\x01" + b"TCP-AO" + context + b"\x00\xa0"
-+        return hmac.digest(master_key, input, "SHA1")
-+
-+    @classmethod
-+    def mac(cls, traffic_key: bytes, message: bytes) -> bytes:
-+        return hmac.digest(traffic_key, message, "SHA1")[:12]
-+
-+    maclen = 12
-+
-+
-+class TcpAuthOptAlg_CMAC_AES(TcpAuthOptAlg):
-+    @classmethod
-+    def kdf(self, master_key: bytes, context: bytes) -> bytes:
-+        if len(master_key) == 16:
-+            key = master_key
-+        else:
-+            key = _cmac_aes_digest(b"\x00" * 16, master_key)
-+        return _cmac_aes_digest(key, b"\x01" + b"TCP-AO" + context + b"\x00\x80")
-+
-+    @classmethod
-+    def mac(self, traffic_key: bytes, message: bytes) -> bytes:
-+        return _cmac_aes_digest(traffic_key, message)[:12]
-+
-+    maclen = 12
-+
-+
-+def get_alg(name: str) -> TcpAuthOptAlg:
-+    if name.upper() == "HMAC-SHA-1-96":
-+        return TcpAuthOptAlg_HMAC_SHA1()
-+    elif name.upper() == "AES-128-CMAC-96":
-+        return TcpAuthOptAlg_CMAC_AES()
-+    else:
-+        raise ValueError(f"Bad TCP AuthOpt algorithms {name}")
-+
-+
-+def build_context(
-+    saddr: IPvXAddress, daddr: IPvXAddress, sport, dport, src_isn, dst_isn
-+) -> bytes:
-+    """Build context bytes as specified by RFC5925 section 5.2"""
-+    return (
-+        saddr.packed
-+        + daddr.packed
-+        + struct.pack(
-+            "!HHII",
-+            sport,
-+            dport,
-+            src_isn,
-+            dst_isn,
-+        )
-+    )
-+
-+
-+def build_context_from_packet(p: Packet, src_isn: int, dst_isn: int) -> bytes:
-+    """Build context based on a scapy Packet and src/dst initial-sequence numbers"""
-+    return build_context(
-+        get_packet_ipvx_src(p),
-+        get_packet_ipvx_dst(p),
-+        p[TCP].sport,
-+        p[TCP].dport,
-+        src_isn,
-+        dst_isn,
-+    )
-+
-+
-+def build_message_from_packet(p: Packet, include_options=True, sne=0) -> bytearray:
-+    """Build message bytes as described by RFC5925 section 5.1"""
-+    result = bytearray()
-+    result += struct.pack("!I", sne)
-+    th = p[TCP]
-+
-+    # ip pseudo-header:
-+    result += get_tcp_pseudoheader(th)
-+
-+    # tcp header with checksum set to zero
-+    th_bytes = bytes(p[TCP])
-+    result += th_bytes[:16]
-+    result += b"\x00\x00"
-+    result += th_bytes[18:20]
-+
-+    # Even if include_options=False the TCP-AO option itself is still included
-+    # with the MAC set to all-zeros. This means we need to parse TCP options.
-+    pos = 20
-+    tcphdr_optend = get_tcp_doff(th) * 4
-+    # logger.info("th_bytes: %s", th_bytes.hex(' '))
-+    assert len(th_bytes) >= tcphdr_optend
-+    while pos < tcphdr_optend:
-+        optnum = th_bytes[pos]
-+        pos += 1
-+        if optnum == 0 or optnum == 1:
-+            if include_options:
-+                result += bytes([optnum])
-+            continue
-+
-+        optlen = th_bytes[pos]
-+        pos += 1
-+        if pos + optlen - 2 > tcphdr_optend:
-+            logger.info(
-+                "bad tcp option %d optlen %d beyond end-of-header", optnum, optlen
-+            )
-+            break
-+        if optlen < 2:
-+            logger.info("bad tcp option %d optlen %d less than two", optnum, optlen)
-+            break
-+        if optnum == TCPOPT_AUTHOPT:
-+            if optlen < 4:
-+                logger.info("bad tcp option %d optlen %d", optnum, optlen)
-+                break
-+            result += bytes([optnum, optlen])
-+            result += th_bytes[pos : pos + 2]
-+            result += (optlen - 4) * b"\x00"
-+        elif include_options:
-+            result += bytes([optnum, optlen])
-+            result += th_bytes[pos : pos + optlen - 2]
-+        pos += optlen - 2
-+    result += bytes(p[TCP].payload)
-+    return result
-+
-+
-+def check_tcp_authopt_signature(
-+    p: Packet, alg: TcpAuthOptAlg, master_key, sisn, disn, include_options=True, sne=0
-+):
-+    from .scapy_utils import scapy_tcp_get_authopt_val
-+
-+    ao = scapy_tcp_get_authopt_val(p[TCP])
-+    if ao is None:
-+        return None
-+
-+    context_bytes = build_context_from_packet(p, sisn, disn)
-+    traffic_key = alg.kdf(master_key, context_bytes)
-+    message_bytes = build_message_from_packet(
-+        p, include_options=include_options, sne=sne
-+    )
-+    mac = alg.mac(traffic_key, message_bytes)
-+    return mac == ao.mac
-+
-+
-+def add_tcp_authopt_signature(
-+    p: Packet,
-+    alg: TcpAuthOptAlg,
-+    master_key,
-+    sisn,
-+    disn,
-+    keyid=0,
-+    rnextkeyid=0,
-+    include_options=True,
-+    sne=0,
-+):
-+    """Sign a packet"""
-+    th = p[TCP]
-+    keyids = struct.pack("BB", keyid, rnextkeyid)
-+    th.options = th.options + [(TCPOPT_AUTHOPT, keyids + alg.maclen * b"\x00")]
-+
-+    context_bytes = build_context_from_packet(p, sisn, disn)
-+    traffic_key = alg.kdf(master_key, context_bytes)
-+    message_bytes = build_message_from_packet(
-+        p, include_options=include_options, sne=sne
-+    )
-+    mac = alg.mac(traffic_key, message_bytes)
-+    th.options[-1] = (TCPOPT_AUTHOPT, keyids + mac)
-+
-+
-+def break_tcp_authopt_signature(packet: Packet):
-+    """Invalidate TCP-AO signature inside a packet
-+
-+    The packet must already be signed and it gets modified in-place.
-+    """
-+    opt = packet[TCP].options[-1]
-+    if opt[0] != TCPOPT_AUTHOPT:
-+        raise ValueError("TCP option list must end with TCP_AUTHOPT")
-+    opt_mac = bytearray(opt[1])
-+    opt_mac[-1] ^= 0xFF
-+    packet[TCP].options[-1] = (opt[0], bytes(opt_mac))
-diff --git a/tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_utils.py b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_utils.py
-new file mode 100644
-index 000000000000..03c843b8378e
---- /dev/null
-+++ b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/scapy_utils.py
-@@ -0,0 +1,177 @@
-+# SPDX-License-Identifier: GPL-2.0
-+import socket
-+import struct
-+import threading
-+import typing
-+from dataclasses import dataclass
-+from ipaddress import IPv4Address, IPv6Address
-+
-+from scapy.config import conf as scapy_conf
-+from scapy.layers.inet import IP, TCP
-+from scapy.layers.inet6 import IPv6
-+from scapy.packet import Packet
-+from scapy.sendrecv import AsyncSniffer
-+
-+from .utils import netns_context
-+
-+# TCPOPT numbers are apparently not available in scapy
-+TCPOPT_MD5SIG = 19
-+TCPOPT_AUTHOPT = 29
-+
-+# Easy generic handling of IPv4/IPv6Address
-+IPvXAddress = typing.Union[IPv4Address, IPv6Address]
-+
-+
-+def get_packet_ipvx_src(p: Packet) -> IPvXAddress:
-+    if IP in p:
-+        return IPv4Address(p[IP].src)
-+    elif IPv6 in p:
-+        return IPv6Address(p[IPv6].src)
-+    else:
-+        raise Exception("Neither IP nor IPv6 found on packet")
-+
-+
-+def get_packet_ipvx_dst(p: Packet) -> IPvXAddress:
-+    if IP in p:
-+        return IPv4Address(p[IP].dst)
-+    elif IPv6 in p:
-+        return IPv6Address(p[IPv6].dst)
-+    else:
-+        raise Exception("Neither IP nor IPv6 found on packet")
-+
-+
-+def get_tcp_doff(th: TCP):
-+    """Get the TCP data offset, even if packet is not yet built"""
-+    doff = th.dataofs
-+    if doff is None:
-+        opt_len = len(th.get_field("options").i2m(th, th.options))
-+        doff = 5 + ((opt_len + 3) // 4)
-+    return doff
-+
-+
-+def get_tcp_v4_pseudoheader(tcp_packet: TCP) -> bytes:
-+    iph = tcp_packet.underlayer
-+    return struct.pack(
-+        "!4s4sHH",
-+        IPv4Address(iph.src).packed,
-+        IPv4Address(iph.dst).packed,
-+        socket.IPPROTO_TCP,
-+        get_tcp_doff(tcp_packet) * 4 + len(tcp_packet.payload),
-+    )
-+
-+
-+def get_tcp_v6_pseudoheader(tcp_packet: TCP) -> bytes:
-+    ipv6 = tcp_packet.underlayer
-+    return struct.pack(
-+        "!16s16sII",
-+        IPv6Address(ipv6.src).packed,
-+        IPv6Address(ipv6.dst).packed,
-+        get_tcp_doff(tcp_packet) * 4 + len(tcp_packet.payload),
-+        socket.IPPROTO_TCP,
-+    )
-+
-+
-+def get_tcp_pseudoheader(tcp_packet: TCP):
-+    if isinstance(tcp_packet.underlayer, IP):
-+        return get_tcp_v4_pseudoheader(tcp_packet)
-+    if isinstance(tcp_packet.underlayer, IPv6):
-+        return get_tcp_v6_pseudoheader(tcp_packet)
-+    raise ValueError("TCP underlayer is neither IP nor IPv6")
-+
-+
-+def tcp_seq_wrap(seq):
-+    return seq & 0xFFFFFFFF
-+
-+
-+@dataclass
-+class tcphdr_authopt:
-+    """Representation of a TCP auth option as it appears in a TCP packet"""
-+
-+    keyid: int
-+    rnextkeyid: int
-+    mac: bytes
-+
-+    @classmethod
-+    def unpack(cls, buf) -> "tcphdr_authopt":
-+        return cls(buf[0], buf[1], buf[2:])
-+
-+    def __repr__(self):
-+        return f"tcphdr_authopt({self.keyid}, {self.rnextkeyid}, bytes.fromhex({self.mac.hex(' ')!r})"
-+
-+
-+def scapy_tcp_get_authopt_val(tcp) -> typing.Optional[tcphdr_authopt]:
-+    for optnum, optval in tcp.options:
-+        if optnum == TCPOPT_AUTHOPT:
-+            return tcphdr_authopt.unpack(optval)
-+    return None
-+
-+
-+def scapy_tcp_get_md5_sig(tcp) -> typing.Optional[bytes]:
-+    """Return the MD5 signature (as bytes) or None"""
-+    for optnum, optval in tcp.options:
-+        if optnum == TCPOPT_MD5SIG:
-+            return optval
-+    return None
-+
-+
-+def calc_tcp_md5_hash(p, key: bytes) -> bytes:
-+    """Calculate TCP-MD5 hash from packet and return a 16-byte string"""
-+    import hashlib
-+
-+    h = hashlib.md5()
-+    tp = p[TCP]
-+    th_bytes = bytes(p[TCP])
-+    h.update(get_tcp_pseudoheader(tp))
-+    h.update(th_bytes[:16])
-+    h.update(b"\x00\x00")
-+    h.update(th_bytes[18:20])
-+    h.update(bytes(tp.payload))
-+    h.update(key)
-+
-+    return h.digest()
-+
-+
-+def create_l2socket(ns: str = "", **kw):
-+    """Create a scapy L2socket inside a namespace"""
-+
-+    with netns_context(ns):
-+        return scapy_conf.L2socket(**kw)
-+
-+
-+def create_capture_socket(ns: str = "", **kw):
-+    """Create a scapy L2listen socket inside a namespace"""
-+    from scapy.config import conf as scapy_conf
-+
-+    with netns_context(ns):
-+        return scapy_conf.L2listen(**kw)
-+
-+
-+def scapy_sniffer_start_block(sniffer: AsyncSniffer, timeout=1):
-+    """Like AsyncSniffer.start except block until sniffing starts
-+
-+    This ensures no lost packets and no delays
-+    """
-+    if sniffer.kwargs.get("started_callback"):
-+        raise ValueError("sniffer must not already have a started_callback")
-+
-+    e = threading.Event()
-+    sniffer.kwargs["started_callback"] = e.set
-+    sniffer.start()
-+    e.wait(timeout=timeout)
-+    if not e.is_set():
-+        raise TimeoutError("Timed out waiting for sniffer to start")
-+
-+
-+def scapy_sniffer_stop(sniffer: AsyncSniffer):
-+    """Like AsyncSniffer.stop except no error is raising if not running"""
-+    if sniffer is not None and sniffer.running:
-+        sniffer.stop()
-+
-+
-+class AsyncSnifferContext(AsyncSniffer):
-+    def __enter__(self):
-+        scapy_sniffer_start_block(self)
-+        return self
-+
-+    def __exit__(self, *a):
-+        scapy_sniffer_stop(self)
-diff --git a/tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_vectors.py b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_vectors.py
-new file mode 100644
-index 000000000000..e0fcde04629c
---- /dev/null
-+++ b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/test_vectors.py
-@@ -0,0 +1,365 @@
-+# SPDX-License-Identifier: GPL-2.0
-+import logging
-+import socket
-+from ipaddress import IPv4Address, IPv6Address
-+
-+from scapy.layers.inet import IP, TCP
-+from scapy.layers.inet6 import IPv6
-+
-+from .scapy_tcp_authopt import (
-+    build_context_from_packet,
-+    build_message_from_packet,
-+    get_alg,
-+)
-+from .scapy_utils import scapy_tcp_get_authopt_val
-+
-+logger = logging.getLogger(__name__)
-+
-+
-+class TestIETFVectors:
-+    """Test python implementation of TCP-AO algorithms
-+
-+    Data is a subset of IETF test vectors:
-+    https://datatracker.ietf.org/doc/html/draft-touch-tcpm-ao-test-vectors-02
-+    """
-+
-+    master_key = b"testvector"
-+    client_keyid = 61
-+    server_keyid = 84
-+    client_ipv4 = IPv4Address("10.11.12.13")
-+    client_ipv6 = IPv6Address("FD00::1")
-+    server_ipv4 = IPv4Address("172.27.28.29")
-+    server_ipv6 = IPv6Address("FD00::2")
-+
-+    client_isn_41x = 0xFBFBAB5A
-+    server_isn_41x = 0x11C14261
-+    client_isn_42x = 0xCB0EFBEE
-+    server_isn_42x = 0xACD5B5E1
-+    client_isn_61x = 0x176A833F
-+    server_isn_61x = 0x3F51994B
-+    client_isn_62x = 0x020C1E69
-+    server_isn_62x = 0xEBA3734D
-+
-+    def check(
-+        self,
-+        packet_hex: str,
-+        traffic_key_hex: str,
-+        mac_hex: str,
-+        src_isn,
-+        dst_isn,
-+        include_options=True,
-+        alg_name="HMAC-SHA-1-96",
-+        sne=0,
-+    ):
-+        packet_bytes = bytes.fromhex(packet_hex)
-+
-+        # sanity check for ip version
-+        ipv = packet_bytes[0] >> 4
-+        if ipv == 4:
-+            p = IP(bytes.fromhex(packet_hex))
-+            assert p[IP].proto == socket.IPPROTO_TCP
-+        elif ipv == 6:
-+            p = IPv6(bytes.fromhex(packet_hex))
-+            assert p[IPv6].nh == socket.IPPROTO_TCP
-+        else:
-+            raise ValueError(f"bad ipv={ipv}")
-+
-+        # sanity check for seq/ack in SYN/ACK packets
-+        if p[TCP].flags.S and p[TCP].flags.A is False:
-+            assert p[TCP].seq == src_isn
-+            assert p[TCP].ack == 0
-+        if p[TCP].flags.S and p[TCP].flags.A:
-+            assert p[TCP].seq == src_isn
-+            assert p[TCP].ack == dst_isn + 1
-+
-+        # check traffic key
-+        alg = get_alg(alg_name)
-+        context_bytes = build_context_from_packet(p, src_isn, dst_isn)
-+        traffic_key = alg.kdf(self.master_key, context_bytes)
-+        assert traffic_key.hex(" ") == traffic_key_hex
-+
-+        # check mac
-+        message_bytes = build_message_from_packet(
-+            p, include_options=include_options, sne=sne
-+        )
-+        mac = alg.mac(traffic_key, message_bytes)
-+        assert mac.hex(" ") == mac_hex
-+
-+        # check option bytes in header
-+        opt = scapy_tcp_get_authopt_val(p[TCP])
-+        assert opt is not None
-+        assert opt.keyid in [self.client_keyid, self.server_keyid]
-+        assert opt.rnextkeyid in [self.client_keyid, self.server_keyid]
-+        assert opt.mac.hex(" ") == mac_hex
-+
-+    def test_4_1_1(self):
-+        self.check(
-+            """
-+            45 e0 00 4c dd 0f 40 00 ff 06 bf 6b 0a 0b 0c 0d
-+            ac 1b 1c 1d e9 d7 00 b3 fb fb ab 5a 00 00 00 00
-+            e0 02 ff ff ca c4 00 00 02 04 05 b4 01 03 03 08
-+            04 02 08 0a 00 15 5a b7 00 00 00 00 1d 10 3d 54
-+            2e e4 37 c6 f8 ed e6 d7 c4 d6 02 e7
-+            """,
-+            "6d 63 ef 1b 02 fe 15 09 d4 b1 40 27 07 fd 7b 04 16 ab b7 4f",
-+            "2e e4 37 c6 f8 ed e6 d7 c4 d6 02 e7",
-+            self.client_isn_41x,
-+            0,
-+        )
-+
-+    def test_4_1_2(self):
-+        self.check(
-+            """
-+            45 e0 00 4c 65 06 40 00 ff 06 37 75 ac 1b 1c 1d
-+            0a 0b 0c 0d 00 b3 e9 d7 11 c1 42 61 fb fb ab 5b
-+            e0 12 ff ff 37 76 00 00 02 04 05 b4 01 03 03 08
-+            04 02 08 0a 84 a5 0b eb 00 15 5a b7 1d 10 54 3d
-+            ee ab 0f e2 4c 30 10 81 51 16 b3 be
-+            """,
-+            "d9 e2 17 e4 83 4a 80 ca 2f 3f d8 de 2e 41 b8 e6 79 7f ea 96",
-+            "ee ab 0f e2 4c 30 10 81 51 16 b3 be",
-+            self.server_isn_41x,
-+            self.client_isn_41x,
-+        )
-+
-+    def test_4_1_3(self):
-+        self.check(
-+            """
-+            45 e0 00 87 36 a1 40 00 ff 06 65 9f 0a 0b 0c 0d
-+            ac 1b 1c 1d e9 d7 00 b3 fb fb ab 5b 11 c1 42 62
-+            c0 18 01 04 a1 62 00 00 01 01 08 0a 00 15 5a c1
-+            84 a5 0b eb 1d 10 3d 54 70 64 cf 99 8c c6 c3 15
-+            c2 c2 e2 bf ff ff ff ff ff ff ff ff ff ff ff ff
-+            ff ff ff ff 00 43 01 04 da bf 00 b4 0a 0b 0c 0d
-+            26 02 06 01 04 00 01 00 01 02 02 80 00 02 02 02
-+            00 02 02 42 00 02 06 41 04 00 00 da bf 02 08 40
-+            06 00 64 00 01 01 00
-+            """,
-+            "d2 e5 9c 65 ff c7 b1 a3 93 47 65 64 63 b7 0e dc 24 a1 3d 71",
-+            "70 64 cf 99 8c c6 c3 15 c2 c2 e2 bf",
-+            self.client_isn_41x,
-+            self.server_isn_41x,
-+        )
-+
-+    def test_4_1_4(self):
-+        self.check(
-+            """
-+            45 e0 00 87 1f a9 40 00 ff 06 7c 97 ac 1b 1c 1d
-+            0a 0b 0c 0d 00 b3 e9 d7 11 c1 42 62 fb fb ab 9e
-+            c0 18 01 00 40 0c 00 00 01 01 08 0a 84 a5 0b f5
-+            00 15 5a c1 1d 10 54 3d a6 3f 0e cb bb 2e 63 5c
-+            95 4d ea c7 ff ff ff ff ff ff ff ff ff ff ff ff
-+            ff ff ff ff 00 43 01 04 da c0 00 b4 ac 1b 1c 1d
-+            26 02 06 01 04 00 01 00 01 02 02 80 00 02 02 02
-+            00 02 02 42 00 02 06 41 04 00 00 da c0 02 08 40
-+            06 00 64 00 01 01 00
-+            """,
-+            "d9 e2 17 e4 83 4a 80 ca 2f 3f d8 de 2e 41 b8 e6 79 7f ea 96",
-+            "a6 3f 0e cb bb 2e 63 5c 95 4d ea c7",
-+            self.server_isn_41x,
-+            self.client_isn_41x,
-+        )
-+
-+    def test_4_2_1(self):
-+        self.check(
-+            """
-+            45 e0 00 4c 53 99 40 00 ff 06 48 e2 0a 0b 0c 0d
-+            ac 1b 1c 1d ff 12 00 b3 cb 0e fb ee 00 00 00 00
-+            e0 02 ff ff 54 1f 00 00 02 04 05 b4 01 03 03 08
-+            04 02 08 0a 00 02 4c ce 00 00 00 00 1d 10 3d 54
-+            80 af 3c fe b8 53 68 93 7b 8f 9e c2
-+            """,
-+            "30 ea a1 56 0c f0 be 57 da b5 c0 45 22 9f b1 0a 42 3c d7 ea",
-+            "80 af 3c fe b8 53 68 93 7b 8f 9e c2",
-+            self.client_isn_42x,
-+            0,
-+            include_options=False,
-+        )
-+
-+    def test_4_2_2(self):
-+        self.check(
-+            """
-+            45 e0 00 4c 32 84 40 00 ff 06 69 f7 ac 1b 1c 1d
-+            0a 0b 0c 0d 00 b3 ff 12 ac d5 b5 e1 cb 0e fb ef
-+            e0 12 ff ff 38 8e 00 00 02 04 05 b4 01 03 03 08
-+            04 02 08 0a 57 67 72 f3 00 02 4c ce 1d 10 54 3d
-+            09 30 6f 9a ce a6 3a 8c 68 cb 9a 70
-+            """,
-+            "b5 b2 89 6b b3 66 4e 81 76 b0 ed c6 e7 99 52 41 01 a8 30 7f",
-+            "09 30 6f 9a ce a6 3a 8c 68 cb 9a 70",
-+            self.server_isn_42x,
-+            self.client_isn_42x,
-+            include_options=False,
-+        )
-+
-+    def test_4_2_3(self):
-+        self.check(
-+            """
-+            45 e0 00 87 a8 f5 40 00 ff 06 f3 4a 0a 0b 0c 0d
-+            ac 1b 1c 1d ff 12 00 b3 cb 0e fb ef ac d5 b5 e2
-+            c0 18 01 04 6c 45 00 00 01 01 08 0a 00 02 4c ce
-+            57 67 72 f3 1d 10 3d 54 71 06 08 cc 69 6c 03 a2
-+            71 c9 3a a5 ff ff ff ff ff ff ff ff ff ff ff ff
-+            ff ff ff ff 00 43 01 04 da bf 00 b4 0a 0b 0c 0d
-+            26 02 06 01 04 00 01 00 01 02 02 80 00 02 02 02
-+            00 02 02 42 00 02 06 41 04 00 00 da bf 02 08 40
-+            06 00 64 00 01 01 00
-+            """,
-+            "f3 db 17 93 d7 91 0e cd 80 6c 34 f1 55 ea 1f 00 34 59 53 e3",
-+            "71 06 08 cc 69 6c 03 a2 71 c9 3a a5",
-+            self.client_isn_42x,
-+            self.server_isn_42x,
-+            include_options=False,
-+        )
-+
-+    def test_4_2_4(self):
-+        self.check(
-+            """
-+            45 e0 00 87 54 37 40 00 ff 06 48 09 ac 1b 1c 1d
-+            0a 0b 0c 0d 00 b3 ff 12 ac d5 b5 e2 cb 0e fc 32
-+            c0 18 01 00 46 b6 00 00 01 01 08 0a 57 67 72 f3
-+            00 02 4c ce 1d 10 54 3d 97 76 6e 48 ac 26 2d e9
-+            ae 61 b4 f9 ff ff ff ff ff ff ff ff ff ff ff ff
-+            ff ff ff ff 00 43 01 04 da c0 00 b4 ac 1b 1c 1d
-+            26 02 06 01 04 00 01 00 01 02 02 80 00 02 02 02
-+            00 02 02 42 00 02 06 41 04 00 00 da c0 02 08 40
-+            06 00 64 00 01 01 00
-+            """,
-+            "b5 b2 89 6b b3 66 4e 81 76 b0 ed c6 e7 99 52 41 01 a8 30 7f",
-+            "97 76 6e 48 ac 26 2d e9 ae 61 b4 f9",
-+            self.server_isn_42x,
-+            self.client_isn_42x,
-+            include_options=False,
-+        )
-+
-+    def test_5_1_1(self):
-+        self.check(
-+            """
-+            45 e0 00 4c 7b 9f 40 00 ff 06 20 dc 0a 0b 0c 0d
-+            ac 1b 1c 1d c4 fa 00 b3 78 7a 1d df 00 00 00 00
-+            e0 02 ff ff 5a 0f 00 00 02 04 05 b4 01 03 03 08
-+            04 02 08 0a 00 01 7e d0 00 00 00 00 1d 10 3d 54
-+            e4 77 e9 9c 80 40 76 54 98 e5 50 91
-+            """,
-+            "f5 b8 b3 d5 f3 4f db b6 eb 8d 4a b9 66 0e 60 e3",
-+            "e4 77 e9 9c 80 40 76 54 98 e5 50 91",
-+            0x787A1DDF,
-+            0,
-+            include_options=True,
-+            alg_name="AES-128-CMAC-96",
-+        )
-+
-+    def test_6_1_1(self):
-+        self.check(
-+            """
-+            6e 08 91 dc 00 38 06 40 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 01 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 02 f7 e4 00 b3 17 6a 83 3f
-+            00 00 00 00 e0 02 ff ff 47 21 00 00 02 04 05 a0
-+            01 03 03 08 04 02 08 0a 00 41 d0 87 00 00 00 00
-+            1d 10 3d 54 90 33 ec 3d 73 34 b6 4c 5e dd 03 9f
-+            """,
-+            "62 5e c0 9d 57 58 36 ed c9 b6 42 84 18 bb f0 69 89 a3 61 bb",
-+            "90 33 ec 3d 73 34 b6 4c 5e dd 03 9f",
-+            self.client_isn_61x,
-+            0,
-+            include_options=True,
-+        )
-+
-+    def test_6_1_2(self):
-+        self.check(
-+            """
-+            6e 01 00 9e 00 38 06 40 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 02 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 01 00 b3 f7 e4 3f 51 99 4b
-+            17 6a 83 40 e0 12 ff ff bf ec 00 00 02 04 05 a0
-+            01 03 03 08 04 02 08 0a bd 33 12 9b 00 41 d0 87
-+            1d 10 54 3d f1 cb a3 46 c3 52 61 63 f7 1f 1f 55
-+            """,
-+            "e4 a3 7a da 2a 0a fc a8 71 14 34 91 3f e1 38 c7 71 eb cb 4a",
-+            "f1 cb a3 46 c3 52 61 63 f7 1f 1f 55",
-+            self.server_isn_61x,
-+            self.client_isn_61x,
-+            include_options=True,
-+        )
-+
-+    def test_6_2_2(self):
-+        self.check(
-+            """
-+            6e 0a 7e 1f 00 38 06 40 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 02 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 01 00 b3 c6 cd eb a3 73 4d
-+            02 0c 1e 6a e0 12 ff ff 77 4d 00 00 02 04 05 a0
-+            01 03 03 08 04 02 08 0a 5e c9 9b 70 00 9d b9 5b
-+            1d 10 54 3d 3c 54 6b ad 97 43 f1 2d f8 b8 01 0d
-+            """,
-+            "40 51 08 94 7f 99 65 75 e7 bd bc 26 d4 02 16 a2 c7 fa 91 bd",
-+            "3c 54 6b ad 97 43 f1 2d f8 b8 01 0d",
-+            self.server_isn_62x,
-+            self.client_isn_62x,
-+            include_options=False,
-+        )
-+
-+    def test_6_2_4(self):
-+        self.check(
-+            """
-+            6e 0a 7e 1f 00 73 06 40 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 02 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 01 00 b3 c6 cd eb a3 73 4e
-+            02 0c 1e ad c0 18 01 00 71 6a 00 00 01 01 08 0a
-+            5e c9 9b 7a 00 9d b9 65 1d 10 54 3d 55 9a 81 94
-+            45 b4 fd e9 8d 9e 13 17 ff ff ff ff ff ff ff ff
-+            ff ff ff ff ff ff ff ff 00 43 01 04 fd e8 00 b4
-+            01 01 01 7a 26 02 06 01 04 00 01 00 01 02 02 80
-+            00 02 02 02 00 02 02 42 00 02 06 41 04 00 00 fd
-+            e8 02 08 40 06 00 64 00 01 01 00
-+            """,
-+            "40 51 08 94 7f 99 65 75 e7 bd bc 26 d4 02 16 a2 c7 fa 91 bd",
-+            "55 9a 81 94 45 b4 fd e9 8d 9e 13 17",
-+            self.server_isn_62x,
-+            self.client_isn_62x,
-+            include_options=False,
-+        )
-+
-+    server_isn_71x = 0xA6744ECB
-+    client_isn_71x = 0x193CCCEC
-+
-+    def test_7_1_2(self):
-+        self.check(
-+            """
-+            6e 06 15 20 00 38 06 40 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 02 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 01 00 b3 f8 5a a6 74 4e cb
-+            19 3c cc ed e0 12 ff ff ea bb 00 00 02 04 05 a0
-+            01 03 03 08 04 02 08 0a 71 da ab c8 13 e4 ab 99
-+            1d 10 54 3d dc 28 43 a8 4e 78 a6 bc fd c5 ed 80
-+            """,
-+            "cf 1b 1e 22 5e 06 a6 36 16 76 4a 06 7b 46 f4 b1",
-+            "dc 28 43 a8 4e 78 a6 bc fd c5 ed 80",
-+            self.server_isn_71x,
-+            self.client_isn_71x,
-+            alg_name="AES-128-CMAC-96",
-+            include_options=True,
-+        )
-+
-+    def test_7_1_4(self):
-+        self.check(
-+            """
-+            6e 06 15 20 00 73 06 40 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 02 fd 00 00 00 00 00 00 00
-+            00 00 00 00 00 00 00 01 00 b3 f8 5a a6 74 4e cc
-+            19 3c cd 30 c0 18 01 00 52 f4 00 00 01 01 08 0a
-+            71 da ab d3 13 e4 ab a3 1d 10 54 3d c1 06 9b 7d
-+            fd 3d 69 3a 6d f3 f2 89 ff ff ff ff ff ff ff ff
-+            ff ff ff ff ff ff ff ff 00 43 01 04 fd e8 00 b4
-+            01 01 01 7a 26 02 06 01 04 00 01 00 01 02 02 80
-+            00 02 02 02 00 02 02 42 00 02 06 41 04 00 00 fd
-+            e8 02 08 40 06 00 64 00 01 01 00
-+            """,
-+            "cf 1b 1e 22 5e 06 a6 36 16 76 4a 06 7b 46 f4 b1",
-+            "c1 06 9b 7d fd 3d 69 3a 6d f3 f2 89",
-+            self.server_isn_71x,
-+            self.client_isn_71x,
-+            alg_name="AES-128-CMAC-96",
-+            include_options=True,
-+        )
-diff --git a/tools/testing/selftests/tcp_authopt/tcp_authopt_test/validator.py b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/validator.py
-new file mode 100644
-index 000000000000..295220e3964d
---- /dev/null
-+++ b/tools/testing/selftests/tcp_authopt/tcp_authopt_test/validator.py
-@@ -0,0 +1,138 @@
-+# SPDX-License-Identifier: GPL-2.0
-+import logging
-+import typing
-+from dataclasses import dataclass
-+
-+from scapy.layers.inet import TCP
-+from scapy.packet import Packet
-+
-+from . import scapy_tcp_authopt
-+from .scapy_conntrack import TCPConnectionTracker, get_packet_tcp_connection_key
-+from .scapy_utils import scapy_tcp_get_authopt_val
-+
-+logger = logging.getLogger(__name__)
-+
-+
-+@dataclass
-+class TcpAuthValidatorKey:
-+    """Representation of a TCP Authentication Option key for the validator
-+
-+    The matching rules are independent.
-+    """
-+
-+    key: bytes
-+    alg_name: str
-+    include_options: bool = True
-+    keyid: typing.Optional[int] = None
-+    sport: typing.Optional[int] = None
-+    dport: typing.Optional[int] = None
-+
-+    def match_packet(self, p: Packet) -> bool:
-+        """Determine if this key matches a specific packet"""
-+        if not TCP in p:
-+            return False
-+        authopt = scapy_tcp_get_authopt_val(p[TCP])
-+        if authopt is None:
-+            return False
-+        if self.keyid is not None and authopt.keyid != self.keyid:
-+            return False
-+        if self.sport is not None and p[TCP].sport != self.sport:
-+            return False
-+        if self.dport is not None and p[TCP].dport != self.dport:
-+            return False
-+        return True
-+
-+    def get_alg_imp(self):
-+        return scapy_tcp_authopt.get_alg(self.alg_name)
-+
-+
-+class TcpAuthValidator:
-+    """Validate TCP Authentication Option signatures inside a capture
-+
-+    This can track multiple connections, determine their initial sequence numbers
-+    and verify their signatures independently.
-+
-+    Keys are provided as a collection of `.TcpAuthValidatorKey`
-+    """
-+
-+    keys: typing.List[TcpAuthValidatorKey]
-+    tracker: TCPConnectionTracker
-+    any_incomplete: bool = False
-+    any_unsigned: bool = False
-+    any_fail: bool = False
-+    debug_sne: bool = False
-+
-+    def __init__(self, keys=None):
-+        self.keys = keys or []
-+        self.tracker = TCPConnectionTracker()
-+        self.conn_dict = {}
-+
-+    def get_key_for_packet(self, p):
-+        for k in self.keys:
-+            if k.match_packet(p):
-+                return k
-+        return None
-+
-+    def handle_packet(self, p: Packet):
-+        if not TCP in p:
-+            return
-+        self.tracker.handle_packet(p)
-+        authopt = scapy_tcp_get_authopt_val(p[TCP])
-+        if not authopt:
-+            self.any_unsigned = True
-+            logger.debug("skip packet without tcp authopt: %r", p)
-+            return
-+        key = self.get_key_for_packet(p)
-+        if not key:
-+            self.any_unsigned = True
-+            logger.debug("skip packet not matching any known keys: %r", p)
-+            return
-+        tcp_track_key = get_packet_tcp_connection_key(p)
-+        conn = self.tracker.get(tcp_track_key)
-+
-+        if conn is None:
-+            raise ValueError(
-+                "TCPConnectionTracker.handle_packet should have initialized TCPConnectionInfo"
-+            )
-+
-+        if not conn.found_syn:
-+            logger.warning("missing SYN for packet %s", p.summary())
-+            self.any_incomplete = True
-+            return
-+        if not conn.found_synack and not p[TCP].flags.S:
-+            logger.warning("missing SYNACK for packet %s", p.summary())
-+            self.any_incomplete = True
-+            return
-+
-+        alg = key.get_alg_imp()
-+        context_bytes = scapy_tcp_authopt.build_context_from_packet(
-+            p, conn.sisn or 0, conn.disn or 0
-+        )
-+        traffic_key = alg.kdf(key.key, context_bytes)
-+        sne = conn.snd_sne.calc(p[TCP].seq, update=False)
-+        if self.debug_sne:
-+            logger.debug("sne %08x seq %08x for %s", sne, p[TCP].seq, p[TCP].summary())
-+        message_bytes = scapy_tcp_authopt.build_message_from_packet(
-+            p,
-+            include_options=key.include_options,
-+            sne=sne,
-+        )
-+        computed_mac = alg.mac(traffic_key, message_bytes)
-+        captured_mac = authopt.mac
-+        if computed_mac == captured_mac:
-+            logger.debug("ok - mac %s", computed_mac.hex())
-+        else:
-+            self.any_fail = True
-+            logger.error(
-+                "not ok - captured %s computed %s",
-+                captured_mac.hex(),
-+                computed_mac.hex(),
-+            )
-+
-+    def raise_errors(self, allow_unsigned=False, allow_incomplete=False):
-+        if self.any_fail:
-+            raise Exception("Found failed signatures")
-+        if self.any_incomplete and not allow_incomplete:
-+            raise Exception("Incomplete capture missing SYN/ACK")
-+        if self.any_unsigned and not allow_unsigned:
-+            raise Exception("Found unsigned packets")
+diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
+index 5455a9ecfe6b..1fd98d67ec10 100644
+--- a/net/ipv4/tcp_authopt.c
++++ b/net/ipv4/tcp_authopt.c
+@@ -425,5 +425,515 @@ int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
+ 	memcpy(&key_info->addr, &opt.addr, sizeof(key_info->addr));
+ 	hlist_add_head_rcu(&key_info->node, &info->head);
+ 
+ 	return 0;
+ }
++
++static int tcp_authopt_get_isn(struct sock *sk,
++			       struct sk_buff *skb,
++			       int input,
++			       __be32 *sisn,
++			       __be32 *disn)
++{
++	struct tcp_authopt_info *authopt_info;
++	struct tcphdr *th = tcp_hdr(skb);
++
++	/* special cases for SYN and SYN/ACK */
++	if (th->syn && !th->ack) {
++		*sisn = th->seq;
++		*disn = 0;
++		return 0;
++	}
++	if (th->syn && th->ack) {
++		*sisn = th->seq;
++		*disn = htonl(ntohl(th->ack_seq) - 1);
++		return 0;
++	}
++
++	/* Fetching authopt_info like this should be safe because authopt_info
++	 * is never released intil the socket is being closed
++	 *
++	 * tcp_timewait_sock is handled but not tcp_request_sock.
++	 * for the synack case sk should be the listen socket.
++	 */
++	rcu_read_lock();
++	if (unlikely(sk->sk_state == TCP_NEW_SYN_RECV)) {
++		/* should never happen, sk should be the listen socket */
++		authopt_info = NULL;
++		WARN_ONCE(1, "TCP-AO can't sign with request sock\n");
++		return -EINVAL;
++	} else if (sk->sk_state == TCP_LISTEN) {
++		/* Signature computation for non-syn packet on a listen
++		 * socket is not possible because we lack the initial
++		 * sequence numbers.
++		 *
++		 * Input segments that are not matched by any request,
++		 * established or timewait socket will get here. These
++		 * are not normally sent by peers.
++		 *
++		 * Their signature might be valid but we don't have
++		 * enough state to determine that. TCP-MD5 can attempt
++		 * to validate and reply with a signed RST because it
++		 * doesn't care about ISNs.
++		 *
++		 * Reporting an error from signature code causes the
++		 * packet to be discarded which is good.
++		 */
++		if (input) {
++			/* Assume this is an ACK to a SYN/ACK
++			 * This will incorrectly report "failed
++			 * signature" for segments without a connection.
++			 */
++			*sisn = htonl(ntohl(th->seq) - 1);
++			*disn = htonl(ntohl(th->ack_seq) - 1);
++			rcu_read_unlock();
++			return 0;
++		}
++		/* This would be an internal bug. */
++		authopt_info = NULL;
++		WARN_ONCE(1, "TCP-AO can't sign non-syn from TCP_LISTEN sock\n");
++		return -EINVAL;
++	} else if (sk->sk_state == TCP_TIME_WAIT) {
++		authopt_info = tcp_twsk(sk)->tw_authopt_info;
++	} else {
++		authopt_info = rcu_dereference(tcp_sk(sk)->authopt_info);
++	}
++	if (!authopt_info) {
++		rcu_read_unlock();
++		return -EINVAL;
++	}
++	/* Initial sequence numbers for ESTABLISHED connections from info */
++	if (input) {
++		*sisn = htonl(authopt_info->dst_isn);
++		*disn = htonl(authopt_info->src_isn);
++	} else {
++		*sisn = htonl(authopt_info->src_isn);
++		*disn = htonl(authopt_info->dst_isn);
++	}
++	rcu_read_unlock();
++	return 0;
++}
++
++/* feed traffic key into shash */
++static int tcp_authopt_shash_traffic_key(struct shash_desc *desc,
++					 struct sock *sk,
++					 struct sk_buff *skb,
++					 bool input,
++					 bool ipv6)
++{
++	struct tcphdr *th = tcp_hdr(skb);
++	int err;
++	__be32 sisn, disn;
++	__be16 digestbits = htons(crypto_shash_digestsize(desc->tfm) * 8);
++
++	// RFC5926 section 3.1.1.1
++	err = crypto_shash_update(desc, "\x01TCP-AO", 7);
++	if (err)
++		return err;
++
++	/* Addresses from packet on input and from sk_common on output
++	 * This is because on output MAC is computed before prepending IP header
++	 */
++	if (input) {
++		if (ipv6)
++			err = crypto_shash_update(desc, (u8 *)&ipv6_hdr(skb)->saddr, 32);
++		else
++			err = crypto_shash_update(desc, (u8 *)&ip_hdr(skb)->saddr, 8);
++		if (err)
++			return err;
++	} else {
++		if (ipv6) {
++			err = crypto_shash_update(desc, (u8 *)&sk->sk_v6_rcv_saddr, 16);
++			if (err)
++				return err;
++			err = crypto_shash_update(desc, (u8 *)&sk->sk_v6_daddr, 16);
++			if (err)
++				return err;
++		} else {
++			err = crypto_shash_update(desc, (u8 *)&sk->sk_rcv_saddr, 4);
++			if (err)
++				return err;
++			err = crypto_shash_update(desc, (u8 *)&sk->sk_daddr, 4);
++			if (err)
++				return err;
++		}
++	}
++
++	/* TCP ports from header */
++	err = crypto_shash_update(desc, (u8 *)&th->source, 4);
++	if (err)
++		return err;
++	err = tcp_authopt_get_isn(sk, skb, input, &sisn, &disn);
++	if (err)
++		return err;
++	err = crypto_shash_update(desc, (u8 *)&sisn, 4);
++	if (err)
++		return err;
++	err = crypto_shash_update(desc, (u8 *)&disn, 4);
++	if (err)
++		return err;
++	err = crypto_shash_update(desc, (u8 *)&digestbits, 2);
++	if (err)
++		return err;
++
++	return 0;
++}
++
++/* Convert a variable-length key to a 16-byte fixed-length key for AES-CMAC
++ * This is described in RFC5926 section 3.1.1.2
++ */
++static int aes_setkey_derived(struct crypto_shash *tfm, u8 *key, size_t keylen)
++{
++	static const u8 zeros[16] = {0};
++	u8 derived_key[16];
++	int err;
++
++	if (WARN_ON_ONCE(crypto_shash_digestsize(tfm) != 16))
++		return -EINVAL;
++	err = crypto_shash_setkey(tfm, zeros, sizeof(zeros));
++	if (err)
++		return err;
++	err = crypto_shash_tfm_digest(tfm, key, keylen, derived_key);
++	if (err)
++		return err;
++	return crypto_shash_setkey(tfm, derived_key, sizeof(derived_key));
++}
++
++static int tcp_authopt_setkey(struct crypto_shash *tfm, struct tcp_authopt_key_info *key)
++{
++	if (key->alg_id == TCP_AUTHOPT_ALG_AES_128_CMAC_96 && key->keylen != 16)
++		return aes_setkey_derived(tfm, key->key, key->keylen);
++	else
++		return crypto_shash_setkey(tfm, key->key, key->keylen);
++}
++
++static int tcp_authopt_get_traffic_key(struct sock *sk,
++				       struct sk_buff *skb,
++				       struct tcp_authopt_key_info *key,
++				       bool input,
++				       bool ipv6,
++				       u8 *traffic_key)
++{
++	SHASH_DESC_ON_STACK(desc, kdf_tfm);
++	struct crypto_shash *kdf_tfm;
++	int err;
++
++	kdf_tfm = tcp_authopt_get_kdf_shash(key);
++	if (IS_ERR(kdf_tfm))
++		return PTR_ERR(kdf_tfm);
++
++	err = tcp_authopt_setkey(kdf_tfm, key);
++	if (err)
++		goto out;
++
++	desc->tfm = kdf_tfm;
++	err = crypto_shash_init(desc);
++	if (err)
++		goto out;
++
++	err = tcp_authopt_shash_traffic_key(desc, sk, skb, input, ipv6);
++	if (err)
++		goto out;
++
++	err = crypto_shash_final(desc, traffic_key);
++	if (err)
++		goto out;
++
++out:
++	tcp_authopt_put_kdf_shash(key, kdf_tfm);
++	return err;
++}
++
++static int crypto_shash_update_zero(struct shash_desc *desc, int len)
++{
++	u8 zero = 0;
++	int i, err;
++
++	for (i = 0; i < len; ++i) {
++		err = crypto_shash_update(desc, &zero, 1);
++		if (err)
++			return err;
++	}
++
++	return 0;
++}
++
++static int tcp_authopt_hash_tcp4_pseudoheader(struct shash_desc *desc,
++					      __be32 saddr,
++					      __be32 daddr,
++					      int nbytes)
++{
++	struct tcp4_pseudohdr phdr = {
++		.saddr = saddr,
++		.daddr = daddr,
++		.pad = 0,
++		.protocol = IPPROTO_TCP,
++		.len = htons(nbytes)
++	};
++	return crypto_shash_update(desc, (u8 *)&phdr, sizeof(phdr));
++}
++
++static int tcp_authopt_hash_tcp6_pseudoheader(struct shash_desc *desc,
++					      struct in6_addr *saddr,
++					      struct in6_addr *daddr,
++					      u32 plen)
++{
++	int err;
++	__be32 buf[2];
++
++	buf[0] = htonl(plen);
++	buf[1] = htonl(IPPROTO_TCP);
++
++	err = crypto_shash_update(desc, (u8 *)saddr, sizeof(*saddr));
++	if (err)
++		return err;
++	err = crypto_shash_update(desc, (u8 *)daddr, sizeof(*daddr));
++	if (err)
++		return err;
++	return crypto_shash_update(desc, (u8 *)&buf, sizeof(buf));
++}
++
++/* TCP authopt as found in header */
++struct tcphdr_authopt {
++	u8 num;
++	u8 len;
++	u8 keyid;
++	u8 rnextkeyid;
++	u8 mac[0];
++};
++
++/* Find TCP_AUTHOPT in header.
++ *
++ * Returns pointer to TCP_AUTHOPT or NULL if not found.
++ */
++static u8 *tcp_authopt_find_option(struct tcphdr *th)
++{
++	int length = (th->doff << 2) - sizeof(*th);
++	u8 *ptr = (u8 *)(th + 1);
++
++	while (length >= 2) {
++		int opcode = *ptr++;
++		int opsize;
++
++		switch (opcode) {
++		case TCPOPT_EOL:
++			return NULL;
++		case TCPOPT_NOP:
++			length--;
++			continue;
++		default:
++			if (length < 2)
++				return NULL;
++			opsize = *ptr++;
++			if (opsize < 2)
++				return NULL;
++			if (opsize > length)
++				return NULL;
++			if (opcode == TCPOPT_AUTHOPT)
++				return ptr - 2;
++		}
++		ptr += opsize - 2;
++		length -= opsize;
++	}
++	return NULL;
++}
++
++/** Hash tcphdr options.
++ *  If include_options is false then only the TCPOPT_AUTHOPT option itself is hashed
++ *  Maybe we could skip option parsing by assuming the AUTHOPT header is at hash_location-4?
++ */
++static int tcp_authopt_hash_opts(struct shash_desc *desc,
++				 struct tcphdr *th,
++				 bool include_options)
++{
++	int err;
++	/* start of options */
++	u8 *tcp_opts = (u8 *)(th + 1);
++	/* end of options */
++	u8 *tcp_data = ((u8 *)th) + th->doff * 4;
++	/* pointer to TCPOPT_AUTHOPT */
++	u8 *authopt_ptr = tcp_authopt_find_option(th);
++	u8 authopt_len;
++
++	if (!authopt_ptr)
++		return -EINVAL;
++	authopt_len = *(authopt_ptr + 1);
++
++	if (include_options) {
++		err = crypto_shash_update(desc, tcp_opts, authopt_ptr - tcp_opts + 4);
++		if (err)
++			return err;
++		err = crypto_shash_update_zero(desc, authopt_len - 4);
++		if (err)
++			return err;
++		err = crypto_shash_update(desc,
++					  authopt_ptr + authopt_len,
++					  tcp_data - (authopt_ptr + authopt_len));
++		if (err)
++			return err;
++	} else {
++		err = crypto_shash_update(desc, authopt_ptr, 4);
++		if (err)
++			return err;
++		err = crypto_shash_update_zero(desc, authopt_len - 4);
++		if (err)
++			return err;
++	}
++
++	return 0;
++}
++
++static int skb_shash_frags(struct shash_desc *desc,
++			   struct sk_buff *skb)
++{
++	struct sk_buff *frag_iter;
++	int err, i;
++
++	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
++		skb_frag_t *f = &skb_shinfo(skb)->frags[i];
++		u32 p_off, p_len, copied;
++		struct page *p;
++		u8 *vaddr;
++
++		skb_frag_foreach_page(f, skb_frag_off(f), skb_frag_size(f),
++				      p, p_off, p_len, copied) {
++			vaddr = kmap_atomic(p);
++			err = crypto_shash_update(desc, vaddr + p_off, p_len);
++			kunmap_atomic(vaddr);
++			if (err)
++				return err;
++		}
++	}
++
++	skb_walk_frags(skb, frag_iter) {
++		err = skb_shash_frags(desc, frag_iter);
++		if (err)
++			return err;
++	}
++
++	return 0;
++}
++
++static int tcp_authopt_hash_packet(struct crypto_shash *tfm,
++				   struct sock *sk,
++				   struct sk_buff *skb,
++				   bool input,
++				   bool ipv6,
++				   bool include_options,
++				   u8 *macbuf)
++{
++	struct tcphdr *th = tcp_hdr(skb);
++	SHASH_DESC_ON_STACK(desc, tfm);
++	int err;
++
++	/* NOTE: SNE unimplemented */
++	__be32 sne = 0;
++
++	desc->tfm = tfm;
++	err = crypto_shash_init(desc);
++	if (err)
++		return err;
++
++	err = crypto_shash_update(desc, (u8 *)&sne, 4);
++	if (err)
++		return err;
++
++	if (ipv6) {
++		struct in6_addr *saddr;
++		struct in6_addr *daddr;
++
++		if (input) {
++			saddr = &ipv6_hdr(skb)->saddr;
++			daddr = &ipv6_hdr(skb)->daddr;
++		} else {
++			saddr = &sk->sk_v6_rcv_saddr;
++			daddr = &sk->sk_v6_daddr;
++		}
++		err = tcp_authopt_hash_tcp6_pseudoheader(desc, saddr, daddr, skb->len);
++		if (err)
++			return err;
++	} else {
++		__be32 saddr;
++		__be32 daddr;
++
++		if (input) {
++			saddr = ip_hdr(skb)->saddr;
++			daddr = ip_hdr(skb)->daddr;
++		} else {
++			saddr = sk->sk_rcv_saddr;
++			daddr = sk->sk_daddr;
++		}
++		err = tcp_authopt_hash_tcp4_pseudoheader(desc, saddr, daddr, skb->len);
++		if (err)
++			return err;
++	}
++
++	// TCP header with checksum set to zero
++	{
++		struct tcphdr hashed_th = *th;
++
++		hashed_th.check = 0;
++		err = crypto_shash_update(desc, (u8 *)&hashed_th, sizeof(hashed_th));
++		if (err)
++			return err;
++	}
++
++	// TCP options
++	err = tcp_authopt_hash_opts(desc, th, include_options);
++	if (err)
++		return err;
++
++	// Rest of SKB->data
++	err = crypto_shash_update(desc, (u8 *)th + th->doff * 4, skb_headlen(skb) - th->doff * 4);
++	if (err)
++		return err;
++
++	err = skb_shash_frags(desc, skb);
++	if (err)
++		return err;
++
++	return crypto_shash_final(desc, macbuf);
++}
++
++/* __tcp_authopt_calc_mac - Compute packet MAC using key
++ *
++ * The macbuf output buffer must be large enough to fit the digestsize of the
++ * underlying transform before truncation.
++ * This means TCP_AUTHOPT_MAXMACBUF, not TCP_AUTHOPT_MACLEN
++ */
++static int __tcp_authopt_calc_mac(struct sock *sk,
++				  struct sk_buff *skb,
++				  struct tcp_authopt_key_info *key,
++				  bool input,
++				  char *macbuf)
++{
++	struct crypto_shash *mac_tfm;
++	u8 traffic_key[TCP_AUTHOPT_MAX_TRAFFIC_KEY_LEN];
++	int err;
++	bool ipv6 = (sk->sk_family != AF_INET);
++
++	if (sk->sk_family != AF_INET && sk->sk_family != AF_INET6)
++		return -EINVAL;
++
++	err = tcp_authopt_get_traffic_key(sk, skb, key, input, ipv6, traffic_key);
++	if (err)
++		return err;
++
++	mac_tfm = tcp_authopt_get_mac_shash(key);
++	if (IS_ERR(mac_tfm))
++		return PTR_ERR(mac_tfm);
++	err = crypto_shash_setkey(mac_tfm, traffic_key, key->alg->traffic_key_len);
++	if (err)
++		goto out;
++
++	err = tcp_authopt_hash_packet(mac_tfm,
++				      sk,
++				      skb,
++				      input,
++				      ipv6,
++				      !(key->flags & TCP_AUTHOPT_KEY_EXCLUDE_OPTS),
++				      macbuf);
++
++out:
++	tcp_authopt_put_mac_shash(key, mac_tfm);
++	return err;
++}
 -- 
 2.25.1
 
