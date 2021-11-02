@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB22C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 16:48:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18BC8C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 16:48:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88EB260EB4
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 16:48:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0577D60EB8
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 16:48:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231918AbhKBQuq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Nov 2021 12:50:46 -0400
-Received: from mx07-00178001.pphosted.com ([185.132.182.106]:41488 "EHLO
+        id S233681AbhKBQur (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Nov 2021 12:50:47 -0400
+Received: from mx07-00178001.pphosted.com ([185.132.182.106]:33802 "EHLO
         mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231874AbhKBQun (ORCPT
+        by vger.kernel.org with ESMTP id S231881AbhKBQuo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Nov 2021 12:50:43 -0400
-Received: from pps.filterd (m0046668.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1A2F12ff015193;
-        Tue, 2 Nov 2021 17:47:52 +0100
+        Tue, 2 Nov 2021 12:50:44 -0400
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1A2EMM4J011759;
+        Tue, 2 Nov 2021 17:47:55 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-type; s=selector1;
- bh=ApzKX0Ohee8Bs+HYdLXyjIjlJjwLbFK+nNLOPyTFAjc=;
- b=6sUtsk008pRWMXt14NUyNvvscQfSdi1a7cNmPrXILobmEb8VoWuAtQTNuV/p7x+R7NYk
- z0CBDs1RWfBeNlLf6OeD98SdRkb2IN012nfBNviJ+L+/58YfXcT7UuUmsOU94WLNnRYz
- fSMU9EMEVkBIR3Z2l2Im360XAc3NLHoVAxE7Q/c1pDlDAs2AT7AaYXz4NZytGzUoVauw
- l8R/yLvD3yW3byXCNtQVzCwDxWgmyOfrhMMsXLhFHb38dbkjZXmjIPDs2g9ipHmywfbO
- 0O+psAMsH8BVKsGq7UfzxyoEzjnNrGIranCGiCz4j7q9o1esTC+qt8XpBqWwYGn96cYm Vg== 
+ bh=23KQt3SEHQG2x+P/jacjp6tL0OJTLQOO2vIEH5W7XlU=;
+ b=IKDDoyq4SSJg7hlvBpSzSglCmssE4vrrIGuzOq8oPaxJpDFsgwDMjwxOLV9u+P9DHiAK
+ YkYgNLfEslixcP1xRp9ujeJ2u0i/a282cMbCTOTI4n32nlOaSpje5ZsxdVqLkbVMuhs7
+ WUmzaAaKGWKJ+6LGO0zl9Bap1hZGYn2JWbmrskPrlA9k4h/kL+DeitwMhKdN/2dm2Qg3
+ 1HvJoo+JUI8DtPY/+0t1VwvCPBBoU3qvRG3IRoDPqC02WH02So9kj+/MvotBjIGdHaIp
+ s90VqkoM4KFFASXvhof+dpsqi1i+UONHd/1E/NrD1d9dob2sVDX72DjcUbfumukLXuid pA== 
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3c2yg3ku7d-1
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3c2jfj6pc4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Nov 2021 17:47:52 +0100
+        Tue, 02 Nov 2021 17:47:55 +0100
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 7FF9C100034;
-        Tue,  2 Nov 2021 17:47:51 +0100 (CET)
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id AE268100034;
+        Tue,  2 Nov 2021 17:47:54 +0100 (CET)
 Received: from Webmail-eu.st.com (sfhdag2node2.st.com [10.75.127.5])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 78013236528;
-        Tue,  2 Nov 2021 17:47:51 +0100 (CET)
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id A650822FA5E;
+        Tue,  2 Nov 2021 17:47:54 +0100 (CET)
 Received: from localhost (10.75.127.46) by SFHDAG2NODE2.st.com (10.75.127.5)
- with Microsoft SMTP Server (TLS) id 15.0.1497.18; Tue, 2 Nov 2021 17:47:51
+ with Microsoft SMTP Server (TLS) id 15.0.1497.18; Tue, 2 Nov 2021 17:47:54
  +0100
 From:   Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
@@ -53,9 +53,9 @@ CC:     Marek Vasut <marex@denx.de>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>,
         Etienne Carriere <etienne.carriere@foss.st.com>
-Subject: [PATCH v2 1/8] crypto: stm32/cryp - defer probe for reset controller
-Date:   Tue, 2 Nov 2021 17:47:22 +0100
-Message-ID: <20211102164729.9957-2-nicolas.toromanoff@foss.st.com>
+Subject: [PATCH v2 2/8] crypto: stm32/cryp - don't print error on probe deferral
+Date:   Tue, 2 Nov 2021 17:47:23 +0100
+Message-ID: <20211102164729.9957-3-nicolas.toromanoff@foss.st.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20211102164729.9957-1-nicolas.toromanoff@foss.st.com>
 References: <20211102164729.9957-1-nicolas.toromanoff@foss.st.com>
@@ -73,41 +73,29 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Etienne Carriere <etienne.carriere@foss.st.com>
 
-Change stm32 CRYP driver to defer its probe operation when
-reset controller device is registered but has not been probed yet.
+Change driver to not print an error message when the device
+probe is deferred for a clock resource.
 
 Signed-off-by: Etienne Carriere <etienne.carriere@foss.st.com>
 Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
 ---
- drivers/crypto/stm32/stm32-cryp.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/crypto/stm32/stm32-cryp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
-index 7389a0536ff0..dcdd313485de 100644
+index dcdd313485de..7b55ad6d2f1a 100644
 --- a/drivers/crypto/stm32/stm32-cryp.c
 +++ b/drivers/crypto/stm32/stm32-cryp.c
-@@ -1973,7 +1973,11 @@ static int stm32_cryp_probe(struct platform_device *pdev)
- 	pm_runtime_enable(dev);
+@@ -1955,7 +1955,8 @@ static int stm32_cryp_probe(struct platform_device *pdev)
  
- 	rst = devm_reset_control_get(dev, NULL);
--	if (!IS_ERR(rst)) {
-+	if (IS_ERR(rst)) {
-+		ret = PTR_ERR(rst);
-+		if (ret == -EPROBE_DEFER)
-+			goto err_rst;
-+	} else {
- 		reset_control_assert(rst);
- 		udelay(2);
- 		reset_control_deassert(rst);
-@@ -2024,7 +2028,7 @@ static int stm32_cryp_probe(struct platform_device *pdev)
- 	spin_lock(&cryp_list.lock);
- 	list_del(&cryp->list);
- 	spin_unlock(&cryp_list.lock);
--
-+err_rst:
- 	pm_runtime_disable(dev);
- 	pm_runtime_put_noidle(dev);
- 	pm_runtime_disable(dev);
+ 	cryp->clk = devm_clk_get(dev, NULL);
+ 	if (IS_ERR(cryp->clk)) {
+-		dev_err(dev, "Could not get clock\n");
++		dev_err_probe(dev, PTR_ERR(cryp->clk), "Could not get clock\n");
++
+ 		return PTR_ERR(cryp->clk);
+ 	}
+ 
 -- 
 2.17.1
 
