@@ -2,234 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC61BC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 15:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E9AEC4332F
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 16:36:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1A3960F45
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 15:41:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A00561058
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 16:36:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233646AbhKBPo3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Nov 2021 11:44:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58632 "EHLO
+        id S234986AbhKBQi4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Nov 2021 12:38:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232003AbhKBPo2 (ORCPT
+        with ESMTP id S235028AbhKBQiq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Nov 2021 11:44:28 -0400
-Received: from michel.telenet-ops.be (michel.telenet-ops.be [IPv6:2a02:1800:110:4::f00:18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9145EC0613F5
-        for <linux-crypto@vger.kernel.org>; Tue,  2 Nov 2021 08:41:53 -0700 (PDT)
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed20:a1ae:b980:25da:18ce])
-        by michel.telenet-ops.be with bizsmtp
-        id DThp2600U4WmP4T06ThpKP; Tue, 02 Nov 2021 16:41:50 +0100
-Received: from geert (helo=localhost)
-        by ramsan.of.borg with local-esmtp (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1mhvv3-009mVx-EJ; Tue, 02 Nov 2021 16:41:49 +0100
-Date:   Tue, 2 Nov 2021 16:41:49 +0100 (CET)
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-X-X-Sender: geert@ramsan.of.borg
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-cc:     Nathan Chancellor <nathan@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Vladis Dronov <vdronov@redhat.com>,
-        Simo Sorce <ssorce@redhat.com>,
-        Eric Biggers <ebiggers@kernel.org>, llvm@lists.linux.dev,
-        kernel test robot <lkp@intel.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: api - Do not create test larvals if manager is
- disabled
-In-Reply-To: <20211019132802.GA14233@gondor.apana.org.au>
-Message-ID: <alpine.DEB.2.22.394.2111021636040.2330984@ramsan.of.borg>
-References: <20210913071251.GA15235@gondor.apana.org.au> <20210917002619.GA6407@gondor.apana.org.au> <YVNfqUVJ7w4Z3WXK@archlinux-ax161> <20211001055058.GA6081@gondor.apana.org.au> <YVdNFzs8HUQwHa54@archlinux-ax161> <20211003002801.GA5435@gondor.apana.org.au>
- <YV0K+EbrAqDdw2vp@archlinux-ax161> <20211019132802.GA14233@gondor.apana.org.au>
-User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+        Tue, 2 Nov 2021 12:38:46 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E73C0432C5
+        for <linux-crypto@vger.kernel.org>; Tue,  2 Nov 2021 09:28:36 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id k24so16453895ljg.3
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Nov 2021 09:28:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=EFG0W4zbuZBKc8KwN//b04i0rLIBd1L+XKZX7MrXoOc=;
+        b=hpAI9rD1GQefjY1Adn77Zrw92FmMVgTkMn30tMZmiv+NzH79bDofjvVfqKAG8t/k/X
+         RX50bQ0reQiJiASa+Wi3Ks1ITAO2X1a1eJlnJACu0G3dfCj6pzLhRwt8ttFnbVlWmoih
+         YPvqmqixTXafViP0iPMRbo61wTri5tdAgB7Xgql0KMeJu4DRONJOd+Fi6ZlSTyat+I+Q
+         5xy0YYH3X0UkObJm99RE+K2WL4jqLBDPTTC+Tzj6E00Dm9qb+8BNDCtMvoqEYLD0zh/b
+         IqW8SERdtvpoDMuR6KEkDkzZ+qx8Wj5KfkegnFR8YN9De6j7NaUULuVOt67gpk6SN3hR
+         u+ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=EFG0W4zbuZBKc8KwN//b04i0rLIBd1L+XKZX7MrXoOc=;
+        b=3csLoukBQWn9+6xE/W+DL3vwhoTBW4yIYPfMzCsTWNOqYhAkDb5t1L50Gj14RaQqZv
+         p7eGb9tQ33L4c30ciVjZ3pjr7vqVUCXiM4KumqJHf2wab5fXx4/qmOvMQOFcCKY45cld
+         t+Unsj6ql4nI6GGw4dslAsnPknpWGG/fqK174lHkq9L2UrzdXkPJtfUas0NAYlXmV9je
+         2b9zsYEvr6Gp78EuhUL09EUITYmPH+kcEQM1pHtxwBdxousqCHGPYCwKu1dUF7YG1c+M
+         f6P1rmxLXCjKDLrVcG1FHH96ushKbUKaVW51rM8HoHhPcezm5AtQy+zZzvJ+1zbwNwgc
+         gq5w==
+X-Gm-Message-State: AOAM530x5J3L9QImI5sn7HXBi9xpFDwHImJwxjRy+QRJq1KRJsUORxCx
+        C2oKSMj0dPG4r+dMHA6p2tailmHPYXo0joJBzC1smw==
+X-Google-Smtp-Source: ABdhPJyjGrPaYpq4OUOloYJA4hOuXnQyAusv+PW6kvERDc2Qqy0X3OdonYHzSsLN1pu41EWzSDjt6FFszoZuWuMvlVI=
+X-Received: by 2002:a2e:9a18:: with SMTP id o24mr34636588lji.426.1635870514872;
+ Tue, 02 Nov 2021 09:28:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+References: <20211102142331.3753798-1-pgonda@google.com> <20211102142331.3753798-5-pgonda@google.com>
+ <0701eb12-a60e-381f-ddd0-9ee9a0fa3edb@amd.com>
+In-Reply-To: <0701eb12-a60e-381f-ddd0-9ee9a0fa3edb@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 2 Nov 2021 10:28:23 -0600
+Message-ID: <CAMkAt6psP-qK3DJiDD=54_LKQ6cA8xHndD7wLmsOkrmvA=+EVA@mail.gmail.com>
+Subject: Re: [PATCH V3 4/4] crypto: ccp - Add SEV_INIT_EX support
+To:     Tom Lendacky <Thomas.Lendacky@amd.com>
+Cc:     David Rientjes <rientjes@google.com>,
+        Marc Orr <marcorr@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        John Allen <john.allen@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
- 	Hi Herbert,
+On Tue, Nov 2, 2021 at 9:38 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+>
+> On 11/2/21 9:23 AM, Peter Gonda wrote:
+> > From: David Rientjes <rientjes@google.com>
+> >
+> > +
+> > +     nread = kernel_read(fp, sev_init_ex_nv_address, NV_LENGTH, NULL);
+>
+> Not sure if you missed the previous comment, but kernel_read can return an
+> error, shouldn't it be checked and fail on error?
 
-On Tue, 19 Oct 2021, Herbert Xu wrote:
-> On Tue, Oct 05, 2021 at 07:33:28PM -0700, Nathan Chancellor wrote:
->> I assume this is the diff you mean? This does not resolve the issue. My
->> apologies if I am slow to respond, I am on vacation until the middle of
->> next week.
+I did miss that comment. Updated to make sure nread == NV_LENGTH.
 >
-> Sorry for the delay.  The kernel robot figured out the problem
-> for me.  It's the crypto_alg_tested call that causes api.c to
-> depend on algapi.c.  This call is only invoked in the case where
-> the crypto manager is turned off.  We could instead simply make
-> test larvals disappear in that case.
+> Thanks,
+> Tom
 >
-> ---8<---
-> The delayed boot-time testing patch created a dependency loop
-> between api.c and algapi.c because it added a crypto_alg_tested
-> call to the former when the crypto manager is disabled.
->
-> We could instead avoid creating the test larvals if the crypto
-> manager is disabled.  This avoids the dependency loop as well
-> as saving some unnecessary work, albeit in a very unlikely case.
->
-> Reported-by: Nathan Chancellor <nathan@kernel.org>
-> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Fixes: adad556efcdd ("crypto: api - Fix built-in testing dependency failures")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-Thanks for your patch, which is now commit cad439fc040efe5f
-("crypto: api - Do not create test larvals if manager is disabled").
-
-I have bisected a failure to mount the root file system on k210 to this
-commit.
-
-Dmesg before/after:
-
-      mmcblk0: mmc0:0000 SA04G 3.68 GiB
-      random: fast init done
-       mmcblk0: p1
-     -EXT4-fs (mmcblk0p1): mounted filesystem with ordered data mode. Opts: (null). Quota mode: disabled.
-     -VFS: Mounted root (ext4 filesystem) readonly on device 179:1.
-     +EXT4-fs (mmcblk0p1): Cannot load crc32c driver.
-     +VFS: Cannot open root device "mmcblk0p1" or unknown-block(179,1): error -80
-     +Please append a correct "root=" boot option; here are the available partitions:
-     +b300         3858432 mmcblk0
-     + driver: mmcblk
-     +  b301         3854336 mmcblk0p1 00000000-01
-
-> --- a/crypto/algapi.c
-> +++ b/crypto/algapi.c
-> @@ -216,6 +216,32 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
-> }
-> EXPORT_SYMBOL_GPL(crypto_remove_spawns);
->
-> +static struct crypto_larval *crypto_alloc_test_larval(struct crypto_alg *alg)
-> +{
-> +	struct crypto_larval *larval;
-> +
-> +	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER))
-> +		return NULL;
-> +
-> +	larval = crypto_larval_alloc(alg->cra_name,
-> +				     alg->cra_flags | CRYPTO_ALG_TESTED, 0);
-> +	if (IS_ERR(larval))
-> +		return larval;
-> +
-> +	larval->adult = crypto_mod_get(alg);
-> +	if (!larval->adult) {
-> +		kfree(larval);
-> +		return ERR_PTR(-ENOENT);
-> +	}
-> +
-> +	refcount_set(&larval->alg.cra_refcnt, 1);
-> +	memcpy(larval->alg.cra_driver_name, alg->cra_driver_name,
-> +	       CRYPTO_MAX_ALG_NAME);
-> +	larval->alg.cra_priority = alg->cra_priority;
-> +
-> +	return larval;
-> +}
-> +
-> static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
-> {
-> 	struct crypto_alg *q;
-> @@ -250,31 +276,20 @@ static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
-> 			goto err;
-> 	}
->
-> -	larval = crypto_larval_alloc(alg->cra_name,
-> -				     alg->cra_flags | CRYPTO_ALG_TESTED, 0);
-> +	larval = crypto_alloc_test_larval(alg);
-> 	if (IS_ERR(larval))
-> 		goto out;
->
-> -	ret = -ENOENT;
-> -	larval->adult = crypto_mod_get(alg);
-> -	if (!larval->adult)
-> -		goto free_larval;
-> -
-> -	refcount_set(&larval->alg.cra_refcnt, 1);
-> -	memcpy(larval->alg.cra_driver_name, alg->cra_driver_name,
-> -	       CRYPTO_MAX_ALG_NAME);
-> -	larval->alg.cra_priority = alg->cra_priority;
-> -
-> 	list_add(&alg->cra_list, &crypto_alg_list);
-> -	list_add(&larval->alg.cra_list, &crypto_alg_list);
-> +
-> +	if (larval)
-> +		list_add(&larval->alg.cra_list, &crypto_alg_list);
->
-> 	crypto_stats_init(alg);
->
-> out:
-> 	return larval;
->
-> -free_larval:
-> -	kfree(larval);
-> err:
-> 	larval = ERR_PTR(ret);
-> 	goto out;
-> @@ -403,10 +418,11 @@ int crypto_register_alg(struct crypto_alg *alg)
-> 	down_write(&crypto_alg_sem);
-> 	larval = __crypto_register_alg(alg);
-> 	test_started = static_key_enabled(&crypto_boot_test_finished);
-> -	larval->test_started = test_started;
-> +	if (!IS_ERR_OR_NULL(larval))
-> +		larval->test_started = test_started;
-> 	up_write(&crypto_alg_sem);
->
-> -	if (IS_ERR(larval))
-> +	if (IS_ERR_OR_NULL(larval))
-> 		return PTR_ERR(larval);
->
-> 	if (test_started)
-> @@ -616,8 +632,8 @@ int crypto_register_instance(struct crypto_template *tmpl,
-> 	larval = __crypto_register_alg(&inst->alg);
-> 	if (IS_ERR(larval))
-> 		goto unlock;
-> -
-> -	larval->test_started = true;
-> +	else if (larval)
-> +		larval->test_started = true;
->
-> 	hlist_add_head(&inst->list, &tmpl->instances);
-> 	inst->tmpl = tmpl;
-> @@ -626,7 +642,7 @@ int crypto_register_instance(struct crypto_template *tmpl,
-> 	up_write(&crypto_alg_sem);
->
-> 	err = PTR_ERR(larval);
-> -	if (IS_ERR(larval))
-> +	if (IS_ERR_OR_NULL(larval))
-> 		goto err;
->
-> 	crypto_wait_for_test(larval);
-> diff --git a/crypto/api.c b/crypto/api.c
-> index ee5991fe11f8..cf0869dd130b 100644
-> --- a/crypto/api.c
-> +++ b/crypto/api.c
-> @@ -167,11 +167,8 @@ void crypto_wait_for_test(struct crypto_larval *larval)
-> 	int err;
->
-> 	err = crypto_probing_notify(CRYPTO_MSG_ALG_REGISTER, larval->adult);
-> -	if (err != NOTIFY_STOP) {
-> -		if (WARN_ON(err != NOTIFY_DONE))
-> -			goto out;
-> -		crypto_alg_tested(larval->alg.cra_driver_name, 0);
-> -	}
-> +	if (WARN_ON_ONCE(err != NOTIFY_STOP))
-> +		goto out;
->
-> 	err = wait_for_completion_killable(&larval->completion);
-> 	WARN_ON(err);
-
-Gr{oetje,eeting}s,
-
- 						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
- 							    -- Linus Torvalds
+> > +     dev_dbg(psp_master->dev, "SEV: read %ld bytes from NV file\n", nread);
+> > +     filp_close(fp, NULL);
+> > +
+> > +     return 0;
+> > +}
+> > +
