@@ -2,67 +2,138 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D73C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 04:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C8DC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 09:51:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D1AA603E5
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 04:27:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EBE361076
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Nov 2021 09:51:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229486AbhKBE3n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Nov 2021 00:29:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56918 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229458AbhKBE3l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Nov 2021 00:29:41 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id D0F6D603E5;
-        Tue,  2 Nov 2021 04:27:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635827226;
-        bh=DAIAGLlPza43ypb0m5Avq3EgWyVgVlQPUqP9iY6eRX8=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=pUJGS13QePR/xyWgnqYAwcHomyIZqod2FCR/PwokWzmVN4gYewgtgTqT9ReSgPwo2
-         drOXcm8qUB+UbEdnHhw5t3tXMcJ1LrPjsMoI/CveYNalphoXrsPWtqZu2NgM/aQYxb
-         T4XjOA9GG2Zcq2wE2EtSpzMhBPM1T0sTfTQgTWHWiuB7xO/0AONdG5nPRLiwOryso7
-         EX7H67doqe9o0FqdKk8wKeYYt6Tsc9uDcCa147pcQCWGNrr89yZicVrLHUdYhdcf0V
-         z7vEOpV1udw5onb1T1jCl0lRP9m+OfF7gHJa5QQ4E3muoUmIR60lpynaCDgjO99gvG
-         uer/qQImSgLGw==
-Subject: Re: [GIT PULL] Crypto Update for 5.16
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20211102035201.GA23331@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20201012033249.GA25179@gondor.apana.org.au>
- <20201214055515.GA14196@gondor.apana.org.au>
- <20210215024721.GA20593@gondor.apana.org.au>
- <20210426123200.kgbyk6ayey4l4lrw@gondor.apana.org.au>
- <20210628110050.GA12162@gondor.apana.org.au>
- <20210830082818.GA30921@gondor.apana.org.au> <20211102035201.GA23331@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20211102035201.GA23331@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 39ef08517082a424b5b65c3dbaa6c0fa9d3303b9
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: bfc484fe6abba4b89ec9330e0e68778e2a9856b2
-Message-Id: <163582722671.31139.16633728573643694762.pr-tracker-bot@kernel.org>
-Date:   Tue, 02 Nov 2021 04:27:06 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        id S231664AbhKBJyV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Nov 2021 05:54:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34816 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231340AbhKBJxu (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Nov 2021 05:53:50 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CFA7C061239;
+        Tue,  2 Nov 2021 02:50:50 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id w1so19941645edd.10;
+        Tue, 02 Nov 2021 02:50:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=phT7BPlJVjW6ePMt+YURvMOEW4v6/gql/qbCudKf21c=;
+        b=hwYcMpbxOJBhA2H4xFMNy3YthlGe77+7VaHJwM1EcWGxP3zh3DPXERJfvVM+9nEGTP
+         wT6hfp5yDlP5tQqDd6MXzzIKx3qCOaygo0HDKxa9xkVFsCNe0f2OozONiorH/CuzBOc6
+         V1sTyYGPqu80ejeFHU5VVzEFbORQnDlRWiLwtRNDHq3JI3EyvuT3cjWYdlQZQSSewo0r
+         RmjvFviV4xe6vzCAKrLuKSQzCueeeOz9rWmgGama8XYWrQJdLRQIRAGVPfnRd4dm72m5
+         n6b9wxKQh/t/VGC3xBZaBt/tU+MGSlpNAhqS+TeXvbvDSusWbb+YNwVcsLajz6ED4Xf6
+         OqZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=phT7BPlJVjW6ePMt+YURvMOEW4v6/gql/qbCudKf21c=;
+        b=mD1uTaqr9hRkq12Di2H8mlhW6fJSao5x91+cQDrUrGGUJM0WY11WWIPRHHmwr9d0Av
+         FteQM31mkyY7BaMBihnvAeWj4HExfxEkCOfBPfLZUYh16NgzKO3vfFPFgfwkVm/kNErQ
+         +flCqC3IvH/gVa1sb84MgqP6UW6QraEfgh50YxZcnZghT0tlFWph89a4gM7puLKHwyYh
+         ipaVKjeE7c7v8dkkYoQOytB1XqbhwWG2JziEGM5uI6v30ptBVP0t1I+3Y/sJUxSpQKoo
+         W1/qDj/vNM5Gk3Z99GM3N/lIaTMLUxPQ/Wpabatsl/O4CTX/GnE5O49xlzOVJzNvM//O
+         8jHw==
+X-Gm-Message-State: AOAM532UqgVVAEHnItFw3QhUypZ4ev5KMN1LL1PCalU18Whzb11gXosF
+        g3e09FW5Wnr78j/BWywSAfE=
+X-Google-Smtp-Source: ABdhPJxnALGXIZMcJ/oN1CzPmiie5WA5VQewo2TvYMcnOMUt8YKU7kdHG07188Y1g11ACuVaMDZHBQ==
+X-Received: by 2002:a05:6402:280f:: with SMTP id h15mr17701049ede.286.1635846649084;
+        Tue, 02 Nov 2021 02:50:49 -0700 (PDT)
+Received: from ?IPv6:2a04:241e:501:3870:88ff:d1a0:a1c6:4b6a? ([2a04:241e:501:3870:88ff:d1a0:a1c6:4b6a])
+        by smtp.gmail.com with ESMTPSA id hc15sm7849472ejc.73.2021.11.02.02.50.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Nov 2021 02:50:48 -0700 (PDT)
+Subject: Re: [PATCH v2 11/25] tcp: authopt: Implement Sequence Number
+ Extension
+To:     Eric Dumazet <eric.dumazet@gmail.com>,
+        Francesco Ruggeri <fruggeri@arista.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        David Ahern <dsahern@kernel.org>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Shuah Khan <shuah@kernel.org>
+References: <cover.1635784253.git.cdleonard@gmail.com>
+ <6097ec24d87efc55962a1bfac9441132f0fc4206.1635784253.git.cdleonard@gmail.com>
+ <07987e29-87a0-9a09-bdf0-b5e385d9c55f@gmail.com>
+From:   Leonard Crestez <cdleonard@gmail.com>
+Message-ID: <344a6d47-3d4d-ee98-10ef-c710b8538f24@gmail.com>
+Date:   Tue, 2 Nov 2021 11:50:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+MIME-Version: 1.0
+In-Reply-To: <07987e29-87a0-9a09-bdf0-b5e385d9c55f@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Tue, 2 Nov 2021 11:52:02 +0800:
+On 11/1/21 10:54 PM, Eric Dumazet wrote:
+> On 11/1/21 9:34 AM, Leonard Crestez wrote:
+>> Add a compute_sne function which finds the value of SNE for a certain
+>> SEQ given an already known "recent" SNE/SEQ. This is implemented using
+>> the standard tcp before/after macro and will work for SEQ values that
+>> are without 2^31 of the SEQ for which we know the SNE.
+> 
+>>   }
+>> +void __tcp_authopt_update_rcv_sne(struct tcp_sock *tp, struct tcp_authopt_info *info, u32 seq);
+>> +static inline void tcp_authopt_update_rcv_sne(struct tcp_sock *tp, u32 seq)
+>> +{
+>> +	struct tcp_authopt_info *info;
+>> +
+>> +	if (static_branch_unlikely(&tcp_authopt_needed)) {
+>> +		rcu_read_lock();
+>> +		info = rcu_dereference(tp->authopt_info);
+>> +		if (info)
+>> +			__tcp_authopt_update_rcv_sne(tp, info, seq);
+>> +		rcu_read_unlock();
+>> +	}
+>> +}
+>> +void __tcp_authopt_update_snd_sne(struct tcp_sock *tp, struct tcp_authopt_info *info, u32 seq);
+>> +static inline void tcp_authopt_update_snd_sne(struct tcp_sock *tp, u32 seq)
+>> +{
+>> +	struct tcp_authopt_info *info;
+>> +
+>> +	if (static_branch_unlikely(&tcp_authopt_needed)) {
+>> +		rcu_read_lock();
+>> +		info = rcu_dereference(tp->authopt_info);
+>> +		if (info)
+>> +			__tcp_authopt_update_snd_sne(tp, info, seq);
+>> +		rcu_read_unlock();
+>> +	}
+>> +}
+>>
+> 
+> I would think callers of these helpers own socket lock,
+> so no rcu_read_lock()/unlock() should be needed.
+> 
+> Perhaps instead
+> rcu_dereference_protected(tp->authopt_info, lockdep_sock_is_held(sk));
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+Yes, all the callers hold the socket lock and replacing rcu_read_lock 
+doesn't trigger any RCU warnings.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/bfc484fe6abba4b89ec9330e0e68778e2a9856b2
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+--
+Regards,
+Leonard
