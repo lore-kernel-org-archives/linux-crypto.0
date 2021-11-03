@@ -2,62 +2,63 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4761C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Nov 2021 02:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A836C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Nov 2021 02:44:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B65E960E73
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Nov 2021 02:39:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA4C860EFE
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Nov 2021 02:44:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231240AbhKCCma (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Nov 2021 22:42:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39542 "EHLO
+        id S230518AbhKCCrI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Nov 2021 22:47:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231340AbhKCCm3 (ORCPT
+        with ESMTP id S229650AbhKCCrH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Nov 2021 22:42:29 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D428C061714;
-        Tue,  2 Nov 2021 19:39:54 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id w29-20020a056830411d00b0055abaca9349so1529670ott.13;
-        Tue, 02 Nov 2021 19:39:54 -0700 (PDT)
+        Tue, 2 Nov 2021 22:47:07 -0400
+Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC69C061714;
+        Tue,  2 Nov 2021 19:44:32 -0700 (PDT)
+Received: by mail-oi1-x22c.google.com with SMTP id l15so1698032oie.8;
+        Tue, 02 Nov 2021 19:44:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=xvmUh+kq0qTw+qHqGvn2Q3Zzs548+5cTf9/0rb+MLBg=;
-        b=J20RSSX8JCBK5BS5hTCLpLsYV8WHE2ZeTA8iSflgoS8iGa17seKc8DdIt6mpWT3qtX
-         5s4O6TEPY/KAZ7pwTLRyprD5mrxQ2etlcuPjxIH50HjPw5ASImHvkdt+LptDJSoihK6M
-         +KPkR/peMqvzrxhoSyu62snNPf1NUKh2n3TG8WYURCiPx9kP5XgWp7uozwjqtjezrxXC
-         iy5ukKJi809VPxDd1sF4FOgoYjsqCNoy/p3j4tAUWcl/4H/nyj+TBjcVFC5bcULuUOWn
-         rGB6zNonvoixk53xlXieUtklibMCzCiS8aaWKb4l8OMS/aDZbR2wvOsGK+acFa4xQYO8
-         CVUQ==
+        bh=cL6u9895NSZTZOeZgFQofwNy409f1x1M+KuZz4xRj4U=;
+        b=mxG1TktwRrsKRDbub3sFNRLnMExnCSubzzZ2/QIruPaEIwG9PdVLRov/5VNr6X8BD0
+         Wr/OwRzSiSjRfmW5gwiX6x3RlgL2IhHZTNGnY4UesP7cbtLAkCzqpuGli2XdFkio2CTM
+         A85yyX0R3LMsVdkawvt4BbZLDaUSMPV/vQ5sdvIrEKguEcztckHEZigOyualJ/W/1eTQ
+         7wp7VRCEb/wgvpEMtz8t6Ow1Mws1Q/t37aZLHhUcANp/J+43I7NdQoWkXufOvHmPfKBe
+         dhRKtd6VCVe4ixstfyia+BBKk2FWUonbW1JQgTzJXvspBNf7JsBoWerDjJ/x2kgtLdWx
+         2c7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=xvmUh+kq0qTw+qHqGvn2Q3Zzs548+5cTf9/0rb+MLBg=;
-        b=u9diKYsNpIBqCYLVqu1M7eyj/cXUMIgpfrLO0g3tt4EKDgz3ed8W3F+dzoSg0rVGXv
-         DvinfDfLXhoNWNUHVQsRpcErfsgc/kwN4oyMzGz6Z5fARb9TBy6F6VTa/82zDprXc7Ka
-         14R0ZRron1eNYuKRMxUfOCBVVTtYuvD5B0jzRAjtPebETHIvSF7seNqID6JDHv+m4LMH
-         auDL037ayIaW8HxJ65kzbyYDMTinYprIsY7chJbcnYZnqTBcAZYR7MKp2TPh0tOsGDGm
-         S/2gCJzkZq5KlkjAQSTA6jSNbI++rAaePBLSGyPU8DdTtMvua4YUCUakuL4wC0S+cCPI
-         TxAw==
-X-Gm-Message-State: AOAM532ZHdyNOeWuvkvqLRJgBp8NBqrTmfXfLQO4v3wWHsF9UGSCzrN9
-        BKpoj4lHDPWwZsPsayJOC5g=
-X-Google-Smtp-Source: ABdhPJz4tKMQ1MjNEIG7ggL1zNJpch1g4/PBFmNyxqIjP4oWUPpngevfdi8k5NcR3AKhb6kaSbEAeA==
-X-Received: by 2002:a9d:4c11:: with SMTP id l17mr3801606otf.289.1635907193676;
-        Tue, 02 Nov 2021 19:39:53 -0700 (PDT)
+        bh=cL6u9895NSZTZOeZgFQofwNy409f1x1M+KuZz4xRj4U=;
+        b=klZm5hyzfQfp3RYe73kUUQKU7GDMLp0ay6xqeKuwBMvzSlMqoXTkzcLUn8++nABliG
+         2VzexC6NTley6qHIx+I8UTLhUwST0YJyex6CqeSWtbsu9rBmqkdHoOD0CL6aTSWP3h1X
+         nWV9moFAhau5iNFzdwjC/svUo6xelpVDm2/b5qld9rCoQVW7H1GiQk2tXWyXUzSMAg2k
+         70kiWQbjuPbc+NZmPd/ag/xO/Rk+vy0scYYapIgtu7q/kevb8bXsgvxfLcFJ5zh77/pA
+         dNIXtPq1faJBm/lKPvsPKffwnPJe1Zpn3eI5+gjIBg47hmbQ4/2QqCrOJExq/IQ45roB
+         gtXA==
+X-Gm-Message-State: AOAM53219gGew0ufETlj8/PnTqFRBHktqjRxH4hsiFkA2VtnPNwYkypK
+        BsBMzxDOP2DbtKPYP0fE0is=
+X-Google-Smtp-Source: ABdhPJzISGebWubSHi3AkRuopPQ2C+KWhyezGClxf6GuEATRD33F95in2Di213SnjnQWU7PlWk1HSA==
+X-Received: by 2002:aca:b9c5:: with SMTP id j188mr8298845oif.104.1635907471267;
+        Tue, 02 Nov 2021 19:44:31 -0700 (PDT)
 Received: from [172.16.0.2] ([8.48.134.30])
-        by smtp.googlemail.com with ESMTPSA id 64sm210982otm.37.2021.11.02.19.39.51
+        by smtp.googlemail.com with ESMTPSA id k26sm214615otp.42.2021.11.02.19.44.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Nov 2021 19:39:53 -0700 (PDT)
-Message-ID: <019e96b5-4047-6458-0cfa-c9ef8f0d0470@gmail.com>
-Date:   Tue, 2 Nov 2021 20:39:51 -0600
+        Tue, 02 Nov 2021 19:44:30 -0700 (PDT)
+Message-ID: <37c1a2c7-3bfa-d36d-075f-a0065b8a05c1@gmail.com>
+Date:   Tue, 2 Nov 2021 20:44:28 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.2.1
-Subject: Re: [PATCH v2 09/25] tcp: authopt: Disable via sysctl by default
+Subject: Re: [PATCH v2 12/25] tcp: ipv6: Add AO signing for
+ tcp_v6_send_response
 Content-Language: en-US
 To:     Leonard Crestez <cdleonard@gmail.com>,
         David Ahern <dsahern@kernel.org>,
@@ -78,9 +79,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <cover.1635784253.git.cdleonard@gmail.com>
- <137399b962131c278acbfa5446a3b6d59aa0547b.1635784253.git.cdleonard@gmail.com>
+ <f9ff27ecc4aabd8ed89d5dfe5195c9cda1e7dc9f.1635784253.git.cdleonard@gmail.com>
 From:   David Ahern <dsahern@gmail.com>
-In-Reply-To: <137399b962131c278acbfa5446a3b6d59aa0547b.1635784253.git.cdleonard@gmail.com>
+In-Reply-To: <f9ff27ecc4aabd8ed89d5dfe5195c9cda1e7dc9f.1635784253.git.cdleonard@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -88,46 +89,78 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 11/1/21 10:34 AM, Leonard Crestez wrote:
-> diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-> index 97eb54774924..cc34de6e4817 100644
-> --- a/net/ipv4/sysctl_net_ipv4.c
-> +++ b/net/ipv4/sysctl_net_ipv4.c
-> @@ -17,10 +17,11 @@
->  #include <net/udp.h>
->  #include <net/cipso_ipv4.h>
->  #include <net/ping.h>
->  #include <net/protocol.h>
->  #include <net/netevent.h>
-> +#include <net/tcp_authopt.h>
->  
->  static int two = 2;
->  static int three __maybe_unused = 3;
->  static int four = 4;
->  static int thousand = 1000;
-> @@ -583,10 +584,19 @@ static struct ctl_table ipv4_table[] = {
->  		.mode		= 0644,
->  		.proc_handler	= proc_douintvec_minmax,
->  		.extra1		= &sysctl_fib_sync_mem_min,
->  		.extra2		= &sysctl_fib_sync_mem_max,
->  	},
+> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+> index 96a29caf56c7..68f9545e4347 100644
+> --- a/net/ipv6/tcp_ipv6.c
+> +++ b/net/ipv6/tcp_ipv6.c
+> @@ -902,13 +902,37 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
+>  	struct sock *ctl_sk = net->ipv6.tcp_sk;
+>  	unsigned int tot_len = sizeof(struct tcphdr);
+>  	__be32 mrst = 0, *topt;
+>  	struct dst_entry *dst;
+>  	__u32 mark = 0;
 > +#ifdef CONFIG_TCP_AUTHOPT
-> +	{
-> +		.procname	= "tcp_authopt",
-> +		.data		= &sysctl_tcp_authopt,
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dointvec,
+> +	struct tcp_authopt_info *authopt_info = NULL;
+> +	struct tcp_authopt_key_info *authopt_key_info = NULL;
+> +	u8 authopt_rnextkeyid;
+> +#endif
+>  
+>  	if (tsecr)
+>  		tot_len += TCPOLEN_TSTAMP_ALIGNED;
+> +#ifdef CONFIG_TCP_AUTHOPT
 
-Just add it to the namespace set, and this could be a u8 (try to plug a
-hole if possible) with min/max specified:
+I realize MD5 is done this way, but new code can always strive to be
+better. Put this and the one below in helpers such that this logic is in
+the authopt.h file and the intrusion here is a one liner that either
+compiles in or out based on the config setting.
 
-                .maxlen         = sizeof(u8),
-                .mode           = 0644,
-                .extra1         = SYSCTL_ZERO,
-                .extra2         = SYSCTL_ONE
-
-
-see icmp_echo_enable_probe as an example. And if you are not going to
-clean up when toggled off, you need a handler that tells the user it can
-not be disabled by erroring out on attempts to disable it.
+> +	/* Key lookup before SKB allocation */
+> +	if (static_branch_unlikely(&tcp_authopt_needed) && sk) {
+> +		if (sk->sk_state == TCP_TIME_WAIT)
+> +			authopt_info = tcp_twsk(sk)->tw_authopt_info;
+> +		else
+> +			authopt_info = rcu_dereference(tcp_sk(sk)->authopt_info);
+> +
+> +		if (authopt_info) {
+> +			authopt_key_info = __tcp_authopt_select_key(sk, authopt_info, sk,
+> +								    &authopt_rnextkeyid);
+> +			if (authopt_key_info) {
+> +				tot_len += TCPOLEN_AUTHOPT_OUTPUT;
+> +				/* Don't use MD5 */
+> +				key = NULL;
+> +			}
+> +		}
+> +	}
+> +#endif
+>  #ifdef CONFIG_TCP_MD5SIG
+>  	if (key)
+>  		tot_len += TCPOLEN_MD5SIG_ALIGNED;
+>  #endif
+>  
+> @@ -961,10 +985,24 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
+>  		tcp_v6_md5_hash_hdr((__u8 *)topt, key,
+>  				    &ipv6_hdr(skb)->saddr,
+>  				    &ipv6_hdr(skb)->daddr, t1);
+>  	}
+>  #endif
+> +#ifdef CONFIG_TCP_AUTHOPT
+> +	/* Compute the TCP-AO mac. Unlike in the ipv4 case we have a real SKB */
+> +	if (static_branch_unlikely(&tcp_authopt_needed) && authopt_key_info) {
+> +		*topt++ = htonl((TCPOPT_AUTHOPT << 24) |
+> +				(TCPOLEN_AUTHOPT_OUTPUT << 16) |
+> +				(authopt_key_info->send_id << 8) |
+> +				(authopt_rnextkeyid));
+> +		tcp_authopt_hash((char *)topt,
+> +				 authopt_key_info,
+> +				 authopt_info,
+> +				 (struct sock *)sk,
+> +				 buff);
+> +	}
+> +#endif
+>  
+>  	memset(&fl6, 0, sizeof(fl6));
+>  	fl6.daddr = ipv6_hdr(skb)->saddr;
+>  	fl6.saddr = ipv6_hdr(skb)->daddr;
+>  	fl6.flowlabel = label;
+> 
 
