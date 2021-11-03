@@ -2,101 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F215C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Nov 2021 09:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF15C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Nov 2021 12:46:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E854611AD
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Nov 2021 09:47:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4E04610A8
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Nov 2021 12:46:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231338AbhKCJuC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Nov 2021 05:50:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50336 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230097AbhKCJuB (ORCPT
+        id S231178AbhKCMtM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 3 Nov 2021 08:49:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31921 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230282AbhKCMtL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Nov 2021 05:50:01 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8AEC061714;
-        Wed,  3 Nov 2021 02:47:25 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id t30so2580706wra.10;
-        Wed, 03 Nov 2021 02:47:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Owuxu/u/a2bHMDCGZQeGYLoaD+hfbfqkKmW4rV72EDg=;
-        b=OHlMo4AEB3El1xuPYSeoUEOZ8QkjsQ/eUYqmmv/EZCjaM+yZQV4XNLGiayYmXQJ7dY
-         U0QThqegFN7ujzo5fqAxGE/k/fogrx2nWD1LNZL+RAMrvmeHC/0bHWuSYbtRkMhIjaMa
-         QvgD7ra+DMDY0qSLZr4MrQO6/S6YGWKK4TJWjhyxKvqvr56YQ2R1rHTXiVzhvgg/VGri
-         gE4nooMYMvUK5LbJJrD96RCVg0gXEgpZaBkHzcCnLdLlHad2/889nZHp6FlmY+59OZde
-         BSqOYVJ7o6jnbBctnRO7pFdjQobsu6XaCk07uVuh2FlmFjCrwPbriIlft+rmz2CJY2lV
-         +qDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Owuxu/u/a2bHMDCGZQeGYLoaD+hfbfqkKmW4rV72EDg=;
-        b=HphlRgUQ5viFhfDvOtNnt2kFjwBOSHG/DDZev5Wa1cL0egGN2DPWhkHMFWCXg+MBcc
-         evKRUZEavyB+3P2sebPtZoW45GrCiJgb3QAuCUiZVgokelGKohIrtZZFyujEDeyz7vp0
-         dPqZ++VQEaaF8CUKi0R5lHcynAwC2nXZlYR7SrP8P8nORwDTn+0uAxxGa10GkaRsBOaJ
-         m5EdCUC1O5/YgNGLdep7M2UFGrnxvlr++FbnqIGGhCPf3JQYSnI+myrAUYgZgfqNNd9Q
-         5MSLfNsqaWa3iKEuXM+6Ym3tLQYWi+1Q4Da90Ppfed+jhOD0PT0JwDD7YOLj6VWr1p11
-         b/Qg==
-X-Gm-Message-State: AOAM532bR27jeKBhiD6fpL6XmLwwIAlwARcDzRWPECeIbHABkqokDOBi
-        /O1Hc5nXfYj00uzutRM6YGc=
-X-Google-Smtp-Source: ABdhPJw6J4+VCHWxT1GPXHqXpGNOOBk0+iT4tUFqkeGI1hU7hTG0Xt73bJZaS6mBMLuFHyr5y1ED4Q==
-X-Received: by 2002:adf:fe4f:: with SMTP id m15mr25960360wrs.81.1635932843964;
-        Wed, 03 Nov 2021 02:47:23 -0700 (PDT)
-Received: from localhost.elektrobit.com (eth1-fw1-nbg6.eb.noris.de. [213.95.148.172])
-        by smtp.gmail.com with ESMTPSA id l7sm1779889wry.86.2021.11.03.02.47.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Nov 2021 02:47:23 -0700 (PDT)
-From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
-To:     Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+        Wed, 3 Nov 2021 08:49:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635943594;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=z6Gv9aPGAm2nkgSP8Un5y2TgCpXofV69fWr18YkFIeQ=;
+        b=AlBOiaM2/FQAR6QEqjF3uH7XdY9a2m2KVbSipFasTRy8GeblOTZiWMpc5jKeAlJ3RgGudn
+        4i/pmnF+qccXrHJ9cfFK9kf9qyU1vfKXqT6pENzs3wcZpH0BCxKUXnYpt/WgbWMX3ciBXe
+        L9+ZQjSyTKZL6Y410uTF4QGY3jFQRzM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-nRiYLvqzPYK0wVmqGeNc8Q-1; Wed, 03 Nov 2021 08:46:31 -0400
+X-MC-Unique: nRiYLvqzPYK0wVmqGeNc8Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19444DF8A7;
+        Wed,  3 Nov 2021 12:46:30 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.194.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 85E4070F6A;
+        Wed,  3 Nov 2021 12:46:15 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        linux-crypto@vger.kernel.org (open list:CRYPTO API),
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Declan Murphy <declan.murphy@intel.com>,
-        linux-crypto@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH] MAINTAINERS: rectify entry for INTEL KEEM BAY OCS ECC CRYPTO DRIVER
-Date:   Wed,  3 Nov 2021 10:47:11 +0100
-Message-Id: <20211103094711.8844-1-lukas.bulwahn@gmail.com>
-X-Mailer: git-send-email 2.26.2
+        Borislav Petkov <bp@alien8.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH] crypto: x86/aes-ni: fix AVX detection
+Date:   Wed,  3 Nov 2021 14:46:14 +0200
+Message-Id: <20211103124614.499580-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Commit c9f608c38009 ("crypto: keembay-ocs-ecc - Add Keem Bay OCS ECC
-Driver") only adds drivers/crypto/keembay/keembay-ocs-ecc.c, but adds a
-file entry drivers/crypto/keembay/ocs-ecc-curve-defs.h in MAINTAINERS.
+Fix two semi-theoretical issues that are present.
 
-Hence, ./scripts/get_maintainer.pl --self-test=patterns warns:
+1. AVX is assumed to be present when AVX2 is present.
+ That can be false in a VM.
+ This can be considered a hypervisor bug,
+ but the kernel should not crash in this case if this is possible.
 
-  warning: no file matches  F:  drivers/crypto/keembay/ocs-ecc-curve-defs.h
+2. YMM state can be soft disabled in XCR0.
 
-Assuming that this header is obsolete and will not be included in the
-repository, remove the unneeded file entry from MAINTAINERS.
+Fix both issues by using 'cpu_has_xfeatures(XFEATURE_MASK_YMM')
+to check for usable AVX support.
 
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Fixes: d764593af9249 ("crypto: aesni - AVX and AVX2 version of AESNI-GCM encode and decode")
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- MAINTAINERS | 1 -
- 1 file changed, 1 deletion(-)
+ arch/x86/crypto/aesni-intel_glue.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ba9f6537abc3..1fb254aa12d1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9671,7 +9671,6 @@ F:	Documentation/devicetree/bindings/crypto/intel,keembay-ocs-ecc.yaml
- F:	drivers/crypto/keembay/Kconfig
- F:	drivers/crypto/keembay/Makefile
- F:	drivers/crypto/keembay/keembay-ocs-ecc.c
--F:	drivers/crypto/keembay/ocs-ecc-curve-defs.h
- 
- INTEL KEEM BAY OCS HCU CRYPTO DRIVER
- M:	Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 0fc961bef299c..20db1e500ef6f 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -1147,24 +1147,25 @@ static int __init aesni_init(void)
+ 	if (!x86_match_cpu(aesni_cpu_id))
+ 		return -ENODEV;
+ #ifdef CONFIG_X86_64
+-	if (boot_cpu_has(X86_FEATURE_AVX2)) {
+-		pr_info("AVX2 version of gcm_enc/dec engaged.\n");
+-		static_branch_enable(&gcm_use_avx);
+-		static_branch_enable(&gcm_use_avx2);
+-	} else
+-	if (boot_cpu_has(X86_FEATURE_AVX)) {
+-		pr_info("AVX version of gcm_enc/dec engaged.\n");
++	if (cpu_has_xfeatures(XFEATURE_MASK_YMM, NULL)) {
++
+ 		static_branch_enable(&gcm_use_avx);
+-	} else {
+-		pr_info("SSE version of gcm_enc/dec engaged.\n");
+-	}
+-	if (boot_cpu_has(X86_FEATURE_AVX)) {
++
++		if (boot_cpu_has(X86_FEATURE_AVX2)) {
++			static_branch_enable(&gcm_use_avx2);
++			pr_info("AVX2 version of gcm_enc/dec engaged.\n");
++		} else {
++			pr_info("AVX version of gcm_enc/dec engaged.\n");
++		}
++
+ 		/* optimize performance of ctr mode encryption transform */
+ 		static_call_update(aesni_ctr_enc_tfm, aesni_ctr_enc_avx_tfm);
+ 		pr_info("AES CTR mode by8 optimization enabled\n");
++
++	} else {
++		pr_info("SSE version of gcm_enc/dec engaged.\n");
+ 	}
+ #endif
+-
+ 	err = crypto_register_alg(&aesni_cipher_alg);
+ 	if (err)
+ 		return err;
 -- 
-2.26.2
+2.26.3
 
