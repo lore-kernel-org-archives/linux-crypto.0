@@ -2,165 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 811F8C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Nov 2021 22:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 994C1C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Nov 2021 06:19:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64F4660EB4
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Nov 2021 22:22:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74F86611C9
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Nov 2021 06:19:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbhKCWZa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Nov 2021 18:25:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53358 "EHLO
+        id S230119AbhKDGWA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Nov 2021 02:22:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbhKCWZ3 (ORCPT
+        with ESMTP id S229994AbhKDGV7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Nov 2021 18:25:29 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8915C061714;
-        Wed,  3 Nov 2021 15:22:52 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id f8so14723073edy.4;
-        Wed, 03 Nov 2021 15:22:52 -0700 (PDT)
+        Thu, 4 Nov 2021 02:21:59 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50E24C061714;
+        Wed,  3 Nov 2021 23:19:22 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id p18so5505313plf.13;
+        Wed, 03 Nov 2021 23:19:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=J2NdaQ8T+dt9p0jHQsB0InvqWOp8/QEv69XWnnosGBY=;
-        b=GzUMX9Jd1JqRALeydvQkd1EteV+LGofdP3599Qk4mjqzSesoDGjQdQcKoqGFR4aoDk
-         JsSLfMQxKvkEfaa+V4djLBHJg7gcSyqFtQvkkMJEbH9MofIg56bjXxLf+Vbfyf6NuNdZ
-         efy9VFnCdyjcQmueGYDvJv5cL8JcrhSDLQls9ycfzplAA8GWc8BwHVEAqTfPJQkWi5Ov
-         41UH+Cfvqw8ipreeDS/0Lo/dbZJuIAK2WVBsv7ekD1Rfdf/uNBVLkKM3v/YbFoTyqxWw
-         UwIxMgDH50zWAm2SzdskqS58ZW6oBLOos6zQQG4FhNXgtAMqfWXQXyuOg0AszvkWxh7i
-         Tr6g==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=x/7yWa9TJnaSeRyI/HPqifrDsWRJ3du7nMikT4cHRgc=;
+        b=i0bqzK23wAuVTAvxivcIjUs5QJ5W51FYUAqolWFzGQHXH7f7jvcJJxGFjSZHo08JBE
+         EQXvBCNVi9Ui8o2zEWtgSIpgSmCGjPtVD2KELXP7JMH08TOshe6pjRAERpKavq1U+DTR
+         kmJE98pQiVrDwglZj5KflNamJIvnI8WtPnx5bF1wZDbXrJmjPT5n1utYnqarZYHOPSXc
+         yPsBpIwKF76MIR1Phw0WX2k7tjIuloKGbqlm96FnB4DQNrMoKR1+c1JslUgti3MtcwBZ
+         u2xRRRYMRd1iqP/pyWLev/MfozauLev/Bk+8xuF/a4JZdmjb5P7J0LtaRV1pf2zJumGm
+         neIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=J2NdaQ8T+dt9p0jHQsB0InvqWOp8/QEv69XWnnosGBY=;
-        b=yLj5H2Hk3FYmZ6a7Uta8ESfZ8EROBMuEhyp5ZT0kcyu1zudciX2HaTV5WrD4DL7bZO
-         ddxzjLUnZxrYCifmjsGOCGsUlvj/PmOf7QgprAdWjPdfrEDlldsmlP2SQB7wz8UHuaJd
-         R3bTuyVoBGKF5MQLP0Iqc8RGvKIsZ/qRP6JGfh2D8CzNy8VDCNU9B0lakmsgqYaf1EfZ
-         //NgvSKqcGEexR1HYNmewfUuzzvxJkX1LeukCqr+hm3ed00zjmaXtsck4A/gTvHbwaBK
-         YZ4LrgGhkdM91CAi8tNs+ZFsIQ1ilsujJy+Gscv+e6z3dw448k4iPnntJ6ysOEgHh6db
-         It8Q==
-X-Gm-Message-State: AOAM532wfw64ASo5iuz5H+QuXBYwaV4fzH5BxuAfadyurH7wKcjae6fn
-        LPnJ3/QaYQxTrkC9cwS54SKGJ/JOz91Tpg==
-X-Google-Smtp-Source: ABdhPJzV4/y5qTs4xQPrAXlnayDNX8Mrj7BkhVqpL8WzEHl/VS/hgdFLOpFJr0DwVrlp/gonwlrvsA==
-X-Received: by 2002:a17:907:1c85:: with SMTP id nb5mr23550781ejc.502.1635978171338;
-        Wed, 03 Nov 2021 15:22:51 -0700 (PDT)
-Received: from ?IPv6:2a04:241e:501:3800:dd98:1fb5:16b3:cb28? ([2a04:241e:501:3800:dd98:1fb5:16b3:cb28])
-        by smtp.gmail.com with ESMTPSA id p23sm2064759edw.94.2021.11.03.15.22.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Nov 2021 15:22:50 -0700 (PDT)
-Subject: Re: [PATCH v2] tcp: Initial support for RFC5925 auth option
-To:     David Ahern <dsahern@gmail.com>, David Ahern <dsahern@kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Eric Dumazet <edumazet@google.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1635784253.git.cdleonard@gmail.com>
- <832e6d49-8490-ab8b-479b-0420596d0aaa@gmail.com>
-From:   Leonard Crestez <cdleonard@gmail.com>
-Message-ID: <9bcd27f0-e14e-ab89-88a4-f6cf6b4323b4@gmail.com>
-Date:   Thu, 4 Nov 2021 00:22:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        bh=x/7yWa9TJnaSeRyI/HPqifrDsWRJ3du7nMikT4cHRgc=;
+        b=jn3m1W0MWb2oVEQNyfhms1kNCFIfyzI7qlQboOpFMITOQvBjKAqK1np577gcyBOxTX
+         95NEw19U5/gdhA7Sez7G0xIkqIq/wJVKk5ryKvJFd4pxO/tWA4Y6IT99rqyHwpgFniVO
+         lZ7VIYWIAp2sfBQKOzYcT317d2jehGLzZNc7lOei5huMg/7y8V2aqppgzKeh8WVS0P+o
+         YbP5Sa0GWc4j+MLRM0f9yWKhSJPns+gQaz+XnKUZhsDmrj1gfd6hfrHV3el3mhkkeYWO
+         VWBUtZeggpfR/fuWtw1sBvJlQ0vjDYTFsifvlo59jBpsmOr+xrFbhfOs6nTi41s3WUks
+         skmA==
+X-Gm-Message-State: AOAM531/DpJVfDeMZJtCbtbCnMDj2hnBlYrAuSBbEr219OddS5cjti4Q
+        P97/urg/44WDD5JlpbEPkLA=
+X-Google-Smtp-Source: ABdhPJxb8DxHTfIf0CGlkUjUIP0a+fO0BK/QvPiyhQ29jLhC1bArOGeK5zBXU0vqt51tk3V7nQ+myg==
+X-Received: by 2002:a17:902:900c:b0:13f:974c:19b0 with SMTP id a12-20020a170902900c00b0013f974c19b0mr42386170plp.12.1636006761921;
+        Wed, 03 Nov 2021 23:19:21 -0700 (PDT)
+Received: from debian11-dev-61.localdomain (192.243.120.180.16clouds.com. [192.243.120.180])
+        by smtp.gmail.com with ESMTPSA id n14sm3212646pgd.68.2021.11.03.23.19.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Nov 2021 23:19:21 -0700 (PDT)
+From:   davidcomponentone@gmail.com
+X-Google-Original-From: yang.guang5@zte.com.cn
+To:     xuzaibo@huawei.com
+Cc:     davidcomponentone@gmail.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Yang Guang <yang.guang5@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH] crypto: hisilicon/hpre -  use swap() to make code cleaner
+Date:   Thu,  4 Nov 2021 14:19:10 +0800
+Message-Id: <20211104061910.1505738-1-yang.guang5@zte.com.cn>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <832e6d49-8490-ab8b-479b-0420596d0aaa@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/3/21 5:18 AM, David Ahern wrote:
-> On 11/1/21 10:34 AM, Leonard Crestez wrote:
->> This is similar to TCP MD5 in functionality but it's sufficiently
->> different that wire formats are incompatible. Compared to TCP-MD5 more
->> algorithms are supported and multiple keys can be used on the same
->> connection but there is still no negotiation mechanism.
->>
->> Expected use-case is protecting long-duration BGP/LDP connections
->> between routers using pre-shared keys. The goal of this series is to
->> allow routers using the linux TCP stack to interoperate with vendors
->> such as Cisco and Juniper.
->>
->> Both algorithms described in RFC5926 are implemented but the code is not
->> very easily extensible beyond that. In particular there are several code
->> paths making stack allocations based on RFC5926 maximum, those would
->> have to be increased.
->>
->> This version implements SNE and l3mdev awareness and adds more tests.
->> Here are some known flaws and limitations:
->>
->> * Interaction with TCP-MD5 not tested in all corners
->> * Interaction with FASTOPEN not tested and unlikely to work because
->> sequence number assumptions for syn/ack.
->> * Not clear if crypto_shash_setkey might sleep. If some implementation
->> do that then maybe they could be excluded through alloc flags.
->> * Traffic key is not cached (reducing performance)
->> * User is responsible for ensuring keys do not overlap.
->> * There is no useful way to list keys, making userspace debug difficult.
->> * There is no prefixlen support equivalent to md5. This is used in
->> some complex FRR configs.
->>
->> Test suite was added to tools/selftests/tcp_authopt. Tests are written
->> in python using pytest and scapy and check the API in some detail and
->> validate packet captures. Python code is already used in linux and in
->> kselftests but virtualenvs not very much, this particular test suite
->> uses `pip` to create a private virtualenv and hide dependencies.
->>
->> This actually forms the bulk of the series by raw line-count. Since
->> there is a lot of code it was mostly split on "functional area" so most
->> files are only affected by a single code. A lot of those tests are
->> relevant to TCP-MD5 so perhaps it might help to split into a separate
->> series?
->>
->> Some testing support is included in nettest and fcnal-test.sh, similar
->> to the current level of tcp-md5 testing.
->>
->> SNE was tested by creating connections in a loop until a large SEQ is
->> randomly selected and then making it rollover. The "connect in a loop"
->> step ran into timewait overflow and connection failure on port reuse.
->> After spending some time on this issue and my conclusion is that AO
->> makes it impossible to kill remainders of old connections in a manner
->> similar to unsigned or md5sig, this is because signatures are dependent
->> on ISNs.  This means that if a timewait socket is closed improperly then
->> information required to RST the peer is lost.
->>
->> The fact that AO completely breaks all connection-less RSTs is
->> acknowledged in the RFC and the workaround of "respect timewait" seems
->> acceptable.
->>
->> Changes for frr (old): https://github.com/FRRouting/frr/pull/9442
->> That PR was made early for ABI feedback, it has many issues.
->>
-> 
-> overall looks ok to me. I did not wade through the protocol details.
-> 
-> I did see the comment about no prefixlen support in the tests. A lot of
-> patches to absorb, perhaps I missed it. Does AuthOpt support for
-> prefixes? If not, you should consider adding that as a quick follow on
-> (within the same dev cycle). MD5 added prefix support for scalability;
-> seems like AO should be concerned about the same.
+From: Yang Guang <yang.guang5@zte.com.cn>
 
-I just skipped it because it's not required for core functionality.
+Use the macro 'swap()' defined in 'include/linux/minmax.h' to avoid
+opencoding it.
 
-It's very straight forward so I will add it to the next version.
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Yang Guang <yang.guang5@zte.com.cn>
+---
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
---
-Regards,
-Leonard
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index a032c192ef1d..0f1724d355b8 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -1177,13 +1177,10 @@ static void hpre_rsa_exit_tfm(struct crypto_akcipher *tfm)
+ static void hpre_key_to_big_end(u8 *data, int len)
+ {
+ 	int i, j;
+-	u8 tmp;
+ 
+ 	for (i = 0; i < len / 2; i++) {
+ 		j = len - i - 1;
+-		tmp = data[j];
+-		data[j] = data[i];
+-		data[i] = tmp;
++		swap(data[j], data[i]);
+ 	}
+ }
+ 
+-- 
+2.30.2
+
