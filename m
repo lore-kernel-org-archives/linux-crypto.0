@@ -2,123 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E82D8C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 09:54:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F2DC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 09:55:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB5C56124F
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 09:54:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4C496124F
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 09:55:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229785AbhKEJ4q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Nov 2021 05:56:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49804 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230075AbhKEJ4p (ORCPT
+        id S232837AbhKEJ5v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Nov 2021 05:57:51 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:50992 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230075AbhKEJ5u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Nov 2021 05:56:45 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6CA3C061714;
-        Fri,  5 Nov 2021 02:54:05 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id c8so14399054ede.13;
-        Fri, 05 Nov 2021 02:54:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DuiEAv4X8nRbsvh0TZ76A3H9pHWEyuQ0bqy+epxl76w=;
-        b=We/W8/ZwmW6KJVN5yi8xuNZi7QCwaeCftdWuWWAR/vV3xMPtMYkzFJTXso470Bzjbn
-         IwhSwQEz4cswX8a+4rk8XlgGnwiiSmu5Vs1qiiVY5Le0qpd9jBzs5J5N32K6W+VEvrG5
-         J+02lX0aCdB82U3TnGMTTXY2Y7GYPFnsMmDB7B+WDpMR9Z7vmwVFCsTzro/assNPWaJ4
-         4CTk0vFS0prH562T+t6ibiYjYN4ahuqQNkeHUOAc7D63pJgNJ2AiYpV+4NNfHAAXXW3V
-         iLKyndc/IjZbY5z8oEliNcGtG9B60l1xpOgSAIBjb2GEzvOn1VX6LZd1c97HFICr0gNv
-         lFwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DuiEAv4X8nRbsvh0TZ76A3H9pHWEyuQ0bqy+epxl76w=;
-        b=hU8VM0Zg71zqxWQghqEbvayddG72ObQIz5ksJfw85prFA053Y78WvMXkl+XeVG9ktr
-         srvszucz6jjHaKGYnkxAnUlTDaRb/wo/bEBlKJAXk+johcKGy+V8GPenOyUjwvUTQ3/J
-         YQGSl+kG72himveBGRaj90R63grq5peoi0QZnmu1nG/jhUjnAIKzEDAb6+9RtJ2Qgzqz
-         RVtBuSMK+1ofAS6KTHWm0h69N8HCLtYtQE/VorUuQJBXSIyJ2k/jt3WBVICgSOBl5EfC
-         gDVpJtJpY4W6yKHwfOu8nuTWULj+jRwp1RY9VvOUYZaTVlOkxRpUSpYfCbIsloU4OFvv
-         UmsQ==
-X-Gm-Message-State: AOAM531ytN8+/xSa6J4bF+/qP0dWy1PkDOB2dEWrG0Z2LPFXR7gMNQvO
-        IaEmhLR/yTs7V/kuyRWnXm0BcZFk4gu/HA==
-X-Google-Smtp-Source: ABdhPJzxAQA4oTPZ0kTrV59usVLSC0mfI0frSSPQlkuxiDVCm7buQEtr1KQolS/oUoQuZgL+j0Ff7w==
-X-Received: by 2002:a05:6402:4246:: with SMTP id g6mr40694394edb.112.1636106044469;
-        Fri, 05 Nov 2021 02:54:04 -0700 (PDT)
-Received: from ?IPv6:2a04:241e:501:3870:9439:4202:183c:5296? ([2a04:241e:501:3870:9439:4202:183c:5296])
-        by smtp.gmail.com with ESMTPSA id g21sm4286121edw.86.2021.11.05.02.54.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Nov 2021 02:54:04 -0700 (PDT)
-Subject: Re: [PATCH 5/5] tcp/md5: Make more generic tcp_sig_pool
-To:     Dmitry Safonov <dima@arista.com>,
+        Fri, 5 Nov 2021 05:57:50 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 4DEA91FD33;
+        Fri,  5 Nov 2021 09:55:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1636106109; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mby2JIZUNM+DNzTfY4azBDzQa/92IvvCw8tLadYHt78=;
+        b=rNlRdZcKQOCSZpYPzPrRzb2E+1bXLWVEnJM4Dzb5PAiL9uNR+XeyDlYZ3UTyI6Fml8Cv8C
+        vx9asIPpjaxVUPubuozUoaYNWXM5AH5VpTx5MjycaA0faTncC5vcdk65IDTZXHAjhSvB1e
+        poh38Gdvgtr80NuSSZMT1EpLyodmnCk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1636106109;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mby2JIZUNM+DNzTfY4azBDzQa/92IvvCw8tLadYHt78=;
+        b=nzctrc7rLdjmdCVlJNft5ocJrbG6SAddj/2+I5zFvjB2sJzkxB3jwNmuGN1hzLRVZzMixK
+        /fHuVK51FITdOyAQ==
+Received: from kitsune.suse.cz (kitsune.suse.cz [10.100.12.127])
+        by relay2.suse.de (Postfix) with ESMTP id 4FBFF2C14A;
+        Fri,  5 Nov 2021 09:55:07 +0000 (UTC)
+From:   Michal Suchanek <msuchanek@suse.de>
+To:     keyrings@vger.kernel.org
+Cc:     Michal Suchanek <msuchanek@suse.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>
-Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
-        Andy Lutomirski <luto@amacapital.net>,
         "David S. Miller" <davem@davemloft.net>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211105014953.972946-1-dima@arista.com>
- <20211105014953.972946-6-dima@arista.com>
-From:   Leonard Crestez <cdleonard@gmail.com>
-Message-ID: <88edb8ff-532e-5662-cda7-c00904c612b4@gmail.com>
-Date:   Fri, 5 Nov 2021 11:54:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Jessica Yu <jeyu@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Rob Herring <robh@kernel.org>,
+        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
+        Hari Bathini <hbathini@linux.ibm.com>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        Frank van der Linden <fllinden@amazon.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: [PATCH 0/2] Additional appended signature cleanup
+Date:   Fri,  5 Nov 2021 10:55:03 +0100
+Message-Id: <cover.1636105912.git.msuchanek@suse.de>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <cover.1635948742.git.msuchanek@suse.de>
+References: <cover.1635948742.git.msuchanek@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20211105014953.972946-6-dima@arista.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/5/21 3:49 AM, Dmitry Safonov wrote:
-> Convert tcp_md5sig_pool to more generic tcp_sig_pool.
-> Now tcp_sig_pool_alloc(const char *alg) can be used to allocate per-cpu
-> ahash request for different hashing algorithms besides md5.
-> tcp_sig_pool_get() and tcp_sig_pool_put() should be used to get
-> ahash_request and scratch area.
+There is one more copy of the code checking appended signarutes.
 
-This pool pattern is a workaround for crypto-api only being able to 
-allocate transforms from user context.
+Merge the common code to module_signature.c
 
-It would be useful for this "one-transform-per-cpu" object to be part of 
-crypto api itself, there is nothing TCP-specific here other than the 
-size of scratch buffer.
+Thanks
 
-> Make tcp_sig_pool reusable for TCP Authentication Option support
-> (TCP-AO, RFC5925), where RFC5926[1] requires HMAC-SHA1 and AES-128_CMAC
-> hashing at least.
-Additional work would be required to support options of arbitrary size 
-and I don't think anyone would use non-standard crypto algorithms.
+Michal
 
-Is RFC5926 conformance really insufficient?
+Michal Suchanek (2):
+  module: Use key_being_used_for for log messages in
+    verify_appended_signature
+  module: Move duplicate mod_check_sig users code to mod_parse_sig
 
-My knowledge of cryptography doesn't go much beyond "data goes in 
-signature goes out" but there are many recent arguments from that cipher 
-agility is outright harmful and recent protocols like WireGuard don't 
-support any algorithm choices.
+ arch/powerpc/kexec/elf_64.c              |  2 +-
+ arch/s390/kernel/machine_kexec_file.c    |  2 +-
+ crypto/asymmetric_keys/asymmetric_type.c |  1 +
+ include/linux/module_signature.h         |  1 +
+ include/linux/verification.h             |  3 +-
+ kernel/module.c                          |  3 +-
+ kernel/module_signature.c                | 56 +++++++++++++++++++++++-
+ kernel/module_signing.c                  | 33 ++++----------
+ security/integrity/ima/ima_modsig.c      | 22 ++--------
+ 9 files changed, 74 insertions(+), 49 deletions(-)
 
-> +#define TCP_SIG_POOL_MAX		8
-> +static struct tcp_sig_pool_priv_t {
-> +	struct tcp_sig_crypto		cryptos[TCP_SIG_POOL_MAX];
-> +	unsigned int			cryptos_nr;
-> +} tcp_sig_pool_priv = {
-> +	.cryptos_nr = 1,
-> +	.cryptos[TCP_MD5_SIG_ID].alg = "md5",
-> +};
+-- 
+2.31.1
 
-Why an array of 8? Better to use an arbitrary list.
-
---
-Regards,
-Leonard
