@@ -2,109 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DCD5C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 12:27:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DFB2C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 13:26:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24E3D60E73
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 12:27:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15F31610FD
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 13:26:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229923AbhKEM3m (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Nov 2021 08:29:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55872 "EHLO
+        id S232946AbhKEN25 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Nov 2021 09:28:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbhKEM3l (ORCPT
+        with ESMTP id S232258AbhKEN24 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Nov 2021 08:29:41 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1527CC061714;
-        Fri,  5 Nov 2021 05:27:02 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id w1so32727693edd.10;
-        Fri, 05 Nov 2021 05:27:02 -0700 (PDT)
+        Fri, 5 Nov 2021 09:28:56 -0400
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F635C061714;
+        Fri,  5 Nov 2021 06:26:17 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id bk26so13281529oib.11;
+        Fri, 05 Nov 2021 06:26:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=VWnwoguiS8Ek3wXdinAoUlLWrPmI0p9qcxlIOqqvuf4=;
-        b=WQTtiepPdxr+1qL1KOH7sLyVAHlZ4keVF2ROBKBaalj+LYa8+kUcsWY8b+ZnFEaseG
-         ROTVJpXjPrRSfBHrfQcX+6W9DZFhS4teSACoXplshotQffNKW3wxCaE3eOS4eKHrDfoH
-         LvjsMuvNbJSbaYKvsQehN/eRQnBheZjA8ncbrmpO+f2kSDuPmKcI3AnfXAzWWkUuKVAN
-         mnj/RAbhMPbLwZxPJCiNnyCPBsqM6u/cq6Jtd5OT+efqhTJCggfYSwD97E9iyabfdMeI
-         XbuAdP0tII+p9J/1g5aJ/Wm7RastZAQjeP+g7JGMkaGbeHClk+k3jXZSglBN/Q8a8zKi
-         t5ww==
+        h=sender:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=SS/+GawiHt4AKQM+4dzNVtQd4ve18Yf7ZbG8yygMuQ8=;
+        b=EIpAESqujtMyfMEh64OQ3A4jvZTIkxWetvJm4blYAyALH/1z9KT46AM0yJbk3EpYf4
+         Z1hxc8w98ugDN+dX8C5NTkAc7i7YlYpCgIMorJMMltqIcObvxOthb0THrAzMNhIrmbha
+         n5SnTqCKxjW6CjtcXV1dhOcGZc/YJDgvYM72VSRAzO9EPa4p64MDH8yagR8xy4apfNr6
+         VhUryQ5bcLzqEcLWEosrQnxmjl2FfJiR3ZN0KRl7mLo+tOrWWmuBaD90EFKWjN1voqHA
+         AaNzXqahv+3Wt8qoIK8bqdvDcKSZJqgMYk+EgLdpiFJ9NuxklutHxotoL4d5LUHYK+Q2
+         CZdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=VWnwoguiS8Ek3wXdinAoUlLWrPmI0p9qcxlIOqqvuf4=;
-        b=ofsJbqap6nPjPHdhkU1+LI37jk2ZMIDJc6bnk28tjLwImWqnF0ITJ942mrsqJKV7X4
-         KiN6CGOtRdqQs2RRcdLMqDpZHu/mmywbcCRL1CqpPf7Us3Ovj/FnIoSrQuSTn3uBOepM
-         cuOcdfETP23HEUUMIpBiUNqIpwiHYmLF/XFphBuvxmP3Nn4PennpXOq14wJ4gC0ZataE
-         /wnh1mbdQ1oAjCsYGIz/1mb1e3G1dQ57xriepbvE6a4coWzdmCgh0KQ8Twibh4AhnsBy
-         s+A/vq9mlqwBb8gYSUTFSs1oPIYIJuO3j+8jhOb/rVavvO/0h5Vmzm+gyxCcS393MsMw
-         4Rew==
-X-Gm-Message-State: AOAM531VLBTQQ622Qs4TUGYL7/ijQoCxiS0sCuFPxYPQlk7MztzITLUH
-        Q4tB+1ZXPxOCyNIP/suFRvaKkRC29GZn0w==
-X-Google-Smtp-Source: ABdhPJy1p4mx96iQlG4iPSiOJ8nL03P+wrgU9AOxqAdkTOF/0WQLNezrp9b8Abnn76W3ALi6elQrTQ==
-X-Received: by 2002:a17:906:d541:: with SMTP id cr1mr74734988ejc.81.1636115220681;
-        Fri, 05 Nov 2021 05:27:00 -0700 (PDT)
-Received: from ?IPv6:2a04:241e:501:3870:9439:4202:183c:5296? ([2a04:241e:501:3870:9439:4202:183c:5296])
-        by smtp.gmail.com with ESMTPSA id oz13sm4081898ejc.65.2021.11.05.05.26.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Nov 2021 05:27:00 -0700 (PDT)
-Subject: Re: [PATCH v2 21/25] tcp: authopt: Add initial l3index support
-To:     David Ahern <dsahern@gmail.com>
-Cc:     Eric Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1635784253.git.cdleonard@gmail.com>
- <4e049d1ade4be3010b4ea63daf2ef3bed4e1892b.1635784253.git.cdleonard@gmail.com>
- <e08a7554-bd3e-e524-830d-64b76853ace2@gmail.com>
-From:   Leonard Crestez <cdleonard@gmail.com>
-Message-ID: <320b8801-1f35-a283-be11-a4f4275847d2@gmail.com>
-Date:   Fri, 5 Nov 2021 14:26:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mime-version:content-disposition;
+        bh=SS/+GawiHt4AKQM+4dzNVtQd4ve18Yf7ZbG8yygMuQ8=;
+        b=HudtrcRc7x+L16AELdHaXCWrTWhuX4rChjfo/CtRuG5tzKDQOvGUX6Sk7BAQFHFtmW
+         JTN+6+/0fEYS3PVZOCS5eAL3JAsirI4/kxvn17pXyli5NzYWRntxyKp8PM8ALn2j/Ivw
+         BKowhnmT95ZkmmTeOaGJf13kpzsyEFOncfqFBbGWwpB//8CFUSMtESiOnN3on7t1zBLz
+         eGENIVouX2npcMw31/oGG7sYdpkb1KjvXT8OpJpiTMj6R8iWCFvFfaIJmsXgotxPZHkX
+         2rGCFlSNHzwsaTIjpoWV/1eXIbfLFsgeDN/r6r5ryc5FvbAhs07u2gZu8BGd4sZNyynV
+         buOg==
+X-Gm-Message-State: AOAM531HyXuhNVW+rrtDXkcKnU8Sn8umBZ62eAQOaCBA6dpXfoT6ztUj
+        lkeop126nHHvvgP4KETTC5U=
+X-Google-Smtp-Source: ABdhPJzQxYMD6ED3vyItTfr3+KH21wd2coF0sEr2XvgMNrjO1G5P6FF5lP/RNtLGITHR9T0jJ7B2EA==
+X-Received: by 2002:a05:6808:1483:: with SMTP id e3mr12400151oiw.83.1636118776298;
+        Fri, 05 Nov 2021 06:26:16 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id m21sm2250944otp.75.2021.11.05.06.26.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Nov 2021 06:26:15 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date:   Fri, 5 Nov 2021 06:26:14 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Ido Schimmel <idosch@idosch.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Vladis Dronov <vdronov@redhat.com>,
+        Simo Sorce <ssorce@redhat.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+        kernel test robot <lkp@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: crypto: api - Fix boot-up crash when crypto manager is disabled
+Message-ID: <20211105132614.GA2791625@roeck-us.net>
 MIME-Version: 1.0
-In-Reply-To: <e08a7554-bd3e-e524-830d-64b76853ace2@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/3/21 5:06 AM, David Ahern wrote:
-> On 11/1/21 10:34 AM, Leonard Crestez wrote:
->> @@ -584,10 +614,24 @@ int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
->>   		return -EINVAL;
->>   	err = tcp_authopt_alg_require(alg);
->>   	if (err)
->>   		return err;
->>   
->> +	/* check ifindex is valid (zero is always valid) */
->> +	if (opt.flags & TCP_AUTHOPT_KEY_IFINDEX && opt.ifindex) {
->> +		struct net_device *dev;
->> +
->> +		rcu_read_lock();
->> +		dev = dev_get_by_index_rcu(sock_net(sk), opt.ifindex);
->> +		if (dev && netif_is_l3_master(dev))
->> +			l3index = dev->ifindex;
->> +		rcu_read_unlock();
+On Fri, Nov 05, 2021 at 03:26:08PM +0800, Herbert Xu wrote:
+> On Thu, Nov 04, 2021 at 05:18:34PM +0200, Ido Schimmel wrote:
+> >
+> > Attached my config. I can easily test patches.
 > 
-> rcu_read_lock()... rcu_read_unlock() can be replaced with
-> netif_index_is_l3_master(...)
+> Thanks!
+> 
+> Could you all try this patch please?
+> 
+> ---8<---
+> When the crypto manager is disabled, we need to explicitly set
+> the crypto algorithms' tested status so that they can be used.
+> 
+> Fixes: cad439fc040e ("crypto: api - Do not create test larvals if...")
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Reported-by: Ido Schimmel <idosch@idosch.org>
+> Reported-by: Guenter Roeck <linux@roeck-us.net>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Yes, this makes the code shorter.
+Tested-by: Guenter Roeck <linux@roeck-us.net>
+
+> 
+> diff --git a/crypto/algapi.c b/crypto/algapi.c
+> index d379fd91fb7b..a366cb3e8aa1 100644
+> --- a/crypto/algapi.c
+> +++ b/crypto/algapi.c
+> @@ -284,6 +284,8 @@ static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
+>  
+>  	if (larval)
+>  		list_add(&larval->alg.cra_list, &crypto_alg_list);
+> +	else
+> +		alg->cra_flags |= CRYPTO_ALG_TESTED;
+>  
+>  	crypto_stats_init(alg);
+>  
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
