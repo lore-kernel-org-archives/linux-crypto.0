@@ -2,245 +2,156 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9571EC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 01:20:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24699C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 01:22:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 71C1161245
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 01:20:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03F9961052
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 01:22:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230457AbhKEBX1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Nov 2021 21:23:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49242 "EHLO
+        id S230367AbhKEBZL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Nov 2021 21:25:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbhKEBX1 (ORCPT
+        with ESMTP id S229596AbhKEBZK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Nov 2021 21:23:27 -0400
-Received: from ssl.serverraum.org (ssl.serverraum.org [IPv6:2a01:4f8:151:8464::1:2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80913C061714;
-        Thu,  4 Nov 2021 18:20:47 -0700 (PDT)
-Received: from ssl.serverraum.org (web.serverraum.org [172.16.0.2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ssl.serverraum.org (Postfix) with ESMTPSA id 4CA3322221;
-        Fri,  5 Nov 2021 02:20:43 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
-        t=1636075245;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=czoGMI7pSGD+jgK2GH+aWkW1UvHzzNCq7dk4XmwLUZ8=;
-        b=kfu5PyBxJpoDNyt86ETewP7DrC0EwQNyd/TkGWVvffCKytziAa+Y/AK15hixRZbAi7+l09
-        PQE/hW2FJOtJ+lKPXgG8XlEdiArx+GcTLhAMqxlRJjbDldeGJf9Xx0fChuMrNOL10PxNQg
-        scPRzdhAHBKm1ydwi98uh2uWzhtocTY=
+        Thu, 4 Nov 2021 21:25:10 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8EC2C061714;
+        Thu,  4 Nov 2021 18:22:31 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id b184-20020a1c1bc1000000b0033140bf8dd5so5453326wmb.5;
+        Thu, 04 Nov 2021 18:22:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=SLnnbrtMHtKbdTFjn0/cgFPnGOzXZjXisxXELw1s/tE=;
+        b=g/nx8bR6C1aHJgc2XPHBETGyeNH1xR6pC24lfysfM53iN2Przw8zztZAEyJ8LGv88T
+         NXAN/cBgKSIGHcwYPATtgiKaIv3e2WVdM3iNUaZhEfzDZ7AOwW5EJAfezG2ElCuDdULm
+         wMRnVIMpd3b3nf1Qm28n7u/OgQGkhP1ikkl+1ddFhwGtc9ODoYZmziS6MZWNC1WqjcMm
+         pmA3cuG6mdcgB1nLCqDt2d5aik5HVK0OYKQCMX9Xcs0tB4WdwmQv5L90z1HmYrYBTg1x
+         +7Gg4/UbqbPL8vMPkyl4GbWfTduOercmegg4WSSZgpzAmpEOG01WEtqNJCUrV9kzfxi+
+         o/FA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=SLnnbrtMHtKbdTFjn0/cgFPnGOzXZjXisxXELw1s/tE=;
+        b=j9pO8L633sl0Zg+6vJGx24KVYeNde3jv+9jMIg7OBuTCxs3CQ9EtOn34oG1qU2QiyV
+         66hldVI/3Vo841KYSw1mS+8xEW2sMTj3YrrFGxjQIiXm07CKLaEALaMx9rgnDVr8oSxY
+         SpD5B0wIbWcQlqAxVr9eS6+NCvzEKK7fEadBK0JGOle49I9WCL8ihRkI+EHwR7QCxAlm
+         Qy4N7ncfzyfJPcuW9377NTdGxfg6GD1t5m+qMro4AHP1aIYLhx6MLDxnV6JM/Zvw6PeP
+         MPMgEwBMsomSGPIDMi91CDY1vDwgNpOoRF1dMSWau+w4DLy6S+V+hHxeC/GfFakvBBx0
+         jdGw==
+X-Gm-Message-State: AOAM531k6o4CNfmchdvyvviI3JOxViI4Rk9akgOBv9pY8bNEo2g63/rv
+        BT9El7rcsnst0IRvwounbes=
+X-Google-Smtp-Source: ABdhPJzaHeSt9WmG5hywsdxM3iRAB7np2FMyH9cay7JfOOMPABFibQgtsFIowz4CW//+DCur9dY3EA==
+X-Received: by 2002:a1c:c91a:: with SMTP id f26mr27198007wmb.89.1636075350302;
+        Thu, 04 Nov 2021 18:22:30 -0700 (PDT)
+Received: from ?IPV6:2a02:8084:e84:2480:228:f8ff:fe6f:83a8? ([2a02:8084:e84:2480:228:f8ff:fe6f:83a8])
+        by smtp.gmail.com with ESMTPSA id f18sm6519388wre.7.2021.11.04.18.22.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Nov 2021 18:22:29 -0700 (PDT)
+Message-ID: <e7f0449a-2bad-99ad-4737-016a0e6b8b84@gmail.com>
+Date:   Fri, 5 Nov 2021 01:22:28 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v2 01/25] tcp: authopt: Initial support and key management
+Content-Language: en-US
+To:     Leonard Crestez <cdleonard@gmail.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+        Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>
+References: <cover.1635784253.git.cdleonard@gmail.com>
+ <51044c39f2e4331f2609484d28c756e2a9db5144.1635784253.git.cdleonard@gmail.com>
+From:   Dmitry Safonov <0x7f454c46@gmail.com>
+In-Reply-To: <51044c39f2e4331f2609484d28c756e2a9db5144.1635784253.git.cdleonard@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Date:   Fri, 05 Nov 2021 02:20:43 +0100
-From:   Michael Walle <michael@walle.cc>
-To:     Andrey Zhizhikin <andrey.zhizhikin@leica-geosystems.com>
-Cc:     horia.geanta@nxp.com, pankaj.gupta@nxp.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        iuliana.prodan@nxp.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: caam - check jr permissions before probing
-In-Reply-To: <20211104162114.2019509-1-andrey.zhizhikin@leica-geosystems.com>
-References: <20211104162114.2019509-1-andrey.zhizhikin@leica-geosystems.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <d5cf77b4734f9d60c8d61a2a0a799180@walle.cc>
-X-Sender: michael@walle.cc
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Andrey,
+Hi Leonard,
 
-Am 2021-11-04 17:21, schrieb Andrey Zhizhikin:
-> Job Rings can be set to be exclusively used by TrustZone which makes 
-> the
-> access to those rings only possible from Secure World. This access
-> separation is defined by setting bits in CAAM JRxDID_MS register. Once
-> reserved to be owned by TrustZone, this Job Ring becomes unavailable 
-> for
-> the Kernel. This reservation is performed early in the boot process,
-> even before the Kernel starts, which leads to unavailability of the HW
-> at the probing stage. Moreover, the reservation can be done for any Job
-> Ring and is not under control of the Kernel. The only condition that
-> remains is: at least one Job Ring should be made available for the NS
-> world.
-
-Where is that written down?
-
-> Current implementation lists Job Rings as child nodes of CAAM driver,
-> and tries to perform probing on those regardless of whether JR HW is
-> accessible or not.
-> 
-> This leads to the following error while probing:
-> [    1.509894] caam 30900000.crypto: job rings = 3, qi = 0
-> [    1.525201] caam_jr 30901000.jr: failed to flush job ring 0
-> [    1.525214] caam_jr: probe of 30901000.jr failed with error -5
-> 
-> Implement a dynamic mechanism to identify which Job Ring is actually
-> marked as owned by TrustZone, and fail the probing of those child nodes
-> with -ENODEV.
-> 
-> Signed-off-by: Andrey Zhizhikin <andrey.zhizhikin@leica-geosystems.com>
-> ---
->  drivers/crypto/caam/ctrl.c   | 18 ++++++++++++------
->  drivers/crypto/caam/intern.h |  1 +
->  drivers/crypto/caam/jr.c     | 17 +++++++++++++++++
->  drivers/crypto/caam/regs.h   |  8 +++++---
->  4 files changed, 35 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-> index ca0361b2dbb0..c48506a02340 100644
-> --- a/drivers/crypto/caam/ctrl.c
-> +++ b/drivers/crypto/caam/ctrl.c
-> @@ -805,12 +805,18 @@ static int caam_probe(struct platform_device 
-> *pdev)
->  	for_each_available_child_of_node(nprop, np)
->  		if (of_device_is_compatible(np, "fsl,sec-v4.0-job-ring") ||
->  		    of_device_is_compatible(np, "fsl,sec4.0-job-ring")) {
-> -			ctrlpriv->jr[ring] = (struct caam_job_ring __iomem __force *)
-> -					     ((__force uint8_t *)ctrl +
-> -					     (ring + JR_BLOCK_NUMBER) *
-> -					      BLOCK_OFFSET
-> -					     );
-> -			ctrlpriv->total_jobrs++;
-> +			/* Check if the JR is not owned exclusively by TZ */
-> +			if (!((rd_reg32(&ctrl->jr_mid[ring].liodn_ms)) &
-> +				(MSTRID_LOCK_TZ_OWN | MSTRID_LOCK_PRIM_TZ))) {
-
-what is the PRIM_TZ bit? I don't see it in my reference manual
-(which is for the LS1028A).
-
-Can't we just do a
-if (rd_reg32(&ctrl->jr_mid[ring].liodn_ms) &
-     (MSTRID_LOCK_TZ_OWN | MSTRID_LOCK_PRIM_TZ))
-	continue;
-
-> +				ctrlpriv->jr[ring] = (struct caam_job_ring __iomem __force *)
-> +						     ((__force uint8_t *)ctrl +
-> +						     (ring + JR_BLOCK_NUMBER) *
-> +						      BLOCK_OFFSET
-> +						     );
-
-This isn't really used at all. Can we drop "jr" from
-struct caam_drv_private altogether? See also below.
-
-> +				/* Indicate that this JR is available for NS */
-> +				ctrlpriv->jobr_ns_flags |= BIT(ring);
-> +				ctrlpriv->total_jobrs++;
-
-as well as this?
-
-> +			}
->  			ring++;
->  		}
-> 
-> diff --git a/drivers/crypto/caam/intern.h 
-> b/drivers/crypto/caam/intern.h
-> index 7d45b21bd55a..2919af55dbfe 100644
-> --- a/drivers/crypto/caam/intern.h
-> +++ b/drivers/crypto/caam/intern.h
-> @@ -91,6 +91,7 @@ struct caam_drv_private {
->  	 * or from register-based version detection code
->  	 */
->  	u8 total_jobrs;		/* Total Job Rings in device */
-> +	u8 jobr_ns_flags;	/* Flags for each Job Ring if it is not owned by 
-> TZ*/
->  	u8 qi_present;		/* Nonzero if QI present in device */
->  	u8 mc_en;		/* Nonzero if MC f/w is active */
->  	int secvio_irq;		/* Security violation interrupt number */
-> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-> index 7f2b1101f567..a260981e0843 100644
-> --- a/drivers/crypto/caam/jr.c
-> +++ b/drivers/crypto/caam/jr.c
-> @@ -511,10 +511,27 @@ static int caam_jr_probe(struct platform_device 
-> *pdev)
->  	struct device_node *nprop;
->  	struct caam_job_ring __iomem *ctrl;
->  	struct caam_drv_private_jr *jrpriv;
-> +	struct caam_drv_private *caamctrlpriv;
->  	static int total_jobrs;
-
-ugh.
-
->  	struct resource *r;
->  	int error;
-> 
-> +	/* Before we proceed with the JR device probing, verify
-> +	 * that the job ring itself is available to Non-Secure world.
-> +	 * If the JR is owned exclusively by TZ - we should not even
-> +	 * process it further.
+On 11/1/21 16:34, Leonard Crestez wrote:
+[..]
+> +struct tcp_authopt_key {
+> +	/** @flags: Combination of &enum tcp_authopt_key_flag */
+> +	__u32	flags;
+> +	/** @send_id: keyid value for send */
+> +	__u8	send_id;
+> +	/** @recv_id: keyid value for receive */
+> +	__u8	recv_id;
+> +	/** @alg: One of &enum tcp_authopt_alg */
+> +	__u8	alg;
+> +	/** @keylen: Length of the key buffer */
+> +	__u8	keylen;
+> +	/** @key: Secret key */
+> +	__u8	key[TCP_AUTHOPT_MAXKEYLEN];
+> +	/**
+> +	 * @addr: Key is only valid for this address
+> +	 *
+> +	 * Ignored unless TCP_AUTHOPT_KEY_ADDR_BIND flag is set
 > +	 */
-> +	caamctrlpriv = dev_get_drvdata(pdev->dev.parent);
-> +	if (!(caamctrlpriv->jobr_ns_flags & BIT(total_jobrs))) {
-
-Is anything preventing from total_jobrs getting big? Can't
-we get rid of this static variable somehow? Before this commit,
-it was just used for messages. Can we check the TZ bit here
-instead of doing that bitflags dance?
-
-nitpick: in caam there are no netdev comments. So multiline
-comments look like:
-/*
-  * this is a comment.
-  */
-
-> +		/* This job ring is marked to be exclusively used by TZ,
-> +		 * do not proceed with probing as the HW block is inaccessible.
-> +		 * Increment total seen JR devices since it is used as the index
-> +		 * into verification and fail probing for this node.
-> +		 */
-> +		total_jobrs++;
-> +		return -ENODEV;
-> +	}
+> +	struct __kernel_sockaddr_storage addr;
+> +};
+[..]
+> +/* Free key nicely, for living sockets */
+> +static void tcp_authopt_key_del(struct sock *sk,
+> +				struct tcp_authopt_info *info,
+> +				struct tcp_authopt_key_info *key)
+> +{
+> +	sock_owned_by_me(sk);
+> +	hlist_del_rcu(&key->node);
+> +	atomic_sub(sizeof(*key), &sk->sk_omem_alloc);
+> +	kfree_rcu(key, rcu);
+> +}
+[..]
+> +#define TCP_AUTHOPT_KEY_KNOWN_FLAGS ( \
+> +	TCP_AUTHOPT_KEY_DEL | \
+> +	TCP_AUTHOPT_KEY_EXCLUDE_OPTS | \
+> +	TCP_AUTHOPT_KEY_ADDR_BIND)
 > +
->  	jrdev = &pdev->dev;
->  	jrpriv = devm_kzalloc(jrdev, sizeof(*jrpriv), GFP_KERNEL);
->  	if (!jrpriv)
-> diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-> index 3738625c0250..8ade617f9e65 100644
-> --- a/drivers/crypto/caam/regs.h
-> +++ b/drivers/crypto/caam/regs.h
-> @@ -445,10 +445,12 @@ struct caam_perfmon {
->  };
-> 
->  /* LIODN programming for DMA configuration */
-> -#define MSTRID_LOCK_LIODN	0x80000000
-> -#define MSTRID_LOCK_MAKETRUSTED	0x00010000	/* only for JR masterid */
-> +#define MSTRID_LOCK_LIODN		BIT(31)
-> +#define MSTRID_LOCK_MAKETRUSTED	BIT(16)	/* only for JR: masterid */
-> +#define MSTRID_LOCK_TZ_OWN		BIT(15)	/* only for JR: owned by TZ */
-> +#define MSTRID_LOCK_PRIM_TZ		BIT(4)	/* only for JR: Primary TZ */
+> +int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> +{
+[..]
+> +	/* Delete is a special case: */
+> +	if (opt.flags & TCP_AUTHOPT_KEY_DEL) {
+> +		info = rcu_dereference_check(tcp_sk(sk)->authopt_info, lockdep_sock_is_held(sk));
+> +		if (!info)
+> +			return -ENOENT;
+> +		key_info = tcp_authopt_key_lookup_exact(sk, info, &opt);
+> +		if (!key_info)
+> +			return -ENOENT;
+> +		tcp_authopt_key_del(sk, info, key_info);
+> +		return 0;
 
-can't find that one.
+I remember we discussed it in RFC, that removing a key that's currently
+in use may result in random MKT to be used.
 
-in general, does these marcros match with your reference
-manual? Which one do you have?
+I think, it's possible to make this API a bit more predictable if:
+- DEL command fails to remove a key that is current/receive_next;
+- opt.flags has CURR/NEXT flag that has corresponding `u8 current_key`
+and `u8 receive_next` values. As socket lock is held - that makes
+current_key/receive_next change atomic with deletion of an existing key
+that might have been in use.
 
-for me the bits are named:
-LICID[31], AMTD[16], TZ[15] and SDID[11:0]
-also the register is called JRnICID.
+In result user may remove a key that's not in use or has to set new
+current/next. Which avoids the issue with random MKT being used to sign
+segments.
 
-I wonder if the LS1028A has a newer/older CAAM version.
-according to the device tree (fsl-ls1028a.dtsi) the
-sec is v5.0 (and also compatible with v4.0). If you
-have a look at the RM it says 7.0 (at least the MAJ_VER
-in SECVID_MS is 7 accoring to the manual; i haven't
-checked on the hardware for now.
-
-Horia, can you shed some light here.
-
-> -#define MSTRID_LIODN_MASK	0x0fff
-> +#define MSTRID_LIODN_MASK		GENMASK(11, 0)
->  struct masterid {
->  	u32 liodn_ms;	/* lock and make-trusted control bits */
->  	u32 liodn_ls;	/* LIODN for non-sequence and seq access */
-> 
-> base-commit: 8a796a1dfca2780321755033a74bca2bbe651680
-
--- 
--michael
+Thanks,
+          Dmitry
