@@ -2,111 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 034D5C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 12:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DCD5C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 12:27:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D080061215
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 12:25:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24E3D60E73
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 12:27:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231239AbhKEM2T (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Nov 2021 08:28:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55554 "EHLO
+        id S229923AbhKEM3m (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Nov 2021 08:29:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229759AbhKEM2S (ORCPT
+        with ESMTP id S229529AbhKEM3l (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Nov 2021 08:28:18 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 331D6C061205
-        for <linux-crypto@vger.kernel.org>; Fri,  5 Nov 2021 05:25:39 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id c126so268041pfb.0
-        for <linux-crypto@vger.kernel.org>; Fri, 05 Nov 2021 05:25:39 -0700 (PDT)
+        Fri, 5 Nov 2021 08:29:41 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1527CC061714;
+        Fri,  5 Nov 2021 05:27:02 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id w1so32727693edd.10;
+        Fri, 05 Nov 2021 05:27:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wFA/PQHqVLHAswIP07odo99SFSBTmuENHHzd1hwpl1I=;
-        b=ANwh8ajyZlakCf7P/G/GPbotqbSgxZe3ye0P5ORMtyJVFfYZOXrApWoMhUl4A6oJN8
-         DoOAPKaKcDl+Th0oyk7s180uogyJUpVasfIutXgKeBfc97hT4+JLC4TglUzcp9E6n5VD
-         HIcPCUhUtSQvP2lm3+XOD8d4d1Pb/LE5TZTuSfJOnZ+QBvmrJx3NyYWLJ5X+XtPNYtTB
-         6MEFia2GvE5yHoyUQDgzNfQNmP9lL8LZvOSpxQltBaWui3OASyc0f0qcJJ2d8mVXTg1u
-         DPqoxpWMr+7p7BTRqMV1RBWQo4YzFYi2UYnkGYLxwqOc52xTJLYe12zWDzoHZUB/exLA
-         4HfQ==
+        d=gmail.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=VWnwoguiS8Ek3wXdinAoUlLWrPmI0p9qcxlIOqqvuf4=;
+        b=WQTtiepPdxr+1qL1KOH7sLyVAHlZ4keVF2ROBKBaalj+LYa8+kUcsWY8b+ZnFEaseG
+         ROTVJpXjPrRSfBHrfQcX+6W9DZFhS4teSACoXplshotQffNKW3wxCaE3eOS4eKHrDfoH
+         LvjsMuvNbJSbaYKvsQehN/eRQnBheZjA8ncbrmpO+f2kSDuPmKcI3AnfXAzWWkUuKVAN
+         mnj/RAbhMPbLwZxPJCiNnyCPBsqM6u/cq6Jtd5OT+efqhTJCggfYSwD97E9iyabfdMeI
+         XbuAdP0tII+p9J/1g5aJ/Wm7RastZAQjeP+g7JGMkaGbeHClk+k3jXZSglBN/Q8a8zKi
+         t5ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=wFA/PQHqVLHAswIP07odo99SFSBTmuENHHzd1hwpl1I=;
-        b=7Zz2gNKWbtlHV2FmLWj+11ytQQiEzd1/0Z8/7obg9Jp49kxgmSHXM/08qBz5E6/N+I
-         QIsHfwrQnKPZci9l3zjovaCaNIOxij8Eb4bFEX+F2V6FIm2AFVhcRV2jBHKtmQCT0l1G
-         lSPe5ySE59QB6EyExgyWWGJilqIsBZonlvomhSn/7ugxeJP51vikYyisoEl7iQ2eLb4+
-         zfWkpJHBH3nRTBpuAaLP9e4Ca3T0tI5U/CXpPqGOdBiw0HtN8/sBMZGH9n3MBubJra7P
-         SF7mTnpXrhaRTg+8V8Fz5gdzm1mmYtb0MwL3wemh0QCuc8ghmQ7i7UBUYl5kU9vT9ABF
-         Tz8w==
-X-Gm-Message-State: AOAM533ZRayDMFakeGXGTZKFJd/ptmYTWvt+0StVh44qqSGVS+niIuJO
-        wGET/NNuCvvNms141AwyqXL0pA==
-X-Google-Smtp-Source: ABdhPJy3rPGP1CEIeXpZ+EdREFacYam00MXt9smlAzcYMpEUXnGTFSL/Q/0fbgGJmUfLTdcOlVUnpw==
-X-Received: by 2002:a62:6411:0:b0:44c:bf9f:f584 with SMTP id y17-20020a626411000000b0044cbf9ff584mr58429077pfb.29.1636115138711;
-        Fri, 05 Nov 2021 05:25:38 -0700 (PDT)
-Received: from FVFDK26JP3YV.bytedance.net ([61.120.150.77])
-        by smtp.gmail.com with ESMTPSA id hk18sm4770620pjb.20.2021.11.05.05.25.35
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Nov 2021 05:25:38 -0700 (PDT)
-From:   Lei He <helei.sig11@bytedance.com>
-To:     herbert@gondor.apana.org.au
-Cc:     helei.sig11@bytedance.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pizhenwei@bytedance.com
-Subject: [PATCH] crypto: testmgr - Fix wrong test case of RSA
-Date:   Fri,  5 Nov 2021 20:25:31 +0800
-Message-Id: <20211105122531.73891-1-helei.sig11@bytedance.com>
-X-Mailer: git-send-email 2.29.2
+        bh=VWnwoguiS8Ek3wXdinAoUlLWrPmI0p9qcxlIOqqvuf4=;
+        b=ofsJbqap6nPjPHdhkU1+LI37jk2ZMIDJc6bnk28tjLwImWqnF0ITJ942mrsqJKV7X4
+         KiN6CGOtRdqQs2RRcdLMqDpZHu/mmywbcCRL1CqpPf7Us3Ovj/FnIoSrQuSTn3uBOepM
+         cuOcdfETP23HEUUMIpBiUNqIpwiHYmLF/XFphBuvxmP3Nn4PennpXOq14wJ4gC0ZataE
+         /wnh1mbdQ1oAjCsYGIz/1mb1e3G1dQ57xriepbvE6a4coWzdmCgh0KQ8Twibh4AhnsBy
+         s+A/vq9mlqwBb8gYSUTFSs1oPIYIJuO3j+8jhOb/rVavvO/0h5Vmzm+gyxCcS393MsMw
+         4Rew==
+X-Gm-Message-State: AOAM531VLBTQQ622Qs4TUGYL7/ijQoCxiS0sCuFPxYPQlk7MztzITLUH
+        Q4tB+1ZXPxOCyNIP/suFRvaKkRC29GZn0w==
+X-Google-Smtp-Source: ABdhPJy1p4mx96iQlG4iPSiOJ8nL03P+wrgU9AOxqAdkTOF/0WQLNezrp9b8Abnn76W3ALi6elQrTQ==
+X-Received: by 2002:a17:906:d541:: with SMTP id cr1mr74734988ejc.81.1636115220681;
+        Fri, 05 Nov 2021 05:27:00 -0700 (PDT)
+Received: from ?IPv6:2a04:241e:501:3870:9439:4202:183c:5296? ([2a04:241e:501:3870:9439:4202:183c:5296])
+        by smtp.gmail.com with ESMTPSA id oz13sm4081898ejc.65.2021.11.05.05.26.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Nov 2021 05:27:00 -0700 (PDT)
+Subject: Re: [PATCH v2 21/25] tcp: authopt: Add initial l3index support
+To:     David Ahern <dsahern@gmail.com>
+Cc:     Eric Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1635784253.git.cdleonard@gmail.com>
+ <4e049d1ade4be3010b4ea63daf2ef3bed4e1892b.1635784253.git.cdleonard@gmail.com>
+ <e08a7554-bd3e-e524-830d-64b76853ace2@gmail.com>
+From:   Leonard Crestez <cdleonard@gmail.com>
+Message-ID: <320b8801-1f35-a283-be11-a4f4275847d2@gmail.com>
+Date:   Fri, 5 Nov 2021 14:26:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <e08a7554-bd3e-e524-830d-64b76853ace2@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-According to the BER encoding rules, integer value should be encoded
-as two's complement, and if the highest bit of a positive integer
-is 1, should add a leading zero-octet.
+On 11/3/21 5:06 AM, David Ahern wrote:
+> On 11/1/21 10:34 AM, Leonard Crestez wrote:
+>> @@ -584,10 +614,24 @@ int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
+>>   		return -EINVAL;
+>>   	err = tcp_authopt_alg_require(alg);
+>>   	if (err)
+>>   		return err;
+>>   
+>> +	/* check ifindex is valid (zero is always valid) */
+>> +	if (opt.flags & TCP_AUTHOPT_KEY_IFINDEX && opt.ifindex) {
+>> +		struct net_device *dev;
+>> +
+>> +		rcu_read_lock();
+>> +		dev = dev_get_by_index_rcu(sock_net(sk), opt.ifindex);
+>> +		if (dev && netif_is_l3_master(dev))
+>> +			l3index = dev->ifindex;
+>> +		rcu_read_unlock();
+> 
+> rcu_read_lock()... rcu_read_unlock() can be replaced with
+> netif_index_is_l3_master(...)
 
-The kernel's built-in RSA algorithm cannot recognize negative numbers
-when parsing keys, so it can pass this test case.
-
-Export the key to file and run the following command to verify the
-fix result:
-
-  openssl asn1parse -inform DER -in /path/to/key/file
-
-Signed-off-by: Lei He <helei.sig11@bytedance.com>
----
- crypto/testmgr.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 779720bf9364..a253d66ba1c1 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -257,9 +257,9 @@ static const struct akcipher_testvec rsa_tv_template[] = {
- 	}, {
- #endif
- 	.key =
--	"\x30\x82\x02\x1F" /* sequence of 543 bytes */
-+	"\x30\x82\x02\x20" /* sequence of 544 bytes */
- 	"\x02\x01\x01" /* version - integer of 1 byte */
--	"\x02\x82\x01\x00" /* modulus - integer of 256 bytes */
-+	"\x02\x82\x01\x01\x00" /* modulus - integer of 256 bytes */
- 	"\xDB\x10\x1A\xC2\xA3\xF1\xDC\xFF\x13\x6B\xED\x44\xDF\xF0\x02\x6D"
- 	"\x13\xC7\x88\xDA\x70\x6B\x54\xF1\xE8\x27\xDC\xC3\x0F\x99\x6A\xFA"
- 	"\xC6\x67\xFF\x1D\x1E\x3C\x1D\xC1\xB5\x5F\x6C\xC0\xB2\x07\x3A\x6D"
-@@ -299,7 +299,7 @@ static const struct akcipher_testvec rsa_tv_template[] = {
- 	"\x02\x01\x00" /* exponent1 - integer of 1 byte */
- 	"\x02\x01\x00" /* exponent2 - integer of 1 byte */
- 	"\x02\x01\x00", /* coefficient - integer of 1 byte */
--	.key_len = 547,
-+	.key_len = 548,
- 	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
- 	.c =
- 	"\xb2\x97\x76\xb4\xae\x3e\x38\x3c\x7e\x64\x1f\xcc\xa2\x7f\xf6\xbe"
--- 
-2.11.0
-
+Yes, this makes the code shorter.
