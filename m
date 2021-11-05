@@ -2,131 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A00C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 12:11:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 034D5C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 12:25:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABE6061215
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 12:11:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D080061215
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Nov 2021 12:25:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232944AbhKEMNn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Nov 2021 08:13:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52266 "EHLO
+        id S231239AbhKEM2T (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Nov 2021 08:28:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229634AbhKEMNm (ORCPT
+        with ESMTP id S229759AbhKEM2S (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Nov 2021 08:13:42 -0400
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2931C061714;
-        Fri,  5 Nov 2021 05:11:02 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id w1so32571042edd.10;
-        Fri, 05 Nov 2021 05:11:02 -0700 (PDT)
+        Fri, 5 Nov 2021 08:28:18 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 331D6C061205
+        for <linux-crypto@vger.kernel.org>; Fri,  5 Nov 2021 05:25:39 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id c126so268041pfb.0
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Nov 2021 05:25:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=A9FWe+Q/3oFjwcEgdT/9ZzBWdSEkL2HviP2PBDNeDAg=;
-        b=law0s4iYgwruPU72un+fzKv2mg2XMoS7Jnoon+uSS5tk2nGWBLSem7c5IKlXkVfq2V
-         gLXquo3p04ZqgppUGU5EnYOMBf1F7R0F+pWGZjHCghzpvcTP2mwtME7huHxIhjLzexMr
-         pSnBD9xUpCVqUYWg67p0elr/gcB0IFJtuqhI8T3cqEwJz27fqZopekQ7W9oCOfwyng+E
-         nGVEX61skj9rTD833PVdMuwDKwGmxbbPOp+EiZyN3lo3MteDNPyBStWXRsA+/Nmv9ddZ
-         Ir4++VmEL8ZcTpj8mztlCPWd/3r9ofYZ+VvJBq8ic/cYHxVzFX6btRFn7Ay0R2f6XHSv
-         Fwkg==
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wFA/PQHqVLHAswIP07odo99SFSBTmuENHHzd1hwpl1I=;
+        b=ANwh8ajyZlakCf7P/G/GPbotqbSgxZe3ye0P5ORMtyJVFfYZOXrApWoMhUl4A6oJN8
+         DoOAPKaKcDl+Th0oyk7s180uogyJUpVasfIutXgKeBfc97hT4+JLC4TglUzcp9E6n5VD
+         HIcPCUhUtSQvP2lm3+XOD8d4d1Pb/LE5TZTuSfJOnZ+QBvmrJx3NyYWLJ5X+XtPNYtTB
+         6MEFia2GvE5yHoyUQDgzNfQNmP9lL8LZvOSpxQltBaWui3OASyc0f0qcJJ2d8mVXTg1u
+         DPqoxpWMr+7p7BTRqMV1RBWQo4YzFYi2UYnkGYLxwqOc52xTJLYe12zWDzoHZUB/exLA
+         4HfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=A9FWe+Q/3oFjwcEgdT/9ZzBWdSEkL2HviP2PBDNeDAg=;
-        b=oxUZHAPYrMhTqMwtPMu/Jxpjqw4SFOyNZVIhz5rMSISxJZgdbjy1sGfvAnE777Nfbs
-         gU6KalZiCcy94VZ81m44vKzdJtwGnez9kB4sCu8az4UY2SiQWwvONOiDELa9a5/yNm+z
-         mi+GqQt7lGDiSGpyPnnkQ4WC9oiI54DdzI62CYoDwiQTmsd/pRegFLLOZVHcP+e+VMyz
-         dX9RbJOIsJCVGOKjtUYib+R17TZOca67TE3CfqKd57ZKZGkZTLjQWO7Zkgu554ehPXKi
-         30hWLo+yTLDd4YYgUfg2HclK0+5YT2zI+fBqcwT9k2I0HSmLL9vAzTKjhoXZFXjCJwLf
-         RrFg==
-X-Gm-Message-State: AOAM530ZgYqyRozGAvpCPoweCcyh5gx+KFm7tShHuQBW8/IP9KW2yluc
-        /HOz91t+AkgH3v6D7pLW6tM=
-X-Google-Smtp-Source: ABdhPJzRqInKUKr3eTOuYcKNukH8MLjObmuAS+KGGzGkToD1LRSnKEjR4qRuDwHaHJfN6a8HlOVXXA==
-X-Received: by 2002:a05:6402:27cd:: with SMTP id c13mr36175664ede.365.1636114261340;
-        Fri, 05 Nov 2021 05:11:01 -0700 (PDT)
-Received: from ?IPv6:2a04:241e:501:3870:9439:4202:183c:5296? ([2a04:241e:501:3870:9439:4202:183c:5296])
-        by smtp.gmail.com with ESMTPSA id mc3sm819869ejb.24.2021.11.05.05.10.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Nov 2021 05:11:00 -0700 (PDT)
-Subject: Re: [PATCH v2 01/25] tcp: authopt: Initial support and key management
-To:     David Ahern <dsahern@gmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Shuah Khan <shuah@kernel.org>
-References: <cover.1635784253.git.cdleonard@gmail.com>
- <51044c39f2e4331f2609484d28c756e2a9db5144.1635784253.git.cdleonard@gmail.com>
- <54e31e3f-d6b3-2124-b57a-4e791938ff2f@gmail.com>
-From:   Leonard Crestez <cdleonard@gmail.com>
-Message-ID: <d6155622-07fd-d9ab-9174-feb945b1b069@gmail.com>
-Date:   Fri, 5 Nov 2021 14:10:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        bh=wFA/PQHqVLHAswIP07odo99SFSBTmuENHHzd1hwpl1I=;
+        b=7Zz2gNKWbtlHV2FmLWj+11ytQQiEzd1/0Z8/7obg9Jp49kxgmSHXM/08qBz5E6/N+I
+         QIsHfwrQnKPZci9l3zjovaCaNIOxij8Eb4bFEX+F2V6FIm2AFVhcRV2jBHKtmQCT0l1G
+         lSPe5ySE59QB6EyExgyWWGJilqIsBZonlvomhSn/7ugxeJP51vikYyisoEl7iQ2eLb4+
+         zfWkpJHBH3nRTBpuAaLP9e4Ca3T0tI5U/CXpPqGOdBiw0HtN8/sBMZGH9n3MBubJra7P
+         SF7mTnpXrhaRTg+8V8Fz5gdzm1mmYtb0MwL3wemh0QCuc8ghmQ7i7UBUYl5kU9vT9ABF
+         Tz8w==
+X-Gm-Message-State: AOAM533ZRayDMFakeGXGTZKFJd/ptmYTWvt+0StVh44qqSGVS+niIuJO
+        wGET/NNuCvvNms141AwyqXL0pA==
+X-Google-Smtp-Source: ABdhPJy3rPGP1CEIeXpZ+EdREFacYam00MXt9smlAzcYMpEUXnGTFSL/Q/0fbgGJmUfLTdcOlVUnpw==
+X-Received: by 2002:a62:6411:0:b0:44c:bf9f:f584 with SMTP id y17-20020a626411000000b0044cbf9ff584mr58429077pfb.29.1636115138711;
+        Fri, 05 Nov 2021 05:25:38 -0700 (PDT)
+Received: from FVFDK26JP3YV.bytedance.net ([61.120.150.77])
+        by smtp.gmail.com with ESMTPSA id hk18sm4770620pjb.20.2021.11.05.05.25.35
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 05 Nov 2021 05:25:38 -0700 (PDT)
+From:   Lei He <helei.sig11@bytedance.com>
+To:     herbert@gondor.apana.org.au
+Cc:     helei.sig11@bytedance.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pizhenwei@bytedance.com
+Subject: [PATCH] crypto: testmgr - Fix wrong test case of RSA
+Date:   Fri,  5 Nov 2021 20:25:31 +0800
+Message-Id: <20211105122531.73891-1-helei.sig11@bytedance.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <54e31e3f-d6b3-2124-b57a-4e791938ff2f@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/3/21 4:29 AM, David Ahern wrote:
-> On 11/1/21 10:34 AM, Leonard Crestez wrote:
->> diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
->> new file mode 100644
->> index 000000000000..c412a712f229
->> --- /dev/null
->> +++ b/net/ipv4/tcp_authopt.c
->> @@ -0,0 +1,263 @@
->> +// SPDX-License-Identifier: GPL-2.0-or-later
->> +
->> +#include <linux/kernel.h>
->> +#include <net/tcp.h>
->> +#include <net/tcp_authopt.h>
->> +#include <crypto/hash.h>
->> +
->> +/* checks that ipv4 or ipv6 addr matches. */
->> +static bool ipvx_addr_match(struct sockaddr_storage *a1,
->> +			    struct sockaddr_storage *a2)
->> +{
->> +	if (a1->ss_family != a2->ss_family)
->> +		return false;
->> +	if (a1->ss_family == AF_INET &&
->> +	    (((struct sockaddr_in *)a1)->sin_addr.s_addr !=
->> +	     ((struct sockaddr_in *)a2)->sin_addr.s_addr))
->> +		return false;
->> +	if (a1->ss_family == AF_INET6 &&
->> +	    !ipv6_addr_equal(&((struct sockaddr_in6 *)a1)->sin6_addr,
->> +			     &((struct sockaddr_in6 *)a2)->sin6_addr))
->> +		return false;
-> 
-> The above 2 could just be
-> 
-> 	if (a1->ss_family == AF_INET)
-> 		return (((struct sockaddr_in *)a1)->sin_addr.s_addr ==
-> 			((struct sockaddr_in *)a2)->sin_addr.s_addr))
+According to the BER encoding rules, integer value should be encoded
+as two's complement, and if the highest bit of a positive integer
+is 1, should add a leading zero-octet.
 
-OK. The function is a little weird that it has a final "return true" 
-which is technically also reachable if AF is unexpected but that 
-situation is prevented from higher up.
+The kernel's built-in RSA algorithm cannot recognize negative numbers
+when parsing keys, so it can pass this test case.
 
---
-Regards,
-Leonard
+Export the key to file and run the following command to verify the
+fix result:
+
+  openssl asn1parse -inform DER -in /path/to/key/file
+
+Signed-off-by: Lei He <helei.sig11@bytedance.com>
+---
+ crypto/testmgr.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 779720bf9364..a253d66ba1c1 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -257,9 +257,9 @@ static const struct akcipher_testvec rsa_tv_template[] = {
+ 	}, {
+ #endif
+ 	.key =
+-	"\x30\x82\x02\x1F" /* sequence of 543 bytes */
++	"\x30\x82\x02\x20" /* sequence of 544 bytes */
+ 	"\x02\x01\x01" /* version - integer of 1 byte */
+-	"\x02\x82\x01\x00" /* modulus - integer of 256 bytes */
++	"\x02\x82\x01\x01\x00" /* modulus - integer of 256 bytes */
+ 	"\xDB\x10\x1A\xC2\xA3\xF1\xDC\xFF\x13\x6B\xED\x44\xDF\xF0\x02\x6D"
+ 	"\x13\xC7\x88\xDA\x70\x6B\x54\xF1\xE8\x27\xDC\xC3\x0F\x99\x6A\xFA"
+ 	"\xC6\x67\xFF\x1D\x1E\x3C\x1D\xC1\xB5\x5F\x6C\xC0\xB2\x07\x3A\x6D"
+@@ -299,7 +299,7 @@ static const struct akcipher_testvec rsa_tv_template[] = {
+ 	"\x02\x01\x00" /* exponent1 - integer of 1 byte */
+ 	"\x02\x01\x00" /* exponent2 - integer of 1 byte */
+ 	"\x02\x01\x00", /* coefficient - integer of 1 byte */
+-	.key_len = 547,
++	.key_len = 548,
+ 	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
+ 	.c =
+ 	"\xb2\x97\x76\xb4\xae\x3e\x38\x3c\x7e\x64\x1f\xcc\xa2\x7f\xf6\xbe"
+-- 
+2.11.0
+
