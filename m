@@ -2,102 +2,158 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9859BC4321E
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Nov 2021 15:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D03C8C43217
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Nov 2021 15:33:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 850DF6105A
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Nov 2021 15:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B48DE610A8
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Nov 2021 15:33:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240877AbhKHPLu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Nov 2021 10:11:50 -0500
-Received: from esa.microchip.iphmx.com ([68.232.154.123]:23991 "EHLO
-        esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240863AbhKHPKf (ORCPT
+        id S240922AbhKHPgE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 Nov 2021 10:36:04 -0500
+Received: from mail-qt1-f172.google.com ([209.85.160.172]:43861 "EHLO
+        mail-qt1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240901AbhKHPgE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Nov 2021 10:10:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1636384072; x=1667920072;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=zstF7h07gTp/nSKCbQQYFsltrxG1f82P+gEsZAQgpqk=;
-  b=02kxndMFCiYXF30RPQQL+JnxhzfbfJ3vsL3k/li9U0rExwve71qJ9+ys
-   hGdlgZl2yXj7ydkam6b6BVN+ouOnQm7UgMFQaqA2iadowR88L4knZu6Yi
-   OdKELw5x8Nbw0Dg3rZ9WwuMCO8ZZ4k2rl9fV+NL9FrKKL+bHT0iv2HJ0V
-   heUB7Qnvcy7qz/7L7CO6OLTlyO/+UA3FYQSg1niVfu2080xXqoigtW6Je
-   8KpF+lNMpWiUi2RQdwRDb2JkbmKfphzvJwcZYfFVpg5nRO1OiHpG5/BW4
-   9GwHFi2hGG23Ldx917Ldg/TjQQdkGbiLuF5a3ntKNRjcxORp3BYVNTCTC
-   A==;
-IronPort-SDR: Eogmog9AAXgm4HnCJJNC5JQfchpBBEOXSO9Szw9Yd6IV1QVflnJrLHXeS92sou3QG5r9z3DAb0
- u/vPYB9PXTmDijeXfeSAE9Hw4D4QxiXyUiKC9SwSKVmc1uAhYqH7vf8zdmGoYTggva0kJsP7WW
- xE6IUll8rSK8YEXhlMRqt23eNZIlsvjl8CCURx7fsPBrrnRdUJfG8wKqpwRsLOg34SZRx07PTB
- 7qRZ86+1cqR97sBJlnGgEoxG+SNGDATG2j6o5Iz8k1VKg4t6bzGcO1bfWINExTZ8NeOfVpmOcA
- yK/txlrGNY6Mc976wnSszjAU
-X-IronPort-AV: E=Sophos;i="5.87,218,1631602800"; 
-   d="scan'208";a="138382872"
-Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 08 Nov 2021 08:07:50 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.14; Mon, 8 Nov 2021 08:07:49 -0700
-Received: from wendy.microchip.com (10.10.115.15) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2176.14 via Frontend
- Transport; Mon, 8 Nov 2021 08:07:45 -0700
-From:   <conor.dooley@microchip.com>
-To:     <linus.walleij@linaro.org>, <bgolaszewski@baylibre.com>,
-        <robh+dt@kernel.org>, <jassisinghbrar@gmail.com>,
-        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
-        <aou@eecs.berkeley.edu>, <a.zummo@towertech.it>,
-        <alexandre.belloni@bootlin.com>, <broonie@kernel.org>,
-        <gregkh@linuxfoundation.org>, <lewis.hanly@microchip.com>,
-        <conor.dooley@microchip.com>, <daire.mcnamara@microchip.com>,
-        <atish.patra@wdc.com>, <ivan.griffin@microchip.com>,
-        <linux-gpio@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-riscv@lists.infradead.org>, <linux-crypto@vger.kernel.org>,
-        <linux-rtc@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-CC:     <krzysztof.kozlowski@canonical.com>, <geert@linux-m68k.org>,
-        <bin.meng@windriver.com>
-Subject: [PATCH 13/13] MAINTAINERS: update riscv/microchip entry
-Date:   Mon, 8 Nov 2021 15:05:54 +0000
-Message-ID: <20211108150554.4457-14-conor.dooley@microchip.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211108150554.4457-1-conor.dooley@microchip.com>
-References: <20211108150554.4457-1-conor.dooley@microchip.com>
+        Mon, 8 Nov 2021 10:36:04 -0500
+Received: by mail-qt1-f172.google.com with SMTP id 8so13954457qty.10;
+        Mon, 08 Nov 2021 07:33:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=x4ykPITI22sSh/L6reU4seHVLFfVjdO/v+W3/SN8DUg=;
+        b=AK5+ymHpBJW394fq5QAJLtdTA/ZOqD4CMNR9HBtKgBlKaocEikykm9zWu2Qq3FsTDL
+         IBKgKBLjeGow4SxpkJ3x2oRGNnBBM0NSZ7leYaUE+sCbLlU8e+JdCCmHwGdf11yTS7jj
+         INUpSYd8YTGwyay9k1OcwzYpdYcV9EphK2OvOUVV9gSZxXZxi4QIiBYrsZTyoOgrppre
+         0wprgxHXRXz//JJtuaBp7hB+dbvc/y85rRMUeNSC0zaCdkGtvZcR3mZvLtetjRGhVxNU
+         Kq48BbcYt3WMF9YTaLnfqSufIaTCw2FbfsTbHiFPM419cNwj86653TvYIoMnsf+J4fK+
+         gBYw==
+X-Gm-Message-State: AOAM533eiMtrTJQK05ouqSS0wCB8B6mKp/DGcpb7z8dQ92ZCTvl80eY0
+        jARg/oG42UJJhg0c3f7dAUMoRa5LWBurk5lZ
+X-Google-Smtp-Source: ABdhPJykPOH3YWmh1bWslDbzGH3og2HDnOT28nOQQhf2wbjOhuI4A+4quz4f35G+kzZC3Oinm8VRnw==
+X-Received: by 2002:ac8:5a4b:: with SMTP id o11mr304870qta.321.1636385597559;
+        Mon, 08 Nov 2021 07:33:17 -0800 (PST)
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com. [209.85.219.174])
+        by smtp.gmail.com with ESMTPSA id i14sm11098927qti.25.2021.11.08.07.33.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Nov 2021 07:33:17 -0800 (PST)
+Received: by mail-yb1-f174.google.com with SMTP id v7so44765592ybq.0;
+        Mon, 08 Nov 2021 07:33:17 -0800 (PST)
+X-Received: by 2002:a9f:2c98:: with SMTP id w24mr725068uaj.89.1636385158322;
+ Mon, 08 Nov 2021 07:25:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+References: <20211108101157.15189-1-bp@alien8.de> <20211108101157.15189-43-bp@alien8.de>
+ <CAMuHMdWH+txiSP_d7Jc4f_bU8Lf9iWpT4E3o5o7BJr-YdA6-VA@mail.gmail.com> <YYkyUEqcsOwQMb1S@zn.tnic>
+In-Reply-To: <YYkyUEqcsOwQMb1S@zn.tnic>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Mon, 8 Nov 2021 16:25:47 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXiBEQyEXJagSfpH44hxVA2t0sDH7B7YubLGHrb2MJLLA@mail.gmail.com>
+Message-ID: <CAMuHMdXiBEQyEXJagSfpH44hxVA2t0sDH7B7YubLGHrb2MJLLA@mail.gmail.com>
+Subject: Re: [PATCH v0 42/42] notifier: Return an error when callback is
+ already registered
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ayush Sawal <ayush.sawal@chelsio.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Rohit Maheshwari <rohitm@chelsio.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        Intel Graphics Development <intel-gfx@lists.freedesktop.org>,
+        intel-gvt-dev@lists.freedesktop.org,
+        alpha <linux-alpha@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-clk <linux-clk@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-edac@vger.kernel.org,
+        Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
+        linux-hyperv@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-leds <linux-leds@vger.kernel.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        Parisc List <linux-parisc@vger.kernel.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        "open list:REMOTE PROCESSOR (REMOTEPROC) SUBSYSTEM" 
+        <linux-remoteproc@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        scsi <linux-scsi@vger.kernel.org>,
+        Linux-sh list <linux-sh@vger.kernel.org>,
+        linux-staging@lists.linux.dev,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        linux-um <linux-um@lists.infradead.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        "open list:TENSILICA XTENSA PORT (xtensa)" 
+        <linux-xtensa@linux-xtensa.org>, netdev <netdev@vger.kernel.org>,
+        openipmi-developer@lists.sourceforge.net, rcu@vger.kernel.org,
+        sparclinux <sparclinux@vger.kernel.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        xen-devel@lists.xenproject.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Conor Dooley <conor.dooley@microchip.com>
+Hi Borislav,
 
-Update the riscv/microchip entry by adding the microchip dts
-directory and myself as maintainer
+On Mon, Nov 8, 2021 at 3:21 PM Borislav Petkov <bp@alien8.de> wrote:
+> On Mon, Nov 08, 2021 at 03:07:03PM +0100, Geert Uytterhoeven wrote:
+> > I think the addition of __must_check is overkill, leading to the
+> > addition of useless error checks and message printing.
+>
+> See the WARN in notifier_chain_register() - it will already do "message
+> printing".
 
-Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
----
- MAINTAINERS | 2 ++
- 1 file changed, 2 insertions(+)
+I mean the addition of useless error checks and message printing _to
+the callers_.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ca6d6fde85cf..a0000ddd02fd 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16077,8 +16077,10 @@ K:	riscv
- 
- RISC-V/MICROCHIP POLARFIRE SOC SUPPORT
- M:	Lewis Hanly <lewis.hanly@microchip.com>
-+M:	Conor Dooley <conor.dooley@microchip.com>
- L:	linux-riscv@lists.infradead.org
- S:	Supported
-+F:	arch/riscv/boot/dts/microchip/
- F:	drivers/mailbox/mailbox-mpfs.c
- F:	drivers/soc/microchip/
- F:	include/soc/microchip/mpfs.h
--- 
-2.33.1
+> > Many callers call this where it cannot fail, and where nothing can
+> > be done in the very unlikely event that the call would ever start to
+> > fail.
+>
+> This is an attempt to remove this WARN() hack in
+> notifier_chain_register() and have the function return a proper error
+> value instead of this "Currently always returns zero." which is bad
+> design.
+>
+> Some of the registration functions around the tree check that retval and
+> some don't. So if "it cannot fail" those registration either should not
+> return a value or callers should check that return value - what we have
+> now doesn't make a whole lot of sense.
 
+With __must_check callers are required to check, even if they know
+it cannot fail.
+
+> Oh, and then fixing this should avoid stuff like:
+>
+> +       if (notifier_registered == false) {
+> +               mce_register_decode_chain(&amdgpu_bad_page_nb);
+> +               notifier_registered = true;
+> +       }
+>
+> from propagating in the code.
+
+That's unrelated to the addition of __must_check.
+
+I'm not against returning proper errors codes.  I'm against forcing
+callers to check things that cannot fail and to add individual error
+printing to each and every caller.
+
+Note that in other areas, we are moving in the other
+direction, to a centralized printing of error messages,
+cfr. e.g. commit 7723f4c5ecdb8d83 ("driver core: platform: Add an
+error message to platform_get_irq*()").
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
