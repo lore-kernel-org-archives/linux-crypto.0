@@ -2,115 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9923BC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 873E1C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:35:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C448611AF
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:35:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70F856115A
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:35:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238984AbhKIIh7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Nov 2021 03:37:59 -0500
-Received: from mail-ua1-f47.google.com ([209.85.222.47]:34468 "EHLO
-        mail-ua1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244280AbhKIIhg (ORCPT
+        id S235911AbhKIIiE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 Nov 2021 03:38:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60120 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239048AbhKIIh4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Nov 2021 03:37:36 -0500
-Received: by mail-ua1-f47.google.com with SMTP id b3so37086347uam.1;
-        Tue, 09 Nov 2021 00:34:50 -0800 (PST)
+        Tue, 9 Nov 2021 03:37:56 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 630BDC061766;
+        Tue,  9 Nov 2021 00:35:10 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id y1so19598350plk.10;
+        Tue, 09 Nov 2021 00:35:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=o1cvMhjy6fdnuouwYm+15BaMU3WeB3ZqppuOOP+IdbA=;
+        b=NuT+usCXZoscybyvMzPhWmJzLdkr4FzjbII6e+EiSMU0jT0pDUnp0whPvULMcJHsWA
+         5UL0Fj1lfanlgShx2s9Vj8P8rrZVpFU0DEXTfz33PSF2FYvj8R4wooFR7KNru3u/Q5po
+         6v36EgJuQT70yDJX0YltUindh6/tmvzTGZsvjh7BPt8N5lR0bLdqLS51ExQIMxrifsFM
+         MZ509TmpP+ayPKvjDxmpR75mweuxM+MINhhub8rv4hHkgv7UoI87OlalSxZJwsTEWJYp
+         fESmSS/vuLk4NVsKQ0GtnMop3zmKzPi8D2YxvT+i/49v5gwd6/6evlxBtJObm6UWEoYU
+         IjoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AeQsRqY/GskMz/vOm4ldxuS7JHiWlKXTjA+Am1FlP0g=;
-        b=5r7uvOhw7ynCk9Af+p6Mek1PwSJ53TQ2RWapaDY4UfTPNdB/UuxNSVRvZ+QrLxnHzE
-         kArpQlzv1vM9eX3gFCT683DrheD2AU3GtdIy2f71BA59DA5FxaQu7VvVcPOmnD3ch4+d
-         dmrhIJDJwA1F0fi3dPULvCHo8HK7FHtUGxwbSmrQMwnWBtDs8NpkWBzWcmKwfTk2ocpX
-         Y8iFF5fWSFtJ8PF1K81VmxkP7IARFB9a7sf5ClUE4WpXgNNafowPbLTUphsjVpf2ALsG
-         pDpDC6OvhbLuoLz1VTSFu0jtNyXzFKfyQvSu/atdMFvLYdKvtREXTb417r8Bg2Po96Ur
-         lDDg==
-X-Gm-Message-State: AOAM533YHVNpX3xKC2R3FC38oYiEFNevOQvMRUpyvgETqWfjG7S3349n
-        FknGjDx7Ty2EqWjWv4jXZ9j9F6hm4PNNghw9
-X-Google-Smtp-Source: ABdhPJwa1j6nX5jloLYtG9RuU90/Sh9fPVM9brTspVa1+XS29skV/GXmtqcLaiUDjzoIxZ5qEBA8dQ==
-X-Received: by 2002:ab0:6942:: with SMTP id c2mr7733560uas.92.1636446889902;
-        Tue, 09 Nov 2021 00:34:49 -0800 (PST)
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com. [209.85.222.51])
-        by smtp.gmail.com with ESMTPSA id f7sm2310878vkm.31.2021.11.09.00.34.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Nov 2021 00:34:49 -0800 (PST)
-Received: by mail-ua1-f51.google.com with SMTP id b17so37082452uas.0;
-        Tue, 09 Nov 2021 00:34:49 -0800 (PST)
-X-Received: by 2002:a9f:2584:: with SMTP id 4mr7741221uaf.114.1636446888895;
- Tue, 09 Nov 2021 00:34:48 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=o1cvMhjy6fdnuouwYm+15BaMU3WeB3ZqppuOOP+IdbA=;
+        b=FHnSiumbt29TzKrSsomdVKvRHUmjVDzXjO/ogZEWAgM2nPuB22/BLUVUg1Xo+6rhls
+         evtxMLnJo3AFNKTbccTVdEW8yOkDkY3RWDt+UvdXKm1SlkGeDUPYNbLs0TQ6av4cg0XY
+         l1LIR3/GWcPGmg45MG4jiTBHYckr9OEuXnQU9MZKUfyyfclvEm+kv6y/jVqCNYmkga8a
+         hnO3BIfKvOVi4bd+5Y2lH5dZJvsbuzn/qBVRtyGBF6l7bxBoRyieI1d8LUKagRsR9vCY
+         lLUyzJLi/31+9CxHF8qoF4WIyDnxVe06MIO52yGZ1zZbrN9w27pF28Zqm8cYcjPERLF/
+         RRzw==
+X-Gm-Message-State: AOAM532+FFN7Y7ZSvOnRC9MiwdBKTnk+lUerV7dDY7e8MTkMhZNSTg9g
+        s6e65hlAyJ3BQ+cke4Arqfc=
+X-Google-Smtp-Source: ABdhPJz1Bmf4Sahmca+Rh+H2qps0zm9EFfGfJvy/OSzIAS6mrpd8zFFFzPtQQDiSLpdRpJurU5eVHw==
+X-Received: by 2002:a17:902:8505:b0:142:892d:918 with SMTP id bj5-20020a170902850500b00142892d0918mr5468434plb.39.1636446909971;
+        Tue, 09 Nov 2021 00:35:09 -0800 (PST)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id e11sm1820296pjl.20.2021.11.09.00.35.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Nov 2021 00:35:09 -0800 (PST)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: chi.minghao@zte.com.cn
+To:     bbrezillon@kernel.org
+Cc:     arno@natisbad.org, schalla@marvell.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        lbartosik@marvell.com, chi.minghao@zte.com.cn,
+        schandran@marvell.com, ebiggers@google.com,
+        ovidiu.panait@windriver.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH] crypto:otx2_cptvf_algs: use swap() to make code cleaner
+Date:   Tue,  9 Nov 2021 08:35:03 +0000
+Message-Id: <20211109083503.131468-1-chi.minghao@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20211108150554.4457-1-conor.dooley@microchip.com> <20211108150554.4457-5-conor.dooley@microchip.com>
-In-Reply-To: <20211108150554.4457-5-conor.dooley@microchip.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Tue, 9 Nov 2021 09:34:37 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdX1Xm9CP2hSpkD4ApVJ8gC_ZAE1L5CT0zjF+b5An4kmqw@mail.gmail.com>
-Message-ID: <CAMuHMdX1Xm9CP2hSpkD4ApVJ8gC_ZAE1L5CT0zjF+b5An4kmqw@mail.gmail.com>
-Subject: Re: [PATCH 04/13] dt-bindings: riscv: update microchip polarfire binds
-To:     Conor Dooley <conor.dooley@microchip.com>
-Cc:     Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Lewis Hanly <lewis.hanly@microchip.com>,
-        daire.mcnamara@microchip.com, Atish Patra <atish.patra@wdc.com>,
-        ivan.griffin@microchip.com,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux I2C <linux-i2c@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-rtc@vger.kernel.org, linux-spi <linux-spi@vger.kernel.org>,
-        USB list <linux-usb@vger.kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Bin Meng <bin.meng@windriver.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Conor,
+From: chiminghao <chi.minghao@zte.com.cn>
 
-On Mon, Nov 8, 2021 at 4:06 PM <conor.dooley@microchip.com> wrote:
-> From: Conor Dooley <conor.dooley@microchip.com>
->
-> Add mpfs-soc to clear undocumented binding warning
->
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> ---
->  Documentation/devicetree/bindings/riscv/microchip.yaml | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/Documentation/devicetree/bindings/riscv/microchip.yaml b/Documentation/devicetree/bindings/riscv/microchip.yaml
-> index 3f981e897126..1ff7a5224bbc 100644
-> --- a/Documentation/devicetree/bindings/riscv/microchip.yaml
-> +++ b/Documentation/devicetree/bindings/riscv/microchip.yaml
-> @@ -21,6 +21,7 @@ properties:
->        - enum:
->            - microchip,mpfs-icicle-kit
->        - const: microchip,mpfs
-> +      - const: microchip,mpfs-soc
+Fix the following coccicheck REVIEW:
+./drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c:1688:16-17 use swap() to make code cleaner
 
-Doesn't the "s" in "mpfs" already stand for "soc"?
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: chiminghao <chi.minghao@zte.com.cn>
+---
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Gr{oetje,eeting}s,
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+index 877a948469bd..2748a3327e39 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+@@ -1682,11 +1682,8 @@ static void swap_func(void *lptr, void *rptr, int size)
+ {
+ 	struct cpt_device_desc *ldesc = lptr;
+ 	struct cpt_device_desc *rdesc = rptr;
+-	struct cpt_device_desc desc;
+ 
+-	desc = *ldesc;
+-	*ldesc = *rdesc;
+-	*rdesc = desc;
++	swap(*ldesc, *rdesc);
+ }
+ 
+ int otx2_cpt_crypto_init(struct pci_dev *pdev, struct module *mod,
+-- 
+2.25.1
 
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
