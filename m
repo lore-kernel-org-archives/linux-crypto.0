@@ -2,49 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9FF2C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 19:25:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BBF2C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 20:09:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C93C261211
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 19:25:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44F576115A
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 20:09:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243152AbhKIT17 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Nov 2021 14:27:59 -0500
-Received: from mail-dm6nam12on2075.outbound.protection.outlook.com ([40.107.243.75]:38753
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235259AbhKIT16 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Nov 2021 14:27:58 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WRAk04kVfwmLusQdDJpWVyl3pZ//Ezk0Ruq//pxs7feVneoP/59mrp4EoZAmnGZdpwciLp+1VjMlZkw0JR9WIsAzvAIdm1Sz+WnStuUCuY1EVmTm3hIGDoFswz3B6sTw/U4oXPqaFDKIc/Cc2CqNQPTq73YWk1ZyiHEmGC1Kl0PX3AAC62vnvCJzZSV+dxaz9LJMDtamrAC8u38A5i1cIsgLsigSlNu9ZSQFVttGqM0jlbzTfBHyFjHiz08olhjTutPXUGzIoz3ifQBdZidwfBWHSSKOyE9fe4EtHUfLGl+TesYYuYowMcORejE7mAzFp+asoYhr8CGdu7yj/vD6JQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CZII3zDYh1Qn7f5O1uPhYaA1/BxSVACeSR/4Hvwa2mY=;
- b=e+8a75ZYAxcvJjphuDVG+tmbIK+xT05tGcoIiDl7oxV/LxFULS+hTWKpUnVKO2xJEXKTRctDimUIrc7GveIGo4wCrKc6kulgsVPIlUf6LgKb0u2hPWnbQjzmkicA0XYAh/M9qwERFAipSOX6aP/g4WefhXHnYSCilr98WSnpOIQvuIAzKIkBHxwVYjw+bldHohiqQoMdLgW2aL7C9xgQ91UvFkPDFzT08ly4s1javgOlURqjI1YXxLbSZAFCrGrrkeebUMHrfZ15W9L7V2dnOiFPPUxGkOL0CW8yFV8VsMlyXoCMzSGlfhR2iSmhtB0hgICy8FijPrFKSa2ifQPz2A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CZII3zDYh1Qn7f5O1uPhYaA1/BxSVACeSR/4Hvwa2mY=;
- b=ad7sE2DJCKY8KUZRF4dm13UmZuA3KgPFKf6be+zEUm2F/r6551wylU8gAhOYkxfYm/bL414BmFhhuU59+Qi3rYQZGybSjIC8ma5jq8WTOLUr2IpPfAtYOFq2hALOfOENKq4KD1Qi4qPCRE7c6F9mUpswEwCsreL8rUNuXR1R3wo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM4PR12MB5264.namprd12.prod.outlook.com (2603:10b6:5:39c::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.15; Tue, 9 Nov
- 2021 19:25:11 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::a87d:568d:994f:c5f9]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::a87d:568d:994f:c5f9%9]) with mapi id 15.20.4669.016; Tue, 9 Nov 2021
- 19:25:11 +0000
-Subject: Re: [PATCH V3 1/4] crypto: ccp - Fix SEV_INIT error logging on init
-To:     Peter Gonda <pgonda@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
+        id S244190AbhKIUM1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 Nov 2021 15:12:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49922 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244177AbhKIUM0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 9 Nov 2021 15:12:26 -0500
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFFDBC061764
+        for <linux-crypto@vger.kernel.org>; Tue,  9 Nov 2021 12:09:39 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id p16so358964lfa.2
+        for <linux-crypto@vger.kernel.org>; Tue, 09 Nov 2021 12:09:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cI8enJN+Q14x6YoLuvpneR9tp1h24v9MOsMkgZn71wA=;
+        b=Trg7SEgaYNB2vMkMAfchkjxlLNQJ1YomKjWglE9RdvnEqX8kXsbHv2SMXaGOt9pi3o
+         lkGZ4oIYtQBFmIGztInjtxPod56Ah7PbmyGWiW1CKykRmS9w68fVyyhNcKM361AeUg97
+         POEdJF0eSktWMjS3BvrXBBvvRalEtUvfKx46/wxRknwI7t4p6YBvuf4qaCA00cnp+l0Y
+         V9rfl0dhUeXUcuWUP9KpHnl0KF286iqqZQuyvvy3DPvO9/MnZXB2FEWiRebPTbod87Kb
+         pBjAO/A3o459RVxrfE5fI9g5+Pneu7XFZ7Q02HS1vfN//PTnMWSGPTL0ZsfnH42UzGuT
+         9c4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cI8enJN+Q14x6YoLuvpneR9tp1h24v9MOsMkgZn71wA=;
+        b=PS0dTh/kTLhrbDwYVcmiaGZohLvtIYIL4PAJS+AOicaSkKceyPERl4j3fqzuHSjKcb
+         g1LHZuxXcGGf36g5SBJEFVlRgLokHrzS9UgJHRqTyrmYzDgKx8B2g1l1JHqhTf2Fxz5c
+         Ub30H3TrT/DbX9fDsB1ePvnyomFp4C4HFftBCxFqidCuC55HcZcU6SOEeGPHnzLLsS1q
+         fT2BrNWpC/W6MPQjy+rtJCUGTmGTuQL9TrbM/Co811nE2AAAl1r/mz/URWfvRZUXtSYC
+         rytwJe8uC/TJsPV0/4ylevM/NByq8U1QzRTv9zjvD+iEjUPI3oizFtk5EYUcB2nyX6s0
+         6Pwg==
+X-Gm-Message-State: AOAM533/2l9uUfZmKgiuvuPHrw0fPkM27X3Z3J9cGGGsmQYYiA4NTl/k
+        5V74Bw0nt4tvYKx3yLWGSdjJNS/s13JS1NF+1jJ0aA==
+X-Google-Smtp-Source: ABdhPJxiUglUe8ppV37N00Lz09TaBeyc3wL8AQFtl5QLZ92LwzK789+owXHQhT8/tZ/SH6QMsNuHGu5AtcJEXFBsu0g=
+X-Received: by 2002:a05:6512:6d1:: with SMTP id u17mr1019746lff.402.1636488577782;
+ Tue, 09 Nov 2021 12:09:37 -0800 (PST)
+MIME-Version: 1.0
+References: <20211102142331.3753798-1-pgonda@google.com> <20211102142331.3753798-5-pgonda@google.com>
+ <YYquDWbkIwCkixxD@google.com>
+In-Reply-To: <YYquDWbkIwCkixxD@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 9 Nov 2021 13:09:26 -0700
+Message-ID: <CAMkAt6rHdsdD-L4PbZL7qaOY7GRHmApVJam0V0yY2BnYdhmPjA@mail.gmail.com>
+Subject: Re: [PATCH V3 4/4] crypto: ccp - Add SEV_INIT_EX support
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Thomas.Lendacky@amd.com, David Rientjes <rientjes@google.com>,
+        Marc Orr <marcorr@google.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
         Joerg Roedel <jroedel@suse.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -52,129 +65,453 @@ Cc:     Marc Orr <marcorr@google.com>,
         "David S. Miller" <davem@davemloft.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20211102142331.3753798-1-pgonda@google.com>
- <20211102142331.3753798-2-pgonda@google.com> <YYqhT+Enba5xa4cO@google.com>
- <CAMkAt6oVySH-1g+EXKvxQ9vmBV8rwTLq=qfe2+VZC+c6vATL7w@mail.gmail.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <45af7051-aab0-2b19-2904-64eceec93df5@amd.com>
-Date:   Tue, 9 Nov 2021 13:25:08 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-In-Reply-To: <CAMkAt6oVySH-1g+EXKvxQ9vmBV8rwTLq=qfe2+VZC+c6vATL7w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL1PR13CA0369.namprd13.prod.outlook.com
- (2603:10b6:208:2c0::14) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
-MIME-Version: 1.0
-Received: from [10.236.30.241] (165.204.77.1) by BL1PR13CA0369.namprd13.prod.outlook.com (2603:10b6:208:2c0::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.5 via Frontend Transport; Tue, 9 Nov 2021 19:25:09 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3dfe1398-297e-40a4-c1e9-08d9a3b6a5ac
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5264:
-X-Microsoft-Antispam-PRVS: <DM4PR12MB52640592846AC1C60FEF8E16EC929@DM4PR12MB5264.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BkkyWvgyUJReHfVgv3mWQV6zxP+WuwrJzCHFOOr+UuF0WeanF6KPtsfq+OkPGEghvdmvwzR7TcUVoRLQokj1cX7/+4VnKOx5TdtRZ+JDYLDi0OWWJ6pxqKQH0eOawexZpXO6UHTsCuikYxs/xkxeYAWUTPjg2ywhk3ukqpa3Tm0N4GIjBife1RTkdilNudzcJMuT8r/Vamrqda1r5KBLQiNvowrWYR2RnJTox+bU8xtZwMSC5SIQynx+b8ZUCu9ekfNvVK4HKADRSWy4RoBQjSkT4uqvbweERw7s2uCPA1QrdXOPMENpvu+vhw1DTWLbFFx1NWjm0LJnH1Fde8ex6UIcXi8xQM1O7x1iFyn6IJpwuHp5EIAmwGg8sYL1pGDCD/W4VksB+9ZiaO0eg6tJWea6Vk7VZ6RCAYrs6FS5K3sKlFI8NlMXeJls6rARtgQIPeHRghyJBcg+18ptrPM/pZlli4uwBo4Wmq0F/ZA0VtIKZKGj2arQBxEKTn8KuohCA9pk7Ki5XAMhXVY3TlyM2VW9R7tyyF0Vp8/8hsQy+4tTNo4sQ9wHZVV3IBdfrLVuPdQto/YT3m6I3pJ5h/e4hgN9d98fE4CbzGpMvcuc2dAkL6veKjyhPMIuP0U4XgA1ir3jzmkQLMzBqjxyltgG2kAid/rWv64EgLbA/anwGyaxWyud011YrnULKmNQ4edxHVQm/AWZIjcAcNLEaV9bo2jJKlvZurI/OG5p6sVw+3z5EsD4lE2oLKG+u/mmq0CN
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(26005)(86362001)(7416002)(31696002)(54906003)(110136005)(8676002)(6486002)(186003)(66476007)(53546011)(66556008)(16576012)(5660300002)(66946007)(2906002)(508600001)(31686004)(316002)(8936002)(956004)(4326008)(2616005)(38100700002)(36756003)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UW1kRGkrTmlOOFJkZmZ1eHpiclZOKytOWkdwOGpiUDl3bXhwWW05Q2xCMGlS?=
- =?utf-8?B?T3E1QnlrMEZMMnRLOXJEVGk2bk9TUGtVcHZ6YWR2aHlqUlc0TUVpRUFjaXc3?=
- =?utf-8?B?SENjaEpjaUMwUXBYM1ZyR0lzek15QmdMTFJXKy9xc0ZQVHVEL2VHWXArekF2?=
- =?utf-8?B?NDMwRUp1OHBGVG1aMVF6YzVZRWxnQndYZHYxaFhMcENuKzZ0b3BFYnl3RWpG?=
- =?utf-8?B?VkFJV0RQQ0N5SE5pRXdsTkVHcE04TFo5QTdFdllhcmkvODhIU0dXOWpXS1dx?=
- =?utf-8?B?d3AvalArR0NYVW9KR0M0UW9Xa3h3bGcxVG1RanVzTmtZSjg5akVMYjY5YTNI?=
- =?utf-8?B?am9kd1pSV3BLdnlIRjVIR3l2U1NkTzdOVFNyc1RQK0VEU1JEWExGMklHMTRI?=
- =?utf-8?B?dnpXdmMzMzdUVkFJMU5xLy9ROEJKVU9NYlJpQ3NCQVhnYkJueGEyV1NudDl0?=
- =?utf-8?B?QUN4aktRNUFBREFJT2I0S0FmWFBpLzYxTFA4TW5qTEZ2Y1JEOTBpRllMQjZs?=
- =?utf-8?B?dC9mSG45WmNlSkZWSVU5N3ZOa05RcXhOR3RFakd1QXRSZGxuNlJzcTZ0cDZS?=
- =?utf-8?B?NHRQc1A0RzEwbHo2UDNzUXN5N2lta0xPTkJYcFhRL05MUUR3V2g4Rnl0S05H?=
- =?utf-8?B?bWVkOS9LcG1hWjQ2MEdrMjd2ejRzdUhFV2pGbGFsVnBDam1YTTZVRWNHS0ty?=
- =?utf-8?B?OVVxVjFmZG9RV1FTZDd6Zy9BRy9HRUlGeUI0TldEL2VGa0p6alp3MStWSytQ?=
- =?utf-8?B?RUVrWFYxYkpKL3EwMHFNM0tMQ00ydStlRFFPYTB3SGEzaFpzTytIVGw1akNi?=
- =?utf-8?B?K0VIOFFwclBzMWgwZmFVUUJKcmF4VWdSQVFlSkdxb1c2aHJSbk9ZL3lqYUVp?=
- =?utf-8?B?RWl5OVN3bys1akpHV1Jsa2pmQjg3Qzl4SGlVRGNxaDhFVEF2cDdYNjFldUtn?=
- =?utf-8?B?ZzdIcXliU1RFaEZ6Rkc1RzRNT3JUQkdkUVVrc3dsOTRZOTd6YjlNMWN1a0Nj?=
- =?utf-8?B?VWVzY28zRGVMUWxDeHdmRHhXclY5WHB3UmxKTy9IeWhkbGdadSsydXpzOU9O?=
- =?utf-8?B?ZkM5MlBCdjk2Zlk1emtETTZLYWtXZENseDFuZVlyWEE0UjZ6RUFBZ05oRkhp?=
- =?utf-8?B?cTQzZGVlRk9IRmRIMXY5SVdndFNzM041clpTMzVrbEtFMEl4YzEzTjR3RG9w?=
- =?utf-8?B?VkNJQ3JvemxTMERVY3BNR1JuTUl5MVhNUDdpU0hCWDhzRVVyZlMzUnltREpt?=
- =?utf-8?B?dXBCUjQrVDFOVzVoVEtPWHpBdEVTanVoV2VDSlg2VHd2N2d3YW1icWlFeUxC?=
- =?utf-8?B?RXNKYVV1N2cvVEVkc3JZNjNpbGtGSVNweTE1YzJiQnlHTkhGMUJqT1R5YWt3?=
- =?utf-8?B?Vi92dVNuR3MxWEFQQjQxZk5wMjJOQlBGYU42byt1SVBzQWZ4eGZFNmdLcWpi?=
- =?utf-8?B?MmhvamdiaGpra2JleFdndkJCdWVoMEZ6MG1XanJuUHJubStHc0hLbTZhMG5o?=
- =?utf-8?B?dW85eCtGbUgvNlkwbmRCTU9TM1piTU5SQnd0cVRhNEVUNitWczBtaVFwUklE?=
- =?utf-8?B?VmIxdXN1SlR0UkR2SlN5VUh5QzE2OGhTcGFPcjF5SGw3OFFZRDNQbWFraHEv?=
- =?utf-8?B?ZmgxdE9kbWtXQU16SmVwaWJjdTYveWQ4OEgxNnB4bEJoeGFqV3ZLd1VQOTFt?=
- =?utf-8?B?NlNsK0Zma1VPRWUyZUFWN1Z1M2RzZVJDVU9ZQ3dhczhuZjI2YUcrcWtxOWI0?=
- =?utf-8?B?QzlFU2dDUUxybWJJdWFDTm1zRGliK3cvQW9Fc0JlOUs1azZjSnhxVUtRNDBJ?=
- =?utf-8?B?eGl5VWRSL1RTK3h0OENJdmdjWHlNLzRYTDVLdVdZSVFrZkdYRXRMRjVjOXhC?=
- =?utf-8?B?bkhGR0NlUkZOd3NwNXV3SENIblprQW1iZzhSVzAyYkIvQW9Yc3BJK0ZFa3Bn?=
- =?utf-8?B?K2FXV3RnbGcybUYzOEtJYnNIdUNXY2lLUXpmYmUyWmRySVlpK2pRS3QrVGlv?=
- =?utf-8?B?NjBvdUhGTk1teWpwbXJnOUVFYXdtbHBodkE1SFlvZ25uWFJaMnZrSDMyM0VT?=
- =?utf-8?B?YTJHdURrL2RPVmkyT3poRzdoenJaRVptcFVlWU9uS2tSSlp5T1o3Ym5Gc0da?=
- =?utf-8?B?MHhIYktTbVVBTnRrL25DZmdKYjJtQVZobUNGdW8wRjdMd25VZUtUU3dvZVVJ?=
- =?utf-8?Q?MP3pldZgicYyjHA9XtJfzN4=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3dfe1398-297e-40a4-c1e9-08d9a3b6a5ac
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2021 19:25:11.3820
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 409lAHUtMirtsQgn6yITuJW5OlyoLjyFbItZ7kqFtw0QeeUtzWmoxYdfLu+lI7miXWj7p1A3mkbIWPYUwNwd2A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5264
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/9/21 10:46 AM, Peter Gonda wrote:
-> On Tue, Nov 9, 2021 at 9:27 AM Sean Christopherson <seanjc@google.com> wrote:
->> On Tue, Nov 02, 2021, Peter Gonda wrote:
+.
 
-...
+On Tue, Nov 9, 2021 at 10:21 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, Nov 02, 2021, Peter Gonda wrote:
+> > @@ -43,6 +44,10 @@ static int psp_probe_timeout = 5;
+> >  module_param(psp_probe_timeout, int, 0644);
+> >  MODULE_PARM_DESC(psp_probe_timeout, " default timeout value, in seconds, during PSP device probe");
+> >
+> > +static char *init_ex_path;
+> > +module_param(init_ex_path, charp, 0660);
+>
+> Why is this writable after the module loads?  At best, it seems like it will give
+> userspace an easy way to shoot itself in the foot, at worst it will lead to a
+> TOCTOU bug in the kernel.
 
->>
->>          SEV: failed to INIT error 0, rc -16
->>
->> which a bit head scratching without looking at the code.  AFAICT, the PSP return
->> codes aren't intrinsically hex, so printing error as a signed demical and thus
->>
->>          SEV: failed to INIT error -1, rc -16
->>
->> would be less confusing.
->>
->> And IMO requiring the caller to initialize error is will be neverending game of
->> whack-a-mole.  E.g. sev_ioctl() fails to set "error" in the userspace structure,
->> and literally every function exposed via include/linux/psp-sev.h has this same
->> issue.  Case in point, the retry path fails to re-initialize "error" and will
->> display stale information if the second sev_platform_init() fails without reaching
->> the PSP.
-> 
-> OK I can update __sev_platform_init_locked() to set error to -1. That
-> seems pretty reasonable. Tom, is that OK with you?
+Will update.
 
-Yup, I'm ok with using -1.
+>
+> > +MODULE_PARM_DESC(init_ex_path, " Path for INIT_EX data; if set try INIT_EX");
+> > +
+> >  MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
+> >  MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
+> >  MODULE_FIRMWARE("amd/amd_sev_fam19h_model0xh.sbin"); /* 3rd gen EPYC */
+> > @@ -58,6 +63,14 @@ static int psp_timeout;
+> >  #define SEV_ES_TMR_SIZE              (1024 * 1024)
+> >  static void *sev_es_tmr;
+> >
+> > +/* INIT_EX NV Storage:
+> > + *   The NV Storage is a 32Kb area and must be 4Kb page aligned.  Use the page
+> > + *   allocator to allocate the memory, which will return aligned memory for the
+> > + *   specified allocation order.
+> > + */
+> > +#define NV_LENGTH (32 * 1024)
+> > +static void *sev_init_ex_nv_address;
+>
+> The "address" part is redundant and potentially confusing, e.g. one might expect
+> it to contain a physical address.
+>
+> And the "NV" part is kind of a lie, this isn't in non-volatile memory (it's a
+> kernel buffer) and it's obviously volatile in the sense that it can be changed
+> by the PSP.  I get that from the PSP's perspective it's _intended_ to be NV
+> storage, but (a) this does not point at NV storage and (b) there is no guarantee
+> that the path provided by userspace points at NV storage.
+>
+> Maybe "sev_init_ex_buffer" or something along those lines?
+>
+> >  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+> >  {
+> >       struct sev_device *sev = psp_master->sev_data;
+> > @@ -107,6 +120,7 @@ static int sev_cmd_buffer_len(int cmd)
+> >  {
+> >       switch (cmd) {
+> >       case SEV_CMD_INIT:                      return sizeof(struct sev_data_init);
+> > +     case SEV_CMD_INIT_EX:                   return sizeof(struct sev_data_init_ex);
+> >       case SEV_CMD_PLATFORM_STATUS:           return sizeof(struct sev_user_data_status);
+> >       case SEV_CMD_PEK_CSR:                   return sizeof(struct sev_data_pek_csr);
+> >       case SEV_CMD_PEK_CERT_IMPORT:           return sizeof(struct sev_data_pek_cert_import);
+> > @@ -152,6 +166,87 @@ static void *sev_fw_alloc(unsigned long len)
+> >       return page_address(page);
+> >  }
+> >
+> > +static int sev_read_nv_memory(void)
+>
+> Similar to above, this is reading from a file that's backed by who knows what,
+> i.e. it may or may not be reading NV memory.  And if it's going to implicitly
+> read into the buffer, that should be reflected in the name.
+>
+> > +{
+> > +     struct file *fp;
+> > +     ssize_t nread;
+> > +
+> > +     if (!sev_init_ex_nv_address)
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     fp = filp_open(init_ex_path, O_RDONLY, 0);
+> > +     if (IS_ERR(fp)) {
+> > +             int ret = PTR_ERR(fp);
+> > +
+> > +             dev_err(psp_master->dev,
+> > +                     "SEV: could not open %s for read, error %d\n",
+> > +                     init_ex_path, ret);
+> > +             return ret;
+> > +     }
+> > +
+> > +     nread = kernel_read(fp, sev_init_ex_nv_address, NV_LENGTH, NULL);
+> > +     dev_dbg(psp_master->dev, "SEV: read %ld bytes from NV file\n", nread);
+> > +     filp_close(fp, NULL);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static void sev_write_nv_memory(void)
+>
+> Same comments here.
+>
+> > +{
+> > +     struct sev_device *sev = psp_master->sev_data;
+> > +     struct file *fp;
+> > +     loff_t offset = 0;
+> > +     ssize_t nwrite;
+> > +
+> > +     if (!sev_init_ex_nv_address)
+> > +             return;
+> > +
+> > +     fp = filp_open(init_ex_path, O_CREAT | O_WRONLY, 0600);
+> > +     if (IS_ERR(fp)) {
+> > +             dev_err(sev->dev,
+> > +                     "SEV: could not open file for write, error %d\n",
+> > +                     PTR_ERR(fp));
+> > +             return;
+> > +     }
+> > +
+> > +     nwrite = kernel_write(fp, sev_init_ex_nv_address, NV_LENGTH, &offset);
+> > +     vfs_fsync(fp, 0);
+> > +     filp_close(fp, NULL);
+> > +
+> > +     if (nwrite != NV_LENGTH) {
+> > +             dev_err(sev->dev,
+> > +                     "SEV: failed to write %u bytes to non volatile memory area, ret %ld\n",
+> > +                     NV_LENGTH, nwrite);
+> > +             return;
+> > +     }
+> > +
+> > +     dev_dbg(sev->dev, "SEV: write successful to NV file\n");
+> > +}
+> > +
+> > +static void sev_write_nv_memory_if_required(int cmd_id)
+>
+> And here.
 
-> 
+I'll update the naming.
 
-...
+>
+> > +{
+> > +     if (!sev_init_ex_nv_address)
+> > +             return;
+> > +
+> > +     /*
+> > +      * Only a few platform commands modify the SPI/NV area, but none of the
+> > +      * non-platform commands do. Only INIT(_EX), PLATFORM_RESET, PEK_GEN,
+> > +      * PEK_CERT_IMPORT, and PDH_GEN do.
+> > +      */
+> > +     switch (cmd_id) {
+> > +     case SEV_CMD_FACTORY_RESET:
+> > +     case SEV_CMD_INIT_EX:
+> > +     case SEV_CMD_PDH_GEN:
+> > +     case SEV_CMD_PEK_CERT_IMPORT:
+> > +     case SEV_CMD_PEK_GEN:
+> > +             break;
+> > +     default:
+> > +             return;
+> > +     };
+> > +
+> > +     sev_write_nv_memory();
+> > +}
+> > +
+> >  static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+> >  {
+> >       struct psp_device *psp = psp_master;
+> > @@ -221,6 +316,8 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+> >               dev_dbg(sev->dev, "sev command %#x failed (%#010x)\n",
+> >                       cmd, reg & PSP_CMDRESP_ERR_MASK);
+> >               ret = -EIO;
+> > +     } else {
+> > +             sev_write_nv_memory_if_required(cmd);
+> >       }
+> >
+> >       print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
+> > @@ -247,22 +344,42 @@ static int sev_do_cmd(int cmd, void *data, int *psp_ret)
+> >       return rc;
+> >  }
+> >
+> > -static int __sev_platform_init_locked(int *error)
+> > +static int __sev_init_locked(int *error)
+> >  {
+> > -     struct psp_device *psp = psp_master;
+> >       struct sev_data_init data;
+> > -     struct sev_device *sev;
+> > -     int rc = 0;
+> >
+> > -     if (!psp || !psp->sev_data)
+> > -             return -ENODEV;
+> > +     memset(&data, 0, sizeof(data));
+> > +     if (sev_es_tmr) {
+> > +             u64 tmr_pa;
+> >
+> > -     sev = psp->sev_data;
+> > +             /*
+> > +              * Do not include the encryption mask on the physical
+> > +              * address of the TMR (firmware should clear it anyway).
+> > +              */
+> > +             tmr_pa = __pa(sev_es_tmr);
+>
+> I realize this is copy-pasted from existing code, by why bother with an intermediate
+> tmr_pa?  Just set data.tmr_address directly.
 
-> 
-> These comments seem fine to me. But I'll refrain from updating
-> anything here since this seems out-of-scope of this series. Happy to
-> discuss further and work on that if Tom is interested in those
-> refactors too.
+I can fix that up in the next revison.
 
-That's one of those things we've wanted to get around to improving but 
-just haven't had the time. So, yes, if you wish to refactor the 'error' 
-related area, that would be great.
+>
+> >
+> > -     if (sev->state == SEV_STATE_INIT)
+> > -             return 0;
+> > +             data.flags |= SEV_INIT_FLAGS_SEV_ES;
+> > +             data.tmr_address = tmr_pa;
+> > +             data.tmr_len = SEV_ES_TMR_SIZE;
+> > +     }
+> > +
+> > +     return __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> > +}
+> > +
+> > +static int __sev_init_ex_locked(int *error)
+> > +{
+> > +     struct sev_data_init_ex data;
+> > +     int ret;
+> >
+> >       memset(&data, 0, sizeof(data));
+> > +     data.length = sizeof(data);
+> > +     data.nv_address = __psp_pa(sev_init_ex_nv_address);
+> > +     data.nv_len = NV_LENGTH;
+> > +
+> > +     ret = sev_read_nv_memory();
+>
+> Why defer reading the file until INIT_EX?  Why not read the data when the path
+> is first verified and consumed?  More comments below in the retry path.
+>
+> And what happens when sev_platform_init() is reached through a path other than
+> sev_pci_init()?  I guess that's a question for the existing code since sev_es_tmr
+> will be NULL unless sev_platform_init() routes through sev_pci_init().  So either
+> the sev_platform_init() call from KVM's sev_guest_init() is pointless, or there's
+> potential for some truly bizarre and confusing behavior.
 
-Thanks,
-Tom
+Lets consolidate this discussion below.
 
-> 
+>
+> > +     if (ret)
+> > +             return ret;
+> > +
+> >       if (sev_es_tmr) {
+> >               u64 tmr_pa;
+> >
+> > @@ -277,7 +394,27 @@ static int __sev_platform_init_locked(int *error)
+> >               data.tmr_len = SEV_ES_TMR_SIZE;
+> >       }
+> >
+> > -     rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> > +     return __sev_do_cmd_locked(SEV_CMD_INIT_EX, &data, error);
+> > +}
+> > +
+> > +static int __sev_platform_init_locked(int *error)
+> > +{
+> > +     struct psp_device *psp = psp_master;
+> > +     struct sev_device *sev;
+> > +     int rc;
+> > +     int (*init_function)(int *error);
+> > +
+> > +     if (!psp || !psp->sev_data)
+> > +             return -ENODEV;
+> > +
+> > +     sev = psp->sev_data;
+> > +
+> > +     if (sev->state == SEV_STATE_INIT)
+> > +             return 0;
+> > +
+> > +     init_function = sev_init_ex_nv_address ? __sev_init_ex_locked :
+> > +         __sev_init_locked;
+>
+> There's no need for this to be a function pointer, and the duplicate code can be
+> consolidated.
+>
+> static int sev_do_init_locked(int cmd, void *data, int *error)
+> {
+>         if (sev_es_tmr) {
+>                 /*
+>                  * Do not include the encryption mask on the physical
+>                  * address of the TMR (firmware should clear it anyway).
+>                  */
+>                 data.flags |= SEV_INIT_FLAGS_SEV_ES;
+>                 data.tmr_address = __pa(sev_es_tmr);
+>                 data.tmr_len = SEV_ES_TMR_SIZE;
+>         }
+>         return __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> }
+>
+> static int __sev_init_locked(int *error)
+> {
+>         struct sev_data_init data;
+>
+>         memset(&data, 0, sizeof(data));
+>         return sev_do_init_locked(cmd, &data, error);
+> }
+>
+> static int __sev_init_ex_locked(int *error)
+> {
+>         struct sev_data_init_ex data;
+>
+>         memset(&data, 0, sizeof(data));
+>         data.length = sizeof(data);
+>         data.nv_address = __psp_pa(sev_init_ex_nv_address);
+>         data.nv_len = NV_LENGTH;
+>         return sev_do_init_locked(SEV_CMD_INIT_EX, &data, error);
+> }
+
+I am missing how this removes the duplication of the retry code,
+parameter checking, and other error checking code.. With what you have
+typed out I would assume I still need to function pointer between
+__sev_init_ex_locked and __sev_init_locked. Can you please elaborate
+here? Also is there some reason the function pointer is not
+acceptable?
+
+>
+> > +     rc = init_function(error);
+> >       if (rc && *error == SEV_RET_SECURE_DATA_INVALID) {
+> >               /*
+> >                * INIT command returned an integrity check failure
+> > @@ -286,8 +423,8 @@ static int __sev_platform_init_locked(int *error)
+> >                * failed and persistent state has been erased.
+> >                * Retrying INIT command here should succeed.
+> >                */
+> > -             dev_dbg(sev->dev, "SEV: retrying INIT command");
+> > -             rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> > +             dev_notice(sev->dev, "SEV: retrying INIT command");
+> > +             rc = init_function(error);
+>
+> The above comment says "persistent state has been erased", but __sev_do_cmd_locked()
+> only writes back to the file if a relevant command was successful, which means
+> that rereading the userspace file in __sev_init_ex_locked() will retry INIT_EX
+> with the same garbage data.
+
+Ack my mistake, that comment is stale. I will update it so its correct
+for the INIT and INIT_EX flows.
+>
+> IMO, the behavior should be to read the file on load and then use the kernel buffer
+> without ever reloading (unless this is built as a module and is unloaded and reloaded).
+> The writeback then becomes opportunistic in the sense that if it fails for some reason,
+> the kernel's internal state isn't blasted away.
+
+One issue here is that the file read can fail on load so we use the
+late retry to guarantee we can read the file. The other point seems
+like preference. Users may wish to shutdown the PSP FW, load a new
+file, and INIT_EX again with that new data. Why should we preclude
+them from that functionality?
+
+>
+> >       }
+> >
+> >       if (rc)
+> > @@ -303,7 +440,7 @@ static int __sev_platform_init_locked(int *error)
+> >
+> >       dev_dbg(sev->dev, "SEV firmware initialized\n");
+> >
+> > -     return rc;
+> > +     return 0;
+> >  }
+> >
+> >  int sev_platform_init(int *error)
+> > @@ -1057,6 +1194,12 @@ static void sev_firmware_shutdown(struct sev_device *sev)
+> >                          get_order(SEV_ES_TMR_SIZE));
+> >               sev_es_tmr = NULL;
+> >       }
+> > +
+> > +     if (sev_init_ex_nv_address) {
+>
+> It really seems like the the teardown path should be paranoid and do a final
+> writeback of the kernel's buffer.
+
+Tom asked me to remove that in the last revision.
+
+>
+> > +             free_pages((unsigned long)sev_init_ex_nv_address,
+> > +                        get_order(NV_LENGTH));
+> > +             sev_init_ex_nv_address = NULL;
+> > +     }
+> >  }
+> >
+> >  void sev_dev_destroy(struct psp_device *psp)
+> > @@ -1101,6 +1244,18 @@ void sev_pci_init(void)
+> >           sev_update_firmware(sev->dev) == 0)
+> >               sev_get_api_version();
+> >
+> > +     /* If an init_ex_path is provided rely on INIT_EX for PSP initialization
+> > +      * instead of INIT.
+> > +      */
+> > +     if (init_ex_path) {
+> > +             sev_init_ex_nv_address = sev_fw_alloc(NV_LENGTH);
+> > +             if (!sev_init_ex_nv_address) {
+> > +                     dev_err(sev->dev,
+> > +                             "SEV: INIT_EX NV memory allocation failed\n");
+> > +                     goto err;
+>
+> Why does this nullify psp_master->sev_data but later failures do not?
+
+If the buffer cannot be allocated then we cannot INIT_EX the PSP so
+the operation is completely stopped similar to the error condition
+with having an acceptable PSP API version.
+
+>
+> > +             }
+> > +     }
+> > +
+> >       /* Obtain the TMR memory area for SEV-ES use */
+> >       sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
+> >       if (!sev_es_tmr)
+> > diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> > index d48a7192e881..1595088c428b 100644
+> > --- a/include/linux/psp-sev.h
+> > +++ b/include/linux/psp-sev.h
+> > @@ -52,6 +52,7 @@ enum sev_cmd {
+> >       SEV_CMD_DF_FLUSH                = 0x00A,
+> >       SEV_CMD_DOWNLOAD_FIRMWARE       = 0x00B,
+> >       SEV_CMD_GET_ID                  = 0x00C,
+> > +     SEV_CMD_INIT_EX                 = 0x00D,
+> >
+> >       /* Guest commands */
+> >       SEV_CMD_DECOMMISSION            = 0x020,
+> > @@ -102,6 +103,26 @@ struct sev_data_init {
+> >       u32 tmr_len;                    /* In */
+> >  } __packed;
+> >
+> > +/**
+> > + * struct sev_data_init_ex - INIT_EX command parameters
+> > + *
+> > + * @length: len of the command buffer read by the PSP
+> > + * @flags: processing flags
+> > + * @tmr_address: system physical address used for SEV-ES
+> > + * @tmr_len: len of tmr_address
+> > + * @nv_address: system physical address used for PSP NV storage
+> > + * @nv_len: len of nv_address
+> > + */
+> > +struct sev_data_init_ex {
+> > +     u32 length;                     /* In */
+> > +     u32 flags;                      /* In */
+> > +     u64 tmr_address;                /* In */
+> > +     u32 tmr_len;                    /* In */
+> > +     u32 reserved;                   /* In */
+> > +     u64 nv_address;                 /* In/Out */
+> > +     u32 nv_len;                     /* In */
+> > +} __packed;
+> > +
+> >  #define SEV_INIT_FLAGS_SEV_ES        0x01
+> >
+> >  /**
+> > --
+> > 2.33.1.1089.g2158813163f-goog
+> >
