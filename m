@@ -2,59 +2,59 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5D5C4332F
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 16:46:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86D72C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 16:56:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8534860234
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 16:46:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69A8E61131
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 16:56:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240408AbhKIQtn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Nov 2021 11:49:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60392 "EHLO
+        id S238281AbhKIQ7S (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 Nov 2021 11:59:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240345AbhKIQtk (ORCPT
+        with ESMTP id S232513AbhKIQ7R (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Nov 2021 11:49:40 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED8CFC0613F5
-        for <linux-crypto@vger.kernel.org>; Tue,  9 Nov 2021 08:46:53 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id z34so2675918lfu.8
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Nov 2021 08:46:53 -0800 (PST)
+        Tue, 9 Nov 2021 11:59:17 -0500
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB660C061764
+        for <linux-crypto@vger.kernel.org>; Tue,  9 Nov 2021 08:56:30 -0800 (PST)
+Received: by mail-lj1-x233.google.com with SMTP id t11so37560701ljh.6
+        for <linux-crypto@vger.kernel.org>; Tue, 09 Nov 2021 08:56:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=+DobYMn9JpQ+enw2TdOzWV1L7zxSGklfH9GxpMYDKho=;
-        b=sxk0uFKMhwTn+CM8H0CHltcLP+zx3SB/DVLc3/ZV2EpxzoTwd7i/FFmTKgom2vg7Cy
-         84XnO+mOHJMUaFVLaMVN9Yyblxw95Cm5gf9awuPaTvDxYJFiMi06wWFYcAtYDuCpSqpf
-         hy4T4mw9dbtUQMZf3oPlvXWSRKr6vEn1Jz0LoOUXMlI51YBsAdVlXEJv6QQ5XujJeCzf
-         MDxETFpwUsvt+SnIxvaK/7gYyvz+QwoU617eZKQfoEkBt3+uWNn6rNz3j3wdRHOpyaGE
-         vR93EOuUspGrqdNIl6I9aJXXT9YUcp4/dhTaKG97bZFdKLAIDZYaWT+FApSy0L+jRjxK
-         VBzQ==
+        bh=g/boREeiOnUsS7l12hdWo7Yz/43cU9hRgiBg0G45VUI=;
+        b=U644LgmH5os0YhjyX2lXGVcMnJy/jzLf+nmKZWo4uzo4LdV1H8Cv0tRTOTTy7/M6Aq
+         ZrFTYuHQ3V5e40aKm+hxm5JZ08l1WUXxk64GmITWcPwbOWVJbsp1fmyA9DZftQSsHuPR
+         weHY4BIvmTZtEyip2t8+bf6UVbzSFsL/zUI+tS9yGAYBLWSikonnZM7GeKILQesWnuLT
+         woivcyqg6fgqO8+otNCwxgPTTZpGD3uN9/wgeDTmUS6oXMJvaPJrE2qskAb89Vw0/d1k
+         Dx4SDGwPDT8KwiqjSf9kxaa7t45b+eS+I2hVNMgo0QhQvh2N9MALqreUVFN3MxboqNEE
+         d2sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=+DobYMn9JpQ+enw2TdOzWV1L7zxSGklfH9GxpMYDKho=;
-        b=3mg/lU1qcDClvaKMKyZprSZFyMwpx1PTewAT01a+GPcnRLzleMbT3hTxbDSRd31iw2
-         29hjSeBH+HY+CSP3UI/pDSH2lbc2q6jrG+LHSc9qZhVuBBhv9ZagpHLhqbWJZ92/N2P3
-         ddkB0z7Xfd5hpUBglgyWzbldv02c5sXQ4j7nqp/vtXiTPCCkvec98s9vsYEd9EzHEOuR
-         MzkQ1j/I04ewOAbDH6e7f5YuqAnc+1BKU5e1LGYTxS5brCMA+yAKmjIAm3b6E9qd/GDD
-         2p/9+Bxrl1keI7AunYabzcGuckr/l9q5BGWt/WzsVUapag6sv4TjAgGShqQZ58dBpAAC
-         qyNw==
-X-Gm-Message-State: AOAM533IVx6TGwZpFfma+DeckEXv9sZgrs0Uip7QQliJCAi6k5Qu+RP6
-        1oNh5/g2zZ3YzxnJgai0feLS8KNSnHYaK1DtATzJjQ==
-X-Google-Smtp-Source: ABdhPJx8Ubj02xgDy+a1EYHccglsh8KzRnTqS7Goni4XUv7NERlEZm2nzxsi+HgSvub+r6vBHdjdvJ1w3SVniNoez0c=
-X-Received: by 2002:a19:ad4d:: with SMTP id s13mr8364668lfd.373.1636476412095;
- Tue, 09 Nov 2021 08:46:52 -0800 (PST)
+        bh=g/boREeiOnUsS7l12hdWo7Yz/43cU9hRgiBg0G45VUI=;
+        b=jJI0iFz5b7noKj5abK7ZO8P9CsOOQd4/ivJw2rx3PDboNyifjRNP5Qrf/gr/L85957
+         LnjTXXhsTExc0VrFsqie63JuJ2WxHetvbTRjNJl65jayw9o/DN2M+ex2YYkcGOe+kwGO
+         LLdxspogDZqCy+d0mNVzcxhjtR3roBjCh3FEwM/RgymB5Mq9iXPUZCfDVQ7asTGHalym
+         hgWq1QGdhomwcf+Us5L1uCLAKLUSWzHwjihzkUHbIyVEPRNOXNHyXn1OGKYga0T+l4to
+         ZVg0ZC+3PENlRYOToE1+peQ4Yox5Zo9TaXb2UQQnQ26yjFOKD8KpwM2wUknKlEldQyu7
+         9XuQ==
+X-Gm-Message-State: AOAM530GJI4go4k1oFy0rZmgkC/XH/evIYAT5iuYIwgotZA0TfN47jgs
+        dtAmvaH+q5s4zokMSyHg3bYRLops1M9kQsBbeGNaCA==
+X-Google-Smtp-Source: ABdhPJzDj9Vv1wNyWnEEvLmld2YkGi0DQTUPwiqlGO23z4KMUMdDxmu6xiSKFYw+E4RgCf2MhFP+zpUg6U2e12w0JDE=
+X-Received: by 2002:a2e:b8cd:: with SMTP id s13mr9222842ljp.527.1636476988886;
+ Tue, 09 Nov 2021 08:56:28 -0800 (PST)
 MIME-Version: 1.0
-References: <20211102142331.3753798-1-pgonda@google.com> <20211102142331.3753798-2-pgonda@google.com>
- <YYqhT+Enba5xa4cO@google.com>
-In-Reply-To: <YYqhT+Enba5xa4cO@google.com>
+References: <20211102142331.3753798-1-pgonda@google.com> <20211102142331.3753798-3-pgonda@google.com>
+ <YYqicq5YnNuwTS+B@google.com>
+In-Reply-To: <YYqicq5YnNuwTS+B@google.com>
 From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 9 Nov 2021 09:46:40 -0700
-Message-ID: <CAMkAt6oVySH-1g+EXKvxQ9vmBV8rwTLq=qfe2+VZC+c6vATL7w@mail.gmail.com>
-Subject: Re: [PATCH V3 1/4] crypto: ccp - Fix SEV_INIT error logging on init
+Date:   Tue, 9 Nov 2021 09:56:17 -0700
+Message-ID: <CAMkAt6q37BmPcA2Le98NOFQoz9nAwiDQqrALLD-Ogf5RytSS4g@mail.gmail.com>
+Subject: Re: [PATCH V3 2/4] crypto: ccp - Move SEV_INIT retry for corrupted data
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Thomas.Lendacky@amd.com, Marc Orr <marcorr@google.com>,
         David Rientjes <rientjes@google.com>,
@@ -70,14 +70,20 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 9, 2021 at 9:27 AM Sean Christopherson <seanjc@google.com> wrote:
+On Tue, Nov 9, 2021 at 9:31 AM Sean Christopherson <seanjc@google.com> wrote:
 >
 > On Tue, Nov 02, 2021, Peter Gonda wrote:
-> > Currently only the firmware error code is printed. This is incomplete
-> > and also incorrect as error cases exists where the firmware is never
-> > called and therefore does not set an error code. This change zeros the
-> > firmware error code in case the call does not get that far and prints
-> > the return code for non firmware errors.
+> > This change moves the data corrupted retry of SEV_INIT into the
+>
+> Use imperative mood.
+
+Will do for next revision
+
+>
+> > __sev_platform_init_locked() function. This is for upcoming INIT_EX
+> > support as well as helping direct callers of
+> > __sev_platform_init_locked() which currently do not support the
+> > retry.
 > >
 > > Signed-off-by: Peter Gonda <pgonda@google.com>
 > > Reviewed-by: Marc Orr <marcorr@google.com>
@@ -95,130 +101,109 @@ On Tue, Nov 9, 2021 at 9:27 AM Sean Christopherson <seanjc@google.com> wrote:
 > > Cc: linux-crypto@vger.kernel.org
 > > Cc: linux-kernel@vger.kernel.org
 > > ---
-> >  drivers/crypto/ccp/sev-dev.c | 5 +++--
-> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> >  drivers/crypto/ccp/sev-dev.c | 24 ++++++++++++------------
+> >  1 file changed, 12 insertions(+), 12 deletions(-)
 > >
 > > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> > index 2ecb0e1f65d8..ec89a82ba267 100644
+> > index ec89a82ba267..e4bc833949a0 100644
 > > --- a/drivers/crypto/ccp/sev-dev.c
 > > +++ b/drivers/crypto/ccp/sev-dev.c
-> > @@ -1065,7 +1065,7 @@ void sev_pci_init(void)
-> >  {
-> >       struct sev_device *sev = psp_master->sev_data;
-> >       struct page *tmr_page;
-> > -     int error, rc;
-> > +     int error = 0, rc;
->
-> Wouldn't it be more appropriate to use something the PSP can't return, e.g. -1?
-> '0' is SEV_RET_SUCCESS, which is quite misleading, e.g. the below error message
-> will print
->
->         SEV: failed to INIT error 0, rc -16
->
-> which a bit head scratching without looking at the code.  AFAICT, the PSP return
-> codes aren't intrinsically hex, so printing error as a signed demical and thus
->
->         SEV: failed to INIT error -1, rc -16
->
-> would be less confusing.
->
-> And IMO requiring the caller to initialize error is will be neverending game of
-> whack-a-mole.  E.g. sev_ioctl() fails to set "error" in the userspace structure,
-> and literally every function exposed via include/linux/psp-sev.h has this same
-> issue.  Case in point, the retry path fails to re-initialize "error" and will
-> display stale information if the second sev_platform_init() fails without reaching
-> the PSP.
-
-OK I can update __sev_platform_init_locked() to set error to -1. That
-seems pretty reasonable. Tom, is that OK with you?
-
->
->         rc = sev_platform_init(&error);
->         if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
->                 /*
->                  * INIT command returned an integrity check failure
->                  * status code, meaning that firmware load and
->                  * validation of SEV related persistent data has
->                  * failed and persistent state has been erased.
->                  * Retrying INIT command here should succeed.
->                  */
->                 dev_dbg(sev->dev, "SEV: retrying INIT command");
->                 rc = sev_platform_init(&error); <------ error may or may not be set
->         }
->
-> Ideally, error wouldn't be an output param and instead would be squished into the
-> true return value, but that'd required quite the refactoring, and might yield ugly
-> code generation on non-64-bit architectures (does this code support those?).
->
-> As a minimal step toward sanity, sev_ioctl(), __sev_platform_init_locked(), and
-> __sev_do_cmd_locked() should initialize the incoming error.  Long term, sev-dev
-> really needs to either have well-defined API for when "error" is meaningful, or
-> ensure the pointer is initialized in all paths.
-
-These comments seem fine to me. But I'll refrain from updating
-anything here since this seems out-of-scope of this series. Happy to
-discuss further and work on that if Tom is interested in those
-refactors too.
-
->
-> E.g.
->
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index ec89a82ba267..549686a1e812 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -149,6 +149,9 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
->         unsigned int reg, ret = 0;
->         int buf_len;
->
-> +       if (psp_ret)
-> +               *psp_ret = -1;
-> +
->         if (!psp || !psp->sev_data)
->                 return -ENODEV;
->
-> @@ -192,9 +195,6 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
->         /* wait for command completion */
->         ret = sev_wait_cmd_ioc(sev, &reg, psp_timeout);
->         if (ret) {
-> -               if (psp_ret)
-> -                       *psp_ret = 0;
-> -
->                 dev_err(sev->dev, "sev command %#x timed out, disabling PSP\n", cmd);
->                 psp_dead = true;
->
-> @@ -243,6 +243,9 @@ static int __sev_platform_init_locked(int *error)
->         struct sev_device *sev;
->         int rc = 0;
->
-> +       if (error)
-> +               *error = -1;
-> +
->         if (!psp || !psp->sev_data)
->                 return -ENODEV;
->
-> @@ -838,6 +841,8 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
->         if (input.cmd > SEV_MAX)
->                 return -EINVAL;
->
-> +       input.error = -1;
-> +
->         mutex_lock(&sev_cmd_mutex);
->
->         switch (input.cmd) {
->
-> >       if (!sev)
-> >               return;
-> > @@ -1104,7 +1104,8 @@ void sev_pci_init(void)
+> > @@ -267,6 +267,18 @@ static int __sev_platform_init_locked(int *error)
 > >       }
 > >
+> >       rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> > +     if (rc && *error == SEV_RET_SECURE_DATA_INVALID) {
+>
+> There are no guarantees that @error is non-NULL as this is reachable via an
+> exported function, sev_platform_init().  Which ties in with my complaints in the
+> previous patch that the API is a bit of a mess.
+
+That seems like a bug from the caller right? Is it typical that we
+sanity-check the caller in these instances? For example the same
+comment could be made here:
+https://elixir.bootlin.com/linux/latest/source/drivers/crypto/ccp/sev-dev.c#L336
+
+```
+static int sev_get_platform_state(int *state, int *error)
+{
+struct sev_user_data_status data;
+int rc;
+
+rc = __sev_do_cmd_locked(SEV_CMD_PLATFORM_STATUS, &data, error);
+if (rc)
+return rc;
+
+*state = data.state;  <--- State could be null.
+return rc;
+}
+```
+
+Example outside of this driver:
+https://elixir.bootlin.com/linux/v5.15.1/source/arch/x86/kvm/x86.c#L468
+
+```
+int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+{
+enum lapic_mode old_mode = kvm_get_apic_mode(vcpu);
+enum lapic_mode new_mode = kvm_apic_mode(msr_info->data);  <---
+msr_info could be null here
+u64 reserved_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu) | 0x2ff |
+(guest_cpuid_has(vcpu, X86_FEATURE_X2APIC) ? 0 : X2APIC_ENABLE);
+
+if ((msr_info->data & reserved_bits) != 0 || new_mode == LAPIC_MODE_INVALID)
+return 1;
+if (!msr_info->host_initiated) {
+if (old_mode == LAPIC_MODE_X2APIC && new_mode == LAPIC_MODE_XAPIC)
+return 1;
+if (old_mode == LAPIC_MODE_DISABLED && new_mode == LAPIC_MODE_X2APIC)
+return 1;
+}
+
+kvm_lapic_set_base(vcpu, msr_info->data);
+kvm_recalculate_apic_map(vcpu->kvm);
+return 0;
+}
+EXPORT_SYMBOL_GPL(kvm_set_apic_base);
+```
+
+About the API being a mess that seems a little out of scope for this
+change. I am not changing the API surface at all here. Again happy to
+discuss improvements with you and Tom for follow up series.
+
+>
+> > +             /*
+> > +              * INIT command returned an integrity check failure
+> > +              * status code, meaning that firmware load and
+> > +              * validation of SEV related persistent data has
+> > +              * failed and persistent state has been erased.
+> > +              * Retrying INIT command here should succeed.
+> > +              */
+> > +             dev_dbg(sev->dev, "SEV: retrying INIT command");
+> > +             rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> > +     }
+> > +
+> >       if (rc)
+> >               return rc;
+> >
+> > @@ -1091,18 +1103,6 @@ void sev_pci_init(void)
+> >
+> >       /* Initialize the platform */
+> >       rc = sev_platform_init(&error);
+> > -     if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
+> > -             /*
+> > -              * INIT command returned an integrity check failure
+> > -              * status code, meaning that firmware load and
+> > -              * validation of SEV related persistent data has
+> > -              * failed and persistent state has been erased.
+> > -              * Retrying INIT command here should succeed.
+> > -              */
+> > -             dev_dbg(sev->dev, "SEV: retrying INIT command");
+> > -             rc = sev_platform_init(&error);
+> > -     }
+> > -
 > >       if (rc) {
-> > -             dev_err(sev->dev, "SEV: failed to INIT error %#x\n", error);
-> > +             dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
-> > +                     error, rc);
-> >               return;
-> >       }
-> >
+> >               dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
+> >                       error, rc);
 > > --
 > > 2.33.1.1089.g2158813163f-goog
 > >
