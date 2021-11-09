@@ -2,102 +2,131 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 873E1C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E7FDC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:37:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 70F856115A
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:35:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60CDC601FA
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:37:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235911AbhKIIiE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Nov 2021 03:38:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60120 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239048AbhKIIh4 (ORCPT
+        id S244198AbhKIIkU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 Nov 2021 03:40:20 -0500
+Received: from mail-vk1-f172.google.com ([209.85.221.172]:33535 "EHLO
+        mail-vk1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237880AbhKIIkT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Nov 2021 03:37:56 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 630BDC061766;
-        Tue,  9 Nov 2021 00:35:10 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id y1so19598350plk.10;
-        Tue, 09 Nov 2021 00:35:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=o1cvMhjy6fdnuouwYm+15BaMU3WeB3ZqppuOOP+IdbA=;
-        b=NuT+usCXZoscybyvMzPhWmJzLdkr4FzjbII6e+EiSMU0jT0pDUnp0whPvULMcJHsWA
-         5UL0Fj1lfanlgShx2s9Vj8P8rrZVpFU0DEXTfz33PSF2FYvj8R4wooFR7KNru3u/Q5po
-         6v36EgJuQT70yDJX0YltUindh6/tmvzTGZsvjh7BPt8N5lR0bLdqLS51ExQIMxrifsFM
-         MZ509TmpP+ayPKvjDxmpR75mweuxM+MINhhub8rv4hHkgv7UoI87OlalSxZJwsTEWJYp
-         fESmSS/vuLk4NVsKQ0GtnMop3zmKzPi8D2YxvT+i/49v5gwd6/6evlxBtJObm6UWEoYU
-         IjoQ==
+        Tue, 9 Nov 2021 03:40:19 -0500
+Received: by mail-vk1-f172.google.com with SMTP id d130so9629460vke.0;
+        Tue, 09 Nov 2021 00:37:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=o1cvMhjy6fdnuouwYm+15BaMU3WeB3ZqppuOOP+IdbA=;
-        b=FHnSiumbt29TzKrSsomdVKvRHUmjVDzXjO/ogZEWAgM2nPuB22/BLUVUg1Xo+6rhls
-         evtxMLnJo3AFNKTbccTVdEW8yOkDkY3RWDt+UvdXKm1SlkGeDUPYNbLs0TQ6av4cg0XY
-         l1LIR3/GWcPGmg45MG4jiTBHYckr9OEuXnQU9MZKUfyyfclvEm+kv6y/jVqCNYmkga8a
-         hnO3BIfKvOVi4bd+5Y2lH5dZJvsbuzn/qBVRtyGBF6l7bxBoRyieI1d8LUKagRsR9vCY
-         lLUyzJLi/31+9CxHF8qoF4WIyDnxVe06MIO52yGZ1zZbrN9w27pF28Zqm8cYcjPERLF/
-         RRzw==
-X-Gm-Message-State: AOAM532+FFN7Y7ZSvOnRC9MiwdBKTnk+lUerV7dDY7e8MTkMhZNSTg9g
-        s6e65hlAyJ3BQ+cke4Arqfc=
-X-Google-Smtp-Source: ABdhPJz1Bmf4Sahmca+Rh+H2qps0zm9EFfGfJvy/OSzIAS6mrpd8zFFFzPtQQDiSLpdRpJurU5eVHw==
-X-Received: by 2002:a17:902:8505:b0:142:892d:918 with SMTP id bj5-20020a170902850500b00142892d0918mr5468434plb.39.1636446909971;
-        Tue, 09 Nov 2021 00:35:09 -0800 (PST)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id e11sm1820296pjl.20.2021.11.09.00.35.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Nov 2021 00:35:09 -0800 (PST)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: chi.minghao@zte.com.cn
-To:     bbrezillon@kernel.org
-Cc:     arno@natisbad.org, schalla@marvell.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        lbartosik@marvell.com, chi.minghao@zte.com.cn,
-        schandran@marvell.com, ebiggers@google.com,
-        ovidiu.panait@windriver.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH] crypto:otx2_cptvf_algs: use swap() to make code cleaner
-Date:   Tue,  9 Nov 2021 08:35:03 +0000
-Message-Id: <20211109083503.131468-1-chi.minghao@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=a20XwW+ywquM0TvSLc4Uu7eUmVwNDFrP9cILSrmfGU4=;
+        b=ZPXlAO4KvMB6hGXaYL5C/A3eafP22MA8lyU1gWi5L/KRoqr0J3niBVcAR8NQrSJJKl
+         siQIrqk0bVxCI2xvRmmTLl45HW/YsKyI3LnB9cG0MDKCrBrnemt/PIkOiBcpy7FhZcFw
+         CCwDidcd2ML7gLm5XGqH98ZdS9BhvqCd1L8jiYEPRWVufOD6wcPHpmvyZEZdm22EyX1h
+         eypqecDErl57KmXjv0nH/hxLiwt+JZGd5+99gFKGlqPswVWCqWL7/LE/3AO/AGFt6803
+         T5u6f+oSVyPdl78PYdJT8Io4UQ5N6sjQvGK8H3WCx2kVAsuxk3GIKID0oXCaMO2yoml+
+         PfnA==
+X-Gm-Message-State: AOAM531FoZRLDJXb2065hmnc41mIc+8QV71ip+AqS3gNHfW7X1eNg4kc
+        z3NSXOT9tpJQ9BW1+glCLCqMxVXOLm7f5w==
+X-Google-Smtp-Source: ABdhPJxSJJiIqvqWvbpTflwUf4QrflfXVMFmla87mAJ93jPLjO5aJs/kaHm9LcUKMl8TNu/VB7nRJw==
+X-Received: by 2002:a05:6122:2005:: with SMTP id l5mr36807793vkd.4.1636447052081;
+        Tue, 09 Nov 2021 00:37:32 -0800 (PST)
+Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com. [209.85.222.52])
+        by smtp.gmail.com with ESMTPSA id x9sm1655185vkn.36.2021.11.09.00.37.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Nov 2021 00:37:32 -0800 (PST)
+Received: by mail-ua1-f52.google.com with SMTP id s13so21496268uaj.11;
+        Tue, 09 Nov 2021 00:37:31 -0800 (PST)
+X-Received: by 2002:a05:6102:2910:: with SMTP id cz16mr48697933vsb.9.1636447051587;
+ Tue, 09 Nov 2021 00:37:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20211108150554.4457-1-conor.dooley@microchip.com> <20211108150554.4457-7-conor.dooley@microchip.com>
+In-Reply-To: <20211108150554.4457-7-conor.dooley@microchip.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Tue, 9 Nov 2021 09:37:20 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdWWzQE7Pq8Qo=Vt3ey-ODhnP9B5+r==fsoK0miDv7-arA@mail.gmail.com>
+Message-ID: <CAMuHMdWWzQE7Pq8Qo=Vt3ey-ODhnP9B5+r==fsoK0miDv7-arA@mail.gmail.com>
+Subject: Re: [PATCH 06/13] dt-bindings: rng: add bindings for microchip mpfs rng
+To:     Conor Dooley <conor.dooley@microchip.com>
+Cc:     Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Lewis Hanly <lewis.hanly@microchip.com>,
+        daire.mcnamara@microchip.com, Atish Patra <atish.patra@wdc.com>,
+        ivan.griffin@microchip.com,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-rtc@vger.kernel.org, linux-spi <linux-spi@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Bin Meng <bin.meng@windriver.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: chiminghao <chi.minghao@zte.com.cn>
+Hi Conor,
 
-Fix the following coccicheck REVIEW:
-./drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c:1688:16-17 use swap() to make code cleaner
+On Mon, Nov 8, 2021 at 4:07 PM <conor.dooley@microchip.com> wrote:
+> From: Conor Dooley <conor.dooley@microchip.com>
+>
+> Add device tree bindings for the hardware rng device accessed via
+> the system services on the Microchip PolarFire SoC.
+>
+> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: chiminghao <chi.minghao@zte.com.cn>
----
- drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Thanks for your patch!
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-index 877a948469bd..2748a3327e39 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-@@ -1682,11 +1682,8 @@ static void swap_func(void *lptr, void *rptr, int size)
- {
- 	struct cpt_device_desc *ldesc = lptr;
- 	struct cpt_device_desc *rdesc = rptr;
--	struct cpt_device_desc desc;
- 
--	desc = *ldesc;
--	*ldesc = *rdesc;
--	*rdesc = desc;
-+	swap(*ldesc, *rdesc);
- }
- 
- int otx2_cpt_crypto_init(struct pci_dev *pdev, struct module *mod,
--- 
-2.25.1
+> ---
+>  .../bindings/rng/microchip,mpfs-rng.yaml      | 31 +++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/microchip,mpfs-rng.yaml
+>
+> diff --git a/Documentation/devicetree/bindings/rng/microchip,mpfs-rng.yaml b/Documentation/devicetree/bindings/rng/microchip,mpfs-rng.yaml
+> new file mode 100644
+> index 000000000000..e8ecb3538a86
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/rng/microchip,mpfs-rng.yaml
+> @@ -0,0 +1,31 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: "http://devicetree.org/schemas/rng/microchip,mpfs-rng.yaml#"
+> +$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+> +
+> +title: Microchip MPFS random number generator
+> +
+> +maintainers:
+> +  - Conor Dooley <conor.dooley@microchip.com>
+> +
+> +properties:
+> +  compatible:
+> +    const: microchip,polarfire-soc-rng
 
+"microchip,mpfs-rng", for consistency with other bindings?
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
