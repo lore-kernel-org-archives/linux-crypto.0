@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D2B9C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:41:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E108C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:43:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57FF8611CA
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:41:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B14A61057
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 08:43:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244360AbhKIIoM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Nov 2021 03:44:12 -0500
-Received: from mail-pl1-f173.google.com ([209.85.214.173]:39674 "EHLO
-        mail-pl1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244402AbhKIInQ (ORCPT
+        id S244430AbhKIIqJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 Nov 2021 03:46:09 -0500
+Received: from mail-ua1-f44.google.com ([209.85.222.44]:37621 "EHLO
+        mail-ua1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238085AbhKIIqH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Nov 2021 03:43:16 -0500
-Received: by mail-pl1-f173.google.com with SMTP id t21so19642292plr.6;
-        Tue, 09 Nov 2021 00:40:30 -0800 (PST)
+        Tue, 9 Nov 2021 03:46:07 -0500
+Received: by mail-ua1-f44.google.com with SMTP id l43so37050316uad.4;
+        Tue, 09 Nov 2021 00:43:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=gSLDpPNAPTFpdKJNeNQhMNDuIXO+IuEe87YK9rCw7Wk=;
-        b=bkicM4NptlSvs00dBmXJ8TA9DlC4vSJ2JXtFGNClf/JdgY4gMyYyDkSYfwVpSzaTnz
-         X/9Wi4YkrynGP0SbMT9EbYhwepz+NrK9oERNaggxMkpCgX+anSzKxtgAOIKj4IYigEg0
-         9ziUGP3BHi4ZZk6si4bLc9OwHusH/W4uqufNQGUc7GWsZYNR/2ugLGrYPK2Y/IuTbNWx
-         ocF8GDLevXNUHUAP+S9RN7O/NISFiLxrDiEy4+ZZ/7GaeGMzoIQvLQUzjhwcMEb6xQjS
-         GFVmaUA4Tuo/vGfkt0fsCpn5T74w77WAPuCupdrAq5wpzcctY8fN/XoXodE/YsvedD0a
-         0v6A==
-X-Gm-Message-State: AOAM532+o1o3PB0qgfdwg60wYvQCsPagQHqel0K7+/32C8gpUGzkhywD
-        d8m7o/BRi10LzU2X5WI1pTtuoRpciUOYTtil
-X-Google-Smtp-Source: ABdhPJwtNor6FrZO+2M63XnKFgzRT/k6VXW3jhwqnHCDRjPu1KybXzCzjDFd1YQD8ThE7ACLxJkvoA==
-X-Received: by 2002:a17:90a:134f:: with SMTP id y15mr5317434pjf.158.1636447230229;
-        Tue, 09 Nov 2021 00:40:30 -0800 (PST)
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com. [209.85.210.181])
-        by smtp.gmail.com with ESMTPSA id a13sm1962640pfv.99.2021.11.09.00.40.29
+        bh=SKaAwaDUF8hgJ7xnatzckTO00J9HAeQbGqYqskKTjGY=;
+        b=FAY1Wpn0OyCTyGJ3tBzNZO/EoRytfhdPMAMJgBEC8u6z5Od3he1hZ1nytEyqctvK2w
+         sXasIkRqGQQ5PXHtRLzu7ud9dS+d1OJJpaDedgV1iPbUJdOJHK8pkcOBaaK+eRM9SmxS
+         uJHX6sMlrSncxPlrQu5f7482T2N5XAnKf1lBK6FAV0fZCijRjDuDz+wPfyifLU9IV9nu
+         vfTD+WLBnl5MXMQY0vGpXistxpEIxWE93Zpml9e8+vWM3wsNOwAR8MZJb476jRwXZMD9
+         QvZm5kcwKodSQprBNTjsTqZ07vdmjRPyGiUK3cKmxsJXwOimrSHG1iFw4e9/jhvjS01h
+         Lh1A==
+X-Gm-Message-State: AOAM531R7hiO8Jzg5nOc3YlqlGcBfpqd/jE+Z0h7njoCFkRsz5sGosUd
+        IJte5DOV4LMRrcnM0KW/YZnNB/cSsWPp8+uY
+X-Google-Smtp-Source: ABdhPJy0ZS3OG3q8mnvej06NQRd9imNTJ8MMZys+9P5Oz8GwyO7tmUaoPKrnG8ApUfvuo7d5GrLxwQ==
+X-Received: by 2002:a67:a60b:: with SMTP id p11mr115778874vse.34.1636447400247;
+        Tue, 09 Nov 2021 00:43:20 -0800 (PST)
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com. [209.85.222.51])
+        by smtp.gmail.com with ESMTPSA id u11sm37284vkl.53.2021.11.09.00.43.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Nov 2021 00:40:30 -0800 (PST)
-Received: by mail-pf1-f181.google.com with SMTP id o4so4771059pfp.13;
-        Tue, 09 Nov 2021 00:40:29 -0800 (PST)
-X-Received: by 2002:a05:6102:e82:: with SMTP id l2mr9441005vst.37.1636446824427;
- Tue, 09 Nov 2021 00:33:44 -0800 (PST)
+        Tue, 09 Nov 2021 00:43:19 -0800 (PST)
+Received: by mail-ua1-f51.google.com with SMTP id e2so37040010uax.7;
+        Tue, 09 Nov 2021 00:43:19 -0800 (PST)
+X-Received: by 2002:a05:6102:3a07:: with SMTP id b7mr84616404vsu.35.1636447398871;
+ Tue, 09 Nov 2021 00:43:18 -0800 (PST)
 MIME-Version: 1.0
-References: <20211108150554.4457-1-conor.dooley@microchip.com> <20211108150554.4457-4-conor.dooley@microchip.com>
-In-Reply-To: <20211108150554.4457-4-conor.dooley@microchip.com>
+References: <20211108150554.4457-1-conor.dooley@microchip.com> <20211108150554.4457-10-conor.dooley@microchip.com>
+In-Reply-To: <20211108150554.4457-10-conor.dooley@microchip.com>
 From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Tue, 9 Nov 2021 09:33:33 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdVx9BgCYHX5-Bwx1TzQzNK1+7cUWoWnOdMX31SJ22sMzg@mail.gmail.com>
-Message-ID: <CAMuHMdVx9BgCYHX5-Bwx1TzQzNK1+7cUWoWnOdMX31SJ22sMzg@mail.gmail.com>
-Subject: Re: [PATCH 03/13] dt-bindings: soc/microchip: update sys ctrlr compat string
+Date:   Tue, 9 Nov 2021 09:43:07 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdUpGjyN-+u+THiNJ-Ouzp8vRTeg6u23P1BoF8Gi4aSnWQ@mail.gmail.com>
+Message-ID: <CAMuHMdUpGjyN-+u+THiNJ-Ouzp8vRTeg6u23P1BoF8Gi4aSnWQ@mail.gmail.com>
+Subject: Re: [PATCH 09/13] dt-bindings: gpio: add bindings for microchip mpfs gpio
 To:     Conor Dooley <conor.dooley@microchip.com>
 Cc:     Linus Walleij <linus.walleij@linaro.org>,
         Bartosz Golaszewski <bgolaszewski@baylibre.com>,
@@ -82,29 +82,144 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Hi Conor,
 
-On Mon, Nov 8, 2021 at 4:06 PM <conor.dooley@microchip.com> wrote:
+On Mon, Nov 8, 2021 at 4:07 PM <conor.dooley@microchip.com> wrote:
 > From: Conor Dooley <conor.dooley@microchip.com>
 >
-> Update 'compatible' strings for system controller drivers to the
-> approved Microchip name.
+> Add device tree bindings for the gpio controller on
+> the Microchip PolarFire SoC.
 >
 > Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 
 Thanks for your patch!
 
-> --- a/Documentation/devicetree/bindings/mailbox/microchip,polarfire-soc-mailbox.yaml
-> +++ b/Documentation/devicetree/bindings/mailbox/microchip,polarfire-soc-mailbox.yaml
-> @@ -11,7 +11,9 @@ maintainers:
->
->  properties:
->    compatible:
-> -    const: microchip,polarfire-soc-mailbox
-> +    enum:
-> +      - microchip,polarfire-soc-mailbox
-> +      - microchip,mpfs-mailbox
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/gpio/microchip,mpfs-gpio.yaml
+> @@ -0,0 +1,108 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/gpio/microchip,mpfs-gpio.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Microchip MPFS GPIO Controller Device Tree Bindings
+> +
+> +maintainers:
+> +  - Conor Dooley <conor.dooley@microchip.com>
+> +
+> +description: |
+> +  This GPIO controller is found on the Microchip PolarFire SoC.
+> +
+> +properties:
+> +  compatible:
+> +    items:
+> +      - enum:
+> +          - microchip,mpfs-gpio
+> +          - microsemi,ms-pf-mss-gpio
 
-Is there any point in keeping the old compatible value?
-Are there any real users? Most of the MPFS upstream DT is still in flux.
+What's the difference between these two?
+If there is a difference, please add a comment "# <explanation>"
+to each entry.
+If there is no difference, please drop the second one.
+
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    description:
+> +      Interrupt mapping, one per GPIO. Maximum 32 GPIOs.
+> +    minItems: 1
+> +    maxItems: 32
+> +
+> +  interrupt-controller: true
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  "#gpio-cells":
+> +    const: 2
+> +
+> +  ngpios:
+> +    description:
+> +      The number of GPIOs available.
+> +    minimum: 1
+> +    maximum: 32
+> +    default: 32
+> +
+> +  gpio-controller: true
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +  - "#interrupt-cells"
+> +  - "#gpio-cells"
+> +  - gpio-controller
+> +  - clocks
+
+Any specific reason interrupt-controller is not required?
+
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include "dt-bindings/clock/microchip,mpfs-clock.h"
+> +    #include "dt-bindings/interrupt-controller/microchip,mpfs-plic.h"
+> +    soc {
+> +      #address-cells = <2>;
+> +      #size-cells = <2>;
+
+Just drop these two...
+
+> +      gpio2: gpio@20122000 {
+> +        compatible = "microchip,mpfs-gpio";
+> +        reg = <0x0 0x20122000 0x0 0x1000>;
+
+... and the zeros here.
+
+> +        clocks = <&clkcfg CLK_GPIO2>;
+> +        interrupt-parent = <&plic>;
+> +        interrupts = <PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT
+> +          PLIC_INT_GPIO2_NON_DIRECT>;
+> +        gpio-controller;
+> +        #gpio-cells = <2>;
+> +        status = "disabled";
+
+Please drop this.
+
+> +      };
+> +    };
 
 Gr{oetje,eeting}s,
 
