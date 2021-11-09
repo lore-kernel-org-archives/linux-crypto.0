@@ -2,56 +2,56 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB9BC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 16:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3312DC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 16:32:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA5676109D
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 16:27:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D06C6109D
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Nov 2021 16:32:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239849AbhKIQ3t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Nov 2021 11:29:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55564 "EHLO
+        id S235354AbhKIQer (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 Nov 2021 11:34:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239718AbhKIQ3q (ORCPT
+        with ESMTP id S235386AbhKIQeh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Nov 2021 11:29:46 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E6AC061766
-        for <linux-crypto@vger.kernel.org>; Tue,  9 Nov 2021 08:27:00 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id g184so18986337pgc.6
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Nov 2021 08:27:00 -0800 (PST)
+        Tue, 9 Nov 2021 11:34:37 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 426C1C0613F5
+        for <linux-crypto@vger.kernel.org>; Tue,  9 Nov 2021 08:31:51 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id r5so21910583pls.1
+        for <linux-crypto@vger.kernel.org>; Tue, 09 Nov 2021 08:31:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=twc11wTijDol+V5sYkUbqWC/Fb481jyMCWDrEPnsYeM=;
-        b=YJb6IRksssQC+zqpdvq0ZyonBrShcW4KWBv4SGnArUKMIvGmF6MgkADrHb9rX0FETD
-         0zwsbBgi3wEDHtXteiEcrlm5jR8KO3pPLMhMWiT3yhgi3NKvdgDXZz9+Dv1fZwilxiOP
-         jFLnVgYeMzEhrytax9IHvBlwx7DyAZey26+jr0W1o4zKz88H6Dysjc+5HE5v6ZpqAQ30
-         mswDgVh84oM1IzDSNhnDg2AMikezIKKsjoUodA5cWu0vSK3AP5NabL/vkfstvpPr6co6
-         1hQpUgk9WFoJ+cjBOnl9RvJE8yg0h/ZT+AffLYi60h40z1GF8BP1rnRWMJ/XUQzlQ5va
-         LD4Q==
+        bh=1J1nd78cdv8kJv4UV8p3MY6PnDte+RFrlg5PV9fd6w8=;
+        b=Skk8b9vnj8IsmyAslWRo75Vfvafe0qUtaLxjEX9gJu1p+WAzrUMmzNJUbbEy32MEKU
+         UaSnyAYMEE3+qoCxcd2TfEfIB9HRoKGi4+P5Bp1Yn1Iekk3gDWFrrDEb/QOrR+uAm7Mt
+         V5UOxCUOGDigLnxHOb3wiJ+FmrBZ0RidENkBfRYAPEQ3Qgkn6RMDQlj95MXJ792lnPDm
+         NsF4LHRq3XY5VBJrB7WeoBNbSCCmfCmaxH0yre5YoAXU2GBt4t8fG1cpPq9BMn2lBkUy
+         kUO8YsbXVIRHjJl2ItsZPONIRAqcwlJIfRIUbadVw577AjbTlHum2GJNh4frrtPMHvHY
+         GbdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=twc11wTijDol+V5sYkUbqWC/Fb481jyMCWDrEPnsYeM=;
-        b=QEXQXOcOZ2MoMEns3foxvtgydlKXb0pOaGsaKo2o8ywJv5Xodd6PnrfLF6KfkriuxJ
-         8Wmb34Z+57WmzCUrz+mgyYV3dCU6DR+hPa/i+5bcEp1XxZEdj4MfUfbTwl+WhnrLDoom
-         F5/kkwrcN19pxpBy1wxJLP3JY2+xfR+uQOo2TYzI0hUF6hMPiweIKs0v9Xq95pbosBvI
-         sMv1JTDDgWaF8GlFlpTQeNTX6qTy/XFZ7sb3qFbmkfWfnWqTb1X3xSzZDZuZUhkZtkhE
-         trEY7IoTai9JoJZc5Gyj+rEcMm9vf8w0+yBh6Eq+gHJzzgKA3a75CSpvLhrai7+Gon4x
-         +XmA==
-X-Gm-Message-State: AOAM532EoX1UtT5s/0H70YulqTmj9hN8Bakg8HHENazikXddgA1IXpBa
-        g4w+2WBbljICp/OX0OhIbYdaMQ==
-X-Google-Smtp-Source: ABdhPJysTCKCFRyYLRJ3W3Q0q2hZeG4rP1jyD6c2DHOify59QaMiTL4EApss1dP7B6pJLvN2gpdrBw==
-X-Received: by 2002:a63:68c9:: with SMTP id d192mr6899174pgc.335.1636475219843;
-        Tue, 09 Nov 2021 08:26:59 -0800 (PST)
+        bh=1J1nd78cdv8kJv4UV8p3MY6PnDte+RFrlg5PV9fd6w8=;
+        b=Tuuo748bYqzo8Z82j5vzzQcAqQvZ91fe2aPBWZNI3VAQ1g6H6m4NcEQ55/bk+c4WUl
+         priVRqd7AcAKS+NPxA/yU4NyTMczSbGUTdBWJDmqDqRdcK9hTcFFvtMNgPkPxX3mjHJd
+         A5HDEahBRocOH1tuq/mEiGZMFJd0esunPPd6m30sUBt9pzGmqudEK2ENEeZdYgwZ/ib+
+         ULpsI0a9MVhPvoXnlrmQIAcepRXH7dFt1pzXGABmhcKHBP7050JBJLhWKD7+UpLouTny
+         hjHYT92qkrCKrbZxDCenZ4+OmGhiTT6fyiiDcVu6K+2mfP1k15A0uqgQB9qVqMrow7ta
+         2a8Q==
+X-Gm-Message-State: AOAM532yHMXmNfmt8KFf9YEoZxQUfIsESfatI5ldQ7AP7kR8Psy2Tt28
+        87jC5HUwJR2PxuAplX19RV/2dQ==
+X-Google-Smtp-Source: ABdhPJzd7q1Y5sTxorFqAUpTw86E9J6os0LfJbG5O5EXfXg4iX/h406XwXXCveJCjHjhoJ8onY57QA==
+X-Received: by 2002:a17:902:c206:b0:142:631:5ffc with SMTP id 6-20020a170902c20600b0014206315ffcmr8483029pll.38.1636475510533;
+        Tue, 09 Nov 2021 08:31:50 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s14sm5274517pfk.73.2021.11.09.08.26.58
+        by smtp.gmail.com with ESMTPSA id u2sm19222139pfi.120.2021.11.09.08.31.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Nov 2021 08:26:59 -0800 (PST)
-Date:   Tue, 9 Nov 2021 16:26:55 +0000
+        Tue, 09 Nov 2021 08:31:49 -0800 (PST)
+Date:   Tue, 9 Nov 2021 16:31:46 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Peter Gonda <pgonda@google.com>
 Cc:     thomas.lendacky@amd.com, Marc Orr <marcorr@google.com>,
@@ -63,24 +63,28 @@ Cc:     thomas.lendacky@amd.com, Marc Orr <marcorr@google.com>,
         "David S. Miller" <davem@davemloft.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V3 1/4] crypto: ccp - Fix SEV_INIT error logging on init
-Message-ID: <YYqhT+Enba5xa4cO@google.com>
+Subject: Re: [PATCH V3 2/4] crypto: ccp - Move SEV_INIT retry for corrupted
+ data
+Message-ID: <YYqicq5YnNuwTS+B@google.com>
 References: <20211102142331.3753798-1-pgonda@google.com>
- <20211102142331.3753798-2-pgonda@google.com>
+ <20211102142331.3753798-3-pgonda@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211102142331.3753798-2-pgonda@google.com>
+In-Reply-To: <20211102142331.3753798-3-pgonda@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Tue, Nov 02, 2021, Peter Gonda wrote:
-> Currently only the firmware error code is printed. This is incomplete
-> and also incorrect as error cases exists where the firmware is never
-> called and therefore does not set an error code. This change zeros the
-> firmware error code in case the call does not get that far and prints
-> the return code for non firmware errors.
+> This change moves the data corrupted retry of SEV_INIT into the
+
+Use imperative mood.
+
+> __sev_platform_init_locked() function. This is for upcoming INIT_EX
+> support as well as helping direct callers of
+> __sev_platform_init_locked() which currently do not support the
+> retry.
 > 
 > Signed-off-by: Peter Gonda <pgonda@google.com>
 > Reviewed-by: Marc Orr <marcorr@google.com>
@@ -98,120 +102,56 @@ On Tue, Nov 02, 2021, Peter Gonda wrote:
 > Cc: linux-crypto@vger.kernel.org
 > Cc: linux-kernel@vger.kernel.org
 > ---
->  drivers/crypto/ccp/sev-dev.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  drivers/crypto/ccp/sev-dev.c | 24 ++++++++++++------------
+>  1 file changed, 12 insertions(+), 12 deletions(-)
 > 
 > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 2ecb0e1f65d8..ec89a82ba267 100644
+> index ec89a82ba267..e4bc833949a0 100644
 > --- a/drivers/crypto/ccp/sev-dev.c
 > +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1065,7 +1065,7 @@ void sev_pci_init(void)
->  {
->  	struct sev_device *sev = psp_master->sev_data;
->  	struct page *tmr_page;
-> -	int error, rc;
-> +	int error = 0, rc;
-
-Wouldn't it be more appropriate to use something the PSP can't return, e.g. -1?
-'0' is SEV_RET_SUCCESS, which is quite misleading, e.g. the below error message
-will print
-
-	SEV: failed to INIT error 0, rc -16
-
-which a bit head scratching without looking at the code.  AFAICT, the PSP return
-codes aren't intrinsically hex, so printing error as a signed demical and thus
-
-	SEV: failed to INIT error -1, rc -16
-
-would be less confusing.
-
-And IMO requiring the caller to initialize error is will be neverending game of
-whack-a-mole.  E.g. sev_ioctl() fails to set "error" in the userspace structure,
-and literally every function exposed via include/linux/psp-sev.h has this same
-issue.  Case in point, the retry path fails to re-initialize "error" and will
-display stale information if the second sev_platform_init() fails without reaching
-the PSP.
-
-	rc = sev_platform_init(&error);
-	if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
-		/*
-		 * INIT command returned an integrity check failure
-		 * status code, meaning that firmware load and
-		 * validation of SEV related persistent data has
-		 * failed and persistent state has been erased.
-		 * Retrying INIT command here should succeed.
-		 */
-		dev_dbg(sev->dev, "SEV: retrying INIT command");
-		rc = sev_platform_init(&error); <------ error may or may not be set
-	}
-
-Ideally, error wouldn't be an output param and instead would be squished into the
-true return value, but that'd required quite the refactoring, and might yield ugly
-code generation on non-64-bit architectures (does this code support those?).
-
-As a minimal step toward sanity, sev_ioctl(), __sev_platform_init_locked(), and
-__sev_do_cmd_locked() should initialize the incoming error.  Long term, sev-dev
-really needs to either have well-defined API for when "error" is meaningful, or
-ensure the pointer is initialized in all paths.
-
-E.g. 
-
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index ec89a82ba267..549686a1e812 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -149,6 +149,9 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
-        unsigned int reg, ret = 0;
-        int buf_len;
-
-+       if (psp_ret)
-+               *psp_ret = -1;
-+
-        if (!psp || !psp->sev_data)
-                return -ENODEV;
-
-@@ -192,9 +195,6 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
-        /* wait for command completion */
-        ret = sev_wait_cmd_ioc(sev, &reg, psp_timeout);
-        if (ret) {
--               if (psp_ret)
--                       *psp_ret = 0;
--
-                dev_err(sev->dev, "sev command %#x timed out, disabling PSP\n", cmd);
-                psp_dead = true;
-
-@@ -243,6 +243,9 @@ static int __sev_platform_init_locked(int *error)
-        struct sev_device *sev;
-        int rc = 0;
-
-+       if (error)
-+               *error = -1;
-+
-        if (!psp || !psp->sev_data)
-                return -ENODEV;
-
-@@ -838,6 +841,8 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
-        if (input.cmd > SEV_MAX)
-                return -EINVAL;
-
-+       input.error = -1;
-+
-        mutex_lock(&sev_cmd_mutex);
-
-        switch (input.cmd) {
-
->  	if (!sev)
->  		return;
-> @@ -1104,7 +1104,8 @@ void sev_pci_init(void)
+> @@ -267,6 +267,18 @@ static int __sev_platform_init_locked(int *error)
 >  	}
 >  
+>  	rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> +	if (rc && *error == SEV_RET_SECURE_DATA_INVALID) {
+
+There are no guarantees that @error is non-NULL as this is reachable via an
+exported function, sev_platform_init().  Which ties in with my complaints in the
+previous patch that the API is a bit of a mess.
+
+> +		/*
+> +		 * INIT command returned an integrity check failure
+> +		 * status code, meaning that firmware load and
+> +		 * validation of SEV related persistent data has
+> +		 * failed and persistent state has been erased.
+> +		 * Retrying INIT command here should succeed.
+> +		 */
+> +		dev_dbg(sev->dev, "SEV: retrying INIT command");
+> +		rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> +	}
+> +
+>  	if (rc)
+>  		return rc;
+>  
+> @@ -1091,18 +1103,6 @@ void sev_pci_init(void)
+>  
+>  	/* Initialize the platform */
+>  	rc = sev_platform_init(&error);
+> -	if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
+> -		/*
+> -		 * INIT command returned an integrity check failure
+> -		 * status code, meaning that firmware load and
+> -		 * validation of SEV related persistent data has
+> -		 * failed and persistent state has been erased.
+> -		 * Retrying INIT command here should succeed.
+> -		 */
+> -		dev_dbg(sev->dev, "SEV: retrying INIT command");
+> -		rc = sev_platform_init(&error);
+> -	}
+> -
 >  	if (rc) {
-> -		dev_err(sev->dev, "SEV: failed to INIT error %#x\n", error);
-> +		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
-> +			error, rc);
->  		return;
->  	}
->  
+>  		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
+>  			error, rc);
 > -- 
 > 2.33.1.1089.g2158813163f-goog
 > 
