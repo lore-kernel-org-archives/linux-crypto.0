@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5F4C4167B
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 15:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E562C197A0
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 15:02:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26A78610C8
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 15:02:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 442426102A
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 15:02:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232406AbhKJPFK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Nov 2021 10:05:10 -0500
-Received: from mx07-00178001.pphosted.com ([185.132.182.106]:45778 "EHLO
+        id S232411AbhKJPFL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Nov 2021 10:05:11 -0500
+Received: from mx07-00178001.pphosted.com ([185.132.182.106]:33810 "EHLO
         mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232391AbhKJPFI (ORCPT
+        by vger.kernel.org with ESMTP id S231593AbhKJPFI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 10 Nov 2021 10:05:08 -0500
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1AAEHiPq019003;
-        Wed, 10 Nov 2021 16:01:51 +0100
+Received: from pps.filterd (m0046668.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1AABtbA0015793;
+        Wed, 10 Nov 2021 16:01:54 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-type; s=selector1;
- bh=fy0nJ4jsnYOrNbmlnWpKKRsONkGfDSFo37lhgrdZifo=;
- b=jCblevN4sArT3TbOfud8zxCq510ZtTMzk0aebTHg9A8mMWr4mHYulSD4POfb3PkRdJw/
- f3psof2GVLL5A0ahcjIdxuKwQh/qmwB/ZHhVdF42ENbIlsAkpaHcrQ44oMs5SNCo1IGs
- V/1EERuuFD9AZ1eHoARiAxoA59FBLifz03K90sjv2OCsNStKTSdItvQLmsGmZ5udzfc+
- 2yv9CsZ4R8bb0KKCDBg7iE+p5zfOBhTmpNAMDa4g43gHBCC+iqKjTddE2ktYRpmG3/W1
- Pg1qPjJR6dr2Vm77FT7oueoLlDUM2+hTpmmSw2ukMZGby9fRv1BY6i9wXixO1xE9c/FN QA== 
+ bh=uvjcNBfg4Ag+xSMxxfAcIs/mdreMSdQjNkKdGHVHtA4=;
+ b=XAbsAtSa61Iq6bEunvgOj+SPaPufjX6LuyhQq2pjIqSN8bYl0dJTe4eZBiqQQY5TjdYy
+ KJZIdn1bGNAK5msN1i/KTZGTrPVPMXq/TRIACCYg8SBTyBazvWMSp0IXt9IvZ6Bmvtqe
+ EBIW984mVSSTNjvgouzQjOtph/05dHGnbiwbtuOG9hnZ23tq/KP3t63cVzD89AFhy+kA
+ KZXOag0Ew5gAIk11giRAuWdGKQ66/vd8k/TyiTYOHk8L1p+/9w8zAMbDhH1z0UTxLTSI
+ yowKkfYvSyYO5HoOiPl0lwbdT7N4JZSrOlCxiO0FwE3Tuxg2327d5s5uYmPewYMY9h9M 8Q== 
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3c7ufnfufj-1
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3c8dmw16at-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Nov 2021 16:01:51 +0100
+        Wed, 10 Nov 2021 16:01:53 +0100
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 32367100034;
-        Wed, 10 Nov 2021 16:01:51 +0100 (CET)
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 5C7A010002A;
+        Wed, 10 Nov 2021 16:01:53 +0100 (CET)
 Received: from Webmail-eu.st.com (sfhdag2node2.st.com [10.75.127.5])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 154B5207568;
-        Wed, 10 Nov 2021 16:01:51 +0100 (CET)
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 3EFB6207568;
+        Wed, 10 Nov 2021 16:01:53 +0100 (CET)
 Received: from localhost (10.75.127.49) by SFHDAG2NODE2.st.com (10.75.127.5)
- with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 10 Nov 2021 16:01:50
+ with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 10 Nov 2021 16:01:52
  +0100
 From:   <patrice.chotard@foss.st.com>
 To:     Rob Herring <robh+dt@kernel.org>,
@@ -127,16 +127,16 @@ CC:     <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
         <linux-pm@vger.kernel.org>, <linux-usb@vger.kernel.org>,
         <linux-watchdog@vger.kernel.org>
-Subject: [PATCH v3 2/5] dt-bindings: mfd: timers: Update maintainers for st,stm32-timers
-Date:   Wed, 10 Nov 2021 16:01:41 +0100
-Message-ID: <20211110150144.18272-3-patrice.chotard@foss.st.com>
+Subject: [PATCH v3 4/5] dt-bindings: media: Update maintainers for st,stm32-hwspinlock.yaml
+Date:   Wed, 10 Nov 2021 16:01:43 +0100
+Message-ID: <20211110150144.18272-5-patrice.chotard@foss.st.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20211110150144.18272-1-patrice.chotard@foss.st.com>
 References: <20211110150144.18272-1-patrice.chotard@foss.st.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.75.127.49]
-X-ClientProxiedBy: SFHDAG2NODE3.st.com (10.75.127.6) To SFHDAG2NODE2.st.com
+X-ClientProxiedBy: SFHDAG1NODE2.st.com (10.75.127.2) To SFHDAG2NODE2.st.com
  (10.75.127.5)
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
@@ -151,19 +151,19 @@ Benjamin has left the company, remove his name from maintainers.
 
 Signed-off-by: Patrice Chotard <patrice.chotard@foss.st.com>
 ---
- Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml | 1 -
+ .../devicetree/bindings/hwlock/st,stm32-hwspinlock.yaml          | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml b/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml
-index dace35362a7a..210a7c85b884 100644
---- a/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml
-+++ b/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml
-@@ -17,7 +17,6 @@ description: |
-       programmable prescaler.
+diff --git a/Documentation/devicetree/bindings/hwlock/st,stm32-hwspinlock.yaml b/Documentation/devicetree/bindings/hwlock/st,stm32-hwspinlock.yaml
+index 47cf9c8d97e9..8f136542a4ea 100644
+--- a/Documentation/devicetree/bindings/hwlock/st,stm32-hwspinlock.yaml
++++ b/Documentation/devicetree/bindings/hwlock/st,stm32-hwspinlock.yaml
+@@ -7,7 +7,6 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+ title: STMicroelectronics STM32 Hardware Spinlock bindings
  
  maintainers:
 -  - Benjamin Gaignard <benjamin.gaignard@st.com>
-   - Fabrice Gasnier <fabrice.gasnier@st.com>
+   - Fabien Dessenne <fabien.dessenne@st.com>
  
  properties:
 -- 
