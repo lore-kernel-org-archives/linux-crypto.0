@@ -2,55 +2,55 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E36CC4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 11:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29DF6C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 11:00:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D04B61205
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 11:00:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 13D5461078
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 11:00:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231658AbhKJLC7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Nov 2021 06:02:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50330 "EHLO
+        id S231628AbhKJLDI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Nov 2021 06:03:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231601AbhKJLCx (ORCPT
+        with ESMTP id S231477AbhKJLC4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Nov 2021 06:02:53 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CADE3C06120E
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Nov 2021 03:00:01 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id t5-20020a17090a4e4500b001a0a284fcc2so1525593pjl.2
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Nov 2021 03:00:01 -0800 (PST)
+        Wed, 10 Nov 2021 06:02:56 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF7A5C06127A
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Nov 2021 03:00:06 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id h24so1256225pjq.2
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Nov 2021 03:00:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=peaVpA9FhN/Vc52TS1nlumYAVj2G5wsFUHbVuVwYxEc=;
-        b=I0pp1973B+/mL+qLzoqDH844dZuiimsjhHWNDXNEcoTwN9T+W7zx49z6sJYI0IeeiF
-         CuHr2iFikkyiDMmJ0OOtZ/gWPoNAsCyW+gsQaBc2rCf7ml++GRVqQpGs0IjIPlr82OgQ
-         0J3shYvFZmfP21m6qahrqEhEH7CkPTrJzrOtbC6l6zoLPmq40js7SPT83Qs7ZAw2rCgS
-         wCdhnVYKtj+YoAspYSH/xwBc71ffwpaxz2+ExvCioElCOX5KJirOJLyf6kIx+kZosYIz
-         5ELMkR/WJZOH7NZzpPkxjB61dhiPfgB3G92rNMNOhcR/23VIAkyZlDYnpifEd1WV61nA
-         oBpw==
+        bh=rbApVhsArFiEK2jewYhlo8Ja8onBMQkN7/T+JTYi1Gg=;
+        b=peNYxpcs7mtexs3d0yeF1cCOMVzTtj7Nz8HEF2MiJ8xwua8BkFZ3CwUek0oI3Jo56c
+         syhvi6+PbvMGofCX0Z1T5hPShyFSd7EP6+AII3LnVJpoFRkomKQXJaBkenu/IM/u32ou
+         IVAhiOmwZW3D+4jpzCDINBlQdvZCBXeuGu4eFOwvCNlmPyvMIKG29fgE72IF6bfMTiF/
+         kV1Am+HwmxQr6ICkpZAVPvnKjw9Zj2l2aCklTTMjdHagaDh77g0Es0Fpnvzf7J4XrIrc
+         UOf3mA9YcSelXv5MHMUo5nJoWoNuCh9BuljuespUonCnNGe/AsI9+qZjcKx1NKqIAioi
+         9TxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=peaVpA9FhN/Vc52TS1nlumYAVj2G5wsFUHbVuVwYxEc=;
-        b=AvMSO95rCJWINey7CsaJpGMeoJo/ICUTPFe+VOe30pKHSJ7L/FI/DGLbCDAz6U2/gp
-         zO2kOeNiC29TEn53536r2qFbFQz7dlrtTl/q8vYBJb3wRJCopYL1LFJIM7Ng814F0H19
-         V4QMajaWxnifUUSxR2Tjc0CGQDztCUBOmfvCiLwqM3Tq401QIvu36LNozSSSYx7q0wNn
-         wLRIBxIjsLraZp9d/AM2Axl3QCr5GULcvfh+k1YNui5x0zEtUQez42n3weU7HSk5xVGi
-         Dw6ujUFk+H5+hnEQnpKxJ+gKD81ViTu8sYFLghNlNcD9hROA054IAk0XT7/S4CBfVKcK
-         sMTQ==
-X-Gm-Message-State: AOAM533Jg9AB7yisRVp7IbGwIYpdEpMco9+AOyACb1ny5g841GV3R1Ye
-        WOYd9MzriIx6a98Na7LJFe80mQ==
-X-Google-Smtp-Source: ABdhPJww5ePwPiazLWacGwZAiQVioAsM/0bZxgb+wuEvmSOomy6uvG9/aOpiW/bTJfBNx0oAwBWbJQ==
-X-Received: by 2002:a17:903:246:b0:13f:75bb:cabd with SMTP id j6-20020a170903024600b0013f75bbcabdmr15103212plh.30.1636542001334;
-        Wed, 10 Nov 2021 03:00:01 -0800 (PST)
+        bh=rbApVhsArFiEK2jewYhlo8Ja8onBMQkN7/T+JTYi1Gg=;
+        b=npPCAKSEv7K1h7U+qw4hN9lYRUYxprmQ12NSPrp22vE/f39dKBUUxCvPdm57V8bdym
+         MIFx7bf7sMouymU4942dzxpPFLc0aHJh3r6EySAR3s9YmCR65lMw1tPjQAvjdov3X9GS
+         trL2ixdLFjWkwlexTYQan4aSMrfcn0NsHQ1YA5SGDkzl0q/bscLm04HoOaN8LJPNEL7b
+         Jo40E7/vcXqnRrT6AJP4AA0uTxvgRVxCh44T5gHu01Zyc/ltMoM4b1q7JrX/AT5yzxpG
+         TiqvA5d0YGJHmmpYUWA2fM6U84UsBjOQ240Kwa6Betz84mewwEBIm2ywzfN2fgpk+FE9
+         IKKg==
+X-Gm-Message-State: AOAM531DENi/36nfRWHL3Lg75mzl6QcUkHRmGUgBW+RiGYivBM1rZHxu
+        VrFd6hMCK/9x4gN10R4x93xEsg==
+X-Google-Smtp-Source: ABdhPJweMujZoY1RGGyRy8cWHOVOH511XlIDYHU4XmaLF98GhNDmFbd+sDc/91gHQ/VFeu2MpAfZcg==
+X-Received: by 2002:a17:902:da81:b0:141:fa9d:806d with SMTP id j1-20020a170902da8100b00141fa9d806dmr14548568plx.26.1636542006449;
+        Wed, 10 Nov 2021 03:00:06 -0800 (PST)
 Received: from localhost.name ([122.161.52.143])
-        by smtp.gmail.com with ESMTPSA id e11sm5585282pjl.20.2021.11.10.02.59.56
+        by smtp.gmail.com with ESMTPSA id e11sm5585282pjl.20.2021.11.10.03.00.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Nov 2021 03:00:00 -0800 (PST)
+        Wed, 10 Nov 2021 03:00:06 -0800 (PST)
 From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
 To:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org
 Cc:     bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
@@ -59,9 +59,9 @@ Cc:     bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
         davem@davemloft.net, stephan@gerhold.net,
         Thara Gopinath <thara.gopinath@linaro.org>,
         Bjorn Andersson <bjorn.andersson@linaro.org>
-Subject: [PATCH v5 04/22] dt-bindings: qcom-bam: Add 'interconnects' & 'interconnect-names' to optional properties
-Date:   Wed, 10 Nov 2021 16:29:04 +0530
-Message-Id: <20211110105922.217895-5-bhupesh.sharma@linaro.org>
+Subject: [PATCH v5 05/22] dt-bindings: qcom-bam: Add 'iommus' to optional properties
+Date:   Wed, 10 Nov 2021 16:29:05 +0530
+Message-Id: <20211110105922.217895-6-bhupesh.sharma@linaro.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211110105922.217895-1-bhupesh.sharma@linaro.org>
 References: <20211110105922.217895-1-bhupesh.sharma@linaro.org>
@@ -71,40 +71,46 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add new optional properties - 'interconnects' and
-'interconnect-names' to the device-tree binding documentation for
-qcom-bam DMA IP.
+Add 'optional' property - 'iommus' to the
+device-tree binding documentation for qcom-bam DMA IP.
 
-These properties describe the interconnect path between bam and main
-memory and the interconnect type respectively.
+This property describes the phandle(s) to apps_smmu node
+with sid mask.
 
 Cc: Thara Gopinath <thara.gopinath@linaro.org>
 Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
 Cc: Rob Herring <robh+dt@kernel.org>
 Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
 ---
- Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ .../devicetree/bindings/dma/qcom_bam_dma.yaml          | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml b/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
-index 3ca222bd10bd..20e734448c1f 100644
+index 20e734448c1f..cfff3a2286fb 100644
 --- a/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
 +++ b/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
-@@ -45,6 +45,14 @@ properties:
-     const: 1
-     description: The single cell represents the channel index.
+@@ -53,6 +53,12 @@ properties:
+   interconnect-names:
+     const: memory
  
-+  interconnects:
-+    maxItems: 1
++  iommus:
++    minItems: 1
++    maxItems: 8
 +    description:
-+      Interconnect path between bam and main memory.
-+
-+  interconnect-names:
-+    const: memory
++      phandle(s) to apps_smmu node with sid mask.
 +
    qcom,ee:
      $ref: /schemas/types.yaml#/definitions/uint32
      minimum: 0
+@@ -96,4 +102,8 @@ examples:
+         clock-names = "bam_clk";
+         #dma-cells = <1>;
+         qcom,ee = <0>;
++        iommus = <&apps_smmu 0x584 0x0011>,
++                 <&apps_smmu 0x586 0x0011>,
++                 <&apps_smmu 0x594 0x0011>,
++                 <&apps_smmu 0x596 0x0011>;
+     };
 -- 
 2.31.1
 
