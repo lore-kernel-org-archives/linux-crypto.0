@@ -2,202 +2,208 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B7CC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 15:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3871FC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 15:32:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A5FF60FC1
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 15:07:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1582361241
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 15:32:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231824AbhKJPKD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Nov 2021 10:10:03 -0500
-Received: from esa.microchip.iphmx.com ([68.232.153.233]:45977 "EHLO
-        esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231743AbhKJPKC (ORCPT
+        id S232392AbhKJPfk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Nov 2021 10:35:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57054 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232388AbhKJPfk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Nov 2021 10:10:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1636556835; x=1668092835;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=ku0Bc3dw+XghLk8Hz3gIe8DWYpof0HxDDPwRgHh4xGo=;
-  b=J6QbhE+c23hyz4TnFAY1r1Ps/iKwRsgoUgOXV0bZlgMQAgx4CSzC/2Jx
-   GIzJ1tW9wwlmiGXCe4oyK42Kb/IdXtNqy/1S9y6Biji6pwBpYMZ1saXMj
-   ofMEvDSyLPSET9tfgSqSf+2k+SqbvqHVoNfQpZMTg3SYJ2/BhjHwZyB2+
-   6uTUhslO3uL8/CyoiT2hC2nN3sxFQye6PbzVGBc+nKUvVkxzo26an38fK
-   PnU9kv7APSF0g8io24fntwd7cMfuZaKL7oeJGHNc5b+xBS9Iqb2krm4RL
-   RGahHXz+KZpmomDwIVme6pc9lmsxLVzxYxeQk+JOBTUhIT1rxn5KsMLfE
-   g==;
-IronPort-SDR: by5W3xuP2DIhWbwJOfkWT1/sW0Ev/qXH6TLH43N3nGcakykcYtXzIYpxjzgji7JDZBxLzpSZ5a
- 5W/2G3qTu063MLaHdWKCdzpXuhDkJ2v6+Tmmbx25Qp8dLZHaDwaNwvcnsm8mQKMUZ4LmRVD2fc
- Q1XcEh8FNKKEF0xvAtj1YB3+Z7Av0+sNlg+CTvli5y36m/H8g0ZWxghn4smwBO4dx36DNAIrx8
- cQUtxLIsVMaNgySPyVJQdqUyMlFBJikcHQBhz5BxYcw1TbSDpbeI42ON2J7STEKo4o1B6Od5KW
- OKVh/Aj6PiiikZ03iayKeLRC
-X-IronPort-AV: E=Sophos;i="5.87,224,1631602800"; 
-   d="scan'208";a="143476439"
-Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 10 Nov 2021 08:07:14 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.14; Wed, 10 Nov 2021 08:07:13 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (10.10.215.89) by
- email.microchip.com (10.10.87.72) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.14 via Frontend
- Transport; Wed, 10 Nov 2021 08:07:13 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B//AX0a/UzzAgwnnqhagdNNuCDbm6lZQ+pvqkaAPdGON6roBvosxqyQ2f3NE8Mb9Wf04B/HjE/r+AFOqxTMHZ3qwYmEdHa8NPl0+Gmz/UFtSKvuhckcjWWFS52mudCOaOZtQmWLCHTyEufF3eu45tzHW7J34Erk8dC2st3hyIsOgPwa/uq2gRsCkejimHT3JXsBcHRodWefJc8Ge6aMGse+AuUvaqC5usnrzViAO8u1NpjFjxWTvS/fTG3rzgqYOkiNOpDGG0i5OKypXkgzysDKoWNeZQke3mczm95DzSdjG7zoEXL5lUF+XeDE6xc9s4Inz3aN+3nP70TgDjJlxQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ku0Bc3dw+XghLk8Hz3gIe8DWYpof0HxDDPwRgHh4xGo=;
- b=FazHA1qYofiQYB3ncl6xxb5xaV2gIy6KXYD1/nag7ZjPTyOE4iZgnzp5Hv1CkzzSQ+PNIeTWtK3EcSRS56mJtH6JJxxnJofAfdIvWOojOPhDEZ83mfxIlyXPEkkTV0JFnWcqzW13Qc1JcBw0WLLAzEOQv0GmcwvhfVG7kX06tu9tmCMlkviBpICN/GSD/6vG0tdVlmQixXl1Kxz1nhh6Jg4sHBAqzuVbdwCWeS4RAneb7lmw1JmBHhsVo24w47/4+0P8M3/Nj+EyNFqUUmv8OCgRIu7oPxfq6ikZUsijw4UiEmzwsmNXJSh8A7Fa+tt7gnXZqXKgfEvgXzMez8EiDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+        Wed, 10 Nov 2021 10:35:40 -0500
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55A1CC061764
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Nov 2021 07:32:52 -0800 (PST)
+Received: by mail-lj1-x22c.google.com with SMTP id m5so6064692ljp.4
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Nov 2021 07:32:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=microchiptechnology.onmicrosoft.com;
- s=selector2-microchiptechnology-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ku0Bc3dw+XghLk8Hz3gIe8DWYpof0HxDDPwRgHh4xGo=;
- b=WB0oGbTnLaM810X401BWFE3EtO6kKkmdwT9nYF+VTWVbHDzOehP/49w9/GaWwyTGUwULYCVbOSy5LLGGQPwFF+N/fg/LDys+H33uAlzYA1YaI6iGByIdNwjppO6EpJyplKInrxPDwTlp7KohYdzp2ulmJ+9XcMyRKhE206kgGUo=
-Received: from CO1PR11MB5154.namprd11.prod.outlook.com (2603:10b6:303:95::7)
- by CO1PR11MB5140.namprd11.prod.outlook.com (2603:10b6:303:95::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.16; Wed, 10 Nov
- 2021 15:07:12 +0000
-Received: from CO1PR11MB5154.namprd11.prod.outlook.com
- ([fe80::ccb6:6f5a:9841:266d]) by CO1PR11MB5154.namprd11.prod.outlook.com
- ([fe80::ccb6:6f5a:9841:266d%8]) with mapi id 15.20.4690.015; Wed, 10 Nov 2021
- 15:07:11 +0000
-From:   <Conor.Dooley@microchip.com>
-To:     <geert@linux-m68k.org>
-CC:     <linus.walleij@linaro.org>, <bgolaszewski@baylibre.com>,
-        <robh+dt@kernel.org>, <jassisinghbrar@gmail.com>,
-        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
-        <aou@eecs.berkeley.edu>, <a.zummo@towertech.it>,
-        <alexandre.belloni@bootlin.com>, <broonie@kernel.org>,
-        <gregkh@linuxfoundation.org>, <Lewis.Hanly@microchip.com>,
-        <Daire.McNamara@microchip.com>, <atish.patra@wdc.com>,
-        <Ivan.Griffin@microchip.com>, <linux-gpio@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-        <linux-crypto@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
-        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        <krzysztof.kozlowski@canonical.com>, <bin.meng@windriver.com>
-Subject: Re: [PATCH 12/13] riscv: icicle-kit: update microchip icicle kit
- device tree
-Thread-Topic: [PATCH 12/13] riscv: icicle-kit: update microchip icicle kit
- device tree
-Thread-Index: AQHX1LJ2yk8h5UAHwUis11m3Urxauav66E+AgAHqiICAAAqfAIAAApqA
-Date:   Wed, 10 Nov 2021 15:07:11 +0000
-Message-ID: <6b065b43-e3a8-a3ff-d537-7cf70b153d22@microchip.com>
-References: <20211108150554.4457-1-conor.dooley@microchip.com>
- <20211108150554.4457-13-conor.dooley@microchip.com>
- <CAMuHMdWEhJj0Cqt3sgGvgZe7JSFqBmTgtZRkom30NKqEW27NvQ@mail.gmail.com>
- <0e379411-2469-8c78-1a3f-0645579a967c@microchip.com>
- <CAMuHMdULO5gJcbnsDzZcVShmYkByyM30f9nYyDD8e4PJ6nrnCQ@mail.gmail.com>
-In-Reply-To: <CAMuHMdULO5gJcbnsDzZcVShmYkByyM30f9nYyDD8e4PJ6nrnCQ@mail.gmail.com>
-Accept-Language: en-IE, en-US
-Content-Language: en-IE
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 112658e6-9730-424d-068a-08d9a45bc5f3
-x-ms-traffictypediagnostic: CO1PR11MB5140:
-x-microsoft-antispam-prvs: <CO1PR11MB514077ACE75FD38B57C9850E98939@CO1PR11MB5140.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Tcr/8K77hxUn6mTHwVYVvkKLxmYjWVsR0u5cCpFEZrgf0O62sZnU/f/I41BzKdxJg2M/ku4Rw4cQ1bebrPFppb1q884azLEaK/D4/gHxbuPnBfKWJhiZatyIJYxCxSsrwRjeqmo6p6fGPPC1ydkifNgltTn2hvEEOknAoVNsmDfBkQEeJJKd5/Ik60UO+THgo330xXcLMEc6hLEeTr6VkjfxA82Qa9okrKuBFuFcXVDiSNieH6LTlhr4AkDNO4V/R9indwlDt9htu6aHlHUHVltBQ948QWX3PHsBen9rvjw9cijjEMr2dc6fIW0bMhUO3YqSmLMbjJf1OBzEBkKujaHkMgEAwJruOkQSfsWbIDyEiaxDOA1aiS3kWCRVOgOkch5P3LVY1hFuUOjQAW1o2+MI/CtwuTaFWs7STyhdj11xLUWDCsx+raZ0leM0zDv+RTh731I2Te20xkWtiGGdwImUGb4GAFx+zJl8b1Z3RFdIDQwbzR03Fmzir7g9Cp2tJl6yPCJH+5nw85gGUED3Z9VG8cSw7Wqff6u0WOVJ4oToABIfLqIAgEgdtDo+jrOV31iF3va+H5TB5sKOsQ/WCZDdZnr9ykF8Zd1F+JkxaYDTUtoeNIoFFfLBhmJxzsobmUVCLSkaGgO9QCdZI6qYn8ncfAXF1NdJBxJypNsSMr4UWew+alezhKigY4+gNmuq7zm3laqy8QKkS0L5OvGQBUskqePqrkBK0GwYoHbCQqs2ItHwk6Hxd3WEHk7DrwmXSCx/1cP4JPvXk4tHb7621Q==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5154.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(31686004)(5660300002)(2906002)(71200400001)(6506007)(31696002)(6916009)(36756003)(26005)(4326008)(38070700005)(76116006)(54906003)(66946007)(186003)(64756008)(66476007)(508600001)(6486002)(66446008)(66556008)(8936002)(6512007)(316002)(38100700002)(122000001)(2616005)(86362001)(91956017)(8676002)(53546011)(7416002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?V2VGckZWamYySEZ4cGVyYkhNSEZVZ3N6TnJkaVpUR3lMR1JQRWdtYWhnOXY4?=
- =?utf-8?B?cG1pY3VubWh0OTY3dDh2cGVya1d4UmV4UStpR29ycXdnajdISUhxaDFzNnpF?=
- =?utf-8?B?RGlISFRpZ1BlR0p2WGNUanZTMURJUjIwZldUTjdNQW1WUCthZ0lFa3o5c25i?=
- =?utf-8?B?TE8rNnhObERoU29GenkySjdnUjhiak5WMlhKR1hGTUdFTCs1TkpyRFhEd1dv?=
- =?utf-8?B?WTVUbTBac1lTUXR4VVlsaDY2YnJDdFJEZ0RHU3ZFeUFvQWNFZjdvMlFGaDcr?=
- =?utf-8?B?eSthOTZ4bjFVcGpwNHpQNk1DWHdPRWtBc2RMUitVa2NGTVkxZ2lUTnNYOHA5?=
- =?utf-8?B?d3VYdkx0a2VSdnhNOGtmNk5iOEVweEo0bUtydzRzYzgrRm01VE9hUm1JanMr?=
- =?utf-8?B?U1dpZzh4OURLTTREbXRYQVF2VkZ5Y2lMa0tGMGw1VWVQdld2VEdLK096eDJT?=
- =?utf-8?B?aGl4OWZPV0txaGVSdnNoSXdMNXBYREdZTE02UlJXN1NXSzBjU1JVQXpuVndU?=
- =?utf-8?B?R3EzcGsvQVBHQW9VN21STEJtMDZySUhmaUZUbFlTRXdENDVHYXNncVhRZmJm?=
- =?utf-8?B?dEJ3UDdTY1FPWE5SZ2ZqMDhFeHppMTR4NFU0bEd3a2g1QktGVzNFWVRBS0Ur?=
- =?utf-8?B?M2RkMmxPVU9yakVyZFpLcWRLWWt4LzVRcEpaVnMrSnpvNmk5K2pzMXlkT2RI?=
- =?utf-8?B?cWM1Y3VyTndMMnF0UkxuaGlZRHUxd29CTGZlaGhuYXFabDhqS0FXZ210N3lq?=
- =?utf-8?B?V2lLbGNQL05uWGhHUnRZQVpJMjJnT2E3Qm9BOW1JVnl4cVZwOHhVQXdpMFY1?=
- =?utf-8?B?SGdFTDViUDAwN0RxR1dST0d2WVZHODZVTkRrWHM4M3ZNQ01TdDdVUjNCWnRV?=
- =?utf-8?B?bFJVb2s3YzB3d1BUREtDMVdjSTZ2ZTdrQlNHcUlaY05YZTFtcHpCL0c4eU5D?=
- =?utf-8?B?aDlrb09RWDBFQnhQVHphWmV6L0sveXVmWXJma0g2cUVKYmU2MHpUMGlpVDIy?=
- =?utf-8?B?QU9sbVdodXFUL3pYQ3lEQkFacUJjMmpCWEw2djV5ODlURi9hc3FTdkNsMVpM?=
- =?utf-8?B?R3dVeGUxdHJxL1dVYXZKT2dheUJzbUtXaGVvVk5QTUVJNkphaW14ZnhqSkEw?=
- =?utf-8?B?WDBSdnBLQUlmeWE2MjY1dDhxSC9TaGlmNnkwUDJkVGJ1cWs5c0ZkdjhXSEl3?=
- =?utf-8?B?Yk9QcE10Tlc5RlhTNDd5QWxDVDROSWFlRDF1Rmluc1JWdUROTlBwZTQwWFdU?=
- =?utf-8?B?cXFFbGxBMWVtN3RvVTdSTk9nM01WUE0wS1phYkhTSks3Y01tcWJYSnJDVEhY?=
- =?utf-8?B?dXYzNTZCNnltdzBBMXQxWG1pdm4yTG5wTWdJL1NtTHdhcllhVlEzWjdxSXVS?=
- =?utf-8?B?KzFJeVRwbE9Ick44MHlaR21JTFF1YXhONzh0eU9sMmNEWEVzTWRXa2ZMcE1M?=
- =?utf-8?B?MGM1T01WanBNWkxJWTkzZC8zT01QWnFIaHpKR2xrYldHeVhCU0Q1UktjUkxt?=
- =?utf-8?B?bXFBczdoNyttWUd3cE42c0lOcit5SUJRMmJrSWxSQzNXUEZGK0IxdnpvRHhM?=
- =?utf-8?B?dElGbWp3bjErS3UrcldlaFl6MEJGZlovL0lzM0QxVzhsNzEwVDhkd3h2YmVU?=
- =?utf-8?B?dHA5TVNUNHdJa2E5UUFjRWVCTThKMERaVFdRaEhEbkY5UjMybkRKNDlOMkZj?=
- =?utf-8?B?OGUydTZlb2NqcHdCbStrQTlKZ0hwclV6MzVJbE9RNmMrQk5NenJzaFhLUnFu?=
- =?utf-8?B?S256WDNvbUVOekt6cUkrUWFJSSt6MURlTzVjTy9HRWtOempnbUtRMkpldTBS?=
- =?utf-8?B?SlpZaDRlMGE1Y1QvVjdVNVF3OE1mN2lCdTk4ZnpzYWlJUnBGblFoQjN0aDF4?=
- =?utf-8?B?MmdlZDJrT1hsS3I0MjBxTVl3K3FzRjY3VFF4L0NMMURyQkpSWWVzOGhNRzA3?=
- =?utf-8?B?VkhicVliQXREWFNPdFRLZkY3WEV0VUIxd3pkVENZb3ZNUXA3UGRvb1UwVUpC?=
- =?utf-8?B?YVhnbndjTDRNdDFaaVVUa2VQMXpQdExWaFNONXhqSVZBNW82cEhvYThzOFFJ?=
- =?utf-8?B?RkxnRDIzbUhHKzZZOG1uTDRJRGhzZ3lEZmZBU1pBWXFzZmJPUGlxUG1YM2NX?=
- =?utf-8?B?aHN5QVdLY0xUTTFFN1dXdkl1UU85aStCMmYxbmd3TEFMU1MxQ0IvZVRPQjY3?=
- =?utf-8?B?eFI1N1NtOFNLSE9qbHFVMmhkcDRoY1BBVmVRaHF3d0Q2UzZ3Z2hCN1lDeTVu?=
- =?utf-8?B?TXRWQ3hLVFJSL2kvcGhzZHAva1d3PT0=?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B8744197C8EEDC40A9C6023E4BC36DE7@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lgnxHpODLfO97J2yEr0Lgc9c26Tdre2cWAJCLwwYcLE=;
+        b=fa5BPQDJ3MCjtDnhVvoTCstK7EKMlBcs6VwSYsuGhukmLU8n5C5WoA8OzDj00ZYOiz
+         hqsBn0HgpxlSnjEvK064oBdIhzHlBqiHP9yV1kQtUqFTSbY3545FcjomZ+SUTrrPT+PK
+         hwT2SPSiHKPGvt+Wr/LGGCKLZdi3eDB+V+8yqXwiwnkrcwPMOd8J7d4/aXZu0q5JFvUv
+         HCZuJTXtNYJUoJJtwqESWaKpiuh4TNG0fsQgw3DfvexwLXsBYUW4/jyn2ZV8T56bQ1YA
+         jDSzHiW2PfHLz/4nkiJQbybbbQImYH8DfVnSr99AN7/M5CQIUHg80XR8NyRGvNHewyvV
+         cLrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lgnxHpODLfO97J2yEr0Lgc9c26Tdre2cWAJCLwwYcLE=;
+        b=FijwY17NK/1+9YPIW/3L3BFPe/cZQb9lzPemtPutFM19W8BvFSE61c0C7SG/IGTxN3
+         U+PNpcXuidaGr20uVmJgSCYh6/p3vWLr4jaFLcujScxMrQkry9rzHeyBDJlJ3BgWii1x
+         T7RLqag5HcKEngObr/2kqL6Fd11fTiQgC3z8wy3RGUESZ2Hr+ay2uetOMXwcbVIv5mx7
+         xIIp6IbVb7cmXRbYNR4wz/Aw/doPL1w/RQWfxJvDmVpQFFHbZhoX9Dfd+lFr8D64b/n6
+         oxuaj3qk74Gai+aSWDxVvT799e7Rj1ETxaYSyHJfBfZAdqqkgUSp3W027JycWA8UhxLA
+         YhWQ==
+X-Gm-Message-State: AOAM530SRQd5Mg/Pzqe7LySvG80i3WScDw0sOSdPB6ooK+TzphWQem3v
+        +AOGj0wxhvypyqnsYvYUFXM1b+681wj7JAfoNkBmiQ==
+X-Google-Smtp-Source: ABdhPJyEiu7DvQleXm6qr5yt7Ynnf9cbec/8aIllgbxX+RUZq1gRRznfC5YDIgaCRimVmMWiCa56JaKo4c7c0qOYtsY=
+X-Received: by 2002:a05:651c:1035:: with SMTP id w21mr292598ljm.278.1636558370438;
+ Wed, 10 Nov 2021 07:32:50 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5154.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 112658e6-9730-424d-068a-08d9a45bc5f3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Nov 2021 15:07:11.8020
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: HfbTYa0NZsKdI4HCEc0Ra1zmNlhkCH4J2VKeufOHDRDqEi05xa/GZ6plCLDyXZQtk087DsJMzzZkJ7PtvLZsGNVgfRUSfBvMr/7J2XVkr5g=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5140
+References: <20211102142331.3753798-1-pgonda@google.com> <20211102142331.3753798-5-pgonda@google.com>
+ <YYquDWbkIwCkixxD@google.com> <CAMkAt6rHdsdD-L4PbZL7qaOY7GRHmApVJam0V0yY2BnYdhmPjA@mail.gmail.com>
+ <YYrZXRTukz3RccPN@google.com> <CAMkAt6qauoiTBXF9VXRGiqtJD5pTAV=NqKHZgNFXHCkrR50gkg@mail.gmail.com>
+ <eff7a2cb-f78a-646a-dc0c-b24998e9e9af@amd.com>
+In-Reply-To: <eff7a2cb-f78a-646a-dc0c-b24998e9e9af@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Wed, 10 Nov 2021 08:32:38 -0700
+Message-ID: <CAMkAt6rj94Mzb6HBaqQbi7HHfhS4q1O4fxO8M7Xe=TZeZ0zZOg@mail.gmail.com>
+Subject: Re: [PATCH V3 4/4] crypto: ccp - Add SEV_INIT_EX support
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>, Thomas.Lendacky@amd.com,
+        David Rientjes <rientjes@google.com>,
+        Marc Orr <marcorr@google.com>, Joerg Roedel <jroedel@suse.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        John Allen <john.allen@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gMTAvMTEvMjAyMSAxNDo1OCwgR2VlcnQgVXl0dGVyaG9ldmVuIHdyb3RlOg0KPiBFWFRFUk5B
-TCBFTUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlv
-dSBrbm93IHRoZSBjb250ZW50IGlzIHNhZmUNCj4gDQo+IEhpIENvbm9yLA0KPiANCj4+Pj4gICAg
-ICAgICAgICAgICAgICAgcGxpYzogaW50ZXJydXB0LWNvbnRyb2xsZXJAYzAwMDAwMCB7DQo+Pj4+
-IC0gICAgICAgICAgICAgICAgICAgICAgICNpbnRlcnJ1cHQtY2VsbHMgPSA8MT47DQo+Pj4+IC0g
-ICAgICAgICAgICAgICAgICAgICAgIGNvbXBhdGlibGUgPSAic2lmaXZlLGZ1NTQwLWMwMDAtcGxp
-YyIsICJzaWZpdmUscGxpYy0xLjAuMCI7DQo+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgIGNv
-bXBhdGlibGUgPSAic2lmaXZlLHBsaWMtMS4wLjAiOw0KPj4+DQo+Pj4gV2h5IGRyb3AgdGhlIGZp
-cnN0IG9uZSBhZ2Fpbj8NCj4+IHdlIGZlbHQgaXQgZGlkbnQgbWFrZSBzZW5zZSB0byBoYXZlIHNv
-bWV0aGluZyB0aGF0IHNwZWNpZmljYWxseQ0KPj4gcmVmZXJlbmNlcyB0aGUgZnU1NDAgaW4gdGhl
-IGRldmljZSB0cmVlIGZvciB0aGlzIGJvYXJkLg0KPiANCj4gVGhhdCB3b3VsZCBiZSBhIHJldmVy
-dCBvZiBjb21taXQgNzNkM2M0NDExNTUxNDYxNiAoInJpc2N2OiBkdHM6DQo+IG1pY3JvY2hpcDog
-YWRkIG1pc3NpbmcgY29tcGF0aWJsZXMgZm9yIGNsaW50IGFuZCBwbGljIiksIHdoaWNoIHlvdQ0K
-PiBzdXBwbGllZCBhbiBSLWIgdGFnIGZvcj8NCj4gDQo+IElzIHRoaXMgdGhlIHNhbWUgcGxpYyBh
-cyBpbiB0aGUgRlU1NDAgU29DPyBPciBkbyB3ZSBuZWVkIGEgbmV3DQo+IG1pY3JvY2hpcCxtcGZz
-LXBsaWMgY29tcGF0aWJsZSB2YWx1ZT8NCj4gDQp5ZWFoLCBpZ25vcmUgdGhhdC4gaSBjb25mdXNl
-ZCB0aGlzIGNoYW5nZSAod2hpY2ggaXMgYW4gYWNjaWRlbnRhbCANCmNsb2JiZXIpIHdpdGggYW5v
-dGhlciBzaWZpdmUgY29tcGF0aWJsZSB0aGF0IHdhcyBkcm9wcGVkIGZvciBub3QgYmVpbmcgDQpy
-ZWxldmFudC4gaGFyZGx5IG1ha2VzIHNlbnNlIHRvIGRyb3AgdGhpcyBvbmUgd2hlbiBpIGtlcHQg
-aXQgZm9yIHRoZSANCmNsaW50IGFuZCBjYWNoZSBjb250cm9sbGVyIQ0KDQo+IA0KPiBHcntvZXRq
-ZSxlZXRpbmd9cywNCj4gDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICBHZWVydA0KPiANCj4g
-LS0NCj4gR2VlcnQgVXl0dGVyaG9ldmVuIC0tIFRoZXJlJ3MgbG90cyBvZiBMaW51eCBiZXlvbmQg
-aWEzMiAtLSBnZWVydEBsaW51eC1tNjhrLm9yZw0KPiANCj4gSW4gcGVyc29uYWwgY29udmVyc2F0
-aW9ucyB3aXRoIHRlY2huaWNhbCBwZW9wbGUsIEkgY2FsbCBteXNlbGYgYSBoYWNrZXIuIEJ1dA0K
-PiB3aGVuIEknbSB0YWxraW5nIHRvIGpvdXJuYWxpc3RzIEkganVzdCBzYXkgInByb2dyYW1tZXIi
-IG9yIHNvbWV0aGluZyBsaWtlIHRoYXQuDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIC0tIExpbnVzIFRvcnZhbGRzDQo+IA0KDQo=
+On Tue, Nov 9, 2021 at 3:20 PM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+>
+>
+> On 11/9/21 2:46 PM, Peter Gonda wrote:
+> > On Tue, Nov 9, 2021 at 1:26 PM Sean Christopherson <seanjc@google.com> wrote:
+> >>
+> >> On Tue, Nov 09, 2021, Peter Gonda wrote:
+> >>> On Tue, Nov 9, 2021 at 10:21 AM Sean Christopherson <seanjc@google.com> wrote:
+> >>>> There's no need for this to be a function pointer, and the duplicate code can be
+> >>>> consolidated.
+> >>>>
+> >>>> static int sev_do_init_locked(int cmd, void *data, int *error)
+> >>>> {
+> >>>>          if (sev_es_tmr) {
+> >>>>                  /*
+> >>>>                   * Do not include the encryption mask on the physical
+> >>>>                   * address of the TMR (firmware should clear it anyway).
+> >>>>                   */
+> >>>>                  data.flags |= SEV_INIT_FLAGS_SEV_ES;
+> >>>>                  data.tmr_address = __pa(sev_es_tmr);
+> >>>>                  data.tmr_len = SEV_ES_TMR_SIZE;
+> >>>>          }
+> >>>>          return __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> >>>> }
+> >>>>
+> >>>> static int __sev_init_locked(int *error)
+> >>>> {
+> >>>>          struct sev_data_init data;
+> >>>>
+> >>>>          memset(&data, 0, sizeof(data));
+> >>>>          return sev_do_init_locked(cmd, &data, error);
+> >>>> }
+> >>>>
+> >>>> static int __sev_init_ex_locked(int *error)
+> >>>> {
+> >>>>          struct sev_data_init_ex data;
+> >>>>
+> >>>>          memset(&data, 0, sizeof(data));
+> >>>>          data.length = sizeof(data);
+> >>>>          data.nv_address = __psp_pa(sev_init_ex_nv_address);
+> >>>>          data.nv_len = NV_LENGTH;
+> >>>>          return sev_do_init_locked(SEV_CMD_INIT_EX, &data, error);
+> >>>> }
+> >>>
+> >>> I am missing how this removes the duplication of the retry code,
+> >>> parameter checking, and other error checking code.. With what you have
+> >>> typed out I would assume I still need to function pointer between
+> >>> __sev_init_ex_locked and __sev_init_locked. Can you please elaborate
+> >>> here?
+> >>
+> >> Hmm.  Ah, I got distracted between the original thought, the realization that
+> >> the two commands used different structs, and typing up the above.
+> >>
+> >>> Also is there some reason the function pointer is not acceptable?
+> >>
+> >> It's not unacceptable, it would just be nice to avoid, assuming the alternative
+> >> is cleaner.  But I don't think any alternative is cleaner, since as you pointed
+> >> out the above is a half-baked thought.
+> >
+> > OK I'll leave as is.
+> >
+> >>
+> >>>>> +     rc = init_function(error);
+> >>>>>        if (rc && *error == SEV_RET_SECURE_DATA_INVALID) {
+> >>>>>                /*
+> >>>>>                 * INIT command returned an integrity check failure
+> >>>>> @@ -286,8 +423,8 @@ static int __sev_platform_init_locked(int *error)
+> >>>>>                 * failed and persistent state has been erased.
+> >>>>>                 * Retrying INIT command here should succeed.
+> >>>>>                 */
+> >>>>> -             dev_dbg(sev->dev, "SEV: retrying INIT command");
+> >>>>> -             rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> >>>>> +             dev_notice(sev->dev, "SEV: retrying INIT command");
+> >>>>> +             rc = init_function(error);
+> >>>>
+> >>>> The above comment says "persistent state has been erased", but __sev_do_cmd_locked()
+> >>>> only writes back to the file if a relevant command was successful, which means
+> >>>> that rereading the userspace file in __sev_init_ex_locked() will retry INIT_EX
+> >>>> with the same garbage data.
+> >>>
+> >>> Ack my mistake, that comment is stale. I will update it so its correct
+> >>> for the INIT and INIT_EX flows.
+> >>>>
+> >>>> IMO, the behavior should be to read the file on load and then use the kernel buffer
+> >>>> without ever reloading (unless this is built as a module and is unloaded and reloaded).
+> >>>> The writeback then becomes opportunistic in the sense that if it fails for some reason,
+> >>>> the kernel's internal state isn't blasted away.
+> >>>
+> >>> One issue here is that the file read can fail on load so we use the
+> >>> late retry to guarantee we can read the file.
+> >>
+> >> But why continue loading if reading the file fails on load?
+> >>
+> >>> The other point seems like preference. Users may wish to shutdown the PSP FW,
+> >>> load a new file, and INIT_EX again with that new data. Why should we preclude
+> >>> them from that functionality?
+> >>
+> >> I don't think we should preclude that functionality, but it needs to be explicitly
+> >> tied to a userspace action, e.g. either on module load or on writing the param to
+> >> change the path.  If the latter is allowed, then it needs to be denied if the PSP
+> >> is initialized, otherwise the kernel will be in a non-coherent state and AFAICT
+> >> userspace will have a heck of a time even understanding what state has been used
+> >> to initialize the PSP.
+> >
+> > If this driver is builtin the filesystem will be unavailable during
+> > __init. Using the existing retries already built into
+> > sev_platform_init() also the file to be read once userspace is
+> > running, meaning the file system is usable. As I tried to explain in
+> > the commit message. We could remove the sev_platform_init call during
+> > sev_pci_init since this only actually needs to be initialized when the
+> > first command requiring it is issues (either reading some keys/certs
+> > from the PSP or launching an SEV guest). Then userspace in both the
+> > builtin and module usage would know running one of those commands
+> > cause the file to be read for PSP usage. Tom any thoughts on this?
+> >
+>
+> One thing to note is that if we do the INIT on the first command then
+> the first guest launch will take a longer. The init command is not
+> cheap (especially with the SNP, it may take a longer because it has to
+> do all those RMP setup etc). IIRC, in my early SEV series in I was doing
+> the INIT during the first command execution and based on the
+> recommendation moved to do the init on probe.
+>
+> Should we add a module param to control whether to do INIT on probe or
+> delay until the first command ?
+
+Thats a good point Brijesh. I've only been testing this with SEV and
+ES so haven't noticed that long setup time. I like the idea of a
+module parameter to decide when to INIT, that should satisfy Sean's
+concern that the user doesn't know when the INIT_EX file would be read
+and that there is extra retry code (duplicated between sev_pci_init
+and all the PSP commands). I'll get started on that.
+
+>
+> -Brijesh
