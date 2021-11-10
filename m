@@ -2,241 +2,150 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0175AC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 19:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF635C43219
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 19:49:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6E3A60FA0
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 19:44:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD9CF61168
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 19:49:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233356AbhKJTrg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Nov 2021 14:47:36 -0500
-Received: from mail-oi1-f179.google.com ([209.85.167.179]:35708 "EHLO
-        mail-oi1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233102AbhKJTrQ (ORCPT
+        id S231370AbhKJTwi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Nov 2021 14:52:38 -0500
+Received: from mail-ot1-f54.google.com ([209.85.210.54]:39884 "EHLO
+        mail-ot1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230171AbhKJTwh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Nov 2021 14:47:16 -0500
-Received: by mail-oi1-f179.google.com with SMTP id m6so7312961oim.2;
-        Wed, 10 Nov 2021 11:44:28 -0800 (PST)
+        Wed, 10 Nov 2021 14:52:37 -0500
+Received: by mail-ot1-f54.google.com with SMTP id r10-20020a056830080a00b0055c8fd2cebdso5545847ots.6;
+        Wed, 10 Nov 2021 11:49:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject:date
-         :message-id;
-        bh=jxACcC5TGHjnCJC9Ui8FOKjkYdvzVT+5ha6aT9Ynf54=;
-        b=rHngdqOXy4I3uVFpidIpryGAL5g1H3a/ZEIBv5KJDyllkKFulmbDIjT6RQU1vWONhL
-         JEHl2Y4j8lVxU1jXqkHtGnVijeHgb0S2vcmvv3Ytg9zDlpcU2xJX3IkZGBUu/OdzesAQ
-         Orlgo87qA+RWca37P5rB9m+x+UVcjEB1bm1VeEiSEhRMc4kITBEQLITtdqQCrvLuJCiA
-         BkyjfiFPzH1EZybPXEAPlK88L/dM/BaM7ztS3bU9oVEhrtggY3pQXaiTtjvADiUgPRIX
-         rscLVjJuDN3BtiYeS4y9KIttvIvny5vaKTDdyyes8CjjF3NEJZ7XE0qWrcUUH69MDgSp
-         IOQA==
-X-Gm-Message-State: AOAM533RN46st6DD+bTo9I8iPMOP4zgaPErvCcWaHOokw810lmXoSGqH
-        G9juHZhuAqjKoK72hRYdcg==
-X-Google-Smtp-Source: ABdhPJx64iQIoH2bg4ZV7dSSu5wsBD5lYdkT37nMlYzZHb8Tk1YVPPYtofwACXtINRAmF9yx1SuX4g==
-X-Received: by 2002:aca:d0d:: with SMTP id 13mr1381306oin.107.1636573467757;
-        Wed, 10 Nov 2021 11:44:27 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Jffv+4OBBpjkkC43YZCngYWCvEJMwZVhqAxEmFK8L/I=;
+        b=MQxfkCCi2v2hsTKxKKuRvH/yTYF6TvDBR2IkrVLa3FgtYNkKDKAvhOX7hlWsN/EjhA
+         6++46uomlk3KOlLKNE7k9u0dvTqAYLBDLBZHQ6HZ0YNytxlA4y10ptz371mCGPzRsGCh
+         h/a/SsGW1e01hZkI9vuDR0obEq//YfAcPrQcEkR3WlwdocoMFfFIa0rrHuQ05Dj1v7Bs
+         82C3y+q4e6XXDZhAOfJPbSFyCn79J9t2hGE0w/Ewrs5NUPg4+q8n4DYanW8Ynzb/VWIy
+         6f8vx0BJyPV++gOnPVlNcixBtHRHKxqWz9RYhzjUgosiC3OOv6ZFWvz8ZIdnRilx7ChI
+         4D/w==
+X-Gm-Message-State: AOAM531HkJ2fCFC3fCq5mihHJeLsLKt6n9DZ2HfLf+TVea7JNQpnA2PV
+        +2/L2NW0LazGv+oEF/CAnQ==
+X-Google-Smtp-Source: ABdhPJyfVpmfG+ubS7aEU1ww03RUaTffAeDZHobEFdd7aYoPfW2ZAH5HMpiQ+tL5kGtHFO9Urrh52g==
+X-Received: by 2002:a9d:67c1:: with SMTP id c1mr1412382otn.299.1636573788340;
+        Wed, 10 Nov 2021 11:49:48 -0800 (PST)
 Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
-        by smtp.gmail.com with ESMTPSA id k4sm157124oic.48.2021.11.10.11.44.26
+        by smtp.gmail.com with ESMTPSA id p14sm130082oov.0.2021.11.10.11.49.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Nov 2021 11:44:26 -0800 (PST)
-Received: (nullmailer pid 1783743 invoked by uid 1000);
-        Wed, 10 Nov 2021 19:44:20 -0000
+        Wed, 10 Nov 2021 11:49:47 -0800 (PST)
+Received: (nullmailer pid 1843729 invoked by uid 1000);
+        Wed, 10 Nov 2021 19:49:44 -0000
+Date:   Wed, 10 Nov 2021 13:49:44 -0600
 From:   Rob Herring <robh@kernel.org>
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     agross@kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        robh+dt@kernel.org, devicetree@vger.kernel.org,
-        Thara Gopinath <thara.gopinath@linaro.org>,
-        stephan@gerhold.net, bhupesh.linux@gmail.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org
-In-Reply-To: <20211110105922.217895-4-bhupesh.sharma@linaro.org>
-References: <20211110105922.217895-1-bhupesh.sharma@linaro.org> <20211110105922.217895-4-bhupesh.sharma@linaro.org>
-Subject: Re: [PATCH v5 03/22] dt-bindings: qcom-bam: Convert binding to YAML
-Date:   Wed, 10 Nov 2021 13:44:20 -0600
-Message-Id: <1636573460.935618.1783742.nullmailer@robh.at.kernel.org>
+To:     patrice.chotard@foss.st.com
+Cc:     Sebastian Reichel <sre@kernel.org>,
+        dri-devel@lists.freedesktop.org,
+        thierry reding <thierry.reding@gmail.com>,
+        linux-iio@vger.kernel.org, Paul Cercueil <paul@crapouillou.net>,
+        herbert xu <herbert@gondor.apana.org.au>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        linux-remoteproc@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-gpio@vger.kernel.org,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        linux-mtd@lists.infradead.org,
+        Fabien Dessenne <fabien.dessenne@foss.st.com>,
+        Pierre-Yves MORDRET <pierre-yves.mordret@foss.st.com>,
+        "david s . miller" <davem@davemloft.net>,
+        olivier moysan <olivier.moysan@foss.st.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, linux-clk@vger.kernel.org,
+        michael turquette <mturquette@baylibre.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Fabrice Gasnier <fabrice.gasnier@foss.st.com>,
+        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+        arnaud pouliquen <arnaud.pouliquen@foss.st.com>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Viresh Kumar <viresh.kumar@linaro.org>, netdev@vger.kernel.org,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        linux-stm32@st-md-mailman.stormreply.com, linux-pm@vger.kernel.org,
+        Amit Kucheria <amitk@kernel.org>, dmaengine@vger.kernel.org,
+        linux-usb@vger.kernel.org, dillon min <dillon.minfei@gmail.com>,
+        yannick fertre <yannick.fertre@foss.st.com>,
+        linux-watchdog@vger.kernel.org, ohad ben-cohen <ohad@wizery.com>,
+        Le Ray <erwan.leray@foss.st.com>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        devicetree@vger.kernel.org,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+        linux-spi@vger.kernel.org,
+        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        bjorn andersson <bjorn.andersson@linaro.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        linux-i2c@vger.kernel.org,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Jagan Teki <jagan@amarulasolutions.com>,
+        benjamin gaignard <benjamin.gaignard@linaro.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        david airlie <airlied@linux.ie>, alsa-devel@alsa-project.org,
+        baolin wang <baolin.wang7@gmail.com>,
+        philippe cornu <philippe.cornu@foss.st.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        daniel vetter <daniel@ffwll.ch>, linux-media@vger.kernel.org,
+        Lee Jones <lee.jones@linaro.org>,
+        maxime coquelin <mcoquelin.stm32@gmail.com>,
+        Ludovic Barre <ludovic.barre@foss.st.com>,
+        linux-crypto@vger.kernel.org, Jose Abreu <joabreu@synopsys.com>,
+        linux-kernel@vger.kernel.org,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Zhang Rui <rui.zhang@intel.com>,
+        jonathan cameron <jic23@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        alexandre torgue <alexandre.torgue@foss.st.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        sam ravnborg <sam@ravnborg.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marek Vasut <marex@denx.de>, linux-phy@lists.infradead.org,
+        Guenter Roeck <linux@roeck-us.net>,
+        Richard Weinberger <richard@nod.at>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        vinod koul <vkoul@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Christophe Roullier <christophe.roullier@foss.st.com>,
+        lars-peter clausen <lars@metafoo.de>,
+        linux-serial@vger.kernel.org,
+        pascal Paillet <p.paillet@foss.st.com>,
+        Hugues Fruchet <hugues.fruchet@foss.st.com>,
+        Gabriel Fernandez <gabriel.fernandez@foss.st.com>,
+        Christophe Kerello <christophe.kerello@foss.st.com>,
+        stephen boyd <sboyd@kernel.org>,
+        Amelie Delaunay <amelie.delaunay@foss.st.com>,
+        Mark Brown <broonie@kernel.org>,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 1/5] dt-bindings: timer: Update maintainers for
+ st,stm32-timer
+Message-ID: <YYwiWGn0ehnD4nDZ@robh.at.kernel.org>
+References: <20211110150144.18272-1-patrice.chotard@foss.st.com>
+ <20211110150144.18272-2-patrice.chotard@foss.st.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211110150144.18272-2-patrice.chotard@foss.st.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 10 Nov 2021 16:29:03 +0530, Bhupesh Sharma wrote:
-> Convert Qualcomm BAM DMA devicetree binding to YAML.
+On Wed, 10 Nov 2021 16:01:40 +0100, patrice.chotard@foss.st.com wrote:
+> From: Patrice Chotard <patrice.chotard@foss.st.com>
 > 
-> Cc: Thara Gopinath <thara.gopinath@linaro.org>
-> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> Cc: Rob Herring <robh+dt@kernel.org>
-> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> Benjamin has left the company, add Fabrice and myself as maintainers.
+> 
+> Signed-off-by: Patrice Chotard <patrice.chotard@foss.st.com>
 > ---
->  .../devicetree/bindings/dma/qcom_bam_dma.txt  | 50 ----------
->  .../devicetree/bindings/dma/qcom_bam_dma.yaml | 91 +++++++++++++++++++
->  2 files changed, 91 insertions(+), 50 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/dma/qcom_bam_dma.txt
->  create mode 100644 Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
+>  Documentation/devicetree/bindings/timer/st,stm32-timer.yaml | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
 
-Running 'make dtbs_check' with the schema in this patch gives the
-following warnings. Consider if they are expected or the schema is
-incorrect. These may not be new warnings.
-
-Note that it is not yet a requirement to have 0 warnings for dtbs_check.
-This will change in the future.
-
-Full log is available here: https://patchwork.ozlabs.org/patch/1553369
-
-
-dma@12142000: $nodename:0: 'dma@12142000' does not match '^dma-controller(@.*)?$'
-	arch/arm/boot/dts/qcom-mdm9615-wp8548-mangoh-green.dt.yaml
-
-dma@12182000: $nodename:0: 'dma@12182000' does not match '^dma-controller(@.*)?$'
-	arch/arm/boot/dts/qcom-apq8064-asus-nexus7-flo.dt.yaml
-	arch/arm/boot/dts/qcom-apq8064-cm-qs600.dt.yaml
-	arch/arm/boot/dts/qcom-apq8064-ifc6410.dt.yaml
-	arch/arm/boot/dts/qcom-apq8064-sony-xperia-yuga.dt.yaml
-	arch/arm/boot/dts/qcom-ipq8064-ap148.dt.yaml
-	arch/arm/boot/dts/qcom-ipq8064-rb3011.dt.yaml
-	arch/arm/boot/dts/qcom-mdm9615-wp8548-mangoh-green.dt.yaml
-
-dma@121c2000: $nodename:0: 'dma@121c2000' does not match '^dma-controller(@.*)?$'
-	arch/arm/boot/dts/qcom-apq8064-asus-nexus7-flo.dt.yaml
-	arch/arm/boot/dts/qcom-apq8064-cm-qs600.dt.yaml
-	arch/arm/boot/dts/qcom-apq8064-ifc6410.dt.yaml
-	arch/arm/boot/dts/qcom-apq8064-sony-xperia-yuga.dt.yaml
-
-dma@12402000: $nodename:0: 'dma@12402000' does not match '^dma-controller(@.*)?$'
-	arch/arm/boot/dts/qcom-apq8064-asus-nexus7-flo.dt.yaml
-	arch/arm/boot/dts/qcom-apq8064-cm-qs600.dt.yaml
-	arch/arm/boot/dts/qcom-apq8064-ifc6410.dt.yaml
-	arch/arm/boot/dts/qcom-apq8064-sony-xperia-yuga.dt.yaml
-	arch/arm/boot/dts/qcom-ipq8064-ap148.dt.yaml
-	arch/arm/boot/dts/qcom-ipq8064-rb3011.dt.yaml
-
-dma@1dc4000: $nodename:0: 'dma@1dc4000' does not match '^dma-controller(@.*)?$'
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r1.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r2.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r3.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-db845c.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-mtp.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-oneplus-enchilada.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-oneplus-fajita.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-xiaomi-beryllium.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dt.yaml
-
-dma@1dc4000: 'iommus' does not match any of the regexes: 'pinctrl-[0-9]+'
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r1.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r2.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r3.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-db845c.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-mtp.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-oneplus-enchilada.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-oneplus-fajita.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-xiaomi-beryllium.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dt.yaml
-
-dma@1dc4000: qcom,controlled-remotely: 'oneOf' conditional failed, one must be fixed:
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r1.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r2.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r3.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-db845c.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-mtp.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-oneplus-enchilada.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-oneplus-fajita.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-xiaomi-beryllium.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dt.yaml
-
-dma@704000: $nodename:0: 'dma@704000' does not match '^dma-controller(@.*)?$'
-	arch/arm64/boot/dts/qcom/ipq8074-hk01.dt.yaml
-	arch/arm64/boot/dts/qcom/ipq8074-hk10-c1.dt.yaml
-	arch/arm64/boot/dts/qcom/ipq8074-hk10-c2.dt.yaml
-
-dma@704000: qcom,controlled-remotely: 'oneOf' conditional failed, one must be fixed:
-	arch/arm64/boot/dts/qcom/ipq8074-hk01.dt.yaml
-	arch/arm64/boot/dts/qcom/ipq8074-hk10-c1.dt.yaml
-	arch/arm64/boot/dts/qcom/ipq8074-hk10-c2.dt.yaml
-
-dma@7544000: $nodename:0: 'dma@7544000' does not match '^dma-controller(@.*)?$'
-	arch/arm64/boot/dts/qcom/apq8096-db820c.dt.yaml
-	arch/arm64/boot/dts/qcom/apq8096-ifc6640.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-mtp.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-pmi8996-sony-xperia-tone-dora.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-pmi8996-sony-xperia-tone-kagura.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-pmi8996-sony-xperia-tone-keyaki.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-sony-xperia-tone-dora.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-sony-xperia-tone-kagura.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-sony-xperia-tone-keyaki.dt.yaml
-
-dma@7584000: $nodename:0: 'dma@7584000' does not match '^dma-controller(@.*)?$'
-	arch/arm64/boot/dts/qcom/apq8096-db820c.dt.yaml
-	arch/arm64/boot/dts/qcom/apq8096-ifc6640.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-mtp.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-pmi8996-sony-xperia-tone-dora.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-pmi8996-sony-xperia-tone-kagura.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-pmi8996-sony-xperia-tone-keyaki.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-sony-xperia-tone-dora.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-sony-xperia-tone-kagura.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8996-sony-xperia-tone-keyaki.dt.yaml
-
-dma@7884000: $nodename:0: 'dma@7884000' does not match '^dma-controller(@.*)?$'
-	arch/arm/boot/dts/qcom-ipq4018-ap120c-ac-bit.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4018-ap120c-ac.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4018-jalapeno.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk01.1-c1.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk04.1-c1.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk04.1-c3.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk07.1-c1.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk07.1-c2.dt.yaml
-
-dma@7984000: $nodename:0: 'dma@7984000' does not match '^dma-controller(@.*)?$'
-	arch/arm/boot/dts/qcom-ipq4018-ap120c-ac-bit.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4018-ap120c-ac.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4018-jalapeno.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk01.1-c1.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk04.1-c1.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk04.1-c3.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk07.1-c1.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk07.1-c2.dt.yaml
-
-dma@8e04000: $nodename:0: 'dma@8e04000' does not match '^dma-controller(@.*)?$'
-	arch/arm/boot/dts/qcom-ipq4018-ap120c-ac-bit.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4018-ap120c-ac.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4018-jalapeno.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk01.1-c1.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk04.1-c1.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk04.1-c3.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk07.1-c1.dt.yaml
-	arch/arm/boot/dts/qcom-ipq4019-ap.dk07.1-c2.dt.yaml
-
-dma@c184000: $nodename:0: 'dma@c184000' does not match '^dma-controller(@.*)?$'
-	arch/arm64/boot/dts/qcom/msm8998-asus-novago-tp370ql.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8998-hp-envy-x2.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8998-lenovo-miix-630.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8998-mtp.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8998-oneplus-cheeseburger.dt.yaml
-	arch/arm64/boot/dts/qcom/msm8998-oneplus-dumpling.dt.yaml
-
-dma-controller@17184000: 'iommus' does not match any of the regexes: 'pinctrl-[0-9]+'
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r1.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r2.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-cheza-r3.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-db845c.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-mtp.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-oneplus-enchilada.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-oneplus-fajita.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm845-xiaomi-beryllium.dt.yaml
-	arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dt.yaml
-
-dma-controller@704000: 'qcom,config-pipe-trust-reg' does not match any of the regexes: 'pinctrl-[0-9]+'
-	arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
-
-dma-controller@704000: qcom,controlled-remotely: 'oneOf' conditional failed, one must be fixed:
-	arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
-
-dma-controller@7984000: clock-names:0: 'bam_clk' was expected
-	arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
-
-dma-controller@7984000: clock-names: Additional items are not allowed ('bam_clk' was unexpected)
-	arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
-
-dma-controller@7984000: clock-names: ['iface_clk', 'bam_clk'] is too long
-	arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
-
-dma-controller@7984000: clocks: [[9, 138], [9, 137]] is too long
-	arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
-
+Applied, thanks!
