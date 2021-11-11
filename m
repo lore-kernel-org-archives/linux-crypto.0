@@ -2,182 +2,160 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 388FCC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Nov 2021 14:10:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE052C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Nov 2021 16:46:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11D926112E
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Nov 2021 14:10:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C53861002
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Nov 2021 16:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232699AbhKKONd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Nov 2021 09:13:33 -0500
-Received: from mail-bn8nam12on2041.outbound.protection.outlook.com ([40.107.237.41]:47585
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        id S233994AbhKKQtR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 11 Nov 2021 11:49:17 -0500
+Received: from mail-am6eur05on2099.outbound.protection.outlook.com ([40.107.22.99]:38144
+        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232630AbhKKONc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Nov 2021 09:13:32 -0500
+        id S233966AbhKKQtR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Nov 2021 11:49:17 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FhzLP5v5q3Lo85/BSmXHV83SinahaWv3uwt1jr1sd6590tS4MDHYOMYB7i/G6b9U/RV6gmG3uGVOYc3AZwUFE6PWRT5yJtHbaaa4JmbKB84X7ZKaq1O1aPREinfw39ZnNHm3t2IMHsQ6vqhgL2HJgyH6XB3wOG9TLuPVfJBfYG/Y24zGahmQrGGNAPFbKGt9ahDQMEZjEhEnICpDvAdfYwGW7efvzZ0mipnErUu2e4VGzmxq8ZqsYfWF71CmQPeRt5Vm4LH9Zd4VWkPxXxArPhUzFn8LXFip/QLxzvchAiqpjcMsIM1T3Qo5HrZYizAF+cmVYVeuOi2HImEWetb+dQ==
+ b=F1Ke1HDB2sWPzucO0krFQRvCAE5UJF7xoJztpLjw4VABn8MK4S8qs9aCvGbVnxsmYZ0OMdgBehSyEtlYmRF1AWVcrFJ1dPkmBuWTE9SfDf8tm3QU6RVeo3t1u+6+gwml3C0AkObhzO0+spD0rNeTsQEUs+VuGBOb4oq/7T6JiM3+s6tP6yfaLz3dL/XXy98rkeP8rpFjRgl9uanNdGKytnJhxl+zJVMZKFbtYW48P9q36/7zlam01N/srRiVEkWiMVq4ILWafVnP3Z4GJHRNsq30mTfYDdRj9bY7xKVzpz1sm+aKfmEMLQ191Mr/cCggHY2uSkSKKSZEy0lK0FRiRw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HE+SsJxlPraSdv6EQMY2lEyd7A4e9V29lU4E5cgjHPs=;
- b=KtRglIWrHfpMVKncU0l4aL6KFot5dfJIXegN7OoufdbeTgGENeh9g9haYuluPsJehEeiKtawV//zcm2cXoUObtIYLHLV8mvJzo9jQU4e0Hd3NN/+borVQugksyY5R+SDWectjJr3085dbGVtvOYS5Cak4hiBu6E3KU5POqjpUICW8T5UQ08R1XL3f7lIiy410sdQtVnrenFRrtlIxIodfcUAd6n8ni8fIpGr7IMNhZhN6be5WIWaeG9p7HH4WRGmP7eYbScMHnvOenZ3IQKHGJMFc40aEPdJU0x5kJBnhBKxn4V1cZxnwgyrgUQIaAB9nB+vdAtkY29o/sW/AIBxBg==
+ bh=Zerkbcep/Q5PY9vBjI53Yl6Sqd93m76agKMYCiUSVbw=;
+ b=GSfce+k/bVCC/Tnm3EDmeMdmqOmuEsbB9JvxOI6NYIszw/u8NKYQoTtnIIVVgTsNh27QPpPPqBqs8g7C/xqvR4+S/KgajhjVVjQGNctUcZ8Zs1TTiGUDzrZ5BmYUfLCTLjp/rdiKCmZcb502r68Ifst2iE7hGYIFlypWfMTXqEIjC+OvJyq6gJXjfUL5lLkBfM1dxfTbBc51v/qJvmB7vtmh9HXBzwj045jyc2HcWImiDumXMCk9whMGTbbwUlUN8ItxgTjHSzsDSymwOPwGl/Iy790ujZS52Z16wIM+6LdlWpl/q+dryzjrz2jfMldG9QHwzQJW0NRxxSjh7wk3KQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=leica-geosystems.com; dmarc=pass action=none
+ header.from=leica-geosystems.com; dkim=pass header.d=leica-geosystems.com;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HE+SsJxlPraSdv6EQMY2lEyd7A4e9V29lU4E5cgjHPs=;
- b=qmfleEmPnGBxDU5xXhxau3gIDyfCsUl4d20j4vE9ESrRj8eAPM1XsJ6Q246zjpobUqUvFfhke32cOhniwAEtjTmcHLIxerVdFsNf3zpL/bMozgWp8yvwVFH9Lbof/4Xhyk44M3k0UCkiM+fJ0jLNXcvPD29UWzk0D9pNzaGApdE=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM8PR12MB5479.namprd12.prod.outlook.com (2603:10b6:8:38::18) with
+ bh=Zerkbcep/Q5PY9vBjI53Yl6Sqd93m76agKMYCiUSVbw=;
+ b=SgoiH0yiVS2sEoJW3xHGBGTubPQiMyv3e11YmdIQgaekGMCgJJjmssHwiRbXujjKQ1Tsiqj9oMGGb5AuanL8/jQVxsIuV75Pjuhbk80f4hLuEoiE6ich1FV6pQT3oGRP8f8xiHzIDT9JPH3FOwEi6u7DV1V2FPjCQ+LnjFvvw5w=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=leica-geosystems.com;
+Received: from VI1PR06MB3102.eurprd06.prod.outlook.com (2603:10a6:802:c::17)
+ by VI1PR0601MB2430.eurprd06.prod.outlook.com (2603:10a6:801:7::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.11; Thu, 11 Nov
- 2021 14:10:39 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::a87d:568d:994f:c5f9]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::a87d:568d:994f:c5f9%9]) with mapi id 15.20.4690.020; Thu, 11 Nov 2021
- 14:10:39 +0000
-Subject: Re: [PATCH V3 1/4] crypto: ccp - Fix SEV_INIT error logging on init
-To:     Peter Gonda <pgonda@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        John Allen <john.allen@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.15; Thu, 11 Nov
+ 2021 16:46:25 +0000
+Received: from VI1PR06MB3102.eurprd06.prod.outlook.com
+ ([fe80::5420:b387:e6b8:9e22]) by VI1PR06MB3102.eurprd06.prod.outlook.com
+ ([fe80::5420:b387:e6b8:9e22%4]) with mapi id 15.20.4669.016; Thu, 11 Nov 2021
+ 16:46:24 +0000
+From:   Andrey Zhizhikin <andrey.zhizhikin@leica-geosystems.com>
+To:     horia.geanta@nxp.com, pankaj.gupta@nxp.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        iuliana.prodan@nxp.com, michael@walle.cc,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20211102142331.3753798-1-pgonda@google.com>
- <20211102142331.3753798-2-pgonda@google.com> <YYqhT+Enba5xa4cO@google.com>
- <CAMkAt6oVySH-1g+EXKvxQ9vmBV8rwTLq=qfe2+VZC+c6vATL7w@mail.gmail.com>
- <45af7051-aab0-2b19-2904-64eceec93df5@amd.com>
- <CAMkAt6pivYG=nV_EhP9Uj2gB8kBQB4dAnTcSeGd9249KuWzsyg@mail.gmail.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <a6823579-c4af-6506-ba13-d6391b42d4ec@amd.com>
-Date:   Thu, 11 Nov 2021 08:10:36 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <CAMkAt6pivYG=nV_EhP9Uj2gB8kBQB4dAnTcSeGd9249KuWzsyg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0201CA0044.namprd02.prod.outlook.com
- (2603:10b6:803:2e::30) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+Cc:     Andrey Zhizhikin <andrey.zhizhikin@leica-geosystems.com>
+Subject: [PATCH v2 0/2] CAAM Driver: re-factor and dynamic JR availability check
+Date:   Thu, 11 Nov 2021 17:45:59 +0100
+Message-Id: <20211111164601.13135-1-andrey.zhizhikin@leica-geosystems.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20211104162114.2019509-1-andrey.zhizhikin@leica-geosystems.com>
+References: <20211104162114.2019509-1-andrey.zhizhikin@leica-geosystems.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ZR0P278CA0166.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:45::13) To VI1PR06MB3102.eurprd06.prod.outlook.com
+ (2603:10a6:802:c::17)
 MIME-Version: 1.0
-Received: from office-ryzen.texastahm.com (67.79.209.213) by SN4PR0201CA0044.namprd02.prod.outlook.com (2603:10b6:803:2e::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.15 via Frontend Transport; Thu, 11 Nov 2021 14:10:38 +0000
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from GEO-HfyyrYQLnZo.lgs-net.com (193.8.40.112) by ZR0P278CA0166.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:45::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.16 via Frontend Transport; Thu, 11 Nov 2021 16:46:24 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1f63cdfe-5e7b-4966-4e58-08d9a51d09fe
-X-MS-TrafficTypeDiagnostic: DM8PR12MB5479:
-X-Microsoft-Antispam-PRVS: <DM8PR12MB547998A65B50664D3DA025DFEC949@DM8PR12MB5479.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: ff1e7688-ffc4-4a38-2355-08d9a532cc6a
+X-MS-TrafficTypeDiagnostic: VI1PR0601MB2430:
+X-Microsoft-Antispam-PRVS: <VI1PR0601MB24304EEF00F121275BEF374BA6949@VI1PR0601MB2430.eurprd06.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sjHxGUzxgS7Ng78x+wp1iJ5CwlZxUBq1Z91SHjD49IlIEO22G1v45CFISzQ7F3DmyZJ9Or2NYUAH+jY0WSgWdJWtbB/jB+uIGLCy01ycSJ/P0+jzCdqKCk1uEXfQaeEntHtWxKui1OE8/TuoXITLzE3VN++f40kADjh7NssL5uDC2aW95Y4vuIMbAcOH5L7PAVOr9/52PtI828aFfwGB0/UqM/Igzd6veq6zid597mPIpKhUr8DR3bD7j8e57VqqyaZDCoWjxQdBWZ1RaX/1YyrHEPjbdTOsq9xt2jJXtzLDOVxaGLLcKzxIK8+QhE2993jz4cPg6tCLDPNOA/dMldsS7PQmOQOdxfAd+tTCVnTg5Gn8hR63msPkDKykZtnKRJmzgobLjHQdRfAEMbMPzmUoxZ3V1jP/FBMtHh22dAvaC6U8O0KMA8reCmTk2alwQOqNlXN+m9PaCDixuZKWdik3qd2lKtlfymxXv/OKLEVdLM/4AG3hW3DBlYtYZLbN7Ghwy+A4VDaB+IUILc/d2nwFShVYmkXV87zwNoIHDT0d2VSMueO2Q3X3cH8PsO9Juef85VOs7HLNphqqOQX+SoHpMckUWoyu1wh/onLRhqNUQMPaxEH0qg3UGlw1V9NSS3TNWtoDpSkWe1zVCV6Yx5km2r3LHpxKKIDa0n4fPCb9+fRt1RW0FH/+zYjMt1WUukFPY8IgXGAuWNih+NhmGq2ZqRnxIWxJpoFqHKtqZ678vhcIdk4rSYCDWVmUqdec
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7416002)(2616005)(8936002)(4326008)(66946007)(36756003)(508600001)(8676002)(6486002)(38100700002)(66556008)(66476007)(186003)(31696002)(316002)(6506007)(956004)(26005)(6512007)(2906002)(53546011)(54906003)(6916009)(86362001)(83380400001)(31686004)(5660300002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: pgbBsJNd2tjv1TwbAelJ0Ge1XQTiryOGcR5fv0GCh04L3P3exxjM9FbxU0VdtlmH7n1YsyBuWUy0IgcF90xRGB5fVxWP+2tGy/5QylAv7xS5PyO3RiT2MSQ5yWyHFanh0E2jEX6CQYW66ln/THwONAeQDlwkggvvNh3/bi0eB8FWcVAO2JE+1h7UqJzAyo/ObC4Y55lqhajdWvyPVFFCOtyGyYbf9APk7cAcFvyUpCoGkV15/YhiuPj14rqA9/XOpALrUuYlxiVJygJWLGlMFNGVPLZ9xvnQ1tpLmwKSv7AY8PQLDy3I416T/fC6N8vEW5PcgaXh6HAVn+mq6HF1ZeeG1hd4WahHUt5fIsaiF31hsbxYfExh21GO+AF89kgMXTiKPa+d3yjwIrdPVYhTl4XNJOR3wMXoYZsJdHi9ynPBgsmdZYdw9EfXZFqajd628vUgLC/jGPxXImipQdnsQ0h++X/JqceGjA1oeyr+oOAocd+v6k1jCSk7MyhwsdX/I7067at9UxVsnnKBc64dbeBNiWxb0izZnTlF7bs/IscVK6Qh7Mm3yFEjTfha9gR37I+wUTZHE4nra9p4ZA2KqqXiHkTJUJse+5C9TX2SkEHghZ4Z9nn9b6xX7//PXafyZ09eGanimWGOjlo8to6oNF6bUIA5MW4t8bXtIqqoYkDvM0auh+CWG3xQWFB2DFhmYLr5yH3KdJp9ZfTIfnae1pt45wXOX/h4i6bnLMvJR4z6DqIPgJKb+N4BmZwAsMCsw6bPn4HpJf/ws7H/ut94kSKd+svdwTWUqRCxFjoIZoY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR06MB3102.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66946007)(2906002)(8676002)(66556008)(66476007)(6486002)(508600001)(966005)(44832011)(6666004)(2616005)(956004)(8936002)(4326008)(6512007)(52116002)(83380400001)(316002)(6506007)(5660300002)(26005)(86362001)(36756003)(38100700002)(38350700002)(107886003)(186003)(1076003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cENMcHIwenp0MFdMNnozZ1RBdkFIS25mbVFMbzlUVnd0QllJNzBUdGRuWmpj?=
- =?utf-8?B?UGRrRHlTeU9iTnYyL0RtamZ1T2R2YklIVEpZNUxLaHJ2WW8vQjA5KzVnSFly?=
- =?utf-8?B?RjdOUGdtbmkyUkFlUDE0RlFlbHVYSzdWRUl2UU52ZFlhRURoTlg5Nk9qdEts?=
- =?utf-8?B?MnkrcUJIV2hzSUFVdjhHeWlBWlVhZEtqTHIvN2xVdUdjbjhucXVXQnZsMDE2?=
- =?utf-8?B?TGVWK0Y0WDhsRjVjRVgwaTV2cmlacjlSSFpseklMQzNWb1BYcHpGMHd6U3dR?=
- =?utf-8?B?MHk0WllkQzdTWjJiV1FTOTJsRUF3dmpFQU1HMWxpbXhsZkllWmFZMzkxY3Yw?=
- =?utf-8?B?WU1saVpjUDI4ajk4U2FUMHErbnAxN1NWQnZqM3dzRmFMRFltVEtHU3pYQXFT?=
- =?utf-8?B?SytpWHVFZmJyS1lwVzFFL2JzZWc1a3FwL2FZTEtoNzI5WU54WUlPYzlvZSt1?=
- =?utf-8?B?WjV6Mk43c3BKSDFZVDczcEdoUHZ0UVhmbUhwNjluY3NMeDFOY3hMbTJCeUJB?=
- =?utf-8?B?ZTM1aGVIS0cyOXlHMmVRcUhoa1VaZmlieGR3RjZBbDU3eUxqNTFLbzJ6Slpa?=
- =?utf-8?B?dnZZY2RQSzVnVmwxdTFXSkFUQkhoS2l0a2hiaW9pNmVjaGZHdDM0U3JTRi9o?=
- =?utf-8?B?MnBBRkFpUGZKcVFXaDJHRDAzazU5MVd1Q0FhcVNNa0VUd1h3U0RvdXlhV0Qz?=
- =?utf-8?B?ZHBXb0FLb2FhQlBqUHhLMHh6ZGlwRk1WN1VVUHIzU2NsZkxpZ1FMSE16dTgr?=
- =?utf-8?B?R0VEa05HTjBXQnZoV1JPY2xxTy9aMk5HV2VSRGNjOGZoSklka3BzMWUwakVx?=
- =?utf-8?B?VVVNN0pWK09WNlgzUm5TSFhrYVBDaFhuTlFKZ2ZoS0xMdDNpVG45eEVJZW9t?=
- =?utf-8?B?ZTRxdXRTcVZ0TnR6dWVweWp3WkVQTHJrK3ByM0s4bW9iOWlibFYwSnVoeXZh?=
- =?utf-8?B?a1FxcVpnZFphcUk5WGpRaytXUXFqOTl5SE5jVkxIbnM5YTJTYW8zWmVyNGNi?=
- =?utf-8?B?NDdKM0c3ZlpoN3dFam9XcXowWWtLY0lTUU9ZNnkvSnBwZW56VFdOaXd4U2R5?=
- =?utf-8?B?TDE0b0Ywak1uT3BDYUgyRTBxdE9yeUZoQ1dMd1JXcTBkUVNIYTlkY0FJY2pW?=
- =?utf-8?B?TFNuSW1KMERyVHltVlgxU2VmUGVKM0UxY0tvZ0R5eC83bWV6WE9MRmg2a0JK?=
- =?utf-8?B?M0duOStVMWRJZ0FNVDJPWmtPc015UGh6L2R1UDFIbklYNDZOeUZrUVhiaWw5?=
- =?utf-8?B?N3plRXlBRXQzbDZPYkRIMU1ROUZkM2ZETlY4UGE1YTdUNjhiUy9mOFdOellG?=
- =?utf-8?B?UjlyZ25hQ3dhOTdTc2Z5bjA4YjZOQ2FaZkJTM3NndU9KanU2S2dCUUVwTDlM?=
- =?utf-8?B?cnRQQ1AwV3AwMXRXTEZXN3M3ekRHaC9oQ1hLTERLa2RpeTd6SUtFNG1iZkVy?=
- =?utf-8?B?eFdhV1NHSndyS1RlTk5UaVRhU2JSUG9yNVN3SlpvZDV6UThWMkY1WllLY3Ru?=
- =?utf-8?B?bitXVEl6ZXhGMWFTWTJjS1ZZSUd0RlR1QU5UTis4eGY5aFU0SjNoMzYvMi9O?=
- =?utf-8?B?Vko2K1RlbThrSmFZS2lIQ0Zya01uckZkSmFRQU8rSFhkYWpwblJPVng0WldK?=
- =?utf-8?B?ZGdHYmZ3OWMrQWk3a24xMEFrUjVuWXo1ZmsyZ1N6S05OTThBUmZQTkFSb3p0?=
- =?utf-8?B?Y2VnVS94OUZpQ0dGSHNtME9IaU5UWllPTTBzTUo1Vjh5SjNIamZyT0pCdzlZ?=
- =?utf-8?B?NGlzSi9oZUhaVGZQd2hZcnNENmlOYXNqdnJqWXRRQzNEeFB5UEJ1STFUR0Nh?=
- =?utf-8?B?K3RHNzFSR0JRUGJONU9xVUpFV050K2g4M3NwdUx2SEpVdFh0dmwrb0hUbTNS?=
- =?utf-8?B?ZzZwQjN4MkYxSGowTm1IaDlXclZlelJNRXpJYytpWkFIc1dITVd5akN3RzJM?=
- =?utf-8?B?a1RzQVZuYjBURDNCTEZOZnZTRm1QeGtQK05iaGFyU0hEcjdiaUFJSkxFazZq?=
- =?utf-8?B?VlhXdUcwNndYN1dLMy9kR1dLMlA1T3RaaEF5OGtUcVJqaG1ydzlWYU9LNk5B?=
- =?utf-8?B?R29HVnBTOGtSbXZnblpZcjUwMzVZK3NudXFpVzJwd3VKM0lUR1h0NXBqQ0t6?=
- =?utf-8?B?dEVWOGZVS2tKL0ZSMFNab0s2cjFXQ2pXK0NGaCtjbHEzUTFzU0FFejVFSXFJ?=
- =?utf-8?Q?2huj+C8BEEW3ngOvX8d8bvo=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1f63cdfe-5e7b-4966-4e58-08d9a51d09fe
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?o2VeYqRszAJMY/F3UmYWzXm3sjFMAYFvTe1Fkko+oNwc03wjeg1JU+D9qvLS?=
+ =?us-ascii?Q?PTZpAaZ2vjPaX5P+WoCFAZaTHx4MCLvpwImUkURO0V29bPyjK7czgI1nJBy2?=
+ =?us-ascii?Q?+vb2UKKXb7ZuheWQ0E5QGsd6Ec3ZTlFLE++Ltd0z3Llz+xnKSiEhqVM2zpP0?=
+ =?us-ascii?Q?6TeelOJ9390nXGAjFme+Y6YyxhxBVVVwKTS0YRt5o5M4xuoQ0T5LHvoMk8Dj?=
+ =?us-ascii?Q?UA/NSLJC6NA9lyBwPvtZd0Wf82eYhMCV681uWRTZvpOzHcaXJ0N7TWtdMJFk?=
+ =?us-ascii?Q?GaBrzvtobAbs5IrjRlsU3CJX8ZBLUmc8ovScyAVCrJOaM1jTG/8ZhCUWVjdM?=
+ =?us-ascii?Q?2YGAy30b7edKSY7Ga8JUYUffqBF1I2Iu+OXLVq2YE8arGSghtTpo9LnqnTbh?=
+ =?us-ascii?Q?RZNv90L5gJH37d+go/Jx5mAhhXkCzskwj5IYWvW9voow2rSMwS+mSlaL4Nea?=
+ =?us-ascii?Q?FHXljQOqu+CVvJqOusQpYnYx+t6rMlJKs8cys+NkD7sqq4R4HWnw4xtI/lMa?=
+ =?us-ascii?Q?udfHlqHMZMGRjZyhUX/F/BoDfFq0IwzdAMaBv5aMU6HY+pqHA42EyV5CWvlb?=
+ =?us-ascii?Q?6q1sK0Q9ArdeELSAH1D2rViSPBKd+yJbgDSt09w6ZuoAVRuw6zUDb6rRHFlq?=
+ =?us-ascii?Q?KS6U9X9CxQi2ggr8FmLzGV7f6S/glIrOpoUm56PwFsHqatnf+EOP2geoxqE2?=
+ =?us-ascii?Q?a9Oeyjrafx9dzorq96HkTnCCEhuVC1shlifhVjRARUmJio4jbXvV2ZF0NlZs?=
+ =?us-ascii?Q?Qv/8DFI/bEzj/3XXfd69OJF+BAP0m4+a4qfY1+/5UjnEpWZp56ct+Pv8tu/u?=
+ =?us-ascii?Q?9pB7ecjuvDL6MVmY7vM/tW/K6gjWnvQJVeAohCj+wOVyRhNxwhN/hNaOPlV6?=
+ =?us-ascii?Q?nk89sHY2oQ+sMWwHCYPtG3bBLT61SfnkO69eyP4+OGqeddcQdeeeHJO8488O?=
+ =?us-ascii?Q?45NyMHhKHpRSpbzFbL1WPROI5z6YLTXiybHSv3BLcKOCFkGLxtXkPnDUN6cS?=
+ =?us-ascii?Q?XWIEMiCE86qfKGuUzgXhYnnnJWY1n0ymFVpgul0DzteyzIi9yH0hbuZm7K8+?=
+ =?us-ascii?Q?KG2sPfLM9RseuwkFG0AXxdnzUWMkCWSq0Z9KLWrmrjbGfy2blQ1ojpDGjx4f?=
+ =?us-ascii?Q?RnTX/qmEaNMnRIfH18MdUf3T3lcGSKs4xVlpFyiMKG8RlldioUuLYuz/c3kL?=
+ =?us-ascii?Q?EpeGhEH1ihoLy0DfmGxLh0oPOrd5mp4wA389YjhUfI8QxfF5AjxIaGe/u9+B?=
+ =?us-ascii?Q?PEwkqaxIG91bLdbfER2eP/NNeBSaHyQhH+TZo9sXVWAko10abj0x87nmYLUV?=
+ =?us-ascii?Q?lZPu4I+RFCA27ryeNIqIKw5J7Bl+9MeTFXBBcQUA3rf9lOaA9Vyvv60kEOGW?=
+ =?us-ascii?Q?6q6AMU62tzzhF1JHyN5l6BtJlp+vUeS+Xq4/G0Kku+zaK0pfdQkqGy3vt/zb?=
+ =?us-ascii?Q?jpksxfj/aS2gW5Dtw9z3jKGDl6yEuLEIUM0Mo+brDLXlwZT6K66n5llQOGTY?=
+ =?us-ascii?Q?ULuuL7h2N9tDQCnCFBFbYSpCkSIMyn5NXA18VqwCOpJo8rSf/8Gp6YSg3CD7?=
+ =?us-ascii?Q?2nvhh5YXYZ87DwW337wG0MeAKam/4Rih8+/SF+gHziwfJWfbVTQDcTSmSeCc?=
+ =?us-ascii?Q?mu6zuUQEW7TwcFHEkFA7bgXcw/TE3tlG+29bX2Bfm9eyJaWN80VAJCvnSJG8?=
+ =?us-ascii?Q?ZPQT5jVsUuCth/FrEzwb7Mb5jF8=3D?=
+X-OriginatorOrg: leica-geosystems.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff1e7688-ffc4-4a38-2355-08d9a532cc6a
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR06MB3102.eurprd06.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2021 14:10:39.1713
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2021 16:46:24.8390
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zuWEwq4dQFxDNt8h9Gc/unMOrqVpjDMftk0TMcSNIcarM7TS9AqrmERezRfI79bCsQtgx8QtwSfnptageDqLVg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5479
+X-MS-Exchange-CrossTenant-UserPrincipalName: LqcWn84z+23e5RhLBGGwOYMtzzQx0dqGFgt/9E8EMj7qDVxpc0LNUuEOpKG7YQi0be+Z53C2/t7jor17iYg7OaFfMVNthihKbrIqcjaxpVs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0601MB2430
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/10/21 11:29 AM, Peter Gonda wrote:
-> On Tue, Nov 9, 2021 at 12:25 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->> On 11/9/21 10:46 AM, Peter Gonda wrote:
->>> On Tue, Nov 9, 2021 at 9:27 AM Sean Christopherson <seanjc@google.com> wrote:
->>>> On Tue, Nov 02, 2021, Peter Gonda wrote:
->>
+This patchset is a follow-up work, which was originated with patch [1].
 
-...
+During the review of originally proposed solution, it has been
+discovered that a certain level of clean-up and re-factoring would be
+needed for CAAM Driver to remove static variables in JR probing
+functions, and some bits of CAAM driver code that is used for debug
+output purposes only.
 
->>
->> That's one of those things we've wanted to get around to improving but
->> just haven't had the time. So, yes, if you wish to refactor the 'error'
->> related area, that would be great.
-> 
-> OK so when I actually sat down to work on this. I realized this is
-> bigger than I thought. If we want to have error == -1 for all return
-> from psp-sev.h functions where the PSP isn't called yet there are a
-> lot of changes. For example if CONFIG_CRYPTO_DEV_SP_PSP is not defined
-> all these stubs need to be to set `*errror == -`, basically all these
-> functions need to be updated.
-> 
-> So to keep this series more targeted. I think I'll drop the error
-> here. And just have this patch print the rc value. If what I said
+New solution is proposed in this series, and provides following
+enhancements to the CAAM Driver infrastructure:
+- CAAM Driver uses new bitmap to indicate capabilities, which has been
+  previously accomplished by various assorted variables in
+  caam_ctrl_priv structure
+- JR node parsing is made independent from the order of appearance in
+  the DTB, indexing is now based on the address provided by the "reg"
+  property
+- CAAM Driver checks the presence on JR nodes in DTB, and matches the
+  access to JR HW units in its internal registers. If the JR HW unit is
+  marked to be used by TrustZone - it would be marked appropriate and
+  further probing of JR device would be stopped at the very early stage.
 
-In that case, I think you should keep the error value and initialize it to 
-0. That is consistent with the other paths. Then, if you take on the 
-fixups, it can be changed then.
+Changelog with respect to original patch [1] is recorded in the updated
+version of the patch, which is included in this series.
 
-> above seems reasonable I'll do those error refactors. Are people
-> envisioning something else for the error fixups?
+Link: [1]: https://lore.kernel.org/lkml/20211104162114.2019509-1-andrey.zhizhikin@leica-geosystems.com/
 
-The main refactoring I wanted was to make sure the caller didn't have to 
-initialize the error variable. Whether to initialize it to 0 or -1 wasn't 
-part of my original thoughts. But I do like the -1 value because, 
-theoretically, we shouldn't get such a value back from the PSP. So if the 
-value printed is not -1, that is an indication that the PSP API was called 
-no matter the value of rc.
+Andrey Zhizhikin (2):
+  crypto: caam - convert to use capabilities
+  crypto: caam - check jr permissions before probing
 
-Thanks,
-Tom
+ drivers/crypto/caam/caamalg_qi.c |   2 +-
+ drivers/crypto/caam/ctrl.c       | 110 ++++++++++++++++++++++---------
+ drivers/crypto/caam/intern.h     |  18 ++---
+ drivers/crypto/caam/jr.c         |  33 ++++++++--
+ drivers/crypto/caam/regs.h       |   9 ++-
+ 5 files changed, 122 insertions(+), 50 deletions(-)
 
-> 
->>
->> Thanks,
->> Tom
->>
->>>
+
+base-commit: ad8be4fa6e8149ba6ea21fdf0089e8254437b3c8
+-- 
+2.25.1
+
