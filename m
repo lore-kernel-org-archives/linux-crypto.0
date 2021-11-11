@@ -2,182 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0D1C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 20:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 388FCC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Nov 2021 14:10:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3C8F61213
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Nov 2021 20:53:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11D926112E
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Nov 2021 14:10:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233166AbhKJUz4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Nov 2021 15:55:56 -0500
-Received: from mga09.intel.com ([134.134.136.24]:55820 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233167AbhKJUzu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Nov 2021 15:55:50 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10164"; a="232611495"
-X-IronPort-AV: E=Sophos;i="5.87,224,1631602800"; 
-   d="scan'208";a="232611495"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2021 12:53:01 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,224,1631602800"; 
-   d="scan'208";a="642663531"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by fmsmga001.fm.intel.com with ESMTP; 10 Nov 2021 12:53:00 -0800
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        marco.chiappero@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH 24/24] crypto: qat - improve logging of PFVF messages
-Date:   Wed, 10 Nov 2021 20:52:17 +0000
-Message-Id: <20211110205217.99903-25-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211110205217.99903-1-giovanni.cabiddu@intel.com>
-References: <20211110205217.99903-1-giovanni.cabiddu@intel.com>
+        id S232699AbhKKONd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 11 Nov 2021 09:13:33 -0500
+Received: from mail-bn8nam12on2041.outbound.protection.outlook.com ([40.107.237.41]:47585
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232630AbhKKONc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Nov 2021 09:13:32 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FhzLP5v5q3Lo85/BSmXHV83SinahaWv3uwt1jr1sd6590tS4MDHYOMYB7i/G6b9U/RV6gmG3uGVOYc3AZwUFE6PWRT5yJtHbaaa4JmbKB84X7ZKaq1O1aPREinfw39ZnNHm3t2IMHsQ6vqhgL2HJgyH6XB3wOG9TLuPVfJBfYG/Y24zGahmQrGGNAPFbKGt9ahDQMEZjEhEnICpDvAdfYwGW7efvzZ0mipnErUu2e4VGzmxq8ZqsYfWF71CmQPeRt5Vm4LH9Zd4VWkPxXxArPhUzFn8LXFip/QLxzvchAiqpjcMsIM1T3Qo5HrZYizAF+cmVYVeuOi2HImEWetb+dQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HE+SsJxlPraSdv6EQMY2lEyd7A4e9V29lU4E5cgjHPs=;
+ b=KtRglIWrHfpMVKncU0l4aL6KFot5dfJIXegN7OoufdbeTgGENeh9g9haYuluPsJehEeiKtawV//zcm2cXoUObtIYLHLV8mvJzo9jQU4e0Hd3NN/+borVQugksyY5R+SDWectjJr3085dbGVtvOYS5Cak4hiBu6E3KU5POqjpUICW8T5UQ08R1XL3f7lIiy410sdQtVnrenFRrtlIxIodfcUAd6n8ni8fIpGr7IMNhZhN6be5WIWaeG9p7HH4WRGmP7eYbScMHnvOenZ3IQKHGJMFc40aEPdJU0x5kJBnhBKxn4V1cZxnwgyrgUQIaAB9nB+vdAtkY29o/sW/AIBxBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HE+SsJxlPraSdv6EQMY2lEyd7A4e9V29lU4E5cgjHPs=;
+ b=qmfleEmPnGBxDU5xXhxau3gIDyfCsUl4d20j4vE9ESrRj8eAPM1XsJ6Q246zjpobUqUvFfhke32cOhniwAEtjTmcHLIxerVdFsNf3zpL/bMozgWp8yvwVFH9Lbof/4Xhyk44M3k0UCkiM+fJ0jLNXcvPD29UWzk0D9pNzaGApdE=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DM8PR12MB5479.namprd12.prod.outlook.com (2603:10b6:8:38::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.11; Thu, 11 Nov
+ 2021 14:10:39 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::a87d:568d:994f:c5f9]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::a87d:568d:994f:c5f9%9]) with mapi id 15.20.4690.020; Thu, 11 Nov 2021
+ 14:10:39 +0000
+Subject: Re: [PATCH V3 1/4] crypto: ccp - Fix SEV_INIT error logging on init
+To:     Peter Gonda <pgonda@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        John Allen <john.allen@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20211102142331.3753798-1-pgonda@google.com>
+ <20211102142331.3753798-2-pgonda@google.com> <YYqhT+Enba5xa4cO@google.com>
+ <CAMkAt6oVySH-1g+EXKvxQ9vmBV8rwTLq=qfe2+VZC+c6vATL7w@mail.gmail.com>
+ <45af7051-aab0-2b19-2904-64eceec93df5@amd.com>
+ <CAMkAt6pivYG=nV_EhP9Uj2gB8kBQB4dAnTcSeGd9249KuWzsyg@mail.gmail.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <a6823579-c4af-6506-ba13-d6391b42d4ec@amd.com>
+Date:   Thu, 11 Nov 2021 08:10:36 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <CAMkAt6pivYG=nV_EhP9Uj2gB8kBQB4dAnTcSeGd9249KuWzsyg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0201CA0044.namprd02.prod.outlook.com
+ (2603:10b6:803:2e::30) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+Received: from office-ryzen.texastahm.com (67.79.209.213) by SN4PR0201CA0044.namprd02.prod.outlook.com (2603:10b6:803:2e::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.15 via Frontend Transport; Thu, 11 Nov 2021 14:10:38 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1f63cdfe-5e7b-4966-4e58-08d9a51d09fe
+X-MS-TrafficTypeDiagnostic: DM8PR12MB5479:
+X-Microsoft-Antispam-PRVS: <DM8PR12MB547998A65B50664D3DA025DFEC949@DM8PR12MB5479.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: sjHxGUzxgS7Ng78x+wp1iJ5CwlZxUBq1Z91SHjD49IlIEO22G1v45CFISzQ7F3DmyZJ9Or2NYUAH+jY0WSgWdJWtbB/jB+uIGLCy01ycSJ/P0+jzCdqKCk1uEXfQaeEntHtWxKui1OE8/TuoXITLzE3VN++f40kADjh7NssL5uDC2aW95Y4vuIMbAcOH5L7PAVOr9/52PtI828aFfwGB0/UqM/Igzd6veq6zid597mPIpKhUr8DR3bD7j8e57VqqyaZDCoWjxQdBWZ1RaX/1YyrHEPjbdTOsq9xt2jJXtzLDOVxaGLLcKzxIK8+QhE2993jz4cPg6tCLDPNOA/dMldsS7PQmOQOdxfAd+tTCVnTg5Gn8hR63msPkDKykZtnKRJmzgobLjHQdRfAEMbMPzmUoxZ3V1jP/FBMtHh22dAvaC6U8O0KMA8reCmTk2alwQOqNlXN+m9PaCDixuZKWdik3qd2lKtlfymxXv/OKLEVdLM/4AG3hW3DBlYtYZLbN7Ghwy+A4VDaB+IUILc/d2nwFShVYmkXV87zwNoIHDT0d2VSMueO2Q3X3cH8PsO9Juef85VOs7HLNphqqOQX+SoHpMckUWoyu1wh/onLRhqNUQMPaxEH0qg3UGlw1V9NSS3TNWtoDpSkWe1zVCV6Yx5km2r3LHpxKKIDa0n4fPCb9+fRt1RW0FH/+zYjMt1WUukFPY8IgXGAuWNih+NhmGq2ZqRnxIWxJpoFqHKtqZ678vhcIdk4rSYCDWVmUqdec
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7416002)(2616005)(8936002)(4326008)(66946007)(36756003)(508600001)(8676002)(6486002)(38100700002)(66556008)(66476007)(186003)(31696002)(316002)(6506007)(956004)(26005)(6512007)(2906002)(53546011)(54906003)(6916009)(86362001)(83380400001)(31686004)(5660300002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cENMcHIwenp0MFdMNnozZ1RBdkFIS25mbVFMbzlUVnd0QllJNzBUdGRuWmpj?=
+ =?utf-8?B?UGRrRHlTeU9iTnYyL0RtamZ1T2R2YklIVEpZNUxLaHJ2WW8vQjA5KzVnSFly?=
+ =?utf-8?B?RjdOUGdtbmkyUkFlUDE0RlFlbHVYSzdWRUl2UU52ZFlhRURoTlg5Nk9qdEts?=
+ =?utf-8?B?MnkrcUJIV2hzSUFVdjhHeWlBWlVhZEtqTHIvN2xVdUdjbjhucXVXQnZsMDE2?=
+ =?utf-8?B?TGVWK0Y0WDhsRjVjRVgwaTV2cmlacjlSSFpseklMQzNWb1BYcHpGMHd6U3dR?=
+ =?utf-8?B?MHk0WllkQzdTWjJiV1FTOTJsRUF3dmpFQU1HMWxpbXhsZkllWmFZMzkxY3Yw?=
+ =?utf-8?B?WU1saVpjUDI4ajk4U2FUMHErbnAxN1NWQnZqM3dzRmFMRFltVEtHU3pYQXFT?=
+ =?utf-8?B?SytpWHVFZmJyS1lwVzFFL2JzZWc1a3FwL2FZTEtoNzI5WU54WUlPYzlvZSt1?=
+ =?utf-8?B?WjV6Mk43c3BKSDFZVDczcEdoUHZ0UVhmbUhwNjluY3NMeDFOY3hMbTJCeUJB?=
+ =?utf-8?B?ZTM1aGVIS0cyOXlHMmVRcUhoa1VaZmlieGR3RjZBbDU3eUxqNTFLbzJ6Slpa?=
+ =?utf-8?B?dnZZY2RQSzVnVmwxdTFXSkFUQkhoS2l0a2hiaW9pNmVjaGZHdDM0U3JTRi9o?=
+ =?utf-8?B?MnBBRkFpUGZKcVFXaDJHRDAzazU5MVd1Q0FhcVNNa0VUd1h3U0RvdXlhV0Qz?=
+ =?utf-8?B?ZHBXb0FLb2FhQlBqUHhLMHh6ZGlwRk1WN1VVUHIzU2NsZkxpZ1FMSE16dTgr?=
+ =?utf-8?B?R0VEa05HTjBXQnZoV1JPY2xxTy9aMk5HV2VSRGNjOGZoSklka3BzMWUwakVx?=
+ =?utf-8?B?VVVNN0pWK09WNlgzUm5TSFhrYVBDaFhuTlFKZ2ZoS0xMdDNpVG45eEVJZW9t?=
+ =?utf-8?B?ZTRxdXRTcVZ0TnR6dWVweWp3WkVQTHJrK3ByM0s4bW9iOWlibFYwSnVoeXZh?=
+ =?utf-8?B?a1FxcVpnZFphcUk5WGpRaytXUXFqOTl5SE5jVkxIbnM5YTJTYW8zWmVyNGNi?=
+ =?utf-8?B?NDdKM0c3ZlpoN3dFam9XcXowWWtLY0lTUU9ZNnkvSnBwZW56VFdOaXd4U2R5?=
+ =?utf-8?B?TDE0b0Ywak1uT3BDYUgyRTBxdE9yeUZoQ1dMd1JXcTBkUVNIYTlkY0FJY2pW?=
+ =?utf-8?B?TFNuSW1KMERyVHltVlgxU2VmUGVKM0UxY0tvZ0R5eC83bWV6WE9MRmg2a0JK?=
+ =?utf-8?B?M0duOStVMWRJZ0FNVDJPWmtPc015UGh6L2R1UDFIbklYNDZOeUZrUVhiaWw5?=
+ =?utf-8?B?N3plRXlBRXQzbDZPYkRIMU1ROUZkM2ZETlY4UGE1YTdUNjhiUy9mOFdOellG?=
+ =?utf-8?B?UjlyZ25hQ3dhOTdTc2Z5bjA4YjZOQ2FaZkJTM3NndU9KanU2S2dCUUVwTDlM?=
+ =?utf-8?B?cnRQQ1AwV3AwMXRXTEZXN3M3ekRHaC9oQ1hLTERLa2RpeTd6SUtFNG1iZkVy?=
+ =?utf-8?B?eFdhV1NHSndyS1RlTk5UaVRhU2JSUG9yNVN3SlpvZDV6UThWMkY1WllLY3Ru?=
+ =?utf-8?B?bitXVEl6ZXhGMWFTWTJjS1ZZSUd0RlR1QU5UTis4eGY5aFU0SjNoMzYvMi9O?=
+ =?utf-8?B?Vko2K1RlbThrSmFZS2lIQ0Zya01uckZkSmFRQU8rSFhkYWpwblJPVng0WldK?=
+ =?utf-8?B?ZGdHYmZ3OWMrQWk3a24xMEFrUjVuWXo1ZmsyZ1N6S05OTThBUmZQTkFSb3p0?=
+ =?utf-8?B?Y2VnVS94OUZpQ0dGSHNtME9IaU5UWllPTTBzTUo1Vjh5SjNIamZyT0pCdzlZ?=
+ =?utf-8?B?NGlzSi9oZUhaVGZQd2hZcnNENmlOYXNqdnJqWXRRQzNEeFB5UEJ1STFUR0Nh?=
+ =?utf-8?B?K3RHNzFSR0JRUGJONU9xVUpFV050K2g4M3NwdUx2SEpVdFh0dmwrb0hUbTNS?=
+ =?utf-8?B?ZzZwQjN4MkYxSGowTm1IaDlXclZlelJNRXpJYytpWkFIc1dITVd5akN3RzJM?=
+ =?utf-8?B?a1RzQVZuYjBURDNCTEZOZnZTRm1QeGtQK05iaGFyU0hEcjdiaUFJSkxFazZq?=
+ =?utf-8?B?VlhXdUcwNndYN1dLMy9kR1dLMlA1T3RaaEF5OGtUcVJqaG1ydzlWYU9LNk5B?=
+ =?utf-8?B?R29HVnBTOGtSbXZnblpZcjUwMzVZK3NudXFpVzJwd3VKM0lUR1h0NXBqQ0t6?=
+ =?utf-8?B?dEVWOGZVS2tKL0ZSMFNab0s2cjFXQ2pXK0NGaCtjbHEzUTFzU0FFejVFSXFJ?=
+ =?utf-8?Q?2huj+C8BEEW3ngOvX8d8bvo=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f63cdfe-5e7b-4966-4e58-08d9a51d09fe
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2021 14:10:39.1713
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zuWEwq4dQFxDNt8h9Gc/unMOrqVpjDMftk0TMcSNIcarM7TS9AqrmERezRfI79bCsQtgx8QtwSfnptageDqLVg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5479
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Marco Chiappero <marco.chiappero@intel.com>
+On 11/10/21 11:29 AM, Peter Gonda wrote:
+> On Tue, Nov 9, 2021 at 12:25 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+>> On 11/9/21 10:46 AM, Peter Gonda wrote:
+>>> On Tue, Nov 9, 2021 at 9:27 AM Sean Christopherson <seanjc@google.com> wrote:
+>>>> On Tue, Nov 02, 2021, Peter Gonda wrote:
+>>
 
-Improve and simplify logging of PFVF messages.
+...
 
-Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/adf_gen2_pfvf.c |  4 +--
- .../crypto/qat/qat_common/adf_pfvf_pf_proto.c | 30 +++++++------------
- .../crypto/qat/qat_common/adf_pfvf_vf_proto.c |  7 +++--
- 3 files changed, 17 insertions(+), 24 deletions(-)
+>>
+>> That's one of those things we've wanted to get around to improving but
+>> just haven't had the time. So, yes, if you wish to refactor the 'error'
+>> related area, that would be great.
+> 
+> OK so when I actually sat down to work on this. I realized this is
+> bigger than I thought. If we want to have error == -1 for all return
+> from psp-sev.h functions where the PSP isn't called yet there are a
+> lot of changes. For example if CONFIG_CRYPTO_DEV_SP_PSP is not defined
+> all these stubs need to be to set `*errror == -`, basically all these
+> functions need to be updated.
+> 
+> So to keep this series more targeted. I think I'll drop the error
+> here. And just have this patch print the rc value. If what I said
 
-diff --git a/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c b/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
-index b71230d8ec73..16d8f9056a1d 100644
---- a/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
-+++ b/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
-@@ -183,14 +183,14 @@ static u32 adf_gen2_pfvf_recv(struct adf_accel_dev *accel_dev, u8 vf_nr)
- 	msg = ADF_CSR_RD(pmisc_addr, pfvf_offset);
- 	if (!(msg & int_bit)) {
- 		dev_info(&GET_DEV(accel_dev),
--			 "Spurious PFVF interrupt, msg %X. Ignored\n", msg);
-+			 "Spurious PFVF interrupt, msg 0x%.8x. Ignored\n", msg);
- 		return 0;
- 	}
- 
- 	/* Ignore legacy non-system (non-kernel) VF2PF messages */
- 	if (!(msg & msg_origin)) {
- 		dev_dbg(&GET_DEV(accel_dev),
--			"Ignored non-system message (0x%x);\n", msg);
-+			"Ignored non-system message (0x%.8x);\n", msg);
- 		return 0;
- 	}
- 
-diff --git a/drivers/crypto/qat/qat_common/adf_pfvf_pf_proto.c b/drivers/crypto/qat/qat_common/adf_pfvf_pf_proto.c
-index 82b6cc7162ba..631038bad21e 100644
---- a/drivers/crypto/qat/qat_common/adf_pfvf_pf_proto.c
-+++ b/drivers/crypto/qat/qat_common/adf_pfvf_pf_proto.c
-@@ -49,20 +49,13 @@ static int adf_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr,
- 		u8 compat;
- 
- 		dev_dbg(&GET_DEV(accel_dev),
--			"Compatibility Version Request from VF%d vers=%u\n",
--			vf_nr, vf_compat_ver);
-+			"VersionRequest received from VF%d (vers %d) to PF (vers %d)\n",
-+			vf_nr, vf_compat_ver, ADF_PFVF_COMPAT_THIS_VERSION);
- 
--		if (vf_compat_ver <= ADF_PFVF_COMPAT_THIS_VERSION) {
-+		if (vf_compat_ver <= ADF_PFVF_COMPAT_THIS_VERSION)
- 			compat = ADF_PF2VF_VF_COMPATIBLE;
--			dev_dbg(&GET_DEV(accel_dev),
--				"VF (vers %d) compatible with PF (vers %d)\n",
--				vf_compat_ver, ADF_PFVF_COMPAT_THIS_VERSION);
--		} else {
-+		else
- 			compat = ADF_PF2VF_VF_COMPAT_UNKNOWN;
--			dev_err(&GET_DEV(accel_dev),
--				"VF (vers %d) compat with PF (vers %d) unkn.\n",
--				vf_compat_ver, ADF_PFVF_COMPAT_THIS_VERSION);
--		}
- 
- 		resp =  ADF_PF2VF_MSGORIGIN_SYSTEM;
- 		resp |= ADF_PF2VF_MSGTYPE_VERSION_RESP << ADF_PF2VF_MSGTYPE_SHIFT;
-@@ -75,8 +68,8 @@ static int adf_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr,
- 		u8 compat;
- 
- 		dev_dbg(&GET_DEV(accel_dev),
--			"Legacy VersionRequest received from VF%d 0x%x\n",
--			vf_nr, msg);
-+			"Legacy VersionRequest received from VF%d to PF (vers 1.1)\n",
-+			vf_nr);
- 
- 		/* PF always newer than legacy VF */
- 		compat = ADF_PF2VF_VF_COMPATIBLE;
-@@ -92,21 +85,19 @@ static int adf_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr,
- 	case ADF_VF2PF_MSGTYPE_INIT:
- 		{
- 		dev_dbg(&GET_DEV(accel_dev),
--			"Init message received from VF%d 0x%x\n",
--			vf_nr, msg);
-+			"Init message received from VF%d\n", vf_nr);
- 		vf_info->init = true;
- 		}
- 		break;
- 	case ADF_VF2PF_MSGTYPE_SHUTDOWN:
- 		{
- 		dev_dbg(&GET_DEV(accel_dev),
--			"Shutdown message received from VF%d 0x%x\n",
--			vf_nr, msg);
-+			"Shutdown message received from VF%d\n", vf_nr);
- 		vf_info->init = false;
- 		}
- 		break;
- 	default:
--		dev_dbg(&GET_DEV(accel_dev), "Unknown message from VF%d (0x%x)\n",
-+		dev_dbg(&GET_DEV(accel_dev), "Unknown message from VF%d (0x%.8x)\n",
- 			vf_nr, msg);
- 		return -ENOMSG;
- 	}
-@@ -129,7 +120,8 @@ bool adf_recv_and_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr)
- 		return false;
- 
- 	if (resp && adf_send_pf2vf_msg(accel_dev, vf_nr, resp))
--		dev_err(&GET_DEV(accel_dev), "Failed to send response to VF\n");
-+		dev_err(&GET_DEV(accel_dev),
-+			"Failed to send response to VF%d\n", vf_nr);
- 
- 	return true;
- }
-diff --git a/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c b/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c
-index ea1a00e746ff..9c7489ed122c 100644
---- a/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c
-+++ b/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c
-@@ -90,18 +90,19 @@ static bool adf_handle_pf2vf_msg(struct adf_accel_dev *accel_dev, u32 msg)
- {
- 	switch ((msg & ADF_PF2VF_MSGTYPE_MASK) >> ADF_PF2VF_MSGTYPE_SHIFT) {
- 	case ADF_PF2VF_MSGTYPE_RESTARTING:
--		dev_dbg(&GET_DEV(accel_dev),
--			"Restarting msg received from PF 0x%x\n", msg);
-+		dev_dbg(&GET_DEV(accel_dev), "Restarting message received from PF\n");
- 
- 		adf_pf2vf_handle_pf_restarting(accel_dev);
- 		return false;
- 	case ADF_PF2VF_MSGTYPE_VERSION_RESP:
-+		dev_dbg(&GET_DEV(accel_dev),
-+			"Response message received from PF (0x%.8x)\n", msg);
- 		accel_dev->vf.response = msg;
- 		complete(&accel_dev->vf.msg_received);
- 		return true;
- 	default:
- 		dev_err(&GET_DEV(accel_dev),
--			"Unknown PF2VF message(0x%x)\n", msg);
-+			"Unknown PF2VF message (0x%.8x) from PF\n", msg);
- 	}
- 
- 	return false;
--- 
-2.33.1
+In that case, I think you should keep the error value and initialize it to 
+0. That is consistent with the other paths. Then, if you take on the 
+fixups, it can be changed then.
 
+> above seems reasonable I'll do those error refactors. Are people
+> envisioning something else for the error fixups?
+
+The main refactoring I wanted was to make sure the caller didn't have to 
+initialize the error variable. Whether to initialize it to 0 or -1 wasn't 
+part of my original thoughts. But I do like the -1 value because, 
+theoretically, we shouldn't get such a value back from the PSP. So if the 
+value printed is not -1, that is an indication that the PSP API was called 
+no matter the value of rc.
+
+Thanks,
+Tom
+
+> 
+>>
+>> Thanks,
+>> Tom
+>>
+>>>
