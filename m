@@ -2,206 +2,272 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B260BC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 22:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C448C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 23:39:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99CCD61078
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 22:54:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA67060ED7
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 23:39:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233270AbhKLW5O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 17:57:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43420 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231320AbhKLW5O (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 17:57:14 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7837C0613F5
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 14:54:22 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id c32so25920682lfv.4
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 14:54:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=3NQdFGcDVG2JjfnOpdeoQHmcElnD9tk5T9TB7oLbDK4=;
-        b=r3dDCXEZkM+k571XU2EKqa8ZvMbUOqLaG1ZtJYrepKQf1i4VLU14Meciy3mRyhJeG7
-         LND2XIG9Sn7tH7eOksKceNqEl33+9Z3Hie5MLtCFe3USQ58kEJQRO+TOnK2fLyei96CS
-         2GpIhnPedfVj1vjes0bI3QKfemARHgiAd9apcHUetJ0YZNaxNeOMo6oFY6YfQ7sisleU
-         Bqzc1xTxUDDZQ3xMSeu596xH9bM60Q80ut4BDpwGFdNul8WE6p+5v0rR7Vc9d5q/i6Dz
-         ON9huOgL4kbnru8b17TxqW1+yOokAZC4L647o37nuR9pCz5XCSGhNWqjSjddfDfAxuEX
-         ZH3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=3NQdFGcDVG2JjfnOpdeoQHmcElnD9tk5T9TB7oLbDK4=;
-        b=ZY2WW0ChXZ99/4S4/F5+pw6jZt/Bdawn6amkged2pM7Pta+UcIvTLPm8oWrdt4A9EL
-         dsZgimnjh30TKTnwLZeCgCrjp5OZ0E0Gzn80Uur9SgXLrGsY7l9BHr7J9PdZ/AmBT0ki
-         BW672eq84WOYFnB3sYKE+xQxTYTgkd6sI2NPXjae6PpYTxMZ2mkjmsQUT43d0pkKUAbs
-         1YAY5KsF3y76prg2BGcJpLA9ga5RZYNLE88Fgwj6giR4cP8s4HlYnNDNDi4tXvHodBw4
-         j+H+FDLKy1WmUHgWXhSSGQm97qHq/cagGtoedF66TqbWn9uy7nV4LQJhoSh8CZEL6Nkq
-         zjDA==
-X-Gm-Message-State: AOAM533xa/oKX5zSjws4QTckzZcRv8inKAK5krvdTwbOyexH3GktCmib
-        XOabeZWUQXjdOAzQQMvepr6Le9qHC/4SylUaqWW9XA==
-X-Google-Smtp-Source: ABdhPJynmFltlI6U1GhsgqUrEbW7pfoilOaw0qhDblA/+afTrHXkohHbxH17eNpN4smESxrgB/7qd3uMp8uwDBdwFok=
-X-Received: by 2002:a19:7902:: with SMTP id u2mr17022058lfc.644.1636757660891;
- Fri, 12 Nov 2021 14:54:20 -0800 (PST)
-MIME-Version: 1.0
-References: <20210820155918.7518-1-brijesh.singh@amd.com> <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com> <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com> <YY7I6sgqIPubTrtA@zn.tnic> <YY7Qp8c/gTD1rT86@google.com>
- <CAA03e5GwHMPYHHq3Nkkq1HnEJUUsw-Vk+5wFCott3pmJY7WuAw@mail.gmail.com>
- <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com> <CAA03e5Fw9cRnb=+eJmzEB+0QmdgaGZ7=fPTUYx7f55mGVXLRMA@mail.gmail.com>
-In-Reply-To: <CAA03e5Fw9cRnb=+eJmzEB+0QmdgaGZ7=fPTUYx7f55mGVXLRMA@mail.gmail.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 12 Nov 2021 15:54:09 -0700
-Message-ID: <CAMkAt6q9Wsw_KYypyZxhA1gkd=kFepk5rC5QeZ6Vo==P6=EAxg@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-To:     Marc Orr <marcorr@google.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        id S230300AbhKLXml (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 18:42:41 -0500
+Received: from mail-dm3nam07on2080.outbound.protection.outlook.com ([40.107.95.80]:65504
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229674AbhKLXmk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Nov 2021 18:42:40 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Xtk1f6PHzy+SU56WuYsEdsmU4II5JUh4Ey1zbhOLHfHSIHUbBaE2t2AowT0us5CES0CLk0ar1uqR3qsYSVmMvvVQvw18oYmV5XKSCF/8zLZCpT/kfC1K118i942PYpDEBfbNy2pfjdJdLHjYSfVLAmwKZLGCad0bhWQ+0W8hXmH0CDlPMlXwFYSi9PiJClecbJsiF4z6lnH+jWWJe+pOmyo6AF9MRBujdMNV/zuWIQ54vwCs17jifx4y+S8TMHBQ7Glixp2B1xSb7xiDWRYeBRPfDNtorTfjXzjw2gRCQKSTQ31+oH89ltn9AzfZaPBy2DJmjHW7XC4szAmegGgZLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Z1BvMiOou6IiP83iST8RBByVWqWC5YbEDZdT9PmWALg=;
+ b=gyTXYYljF/iA1u2tzJbo4TTYI6qZdV267qpkZBbOZboW+g2f+o3iovlTkOdYcg738DMKleA2R6vtnl9sDsVn1jrtLGwbxvo/Yw8yGMjpj0GFL94O/CbPZEz95MSRvKW6zE2TtfURjIR0URqrqkt49PpFc175QXQedtWj4cAfWfw9ocTvoC0rjAqUjcK8sBTWOnT2n1M35wecUQNC3FVL6mPH70V+shwHi/I9wp6e9doJTa8vbsOwHFGpL2degfdyQEJ0QeXVpg0IcpDC4zvpCbDDUE5w9JwoSMHJO4izRjsLX7mGCpucvIerJ3jyC1sw4xv16efbhCqGQZ7Gm3vz4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z1BvMiOou6IiP83iST8RBByVWqWC5YbEDZdT9PmWALg=;
+ b=Pb1xRMaaYhg3IFda5lyKByNXiPYdVZdQg6csGusxmy2HeHG0UrUoMMuGmWr/5KOv4R3qW4ATfzZvRaCxGefWh6aHt6sYIdU8p7L2WQcV8H0B4zk3CRX/2UOAp17mN0KqJZ/AhpcFti59aGfIrOlIMOqYKXuYfM5MNGY/nsJ/GLs=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SN6PR12MB4670.namprd12.prod.outlook.com (2603:10b6:805:11::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.11; Fri, 12 Nov
+ 2021 23:39:46 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::e4da:b3ea:a3ec:761c]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::e4da:b3ea:a3ec:761c%7]) with mapi id 15.20.4669.020; Fri, 12 Nov 2021
+ 23:39:46 +0000
+Message-ID: <14e6c746-c7d3-8cca-47ed-b90f31e4e495@amd.com>
+Date:   Fri, 12 Nov 2021 17:39:42 -0600
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.2.1
+Cc:     brijesh.singh@amd.com, Sean Christopherson <seanjc@google.com>,
+        Thomas.Lendacky@amd.com, David Rientjes <rientjes@google.com>,
+        Marc Orr <marcorr@google.com>, Joerg Roedel <jroedel@suse.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        John Allen <john.allen@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V3 4/4] crypto: ccp - Add SEV_INIT_EX support
+Content-Language: en-US
+To:     Peter Gonda <pgonda@google.com>
+References: <20211102142331.3753798-1-pgonda@google.com>
+ <20211102142331.3753798-5-pgonda@google.com> <YYquDWbkIwCkixxD@google.com>
+ <CAMkAt6rHdsdD-L4PbZL7qaOY7GRHmApVJam0V0yY2BnYdhmPjA@mail.gmail.com>
+ <YYrZXRTukz3RccPN@google.com>
+ <CAMkAt6qauoiTBXF9VXRGiqtJD5pTAV=NqKHZgNFXHCkrR50gkg@mail.gmail.com>
+ <eff7a2cb-f78a-646a-dc0c-b24998e9e9af@amd.com>
+ <CAMkAt6rj94Mzb6HBaqQbi7HHfhS4q1O4fxO8M7Xe=TZeZ0zZOg@mail.gmail.com>
+ <CAMkAt6r5MJq0rGYg7MAqm83Xp4mBADSKtQxV=i2_OFuQnDd5Yg@mail.gmail.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+In-Reply-To: <CAMkAt6r5MJq0rGYg7MAqm83Xp4mBADSKtQxV=i2_OFuQnDd5Yg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0501CA0040.namprd05.prod.outlook.com
+ (2603:10b6:803:41::17) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
+MIME-Version: 1.0
+Received: from [10.0.0.5] (70.112.153.56) by SN4PR0501CA0040.namprd05.prod.outlook.com (2603:10b6:803:41::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.8 via Frontend Transport; Fri, 12 Nov 2021 23:39:44 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fd07790b-9656-421d-f9ea-08d9a635b54c
+X-MS-TrafficTypeDiagnostic: SN6PR12MB4670:
+X-Microsoft-Antispam-PRVS: <SN6PR12MB4670DBB3BFB48487282A3001E5959@SN6PR12MB4670.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7CAHmKwKlZqep0lDm362ogakyFXOMrhcrSd67YsqIEHbvlWSJhqQ1Whqhw1ZQjjOW4F/eCwLSALBFMiIBsuKp19JwzqGwQkKIzT8neeYsUgxMIaH7xekb8XJuX5l9eUOOfwSprWd7i8gD/Ad5pw31rT8rIDYAqPE0RkjMzDs9yXDZm+lzAVKsm22ZVGA9GTf/GeXDZvGZMZfhYS66aL8p6gAQOeJQYxUBU9MxyY0PZwZOlw7DM1dcf21n5iv5qCbwoFC5aut3AMIC1C6y5Rv4kBrHgvXbNKJZ+q2vIQD694JtGtC+K5M456Sz820HYM6geD6pUVzG2amrGTs3LxpZC4HeP1VoXd+czKxRFBcReXi5nlDvxquOE4FLVfNr0okVvYBjGAekQ969kGm4/S7dRYEU4xJbt8ddtF7WnRQ5qngKoBrCDmu2Pwhvvvg8fgGNO9oR+X2RqmuQOqEyLyZoW0ntiJNGLSpjQ8tGm1fdf8KUL3QLu6hOMaMC5VXwsNeCBGHMUfL5gsBqgreSE+kXnicCLTjov3DzVIkglrMdq0tuG80yjw7uw4zNKNSac+dcakQdENanF9qbaq/U/tfFqrXt92ZifneNvTVV7pEDYbXKD4Ibm2VouNa6kU2WOBL7wC14QVsULKXXWZoRh7Le48/b3q8pDIPDz51oWSeF92yKpM7sijgb1OSeNL4EyeHSLW8H4BzPUii1xTksfHf4rY98RxpKrdQI51eouwb+2ALh8Z0MbXiaecpBrEHvMmZ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(53546011)(36756003)(86362001)(31686004)(8676002)(8936002)(7416002)(31696002)(83380400001)(38100700002)(2906002)(66946007)(66476007)(66556008)(508600001)(316002)(16576012)(956004)(186003)(26005)(44832011)(2616005)(4326008)(6486002)(5660300002)(54906003)(6916009)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VGg5dTZ3ZEFlRUw0ZzhBMHlvbmJGL2kvUW10NUphaVlXZ1UrRmZQMTRIREF4?=
+ =?utf-8?B?RWdaMjFpaS9nQjFYN1VuU3BUT2ZXQmN5bUVsNmRMNGovM081WUF6SVlrVjU1?=
+ =?utf-8?B?SFlpZk9pcUF5aVZVVmE5eURONm5lVWJZbVhSWEE1Vnh5RWpXVHV0RENhb3dn?=
+ =?utf-8?B?TlZ0MmpKeXMvcXV6cWxVMVRITERMemk0clhZcUtuQTQrSG4xN3FjU1IxU2Nh?=
+ =?utf-8?B?c0ptWnpuRjVaNVFwU2grOXR0dUZCTVJONnhPWURVb3ZDbllkVVpwMjNncWQy?=
+ =?utf-8?B?RTNwb1pHcU9jcGlNMUlac1VGd2t5azFyZzJEZUVRNURSTnhRSGI2T283bktW?=
+ =?utf-8?B?UFJmblVXNWxZMmRPQ1h4L0VXdU1NVVJnVWtCTC9pbHl3eGE5SVNYUS9Dc3ZK?=
+ =?utf-8?B?MGJHMEdSa2J2QXIvcGxmM0N3QkF0NjVIKzByb0laUGRDUnpaZXJYWmZZcU42?=
+ =?utf-8?B?Sm5Ic1RTNUNOSVUzQmI2RlltUFNnQlhabmczTzQzK1NPdGRpQXVZVTd2SHRi?=
+ =?utf-8?B?dENGUmV4YTdOM0VjMFZ2VFdmdnl1OE1HZ3hKa2pNczNmblR3NU1YaVNuQjlk?=
+ =?utf-8?B?NEJyYlJNWHpqQVZISURxWkUvSGQ5VklRY1d4OXlqR3pFRlBuR3crY2Vjd3RM?=
+ =?utf-8?B?T3QrbktpVVhVb1ZtV05QbmQyTWxjSFNiaHdSL3dBODVSbUUvTmduOVpEUFRR?=
+ =?utf-8?B?eDExUjlveVhDdi9PMDkwUWpJZUE1T0RxdHRvQ3ZUeVE5MEd4YXNFS2xNdlYw?=
+ =?utf-8?B?ZmYzdlFvQkRQRkowN1RqUjNSTTNTUFIyQjF1K0VXVXRHa3dKdWQvU1ZmZHE1?=
+ =?utf-8?B?N09nRWp6clAvYnEyeUUweWo1NUpVMkM2bVJvSm5hbzlFSUc2RHNPSzdZbVlS?=
+ =?utf-8?B?c0tQQTIxL0M3c2dPREFoaERRMmVKQmZzQ2FCdTNtR1cvMFUzbDZoTEQvUVZz?=
+ =?utf-8?B?bjVMaDFLZWllNUVnenNnTlNmWFdLN3VFVHZvL3Jja3Z0UklkNUhjeXp1VWpn?=
+ =?utf-8?B?NTB6L1JRVCtjbk1CUEdpdnU0ejc0b1FHNDVmZ3JaQjlhZ2w1VS9OUllMSjVv?=
+ =?utf-8?B?dnNrN2dDaXpUM0lyOEVNMktDZHJGUkhIMXZNaGVud1JlMXVwYkY2YVJIU0dB?=
+ =?utf-8?B?dm5YQ2ZzbFdIWHRYVkxEa3REVDZRWGovMEN1UEpKQXRaRnZod0d5eGpYMWVw?=
+ =?utf-8?B?dFM4V3BPUFVmdnZqb1VLejdOd2VFM0d1bHFwZFEraUJlOThZRTZkZE5VUE1C?=
+ =?utf-8?B?TmI1Q1JJejhscW5JQmY4UDNqN3R3QVdlVW03cVhPVGNtY3plS2ttQTduU3Yr?=
+ =?utf-8?B?YVhxd3padXB1YSt0NWlmRWh1TnhCYmZyb0tSVERUT2lVL2Z0ZFl4dUVtaDdj?=
+ =?utf-8?B?NVk2Z3dMVmNwM2VBby9PNElUYnY2Ti9Bc1RWTWVXcDFzM0xFMEQ5QlQ4YXBZ?=
+ =?utf-8?B?MklvVDFnQWdDaFhyN2k2U0dMalB2WjlLdkd2N2dFY1NKN09VZXdWSFIvU3Y1?=
+ =?utf-8?B?SXB4bmYwVkpKNUEwR2grZERwT0RNRFlBVUg4ZGFDTE0yYU9yOUEwTUFLOHVG?=
+ =?utf-8?B?SlNYVnpGUUtPaEZDVmJWVjVRMjNvZkgzMEdHTU5qVm13Wm5Rc0hrSVlpVWdu?=
+ =?utf-8?B?dGduY3FqTFR1QUYybWc5UGRjWWJDS2o3b3QxZ0UzNHpwRVJMTVBGTmtodEww?=
+ =?utf-8?B?VVJVK2JjQXNUSnJSYlFJTGQwVWMrQkdzdXgxRzJsZ0hId3VKUVVHOHBaQVhG?=
+ =?utf-8?B?eENPbU0yRUZveHkzd1VGRU11NkxwUVB1LzZUR3N2bWJsYlZWZjhjRDNTcHJJ?=
+ =?utf-8?B?OXUwR09sOWpnUG1CaHlyMUh2UTZjdjN3YjBrdFhWTWlLdUdCMEJGdEdoVzRm?=
+ =?utf-8?B?U2ZPTGhrVXVja0djTmZibC9teTJFKys3ZlVEYnNjdTc2cDhaK1ZmalJ0YXJu?=
+ =?utf-8?B?aXdOQ2pETzdscFlJSnFYRTZGbG9oZUZ3d1FSeGRkUnNvaXkrTlQyeCs3VmlJ?=
+ =?utf-8?B?eXpqMTBxNWRVb2UzVzRVRFJpRFlXSFRkYTZyUHIvQ3NGbUpVd1JiY3pRRGQz?=
+ =?utf-8?B?SS9ZQ0grcWZpR3kvcjdDVEZ0ODMwWGY2R3U4RGFCZmZ0emg5OENwN3NlOENV?=
+ =?utf-8?B?S3lYVkxpUHBGeHpLNlNCQW9pSi8yTzZQK1FTTWpsblpWNDNhWHRzNXpMT3dz?=
+ =?utf-8?Q?SOWXQd6cwZSSJnwnXYJLZc4=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd07790b-9656-421d-f9ea-08d9a635b54c
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2021 23:39:46.5827
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: m3ahlB9RYUpAP9fBYoWV/aXD00MNvV+/NmSPxcr+E+b3dCI5r1XkKg2svCSkVI22CYy9/WLLm7O0qIpdztF6IQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB4670
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 12, 2021 at 2:43 PM Marc Orr <marcorr@google.com> wrote:
+
+On 11/12/21 10:55 AM, Peter Gonda wrote:
+> On Wed, Nov 10, 2021 at 8:32 AM Peter Gonda <pgonda@google.com> wrote:
+>> On Tue, Nov 9, 2021 at 3:20 PM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>>>
+>>>
+>>> On 11/9/21 2:46 PM, Peter Gonda wrote:
+>>>> On Tue, Nov 9, 2021 at 1:26 PM Sean Christopherson <seanjc@google.com> wrote:
+>>>>> On Tue, Nov 09, 2021, Peter Gonda wrote:
+>>>>>> On Tue, Nov 9, 2021 at 10:21 AM Sean Christopherson <seanjc@google.com> wrote:
+>>>>>>> There's no need for this to be a function pointer, and the duplicate code can be
+>>>>>>> consolidated.
+>>>>>>>
+>>>>>>> static int sev_do_init_locked(int cmd, void *data, int *error)
+>>>>>>> {
+>>>>>>>          if (sev_es_tmr) {
+>>>>>>>                  /*
+>>>>>>>                   * Do not include the encryption mask on the physical
+>>>>>>>                   * address of the TMR (firmware should clear it anyway).
+>>>>>>>                   */
+>>>>>>>                  data.flags |= SEV_INIT_FLAGS_SEV_ES;
+>>>>>>>                  data.tmr_address = __pa(sev_es_tmr);
+>>>>>>>                  data.tmr_len = SEV_ES_TMR_SIZE;
+>>>>>>>          }
+>>>>>>>          return __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+>>>>>>> }
+>>>>>>>
+>>>>>>> static int __sev_init_locked(int *error)
+>>>>>>> {
+>>>>>>>          struct sev_data_init data;
+>>>>>>>
+>>>>>>>          memset(&data, 0, sizeof(data));
+>>>>>>>          return sev_do_init_locked(cmd, &data, error);
+>>>>>>> }
+>>>>>>>
+>>>>>>> static int __sev_init_ex_locked(int *error)
+>>>>>>> {
+>>>>>>>          struct sev_data_init_ex data;
+>>>>>>>
+>>>>>>>          memset(&data, 0, sizeof(data));
+>>>>>>>          data.length = sizeof(data);
+>>>>>>>          data.nv_address = __psp_pa(sev_init_ex_nv_address);
+>>>>>>>          data.nv_len = NV_LENGTH;
+>>>>>>>          return sev_do_init_locked(SEV_CMD_INIT_EX, &data, error);
+>>>>>>> }
+>>>>>> I am missing how this removes the duplication of the retry code,
+>>>>>> parameter checking, and other error checking code.. With what you have
+>>>>>> typed out I would assume I still need to function pointer between
+>>>>>> __sev_init_ex_locked and __sev_init_locked. Can you please elaborate
+>>>>>> here?
+>>>>> Hmm.  Ah, I got distracted between the original thought, the realization that
+>>>>> the two commands used different structs, and typing up the above.
+>>>>>
+>>>>>> Also is there some reason the function pointer is not acceptable?
+>>>>> It's not unacceptable, it would just be nice to avoid, assuming the alternative
+>>>>> is cleaner.  But I don't think any alternative is cleaner, since as you pointed
+>>>>> out the above is a half-baked thought.
+>>>> OK I'll leave as is.
+>>>>
+>>>>>>>> +     rc = init_function(error);
+>>>>>>>>        if (rc && *error == SEV_RET_SECURE_DATA_INVALID) {
+>>>>>>>>                /*
+>>>>>>>>                 * INIT command returned an integrity check failure
+>>>>>>>> @@ -286,8 +423,8 @@ static int __sev_platform_init_locked(int *error)
+>>>>>>>>                 * failed and persistent state has been erased.
+>>>>>>>>                 * Retrying INIT command here should succeed.
+>>>>>>>>                 */
+>>>>>>>> -             dev_dbg(sev->dev, "SEV: retrying INIT command");
+>>>>>>>> -             rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+>>>>>>>> +             dev_notice(sev->dev, "SEV: retrying INIT command");
+>>>>>>>> +             rc = init_function(error);
+>>>>>>> The above comment says "persistent state has been erased", but __sev_do_cmd_locked()
+>>>>>>> only writes back to the file if a relevant command was successful, which means
+>>>>>>> that rereading the userspace file in __sev_init_ex_locked() will retry INIT_EX
+>>>>>>> with the same garbage data.
+>>>>>> Ack my mistake, that comment is stale. I will update it so its correct
+>>>>>> for the INIT and INIT_EX flows.
+>>>>>>> IMO, the behavior should be to read the file on load and then use the kernel buffer
+>>>>>>> without ever reloading (unless this is built as a module and is unloaded and reloaded).
+>>>>>>> The writeback then becomes opportunistic in the sense that if it fails for some reason,
+>>>>>>> the kernel's internal state isn't blasted away.
+>>>>>> One issue here is that the file read can fail on load so we use the
+>>>>>> late retry to guarantee we can read the file.
+>>>>> But why continue loading if reading the file fails on load?
+>>>>>
+>>>>>> The other point seems like preference. Users may wish to shutdown the PSP FW,
+>>>>>> load a new file, and INIT_EX again with that new data. Why should we preclude
+>>>>>> them from that functionality?
+>>>>> I don't think we should preclude that functionality, but it needs to be explicitly
+>>>>> tied to a userspace action, e.g. either on module load or on writing the param to
+>>>>> change the path.  If the latter is allowed, then it needs to be denied if the PSP
+>>>>> is initialized, otherwise the kernel will be in a non-coherent state and AFAICT
+>>>>> userspace will have a heck of a time even understanding what state has been used
+>>>>> to initialize the PSP.
+>>>> If this driver is builtin the filesystem will be unavailable during
+>>>> __init. Using the existing retries already built into
+>>>> sev_platform_init() also the file to be read once userspace is
+>>>> running, meaning the file system is usable. As I tried to explain in
+>>>> the commit message. We could remove the sev_platform_init call during
+>>>> sev_pci_init since this only actually needs to be initialized when the
+>>>> first command requiring it is issues (either reading some keys/certs
+>>>> from the PSP or launching an SEV guest). Then userspace in both the
+>>>> builtin and module usage would know running one of those commands
+>>>> cause the file to be read for PSP usage. Tom any thoughts on this?
+>>>>
+>>> One thing to note is that if we do the INIT on the first command then
+>>> the first guest launch will take a longer. The init command is not
+>>> cheap (especially with the SNP, it may take a longer because it has to
+>>> do all those RMP setup etc). IIRC, in my early SEV series in I was doing
+>>> the INIT during the first command execution and based on the
+>>> recommendation moved to do the init on probe.
+>>>
+>>> Should we add a module param to control whether to do INIT on probe or
+>>> delay until the first command ?
+>> Thats a good point Brijesh. I've only been testing this with SEV and
+>> ES so haven't noticed that long setup time. I like the idea of a
+>> module parameter to decide when to INIT, that should satisfy Sean's
+>> concern that the user doesn't know when the INIT_EX file would be read
+>> and that there is extra retry code (duplicated between sev_pci_init
+>> and all the PSP commands). I'll get started on that.
+> I need a little guidance on how to proceed with this. Should I have
+> the new module parameter 'psp_init_on_probe' just disable PSP init on
+> module init if false. Or should it also disable PSP init during
+> command flow if it's true?
 >
-> On Fri, Nov 12, 2021 at 1:39 PM Andy Lutomirski <luto@kernel.org> wrote:
-> >
-> >
-> >
-> > On Fri, Nov 12, 2021, at 1:30 PM, Marc Orr wrote:
-> > > On Fri, Nov 12, 2021 at 12:38 PM Sean Christopherson <seanjc@google.c=
-om> wrote:
-> > >>
-> > >> On Fri, Nov 12, 2021, Borislav Petkov wrote:
-> > >> > On Fri, Nov 12, 2021 at 07:48:17PM +0000, Sean Christopherson wrot=
-e:
-> > >> > > Yes, but IMO inducing a fault in the guest because of _host_ bug=
- is wrong.
-> > >> >
-> > >> > What do you suggest instead?
-> > >>
-> > >> Let userspace decide what is mapped shared and what is mapped privat=
-e.  The kernel
-> > >> and KVM provide the APIs/infrastructure to do the actual conversions=
- in a thread-safe
-> > >> fashion and also to enforce the current state, but userspace is the =
-control plane.
-> > >>
-> > >> It would require non-trivial changes in userspace if there are multi=
-ple processes
-> > >> accessing guest memory, e.g. Peter's networking daemon example, but =
-it _is_ fully
-> > >> solvable.  The exit to userspace means all three components (guest, =
-kernel,
-> > >> and userspace) have full knowledge of what is shared and what is pri=
-vate.  There
-> > >> is zero ambiguity:
-> > >>
-> > >>   - if userspace accesses guest private memory, it gets SIGSEGV or w=
-hatever.
-> > >>   - if kernel accesses guest private memory, it does BUG/panic/oops[=
-*]
-> > >>   - if guest accesses memory with the incorrect C/SHARED-bit, it get=
-s killed.
-> > >>
-> > >> This is the direction KVM TDX support is headed, though it's obvious=
-ly still a WIP.
-> > >>
-> > >> And ideally, to avoid implicit conversions at any level, hardware ve=
-ndors' ABIs
-> > >> define that:
-> > >>
-> > >>   a) All convertible memory, i.e. RAM, starts as private.
-> > >>   b) Conversions between private and shared must be done via explici=
-t hypercall.
-> > >>
-> > >> Without (b), userspace and thus KVM have to treat guest accesses to =
-the incorrect
-> > >> type as implicit conversions.
-> > >>
-> > >> [*] Sadly, fully preventing kernel access to guest private is not po=
-ssible with
-> > >>     TDX, especially if the direct map is left intact.  But maybe in =
-the future
-> > >>     TDX will signal a fault instead of poisoning memory and leaving =
-a #MC mine.
-> > >
-> > > In this proposal, consider a guest driver instructing a device to DMA
-> > > write a 1 GB memory buffer. A well-behaved guest driver will ensure
-> > > that the entire 1 GB is marked shared. But what about a malicious or
-> > > buggy guest? Let's assume a bad guest driver instructs the device to
-> > > write guest private memory.
-> > >
-> > > So now, the virtual device, which might be implemented as some host
-> > > side process, needs to (1) check and lock all 4k constituent RMP
-> > > entries (so they're not converted to private while the DMA write is
-> > > taking palce), (2) write the 1 GB buffer, and (3) unlock all 4 k
-> > > constituent RMP entries? If I'm understanding this correctly, then th=
-e
-> > > synchronization will be prohibitively expensive.
-> >
-> > Let's consider a very very similar scenario: consider a guest driver se=
-tting up a 1 GB DMA buffer.  The virtual device, implemented as host proces=
-s, needs to (1) map (and thus lock *or* be prepared for faults) in 1GB / 4k=
- pages of guest memory (so they're not *freed* while the DMA write is takin=
-g place), (2) write the buffer, and (3) unlock all the pages.  Or it can lo=
-ck them at setup time and keep them locked for a long time if that's approp=
-riate.
-> >
-> > Sure, the locking is expensive, but it's nonnegotiable.  The RMP issue =
-is just a special case of the more general issue that the host MUST NOT ACC=
-ESS GUEST MEMORY AFTER IT'S FREED.
+> I was thinking I should just have 'psp_init_on_probe' default to true,
+> and if false it stops the PSP init during sev_pci_init(). If I add the
+> second change that seems like it changes the ABI. Thoughts?
 >
-> Good point.
+Good point that a module params may break the ABI. How about if we add a
+new ioctl that can be used to initialize the SEV_INIT_EX. The ioctl
+implementation will be similar to the PLATFORM_RESET; it will shutdown
+the firmware then call INIT_EX. A platform provisioning tool may use ioctl.
 
-Thanks for the responses Andy.
+-Brijesh
 
-Having a way for userspace to lock pages as shared was an idea I just
-proposed the simplest solution to start the conversation. So what we
-could do here is change map to error if the selected region has
-private pages, if the region is mapped we can then lock the pages
-shared. Now processes mapping guest memory that are well behaved can
-be safe from RMP violations. That seems like a reasonable solution for
-allowing userspace to know if guest memory is accessible or not. Or do
-you have other ideas to meet your other comment:
-
-> SEV-SNP, TDX, and any reasonable software solution all require that the
-> host know which pages are private and which pages are shared.  Sure, the
-> old SEV-ES Linux host implementation was very simple, but it's nasty and
-> fundamentally can't support migration.
