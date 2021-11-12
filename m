@@ -2,69 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFABC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 20:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F14BC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 20:55:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E3ED0610F8
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 20:42:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B4A661073
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 20:55:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235554AbhKLUo6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 15:44:58 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52492 "EHLO mail.kernel.org"
+        id S235612AbhKLU6h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 15:58:37 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:48400 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231968AbhKLUo5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 15:44:57 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 52360610D0;
-        Fri, 12 Nov 2021 20:42:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1636749726;
-        bh=dQUk4X2qOhzpCjHCPly9op5V1uDns0LwUl4joXekB5Q=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=d7TwD2E4xb4SRStHK/UCbdKBV26lrwuq5WYsOye6InZouqIfOwEQMg/xgul+mE45E
-         /jus2l4MtO9lqF195+6sLV4etZTq3kF1LLz6Kpx6s+aF1oR+qobLJuAHJ1aChjf9wF
-         fDkgzW1GwifR2mFGLepHbWbVevHniHxUlnsIs4AEeABzE+qNkzdwM3mPlal+7s0xXf
-         dDag0zXfH7h9FiICJHvkMG78OoyNKeFDQTR/uEfElACtLZmIyn25nUJGF2Ab0BI07j
-         Ipf5yFV2Ea/0wuZZueaAPoPaJV6XIPVBdWQA1wSQINxngZAp4SkAp4TetfYbMlz7JA
-         +hQKZFELyOF4A==
-Subject: Re: [GIT PULL] Crypto Fixes for 5.16
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20211112104815.GA14105@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20200830223304.GA16882@gondor.apana.org.au>
- <20201026011159.GA2428@gondor.apana.org.au>
- <20201227113221.GA28744@gondor.apana.org.au>
- <20210108035450.GA6191@gondor.apana.org.au>
- <20210708030913.GA32097@gondor.apana.org.au>
- <20210817013601.GA14148@gondor.apana.org.au>
- <20210929023843.GA28594@gondor.apana.org.au>
- <20211029041408.GA3192@gondor.apana.org.au> <20211112104815.GA14105@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20211112104815.GA14105@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: beaaaa37c664e9afdf2913aee19185d8e3793b50
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 66f4beaa6c1d28161f534471484b2daa2de1dce0
-Message-Id: <163674972619.4802.15642938512992640681.pr-tracker-bot@kernel.org>
-Date:   Fri, 12 Nov 2021 20:42:06 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        id S235576AbhKLU6h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Nov 2021 15:58:37 -0500
+Received: from zn.tnic (p4fed33a9.dip0.t-ipconnect.de [79.237.51.169])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 85A0B1EC0529;
+        Fri, 12 Nov 2021 21:55:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1636750544;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=YSgDHuKhBpkqw17ADxN7YSfqRqwjIHqhI8doQGc8d10=;
+        b=rbgux9nzUu8Q/zoKBmWrR/YgJ7Ku6OSXgzE0pVkFuiK98PVCh6uGpkU3qd4ejG1hZQ7mp0
+        6OYwPqXWT3HM/txQIgbGGHLUQZNj1c2qPLne7SUNQZX6A5W69/5rZTzSp7wTk98BqH/qd/
+        hzKC4giut7QEt0uq7X0O2e4KkbVFJzM=
+Date:   Fri, 12 Nov 2021 21:53:28 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YY7USItsMPNbuSSG@zn.tnic>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
+ <YY7I6sgqIPubTrtA@zn.tnic>
+ <YY7Qp8c/gTD1rT86@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YY7Qp8c/gTD1rT86@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Fri, 12 Nov 2021 18:48:15 +0800:
+On Fri, Nov 12, 2021 at 08:37:59PM +0000, Sean Christopherson wrote:
+> Let userspace decide what is mapped shared and what is mapped private. 
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+With "userspace", you mean the *host* userspace?
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/66f4beaa6c1d28161f534471484b2daa2de1dce0
+> The kernel and KVM provide the APIs/infrastructure to do the actual
+> conversions in a thread-safe fashion and also to enforce the current
+> state, but userspace is the control plane.
+>
+> It would require non-trivial changes in userspace if there are multiple processes
+> accessing guest memory, e.g. Peter's networking daemon example, but it _is_ fully
+> solvable.  The exit to userspace means all three components (guest, kernel, 
+> and userspace) have full knowledge of what is shared and what is private.  There
+> is zero ambiguity:
+> 
+>   - if userspace accesses guest private memory, it gets SIGSEGV or whatever.  
 
-Thank you!
+That SIGSEGV is generated by the host kernel, I presume, after it checks
+whether the memory belongs to the guest?
+
+>   - if kernel accesses guest private memory, it does BUG/panic/oops[*]
+
+If *it* is the host kernel, then you probably shouldn't do that -
+otherwise you just killed the host kernel on which all those guests are
+running.
+
+>   - if guest accesses memory with the incorrect C/SHARED-bit, it gets killed.
+
+Yah, that's the easy one.
+
+> This is the direction KVM TDX support is headed, though it's obviously still a WIP.
+> 
+> And ideally, to avoid implicit conversions at any level, hardware vendors' ABIs
+> define that:
+> 
+>   a) All convertible memory, i.e. RAM, starts as private.
+>   b) Conversions between private and shared must be done via explicit hypercall.
+
+I like the explicit nature of this but devil's in the detail and I'm no
+virt guy...
+
+> Without (b), userspace and thus KVM have to treat guest accesses to the incorrect
+> type as implicit conversions.
+> 
+> [*] Sadly, fully preventing kernel access to guest private is not possible with
+>     TDX, especially if the direct map is left intact.  But maybe in the future
+>     TDX will signal a fault instead of poisoning memory and leaving a #MC mine.
+
+Yah, the #MC thing sounds like someone didn't think things through. ;-\
+
+Thx.
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
