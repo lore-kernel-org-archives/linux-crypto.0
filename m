@@ -2,230 +2,192 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECFBC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 17:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F653C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 17:59:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BF3861039
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 17:49:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDE3461076
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 17:59:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235342AbhKLRwT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 12:52:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59236 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235348AbhKLRwS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 12:52:18 -0500
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2363C061767
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 09:49:27 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id k37so24236688lfv.3
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 09:49:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xyolfoRRwbVIP6OuNHHRJxW8c1ckAZHd8CQ+YzCEItg=;
-        b=jhFLBPRt5ibdj5m8MjHnIYzqg3/agjnuyKJbKNotFOa3kgQMmBIWikHAohvgIuQQG2
-         ILK/PL5g4wB4PCrUzFfp8WDYBJ1tzmLR5CyIalREs8kGWXr1MCjrjRsSjvRd8vlCZq75
-         oNZQJblrPoaHyzI5xJacGD5vCJfE8vtHjKRGEvEoJ2fjfXZYqmKjpKXrPd/ZW/hZrgPx
-         RjtLKMShoVGKLP+mzbfzBrFJ8+OSVYPqrzJHCRT2CCgJES6gx9wPx3CcJG29zs/gIH9W
-         Wu/tPjPGgptlH+KI8eORsXpyiKorYjXr0ppS3tk0E/z/i+5MiS6/IKb5ZdgSVTz4ZMOB
-         UTtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xyolfoRRwbVIP6OuNHHRJxW8c1ckAZHd8CQ+YzCEItg=;
-        b=GYbBi4FgPWJpOYbfcJNbTxhkBM9zVAoKoU+KdQTdeUC2SjLvu7ZAYdlMrFt0BDSL4E
-         2g+BQrodoekPGh5PlNo6jlSBkTKKHtL4rFqAzsfZdeCgV+Wy+BOIxME178P+dnU3U3q+
-         iAddnX56FF1TtT7phjVlGZrkSjP7S65cT/6tAywlRQ5Tb1bY2rPbkQYi3vRUGuI+dRKM
-         RZt+/IJU1byuCb55C/vA1FDqMRV3yD6UkynwbtppL/YT5ZFG3xof+2bJTotyFZmmg4aT
-         KPbSzpcxiJwpjS7tZxwFnBwafDvPt9Nv0y5AhcHqhbKkXGUFEHYyUpowlPEf0KW/LC2F
-         YseQ==
-X-Gm-Message-State: AOAM533+nqp/SIbMHZcpNZZgO8HA/+9hhKoGh3QidY7INpTfuGHN45eY
-        yXbHtgYnS1ULJZjrE5l+sb7iJG3d5Ya9a+w9HKaIYQ==
-X-Google-Smtp-Source: ABdhPJxqNatXEIk4Aax3z6nQtkoc4fqJtcgge+AsAtCbj7G5bmdaZRuwnAm55ya1wyLljmOIkKfHNIxLIHEG0xzMBJY=
-X-Received: by 2002:a05:6512:6d1:: with SMTP id u17mr15378156lff.402.1636739365739;
- Fri, 12 Nov 2021 09:49:25 -0800 (PST)
-MIME-Version: 1.0
-References: <20211102142331.3753798-1-pgonda@google.com> <20211102142331.3753798-5-pgonda@google.com>
- <YYquDWbkIwCkixxD@google.com> <CAMkAt6rHdsdD-L4PbZL7qaOY7GRHmApVJam0V0yY2BnYdhmPjA@mail.gmail.com>
- <YYrZXRTukz3RccPN@google.com> <CAMkAt6qauoiTBXF9VXRGiqtJD5pTAV=NqKHZgNFXHCkrR50gkg@mail.gmail.com>
- <eff7a2cb-f78a-646a-dc0c-b24998e9e9af@amd.com> <CAMkAt6rj94Mzb6HBaqQbi7HHfhS4q1O4fxO8M7Xe=TZeZ0zZOg@mail.gmail.com>
- <CAMkAt6r5MJq0rGYg7MAqm83Xp4mBADSKtQxV=i2_OFuQnDd5Yg@mail.gmail.com> <CAA03e5GDo3oFe8D8xTP1YsasN=moYqnT-AKayu006u1ARa7cYg@mail.gmail.com>
-In-Reply-To: <CAA03e5GDo3oFe8D8xTP1YsasN=moYqnT-AKayu006u1ARa7cYg@mail.gmail.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 12 Nov 2021 10:49:14 -0700
-Message-ID: <CAMkAt6og+9LJn84PJhhCn9QAkxzAg_27i1iCy+8edLtymUeyaw@mail.gmail.com>
-Subject: Re: [PATCH V3 4/4] crypto: ccp - Add SEV_INIT_EX support
-To:     Marc Orr <marcorr@google.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas.Lendacky@amd.com, David Rientjes <rientjes@google.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        John Allen <john.allen@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
+        id S235429AbhKLSCo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 13:02:44 -0500
+Received: from mga17.intel.com ([192.55.52.151]:4713 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231919AbhKLSCn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Nov 2021 13:02:43 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10166"; a="213902572"
+X-IronPort-AV: E=Sophos;i="5.87,230,1631602800"; 
+   d="scan'208";a="213902572"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2021 09:59:52 -0800
+X-IronPort-AV: E=Sophos;i="5.87,230,1631602800"; 
+   d="scan'208";a="590617851"
+Received: from cheemeig-mobl1.gar.corp.intel.com (HELO [10.212.248.140]) ([10.212.248.140])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2021 09:59:49 -0800
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+To:     Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+Date:   Fri, 12 Nov 2021 09:59:46 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 12, 2021 at 10:46 AM Marc Orr <marcorr@google.com> wrote:
->
-> On Fri, Nov 12, 2021 at 8:55 AM Peter Gonda <pgonda@google.com> wrote:
-> >
-> > On Wed, Nov 10, 2021 at 8:32 AM Peter Gonda <pgonda@google.com> wrote:
-> > >
-> > > On Tue, Nov 9, 2021 at 3:20 PM Brijesh Singh <brijesh.singh@amd.com> wrote:
-> > > >
-> > > >
-> > > >
-> > > > On 11/9/21 2:46 PM, Peter Gonda wrote:
-> > > > > On Tue, Nov 9, 2021 at 1:26 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > > >>
-> > > > >> On Tue, Nov 09, 2021, Peter Gonda wrote:
-> > > > >>> On Tue, Nov 9, 2021 at 10:21 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > > >>>> There's no need for this to be a function pointer, and the duplicate code can be
-> > > > >>>> consolidated.
-> > > > >>>>
-> > > > >>>> static int sev_do_init_locked(int cmd, void *data, int *error)
-> > > > >>>> {
-> > > > >>>>          if (sev_es_tmr) {
-> > > > >>>>                  /*
-> > > > >>>>                   * Do not include the encryption mask on the physical
-> > > > >>>>                   * address of the TMR (firmware should clear it anyway).
-> > > > >>>>                   */
-> > > > >>>>                  data.flags |= SEV_INIT_FLAGS_SEV_ES;
-> > > > >>>>                  data.tmr_address = __pa(sev_es_tmr);
-> > > > >>>>                  data.tmr_len = SEV_ES_TMR_SIZE;
-> > > > >>>>          }
-> > > > >>>>          return __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
-> > > > >>>> }
-> > > > >>>>
-> > > > >>>> static int __sev_init_locked(int *error)
-> > > > >>>> {
-> > > > >>>>          struct sev_data_init data;
-> > > > >>>>
-> > > > >>>>          memset(&data, 0, sizeof(data));
-> > > > >>>>          return sev_do_init_locked(cmd, &data, error);
-> > > > >>>> }
-> > > > >>>>
-> > > > >>>> static int __sev_init_ex_locked(int *error)
-> > > > >>>> {
-> > > > >>>>          struct sev_data_init_ex data;
-> > > > >>>>
-> > > > >>>>          memset(&data, 0, sizeof(data));
-> > > > >>>>          data.length = sizeof(data);
-> > > > >>>>          data.nv_address = __psp_pa(sev_init_ex_nv_address);
-> > > > >>>>          data.nv_len = NV_LENGTH;
-> > > > >>>>          return sev_do_init_locked(SEV_CMD_INIT_EX, &data, error);
-> > > > >>>> }
-> > > > >>>
-> > > > >>> I am missing how this removes the duplication of the retry code,
-> > > > >>> parameter checking, and other error checking code.. With what you have
-> > > > >>> typed out I would assume I still need to function pointer between
-> > > > >>> __sev_init_ex_locked and __sev_init_locked. Can you please elaborate
-> > > > >>> here?
-> > > > >>
-> > > > >> Hmm.  Ah, I got distracted between the original thought, the realization that
-> > > > >> the two commands used different structs, and typing up the above.
-> > > > >>
-> > > > >>> Also is there some reason the function pointer is not acceptable?
-> > > > >>
-> > > > >> It's not unacceptable, it would just be nice to avoid, assuming the alternative
-> > > > >> is cleaner.  But I don't think any alternative is cleaner, since as you pointed
-> > > > >> out the above is a half-baked thought.
-> > > > >
-> > > > > OK I'll leave as is.
-> > > > >
-> > > > >>
-> > > > >>>>> +     rc = init_function(error);
-> > > > >>>>>        if (rc && *error == SEV_RET_SECURE_DATA_INVALID) {
-> > > > >>>>>                /*
-> > > > >>>>>                 * INIT command returned an integrity check failure
-> > > > >>>>> @@ -286,8 +423,8 @@ static int __sev_platform_init_locked(int *error)
-> > > > >>>>>                 * failed and persistent state has been erased.
-> > > > >>>>>                 * Retrying INIT command here should succeed.
-> > > > >>>>>                 */
-> > > > >>>>> -             dev_dbg(sev->dev, "SEV: retrying INIT command");
-> > > > >>>>> -             rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
-> > > > >>>>> +             dev_notice(sev->dev, "SEV: retrying INIT command");
-> > > > >>>>> +             rc = init_function(error);
-> > > > >>>>
-> > > > >>>> The above comment says "persistent state has been erased", but __sev_do_cmd_locked()
-> > > > >>>> only writes back to the file if a relevant command was successful, which means
-> > > > >>>> that rereading the userspace file in __sev_init_ex_locked() will retry INIT_EX
-> > > > >>>> with the same garbage data.
-> > > > >>>
-> > > > >>> Ack my mistake, that comment is stale. I will update it so its correct
-> > > > >>> for the INIT and INIT_EX flows.
-> > > > >>>>
-> > > > >>>> IMO, the behavior should be to read the file on load and then use the kernel buffer
-> > > > >>>> without ever reloading (unless this is built as a module and is unloaded and reloaded).
-> > > > >>>> The writeback then becomes opportunistic in the sense that if it fails for some reason,
-> > > > >>>> the kernel's internal state isn't blasted away.
-> > > > >>>
-> > > > >>> One issue here is that the file read can fail on load so we use the
-> > > > >>> late retry to guarantee we can read the file.
-> > > > >>
-> > > > >> But why continue loading if reading the file fails on load?
-> > > > >>
-> > > > >>> The other point seems like preference. Users may wish to shutdown the PSP FW,
-> > > > >>> load a new file, and INIT_EX again with that new data. Why should we preclude
-> > > > >>> them from that functionality?
-> > > > >>
-> > > > >> I don't think we should preclude that functionality, but it needs to be explicitly
-> > > > >> tied to a userspace action, e.g. either on module load or on writing the param to
-> > > > >> change the path.  If the latter is allowed, then it needs to be denied if the PSP
-> > > > >> is initialized, otherwise the kernel will be in a non-coherent state and AFAICT
-> > > > >> userspace will have a heck of a time even understanding what state has been used
-> > > > >> to initialize the PSP.
-> > > > >
-> > > > > If this driver is builtin the filesystem will be unavailable during
-> > > > > __init. Using the existing retries already built into
-> > > > > sev_platform_init() also the file to be read once userspace is
-> > > > > running, meaning the file system is usable. As I tried to explain in
-> > > > > the commit message. We could remove the sev_platform_init call during
-> > > > > sev_pci_init since this only actually needs to be initialized when the
-> > > > > first command requiring it is issues (either reading some keys/certs
-> > > > > from the PSP or launching an SEV guest). Then userspace in both the
-> > > > > builtin and module usage would know running one of those commands
-> > > > > cause the file to be read for PSP usage. Tom any thoughts on this?
-> > > > >
-> > > >
-> > > > One thing to note is that if we do the INIT on the first command then
-> > > > the first guest launch will take a longer. The init command is not
-> > > > cheap (especially with the SNP, it may take a longer because it has to
-> > > > do all those RMP setup etc). IIRC, in my early SEV series in I was doing
-> > > > the INIT during the first command execution and based on the
-> > > > recommendation moved to do the init on probe.
-> > > >
-> > > > Should we add a module param to control whether to do INIT on probe or
-> > > > delay until the first command ?
-> > >
-> > > Thats a good point Brijesh. I've only been testing this with SEV and
-> > > ES so haven't noticed that long setup time. I like the idea of a
-> > > module parameter to decide when to INIT, that should satisfy Sean's
-> > > concern that the user doesn't know when the INIT_EX file would be read
-> > > and that there is extra retry code (duplicated between sev_pci_init
-> > > and all the PSP commands). I'll get started on that.
-> >
-> > I need a little guidance on how to proceed with this. Should I have
-> > the new module parameter 'psp_init_on_probe' just disable PSP init on
-> > module init if false. Or should it also disable PSP init during
-> > command flow if it's true?
-> >
-> > I was thinking I should just have 'psp_init_on_probe' default to true,
-> > and if false it stops the PSP init during sev_pci_init(). If I add the
-> > second change that seems like it changes the ABI. Thoughts?
->
-> What about doing the INIT when we load the KVM module? Does that
-> resolve all of these problems? By the time we load the KVM module, we
-> know that the file system is up, which is the original problem we were
-> trying to solve. And the KVM module is most likely loaded before we
-> run the first guest.
+On 11/12/21 7:43 AM, Peter Gonda wrote:
+...
+> Here is an alternative to the current approach: On RMP violation (host
+> or userspace) the page fault handler converts the page from private to
+> shared to allow the write to continue. This pulls from s390’s error
+> handling which does exactly this. See ‘arch_make_page_accessible()’.
+> Additionally it adds less complexity to the SNP kernel patches, and
+> requires no new ABI.
 
-KVM can be compiled as Y as well right? Then KVM module init is still too early.
+I think it's important to very carefully describe where these RMP page
+faults can occur within the kernel.  They can obvious occur on things like:
+
+	copy_to_user(&user_buf, &kernel_buf, len);
+
+That's not a big deal.  Those can obviously handle page faults.  We know
+exactly the instruction on which the fault can occur and we handle it
+gracefully.
+
+*But*, these are harder:
+
+	get_user_pages(addr, len, &pages);
+	spin_lock(&lock);
+	ptr = kmap_atomic(pages[0]);
+	*ptr = foo; // #PF here
+	kunmap_atomic(ptr);
+	spin_unlock(&lock);
+	put_page(pages[0]);
+
+In this case, the place where the fault happens are not especially well
+bounded.  It can be in compiler-generated code.  It can happen on any
+random instruction in there.
+
+Or, is there some mechanism that prevent guest-private memory from being
+accessed in random host kernel code?
+
+> This proposal does cause guest memory corruption for some bugs but one
+> of SEV-SNP’s goals extended from SEV-ES’s goals is for guest’s to be
+> able to detect when its memory has been corrupted / replayed by the
+> host. So SNP already has features for allowing guests to detect this
+> kind of memory corruption. Additionally this is very similar to a page
+> of memory generating a machine check because of 2-bit memory
+> corruption. In other words SNP guests must be enlightened and ready
+> for these kinds of errors.
+> 
+> For an SNP guest running under this proposal the flow would look like this:
+> * Host gets a #PF because its trying to write to a private page.
+> * Host #PF handler updates the page to shared.
+> * Write continues normally.
+> * Guest accesses memory (r/w).
+> * Guest gets a #VC error because the page is not PVALIDATED
+> * Guest is now in control. Guest can terminate because its memory has
+> been corrupted. Guest could try and continue to log the error to its
+> owner.
+
+This sounds like a _possible_ opportunity for the guest to do some extra
+handling.  It's also quite possible that this #VC happens in a place
+that the guest can't handle.
+
+
+> A similar approach was introduced in the SNP patches V1 and V2 for
+> kernel page fault handling. The pushback around this convert to shared
+> approach was largely focused around the idea that the kernel has all
+> the information about which pages are shared vs private so it should
+> be able to check shared status before write to pages. After V2 the
+> patches were updated to not have a kernel page fault handler for RMP
+> violations (other than dumping state during a panic). The current
+> patches protect the host with new post_{map,unmap}_gfn() function that
+> checks if a page is shared before mapping it, then locks the page
+> shared until unmapped. Given the discussions on ‘[Part2,v5,39/45] KVM:
+> SVM: Introduce ops for the post gfn map and unmap’ building a solution
+> to do this is non trivial and adds new overheads to KVM. Additionally
+> the current solution is local to the kernel. So a new ABI just now be
+> created to allow the userspace VMM to access the kernel-side locks for
+> this to work generically for the whole host. This is more complicated
+> than this proposal and adding more lock holders seems like it could
+> reduce performance further.
+
+The locking is complicated.  But, I think it is necessary.  Once the
+kernel can map private memory, it can access it in random spots.  It's
+hard to make random kernel code recoverable from faults.
