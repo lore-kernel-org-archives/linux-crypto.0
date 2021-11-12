@@ -2,112 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B11C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 10:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03DEEC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 10:48:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2387760EDF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 10:42:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA76F60F21
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 10:48:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234415AbhKLKpl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 05:45:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45788 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231173AbhKLKpl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 05:45:41 -0500
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83635C061766
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 02:42:50 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id f3so21175720lfu.12
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 02:42:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=7EZ9QdgsdMAEVS3fE4SgINpNgX5xY0FsGu/mWvtIiQI=;
-        b=IyfkYPacfZPnzhtulkfztchRIHnAT3Pu34SkkJh/8WnLOSqJHfCuK65VikFPNLJv9R
-         /ZzsDa85wBpTIYScMQ7gsFDW126gMmxhPpx+V06SXgrLVOc3sblbJR4N8kyNdNsB5eZi
-         GmBTKJoHiGnldBugYnYVEN2lqQUUUDhIGiuLTFEJ4xjIfozdoeeSQ0V0n+8FW7CxH73U
-         Qx1HeN0sOO4TeWmADhQdhYqw4iNZnk6JWiycGHU4chYRg8dP2t5kC/xczz+RXs3fKXMu
-         e+q8u7dA3vP1d/5Se3np6X69hBPadoeqJWfx9LQpZ9EeEl3ELuHX05w4hGKkDPkoY3x/
-         4hgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=7EZ9QdgsdMAEVS3fE4SgINpNgX5xY0FsGu/mWvtIiQI=;
-        b=lxua8/uGBEVpC86GWo+baupTqkX4Kzi7NXrjwhyF6CcVWHTlxG8vJtbOU7L/ELkj4c
-         BjzNfwGS4m4JW6cDuYrn1dt4iCOXZBn9OEJKsIgk4IMTo3MNe++aMCrAIstRQSCN48NS
-         BsN6dotWRNXQaXrD2+OarOeyb2QE9yOzN6ofpK5NepvOADfbBm4ywwxEZ84X/fBY0uqK
-         bHYkjs1peWexlCZEHROwqbDR282wfFIfQ8hjqdIJLbyyzT76pMICl2w/Syxe7ypn+MnE
-         kutSrS4AjPehqqhUuArhxYKW4dejt/m/6j5oS/bYI/1Zn55W4sO8iOeg/G/6kaJe2l4w
-         RgxA==
-X-Gm-Message-State: AOAM533n+cC/bBRFrFammtYQ1a++QmR2lxP8835d9zwBxZi6kTtimtcw
-        x1g97ijMIK7V9jXcxjwn/6aPwFGWclDJUFQA
-X-Google-Smtp-Source: ABdhPJxc3CpcqYaTYVf/JJGUSc6lfqaDL4QcpqKBIaKsyDpKTEvakzYd+ikLWV0ZlWpi6tUbRfVkQg==
-X-Received: by 2002:ac2:5f0d:: with SMTP id 13mr13334331lfq.334.1636713768917;
-        Fri, 12 Nov 2021 02:42:48 -0800 (PST)
-Received: from [192.168.1.102] (62-248-207-242.elisa-laajakaista.fi. [62.248.207.242])
-        by smtp.gmail.com with ESMTPSA id x27sm529171lfq.192.2021.11.12.02.42.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Nov 2021 02:42:48 -0800 (PST)
-Subject: Re: [PATCH v5 17/22] crypto: qce: Print a failure msg in case probe()
- fails
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     bhupesh.linux@gmail.com, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, robh+dt@kernel.org, agross@kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        stephan@gerhold.net, Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Thara Gopinath <thara.gopinath@linaro.org>
-References: <20211110105922.217895-1-bhupesh.sharma@linaro.org>
- <20211110105922.217895-18-bhupesh.sharma@linaro.org>
-From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
-Message-ID: <5b8d5f23-e766-5b9c-986c-ef70fae9119e@linaro.org>
-Date:   Fri, 12 Nov 2021 12:42:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S233883AbhKLKvP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 05:51:15 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:56674 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233441AbhKLKvP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Nov 2021 05:51:15 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1mlU6W-00076q-2H; Fri, 12 Nov 2021 18:48:20 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1mlU6R-0003fz-LQ; Fri, 12 Nov 2021 18:48:15 +0800
+Date:   Fri, 12 Nov 2021 18:48:15 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 5.16
+Message-ID: <20211112104815.GA14105@gondor.apana.org.au>
+References: <20200803044024.GA6429@gondor.apana.org.au>
+ <20200830223304.GA16882@gondor.apana.org.au>
+ <20201026011159.GA2428@gondor.apana.org.au>
+ <20201227113221.GA28744@gondor.apana.org.au>
+ <20210108035450.GA6191@gondor.apana.org.au>
+ <20210708030913.GA32097@gondor.apana.org.au>
+ <20210817013601.GA14148@gondor.apana.org.au>
+ <20210929023843.GA28594@gondor.apana.org.au>
+ <20211029041408.GA3192@gondor.apana.org.au>
 MIME-Version: 1.0
-In-Reply-To: <20211110105922.217895-18-bhupesh.sharma@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211029041408.GA3192@gondor.apana.org.au>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Bhupesh,
+Hi Linus:
 
-On 11/10/21 12:59 PM, Bhupesh Sharma wrote:
-> Print a failure message (dev_err) in case the qcom qce crypto
-> driver probe() fails.
-> 
-> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> Cc: Rob Herring <robh+dt@kernel.org>
-> Reviewed-by: Thara Gopinath <thara.gopinath@linaro.org>
-> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> ---
->   drivers/crypto/qce/core.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-> index 98784d63d78c..7c90401a2ef1 100644
-> --- a/drivers/crypto/qce/core.c
-> +++ b/drivers/crypto/qce/core.c
-> @@ -280,6 +280,7 @@ static int qce_crypto_probe(struct platform_device *pdev)
->   err_mem_path_disable:
->   	icc_set_bw(qce->mem_path, 0, 0);
->   err:
-> +	dev_err(dev, "%s failed : %d\n", __func__, ret);
->   	return ret;
->   }
->   
-> 
+This push fixes a boot crash regression.
 
-in my opinion expressed earlier this change is not needed, but I'll recede,
-if somebody thinks that the change is useful in any way.
+The following changes since commit 39ef08517082a424b5b65c3dbaa6c0fa9d3303b9:
 
---
-Best wishes,
-Vladimir
+  crypto: testmgr - fix wrong key length for pkcs1pad (2021-10-29 21:04:04 +0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus 
+
+for you to fetch changes up to beaaaa37c664e9afdf2913aee19185d8e3793b50:
+
+  crypto: api - Fix boot-up crash when crypto manager is disabled (2021-11-09 13:45:48 +0800)
+
+----------------------------------------------------------------
+Herbert Xu (1):
+      crypto: api - Fix boot-up crash when crypto manager is disabled
+
+ crypto/algapi.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
