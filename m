@@ -2,74 +2,42 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B3DC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 21:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03238C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 22:07:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73A0060E9C
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 21:43:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB3AA60E73
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 22:07:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235775AbhKLVqQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 16:46:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55374 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235756AbhKLVqQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 16:46:16 -0500
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E1C2C0613F5
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 13:43:25 -0800 (PST)
-Received: by mail-oi1-x235.google.com with SMTP id q124so20366823oig.3
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 13:43:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=p6BJgAR2dKpdI5PQSFC6gOgUXqAUQZJtadmObr7tjTY=;
-        b=AnRQXnEvNzvr8lmbdoVBi472Kzz/I2xvy53cquSxtFszpAe3zph3LuOPEc5/48deXh
-         xzvEzM60QjlA+Vpeqcr5k2Xs9hIpwxJHjlaBy+UJ+tVrUBkcD59RCdQ+/DT38Ot+4p9h
-         v0AIhXq1nE9873XX18Cuk0CjaQh/m87fMJI7jgMcSqhzslXXtaw6E3pz1r6NeJVqvqhN
-         K7/P/WRPlJwR11gNsOk5JE/VBsulqTP5MhsyHwJIlWm8Cg31Kz6C4pLrDMcWcLhAv+2h
-         1h3Rk1x09vCadHQBu9BU9p2uxYWPHVizVC0N06lkIufqe7Tq8CJVeVZLg5AIwOIU7Q0y
-         7plA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=p6BJgAR2dKpdI5PQSFC6gOgUXqAUQZJtadmObr7tjTY=;
-        b=oOFeiuFIVjf9I/nECZveo0R7LpE1xQOoXIRi99etQv0GdD/kUq24SsqT1VpMdtp5wI
-         vuW8Cn0qAFf5R0NFY0Q5pSAcdcLl7hfPz0LFezk1fVorW1tqUHGCeDwTcmfBLRqtdQ7y
-         o4T1e6DscLizpz7Qdk9P3VC8vBh0M2Z23a3q3vTZmdp0i0nhIUIpva6AeeAdDL2KXluF
-         v1/C8OMh7/9LwjDtoyCVzy2hWMJYZb/KJN5tDmU9P6YqPoLA2+kI1AbhorBm+NG+I1SU
-         VgdMH5XnxDv+DR/gVQ8dqGOqf15gDDAyP2pqTki1+ja35TMI0d6zhtVt3pXIN0mmqwNL
-         aAGA==
-X-Gm-Message-State: AOAM531MuQrfV3SNJPjSGJaIfuwrIrliutcJ8oekQ5eR2GLEVneu8/ZH
-        Lb/tieLqryptyINucTNrrAQbiy5yZwd4rByffsiTvA==
-X-Google-Smtp-Source: ABdhPJwN1DMFj8lwZlramd1I0OGWe2kSl7QSbL+hhwnl5gfxV3O28d9EPTR8alNht5b3hCsOpj1PmUPMkqmyQaJMInE=
-X-Received: by 2002:aca:2319:: with SMTP id e25mr28956699oie.164.1636753404063;
- Fri, 12 Nov 2021 13:43:24 -0800 (PST)
-MIME-Version: 1.0
-References: <20210820155918.7518-1-brijesh.singh@amd.com> <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com> <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com> <YY7I6sgqIPubTrtA@zn.tnic> <YY7Qp8c/gTD1rT86@google.com>
- <CAA03e5GwHMPYHHq3Nkkq1HnEJUUsw-Vk+5wFCott3pmJY7WuAw@mail.gmail.com> <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com>
-In-Reply-To: <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Fri, 12 Nov 2021 13:43:13 -0800
-Message-ID: <CAA03e5Fw9cRnb=+eJmzEB+0QmdgaGZ7=fPTUYx7f55mGVXLRMA@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
+        id S231320AbhKLWKG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 17:10:06 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:58186 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232139AbhKLWKF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Nov 2021 17:10:05 -0500
+Received: from zn.tnic (p4fed33a9.dip0.t-ipconnect.de [79.237.51.169])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F0BF71EC0529;
+        Fri, 12 Nov 2021 23:07:12 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1636754833;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Rz0bvMnxj1mTcV1uKRokUV4035i6Ep9FMFYlLaZIcRU=;
+        b=AzW7bLGwJw3aqcyrd9/ivwlTxGKaefH1BpiKsMx8IFGcyZqfWYKquWAdkBxOnUmm7krQcJ
+        pkWiVRpkY+GmCNe0ALHUo9kn7M0dHKnQqRfHKREgQd/E0A7Tm3SKN+JZOuK+3gKwTf3eBS
+        Wm6JnlJ8z/W93wrW1L9dOx26Fr5BKwA=
+Date:   Fri, 12 Nov 2021 23:04:56 +0100
+From:   Borislav Petkov <bp@alien8.de>
 To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
+Cc:     Peter Gonda <pgonda@google.com>,
+        Sean Christopherson <seanjc@google.com>,
         Dave Hansen <dave.hansen@intel.com>,
-        Peter Gonda <pgonda@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
         Tom Lendacky <Thomas.Lendacky@amd.com>,
         "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
@@ -79,107 +47,71 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Sergio Lopez <slp@redhat.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Peter Zijlstra <peterz@infradead.org>,
         Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
         David Rientjes <rientjes@google.com>,
         Dov Murik <dovmurik@linux.ibm.com>,
         Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <Michael.Roth@amd.com>,
+        Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YY7lCGB21gqp2Zah@zn.tnic>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
+ <YY7I6sgqIPubTrtA@zn.tnic>
+ <YY7Qp8c/gTD1rT86@google.com>
+ <YY7USItsMPNbuSSG@zn.tnic>
+ <CAMkAt6o909yYq3NfRboF3U3V8k-2XGb9p_WcQuvSjOKokmMzMA@mail.gmail.com>
+ <869622df-5bf6-0fbb-cac4-34c6ae7df119@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <869622df-5bf6-0fbb-cac4-34c6ae7df119@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 12, 2021 at 1:39 PM Andy Lutomirski <luto@kernel.org> wrote:
->
->
->
-> On Fri, Nov 12, 2021, at 1:30 PM, Marc Orr wrote:
-> > On Fri, Nov 12, 2021 at 12:38 PM Sean Christopherson <seanjc@google.com=
-> wrote:
-> >>
-> >> On Fri, Nov 12, 2021, Borislav Petkov wrote:
-> >> > On Fri, Nov 12, 2021 at 07:48:17PM +0000, Sean Christopherson wrote:
-> >> > > Yes, but IMO inducing a fault in the guest because of _host_ bug i=
-s wrong.
-> >> >
-> >> > What do you suggest instead?
-> >>
-> >> Let userspace decide what is mapped shared and what is mapped private.=
-  The kernel
-> >> and KVM provide the APIs/infrastructure to do the actual conversions i=
-n a thread-safe
-> >> fashion and also to enforce the current state, but userspace is the co=
-ntrol plane.
-> >>
-> >> It would require non-trivial changes in userspace if there are multipl=
-e processes
-> >> accessing guest memory, e.g. Peter's networking daemon example, but it=
- _is_ fully
-> >> solvable.  The exit to userspace means all three components (guest, ke=
-rnel,
-> >> and userspace) have full knowledge of what is shared and what is priva=
-te.  There
-> >> is zero ambiguity:
-> >>
-> >>   - if userspace accesses guest private memory, it gets SIGSEGV or wha=
-tever.
-> >>   - if kernel accesses guest private memory, it does BUG/panic/oops[*]
-> >>   - if guest accesses memory with the incorrect C/SHARED-bit, it gets =
-killed.
-> >>
-> >> This is the direction KVM TDX support is headed, though it's obviously=
- still a WIP.
-> >>
-> >> And ideally, to avoid implicit conversions at any level, hardware vend=
-ors' ABIs
-> >> define that:
-> >>
-> >>   a) All convertible memory, i.e. RAM, starts as private.
-> >>   b) Conversions between private and shared must be done via explicit =
-hypercall.
-> >>
-> >> Without (b), userspace and thus KVM have to treat guest accesses to th=
-e incorrect
-> >> type as implicit conversions.
-> >>
-> >> [*] Sadly, fully preventing kernel access to guest private is not poss=
-ible with
-> >>     TDX, especially if the direct map is left intact.  But maybe in th=
-e future
-> >>     TDX will signal a fault instead of poisoning memory and leaving a =
-#MC mine.
-> >
-> > In this proposal, consider a guest driver instructing a device to DMA
-> > write a 1 GB memory buffer. A well-behaved guest driver will ensure
-> > that the entire 1 GB is marked shared. But what about a malicious or
-> > buggy guest? Let's assume a bad guest driver instructs the device to
-> > write guest private memory.
-> >
-> > So now, the virtual device, which might be implemented as some host
-> > side process, needs to (1) check and lock all 4k constituent RMP
-> > entries (so they're not converted to private while the DMA write is
-> > taking palce), (2) write the 1 GB buffer, and (3) unlock all 4 k
-> > constituent RMP entries? If I'm understanding this correctly, then the
-> > synchronization will be prohibitively expensive.
->
-> Let's consider a very very similar scenario: consider a guest driver sett=
-ing up a 1 GB DMA buffer.  The virtual device, implemented as host process,=
- needs to (1) map (and thus lock *or* be prepared for faults) in 1GB / 4k p=
-ages of guest memory (so they're not *freed* while the DMA write is taking =
-place), (2) write the buffer, and (3) unlock all the pages.  Or it can lock=
- them at setup time and keep them locked for a long time if that's appropri=
-ate.
->
-> Sure, the locking is expensive, but it's nonnegotiable.  The RMP issue is=
- just a special case of the more general issue that the host MUST NOT ACCES=
-S GUEST MEMORY AFTER IT'S FREED.
+On Fri, Nov 12, 2021 at 01:20:53PM -0800, Andy Lutomirski wrote:
+> Can you clarify what type of host bug you're talking about here?  We're
+> talking about the host kernel reading or writing guest private memory
+> through the direct map or kmap, right?  It seems to me that the way this
+> happens is:
+> 
+> struct page *guest_page = (get and refcount a guest page);
+> 
+> ...
+> 
+> guest switches the page to private;
+> 
+> ...
+> 
+> read or write the page via direct map or kmap.
 
-Good point.
+Maybe I don't understand your example properly but on this access here,
+the page is not gonna be validated anymore in the RMP table, i.e., on
+the next access, the guest will get a #VC.
+
+Or are you talking about a case where the host gets a reference to a
+guest page and the guest - in the meantime - PVALIDATEs that page and
+thus converts it into a private page?
+
+So that case is simple: if the guest really deliberately gave that page
+to the host to do stuff to it and it converted it to private in the
+meantime, guest dies.
+
+That's why it would make sense to have explicit consensus between guest
+and host which pages get shared. Everything else is not going to be
+allowed and the entity at fault pays the consequences.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
