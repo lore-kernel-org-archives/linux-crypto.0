@@ -2,220 +2,358 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD69C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 16:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 501FDC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 17:39:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9827461073
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 16:55:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31FCB60FE3
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 17:39:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235333AbhKLQ6U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 11:58:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47102 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235331AbhKLQ6T (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 11:58:19 -0500
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131F5C061766
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 08:55:28 -0800 (PST)
-Received: by mail-lj1-x236.google.com with SMTP id e9so19724882ljl.5
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 08:55:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Hm2H8ZgFFHPAU4qfb3b/BSJd0XRMlWu5AvWuSmXvi28=;
-        b=SinHaY3dhHRcOqPVkPd1IPujerUVPA0LjnDsPyKqW0X7an9+Eob1/CJNtehkiWSTKc
-         J58P+Dhs2EclH2aJMZGk2jbnVaLnad4j14xAxpBQvS5q4Ipcehsx5Hm5RDPgGHxzTlkW
-         mG/g0ajk+n9y/CQrka0xuXN1ovB2GLxNHdBSer/GS3b1vXiY6B2lX6tBnu7qGK07PMQY
-         py5fRDgADEDK6m/Jke8jUD36MUQKdLy7okHHM7qN8RwZZMpeiw0xhnGQHVmKhqYsofaQ
-         avFQ9L6vmAjPHIphLbei9WeQ6egJxY2faHPdZRa2jh2rQZjB8zc7FosAgbiGpcna1Uyt
-         uznA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Hm2H8ZgFFHPAU4qfb3b/BSJd0XRMlWu5AvWuSmXvi28=;
-        b=Ic+o261HJaT9aJlu29Gxl6bEjVn4eMOLZ3MDKrxdFbiAGbnsUf0IOiwl98Z7dQRNyF
-         NGD9XodhmghA0MMxAyyiReIMULPkfdUCe8825MiNcsvtzNuh0RYEyaWDqbj2Ij/TAT2+
-         kGt01tvTEtpn0YP2PH0fRzpakO8XZDpxDdjHmu9lXNPUE+WiY1wAd80aI5GFJde5wm7f
-         59i7fbFqYejMbXCxFA3y61s9bdRw6/dHKOeEzQ1lsN9Yt9iHuKVOJB6TH0YLWiL3ezEz
-         y1OaI7bO07MUK2VfC4I9BVgaLBOyG/m07hFzPbxyRwEvUind0U2fcRT5KvrlrL07oMJ2
-         /jnA==
-X-Gm-Message-State: AOAM5307llDll7/FQqkMFyu8/GeEkU0LevzjQqSWABwAAzgAzPe/wAfe
-        wjUGvVB6U5hqlMBIJiwgFrGiALOhLx6igmBWr2Vtug==
-X-Google-Smtp-Source: ABdhPJx34NZhoDLJkZ1e9VSfWbKvbXQCN+8BLUffYvOT/TIacZTnYFaak9yXMUlymqwpzXsuC7Wt5b+aAH6/CSbPRI0=
-X-Received: by 2002:a2e:6e12:: with SMTP id j18mr14475941ljc.527.1636736126134;
- Fri, 12 Nov 2021 08:55:26 -0800 (PST)
+        id S235420AbhKLRmq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 12:42:46 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47328 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233404AbhKLRmp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Nov 2021 12:42:45 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 729F960FE7;
+        Fri, 12 Nov 2021 17:39:54 +0000 (UTC)
+From:   Chuck Lever <chuck.lever@oracle.com>
+To:     dhowells@redhat.com
+Cc:     ak@tempesta-tech.com, linux-crypto@vger.kernel.org
+Subject: [PATCH Strawman] crypto: Handle PEM-encoded x.509 certificates
+Date:   Fri, 12 Nov 2021 12:39:52 -0500
+Message-Id:  <163673838611.45802.5085223391786276660.stgit@morisot.1015granger.net>
+X-Mailer: git-send-email 2.33.0
+User-Agent: StGit/1.4
 MIME-Version: 1.0
-References: <20211102142331.3753798-1-pgonda@google.com> <20211102142331.3753798-5-pgonda@google.com>
- <YYquDWbkIwCkixxD@google.com> <CAMkAt6rHdsdD-L4PbZL7qaOY7GRHmApVJam0V0yY2BnYdhmPjA@mail.gmail.com>
- <YYrZXRTukz3RccPN@google.com> <CAMkAt6qauoiTBXF9VXRGiqtJD5pTAV=NqKHZgNFXHCkrR50gkg@mail.gmail.com>
- <eff7a2cb-f78a-646a-dc0c-b24998e9e9af@amd.com> <CAMkAt6rj94Mzb6HBaqQbi7HHfhS4q1O4fxO8M7Xe=TZeZ0zZOg@mail.gmail.com>
-In-Reply-To: <CAMkAt6rj94Mzb6HBaqQbi7HHfhS4q1O4fxO8M7Xe=TZeZ0zZOg@mail.gmail.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 12 Nov 2021 09:55:14 -0700
-Message-ID: <CAMkAt6r5MJq0rGYg7MAqm83Xp4mBADSKtQxV=i2_OFuQnDd5Yg@mail.gmail.com>
-Subject: Re: [PATCH V3 4/4] crypto: ccp - Add SEV_INIT_EX support
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     Sean Christopherson <seanjc@google.com>, Thomas.Lendacky@amd.com,
-        David Rientjes <rientjes@google.com>,
-        Marc Orr <marcorr@google.com>, Joerg Roedel <jroedel@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        John Allen <john.allen@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=11131; h=from:subject:message-id; bh=qKTUvTIVw8p+7BNq59Lhbz1JipQqS8JAzjd2dgeXDvU=; b=owEBbQKS/ZANAwAIATNqszNvZn+XAcsmYgBhjqbimfjqDvQJslhMdQd5hbL8ixIT88pDP97Sif5N A4TjfNmJAjMEAAEIAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCYY6m4gAKCRAzarMzb2Z/lx2xD/ 48O9Jjpe6DtSJHg0hQXgf5JfZbEbxbSKY2xiaXbHpi/jJcZ2D4rGCLD76cOPXhXyqcTpMfp24jggCR ja9YfL1rhG9K3Bn8H3uyqKCwn7qHQ/InFcNo+stJ5WUFPAhI6SiNHugXuw4M4JWkO4bAdZj9JJB0Jm VLbmUPiXuCKtcy18tBXppg69lMAeWZfZ0dN5F5s1sZQUI1M7EvHkYxrmXPEuCPCSLDActiD0b0R8HF imFSrUBnLqDriknOfbDo19aiMRBzImCB2mgP3ao2S10rkoJ9fq3S5FECAFCYFKe/ntbUn8dh/wAVgY iMhNG/22IOjM36XOsL3AGWSA3Zaj9aBVFc8f7eze80yvcnuQmN2qoBXutn5R9SQuWvaFFvPKn9qwKf +JYYkdd9FXyPmMeTeGfn0jL8TWk184lm/ZoCfMp3d0AuLADhuF9afcGXRTcNTrP4yyDYEdV2GEMJjO LENUE1DShSQmN3F2uXBd44jq9rgD0d3d3IeigC1Tn9c5OYjAF9ytRJFZRJMJc7423qGh9TyEhQAm7k 3QiT1O2nqkUAV+e3oi189pdeo1s6YRd42S8tuHv4fHKJeit6xsUkDEA+CS2FP9w4THhzoLmB9ZZTUp jccQ6NzkzF8O0yNM4LO0NNpvbVNqFT2f/kLMudkqNQuxkd+tUHcZKlNDvoCQ==
+X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp; fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 10, 2021 at 8:32 AM Peter Gonda <pgonda@google.com> wrote:
->
-> On Tue, Nov 9, 2021 at 3:20 PM Brijesh Singh <brijesh.singh@amd.com> wrote:
-> >
-> >
-> >
-> > On 11/9/21 2:46 PM, Peter Gonda wrote:
-> > > On Tue, Nov 9, 2021 at 1:26 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >>
-> > >> On Tue, Nov 09, 2021, Peter Gonda wrote:
-> > >>> On Tue, Nov 9, 2021 at 10:21 AM Sean Christopherson <seanjc@google.com> wrote:
-> > >>>> There's no need for this to be a function pointer, and the duplicate code can be
-> > >>>> consolidated.
-> > >>>>
-> > >>>> static int sev_do_init_locked(int cmd, void *data, int *error)
-> > >>>> {
-> > >>>>          if (sev_es_tmr) {
-> > >>>>                  /*
-> > >>>>                   * Do not include the encryption mask on the physical
-> > >>>>                   * address of the TMR (firmware should clear it anyway).
-> > >>>>                   */
-> > >>>>                  data.flags |= SEV_INIT_FLAGS_SEV_ES;
-> > >>>>                  data.tmr_address = __pa(sev_es_tmr);
-> > >>>>                  data.tmr_len = SEV_ES_TMR_SIZE;
-> > >>>>          }
-> > >>>>          return __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
-> > >>>> }
-> > >>>>
-> > >>>> static int __sev_init_locked(int *error)
-> > >>>> {
-> > >>>>          struct sev_data_init data;
-> > >>>>
-> > >>>>          memset(&data, 0, sizeof(data));
-> > >>>>          return sev_do_init_locked(cmd, &data, error);
-> > >>>> }
-> > >>>>
-> > >>>> static int __sev_init_ex_locked(int *error)
-> > >>>> {
-> > >>>>          struct sev_data_init_ex data;
-> > >>>>
-> > >>>>          memset(&data, 0, sizeof(data));
-> > >>>>          data.length = sizeof(data);
-> > >>>>          data.nv_address = __psp_pa(sev_init_ex_nv_address);
-> > >>>>          data.nv_len = NV_LENGTH;
-> > >>>>          return sev_do_init_locked(SEV_CMD_INIT_EX, &data, error);
-> > >>>> }
-> > >>>
-> > >>> I am missing how this removes the duplication of the retry code,
-> > >>> parameter checking, and other error checking code.. With what you have
-> > >>> typed out I would assume I still need to function pointer between
-> > >>> __sev_init_ex_locked and __sev_init_locked. Can you please elaborate
-> > >>> here?
-> > >>
-> > >> Hmm.  Ah, I got distracted between the original thought, the realization that
-> > >> the two commands used different structs, and typing up the above.
-> > >>
-> > >>> Also is there some reason the function pointer is not acceptable?
-> > >>
-> > >> It's not unacceptable, it would just be nice to avoid, assuming the alternative
-> > >> is cleaner.  But I don't think any alternative is cleaner, since as you pointed
-> > >> out the above is a half-baked thought.
-> > >
-> > > OK I'll leave as is.
-> > >
-> > >>
-> > >>>>> +     rc = init_function(error);
-> > >>>>>        if (rc && *error == SEV_RET_SECURE_DATA_INVALID) {
-> > >>>>>                /*
-> > >>>>>                 * INIT command returned an integrity check failure
-> > >>>>> @@ -286,8 +423,8 @@ static int __sev_platform_init_locked(int *error)
-> > >>>>>                 * failed and persistent state has been erased.
-> > >>>>>                 * Retrying INIT command here should succeed.
-> > >>>>>                 */
-> > >>>>> -             dev_dbg(sev->dev, "SEV: retrying INIT command");
-> > >>>>> -             rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
-> > >>>>> +             dev_notice(sev->dev, "SEV: retrying INIT command");
-> > >>>>> +             rc = init_function(error);
-> > >>>>
-> > >>>> The above comment says "persistent state has been erased", but __sev_do_cmd_locked()
-> > >>>> only writes back to the file if a relevant command was successful, which means
-> > >>>> that rereading the userspace file in __sev_init_ex_locked() will retry INIT_EX
-> > >>>> with the same garbage data.
-> > >>>
-> > >>> Ack my mistake, that comment is stale. I will update it so its correct
-> > >>> for the INIT and INIT_EX flows.
-> > >>>>
-> > >>>> IMO, the behavior should be to read the file on load and then use the kernel buffer
-> > >>>> without ever reloading (unless this is built as a module and is unloaded and reloaded).
-> > >>>> The writeback then becomes opportunistic in the sense that if it fails for some reason,
-> > >>>> the kernel's internal state isn't blasted away.
-> > >>>
-> > >>> One issue here is that the file read can fail on load so we use the
-> > >>> late retry to guarantee we can read the file.
-> > >>
-> > >> But why continue loading if reading the file fails on load?
-> > >>
-> > >>> The other point seems like preference. Users may wish to shutdown the PSP FW,
-> > >>> load a new file, and INIT_EX again with that new data. Why should we preclude
-> > >>> them from that functionality?
-> > >>
-> > >> I don't think we should preclude that functionality, but it needs to be explicitly
-> > >> tied to a userspace action, e.g. either on module load or on writing the param to
-> > >> change the path.  If the latter is allowed, then it needs to be denied if the PSP
-> > >> is initialized, otherwise the kernel will be in a non-coherent state and AFAICT
-> > >> userspace will have a heck of a time even understanding what state has been used
-> > >> to initialize the PSP.
-> > >
-> > > If this driver is builtin the filesystem will be unavailable during
-> > > __init. Using the existing retries already built into
-> > > sev_platform_init() also the file to be read once userspace is
-> > > running, meaning the file system is usable. As I tried to explain in
-> > > the commit message. We could remove the sev_platform_init call during
-> > > sev_pci_init since this only actually needs to be initialized when the
-> > > first command requiring it is issues (either reading some keys/certs
-> > > from the PSP or launching an SEV guest). Then userspace in both the
-> > > builtin and module usage would know running one of those commands
-> > > cause the file to be read for PSP usage. Tom any thoughts on this?
-> > >
-> >
-> > One thing to note is that if we do the INIT on the first command then
-> > the first guest launch will take a longer. The init command is not
-> > cheap (especially with the SNP, it may take a longer because it has to
-> > do all those RMP setup etc). IIRC, in my early SEV series in I was doing
-> > the INIT during the first command execution and based on the
-> > recommendation moved to do the init on probe.
-> >
-> > Should we add a module param to control whether to do INIT on probe or
-> > delay until the first command ?
->
-> Thats a good point Brijesh. I've only been testing this with SEV and
-> ES so haven't noticed that long setup time. I like the idea of a
-> module parameter to decide when to INIT, that should satisfy Sean's
-> concern that the user doesn't know when the INIT_EX file would be read
-> and that there is extra retry code (duplicated between sev_pci_init
-> and all the PSP commands). I'll get started on that.
+This enables "# cat cert.pem | keyctl padd asymmetric <keyring>"
 
-I need a little guidance on how to proceed with this. Should I have
-the new module parameter 'psp_init_on_probe' just disable PSP init on
-module init if false. Or should it also disable PSP init during
-command flow if it's true?
+Since prep->data is a "const void *" I didn't feel comfortable with
+pem_decode() simply overwriting either the pointer or the contents
+of the provided buffer. A secondary buffer is therefore allocated,
+and then later freed by .free_preparse.
 
-I was thinking I should just have 'psp_init_on_probe' default to true,
-and if false it stops the PSP init during sev_pci_init(). If I add the
-second change that seems like it changes the ABI. Thoughts?
+This compiles, but is otherwise untested. I'm interested in opinions
+about this approach.
 
->
-> >
-> > -Brijesh
+Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+---
+ crypto/asymmetric_keys/Makefile          |    3 
+ crypto/asymmetric_keys/asymmetric_type.c |    7 +
+ crypto/asymmetric_keys/pem.c             |  185 ++++++++++++++++++++++++++++++
+ crypto/asymmetric_keys/pem.h             |    8 +
+ crypto/asymmetric_keys/pkcs8_parser.c    |    5 +
+ crypto/asymmetric_keys/x509_public_key.c |    5 +
+ include/linux/key-type.h                 |    2 
+ 7 files changed, 212 insertions(+), 3 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/pem.c
+ create mode 100644 crypto/asymmetric_keys/pem.h
+
+diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
+index 28b91adba2ae..1df8c976dd2f 100644
+--- a/crypto/asymmetric_keys/Makefile
++++ b/crypto/asymmetric_keys/Makefile
+@@ -8,7 +8,8 @@ obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += asymmetric_keys.o
+ asymmetric_keys-y := \
+ 	asymmetric_type.o \
+ 	restrict.o \
+-	signature.o
++	signature.o \
++	pem.o
+ 
+ obj-$(CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE) += public_key.o
+ obj-$(CONFIG_ASYMMETRIC_TPM_KEY_SUBTYPE) += asym_tpm.o
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index ad8af3d70ac0..f5d810c079b6 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -12,10 +12,12 @@
+ #include <linux/seq_file.h>
+ #include <linux/module.h>
+ #include <linux/slab.h>
++#include <linux/vmalloc.h>
+ #include <linux/ctype.h>
+ #include <keys/system_keyring.h>
+ #include <keys/user-type.h>
+ #include "asymmetric_keys.h"
++#include "pem.h"
+ 
+ MODULE_LICENSE("GPL");
+ 
+@@ -378,6 +380,10 @@ static int asymmetric_key_preparse(struct key_preparsed_payload *prep)
+ 	if (prep->datalen == 0)
+ 		return -EINVAL;
+ 
++	ret = pem_decode(prep);
++	if (ret < 0)
++		return ret;
++
+ 	down_read(&asymmetric_key_parsers_sem);
+ 
+ 	ret = -EBADMSG;
+@@ -428,6 +434,7 @@ static void asymmetric_key_free_preparse(struct key_preparsed_payload *prep)
+ 	}
+ 	asymmetric_key_free_kids(kids);
+ 	kfree(prep->description);
++	vfree(prep->decoded);
+ }
+ 
+ /*
+diff --git a/crypto/asymmetric_keys/pem.c b/crypto/asymmetric_keys/pem.c
+new file mode 100644
+index 000000000000..b989fe7c1049
+--- /dev/null
++++ b/crypto/asymmetric_keys/pem.c
+@@ -0,0 +1,185 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Unwrap a PEM-encoded asymmetric key. This implementation unwraps
++ * the interoperable text encoding format specified in RFC 7468.
++ *
++ * Author: Chuck Lever <chuck.lever@oracle.com>
++ *
++ * Copyright (c) 2021, Oracle and/or its affiliates.
++ */
++
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/vmalloc.h>
++#include <linux/key-type.h>
++
++#include "pem.h"
++
++/* Encapsulation boundaries */
++#define PEM_EB_MARKER		"-----"
++#define PEM_BEGIN_MARKER	PEM_EB_MARKER "BEGIN"
++#define PEM_END_MARKER		PEM_EB_MARKER "END"
++
++/*
++ * Unremarkable table-driven base64 decoder based on the public domain
++ * implementation provided at:
++ *   https://en.wikibooks.org/wiki/Algorithm_Implementation/Miscellaneous/Base64
++ *
++ * XXX: Replace this implementation with one that handles EBCDIC input properly.
++ */
++
++#define WHITESPACE 253
++#define EQUALS     254
++#define INVALID    255
++
++static const u8 alphabet[] = {
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, WHITESPACE, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, 62,      INVALID, INVALID, INVALID, 63,
++	52,      53,      54,      55,      56,      57,      58,      59,
++	60,      61,      INVALID, INVALID, INVALID, EQUALS,  INVALID, INVALID,
++	INVALID, 0,       1,       2,       3,       4,       5,       6,
++	7,       8,       9,       10,      11,      12,      13,      14,
++	15,      16,      17,      18,      19,      20,      21,      22,
++	23,      24,      25,      INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, 26,      27,      28,      29,      30,      31,      32,
++	33,      34,      35,      36,      37,      38,      39,      40,
++	41,      42,      43,      44,      45,      46,      47,      48,
++	49,      50,      51,      INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++	INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID,
++};
++
++static bool base64decode(unsigned char *in, size_t inLen,
++			 unsigned char *out, size_t *outLen)
++{
++	unsigned char *end = in + inLen;
++	char iter = 0;
++	uint32_t buf = 0;
++	size_t len = 0;
++
++	while (in < end) {
++		u8 c = alphabet[*in++];
++
++		switch (c) {
++		case WHITESPACE:
++			continue;
++		case INVALID:
++			return false;
++		case EQUALS:
++			in = end;
++			continue;
++		default:
++			buf = buf << 6 | c;
++			iter++;
++
++			if (iter == 4) {
++				if ((len += 3) > *outLen)
++					return false;
++				*(out++) = (buf >> 16) & 255;
++				*(out++) = (buf >> 8) & 255;
++				*(out++) = buf & 255;
++				buf = 0;
++				iter = 0;
++			}
++		}
++	}
++
++	if (iter == 3) {
++		if ((len += 2) > *outLen)
++			return false;
++		*(out++) = (buf >> 10) & 255;
++		*(out++) = (buf >> 2) & 255;
++	} else if (iter == 2) {
++		if (++len > *outLen)
++			return false;
++		*(out++) = (buf >> 4) & 255;
++	}
++
++	*outLen = len;
++	return true;
++}
++
++/**
++ * pem_decode - Attempt to decode a PEM-encoded data blob.
++ * @prep: Data content to examine
++ *
++ * Assumptions:
++ * - The input data buffer is not more than a few pages in size.
++ * - The input data buffer has already been vetted for proper
++ *   kernel read access.
++ * - The input data buffer might not be NUL-terminated.
++ *
++ * PEM type labels are ignored. Subsequent parsing of the
++ * decoded message adequately identifies its content.
++ *
++ * On success, a pointer to a dynamically-allocated buffer
++ * containing the decoded content is returned. This buffer is
++ * vfree'd in the .free_preparse method.
++ *
++ * Return values:
++ *   %1: @prep.decoded points to the decoded message
++ *   %0: @prep did not contain a PEM-encoded message
++ *
++ * A negative errno is returned if an unexpected error has
++ * occurred (eg, memory exhaustion).
++ */
++int pem_decode(struct key_preparsed_payload *prep)
++{
++	const unsigned char *in = prep->data;
++	unsigned char *begin, *end, *out;
++	size_t outlen;
++
++	prep->decoded = NULL;
++	prep->decoded_len = 0;
++
++	/* Find the beginning encapsulation boundary */
++	begin = strnstr(in, PEM_BEGIN_MARKER, prep->datalen);
++	if (!begin)
++		goto out_not_pem;
++	begin = strnstr(begin, PEM_EB_MARKER, begin - in);
++	if (!begin)
++		goto out_not_pem;
++	begin += sizeof(PEM_EB_MARKER);
++
++	/* Find the ending encapsulation boundary */
++	end = strnstr(begin, PEM_END_MARKER, begin - in);
++	if (!end)
++		goto out_not_pem;
++	if (!strnstr(end, PEM_EB_MARKER, end - in))
++		goto out_not_pem;
++	end--;
++
++	/* Attempt to decode */
++	out = vmalloc(end - begin);
++	if (!out)
++		return -ENOMEM;
++	if (!base64decode(begin, end - begin, out, &outlen)) {
++		vfree(out);
++		goto out_not_pem;
++	}
++
++	prep->decoded = out;
++	prep->decoded_len = outlen;
++	return 1;
++
++out_not_pem:
++	return 0;
++}
+diff --git a/crypto/asymmetric_keys/pem.h b/crypto/asymmetric_keys/pem.h
+new file mode 100644
+index 000000000000..51b9db517f94
+--- /dev/null
++++ b/crypto/asymmetric_keys/pem.h
+@@ -0,0 +1,8 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++
++#ifndef __ASYMMETRIC_PEM_H
++#define __ASYMMETRIC_PEM_H
++
++int pem_decode(struct key_preparsed_payload *prep);
++
++#endif /* __ASYMMETRIC_PEM_H */
+diff --git a/crypto/asymmetric_keys/pkcs8_parser.c b/crypto/asymmetric_keys/pkcs8_parser.c
+index 105dcce27f71..b7ce76d3a767 100644
+--- a/crypto/asymmetric_keys/pkcs8_parser.c
++++ b/crypto/asymmetric_keys/pkcs8_parser.c
+@@ -137,7 +137,10 @@ static int pkcs8_key_preparse(struct key_preparsed_payload *prep)
+ {
+ 	struct public_key *pub;
+ 
+-	pub = pkcs8_parse(prep->data, prep->datalen);
++	if (prep->decoded)
++		pub = pkcs8_parse(prep->decoded, prep->decoded_len);
++	else
++		pub = pkcs8_parse(prep->data, prep->datalen);
+ 	if (IS_ERR(pub))
+ 		return PTR_ERR(pub);
+ 
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 3d45161b271a..d8b559ac6d7c 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -167,7 +167,10 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ 	char *desc = NULL, *p;
+ 	int ret;
+ 
+-	cert = x509_cert_parse(prep->data, prep->datalen);
++	if (prep->decoded)
++		cert = x509_cert_parse(prep->decoded, prep->decoded_len);
++	else
++		cert = x509_cert_parse(prep->data, prep->datalen);
+ 	if (IS_ERR(cert))
+ 		return PTR_ERR(cert);
+ 
+diff --git a/include/linux/key-type.h b/include/linux/key-type.h
+index 7d985a1dfe4a..1672f9599afa 100644
+--- a/include/linux/key-type.h
++++ b/include/linux/key-type.h
+@@ -34,6 +34,8 @@ struct key_preparsed_payload {
+ 	union key_payload payload;	/* Proposed payload */
+ 	const void	*data;		/* Raw data */
+ 	size_t		datalen;	/* Raw datalen */
++	const void	*decoded;	/* PEM-decoded data */
++	size_t		decoded_len;	/* Length of PEM-decoded data */
+ 	size_t		quotalen;	/* Quota length for proposed payload */
+ 	time64_t	expiry;		/* Expiry time of key */
+ } __randomize_layout;
+
