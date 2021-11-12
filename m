@@ -2,70 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36963C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 21:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B3DC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 21:43:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 187DD61108
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 21:40:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73A0060E9C
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 21:43:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235800AbhKLVns (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 16:43:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54818 "EHLO
+        id S235775AbhKLVqQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 16:46:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235787AbhKLVnr (ORCPT
+        with ESMTP id S235756AbhKLVqQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 16:43:47 -0500
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C79DC061766
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 13:40:56 -0800 (PST)
-Received: by mail-ot1-x336.google.com with SMTP id z2-20020a9d71c2000000b0055c6a7d08b8so15850183otj.5
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 13:40:56 -0800 (PST)
+        Fri, 12 Nov 2021 16:46:16 -0500
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E1C2C0613F5
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 13:43:25 -0800 (PST)
+Received: by mail-oi1-x235.google.com with SMTP id q124so20366823oig.3
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 13:43:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sloIfHJE+iKk44+AlxrE6ZUAY0xZ35xpRmFUJf3Gn7g=;
-        b=jbcHJF+9hw4eupohwgwDHSMp00T1Og3E98oOfGaje91bd+dB1KH7tEeFB5c9b12QZf
-         M4SfUDdzJh6g/h8SHtMEiY/OpXQgZa1mp35EAXj0B5F0TgrglUAjwdbZeXKRKexgpfYO
-         JeOnZeMhhCE8gyh2sFfqBX7/I9k4lZqXwrlsBgSoRfE0SUOzqVQ4eVF+1qCFkBMQh1kK
-         298qvzCaX1ue3cAtufn+eVTZhGsynUII+gkPfNYusg3eSIIg+qWAWt/vCVbxhZ82tHZc
-         cGcYM6mp+5vX6aBy1DxY0HXVj3TuSIbR+XqrVr1amrcn02wI48UBN3Yh804aRilPcDTK
-         ws/w==
+         :cc:content-transfer-encoding;
+        bh=p6BJgAR2dKpdI5PQSFC6gOgUXqAUQZJtadmObr7tjTY=;
+        b=AnRQXnEvNzvr8lmbdoVBi472Kzz/I2xvy53cquSxtFszpAe3zph3LuOPEc5/48deXh
+         xzvEzM60QjlA+Vpeqcr5k2Xs9hIpwxJHjlaBy+UJ+tVrUBkcD59RCdQ+/DT38Ot+4p9h
+         v0AIhXq1nE9873XX18Cuk0CjaQh/m87fMJI7jgMcSqhzslXXtaw6E3pz1r6NeJVqvqhN
+         K7/P/WRPlJwR11gNsOk5JE/VBsulqTP5MhsyHwJIlWm8Cg31Kz6C4pLrDMcWcLhAv+2h
+         1h3Rk1x09vCadHQBu9BU9p2uxYWPHVizVC0N06lkIufqe7Tq8CJVeVZLg5AIwOIU7Q0y
+         7plA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sloIfHJE+iKk44+AlxrE6ZUAY0xZ35xpRmFUJf3Gn7g=;
-        b=YgZF4WH4svB4LCddlfM36p/uMU1s0S8uNCeFc8/cVLceMelSZama50DfuwniQD5QYv
-         N60WgaofF2M5AYJXgGRXYdoAFvyUpcsp1lFsiMOuJd32rcPUrXV0OAIsS9nLDDPQNVye
-         +a9R1MRfj7xbxQQOTQMrQNNp+QEwlR9aj4Ax5o/NO1ZMVgA96NzRhLPIkoSoLFkgNgSH
-         Rs1WJx3DxEpPOryu9XRLOgnrtqdzboExIjmMeN8O38qK2EX/YneNx9i9SfxomitCI/Gc
-         Mwvv3QzO8QHeoojVvnr8ZuETDsMvv+74tpomk0F9QPCxu+WOOMqrIpayiwaj2edtxbKK
-         /oHQ==
-X-Gm-Message-State: AOAM533p9dRxZiQ0HNuxHw/i0wFBmTdHui9ko9Q6dQ7JcJfTk5PM1N+B
-        AmQyJWxW3YORBu5hVnNmlnfKSj7OoYfJz7EPBHrssg==
-X-Google-Smtp-Source: ABdhPJzJAeqA1sayja54+gOvTJNTZu3qoAAJtDM/QZXI4YyzJUymLHcSZzFuIQbvvaE/f6iQ+J28yRbXzpfZhgNiSG4=
-X-Received: by 2002:a05:6830:1aee:: with SMTP id c14mr15114563otd.25.1636753255031;
- Fri, 12 Nov 2021 13:40:55 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=p6BJgAR2dKpdI5PQSFC6gOgUXqAUQZJtadmObr7tjTY=;
+        b=oOFeiuFIVjf9I/nECZveo0R7LpE1xQOoXIRi99etQv0GdD/kUq24SsqT1VpMdtp5wI
+         vuW8Cn0qAFf5R0NFY0Q5pSAcdcLl7hfPz0LFezk1fVorW1tqUHGCeDwTcmfBLRqtdQ7y
+         o4T1e6DscLizpz7Qdk9P3VC8vBh0M2Z23a3q3vTZmdp0i0nhIUIpva6AeeAdDL2KXluF
+         v1/C8OMh7/9LwjDtoyCVzy2hWMJYZb/KJN5tDmU9P6YqPoLA2+kI1AbhorBm+NG+I1SU
+         VgdMH5XnxDv+DR/gVQ8dqGOqf15gDDAyP2pqTki1+ja35TMI0d6zhtVt3pXIN0mmqwNL
+         aAGA==
+X-Gm-Message-State: AOAM531MuQrfV3SNJPjSGJaIfuwrIrliutcJ8oekQ5eR2GLEVneu8/ZH
+        Lb/tieLqryptyINucTNrrAQbiy5yZwd4rByffsiTvA==
+X-Google-Smtp-Source: ABdhPJwN1DMFj8lwZlramd1I0OGWe2kSl7QSbL+hhwnl5gfxV3O28d9EPTR8alNht5b3hCsOpj1PmUPMkqmyQaJMInE=
+X-Received: by 2002:aca:2319:: with SMTP id e25mr28956699oie.164.1636753404063;
+ Fri, 12 Nov 2021 13:43:24 -0800 (PST)
 MIME-Version: 1.0
 References: <20210820155918.7518-1-brijesh.singh@amd.com> <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
  <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com> <YY6z5/0uGJmlMuM6@zn.tnic>
  <YY7FAW5ti7YMeejj@google.com> <YY7I6sgqIPubTrtA@zn.tnic> <YY7Qp8c/gTD1rT86@google.com>
- <CAA03e5GwHMPYHHq3Nkkq1HnEJUUsw-Vk+5wFCott3pmJY7WuAw@mail.gmail.com> <48e20b96-3995-6998-56cf-3f15694c5db2@intel.com>
-In-Reply-To: <48e20b96-3995-6998-56cf-3f15694c5db2@intel.com>
+ <CAA03e5GwHMPYHHq3Nkkq1HnEJUUsw-Vk+5wFCott3pmJY7WuAw@mail.gmail.com> <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com>
+In-Reply-To: <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com>
 From:   Marc Orr <marcorr@google.com>
-Date:   Fri, 12 Nov 2021 13:40:43 -0800
-Message-ID: <CAA03e5GEkpit7ipvm-di-aQ49Wv+YDT2CFj5SzBTjcEa2F3n2Q@mail.gmail.com>
+Date:   Fri, 12 Nov 2021 13:43:13 -0800
+Message-ID: <CAA03e5Fw9cRnb=+eJmzEB+0QmdgaGZ7=fPTUYx7f55mGVXLRMA@mail.gmail.com>
 Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
  Hypervisor Support
-To:     Dave Hansen <dave.hansen@intel.com>
+To:     Andy Lutomirski <luto@kernel.org>
 Cc:     Sean Christopherson <seanjc@google.com>,
         Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
         Peter Gonda <pgonda@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
         Tom Lendacky <Thomas.Lendacky@amd.com>,
         "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
@@ -73,10 +77,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
         Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
         David Rientjes <rientjes@google.com>,
         Dov Murik <dovmurik@linux.ibm.com>,
@@ -84,16 +87,76 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Michael Roth <Michael.Roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 12, 2021 at 1:38 PM Dave Hansen <dave.hansen@intel.com> wrote:
+On Fri, Nov 12, 2021 at 1:39 PM Andy Lutomirski <luto@kernel.org> wrote:
 >
-> On 11/12/21 1:30 PM, Marc Orr wrote:
+>
+>
+> On Fri, Nov 12, 2021, at 1:30 PM, Marc Orr wrote:
+> > On Fri, Nov 12, 2021 at 12:38 PM Sean Christopherson <seanjc@google.com=
+> wrote:
+> >>
+> >> On Fri, Nov 12, 2021, Borislav Petkov wrote:
+> >> > On Fri, Nov 12, 2021 at 07:48:17PM +0000, Sean Christopherson wrote:
+> >> > > Yes, but IMO inducing a fault in the guest because of _host_ bug i=
+s wrong.
+> >> >
+> >> > What do you suggest instead?
+> >>
+> >> Let userspace decide what is mapped shared and what is mapped private.=
+  The kernel
+> >> and KVM provide the APIs/infrastructure to do the actual conversions i=
+n a thread-safe
+> >> fashion and also to enforce the current state, but userspace is the co=
+ntrol plane.
+> >>
+> >> It would require non-trivial changes in userspace if there are multipl=
+e processes
+> >> accessing guest memory, e.g. Peter's networking daemon example, but it=
+ _is_ fully
+> >> solvable.  The exit to userspace means all three components (guest, ke=
+rnel,
+> >> and userspace) have full knowledge of what is shared and what is priva=
+te.  There
+> >> is zero ambiguity:
+> >>
+> >>   - if userspace accesses guest private memory, it gets SIGSEGV or wha=
+tever.
+> >>   - if kernel accesses guest private memory, it does BUG/panic/oops[*]
+> >>   - if guest accesses memory with the incorrect C/SHARED-bit, it gets =
+killed.
+> >>
+> >> This is the direction KVM TDX support is headed, though it's obviously=
+ still a WIP.
+> >>
+> >> And ideally, to avoid implicit conversions at any level, hardware vend=
+ors' ABIs
+> >> define that:
+> >>
+> >>   a) All convertible memory, i.e. RAM, starts as private.
+> >>   b) Conversions between private and shared must be done via explicit =
+hypercall.
+> >>
+> >> Without (b), userspace and thus KVM have to treat guest accesses to th=
+e incorrect
+> >> type as implicit conversions.
+> >>
+> >> [*] Sadly, fully preventing kernel access to guest private is not poss=
+ible with
+> >>     TDX, especially if the direct map is left intact.  But maybe in th=
+e future
+> >>     TDX will signal a fault instead of poisoning memory and leaving a =
+#MC mine.
+> >
 > > In this proposal, consider a guest driver instructing a device to DMA
 > > write a 1 GB memory buffer. A well-behaved guest driver will ensure
 > > that the entire 1 GB is marked shared. But what about a malicious or
@@ -107,14 +170,16 @@ On Fri, Nov 12, 2021 at 1:38 PM Dave Hansen <dave.hansen@intel.com> wrote:
 > > constituent RMP entries? If I'm understanding this correctly, then the
 > > synchronization will be prohibitively expensive.
 >
-> Are you taking about a 1GB *mapping* here?  As in, something us using a
-> 1GB page table entry to map the 1GB memory buffer?  That was the only
-> case where I knew we needed coordination between neighbor RMP entries
-> and host memory accesses.
+> Let's consider a very very similar scenario: consider a guest driver sett=
+ing up a 1 GB DMA buffer.  The virtual device, implemented as host process,=
+ needs to (1) map (and thus lock *or* be prepared for faults) in 1GB / 4k p=
+ages of guest memory (so they're not *freed* while the DMA write is taking =
+place), (2) write the buffer, and (3) unlock all the pages.  Or it can lock=
+ them at setup time and keep them locked for a long time if that's appropri=
+ate.
 >
-> That 1GB problem _should_ be impossible.  I thought we settled on
-> disabling hugetlbfs and fracturing the whole of the direct map down to 4k.
+> Sure, the locking is expensive, but it's nonnegotiable.  The RMP issue is=
+ just a special case of the more general issue that the host MUST NOT ACCES=
+S GUEST MEMORY AFTER IT'S FREED.
 
-No. I was trying to give an example where a host-side process is
-virtualizing a DMA write over a large buffer that consists of a lot of
-4k or 2MB RMP entries. I picked 1 GB as an arbitrary example.
+Good point.
