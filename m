@@ -2,123 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E7EEC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 18:32:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 312E9C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 18:35:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 324C760551
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 18:32:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11EC360F5B
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 18:35:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235265AbhKLSf2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 13:35:28 -0500
-Received: from foss.arm.com ([217.140.110.172]:43370 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235122AbhKLSf1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 13:35:27 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9D1BA101E;
-        Fri, 12 Nov 2021 10:32:36 -0800 (PST)
-Received: from e120937-lin (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 08E443F718;
-        Fri, 12 Nov 2021 10:32:35 -0800 (PST)
-Date:   Fri, 12 Nov 2021 18:32:33 +0000
-From:   Cristian Marussi <cristian.marussi@arm.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v0 39/42] crypto: ccree - check notifier registration
- return value
-Message-ID: <20211112183233.GB6655@e120937-lin>
-References: <20211108101157.15189-1-bp@alien8.de>
- <20211108101157.15189-40-bp@alien8.de>
+        id S235513AbhKLSiV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 13:38:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41302 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235510AbhKLSiU (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Nov 2021 13:38:20 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E879C061766;
+        Fri, 12 Nov 2021 10:35:28 -0800 (PST)
+Received: from zn.tnic (p200300ec2f10ce00d687ada8c7fa1c88.dip0.t-ipconnect.de [IPv6:2003:ec:2f10:ce00:d687:ada8:c7fa:1c88])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A5E241EC03AD;
+        Fri, 12 Nov 2021 19:35:26 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1636742126;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=JmA2cfYq/RSf+0ammQvVqrSmh6MfYoVev6SVnovd+no=;
+        b=ECPlX/c1Pahyqr2/in+oog3PPH5hgi86QxIT/3FK6k2C1LOWpJ48d8oSC02yYxCr0jhJpC
+        Zotq7GNmwIX01kKhehALvprcqEpVGp8V42oRd4RF5oNa3hrFQAHydUx41Fv9E/GGctyuyp
+        VNaqgHj42R1Ut+uwWiG6v4Pp6CoP96g=
+Date:   Fri, 12 Nov 2021 19:35:19 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YY6z5/0uGJmlMuM6@zn.tnic>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20211108101157.15189-40-bp@alien8.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 08, 2021 at 11:11:54AM +0100, Borislav Petkov wrote:
-> From: Borislav Petkov <bp@suse.de>
-> 
-> Avoid homegrown notifier registration checks.
-> 
-> No functional changes.
-> 
+On Fri, Nov 12, 2021 at 09:59:46AM -0800, Dave Hansen wrote:
+> Or, is there some mechanism that prevent guest-private memory from being
+> accessed in random host kernel code?
 
-Hi Borislav,
+So I'm currently under the impression that random host->guest accesses
+should not happen if not previously agreed upon by both.
 
-> Signed-off-by: Borislav Petkov <bp@suse.de>
-> Cc: linux-crypto@vger.kernel.org
-> ---
->  drivers/crypto/ccree/cc_fips.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/ccree/cc_fips.c b/drivers/crypto/ccree/cc_fips.c
-> index 702aefc21447..de842da7d51c 100644
-> --- a/drivers/crypto/ccree/cc_fips.c
-> +++ b/drivers/crypto/ccree/cc_fips.c
-> @@ -146,7 +146,9 @@ int cc_fips_init(struct cc_drvdata *p_drvdata)
->  	tasklet_init(&fips_h->tasklet, fips_dsr, (unsigned long)p_drvdata);
->  	fips_h->drvdata = p_drvdata;
->  	fips_h->nb.notifier_call = cc_ree_fips_failure;
-> -	atomic_notifier_chain_register(&fips_fail_notif_chain, &fips_h->nb);
-> +
-> +	if (atomic_notifier_chain_register(&fips_fail_notif_chain, &fips_h->nb))
-> +		pr_warn("Failure notifier already registered\n");
->  
+Because, as explained on IRC, if host touches a private guest page,
+whatever the host does to that page, the next time the guest runs, it'll
+get a #VC where it will see that that page doesn't belong to it anymore
+and then, out of paranoia, it will simply terminate to protect itself.
 
-Looking at the implementation of atomic_notifier_chain_register() and
-its internal helper down below, I can see that atomic_notifier_chain_register()
-ALWAYS return 0 (O_o) and anyway there is a WARN() in the notifiier core already
-to alert of double registrations.
+So cloud providers should have an interest to prevent such random stray
+accesses if they wanna have guests. :)
 
-What is the aim of this patch ?
-It's not clear from the commit message what are you trying to achieve.
-Am I missing something ?
-(Is it to circumvent some static checker to avoid this false positive ?
-just guessing...)
+> This sounds like a _possible_ opportunity for the guest to do some extra
+> handling.  It's also quite possible that this #VC happens in a place
+> that the guest can't handle.
 
-Thanks,
-Cristian
+How? It'll get a #VC when it first touches that page.
 
------8<----------
-static int notifier_chain_register(struct notifier_block **nl,
-                struct notifier_block *n)
-{
-        while ((*nl) != NULL) {
-                if (unlikely((*nl) == n)) {
-                        WARN(1, "double register detected");
-                        return 0;
-                }
-                if (n->priority > (*nl)->priority)
-                        break;
-                nl = &((*nl)->next);
-        }
-        n->next = *nl;
-        rcu_assign_pointer(*nl, n);
-        return 0;
-}
+I'd say the #VC handler should be able to deal with it...
 
-/**
- *      atomic_notifier_chain_register - Add notifier to an atomic notifier chain
- *      @nh: Pointer to head of the atomic notifier chain
- *      @n: New entry in notifier chain
- *
- *      Adds a notifier to an atomic notifier chain.
- *
- *      Currently always returns zero.
- */
-int atomic_notifier_chain_register(struct atomic_notifier_head *nh,
-                struct notifier_block *n)
-{
-        unsigned long flags;
-        int ret;
+Thx.
 
-        spin_lock_irqsave(&nh->lock, flags);
-        ret = notifier_chain_register(&nh->head, n);
-        spin_unlock_irqrestore(&nh->lock, flags);
-        return ret;
-}
-EXPORT_SYMBOL_GPL(atomic_notifier_chain_register);
-------
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
