@@ -2,95 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E8BC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 11:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 496CEC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 12:59:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B02860F22
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 11:03:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27016610A0
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 12:59:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233619AbhKLLGW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 06:06:22 -0500
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:25863 "EHLO
-        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232791AbhKLLGW (ORCPT
+        id S234881AbhKLNC3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 08:02:29 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:44840 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234899AbhKLNC3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 06:06:22 -0500
-X-Greylist: delayed 427 seconds by postgrey-1.27 at vger.kernel.org; Fri, 12 Nov 2021 06:06:22 EST
-IronPort-Data: =?us-ascii?q?A9a23=3ABO2bra3AiM9WWu6uEfbD5cxwkn2cJEfYwER7XOP?=
- =?us-ascii?q?LsXnJ1joigjwByzRND2iBOK2JMGf8e4x+aNyzo0IOu8fTzIQ2QQE+nZ1PZyIT+?=
- =?us-ascii?q?JCdXbx1DW+pYnjMdpWbJK5fAnR3huDodKjYdVeB4EfyWlTdhSMkj/jRH+OmULS?=
- =?us-ascii?q?s1h1ZHmeIdg9w0HqPpMZp2uaEsfDha++8kYuaT//3YDdJ6BYoWo4g0J9vnTs01?=
- =?us-ascii?q?BjEVJz0iXRlDRxDlAe2e3D4l/vzL4npR5fzatE88uJX24/+IL+FEmPxp3/BC/u?=
- =?us-ascii?q?lm7rhc0AMKlLQFVjTzCQGHfH4214b+XdaPqUTbZLwbW9VljGIlpZ1wcpEsZiYS?=
- =?us-ascii?q?AEzP6SKlv51vxxwSHsuYPwdo9crJlD666R/1Xbudnbjw/woAEwnFYwe5utzR2p?=
- =?us-ascii?q?J8JQwKzoQbxSPwuuyxJq/S/JwnYJ7dY/sJox3knVhyyzJSPUrW5bOR43U6tJCm?=
- =?us-ascii?q?jQ9nMZDGbDZfcVxQSZoaR3bcVtMM1ELBZk9nc+pgGXyd3tTr1f9jao6+WLe1hB?=
- =?us-ascii?q?Z37/rPN3PPNWSTMNc2EGCqSTP4gzRHh4eJPSbyDyY7mirgO7f2y/2MKoXFbu38?=
- =?us-ascii?q?dZwjVGTz3BVAxoTPXOxudGwjk+zXYIZJ0F80jp+84Ax+VatQ927WAe3yFaEphc?=
- =?us-ascii?q?0SctMFPd84waIooLQ4gCEFi0PVC9ZdNsOqsA7X3op20WPktevAiZg2JWRSHSA5?=
- =?us-ascii?q?vKXoCm0NCw9M2APf2kHQBED7t2lp5s85i8j5P4L/LWd14KuX2iqmnbU/G5u2vM?=
- =?us-ascii?q?JgNBNzKuhu1bKn1qRSlHyZlZdzm3qsqiNt2uVvLKYWrE=3D?=
-IronPort-HdrOrdr: =?us-ascii?q?A9a23=3ADrvr26MpHffWjMBcT4H155DYdb4zR+YMi2QD?=
- =?us-ascii?q?/1t6SBxLfsHdv93GpoVc6fajskdjZJhGo6H3BEDgewKqyXcb2/htAV7JZniDhI?=
- =?us-ascii?q?KXFvAp0WKP+UyeJ8S6zJ8p6U+PG5IOT+EZIzBB/IbHCSODYpcdKEHtytHtuQ/m?=
- =?us-ascii?q?p00dCD2DgclbnkRE43+gYw9LrWp9dO4E/finl7t6TmGbCDlnIvhTb0NtN4Ovy7?=
- =?us-ascii?q?Kk9OOEEHx2YG9AmXH+9kLT1FedKWnn4v4waUIB/V5IyxmNr+WW3NTejxiT8G6v?=
- =?us-ascii?q?64fsha4m0OcJsuEzdPBk5/JlTwkFgWyTFc9cswjuhlEIST6UgidSrPD85xAne8?=
- =?us-ascii?q?xp4XLQYW3dm2qi5yDQlC8/xnO+7VPC6EGT+L2gNWlKUfZ8uQ=3D=3D?=
-X-IronPort-AV: E=Sophos;i="5.87,229,1631570400"; 
-   d="scan'208";a="3285933"
-Received: from 173.121.68.85.rev.sfr.net (HELO hadrien) ([85.68.121.173])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Nov 2021 11:56:22 +0100
-Date:   Fri, 12 Nov 2021 11:56:22 +0100 (CET)
-From:   Julia Lawall <julia.lawall@inria.fr>
-X-X-Sender: jll@hadrien
-To:     Megha Dey <megha.dey@intel.com>
-cc:     kbuild-all@lists.01.org, linux-kernel@vger.kernel.org,
-        Tomasz Kantecki <tomasz.kantecki@intel.com>,
+        Fri, 12 Nov 2021 08:02:29 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 9C27821978;
+        Fri, 12 Nov 2021 12:59:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1636721977; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yQAKV/G2LGNuS/sfJa5NmKXWu/SnHCyYvEbPF+KVioA=;
+        b=f8vi5NyrHAmgWPHrtGt2Kg7tS6iKJBaX4UhQCv4FqFNjhpn3OT1qaCXC8LhCrmY79b5Qd8
+        y9qeOf4ZuY7rg0j8xwtuWVy8ugt72RFKw1xsvZ/Dq08WjGqxVdevnC9Au1KFXYXXjX9ohY
+        ZzKkFGepAlqj73/Wd6vccU+FYMPI0Yc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1636721977;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yQAKV/G2LGNuS/sfJa5NmKXWu/SnHCyYvEbPF+KVioA=;
+        b=HtDmVCBq2mq5KIMY/B+KFAN0z+JqOM95Cz3fN7X5M2Ax9hPpWkdZjv4P5W/56D7cmC04JB
+        WaS6uSHOfd6IiLAQ==
+Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
+        by relay2.suse.de (Postfix) with ESMTP id 5C138A3B87;
+        Fri, 12 Nov 2021 12:59:36 +0000 (UTC)
+Received: by adalid.arch.suse.de (Postfix, from userid 16045)
+        id 1CABC5191255; Fri, 12 Nov 2021 13:59:36 +0100 (CET)
+From:   Hannes Reinecke <hare@suse.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
+        linux-nvme@lists.infradead.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: fix flexible_array.cocci warnings
-Message-ID: <alpine.DEB.2.22.394.2111121154320.2916@hadrien>
-User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+Subject: [PATCH 01/12] crypto: add crypto_has_shash()
+Date:   Fri, 12 Nov 2021 13:59:17 +0100
+Message-Id: <20211112125928.97318-2-hare@suse.de>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20211112125928.97318-1-hare@suse.de>
+References: <20211112125928.97318-1-hare@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: kernel test robot <lkp@intel.com>
+Add helper function to determine if a given synchronous hash is supported.
 
- Zero-length and one-element arrays are deprecated, see
- Documentation/process/deprecated.rst
- Flexible-array members should be used instead.
-
-Generated by: scripts/coccinelle/misc/flexible_array.cocci
-
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Julia Lawall <julia.lawall@inria.fr>
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 ---
+ crypto/shash.c        | 6 ++++++
+ include/crypto/hash.h | 2 ++
+ 2 files changed, 8 insertions(+)
 
-tree:   https://github.com/meghadey/crypto crypto-avx512
-head:   9c8c2ca77f6e2575a130bddb9767d068e1162d71
-commit: 377aede9f10ee28be954473668bc6d33c6c9db75 [5/6] crypto: aesni - AVX512 version of AESNI-GCM using VPCLMULQDQ
-:::::: branch date: 7 weeks ago
-:::::: commit date: 7 weeks ago
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 0a0a50cb694f..4c88e63b3350 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -521,6 +521,12 @@ struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_shash);
+ 
++int crypto_has_shash(const char *alg_name, u32 type, u32 mask)
++{
++	return crypto_type_has_alg(alg_name, &crypto_shash_type, type, mask);
++}
++EXPORT_SYMBOL_GPL(crypto_has_shash);
++
+ static int shash_prepare_alg(struct shash_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index f140e4643949..f5841992dc9b 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -718,6 +718,8 @@ static inline void ahash_request_set_crypt(struct ahash_request *req,
+ struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
+ 					u32 mask);
+ 
++int crypto_has_shash(const char *alg_name, u32 type, u32 mask);
++
+ static inline struct crypto_tfm *crypto_shash_tfm(struct crypto_shash *tfm)
+ {
+ 	return &tfm->base;
+-- 
+2.29.2
 
- aesni-intel_glue.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -87,7 +87,7 @@ struct gcm_context_data {
- 	u64 partial_block_len;
- 	u64 unused;
- 	/* Allocate space for hash_keys later */
--	u8 hash_keys[0];
-+	u8 hash_keys[];
- };
-
- asmlinkage int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
