@@ -2,211 +2,413 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E137C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 15:35:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ACCFC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 15:43:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4FE1260F70
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 15:35:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D5BB60273
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 15:43:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233843AbhKLPik (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 10:38:40 -0500
-Received: from uho.ysoft.cz ([81.19.3.130]:58848 "EHLO uho.ysoft.cz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229841AbhKLPij (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 10:38:39 -0500
-X-Greylist: delayed 474 seconds by postgrey-1.27 at vger.kernel.org; Fri, 12 Nov 2021 10:38:39 EST
-Received: from vokac-Latitude-7410.ysoft.local (unknown [10.0.29.210])
-        by uho.ysoft.cz (Postfix) with ESMTP id D0DC3A83B0;
-        Fri, 12 Nov 2021 16:27:53 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ysoft.com;
-        s=20160406-ysoft-com; t=1636730874;
-        bh=sRyWfWvUhYcLed9k266C2obfp+SxlQfFYRCig9vaidk=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=d8AQuKw3rK5okAkx2e6HqrGlDVHL4qqGCQLJ+O/ZuPOjiGtQTHqCk5OqDvm++z7m1
-         oOwPc3iJ3rPE6Z78hPqGFA4YM7J6jQI6lJXeBWrlEUlkLHdgpvBsC44SNRis5lGu/j
-         ndrZfddefIp8JU3IkomGXaqXnIPW9HPaPqXmgNKo=
-From:   =?UTF-8?q?Michal=20Vok=C3=A1=C4=8D?= <michal.vokac@ysoft.com>
-To:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        l.stach@pengutronix.de, robert.hancock@calian.com,
-        Petr Benes <petr.benes@ysoft.com>, petrben@gmail.com,
-        =?UTF-8?q?Michal=20Vok=C3=A1=C4=8D?= <michal.vokac@ysoft.com>
-Subject: [RFC PATCH] crypto: caam - restore retry count after HW RNG failure
-Date:   Fri, 12 Nov 2021 16:27:05 +0100
-Message-Id: <20211112152705.90513-1-michal.vokac@ysoft.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <ea3906acc2c8d6fb56eacd94b9531c18fa7cb4dc.camel@calian.com>
-References: <ea3906acc2c8d6fb56eacd94b9531c18fa7cb4dc.camel@calian.com>
+        id S232194AbhKLPq3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 10:46:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58738 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233128AbhKLPq2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Nov 2021 10:46:28 -0500
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8F81C061767
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 07:43:36 -0800 (PST)
+Received: by mail-lj1-x236.google.com with SMTP id h11so19392946ljk.1
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 07:43:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=uYii4K2YH5djqKGK5adbE/sm1hAFMBBprNlHTABn6Pc=;
+        b=kxZefhQBnG4H+BwZC4L49iVMEcmf6eJrzmxWibpvGcSN4o5NtFs3BQPJriFbSSj8ii
+         wvEVDpveRYYpnSzVeQXZfF+j2kZjbPNP9NbufMcSwkXNUACfAXkQAZVMlCqdBAUs0BSx
+         6uoSh4JQJYW0O3maihI6SuWIoS6c4sVUfhVIm/rJfibfwAI9XHDgj01qbqnrqibafTJS
+         5V4yq9ejuBO9ri8GUfCidaRUm3Ldgnn1zbU7Qc7pBebsldfq3Uv0b8oF8ZXfhddmXVgZ
+         3DXhMqnabAVj+rrEzXAjCYk6XuPoXIQ02dIeH9e+Kcq/K1s0+Wm6BUDLeyYSvJprMcM9
+         9QZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=uYii4K2YH5djqKGK5adbE/sm1hAFMBBprNlHTABn6Pc=;
+        b=u75Y2R67r9vVbu3FawxCNOu4L6W80Z1Gg7Ok3ZkEZdWRBCvkE6sq93WuZj09KV+5Rf
+         HSmtbQb4kG0xtTkMktv7skTodZPVO9z8fbQ8qqILbMyos90VaL/NrZYQPKpq8C74Bale
+         euQi4/W9EAGu29vnE+WOlxGxzXe32j1vrTN0C8i5i70n2yI8eOtFJPL9jFwhOOX8NMv5
+         DlXZsPWxWBYaKwysSJ469cdYMbR8EemYDHEVYQKp/V3tyKQhcUrvVA6EZ8dYyR7djY4d
+         kgp+GmCP/mTn0O0C4uX85CcAiz1QzjvKNiLFtIkmb5Gh2TAnmbM8bcgRSmFn+hdRT+h3
+         /9DQ==
+X-Gm-Message-State: AOAM532aeiHwRQMKZiHS7k90RldlN9/6syLYJFbnrBg1R4GIDqmW8Lzd
+        zUrk1qeXt3lOthAEf9iA7+llVUvLKA+lyNYjFbkUmA==
+X-Google-Smtp-Source: ABdhPJxsvwZkYAJ6dywXETP7lROD6GLBQbOTmgFW7y2bkRBmKHtRAZ3FciqmYeg9vuoxvJ+QEskhXo8WHfwozFtam8s=
+X-Received: by 2002:a05:651c:1035:: with SMTP id w21mr15474627ljm.278.1636731814652;
+ Fri, 12 Nov 2021 07:43:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+In-Reply-To: <20210820155918.7518-1-brijesh.singh@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 12 Nov 2021 08:43:22 -0700
+Message-ID: <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Petr Benes <petr.benes@ysoft.com>
+Hi Brijesh,,
 
-Each time TRNG generates entropy, statistical tests are run.
-If they fail, RETRY_COUNT value is decremented. Once it
-reaches 0, HW RNG returns an error, and needs to be reset.
-RETRY_COUNT could be programmed in RTSCMISC register and is
-set to 1 by default. Hence, we are left without hwrng after
-the first error, which could happen even under normal
-conditions.
+One high level discussion I'd like to have on these SNP KVM patches.
 
-Cc: petrben@gmail.com
-Signed-off-by: Petr Benes <petr.benes@ysoft.com>
-Signed-off-by: Michal Vokáč <michal.vokac@ysoft.com>
----
-Hi,
-we are also experiencing this issue:
+In these patches (V5) if a host userspace process writes a guest
+private page a SIGBUS is issued to that process. If the kernel writes
+a guest private page then the kernel panics due to the unhandled RMP
+fault page fault. This is an issue because not all writes into guest
+memory may come from a bug in the host. For instance a malicious or
+even buggy guest could easily point the host to writing a private page
+during the emulation of many virtual devices (virtio, NVMe, etc). For
+example if a well behaved guests behavior is to: start up a driver,
+select some pages to share with the guest, ask the host to convert
+them to shared, then use those pages for virtual device DMA, if a
+buggy guest forget the step to request the pages be converted to
+shared its easy to see how the host could rightfully write to private
+memory. I think we can better guarantee host reliability when running
+SNP guests without changing SNP=E2=80=99s security properties.
 
-caam_jr 2101000.jr0: 20003c5b: CCB: desc idx 60: RNG: Hardware error.
+Here is an alternative to the current approach: On RMP violation (host
+or userspace) the page fault handler converts the page from private to
+shared to allow the write to continue. This pulls from s390=E2=80=99s error
+handling which does exactly this. See =E2=80=98arch_make_page_accessible()=
+=E2=80=99.
+Additionally it adds less complexity to the SNP kernel patches, and
+requires no new ABI.
 
-It is happening on both i.MX6S and i.MX6DL SoCs we use.
-On Solo I can reproduce it really fast. Sometimes it happens right
-after the board is NFS booted, sometimes I need to stress the HWRNG
-for a while (generate few hundred KBs of random data). On some
-DualLite SoCs it is happening at least once a day.
+In the current (V5) KVM implementation if a userspace process
+generates an RMP violation (writes to guest private memory) the
+process receives a SIGBUS. At first glance, it would appear that
+user-space shouldn=E2=80=99t write to private memory. However, guaranteeing
+this in a generic fashion requires locking the RMP entries (via locks
+external to the RMP). Otherwise, a user-space process emulating a
+guest device IO may be vulnerable to having the guest memory
+(maliciously or by guest bug) converted to private while user-space
+emulation is happening. This results in a well behaved userspace
+process receiving a SIGBUS.
 
-We are using the v5.10 LTS branch but I can confirm that this is
-happening on all kernels since v5.7 to the latest linux-next.
+This proposal allows buggy and malicious guests to run under SNP
+without jeopardizing the reliability / safety of host processes. This
+is very important to a cloud service provider (CSP) since it=E2=80=99s comm=
+on
+to have host wide daemons that write/read all guests, i.e. a single
+process could manage the networking for all VMs on the host. Crashing
+that singleton process kills networking for all VMs on the system.
 
-We also tried to increase the RTSDCTL_ENT_DLY_MIN delay as suggested
-in this thread [1]. It helped and the issue never occurred since then
-but we are looking for more universal and permanent solution suitable
-for upstream, hence we came up with this patch.
+This proposal also allows for minimal changes to the kexec flow and
+kdump. The new kexec kernel can simply update private pages to shared
+as it encounters them during their boot. This avoids needing to
+propagate the RMP state from kernel to kernel. Of course this doesn=E2=80=
+=99t
+preserve any running VMs but is still useful for kdump crash dumps or
+quicker rekerneling for development with kexec.
 
-Any comments will be appreciated.
-Thanks, Michal
+This proposal does cause guest memory corruption for some bugs but one
+of SEV-SNP=E2=80=99s goals extended from SEV-ES=E2=80=99s goals is for gues=
+t=E2=80=99s to be
+able to detect when its memory has been corrupted / replayed by the
+host. So SNP already has features for allowing guests to detect this
+kind of memory corruption. Additionally this is very similar to a page
+of memory generating a machine check because of 2-bit memory
+corruption. In other words SNP guests must be enlightened and ready
+for these kinds of errors.
 
-[1] https://lkml.org/lkml/2021/8/30/296
+For an SNP guest running under this proposal the flow would look like this:
+* Host gets a #PF because its trying to write to a private page.
+* Host #PF handler updates the page to shared.
+* Write continues normally.
+* Guest accesses memory (r/w).
+* Guest gets a #VC error because the page is not PVALIDATED
+* Guest is now in control. Guest can terminate because its memory has
+been corrupted. Guest could try and continue to log the error to its
+owner.
 
- drivers/crypto/caam/caamrng.c | 42 ++++++++++++++++++++++++++++++++---
- drivers/crypto/caam/ctrl.c    | 13 +++++++++++
- drivers/crypto/caam/ctrl.h    |  2 ++
- 3 files changed, 54 insertions(+), 3 deletions(-)
+A similar approach was introduced in the SNP patches V1 and V2 for
+kernel page fault handling. The pushback around this convert to shared
+approach was largely focused around the idea that the kernel has all
+the information about which pages are shared vs private so it should
+be able to check shared status before write to pages. After V2 the
+patches were updated to not have a kernel page fault handler for RMP
+violations (other than dumping state during a panic). The current
+patches protect the host with new post_{map,unmap}_gfn() function that
+checks if a page is shared before mapping it, then locks the page
+shared until unmapped. Given the discussions on =E2=80=98[Part2,v5,39/45] K=
+VM:
+SVM: Introduce ops for the post gfn map and unmap=E2=80=99 building a solut=
+ion
+to do this is non trivial and adds new overheads to KVM. Additionally
+the current solution is local to the kernel. So a new ABI just now be
+created to allow the userspace VMM to access the kernel-side locks for
+this to work generically for the whole host. This is more complicated
+than this proposal and adding more lock holders seems like it could
+reduce performance further.
 
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 77d048dfe5d0..2be5584ae591 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -21,6 +21,7 @@
- #include "desc_constr.h"
- #include "jr.h"
- #include "error.h"
-+#include "ctrl.h"
- 
- #define CAAM_RNG_MAX_FIFO_STORE_SIZE	16
- 
-@@ -113,6 +114,35 @@ static int caam_rng_read_one(struct device *jrdev,
- 	return err ?: (ret ?: len);
- }
- 
-+static void caam_rng_retry_reset(struct caam_rng_ctx *context)
-+{
-+	struct device *ctrldev = context->ctrldev;
-+	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctrldev);
-+	struct caam_ctrl __iomem *ctrl;
-+	struct rng4tst __iomem *r4tst;
-+	u32 __iomem *rtstatus;
-+	u32 retry_count;
-+
-+	ctrl = (struct caam_ctrl __iomem *)ctrlpriv->ctrl;
-+	r4tst = &ctrl->r4tst[0];
-+
-+	/*
-+	 * There is unfortunately no member for RTSTATUS register in
-+	 * struct rng4tst and the structure doesn't look stable
-+	 */
-+	rtstatus = (u32 *)((char *)&ctrl->r4tst[0] + 0x3C);
-+	retry_count = (rd_reg32(rtstatus) >> 16) & 0xf;
-+	dev_dbg(ctrldev, "CAAM RNG retry count %d\n", retry_count);
-+	if (retry_count == 0) {
-+		dev_err(ctrldev, "CAAM RNG resetting retry count to 1\n");
-+		clrsetbits_32(&r4tst->rtmctl, 0, RTMCTL_PRGM | RTMCTL_ACC);
-+		wr_reg32(&r4tst->rtscmisc, (rd_reg32(&r4tst->rtscmisc) & 0x7f) | (1 << 16));
-+		clrsetbits_32(&r4tst->rtmctl, RTMCTL_PRGM | RTMCTL_ACC,
-+				RTMCTL_SAMP_MODE_RAW_ES_SC);
-+		caam_reinstantiate_rng(ctrldev);
-+	}
-+}
-+
- static void caam_rng_fill_async(struct caam_rng_ctx *ctx)
- {
- 	struct scatterlist sg[1];
-@@ -129,8 +159,10 @@ static void caam_rng_fill_async(struct caam_rng_ctx *ctx)
- 				sg[0].length,
- 				ctx->desc_async,
- 				&done);
--	if (len < 0)
-+	if (len < 0) {
-+		caam_rng_retry_reset(ctx);
- 		return;
-+	}
- 
- 	kfifo_dma_in_finish(&ctx->fifo, len);
- }
-@@ -145,13 +177,17 @@ static void caam_rng_worker(struct work_struct *work)
- static int caam_read(struct hwrng *rng, void *dst, size_t max, bool wait)
- {
- 	struct caam_rng_ctx *ctx = to_caam_rng_ctx(rng);
--	int out;
-+	int out, ret;
- 
- 	if (wait) {
- 		struct completion done;
- 
--		return caam_rng_read_one(ctx->jrdev, dst, max,
-+		ret = caam_rng_read_one(ctx->jrdev, dst, max,
- 					 ctx->desc_sync, &done);
-+		if (ret < 0)
-+			caam_rng_retry_reset(ctx);
-+
-+		return ret;
- 	}
- 
- 	out = kfifo_out(&ctx->fifo, dst, max);
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index ca0361b2dbb0..e421f8d1982b 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -339,6 +339,19 @@ static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
- 	return devm_add_action_or_reset(ctrldev, devm_deinstantiate_rng, ctrldev);
- }
- 
-+/*
-+ * caam_reinstantiate_rng - reinstantiates RNG. Intended for a case when RNG falls into
-+ *			    HW error condition. That happens if TRNG fails statistical
-+ *			    check and RTY_CNT value set in RTSCMISC decrements to zero.
-+ *			    It is exported to caamrng.c
-+ * @ctrldev - pointer to device
-+ */
-+
-+int caam_reinstantiate_rng(struct device *ctrldev)
-+{
-+	return instantiate_rng(ctrldev, 0, 0);
-+}
-+
- /*
-  * kick_trng - sets the various parameters for enabling the initialization
-  *	       of the RNG4 block in CAAM
-diff --git a/drivers/crypto/caam/ctrl.h b/drivers/crypto/caam/ctrl.h
-index f3ecd67922a7..26ff5a49a865 100644
---- a/drivers/crypto/caam/ctrl.h
-+++ b/drivers/crypto/caam/ctrl.h
-@@ -8,6 +8,8 @@
- #ifndef CTRL_H
- #define CTRL_H
- 
-+int caam_reinstantiate_rng(struct device *ctrldev);
-+
- /* Prototypes for backend-level services exposed to APIs */
- extern bool caam_dpaa2;
- 
--- 
-2.25.1
+There are a couple corner cases with this approach. Under SNP guests
+can request their memory be changed into a VMSA. This VMSA page cannot
+be changed to shared while the vCPU associated with it is running. So
+KVM + the #PF handler will need something to kick vCPUs from running.
+Joerg believes that a possible fix for this could be a new MMU
+notifier in the kernel, then on the #PF we can go through the rmp and
+execute this vCPU kick callback.
 
+Another corner case is the RMPUPDATE instruction is not guaranteed to
+succeed on first iteration. As noted above if the page is a VMSA it
+cannot be updated while the vCPU is running. Another issue is if the
+guest is running a RMPADJUST on a page it cannot be RMPUPDATED at that
+time. There is a lock for each RMP Entry so there is a race for these
+instructions. The vCPU kicking can solve this issue to be kicking all
+guest vCPUs which removes the chance for the race.
+
+Since this proposal probably results in SNP guests terminating due to
+a page unexpectedly needing PVALIDATE. The approach could be
+simplified to just the KVM killing the guest. I think it's nicer to
+users to instead of unilaterally killing the guest allowing the
+unvalidated #VC exception to allow users to collect some additional
+debug information and any additional clean up work they would like to
+perform.
+
+Thanks
+Peter
+
+On Fri, Aug 20, 2021 at 9:59 AM Brijesh Singh <brijesh.singh@amd.com> wrote=
+:
+>
+> This part of the Secure Encrypted Paging (SEV-SNP) series focuses on the
+> changes required in a host OS for SEV-SNP support. The series builds upon
+> SEV-SNP Part-1.
+>
+> This series provides the basic building blocks to support booting the SEV=
+-SNP
+> VMs, it does not cover all the security enhancement introduced by the SEV=
+-SNP
+> such as interrupt protection.
+>
+> The CCP driver is enhanced to provide new APIs that use the SEV-SNP
+> specific commands defined in the SEV-SNP firmware specification. The KVM
+> driver uses those APIs to create and managed the SEV-SNP guests.
+>
+> The GHCB specification version 2 introduces new set of NAE's that is
+> used by the SEV-SNP guest to communicate with the hypervisor. The series
+> provides support to handle the following new NAE events:
+> - Register GHCB GPA
+> - Page State Change Request
+> - Hypevisor feature
+> - Guest message request
+>
+> The RMP check is enforced as soon as SEV-SNP is enabled. Not every memory
+> access requires an RMP check. In particular, the read accesses from the
+> hypervisor do not require RMP checks because the data confidentiality is
+> already protected via memory encryption. When hardware encounters an RMP
+> checks failure, it raises a page-fault exception. If RMP check failure
+> is due to the page-size mismatch, then split the large page to resolve
+> the fault.
+>
+> The series does not provide support for the interrupt security and migrat=
+ion
+> and those feature will be added after the base support.
+>
+> The series is based on the commit:
+>  SNP part1 commit and
+>  fa7a549d321a (kvm/next, next) KVM: x86: accept userspace interrupt only =
+if no event is injected
+>
+> TODO:
+>   * Add support for command to ratelimit the guest message request.
+>
+> Changes since v4:
+>  * Move the RMP entry definition to x86 specific header file.
+>  * Move the dump RMP entry function to SEV specific file.
+>  * Use BIT_ULL while defining the #PF bit fields.
+>  * Add helper function to check the IOMMU support for SEV-SNP feature.
+>  * Add helper functions for the page state transition.
+>  * Map and unmap the pages from the direct map after page is added or
+>    removed in RMP table.
+>  * Enforce the minimum SEV-SNP firmware version.
+>  * Extend the LAUNCH_UPDATE to accept the base_gfn and remove the
+>    logic to calculate the gfn from the hva.
+>  * Add a check in LAUNCH_UPDATE to ensure that all the pages are
+>    shared before calling the PSP.
+>  * Mark the memory failure when failing to remove the page from the
+>    RMP table or clearing the immutable bit.
+>  * Exclude the encrypted hva range from the KSM.
+>  * Remove the gfn tracking during the kvm_gfn_map() and use SRCU to
+>    syncronize the PSC and gfn mapping.
+>  * Allow PSC on the registered hva range only.
+>  * Add support for the Preferred GPA VMGEXIT.
+>  * Simplify the PSC handling routines.
+>  * Use the static_call() for the newly added kvm_x86_ops.
+>  * Remove the long-lived GHCB map.
+>  * Move the snp enable module parameter to the end of the file.
+>  * Remove the kvm_x86_op for the RMP fault handling. Call the
+>    fault handler directly from the #NPF interception.
+>
+> Changes since v3:
+>  * Add support for extended guest message request.
+>  * Add ioctl to query the SNP Platform status.
+>  * Add ioctl to get and set the SNP config.
+>  * Add check to verify that memory reserved for the RMP covers the full s=
+ystem RAM.
+>  * Start the SNP specific commands from 256 instead of 255.
+>  * Multiple cleanup and fixes based on the review feedback.
+>
+> Changes since v2:
+>  * Add AP creation support.
+>  * Drop the patch to handle the RMP fault for the kernel address.
+>  * Add functions to track the write access from the hypervisor.
+>  * Do not enable the SNP feature when IOMMU is disabled or is in passthro=
+ugh mode.
+>  * Dump the RMP entry on RMP violation for the debug.
+>  * Shorten the GHCB macro names.
+>  * Start the SNP_INIT command id from 255 to give some gap for the legacy=
+ SEV.
+>  * Sync the header with the latest 0.9 SNP spec.
+>
+> Changes since v1:
+>  * Add AP reset MSR protocol VMGEXIT NAE.
+>  * Add Hypervisor features VMGEXIT NAE.
+>  * Move the RMP table initialization and RMPUPDATE/PSMASH helper in
+>    arch/x86/kernel/sev.c.
+>  * Add support to map/unmap SEV legacy command buffer to firmware state w=
+hen
+>    SNP is active.
+>  * Enhance PSP driver to provide helper to allocate/free memory used for =
+the
+>    firmware context page.
+>  * Add support to handle RMP fault for the kernel address.
+>  * Add support to handle GUEST_REQUEST NAE event for attestation.
+>  * Rename RMP table lookup helper.
+>  * Drop typedef from rmpentry struct definition.
+>  * Drop SNP static key and use cpu_feature_enabled() to check whether SEV=
+-SNP
+>    is active.
+>  * Multiple cleanup/fixes to address Boris review feedback.
+>
+> Brijesh Singh (40):
+>   x86/cpufeatures: Add SEV-SNP CPU feature
+>   iommu/amd: Introduce function to check SEV-SNP support
+>   x86/sev: Add the host SEV-SNP initialization support
+>   x86/sev: Add RMP entry lookup helpers
+>   x86/sev: Add helper functions for RMPUPDATE and PSMASH instruction
+>   x86/sev: Invalid pages from direct map when adding it to RMP table
+>   x86/traps: Define RMP violation #PF error code
+>   x86/fault: Add support to handle the RMP fault for user address
+>   x86/fault: Add support to dump RMP entry on fault
+>   crypto: ccp: shutdown SEV firmware on kexec
+>   crypto:ccp: Define the SEV-SNP commands
+>   crypto: ccp: Add support to initialize the AMD-SP for SEV-SNP
+>   crypto:ccp: Provide APIs to issue SEV-SNP commands
+>   crypto: ccp: Handle the legacy TMR allocation when SNP is enabled
+>   crypto: ccp: Handle the legacy SEV command when SNP is enabled
+>   crypto: ccp: Add the SNP_PLATFORM_STATUS command
+>   crypto: ccp: Add the SNP_{SET,GET}_EXT_CONFIG command
+>   crypto: ccp: Provide APIs to query extended attestation report
+>   KVM: SVM: Provide the Hypervisor Feature support VMGEXIT
+>   KVM: SVM: Make AVIC backing, VMSA and VMCB memory allocation SNP safe
+>   KVM: SVM: Add initial SEV-SNP support
+>   KVM: SVM: Add KVM_SNP_INIT command
+>   KVM: SVM: Add KVM_SEV_SNP_LAUNCH_START command
+>   KVM: SVM: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+>   KVM: SVM: Mark the private vma unmerable for SEV-SNP guests
+>   KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH command
+>   KVM: X86: Keep the NPT and RMP page level in sync
+>   KVM: x86: Introduce kvm_mmu_get_tdp_walk() for SEV-SNP use
+>   KVM: x86: Define RMP page fault error bits for #NPF
+>   KVM: x86: Update page-fault trace to log full 64-bit error code
+>   KVM: SVM: Do not use long-lived GHCB map while setting scratch area
+>   KVM: SVM: Remove the long-lived GHCB host map
+>   KVM: SVM: Add support to handle GHCB GPA register VMGEXIT
+>   KVM: SVM: Add support to handle MSR based Page State Change VMGEXIT
+>   KVM: SVM: Add support to handle Page State Change VMGEXIT
+>   KVM: SVM: Introduce ops for the post gfn map and unmap
+>   KVM: x86: Export the kvm_zap_gfn_range() for the SNP use
+>   KVM: SVM: Add support to handle the RMP nested page fault
+>   KVM: SVM: Provide support for SNP_GUEST_REQUEST NAE event
+>   KVM: SVM: Add module parameter to enable the SEV-SNP
+>
+> Sean Christopherson (2):
+>   KVM: x86/mmu: Move 'pfn' variable to caller of direct_page_fault()
+>   KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX and SNP
+>
+> Tom Lendacky (3):
+>   KVM: SVM: Add support to handle AP reset MSR protocol
+>   KVM: SVM: Use a VMSA physical address variable for populating VMCB
+>   KVM: SVM: Support SEV-SNP AP Creation NAE event
+>
+>  Documentation/virt/coco/sevguest.rst          |   55 +
+>  .../virt/kvm/amd-memory-encryption.rst        |  102 +
+>  arch/x86/include/asm/cpufeatures.h            |    1 +
+>  arch/x86/include/asm/disabled-features.h      |    8 +-
+>  arch/x86/include/asm/kvm-x86-ops.h            |    5 +
+>  arch/x86/include/asm/kvm_host.h               |   20 +
+>  arch/x86/include/asm/msr-index.h              |    6 +
+>  arch/x86/include/asm/sev-common.h             |   28 +
+>  arch/x86/include/asm/sev.h                    |   45 +
+>  arch/x86/include/asm/svm.h                    |    7 +
+>  arch/x86/include/asm/trap_pf.h                |   18 +-
+>  arch/x86/kernel/cpu/amd.c                     |    3 +-
+>  arch/x86/kernel/sev.c                         |  361 ++++
+>  arch/x86/kvm/lapic.c                          |    5 +-
+>  arch/x86/kvm/mmu.h                            |    7 +-
+>  arch/x86/kvm/mmu/mmu.c                        |   84 +-
+>  arch/x86/kvm/svm/sev.c                        | 1676 ++++++++++++++++-
+>  arch/x86/kvm/svm/svm.c                        |   62 +-
+>  arch/x86/kvm/svm/svm.h                        |   74 +-
+>  arch/x86/kvm/trace.h                          |   40 +-
+>  arch/x86/kvm/x86.c                            |   92 +-
+>  arch/x86/mm/fault.c                           |   84 +-
+>  drivers/crypto/ccp/sev-dev.c                  |  924 ++++++++-
+>  drivers/crypto/ccp/sev-dev.h                  |   17 +
+>  drivers/crypto/ccp/sp-pci.c                   |   12 +
+>  drivers/iommu/amd/init.c                      |   30 +
+>  include/linux/iommu.h                         |    9 +
+>  include/linux/mm.h                            |    6 +-
+>  include/linux/psp-sev.h                       |  346 ++++
+>  include/linux/sev.h                           |   32 +
+>  include/uapi/linux/kvm.h                      |   56 +
+>  include/uapi/linux/psp-sev.h                  |   60 +
+>  mm/memory.c                                   |   13 +
+>  tools/arch/x86/include/asm/cpufeatures.h      |    1 +
+>  34 files changed, 4088 insertions(+), 201 deletions(-)
+>  create mode 100644 include/linux/sev.h
+>
+> --
+> 2.17.1
+>
