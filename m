@@ -2,72 +2,180 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB76BC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 06:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60759C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 07:42:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8CD060F42
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 06:16:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 497E961002
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 07:42:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231796AbhKLGTK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 01:19:10 -0500
-Received: from mail-io1-f72.google.com ([209.85.166.72]:47071 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230510AbhKLGTG (ORCPT
+        id S232791AbhKLHpk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 02:45:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33182 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233978AbhKLHpe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 01:19:06 -0500
-Received: by mail-io1-f72.google.com with SMTP id z21-20020a5e8615000000b005e22e531c8aso5595595ioj.13
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Nov 2021 22:16:16 -0800 (PST)
+        Fri, 12 Nov 2021 02:45:34 -0500
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80BE2C06121D
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Nov 2021 23:42:43 -0800 (PST)
+Received: by mail-wm1-x330.google.com with SMTP id 133so7036122wme.0
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Nov 2021 23:42:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=d4YpBbYWP9wG3LFBKWknnju7IW21BdQrAXLAFoUfJjk=;
+        b=L0G7vqzIu4OmVtWPcfcfA5NzLtPk2i0H7s2BzObNlHQTFEkm03sqk/2QHQ4kjpk9BH
+         XMXouE5QpmwrxFfo6B5ZLvuccwWWhT/w9Ko9Yi7L+7BfDDnicqyRLnT+TM8ck5H5bQEY
+         cyD6P6qfh9iWldNqTQR7o5UJ+sXkSMXyDzLNU6kkBq7ka/+ZuUqEk/qcSbQ3GxXC7kiU
+         cm9dyledHK9n0gr3crraQGaAfhd3vfTQwfXVu/kwmwojjE1dRCSgNEVgeiJJB70r7ke9
+         OYePQHHEPa/usZJXytv516/nCeAGVXFsmZBOHnIcNaOTOhsULeXowN7ikvsxKqOo/gxw
+         3O2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=h95aiI2OL6pv1tC2hySS8sQH6YMt5Au+h2zaEiTNf9I=;
-        b=k3317/Sh4L4dFgjMzt0u7YBMSIiDG82RAsRGysNgRff2lz4rDj/v0AycW3v+lJYnOp
-         4sbYbDs/+49xr3Md8On4YkUXDKsODeqD4MDEDS//zL3rS9uQcf0BP5crufBFcmRWsf4z
-         /y2aigNB/l4YOODwtHVKYFUdLuEi229HmsPTjiTuhDQS0RbJBf+njFzhPaqkyNBHbmZF
-         mChdHMkOEyi+s+RROBYnqffFtSfJSgvRVd30Amfl/kmp7IVi9u3HJsxLYIMKiU7dg2Qr
-         f0ddAYXGAuVSmA2bEY6I8hInjk3C5uozyTOkYeLTS6+ai3KzX/7vino+yVALfYipo2bg
-         c51g==
-X-Gm-Message-State: AOAM532K5QixSXMm1NR+Of320X7WAX1qqLEWTfHIQVeMoR+RazEe9Tg3
-        Vft8WI8PriqWRkOJJFeygfVh7KyZUnCLHNJHPg5ktDJCgKng
-X-Google-Smtp-Source: ABdhPJwv38CoU5xFFHLAfMljQmhviZ0VQHuWT5jYXeqzV9JTP0D7iodZtEDh0DaBNHjBTsUZE61GqMmigEYSnELQ7Rq0Rd1doAEE
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=d4YpBbYWP9wG3LFBKWknnju7IW21BdQrAXLAFoUfJjk=;
+        b=44D82SS1e7f/wjayMPA5uHDP82oRTpxoF9bU1Ie8kZ7Kll+Igx61ar6tV4dDzai8Q8
+         CznqR/5fP0ZX5+R72dqkmtR3P9hNmPeuUboVSiTvPtBk/aWQUkqaHyZgkMhK4EiQbmPc
+         skDC2eEPMlm2DIQSVEzXNc1RKvpPZSwnf/5PhRdi+nj0jEPp30wzGxRiMys3enLRXPPI
+         NbXkDu98Rxx5yD/5D3cSdrG0gcsWMEQcAiV5qw1rFLhrkyzalRcQc6z1m86ZPbtqWQFP
+         4bHPP7xLCEfigxv03ywcdCIIOTUIBRnBHcXFXHn8e+AeGtHqcVIdeNG9+FuUq639Bre+
+         UzUg==
+X-Gm-Message-State: AOAM530U70J8A60lGZZg94JppcuYo+b39zVsSnkm1e2HCmNT/gK7hUUY
+        +bXCdDlGdTg5Nx3QGvF4FamOvw==
+X-Google-Smtp-Source: ABdhPJyYtg+MHn61GMl0MRFqSO/sm1wnHgrm7yORmq7WT7ihtvN7d0mp317CBhRDaom5mAlXGDszmg==
+X-Received: by 2002:a05:600c:2107:: with SMTP id u7mr32377342wml.82.1636702961238;
+        Thu, 11 Nov 2021 23:42:41 -0800 (PST)
+Received: from google.com ([95.148.6.174])
+        by smtp.gmail.com with ESMTPSA id q8sm4978469wrx.71.2021.11.11.23.42.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Nov 2021 23:42:40 -0800 (PST)
+Date:   Fri, 12 Nov 2021 07:42:37 +0000
+From:   Lee Jones <lee.jones@linaro.org>
+To:     Rob Herring <robh@kernel.org>
+Cc:     patrice.chotard@foss.st.com, Mark Brown <broonie@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        alexandre torgue <alexandre.torgue@foss.st.com>,
+        jonathan cameron <jic23@kernel.org>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        olivier moysan <olivier.moysan@foss.st.com>,
+        Amelie Delaunay <amelie.delaunay@foss.st.com>,
+        linux-mtd@lists.infradead.org, linux-watchdog@vger.kernel.org,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        maxime coquelin <mcoquelin.stm32@gmail.com>,
+        Matt Mackall <mpm@selenic.com>, vinod koul <vkoul@kernel.org>,
+        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        baolin wang <baolin.wang7@gmail.com>,
+        linux-spi@vger.kernel.org, david airlie <airlied@linux.ie>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        netdev@vger.kernel.org,
+        Fabrice Gasnier <fabrice.gasnier@foss.st.com>,
+        ohad ben-cohen <ohad@wizery.com>, linux-gpio@vger.kernel.org,
+        Jose Abreu <joabreu@synopsys.com>,
+        Le Ray <erwan.leray@foss.st.com>,
+        herbert xu <herbert@gondor.apana.org.au>,
+        michael turquette <mturquette@baylibre.com>,
+        Christophe Kerello <christophe.kerello@foss.st.com>,
+        Gabriel Fernandez <gabriel.fernandez@foss.st.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Christophe Roullier <christophe.roullier@foss.st.com>,
+        linux-serial@vger.kernel.org, Amit Kucheria <amitk@kernel.org>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Ludovic Barre <ludovic.barre@foss.st.com>,
+        "david s . miller" <davem@davemloft.net>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        linux-i2c@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        Guenter Roeck <linux@roeck-us.net>,
+        thierry reding <thierry.reding@gmail.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        philippe cornu <philippe.cornu@foss.st.com>,
+        linux-rtc@vger.kernel.org,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Hugues Fruchet <hugues.fruchet@foss.st.com>,
+        alsa-devel@alsa-project.org, Zhang Rui <rui.zhang@intel.com>,
+        linux-crypto@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        linux-iio@vger.kernel.org, pascal Paillet <p.paillet@foss.st.com>,
+        Pierre-Yves MORDRET <pierre-yves.mordret@foss.st.com>,
+        Fabien Dessenne <fabien.dessenne@foss.st.com>,
+        linux-pm@vger.kernel.org, Paul Cercueil <paul@crapouillou.net>,
+        stephen boyd <sboyd@kernel.org>,
+        dillon min <dillon.minfei@gmail.com>,
+        devicetree@vger.kernel.org,
+        yannick fertre <yannick.fertre@foss.st.com>,
+        linux-kernel@vger.kernel.org,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+        linux-phy@lists.infradead.org,
+        benjamin gaignard <benjamin.gaignard@linaro.org>,
+        sam ravnborg <sam@ravnborg.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        linux-clk@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Richard Weinberger <richard@nod.at>,
+        Rob Herring <robh+dt@kernel.org>, Marek Vasut <marex@denx.de>,
+        arnaud pouliquen <arnaud.pouliquen@foss.st.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-usb@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        Jagan Teki <jagan@amarulasolutions.com>,
+        dmaengine@vger.kernel.org, linux-media@vger.kernel.org,
+        daniel vetter <daniel@ffwll.ch>, Marc Zyngier <maz@kernel.org>,
+        bjorn andersson <bjorn.andersson@linaro.org>,
+        lars-peter clausen <lars@metafoo.de>
+Subject: Re: [PATCH v3 2/5] dt-bindings: mfd: timers: Update maintainers for
+ st,stm32-timers
+Message-ID: <YY4a7ZxzhNq6Or+t@google.com>
+References: <20211110150144.18272-1-patrice.chotard@foss.st.com>
+ <20211110150144.18272-3-patrice.chotard@foss.st.com>
+ <YYwjPAoCtuM6iycz@robh.at.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c0e:: with SMTP id l14mr7470656ilh.8.1636697775906;
- Thu, 11 Nov 2021 22:16:15 -0800 (PST)
-Date:   Thu, 11 Nov 2021 22:16:15 -0800
-In-Reply-To: <0000000000003991b905c9cb527a@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000089a5e805d0916571@google.com>
-Subject: Re: [syzbot] INFO: task hung in hwrng_register
-From:   syzbot <syzbot+fa0abe20d13faf06353d@syzkaller.appspotmail.com>
-To:     f.fangjian@huawei.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lvivier@redhat.com, mpm@selenic.com, mst@redhat.com,
-        syzkaller-bugs@googlegroups.com, tangzihao1@hisilicon.com,
-        yuehaibing@huawei.com, zhangshaokun@hisilicon.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YYwjPAoCtuM6iycz@robh.at.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+On Wed, 10 Nov 2021, Rob Herring wrote:
 
-commit 2bb31abdbe55742c89f4dc0cc26fcbc8467364f6
-Author: Laurent Vivier <lvivier@redhat.com>
-Date:   Thu Oct 28 10:11:09 2021 +0000
+> On Wed, 10 Nov 2021 16:01:41 +0100, patrice.chotard@foss.st.com wrote:
+> > From: Patrice Chotard <patrice.chotard@foss.st.com>
+> > 
+> > Benjamin has left the company, remove his name from maintainers.
+> > 
+> > Signed-off-by: Patrice Chotard <patrice.chotard@foss.st.com>
+> > ---
+> >  Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml | 1 -
+> >  1 file changed, 1 deletion(-)
+> > 
+> 
+> Lee indicated he was going to pick this one up, so:
+> 
+> Acked-by: Rob Herring <robh@kernel.org>
 
-    hwrng: virtio - don't wait on cleanup
+Since you already merged the treewide patch, you may as well take
+this too.  We'll work through any conflicts that may occur as a
+result.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11d4141ab00000
-start commit:   f8e6dfc64f61 Merge tag 'net-5.14-rc6' of git://git.kernel...
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=171d57d5a48c8cad
-dashboard link: https://syzkaller.appspot.com/bug?extid=fa0abe20d13faf06353d
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16cfe231300000
+Acked-by: Lee Jones <lee.jones@linaro.org>
 
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: hwrng: virtio - don't wait on cleanup
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+-- 
+Lee Jones [李琼斯]
+Senior Technical Lead - Developer Services
+Linaro.org │ Open source software for Arm SoCs
+Follow Linaro: Facebook | Twitter | Blog
