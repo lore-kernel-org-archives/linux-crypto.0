@@ -2,106 +2,365 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2941C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 21:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2954FC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 21:18:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D38C761073
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 21:16:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A11B60C51
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 21:18:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235694AbhKLVTp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 16:19:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49186 "EHLO
+        id S235636AbhKLVUz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 16:20:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235668AbhKLVTp (ORCPT
+        with ESMTP id S232183AbhKLVUy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 16:19:45 -0500
-Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37D36C061767
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 13:16:54 -0800 (PST)
-Received: by mail-oo1-xc2e.google.com with SMTP id v30-20020a4a315e000000b002c52d555875so2350499oog.12
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Nov 2021 13:16:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Wss/5FTdvL/ZsvqJzpcpP0vdH9OVb8c+LLdYEkdhnSs=;
-        b=rH4CDA2O6JCJq7jEtKrpJB3naSzfLAW3EwcXwJBgz8NHwCbEfX4Y7uVz+LkZr+hrEJ
-         +I0JUbdCZ0Eg+jU7wr0UWgv5MDmCQEwSLGmghVhPsyXWCJLkgNTbAEEIodMi2vC+nDGP
-         vAnO27RJCLMGr+oQH3ulQDVXl+wQnrPymGwD+C8Ct6C3DeEXgjsqVjqN+hGRnsLmOFi8
-         nPkzBkWeT1G3yIcW2QZxvHaZQmPv3Hr+tSGUPT0LwTUvBEwM3VTfJSuVQ97JJ6+ohD0v
-         sm4Jcwh4byJx7uc264omN9uaYgtuYaY49B2I53HH1xF8Dj1+neZHJFB8B1P12TfFku+L
-         wdbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Wss/5FTdvL/ZsvqJzpcpP0vdH9OVb8c+LLdYEkdhnSs=;
-        b=VX12C4nGvY3Sd6jalMt+LUQBW+ZGQDWAJ87cFVQx5TkKZLq73SbMvuA0QL/gz0qdPy
-         ytqrb4BmUkg0LQ7CIYY3Sal2Xdy09E+zWR0QSuEY+9XcBf0cdOyGiKE946ibkXr7eNEa
-         S2b4e+SNWry+7b7eAx8+rdvHPamt61S09BxCwzFf+W8WviGjw6WDKHpPDpiuwuS6I+i3
-         pJnuWsKfFShGHN61naN99Sc8QlpOyhxSrx13kIhKF/UT+jllEcy7c0t+vZk1KM5Ad1b9
-         1IKXrUBJ+5cU8AuYlsWDj26OLbFavko9iSK12CjjSmHBURnGJ6OYfYQ1XfkfpIOQoiTL
-         VYgQ==
-X-Gm-Message-State: AOAM533RIc+isXjvi/rhN3GHehqD+x57c45s65chulC03sSTIZ+E0z7D
-        aHtVW2iCp7DsibMKEE8rNu/HczLJJTwH60cS2whqNQ==
-X-Google-Smtp-Source: ABdhPJyat1/wejZeYNbgqmYOxRGD7fk2dWxHtnIZDfKhyhl6kHLjSWImplcgB28WjBzJ96p1EICE1Qugb0LOIJXrx6U=
-X-Received: by 2002:a4a:dc1a:: with SMTP id p26mr10372786oov.6.1636751813173;
- Fri, 12 Nov 2021 13:16:53 -0800 (PST)
+        Fri, 12 Nov 2021 16:20:54 -0500
+Received: from ssl.serverraum.org (ssl.serverraum.org [IPv6:2a01:4f8:151:8464::1:2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84A68C061766;
+        Fri, 12 Nov 2021 13:18:02 -0800 (PST)
+Received: from ssl.serverraum.org (web.serverraum.org [172.16.0.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ssl.serverraum.org (Postfix) with ESMTPSA id DA77722175;
+        Fri, 12 Nov 2021 22:17:59 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
+        t=1636751880;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hE/NLM5PyvF/iHtnTPaAlITOzlFT/NldAZ4tUsD593E=;
+        b=QLs5pBZKQRQqTcXpeSIrfXTl9b3ZSVDk5G1Lj7hta8mxYA8rIb7w6wCXU/aHrorz3BrVDD
+        xszi44iYfCidG+wMFaxy4LBGn0qGymZ+NgePpVfoHFNxOGMd78H8M8Zjj7u6hOvxcsiOx6
+        okRaKLGTtorID6NjfozssRmrNWWGSkI=
 MIME-Version: 1.0
-References: <20210820155918.7518-1-brijesh.singh@amd.com> <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com> <YY6z5/0uGJmlMuM6@zn.tnic> <YY7FAW5ti7YMeejj@google.com>
-In-Reply-To: <YY7FAW5ti7YMeejj@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Fri, 12 Nov 2021 13:16:42 -0800
-Message-ID: <CAA03e5EpQZnNzWgRsCAahwwvsd6+QVnRHdiYFM=GhEb2N1W0GQ@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Peter Gonda <pgonda@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Fri, 12 Nov 2021 22:17:59 +0100
+From:   Michael Walle <michael@walle.cc>
+To:     Andrey Zhizhikin <andrey.zhizhikin@leica-geosystems.com>
+Cc:     horia.geanta@nxp.com, pankaj.gupta@nxp.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        iuliana.prodan@nxp.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] crypto: caam - check jr permissions before probing
+In-Reply-To: <20211111164601.13135-3-andrey.zhizhikin@leica-geosystems.com>
+References: <20211104162114.2019509-1-andrey.zhizhikin@leica-geosystems.com>
+ <20211111164601.13135-1-andrey.zhizhikin@leica-geosystems.com>
+ <20211111164601.13135-3-andrey.zhizhikin@leica-geosystems.com>
+User-Agent: Roundcube Webmail/1.4.11
+Message-ID: <e8456cc0bb9e4fc306e8188c5bd666d0@walle.cc>
+X-Sender: michael@walle.cc
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> > So cloud providers should have an interest to prevent such random stray
-> > accesses if they wanna have guests. :)
->
-> Yes, but IMO inducing a fault in the guest because of _host_ bug is wrong.
+Am 2021-11-11 17:46, schrieb Andrey Zhizhikin:
+> Job Rings can be set to be exclusively used by TrustZone which makes 
+> the
+> access to those rings only possible from Secure World. This access
+> separation is defined by setting bits in CAAM JRxDID_MS register. Once
+> reserved to be owned by TrustZone, this Job Ring becomes unavailable 
+> for
+> the Kernel. This reservation is performed early in the boot process,
+> even before the Kernel starts, which leads to unavailability of the HW
+> at the probing stage. Moreover, the reservation can be done for any Job
+> Ring and is not under control of the Kernel.
+> 
+> Current implementation lists Job Rings as child nodes of CAAM driver,
+> and tries to perform probing on those regardless of whether JR HW is
+> accessible or not.
+> 
+> This leads to the following error while probing:
+> [    1.509894] caam 30900000.crypto: job rings = 3, qi = 0
+> [    1.525201] caam_jr 30901000.jr: failed to flush job ring 0
+> [    1.525214] caam_jr: probe of 30901000.jr failed with error -5
+> 
+> Implement a dynamic mechanism to identify which Job Ring is actually
+> marked as owned by TrustZone, and fail the probing of those child nodes
+> with -ENODEV.
 
-I want to push back on "inducing a fault in the guest because of
-_host_ bug is wrong.". The guest is _required_ to be robust against
-the host maliciously (or accidentally) writing its memory. SNP
-security depends on the guest detecting such writes. Therefore, why is
-leveraging this system property that the guest will detect when its
-private memory has been written wrong? Especially when its orders or
-magnitudes simpler than the alternative to have everything in the
-system -- kernel, user-space, and guest -- all coordinate to agree
-what's private and what's shared. Such a complex approach is likely to
-bring a lot of bugs, vulnerabilities, and limitations on future design
-into the picture.
+For other reviewers/maintainers: I'm still not sure this is the way
+to go. Instead one can let u-boot fix up the device tree and remove
+or disable the JR node if its not available.
+
+> If the Job Ring is released from the Secure World at the later stage,
+> then bind can be performed, which would check the Ring availability and
+> proceed with probing if the Ring is released.
+
+But what if its the other way around and S world will "steal" it from
+NS world.
+
+> 
+> Signed-off-by: Andrey Zhizhikin <andrey.zhizhikin@leica-geosystems.com>
+> ---
+> Changes in V2:
+> - Create and export new method in CAAM control driver to verify JR
+>   validity based on the address supplied.
+> - Re-work the logic JR driver to call CAAM control method instead of 
+> bit
+>   verification. This ensures the actual information retrival from CAAM
+>   module during JR probe.
+> - Clean-up of internal static job indexes used during probing, new
+>   indexing is performed based on the address supplied in DTB node.
+> 
+>  drivers/crypto/caam/ctrl.c   | 63 ++++++++++++++++++++++++++++++------
+>  drivers/crypto/caam/intern.h |  2 ++
+>  drivers/crypto/caam/jr.c     | 33 ++++++++++++++++---
+>  drivers/crypto/caam/regs.h   |  7 ++--
+>  4 files changed, 87 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+> index 7a14a69d89c7..ffe233f2c4ef 100644
+> --- a/drivers/crypto/caam/ctrl.c
+> +++ b/drivers/crypto/caam/ctrl.c
+> @@ -79,6 +79,42 @@ static void build_deinstantiation_desc(u32 *desc, 
+> int handle)
+>  	append_jump(desc, JUMP_CLASS_CLASS1 | JUMP_TYPE_HALT);
+>  }
+> 
+> +/*
+> + * caam_ctrl_check_jr_perm - check if the job ring can be accessed
+> + *				from Non-Secure World.
+> + * @ctrldev - pointer to CAAM control device
+> + * @ring_addr - input address of Job Ring, which access should be 
+> verified
+> + *
+> + * Return: - 0 if Job Ring is available in NS World
+> + *	    - 1 if Job Ring is reserved in the Secure World
+> + */
+> +inline int caam_ctrl_check_jr_perm(struct device *ctrldev, u32 
+> ring_addr)
+
+inline?
+static int caam_ctrl_..
+
+> +{
+> +	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctrldev);
+> +	struct caam_ctrl __iomem *ctrl = ctrlpriv->ctrl;
+> +	u32 ring_id;
+> +
+> +	ring_id = ring_addr >>
+> +		((ctrlpriv->caam_caps & CAAM_CAPS_64K_PAGESIZE) ?
+> +		16 : 12);
+
+mh also here:
+if (ctrlpriv->caam_caps & CAAM_CAPS_64K_PAGESIZE)
+   ring_id = ring_addr >> 16;
+else
+   ring_id = ring_addr >> 12;
+
+Is there something to replace that "16" and "12" by the SZ_ macros,
+btw?
+
+> +	/*
+> +	 * Check if the JR is not owned exclusively by TZ,
+> +	 * and update capabilities bitmap to indicate that
+> +	 * the Job Ring is available.
+> +	 * Note: Ring index is 0-based in the register map
+> +	 */
+> +	if (!((rd_reg32(&ctrl->jr_mid[ring_id - 1].liodn_ms)) &
+> +		MSTRID_LOCK_TZ_OWN)) {
+> +		ctrlpriv->caam_caps |= BIT(ring_id);
+
+See also the former patch, this should be a macro.
+
+> +		return 0;
+> +	}
+> +
+> +	/* Job Ring is reserved, clear bit if is was set before */
+> +	ctrlpriv->caam_caps &= ~BIT(ring_id);
+> +	return 1;
+> +}
+> +EXPORT_SYMBOL(caam_ctrl_check_jr_perm);
+
+no need for exporting this, no?
+
+> +
+>  /*
+>   * run_descriptor_deco0 - runs a descriptor on DECO0, under direct 
+> control of
+>   *			  the software (no JR/QI used).
+> @@ -612,7 +648,7 @@ static bool check_version(struct fsl_mc_version
+> *mc_version, u32 major,
+>  /* Probe routine for CAAM top (controller) level */
+>  static int caam_probe(struct platform_device *pdev)
+>  {
+> -	int ret, ring, gen_sk, ent_delay = RTSDCTL_ENT_DLY_MIN;
+> +	int ret, gen_sk, ent_delay = RTSDCTL_ENT_DLY_MIN;
+>  	u64 caam_id;
+>  	const struct soc_device_attribute *imx_soc_match;
+>  	struct device *dev;
+> @@ -803,20 +839,27 @@ static int caam_probe(struct platform_device 
+> *pdev)
+>  #endif
+>  	}
+> 
+> -	ring = 0;
+>  	for_each_available_child_of_node(nprop, np)
+>  		if (of_device_is_compatible(np, "fsl,sec-v4.0-job-ring") ||
+>  		    of_device_is_compatible(np, "fsl,sec4.0-job-ring")) {
+> -			ctrlpriv->jr[ring] = (struct caam_job_ring __iomem __force *)
+> -					     ((__force uint8_t *)ctrl +
+> -					     (ring + JR_BLOCK_NUMBER) *
+> -					      BLOCK_OFFSET
+> -					     );
+> -			ring++;
+> -			ctrlpriv->caam_caps |= BIT(ring);
+> +			u32 ring_id;
+> +			/*
+> +			 * Get register page to see the start address of CB
+> +			 * This is used to index into the bitmap of available
+> +			 * job rings and indicate if it is available in NS world.
+> +			 */
+> +			ret = of_property_read_u32(np, "reg", &ring_id);
+
+Not sure about this one, but I don't have any better idea.
+
+
+> +			if (ret) {
+> +				dev_err(dev, "failed to get register address for jobr\n");
+> +				continue;
+> +			}
+> +			caam_ctrl_check_jr_perm(dev, ring_id);
+
+What about
+if (!caam_ctrl_is_jr_available(dev, ring_id))
+    ctrlpriv->caam_caps &= ~BIT(ring_id);
+
+Again BIT() should be its own macro.
+
+>  		}
+> 
+> -	/* If no QI and no rings specified, quit and go home */
+> +	/*
+> +	 * If no QI, no rings specified or no rings available for NS -
+> +	 * quit and go home
+> +	 */
+>  	if (!(ctrlpriv->caam_caps & CAAM_CAPS_QI_PRESENT) &&
+>  	    (hweight_long(ctrlpriv->caam_caps & CAAM_CAPS_JOBRS_MASK) == 0)) 
+> {
+>  		dev_err(dev, "no queues configured, terminating\n");
+> diff --git a/drivers/crypto/caam/intern.h 
+> b/drivers/crypto/caam/intern.h
+> index 37f0b93c7087..8d6a0cff556a 100644
+> --- a/drivers/crypto/caam/intern.h
+> +++ b/drivers/crypto/caam/intern.h
+> @@ -115,6 +115,8 @@ struct caam_drv_private {
+>  #endif
+>  };
+> 
+> +inline int caam_ctrl_check_jr_perm(struct device *ctrldev, u32 
+> ring_addr);
+> +
+>  #ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API
+> 
+>  int caam_algapi_init(struct device *dev);
+> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+> index 7f2b1101f567..e1bc1ce5515e 100644
+> --- a/drivers/crypto/caam/jr.c
+> +++ b/drivers/crypto/caam/jr.c
+> @@ -90,7 +90,7 @@ static int caam_reset_hw_jr(struct device *dev)
+> 
+>  	if ((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) !=
+>  	    JRINT_ERR_HALT_COMPLETE || timeout == 0) {
+> -		dev_err(dev, "failed to flush job ring %d\n", jrp->ridx);
+> +		dev_err(dev, "failed to flush job ring %x\n", jrp->ridx);
+
+mh? why changing this?
+
+>  		return -EIO;
+>  	}
+> 
+> @@ -101,7 +101,7 @@ static int caam_reset_hw_jr(struct device *dev)
+>  		cpu_relax();
+> 
+>  	if (timeout == 0) {
+> -		dev_err(dev, "failed to reset job ring %d\n", jrp->ridx);
+> +		dev_err(dev, "failed to reset job ring %x\n", jrp->ridx);
+>  		return -EIO;
+>  	}
+> 
+> @@ -489,7 +489,7 @@ static int caam_jr_init(struct device *dev)
+>  	error = devm_request_irq(dev, jrp->irq, caam_jr_interrupt, 
+> IRQF_SHARED,
+>  				 dev_name(dev), dev);
+>  	if (error) {
+> -		dev_err(dev, "can't connect JobR %d interrupt (%d)\n",
+> +		dev_err(dev, "can't connect JobR %x interrupt (%d)\n",
+>  			jrp->ridx, jrp->irq);
+>  		tasklet_kill(&jrp->irqtask);
+>  	}
+> @@ -511,10 +511,33 @@ static int caam_jr_probe(struct platform_device 
+> *pdev)
+>  	struct device_node *nprop;
+>  	struct caam_job_ring __iomem *ctrl;
+>  	struct caam_drv_private_jr *jrpriv;
+> -	static int total_jobrs;
+> +	u32 ring_addr;
+>  	struct resource *r;
+>  	int error;
+> 
+> +	/*
+> +	 * Get register page to see the start address of CB.
+> +	 * Job Rings have their respective input base addresses
+> +	 * defined in the register IRBAR_JRx. This address is
+> +	 * present in the DT node and is aligned to the page
+> +	 * size defined at CAAM compile time.
+> +	 */
+> +	if (of_property_read_u32(pdev->dev.of_node, "reg", &ring_addr)) {
+> +		dev_err(&pdev->dev, "failed to get register address for jobr\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	if (caam_ctrl_check_jr_perm(pdev->dev.parent, ring_addr)) {
+
+With the change above, this will also have no bogus side effects
+on caam_caps.
+
+> +		/*
+> +		 * This job ring is marked to be exclusively used by TZ,
+> +		 * do not proceed with probing as the HW block is inaccessible.
+> +		 * Defer this device probing for later, it might be released
+> +		 * into NS world.
+> +		 */
+> +		dev_info(&pdev->dev, "job ring is reserved in secure world\n");
+> +		return -ENODEV;
+> +	}
+> +
+>  	jrdev = &pdev->dev;
+>  	jrpriv = devm_kzalloc(jrdev, sizeof(*jrpriv), GFP_KERNEL);
+>  	if (!jrpriv)
+> @@ -523,7 +546,7 @@ static int caam_jr_probe(struct platform_device 
+> *pdev)
+>  	dev_set_drvdata(jrdev, jrpriv);
+> 
+>  	/* save ring identity relative to detection */
+> -	jrpriv->ridx = total_jobrs++;
+> +	jrpriv->ridx = ring_addr;
+> 
+>  	nprop = pdev->dev.of_node;
+>  	/* Get configuration properties from device tree */
+> diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+> index 186e76e6a3e7..c4e8574bc570 100644
+> --- a/drivers/crypto/caam/regs.h
+> +++ b/drivers/crypto/caam/regs.h
+> @@ -445,10 +445,11 @@ struct caam_perfmon {
+>  };
+> 
+>  /* LIODN programming for DMA configuration */
+> -#define MSTRID_LOCK_LIODN	0x80000000
+> -#define MSTRID_LOCK_MAKETRUSTED	0x00010000	/* only for JR masterid */
+> +#define MSTRID_LOCK_LIODN		BIT(31)
+> +#define MSTRID_LOCK_MAKETRUSTED	BIT(16)	/* only for JR: masterid */
+> +#define MSTRID_LOCK_TZ_OWN		BIT(15)	/* only for JR: owned by TZ */
+> 
+> -#define MSTRID_LIODN_MASK	0x0fff
+> +#define MSTRID_LIODN_MASK		GENMASK(11, 0)
+>  struct masterid {
+>  	u32 liodn_ms;	/* lock and make-trusted control bits */
+>  	u32 liodn_ls;	/* LIODN for non-sequence and seq access */
+
+-- 
+-michael
