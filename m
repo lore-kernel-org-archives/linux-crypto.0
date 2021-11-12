@@ -2,75 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03DEEC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 10:48:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E8BC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 11:03:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA76F60F21
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 10:48:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B02860F22
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Nov 2021 11:03:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233883AbhKLKvP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Nov 2021 05:51:15 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:56674 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233441AbhKLKvP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Nov 2021 05:51:15 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1mlU6W-00076q-2H; Fri, 12 Nov 2021 18:48:20 +0800
-Received: from herbert by gondobar with local (Exim 4.92)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1mlU6R-0003fz-LQ; Fri, 12 Nov 2021 18:48:15 +0800
-Date:   Fri, 12 Nov 2021 18:48:15 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 5.16
-Message-ID: <20211112104815.GA14105@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20200830223304.GA16882@gondor.apana.org.au>
- <20201026011159.GA2428@gondor.apana.org.au>
- <20201227113221.GA28744@gondor.apana.org.au>
- <20210108035450.GA6191@gondor.apana.org.au>
- <20210708030913.GA32097@gondor.apana.org.au>
- <20210817013601.GA14148@gondor.apana.org.au>
- <20210929023843.GA28594@gondor.apana.org.au>
- <20211029041408.GA3192@gondor.apana.org.au>
+        id S233619AbhKLLGW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Nov 2021 06:06:22 -0500
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:25863 "EHLO
+        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232791AbhKLLGW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Nov 2021 06:06:22 -0500
+X-Greylist: delayed 427 seconds by postgrey-1.27 at vger.kernel.org; Fri, 12 Nov 2021 06:06:22 EST
+IronPort-Data: =?us-ascii?q?A9a23=3ABO2bra3AiM9WWu6uEfbD5cxwkn2cJEfYwER7XOP?=
+ =?us-ascii?q?LsXnJ1joigjwByzRND2iBOK2JMGf8e4x+aNyzo0IOu8fTzIQ2QQE+nZ1PZyIT+?=
+ =?us-ascii?q?JCdXbx1DW+pYnjMdpWbJK5fAnR3huDodKjYdVeB4EfyWlTdhSMkj/jRH+OmULS?=
+ =?us-ascii?q?s1h1ZHmeIdg9w0HqPpMZp2uaEsfDha++8kYuaT//3YDdJ6BYoWo4g0J9vnTs01?=
+ =?us-ascii?q?BjEVJz0iXRlDRxDlAe2e3D4l/vzL4npR5fzatE88uJX24/+IL+FEmPxp3/BC/u?=
+ =?us-ascii?q?lm7rhc0AMKlLQFVjTzCQGHfH4214b+XdaPqUTbZLwbW9VljGIlpZ1wcpEsZiYS?=
+ =?us-ascii?q?AEzP6SKlv51vxxwSHsuYPwdo9crJlD666R/1Xbudnbjw/woAEwnFYwe5utzR2p?=
+ =?us-ascii?q?J8JQwKzoQbxSPwuuyxJq/S/JwnYJ7dY/sJox3knVhyyzJSPUrW5bOR43U6tJCm?=
+ =?us-ascii?q?jQ9nMZDGbDZfcVxQSZoaR3bcVtMM1ELBZk9nc+pgGXyd3tTr1f9jao6+WLe1hB?=
+ =?us-ascii?q?Z37/rPN3PPNWSTMNc2EGCqSTP4gzRHh4eJPSbyDyY7mirgO7f2y/2MKoXFbu38?=
+ =?us-ascii?q?dZwjVGTz3BVAxoTPXOxudGwjk+zXYIZJ0F80jp+84Ax+VatQ927WAe3yFaEphc?=
+ =?us-ascii?q?0SctMFPd84waIooLQ4gCEFi0PVC9ZdNsOqsA7X3op20WPktevAiZg2JWRSHSA5?=
+ =?us-ascii?q?vKXoCm0NCw9M2APf2kHQBED7t2lp5s85i8j5P4L/LWd14KuX2iqmnbU/G5u2vM?=
+ =?us-ascii?q?JgNBNzKuhu1bKn1qRSlHyZlZdzm3qsqiNt2uVvLKYWrE=3D?=
+IronPort-HdrOrdr: =?us-ascii?q?A9a23=3ADrvr26MpHffWjMBcT4H155DYdb4zR+YMi2QD?=
+ =?us-ascii?q?/1t6SBxLfsHdv93GpoVc6fajskdjZJhGo6H3BEDgewKqyXcb2/htAV7JZniDhI?=
+ =?us-ascii?q?KXFvAp0WKP+UyeJ8S6zJ8p6U+PG5IOT+EZIzBB/IbHCSODYpcdKEHtytHtuQ/m?=
+ =?us-ascii?q?p00dCD2DgclbnkRE43+gYw9LrWp9dO4E/finl7t6TmGbCDlnIvhTb0NtN4Ovy7?=
+ =?us-ascii?q?Kk9OOEEHx2YG9AmXH+9kLT1FedKWnn4v4waUIB/V5IyxmNr+WW3NTejxiT8G6v?=
+ =?us-ascii?q?64fsha4m0OcJsuEzdPBk5/JlTwkFgWyTFc9cswjuhlEIST6UgidSrPD85xAne8?=
+ =?us-ascii?q?xp4XLQYW3dm2qi5yDQlC8/xnO+7VPC6EGT+L2gNWlKUfZ8uQ=3D=3D?=
+X-IronPort-AV: E=Sophos;i="5.87,229,1631570400"; 
+   d="scan'208";a="3285933"
+Received: from 173.121.68.85.rev.sfr.net (HELO hadrien) ([85.68.121.173])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Nov 2021 11:56:22 +0100
+Date:   Fri, 12 Nov 2021 11:56:22 +0100 (CET)
+From:   Julia Lawall <julia.lawall@inria.fr>
+X-X-Sender: jll@hadrien
+To:     Megha Dey <megha.dey@intel.com>
+cc:     kbuild-all@lists.01.org, linux-kernel@vger.kernel.org,
+        Tomasz Kantecki <tomasz.kantecki@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: fix flexible_array.cocci warnings
+Message-ID: <alpine.DEB.2.22.394.2111121154320.2916@hadrien>
+User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211029041408.GA3192@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+From: kernel test robot <lkp@intel.com>
 
-This push fixes a boot crash regression.
+ Zero-length and one-element arrays are deprecated, see
+ Documentation/process/deprecated.rst
+ Flexible-array members should be used instead.
 
-The following changes since commit 39ef08517082a424b5b65c3dbaa6c0fa9d3303b9:
+Generated by: scripts/coccinelle/misc/flexible_array.cocci
 
-  crypto: testmgr - fix wrong key length for pkcs1pad (2021-10-29 21:04:04 +0800)
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Julia Lawall <julia.lawall@inria.fr>
+---
 
-are available in the Git repository at:
+tree:   https://github.com/meghadey/crypto crypto-avx512
+head:   9c8c2ca77f6e2575a130bddb9767d068e1162d71
+commit: 377aede9f10ee28be954473668bc6d33c6c9db75 [5/6] crypto: aesni - AVX512 version of AESNI-GCM using VPCLMULQDQ
+:::::: branch date: 7 weeks ago
+:::::: commit date: 7 weeks ago
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus 
+ aesni-intel_glue.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-for you to fetch changes up to beaaaa37c664e9afdf2913aee19185d8e3793b50:
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -87,7 +87,7 @@ struct gcm_context_data {
+ 	u64 partial_block_len;
+ 	u64 unused;
+ 	/* Allocate space for hash_keys later */
+-	u8 hash_keys[0];
++	u8 hash_keys[];
+ };
 
-  crypto: api - Fix boot-up crash when crypto manager is disabled (2021-11-09 13:45:48 +0800)
-
-----------------------------------------------------------------
-Herbert Xu (1):
-      crypto: api - Fix boot-up crash when crypto manager is disabled
-
- crypto/algapi.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ asmlinkage int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
