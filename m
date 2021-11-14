@@ -2,133 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B3F3C433EF
-	for <linux-crypto@archiver.kernel.org>; Sun, 14 Nov 2021 07:54:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A48D9C433FE
+	for <linux-crypto@archiver.kernel.org>; Sun, 14 Nov 2021 10:40:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03963610FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 14 Nov 2021 07:54:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BFD9610A8
+	for <linux-crypto@archiver.kernel.org>; Sun, 14 Nov 2021 10:40:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231656AbhKNH5R (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 14 Nov 2021 02:57:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46968 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbhKNH5N (ORCPT
+        id S229908AbhKNKnd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 14 Nov 2021 05:43:33 -0500
+Received: from mail-wm1-f50.google.com ([209.85.128.50]:45575 "EHLO
+        mail-wm1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229563AbhKNKn3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 14 Nov 2021 02:57:13 -0500
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B19AC061767
-        for <linux-crypto@vger.kernel.org>; Sat, 13 Nov 2021 23:54:16 -0800 (PST)
-Received: by mail-oi1-x234.google.com with SMTP id s139so27483786oie.13
-        for <linux-crypto@vger.kernel.org>; Sat, 13 Nov 2021 23:54:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Mt/vtZHK8U1Y/g0MBAk3dgrCqujD9uU9xm4N+TPiSC4=;
-        b=tBOhWBAxKbwGO/xAhEYg4SBgMOy31mURG+gnZgnfLWd0BcqM4s6mHLkFKKh9U20tqm
-         j21UFff0YGhDA2L5IMJge6yKksxUep3zESPktW08MvFCpLVyt4Nv7r1BxR82ws+hY6/S
-         UWFfsFPKT5q+ifV7sZMKU3O57gCLfybInChsSP9l+tNHzXKzudrCgvtFkc+sKedNIXgN
-         MZOYa7Mkq5SglN22g7X9lmOWUZyx3TZKvHGcvEV8BYWbZRIYtB/Bmh51jSluTwi6ATE6
-         SYXOwfYZXzFY2gYXfZ8NxFvzsR6AMs36aseiZileJ5s2gFJx+8bgkzF0VXINlm21cWq8
-         /XwQ==
+        Sun, 14 Nov 2021 05:43:29 -0500
+Received: by mail-wm1-f50.google.com with SMTP id g191-20020a1c9dc8000000b0032fbf912885so10072140wme.4
+        for <linux-crypto@vger.kernel.org>; Sun, 14 Nov 2021 02:40:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Mt/vtZHK8U1Y/g0MBAk3dgrCqujD9uU9xm4N+TPiSC4=;
-        b=S0E5lZvoTzV7Mxhfz6ss29ruqQ/OS2LQ5VbJ1rcoS7KRn9jgTLUvj3lF48CAtq5Yiu
-         xnzBGYxyJ3AKw9QILdhBvfW5moq36gvtiiQTDVEj7hojf1R2hes99zUDfO4bL1m48Ovy
-         4xcgxD0a5eGIml/3TNGy8F0mIGmXpL9vQinP6GhKtLimVKJq5T8PjOEik1LPBxuHp8r1
-         45cgX/+oRbngVa3mNF1752EvVGciaVFsH4zAdOFLd2UBbSSUn0in9++FaLWsGCfi4LOh
-         KDTUUDokI+yn9ip0KSTRiFLhMj/c+EKxwUjzcNVetA7S/fWXLhlvnL8QTFvxkTaofXWj
-         Jbow==
-X-Gm-Message-State: AOAM533YitG1dh+rltDfUY0FBkktE0a8XYv4sENnG9rvptMxgcl7GLH3
-        vxO5vCj2paRzrXg38/5WOhFPtSc+DAUwBQp0ZCVUaQ==
-X-Google-Smtp-Source: ABdhPJxjgt74dMqwnlL+VtqSOado4iTXu/hJhaIpCUKV4d77eCrVnjV65nNKQFkeuwmKVjJ2koqS4DBKBgoEFCPKGW8=
-X-Received: by 2002:aca:2319:: with SMTP id e25mr37402844oie.164.1636876455060;
- Sat, 13 Nov 2021 23:54:15 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ijAtENWn1ygUhu59xmA540JQUcVLLz9Nox8HONApS5w=;
+        b=NtNtSkCI799bY1uQvyw8yGEzmahSfyWM8wioPwE9ZwxBmGmWnVm+szGUeVgCabsV1V
+         0CEJPBBLWpN+sg7e2EAQoMNXKR/4YAUUY4ZvHs3g9DQ8EEbUu9VwElUa3s1grC9CkujQ
+         FVWo7bGY9vp691gmw8eQsP+bPYbRgHVzqZ1NK5+HE8Hm67WefYxyWnlC5K/97FNb/anl
+         LRHV/nqLIRCuGUGhsmdBOWGrEl/RVzZGf4Z2YwgAf+3yyqxzNDTz1gTQRrPtMfeGlBVI
+         RwPJI59DgZNU0cd7JR4PpouEoYT9mHXaRB2y6DPcFfzdg/qVdJMtgMVc8vHEIsPJA+vC
+         IxIA==
+X-Gm-Message-State: AOAM530q72Dg3Xm2O6YyTEV86XDbhjB1ecSwSFwkjMKJwuH7mWdSbfLP
+        YaHLMNMwlUs5YGFj7jb2Z7vuFhPFxeI=
+X-Google-Smtp-Source: ABdhPJzbCHf7KtlEb6QB1X2JJ414kye+aE2OlXNM87ZZRWWxsIXaAq84q0yH3B1wCJ+T6cb66HzsIQ==
+X-Received: by 2002:a7b:ce01:: with SMTP id m1mr38231010wmc.187.1636886434640;
+        Sun, 14 Nov 2021 02:40:34 -0800 (PST)
+Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id f18sm10729240wre.7.2021.11.14.02.40.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 14 Nov 2021 02:40:34 -0800 (PST)
+Subject: Re: [PATCHv5 00/12] nvme: In-band authentication support
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
+        linux-nvme@lists.infradead.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+References: <20211112125928.97318-1-hare@suse.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <74db7c77-7cbf-4bc9-1c80-e7c42acaea64@grimberg.me>
+Date:   Sun, 14 Nov 2021 12:40:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com> <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com> <YY7I6sgqIPubTrtA@zn.tnic> <YY7Qp8c/gTD1rT86@google.com>
- <YY7USItsMPNbuSSG@zn.tnic> <CAMkAt6o909yYq3NfRboF3U3V8k-2XGb9p_WcQuvSjOKokmMzMA@mail.gmail.com>
- <YY8AJnMo9nh3tyPB@google.com> <CAA03e5G=fY7_qESCuoHW3_VdVbDWekqQxmvLPzWNepBqJjyCXg@mail.gmail.com>
- <YZAFTBXtC/yS7xtq@google.com>
-In-Reply-To: <YZAFTBXtC/yS7xtq@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Sat, 13 Nov 2021 23:54:03 -0800
-Message-ID: <CAA03e5Hhmji-uhv4eh4cgyu0XBf9=C5r8MtGtWcB480eaVGvSg@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20211112125928.97318-1-hare@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Nov 13, 2021 at 10:35 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Nov 12, 2021, Marc Orr wrote:
-> > > > > If *it* is the host kernel, then you probably shouldn't do that -
-> > > > > otherwise you just killed the host kernel on which all those guests are
-> > > > > running.
-> > > >
-> > > > I agree, it seems better to terminate the single guest with an issue.
-> > > > Rather than killing the host (and therefore all guests). So I'd
-> > > > suggest even in this case we do the 'convert to shared' approach or
-> > > > just outright terminate the guest.
-> > > >
-> > > > Are there already examples in KVM of a KVM bug in servicing a VM's
-> > > > request results in a BUG/panic/oops? That seems not ideal ever.
-> > >
-> > > Plenty of examples.  kvm_spurious_fault() is the obvious one.  Any NULL pointer
-> > > deref will lead to a BUG, etc...  And it's not just KVM, e.g. it's possible, if
-> > > unlikely, for the core kernel to run into guest private memory (e.g. if the kernel
-> > > botches an RMP change), and if that happens there's no guarantee that the kernel
-> > > can recover.
-> > >
-> > > I fully agree that ideally KVM would have a better sense of self-preservation,
-> > > but IMO that's an orthogonal discussion.
-> >
-> > I don't think we should treat the possibility of crashing the host
-> > with live VMs nonchalantly. It's a big deal. Doing so has big
-> > implications on the probability that any cloud vendor wil bee able to
-> > deploy this code to production. And aren't cloud vendors one of the
-> > main use cases for all of this confidential compute stuff? I'm
-> > honestly surprised that so many people are OK with crashing the host.
->
-> I'm not treating it nonchalantly, merely acknowledging that (a) some flavors of kernel
-> bugs (or hardware issues!) are inherently fatal to the system, and (b) crashing the
-> host may be preferable to continuing on in certain cases, e.g. if continuing on has a
-> high probablity of corrupting guest data.
 
-I disagree. Crashing the host -- and _ALL_ of its VMs (including
-non-confidential VMs) -- is not preferable to crashing a single SNP
-VM. Especially when that SNP VM is guaranteed to detect the memory
-corruption and react accordingly.
+
+On 11/12/21 2:59 PM, Hannes Reinecke wrote:
+> Hi all,
+> 
+> recent updates to the NVMe spec have added definitions for in-band
+> authentication, and seeing that it provides some real benefit
+> especially for NVMe-TCP here's an attempt to implement it.
+> 
+> Tricky bit here is that the specification orients itself on TLS 1.3,
+> but supports only the FFDHE groups. Which of course the kernel doesn't
+> support. I've been able to come up with a patch for this, but as this
+> is my first attempt to fix anything in the crypto area I would invite
+> people more familiar with these matters to have a look.
+> 
+> Also note that this is just for in-band authentication. Secure
+> concatenation (ie starting TLS with the negotiated parameters) is not
+> implemented; one would need to update the kernel TLS implementation
+> for this, which at this time is beyond scope.
+> 
+> As usual, comments and reviews are welcome.
+> 
+> Changes to v4:
+> - Validate against blktest suite
+
+Nice! thanks hannes, this is going to be very useful moving
+forward.
+
+> - Fixup base64 decoding
+
+What was fixed up there?
+
+> - Transform secret with correct hmac algorithm
+
+Is that what I reported last time? Can you perhaps
+point me to the exact patch that fixes this?
