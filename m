@@ -2,99 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C32AC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 10:20:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF386C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 11:17:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2CA3263222
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 10:20:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEAEB63210
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 11:17:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237551AbhKOKX3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 05:23:29 -0500
-Received: from mail-wm1-f49.google.com ([209.85.128.49]:45901 "EHLO
-        mail-wm1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237584AbhKOKXO (ORCPT
+        id S231168AbhKOLUm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 06:20:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39818 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231176AbhKOLUZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 05:23:14 -0500
-Received: by mail-wm1-f49.google.com with SMTP id g191-20020a1c9dc8000000b0032fbf912885so11976403wme.4
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 02:20:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=BF/osmNNPfDts1fW+0kCRVGbiBTFAPA2CyU1oR+zBR0=;
-        b=Z4JlmZ4zUTesHxfEnZcJqBYYPxvRbKWOE6MRwzvQmpkbV4aBospXjKxj9GxQdUIMON
-         dN/AK1964h2y5pwDdSMTXLzFRzSZaBYdyv6ckn7Z+Du1H9sAeAr/dNhm35i7tx6nqrlK
-         lkv6rOmFOJ20kFH3QwzCTGOKUnyjOrwz7lyd3qrT94TplHyvZzyOMETIx6Txhlso4JWJ
-         4Ckcj/Vx9KpqFYbFwVL33YD6Ft7LRnpr9JphIhKLGQPXEt7e5X2SZBtyVzer+VanAbdO
-         vg12lRlkKsLIt+8arGWh471Z/4mU9NEuYchxZEM97AdDijZk04sqezxdQBeFeQkDY/XA
-         uFYA==
-X-Gm-Message-State: AOAM533lTckGb+ZKd4K+uXEsUpunMpzWzuquZbFVlQLhI2XUPR0PwLLd
-        D+FD3q1M4ebx9qXIbLzGWxcQ4PwG3pM=
-X-Google-Smtp-Source: ABdhPJwHtMNWBlf6CjJhbujzn8Xi6oBFGscH9w9KFPZMp53i+L12Bbpfr2eQBs2SSk5aOMJkfm/25Q==
-X-Received: by 2002:a1c:287:: with SMTP id 129mr44747564wmc.49.1636971618146;
-        Mon, 15 Nov 2021 02:20:18 -0800 (PST)
-Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id g5sm20696736wri.45.2021.11.15.02.20.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Nov 2021 02:20:17 -0800 (PST)
-Subject: Re: [PATCHv5 00/12] nvme: In-band authentication support
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-References: <20211112125928.97318-1-hare@suse.de>
- <74db7c77-7cbf-4bc9-1c80-e7c42acaea64@grimberg.me>
- <f67ca46e-f421-33f7-da8b-ff6e47acf8c2@suse.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <8553266f-005c-f947-4737-2108cb7062d1@grimberg.me>
-Date:   Mon, 15 Nov 2021 12:20:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Mon, 15 Nov 2021 06:20:25 -0500
+Received: from ssl.serverraum.org (ssl.serverraum.org [IPv6:2a01:4f8:151:8464::1:2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D65DC061746;
+        Mon, 15 Nov 2021 03:17:27 -0800 (PST)
+Received: from ssl.serverraum.org (web.serverraum.org [172.16.0.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ssl.serverraum.org (Postfix) with ESMTPSA id 43A8022221;
+        Mon, 15 Nov 2021 12:17:24 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
+        t=1636975046;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=O/iWpLyoa1gNZiyBDxuUPBO05cWoG2tLuiKiWw/oH/0=;
+        b=agijY97sqc3+pHSLv4oLGgRmgzivxSkJnuGG9xuwYFuSs8BlVx4ccdf7f7qmsz7pIHVToJ
+        cB/nGsDz5wApvdNmP1mHsW3gYs5C5yc1P81YBxKStoVfYsM95R0TWoj4lsus8vd5avWKWz
+        WVGqg1TUWRbQrwYNPv9cgfhrfjtCDYc=
 MIME-Version: 1.0
-In-Reply-To: <f67ca46e-f421-33f7-da8b-ff6e47acf8c2@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
+Date:   Mon, 15 Nov 2021 12:17:23 +0100
+From:   Michael Walle <michael@walle.cc>
+To:     ZHIZHIKIN Andrey <andrey.zhizhikin@leica-geosystems.com>
+Cc:     horia.geanta@nxp.com, pankaj.gupta@nxp.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        iuliana.prodan@nxp.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] crypto: caam - check jr permissions before probing
+In-Reply-To: <AM6PR06MB46914ECA12815ABFCE8C1A59A6989@AM6PR06MB4691.eurprd06.prod.outlook.com>
+References: <20211104162114.2019509-1-andrey.zhizhikin@leica-geosystems.com>
+ <20211111164601.13135-1-andrey.zhizhikin@leica-geosystems.com>
+ <20211111164601.13135-3-andrey.zhizhikin@leica-geosystems.com>
+ <e8456cc0bb9e4fc306e8188c5bd666d0@walle.cc>
+ <AM6PR06MB46914ECA12815ABFCE8C1A59A6989@AM6PR06MB4691.eurprd06.prod.outlook.com>
+User-Agent: Roundcube Webmail/1.4.11
+Message-ID: <2070c2062606821fbf6ed052e6864255@walle.cc>
+X-Sender: michael@walle.cc
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
->>> Changes to v4:
->>> - Validate against blktest suite
->>
->> Nice! thanks hannes, this is going to be very useful moving
->> forward.
->>
-> Oh, definitely. The number of issue these tests found...
-
-Great, good that this was useful for you.
-
->>> - Fixup base64 decoding
->>
->> What was fixed up there?
->>
-> The padding character '=' wasn't handled correctly on decoding (the 
-> character itself was skipped, by the 'bits' value wasn't increased, 
-> leading to a spurious error in decoding an any key longer than 32 bit 
-> not being accepted.
-
-I see.
-
->>> - Transform secret with correct hmac algorithm
->>
->> Is that what I reported last time? Can you perhaps
->> point me to the exact patch that fixes this?
+>> > +EXPORT_SYMBOL(caam_ctrl_check_jr_perm);
+>> 
+>> no need for exporting this, no?
 > 
-> Well, no, not really; the patch itself got squashed in the main patches.
-> But problem here was that the key transformation from section 8.13.5.7 
-> had been using the hash algorithm from the initial challenge, not the 
-> one specified in the key itself.
-> This lead to decoding errors when using a key with a different length 
-> than the hash algorithm.
+> Unfortunately, both CONFIG_CRYPTO_DEV_FSL_CAAM and
+> CONFIG_CRYPTO_DEV_FSL_CAAM_JR are tristate. Setting both
+> config options to "=m" fails to resolve caam_ctrl_check_jr_perm,
+> therefore I had to export it.
+> 
+> It strikes me odd however that CAAM can be compiled as module
+> without CAAM_JR module at all. This would imply that DECO is used
+> directly, which according to SRM is used for pure descriptor debug
+> purposes and should never be used in production.
+> 
+> I guess CRYPTO_DEV_FSL_CAAM _JR should be merged into
+> CRYPTO_DEV_FSL_CAAM, so they at least comes together. In that
+> case the export would not be necessary at all.
+> 
+> I must admit I didn't find this a good solution, therefore any advise
+> on a better solution here is highly appreciated.
 
-That is exactly what I reported, changing the key length leads to
-authentication errors.
+I see, and I'm too lazy at the moment to figure that out ;) but afaik
+new exports should be only EXPORT_SYMBOL_GPL().
+
+>> >       if ((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) !=
+>> >           JRINT_ERR_HALT_COMPLETE || timeout == 0) {
+>> > -             dev_err(dev, "failed to flush job ring %d\n", jrp->ridx);
+>> > +             dev_err(dev, "failed to flush job ring %x\n",
+>> > + jrp->ridx);
+>> 
+>> mh? why changing this?
+> 
+> After the change, jrp->ridx would contain JR hex address instead of 
+> index,
+> therefore I had to replace the debug output.
+
+ahh then, ridx should renamed accordingly, I suppose.
+
+-michael
