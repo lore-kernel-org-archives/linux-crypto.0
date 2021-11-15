@@ -2,162 +2,127 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A56FC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 00:52:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8607C43217
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 01:07:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 159A563252
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 00:52:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B49E561350
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 01:07:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345403AbhKPAzs (ORCPT
+        id S1351394AbhKPBKK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 19:55:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36330 "EHLO
+        Mon, 15 Nov 2021 20:10:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343580AbhKOTVX (ORCPT
+        with ESMTP id S245132AbhKOTTc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 14:21:23 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C483BC07DE4C
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 10:17:56 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id y14-20020a17090a2b4e00b001a5824f4918so13906134pjc.4
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 10:17:56 -0800 (PST)
+        Mon, 15 Nov 2021 14:19:32 -0500
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C06C0386CA
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 10:10:48 -0800 (PST)
+Received: by mail-ot1-x335.google.com with SMTP id x43-20020a056830246b00b00570d09d34ebso15368923otr.2
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 10:10:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=linaro.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=zVIigt5hFRhwoHdnPkqdezNkgtT3bQVD+JV1TZ0yBQk=;
-        b=aIFb+Bg2kAQ6u2avnkXgX+2F+XsjwU8PJbAILzNG66y0Npi9zFLasu3DiaXqW2vnUq
-         XQn2eLnu4wHnrtJsF/JKd/GXTb/hXXs1b1tvMaulKoZJJG/RKlWLZNxsr6DJPAMgyhyQ
-         gLSA7I+KjaST0YMZnMn+HI9FW40+/+MwqE+2nhY8Y+6N2j7cMXMxniw6Tf0yVSTkiE3U
-         w1EBeHcm/riM8DRmyCdwozujjMclAB0IhtYBKO4J4uioDIWabX2Ng1GO2HH+mbCJlpC9
-         38U5GlMY9tw62ZR1mlT3p0jLcsVoNuP7Qbvh/lSUuU7SQnhyzDLppN9qLlWFSqBZZGwk
-         +MGA==
+        bh=btXP5JTOTPHN2wBCk/VjqAMkewryvyIZIdcv+nbDmjs=;
+        b=KFeET7Jo1zA/GLeNPXLNhLjW4GX0S6rNhH8crHvhvla+DjueTpwSw5iF9onmZhMU9U
+         L0TJbxv9B85FBo1rztKCQARvrlLxO1EPlOuS5DNmtX3uwAJezbb+oDBMZuylRANWbUfb
+         WL4s4i4FGldWsdq8g8HvmZUDRFg7eJFE8JnQITAd2WSFuuYb6Oasun9CD2yHY7GfUr8C
+         HTpFSjPJPCGefDJE8i+K/58Ccq0yEPlwFXXds4//i1UEl3XfUxlo/tHnVfLJyu8maid6
+         6hXMppAVCA2WE36IwlazSwxpQfgxWXam5ezKWFxLRXOUYdxJZM7HplXaFG8ZSytzUCXH
+         /D+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=zVIigt5hFRhwoHdnPkqdezNkgtT3bQVD+JV1TZ0yBQk=;
-        b=d9Q9jTfbo0C8VLpkGBGcTLcj/3pYtUNmGB5HqKrHaG2vFOW1eUHVmHbVjCTA6rIXT8
-         0xQZwSQyClzKG/zQh7/c/yHFI1V7NaKmbVz5xW3rnlOTrA5EHTve3U0qf6V9bquips7K
-         KPcf/S/MtHRAsuyIynp6vkEaZPz3cJEMls48ZqIEjv4T6qDsK9hp7PgWMtET8kI9oTm1
-         AgACF+H2iSy9C56Go5HEU4WfVu7K4B97fNsurLUlMeAp5K9ET7PFywJQzn9rhd8j/vSI
-         sgfYBbZ17BT8fmx7TAO8p4O7SDwkJ996qIkzJ3lseyXDoMBOlIa8yOaO7Tg4uGQo2mUG
-         M6tQ==
-X-Gm-Message-State: AOAM532zIt0KnaWySY8FKFwi7woKrGSBBiDlXjt7RURjPtsElHhzUmWL
-        p/BjKlY1TVEcNSlKZA6IWbU+xQ==
-X-Google-Smtp-Source: ABdhPJyEk01A4cEBJRk2IJwMDA9ufuQA+Un9JScTgr2yhZJMzSPbmQlcRKUkuJ1yVS564FPMQwEnDg==
-X-Received: by 2002:a17:90b:4b04:: with SMTP id lx4mr647925pjb.11.1637000276010;
-        Mon, 15 Nov 2021 10:17:56 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c3sm11160202pgk.16.2021.11.15.10.17.55
+        bh=btXP5JTOTPHN2wBCk/VjqAMkewryvyIZIdcv+nbDmjs=;
+        b=W4RnXMe7CX/kAprzRKnb8GMHD1vR5n0Tyy7lwgAkdwsGwIK0ZamZUHqwwOVtIroUUn
+         kgFB7OXjN6pL2n7T/4k7TEgaiNbYvGOmx6Wq+aDUU8U2Kpkzd+wFfMAVm5zHtcpAhg4g
+         oSMxON/7Vr8Is+FmoajXQ3V3ed+9G7Mbz9WA1J+bO97tvxTKBLI+cqvwjP+zU4ukUSlf
+         oIRW4H4awmfeuizo7UjqlCfvYi21dJmCKdlHx6Qsj9FidwQ2Z8u655rlxBhYWifETvNj
+         FCaEaE6y16Ufz6hCj4bMP2Pm7gUF64KdQwlVYE/46F9WjF8fXPpn+24C6TvpxAY59wUk
+         TStA==
+X-Gm-Message-State: AOAM533gbzDYfzizMmizrQHzRABjp+N65KMuVBSAfEsFm2AYUquUp80I
+        tUhcpsojokhmQtzYjvxUGh4MMQ==
+X-Google-Smtp-Source: ABdhPJwvZP5w9iunnbVacXS+t5Qx3X/+MhKg+S8e/AkaARLNqNF8AI5kwj0o3zSAz8HdWkU64r1Diw==
+X-Received: by 2002:a05:6830:3155:: with SMTP id c21mr764093ots.183.1636999848157;
+        Mon, 15 Nov 2021 10:10:48 -0800 (PST)
+Received: from builder.lan (104-57-184-186.lightspeed.austtx.sbcglobal.net. [104.57.184.186])
+        by smtp.gmail.com with ESMTPSA id n23sm3309780oic.26.2021.11.15.10.10.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Nov 2021 10:17:55 -0800 (PST)
-Date:   Mon, 15 Nov 2021 18:17:51 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Orr <marcorr@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Message-ID: <YZKkT1jwfGbkrGqu@google.com>
-References: <YY7I6sgqIPubTrtA@zn.tnic>
- <YY7Qp8c/gTD1rT86@google.com>
- <CAA03e5GwHMPYHHq3Nkkq1HnEJUUsw-Vk+5wFCott3pmJY7WuAw@mail.gmail.com>
- <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com>
- <CAA03e5Fw9cRnb=+eJmzEB+0QmdgaGZ7=fPTUYx7f55mGVXLRMA@mail.gmail.com>
- <CAMkAt6q9Wsw_KYypyZxhA1gkd=kFepk5rC5QeZ6Vo==P6=EAxg@mail.gmail.com>
- <YY8Mi36N/e4PzGP0@google.com>
- <CAA03e5F=7T3TcJBksiJ9ovafX65YfzAc0S+uYu5LjfTQ60yC7w@mail.gmail.com>
- <YZADwHxsx5cZ6m47@google.com>
- <CAA03e5HwYtn+eG1f5eP-SrZPyE4D2uf0v10=VkVoTNQQk87Kew@mail.gmail.com>
+        Mon, 15 Nov 2021 10:10:47 -0800 (PST)
+Date:   Mon, 15 Nov 2021 12:10:42 -0600
+From:   Bjorn Andersson <bjorn.andersson@linaro.org>
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        bhupesh.linux@gmail.com, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, robh+dt@kernel.org, agross@kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        stephan@gerhold.net, Thara Gopinath <thara.gopinath@linaro.org>
+Subject: Re: [PATCH v5 17/22] crypto: qce: Print a failure msg in case
+ probe() fails
+Message-ID: <YZKiovE1D9t17TVe@builder.lan>
+References: <20211110105922.217895-1-bhupesh.sharma@linaro.org>
+ <20211110105922.217895-18-bhupesh.sharma@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAA03e5HwYtn+eG1f5eP-SrZPyE4D2uf0v10=VkVoTNQQk87Kew@mail.gmail.com>
+In-Reply-To: <20211110105922.217895-18-bhupesh.sharma@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Nov 13, 2021, Marc Orr wrote:
-> On Sat, Nov 13, 2021 at 10:28 AM Sean Christopherson <seanjc@google.com> wrote:
-> > The behavior is no different than it is today for regular VMs.
+On Wed 10 Nov 04:59 CST 2021, Bhupesh Sharma wrote:
+
+> Print a failure message (dev_err) in case the qcom qce crypto
+> driver probe() fails.
 > 
-> Isn't this counter to the sketch you laid out earlier where you wrote:
+> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Cc: Rob Herring <robh+dt@kernel.org>
+> Reviewed-by: Thara Gopinath <thara.gopinath@linaro.org>
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>  drivers/crypto/qce/core.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> --- QUOTE START ---
->   - if userspace accesses guest private memory, it gets SIGSEGV or whatever.
->   - if kernel accesses guest private memory, it does BUG/panic/oops[*]
->   - if guest accesses memory with the incorrect C/SHARED-bit, it gets killed.
-> --- QUOTE END ---
+> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+> index 98784d63d78c..7c90401a2ef1 100644
+> --- a/drivers/crypto/qce/core.c
+> +++ b/drivers/crypto/qce/core.c
+> @@ -280,6 +280,7 @@ static int qce_crypto_probe(struct platform_device *pdev)
+>  err_mem_path_disable:
+>  	icc_set_bw(qce->mem_path, 0, 0);
+>  err:
+> +	dev_err(dev, "%s failed : %d\n", __func__, ret);
+
+There's two possible outcomes of this style of error logging:
+
+1) You came through a code path with a specific error message, so you
+will have something that will say:
+
+qce: Some useful error text
+qce: qce_crypto_probe failed: -22
+
+2) You came through a code path without a specific error message:
+
+qce: qce_crypto_probe failed: -22
+
+
+In the first case the second line is just pure spam, in the second case
+the bare -22 is typically completely useless - given that there tend to
+be just a few commonly used errno values coming from multiple possible
+error sources.
+
+As such, no thanks. If you have an error case in qce_crypto_probe() that
+doesn't have a good, useful, error message, please fix that.
+
+Regards,
+Bjorn
+
+>  	return ret;
+>  }
+>  
+> -- 
+> 2.31.1
 > 
-> Here, the guest does not get killed. Which seems hard to debug.
-
-No, it does contradict that statement.
- 
-  If the guest requests a conversion from shared=>private without first ensuring
-  the gfn is unused (by a host "device"), the host will side will continue accessing
-  the old, shared memory, which it locked, while the guest will be doing who knows
-  what.
-
-In this case, the guest will have converted a GPA from shared=>private, i.e. changed
-the effective GFN for a e.g. a shared queue, without informing host userspace that
-the GFN, and thus the associated HVA in the host, has changed. For TDX that is
-literally the same bug as the guest changing the GFN without informing the host, as
-the SHARED bit is just an address bit with some extra meaning piled on top.  For SNP,
-it's slightly different because the C-bit isn't strictly required to be an address
-bit, but for all intents and purposes it's the same type of bug.
-
-I phrased it "guest will be doing who knows what" because from a host userspace
-perspective, it can't know what the guest behavior will be, and more importantly,
-it doesn't care because (a) the guest is buggy and (b) the host itself  is _not_ in
-danger.
-
-Yes, those types of bugs suck to debug.  But they really should be few and far
-between.  The only reason I called out this specific scenario was to note that host
-userspace doesn't need to take extra steps to guard against bogus shared=>private
-conversions, because host userspace already needs to have such guards in place.  In
-prior (offline?) conversations, we had assumed that host userspace would need to
-propagate the shared vs. private status to any and all processes that map guest
-memory, i.e. would require substantial enabling, but that assumption was wrong.
-
-> If allowing userspace to inject #VC into the guest means that the host
-> can continue to serve other guests, that seems like a win. The
-> alternative, to blow up the host, essentially expands the blast radius
-> from a single guest to all guests.
-
-As mentioned in other threads of this conversation, when I say "host crashes", I
-am specifically talking about scenarios where it is simply not possible for the
-host kernel to recover, e.g. an RMP #PF violation on the IDT.
-
-Setting that aside, injecting a #VC into the guest is not in anyway necessary for
-a buggy host userspace to terminate a single guest, host userspace can simply stop
-running that specific guest.
