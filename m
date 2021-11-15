@@ -2,57 +2,56 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8607C43217
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 01:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE95C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 01:28:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B49E561350
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 01:07:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69C8C61104
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 01:28:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351394AbhKPBKK (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 20:10:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35226 "EHLO
+        id S236590AbhKPBbS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 20:31:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245132AbhKOTTc (ORCPT
+        with ESMTP id S243187AbhKOSze (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 14:19:32 -0500
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C06C0386CA
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 10:10:48 -0800 (PST)
-Received: by mail-ot1-x335.google.com with SMTP id x43-20020a056830246b00b00570d09d34ebso15368923otr.2
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 10:10:48 -0800 (PST)
+        Mon, 15 Nov 2021 13:55:34 -0500
+Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20E18C0D943B
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 09:54:04 -0800 (PST)
+Received: by mail-ot1-x332.google.com with SMTP id o15-20020a9d410f000000b0055c942cc7a0so28808177ote.8
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 09:54:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=btXP5JTOTPHN2wBCk/VjqAMkewryvyIZIdcv+nbDmjs=;
-        b=KFeET7Jo1zA/GLeNPXLNhLjW4GX0S6rNhH8crHvhvla+DjueTpwSw5iF9onmZhMU9U
-         L0TJbxv9B85FBo1rztKCQARvrlLxO1EPlOuS5DNmtX3uwAJezbb+oDBMZuylRANWbUfb
-         WL4s4i4FGldWsdq8g8HvmZUDRFg7eJFE8JnQITAd2WSFuuYb6Oasun9CD2yHY7GfUr8C
-         HTpFSjPJPCGefDJE8i+K/58Ccq0yEPlwFXXds4//i1UEl3XfUxlo/tHnVfLJyu8maid6
-         6hXMppAVCA2WE36IwlazSwxpQfgxWXam5ezKWFxLRXOUYdxJZM7HplXaFG8ZSytzUCXH
-         /D+g==
+        bh=mhDcbvt6bY3rEXESOl/FhsOyEe367fZY3QXfGILaNvI=;
+        b=Z6rmlDsOcxgFoRoNBMeZ1HvqRdRwQM4Bm/MYZgzcMWEO4K0eqqceVPHOnYvzXQMmR4
+         GQYfVOnwUZJk9CS384upCeRFikNOPefummYl2/nBlQKBNO2tzllRLlCiVyPR0yPwJOVp
+         riAJnBmCW6k8lil79FwE3zGJzKdvCpJ1xLX46sgHOBiaSemOWTPySQC6xPH+7fp6OcoC
+         aSG3bcrrlD+ltFKOf3CoWEwy9w4ODPlVT4U02nSHTCt+DxvxaaeFKhSrjwcNkRWZ0OHC
+         MOa0yUH8IIzWEGkepaCf7JtTSdi81y2lhrgFiQNnNd7OItCMvA7M28kQ66l3aYfQYZof
+         e/5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=btXP5JTOTPHN2wBCk/VjqAMkewryvyIZIdcv+nbDmjs=;
-        b=W4RnXMe7CX/kAprzRKnb8GMHD1vR5n0Tyy7lwgAkdwsGwIK0ZamZUHqwwOVtIroUUn
-         kgFB7OXjN6pL2n7T/4k7TEgaiNbYvGOmx6Wq+aDUU8U2Kpkzd+wFfMAVm5zHtcpAhg4g
-         oSMxON/7Vr8Is+FmoajXQ3V3ed+9G7Mbz9WA1J+bO97tvxTKBLI+cqvwjP+zU4ukUSlf
-         oIRW4H4awmfeuizo7UjqlCfvYi21dJmCKdlHx6Qsj9FidwQ2Z8u655rlxBhYWifETvNj
-         FCaEaE6y16Ufz6hCj4bMP2Pm7gUF64KdQwlVYE/46F9WjF8fXPpn+24C6TvpxAY59wUk
-         TStA==
-X-Gm-Message-State: AOAM533gbzDYfzizMmizrQHzRABjp+N65KMuVBSAfEsFm2AYUquUp80I
-        tUhcpsojokhmQtzYjvxUGh4MMQ==
-X-Google-Smtp-Source: ABdhPJwvZP5w9iunnbVacXS+t5Qx3X/+MhKg+S8e/AkaARLNqNF8AI5kwj0o3zSAz8HdWkU64r1Diw==
-X-Received: by 2002:a05:6830:3155:: with SMTP id c21mr764093ots.183.1636999848157;
-        Mon, 15 Nov 2021 10:10:48 -0800 (PST)
+        bh=mhDcbvt6bY3rEXESOl/FhsOyEe367fZY3QXfGILaNvI=;
+        b=cBEChVIz2vwSgSbOUh5n3UhWgQMQ3+ePLP77YA0x2tOL2VKWW37SHmIZCzFNQ5642H
+         IGvgaegxHqP7eyqiEttOvYmXsj7FBDghuY6pIr/WnvV5viaHrdHbhoukH+qA0M6c+Sw1
+         4jKvJZtTPDFnNBUxw4Cpmvt6U8g4KZsIrTYiY7BTQfbiuKwPuiEPVorInKveWfWk7E/H
+         0r3ABNoWqDGKTsJGO3GsPvE78W/HbPYLKpm1/BLASBHBV1qpK1fk/93dj3OToFe8hQUt
+         NZnljkB1eEekglEVaF5rLRz63XL0qgkZiUdInqZoNDW5UVofsQ3HzlNorxb/DHeDHTnK
+         CHSQ==
+X-Gm-Message-State: AOAM532layZKbicxiFTfJUfm1XsG4JH4ORZGZc/DAC1tYj47VuT9Pg3x
+        3zPfh/FRq+eaGJj1smsyrrFqgw==
+X-Google-Smtp-Source: ABdhPJyBiYyqVKBocj5pSTyvXKNUgMK9jjO8jLchf1Sn2nZmxsbyAHbhkeaE2XGmykvafJ1IbuTjbg==
+X-Received: by 2002:a05:6830:1ad2:: with SMTP id r18mr696349otc.308.1636998843371;
+        Mon, 15 Nov 2021 09:54:03 -0800 (PST)
 Received: from builder.lan (104-57-184-186.lightspeed.austtx.sbcglobal.net. [104.57.184.186])
-        by smtp.gmail.com with ESMTPSA id n23sm3309780oic.26.2021.11.15.10.10.47
+        by smtp.gmail.com with ESMTPSA id q6sm3250411oig.14.2021.11.15.09.54.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Nov 2021 10:10:47 -0800 (PST)
-Date:   Mon, 15 Nov 2021 12:10:42 -0600
+        Mon, 15 Nov 2021 09:54:03 -0800 (PST)
+Date:   Mon, 15 Nov 2021 11:53:58 -0600
 From:   Bjorn Andersson <bjorn.andersson@linaro.org>
 To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
 Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
@@ -60,69 +59,118 @@ Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
         devicetree@vger.kernel.org, robh+dt@kernel.org, agross@kernel.org,
         herbert@gondor.apana.org.au, davem@davemloft.net,
         stephan@gerhold.net, Thara Gopinath <thara.gopinath@linaro.org>
-Subject: Re: [PATCH v5 17/22] crypto: qce: Print a failure msg in case
- probe() fails
-Message-ID: <YZKiovE1D9t17TVe@builder.lan>
+Subject: Re: [PATCH v5 13/22] dma: qcom: bam_dma: Add support to initialize
+ interconnect path
+Message-ID: <YZKetkkXYR5Vdz1w@builder.lan>
 References: <20211110105922.217895-1-bhupesh.sharma@linaro.org>
- <20211110105922.217895-18-bhupesh.sharma@linaro.org>
+ <20211110105922.217895-14-bhupesh.sharma@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211110105922.217895-18-bhupesh.sharma@linaro.org>
+In-Reply-To: <20211110105922.217895-14-bhupesh.sharma@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Wed 10 Nov 04:59 CST 2021, Bhupesh Sharma wrote:
 
-> Print a failure message (dev_err) in case the qcom qce crypto
-> driver probe() fails.
+> From: Thara Gopinath <thara.gopinath@linaro.org>
 > 
+> BAM dma engine associated with certain hardware blocks could require
+> relevant interconnect pieces be initialized prior to the dma engine
+> initialization. For e.g. crypto bam dma engine on sm8250. Such requirement
+> is passed on to the bam dma driver from dt via the "interconnects"
+> property.  Add support in bam_dma driver to check whether the interconnect
+> path is accessible/enabled prior to attempting driver intializations.
+> 
+
+This patch acquires the path, presumably between BAM and DDR, but I
+don't see that it actually do anything with it.
+
+So if this makes sm8250 work I presume it's because you'll get probe
+deferred until the interconnect provider is in place and it will hold
+buses at max speed until sync_state - and then in runtime perhaps the
+crypto driver hides the fact that BAM doesn't vote for its bandwidth?
+
+I'm sceptical about hiding behind such circumstances, but at least the
+commit message should be clear on what's going on - or you need cast
+some bandwidth votes when the block is expected to transfer data.
+
 > Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
 > Cc: Rob Herring <robh+dt@kernel.org>
-> Reviewed-by: Thara Gopinath <thara.gopinath@linaro.org>
 > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> [Make header file inclusion alphabetical and use 'devm_of_icc_get()']
+> Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
+
+As Vladimir pointed out, the S-o-b of a patch should be read in
+chronological order.
+
+Please read the section about Developer's Certificate of Origin (link
+below), it should make it clear why the specific order is important.
+
+https://www.kernel.org/doc/html/latest/process/submitting-patches.html#developer-s-certificate-of-origin-1-1
+
 > ---
->  drivers/crypto/qce/core.c | 1 +
->  1 file changed, 1 insertion(+)
+>  drivers/dma/qcom/bam_dma.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 > 
-> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-> index 98784d63d78c..7c90401a2ef1 100644
-> --- a/drivers/crypto/qce/core.c
-> +++ b/drivers/crypto/qce/core.c
-> @@ -280,6 +280,7 @@ static int qce_crypto_probe(struct platform_device *pdev)
->  err_mem_path_disable:
->  	icc_set_bw(qce->mem_path, 0, 0);
->  err:
-> +	dev_err(dev, "%s failed : %d\n", __func__, ret);
+> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
+> index c8a77b428b52..19fb17db467f 100644
+> --- a/drivers/dma/qcom/bam_dma.c
+> +++ b/drivers/dma/qcom/bam_dma.c
+> @@ -26,6 +26,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/io.h>
+>  #include <linux/init.h>
+> +#include <linux/interconnect.h>
+>  #include <linux/slab.h>
+>  #include <linux/module.h>
+>  #include <linux/interrupt.h>
+> @@ -392,6 +393,7 @@ struct bam_device {
+>  	const struct reg_offset_data *layout;
+>  
+>  	struct clk *bamclk;
+> +	struct icc_path *mem_path;
+>  	int irq;
+>  
+>  	/* dma start transaction tasklet */
+> @@ -1284,6 +1286,15 @@ static int bam_dma_probe(struct platform_device *pdev)
+>  		return ret;
+>  	}
+>  
+> +	/* Ensure that interconnects are initialized */
+> +	bdev->mem_path = devm_of_icc_get(bdev->dev, "memory");
+> +
 
-There's two possible outcomes of this style of error logging:
+Please drop this empty line.
 
-1) You came through a code path with a specific error message, so you
-will have something that will say:
+> +	if (IS_ERR(bdev->mem_path)) {
+> +		ret = PTR_ERR(bdev->mem_path);
+> +		dev_err(bdev->dev, "failed to acquire icc path %d\n", ret);
 
-qce: Some useful error text
-qce: qce_crypto_probe failed: -22
+We typically want to avoid printing error messages when ret is
+-EPROBE_DEFER. The best way around this is to utilize the
+dev_err_probe() helper function.
 
-2) You came through a code path without a specific error message:
+Replace the two lines above with:
 
-qce: qce_crypto_probe failed: -22
+		ret = dev_err_probe(bdev->dev, PTR_ERR(bdev->mem_path),
+				    "failed to acquire icc path\n")
 
+> +		goto err_disable_clk;
 
-In the first case the second line is just pure spam, in the second case
-the bare -22 is typically completely useless - given that there tend to
-be just a few commonly used errno values coming from multiple possible
-error sources.
-
-As such, no thanks. If you have an error case in qce_crypto_probe() that
-doesn't have a good, useful, error message, please fix that.
+If you move the devm_of_icc_get() right before clk_prepare_enable()
+(still after devm_clk_get*()) you can simply return dev_err_probe() -
+and will avoid toggling the CE clock unnecessarily on EPROBE_DEFER.
 
 Regards,
 Bjorn
 
->  	return ret;
->  }
->  
+> +	}
+> +
+>  	ret = bam_init(bdev);
+>  	if (ret)
+>  		goto err_disable_clk;
 > -- 
 > 2.31.1
 > 
