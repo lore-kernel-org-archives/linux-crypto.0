@@ -2,67 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C1FC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 16:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 422DAC43217
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 17:46:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 379B460174
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 16:52:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BDB8633B5
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 17:46:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231819AbhKOQzF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 11:55:05 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:45536 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231697AbhKOQzC (ORCPT
+        id S238655AbhKORti (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 12:49:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44310 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238825AbhKORrl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 11:55:02 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 5DB8B1FD67;
-        Mon, 15 Nov 2021 16:52:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1636995125; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cF6gRwZuLUiNl2xcIEuaWtuAmHNRho9AqC9wCZCdOO8=;
-        b=2KJORy1sTUR9wRfGJRyXN1nv07fZ38SBxoGMzZx7j5ZUIZb07k43gywgWn6t5eaokma2eZ
-        SEcLIqcap+ac8M6xGtYdBATImFf7P060wRgr3dildxU+BJj9kcIfeXqUf53ODeHzDaXPSz
-        Df8u11CzGh0d4gL04sJ103q8h2MjttM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1636995125;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cF6gRwZuLUiNl2xcIEuaWtuAmHNRho9AqC9wCZCdOO8=;
-        b=3+c573I918+mekzNcqL4MXr9DiRfrPEXE6oGKP4NmbVr/eMLhegZYO4En6CtGo1+4FVTzP
-        M0kPCq11m8zgA8Dg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2AE9F13A66;
-        Mon, 15 Nov 2021 16:52:04 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 0yGvCDSQkmFoEwAAMHmgww
-        (envelope-from <jroedel@suse.de>); Mon, 15 Nov 2021 16:52:04 +0000
-Date:   Mon, 15 Nov 2021 17:52:02 +0100
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Sean Christopherson <seanjc@google.com>
+        Mon, 15 Nov 2021 12:47:41 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33312C06120D
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 09:25:49 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id 200so15182655pga.1
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 09:25:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zTcl/CA5Ev6UODKtmHkLeIkZrDlcXRolMIEi+XRmo/4=;
+        b=Ecl0cR1xR7V7WnPSUzOs7tEPw8P6cyZ335nnh7QMRz62gsdjjFoubmdkPQZg9HWsC6
+         V/p1WnKw07yMKVmnJmySSdDW4RE2A8/YHpHDZkgGWtFrFcjQxO8t5+Aqi/pjzl1GgOkC
+         hrDk+k2oXpUzuuJwg1XiLvM/suOqVOj/YAIJU+NLl0gyY5fArOTbfTJhWw1CjosHBRdR
+         FpLALiKVdw8LRNvx5HjfNzYxjm9es2xaaoMx8A7aRY5FWbzRyNhpQ2IH7aBoPzPLBnoY
+         CfbfwKnxMlD3rKWI+D0BUnzoJghtxM0gtp8RpaEsc8Hno8aJzxPRsck0OCTmhfDuEdJV
+         gMJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zTcl/CA5Ev6UODKtmHkLeIkZrDlcXRolMIEi+XRmo/4=;
+        b=TK3wMXh6/hS13FAMmJrOqqOUZcp+k5YdcMAJH2QyUZ5+1WeE2JQNB7wxh74olVON1p
+         cCOKyAmf0/Qd9idDF4nurgVUJ+8SzS6FUCmJ8aIx0F8HSr3UoZDe7ZaTxkzNbCOpD/KV
+         WCS7uRNpI6x8T35ImoSHuoRCGQ2h4rBlPcZfnWuV9xBtZi+2/dsRBn/yswoD+berY2R5
+         yUdTtiTZHICW+yJSeND+M9+uH2wpooM48vXr8AJ2F5lzFv56ZAUnMjRI8wm6Pw3Kp8g+
+         ueY82lBbAZlO1mUMajlEybQIY6P1BrArrcvfcn86DkxOHhW7AWhGf7x5S2hMrtZcWg7M
+         wbAg==
+X-Gm-Message-State: AOAM531I2FFbs0djPqoApMdQA1GlrJl8LKy8HdBqpaWskwyeSf5TqQ8f
+        1fW0vjweYl7uxR8lRRatASX/ow==
+X-Google-Smtp-Source: ABdhPJxWeWGi2U9i9fC6X4OCa+G3zMGesVsvaMbNPJ+jfguhVVFtD+RJxF8y7Z6fLKMDMarAgB7c6Q==
+X-Received: by 2002:aa7:888d:0:b0:47c:128b:ee57 with SMTP id z13-20020aa7888d000000b0047c128bee57mr34630009pfe.81.1636997148447;
+        Mon, 15 Nov 2021 09:25:48 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id j6sm12238880pgf.60.2021.11.15.09.25.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 09:25:47 -0800 (PST)
+Date:   Mon, 15 Nov 2021 17:25:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Joerg Roedel <jroedel@suse.de>
 Cc:     Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
         Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
         Tom Lendacky <Thomas.Lendacky@amd.com>,
         "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
@@ -70,9 +68,10 @@ Cc:     Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Sergio Lopez <slp@redhat.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Peter Zijlstra <peterz@infradead.org>,
         Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
         David Rientjes <rientjes@google.com>,
         Dov Murik <dovmurik@linux.ibm.com>,
@@ -80,54 +79,55 @@ Cc:     Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
         Michael Roth <Michael.Roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
 Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
  Hypervisor Support
-Message-ID: <YZKQMgyebV6NT0P0@suse.de>
-References: <YY7FAW5ti7YMeejj@google.com>
+Message-ID: <YZKYF5DSjUmWJDEI@google.com>
+References: <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
  <YY7I6sgqIPubTrtA@zn.tnic>
  <YY7Qp8c/gTD1rT86@google.com>
- <CAA03e5GwHMPYHHq3Nkkq1HnEJUUsw-Vk+5wFCott3pmJY7WuAw@mail.gmail.com>
- <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com>
- <CAA03e5Fw9cRnb=+eJmzEB+0QmdgaGZ7=fPTUYx7f55mGVXLRMA@mail.gmail.com>
- <CAMkAt6q9Wsw_KYypyZxhA1gkd=kFepk5rC5QeZ6Vo==P6=EAxg@mail.gmail.com>
- <YY8Mi36N/e4PzGP0@google.com>
- <CAA03e5F=7T3TcJBksiJ9ovafX65YfzAc0S+uYu5LjfTQ60yC7w@mail.gmail.com>
- <YZADwHxsx5cZ6m47@google.com>
+ <YY7USItsMPNbuSSG@zn.tnic>
+ <CAMkAt6o909yYq3NfRboF3U3V8k-2XGb9p_WcQuvSjOKokmMzMA@mail.gmail.com>
+ <YY8AJnMo9nh3tyPB@google.com>
+ <CAA03e5G=fY7_qESCuoHW3_VdVbDWekqQxmvLPzWNepBqJjyCXg@mail.gmail.com>
+ <YZAFTBXtC/yS7xtq@google.com>
+ <YZKMmciB+wJyrmFI@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YZADwHxsx5cZ6m47@google.com>
+In-Reply-To: <YZKMmciB+wJyrmFI@suse.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Nov 13, 2021 at 06:28:16PM +0000, Sean Christopherson wrote:
-> Another issue is that the host kernel, which despite being "untrusted", absolutely
-> should be acting in the best interests of the guest.  Allowing userspace to inject
-> #VC, e.g. to attempt to attack the guest by triggering a spurious PVALIDATE, means
-> the kernel is failing miserably on that front.
+On Mon, Nov 15, 2021, Joerg Roedel wrote:
+> On Sat, Nov 13, 2021 at 06:34:52PM +0000, Sean Christopherson wrote:
+> > I'm not treating it nonchalantly, merely acknowledging that (a) some flavors of kernel
+> > bugs (or hardware issues!) are inherently fatal to the system, and (b) crashing the
+> > host may be preferable to continuing on in certain cases, e.g. if continuing on has a
+> > high probablity of corrupting guest data.
+> 
+> The problem here is that for SNP host-side RMP faults it will often not
+> be clear at fault-time if it was caused by wrong guest or host behavior. 
+> 
+> I agree with Marc that crashing the host is not the right thing to do in
+> this situation. Instead debug data should be collected to do further
+> post-mortem analysis.
 
-Well, no. The kernel is only a part of the hypervisor, KVM userspace is
-another. It is possible today for the userspace part(s) to interact in bad
-ways with the guest and trick or kill it. Allowing user-space to cause a
-#VC in the guest is no different from that.
+Again, I am not saying that any RMP #PF violation is an immediate, "crash the
+host".  It should be handled exactly like any other #PF due to permission violation.
+The only wrinkle added by the RMP is that the #PF can be due to permissions on the
+GPA itself, but even that is not unique, e.g. see the proposed KVM XO support that
+will hopefully still land someday.
 
-Regards,
+If the guest violates the current permissions, it (indirectly) gets a #VC.  If host
+userspace violates permissions, it gets SIGSEGV.  If the host kernel violates
+permissions, then it reacts to the #PF in whatever way it can.  What I am saying is
+that in some cases, there is _zero_ chance of recovery in the host and so crashing
+the entire system is inevitable.   E.g. if the host kernel hits an RMP #PF when
+vectoring a #GP because the IDT lookup somehow triggers an RMP violation, then the
+host is going into triple fault shutdown.
 
--- 
-Jörg Rödel
-jroedel@suse.de
-
-SUSE Software Solutions Germany GmbH
-Maxfeldstr. 5
-90409 Nürnberg
-Germany
- 
-(HRB 36809, AG Nürnberg)
-Geschäftsführer: Ivo Totev
-
+[*] https://lore.kernel.org/linux-mm/20191003212400.31130-1-rick.p.edgecombe@intel.com/
