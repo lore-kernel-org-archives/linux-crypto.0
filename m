@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 374CBC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16890C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:04:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E48B61B53
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:04:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F365E6322D
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:04:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231453AbhKOMHF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 07:07:05 -0500
-Received: from mga09.intel.com ([134.134.136.24]:13631 "EHLO mga09.intel.com"
+        id S231504AbhKOMHG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 07:07:06 -0500
+Received: from mga09.intel.com ([134.134.136.24]:13626 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231383AbhKOMG5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S230258AbhKOMG5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 15 Nov 2021 07:06:57 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="233265543"
+X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="233265533"
 X-IronPort-AV: E=Sophos;i="5.87,236,1631602800"; 
-   d="scan'208";a="233265543"
+   d="scan'208";a="233265533"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2021 04:04:01 -0800
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2021 04:03:57 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,236,1631602800"; 
-   d="scan'208";a="535486367"
+   d="scan'208";a="535486352"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
-  by orsmga001.jf.intel.com with ESMTP; 15 Nov 2021 04:03:59 -0800
+  by orsmga001.jf.intel.com with ESMTP; 15 Nov 2021 04:03:56 -0800
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         marco.chiappero@intel.com,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v2 08/24] crypto: qat - split PFVF message decoding from handling
-Date:   Mon, 15 Nov 2021 12:03:20 +0000
-Message-Id: <20211115120336.22292-9-giovanni.cabiddu@intel.com>
+Subject: [PATCH v2 06/24] crypto: qat - change PFVF ACK behaviour
+Date:   Mon, 15 Nov 2021 12:03:18 +0000
+Message-Id: <20211115120336.22292-7-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211115120336.22292-1-giovanni.cabiddu@intel.com>
 References: <20211115120336.22292-1-giovanni.cabiddu@intel.com>
@@ -42,202 +42,71 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Marco Chiappero <marco.chiappero@intel.com>
+Change the PFVF receipt flow on the VF side to read, ack and handle the
+message instead of read, handle and ack.
+This is done for (1) consistency with the PF side, see the function
+adf_recv_and_handle_vf2pf_msg() in adf_pf2vf_msg.c, and (2) performance
+reasons, to avoid keeping the CSR busy while parsing the message.
 
-Refactor the receive and handle logic to separate the parsing and
-handling of the PFVF message from the initial retrieval and ACK.
+In addition, do not ACK PFVF legacy messages, as this driver is not
+capable of handling PFVF legacy messages.
+If a PFVF message with MSGORIGIN not set is received, do nothing.
 
-This is to allow the intoduction of the recv function in a subsequent
-patch.
-
-Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
-Co-developed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
 ---
- drivers/crypto/qat/qat_common/adf_pf2vf_msg.c | 68 ++++++++++++-------
- drivers/crypto/qat/qat_common/adf_vf2pf_msg.c | 62 ++++++++---------
- 2 files changed, 71 insertions(+), 59 deletions(-)
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.c | 8 ++++----
+ drivers/crypto/qat/qat_common/adf_vf2pf_msg.c | 7 ++++---
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
-index 296f54805e33..201744825e23 100644
+index 796301e9fe5b..4922ee2a2a08 100644
 --- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
 +++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
-@@ -178,30 +178,12 @@ static int adf_send_vf2pf_req(struct adf_accel_dev *accel_dev, u32 msg)
- 	return 0;
- }
+@@ -195,14 +195,14 @@ bool adf_recv_and_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr)
+ 		return true;
+ 	}
  
--bool adf_recv_and_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr)
-+static int adf_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr,
-+				u32 msg, u32 *response)
- {
- 	struct adf_accel_vf_info *vf_info = &accel_dev->pf.vf_info[vf_nr];
- 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
--	int bar_id = hw_data->get_misc_bar_id(hw_data);
--	struct adf_bar *pmisc = &GET_BARS(accel_dev)[bar_id];
--	void __iomem *pmisc_addr = pmisc->virt_addr;
--	u32 msg, resp = 0;
--
--	/* Read message from the VF */
--	msg = ADF_CSR_RD(pmisc_addr, hw_data->get_pf2vf_offset(vf_nr));
--	if (!(msg & ADF_VF2PF_INT)) {
--		dev_info(&GET_DEV(accel_dev),
--			 "Spurious VF2PF interrupt, msg %X. Ignored\n", msg);
--		return true;
--	}
--
--	if (!(msg & ADF_VF2PF_MSGORIGIN_SYSTEM))
--		/* Ignore legacy non-system (non-kernel) VF2PF messages */
--		return true;
--
 -	/* To ACK, clear the VF2PFINT bit */
 -	msg &= ~ADF_VF2PF_INT;
 -	ADF_CSR_WR(pmisc_addr, hw_data->get_pf2vf_offset(vf_nr), msg);
-+	u32 resp = 0;
- 
- 	switch ((msg & ADF_VF2PF_MSGTYPE_MASK) >> ADF_VF2PF_MSGTYPE_SHIFT) {
- 	case ADF_VF2PF_MSGTYPE_COMPAT_VER_REQ:
-@@ -271,17 +253,51 @@ bool adf_recv_and_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr)
- 		}
- 		break;
- 	default:
--		goto err;
-+		dev_dbg(&GET_DEV(accel_dev), "Unknown message from VF%d (0x%x)\n",
-+			vf_nr + 1, msg);
-+		return -ENOMSG;
-+	}
-+
-+	*response = resp;
-+
-+	return 0;
-+}
-+
-+bool adf_recv_and_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr)
-+{
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	int bar_id = hw_data->get_misc_bar_id(hw_data);
-+	struct adf_bar *pmisc = &GET_BARS(accel_dev)[bar_id];
-+	void __iomem *pmisc_addr = pmisc->virt_addr;
-+	u32 msg, resp = 0;
-+
-+	/* Read message from the VF */
-+	msg = ADF_CSR_RD(pmisc_addr, hw_data->get_pf2vf_offset(vf_nr));
-+	if (!(msg & ADF_VF2PF_INT)) {
-+		dev_info(&GET_DEV(accel_dev),
-+			 "Spurious VF2PF interrupt, msg %X. Ignored\n", msg);
-+		return true;
-+	}
-+
-+	/* Ignore legacy non-system (non-kernel) VF2PF messages */
-+	if (!(msg & ADF_VF2PF_MSGORIGIN_SYSTEM)) {
-+		dev_dbg(&GET_DEV(accel_dev),
-+			"Ignored non-system message from VF%d (0x%x);\n",
-+			vf_nr + 1, msg);
-+		return true;
- 	}
+-
+ 	if (!(msg & ADF_VF2PF_MSGORIGIN_SYSTEM))
+ 		/* Ignore legacy non-system (non-kernel) VF2PF messages */
+ 		goto err;
  
 +	/* To ACK, clear the VF2PFINT bit */
 +	msg &= ~ADF_VF2PF_INT;
 +	ADF_CSR_WR(pmisc_addr, hw_data->get_pf2vf_offset(vf_nr), msg);
 +
-+	if (adf_handle_vf2pf_msg(accel_dev, vf_nr, msg, &resp))
-+		return false;
-+
- 	if (resp && adf_send_pf2vf_msg(accel_dev, vf_nr, resp))
- 		dev_err(&GET_DEV(accel_dev), "Failed to send response to VF\n");
- 
- 	return true;
--err:
--	dev_dbg(&GET_DEV(accel_dev), "Unknown message from VF%d (0x%x);\n",
--		vf_nr + 1, msg);
--	return false;
- }
- 
- void adf_pf2vf_notify_restarting(struct adf_accel_dev *accel_dev)
+ 	switch ((msg & ADF_VF2PF_MSGTYPE_MASK) >> ADF_VF2PF_MSGTYPE_SHIFT) {
+ 	case ADF_VF2PF_MSGTYPE_COMPAT_VER_REQ:
+ 		{
 diff --git a/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c b/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
-index e383232b0685..01a6e68f256b 100644
+index 064477fcb5fb..a6eaf93d5462 100644
 --- a/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
 +++ b/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
-@@ -47,6 +47,34 @@ void adf_vf2pf_notify_shutdown(struct adf_accel_dev *accel_dev)
- }
- EXPORT_SYMBOL_GPL(adf_vf2pf_notify_shutdown);
+@@ -69,6 +69,10 @@ bool adf_recv_and_handle_pf2vf_msg(struct adf_accel_dev *accel_dev)
+ 		/* Ignore legacy non-system (non-kernel) PF2VF messages */
+ 		goto err;
  
-+static bool adf_handle_pf2vf_msg(struct adf_accel_dev *accel_dev, u32 msg)
-+{
-+	switch ((msg & ADF_PF2VF_MSGTYPE_MASK) >> ADF_PF2VF_MSGTYPE_SHIFT) {
-+	case ADF_PF2VF_MSGTYPE_RESTARTING:
-+		dev_dbg(&GET_DEV(accel_dev),
-+			"Restarting msg received from PF 0x%x\n", msg);
++	/* To ack, clear the PF2VFINT bit */
++	msg &= ~ADF_PF2VF_INT;
++	ADF_CSR_WR(pmisc_bar_addr, offset, msg);
 +
-+		adf_pf2vf_handle_pf_restarting(accel_dev);
-+		return false;
-+	case ADF_PF2VF_MSGTYPE_VERSION_RESP:
-+		dev_dbg(&GET_DEV(accel_dev),
-+			"Version resp received from PF 0x%x\n", msg);
-+		accel_dev->vf.pf_version =
-+			(msg & ADF_PF2VF_VERSION_RESP_VERS_MASK) >>
-+			ADF_PF2VF_VERSION_RESP_VERS_SHIFT;
-+		accel_dev->vf.compatible =
-+			(msg & ADF_PF2VF_VERSION_RESP_RESULT_MASK) >>
-+			ADF_PF2VF_VERSION_RESP_RESULT_SHIFT;
-+		complete(&accel_dev->vf.iov_msg_completion);
-+		return true;
-+	default:
-+		dev_err(&GET_DEV(accel_dev),
-+			"Unknown PF2VF message(0x%x)\n", msg);
-+	}
-+
-+	return false;
-+}
-+
- bool adf_recv_and_handle_pf2vf_msg(struct adf_accel_dev *accel_dev)
- {
- 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-@@ -54,7 +82,6 @@ bool adf_recv_and_handle_pf2vf_msg(struct adf_accel_dev *accel_dev)
- 			&GET_BARS(accel_dev)[hw_data->get_misc_bar_id(hw_data)];
- 	void __iomem *pmisc_bar_addr = pmisc->virt_addr;
- 	u32 offset = hw_data->get_pf2vf_offset(0);
--	bool ret;
- 	u32 msg;
+ 	switch ((msg & ADF_PF2VF_MSGTYPE_MASK) >> ADF_PF2VF_MSGTYPE_SHIFT) {
+ 	case ADF_PF2VF_MSGTYPE_RESTARTING:
+ 		dev_dbg(&GET_DEV(accel_dev),
+@@ -93,9 +97,6 @@ bool adf_recv_and_handle_pf2vf_msg(struct adf_accel_dev *accel_dev)
+ 		goto err;
+ 	}
  
- 	/* Read the message from PF */
-@@ -73,36 +100,5 @@ bool adf_recv_and_handle_pf2vf_msg(struct adf_accel_dev *accel_dev)
- 	msg &= ~ADF_PF2VF_INT;
- 	ADF_CSR_WR(pmisc_bar_addr, offset, msg);
+-	/* To ack, clear the PF2VFINT bit */
+-	msg &= ~ADF_PF2VF_INT;
+-	ADF_CSR_WR(pmisc_bar_addr, offset, msg);
+ 	return ret;
  
--	switch ((msg & ADF_PF2VF_MSGTYPE_MASK) >> ADF_PF2VF_MSGTYPE_SHIFT) {
--	case ADF_PF2VF_MSGTYPE_RESTARTING:
--		dev_dbg(&GET_DEV(accel_dev),
--			"Restarting msg received from PF 0x%x\n", msg);
--
--		adf_pf2vf_handle_pf_restarting(accel_dev);
--		ret = false;
--		break;
--	case ADF_PF2VF_MSGTYPE_VERSION_RESP:
--		dev_dbg(&GET_DEV(accel_dev),
--			"Version resp received from PF 0x%x\n", msg);
--		accel_dev->vf.pf_version =
--			(msg & ADF_PF2VF_VERSION_RESP_VERS_MASK) >>
--			ADF_PF2VF_VERSION_RESP_VERS_SHIFT;
--		accel_dev->vf.compatible =
--			(msg & ADF_PF2VF_VERSION_RESP_RESULT_MASK) >>
--			ADF_PF2VF_VERSION_RESP_RESULT_SHIFT;
--		complete(&accel_dev->vf.iov_msg_completion);
--		ret = true;
--		break;
--	default:
--		goto err;
--	}
--
--	return ret;
--
--err:
--	dev_err(&GET_DEV(accel_dev),
--		"Unknown message from PF (0x%x); leaving PF2VF ints disabled\n",
--		msg);
--
--	return false;
-+	return adf_handle_pf2vf_msg(accel_dev, msg);
- }
+ err:
 -- 
 2.33.1
 
