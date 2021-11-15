@@ -2,64 +2,69 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D89BC43217
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 00:32:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A56FC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 00:52:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AD506326B
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 00:32:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 159A563252
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 00:52:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233001AbhKPAfL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 19:35:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36816 "EHLO
+        id S1345403AbhKPAzs (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 19:55:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345176AbhKOT1V (ORCPT
+        with ESMTP id S1343580AbhKOTVX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 14:27:21 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754E4C09E004
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 10:44:53 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id n26so11213643pff.3
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 10:44:53 -0800 (PST)
+        Mon, 15 Nov 2021 14:21:23 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C483BC07DE4C
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 10:17:56 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id y14-20020a17090a2b4e00b001a5824f4918so13906134pjc.4
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 10:17:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=YnA5RxswdR0pXIdDfw42jEIDMfa1Anknf8jHYLDLebQ=;
-        b=b2wJRkAtOs8VLbM0lZNMe/RxwW3htbsJhf+JSJaqKtTxUt1keDFKRzlcUNWyPRBoxr
-         LBU9Tn21V6eNtb8W2Ualydb/xatXcwyrVl137vORscIWpZaHyqhtaJ4PL//nGRBuvlVf
-         5Lk0OB2dy54Hh7saCw2v3Mzu3qwwaI2j4DGdC76QW8zGmrexY7HRIYzc4TLXnHc/XzER
-         piGaJLzdwxwiNPpaBVCWww3uXt8XWY3x2Qzr69DlQN7DsLjKBaIJfEtq5ll5aehSHh79
-         9DNaDrov5aBJp9lHbu2laW/mwNkbPco4mg1trxgMYI0j2IaFvXiSMYscDWB6oXCmZKp4
-         AdyQ==
+        bh=zVIigt5hFRhwoHdnPkqdezNkgtT3bQVD+JV1TZ0yBQk=;
+        b=aIFb+Bg2kAQ6u2avnkXgX+2F+XsjwU8PJbAILzNG66y0Npi9zFLasu3DiaXqW2vnUq
+         XQn2eLnu4wHnrtJsF/JKd/GXTb/hXXs1b1tvMaulKoZJJG/RKlWLZNxsr6DJPAMgyhyQ
+         gLSA7I+KjaST0YMZnMn+HI9FW40+/+MwqE+2nhY8Y+6N2j7cMXMxniw6Tf0yVSTkiE3U
+         w1EBeHcm/riM8DRmyCdwozujjMclAB0IhtYBKO4J4uioDIWabX2Ng1GO2HH+mbCJlpC9
+         38U5GlMY9tw62ZR1mlT3p0jLcsVoNuP7Qbvh/lSUuU7SQnhyzDLppN9qLlWFSqBZZGwk
+         +MGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=YnA5RxswdR0pXIdDfw42jEIDMfa1Anknf8jHYLDLebQ=;
-        b=DUD6Xb8MNX57ya1w5+B97cNVnLJmtgvspuVBmMfaqDTTZawGUOvHkjoZCdsvomIKxg
-         nHyQkMmLehjI0BsYKj066Et8dg6c4W7T3MwFIwjrRMj+lue6H8VTV3E8xlO+YyRSAsCN
-         9lsTn09goQEEDewohWRSF+xZEmgYmc/ZrVu74ydtuPUc8/UQutYQevGbzfJEje8MowLy
-         enNwdlcdLnQc8KR/pqyWc6thkTipreUnQ2JEFD4gFmuY4FSEUaqVAcHnzKKyuhsjnd6v
-         a6bQVmO6tvCo3q7JhAQCVbNcWXDFL86mEptBF+IJKEsyl41W0R02ATwf+l6zGSFkYVts
-         lCIA==
-X-Gm-Message-State: AOAM530z+3Thak+sa88xWhtlrg91bfEcsTRbthu4SO1+H2hKvdkljUix
-        hsKU/swEwfbO6VAEe8v7WJRrJA==
-X-Google-Smtp-Source: ABdhPJwv65aVu6kpZNGGw0N7gTXRvONlRDhXoyAUv+VgR6kFzqLSM/NP5wts15+VyzsP2RdH5A+iaA==
-X-Received: by 2002:a63:33cc:: with SMTP id z195mr669715pgz.339.1637001892769;
-        Mon, 15 Nov 2021 10:44:52 -0800 (PST)
+        bh=zVIigt5hFRhwoHdnPkqdezNkgtT3bQVD+JV1TZ0yBQk=;
+        b=d9Q9jTfbo0C8VLpkGBGcTLcj/3pYtUNmGB5HqKrHaG2vFOW1eUHVmHbVjCTA6rIXT8
+         0xQZwSQyClzKG/zQh7/c/yHFI1V7NaKmbVz5xW3rnlOTrA5EHTve3U0qf6V9bquips7K
+         KPcf/S/MtHRAsuyIynp6vkEaZPz3cJEMls48ZqIEjv4T6qDsK9hp7PgWMtET8kI9oTm1
+         AgACF+H2iSy9C56Go5HEU4WfVu7K4B97fNsurLUlMeAp5K9ET7PFywJQzn9rhd8j/vSI
+         sgfYBbZ17BT8fmx7TAO8p4O7SDwkJ996qIkzJ3lseyXDoMBOlIa8yOaO7Tg4uGQo2mUG
+         M6tQ==
+X-Gm-Message-State: AOAM532zIt0KnaWySY8FKFwi7woKrGSBBiDlXjt7RURjPtsElHhzUmWL
+        p/BjKlY1TVEcNSlKZA6IWbU+xQ==
+X-Google-Smtp-Source: ABdhPJyEk01A4cEBJRk2IJwMDA9ufuQA+Un9JScTgr2yhZJMzSPbmQlcRKUkuJ1yVS564FPMQwEnDg==
+X-Received: by 2002:a17:90b:4b04:: with SMTP id lx4mr647925pjb.11.1637000276010;
+        Mon, 15 Nov 2021 10:17:56 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id on6sm72382pjb.47.2021.11.15.10.44.51
+        by smtp.gmail.com with ESMTPSA id c3sm11160202pgk.16.2021.11.15.10.17.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Nov 2021 10:44:52 -0800 (PST)
-Date:   Mon, 15 Nov 2021 18:44:48 +0000
+        Mon, 15 Nov 2021 10:17:55 -0800 (PST)
+Date:   Mon, 15 Nov 2021 18:17:51 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
+To:     Marc Orr <marcorr@google.com>
+Cc:     Peter Gonda <pgonda@google.com>, Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@intel.com>,
-        Peter Gonda <pgonda@google.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
         Tom Lendacky <Thomas.Lendacky@amd.com>,
         "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
@@ -67,52 +72,92 @@ Cc:     Borislav Petkov <bp@alien8.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
         Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
         David Rientjes <rientjes@google.com>,
         Dov Murik <dovmurik@linux.ibm.com>,
         Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
+        Michael Roth <Michael.Roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
 Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
  Hypervisor Support
-Message-ID: <YZKqoPAoMCqPZymh@google.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
- <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com>
- <YY7I6sgqIPubTrtA@zn.tnic>
+Message-ID: <YZKkT1jwfGbkrGqu@google.com>
+References: <YY7I6sgqIPubTrtA@zn.tnic>
  <YY7Qp8c/gTD1rT86@google.com>
- <f2edf71e-f3b5-f8e3-a75e-e0f811fe6a14@amd.com>
+ <CAA03e5GwHMPYHHq3Nkkq1HnEJUUsw-Vk+5wFCott3pmJY7WuAw@mail.gmail.com>
+ <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com>
+ <CAA03e5Fw9cRnb=+eJmzEB+0QmdgaGZ7=fPTUYx7f55mGVXLRMA@mail.gmail.com>
+ <CAMkAt6q9Wsw_KYypyZxhA1gkd=kFepk5rC5QeZ6Vo==P6=EAxg@mail.gmail.com>
+ <YY8Mi36N/e4PzGP0@google.com>
+ <CAA03e5F=7T3TcJBksiJ9ovafX65YfzAc0S+uYu5LjfTQ60yC7w@mail.gmail.com>
+ <YZADwHxsx5cZ6m47@google.com>
+ <CAA03e5HwYtn+eG1f5eP-SrZPyE4D2uf0v10=VkVoTNQQk87Kew@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f2edf71e-f3b5-f8e3-a75e-e0f811fe6a14@amd.com>
+In-Reply-To: <CAA03e5HwYtn+eG1f5eP-SrZPyE4D2uf0v10=VkVoTNQQk87Kew@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 15, 2021, Brijesh Singh wrote:
+On Sat, Nov 13, 2021, Marc Orr wrote:
+> On Sat, Nov 13, 2021 at 10:28 AM Sean Christopherson <seanjc@google.com> wrote:
+> > The behavior is no different than it is today for regular VMs.
 > 
-> On 11/12/21 2:37 PM, Sean Christopherson wrote:
-> > This is the direction KVM TDX support is headed, though it's obviously still a WIP.
-> > 
+> Isn't this counter to the sketch you laid out earlier where you wrote:
 > 
-> Just curious, in this approach, how do you propose handling the host
-> kexec/kdump? If a kexec/kdump occurs while the VM is still active, the new
-> kernel will encounter the #PF (RMP violation) because some pages are still
-> marked 'private' in the RMP table.
+> --- QUOTE START ---
+>   - if userspace accesses guest private memory, it gets SIGSEGV or whatever.
+>   - if kernel accesses guest private memory, it does BUG/panic/oops[*]
+>   - if guest accesses memory with the incorrect C/SHARED-bit, it gets killed.
+> --- QUOTE END ---
+> 
+> Here, the guest does not get killed. Which seems hard to debug.
 
-There are two basic options: a) eagerly purge the RMP or b) lazily fixup the RMP
-on #PF.  Either approach can be made to work.  I'm not opposed to fixing up the RMP
-on #PF in the kexec/kdump case, I'm opposed to blindly updating the RMP on _all_
-RMP #PFs, i.e. the kernel should modify the RMP if and only if it knows that doing
-so is correct.  E.g. a naive lazy-fixup solution would be to track which pages have
-been sanitized and adjust the RMP on #PF to a page that hasn't yet been sanitized.
+No, it does contradict that statement.
+ 
+  If the guest requests a conversion from shared=>private without first ensuring
+  the gfn is unused (by a host "device"), the host will side will continue accessing
+  the old, shared memory, which it locked, while the guest will be doing who knows
+  what.
+
+In this case, the guest will have converted a GPA from shared=>private, i.e. changed
+the effective GFN for a e.g. a shared queue, without informing host userspace that
+the GFN, and thus the associated HVA in the host, has changed. For TDX that is
+literally the same bug as the guest changing the GFN without informing the host, as
+the SHARED bit is just an address bit with some extra meaning piled on top.  For SNP,
+it's slightly different because the C-bit isn't strictly required to be an address
+bit, but for all intents and purposes it's the same type of bug.
+
+I phrased it "guest will be doing who knows what" because from a host userspace
+perspective, it can't know what the guest behavior will be, and more importantly,
+it doesn't care because (a) the guest is buggy and (b) the host itself  is _not_ in
+danger.
+
+Yes, those types of bugs suck to debug.  But they really should be few and far
+between.  The only reason I called out this specific scenario was to note that host
+userspace doesn't need to take extra steps to guard against bogus shared=>private
+conversions, because host userspace already needs to have such guards in place.  In
+prior (offline?) conversations, we had assumed that host userspace would need to
+propagate the shared vs. private status to any and all processes that map guest
+memory, i.e. would require substantial enabling, but that assumption was wrong.
+
+> If allowing userspace to inject #VC into the guest means that the host
+> can continue to serve other guests, that seems like a win. The
+> alternative, to blow up the host, essentially expands the blast radius
+> from a single guest to all guests.
+
+As mentioned in other threads of this conversation, when I say "host crashes", I
+am specifically talking about scenarios where it is simply not possible for the
+host kernel to recover, e.g. an RMP #PF violation on the IDT.
+
+Setting that aside, injecting a #VC into the guest is not in anyway necessary for
+a buggy host userspace to terminate a single guest, host userspace can simply stop
+running that specific guest.
