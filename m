@@ -2,187 +2,206 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3443BC4321E
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 00:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E34FDC43217
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 00:27:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1CFE461407
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 00:19:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CCDA961A3A
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 00:27:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348148AbhKPAW1 (ORCPT
+        id S1346129AbhKPAal (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 19:22:27 -0500
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:57876 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1353536AbhKPATx (ORCPT
+        Mon, 15 Nov 2021 19:30:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38278 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346134AbhKOT36 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 19:19:53 -0500
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AFN9cVw029754;
-        Tue, 16 Nov 2021 00:16:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : content-type :
- mime-version; s=corp-2021-07-09;
- bh=60O6rnQkrlw0sUUcObFEFRo6UsPfAax+n5OYP2BTs4s=;
- b=RJJCtEpHFWiYyRu4VP7kQyMSjzaIklh8aPTePj2wLtVioIWZ5Um5JLNrDhsa5RiGEWwX
- QtTl+G5g5k9GcF6NeGwvV0L1q18nixXnSKTuf9jL8Ru7N101VTeUT47Nc3yk3O8uTxJL
- pBZAxcJvTyXysJmefoa3MNHASwDLr+JMmptHRWq+uxYASTge9Xsr12T5VTgD4OWWgq0i
- Sp/npDwWVVrY5a5OwHN2h9pFQ5okgfWYb8P7iZatwKIKUUwPX9Ferh5xY/Hb3E5JiZgZ
- Gzj8Ve+xhMBxIBh099CocxKBZxse3P4yMjt+cj0Th/j80EF7QhuTINNutBZCIWE0crYY 3A== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3cbhmnp3p8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Nov 2021 00:16:22 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1AG0AMOx072901;
-        Tue, 16 Nov 2021 00:16:21 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2104.outbound.protection.outlook.com [104.47.70.104])
-        by aserp3030.oracle.com with ESMTP id 3ca3df6j1g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Nov 2021 00:16:21 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NNlT7XCdjbgq9MX223nraZkpfTjco8tGduyfJzm1bTKPeyYVcbnubW+xUWL0SJPRgiD+mvXwSLwPu5s1jFRBaLCrjRXPYk9fHMUd9/mmC1k9FFHlAiv1YjX2S5Pjx8IIp/blFYwRYrvaigSNDevzH7c3Djlua4/vDojwk0jSSBqSyoM4jBKS+zze0YaiFTMxgwtig7BYFbrKwodKOPqyNjk92eKeY7opWMLVkTXC40k8/cu9fYOdGOBXnvWU2ssF5DIl8iJxEMAGv2upqRzkzdpuL1e5QblG+TnALU77juHGHYuTSy/KQ53kZz2ziZBL/Iea9ObzBaCtJZzULR6kwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=60O6rnQkrlw0sUUcObFEFRo6UsPfAax+n5OYP2BTs4s=;
- b=EIfDoV+Xkz4LxZdMsFPy76KF5Y48QmHcNeSz3hlKrSvQnPWh61ZB2Dca7vvm28dpa0IhiqQnr7VrqCuq/t3uo2PKdJIUiyY2qKokzEUGOxYtuRYk6m/y6uS1YKwSjDg6KtWIguIOp0VllRLqKwkzNWFkJNy3RQgoQY2H/20qR9l3jT8Y0ooMl22CcKdOV/R/GuUo3to3tcAtXiflYSJ69bHkiWjsn/hmxmhQo0fiYbY1C3nUh8+I5QZRXT7EF1Xu5n9JhiRhfsBPVeYCWCA/fSFLte4/Dr4QeHMCCEQoqQnAGnBoyLgVlCZhPS4clUYx8bqNTUyAbUaThqz7mxkXRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        Mon, 15 Nov 2021 14:29:58 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977AEC04C350
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 11:15:12 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id gx15-20020a17090b124f00b001a695f3734aso707101pjb.0
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 11:15:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=60O6rnQkrlw0sUUcObFEFRo6UsPfAax+n5OYP2BTs4s=;
- b=glW15V7XnmLvnziud0sZUfEdpzfdbCCRaJzcvC+uqiqmfm4pcR8CeUqzVdcIjWHz+zsfQFANJxxmsajawnx/+ap031wmvqQZZ9y+Pg0U7z1xt9NNRkVGccYnBgwd9L0Fzmxt6yogI8aFlCyxPAkaZEnIksw4OcjmANiIXNMrIxg=
-Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
- by CH2PR10MB4358.namprd10.prod.outlook.com (2603:10b6:610:a8::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.15; Tue, 16 Nov
- 2021 00:16:19 +0000
-Received: from CH2PR10MB4150.namprd10.prod.outlook.com
- ([fe80::65b8:d8e7:e373:4896]) by CH2PR10MB4150.namprd10.prod.outlook.com
- ([fe80::65b8:d8e7:e373:4896%9]) with mapi id 15.20.4690.027; Tue, 16 Nov 2021
- 00:16:19 +0000
-From:   Eric Snowberg <eric.snowberg@oracle.com>
-To:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
-        zohar@linux.ibm.com, dhowells@redhat.com, dwmw2@infradead.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jarkko@kernel.org, jmorris@namei.org, serge@hallyn.com
-Cc:     eric.snowberg@oracle.com, keescook@chromium.org,
-        torvalds@linux-foundation.org, weiyongjun1@huawei.com,
-        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
-        nramas@linux.microsoft.com, lszubowi@redhat.com, jason@zx2c4.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-efi@vger.kernel.org, linux-security-module@vger.kernel.org,
-        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
-        konrad.wilk@oracle.com
-Subject: [PATCH v7 03/17] KEYS: Create static version of public_key_verify_signature
-Date:   Mon, 15 Nov 2021 19:15:31 -0500
-Message-Id: <20211116001545.2639333-4-eric.snowberg@oracle.com>
-X-Mailer: git-send-email 2.18.4
-In-Reply-To: <20211116001545.2639333-1-eric.snowberg@oracle.com>
-References: <20211116001545.2639333-1-eric.snowberg@oracle.com>
-Content-Type: text/plain
-X-ClientProxiedBy: SN1PR12CA0048.namprd12.prod.outlook.com
- (2603:10b6:802:20::19) To CH2PR10MB4150.namprd10.prod.outlook.com
- (2603:10b6:610:ac::13)
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Y6OLQ3pmyLU/AZ8mF6RNILhOeEW50lkatnqGQxIhBPM=;
+        b=NE9Q7X3JQ8LUyUWzz9DeIgL8OoW6QfsSl8vnkAy3xBAwWAiJcKASkCUUxhcuo6wGyj
+         z0tTg0V02jsjXd11PJgj5pF2sV6adXai4Cr/YnvZX6P2JywIyZqrgMvIK1o4b4n3CR4U
+         kb1rRvSa9srpZSUM73KrRPAW7WF63brJAF7P+m9rZj00jlEp1gmZnXael/2ixsugtcfF
+         5ypgZuP4pQNZdnFB+tzrTmgfKrUWEuMx2G8v8dc03lWFP5lJXYJ/csad9Fg7klPM3GOB
+         tMQ6yZKMaygcUZXi1oP+i64HY5Cs9C48DJy9vo9/LqSUFte0HE75KGuv45yY5HXtL2KK
+         KeeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Y6OLQ3pmyLU/AZ8mF6RNILhOeEW50lkatnqGQxIhBPM=;
+        b=ithWbrsNXtKvLFtgZuR55bcmjsd4AMV9M7oepJMiZ+RikRat3rGh4rFzOrBflm5t/z
+         4SUSf/j9qyVRvtlhsuALLc0ax8wbc/1zVyksSmfp891pS0qSovlnLpH0VScblWyUAm+n
+         inJsfDfImn13gjZLO5grV4vJ8UhDKxy1GaGkfl0HQth7Xn0DNWNEjhASfvTHQXlUkGkw
+         M+bWEmahgNy/PMbIiEu/DnebvzHuyiUPYyNu28lbrnrG2R/01oC7dHJN3dUW5P5nHnBD
+         EAPPTukHenG7Ar+mvkAu2/wXpKwBqmCQNBAl3tF2gC1kS7jJOpRV6eC1NZEJQc1E4Hvb
+         AmRg==
+X-Gm-Message-State: AOAM533AGCuyqiq9jJPD6QtBE7NOLKxZ51hzzZEOeXiT+WsX3bjfiwxz
+        uGBgmr14didXcaS1I/K9uTnhUw==
+X-Google-Smtp-Source: ABdhPJwIFe7bp49F+hbCo4lJVLh4GeyP1ulE3zxQubU+9fPyf7wjxXFI+ZxzYa7IzMeEdwHA9OfIBA==
+X-Received: by 2002:a17:902:f24a:b0:141:c6fc:2e18 with SMTP id j10-20020a170902f24a00b00141c6fc2e18mr38537915plc.55.1637003711772;
+        Mon, 15 Nov 2021 11:15:11 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id h10sm17329094pfc.104.2021.11.15.11.15.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 11:15:11 -0800 (PST)
+Date:   Mon, 15 Nov 2021 19:15:07 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Orr <marcorr@google.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <Michael.Roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZKxuxZurFW6BVZJ@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
+ <YZJTA1NyLCmVtGtY@work-vm>
+ <YZKmSDQJgCcR06nE@google.com>
+ <CAA03e5E3Rvx0t8_ZrbNMZwBkjPivGKOg5HCShSFYwfkKDDHWtA@mail.gmail.com>
 MIME-Version: 1.0
-Received: from ca-dev113.us.oracle.com (148.87.23.5) by SN1PR12CA0048.namprd12.prod.outlook.com (2603:10b6:802:20::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.26 via Frontend Transport; Tue, 16 Nov 2021 00:16:16 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 84b92552-311c-404d-7fd5-08d9a8964fdb
-X-MS-TrafficTypeDiagnostic: CH2PR10MB4358:
-X-Microsoft-Antispam-PRVS: <CH2PR10MB4358BB5A706D2165CD7A9C5D87999@CH2PR10MB4358.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2733;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qd+ol6pC+wheqbb9Qir9OGgxQFa+4Ovq4/i5HLd7kYP7orFNNC8Nx5C1ocJWxkEoYDlquif57cFjUZUbx8aYJja/f7ehHqD4EUxAmuKrZ2aI3QucKczQ2D0QjKLnEwpQDQOFkSH0XGfRYpOslXtmI/vxOO1b/xTyA56i6wuODyAWbIgE2ECp+s72ejozMMkaX3T3XMBrbWGO1JEsppc4j3wNa4N9Mmqa7p+1n+YX/pnSjDnUdDAMFszK1rKnKMv2NqaRTr5v/WecXc3K5ykLpyuEJQFtWr5wsB+exlMdWuBLG/DnLiVswOUhjModbAH3QAL90O0+u5DxXUhFuSFyB6/hHyw5tTs3Ttoa+QH7R6sa1Lvj5wDK/VpsyiNQHR2e9wata1ffOoIfExjB8OiSAgcl3zPD8G+NoWZtzqM6gR/CqxYKE97JXoQq6KfPEwLy8fQ1Gnr/vIN1e4churqN+rIZOOB660fSKMBQ4FCgEaejHhGEt/H0q82dVfyPyUuOdBNii2+xDz0nMoG6TwbWz0Pp7B4ZVN7B3s1pGoqnZMvZtQPlPRERsYHGqvtBNpI+9ejI97IDR0eX5byd57+B+xdHQE1wiNIkVq6xM8CZI9x1Ut7MY70k4xBF2YLkhZSlibP5zJrDcDDDyD/Zayf1IWj0t6yM5jFJrVl8GxspSU1zbI+L1960bC+yhhglCwvuK3Nk0Lp34kIoNsN9EhjeLenDSx+v7D9LfQYXWs9dCRM=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(7416002)(38350700002)(186003)(86362001)(66556008)(38100700002)(8676002)(26005)(316002)(4326008)(8936002)(83380400001)(52116002)(508600001)(6486002)(7696005)(5660300002)(921005)(107886003)(1076003)(44832011)(6666004)(956004)(2616005)(36756003)(2906002)(66946007)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?EYId2ypom6+PrlTqtfVqvlfU0+exsRxk2N1g3EQXwdPop0FM/k1AQLDwetJZ?=
- =?us-ascii?Q?+DkX0ohC6bbg7gi3h4+Ra4kEegIUbji9wKslJUpkKMuicTjzZ9HVZ+Bbks9I?=
- =?us-ascii?Q?YpcE/m8/Ze3ty4vhABimY+IT7XlmrhlRS7uEYz7e5Z5nPyB/+FLL33AusV5h?=
- =?us-ascii?Q?lEylLF7vd725dBDTCot99cps/Kg+xlkwIINp0B+CEH8fX+nTuaVzhkzVKcI3?=
- =?us-ascii?Q?bZUYGhmA+sJLiLWeaI8ld17Ff6NU43RYovWSleFkMhLK//vBs3k5bgygDmsV?=
- =?us-ascii?Q?4QprVmIn0YDSAlYs7QnHsZGL+kHNS81WsiYbdLfItP/qXAd18Ki/Fk/OGZ2B?=
- =?us-ascii?Q?2klUAvxBhuGD/wIbL4VT654TfrUefverl4lQzItTTWa08QhZb8TvKCeTCufQ?=
- =?us-ascii?Q?l0Bb9MQtQn83HvkRdx8BzVGl/J+VeRNO4GdB6RTNhAJffxI3sFb//NNgNNpD?=
- =?us-ascii?Q?loeZlJj/HnmBTZNRe9T1aPPUMXsQVPX1V1484O4TP+J6EMI/yTMZ99wNY4xg?=
- =?us-ascii?Q?q+FSksScSwH04UNEzHbHdos5JVybp4QtkgwkLkqEjDL8RPCT6G8YjWKAknG5?=
- =?us-ascii?Q?QMrjejFqLMaWc1qJmz3DlgRTJ+bxrtWgyhzQ8ej/1qbeoNaFlBzqtv5bsrFg?=
- =?us-ascii?Q?4LI1OfpyDMC1aCb71h0U64GTWrUOckPWcoOHhIhIdDXCTUEZtC72lvM+nSX7?=
- =?us-ascii?Q?UDxnHojW2HVlrUFandcj/Nnyi6s4i6Hl3tnxiHl+FRr7sinZdOiYSTnFzF31?=
- =?us-ascii?Q?09MDSA/dxNjgVjlmJ4yWIuQCg6uRYd6rlRDuelkHr/AsRBJ6/ldu1u1i6CUk?=
- =?us-ascii?Q?Nd8UJXgqGsGhl59MpJ3WtkPBSJRwHt8o2VfxoPzKytV/bvCJo88qCpV9GJ+m?=
- =?us-ascii?Q?/PQ3vw9puUEUAXD4TOfLJEqKZpS9BzEcYaMBG+kA4CzCevS/Q/+8kcARNEPL?=
- =?us-ascii?Q?BEfErnGVMfniyGxguPSbq3hJdm3JFHxGBygZFIkQqvVTwUe5Zc4MN4SpYLVR?=
- =?us-ascii?Q?o4cxB+UBs8Dr1EU5JiEEcyU8SVRMxRlrZhyBNZwx4RZG9pvwZ4CeZZdCaV2l?=
- =?us-ascii?Q?GgFgQnmP1qnU2Dufx2hBFEsdKCGbQuD24XfXxGtEyXIAWFObv5vghw8LLbBU?=
- =?us-ascii?Q?SDekQDSXktfVixl8mxUlRSga5uvhk9KxWsua0RfMF6Xj2LK4gmnOJHFzpT5Y?=
- =?us-ascii?Q?h+IM/Cw//fRjZY93lx5PaNv0FquRQT6/45rZ79JkCGKEqYkddmsIV7vvJ4/p?=
- =?us-ascii?Q?FUaCiX0wGEY3VnHz1Gy18Q3eT8OV6Ro56NKU05Bo+muT/6z2SBDW2GvooUwI?=
- =?us-ascii?Q?nwQeiYz0ya3dfjylXtEB8RogSTk6Jm/HlDSIXD4vEy0MXXR5kjOeuFGGPHNu?=
- =?us-ascii?Q?KfPJZBSvFdjMrBXiz+hYza9pUJvaxE6U+Bft1HoZMbFru+dMAU2Zk+vwDgt8?=
- =?us-ascii?Q?tV1Wpnbzs3iJh7kZTSRFjlUq/lbz/wzwAYpAqBdyHiZ2bFMYaqk+bTLwphzd?=
- =?us-ascii?Q?vQ+4afpkKdTSQlRh80d5uyPErsX7U+ZFhP2mY6QVTUc3nb8ATugFYkvbTdfG?=
- =?us-ascii?Q?z3DQZmB5m/fWJABc4UfS3BF4c1LhHTXu74nqI7ws87WClIaFX0H9IcvE717n?=
- =?us-ascii?Q?l/fuwgR9/e7D9CIJI80N9fb4J/fcCkLCvb3uYX3z7xIPV+C6q36/qRJpf88E?=
- =?us-ascii?Q?CYFbzg=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 84b92552-311c-404d-7fd5-08d9a8964fdb
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2021 00:16:19.0829
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HhZQFNpQyM6tZTP/670EJZTGT0upEy9zLPvC+IqSqzt3g0WaL7yAUfLBgfSP4tIjBSGT9fHGJnYjxUbIP6U1QIVKHugpWTPh0wb06NvotIE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4358
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10169 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 spamscore=0
- adultscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2111150124
-X-Proofpoint-ORIG-GUID: fKrzdRgOC6FpbAt52txBX19_V_eR8QHd
-X-Proofpoint-GUID: fKrzdRgOC6FpbAt52txBX19_V_eR8QHd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAA03e5E3Rvx0t8_ZrbNMZwBkjPivGKOg5HCShSFYwfkKDDHWtA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The kernel test robot reports undefined reference to
-public_key_verify_signature when CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE is
-not defined. Create a static version in this case and return -EINVAL.
++arm64 KVM folks
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
----
-v7: Initial version
----
- include/crypto/public_key.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+On Mon, Nov 15, 2021, Marc Orr wrote:
+> On Mon, Nov 15, 2021 at 10:26 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Mon, Nov 15, 2021, Dr. David Alan Gilbert wrote:
+> > > * Sean Christopherson (seanjc@google.com) wrote:
+> > > > On Fri, Nov 12, 2021, Borislav Petkov wrote:
+> > > > > On Fri, Nov 12, 2021 at 09:59:46AM -0800, Dave Hansen wrote:
+> > > > > > Or, is there some mechanism that prevent guest-private memory from being
+> > > > > > accessed in random host kernel code?
+> > > >
+> > > > Or random host userspace code...
+> > > >
+> > > > > So I'm currently under the impression that random host->guest accesses
+> > > > > should not happen if not previously agreed upon by both.
+> > > >
+> > > > Key word "should".
+> > > >
+> > > > > Because, as explained on IRC, if host touches a private guest page,
+> > > > > whatever the host does to that page, the next time the guest runs, it'll
+> > > > > get a #VC where it will see that that page doesn't belong to it anymore
+> > > > > and then, out of paranoia, it will simply terminate to protect itself.
+> > > > >
+> > > > > So cloud providers should have an interest to prevent such random stray
+> > > > > accesses if they wanna have guests. :)
+> > > >
+> > > > Yes, but IMO inducing a fault in the guest because of _host_ bug is wrong.
+> > >
+> > > Would it necessarily have been a host bug?  A guest telling the host a
+> > > bad GPA to DMA into would trigger this wouldn't it?
+> >
+> > No, because as Andy pointed out, host userspace must already guard against a bad
+> > GPA, i.e. this is just a variant of the guest telling the host to DMA to a GPA
+> > that is completely bogus.  The shared vs. private behavior just means that when
+> > host userspace is doing a GPA=>HVA lookup, it needs to incorporate the "shared"
+> > state of the GPA.  If the host goes and DMAs into the completely wrong HVA=>PFN,
+> > then that is a host bug; that the bug happened to be exploited by a buggy/malicious
+> > guest doesn't change the fact that the host messed up.
+> 
+> "If the host goes and DMAs into the completely wrong HVA=>PFN, then
+> that is a host bug; that the bug happened to be exploited by a
+> buggy/malicious guest doesn't change the fact that the host messed
+> up."
+> ^^^
+> Again, I'm flabbergasted that you are arguing that it's OK for a guest
+> to exploit a host bug to take down host-side processes or the host
+> itself, either of which could bring down all other VMs on the machine.
+> 
+> I'm going to repeat -- this is not OK! Period.
 
-diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-index f603325c0c30..a9b2e600b7cc 100644
---- a/include/crypto/public_key.h
-+++ b/include/crypto/public_key.h
-@@ -80,7 +80,16 @@ extern int create_signature(struct kernel_pkey_params *, const void *, void *);
- extern int verify_signature(const struct key *,
- 			    const struct public_key_signature *);
- 
-+#if IS_REACHABLE(CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE)
- int public_key_verify_signature(const struct public_key *pkey,
- 				const struct public_key_signature *sig);
-+#else
-+static inline
-+int public_key_verify_signature(const struct public_key *pkey,
-+				const struct public_key_signature *sig)
-+{
-+	return -EINVAL;
-+}
-+#endif
- 
- #endif /* _LINUX_PUBLIC_KEY_H */
--- 
-2.18.4
+Huh?  At which point did I suggest it's ok to ship software with bugs?  Of course
+it's not ok to introduce host bugs that let the guest crash the host (or host
+processes).  But _if_ someone does ship buggy host software, it's not like we can
+wave a magic wand and stop the guest from exploiting the bug.  That's why they're
+such a big deal.
 
+Yes, in this case a very specific flavor of host userspace bug could be morphed
+into a guest exception, but as mentioned ad nauseum, _if_ host userspace has bug
+where it does not properly validate a GPA=>HVA, then any such bug exists and is
+exploitable today irrespective of SNP.
+
+> Again, if the community wants to layer some orchestration scheme
+> between host userspace, host kernel, and guest, on top of the code to
+> inject the #VC into the guest, that's fine. This proposal is not
+> stopping that. In fact, the two approaches are completely orthogonal
+> and compatible.
+> 
+> But so far I have heard zero reasons why injecting a #VC into the
+> guest is wrong. Other than just stating that it's wrong.
+
+It creates a new attack surface, e.g. if the guest mishandles the #VC and does
+PVALIDATE on memory that it previously accepted, then userspace can attack the
+guest by accessing guest private memory to coerce the guest into consuming corrupted
+data.
+
+> Again, the guest must be able to detect buggy and malicious host-side
+> writes to private memory. Or else "confidential computing" doesn't
+> work.
+
+That assertion assumes the host _hypervisor_ is untrusted, which does not hold true
+for all use cases.  The Cc'd arm64 folks are working on a protected VM model where
+the host kernel at large is untrusted, but the "hypervisor" (KVM plus a few other
+bits), is still trusted by the guest.  Because the hypervisor is trusted, the guest
+doesn't need to be hardened against event injection attacks from the host.
+
+Note, SNP already has a similar concept in it's VMPLs.  VMPL3 runs a confidential VM
+that is not hardened in any way, and fully trusts VMPL0 to not inject bogus faults.
+
+And along the lines of arm64's pKVM, I would very much like to get KVM to a point
+where it can remove host userspace from the guest's TCB without relying on hardware.
+Anything that can be in hardware absolutely can be done in the kernel, and likely
+can be done with significantly less performance overhead.  Confidential computing is
+not a binary thing where the only valid use case is removing the host kernel from
+the TCB and trusting only hardware.  There are undoubtedly use cases where trusting
+the host kernel but not host userspace brings tangible value, but the overhead of
+TDX/SNP to get the host kernel out of the TCB is the wrong tradeoff for performance
+vs. security.
+
+> Assuming that's not true is not a valid argument to dismiss
+> injecting a #VC exception into the guest.
