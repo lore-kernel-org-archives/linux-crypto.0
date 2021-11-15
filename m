@@ -2,268 +2,189 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B5E4C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC2B3C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:31:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2CFF361B53
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:06:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AD7060F9C
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:31:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231454AbhKOMI7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 07:08:59 -0500
-Received: from mga09.intel.com ([134.134.136.24]:13648 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231445AbhKOMHn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 07:07:43 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="233265610"
-X-IronPort-AV: E=Sophos;i="5.87,236,1631602800"; 
-   d="scan'208";a="233265610"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2021 04:04:22 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,236,1631602800"; 
-   d="scan'208";a="535486531"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
-  by orsmga001.jf.intel.com with ESMTP; 15 Nov 2021 04:04:20 -0800
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        marco.chiappero@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v2 20/24] crypto: qat - pass the PF2VF responses back to the callers
-Date:   Mon, 15 Nov 2021 12:03:32 +0000
-Message-Id: <20211115120336.22292-21-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211115120336.22292-1-giovanni.cabiddu@intel.com>
-References: <20211115120336.22292-1-giovanni.cabiddu@intel.com>
+        id S230023AbhKOMeK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 07:34:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56723 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229716AbhKOMeE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Nov 2021 07:34:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636979465;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bmrvKUYAASjH6mIRSwiOSO3Soa8eQXTmOOyvhFqgyNs=;
+        b=PlhU5wUvHxEkxUN/0wfhdgarriS7P0omcXC+49/+bfJGioo0srS0A7Jq+HtL3mmXWitOkL
+        4We335oA0ecjXUqhTP3aJx1Inixfde4oZsHNVWk/D2ksL7fC59fetqMGClQI2zFu4ByJom
+        iOkfWrr6BO0knYMz1/ag4aSoZhZxZXg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-556-VfMZrTN_NiehjFJ-zX6eRA-1; Mon, 15 Nov 2021 07:31:04 -0500
+X-MC-Unique: VfMZrTN_NiehjFJ-zX6eRA-1
+Received: by mail-wm1-f72.google.com with SMTP id l6-20020a05600c4f0600b0033321934a39so7796672wmq.9
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 04:31:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=bmrvKUYAASjH6mIRSwiOSO3Soa8eQXTmOOyvhFqgyNs=;
+        b=DN9dRvTYGxdcETg4cGN/YymbzkzSsLJxD13/aPqVRq8MtmcNz6ldHmfJvU07fuvbAV
+         ZTlaCqDdIIlBkdtGVDXICh28BQOFVRN4jpWqxUraWZxNj0mONrtfOHbILaEfOl5Nnd6Q
+         Oe8o8lr0wuQmkY5SH371atGk8C+98/Ju+RzpYT+kU6eL68ijDrCPiUil1TNquRhLVPWT
+         UrMJ0nd1NbQ26fzE7wRc1vY4z3YmOKhNTWATZR8WK+bZnJSqfCM/mWgi7+eywwSkNucb
+         cru0ym16gAFvCiKmZ/ETxz+wT3g3WTrYNAvJtmkcJ4PBh6BqueXTtjl8uBD5OvWnXJxb
+         zwCQ==
+X-Gm-Message-State: AOAM530CO5WGMeisofMGg3J9C1H4sTh24kEjQrlstMqrmPC+M2hPhaPX
+        fiss762nRxIFqQ3nfHtuPeXU4bxIupD0mtjIIblKjIjh2UWO5mDx012RRZMv70JiRs/pCwY87AN
+        kTeW+JflR03W38grIrPDTn3kw
+X-Received: by 2002:adf:f708:: with SMTP id r8mr46380761wrp.198.1636979463472;
+        Mon, 15 Nov 2021 04:31:03 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzH7dBVhHzposGOZpkUWZ27MvoJHO6QECzLEU5yEXHaBNIHFbfvFOSCbhtiEPuokaDOzbkyRg==
+X-Received: by 2002:adf:f708:: with SMTP id r8mr46380675wrp.198.1636979463157;
+        Mon, 15 Nov 2021 04:31:03 -0800 (PST)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id f7sm22666208wmg.6.2021.11.15.04.31.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 04:31:02 -0800 (PST)
+Date:   Mon, 15 Nov 2021 12:30:59 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZJTA1NyLCmVtGtY@work-vm>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <YY7FAW5ti7YMeejj@google.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Marco Chiappero <marco.chiappero@intel.com>
+* Sean Christopherson (seanjc@google.com) wrote:
+> On Fri, Nov 12, 2021, Borislav Petkov wrote:
+> > On Fri, Nov 12, 2021 at 09:59:46AM -0800, Dave Hansen wrote:
+> > > Or, is there some mechanism that prevent guest-private memory from being
+> > > accessed in random host kernel code?
+> 
+> Or random host userspace code...
+> 
+> > So I'm currently under the impression that random host->guest accesses
+> > should not happen if not previously agreed upon by both.
+> 
+> Key word "should".
+> 
+> > Because, as explained on IRC, if host touches a private guest page,
+> > whatever the host does to that page, the next time the guest runs, it'll
+> > get a #VC where it will see that that page doesn't belong to it anymore
+> > and then, out of paranoia, it will simply terminate to protect itself.
+> > 
+> > So cloud providers should have an interest to prevent such random stray
+> > accesses if they wanna have guests. :)
+> 
+> Yes, but IMO inducing a fault in the guest because of _host_ bug is wrong.
 
-Currently, any PF response to a VF request is fully parsed during the
-interrupt handling. This way the individual response values are stored
-into the accel_dev structure, preventing the caller to access and decode
-the full response message itself.
+Would it necessarily have been a host bug?  A guest telling the host a
+bad GPA to DMA into would trigger this wouldn't it?
 
-Change this behavior, by letting the API return back the entire message
-to the caller, in order to:
-  - keep correlated code together, that is, the (building of the)
-    request and the (decoding of the) response;
-  - avoid polluting the accel_dev data structure with unnecessary and at
-    times temporary values; only the entire message is stored in a
-    temporary buffer.
+Still; I wonder if it's best to kill the guest - maybe it's best for
+the host to kill the guest and leave behind diagnostics of what
+happened; for someone debugging the crash, it's going to be less useful
+to know that page X was wrongly accessed (which is what the guest would
+see), and more useful to know that it was the kernel's vhost-... driver
+that accessed it.
 
-Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_c3xxxvf/adf_drv.c      |  2 +-
- drivers/crypto/qat/qat_c62xvf/adf_drv.c       |  2 +-
- .../crypto/qat/qat_common/adf_accel_devices.h |  4 ++--
- .../crypto/qat/qat_common/adf_pfvf_vf_msg.c   | 23 +++++++++++-------
- .../crypto/qat/qat_common/adf_pfvf_vf_proto.c | 24 +++++++++----------
- .../crypto/qat/qat_common/adf_pfvf_vf_proto.h |  2 +-
- drivers/crypto/qat/qat_dh895xccvf/adf_drv.c   |  2 +-
- 7 files changed, 33 insertions(+), 26 deletions(-)
+Dave
 
-diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-index 1df1b868978d..0ba1d293bb81 100644
---- a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-@@ -171,7 +171,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
- 	pci_set_master(pdev);
- 	/* Completion for VF2PF request/response message exchange */
--	init_completion(&accel_dev->vf.iov_msg_completion);
-+	init_completion(&accel_dev->vf.msg_received);
- 
- 	ret = qat_crypto_dev_config(accel_dev);
- 	if (ret)
-diff --git a/drivers/crypto/qat/qat_c62xvf/adf_drv.c b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-index 8103bd81d617..176d8e2786f4 100644
---- a/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-@@ -171,7 +171,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
- 	pci_set_master(pdev);
- 	/* Completion for VF2PF request/response message exchange */
--	init_completion(&accel_dev->vf.iov_msg_completion);
-+	init_completion(&accel_dev->vf.msg_received);
- 
- 	ret = qat_crypto_dev_config(accel_dev);
- 	if (ret)
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-index a99800e51343..5ca9458d9158 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-@@ -271,8 +271,8 @@ struct adf_accel_dev {
- 			char irq_name[ADF_MAX_MSIX_VECTOR_NAME];
- 			struct tasklet_struct pf2vf_bh_tasklet;
- 			struct mutex vf2pf_lock; /* protect CSR access */
--			struct completion iov_msg_completion;
--			u8 compatible;
-+			struct completion msg_received;
-+			u32 response; /* temp field holding pf2vf response */
- 			u8 pf_version;
- 		} vf;
- 	};
-diff --git a/drivers/crypto/qat/qat_common/adf_pfvf_vf_msg.c b/drivers/crypto/qat/qat_common/adf_pfvf_vf_msg.c
-index 7969a644e24b..d5cccec03a3b 100644
---- a/drivers/crypto/qat/qat_common/adf_pfvf_vf_msg.c
-+++ b/drivers/crypto/qat/qat_common/adf_pfvf_vf_msg.c
-@@ -52,7 +52,10 @@ EXPORT_SYMBOL_GPL(adf_vf2pf_notify_shutdown);
- int adf_vf2pf_request_version(struct adf_accel_dev *accel_dev)
- {
- 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	u8 pf_version;
- 	u32 msg = 0;
-+	int compat;
-+	u32 resp;
- 	int ret;
- 
- 	msg = ADF_VF2PF_MSGORIGIN_SYSTEM;
-@@ -60,34 +63,38 @@ int adf_vf2pf_request_version(struct adf_accel_dev *accel_dev)
- 	msg |= ADF_PFVF_COMPAT_THIS_VERSION << ADF_VF2PF_COMPAT_VER_REQ_SHIFT;
- 	BUILD_BUG_ON(ADF_PFVF_COMPAT_THIS_VERSION > 255);
- 
--	ret = adf_send_vf2pf_req(accel_dev, msg);
-+	ret = adf_send_vf2pf_req(accel_dev, msg, &resp);
- 	if (ret) {
- 		dev_err(&GET_DEV(accel_dev),
- 			"Failed to send Compatibility Version Request.\n");
- 		return ret;
- 	}
- 
-+	pf_version = (resp & ADF_PF2VF_VERSION_RESP_VERS_MASK)
-+		     >> ADF_PF2VF_VERSION_RESP_VERS_SHIFT;
-+	compat = (resp & ADF_PF2VF_VERSION_RESP_RESULT_MASK)
-+		 >> ADF_PF2VF_VERSION_RESP_RESULT_SHIFT;
-+
- 	/* Response from PF received, check compatibility */
--	switch (accel_dev->vf.compatible) {
-+	switch (compat) {
- 	case ADF_PF2VF_VF_COMPATIBLE:
- 		break;
- 	case ADF_PF2VF_VF_COMPAT_UNKNOWN:
- 		/* VF is newer than PF and decides whether it is compatible */
--		if (accel_dev->vf.pf_version >= hw_data->min_iov_compat_ver) {
--			accel_dev->vf.compatible = ADF_PF2VF_VF_COMPATIBLE;
-+		if (pf_version >= hw_data->min_iov_compat_ver)
- 			break;
--		}
- 		fallthrough;
- 	case ADF_PF2VF_VF_INCOMPATIBLE:
- 		dev_err(&GET_DEV(accel_dev),
- 			"PF (vers %d) and VF (vers %d) are not compatible\n",
--			accel_dev->vf.pf_version,
--			ADF_PFVF_COMPAT_THIS_VERSION);
-+			pf_version, ADF_PFVF_COMPAT_THIS_VERSION);
- 		return -EINVAL;
- 	default:
- 		dev_err(&GET_DEV(accel_dev),
- 			"Invalid response from PF; assume not compatible\n");
- 		return -EINVAL;
- 	}
--	return ret;
-+
-+	accel_dev->vf.pf_version = pf_version;
-+	return 0;
- }
-diff --git a/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c b/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c
-index 62817bcec121..ea1a00e746ff 100644
---- a/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c
-+++ b/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c
-@@ -47,18 +47,19 @@ static u32 adf_recv_pf2vf_msg(struct adf_accel_dev *accel_dev)
-  * adf_send_vf2pf_req() - send VF2PF request message
-  * @accel_dev:	Pointer to acceleration device.
-  * @msg:	Request message to send
-+ * @resp:	Returned PF response
-  *
-  * This function sends a message that requires a response from the VF to the PF
-  * and waits for a reply.
-  *
-  * Return: 0 on success, error code otherwise.
-  */
--int adf_send_vf2pf_req(struct adf_accel_dev *accel_dev, u32 msg)
-+int adf_send_vf2pf_req(struct adf_accel_dev *accel_dev, u32 msg, u32 *resp)
- {
- 	unsigned long timeout = msecs_to_jiffies(ADF_PFVF_MSG_RESP_TIMEOUT);
- 	int ret;
- 
--	reinit_completion(&accel_dev->vf.iov_msg_completion);
-+	reinit_completion(&accel_dev->vf.msg_received);
- 
- 	/* Send request from VF to PF */
- 	ret = adf_send_vf2pf_msg(accel_dev, msg);
-@@ -69,13 +70,19 @@ int adf_send_vf2pf_req(struct adf_accel_dev *accel_dev, u32 msg)
- 	}
- 
- 	/* Wait for response */
--	if (!wait_for_completion_timeout(&accel_dev->vf.iov_msg_completion,
-+	if (!wait_for_completion_timeout(&accel_dev->vf.msg_received,
- 					 timeout)) {
- 		dev_err(&GET_DEV(accel_dev),
- 			"PFVF request/response message timeout expired\n");
- 		return -EIO;
- 	}
- 
-+	if (likely(resp))
-+		*resp = accel_dev->vf.response;
-+
-+	/* Once copied, set to an invalid value */
-+	accel_dev->vf.response = 0;
-+
- 	return 0;
- }
- 
-@@ -89,15 +96,8 @@ static bool adf_handle_pf2vf_msg(struct adf_accel_dev *accel_dev, u32 msg)
- 		adf_pf2vf_handle_pf_restarting(accel_dev);
- 		return false;
- 	case ADF_PF2VF_MSGTYPE_VERSION_RESP:
--		dev_dbg(&GET_DEV(accel_dev),
--			"Version resp received from PF 0x%x\n", msg);
--		accel_dev->vf.pf_version =
--			(msg & ADF_PF2VF_VERSION_RESP_VERS_MASK) >>
--			ADF_PF2VF_VERSION_RESP_VERS_SHIFT;
--		accel_dev->vf.compatible =
--			(msg & ADF_PF2VF_VERSION_RESP_RESULT_MASK) >>
--			ADF_PF2VF_VERSION_RESP_RESULT_SHIFT;
--		complete(&accel_dev->vf.iov_msg_completion);
-+		accel_dev->vf.response = msg;
-+		complete(&accel_dev->vf.msg_received);
- 		return true;
- 	default:
- 		dev_err(&GET_DEV(accel_dev),
-diff --git a/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.h b/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.h
-index a3ab24c7d18b..6226d4d9d520 100644
---- a/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.h
-+++ b/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.h
-@@ -7,7 +7,7 @@
- #include "adf_accel_devices.h"
- 
- int adf_send_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 msg);
--int adf_send_vf2pf_req(struct adf_accel_dev *accel_dev, u32 msg);
-+int adf_send_vf2pf_req(struct adf_accel_dev *accel_dev, u32 msg, u32 *resp);
- 
- int adf_enable_vf2pf_comms(struct adf_accel_dev *accel_dev);
- 
-diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-index 99d90f3ea2b7..ee45d688b5d7 100644
---- a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-@@ -171,7 +171,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	}
- 	pci_set_master(pdev);
- 	/* Completion for VF2PF request/response message exchange */
--	init_completion(&accel_dev->vf.iov_msg_completion);
-+	init_completion(&accel_dev->vf.msg_received);
- 
- 	ret = qat_crypto_dev_config(accel_dev);
- 	if (ret)
+> On Fri, Nov 12, 2021, Peter Gonda wrote:
+> > Here is an alternative to the current approach: On RMP violation (host
+> > or userspace) the page fault handler converts the page from private to
+> > shared to allow the write to continue. This pulls from s390’s error
+> > handling which does exactly this. See ‘arch_make_page_accessible()’.
+> 
+> Ah, after further reading, s390 does _not_ do implicit private=>shared conversions.
+> 
+> s390's arch_make_page_accessible() is somewhat similar, but it is not a direct
+> comparison.  IIUC, it exports and integrity protects the data and thus preserves
+> the guest's data in an encrypted form, e.g. so that it can be swapped to disk.
+> And if the host corrupts the data, attempting to convert it back to secure on a
+> subsequent guest access will fail.
+> 
+> The host kernel's handling of the "convert to secure" failures doesn't appear to
+> be all that robust, e.g. it looks like there are multiple paths where the error
+> is dropped on the floor and the guest is resumed , but IMO soft hanging the guest 
+> is still better than inducing a fault in the guest, and far better than potentially
+> coercing the guest into reading corrupted memory ("spurious" PVALIDATE).  And s390's
+> behavior is fixable since it's purely a host error handling problem.
+> 
+> To truly make a page shared, s390 requires the guest to call into the ultravisor
+> to make a page shared.  And on the host side, the host can pin a page as shared
+> to prevent the guest from unsharing it while the host is accessing it as a shared
+> page.
+> 
+> So, inducing #VC is similar in the sense that a malicious s390 can also DoS itself,
+> but is quite different in that (AFAICT) s390 does not create an attack surface where
+> a malicious or buggy host userspace can induce faults in the guest, or worst case in
+> SNP, exploit a buggy guest into accepting and accessing corrupted data.
+> 
+> It's also different in that s390 doesn't implicitly convert between shared and
+> private.  Functionally, it doesn't really change the end result because a buggy
+> host that writes guest private memory will DoS the guest (by inducing a #VC or
+> corrupting exported data), but at least for s390 there's a sane, legitimate use
+> case for accessing guest private memory (swap and maybe migration?), whereas for
+> SNP, IMO implicitly converting to shared on a host access is straight up wrong.
+> 
+> > Additionally it adds less complexity to the SNP kernel patches, and
+> > requires no new ABI.
+> 
+> I disagree, this would require "new" ABI in the sense that it commits KVM to
+> supporting SNP without requiring userspace to initiate any and all conversions
+> between shared and private.  Which in my mind is the big elephant in the room:
+> do we want to require new KVM (and kernel?) ABI to allow/force userspace to
+> explicitly declare guest private memory for TDX _and_ SNP, or just TDX?
+> 
 -- 
-2.33.1
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
