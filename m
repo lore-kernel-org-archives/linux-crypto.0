@@ -2,260 +2,262 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA22C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 08:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAE0C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 08:47:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15C6163218
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 08:06:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F05D604D1
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 08:47:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236681AbhKOIJu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 03:09:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52318 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236869AbhKOIJG (ORCPT
+        id S237584AbhKOIuD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 03:50:03 -0500
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.53]:16759 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236706AbhKOIs1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 03:09:06 -0500
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 170EBC061200
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 00:06:10 -0800 (PST)
-Received: by mail-oi1-x233.google.com with SMTP id bf8so33231754oib.6
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 00:06:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vInCllpdZJK8HYx6VQyYUDaprqkzpWu+HmJAPYn2v50=;
-        b=HxgSxKIntchJ9V+1j6TZ6/zSWnalYU4SllF6Qtl1TAmuWiQD/m8ic51slAuG0LR6uO
-         fnkH9OnHkBaQ+nyG2iYWLHXgWdRQHf0SFhhxZ9rU7G6tsGP/aQSD/vUOk57r8bO5BLVm
-         ktc2j7bpxi22rL+/rsWaQDWZS1eM59ibUf9gvizDgXrVa3Kx+fZKFhx4HaBZ4eVjLK4/
-         298CTDz2iJ58wlGFsU1O6ltqWSWRP/t3sVL086mcW+rdJYI6JUAtKWw6kH1hnPHOtkRC
-         HbeqEbqmRupAq0sMu/prFcPer60b1uIFdnXjh3t2f7XNaGfDnGRLdQxRxZSWWSOICyk6
-         nVnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vInCllpdZJK8HYx6VQyYUDaprqkzpWu+HmJAPYn2v50=;
-        b=rHN7YxycKaEkmOuk9Q70/XsYTZ0/uBjKoqOj4oJq93Whjf7SjjGpH5i1OArGeVP8+D
-         PivzznNFftGNMz/NWeL7LQ7zvrpZcEPxqiJtokJVwzTVcrbmCV41ADkZK/fOyxR3PH63
-         3bbyVE6aNCmwcW3pfGRVpbNIZKWWv8Syuqzris0ayScb8u7APT8UuV6RSimBLvcg/pTN
-         lE3JaJ8iYUAw76pgIdIFjKNdIPMRX1CYl/VZ0ScZic0R1cO7e7dQ9qQTSoIrGjxonKxf
-         a6EuHk+nL7VrTtDr2Qq3YNqo4tkjAtv/NUkNyUAcsbx5olh0vJR9boaaVxrngq5ywog5
-         2mnA==
-X-Gm-Message-State: AOAM532LOyIyQx8AS5PKoKpfwzkQk/sUsnhRmV3DLHH0hy9nGLQ03VzE
-        6Dn1+MqhD099MnMdrvig4+Xs37rtHHrDRoTTF8raLg==
-X-Google-Smtp-Source: ABdhPJzMEV2wPO87eb6zhBFjYr/AyoSofRxeiCu2JqzFVwV7tOI9z0eR69HajfWSWZZKHbGj2TJxsuZDqRt54wsuiwY=
-X-Received: by 2002:a05:6808:b08:: with SMTP id s8mr5206631oij.126.1636963569363;
- Mon, 15 Nov 2021 00:06:09 -0800 (PST)
+        Mon, 15 Nov 2021 03:48:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1636965899;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=dO3ADDPrtn5Id/yZtKIECynwqcEkF8YOxxKpEn1qPWQ=;
+    b=OAb9Bu1uzXlZ0KPLrqSDBtfc9LoHYu4qbcQgS9yZtpvIh+LA8k+M+jElKEQybxkZgy
+    fSYs9nUBmnsxVtbojriA4NS7VNV6tDt4Nwj6ZX9urZV0Q1jPYP7Y9T6W+TW2mQ2aanBU
+    OruKPywIgUdylo4NchNYr5ZmofZTzq58uaNGFbMjDXJjfQkLu4RPT41KFiBtdlGwjlHD
+    UatmhDM8F5CAvgxDuDSax91J/ki++NV9RWp+ortioTgod1AGHy1HB5Z9lFAuwqpmyYWy
+    vxaTKXQNsgdhtmGqD8jtwpbCioS7evLGO7Kt9lWZ5RnwdMnZgYTM+ONY4KcfYogBtpZR
+    1T1g==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXvTOeuXTEc="
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 47.34.5 DYNA|AUTH)
+    with ESMTPSA id U02dfbxAF8iwU8n
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Mon, 15 Nov 2021 09:44:58 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     herbert@gondor.apana.org.au
+Cc:     ebiggers@kernel.org, Jarkko Sakkinen <jarkko@kernel.org>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keyrings <keyrings@vger.kernel.org>, simo@redhat.com
+Subject: [PATCH v3 4/4] security: DH - use KDF implementation from crypto API
+Date:   Mon, 15 Nov 2021 09:44:25 +0100
+Message-ID: <9271627.eNJFYEL58v@positron.chronox.de>
+In-Reply-To: <2589009.vuYhMxLoTh@positron.chronox.de>
+References: <2589009.vuYhMxLoTh@positron.chronox.de>
 MIME-Version: 1.0
-References: <20211110105922.217895-1-bhupesh.sharma@linaro.org>
- <20211110105922.217895-4-bhupesh.sharma@linaro.org> <YZAOTCQ0yIJUJTYO@builder.lan>
-In-Reply-To: <YZAOTCQ0yIJUJTYO@builder.lan>
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Date:   Mon, 15 Nov 2021 13:35:58 +0530
-Message-ID: <CAH=2Ntw=GC0a2iscffe--6_UpnCkdpnNO=7bZSAgFQonuK-4BA@mail.gmail.com>
-Subject: Re: [PATCH v5 03/22] dt-bindings: qcom-bam: Convert binding to YAML
-To:     Bjorn Andersson <bjorn.andersson@linaro.org>
-Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        bhupesh.linux@gmail.com, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, robh+dt@kernel.org, agross@kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        stephan@gerhold.net, Thara Gopinath <thara.gopinath@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Bjorn,
+The kernel crypto API provides the SP800-108 counter KDF implementation.
+Thus, the separate implementation provided as part of the keys subsystem
+can be replaced with calls to the KDF offered by the kernel crypto API.
 
-On Sun, 14 Nov 2021 at 00:43, Bjorn Andersson
-<bjorn.andersson@linaro.org> wrote:
->
-> On Wed 10 Nov 04:59 CST 2021, Bhupesh Sharma wrote:
->
-> > Convert Qualcomm BAM DMA devicetree binding to YAML.
-> >
-> > Cc: Thara Gopinath <thara.gopinath@linaro.org>
-> > Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> > Cc: Rob Herring <robh+dt@kernel.org>
-> > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> > ---
-> >  .../devicetree/bindings/dma/qcom_bam_dma.txt  | 50 ----------
-> >  .../devicetree/bindings/dma/qcom_bam_dma.yaml | 91 +++++++++++++++++++
-> >  2 files changed, 91 insertions(+), 50 deletions(-)
-> >  delete mode 100644 Documentation/devicetree/bindings/dma/qcom_bam_dma.txt
-> >  create mode 100644 Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/dma/qcom_bam_dma.txt b/Documentation/devicetree/bindings/dma/qcom_bam_dma.txt
-> > deleted file mode 100644
-> > index cf5b9e44432c..000000000000
-> > --- a/Documentation/devicetree/bindings/dma/qcom_bam_dma.txt
-> > +++ /dev/null
-> > @@ -1,50 +0,0 @@
-> > -QCOM BAM DMA controller
-> > -
-> > -Required properties:
-> > -- compatible: must be one of the following:
-> > - * "qcom,bam-v1.4.0" for MSM8974, APQ8074 and APQ8084
-> > - * "qcom,bam-v1.3.0" for APQ8064, IPQ8064 and MSM8960
-> > - * "qcom,bam-v1.7.0" for MSM8916
-> > -- reg: Address range for DMA registers
-> > -- interrupts: Should contain the one interrupt shared by all channels
-> > -- #dma-cells: must be <1>, the cell in the dmas property of the client device
-> > -  represents the channel number
-> > -- clocks: required clock
-> > -- clock-names: must contain "bam_clk" entry
-> > -- qcom,ee : indicates the active Execution Environment identifier (0-7) used in
-> > -  the secure world.
-> > -- qcom,controlled-remotely : optional, indicates that the bam is controlled by
-> > -  remote proccessor i.e. execution environment.
-> > -- num-channels : optional, indicates supported number of DMA channels in a
-> > -  remotely controlled bam.
-> > -- qcom,num-ees : optional, indicates supported number of Execution Environments
-> > -  in a remotely controlled bam.
-> > -
-> > -Example:
-> > -
-> > -     uart-bam: dma@f9984000 = {
-> > -             compatible = "qcom,bam-v1.4.0";
-> > -             reg = <0xf9984000 0x15000>;
-> > -             interrupts = <0 94 0>;
-> > -             clocks = <&gcc GCC_BAM_DMA_AHB_CLK>;
-> > -             clock-names = "bam_clk";
-> > -             #dma-cells = <1>;
-> > -             qcom,ee = <0>;
-> > -     };
-> > -
-> > -DMA clients must use the format described in the dma.txt file, using a two cell
-> > -specifier for each channel.
-> > -
-> > -Example:
-> > -     serial@f991e000 {
-> > -             compatible = "qcom,msm-uart";
-> > -             reg = <0xf991e000 0x1000>
-> > -                     <0xf9944000 0x19000>;
-> > -             interrupts = <0 108 0>;
-> > -             clocks = <&gcc GCC_BLSP1_UART2_APPS_CLK>,
-> > -                     <&gcc GCC_BLSP1_AHB_CLK>;
-> > -             clock-names = "core", "iface";
-> > -
-> > -             dmas = <&uart-bam 0>, <&uart-bam 1>;
-> > -             dma-names = "rx", "tx";
-> > -     };
-> > diff --git a/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml b/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
-> > new file mode 100644
-> > index 000000000000..3ca222bd10bd
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/dma/qcom_bam_dma.yaml
-> > @@ -0,0 +1,91 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/dma/qcom_bam_dma.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: QCOM BAM DMA controller binding
-> > +
-> > +maintainers:
-> > +  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> > +
-> > +description: |
-> > +  This document defines the binding for the BAM DMA controller
-> > +  found on Qualcomm parts.
-> > +
-> > +allOf:
-> > +  - $ref: "dma-controller.yaml#"
-> > +
-> > +properties:
-> > +  compatible:
-> > +    enum:
-> > +      - qcom,bam-v1.3.0 # for APQ8064, IPQ8064 and MSM8960
-> > +      - qcom,bam-v1.4.0 # for MSM8974, APQ8074 and APQ8084
-> > +      - qcom,bam-v1.7.0 # for MSM8916
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    maxItems: 1
-> > +
-> > +  clock-names:
-> > +    const: bam_clk
-> > +
-> > +  interrupts:
-> > +    minItems: 1
-> > +    maxItems: 31
->
-> The old binding uses the wording "the one interrupt" and at least the
-> Linux implementation indicates that there's only a single interrupt.
->
-> So I think this should just be maxItems: 1
->
-> > +
-> > +  num-channels:
-> > +    maximum: 31
-> > +    description:
-> > +      Indicates supported number of DMA channels in a remotely controlled bam.
-> > +
-> > +  "#dma-cells":
-> > +    const: 1
-> > +    description: The single cell represents the channel index.
-> > +
-> > +  qcom,ee:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    minimum: 0
-> > +    maximum: 7
-> > +    description:
-> > +      Indicates the active Execution Environment identifier (0-7)
-> > +      used in the secure world.
-> > +
-> > +  qcom,controlled-remotely:
-> > +    $ref: /schemas/types.yaml#/definitions/flag
-> > +    description:
-> > +      Indicates that the bam is controlled by remote proccessor i.e.
-> > +      execution environment.
-> > +
-> > +  qcom,num-ees:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    minimum: 0
-> > +    maximum: 31
-> > +    default: 2
-> > +    description:
-> > +      Indicates supported number of Execution Environments in a
-> > +      remotely controlled bam.
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - interrupts
-> > +  - "#dma-cells"
-> > +  - qcom,ee
-> > +
-> > +additionalProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    #include <dt-bindings/clock/qcom,gcc-msm8974.h>
-> > +    dma-controller@f9984000 {
-> > +        compatible = "qcom,bam-v1.4.0";
-> > +        reg = <0xf9984000 0x15000>;
-> > +        interrupts = <0 94 0>;
->
-> While the txt->yaml conversion should retain the original content, I
-> think it's okay to fix this line up while you're at it; and make it:
->
->         interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
+The keys subsystem uses the counter KDF with a hash primitive. Thus,
+it only uses the call to crypto_kdf108_ctr_generate.
 
-Sure, will do this in v6.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ security/keys/Kconfig |  2 +-
+ security/keys/dh.c    | 97 +++++++------------------------------------
+ 2 files changed, 15 insertions(+), 84 deletions(-)
 
-Regards,
-Bhupesh
+diff --git a/security/keys/Kconfig b/security/keys/Kconfig
+index 64b81abd087e..969122c7b92f 100644
+--- a/security/keys/Kconfig
++++ b/security/keys/Kconfig
+@@ -109,7 +109,7 @@ config KEY_DH_OPERATIONS
+        bool "Diffie-Hellman operations on retained keys"
+        depends on KEYS
+        select CRYPTO
+-       select CRYPTO_HASH
++       select CRYPTO_KDF800108_CTR
+        select CRYPTO_DH
+        help
+ 	 This option provides support for calculating Diffie-Hellman
+diff --git a/security/keys/dh.c b/security/keys/dh.c
+index 56e12dae4534..46fa442b81ec 100644
+--- a/security/keys/dh.c
++++ b/security/keys/dh.c
+@@ -11,6 +11,7 @@
+ #include <crypto/hash.h>
+ #include <crypto/kpp.h>
+ #include <crypto/dh.h>
++#include <crypto/kdf_sp800108.h>
+ #include <keys/user-type.h>
+ #include "internal.h"
+ 
+@@ -79,16 +80,9 @@ static void dh_crypto_done(struct crypto_async_request *req, int err)
+ 	complete(&compl->completion);
+ }
+ 
+-struct kdf_sdesc {
+-	struct shash_desc shash;
+-	char ctx[];
+-};
+-
+-static int kdf_alloc(struct kdf_sdesc **sdesc_ret, char *hashname)
++static int kdf_alloc(struct crypto_shash **hash, char *hashname)
+ {
+ 	struct crypto_shash *tfm;
+-	struct kdf_sdesc *sdesc;
+-	int size;
+ 	int err;
+ 
+ 	/* allocate synchronous hash */
+@@ -102,14 +96,7 @@ static int kdf_alloc(struct kdf_sdesc **sdesc_ret, char *hashname)
+ 	if (crypto_shash_digestsize(tfm) == 0)
+ 		goto out_free_tfm;
+ 
+-	err = -ENOMEM;
+-	size = sizeof(struct shash_desc) + crypto_shash_descsize(tfm);
+-	sdesc = kmalloc(size, GFP_KERNEL);
+-	if (!sdesc)
+-		goto out_free_tfm;
+-	sdesc->shash.tfm = tfm;
+-
+-	*sdesc_ret = sdesc;
++	*hash = tfm;
+ 
+ 	return 0;
+ 
+@@ -118,76 +105,20 @@ static int kdf_alloc(struct kdf_sdesc **sdesc_ret, char *hashname)
+ 	return err;
+ }
+ 
+-static void kdf_dealloc(struct kdf_sdesc *sdesc)
+-{
+-	if (!sdesc)
+-		return;
+-
+-	if (sdesc->shash.tfm)
+-		crypto_free_shash(sdesc->shash.tfm);
+-
+-	kfree_sensitive(sdesc);
+-}
+-
+-/*
+- * Implementation of the KDF in counter mode according to SP800-108 section 5.1
+- * as well as SP800-56A section 5.8.1 (Single-step KDF).
+- *
+- * SP800-56A:
+- * The src pointer is defined as Z || other info where Z is the shared secret
+- * from DH and other info is an arbitrary string (see SP800-56A section
+- * 5.8.1.2).
+- *
+- * 'dlen' must be a multiple of the digest size.
+- */
+-static int kdf_ctr(struct kdf_sdesc *sdesc, const u8 *src, unsigned int slen,
+-		   u8 *dst, unsigned int dlen)
++static void kdf_dealloc(struct crypto_shash *hash)
+ {
+-	struct shash_desc *desc = &sdesc->shash;
+-	unsigned int h = crypto_shash_digestsize(desc->tfm);
+-	int err = 0;
+-	u8 *dst_orig = dst;
+-	__be32 counter = cpu_to_be32(1);
+-
+-	while (dlen) {
+-		err = crypto_shash_init(desc);
+-		if (err)
+-			goto err;
+-
+-		err = crypto_shash_update(desc, (u8 *)&counter, sizeof(__be32));
+-		if (err)
+-			goto err;
+-
+-		if (src && slen) {
+-			err = crypto_shash_update(desc, src, slen);
+-			if (err)
+-				goto err;
+-		}
+-
+-		err = crypto_shash_final(desc, dst);
+-		if (err)
+-			goto err;
+-
+-		dlen -= h;
+-		dst += h;
+-		counter = cpu_to_be32(be32_to_cpu(counter) + 1);
+-	}
+-
+-	return 0;
+-
+-err:
+-	memzero_explicit(dst_orig, dlen);
+-	return err;
++	if (hash)
++		crypto_free_shash(hash);
+ }
+ 
+-static int keyctl_dh_compute_kdf(struct kdf_sdesc *sdesc,
++static int keyctl_dh_compute_kdf(struct crypto_shash *hash,
+ 				 char __user *buffer, size_t buflen,
+ 				 uint8_t *kbuf, size_t kbuflen)
+ {
++	struct kvec kbuf_iov = { .iov_base = kbuf, .iov_len = kbuflen };
+ 	uint8_t *outbuf = NULL;
+ 	int ret;
+-	size_t outbuf_len = roundup(buflen,
+-				    crypto_shash_digestsize(sdesc->shash.tfm));
++	size_t outbuf_len = roundup(buflen, crypto_shash_digestsize(hash));
+ 
+ 	outbuf = kmalloc(outbuf_len, GFP_KERNEL);
+ 	if (!outbuf) {
+@@ -195,7 +126,7 @@ static int keyctl_dh_compute_kdf(struct kdf_sdesc *sdesc,
+ 		goto err;
+ 	}
+ 
+-	ret = kdf_ctr(sdesc, kbuf, kbuflen, outbuf, outbuf_len);
++	ret = crypto_kdf108_ctr_generate(hash, &kbuf_iov, 1, outbuf, outbuf_len);
+ 	if (ret)
+ 		goto err;
+ 
+@@ -224,7 +155,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
+ 	struct kpp_request *req;
+ 	uint8_t *secret;
+ 	uint8_t *outbuf;
+-	struct kdf_sdesc *sdesc = NULL;
++	struct crypto_shash *hash = NULL;
+ 
+ 	if (!params || (!buffer && buflen)) {
+ 		ret = -EINVAL;
+@@ -257,7 +188,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
+ 		}
+ 
+ 		/* allocate KDF from the kernel crypto API */
+-		ret = kdf_alloc(&sdesc, hashname);
++		ret = kdf_alloc(&hash, hashname);
+ 		kfree(hashname);
+ 		if (ret)
+ 			goto out1;
+@@ -367,7 +298,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
+ 			goto out6;
+ 		}
+ 
+-		ret = keyctl_dh_compute_kdf(sdesc, buffer, buflen, outbuf,
++		ret = keyctl_dh_compute_kdf(hash, buffer, buflen, outbuf,
+ 					    req->dst_len + kdfcopy->otherinfolen);
+ 	} else if (copy_to_user(buffer, outbuf, req->dst_len) == 0) {
+ 		ret = req->dst_len;
+@@ -386,7 +317,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
+ out2:
+ 	dh_free_data(&dh_inputs);
+ out1:
+-	kdf_dealloc(sdesc);
++	kdf_dealloc(hash);
+ 	return ret;
+ }
+ 
+-- 
+2.33.1
 
-> > +        clocks = <&gcc GCC_BAM_DMA_AHB_CLK>;
-> > +        clock-names = "bam_clk";
-> > +        #dma-cells = <1>;
-> > +        qcom,ee = <0>;
-> > +    };
-> > --
-> > 2.31.1
-> >
+
+
+
