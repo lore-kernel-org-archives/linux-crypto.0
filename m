@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EDA6C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:04:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E1BC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:04:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76EFA61B53
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:04:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 660CA61B53
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 12:04:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231263AbhKOMHi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 07:07:38 -0500
-Received: from mga09.intel.com ([134.134.136.24]:13651 "EHLO mga09.intel.com"
+        id S231446AbhKOMHn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 07:07:43 -0500
+Received: from mga09.intel.com ([134.134.136.24]:13626 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231538AbhKOMHJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 07:07:09 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="233265576"
+        id S231449AbhKOMH3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Nov 2021 07:07:29 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="233265598"
 X-IronPort-AV: E=Sophos;i="5.87,236,1631602800"; 
-   d="scan'208";a="233265576"
+   d="scan'208";a="233265598"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2021 04:04:12 -0800
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2021 04:04:19 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,236,1631602800"; 
-   d="scan'208";a="535486452"
+   d="scan'208";a="535486515"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
-  by orsmga001.jf.intel.com with ESMTP; 15 Nov 2021 04:04:10 -0800
+  by orsmga001.jf.intel.com with ESMTP; 15 Nov 2021 04:04:17 -0800
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         marco.chiappero@intel.com,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v2 14/24] crypto: qat - differentiate between pf2vf and vf2pf offset
-Date:   Mon, 15 Nov 2021 12:03:26 +0000
-Message-Id: <20211115120336.22292-15-giovanni.cabiddu@intel.com>
+Subject: [PATCH v2 18/24] crypto: qat - reorganize PFVF protocol definitions
+Date:   Mon, 15 Nov 2021 12:03:30 +0000
+Message-Id: <20211115120336.22292-19-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211115120336.22292-1-giovanni.cabiddu@intel.com>
 References: <20211115120336.22292-1-giovanni.cabiddu@intel.com>
@@ -44,109 +44,82 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Marco Chiappero <marco.chiappero@intel.com>
 
-Add the function get_vf2pf_offset() to adf_pfvf_ops to differentiate the
-CSRs used for pf2vf and vf2pf.
-
-Offsets may or may not be direction specific depending on QAT
-generation. Since in QAT GEN2 the CSR is not direction specific, i.e.
-there is a single mailbox register shared for pf2vf and vf2pf, both
-get_vf2pf_offset() and get_vf2pf_offset() will return the same offset.
-
-This change is to make the direction explicit, so it is easier to
-understand and debug and also in preparation for the introduction of
-PFVF support in the qat_4xxx driver since QAT GEN4 devices have a
-separate CSR for pf2vf and vf2pf communications.
+Organize PFVF protocol definitions by type rather than direction, by
+keeping related fields close.
+Also, make sure the order is consistent for both PF and VF definitions.
 
 Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/qat/qat_common/adf_accel_devices.h |  1 +
- drivers/crypto/qat/qat_common/adf_gen2_pfvf.c     | 10 ++++++----
- drivers/crypto/qat/qat_common/adf_pf2vf_msg.c     |  6 +++---
- 3 files changed, 10 insertions(+), 7 deletions(-)
+ drivers/crypto/qat/qat_common/adf_pfvf_msg.h | 36 +++++++++++---------
+ 1 file changed, 19 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-index 67a362021997..08bb51321c32 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-@@ -150,6 +150,7 @@ struct adf_etr_ring_data;
- struct adf_pfvf_ops {
- 	int (*enable_comms)(struct adf_accel_dev *accel_dev);
- 	u32 (*get_pf2vf_offset)(u32 i);
-+	u32 (*get_vf2pf_offset)(u32 i);
- 	u32 (*get_vf2pf_sources)(void __iomem *pmisc_addr);
- 	void (*enable_vf2pf_interrupts)(void __iomem *pmisc_bar_addr, u32 vf_mask);
- 	void (*disable_vf2pf_interrupts)(void __iomem *pmisc_bar_addr, u32 vf_mask);
-diff --git a/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c b/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
-index 1ed7a6f002ce..9bd45878eedf 100644
---- a/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
-+++ b/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
-@@ -12,12 +12,12 @@
- #define ADF_GEN2_PF_PF2VF_OFFSET(i)	(0x3A000 + 0x280 + ((i) * 0x04))
- #define ADF_GEN2_VF_PF2VF_OFFSET	0x200
+diff --git a/drivers/crypto/qat/qat_common/adf_pfvf_msg.h b/drivers/crypto/qat/qat_common/adf_pfvf_msg.h
+index 0520466563fd..23f4c4b35dac 100644
+--- a/drivers/crypto/qat/qat_common/adf_pfvf_msg.h
++++ b/drivers/crypto/qat/qat_common/adf_pfvf_msg.h
+@@ -53,34 +53,21 @@
+  * adf_gen2_pfvf_send() in adf_pf2vf_msg.c).
+  */
  
--static u32 adf_gen2_pf_get_pf2vf_offset(u32 i)
-+static u32 adf_gen2_pf_get_pfvf_offset(u32 i)
- {
- 	return ADF_GEN2_PF_PF2VF_OFFSET(i);
- }
+-#define ADF_PFVF_COMPAT_THIS_VERSION		0x1	/* PF<->VF compat */
+-
+ /* PF->VF messages */
+ #define ADF_PF2VF_INT				BIT(0)
+ #define ADF_PF2VF_MSGORIGIN_SYSTEM		BIT(1)
++#define ADF_PF2VF_IN_USE_BY_PF			0x6AC20000
++#define ADF_PF2VF_IN_USE_BY_PF_MASK		0xFFFE0000
+ #define ADF_PF2VF_MSGTYPE_MASK			0x0000003C
+ #define ADF_PF2VF_MSGTYPE_SHIFT			2
+ #define ADF_PF2VF_MSGTYPE_RESTARTING		0x01
+ #define ADF_PF2VF_MSGTYPE_VERSION_RESP		0x02
+-#define ADF_PF2VF_IN_USE_BY_PF			0x6AC20000
+-#define ADF_PF2VF_IN_USE_BY_PF_MASK		0xFFFE0000
+-
+-/* PF->VF Version Response */
+-#define ADF_PF2VF_VERSION_RESP_VERS_MASK	0x00003FC0
+-#define ADF_PF2VF_VERSION_RESP_VERS_SHIFT	6
+-#define ADF_PF2VF_VERSION_RESP_RESULT_MASK	0x0000C000
+-#define ADF_PF2VF_VERSION_RESP_RESULT_SHIFT	14
+-#define ADF_PF2VF_MINORVERSION_SHIFT		6
+-#define ADF_PF2VF_MAJORVERSION_SHIFT		10
+-#define ADF_PF2VF_VF_COMPATIBLE			1
+-#define ADF_PF2VF_VF_INCOMPATIBLE		2
+-#define ADF_PF2VF_VF_COMPAT_UNKNOWN		3
  
--static u32 adf_gen2_vf_get_pf2vf_offset(u32 i)
-+static u32 adf_gen2_vf_get_pfvf_offset(u32 i)
- {
- 	return ADF_GEN2_VF_PF2VF_OFFSET;
- }
-@@ -62,7 +62,8 @@ static void adf_gen2_disable_vf2pf_interrupts(void __iomem *pmisc_addr, u32 vf_m
- void adf_gen2_init_pf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops)
- {
- 	pfvf_ops->enable_comms = adf_enable_pf2vf_comms;
--	pfvf_ops->get_pf2vf_offset = adf_gen2_pf_get_pf2vf_offset;
-+	pfvf_ops->get_pf2vf_offset = adf_gen2_pf_get_pfvf_offset;
-+	pfvf_ops->get_vf2pf_offset = adf_gen2_pf_get_pfvf_offset;
- 	pfvf_ops->get_vf2pf_sources = adf_gen2_get_vf2pf_sources;
- 	pfvf_ops->enable_vf2pf_interrupts = adf_gen2_enable_vf2pf_interrupts;
- 	pfvf_ops->disable_vf2pf_interrupts = adf_gen2_disable_vf2pf_interrupts;
-@@ -72,6 +73,7 @@ EXPORT_SYMBOL_GPL(adf_gen2_init_pf_pfvf_ops);
- void adf_gen2_init_vf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops)
- {
- 	pfvf_ops->enable_comms = adf_enable_vf2pf_comms;
--	pfvf_ops->get_pf2vf_offset = adf_gen2_vf_get_pf2vf_offset;
-+	pfvf_ops->get_pf2vf_offset = adf_gen2_vf_get_pfvf_offset;
-+	pfvf_ops->get_vf2pf_offset = adf_gen2_vf_get_pfvf_offset;
- }
- EXPORT_SYMBOL_GPL(adf_gen2_init_vf_pfvf_ops);
-diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
-index 78dc8aea4866..c420ec03081b 100644
---- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
-+++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
-@@ -29,7 +29,7 @@ static int adf_iov_putmsg(struct adf_accel_dev *accel_dev, u32 msg, u8 vf_nr)
- 	int ret;
+ /* VF->PF messages */
+-#define ADF_VF2PF_IN_USE_BY_VF			0x00006AC2
+-#define ADF_VF2PF_IN_USE_BY_VF_MASK		0x0000FFFE
+ #define ADF_VF2PF_INT				BIT(16)
+ #define ADF_VF2PF_MSGORIGIN_SYSTEM		BIT(17)
++#define ADF_VF2PF_IN_USE_BY_VF			0x00006AC2
++#define ADF_VF2PF_IN_USE_BY_VF_MASK		0x0000FFFE
+ #define ADF_VF2PF_MSGTYPE_MASK			0x003C0000
+ #define ADF_VF2PF_MSGTYPE_SHIFT			18
+ #define ADF_VF2PF_MSGTYPE_INIT			0x3
+@@ -88,6 +75,21 @@
+ #define ADF_VF2PF_MSGTYPE_VERSION_REQ		0x5
+ #define ADF_VF2PF_MSGTYPE_COMPAT_VER_REQ	0x6
  
- 	if (accel_dev->is_vf) {
--		pf2vf_offset = hw_data->pfvf_ops.get_pf2vf_offset(0);
-+		pf2vf_offset = hw_data->pfvf_ops.get_vf2pf_offset(0);
- 		lock = &accel_dev->vf.vf2pf_lock;
- 		local_in_use_mask = ADF_VF2PF_IN_USE_BY_VF_MASK;
- 		local_in_use_pattern = ADF_VF2PF_IN_USE_BY_VF;
-@@ -258,7 +258,7 @@ bool adf_recv_and_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr)
- 	u32 msg, resp = 0;
++/* VF/PF compatibility version. */
++/* Reference to the current version */
++#define ADF_PFVF_COMPAT_THIS_VERSION		1  /* PF<->VF compat */
++
++/* PF->VF Version Response */
++#define ADF_PF2VF_MINORVERSION_SHIFT		6
++#define ADF_PF2VF_MAJORVERSION_SHIFT		10
++#define ADF_PF2VF_VERSION_RESP_VERS_MASK	0x00003FC0
++#define ADF_PF2VF_VERSION_RESP_VERS_SHIFT	6
++#define ADF_PF2VF_VERSION_RESP_RESULT_MASK	0x0000C000
++#define ADF_PF2VF_VERSION_RESP_RESULT_SHIFT	14
++#define ADF_PF2VF_VF_COMPATIBLE			1
++#define ADF_PF2VF_VF_INCOMPATIBLE		2
++#define ADF_PF2VF_VF_COMPAT_UNKNOWN		3
++
+ /* VF->PF Compatible Version Request */
+ #define ADF_VF2PF_COMPAT_VER_REQ_SHIFT		22
  
- 	/* Read message from the VF */
--	msg = ADF_CSR_RD(pmisc_addr, hw_data->pfvf_ops.get_pf2vf_offset(vf_nr));
-+	msg = ADF_CSR_RD(pmisc_addr, hw_data->pfvf_ops.get_vf2pf_offset(vf_nr));
- 	if (!(msg & ADF_VF2PF_INT)) {
- 		dev_info(&GET_DEV(accel_dev),
- 			 "Spurious VF2PF interrupt, msg %X. Ignored\n", msg);
-@@ -275,7 +275,7 @@ bool adf_recv_and_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr)
- 
- 	/* To ACK, clear the VF2PFINT bit */
- 	msg &= ~ADF_VF2PF_INT;
--	ADF_CSR_WR(pmisc_addr, hw_data->pfvf_ops.get_pf2vf_offset(vf_nr), msg);
-+	ADF_CSR_WR(pmisc_addr, hw_data->pfvf_ops.get_vf2pf_offset(vf_nr), msg);
- 
- 	if (adf_handle_vf2pf_msg(accel_dev, vf_nr, msg, &resp))
- 		return false;
 -- 
 2.33.1
 
