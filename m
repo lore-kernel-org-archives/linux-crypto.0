@@ -2,129 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C4AC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 16:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 790C3C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 16:45:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 087366121F
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 16:36:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CE6663210
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 16:45:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229926AbhKOQjn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 11:39:43 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:38960 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbhKOQjm (ORCPT
+        id S231697AbhKOQrs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 11:47:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58862 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230214AbhKOQro (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 11:39:42 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id ADF0C21963;
-        Mon, 15 Nov 2021 16:36:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1636994204; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KaxLLvOzT2j0Wu9dqBqHu9yCvP/s1KUCxOnuX46wnVA=;
-        b=he4TGX9CCcoX9/xXoCbB0UxgFOrjKc1RzoBySqim3b/w3FBOXaeZwd3V3U1bT1rA/IAn1R
-        J2mBfc4U6M/FVEePMWZtXKurPrHYW/yxmASOgplvEI4MIuZ3H3jGcOJRXL+tzJnGqevv+Y
-        wMYM5lgnZ4t6UW5A61tSSoOBaIVgo2A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1636994204;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KaxLLvOzT2j0Wu9dqBqHu9yCvP/s1KUCxOnuX46wnVA=;
-        b=S0VKXJLr2wASWTbLab+KzHlL9SuDHyjQngmMOY+f3n/XRzjRcfUq2/tsnSvaNmpM2X6tdm
-        SrpcQrZrz7zrGKBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4D48C139EC;
-        Mon, 15 Nov 2021 16:36:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id qQ0MEZuMkmG8CAAAMHmgww
-        (envelope-from <jroedel@suse.de>); Mon, 15 Nov 2021 16:36:43 +0000
-Date:   Mon, 15 Nov 2021 17:36:41 +0100
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
+        Mon, 15 Nov 2021 11:47:44 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 287BAC061714
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 08:44:43 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id d27so31994172wrb.6
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 08:44:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=ebmLJNm972HwzSUFY9uX5jVcx5/iRccpx4YVQ/Ccmok=;
+        b=g0iqrBMJQyEnc9qSvvS/XvHhd4djVrsEvm98CX1l0gQprLyW37oWizStTVfu+JpU4j
+         1snhgegTeq2Go6+vBUOrpXihNI10YMbkcvvXaEwefmt0nfKCUqM6py3tUZZT1Yz+ysvt
+         RtY0+uWnRT0CdzccrmRVIVXM3cI2M0sPczP6vvdlmzk8FrzjyEthEg9YPZL+bo2ajWHS
+         EIUTacEpVfIuOn/rHjnvRUH4nNnMrd2RlGND++F7kkjRGZrkroOEqdM26t6d1RsdGwrK
+         OgfAqIsE5ct/iU3rWgdDMBkLWE8Ys1mZWvoN7azO5tlcvifNOBh4n+QQwZMY/xUjR6Uj
+         4KlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ebmLJNm972HwzSUFY9uX5jVcx5/iRccpx4YVQ/Ccmok=;
+        b=QLEbcTo+/znE3eGNYbVQXuO9O5aRhjQXXssad9sNEPpUweSWbPK/mndzwx/GAYdyu6
+         m5+JJMlBEl1FCBGDoYUEgkMyUqOuxmbqJOOFxNfTdkVGOUD2l23rRalMsAaLCKFH0riG
+         aWo9QnUDJG8bIbSTp68aPQ92eYMi87lJI7Lqz84UuZ2LA3FL1ktJYOSmzLRcKOK+i0Au
+         yNkhAVWUM09rqjOtSiHGP46BtWWyw9S4rPqM3rVJhpb31H1kdl9JiPwGBqox/51ekf0I
+         8WEfyePEWYBQVY1vMJbK+uv0TGVxHTE0Eaidi3t7auM77Nt8g85FdSHO+9osKQ+DnS4W
+         Uw5A==
+X-Gm-Message-State: AOAM53040VeTmT1TBQMEHKeuhyGbC4gotu4l1TymXEBdiYZKAcY7gdll
+        J12k36eGp4le9i6UicIPJLJfhQ==
+X-Google-Smtp-Source: ABdhPJwPwppatgTfARevG5qj57LzkviHyAEVrbH6osVFyFMK9ugSZOG8qsD/QNJudQxR5pXFv4wYIw==
+X-Received: by 2002:adf:e810:: with SMTP id o16mr394870wrm.359.1636994681553;
+        Mon, 15 Nov 2021 08:44:41 -0800 (PST)
+Received: from elver.google.com ([2a00:79e0:15:13:6385:6bd0:4ede:d8c6])
+        by smtp.gmail.com with ESMTPSA id 126sm19916816wmz.28.2021.11.15.08.44.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 08:44:40 -0800 (PST)
+Date:   Mon, 15 Nov 2021 17:44:33 +0100
+From:   Marco Elver <elver@google.com>
+To:     Kees Cook <keescook@chromium.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Nick Terrell <terrelln@fb.com>,
+        Rob Clark <robdclark@gmail.com>,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        Helge Deller <deller@gmx.de>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Sergio Paracuellos <sergio.paracuellos@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Joey Gouly <joey.gouly@arm.com>,
+        Stan Skowronek <stan@corellium.com>,
+        Hector Martin <marcan@marcan.st>,
+        Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+        =?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@collabora.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Message-ID: <YZKMmciB+wJyrmFI@suse.de>
-References: <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
- <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com>
- <YY7I6sgqIPubTrtA@zn.tnic>
- <YY7Qp8c/gTD1rT86@google.com>
- <YY7USItsMPNbuSSG@zn.tnic>
- <CAMkAt6o909yYq3NfRboF3U3V8k-2XGb9p_WcQuvSjOKokmMzMA@mail.gmail.com>
- <YY8AJnMo9nh3tyPB@google.com>
- <CAA03e5G=fY7_qESCuoHW3_VdVbDWekqQxmvLPzWNepBqJjyCXg@mail.gmail.com>
- <YZAFTBXtC/yS7xtq@google.com>
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Parisc List <linux-parisc@vger.kernel.org>,
+        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        linux-ntfs-dev@lists.sourceforge.net,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        kasan-dev <kasan-dev@googlegroups.com>
+Subject: Re: Build regressions/improvements in v5.16-rc1
+Message-ID: <YZKOce4XhAU49+Yn@elver.google.com>
+References: <20211115155105.3797527-1-geert@linux-m68k.org>
+ <CAMuHMdUCsyUxaEf1Lz7+jMnur4ECwK+JoXQqmOCkRKqXdb1hTQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YZAFTBXtC/yS7xtq@google.com>
+In-Reply-To: <CAMuHMdUCsyUxaEf1Lz7+jMnur4ECwK+JoXQqmOCkRKqXdb1hTQ@mail.gmail.com>
+User-Agent: Mutt/2.0.5 (2021-01-21)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Nov 13, 2021 at 06:34:52PM +0000, Sean Christopherson wrote:
-> I'm not treating it nonchalantly, merely acknowledging that (a) some flavors of kernel
-> bugs (or hardware issues!) are inherently fatal to the system, and (b) crashing the
-> host may be preferable to continuing on in certain cases, e.g. if continuing on has a
-> high probablity of corrupting guest data.
+On Mon, Nov 15, 2021 at 05:12PM +0100, Geert Uytterhoeven wrote:
+[...]
+> >   + /kisskb/src/include/linux/fortify-string.h: error: call to '__read_overflow' declared with attribute error: detected read beyond size of object (1st parameter):  => 263:25, 277:17
+> 
+>     in lib/test_kasan.c
+> 
+> s390-all{mod,yes}config
+> arm64-allmodconfig (gcc11)
 
-The problem here is that for SNP host-side RMP faults it will often not
-be clear at fault-time if it was caused by wrong guest or host behavior. 
+Kees, wasn't that what [1] was meant to fix?
+[1] https://lkml.kernel.org/r/20211006181544.1670992-1-keescook@chromium.org
 
-I agree with Marc that crashing the host is not the right thing to do in
-this situation. Instead debug data should be collected to do further
-post-mortem analysis.
-
-Regards,
-
--- 
-Jörg Rödel
-jroedel@suse.de
-
-SUSE Software Solutions Germany GmbH
-Maxfeldstr. 5
-90409 Nürnberg
-Germany
- 
-(HRB 36809, AG Nürnberg)
-Geschäftsführer: Ivo Totev
-
+Thanks,
+-- Marco
