@@ -2,193 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 953E1C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 15:26:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76008C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 15:33:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B7D261AA5
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 15:26:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F16E63227
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Nov 2021 15:33:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236534AbhKOP3e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 10:29:34 -0500
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:54530 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236499AbhKOP3a (ORCPT
+        id S236805AbhKOPgb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 10:36:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35577 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236614AbhKOPgI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 10:29:30 -0500
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AFEpgqA005201;
-        Mon, 15 Nov 2021 15:26:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=iFXjXsu5byYWWp3tZbGZbVPZ/suJcv2fpB1ETK7Yuhs=;
- b=sRWf6m//bG777yG91xR8eh5gRM8J9vC9viUlkcGm2zIpQ6yg2GkA7XDwLU/GQAcPxtmW
- k/e2hzmBFvZuvBDwL4dpkgpBmZQ7djRNParQQBWiDpxgbPdth7tUeHexh9psTuCuC7P5
- Hnw3zdoidv16fnzwbjKYlYcdv88tHpEFUjNN4jfx/1h3w8beNS/dwM2CXeO+5gNXvm7k
- BXAEVFqSrxNEWYsGjl/7vkMihTu3oZoJ4oFKIQrw96fHwSgmuTYL1KdejR37J5H21VLg
- oHgeuw/mfz0IJOHijChxcj/UiZHrdvX7i7h2oilzCLjwr17CS/1vNhwqGCrB8jJ2aNo2 CQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3cbfjxk8fh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 Nov 2021 15:26:14 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1AFFKMPp159326;
-        Mon, 15 Nov 2021 15:25:47 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2173.outbound.protection.outlook.com [104.47.56.173])
-        by aserp3030.oracle.com with ESMTP id 3ca3dej057-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 Nov 2021 15:25:46 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mH2UmENxWC5v0Auf8C4qCrwfEejF50a4sNKAxriQOyBWsKvygEjjBu6F8K2swgVS29+FJh+ZHKZQxxj7afn0+NDhj5ScrRSE12oUl8GmjbeW7hh5gMSSml2i1X/zTCzpuhtAyw2zeEiPBc25T7Nbri2Ze/UDaGVgwmsF2rzy68723zmtXiG9w+zSKvqB/bjlJm0a/LybzDq1Uj0YtCB871JK9Wgn1YRBdFhkIuemwFLe6Ex/zBRcl50RGI/zK1gOlTIx4OwTzK81ZYMIscBhkU4RGESKOm6enk8YFU5NBUD2bIo+gZk7A1P9Jcp1wNQmDwABPFgZQraTiEpb3mxyUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iFXjXsu5byYWWp3tZbGZbVPZ/suJcv2fpB1ETK7Yuhs=;
- b=LQZjsl87dtwiYHKi1y1I+kQym0akHpH/iGUC/qJ6iM37md5ubUKRbM0rDPurbRw8uq5JiSYR7yw5qrp78NQZv3UlS7x+niI/d9zynWNxdWjvyfuGkk5ytF5m0SI3wb+OvfhgRAaMwZHHITWWwMtpotDUt9ddpgADY9yBB4CXXuojqIzV5DHg6zL8v/79HDVlaeZGjwKkyaP6tFeScZlpFg0LOHWG2HuvvNe4tjVfg9HIf5rMU5Vc46MhwL5y7u4hbxDTOKExb63vxMUdidr+e1uRZYNcWQssvrE+i4pY1GMEo57CwmxCqOKq3i0u12EfKzchAb+anmrRqStfXuqn9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iFXjXsu5byYWWp3tZbGZbVPZ/suJcv2fpB1ETK7Yuhs=;
- b=HmMk6ryzy9UJdKC6gGSWnH7w4bigbVOhCyN9HvG5Gl+1MkSh3uNTyaa0cb5n4R598WvTK9QZJssFZb68O5JNNbYLOVADdCS0kYdDRnudOKRTcLKiGhQuXErvONS+6qH78IYq5WNef1Je24X5bnGdZUcIapibP3TyA0keBu3l8EU=
-Received: from SN6PR10MB2943.namprd10.prod.outlook.com (2603:10b6:805:d4::19)
- by SN6PR10MB2510.namprd10.prod.outlook.com (2603:10b6:805:3f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.26; Mon, 15 Nov
- 2021 15:25:45 +0000
-Received: from SN6PR10MB2943.namprd10.prod.outlook.com
- ([fe80::5dd3:803d:4c46:2d08]) by SN6PR10MB2943.namprd10.prod.outlook.com
- ([fe80::5dd3:803d:4c46:2d08%7]) with mapi id 15.20.4690.027; Mon, 15 Nov 2021
- 15:25:45 +0000
-Message-ID: <4c301e38-5b87-fccb-5e2b-ec5f78895151@oracle.com>
-Date:   Mon, 15 Nov 2021 09:25:42 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 06/12] nvme-fabrics: decode 'authentication required'
- connect error
-Content-Language: en-US
-To:     Hannes Reinecke <hare@suse.de>, Sagi Grimberg <sagi@grimberg.me>
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>
-References: <20211112125928.97318-1-hare@suse.de>
- <20211112125928.97318-7-hare@suse.de>
-From:   Himanshu Madhani <himanshu.madhani@oracle.com>
-Organization: Oracle
-In-Reply-To: <20211112125928.97318-7-hare@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR11CA0018.namprd11.prod.outlook.com
- (2603:10b6:806:6e::23) To SN6PR10MB2943.namprd10.prod.outlook.com
- (2603:10b6:805:d4::19)
+        Mon, 15 Nov 2021 10:36:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636990389;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=APBRR/Tu29EEMq5VPRu2UikpYWd3k5GAcRpc7iagv8Y=;
+        b=iSq5dZ11iKlabDh5S81yAjysNZaK05j+T/3Db3PfuPoWHz+O2DDtCbLnJNoL5Bmm3bf+e3
+        PYnvmk2ruRsjVyrFhr6BCYnvHOx9eCpptvzazpmLTWqq1qwvhX6aHMj1O7ax00tAynE1DY
+        t1MJZUC5uszmBAnOmVeBfxEJeB2nF/k=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-522-3PmOjfI9M4e2ucVGQLtNFg-1; Mon, 15 Nov 2021 10:33:07 -0500
+X-MC-Unique: 3PmOjfI9M4e2ucVGQLtNFg-1
+Received: by mail-wr1-f72.google.com with SMTP id p3-20020a056000018300b00186b195d4ddso3681029wrx.15
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 07:33:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=APBRR/Tu29EEMq5VPRu2UikpYWd3k5GAcRpc7iagv8Y=;
+        b=zDGNuWy0zBOBJ6tJWwv0cK+nvtFbayvNBSwpJGRKIsKvGedLV9a1E1yU/tx3IJEvRa
+         3p+uw2IArlXDQVuRL5MYkPBdhu4nINIa9+JbmZscdHeCpgb9lcRriXOYHj4rN6J05yDj
+         dkM1OfcfR3s6Hb3ZugcG4zwnpY64D37UVEktc9+Y2SgGObV8iZfCOFR+Da2If2DSjhgO
+         BHeBrvaMWapD6oQg3hAGEHciwBDuasaOB27DWVx9RsmVNDu12ONdurrDfLBIVejZlWLw
+         VQFyGHEnTnT4dFBQQM/EIhWebxZfcXSvTlxDWnSCA8P3ZysZYtCjBa0pHR5kay9lklDT
+         0/ww==
+X-Gm-Message-State: AOAM532p4fSzBc9ZkKRNKKYFAez9ZLwX4Arz+IDnv/yTPcOmuKAJMNRW
+        rGh3OrdWuWnXuLVYA/Q+zW02mZ3nvRAT5QnMGCXto0ta2i+PQFbFaYrHoKI7l1YoI1BZN6SB718
+        pVycYMP+M8IUenS5Nbcsb4q8v
+X-Received: by 2002:a1c:f416:: with SMTP id z22mr3828172wma.121.1636990386548;
+        Mon, 15 Nov 2021 07:33:06 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzVEfAw7ZxqSyPXBoql05G+DuRg+Mia/ijEWI8l4vzLqLBTzBiaKW9nePq93987lkPciDsGDA==
+X-Received: by 2002:a1c:f416:: with SMTP id z22mr3828132wma.121.1636990386389;
+        Mon, 15 Nov 2021 07:33:06 -0800 (PST)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id t8sm17359470wmq.32.2021.11.15.07.33.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 07:33:05 -0800 (PST)
+Date:   Mon, 15 Nov 2021 15:33:03 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZJ9rzNOllCwvNEv@work-vm>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
+ <YZJTA1NyLCmVtGtY@work-vm>
+ <YZJx5PcBZ/izVg8L@suse.de>
 MIME-Version: 1.0
-Received: from [192.168.1.28] (70.114.128.235) by SA9PR11CA0018.namprd11.prod.outlook.com (2603:10b6:806:6e::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.15 via Frontend Transport; Mon, 15 Nov 2021 15:25:44 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f14f2233-22c7-4885-aa7f-08d9a84c3157
-X-MS-TrafficTypeDiagnostic: SN6PR10MB2510:
-X-Microsoft-Antispam-PRVS: <SN6PR10MB25101EE5C9AA5F2BB1613A65E6989@SN6PR10MB2510.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:494;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NOOsjMauD149d5W41XQByG7UXdCNLjhroTlOHgX5KVRepiwDHGMFWoE288xROJOSmasdOgBPfzOx3NV/YA6oCrEtlA/Xm8Y8Ps9wW9NqtID4xDSuPRMu6lxB+21OwXlKMD0WjsyaldHx0d0Y98rk2YP5Tj8NQmOMWV9LkmdZdljeJnD21vktNsiKrhys5uK5YL++LoeKzdsRo+jJl7yQrjCCpd79YwM126L4kiM9Z9gWV3n8dBkIBHlJlDqdq3lW0UIIN1brV32GYj/IIdHNAkKvpw6mlPQUJI0IaHHifoD+1Q1i7eQrEIJ3ZQsKXHmld0EGvpwRCq4uhWEP4UPl+rkPh0KJKcmXU+fs33FzakGwPvr/FxTdQgNZhtlt3IzE/8e2agWt/IBz0m/S3pC8QWTQdHkURKeFlrENYO31OwxWLz6BFPZDis2SIVmAAT7fPO9s+Ryd7oPUunGI1SeMSijFSWfpq41kpd3d1OWOtL+5kQvDjSA44ZUW04aWI9K1u718QlKtPUB+1aymmlt7LRgtLWa/rxC/wzt/Hb3ACEvLWd56Ykf1vzMSw212wYoXfU3P+5f4azJlnJYLbUnIJYUtVo9sBtJRuHzcCUS0jG84TZbmZi2v+OA5w30RilFFSGQiWM63kr6yjQRLGeYVktzFTSaljjfs7vBJf7VbgF0wsi1wBYtlB2oBrLctO5e27GLrZB0c3TgBzry3+TRCZnAlC3aVALN2VwZ1wBF1/hI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB2943.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(16576012)(36756003)(66946007)(38100700002)(26005)(8936002)(316002)(508600001)(44832011)(36916002)(31686004)(8676002)(6486002)(54906003)(2906002)(110136005)(53546011)(2616005)(66556008)(86362001)(4326008)(186003)(66476007)(5660300002)(31696002)(956004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y01oTm93OXEzVEl4YjNidjdFamZyMXBJZUtmanhnTk5hbXJsZ0VGaFY5TlQ5?=
- =?utf-8?B?a2tFWlZjMWdDcDY1WVVJcEc0dGduY3lVTGxHTUljVWxPNmZ6UDBYV244Q2hu?=
- =?utf-8?B?Y1V5dmMwc2hPK29Leno2eHlaTHY3cnpMRWN3UjBqUk16VnZBalFHWStIVDl3?=
- =?utf-8?B?amJpL1JoK1pkMkVOdGs1a0xIV29IQWJNczdqd2FVQTBKekw0a3RHVVFiVktY?=
- =?utf-8?B?ZVRzVlVwZnA2QjJpcTZwdE1ScEVlbXZabmNPUmY4TkE1MzlpNWgvQjNYbk5m?=
- =?utf-8?B?TkpldlBrZjNKRzB2Slh2YnVpdTMvOWQ2LzByOE9UMTlUU28vNEp6M0tOQW1r?=
- =?utf-8?B?NzhnUnJuaU5mNGhNV0JxOGF6WnZpaVJuZ0ZxWTRaZFc0dUNzQmRZZnNuWk44?=
- =?utf-8?B?TzNDL2Z5MzRFd1FrbUZmUk9ERmd4d3IvdExSU0JvUmp5OEU2cFBFV0h3Y0gv?=
- =?utf-8?B?b0xJeTBHelJGWG9ZNTBhd3M3bXVyL01qWUgrTE5BYkpFeDUrbzdXQUJHVEJz?=
- =?utf-8?B?Yko2M0xvYXRZaUhMSGdXWW1tUHpVMFNXQ2hwdzVnbFNJdnpFb3hHenh2bTBC?=
- =?utf-8?B?QVI0RFJmL3ZrWStFWlZFMy9EVVh0MTk0NjVZTEFvQ21vbUloWUtqSyt0cDFF?=
- =?utf-8?B?ZGUyVWFZQzl0YURiNEJtVDJyU3Yvc0lrUjF3OGhWZGFsejdyblU1eVlZOGky?=
- =?utf-8?B?L0hzNTB5Z1RjMUJGcXdZNmpFdDA5by85Y2M3b3pDS0djRTEwWHNtSEpPUmEx?=
- =?utf-8?B?dzZ5WGxtd3U4RFd3L2lzbHJaK3pDVEhTazBhSmY0bXVSVm5aVmdoN0tqQUtq?=
- =?utf-8?B?d0tpOXlZL0dEYUNjQmp6cGlHM3RqVUE1eFBLMTlDUjNhUVpiS29peFNBVWxP?=
- =?utf-8?B?OUdKbnBtcmFBV2VOWVUzOXpyUWJMbi9qSzRCb09PRWJFVXVDM1FCZ2RLNVVS?=
- =?utf-8?B?NWlXWURMeUsyTFBJWm1TcGUvSnBKd3pZNEIyTFJBYkVxYTJkcm5US2w1S1Ra?=
- =?utf-8?B?LzM4aGF5NEptYmp4eFFBVGMrcVZ6b1RHZ1RqRzFSUHZVano4R3NSV3pGMGg5?=
- =?utf-8?B?blN6MGFOUU9XZ1BmTGpNVWkremVrUStUVTBDWkF4bXFId29Ub1I1UzdBNnRQ?=
- =?utf-8?B?Z0FXNnZ5aEJwZHZjMG44WTJBejBTMExMeWRWRFF3MmJLY2xEbGRrb3FpUTJY?=
- =?utf-8?B?OTBENzRuSjJKWkJQZ1JFV0hQR0ZOL29velNVa1graGY4R051ejR5enZQbmU4?=
- =?utf-8?B?QnR2My8xZFlkUXp2cWVoaElnWDJiQTZqVFlTV3NDckJwQ3FwdGV3dXpBTmMy?=
- =?utf-8?B?a2cvUU5MVHFSTy93a1UrNnB3cUQzYzVmcHFtTGdmbEx4RWwrUkdyODRIQWhj?=
- =?utf-8?B?KzZUdUI5clYrVmY4VEREMDk1Ym1oZ29FcXFJQVhObTdIRllRNTJPdzdIOU4w?=
- =?utf-8?B?TGRpTnBpQ0x1bXRNU1ZJQlNsK0tjTHVCRk83Ty9RY1Ewc0tpWXZoRXlia2o0?=
- =?utf-8?B?MDlwRmZSbDRBNGtxRmpHRlpYVWxwQjFJZU1NSTloWll1UW9sZDBJUXlKbEUw?=
- =?utf-8?B?SWx3dWJ0QUo0eXBDZW1DSzZHRGl1RnkyK3dEYjZYMjVUY1ljazQzUWVTcUpY?=
- =?utf-8?B?eFkrNDcrTHZKSm9NT0pYNmNEWkZkdHFCNGJvYWFqUzhUUkxwRERJNE43MGh2?=
- =?utf-8?B?VXZJYmozc3pLejF5citvV2RHRVFEbVE4dDNDcTVlUTJ6WVFBbjZZSWVJeXpV?=
- =?utf-8?B?SFBUZHpib0o3UzFzNmJpYlNBS053MWNCKzRsSHNtaVNOWjFyeXBsUE4veGVa?=
- =?utf-8?B?VXVoa1lHT1Q3cUE5Ukd2NkVDYVpwVkNuWjZPNXB2QzE1bnJtU0QvSXNjM0Rl?=
- =?utf-8?B?Z0wvR3BEVWFNT25sZEltYnNjMlJpU3JPWERiR3IybVNkdTFHNVFXeDBmTkgx?=
- =?utf-8?B?ZEd3ZHlNU2d2WkdEREVhOFJqNDV3b3ppYmQzTjhINjRjTTRBdHAvUzl3RGdw?=
- =?utf-8?B?eUpsSFNLdmpTaVMrSStSejRsbU1MQXFKWFUyeE5JZGVQSHArRGhVc00zdVh4?=
- =?utf-8?B?SHJ3aGMrbEdCUUltWTVzMTcwUVhna1d5NFdRcFY3YUNxTFlPRlQwdko0dWxO?=
- =?utf-8?B?SkhrTzBwU2R4YW5aSlNXR0ZGL0ZLYlZmZHVlSFJCdk1KTnVrckVDalRHZTRD?=
- =?utf-8?B?WDBnVS9GS1hPUU5RT0NLcURraVRZKzlGY3QxT0lpTTNjNzlNWGVvVkJlWGU3?=
- =?utf-8?B?M1l1VnplN1J3QS95MXhrK0RDTzZBPT0=?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f14f2233-22c7-4885-aa7f-08d9a84c3157
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB2943.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2021 15:25:44.9704
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T/QbNXU5uSQenRGtZEYUrHiGQyQNi05wYJP6RoWN0K0Zu8IuHox6fn9fi/LdfXPbCIdVPp9owQl+e4UEUGNgmat5eDbxvlza06OjklQcG+c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR10MB2510
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10168 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 spamscore=0
- adultscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2111150082
-X-Proofpoint-ORIG-GUID: GP5dKMa7TIJsioc777hYEZmZWNDO4L07
-X-Proofpoint-GUID: GP5dKMa7TIJsioc777hYEZmZWNDO4L07
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YZJx5PcBZ/izVg8L@suse.de>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 11/12/21 06:59, Hannes Reinecke wrote:
-> The 'connect' command might fail with NVME_SC_AUTH_REQUIRED, so we
-> should be decoding this error, too.
+* Joerg Roedel (jroedel@suse.de) wrote:
+> On Mon, Nov 15, 2021 at 12:30:59PM +0000, Dr. David Alan Gilbert wrote:
+> > Still; I wonder if it's best to kill the guest - maybe it's best for
+> > the host to kill the guest and leave behind diagnostics of what
+> > happened; for someone debugging the crash, it's going to be less useful
+> > to know that page X was wrongly accessed (which is what the guest would
+> > see), and more useful to know that it was the kernel's vhost-... driver
+> > that accessed it.
 > 
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> ---
->   drivers/nvme/host/fabrics.c | 4 ++++
->   1 file changed, 4 insertions(+)
+> I is best to let the guest #VC on the page when this happens. If it
+> happened because of a guest bug all necessary debugging data is in the
+> guest and only the guest owner can obtain it.
 > 
-> diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
-> index c5a2b71c5268..a1343a0790f6 100644
-> --- a/drivers/nvme/host/fabrics.c
-> +++ b/drivers/nvme/host/fabrics.c
-> @@ -332,6 +332,10 @@ static void nvmf_log_connect_error(struct nvme_ctrl *ctrl,
->   		dev_err(ctrl->device,
->   			"Connect command failed: host path error\n");
->   		break;
-> +	case NVME_SC_AUTH_REQUIRED:
-> +		dev_err(ctrl->device,
-> +			"Connect command failed: authentication required\n");
-> +		break;
->   	default:
->   		dev_err(ctrl->device,
->   			"Connect command failed, error wo/DNR bit: %d\n",
+> Then the guest owner can do a kdump on this unexpected #VC and collect
+> the data to debug the issue. With just killing the guest from the host
+> side this data would be lost.
+
+How would you debug an unexpected access by the host kernel using a
+guests kdump?
+
+Dave
+
+> Regards,
 > 
-
-Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
-
+> 	Joerg
+> 
 -- 
-Himanshu Madhani                                Oracle Linux Engineering
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
