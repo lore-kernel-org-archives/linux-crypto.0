@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BB9CC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E6C4C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:28:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6651B619E8
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:26:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6618E61360
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:28:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235004AbhKPL3t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 06:29:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53234 "EHLO
+        id S234967AbhKPLby (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 06:31:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234874AbhKPL3b (ORCPT
+        with ESMTP id S235030AbhKPLbc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 06:29:31 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64B19C061766;
-        Tue, 16 Nov 2021 03:25:35 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id b184-20020a1c1bc1000000b0033140bf8dd5so2095684wmb.5;
-        Tue, 16 Nov 2021 03:25:35 -0800 (PST)
+        Tue, 16 Nov 2021 06:31:32 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5701C061202;
+        Tue, 16 Nov 2021 03:27:54 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id d72-20020a1c1d4b000000b00331140f3dc8so2118116wmd.1;
+        Tue, 16 Nov 2021 03:27:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:from:date:message-id:subject:to;
-        bh=KIxL8pBMd//z5YINEw+kh9VMjDTIKYH5lzSpZAefCDI=;
-        b=WjtCOMMLpaA8sOhPA/0pKpG5Pjx22ssT5Zy9+XY45U6LQ7ZVk/7eaNAi4nZPfhoT09
-         7R4XhIrksJQ1CdNDDFWh1WJBhfGmzbwc+bGMwxKAC6ttM4G5LOS5AySeONbhcI1xHve/
-         X5wuPCrQR5rAfnh+sG1Yb7QziO5QrrIOxmSBH//cO0iUYtPws1fjK9ZiCNmVVEUU576H
-         haZKIcCgIglMWTisNVK3Vd9dI8GqPpvTeqoEs7+71qxDhH5oTBmrWEgUEAwUF705qJ3z
-         4uzlGH6g5wHgOjurP7ylVKCafttBGNEZBHeYJEs+g3xAJo4Rj4avxR+UE9Fy+8Z65bSl
-         5fiA==
+        bh=vWgOKohvQ1jgRBXJgzAciLoS0Yy7GFRwvJIzGnozW3I=;
+        b=i1BgAeNO/tOsTb8KAd2vhXRtX4E303K14B3V/34rANciSCktefSUex0sMNQAm1f4To
+         VPvE2xSPiOIG67HlR7UE6BkUKkUvWlGa48Ti4Wl1syF48lsOr8skMdR+sKtjmKa0TOBE
+         VcQnADecEsinktocIlx+qrPmNVC3N6nCZfkx/i1IIPdNqBwmIjTwsRXfF0vq1/u8NGz5
+         jSTirGYqEUEVr0U+eZJBBDqndltIcnXBNyr6SFxS95JaecNLDO8YFGKZBSBqTQ0MOwF+
+         /8n1WkDRCknE9uuoHqQwPtMQZ1XbH/YkDb1AAEOMR9bCedB3vpfW2flwdGjH0ONM1ixt
+         gVAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=KIxL8pBMd//z5YINEw+kh9VMjDTIKYH5lzSpZAefCDI=;
-        b=yiEfgKW3d3TAxoGksgOH1hscOjdHkHpsxyUHCNtdy1qFZ52yosuH6wPwn7yFySqzb/
-         SD8IeZDHp+TTAev54D3qIWcjwDyq8zLCL3hxw1T1CEJj82/3ZrOUOxYSiiK/bM3CA/ii
-         DjGkNJk9tz74XBxm4nmOp3JH9x+OU4tHiQmCW6zWkhC+6W7CE1iIgwi19smIgpkvdBpb
-         WyrCiIeCv6bmE+NWkJrN1KitmjMiEifBNxnLlY+yF0Y7CZ8psSDo7+SgcjK6LWznr5IW
-         oeSVQwGJ7/uUYsLEd0hWOPiI7l5M+js1KyxwoEOSf/XAFO0Iady/SIxiyuyFbcM1NA26
-         uqxg==
-X-Gm-Message-State: AOAM533FNYTD0hF+iM6DoiyQMVY/Z7IWmrQMncau++DbnQq4zKlfbMCb
-        sD4aXmIBMCDbSRo1+XRtsvDHTl2EMVd6vg623yq7ajo4rM0=
-X-Google-Smtp-Source: ABdhPJxnbFQv1dTzlXUN67+XMFz/lUUZpvt7OlTc0tdxapNHsE53zcaflGNH6ScTj3O2csAYZxRXAeBNNWGHy7A7oNk=
-X-Received: by 2002:a7b:cf10:: with SMTP id l16mr69365510wmg.17.1637061933897;
- Tue, 16 Nov 2021 03:25:33 -0800 (PST)
+        bh=vWgOKohvQ1jgRBXJgzAciLoS0Yy7GFRwvJIzGnozW3I=;
+        b=G2548SxBGI0gMETp0nNj6MxPn2hR4D0UpiGZ5rVtZiUM2FAKJ5WXQFe1zuV25d5WQz
+         HEfQzKYMKv8qL7mwQko9qrOZUTKVw2jbu5OBBloAoNL/GIe/RvpzuSn2b1Mbd4fTeZj1
+         l+W9o4/s46+Sjqj2z/3UhoqXK/5eep7+joAWi3WOOoNhKqQXoHFGuiSzQcDvzcskbVfY
+         SrTms7kvF8FBb5QGoSbN6n3LZsuDyHt92fRjb40R10LL++AFlMedDvYsTcfrV8dwNLUd
+         A6dZuP7h/VrLntZpsXIUOV8JzL23qIMomXddHd7VlsXjpwx3mlfeL7Br8ZLsVc/hZlRA
+         K1Qw==
+X-Gm-Message-State: AOAM532mtrh4RH4nesIyh7HtAilQ8rrQR/MUENw63nwtJkE4aC24n1Z3
+        pgz93RfckWwhR5DLrGoiAMWE7hykzcQpL5+nbNtX+mlPWoM=
+X-Google-Smtp-Source: ABdhPJyBWvBh4Y082LIMiso5r6ENmFOkrKKeIhWG2FaAVAUFGOMJlcUc34PbNoiCJ2YYaifii8INeV82KxFVp67pB1Q=
+X-Received: by 2002:a05:600c:2246:: with SMTP id a6mr67603571wmm.5.1637062073422;
+ Tue, 16 Nov 2021 03:27:53 -0800 (PST)
 MIME-Version: 1.0
 From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Tue, 16 Nov 2021 19:25:22 +0800
-Message-ID: <CACXcFm=kwziZ5Etdevu0uq_t5qy0NbGY753WfLvnwkMqtU9Tvg@mail.gmail.com>
-Subject: [PATCH 1/8] Replace memset() with memzero_explicit()
+Date:   Tue, 16 Nov 2021 19:27:41 +0800
+Message-ID: <CACXcFmke4tekfof2x3jqW0zA1yC9cMKhwo2SrRG3vzC_CCot8Q@mail.gmail.com>
+Subject: [PATCH 2/8] Replace memset() with memzero_explicit()
 To:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
@@ -65,30 +65,98 @@ with memzero_explicit(address,bytes) which resists
 such optimisation
 
 ---
- crypto/des_generic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ crypto/drbg.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/crypto/des_generic.c b/crypto/des_generic.c
-index c85354a5e94c..105a32e7afea 100644
---- a/crypto/des_generic.c
-+++ b/crypto/des_generic.c
-@@ -30,7 +30,7 @@ static int des_setkey(struct crypto_tfm *tfm, const u8 *key,
-             err = 0;
-     }
-     if (err)
--        memset(dctx, 0, sizeof(*dctx));
-+        memzero_explicit(dctx, sizeof(*dctx));
-     return err;
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index f72f340a1321..08c4586a4cc9 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -507,9 +507,9 @@ static int drbg_ctr_df(struct drbg_state *drbg,
+     ret = 0;
+
+ out:
+-    memset(iv, 0, drbg_blocklen(drbg));
+-    memset(temp, 0, drbg_statelen(drbg) + drbg_blocklen(drbg));
+-    memset(pad, 0, drbg_blocklen(drbg));
++    memzero_explicit(iv, drbg_blocklen(drbg));
++    memzero_explicit(temp, drbg_statelen(drbg) + drbg_blocklen(drbg));
++    memzero_explicit(pad, drbg_blocklen(drbg));
+     return ret;
  }
 
-@@ -62,7 +62,7 @@ static int des3_ede_setkey(struct crypto_tfm *tfm,
-const u8 *key,
-             err = 0;
-     }
-     if (err)
--        memset(dctx, 0, sizeof(*dctx));
-+        memzero_explicit(dctx, sizeof(*dctx));
-     return err;
+@@ -580,9 +580,9 @@ static int drbg_ctr_update(struct drbg_state
+*drbg, struct list_head *seed,
+     ret = 0;
+
+ out:
+-    memset(temp, 0, drbg_statelen(drbg) + drbg_blocklen(drbg));
++    memzero_explicit(temp, drbg_statelen(drbg) + drbg_blocklen(drbg));
+     if (2 != reseed)
+-        memset(df_data, 0, drbg_statelen(drbg));
++        memzero_explicit(df_data, drbg_statelen(drbg));
+     return ret;
  }
 
---
+@@ -852,7 +852,7 @@ static int drbg_hash_df(struct drbg_state *drbg,
+     }
+
+ out:
+-    memset(tmp, 0, drbg_blocklen(drbg));
++    memzero_explicit(tmp, drbg_blocklen(drbg));
+     return ret;
+ }
+
+@@ -895,7 +895,7 @@ static int drbg_hash_update(struct drbg_state
+*drbg, struct list_head *seed,
+     ret = drbg_hash_df(drbg, drbg->C, drbg_statelen(drbg), &datalist2);
+
+ out:
+-    memset(drbg->scratchpad, 0, drbg_statelen(drbg));
++    memzero_explicit(drbg->scratchpad, drbg_statelen(drbg));
+     return ret;
+ }
+
+@@ -927,7 +927,7 @@ static int drbg_hash_process_addtl(struct drbg_state *drbg,
+              drbg->scratchpad, drbg_blocklen(drbg));
+
+ out:
+-    memset(drbg->scratchpad, 0, drbg_blocklen(drbg));
++    memzero_explicit(drbg->scratchpad, drbg_blocklen(drbg));
+     return ret;
+ }
+
+@@ -967,8 +967,7 @@ static int drbg_hash_hashgen(struct drbg_state *drbg,
+     }
+
+ out:
+-    memset(drbg->scratchpad, 0,
+-           (drbg_statelen(drbg) + drbg_blocklen(drbg)));
++    memzero_explicit(drbg->scratchpad, (drbg_statelen(drbg) +
+drbg_blocklen(drbg)));
+     return len;
+ }
+
+@@ -1015,7 +1014,7 @@ static int drbg_hash_generate(struct drbg_state *drbg,
+     drbg_add_buf(drbg->V, drbg_statelen(drbg), u.req, 8);
+
+ out:
+-    memset(drbg->scratchpad, 0, drbg_blocklen(drbg));
++    memzero_explicit(drbg->scratchpad, drbg_blocklen(drbg));
+     return len;
+ }
+
+@@ -1202,8 +1201,8 @@ static int drbg_seed(struct drbg_state *drbg,
+struct drbg_string *pers,
+     }
+
+     if (!reseed) {
+-        memset(drbg->V, 0, drbg_statelen(drbg));
+-        memset(drbg->C, 0, drbg_statelen(drbg));
++        memzero_explicit(drbg->V, drbg_statelen(drbg));
++        memzero_explicit(drbg->C, drbg_statelen(drbg));
+     }
+
+     ret = __drbg_seed(drbg, &seedlist, reseed);
+-- 
+2.25.1
