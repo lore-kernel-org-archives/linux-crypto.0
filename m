@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B9FCC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 03:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B5EC43217
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 03:54:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1563E63215
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 03:51:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4AEA61A58
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 03:54:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235537AbhKPDyp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 22:54:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35976 "EHLO
+        id S235920AbhKPD5I (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 22:57:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235506AbhKPDyo (ORCPT
+        with ESMTP id S235928AbhKPD5G (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 22:54:44 -0500
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE3BDC1A2993
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 16:31:10 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id 200so16035717pga.1
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 16:31:10 -0800 (PST)
+        Mon, 15 Nov 2021 22:57:06 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B093C1E82A5
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 16:35:15 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id q17so15847176plr.11
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 16:35:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=zUAbk3pYDxq1bSuJItD74NAh/MbYUz0fiMi2jjsqIPc=;
-        b=jkN0+anUkVZEafZbns3mnQH3BOzdPE6stTt8SrDHZFGkz5SQGDyxTuScjmOkAtjtG9
-         AT2XFauNYqbJ3Hv+WUTHMAUTNsTes+od+8KqsU/GEVyVgjrYYw/xt4G0TAF8HM1LcPVm
-         2WJe85H3kQUjZSV8Rb5yVnjCooZk+xWNu9wek=
+        bh=6YrJDwz5lHylUrRKBiCCXn7XIadwbTCaDNmr8F8Qv+s=;
+        b=kRgsOovbagRO/7210nSyOKEBlmhfA5hNYfPQV4k7lydus9N2uNl5Vt0UygZC7jGLy1
+         CcSKdAOPN7CAjIaxG2Nk7LhNoTdTNyUIV57l7UZ/U0TQtm7n+dBKTmv+GCqWpklKxw86
+         72xq1Tvc+lxHwltemgeZ72MdiUZIJVqjFa0RI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=zUAbk3pYDxq1bSuJItD74NAh/MbYUz0fiMi2jjsqIPc=;
-        b=RYiqPnD+WTii/r6m8K0xFQR9QjIwv6tTvAsu2Rb6g+R03bY2DoT0ANaNpZgwMW9s9h
-         6ISM3nPEcbcOIoQ+duoqq8ufw4kNsda2OeNo4xjW7aZcGn/HT3Bgy/WL7AJRJIgBe/FL
-         y+DID31mdUzKwrQ/hum409bc3OJA4mQSD+xUs/zGOIQi/t6XBunrHrKeSt39LQ/oGSed
-         N9domuWuGPBYBkhCSE2FJVDiD37JqIEZHRb+EWnWbYJkaLzwRoPK67Zew4rUU4bm7ePM
-         yn/DZ2XCemhTW5wBOe5gCYFNNDyZG4UyqDzkXu3+gpvvtQLoHN7I/MbB7h2oMRVkDwQ6
-         gTJQ==
-X-Gm-Message-State: AOAM530DawJ5yR33Ph01LjKs/SDr5AS8dDSXRUQyDQdtq5EvhquOxbyJ
-        tY7GcIZ0SvOCy8zJ7gIwyDFLew==
-X-Google-Smtp-Source: ABdhPJxDrEb7NedduOiss/lXzBJfLpYZT+5k0kObH71YXHTZztaI+VVMmjTV988TJQv8GS02GfUMPA==
-X-Received: by 2002:a05:6a00:1945:b0:44c:a955:35ea with SMTP id s5-20020a056a00194500b0044ca95535eamr36094903pfk.85.1637022670112;
-        Mon, 15 Nov 2021 16:31:10 -0800 (PST)
+        bh=6YrJDwz5lHylUrRKBiCCXn7XIadwbTCaDNmr8F8Qv+s=;
+        b=qLAnd0667KaR+m+cQaNhZaz0LVHjgKKw3364vKFfZcP9wm7noWJgBMSv7qOIxHTb9v
+         PGcWAgwdemrif6vkzuQGrSGhx0+k4mhIncp2JkaJoPw3/Hgg8FUK34b89MOUrPxORPJ8
+         wMN/ZWRfEaKcZdNdrzdQX2X+sv801cldRU6XPfqgtOfj2DMpburVXgDyF3D9jplmhlwd
+         tsey0nglI9cI1/GA6p1vBufbobK4ju2VzYyjdcbx0ImY4ybBEi/jCseVOjvfdttsBinW
+         Evq1fM8Jd5e2864o8iD3sBMUM0Kgtx60BootQtxi2ZbUIt1GqctmWNE0DV/KhmQpPF0V
+         IJuA==
+X-Gm-Message-State: AOAM530UwSa2jKmc4iL+AIRsdbiOy5r9eAdp8GmpMPi9aWnrZK3Thh1/
+        uEhKtAHZdL5NcBGHNZ05PbSTag==
+X-Google-Smtp-Source: ABdhPJy9iYaBB3Pj/LejC8q7/hsST+5gxO7ABIHhxz3+lYk9ZK6BkrL6e9tXPNM1m5lGV6jB9/FWOw==
+X-Received: by 2002:a17:90a:c398:: with SMTP id h24mr3495024pjt.73.1637022914921;
+        Mon, 15 Nov 2021 16:35:14 -0800 (PST)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id h21sm12755848pgk.74.2021.11.15.16.31.09
+        by smtp.gmail.com with ESMTPSA id s21sm16292860pfk.3.2021.11.15.16.35.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Nov 2021 16:31:09 -0800 (PST)
-Date:   Mon, 15 Nov 2021 16:31:09 -0800
+        Mon, 15 Nov 2021 16:35:14 -0800 (PST)
+Date:   Mon, 15 Nov 2021 16:35:14 -0800
 From:   Kees Cook <keescook@chromium.org>
 To:     Marco Elver <elver@google.com>
 Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -79,7 +79,7 @@ Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         kasan-dev <kasan-dev@googlegroups.com>
 Subject: Re: Build regressions/improvements in v5.16-rc1
-Message-ID: <202111151624.91EDCFF7@keescook>
+Message-ID: <202111151633.DE719CE@keescook>
 References: <20211115155105.3797527-1-geert@linux-m68k.org>
  <CAMuHMdUCsyUxaEf1Lz7+jMnur4ECwK+JoXQqmOCkRKqXdb1hTQ@mail.gmail.com>
  <YZKOce4XhAU49+Yn@elver.google.com>
@@ -104,17 +104,19 @@ On Mon, Nov 15, 2021 at 05:44:33PM +0100, Marco Elver wrote:
 > Kees, wasn't that what [1] was meant to fix?
 > [1] https://lkml.kernel.org/r/20211006181544.1670992-1-keescook@chromium.org
 
-[1] fixed the ones I found when scanning for __write_overflow(). [2]
-fixed some others, so it's possible there are yet more to fix?
+Ah, I found it:
 
-Taking a look at Linus's tree, though, the "263" and "277" lines don't
-line up correctly. I'll go see if I can reproduce this. Is this with
-W=1?
+http://kisskb.ellerman.id.au/kisskb/buildresult/14660585/log/
 
--Kees
+it's actually:
 
-[2] https://www.ozlabs.org/~akpm/mmotm/broken-out/kasan-test-consolidate-workarounds-for-unwanted-__alloc_size-protection.patch
+    inlined from 'kasan_memcmp' at /kisskb/src/lib/test_kasan.c:897:2:
 
+and
+
+    inlined from 'kasan_memchr' at /kisskb/src/lib/test_kasan.c:872:2:
+
+I can send a patch doing the same as what [1] does for these cases too.
 
 -- 
 Kees Cook
