@@ -2,88 +2,143 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3895C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 12:52:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2653DC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 13:02:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AEFC61BF6
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 12:52:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B652611CC
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 13:02:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236424AbhKPMzk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 07:55:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60258 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236372AbhKPMzj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 07:55:39 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E536D615A4;
-        Tue, 16 Nov 2021 12:52:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1637067162;
-        bh=o1WtAZAgo7NnvkYIzkDGmVlb4BEVKi/y98HXaVyEhcA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KC9olUBcxCYOG2Lngnhg30qkDLt11Ekr/Vu59d6YR+YPnsaDinCx5NtCPNyEZOvnV
-         kGN+g0WpNKJZEPvnGOfdOVm6oaghhg+Lv5XR1OEQjmrzHhI+5W7fq7mA80RtSd77Ui
-         YQdgNeP/T2/s6tcJyN494tRoLKlqgDcfbrWRncjo=
-Date:   Tue, 16 Nov 2021 13:52:39 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/8] Replace memset() with memzero_explicit()
-Message-ID: <YZOpl5mVVcG/s9w1@kroah.com>
-References: <CACXcFm=kwziZ5Etdevu0uq_t5qy0NbGY753WfLvnwkMqtU9Tvg@mail.gmail.com>
- <YZObImtJITs1ZfUc@kroah.com>
+        id S231833AbhKPNFO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 08:05:14 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:57862 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230182AbhKPNFN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Nov 2021 08:05:13 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id B5E1C212C3;
+        Tue, 16 Nov 2021 13:02:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1637067729; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HZbn//2jHoLXpUwrCvvkW6DSHLSoB+3INvS/r2/24sc=;
+        b=FYRTscp/uk3I5t9ARhqDS+oQtcnEQmCncTzGPO3Hv9HK0a/NVU4TCKluaVO5R/7cGPqGbW
+        LEx7IOGROGGptHOqKmq0pFGJfJkdtNfSh5LJ0HAz9Fwe6SfxQtUxJJ6h3bEnl8NYqni85w
+        fHUT8gn/GEU0ASDMIXnyfZqwO8Oq4AI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1637067729;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HZbn//2jHoLXpUwrCvvkW6DSHLSoB+3INvS/r2/24sc=;
+        b=Ldn19b969Jzd4AIEqkaYx8K4ZPFYTGGbLwIV0KErqmeO5oTXcggS3KFfP/xdUBfurLUSgP
+        B8CPXQUhz4RySSAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7D46E13BA3;
+        Tue, 16 Nov 2021 13:02:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id HRJfHNCrk2HmbwAAMHmgww
+        (envelope-from <jroedel@suse.de>); Tue, 16 Nov 2021 13:02:08 +0000
+Date:   Tue, 16 Nov 2021 14:02:06 +0100
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZOrziJfGWHnBh++@suse.de>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
+ <YZJTA1NyLCmVtGtY@work-vm>
+ <YZKmSDQJgCcR06nE@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <YZObImtJITs1ZfUc@kroah.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YZKmSDQJgCcR06nE@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 16, 2021 at 12:50:58PM +0100, Greg Kroah-Hartman wrote:
-> On Tue, Nov 16, 2021 at 07:25:22PM +0800, Sandy Harris wrote:
-> > Replace memset(address,0,bytes) which may be optimised away
-> > with memzero_explicit(address,bytes) which resists
-> > such optimisation
-> > 
-> > ---
-> >  crypto/des_generic.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/crypto/des_generic.c b/crypto/des_generic.c
-> > index c85354a5e94c..105a32e7afea 100644
-> > --- a/crypto/des_generic.c
-> > +++ b/crypto/des_generic.c
-> > @@ -30,7 +30,7 @@ static int des_setkey(struct crypto_tfm *tfm, const u8 *key,
-> >              err = 0;
-> >      }
-> >      if (err)
-> > -        memset(dctx, 0, sizeof(*dctx));
-> > +        memzero_explicit(dctx, sizeof(*dctx));
-> >      return err;
-> >  }
-> > 
-> > @@ -62,7 +62,7 @@ static int des3_ede_setkey(struct crypto_tfm *tfm,
-> > const u8 *key,
-> >              err = 0;
-> >      }
-> >      if (err)
-> > -        memset(dctx, 0, sizeof(*dctx));
-> > +        memzero_explicit(dctx, sizeof(*dctx));
-> >      return err;
-> >  }
-> > 
-> 
-> Have you looked at the output of the compiler to see if this really is
-> needed or not?
+On Mon, Nov 15, 2021 at 06:26:16PM +0000, Sean Christopherson wrote:
+> No, because as Andy pointed out, host userspace must already guard against a bad
+> GPA, i.e. this is just a variant of the guest telling the host to DMA to a GPA
+> that is completely bogus.  The shared vs. private behavior just means that when
+> host userspace is doing a GPA=>HVA lookup, it needs to incorporate the "shared"
+> state of the GPA.  If the host goes and DMAs into the completely wrong HVA=>PFN,
+> then that is a host bug; that the bug happened to be exploited by a buggy/malicious
+> guest doesn't change the fact that the host messed up.
 
-Oh wait, that's not a stack variable, how would this be optimized away
-at all?  If it is, that's a HUGE compiler bug.
+The thing is that the usual checking mechanisms can't be applied to
+guest-private pages. For user-space the GPA is valid if it fits into the
+guest memory layout user-space set up before. But whether a page is
+shared or private is the guests business. And without an expensive
+reporting/query mechanism user-space doesn't have the information to do
+the check.
 
-Is that really happening here?
+A mechanism to lock pages to shared is also needed, and that creates the
+next problems:
 
-thanks,
+	* Who can release the lock, only the process which created it or
+	  anyone who has the memory mapped?
 
-greg k-h
+	* What happens when a process has locked guest regions and then
+	  dies with SIGSEGV, will its locks on guest memory be released
+	  stay around forever?
+
+And this is only what comes to mind immediatly, I sure there are more
+problematic details in such an interface.
+
+Regards,
+
+-- 
+Jörg Rödel
+jroedel@suse.de
+
+SUSE Software Solutions Germany GmbH
+Maxfeldstr. 5
+90409 Nürnberg
+Germany
+ 
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev
+
