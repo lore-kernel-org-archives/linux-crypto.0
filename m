@@ -2,120 +2,180 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A52C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 07:42:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA33C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 08:40:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 974AA615E3
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 07:42:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D00261055
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 08:40:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231209AbhKPHpY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 02:45:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59118 "EHLO
+        id S232358AbhKPIm4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 03:42:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230461AbhKPHpX (ORCPT
+        with ESMTP id S232339AbhKPImx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 02:45:23 -0500
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F3C7C061570
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 23:42:26 -0800 (PST)
-Received: by mail-yb1-xb2f.google.com with SMTP id y68so49588948ybe.1
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 23:42:26 -0800 (PST)
+        Tue, 16 Nov 2021 03:42:53 -0500
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8B6AC061764
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Nov 2021 00:39:56 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id g14so20628562edb.8
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Nov 2021 00:39:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20210112.gappssmtp.com; s=20210112;
+        d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=/403usa2qPXJuWuTJ+2ECrIYe8wmx/A5m8sB3XJBUhg=;
-        b=38f+p+5jAxF+2Vn+yPpQupSewmEGSxjj6L3/RdOKgo0oNXVuJ0uZi1G8xiafAwpS/Z
-         1oWy9EmUM1zyWUhwf9bCI6A30hnMD3gTaFVOkz9dVDrZGOwjW8n8xzT6yWkaTnIuA3aG
-         M2DKrjwobfTyTy9PiVNrDveoGydhZ0/eN+jxTu4P13dgtE7eTduKRh+BFS/d4eYQdYoQ
-         Zqb3Um8V7St03k7NkNFYr4uKcMq+zqquDNEPNFOVbPQaGTbW7AWxBO/DSxgQq/pnNM1w
-         5lcnVl1e9f2BTOmnnE4XODPv+jph41h4deNDM6JHxqoIMXqKiMIMxfG+A5/Rb3QM6tv0
-         iiNg==
+         :cc;
+        bh=29oqjmL46qhcPK7GumgLq+DG8d/OcnmM7sBa267LNJc=;
+        b=HONPxPc4fpua+nyA5KACQL975ArZH3/eBZ5dZY+p2HgPVPrzmmke+3HJWO2fCuuPVf
+         l6f/AdcurSlwQitjA8g/mqh5lMP6Ad7Y2yKDZ3KPIDSx/M9xUBEV1QmMbD9uzAlXdMnm
+         2Pq6zA92NLyZGraUjpKEnUeaXM8JEomRJRcxIk3CjGNzoDdCiIAeukpjfz5e9+dKV+1c
+         y0luK2d9szpkwic7PL+e/BbeLQ3eEvF2IkQeSyDfW6u4WlVuDTNraMytYMqlRCrUgZwX
+         LHmEkcCL8WrLlzzguwmU1M1g+DuVFytZ6yvWZ9Fyz1Mm+5z2F+fz+/KOCsQkakBVfK4r
+         /1Hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=/403usa2qPXJuWuTJ+2ECrIYe8wmx/A5m8sB3XJBUhg=;
-        b=BV27Re7vn/ZQj0HMbbt+sVX8cqOtZk+IxlkMuiy9ezwwSDuQiHTGyLmr8Z0qeHobOZ
-         wSl0saw5KlVOaD3pJq952nPa+nB07bp69UH6kHBD5lavA93aOt5hVIxVlVctzjFDdEM4
-         5Xe9T1N5aBg8eNTokOGcKC5BomfOnKuEzneX6zSrpMueBo7krdMrdWX+NPqbNrCMqq1F
-         WPsaQmn9U6EBgRMCdClkXdQDPTA7PfIaQqf3MEZu7iMEDQGkuUWX5wiagwG+diDvImmC
-         qQdXrmYit/lAEGUSb7rzfgGiRmb6Rf/LknYgF8N10FxsKFrKydi99YrOGWm4wEHUt18r
-         wE6A==
-X-Gm-Message-State: AOAM530bl3f65JJQEv+z3JHerdIkucl0An2rOH85tr4vfWskC+1lqDg6
-        6pDiBBJKdv2aXVr+8muhVbBY4VErvFtw0kR/7McRNg==
-X-Google-Smtp-Source: ABdhPJxKUgq418SOGaeoyAUz9+0oatLbKuctux+kxFuu+v+vwdpBLskKGam4yEE77+/ksz07h5j33q5EI4wchisgQkc=
-X-Received: by 2002:a5b:b92:: with SMTP id l18mr6183244ybq.10.1637048545324;
- Mon, 15 Nov 2021 23:42:25 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=29oqjmL46qhcPK7GumgLq+DG8d/OcnmM7sBa267LNJc=;
+        b=IxtWgoT4aA9FHRoR9frWJb4jKlFaDe1AdfWZExXzcUM+fuxM0IPw4U8fTYVLeVwWeT
+         9Mgm9NJbn/4D5tvAM1yhF6YLYCxgakEDvecCiL21gsUEZw0P1oijKZY/OoA95zG98tWX
+         IERKJZrF47DFPTztGzBW0so2ySDWxTfh3jmagmteXyrV4cq/4Yutwtm2YmTafa2r81Sx
+         rI2ucWNvSAIoJOofBgEGoNe22OiH0JQA4b+B39hD+aBxH5l2t3xbnABwsgGqAwlN6yax
+         lFhjoCKXtW062zN5q0k7vmQ5WPbFa7abX9WGhVuPO48pGN7SP4ggQVbe+xxfo1Apd9Cq
+         Ql7Q==
+X-Gm-Message-State: AOAM530BCdtDTzZEQzm5IgsHk0W5A0fHWQ+BIw0aMV7mE0epnUzYI3nC
+        HQyKF50fE2YnwIo5z4aqrBnn6Arn2H4pW+pygaLbnQ==
+X-Google-Smtp-Source: ABdhPJzw2cpdURyncHf4l37gZdIW9qTyoDRpERcWbGarQ+ldN+Qh5JZMa2Mv6dpFTys9HHv83+R10ncImdIENaH1IUM=
+X-Received: by 2002:a17:906:7955:: with SMTP id l21mr8006801ejo.6.1637051995253;
+ Tue, 16 Nov 2021 00:39:55 -0800 (PST)
 MIME-Version: 1.0
-References: <2a313cc6de53c492db10e29c6444d8e6f2529689.1636735696.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <2a313cc6de53c492db10e29c6444d8e6f2529689.1636735696.git.christophe.jaillet@wanadoo.fr>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Tue, 16 Nov 2021 09:42:11 +0200
-Message-ID: <CAOtvUMcQONyqJ=MaprVLyDyc_z+5_HwCdjgaNVcOLMFV6i3FPA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: ccree - remove redundant 'flush_workqueue()' calls
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
+References: <20211115165428.722074685@linuxfoundation.org> <CA+G9fYtFOnKQ4=3-4rUTfVM-fPno1KyTga1ZAFA2OoqNvcnAUg@mail.gmail.com>
+In-Reply-To: <CA+G9fYtFOnKQ4=3-4rUTfVM-fPno1KyTga1ZAFA2OoqNvcnAUg@mail.gmail.com>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Tue, 16 Nov 2021 14:09:44 +0530
+Message-ID: <CA+G9fYuF1F-9TAwgR9ik_qjFqQvp324FJwFJbYForA_iRexZjg@mail.gmail.com>
+Subject: Re: [PATCH 5.15 000/917] 5.15.3-rc1 review
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-kernel@vger.kernel.org, shuah@kernel.org,
+        f.fainelli@gmail.com, patches@kernelci.org,
+        lkft-triage@lists.linaro.org, jonathanh@nvidia.com,
+        stable@vger.kernel.org, pavel@denx.de, akpm@linux-foundation.org,
+        torvalds@linux-foundation.org, linux@roeck-us.net,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Vladis Dronov <vdronov@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 12, 2021 at 6:49 PM Christophe JAILLET
-<christophe.jaillet@wanadoo.fr> wrote:
+On Tue, 16 Nov 2021 at 12:06, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
 >
-> 'destroy_workqueue()' already drains the queue before destroying it, so
-> there is no need to flush it explicitly.
+> On Tue, 16 Nov 2021 at 00:03, Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
+> >
+> > This is the start of the stable review cycle for the 5.15.3 release.
+> > There are 917 patches in this series, all will be posted as a response
+> > to this one.  If anyone has any issues with these being applied, please
+> > let me know.
+> >
+> > Responses should be made by Wed, 17 Nov 2021 16:52:23 +0000.
+> > Anything received after that time might be too late.
+> >
+> > The whole patch series can be found in one patch at:
+> >         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-5.15.3-rc1.gz
+> > or in the git tree and branch at:
+> >         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-5.15.y
+> > and the diffstat can be found below.
+> >
+> > thanks,
+> >
+> > greg k-h
 >
-> Remove the redundant 'flush_workqueue()' calls.
->
-> This was generated with coccinelle:
->
-> @@
-> expression E;
-> @@
-> -       flush_workqueue(E);
->         destroy_workqueue(E);
->
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
->  drivers/crypto/ccree/cc_request_mgr.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/drivers/crypto/ccree/cc_request_mgr.c b/drivers/crypto/ccree=
-/cc_request_mgr.c
-> index 33fb27745d52..887162df50f9 100644
-> --- a/drivers/crypto/ccree/cc_request_mgr.c
-> +++ b/drivers/crypto/ccree/cc_request_mgr.c
-> @@ -101,7 +101,6 @@ void cc_req_mgr_fini(struct cc_drvdata *drvdata)
->         dev_dbg(dev, "max_used_sw_slots=3D%d\n", req_mgr_h->max_used_sw_s=
-lots);
->
->  #ifdef COMP_IN_WQ
-> -       flush_workqueue(req_mgr_h->workq);
->         destroy_workqueue(req_mgr_h->workq);
->  #else
->         /* Kill tasklet */
-> --
-> 2.30.2
 >
 
-Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Regression found on arm64 juno-r2 / qemu.
+Following kernel crash reported on stable-rc 5.15.
 
-Thank you for finding ths.
+Anders bisected this kernel crash and found the first bad commit,
 
-Also, this triggers me to revisit why the workqueue code is there at
-all. I think we don't actually use it, so double thanks.
+Herbert Xu <herbert@gondor.apana.org.au>
+   crypto: api - Fix built-in testing dependency failures
 
-Gilad
 
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
+>
+> metadata:
+>   git branch: linux-5.15.y
+>   git repo: https://gitlab.com/Linaro/lkft/mirrors/stable/linux-stable-rc
+>   git commit: ff5232812521d01d1ddfd8f36559a9cf83fea928
+>   git describe: v5.15.2-918-gff5232812521
+>   make_kernelversion: 5.15.3-rc1
+>   kernel-config: https://builds.tuxbuild.com/20yUV5tYmCSzjklEffg3Dhkbdzi/config
+>
+> Kernel crash log:
+> -----------------
+> [    1.178361] kvm [1]: Hyp mode initialized successfully
+> [    1.184780] Unable to handle kernel NULL pointer dereference at
+> virtual address 000000000000019b
+> [    1.193599] Mem abort info:
+> [    1.196394]   ESR = 0x96000044
+> [    1.199458]   EC = 0x25: DABT (current EL), IL = 32 bits
+> [    1.204786]   SET = 0, FnV = 0
+> [    1.207848]   EA = 0, S1PTW = 0
+> [    1.210998]   FSC = 0x04: level 0 translation fault
+> [    1.215889] Data abort info:
+> [    1.218777]   ISV = 0, ISS = 0x00000044
+> [    1.222623]   CM = 0, WnR = 1
+> [    1.225605] [000000000000019b] user address but active_mm is swapper
+> [    1.231979] Internal error: Oops: 96000044 [#1] PREEMPT SMP
+> [    1.237559] Modules linked in:
+> [    1.240617] CPU: 1 PID: 1 Comm: swapper/0 Not tainted 5.15.3-rc1 #1
+> [    1.246894] Hardware name: ARM Juno development board (r2) (DT)
+> [    1.252820] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> [    1.259793] pc : crypto_register_alg+0x88/0xe4
+> [    1.264246] lr : crypto_register_alg+0x78/0xe4
+> [    1.268694] sp : ffff800012b9bce0
+> [    1.272008] x29: ffff800012b9bce0 x28: 0000000000000000 x27: ffff800012644c80
+> [    1.279162] x26: ffff000820d95480 x25: ffff000820d96000 x24: ffff800012644d3a
+> [    1.286313] x23: ffff800012644cba x22: 0000000000000000 x21: ffff800012742518
+> [    1.293463] x20: 0000000000000000 x19: ffffffffffffffef x18: ffffffffffffffff
+> [    1.300614] x17: 000000000000003f x16: 0000000000000010 x15: ffff000800844a1c
+> [    1.307765] x14: 0000000000000001 x13: 293635326168732c x12: 2973656128636263
+> [    1.314916] x11: 0000000000000010 x10: 0101010101010101 x9 : ffff80001054b5a8
+> [    1.322066] x8 : 7f7f7f7f7f7f7f7f x7 : fefefefefeff6462 x6 : 0000808080808080
+> [    1.329217] x5 : 0000000000000000 x4 : 8080808080800000 x3 : 0000000000000000
+> [    1.336367] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff800012742518
+> [    1.343517] Call trace:
+> [    1.345962]  crypto_register_alg+0x88/0xe4
+> [    1.350062]  crypto_register_skcipher+0x80/0x9c
+> [    1.354600]  simd_skcipher_create_compat+0x19c/0x1d0
+> [    1.359572]  cpu_feature_match_AES_init+0x9c/0xdc
+> [    1.364284]  do_one_initcall+0x50/0x2b0
+> [    1.368125]  kernel_init_freeable+0x250/0x2d8
+> [    1.372488]  kernel_init+0x30/0x140
+> [    1.375981]  ret_from_fork+0x10/0x20
+> [    1.379562] Code: 2a0003f6 710002df aa1503e0 1a9fd7e1 (3906b261)
+> [    1.385667] ---[ end trace a032e96fc9ec202d ]---
+> [    1.390350] Kernel panic - not syncing: Attempted to kill init!
+> exitcode=0x0000000b
+> [    1.398018] SMP: stopping secondary CPUs
+> [    1.401947] Kernel Offset: disabled
+> [    1.405434] CPU features: 0x10001871,00000846
+> [    1.409794] Memory Limit: none
+> [    1.412849] ---[ end Kernel panic - not syncing: Attempted to kill
+> init! exitcode=0x0000000b ]---
+>
+>
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+>
+> build link:
+> -----------
+> https://builds.tuxbuild.com/20yUV5tYmCSzjklEffg3Dhkbdzi/build.log
+>
+> build config:
+> -------------
+> https://builds.tuxbuild.com/20yUV5tYmCSzjklEffg3Dhkbdzi/config
 
-values of =CE=B2 will give rise to dom!
+- Naresh
