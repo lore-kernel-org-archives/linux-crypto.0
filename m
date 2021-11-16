@@ -2,90 +2,197 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 649B5C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 15:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E56E3C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 16:00:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 45ACB61BFE
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 15:21:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD30161A56
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 16:00:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237917AbhKPPYC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 10:24:02 -0500
-Received: from mx08-00178001.pphosted.com ([91.207.212.93]:50520 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S237827AbhKPPYC (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 10:24:02 -0500
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1AGDcCsf017657;
-        Tue, 16 Nov 2021 16:20:41 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=date : from : to :
- cc : subject : in-reply-to : message-id : references : mime-version :
- content-type; s=selector1;
- bh=QoQgYbIAYqqyndy0lpMG3AWVrk68VVjTmBAW9B7ADps=;
- b=Fc5c0QCnFHbqDnhYoeNR2fBkRjdgcJ8PhXDr+lPVffNKwrhbNStOGymy20c11kfkOMsn
- FJz65/diglwzHLsF4OPc+3P00RCuw7ewUV4/NO64rN2HRWTp1lw7up/TIh/I9iZw6Ukf
- 3BhTEnHRzO/Iy0/0KOs1Yjb+n78uDbgnbz43D0I3DvDLtXDPI7zSA+v9aIhlOlvL/4PJ
- NfV3cUOmGyHoBsoO/jd12B5O19sBgcpkcIxOJJpQKhYKNsGC3182+ZD5Unwrww5KXGVG
- 1KHULA/l6pAz+VEPcGue4z2Y8UyQVNKBnmh3F8yh8+21upvJWzL8iVWFkCMdDobmnn/0 5g== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3cc2u453x6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Nov 2021 16:20:41 +0100
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 62BE210002A;
-        Tue, 16 Nov 2021 16:20:39 +0100 (CET)
-Received: from Webmail-eu.st.com (sfhdag2node2.st.com [10.75.127.5])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 1E2762350F0;
-        Tue, 16 Nov 2021 16:20:39 +0100 (CET)
-Received: from gnbcxd0088.gnb.st.com (10.75.127.46) by SFHDAG2NODE2.st.com
- (10.75.127.5) with Microsoft SMTP Server (TLS) id 15.0.1497.26; Tue, 16 Nov
- 2021 16:20:38 +0100
-Date:   Tue, 16 Nov 2021 16:20:28 +0100
-From:   Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
-X-X-Sender: toromano@gnbcxd0088.gnb.st.com
-To:     Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Marek Vasut <marex@denx.de>, Ard Biesheuvel <ardb@kernel.org>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 7/8] crypto: stm32/cryp - fix bugs and crash in
- tests
-In-Reply-To: <20211102164729.9957-8-nicolas.toromanoff@foss.st.com>
-Message-ID: <alpine.DEB.2.21.2111161614500.27385@gnbcxd0088.gnb.st.com>
-References: <20211102164729.9957-1-nicolas.toromanoff@foss.st.com> <20211102164729.9957-8-nicolas.toromanoff@foss.st.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S238736AbhKPQDe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 11:03:34 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60600 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238619AbhKPQDd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Nov 2021 11:03:33 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F3FFA61C12;
+        Tue, 16 Nov 2021 16:00:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637078436;
+        bh=JwxnYwbgjPGa5I2tARYbozTLXPfvt8vxbd7WNU9JvRA=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=JHqr3wSXUs6/2LCB1i0BwUkEOuft8NUX2nn7LbdnN4RlbtrNAxVbkvnGGuWYDEHaj
+         g+l8IXd4nWozKS4ef3PI7UaSErC/GWw4eQ+I0lrmgayG6SJogWxn34dtnveij05Yw2
+         4mmnn6RLNJx6e/VAkFlN7yaIO7xYcKSgGSEi2+9kplKBoSZ928HsHJP0Sqm4arfD3t
+         /e7854T6dbsJd9ghvbJegay0Uhyp4fVgz4rF/efpAaxTgu7X71UanxgwgyOZY29UJJ
+         CzD6dqtEtonOIzvgCzaqKT5Mf0m2DSZ5v7JepbTROJHvcgncd8HYRVdCPNVjqAZzZO
+         VE/H0jUXQRlqA==
+Message-ID: <eac5f11d7ddcc65d16a9a949c5cf44851bff8f5f.camel@kernel.org>
+Subject: Re: [PATCH v7 00/17] Enroll kernel keys thru MOK
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Snowberg <eric.snowberg@oracle.com>, keyrings@vger.kernel.org,
+        linux-integrity@vger.kernel.org, zohar@linux.ibm.com,
+        dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jmorris@namei.org, serge@hallyn.com
+Cc:     keescook@chromium.org, torvalds@linux-foundation.org,
+        weiyongjun1@huawei.com, nayna@linux.ibm.com, ebiggers@google.com,
+        ardb@kernel.org, nramas@linux.microsoft.com, lszubowi@redhat.com,
+        jason@zx2c4.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        konrad.wilk@oracle.com
+Date:   Tue, 16 Nov 2021 18:00:34 +0200
+In-Reply-To: <20211116001545.2639333-1-eric.snowberg@oracle.com>
+References: <20211116001545.2639333-1-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.40.4-1 
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="US-ASCII"
-X-Originating-IP: [10.75.127.46]
-X-ClientProxiedBy: SFHDAG1NODE3.st.com (10.75.127.3) To SFHDAG2NODE2.st.com
- (10.75.127.5)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-16_03,2021-11-16_01,2020-04-07_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Mon, 2021-11-15 at 19:15 -0500, Eric Snowberg wrote:
+> Back in 2013 Linus requested a feature to allow end-users to have the=20
+> ability "to add their own keys and sign modules they trust". This was
+> his *second* order outlined here [1]. There have been many attempts=20
+> over the years to solve this problem, all have been rejected.=C2=A0 Many=
+=20
+> of the failed attempts loaded all preboot firmware keys into the kernel,
+> including the Secure Boot keys. Many distributions carry one of these=20
+> rejected attempts [2], [3], [4]. This series tries to solve this problem=
+=20
+> with a solution that takes into account all the problems brought up in=
+=20
+> the previous attempts.
+>=20
+> On UEFI based systems, this series introduces a new Linux kernel keyring=
+=20
+> containing the Machine Owner Keys (MOK) called machine. It also defines
+> a new MOK variable in shim. This variable allows the end-user to decide=
+=20
+> if they want to load MOK keys into the machine keyring. Mimi has suggeste=
+d=20
+> that only CA keys contained within the MOK be loaded into the machine=20
+> keyring. All other certs will load into the platform keyring instead.
+>=20
+> By default, nothing changes; MOK keys are not loaded into the machine
+> keyring.=C2=A0 They are only loaded after the end-user makes the decision=
+=20
+> themselves.=C2=A0 The end-user would set this through mokutil using a new=
+=20
+> --trust-mok option [5]. This would work similar to how the kernel uses=
+=20
+> MOK variables to enable/disable signature validation as well as use/ignor=
+e=20
+> the db. Any kernel operation that uses either the builtin or secondary=
+=20
+> trusted keys as a trust source shall also reference the new machine=20
+> keyring as a trust source.
+>=20
+> Secure Boot keys will never be loaded into the machine keyring.=C2=A0 The=
+y
+> will always be loaded into the platform keyring.=C2=A0 If an end-user wan=
+ted=20
+> to load one, they would need to enroll it into the MOK.
+>=20
+> Steps required by the end user:
+>=20
+> Sign kernel module with user created key:
+> $ /usr/src/kernels/$(uname -r)/scripts/sign-file sha512 \
+> =C2=A0=C2=A0 machine_signing_key.priv machine_signing_key.x509 my_module.=
+ko
+>=20
+> Import the key into the MOK
+> $ mokutil --import machine_signing_key.x509
+>=20
+> Setup the kernel to load MOK keys into the .machine keyring
+> $ mokutil --trust-mok
+>=20
+> Then reboot, the MokManager will load and ask if you want to trust the
+> MOK key and enroll the MOK into the MOKList.=C2=A0 Afterwards the signed =
+kernel
+> module will load.
+>=20
+> I have included=C2=A0 a link to the mokutil [5] changes I have made to su=
+pport=20
+> this new functionality.=C2=A0 The shim changes have now been accepted
+> upstream [6].
+>=20
+> [1] https://marc.info/?l=3Dlinux-kernel&m=3D136185386310140&w=3D2
+> [2] https://lore.kernel.org/lkml/1479737095.2487.34.camel@linux.vnet.ibm.=
+com/
+> [3] https://lore.kernel.org/lkml/1556221605.24945.3.camel@HansenPartnersh=
+ip.com/
+> [4] https://lore.kernel.org/linux-integrity/1e41f22b1f11784f1e943f32bf620=
+34d4e054cdb.camel@HansenPartnership.com/
+> [5] https://github.com/esnowberg/mokutil/tree/mokvars-v3
+> [6] https://github.com/rhboot/shim/commit/4e513405b4f1641710115780d19dcec=
+130c5208f
+>=20
+> Eric Snowberg (17):
+> =C2=A0 integrity: Introduce a Linux keyring called machine
+> =C2=A0 integrity: Do not allow machine keyring updates following init
+> =C2=A0 KEYS: Create static version of public_key_verify_signature
+> =C2=A0 X.509: Parse Basic Constraints for CA
+> =C2=A0 KEYS: CA link restriction
+> =C2=A0 integrity: restrict INTEGRITY_KEYRING_MACHINE to restrict_link_by_=
+ca
+> =C2=A0 integrity: Fix warning about missing prototypes
+> =C2=A0 integrity: add new keyring handler for mok keys
+> =C2=A0 KEYS: Rename get_builtin_and_secondary_restriction
+> =C2=A0 KEYS: add a reference to machine keyring
+> =C2=A0 KEYS: Introduce link restriction for machine keys
+> =C2=A0 KEYS: integrity: change link restriction to trust the machine keyr=
+ing
+> =C2=A0 KEYS: link secondary_trusted_keys to machine trusted keys
+> =C2=A0 integrity: store reference to machine keyring
+> =C2=A0 efi/mokvar: move up init order
+> =C2=A0 integrity: Trust MOK keys if MokListTrustedRT found
+> =C2=A0 integrity: Only use machine keyring when uefi_check_trust_mok_keys=
+ is
+> =C2=A0=C2=A0=C2=A0 true
+>=20
+> =C2=A0certs/system_keyring.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 | 44 ++++++++++-
+> =C2=A0crypto/asymmetric_keys/restrict.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 43 +++++++++++
+> =C2=A0crypto/asymmetric_keys/x509_cert_parser.c=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0 9 +++
+> =C2=A0drivers/firmware/efi/mokvar-table.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
+> =C2=A0include/crypto/public_key.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 15 =
+++++
+> =C2=A0include/keys/system_keyring.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 14 ++++
+> =C2=A0security/integrity/Kconfig=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ | 12 +++
+> =C2=A0security/integrity/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
+=A0 1 +
+> =C2=A0security/integrity/digsig.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 23 =
++++++-
+> =C2=A0security/integrity/integrity.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 17 +++-
+> =C2=A0.../platform_certs/keyring_handler.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 | 18 ++++-
+> =C2=A0.../platform_certs/keyring_handler.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 5 ++
+> =C2=A0security/integrity/platform_certs/load_uefi.c |=C2=A0 4 +-
+> =C2=A0.../platform_certs/machine_keyring.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 | 77 +++++++++++++++++++
+> =C2=A014 files changed, 273 insertions(+), 11 deletions(-)
+> =C2=A0create mode 100644 security/integrity/platform_certs/machine_keyrin=
+g.c
+>=20
+>=20
+> base-commit: fa55b7dcdc43c1aa1ba12bca9d2dd4318c2a0dbf
 
-Hello,
+Does shim have the necessary features in a release?
 
-> +static void stm32_cryp_write_ccm_first_header(struct stm32_cryp *cryp)
-> +{
-> [...]
-> +	} else {
-> +		/* Build the two first u32 of B1 */
-> +		b8[0] = 0xFF;
-> +		b8[1] = 0xFE;
-> +		b8[2] = alen & 0xFF000000 >> 24;
-> +		b8[3] = alen & 0x00FF0000 >> 16;
-> +		b8[4] = alen & 0x0000FF00 >> 8;
-
-Smatch found a bug here: "warn: shift has higher precedence than mask"
-
-Regards,
-Nicolas.
+/Jarkko
