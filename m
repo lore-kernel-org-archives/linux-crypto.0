@@ -2,44 +2,55 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D9ABC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 10:19:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9AE1C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 10:23:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3185161C4F
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 10:19:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90A0561AA2
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 10:23:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233962AbhKPKWf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 05:22:35 -0500
-Received: from mail-wr1-f48.google.com ([209.85.221.48]:40482 "EHLO
-        mail-wr1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233941AbhKPKWV (ORCPT
+        id S232919AbhKPK0r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 05:26:47 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:45922 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233977AbhKPK0n (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 05:22:21 -0500
-Received: by mail-wr1-f48.google.com with SMTP id r8so36428504wra.7
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Nov 2021 02:19:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2pVUUhOW+PPHRe1owVHKWAC0hNxvDcyMPYMZUcLWpfo=;
-        b=VIyGboDRF2Ffo5ssK9ht0mId8DDFE3D1zjXHMbLvRwb3hJ8LODhdtofI6e6lC226R1
-         SPTr1ZR9P1ZVUlLyAarLOAUVjIWnASqcGOjdJ4vwNo3tpzxYfNCmbxIvMDNai1nm5MDs
-         /dEUPzwr4b+QI2YOU7uhhO+iGgVHm7nNbTylA8n2tQdwS2R+fVFzAUq4kZO2rNuUtPxq
-         4456u45c38jfQic1tDeAjRAmurtMsO+oXXDREFiniEdbM2VMTCVN9NN9VDjixUuEYN8k
-         gART6yCQam6GE5/9b9g3faUpVvi1pVA4yI3g/gnFS9l2KQvyQkrCw0FjX/6gFstZa9uw
-         Bh0A==
-X-Gm-Message-State: AOAM532aovIZd6t4MU2asd4ltZLrAzx69Knfc8pw2VBft3mWnxceBB/K
-        SHT3Phfopa8PNErBVEPrItcCbUG4cSo=
-X-Google-Smtp-Source: ABdhPJwqefqf0wNR0FMTlsltbl/SJPJHAGRP8LTifsg0vB3tNEwjvpbKaPNg2IP7kWKdjELhfRti7Q==
-X-Received: by 2002:adf:e882:: with SMTP id d2mr7934329wrm.389.1637057964056;
-        Tue, 16 Nov 2021 02:19:24 -0800 (PST)
-Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id z6sm2560612wmp.1.2021.11.16.02.19.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Nov 2021 02:19:08 -0800 (PST)
+        Tue, 16 Nov 2021 05:26:43 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 49810218CE;
+        Tue, 16 Nov 2021 10:23:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1637058226; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=C6vc1pqiJTa400b8j7/ol2JdQMZnjyWLCaw6z9FjbcY=;
+        b=ACoAvPykN3W3fo2L9A90u/j+cpfdTAJQ4NEkSeh0LOEAJzMdqoWK1N8Ffbuz7NHFVPpQGX
+        whARcZIZMm5hr+HJHXCteFAfrQsTRyszl93fb1IWYQuLr+/78OkLYeplutEHXi7FPfCqF2
+        y+2z36Kam5n2zmlVwNc3+6+G3hwsH6U=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1637058226;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=C6vc1pqiJTa400b8j7/ol2JdQMZnjyWLCaw6z9FjbcY=;
+        b=Ej2xlWgnfiustAX4RgB86Yk+VpuJ6xG4NAUC+2Q1XuICJKAHbJNxr2E7mlzIQSa9rzR4pI
+        yETaX+HEzzSlsQDQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2A41913BA1;
+        Tue, 16 Nov 2021 10:23:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id W5XZCbKGk2HOJgAAMHmgww
+        (envelope-from <hare@suse.de>); Tue, 16 Nov 2021 10:23:46 +0000
 Subject: Re: [PATCHv5 00/12] nvme: In-band authentication support
-To:     Hannes Reinecke <hare@suse.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
 Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
         linux-nvme@lists.infradead.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -50,38 +61,77 @@ References: <20211112125928.97318-1-hare@suse.de>
  <f67ca46e-f421-33f7-da8b-ff6e47acf8c2@suse.de>
  <8553266f-005c-f947-4737-2108cb7062d1@grimberg.me>
  <a7363853-05af-9d7f-4d6f-b02ec756ce6b@suse.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <50095ec8-3825-efa5-98bb-76b0f0fdc21e@grimberg.me>
-Date:   Tue, 16 Nov 2021 12:18:58 +0200
+ <50095ec8-3825-efa5-98bb-76b0f0fdc21e@grimberg.me>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <31088486-0134-0dad-b052-32fd3ce2d1cf@suse.de>
+Date:   Tue, 16 Nov 2021 11:23:45 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <a7363853-05af-9d7f-4d6f-b02ec756ce6b@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <50095ec8-3825-efa5-98bb-76b0f0fdc21e@grimberg.me>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
->>>>> - Transform secret with correct hmac algorithm
->>>>
->>>> Is that what I reported last time? Can you perhaps
->>>> point me to the exact patch that fixes this?
->>>
->>> Well, no, not really; the patch itself got squashed in the main patches.
->>> But problem here was that the key transformation from section 8.13.5.7
->>> had been using the hash algorithm from the initial challenge, not the
->>> one specified in the key itself.
->>> This lead to decoding errors when using a key with a different length
->>> than the hash algorithm.
->>
->> That is exactly what I reported, changing the key length leads to
->> authentication errors.
+On 11/16/21 11:18 AM, Sagi Grimberg wrote:
 > 
-> Right-o. So it should be sorted then.
+>>>>>> - Transform secret with correct hmac algorithm
+>>>>>
+>>>>> Is that what I reported last time? Can you perhaps
+>>>>> point me to the exact patch that fixes this?
+>>>>
+>>>> Well, no, not really; the patch itself got squashed in the main
+>>>> patches.
+>>>> But problem here was that the key transformation from section 8.13.5.7
+>>>> had been using the hash algorithm from the initial challenge, not the
+>>>> one specified in the key itself.
+>>>> This lead to decoding errors when using a key with a different length
+>>>> than the hash algorithm.
+>>>
+>>> That is exactly what I reported, changing the key length leads to
+>>> authentication errors.
+>>
+>> Right-o. So it should be sorted then.
+> 
+> Hannes, was the issue on the host side or the controller side?
+> 
+The issue was actually on the host side.
 
-Hannes, was the issue on the host side or the controller side?
+> I'm a little lost into what was the actual fix...
 
-I'm a little lost into what was the actual fix...
+The basic fix was this:
+
+@@ -927,13 +944,17 @@ static int nvme_auth_dhchap_host_response(struct
+nvme_ctrl
+ *ctrl,
+
+        if (!chap->host_response) {
+                chap->host_response =
+nvme_auth_transform_key(ctrl->dhchap_key,
+-                                       ctrl->dhchap_key_len, chap->hash_id,
++                                       ctrl->dhchap_key_len,
++                                       ctrl->dhchap_key_hash,
+                                        ctrl->opts->host->nqn);
+                if (IS_ERR(chap->host_response)) {
+                        ret = PTR_ERR(chap->host_response);
+                        chap->host_response = NULL;
+                        return ret;
+                }
+
+
+(minus the linebreaks, of course).
+'chap->hash_id' is the hash selected by the initial negotiation, which
+is wrong as we should have used the hash function selected by the key
+itself.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
