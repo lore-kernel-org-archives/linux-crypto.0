@@ -2,143 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2653DC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 13:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A75EFC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 13:02:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B652611CC
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 13:02:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F74260EE0
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 13:02:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231833AbhKPNFO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 08:05:14 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:57862 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230182AbhKPNFN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 08:05:13 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B5E1C212C3;
-        Tue, 16 Nov 2021 13:02:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1637067729; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HZbn//2jHoLXpUwrCvvkW6DSHLSoB+3INvS/r2/24sc=;
-        b=FYRTscp/uk3I5t9ARhqDS+oQtcnEQmCncTzGPO3Hv9HK0a/NVU4TCKluaVO5R/7cGPqGbW
-        LEx7IOGROGGptHOqKmq0pFGJfJkdtNfSh5LJ0HAz9Fwe6SfxQtUxJJ6h3bEnl8NYqni85w
-        fHUT8gn/GEU0ASDMIXnyfZqwO8Oq4AI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1637067729;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HZbn//2jHoLXpUwrCvvkW6DSHLSoB+3INvS/r2/24sc=;
-        b=Ldn19b969Jzd4AIEqkaYx8K4ZPFYTGGbLwIV0KErqmeO5oTXcggS3KFfP/xdUBfurLUSgP
-        B8CPXQUhz4RySSAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7D46E13BA3;
-        Tue, 16 Nov 2021 13:02:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id HRJfHNCrk2HmbwAAMHmgww
-        (envelope-from <jroedel@suse.de>); Tue, 16 Nov 2021 13:02:08 +0000
-Date:   Tue, 16 Nov 2021 14:02:06 +0100
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Peter Gonda <pgonda@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Message-ID: <YZOrziJfGWHnBh++@suse.de>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
- <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com>
- <YZJTA1NyLCmVtGtY@work-vm>
- <YZKmSDQJgCcR06nE@google.com>
+        id S236507AbhKPNFg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 08:05:36 -0500
+Received: from pegase2.c-s.fr ([93.17.235.10]:37269 "EHLO pegase2.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236469AbhKPNFc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Nov 2021 08:05:32 -0500
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+        by localhost (Postfix) with ESMTP id 4HtmS96gnmz9sSD;
+        Tue, 16 Nov 2021 14:02:33 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+        by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id k0lLfgbTW02j; Tue, 16 Nov 2021 14:02:33 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase2.c-s.fr (Postfix) with ESMTP id 4HtmS95sz3z9sS6;
+        Tue, 16 Nov 2021 14:02:33 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id B64088B77A;
+        Tue, 16 Nov 2021 14:02:33 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id lWkZgdczF1MK; Tue, 16 Nov 2021 14:02:33 +0100 (CET)
+Received: from [192.168.234.8] (unknown [192.168.234.8])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 610B78B763;
+        Tue, 16 Nov 2021 14:02:33 +0100 (CET)
+Message-ID: <03183ae9-3dd3-b0da-31e6-c186b2bfcfcc@csgroup.eu>
+Date:   Tue, 16 Nov 2021 14:02:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 0/8] memset() in crypto code
+Content-Language: fr-FR
+To:     Sandy Harris <sandyinchina@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+References: <CACXcFmkO0g2YRjvfknKXr_ZnJaMg2cpvOsLq=h1ZcB=hg9NK8w@mail.gmail.com>
+From:   Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <CACXcFmkO0g2YRjvfknKXr_ZnJaMg2cpvOsLq=h1ZcB=hg9NK8w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <YZKmSDQJgCcR06nE@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 06:26:16PM +0000, Sean Christopherson wrote:
-> No, because as Andy pointed out, host userspace must already guard against a bad
-> GPA, i.e. this is just a variant of the guest telling the host to DMA to a GPA
-> that is completely bogus.  The shared vs. private behavior just means that when
-> host userspace is doing a GPA=>HVA lookup, it needs to incorporate the "shared"
-> state of the GPA.  If the host goes and DMAs into the completely wrong HVA=>PFN,
-> then that is a host bug; that the bug happened to be exploited by a buggy/malicious
-> guest doesn't change the fact that the host messed up.
 
-The thing is that the usual checking mechanisms can't be applied to
-guest-private pages. For user-space the GPA is valid if it fits into the
-guest memory layout user-space set up before. But whether a page is
-shared or private is the guests business. And without an expensive
-reporting/query mechanism user-space doesn't have the information to do
-the check.
 
-A mechanism to lock pages to shared is also needed, and that creates the
-next problems:
+Le 16/11/2021 Ã  12:20, Sandy Harris a Ã©critÂ :
+> Fairly often we want to clear some memory in crypto code; it holds
+> things we are done using and do not want to leave lying around where
+> an enemy might discover them. Typical examples are crypto keys or
+> random numbers we have generated and used for output.
+> 
+> The obvious way to do this is with memset(address,0,bytes) but there
+> is a problem with that; because we are done using that memory, the
+> compiler may optimise away the "useless" memset() call. Using
+> memzero_explicit(address,bytes) instead solves the problem; that
+> function is designed to resist the optimisation.
+> 
+> There are well over 100 memset() calls in .c files in the crypto and
+> security directories. I looked at them all and found about a dozen in
+> eight files that I thought should be changed to memzero_explicit().
+> Here they are as patches 1 to 8 in this series.
+> 
+> I did read some code & think moderately carefully, but I do not know
+> the code deeply & it is possible I have made some errors. I think
+> false positives (making unnecessary changes) are more likely than
+> false negatives (not catching necessary changes).
+> 
 
-	* Who can release the lock, only the process which created it or
-	  anyone who has the memory mapped?
+I see no point in doing 8 separate patches that all have the same 
+subject and the exact same light description.
 
-	* What happens when a process has locked guest regions and then
-	  dies with SIGSEGV, will its locks on guest memory be released
-	  stay around forever?
+I think it would be better to have a single patch with all the changes, 
+and use the cover letter description as description for that patch.
 
-And this is only what comes to mind immediatly, I sure there are more
-problematic details in such an interface.
-
-Regards,
-
--- 
-Jörg Rödel
-jroedel@suse.de
-
-SUSE Software Solutions Germany GmbH
-Maxfeldstr. 5
-90409 Nürnberg
-Germany
- 
-(HRB 36809, AG Nürnberg)
-Geschäftsführer: Ivo Totev
-
+Christophe
