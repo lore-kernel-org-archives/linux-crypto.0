@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0BABC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC1DC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:40:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD9326334A
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:40:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE0966336D
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:40:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232424AbhKPLnt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 06:43:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56136 "EHLO
+        id S235261AbhKPLnu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 06:43:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234944AbhKPLmg (ORCPT
+        with ESMTP id S235638AbhKPLn2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 06:42:36 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB8CDC061767;
-        Tue, 16 Nov 2021 03:38:19 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id p3-20020a05600c1d8300b003334fab53afso1679397wms.3;
-        Tue, 16 Nov 2021 03:38:19 -0800 (PST)
+        Tue, 16 Nov 2021 06:43:28 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C51FFC06120E;
+        Tue, 16 Nov 2021 03:39:57 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id a9so10733331wrr.8;
+        Tue, 16 Nov 2021 03:39:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:from:date:message-id:subject:to;
-        bh=eHO+LnzYTLvi1ibWQBQ4VJT9l42Re/gLaBNAO09hBu0=;
-        b=pu130IqB8Qy4jcg4TDLmnmcKdgryY8vLFCykVkkPJfcnk+FX8jnNgtK88l1bDHL5+W
-         lhhes8rAN46j/p3Ok/L8YwIUH/K78PiaU9P5ABv+gQAfN9pr5rSoh84kTj6SYzbrycdL
-         vKffhO1bYf30ZbIaqxezRU5MqfGyCC7XDMRqgf0G7elhzzoeNZm23WJpPJmyR2r9OIsV
-         2QQL3OnET3qK27plJHFGEyMVRfwxvWeOpPUAfMga6eRvT9+Dls8y92ry6RhzHMsvl+vz
-         1Zh/UrSN0tvDDaT7DzWilExeBYmWK0o+4BwLntgVF+SqWq0xvITEyVkv75qikIV+OJfU
-         LGLw==
+        bh=0lnIW5bIuasV3MVGJulBjO6erZ6NZCFpVTL6XPkUY7g=;
+        b=UTENRlvJv4CKfNdhgLfetOkofGUZ4Zvf1hW/NurNT5vUDxHNNIb/33acvpw1+D77OS
+         RvrwY+3Da+G0yn/wpX2PwmfBo2Fw11YM+9pTZpZB2NuProGgpT6TKugrcGdEc5KqCvZM
+         vwZGV7OG+wZjz4KAAFS/IJEIQE8bnRXLsjgD12Rjg/T/Tv4+5tQ+iq3zPs9/o4E+e8q/
+         5nYBR5MlANoH56B+5qlZj/z0S69ytkHHKgHOiE26ae3ghN4rQFiT77yWuG761QL5piO1
+         eMsLFG2qCR+MHRs1nd5AaLNE2C3n98hbtjeATSRPY+BCdMQI49O9ghgOKjy7lkBTyI4V
+         Y+xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=eHO+LnzYTLvi1ibWQBQ4VJT9l42Re/gLaBNAO09hBu0=;
-        b=c1jr6Tz51KM/PAg+yntP2Dc8MaP7LwwCPHtB+0VVr7vasxaR8/J5tNmGaRb0QTXvJh
-         EN4RLmSZSaZXnGKPWWzno0HbLDN3iT8mumlRQk3mtUxsSSvCRawixewbz84f+MQfAKHH
-         E+UbP7Ng5qQhHuZzWuxje2YP+f54orSfoNkycmEw001sUKYdHlkx0RJk1lnLC7Ff6QK6
-         DBUh/Wa9uRoc0SmRSmY3cTv6sz9PvR1n0iZ8ZUwcaWpb5EhUog1r+9q7sKAG+43Kwy4s
-         VLLLSz1nXOMXpFBJiXrxG0us2MXZQQchNMDKjd7UfcGEKsnVyWKqnkuGGKdF2dWmPJEu
-         NOaw==
-X-Gm-Message-State: AOAM5305BlISJ/yVE2hAPzPzpOA0ovpfhIcbypajp3bPZ9FA7+D147Cu
-        BACO3vhaMpNfVDE7JPPMhMZMcviPJCP/4h2qHV35ByAY/u0=
-X-Google-Smtp-Source: ABdhPJyeOJR96UJvqBee6IUrqwD26c0Xsj7Rz0iifGm1qj625vOJ1lY28aMdqEdExTkhtHnu3XsR5Oexjj5iVJnHvwI=
-X-Received: by 2002:a05:600c:1f13:: with SMTP id bd19mr52327080wmb.9.1637062698315;
- Tue, 16 Nov 2021 03:38:18 -0800 (PST)
+        bh=0lnIW5bIuasV3MVGJulBjO6erZ6NZCFpVTL6XPkUY7g=;
+        b=eF8AGFFV9D2JJ3F+kZg3buGiSs0YF0sUY6dwqFlp6aAbsmg4Bj0FaoG5+HZkPnkRNx
+         6gyPJD7nuUBO5JE2wdiIQzR9fwXlO1ZgmLnUMIf21EYtSb7MYw79e8GlVMWOBJZ0yh+T
+         dsVg7pdlsmo9V9LrSy2CcNDdpftC5eeMdPKplTOjQ4TJPdfnxNBW6zqLJW8dk6Ms7Xa2
+         znr3XI7xpKx8LEYpvuxjeYDWPknmFNUvgJ5gKNoT5ergwGNe5vSVWRBCs2RnJi+lv2NJ
+         +LaVRVzFwnflocIlaxBzb401H+4gNh04orqkxXFmUVl+nUax6i/pXxjvcrQxadkEM4pf
+         m1xQ==
+X-Gm-Message-State: AOAM530XkfLr33q6W5ZCfUsLVW5VrUHCOPvESOiW43Hoj2qIDZ0nBRW+
+        fn5OM3e6k32A9MXQLKESdGN1zxPzVIi1+pnpZD0y6NaFQ4o=
+X-Google-Smtp-Source: ABdhPJxdqnHy+l4gg9zlNJwBz43z7HVYBhCmcU6R3AaNMLjruGuDQXNbnm08ViAsE3fyjpx103quBwNYR6jNnV3NPwE=
+X-Received: by 2002:a05:6000:52:: with SMTP id k18mr8294124wrx.192.1637062796271;
+ Tue, 16 Nov 2021 03:39:56 -0800 (PST)
 MIME-Version: 1.0
 From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Tue, 16 Nov 2021 19:38:06 +0800
-Message-ID: <CACXcFmm=eUjfVAJGgFGPfHWCc7s37j0==eASdqJK3OBAazeyOQ@mail.gmail.com>
-Subject: [PATCH 7/8] Replace memset() with memzero_explicit()
+Date:   Tue, 16 Nov 2021 19:39:44 +0800
+Message-ID: <CACXcFmnYNSLvjNfyvWXq4VSxoreKTC27E+hotcFz-AQ0FCDT5w@mail.gmail.com>
+Subject: [PATCH 8/8] Replace memset() with memzero_explicit()
 To:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
@@ -65,20 +65,20 @@ away with memzero_explicit(address,bytes) which resists
 such optimisation
 
 ---
- crypto/sm2.c | 2 +-
+ crypto/rmd160.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/sm2.c b/crypto/sm2.c
-index db8a4a265669..58641d964671 100644
---- a/crypto/sm2.c
-+++ b/crypto/sm2.c
-@@ -124,7 +124,7 @@ static void sm2_ec_ctx_deinit(struct mpi_ec_ctx *ec)
- {
-     mpi_ec_deinit(ec);
+diff --git a/crypto/rmd160.c b/crypto/rmd160.c
+index c5fe4034b153..a80f783d5a4f 100644
+--- a/crypto/rmd160.c
++++ b/crypto/rmd160.c
+@@ -329,7 +329,7 @@ static int rmd160_final(struct shash_desc *desc, u8 *out)
+         dst[i] = cpu_to_le32p(&rctx->state[i]);
 
--    memset(ec, 0, sizeof(*ec));
-+    memzero_explicit(ec, sizeof(*ec));
+     /* Wipe context */
+-    memset(rctx, 0, sizeof(*rctx));
++    memzero_explicit(rctx, sizeof(*rctx));
+
+     return 0;
  }
-
- /* RESULT must have been initialized and is set on success to the
 --
