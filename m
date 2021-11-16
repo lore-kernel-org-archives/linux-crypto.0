@@ -2,83 +2,181 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EDE2C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 03:59:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42546C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 05:00:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3652061BFE
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 03:59:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2609A61BFB
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 05:00:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238464AbhKPEC2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 23:02:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36686 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238288AbhKPEC0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 23:02:26 -0500
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB5D3C1F317B;
-        Mon, 15 Nov 2021 16:47:39 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id g191-20020a1c9dc8000000b0032fbf912885so1081688wme.4;
-        Mon, 15 Nov 2021 16:47:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=a7Zpl/DXdhG00ea4QY24UUqjABtDhWhOn+Yu7tlYVgg=;
-        b=DDAcr2gsJ09hWMFGvzP3SCIik8Ot9gHLzhRzFB/JBY6bue7cOQ0KfNt1jpGHwbrmZJ
-         0Aqqt59vOfNv6TOQ2dQLXJhKdFbZmcBf8SrO63LJZlVuTQoNItLu+WhJP+F2ja2pL4LK
-         WDQhBXxr00BpgEge7yBuPUGwCeTQDtj1l4FpKKzFEsq4jF0OnLVnjU4EjgFqJw0RbNvC
-         v+9sh+s5V8oImiPF/qR70MR9Rn4AfGqofzaU5ksou7C/x7PFE+DrvFbGsaxTs4cj+O/n
-         DI6u+smh7iwCyXsiQEFadW6naLON9qMAGlmpJHbEj4jjlrzC8MGtHjD2MPn0Bn9MU1J5
-         8IWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=a7Zpl/DXdhG00ea4QY24UUqjABtDhWhOn+Yu7tlYVgg=;
-        b=G3B3uclaBUmQoKXGpT0KuFinO/wftEf7/wB5teJLu2xt/aRyG/Qghsx4TBmvZ11iYs
-         SUi8g0qPRCEV9ood2nhRlT016mG2kxLebC7OdbTnZsIP9voHjycUshzhne9W8wAn4KQZ
-         iLJ6sQvKO/ckJxfSacjhEN3JZGRzLmU3NeaBKuaQ2Zr9GtM6IpL+f83qRnhZpcUgvL7r
-         +Hru/JNBBJaTxHFekVlbeCZcLv65nnmfSViS73hf/UYnpdVF/9fIa9V6nN+hsBu4m/Uh
-         XFhKE7Oyi9VWLLK08YPQ/zH2y71xCmKwvI310dOovEQPQeGvR3BhyqNRWtB1nZKvS0xj
-         Dv5w==
-X-Gm-Message-State: AOAM530mqzD02Ni6Kk7JAht7hYjC0a5d+6XaDPm48vNmP8qV/sn744WP
-        MOuJOf+T+4TzHhGkuBFlPyVZq8ExWxu3ccGj96A=
-X-Google-Smtp-Source: ABdhPJxVNCaPU/aUukWSdSMMsjLAdKYDfnvDUeXfun4RqT4loLAMWitSH1BZt3ZVWHm01xMLz6Eyz5RfWhiutR0W4TE=
-X-Received: by 2002:a05:600c:2246:: with SMTP id a6mr63786688wmm.5.1637023658559;
- Mon, 15 Nov 2021 16:47:38 -0800 (PST)
-MIME-Version: 1.0
-References: <CACXcFmnOeHwuu4N=WiGrMB+NNgGer9oCLoG0JAORN03gv1y+HQ@mail.gmail.com>
- <YTG9fAQTha7ZP/kh@kroah.com>
-In-Reply-To: <YTG9fAQTha7ZP/kh@kroah.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Tue, 16 Nov 2021 08:47:26 +0800
-Message-ID: <CACXcFmkwRi9+guXc0v_t=pP6nMidKprD1EJdGTmEsU4puyit-A@mail.gmail.com>
-Subject: Re: memset() in crypto code
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        id S237275AbhKPFDv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 00:03:51 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36876 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230482AbhKPFDo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Nov 2021 00:03:44 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0A2DB61BF9;
+        Tue, 16 Nov 2021 05:00:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637038848;
+        bh=gOA/DqIuHnoyIPWhMKi35OEWm99vzDEl2z9BCaXYPCE=;
+        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
+        b=ECWHdIsa9raOte0ivRlaX5zUraoSDor3mhLn1LjGpJmCqjYI1EL+gpvDrx51IJ+rm
+         +VCi4FdIKlSWHpgaEdNEQV9GW/Q6hYPrNlCJ2abLV6ATrA2YigItSgj5TBy2V5fO2G
+         UfpxP0B4WrsVqdOqqwvc/bU5yC+z6EmeuKc7ksM6E0E7WdQllMHu0iCXw0FRQEWVdX
+         vSd/QjOvM6oFcsozrooiosqzbozOtI2QCeIAlzNhdOPJGQ31YEiKlcVi+ZCxgKD2Nm
+         OXynOhjRjnUgUJLXJgDY7Fq78lnkYKQBkQJw/ZG0Osa20kL+HV/7DKPP7IQ9m/IB0f
+         bmuicnUuWNX0A==
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
+        by mailauth.nyi.internal (Postfix) with ESMTP id 13AC227C0054;
+        Tue, 16 Nov 2021 00:00:45 -0500 (EST)
+Received: from imap48 ([10.202.2.98])
+  by compute6.internal (MEProxy); Tue, 16 Nov 2021 00:00:45 -0500
+X-ME-Sender: <xms:-zqTYTkmpastpk7xioLaZBSRJao9k-n9qE52sPvZxvCjyuYGPlTm3w>
+    <xme:-zqTYW2YKmgXBYjbSSfdL9g_gq7srYrbJqCH19hxDrrnQws_r-JGvfTr0Lcd2j7EN
+    0VC-b49C8sYHIRPYNE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvuddrfedugdejhecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvufgtgfesthhqredtreerjeenucfhrhhomhepfdetnhgu
+    hicunfhuthhomhhirhhskhhifdcuoehluhhtoheskhgvrhhnvghlrdhorhhgqeenucggtf
+    frrghtthgvrhhnpedvleehjeejvefhuddtgeegffdtjedtffegveethedvgfejieevieeu
+    feevuedvteenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpegrnhguhidomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudduiedukeeh
+    ieefvddqvdeifeduieeitdekqdhluhhtoheppehkvghrnhgvlhdrohhrgheslhhinhhugi
+    drlhhuthhordhush
+X-ME-Proxy: <xmx:-zqTYZos8aDErUYGtevu8zo8GpOSWHNJPRa1OlMpwA96D1xkSAP0ug>
+    <xmx:-zqTYbnFnSNboyysvQdEXnREdxw3kOK-5xGg3xzoovnZyffzwRl1qg>
+    <xmx:-zqTYR0qodo9tm-jUVoP1wGLE_O8e5kUf7g046VWPo_h0_kuu8zlhg>
+    <xmx:_TqTYb0twwIFSsfD0VdncnhPVDfBQfN2ipRE5-969-HzkGQC1p3h7YV7F0A>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 781AA21E006E; Tue, 16 Nov 2021 00:00:43 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.5.0-alpha0-1371-g2296cc3491-fm-20211109.003-g2296cc34
+Mime-Version: 1.0
+Message-Id: <40c1794a-104e-4bcd-add5-2096aefc23e1@www.fastmail.com>
+In-Reply-To: <CAA03e5E3Rvx0t8_ZrbNMZwBkjPivGKOg5HCShSFYwfkKDDHWtA@mail.gmail.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com> <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com> <YZJTA1NyLCmVtGtY@work-vm>
+ <YZKmSDQJgCcR06nE@google.com>
+ <CAA03e5E3Rvx0t8_ZrbNMZwBkjPivGKOg5HCShSFYwfkKDDHWtA@mail.gmail.com>
+Date:   Mon, 15 Nov 2021 21:00:23 -0800
+From:   "Andy Lutomirski" <luto@kernel.org>
+To:     "Marc Orr" <marcorr@google.com>,
+        "Sean Christopherson" <seanjc@google.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        "Borislav Petkov" <bp@alien8.de>,
+        "Dave Hansen" <dave.hansen@intel.com>,
+        "Peter Gonda" <pgonda@google.com>,
+        "Brijesh Singh" <brijesh.singh@amd.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+        "kvm list" <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, "Joerg Roedel" <jroedel@suse.de>,
+        "Tom Lendacky" <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Ard Biesheuvel" <ardb@kernel.org>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        "Wanpeng Li" <wanpengli@tencent.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        "Dave Hansen" <dave.hansen@linux.intel.com>,
+        "Sergio Lopez" <slp@redhat.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        "Srinivas Pandruvada" <srinivas.pandruvada@linux.intel.com>,
+        "David Rientjes" <rientjes@google.com>,
+        "Dov Murik" <dovmurik@linux.ibm.com>,
+        "Tobin Feldman-Fitzthum" <tobin@ibm.com>,
+        "Michael Roth" <Michael.Roth@amd.com>,
+        "Vlastimil Babka" <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        "Andi Kleen" <ak@linux.intel.com>,
+        "Tony Luck" <tony.luck@intel.com>,
+        "Sathyanarayanan Kuppuswamy" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP) Hypervisor
+ Support
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 3, 2021 at 2:15 PM Greg KH <gregkh@linuxfoundation.org> wrote:
->
-> On Fri, Sep 03, 2021 at 09:13:43AM +0800, Sandy Harris wrote:
-> > Doing this the crypto directory:
-> > grep memset *.c | wc -l
-> > I get 137 results.
-> >
-> > The compiler may optimise memset() away, subverting the intent of
-> > these operations. We have memzero_explicit() to avoid that problem.
-> >
-> > Should most or all those memset() calls be replaced?
->
-> The ones that are determined to actually need this, sure, but a simple
-> grep like that does not actually show that.  You need to read the code
-> itself to determine the need or not, please do so.
 
-Done. Patches to follow. I ended up making about a dozen changes
-in eight files. Of course, while I did read the code, I do not know it
-deeply so I may have misjudged some.
+
+On Mon, Nov 15, 2021, at 10:41 AM, Marc Orr wrote:
+> On Mon, Nov 15, 2021 at 10:26 AM Sean Christopherson <seanjc@google.co=
+m> wrote:
+>>
+>> On Mon, Nov 15, 2021, Dr. David Alan Gilbert wrote:
+>> > * Sean Christopherson (seanjc@google.com) wrote:
+>> > > On Fri, Nov 12, 2021, Borislav Petkov wrote:
+>> > > > On Fri, Nov 12, 2021 at 09:59:46AM -0800, Dave Hansen wrote:
+>> > > > > Or, is there some mechanism that prevent guest-private memory=
+ from being
+>> > > > > accessed in random host kernel code?
+>> > >
+>> > > Or random host userspace code...
+>> > >
+>> > > > So I'm currently under the impression that random host->guest a=
+ccesses
+>> > > > should not happen if not previously agreed upon by both.
+>> > >
+>> > > Key word "should".
+>> > >
+>> > > > Because, as explained on IRC, if host touches a private guest p=
+age,
+>> > > > whatever the host does to that page, the next time the guest ru=
+ns, it'll
+>> > > > get a #VC where it will see that that page doesn't belong to it=
+ anymore
+>> > > > and then, out of paranoia, it will simply terminate to protect =
+itself.
+>> > > >
+>> > > > So cloud providers should have an interest to prevent such rand=
+om stray
+>> > > > accesses if they wanna have guests. :)
+>> > >
+>> > > Yes, but IMO inducing a fault in the guest because of _host_ bug =
+is wrong.
+>> >
+>> > Would it necessarily have been a host bug?  A guest telling the hos=
+t a
+>> > bad GPA to DMA into would trigger this wouldn't it?
+>>
+>> No, because as Andy pointed out, host userspace must already guard ag=
+ainst a bad
+>> GPA, i.e. this is just a variant of the guest telling the host to DMA=
+ to a GPA
+>> that is completely bogus.  The shared vs. private behavior just means=
+ that when
+>> host userspace is doing a GPA=3D>HVA lookup, it needs to incorporate =
+the "shared"
+>> state of the GPA.  If the host goes and DMAs into the completely wron=
+g HVA=3D>PFN,
+>> then that is a host bug; that the bug happened to be exploited by a b=
+uggy/malicious
+>> guest doesn't change the fact that the host messed up.
+>
+> "If the host goes and DMAs into the completely wrong HVA=3D>PFN, then
+> that is a host bug; that the bug happened to be exploited by a
+> buggy/malicious guest doesn't change the fact that the host messed
+> up."
+> ^^^
+> Again, I'm flabbergasted that you are arguing that it's OK for a guest
+> to exploit a host bug to take down host-side processes or the host
+> itself, either of which could bring down all other VMs on the machine.
+>
+> I'm going to repeat -- this is not OK! Period.
+
+I don=E2=80=99t understand the point you=E2=80=99re trying to make. If t=
+he host _kernel_has a bug that allows a guest to trigger invalid host me=
+mory access, this is bad. We want to know about it and fix it, abcs the =
+security folks want to minimize the chance that such a bug exists.
+
+If host _userspace_ such a bug, the kernel should not crash if it=E2=80=99=
+s exploited.
