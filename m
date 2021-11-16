@@ -2,112 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFA7BC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 14:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD8EBC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 14:42:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B15EE63213
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 14:33:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1FC163219
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 14:42:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237415AbhKPOgC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 09:36:02 -0500
-Received: from wnew2-smtp.messagingengine.com ([64.147.123.27]:43203 "EHLO
-        wnew2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237311AbhKPOgA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 09:36:00 -0500
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailnew.west.internal (Postfix) with ESMTP id 119052B012A8;
-        Tue, 16 Nov 2021 09:33:00 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Tue, 16 Nov 2021 09:33:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cerno.tech; h=
-        from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=fm1; bh=6hLb7OiPLBrXnVyULLTa9eHYTZ
-        vzjrzL3lOYSa2SxUA=; b=h+v4YcQKu+CrzkqZTy9bmNtSZ2hXULf0aC8sHp1E4e
-        Z/ni0EHF0HiM3Dfl0QtAymT2PVq5z15HzVNWqobF6+eZ52f1AwdsXWMin7hBXBSp
-        pvU8fbVOaIrUgt2e2yddrhKm+O1Lct/lW/7QSPQVaKe3eiitFNp1mXJ36czbQHjJ
-        /ZnfsX+qvTJfgSkUWnKCMTUJRBJvJIcFtPVOZnY4nCYJr2O0/W+QQqcjSO2hEWS0
-        TzULGCzNEngZZLnj88B0Wm4X5l9dAx2HkJSfyS0XSGE8ZDErYb08/qgn+9SLAnsv
-        ZLe3LFgLzqHGoO8Y+2hTFyI/Gc9mIaq2Zm4sDbkLtiwg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=6hLb7OiPLBrXnVyUL
-        LTa9eHYTZvzjrzL3lOYSa2SxUA=; b=lYvIBrks1J5OC0qoI5w0NwLEF2d0RtLzt
-        T3CZQ28oh4ijYSJNm3DU/+p7e7YWPFHJAzR4DcUWDrWmkqLnKrOqWjBWOkFkDFGO
-        PyRJpmFX+VC0Xl7UkwJXQmO6C/4CCbnfz5J1rFZHX7uCKEd16v4h+qFIlz+ax+Wk
-        bWu205D/op0Z7zBV3/AV68PyJHJz0NLlpi3ZvnOiLAwl8vNdk03B0xiIy4VKQyef
-        ClK28MkyIsyhCBOSOsJ0e3BdGzCYB4NyetwFXb6hPMG2pAofPIlLJLzpm44KPB+8
-        97UCHeXcPymYwjKG5lhP1KlyZxpUdP+Gf/aRgLPpu4WgDvdD2+HoQ==
-X-ME-Sender: <xms:GsGTYaDtOYcM-Y8T8Yrf_Qa12vKN-RydhBqdTbCRuYz5RnX6kQ1t8A>
-    <xme:GsGTYUgJnra-_Hvasw9UEjf4k75ehvU4UMaNTe-OentATW79qAUSnuY7hCbpHwZFa
-    Gv-Mby9hZ-eTvsvN_E>
-X-ME-Received: <xmr:GsGTYdn7YLMx-5UDDrr6pBS9i5zMfeLUP9-cc8KJiESiVCaHI1dQfpRRP8aYK9f0jEtTjQubqCqToQy18WT7ezdBkIzBddaGLWDesIiq>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvuddrfedvgdeigecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefhvffufffkofgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucft
-    ihhprghrugcuoehmrgigihhmvgestggvrhhnohdrthgvtghhqeenucggtffrrghtthgvrh
-    hnpeejffehuddvvddvlefhgeelleffgfeijedvhefgieejtdeiueetjeetfeeukeejgeen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmrgigih
-    hmvgestggvrhhnohdrthgvtghh
-X-ME-Proxy: <xmx:GsGTYYydfyEhLnPJlKflOFIZ_j1DFl04W98JVkOIUe-tYdaeX7NZ5A>
-    <xmx:GsGTYfSgNcwwotchPUcyJW44h9c5fBLbRjzqIi4w2KWS6ail8IYaoA>
-    <xmx:GsGTYTZcR5tiSfewkOu_Sunv2DYjKHLFPt-NBkDRTJCDVe-qEPko5Q>
-    <xmx:G8GTYU85J4GqdSITe81KCz4ZBAi-AChIINzXopoqrU_PLlPAddjqHLr9Khk>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 16 Nov 2021 09:32:57 -0500 (EST)
-From:   Maxime Ripard <maxime@cerno.tech>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Frank Rowand <frowand.list@gmail.com>
-Cc:     devicetree@vger.kernel.org, Chen-Yu Tsai <wens@csie.org>,
-        Maxime Ripard <maxime@cerno.tech>,
-        =?UTF-8?q?Jernej=20=C5=A0krabec?= <jernej.skrabec@gmail.com>,
-        linux-sunxi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH] dt-bindings: crypto: Add optional dma properties
-Date:   Tue, 16 Nov 2021 15:32:55 +0100
-Message-Id: <20211116143255.385480-1-maxime@cerno.tech>
-X-Mailer: git-send-email 2.33.1
+        id S237701AbhKPOpB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 09:45:01 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47308 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237777AbhKPOoK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Nov 2021 09:44:10 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 210E46323D;
+        Tue, 16 Nov 2021 14:41:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637073673;
+        bh=BI3DXbE9gpfIqWL9BnbaNZ6E/Bn4OUk2FHNYGVBobTk=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=TrvFSCcMyTIR9IVO+ThXMrw0tcoffWYWpf8myCun9FASehWutNb10MQ+3WMjGLM/M
+         zfY5FGVJTlE38W0ko3zcTDyujAjvyyj5MCTi7ylgWp+F9HEFoMwUSyV+LNxCjgodq2
+         Z7mZ9KHIt3W8feRD9nZ5zHEkuT57rWzyZBDxh170wVA4KhvnnXsd0MzDFXSbvT/U5Z
+         Ew54jUQAx6AAwhxNxTQqYpPspXnrvSr4915YbGoiyDhm+iBs/7q7VRvAVOMHL3+U8D
+         X9xlejw09rBzZ7MikbKxcblj6WtV20RYxktX/h8dErc0M9UIZij4uSOid1OGFY44HW
+         l2y7cZoAF3/PA==
+Received: by mail-ot1-f42.google.com with SMTP id u18-20020a9d7212000000b00560cb1dc10bso33810457otj.11;
+        Tue, 16 Nov 2021 06:41:13 -0800 (PST)
+X-Gm-Message-State: AOAM530HLwUC7wa1rKwZS9E3xh6BQAbtn5GZHhDGhU/cr0LdFtNoLgy0
+        tI2ChKtSuKHxAEuRs2pt+PraYAFp91d7/6YHN2k=
+X-Google-Smtp-Source: ABdhPJyz182iVRGs2o144bv5JsNE7qgZa+kRxcT3JaTqZi5BX2Ugif7IVqr45uC7Ts3OoFdaw6xmJmhcM99DAzDQNNM=
+X-Received: by 2002:a9d:6c54:: with SMTP id g20mr6710255otq.30.1637073672398;
+ Tue, 16 Nov 2021 06:41:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CACXcFmkO0g2YRjvfknKXr_ZnJaMg2cpvOsLq=h1ZcB=hg9NK8w@mail.gmail.com>
+In-Reply-To: <CACXcFmkO0g2YRjvfknKXr_ZnJaMg2cpvOsLq=h1ZcB=hg9NK8w@mail.gmail.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 16 Nov 2021 15:41:00 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXE5rZdUoNd4vqXDCuNbHuwapnxskU1pabQax4LVvUWxgg@mail.gmail.com>
+Message-ID: <CAMj1kXE5rZdUoNd4vqXDCuNbHuwapnxskU1pabQax4LVvUWxgg@mail.gmail.com>
+Subject: Re: [PATCH 0/8] memset() in crypto code
+To:     Sandy Harris <sandyinchina@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some platforms, like the v3s, have DMA channels assigned to the crypto
-engine, which were in the DTSI but were never documented.
+On Tue, 16 Nov 2021 at 12:20, Sandy Harris <sandyinchina@gmail.com> wrote:
+>
+> Fairly often we want to clear some memory in crypto code; it holds
+> things we are done using and do not want to leave lying around where
+> an enemy might discover them. Typical examples are crypto keys or
+> random numbers we have generated and used for output.
+>
+> The obvious way to do this is with memset(address,0,bytes) but there
+> is a problem with that; because we are done using that memory, the
+> compiler may optimise away the "useless" memset() call. Using
+> memzero_explicit(address,bytes) instead solves the problem; that
+> function is designed to resist the optimisation.
+>
+> There are well over 100 memset() calls in .c files in the crypto and
+> security directories. I looked at them all and found about a dozen in
+> eight files that I thought should be changed to memzero_explicit().
+> Here they are as patches 1 to 8 in this series.
+>
+> I did read some code & think moderately carefully, but I do not know
+> the code deeply & it is possible I have made some errors. I think
+> false positives (making unnecessary changes) are more likely than
+> false negatives (not catching necessary changes).
 
-Let's make sure they are.
+Hello Sandy,
 
-Signed-off-by: Maxime Ripard <maxime@cerno.tech>
----
- .../bindings/crypto/allwinner,sun4i-a10-crypto.yaml    | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+As Greg alluded in reply to one of these patches, memzero_explicit()
+is only usually needed for stack variables, because in those cases,
+the compiler is able to infer that the memset() is the last thing that
+touches the variable before it goes out of scope, and so memset()ing
+it can be omitted.
 
-diff --git a/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto.yaml b/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto.yaml
-index 0429fb774f10..dedc99e34ebc 100644
---- a/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto.yaml
-+++ b/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto.yaml
-@@ -44,6 +44,16 @@ properties:
-       - const: ahb
-       - const: mod
- 
-+  dmas:
-+    items:
-+      - description: RX DMA Channel
-+      - description: TX DMA Channel
-+
-+  dma-names:
-+    items:
-+      - const: rx
-+      - const: tx
-+
-   resets:
-     maxItems: 1
- 
--- 
-2.33.1
-
+Variables that are passed into a function by pointer reference have a
+life time that is not known to the callee, and so there is no way the
+compiler can elide memset() calls, which means that using
+memzero_explicit() in such cases is not needed. The exception is
+functions with static linkage that may end up being inlined into their
+callers, but in the crypto subsystem, many such functions are invoked
+indirectly via exported function pointers, which makes inlining
+impossible.
