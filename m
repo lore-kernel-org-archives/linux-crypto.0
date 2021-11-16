@@ -2,83 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC1DC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:40:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B67C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:49:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE0966336D
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:40:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE116611C3
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:49:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235261AbhKPLnu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 06:43:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56490 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235638AbhKPLn2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 06:43:28 -0500
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C51FFC06120E;
-        Tue, 16 Nov 2021 03:39:57 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id a9so10733331wrr.8;
-        Tue, 16 Nov 2021 03:39:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=0lnIW5bIuasV3MVGJulBjO6erZ6NZCFpVTL6XPkUY7g=;
-        b=UTENRlvJv4CKfNdhgLfetOkofGUZ4Zvf1hW/NurNT5vUDxHNNIb/33acvpw1+D77OS
-         RvrwY+3Da+G0yn/wpX2PwmfBo2Fw11YM+9pTZpZB2NuProGgpT6TKugrcGdEc5KqCvZM
-         vwZGV7OG+wZjz4KAAFS/IJEIQE8bnRXLsjgD12Rjg/T/Tv4+5tQ+iq3zPs9/o4E+e8q/
-         5nYBR5MlANoH56B+5qlZj/z0S69ytkHHKgHOiE26ae3ghN4rQFiT77yWuG761QL5piO1
-         eMsLFG2qCR+MHRs1nd5AaLNE2C3n98hbtjeATSRPY+BCdMQI49O9ghgOKjy7lkBTyI4V
-         Y+xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=0lnIW5bIuasV3MVGJulBjO6erZ6NZCFpVTL6XPkUY7g=;
-        b=eF8AGFFV9D2JJ3F+kZg3buGiSs0YF0sUY6dwqFlp6aAbsmg4Bj0FaoG5+HZkPnkRNx
-         6gyPJD7nuUBO5JE2wdiIQzR9fwXlO1ZgmLnUMIf21EYtSb7MYw79e8GlVMWOBJZ0yh+T
-         dsVg7pdlsmo9V9LrSy2CcNDdpftC5eeMdPKplTOjQ4TJPdfnxNBW6zqLJW8dk6Ms7Xa2
-         znr3XI7xpKx8LEYpvuxjeYDWPknmFNUvgJ5gKNoT5ergwGNe5vSVWRBCs2RnJi+lv2NJ
-         +LaVRVzFwnflocIlaxBzb401H+4gNh04orqkxXFmUVl+nUax6i/pXxjvcrQxadkEM4pf
-         m1xQ==
-X-Gm-Message-State: AOAM530XkfLr33q6W5ZCfUsLVW5VrUHCOPvESOiW43Hoj2qIDZ0nBRW+
-        fn5OM3e6k32A9MXQLKESdGN1zxPzVIi1+pnpZD0y6NaFQ4o=
-X-Google-Smtp-Source: ABdhPJxdqnHy+l4gg9zlNJwBz43z7HVYBhCmcU6R3AaNMLjruGuDQXNbnm08ViAsE3fyjpx103quBwNYR6jNnV3NPwE=
-X-Received: by 2002:a05:6000:52:: with SMTP id k18mr8294124wrx.192.1637062796271;
- Tue, 16 Nov 2021 03:39:56 -0800 (PST)
-MIME-Version: 1.0
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Tue, 16 Nov 2021 19:39:44 +0800
-Message-ID: <CACXcFmnYNSLvjNfyvWXq4VSxoreKTC27E+hotcFz-AQ0FCDT5w@mail.gmail.com>
-Subject: [PATCH 8/8] Replace memset() with memzero_explicit()
-To:     LKML <linux-kernel@vger.kernel.org>,
+        id S235421AbhKPLwm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 06:52:42 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42646 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235621AbhKPLwQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Nov 2021 06:52:16 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 362CF61507;
+        Tue, 16 Nov 2021 11:49:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1637063359;
+        bh=ltnwVkm+/9lPDIu3OTfyYvoXGXjInw+a7bphTvljOYk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=0j79+bJyAjRL40BhpORoBUK/QLN7+SUlloYLNgmGgNhPXBsbKNcXBQCvWnDwGrsMp
+         NmPh7/OSo30bALWMOsR/9RjxxsuEw1A62QGhiZmjVbXncbTbEWlQQlStIfHWRxCwMK
+         Z5xzmf06mykSINjERBZw5atJLYpqz/ycBVulCOgs=
+Date:   Tue, 16 Nov 2021 12:49:17 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Sandy Harris <sandyinchina@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/8] Replace memset() with memzero_explicit()
+Message-ID: <YZOavRak9sxXKZMq@kroah.com>
+References: <CACXcFm=kwziZ5Etdevu0uq_t5qy0NbGY753WfLvnwkMqtU9Tvg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACXcFm=kwziZ5Etdevu0uq_t5qy0NbGY753WfLvnwkMqtU9Tvg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Replace memset(address,0,bytes) which may be optimised
-away with memzero_explicit(address,bytes) which resists
-such optimisation
+On Tue, Nov 16, 2021 at 07:25:22PM +0800, Sandy Harris wrote:
+> Replace memset(address,0,bytes) which may be optimised away
+> with memzero_explicit(address,bytes) which resists
+> such optimisation
+> 
+> ---
+>  crypto/des_generic.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/crypto/des_generic.c b/crypto/des_generic.c
+> index c85354a5e94c..105a32e7afea 100644
+> --- a/crypto/des_generic.c
+> +++ b/crypto/des_generic.c
+> @@ -30,7 +30,7 @@ static int des_setkey(struct crypto_tfm *tfm, const u8 *key,
+>              err = 0;
+>      }
+>      if (err)
+> -        memset(dctx, 0, sizeof(*dctx));
+> +        memzero_explicit(dctx, sizeof(*dctx));
+>      return err;
+>  }
+> 
+> @@ -62,7 +62,7 @@ static int des3_ede_setkey(struct crypto_tfm *tfm,
+> const u8 *key,
+>              err = 0;
+>      }
+>      if (err)
+> -        memset(dctx, 0, sizeof(*dctx));
+> +        memzero_explicit(dctx, sizeof(*dctx));
+>      return err;
+>  }
+> 
+> --
 
----
- crypto/rmd160.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi,
 
-diff --git a/crypto/rmd160.c b/crypto/rmd160.c
-index c5fe4034b153..a80f783d5a4f 100644
---- a/crypto/rmd160.c
-+++ b/crypto/rmd160.c
-@@ -329,7 +329,7 @@ static int rmd160_final(struct shash_desc *desc, u8 *out)
-         dst[i] = cpu_to_le32p(&rctx->state[i]);
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
 
-     /* Wipe context */
--    memset(rctx, 0, sizeof(*rctx));
-+    memzero_explicit(rctx, sizeof(*rctx));
+You are receiving this message because of the following common error(s)
+as indicated below:
 
-     return 0;
- }
---
+- Your patch does not have a Signed-off-by: line.  Please read the
+  kernel file, Documentation/SubmittingPatches and resend it after
+  adding that line.  Note, the line needs to be in the body of the
+  email, before the patch, not at the bottom of the patch or in the
+  email signature.
+
+- You did not write a descriptive Subject: for the patch, allowing Greg,
+  and everyone else, to know what this patch is all about.  Please read
+  the section entitled "The canonical patch format" in the kernel file,
+  Documentation/SubmittingPatches for what a proper Subject: line should
+  look like.
+
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
+
+thanks,
+
+greg k-h's patch email bot
