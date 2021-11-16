@@ -2,28 +2,28 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B67C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:49:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15A95C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:51:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE116611C3
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:49:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 033B7619E8
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:51:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235421AbhKPLwm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 06:52:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:42646 "EHLO mail.kernel.org"
+        id S235590AbhKPLyY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 06:54:24 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43234 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235621AbhKPLwQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 06:52:16 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 362CF61507;
-        Tue, 16 Nov 2021 11:49:19 +0000 (UTC)
+        id S235600AbhKPLyB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Nov 2021 06:54:01 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 28E3E617E4;
+        Tue, 16 Nov 2021 11:51:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1637063359;
-        bh=ltnwVkm+/9lPDIu3OTfyYvoXGXjInw+a7bphTvljOYk=;
+        s=korg; t=1637063460;
+        bh=XA/nVyuSqCQwJvSumwNtOCvTk0XF+pHit+xMMiZ+vQg=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=0j79+bJyAjRL40BhpORoBUK/QLN7+SUlloYLNgmGgNhPXBsbKNcXBQCvWnDwGrsMp
-         NmPh7/OSo30bALWMOsR/9RjxxsuEw1A62QGhiZmjVbXncbTbEWlQQlStIfHWRxCwMK
-         Z5xzmf06mykSINjERBZw5atJLYpqz/ycBVulCOgs=
-Date:   Tue, 16 Nov 2021 12:49:17 +0100
+        b=vgJu23Q58AmUmvYJ8mHf+XYkmjR/I9kKpqZDVAz2zehyFTUQVJQzzQnQ/ka3v9ZKh
+         RC+L+WWWLKPBcGsbXhRcwXr1s3+Fd+XUBpc7zc14HbAGOUEGpM4P7EKfV0ifbE35Fy
+         DPHUKXT+pdyFD0jiKS5SFNrvb8USCRwuzKf9BRls=
+Date:   Tue, 16 Nov 2021 12:50:58 +0100
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     Sandy Harris <sandyinchina@gmail.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
@@ -31,7 +31,7 @@ Cc:     LKML <linux-kernel@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 1/8] Replace memset() with memzero_explicit()
-Message-ID: <YZOavRak9sxXKZMq@kroah.com>
+Message-ID: <YZObImtJITs1ZfUc@kroah.com>
 References: <CACXcFm=kwziZ5Etdevu0uq_t5qy0NbGY753WfLvnwkMqtU9Tvg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -73,38 +73,13 @@ On Tue, Nov 16, 2021 at 07:25:22PM +0800, Sandy Harris wrote:
 >      return err;
 >  }
 > 
-> --
 
-Hi,
+Have you looked at the output of the compiler to see if this really is
+needed or not?
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
-
-You are receiving this message because of the following common error(s)
-as indicated below:
-
-- Your patch does not have a Signed-off-by: line.  Please read the
-  kernel file, Documentation/SubmittingPatches and resend it after
-  adding that line.  Note, the line needs to be in the body of the
-  email, before the patch, not at the bottom of the patch or in the
-  email signature.
-
-- You did not write a descriptive Subject: for the patch, allowing Greg,
-  and everyone else, to know what this patch is all about.  Please read
-  the section entitled "The canonical patch format" in the kernel file,
-  Documentation/SubmittingPatches for what a proper Subject: line should
-  look like.
-
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
+And what exactly are you zeroing out that could be read afterward
+somehow?
 
 thanks,
 
-greg k-h's patch email bot
+greg k-h
