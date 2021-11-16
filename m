@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF9EEC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:33:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05491C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:36:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93B6C61360
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:33:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3C3761AA3
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 11:36:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235719AbhKPLfv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 06:35:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55032 "EHLO
+        id S235144AbhKPLjI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 06:39:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235554AbhKPLdt (ORCPT
+        with ESMTP id S235475AbhKPLiG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 06:33:49 -0500
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DBC4C061766;
-        Tue, 16 Nov 2021 03:30:52 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id d5so36908926wrc.1;
-        Tue, 16 Nov 2021 03:30:52 -0800 (PST)
+        Tue, 16 Nov 2021 06:38:06 -0500
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C4ECC061764;
+        Tue, 16 Nov 2021 03:32:59 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id a9so10695411wrr.8;
+        Tue, 16 Nov 2021 03:32:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:from:date:message-id:subject:to;
-        bh=3vMY7wpgxEOPnmcVhZUPHgtnZuCn2Fi54kwyxPuSgk8=;
-        b=kzFtBPZjmp0qawjCbfxG0hnHk7KOrRP6WQUQX5LTYV2SFnL6XudBi5VXQpJjg+H3cR
-         VMDzyBvvzhcucCY5qTArAiyUOaVmww1jULjbJWYqhmgIuofuniWBVQrzDPa/nhbfmaHb
-         uNhsjT3Jh090Pe7+ISUlSpA8Kwsj5/+egeesATH6wHGnqCBSWME+Hn8AyRSTnBsdaizJ
-         XbmIEoLvOkDjDcTp/EhIzMXUIuLR7o78amgM7h+/6Oq6ZjkPTnTqL0fGzFC4iUS79453
-         jLM6Lok1davECP+gqPQd0oZObZPLZMz2lXmrZaUmkCytScvgk5d3d+ovz+KXTN0Py1vc
-         Z8sg==
+        bh=MwLBy7MN9rjOVXhuT6sJXkWqGYnANC26XLE5d8TIP2Q=;
+        b=D00XmI5yrQrfUGaeKyMzsfY8RNjjMt8lkKZ+ONpTApw9XlyRxU9RYC744+12rvK8Ks
+         6JxSFOiWlDSVI3eAFxm8K8caAqtBXetSwMPf3OTWgNNTcGceTAsNkYHcbShp0xv9H6NC
+         gk0W+dWgc5BHF3Qb9XdTNaBjIZx45C2SHpbtmZeEa7HxC0NeoZGHwfY898jNio8jRi4S
+         NuTyLVkhtj9HtFxKAwUbwZD1PhYhS9jv06Rwqx27sIW1k2EvSBbuiWKSU/hHo6vp+6TP
+         0L8zxyx07NO5i6lisAJa56j4yI4kkfMCV2IAiy+ya8DiBvv8gtnMMwRkahQJTbSf+yX/
+         R9kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=3vMY7wpgxEOPnmcVhZUPHgtnZuCn2Fi54kwyxPuSgk8=;
-        b=sh2tJsScShaqrOJzLMig94XqVK5Y6ZgdJUGRwWww0d3Dq7fZz59bDJqgckU+0hfiNJ
-         odulci9s5eNHIgJkch51idhDKVtz+hO0xlEEb6LRU1VwLGdQM/cSE4O4POioV9vxr7VJ
-         B4vEibUeO2H53uB1w3i86PQGO/T8EVem7Q1lx+Dl343cG4tRRCAPujrobO7tqespBG7R
-         nUdvJZfenUrqTRngx6fATAPbOApt3pYhElmmiYmtY70RrQvItO4Ur7oxwkGdIiyN/UkD
-         cSElOcyhy+kDwshDtDgSHeIl5HxVmIieZiGhgpj8yF73CEyZT3O1TIayFwYk4d/BRqyN
-         Be/A==
-X-Gm-Message-State: AOAM530AJfXypxL5j/2zaje/AAyuxo6MAbEybp+agS6lj+MVeYaDJK54
-        kx3YpbrIgAzdOhKFUXXcJt+zeMYGPxyx6hUEkw+igxb5LhU=
-X-Google-Smtp-Source: ABdhPJzzFCih2BQmHE18MCNDHQ736Sv16LAswewqmtT6w64I5zRTmsiO6WN0ZLPpnX5P8nlDxIj6cB0AOBnu6Oq3hs4=
-X-Received: by 2002:a05:6000:52:: with SMTP id k18mr8225993wrx.192.1637062250915;
- Tue, 16 Nov 2021 03:30:50 -0800 (PST)
+        bh=MwLBy7MN9rjOVXhuT6sJXkWqGYnANC26XLE5d8TIP2Q=;
+        b=RTLkZr6ppz6DO84YoteKaazpujfaBG2HYU0tgBZpr166R27R5R/AzngYtREthGVos2
+         E0si9qDRKxVHTY/OYoAjd1PJdYXqyehY4TEDnuP+cX7CT9wtdsYscBtXDxkGzrrVCIee
+         FWxvSqgVBhebgm/Op/T8VaPGjikz71F6VK0DQPKZZyogmnis9SODRGIBe2oyv/iA097i
+         +dtGMiblr+3QMsjHTsed3M9Eo+xEiozX/fp8HvjVD2BMIYwDS6ftzpqFuzXgomkz5sMQ
+         6qr0qVYpzWor7+ee5cDYfRuWIgx4O5cwyIOyq8NNUuwwPEq29k5NCI6dv82ODGwmAXWo
+         CnAA==
+X-Gm-Message-State: AOAM532gvKuIeiGtSOkpi7+DXPEOKicxCnMJgQGsw74eQo7vX2S4coKa
+        qdUv436aOqu8lLa39PU4356DAZj2YIov2dteUhn720VHEdw=
+X-Google-Smtp-Source: ABdhPJwCX3Ef/IG/ZRI/s+QbwYsKKUuA0ClGBt/EsUwqNcFVFeMBhoF37aWTvxiJRh58gue/QXMXnQ+Ho0FldLcxgGU=
+X-Received: by 2002:a05:6000:18ac:: with SMTP id b12mr7799584wri.355.1637062377685;
+ Tue, 16 Nov 2021 03:32:57 -0800 (PST)
 MIME-Version: 1.0
 From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Tue, 16 Nov 2021 19:30:39 +0800
-Message-ID: <CACXcFmnGYb_7Priu+JF3p2mKgB=5aua7VpMnpxENjfssg2bL_g@mail.gmail.com>
-Subject: [PATCH 3/8] Replace memset() with memzero_explicit()
+Date:   Tue, 16 Nov 2021 19:32:46 +0800
+Message-ID: <CACXcFmmyTXg77Dq1cR+MGCP=DRvcEzM=pCPcKL5u6-O+xofR1Q@mail.gmail.com>
+Subject: [PATCH 4/8] Replace memset() with memzero_explicit()
 To:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
@@ -65,21 +65,20 @@ away with memzero_explicit(address,bytes) which resists
 such optimisation
 
 ---
- crypto/dh.c | 2 +-
+ crypto/echainiv.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/dh.c b/crypto/dh.c
-index cd4f32092e5c..ff7dc65b3b41 100644
---- a/crypto/dh.c
-+++ b/crypto/dh.c
-@@ -25,7 +25,7 @@ static void dh_clear_ctx(struct dh_ctx *ctx)
-     mpi_free(ctx->q);
-     mpi_free(ctx->g);
-     mpi_free(ctx->xa);
--    memset(ctx, 0, sizeof(*ctx));
-+    memzero_explicit(ctx, sizeof(*ctx));
- }
+diff --git a/crypto/echainiv.c b/crypto/echainiv.c
+index 69686668625e..6a7321da2fc1 100644
+--- a/crypto/echainiv.c
++++ b/crypto/echainiv.c
+@@ -64,7 +64,7 @@ static int echainiv_encrypt(struct aead_request *req)
 
- /*
--- 
-2.25.1
+     memcpy(&nseqno, info + ivsize - 8, 8);
+     seqno = be64_to_cpu(nseqno);
+-    memset(info, 0, ivsize);
++    memzero_explicit(info, ivsize);
+
+     scatterwalk_map_and_copy(info, req->dst, req->assoclen, ivsize, 1);
+
+--
