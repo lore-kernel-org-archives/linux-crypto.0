@@ -2,164 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F97C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 02:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B9FCC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 03:51:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A97A60EB9
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 02:21:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1563E63215
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 03:51:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237765AbhKPCY1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Nov 2021 21:24:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39128 "EHLO
+        id S235537AbhKPDyp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Nov 2021 22:54:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237523AbhKORZQ (ORCPT
+        with ESMTP id S235506AbhKPDyo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Nov 2021 12:25:16 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B120FC07978C
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 09:16:44 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id b68so15600541pfg.11
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 09:16:44 -0800 (PST)
+        Mon, 15 Nov 2021 22:54:44 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE3BDC1A2993
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 16:31:10 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id 200so16035717pga.1
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Nov 2021 16:31:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=3NVKLepWYzLSq9Cpv5qCJO3VSr1f5SzOwcseFg0x0pY=;
-        b=ViN8wyNqVHdH+Hf9uZiVt6rzm1zmo2rrXKAIKjHBt08UAFUv9BJAAWNuMofRgCUGQ3
-         pSvTt7NJ6bDoFBPiaYn8UdmOLOhoCBRC9mz4/pdqJcKbq7uz+rJ0AQkNnz+4KO1DLs0Q
-         HU5a5hhkU5p7C2S0n9dF5y8Mk3j+BCuMBOIblS2P7zdESzvV5Y9HVMDTDykC83v6Qk0i
-         Fn1IMf5XPZ/ppn+OHgMAEheBtO3CvwWvP5wks+OYQAmdJn6WqO2qeWGXP1DoUiP3tBIj
-         0bYE43Iqf38tJRkO+DgbWI4wdtkRUx2Mf6ROzMGAY9Pa79Spx5521xjH6LTLH67cXDFl
-         LNeQ==
+        bh=zUAbk3pYDxq1bSuJItD74NAh/MbYUz0fiMi2jjsqIPc=;
+        b=jkN0+anUkVZEafZbns3mnQH3BOzdPE6stTt8SrDHZFGkz5SQGDyxTuScjmOkAtjtG9
+         AT2XFauNYqbJ3Hv+WUTHMAUTNsTes+od+8KqsU/GEVyVgjrYYw/xt4G0TAF8HM1LcPVm
+         2WJe85H3kQUjZSV8Rb5yVnjCooZk+xWNu9wek=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=3NVKLepWYzLSq9Cpv5qCJO3VSr1f5SzOwcseFg0x0pY=;
-        b=PcPVxGZ6IMfUVlsRZ8KU6lR2FbsSivRxU31/egOyPnh5X0wX6n3M1jJD+JcnZfi7rC
-         yqJ7BIBMEfQC7ql+Xs2BTah9mAh0I99SkKO65WtfRsccxKGCUGFxHqywHSrbZffKCmq/
-         Z4ff4eZiOR/ZUnZ4qFKMqySa22h5YkCwu0NTYSeVzgeLs92HLC572Qq2GOoUkRJa6nft
-         7DmxBcT7RLUYidslhHoE/Ku8acF5jY2TwB6A88wzcntCE3k073yvMYw8KQG+zGoWBIFE
-         BGqdp+fi3ZMTkJIsT4I3YeyGt+sITdnAzAHLvuHc0R6L2dZWQEJfY/+2MCiZ3pV1fX88
-         c5IQ==
-X-Gm-Message-State: AOAM530+HLYoxJ9j4L5nM1m6hoSI4fMy/RO6Z/idvessbfaSPvNc8U0v
-        XrAWUYhQK9x/Z5VZWype4VNwmg==
-X-Google-Smtp-Source: ABdhPJyKc9UQWUIc7Wr3sPqTISPItmNSDSwgcqkezQohZCsJMhsK1Nvfuw30uGNo+HWmOQFuW461xA==
-X-Received: by 2002:a63:4d3:: with SMTP id 202mr328555pge.36.1636996603928;
-        Mon, 15 Nov 2021 09:16:43 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o28sm3060761pgn.85.2021.11.15.09.16.43
+        bh=zUAbk3pYDxq1bSuJItD74NAh/MbYUz0fiMi2jjsqIPc=;
+        b=RYiqPnD+WTii/r6m8K0xFQR9QjIwv6tTvAsu2Rb6g+R03bY2DoT0ANaNpZgwMW9s9h
+         6ISM3nPEcbcOIoQ+duoqq8ufw4kNsda2OeNo4xjW7aZcGn/HT3Bgy/WL7AJRJIgBe/FL
+         y+DID31mdUzKwrQ/hum409bc3OJA4mQSD+xUs/zGOIQi/t6XBunrHrKeSt39LQ/oGSed
+         N9domuWuGPBYBkhCSE2FJVDiD37JqIEZHRb+EWnWbYJkaLzwRoPK67Zew4rUU4bm7ePM
+         yn/DZ2XCemhTW5wBOe5gCYFNNDyZG4UyqDzkXu3+gpvvtQLoHN7I/MbB7h2oMRVkDwQ6
+         gTJQ==
+X-Gm-Message-State: AOAM530DawJ5yR33Ph01LjKs/SDr5AS8dDSXRUQyDQdtq5EvhquOxbyJ
+        tY7GcIZ0SvOCy8zJ7gIwyDFLew==
+X-Google-Smtp-Source: ABdhPJxDrEb7NedduOiss/lXzBJfLpYZT+5k0kObH71YXHTZztaI+VVMmjTV988TJQv8GS02GfUMPA==
+X-Received: by 2002:a05:6a00:1945:b0:44c:a955:35ea with SMTP id s5-20020a056a00194500b0044ca95535eamr36094903pfk.85.1637022670112;
+        Mon, 15 Nov 2021 16:31:10 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id h21sm12755848pgk.74.2021.11.15.16.31.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Nov 2021 09:16:43 -0800 (PST)
-Date:   Mon, 15 Nov 2021 17:16:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Orr <marcorr@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
+        Mon, 15 Nov 2021 16:31:09 -0800 (PST)
+Date:   Mon, 15 Nov 2021 16:31:09 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Marco Elver <elver@google.com>
+Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Nick Terrell <terrelln@fb.com>,
+        Rob Clark <robdclark@gmail.com>,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        Helge Deller <deller@gmx.de>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Sergio Paracuellos <sergio.paracuellos@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Joey Gouly <joey.gouly@arm.com>,
+        Stan Skowronek <stan@corellium.com>,
+        Hector Martin <marcan@marcan.st>,
+        Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+        =?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@collabora.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Message-ID: <YZKV9zo25l3LKahi@google.com>
-References: <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com>
- <YY7I6sgqIPubTrtA@zn.tnic>
- <YY7Qp8c/gTD1rT86@google.com>
- <YY7USItsMPNbuSSG@zn.tnic>
- <CAMkAt6o909yYq3NfRboF3U3V8k-2XGb9p_WcQuvSjOKokmMzMA@mail.gmail.com>
- <YY8AJnMo9nh3tyPB@google.com>
- <CAA03e5G=fY7_qESCuoHW3_VdVbDWekqQxmvLPzWNepBqJjyCXg@mail.gmail.com>
- <YZAFTBXtC/yS7xtq@google.com>
- <CAA03e5Hhmji-uhv4eh4cgyu0XBf9=C5r8MtGtWcB480eaVGvSg@mail.gmail.com>
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        Parisc List <linux-parisc@vger.kernel.org>,
+        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        linux-ntfs-dev@lists.sourceforge.net,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        kasan-dev <kasan-dev@googlegroups.com>
+Subject: Re: Build regressions/improvements in v5.16-rc1
+Message-ID: <202111151624.91EDCFF7@keescook>
+References: <20211115155105.3797527-1-geert@linux-m68k.org>
+ <CAMuHMdUCsyUxaEf1Lz7+jMnur4ECwK+JoXQqmOCkRKqXdb1hTQ@mail.gmail.com>
+ <YZKOce4XhAU49+Yn@elver.google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAA03e5Hhmji-uhv4eh4cgyu0XBf9=C5r8MtGtWcB480eaVGvSg@mail.gmail.com>
+In-Reply-To: <YZKOce4XhAU49+Yn@elver.google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Nov 13, 2021, Marc Orr wrote:
-> On Sat, Nov 13, 2021 at 10:35 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Fri, Nov 12, 2021, Marc Orr wrote:
-> > > > > > If *it* is the host kernel, then you probably shouldn't do that -
-> > > > > > otherwise you just killed the host kernel on which all those guests are
-> > > > > > running.
-> > > > >
-> > > > > I agree, it seems better to terminate the single guest with an issue.
-> > > > > Rather than killing the host (and therefore all guests). So I'd
-> > > > > suggest even in this case we do the 'convert to shared' approach or
-> > > > > just outright terminate the guest.
-> > > > >
-> > > > > Are there already examples in KVM of a KVM bug in servicing a VM's
-> > > > > request results in a BUG/panic/oops? That seems not ideal ever.
-> > > >
-> > > > Plenty of examples.  kvm_spurious_fault() is the obvious one.  Any NULL pointer
-> > > > deref will lead to a BUG, etc...  And it's not just KVM, e.g. it's possible, if
-> > > > unlikely, for the core kernel to run into guest private memory (e.g. if the kernel
-> > > > botches an RMP change), and if that happens there's no guarantee that the kernel
-> > > > can recover.
-> > > >
-> > > > I fully agree that ideally KVM would have a better sense of self-preservation,
-> > > > but IMO that's an orthogonal discussion.
-> > >
-> > > I don't think we should treat the possibility of crashing the host
-> > > with live VMs nonchalantly. It's a big deal. Doing so has big
-> > > implications on the probability that any cloud vendor wil bee able to
-> > > deploy this code to production. And aren't cloud vendors one of the
-> > > main use cases for all of this confidential compute stuff? I'm
-> > > honestly surprised that so many people are OK with crashing the host.
-> >
-> > I'm not treating it nonchalantly, merely acknowledging that (a) some flavors of kernel
-> > bugs (or hardware issues!) are inherently fatal to the system, and (b) crashing the
-> > host may be preferable to continuing on in certain cases, e.g. if continuing on has a
-> > high probablity of corrupting guest data.
+On Mon, Nov 15, 2021 at 05:44:33PM +0100, Marco Elver wrote:
+> On Mon, Nov 15, 2021 at 05:12PM +0100, Geert Uytterhoeven wrote:
+> [...]
+> > >   + /kisskb/src/include/linux/fortify-string.h: error: call to '__read_overflow' declared with attribute error: detected read beyond size of object (1st parameter):  => 263:25, 277:17
+> > 
+> >     in lib/test_kasan.c
+> > 
+> > s390-all{mod,yes}config
+> > arm64-allmodconfig (gcc11)
 > 
-> I disagree. Crashing the host -- and _ALL_ of its VMs (including
-> non-confidential VMs) -- is not preferable to crashing a single SNP
-> VM.
+> Kees, wasn't that what [1] was meant to fix?
+> [1] https://lkml.kernel.org/r/20211006181544.1670992-1-keescook@chromium.org
 
-We're in violent agreement.  I fully agree that, when allowed by the architecture,
-injecting an error into the guest is preferable to killing the VM, which is in turn
-preferable to crashing the host.
+[1] fixed the ones I found when scanning for __write_overflow(). [2]
+fixed some others, so it's possible there are yet more to fix?
 
-What I'm saying is that there are classes of bugs where injecting an error is not
-allowed/feasible, and where killing an individual VM is not correct/feasible.
+Taking a look at Linus's tree, though, the "263" and "277" lines don't
+line up correctly. I'll go see if I can reproduce this. Is this with
+W=1?
 
-The canonical example of this escalating behavior is an uncorrectable ECC #MC.  If
-the bad page is guest memory and the guest vCPU model supports MCA, then userspace
-can inject an #MC into the guest so that the guest can take action and hopefully
-not simply die.  If the bad page is in the guest but the guest doesn't support #MC
-injection, the guest effectively gets killed.  And if the #MC is in host kernel
-memory that can't be offlined, e.g. hits the IDT, then the whole system comes
-crashing down.
+-Kees
 
-> Especially when that SNP VM is guaranteed to detect the memory corruption and
-> react accordingly.
+[2] https://www.ozlabs.org/~akpm/mmotm/broken-out/kasan-test-consolidate-workarounds-for-unwanted-__alloc_size-protection.patch
 
-For the record, we can make no such guarantees about the SNP VM.  Yes, the VM
-_should_ do the right thing when handed a #VC, but bugs happen, otherwise we
-wouldn't be having this discussion.
+
+-- 
+Kees Cook
