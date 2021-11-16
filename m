@@ -2,139 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92BB1C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 10:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D9ABC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 10:19:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 773BD61AE3
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 10:13:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3185161C4F
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Nov 2021 10:19:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233958AbhKPKQF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 05:16:05 -0500
-Received: from mail-ua1-f45.google.com ([209.85.222.45]:41775 "EHLO
-        mail-ua1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233908AbhKPKPe (ORCPT
+        id S233962AbhKPKWf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Nov 2021 05:22:35 -0500
+Received: from mail-wr1-f48.google.com ([209.85.221.48]:40482 "EHLO
+        mail-wr1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233941AbhKPKWV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 05:15:34 -0500
-Received: by mail-ua1-f45.google.com with SMTP id p37so39534907uae.8;
-        Tue, 16 Nov 2021 02:12:37 -0800 (PST)
+        Tue, 16 Nov 2021 05:22:21 -0500
+Received: by mail-wr1-f48.google.com with SMTP id r8so36428504wra.7
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Nov 2021 02:19:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1nds6uFGqbyvPuDVHazG3SNcBfSR72giETk/vmz+pug=;
-        b=RriKkQWzi0EBTz0xvH9Ni30eaFUiTpNrgalTGM0JifrEo75OfiJ8vfhZNITor+zqGl
-         siWdxT5/OGb9oUfe9CwvcXACzAsC6xwaX+aCugF0wMUgYRFDOUicjCns3m2Fu2tVjj2Q
-         /MttW0GQ3xiVYr6P6q/rY8ylS2qisl7bNBBky40a3QMmbVnlZb4Vlh0El692HOxbfzxq
-         QB6ua94+xawuEpEKyakb2W2itZfsbawXm1nK9e7iS1pg+LeYMVFa3Edc/ZfBXEtps6qe
-         N0+OaFWpO3dgs82am4C6BdrYMfz6LibAHoe11wLhJYdup+8Sd2vR6xj9PmYYa2FJQKD3
-         HIMg==
-X-Gm-Message-State: AOAM533IlQmnVtpI2Y09bbT2gqPPUjkK/wTnpl3P8bG3tBn8z6gdAO3r
-        Nv9LCFzJZUSq+UTM7vPg+QeVYPBkgEE9TQ==
-X-Google-Smtp-Source: ABdhPJwAG93rfedsTIAAzZWhezNyGxWGUMIOvObdjtJl49PzNS5ybwfim+Q1dcTdlhXbj+9tMa6ukQ==
-X-Received: by 2002:a67:ee88:: with SMTP id n8mr53242798vsp.58.1637057556636;
-        Tue, 16 Nov 2021 02:12:36 -0800 (PST)
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com. [209.85.222.52])
-        by smtp.gmail.com with ESMTPSA id d128sm10313957vsd.20.2021.11.16.02.12.35
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2pVUUhOW+PPHRe1owVHKWAC0hNxvDcyMPYMZUcLWpfo=;
+        b=VIyGboDRF2Ffo5ssK9ht0mId8DDFE3D1zjXHMbLvRwb3hJ8LODhdtofI6e6lC226R1
+         SPTr1ZR9P1ZVUlLyAarLOAUVjIWnASqcGOjdJ4vwNo3tpzxYfNCmbxIvMDNai1nm5MDs
+         /dEUPzwr4b+QI2YOU7uhhO+iGgVHm7nNbTylA8n2tQdwS2R+fVFzAUq4kZO2rNuUtPxq
+         4456u45c38jfQic1tDeAjRAmurtMsO+oXXDREFiniEdbM2VMTCVN9NN9VDjixUuEYN8k
+         gART6yCQam6GE5/9b9g3faUpVvi1pVA4yI3g/gnFS9l2KQvyQkrCw0FjX/6gFstZa9uw
+         Bh0A==
+X-Gm-Message-State: AOAM532aovIZd6t4MU2asd4ltZLrAzx69Knfc8pw2VBft3mWnxceBB/K
+        SHT3Phfopa8PNErBVEPrItcCbUG4cSo=
+X-Google-Smtp-Source: ABdhPJwqefqf0wNR0FMTlsltbl/SJPJHAGRP8LTifsg0vB3tNEwjvpbKaPNg2IP7kWKdjELhfRti7Q==
+X-Received: by 2002:adf:e882:: with SMTP id d2mr7934329wrm.389.1637057964056;
+        Tue, 16 Nov 2021 02:19:24 -0800 (PST)
+Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id z6sm2560612wmp.1.2021.11.16.02.19.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Nov 2021 02:12:35 -0800 (PST)
-Received: by mail-ua1-f52.google.com with SMTP id n6so24630571uak.1;
-        Tue, 16 Nov 2021 02:12:35 -0800 (PST)
-X-Received: by 2002:a05:6102:1354:: with SMTP id j20mr53829461vsl.41.1637057554823;
- Tue, 16 Nov 2021 02:12:34 -0800 (PST)
-MIME-Version: 1.0
-References: <20211115165428.722074685@linuxfoundation.org> <CA+G9fYtFOnKQ4=3-4rUTfVM-fPno1KyTga1ZAFA2OoqNvcnAUg@mail.gmail.com>
- <CA+G9fYuF1F-9TAwgR9ik_qjFqQvp324FJwFJbYForA_iRexZjg@mail.gmail.com>
- <YZNwcylQcKVlZDlO@kroah.com> <dabc323f-b0e1-8c9f-1035-c48349a0eff4@nvidia.com>
-In-Reply-To: <dabc323f-b0e1-8c9f-1035-c48349a0eff4@nvidia.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Tue, 16 Nov 2021 11:12:23 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXG2Y-rwPtBw1PsGckk3MLRQvn6Xht6ts2RkW7Zkx=w2w@mail.gmail.com>
-Message-ID: <CAMuHMdXG2Y-rwPtBw1PsGckk3MLRQvn6Xht6ts2RkW7Zkx=w2w@mail.gmail.com>
-Subject: Re: [PATCH 5.15 000/917] 5.15.3-rc1 review
-To:     Jon Hunter <jonathanh@nvidia.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Tue, 16 Nov 2021 02:19:08 -0800 (PST)
+Subject: Re: [PATCHv5 00/12] nvme: In-band authentication support
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
+        linux-nvme@lists.infradead.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Florian Fainelli <f.fainelli@gmail.com>, patches@kernelci.org,
-        lkft-triage@lists.linaro.org, stable <stable@vger.kernel.org>,
-        Pavel Machek <pavel@denx.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Vladis Dronov <vdronov@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+References: <20211112125928.97318-1-hare@suse.de>
+ <74db7c77-7cbf-4bc9-1c80-e7c42acaea64@grimberg.me>
+ <f67ca46e-f421-33f7-da8b-ff6e47acf8c2@suse.de>
+ <8553266f-005c-f947-4737-2108cb7062d1@grimberg.me>
+ <a7363853-05af-9d7f-4d6f-b02ec756ce6b@suse.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <50095ec8-3825-efa5-98bb-76b0f0fdc21e@grimberg.me>
+Date:   Tue, 16 Nov 2021 12:18:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+MIME-Version: 1.0
+In-Reply-To: <a7363853-05af-9d7f-4d6f-b02ec756ce6b@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jon,
 
-On Tue, Nov 16, 2021 at 10:23 AM Jon Hunter <jonathanh@nvidia.com> wrote:
-> On 16/11/2021 08:48, Greg Kroah-Hartman wrote:
-> > On Tue, Nov 16, 2021 at 02:09:44PM +0530, Naresh Kamboju wrote:
-> >> On Tue, 16 Nov 2021 at 12:06, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
-> >>>
-> >>> On Tue, 16 Nov 2021 at 00:03, Greg Kroah-Hartman
-> >>> <gregkh@linuxfoundation.org> wrote:
-> >>>>
-> >>>> This is the start of the stable review cycle for the 5.15.3 release.
-> >>>> There are 917 patches in this series, all will be posted as a response
-> >>>> to this one.  If anyone has any issues with these being applied, please
-> >>>> let me know.
-> >>>>
-> >>>> Responses should be made by Wed, 17 Nov 2021 16:52:23 +0000.
-> >>>> Anything received after that time might be too late.
-> >>>>
-> >>>> The whole patch series can be found in one patch at:
-> >>>>          https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-5.15.3-rc1.gz
-> >>>> or in the git tree and branch at:
-> >>>>          git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-5.15.y
-> >>>> and the diffstat can be found below.
-> >>>>
-> >>>> thanks,
-> >>>>
-> >>>> greg k-h
-> >>>
-> >>>
-> >>
-> >> Regression found on arm64 juno-r2 / qemu.
-> >> Following kernel crash reported on stable-rc 5.15.
-> >>
-> >> Anders bisected this kernel crash and found the first bad commit,
-> >>
-> >> Herbert Xu <herbert@gondor.apana.org.au>
-> >>     crypto: api - Fix built-in testing dependency failures
+>>>>> - Transform secret with correct hmac algorithm
+>>>>
+>>>> Is that what I reported last time? Can you perhaps
+>>>> point me to the exact patch that fixes this?
+>>>
+>>> Well, no, not really; the patch itself got squashed in the main patches.
+>>> But problem here was that the key transformation from section 8.13.5.7
+>>> had been using the hash algorithm from the initial challenge, not the
+>>> one specified in the key itself.
+>>> This lead to decoding errors when using a key with a different length
+>>> than the hash algorithm.
+>>
+>> That is exactly what I reported, changing the key length leads to
+>> authentication errors.
+> 
+> Right-o. So it should be sorted then.
 
-That's commit adad556efcdd ("crypto: api - Fix built-in testing
-dependency failures")
+Hannes, was the issue on the host side or the controller side?
 
-> I am seeing the same for Tegra as well and bisect is pointing to the
-> above for me too.
-> > Is this also an issue on 5.16-rc1?
->
-> I have not observed the same issue for 5.16-rc1.
-
-Following the "Fixes: adad556efcdd" chain:
-
-cad439fc040efe5f ("crypto: api - Do not create test larvals if manager
-is disabled")
-beaaaa37c664e9af ("crypto: api - Fix boot-up crash when crypto manager
-is disabled")
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+I'm a little lost into what was the actual fix...
