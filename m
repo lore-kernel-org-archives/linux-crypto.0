@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E58C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 14:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ECA2C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 14:31:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C4C061B54
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 14:31:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16B2C61B54
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 14:31:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235272AbhKQOeT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Nov 2021 09:34:19 -0500
+        id S238535AbhKQOeU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 17 Nov 2021 09:34:20 -0500
 Received: from mga01.intel.com ([192.55.52.88]:57918 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235127AbhKQOeR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Nov 2021 09:34:17 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10170"; a="257722594"
+        id S234772AbhKQOeU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Nov 2021 09:34:20 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10170"; a="257722609"
 X-IronPort-AV: E=Sophos;i="5.87,241,1631602800"; 
-   d="scan'208";a="257722594"
+   d="scan'208";a="257722609"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2021 06:31:18 -0800
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2021 06:31:21 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,241,1631602800"; 
-   d="scan'208";a="735829668"
+   d="scan'208";a="735829681"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
-  by fmsmga006.fm.intel.com with ESMTP; 17 Nov 2021 06:31:17 -0800
+  by fmsmga006.fm.intel.com with ESMTP; 17 Nov 2021 06:31:20 -0800
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         marco.chiappero@intel.com,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v3 05/25] crypto: qat - move VF message handler to adf_vf2pf_msg.c
-Date:   Wed, 17 Nov 2021 14:30:38 +0000
-Message-Id: <20211117143058.211550-6-giovanni.cabiddu@intel.com>
+Subject: [PATCH v3 07/25] crypto: qat - change PFVF ACK behaviour
+Date:   Wed, 17 Nov 2021 14:30:40 +0000
+Message-Id: <20211117143058.211550-8-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211117143058.211550-1-giovanni.cabiddu@intel.com>
 References: <20211117143058.211550-1-giovanni.cabiddu@intel.com>
@@ -42,219 +42,71 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Marco Chiappero <marco.chiappero@intel.com>
+Change the PFVF receipt flow on the VF side to read, ack and handle the
+message instead of read, handle and ack.
+This is done for (1) consistency with the PF side, see the function
+adf_recv_and_handle_vf2pf_msg() in adf_pf2vf_msg.c, and (2) performance
+reasons, to avoid keeping the CSR busy while parsing the message.
 
-Move the reading and parsing of a PF2VF message from the bottom half
-function in adf_vf_isr.c, adf_pf2vf_bh_handler(), to the PFVF protocol
-file adf_vf2pf_msg.c, for better code organization.
+In addition, do not ACK PFVF legacy messages, as this driver is not
+capable of handling PFVF legacy messages.
+If a PFVF message with MSGORIGIN not set is received, do nothing.
 
-The receive and handle logic has been moved to a new function called
-adf_recv_and_handle_pf2vf_msg() which returns a boolean indicating if
-interrupts need to be re-enabled or not.
-A slight refactoring has been done to avoid calculating the PF2VF CSR
-offset twice and repeating the clearing of the PF2VFINT bit.
-
-The "PF restarting" logic, now defined in the function
-adf_pf2vf_handle_pf_restaring(), has been kept in adf_vf_isr.c due to
-the dependencies with the adf_vf_stop_wq workqueue.
-
-Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
-Co-developed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
 ---
- .../crypto/qat/qat_common/adf_common_drv.h    |  2 +
- drivers/crypto/qat/qat_common/adf_vf2pf_msg.c | 59 ++++++++++++
- drivers/crypto/qat/qat_common/adf_vf_isr.c    | 91 +++++--------------
- 3 files changed, 86 insertions(+), 66 deletions(-)
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.c | 8 ++++----
+ drivers/crypto/qat/qat_common/adf_vf2pf_msg.c | 7 ++++---
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
-index d06b5aab7fc3..050db8967983 100644
---- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-@@ -194,6 +194,8 @@ void adf_disable_vf2pf_interrupts(struct adf_accel_dev *accel_dev,
- 				  u32 vf_mask);
- void adf_enable_vf2pf_interrupts(struct adf_accel_dev *accel_dev,
- 				 u32 vf_mask);
-+bool adf_recv_and_handle_pf2vf_msg(struct adf_accel_dev *accel_dev);
-+int adf_pf2vf_handle_pf_restarting(struct adf_accel_dev *accel_dev);
- int adf_enable_pf2vf_comms(struct adf_accel_dev *accel_dev);
- void adf_enable_pf2vf_interrupts(struct adf_accel_dev *accel_dev);
- void adf_disable_pf2vf_interrupts(struct adf_accel_dev *accel_dev);
+diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+index 796301e9fe5b..4922ee2a2a08 100644
+--- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
++++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
+@@ -195,14 +195,14 @@ bool adf_recv_and_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr)
+ 		return true;
+ 	}
+ 
+-	/* To ACK, clear the VF2PFINT bit */
+-	msg &= ~ADF_VF2PF_INT;
+-	ADF_CSR_WR(pmisc_addr, hw_data->get_pf2vf_offset(vf_nr), msg);
+-
+ 	if (!(msg & ADF_VF2PF_MSGORIGIN_SYSTEM))
+ 		/* Ignore legacy non-system (non-kernel) VF2PF messages */
+ 		goto err;
+ 
++	/* To ACK, clear the VF2PFINT bit */
++	msg &= ~ADF_VF2PF_INT;
++	ADF_CSR_WR(pmisc_addr, hw_data->get_pf2vf_offset(vf_nr), msg);
++
+ 	switch ((msg & ADF_VF2PF_MSGTYPE_MASK) >> ADF_VF2PF_MSGTYPE_SHIFT) {
+ 	case ADF_VF2PF_MSGTYPE_COMPAT_VER_REQ:
+ 		{
 diff --git a/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c b/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
-index 8d11bb24cea0..064477fcb5fb 100644
+index 064477fcb5fb..a6eaf93d5462 100644
 --- a/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
 +++ b/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
-@@ -46,3 +46,62 @@ void adf_vf2pf_notify_shutdown(struct adf_accel_dev *accel_dev)
- 				"Failed to send Shutdown event to PF\n");
- }
- EXPORT_SYMBOL_GPL(adf_vf2pf_notify_shutdown);
-+
-+bool adf_recv_and_handle_pf2vf_msg(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	struct adf_bar *pmisc =
-+			&GET_BARS(accel_dev)[hw_data->get_misc_bar_id(hw_data)];
-+	void __iomem *pmisc_bar_addr = pmisc->virt_addr;
-+	u32 offset = hw_data->get_pf2vf_offset(0);
-+	bool ret;
-+	u32 msg;
-+
-+	/* Read the message from PF */
-+	msg = ADF_CSR_RD(pmisc_bar_addr, offset);
-+	if (!(msg & ADF_PF2VF_INT)) {
-+		dev_info(&GET_DEV(accel_dev),
-+			 "Spurious PF2VF interrupt, msg %X. Ignored\n", msg);
-+		return true;
-+	}
-+
-+	if (!(msg & ADF_PF2VF_MSGORIGIN_SYSTEM))
-+		/* Ignore legacy non-system (non-kernel) PF2VF messages */
-+		goto err;
-+
-+	switch ((msg & ADF_PF2VF_MSGTYPE_MASK) >> ADF_PF2VF_MSGTYPE_SHIFT) {
-+	case ADF_PF2VF_MSGTYPE_RESTARTING:
-+		dev_dbg(&GET_DEV(accel_dev),
-+			"Restarting msg received from PF 0x%x\n", msg);
-+
-+		adf_pf2vf_handle_pf_restarting(accel_dev);
-+		ret = false;
-+		break;
-+	case ADF_PF2VF_MSGTYPE_VERSION_RESP:
-+		dev_dbg(&GET_DEV(accel_dev),
-+			"Version resp received from PF 0x%x\n", msg);
-+		accel_dev->vf.pf_version =
-+			(msg & ADF_PF2VF_VERSION_RESP_VERS_MASK) >>
-+			ADF_PF2VF_VERSION_RESP_VERS_SHIFT;
-+		accel_dev->vf.compatible =
-+			(msg & ADF_PF2VF_VERSION_RESP_RESULT_MASK) >>
-+			ADF_PF2VF_VERSION_RESP_RESULT_SHIFT;
-+		complete(&accel_dev->vf.iov_msg_completion);
-+		ret = true;
-+		break;
-+	default:
-+		goto err;
-+	}
-+
+@@ -69,6 +69,10 @@ bool adf_recv_and_handle_pf2vf_msg(struct adf_accel_dev *accel_dev)
+ 		/* Ignore legacy non-system (non-kernel) PF2VF messages */
+ 		goto err;
+ 
 +	/* To ack, clear the PF2VFINT bit */
 +	msg &= ~ADF_PF2VF_INT;
 +	ADF_CSR_WR(pmisc_bar_addr, offset, msg);
-+	return ret;
 +
-+err:
-+	dev_err(&GET_DEV(accel_dev),
-+		"Unknown message from PF (0x%x); leaving PF2VF ints disabled\n",
-+		msg);
-+
-+	return false;
-+}
-diff --git a/drivers/crypto/qat/qat_common/adf_vf_isr.c b/drivers/crypto/qat/qat_common/adf_vf_isr.c
-index db5e7abbe5f3..b17040b8a4b9 100644
---- a/drivers/crypto/qat/qat_common/adf_vf_isr.c
-+++ b/drivers/crypto/qat/qat_common/adf_vf_isr.c
-@@ -85,78 +85,37 @@ static void adf_dev_stop_async(struct work_struct *work)
- 	kfree(stop_data);
- }
- 
--static void adf_pf2vf_bh_handler(void *data)
-+int adf_pf2vf_handle_pf_restarting(struct adf_accel_dev *accel_dev)
- {
--	struct adf_accel_dev *accel_dev = data;
--	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
--	struct adf_bar *pmisc =
--			&GET_BARS(accel_dev)[hw_data->get_misc_bar_id(hw_data)];
--	void __iomem *pmisc_bar_addr = pmisc->virt_addr;
--	u32 msg;
--
--	/* Read the message from PF */
--	msg = ADF_CSR_RD(pmisc_bar_addr, hw_data->get_pf2vf_offset(0));
--	if (!(msg & ADF_PF2VF_INT)) {
--		dev_info(&GET_DEV(accel_dev),
--			 "Spurious PF2VF interrupt, msg %X. Ignored\n", msg);
--		goto out;
--	}
-+	struct adf_vf_stop_data *stop_data;
- 
--	if (!(msg & ADF_PF2VF_MSGORIGIN_SYSTEM))
--		/* Ignore legacy non-system (non-kernel) PF2VF messages */
--		goto err;
--
--	switch ((msg & ADF_PF2VF_MSGTYPE_MASK) >> ADF_PF2VF_MSGTYPE_SHIFT) {
--	case ADF_PF2VF_MSGTYPE_RESTARTING: {
--		struct adf_vf_stop_data *stop_data;
--
--		dev_dbg(&GET_DEV(accel_dev),
--			"Restarting msg received from PF 0x%x\n", msg);
--
--		clear_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
--
--		stop_data = kzalloc(sizeof(*stop_data), GFP_ATOMIC);
--		if (!stop_data) {
--			dev_err(&GET_DEV(accel_dev),
--				"Couldn't schedule stop for vf_%d\n",
--				accel_dev->accel_id);
--			return;
--		}
--		stop_data->accel_dev = accel_dev;
--		INIT_WORK(&stop_data->work, adf_dev_stop_async);
--		queue_work(adf_vf_stop_wq, &stop_data->work);
--		/* To ack, clear the PF2VFINT bit */
--		msg &= ~ADF_PF2VF_INT;
--		ADF_CSR_WR(pmisc_bar_addr, hw_data->get_pf2vf_offset(0), msg);
--		return;
--	}
--	case ADF_PF2VF_MSGTYPE_VERSION_RESP:
--		dev_dbg(&GET_DEV(accel_dev),
--			"Version resp received from PF 0x%x\n", msg);
--		accel_dev->vf.pf_version =
--			(msg & ADF_PF2VF_VERSION_RESP_VERS_MASK) >>
--			ADF_PF2VF_VERSION_RESP_VERS_SHIFT;
--		accel_dev->vf.compatible =
--			(msg & ADF_PF2VF_VERSION_RESP_RESULT_MASK) >>
--			ADF_PF2VF_VERSION_RESP_RESULT_SHIFT;
--		complete(&accel_dev->vf.iov_msg_completion);
--		break;
--	default:
--		goto err;
-+	clear_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
-+	stop_data = kzalloc(sizeof(*stop_data), GFP_ATOMIC);
-+	if (!stop_data) {
-+		dev_err(&GET_DEV(accel_dev),
-+			"Couldn't schedule stop for vf_%d\n",
-+			accel_dev->accel_id);
-+		return -ENOMEM;
+ 	switch ((msg & ADF_PF2VF_MSGTYPE_MASK) >> ADF_PF2VF_MSGTYPE_SHIFT) {
+ 	case ADF_PF2VF_MSGTYPE_RESTARTING:
+ 		dev_dbg(&GET_DEV(accel_dev),
+@@ -93,9 +97,6 @@ bool adf_recv_and_handle_pf2vf_msg(struct adf_accel_dev *accel_dev)
+ 		goto err;
  	}
-+	stop_data->accel_dev = accel_dev;
-+	INIT_WORK(&stop_data->work, adf_dev_stop_async);
-+	queue_work(adf_vf_stop_wq, &stop_data->work);
  
 -	/* To ack, clear the PF2VFINT bit */
 -	msg &= ~ADF_PF2VF_INT;
--	ADF_CSR_WR(pmisc_bar_addr, hw_data->get_pf2vf_offset(0), msg);
-+	return 0;
-+}
-+
-+static void adf_pf2vf_bh_handler(void *data)
-+{
-+	struct adf_accel_dev *accel_dev = data;
-+	bool ret;
-+
-+	ret = adf_recv_and_handle_pf2vf_msg(accel_dev);
-+	if (ret)
-+		/* Re-enable PF2VF interrupts */
-+		adf_enable_pf2vf_interrupts(accel_dev);
+-	ADF_CSR_WR(pmisc_bar_addr, offset, msg);
+ 	return ret;
  
--out:
--	/* Re-enable PF2VF interrupts */
--	adf_enable_pf2vf_interrupts(accel_dev);
- 	return;
--err:
--	dev_err(&GET_DEV(accel_dev),
--		"Unknown message from PF (0x%x); leaving PF2VF ints disabled\n",
--		msg);
-+
- }
- 
- static int adf_setup_pf2vf_bh(struct adf_accel_dev *accel_dev)
+ err:
 -- 
 2.33.1
 
