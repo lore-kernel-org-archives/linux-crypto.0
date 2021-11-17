@@ -2,182 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E78C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 14:32:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D1AC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 15:16:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A8CC61BE3
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 14:32:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 787DA62F90
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 15:16:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238570AbhKQOfD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Nov 2021 09:35:03 -0500
-Received: from mga01.intel.com ([192.55.52.88]:57956 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238622AbhKQOey (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Nov 2021 09:34:54 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10170"; a="257722716"
-X-IronPort-AV: E=Sophos;i="5.87,241,1631602800"; 
-   d="scan'208";a="257722716"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2021 06:31:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,241,1631602800"; 
-   d="scan'208";a="735830061"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
-  by fmsmga006.fm.intel.com with ESMTP; 17 Nov 2021 06:31:48 -0800
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        marco.chiappero@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v3 25/25] crypto: qat - improve logging of PFVF messages
-Date:   Wed, 17 Nov 2021 14:30:58 +0000
-Message-Id: <20211117143058.211550-26-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211117143058.211550-1-giovanni.cabiddu@intel.com>
-References: <20211117143058.211550-1-giovanni.cabiddu@intel.com>
-MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+        id S233182AbhKQPTz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 17 Nov 2021 10:19:55 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21516 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232882AbhKQPTx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Nov 2021 10:19:53 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AHF4I2F026628;
+        Wed, 17 Nov 2021 15:16:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=Pdz6EcI3HLQgoDL16do0wFLbHIcHaNdtEDqRgcx1CaA=;
+ b=VOJsA9eOXos9wRlklVvDS+O8D30uzNDHYztddMM7qX83ne2QP/faD2zKmFgQdfl/eKio
+ Nu3dwrcLIO8i/0XmbGruonIyHiV5dn+gkl33T5Lqo4soqEGL5G8Ru+Ttbe5rT5wH4QpO
+ 8aCn4gJytsqfCYQAYzw3j2aWMDVMBZe5jD9nL4k0Sv6PLhiUBF3G4j1y+Jqu4nDTfRPh
+ R6bRi0+BiKb05vjI7WmuWOX+Hr3gznOO7n8VTk8xKXt6i32bY0zPpT7SZgzVU+GCGwAF
+ RrCcSwNgHVLg3+BA1H9yKetqxEqaPSR68n7dylKSnxp0WNvTvA/Jq01SYVjAH9kRsayy 3Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cd2ed2ymn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Nov 2021 15:16:33 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AHF6N1G006026;
+        Wed, 17 Nov 2021 15:16:32 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cd2ed2ykq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Nov 2021 15:16:32 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AHEqsQJ005654;
+        Wed, 17 Nov 2021 15:16:28 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 3ca50cj1re-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Nov 2021 15:16:28 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AHFGPWT5177946
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 17 Nov 2021 15:16:25 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B4E564C05A;
+        Wed, 17 Nov 2021 15:16:25 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B64B94C062;
+        Wed, 17 Nov 2021 15:16:22 +0000 (GMT)
+Received: from sig-9-65-64-222.ibm.com (unknown [9.65.64.222])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 17 Nov 2021 15:16:22 +0000 (GMT)
+Message-ID: <17ce63cca47d7cc146ab9c5012c7429b1eacf3b4.camel@linux.ibm.com>
+Subject: Re: [PATCH v7 07/17] integrity: Fix warning about missing prototypes
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Eric Snowberg <eric.snowberg@oracle.com>, keyrings@vger.kernel.org,
+        linux-integrity@vger.kernel.org, dhowells@redhat.com,
+        dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, jarkko@kernel.org, jmorris@namei.org,
+        serge@hallyn.com
+Cc:     keescook@chromium.org, torvalds@linux-foundation.org,
+        weiyongjun1@huawei.com, nayna@linux.ibm.com, ebiggers@google.com,
+        ardb@kernel.org, nramas@linux.microsoft.com, lszubowi@redhat.com,
+        jason@zx2c4.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        konrad.wilk@oracle.com
+Date:   Wed, 17 Nov 2021 10:16:22 -0500
+In-Reply-To: <20211116001545.2639333-8-eric.snowberg@oracle.com>
+References: <20211116001545.2639333-1-eric.snowberg@oracle.com>
+         <20211116001545.2639333-8-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: HfmPQ5Ep0dKfngIGkYv3ffjaBYUliVec
+X-Proofpoint-ORIG-GUID: RJG6mAjCvo3K2Ruc7rc7YsKIiHkDElo3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-17_05,2021-11-17_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 mlxscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
+ priorityscore=1501 adultscore=0 bulkscore=0 phishscore=0 clxscore=1015
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111170074
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Marco Chiappero <marco.chiappero@intel.com>
+Hi Eric,
 
-Improve and simplify logging of PFVF messages.
+On Mon, 2021-11-15 at 19:15 -0500, Eric Snowberg wrote:
+> make W=1 generates the following warning in keyring_handler.c
+> 
+> security/integrity/platform_certs/keyring_handler.c:71:30: warning: no previous prototype for get_handler_for_db [-Wmissing-prototypes]
+>  __init efi_element_handler_t get_handler_for_db(const efi_guid_t *sig_type)
+>                               ^~~~~~~~~~~~~~~~~~
+> security/integrity/platform_certs/keyring_handler.c:82:30: warning: no previous prototype for get_handler_for_dbx [-Wmissing-prototypes]
+>  __init efi_element_handler_t get_handler_for_dbx(const efi_guid_t *sig_type)
+>                               ^~~~~~~~~~~~~~~~~~~
+> Add the missing prototypes by including keyring_handler.h.
+> 
+> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
 
-Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/adf_gen2_pfvf.c |  4 +--
- .../crypto/qat/qat_common/adf_pfvf_pf_proto.c | 30 +++++++------------
- .../crypto/qat/qat_common/adf_pfvf_vf_proto.c |  7 +++--
- 3 files changed, 17 insertions(+), 24 deletions(-)
+These sorts of fixes, which aren't really dependent on the patch set,
+could be moved to the begining of the patch set.
 
-diff --git a/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c b/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
-index f3a0a9d651e0..099e39808d13 100644
---- a/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
-+++ b/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
-@@ -183,14 +183,14 @@ static u32 adf_gen2_pfvf_recv(struct adf_accel_dev *accel_dev, u8 vf_nr)
- 	msg = ADF_CSR_RD(pmisc_addr, pfvf_offset);
- 	if (!(msg & int_bit)) {
- 		dev_info(&GET_DEV(accel_dev),
--			 "Spurious PFVF interrupt, msg %X. Ignored\n", msg);
-+			 "Spurious PFVF interrupt, msg 0x%.8x. Ignored\n", msg);
- 		return 0;
- 	}
- 
- 	/* Ignore legacy non-system (non-kernel) VF2PF messages */
- 	if (!(msg & msg_origin)) {
- 		dev_dbg(&GET_DEV(accel_dev),
--			"Ignored non-system message (0x%x);\n", msg);
-+			"Ignored non-system message (0x%.8x);\n", msg);
- 		return 0;
- 	}
- 
-diff --git a/drivers/crypto/qat/qat_common/adf_pfvf_pf_proto.c b/drivers/crypto/qat/qat_common/adf_pfvf_pf_proto.c
-index b486b2b599c2..4f20dd35fcd4 100644
---- a/drivers/crypto/qat/qat_common/adf_pfvf_pf_proto.c
-+++ b/drivers/crypto/qat/qat_common/adf_pfvf_pf_proto.c
-@@ -49,20 +49,13 @@ static int adf_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr,
- 		u8 compat;
- 
- 		dev_dbg(&GET_DEV(accel_dev),
--			"Compatibility Version Request from VF%d vers=%u\n",
--			vf_nr, vf_compat_ver);
-+			"VersionRequest received from VF%d (vers %d) to PF (vers %d)\n",
-+			vf_nr, vf_compat_ver, ADF_PFVF_COMPAT_THIS_VERSION);
- 
--		if (vf_compat_ver <= ADF_PFVF_COMPAT_THIS_VERSION) {
-+		if (vf_compat_ver <= ADF_PFVF_COMPAT_THIS_VERSION)
- 			compat = ADF_PF2VF_VF_COMPATIBLE;
--			dev_dbg(&GET_DEV(accel_dev),
--				"VF (vers %d) compatible with PF (vers %d)\n",
--				vf_compat_ver, ADF_PFVF_COMPAT_THIS_VERSION);
--		} else {
-+		else
- 			compat = ADF_PF2VF_VF_COMPAT_UNKNOWN;
--			dev_err(&GET_DEV(accel_dev),
--				"VF (vers %d) compat with PF (vers %d) unkn.\n",
--				vf_compat_ver, ADF_PFVF_COMPAT_THIS_VERSION);
--		}
- 
- 		resp =  ADF_PF2VF_MSGORIGIN_SYSTEM;
- 		resp |= ADF_PF2VF_MSGTYPE_VERSION_RESP <<
-@@ -77,8 +70,8 @@ static int adf_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr,
- 		u8 compat;
- 
- 		dev_dbg(&GET_DEV(accel_dev),
--			"Legacy VersionRequest received from VF%d 0x%x\n",
--			vf_nr, msg);
-+			"Legacy VersionRequest received from VF%d to PF (vers 1.1)\n",
-+			vf_nr);
- 
- 		/* PF always newer than legacy VF */
- 		compat = ADF_PF2VF_VF_COMPATIBLE;
-@@ -95,21 +88,19 @@ static int adf_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr,
- 	case ADF_VF2PF_MSGTYPE_INIT:
- 		{
- 		dev_dbg(&GET_DEV(accel_dev),
--			"Init message received from VF%d 0x%x\n",
--			vf_nr, msg);
-+			"Init message received from VF%d\n", vf_nr);
- 		vf_info->init = true;
- 		}
- 		break;
- 	case ADF_VF2PF_MSGTYPE_SHUTDOWN:
- 		{
- 		dev_dbg(&GET_DEV(accel_dev),
--			"Shutdown message received from VF%d 0x%x\n",
--			vf_nr, msg);
-+			"Shutdown message received from VF%d\n", vf_nr);
- 		vf_info->init = false;
- 		}
- 		break;
- 	default:
--		dev_dbg(&GET_DEV(accel_dev), "Unknown message from VF%d (0x%x)\n",
-+		dev_dbg(&GET_DEV(accel_dev), "Unknown message from VF%d (0x%.8x)\n",
- 			vf_nr, msg);
- 		return -ENOMSG;
- 	}
-@@ -132,7 +123,8 @@ bool adf_recv_and_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr)
- 		return false;
- 
- 	if (resp && adf_send_pf2vf_msg(accel_dev, vf_nr, resp))
--		dev_err(&GET_DEV(accel_dev), "Failed to send response to VF\n");
-+		dev_err(&GET_DEV(accel_dev),
-+			"Failed to send response to VF%d\n", vf_nr);
- 
- 	return true;
- }
-diff --git a/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c b/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c
-index ea1a00e746ff..9c7489ed122c 100644
---- a/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c
-+++ b/drivers/crypto/qat/qat_common/adf_pfvf_vf_proto.c
-@@ -90,18 +90,19 @@ static bool adf_handle_pf2vf_msg(struct adf_accel_dev *accel_dev, u32 msg)
- {
- 	switch ((msg & ADF_PF2VF_MSGTYPE_MASK) >> ADF_PF2VF_MSGTYPE_SHIFT) {
- 	case ADF_PF2VF_MSGTYPE_RESTARTING:
--		dev_dbg(&GET_DEV(accel_dev),
--			"Restarting msg received from PF 0x%x\n", msg);
-+		dev_dbg(&GET_DEV(accel_dev), "Restarting message received from PF\n");
- 
- 		adf_pf2vf_handle_pf_restarting(accel_dev);
- 		return false;
- 	case ADF_PF2VF_MSGTYPE_VERSION_RESP:
-+		dev_dbg(&GET_DEV(accel_dev),
-+			"Response message received from PF (0x%.8x)\n", msg);
- 		accel_dev->vf.response = msg;
- 		complete(&accel_dev->vf.msg_received);
- 		return true;
- 	default:
- 		dev_err(&GET_DEV(accel_dev),
--			"Unknown PF2VF message(0x%x)\n", msg);
-+			"Unknown PF2VF message (0x%.8x) from PF\n", msg);
- 	}
- 
- 	return false;
--- 
-2.33.1
+Reviewed-by:  Mimi Zohar <zohar@linux.ibm.com>
 
