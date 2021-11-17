@@ -2,84 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA1DC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 06:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B308C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 07:50:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4601B6321B
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 06:02:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 297E961BCF
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 07:50:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233507AbhKQGFJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Nov 2021 01:05:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53398 "EHLO mail.kernel.org"
+        id S234236AbhKQHxf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 17 Nov 2021 02:53:35 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42534 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233538AbhKQGEz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Nov 2021 01:04:55 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5709A613A3;
-        Wed, 17 Nov 2021 06:01:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1637128917;
-        bh=gfX116bxT6Kmb5OIElWbXiP6Js2wUjVHW/NaDgV7ROo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=c3PR1BTSPOR5c8cxKgOsV1Mzxw5nXrdOVSzYdUmpdTvNFV/ksYmWD/TA/kBVzhG7u
-         eD4xa/KWzYDc/SMhIHOCZACMjD8J9lHwczlEEZjyLkEn19v0cAHu1p5IdXpZxqmMVl
-         0aH696CfBclS8HgkuKyNmoLU/x/hmclAr2j7Cbao=
-Date:   Wed, 17 Nov 2021 07:01:45 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/8] Replace memset() with memzero_explicit()
-Message-ID: <YZSaybga3KV/fimg@kroah.com>
-References: <CACXcFm=kwziZ5Etdevu0uq_t5qy0NbGY753WfLvnwkMqtU9Tvg@mail.gmail.com>
- <YZObImtJITs1ZfUc@kroah.com>
- <CACXcFm=bPdoLqYHEUpeZEQEULVGW6ej4ESHX+vMdeGfvjc51tg@mail.gmail.com>
+        id S232915AbhKQHxe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Nov 2021 02:53:34 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F13C361BD2;
+        Wed, 17 Nov 2021 07:50:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637135436;
+        bh=yQY9R0lrcyoB7swIATJ2qgVM1QwPaUY/bwGkzyWzf8o=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=CG89rB9WFnNZQ2FJ4DaQ81FyG0DEkn0fnW4Y25UINXiGfEvq7s9BN7oCK7ncXIP4X
+         ekg7NdN9ETKoDjr+/P+6rT3TvH/aWrwev33yMMPFRSEP3DVY4WAEmSTV8kyjcrtxps
+         /CHNGB53jrt22BZE2sTtk4MpOvA2iPYOn1pND5NFiOz3jQy6QEFjQAMdVrf+X6AD2R
+         UED/q6YKAXV+F7xO+xGtvlln3PgQYIguDIWuskjME2RcJnv34MD+mZgvioWZyhmC1g
+         tsY/5sAIGGgGBr74tKuSf0VKhtNQ1ExBg3+AGs/fnTdVucxMJnK806hUsPXZUNv405
+         SexUNgmrzN33A==
+Message-ID: <8fcadcf2a5da5118fb7f9caea0a61440525a67b2.camel@kernel.org>
+Subject: Re: [PATCH v7 00/17] Enroll kernel keys thru MOK
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc:     Eric Snowberg <eric.snowberg@oracle.com>, keyrings@vger.kernel.org,
+        linux-integrity@vger.kernel.org, zohar@linux.ibm.com,
+        dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jmorris@namei.org, serge@hallyn.com, keescook@chromium.org,
+        torvalds@linux-foundation.org, weiyongjun1@huawei.com,
+        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
+        nramas@linux.microsoft.com, lszubowi@redhat.com, jason@zx2c4.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-efi@vger.kernel.org, linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com
+Date:   Wed, 17 Nov 2021 09:50:33 +0200
+In-Reply-To: <YZPevFtTucji7gIm@0xbeefdead.lan>
+References: <20211116001545.2639333-1-eric.snowberg@oracle.com>
+         <eac5f11d7ddcc65d16a9a949c5cf44851bff8f5f.camel@kernel.org>
+         <YZPZww0bafYEQ0VS@0xbeefdead.lan>
+         <f30a1399208a88257b3ff25b369088cf88a96367.camel@kernel.org>
+         <YZPevFtTucji7gIm@0xbeefdead.lan>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.40.4-1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACXcFm=bPdoLqYHEUpeZEQEULVGW6ej4ESHX+vMdeGfvjc51tg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 17, 2021 at 11:08:45AM +0800, Sandy Harris wrote:
-> On Tue, Nov 16, 2021 at 7:51 PM Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> 
-> > Have you looked at the output of the compiler to see if this really is
-> > needed or not?
-> 
-> No. To do that right you'd need to look at (at least) gcc & clang,
-> multiple architectures (cross-compiled & native) & various levels
-> of optimisation. I just looked at the C code.
+On Tue, 2021-11-16 at 11:39 -0500, Konrad Rzeszutek Wilk wrote:
+> On Tue, Nov 16, 2021 at 06:24:52PM +0200, Jarkko Sakkinen wrote:
+> > On Tue, 2021-11-16 at 11:18 -0500, Konrad Rzeszutek Wilk wrote:
+> > > > > I have included=C2=A0 a link to the mokutil [5] changes I have ma=
+de to support=20
+> > > > > this new functionality.=C2=A0 The shim changes have now been acce=
+pted
+> > > > > upstream [6].
+> > >=20
+> > > ..snip..
+> > > > > [6] https://github.com/rhboot/shim/commit/4e513405b4f164171011578=
+0d19dcec130c5208f
+> > >=20
+> > > ..snip..
+> > > >=20
+> > > > Does shim have the necessary features in a release?
+> > >=20
+> > > Hi!
+> > >=20
+> > > It has been accepted in the upstream shim. If you are looking
+> > > for a distribution having rolled out a shim with this feature (so sig=
+ned
+> > > by MSF) I fear that distributions are not that fast with shim release=
+s.
+         ~~~
 
-You should at least look, right?
+Should that be MS, or what does MSF mean?
 
-> > And what exactly are you zeroing out that could be read afterward
-> > somehow?
-> 
-> Whatever it is, the person who wrote the code thought it was
-> worth zeroing out with memset(). The only question is whether
-> it is safer to use memzero_explicit().
-> 
-> Granted in many cases this will not matter unless the kernel
-> is compiled at some optimisation level that does cross-function
-> analysis so it might be "smart" enough to optimise out the
-> memset(). Also granted it does not matter unless an attacker
-> can look inside the running kernel & if  he or she has that
-> level of privilege, then you have much else to worry about.
+> > >=20
+> > > Also these:
+> > > https://github.com/rhboot/shim/pulls
+> > > https://github.com/rhboot/shim/issues
+> > >=20
+> > > do mean some extra work would need to go in before an official
+> > > release is cut.
+> > >=20
+> > > Hope this helps?
+> >=20
+> > Yes. I'll hold with this up until there is an official release. Thank y=
+ou.
+>=20
+> Not sure I understand - but what are the concerns you have with shim
+> code that has been accepted?
 
-As Ard said, there should not be any such "optimization" as this is not
-something that any non-broken compiler should do.
+Maybe my concern is that none of the patches have a tested-by?
 
-> Still, it seemed safer to me to use memzero_explicit() in
-> these cases.
+Probably would be easier to get a test coverage, e.g. for people like
+me who do not even know how to self-compile Shim, how to setup user
+space using the product and so forth.
 
-I do not see why these cases are any different than any other call to
-memset() is, because this data is not on the stack so nothing should be
-removed by the compiler, right?
+I don't demand a release, if the changes have been accepted, but 17
+patches do need to be tested.
 
-thanks,
+/Jarkko
 
-greg k-h
+
