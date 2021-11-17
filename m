@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC3E9C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 14:31:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B744C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 14:31:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 935A661C12
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 14:31:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D10661B54
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 14:31:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238633AbhKQOei (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S238598AbhKQOei (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 17 Nov 2021 09:34:38 -0500
-Received: from mga01.intel.com ([192.55.52.88]:57934 "EHLO mga01.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:57945 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237841AbhKQOeb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Nov 2021 09:34:31 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10170"; a="257722642"
+        id S238613AbhKQOef (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Nov 2021 09:34:35 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10170"; a="257722659"
 X-IronPort-AV: E=Sophos;i="5.87,241,1631602800"; 
-   d="scan'208";a="257722642"
+   d="scan'208";a="257722659"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2021 06:31:32 -0800
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2021 06:31:35 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,241,1631602800"; 
-   d="scan'208";a="735829763"
+   d="scan'208";a="735829781"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
-  by fmsmga006.fm.intel.com with ESMTP; 17 Nov 2021 06:31:31 -0800
+  by fmsmga006.fm.intel.com with ESMTP; 17 Nov 2021 06:31:34 -0800
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         marco.chiappero@intel.com,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v3 14/25] crypto: qat - add pfvf_ops
-Date:   Wed, 17 Nov 2021 14:30:47 +0000
-Message-Id: <20211117143058.211550-15-giovanni.cabiddu@intel.com>
+Subject: [PATCH v3 16/25] crypto: qat - abstract PFVF send function
+Date:   Wed, 17 Nov 2021 14:30:49 +0000
+Message-Id: <20211117143058.211550-17-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211117143058.211550-1-giovanni.cabiddu@intel.com>
 References: <20211117143058.211550-1-giovanni.cabiddu@intel.com>
@@ -44,490 +44,313 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Marco Chiappero <marco.chiappero@intel.com>
 
-Add pfvf_ops structure to isolate PFVF related functions inside the
-adf_hw_device_data structure.
+Make the PFVF send function device specific.
 
-For GEN2, the structure is populated using one of the two helper
-functions, adf_gen2_init_pf_pfvf_ops() or adf_gen2_init_vf_pfvf_ops(),
-for the PF and VF driver respectively.
-
-For the DH895XCC PF driver, the structure is populated using
-adf_gen2_init_pf_pfvf_ops() but some of the functions are then
-overwritten.
+This is in preparation for the introduction of PFVF support in the
+qat_4xxx driver since the send logic differs between QAT GEN2 and
+QAT GEN4 devices.
 
 Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
 Co-developed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.c    |  4 +--
- .../crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c  |  6 +---
- .../qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c     |  3 +-
- .../crypto/qat/qat_c62x/adf_c62x_hw_data.c    |  6 +---
- .../qat/qat_c62xvf/adf_c62xvf_hw_data.c       |  3 +-
- drivers/crypto/qat/qat_common/Makefile        |  6 ++--
- .../crypto/qat/qat_common/adf_accel_devices.h | 17 +++++----
- drivers/crypto/qat/qat_common/adf_gen2_pfvf.c | 35 +++++++++++++------
- drivers/crypto/qat/qat_common/adf_gen2_pfvf.h | 19 +++++++---
- drivers/crypto/qat/qat_common/adf_init.c      |  2 +-
- drivers/crypto/qat/qat_common/adf_isr.c       |  8 ++---
- drivers/crypto/qat/qat_common/adf_pf2vf_msg.c |  8 ++---
- drivers/crypto/qat/qat_common/adf_sriov.c     |  6 ++--
- drivers/crypto/qat/qat_common/adf_vf2pf_msg.c |  2 +-
- .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |  9 +++--
- .../qat_dh895xccvf/adf_dh895xccvf_hw_data.c   |  3 +-
- 16 files changed, 76 insertions(+), 61 deletions(-)
+ .../crypto/qat/qat_common/adf_accel_devices.h |  1 +
+ drivers/crypto/qat/qat_common/adf_gen2_pfvf.c | 97 +++++++++++++++++++
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.c | 92 +-----------------
+ drivers/crypto/qat/qat_common/adf_pf2vf_msg.h |  3 +-
+ 4 files changed, 102 insertions(+), 91 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-index f4521eeeebed..ec57a2e2d1fc 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-+++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -254,8 +254,8 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data)
- 	hw_data->uof_get_ae_mask = uof_get_ae_mask;
- 	hw_data->set_msix_rttable = set_msix_default_rttable;
- 	hw_data->set_ssm_wdtimer = adf_gen4_set_ssm_wdtimer;
--	hw_data->enable_pfvf_comms = adf_pfvf_comms_disabled;
--	hw_data->get_vf2pf_sources = get_vf2pf_sources;
-+	hw_data->pfvf_ops.enable_comms = adf_pfvf_comms_disabled;
-+	hw_data->pfvf_ops.get_vf2pf_sources = get_vf2pf_sources;
- 	hw_data->disable_iov = adf_disable_sriov;
- 	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
- 
-diff --git a/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c b/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-index aaf8e65887b8..d25f78660b8c 100644
---- a/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-+++ b/drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-@@ -136,14 +136,10 @@ void adf_init_hw_data_c3xxx(struct adf_hw_device_data *hw_data)
- 	hw_data->enable_ints = adf_enable_ints;
- 	hw_data->reset_device = adf_reset_flr;
- 	hw_data->set_ssm_wdtimer = adf_gen2_set_ssm_wdtimer;
--	hw_data->get_pf2vf_offset = adf_gen2_pf_get_pf2vf_offset;
--	hw_data->get_vf2pf_sources = adf_gen2_get_vf2pf_sources;
--	hw_data->enable_vf2pf_interrupts = adf_gen2_enable_vf2pf_interrupts;
--	hw_data->disable_vf2pf_interrupts = adf_gen2_disable_vf2pf_interrupts;
--	hw_data->enable_pfvf_comms = adf_enable_pf2vf_comms;
- 	hw_data->disable_iov = adf_disable_sriov;
- 	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
- 
-+	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
- 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
- }
- 
-diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c b/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
-index ee61f69a8077..c39733320063 100644
---- a/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
-+++ b/drivers/crypto/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
-@@ -82,13 +82,12 @@ void adf_init_hw_data_c3xxxiov(struct adf_hw_device_data *hw_data)
- 	hw_data->get_num_aes = get_num_aes;
- 	hw_data->get_etr_bar_id = get_etr_bar_id;
- 	hw_data->get_misc_bar_id = get_misc_bar_id;
--	hw_data->get_pf2vf_offset = adf_gen2_vf_get_pf2vf_offset;
- 	hw_data->get_sku = get_sku;
- 	hw_data->enable_ints = adf_vf_void_noop;
--	hw_data->enable_pfvf_comms = adf_enable_vf2pf_comms;
- 	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
- 	hw_data->dev_class->instances++;
- 	adf_devmgr_update_class_index(hw_data);
-+	adf_gen2_init_vf_pfvf_ops(&hw_data->pfvf_ops);
- 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
- }
- 
-diff --git a/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
-index 0d694c713797..f24a01e1bc1a 100644
---- a/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
-+++ b/drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c
-@@ -138,14 +138,10 @@ void adf_init_hw_data_c62x(struct adf_hw_device_data *hw_data)
- 	hw_data->enable_ints = adf_enable_ints;
- 	hw_data->reset_device = adf_reset_flr;
- 	hw_data->set_ssm_wdtimer = adf_gen2_set_ssm_wdtimer;
--	hw_data->get_pf2vf_offset = adf_gen2_pf_get_pf2vf_offset;
--	hw_data->get_vf2pf_sources = adf_gen2_get_vf2pf_sources;
--	hw_data->enable_vf2pf_interrupts = adf_gen2_enable_vf2pf_interrupts;
--	hw_data->disable_vf2pf_interrupts = adf_gen2_disable_vf2pf_interrupts;
--	hw_data->enable_pfvf_comms = adf_enable_pf2vf_comms;
- 	hw_data->disable_iov = adf_disable_sriov;
- 	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
- 
-+	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
- 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
- }
- 
-diff --git a/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c b/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c
-index 407f3beee43c..03097bbe600a 100644
---- a/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c
-+++ b/drivers/crypto/qat/qat_c62xvf/adf_c62xvf_hw_data.c
-@@ -82,13 +82,12 @@ void adf_init_hw_data_c62xiov(struct adf_hw_device_data *hw_data)
- 	hw_data->get_num_aes = get_num_aes;
- 	hw_data->get_etr_bar_id = get_etr_bar_id;
- 	hw_data->get_misc_bar_id = get_misc_bar_id;
--	hw_data->get_pf2vf_offset = adf_gen2_vf_get_pf2vf_offset;
- 	hw_data->get_sku = get_sku;
- 	hw_data->enable_ints = adf_vf_void_noop;
--	hw_data->enable_pfvf_comms = adf_enable_vf2pf_comms;
- 	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
- 	hw_data->dev_class->instances++;
- 	adf_devmgr_update_class_index(hw_data);
-+	adf_gen2_init_vf_pfvf_ops(&hw_data->pfvf_ops);
- 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
- }
- 
-diff --git a/drivers/crypto/qat/qat_common/Makefile b/drivers/crypto/qat/qat_common/Makefile
-index 3874e427d1f7..676aef6533e0 100644
---- a/drivers/crypto/qat/qat_common/Makefile
-+++ b/drivers/crypto/qat/qat_common/Makefile
-@@ -16,9 +16,9 @@ intel_qat-objs := adf_cfg.o \
- 	qat_algs.o \
- 	qat_asym_algs.o \
- 	qat_uclo.o \
--	qat_hal.o \
--	adf_gen2_pfvf.o
-+	qat_hal.o
- 
- intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o
- intel_qat-$(CONFIG_PCI_IOV) += adf_sriov.o adf_pf2vf_msg.o \
--			       adf_vf2pf_msg.o adf_vf_isr.o
-+			       adf_vf2pf_msg.o adf_vf_isr.o \
-+			       adf_gen2_pfvf.o
 diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-index 57d9ca08e611..a1baa65bd034 100644
+index d9b2cc935b61..893814959083 100644
 --- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
 +++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-@@ -147,6 +147,14 @@ struct adf_accel_dev;
- struct adf_etr_data;
- struct adf_etr_ring_data;
+@@ -154,6 +154,7 @@ struct adf_pfvf_ops {
+ 	u32 (*get_vf2pf_sources)(void __iomem *pmisc_addr);
+ 	void (*enable_vf2pf_interrupts)(void __iomem *pmisc_addr, u32 vf_mask);
+ 	void (*disable_vf2pf_interrupts)(void __iomem *pmisc_addr, u32 vf_mask);
++	int (*send_msg)(struct adf_accel_dev *accel_dev, u32 msg, u8 vf_nr);
+ };
  
-+struct adf_pfvf_ops {
-+	int (*enable_comms)(struct adf_accel_dev *accel_dev);
-+	u32 (*get_pf2vf_offset)(u32 i);
-+	u32 (*get_vf2pf_sources)(void __iomem *pmisc_addr);
-+	void (*enable_vf2pf_interrupts)(void __iomem *pmisc_addr, u32 vf_mask);
-+	void (*disable_vf2pf_interrupts)(void __iomem *pmisc_addr, u32 vf_mask);
-+};
-+
  struct adf_hw_device_data {
- 	struct adf_hw_device_class *dev_class;
- 	u32 (*get_accel_mask)(struct adf_hw_device_data *self);
-@@ -157,7 +165,6 @@ struct adf_hw_device_data {
- 	u32 (*get_etr_bar_id)(struct adf_hw_device_data *self);
- 	u32 (*get_num_aes)(struct adf_hw_device_data *self);
- 	u32 (*get_num_accels)(struct adf_hw_device_data *self);
--	u32 (*get_pf2vf_offset)(u32 i);
- 	void (*get_arb_info)(struct arb_info *arb_csrs_info);
- 	void (*get_admin_info)(struct admin_info *admin_csrs_info);
- 	enum dev_sku_info (*get_sku)(struct adf_hw_device_data *self);
-@@ -176,17 +183,12 @@ struct adf_hw_device_data {
- 				      bool enable);
- 	void (*enable_ints)(struct adf_accel_dev *accel_dev);
- 	void (*set_ssm_wdtimer)(struct adf_accel_dev *accel_dev);
--	int (*enable_pfvf_comms)(struct adf_accel_dev *accel_dev);
--	u32 (*get_vf2pf_sources)(void __iomem *pmisc_addr);
--	void (*enable_vf2pf_interrupts)(void __iomem *pmisc_bar_addr,
--					u32 vf_mask);
--	void (*disable_vf2pf_interrupts)(void __iomem *pmisc_bar_addr,
--					 u32 vf_mask);
- 	void (*reset_device)(struct adf_accel_dev *accel_dev);
- 	void (*set_msix_rttable)(struct adf_accel_dev *accel_dev);
- 	char *(*uof_get_name)(u32 obj_num);
- 	u32 (*uof_get_num_objs)(void);
- 	u32 (*uof_get_ae_mask)(u32 obj_num);
-+	struct adf_pfvf_ops pfvf_ops;
- 	struct adf_hw_csr_ops csr_ops;
- 	const char *fw_name;
- 	const char *fw_mmp_name;
-@@ -222,6 +224,7 @@ struct adf_hw_device_data {
- 	GET_HW_DATA(accel_dev)->num_rings_per_bank
- #define GET_MAX_ACCELENGINES(accel_dev) (GET_HW_DATA(accel_dev)->num_engines)
- #define GET_CSR_OPS(accel_dev) (&(accel_dev)->hw_device->csr_ops)
-+#define GET_PFVF_OPS(accel_dev) (&(accel_dev)->hw_device->pfvf_ops)
- #define accel_to_pci_dev(accel_ptr) accel_ptr->accel_pci_dev.pci_dev
- 
- struct adf_admin_comms;
 diff --git a/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c b/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
-index ea8d34922374..36c8ff009661 100644
+index 2f27146bb7c6..5eba042d453b 100644
 --- a/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
 +++ b/drivers/crypto/qat/qat_common/adf_gen2_pfvf.c
-@@ -2,6 +2,7 @@
+@@ -1,9 +1,12 @@
+ // SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only)
  /* Copyright(c) 2021 Intel Corporation */
++#include <linux/delay.h>
++#include <linux/mutex.h>
  #include <linux/types.h>
  #include "adf_accel_devices.h"
-+#include "adf_common_drv.h"
+ #include "adf_common_drv.h"
  #include "adf_gen2_pfvf.h"
++#include "adf_pf2vf_msg.h"
  
   /* VF2PF interrupts */
-@@ -11,19 +12,17 @@
+ #define ADF_GEN2_ERR_REG_VF2PF(vf_src)	(((vf_src) & 0x01FFFE00) >> 9)
+@@ -12,6 +15,12 @@
  #define ADF_GEN2_PF_PF2VF_OFFSET(i)	(0x3A000 + 0x280 + ((i) * 0x04))
  #define ADF_GEN2_VF_PF2VF_OFFSET	0x200
  
--u32 adf_gen2_pf_get_pf2vf_offset(u32 i)
-+static u32 adf_gen2_pf_get_pf2vf_offset(u32 i)
++#define ADF_PFVF_MSG_ACK_DELAY		2
++#define ADF_PFVF_MSG_ACK_MAX_RETRY	100
++
++#define ADF_PFVF_MSG_RETRY_DELAY	5
++#define ADF_PFVF_MSG_MAX_RETRIES	3
++
+ static u32 adf_gen2_pf_get_pfvf_offset(u32 i)
  {
  	return ADF_GEN2_PF_PF2VF_OFFSET(i);
- }
--EXPORT_SYMBOL_GPL(adf_gen2_pf_get_pf2vf_offset);
- 
--u32 adf_gen2_vf_get_pf2vf_offset(u32 i)
-+static u32 adf_gen2_vf_get_pf2vf_offset(u32 i)
- {
- 	return ADF_GEN2_VF_PF2VF_OFFSET;
- }
--EXPORT_SYMBOL_GPL(adf_gen2_vf_get_pf2vf_offset);
- 
--u32 adf_gen2_get_vf2pf_sources(void __iomem *pmisc_addr)
-+static u32 adf_gen2_get_vf2pf_sources(void __iomem *pmisc_addr)
- {
- 	u32 errsou3, errmsk3, vf_int_mask;
- 
-@@ -39,9 +38,9 @@ u32 adf_gen2_get_vf2pf_sources(void __iomem *pmisc_addr)
- 
- 	return vf_int_mask;
- }
--EXPORT_SYMBOL_GPL(adf_gen2_get_vf2pf_sources);
- 
--void adf_gen2_enable_vf2pf_interrupts(void __iomem *pmisc_addr, u32 vf_mask)
-+static void adf_gen2_enable_vf2pf_interrupts(void __iomem *pmisc_addr,
-+					     u32 vf_mask)
- {
- 	/* Enable VF2PF Messaging Ints - VFs 0 through 15 per vf_mask[15:0] */
- 	if (vf_mask & 0xFFFF) {
-@@ -50,9 +49,9 @@ void adf_gen2_enable_vf2pf_interrupts(void __iomem *pmisc_addr, u32 vf_mask)
- 		ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, val);
+@@ -61,6 +70,92 @@ static void adf_gen2_disable_vf2pf_interrupts(void __iomem *pmisc_addr,
  	}
  }
--EXPORT_SYMBOL_GPL(adf_gen2_enable_vf2pf_interrupts);
  
--void adf_gen2_disable_vf2pf_interrupts(void __iomem *pmisc_addr, u32 vf_mask)
-+static void adf_gen2_disable_vf2pf_interrupts(void __iomem *pmisc_addr,
-+					      u32 vf_mask)
++static int adf_gen2_pfvf_send(struct adf_accel_dev *accel_dev, u32 msg,
++			      u8 vf_nr)
++{
++	struct adf_accel_pci *pci_info = &accel_dev->accel_pci_dev;
++	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
++	void __iomem *pmisc_bar_addr =
++		pci_info->pci_bars[hw_data->get_misc_bar_id(hw_data)].virt_addr;
++	u32 val, pfvf_offset, count = 0;
++	u32 local_in_use_mask, local_in_use_pattern;
++	u32 remote_in_use_mask, remote_in_use_pattern;
++	struct mutex *lock;	/* lock preventing concurrent acces of CSR */
++	unsigned int retries = ADF_PFVF_MSG_MAX_RETRIES;
++	u32 int_bit;
++	int ret;
++
++	if (accel_dev->is_vf) {
++		pfvf_offset = GET_PFVF_OPS(accel_dev)->get_vf2pf_offset(0);
++		lock = &accel_dev->vf.vf2pf_lock;
++		local_in_use_mask = ADF_VF2PF_IN_USE_BY_VF_MASK;
++		local_in_use_pattern = ADF_VF2PF_IN_USE_BY_VF;
++		remote_in_use_mask = ADF_PF2VF_IN_USE_BY_PF_MASK;
++		remote_in_use_pattern = ADF_PF2VF_IN_USE_BY_PF;
++		int_bit = ADF_VF2PF_INT;
++	} else {
++		pfvf_offset = GET_PFVF_OPS(accel_dev)->get_pf2vf_offset(vf_nr);
++		lock = &accel_dev->pf.vf_info[vf_nr].pf2vf_lock;
++		local_in_use_mask = ADF_PF2VF_IN_USE_BY_PF_MASK;
++		local_in_use_pattern = ADF_PF2VF_IN_USE_BY_PF;
++		remote_in_use_mask = ADF_VF2PF_IN_USE_BY_VF_MASK;
++		remote_in_use_pattern = ADF_VF2PF_IN_USE_BY_VF;
++		int_bit = ADF_PF2VF_INT;
++	}
++
++	msg &= ~local_in_use_mask;
++	msg |= local_in_use_pattern;
++
++	mutex_lock(lock);
++
++start:
++	ret = 0;
++
++	/* Check if the PFVF CSR is in use by remote function */
++	val = ADF_CSR_RD(pmisc_bar_addr, pfvf_offset);
++	if ((val & remote_in_use_mask) == remote_in_use_pattern) {
++		dev_dbg(&GET_DEV(accel_dev),
++			"PFVF CSR in use by remote function\n");
++		goto retry;
++	}
++
++	/* Attempt to get ownership of the PFVF CSR */
++	ADF_CSR_WR(pmisc_bar_addr, pfvf_offset, msg | int_bit);
++
++	/* Wait for confirmation from remote func it received the message */
++	do {
++		msleep(ADF_PFVF_MSG_ACK_DELAY);
++		val = ADF_CSR_RD(pmisc_bar_addr, pfvf_offset);
++	} while ((val & int_bit) && (count++ < ADF_PFVF_MSG_ACK_MAX_RETRY));
++
++	if (val & int_bit) {
++		dev_dbg(&GET_DEV(accel_dev), "ACK not received from remote\n");
++		val &= ~int_bit;
++		ret = -EIO;
++	}
++
++	if (val != msg) {
++		dev_dbg(&GET_DEV(accel_dev),
++			"Collision - PFVF CSR overwritten by remote function\n");
++		goto retry;
++	}
++
++	/* Finished with the PFVF CSR; relinquish it and leave msg in CSR */
++	ADF_CSR_WR(pmisc_bar_addr, pfvf_offset, val & ~local_in_use_mask);
++out:
++	mutex_unlock(lock);
++	return ret;
++
++retry:
++	if (--retries) {
++		msleep(ADF_PFVF_MSG_RETRY_DELAY);
++		goto start;
++	} else {
++		ret = -EBUSY;
++		goto out;
++	}
++}
++
+ void adf_gen2_init_pf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops)
  {
- 	/* Disable VF2PF interrupts for VFs 0 through 15 per vf_mask[15:0] */
- 	if (vf_mask & 0xFFFF) {
-@@ -61,4 +60,20 @@ void adf_gen2_disable_vf2pf_interrupts(void __iomem *pmisc_addr, u32 vf_mask)
- 		ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, val);
- 	}
+ 	pfvf_ops->enable_comms = adf_enable_pf2vf_comms;
+@@ -69,6 +164,7 @@ void adf_gen2_init_pf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops)
+ 	pfvf_ops->get_vf2pf_sources = adf_gen2_get_vf2pf_sources;
+ 	pfvf_ops->enable_vf2pf_interrupts = adf_gen2_enable_vf2pf_interrupts;
+ 	pfvf_ops->disable_vf2pf_interrupts = adf_gen2_disable_vf2pf_interrupts;
++	pfvf_ops->send_msg = adf_gen2_pfvf_send;
  }
--EXPORT_SYMBOL_GPL(adf_gen2_disable_vf2pf_interrupts);
-+
-+void adf_gen2_init_pf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops)
-+{
-+	pfvf_ops->enable_comms = adf_enable_pf2vf_comms;
-+	pfvf_ops->get_pf2vf_offset = adf_gen2_pf_get_pf2vf_offset;
-+	pfvf_ops->get_vf2pf_sources = adf_gen2_get_vf2pf_sources;
-+	pfvf_ops->enable_vf2pf_interrupts = adf_gen2_enable_vf2pf_interrupts;
-+	pfvf_ops->disable_vf2pf_interrupts = adf_gen2_disable_vf2pf_interrupts;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen2_init_pf_pfvf_ops);
-+
-+void adf_gen2_init_vf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops)
-+{
-+	pfvf_ops->enable_comms = adf_enable_vf2pf_comms;
-+	pfvf_ops->get_pf2vf_offset = adf_gen2_vf_get_pf2vf_offset;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen2_init_vf_pfvf_ops);
-diff --git a/drivers/crypto/qat/qat_common/adf_gen2_pfvf.h b/drivers/crypto/qat/qat_common/adf_gen2_pfvf.h
-index a21787e3e550..a716545a764c 100644
---- a/drivers/crypto/qat/qat_common/adf_gen2_pfvf.h
-+++ b/drivers/crypto/qat/qat_common/adf_gen2_pfvf.h
-@@ -11,10 +11,19 @@
- #define ADF_GEN2_ERRMSK3 (0x3A000 + 0x1C)
- #define ADF_GEN2_ERRMSK5 (0x3A000 + 0xDC)
+ EXPORT_SYMBOL_GPL(adf_gen2_init_pf_pfvf_ops);
  
--u32 adf_gen2_pf_get_pf2vf_offset(u32 i);
--u32 adf_gen2_vf_get_pf2vf_offset(u32 i);
--u32 adf_gen2_get_vf2pf_sources(void __iomem *pmisc_bar);
--void adf_gen2_enable_vf2pf_interrupts(void __iomem *pmisc_addr, u32 vf_mask);
--void adf_gen2_disable_vf2pf_interrupts(void __iomem *pmisc_addr, u32 vf_mask);
-+#if defined(CONFIG_PCI_IOV)
-+void adf_gen2_init_pf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops);
-+void adf_gen2_init_vf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops);
-+#else
-+static inline void adf_gen2_init_pf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops)
-+{
-+	pfvf_ops->enable_comms = adf_pfvf_comms_disabled;
-+}
-+
-+static inline void adf_gen2_init_vf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops)
-+{
-+	pfvf_ops->enable_comms = adf_pfvf_comms_disabled;
-+}
-+#endif
- 
- #endif /* ADF_GEN2_PFVF_H */
-diff --git a/drivers/crypto/qat/qat_common/adf_init.c b/drivers/crypto/qat/qat_common/adf_init.c
-index e3749e5817d9..391d82a64a93 100644
---- a/drivers/crypto/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/qat/qat_common/adf_init.c
-@@ -117,7 +117,7 @@ int adf_dev_init(struct adf_accel_dev *accel_dev)
- 	hw_data->enable_ints(accel_dev);
- 	hw_data->enable_error_correction(accel_dev);
- 
--	ret = hw_data->enable_pfvf_comms(accel_dev);
-+	ret = hw_data->pfvf_ops.enable_comms(accel_dev);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/crypto/qat/qat_common/adf_isr.c b/drivers/crypto/qat/qat_common/adf_isr.c
-index 2b4900c91308..358200c0d598 100644
---- a/drivers/crypto/qat/qat_common/adf_isr.c
-+++ b/drivers/crypto/qat/qat_common/adf_isr.c
-@@ -64,7 +64,7 @@ void adf_enable_vf2pf_interrupts(struct adf_accel_dev *accel_dev, u32 vf_mask)
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&accel_dev->pf.vf2pf_ints_lock, flags);
--	hw_data->enable_vf2pf_interrupts(pmisc_addr, vf_mask);
-+	hw_data->pfvf_ops.enable_vf2pf_interrupts(pmisc_addr, vf_mask);
- 	spin_unlock_irqrestore(&accel_dev->pf.vf2pf_ints_lock, flags);
+@@ -77,5 +173,6 @@ void adf_gen2_init_vf_pfvf_ops(struct adf_pfvf_ops *pfvf_ops)
+ 	pfvf_ops->enable_comms = adf_enable_vf2pf_comms;
+ 	pfvf_ops->get_pf2vf_offset = adf_gen2_vf_get_pfvf_offset;
+ 	pfvf_ops->get_vf2pf_offset = adf_gen2_vf_get_pfvf_offset;
++	pfvf_ops->send_msg = adf_gen2_pfvf_send;
  }
- 
-@@ -77,7 +77,7 @@ void adf_disable_vf2pf_interrupts(struct adf_accel_dev *accel_dev, u32 vf_mask)
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&accel_dev->pf.vf2pf_ints_lock, flags);
--	hw_data->disable_vf2pf_interrupts(pmisc_addr, vf_mask);
-+	hw_data->pfvf_ops.disable_vf2pf_interrupts(pmisc_addr, vf_mask);
- 	spin_unlock_irqrestore(&accel_dev->pf.vf2pf_ints_lock, flags);
- }
- 
-@@ -90,7 +90,7 @@ static void adf_disable_vf2pf_interrupts_irq(struct adf_accel_dev *accel_dev,
- 	void __iomem *pmisc_addr = pmisc->virt_addr;
- 
- 	spin_lock(&accel_dev->pf.vf2pf_ints_lock);
--	hw_data->disable_vf2pf_interrupts(pmisc_addr, vf_mask);
-+	hw_data->pfvf_ops.disable_vf2pf_interrupts(pmisc_addr, vf_mask);
- 	spin_unlock(&accel_dev->pf.vf2pf_ints_lock);
- }
- 
-@@ -104,7 +104,7 @@ static bool adf_handle_vf2pf_int(struct adf_accel_dev *accel_dev)
- 	unsigned long vf_mask;
- 
- 	/* Get the interrupt sources triggered by VFs */
--	vf_mask = hw_data->get_vf2pf_sources(pmisc_addr);
-+	vf_mask = hw_data->pfvf_ops.get_vf2pf_sources(pmisc_addr);
- 
- 	if (vf_mask) {
- 		struct adf_accel_vf_info *vf_info;
+ EXPORT_SYMBOL_GPL(adf_gen2_init_vf_pfvf_ops);
 diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
-index d98e3639c9d2..78dc8aea4866 100644
+index c420ec03081b..074e521ed9e8 100644
 --- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
 +++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.c
-@@ -29,7 +29,7 @@ static int adf_iov_putmsg(struct adf_accel_dev *accel_dev, u32 msg, u8 vf_nr)
- 	int ret;
+@@ -1,6 +1,5 @@
+ // SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only)
+ /* Copyright(c) 2015 - 2020 Intel Corporation */
+-#include <linux/delay.h>
+ #include "adf_accel_devices.h"
+ #include "adf_common_drv.h"
+ #include "adf_pf2vf_msg.h"
+@@ -8,97 +7,10 @@
+ #define ADF_PFVF_MSG_COLLISION_DETECT_DELAY	10
+ #define ADF_PFVF_MSG_ACK_DELAY			2
+ #define ADF_PFVF_MSG_ACK_MAX_RETRY		100
+-#define ADF_PFVF_MSG_RETRY_DELAY		5
+-#define ADF_PFVF_MSG_MAX_RETRIES		3
+ #define ADF_PFVF_MSG_RESP_TIMEOUT	(ADF_PFVF_MSG_ACK_DELAY * \
+ 					 ADF_PFVF_MSG_ACK_MAX_RETRY + \
+ 					 ADF_PFVF_MSG_COLLISION_DETECT_DELAY)
  
- 	if (accel_dev->is_vf) {
--		pf2vf_offset = hw_data->get_pf2vf_offset(0);
-+		pf2vf_offset = hw_data->pfvf_ops.get_pf2vf_offset(0);
- 		lock = &accel_dev->vf.vf2pf_lock;
- 		local_in_use_mask = ADF_VF2PF_IN_USE_BY_VF_MASK;
- 		local_in_use_pattern = ADF_VF2PF_IN_USE_BY_VF;
-@@ -37,7 +37,7 @@ static int adf_iov_putmsg(struct adf_accel_dev *accel_dev, u32 msg, u8 vf_nr)
- 		remote_in_use_pattern = ADF_PF2VF_IN_USE_BY_PF;
- 		int_bit = ADF_VF2PF_INT;
- 	} else {
--		pf2vf_offset = hw_data->get_pf2vf_offset(vf_nr);
-+		pf2vf_offset = hw_data->pfvf_ops.get_pf2vf_offset(vf_nr);
- 		lock = &accel_dev->pf.vf_info[vf_nr].pf2vf_lock;
- 		local_in_use_mask = ADF_PF2VF_IN_USE_BY_PF_MASK;
- 		local_in_use_pattern = ADF_PF2VF_IN_USE_BY_PF;
-@@ -258,7 +258,7 @@ bool adf_recv_and_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr)
- 	u32 msg, resp = 0;
- 
- 	/* Read message from the VF */
--	msg = ADF_CSR_RD(pmisc_addr, hw_data->get_pf2vf_offset(vf_nr));
-+	msg = ADF_CSR_RD(pmisc_addr, hw_data->pfvf_ops.get_pf2vf_offset(vf_nr));
- 	if (!(msg & ADF_VF2PF_INT)) {
- 		dev_info(&GET_DEV(accel_dev),
- 			 "Spurious VF2PF interrupt, msg %X. Ignored\n", msg);
-@@ -275,7 +275,7 @@ bool adf_recv_and_handle_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 vf_nr)
- 
- 	/* To ACK, clear the VF2PFINT bit */
- 	msg &= ~ADF_VF2PF_INT;
--	ADF_CSR_WR(pmisc_addr, hw_data->get_pf2vf_offset(vf_nr), msg);
-+	ADF_CSR_WR(pmisc_addr, hw_data->pfvf_ops.get_pf2vf_offset(vf_nr), msg);
- 
- 	if (adf_handle_vf2pf_msg(accel_dev, vf_nr, msg, &resp))
- 		return false;
-diff --git a/drivers/crypto/qat/qat_common/adf_sriov.c b/drivers/crypto/qat/qat_common/adf_sriov.c
-index b1a814ac1d67..342063406c19 100644
---- a/drivers/crypto/qat/qat_common/adf_sriov.c
-+++ b/drivers/crypto/qat/qat_common/adf_sriov.c
-@@ -70,7 +70,7 @@ static int adf_enable_sriov(struct adf_accel_dev *accel_dev)
- 		hw_data->configure_iov_threads(accel_dev, true);
- 
- 	/* Enable VF to PF interrupts for all VFs */
--	if (hw_data->get_pf2vf_offset)
-+	if (hw_data->pfvf_ops.get_pf2vf_offset)
- 		adf_enable_vf2pf_interrupts(accel_dev, BIT_ULL(totalvfs) - 1);
- 
- 	/*
-@@ -100,13 +100,13 @@ void adf_disable_sriov(struct adf_accel_dev *accel_dev)
- 	if (!accel_dev->pf.vf_info)
- 		return;
- 
--	if (hw_data->get_pf2vf_offset)
-+	if (hw_data->pfvf_ops.get_pf2vf_offset)
- 		adf_pf2vf_notify_restarting(accel_dev);
- 
- 	pci_disable_sriov(accel_to_pci_dev(accel_dev));
- 
- 	/* Disable VF to PF interrupts */
--	if (hw_data->get_pf2vf_offset)
-+	if (hw_data->pfvf_ops.get_pf2vf_offset)
- 		adf_disable_vf2pf_interrupts(accel_dev, GENMASK(31, 0));
- 
- 	/* Clear Valid bits in AE Thread to PCIe Function Mapping */
-diff --git a/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c b/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
-index 01a6e68f256b..d11eb60b3e86 100644
---- a/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
-+++ b/drivers/crypto/qat/qat_common/adf_vf2pf_msg.c
-@@ -81,7 +81,7 @@ bool adf_recv_and_handle_pf2vf_msg(struct adf_accel_dev *accel_dev)
- 	struct adf_bar *pmisc =
- 			&GET_BARS(accel_dev)[hw_data->get_misc_bar_id(hw_data)];
- 	void __iomem *pmisc_bar_addr = pmisc->virt_addr;
--	u32 offset = hw_data->get_pf2vf_offset(0);
-+	u32 offset = hw_data->pfvf_ops.get_pf2vf_offset(0);
- 	u32 msg;
- 
- 	/* Read the message from PF */
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-index 5fc2e5a7f10b..aa42373a7118 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-@@ -215,14 +215,13 @@ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data)
- 	hw_data->get_arb_mapping = adf_get_arbiter_mapping;
- 	hw_data->enable_ints = adf_enable_ints;
- 	hw_data->reset_device = adf_reset_sbr;
--	hw_data->get_pf2vf_offset = adf_gen2_pf_get_pf2vf_offset;
--	hw_data->get_vf2pf_sources = get_vf2pf_sources;
--	hw_data->enable_vf2pf_interrupts = enable_vf2pf_interrupts;
--	hw_data->disable_vf2pf_interrupts = disable_vf2pf_interrupts;
--	hw_data->enable_pfvf_comms = adf_enable_pf2vf_comms;
- 	hw_data->disable_iov = adf_disable_sriov;
- 	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
- 
-+	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
-+	hw_data->pfvf_ops.get_vf2pf_sources = get_vf2pf_sources;
-+	hw_data->pfvf_ops.enable_vf2pf_interrupts = enable_vf2pf_interrupts;
-+	hw_data->pfvf_ops.disable_vf2pf_interrupts = disable_vf2pf_interrupts;
- 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
+-static int adf_iov_putmsg(struct adf_accel_dev *accel_dev, u32 msg, u8 vf_nr)
+-{
+-	struct adf_accel_pci *pci_info = &accel_dev->accel_pci_dev;
+-	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
+-	void __iomem *pmisc_bar_addr =
+-		pci_info->pci_bars[hw_data->get_misc_bar_id(hw_data)].virt_addr;
+-	u32 val, pf2vf_offset, count = 0;
+-	u32 local_in_use_mask, local_in_use_pattern;
+-	u32 remote_in_use_mask, remote_in_use_pattern;
+-	struct mutex *lock;	/* lock preventing concurrent acces of CSR */
+-	unsigned int retries = ADF_PFVF_MSG_MAX_RETRIES;
+-	u32 int_bit;
+-	int ret;
+-
+-	if (accel_dev->is_vf) {
+-		pf2vf_offset = hw_data->pfvf_ops.get_vf2pf_offset(0);
+-		lock = &accel_dev->vf.vf2pf_lock;
+-		local_in_use_mask = ADF_VF2PF_IN_USE_BY_VF_MASK;
+-		local_in_use_pattern = ADF_VF2PF_IN_USE_BY_VF;
+-		remote_in_use_mask = ADF_PF2VF_IN_USE_BY_PF_MASK;
+-		remote_in_use_pattern = ADF_PF2VF_IN_USE_BY_PF;
+-		int_bit = ADF_VF2PF_INT;
+-	} else {
+-		pf2vf_offset = hw_data->pfvf_ops.get_pf2vf_offset(vf_nr);
+-		lock = &accel_dev->pf.vf_info[vf_nr].pf2vf_lock;
+-		local_in_use_mask = ADF_PF2VF_IN_USE_BY_PF_MASK;
+-		local_in_use_pattern = ADF_PF2VF_IN_USE_BY_PF;
+-		remote_in_use_mask = ADF_VF2PF_IN_USE_BY_VF_MASK;
+-		remote_in_use_pattern = ADF_VF2PF_IN_USE_BY_VF;
+-		int_bit = ADF_PF2VF_INT;
+-	}
+-
+-	msg &= ~local_in_use_mask;
+-	msg |= local_in_use_pattern;
+-
+-	mutex_lock(lock);
+-
+-start:
+-	ret = 0;
+-
+-	/* Check if the PFVF CSR is in use by remote function */
+-	val = ADF_CSR_RD(pmisc_bar_addr, pf2vf_offset);
+-	if ((val & remote_in_use_mask) == remote_in_use_pattern) {
+-		dev_dbg(&GET_DEV(accel_dev),
+-			"PFVF CSR in use by remote function\n");
+-		goto retry;
+-	}
+-
+-	/* Attempt to get ownership of the PFVF CSR */
+-	ADF_CSR_WR(pmisc_bar_addr, pf2vf_offset, msg | int_bit);
+-
+-	/* Wait for confirmation from remote func it received the message */
+-	do {
+-		msleep(ADF_PFVF_MSG_ACK_DELAY);
+-		val = ADF_CSR_RD(pmisc_bar_addr, pf2vf_offset);
+-	} while ((val & int_bit) && (count++ < ADF_PFVF_MSG_ACK_MAX_RETRY));
+-
+-	if (val & int_bit) {
+-		dev_dbg(&GET_DEV(accel_dev), "ACK not received from remote\n");
+-		val &= ~int_bit;
+-		ret = -EIO;
+-	}
+-
+-	if (val != msg) {
+-		dev_dbg(&GET_DEV(accel_dev),
+-			"Collision - PFVF CSR overwritten by remote function\n");
+-		goto retry;
+-	}
+-
+-	/* Finished with the PFVF CSR; relinquish it and leave msg in CSR */
+-	ADF_CSR_WR(pmisc_bar_addr, pf2vf_offset, val & ~local_in_use_mask);
+-out:
+-	mutex_unlock(lock);
+-	return ret;
+-
+-retry:
+-	if (--retries) {
+-		msleep(ADF_PFVF_MSG_RETRY_DELAY);
+-		goto start;
+-	} else {
+-		ret = -EBUSY;
+-		goto out;
+-	}
+-}
+-
+ /**
+  * adf_send_pf2vf_msg() - send PF to VF message
+  * @accel_dev:	Pointer to acceleration device
+@@ -111,7 +23,7 @@ static int adf_iov_putmsg(struct adf_accel_dev *accel_dev, u32 msg, u8 vf_nr)
+  */
+ static int adf_send_pf2vf_msg(struct adf_accel_dev *accel_dev, u8 vf_nr, u32 msg)
+ {
+-	return adf_iov_putmsg(accel_dev, msg, vf_nr);
++	return GET_PFVF_OPS(accel_dev)->send_msg(accel_dev, msg, vf_nr);
  }
  
-diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c b/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
-index 30d862226026..2e2ef6b5bd2a 100644
---- a/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
-+++ b/drivers/crypto/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
-@@ -82,13 +82,12 @@ void adf_init_hw_data_dh895xcciov(struct adf_hw_device_data *hw_data)
- 	hw_data->get_num_aes = get_num_aes;
- 	hw_data->get_etr_bar_id = get_etr_bar_id;
- 	hw_data->get_misc_bar_id = get_misc_bar_id;
--	hw_data->get_pf2vf_offset = adf_gen2_vf_get_pf2vf_offset;
- 	hw_data->get_sku = get_sku;
- 	hw_data->enable_ints = adf_vf_void_noop;
--	hw_data->enable_pfvf_comms = adf_enable_vf2pf_comms;
- 	hw_data->min_iov_compat_ver = ADF_PFVF_COMPAT_THIS_VERSION;
- 	hw_data->dev_class->instances++;
- 	adf_devmgr_update_class_index(hw_data);
-+	adf_gen2_init_vf_pfvf_ops(&hw_data->pfvf_ops);
- 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
+ /**
+@@ -125,7 +37,7 @@ static int adf_send_pf2vf_msg(struct adf_accel_dev *accel_dev, u8 vf_nr, u32 msg
+  */
+ int adf_send_vf2pf_msg(struct adf_accel_dev *accel_dev, u32 msg)
+ {
+-	return adf_iov_putmsg(accel_dev, msg, 0);
++	return GET_PFVF_OPS(accel_dev)->send_msg(accel_dev, msg, 0);
  }
  
+ /**
+diff --git a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.h b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.h
+index a7d8f8367345..73eb8f13ad09 100644
+--- a/drivers/crypto/qat/qat_common/adf_pf2vf_msg.h
++++ b/drivers/crypto/qat/qat_common/adf_pf2vf_msg.h
+@@ -49,7 +49,8 @@
+  *
+  * When a PF or VF attempts to send a message in the lower or upper 16 bits,
+  * respectively, the other 16 bits are written to first with a defined
+- * IN_USE_BY pattern as part of a collision control scheme (see adf_iov_putmsg).
++ * IN_USE_BY pattern as part of a collision control scheme (see function
++ * adf_gen2_pfvf_send() in adf_pf2vf_msg.c).
+  */
+ 
+ #define ADF_PFVF_COMPAT_THIS_VERSION		0x1	/* PF<->VF compat */
 -- 
 2.33.1
 
