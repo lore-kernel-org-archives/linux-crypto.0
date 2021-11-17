@@ -2,92 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF336C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 03:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0132C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 05:53:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8E3D6108D
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 03:09:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA20663214
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Nov 2021 05:53:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231303AbhKQDL5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Nov 2021 22:11:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43192 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230447AbhKQDL5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Nov 2021 22:11:57 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2482C061570;
-        Tue, 16 Nov 2021 19:08:58 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id s13so1686909wrb.3;
-        Tue, 16 Nov 2021 19:08:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7UhcpsKrtyIsxTBA6QenhVurPqFsIK55Y63ymJwZ+Fo=;
-        b=ZN3EHphS8kER4m9GoZKX4VnmOccZKxd/re2+Nz57yq/lVLPXTU+QZvlDe8LMQ+H5r4
-         tZc3nW7KQ1hvlw0IzDjZLcyojYbiDYJYv9EudP8AwUXQxqbCLLO2A/1ejyqG1E/wlUH8
-         aHtqioUWjjXnkTn21knutTwSEa/1bgJCyl01FspxsPqrMghXEwQL7OXF1Bh9gS/e69Sf
-         awPFGVn52q4YlgfPHjbwmlpihG38fkbznvPIgn+XLRKw2AWrsnSrBnXJyda3ak7sLbCw
-         TmiEsGzpduktEf5hP9WVlgKkV3pclXs8c7xlbvkSWLGxbK46zGQncz11fPn9cEp/CN0Z
-         +aMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7UhcpsKrtyIsxTBA6QenhVurPqFsIK55Y63ymJwZ+Fo=;
-        b=RSjRS4yk0nqR6zinURa7fXLFyYk5x/n3Bv9mOpicG23WlPf9Z8BHGFueYAllgOwZiT
-         5QyvE6CM+csxYrVSkdYGY0vmqlXPVF9enWQ1aKzC7KkqgnrxyL4csra1Guc8UKiAgvMT
-         2C2FcOjJ7+kiJRYy/h53x/u20LBvmu9y7SbGq/Bq5shjvbF40Veexu5csRtv8O41Ad94
-         IWO0Pl20Pjz7P/4oa69SGHj4fCv3/HvdNMZcDy3nO+P9EtGJTF/Xde0y5HWBmLZbDA5h
-         ka6WCBQlE6riBOEEJNuB0TMG+UiOm/0IKhPUQyfbt4ZZjHLkgt/DItpcQNAaux7A+Tuk
-         fFDQ==
-X-Gm-Message-State: AOAM531wfXbr2Q9VP7Qc5+8ln054lgrE90FuYXDASLVVE1pFKxGcqQbU
-        FnmNhHWTgZrAuRbbi7w5W9irugpGSZbEvAjxKNeFGDqT9DA=
-X-Google-Smtp-Source: ABdhPJxcXeWlmlPMVZTnLP71dZsGRLdLEtXRpeRD39863OkYlkfI2jQI8gE+je80TT7FAJUWbe/hPpu54cymOk+zG8k=
-X-Received: by 2002:adf:9d82:: with SMTP id p2mr15637311wre.414.1637118537630;
- Tue, 16 Nov 2021 19:08:57 -0800 (PST)
+        id S233357AbhKQF4E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 17 Nov 2021 00:56:04 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45520 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233348AbhKQF4D (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Nov 2021 00:56:03 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C206C60E08;
+        Wed, 17 Nov 2021 05:53:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637128385;
+        bh=FoIpIh0kWZhRl7ZuVuarWxUqjOzcP3NUPIm79CZvako=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=gwIIQt3I/u+7T4N3Adz1s9U12jXTJFrI4PJo2KUxZbUOCP/FkjwkV7v/M+TvE8SGR
+         Nvmw11cVlGkr8gXZaX453XRnGAacRSb9uRwM4dhvaelHlRrOtu1IROG+3HEM3dT0Y6
+         SjzVOC7t4JOxt57jq3dvLsqLtlwJjKY7jkW4G1AdH1G2WKjyl294OA04uvVJoy2HDW
+         4VKSxZDhIxf6+PF/E3R/4e687d7+Gvc9MoPgbaM3kF9XOO0M3DgfDUviSuW5hYa9FZ
+         kbzOJHuP9/nls56zwWy5CMHdWJyg6mjUXqT1j8OrzJD8tHloZW2iZCRF7Df0ipxMgN
+         UDSjprpO/vKCw==
+Date:   Wed, 17 Nov 2021 11:23:00 +0530
+From:   Vinod Koul <vkoul@kernel.org>
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        bhupesh.linux@gmail.com, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, robh+dt@kernel.org, agross@kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        stephan@gerhold.net, Thara Gopinath <thara.gopinath@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>
+Subject: Re: [PATCH v5 02/22] arm64: dts: qcom: msm8996: Fix 'dma' nodes in
+ dts
+Message-ID: <YZSYvBEoDExaaGD5@matsya>
+References: <20211110105922.217895-1-bhupesh.sharma@linaro.org>
+ <20211110105922.217895-3-bhupesh.sharma@linaro.org>
 MIME-Version: 1.0
-References: <CACXcFm=kwziZ5Etdevu0uq_t5qy0NbGY753WfLvnwkMqtU9Tvg@mail.gmail.com>
- <YZObImtJITs1ZfUc@kroah.com>
-In-Reply-To: <YZObImtJITs1ZfUc@kroah.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Wed, 17 Nov 2021 11:08:45 +0800
-Message-ID: <CACXcFm=bPdoLqYHEUpeZEQEULVGW6ej4ESHX+vMdeGfvjc51tg@mail.gmail.com>
-Subject: Re: [PATCH 1/8] Replace memset() with memzero_explicit()
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211110105922.217895-3-bhupesh.sharma@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 16, 2021 at 7:51 PM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
+On 10-11-21, 16:29, Bhupesh Sharma wrote:
+> Preparatory patch for subsequent patch in this series which
+> converts the qcom_bam_dma device-tree binding into YAML format.
+> 
+> Correct dma-controller node inside msm8996 dts, which
+> leads to following errors with 'make dtbs_check':
+> 
+>      dma@164400: $nodename:0: 'dma@164400' does not match
+>      '^dma-controller(@.*)?$'
+> 
+> Fix the same.
 
-> Have you looked at the output of the compiler to see if this really is
-> needed or not?
 
-No. To do that right you'd need to look at (at least) gcc & clang,
-multiple architectures (cross-compiled & native) & various levels
-of optimisation. I just looked at the C code.
+Looks like one more crept in, this is the only one.. I did fix a bunch
+previously...
 
-> And what exactly are you zeroing out that could be read afterward
-> somehow?
+Reviewed-by: Vinod Koul <vkoul@kernel.org>
 
-Whatever it is, the person who wrote the code thought it was
-worth zeroing out with memset(). The only question is whether
-it is safer to use memzero_explicit().
+> 
+> Cc: Thara Gopinath <thara.gopinath@linaro.org>
+> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Cc: Rob Herring <robh+dt@kernel.org>
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>  arch/arm64/boot/dts/qcom/msm8996.dtsi | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/msm8996.dtsi b/arch/arm64/boot/dts/qcom/msm8996.dtsi
+> index 27683d7fdfe6..508cd9d06350 100644
+> --- a/arch/arm64/boot/dts/qcom/msm8996.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/msm8996.dtsi
+> @@ -705,7 +705,7 @@ tsens1: thermal-sensor@4ad000 {
+>  			#thermal-sensor-cells = <1>;
+>  		};
+>  
+> -		cryptobam: dma@644000 {
+> +		cryptobam: dma-controller@644000 {
+>  			compatible = "qcom,bam-v1.7.0";
+>  			reg = <0x00644000 0x24000>;
+>  			interrupts = <GIC_SPI 206 IRQ_TYPE_LEVEL_HIGH>;
+> -- 
+> 2.31.1
 
-Granted in many cases this will not matter unless the kernel
-is compiled at some optimisation level that does cross-function
-analysis so it might be "smart" enough to optimise out the
-memset(). Also granted it does not matter unless an attacker
-can look inside the running kernel & if  he or she has that
-level of privilege, then you have much else to worry about.
-
-Still, it seemed safer to me to use memzero_explicit() in
-these cases.
+-- 
+~Vinod
