@@ -2,183 +2,160 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5EF4C43217
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Nov 2021 08:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BBCC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Nov 2021 08:21:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AD25761B3A
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Nov 2021 08:14:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 120D361B7D
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Nov 2021 08:21:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244368AbhKRIRq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Nov 2021 03:17:46 -0500
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.54]:32017 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244446AbhKRIRD (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Nov 2021 03:17:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1637222876;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=pqxqeDLYvduBqgPCaONKS31VBdYNk/GP5KTwPLPfQJE=;
-    b=e4TfzP/RSBFBhnYFpBG0Oz/NFSBdc86BMUSY4fs9cnwFrdsPztGri2n8/50l5cnp14
-    F8F5ozqprk8iyO//8YFnEQq5WmogWtbBGNHVUf7PDKxuulPTj0GHxcRFYdfBpyfGiGpa
-    61h2yC0qE8nKtycvwukgutOH1BhY+ofPCb1DgfkWuAyMgLFUsptPAVru0dd9Yn3Tlw0P
-    /FkRt5wEtNuSH78oLrtUDNN/kkcQ5fk73XoYRot1tR/AFYXYe/Q7jHSwM+FDuU2m88F4
-    VNDVG6XoYEgA0yir4ebvzY7djV/nnMJnjU1U30/GvssOPG1u/KInw4Y+V3ke2fLvAU6Z
-    rAXQ==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbJvScPP/G"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 47.34.5 DYNA|AUTH)
-    with ESMTPSA id U02dfbxAI87toU9
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Thu, 18 Nov 2021 09:07:55 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     herbert@gondor.apana.org.au, Jarkko Sakkinen <jarkko@kernel.org>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keyrings <keyrings@vger.kernel.org>, simo@redhat.com
-Subject: Re: [PATCH v3 2/4] crypto: add SP800-108 counter key derivation function
-Date:   Thu, 18 Nov 2021 09:07:55 +0100
-Message-ID: <3820150.6QZi0asr2n@tauon.chronox.de>
-In-Reply-To: <YZVTx01YyvCsPc9i@gmail.com>
-References: <2589009.vuYhMxLoTh@positron.chronox.de> <3412396.dWV9SEqChM@positron.chronox.de> <YZVTx01YyvCsPc9i@gmail.com>
+        id S235672AbhKRIY2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 18 Nov 2021 03:24:28 -0500
+Received: from mail-db8eur05on2070.outbound.protection.outlook.com ([40.107.20.70]:38093
+        "EHLO EUR05-DB8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S244370AbhKRIY0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Nov 2021 03:24:26 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CRIHTLWkQOf8CYYL/7lexc3RaQ7aBJdF9xSMYFuYGuHQgsXcpdJ1HkeilM+Mx8tm3cblRhbez0O+CPzeyYE5ladWW5JSvcf/4q2V9QQwCwruRXurBoV9K75rjDq05Bx0Fq4UdkC8W6UjrNt4KT4nD38scpLrhAWsvGVleZsPL+O/FOc5C6ScXhft80RL0ZZSPE5e2Kv4qF40CWfeRJ1nvGMI1yRUMaEiqLj9ICqy+nWYkxoeMaGaoJDVLm+2gzUnq0zEhxFrVpsEyXaiFMIQTSpfcfZWbHc63b8zaDpopANN4F0D4tn6NmIxhD6xJ8ogEvFAoPJVWzolgZvsEnlSSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZbKvH+zj/abXsWV4DNkHriyHP42Q4fOqKZOCkWKpjjs=;
+ b=KBYS7x4dTfTBz5jPN35Xmp1etSyIZZj93ugoEf3h3dhUshGST8+I4asFV9gZJkr1HwEjum4SNxBbDaVAVWT35eOhESKJC1idfZNJYqaufV+CUwHl1SKG52en6oiFqfdkdhYu5AftwTF9LC+alncEytsAtleMu3wQwodGTGDdZopD6LuUrDzTe8d4EiEyGhkz5//54prOoS/S+7V/AtljrN67JLiFvapJXStAYPm4CDpXBfKzfdAa/58ggPyn31fc5XjlV5CWt3gTwwicG8OlMcYN8oHKyQfOrhECmkrK3zT41SKesDFZQC5lITzo+gvP37+8Fehsw2suYur9IN8ipg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZbKvH+zj/abXsWV4DNkHriyHP42Q4fOqKZOCkWKpjjs=;
+ b=p4sFMJi+PhH2u2QTnebxOQk+fYdgNNGNGWVw/H1O2vJdxSDeKuwnZOzL/5yxz4umDUot/Msfuhj36qEmfhMF/NaxNgcFzu8Ni4ssNpF56+N4COfyM8gVZQboV35VWE2Jitvbn3CcrtNi9VJeHyef3Y0oK2Utgh7IsxLkUw7Wpqc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
+ by VI1PR04MB3983.eurprd04.prod.outlook.com (2603:10a6:803:4c::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.18; Thu, 18 Nov
+ 2021 08:21:23 +0000
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::50f1:1936:3037:778b]) by VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::50f1:1936:3037:778b%7]) with mapi id 15.20.4690.029; Thu, 18 Nov 2021
+ 08:21:23 +0000
+Message-ID: <d45c25c1-1cb5-cde2-3152-3920200a8b3d@nxp.com>
+Date:   Thu, 18 Nov 2021 10:21:20 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.1
+Subject: Re: [PATCH v2] driver: crypto: caam: replace this_cpu_ptr with
+ raw_cpu_ptr
+Content-Language: en-US
+To:     Meng Li <Meng.Li@windriver.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20211101031353.2119-1-Meng.Li@windriver.com>
+From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+In-Reply-To: <20211101031353.2119-1-Meng.Li@windriver.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR06CA0133.eurprd06.prod.outlook.com
+ (2603:10a6:208:ab::38) To VI1PR04MB4046.eurprd04.prod.outlook.com
+ (2603:10a6:803:4d::29)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Received: from [192.168.0.213] (89.136.162.44) by AM0PR06CA0133.eurprd06.prod.outlook.com (2603:10a6:208:ab::38) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.19 via Frontend Transport; Thu, 18 Nov 2021 08:21:22 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e5eaaa38-b151-42ab-a03d-08d9aa6c67f7
+X-MS-TrafficTypeDiagnostic: VI1PR04MB3983:
+X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
+X-Microsoft-Antispam-PRVS: <VI1PR04MB3983A7F0D39962981FF7E9CD989B9@VI1PR04MB3983.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:568;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WNHWeVFnT9U8mRrhXHWi6idzml/N+kiT5MuIHT381cVcAdXHdfUcMKnsL08FmsdpL7TN9KxHSBbPx2/oy4XO7tE562iA3WStzJQDk12yVnBTwIsyYgd0pRTb5qn1yBmSX1Riel5BMFcRUx0792Wap4h8gIM9s1RVxhmS1j2gbz3r9YeZbITjbf+tQ05FlDNT6woU5eJXulqHDQ39HzKYJBwhbqYhcIrxaCjPM9GWxOFxrD03fmq/gWdAVhJ30A9JtPwo4DLqTncOs4Ryj7wqVo3jr9devEflYj7noViPmav1EgqG01/hIncX+bobqmkcmF1oD2rPtXY5KqH00fPSl1XnVals2aAdxdz1Ujl3q5nCcfShSSveQ8kwPiAtZdyrQYgMqdCTvUnbtn48QjhhnuhW4B8LhFsB8PAghn5nSyoqqWK4tX33pcFodHH781bXpdS290a4jSbP365B+YXwcDu03APaCcZDDMCcDroclb5u1n7kNnHX0kLrfFM/NRWsCAkJutumToWu6aelW30zVww4BrJ87368Gch11By97JSFRIhBCQMNLpAMt39ovMhPboS9pcsEKEi16Td7TxUnRAXCWSYKaN1o3q5WniPDYBLgr7O4vehld8il/WKtuF/+0XVq/ZZop7HrPUvmtyZK+euaJwGvE0BPqFK/05sc5lbLy3PnjJ+7KaEWvuYmjtCEU8LcmzqUSerMM5UYjSlX228SloY21M3dzO5Mho46t8f+t/IgV2vIGPbtKpnPXIUZirQWeMlTkZ0+EmX7/rkdmg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(5660300002)(26005)(2906002)(31696002)(508600001)(36756003)(86362001)(52116002)(110136005)(4326008)(186003)(54906003)(8936002)(31686004)(38350700002)(53546011)(316002)(16576012)(2616005)(66946007)(66476007)(66556008)(956004)(38100700002)(8676002)(6486002)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MGo1Yy8vSTdqcW4zTWVvaWhzSU54dml1UFFUWEt6aVdqQW1XRitsQ01YTU1F?=
+ =?utf-8?B?SGkvSENnQlVQZUVFVnpFYldXQjhyZld1T1U2aCthbGNPVmxvaldrUGl4WlhR?=
+ =?utf-8?B?YTZnMzhZMDdKVEM3QmVEbkxVV0U2b1NTcUVRblkzZ1ZYYStreXIzWUNQK1Mr?=
+ =?utf-8?B?ZTd1LzNjSHZJemcrLzdCbUkvM1RzKzBCWnpkdDh5TGdtdytQQnV2UzJ5enNh?=
+ =?utf-8?B?NEFmY0tuN3pweDFzaWtVbjBTNmpUcnk5MC9HbkVJVVFCUFBORFIxTlJBa3FO?=
+ =?utf-8?B?ZlJ1bng5dWxFRGFmeWNPQnprUjBYcEhXcUs3K29iS2RIQmZobXd3Sko3TTI0?=
+ =?utf-8?B?cDdGWjhZTFRkRjNXSlU4aE9sNG5EWmhGN3FWTUYrVjFuWUhUaE5Ya2NvZk44?=
+ =?utf-8?B?YzVHY1A5L2d2NTdYZThsQXNsTWZJNVMvQTZ4YjRNU0toRjMzSlBJVWhwMlox?=
+ =?utf-8?B?MWh6V0lSUGpkKzVYVDhIaGxXZ1Jnd0h2eE5XR2ZHM3NDY3REd3l0UUlHV1pN?=
+ =?utf-8?B?Y1hQQk05S1RGUjNUQjFra2h5QUVoR1U1ZVY2eWZhZVVZdUltUkhQc0hsNWhx?=
+ =?utf-8?B?Z01ldkJlejY4ZXJkYnJCaXUyZHd1UUpWQVY0eDBJWkYvNUNjRGhuWXB2SDlz?=
+ =?utf-8?B?YjJoR1FMcXlka3dVU01BdFgvd1YrWlViM1A4QUpBV1lTQi95NmpVSVpST2tM?=
+ =?utf-8?B?RUhHV2IvODJMZVZMeFZua05iQnhac0J0RG1BV1NBMkVCOGxENHlIR25uL2xY?=
+ =?utf-8?B?OGFwMitzRVRIVTJrSjBvN3lWU21hbHk1d0QwSzFGaFNseFBsd1llRWFhWFRu?=
+ =?utf-8?B?RnMwSnFXdTlHVTZ0MTRIQnpwL3Y4c21xU3lCRis1b0dFcFNkN3JLSEM0Q1Ev?=
+ =?utf-8?B?OXVUUnRzTmlIQncwSXl4cU1SeFpiWEk4c1dCKy8rS2o1K2ZYUFVnQnhWN0V6?=
+ =?utf-8?B?M3dFTDlNaVhTRUFHTiszVTJBcGJyc0I0K3FGMGR2TDFleWhhSWU4REZVTDRV?=
+ =?utf-8?B?ejVRN0h5Qm9hNFVabFVaVTBkRWZhTjR4Rm9tL0pWK2ZHM0ZTOTdUMmRWYWIw?=
+ =?utf-8?B?MHZ0aVZ0UFFmT0Y5MXZoWjA3YTZvbUJPWTdYbDQzRWcxd083Z1J4UlhRZ2Rv?=
+ =?utf-8?B?U0NjZWFzTDJBcHo2YllOa1NidUdxb0xZZjZvMUhMbUFqdWp5QkJlNFg3RzhU?=
+ =?utf-8?B?R3JRb3VkQ0x5VFhmM0hFZkdSSHJpOVhFenlrY09ydCtRd0lSVDdWL1AvSzFw?=
+ =?utf-8?B?UUVzcWp0WktBb1BlMmFCb3lhSVJSQnZBZXkyeUsrRGozcUhuMlNJSDBLRWc4?=
+ =?utf-8?B?b3liTFdhTE15Y1REMm5IbktJMnV4TEVnOHZ0ZllTYVhtL1Bib0RxdHJ6L2hW?=
+ =?utf-8?B?RjhNOWE0c0N5aXRGN3RkU2FMU1Y1VGZoNnY5dkh5bG1GZEt2K1BCaUtaODBv?=
+ =?utf-8?B?ZVFYK1lBSkd1Vkt0WmJuR0lmYWZEdmpLOUZzdjlHN1NTK0thRE45S0ZrMnJR?=
+ =?utf-8?B?TEhBTTFTRDRyaERqWnd3L05MbnNlMnZLdWJSSmwyOWpqM3VUNTB5MlF5VjJJ?=
+ =?utf-8?B?cFlpRWVFMDNKRjFCckxGZWpXVjhzZjl0aDlsQ01kc1BmcmJkYjkzNmpvMStT?=
+ =?utf-8?B?NjdkZ3ZQOGtMT2xFL2hUbndSdlBLK2dkVXZSUEJMMzE4UlMyUTNGSzBSWlJV?=
+ =?utf-8?B?YjQ3WlFyM2tRS2NndW5USlBNVHROdnNORGE5K0ovTGtGOUdqV21FOWdTVlFn?=
+ =?utf-8?B?cjZUdk1rT0dPMjJ6TW9yemtiUWZ2eS8wbEF2Ukh2a0RhdHVIYWdkVnVsTG92?=
+ =?utf-8?B?MUtlR0YzdzYvVHVjK3lkcVlXYkhrbGNZRllTL2xUUVdQQnl1aXUyWENibVhK?=
+ =?utf-8?B?UU5JNm9sckRTWmdsK3ZwUHh0ZTZ4WlhuUm5mNzlScG5ZU3NlNkpPSFlTaUo1?=
+ =?utf-8?B?Ky9PcE4xQXE2TUcxNlUyZVhZbWxGcUNDQ0Nza3NySHJlMGUzL0V5SUhkV2p5?=
+ =?utf-8?B?dVcvWkhmZ05YcjFEOVB4eEdtV1Vjd2ljUHNFeUdFUzJrMXdFRDUvcXVXWGRF?=
+ =?utf-8?B?Njhjd0tSMTFYTlRqOHU0dGxQMDROTVFsODdMNWtvWVAzUmtUOEZ0ZzVFMVBu?=
+ =?utf-8?B?aThPaWR3S3VJWWtzWE5oeHJhRlZySmQ2UkZxSVV2ajlMa2tsOGVIZXhVY0FO?=
+ =?utf-8?Q?uKnLuOIEqdd/bwtstIywtsU=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5eaaa38-b151-42ab-a03d-08d9aa6c67f7
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2021 08:21:22.8356
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: U0721R63uuNMWlD0Xpggm9fGHIK7IYe+73JVKgFxnvXmNsVJ23eNjJ8tTV1bhalYLT5oGQL7vM89W+1cPQ+XaA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB3983
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Mittwoch, 17. November 2021, 20:11:03 CET schrieb Eric Biggers:
+On 11/1/2021 5:14 AM, Meng Li wrote:
+> When enable the kernel debug config, there is below calltrace detected:
+> BUG: using smp_processor_id() in preemptible [00000000] code: cryptomgr_test/339
+> caller is debug_smp_processor_id+0x20/0x30
+> CPU: 9 PID: 339 Comm: cryptomgr_test Not tainted 5.10.63-yocto-standard #1
+> Hardware name: NXP Layerscape LX2160ARDB (DT)
+> Call trace:
+>  dump_backtrace+0x0/0x1a0
+>  show_stack+0x24/0x30
+>  dump_stack+0xf0/0x13c
+>  check_preemption_disabled+0x100/0x110
+>  debug_smp_processor_id+0x20/0x30
+>  dpaa2_caam_enqueue+0x10c/0x25c
+>  ......
+>  cryptomgr_test+0x38/0x60
+>  kthread+0x158/0x164
+>  ret_from_fork+0x10/0x38
+> According to the comment in commit ac5d15b4519f("crypto: caam/qi2
+>  - use affine DPIOs "), because preemption is no longer disabled
+> while trying to enqueue an FQID, it might be possible to run the
+> enqueue on a different CPU(due to migration, when in process context),
+> however this wouldn't be a functionality issue. But there will be
+> above calltrace when enable kernel debug config. So, replace this_cpu_ptr
+> with raw_cpu_ptr to avoid above call trace.
+> 
+> Fixes: ac5d15b4519f ("crypto: caam/qi2 - use affine DPIOs")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Meng Li <Meng.Li@windriver.com>
+Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
 
-Hi Eric,
-
-thanks for your comments.
-
-> On Mon, Nov 15, 2021 at 09:43:13AM +0100, Stephan M=FCller wrote:
-> > SP800-108 defines three KDFs - this patch provides the counter KDF
-> > implementation.
-> >=20
-> > The KDF is implemented as a service function where the caller has to
-> > maintain the hash / HMAC state. Apart from this hash/HMAC state, no
-> > additional state is required to be maintained by either the caller or
-> > the KDF implementation.
-> >=20
-> > The key for the KDF is set with the crypto_kdf108_setkey function which
-> > is intended to be invoked before the caller requests a key derivation
-> > operation via crypto_kdf108_ctr_generate.
-> >=20
-> > SP800-108 allows the use of either a HMAC or a hash as crypto primitive
-> > for the KDF. When a HMAC primtive is intended to be used,
-> > crypto_kdf108_setkey must be used to set the HMAC key. Otherwise, for a
-> > hash crypto primitve crypto_kdf108_ctr_generate can be used immediately
-> > after allocating the hash handle.
-> >=20
-> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> > ---
-> >=20
-> >  crypto/Kconfig                |   7 ++
-> >  crypto/Makefile               |   5 ++
-> >  crypto/kdf_sp800108.c         | 149 ++++++++++++++++++++++++++++++++++
-> >  include/crypto/kdf_sp800108.h |  61 ++++++++++++++
-> >  4 files changed, 222 insertions(+)
-> >  create mode 100644 crypto/kdf_sp800108.c
-> >  create mode 100644 include/crypto/kdf_sp800108.h
-> >=20
-> > diff --git a/crypto/Kconfig b/crypto/Kconfig
-> > index 285f82647d2b..09c393a57b58 100644
-> > --- a/crypto/Kconfig
-> > +++ b/crypto/Kconfig
-> > @@ -1845,6 +1845,13 @@ config CRYPTO_JITTERENTROPY
-> >=20
-> >  	  random numbers. This Jitterentropy RNG registers with
-> >  	  the kernel crypto API and can be used by any caller.
-> >=20
-> > +config CRYPTO_KDF800108_CTR
-> > +	tristate "Counter KDF (SP800-108)"
-> > +	select CRYPTO_HASH
-> > +	help
-> > +	  Enable the key derivation function in counter mode compliant to
-> > +	  SP800-108.
->=20
-> These are just some library functions, so they shouldn't be user-selectab=
-le.
-
-Ok, I will remove the user-visible entry in the kernel configuration.
-
-> > +/*
-> > + * The seeding of the KDF
-> > + */
-> > +int crypto_kdf108_setkey(struct crypto_shash *kmd,
-> > +			 const u8 *key, size_t keylen,
-> > +			 const u8 *ikm, size_t ikmlen)
-> > +{
-> > +	unsigned int ds =3D crypto_shash_digestsize(kmd);
-> > +
-> > +	/* SP800-108 does not support IKM */
-> > +	if (ikm || ikmlen)
-> > +		return -EINVAL;
->=20
-> Why have the ikm parameter if it's not supported?
-
-The original idea is that we have a common function declaration for SP800-1=
-08=20
-and HKDF. I am still thinking that in the long run, a KDF template support =
-may=20
-make sense. In this case, a common function declaration would be needed for=
-=20
-all KDF implementations.
-
-=46urthermore, the test code can be shared between the different KDFs when =
-we=20
-allow the ikm/ikmlen parameter for this function.
->=20
-> > +	/*
-> > +	 * We require that we operate on a MAC -- if we do not operate on a
-> > +	 * MAC, this function returns an error.
-> > +	 */
-> > +	return crypto_shash_setkey(kmd, key, keylen);
-> > +}
-> > +EXPORT_SYMBOL(crypto_kdf108_setkey);
->=20
-> Well, crypto_shash_setkey() will succeed if the hash algorithm takes a
-> "key". That doesn't necessarily mean that it's a MAC.	It could be crc32 or
-> xxhash64, for example; those interpret the "key" as the initial value.
-
-Agreed. But I am not sure a check in this regard would be needed considerin=
-g=20
-that this KDF is only an internal service function.
-
-I have updated the comment accordingly.
->=20
-> > +static int __init crypto_kdf108_init(void)
-> > +{
-> > +	int ret =3D kdf_test(&kdf_ctr_hmac_sha256_tv_template[0],=20
-"hmac(sha256)",
-> > +			   crypto_kdf108_setkey, crypto_kdf108_ctr_generate);
-> > +
-> > +	if (ret)
-> > +		pr_warn("alg: self-tests for CTR-KDF (hmac(sha256)) failed=20
-(rc=3D%d)\n",
-> > +			ret);
->=20
-> This should be a WARN() since it indicates a kernel bug.
-
-Changed. Considering that the test result behavior should be identical to=20
-testmgr.c, I have added also the panic() call in case of fips_enabled.
-
-Thanks a lot for your review.
->=20
-> - Eric
-
-
-Ciao
-Stephan
-
-
+Thanks,
+Horia
