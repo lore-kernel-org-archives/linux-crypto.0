@@ -2,144 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CA93C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Nov 2021 23:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FD5C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Nov 2021 00:06:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5610761AE2
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Nov 2021 23:57:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82F036128A
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Nov 2021 00:06:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230013AbhKSAAi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Nov 2021 19:00:38 -0500
-Received: from mail-oo1-f50.google.com ([209.85.161.50]:39474 "EHLO
-        mail-oo1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbhKSAAi (ORCPT
+        id S231366AbhKSAJY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 18 Nov 2021 19:09:24 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59526 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231176AbhKSAJY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Nov 2021 19:00:38 -0500
-Received: by mail-oo1-f50.google.com with SMTP id d1-20020a4a3c01000000b002c2612c8e1eso3070474ooa.6;
-        Thu, 18 Nov 2021 15:57:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=JEf4wkkJLSiCgtn7KTR+KrTaS841Nm2x4yld9LFTxEc=;
-        b=MKL7gG/xVKJ28q3d6M4B2cv5nCzwj50m4g3fl9IP69AXS62zIQxcaIjSc9ZLBuwm6o
-         5io4ozIfG4dot83IrGZTxR6ovbOkz5y9OoF6sofVZJ1OVWHxKw+80RUTqUnf6QXil3Xj
-         SYFKKtaEaLsp2QEU1QvfuhkursC2gpGD8zks5lAwnmE3unOKkC0WgrB7E/o+JoAlC1Lj
-         +VMWwshTFWUcJNN1/24NI/M7WEHYkC4EBBB37m+ZABYbAP9DDziY5AphKGZZhWgAun33
-         nbXq0iziqL8R8W6FMb4WIBwSHii2MvndcPEsOKznfPJklwdK6gQLti4dZ8WX9RdZr0tU
-         sA/w==
-X-Gm-Message-State: AOAM5313DZtpz3XKFeCXfGGj66rqO1hNzquHuEj0jRbsx2bscMxEFwGj
-        uPFx2yd/sS/6VqFBcl48Ww==
-X-Google-Smtp-Source: ABdhPJzZE7VtNhasAMeC3YkchxPjyv6XPCAj9aHJbn9MVVBOoNJXjDLfGbc/PlEcil7brjgzAagZIw==
-X-Received: by 2002:a4a:5b85:: with SMTP id g127mr15790263oob.86.1637279857237;
-        Thu, 18 Nov 2021 15:57:37 -0800 (PST)
-Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
-        by smtp.gmail.com with ESMTPSA id q12sm236261otl.66.2021.11.18.15.57.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Nov 2021 15:57:36 -0800 (PST)
-Received: (nullmailer pid 2028180 invoked by uid 1000);
-        Thu, 18 Nov 2021 23:57:35 -0000
-Date:   Thu, 18 Nov 2021 17:57:35 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     Bjorn Andersson <bjorn.andersson@linaro.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        bhupesh.linux@gmail.com, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, agross@kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        stephan@gerhold.net, Thara Gopinath <thara.gopinath@linaro.org>
-Subject: Re: [PATCH v5 09/22] dt-bindings: qcom-qce: Move 'clocks' to
- optional properties
-Message-ID: <YZbobzlBNWIRNn/e@robh.at.kernel.org>
-References: <20211110105922.217895-1-bhupesh.sharma@linaro.org>
- <20211110105922.217895-10-bhupesh.sharma@linaro.org>
- <YZAZxmsp5WLeOBuF@builder.lan>
- <CAH=2NtwGM0==3etkG6seV=3+xO347VNEoKghpyBs9DjZPU4xNA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAH=2NtwGM0==3etkG6seV=3+xO347VNEoKghpyBs9DjZPU4xNA@mail.gmail.com>
+        Thu, 18 Nov 2021 19:09:24 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AINMsf1009468;
+        Fri, 19 Nov 2021 00:05:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=SFTrCDUlq/eLPPnNvJ0sfZFy+WwHVeIyOeS1AcNhDRE=;
+ b=Q8WUqyAnWcOvZtBn4obJLuspEqgIUDeGCsMIreqBLF5l4aIqKEXOGYzOJ5XjNhevZ6ar
+ mNMFPIn8J/dgnHYLdGXuC6rcj1FUWuvRzfyYKV+iXt4Bems6wRUOOHOalP+DsR2JqTq8
+ DwAohyNkzu4ds+QE3yoa39Vq84lsXIXOdeLCkvhKhnKGbet/1j4Lg8yoMH/qlwBopkfJ
+ LUGSqn4u3WwGMAwGBj7++AJEIJpqy0mmvSokQU+KXiqtwF9Six1hQRM24/pC7uGY0xsm
+ 0MCZqdGhRVpXcFqenR/8tIpcDsrL5LtJTyZsdCatYxJk85Ytqyj1PqpuSeiv/LvbbXJG Ew== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ce0f011mh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Nov 2021 00:05:56 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AINv07i008032;
+        Fri, 19 Nov 2021 00:05:55 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ce0f011kd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Nov 2021 00:05:55 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AJ040Mm032308;
+        Fri, 19 Nov 2021 00:05:53 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3ca50bu7rs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Nov 2021 00:05:53 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AJ05o799568752
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Nov 2021 00:05:50 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5B8A252057;
+        Fri, 19 Nov 2021 00:05:50 +0000 (GMT)
+Received: from sig-9-65-86-194.ibm.com (unknown [9.65.86.194])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 4583152050;
+        Fri, 19 Nov 2021 00:05:47 +0000 (GMT)
+Message-ID: <282e550948d21b7d1ee316ad73b288c302121bb2.camel@linux.ibm.com>
+Subject: Re: [PATCH v7 08/17] integrity: add new keyring handler for mok keys
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Eric Snowberg <eric.snowberg@oracle.com>, keyrings@vger.kernel.org,
+        linux-integrity@vger.kernel.org, dhowells@redhat.com,
+        dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, jarkko@kernel.org, jmorris@namei.org,
+        serge@hallyn.com
+Cc:     keescook@chromium.org, torvalds@linux-foundation.org,
+        weiyongjun1@huawei.com, nayna@linux.ibm.com, ebiggers@google.com,
+        ardb@kernel.org, nramas@linux.microsoft.com, lszubowi@redhat.com,
+        jason@zx2c4.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@HansenPartnership.com, pjones@redhat.com,
+        konrad.wilk@oracle.com
+Date:   Thu, 18 Nov 2021 19:05:46 -0500
+In-Reply-To: <20211116001545.2639333-9-eric.snowberg@oracle.com>
+References: <20211116001545.2639333-1-eric.snowberg@oracle.com>
+         <20211116001545.2639333-9-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: szs-S0QTh63CN6gxnqubgoUdLHVXBzt1
+X-Proofpoint-ORIG-GUID: 25_TMygxCv07mUz0fQcphSkqn80GXbD-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-18_12,2021-11-17_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ spamscore=0 mlxlogscore=999 bulkscore=0 malwarescore=0 mlxscore=0
+ impostorscore=0 suspectscore=0 clxscore=1015 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111180122
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 11:04:31AM +0530, Bhupesh Sharma wrote:
-> Hi Bjorn,
+On Mon, 2021-11-15 at 19:15 -0500, Eric Snowberg wrote:
+> Currently both Secure Boot DB and Machine Owner Keys (MOK) go through
+> the same keyring handler (get_handler_for_db). With the addition of the
+> new machine keyring, the end-user may choose to trust MOK keys.
 > 
-> On Sun, 14 Nov 2021 at 01:32, Bjorn Andersson
-> <bjorn.andersson@linaro.org> wrote:
-> >
-> > On Wed 10 Nov 04:59 CST 2021, Bhupesh Sharma wrote:
-> >
-> > > QCom QCE block on some SoCs like ipq6018 don't
-> > > require clock as the required property, so the properties
-> > > 'clocks' and 'clock-names' can be moved instead in the dt-bindings
-> > > to the 'optional' properties section.
-> > >
-> > > Otherwise, running 'make dtbs_check' leads to the following
-> > > errors:
-> > >
-> > > dma-controller@7984000: clock-names:0: 'bam_clk' was expected
-> > >       arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
-> > >
-> > > dma-controller@7984000: clock-names: Additional items are not allowed ('bam_clk' was unexpected)
-> > >       arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
-> > >
-> > > dma-controller@7984000: clock-names: ['iface_clk', 'bam_clk'] is too long
-> > >       arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
-> > >
-> > > dma-controller@7984000: clocks: [[9, 138], [9, 137]] is too long
-> > >       arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
-> > >
-> > > Cc: Thara Gopinath <thara.gopinath@linaro.org>
-> > > Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> > > Cc: Rob Herring <robh+dt@kernel.org>
-> > > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> > > ---
-> > >  Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 2 --
-> > >  1 file changed, 2 deletions(-)
-> > >
-> > > diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> > > index 30deaa0fa93d..f35bdb9ee7a8 100644
-> > > --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> > > +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> > > @@ -53,8 +53,6 @@ properties:
-> > >  required:
-> > >    - compatible
-> > >    - reg
-> > > -  - clocks
-> > > -  - clock-names
-> >
-> > I would prefer that we make this conditional on the compatible. That
-> > said, if this only applies to ipq6018 I think we should double check the
-> > fact that there's no clock there...
-> >
-> > For the sake of making progress on the series, I think you should omit
-> > this patch from the next version.
+> Introduce a new keyring handler specific for MOK keys.  If MOK keys are
+> trusted by the end-user, use the new keyring handler instead.
 > 
-> Without this patch, 'make dtbs_check' fails with the following error:
-> dma-controller@7984000: clock-names:0: 'bam_clk' was expected
->         arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
-> 
-> dma-controller@7984000: clock-names: Additional items are not allowed
-> ('bam_clk' was unexpected)
->         arch/arm64/boot/dts/qcom/ipq6018-cp01-c1.dt.yaml
+> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
 
-Those errors do not correspond to the change here. Adding something to 
-'required' would never solve any error (other than a driver requires a 
-property to function).
+Reviewed-by:  Mimi Zohar <zohar@linux.ibm.com>
 
-
-> which I think is making Rob bot-check fail.
-
-dtbs_check don't have to be fixed as the message says.
-
-> So, I think instead of dropping the patch, let's try and understand
-> from the 'ipq6018 qce' documentation if the clocks are really
-> 'optional' there for the qce block (as clock properties are not
-> mentioned in the dts from the very first upstream version). If not, we
-> can try and fix the 'ipq6018 qce' dts node itself.
-> 
-> Regards,
-> Bhupesh
-> 
