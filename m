@@ -2,109 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22566C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Nov 2021 08:29:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D2AC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Nov 2021 18:36:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A51961AF0
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Nov 2021 08:29:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 883F861B66
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Nov 2021 18:36:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231466AbhKSIcX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Nov 2021 03:32:23 -0500
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:33963 "EHLO
-        out4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231271AbhKSIcX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Nov 2021 03:32:23 -0500
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id 76BAE5C0103;
-        Fri, 19 Nov 2021 03:29:21 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Fri, 19 Nov 2021 03:29:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cerno.tech; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm1; bh=LW/p0wyoCcIJog59YYQV//3Akj0
-        rWF+oNpGoc/GozLo=; b=gIispYTY6e+7QaxE5wpdCJnEYr/NIkLBOjnK1D/0p0U
-        mUWvYkXRXnOsj/dG2e5vbJ5t4z3xSRKC6ac4unew1aBioOAtcOJQlun6/Wh30ls6
-        a9Y66DR6y8IJ/z5C2WYPMmztF7SmQgCtOnB1ks8w//BG3JXQE6qEskJh2TJy+/UP
-        5Z86fWuiHUirauZUQZC0qASsOi8xtg6215eoD20mEIfWJmtfAScv5VTp7EQ10RcW
-        etp22l5UMs6f22giprSZZh/YQ/bDDPyzIXCE+DFOx1SAvixX1RzPk7rlrF7tkNeW
-        rnEFLZbYU50IKWIxZ+U4KKZ1Wewoihd+qE+dVGiBm3g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=LW/p0w
-        yoCcIJog59YYQV//3Akj0rWF+oNpGoc/GozLo=; b=hwI+NaioJIwamB4b5IZrCi
-        XRId1VIy9G7gP3O6C43GC+Q2dVW+0JRzI/Pij/LWogvDqjb7uxgDFIU3K6SSU7ND
-        qcjuorXbc7hoxPVFSZrFWnjG5d8wx0Lg1yosG2ztmU9AQoaCD3cE2GNsp/sGlbys
-        Gv9Xq/AD4SWdJqUy/cUQ+f2cBc+ZKzj4JIA7J1UO17rfMpt0l17ipFPSJh915rx6
-        M049RDPUuhIZTXhrQNInhwB7LWHBQUwJsnqqn1n2HStGpfWCN0RGNMiFkSm0U0ou
-        qO+ghkKC846MA5WdbIv+FXyOtH7ov/oCgY39YTWrOCf+Jhum87Nb/tP3m65pgBBQ
-        ==
-X-ME-Sender: <xms:YGCXYRcT8UvME9qz4tK6yFVQy3PtDhnggv1pxEDG1DtQ6Z0WiMi44A>
-    <xme:YGCXYfPm9b8CO1EylbabEBj5uTX4IsYdnpMT7oOPwNSwD6C265TCfyhxKhRvaadPa
-    b7S5NNR0kk2Nc3cap8>
-X-ME-Received: <xmr:YGCXYaj_lUIZIFF99s1vm_PMvpCM_aWSJgAoPROfrDUC4d93hALSWltaKSIeXaq8umkZwLUriM8JX7dDKBKAQ8hgrKFYKp5vJf2cgJ-E4JU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvuddrfeejgdduudekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtuggjsehgtderredttddvnecuhfhrohhmpeforgigihhm
-    vgcutfhiphgrrhguuceomhgrgihimhgvsegtvghrnhhordhtvggthheqnecuggftrfgrth
-    htvghrnhepleekgeehhfdutdeljefgleejffehfffgieejhffgueefhfdtveetgeehieeh
-    gedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmh
-    grgihimhgvsegtvghrnhhordhtvggthh
-X-ME-Proxy: <xmx:YGCXYa82UsGR1WsrywHQucvPPwIT6DT6zY3sKuME4tgtyy56KVKVyg>
-    <xmx:YGCXYdtGupRHGCTYWfTaMwINBJrq3fO-JhaCrAFTQlYIJmnbkHR6SQ>
-    <xmx:YGCXYZGJw2uhm5nAIVQIxH9mqBF6xazB8Ed36ZZn1pzUkm0T-4ZcVw>
-    <xmx:YWCXYTAi5COVehX8pG2sv6FyJdRdzS25DoGpC935sP4mu7t30r3EQw>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 19 Nov 2021 03:29:20 -0500 (EST)
-Date:   Fri, 19 Nov 2021 09:29:19 +0100
-From:   Maxime Ripard <maxime@cerno.tech>
-To:     Samuel Holland <samuel@sholland.org>
-Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        devicetree@vger.kernel.org, Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        linux-sunxi@lists.linux.dev
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: sun8i-ce: Add compatible for D1
-Message-ID: <20211119082919.k4r7ln4jfseqblcr@gilmour>
-References: <20211119051026.13049-1-samuel@sholland.org>
+        id S235260AbhKSSjI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 Nov 2021 13:39:08 -0500
+Received: from mga07.intel.com ([134.134.136.100]:2265 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235396AbhKSSjH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 19 Nov 2021 13:39:07 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10173"; a="297887058"
+X-IronPort-AV: E=Sophos;i="5.87,248,1631602800"; 
+   d="scan'208";a="297887058"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2021 10:36:05 -0800
+X-IronPort-AV: E=Sophos;i="5.87,248,1631602800"; 
+   d="scan'208";a="673310220"
+Received: from chardy-mobl.amr.corp.intel.com ([10.209.29.151])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2021 10:36:04 -0800
+Date:   Fri, 19 Nov 2021 10:36:04 -0800 (PST)
+From:   Mat Martineau <mathew.j.martineau@linux.intel.com>
+To:     =?ISO-8859-15?Q?Stephan_M=FCller?= <smueller@chronox.de>
+cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        jarkko@kernel.org, dhowells@redhat.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        keyrings@vger.kernel.org, simo@redhat.com
+Subject: Re: [PATCH v4 4/4] security: DH - use KDF implementation from crypto
+ API
+In-Reply-To: <4181314.UPlyArG6xL@positron.chronox.de>
+Message-ID: <c4b0b368-3168-bb65-a7b8-4f6d4e7015c7@linux.intel.com>
+References: <4642773.OV4Wx5bFTl@positron.chronox.de> <4181314.UPlyArG6xL@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="lmxak3wlnqlumgug"
-Content-Disposition: inline
-In-Reply-To: <20211119051026.13049-1-samuel@sholland.org>
+Content-Type: multipart/mixed; boundary="0-1017921664-1637346964=:1817"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
---lmxak3wlnqlumgug
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+--0-1017921664-1637346964=:1817
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-On Thu, Nov 18, 2021 at 11:10:24PM -0600, Samuel Holland wrote:
-> D1 has a crypto engine similar to the one in other Allwinner SoCs.
-> Like H6, it has a separate MBUS clock gate.
->=20
-> Signed-off-by: Samuel Holland <samuel@sholland.org>
+On Fri, 19 Nov 2021, Stephan Müller wrote:
 
-Acked-by: Maxime Ripard <maxime@cerno.tech>
+> The kernel crypto API provides the SP800-108 counter KDF implementation.
+> Thus, the separate implementation provided as part of the keys subsystem
+> can be replaced with calls to the KDF offered by the kernel crypto API.
+>
+> The keys subsystem uses the counter KDF with a hash primitive. Thus,
+> it only uses the call to crypto_kdf108_ctr_generate.
+>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> ---
+> security/keys/Kconfig |   2 +-
+> security/keys/dh.c    | 109 +++++++-----------------------------------
+> 2 files changed, 19 insertions(+), 92 deletions(-)
 
-Maxime
+Acked-by: Mat Martineau <mathew.j.martineau@linux.intel.com>
 
---lmxak3wlnqlumgug
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRcEzekXsqa64kGDp7j7w1vZxhRxQUCYZdgXgAKCRDj7w1vZxhR
-xaDTAP9Y0zp+1nrtorIbXYFgevtVz8+kCmHvzv6r4091HP92twEAyCcQwpl3NTQe
-Rb74BF/TcPGlUR07Tyzg2LurLRFpRgw=
-=GvEZ
------END PGP SIGNATURE-----
-
---lmxak3wlnqlumgug--
+--
+Mat Martineau
+Intel
+--0-1017921664-1637346964=:1817--
