@@ -1,72 +1,81 @@
 Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D2AC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Nov 2021 18:36:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 883F861B66
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Nov 2021 18:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A06CC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 20 Nov 2021 04:07:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235260AbhKSSjI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Nov 2021 13:39:08 -0500
-Received: from mga07.intel.com ([134.134.136.100]:2265 "EHLO mga07.intel.com"
+        id S231579AbhKTEKM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 Nov 2021 23:10:12 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:56892 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235396AbhKSSjH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Nov 2021 13:39:07 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10173"; a="297887058"
-X-IronPort-AV: E=Sophos;i="5.87,248,1631602800"; 
-   d="scan'208";a="297887058"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2021 10:36:05 -0800
-X-IronPort-AV: E=Sophos;i="5.87,248,1631602800"; 
-   d="scan'208";a="673310220"
-Received: from chardy-mobl.amr.corp.intel.com ([10.209.29.151])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2021 10:36:04 -0800
-Date:   Fri, 19 Nov 2021 10:36:04 -0800 (PST)
-From:   Mat Martineau <mathew.j.martineau@linux.intel.com>
-To:     =?ISO-8859-15?Q?Stephan_M=FCller?= <smueller@chronox.de>
-cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
-        jarkko@kernel.org, dhowells@redhat.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        keyrings@vger.kernel.org, simo@redhat.com
-Subject: Re: [PATCH v4 4/4] security: DH - use KDF implementation from crypto
- API
-In-Reply-To: <4181314.UPlyArG6xL@positron.chronox.de>
-Message-ID: <c4b0b368-3168-bb65-a7b8-4f6d4e7015c7@linux.intel.com>
-References: <4642773.OV4Wx5bFTl@positron.chronox.de> <4181314.UPlyArG6xL@positron.chronox.de>
+        id S230436AbhKTEKI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 19 Nov 2021 23:10:08 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
+        id 1moHeF-0001Cs-8q; Sat, 20 Nov 2021 12:06:43 +0800
+Received: from herbert by gondobar with local (Exim 4.92)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1moHdx-0006ga-HG; Sat, 20 Nov 2021 12:06:25 +0800
+Date:   Sat, 20 Nov 2021 12:06:25 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Julia Lawall <julia.lawall@inria.fr>
+Cc:     Megha Dey <megha.dey@intel.com>, kbuild-all@lists.01.org,
+        linux-kernel@vger.kernel.org,
+        Tomasz Kantecki <tomasz.kantecki@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: fix flexible_array.cocci warnings
+Message-ID: <20211120040625.GA25678@gondor.apana.org.au>
+References: <alpine.DEB.2.22.394.2111121154320.2916@hadrien>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="0-1017921664-1637346964=:1817"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.22.394.2111121154320.2916@hadrien>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---0-1017921664-1637346964=:1817
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 8BIT
-
-On Fri, 19 Nov 2021, Stephan Müller wrote:
-
-> The kernel crypto API provides the SP800-108 counter KDF implementation.
-> Thus, the separate implementation provided as part of the keys subsystem
-> can be replaced with calls to the KDF offered by the kernel crypto API.
->
-> The keys subsystem uses the counter KDF with a hash primitive. Thus,
-> it only uses the call to crypto_kdf108_ctr_generate.
->
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+On Fri, Nov 12, 2021 at 11:56:22AM +0100, Julia Lawall wrote:
+> From: kernel test robot <lkp@intel.com>
+> 
+>  Zero-length and one-element arrays are deprecated, see
+>  Documentation/process/deprecated.rst
+>  Flexible-array members should be used instead.
+> 
+> Generated by: scripts/coccinelle/misc/flexible_array.cocci
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Julia Lawall <julia.lawall@inria.fr>
 > ---
-> security/keys/Kconfig |   2 +-
-> security/keys/dh.c    | 109 +++++++-----------------------------------
-> 2 files changed, 19 insertions(+), 92 deletions(-)
+> 
+> tree:   https://github.com/meghadey/crypto crypto-avx512
+> head:   9c8c2ca77f6e2575a130bddb9767d068e1162d71
+> commit: 377aede9f10ee28be954473668bc6d33c6c9db75 [5/6] crypto: aesni - AVX512 version of AESNI-GCM using VPCLMULQDQ
+> :::::: branch date: 7 weeks ago
+> :::::: commit date: 7 weeks ago
+> 
+>  aesni-intel_glue.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -87,7 +87,7 @@ struct gcm_context_data {
+>  	u64 partial_block_len;
+>  	u64 unused;
+>  	/* Allocate space for hash_keys later */
+> -	u8 hash_keys[0];
+> +	u8 hash_keys[];
 
-Acked-by: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Which tree did this come from? Not only is this not zero in my
+tree, but it seems to have never been zero in the git history.
 
-
---
-Mat Martineau
-Intel
---0-1017921664-1637346964=:1817--
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
