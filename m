@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E4E7C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC2CAC4332F
 	for <linux-crypto@archiver.kernel.org>; Sun, 21 Nov 2021 16:49:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229641AbhKUQwu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Nov 2021 11:52:50 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.122]:32404 "EHLO
+        id S238219AbhKUQwy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 21 Nov 2021 11:52:54 -0500
+Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.124]:23851 "EHLO
         mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230330AbhKUQwr (ORCPT
+        with ESMTP id S238309AbhKUQwx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Nov 2021 11:52:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1637513322;
+        Sun, 21 Nov 2021 11:52:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1637513312;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=47kUu1gvgAojHM0onaJh5SkhZFTBbB8KzuQtaBIQ9qY=;
-    b=atUCVNxlGUrFnRHw2CTPyCzwopzem+jcb9liL5DgIee6idGEKIvikkuIXqyMCgWaaY
-    PmwHkrrAS90TY2Au2MPQJ3aFmLZTBGvXcaub2enxiBWoMziLo5tf4qUJFHvUPQRGw/tq
-    8xYrN1uWLhkKPjKWtFNJjcJ1yslEGr1115NAduwfOWKY0aeZdiQq4PzLc+8zvyk3Nt+Z
-    fJtvP8NwziG1r6Xmre3AMCr2DoozcNT5TvvxlPPfet8iwJEuDOUmTJ//GKJ+ml0WtM2n
-    tU+6TzVUpUPcYBQvcyukY2dosSOwYiNGVK5lPcotM7E8SR/f4KzoBKvBQlBc7KFMc3/G
-    9haQ==
+    bh=tbub+YgtdfV2WlpwVU0mzEJmPRl/ZQ8vbyt1Oh9UfkI=;
+    b=CGbb8AUmBSnnJc5Cie0inUWOmIUxXxpPFJSntqgVditTfLkxeL4h0OiDVE73fxJztx
+    HoYdGYBTblYUEQKlul1xgDzfIRpt7pHFA5Qv43MtqKVJw3i8CifyW49h5CZe4OnWQQ7W
+    oGWi28wRIVER/zsdSb8GgYmyT3eF3/C6MW/gD2n15y3r3R8nyZ3CIZ0l2tQResHNMI3Q
+    qnRU0cNPduui1PvnNuvaq+iS/PHUAr8oGA8Hyh1+zmBWrmWDAJTi3ueAwvSkfV3em9iT
+    FWQ8XYfmlTXy1QwF8CQz++KKp0bRGrk47waFCIKa/84HD20+Qr1dq7HPBNm/abNzpEZ2
+    pFHg==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbJvSfE+K2"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.34.5 DYNA|AUTH)
-    with ESMTPSA id U02dfbxALGmf3Wn
+    with ESMTPSA id U02dfbxALGmV3Wf
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Sun, 21 Nov 2021 17:48:41 +0100 (CET)
+    Sun, 21 Nov 2021 17:48:31 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
@@ -64,9 +64,9 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>,
         Jirka Hladky <jhladky@redhat.com>
-Subject: [PATCH v43 02/15] LRNG - IRQ entropy source
-Date:   Sun, 21 Nov 2021 17:40:27 +0100
-Message-ID: <2154536.vFx2qVVIhK@positron.chronox.de>
+Subject: [PATCH v43 09/15] LRNG - add SP800-90A DRBG extension
+Date:   Sun, 21 Nov 2021 17:44:36 +0100
+Message-ID: <2514269.vYhyI6sBWr@positron.chronox.de>
 In-Reply-To: <2036923.9o76ZdvQCi@positron.chronox.de>
 References: <2036923.9o76ZdvQCi@positron.chronox.de>
 MIME-Version: 1.0
@@ -76,29 +76,22 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The interrupt entropy source hooks into the interrupt handler via the
-add_interrupt_randomness function callback. Every interrupt received by
-the kernel is also sent to the LRNG for processing.
+Using the LRNG switchable DRNG support, the SP800-90A DRBG extension is
+implemented.
 
-The IRQ entropy source performs the following processing:
+The DRBG uses the kernel crypto API DRBG implementation. In addition, it
+uses the kernel crypto API SHASH support to provide the hashing
+operation.
 
-1. Record a time stamp
+The DRBG supports the choice of either a CTR DRBG using AES-256, HMAC
+DRBG with SHA-512 core or Hash DRBG with SHA-512 core. The used core can
+be selected with the module parameter lrng_drbg_type. The default is the
+CTR DRBG.
 
-2. Divide the time stamp by its greatest common divisor to eliminate
-   fixed least significant bits.
-
-3. Insert the 8 LSB of the result from step 2 into the collection pool.
-
-4. When the collection pool is full, it is hashed into the per-CPU
-   entropy pool (if continuous compression is enabled) or the latest
-   time stamps overwrite the oldest entries in the collection pool.
-
-If entropy is requested from the IRQ entropy pool, a message digest over
-all per-CPU entropy pool digests is calculated.
-
-The GCD calculation is performed for the first 100 interupt time stamps.
-Until the GCD value is calculated, the full 32 bit time stamp is
-inserted into the collection pool.
+When compiling the DRBG extension statically, the DRBG is loaded at
+late_initcall stage which implies that with the start of user space, the
+user space interfaces of getrandom(2), /dev/random and /dev/urandom
+provide random data produced by an SP800-90A DRBG.
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -119,8 +112,6 @@ CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
 Reviewed-by: Alexander Lobakin <alobakin@pm.me>
 Tested-by: Alexander Lobakin <alobakin@pm.me>
-Mathematical aspects Reviewed-by: "Peter, Matthias" <matthias.peter@bsi.bund.de>
-Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
@@ -128,1101 +119,246 @@ Tested-by: Jirka Hladky <jhladky@redhat.com>
 Reviewed-by: Jirka Hladky <jhladky@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/char/lrng/Kconfig       | 162 +++++++
- drivers/char/lrng/Makefile      |   2 +
- drivers/char/lrng/lrng_es_irq.c | 823 ++++++++++++++++++++++++++++++++
- drivers/char/lrng/lrng_es_irq.h |  71 +++
- 4 files changed, 1058 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_es_irq.c
- create mode 100644 drivers/char/lrng/lrng_es_irq.h
+ drivers/char/lrng/Kconfig     |  10 ++
+ drivers/char/lrng/Makefile    |   1 +
+ drivers/char/lrng/lrng_drbg.c | 198 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 209 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_drbg.c
 
 diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index 655d873480b0..a9ae35d9f648 100644
+index 531b34b9ae65..d06d0417b025 100644
 --- a/drivers/char/lrng/Kconfig
 +++ b/drivers/char/lrng/Kconfig
-@@ -55,4 +55,166 @@ config LRNG_SEED_BUFFER_INIT_ADD_BITS
+@@ -268,6 +268,16 @@ config LRNG_KCAPI_HASH
+ 	bool
+ 	select CRYPTO_HASH
  
- endmenu # "Specific DRNG seeding strategies"
++config LRNG_DRBG
++	tristate "SP800-90A support for the LRNG"
++	depends on CRYPTO
++	select CRYPTO_DRBG_MENU
++	select CRYPTO_SHA512
++	select LRNG_KCAPI_HASH
++	help
++	  Enable the SP800-90A DRBG support for the LRNG. Once the
++	  module is loaded, output from /dev/random, /dev/urandom,
++	  getrandom(2), or get_random_bytes_full is provided by a DRBG.
+ endif # LRNG_DRNG_SWITCH
  
-+menu "Entropy Source Configuration"
-+
-+comment "Interrupt Entropy Source"
-+
-+config LRNG_IRQ
-+	bool "Enable Interrupt Entropy Source as LRNG Seed Source"
-+	default y
-+	help
-+	  The LRNG models an entropy source based on the timing of the
-+	  occurrence of interrupts. Enable this option to enable this
-+	  IRQ entropy source.
-+
-+	  The IRQ entropy source is triggered every time an interrupt
-+	  arrives and thus causes the interrupt handler to execute
-+	  slightly longer. Disabling the IRQ entropy source implies
-+	  that the performance penalty on the interrupt handler added
-+	  by the LRNG is eliminated. Yet, this entropy source is
-+	  considered to be the internal entropy source of the LRNG.
-+	  Thus, only disable it if you ensured that other entropy
-+	  sources are available that supply the LRNG with entropy.
-+
-+	  If you disable the IRQ entropy source, you MUST ensure
-+	  one or more entropy sources collectively have the
-+	  capability to deliver sufficient entropy with one invocation
-+	  at a rate compliant to the security strength of the DRNG
-+	  (usually 256 bits of entropy). In addition, if those
-+	  entropy sources do not deliver sufficient entropy during
-+	  first request, the reseed must be triggered from user
-+	  space or kernel space when sufficient entropy is considered
-+	  to be present.
-+
-+	  If unsure, say Y.
-+
-+choice
-+	prompt "Continuous entropy compression boot time setting"
-+	default LRNG_CONTINUOUS_COMPRESSION_ENABLED
-+	depends on LRNG_IRQ
-+	help
-+	  Select the default behavior of the interrupt entropy source
-+	  continuous compression operation.
-+
-+	  The Linux RNG collects entropy data during each interrupt.
-+	  For performance reasons, a amount of entropy data defined by
-+	  the LRNG entropy collection pool size is concatenated into
-+	  an array. When that array is filled up, a hash is calculated
-+	  to compress the entropy. That hash is calculated in
-+	  interrupt context.
-+
-+	  In case such hash calculation in interrupt context is deemed
-+	  too time-consuming, the continuous compression operation
-+	  can be disabled. If disabled, the collection of entropy will
-+	  not trigger a hash compression operation in interrupt context.
-+	  The compression happens only when the DRNG is reseeded which is
-+	  in process context. This implies that old entropy data
-+	  collected after the last DRNG-reseed is overwritten with newer
-+	  entropy data once the collection pool is full instead of
-+	  retaining its entropy with the compression operation.
-+
-+	config LRNG_CONTINUOUS_COMPRESSION_ENABLED
-+		bool "Enable continuous compression (default)"
-+
-+	config LRNG_CONTINUOUS_COMPRESSION_DISABLED
-+		bool "Disable continuous compression"
-+endchoice
-+
-+config LRNG_ENABLE_CONTINUOUS_COMPRESSION
-+	bool
-+	default y if LRNG_CONTINUOUS_COMPRESSION_ENABLED
-+	default n if LRNG_CONTINUOUS_COMPRESSION_DISABLED
-+
-+config LRNG_SWITCHABLE_CONTINUOUS_COMPRESSION
-+	bool "Runtime-switchable continuous entropy compression"
-+	depends on LRNG_IRQ
-+	help
-+	  Per default, the interrupt entropy source continuous
-+	  compression operation behavior is hard-wired into the kernel.
-+	  Enable this option to allow it to be configurable at boot time.
-+
-+	  To modify the default behavior of the continuous
-+	  compression operation, use the kernel command line option
-+	  of lrng_sw_noise.lrng_pcpu_continuous_compression.
-+
-+	  If unsure, say N.
-+
-+choice
-+	prompt "LRNG Entropy Collection Pool Size"
-+	default LRNG_COLLECTION_SIZE_1024
-+	depends on LRNG_IRQ
-+	help
-+	  Select the size of the LRNG entropy collection pool
-+	  storing data for the interrupt entropy source without
-+	  performing a compression operation. The larger the
-+	  collection size is, the faster the average interrupt
-+	  handling will be. The collection size represents the
-+	  number of bytes of the per-CPU memory used to batch
-+	  up entropy event data.
-+
-+	  The default value is good for regular operations. Choose
-+	  larger sizes for servers that have no memory limitations.
-+	  If runtime memory is precious, choose a smaller size.
-+
-+	  The collection size is unrelated to the entropy rate
-+	  or the amount of entropy the LRNG can process.
-+
-+	config LRNG_COLLECTION_SIZE_32
-+	depends on LRNG_CONTINUOUS_COMPRESSION_ENABLED
-+	depends on !LRNG_SWITCHABLE_CONTINUOUS_COMPRESSION
-+	depends on !LRNG_OVERSAMPLE_ENTROPY_SOURCES
-+		bool "32 interrupt events"
-+
-+	config LRNG_COLLECTION_SIZE_256
-+	depends on !LRNG_OVERSAMPLE_ENTROPY_SOURCES
-+		bool "256 interrupt events"
-+
-+	config LRNG_COLLECTION_SIZE_512
-+		bool "512 interrupt events"
-+
-+	config LRNG_COLLECTION_SIZE_1024
-+		bool "1024 interrupt events (default)"
-+
-+	config LRNG_COLLECTION_SIZE_2048
-+		bool "2048 interrupt events"
-+
-+	config LRNG_COLLECTION_SIZE_4096
-+		bool "4096 interrupt events"
-+
-+	config LRNG_COLLECTION_SIZE_8192
-+		bool "8192 interrupt events"
-+
-+endchoice
-+
-+config LRNG_COLLECTION_SIZE
-+	int
-+	default 32 if LRNG_COLLECTION_SIZE_32
-+	default 256 if LRNG_COLLECTION_SIZE_256
-+	default 512 if LRNG_COLLECTION_SIZE_512
-+	default 1024 if LRNG_COLLECTION_SIZE_1024
-+	default 2048 if LRNG_COLLECTION_SIZE_2048
-+	default 4096 if LRNG_COLLECTION_SIZE_4096
-+	default 8192 if LRNG_COLLECTION_SIZE_8192
-+
-+config LRNG_IRQ_ENTROPY_RATE
-+	int "Interrupt Entropy Source Entropy Rate"
-+	depends on LRNG_IRQ
-+	range 256 4294967295
-+	default 256
-+	help
-+	  The LRNG will collect the configured number of interrupts to
-+	  obtain 256 bits of entropy. This value can be set to any between
-+	  256 and 4294967295. The LRNG guarantees that this value is not
-+	  lower than 256. This lower limit implies that one interrupt event
-+	  is credited with one bit of entropy. This value is subject to the
-+	  increase by the oversampling factor, if no high-resolution timer
-+	  is found.
-+
-+	  In order to effectively disable the interrupt entropy source,
-+	  the option has to be set to 4294967295. In this case, the
-+	  interrupt entropy source will still deliver data but without
-+	  being credited with entropy.
-+
-+endmenu # "Entropy Source Configuration"
-+
  endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 6f4603f897cd..d321d6d21a44 100644
+index cb9b03bdfd00..c00e15b6396e 100644
 --- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -6,3 +6,5 @@
- obj-y				+= lrng_es_mgr.o lrng_aux.o \
- 				   lrng_drng.o lrng_chacha20.o \
- 				   lrng_interfaces.o lrng_es_aux.o
-+
-+obj-$(CONFIG_LRNG_IRQ)		+= lrng_es_irq.o
-diff --git a/drivers/char/lrng/lrng_es_irq.c b/drivers/char/lrng/lrng_es_irq.c
+@@ -13,3 +13,4 @@ obj-$(CONFIG_NUMA)		+= lrng_numa.o
+ obj-$(CONFIG_LRNG_CPU)		+= lrng_es_archrandom.o
+ obj-$(CONFIG_LRNG_DRNG_SWITCH)	+= lrng_switch.o
+ obj-$(CONFIG_LRNG_KCAPI_HASH)	+= lrng_kcapi_hash.o
++obj-$(CONFIG_LRNG_DRBG)		+= lrng_drbg.o
+diff --git a/drivers/char/lrng/lrng_drbg.c b/drivers/char/lrng/lrng_drbg.c
 new file mode 100644
-index 000000000000..82a73b0426fb
+index 000000000000..6ca6b05eccf4
 --- /dev/null
-+++ b/drivers/char/lrng/lrng_es_irq.c
-@@ -0,0 +1,823 @@
++++ b/drivers/char/lrng/lrng_drbg.c
+@@ -0,0 +1,198 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * LRNG Slow Entropy Source: Interrupt data collection
++ * Backend for the LRNG providing the cryptographic primitives using the
++ * kernel crypto API and its DRBG.
 + *
 + * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
 + */
 +
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <asm/irq_regs.h>
-+#include <asm/ptrace.h>
-+#include <crypto/hash.h>
-+#include <linux/gcd.h>
++#include <crypto/drbg.h>
++#include <linux/init.h>
++#include <linux/module.h>
 +#include <linux/lrng.h>
-+#include <linux/random.h>
 +
-+#include "lrng_internal.h"
-+#include "lrng_es_irq.h"
++#include "lrng_kcapi_hash.h"
 +
 +/*
-+ * Number of interrupts to be recorded to assume that DRNG security strength
-+ * bits of entropy are received.
-+ * Note: a value below the DRNG security strength should not be defined as this
-+ *	 may imply the DRNG can never be fully seeded in case other noise
-+ *	 sources are unavailable.
++ * Define a DRBG plus a hash / MAC used to extract data from the entropy pool.
++ * For LRNG_HASH_NAME you can use a hash or a MAC (HMAC or CMAC) of your choice
++ * (Note, you should use the suggested selections below -- using SHA-1 or MD5
++ * is not wise). The idea is that the used cipher primitive can be selected to
++ * be the same as used for the DRBG. I.e. the LRNG only uses one cipher
++ * primitive using the same cipher implementation with the options offered in
++ * the following. This means, if the CTR DRBG is selected and AES-NI is present,
++ * both the CTR DRBG and the selected cmac(aes) use AES-NI.
++ *
++ * The security strengths of the DRBGs are all 256 bits according to
++ * SP800-57 section 5.6.1.
++ *
++ * This definition is allowed to be changed.
 + */
-+#define LRNG_IRQ_ENTROPY_BITS		CONFIG_LRNG_IRQ_ENTROPY_RATE
-+
-+
-+/* Number of interrupts required for LRNG_DRNG_SECURITY_STRENGTH_BITS entropy */
-+static u32 lrng_irq_entropy_bits = LRNG_IRQ_ENTROPY_BITS;
-+/* Is high-resolution timer present? */
-+static bool lrng_irq_highres_timer = false;
-+
-+static u32 irq_entropy __read_mostly = LRNG_IRQ_ENTROPY_BITS;
-+#ifdef CONFIG_LRNG_RUNTIME_ES_CONFIG
-+module_param(irq_entropy, uint, 0444);
-+MODULE_PARM_DESC(irq_entropy,
-+		 "How many interrupts must be collected for obtaining 256 bits of entropy\n");
++#ifdef CONFIG_CRYPTO_DRBG_CTR
++static unsigned int lrng_drbg_type = 0;
++#elif defined CONFIG_CRYPTO_DRBG_HMAC
++static unsigned int lrng_drbg_type = 1;
++#elif defined CONFIG_CRYPTO_DRBG_HASH
++static unsigned int lrng_drbg_type = 2;
++#else
++#error "Unknown DRBG in use"
 +#endif
 +
-+/* Per-CPU array holding concatenated entropy events */
-+static DEFINE_PER_CPU(u32 [LRNG_DATA_ARRAY_SIZE], lrng_pcpu_array)
-+						__aligned(LRNG_KCAPI_ALIGN);
-+static DEFINE_PER_CPU(u32, lrng_pcpu_array_ptr) = 0;
-+static DEFINE_PER_CPU(atomic_t, lrng_pcpu_array_irqs) = ATOMIC_INIT(0);
++/* The parameter must be r/o in sysfs as otherwise races appear. */
++module_param(lrng_drbg_type, uint, 0444);
++MODULE_PARM_DESC(lrng_drbg_type, "DRBG type used for LRNG (0->CTR_DRBG, 1->HMAC_DRBG, 2->Hash_DRBG)");
 +
-+/*
-+ * The entropy collection is performed by executing the following steps:
-+ * 1. fill up the per-CPU array holding the time stamps
-+ * 2. once the per-CPU array is full, a compression of the data into
-+ *    the entropy pool is performed - this happens in interrupt context
-+ *
-+ * If step 2 is not desired in interrupt context, the following boolean
-+ * needs to be set to false. This implies that old entropy data in the
-+ * per-CPU array collected since the last DRNG reseed is overwritten with
-+ * new entropy data instead of retaining the entropy with the compression
-+ * operation.
-+ *
-+ * Impact on entropy:
-+ *
-+ * If continuous compression is enabled, the maximum entropy that is collected
-+ * per CPU between DRNG reseeds is equal to the digest size of the used hash.
-+ *
-+ * If continuous compression is disabled, the maximum number of entropy events
-+ * that can be collected per CPU is equal to LRNG_DATA_ARRAY_SIZE. This amount
-+ * of events is converted into an entropy statement which then represents the
-+ * maximum amount of entropy collectible per CPU between DRNG reseeds.
-+ */
-+static bool lrng_pcpu_continuous_compression __read_mostly =
-+			IS_ENABLED(CONFIG_LRNG_ENABLE_CONTINUOUS_COMPRESSION);
++struct lrng_drbg {
++	const char *hash_name;
++	const char *drbg_core;
++};
 +
-+#ifdef CONFIG_LRNG_SWITCHABLE_CONTINUOUS_COMPRESSION
-+module_param(lrng_pcpu_continuous_compression, bool, 0444);
-+MODULE_PARM_DESC(lrng_pcpu_continuous_compression,
-+		 "Perform entropy compression if per-CPU entropy data array is full\n");
-+#endif
-+
-+/*
-+ * Per-CPU entropy pool with compressed entropy event
-+ *
-+ * The per-CPU entropy pool is defined as the hash state. New data is simply
-+ * inserted into the entropy pool by performing a hash update operation.
-+ * To read the entropy pool, a hash final must be invoked. However, before
-+ * the entropy pool is released again after a hash final, the hash init must
-+ * be performed.
-+ */
-+static DEFINE_PER_CPU(u8 [LRNG_POOL_SIZE], lrng_pcpu_pool)
-+						__aligned(LRNG_KCAPI_ALIGN);
-+/*
-+ * Lock to allow other CPUs to read the pool - as this is only done during
-+ * reseed which is infrequent, this lock is hardly contended.
-+ */
-+static DEFINE_PER_CPU(spinlock_t, lrng_pcpu_lock);
-+static DEFINE_PER_CPU(bool, lrng_pcpu_lock_init) = false;
-+
-+/* Number of time stamps analyzed to calculate a GCD */
-+#define LRNG_GCD_WINDOW_SIZE	100
-+static u32 lrng_gcd_history[LRNG_GCD_WINDOW_SIZE];
-+static atomic_t lrng_gcd_history_ptr = ATOMIC_INIT(-1);
-+
-+/* The common divisor for all timestamps */
-+static u32 lrng_gcd_timer = 0;
-+
-+static inline bool lrng_gcd_tested(void)
-+{
-+	return (lrng_gcd_timer != 0);
-+}
-+
-+/* Set the GCD for use in IRQ ES - if 0, the GCD calculation is restarted. */
-+static inline void _lrng_gcd_set(u32 running_gcd)
-+{
-+	lrng_gcd_timer = running_gcd;
-+	mb();
-+}
-+
-+static void lrng_gcd_set(u32 running_gcd)
-+{
-+	if (!lrng_gcd_tested()) {
-+		_lrng_gcd_set(running_gcd);
-+		pr_debug("Setting GCD to %u\n", running_gcd);
++static const struct lrng_drbg lrng_drbg_types[] = {
++	{	/* CTR_DRBG with AES-256 using derivation function */
++		.hash_name = "sha512",
++		.drbg_core = "drbg_nopr_ctr_aes256",
++	}, {	/* HMAC_DRBG with SHA-512 */
++		.hash_name = "sha512",
++		.drbg_core = "drbg_nopr_hmac_sha512",
++	}, {	/* Hash_DRBG with SHA-512 using derivation function */
++		.hash_name = "sha512",
++		.drbg_core = "drbg_nopr_sha512"
 +	}
-+}
++};
 +
-+u32 lrng_gcd_analyze(u32 *history, size_t nelem)
++static int lrng_drbg_drng_seed_helper(void *drng, const u8 *inbuf, u32 inbuflen)
 +{
-+	u32 running_gcd = 0;
-+	size_t i;
++	struct drbg_state *drbg = (struct drbg_state *)drng;
++	LIST_HEAD(seedlist);
++	struct drbg_string data;
++	int ret;
 +
-+	/* Now perform the analysis on the accumulated time data. */
-+	for (i = 0; i < nelem; i++) {
-+		/*
-+		 * NOTE: this would be the place to add more analysis on the
-+		 * appropriateness of the timer like checking the presence
-+		 * of sufficient variations in the timer.
-+		 */
++	drbg_string_fill(&data, inbuf, inbuflen);
++	list_add_tail(&data.list, &seedlist);
++	ret = drbg->d_ops->update(drbg, &seedlist, drbg->seeded);
 +
-+		/*
-+		 * This calculates the gcd of all the time values. that is
-+		 * gcd(time_1, time_2, ..., time_nelem)
-+		 *
-+		 * Some timers increment by a fixed (non-1) amount each step.
-+		 * This code checks for such increments, and allows the library
-+		 * to output the number of such changes have occurred.
-+		 */
-+		running_gcd = (u32)gcd(history[i], running_gcd);
++	if (ret >= 0)
++		drbg->seeded = true;
 +
-+		/* Zeroize data */
-+		history[i] = 0;
-+	}
-+
-+	return running_gcd;
-+}
-+
-+static void lrng_gcd_add_value(u32 time)
-+{
-+	u32 ptr = (u32)atomic_inc_return_relaxed(&lrng_gcd_history_ptr);
-+
-+	if (ptr < LRNG_GCD_WINDOW_SIZE) {
-+		lrng_gcd_history[ptr] = time;
-+	} else if (ptr == LRNG_GCD_WINDOW_SIZE) {
-+		u32 gcd = lrng_gcd_analyze(lrng_gcd_history,
-+					   LRNG_GCD_WINDOW_SIZE);
-+
-+		if (!gcd)
-+			gcd = 1;
-+
-+		/*
-+		 * Ensure that we have variations in the time stamp below the
-+		 * given value. This is just a safety measure to prevent the GCD
-+		 * becoming too large.
-+		 */
-+		if (gcd >= 1000) {
-+			pr_warn("calculated GCD is larger than expected: %u\n",
-+				gcd);
-+			gcd = 1000;
-+		}
-+
-+		/*  Adjust all deltas by the observed (small) common factor. */
-+		lrng_gcd_set(gcd);
-+		atomic_set(&lrng_gcd_history_ptr, 0);
-+	}
-+}
-+
-+/* Return boolean whether LRNG identified presence of high-resolution timer */
-+static bool lrng_pool_highres_timer(void)
-+{
-+	return lrng_irq_highres_timer;
-+}
-+
-+/* Convert entropy in bits into number of IRQs with the same entropy content. */
-+static inline u32 lrng_entropy_to_data(u32 entropy_bits)
-+{
-+	return ((entropy_bits * lrng_irq_entropy_bits) /
-+		LRNG_DRNG_SECURITY_STRENGTH_BITS);
-+}
-+
-+/* Convert number of IRQs into entropy value. */
-+static inline u32 lrng_data_to_entropy(u32 irqnum)
-+{
-+	return ((irqnum * LRNG_DRNG_SECURITY_STRENGTH_BITS) /
-+		lrng_irq_entropy_bits);
-+}
-+
-+static inline bool lrng_pcpu_pool_online(int cpu)
-+{
-+	return per_cpu(lrng_pcpu_lock_init, cpu);
-+}
-+
-+static void lrng_pcpu_check_compression_state(void)
-+{
-+	/* One pool must hold sufficient entropy for disabled compression */
-+	if (!lrng_pcpu_continuous_compression) {
-+		u32 max_ent = min_t(u32, lrng_get_digestsize(),
-+				    lrng_data_to_entropy(LRNG_DATA_NUM_VALUES));
-+		if (max_ent < lrng_security_strength()) {
-+			pr_warn("Force continuous compression operation to ensure LRNG can hold enough entropy\n");
-+			lrng_pcpu_continuous_compression = true;
-+		}
-+	}
-+}
-+
-+static int __init lrng_init_time_source(void)
-+{
-+	/* Set a minimum number of interrupts that must be collected */
-+	irq_entropy = max_t(u32, LRNG_IRQ_ENTROPY_BITS, irq_entropy);
-+
-+	if ((random_get_entropy() & LRNG_DATA_SLOTSIZE_MASK) ||
-+	    (random_get_entropy() & LRNG_DATA_SLOTSIZE_MASK)) {
-+		/*
-+		 * As the highres timer is identified here, previous interrupts
-+		 * obtained during boot time are treated like a lowres-timer
-+		 * would have been present.
-+		 */
-+		lrng_irq_highres_timer = true;
-+		lrng_irq_entropy_bits = irq_entropy;
-+	} else {
-+		u32 new_entropy = irq_entropy * LRNG_IRQ_OVERSAMPLING_FACTOR;
-+
-+		lrng_health_disable();
-+		lrng_irq_highres_timer = false;
-+		lrng_irq_entropy_bits = (irq_entropy < new_entropy) ?
-+					 new_entropy : irq_entropy;
-+		pr_warn("operating without high-resolution timer and applying IRQ oversampling factor %u\n",
-+			LRNG_IRQ_OVERSAMPLING_FACTOR);
-+		lrng_pcpu_check_compression_state();
-+	}
-+	mb();
-+
-+	return 0;
-+}
-+core_initcall(lrng_init_time_source);
-+
-+/*
-+ * Reset all per-CPU pools - reset entropy estimator but leave the pool data
-+ * that may or may not have entropy unchanged.
-+ */
-+void lrng_pcpu_reset(void)
-+{
-+	int cpu;
-+
-+	/* Trigger GCD calculation anew. */
-+	_lrng_gcd_set(0);
-+
-+	for_each_online_cpu(cpu)
-+		atomic_set(per_cpu_ptr(&lrng_pcpu_array_irqs, cpu), 0);
-+}
-+
-+u32 lrng_pcpu_avail_pool_size(void)
-+{
-+	u32 max_size = 0, max_pool = lrng_get_digestsize();
-+	int cpu;
-+
-+	if (!lrng_pcpu_continuous_compression)
-+		max_pool = min_t(u32, max_pool, LRNG_DATA_NUM_VALUES);
-+
-+	for_each_online_cpu(cpu) {
-+		if (lrng_pcpu_pool_online(cpu))
-+			max_size += max_pool;
-+	}
-+
-+	return max_size;
-+}
-+
-+/* Return entropy of unused IRQs present in all per-CPU pools. */
-+u32 lrng_pcpu_avail_entropy(void)
-+{
-+	u32 digestsize_irqs, irq = 0;
-+	int cpu;
-+
-+	/* Obtain the cap of maximum numbers of IRQs we count */
-+	digestsize_irqs = lrng_entropy_to_data(lrng_get_digestsize());
-+	if (!lrng_pcpu_continuous_compression) {
-+		/* Cap to max. number of IRQs the array can hold */
-+		digestsize_irqs = min_t(u32, digestsize_irqs,
-+					LRNG_DATA_NUM_VALUES);
-+	}
-+
-+	for_each_online_cpu(cpu) {
-+		if (!lrng_pcpu_pool_online(cpu))
-+			continue;
-+		irq += min_t(u32, digestsize_irqs,
-+			     atomic_read_u32(per_cpu_ptr(&lrng_pcpu_array_irqs,
-+							 cpu)));
-+	}
-+
-+	/* Consider oversampling rate */
-+	return lrng_reduce_by_osr(lrng_data_to_entropy(irq));
-+}
-+
-+/*
-+ * Trigger a switch of the hash implementation for the per-CPU pool.
-+ *
-+ * For each per-CPU pool, obtain the message digest with the old hash
-+ * implementation, initialize the per-CPU pool again with the new hash
-+ * implementation and inject the message digest into the new state.
-+ *
-+ * Assumption: the caller must guarantee that the new_cb is available during the
-+ * entire operation (e.g. it must hold the lock against pointer updating).
-+ */
-+int lrng_pcpu_switch_hash(int node,
-+			  const struct lrng_crypto_cb *new_cb, void *new_hash,
-+			  const struct lrng_crypto_cb *old_cb)
-+{
-+	u8 digest[LRNG_MAX_DIGESTSIZE];
-+	u32 digestsize_irqs, found_irqs;
-+	int ret = 0, cpu;
-+
-+	if (!IS_ENABLED(CONFIG_LRNG_DRNG_SWITCH))
-+		return -EOPNOTSUPP;
-+
-+	for_each_online_cpu(cpu) {
-+		struct shash_desc *pcpu_shash;
-+
-+		/*
-+		 * Only switch the per-CPU pools for the current node because
-+		 * the crypto_cb only applies NUMA-node-wide.
-+		 */
-+		if (cpu_to_node(cpu) != node || !lrng_pcpu_pool_online(cpu))
-+			continue;
-+
-+		pcpu_shash = (struct shash_desc *)per_cpu_ptr(lrng_pcpu_pool,
-+							      cpu);
-+
-+		digestsize_irqs = old_cb->lrng_hash_digestsize(pcpu_shash);
-+		digestsize_irqs = lrng_entropy_to_data(digestsize_irqs << 3);
-+
-+		if (pcpu_shash->tfm == new_hash)
-+			continue;
-+
-+		/* Get the per-CPU pool hash with old digest ... */
-+		ret = old_cb->lrng_hash_final(pcpu_shash, digest) ?:
-+		      /* ... re-initialize the hash with the new digest ... */
-+		      new_cb->lrng_hash_init(pcpu_shash, new_hash) ?:
-+		      /*
-+		       * ... feed the old hash into the new state. We may feed
-+		       * uninitialized memory into the new state, but this is
-+		       * considered no issue and even good as we have some more
-+		       * uncertainty here.
-+		       */
-+		      new_cb->lrng_hash_update(pcpu_shash, digest,
-+					       sizeof(digest));
-+		if (ret)
-+			goto out;
-+
-+		/*
-+		 * In case the new digest is larger than the old one, cap
-+		 * the available entropy to the old message digest used to
-+		 * process the existing data.
-+		 */
-+		found_irqs = atomic_xchg_relaxed(
-+				per_cpu_ptr(&lrng_pcpu_array_irqs, cpu), 0);
-+		found_irqs = min_t(u32, found_irqs, digestsize_irqs);
-+		atomic_add_return_relaxed(found_irqs,
-+				per_cpu_ptr(&lrng_pcpu_array_irqs, cpu));
-+
-+		pr_debug("Re-initialize per-CPU entropy pool for CPU %d on NUMA node %d with hash %s\n",
-+			 cpu, node, new_cb->lrng_hash_name());
-+	}
-+
-+out:
-+	memzero_explicit(digest, sizeof(digest));
 +	return ret;
 +}
 +
-+/*
-+ * When reading the per-CPU message digest, make sure we use the crypto
-+ * callbacks defined for the NUMA node the per-CPU pool is defined for because
-+ * the LRNG crypto switch support is only atomic per NUMA node.
-+ */
-+static inline u32
-+lrng_pcpu_pool_hash_one(const struct lrng_crypto_cb *pcpu_crypto_cb,
-+			void *pcpu_hash, int cpu, u8 *digest, u32 *digestsize)
++static int lrng_drbg_drng_generate_helper(void *drng, u8 *outbuf, u32 outbuflen)
 +{
-+	struct shash_desc *pcpu_shash =
-+		(struct shash_desc *)per_cpu_ptr(lrng_pcpu_pool, cpu);
-+	spinlock_t *lock = per_cpu_ptr(&lrng_pcpu_lock, cpu);
-+	unsigned long flags;
-+	u32 digestsize_irqs, found_irqs;
++	struct drbg_state *drbg = (struct drbg_state *)drng;
 +
-+	/* Lock guarding against reading / writing to per-CPU pool */
-+	spin_lock_irqsave(lock, flags);
-+
-+	*digestsize = pcpu_crypto_cb->lrng_hash_digestsize(pcpu_hash);
-+	digestsize_irqs = lrng_entropy_to_data(*digestsize << 3);
-+
-+	/* Obtain entropy statement like for the entropy pool */
-+	found_irqs = atomic_xchg_relaxed(
-+				per_cpu_ptr(&lrng_pcpu_array_irqs, cpu), 0);
-+	/* Cap to maximum amount of data we can hold in hash */
-+	found_irqs = min_t(u32, found_irqs, digestsize_irqs);
-+
-+	/* Cap to maximum amount of data we can hold in array */
-+	if (!lrng_pcpu_continuous_compression)
-+		found_irqs = min_t(u32, found_irqs, LRNG_DATA_NUM_VALUES);
-+
-+	/* Store all not-yet compressed data in data array into hash, ... */
-+	if (pcpu_crypto_cb->lrng_hash_update(pcpu_shash,
-+				(u8 *)per_cpu_ptr(lrng_pcpu_array, cpu),
-+				LRNG_DATA_ARRAY_SIZE * sizeof(u32)) ?:
-+	    /* ... get the per-CPU pool digest, ... */
-+	    pcpu_crypto_cb->lrng_hash_final(pcpu_shash, digest) ?:
-+	    /* ... re-initialize the hash, ... */
-+	    pcpu_crypto_cb->lrng_hash_init(pcpu_shash, pcpu_hash) ?:
-+	    /* ... feed the old hash into the new state. */
-+	    pcpu_crypto_cb->lrng_hash_update(pcpu_shash, digest, *digestsize))
-+		found_irqs = 0;
-+
-+	spin_unlock_irqrestore(lock, flags);
-+	return found_irqs;
++	return drbg->d_ops->generate(drbg, outbuf, outbuflen, NULL);
 +}
 +
-+/*
-+ * Hash all per-CPU pools and return the digest to be used as seed data for
-+ * seeding a DRNG. The caller must guarantee backtracking resistance.
-+ * The function will only copy as much data as entropy is available into the
-+ * caller-provided output buffer.
-+ *
-+ * This function handles the translation from the number of received interrupts
-+ * into an entropy statement. The conversion depends on LRNG_IRQ_ENTROPY_BITS
-+ * which defines how many interrupts must be received to obtain 256 bits of
-+ * entropy. With this value, the function lrng_data_to_entropy converts a given
-+ * data size (received interrupts, requested amount of data, etc.) into an
-+ * entropy statement. lrng_entropy_to_data does the reverse.
-+ *
-+ * @outbuf: buffer to store data in with size requested_bits
-+ * @requested_bits: Requested amount of entropy
-+ * @fully_seeded: indicator whether LRNG is fully seeded
-+ * @return: amount of entropy in outbuf in bits.
-+ */
-+u32 lrng_pcpu_pool_hash(u8 *outbuf, u32 requested_bits, bool fully_seeded)
++static void *lrng_drbg_drng_alloc(u32 sec_strength)
 +{
-+	SHASH_DESC_ON_STACK(shash, NULL);
-+	const struct lrng_crypto_cb *crypto_cb;
-+	struct lrng_drng **lrng_drng = lrng_drng_instances();
-+	struct lrng_drng *drng = lrng_drng_init_instance();
-+	u8 digest[LRNG_MAX_DIGESTSIZE];
-+	unsigned long flags, flags2;
-+	u32 found_irqs, collected_irqs = 0, collected_ent_bits, requested_irqs,
-+	    returned_ent_bits;
-+	int ret, cpu;
-+	void *hash;
++	struct drbg_state *drbg;
++	int coreref = -1;
++	bool pr = false;
++	int ret;
 +
-+	/* Lock guarding replacement of per-NUMA hash */
-+	lrng_hash_lock(drng, &flags);
++	drbg_convert_tfm_core(lrng_drbg_types[lrng_drbg_type].drbg_core,
++			      &coreref, &pr);
++	if (coreref < 0)
++		return ERR_PTR(-EFAULT);
 +
-+	crypto_cb = drng->crypto_cb;
-+	hash = drng->hash;
++	drbg = kzalloc(sizeof(struct drbg_state), GFP_KERNEL);
++	if (!drbg)
++		return ERR_PTR(-ENOMEM);
 +
-+	/* The hash state of filled with all per-CPU pool hashes. */
-+	ret = crypto_cb->lrng_hash_init(shash, hash);
++	drbg->core = &drbg_cores[coreref];
++	drbg->seeded = false;
++	ret = drbg_alloc_state(drbg);
 +	if (ret)
 +		goto err;
 +
-+	requested_irqs = lrng_entropy_to_data(requested_bits +
-+					      lrng_compress_osr());
-+
-+	/*
-+	 * Harvest entropy from each per-CPU hash state - even though we may
-+	 * have collected sufficient entropy, we will hash all per-CPU pools.
-+	 */
-+	for_each_online_cpu(cpu) {
-+		struct lrng_drng *pcpu_drng = drng;
-+		u32 digestsize, pcpu_unused_irqs = 0;
-+		int node = cpu_to_node(cpu);
-+
-+		/* If pool is not online, then no entropy is present. */
-+		if (!lrng_pcpu_pool_online(cpu))
-+			continue;
-+
-+		if (lrng_drng && lrng_drng[node])
-+			pcpu_drng = lrng_drng[node];
-+
-+		if (pcpu_drng == drng) {
-+			found_irqs = lrng_pcpu_pool_hash_one(crypto_cb, hash,
-+							     cpu, digest,
-+							     &digestsize);
-+		} else {
-+			lrng_hash_lock(pcpu_drng, &flags2);
-+			found_irqs =
-+				lrng_pcpu_pool_hash_one(pcpu_drng->crypto_cb,
-+							pcpu_drng->hash, cpu,
-+							digest, &digestsize);
-+			lrng_hash_unlock(pcpu_drng, flags2);
-+		}
-+
-+		/* Inject the digest into the state of all per-CPU pools */
-+		ret = crypto_cb->lrng_hash_update(shash, digest, digestsize);
-+		if (ret)
-+			goto err;
-+
-+		collected_irqs += found_irqs;
-+		if (collected_irqs > requested_irqs) {
-+			pcpu_unused_irqs = collected_irqs - requested_irqs;
-+			atomic_add_return_relaxed(pcpu_unused_irqs,
-+				per_cpu_ptr(&lrng_pcpu_array_irqs, cpu));
-+			collected_irqs = requested_irqs;
-+		}
-+		pr_debug("%u interrupts used from entropy pool of CPU %d, %u interrupts remain unused\n",
-+			 found_irqs - pcpu_unused_irqs, cpu, pcpu_unused_irqs);
++	if (sec_strength > drbg_sec_strength(drbg->core->flags)) {
++		pr_err("Security strength of DRBG (%u bits) lower than requested by LRNG (%u bits)\n",
++			drbg_sec_strength(drbg->core->flags) * 8,
++			sec_strength * 8);
++		goto dealloc;
 +	}
 +
-+	ret = crypto_cb->lrng_hash_final(shash, digest);
-+	if (ret)
-+		goto err;
++	if (sec_strength < drbg_sec_strength(drbg->core->flags))
++		pr_warn("Security strength of DRBG (%u bits) higher than requested by LRNG (%u bits)\n",
++			drbg_sec_strength(drbg->core->flags) * 8,
++			sec_strength * 8);
 +
-+	collected_ent_bits = lrng_data_to_entropy(collected_irqs);
-+	/* Cap to maximum entropy that can ever be generated with given hash */
-+	collected_ent_bits = min_t(u32, collected_ent_bits,
-+				   crypto_cb->lrng_hash_digestsize(hash) << 3);
-+	/* Apply oversampling: discount requested oversampling rate */
-+	returned_ent_bits = lrng_reduce_by_osr(collected_ent_bits);
++	pr_info("DRBG with %s core allocated\n", drbg->core->backend_cra_name);
 +
-+	pr_debug("obtained %u bits by collecting %u bits of entropy from entropy pool noise source\n",
-+		 returned_ent_bits, collected_ent_bits);
++	return drbg;
 +
-+	/*
-+	 * Truncate to available entropy as implicitly allowed by SP800-90B
-+	 * section 3.1.5.1.1 table 1 which awards truncated hashes full
-+	 * entropy.
-+	 *
-+	 * During boot time, we read requested_bits data with
-+	 * returned_ent_bits entropy. In case our conservative entropy
-+	 * estimate underestimates the available entropy we can transport as
-+	 * much available entropy as possible.
-+	 */
-+	memcpy(outbuf, digest, fully_seeded ? returned_ent_bits >> 3 :
-+					      requested_bits >> 3);
-+
-+out:
-+	crypto_cb->lrng_hash_desc_zero(shash);
-+	lrng_hash_unlock(drng, flags);
-+	memzero_explicit(digest, sizeof(digest));
-+	return returned_ent_bits;
-+
++dealloc:
++	if (drbg->d_ops)
++		drbg->d_ops->crypto_fini(drbg);
++	drbg_dealloc_state(drbg);
 +err:
-+	returned_ent_bits = 0;
-+	goto out;
++	kfree(drbg);
++	return ERR_PTR(-EINVAL);
 +}
 +
-+/* Compress the lrng_pcpu_array array into lrng_pcpu_pool */
-+static inline void lrng_pcpu_array_compress(void)
++static void lrng_drbg_drng_dealloc(void *drng)
 +{
-+	struct shash_desc *shash =
-+			(struct shash_desc *)this_cpu_ptr(lrng_pcpu_pool);
-+	struct lrng_drng **lrng_drng = lrng_drng_instances();
-+	struct lrng_drng *drng = lrng_drng_init_instance();
-+	const struct lrng_crypto_cb *crypto_cb;
-+	spinlock_t *lock = this_cpu_ptr(&lrng_pcpu_lock);
-+	unsigned long flags, flags2;
-+	int node = numa_node_id();
-+	void *hash;
-+	bool init = false;
++	struct drbg_state *drbg = (struct drbg_state *)drng;
 +
-+	/* Get NUMA-node local hash instance */
-+	if (lrng_drng && lrng_drng[node])
-+		drng = lrng_drng[node];
++	if (drbg && drbg->d_ops)
++		drbg->d_ops->crypto_fini(drbg);
++	drbg_dealloc_state(drbg);
++	kfree_sensitive(drbg);
++	pr_info("DRBG deallocated\n");
++}
 +
-+	lrng_hash_lock(drng, &flags);
-+	crypto_cb = drng->crypto_cb;
-+	hash = drng->hash;
++static void *lrng_drbg_hash_alloc(void)
++{
++	return lrng_kcapi_hash_alloc(lrng_drbg_types[lrng_drbg_type].hash_name);
++}
 +
-+	if (unlikely(!this_cpu_read(lrng_pcpu_lock_init))) {
-+		init = true;
-+		spin_lock_init(lock);
-+		this_cpu_write(lrng_pcpu_lock_init, true);
-+		pr_debug("Initializing per-CPU entropy pool for CPU %d on NUMA node %d with hash %s\n",
-+			 raw_smp_processor_id(), node,
-+			 crypto_cb->lrng_hash_name());
++static const char *lrng_drbg_name(void)
++{
++	return lrng_drbg_types[lrng_drbg_type].drbg_core;
++}
++
++static const char *lrng_hash_name(void)
++{
++	return lrng_drbg_types[lrng_drbg_type].hash_name;
++}
++
++static const struct lrng_crypto_cb lrng_drbg_crypto_cb = {
++	.lrng_drng_name			= lrng_drbg_name,
++	.lrng_hash_name			= lrng_hash_name,
++	.lrng_drng_alloc		= lrng_drbg_drng_alloc,
++	.lrng_drng_dealloc		= lrng_drbg_drng_dealloc,
++	.lrng_drng_seed_helper		= lrng_drbg_drng_seed_helper,
++	.lrng_drng_generate_helper	= lrng_drbg_drng_generate_helper,
++	.lrng_hash_alloc		= lrng_drbg_hash_alloc,
++	.lrng_hash_dealloc		= lrng_kcapi_hash_dealloc,
++	.lrng_hash_digestsize		= lrng_kcapi_hash_digestsize,
++	.lrng_hash_init			= lrng_kcapi_hash_init,
++	.lrng_hash_update		= lrng_kcapi_hash_update,
++	.lrng_hash_final		= lrng_kcapi_hash_final,
++	.lrng_hash_desc_zero		= lrng_kcapi_hash_zero,
++};
++
++static int __init lrng_drbg_init(void)
++{
++	if (lrng_drbg_type >= ARRAY_SIZE(lrng_drbg_types)) {
++		pr_err("lrng_drbg_type parameter too large (given %u - max: %lu)",
++		       lrng_drbg_type,
++		       (unsigned long)ARRAY_SIZE(lrng_drbg_types) - 1);
++		return -EAGAIN;
 +	}
-+
-+	spin_lock_irqsave(lock, flags2);
-+
-+	if (unlikely(init) && crypto_cb->lrng_hash_init(shash, hash)) {
-+		this_cpu_write(lrng_pcpu_lock_init, false);
-+		pr_warn("Initialization of hash failed\n");
-+	} else if (lrng_pcpu_continuous_compression) {
-+		/* Add entire per-CPU data array content into entropy pool. */
-+		if (crypto_cb->lrng_hash_update(shash,
-+					(u8 *)this_cpu_ptr(lrng_pcpu_array),
-+					LRNG_DATA_ARRAY_SIZE * sizeof(u32)))
-+			pr_warn_ratelimited("Hashing of entropy data failed\n");
-+	}
-+
-+	spin_unlock_irqrestore(lock, flags2);
-+	lrng_hash_unlock(drng, flags);
++	return lrng_set_drng_cb(&lrng_drbg_crypto_cb);
 +}
 +
-+/* Compress data array into hash */
-+static inline void lrng_pcpu_array_to_hash(u32 ptr)
++static void __exit lrng_drbg_exit(void)
 +{
-+	u32 *array = this_cpu_ptr(lrng_pcpu_array);
-+
-+	/*
-+	 * During boot time the hash operation is triggered more often than
-+	 * during regular operation.
-+	 */
-+	if (unlikely(!lrng_state_fully_seeded())) {
-+		if ((ptr & 31) && (ptr < LRNG_DATA_WORD_MASK))
-+			return;
-+	} else if (ptr < LRNG_DATA_WORD_MASK) {
-+		return;
-+	}
-+
-+	if (lrng_raw_array_entropy_store(*array)) {
-+		u32 i;
-+
-+		/*
-+		 * If we fed even a part of the array to external analysis, we
-+		 * mark that the entire array and the per-CPU pool to have no
-+		 * entropy. This is due to the non-IID property of the data as
-+		 * we do not fully know whether the existing dependencies
-+		 * diminish the entropy beyond to what we expect it has.
-+		 */
-+		atomic_set(this_cpu_ptr(&lrng_pcpu_array_irqs), 0);
-+
-+		for (i = 1; i < LRNG_DATA_ARRAY_SIZE; i++)
-+			lrng_raw_array_entropy_store(*(array + i));
-+	} else {
-+		lrng_pcpu_array_compress();
-+		/* Ping pool handler about received entropy */
-+		lrng_pool_add_entropy();
-+	}
++	lrng_set_drng_cb(NULL);
 +}
 +
-+/*
-+ * Concatenate full 32 bit word at the end of time array even when current
-+ * ptr is not aligned to sizeof(data).
-+ */
-+static inline void _lrng_pcpu_array_add_u32(u32 data)
-+{
-+	/* Increment pointer by number of slots taken for input value */
-+	u32 pre_ptr, mask, ptr = this_cpu_add_return(lrng_pcpu_array_ptr,
-+						     LRNG_DATA_SLOTS_PER_UINT);
-+	unsigned int pre_array;
-+
-+	/*
-+	 * This function injects a unit into the array - guarantee that
-+	 * array unit size is equal to data type of input data.
-+	 */
-+	BUILD_BUG_ON(LRNG_DATA_ARRAY_MEMBER_BITS != (sizeof(data) << 3));
-+
-+	/*
-+	 * The following logic requires at least two units holding
-+	 * the data as otherwise the pointer would immediately wrap when
-+	 * injection an u32 word.
-+	 */
-+	BUILD_BUG_ON(LRNG_DATA_NUM_VALUES <= LRNG_DATA_SLOTS_PER_UINT);
-+
-+	lrng_pcpu_split_u32(&ptr, &pre_ptr, &mask);
-+
-+	/* MSB of data go into previous unit */
-+	pre_array = lrng_data_idx2array(pre_ptr);
-+	/* zeroization of slot to ensure the following OR adds the data */
-+	this_cpu_and(lrng_pcpu_array[pre_array], ~(0xffffffff & ~mask));
-+	this_cpu_or(lrng_pcpu_array[pre_array], data & ~mask);
-+
-+	/* Invoke compression as we just filled data array completely */
-+	if (unlikely(pre_ptr > ptr))
-+		lrng_pcpu_array_to_hash(LRNG_DATA_WORD_MASK);
-+
-+	/* LSB of data go into current unit */
-+	this_cpu_write(lrng_pcpu_array[lrng_data_idx2array(ptr)],
-+		       data & mask);
-+
-+	if (likely(pre_ptr <= ptr))
-+		lrng_pcpu_array_to_hash(ptr);
-+}
-+
-+/* Concatenate a 32-bit word at the end of the per-CPU array */
-+void lrng_pcpu_array_add_u32(u32 data)
-+{
-+	/*
-+	 * Disregard entropy-less data without continuous compression to
-+	 * avoid it overwriting data with entropy when array ptr wraps.
-+	 */
-+	if (lrng_pcpu_continuous_compression)
-+		_lrng_pcpu_array_add_u32(data);
-+}
-+
-+/* Concatenate data of max LRNG_DATA_SLOTSIZE_MASK at the end of time array */
-+static inline void lrng_pcpu_array_add_slot(u32 data)
-+{
-+	/* Get slot */
-+	u32 ptr = this_cpu_inc_return(lrng_pcpu_array_ptr) &
-+							LRNG_DATA_WORD_MASK;
-+	unsigned int array = lrng_data_idx2array(ptr);
-+	unsigned int slot = lrng_data_idx2slot(ptr);
-+
-+	BUILD_BUG_ON(LRNG_DATA_ARRAY_MEMBER_BITS % LRNG_DATA_SLOTSIZE_BITS);
-+	/* Ensure consistency of values */
-+	BUILD_BUG_ON(LRNG_DATA_ARRAY_MEMBER_BITS !=
-+		     sizeof(lrng_pcpu_array[0]) << 3);
-+
-+	/* zeroization of slot to ensure the following OR adds the data */
-+	this_cpu_and(lrng_pcpu_array[array],
-+		     ~(lrng_data_slot_val(0xffffffff & LRNG_DATA_SLOTSIZE_MASK,
-+					  slot)));
-+	/* Store data into slot */
-+	this_cpu_or(lrng_pcpu_array[array], lrng_data_slot_val(data, slot));
-+
-+	lrng_pcpu_array_to_hash(ptr);
-+}
-+
-+static inline void
-+lrng_time_process_common(u32 time, void(*add_time)(u32 data))
-+{
-+	enum lrng_health_res health_test;
-+
-+	if (lrng_raw_hires_entropy_store(time))
-+		return;
-+
-+	health_test = lrng_health_test(time);
-+	if (health_test > lrng_health_fail_use)
-+		return;
-+
-+	if (health_test == lrng_health_pass)
-+		atomic_inc_return(this_cpu_ptr(&lrng_pcpu_array_irqs));
-+
-+	add_time(time);
-+}
-+
-+/*
-+ * Batching up of entropy in per-CPU array before injecting into entropy pool.
-+ */
-+static inline void lrng_time_process(void)
-+{
-+	u32 now_time = random_get_entropy();
-+
-+	if (unlikely(!lrng_gcd_tested())) {
-+		/* When GCD is unknown, we process the full time stamp */
-+		lrng_time_process_common(now_time, _lrng_pcpu_array_add_u32);
-+		lrng_gcd_add_value(now_time);
-+	} else {
-+		/* GCD is known and applied */
-+		lrng_time_process_common((now_time / lrng_gcd_timer) &
-+					 LRNG_DATA_SLOTSIZE_MASK,
-+					 lrng_pcpu_array_add_slot);
-+	}
-+
-+	lrng_perf_time(now_time);
-+}
-+
-+/* Hot code path - Callback for interrupt handler */
-+void add_interrupt_randomness(int irq, int irq_flg)
-+{
-+	if (lrng_pool_highres_timer()) {
-+		lrng_time_process();
-+	} else {
-+		struct pt_regs *regs = get_irq_regs();
-+		static atomic_t reg_idx = ATOMIC_INIT(0);
-+		u64 ip;
-+		u32 tmp;
-+
-+		if (regs) {
-+			u32 *ptr = (u32 *)regs;
-+			int reg_ptr = atomic_add_return_relaxed(1, &reg_idx);
-+			size_t n = (sizeof(struct pt_regs) / sizeof(u32));
-+
-+			ip = instruction_pointer(regs);
-+			tmp = *(ptr + (reg_ptr % n));
-+			tmp = lrng_raw_regs_entropy_store(tmp) ? 0 : tmp;
-+			_lrng_pcpu_array_add_u32(tmp);
-+		} else {
-+			ip = _RET_IP_;
-+		}
-+
-+		lrng_time_process();
-+
-+		/*
-+		 * The XOR operation combining the different values is not
-+		 * considered to destroy entropy since the entirety of all
-+		 * processed values delivers the entropy (and not each
-+		 * value separately of the other values).
-+		 */
-+		tmp = lrng_raw_jiffies_entropy_store(jiffies) ? 0 : jiffies;
-+		tmp ^= lrng_raw_irq_entropy_store(irq) ? 0 : irq;
-+		tmp ^= lrng_raw_irqflags_entropy_store(irq_flg) ? 0 : irq_flg;
-+		tmp ^= lrng_raw_retip_entropy_store(ip) ? 0 : ip;
-+		tmp ^= ip >> 32;
-+		_lrng_pcpu_array_add_u32(tmp);
-+	}
-+}
-+EXPORT_SYMBOL(add_interrupt_randomness);
-+
-+void lrng_irq_es_state(unsigned char *buf, size_t buflen)
-+{
-+	const struct lrng_drng *lrng_drng_init = lrng_drng_init_instance();
-+
-+	/* Assume the lrng_drng_init lock is taken by caller */
-+	snprintf(buf, buflen,
-+		 "IRQ ES properties:\n"
-+		 " Hash for operating entropy pool: %s\n"
-+		 " per-CPU interrupt collection size: %u\n"
-+		 " Standards compliance: %s\n"
-+		 " High-resolution timer: %s\n"
-+		 " Continuous compression: %s\n",
-+		 lrng_drng_init->crypto_cb->lrng_hash_name(),
-+		 LRNG_DATA_NUM_VALUES,
-+		 lrng_sp80090b_compliant() ? "SP800-90B " : "",
-+		 lrng_pool_highres_timer() ? "true" : "false",
-+		 lrng_pcpu_continuous_compression ? "true" : "false");
-+}
-diff --git a/drivers/char/lrng/lrng_es_irq.h b/drivers/char/lrng/lrng_es_irq.h
-new file mode 100644
-index 000000000000..00b16b1aa45f
---- /dev/null
-+++ b/drivers/char/lrng/lrng_es_irq.h
-@@ -0,0 +1,71 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause */
-+/*
-+ * LRNG Slow Noise Source: Time stamp array handling
-+ *
-+ * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
-+ */
-+
-+/*
-+ * To limit the impact on the interrupt handling, the LRNG concatenates
-+ * entropic LSB parts of the time stamps in a per-CPU array and only
-+ * injects them into the entropy pool when the array is full.
-+ */
-+
-+/* Store multiple integers in one u32 */
-+#define LRNG_DATA_SLOTSIZE_BITS		(8)
-+#define LRNG_DATA_SLOTSIZE_MASK		((1 << LRNG_DATA_SLOTSIZE_BITS) - 1)
-+#define LRNG_DATA_ARRAY_MEMBER_BITS	(4 << 3) /* ((sizeof(u32)) << 3) */
-+#define LRNG_DATA_SLOTS_PER_UINT	(LRNG_DATA_ARRAY_MEMBER_BITS / \
-+					 LRNG_DATA_SLOTSIZE_BITS)
-+
-+/*
-+ * Number of time values to store in the array - in small environments
-+ * only one atomic_t variable per CPU is used.
-+ */
-+#define LRNG_DATA_NUM_VALUES		(CONFIG_LRNG_COLLECTION_SIZE)
-+/* Mask of LSB of time stamp to store */
-+#define LRNG_DATA_WORD_MASK		(LRNG_DATA_NUM_VALUES - 1)
-+
-+#define LRNG_DATA_SLOTS_MASK		(LRNG_DATA_SLOTS_PER_UINT - 1)
-+#define LRNG_DATA_ARRAY_SIZE		(LRNG_DATA_NUM_VALUES /	\
-+					 LRNG_DATA_SLOTS_PER_UINT)
-+
-+/* Starting bit index of slot */
-+static inline unsigned int lrng_data_slot2bitindex(unsigned int slot)
-+{
-+	return (LRNG_DATA_SLOTSIZE_BITS * slot);
-+}
-+
-+/* Convert index into the array index */
-+static inline unsigned int lrng_data_idx2array(unsigned int idx)
-+{
-+	return idx / LRNG_DATA_SLOTS_PER_UINT;
-+}
-+
-+/* Convert index into the slot of a given array index */
-+static inline unsigned int lrng_data_idx2slot(unsigned int idx)
-+{
-+	return idx & LRNG_DATA_SLOTS_MASK;
-+}
-+
-+/* Convert value into slot value */
-+static inline unsigned int lrng_data_slot_val(unsigned int val,
-+					      unsigned int slot)
-+{
-+	return val << lrng_data_slot2bitindex(slot);
-+}
-+
-+/*
-+ * Return the pointers for the previous and current units to inject a u32 into.
-+ * Also return the mask which the u32 word is to be processed.
-+ */
-+static inline void lrng_pcpu_split_u32(u32 *ptr, u32 *pre_ptr, u32 *mask)
-+{
-+	/* ptr to previous unit */
-+	*pre_ptr = (*ptr - LRNG_DATA_SLOTS_PER_UINT) & LRNG_DATA_WORD_MASK;
-+	*ptr &= LRNG_DATA_WORD_MASK;
-+
-+	/* mask to split data into the two parts for the two units */
-+	*mask = ((1 << (*pre_ptr & (LRNG_DATA_SLOTS_PER_UINT - 1)) *
-+			LRNG_DATA_SLOTSIZE_BITS)) - 1;
-+}
++late_initcall(lrng_drbg_init);
++module_exit(lrng_drbg_exit);
++MODULE_LICENSE("Dual BSD/GPL");
++MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
++MODULE_DESCRIPTION("Linux Random Number Generator - SP800-90A DRBG backend");
 -- 
 2.31.1
 
