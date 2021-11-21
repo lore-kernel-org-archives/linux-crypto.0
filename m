@@ -2,183 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2007C43217
-	for <linux-crypto@archiver.kernel.org>; Sat, 20 Nov 2021 04:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34EB2C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Nov 2021 14:14:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234128AbhKTEw4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Nov 2021 23:52:56 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:26341 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231994AbhKTEwz (ORCPT
+        id S237083AbhKUORc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 21 Nov 2021 09:17:32 -0500
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.21]:31253 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236405AbhKUORb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Nov 2021 23:52:55 -0500
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Hx1D52clkzbhvt;
-        Sat, 20 Nov 2021 12:44:53 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.15; Sat, 20 Nov 2021 12:49:50 +0800
-Received: from huawei.com (10.69.192.56) by dggpeml100012.china.huawei.com
- (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.15; Sat, 20 Nov
- 2021 12:49:50 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH 4/4] crypto: hisilicon/qm - simplified the calculation of qos shaper parameters
-Date:   Sat, 20 Nov 2021 12:47:39 +0800
-Message-ID: <20211120044739.5667-5-yekai13@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211120044739.5667-1-yekai13@huawei.com>
-References: <20211120044739.5667-1-yekai13@huawei.com>
+        Sun, 21 Nov 2021 09:17:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1637504062;
+    s=strato-dkim-0002; d=chronox.de;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=15sWvFb3q2s6oiV3qHU6PvIicdlkGPTCIfTp/IQwKTM=;
+    b=lQjFvST2+/6GdA4YG/pxBwoYK/L+mcgXLzs1kyX8Q+EbjTxyCFg1izBQPUUECYsJ+z
+    YvDPoqhO4EFucLhuD/kkPunEA0XCXi/hYO/G8OlmSbyN4+64WEldGy9wV5FiGl1BwfNp
+    WMqX+QHeeyA9Ct4UpSJbnwerAZzlt8phKQ5L+8AA946MYA+rRJH6pnwzIY95SQkyrFlW
+    JLNPLdJ9w65xAuY9q+5o2Hq8+mKhweUlI9ccP7auudsTZ76/v/x0TEKR+PcKdthH/g5D
+    QUDVHRkXowANnkLxoio/JtezVDaCtYJJ3ejtxMnU4zYf9RUX8fyGhpxWNIFfV72PeM7i
+    oigA==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbJvSfE+K2"
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 47.34.5 DYNA|AUTH)
+    with ESMTPSA id U02dfbxALEEK3FD
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Sun, 21 Nov 2021 15:14:20 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: Jitter RNG - consider 32 LSB for APT
+Date:   Sun, 21 Nov 2021 15:14:20 +0100
+Message-ID: <2572116.vuYhMxLoTh@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some optimize for the calculation of qos shaper parameters.
-and modify the comments.
+The APT compares the current time stamp with a pre-set value. The
+current code only considered the 4 LSB only. Yet, after reviews by
+mathematicians of the user space Jitter RNG version >= 3.1.0, it was
+concluded that the APT can be calculated on the 32 LSB of the time
+delta. Thi change is applied to the kernel.
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
+This fixes a bug where an AMD EPYC fails this test as its RDTSC value
+contains zeros in the LSB. The most appropriate fix would have been to
+apply a GCD calculation and divide the time stamp by the GCD. Yet, this
+is a significant code change that will be considered for a future
+update. Note, tests showed that constantly the GCD always was 32 on
+these systems, i.e. the 5 LSB were always zero (thus failing the APT
+since it only considered the 4 LSB for its calculation).
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/crypto/hisilicon/qm.c | 84 +++++++++++++++++++++++------------
- 1 file changed, 55 insertions(+), 29 deletions(-)
+ crypto/jitterentropy.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 88e638491e8f..81a94e05948e 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -501,10 +501,30 @@ static const char * const qp_s[] = {
- 	"none", "init", "start", "stop", "close",
- };
- 
--static const u32 typical_qos_val[QM_QOS_TYPICAL_NUM] = {100, 250, 500, 1000,
--						10000, 25000, 50000, 100000};
--static const u32 typical_qos_cbs_s[QM_QOS_TYPICAL_NUM] = {9, 10, 11, 12, 16,
--							 17, 18, 19};
-+struct qm_typical_qos_table {
-+	u32 start;
-+	u32 end;
-+	u32 val;
-+};
-+
-+/* the qos step is 100 */
-+static struct qm_typical_qos_table shaper_cir_s[] = {
-+	{100, 100, 4},
-+	{200, 200, 3},
-+	{300, 500, 2},
-+	{600, 1000, 1},
-+	{1100, 100000, 0},
-+};
-+
-+static struct qm_typical_qos_table shaper_cbs_s[] = {
-+	{100, 200, 9},
-+	{300, 500, 11},
-+	{600, 1000, 12},
-+	{1100, 10000, 16},
-+	{10100, 25000, 17},
-+	{25100, 50000, 18},
-+	{50100, 100000, 19}
-+};
- 
- static bool qm_avail_state(struct hisi_qm *qm, enum qm_state new)
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index a11b3208760f..f6d3a84e3c21 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -265,7 +265,6 @@ static int jent_stuck(struct rand_data *ec, __u64 current_delta)
  {
-@@ -988,12 +1008,14 @@ static void qm_init_prefetch(struct hisi_qm *qm)
- }
+ 	__u64 delta2 = jent_delta(ec->last_delta, current_delta);
+ 	__u64 delta3 = jent_delta(ec->last_delta2, delta2);
+-	unsigned int delta_masked = current_delta & JENT_APT_WORD_MASK;
  
- /*
-+ * acc_shaper_para_calc() Get the IR value by the qos formula, the return value
-+ * is the expected qos calculated.
-  * the formula:
-  * IR = X Mbps if ir = 1 means IR = 100 Mbps, if ir = 10000 means = 10Gbps
-  *
-- *		        IR_b * (2 ^ IR_u) * 8
-- * IR(Mbps) * 10 ^ -3 = -------------------------
-- *		        Tick * (2 ^ IR_s)
-+ *		IR_b * (2 ^ IR_u) * 8000
-+ * IR(Mbps) = -------------------------
-+ *		  Tick * (2 ^ IR_s)
-  */
- static u32 acc_shaper_para_calc(u64 cir_b, u64 cir_u, u64 cir_s)
- {
-@@ -1003,17 +1025,28 @@ static u32 acc_shaper_para_calc(u64 cir_b, u64 cir_u, u64 cir_s)
+ 	ec->last_delta = current_delta;
+ 	ec->last_delta2 = delta2;
+@@ -274,7 +273,7 @@ static int jent_stuck(struct rand_data *ec, __u64 current_delta)
+ 	 * Insert the result of the comparison of two back-to-back time
+ 	 * deltas.
+ 	 */
+-	jent_apt_insert(ec, delta_masked);
++	jent_apt_insert(ec, current_delta);
  
- static u32 acc_shaper_calc_cbs_s(u32 ir)
- {
-+	int table_size = ARRAY_SIZE(shaper_cbs_s);
- 	int i;
- 
--	if (ir < typical_qos_val[0])
--		return QM_SHAPER_MIN_CBS_S;
-+	for (i = 0; i < table_size; i++) {
-+		if (ir >= shaper_cbs_s[i].start && ir <= shaper_cbs_s[i].end)
-+			return shaper_cbs_s[i].val;
-+	}
- 
--	for (i = 1; i < QM_QOS_TYPICAL_NUM; i++) {
--		if (ir >= typical_qos_val[i - 1] && ir < typical_qos_val[i])
--			return typical_qos_cbs_s[i - 1];
-+	return QM_SHAPER_MIN_CBS_S;
-+}
-+
-+static u32 acc_shaper_calc_cir_s(u32 ir)
-+{
-+	int table_size = ARRAY_SIZE(shaper_cir_s);
-+	int i;
-+
-+	for (i = 0; i < table_size; i++) {
-+		if (ir >= shaper_cir_s[i].start && ir <= shaper_cir_s[i].end)
-+			return shaper_cir_s[i].val;
- 	}
- 
--	return typical_qos_cbs_s[QM_QOS_TYPICAL_NUM - 1];
-+	return 0;
- }
- 
- static int qm_get_shaper_para(u32 ir, struct qm_shaper_factor *factor)
-@@ -1022,25 +1055,18 @@ static int qm_get_shaper_para(u32 ir, struct qm_shaper_factor *factor)
- 	u32 error_rate;
- 
- 	factor->cbs_s = acc_shaper_calc_cbs_s(ir);
-+	cir_s = acc_shaper_calc_cir_s(ir);
- 
- 	for (cir_b = QM_QOS_MIN_CIR_B; cir_b <= QM_QOS_MAX_CIR_B; cir_b++) {
- 		for (cir_u = 0; cir_u <= QM_QOS_MAX_CIR_U; cir_u++) {
--			for (cir_s = 0; cir_s <= QM_QOS_MAX_CIR_S; cir_s++) {
--				/** the formula is changed to:
--				 *	   IR_b * (2 ^ IR_u) * DIVISOR_CLK
--				 * IR(Mbps) = -------------------------
--				 *	       768 * (2 ^ IR_s)
--				 */
--				ir_calc = acc_shaper_para_calc(cir_b, cir_u,
--							       cir_s);
--				error_rate = QM_QOS_EXPAND_RATE * (u32)abs(ir_calc - ir) / ir;
--				if (error_rate <= QM_QOS_MIN_ERROR_RATE) {
--					factor->cir_b = cir_b;
--					factor->cir_u = cir_u;
--					factor->cir_s = cir_s;
--
--					return 0;
--				}
-+			ir_calc = acc_shaper_para_calc(cir_b, cir_u, cir_s);
-+
-+			error_rate = QM_QOS_EXPAND_RATE * (u32)abs(ir_calc - ir) / ir;
-+			if (error_rate <= QM_QOS_MIN_ERROR_RATE) {
-+				factor->cir_b = cir_b;
-+				factor->cir_u = cir_u;
-+				factor->cir_s = cir_s;
-+				return 0;
- 			}
- 		}
- 	}
+ 	if (!current_delta || !delta2 || !delta3) {
+ 		/* RCT with a stuck bit */
 -- 
-2.33.0
+2.33.1
+
+
+
 
