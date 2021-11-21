@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2122DC433F5
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Nov 2021 16:50:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E751FC433EF
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Nov 2021 16:50:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238478AbhKUQxF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Nov 2021 11:53:05 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.124]:32607 "EHLO
+        id S238367AbhKUQxG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 21 Nov 2021 11:53:06 -0500
+Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.177]:29147 "EHLO
         mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230330AbhKUQwz (ORCPT
+        with ESMTP id S238079AbhKUQwz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sun, 21 Nov 2021 11:52:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1637513314;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1637513318;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=EP8fLYCVMx5sb8QT0QKbrcG/P4b5kiIAtaH7WxxjkrQ=;
-    b=aqz+uq71yUXmQXDRItbXXO4PmS+qyyPGYU2CPAp+Ne9TNkgNj5qxQhz/IVWnoB85Zn
-    IUC/uMAftmh00p53HaHHJ2suyYNxIVkyaNZQrmlA52uUWwO4iQOb/YT1P66j0WGVRpTE
-    MnM+Z9f3Y2J8bX4swx5cgkssuObV4m43rUzWjd4S44m+8jXvlcgQeRoF0FdfK70VzW9J
-    pUB9BxMnxHc80dE7drN4ehpBS8BPTiY4mBXOgtcFcFp+8hSLHE6QWwArGCjAn14oB5rp
-    j4lI6zTwzM+ZLiA6NL3iNhwzOqCJw2rbygkjBASmcGOOzoW+LGmNm9bI3ccx1ZH41NM1
-    jvpQ==
+    bh=YUtaUGvXy4RCwHEdoN+oGR/T7eofnkQwvJGOX+pp5/s=;
+    b=BUovignxOjM0jsdtw2/OZwtcEeVLWrBTSukaBoDwwA4wkpFWM4l9qyus3Cob57YdX+
+    MR9Cq6z04gUUFzpxJ7ma6++vrt//RVXA0AqPUPEsgajUvFL1aKhXGaiCIi1ReuwMQuil
+    3xT6MPkVE5CsypJt2zkRqGXzQNWJTJFqBOno3pUH7cWg1X9Waj6iQIPsi7aX3ayW7fcu
+    aUbxYYO0syGoPKyNUDvr57hIdGlWdM/pvpGOv1aUfyJOixlWhzCaaBWu9DneFW1eb1fC
+    +lQqSPwTbfDcfk9QxWqYxU0GO5eQi0AiJvCgA1tn7cKrB87dCt0yckDygb/VGG+jPZ55
+    i8tA==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbJvSfE+K2"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.34.5 DYNA|AUTH)
-    with ESMTPSA id U02dfbxALGmX3Wg
+    with ESMTPSA id U02dfbxALGmb3Wk
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Sun, 21 Nov 2021 17:48:33 +0100 (CET)
+    Sun, 21 Nov 2021 17:48:37 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
@@ -64,20 +64,21 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>,
         Jirka Hladky <jhladky@redhat.com>
-Subject: [PATCH v43 08/15] crypto: DRBG - externalize DRBG functions for LRNG
-Date:   Sun, 21 Nov 2021 17:43:51 +0100
-Message-ID: <1970910.YKUYFuaPT4@positron.chronox.de>
+Subject: [PATCH v43 05/15] LRNG - CPU entropy source
+Date:   Sun, 21 Nov 2021 17:42:09 +0100
+Message-ID: <6686472.9J7NaK4W3v@positron.chronox.de>
 In-Reply-To: <2036923.9o76ZdvQCi@positron.chronox.de>
 References: <2036923.9o76ZdvQCi@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch allows several DRBG functions to be called by the LRNG kernel
-code paths outside the drbg.c file.
+Certain CPUs provide instructions giving access to an entropy source
+(e.g. RDSEED on Intel/AMD, DARN on POWER, etc.). The LRNG can utilize
+the entropy source to seed its DRNG from.
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -98,131 +99,312 @@ CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
 Reviewed-by: Alexander Lobakin <alobakin@pm.me>
 Tested-by: Alexander Lobakin <alobakin@pm.me>
+Mathematical aspects Reviewed-by: "Peter, Matthias" <matthias.peter@bsi.bund.de>
+Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
-Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
 Tested-by: Jirka Hladky <jhladky@redhat.com>
 Reviewed-by: Jirka Hladky <jhladky@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
-=2D--
- crypto/drbg.c         | 16 ++++++++++------
- include/crypto/drbg.h |  7 +++++++
- 2 files changed, 17 insertions(+), 6 deletions(-)
+---
+ drivers/char/lrng/Kconfig              |  38 +++++
+ drivers/char/lrng/Makefile             |   1 +
+ drivers/char/lrng/lrng_es_archrandom.c | 226 +++++++++++++++++++++++++
+ 3 files changed, 265 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_es_archrandom.c
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index ea85d4a0fe9e..74a9dca67698 100644
-=2D-- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -114,7 +114,7 @@
-  * the SHA256 / AES 256 over other ciphers. Thus, the favored
-  * DRBGs are the latest entries in this array.
-  */
-=2Dstatic const struct drbg_core drbg_cores[] =3D {
-+const struct drbg_core drbg_cores[] =3D {
- #ifdef CONFIG_CRYPTO_DRBG_CTR
- 	{
- 		.flags =3D DRBG_CTR | DRBG_STRENGTH128,
-@@ -191,6 +191,7 @@ static const struct drbg_core drbg_cores[] =3D {
- 	},
- #endif /* CONFIG_CRYPTO_DRBG_HMAC */
- };
-+EXPORT_SYMBOL(drbg_cores);
-=20
- static int drbg_uninstantiate(struct drbg_state *drbg);
-=20
-@@ -206,7 +207,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
-  * Return: normalized strength in *bytes* value or 32 as default
-  *	   to counter programming errors
-  */
-=2Dstatic inline unsigned short drbg_sec_strength(drbg_flag_t flags)
-+unsigned short drbg_sec_strength(drbg_flag_t flags)
- {
- 	switch (flags & DRBG_STRENGTH_MASK) {
- 	case DRBG_STRENGTH128:
-@@ -219,6 +220,7 @@ static inline unsigned short drbg_sec_strength(drbg_fla=
-g_t flags)
- 		return 32;
- 	}
- }
-+EXPORT_SYMBOL(drbg_sec_strength);
-=20
- /*
-  * FIPS 140-2 continuous self test for the noise source
-@@ -1215,7 +1217,7 @@ static int drbg_seed(struct drbg_state *drbg, struct =
-drbg_string *pers,
- }
-=20
- /* Free all substructures in a DRBG state without the DRBG state structure=
- */
-=2Dstatic inline void drbg_dealloc_state(struct drbg_state *drbg)
-+void drbg_dealloc_state(struct drbg_state *drbg)
- {
- 	if (!drbg)
- 		return;
-@@ -1236,12 +1238,13 @@ static inline void drbg_dealloc_state(struct drbg_s=
-tate *drbg)
- 		drbg->fips_primed =3D false;
- 	}
- }
-+EXPORT_SYMBOL(drbg_dealloc_state);
-=20
- /*
-  * Allocate all sub-structures for a DRBG state.
-  * The DRBG state structure must already be allocated.
-  */
-=2Dstatic inline int drbg_alloc_state(struct drbg_state *drbg)
-+int drbg_alloc_state(struct drbg_state *drbg)
- {
- 	int ret =3D -ENOMEM;
- 	unsigned int sb_size =3D 0;
-@@ -1322,6 +1325,7 @@ static inline int drbg_alloc_state(struct drbg_state =
-*drbg)
- 	drbg_dealloc_state(drbg);
- 	return ret;
- }
-+EXPORT_SYMBOL(drbg_alloc_state);
-=20
- /*************************************************************************
-  * DRBG interface functions
-@@ -1891,8 +1895,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
-  *
-  * return: flags
-  */
-=2Dstatic inline void drbg_convert_tfm_core(const char *cra_driver_name,
-=2D					 int *coreref, bool *pr)
-+void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool=
- *pr)
- {
- 	int i =3D 0;
- 	size_t start =3D 0;
-@@ -1919,6 +1922,7 @@ static inline void drbg_convert_tfm_core(const char *=
-cra_driver_name,
- 		}
- 	}
- }
-+EXPORT_SYMBOL(drbg_convert_tfm_core);
-=20
- static int drbg_kcapi_init(struct crypto_tfm *tfm)
- {
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index c4165126937e..71d53e028e6d 100644
-=2D-- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -278,4 +278,11 @@ enum drbg_prefixes {
- 	DRBG_PREFIX3
- };
-=20
-+extern int drbg_alloc_state(struct drbg_state *drbg);
-+extern void drbg_dealloc_state(struct drbg_state *drbg);
-+extern void drbg_convert_tfm_core(const char *cra_driver_name, int *corere=
-f,
-+				  bool *pr);
-+extern const struct drbg_core drbg_cores[];
-+extern unsigned short drbg_sec_strength(drbg_flag_t flags);
+diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
+index a9ae35d9f648..d3abdfa28493 100644
+--- a/drivers/char/lrng/Kconfig
++++ b/drivers/char/lrng/Kconfig
+@@ -215,6 +215,44 @@ config LRNG_IRQ_ENTROPY_RATE
+ 	  interrupt entropy source will still deliver data but without
+ 	  being credited with entropy.
+ 
++comment "CPU Entropy Source"
 +
- #endif /* _DRBG_H */
-=2D-=20
++config LRNG_CPU
++	bool "Enable CPU Entropy Source as LRNG Seed Source"
++	default y
++	help
++	  Current CPUs commonly contain entropy sources which can be
++	  used to seed the LRNG. For example, the Intel RDSEED
++	  instruction, or the POWER DARN instruction will be sourced
++	  to seed the LRNG if this option is enabled.
++
++	  Note, if this option is enabled and the underlying CPU
++	  does not offer such entropy source, the LRNG will automatically
++	  detect this and ignore the hardware.
++
++config LRNG_CPU_FULL_ENT_MULTIPLIER
++	int
++	default 1 if !LRNG_TEST_CPU_ES_COMPRESSION
++	default 123 if LRNG_TEST_CPU_ES_COMPRESSION
++
++config LRNG_CPU_ENTROPY_RATE
++	int "CPU Entropy Source Entropy Rate"
++	depends on LRNG_CPU
++	range 0 256
++	default 8
++	help
++	  The option defines the amount of entropy the LRNG applies to 256
++	  bits of data obtained from the CPU entropy source. The LRNG
++	  enforces the limit that this value must be in the range between
++	  0 and 256.
++
++	  When configuring this value to 0, the CPU entropy source will
++	  provide 256 bits of data without being credited to contain
++	  entropy.
++
++	  Note, this option is overwritten when the option
++	  CONFIG_RANDOM_TRUST_CPU is set.
++
+ endmenu # "Entropy Source Configuration"
+ 
+ endif # LRNG
+diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
+index 1e722e0967e0..1e18e2c1016b 100644
+--- a/drivers/char/lrng/Makefile
++++ b/drivers/char/lrng/Makefile
+@@ -10,3 +10,4 @@ obj-y				+= lrng_es_mgr.o lrng_aux.o \
+ obj-$(CONFIG_LRNG_IRQ)		+= lrng_es_irq.o
+ obj-$(CONFIG_SYSCTL)		+= lrng_proc.o
+ obj-$(CONFIG_NUMA)		+= lrng_numa.o
++obj-$(CONFIG_LRNG_CPU)		+= lrng_es_archrandom.o
+diff --git a/drivers/char/lrng/lrng_es_archrandom.c b/drivers/char/lrng/lrng_es_archrandom.c
+new file mode 100644
+index 000000000000..6965f9b8ae50
+--- /dev/null
++++ b/drivers/char/lrng/lrng_es_archrandom.c
+@@ -0,0 +1,226 @@
++// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
++/*
++ * LRNG Fast Entropy Source: CPU-based entropy source
++ *
++ * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
++ */
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <crypto/hash.h>
++#include <linux/lrng.h>
++#include <linux/random.h>
++
++#include "lrng_internal.h"
++
++/*
++ * Estimated entropy of data is a 32th of LRNG_DRNG_SECURITY_STRENGTH_BITS.
++ * As we have no ability to review the implementation of those noise sources,
++ * it is prudent to have a conservative estimate here.
++ */
++#define LRNG_ARCHRANDOM_DEFAULT_STRENGTH CONFIG_LRNG_CPU_ENTROPY_RATE
++#define LRNG_ARCHRANDOM_TRUST_CPU_STRENGTH LRNG_DRNG_SECURITY_STRENGTH_BITS
++#ifdef CONFIG_RANDOM_TRUST_CPU
++static u32 archrandom = LRNG_ARCHRANDOM_TRUST_CPU_STRENGTH;
++#else
++static u32 archrandom = LRNG_ARCHRANDOM_DEFAULT_STRENGTH;
++#endif
++#ifdef CONFIG_LRNG_RUNTIME_ES_CONFIG
++module_param(archrandom, uint, 0644);
++MODULE_PARM_DESC(archrandom, "Entropy in bits of 256 data bits from CPU noise source (e.g. RDSEED)");
++#endif
++
++static int __init lrng_parse_trust_cpu(char *arg)
++{
++	int ret;
++	bool trust_cpu = false;
++
++	ret = kstrtobool(arg, &trust_cpu);
++	if (ret)
++		return ret;
++
++	if (trust_cpu) {
++		archrandom = LRNG_ARCHRANDOM_TRUST_CPU_STRENGTH;
++		lrng_pool_add_entropy();
++	} else {
++		archrandom = LRNG_ARCHRANDOM_DEFAULT_STRENGTH;
++	}
++
++	return 0;
++}
++early_param("random.trust_cpu", lrng_parse_trust_cpu);
++
++u32 lrng_archrandom_entropylevel(u32 requested_bits)
++{
++	return lrng_fast_noise_entropylevel(archrandom, requested_bits);
++}
++
++static u32 lrng_get_arch_data(u8 *outbuf, u32 requested_bits)
++{
++	u32 i;
++
++	/* operate on full blocks */
++	BUILD_BUG_ON(LRNG_DRNG_SECURITY_STRENGTH_BYTES % sizeof(unsigned long));
++	BUILD_BUG_ON(CONFIG_LRNG_SEED_BUFFER_INIT_ADD_BITS %
++							 sizeof(unsigned long));
++	/* ensure we have aligned buffers */
++	BUILD_BUG_ON(LRNG_KCAPI_ALIGN % sizeof(unsigned long));
++
++	for (i = 0; i < (requested_bits >> 3);
++	     i += sizeof(unsigned long)) {
++		if (!arch_get_random_seed_long((unsigned long *)(outbuf + i)) &&
++		    !arch_get_random_long((unsigned long *)(outbuf + i))) {
++			archrandom = 0;
++			return 0;
++		}
++	}
++
++	return requested_bits;
++}
++
++static u32 inline lrng_get_arch_data_compress(u8 *outbuf, u32 requested_bits,
++					      u32 data_multiplier)
++{
++	SHASH_DESC_ON_STACK(shash, NULL);
++	const struct lrng_crypto_cb *crypto_cb;
++	struct lrng_drng *drng = lrng_drng_init_instance();
++	unsigned long flags;
++	u32 ent_bits = 0, i, partial_bits = 0,
++	    full_bits = requested_bits * data_multiplier;
++	void *hash;
++
++	/* Calculate oversampling for SP800-90C */
++	if (lrng_sp80090c_compliant()) {
++		/* Complete amount of bits to be pulled */
++		full_bits += CONFIG_LRNG_OVERSAMPLE_ES_BITS * data_multiplier;
++		/* Full blocks that will be pulled */
++		data_multiplier = full_bits / requested_bits;
++		/* Partial block in bits to be pulled */
++		partial_bits = full_bits - (data_multiplier * requested_bits);
++	}
++
++	lrng_hash_lock(drng, &flags);
++	crypto_cb = drng->crypto_cb;
++	hash = drng->hash;
++
++	if (crypto_cb->lrng_hash_init(shash, hash))
++		goto out;
++
++	/* Hash all data from the CPU entropy source */
++	for (i = 0; i < data_multiplier; i++) {
++		ent_bits = lrng_get_arch_data(outbuf, requested_bits);
++		if (!ent_bits)
++			goto out;
++
++		if (crypto_cb->lrng_hash_update(shash, outbuf, ent_bits >> 3))
++			goto err;
++	}
++
++	/* Hash partial block, if applicable */
++	ent_bits = lrng_get_arch_data(outbuf, partial_bits);
++	if (ent_bits &&
++	    crypto_cb->lrng_hash_update(shash, outbuf, ent_bits >> 3))
++		goto err;
++
++	pr_debug("pulled %u bits from CPU RNG entropy source\n", full_bits);
++
++	/* Generate the compressed data to be returned to the caller */
++	ent_bits = crypto_cb->lrng_hash_digestsize(hash) << 3;
++	if (requested_bits < ent_bits) {
++		u8 digest[LRNG_MAX_DIGESTSIZE];
++
++		if (crypto_cb->lrng_hash_final(shash, digest))
++			goto err;
++
++		/* Truncate output data to requested size */
++		memcpy(outbuf, digest, requested_bits >> 3);
++		memzero_explicit(digest, crypto_cb->lrng_hash_digestsize(hash));
++		ent_bits = requested_bits;
++	} else {
++		if (crypto_cb->lrng_hash_final(shash, outbuf))
++			goto err;
++	}
++
++out:
++	crypto_cb->lrng_hash_desc_zero(shash);
++	lrng_hash_unlock(drng, flags);
++	return ent_bits;
++
++err:
++	ent_bits = 0;
++	goto out;
++}
++
++/*
++ * If CPU entropy source requires does not return full entropy, return the
++ * multiplier of how much data shall be sampled from it.
++ */
++static u32 lrng_arch_multiplier(void)
++{
++	static u32 data_multiplier = 0;
++
++	if (data_multiplier > 0) {
++		return data_multiplier;
++	} else {
++		unsigned long v;
++
++		if (IS_ENABLED(CONFIG_X86) && !arch_get_random_seed_long(&v)) {
++			/*
++			 * Intel SPEC: pulling 512 blocks from RDRAND ensures
++			 * one reseed making it logically equivalent to RDSEED.
++			 */
++			data_multiplier = 512;
++		} else if (IS_ENABLED(CONFIG_PPC)) {
++			/*
++			 * PowerISA defines DARN to deliver at least 0.5 bits of
++			 * entropy per data bit.
++			 */
++			data_multiplier = 2;
++		} else {
++			/* CPU provides full entropy */
++			data_multiplier = CONFIG_LRNG_CPU_FULL_ENT_MULTIPLIER;
++		}
++	}
++	return data_multiplier;
++}
++
++/*
++ * lrng_get_arch() - Get CPU entropy source entropy
++ *
++ * @outbuf: buffer to store entropy of size requested_bits
++ *
++ * Return:
++ * * > 0 on success where value provides the added entropy in bits
++ * *   0 if no fast source was available
++ */
++u32 lrng_get_arch(u8 *outbuf, u32 requested_bits)
++{
++	u32 ent_bits, data_multiplier = lrng_arch_multiplier();
++
++	if (data_multiplier <= 1) {
++		ent_bits = lrng_get_arch_data(outbuf, requested_bits);
++	} else {
++		ent_bits = lrng_get_arch_data_compress(outbuf, requested_bits,
++						       data_multiplier);
++	}
++
++	ent_bits = lrng_archrandom_entropylevel(ent_bits);
++	pr_debug("obtained %u bits of entropy from CPU RNG entropy source\n",
++		 ent_bits);
++	return ent_bits;
++}
++
++void lrng_arch_es_state(unsigned char *buf, size_t buflen)
++{
++	const struct lrng_drng *lrng_drng_init = lrng_drng_init_instance();
++	u32 data_multiplier = lrng_arch_multiplier();
++
++	/* Assume the lrng_drng_init lock is taken by caller */
++	snprintf(buf, buflen,
++		 "CPU ES properties:\n"
++		 " Hash for compressing data: %s\n"
++		 " Data multiplier: %u\n",
++		 (data_multiplier <= 1) ?
++			"N/A" : lrng_drng_init->crypto_cb->lrng_hash_name(),
++		 data_multiplier);
++}
+-- 
 2.31.1
 
 
