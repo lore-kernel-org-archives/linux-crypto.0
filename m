@@ -2,27 +2,50 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF6E0C433F5
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Nov 2021 17:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E310C433EF
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Nov 2021 22:48:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233693AbhKUR1K (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Nov 2021 12:27:10 -0500
-Received: from smtprelay0216.hostedemail.com ([216.40.44.216]:48698 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S238369AbhKUR1K (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Nov 2021 12:27:10 -0500
-Received: from omf15.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay01.hostedemail.com (Postfix) with ESMTP id BB28A101EEBB2;
-        Sun, 21 Nov 2021 17:24:03 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf15.hostedemail.com (Postfix) with ESMTPA id 5FB772000508;
-        Sun, 21 Nov 2021 17:23:54 +0000 (UTC)
-Message-ID: <3c22f7e433ad86424c3a7b171f7e0710afc644a2.camel@perches.com>
+        id S232227AbhKUWvE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 21 Nov 2021 17:51:04 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60608 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231975AbhKUWvB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 Nov 2021 17:51:01 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 52E2760F51;
+        Sun, 21 Nov 2021 22:47:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="GbMot8tS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1637534855;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=49KbcxfJNV1n2RVKWCTE0quBozAdXkzBFMwyBg1S/h4=;
+        b=GbMot8tS1/NzLBe/1J2Znlh4M24QodTJPJAPlISv7VIWiYUfAeUfueVuDqmtoBCwJSmQrE
+        9fwN8LfrtPtO+IK3E74PJMyfj76HM9NHDb4hpdGrqQtK5F0zGk6rw598gmC0SKBJNjr9yK
+        25OSHk8ley2HzHd9If00dnOBE9cYRHI=
+Received: by mail.zx2c4.com (OpenSMTPD) with ESMTPSA id f956d940 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sun, 21 Nov 2021 22:47:35 +0000 (UTC)
+Received: by mail-yb1-xb2b.google.com with SMTP id v7so45059052ybq.0;
+        Sun, 21 Nov 2021 14:47:35 -0800 (PST)
+X-Gm-Message-State: AOAM5313tSlXau9NcXM9p8iVzLgh6nW0mL0//sW1IERbbYyWa9/pzagB
+        KotG0Ph+ahe0KBwNwXPRjECpwcRy7OGRm1YkXJ4=
+X-Google-Smtp-Source: ABdhPJyEkNWUKO62KpzDGR/PTn5oAIPQpcQVOMJVxDDxppJOrJiVeFLFrRWTvw9jqnE9AatgYl9O47/Gy0oH4Ho7KkI=
+X-Received: by 2002:a25:ba0f:: with SMTP id t15mr62225836ybg.62.1637534554276;
+ Sun, 21 Nov 2021 14:42:34 -0800 (PST)
+MIME-Version: 1.0
+Received: by 2002:a05:7110:a243:b0:111:6be9:cf8a with HTTP; Sun, 21 Nov 2021
+ 14:42:33 -0800 (PST)
+In-Reply-To: <4641592.OV4Wx5bFTl@positron.chronox.de>
+References: <2036923.9o76ZdvQCi@positron.chronox.de> <4641592.OV4Wx5bFTl@positron.chronox.de>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Sun, 21 Nov 2021 23:42:33 +0100
+X-Gmail-Original-Message-ID: <CAHmME9oaS4TOpk7rQ73BRKeVLjMUNyt6EFyeOX=hZSkFBPDu0g@mail.gmail.com>
+Message-ID: <CAHmME9oaS4TOpk7rQ73BRKeVLjMUNyt6EFyeOX=hZSkFBPDu0g@mail.gmail.com>
 Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-From:   Joe Perches <joe@perches.com>
-To:     Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>,
-        Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
-Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+To:     =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+Cc:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org,
+        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         LKML <linux-kernel@vger.kernel.org>,
         Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -46,62 +69,42 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         Dan Carpenter <dan.carpenter@oracle.com>,
         Andy Lavr <andy.lavr@gmail.com>,
         Eric Biggers <ebiggers@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Petr Tesarik <ptesarik@suse.cz>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>,
         Jirka Hladky <jhladky@redhat.com>
-Date:   Sun, 21 Nov 2021 09:23:53 -0800
-In-Reply-To: <4641592.OV4Wx5bFTl@positron.chronox.de>
-References: <2036923.9o76ZdvQCi@positron.chronox.de>
-         <4641592.OV4Wx5bFTl@positron.chronox.de>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.4-1 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Server: rspamout04
-X-Rspamd-Queue-Id: 5FB772000508
-X-Stat-Signature: p4ietruf66nm8oosn4wyx3daxy3isjdi
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX1+oVSRchNiOt+YglZxBuciD8t3B6J1pJUQ=
-X-HE-Tag: 1637515434-982633
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 2021-11-21 at 17:40 +0100, Stephan Müller wrote:
-> In an effort to provide a flexible implementation for a random number
-> generator that also delivers entropy during early boot time, allows
-> replacement of the deterministic random number generation mechanism,
-> implement the various components in separate code for easier
-> maintenance, and provide compliance to SP800-90[A|B|C], introduce
-> the Linux Random Number Generator (LRNG) framework.
-[]
-> diff --git a/MAINTAINERS b/MAINTAINERS
-[]
-> @@ -10817,6 +10817,13 @@ F:	Documentation/litmus-tests/
->  F:	Documentation/memory-barriers.txt
->  F:	tools/memory-model/
->  
-> +LINUX RANDOM NUMBER GENERATOR (LRNG) DRIVER
-> +M:	Stephan Mueller <smueller@chronox.de>
-> +S:	Maintained
-> +W:	https://www.chronox.de/lrng.html
-> +F:	drivers/char/lrng/*
+Hi Stephan,
 
-Are you specifically intending _not_ to maintain any files in
-any possible subdirectories of this directory?
+You've posted it again, and yet I still believe this is not the
+correct design or direction. I do not think the explicit goal of
+extended configurability ("flexibility") or the explicit goal of being
+FIPS compatible represent good directions, and I think this introduces
+new problems rather than solving any existing ones. While there are
+ways the current RNG could or even should be improved -- or rewritten
+-- this approach is still not that, no matter how many times you post
+it. It is almost as though you hope this somehow gets accepted through
+a general apathy that might develop by the 1000th revision, when
+cranks like me and others no longer have the motivation to keep
+responding with the same thing. But here we are again.
 
-If not, this should be
+My own experience pushing something that didn't have substantial
+enough buy-in from existing maintainers (the Zinc crypto library)
+ultimately led me to stop pushing in order to not alienate folks, step
+back, and listen a bit. Eventually somebody reached out to work with
+me (Ard) and we submitted a good compromise collaboration that we all
+generally felt better about. In this case, your cryptographic design
+tastes are sufficiently divergent from mine that I'm not sure how far
+such a thing would go, but it also seems to me that continually
+pushing the same thing over and over isn't winning you any points here
+either. Submission by attrition is not an outcome anybody should want.
 
-F:	drivers/char/lrng/
+Sorry to be so blunt. It's just that my, "I don't like this" is the
+same as it was the last time, and I'm not aware of anything
+significant in that area changing this time.
 
-> +F:	include/linux/lrng.h
-> +
-
-Trivia and additionally: 
-
-Maybe run the patch series through scripts/checkpatch.pl --strict and
-see if you want to change anything.
-
-
+Jason
