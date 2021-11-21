@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E751FC433EF
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Nov 2021 16:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F778C4332F
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Nov 2021 16:50:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238367AbhKUQxG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S238318AbhKUQxG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Sun, 21 Nov 2021 11:53:06 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.177]:29147 "EHLO
+Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.178]:33816 "EHLO
         mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238079AbhKUQwz (ORCPT
+        with ESMTP id S238051AbhKUQwz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sun, 21 Nov 2021 11:52:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1637513318;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1637513317;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=YUtaUGvXy4RCwHEdoN+oGR/T7eofnkQwvJGOX+pp5/s=;
-    b=BUovignxOjM0jsdtw2/OZwtcEeVLWrBTSukaBoDwwA4wkpFWM4l9qyus3Cob57YdX+
-    MR9Cq6z04gUUFzpxJ7ma6++vrt//RVXA0AqPUPEsgajUvFL1aKhXGaiCIi1ReuwMQuil
-    3xT6MPkVE5CsypJt2zkRqGXzQNWJTJFqBOno3pUH7cWg1X9Waj6iQIPsi7aX3ayW7fcu
-    aUbxYYO0syGoPKyNUDvr57hIdGlWdM/pvpGOv1aUfyJOixlWhzCaaBWu9DneFW1eb1fC
-    +lQqSPwTbfDcfk9QxWqYxU0GO5eQi0AiJvCgA1tn7cKrB87dCt0yckDygb/VGG+jPZ55
-    i8tA==
+    bh=R/qN8ZJhYSbGmxPnkIQFfUc6pPA6Du/OhZt/p+rVCWU=;
+    b=iUoKImdUcSES92a/tcAU+0Usp7CPXiBf04emTKu+qLu21h/qNnN3wg9R/QmAPKMx/R
+    X553JWP8DGWvEiG/ja/Ut/cwTIqIAUZZ6Viw+YzIauSRcnM7BAW/yFYrWMFIJnE7SGa1
+    GwPz8s+99hrf324zIjdfDd5rGMTZE/Rm6mITyEO5hOJRVHpc0q7fwl9olvOwfZyZQrpz
+    wd9vUQUycum3xNcNr69WWaIu2iF27wjBPAXJzJ6f55qC0k2IKIj3E5/6IKD68PKRbhaF
+    K8fJx6iMp43VuX5LupysOIKE+hm2Y73fthZqS8gl1T6J9WhqlyYJGeknrzNbcHf3ipDi
+    QVyw==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbJvSfE+K2"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.34.5 DYNA|AUTH)
-    with ESMTPSA id U02dfbxALGmb3Wk
+    with ESMTPSA id U02dfbxALGma3Wj
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Sun, 21 Nov 2021 17:48:37 +0100 (CET)
+    Sun, 21 Nov 2021 17:48:36 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
@@ -64,9 +64,9 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>,
         Jirka Hladky <jhladky@redhat.com>
-Subject: [PATCH v43 05/15] LRNG - CPU entropy source
-Date:   Sun, 21 Nov 2021 17:42:09 +0100
-Message-ID: <6686472.9J7NaK4W3v@positron.chronox.de>
+Subject: [PATCH v43 06/15] LRNG - add switchable DRNG support
+Date:   Sun, 21 Nov 2021 17:42:41 +0100
+Message-ID: <20730758.4csPzL39Zc@positron.chronox.de>
 In-Reply-To: <2036923.9o76ZdvQCi@positron.chronox.de>
 References: <2036923.9o76ZdvQCi@positron.chronox.de>
 MIME-Version: 1.0
@@ -76,9 +76,41 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Certain CPUs provide instructions giving access to an entropy source
-(e.g. RDSEED on Intel/AMD, DARN on POWER, etc.). The LRNG can utilize
-the entropy source to seed its DRNG from.
+The DRNG switch support allows replacing the DRNG mechanism of the
+LRNG. The switching support rests on the interface definition of
+include/linux/lrng.h. A new DRNG is implemented by filling in the
+interface defined in this header file.
+
+In addition to the DRNG, the extension also has to provide a hash
+implementation that is used to hash the entropy pool for random number
+extraction.
+
+Note: It is permissible to implement a DRNG whose operations may sleep.
+However, the hash function must not sleep.
+
+The switchable DRNG support allows replacing the DRNG at runtime.
+However, only one DRNG extension is allowed to be loaded at any given
+time. Before replacing it with another DRNG implementation, the possibly
+existing DRNG extension must be unloaded.
+
+The switchable DRNG extension activates the new DRNG during load time.
+It is expected, however, that such a DRNG switch would be done only once
+by an administrator to load the intended DRNG implementation.
+
+It is permissible to compile DRNG extensions either as kernel modules or
+statically. The initialization of the DRNG extension should be performed
+with a late_initcall to ensure the extension is available when user
+space starts but after all other initialization completed.
+The initialization is performed by registering the function call data
+structure with the lrng_set_drng_cb function. In order to unload the
+DRNG extension, lrng_set_drng_cb must be invoked with the NULL
+parameter.
+
+The DRNG extension should always provide a security strength that is at
+least as strong as LRNG_DRNG_SECURITY_STRENGTH_BITS.
+
+The hash extension must not sleep and must not maintain a separate
+state.
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -99,7 +131,6 @@ CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
 Reviewed-by: Alexander Lobakin <alobakin@pm.me>
 Tested-by: Alexander Lobakin <alobakin@pm.me>
-Mathematical aspects Reviewed-by: "Peter, Matthias" <matthias.peter@bsi.bund.de>
 Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
@@ -108,302 +139,269 @@ Tested-by: Jirka Hladky <jhladky@redhat.com>
 Reviewed-by: Jirka Hladky <jhladky@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/char/lrng/Kconfig              |  38 +++++
- drivers/char/lrng/Makefile             |   1 +
- drivers/char/lrng/lrng_es_archrandom.c | 226 +++++++++++++++++++++++++
- 3 files changed, 265 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_es_archrandom.c
+ drivers/char/lrng/Kconfig       |   7 +
+ drivers/char/lrng/Makefile      |   1 +
+ drivers/char/lrng/lrng_switch.c | 226 ++++++++++++++++++++++++++++++++
+ 3 files changed, 234 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_switch.c
 
 diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index a9ae35d9f648..d3abdfa28493 100644
+index d3abdfa28493..9fea73b72f88 100644
 --- a/drivers/char/lrng/Kconfig
 +++ b/drivers/char/lrng/Kconfig
-@@ -215,6 +215,44 @@ config LRNG_IRQ_ENTROPY_RATE
- 	  interrupt entropy source will still deliver data but without
- 	  being credited with entropy.
+@@ -255,4 +255,11 @@ config LRNG_CPU_ENTROPY_RATE
  
-+comment "CPU Entropy Source"
-+
-+config LRNG_CPU
-+	bool "Enable CPU Entropy Source as LRNG Seed Source"
-+	default y
-+	help
-+	  Current CPUs commonly contain entropy sources which can be
-+	  used to seed the LRNG. For example, the Intel RDSEED
-+	  instruction, or the POWER DARN instruction will be sourced
-+	  to seed the LRNG if this option is enabled.
-+
-+	  Note, if this option is enabled and the underlying CPU
-+	  does not offer such entropy source, the LRNG will automatically
-+	  detect this and ignore the hardware.
-+
-+config LRNG_CPU_FULL_ENT_MULTIPLIER
-+	int
-+	default 1 if !LRNG_TEST_CPU_ES_COMPRESSION
-+	default 123 if LRNG_TEST_CPU_ES_COMPRESSION
-+
-+config LRNG_CPU_ENTROPY_RATE
-+	int "CPU Entropy Source Entropy Rate"
-+	depends on LRNG_CPU
-+	range 0 256
-+	default 8
-+	help
-+	  The option defines the amount of entropy the LRNG applies to 256
-+	  bits of data obtained from the CPU entropy source. The LRNG
-+	  enforces the limit that this value must be in the range between
-+	  0 and 256.
-+
-+	  When configuring this value to 0, the CPU entropy source will
-+	  provide 256 bits of data without being credited to contain
-+	  entropy.
-+
-+	  Note, this option is overwritten when the option
-+	  CONFIG_RANDOM_TRUST_CPU is set.
-+
  endmenu # "Entropy Source Configuration"
  
++menuconfig LRNG_DRNG_SWITCH
++	bool "Support DRNG runtime switching"
++	help
++	  The Linux RNG per default uses a ChaCha20 DRNG that is
++	  accessible via the external interfaces. With this configuration
++	  option other DRNGs can be selected and loaded at runtime.
++
  endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 1e722e0967e0..1e18e2c1016b 100644
+index 1e18e2c1016b..2202aa78b63f 100644
 --- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -10,3 +10,4 @@ obj-y				+= lrng_es_mgr.o lrng_aux.o \
- obj-$(CONFIG_LRNG_IRQ)		+= lrng_es_irq.o
+@@ -11,3 +11,4 @@ obj-$(CONFIG_LRNG_IRQ)		+= lrng_es_irq.o
  obj-$(CONFIG_SYSCTL)		+= lrng_proc.o
  obj-$(CONFIG_NUMA)		+= lrng_numa.o
-+obj-$(CONFIG_LRNG_CPU)		+= lrng_es_archrandom.o
-diff --git a/drivers/char/lrng/lrng_es_archrandom.c b/drivers/char/lrng/lrng_es_archrandom.c
+ obj-$(CONFIG_LRNG_CPU)		+= lrng_es_archrandom.o
++obj-$(CONFIG_LRNG_DRNG_SWITCH)	+= lrng_switch.o
+diff --git a/drivers/char/lrng/lrng_switch.c b/drivers/char/lrng/lrng_switch.c
 new file mode 100644
-index 000000000000..6965f9b8ae50
+index 000000000000..5fce40149911
 --- /dev/null
-+++ b/drivers/char/lrng/lrng_es_archrandom.c
++++ b/drivers/char/lrng/lrng_switch.c
 @@ -0,0 +1,226 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * LRNG Fast Entropy Source: CPU-based entropy source
++ * LRNG DRNG switching support
 + *
 + * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
 + */
 +
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <crypto/hash.h>
 +#include <linux/lrng.h>
-+#include <linux/random.h>
 +
 +#include "lrng_internal.h"
 +
-+/*
-+ * Estimated entropy of data is a 32th of LRNG_DRNG_SECURITY_STRENGTH_BITS.
-+ * As we have no ability to review the implementation of those noise sources,
-+ * it is prudent to have a conservative estimate here.
-+ */
-+#define LRNG_ARCHRANDOM_DEFAULT_STRENGTH CONFIG_LRNG_CPU_ENTROPY_RATE
-+#define LRNG_ARCHRANDOM_TRUST_CPU_STRENGTH LRNG_DRNG_SECURITY_STRENGTH_BITS
-+#ifdef CONFIG_RANDOM_TRUST_CPU
-+static u32 archrandom = LRNG_ARCHRANDOM_TRUST_CPU_STRENGTH;
-+#else
-+static u32 archrandom = LRNG_ARCHRANDOM_DEFAULT_STRENGTH;
-+#endif
-+#ifdef CONFIG_LRNG_RUNTIME_ES_CONFIG
-+module_param(archrandom, uint, 0644);
-+MODULE_PARM_DESC(archrandom, "Entropy in bits of 256 data bits from CPU noise source (e.g. RDSEED)");
-+#endif
-+
-+static int __init lrng_parse_trust_cpu(char *arg)
++static int lrng_drng_switch(struct lrng_drng *drng_store,
++			    const struct lrng_crypto_cb *cb, int node)
 +{
++	const struct lrng_crypto_cb *old_cb;
++	unsigned long flags = 0, flags2 = 0;
 +	int ret;
-+	bool trust_cpu = false;
++	u8 seed[LRNG_DRNG_SECURITY_STRENGTH_BYTES];
++	void *new_drng = cb->lrng_drng_alloc(LRNG_DRNG_SECURITY_STRENGTH_BYTES);
++	void *old_drng, *new_hash, *old_hash;
++	u32 current_security_strength;
++	bool sl = false, reset_drng = !lrng_get_available();
 +
-+	ret = kstrtobool(arg, &trust_cpu);
-+	if (ret)
-+		return ret;
-+
-+	if (trust_cpu) {
-+		archrandom = LRNG_ARCHRANDOM_TRUST_CPU_STRENGTH;
-+		lrng_pool_add_entropy();
-+	} else {
-+		archrandom = LRNG_ARCHRANDOM_DEFAULT_STRENGTH;
++	if (IS_ERR(new_drng)) {
++		pr_warn("could not allocate new DRNG for NUMA node %d (%ld)\n",
++			node, PTR_ERR(new_drng));
++		return PTR_ERR(new_drng);
 +	}
++
++	new_hash = cb->lrng_hash_alloc();
++	if (IS_ERR(new_hash)) {
++		pr_warn("could not allocate new LRNG pool hash (%ld)\n",
++			PTR_ERR(new_hash));
++		cb->lrng_drng_dealloc(new_drng);
++		return PTR_ERR(new_hash);
++	}
++
++	if (cb->lrng_hash_digestsize(new_hash) > LRNG_MAX_DIGESTSIZE) {
++		pr_warn("digest size of newly requested hash too large\n");
++		cb->lrng_hash_dealloc(new_hash);
++		cb->lrng_drng_dealloc(new_drng);
++		return -EINVAL;
++	}
++
++	current_security_strength = lrng_security_strength();
++	lrng_drng_lock(drng_store, &flags);
++
++	/*
++	 * Pull from existing DRNG to seed new DRNG regardless of seed status
++	 * of old DRNG -- the entropy state for the DRNG is left unchanged which
++	 * implies that als the new DRNG is reseeded when deemed necessary. This
++	 * seeding of the new DRNG shall only ensure that the new DRNG has the
++	 * same entropy as the old DRNG.
++	 */
++	ret = drng_store->crypto_cb->lrng_drng_generate_helper(
++				drng_store->drng, seed, sizeof(seed));
++	lrng_drng_unlock(drng_store, &flags);
++
++	if (ret < 0) {
++		reset_drng = true;
++		pr_warn("getting random data from DRNG failed for NUMA node %d (%d)\n",
++			node, ret);
++	} else {
++		/* seed new DRNG with data */
++		ret = cb->lrng_drng_seed_helper(new_drng, seed, ret);
++		memzero_explicit(seed, sizeof(seed));
++		if (ret < 0) {
++			reset_drng = true;
++			pr_warn("seeding of new DRNG failed for NUMA node %d (%d)\n",
++				node, ret);
++		} else {
++			pr_debug("seeded new DRNG of NUMA node %d instance from old DRNG instance\n",
++				 node);
++		}
++	}
++
++	mutex_lock(&drng_store->lock);
++	write_lock_irqsave(&drng_store->hash_lock, flags2);
++	/*
++	 * If we switch the DRNG from the initial ChaCha20 DRNG to something
++	 * else, there is a lock transition from spin lock to mutex (see
++	 * lrng_drng_is_atomic and how the lock is taken in lrng_drng_lock).
++	 * Thus, we need to take both locks during the transition phase.
++	 */
++	if (lrng_drng_is_atomic(drng_store)) {
++		spin_lock_irqsave(&drng_store->spin_lock, flags);
++		sl = true;
++	} else {
++		__acquire(&drng_store->spin_lock);
++	}
++
++	/* Trigger the switch of the aux entropy pool for current node. */
++	if (drng_store == lrng_drng_init_instance()) {
++		ret = lrng_aux_switch_hash(cb, new_hash, drng_store->crypto_cb);
++		if (ret)
++			goto err;
++	}
++
++	/* Trigger the switch of the per-CPU entropy pools for current node. */
++	ret = lrng_pcpu_switch_hash(node, cb, new_hash, drng_store->crypto_cb);
++	if (ret) {
++		/* Switch the crypto operation back to be consistent */
++		WARN_ON(lrng_aux_switch_hash(drng_store->crypto_cb,
++					     drng_store->hash, cb));
++	} else {
++		if (reset_drng)
++			lrng_drng_reset(drng_store);
++
++		old_drng = drng_store->drng;
++		old_cb = drng_store->crypto_cb;
++		drng_store->drng = new_drng;
++		drng_store->crypto_cb = cb;
++
++		old_hash = drng_store->hash;
++		drng_store->hash = new_hash;
++		pr_info("Entropy pool read-hash allocated for DRNG for NUMA node %d\n",
++			node);
++
++		/* Reseed if previous LRNG security strength was insufficient */
++		if (current_security_strength < lrng_security_strength())
++			drng_store->force_reseed = true;
++
++		/* Force oversampling seeding as we initialize DRNG */
++		if (IS_ENABLED(CONFIG_LRNG_OVERSAMPLE_ENTROPY_SOURCES))
++			lrng_unset_fully_seeded(drng_store);
++
++		if (lrng_state_min_seeded())
++			lrng_set_entropy_thresh(lrng_get_seed_entropy_osr(
++						drng_store->fully_seeded));
++
++		/* ChaCha20 serves as atomic instance left untouched. */
++		if (old_drng != &chacha20) {
++			old_cb->lrng_drng_dealloc(old_drng);
++			old_cb->lrng_hash_dealloc(old_hash);
++		}
++
++		pr_info("DRNG of NUMA node %d switched\n", node);
++	}
++
++err:
++	if (sl)
++		spin_unlock_irqrestore(&drng_store->spin_lock, flags);
++	else
++		__release(&drng_store->spin_lock);
++	write_unlock_irqrestore(&drng_store->hash_lock, flags2);
++	mutex_unlock(&drng_store->lock);
++
++	return ret;
++}
++
++/*
++ * Switch the existing DRNG instances with new using the new crypto callbacks.
++ * The caller must hold the lrng_crypto_cb_update lock.
++ */
++static int lrng_drngs_switch(const struct lrng_crypto_cb *cb)
++{
++	struct lrng_drng **lrng_drng = lrng_drng_instances();
++	struct lrng_drng *lrng_drng_init = lrng_drng_init_instance();
++	int ret = 0;
++
++	/* Update DRNG */
++	if (lrng_drng) {
++		u32 node;
++
++		for_each_online_node(node) {
++			if (lrng_drng[node])
++				ret = lrng_drng_switch(lrng_drng[node], cb,
++						       node);
++		}
++	} else {
++		ret = lrng_drng_switch(lrng_drng_init, cb, 0);
++	}
++
++	if (!ret)
++		lrng_set_available();
 +
 +	return 0;
 +}
-+early_param("random.trust_cpu", lrng_parse_trust_cpu);
-+
-+u32 lrng_archrandom_entropylevel(u32 requested_bits)
-+{
-+	return lrng_fast_noise_entropylevel(archrandom, requested_bits);
-+}
-+
-+static u32 lrng_get_arch_data(u8 *outbuf, u32 requested_bits)
-+{
-+	u32 i;
-+
-+	/* operate on full blocks */
-+	BUILD_BUG_ON(LRNG_DRNG_SECURITY_STRENGTH_BYTES % sizeof(unsigned long));
-+	BUILD_BUG_ON(CONFIG_LRNG_SEED_BUFFER_INIT_ADD_BITS %
-+							 sizeof(unsigned long));
-+	/* ensure we have aligned buffers */
-+	BUILD_BUG_ON(LRNG_KCAPI_ALIGN % sizeof(unsigned long));
-+
-+	for (i = 0; i < (requested_bits >> 3);
-+	     i += sizeof(unsigned long)) {
-+		if (!arch_get_random_seed_long((unsigned long *)(outbuf + i)) &&
-+		    !arch_get_random_long((unsigned long *)(outbuf + i))) {
-+			archrandom = 0;
-+			return 0;
-+		}
-+	}
-+
-+	return requested_bits;
-+}
-+
-+static u32 inline lrng_get_arch_data_compress(u8 *outbuf, u32 requested_bits,
-+					      u32 data_multiplier)
-+{
-+	SHASH_DESC_ON_STACK(shash, NULL);
-+	const struct lrng_crypto_cb *crypto_cb;
-+	struct lrng_drng *drng = lrng_drng_init_instance();
-+	unsigned long flags;
-+	u32 ent_bits = 0, i, partial_bits = 0,
-+	    full_bits = requested_bits * data_multiplier;
-+	void *hash;
-+
-+	/* Calculate oversampling for SP800-90C */
-+	if (lrng_sp80090c_compliant()) {
-+		/* Complete amount of bits to be pulled */
-+		full_bits += CONFIG_LRNG_OVERSAMPLE_ES_BITS * data_multiplier;
-+		/* Full blocks that will be pulled */
-+		data_multiplier = full_bits / requested_bits;
-+		/* Partial block in bits to be pulled */
-+		partial_bits = full_bits - (data_multiplier * requested_bits);
-+	}
-+
-+	lrng_hash_lock(drng, &flags);
-+	crypto_cb = drng->crypto_cb;
-+	hash = drng->hash;
-+
-+	if (crypto_cb->lrng_hash_init(shash, hash))
-+		goto out;
-+
-+	/* Hash all data from the CPU entropy source */
-+	for (i = 0; i < data_multiplier; i++) {
-+		ent_bits = lrng_get_arch_data(outbuf, requested_bits);
-+		if (!ent_bits)
-+			goto out;
-+
-+		if (crypto_cb->lrng_hash_update(shash, outbuf, ent_bits >> 3))
-+			goto err;
-+	}
-+
-+	/* Hash partial block, if applicable */
-+	ent_bits = lrng_get_arch_data(outbuf, partial_bits);
-+	if (ent_bits &&
-+	    crypto_cb->lrng_hash_update(shash, outbuf, ent_bits >> 3))
-+		goto err;
-+
-+	pr_debug("pulled %u bits from CPU RNG entropy source\n", full_bits);
-+
-+	/* Generate the compressed data to be returned to the caller */
-+	ent_bits = crypto_cb->lrng_hash_digestsize(hash) << 3;
-+	if (requested_bits < ent_bits) {
-+		u8 digest[LRNG_MAX_DIGESTSIZE];
-+
-+		if (crypto_cb->lrng_hash_final(shash, digest))
-+			goto err;
-+
-+		/* Truncate output data to requested size */
-+		memcpy(outbuf, digest, requested_bits >> 3);
-+		memzero_explicit(digest, crypto_cb->lrng_hash_digestsize(hash));
-+		ent_bits = requested_bits;
-+	} else {
-+		if (crypto_cb->lrng_hash_final(shash, outbuf))
-+			goto err;
-+	}
-+
-+out:
-+	crypto_cb->lrng_hash_desc_zero(shash);
-+	lrng_hash_unlock(drng, flags);
-+	return ent_bits;
-+
-+err:
-+	ent_bits = 0;
-+	goto out;
-+}
 +
 +/*
-+ * If CPU entropy source requires does not return full entropy, return the
-+ * multiplier of how much data shall be sampled from it.
-+ */
-+static u32 lrng_arch_multiplier(void)
-+{
-+	static u32 data_multiplier = 0;
-+
-+	if (data_multiplier > 0) {
-+		return data_multiplier;
-+	} else {
-+		unsigned long v;
-+
-+		if (IS_ENABLED(CONFIG_X86) && !arch_get_random_seed_long(&v)) {
-+			/*
-+			 * Intel SPEC: pulling 512 blocks from RDRAND ensures
-+			 * one reseed making it logically equivalent to RDSEED.
-+			 */
-+			data_multiplier = 512;
-+		} else if (IS_ENABLED(CONFIG_PPC)) {
-+			/*
-+			 * PowerISA defines DARN to deliver at least 0.5 bits of
-+			 * entropy per data bit.
-+			 */
-+			data_multiplier = 2;
-+		} else {
-+			/* CPU provides full entropy */
-+			data_multiplier = CONFIG_LRNG_CPU_FULL_ENT_MULTIPLIER;
-+		}
-+	}
-+	return data_multiplier;
-+}
-+
-+/*
-+ * lrng_get_arch() - Get CPU entropy source entropy
++ * lrng_set_drng_cb - Register new cryptographic callback functions for DRNG
++ * The registering implies that all old DRNG states are replaced with new
++ * DRNG states.
 + *
-+ * @outbuf: buffer to store entropy of size requested_bits
++ * @cb: Callback functions to be registered -- if NULL, use the default
++ *	callbacks pointing to the ChaCha20 DRNG.
 + *
 + * Return:
-+ * * > 0 on success where value provides the added entropy in bits
-+ * *   0 if no fast source was available
++ * * 0 on success
++ * * < 0 on error
 + */
-+u32 lrng_get_arch(u8 *outbuf, u32 requested_bits)
++int lrng_set_drng_cb(const struct lrng_crypto_cb *cb)
 +{
-+	u32 ent_bits, data_multiplier = lrng_arch_multiplier();
++	struct lrng_drng *lrng_drng_init = lrng_drng_init_instance();
++	int ret;
 +
-+	if (data_multiplier <= 1) {
-+		ent_bits = lrng_get_arch_data(outbuf, requested_bits);
-+	} else {
-+		ent_bits = lrng_get_arch_data_compress(outbuf, requested_bits,
-+						       data_multiplier);
++	if (!cb)
++		cb = &lrng_cc20_crypto_cb;
++
++	mutex_lock(&lrng_crypto_cb_update);
++
++	/*
++	 * If a callback other than the default is set, allow it only to be
++	 * set back to the default callback. This ensures that multiple
++	 * different callbacks can be registered at the same time. If a
++	 * callback different from the current callback and the default
++	 * callback shall be set, the current callback must be deregistered
++	 * (e.g. the kernel module providing it must be unloaded) and the new
++	 * implementation can be registered.
++	 */
++	if ((cb != &lrng_cc20_crypto_cb) &&
++	    (lrng_drng_init->crypto_cb != &lrng_cc20_crypto_cb)) {
++		pr_warn("disallow setting new cipher callbacks, unload the old callbacks first!\n");
++		ret = -EINVAL;
++		goto out;
 +	}
 +
-+	ent_bits = lrng_archrandom_entropylevel(ent_bits);
-+	pr_debug("obtained %u bits of entropy from CPU RNG entropy source\n",
-+		 ent_bits);
-+	return ent_bits;
-+}
++	ret = lrng_drngs_switch(cb);
 +
-+void lrng_arch_es_state(unsigned char *buf, size_t buflen)
-+{
-+	const struct lrng_drng *lrng_drng_init = lrng_drng_init_instance();
-+	u32 data_multiplier = lrng_arch_multiplier();
-+
-+	/* Assume the lrng_drng_init lock is taken by caller */
-+	snprintf(buf, buflen,
-+		 "CPU ES properties:\n"
-+		 " Hash for compressing data: %s\n"
-+		 " Data multiplier: %u\n",
-+		 (data_multiplier <= 1) ?
-+			"N/A" : lrng_drng_init->crypto_cb->lrng_hash_name(),
-+		 data_multiplier);
++out:
++	mutex_unlock(&lrng_crypto_cb_update);
++	return ret;
 +}
++EXPORT_SYMBOL(lrng_set_drng_cb);
 -- 
 2.31.1
 
