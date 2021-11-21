@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F27BC433F5
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Nov 2021 16:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2852AC433EF
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Nov 2021 16:50:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238587AbhKUQxW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Nov 2021 11:53:22 -0500
-Received: from mo4-p02-ob.smtp.rzone.de ([81.169.146.169]:12435 "EHLO
-        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238335AbhKUQxA (ORCPT
+        id S238595AbhKUQxX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 21 Nov 2021 11:53:23 -0500
+Received: from mo4-p03-ob.smtp.rzone.de ([85.215.255.102]:22571 "EHLO
+        mo4-p03-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238323AbhKUQxA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sun, 21 Nov 2021 11:53:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1637513305;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1637513307;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=zjbd0tP5oE3K18k5XhXFfznov394RduCD+HvvvL6SVw=;
-    b=Sr0tpIssRKEWHh6Q8HfZtMMOZr1D4Jozyc4J0BtpsXDJAc0JOTCxrkA3jmYGRqBhLw
-    9SIIpFBCxg8b8yGXKAKqeoiYmhlHRqYaoQyb8yC2A0neTLtiCjJJRKLipez1JF87hS/n
-    KRsWX/e4f9eTVnw5Mg2V4iA/7zvps3+sy9aeQcbHaQ8cHxjT+bcA4YbMe62zZEKdcTVS
-    EhDGLYrIXNAMoO+7I/61hk07zLDnjOXEpsoFJVCWx6E3xGr+E1OYuYUPpipamYSOSXQP
-    gt33xiEavRCa0p+3XUrbr/wxNy1X/HDyKfPWGeYFbJQEHxf5F4VqpLcxFVbpaiA2x9eh
-    e5JA==
+    bh=6Dik6M2gP+b/2yU5fvGY1Xcm1PBdB6MvJXqCoZuYdEU=;
+    b=MOrN7GxaECPtqsrSrbThf997f2yZUDzMr97aPNQcFKPV+n0TNpEv71nT2AZLIwDwM+
+    AtzYUhMaFYGRt0hSuJ3Tv7TpMoWECm6mW3BjbLS4Dm2R1riX2ugiOAhs3LTRAuzwqqE/
+    b8jSSuedjQikFYr6n+8WLNKgkuAmTqEs2cWElpEEIe+MVSeg65477XBL0fH7Ru2BqOKa
+    wSe6UT6iZ3nI5wjD/hxrNXJN5plHKiq8AV0JgHGU/bJMAcQtm8cm+ebxE9xHU5mKNAbJ
+    bfOHHM5XP+YDr2EhoGtDlgGM59A9HQhRnVZx1fomSYaT69RP1jlDnLP/6KH+o5qcIuA0
+    6uHg==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbJvSfE+K2"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.34.5 DYNA|AUTH)
-    with ESMTPSA id U02dfbxALGmO3Wa
+    with ESMTPSA id U02dfbxALGmP3Wb
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Sun, 21 Nov 2021 17:48:24 +0100 (CET)
+    Sun, 21 Nov 2021 17:48:25 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
@@ -64,71 +64,118 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>,
         Jirka Hladky <jhladky@redhat.com>
-Subject: [PATCH v43 14/15] LRNG - add interface for gathering of raw entropy
-Date:   Sun, 21 Nov 2021 17:47:26 +0100
-Message-ID: <2631178.QOukoFCf94@positron.chronox.de>
+Subject: [PATCH v43 13/15] LRNG - add SP800-90B compliant health tests
+Date:   Sun, 21 Nov 2021 17:46:57 +0100
+Message-ID: <3324273.sQuhbGJ8Bu@positron.chronox.de>
 In-Reply-To: <2036923.9o76ZdvQCi@positron.chronox.de>
 References: <2036923.9o76ZdvQCi@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The test interface allows a privileged process to capture the raw
-unconditioned noise that is collected by the LRNG for statistical
-analysis. Such testing allows the analysis how much entropy
-the interrupt noise source provides on a given platform.
-Extracted noise data is not used to seed the LRNG. This
-is a test interface and not appropriate for production systems.
-Yet, the interface is considered to be sufficiently secured for
-production systems.
+Implement health tests for LRNG's slow noise sources as mandated by
+SP-800-90B The file contains the following health tests:
 
-Access to the data is given through the lrng_raw debugfs file. The
-data buffer should be multiples of sizeof(u32) to fill the entire
-buffer. Using the option lrng_testing.boot_test=1 the raw noise of
-the first 1000 entropy events since boot can be sampled.
+=2D stuck test: The stuck test calculates the first, second and third
+  discrete derivative of the time stamp to be processed by the hash
+  for the per-CPU entropy pool. Only if all three values are non-zero,
+  the received time delta is considered to be non-stuck.
 
-This test interface allows generating the data required for
-analysis whether the LRNG is in compliance with SP800-90B
-sections 3.1.3 and 3.1.4.
+=2D SP800-90B Repetition Count Test (RCT): The LRNG uses an enhanced
+  version of the RCT specified in SP800-90B section 4.4.1. Instead of
+  counting identical back-to-back values, the input to the RCT is the
+  counting of the stuck values during the processing of received
+  interrupt events. The RCT is applied with alpha=3D2^-30 compliant to
+  the recommendation of FIPS 140-2 IG 9.8. During the counting operation,
+  the LRNG always calculates the RCT cut-off value of C. If that value
+  exceeds the allowed cut-off value, the LRNG will trigger the health
+  test failure discussed below. An error is logged to the kernel log
+  that such RCT failure occurred. This test is only applied and
+  enforced in FIPS mode, i.e. when the kernel compiled with
+  CONFIG_CONFIG_FIPS is started with fips=3D1.
 
-In addition, the test interface allows gathering of the concatenated raw
-entropy data to verify that the concatenation works appropriately.
-This includes sampling of the following raw data:
+=2D SP800-90B Adaptive Proportion Test (APT): The LRNG implements the
+  APT as defined in SP800-90B section 4.4.2. The applied significance
+  level again is alpha=3D2^-30 compliant to the recommendation of FIPS
+  140-2 IG 9.8.
 
-* high-resolution time stamp
+The aforementioned health tests are applied to the first 1,024 time stamps
+obtained from interrupt events. In case one error is identified for either
+the RCT, or the APT, the collected entropy is invalidated and the
+SP800-90B startup health test is restarted.
 
-* Jiffies
+As long as the SP800-90B startup health test is not completed, all LRNG
+random number output interfaces that may block will block and not generate
+any data. This implies that only those potentially blocking interfaces are
+defined to provide random numbers that are seeded with the interrupt noise
+source being SP800-90B compliant. All other output interfaces will not be
+affected by the SP800-90B startup test and thus are not considered
+SP800-90B compliant.
 
-* IRQ number
+At runtime, the SP800-90B APT and RCT are applied to each time stamp
+generated for a received interrupt. When either the APT and RCT indicates
+a noise source failure, the LRNG is reset to a state it has immediately
+after boot:
 
-* IRQ flags
+=2D all entropy counters are set to zero
 
-* return instruction pointer
+=2D the SP800-90B startup tests are re-performed which implies that
+getrandom(2) would block again until new entropy was collected
 
-* interrupt register state
+To summarize, the following rules apply:
 
-* array logic batching the high-resolution time stamp
+=E2=80=A2 SP800-90B compliant output interfaces
 
-* enabling the runtime configuration of entropy source entropy rates
+  - /dev/random
 
-Also, a testing interface to support ACVT of the hash implementation
-is provided. The reason why only hash testing is supported (as
-opposed to also provide testing for the DRNG) is the fact that the
-LRNG software hash implementation contains glue code that may
-warrant testing in addition to the testing of the software ciphers
-via the kernel crypto API. Also, for testing the CTR-DRBG, the
-underlying AES implementation would need to be tested. However,
-such AES test interface cannot be provided by the LRNG as it has no
-means to access the AES operation.
+  - getrandom(2) system call
 
-Finally, the execution duration for processing a time stamp can be
-obtained with the LRNG raw entropy interface.
+  -  get_random_bytes kernel-internal interface when being triggered by
+     the callback registered with add_random_ready_callback
 
-If a test interface is not compiled, its code is a noop which has no
-impact on the performance.
+=E2=80=A2 SP800-90B non-compliant output interfaces
+
+  - /dev/urandom
+
+  - get_random_bytes kernel-internal interface called directly
+
+  - randomize_page kernel-internal interface
+
+  - get_random_u32 and get_random_u64 kernel-internal interfaces
+
+  - get_random_u32_wait, get_random_u64_wait, get_random_int_wait, and
+    get_random_long_wait kernel-internal interfaces
+
+If either the RCT, or the APT health test fails irrespective whether
+during initialization or runtime, the following actions occur:
+
+  1. The entropy of the entire entropy pool is invalidated.
+
+  2. All DRNGs are reset which imply that they are treated as being
+     not seeded and require a reseed during next invocation.
+
+  3. The SP800-90B startup health test are initiated with all
+     implications of the startup tests. That implies that from that point
+     on, new events must be observed and its entropy must be inserted into
+     the entropy pool before random numbers are calculated from the
+     entropy pool.
+
+=46urther details on the SP800-90B compliance and the availability of all
+test tools required to perform all tests mandated by SP800-90B are
+provided at [1].
+
+The entire health testing code is compile-time configurable.
+
+The patch provides a CONFIG_BROKEN configuration of the APT / RCT cutoff
+values which have a high likelihood to trigger the health test failure.
+The BROKEN APT cutoff is set to the exact mean of the expected value if
+the time stamps are equally distributed (512 time stamps divided by 16
+possible values due to using the 4 LSB of the time stamp). The BROKEN
+RCT cutoff value is set to 1 which is likely to be triggered during
+regular operation.
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -155,907 +202,529 @@ Tested-by: Neil Horman <nhorman@redhat.com>
 Tested-by: Jirka Hladky <jhladky@redhat.com>
 Reviewed-by: Jirka Hladky <jhladky@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- drivers/char/lrng/Kconfig        | 180 ++++++++
- drivers/char/lrng/Makefile       |   1 +
- drivers/char/lrng/lrng_testing.c | 689 +++++++++++++++++++++++++++++++
- 3 files changed, 870 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_testing.c
+=2D--
+ drivers/char/lrng/Kconfig       |  58 +++++
+ drivers/char/lrng/Makefile      |   1 +
+ drivers/char/lrng/lrng_health.c | 410 ++++++++++++++++++++++++++++++++
+ 3 files changed, 469 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_health.c
 
 diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index bc1b85929b94..72b572cb7df5 100644
---- a/drivers/char/lrng/Kconfig
+index 478b12839907..bc1b85929b94 100644
+=2D-- a/drivers/char/lrng/Kconfig
 +++ b/drivers/char/lrng/Kconfig
-@@ -380,4 +380,184 @@ config LRNG_KCAPI
- 	  provided by the selected kernel crypto API RNG.
- endif # LRNG_DRNG_SWITCH
- 
-+menuconfig LRNG_TESTING_MENU
-+	bool "LRNG testing interfaces"
-+	depends on DEBUG_FS
+@@ -196,6 +196,64 @@ config LRNG_COLLECTION_SIZE
+ 	default 4096 if LRNG_COLLECTION_SIZE_4096
+ 	default 8192 if LRNG_COLLECTION_SIZE_8192
+=20
++config LRNG_HEALTH_TESTS
++	bool "Enable interrupt entropy source online health tests"
++	depends on LRNG_IRQ
 +	help
-+	  Enable one or more of the following test interfaces.
++	  The online health tests applied to the interrupt entropy
++	  source validate the noise source at runtime for fatal
++	  errors. These tests include SP800-90B compliant tests
++	  which are invoked if the system is booted with fips=3D1.
++	  In case of fatal errors during active SP800-90B tests,
++	  the issue is logged and the noise data is discarded.
++	  These tests are required for full compliance of the
++	  interrupt entropy source with SP800-90B.
++
++	  If unsure, say Y.
++
++config LRNG_RCT_BROKEN
++	bool "SP800-90B RCT with dangerous low cutoff value"
++	depends on LRNG_HEALTH_TESTS
++	depends on BROKEN
++	default n
++	help
++	  This option enables a dangerously low SP800-90B repetitive
++	  count test (RCT) cutoff value which makes it very likely
++	  that the RCT is triggered to raise a self test failure.
++
++	  This option is ONLY intended for developers wanting to
++	  test the effectiveness of the SP800-90B RCT health test.
 +
 +	  If unsure, say N.
 +
-+if LRNG_TESTING_MENU
-+
-+config LRNG_RAW_HIRES_ENTROPY
-+	bool "Enable entropy test interface to hires timer noise source"
-+	default y
++config LRNG_APT_BROKEN
++	bool "SP800-90B APT with dangerous low cutoff value"
++	depends on LRNG_HEALTH_TESTS
++	depends on BROKEN
++	default n
 +	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned high resolution time stamp noise that
-+	  is collected by the LRNG for statistical analysis. Extracted
-+	  noise data is not used to seed the LRNG.
++	  This option enables a dangerously low SP800-90B adaptive
++	  proportion test (APT) cutoff value which makes it very
++	  likely that the APT is triggered to raise a self test
++	  failure.
 +
-+	  The raw noise data can be obtained using the lrng_raw_hires
-+	  debugfs file. Using the option lrng_testing.boot_raw_hires_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
++	  This option is ONLY intended for developers wanting to
++	  test the effectiveness of the SP800-90B APT health test.
 +
-+config LRNG_RAW_JIFFIES_ENTROPY
-+	bool "Enable entropy test interface to Jiffies noise source"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned Jiffies that is collected by
-+	  the LRNG for statistical analysis. This data is used for
-+	  seeding the LRNG if a high-resolution time stamp is not
-+	  available. If a high-resolution time stamp is detected,
-+	  the Jiffies value is not collected by the LRNG and no
-+	  data is provided via the test interface. Extracted noise
-+	  data is not used to seed the random number generator.
++	  If unsure, say N.
 +
-+	  The raw noise data can be obtained using the lrng_raw_jiffies
-+	  debugfs file. Using the option lrng_testing.boot_raw_jiffies_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
++# Default taken from SP800-90B sec 4.4.1 - significance level 2^-30
++config LRNG_RCT_CUTOFF
++	int
++	default 31 if !LRNG_RCT_BROKEN
++	default 1 if LRNG_RCT_BROKEN
 +
-+config LRNG_RAW_IRQ_ENTROPY
-+	bool "Enable entropy test interface to IRQ number noise source"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned interrupt number that is collected by
-+	  the LRNG for statistical analysis. This data is used for
-+	  seeding the random32 PRNG external to the LRNG if a
-+	  high-resolution time stamp is available or it will be used to
-+	  seed the LRNG otherwise. Extracted noise data is not used to
-+	  seed the random number generator.
++# Default taken from SP800-90B sec 4.4.2 - significance level 2^-30
++config LRNG_APT_CUTOFF
++	int
++	default 325 if !LRNG_APT_BROKEN
++	default 32 if LRNG_APT_BROKEN
 +
-+	  The raw noise data can be obtained using the lrng_raw_irq
-+	  debugfs file. Using the option lrng_testing.boot_raw_irq_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_RAW_IRQFLAGS_ENTROPY
-+	bool "Enable entropy test interface to IRQ flags noise source"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned interrupt flags that is collected by
-+	  the LRNG for statistical analysis. This data is used for
-+	  seeding the random32 PRNG external to the LRNG if a
-+	  high-resolution time stamp is available or it will be used to
-+	  seed the LRNG otherwise. Extracted noise data is not used to
-+	  seed the random number generator.
-+
-+	  The raw noise data can be obtained using the lrng_raw_irqflags
-+	  debugfs file. Using the option lrng_testing.boot_raw_irqflags_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_RAW_RETIP_ENTROPY
-+	bool "Enable entropy test interface to RETIP value noise source"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned return instruction pointer value
-+	  that is collected by the LRNG for statistical analysis.
-+	  This data is used for seeding the random32 PRNG external
-+	  to the LRNG if a high-resolution time stamp is available or
-+	  it will be used to seed the LRNG otherwise. Extracted noise
-+	  data is not used to seed the random number generator.
-+
-+	  The raw noise data can be obtained using the lrng_raw_retip
-+	  debugfs file. Using the option lrng_testing.boot_raw_retip_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_RAW_REGS_ENTROPY
-+	bool "Enable entropy test interface to IRQ register value noise source"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned interrupt register value that is
-+	  collected by the LRNG for statistical analysis. Extracted noise
-+	  data is not used to seed the random number generator.
-+
-+	  The raw noise data can be obtained using the lrng_raw_regs
-+	  debugfs file. Using the option lrng_testing.boot_raw_regs_test=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_RAW_ARRAY
-+	bool "Enable test interface to LRNG raw entropy storage array"
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw noise data that is collected by the LRNG
-+	  in the per-CPU array for statistical analysis. The purpose
-+	  of this interface is to verify that the array handling code
-+	  truly only concatenates data and provides the same entropy
-+	  rate as the raw unconditioned noise source when assessing
-+	  the collected data byte-wise.
-+
-+	  The data can be obtained using the lrng_raw_array debugfs
-+	  file. Using the option lrng_testing.boot_raw_array=1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+config LRNG_IRQ_PERF
-+	bool "Enable LRNG interrupt performance monitor"
-+	help
-+	  With this option, the performance monitor of the LRNG
-+	  interrupt handling code is enabled. The file provides
-+	  the execution time of the interrupt handler in
-+	  cycles.
-+
-+	  The interrupt performance data can be obtained using
-+	  the lrng_irq_perf debugfs file. Using the option
-+	  lrng_testing.boot_irq_perf=1 the performance data of
-+	  the first 1000 entropy events since boot can be sampled.
-+
-+config LRNG_ACVT_HASH
-+	bool "Enable LRNG ACVT Hash interface"
-+	help
-+	  With this option, the LRNG built-in hash function used for
-+	  auxiliary pool management and prior to switching the
-+	  cryptographic backends is made available for ACVT. The
-+	  interface allows writing of the data to be hashed
-+	  into the interface. The read operation triggers the hash
-+	  operation to generate message digest.
-+
-+	  The ACVT interface is available with the lrng_acvt_hash
-+	  debugfs file.
-+
-+config LRNG_RUNTIME_ES_CONFIG
-+	bool "Enable runtime configuration of entropy sources"
-+	help
-+	  When enabling this option, the LRNG provides the mechanism
-+	  allowing to alter the entropy rate of each entropy source
-+	  during boot time and runtime.
-+
-+	  The following interfaces are available:
-+	  lrng_archrandom.archrandom for the CPU entropy source,
-+	  lrng_jent.jitterrng for the Jitter RNG entropy source, and
-+	  lrng_sw_noise.irq_entropy for the interrupt entropy source.
-+
-+config LRNG_RUNTIME_MAX_WO_RESEED_CONFIG
-+	bool "Enable runtime configuration of max reseed threshold"
-+	help
-+	  When enabling this option, the LRNG provides an interface
-+	  allowing the setting of the maximum number of DRNG generate
-+	  operations without a reseed that has full entropy. The
-+	  interface is lrng_drng.max_wo_reseed.
-+
-+config LRNG_TEST_CPU_ES_COMPRESSION
-+	bool "Force CPU ES compression operation"
-+	help
-+	  When enabling this option, the CPU ES compression operation
-+	  is forced by setting an arbitrary value > 1 for the data
-+	  multiplier even when the CPU ES would deliver full entropy.
-+	  This allows testing of the compression operation. It
-+	  therefore forces to pull more data from the CPU ES
-+	  than what may be required.
-+
-+config LRNG_TESTING
-+	bool
-+	default y if (LRNG_RAW_HIRES_ENTROPY || LRNG_RAW_JIFFIES_ENTROPY ||LRNG_RAW_IRQ_ENTROPY || LRNG_RAW_IRQFLAGS_ENTROPY || LRNG_RAW_RETIP_ENTROPY || LRNG_RAW_REGS_ENTROPY || LRNG_RAW_ARRAY || LRNG_IRQ_PERF || LRNG_ACVT_HASH)
-+
-+endif #LRNG_TESTING_MENU
-+
- endif # LRNG
+ config LRNG_IRQ_ENTROPY_RATE
+ 	int "Interrupt Entropy Source Entropy Rate"
+ 	depends on LRNG_IRQ
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index f868f9fe53a6..6d5035aa611e 100644
---- a/drivers/char/lrng/Makefile
+index c797fbd10a98..f868f9fe53a6 100644
+=2D-- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -17,3 +17,4 @@ obj-$(CONFIG_LRNG_DRBG)		+= lrng_drbg.o
- obj-$(CONFIG_LRNG_KCAPI)	+= lrng_kcapi.o
- obj-$(CONFIG_LRNG_JENT)		+= lrng_es_jent.o
- obj-$(CONFIG_LRNG_HEALTH_TESTS)	+= lrng_health.o
-+obj-$(CONFIG_LRNG_TESTING)	+= lrng_testing.o
-diff --git a/drivers/char/lrng/lrng_testing.c b/drivers/char/lrng/lrng_testing.c
+@@ -16,3 +16,4 @@ obj-$(CONFIG_LRNG_KCAPI_HASH)	+=3D lrng_kcapi_hash.o
+ obj-$(CONFIG_LRNG_DRBG)		+=3D lrng_drbg.o
+ obj-$(CONFIG_LRNG_KCAPI)	+=3D lrng_kcapi.o
+ obj-$(CONFIG_LRNG_JENT)		+=3D lrng_es_jent.o
++obj-$(CONFIG_LRNG_HEALTH_TESTS)	+=3D lrng_health.o
+diff --git a/drivers/char/lrng/lrng_health.c b/drivers/char/lrng/lrng_healt=
+h.c
 new file mode 100644
-index 000000000000..99cc35abf45c
---- /dev/null
-+++ b/drivers/char/lrng/lrng_testing.c
-@@ -0,0 +1,689 @@
+index 000000000000..a56a0c4261ab
+=2D-- /dev/null
++++ b/drivers/char/lrng/lrng_health.c
+@@ -0,0 +1,410 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * Linux Random Number Generator (LRNG) testing interfaces
++ * Linux Random Number Generator (LRNG) Health Testing
 + *
 + * Copyright (C) 2019 - 2021, Stephan Mueller <smueller@chronox.de>
 + */
 +
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <linux/atomic.h>
-+#include <linux/bug.h>
-+#include <linux/debugfs.h>
-+#include <linux/lrng.h>
++#include <linux/fips.h>
 +#include <linux/module.h>
-+#include <linux/sched.h>
-+#include <linux/sched/signal.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/types.h>
-+#include <linux/uaccess.h>
-+#include <linux/workqueue.h>
-+#include <asm/errno.h>
 +
 +#include "lrng_internal.h"
 +
-+#define LRNG_TESTING_RINGBUFFER_SIZE	1024
-+#define LRNG_TESTING_RINGBUFFER_MASK	(LRNG_TESTING_RINGBUFFER_SIZE - 1)
-+
-+struct lrng_testing {
-+	u32 lrng_testing_rb[LRNG_TESTING_RINGBUFFER_SIZE];
-+	u32 rb_reader;
-+	u32 rb_writer;
-+	atomic_t lrng_testing_enabled;
-+	spinlock_t lock;
-+	wait_queue_head_t read_wait;
++/* Stuck Test */
++struct lrng_stuck_test {
++	u32 last_time;		/* Stuck test: time of previous IRQ */
++	u32 last_delta;		/* Stuck test: delta of previous IRQ */
++	u32 last_delta2;	/* Stuck test: 2. time derivation of prev IRQ */
 +};
 +
-+/*************************** Generic Data Handling ****************************/
++/* Repetition Count Test */
++struct lrng_rct {
++	atomic_t rct_count;	/* Number of stuck values */
++};
++
++/* Adaptive Proportion Test */
++struct lrng_apt {
++	/* Data window size */
++#define LRNG_APT_WINDOW_SIZE	512
++	/* LSB of time stamp to process */
++#define LRNG_APT_LSB		16
++#define LRNG_APT_WORD_MASK	(LRNG_APT_LSB - 1)
++	atomic_t apt_count;		/* APT counter */
++	atomic_t apt_base;		/* APT base reference */
++
++	atomic_t apt_trigger;
++	bool apt_base_set;	/* Is APT base set? */
++};
++
++/* The health test code must operate lock-less */
++struct lrng_health {
++	struct lrng_rct rct;
++	struct lrng_apt apt;
++
++	bool health_test_enabled;
++
++	/* SP800-90B startup health tests */
++#define LRNG_SP80090B_STARTUP_SAMPLES  1024
++#define LRNG_SP80090B_STARTUP_BLOCKS   ((LRNG_SP80090B_STARTUP_SAMPLES + \
++					 LRNG_APT_WINDOW_SIZE - 1) /    \
++					LRNG_APT_WINDOW_SIZE)
++	bool sp80090b_startup_done;
++	atomic_t sp80090b_startup_blocks;
++};
++
++static struct lrng_health lrng_health =3D {
++	.rct.rct_count =3D ATOMIC_INIT(0),
++
++	.apt.apt_count =3D ATOMIC_INIT(0),
++	.apt.apt_base =3D ATOMIC_INIT(-1),
++	.apt.apt_trigger =3D ATOMIC_INIT(LRNG_APT_WINDOW_SIZE),
++	.apt.apt_base_set =3D false,
++
++	.health_test_enabled =3D true,
++
++	.sp80090b_startup_blocks =3D ATOMIC_INIT(LRNG_SP80090B_STARTUP_BLOCKS),
++	.sp80090b_startup_done =3D false,
++};
++
++static DEFINE_PER_CPU(struct lrng_stuck_test, lrng_stuck_test);
++
++static inline bool lrng_sp80090b_health_requested(void)
++{
++	/* Health tests are only requested in FIPS mode */
++	return fips_enabled;
++}
++
++static inline bool lrng_sp80090b_health_enabled(void)
++{
++	struct lrng_health *health =3D &lrng_health;
++
++	return lrng_sp80090b_health_requested() && health->health_test_enabled;
++}
++
++/*************************************************************************=
+**
++ * SP800-90B Compliance
++ *
++ * If the Linux-RNG is booted into FIPS mode, the following interfaces
++ * provide an SP800-90B compliant noise source:
++ *
++ * * /dev/random
++ * * getrandom(2)
++ * * get_random_bytes when using it in conjunction with
++ *   add_random_ready_callback
++ *
++ * All other interfaces, including /dev/urandom or get_random_bytes without
++ * the add_random_ready_callback cannot claim to use an SP800-90B compliant
++ * noise source.
++ *************************************************************************=
+**/
 +
 +/*
-+ * boot variable:
-+ * 0 ==> No boot test, gathering of runtime data allowed
-+ * 1 ==> Boot test enabled and ready for collecting data, gathering runtime
-+ *	 data is disabled
-+ * 2 ==> Boot test completed and disabled, gathering of runtime data is
-+ *	 disabled
++ * Perform SP800-90B startup testing
 + */
-+
-+static inline void lrng_testing_reset(struct lrng_testing *data)
++static inline void lrng_sp80090b_startup(struct lrng_health *health)
 +{
-+	unsigned long flags;
++	if (!health->sp80090b_startup_done &&
++	    atomic_dec_and_test(&health->sp80090b_startup_blocks)) {
++		struct entropy_buf eb;
 +
-+	spin_lock_irqsave(&data->lock, flags);
-+	data->rb_reader = 0;
-+	data->rb_writer = 0;
-+	spin_unlock_irqrestore(&data->lock, flags);
++		health->sp80090b_startup_done =3D true;
++		pr_info("SP800-90B startup health tests completed\n");
++		memset(&eb, 0, sizeof(eb));
++		lrng_init_ops(&eb);
++
++		/*
++		 * Force a reseed of DRNGs to ensure they are seeded with
++		 * entropy that passed the SP800-90B health tests.
++		 * As the DRNG always will reseed before generating
++		 * random numbers, it does not need a reseed trigger.
++		 */
++		lrng_drng_force_reseed();
++	}
 +}
 +
-+static inline void lrng_testing_init(struct lrng_testing *data, u32 boot)
++/*
++ * Handle failure of SP800-90B startup testing
++ */
++static inline void lrng_sp80090b_startup_failure(struct lrng_health *healt=
+h)
 +{
-+	/*
-+	 * The boot time testing implies we have a running test. If the
-+	 * caller wants to clear it, he has to unset the boot_test flag
-+	 * at runtime via sysfs to enable regular runtime testing
-+	 */
-+	if (boot)
-+		return;
-+
-+	lrng_testing_reset(data);
-+	atomic_set(&data->lrng_testing_enabled, 1);
-+	pr_warn("Enabling data collection\n");
-+}
-+
-+static inline void lrng_testing_fini(struct lrng_testing *data, u32 boot)
-+{
-+	/* If we have boot data, we do not reset yet to allow data to be read */
-+	if (boot)
-+		return;
-+
-+	atomic_set(&data->lrng_testing_enabled, 0);
-+	lrng_testing_reset(data);
-+	pr_warn("Disabling data collection\n");
-+}
-+
-+static inline bool lrng_testing_store(struct lrng_testing *data, u32 value,
-+				      u32 *boot)
-+{
-+	unsigned long flags;
-+
-+	if (!atomic_read(&data->lrng_testing_enabled) && (*boot != 1))
-+		return false;
-+
-+	spin_lock_irqsave(&data->lock, flags);
++	/* Reset of LRNG and its entropy - NOTE: we are in atomic context */
++	lrng_reset();
 +
 +	/*
-+	 * Disable entropy testing for boot time testing after ring buffer
-+	 * is filled.
++	 * Reset the SP800-90B startup test.
++	 *
++	 * NOTE SP800-90B section 4.3 bullet 4 does not specify what
++	 * exactly is to be done in case of failure! Thus, we do what
++	 * makes sense, i.e. restarting the health test and thus gating
++	 * the output function of /dev/random and getrandom(2).
 +	 */
-+	if (*boot) {
-+		if (data->rb_writer > LRNG_TESTING_RINGBUFFER_SIZE) {
-+			*boot = 2;
-+			pr_warn_once("One time data collection test disabled\n");
-+			spin_unlock_irqrestore(&data->lock, flags);
-+			return false;
-+		}
++	atomic_set(&health->sp80090b_startup_blocks,
++		   LRNG_SP80090B_STARTUP_BLOCKS);
++}
 +
-+		if (data->rb_writer == 1)
-+			pr_warn("One time data collection test enabled\n");
++/*
++ * Handle failure of SP800-90B runtime testing
++ */
++static inline void lrng_sp80090b_runtime_failure(struct lrng_health *healt=
+h)
++{
++	lrng_sp80090b_startup_failure(health);
++	health->sp80090b_startup_done =3D false;
++}
++
++static inline void lrng_sp80090b_failure(struct lrng_health *health)
++{
++	if (health->sp80090b_startup_done) {
++		pr_err("SP800-90B runtime health test failure - invalidating all existin=
+g entropy and initiate SP800-90B startup\n");
++		lrng_sp80090b_runtime_failure(health);
++	} else {
++		pr_err("SP800-90B startup test failure - resetting\n");
++		lrng_sp80090b_startup_failure(health);
++	}
++}
++
++/*
++ * Is the SP800-90B startup testing complete?
++ *
++ * This function is called by the LRNG to determine whether to unblock
++ * a certain user interface. Therefore, only the potentially blocking
++ * user interfaces are considered SP800-90B compliant.
++ */
++bool lrng_sp80090b_startup_complete(void)
++{
++	struct lrng_health *health =3D &lrng_health;
++
++	return (lrng_sp80090b_health_enabled()) ? health->sp80090b_startup_done:
++						  true;
++}
++
++bool lrng_sp80090b_compliant(void)
++{
++	struct lrng_health *health =3D &lrng_health;
++
++	return lrng_sp80090b_health_enabled() && health->sp80090b_startup_done;
++}
++
++/*************************************************************************=
+**
++ * Adaptive Proportion Test
++ *
++ * This test complies with SP800-90B section 4.4.2.
++ *************************************************************************=
+**/
++
++/*
++ * Reset the APT counter
++ *
++ * @health [in] Reference to health state
++ */
++static inline void lrng_apt_reset(struct lrng_health *health,
++				  unsigned int time_masked)
++{
++	struct lrng_apt *apt =3D &health->apt;
++
++	pr_debug("APT value %d for base %d\n",
++		 atomic_read(&apt->apt_count), atomic_read(&apt->apt_base));
++
++	/* Reset APT */
++	atomic_set(&apt->apt_count, 0);
++	atomic_set(&apt->apt_base, time_masked);
++}
++
++static inline void lrng_apt_restart(struct lrng_health *health)
++{
++	struct lrng_apt *apt =3D &health->apt;
++
++	atomic_set(&apt->apt_trigger, LRNG_APT_WINDOW_SIZE);
++}
++
++/*
++ * Insert a new entropy event into APT
++ *
++ * This function does is void as it does not decide about the fate of a ti=
+me
++ * stamp. An APT failure can only happen at the same time of a stuck test
++ * failure. Thus, the stuck failure will already decide how the time stamp
++ * is handled.
++ *
++ * @health [in] Reference to health state
++ * @now_time [in] Time stamp to process
++ */
++static inline void lrng_apt_insert(struct lrng_health *health,
++				   unsigned int now_time)
++{
++	struct lrng_apt *apt =3D &health->apt;
++
++	if (!lrng_sp80090b_health_requested())
++		return;
++
++	now_time &=3D LRNG_APT_WORD_MASK;
++
++	/* Initialization of APT */
++	if (!apt->apt_base_set) {
++		atomic_set(&apt->apt_base, now_time);
++		apt->apt_base_set =3D true;
++		return;
 +	}
 +
-+	data->lrng_testing_rb[data->rb_writer & LRNG_TESTING_RINGBUFFER_MASK] =
-+									value;
-+	data->rb_writer++;
++	if (now_time =3D=3D (unsigned int)atomic_read(&apt->apt_base)) {
++		u32 apt_val =3D (u32)atomic_inc_return_relaxed(&apt->apt_count);
 +
-+	spin_unlock_irqrestore(&data->lock, flags);
++		if (apt_val >=3D CONFIG_LRNG_APT_CUTOFF)
++			lrng_sp80090b_failure(health);
++	}
 +
-+	if (wq_has_sleeper(&data->read_wait))
-+		wake_up_interruptible(&data->read_wait);
-+
-+	return true;
++	if (atomic_dec_and_test(&apt->apt_trigger)) {
++		lrng_apt_restart(health);
++		lrng_apt_reset(health, now_time);
++		lrng_sp80090b_startup(health);
++	}
 +}
 +
-+static inline bool lrng_testing_have_data(struct lrng_testing *data)
++/*************************************************************************=
+**
++ * Repetition Count Test
++ *
++ * The LRNG uses an enhanced version of the Repetition Count Test
++ * (RCT) specified in SP800-90B section 4.4.1. Instead of counting identic=
+al
++ * back-to-back values, the input to the RCT is the counting of the stuck
++ * values while filling the entropy pool.
++ *
++ * The RCT is applied with an alpha of 2^-30 compliant to FIPS 140-2 IG 9.=
+8.
++ *
++ * During the counting operation, the LRNG always calculates the RCT
++ * cut-off value of C. If that value exceeds the allowed cut-off value,
++ * the LRNG will invalidate all entropy for the entropy pool which implies
++ * that no data can be extracted from the entropy pool unless new entropy
++ * is received.
++ *************************************************************************=
+**/
++
++/*
++ * Hot code path - Insert data for Repetition Count Test
++ *
++ * @health: Reference to health information
++ * @stuck: Decision of stuck test
++ */
++static inline void lrng_rct(struct lrng_health *health, int stuck)
 +{
-+	return ((data->rb_writer & LRNG_TESTING_RINGBUFFER_MASK) !=
-+		 (data->rb_reader & LRNG_TESTING_RINGBUFFER_MASK));
-+}
++	struct lrng_rct *rct =3D &health->rct;
 +
-+static inline int lrng_testing_reader(struct lrng_testing *data, u32 *boot,
-+				      u8 *outbuf, u32 outbuflen)
-+{
-+	unsigned long flags;
-+	int collected_data = 0;
++	if (!lrng_sp80090b_health_requested())
++		return;
 +
-+	lrng_testing_init(data, *boot);
++	if (stuck) {
++		u32 rct_count =3D atomic_add_return_relaxed(1, &rct->rct_count);
 +
-+	while (outbuflen) {
-+		spin_lock_irqsave(&data->lock, flags);
++		pr_debug("RCT count: %u\n", rct_count);
 +
-+		/* We have no data or reached the writer. */
-+		if (!data->rb_writer ||
-+		    (data->rb_writer == data->rb_reader)) {
-+
-+			spin_unlock_irqrestore(&data->lock, flags);
++		/*
++		 * The cutoff value is based on the following consideration:
++		 * alpha =3D 2^-30 as recommended in FIPS 140-2 IG 9.8.
++		 * In addition, we imply an entropy value H of 1 bit as this
++		 * is the minimum entropy required to provide full entropy.
++		 *
++		 * Note, rct_count (which equals to value B in the
++		 * pseudo code of SP800-90B section 4.4.1) starts with zero.
++		 * Hence we need to subtract one from the cutoff value as
++		 * calculated following SP800-90B.
++		 */
++		if (rct_count >=3D CONFIG_LRNG_RCT_CUTOFF) {
++			atomic_set(&rct->rct_count, 0);
 +
 +			/*
-+			 * Now we gathered all boot data, enable regular data
-+			 * collection.
++			 * APT must start anew as we consider all previously
++			 * recorded data to contain no entropy.
 +			 */
-+			if (*boot) {
-+				*boot = 0;
-+				goto out;
-+			}
++			lrng_apt_restart(health);
 +
-+			wait_event_interruptible(data->read_wait,
-+						 lrng_testing_have_data(data));
-+			if (signal_pending(current)) {
-+				collected_data = -ERESTARTSYS;
-+				goto out;
-+			}
-+
-+			continue;
++			lrng_sp80090b_failure(health);
 +		}
-+
-+		/* We copy out word-wise */
-+		if (outbuflen < sizeof(u32)) {
-+			spin_unlock_irqrestore(&data->lock, flags);
-+			goto out;
-+		}
-+
-+		memcpy(outbuf, &data->lrng_testing_rb[data->rb_reader],
-+		       sizeof(u32));
-+		data->rb_reader++;
-+
-+		spin_unlock_irqrestore(&data->lock, flags);
-+
-+		outbuf += sizeof(u32);
-+		outbuflen -= sizeof(u32);
-+		collected_data += sizeof(u32);
++	} else {
++		atomic_set(&rct->rct_count, 0);
 +	}
-+
-+out:
-+	lrng_testing_fini(data, *boot);
-+	return collected_data;
 +}
 +
-+static int lrng_testing_extract_user(struct file *file, char __user *buf,
-+				     size_t nbytes, loff_t *ppos,
-+				     int (*reader)(u8 *outbuf, u32 outbuflen))
++/*************************************************************************=
+**
++ * Stuck Test
++ *
++ * Checking the:
++ *      1st derivative of the event occurrence (time delta)
++ *      2nd derivative of the event occurrence (delta of time deltas)
++ *      3rd derivative of the event occurrence (delta of delta of time del=
+tas)
++ *
++ * All values must always be non-zero. The stuck test is only valid disabl=
+ed if
++ * high-resolution time stamps are identified after initialization.
++ *************************************************************************=
+**/
++
++static inline u32 lrng_delta(u32 prev, u32 next)
 +{
-+	u8 *tmp, *tmp_aligned;
-+	int ret = 0, large_request = (nbytes > 256);
-+
-+	if (!nbytes)
-+		return 0;
-+
 +	/*
-+	 * The intention of this interface is for collecting at least
-+	 * 1000 samples due to the SP800-90B requirements. So, we make no
-+	 * effort in avoiding allocating more memory that actually needed
-+	 * by the user. Hence, we allocate sufficient memory to always hold
-+	 * that amount of data.
++	 * Note that this (unsigned) subtraction does yield the correct value
++	 * in the wraparound-case, i.e. when next < prev.
 +	 */
-+	tmp = kmalloc(LRNG_TESTING_RINGBUFFER_SIZE + sizeof(u32), GFP_KERNEL);
-+	if (!tmp)
-+		return -ENOMEM;
-+
-+	tmp_aligned = PTR_ALIGN(tmp, sizeof(u32));
-+
-+	while (nbytes) {
-+		int i;
-+
-+		if (large_request && need_resched()) {
-+			if (signal_pending(current)) {
-+				if (ret == 0)
-+					ret = -ERESTARTSYS;
-+				break;
-+			}
-+			schedule();
-+		}
-+
-+		i = min_t(int, nbytes, LRNG_TESTING_RINGBUFFER_SIZE);
-+		i = reader(tmp_aligned, i);
-+		if (i <= 0) {
-+			if (i < 0)
-+				ret = i;
-+			break;
-+		}
-+		if (copy_to_user(buf, tmp_aligned, i)) {
-+			ret = -EFAULT;
-+			break;
-+		}
-+
-+		nbytes -= i;
-+		buf += i;
-+		ret += i;
-+	}
-+
-+	kfree_sensitive(tmp);
-+
-+	if (ret > 0)
-+		*ppos += ret;
-+
-+	return ret;
++	return (next - prev);
 +}
-+
-+/************** Raw High-Resolution Timer Entropy Data Handling ***************/
-+
-+#ifdef CONFIG_LRNG_RAW_HIRES_ENTROPY
-+
-+static u32 boot_raw_hires_test = 0;
-+module_param(boot_raw_hires_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_hires_test, "Enable gathering boot time high resolution timer entropy of the first entropy events");
-+
-+static struct lrng_testing lrng_raw_hires = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_hires.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_hires.read_wait)
-+};
-+
-+bool lrng_raw_hires_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_hires, value, &boot_raw_hires_test);
-+}
-+
-+static int lrng_raw_hires_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_hires, &boot_raw_hires_test,
-+				   outbuf, outbuflen);
-+}
-+
-+static ssize_t lrng_raw_hires_read(struct file *file, char __user *to,
-+				   size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_hires_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_hires_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_hires_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_HIRES_ENTROPY */
-+
-+/********************* Raw Jiffies Entropy Data Handling **********************/
-+
-+#ifdef CONFIG_LRNG_RAW_JIFFIES_ENTROPY
-+
-+static u32 boot_raw_jiffies_test = 0;
-+module_param(boot_raw_jiffies_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_jiffies_test, "Enable gathering boot time high resolution timer entropy of the first entropy events");
-+
-+static struct lrng_testing lrng_raw_jiffies = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_jiffies.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_jiffies.read_wait)
-+};
-+
-+bool lrng_raw_jiffies_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_jiffies, value,
-+				  &boot_raw_jiffies_test);
-+}
-+
-+static int lrng_raw_jiffies_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_jiffies, &boot_raw_jiffies_test,
-+				   outbuf, outbuflen);
-+}
-+
-+static ssize_t lrng_raw_jiffies_read(struct file *file, char __user *to,
-+				   size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_jiffies_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_jiffies_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_jiffies_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_JIFFIES_ENTROPY */
-+
-+/************************** Raw IRQ Data Handling ****************************/
-+
-+#ifdef CONFIG_LRNG_RAW_IRQ_ENTROPY
-+
-+static u32 boot_raw_irq_test = 0;
-+module_param(boot_raw_irq_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_irq_test, "Enable gathering boot time entropy of the first IRQ entropy events");
-+
-+static struct lrng_testing lrng_raw_irq = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_irq.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_irq.read_wait)
-+};
-+
-+bool lrng_raw_irq_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_irq, value, &boot_raw_irq_test);
-+}
-+
-+static int lrng_raw_irq_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_irq, &boot_raw_irq_test, outbuf,
-+				   outbuflen);
-+}
-+
-+static ssize_t lrng_raw_irq_read(struct file *file, char __user *to,
-+				 size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_irq_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_irq_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_irq_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_IRQ_ENTROPY */
-+
-+/************************ Raw IRQFLAGS Data Handling **************************/
-+
-+#ifdef CONFIG_LRNG_RAW_IRQFLAGS_ENTROPY
-+
-+static u32 boot_raw_irqflags_test = 0;
-+module_param(boot_raw_irqflags_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_irqflags_test, "Enable gathering boot time entropy of the first IRQ flags entropy events");
-+
-+static struct lrng_testing lrng_raw_irqflags = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_irqflags.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_irqflags.read_wait)
-+};
-+
-+bool lrng_raw_irqflags_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_irqflags, value,
-+				  &boot_raw_irqflags_test);
-+}
-+
-+static int lrng_raw_irqflags_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_irqflags, &boot_raw_irqflags_test,
-+				   outbuf, outbuflen);
-+}
-+
-+static ssize_t lrng_raw_irqflags_read(struct file *file, char __user *to,
-+				      size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_irqflags_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_irqflags_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_irqflags_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_IRQFLAGS_ENTROPY */
-+
-+/************************ Raw _RET_IP_ Data Handling **************************/
-+
-+#ifdef CONFIG_LRNG_RAW_RETIP_ENTROPY
-+
-+static u32 boot_raw_retip_test = 0;
-+module_param(boot_raw_retip_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_retip_test, "Enable gathering boot time entropy of the first return instruction pointer entropy events");
-+
-+static struct lrng_testing lrng_raw_retip = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_retip.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_retip.read_wait)
-+};
-+
-+bool lrng_raw_retip_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_retip, value, &boot_raw_retip_test);
-+}
-+
-+static int lrng_raw_retip_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_retip, &boot_raw_retip_test,
-+				   outbuf, outbuflen);
-+}
-+
-+static ssize_t lrng_raw_retip_read(struct file *file, char __user *to,
-+				   size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_retip_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_retip_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_retip_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_RETIP_ENTROPY */
-+
-+/********************** Raw IRQ register Data Handling ************************/
-+
-+#ifdef CONFIG_LRNG_RAW_REGS_ENTROPY
-+
-+static u32 boot_raw_regs_test = 0;
-+module_param(boot_raw_regs_test, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_regs_test, "Enable gathering boot time entropy of the first interrupt register entropy events");
-+
-+static struct lrng_testing lrng_raw_regs = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_regs.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_regs.read_wait)
-+};
-+
-+bool lrng_raw_regs_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_regs, value, &boot_raw_regs_test);
-+}
-+
-+static int lrng_raw_regs_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_regs, &boot_raw_regs_test,
-+				   outbuf, outbuflen);
-+}
-+
-+static ssize_t lrng_raw_regs_read(struct file *file, char __user *to,
-+				  size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_regs_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_regs_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_regs_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_REGS_ENTROPY */
-+
-+/********************** Raw Entropy Array Data Handling ***********************/
-+
-+#ifdef CONFIG_LRNG_RAW_ARRAY
-+
-+static u32 boot_raw_array = 0;
-+module_param(boot_raw_array, uint, 0644);
-+MODULE_PARM_DESC(boot_raw_array, "Enable gathering boot time raw noise array data of the first entropy events");
-+
-+static struct lrng_testing lrng_raw_array = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_raw_array.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_raw_array.read_wait)
-+};
-+
-+bool lrng_raw_array_entropy_store(u32 value)
-+{
-+	return lrng_testing_store(&lrng_raw_array, value, &boot_raw_array);
-+}
-+
-+static int lrng_raw_array_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_raw_array, &boot_raw_array, outbuf,
-+				   outbuflen);
-+}
-+
-+static ssize_t lrng_raw_array_read(struct file *file, char __user *to,
-+				   size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_raw_array_entropy_reader);
-+}
-+
-+static const struct file_operations lrng_raw_array_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_raw_array_read,
-+};
-+
-+#endif /* CONFIG_LRNG_RAW_ARRAY */
-+
-+/******************** Interrupt Performance Data Handling *********************/
-+
-+#ifdef CONFIG_LRNG_IRQ_PERF
-+
-+static u32 boot_irq_perf = 0;
-+module_param(boot_irq_perf, uint, 0644);
-+MODULE_PARM_DESC(boot_irq_perf, "Enable gathering boot time interrupt performance data of the first entropy events");
-+
-+static struct lrng_testing lrng_irq_perf = {
-+	.rb_reader = 0,
-+	.rb_writer = 0,
-+	.lock      = __SPIN_LOCK_UNLOCKED(lrng_irq_perf.lock),
-+	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(lrng_irq_perf.read_wait)
-+};
-+
-+bool lrng_perf_time(u32 start)
-+{
-+	return lrng_testing_store(&lrng_irq_perf, random_get_entropy() - start,
-+				  &boot_irq_perf);
-+}
-+
-+static int lrng_irq_perf_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	return lrng_testing_reader(&lrng_irq_perf, &boot_irq_perf, outbuf,
-+				   outbuflen);
-+}
-+
-+static ssize_t lrng_irq_perf_read(struct file *file, char __user *to,
-+				  size_t count, loff_t *ppos)
-+{
-+	return lrng_testing_extract_user(file, to, count, ppos,
-+					 lrng_irq_perf_reader);
-+}
-+
-+static const struct file_operations lrng_irq_perf_fops = {
-+	.owner = THIS_MODULE,
-+	.read = lrng_irq_perf_read,
-+};
-+
-+#endif /* CONFIG_LRNG_IRQ_PERF */
-+
-+/*********************************** ACVT ************************************/
-+
-+#ifdef CONFIG_LRNG_ACVT_HASH
-+
-+/* maximum amount of data to be hashed as defined by ACVP */
-+#define LRNG_ACVT_MAX_SHA_MSG	(65536 >> 3)
 +
 +/*
-+ * As we use static variables to store the data, it is clear that the
-+ * test interface is only able to handle single threaded testing. This is
-+ * considered to be sufficient for testing. If multi-threaded use of the
-+ * ACVT test interface would be performed, the caller would get garbage
-+ * but the kernel operation is unaffected by this.
++ * Hot code path
++ *
++ * @health: Reference to health information
++ * @now: Event time
++ * @return: 0 event occurrence not stuck (good time stamp)
++ *	    !=3D 0 event occurrence stuck (reject time stamp)
 + */
-+static u8 lrng_acvt_hash_data[LRNG_ACVT_MAX_SHA_MSG]
-+						__aligned(LRNG_KCAPI_ALIGN);
-+static atomic_t lrng_acvt_hash_data_size = ATOMIC_INIT(0);
-+static u8 lrng_acvt_hash_digest[LRNG_ATOMIC_DIGEST_SIZE];
-+
-+static ssize_t lrng_acvt_hash_write(struct file *file, const char __user *buf,
-+				    size_t nbytes, loff_t *ppos)
++static inline int lrng_irq_stuck(struct lrng_stuck_test *stuck, u32 now_ti=
+me)
 +{
-+	if (nbytes > LRNG_ACVT_MAX_SHA_MSG)
-+		return -EINVAL;
++	u32 delta =3D lrng_delta(stuck->last_time, now_time);
++	u32 delta2 =3D lrng_delta(stuck->last_delta, delta);
++	u32 delta3 =3D lrng_delta(stuck->last_delta2, delta2);
 +
-+	atomic_set(&lrng_acvt_hash_data_size, (int)nbytes);
++	stuck->last_time =3D now_time;
++	stuck->last_delta =3D delta;
++	stuck->last_delta2 =3D delta2;
 +
-+	return simple_write_to_buffer(lrng_acvt_hash_data,
-+				      LRNG_ACVT_MAX_SHA_MSG, ppos, buf, nbytes);
-+}
-+
-+static ssize_t lrng_acvt_hash_read(struct file *file, char __user *to,
-+				   size_t count, loff_t *ppos)
-+{
-+	SHASH_DESC_ON_STACK(shash, NULL);
-+	const struct lrng_crypto_cb *crypto_cb = &lrng_cc20_crypto_cb;
-+	ssize_t ret;
-+
-+	if (count > LRNG_ATOMIC_DIGEST_SIZE)
-+		return -EINVAL;
-+
-+	ret = crypto_cb->lrng_hash_init(shash, NULL) ?:
-+	      crypto_cb->lrng_hash_update(shash, lrng_acvt_hash_data,
-+				atomic_read_u32(&lrng_acvt_hash_data_size)) ?:
-+	      crypto_cb->lrng_hash_final(shash, lrng_acvt_hash_digest);
-+	if (ret)
-+		return ret;
-+
-+	return simple_read_from_buffer(to, count, ppos, lrng_acvt_hash_digest,
-+				       sizeof(lrng_acvt_hash_digest));
-+}
-+
-+static const struct file_operations lrng_acvt_hash_fops = {
-+	.owner = THIS_MODULE,
-+	.open = simple_open,
-+	.llseek = default_llseek,
-+	.read = lrng_acvt_hash_read,
-+	.write = lrng_acvt_hash_write,
-+};
-+
-+#endif /* CONFIG_LRNG_ACVT_DRNG */
-+
-+/**************************************************************************
-+ * Debugfs interface
-+ **************************************************************************/
-+
-+static int __init lrng_raw_init(void)
-+{
-+	struct dentry *lrng_raw_debugfs_root;
-+
-+	lrng_raw_debugfs_root = debugfs_create_dir(KBUILD_MODNAME, NULL);
-+
-+#ifdef CONFIG_LRNG_RAW_HIRES_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_hires", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_hires_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_JIFFIES_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_jiffies", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_jiffies_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_IRQ_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_irq", 0400, lrng_raw_debugfs_root,
-+				   NULL, &lrng_raw_irq_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_IRQFLAGS_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_irqflags", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_irqflags_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_RETIP_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_retip", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_retip_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_REGS_ENTROPY
-+	debugfs_create_file_unsafe("lrng_raw_regs", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_regs_fops);
-+#endif
-+#ifdef CONFIG_LRNG_RAW_ARRAY
-+	debugfs_create_file_unsafe("lrng_raw_array", 0400,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_raw_array_fops);
-+#endif
-+#ifdef CONFIG_LRNG_IRQ_PERF
-+	debugfs_create_file_unsafe("lrng_irq_perf", 0400, lrng_raw_debugfs_root,
-+				   NULL, &lrng_irq_perf_fops);
-+#endif
-+#ifdef CONFIG_LRNG_ACVT_HASH
-+	debugfs_create_file_unsafe("lrng_acvt_hash", 0600,
-+				   lrng_raw_debugfs_root, NULL,
-+				   &lrng_acvt_hash_fops);
-+#endif
++	if (!delta || !delta2 || !delta3)
++		return 1;
 +
 +	return 0;
 +}
 +
-+module_init(lrng_raw_init);
--- 
++/*************************************************************************=
+**
++ * Health test interfaces
++ *************************************************************************=
+**/
++
++/*
++ * Disable all health tests
++ */
++void lrng_health_disable(void)
++{
++	struct lrng_health *health =3D &lrng_health;
++
++	health->health_test_enabled =3D false;
++
++	if (lrng_sp80090b_health_requested())
++		pr_warn("SP800-90B compliance requested but the Linux RNG is NOT SP800-9=
+0B compliant\n");
++}
++
++/*
++ * Hot code path - Perform health test on time stamp received from an event
++ *
++ * @now_time Time stamp
++ */
++enum lrng_health_res lrng_health_test(u32 now_time)
++{
++	struct lrng_health *health =3D &lrng_health;
++	struct lrng_stuck_test *stuck_test =3D this_cpu_ptr(&lrng_stuck_test);
++	int stuck;
++
++	if (!health->health_test_enabled)
++		return lrng_health_pass;
++
++	lrng_apt_insert(health, now_time);
++
++	stuck =3D lrng_irq_stuck(stuck_test, now_time);
++	lrng_rct(health, stuck);
++	if (stuck) {
++		/* SP800-90B disallows using a failing health test time stamp */
++		return lrng_sp80090b_health_requested() ?
++			lrng_health_fail_drop : lrng_health_fail_use;
++	}
++
++	return lrng_health_pass;
++}
+=2D-=20
 2.31.1
 
 
