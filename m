@@ -2,102 +2,169 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD7A4C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Nov 2021 14:31:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52806C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Nov 2021 14:59:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233901AbhKVOeX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Nov 2021 09:34:23 -0500
-Received: from mail-wr1-f47.google.com ([209.85.221.47]:33460 "EHLO
-        mail-wr1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbhKVOeW (ORCPT
+        id S237699AbhKVPCM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Nov 2021 10:02:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47610 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233427AbhKVPCM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Nov 2021 09:34:22 -0500
-Received: by mail-wr1-f47.google.com with SMTP id d24so33155896wra.0
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Nov 2021 06:31:16 -0800 (PST)
+        Mon, 22 Nov 2021 10:02:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637593145;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sk7BFBCbKYZJ2jJnbUMcJfbKUen3vUYJmNdShhlxjn0=;
+        b=cEdNrK4ZcDBYmNUPVIyfTewT/4dLyDW2DH3BbmOQO92RJldAjvDqODwg8mv01tryTwarIR
+        6K3YV/QSyvvGPUjZ6syPI4nf3Puzj4kyyYKnm/lhrBxDAZC+wGzFG0qdIkO9ZBM95j30ou
+        Os/uehHkqQa4oPqPrMLtEiW688mivaM=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-588-4T5_36THOemTnNRdHjvxNg-1; Mon, 22 Nov 2021 09:59:04 -0500
+X-MC-Unique: 4T5_36THOemTnNRdHjvxNg-1
+Received: by mail-qv1-f72.google.com with SMTP id j9-20020a05621419c900b003b815c01a54so16527039qvc.10
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Nov 2021 06:59:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:organization:user-agent:mime-version
          :content-transfer-encoding;
-        bh=NOpI29WK93kPIoQN+4npStzaJDQP3VzNREpVcUJTXwI=;
-        b=745E9EfxCBwJRmuBxD1n0e2nLvizwcNlfHwEp6Jkm/QH76zivISuF27/wNPIDIZqcL
-         8X17PI9dFhU12ytnSgRZq6fki1S/i4576iciASnjAzTTO390RRTufMIUn0KeJqZkGFdo
-         Vz7kv16KmDQ9GgWNtP+w5yeknVLQcr9vpVNCLnb1D1MWr3bKWaZPHqOxvKDkFS3YTLiw
-         ohEuJ1fvr2ZM/+St9OCxdvXo5cPZ0vpzstoau9LksDAn98Nwk9/wkQD7ZfSU0kT1FHGH
-         qPj1DZwY/slGOjBprDohcz++rBYIto9asWxCW/d1djloaO14GOwZagHAw9OMihJF4lhR
-         7YrQ==
-X-Gm-Message-State: AOAM532D+PHxbBHQF75r1ORHwTven1RlJ+n9CgD9FHG6uWroJPLsl/kn
-        dYam6tXW0zXx32CSTtUC18iu49+LUHM=
-X-Google-Smtp-Source: ABdhPJx3q5pqRSYEpp0EUSXAYEjgOp7ZwMBhmfiocfElS4LJr62IrLXfEQybOL8EzHGD3G34nBAdbw==
-X-Received: by 2002:adf:d1cb:: with SMTP id b11mr40733574wrd.33.1637591475370;
-        Mon, 22 Nov 2021 06:31:15 -0800 (PST)
-Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id g6sm12354677wmq.36.2021.11.22.06.31.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Nov 2021 06:31:14 -0800 (PST)
-Subject: Re: [PATCH 10/12] nvmet: Implement basic In-Band Authentication
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org,
-        Herbert Xu <herberg@gondor.apana.org.au>,
-        David Miller <davem@davemloft.org>,
-        linux-crypto@vger.kernel.org
-References: <20211122074727.25988-1-hare@suse.de>
- <20211122074727.25988-11-hare@suse.de>
- <762ce404-9035-30ca-078d-eb0b36223e4c@grimberg.me>
- <313b19d2-ea54-ce1c-f9cb-3f1fb6743787@suse.de>
- <891fe077-40d3-5bad-52fb-f0ee6f6107b6@grimberg.me>
- <f7011868-4542-bd09-6d44-3aaa192a9212@suse.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <27432703-8e83-10c0-c428-090e6ec4b9af@grimberg.me>
-Date:   Mon, 22 Nov 2021 16:31:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        bh=sk7BFBCbKYZJ2jJnbUMcJfbKUen3vUYJmNdShhlxjn0=;
+        b=GqiE3ivv+JJFh7ITbO82a+UNfqfC8cEimJc09aKg4Do+A5rgG419lFdmdwTWe0EYJ1
+         evPSPNt3mw6qgfcE0pMpegjyTprqYK48SBg2/sjt2rJWJ4n1mqKLqmRQorShQP+gRaMh
+         TyxNNSDhGexJWYCrywwjh1dOozhc/TT2dj7PSbs+9Ju8MDloFmHdmJIFAXE9U530cZDm
+         nGsl4F2P38RvToPjC0rosS/5Vm8qLAFou+yZADV7iKdOlym4ZQ5/erM/ySdHDB65yaPf
+         88ZGroawelQHzn34kcJRQf8sUIF2vViMccyPAEvyMb/Ej/nI5aQwDMwwGDsk7AP+Zkq6
+         8n3Q==
+X-Gm-Message-State: AOAM5333NwILdWn9d6vxtsWbYCcTRt/78x94N646ydc7mRaaAH/bY52g
+        AmUfykHqiNGqCfP/YBUMxUd8fQV27hZssCEF+fqQG9qADN0tjyeTcqrwTyRtG/lSUfsjSZqQrA4
+        r1TtLNPCqc3iR2yuVNOprIkkm
+X-Received: by 2002:ad4:5969:: with SMTP id eq9mr77549261qvb.4.1637593144043;
+        Mon, 22 Nov 2021 06:59:04 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzE73nVSJPJ9NSL1qvqhsJNhTJ2dEHbz8x9DfS5SCRbaxOQhliNKDhxAmK2WklmGGj03dFoew==
+X-Received: by 2002:ad4:5969:: with SMTP id eq9mr77549217qvb.4.1637593143784;
+        Mon, 22 Nov 2021 06:59:03 -0800 (PST)
+Received: from m8.users.ipa.redhat.com (cpe-158-222-141-151.nyc.res.rr.com. [158.222.141.151])
+        by smtp.gmail.com with ESMTPSA id x4sm4630894qtw.44.2021.11.22.06.59.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Nov 2021 06:59:02 -0800 (PST)
+Message-ID: <56d2da397bb53f71c0354b102c3b40940e9b4eda.camel@redhat.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+From:   Simo Sorce <simo@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org,
+        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>,
+        Alexander Lobakin <alobakin@mailbox.org>,
+        Jirka Hladky <jhladky@redhat.com>
+Date:   Mon, 22 Nov 2021 09:59:01 -0500
+In-Reply-To: <CAHmME9oaS4TOpk7rQ73BRKeVLjMUNyt6EFyeOX=hZSkFBPDu0g@mail.gmail.com>
+References: <2036923.9o76ZdvQCi@positron.chronox.de>
+         <4641592.OV4Wx5bFTl@positron.chronox.de>
+         <CAHmME9oaS4TOpk7rQ73BRKeVLjMUNyt6EFyeOX=hZSkFBPDu0g@mail.gmail.com>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
 MIME-Version: 1.0
-In-Reply-To: <f7011868-4542-bd09-6d44-3aaa192a9212@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Jason,
+have you previously produced a list of reasoned concerns with this
+patchset and direction?
 
->>>>> +    if (data->auth_type == NVME_AUTH_COMMON_MESSAGES) {
->>>>> +        if (data->auth_id == NVME_AUTH_DHCHAP_MESSAGE_NEGOTIATE) {
->>>>> +            /* Restart negotiation */
->>>>> +            pr_debug("%s: ctrl %d qid %d reset negotiation\n",
->>>>> __func__,
->>>>> +                 ctrl->cntlid, req->sq->qid);
->>>>> +            if (!req->sq->qid) {
->>>>> +                status = nvmet_setup_auth(ctrl);
->>>>
->>>> Aren't you leaking memory here?
->>>
->>> I've checked, and I _think_ everything is in order.
->>> Any particular concerns?
->>> ( 'd' is free at 'done_kfree', and we never exit without going through
->>> it AFAICS).
->>> Have I missed something?
->>
->> You are calling nvmet_setup_auth for re-authentication, who is calling
->> nvmet_destroy_auth to free the controller auth stuff?
->>
->> Don't you need something like:
->> -- 
->>          if (!req->sq->qid) {
->>              nvmet_destroy_auth(ctrl);
->>              status = nvmet_setup_auth(ctrl);
->>              ...
->>          }
->> -- 
+This specific email is not really useful to me to understand the
+concerns as it does not contain actionable suggestion or critique.
+
+I personally find the direction fine, and with my distribution hat on I
+can say that FIPS is essential for us and any design must include an
+option to be FIPS certifiable.
+
+As NIST keeps improving their testing capabilities and rigorous
+cryptographic design of the CSPRNGs as well as entropy sources the
+kernel must also adapt.
+
+Stephan is providing a path forward, and I haven't seen any other
+proposal, let alone code, that provide improvements in this area.
+I am pretty sure the design can be improved if there is detailed and
+actionable feedback on what to change.
+
+I hope the path forward can be one of collaboration rather then mere
+opposition.
+
+HTH,
+Simo.
+
+On Sun, 2021-11-21 at 23:42 +0100, Jason A. Donenfeld wrote:
+> Hi Stephan,
 > 
-> nvme_setup_auth() should be re-entrant, ie it'll free old and reallocate
-> new keys as required. Hence no need to call nvmet_destroy_auth().
-> At least that's the plan.
+> You've posted it again, and yet I still believe this is not the
+> correct design or direction. I do not think the explicit goal of
+> extended configurability ("flexibility") or the explicit goal of being
+> FIPS compatible represent good directions, and I think this introduces
+> new problems rather than solving any existing ones. While there are
+> ways the current RNG could or even should be improved -- or rewritten
+> -- this approach is still not that, no matter how many times you post
+> it. It is almost as though you hope this somehow gets accepted through
+> a general apathy that might develop by the 1000th revision, when
+> cranks like me and others no longer have the motivation to keep
+> responding with the same thing. But here we are again.
+> 
+> My own experience pushing something that didn't have substantial
+> enough buy-in from existing maintainers (the Zinc crypto library)
+> ultimately led me to stop pushing in order to not alienate folks, step
+> back, and listen a bit. Eventually somebody reached out to work with
+> me (Ard) and we submitted a good compromise collaboration that we all
+> generally felt better about. In this case, your cryptographic design
+> tastes are sufficiently divergent from mine that I'm not sure how far
+> such a thing would go, but it also seems to me that continually
+> pushing the same thing over and over isn't winning you any points here
+> either. Submission by attrition is not an outcome anybody should want.
+> 
+> Sorry to be so blunt. It's just that my, "I don't like this" is the
+> same as it was the last time, and I'm not aware of anything
+> significant in that area changing this time.
+> 
+> Jason
+> 
 
-OK, I see.
+-- 
+Simo Sorce
+RHEL Crypto Team
+Red Hat, Inc
 
-> Always possible that I messed up things somewhere.
 
-Worth checking with kmemleak but it looks ok to me.
+
+
