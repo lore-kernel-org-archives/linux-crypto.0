@@ -2,143 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF45DC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Nov 2021 05:39:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 760BCC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Nov 2021 07:18:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229948AbhKWFm5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Nov 2021 00:42:57 -0500
-Received: from mo4-p02-ob.smtp.rzone.de ([81.169.146.170]:9334 "EHLO
-        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229569AbhKWFm4 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Nov 2021 00:42:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1637645911;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=5XQcVk/mWF9utsBmrG26dD7whuFkkMxCgJx6KnvZ8gw=;
-    b=NTgp4RNBJTVvzSXCQbYuwVcA/UGK3k91bt6GRF59BdzNYolUxBgfekfXYAcNnpXo7G
-    zheyy5p4IGLBCDCqAOUWK0H3n/qIsK0uT/CC/X9t45ob8uZDNufFM2ELiuK3QJhecH2O
-    POJ5BSJtfF78+n7y+QhqNh/yirRdWt4JDotZsxcgRbsMAEkyLEsbZXDUXHrc57V/sY5H
-    FZ3FHa1UTrTT2/4REpHLB0VMGcobX23ZMAKIpDdGmfhUtDz170HSwS5cWt5r5VsumIOQ
-    kqWy1LzULqQoFa4T8LWQopeMHUBp1x4Yrmspzt4xhDSfDr5LH2CpT8BQHeRtka0AIMo2
-    xj2Q==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbIvScLTm3"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 47.34.6 DYNA|AUTH)
-    with ESMTPSA id y09e43xAN5cT4VK
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Tue, 23 Nov 2021 06:38:29 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Simo Sorce <simo@redhat.com>, noloader@gmail.com
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Tso Ted <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
+        id S233866AbhKWHVl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Nov 2021 02:21:41 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:47558 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233677AbhKWHVk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Nov 2021 02:21:40 -0500
+Received: from zn.tnic (p200300ec2f0afc00fb97e1ddac48f93a.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:fc00:fb97:e1dd:ac48:f93a])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 74C2F1EC0503;
+        Tue, 23 Nov 2021 08:18:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1637651911;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=KqJTOgCp6HK0xHGH7GIW9dclHLRFLBvb7WQynOhv4Zo=;
+        b=J8LWB4M2a2e8olPCNC2yFwCVo2FyCyLjyNvF0yIltKhimu2h8lvvuDckvz0d43x38j5PXn
+        Fcci+px1bFHWiwV3UVCCecTqW5fzZ77yo4D9lYtDWn8TBi4ahZCKf/BZ6p4Jtvcn/2hdjS
+        OxWBvL/fpLbqF+YML+r3YW6GrqG9+To=
+Date:   Tue, 23 Nov 2021 08:18:31 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        Peter Gonda <pgonda@google.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Peter Matthias <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Andy Lavr <andy.lavr@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Petr Tesarik <ptesarik@suse.cz>,
-        John Haxby <john.haxby@oracle.com>,
-        Alexander Lobakin <alobakin@mailbox.org>,
-        Jirka Hladky <jhladky@redhat.com>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-Date:   Tue, 23 Nov 2021 06:38:29 +0100
-Message-ID: <5873227.WSGUhziGkc@tauon.chronox.de>
-In-Reply-To: <CAH8yC8niN=q-pD4B3OU9zj84GN-vfi=T_aLq9V3sLTZ-mRP_GQ@mail.gmail.com>
-References: <2036923.9o76ZdvQCi@positron.chronox.de> <afdf9c4a4005f6aeaded9e976c48160933f3c447.camel@redhat.com> <CAH8yC8niN=q-pD4B3OU9zj84GN-vfi=T_aLq9V3sLTZ-mRP_GQ@mail.gmail.com>
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZyVx38L6gf689zq@zn.tnic>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
+ <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
+ <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
+ <5f3b3aab-9ec2-c489-eefd-9136874762ee@intel.com>
+ <d83e6668-bec4-8d1f-7f8a-085829146846@amd.com>
+ <38282b0c-7eb5-6a91-df19-2f4cfa8549ce@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <38282b0c-7eb5-6a91-df19-2f4cfa8549ce@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Montag, 22. November 2021, 22:06:55 CET schrieb Jeffrey Walton:
-
-Hi Jeffrey,
-
-> On Mon, Nov 22, 2021 at 10:10 AM Simo Sorce <simo@redhat.com> wrote:
-> > On Mon, 2021-11-22 at 07:55 +0100, Greg Kroah-Hartman wrote:
-> > > On Mon, Nov 22, 2021 at 07:42:02AM +0100, Stephan Mueller wrote:
-> > > > ...
-> > > > I will leave the representatives from the distros to chime in and
-> > > > point to
-> > > > these patches.
-> > > 
-> > > Then why not work with the distros to get these changes merged into the
-> > > kernel tree?  They know that keeping things out-of-the-tree costs them
-> > > time and money, so why are they keeping them there?
-> > 
-> > I can speak for my distro.
-> > We have not proposed them because they are hacks, we know they are
-> > hacks, and we know they are not the long term solution.
-> > Yet we have no better way (in our products, today) so far to deal with
-> > these issues because what is needed is an effort like LRNG (does not
-> > have to be this specific implementation), because hacks will not cut it
-> > in the long term.
+On Mon, Nov 22, 2021 at 02:51:35PM -0800, Dave Hansen wrote:
+> By "supporting", do you mean doing something functional?  I don't really
+> care if ptrace() to guest private memory returns -EINVAL or whatever.
+> The most important thing is not crashing the host.
 > 
-> Kernel support for FIPS validated crypto would be very useful, IMHO.
-> 
-> Currently most folks I know and consult with use CentOS because CentOS
-> is free and includes the FIPS canister for OpenSSL. Several folks I
-> know and consult with don't have a solution because they use Debian
-> derivatives, like Ubuntu. They use Ubuntu because Ubuntu offers the
-> image processing packages they need out of the box.
-> 
-> Moving the validated crypto into the kernel would be useful since all
-> distros can provide it without the need for one-off patches.
-> 
-> What I am less clear about.... NIST is only one standard body, and not
-> everyone trusts the US. There are other bodies that should probably be
-> represented, like KISA. So the big question becomes, how does the
-> kernel offer "approved" crypto for different consumers? (where
-> "approved" means blessed by some agency like NIST or KISA).
+> Also, as Sean mentioned, this isn't really about ptrace() itself.  It's
+> really about ensuring that no kernel or devices accesses to guest
+> private memory can induce bad behavior.
 
-IMHO that is where the flexibility of the LRNG comes in. I am currently in 
-discussion with the German BSI on their requirements and these requirements 
-can be covered by a few extra lines since it only affects a different initial 
-seeding of the DRNG.
+I keep repeating this suggestion of mine that we should treat
+guest-private pages as hw-poisoned pages which have experienced a
+uncorrectable error in the past.
 
-In any case, the LRNG supports other approaches by:
+mm already knows how to stay away from those.
 
-- select one or more entropy sources (or provide one from external) that are 
-considered appropriate
+-- 
+Regards/Gruss,
+    Boris.
 
-- if needed, adjust the initial seeding operation
-
-- if needed, adjust the crypto primitives that are in use.
-
-Ciao
-Stephan
-> 
-> Jeff
-
-
-Ciao
-Stephan
-
-
+https://people.kernel.org/tglx/notes-about-netiquette
