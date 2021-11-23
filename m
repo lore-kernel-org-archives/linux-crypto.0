@@ -2,154 +2,219 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3CB8C4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Nov 2021 11:35:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 274E1C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Nov 2021 12:38:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236169AbhKWLjB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Nov 2021 06:39:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50558 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236175AbhKWLjA (ORCPT
+        id S236713AbhKWMlX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Nov 2021 07:41:23 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:59642 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231623AbhKWMlW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Nov 2021 06:39:00 -0500
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E92D9C061746
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Nov 2021 03:35:51 -0800 (PST)
-Received: by mail-wm1-x330.google.com with SMTP id i8-20020a7bc948000000b0030db7b70b6bso1946362wml.1
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Nov 2021 03:35:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=eAAW0gxyL3spMyvFzNZU55TiEHcEGOqrLOJJuSa53K4=;
-        b=4DcfipfNqoq+i8lFBnrntKi3GtNw6X6goztOuq6ZWKhQSuytROlnv18WHcqZhYeh7c
-         GVU/3OFgl1BHcS7c/eSK80Hd36UAWzHFaJQ7HvRGjxLRLvpehVgy/qTdPSxdV6jRIKiv
-         KUBmhXNq4YZ4w4kuOliUyM4YnBMkn32OaZgo2ZnT5yRTOGg+SKtgVsnOrk+YNVJYy4lD
-         7TEDEgB7kTo/0ZPFJUO/BGCiAWb/fgXgFHc2FALVFLl/gTQYgATMGes7lqe/uUECmQQU
-         R5HUDVzCCKPG4/3yDD7kX7/tYF3JE3XCuXq1TzyesuDP+b2eYPrk/jOyI/1Nqgi6l4DO
-         DWpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=eAAW0gxyL3spMyvFzNZU55TiEHcEGOqrLOJJuSa53K4=;
-        b=LNLecT9dQN+u+xHjoTPL7z06tAHA3yG6RH7xkX2Z5H4o1ERZi7FmZOuxIVDhhr2NVl
-         b8F9HQZu8iWdVwVKISxWWJXUoyoIVMIP5c3ctAl7Hq2RN25FHgGPp0w2w32LrTBgn0ov
-         XJCPmuzTIEiAuhGYIuB7fbysu7a4L5Ygt38sc2KapF9zb67C/E+aRMsMUn4nsxtLJFdt
-         slosAMTRUu4BEXKUX4F/fEHcBs5bruMKc/erm4zNff/PC1MtdVu15aGDz4pAjxk6iiLv
-         6/tDDYEh99ul1B706x/ZjW9II6WWyZXi5D9prl/Y0q4/bKdEaNsykkmIg4JvoLn2niAL
-         Mocw==
-X-Gm-Message-State: AOAM531Xi4tQfgJRTIwnOQ/gBQbLuI5jF1xAxtBCouystmZw1AKolIDP
-        HXhJtO2hALw0eKkBBeO1s8NPrrAlDcSTSSdKHUvzJA==
-X-Google-Smtp-Source: ABdhPJyDTgRgvUuV98CyCHfOL5hAURr2qDU4kKqY5aPJ10aLAJMLU+4E45XfCOWPhiTSevTsW28+O1m1n9x86/UMTho=
-X-Received: by 2002:a7b:c017:: with SMTP id c23mr2193327wmb.137.1637667350407;
- Tue, 23 Nov 2021 03:35:50 -0800 (PST)
+        Tue, 23 Nov 2021 07:41:22 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 28741218D9;
+        Tue, 23 Nov 2021 12:38:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1637671094; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nxUHWPSHHKIQkH/xCp19F5dtYwbHfZfyFaAz+qxGBdI=;
+        b=UlXno2KG8DltpmspYGeJrvYmvg+6BmjH7QphQCsHqh3T5BfdXoLE1GLX1B6vmP7wjF3Sgp
+        zT6wNC8L9y5bwLJiRjB3z6b5QzQhRcXCV47hWzxaRMWjPP+oxPR0YCuEUesAZioA+YIkUv
+        VtpTSIebTTbEorqZ1qPxysx1QkVY+68=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1637671094;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nxUHWPSHHKIQkH/xCp19F5dtYwbHfZfyFaAz+qxGBdI=;
+        b=y97crLcjP9hl/sAn3DhLD8gJZxosD3zfCO2vLurLM25BOLZ/lHugJ5avXduySUOnYCSEEa
+        GQEgMDyy0ulXsHDw==
+Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
+        by relay2.suse.de (Postfix) with ESMTP id D1B4EA3B8B;
+        Tue, 23 Nov 2021 12:38:12 +0000 (UTC)
+Received: by adalid.arch.suse.de (Postfix, from userid 16045)
+        id A25F651918C2; Tue, 23 Nov 2021 13:38:12 +0100 (CET)
+From:   Hannes Reinecke <hare@suse.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
+        linux-nvme@lists.infradead.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.org>,
+        linux-crypto@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+        Himanshu Madhani <himanshu.madhani@oracle.com>
+Subject: [PATCH 04/12] lib/base64: RFC4648-compliant base64 encoding
+Date:   Tue, 23 Nov 2021 13:37:53 +0100
+Message-Id: <20211123123801.73197-5-hare@suse.de>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20211123123801.73197-1-hare@suse.de>
+References: <20211123123801.73197-1-hare@suse.de>
 MIME-Version: 1.0
-References: <20211108150554.4457-1-conor.dooley@microchip.com>
- <20211108150554.4457-2-conor.dooley@microchip.com> <272946671.hFph3VMliC@diego>
-In-Reply-To: <272946671.hFph3VMliC@diego>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 23 Nov 2021 17:05:38 +0530
-Message-ID: <CAAhSdy2yr+a7=7Crk7s3pAVbVcYjTdOtRfAaQXBkTVsUpfG20g@mail.gmail.com>
-Subject: Re: [PATCH 01/13] dt-bindings: interrupt-controller: create a header
- for RISC-V interrupts
-To:     =?UTF-8?Q?Heiko_St=C3=BCbner?= <heiko@sntech.de>
-Cc:     Linus Walleij <linus.walleij@linaro.org>,
-        bgolaszewski@baylibre.com, Rob Herring <robh+dt@kernel.org>,
-        jassisinghbrar@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, a.zummo@towertech.it,
-        alexandre.belloni@bootlin.com, broonie@kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        lewis.hanly@microchip.com, conor.dooley@microchip.com,
-        Daire McNamara <daire.mcnamara@microchip.com>,
-        Atish Patra <atish.patra@wdc.com>, ivan.griffin@microchip.com,
-        linux-gpio@vger.kernel.org, DTML <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        linux-i2c@vger.kernel.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-usb@vger.kernel.org,
-        krzysztof.kozlowski@canonical.com,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Bin Meng <bin.meng@windriver.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 23, 2021 at 4:38 PM Heiko St=C3=BCbner <heiko@sntech.de> wrote:
->
-> Am Montag, 8. November 2021, 16:05:42 CET schrieb conor.dooley@microchip.=
-com:
-> > From: Ivan Griffin <ivan.griffin@microchip.com>
-> >
-> > Provide named identifiers for device tree for RISC-V interrupts.
-> >
-> > Licensed under GPL and MIT, as this file may be useful to any OS that
-> > uses device tree.
-> >
-> > Signed-off-by: Ivan Griffin <ivan.griffin@microchip.com>
-> > Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> > ---
-> >  .../interrupt-controller/riscv-hart.h         | 19 +++++++++++++++++++
-> >  1 file changed, 19 insertions(+)
-> >  create mode 100644 include/dt-bindings/interrupt-controller/riscv-hart=
-.h
-> >
-> > diff --git a/include/dt-bindings/interrupt-controller/riscv-hart.h b/in=
-clude/dt-bindings/interrupt-controller/riscv-hart.h
-> > new file mode 100644
-> > index 000000000000..e1c32f6090ac
-> > --- /dev/null
-> > +++ b/include/dt-bindings/interrupt-controller/riscv-hart.h
-> > @@ -0,0 +1,19 @@
-> > +/* SPDX-License-Identifier: (GPL-2.0 OR MIT) */
-> > +/*
-> > + * Copyright (C) 2021 Microchip Technology Inc.  All rights reserved.
-> > + */
-> > +
-> > +#ifndef _DT_BINDINGS_INTERRUPT_CONTROLLER_RISCV_HART_H
-> > +#define _DT_BINDINGS_INTERRUPT_CONTROLLER_RISCV_HART_H
-> > +
-> > +#define HART_INT_U_SOFT   0
-> > +#define HART_INT_S_SOFT   1
-> > +#define HART_INT_M_SOFT   3
-> > +#define HART_INT_U_TIMER  4
-> > +#define HART_INT_S_TIMER  5
-> > +#define HART_INT_M_TIMER  7
-> > +#define HART_INT_U_EXT    8
-> > +#define HART_INT_S_EXT    9
-> > +#define HART_INT_M_EXT    11
->
-> (1) From checking clic doc [0] I see an additional
->         12   CLIC software interrupt
-> defined.
+Add RFC4648-compliant base64 encoding and decoding routines, based on
+the base64url encoding in fs/crypto/fname.c.
 
-Local IRQ #12 is for S-mode guest external interrupts as-per
-the ratified H-extension specification.
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
+---
+ include/linux/base64.h |  16 +++++++
+ lib/Makefile           |   2 +-
+ lib/base64.c           | 103 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 120 insertions(+), 1 deletion(-)
+ create mode 100644 include/linux/base64.h
+ create mode 100644 lib/base64.c
 
-I guess CLIC spec needs to be updated.
+diff --git a/include/linux/base64.h b/include/linux/base64.h
+new file mode 100644
+index 000000000000..660d4cb1ef31
+--- /dev/null
++++ b/include/linux/base64.h
+@@ -0,0 +1,16 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * base64 encoding, lifted from fs/crypto/fname.c.
++ */
++
++#ifndef _LINUX_BASE64_H
++#define _LINUX_BASE64_H
++
++#include <linux/types.h>
++
++#define BASE64_CHARS(nbytes)   DIV_ROUND_UP((nbytes) * 4, 3)
++
++int base64_encode(const u8 *src, int len, char *dst);
++int base64_decode(const char *src, int len, u8 *dst);
++
++#endif /* _LINUX_BASE64_H */
+diff --git a/lib/Makefile b/lib/Makefile
+index 364c23f15578..ddc5cb4c6eb8 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -46,7 +46,7 @@ obj-y += bcd.o sort.o parser.o debug_locks.o random32.o \
+ 	 bust_spinlocks.o kasprintf.o bitmap.o scatterlist.o \
+ 	 list_sort.o uuid.o iov_iter.o clz_ctz.o \
+ 	 bsearch.o find_bit.o llist.o memweight.o kfifo.o \
+-	 percpu-refcount.o rhashtable.o \
++	 percpu-refcount.o rhashtable.o base64.o \
+ 	 once.o refcount.o usercopy.o errseq.o bucket_locks.o \
+ 	 generic-radix-tree.o
+ obj-$(CONFIG_STRING_SELFTEST) += test_string.o
+diff --git a/lib/base64.c b/lib/base64.c
+new file mode 100644
+index 000000000000..60d46157da85
+--- /dev/null
++++ b/lib/base64.c
+@@ -0,0 +1,103 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * base64.c - RFC4648-compliant base64 encoding
++ *
++ * Copyright (c) 2020 Hannes Reinecke, SUSE
++ *
++ * Based on the base64url routines from fs/crypto/fname.c
++ * (which are using the URL-safe base64 encoding),
++ * modified to use the standard coding table from RFC4648 section 4.
++ */
++
++#include <linux/kernel.h>
++#include <linux/types.h>
++#include <linux/export.h>
++#include <linux/string.h>
++#include <linux/base64.h>
++
++static const char base64_table[65] =
++	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
++
++/**
++ * base64_encode() - base64-encode some binary data
++ * @src: the binary data to encode
++ * @srclen: the length of @src in bytes
++ * @dst: (output) the base64-encoded string.  Not NUL-terminated.
++ *
++ * Encodes data using base64 encoding, i.e. the "Base 64 Encoding" specified
++ * by RFC 4648, including the  '='-padding.
++ *
++ * Return: the length of the resulting base64url-encoded string in bytes.
++ */
++int base64_encode(const u8 *src, int srclen, char *dst)
++{
++	u32 ac = 0;
++	int bits = 0;
++	int i;
++	char *cp = dst;
++
++	for (i = 0; i < srclen; i++) {
++		ac = (ac << 8) | src[i];
++		bits += 8;
++		do {
++			bits -= 6;
++			*cp++ = base64_table[(ac >> bits) & 0x3f];
++		} while (bits >= 6);
++	}
++	if (bits) {
++		*cp++ = base64_table[(ac << (6 - bits)) & 0x3f];
++		bits -= 6;
++	}
++	while (bits < 0) {
++		*cp++ = '=';
++		bits += 2;
++	}
++	return cp - dst;
++}
++EXPORT_SYMBOL_GPL(base64_encode);
++
++/**
++ * base64_decode() - base64-decode a string
++ * @src: the string to decode.  Doesn't need to be NUL-terminated.
++ * @srclen: the length of @src in bytes
++ * @dst: (output) the decoded binary data
++ *
++ * Decodes a string using base64url encoding, i.e. the "Base 64 Encoding"
++ * specified by RFC 4648, including the  '='-padding.
++ *
++ * This implementation hasn't been optimized for performance.
++ *
++ * Return: the length of the resulting decoded binary data in bytes,
++ *	   or -1 if the string isn't a valid base64 string.
++ */
++int base64_decode(const char *src, int srclen, u8 *dst)
++{
++	u32 ac = 0;
++	int bits = 0;
++	int i;
++	u8 *bp = dst;
++
++	for (i = 0; i < srclen; i++) {
++		const char *p = strchr(base64_table, src[i]);
++
++		if (src[i] == '=') {
++			ac = (ac << 6);
++			bits += 6;
++			if (bits >= 8)
++				bits -= 8;
++			continue;
++		}
++		if (p == NULL || src[i] == 0)
++			return -1;
++		ac = (ac << 6) | (p - base64_table);
++		bits += 6;
++		if (bits >= 8) {
++			bits -= 8;
++			*bp++ = (u8)(ac >> bits);
++		}
++	}
++	if (ac & ((1 << bits) - 1))
++		return -1;
++	return bp - dst;
++}
++EXPORT_SYMBOL_GPL(base64_decode);
+-- 
+2.29.2
 
-Regards,
-Anup
-
->
-> (2) The doc states that the ordering is a recommendation and
->         "not mandatory in all incarnations of the CLIC"
-> Is that clarified somewhere else that this more than recommended?
->
-> Thanks
-> Heiko
->
->
-> [0] https://github.com/riscv/riscv-fast-interrupt/blob/master/clic.adoc
->
-> > +
-> > +#endif /* _DT_BINDINGS_INTERRUPT_CONTROLLER_RISCV_HART_H */
-> >
->
->
->
->
