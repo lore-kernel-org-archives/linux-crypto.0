@@ -2,24 +2,24 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 205F5C43217
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Nov 2021 20:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4F94C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Nov 2021 20:14:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351570AbhKXURf (ORCPT
+        id S1351521AbhKXURm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Nov 2021 15:17:35 -0500
-Received: from mga05.intel.com ([192.55.52.43]:13498 "EHLO mga05.intel.com"
+        Wed, 24 Nov 2021 15:17:42 -0500
+Received: from mga05.intel.com ([192.55.52.43]:13501 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1351509AbhKXURc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Nov 2021 15:17:32 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="321601955"
+        id S1351526AbhKXURd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Nov 2021 15:17:33 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="321601957"
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="321601955"
+   d="scan'208";a="321601957"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 12:14:19 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 12:14:20 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="510015807"
+   d="scan'208";a="510015811"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
   by orsmga008.jf.intel.com with ESMTP; 24 Nov 2021 12:14:19 -0800
 From:   "Chang S. Bae" <chang.seok.bae@intel.com>
@@ -29,10 +29,11 @@ To:     tglx@linutronix.de, bp@suse.de, dave.hansen@linux.intel.com,
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         dan.j.williams@intel.com, charishma1.gairuboyina@intel.com,
         kumar.n.dwarakanath@intel.com, lalithambika.krishnakumar@intel.com,
-        ravi.v.shankar@intel.com, chang.seok.bae@intel.com
-Subject: [PATCH v3 07/15] x86/cpu/keylocker: Load an internal wrapping key at boot-time
-Date:   Wed, 24 Nov 2021 12:06:52 -0800
-Message-Id: <20211124200700.15888-8-chang.seok.bae@intel.com>
+        ravi.v.shankar@intel.com, chang.seok.bae@intel.com,
+        linux-pm@vger.kernel.org
+Subject: [PATCH v3 08/15] x86/power/keylocker: Restore internal wrapping key from the ACPI S3/4 sleep states
+Date:   Wed, 24 Nov 2021 12:06:53 -0800
+Message-Id: <20211124200700.15888-9-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20211124200700.15888-1-chang.seok.bae@intel.com>
 References: <20211124200700.15888-1-chang.seok.bae@intel.com>
@@ -40,224 +41,274 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Internal Wrapping Key (IWKey) is an entity of Key Locker to encode a
-clear text key into a key handle. This key is a pivot in protecting user
-keys. So the value has to be randomized before being loaded in the
-software-invisible CPU state.
+When the system state switches to these sleep states, the internal
+wrapping key gets reset in the CPU state.
 
-IWKey needs to be established before the first user. Given that the only
-proposed Linux use case for Key Locker is dm-crypt, the feature could be
-lazily enabled when the first dm-crypt user arrives, but there is no
-precedent for late enabling of CPU features and it adds maintenance burden
-without demonstrative benefit outside of minimizing the visibility of
-Key Locker to userspace.
+The primary use case for the feature is bare metal dm-crypt. The key needs
+to be restored properly on wakeup, as dm-crypt does not prompt for the key
+on resume from suspend. Even the prompt it does perform for unlocking
+the volume where the hibernation image is stored, it still expects to reuse
+the key handles within the hibernation image once it is loaded. So it is
+motivated to meet dm-crypt's expectation that the key handles in the
+suspend-image remain valid after resume from an S-state.
 
-The kernel generates random bytes and load them at boot time. These bytes
-are flushed out immediately.
+Key Locker provides a mechanism to back up the internal wrapping key in
+non-volatile storage. The kernel requests a backup right after the key is
+loaded at boot time. It is copied back to each CPU upon wakeup.
 
-Setting the CR4.KL bit does not always enable the feature so ensure the
-dynamic CPU bit (CPUID.AESKLE) is set before loading the key.
+While the backup may be maintained in NVM across S5 and G3 "off"
+states it is not architecturally guaranteed, nor is it expected by dm-crypt
+which expects to prompt for the key each time the volume is started.
 
-Given that the Linux Key Locker support is only intended for bare metal
-dm-crypt consumption, and that switching IWKey per VM is untenable,
-explicitly skip Key Locker setup in the X86_FEATURE_HYPERVISOR case.
+The entirety of Key Locker needs to be disabled if the backup mechanism is
+not available unless CONFIG_SUSPEND=n, otherwise dm-crypt requires the
+backup to be available.
+
+In the event of a key restore failure the kernel proceeds with an
+initialized IWKey state. This has the effect of invalidating any key
+handles that might be present in a suspend-image. When this happens
+dm-crypt will see I/O errors resulting from error returns from
+crypto_skcipher_{en,de}crypt(). While this will disrupt operations in the
+current boot, data is not at risk and access is restored at the next reboot
+to create new handles relative to the current IWKey.
+
+Manage a feature-specific flag to communicate with the crypto
+implementation. This ensures to stop using the AES instructions upon the
+key restore failure while not turning off the feature.
 
 Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
 Reviewed-by: Dan Williams <dan.j.williams@intel.com>
 Cc: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org
+Cc: linux-pm@vger.kernel.org
 ---
 Changes from RFC v2:
-* Make bare metal only.
-* Clean up the code (e.g. dynamically allocate the key cache).
-  (Dan Williams)
-* Massage the changelog.
-* Move out the LOADIWKEY wrapper and the Key Locker CPUID defines.
+* Change the backup key failure handling. (Dan Williams)
 
-Note, Dan wonders that given that the only proposed Linux use case for
-Key Locker is dm-crypt, the feature could be lazily enabled when the
-first dm-crypt user arrives, but as Dave notes there is no precedent
-for late enabling of CPU features and it adds maintenance burden
-without demonstrative benefit outside of minimizing the visibility of
-Key Locker to userspace.
+Changes from RFC v1:
+* Folded the warning message into the if condition check. (Rafael Wysocki)
+* Rebased on the changes of the previous patches.
+* Added error code for key restoration failures.
+* Moved the restore helper.
+* Added function descriptions.
 ---
- arch/x86/include/asm/keylocker.h |  9 ++++
- arch/x86/kernel/Makefile         |  1 +
- arch/x86/kernel/cpu/common.c     |  5 +-
- arch/x86/kernel/keylocker.c      | 79 ++++++++++++++++++++++++++++++++
- arch/x86/kernel/smpboot.c        |  2 +
- 5 files changed, 95 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/kernel/keylocker.c
+ arch/x86/include/asm/keylocker.h |   4 +
+ arch/x86/kernel/keylocker.c      | 124 ++++++++++++++++++++++++++++++-
+ arch/x86/power/cpu.c             |   2 +
+ 3 files changed, 128 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
-index e85dfb6c1524..820ac29c06d9 100644
+index 820ac29c06d9..4000a5eed2c2 100644
 --- a/arch/x86/include/asm/keylocker.h
 +++ b/arch/x86/include/asm/keylocker.h
-@@ -5,6 +5,7 @@
+@@ -32,9 +32,13 @@ struct iwkey {
+ #ifdef CONFIG_X86_KEYLOCKER
+ void setup_keylocker(struct cpuinfo_x86 *c);
+ void destroy_keylocker_data(void);
++void restore_keylocker(void);
++extern bool valid_keylocker(void);
+ #else
+ #define setup_keylocker(c) do { } while (0)
+ #define destroy_keylocker_data() do { } while (0)
++#define restore_keylocker() do { } while (0)
++static inline bool valid_keylocker { return false; }
+ #endif
  
- #ifndef __ASSEMBLY__
- 
-+#include <asm/processor.h>
- #include <linux/bits.h>
- #include <asm/fpu/types.h>
- 
-@@ -28,5 +29,13 @@ struct iwkey {
- #define KEYLOCKER_CPUID_EBX_WIDE	BIT(2)
- #define KEYLOCKER_CPUID_EBX_BACKUP	BIT(4)
- 
-+#ifdef CONFIG_X86_KEYLOCKER
-+void setup_keylocker(struct cpuinfo_x86 *c);
-+void destroy_keylocker_data(void);
-+#else
-+#define setup_keylocker(c) do { } while (0)
-+#define destroy_keylocker_data() do { } while (0)
-+#endif
-+
  #endif /*__ASSEMBLY__ */
- #endif /* _ASM_KEYLOCKER_H */
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index 2ff3e600f426..e15efa238497 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -144,6 +144,7 @@ obj-$(CONFIG_PERF_EVENTS)		+= perf_regs.o
- obj-$(CONFIG_TRACING)			+= tracepoint.o
- obj-$(CONFIG_SCHED_MC_PRIO)		+= itmt.o
- obj-$(CONFIG_X86_UMIP)			+= umip.o
-+obj-$(CONFIG_X86_KEYLOCKER)		+= keylocker.o
- 
- obj-$(CONFIG_UNWINDER_ORC)		+= unwind_orc.o
- obj-$(CONFIG_UNWINDER_FRAME_POINTER)	+= unwind_frame.o
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 0083464de5e3..23b4aa437c1e 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -57,6 +57,8 @@
- #include <asm/microcode_intel.h>
- #include <asm/intel-family.h>
- #include <asm/cpu_device_id.h>
-+#include <asm/keylocker.h>
-+
- #include <asm/uv/uv.h>
- #include <asm/sigframe.h>
- 
-@@ -1595,10 +1597,11 @@ static void identify_cpu(struct cpuinfo_x86 *c)
- 	/* Disable the PN if appropriate */
- 	squash_the_stupid_serial_number(c);
- 
--	/* Set up SMEP/SMAP/UMIP */
-+	/* Setup various Intel-specific CPU security features */
- 	setup_smep(c);
- 	setup_smap(c);
- 	setup_umip(c);
-+	setup_keylocker(c);
- 
- 	/* Enable FSGSBASE instructions if available. */
- 	if (cpu_has(c, X86_FEATURE_FSGSBASE)) {
 diff --git a/arch/x86/kernel/keylocker.c b/arch/x86/kernel/keylocker.c
-new file mode 100644
-index 000000000000..87d775a65716
---- /dev/null
+index 87d775a65716..ff0e012e3dd5 100644
+--- a/arch/x86/kernel/keylocker.c
 +++ b/arch/x86/kernel/keylocker.c
-@@ -0,0 +1,79 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
+@@ -11,11 +11,26 @@
+ #include <asm/fpu/api.h>
+ #include <asm/keylocker.h>
+ #include <asm/tlbflush.h>
++#include <asm/msr.h>
+ 
+ static __initdata struct keylocker_setup_data {
++	bool initialized;
+ 	struct iwkey key;
+ } kl_setup;
+ 
 +/*
-+ * Setup Key Locker feature and support internal wrapping key
-+ * management.
++ * This flag is set with IWKey load. When the key restore fails, it is
++ * reset. This restore state is exported to the crypto library, then AES-KL
++ * will not be used there. So, the feature is soft-disabled with this flag.
 + */
++static bool valid_kl;
 +
-+#include <linux/random.h>
-+#include <linux/poison.h>
-+
-+#include <asm/fpu/api.h>
-+#include <asm/keylocker.h>
-+#include <asm/tlbflush.h>
-+
-+static __initdata struct keylocker_setup_data {
-+	struct iwkey key;
-+} kl_setup;
-+
-+static void __init generate_keylocker_data(void)
++bool valid_keylocker(void)
 +{
-+	get_random_bytes(&kl_setup.key.integrity_key,  sizeof(kl_setup.key.integrity_key));
-+	get_random_bytes(&kl_setup.key.encryption_key, sizeof(kl_setup.key.encryption_key));
++	return valid_kl;
 +}
++EXPORT_SYMBOL_GPL(valid_keylocker);
 +
-+void __init destroy_keylocker_data(void)
-+{
-+	memset(&kl_setup.key, KEY_DESTROY, sizeof(kl_setup.key));
-+}
-+
-+static void __init load_keylocker(void)
-+{
-+	kernel_fpu_begin();
-+	load_xmm_iwkey(&kl_setup.key);
-+	kernel_fpu_end();
-+}
-+
+ static void __init generate_keylocker_data(void)
+ {
+ 	get_random_bytes(&kl_setup.key.integrity_key,  sizeof(kl_setup.key.integrity_key));
+@@ -25,6 +40,8 @@ static void __init generate_keylocker_data(void)
+ void __init destroy_keylocker_data(void)
+ {
+ 	memset(&kl_setup.key, KEY_DESTROY, sizeof(kl_setup.key));
++	kl_setup.initialized = true;
++	valid_kl = true;
+ }
+ 
+ static void __init load_keylocker(void)
+@@ -34,6 +51,27 @@ static void __init load_keylocker(void)
+ 	kernel_fpu_end();
+ }
+ 
 +/**
-+ * setup_keylocker - Enable the feature.
-+ * @c:		A pointer to struct cpuinfo_x86
++ * copy_keylocker - Copy the internal wrapping key from the backup.
++ *
++ * Request hardware to copy the key in non-volatile storage to the CPU
++ * state.
++ *
++ * Returns:	-EBUSY if the copy fails, 0 if successful.
 + */
-+void __ref setup_keylocker(struct cpuinfo_x86 *c)
++static int copy_keylocker(void)
 +{
-+	/* This feature is not compatible with a hypervisor. */
-+	if (!cpu_feature_enabled(X86_FEATURE_KEYLOCKER) ||
-+	    cpu_feature_enabled(X86_FEATURE_HYPERVISOR))
-+		goto out;
++	u64 status;
 +
-+	cr4_set_bits(X86_CR4_KEYLOCKER);
++	wrmsrl(MSR_IA32_COPY_IWKEY_TO_LOCAL, 1);
 +
-+	if (c == &boot_cpu_data) {
-+		u32 eax, ebx, ecx, edx;
++	rdmsrl(MSR_IA32_IWKEY_COPY_STATUS, status);
++	if (status & BIT(0))
++		return 0;
++	else
++		return -EBUSY;
++}
 +
-+		cpuid_count(KEYLOCKER_CPUID, 0, &eax, &ebx, &ecx, &edx);
+ /**
+  * setup_keylocker - Enable the feature.
+  * @c:		A pointer to struct cpuinfo_x86
+@@ -49,6 +87,7 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
+ 
+ 	if (c == &boot_cpu_data) {
+ 		u32 eax, ebx, ecx, edx;
++		bool backup_available;
+ 
+ 		cpuid_count(KEYLOCKER_CPUID, 0, &eax, &ebx, &ecx, &edx);
+ 		/*
+@@ -62,10 +101,49 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
+ 			goto disable;
+ 		}
+ 
++		backup_available = (ebx & KEYLOCKER_CPUID_EBX_BACKUP) ? true : false;
 +		/*
-+		 * Check the feature readiness via CPUID. Note that the
-+		 * CPUID AESKLE bit is conditionally set only when CR4.KL
-+		 * is set.
++		 * The internal wrapping key in CPU state is volatile in
++		 * S3/4 states. So ensure the backup capability along with
++		 * S-states.
 +		 */
-+		if (!(ebx & KEYLOCKER_CPUID_EBX_AESKLE) ||
-+		    !(eax & KEYLOCKER_CPUID_EAX_SUPERVISOR)) {
-+			pr_debug("x86/keylocker: Not fully supported.\n");
++		if (!backup_available && IS_ENABLED(CONFIG_SUSPEND)) {
++			pr_debug("x86/keylocker: No key backup support with possible S3/4.\n");
 +			goto disable;
 +		}
 +
-+		generate_keylocker_data();
+ 		generate_keylocker_data();
+-	}
++		load_keylocker();
+ 
+-	load_keylocker();
++		/* Backup an internal wrapping key in non-volatile media. */
++		if (backup_available)
++			wrmsrl(MSR_IA32_BACKUP_IWKEY_TO_PLATFORM, 1);
++	} else {
++		int rc;
++
++		/*
++		 * Load the internal wrapping key directly when available
++		 * in memory, which is only possible at boot-time.
++		 *
++		 * NB: When system wakes up, this path also recovers the
++		 * internal wrapping key.
++		 */
++		if (!kl_setup.initialized) {
++			load_keylocker();
++		} else if (valid_kl) {
++			rc = copy_keylocker();
++			/*
++			 * The boot CPU was successful but the key copy
++			 * fails here. Then, the subsequent feature use
++			 * will have inconsistent keys and failures. So,
++			 * invalidate the feature via the flag.
++			 */
++			if (rc) {
++				valid_kl = false;
++				pr_err_once("x86/keylocker: Invalid copy status (rc: %d).\n", rc);
++			}
++		}
++	}
+ 
+ 	pr_info_once("x86/keylocker: Enabled.\n");
+ 	return;
+@@ -77,3 +155,45 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
+ 	/* Make sure the feature disabled for kexec-reboot. */
+ 	cr4_clear_bits(X86_CR4_KEYLOCKER);
+ }
++
++/**
++ * restore_keylocker - Restore the internal wrapping key.
++ *
++ * The boot CPU executes this while other CPUs restore it through the setup
++ * function.
++ */
++void restore_keylocker(void)
++{
++	u64 backup_status;
++	int rc;
++
++	if (!cpu_feature_enabled(X86_FEATURE_KEYLOCKER) || !valid_kl)
++		return;
++
++	/*
++	 * The IA32_IWKEYBACKUP_STATUS MSR contains a bitmap that indicates
++	 * an invalid backup if bit 0 is set and a read (or write) error if
++	 * bit 2 is set.
++	 */
++	rdmsrl(MSR_IA32_IWKEY_BACKUP_STATUS, backup_status);
++	if (backup_status & BIT(0)) {
++		rc = copy_keylocker();
++		if (rc)
++			pr_err("x86/keylocker: Invalid copy state (rc: %d).\n", rc);
++		else
++			return;
++	} else {
++		pr_err("x86/keylocker: The key backup access failed with %s.\n",
++		       (backup_status & BIT(2)) ? "read error" : "invalid status");
 +	}
 +
-+	load_keylocker();
-+
-+	pr_info_once("x86/keylocker: Enabled.\n");
-+	return;
-+
-+disable:
-+	setup_clear_cpu_cap(X86_FEATURE_KEYLOCKER);
-+	pr_info_once("x86/keylocker: Disabled.\n");
-+out:
-+	/* Make sure the feature disabled for kexec-reboot. */
-+	cr4_clear_bits(X86_CR4_KEYLOCKER);
++	/*
++	 * Now the backup key is not available. Invalidate the feature via
++	 * the flag to avoid any subsequent use. But keep the feature with
++	 * zero IWKeys instead of disabling it. The current users will see
++	 * key handle integrity failure but that's because of the internal
++	 * key change.
++	 */
++	pr_err("x86/keylocker: Failed to restore internal wrapping key.\n");
++	valid_kl = false;
 +}
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index ac2909f0cab3..3b81fd643784 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -82,6 +82,7 @@
- #include <asm/spec-ctrl.h>
- #include <asm/hw_irq.h>
- #include <asm/stackprotector.h>
+diff --git a/arch/x86/power/cpu.c b/arch/x86/power/cpu.c
+index 9f2b251e83c5..1a290f529c73 100644
+--- a/arch/x86/power/cpu.c
++++ b/arch/x86/power/cpu.c
+@@ -25,6 +25,7 @@
+ #include <asm/cpu.h>
+ #include <asm/mmu_context.h>
+ #include <asm/cpu_device_id.h>
 +#include <asm/keylocker.h>
  
- #ifdef CONFIG_ACPI_CPPC_LIB
- #include <acpi/cppc_acpi.h>
-@@ -1475,6 +1476,7 @@ void __init native_smp_cpus_done(unsigned int max_cpus)
- 	nmi_selftest();
- 	impress_friends();
- 	mtrr_aps_init();
-+	destroy_keylocker_data();
- }
+ #ifdef CONFIG_X86_32
+ __visible unsigned long saved_context_ebx;
+@@ -262,6 +263,7 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
+ 	mtrr_bp_restore();
+ 	perf_restore_debug_store();
+ 	msr_restore_context(ctxt);
++	restore_keylocker();
  
- static int __initdata setup_possible_cpus = -1;
+ 	c = &cpu_data(smp_processor_id());
+ 	if (cpu_has(c, X86_FEATURE_MSR_IA32_FEAT_CTL))
 -- 
 2.17.1
 
