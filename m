@@ -2,56 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EA6C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Nov 2021 18:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC26CC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Nov 2021 03:17:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239652AbhKWSXJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Nov 2021 13:23:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33284 "EHLO mail.kernel.org"
+        id S240809AbhKXDUi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Nov 2021 22:20:38 -0500
+Received: from mga09.intel.com ([134.134.136.24]:56227 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232326AbhKWSXJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Nov 2021 13:23:09 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C53C660F6E;
-        Tue, 23 Nov 2021 18:20:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637691601;
-        bh=/oGeobPgKEELQ9jR8Tid54S7CEBgVi/4RdF59awrB6M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lOfhWqjGTMY5cSS2hechhcQTagHANlBU6FDHuZ2Gx3PVuM29N1MzlIItLdulSljk6
-         AEmseKxSX1kUPxFkzDtwbVA8y3Do5Vi7QLPh5Mh5oQ1YQytBuo/AWn0y/czdQ5xg+s
-         jQvU64VrSM1KEl7bS/z/hVnHOdyAe6mUzjLPkMvK85xRmDgjlrnFEkp/2hyPNF79ig
-         o0AbmsZ++TXC356q4reWTN4DLbPUWamUR/JrWFN7BujPlpgK4ivzEz9raSeP8gH8/4
-         tNfFVGgAp/z5DiSWE9KxaFIJqs22D0cZ+qoqmQQ7VKJje2RvzN04jVKtq5dbFHe/Ys
-         A3VjoccNiSyXQ==
-Date:   Tue, 23 Nov 2021 10:19:59 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.org>,
-        linux-crypto@vger.kernel.org,
-        Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: Re: [PATCH 04/12] lib/base64: RFC4648-compliant base64 encoding
-Message-ID: <YZ0wz+4uA4Nk+aVQ@gmail.com>
-References: <20211123123801.73197-1-hare@suse.de>
- <20211123123801.73197-5-hare@suse.de>
+        id S240802AbhKXDUi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Nov 2021 22:20:38 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10177"; a="235012512"
+X-IronPort-AV: E=Sophos;i="5.87,258,1631602800"; 
+   d="scan'208";a="235012512"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2021 19:17:29 -0800
+X-IronPort-AV: E=Sophos;i="5.87,258,1631602800"; 
+   d="scan'208";a="674714109"
+Received: from rongch2-mobl.ccr.corp.intel.com (HELO [10.255.28.39]) ([10.255.28.39])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2021 19:17:25 -0800
+Subject: Re: [kbuild-all] Re: [PATCH] crypto: fix flexible_array.cocci
+ warnings
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Julia Lawall <julia.lawall@inria.fr>
+Cc:     Megha Dey <megha.dey@intel.com>, kbuild-all@lists.01.org,
+        linux-kernel@vger.kernel.org,
+        Tomasz Kantecki <tomasz.kantecki@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-crypto@vger.kernel.org
+References: <alpine.DEB.2.22.394.2111121154320.2916@hadrien>
+ <20211120040625.GA25678@gondor.apana.org.au>
+From:   "Chen, Rong A" <rong.a.chen@intel.com>
+Message-ID: <4514c646-cae1-cd50-8a1c-1a550593c7a8@intel.com>
+Date:   Wed, 24 Nov 2021 11:17:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211123123801.73197-5-hare@suse.de>
+In-Reply-To: <20211120040625.GA25678@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 23, 2021 at 01:37:53PM +0100, Hannes Reinecke wrote:
-> + * Return: the length of the resulting base64url-encoded string in bytes.
+Hi Herbert,
 
-As I mentioned on a previous version, this is base64, not base64url.
+On 11/20/2021 12:06 PM, Herbert Xu wrote:
+> On Fri, Nov 12, 2021 at 11:56:22AM +0100, Julia Lawall wrote:
+>> From: kernel test robot <lkp@intel.com>
+>>
+>>   Zero-length and one-element arrays are deprecated, see
+>>   Documentation/process/deprecated.rst
+>>   Flexible-array members should be used instead.
+>>
+>> Generated by: scripts/coccinelle/misc/flexible_array.cocci
+>>
+>> Reported-by: kernel test robot <lkp@intel.com>
+>> Signed-off-by: kernel test robot <lkp@intel.com>
+>> Signed-off-by: Julia Lawall <julia.lawall@inria.fr>
+>> ---
+>>
+>> tree:   https://github.com/meghadey/crypto crypto-avx512
+>> head:   9c8c2ca77f6e2575a130bddb9767d068e1162d71
+>> commit: 377aede9f10ee28be954473668bc6d33c6c9db75 [5/6] crypto: aesni - AVX512 version of AESNI-GCM using VPCLMULQDQ
 
-> + * Decodes a string using base64url encoding, i.e. the "Base 64 Encoding"
+Sorry for the noise, this patch tries to fix the above commit, it seems
+the commit is still in the private tree, we have fixed it to avoid 
+sending to maintainers.
 
-Likewise here.
+Best Regards,
+Rong Chen
 
-- Eric
+>> :::::: branch date: 7 weeks ago
+>> :::::: commit date: 7 weeks ago
+>>
+>>   aesni-intel_glue.c |    2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> --- a/arch/x86/crypto/aesni-intel_glue.c
+>> +++ b/arch/x86/crypto/aesni-intel_glue.c
+>> @@ -87,7 +87,7 @@ struct gcm_context_data {
+>>   	u64 partial_block_len;
+>>   	u64 unused;
+>>   	/* Allocate space for hash_keys later */
+>> -	u8 hash_keys[0];
+>> +	u8 hash_keys[];
+> 
+> Which tree did this come from? Not only is this not zero in my
+> tree, but it seems to have never been zero in the git history.
+> 
+> Thanks,
+> 
