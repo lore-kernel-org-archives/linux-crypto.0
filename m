@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4F94C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Nov 2021 20:14:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B577C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Nov 2021 20:14:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351521AbhKXURm (ORCPT
+        id S1351731AbhKXURq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Nov 2021 15:17:42 -0500
-Received: from mga05.intel.com ([192.55.52.43]:13501 "EHLO mga05.intel.com"
+        Wed, 24 Nov 2021 15:17:46 -0500
+Received: from mga18.intel.com ([134.134.136.126]:24872 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1351526AbhKXURd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Nov 2021 15:17:33 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="321601957"
+        id S244409AbhKXURe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Nov 2021 15:17:34 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="222240647"
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="321601957"
+   d="scan'208";a="222240647"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 12:14:20 -0800
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 12:14:21 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="510015811"
+   d="scan'208";a="510015829"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
-  by orsmga008.jf.intel.com with ESMTP; 24 Nov 2021 12:14:19 -0800
+  by orsmga008.jf.intel.com with ESMTP; 24 Nov 2021 12:14:21 -0800
 From:   "Chang S. Bae" <chang.seok.bae@intel.com>
 To:     tglx@linutronix.de, bp@suse.de, dave.hansen@linux.intel.com,
         mingo@kernel.org, luto@kernel.org, x86@kernel.org,
@@ -29,11 +29,10 @@ To:     tglx@linutronix.de, bp@suse.de, dave.hansen@linux.intel.com,
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         dan.j.williams@intel.com, charishma1.gairuboyina@intel.com,
         kumar.n.dwarakanath@intel.com, lalithambika.krishnakumar@intel.com,
-        ravi.v.shankar@intel.com, chang.seok.bae@intel.com,
-        linux-pm@vger.kernel.org
-Subject: [PATCH v3 08/15] x86/power/keylocker: Restore internal wrapping key from the ACPI S3/4 sleep states
-Date:   Wed, 24 Nov 2021 12:06:53 -0800
-Message-Id: <20211124200700.15888-9-chang.seok.bae@intel.com>
+        ravi.v.shankar@intel.com, chang.seok.bae@intel.com
+Subject: [PATCH v3 12/15] crypto: x86/aes-kl - Support ECB mode
+Date:   Wed, 24 Nov 2021 12:06:57 -0800
+Message-Id: <20211124200700.15888-13-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20211124200700.15888-1-chang.seok.bae@intel.com>
 References: <20211124200700.15888-1-chang.seok.bae@intel.com>
@@ -41,274 +40,351 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When the system state switches to these sleep states, the internal
-wrapping key gets reset in the CPU state.
-
-The primary use case for the feature is bare metal dm-crypt. The key needs
-to be restored properly on wakeup, as dm-crypt does not prompt for the key
-on resume from suspend. Even the prompt it does perform for unlocking
-the volume where the hibernation image is stored, it still expects to reuse
-the key handles within the hibernation image once it is loaded. So it is
-motivated to meet dm-crypt's expectation that the key handles in the
-suspend-image remain valid after resume from an S-state.
-
-Key Locker provides a mechanism to back up the internal wrapping key in
-non-volatile storage. The kernel requests a backup right after the key is
-loaded at boot time. It is copied back to each CPU upon wakeup.
-
-While the backup may be maintained in NVM across S5 and G3 "off"
-states it is not architecturally guaranteed, nor is it expected by dm-crypt
-which expects to prompt for the key each time the volume is started.
-
-The entirety of Key Locker needs to be disabled if the backup mechanism is
-not available unless CONFIG_SUSPEND=n, otherwise dm-crypt requires the
-backup to be available.
-
-In the event of a key restore failure the kernel proceeds with an
-initialized IWKey state. This has the effect of invalidating any key
-handles that might be present in a suspend-image. When this happens
-dm-crypt will see I/O errors resulting from error returns from
-crypto_skcipher_{en,de}crypt(). While this will disrupt operations in the
-current boot, data is not at risk and access is restored at the next reboot
-to create new handles relative to the current IWKey.
-
-Manage a feature-specific flag to communicate with the crypto
-implementation. This ensures to stop using the AES instructions upon the
-key restore failure while not turning off the feature.
+Implement ECB mode using AES-KL. Export the methods with a lower priority
+than AES-NI to avoid from selected by default.
 
 Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+Acked-by: Dan Williams <dan.j.williams@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: x86@kernel.org
+Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
-Cc: linux-pm@vger.kernel.org
 ---
 Changes from RFC v2:
-* Change the backup key failure handling. (Dan Williams)
-
-Changes from RFC v1:
-* Folded the warning message into the if condition check. (Rafael Wysocki)
-* Rebased on the changes of the previous patches.
-* Added error code for key restoration failures.
-* Moved the restore helper.
-* Added function descriptions.
+* Separate out the code as a new patch.
 ---
- arch/x86/include/asm/keylocker.h |   4 +
- arch/x86/kernel/keylocker.c      | 124 ++++++++++++++++++++++++++++++-
- arch/x86/power/cpu.c             |   2 +
- 3 files changed, 128 insertions(+), 2 deletions(-)
+ arch/x86/crypto/aeskl-intel_asm.S  | 193 +++++++++++++++++++++++++++++
+ arch/x86/crypto/aeskl-intel_glue.c |  92 +++++++++++++-
+ 2 files changed, 284 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
-index 820ac29c06d9..4000a5eed2c2 100644
---- a/arch/x86/include/asm/keylocker.h
-+++ b/arch/x86/include/asm/keylocker.h
-@@ -32,9 +32,13 @@ struct iwkey {
- #ifdef CONFIG_X86_KEYLOCKER
- void setup_keylocker(struct cpuinfo_x86 *c);
- void destroy_keylocker_data(void);
-+void restore_keylocker(void);
-+extern bool valid_keylocker(void);
- #else
- #define setup_keylocker(c) do { } while (0)
- #define destroy_keylocker_data() do { } while (0)
-+#define restore_keylocker() do { } while (0)
-+static inline bool valid_keylocker { return false; }
- #endif
- 
- #endif /*__ASSEMBLY__ */
-diff --git a/arch/x86/kernel/keylocker.c b/arch/x86/kernel/keylocker.c
-index 87d775a65716..ff0e012e3dd5 100644
---- a/arch/x86/kernel/keylocker.c
-+++ b/arch/x86/kernel/keylocker.c
-@@ -11,11 +11,26 @@
- #include <asm/fpu/api.h>
- #include <asm/keylocker.h>
- #include <asm/tlbflush.h>
-+#include <asm/msr.h>
- 
- static __initdata struct keylocker_setup_data {
-+	bool initialized;
- 	struct iwkey key;
- } kl_setup;
+diff --git a/arch/x86/crypto/aeskl-intel_asm.S b/arch/x86/crypto/aeskl-intel_asm.S
+index d56ec8dd6644..833bb39ae903 100644
+--- a/arch/x86/crypto/aeskl-intel_asm.S
++++ b/arch/x86/crypto/aeskl-intel_asm.S
+@@ -182,3 +182,196 @@ SYM_FUNC_START(_aeskl_dec)
+ 	ret
+ SYM_FUNC_END(_aeskl_dec)
  
 +/*
-+ * This flag is set with IWKey load. When the key restore fails, it is
-+ * reset. This restore state is exported to the crypto library, then AES-KL
-+ * will not be used there. So, the feature is soft-disabled with this flag.
++ * int _aeskl_ecb_enc(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
++ *		      size_t len)
 + */
-+static bool valid_kl;
++SYM_FUNC_START(_aeskl_ecb_enc)
++	FRAME_BEGIN
++#ifndef __x86_64__
++	pushl LEN
++	pushl HANDLEP
++	pushl KLEN
++	movl (FRAME_OFFSET+16)(%esp), HANDLEP	# ctx
++	movl (FRAME_OFFSET+20)(%esp), OUTP	# dst
++	movl (FRAME_OFFSET+24)(%esp), INP	# src
++	movl (FRAME_OFFSET+28)(%esp), LEN	# len
++#endif
++	test LEN, LEN
++	jz .Lecb_enc_noerr
++	mov 480(HANDLEP), KLEN
++	cmp $16, LEN
++	jb .Lecb_enc_noerr
++	cmp $128, LEN
++	jb .Lecb_enc1
 +
-+bool valid_keylocker(void)
-+{
-+	return valid_kl;
-+}
-+EXPORT_SYMBOL_GPL(valid_keylocker);
++.align 4
++.Lecb_enc8:
++	movdqu (INP), STATE1
++	movdqu 0x10(INP), STATE2
++	movdqu 0x20(INP), STATE3
++	movdqu 0x30(INP), STATE4
++	movdqu 0x40(INP), STATE5
++	movdqu 0x50(INP), STATE6
++	movdqu 0x60(INP), STATE7
++	movdqu 0x70(INP), STATE8
 +
- static void __init generate_keylocker_data(void)
++	cmp $16, KLEN
++	je .Lecb_enc8_128
++	aesencwide256kl (HANDLEP)
++	jz .Lecb_enc_err
++	jmp .Lecb_enc8_end
++.Lecb_enc8_128:
++	aesencwide128kl (HANDLEP)
++	jz .Lecb_enc_err
++
++.Lecb_enc8_end:
++	movdqu STATE1, (OUTP)
++	movdqu STATE2, 0x10(OUTP)
++	movdqu STATE3, 0x20(OUTP)
++	movdqu STATE4, 0x30(OUTP)
++	movdqu STATE5, 0x40(OUTP)
++	movdqu STATE6, 0x50(OUTP)
++	movdqu STATE7, 0x60(OUTP)
++	movdqu STATE8, 0x70(OUTP)
++
++	sub $128, LEN
++	add $128, INP
++	add $128, OUTP
++	cmp $128, LEN
++	jge .Lecb_enc8
++	cmp $16, LEN
++	jb .Lecb_enc_noerr
++
++.align 4
++.Lecb_enc1:
++	movdqu (INP), STATE1
++	cmp $16, KLEN
++	je .Lecb_enc1_128
++	aesenc256kl (HANDLEP), STATE
++	jz .Lecb_enc_err
++	jmp .Lecb_enc1_end
++.Lecb_enc1_128:
++	aesenc128kl (HANDLEP), STATE
++	jz .Lecb_enc_err
++
++.Lecb_enc1_end:
++	movdqu STATE1, (OUTP)
++	sub $16, LEN
++	add $16, INP
++	add $16, OUTP
++	cmp $16, LEN
++	jge .Lecb_enc1
++
++.Lecb_enc_noerr:
++	xor AREG, AREG
++	jmp .Lecb_enc_end
++.Lecb_enc_err:
++	mov $1, AREG
++.Lecb_enc_end:
++#ifndef __x86_64__
++	popl KLEN
++	popl HANDLEP
++	popl LEN
++#endif
++	FRAME_END
++	ret
++SYM_FUNC_END(_aeskl_ecb_enc)
++
++/*
++ * int _aeskl_ecb_dec(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
++ *		      size_t len)
++ */
++SYM_FUNC_START(_aeskl_ecb_dec)
++	FRAME_BEGIN
++#ifndef __x86_64__
++	pushl LEN
++	pushl HANDLEP
++	pushl KLEN
++	movl (FRAME_OFFSET+16)(%esp), HANDLEP	# ctx
++	movl (FRAME_OFFSET+20)(%esp), OUTP	# dst
++	movl (FRAME_OFFSET+24)(%esp), INP	# src
++	movl (FRAME_OFFSET+28)(%esp), LEN	# len
++#endif
++
++	test LEN, LEN
++	jz .Lecb_dec_noerr
++	mov 480(HANDLEP), KLEN
++	cmp $16, LEN
++	jb .Lecb_dec_noerr
++	cmp $128, LEN
++	jb .Lecb_dec1
++
++.align 4
++.Lecb_dec8:
++	movdqu (INP), STATE1
++	movdqu 0x10(INP), STATE2
++	movdqu 0x20(INP), STATE3
++	movdqu 0x30(INP), STATE4
++	movdqu 0x40(INP), STATE5
++	movdqu 0x50(INP), STATE6
++	movdqu 0x60(INP), STATE7
++	movdqu 0x70(INP), STATE8
++
++	cmp $16, KLEN
++	je .Lecb_dec8_128
++	aesdecwide256kl (HANDLEP)
++	jz .Lecb_dec_err
++	jmp .Lecb_dec8_end
++.Lecb_dec8_128:
++	aesdecwide128kl (HANDLEP)
++	jz .Lecb_dec_err
++
++.Lecb_dec8_end:
++	movdqu STATE1, (OUTP)
++	movdqu STATE2, 0x10(OUTP)
++	movdqu STATE3, 0x20(OUTP)
++	movdqu STATE4, 0x30(OUTP)
++	movdqu STATE5, 0x40(OUTP)
++	movdqu STATE6, 0x50(OUTP)
++	movdqu STATE7, 0x60(OUTP)
++	movdqu STATE8, 0x70(OUTP)
++
++	sub $128, LEN
++	add $128, INP
++	add $128, OUTP
++	cmp $128, LEN
++	jge .Lecb_dec8
++	cmp $16, LEN
++	jb .Lecb_dec_noerr
++
++.align 4
++.Lecb_dec1:
++	movdqu (INP), STATE1
++	cmp $16, KLEN
++	je .Lecb_dec1_128
++	aesdec256kl (HANDLEP), STATE
++	jz .Lecb_dec_err
++	jmp .Lecb_dec1_end
++.Lecb_dec1_128:
++	aesdec128kl (HANDLEP), STATE
++	jz .Lecb_dec_err
++
++.Lecb_dec1_end:
++	movdqu STATE1, (OUTP)
++	sub $16, LEN
++	add $16, INP
++	add $16, OUTP
++	cmp $16, LEN
++	jge .Lecb_dec1
++
++.Lecb_dec_noerr:
++	xor AREG, AREG
++	jmp .Lecb_dec_end
++.Lecb_dec_err:
++	mov $1, AREG
++.Lecb_dec_end:
++#ifndef __x86_64__
++	popl KLEN
++	popl HANDLEP
++	popl LEN
++#endif
++	FRAME_END
++	ret
++SYM_FUNC_END(_aeskl_ecb_dec)
++
+diff --git a/arch/x86/crypto/aeskl-intel_glue.c b/arch/x86/crypto/aeskl-intel_glue.c
+index 3e3a8b6eccb4..7c9794a0969d 100644
+--- a/arch/x86/crypto/aeskl-intel_glue.c
++++ b/arch/x86/crypto/aeskl-intel_glue.c
+@@ -27,6 +27,9 @@ asmlinkage int aeskl_setkey(struct crypto_aes_ctx *ctx, const u8 *in_key, unsign
+ asmlinkage int _aeskl_enc(const void *ctx, u8 *out, const u8 *in);
+ asmlinkage int _aeskl_dec(const void *ctx, u8 *out, const u8 *in);
+ 
++asmlinkage int _aeskl_ecb_enc(struct crypto_aes_ctx *ctx, u8 *out, const u8 *in, unsigned int len);
++asmlinkage int _aeskl_ecb_dec(struct crypto_aes_ctx *ctx, u8 *out, const u8 *in, unsigned int len);
++
+ static int aeskl_setkey_common(struct crypto_tfm *tfm, void *raw_ctx, const u8 *in_key,
+ 			       unsigned int key_len)
  {
- 	get_random_bytes(&kl_setup.key.integrity_key,  sizeof(kl_setup.key.integrity_key));
-@@ -25,6 +40,8 @@ static void __init generate_keylocker_data(void)
- void __init destroy_keylocker_data(void)
- {
- 	memset(&kl_setup.key, KEY_DESTROY, sizeof(kl_setup.key));
-+	kl_setup.initialized = true;
-+	valid_kl = true;
+@@ -86,11 +89,92 @@ static inline int aeskl_dec(const void *ctx, u8 *out, const u8 *in)
+ 		return 0;
  }
  
- static void __init load_keylocker(void)
-@@ -34,6 +51,27 @@ static void __init load_keylocker(void)
- 	kernel_fpu_end();
- }
- 
-+/**
-+ * copy_keylocker - Copy the internal wrapping key from the backup.
-+ *
-+ * Request hardware to copy the key in non-volatile storage to the CPU
-+ * state.
-+ *
-+ * Returns:	-EBUSY if the copy fails, 0 if successful.
-+ */
-+static int copy_keylocker(void)
++static int aeskl_ecb_enc(struct crypto_aes_ctx *ctx, u8 *out, const u8 *in, unsigned int len)
 +{
-+	u64 status;
-+
-+	wrmsrl(MSR_IA32_COPY_IWKEY_TO_LOCAL, 1);
-+
-+	rdmsrl(MSR_IA32_IWKEY_COPY_STATUS, status);
-+	if (status & BIT(0))
-+		return 0;
++	if (unlikely(ctx->key_length == AES_KEYSIZE_192))
++		return -EINVAL;
++	else if (!valid_keylocker())
++		return -ENODEV;
++	else if (_aeskl_ecb_enc(ctx, out, in, len))
++		return -EINVAL;
 +	else
-+		return -EBUSY;
++		return 0;
 +}
 +
- /**
-  * setup_keylocker - Enable the feature.
-  * @c:		A pointer to struct cpuinfo_x86
-@@ -49,6 +87,7 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
- 
- 	if (c == &boot_cpu_data) {
- 		u32 eax, ebx, ecx, edx;
-+		bool backup_available;
- 
- 		cpuid_count(KEYLOCKER_CPUID, 0, &eax, &ebx, &ecx, &edx);
- 		/*
-@@ -62,10 +101,49 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
- 			goto disable;
- 		}
- 
-+		backup_available = (ebx & KEYLOCKER_CPUID_EBX_BACKUP) ? true : false;
-+		/*
-+		 * The internal wrapping key in CPU state is volatile in
-+		 * S3/4 states. So ensure the backup capability along with
-+		 * S-states.
-+		 */
-+		if (!backup_available && IS_ENABLED(CONFIG_SUSPEND)) {
-+			pr_debug("x86/keylocker: No key backup support with possible S3/4.\n");
-+			goto disable;
-+		}
-+
- 		generate_keylocker_data();
--	}
-+		load_keylocker();
- 
--	load_keylocker();
-+		/* Backup an internal wrapping key in non-volatile media. */
-+		if (backup_available)
-+			wrmsrl(MSR_IA32_BACKUP_IWKEY_TO_PLATFORM, 1);
-+	} else {
-+		int rc;
-+
-+		/*
-+		 * Load the internal wrapping key directly when available
-+		 * in memory, which is only possible at boot-time.
-+		 *
-+		 * NB: When system wakes up, this path also recovers the
-+		 * internal wrapping key.
-+		 */
-+		if (!kl_setup.initialized) {
-+			load_keylocker();
-+		} else if (valid_kl) {
-+			rc = copy_keylocker();
-+			/*
-+			 * The boot CPU was successful but the key copy
-+			 * fails here. Then, the subsequent feature use
-+			 * will have inconsistent keys and failures. So,
-+			 * invalidate the feature via the flag.
-+			 */
-+			if (rc) {
-+				valid_kl = false;
-+				pr_err_once("x86/keylocker: Invalid copy status (rc: %d).\n", rc);
-+			}
-+		}
-+	}
- 
- 	pr_info_once("x86/keylocker: Enabled.\n");
- 	return;
-@@ -77,3 +155,45 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
- 	/* Make sure the feature disabled for kexec-reboot. */
- 	cr4_clear_bits(X86_CR4_KEYLOCKER);
- }
-+
-+/**
-+ * restore_keylocker - Restore the internal wrapping key.
-+ *
-+ * The boot CPU executes this while other CPUs restore it through the setup
-+ * function.
-+ */
-+void restore_keylocker(void)
++static int aeskl_ecb_dec(struct crypto_aes_ctx *ctx, u8 *out, const u8 *in, unsigned int len)
 +{
-+	u64 backup_status;
-+	int rc;
-+
-+	if (!cpu_feature_enabled(X86_FEATURE_KEYLOCKER) || !valid_kl)
-+		return;
-+
-+	/*
-+	 * The IA32_IWKEYBACKUP_STATUS MSR contains a bitmap that indicates
-+	 * an invalid backup if bit 0 is set and a read (or write) error if
-+	 * bit 2 is set.
-+	 */
-+	rdmsrl(MSR_IA32_IWKEY_BACKUP_STATUS, backup_status);
-+	if (backup_status & BIT(0)) {
-+		rc = copy_keylocker();
-+		if (rc)
-+			pr_err("x86/keylocker: Invalid copy state (rc: %d).\n", rc);
-+		else
-+			return;
-+	} else {
-+		pr_err("x86/keylocker: The key backup access failed with %s.\n",
-+		       (backup_status & BIT(2)) ? "read error" : "invalid status");
-+	}
-+
-+	/*
-+	 * Now the backup key is not available. Invalidate the feature via
-+	 * the flag to avoid any subsequent use. But keep the feature with
-+	 * zero IWKeys instead of disabling it. The current users will see
-+	 * key handle integrity failure but that's because of the internal
-+	 * key change.
-+	 */
-+	pr_err("x86/keylocker: Failed to restore internal wrapping key.\n");
-+	valid_kl = false;
++	if (unlikely(ctx->key_length == AES_KEYSIZE_192))
++		return -EINVAL;
++	else if (!valid_keylocker())
++		return -ENODEV;
++	else if (_aeskl_ecb_dec(ctx, out, in, len))
++		return -EINVAL;
++	else
++		return 0;
 +}
-diff --git a/arch/x86/power/cpu.c b/arch/x86/power/cpu.c
-index 9f2b251e83c5..1a290f529c73 100644
---- a/arch/x86/power/cpu.c
-+++ b/arch/x86/power/cpu.c
-@@ -25,6 +25,7 @@
- #include <asm/cpu.h>
- #include <asm/mmu_context.h>
- #include <asm/cpu_device_id.h>
-+#include <asm/keylocker.h>
++
++static int aeskl_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
++				 unsigned int len)
++{
++	struct crypto_tfm *crypto_tfm = crypto_skcipher_tfm(tfm);
++	void *raw_ctx = crypto_skcipher_ctx(tfm);
++
++	return aeskl_setkey_common(crypto_tfm, raw_ctx, key, len);
++}
++
++static int ecb_encrypt(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++
++	if (likely(keylength(crypto_skcipher_ctx(tfm)) != AES_KEYSIZE_192))
++		return ecb_crypt_common(req, aeskl_ecb_enc);
++	else
++		return ecb_crypt_common(req, aesni_ecb_enc);
++}
++
++static int ecb_decrypt(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++
++	if (likely(keylength(crypto_skcipher_ctx(tfm)) != AES_KEYSIZE_192))
++		return ecb_crypt_common(req, aeskl_ecb_dec);
++	else
++		return ecb_crypt_common(req, aesni_ecb_dec);
++}
++
++static struct skcipher_alg aeskl_skciphers[] = {
++	{
++		.base = {
++			.cra_name		= "__ecb(aes)",
++			.cra_driver_name	= "__ecb-aes-aeskl",
++			.cra_priority		= 200,
++			.cra_flags		= CRYPTO_ALG_INTERNAL,
++			.cra_blocksize		= AES_BLOCK_SIZE,
++			.cra_ctxsize		= CRYPTO_AES_CTX_SIZE,
++			.cra_module		= THIS_MODULE,
++		},
++		.min_keysize	= AES_MIN_KEY_SIZE,
++		.max_keysize	= AES_MAX_KEY_SIZE,
++		.setkey		= aeskl_skcipher_setkey,
++		.encrypt	= ecb_encrypt,
++		.decrypt	= ecb_decrypt,
++	}
++};
++
++static struct simd_skcipher_alg *aeskl_simd_skciphers[ARRAY_SIZE(aeskl_skciphers)];
++
+ static int __init aeskl_init(void)
+ {
++	u32 eax, ebx, ecx, edx;
++	int err;
++
+ 	if (!valid_keylocker())
+ 		return -ENODEV;
  
- #ifdef CONFIG_X86_32
- __visible unsigned long saved_context_ebx;
-@@ -262,6 +263,7 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
- 	mtrr_bp_restore();
- 	perf_restore_debug_store();
- 	msr_restore_context(ctxt);
-+	restore_keylocker();
++	cpuid_count(KEYLOCKER_CPUID, 0, &eax, &ebx, &ecx, &edx);
++	if (!(ebx & KEYLOCKER_CPUID_EBX_WIDE))
++		return -ENODEV;
++
+ 	/*
+ 	 * AES-KL itself does not depend on AES-NI. But AES-KL does not
+ 	 * support 192-bit keys. To make itself AES-compliant, it falls
+@@ -99,12 +183,18 @@ static int __init aeskl_init(void)
+ 	if (!boot_cpu_has(X86_FEATURE_AES))
+ 		return -ENODEV;
  
- 	c = &cpu_data(smp_processor_id());
- 	if (cpu_has(c, X86_FEATURE_MSR_IA32_FEAT_CTL))
++	err = simd_register_skciphers_compat(aeskl_skciphers, ARRAY_SIZE(aeskl_skciphers),
++					     aeskl_simd_skciphers);
++	if (err)
++		return err;
++
+ 	return 0;
+ }
+ 
+ static void __exit aeskl_exit(void)
+ {
+-	return;
++	simd_unregister_skciphers(aeskl_skciphers, ARRAY_SIZE(aeskl_skciphers),
++				  aeskl_simd_skciphers);
+ }
+ 
+ late_initcall(aeskl_init);
 -- 
 2.17.1
 
