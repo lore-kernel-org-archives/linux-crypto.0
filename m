@@ -2,126 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EEA3C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Nov 2021 10:07:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C8EC43217
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Nov 2021 18:05:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354194AbhKYKLI (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Nov 2021 05:11:08 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:57768 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354391AbhKYKJH (ORCPT
+        id S232602AbhKYSIq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Nov 2021 13:08:46 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:45790 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232897AbhKYSGq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Nov 2021 05:09:07 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 956CC1FD37;
-        Thu, 25 Nov 2021 10:05:55 +0000 (UTC)
+        Thu, 25 Nov 2021 13:06:46 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 9FBAC2193C;
+        Thu, 25 Nov 2021 18:03:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1637834755; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kLPULizaw+dBwYMC93K74dbVtddw6M0ydyywTzQqk/g=;
-        b=raCxzSygda+EyfOy/HkKqzNIozsd/tth4uNMD+gAzqhgwmCtE84LczdR0N42CyCySfr0vz
-        4NSscVkTyETAVvpPlsnFZYu5OSG9YFVZUfeeobFwSIPtDtPlqLJfk50KeraCGRB+kz/YIm
-        6D1DVwZrfgctmB0qd23TV6hQUy4UL9w=
+        t=1637863412; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=PK+Zc83ByJRm0GdafXCf4h8Ufy35eh7OxSjfkp0YrnM=;
+        b=On15q/90t5q6ngo9oibHUk5cuUrtIKj5zDFosgbzJXlVOceZTDKJfsErLIEzHYK8+4Zc2e
+        cRzs1dtDFfvcKgHNy65H366qh0ixIABXoALdzpohT/qsfymR/UQqpvMuPla/3w1F63BhI7
+        aMxgW0ojb48EH/bKZ2lLNm9ZRBpLx9o=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1637834755;
+        s=susede2_ed25519; t=1637863412;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kLPULizaw+dBwYMC93K74dbVtddw6M0ydyywTzQqk/g=;
-        b=hYJaK8EcP6btovpH+1sJkuNWQ89VC0QAgBKNpeivVpR7P3nLfG0eRJAlC+gG/KYla3RL7n
-        7EE3TtUZ+qLom5Ag==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6439C13F5A;
-        Thu, 25 Nov 2021 10:05:54 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id OTKTFgJgn2GVNgAAMHmgww
-        (envelope-from <jroedel@suse.de>); Thu, 25 Nov 2021 10:05:54 +0000
-Date:   Thu, 25 Nov 2021 11:05:52 +0100
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        Peter Gonda <pgonda@google.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Message-ID: <YZ9gAMHdEo6nQ6a0@suse.de>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
- <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
- <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
- <5f3b3aab-9ec2-c489-eefd-9136874762ee@intel.com>
- <d83e6668-bec4-8d1f-7f8a-085829146846@amd.com>
- <38282b0c-7eb5-6a91-df19-2f4cfa8549ce@intel.com>
- <YZ5iWJuxjSCmZL5l@suse.de>
- <bd31abd4-c8a2-bdda-ea74-1c24b29beda7@intel.com>
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=PK+Zc83ByJRm0GdafXCf4h8Ufy35eh7OxSjfkp0YrnM=;
+        b=FB0cBxjJNmMwuPYkcUDoiU/7Y4SjiDZ53QM2CYK1JiOCieeTSR0SvIeBiwtAX6gWj/69KW
+        suy7eNPadG/YEaAA==
+Received: from kitsune.suse.cz (kitsune.suse.cz [10.100.12.127])
+        by relay2.suse.de (Postfix) with ESMTP id 3B800A3B81;
+        Thu, 25 Nov 2021 18:03:29 +0000 (UTC)
+From:   Michal Suchanek <msuchanek@suse.de>
+To:     keyrings@vger.kernel.org
+Cc:     Michal Suchanek <msuchanek@suse.de>, kexec@lists.infradead.org,
+        Philipp Rudo <prudo@redhat.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
+        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
+        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Jessica Yu <jeyu@kernel.org>, linux-kernel@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Hari Bathini <hbathini@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        Frank van der Linden <fllinden@amazon.com>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        Daniel Axtens <dja@axtens.net>, buendgen@de.ibm.com,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Baoquan He <bhe@redhat.com>, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: [PATCH v2 0/6] KEXEC_SIG with appended signature
+Date:   Thu, 25 Nov 2021 19:02:38 +0100
+Message-Id: <cover.1637862358.git.msuchanek@suse.de>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <bd31abd4-c8a2-bdda-ea74-1c24b29beda7@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 24, 2021 at 09:48:14AM -0800, Dave Hansen wrote:
-> That covers things like copy_from_user().  It does not account for
-> things where kernel mappings are used, like where a
-> get_user_pages()/kmap() is in play.
+Hello,
 
-The kmap case is guarded by KVM code, which locks the page first so that
-the guest can't change the page state, then checks the page state, and
-if it is shared does the kmap and the access.
+This is resend of the KEXEC_SIG patchset.
 
-This should turn an RMP fault in the kernel which is not covered in the
-uaccess exception table into a fatal error.
+The first patch is new because it'a a cleanup that does not require any
+change to the module verification code.
 
-Regards,
+The second patch is the only one that is intended to change any
+functionality.
+
+The rest only deduplicates code but I did not receive any review on that
+part so I don't know if it's desirable as implemented.
+
+The first two patches can be applied separately without the rest.
+
+Thanks
+
+Michal
+
+Michal Suchanek (6):
+  s390/kexec_file: Don't opencode appended signature check.
+  powerpc/kexec_file: Add KEXEC_SIG support.
+  kexec_file: Don't opencode appended signature verification.
+  module: strip the signature marker in the verification function.
+  module: Use key_being_used_for for log messages in
+    verify_appended_signature
+  module: Move duplicate mod_check_sig users code to mod_parse_sig
+
+ arch/powerpc/Kconfig                     | 11 +++++
+ arch/powerpc/kexec/elf_64.c              | 14 ++++++
+ arch/s390/kernel/machine_kexec_file.c    | 42 ++----------------
+ crypto/asymmetric_keys/asymmetric_type.c |  1 +
+ include/linux/module_signature.h         |  1 +
+ include/linux/verification.h             |  4 ++
+ kernel/module-internal.h                 |  2 -
+ kernel/module.c                          | 12 +++--
+ kernel/module_signature.c                | 56 +++++++++++++++++++++++-
+ kernel/module_signing.c                  | 33 +++++++-------
+ security/integrity/ima/ima_modsig.c      | 22 ++--------
+ 11 files changed, 113 insertions(+), 85 deletions(-)
 
 -- 
-Jörg Rödel
-jroedel@suse.de
-
-SUSE Software Solutions Germany GmbH
-Maxfeldstr. 5
-90409 Nürnberg
-Germany
- 
-(HRB 36809, AG Nürnberg)
-Geschäftsführer: Ivo Totev
+2.31.1
 
