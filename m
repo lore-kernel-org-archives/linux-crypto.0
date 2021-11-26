@@ -2,71 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0163CC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Nov 2021 05:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C48BC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Nov 2021 05:33:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345224AbhKZF3u (ORCPT
+        id S1352390AbhKZFg1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Nov 2021 00:29:50 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:57144 "EHLO deadmen.hmeau.com"
+        Fri, 26 Nov 2021 00:36:27 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:57146 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1345380AbhKZF1t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Nov 2021 00:27:49 -0500
+        id S1351992AbhKZFe1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Nov 2021 00:34:27 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1mqTid-0008O2-VT; Fri, 26 Nov 2021 13:24:20 +0800
+        id 1mqTpE-0008Qm-3U; Fri, 26 Nov 2021 13:31:08 +0800
 Received: from herbert by gondobar with local (Exim 4.92)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1mqTiL-0004XE-DX; Fri, 26 Nov 2021 13:24:01 +0800
-Date:   Fri, 26 Nov 2021 13:24:01 +0800
+        id 1mqTpB-0004YK-E4; Fri, 26 Nov 2021 13:31:05 +0800
+Date:   Fri, 26 Nov 2021 13:31:05 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Marek Vasut <marex@denx.de>, Ard Biesheuvel <ardb@kernel.org>,
-        linux-crypto@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/9] crypto: stm32/cryp - fix CTR counter carry
-Message-ID: <20211126052401.GA17410@gondor.apana.org.au>
-References: <20211118150756.6593-1-nicolas.toromanoff@foss.st.com>
- <20211118150756.6593-4-nicolas.toromanoff@foss.st.com>
+To:     Nicolai Stange <nstange@suse.de>
+Cc:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Torsten Duwe <duwe@suse.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/6] crypto: DRBG - improve 'nopr' reseeding
+Message-ID: <20211126053105.GA17477@gondor.apana.org.au>
+References: <20211115141809.11420-1-nstange@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211118150756.6593-4-nicolas.toromanoff@foss.st.com>
+In-Reply-To: <20211115141809.11420-1-nstange@suse.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 18, 2021 at 04:07:50PM +0100, Nicolas Toromanoff wrote:
-> STM32 CRYP hardware doesn't manage CTR counter bigger than max U32, as
-> a workaround, at each block the current IV is saved, if the saved IV
-> lower u32 is 0xFFFFFFFF, the full IV is manually incremented, and set
-> in hardware.
-> Fixes: bbb2832620ac ("crypto: stm32 - Fix sparse warnings")
+On Mon, Nov 15, 2021 at 03:18:03PM +0100, Nicolai Stange wrote:
+> Hi all,
 > 
-> Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
-> ---
->  drivers/crypto/stm32/stm32-cryp.c | 25 ++++++++++++-------------
->  1 file changed, 12 insertions(+), 13 deletions(-)
+> v1 can be found here:
 > 
-> diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
-> index 7b55ad6d2f1a..9d6ccf1eb4ce 100644
-> --- a/drivers/crypto/stm32/stm32-cryp.c
-> +++ b/drivers/crypto/stm32/stm32-cryp.c
-> @@ -163,7 +163,7 @@ struct stm32_cryp {
->  	struct scatter_walk     in_walk;
->  	struct scatter_walk     out_walk;
->  
-> -	u32                     last_ctr[4];
-> +	__be32                  last_ctr[4];
+>   https://lore.kernel.org/r/20211025092525.12805-1-nstange@suse.de
+> 
+> The changes between v1 and v2 are summarized below.
+> 
+> 
+> Cover letter reproduced 1:1 from v1:
+> 
+> This patchset aims at (hopefully) improving the DRBG code related to
+> reseeding from get_random_bytes() a bit:
+> - Replace the asynchronous random_ready_callback based DRBG reseeding
+>   logic with a synchronous solution leveraging rng_is_initialized(). This
+>   move simplifies the code IMO and, as a side-effect, would enable DRBG
+>   users to rely on wait_for_random_bytes() to sync properly with
+>   drbg_generate(), if desired. Implemented by patches 1-5/6.
+> - Make the 'nopr' DRBGs to reseed themselves every 5min from
+>   get_random_bytes(). This achieves at least kind of a partial prediction
+>   resistance over the time domain at almost no extra cost. Implemented
+>   by patch 6/6, the preceding patches in this series are a prerequisite
+>   for this.
+> 
+> Tested with and without fips_enabled in a x86_64 VM, both with
+> random.trust_cpu=on and off. As confirmed with a couple of debugging
+> printks() (added for testing only, not included in this series), DRBGs
+> have been instantiated with and without rng_is_initialized() evaluating
+> to true each during my tests and the patched DRBG reseeding code worked as
+> intended in either case.
+> 
+> Applies to current herbert/cryptodev-2.6.git master.
+> 
+> 
+> Changes between v1 and v2:
+> - 4/6: remove redundant goto statement, spotted by Stephan.
+> 
+> For the unmodified rest, I added Stephan's Reviewed-bys he granted in
+> reply to v1.
+> 
+> Many thanks for your comments and remarks!
+> 
+> Nicolai
+> 
+> Nicolai Stange (6):
+>   crypto: DRBG - prepare for more fine-grained tracking of seeding state
+>   crypto: DRBG - track whether DRBG was seeded with
+>     !rng_is_initialized()
+>   crypto: DRBG - move dynamic ->reseed_threshold adjustments to
+>     __drbg_seed()
+>   crypto: DRBG - make reseeding from get_random_bytes() synchronous
+>   crypto: DRBG - make drbg_prepare_hrng() handle jent instantiation
+>     errors
+>   crypto: DRBG - reseed 'nopr' drbgs periodically from
+>     get_random_bytes()
+> 
+>  crypto/drbg.c         | 143 +++++++++++++++++++++---------------------
+>  include/crypto/drbg.h |  11 +++-
+>  2 files changed, 80 insertions(+), 74 deletions(-)
 
-This introduces a sparse warning, please fix and resubmit.
-
-Thanks,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
