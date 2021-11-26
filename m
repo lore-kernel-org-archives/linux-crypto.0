@@ -2,57 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B75F0C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Nov 2021 05:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24679C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Nov 2021 05:34:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358647AbhKZFhb (ORCPT
+        id S1358715AbhKZFht (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Nov 2021 00:37:31 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:57156 "EHLO deadmen.hmeau.com"
+        Fri, 26 Nov 2021 00:37:49 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:57160 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242823AbhKZFfb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Nov 2021 00:35:31 -0500
+        id S231645AbhKZFfr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Nov 2021 00:35:47 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtp (Exim 4.92 #5 (Debian))
-        id 1mqTqM-0008RY-7r; Fri, 26 Nov 2021 13:32:18 +0800
+        id 1mqTqc-0008Rn-NF; Fri, 26 Nov 2021 13:32:34 +0800
 Received: from herbert by gondobar with local (Exim 4.92)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1mqTqK-0004Zq-KG; Fri, 26 Nov 2021 13:32:16 +0800
-Date:   Fri, 26 Nov 2021 13:32:16 +0800
+        id 1mqTqc-0004aC-KX; Fri, 26 Nov 2021 13:32:34 +0800
+Date:   Fri, 26 Nov 2021 13:32:34 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Kai Ye <yekai13@huawei.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        wangzhou1@hisilicon.com
-Subject: Re: [PATCH 0/4] crypto: hisilicon/qm - misc clean up and fixes
-Message-ID: <20211126053216.GE17477@gondor.apana.org.au>
-References: <20211120044739.5667-1-yekai13@huawei.com>
+To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: Jitter RNG - consider 32 LSB for APT
+Message-ID: <20211126053234.GF17477@gondor.apana.org.au>
+References: <2572116.vuYhMxLoTh@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20211120044739.5667-1-yekai13@huawei.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2572116.vuYhMxLoTh@positron.chronox.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Nov 20, 2021 at 12:47:35PM +0800, Kai Ye wrote:
-> 1. Modify the value of qos initialization in resetting.
-> 2. Some optimizations.
+On Sun, Nov 21, 2021 at 03:14:20PM +0100, Stephan Müller wrote:
+> The APT compares the current time stamp with a pre-set value. The
+> current code only considered the 4 LSB only. Yet, after reviews by
+> mathematicians of the user space Jitter RNG version >= 3.1.0, it was
+> concluded that the APT can be calculated on the 32 LSB of the time
+> delta. Thi change is applied to the kernel.
 > 
-> Kai Ye (4):
->   crypto: hisilicon - modify the value of engine type rate
->   crypto: hisilicon/qm - modify the value of qos initialization
->   crypto: hisilicon/qm - some optimizations of ths qos write process
->   crypto: hisilicon/qm - simplified the calculation of qos shaper
->     parameters
+> This fixes a bug where an AMD EPYC fails this test as its RDTSC value
+> contains zeros in the LSB. The most appropriate fix would have been to
+> apply a GCD calculation and divide the time stamp by the GCD. Yet, this
+> is a significant code change that will be considered for a future
+> update. Note, tests showed that constantly the GCD always was 32 on
+> these systems, i.e. the 5 LSB were always zero (thus failing the APT
+> since it only considered the 4 LSB for its calculation).
 > 
->  drivers/crypto/hisilicon/hpre/hpre_main.c |   2 +-
->  drivers/crypto/hisilicon/qm.c             | 183 +++++++++++++---------
->  drivers/crypto/hisilicon/sec2/sec_main.c  |   2 +-
->  drivers/crypto/hisilicon/zip/zip_main.c   |   4 +-
->  4 files changed, 112 insertions(+), 79 deletions(-)
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> ---
+>  crypto/jitterentropy.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
