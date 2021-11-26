@@ -2,120 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F0FC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Nov 2021 16:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27433C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Nov 2021 20:24:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239282AbhKZQlm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Nov 2021 11:41:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35506 "EHLO
+        id S238219AbhKZU11 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 Nov 2021 15:27:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239797AbhKZQjl (ORCPT
+        with ESMTP id S236513AbhKZUZ0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Nov 2021 11:39:41 -0500
+        Fri, 26 Nov 2021 15:25:26 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDDC1C06175D;
-        Fri, 26 Nov 2021 08:22:17 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 094EAC0613FB;
+        Fri, 26 Nov 2021 12:19:50 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6C7BE622DC;
-        Fri, 26 Nov 2021 16:22:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C62FC93056;
-        Fri, 26 Nov 2021 16:22:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1637943736;
-        bh=DomO1hDprNDoTOXmYbCNRX87KPgD9L75o2eSX1KroPk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WJA20yYaWcCwOvxoKKYkje04BrkazBeI9hI0NuJyYVDA9lsHVyhAepqBN5e7eRqZN
-         E5WebqoyALxWQ8zYDrYUB2XKkNMqCo70u+iXnD5XZ0TCSpn9NMsH49oC0Te6182rgJ
-         bJFE76XgG1K2ykLGhLzIZ+4UJeQWRblcVd0FYNuE=
-Date:   Fri, 26 Nov 2021 17:22:14 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Stephan Mueller <smueller@chronox.de>
-Cc:     Simo Sorce <simo@redhat.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Tso Ted <tytso@mit.edu>,
-        linux-crypto@vger.kernel.org, Willy Tarreau <w@1wt.eu>,
-        Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Peter Matthias <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Andy Lavr <andy.lavr@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Petr Tesarik <ptesarik@suse.cz>,
-        John Haxby <john.haxby@oracle.com>,
-        Alexander Lobakin <alobakin@mailbox.org>,
-        Jirka Hladky <jhladky@redhat.com>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-Message-ID: <YaEJtv4A6SoDFYjc@kroah.com>
-References: <2036923.9o76ZdvQCi@positron.chronox.de>
- <56d2da397bb53f71c0354b102c3b40940e9b4eda.camel@redhat.com>
- <YaEA0fyowmFlDfmK@kroah.com>
- <22137816.pfsBpAd9cS@tauon.chronox.de>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 68C7462294;
+        Fri, 26 Nov 2021 20:19:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC7D3C53FAD;
+        Fri, 26 Nov 2021 20:19:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637957988;
+        bh=a0s2gfBWietgKO4JH0PNWWcxxCfP3DUg5GlbyFnS0hs=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=E7DmdJOmjwVfimksFXilYgRFugV24ViMgoFEjJi6fTRk53x9ErkXvdAaKISr/VTzn
+         SUZB9Uh+IiEcZqLUNf4W9iO5dk++0sldocgQW9YGwlQZmNEWH56WR1Wu/4WbAX7tO1
+         CmGjTb2UN9uw10GqOpFuhmsOvCrBWbcfT8/xHCYToIosZh2YVeWayxPSqvgesUzouC
+         WCrGwoD964D7ddpv8xShKcGAjsAJYB7H/DndpaCvGZEByp+fRzIpeYb/8uLMnifJAe
+         aTe6pUiqqzQq1nUZ+6QrnEVnpJNOvnyYFXKQ5Sf+IfjveuwDTxhfaNfmfX85tqBISF
+         4oDOLcRNVDOTQ==
+Received: by mail-wm1-f42.google.com with SMTP id g191-20020a1c9dc8000000b0032fbf912885so7513205wme.4;
+        Fri, 26 Nov 2021 12:19:48 -0800 (PST)
+X-Gm-Message-State: AOAM531oB6p6uRfBYfWIu9EO05KRszkPlwcdAZ4d0PSYNCMVv4cvPCJE
+        eggYnHaEne76c8WUPRqur0zvkIPEuD1Kow2GSXI=
+X-Google-Smtp-Source: ABdhPJz71/waTta7JgF/geLHgSsIO5CbXPWZ0x5mbSBBYj0q5j8zzOZzGV/JPWNvtUxQCqCYRgc/10cMEUpCWtNsy1s=
+X-Received: by 2002:a1c:1c1:: with SMTP id 184mr18302939wmb.1.1637957987118;
+ Fri, 26 Nov 2021 12:19:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <22137816.pfsBpAd9cS@tauon.chronox.de>
+References: <20211126143329.2689618-1-arnd@kernel.org> <CAHmME9rotnZRzqeD43FJmSX6-i2CwvUVpXHrFkLGt+qVVdxK7A@mail.gmail.com>
+ <CAK8P3a2KfmmGDbVHULWevB0hv71P2oi2ZCHEAqT=8dQfa0=cqQ@mail.gmail.com> <CAHmME9q3ihG6OukcbhgkzwMUY7y+N3tKrGu2aRHjkgmAv4j=WQ@mail.gmail.com>
+In-Reply-To: <CAHmME9q3ihG6OukcbhgkzwMUY7y+N3tKrGu2aRHjkgmAv4j=WQ@mail.gmail.com>
+From:   Arnd Bergmann <arnd@kernel.org>
+Date:   Fri, 26 Nov 2021 21:19:31 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a1Jk8-mokkzo6Q4M5xoO+13fCgdh-A2bajD9HR7Xenn0w@mail.gmail.com>
+Message-ID: <CAK8P3a1Jk8-mokkzo6Q4M5xoO+13fCgdh-A2bajD9HR7Xenn0w@mail.gmail.com>
+Subject: Re: [PATCH] crypto: siphash - use _unaligned version by default
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 26, 2021 at 05:15:59PM +0100, Stephan Mueller wrote:
-> Am Freitag, 26. November 2021, 16:44:17 CET schrieb Greg Kroah-Hartman:
-> 
-> Hi Greg,
-> 
-> > On Mon, Nov 22, 2021 at 09:59:01AM -0500, Simo Sorce wrote:
-> > > Jason,
-> > > have you previously produced a list of reasoned concerns with this
-> > > patchset and direction?
-> > > 
-> > > This specific email is not really useful to me to understand the
-> > > concerns as it does not contain actionable suggestion or critique.
-> > > 
-> > > I personally find the direction fine, and with my distribution hat on I
-> > > can say that FIPS is essential for us and any design must include an
-> > > option to be FIPS certifiable.
-> > > 
-> > > As NIST keeps improving their testing capabilities and rigorous
-> > > cryptographic design of the CSPRNGs as well as entropy sources the
-> > > kernel must also adapt.
-> > > 
-> > > Stephan is providing a path forward, and I haven't seen any other
-> > > proposal, let alone code, that provide improvements in this area.
-> > > I am pretty sure the design can be improved if there is detailed and
-> > > actionable feedback on what to change.
-> > > 
-> > > I hope the path forward can be one of collaboration rather then mere
-> > > opposition.
-> > 
-> > Replacement of the existing code to cut over to the new one is not
-> > collaboration, it's the exact opposite.
-> > 
-> > Submitting patches to the existing codebase to implement the
-> > "requirements" is the proper way forward, why has that never been done.
-> 
-> It has been attempted by Nikolai Stange without avail - no comments were 
-> received, let alone it was integrated.
+On Fri, Nov 26, 2021 at 4:26 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> On Fri, Nov 26, 2021 at 10:18 AM Arnd Bergmann <arnd@kernel.org> wrote:
+> > I have not tested this specific patch on all platforms, but I did
+> > extensive testing of the get_unaligned()/put_unaligned() helpers
+> > in my rewrite earlier this year[1], making sure that these are NOPs
+> > on all the important architectures, and that they prevent the use
+> > of trapping ldrd/ldm instructions on ARMv6/ARMv7.
+>
+> If you're confident that the codegen doesn't change for ARMv8 and
+> x86{,_64}, then:
+>
+> Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
 
-Links to the patches and discussion please?
+Thanks
 
-thanks,
+> We should probably Cc stable@, right?
 
-greg k-h
+Yes, I meant to add that but forgot.
+
+> I'm preparing a patchset for DaveM's stable tree today, and I can take
+> this in that patchset.
+
+It's not urgent, but I think we need to fix it and get it into stable kernels
+at some point. I'm happy with whatever timing works for you.
+
+         Arnd
