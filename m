@@ -2,60 +2,33 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8574EC433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Nov 2021 18:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 321ADC433FE
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Nov 2021 18:05:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238220AbhK1SFe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Nov 2021 13:05:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53514 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358807AbhK1SDd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Nov 2021 13:03:33 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA88C0617A2;
-        Sun, 28 Nov 2021 09:57:02 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id b13so10249269plg.2;
-        Sun, 28 Nov 2021 09:57:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GIVU/9w51Ef2hg0ubArEuNU4cyYrytLI0Mp9d442l5g=;
-        b=MOV5U2nrdRxFhWxyR7bOZpWlabqXOjxSoT999ssZl4Mq0S6JAhQfWyHw7OPilcdHmF
-         6BGRpZnEpe8f9bpa77XQqQiPPBLd4gqEwap2s83tCamJXoetkbl6hCD0wkZTc5ZtL81/
-         0oBwvtx8A8nEwcdqAvCz07X70fdDjUOrb88hgxJCEmCDBMTsfM8MgzFpsGuihBTo3i4/
-         BO5H2USw15PhIR9jKFnq7EoAkCha2k8c7ry0hA6yyRozC0i3UkUk9dhKZX7Fdkb9vjGS
-         8k1hfy+ikEeJEGfeYwNOOXgwgIH5nCo9f2fvYp5m9MjcvWjKnN995P4PSF7zBTJOShEa
-         Axzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GIVU/9w51Ef2hg0ubArEuNU4cyYrytLI0Mp9d442l5g=;
-        b=SNOr0Vk7t+2s5St7ZpxT1BZXRRkotlRASZZHgItDe5FHMqh/Vq2973XYX0YxhxYV2R
-         sSD1LSxcgRuDiwbVjq/mC1c6DbJVWe8L+xmJZTVdo3ds0bGOHnv2GIyOKY5IySEwYo/g
-         VwAd3RoheYvjyOfH+Obm4kaTaNiOaIMTj/QOWm8SnBpkuMr5jGFKNDelpqs3RPpnFc6q
-         d24W76Wx7BbvqhYICtmP7pywWQQ/bj72P92iqZbH9TCHsYqMFL00hHHn1r3J8HkN6RU2
-         nX0Jy267as/4U9Y3pWCd35Qa9ILfdeqULZjpw/bnFYeyoG6tV94u63OOZdfwjSoikZpe
-         vbmA==
-X-Gm-Message-State: AOAM5317DfD3Phv3xb7Y2gCl7ZE7oBsX8MFIXt0fN4FF+EYD03dDAIss
-        hmaH2NP1op04j4/PZ0Iwpv7D3daa+nse8bcJcqA=
-X-Google-Smtp-Source: ABdhPJwg/YAIedkhsO4JO/I1SvpK80O+jGy4LgSO12zXzv7Z2PPdL5Fb+4vML+arhaNI5Rnxj3zFEocQ77wPSF7XA5Q=
-X-Received: by 2002:a17:902:b581:b0:144:e601:de7 with SMTP id
- a1-20020a170902b58100b00144e6010de7mr54292000pls.71.1638122222149; Sun, 28
- Nov 2021 09:57:02 -0800 (PST)
-MIME-Version: 1.0
-References: <20211128035704.270739-1-yury.norov@gmail.com> <20211128035704.270739-8-yury.norov@gmail.com>
- <8f389151c39a8a5b6b31d5238cb680305225d9f2.camel@perches.com> <20211128174320.GA304543@lapt>
-In-Reply-To: <20211128174320.GA304543@lapt>
-From:   Emil Renner Berthing <emil.renner.berthing@gmail.com>
-Date:   Sun, 28 Nov 2021 18:56:51 +0100
-Message-ID: <CANBLGczYBaxES12eCurm6fELat0U-9+VbuKUG_Fea3iK6d9RVA@mail.gmail.com>
-Subject: Re: [PATCH 7/9] lib/cpumask: add num_{possible,present,active}_cpus_{eq,gt,le}
+        id S239289AbhK1SJO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 28 Nov 2021 13:09:14 -0500
+Received: from rere.qmqm.pl ([91.227.64.183]:52591 "EHLO rere.qmqm.pl"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231344AbhK1SHN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 28 Nov 2021 13:07:13 -0500
+Received: from remote.user (localhost [127.0.0.1])
+        by rere.qmqm.pl (Postfix) with ESMTPSA id 4J2GZ84l0lzGX;
+        Sun, 28 Nov 2021 19:03:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
+        t=1638122634; bh=sEqOa0ZEPEWEUlBRSLFAiVwd6iLDymwK+DV3juGIkQI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=c8BMIb6Ys1MM9jtnUFS+OzCZESND169gxM1+qoGuDHQxJkjYTnLg1dYXL65SLSeBD
+         OptKwwF3f6jjeAWkz8hKGEIpBsOyA7AZLbEyI0Ul8i9xig/dKvGR9NZ6kh+Ny2ulTW
+         NSMm5sqIVijexkgrukA2T59koDDkGancK18mcZt702hpU7mgoZQDDZbSDYgNkFc9BO
+         VIw8ONHFtRVbVnzFi4YPF5fViRQnoyL8aNWKj0ctBrm3IfLQEgZY5IGVCfNRdmPFM4
+         VnIE/zolNmZ9Tr6q4VJbIye3TlVbgURGaBOqFwsRQiEoMGrVw4g28fuRp3xh+IiOQd
+         dpDJSAp182XbQ==
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 0.103.3 at mail
+Date:   Sun, 28 Nov 2021 19:03:41 +0100
+From:   mirq-test@rere.qmqm.pl
 To:     Yury Norov <yury.norov@gmail.com>
-Cc:     Joe Perches <joe@perches.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+Cc:     linux-kernel@vger.kernel.org,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         "Paul E. McKenney" <paulmck@kernel.org>,
@@ -135,39 +108,92 @@ Cc:     Joe Perches <joe@perches.com>,
         Vlastimil Babka <vbabka@suse.cz>,
         Will Deacon <will@kernel.org>,
         bcm-kernel-feedback-list@broadcom.com, kvm@vger.kernel.org,
-        linux-alpha@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-crypto@vger.kernel.org, linux-csky@vger.kernel.org,
         linux-ia64@vger.kernel.org, linux-mips@vger.kernel.org,
         linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        linux-s390@vger.kernel.org, linux-snps-arc@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org
-Content-Type: text/plain; charset="UTF-8"
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 0/9] lib/bitmap: optimize bitmap_weight() usage
+Message-ID: <YaPEfZ0t9UFGwpml@qmqm.qmqm.pl>
+References: <20211128035704.270739-1-yury.norov@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-2
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211128035704.270739-1-yury.norov@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 28 Nov 2021 at 18:43, Yury Norov <yury.norov@gmail.com> wrote:
-> On Sun, Nov 28, 2021 at 09:07:52AM -0800, Joe Perches wrote:
-> > On Sat, 2021-11-27 at 19:57 -0800, Yury Norov wrote:
-> > > Add num_{possible,present,active}_cpus_{eq,gt,le} and replace num_*_cpus()
-> > > with one of new functions where appropriate. This allows num_*_cpus_*()
-> > > to return earlier depending on the condition.
-> > []
-> > > diff --git a/arch/arc/kernel/smp.c b/arch/arc/kernel/smp.c
-> > []
-> > > @@ -103,7 +103,7 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
-> > >      * if platform didn't set the present map already, do it now
-> > >      * boot cpu is set to present already by init/main.c
-> > >      */
-> > > -   if (num_present_cpus() <= 1)
-> > > +   if (num_present_cpus_le(2))
-> > >             init_cpu_present(cpu_possible_mask);
-> >
-> > ?  is this supposed to be 2 or 1
->
-> X <= 1 is the equivalent of X < 2.
+On Sat, Nov 27, 2021 at 07:56:55PM -0800, Yury Norov wrote:
+> In many cases people use bitmap_weight()-based functions like this:
+> 
+> 	if (num_present_cpus() > 1)
+> 		do_something();
+> 
+> This may take considerable amount of time on many-cpus machines because
+> num_present_cpus() will traverse every word of underlying cpumask
+> unconditionally.
+> 
+> We can significantly improve on it for many real cases if stop traversing
+> the mask as soon as we count present cpus to any number greater than 1:
+> 
+> 	if (num_present_cpus_gt(1))
+> 		do_something();
+> 
+> To implement this idea, the series adds bitmap_weight_{eq,gt,le}
+> functions together with corresponding wrappers in cpumask and nodemask.
 
-Ah, then the function is confusing. Usually it's lt = less than and lt
-= less than or equal. Same idea for gt vs ge.
+Having slept on it I have more structured thoughts:
+
+First, I like substituting bitmap_empty/full where possible - I think
+the change stands on its own, so could be split and sent as is.
+
+I don't like the proposed API very much. One problem is that it hides
+the comparison operator and makes call sites less readable:
+
+	bitmap_weight(...) > N
+
+becomes:
+
+	bitmap_weight_gt(..., N)
+
+and:
+	bitmap_weight(...) <= N
+
+becomes:
+
+	bitmap_weight_lt(..., N+1)
+or:
+	!bitmap_weight_gt(..., N)
+
+I'd rather see something resembling memcmp() API that's known enough
+to be easier to grasp. For above examples:
+
+	bitmap_weight_cmp(..., N) > 0
+	bitmap_weight_cmp(..., N) <= 0
+	...
+
+This would also make the implementation easier in not having to
+copy and paste the code three times. Could also use a simple
+optimization reducing code size:
+
+#include <linux/overflow.h>
+
+int bitmap_weight_cmp(long *bits, size_t nbits, size_t cmp)
+{
+	for (size_t i = 0; i < nbits / BITS_PER_LONG; ++i, ++bits)
+		if (check_sub_overflow(cmp, popcount(*bits), &cmp))
+			return 1;
+
+	nbits %= BITS_PER_LONG;
+	if (nbits && check_sub_overflow(cmp,
+			popcount(*bits & GENMASK(nbits)), &cmp))
+		return 1;
+
+	return cmp ? -1 : 0;
+}
+
+Best Regards
+Micha³ Miros³aw
