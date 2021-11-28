@@ -2,27 +2,57 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD71C433F5
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Nov 2021 17:10:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D545C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Nov 2021 17:45:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358688AbhK1ROD (ORCPT
+        id S1347340AbhK1Rs4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Nov 2021 12:14:03 -0500
-Received: from smtprelay0096.hostedemail.com ([216.40.44.96]:33562 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1358489AbhK1RMC (ORCPT
+        Sun, 28 Nov 2021 12:48:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50778 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1353733AbhK1Rqz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Nov 2021 12:12:02 -0500
-Received: from omf04.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay08.hostedemail.com (Postfix) with ESMTP id D5832182CED2A;
-        Sun, 28 Nov 2021 17:08:43 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf04.hostedemail.com (Postfix) with ESMTPA id 5EF1EA00041C;
-        Sun, 28 Nov 2021 17:07:48 +0000 (UTC)
-Message-ID: <8f389151c39a8a5b6b31d5238cb680305225d9f2.camel@perches.com>
-Subject: Re: [PATCH 7/9] lib/cpumask: add
- num_{possible,present,active}_cpus_{eq,gt,le}
-From:   Joe Perches <joe@perches.com>
-To:     Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
+        Sun, 28 Nov 2021 12:46:55 -0500
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22DF7C061758;
+        Sun, 28 Nov 2021 09:43:23 -0800 (PST)
+Received: by mail-qv1-xf29.google.com with SMTP id bu11so12236984qvb.0;
+        Sun, 28 Nov 2021 09:43:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=EGDOAtYN2fK/PZFUkmOA85+Y42I5mUiptIM8w58G0rQ=;
+        b=OJQe08uA10eX2TeWvqt06FdB++sdcPrwIbnMHmMMGLEPh2+R8hbd/40wYpjwkaqeE/
+         6XfapPGwIUZ4LDWqz39Nwr5uu4E6umAX+6Z0+jE4weTI7q/jI3+ccI8GT5haFqvlnbNr
+         sS4x0m3enUvOT+nRdFdnlBmA/MI7DQ4E1ZmrvA03uMZsjm9/iv2EP37/X2J9G1KwyXb6
+         Hfv1Hav0WBaO6x7osIh95buMPO77Agb/hfuz57/z7KzCuL+cYyh+7wuFgcWNiN6IEUYt
+         1HZymoWzXAdksfeaUOA73f5K948RKJ1FSFdx5FI5zvS1fbr8o5m0p5Rrx2G97GqX7v/H
+         u+Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=EGDOAtYN2fK/PZFUkmOA85+Y42I5mUiptIM8w58G0rQ=;
+        b=6dE4SpcNSOFrUQK+m5yENGUHFqvhXzqm7C757Oli6jMnV2d+3HPet1kA2ojLC/nYdu
+         t+GZx0E1udm926+sR+pTJwLlvfdH3e/SEJV22y9ytVbOXffk3NIt8PMT57RWkp+WRIVJ
+         C42diz1DWB7hYw1Z8XNO9c3OgawCHl7NzMRO/8rcEbF0dwGZRbgUCg2TFPp/BPSjzXE/
+         NINh5xM0n8JecobwyOks4sIYiH5BpKN/cOrUZNv/s6s4auyaNmq/GutdN9uxUcyAGkAS
+         hy0Vg5FljF8qh/HP6J2xIp1Ty0PPwrbDurfKw0q1i5TQ1CUaYMO+VSZuwJotJJ5wHPYs
+         5B3g==
+X-Gm-Message-State: AOAM531tGOqHQlgWUgla8raeRV4zgJcMcA1eI+M04xrcft6ooLHeNfzP
+        iwfvHOP2b4eFukRqzasluy8=
+X-Google-Smtp-Source: ABdhPJz1EHRO0NhP22/uPVki3bkMYlc7JC+OLMNGN1jvJUoway5a+xcKpp5gLpPJ+uu/Tahl0/hKjQ==
+X-Received: by 2002:a05:6214:f2d:: with SMTP id iw13mr37805973qvb.13.1638121402048;
+        Sun, 28 Nov 2021 09:43:22 -0800 (PST)
+Received: from localhost ([66.216.211.25])
+        by smtp.gmail.com with ESMTPSA id l22sm6905101qtj.68.2021.11.28.09.43.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Nov 2021 09:43:21 -0800 (PST)
+Date:   Sun, 28 Nov 2021 09:43:20 -0800
+From:   Yury Norov <yury.norov@gmail.com>
+To:     Joe Perches <joe@perches.com>
+Cc:     linux-kernel@vger.kernel.org,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         "Paul E. McKenney" <paulmck@kernel.org>,
@@ -108,54 +138,52 @@ To:     Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
         linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-Date:   Sun, 28 Nov 2021 09:07:52 -0800
-In-Reply-To: <20211128035704.270739-8-yury.norov@gmail.com>
+Subject: Re: [PATCH 7/9] lib/cpumask: add
+ num_{possible,present,active}_cpus_{eq,gt,le}
+Message-ID: <20211128174320.GA304543@lapt>
 References: <20211128035704.270739-1-yury.norov@gmail.com>
-         <20211128035704.270739-8-yury.norov@gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.4-1 
+ <20211128035704.270739-8-yury.norov@gmail.com>
+ <8f389151c39a8a5b6b31d5238cb680305225d9f2.camel@perches.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: umd6ft7bscstit6mcsb41shstont4bff
-X-Rspamd-Server: rspamout01
-X-Rspamd-Queue-Id: 5EF1EA00041C
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX1+NoJl8n1YyBqeqY0nk94+uRiGfczHPVi8=
-X-HE-Tag: 1638119268-113142
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8f389151c39a8a5b6b31d5238cb680305225d9f2.camel@perches.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 2021-11-27 at 19:57 -0800, Yury Norov wrote:
-> Add num_{possible,present,active}_cpus_{eq,gt,le} and replace num_*_cpus()
-> with one of new functions where appropriate. This allows num_*_cpus_*()
-> to return earlier depending on the condition.
-[]
-> diff --git a/arch/arc/kernel/smp.c b/arch/arc/kernel/smp.c
-[]
-> @@ -103,7 +103,7 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
->  	 * if platform didn't set the present map already, do it now
->  	 * boot cpu is set to present already by init/main.c
->  	 */
-> -	if (num_present_cpus() <= 1)
-> +	if (num_present_cpus_le(2))
->  		init_cpu_present(cpu_possible_mask);
+On Sun, Nov 28, 2021 at 09:07:52AM -0800, Joe Perches wrote:
+> On Sat, 2021-11-27 at 19:57 -0800, Yury Norov wrote:
+> > Add num_{possible,present,active}_cpus_{eq,gt,le} and replace num_*_cpus()
+> > with one of new functions where appropriate. This allows num_*_cpus_*()
+> > to return earlier depending on the condition.
+> []
+> > diff --git a/arch/arc/kernel/smp.c b/arch/arc/kernel/smp.c
+> []
+> > @@ -103,7 +103,7 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
+> >  	 * if platform didn't set the present map already, do it now
+> >  	 * boot cpu is set to present already by init/main.c
+> >  	 */
+> > -	if (num_present_cpus() <= 1)
+> > +	if (num_present_cpus_le(2))
+> >  		init_cpu_present(cpu_possible_mask);
+> 
+> ?  is this supposed to be 2 or 1
 
-?  is this supposed to be 2 or 1
+X <= 1 is the equivalent of X < 2.
 
-> diff --git a/drivers/cpufreq/pcc-cpufreq.c b/drivers/cpufreq/pcc-cpufreq.c
-[]
-> @@ -593,7 +593,7 @@ static int __init pcc_cpufreq_init(void)
->  		return ret;
->  	}
->  
-> -	if (num_present_cpus() > 4) {
-> +	if (num_present_cpus_gt(4)) {
->  		pcc_cpufreq_driver.flags |= CPUFREQ_NO_AUTO_DYNAMIC_SWITCHING;
->  		pr_err("%s: Too many CPUs, dynamic performance scaling disabled\n",
->  		       __func__);
-
-It looks as if the present variants should be using the same values
-so the _le test above with 1 changed to 2 looks odd.
-
-
+> > diff --git a/drivers/cpufreq/pcc-cpufreq.c b/drivers/cpufreq/pcc-cpufreq.c
+> []
+> > @@ -593,7 +593,7 @@ static int __init pcc_cpufreq_init(void)
+> >  		return ret;
+> >  	}
+> >  
+> > -	if (num_present_cpus() > 4) {
+> > +	if (num_present_cpus_gt(4)) {
+> >  		pcc_cpufreq_driver.flags |= CPUFREQ_NO_AUTO_DYNAMIC_SWITCHING;
+> >  		pr_err("%s: Too many CPUs, dynamic performance scaling disabled\n",
+> >  		       __func__);
+> 
+> It looks as if the present variants should be using the same values
+> so the _le test above with 1 changed to 2 looks odd.
+ 
