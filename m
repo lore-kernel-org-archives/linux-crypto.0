@@ -2,175 +2,323 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 495E3C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 27 Nov 2021 14:12:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A19C433EF
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Nov 2021 03:59:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234522AbhK0OQM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 27 Nov 2021 09:16:12 -0500
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:51398 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235734AbhK0OOM (ORCPT
+        id S1347336AbhK1ECY (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 27 Nov 2021 23:02:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41856 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1343810AbhK1EAX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 27 Nov 2021 09:14:12 -0500
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AR8VETt003142;
-        Sat, 27 Nov 2021 14:10:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : content-type : mime-version; s=corp-2021-07-09;
- bh=PWAP3zbq97CXj1b+aPIziA6CLMqQekXPJvF92lGCeu4=;
- b=fp8aqhr/CFqigPSXvL6bNXwLW15PrETr+p46s7fL2QPl4L3AggfioLZDgWP9bIvMwltE
- Ak/LWT/tPDkLpROm4HxxakJ/xmSogY0949+RXt7Z/Ewe1jjVsIz+4UqrvrtMLbY3e2eo
- ksU5BuISrtfTVcUFNLvC5sip8sbK/lOyzeMC09jryvkPgQ/pcxbUpNeKp7TJUYY7EMsX
- u5xZGJIHt1mbf4KEbb1ss2njwd9yYyHaWZnx3KxtuAZpdWMszUUy7knpAICcMByerSxr
- /0LFlddSgEsb09/WEjOAQ3EsCTQHSiJmmq25NXt1vTnEUzM8VLjE/HvoosvInHfbiATD IA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3ckcjb0xsm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 27 Nov 2021 14:10:47 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1ARE5hAt001769;
-        Sat, 27 Nov 2021 14:10:46 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2169.outbound.protection.outlook.com [104.47.58.169])
-        by userp3020.oracle.com with ESMTP id 3cke4had43-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 27 Nov 2021 14:10:46 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BcXOB9On3VbiNSD9RAji5Lc9cbEUHX2J0B9orIAjGOGIRKcQ/HrropEKmcwk2VG4euF9Iy2Z24N5c4Zy+aJPKEuN6J/mNuhxmRsNnOcOO3OQ/UOjAQV/p496fWtw96avSTwOFWtAshFmodpX7l1DKQqYurKp07AcKfaqp/diKQeNGU8i53cevu4K+CdsoYn9j7T9S6YIv13NUAm2o1d1K0BXq3MGql3hiIqDG3pxTJTeU9eMKJhggQTzK1ypcAoUJHGMFkaeGaHUHeD479/oGDX5TfB7Sqh2s+36ZkIxAQcQ/oDo4p2KjTfamdNG7Pvalbw9GAQZT+NcJijzW7chgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PWAP3zbq97CXj1b+aPIziA6CLMqQekXPJvF92lGCeu4=;
- b=A4HIEG2OAruA2ynhmMZ7ry3e4jhu/Ur/noaRWGTTzyUH8LO73GD9Da4U6D+QOJROvcebAht4KfRxyLU2ewJ1WJfGx6qc9OhXNv+QbIiJFQ2AgfF/VU2vBwcUkvDzn71Z23g6Vkz9hs2qm9ZEeHJpw9Q2cUErMcaQT4CTZavNaXuVHgzzA68oMDH6BrYMmOtftHYYHLyp7LcFzYXj0ATPxSRcV+xr5Dh+/BeEASjOOsUs5Tn/zllEieaNYRoRfdlvjRmoSQVLjveZnYO8ZjslGj6eCaiD3tf2FXQpkTPl1mwnIP10a53XkFFUUNIQ36wES6IqaJ/cP0A3Xfn/LDvIOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        Sat, 27 Nov 2021 23:00:23 -0500
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31A26C06174A;
+        Sat, 27 Nov 2021 19:57:08 -0800 (PST)
+Received: by mail-qt1-x833.google.com with SMTP id 8so12913101qtx.5;
+        Sat, 27 Nov 2021 19:57:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PWAP3zbq97CXj1b+aPIziA6CLMqQekXPJvF92lGCeu4=;
- b=N/097muRp+qhoU7f6H7mrcjBUQ6V1Gnh+Zhw+dZLYPjGTOnmDnvb50/9EWUkOhCnTUKbld38/UxrHEzbk217ugnH0wXr/lQDRNg/YIkooOAdxWlV7xsG2J46UKU6nBDQpYyA2eT93KafTCo3zFGT4xZMFdSC7wpIK8NYsQ3zUu0=
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28) by MWHPR10MB1824.namprd10.prod.outlook.com
- (2603:10b6:300:10a::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.23; Sat, 27 Nov
- 2021 14:10:44 +0000
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::7194:c377:36cc:d9f0]) by MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::7194:c377:36cc:d9f0%6]) with mapi id 15.20.4734.023; Sat, 27 Nov 2021
- 14:10:44 +0000
-Date:   Sat, 27 Nov 2021 17:10:27 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Boris Brezillon <bbrezillon@kernel.org>,
-        Srujana Challa <schalla@marvell.com>
-Cc:     Arnaud Ebalard <arno@natisbad.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Suheil Chandran <schandran@marvell.com>,
-        Lukasz Bartosik <lbartosik@marvell.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] crypto: octeontx2 - uninitialized variable in
- kvf_limits_store()
-Message-ID: <20211127141027.GC24002@kili>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-ClientProxiedBy: ZR0P278CA0114.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:20::11) To MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28)
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fJ8xfnVA+NPUIa5t4yWgB58hLT4DLWUqrE9DXdtQP+o=;
+        b=a5JTXAi8QEj68vc4ha+mPXa/ak1/OEEuTBec3AMtr1hEzo8fmCz3oIwEmN3K8kvQYB
+         67gv/rNWFdzwHiZFz09bpXG9HR51wjgigxUHIjdtAoVE4YB1vUAdNadlYIOtRZECxgba
+         qt3C1oVJF96hYIQdDKlDO0FBz0TCdg6G1jktJ3RCIVLkJZMOcXupEqyjZfFMvq2MAme6
+         UgcKwKoiTAaN0noh2ql7FQQ0Jxhmh2WckqBiI0uS0tM+dBCqWKfFUMxoZTvkiS3PR3wT
+         /2lsgPXrHRO/TwsRXE/k4NEjrGiabGxA6/xpgMyYfvSqIbYUO/V0Hzjl329Ng6juxWHT
+         KZPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fJ8xfnVA+NPUIa5t4yWgB58hLT4DLWUqrE9DXdtQP+o=;
+        b=4C6Vqaso+l2IUpyiEbdZ2SXnIl0b64oOmzu6OukVkbhVMGVndO2DoIouAiLcttLNXd
+         GLCC0dZXhuF7CiEma0nV85UsCgl+Ahb4avVBDKm0Kcfk2e0H6slgbid9y2IJYa8YcVPM
+         s8JFWAJfjPgPaHx9OAKVXbMvCU0RrC1C2NsoEokYbymRnf4V0boS99n1lOO18Xwo0ubA
+         n6yrLVIqsJoMouYlBj9WqH3lLnxjKDYqKM/heZ+Rnq76+1dIg8K+kg/jmD6830ceJc3Q
+         KKG/XHKzBISzvLOSOb67VcmNcMeeWRM9jGg2asO30cGakGGCSaPsVAQbD0TI03ABvzmS
+         7kTQ==
+X-Gm-Message-State: AOAM530V41QuNcU+T+L9ikKlpjzT8BBmcWRnTUjqN2sT4H/RJmg77rYb
+        vm+92Lcv4qcw26OF1XVAeU05qYXbyljYdw==
+X-Google-Smtp-Source: ABdhPJy1HODbinFYUK0hw6hMtPG5eVjRVeAWjrsAbI29+G07rR15rsN4J5IN8e01ddnXvrZIRqJNZg==
+X-Received: by 2002:ac8:7fc2:: with SMTP id b2mr35277966qtk.114.1638071826940;
+        Sat, 27 Nov 2021 19:57:06 -0800 (PST)
+Received: from localhost ([66.216.211.25])
+        by smtp.gmail.com with ESMTPSA id x17sm6473647qta.66.2021.11.27.19.57.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Nov 2021 19:57:06 -0800 (PST)
+From:   Yury Norov <yury.norov@gmail.com>
+To:     linux-kernel@vger.kernel.org, Yury Norov <yury.norov@gmail.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Andi Kleen <ak@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Gross <agross@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Lameter <cl@linux.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        David Laight <David.Laight@ACULAB.COM>,
+        Dennis Zhou <dennis@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Geetha sowjanya <gakula@marvell.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Guo Ren <guoren@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jason Wessel <jason.wessel@windriver.com>,
+        Jens Axboe <axboe@fb.com>, Jiri Olsa <jolsa@redhat.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Kees Cook <keescook@chromium.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Marc Zyngier <maz@kernel.org>, Marcin Wojtas <mw@semihalf.com>,
+        Mark Gross <markgross@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Matti Vaittinen <mazziesaccount@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Mel Gorman <mgorman@suse.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Roy Pledge <Roy.Pledge@nxp.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Solomon Peachy <pizza@shaftnet.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Tariq Toukan <tariqt@nvidia.com>, Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Will Deacon <will@kernel.org>,
+        bcm-kernel-feedback-list@broadcom.com, kvm@vger.kernel.org,
+        linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-csky@vger.kernel.org,
+        linux-ia64@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH 0/9] lib/bitmap: optimize bitmap_weight() usage
+Date:   Sat, 27 Nov 2021 19:56:55 -0800
+Message-Id: <20211128035704.270739-1-yury.norov@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Received: from kili (102.222.70.114) by ZR0P278CA0114.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:20::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.23 via Frontend Transport; Sat, 27 Nov 2021 14:10:37 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fa153532-57c0-4134-e731-08d9b1afb395
-X-MS-TrafficTypeDiagnostic: MWHPR10MB1824:
-X-Microsoft-Antispam-PRVS: <MWHPR10MB18247F2406A2E97BE1AEB1A08E649@MWHPR10MB1824.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: g1WkyF/mjE4/vxeblE0kmhlU7fuWUf38SDhdj7DaQMF0Wb0rZIY/0z7cQyf3UxufgMCn06bYZkrriVv00yqbQw6OoMDeFBPymrZ777XBtrOrHtrdYAg+LSZyl8WkjF0NMsTxf1iodugbqIB0s602dACuVT7xlS5fTQbPGIPjCmMcyDts7aK7HDzSyHrz9h7/VHp5HX/PQrg6VXbNaND3UFiJWUAEUNMgzTcKt2ayMsvF41ciUM9H19N9e9hYuu2AF37HAM1zHLKX/eLS1tyVtmM44BJ3xZzvtDq1Voj2J+cKBspPZzQ6sMqmFvFGl8jOBRUn5aQl+eWZEu+ruchBu+RyWxkZZgLXMQ1XXtBQngPh7uYbC1eBHtTcRlJpedzJYGVPPurExkxMFqhrJFlhIFLcZdnU0NXXb2DnZz/5jfxTalOwO5qL+PDRqIjPJg1XpmNbyhsrtgemozH+O0wWg6nhTpQnnmymysUBVIfghwAZv1HyGwU6rcvfufHkS6qqVW3BQeWo6HvlZhYgW1CZg3QWCGzCy4kXpYqxcWGRzFbp8vnKLPJLBUXcEF6BglzAu+8JG4ugJwLRBZxpXdsMS4IpzvGp7/9QzYm1O3M6vKwaX5uFK/5GHHc/7rJRoQBVV95nptqYuqxPZIqOeeLvbzMc6ZjGeA+2Q5bIcIeJsxuxEf0ZOcIRkCP5qeJNpHov9PluPMg27AW7cwd/7537vw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(8936002)(52116002)(38350700002)(38100700002)(33716001)(86362001)(2906002)(186003)(6496006)(54906003)(5660300002)(33656002)(508600001)(44832011)(9686003)(8676002)(9576002)(55016003)(110136005)(66946007)(26005)(1076003)(4326008)(6666004)(66556008)(83380400001)(316002)(66476007)(956004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+uMDtMIAQSwWe3Pk9so6fnJTUdtQHSI6q6SYQ7RfEnY50dQPFrj9XDz/oIMI?=
- =?us-ascii?Q?kwuYOJy0cQG6tpcaMjw4oQNwMQwWjmNK0ZyspultbsNlazLshfyAGqzVVT0g?=
- =?us-ascii?Q?hbqD8Ly18Bj+R40wzGvvM3Tahrik0tIr/PUx870oCb/UAtFmB+HpEFp4/yAd?=
- =?us-ascii?Q?WZtGbTUA7pk3rFWqFyLQ/TaoevvnAkCceyWUqS+PXBZ7QoUsTminR3zA3XYW?=
- =?us-ascii?Q?VhCpwdYGQY8cEbGG60MLJedhLBLSurHBnJ2fL8moD0ckqRoW6cgTB0GRitWo?=
- =?us-ascii?Q?FjpeXEUFzr+4szsEdjYMq8RHeyuyHZX7B3WinX8SCyLSxd2WXajH0ZHONZuG?=
- =?us-ascii?Q?KoWeIzA40IjV83O87LuEtO6oAs3SFdpElPZ8byL4knY56wCe/J7o5qNMAULF?=
- =?us-ascii?Q?wEqzMJnFHtebRhB6M2Sf5IHMn9OfhbrFDd5lXunmiDc7RMn2Ax5JScr5k1Qi?=
- =?us-ascii?Q?caSRXKNyt9Xh3BR4In+9kVZsBzNz1glUQNIyBVr05ddYI+RTE6ZbJV7XFe0R?=
- =?us-ascii?Q?BFvo9h0sAzRK5mLRzMqrtAPiRV6gHDNcxz2RQcvoir5XIfPYFfq9bjuqfhGr?=
- =?us-ascii?Q?7B0xS0JBhYXXs7uxVvHx3/zACWIyp4tlxruaIQKuSSeem+F038mae8fvjVkI?=
- =?us-ascii?Q?PCpXQ1JF/Nc8OkPzjPvYH5CjzHgQ0eZAM2tdwUO8t6HQA6U6G/K+TWwCmMwY?=
- =?us-ascii?Q?a1QUPDb83xlCCgaY/Xo08EtDFSFY2+zdg7uhNxar42gxfZWuJWedGBEgf/ZK?=
- =?us-ascii?Q?2KBxs3oAuSGOcA2UaWArdyh1jaykvSEWgl7XRwW/0kE7mq/xIjnxakDsepFZ?=
- =?us-ascii?Q?99LCERCL2x1KDcjDnJ+fsRa4DV6tVxpE+1558D4dP7ThjMzjdkwRtoulVraS?=
- =?us-ascii?Q?O5JXeQUe/JetSYSphlheaZPmv/2dTD+SOpR2FCid8kV9A/A/0Dt3p3ZU5mNO?=
- =?us-ascii?Q?1raLfhQ7qzb1rIyNkuHTnHtFo4YOYc48wssZy3XLbr0TiybQoDiDfLxFZg2e?=
- =?us-ascii?Q?e1geMOp0loPPReI5LxQx9rRp1iDwcby2bPJTnO+eTxYxH4ANJ4jGSAEF/lpD?=
- =?us-ascii?Q?kTOpcXTHdDfDuX7AbmfKOOxbvAG5sAAxWVscncSqimzlzqlL74nZiYCDsfXK?=
- =?us-ascii?Q?ooPEnUUQjW9lyQOVJRjXra2/SGGTfes/OFp3+K35irCMy9E0c1KZoUYbXsgW?=
- =?us-ascii?Q?Dd3Xh8NCWkhep8fWeToi50DC3QrffIZ8jE9m9ynghzBqHFJEdwh+roTtgtwB?=
- =?us-ascii?Q?5em5KCg5w8qWaewS4rmj/uZIglKseceK6i+FbbMRIc6CpD6FPnXa2Tg8VPdn?=
- =?us-ascii?Q?cj93mDGgzbRyq/gTF+Kf9+hMAmOOy8/Jd050xSWgzB1yS1hze445gOoNOBvH?=
- =?us-ascii?Q?QV1mA+mCEjTOQvyEQTl5H5kIjhBszho/XmcXS7pU5rpz8vHOZKazPrF1GLkJ?=
- =?us-ascii?Q?8eYQ+4fG442joGJG6Z4/r8aUoJArERceC9nqPbD34nAhPG/DPtoSZ7BM41ns?=
- =?us-ascii?Q?FWqO6HWnxVuFta28blgJRAmTsHyhktYD4yVsXQX8simwR+5TTJByung0IqNJ?=
- =?us-ascii?Q?6uFuRuwCd5PG19dhpBrmc31wTx28RzVLiYoK7PEhyF5gw3fjLWe4fwl1QBGK?=
- =?us-ascii?Q?ndymm/f/3KADktaDmG6WqMMZPgPOa8o4jGiAkLRaSygsdnciQ+7MQ0zBXNZT?=
- =?us-ascii?Q?2bf0G/nxvEMzYzzzzagtf/gDPyw=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa153532-57c0-4134-e731-08d9b1afb395
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2021 14:10:44.2982
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bBQu9VplPCn4PJlyH0mUZBZX5VOYQxaYAM98jCS1UbEo4uhdHF1E7++vtLiky4suucb93bUexOIDu9+FbNErOOKrZGa6GolbEqCc0UgLDf4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR10MB1824
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10180 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
- phishscore=0 suspectscore=0 spamscore=0 adultscore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111270084
-X-Proofpoint-GUID: 7F2dVcT0khVRSV46sy2cxW3daRPwdGc6
-X-Proofpoint-ORIG-GUID: 7F2dVcT0khVRSV46sy2cxW3daRPwdGc6
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If kstrtoint() fails then "lfs_num" is uninitialized and the warning
-doesn't make any sense.  Just delete it.
+In many cases people use bitmap_weight()-based functions like this:
 
-Fixes: 8ec8015a3168 ("crypto: octeontx2 - add support to process the crypto request")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+	if (num_present_cpus() > 1)
+		do_something();
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-index 146a55ac4b9b..be1ad55a208f 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-@@ -494,12 +494,11 @@ static ssize_t kvf_limits_store(struct device *dev,
- {
- 	struct otx2_cptpf_dev *cptpf = dev_get_drvdata(dev);
- 	int lfs_num;
-+	int ret;
- 
--	if (kstrtoint(buf, 0, &lfs_num)) {
--		dev_err(dev, "lfs count %d must be in range [1 - %d]\n",
--			lfs_num, num_online_cpus());
--		return -EINVAL;
--	}
-+	ret = kstrtoint(buf, 0, &lfs_num);
-+	if (ret)
-+		return ret;
- 	if (lfs_num < 1 || lfs_num > num_online_cpus()) {
- 		dev_err(dev, "lfs count %d must be in range [1 - %d]\n",
- 			lfs_num, num_online_cpus());
+This may take considerable amount of time on many-cpus machines because
+num_present_cpus() will traverse every word of underlying cpumask
+unconditionally.
+
+We can significantly improve on it for many real cases if stop traversing
+the mask as soon as we count present cpus to any number greater than 1:
+
+	if (num_present_cpus_gt(1))
+		do_something();
+
+To implement this idea, the series adds bitmap_weight_{eq,gt,le}
+functions together with corresponding wrappers in cpumask and nodemask.
+
+Yury Norov (9):
+  lib/bitmap: add bitmap_weight_{eq,gt,le}
+  lib/bitmap: implement bitmap_{empty,full} with bitmap_weight_eq()
+  all: replace bitmap_weigth() with bitmap_{empty,full,eq,gt,le}
+  tools: sync bitmap_weight() usage with the kernel
+  lib/cpumask: add cpumask_weight_{eq,gt,le}
+  lib/nodemask: add nodemask_weight_{eq,gt,le}
+  lib/cpumask: add num_{possible,present,active}_cpus_{eq,gt,le}
+  lib/nodemask: add num_node_state_eq()
+  MAINTAINERS: add cpumask and nodemask files to BITMAP_API
+
+ MAINTAINERS                                   |  4 ++
+ arch/alpha/kernel/process.c                   |  2 +-
+ arch/arc/kernel/smp.c                         |  2 +-
+ arch/arm/kernel/machine_kexec.c               |  2 +-
+ arch/arm/mach-exynos/exynos.c                 |  2 +-
+ arch/arm/mm/cache-b15-rac.c                   |  2 +-
+ arch/arm64/kernel/smp.c                       |  2 +-
+ arch/arm64/mm/context.c                       |  2 +-
+ arch/csky/mm/asid.c                           |  2 +-
+ arch/csky/mm/context.c                        |  2 +-
+ arch/ia64/kernel/setup.c                      |  2 +-
+ arch/ia64/mm/tlb.c                            |  8 +--
+ arch/mips/cavium-octeon/octeon-irq.c          |  4 +-
+ arch/mips/kernel/crash.c                      |  2 +-
+ arch/mips/kernel/i8253.c                      |  2 +-
+ arch/mips/kernel/perf_event_mipsxx.c          |  4 +-
+ arch/mips/kernel/rtlx-cmp.c                   |  2 +-
+ arch/mips/kernel/smp.c                        |  4 +-
+ arch/mips/kernel/vpe-cmp.c                    |  2 +-
+ .../loongson2ef/common/cs5536/cs5536_mfgpt.c  |  2 +-
+ arch/mips/mm/context.c                        |  2 +-
+ arch/mips/mm/tlbex.c                          |  2 +-
+ arch/nds32/kernel/perf_event_cpu.c            |  4 +-
+ arch/nios2/kernel/cpuinfo.c                   |  2 +-
+ arch/powerpc/kernel/smp.c                     |  2 +-
+ arch/powerpc/kernel/watchdog.c                |  4 +-
+ arch/powerpc/platforms/85xx/smp.c             |  2 +-
+ arch/powerpc/platforms/pseries/hotplug-cpu.c  |  4 +-
+ arch/powerpc/sysdev/mpic.c                    |  2 +-
+ arch/powerpc/xmon/xmon.c                      | 10 +--
+ arch/riscv/kvm/vmid.c                         |  2 +-
+ arch/s390/kernel/perf_cpum_cf.c               |  2 +-
+ arch/sparc/kernel/mdesc.c                     |  6 +-
+ arch/x86/events/amd/core.c                    |  2 +-
+ arch/x86/kernel/alternative.c                 |  8 +--
+ arch/x86/kernel/apic/apic.c                   |  4 +-
+ arch/x86/kernel/apic/apic_flat_64.c           |  2 +-
+ arch/x86/kernel/apic/probe_32.c               |  2 +-
+ arch/x86/kernel/cpu/mce/dev-mcelog.c          |  2 +-
+ arch/x86/kernel/cpu/resctrl/rdtgroup.c        | 18 +++---
+ arch/x86/kernel/hpet.c                        |  2 +-
+ arch/x86/kernel/i8253.c                       |  2 +-
+ arch/x86/kernel/kvm.c                         |  2 +-
+ arch/x86/kernel/kvmclock.c                    |  2 +-
+ arch/x86/kernel/smpboot.c                     |  4 +-
+ arch/x86/kernel/tsc.c                         |  2 +-
+ arch/x86/kvm/hyperv.c                         |  8 +--
+ arch/x86/mm/amdtopology.c                     |  2 +-
+ arch/x86/mm/mmio-mod.c                        |  2 +-
+ arch/x86/mm/numa_emulation.c                  |  4 +-
+ arch/x86/platform/uv/uv_nmi.c                 |  2 +-
+ arch/x86/xen/smp_pv.c                         |  2 +-
+ arch/x86/xen/spinlock.c                       |  2 +-
+ drivers/acpi/numa/srat.c                      |  2 +-
+ drivers/clk/samsung/clk-exynos4.c             |  2 +-
+ drivers/clocksource/ingenic-timer.c           |  3 +-
+ drivers/cpufreq/pcc-cpufreq.c                 |  2 +-
+ drivers/cpufreq/qcom-cpufreq-hw.c             |  2 +-
+ drivers/cpufreq/scmi-cpufreq.c                |  2 +-
+ drivers/crypto/ccp/ccp-dev-v5.c               |  5 +-
+ drivers/dma/mv_xor.c                          |  5 +-
+ drivers/firmware/psci/psci_checker.c          |  2 +-
+ drivers/gpu/drm/i810/i810_drv.c               |  2 +-
+ drivers/gpu/drm/i915/i915_pmu.c               |  2 +-
+ drivers/gpu/drm/msm/disp/mdp5/mdp5_smp.c      |  2 +-
+ drivers/hv/channel_mgmt.c                     |  4 +-
+ drivers/iio/adc/mxs-lradc-adc.c               |  3 +-
+ drivers/iio/dummy/iio_simple_dummy_buffer.c   |  4 +-
+ drivers/iio/industrialio-buffer.c             |  2 +-
+ drivers/iio/industrialio-trigger.c            |  2 +-
+ drivers/infiniband/hw/hfi1/affinity.c         | 13 ++--
+ drivers/infiniband/hw/qib/qib_file_ops.c      |  2 +-
+ drivers/infiniband/hw/qib/qib_iba7322.c       |  2 +-
+ drivers/infiniband/sw/siw/siw_main.c          |  3 +-
+ drivers/irqchip/irq-bcm6345-l1.c              |  2 +-
+ drivers/irqchip/irq-gic.c                     |  2 +-
+ drivers/memstick/core/ms_block.c              |  4 +-
+ drivers/net/caif/caif_virtio.c                |  2 +-
+ drivers/net/dsa/b53/b53_common.c              |  2 +-
+ drivers/net/ethernet/broadcom/bcmsysport.c    |  6 +-
+ .../cavium/liquidio/cn23xx_vf_device.c        |  2 +-
+ drivers/net/ethernet/hisilicon/hns/hns_enet.c |  2 +-
+ .../net/ethernet/intel/ice/ice_virtchnl_pf.c  |  4 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |  2 +-
+ .../net/ethernet/marvell/mvpp2/mvpp2_main.c   |  2 +-
+ .../marvell/octeontx2/nic/otx2_ethtool.c      |  2 +-
+ .../marvell/octeontx2/nic/otx2_flows.c        |  8 +--
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  2 +-
+ drivers/net/ethernet/mellanox/mlx4/cmd.c      | 10 +--
+ drivers/net/ethernet/mellanox/mlx4/eq.c       |  4 +-
+ drivers/net/ethernet/mellanox/mlx4/main.c     |  2 +-
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  |  2 +-
+ drivers/net/ethernet/qlogic/qed/qed_dev.c     |  3 +-
+ drivers/net/ethernet/qlogic/qed/qed_rdma.c    |  4 +-
+ drivers/net/ethernet/qlogic/qed/qed_roce.c    |  2 +-
+ drivers/net/wireless/ath/ath9k/hw.c           |  2 +-
+ drivers/net/wireless/marvell/mwifiex/main.c   |  4 +-
+ drivers/net/wireless/st/cw1200/queue.c        |  3 +-
+ drivers/nvdimm/region.c                       |  2 +-
+ drivers/nvme/host/pci.c                       |  2 +-
+ drivers/perf/arm-cci.c                        |  2 +-
+ drivers/perf/arm_pmu.c                        |  6 +-
+ drivers/perf/hisilicon/hisi_uncore_pmu.c      |  2 +-
+ drivers/perf/thunderx2_pmu.c                  |  3 +-
+ drivers/perf/xgene_pmu.c                      |  2 +-
+ .../intel/speed_select_if/isst_if_common.c    |  6 +-
+ drivers/pwm/pwm-pca9685.c                     |  2 +-
+ drivers/scsi/lpfc/lpfc_init.c                 |  2 +-
+ drivers/soc/bcm/brcmstb/biuctrl.c             |  2 +-
+ drivers/soc/fsl/dpio/dpio-service.c           |  4 +-
+ drivers/soc/fsl/qbman/qman_test_stash.c       |  2 +-
+ drivers/spi/spi-dw-bt1.c                      |  2 +-
+ drivers/staging/media/tegra-video/vi.c        |  2 +-
+ drivers/thermal/intel/intel_powerclamp.c      | 10 ++-
+ drivers/virt/acrn/hsm.c                       |  2 +-
+ fs/ocfs2/cluster/heartbeat.c                  | 14 ++---
+ fs/xfs/xfs_sysfs.c                            |  2 +-
+ include/linux/bitmap.h                        | 45 ++++++++++---
+ include/linux/cpumask.h                       | 55 ++++++++++++++++
+ include/linux/kdb.h                           |  2 +-
+ include/linux/nodemask.h                      | 29 +++++++++
+ kernel/debug/kdb/kdb_bt.c                     |  2 +-
+ kernel/irq/affinity.c                         |  2 +-
+ kernel/padata.c                               |  2 +-
+ kernel/printk/printk.c                        |  2 +-
+ kernel/rcu/tree_nocb.h                        |  4 +-
+ kernel/rcu/tree_plugin.h                      |  2 +-
+ kernel/reboot.c                               |  4 +-
+ kernel/sched/core.c                           | 10 +--
+ kernel/sched/topology.c                       |  4 +-
+ kernel/time/clockevents.c                     |  4 +-
+ kernel/time/clocksource.c                     |  2 +-
+ lib/bitmap.c                                  | 63 +++++++++++++++++++
+ mm/mempolicy.c                                |  2 +-
+ mm/page_alloc.c                               |  2 +-
+ mm/percpu.c                                   |  6 +-
+ mm/slab.c                                     |  2 +-
+ mm/vmstat.c                                   |  4 +-
+ tools/include/linux/bitmap.h                  | 42 ++++++++++---
+ tools/lib/bitmap.c                            | 60 ++++++++++++++++++
+ tools/perf/builtin-c2c.c                      |  4 +-
+ tools/perf/util/pmu.c                         |  2 +-
+ 142 files changed, 490 insertions(+), 251 deletions(-)
+
 -- 
-2.20.1
+2.25.1
 
