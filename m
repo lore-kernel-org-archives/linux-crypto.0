@@ -2,159 +2,156 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D61C433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Nov 2021 23:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C90DFC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Nov 2021 06:40:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348837AbhK1Xlr (ORCPT
+        id S1347270AbhK2GoB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Nov 2021 18:41:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42518 "EHLO
+        Mon, 29 Nov 2021 01:44:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241220AbhK1Xjr (ORCPT
+        with ESMTP id S233836AbhK2GmA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Nov 2021 18:39:47 -0500
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 898A5C06174A;
-        Sun, 28 Nov 2021 15:36:30 -0800 (PST)
-Received: by mail-qk1-x732.google.com with SMTP id 193so20935202qkh.10;
-        Sun, 28 Nov 2021 15:36:30 -0800 (PST)
+        Mon, 29 Nov 2021 01:42:00 -0500
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43BEC061748;
+        Sun, 28 Nov 2021 22:38:43 -0800 (PST)
+Received: by mail-qv1-xf2b.google.com with SMTP id gu12so13619689qvb.6;
+        Sun, 28 Nov 2021 22:38:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=+pvPLMMOaG75eXeO+MYWVtFy7p98nfe1U4iD6DUFgqs=;
-        b=FqHxiwrQ7QYivLGpovhQrNQCHUCj7LxMV2WH4G2Ujzkjgck5ZuLpYg6YmyS5/pcjd8
-         PioI6TsqEy6uPfhoz8wEavEgHnpCryLeBpBEb8dr5G6s12WteiFVLQFxrBR47EVsTB3X
-         ndIWwpq8YabRGonzz7m7f+N7UJXzBMp2vfRHxXo9M1u6ZB6qiEh6DrJAZ2z7gRkAQ5sC
-         IqRPeZsbgWqH6z7gZV/iyVzYOISv9QQ48jjOTsL+5HMXkolOWVbHK0gj+h+Ra3+OPnrQ
-         HZwGnjmshXRb1nFHqTfVME98Ezv2622Zg9Ol7LGc837jR3cjnZ1W8PCl/MaA7m1eTWjV
-         ggTQ==
+        bh=GW7wD7qKvROu8z9xZL5o2Gh9JvMEXrXNdc/d8bAaPNs=;
+        b=Ximtyy9D6hF34jeHkx2abhxO2fEDksv5f5qJu4CbvoNWokti3yxmfDL3L7TYPRNI1N
+         nLBExnAtE1kHxfW3UuSIcTZjpfdkrYaWw77PtYlgHprrRWmhg8onSirLlPaay6tbmdGV
+         QOolCDulR6Tk/EKA2Gv8Xlb2VKcWxKtuMIpV9m8bP/Y2OIkRrwh1D8Uy/bj62ViSMN2l
+         ZvGgVYwmHud/XyWXGXVdXp5Qsb6Tf/NpieRKvdWwCGOCaqCRU7xxjxP8pUys/Y0my6pK
+         DI87mJm/+MqXPnLUnP7Gv+O+UoGKFiXftZWbYzOV5qGvrEcopuUsleS20idOc1qycgZd
+         CJ3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=+pvPLMMOaG75eXeO+MYWVtFy7p98nfe1U4iD6DUFgqs=;
-        b=7aCKBvnO39Y1LuXAjf4CAl3P3dr+n5iUSl7lBKO5t77W1Le21lLr7YvRw5FaPKHmiq
-         ShOcyu57BVIRMNdlGnbI7HN6yV8DB/P0OlwZIZSm0MdLTk/GO/V3xwjg10HglkSYi5Pe
-         KrwAAOWXjINFeJyw7pAJvUpSmV+8tZGvKFTlXrPIHi044KxyTJK2kYrHPdVS+PzBJxmJ
-         pbWzbRIiqHJKtcgqWhXjLSdGtZNNl/WztchxAiPoYIaXMWhM8IZ5xaQK8EkvKC6k4Sv1
-         Ur5vhoAmKInmDomlj15CoBqvBDVzl9Cdf/xXZmiMwTzxKaN+tsRQDozr7sbd7WLF+IzA
-         jhGg==
-X-Gm-Message-State: AOAM533px3vhgBpnIVbCj0cROWTiO3A0pfax9x4pTNf3EOCzzykhbySL
-        8xS7jW+rvn1ISeyXYMYWOKs=
-X-Google-Smtp-Source: ABdhPJwjz8dPYMt9os+urjypBO3KPO0n0aAUmhuhKTUddMw0/hFm/BxjybZbsejId+j0oxfauAhjwQ==
-X-Received: by 2002:a05:620a:4491:: with SMTP id x17mr26762094qkp.528.1638142589577;
-        Sun, 28 Nov 2021 15:36:29 -0800 (PST)
+        bh=GW7wD7qKvROu8z9xZL5o2Gh9JvMEXrXNdc/d8bAaPNs=;
+        b=ZJNzQ26Pb9b5MJ1h3uUNqYGv1DaF8OI97Y1jXO35e62sIp4N/U+id1FQbIb1zKi+8n
+         QKlv6MnvQlACW6tq4DYgO2P2XGDXXmwikomWVIzzVHN6aghoX+BwKX6cWG8+e6akI3l+
+         Ozvclk1Yedo0wVR/WvvQj7PXMQlTOQm48qqzsUfXt5rc+eWaY15RPknM97CG9Xb6fv07
+         YF5wLyZ6Xm8X5bZ67A2PbR6MN2gsFdGO1DL/GCbYIbfYDGWSERBVVgnvVotH/0QVkt6D
+         DR+Y3vwLW4oPazxAcrRIf0acgfZDdryEtnu6UP2qQ1X+szodvu6Rippkk530utTMvaSg
+         9fKw==
+X-Gm-Message-State: AOAM533YI1rNKv+SqHSIcx46h56bqj2sV4uMFtHOzX73HR9Rm2iuz7yU
+        9217RHcBLVci45zm4BX7KW8=
+X-Google-Smtp-Source: ABdhPJwSywxmnS7RgaW8ur/GbWm8YSeTFfi4rMgLh/NdfnxtrZBeDnmatO6ciZp/cAThb6LO+btZbw==
+X-Received: by 2002:a05:6214:984:: with SMTP id dt4mr30031399qvb.120.1638167922796;
+        Sun, 28 Nov 2021 22:38:42 -0800 (PST)
 Received: from localhost ([66.216.211.25])
-        by smtp.gmail.com with ESMTPSA id h19sm8013261qth.63.2021.11.28.15.36.28
+        by smtp.gmail.com with ESMTPSA id h19sm8495514qth.63.2021.11.28.22.38.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Nov 2021 15:36:28 -0800 (PST)
-Date:   Sun, 28 Nov 2021 15:36:27 -0800
+        Sun, 28 Nov 2021 22:38:42 -0800 (PST)
+Date:   Sun, 28 Nov 2021 22:38:39 -0800
 From:   Yury Norov <yury.norov@gmail.com>
-To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Andy Gross <agross@kernel.org>,
-        David Airlie <airlied@linux.ie>,
-        Alexey Klimov <aklimov@redhat.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
+To:     mirq-test@rere.qmqm.pl
+Cc:     linux-kernel@vger.kernel.org, Yury Norov <yury.norov@gmail.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
         Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
         Amitkumar Karwar <amitkarwar@gmail.com>,
-        Andrew Lunn <andrew@lunn.ch>,
+        Andi Kleen <ak@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Gross <agross@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
         Andy Shevchenko <andy@infradead.org>,
         Anup Patel <anup.patel@wdc.com>,
         Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@fb.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        Borislav Petkov <bp@alien8.de>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
         Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Hellwig <hch@lst.de>,
         Christoph Lameter <cl@linux.com>,
         Daniel Vetter <daniel@ffwll.ch>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        David Laight <David.Laight@ACULAB.COM>,
+        David Airlie <airlied@linux.ie>,
+        David Laight <David.Laight@aculab.com>,
         Dennis Zhou <dennis@kernel.org>,
         Dinh Nguyen <dinguyen@kernel.org>,
         Geetha sowjanya <gakula@marvell.com>,
         Geert Uytterhoeven <geert@linux-m68k.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Guo Ren <guoren@kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>,
         Hans de Goede <hdegoede@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
         Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
         Jason Wessel <jason.wessel@windriver.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Jens Axboe <axboe@fb.com>, Jiri Olsa <jolsa@redhat.com>,
         Jonathan Cameron <jic23@kernel.org>,
-        Jiri Olsa <jolsa@redhat.com>,
         Juri Lelli <juri.lelli@redhat.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
         Kees Cook <keescook@chromium.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Kalle Valo <kvalo@codeaurora.org>, kvm@vger.kernel.org,
-        Lee Jones <lee.jones@linaro.org>, linux-alpha@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Russell King <linux@armlinux.org.uk>,
-        linux-crypto@vger.kernel.org, linux-csky@vger.kernel.org,
-        linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-perf-users@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-snps-arc@lists.infradead.org,
-        Andy Lutomirski <luto@kernel.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Marc Zyngier <maz@kernel.org>, Marcin Wojtas <mw@semihalf.com>,
         Mark Gross <markgross@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Marc Zyngier <maz@kernel.org>,
         Matti Vaittinen <mazziesaccount@gmail.com>,
         Mauro Carvalho Chehab <mchehab@kernel.org>,
         Mel Gorman <mgorman@suse.de>,
-        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
-        Ingo Molnar <mingo@redhat.com>,
         Michael Ellerman <mpe@ellerman.id.au>,
-        Marcin Wojtas <mw@semihalf.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
-        Solomon Peachy <pizza@shaftnet.org>,
         Petr Mladek <pmladek@suse.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
         Randy Dunlap <rdunlap@infradead.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         Roy Pledge <Roy.Pledge@nxp.com>,
+        Russell King <linux@armlinux.org.uk>,
         Saeed Mahameed <saeedm@nvidia.com>,
         Sagi Grimberg <sagi@grimberg.me>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        Stephen Boyd <sboyd@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Solomon Peachy <pizza@shaftnet.org>,
+        Stephen Boyd <sboyd@kernel.org>,
         Stephen Rothwell <sfr@canb.auug.org.au>,
-        Sunil Goutham <sgoutham@marvell.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
         Sudeep Holla <sudeep.holla@arm.com>,
-        Tariq Toukan <tariqt@nvidia.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tejun Heo <tj@kernel.org>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Tariq Toukan <tariqt@nvidia.com>, Tejun Heo <tj@kernel.org>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Ulf Hansson <ulf.hansson@linaro.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vineet Gupta <vgupta@kernel.org>,
         Vincent Guittot <vincent.guittot@linaro.org>,
+        Vineet Gupta <vgupta@kernel.org>,
         Viresh Kumar <viresh.kumar@linaro.org>,
         Vivien Didelot <vivien.didelot@gmail.com>,
-        Will Deacon <will@kernel.org>
+        Vlastimil Babka <vbabka@suse.cz>,
+        Will Deacon <will@kernel.org>,
+        bcm-kernel-feedback-list@broadcom.com, kvm@vger.kernel.org,
+        linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-csky@vger.kernel.org,
+        linux-ia64@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
 Subject: Re: [PATCH 0/9] lib/bitmap: optimize bitmap_weight() usage
-Message-ID: <20211128233627.GA323159@lapt>
+Message-ID: <20211129063839.GA338729@lapt>
 References: <20211128035704.270739-1-yury.norov@gmail.com>
- <1638096766.3elxdzb8ly.astroid@bobo.none>
+ <YaPEfZ0t9UFGwpml@qmqm.qmqm.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1638096766.3elxdzb8ly.astroid@bobo.none>
+In-Reply-To: <YaPEfZ0t9UFGwpml@qmqm.qmqm.pl>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Nov 28, 2021 at 09:08:41PM +1000, Nicholas Piggin wrote:
-> Excerpts from Yury Norov's message of November 28, 2021 1:56 pm:
+On Sun, Nov 28, 2021 at 07:03:41PM +0100, mirq-test@rere.qmqm.pl wrote:
+> On Sat, Nov 27, 2021 at 07:56:55PM -0800, Yury Norov wrote:
 > > In many cases people use bitmap_weight()-based functions like this:
 > > 
 > > 	if (num_present_cpus() > 1)
@@ -173,9 +170,64 @@ On Sun, Nov 28, 2021 at 09:08:41PM +1000, Nicholas Piggin wrote:
 > > To implement this idea, the series adds bitmap_weight_{eq,gt,le}
 > > functions together with corresponding wrappers in cpumask and nodemask.
 > 
-> There would be no change to callers if you maintain counters like what
-> is done for num_online_cpus() today. Maybe some fixes to arch code that
-> does not use set_cpu_possible() etc APIs required, but AFAIKS it would
-> be better to fix such cases anyway.
+> Having slept on it I have more structured thoughts:
+> 
+> First, I like substituting bitmap_empty/full where possible - I think
+> the change stands on its own, so could be split and sent as is.
 
-Thanks, Nick. I'll try to do this.
+Ok, I can do it.
+
+> I don't like the proposed API very much. One problem is that it hides
+> the comparison operator and makes call sites less readable:
+> 
+> 	bitmap_weight(...) > N
+> 
+> becomes:
+> 
+> 	bitmap_weight_gt(..., N)
+> 
+> and:
+> 	bitmap_weight(...) <= N
+> 
+> becomes:
+> 
+> 	bitmap_weight_lt(..., N+1)
+> or:
+> 	!bitmap_weight_gt(..., N)
+> 
+> I'd rather see something resembling memcmp() API that's known enough
+> to be easier to grasp. For above examples:
+> 
+> 	bitmap_weight_cmp(..., N) > 0
+> 	bitmap_weight_cmp(..., N) <= 0
+> 	...
+
+bitmap_weight_cmp() cannot be efficient. Consider this example:
+
+bitmap_weight_lt(1000 0000 0000 0000, 1) == false
+                 ^
+                 stop here
+
+bitmap_weight_cmp(1000 0000 0000 0000, 1) == 0
+                                 ^
+                                 stop here
+
+I agree that '_gt' is less verbose than '>', but the advantage of 
+'_gt' over '>' is proportional to length of bitmap, and it means
+that this API should exist.
+
+> This would also make the implementation easier in not having to
+> copy and paste the code three times. Could also use a simple
+> optimization reducing code size:
+
+In the next version I'll reduce code duplication like this:
+
+bool bitmap_eq(..., N);
+bool bitmap_ge(..., N);
+
+#define bitmap_weight_gt(..., N)  bitmap_weight_ge(..., N + 1)
+#define bitmap_weight_lt(..., N) !bitmap_weight_ge(..., N)
+#define bitmap_weight_le(..., N) !bitmap_weight_gt(..., N)
+
+Thanks,
+Yury
