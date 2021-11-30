@@ -2,42 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31428C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 18:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5845BC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 18:39:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245369AbhK3STR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 13:19:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52652 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239483AbhK3STR (ORCPT
+        id S235291AbhK3SnC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 13:43:02 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:43652 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230370AbhK3SnC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 13:19:17 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4C6FC061574;
-        Tue, 30 Nov 2021 10:15:57 -0800 (PST)
+        Tue, 30 Nov 2021 13:43:02 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 842FBCE1AF9;
-        Tue, 30 Nov 2021 18:15:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B56B4C53FC7;
-        Tue, 30 Nov 2021 18:15:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638296153;
-        bh=KszbXaHbfOc2Nhur115bSEzw+sxwzvVpgaoXce0hUeU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pvoBhd3HTrfwP/+FCfUG763klv8OrF/++24trInXsRoQ+avLpr+z0q/0jj/luWbPJ
-         0rwuyx2LhQKj52N5hpDHs4FuXRw11OLjVWunfDFDXoFKTMl5ZzWjK058CYRsNeiPVZ
-         E6kbLcPkUQcGKZ+dmTXXE36mkPbphNcNwte52S23AENgBhu3PWjSGZnnORI+p0xqAV
-         7qDW+1sPQYqArCNmryQFLq8SzihNEscYcGRTbdtz7gUfwJDZ6ehgie8/HgiFN7z+Qm
-         VbUZyboZMswuZFrjPuoYTH1OtgfRf+ZOazEmnfVK4k1Snou75crhMV/36Y3AskKZW1
-         VRvHNXSgkJTag==
-Date:   Tue, 30 Nov 2021 10:15:51 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Simo Sorce <simo@redhat.com>, Jeffrey Walton <noloader@gmail.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Tso Ted <tytso@mit.edu>,
+        by sin.source.kernel.org (Postfix) with ESMTPS id CD490CE1AFF;
+        Tue, 30 Nov 2021 18:39:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF0E5C53FCF;
+        Tue, 30 Nov 2021 18:39:39 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="O5ZPJYmP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1638297574;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WCoEJFsmjkrCrbXHjmh4SpxFM7rNSkrSOQwoA0wrSlg=;
+        b=O5ZPJYmP619ae/2A+AT1eJ8XfddgoQAEYrvpMDwmKAKTEZkat04GsS1tf52a+wcPpwoIjO
+        tQz1ouaBPQwz8k9vo219SG4KukuN89BXrcFUjlogYPQm1iphhn0fFSJaX97BYuZs/qYUly
+        8u+roXhNJOsAMIYf7RpKQk0Io80B7Gs=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4518ea8e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 30 Nov 2021 18:39:34 +0000 (UTC)
+Received: by mail-yb1-f174.google.com with SMTP id d10so55476178ybe.3;
+        Tue, 30 Nov 2021 10:39:33 -0800 (PST)
+X-Gm-Message-State: AOAM532P+QtnpZAuOsyAabDTv6FnlulqliyNrr7MVfBSmoacP9S0bS6u
+        9S7Scs/Zob1KVcHMWFOpzacYe3ZxJKS5Qk4k1iU=
+X-Google-Smtp-Source: ABdhPJzw9kTAlbNg3rrNPlczsyvFRCgkriZ+B/y7W0n1PWSmLYX8REuNa7dYjzcTTno/oHM9M46LeMy/tkPHbcXE41I=
+X-Received: by 2002:a25:9781:: with SMTP id i1mr1003847ybo.638.1638297570686;
+ Tue, 30 Nov 2021 10:39:30 -0800 (PST)
+MIME-Version: 1.0
+References: <2036923.9o76ZdvQCi@positron.chronox.de> <22137816.pfsBpAd9cS@tauon.chronox.de>
+ <YaEJtv4A6SoDFYjc@kroah.com> <9311513.S0ZZtNTvxh@tauon.chronox.de>
+ <YaT+9MueQIa5p8xr@kroah.com> <CAH8yC8nokDTGs8H6nGDkvDxRHN_qoFROAfWnTv-q6UqzYvoSWA@mail.gmail.com>
+ <YaYvYdnSaAvS8MAk@kroah.com> <ac123d96b31f4a51b167b4e85a205f31a6c97876.camel@redhat.com>
+ <YaZHKHjomEivul6U@kroah.com> <YaZqVxI1C8RByq+w@gmail.com>
+In-Reply-To: <YaZqVxI1C8RByq+w@gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Tue, 30 Nov 2021 13:39:19 -0500
+X-Gmail-Original-Message-ID: <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
+Message-ID: <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Simo Sorce <simo@redhat.com>,
+        Jeffrey Walton <noloader@gmail.com>,
+        Stephan Mueller <smueller@chronox.de>, Tso Ted <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -65,61 +83,15 @@ Cc:     Simo Sorce <simo@redhat.com>, Jeffrey Walton <noloader@gmail.com>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>,
         Jirka Hladky <jhladky@redhat.com>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-Message-ID: <YaZqVxI1C8RByq+w@gmail.com>
-References: <2036923.9o76ZdvQCi@positron.chronox.de>
- <22137816.pfsBpAd9cS@tauon.chronox.de>
- <YaEJtv4A6SoDFYjc@kroah.com>
- <9311513.S0ZZtNTvxh@tauon.chronox.de>
- <YaT+9MueQIa5p8xr@kroah.com>
- <CAH8yC8nokDTGs8H6nGDkvDxRHN_qoFROAfWnTv-q6UqzYvoSWA@mail.gmail.com>
- <YaYvYdnSaAvS8MAk@kroah.com>
- <ac123d96b31f4a51b167b4e85a205f31a6c97876.camel@redhat.com>
- <YaZHKHjomEivul6U@kroah.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YaZHKHjomEivul6U@kroah.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 30, 2021 at 04:45:44PM +0100, Greg Kroah-Hartman wrote:
-> > And the main question here is, how can we get there, in any case, if
-> > the maintainer of the random device doesn't even participate in
-> > discussions, does not pick obvious bug fixes and is simply not engaging
-> > at all?
-> 
-> What obvious bug fixes have been dropped?
-> 
+On Tue, Nov 30, 2021 at 1:16 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> So unfortunately, as far as I can tell, Ted is not maintaining random.c anymore.
 
-The RNDRESEEDCRNG ioctl was totally broken, and I sent out a patch to fix it
-which was ignored for months:
-https://lore.kernel.org/linux-crypto/20200916041908.66649-1-ebiggers@kernel.org/
+I am happy to step up here. Feel free to CC me on random.c fixes and
+I'll review them promptly.
 
-Reminders didn't help:
-
-First ping: https://lore.kernel.org/linux-crypto/20201007035021.GB912@sol.localdomain/
-Second ping: https://lore.kernel.org/linux-crypto/20201026163343.GA858@sol.localdomain/
-Third ping: https://lore.kernel.org/linux-crypto/X7gQXgoXHHEr6HXC@sol.localdomain/
-Fourth ping: https://lore.kernel.org/linux-crypto/X%2FNkrKpaIBTjQzbv@sol.localdomain/
-Resent to Andrew Morton: https://lore.kernel.org/linux-crypto/20210112192818.69921-1-ebiggers@kernel.org/
-Pinged Andrew: https://lore.kernel.org/linux-crypto/YBiEJ9Md60HjAWJg@sol.localdomain/
-
-Finally *you* took the patch: https://lore.kernel.org/linux-crypto/YBwZ1a0VIdpTDNuD@kroah.com/
-
-Here's another random.c bug fix which was ignored, this one for 6 months before
-Herbert Xu finally took it through the crypto tree:
-https://lore.kernel.org/linux-crypto/20210322051347.266831-1-ebiggers@kernel.org/
-
-Here's a dead code cleanup which was ignored for 6 months before being taken by
-Herbert Xu through the crypto tree:
-https://lore.kernel.org/linux-crypto/20200916043652.96640-1-ebiggers@kernel.org/
-
-Here's a patch to random.c which was taken by the arm64 maintainers due to being
-ignored by the random.c maintainer:
-https://lore.kernel.org/lkml/20201105152944.16953-1-ardb@kernel.org/
-
-So unfortunately, as far as I can tell, Ted is not maintaining random.c anymore.  
-
-- Eric
+Jason
