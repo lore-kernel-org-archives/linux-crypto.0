@@ -2,315 +2,178 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA42C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 06:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 796DBC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 06:56:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238673AbhK3Gly (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 01:41:54 -0500
-Received: from mga17.intel.com ([192.55.52.151]:30759 "EHLO mga17.intel.com"
+        id S233778AbhK3G7z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 01:59:55 -0500
+Received: from mga06.intel.com ([134.134.136.31]:26426 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233463AbhK3Gly (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 01:41:54 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10183"; a="216849236"
+        id S232051AbhK3G7y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Nov 2021 01:59:54 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10183"; a="296961683"
 X-IronPort-AV: E=Sophos;i="5.87,275,1631602800"; 
-   d="scan'208";a="216849236"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2021 22:38:35 -0800
+   d="scan'208";a="296961683"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2021 22:56:35 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,275,1631602800"; 
-   d="scan'208";a="676710225"
-Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
-  by orsmga005.jf.intel.com with ESMTP; 29 Nov 2021 22:38:34 -0800
-From:   "Chang S. Bae" <chang.seok.bae@intel.com>
-To:     ebiggers@kernel.org
-Cc:     tglx@linutronix.de, bp@suse.de, dave.hansen@linux.intel.com,
-        mingo@kernel.org, luto@kernel.org, x86@kernel.org,
-        herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dan.j.williams@intel.com,
-        charishma1.gairuboyina@intel.com, kumar.n.dwarakanath@intel.com,
-        lalithambika.krishnakumar@intel.com, ravi.v.shankar@intel.com,
-        chang.seok.bae@intel.com, linux-pm@vger.kernel.org
-Subject: [PATCH v3-fix 08/15] x86/power/keylocker: Restore internal wrapping key from the ACPI S3/4 sleep states
-Date:   Mon, 29 Nov 2021 22:31:22 -0800
-Message-Id: <20211130063122.6709-1-chang.seok.bae@intel.com>
-X-Mailer: git-send-email 2.17.1
+   d="scan'208";a="477019405"
+Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
+  by orsmga002.jf.intel.com with ESMTP; 29 Nov 2021 22:56:35 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Mon, 29 Nov 2021 22:56:34 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20 via Frontend Transport; Mon, 29 Nov 2021 22:56:34 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.42) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.20; Mon, 29 Nov 2021 22:56:34 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KFR2u48HL7nGGVT3I/NW9mnqlv1P/bE4yjusWVn9wH7tsiYrNa6nMB+r1zss4B7TpGz49HhTjx3wnqqSilEbGNFk06beptsIHzT44DI8obDc9qM+EYJ0rv6A/s7MHdwQtijfdmiHwxzY3hGz7o6bjSRn9oo0ytzYfDTiMGzPtClZnJ74Nmdpym1UR8mJVYmEKR6PTlj5tVlMtrkMXM150JrlPdxzvJ4EHq4T9MMUveGBlvYdWjbJV8WLGXkYu21wQRfS0vATP6Hz6TuJ1uETVBFK5d/Jlof+sITet/YcdQ48OIXWv6co4nqMDVzWDFA2wQtkM//kjkooxKgQq5ap2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UI+xfsutUXBEa4viZH17WJBGl7AzJ/lbIq6bSdrWn2U=;
+ b=fAAAl8H67GdIUe+68SIYsvL/PqakOniM/39+uMmvmplgRV/Gogkb89E5jlgaYRpJ3t0SUAmn+0LphAzECWNs5mRHYzfONmSUjMrrQ898tThHk3nZ/Z11sG7G3tz9QoOoaon4m0UsumoQXurnPc4+JmnqDTp2DBVC6RtUl7doMoCJEFU7Xf8IdsxxHK10HHdF/6x14UWM4YQ6d1MxumVvYJMWS7qYsEqdvJSpAjlVwVNGwuD7PfTSgi6h6r1j++AWOuO4J/KtzyOOYA3Sy25tQiDOmddZ1QrzDV4bkIGkv/KRaQFl/rkccRWEH22VXiTDXJfyyC1I40RTT+LRfglOcA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UI+xfsutUXBEa4viZH17WJBGl7AzJ/lbIq6bSdrWn2U=;
+ b=n+GV+9tE5Cb772kIFMAxHd3uAkUE9Td84XIuAYdc93bAvNAwpCoOx/sUj0tc+mSYuAi+0HkukRDTvXBh76+od5TM8zh/HqcjKrktyoX3SKMaLd13F8RMue0lNoLaQyPCvYqPReOMmOqQeX8vdKkJeCmCbyflDrF6XfzLe2shzuU=
+Received: from PH0PR11MB4855.namprd11.prod.outlook.com (2603:10b6:510:41::12)
+ by PH0PR11MB5158.namprd11.prod.outlook.com (2603:10b6:510:3b::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.11; Tue, 30 Nov
+ 2021 06:56:31 +0000
+Received: from PH0PR11MB4855.namprd11.prod.outlook.com
+ ([fe80::11ef:b2be:5019:6749]) by PH0PR11MB4855.namprd11.prod.outlook.com
+ ([fe80::11ef:b2be:5019:6749%5]) with mapi id 15.20.4734.024; Tue, 30 Nov 2021
+ 06:56:31 +0000
+From:   "Bae, Chang Seok" <chang.seok.bae@intel.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@suse.de>,
+        "Dave Hansen" <dave.hansen@linux.intel.com>,
+        "mingo@kernel.org" <mingo@kernel.org>,
+        "Lutomirski, Andy" <luto@kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Gairuboyina, Charishma1" <charishma1.gairuboyina@intel.com>,
+        "Dwarakanath, Kumar N" <kumar.n.dwarakanath@intel.com>,
+        "Krishnakumar, Lalithambika" <lalithambika.krishnakumar@intel.com>,
+        "Shankar, Ravi V" <ravi.v.shankar@intel.com>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>
+Subject: Re: [PATCH v3 08/15] x86/power/keylocker: Restore internal wrapping
+ key from the ACPI S3/4 sleep states
+Thread-Topic: [PATCH v3 08/15] x86/power/keylocker: Restore internal wrapping
+ key from the ACPI S3/4 sleep states
+Thread-Index: AQHX4XAEJFOJQ1w1J0ysoCyRSv0seKwbcmWAgAA5ioA=
+Date:   Tue, 30 Nov 2021 06:56:31 +0000
+Message-ID: <157E75DE-4567-42FB-B4F7-BE2A401045B8@intel.com>
+References: <20211124200700.15888-1-chang.seok.bae@intel.com>
+ <20211124200700.15888-9-chang.seok.bae@intel.com>
+ <YaWa2+2eVSFXY1U3@sol.localdomain>
 In-Reply-To: <YaWa2+2eVSFXY1U3@sol.localdomain>
-References: <YaWa2+2eVSFXY1U3@sol.localdomain>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3608.120.23.2.7)
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d68d1f98-065f-43db-1331-08d9b3ce8a8e
+x-ms-traffictypediagnostic: PH0PR11MB5158:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
+x-microsoft-antispam-prvs: <PH0PR11MB5158EC69D87D7DB98AE1ACC9D8679@PH0PR11MB5158.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:246;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: fvoEjuiPuquNFVSkFWBC6qDyNnMPpkQ8RtTKocJBX0S809ZOs/2ibM0jVwfp8Olkg7+NPWs3LJcpGVlgZG+dWikw3V5aB1az7urirhs1tkLpITmqcrGwBasbM+Ejzp0aIUdhg91HGtxT3w+SEswT47mvMXC5yETZBNW9i7myPxaX2ZJXJfEcNjHBjSFcVr1xte+G/+Klo8OjMIy0oOUwWPwhNBeHZQR1cj4R6Fvo8Qf/RYhxU6ZFCizCfutEljFaShytXNbBARbYvYDcPcdWYTnTQ26Kt1PPLA2w7gDMTtzDRvJoWQviA3EF0VLZaT/s8MqKiTg1H6BhuQ3qz1vzEdP17F+0ZPr4w2r/ul+44D39Eq4p1H7k3VujHfNK/qUDSMIKLIsNjPFAQ0h18P/vPzoDRw2fd/UAiU1l2nQmOkG+bOAu6GY8UpH/iXiBhtDif8XMWcFCEzwVW94ef6SgFw2FkR1z0kqb8CrW28zlvcBtVRQyMZLXfaQScgusB1P51+QXySSuXavBOZoZsNNWqXbkJktQirywxx7snTdU73CRU4IzK22Od3ox2mb+8OiQeQx5upTdt+kSVu8Prb5uJ82V1AjIa3sBJ6uR1u8jlS9xuCD6ZVDjanGcVNkJ/5TJcwXLM3rj006uGKpzp0fsrgWu5K+mQAACB5Xln1X5+gGPoHSNuLaqZFxS4Y2Iu9trazgLEFRQY2h4xrAdGEiV2gog3HL9GX0ZsKKlf2Ug/77/qKyQ/gTw/rAPivSqB1KC
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4855.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(7416002)(36756003)(4326008)(54906003)(5660300002)(122000001)(2906002)(33656002)(508600001)(26005)(316002)(6512007)(8936002)(186003)(71200400001)(4744005)(6486002)(8676002)(86362001)(83380400001)(2616005)(53546011)(6506007)(38100700002)(38070700005)(66476007)(64756008)(66556008)(66446008)(6916009)(82960400001)(66946007)(76116006)(45980500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?J6IVPHrgocliEyniTpIsR7WzEoPEqDb5BEGBlMnfJxNRYppftscVc7denLf0?=
+ =?us-ascii?Q?5xp16R/tePXbsszBt69yWKI4jY2scLzL5iBxMT/VQNn7V2wu3KvWx9FCGWcb?=
+ =?us-ascii?Q?DY1ufGQjvF7HAw2W2qKJGG0aZ1toVFQpAGpMND6LtuzlYNipvbotEeHf7Avl?=
+ =?us-ascii?Q?GgK5B+Ou3eU0s71USUXqNRT9FFgM8+5tKvfzGharyRBAE9JoHqwXLl5/6niy?=
+ =?us-ascii?Q?qT8gEzhbbsWyjGTGogO1DDu8U4hASXJsRj59jxsyZMbS/NqTK87Ok5btKVTc?=
+ =?us-ascii?Q?ursqfBvlppEqWyiCNcAM1ZgBu6JPqSYV4sf4cD4SBfHE9CizLz6bGlx4DVbE?=
+ =?us-ascii?Q?FlUE0Ycs4uqO6/7LAiZ3GZg/9h+R8g6nnK0PQjDg74wAEQ39DdGu2vP42iYa?=
+ =?us-ascii?Q?WRmdO9JVNhzwWuaM1TG7ol7ukP6eStYglXqs5J6Sw4SKSdeauScasfWYcsuL?=
+ =?us-ascii?Q?tLu6pjzlNQ0WO68Ryb/51NBS9xVgBWEboqjqrvFZCJbaXwFwSwSq6t0j1BTR?=
+ =?us-ascii?Q?SlAcQg4z7f4FCZgsGMe6TYh22hCdE0/bF5vkbRgZSFSiNB1vr/CaDUMyo923?=
+ =?us-ascii?Q?6CUAwwMh9ff0PZPogwcdKPEIN3kD71AsXseMZ/4psDDCRzip+h1ypKOf3Nim?=
+ =?us-ascii?Q?ulFOn03N4iQCBX9s7Qwo/ctrZ+Jx6ygfx5mKPl6OY2Gws/fcMca+mRGmDRKO?=
+ =?us-ascii?Q?QgPobN5B3yW4YMjsXwZXZxjFt1Owx4k7XHR5NyN3bxP0Q7K4hl1BGtiYFiNu?=
+ =?us-ascii?Q?JqWlb/JUYhZL8KBPdiIyP//dnCaV1A6ghFZ0IpHCOrEAo2jH29myIVu4NwuL?=
+ =?us-ascii?Q?0Qy25US2LocCicvUHyGXD3f1bHlEGgjbaPcyTG+711lZrx1Iwwvf5Y3XaVG0?=
+ =?us-ascii?Q?kOD40uQ2NsadFxchJk2wgy5PSKql0XC1nqo/9U623YrO0R+vHJkCzYEC11CS?=
+ =?us-ascii?Q?Url7up3TaIH/ZBs3OBM6eV2XlWPrviZfZuQ8zbAoFYFwjKuis3/Jt1THoTNV?=
+ =?us-ascii?Q?OiKout/STfBaKYiBVX44EmjgxxDE3jlZiMygNUOLtGs4ZyqLt6c6X/d9b1nF?=
+ =?us-ascii?Q?SP8V0mmn7THXv5HuNPZKR2jXYCcHiFAPrHO2R3joJfhT1k/fXQ7b1NEAk0MA?=
+ =?us-ascii?Q?RoiQjYVBAkI7Xvhg0UPwlG/A06fz8gF+W5XldJPJQIU3ZyGqewpy6pkM0Xj5?=
+ =?us-ascii?Q?AkBdK87JDzcY0ViMV/8x3MFDrx+lOfpgKifoj9AbTQCfiTGO3M1pknYRYOHt?=
+ =?us-ascii?Q?q39EmcHdGrCceKuni1T7OnnfA5FDP9yBdQxB1mcRFwzqNTiPMdqilwAEwBzB?=
+ =?us-ascii?Q?RwREZnaWnkQc33V0GGs3Ul/niua7zSomY+GcKDaxZzA8zSC5Kk8aRo1E03+B?=
+ =?us-ascii?Q?5rzQVupiw7RF5rsywa1n5IBmiJNL6lASxnf/3j3MD+KdW2PCNzKsdAoboCyL?=
+ =?us-ascii?Q?7C49XSFJqTzsgfJHqNVqywcrSb+YtSPwpttgFY2HOeLj1OFbi3ThnPMUieWv?=
+ =?us-ascii?Q?pfTZ4wSlbjAC4jn8j4BIpjOUR7X04712HuDC+fE82f19rgGJj1NyTkcQ7EtX?=
+ =?us-ascii?Q?cMWSZFz02rEMHO16Z+kaktsf43mmiNyJA2rGndEuMgxeYVw+sIppgpHQthlD?=
+ =?us-ascii?Q?ppcgaDOk9t5Z7tEOuiJy8mKt0TH19GZ9M6w6JIOPbDGhId1nqN7DFc7TRg3J?=
+ =?us-ascii?Q?jUYHEuG8n9mxK4uXENXe/kXfvtg=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <F95ABDCC035C8045B323BD4418A57E0D@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4855.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d68d1f98-065f-43db-1331-08d9b3ce8a8e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2021 06:56:31.7652
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: IIFWvYsXrG7dZ6UgcGznZk6CLKPx3ExH54eoBBcU1KXLAdkhXdtZ1Nbh/MONQnF8PSzD2mgpU3iZ+eYcKKtIpY31xKsO997GJH1BGypgbJI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5158
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When the system state switches to these sleep states, the internal
-wrapping key gets reset in the CPU state.
+On Nov 29, 2021, at 19:30, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Wed, Nov 24, 2021 at 12:06:53PM -0800, Chang S. Bae wrote:
+>> diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/key=
+locker.h
+>> index 820ac29c06d9..4000a5eed2c2 100644
+>> --- a/arch/x86/include/asm/keylocker.h
+>> +++ b/arch/x86/include/asm/keylocker.h
+>> @@ -32,9 +32,13 @@ struct iwkey {
+>> #ifdef CONFIG_X86_KEYLOCKER
+>> void setup_keylocker(struct cpuinfo_x86 *c);
+>> void destroy_keylocker_data(void);
+>> +void restore_keylocker(void);
+>> +extern bool valid_keylocker(void);
+>> #else
+>> #define setup_keylocker(c) do { } while (0)
+>> #define destroy_keylocker_data() do { } while (0)
+>> +#define restore_keylocker() do { } while (0)
+>> +static inline bool valid_keylocker { return false; }
+>> #endif
+>=20
+> This breaks the build when !CONFIG_X86_KEYLOCKER.
 
-The primary use case for the feature is bare metal dm-crypt. The key needs
-to be restored properly on wakeup, as dm-crypt does not prompt for the key
-on resume from suspend. Even the prompt it does perform for unlocking
-the volume where the hibernation image is stored, it still expects to reuse
-the key handles within the hibernation image once it is loaded. So it is
-motivated to meet dm-crypt's expectation that the key handles in the
-suspend-image remain valid after resume from an S-state.
+Ah, sorry. My bad on the last-minute change.
 
-Key Locker provides a mechanism to back up the internal wrapping key in
-non-volatile storage. The kernel requests a backup right after the key is
-loaded at boot time. It is copied back to each CPU upon wakeup.
-
-While the backup may be maintained in NVM across S5 and G3 "off"
-states it is not architecturally guaranteed, nor is it expected by dm-crypt
-which expects to prompt for the key each time the volume is started.
-
-The entirety of Key Locker needs to be disabled if the backup mechanism is
-not available unless CONFIG_SUSPEND=n, otherwise dm-crypt requires the
-backup to be available.
-
-In the event of a key restore failure the kernel proceeds with an
-initialized IWKey state. This has the effect of invalidating any key
-handles that might be present in a suspend-image. When this happens
-dm-crypt will see I/O errors resulting from error returns from
-crypto_skcipher_{en,de}crypt(). While this will disrupt operations in the
-current boot, data is not at risk and access is restored at the next reboot
-to create new handles relative to the current IWKey.
-
-Manage a feature-specific flag to communicate with the crypto
-implementation. This ensures to stop using the AES instructions upon the
-key restore failure while not turning off the feature.
-
-Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-Cc: x86@kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-pm@vger.kernel.org
----
-Changes from v3:
-* Fix the build error. (Eric Biggers) 
-
-Changes from RFC v2:
-* Change the backup key failure handling. (Dan Williams)
-
-Changes from RFC v1:
-* Folded the warning message into the if condition check. (Rafael Wysocki)
-* Rebased on the changes of the previous patches.
-* Added error code for key restoration failures.
-* Moved the restore helper.
-* Added function descriptions.
----
- arch/x86/include/asm/keylocker.h |   4 +
- arch/x86/kernel/keylocker.c      | 124 ++++++++++++++++++++++++++++++-
- arch/x86/power/cpu.c             |   2 +
- 3 files changed, 128 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
-index 820ac29c06d9..4000a5eed2c2 100644
---- a/arch/x86/include/asm/keylocker.h
-+++ b/arch/x86/include/asm/keylocker.h
-@@ -32,9 +32,13 @@ struct iwkey {
- #ifdef CONFIG_X86_KEYLOCKER
- void setup_keylocker(struct cpuinfo_x86 *c);
- void destroy_keylocker_data(void);
-+void restore_keylocker(void);
-+extern bool valid_keylocker(void);
- #else
- #define setup_keylocker(c) do { } while (0)
- #define destroy_keylocker_data() do { } while (0)
-+#define restore_keylocker() do { } while (0)
-+static inline bool valid_keylocker() { return false; }
- #endif
- 
- #endif /*__ASSEMBLY__ */
-diff --git a/arch/x86/kernel/keylocker.c b/arch/x86/kernel/keylocker.c
-index 87d775a65716..ff0e012e3dd5 100644
---- a/arch/x86/kernel/keylocker.c
-+++ b/arch/x86/kernel/keylocker.c
-@@ -11,11 +11,26 @@
- #include <asm/fpu/api.h>
- #include <asm/keylocker.h>
- #include <asm/tlbflush.h>
-+#include <asm/msr.h>
- 
- static __initdata struct keylocker_setup_data {
-+	bool initialized;
- 	struct iwkey key;
- } kl_setup;
- 
-+/*
-+ * This flag is set with IWKey load. When the key restore fails, it is
-+ * reset. This restore state is exported to the crypto library, then AES-KL
-+ * will not be used there. So, the feature is soft-disabled with this flag.
-+ */
-+static bool valid_kl;
-+
-+bool valid_keylocker(void)
-+{
-+	return valid_kl;
-+}
-+EXPORT_SYMBOL_GPL(valid_keylocker);
-+
- static void __init generate_keylocker_data(void)
- {
- 	get_random_bytes(&kl_setup.key.integrity_key,  sizeof(kl_setup.key.integrity_key));
-@@ -25,6 +40,8 @@ static void __init generate_keylocker_data(void)
- void __init destroy_keylocker_data(void)
- {
- 	memset(&kl_setup.key, KEY_DESTROY, sizeof(kl_setup.key));
-+	kl_setup.initialized = true;
-+	valid_kl = true;
- }
- 
- static void __init load_keylocker(void)
-@@ -34,6 +51,27 @@ static void __init load_keylocker(void)
- 	kernel_fpu_end();
- }
- 
-+/**
-+ * copy_keylocker - Copy the internal wrapping key from the backup.
-+ *
-+ * Request hardware to copy the key in non-volatile storage to the CPU
-+ * state.
-+ *
-+ * Returns:	-EBUSY if the copy fails, 0 if successful.
-+ */
-+static int copy_keylocker(void)
-+{
-+	u64 status;
-+
-+	wrmsrl(MSR_IA32_COPY_IWKEY_TO_LOCAL, 1);
-+
-+	rdmsrl(MSR_IA32_IWKEY_COPY_STATUS, status);
-+	if (status & BIT(0))
-+		return 0;
-+	else
-+		return -EBUSY;
-+}
-+
- /**
-  * setup_keylocker - Enable the feature.
-  * @c:		A pointer to struct cpuinfo_x86
-@@ -49,6 +87,7 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
- 
- 	if (c == &boot_cpu_data) {
- 		u32 eax, ebx, ecx, edx;
-+		bool backup_available;
- 
- 		cpuid_count(KEYLOCKER_CPUID, 0, &eax, &ebx, &ecx, &edx);
- 		/*
-@@ -62,10 +101,49 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
- 			goto disable;
- 		}
- 
-+		backup_available = (ebx & KEYLOCKER_CPUID_EBX_BACKUP) ? true : false;
-+		/*
-+		 * The internal wrapping key in CPU state is volatile in
-+		 * S3/4 states. So ensure the backup capability along with
-+		 * S-states.
-+		 */
-+		if (!backup_available && IS_ENABLED(CONFIG_SUSPEND)) {
-+			pr_debug("x86/keylocker: No key backup support with possible S3/4.\n");
-+			goto disable;
-+		}
-+
- 		generate_keylocker_data();
--	}
-+		load_keylocker();
- 
--	load_keylocker();
-+		/* Backup an internal wrapping key in non-volatile media. */
-+		if (backup_available)
-+			wrmsrl(MSR_IA32_BACKUP_IWKEY_TO_PLATFORM, 1);
-+	} else {
-+		int rc;
-+
-+		/*
-+		 * Load the internal wrapping key directly when available
-+		 * in memory, which is only possible at boot-time.
-+		 *
-+		 * NB: When system wakes up, this path also recovers the
-+		 * internal wrapping key.
-+		 */
-+		if (!kl_setup.initialized) {
-+			load_keylocker();
-+		} else if (valid_kl) {
-+			rc = copy_keylocker();
-+			/*
-+			 * The boot CPU was successful but the key copy
-+			 * fails here. Then, the subsequent feature use
-+			 * will have inconsistent keys and failures. So,
-+			 * invalidate the feature via the flag.
-+			 */
-+			if (rc) {
-+				valid_kl = false;
-+				pr_err_once("x86/keylocker: Invalid copy status (rc: %d).\n", rc);
-+			}
-+		}
-+	}
- 
- 	pr_info_once("x86/keylocker: Enabled.\n");
- 	return;
-@@ -77,3 +155,45 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
- 	/* Make sure the feature disabled for kexec-reboot. */
- 	cr4_clear_bits(X86_CR4_KEYLOCKER);
- }
-+
-+/**
-+ * restore_keylocker - Restore the internal wrapping key.
-+ *
-+ * The boot CPU executes this while other CPUs restore it through the setup
-+ * function.
-+ */
-+void restore_keylocker(void)
-+{
-+	u64 backup_status;
-+	int rc;
-+
-+	if (!cpu_feature_enabled(X86_FEATURE_KEYLOCKER) || !valid_kl)
-+		return;
-+
-+	/*
-+	 * The IA32_IWKEYBACKUP_STATUS MSR contains a bitmap that indicates
-+	 * an invalid backup if bit 0 is set and a read (or write) error if
-+	 * bit 2 is set.
-+	 */
-+	rdmsrl(MSR_IA32_IWKEY_BACKUP_STATUS, backup_status);
-+	if (backup_status & BIT(0)) {
-+		rc = copy_keylocker();
-+		if (rc)
-+			pr_err("x86/keylocker: Invalid copy state (rc: %d).\n", rc);
-+		else
-+			return;
-+	} else {
-+		pr_err("x86/keylocker: The key backup access failed with %s.\n",
-+		       (backup_status & BIT(2)) ? "read error" : "invalid status");
-+	}
-+
-+	/*
-+	 * Now the backup key is not available. Invalidate the feature via
-+	 * the flag to avoid any subsequent use. But keep the feature with
-+	 * zero IWKeys instead of disabling it. The current users will see
-+	 * key handle integrity failure but that's because of the internal
-+	 * key change.
-+	 */
-+	pr_err("x86/keylocker: Failed to restore internal wrapping key.\n");
-+	valid_kl = false;
-+}
-diff --git a/arch/x86/power/cpu.c b/arch/x86/power/cpu.c
-index 9f2b251e83c5..1a290f529c73 100644
---- a/arch/x86/power/cpu.c
-+++ b/arch/x86/power/cpu.c
-@@ -25,6 +25,7 @@
- #include <asm/cpu.h>
- #include <asm/mmu_context.h>
- #include <asm/cpu_device_id.h>
-+#include <asm/keylocker.h>
- 
- #ifdef CONFIG_X86_32
- __visible unsigned long saved_context_ebx;
-@@ -262,6 +263,7 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
- 	mtrr_bp_restore();
- 	perf_restore_debug_store();
- 	msr_restore_context(ctxt);
-+	restore_keylocker();
- 
- 	c = &cpu_data(smp_processor_id());
- 	if (cpu_has(c, X86_FEATURE_MSR_IA32_FEAT_CTL))
--- 
-2.17.1
-
+Thanks,
+Chang=
