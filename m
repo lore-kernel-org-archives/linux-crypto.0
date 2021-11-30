@@ -2,1271 +2,188 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D16BC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 07:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0DF4C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 08:15:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234449AbhK3IAa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 03:00:30 -0500
-Received: from mx08-00178001.pphosted.com ([91.207.212.93]:56492 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S239265AbhK3IAZ (ORCPT
+        id S239537AbhK3ITP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 03:19:15 -0500
+Received: from esa.microchip.iphmx.com ([68.232.153.233]:40715 "EHLO
+        esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239528AbhK3ITN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 03:00:25 -0500
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1AU19WHK026770;
-        Tue, 30 Nov 2021 08:56:48 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=selector1;
- bh=CgN7C56tdMc3tH3gLtwvGj3yGSwQFF5PL9G8QSoYZd4=;
- b=zaAyGHAFBwNnMSR49Qvb/3QdYyGG49/zxx3FYlssoLlI3wDNQ/ls1Ym0OzExS/xsy4qY
- KjUGRVs6Ta8YueQTZ+4QZ5w0Lb0fPouSV4VTYIV7k6afmLSbXlHHpOFJZwUKIIHpus+p
- c2qBD4fKxkeuQm//W0yaOW3tGcNXuhnPO/YU8Zt3UmAlsw50X1fWNYQAIyUnSDHLeIQs
- KT0Hq58twydaZN404RmL+CCXeqGRN6qPAWDiGnvULzvaL0TPJFPFJhdAYdVNFrM8fsfv
- 59Az0K8/787vtN2oV3AtO+e7qRgKdJP+HzgQM+xV6f085d9+R3pYIGRD6AF0gleTYrps 1Q== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3cna1ysj1w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Nov 2021 08:56:48 +0100
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 6EE1710002A;
-        Tue, 30 Nov 2021 08:56:47 +0100 (CET)
-Received: from Webmail-eu.st.com (sfhdag2node2.st.com [10.75.127.5])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 63FFF21A224;
-        Tue, 30 Nov 2021 08:56:47 +0100 (CET)
-Received: from localhost (10.75.127.45) by SFHDAG2NODE2.st.com (10.75.127.5)
- with Microsoft SMTP Server (TLS) id 15.0.1497.26; Tue, 30 Nov 2021 08:56:46
- +0100
-From:   Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>
-CC:     Marek Vasut <marex@denx.de>,
-        Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v4 8/9] crypto: stm32/cryp - fix bugs and crash in tests
-Date:   Tue, 30 Nov 2021 08:55:00 +0100
-Message-ID: <20211130075501.21958-9-nicolas.toromanoff@foss.st.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20211130075501.21958-1-nicolas.toromanoff@foss.st.com>
-References: <20211130075501.21958-1-nicolas.toromanoff@foss.st.com>
+        Tue, 30 Nov 2021 03:19:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1638260154; x=1669796154;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=p9dllilB8TsQ/cAQv5N9eSUv2sGzoqpZFrs89ulz47Y=;
+  b=kmRuX/p7T5Y2zh/ZzrA1gPdTw2ub1mITxU96UiVw3ZiAtPaCuuEZQTm/
+   KRbDG4Pus7DXfuAdkaqVyZrb6wBfZYEkBAcJ6dzjvxgLWXVkw5A4iuSiL
+   20q12XDTOKRSyXtpwXAFb4LD9Xf6X0CaYK3cTwWKhX78o/ZMR0h1cqc2f
+   SMqdMPul4pWgt7MTk2xB6E3wYkY6z+lQwQyF8uzhOqWl0Qn6cNe1sn7Ki
+   RuOFiSEDaYgowBEoBCud4X6LrgaPhiqTFr4PVrqu5nxuV+w6+CHAS4Woe
+   DdcYpg6EfELzQpGmpGAHauUI7z/q1zwps0RGByXnvlhVZBkaMzNEsHSwu
+   Q==;
+IronPort-SDR: ysefQSwWloG2/rzf0feDP5WaMEsuYBWYGVHdmGKFcuf7ctUaqLCllaPQ7yVvcRNaVMbqGSOdxr
+ r6wgiYDJWs6zb+BASaAYtJSDfUpuaOsuZyyzp1ODCbS+qwC5+D5hi7VSGzyyCNMujAmG06xLjv
+ n9EaDwm2ms2WsT59Muu3JaF+ox7pirjStrHJ0Re3LjIkWMAbmrFqpaUjmPsXIaoyJM2r7RqxGM
+ VMQPUMSvHw1QDQJPrjUVJCrTDudCdeAbewjitpVw3BGwVtagp5LbT4ut7T4ii0crNdhRLzDKFG
+ +Q1eTHGKiF2mcXaYSiYUcENg
+X-IronPort-AV: E=Sophos;i="5.87,275,1631602800"; 
+   d="scan'208";a="153652875"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 30 Nov 2021 01:15:50 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.14; Tue, 30 Nov 2021 01:15:45 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.14 via Frontend
+ Transport; Tue, 30 Nov 2021 01:15:45 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aGZbgNJoiBiXcl54QhP6fydb97SeY27rsD6TgmFW+m4LpNaz5Dj6T4FHTzADq2naUXeDNPaIrpjWGua+wsH2D0+zOvZYRyAjOXToSnENsy//OumGeOxybKWcrdGMRoXgG6KP8hfgYHApPYqhIa7RWKt7uXenbeMkjzfPZGBF4ngU8nNnxP68cEuD6hUWzNIZkZ3fNuu+TQFthUbYtcVw6zyp8VFSJGo4cBKe3wKGjVZsw2WGHagnR/vsLS6QaJYY98nqQRrbEcVRe0wUcblzrtriQGY4TtJpyM6zlmUQ3cpVfSs3+h0qCG3V9VFWBxlRbj2mMZvMWLYm6vQffXi+tA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p9dllilB8TsQ/cAQv5N9eSUv2sGzoqpZFrs89ulz47Y=;
+ b=fG/MVZ04Xx9yoIcv3D6c57qP6oTEexJPvni/26Q7qmmy2zubZKE+ME5PZB2GmVvPCly6faOxmDzLTb08lamW1ZNCgp73O2XF3rBe3240x1t6R+0wye2gDPk6EptILgeTKI1AMHXfN9AcWVaGYuqWE+IqE0z3OS00T2FJGjAxnaEkefInAa4yYiWkQXqD0Ix0KnGVOs0cQx455BRPAf+qmNKHpX6dA/78ARZj4B4DBL3ZYJQJtDYZrrnqPmWnyj8o2Y6ileobWTCn1k1DcuEdo4FM0iHF57zRFNbPNncGfADswU8tHwN9r2ZPcHcToc1gs1j5mfJB0FFPSb9HeTybMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p9dllilB8TsQ/cAQv5N9eSUv2sGzoqpZFrs89ulz47Y=;
+ b=VJ1HIUq9Hx6XP3YuJL9WaM+9AWUHfkgkcDzgcxBNXnudj5abzrfPe9zzIkufXg73l+Ga0Gj9D20E1ut7GrseXwA6/f/khOpUO148mpsEH9lfnbC141WTyCO0wRNcM2fxOpOBfnCNz/0V+HAIEpxUrfqtYd1iSf6aepZkjf315lM=
+Received: from CO1PR11MB5154.namprd11.prod.outlook.com (2603:10b6:303:95::7)
+ by MWHPR1101MB2174.namprd11.prod.outlook.com (2603:10b6:301:50::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.23; Tue, 30 Nov
+ 2021 08:15:41 +0000
+Received: from CO1PR11MB5154.namprd11.prod.outlook.com
+ ([fe80::f579:5f0c:dfab:2d27]) by CO1PR11MB5154.namprd11.prod.outlook.com
+ ([fe80::f579:5f0c:dfab:2d27%6]) with mapi id 15.20.4734.024; Tue, 30 Nov 2021
+ 08:15:41 +0000
+From:   <Conor.Dooley@microchip.com>
+To:     <robh@kernel.org>
+CC:     <linus.walleij@linaro.org>, <bgolaszewski@baylibre.com>,
+        <jassisinghbrar@gmail.com>, <paul.walmsley@sifive.com>,
+        <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>,
+        <a.zummo@towertech.it>, <alexandre.belloni@bootlin.com>,
+        <broonie@kernel.org>, <gregkh@linuxfoundation.org>,
+        <Lewis.Hanly@microchip.com>, <Daire.McNamara@microchip.com>,
+        <atish.patra@wdc.com>, <Ivan.Griffin@microchip.com>,
+        <linux-gpio@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+        <linux-riscv@lists.infradead.org>, <linux-crypto@vger.kernel.org>,
+        <linux-rtc@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>, <krzysztof.kozlowski@canonical.com>,
+        <geert@linux-m68k.org>, <bin.meng@windriver.com>
+Subject: Re: [PATCH 02/13] dt-bindings: interrupt-controller: add defines for
+ mpfs-plic
+Thread-Topic: [PATCH 02/13] dt-bindings: interrupt-controller: add defines for
+ mpfs-plic
+Thread-Index: AQHX1LJCC9opTIZJR0qRg6eFrF7ZDKwbDPQAgADO+YA=
+Date:   Tue, 30 Nov 2021 08:15:41 +0000
+Message-ID: <bfa7f3aa-d486-d982-d9fd-2f29dd8fedf4@microchip.com>
+References: <20211108150554.4457-1-conor.dooley@microchip.com>
+ <20211108150554.4457-3-conor.dooley@microchip.com>
+ <YaUwYkHHhTsPkAQh@robh.at.kernel.org>
+In-Reply-To: <YaUwYkHHhTsPkAQh@robh.at.kernel.org>
+Accept-Language: en-IE, en-US
+Content-Language: en-IE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c0c1e4de-c82f-431d-2d7b-08d9b3d9997c
+x-ms-traffictypediagnostic: MWHPR1101MB2174:
+x-microsoft-antispam-prvs: <MWHPR1101MB21747373FD4CBC2A602D533598679@MWHPR1101MB2174.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4941;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: s5xB4ozJKLH8+4OZ/hQwkHRhO6JEGI/auMfsSh+CXJwkEr0PT2SsYsEWaj5BIroHLbWBJ04m89VAIqIai3VzYopzYQXgtuj9Nq8q8wdQe43u/PtNP+AiHQWMw9zMFkmJbLt6cnw2gLh1qHdu9D4E6a+goiuPqgPJaQSbF6gN6appYNaX35aQUxAESc6KIZ36DHb7DSfAui7cVIO32vVhBXwTaIoYZAvz5joZ4QuTt9rVHiTqT27q+ho6sRMtAaEh5bES1kqGcXD41YZmt04izFV0DmF9tgZ9yoz/BznJeiw4hJQDRuI7DgWbGj7OTS/QK/q1FEEd1SaNlUXeTHC/br12ytWGVYNn/5MW3JwYHnGE8hWpvv4+TzmVb5v2pkspJXvmUxOxa//uIh2VSaxqt4WhBZrkbpwWAs3Cb5WbPeloPv5C222zw5IpEeibmTAcZGq87NyIWx/3MmqkkcTm6o3UPgZ6G3NlAI4vDMly6YFl+nPam8WXusTcKYJLy2IG9x9bDpWshDam6bePKn0HDApA0R+GBRdURD/XVef+tnlbP1IutQSQ2kLOrhpTyhk5rJCa43V6uNqBx6t396E2XwS8fus7/Drw1d/VCgSg1qJvpwja78fmbXTLIh5aq5rXphgzRQdGlL6CHl6dkm4P7sPE9uuX7mBepZuqGMH19Iq/BgsJlGfJ+thbmBVlm2yZnPVojhUaV6OOtzqnR/lkgXoKzGH81MRWpEqhqo74vguV9+/hzH0tu/bVgr7ZfK8mB4HYhwWXQVV9Gbk4w09cUA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5154.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(2616005)(4326008)(76116006)(36756003)(66476007)(508600001)(91956017)(26005)(66446008)(54906003)(4744005)(66946007)(64756008)(38070700005)(6512007)(86362001)(31696002)(31686004)(66556008)(7416002)(186003)(8936002)(8676002)(6916009)(5660300002)(2906002)(53546011)(6506007)(316002)(38100700002)(71200400001)(6486002)(83380400001)(122000001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SXY4VCs1YUVOd2J1SHFmRUlpcWlqY1JnNjArMWxsOGk4OEVTOUFkdDNscWNv?=
+ =?utf-8?B?N3llUTVacG0veXZLQm4xNExZeTNvZUVZZWFncFlZeEZnYnFaSGlWOFRNaWdD?=
+ =?utf-8?B?Mi81ZzFPbnNPNm5oVTR0aHBaZUhZZ3B6dWloOWZmNjk3RFJteFVLSFZ5VTE3?=
+ =?utf-8?B?T3dRYmppM2ltVFlXbjk5RlR6TWNRc28reTRxcXY3bVNGNlEwaVF5NDloOHQr?=
+ =?utf-8?B?K09abmRoTTlXQW9xKys5dDhpRVUxZ0wvYjJCQ3kzL09weFZqS3lyaWdJV20y?=
+ =?utf-8?B?bEJXaHFaOHI3b3lPR0pDeld5RW9MMU8wWHQ4RjlZVHVXSE1OYU5ZOHFuak4x?=
+ =?utf-8?B?RURRUDVyVS9HYjlaQlZ6UHdPRGw0RmgzaEJRbEdEK3QrcWx5MmVuN0VhUUFv?=
+ =?utf-8?B?ZkIyWjFGcU1UT3J3aW9NYkRtL0NlL1dnbDZOYit0SGRBb3d1M240U0xSZVAy?=
+ =?utf-8?B?OUd1MzFMTGQxc3FNeFVTSW1zVTBaZ3VpWmJsZ1B6eFJpdW5yNFdJSFdlK1dj?=
+ =?utf-8?B?TVBjajBqbG9kV083Zlk0MFBFMy82K2VYb0d4REpqeWUrNjZnRElKTU03VzVU?=
+ =?utf-8?B?TmJ2YnlQMEZFTjRGZzhJZHRGSlBCbUFiY21iV0E0Y01CQnF1dXgydVUwSVhH?=
+ =?utf-8?B?M0xwZldHTWg3TExaQXE2R2dKVVJmUHFhZyt0dkxYT0ZJZitPRzFVS1VEQmFG?=
+ =?utf-8?B?VWt6TWEwN2RxOUFER3Jid2E5cnFLTkQ3ZXBOdHBKVWI5ZDdCdTVYbS9INnJO?=
+ =?utf-8?B?TXA3MWJSNEZkb1ZlNlJyMEI4VWkwRUloclRmRzJBb3dOZWJsdVFoM2dSV2tJ?=
+ =?utf-8?B?WlpVMURPbzFiellZVDJiM2NCQTlnSmVUTENVVWREMlZWQWxVbStCMWhUQmtD?=
+ =?utf-8?B?MkJPbkdDQkRDT2I2U0ZyeDVxekthSWFiKytnbWJrQjBYaGRaNGxoZ1VXOGlT?=
+ =?utf-8?B?bTlmalNyYXJRYnVnOUtoVzZ2Q0M2aDFvZmdFbElSZjM2SEFLa2Fta202ajZj?=
+ =?utf-8?B?ODY5Uisraml4WVJwbElXM0JLaDBvdHhEbzlzTWJwMmJobFVrVWhRNlNJcEdU?=
+ =?utf-8?B?ZCtkdlc2ZHNmUHE0cW1xMTgzZ1NxZVRWcmJydkMvQ1F4T3ZJKzd0aFlRRXgy?=
+ =?utf-8?B?L2dEK1pGOXhVYnplaXpUSTEvZW1wbEV5N2RDV254TTZhdFdtdFFtRHNMYzgz?=
+ =?utf-8?B?emFqUHdSY1NtMUVkS09JdWNOai96Wjk4V0hTV2Z2cWxuZ2RhRENvR2JIaENw?=
+ =?utf-8?B?SVdOeUJWVWZVNis2SFNlVEtVYlBuSDFIV1k2dHJyRmJqaExYVEhRdHhkUElx?=
+ =?utf-8?B?RXZZRUhEb2t1bGVXUHJ1N3dKaFh4MlMxT1hNYTRyMTFtS2tNbmtNLzh2cUw3?=
+ =?utf-8?B?anBUemN5N3B4cFA3WmR5SCt3OWlUa0VjcEdlYnpWSE5WYzhQbXNmbnhmaU1p?=
+ =?utf-8?B?UTJNbkFRZHpweUp4WFc0akdSZDZNMkJ0UVJGVVZLMFd0T1AxcDV6ZjI4WUxK?=
+ =?utf-8?B?WW1rTkVvaG9uVXIzajEwU2JUY1UxSHdjNVZLN2JpNVFEY0xQNDFQcFF0WVhO?=
+ =?utf-8?B?WExvUFJNUTQ3eTF4bW9zR1JHSkpTWEd5S1QwcTVyZDdWNzA0Q1lIcTB3K2I4?=
+ =?utf-8?B?M0I5QW16RHFBUXoyS0V2UmRvbjFsRmhSU05FVFBpbWlRT1YzdC8vZ3V2Zk81?=
+ =?utf-8?B?SzMyc0tISGZVYkdhQ1BsSG0rQTJ5cW5oS0kzbzV5TUNaZk5tU0R1dkFYa0lW?=
+ =?utf-8?B?MldNc015dXM1cFk3S3ZEMmxnVlRSWW1DbDJTbnB4Z1g0QURqRTBsL3dhL1Ax?=
+ =?utf-8?B?eVBVaElIYW9oMXkrTFZ6c0Q3T2VKSUpuZS85d3VlK3R5aHVrbHQ0OTd1WXpq?=
+ =?utf-8?B?d1RRa1YyRE9yRjJzamg3TGFxcHJzVE5kTmVtWUNGQzBBdVhkcGVUTm5za1JP?=
+ =?utf-8?B?NFZpcDF6TG9temlXVUZveFFtdlBPaFgzS0lKbzhPR0pNd2ZOWjFPSGYwamhC?=
+ =?utf-8?B?cndITWpKMHpIQWNVMExwTEtieGd6Q3JWVVhSTk1hQThQb3g2WDBncmQvREox?=
+ =?utf-8?B?MkY5Yk5TSXhvV1d4ajI2cHBjdmo1dGtXQmFXNzNnaUdTRVFwSmdCSFlNQjFm?=
+ =?utf-8?B?L3lZaytLQmpMUFN0Sy80eW95b2FveXJlZ282Y3BJQStVKzdFK1g4SVNRVUVm?=
+ =?utf-8?B?RHBVek5PUnBzMHFnK2Y1bW9hcFlNcWlxNU1JOURrNzc3U2UxQ1FDWFF1K3li?=
+ =?utf-8?B?Q1NtZExTM1N6U255MHFHMm9tMDdnPT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <48EDCC4A84FD274E9D5AFAB8CCBC5EC7@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.75.127.45]
-X-ClientProxiedBy: SFHDAG2NODE2.st.com (10.75.127.5) To SFHDAG2NODE2.st.com
- (10.75.127.5)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-30_06,2021-11-28_01,2020-04-07_01
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5154.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0c1e4de-c82f-431d-2d7b-08d9b3d9997c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2021 08:15:41.1812
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: T1HbrAC8CSXzds/AJkZLPiG+rWJS3LlakeQunuUrsVdsN2nPUeuivmUTUc+O3aHPq6nt7jE6WP5QE+b2jQP0elGpJC6D4eIo11pvzeayOdA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2174
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Extra crypto manager auto test were crashing or failling due
-to 2 reasons:
-- block in a dead loop (dues to issues in cipher end process management)
-- crash due to read/write unmapped memory (this crash was also reported
-when using openssl afalg engine)
-
-Rework interrupt management, interrupts are masked as soon as they are
-no more used: if input buffer is fully consumed, "Input FIFO not full"
-interrupt is masked and if output buffer is full, "Output FIFO not
-empty" interrupt is masked.
-And crypto request finish when input *and* outpout buffer are fully
-read/write.
-
-About the crash due to unmapped memory, using scatterwalk_copychunks()
-that will map and copy each block fix the issue.
-Using this api and copying full block will also fix unaligned data
-access, avoid early copy of in/out buffer, and make useless the extra
-alignment constraint.
-
-Fixes: 9e054ec21ef8 ("crypto: stm32 - Support for STM32 CRYP crypto module")
-
-Reported-by: Marek Vasut <marex@denx.de>
-Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
----
- drivers/crypto/stm32/stm32-cryp.c | 790 +++++++++---------------------
- 1 file changed, 243 insertions(+), 547 deletions(-)
-
-diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
-index d3aa0afbe365..faae7ad262ac 100644
---- a/drivers/crypto/stm32/stm32-cryp.c
-+++ b/drivers/crypto/stm32/stm32-cryp.c
-@@ -37,7 +37,6 @@
- /* Mode mask = bits [15..0] */
- #define FLG_MODE_MASK           GENMASK(15, 0)
- /* Bit [31..16] status  */
--#define FLG_CCM_PADDED_WA       BIT(16)
- 
- /* Registers */
- #define CRYP_CR                 0x00000000
-@@ -105,8 +104,6 @@
- /* Misc */
- #define AES_BLOCK_32            (AES_BLOCK_SIZE / sizeof(u32))
- #define GCM_CTR_INIT            2
--#define _walked_in              (cryp->in_walk.offset - cryp->in_sg->offset)
--#define _walked_out             (cryp->out_walk.offset - cryp->out_sg->offset)
- #define CRYP_AUTOSUSPEND_DELAY	50
- 
- struct stm32_cryp_caps {
-@@ -144,21 +141,11 @@ struct stm32_cryp {
- 	size_t                  authsize;
- 	size_t                  hw_blocksize;
- 
--	size_t                  total_in;
--	size_t                  total_in_save;
--	size_t                  total_out;
--	size_t                  total_out_save;
-+	size_t                  payload_in;
-+	size_t                  header_in;
-+	size_t                  payload_out;
- 
--	struct scatterlist      *in_sg;
- 	struct scatterlist      *out_sg;
--	struct scatterlist      *out_sg_save;
--
--	struct scatterlist      in_sgl;
--	struct scatterlist      out_sgl;
--	bool                    sgs_copied;
--
--	int                     in_sg_len;
--	int                     out_sg_len;
- 
- 	struct scatter_walk     in_walk;
- 	struct scatter_walk     out_walk;
-@@ -262,6 +249,7 @@ static inline int stm32_cryp_wait_output(struct stm32_cryp *cryp)
- }
- 
- static int stm32_cryp_read_auth_tag(struct stm32_cryp *cryp);
-+static void stm32_cryp_finish_req(struct stm32_cryp *cryp, int err);
- 
- static struct stm32_cryp *stm32_cryp_find_dev(struct stm32_cryp_ctx *ctx)
- {
-@@ -283,103 +271,6 @@ static struct stm32_cryp *stm32_cryp_find_dev(struct stm32_cryp_ctx *ctx)
- 	return cryp;
- }
- 
--static int stm32_cryp_check_aligned(struct scatterlist *sg, size_t total,
--				    size_t align)
--{
--	int len = 0;
--
--	if (!total)
--		return 0;
--
--	if (!IS_ALIGNED(total, align))
--		return -EINVAL;
--
--	while (sg) {
--		if (!IS_ALIGNED(sg->offset, sizeof(u32)))
--			return -EINVAL;
--
--		if (!IS_ALIGNED(sg->length, align))
--			return -EINVAL;
--
--		len += sg->length;
--		sg = sg_next(sg);
--	}
--
--	if (len != total)
--		return -EINVAL;
--
--	return 0;
--}
--
--static int stm32_cryp_check_io_aligned(struct stm32_cryp *cryp)
--{
--	int ret;
--
--	ret = stm32_cryp_check_aligned(cryp->in_sg, cryp->total_in,
--				       cryp->hw_blocksize);
--	if (ret)
--		return ret;
--
--	ret = stm32_cryp_check_aligned(cryp->out_sg, cryp->total_out,
--				       cryp->hw_blocksize);
--
--	return ret;
--}
--
--static void sg_copy_buf(void *buf, struct scatterlist *sg,
--			unsigned int start, unsigned int nbytes, int out)
--{
--	struct scatter_walk walk;
--
--	if (!nbytes)
--		return;
--
--	scatterwalk_start(&walk, sg);
--	scatterwalk_advance(&walk, start);
--	scatterwalk_copychunks(buf, &walk, nbytes, out);
--	scatterwalk_done(&walk, out, 0);
--}
--
--static int stm32_cryp_copy_sgs(struct stm32_cryp *cryp)
--{
--	void *buf_in, *buf_out;
--	int pages, total_in, total_out;
--
--	if (!stm32_cryp_check_io_aligned(cryp)) {
--		cryp->sgs_copied = 0;
--		return 0;
--	}
--
--	total_in = ALIGN(cryp->total_in, cryp->hw_blocksize);
--	pages = total_in ? get_order(total_in) : 1;
--	buf_in = (void *)__get_free_pages(GFP_ATOMIC, pages);
--
--	total_out = ALIGN(cryp->total_out, cryp->hw_blocksize);
--	pages = total_out ? get_order(total_out) : 1;
--	buf_out = (void *)__get_free_pages(GFP_ATOMIC, pages);
--
--	if (!buf_in || !buf_out) {
--		dev_err(cryp->dev, "Can't allocate pages when unaligned\n");
--		cryp->sgs_copied = 0;
--		return -EFAULT;
--	}
--
--	sg_copy_buf(buf_in, cryp->in_sg, 0, cryp->total_in, 0);
--
--	sg_init_one(&cryp->in_sgl, buf_in, total_in);
--	cryp->in_sg = &cryp->in_sgl;
--	cryp->in_sg_len = 1;
--
--	sg_init_one(&cryp->out_sgl, buf_out, total_out);
--	cryp->out_sg_save = cryp->out_sg;
--	cryp->out_sg = &cryp->out_sgl;
--	cryp->out_sg_len = 1;
--
--	cryp->sgs_copied = 1;
--
--	return 0;
--}
--
- static void stm32_cryp_hw_write_iv(struct stm32_cryp *cryp, __be32 *iv)
- {
- 	if (!iv)
-@@ -481,16 +372,99 @@ static int stm32_cryp_gcm_init(struct stm32_cryp *cryp, u32 cfg)
- 
- 	/* Wait for end of processing */
- 	ret = stm32_cryp_wait_enable(cryp);
--	if (ret)
-+	if (ret) {
- 		dev_err(cryp->dev, "Timeout (gcm init)\n");
-+		return ret;
-+	}
- 
--	return ret;
-+	/* Prepare next phase */
-+	if (cryp->areq->assoclen) {
-+		cfg |= CR_PH_HEADER;
-+		stm32_cryp_write(cryp, CRYP_CR, cfg);
-+	} else if (stm32_cryp_get_input_text_len(cryp)) {
-+		cfg |= CR_PH_PAYLOAD;
-+		stm32_cryp_write(cryp, CRYP_CR, cfg);
-+	}
-+
-+	return 0;
-+}
-+
-+static void stm32_crypt_gcmccm_end_header(struct stm32_cryp *cryp)
-+{
-+	u32 cfg;
-+	int err;
-+
-+	/* Check if whole header written */
-+	if (!cryp->header_in) {
-+		/* Wait for completion */
-+		err = stm32_cryp_wait_busy(cryp);
-+		if (err) {
-+			dev_err(cryp->dev, "Timeout (gcm/ccm header)\n");
-+			stm32_cryp_write(cryp, CRYP_IMSCR, 0);
-+			stm32_cryp_finish_req(cryp, err);
-+			return;
-+		}
-+
-+		if (stm32_cryp_get_input_text_len(cryp)) {
-+			/* Phase 3 : payload */
-+			cfg = stm32_cryp_read(cryp, CRYP_CR);
-+			cfg &= ~CR_CRYPEN;
-+			stm32_cryp_write(cryp, CRYP_CR, cfg);
-+
-+			cfg &= ~CR_PH_MASK;
-+			cfg |= CR_PH_PAYLOAD | CR_CRYPEN;
-+			stm32_cryp_write(cryp, CRYP_CR, cfg);
-+		} else {
-+			/*
-+			 * Phase 4 : tag.
-+			 * Nothing to read, nothing to write, caller have to
-+			 * end request
-+			 */
-+		}
-+	}
-+}
-+
-+static void stm32_cryp_write_ccm_first_header(struct stm32_cryp *cryp)
-+{
-+	unsigned int i;
-+	size_t written;
-+	size_t len;
-+	u32 alen = cryp->areq->assoclen;
-+	u32 block[AES_BLOCK_32] = {0};
-+	u8 *b8 = (u8 *)block;
-+
-+	if (alen <= 65280) {
-+		/* Write first u32 of B1 */
-+		b8[0] = (alen >> 8) & 0xFF;
-+		b8[1] = alen & 0xFF;
-+		len = 2;
-+	} else {
-+		/* Build the two first u32 of B1 */
-+		b8[0] = 0xFF;
-+		b8[1] = 0xFE;
-+		b8[2] = (alen & 0xFF000000) >> 24;
-+		b8[3] = (alen & 0x00FF0000) >> 16;
-+		b8[4] = (alen & 0x0000FF00) >> 8;
-+		b8[5] = alen & 0x000000FF;
-+		len = 6;
-+	}
-+
-+	written = min_t(size_t, AES_BLOCK_SIZE - len, alen);
-+
-+	scatterwalk_copychunks((char *)block + len, &cryp->in_walk, written, 0);
-+	for (i = 0; i < AES_BLOCK_32; i++)
-+		stm32_cryp_write(cryp, CRYP_DIN, block[i]);
-+
-+	cryp->header_in -= written;
-+
-+	stm32_crypt_gcmccm_end_header(cryp);
- }
- 
- static int stm32_cryp_ccm_init(struct stm32_cryp *cryp, u32 cfg)
- {
- 	int ret;
--	u8 iv[AES_BLOCK_SIZE], b0[AES_BLOCK_SIZE];
-+	u32 iv_32[AES_BLOCK_32], b0_32[AES_BLOCK_32];
-+	u8 *iv = (u8 *)iv_32, *b0 = (u8 *)b0_32;
- 	__be32 *bd;
- 	u32 *d;
- 	unsigned int i, textlen;
-@@ -531,17 +505,30 @@ static int stm32_cryp_ccm_init(struct stm32_cryp *cryp, u32 cfg)
- 
- 	/* Wait for end of processing */
- 	ret = stm32_cryp_wait_enable(cryp);
--	if (ret)
-+	if (ret) {
- 		dev_err(cryp->dev, "Timeout (ccm init)\n");
-+		return ret;
-+	}
- 
--	return ret;
-+	/* Prepare next phase */
-+	if (cryp->areq->assoclen) {
-+		cfg |= CR_PH_HEADER | CR_CRYPEN;
-+		stm32_cryp_write(cryp, CRYP_CR, cfg);
-+
-+		/* Write first (special) block (may move to next phase [payload]) */
-+		stm32_cryp_write_ccm_first_header(cryp);
-+	} else if (stm32_cryp_get_input_text_len(cryp)) {
-+		cfg |= CR_PH_PAYLOAD;
-+		stm32_cryp_write(cryp, CRYP_CR, cfg);
-+	}
-+
-+	return 0;
- }
- 
- static int stm32_cryp_hw_init(struct stm32_cryp *cryp)
- {
- 	int ret;
- 	u32 cfg, hw_mode;
--
- 	pm_runtime_resume_and_get(cryp->dev);
- 
- 	/* Disable interrupt */
-@@ -605,16 +592,6 @@ static int stm32_cryp_hw_init(struct stm32_cryp *cryp)
- 		if (ret)
- 			return ret;
- 
--		/* Phase 2 : header (authenticated data) */
--		if (cryp->areq->assoclen) {
--			cfg |= CR_PH_HEADER;
--		} else if (stm32_cryp_get_input_text_len(cryp)) {
--			cfg |= CR_PH_PAYLOAD;
--			stm32_cryp_write(cryp, CRYP_CR, cfg);
--		} else {
--			cfg |= CR_PH_INIT;
--		}
--
- 		break;
- 
- 	case CR_DES_CBC:
-@@ -633,8 +610,6 @@ static int stm32_cryp_hw_init(struct stm32_cryp *cryp)
- 
- 	stm32_cryp_write(cryp, CRYP_CR, cfg);
- 
--	cryp->flags &= ~FLG_CCM_PADDED_WA;
--
- 	return 0;
- }
- 
-@@ -647,25 +622,6 @@ static void stm32_cryp_finish_req(struct stm32_cryp *cryp, int err)
- 	if (!err && (!(is_gcm(cryp) || is_ccm(cryp) || is_ecb(cryp))))
- 		stm32_cryp_get_iv(cryp);
- 
--	if (cryp->sgs_copied) {
--		void *buf_in, *buf_out;
--		int pages, len;
--
--		buf_in = sg_virt(&cryp->in_sgl);
--		buf_out = sg_virt(&cryp->out_sgl);
--
--		sg_copy_buf(buf_out, cryp->out_sg_save, 0,
--			    cryp->total_out_save, 1);
--
--		len = ALIGN(cryp->total_in_save, cryp->hw_blocksize);
--		pages = len ? get_order(len) : 1;
--		free_pages((unsigned long)buf_in, pages);
--
--		len = ALIGN(cryp->total_out_save, cryp->hw_blocksize);
--		pages = len ? get_order(len) : 1;
--		free_pages((unsigned long)buf_out, pages);
--	}
--
- 	pm_runtime_mark_last_busy(cryp->dev);
- 	pm_runtime_put_autosuspend(cryp->dev);
- 
-@@ -1029,6 +985,7 @@ static int stm32_cryp_prepare_req(struct skcipher_request *req,
- 	struct stm32_cryp_ctx *ctx;
- 	struct stm32_cryp *cryp;
- 	struct stm32_cryp_reqctx *rctx;
-+	struct scatterlist *in_sg;
- 	int ret;
- 
- 	if (!req && !areq)
-@@ -1054,76 +1011,55 @@ static int stm32_cryp_prepare_req(struct skcipher_request *req,
- 	if (req) {
- 		cryp->req = req;
- 		cryp->areq = NULL;
--		cryp->total_in = req->cryptlen;
--		cryp->total_out = cryp->total_in;
-+		cryp->header_in = 0;
-+		cryp->payload_in = req->cryptlen;
-+		cryp->payload_out = req->cryptlen;
-+		cryp->authsize = 0;
- 	} else {
- 		/*
- 		 * Length of input and output data:
- 		 * Encryption case:
--		 *  INPUT  =   AssocData  ||   PlainText
-+		 *  INPUT  = AssocData   ||     PlainText
- 		 *          <- assoclen ->  <- cryptlen ->
--		 *          <------- total_in ----------->
- 		 *
--		 *  OUTPUT =   AssocData  ||  CipherText  ||   AuthTag
--		 *          <- assoclen ->  <- cryptlen ->  <- authsize ->
--		 *          <---------------- total_out ----------------->
-+		 *  OUTPUT = AssocData    ||   CipherText   ||      AuthTag
-+		 *          <- assoclen ->  <-- cryptlen -->  <- authsize ->
- 		 *
- 		 * Decryption case:
--		 *  INPUT  =   AssocData  ||  CipherText  ||  AuthTag
--		 *          <- assoclen ->  <--------- cryptlen --------->
--		 *                                          <- authsize ->
--		 *          <---------------- total_in ------------------>
-+		 *  INPUT  =  AssocData     ||    CipherTex   ||       AuthTag
-+		 *          <- assoclen --->  <---------- cryptlen ---------->
- 		 *
--		 *  OUTPUT =   AssocData  ||   PlainText
--		 *          <- assoclen ->  <- crypten - authsize ->
--		 *          <---------- total_out ----------------->
-+		 *  OUTPUT = AssocData    ||               PlainText
-+		 *          <- assoclen ->  <- cryptlen - authsize ->
- 		 */
- 		cryp->areq = areq;
- 		cryp->req = NULL;
- 		cryp->authsize = crypto_aead_authsize(crypto_aead_reqtfm(areq));
--		cryp->total_in = areq->assoclen + areq->cryptlen;
--		if (is_encrypt(cryp))
--			/* Append auth tag to output */
--			cryp->total_out = cryp->total_in + cryp->authsize;
--		else
--			/* No auth tag in output */
--			cryp->total_out = cryp->total_in - cryp->authsize;
-+		if (is_encrypt(cryp)) {
-+			cryp->payload_in = areq->cryptlen;
-+			cryp->header_in = areq->assoclen;
-+			cryp->payload_out = areq->cryptlen;
-+		} else {
-+			cryp->payload_in = areq->cryptlen - cryp->authsize;
-+			cryp->header_in = areq->assoclen;
-+			cryp->payload_out = cryp->payload_in;
-+		}
- 	}
- 
--	cryp->total_in_save = cryp->total_in;
--	cryp->total_out_save = cryp->total_out;
-+	in_sg = req ? req->src : areq->src;
-+	scatterwalk_start(&cryp->in_walk, in_sg);
- 
--	cryp->in_sg = req ? req->src : areq->src;
- 	cryp->out_sg = req ? req->dst : areq->dst;
--	cryp->out_sg_save = cryp->out_sg;
--
--	cryp->in_sg_len = sg_nents_for_len(cryp->in_sg, cryp->total_in);
--	if (cryp->in_sg_len < 0) {
--		dev_err(cryp->dev, "Cannot get in_sg_len\n");
--		ret = cryp->in_sg_len;
--		return ret;
--	}
--
--	cryp->out_sg_len = sg_nents_for_len(cryp->out_sg, cryp->total_out);
--	if (cryp->out_sg_len < 0) {
--		dev_err(cryp->dev, "Cannot get out_sg_len\n");
--		ret = cryp->out_sg_len;
--		return ret;
--	}
--
--	ret = stm32_cryp_copy_sgs(cryp);
--	if (ret)
--		return ret;
--
--	scatterwalk_start(&cryp->in_walk, cryp->in_sg);
- 	scatterwalk_start(&cryp->out_walk, cryp->out_sg);
- 
- 	if (is_gcm(cryp) || is_ccm(cryp)) {
- 		/* In output, jump after assoc data */
--		scatterwalk_advance(&cryp->out_walk, cryp->areq->assoclen);
--		cryp->total_out -= cryp->areq->assoclen;
-+		scatterwalk_copychunks(NULL, &cryp->out_walk, cryp->areq->assoclen, 2);
- 	}
- 
-+	if (is_ctr(cryp))
-+		memset(cryp->last_ctr, 0, sizeof(cryp->last_ctr));
-+
- 	ret = stm32_cryp_hw_init(cryp);
- 	return ret;
- }
-@@ -1171,8 +1107,7 @@ static int stm32_cryp_aead_one_req(struct crypto_engine *engine, void *areq)
- 	if (!cryp)
- 		return -ENODEV;
- 
--	if (unlikely(!cryp->areq->assoclen &&
--		     !stm32_cryp_get_input_text_len(cryp))) {
-+	if (unlikely(!cryp->payload_in && !cryp->header_in)) {
- 		/* No input data to process: get tag and finish */
- 		stm32_cryp_finish_req(cryp, 0);
- 		return 0;
-@@ -1181,43 +1116,10 @@ static int stm32_cryp_aead_one_req(struct crypto_engine *engine, void *areq)
- 	return stm32_cryp_cpu_start(cryp);
- }
- 
--static u32 *stm32_cryp_next_out(struct stm32_cryp *cryp, u32 *dst,
--				unsigned int n)
--{
--	scatterwalk_advance(&cryp->out_walk, n);
--
--	if (unlikely(cryp->out_sg->length == _walked_out)) {
--		cryp->out_sg = sg_next(cryp->out_sg);
--		if (cryp->out_sg) {
--			scatterwalk_start(&cryp->out_walk, cryp->out_sg);
--			return (sg_virt(cryp->out_sg) + _walked_out);
--		}
--	}
--
--	return (u32 *)((u8 *)dst + n);
--}
--
--static u32 *stm32_cryp_next_in(struct stm32_cryp *cryp, u32 *src,
--			       unsigned int n)
--{
--	scatterwalk_advance(&cryp->in_walk, n);
--
--	if (unlikely(cryp->in_sg->length == _walked_in)) {
--		cryp->in_sg = sg_next(cryp->in_sg);
--		if (cryp->in_sg) {
--			scatterwalk_start(&cryp->in_walk, cryp->in_sg);
--			return (sg_virt(cryp->in_sg) + _walked_in);
--		}
--	}
--
--	return (u32 *)((u8 *)src + n);
--}
--
- static int stm32_cryp_read_auth_tag(struct stm32_cryp *cryp)
- {
--	u32 cfg, size_bit, *dst, d32;
--	u8 *d8;
--	unsigned int i, j;
-+	u32 cfg, size_bit;
-+	unsigned int i;
- 	int ret = 0;
- 
- 	/* Update Config */
-@@ -1240,7 +1142,7 @@ static int stm32_cryp_read_auth_tag(struct stm32_cryp *cryp)
- 		stm32_cryp_write(cryp, CRYP_DIN, size_bit);
- 
- 		size_bit = is_encrypt(cryp) ? cryp->areq->cryptlen :
--				cryp->areq->cryptlen - AES_BLOCK_SIZE;
-+				cryp->areq->cryptlen - cryp->authsize;
- 		size_bit *= 8;
- 		if (cryp->caps->swap_final)
- 			size_bit = (__force u32)cpu_to_be32(size_bit);
-@@ -1249,11 +1151,9 @@ static int stm32_cryp_read_auth_tag(struct stm32_cryp *cryp)
- 		stm32_cryp_write(cryp, CRYP_DIN, size_bit);
- 	} else {
- 		/* CCM: write CTR0 */
--		u8 iv[AES_BLOCK_SIZE];
--		u32 *iv32 = (u32 *)iv;
--		__be32 *biv;
--
--		biv = (void *)iv;
-+		u32 iv32[AES_BLOCK_32];
-+		u8 *iv = (u8 *)iv32;
-+		__be32 *biv = (__be32 *)iv32;
- 
- 		memcpy(iv, cryp->areq->iv, AES_BLOCK_SIZE);
- 		memset(iv + AES_BLOCK_SIZE - 1 - iv[0], 0, iv[0] + 1);
-@@ -1275,39 +1175,18 @@ static int stm32_cryp_read_auth_tag(struct stm32_cryp *cryp)
- 	}
- 
- 	if (is_encrypt(cryp)) {
-+		u32 out_tag[AES_BLOCK_32];
-+
- 		/* Get and write tag */
--		dst = sg_virt(cryp->out_sg) + _walked_out;
-+		for (i = 0; i < AES_BLOCK_32; i++)
-+			out_tag[i] = stm32_cryp_read(cryp, CRYP_DOUT);
- 
--		for (i = 0; i < AES_BLOCK_32; i++) {
--			if (cryp->total_out >= sizeof(u32)) {
--				/* Read a full u32 */
--				*dst = stm32_cryp_read(cryp, CRYP_DOUT);
--
--				dst = stm32_cryp_next_out(cryp, dst,
--							  sizeof(u32));
--				cryp->total_out -= sizeof(u32);
--			} else if (!cryp->total_out) {
--				/* Empty fifo out (data from input padding) */
--				stm32_cryp_read(cryp, CRYP_DOUT);
--			} else {
--				/* Read less than an u32 */
--				d32 = stm32_cryp_read(cryp, CRYP_DOUT);
--				d8 = (u8 *)&d32;
--
--				for (j = 0; j < cryp->total_out; j++) {
--					*((u8 *)dst) = *(d8++);
--					dst = stm32_cryp_next_out(cryp, dst, 1);
--				}
--				cryp->total_out = 0;
--			}
--		}
-+		scatterwalk_copychunks(out_tag, &cryp->out_walk, cryp->authsize, 1);
- 	} else {
- 		/* Get and check tag */
- 		u32 in_tag[AES_BLOCK_32], out_tag[AES_BLOCK_32];
- 
--		scatterwalk_map_and_copy(in_tag, cryp->in_sg,
--					 cryp->total_in_save - cryp->authsize,
--					 cryp->authsize, 0);
-+		scatterwalk_copychunks(in_tag, &cryp->in_walk, cryp->authsize, 0);
- 
- 		for (i = 0; i < AES_BLOCK_32; i++)
- 			out_tag[i] = stm32_cryp_read(cryp, CRYP_DOUT);
-@@ -1349,92 +1228,37 @@ static void stm32_cryp_check_ctr_counter(struct stm32_cryp *cryp)
- 	cryp->last_ctr[3] = cpu_to_be32(stm32_cryp_read(cryp, CRYP_IV1RR));
- }
- 
--static bool stm32_cryp_irq_read_data(struct stm32_cryp *cryp)
-+static void stm32_cryp_irq_read_data(struct stm32_cryp *cryp)
- {
--	unsigned int i, j;
--	u32 d32, *dst;
--	u8 *d8;
--	size_t tag_size;
--
--	/* Do no read tag now (if any) */
--	if (is_encrypt(cryp) && (is_gcm(cryp) || is_ccm(cryp)))
--		tag_size = cryp->authsize;
--	else
--		tag_size = 0;
--
--	dst = sg_virt(cryp->out_sg) + _walked_out;
--
--	for (i = 0; i < cryp->hw_blocksize / sizeof(u32); i++) {
--		if (likely(cryp->total_out - tag_size >= sizeof(u32))) {
--			/* Read a full u32 */
--			*dst = stm32_cryp_read(cryp, CRYP_DOUT);
-+	unsigned int i;
-+	u32 block[AES_BLOCK_32];
- 
--			dst = stm32_cryp_next_out(cryp, dst, sizeof(u32));
--			cryp->total_out -= sizeof(u32);
--		} else if (cryp->total_out == tag_size) {
--			/* Empty fifo out (data from input padding) */
--			d32 = stm32_cryp_read(cryp, CRYP_DOUT);
--		} else {
--			/* Read less than an u32 */
--			d32 = stm32_cryp_read(cryp, CRYP_DOUT);
--			d8 = (u8 *)&d32;
--
--			for (j = 0; j < cryp->total_out - tag_size; j++) {
--				*((u8 *)dst) = *(d8++);
--				dst = stm32_cryp_next_out(cryp, dst, 1);
--			}
--			cryp->total_out = tag_size;
--		}
--	}
-+	for (i = 0; i < cryp->hw_blocksize / sizeof(u32); i++)
-+		block[i] = stm32_cryp_read(cryp, CRYP_DOUT);
- 
--	return !(cryp->total_out - tag_size) || !cryp->total_in;
-+	scatterwalk_copychunks(block, &cryp->out_walk, min_t(size_t, cryp->hw_blocksize,
-+							     cryp->payload_out), 1);
-+	cryp->payload_out -= min_t(size_t, cryp->hw_blocksize,
-+				   cryp->payload_out);
- }
- 
- static void stm32_cryp_irq_write_block(struct stm32_cryp *cryp)
- {
--	unsigned int i, j;
--	u32 *src;
--	u8 d8[4];
--	size_t tag_size;
--
--	/* Do no write tag (if any) */
--	if (is_decrypt(cryp) && (is_gcm(cryp) || is_ccm(cryp)))
--		tag_size = cryp->authsize;
--	else
--		tag_size = 0;
--
--	src = sg_virt(cryp->in_sg) + _walked_in;
-+	unsigned int i;
-+	u32 block[AES_BLOCK_32] = {0};
- 
--	for (i = 0; i < cryp->hw_blocksize / sizeof(u32); i++) {
--		if (likely(cryp->total_in - tag_size >= sizeof(u32))) {
--			/* Write a full u32 */
--			stm32_cryp_write(cryp, CRYP_DIN, *src);
-+	scatterwalk_copychunks(block, &cryp->in_walk, min_t(size_t, cryp->hw_blocksize,
-+							    cryp->payload_in), 0);
-+	for (i = 0; i < cryp->hw_blocksize / sizeof(u32); i++)
-+		stm32_cryp_write(cryp, CRYP_DIN, block[i]);
- 
--			src = stm32_cryp_next_in(cryp, src, sizeof(u32));
--			cryp->total_in -= sizeof(u32);
--		} else if (cryp->total_in == tag_size) {
--			/* Write padding data */
--			stm32_cryp_write(cryp, CRYP_DIN, 0);
--		} else {
--			/* Write less than an u32 */
--			memset(d8, 0, sizeof(u32));
--			for (j = 0; j < cryp->total_in - tag_size; j++) {
--				d8[j] = *((u8 *)src);
--				src = stm32_cryp_next_in(cryp, src, 1);
--			}
--
--			stm32_cryp_write(cryp, CRYP_DIN, *(u32 *)d8);
--			cryp->total_in = tag_size;
--		}
--	}
-+	cryp->payload_in -= min_t(size_t, cryp->hw_blocksize, cryp->payload_in);
- }
- 
- static void stm32_cryp_irq_write_gcm_padded_data(struct stm32_cryp *cryp)
- {
- 	int err;
--	u32 cfg, tmp[AES_BLOCK_32];
--	size_t total_in_ori = cryp->total_in;
--	struct scatterlist *out_sg_ori = cryp->out_sg;
-+	u32 cfg, block[AES_BLOCK_32] = {0};
- 	unsigned int i;
- 
- 	/* 'Special workaround' procedure described in the datasheet */
-@@ -1459,18 +1283,25 @@ static void stm32_cryp_irq_write_gcm_padded_data(struct stm32_cryp *cryp)
- 
- 	/* b) pad and write the last block */
- 	stm32_cryp_irq_write_block(cryp);
--	cryp->total_in = total_in_ori;
-+	/* wait end of process */
- 	err = stm32_cryp_wait_output(cryp);
- 	if (err) {
--		dev_err(cryp->dev, "Timeout (write gcm header)\n");
-+		dev_err(cryp->dev, "Timeout (write gcm last data)\n");
- 		return stm32_cryp_finish_req(cryp, err);
- 	}
- 
- 	/* c) get and store encrypted data */
--	stm32_cryp_irq_read_data(cryp);
--	scatterwalk_map_and_copy(tmp, out_sg_ori,
--				 cryp->total_in_save - total_in_ori,
--				 total_in_ori, 0);
-+	/*
-+	 * Same code as stm32_cryp_irq_read_data(), but we want to store
-+	 * block value
-+	 */
-+	for (i = 0; i < cryp->hw_blocksize / sizeof(u32); i++)
-+		block[i] = stm32_cryp_read(cryp, CRYP_DOUT);
-+
-+	scatterwalk_copychunks(block, &cryp->out_walk, min_t(size_t, cryp->hw_blocksize,
-+							     cryp->payload_out), 1);
-+	cryp->payload_out -= min_t(size_t, cryp->hw_blocksize,
-+				   cryp->payload_out);
- 
- 	/* d) change mode back to AES GCM */
- 	cfg &= ~CR_ALGO_MASK;
-@@ -1483,19 +1314,13 @@ static void stm32_cryp_irq_write_gcm_padded_data(struct stm32_cryp *cryp)
- 	stm32_cryp_write(cryp, CRYP_CR, cfg);
- 
- 	/* f) write padded data */
--	for (i = 0; i < AES_BLOCK_32; i++) {
--		if (cryp->total_in)
--			stm32_cryp_write(cryp, CRYP_DIN, tmp[i]);
--		else
--			stm32_cryp_write(cryp, CRYP_DIN, 0);
--
--		cryp->total_in -= min_t(size_t, sizeof(u32), cryp->total_in);
--	}
-+	for (i = 0; i < AES_BLOCK_32; i++)
-+		stm32_cryp_write(cryp, CRYP_DIN, block[i]);
- 
- 	/* g) Empty fifo out */
- 	err = stm32_cryp_wait_output(cryp);
- 	if (err) {
--		dev_err(cryp->dev, "Timeout (write gcm header)\n");
-+		dev_err(cryp->dev, "Timeout (write gcm padded data)\n");
- 		return stm32_cryp_finish_req(cryp, err);
- 	}
- 
-@@ -1508,16 +1333,14 @@ static void stm32_cryp_irq_write_gcm_padded_data(struct stm32_cryp *cryp)
- 
- static void stm32_cryp_irq_set_npblb(struct stm32_cryp *cryp)
- {
--	u32 cfg, payload_bytes;
-+	u32 cfg;
- 
- 	/* disable ip, set NPBLB and reneable ip */
- 	cfg = stm32_cryp_read(cryp, CRYP_CR);
- 	cfg &= ~CR_CRYPEN;
- 	stm32_cryp_write(cryp, CRYP_CR, cfg);
- 
--	payload_bytes = is_decrypt(cryp) ? cryp->total_in - cryp->authsize :
--					   cryp->total_in;
--	cfg |= (cryp->hw_blocksize - payload_bytes) << CR_NBPBL_SHIFT;
-+	cfg |= (cryp->hw_blocksize - cryp->payload_in) << CR_NBPBL_SHIFT;
- 	cfg |= CR_CRYPEN;
- 	stm32_cryp_write(cryp, CRYP_CR, cfg);
- }
-@@ -1526,13 +1349,11 @@ static void stm32_cryp_irq_write_ccm_padded_data(struct stm32_cryp *cryp)
- {
- 	int err = 0;
- 	u32 cfg, iv1tmp;
--	u32 cstmp1[AES_BLOCK_32], cstmp2[AES_BLOCK_32], tmp[AES_BLOCK_32];
--	size_t last_total_out, total_in_ori = cryp->total_in;
--	struct scatterlist *out_sg_ori = cryp->out_sg;
-+	u32 cstmp1[AES_BLOCK_32], cstmp2[AES_BLOCK_32];
-+	u32 block[AES_BLOCK_32] = {0};
- 	unsigned int i;
- 
- 	/* 'Special workaround' procedure described in the datasheet */
--	cryp->flags |= FLG_CCM_PADDED_WA;
- 
- 	/* a) disable ip */
- 	stm32_cryp_write(cryp, CRYP_IMSCR, 0);
-@@ -1562,7 +1383,7 @@ static void stm32_cryp_irq_write_ccm_padded_data(struct stm32_cryp *cryp)
- 
- 	/* b) pad and write the last block */
- 	stm32_cryp_irq_write_block(cryp);
--	cryp->total_in = total_in_ori;
-+	/* wait end of process */
- 	err = stm32_cryp_wait_output(cryp);
- 	if (err) {
- 		dev_err(cryp->dev, "Timeout (wite ccm padded data)\n");
-@@ -1570,13 +1391,16 @@ static void stm32_cryp_irq_write_ccm_padded_data(struct stm32_cryp *cryp)
- 	}
- 
- 	/* c) get and store decrypted data */
--	last_total_out = cryp->total_out;
--	stm32_cryp_irq_read_data(cryp);
-+	/*
-+	 * Same code as stm32_cryp_irq_read_data(), but we want to store
-+	 * block value
-+	 */
-+	for (i = 0; i < cryp->hw_blocksize / sizeof(u32); i++)
-+		block[i] = stm32_cryp_read(cryp, CRYP_DOUT);
- 
--	memset(tmp, 0, sizeof(tmp));
--	scatterwalk_map_and_copy(tmp, out_sg_ori,
--				 cryp->total_out_save - last_total_out,
--				 last_total_out, 0);
-+	scatterwalk_copychunks(block, &cryp->out_walk, min_t(size_t, cryp->hw_blocksize,
-+							     cryp->payload_out), 1);
-+	cryp->payload_out -= min_t(size_t, cryp->hw_blocksize, cryp->payload_out);
- 
- 	/* d) Load again CRYP_CSGCMCCMxR */
- 	for (i = 0; i < ARRAY_SIZE(cstmp2); i++)
-@@ -1593,10 +1417,10 @@ static void stm32_cryp_irq_write_ccm_padded_data(struct stm32_cryp *cryp)
- 	stm32_cryp_write(cryp, CRYP_CR, cfg);
- 
- 	/* g) XOR and write padded data */
--	for (i = 0; i < ARRAY_SIZE(tmp); i++) {
--		tmp[i] ^= cstmp1[i];
--		tmp[i] ^= cstmp2[i];
--		stm32_cryp_write(cryp, CRYP_DIN, tmp[i]);
-+	for (i = 0; i < ARRAY_SIZE(block); i++) {
-+		block[i] ^= cstmp1[i];
-+		block[i] ^= cstmp2[i];
-+		stm32_cryp_write(cryp, CRYP_DIN, block[i]);
- 	}
- 
- 	/* h) wait for completion */
-@@ -1610,30 +1434,34 @@ static void stm32_cryp_irq_write_ccm_padded_data(struct stm32_cryp *cryp)
- 
- static void stm32_cryp_irq_write_data(struct stm32_cryp *cryp)
- {
--	if (unlikely(!cryp->total_in)) {
-+	if (unlikely(!cryp->payload_in)) {
- 		dev_warn(cryp->dev, "No more data to process\n");
- 		return;
- 	}
- 
--	if (unlikely(cryp->total_in < AES_BLOCK_SIZE &&
-+	if (unlikely(cryp->payload_in < AES_BLOCK_SIZE &&
- 		     (stm32_cryp_get_hw_mode(cryp) == CR_AES_GCM) &&
- 		     is_encrypt(cryp))) {
- 		/* Padding for AES GCM encryption */
--		if (cryp->caps->padding_wa)
-+		if (cryp->caps->padding_wa) {
- 			/* Special case 1 */
--			return stm32_cryp_irq_write_gcm_padded_data(cryp);
-+			stm32_cryp_irq_write_gcm_padded_data(cryp);
-+			return;
-+		}
- 
- 		/* Setting padding bytes (NBBLB) */
- 		stm32_cryp_irq_set_npblb(cryp);
- 	}
- 
--	if (unlikely((cryp->total_in - cryp->authsize < AES_BLOCK_SIZE) &&
-+	if (unlikely((cryp->payload_in < AES_BLOCK_SIZE) &&
- 		     (stm32_cryp_get_hw_mode(cryp) == CR_AES_CCM) &&
- 		     is_decrypt(cryp))) {
- 		/* Padding for AES CCM decryption */
--		if (cryp->caps->padding_wa)
-+		if (cryp->caps->padding_wa) {
- 			/* Special case 2 */
--			return stm32_cryp_irq_write_ccm_padded_data(cryp);
-+			stm32_cryp_irq_write_ccm_padded_data(cryp);
-+			return;
-+		}
- 
- 		/* Setting padding bytes (NBBLB) */
- 		stm32_cryp_irq_set_npblb(cryp);
-@@ -1645,192 +1473,60 @@ static void stm32_cryp_irq_write_data(struct stm32_cryp *cryp)
- 	stm32_cryp_irq_write_block(cryp);
- }
- 
--static void stm32_cryp_irq_write_gcm_header(struct stm32_cryp *cryp)
-+static void stm32_cryp_irq_write_gcmccm_header(struct stm32_cryp *cryp)
- {
--	int err;
--	unsigned int i, j;
--	u32 cfg, *src;
--
--	src = sg_virt(cryp->in_sg) + _walked_in;
--
--	for (i = 0; i < AES_BLOCK_32; i++) {
--		stm32_cryp_write(cryp, CRYP_DIN, *src);
--
--		src = stm32_cryp_next_in(cryp, src, sizeof(u32));
--		cryp->total_in -= min_t(size_t, sizeof(u32), cryp->total_in);
--
--		/* Check if whole header written */
--		if ((cryp->total_in_save - cryp->total_in) ==
--				cryp->areq->assoclen) {
--			/* Write padding if needed */
--			for (j = i + 1; j < AES_BLOCK_32; j++)
--				stm32_cryp_write(cryp, CRYP_DIN, 0);
--
--			/* Wait for completion */
--			err = stm32_cryp_wait_busy(cryp);
--			if (err) {
--				dev_err(cryp->dev, "Timeout (gcm header)\n");
--				return stm32_cryp_finish_req(cryp, err);
--			}
--
--			if (stm32_cryp_get_input_text_len(cryp)) {
--				/* Phase 3 : payload */
--				cfg = stm32_cryp_read(cryp, CRYP_CR);
--				cfg &= ~CR_CRYPEN;
--				stm32_cryp_write(cryp, CRYP_CR, cfg);
--
--				cfg &= ~CR_PH_MASK;
--				cfg |= CR_PH_PAYLOAD;
--				cfg |= CR_CRYPEN;
--				stm32_cryp_write(cryp, CRYP_CR, cfg);
--			} else {
--				/* Phase 4 : tag */
--				stm32_cryp_write(cryp, CRYP_IMSCR, 0);
--				stm32_cryp_finish_req(cryp, 0);
--			}
--
--			break;
--		}
--
--		if (!cryp->total_in)
--			break;
--	}
--}
-+	unsigned int i;
-+	u32 block[AES_BLOCK_32] = {0};
-+	size_t written;
- 
--static void stm32_cryp_irq_write_ccm_header(struct stm32_cryp *cryp)
--{
--	int err;
--	unsigned int i = 0, j, k;
--	u32 alen, cfg, *src;
--	u8 d8[4];
--
--	src = sg_virt(cryp->in_sg) + _walked_in;
--	alen = cryp->areq->assoclen;
--
--	if (!_walked_in) {
--		if (cryp->areq->assoclen <= 65280) {
--			/* Write first u32 of B1 */
--			d8[0] = (alen >> 8) & 0xFF;
--			d8[1] = alen & 0xFF;
--			d8[2] = *((u8 *)src);
--			src = stm32_cryp_next_in(cryp, src, 1);
--			d8[3] = *((u8 *)src);
--			src = stm32_cryp_next_in(cryp, src, 1);
--
--			stm32_cryp_write(cryp, CRYP_DIN, *(u32 *)d8);
--			i++;
--
--			cryp->total_in -= min_t(size_t, 2, cryp->total_in);
--		} else {
--			/* Build the two first u32 of B1 */
--			d8[0] = 0xFF;
--			d8[1] = 0xFE;
--			d8[2] = alen & 0xFF000000;
--			d8[3] = alen & 0x00FF0000;
--
--			stm32_cryp_write(cryp, CRYP_DIN, *(u32 *)d8);
--			i++;
--
--			d8[0] = alen & 0x0000FF00;
--			d8[1] = alen & 0x000000FF;
--			d8[2] = *((u8 *)src);
--			src = stm32_cryp_next_in(cryp, src, 1);
--			d8[3] = *((u8 *)src);
--			src = stm32_cryp_next_in(cryp, src, 1);
--
--			stm32_cryp_write(cryp, CRYP_DIN, *(u32 *)d8);
--			i++;
--
--			cryp->total_in -= min_t(size_t, 2, cryp->total_in);
--		}
--	}
-+	written = min_t(size_t, AES_BLOCK_SIZE, cryp->header_in);
- 
--	/* Write next u32 */
--	for (; i < AES_BLOCK_32; i++) {
--		/* Build an u32 */
--		memset(d8, 0, sizeof(u32));
--		for (k = 0; k < sizeof(u32); k++) {
--			d8[k] = *((u8 *)src);
--			src = stm32_cryp_next_in(cryp, src, 1);
--
--			cryp->total_in -= min_t(size_t, 1, cryp->total_in);
--			if ((cryp->total_in_save - cryp->total_in) == alen)
--				break;
--		}
-+	scatterwalk_copychunks(block, &cryp->in_walk, written, 0);
-+	for (i = 0; i < AES_BLOCK_32; i++)
-+		stm32_cryp_write(cryp, CRYP_DIN, block[i]);
- 
--		stm32_cryp_write(cryp, CRYP_DIN, *(u32 *)d8);
--
--		if ((cryp->total_in_save - cryp->total_in) == alen) {
--			/* Write padding if needed */
--			for (j = i + 1; j < AES_BLOCK_32; j++)
--				stm32_cryp_write(cryp, CRYP_DIN, 0);
--
--			/* Wait for completion */
--			err = stm32_cryp_wait_busy(cryp);
--			if (err) {
--				dev_err(cryp->dev, "Timeout (ccm header)\n");
--				return stm32_cryp_finish_req(cryp, err);
--			}
--
--			if (stm32_cryp_get_input_text_len(cryp)) {
--				/* Phase 3 : payload */
--				cfg = stm32_cryp_read(cryp, CRYP_CR);
--				cfg &= ~CR_CRYPEN;
--				stm32_cryp_write(cryp, CRYP_CR, cfg);
--
--				cfg &= ~CR_PH_MASK;
--				cfg |= CR_PH_PAYLOAD;
--				cfg |= CR_CRYPEN;
--				stm32_cryp_write(cryp, CRYP_CR, cfg);
--			} else {
--				/* Phase 4 : tag */
--				stm32_cryp_write(cryp, CRYP_IMSCR, 0);
--				stm32_cryp_finish_req(cryp, 0);
--			}
-+	cryp->header_in -= written;
- 
--			break;
--		}
--	}
-+	stm32_crypt_gcmccm_end_header(cryp);
- }
- 
- static irqreturn_t stm32_cryp_irq_thread(int irq, void *arg)
- {
- 	struct stm32_cryp *cryp = arg;
- 	u32 ph;
-+	u32 it_mask = stm32_cryp_read(cryp, CRYP_IMSCR);
- 
- 	if (cryp->irq_status & MISR_OUT)
- 		/* Output FIFO IRQ: read data */
--		if (unlikely(stm32_cryp_irq_read_data(cryp))) {
--			/* All bytes processed, finish */
--			stm32_cryp_write(cryp, CRYP_IMSCR, 0);
--			stm32_cryp_finish_req(cryp, 0);
--			return IRQ_HANDLED;
--		}
-+		stm32_cryp_irq_read_data(cryp);
- 
- 	if (cryp->irq_status & MISR_IN) {
--		if (is_gcm(cryp)) {
--			ph = stm32_cryp_read(cryp, CRYP_CR) & CR_PH_MASK;
--			if (unlikely(ph == CR_PH_HEADER))
--				/* Write Header */
--				stm32_cryp_irq_write_gcm_header(cryp);
--			else
--				/* Input FIFO IRQ: write data */
--				stm32_cryp_irq_write_data(cryp);
--			cryp->gcm_ctr++;
--		} else if (is_ccm(cryp)) {
-+		if (is_gcm(cryp) || is_ccm(cryp)) {
- 			ph = stm32_cryp_read(cryp, CRYP_CR) & CR_PH_MASK;
- 			if (unlikely(ph == CR_PH_HEADER))
- 				/* Write Header */
--				stm32_cryp_irq_write_ccm_header(cryp);
-+				stm32_cryp_irq_write_gcmccm_header(cryp);
- 			else
- 				/* Input FIFO IRQ: write data */
- 				stm32_cryp_irq_write_data(cryp);
-+			if (is_gcm(cryp))
-+				cryp->gcm_ctr++;
- 		} else {
- 			/* Input FIFO IRQ: write data */
- 			stm32_cryp_irq_write_data(cryp);
- 		}
- 	}
- 
-+	/* Mask useless interrupts */
-+	if (!cryp->payload_in && !cryp->header_in)
-+		it_mask &= ~IMSCR_IN;
-+	if (!cryp->payload_out)
-+		it_mask &= ~IMSCR_OUT;
-+	stm32_cryp_write(cryp, CRYP_IMSCR, it_mask);
-+
-+	if (!cryp->payload_in && !cryp->header_in && !cryp->payload_out)
-+		stm32_cryp_finish_req(cryp, 0);
-+
- 	return IRQ_HANDLED;
- }
- 
-@@ -1851,7 +1547,7 @@ static struct skcipher_alg crypto_algs[] = {
- 	.base.cra_flags		= CRYPTO_ALG_ASYNC,
- 	.base.cra_blocksize	= AES_BLOCK_SIZE,
- 	.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
--	.base.cra_alignmask	= 0xf,
-+	.base.cra_alignmask	= 0,
- 	.base.cra_module	= THIS_MODULE,
- 
- 	.init			= stm32_cryp_init_tfm,
-@@ -1868,7 +1564,7 @@ static struct skcipher_alg crypto_algs[] = {
- 	.base.cra_flags		= CRYPTO_ALG_ASYNC,
- 	.base.cra_blocksize	= AES_BLOCK_SIZE,
- 	.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
--	.base.cra_alignmask	= 0xf,
-+	.base.cra_alignmask	= 0,
- 	.base.cra_module	= THIS_MODULE,
- 
- 	.init			= stm32_cryp_init_tfm,
-@@ -1886,7 +1582,7 @@ static struct skcipher_alg crypto_algs[] = {
- 	.base.cra_flags		= CRYPTO_ALG_ASYNC,
- 	.base.cra_blocksize	= 1,
- 	.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
--	.base.cra_alignmask	= 0xf,
-+	.base.cra_alignmask	= 0,
- 	.base.cra_module	= THIS_MODULE,
- 
- 	.init			= stm32_cryp_init_tfm,
-@@ -1904,7 +1600,7 @@ static struct skcipher_alg crypto_algs[] = {
- 	.base.cra_flags		= CRYPTO_ALG_ASYNC,
- 	.base.cra_blocksize	= DES_BLOCK_SIZE,
- 	.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
--	.base.cra_alignmask	= 0xf,
-+	.base.cra_alignmask	= 0,
- 	.base.cra_module	= THIS_MODULE,
- 
- 	.init			= stm32_cryp_init_tfm,
-@@ -1921,7 +1617,7 @@ static struct skcipher_alg crypto_algs[] = {
- 	.base.cra_flags		= CRYPTO_ALG_ASYNC,
- 	.base.cra_blocksize	= DES_BLOCK_SIZE,
- 	.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
--	.base.cra_alignmask	= 0xf,
-+	.base.cra_alignmask	= 0,
- 	.base.cra_module	= THIS_MODULE,
- 
- 	.init			= stm32_cryp_init_tfm,
-@@ -1939,7 +1635,7 @@ static struct skcipher_alg crypto_algs[] = {
- 	.base.cra_flags		= CRYPTO_ALG_ASYNC,
- 	.base.cra_blocksize	= DES_BLOCK_SIZE,
- 	.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
--	.base.cra_alignmask	= 0xf,
-+	.base.cra_alignmask	= 0,
- 	.base.cra_module	= THIS_MODULE,
- 
- 	.init			= stm32_cryp_init_tfm,
-@@ -1956,7 +1652,7 @@ static struct skcipher_alg crypto_algs[] = {
- 	.base.cra_flags		= CRYPTO_ALG_ASYNC,
- 	.base.cra_blocksize	= DES_BLOCK_SIZE,
- 	.base.cra_ctxsize	= sizeof(struct stm32_cryp_ctx),
--	.base.cra_alignmask	= 0xf,
-+	.base.cra_alignmask	= 0,
- 	.base.cra_module	= THIS_MODULE,
- 
- 	.init			= stm32_cryp_init_tfm,
-@@ -1986,7 +1682,7 @@ static struct aead_alg aead_algs[] = {
- 		.cra_flags		= CRYPTO_ALG_ASYNC,
- 		.cra_blocksize		= 1,
- 		.cra_ctxsize		= sizeof(struct stm32_cryp_ctx),
--		.cra_alignmask		= 0xf,
-+		.cra_alignmask		= 0,
- 		.cra_module		= THIS_MODULE,
- 	},
- },
-@@ -2006,7 +1702,7 @@ static struct aead_alg aead_algs[] = {
- 		.cra_flags		= CRYPTO_ALG_ASYNC,
- 		.cra_blocksize		= 1,
- 		.cra_ctxsize		= sizeof(struct stm32_cryp_ctx),
--		.cra_alignmask		= 0xf,
-+		.cra_alignmask		= 0,
- 		.cra_module		= THIS_MODULE,
- 	},
- },
--- 
-2.17.1
-
+T24gMjkvMTEvMjAyMSAxOTo1NiwgUm9iIEhlcnJpbmcgd3JvdGU6DQo+IEVYVEVSTkFMIEVNQUlM
+OiBEbyBub3QgY2xpY2sgbGlua3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91IGtub3cg
+dGhlIGNvbnRlbnQgaXMgc2FmZQ0KPiANCj4gT24gTW9uLCBOb3YgMDgsIDIwMjEgYXQgMDM6MDU6
+NDNQTSArMDAwMCwgY29ub3IuZG9vbGV5QG1pY3JvY2hpcC5jb20gd3JvdGU6DQo+PiBGcm9tOiBJ
+dmFuIEdyaWZmaW4gPGl2YW4uZ3JpZmZpbkBtaWNyb2NoaXAuY29tPg0KPj4NCj4+IEFkZCBkZXZp
+Y2UgdHJlZSBiaW5kaW5ncyBmb3IgdGhlIE1pY3JvY2hpcCBQb2xhcmZpcmUgU29jIGludGVycnVw
+dA0KPj4gY29udHJvbGxlcg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IENvbm9yIERvb2xleSA8Y29u
+b3IuZG9vbGV5QG1pY3JvY2hpcC5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5OiBJdmFuIEdyaWZmaW4g
+PGl2YW4uZ3JpZmZpbkBtaWNyb2NoaXAuY29tPg0KPj4gLS0tDQo+PiAgIC4uLi9taWNyb2NoaXAs
+bXBmcy1wbGljLmggICAgICAgICAgICAgICAgICAgICB8IDE5OSArKysrKysrKysrKysrKysrKysN
+Cj4+ICAgMSBmaWxlIGNoYW5nZWQsIDE5OSBpbnNlcnRpb25zKCspDQo+PiAgIGNyZWF0ZSBtb2Rl
+IDEwMDY0NCBpbmNsdWRlL2R0LWJpbmRpbmdzL2ludGVycnVwdC1jb250cm9sbGVyL21pY3JvY2hp
+cCxtcGZzLXBsaWMuaA0KPiANCj4gTm90aWNlIGhvdyB0aGVyZSBhcmUgbm90IFNvQyBpbnRlcnJ1
+cHQgZGVmaW5lcyBpbiB0aGlzIGRpcmVjdG9yeS4gVGhhdCdzDQo+IGJlY2F1c2Ugd2UgZG9uJ3Qg
+ZG8gZGVmaW5lcyBmb3IgdGhlbS4gVGhlICdydWxlJyBpcyBvbmx5IGRlZmluZXMgZm9yDQo+IG1h
+ZGUgdXAgbnVtYmVycyB3aGljaCBhcmUgbm90IGluIGEgcmVmZXJlbmNlIG1hbnVhbC4NCk9oIGZh
+aXIgZW5vdWdoLCBJIHdpbGwgZHJvcCB0aGVzZSBjaGFuZ2VzIGZvciBWMiBzby4gVGhhbmtzLg0K
+PiANCj4gUm9iDQo+IA0KDQo=
