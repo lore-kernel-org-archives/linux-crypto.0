@@ -2,161 +2,1225 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E8BCC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 16:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9378C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 16:46:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243979AbhK3QmC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 11:42:02 -0500
-Received: from mail-dm6nam11on2077.outbound.protection.outlook.com ([40.107.223.77]:39264
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230154AbhK3QmA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 11:42:00 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Jfzu7jP5B06JIwD8EWUsfRC6kfmlFOxcFN8wVYEcB+RkSAzQ8NNSA9sU4uLDFSqzrSKPvi96lno0kGIFsw13lKe483nJn4DmeQ370fW7v5L//SvPNxC/qpm+8QYWEoi4ykuh1+VZq+QZwQds3UFYvi7DLjcCT+tNfKdEUZUS2u5/lhbaj/eykQhYCz7DRldvJ0rE+HBBS7rxueAOOlfa7kvyixWHOJbOo9JDuhmc8mc4GI7K8xqDGt6noENvlk/EbZ1Rk3zBRH5Ug2UAXtX6u3esyYt+d4TV48xZ+kpFzh0Y8vzSeFbcy9PniaDfXJVBbhD9xWAub8aZ4dlLxDfT1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Jyc/TYbkhGEq5fih8ZSZ9jawSbE1dJp0dhpQbfwJ5wQ=;
- b=YgiWcXshk2WbXTSCuUBhw+JIb1nsk2+EMVCVqCCz2l+jwKU6Kmcwp5HjRKLxDIHPTbbjquswVnFfF8S9T6GO3v9awtr/v+vh0FGkSqMIxrX4GOjrkhZSffAIAev5NGxSfusdJp4hOzohk8EjbihPVPT9TBsbXcVp6+G6Jl1MTeFJwy4O6QclLukpSgI5lRw/v24c1HlFeFCrAqgj42xS7QnJWO/jlGZhFaLmK5zyFWbtkKwwHvd204Zk3ZHUFd7c6ZHfVZMKimxZ1HjnmFFgWiMvqINKItnm4ThjiGg3gF8s8KRdbAjKojR/7p8CicjE9m5zJ032y2yx7SPBf2EsIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
- dkim=pass header.d=xilinx.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Jyc/TYbkhGEq5fih8ZSZ9jawSbE1dJp0dhpQbfwJ5wQ=;
- b=dXsoqBwOPijGA4vJWa7tclLt6kFpVbj2A0U7GYGhsw1kG1LZfYQcs01eDYzuGYxCTMflMl/nCTWk6/HAOwSI0Jrt9+YZWz2vWpzk/1Ki1o7pD1H9V97z1r/LvbuB2/BCtPYcTsSf5VjbEi5fCAaOQCFE1s++NFG9igO4PUGLACc=
-Received: from SJ0PR02MB7279.namprd02.prod.outlook.com (2603:10b6:a03:2a1::9)
- by BYAPR02MB4519.namprd02.prod.outlook.com (2603:10b6:a03:59::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.24; Tue, 30 Nov
- 2021 16:38:38 +0000
-Received: from SJ0PR02MB7279.namprd02.prod.outlook.com
- ([fe80::dc7:5777:fa1b:ad83]) by SJ0PR02MB7279.namprd02.prod.outlook.com
- ([fe80::dc7:5777:fa1b:ad83%9]) with mapi id 15.20.4734.024; Tue, 30 Nov 2021
- 16:38:38 +0000
-From:   Harsha Harsha <harshah@xilinx.com>
-To:     Randy Dunlap <rdunlap@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Michal Simek <michals@xilinx.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
-CC:     Sarat Chand Savitala <saratcha@xilinx.com>,
-        Harsh Jain <harshj@xilinx.com>
-Subject: RE: [RFC PATCH 5/6] crypto: xilinx: Add Xilinx SHA3 driver
-Thread-Topic: [RFC PATCH 5/6] crypto: xilinx: Add Xilinx SHA3 driver
-Thread-Index: AQHX5cfv/Gtkq75oe0GYT8ahmwjfo6wcHY6AgAAm3pA=
-Date:   Tue, 30 Nov 2021 16:38:38 +0000
-Message-ID: <SJ0PR02MB7279ADF2CBC68F753B43288FDE679@SJ0PR02MB7279.namprd02.prod.outlook.com>
-References: <1638262465-10790-1-git-send-email-harsha.harsha@xilinx.com>
- <1638262465-10790-6-git-send-email-harsha.harsha@xilinx.com>
- <f6c47b8c-6c88-f64f-fdaf-3bb240d4dab0@infradead.org>
-In-Reply-To: <f6c47b8c-6c88-f64f-fdaf-3bb240d4dab0@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=xilinx.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 55f222cf-5ecb-4a48-e2c8-08d9b41fdc84
-x-ms-traffictypediagnostic: BYAPR02MB4519:
-x-microsoft-antispam-prvs: <BYAPR02MB4519B26D253A9AD1A722B625DE679@BYAPR02MB4519.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1079;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 40CvOGVU9Yo6O4qtXtENjRcuPP3coZufl/D6zEA7X7RSc/9CwVcU3ZyppFy9NCGGIs2m3Bmy140Q6TW+gVjFd1vxR6lhRFTBG5ucs0PfF5Qur4xt300Dr6SsqM4NUwyI9nDQvoUOLqKptQURpiKZaomXlxMhsZIqXVrvCZR8nK3meH0DS9bIPtPJxP3l7Rnjgc2naT3M+5nkYmvZsRIuOMsBjbJrThTCQTdp3NGihYVpmtoX80K8xA2eCTF7kIpxwd5I4rkXtSWqpn74E2NKtaUhwDFWtbRB3WLMsHEGgr8hkWgpBGxpG8le8xXiklnuBLlj8Wu9oGbiewKuwvbywbe/pW2Kq+iudCxYYwJUeTEqTlYDqF52iNhWbvRbdMRCdy7yBRxgYH1VK4sbIazymlCQKElb559T3i3HWRkTfleVYVfzLtiGNH7tCah5wq0vjHQIbDaP0J6ojnnESnD1JbHySCXNUQ3OI0gqvUd0s6PUIbUE31ZVzJY8uUHi+TT3SkToDSvf4w6RHV19kZFEFwOCnaTVJVyaHF5bphpQ537cxznBOeXzfm0UtgwR0tiec6uACfwmPF9Few1SlUJ5Zq8xsMTCdLl7AbOfFA/pV5EjOFW4K1pzRFGJOURcm7L2mzgKo+eysSWJiDeeB7GSqjiQY2NzwkMI1HkTqk0w0kJFaugUi13W0qtxs+jzv5kQw2mgAOmjzrkKWnKgvlJT5w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR02MB7279.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(38100700002)(33656002)(64756008)(107886003)(4326008)(186003)(52536014)(8936002)(508600001)(55016003)(38070700005)(6506007)(66446008)(2906002)(66476007)(66556008)(54906003)(86362001)(83380400001)(316002)(53546011)(122000001)(5660300002)(7696005)(76116006)(9686003)(8676002)(66946007)(110136005)(71200400001)(26005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?cFI4bEYyZjl6eXNkQnphMERsRnA1SG5PWGlId3Q3R1JXSGtaU25La3VtRWpv?=
- =?utf-8?B?OWZobGtsL3d6TURwcm54RGZ4TWJLRVFzOU9wQm1NVFNLVkRBdVFWbW9QMkdp?=
- =?utf-8?B?akNjNEZXKzVXVnI2MUl1TTd1L2xOckJISWxpelQyczhONEFpckVVbm95UkxH?=
- =?utf-8?B?MEZpaWVmd1NtVzFudWxQRmU1Y1VZSlE0T3J6YWxqT0g4dk5MUW9aem1lQUps?=
- =?utf-8?B?a1FrblY3N2ZReWhBNG5sM3UxKys2aVBnSkdOaEd1M3pid0tsL1ZUcExwamNL?=
- =?utf-8?B?Njl3WUR0aXZoS1dvT2NoV21HZUFuU21qSWpOajJEdlA4eFlZT3Q3bVJ4ZmV1?=
- =?utf-8?B?eG5NcWNaeWY1bkYwa08rU3Z0SUJORWFCRWpqY2E0M3JyS2h3bDVlTkp2VS91?=
- =?utf-8?B?eDZ4RVIzcUZaVi9wZml3RjhSdmJtUTJIeFJLS1ZMYjUybEtvSWc0VGE4cVBr?=
- =?utf-8?B?SURmSmVRMHkydTZ3MC9mbmN0Y204UUpxTGpjSS83aHZmd2w1U3RmMUppNkhG?=
- =?utf-8?B?bHVlMmxyUnB4bDM0UUlKWitmNlRGWElqN3d4OUZibVJHOHRJYzNoZHVUanZr?=
- =?utf-8?B?Ui9xaGVMZ2tsUXZ1THhYbnhXVmhtVWFPZ3NSeE1tUGVvUXVXRk9OVE1lK0lR?=
- =?utf-8?B?SDBrN1psaWNHNjVvbDE2dVUrOW8wdVdRcm9GY09MOWo2R2t4c0ZmTDZtYTZl?=
- =?utf-8?B?V3NDa2w2UmFKQTB6b281SnF1cHlmVWRCQzFsUGFIUmJNRW5pMzhJMFR0Qzdz?=
- =?utf-8?B?NUJxZlNwWEtrbk1WR2toU21xU2pKc2ZhVjBueVU1Szc4NThIVG5UR21BWVlx?=
- =?utf-8?B?SkYwMW1rRjM0ZzZHT2k0eml3SkExTXFmSm9BRVppRGowTDBlc0FtMXdmSmdO?=
- =?utf-8?B?cE1lc2xJNXNYWEJMaU9idldlRTdyMlcybVJyVjZDWlJTTGVtc1JBVnlrYjdS?=
- =?utf-8?B?Tnd6UGZuV2podDFPM1RWWkhFWU8yQkV3SXRpR2dpejhMam5BeUtDVjFweStW?=
- =?utf-8?B?WUNpcWUwV0I0d2p1U3JHdGdWdzJHZmJuMHlGODdiS2VSMUFSQTB5Z3RSbVMz?=
- =?utf-8?B?dUNuVStZL2pTNkxUQWlyRjZTR2VsNDF5eE5WcGl4Vmg0Q214S1VJM1Z6dGdU?=
- =?utf-8?B?ZmZabysvamV4c3NQTitzbEV0Q3J6TDUwQkZ6amdLK1FuRHNoQUNwSWJTRGQ5?=
- =?utf-8?B?M0JwWEJtQUs4VFZFalFhZmM4dUpSc0R6TzRLT2x0WlBGODFHa28vSTd2RUNq?=
- =?utf-8?B?RTZGUkhPSE5KLy9QenVvTXJwNkxLaEVjYjh0Nk4waHZzMWRlZ2RBMEhUY1N6?=
- =?utf-8?B?Q3BTVEZEM2pWU1pmNVFzVXFaczlYUzVVSzQrYTVqbEtReVdNY2RCR2NNYW5N?=
- =?utf-8?B?ZWlPMnkvVXNKTkhJcUdIdGlLYkQyVThYcHJMZVIzSzdkNnNENmxjVUwrcU9N?=
- =?utf-8?B?cXZWZUpoZ0MwclAvZjZaRWpVV1pMQ2syQ1hnK200cWRGUWtZSnB4MDh1UWxP?=
- =?utf-8?B?NVphMUlDbnJCRWU4VGVoYldCOS9Fc3pJYStKNURUNTJjYUllSXpXN0J6a3pO?=
- =?utf-8?B?NEdGY2pCSWNtT0tueDhrbkhNVWxQT29hZXlSS0Q3NFVkOS9SbnRENHBxd0c0?=
- =?utf-8?B?SmFYeUF1dHd2ejhRRmNlbXFNU3RBSmRSQ05oRWx5VnJGYksxY1VOMzEvRkF3?=
- =?utf-8?B?Q0F0ZXZUNGpWTU1xM2hRaFJWTWovRVd2U2hTYW9FR0ludUFhNUVpaVRpVzNE?=
- =?utf-8?B?bkV3bDU3OXBraXkyVVVxOE9uNEVhcXduemdoNFN6T01sOUV4RVJRTmZwdDBG?=
- =?utf-8?B?SWRkRllBeVprSzNaTEo0eDN0am1Gd0dJOVByYzJ5OUc3M2s3WWdRWEVUSXV4?=
- =?utf-8?B?MDRQeHFJTlJWaXg0S3hybEpEWS9SRzdJODdTRUg2RFlBbzlqVjFZaXQvL2hL?=
- =?utf-8?B?RUJ1Rnp5VXdmSmVoUzhEOFZiOFM5eU1qM3licFYzWi9SWWZyQkZiQlZNUjRx?=
- =?utf-8?B?UHVmL1hvZEZnemhNdVc5TkZCY0E1ODJvbXpGRVBFaHloZzBQZFJienZJWS84?=
- =?utf-8?B?NGJOSFBoNVY1SjZkNExkRjNmY1hGZDdSQ3pUQU8zVWd3azZBcUZ3VEhzMU9k?=
- =?utf-8?B?SXYxalpibkdYcG55ZWo5d2x4RTlJQ2NaOEFJcElteVg4dnFCTE9vZVJqZmdM?=
- =?utf-8?B?NFE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S244359AbhK3Qtl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 11:49:41 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:37120 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244403AbhK3Qtk (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Nov 2021 11:49:40 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 13B2E1FD59;
+        Tue, 30 Nov 2021 16:46:18 +0000 (UTC)
+Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
+        by relay2.suse.de (Postfix) with ESMTP id BB9ACA3B89;
+        Tue, 30 Nov 2021 16:46:15 +0000 (UTC)
+From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+To:     linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        linux-crypto@vger.kernel.org, linux-mtd@lists.infradead.org
+Cc:     geert@linux-m68k.org
+Subject: [PATCH 3/3] MIPS: TXX9: Remove TX4939 SoC support
+Date:   Tue, 30 Nov 2021 17:45:56 +0100
+Message-Id: <20211130164558.85584-3-tsbogend@alpha.franken.de>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20211130164558.85584-1-tsbogend@alpha.franken.de>
+References: <20211130164558.85584-1-tsbogend@alpha.franken.de>
 MIME-Version: 1.0
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR02MB7279.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 55f222cf-5ecb-4a48-e2c8-08d9b41fdc84
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2021 16:38:38.4306
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kawHVPWv6NqlhCIoLS1AkKpDuzv18iSG+k9MXrGxOrPmpTsQOrPX64NSwUDnlX5ECzE8ekqIG7xxV9fd6P9qlA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB4519
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGkgUmFuZHksDQoNClRoYW5rcyBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaC4gSSB3aWxsIG1ha2Ug
-dGhlIGZvbGxvd2luZyBjaGFuZ2VzOg0KLSAgWnlucU1QIFNIQTMgaHcgYWNjZWxlcmF0b3IgLT4g
-WnlucU1QIFNIQTMgaGFyZHdhcmUgYWNjZWxlcmF0b3INCi0gIFNIQTMgaHcgZW5naW5lIC0+IFNI
-QTMgaGFyZHdhcmUgZW5naW5lDQoNClJlZ2FyZHMsDQpIYXJzaGENCg0KPiAtLS0tLU9yaWdpbmFs
-IE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBSYW5keSBEdW5sYXAgPHJkdW5sYXBAaW5mcmFkZWFkLm9y
-Zz4NCj4gU2VudDogVHVlc2RheSwgTm92ZW1iZXIgMzAsIDIwMjEgNzo0NCBQTQ0KPiBUbzogSGFy
-c2hhIEhhcnNoYSA8aGFyc2hhaEB4aWxpbnguY29tPjsgaGVyYmVydEBnb25kb3IuYXBhbmEub3Jn
-LmF1OyBkYXZlbUBkYXZlbWxvZnQubmV0OyBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOw0K
-PiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBNaWNoYWwgU2ltZWsgPG1pY2hhbHNAeGls
-aW54LmNvbT47IGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZzsgcm9iaCtkdEBr
-ZXJuZWwub3JnOw0KPiBkZXZpY2V0cmVlQHZnZXIua2VybmVsLm9yZw0KPiBDYzogU2FyYXQgQ2hh
-bmQgU2F2aXRhbGEgPHNhcmF0Y2hhQHhpbGlueC5jb20+OyBIYXJzaCBKYWluIDxoYXJzaGpAeGls
-aW54LmNvbT4NCj4gU3ViamVjdDogUmU6IFtSRkMgUEFUQ0ggNS82XSBjcnlwdG86IHhpbGlueDog
-QWRkIFhpbGlueCBTSEEzIGRyaXZlcg0KPiANCj4gSGktLQ0KPiANCj4gT24gMTEvMzAvMjEgMDA6
-NTQsIEhhcnNoYSB3cm90ZToNCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vS2NvbmZp
-ZyBiL2RyaXZlcnMvY3J5cHRvL0tjb25maWcNCj4gPiBpbmRleCA1MTY5MGU3Li41ZGYyNTJlIDEw
-MDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL0tjb25maWcNCj4gPiArKysgYi9kcml2ZXJz
-L2NyeXB0by9LY29uZmlnDQo+ID4gQEAgLTc5Niw2ICs3OTYsMTYgQEAgY29uZmlnIENSWVBUT19E
-RVZfWllOUU1QX0FFUw0KPiA+ICAJICBhY2NlbGVyYXRvci4gU2VsZWN0IHRoaXMgaWYgeW91IHdh
-bnQgdG8gdXNlIHRoZSBaeW5xTVAgbW9kdWxlDQo+ID4gIAkgIGZvciBBRVMgYWxnb3JpdGhtcy4N
-Cj4gPg0KPiA+ICtjb25maWcgQ1JZUFRPX0RFVl9aWU5RTVBfU0hBMw0KPiA+ICsJYm9vbCAiU3Vw
-cG9ydCBmb3IgWGlsaW54IFp5bnFNUCBTSEEzIGh3IGFjY2VsZXJhdG9yIg0KPiANCj4gcy9ody9o
-YXJkd2FyZS8NCj4gDQo+ID4gKwlkZXBlbmRzIG9uIEFSQ0hfWllOUU1QIHx8IENPTVBJTEVfVEVT
-VA0KPiA+ICsJc2VsZWN0IENSWVBUT19TSEEzDQo+ID4gKwloZWxwDQo+ID4gKwkgIFhpbGlueCBa
-eW5xTVAgaGFzIFNIQTMgZW5naW5lIHVzZWQgZm9yIHNlY3VyZSBoYXNoIGNhbGN1bGF0aW9uLg0K
-PiA+ICsJICBUaGlzIGRyaXZlciBpbnRlcmZhY2VzIHdpdGggU0hBMyBodyBlbmdpbmUuDQo+IA0K
-PiBzL2h3L2hhcmR3YXJlLw0KPiANCj4gPiArCSAgU2VsZWN0IHRoaXMgaWYgeW91IHdhbnQgdG8g
-dXNlIHRoZSBaeW5xTVAgbW9kdWxlDQo+ID4gKwkgIGZvciBTSEEzIGhhc2ggY29tcHV0YXRpb24u
-DQo+IA0KPiB0aGFua3MuDQo+IC0tDQo+IH5SYW5keQ0K
+After removal of RBTX4939 board support remove code for the TX4939 SoC.
+
+Signed-off-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+---
+ arch/mips/pci/Makefile                |   1 -
+ arch/mips/pci/pci-tx4939.c            | 107 -----
+ arch/mips/txx9/Kconfig                |   8 -
+ arch/mips/txx9/generic/Makefile       |   1 -
+ arch/mips/txx9/generic/irq_tx4939.c   | 216 ----------
+ arch/mips/txx9/generic/setup_tx4939.c | 568 --------------------------
+ drivers/char/hw_random/Kconfig        |  13 -
+ drivers/char/hw_random/Makefile       |   1 -
+ drivers/char/hw_random/tx4939-rng.c   | 157 -------
+ drivers/mtd/nand/raw/Kconfig          |   2 +-
+ 10 files changed, 1 insertion(+), 1073 deletions(-)
+ delete mode 100644 arch/mips/pci/pci-tx4939.c
+ delete mode 100644 arch/mips/txx9/generic/irq_tx4939.c
+ delete mode 100644 arch/mips/txx9/generic/setup_tx4939.c
+ delete mode 100644 drivers/char/hw_random/tx4939-rng.c
+
+diff --git a/arch/mips/pci/Makefile b/arch/mips/pci/Makefile
+index bf18db3026c0..9a6bc702608c 100644
+--- a/arch/mips/pci/Makefile
++++ b/arch/mips/pci/Makefile
+@@ -49,7 +49,6 @@ obj-$(CONFIG_TANBAC_TB0287)	+= fixup-tb0287.o
+ obj-$(CONFIG_TOSHIBA_JMR3927)	+= fixup-jmr3927.o
+ obj-$(CONFIG_SOC_TX4927)	+= pci-tx4927.o
+ obj-$(CONFIG_SOC_TX4938)	+= pci-tx4938.o
+-obj-$(CONFIG_SOC_TX4939)	+= pci-tx4939.o
+ obj-$(CONFIG_TOSHIBA_RBTX4927)	+= fixup-rbtx4927.o
+ obj-$(CONFIG_VICTOR_MPC30X)	+= fixup-mpc30x.o
+ obj-$(CONFIG_ZAO_CAPCELLA)	+= fixup-capcella.o
+diff --git a/arch/mips/pci/pci-tx4939.c b/arch/mips/pci/pci-tx4939.c
+deleted file mode 100644
+index 09a65f7dbe7c..000000000000
+--- a/arch/mips/pci/pci-tx4939.c
++++ /dev/null
+@@ -1,107 +0,0 @@
+-/*
+- * Based on linux/arch/mips/txx9/rbtx4939/setup.c,
+- *	    and RBTX49xx patch from CELF patch archive.
+- *
+- * Copyright 2001, 2003-2005 MontaVista Software Inc.
+- * Copyright (C) 2004 by Ralf Baechle (ralf@linux-mips.org)
+- * (C) Copyright TOSHIBA CORPORATION 2000-2001, 2004-2007
+- *
+- * This file is subject to the terms and conditions of the GNU General Public
+- * License.  See the file "COPYING" in the main directory of this archive
+- * for more details.
+- */
+-#include <linux/init.h>
+-#include <linux/pci.h>
+-#include <linux/kernel.h>
+-#include <linux/interrupt.h>
+-#include <asm/txx9/generic.h>
+-#include <asm/txx9/tx4939.h>
+-
+-int __init tx4939_report_pciclk(void)
+-{
+-	int pciclk = 0;
+-
+-	pr_info("PCIC --%s PCICLK:",
+-		(__raw_readq(&tx4939_ccfgptr->ccfg) & TX4939_CCFG_PCI66) ?
+-		" PCI66" : "");
+-	if (__raw_readq(&tx4939_ccfgptr->pcfg) & TX4939_PCFG_PCICLKEN_ALL) {
+-		pciclk = txx9_master_clock * 20 / 6;
+-		if (!(__raw_readq(&tx4939_ccfgptr->ccfg) & TX4939_CCFG_PCI66))
+-			pciclk /= 2;
+-		pr_cont("Internal(%u.%uMHz)",
+-			(pciclk + 50000) / 1000000,
+-			((pciclk + 50000) / 100000) % 10);
+-	} else {
+-		pr_cont("External");
+-		pciclk = -1;
+-	}
+-	pr_cont("\n");
+-	return pciclk;
+-}
+-
+-void __init tx4939_report_pci1clk(void)
+-{
+-	unsigned int pciclk = txx9_master_clock * 20 / 6;
+-
+-	pr_info("PCIC1 -- PCICLK:%u.%uMHz\n",
+-		(pciclk + 50000) / 1000000,
+-		((pciclk + 50000) / 100000) % 10);
+-}
+-
+-int tx4939_pcic1_map_irq(const struct pci_dev *dev, u8 slot)
+-{
+-	if (get_tx4927_pcicptr(dev->bus->sysdata) == tx4939_pcic1ptr) {
+-		switch (slot) {
+-		case TX4927_PCIC_IDSEL_AD_TO_SLOT(31):
+-			if (__raw_readq(&tx4939_ccfgptr->pcfg) &
+-			    TX4939_PCFG_ET0MODE)
+-				return TXX9_IRQ_BASE + TX4939_IR_ETH(0);
+-			break;
+-		case TX4927_PCIC_IDSEL_AD_TO_SLOT(30):
+-			if (__raw_readq(&tx4939_ccfgptr->pcfg) &
+-			    TX4939_PCFG_ET1MODE)
+-				return TXX9_IRQ_BASE + TX4939_IR_ETH(1);
+-			break;
+-		}
+-		return 0;
+-	}
+-	return -1;
+-}
+-
+-int tx4939_pci_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
+-{
+-	int irq = tx4939_pcic1_map_irq(dev, slot);
+-
+-	if (irq >= 0)
+-		return irq;
+-	irq = pin;
+-	/* IRQ rotation */
+-	irq--;	/* 0-3 */
+-	irq = (irq + 33 - slot) % 4;
+-	irq++;	/* 1-4 */
+-
+-	switch (irq) {
+-	case 1:
+-		irq = TXX9_IRQ_BASE + TX4939_IR_INTA;
+-		break;
+-	case 2:
+-		irq = TXX9_IRQ_BASE + TX4939_IR_INTB;
+-		break;
+-	case 3:
+-		irq = TXX9_IRQ_BASE + TX4939_IR_INTC;
+-		break;
+-	case 4:
+-		irq = TXX9_IRQ_BASE + TX4939_IR_INTD;
+-		break;
+-	}
+-	return irq;
+-}
+-
+-void __init tx4939_setup_pcierr_irq(void)
+-{
+-	if (request_irq(TXX9_IRQ_BASE + TX4939_IR_PCIERR,
+-			tx4927_pcierr_interrupt,
+-			0, "PCI error",
+-			(void *)TX4939_PCIC_REG))
+-		pr_warn("Failed to request irq for PCIERR\n");
+-}
+diff --git a/arch/mips/txx9/Kconfig b/arch/mips/txx9/Kconfig
+index 9e5e33a09cf9..54b4e43053d7 100644
+--- a/arch/mips/txx9/Kconfig
++++ b/arch/mips/txx9/Kconfig
+@@ -67,14 +67,6 @@ config SOC_TX4938
+ 	select GPIO_TXX9
+ 	imply HAS_TXX9_ACLC
+ 
+-config SOC_TX4939
+-	bool
+-	select CEVT_TXX9
+-	imply HAS_TXX9_SERIAL
+-	select HAVE_PCI
+-	select PCI_TX4927
+-	imply HAS_TXX9_ACLC
+-
+ config TOSHIBA_FPCIB0
+ 	bool "FPCIB0 Backplane Support"
+ 	depends on PCI && MACH_TXX9
+diff --git a/arch/mips/txx9/generic/Makefile b/arch/mips/txx9/generic/Makefile
+index 62b6dc6915e3..be5af9fe7c11 100644
+--- a/arch/mips/txx9/generic/Makefile
++++ b/arch/mips/txx9/generic/Makefile
+@@ -8,5 +8,4 @@ obj-$(CONFIG_PCI)	+= pci.o
+ obj-$(CONFIG_SOC_TX3927)	+= setup_tx3927.o irq_tx3927.o
+ obj-$(CONFIG_SOC_TX4927)	+= mem_tx4927.o setup_tx4927.o irq_tx4927.o
+ obj-$(CONFIG_SOC_TX4938)	+= mem_tx4927.o setup_tx4938.o irq_tx4938.o
+-obj-$(CONFIG_SOC_TX4939)	+= setup_tx4939.o irq_tx4939.o
+ obj-$(CONFIG_TOSHIBA_FPCIB0)	+= smsc_fdc37m81x.o
+diff --git a/arch/mips/txx9/generic/irq_tx4939.c b/arch/mips/txx9/generic/irq_tx4939.c
+deleted file mode 100644
+index 0d7267e81a8c..000000000000
+--- a/arch/mips/txx9/generic/irq_tx4939.c
++++ /dev/null
+@@ -1,216 +0,0 @@
+-/*
+- * TX4939 irq routines
+- * Based on linux/arch/mips/kernel/irq_txx9.c,
+- *	    and RBTX49xx patch from CELF patch archive.
+- *
+- * Copyright 2001, 2003-2005 MontaVista Software Inc.
+- * Author: MontaVista Software, Inc.
+- *	   ahennessy@mvista.com
+- *	   source@mvista.com
+- * Copyright (C) 2000-2001,2005-2007 Toshiba Corporation
+- *
+- * This file is subject to the terms and conditions of the GNU General Public
+- * License.  See the file "COPYING" in the main directory of this archive
+- * for more details.
+- */
+-/*
+- * TX4939 defines 64 IRQs.
+- * Similer to irq_txx9.c but different register layouts.
+- */
+-#include <linux/init.h>
+-#include <linux/interrupt.h>
+-#include <linux/irq.h>
+-#include <linux/types.h>
+-#include <asm/irq_cpu.h>
+-#include <asm/txx9irq.h>
+-#include <asm/txx9/tx4939.h>
+-
+-/* IRCER : Int. Control Enable */
+-#define TXx9_IRCER_ICE	0x00000001
+-
+-/* IRCR : Int. Control */
+-#define TXx9_IRCR_LOW	0x00000000
+-#define TXx9_IRCR_HIGH	0x00000001
+-#define TXx9_IRCR_DOWN	0x00000002
+-#define TXx9_IRCR_UP	0x00000003
+-#define TXx9_IRCR_EDGE(cr)	((cr) & 0x00000002)
+-
+-/* IRSCR : Int. Status Control */
+-#define TXx9_IRSCR_EIClrE	0x00000100
+-#define TXx9_IRSCR_EIClr_MASK	0x0000000f
+-
+-/* IRCSR : Int. Current Status */
+-#define TXx9_IRCSR_IF	0x00010000
+-
+-#define irc_dlevel	0
+-#define irc_elevel	1
+-
+-static struct {
+-	unsigned char level;
+-	unsigned char mode;
+-} tx4939irq[TX4939_NUM_IR] __read_mostly;
+-
+-static void tx4939_irq_unmask(struct irq_data *d)
+-{
+-	unsigned int irq_nr = d->irq - TXX9_IRQ_BASE;
+-	u32 __iomem *lvlp;
+-	int ofs;
+-	if (irq_nr < 32) {
+-		irq_nr--;
+-		lvlp = &tx4939_ircptr->lvl[(irq_nr % 16) / 2].r;
+-	} else {
+-		irq_nr -= 32;
+-		lvlp = &tx4939_ircptr->lvl[8 + (irq_nr % 16) / 2].r;
+-	}
+-	ofs = (irq_nr & 16) + (irq_nr & 1) * 8;
+-	__raw_writel((__raw_readl(lvlp) & ~(0xff << ofs))
+-		     | (tx4939irq[irq_nr].level << ofs),
+-		     lvlp);
+-}
+-
+-static inline void tx4939_irq_mask(struct irq_data *d)
+-{
+-	unsigned int irq_nr = d->irq - TXX9_IRQ_BASE;
+-	u32 __iomem *lvlp;
+-	int ofs;
+-	if (irq_nr < 32) {
+-		irq_nr--;
+-		lvlp = &tx4939_ircptr->lvl[(irq_nr % 16) / 2].r;
+-	} else {
+-		irq_nr -= 32;
+-		lvlp = &tx4939_ircptr->lvl[8 + (irq_nr % 16) / 2].r;
+-	}
+-	ofs = (irq_nr & 16) + (irq_nr & 1) * 8;
+-	__raw_writel((__raw_readl(lvlp) & ~(0xff << ofs))
+-		     | (irc_dlevel << ofs),
+-		     lvlp);
+-	mmiowb();
+-}
+-
+-static void tx4939_irq_mask_ack(struct irq_data *d)
+-{
+-	unsigned int irq_nr = d->irq - TXX9_IRQ_BASE;
+-
+-	tx4939_irq_mask(d);
+-	if (TXx9_IRCR_EDGE(tx4939irq[irq_nr].mode)) {
+-		irq_nr--;
+-		/* clear edge detection */
+-		__raw_writel((TXx9_IRSCR_EIClrE | (irq_nr & 0xf))
+-			     << (irq_nr & 0x10),
+-			     &tx4939_ircptr->edc.r);
+-	}
+-}
+-
+-static int tx4939_irq_set_type(struct irq_data *d, unsigned int flow_type)
+-{
+-	unsigned int irq_nr = d->irq - TXX9_IRQ_BASE;
+-	u32 cr;
+-	u32 __iomem *crp;
+-	int ofs;
+-	int mode;
+-
+-	if (flow_type & IRQF_TRIGGER_PROBE)
+-		return 0;
+-	switch (flow_type & IRQF_TRIGGER_MASK) {
+-	case IRQF_TRIGGER_RISING:
+-		mode = TXx9_IRCR_UP;
+-		break;
+-	case IRQF_TRIGGER_FALLING:
+-		mode = TXx9_IRCR_DOWN;
+-		break;
+-	case IRQF_TRIGGER_HIGH:
+-		mode = TXx9_IRCR_HIGH;
+-		break;
+-	case IRQF_TRIGGER_LOW:
+-		mode = TXx9_IRCR_LOW;
+-		break;
+-	default:
+-		return -EINVAL;
+-	}
+-	if (irq_nr < 32) {
+-		irq_nr--;
+-		crp = &tx4939_ircptr->dm[(irq_nr & 8) >> 3].r;
+-	} else {
+-		irq_nr -= 32;
+-		crp = &tx4939_ircptr->dm2[((irq_nr & 8) >> 3)].r;
+-	}
+-	ofs = (((irq_nr & 16) >> 1) | (irq_nr & (8 - 1))) * 2;
+-	cr = __raw_readl(crp);
+-	cr &= ~(0x3 << ofs);
+-	cr |= (mode & 0x3) << ofs;
+-	__raw_writel(cr, crp);
+-	tx4939irq[irq_nr].mode = mode;
+-	return 0;
+-}
+-
+-static struct irq_chip tx4939_irq_chip = {
+-	.name		= "TX4939",
+-	.irq_ack	= tx4939_irq_mask_ack,
+-	.irq_mask	= tx4939_irq_mask,
+-	.irq_mask_ack	= tx4939_irq_mask_ack,
+-	.irq_unmask	= tx4939_irq_unmask,
+-	.irq_set_type	= tx4939_irq_set_type,
+-};
+-
+-static int tx4939_irq_set_pri(int irc_irq, int new_pri)
+-{
+-	int old_pri;
+-
+-	if ((unsigned int)irc_irq >= TX4939_NUM_IR)
+-		return 0;
+-	old_pri = tx4939irq[irc_irq].level;
+-	tx4939irq[irc_irq].level = new_pri;
+-	return old_pri;
+-}
+-
+-void __init tx4939_irq_init(void)
+-{
+-	int i;
+-
+-	mips_cpu_irq_init();
+-	/* disable interrupt control */
+-	__raw_writel(0, &tx4939_ircptr->den.r);
+-	__raw_writel(0, &tx4939_ircptr->maskint.r);
+-	__raw_writel(0, &tx4939_ircptr->maskext.r);
+-	/* irq_base + 0 is not used */
+-	for (i = 1; i < TX4939_NUM_IR; i++) {
+-		tx4939irq[i].level = 4; /* middle level */
+-		tx4939irq[i].mode = TXx9_IRCR_LOW;
+-		irq_set_chip_and_handler(TXX9_IRQ_BASE + i, &tx4939_irq_chip,
+-					 handle_level_irq);
+-	}
+-
+-	/* mask all IRC interrupts */
+-	__raw_writel(0, &tx4939_ircptr->msk.r);
+-	for (i = 0; i < 16; i++)
+-		__raw_writel(0, &tx4939_ircptr->lvl[i].r);
+-	/* setup IRC interrupt mode (Low Active) */
+-	for (i = 0; i < 2; i++)
+-		__raw_writel(0, &tx4939_ircptr->dm[i].r);
+-	for (i = 0; i < 2; i++)
+-		__raw_writel(0, &tx4939_ircptr->dm2[i].r);
+-	/* enable interrupt control */
+-	__raw_writel(TXx9_IRCER_ICE, &tx4939_ircptr->den.r);
+-	__raw_writel(irc_elevel, &tx4939_ircptr->msk.r);
+-
+-	irq_set_chained_handler(MIPS_CPU_IRQ_BASE + TX4939_IRC_INT,
+-				handle_simple_irq);
+-
+-	/* raise priority for errors, timers, sio */
+-	tx4939_irq_set_pri(TX4939_IR_WTOERR, 7);
+-	tx4939_irq_set_pri(TX4939_IR_PCIERR, 7);
+-	tx4939_irq_set_pri(TX4939_IR_PCIPME, 7);
+-	for (i = 0; i < TX4939_NUM_IR_TMR; i++)
+-		tx4939_irq_set_pri(TX4939_IR_TMR(i), 6);
+-	for (i = 0; i < TX4939_NUM_IR_SIO; i++)
+-		tx4939_irq_set_pri(TX4939_IR_SIO(i), 5);
+-}
+-
+-int tx4939_irq(void)
+-{
+-	u32 csr = __raw_readl(&tx4939_ircptr->cs.r);
+-
+-	if (likely(!(csr & TXx9_IRCSR_IF)))
+-		return TXX9_IRQ_BASE + (csr & (TX4939_NUM_IR - 1));
+-	return -1;
+-}
+diff --git a/arch/mips/txx9/generic/setup_tx4939.c b/arch/mips/txx9/generic/setup_tx4939.c
+deleted file mode 100644
+index f5f59b7401a3..000000000000
+--- a/arch/mips/txx9/generic/setup_tx4939.c
++++ /dev/null
+@@ -1,568 +0,0 @@
+-/*
+- * TX4939 setup routines
+- * Based on linux/arch/mips/txx9/generic/setup_tx4938.c,
+- *	    and RBTX49xx patch from CELF patch archive.
+- *
+- * 2003-2005 (c) MontaVista Software, Inc.
+- * (C) Copyright TOSHIBA CORPORATION 2000-2001, 2004-2007
+- *
+- * This file is subject to the terms and conditions of the GNU General Public
+- * License.  See the file "COPYING" in the main directory of this archive
+- * for more details.
+- */
+-#include <linux/init.h>
+-#include <linux/ioport.h>
+-#include <linux/delay.h>
+-#include <linux/netdevice.h>
+-#include <linux/notifier.h>
+-#include <linux/device.h>
+-#include <linux/ethtool.h>
+-#include <linux/param.h>
+-#include <linux/ptrace.h>
+-#include <linux/mtd/physmap.h>
+-#include <linux/platform_device.h>
+-#include <linux/platform_data/txx9/ndfmc.h>
+-#include <asm/reboot.h>
+-#include <asm/traps.h>
+-#include <asm/txx9irq.h>
+-#include <asm/txx9tmr.h>
+-#include <asm/txx9/generic.h>
+-#include <asm/txx9/dmac.h>
+-#include <asm/txx9/tx4939.h>
+-
+-static void __init tx4939_wdr_init(void)
+-{
+-	/* report watchdog reset status */
+-	if (____raw_readq(&tx4939_ccfgptr->ccfg) & TX4939_CCFG_WDRST)
+-		pr_warn("Watchdog reset detected at 0x%lx\n",
+-			read_c0_errorepc());
+-	/* clear WatchDogReset (W1C) */
+-	tx4939_ccfg_set(TX4939_CCFG_WDRST);
+-	/* do reset on watchdog */
+-	tx4939_ccfg_set(TX4939_CCFG_WR);
+-}
+-
+-void __init tx4939_wdt_init(void)
+-{
+-	txx9_wdt_init(TX4939_TMR_REG(2) & 0xfffffffffULL);
+-}
+-
+-static void tx4939_machine_restart(char *command)
+-{
+-	local_irq_disable();
+-	pr_emerg("Rebooting (with %s watchdog reset)...\n",
+-		 (____raw_readq(&tx4939_ccfgptr->ccfg) & TX4939_CCFG_WDREXEN) ?
+-		 "external" : "internal");
+-	/* clear watchdog status */
+-	tx4939_ccfg_set(TX4939_CCFG_WDRST);	/* W1C */
+-	txx9_wdt_now(TX4939_TMR_REG(2) & 0xfffffffffULL);
+-	while (!(____raw_readq(&tx4939_ccfgptr->ccfg) & TX4939_CCFG_WDRST))
+-		;
+-	mdelay(10);
+-	if (____raw_readq(&tx4939_ccfgptr->ccfg) & TX4939_CCFG_WDREXEN) {
+-		pr_emerg("Rebooting (with internal watchdog reset)...\n");
+-		/* External WDRST failed.  Do internal watchdog reset */
+-		tx4939_ccfg_clear(TX4939_CCFG_WDREXEN);
+-	}
+-	/* fallback */
+-	(*_machine_halt)();
+-}
+-
+-void show_registers(struct pt_regs *regs);
+-static int tx4939_be_handler(struct pt_regs *regs, int is_fixup)
+-{
+-	int data = regs->cp0_cause & 4;
+-	console_verbose();
+-	pr_err("%cBE exception at %#lx\n",
+-	       data ? 'D' : 'I', regs->cp0_epc);
+-	pr_err("ccfg:%llx, toea:%llx\n",
+-	       (unsigned long long)____raw_readq(&tx4939_ccfgptr->ccfg),
+-	       (unsigned long long)____raw_readq(&tx4939_ccfgptr->toea));
+-#ifdef CONFIG_PCI
+-	tx4927_report_pcic_status();
+-#endif
+-	show_registers(regs);
+-	panic("BusError!");
+-}
+-static void __init tx4939_be_init(void)
+-{
+-	mips_set_be_handler(tx4939_be_handler);
+-}
+-
+-static struct resource tx4939_sdram_resource[4];
+-static struct resource tx4939_sram_resource;
+-#define TX4939_SRAM_SIZE 0x800
+-
+-void __init tx4939_setup(void)
+-{
+-	int i;
+-	__u32 divmode;
+-	__u64 pcfg;
+-	unsigned int cpuclk = 0;
+-
+-	txx9_reg_res_init(TX4939_REV_PCODE(), TX4939_REG_BASE,
+-			  TX4939_REG_SIZE);
+-	set_c0_config(TX49_CONF_CWFON);
+-
+-	/* SDRAMC,EBUSC are configured by PROM */
+-	for (i = 0; i < 4; i++) {
+-		if (!(TX4939_EBUSC_CR(i) & 0x8))
+-			continue;	/* disabled */
+-		txx9_ce_res[i].start = (unsigned long)TX4939_EBUSC_BA(i);
+-		txx9_ce_res[i].end =
+-			txx9_ce_res[i].start + TX4939_EBUSC_SIZE(i) - 1;
+-		request_resource(&iomem_resource, &txx9_ce_res[i]);
+-	}
+-
+-	/* clocks */
+-	if (txx9_master_clock) {
+-		/* calculate cpu_clock from master_clock */
+-		divmode = (__u32)____raw_readq(&tx4939_ccfgptr->ccfg) &
+-			TX4939_CCFG_MULCLK_MASK;
+-		cpuclk = txx9_master_clock * 20 / 2;
+-		switch (divmode) {
+-		case TX4939_CCFG_MULCLK_8:
+-			cpuclk = cpuclk / 3 * 4 /* / 6 *  8 */; break;
+-		case TX4939_CCFG_MULCLK_9:
+-			cpuclk = cpuclk / 2 * 3 /* / 6 *  9 */; break;
+-		case TX4939_CCFG_MULCLK_10:
+-			cpuclk = cpuclk / 3 * 5 /* / 6 * 10 */; break;
+-		case TX4939_CCFG_MULCLK_11:
+-			cpuclk = cpuclk / 6 * 11; break;
+-		case TX4939_CCFG_MULCLK_12:
+-			cpuclk = cpuclk * 2 /* / 6 * 12 */; break;
+-		case TX4939_CCFG_MULCLK_13:
+-			cpuclk = cpuclk / 6 * 13; break;
+-		case TX4939_CCFG_MULCLK_14:
+-			cpuclk = cpuclk / 3 * 7 /* / 6 * 14 */; break;
+-		case TX4939_CCFG_MULCLK_15:
+-			cpuclk = cpuclk / 2 * 5 /* / 6 * 15 */; break;
+-		}
+-		txx9_cpu_clock = cpuclk;
+-	} else {
+-		if (txx9_cpu_clock == 0)
+-			txx9_cpu_clock = 400000000;	/* 400MHz */
+-		/* calculate master_clock from cpu_clock */
+-		cpuclk = txx9_cpu_clock;
+-		divmode = (__u32)____raw_readq(&tx4939_ccfgptr->ccfg) &
+-			TX4939_CCFG_MULCLK_MASK;
+-		switch (divmode) {
+-		case TX4939_CCFG_MULCLK_8:
+-			txx9_master_clock = cpuclk * 6 / 8; break;
+-		case TX4939_CCFG_MULCLK_9:
+-			txx9_master_clock = cpuclk * 6 / 9; break;
+-		case TX4939_CCFG_MULCLK_10:
+-			txx9_master_clock = cpuclk * 6 / 10; break;
+-		case TX4939_CCFG_MULCLK_11:
+-			txx9_master_clock = cpuclk * 6 / 11; break;
+-		case TX4939_CCFG_MULCLK_12:
+-			txx9_master_clock = cpuclk * 6 / 12; break;
+-		case TX4939_CCFG_MULCLK_13:
+-			txx9_master_clock = cpuclk * 6 / 13; break;
+-		case TX4939_CCFG_MULCLK_14:
+-			txx9_master_clock = cpuclk * 6 / 14; break;
+-		case TX4939_CCFG_MULCLK_15:
+-			txx9_master_clock = cpuclk * 6 / 15; break;
+-		}
+-		txx9_master_clock /= 10; /* * 2 / 20 */
+-	}
+-	/* calculate gbus_clock from cpu_clock */
+-	divmode = (__u32)____raw_readq(&tx4939_ccfgptr->ccfg) &
+-		TX4939_CCFG_YDIVMODE_MASK;
+-	txx9_gbus_clock = txx9_cpu_clock;
+-	switch (divmode) {
+-	case TX4939_CCFG_YDIVMODE_2:
+-		txx9_gbus_clock /= 2; break;
+-	case TX4939_CCFG_YDIVMODE_3:
+-		txx9_gbus_clock /= 3; break;
+-	case TX4939_CCFG_YDIVMODE_5:
+-		txx9_gbus_clock /= 5; break;
+-	case TX4939_CCFG_YDIVMODE_6:
+-		txx9_gbus_clock /= 6; break;
+-	}
+-	/* change default value to udelay/mdelay take reasonable time */
+-	loops_per_jiffy = txx9_cpu_clock / HZ / 2;
+-
+-	/* CCFG */
+-	tx4939_wdr_init();
+-	/* clear BusErrorOnWrite flag (W1C) */
+-	tx4939_ccfg_set(TX4939_CCFG_WDRST | TX4939_CCFG_BEOW);
+-	/* enable Timeout BusError */
+-	if (txx9_ccfg_toeon)
+-		tx4939_ccfg_set(TX4939_CCFG_TOE);
+-
+-	/* DMA selection */
+-	txx9_clear64(&tx4939_ccfgptr->pcfg, TX4939_PCFG_DMASEL_ALL);
+-
+-	/* Use external clock for external arbiter */
+-	if (!(____raw_readq(&tx4939_ccfgptr->ccfg) & TX4939_CCFG_PCIARB))
+-		txx9_clear64(&tx4939_ccfgptr->pcfg, TX4939_PCFG_PCICLKEN_ALL);
+-
+-	pr_info("%s -- %dMHz(M%dMHz,G%dMHz) CRIR:%08x CCFG:%llx PCFG:%llx\n",
+-		txx9_pcode_str,
+-		(cpuclk + 500000) / 1000000,
+-		(txx9_master_clock + 500000) / 1000000,
+-		(txx9_gbus_clock + 500000) / 1000000,
+-		(__u32)____raw_readq(&tx4939_ccfgptr->crir),
+-		____raw_readq(&tx4939_ccfgptr->ccfg),
+-		____raw_readq(&tx4939_ccfgptr->pcfg));
+-
+-	pr_info("%s DDRC -- EN:%08x", txx9_pcode_str,
+-		(__u32)____raw_readq(&tx4939_ddrcptr->winen));
+-	for (i = 0; i < 4; i++) {
+-		__u64 win = ____raw_readq(&tx4939_ddrcptr->win[i]);
+-		if (!((__u32)____raw_readq(&tx4939_ddrcptr->winen) & (1 << i)))
+-			continue;	/* disabled */
+-		pr_cont(" #%d:%016llx", i, win);
+-		tx4939_sdram_resource[i].name = "DDR SDRAM";
+-		tx4939_sdram_resource[i].start =
+-			(unsigned long)(win >> 48) << 20;
+-		tx4939_sdram_resource[i].end =
+-			((((unsigned long)(win >> 32) & 0xffff) + 1) <<
+-			 20) - 1;
+-		tx4939_sdram_resource[i].flags = IORESOURCE_MEM;
+-		request_resource(&iomem_resource, &tx4939_sdram_resource[i]);
+-	}
+-	pr_cont("\n");
+-
+-	/* SRAM */
+-	if (____raw_readq(&tx4939_sramcptr->cr) & 1) {
+-		unsigned int size = TX4939_SRAM_SIZE;
+-		tx4939_sram_resource.name = "SRAM";
+-		tx4939_sram_resource.start =
+-			(____raw_readq(&tx4939_sramcptr->cr) >> (39-11))
+-			& ~(size - 1);
+-		tx4939_sram_resource.end =
+-			tx4939_sram_resource.start + TX4939_SRAM_SIZE - 1;
+-		tx4939_sram_resource.flags = IORESOURCE_MEM;
+-		request_resource(&iomem_resource, &tx4939_sram_resource);
+-	}
+-
+-	/* TMR */
+-	/* disable all timers */
+-	for (i = 0; i < TX4939_NR_TMR; i++)
+-		txx9_tmr_init(TX4939_TMR_REG(i) & 0xfffffffffULL);
+-
+-	/* set PCIC1 reset (required to prevent hangup on BIST) */
+-	txx9_set64(&tx4939_ccfgptr->clkctr, TX4939_CLKCTR_PCI1RST);
+-	pcfg = ____raw_readq(&tx4939_ccfgptr->pcfg);
+-	if (pcfg & (TX4939_PCFG_ET0MODE | TX4939_PCFG_ET1MODE)) {
+-		mdelay(1);	/* at least 128 cpu clock */
+-		/* clear PCIC1 reset */
+-		txx9_clear64(&tx4939_ccfgptr->clkctr, TX4939_CLKCTR_PCI1RST);
+-	} else {
+-		pr_info("%s: stop PCIC1\n", txx9_pcode_str);
+-		/* stop PCIC1 */
+-		txx9_set64(&tx4939_ccfgptr->clkctr, TX4939_CLKCTR_PCI1CKD);
+-	}
+-	if (!(pcfg & TX4939_PCFG_ET0MODE)) {
+-		pr_info("%s: stop ETH0\n", txx9_pcode_str);
+-		txx9_set64(&tx4939_ccfgptr->clkctr, TX4939_CLKCTR_ETH0RST);
+-		txx9_set64(&tx4939_ccfgptr->clkctr, TX4939_CLKCTR_ETH0CKD);
+-	}
+-	if (!(pcfg & TX4939_PCFG_ET1MODE)) {
+-		pr_info("%s: stop ETH1\n", txx9_pcode_str);
+-		txx9_set64(&tx4939_ccfgptr->clkctr, TX4939_CLKCTR_ETH1RST);
+-		txx9_set64(&tx4939_ccfgptr->clkctr, TX4939_CLKCTR_ETH1CKD);
+-	}
+-
+-	_machine_restart = tx4939_machine_restart;
+-	board_be_init = tx4939_be_init;
+-}
+-
+-void __init tx4939_time_init(unsigned int tmrnr)
+-{
+-	if (____raw_readq(&tx4939_ccfgptr->ccfg) & TX4939_CCFG_TINTDIS)
+-		txx9_clockevent_init(TX4939_TMR_REG(tmrnr) & 0xfffffffffULL,
+-				     TXX9_IRQ_BASE + TX4939_IR_TMR(tmrnr),
+-				     TXX9_IMCLK);
+-}
+-
+-void __init tx4939_sio_init(unsigned int sclk, unsigned int cts_mask)
+-{
+-	int i;
+-	unsigned int ch_mask = 0;
+-	__u64 pcfg = __raw_readq(&tx4939_ccfgptr->pcfg);
+-
+-	cts_mask |= ~1; /* only SIO0 have RTS/CTS */
+-	if ((pcfg & TX4939_PCFG_SIO2MODE_MASK) != TX4939_PCFG_SIO2MODE_SIO0)
+-		cts_mask |= 1 << 0; /* disable SIO0 RTS/CTS by PCFG setting */
+-	if ((pcfg & TX4939_PCFG_SIO2MODE_MASK) != TX4939_PCFG_SIO2MODE_SIO2)
+-		ch_mask |= 1 << 2; /* disable SIO2 by PCFG setting */
+-	if (pcfg & TX4939_PCFG_SIO3MODE)
+-		ch_mask |= 1 << 3; /* disable SIO3 by PCFG setting */
+-	for (i = 0; i < 4; i++) {
+-		if ((1 << i) & ch_mask)
+-			continue;
+-		txx9_sio_init(TX4939_SIO_REG(i) & 0xfffffffffULL,
+-			      TXX9_IRQ_BASE + TX4939_IR_SIO(i),
+-			      i, sclk, (1 << i) & cts_mask);
+-	}
+-}
+-
+-#if IS_ENABLED(CONFIG_TC35815)
+-static u32 tx4939_get_eth_speed(struct net_device *dev)
+-{
+-	struct ethtool_link_ksettings cmd;
+-
+-	if (__ethtool_get_link_ksettings(dev, &cmd))
+-		return 100;	/* default 100Mbps */
+-
+-	return cmd.base.speed;
+-}
+-
+-static int tx4939_netdev_event(struct notifier_block *this,
+-			       unsigned long event,
+-			       void *ptr)
+-{
+-	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+-
+-	if (event == NETDEV_CHANGE && netif_carrier_ok(dev)) {
+-		__u64 bit = 0;
+-		if (dev->irq == TXX9_IRQ_BASE + TX4939_IR_ETH(0))
+-			bit = TX4939_PCFG_SPEED0;
+-		else if (dev->irq == TXX9_IRQ_BASE + TX4939_IR_ETH(1))
+-			bit = TX4939_PCFG_SPEED1;
+-		if (bit) {
+-			if (tx4939_get_eth_speed(dev) == 100)
+-				txx9_set64(&tx4939_ccfgptr->pcfg, bit);
+-			else
+-				txx9_clear64(&tx4939_ccfgptr->pcfg, bit);
+-		}
+-	}
+-	return NOTIFY_DONE;
+-}
+-
+-static struct notifier_block tx4939_netdev_notifier = {
+-	.notifier_call = tx4939_netdev_event,
+-	.priority = 1,
+-};
+-
+-void __init tx4939_ethaddr_init(unsigned char *addr0, unsigned char *addr1)
+-{
+-	u64 pcfg = __raw_readq(&tx4939_ccfgptr->pcfg);
+-
+-	if (addr0 && (pcfg & TX4939_PCFG_ET0MODE))
+-		txx9_ethaddr_init(TXX9_IRQ_BASE + TX4939_IR_ETH(0), addr0);
+-	if (addr1 && (pcfg & TX4939_PCFG_ET1MODE))
+-		txx9_ethaddr_init(TXX9_IRQ_BASE + TX4939_IR_ETH(1), addr1);
+-	register_netdevice_notifier(&tx4939_netdev_notifier);
+-}
+-#else
+-void __init tx4939_ethaddr_init(unsigned char *addr0, unsigned char *addr1)
+-{
+-}
+-#endif
+-
+-void __init tx4939_mtd_init(int ch)
+-{
+-	struct physmap_flash_data pdata = {
+-		.width = TX4939_EBUSC_WIDTH(ch) / 8,
+-	};
+-	unsigned long start = txx9_ce_res[ch].start;
+-	unsigned long size = txx9_ce_res[ch].end - start + 1;
+-
+-	if (!(TX4939_EBUSC_CR(ch) & 0x8))
+-		return; /* disabled */
+-	txx9_physmap_flash_init(ch, start, size, &pdata);
+-}
+-
+-#define TX4939_ATA_REG_PHYS(ch) (TX4939_ATA_REG(ch) & 0xfffffffffULL)
+-void __init tx4939_ata_init(void)
+-{
+-	static struct resource ata0_res[] = {
+-		{
+-			.start = TX4939_ATA_REG_PHYS(0),
+-			.end = TX4939_ATA_REG_PHYS(0) + 0x1000 - 1,
+-			.flags = IORESOURCE_MEM,
+-		}, {
+-			.start = TXX9_IRQ_BASE + TX4939_IR_ATA(0),
+-			.flags = IORESOURCE_IRQ,
+-		},
+-	};
+-	static struct resource ata1_res[] = {
+-		{
+-			.start = TX4939_ATA_REG_PHYS(1),
+-			.end = TX4939_ATA_REG_PHYS(1) + 0x1000 - 1,
+-			.flags = IORESOURCE_MEM,
+-		}, {
+-			.start = TXX9_IRQ_BASE + TX4939_IR_ATA(1),
+-			.flags = IORESOURCE_IRQ,
+-		},
+-	};
+-	static struct platform_device ata0_dev = {
+-		.name = "tx4939ide",
+-		.id = 0,
+-		.num_resources = ARRAY_SIZE(ata0_res),
+-		.resource = ata0_res,
+-	};
+-	static struct platform_device ata1_dev = {
+-		.name = "tx4939ide",
+-		.id = 1,
+-		.num_resources = ARRAY_SIZE(ata1_res),
+-		.resource = ata1_res,
+-	};
+-	__u64 pcfg = __raw_readq(&tx4939_ccfgptr->pcfg);
+-
+-	if (pcfg & TX4939_PCFG_ATA0MODE)
+-		platform_device_register(&ata0_dev);
+-	if ((pcfg & (TX4939_PCFG_ATA1MODE |
+-		     TX4939_PCFG_ET1MODE |
+-		     TX4939_PCFG_ET0MODE)) == TX4939_PCFG_ATA1MODE)
+-		platform_device_register(&ata1_dev);
+-}
+-
+-void __init tx4939_rtc_init(void)
+-{
+-	static struct resource res[] = {
+-		{
+-			.start = TX4939_RTC_REG & 0xfffffffffULL,
+-			.end = (TX4939_RTC_REG & 0xfffffffffULL) + 0x100 - 1,
+-			.flags = IORESOURCE_MEM,
+-		}, {
+-			.start = TXX9_IRQ_BASE + TX4939_IR_RTC,
+-			.flags = IORESOURCE_IRQ,
+-		},
+-	};
+-	static struct platform_device rtc_dev = {
+-		.name = "tx4939rtc",
+-		.id = -1,
+-		.num_resources = ARRAY_SIZE(res),
+-		.resource = res,
+-	};
+-
+-	platform_device_register(&rtc_dev);
+-}
+-
+-void __init tx4939_ndfmc_init(unsigned int hold, unsigned int spw,
+-			      unsigned char ch_mask, unsigned char wide_mask)
+-{
+-	struct txx9ndfmc_platform_data plat_data = {
+-		.shift = 1,
+-		.gbus_clock = txx9_gbus_clock,
+-		.hold = hold,
+-		.spw = spw,
+-		.flags = NDFMC_PLAT_FLAG_NO_RSTR | NDFMC_PLAT_FLAG_HOLDADD |
+-			 NDFMC_PLAT_FLAG_DUMMYWRITE,
+-		.ch_mask = ch_mask,
+-		.wide_mask = wide_mask,
+-	};
+-	txx9_ndfmc_init(TX4939_NDFMC_REG & 0xfffffffffULL, &plat_data);
+-}
+-
+-void __init tx4939_dmac_init(int memcpy_chan0, int memcpy_chan1)
+-{
+-	struct txx9dmac_platform_data plat_data = {
+-		.have_64bit_regs = true,
+-	};
+-	int i;
+-
+-	for (i = 0; i < 2; i++) {
+-		plat_data.memcpy_chan = i ? memcpy_chan1 : memcpy_chan0;
+-		txx9_dmac_init(i, TX4939_DMA_REG(i) & 0xfffffffffULL,
+-			       TXX9_IRQ_BASE + TX4939_IR_DMA(i, 0),
+-			       &plat_data);
+-	}
+-}
+-
+-void __init tx4939_aclc_init(void)
+-{
+-	u64 pcfg = __raw_readq(&tx4939_ccfgptr->pcfg);
+-
+-	if ((pcfg & TX4939_PCFG_I2SMODE_MASK) == TX4939_PCFG_I2SMODE_ACLC)
+-		txx9_aclc_init(TX4939_ACLC_REG & 0xfffffffffULL,
+-			       TXX9_IRQ_BASE + TX4939_IR_ACLC, 1, 0, 1);
+-}
+-
+-void __init tx4939_sramc_init(void)
+-{
+-	if (tx4939_sram_resource.start)
+-		txx9_sramc_init(&tx4939_sram_resource);
+-}
+-
+-void __init tx4939_rng_init(void)
+-{
+-	static struct resource res = {
+-		.start = TX4939_RNG_REG & 0xfffffffffULL,
+-		.end = (TX4939_RNG_REG & 0xfffffffffULL) + 0x30 - 1,
+-		.flags = IORESOURCE_MEM,
+-	};
+-	static struct platform_device pdev = {
+-		.name = "tx4939-rng",
+-		.id = -1,
+-		.num_resources = 1,
+-		.resource = &res,
+-	};
+-
+-	platform_device_register(&pdev);
+-}
+-
+-static void __init tx4939_stop_unused_modules(void)
+-{
+-	__u64 pcfg, rst = 0, ckd = 0;
+-	char buf[128];
+-
+-	buf[0] = '\0';
+-	local_irq_disable();
+-	pcfg = ____raw_readq(&tx4939_ccfgptr->pcfg);
+-	if ((pcfg & TX4939_PCFG_I2SMODE_MASK) !=
+-	    TX4939_PCFG_I2SMODE_ACLC) {
+-		rst |= TX4939_CLKCTR_ACLRST;
+-		ckd |= TX4939_CLKCTR_ACLCKD;
+-		strcat(buf, " ACLC");
+-	}
+-	if ((pcfg & TX4939_PCFG_I2SMODE_MASK) !=
+-	    TX4939_PCFG_I2SMODE_I2S &&
+-	    (pcfg & TX4939_PCFG_I2SMODE_MASK) !=
+-	    TX4939_PCFG_I2SMODE_I2S_ALT) {
+-		rst |= TX4939_CLKCTR_I2SRST;
+-		ckd |= TX4939_CLKCTR_I2SCKD;
+-		strcat(buf, " I2S");
+-	}
+-	if (!(pcfg & TX4939_PCFG_ATA0MODE)) {
+-		rst |= TX4939_CLKCTR_ATA0RST;
+-		ckd |= TX4939_CLKCTR_ATA0CKD;
+-		strcat(buf, " ATA0");
+-	}
+-	if (!(pcfg & TX4939_PCFG_ATA1MODE)) {
+-		rst |= TX4939_CLKCTR_ATA1RST;
+-		ckd |= TX4939_CLKCTR_ATA1CKD;
+-		strcat(buf, " ATA1");
+-	}
+-	if (pcfg & TX4939_PCFG_SPIMODE) {
+-		rst |= TX4939_CLKCTR_SPIRST;
+-		ckd |= TX4939_CLKCTR_SPICKD;
+-		strcat(buf, " SPI");
+-	}
+-	if (!(pcfg & (TX4939_PCFG_VSSMODE | TX4939_PCFG_VPSMODE))) {
+-		rst |= TX4939_CLKCTR_VPCRST;
+-		ckd |= TX4939_CLKCTR_VPCCKD;
+-		strcat(buf, " VPC");
+-	}
+-	if ((pcfg & TX4939_PCFG_SIO2MODE_MASK) != TX4939_PCFG_SIO2MODE_SIO2) {
+-		rst |= TX4939_CLKCTR_SIO2RST;
+-		ckd |= TX4939_CLKCTR_SIO2CKD;
+-		strcat(buf, " SIO2");
+-	}
+-	if (pcfg & TX4939_PCFG_SIO3MODE) {
+-		rst |= TX4939_CLKCTR_SIO3RST;
+-		ckd |= TX4939_CLKCTR_SIO3CKD;
+-		strcat(buf, " SIO3");
+-	}
+-	if (rst | ckd) {
+-		txx9_set64(&tx4939_ccfgptr->clkctr, rst);
+-		txx9_set64(&tx4939_ccfgptr->clkctr, ckd);
+-	}
+-	local_irq_enable();
+-	if (buf[0])
+-		pr_info("%s: stop%s\n", txx9_pcode_str, buf);
+-}
+-
+-static int __init tx4939_late_init(void)
+-{
+-	if (txx9_pcode != 0x4939)
+-		return -ENODEV;
+-	tx4939_stop_unused_modules();
+-	return 0;
+-}
+-late_initcall(tx4939_late_init);
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 814b3d0ca7b7..a70d27e4ff7f 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -226,19 +226,6 @@ config HW_RANDOM_VIRTIO
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called virtio-rng.  If unsure, say N.
+ 
+-config HW_RANDOM_TX4939
+-	tristate "TX4939 Random Number Generator support"
+-	depends on SOC_TX4939
+-	default HW_RANDOM
+-	help
+-	  This driver provides kernel-side support for the Random Number
+-	  Generator hardware found on TX4939 SoC.
+-
+-	  To compile this driver as a module, choose M here: the
+-	  module will be called tx4939-rng.
+-
+-	  If unsure, say Y.
+-
+ config HW_RANDOM_MXC_RNGA
+ 	tristate "Freescale i.MX RNGA Random Number Generator"
+ 	depends on SOC_IMX31
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index a5a1c765a394..b4f9b621b447 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -20,7 +20,6 @@ obj-$(CONFIG_HW_RANDOM_OMAP) += omap-rng.o
+ obj-$(CONFIG_HW_RANDOM_OMAP3_ROM) += omap3-rom-rng.o
+ obj-$(CONFIG_HW_RANDOM_PASEMI) += pasemi-rng.o
+ obj-$(CONFIG_HW_RANDOM_VIRTIO) += virtio-rng.o
+-obj-$(CONFIG_HW_RANDOM_TX4939) += tx4939-rng.o
+ obj-$(CONFIG_HW_RANDOM_MXC_RNGA) += mxc-rnga.o
+ obj-$(CONFIG_HW_RANDOM_IMX_RNGC) += imx-rngc.o
+ obj-$(CONFIG_HW_RANDOM_INGENIC_RNG) += ingenic-rng.o
+diff --git a/drivers/char/hw_random/tx4939-rng.c b/drivers/char/hw_random/tx4939-rng.c
+deleted file mode 100644
+index c8bd34e740fd..000000000000
+--- a/drivers/char/hw_random/tx4939-rng.c
++++ /dev/null
+@@ -1,157 +0,0 @@
+-/*
+- * RNG driver for TX4939 Random Number Generators (RNG)
+- *
+- * Copyright (C) 2009 Atsushi Nemoto <anemo@mba.ocn.ne.jp>
+- *
+- * This file is subject to the terms and conditions of the GNU General Public
+- * License.  See the file "COPYING" in the main directory of this archive
+- * for more details.
+- */
+-#include <linux/err.h>
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/init.h>
+-#include <linux/delay.h>
+-#include <linux/io.h>
+-#include <linux/platform_device.h>
+-#include <linux/hw_random.h>
+-#include <linux/gfp.h>
+-
+-#define TX4939_RNG_RCSR		0x00000000
+-#define TX4939_RNG_ROR(n)	(0x00000018 + (n) * 8)
+-
+-#define TX4939_RNG_RCSR_INTE	0x00000008
+-#define TX4939_RNG_RCSR_RST	0x00000004
+-#define TX4939_RNG_RCSR_FIN	0x00000002
+-#define TX4939_RNG_RCSR_ST	0x00000001
+-
+-struct tx4939_rng {
+-	struct hwrng rng;
+-	void __iomem *base;
+-	u64 databuf[3];
+-	unsigned int data_avail;
+-};
+-
+-static void rng_io_start(void)
+-{
+-#ifndef CONFIG_64BIT
+-	/*
+-	 * readq is reading a 64-bit register using a 64-bit load.  On
+-	 * a 32-bit kernel however interrupts or any other processor
+-	 * exception would clobber the upper 32-bit of the processor
+-	 * register so interrupts need to be disabled.
+-	 */
+-	local_irq_disable();
+-#endif
+-}
+-
+-static void rng_io_end(void)
+-{
+-#ifndef CONFIG_64BIT
+-	local_irq_enable();
+-#endif
+-}
+-
+-static u64 read_rng(void __iomem *base, unsigned int offset)
+-{
+-	return ____raw_readq(base + offset);
+-}
+-
+-static void write_rng(u64 val, void __iomem *base, unsigned int offset)
+-{
+-	return ____raw_writeq(val, base + offset);
+-}
+-
+-static int tx4939_rng_data_present(struct hwrng *rng, int wait)
+-{
+-	struct tx4939_rng *rngdev = container_of(rng, struct tx4939_rng, rng);
+-	int i;
+-
+-	if (rngdev->data_avail)
+-		return rngdev->data_avail;
+-	for (i = 0; i < 20; i++) {
+-		rng_io_start();
+-		if (!(read_rng(rngdev->base, TX4939_RNG_RCSR)
+-		      & TX4939_RNG_RCSR_ST)) {
+-			rngdev->databuf[0] =
+-				read_rng(rngdev->base, TX4939_RNG_ROR(0));
+-			rngdev->databuf[1] =
+-				read_rng(rngdev->base, TX4939_RNG_ROR(1));
+-			rngdev->databuf[2] =
+-				read_rng(rngdev->base, TX4939_RNG_ROR(2));
+-			rngdev->data_avail =
+-				sizeof(rngdev->databuf) / sizeof(u32);
+-			/* Start RNG */
+-			write_rng(TX4939_RNG_RCSR_ST,
+-				  rngdev->base, TX4939_RNG_RCSR);
+-			wait = 0;
+-		}
+-		rng_io_end();
+-		if (!wait)
+-			break;
+-		/* 90 bus clock cycles by default for generation */
+-		ndelay(90 * 5);
+-	}
+-	return rngdev->data_avail;
+-}
+-
+-static int tx4939_rng_data_read(struct hwrng *rng, u32 *buffer)
+-{
+-	struct tx4939_rng *rngdev = container_of(rng, struct tx4939_rng, rng);
+-
+-	rngdev->data_avail--;
+-	*buffer = *((u32 *)&rngdev->databuf + rngdev->data_avail);
+-	return sizeof(u32);
+-}
+-
+-static int __init tx4939_rng_probe(struct platform_device *dev)
+-{
+-	struct tx4939_rng *rngdev;
+-	int i;
+-
+-	rngdev = devm_kzalloc(&dev->dev, sizeof(*rngdev), GFP_KERNEL);
+-	if (!rngdev)
+-		return -ENOMEM;
+-	rngdev->base = devm_platform_ioremap_resource(dev, 0);
+-	if (IS_ERR(rngdev->base))
+-		return PTR_ERR(rngdev->base);
+-
+-	rngdev->rng.name = dev_name(&dev->dev);
+-	rngdev->rng.data_present = tx4939_rng_data_present;
+-	rngdev->rng.data_read = tx4939_rng_data_read;
+-
+-	rng_io_start();
+-	/* Reset RNG */
+-	write_rng(TX4939_RNG_RCSR_RST, rngdev->base, TX4939_RNG_RCSR);
+-	write_rng(0, rngdev->base, TX4939_RNG_RCSR);
+-	/* Start RNG */
+-	write_rng(TX4939_RNG_RCSR_ST, rngdev->base, TX4939_RNG_RCSR);
+-	rng_io_end();
+-	/*
+-	 * Drop first two results.  From the datasheet:
+-	 * The quality of the random numbers generated immediately
+-	 * after reset can be insufficient.  Therefore, do not use
+-	 * random numbers obtained from the first and second
+-	 * generations; use the ones from the third or subsequent
+-	 * generation.
+-	 */
+-	for (i = 0; i < 2; i++) {
+-		rngdev->data_avail = 0;
+-		if (!tx4939_rng_data_present(&rngdev->rng, 1))
+-			return -EIO;
+-	}
+-
+-	platform_set_drvdata(dev, rngdev);
+-	return devm_hwrng_register(&dev->dev, &rngdev->rng);
+-}
+-
+-static struct platform_driver tx4939_rng_driver = {
+-	.driver		= {
+-		.name	= "tx4939-rng",
+-	},
+-};
+-
+-module_platform_driver_probe(tx4939_rng_driver, tx4939_rng_probe);
+-
+-MODULE_DESCRIPTION("H/W Random Number Generator (RNG) driver for TX4939");
+-MODULE_LICENSE("GPL");
+diff --git a/drivers/mtd/nand/raw/Kconfig b/drivers/mtd/nand/raw/Kconfig
+index 67b7cb67c030..8af11511ddb0 100644
+--- a/drivers/mtd/nand/raw/Kconfig
++++ b/drivers/mtd/nand/raw/Kconfig
+@@ -308,7 +308,7 @@ config MTD_NAND_DAVINCI
+ 
+ config MTD_NAND_TXX9NDFMC
+ 	tristate "TXx9 NAND controller"
+-	depends on SOC_TX4938 || SOC_TX4939 || COMPILE_TEST
++	depends on SOC_TX4938 || COMPILE_TEST
+ 	depends on HAS_IOMEM
+ 	help
+ 	  This enables the NAND flash controller on the TXx9 SoCs.
+-- 
+2.29.2
+
