@@ -2,37 +2,59 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94915C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 09:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5661C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 12:24:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240018AbhK3JQL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 04:16:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37640 "EHLO
+        id S232530AbhK3M1r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 07:27:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239975AbhK3JQL (ORCPT
+        with ESMTP id S232521AbhK3M1q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 04:16:11 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BD44C061574;
-        Tue, 30 Nov 2021 01:12:52 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 7E98BCE1812;
-        Tue, 30 Nov 2021 09:12:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B893C53FC1;
-        Tue, 30 Nov 2021 09:12:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1638263568;
-        bh=4JcYK/yqU0SL3yp2LRtgP37CCPXprJJvr28ExlWkeAc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=xcIa+VQtbjb0+teyocx83xsLCtG1mvtLcQcuk9O0YJvK7dIncxSZ96CSSqUv9Gpkp
-         Wpr/Oq8MAphjBaKb9FiltQR3ZAKSBi5gpXgwd/+RANyP1cXGD5YFpmjrQUgjr+L7So
-         7e8ADHNnCk8c4X6U0ozzM4Hd0b2lwHOnASP6vGw8=
-Date:   Tue, 30 Nov 2021 10:12:46 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Stephan Mueller <smueller@chronox.de>
-Cc:     Sandy Harris <sandyinchina@gmail.com>,
+        Tue, 30 Nov 2021 07:27:46 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE01BC061574;
+        Tue, 30 Nov 2021 04:24:27 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id h24so15236956pjq.2;
+        Tue, 30 Nov 2021 04:24:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc;
+        bh=5WgDImV6rHMtKmWQnOhQ4KAC1ALI9IdBPOj3Sa2yiKk=;
+        b=cOkEDc9/kUR+6vRryVjIBFx2VXyWkajRZ7s9V0YejauEgRFbiGjVBjEwHEKsQojUxZ
+         voVd6yw3Lb1D4Ier720q3r+wczttifpJYD61/Wq4HfbJjhTQrRTAnP4q/i3tUgssEjQT
+         3x60OZ0YjUHrOsxCC4YTC/a4X+L/9gAYKJR0lR4qjJh/veRNsx31VKqMwCZoem+JO509
+         s0UFGoFtxfkAMPBtaopZug4zlBf0DUQUFuMU9h0cdlhvl/pWTbThOKfQ+uXwsujFvM0C
+         tpTZribKXE6kyDpyVNbKozNW3spB4SLgf462CKODU8q2dJ9+Tv1cTgEmY+0DD4VlRAKi
+         jgOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc;
+        bh=5WgDImV6rHMtKmWQnOhQ4KAC1ALI9IdBPOj3Sa2yiKk=;
+        b=LHVE78nOuLlmvYXNYJMyKk9nkXVReQproc7L3TEyigovVsfpA4mVzah00+LV6qa4GK
+         wJZmIV+xC3qdhcvJv2OgvUNF6k1QxrQMKrZ+fFaZjxV8Gj6LcX7LvEbur7cfjoV5Ztcn
+         u9oqSfw8oPoc8Du/nuhvYkkYgnIcj2BRrXFnbcfHGYkRHHJMyrxHxAS6FFSQfQKCT8gZ
+         YekIg/bhHWBdDeHidYTDFPehwg4yyndL1D/g8KExw69/Du9SvH6aiAvTPbGxwNypfEKm
+         mcpV0BkcstM45qjyXyybKnLEiN8w0sv7adlE/eLOEDh4aQKcpaWRYAGTqx6W9/BluuNT
+         llYA==
+X-Gm-Message-State: AOAM53353gdW4nU66BAb0XBxC6P2qvaaT+064NkZf/VxFiKcjQNjqFUs
+        lvC/zABVvdpEdOAjbKn/n3LatxhBUEqWsdDL4Qw=
+X-Google-Smtp-Source: ABdhPJwuFEBazWnC9hBZfVzu/hrurOmFBj1P6GXb+k8Vn41t34/SXi82nPwgbW3MbljTepMoRtOz1eZzSnF1sF3POSA=
+X-Received: by 2002:a17:90b:4f92:: with SMTP id qe18mr5666408pjb.83.1638275067160;
+ Tue, 30 Nov 2021 04:24:27 -0800 (PST)
+MIME-Version: 1.0
+References: <2036923.9o76ZdvQCi@positron.chronox.de> <22137816.pfsBpAd9cS@tauon.chronox.de>
+ <YaEJtv4A6SoDFYjc@kroah.com> <9311513.S0ZZtNTvxh@tauon.chronox.de> <YaT+9MueQIa5p8xr@kroah.com>
+In-Reply-To: <YaT+9MueQIa5p8xr@kroah.com>
+Reply-To: noloader@gmail.com
+From:   Jeffrey Walton <noloader@gmail.com>
+Date:   Tue, 30 Nov 2021 07:24:15 -0500
+Message-ID: <CAH8yC8nokDTGs8H6nGDkvDxRHN_qoFROAfWnTv-q6UqzYvoSWA@mail.gmail.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Stephan Mueller <smueller@chronox.de>,
         Simo Sorce <simo@redhat.com>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>, Tso Ted <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
@@ -62,58 +84,37 @@ Cc:     Sandy Harris <sandyinchina@gmail.com>,
         Petr Tesarik <ptesarik@suse.cz>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>,
-        Jirka Hladky <jhladky@redhat.com>,
-        John Kelsey <crypto.jmk@gmail.com>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-Message-ID: <YaXrDnsE4+xSGDep@kroah.com>
-References: <2036923.9o76ZdvQCi@positron.chronox.de>
- <CACXcFmntNAWYCwQ6CmH5c3pn3fXbxKh=j75GZUeLkuqi3QdS+A@mail.gmail.com>
- <YaXZCdtyylHMa29o@kroah.com>
- <2288548.vrFIavQkS3@tauon.chronox.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2288548.vrFIavQkS3@tauon.chronox.de>
+        Jirka Hladky <jhladky@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 30, 2021 at 09:56:41AM +0100, Stephan Mueller wrote:
-> Am Dienstag, 30. November 2021, 08:55:53 CET schrieb Greg Kroah-Hartman:
-> 
-> Hi Greg,
-> 
-> > On Tue, Nov 30, 2021 at 03:32:38PM +0800, Sandy Harris wrote:
-> > > I think we should eliminate add_disk_randomness() since it does
-> > > not work well on current hardware. Also, FIPS requires that
-> > > entropy sources be independent & add_interrupt_randomness()
-> > > depends on the same disk events so these sources may not be.
-> > 
-> > This whole "may not be" guessing game when it comes to FIPS
-> > certification is a huge problem.  I have heard of different vendors
-> > getting different feedback and different implementations "passing" in
-> > different ways that totally contradict each other.  It seems that there
-> > is a whole certification industry built up that you can use to try to
-> > pass these tests, but those tests are different depending on the vendor
-> > you use for this, making a total mess.
-> > 
-> > So perhaps getting solid answers, and having the FIPS people actually
-> > implement (or at least review) the changes and submit them (this is all
-> > open for everyone to see and work on), would be the best thing as that
-> > would at least let us know that this is what they require.
-> 
-> Just as a note: I am working as FIPS tester. I am part of the NIST entropy 
-> working group which oversees the entropy related requirements. The LRNG's FIPS 
-> compliant implementation is directly based on those requirements. The LRNG was 
-> even reviewed by NIST personnel who mentioned that they do not see any 
-> contradiction to the specification. Finally, we are pursuing to get a separate 
-> ENT validation from NIST for the LRNG which would indicate that the LRNG meets 
-> all their requirements.
+On Mon, Nov 29, 2021 at 6:07 PM Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
+> ...
+> Sometimes, yes, it is valid to have different implementations for things
+> that do different things in the same area (like filesystems), but for a
+> core function of the kernel, so far the existing random maintainer has
+> not wanted to have multiple implementations.  Same goes for other parts
+> of the kernel, it's not specific only to this one very tiny driver.
+>
+> As a counterpoint, we do not allow duplicate drivers that control the
+> same hardware types in the tree.  We have tried that in the past and it
+> was a nightmare to support and maintain and just caused massive user
+> confusion as well.  One can argue that the random driver is in this same
+> category.
 
-That's great, so you would be one of the best people to help submit
-changes to the existing code to have it be compliant, instead of
-replacing it entirely :)
+I think an argument could be made that they are different drivers
+since they have different requirements and security goals. I don't
+think it matters where the requirements came from, whether it was ad
+hoc from the developer, NIST, KISA, CRYPTREC, NESSIE, or another
+organization.
 
-thanks,
+Maybe the problem is with the name of the driver? Perhaps the current
+driver should be named random-linux, Stephan's driver should be named
+random-nist, and the driver should be wired up based on a user's
+selection. That should sidestep the problems associated with the
+"duplicate drivers" policy.
 
-greg k-h
+Jeff
