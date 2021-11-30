@@ -2,40 +2,40 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB32C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 07:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB995C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 07:57:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239281AbhK3H7s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 02:59:48 -0500
-Received: from mx07-00178001.pphosted.com ([185.132.182.106]:54830 "EHLO
+        id S231362AbhK3IA3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 03:00:29 -0500
+Received: from mx07-00178001.pphosted.com ([185.132.182.106]:37592 "EHLO
         mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239250AbhK3H7p (ORCPT
+        by vger.kernel.org with ESMTP id S234505AbhK3IAY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 02:59:45 -0500
-Received: from pps.filterd (m0046668.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1AU13TYL012031;
-        Tue, 30 Nov 2021 08:56:14 +0100
+        Tue, 30 Nov 2021 03:00:24 -0500
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1AU6fCtI000697;
+        Tue, 30 Nov 2021 08:56:52 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-type; s=selector1;
- bh=fx6j3miJbKPP5I8Sz7a5Q00e33pBgZpv+3rirgFBPuQ=;
- b=bbboV5MVnIMw9kQwfALfh1u2ajMIMb2+6djhgPVHpztY/cCB/xkVU5NJOmQ2+VG2MveX
- cvZ0J9zULERWo1MjfZPx2Q5foIAc/9kd9zhmzB4QMaW0qkLthFvkN7S2gi1QmIyGTHXB
- BQlm7Fpj+TZmcisHrI9O+X9lKSbKMgBgw/qMbXGspT1DObC8lnhPZVR2+G/PryzflNcG
- aWq6CFns3F6ggQxvlXWUmU0s8STSWRhhyafSagYJQuMFVBPONSL2jB+ZEo3dzFjzkbxR
- WmXwqN2KToDbZP/x9QUiK2dmNJP94g67oTXjCvQ9HLQyaAG7KuxKbnExfZ0FVN/uplfE 7g== 
+ bh=s7kOc9rz1OlOoz1QIFijPdtLi7gNjG7VJzQJv0JYfT0=;
+ b=dcHKDLg4DolBQV+nH3GUtBJC3heU+jmRnpqiODbE7qczOrP4JPO99rANtPrAUR+UGbNl
+ 4axmyJ1YCAQFmZRPoKWNp9Zkch0bE6/f6Oox0CLROlFQA1BJUVcPZ6NI3TwmXnTunYN1
+ rmRfZP/U6fg5cvkfkp8IxF860tE0y+hf90JYTXKGod2lsp2Hd0ef+xq5nhlIhLWmDJIo
+ DvMr9YPYsfLiJ/flhtM/aMHePyQy5ILbWlOb7fej3UeQYhd6VXPPZKb8TPP+UNGTQotM
+ Xtlr5qakIocx4uJsHOo2TDFgAHBTpx/nK6EVHEPSCCGLkH4KuELHNMOG/A6jObiyMDnD Kw== 
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3cn9y7sj1f-1
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3cnewbgdpn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Nov 2021 08:56:14 +0100
+        Tue, 30 Nov 2021 08:56:52 +0100
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id A047C10002A;
-        Tue, 30 Nov 2021 08:56:13 +0100 (CET)
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 92F7710002A;
+        Tue, 30 Nov 2021 08:56:51 +0100 (CET)
 Received: from Webmail-eu.st.com (sfhdag2node2.st.com [10.75.127.5])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 979E321A222;
-        Tue, 30 Nov 2021 08:56:13 +0100 (CET)
-Received: from localhost (10.75.127.48) by SFHDAG2NODE2.st.com (10.75.127.5)
- with Microsoft SMTP Server (TLS) id 15.0.1497.26; Tue, 30 Nov 2021 08:56:13
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 89C8721A224;
+        Tue, 30 Nov 2021 08:56:51 +0100 (CET)
+Received: from localhost (10.75.127.44) by SFHDAG2NODE2.st.com (10.75.127.5)
+ with Microsoft SMTP Server (TLS) id 15.0.1497.26; Tue, 30 Nov 2021 08:56:51
  +0100
 From:   Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
@@ -49,16 +49,16 @@ CC:     Marek Vasut <marex@denx.de>,
         <linux-stm32@st-md-mailman.stormreply.com>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v4 7/9] crypto: stm32/cryp - fix lrw chaining mode
-Date:   Tue, 30 Nov 2021 08:54:59 +0100
-Message-ID: <20211130075501.21958-8-nicolas.toromanoff@foss.st.com>
+Subject: [PATCH v4 9/9] crypto: stm32/cryp - reorder hw initialization
+Date:   Tue, 30 Nov 2021 08:55:01 +0100
+Message-ID: <20211130075501.21958-10-nicolas.toromanoff@foss.st.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20211130075501.21958-1-nicolas.toromanoff@foss.st.com>
 References: <20211130075501.21958-1-nicolas.toromanoff@foss.st.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Originating-IP: [10.75.127.48]
-X-ClientProxiedBy: SFHDAG1NODE2.st.com (10.75.127.2) To SFHDAG2NODE2.st.com
+X-Originating-IP: [10.75.127.44]
+X-ClientProxiedBy: SFHDAG1NODE3.st.com (10.75.127.3) To SFHDAG2NODE2.st.com
  (10.75.127.5)
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
@@ -67,33 +67,96 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This fixes the lrw autotest if lrw uses the CRYP as the AES block cipher
-provider (as ecb(aes)). At end of request, CRYP should not update the IV
-in case of ECB chaining mode. Indeed the ECB chaining mode never uses
-the IV, but the software LRW chaining mode uses the IV field as
-a counter and due to the (unexpected) update done by CRYP while the AES
-block process, the counter get a wrong value when the IV overflow.
-
-Fixes: 5f49f18d27cd ("crypto: stm32/cryp - update to return iv_out")
+The CRYP IP checks the written key depending of the configuration, it's
+safer to write the whole configuration to hardware then the key to avoid
+unexpected key rejection.
 
 Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
 ---
- drivers/crypto/stm32/stm32-cryp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/stm32/stm32-cryp.c | 39 ++++++++++++++++++++-----------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
-index 3f71d927843c..d3aa0afbe365 100644
+index faae7ad262ac..c6640f616d8d 100644
 --- a/drivers/crypto/stm32/stm32-cryp.c
 +++ b/drivers/crypto/stm32/stm32-cryp.c
-@@ -644,7 +644,7 @@ static void stm32_cryp_finish_req(struct stm32_cryp *cryp, int err)
- 		/* Phase 4 : output tag */
- 		err = stm32_cryp_read_auth_tag(cryp);
+@@ -232,6 +232,11 @@ static inline int stm32_cryp_wait_busy(struct stm32_cryp *cryp)
+ 			!(status & SR_BUSY), 10, 100000);
+ }
  
--	if (!err && (!(is_gcm(cryp) || is_ccm(cryp))))
-+	if (!err && (!(is_gcm(cryp) || is_ccm(cryp) || is_ecb(cryp))))
- 		stm32_cryp_get_iv(cryp);
++static inline void stm32_cryp_enable(struct stm32_cryp *cryp)
++{
++	writel_relaxed(readl_relaxed(cryp->regs + CRYP_CR) | CR_CRYPEN, cryp->regs + CRYP_CR);
++}
++
+ static inline int stm32_cryp_wait_enable(struct stm32_cryp *cryp)
+ {
+ 	u32 status;
+@@ -534,9 +539,6 @@ static int stm32_cryp_hw_init(struct stm32_cryp *cryp)
+ 	/* Disable interrupt */
+ 	stm32_cryp_write(cryp, CRYP_IMSCR, 0);
  
- 	if (cryp->sgs_copied) {
+-	/* Set key */
+-	stm32_cryp_hw_write_key(cryp);
+-
+ 	/* Set configuration */
+ 	cfg = CR_DATA8 | CR_FFLUSH;
+ 
+@@ -562,23 +564,36 @@ static int stm32_cryp_hw_init(struct stm32_cryp *cryp)
+ 	/* AES ECB/CBC decrypt: run key preparation first */
+ 	if (is_decrypt(cryp) &&
+ 	    ((hw_mode == CR_AES_ECB) || (hw_mode == CR_AES_CBC))) {
+-		stm32_cryp_write(cryp, CRYP_CR, cfg | CR_AES_KP | CR_CRYPEN);
++		/* Configure in key preparation mode */
++		stm32_cryp_write(cryp, CRYP_CR, cfg | CR_AES_KP);
+ 
++		/* Set key only after full configuration done */
++		stm32_cryp_hw_write_key(cryp);
++
++		/* Start prepare key */
++		stm32_cryp_enable(cryp);
+ 		/* Wait for end of processing */
+ 		ret = stm32_cryp_wait_busy(cryp);
+ 		if (ret) {
+ 			dev_err(cryp->dev, "Timeout (key preparation)\n");
+ 			return ret;
+ 		}
+-	}
+ 
+-	cfg |= hw_mode;
++		cfg |= hw_mode | CR_DEC_NOT_ENC;
+ 
+-	if (is_decrypt(cryp))
+-		cfg |= CR_DEC_NOT_ENC;
++		/* Apply updated config (Decrypt + algo) and flush */
++		stm32_cryp_write(cryp, CRYP_CR, cfg);
++	} else {
++		cfg |= hw_mode;
++		if (is_decrypt(cryp))
++			cfg |= CR_DEC_NOT_ENC;
+ 
+-	/* Apply config and flush (valid when CRYPEN = 0) */
+-	stm32_cryp_write(cryp, CRYP_CR, cfg);
++		/* Apply config and flush */
++		stm32_cryp_write(cryp, CRYP_CR, cfg);
++
++		/* Set key only after configuration done */
++		stm32_cryp_hw_write_key(cryp);
++	}
+ 
+ 	switch (hw_mode) {
+ 	case CR_AES_GCM:
+@@ -606,9 +621,7 @@ static int stm32_cryp_hw_init(struct stm32_cryp *cryp)
+ 	}
+ 
+ 	/* Enable now */
+-	cfg |= CR_CRYPEN;
+-
+-	stm32_cryp_write(cryp, CRYP_CR, cfg);
++	stm32_cryp_enable(cryp);
+ 
+ 	return 0;
+ }
 -- 
 2.17.1
 
