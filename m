@@ -2,236 +2,231 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B15C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 17:08:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C38C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 17:38:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244654AbhK3RMQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 12:12:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56698 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243233AbhK3RMQ (ORCPT
+        id S244943AbhK3RmK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 12:42:10 -0500
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:58848 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244935AbhK3RmJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 12:12:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638292136;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7K30WnjkuEnR0TFOmhGj++nMZbWrnMpgZrgfYl/y8Q0=;
-        b=ORx9/m6aU0/j5BToHHtaoav0R21UmfrBXLxMj8bc9YVW48qWsdYggnVVccFOCsOW6oFdTp
-        HLmNI70J3xcrFP0SXtvPLcxRQD3ndtOI8J7Wysldo35p6ATutdH0wdVt1uTrJSFizfv6Li
-        U2wOdBzaWWWXNLzHCPBwAHhUKgwJlPI=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-390-7cSIku7XNaKi7zJOsZMsLQ-1; Tue, 30 Nov 2021 12:08:55 -0500
-X-MC-Unique: 7cSIku7XNaKi7zJOsZMsLQ-1
-Received: by mail-qk1-f200.google.com with SMTP id s8-20020a05620a254800b0046d6993d174so14034439qko.3
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Nov 2021 09:08:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:organization:user-agent:mime-version
-         :content-transfer-encoding;
-        bh=7K30WnjkuEnR0TFOmhGj++nMZbWrnMpgZrgfYl/y8Q0=;
-        b=R2eRTPvY5H2lHrp3t4OnjLcAcTQZRDEI1EURoX4hy57rL7EMrJ/hN1ihGn0ujRViWm
-         I9HzkOfq80Dop0tmi0G82AAXQdArfwdypr+d7j0RgjVeZylzLwkFXNFYgbVhQDSamSC8
-         QfxAJv2P1IUQ7/eqpJFlBPz8eSFtB/xOQ3s+u5MWLZbuV7VHwiYxS5Qm+SBqrJDBfoGE
-         tsD511mHoDGgsmsuGDXf/54jK2+RkY+eSxu3C9VPAJSQ9ZyLo0WFzmnJ2p3/LjvqtFUS
-         fO6j7gQ0/+de9uHgDKWLfDdIIdX+W/osyc5UE5VjfQDYhi2LqpOTllpevidkrl8v/rSi
-         8Nxg==
-X-Gm-Message-State: AOAM531IbVNau5dW2TLAJDnTKvVu7R23SZ91Pd05eviF9I0G0SalZ4kd
-        3734R+EQsFFGsbM43kVwda/37vSjDN21bBc3Ue3wCEdXjvTy9wycBL9UtZDR5t/VkW987N9zn5f
-        /OytSChABvVBOLVTvXn+RIOk1
-X-Received: by 2002:a05:620a:17a2:: with SMTP id ay34mr516389qkb.543.1638292134475;
-        Tue, 30 Nov 2021 09:08:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwfOvEddTXllJYDns2FXJd+Ixkks0Jpy+tw+aPyiZlvUhKtZP+GM/0LBApC5tq++47DqSPywA==
-X-Received: by 2002:a05:620a:17a2:: with SMTP id ay34mr516351qkb.543.1638292134211;
-        Tue, 30 Nov 2021 09:08:54 -0800 (PST)
-Received: from m8.users.ipa.redhat.com (cpe-158-222-141-151.nyc.res.rr.com. [158.222.141.151])
-        by smtp.gmail.com with ESMTPSA id u21sm11136841qtw.29.2021.11.30.09.08.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Nov 2021 09:08:53 -0800 (PST)
-Message-ID: <67cea601fd6b3e1deb6fe0c3401ca8410219ecf1.camel@redhat.com>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-From:   Simo Sorce <simo@redhat.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Jeffrey Walton <noloader@gmail.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Tso Ted <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Peter Matthias <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Andy Lavr <andy.lavr@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Petr Tesarik <ptesarik@suse.cz>,
-        John Haxby <john.haxby@oracle.com>,
-        Alexander Lobakin <alobakin@mailbox.org>,
-        Jirka Hladky <jhladky@redhat.com>
-Date:   Tue, 30 Nov 2021 12:08:51 -0500
-In-Reply-To: <YaZHKHjomEivul6U@kroah.com>
-References: <2036923.9o76ZdvQCi@positron.chronox.de>
-         <22137816.pfsBpAd9cS@tauon.chronox.de> <YaEJtv4A6SoDFYjc@kroah.com>
-         <9311513.S0ZZtNTvxh@tauon.chronox.de> <YaT+9MueQIa5p8xr@kroah.com>
-         <CAH8yC8nokDTGs8H6nGDkvDxRHN_qoFROAfWnTv-q6UqzYvoSWA@mail.gmail.com>
-         <YaYvYdnSaAvS8MAk@kroah.com>
-         <ac123d96b31f4a51b167b4e85a205f31a6c97876.camel@redhat.com>
-         <YaZHKHjomEivul6U@kroah.com>
-Organization: Red Hat
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
+        Tue, 30 Nov 2021 12:42:09 -0500
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AUHYMa3019746;
+        Tue, 30 Nov 2021 17:38:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version; s=corp-2021-07-09;
+ bh=KrNS8J8peoBIOLYOyxCHxqIdVOXlgA7akUdJJYcxt3o=;
+ b=gKFMY49rv6SxBthaZtCeNnrYS/1M0LNEYbnnk6f6spNkLMKQfhp8uYzqSFfEIzPXD+dz
+ oZnGnMjFYYD4YMuAa+Q/y6gbfBTDemBu9nNaqMxfwdeb8bokEenawGmW5vZIL6ToNaP2
+ 3jeeCdGOoSOKxGy6amN/K8g0/i8SY2F8JiwMWd3Fo/yupTvB7T7c29SE9BZnDUzzJrOI
+ AsddbUKjpfVnLm3ytf/k5paImnpYppoP+tDTcX9Lxe2ox3uxlgEBEPBapC5VwGZ53EVe
+ Rp4cy2eGPWlvZyWjR5x7y6mbs0AxltCvcifryXy/5ShBkoCvVpoQGLwiXj6OnVko7Fq8 Yg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3cmvmwu945-15
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Nov 2021 17:38:23 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1AUHLmJb152834;
+        Tue, 30 Nov 2021 17:21:51 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2107.outbound.protection.outlook.com [104.47.55.107])
+        by userp3030.oracle.com with ESMTP id 3ck9sywmqc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Nov 2021 17:21:51 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BKbMVlWsY7a3mHzdeKhqMd67bjoie/8VSmnYK/fZcpL/SlGgvgl11YQzOUKLgOlN8Uye+47+yiMxgSPfM/2goz4Zq6I0E89vppOMSRDKqEQ56V1QOseUrie2Y8tKHlUZYA7t5N4sovOr7J5qPiQTe9a3KJ2VtDYYdGZx5Lxu73nwG9AaGHM+9L6utLdsi+KzwFE5aWmXlqn5xlhZJmJHhEDK0dShvYkawjrsGhr4sKkaOVGpm0+X4co1T9AZj3dUeKUN/k9O1HN/Z+YPNdIWcOj8PjFh7gTVwE6F0EZAPiMAjknm0yvVCVfR4M2y55o7V71xJWkGh0XRN/BQxNn/Hw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KrNS8J8peoBIOLYOyxCHxqIdVOXlgA7akUdJJYcxt3o=;
+ b=YBR+DVegzsXDNRaSFoQ0bMgZ5qtDjNBxtTl16CqUBHAeznikukzuUM+rnw6/f21CfPJmmQjGCj/adIUegW1eYTnabvtV/gZqn9e0xCI2puZUQ0kOZqhPsOlcd/nBkh6BKx6yDRNuP4Cg/SwZpgxTgg3yKMQUGGdpWrIjvE6Dqc/IrWwCZiZAEXSEqE28llclnmn79UJl5zN2cDFdxwUv8uFEKeFWiwD58cHRaU/rx4fVwf85gtHhKpqI5d82+8Fznup1h8g27Xa6mbTUCHYgIwlsYlROxdY6wxvZljhGxRcqirBi4kPg6btmeHMymObwa7kfVHcLxRuAfGfWOPSGgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KrNS8J8peoBIOLYOyxCHxqIdVOXlgA7akUdJJYcxt3o=;
+ b=RNQvQgo6pk/giME/t/FrxYv9VxtbqJf6hBY6Kue218W6rksdgP1MgxFyB+LzN13OTWQ9PiDntItkhhNf6sNqponFf6LypRUh1yWHPLc6URdSLXM2IOIxZALfY4nf/230LbBpwvclQ31uyVn8kKxeTgCUi5UNNruVhCBbhRBtZRI=
+Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
+ by CH2PR10MB4310.namprd10.prod.outlook.com (2603:10b6:610:ab::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.19; Tue, 30 Nov
+ 2021 17:21:45 +0000
+Received: from CH2PR10MB4150.namprd10.prod.outlook.com
+ ([fe80::65b8:d8e7:e373:4896]) by CH2PR10MB4150.namprd10.prod.outlook.com
+ ([fe80::65b8:d8e7:e373:4896%9]) with mapi id 15.20.4713.021; Tue, 30 Nov 2021
+ 17:21:45 +0000
+From:   Eric Snowberg <eric.snowberg@oracle.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+CC:     "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "serge@hallyn.com" <serge@hallyn.com>,
+        "keescook@chromium.org" <keescook@chromium.org>,
+        "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
+        "weiyongjun1@huawei.com" <weiyongjun1@huawei.com>,
+        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "nramas@linux.microsoft.com" <nramas@linux.microsoft.com>,
+        "lszubowi@redhat.com" <lszubowi@redhat.com>,
+        "jason@zx2c4.com" <jason@zx2c4.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "James.Bottomley@hansenpartnership.com" 
+        <James.Bottomley@HansenPartnership.com>,
+        "pjones@redhat.com" <pjones@redhat.com>,
+        Konrad Wilk <konrad.wilk@oracle.com>
+Subject: Re: [PATCH v8 09/17] KEYS: Rename
+ get_builtin_and_secondary_restriction
+Thread-Topic: [PATCH v8 09/17] KEYS: Rename
+ get_builtin_and_secondary_restriction
+Thread-Index: AQHX4O2pDdgPDu39Wk2pZOJ3EdBmzqwWj2cAgAXMOQA=
+Date:   Tue, 30 Nov 2021 17:21:45 +0000
+Message-ID: <8906F8A4-313F-45E5-8ABD-A1A2D07BFD93@oracle.com>
+References: <20211124044124.998170-1-eric.snowberg@oracle.com>
+ <20211124044124.998170-10-eric.snowberg@oracle.com>
+ <fb1d583f588e3f46fdadbe3cf6288bb098ff45f8.camel@kernel.org>
+In-Reply-To: <fb1d583f588e3f46fdadbe3cf6288bb098ff45f8.camel@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3693.20.0.1.32)
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 463944b0-3f9d-4bd3-d41c-08d9b425e25a
+x-ms-traffictypediagnostic: CH2PR10MB4310:
+x-microsoft-antispam-prvs: <CH2PR10MB4310C249B8DC82AEC557E9B887679@CH2PR10MB4310.namprd10.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +oKuCCV5D6mFrzP7YYZ/9HayQdEVTlqFxpykLrpaliVzXsUgipQIM/LY8vBwF05VKhea8jqcx21XubgT/PWi4y1AUNN26juRrE3hZOvxOEcasXsR17LzbdtYgK12hfMLrHWRF95GuuT7j4wqIoGpeY+DfbX3MxOVlOvdPwkV5T28odbHkEvMm5jE8J9D1jknkLgHATTlv4O4KVNyc/afLOgnHZwOhSWekjTfMDL3+pISoa8H/UYLlLCbmkRjDbjnLKi82mS56CddcIX4GVCon0MFZvf9rNnSzKrPbRS/0KACCK/du1Ug7jR157rSBJbbnrFBRc7HIlcLGSczLKC57rKeDyFjJ03XD8heATUVRHfVcIcH01NCIndZvDm1+lV3XPNUYT+99l5rGcAcZijHV1C+N6EprvauSd7/m6Da979VCKgZ+/gNuHcIFeLs7KfU8fHr1FMXdN1kgQgeVQ0JqEyimwy3bh+gFSyK8IxbotStUGV2rh5wFs01G0T2TK0inrF6IFnC404dsB6nrHyhlXGRB13ftJxxizxn2Fd60wto5twojuAEW2EZWGv+CnF9jzys0e16D++lzS2azdVNdvV8sxCstFxwlJm0UOIMepX8IKSIJjco1+1VA69GlH++KDnOb8F05NdPLHpWalBLMTFf61PEDR1eJHJl2mwwZeRXURWQ96yxwsfZINOt+iEZVVayqktzH1izoRRbiJ1Tnz3aKlIYGjxBzmSSyGRrakE=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(36756003)(6916009)(4001150100001)(8676002)(71200400001)(66556008)(66946007)(316002)(33656002)(66476007)(2616005)(6512007)(508600001)(64756008)(8936002)(38100700002)(76116006)(4326008)(54906003)(91956017)(44832011)(186003)(66446008)(38070700005)(107886003)(83380400001)(122000001)(53546011)(86362001)(6506007)(2906002)(6486002)(5660300002)(7416002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?dESvCPo5pji3P7YFNn+kIJAmlyFr7oRlpOFb3IHafeQJPLCnkeUm9QK1g4fi?=
+ =?us-ascii?Q?mxraiKGCbj2gNvmcD9hSJDv4lJG0yU/fbl0Bh8CzcNptePSKExvjvuREhRju?=
+ =?us-ascii?Q?7La+TqjK/48bBGtId+6ShlNwoOw9JSzREGjN1mvQW8FhkbVkEl7PQKMoVU+s?=
+ =?us-ascii?Q?2V95tWGfZCX5sk+Txos8f1X7wWr+nMqonNQ13/51/EEZukIl9h13NxiMz2+f?=
+ =?us-ascii?Q?H+zKJRvoQgaL4fhPkz45kdf6BkCBxatR9gKc/7xMTt75u3lW1skKF0SMuZ5z?=
+ =?us-ascii?Q?Poutd2f/lkliuPvaO5sSBhQWvITcdie1r8OpTYZPdC0WHdp05bLfyqqhg2Cb?=
+ =?us-ascii?Q?eZbjhfahv64CKx9I5lVaJ44BTf40PDOZq9WZjNORIjKBZFJeivJ+0i24uuMR?=
+ =?us-ascii?Q?V1/DtCMabftUsmIuFTUC9A5YGorxasTPG7nimm0/AfNwGRRPZuYydN8aLtas?=
+ =?us-ascii?Q?omJwMsMJqmjKjyLJyKDNdHH+fR0LgXOWStDw/gKUg7Srlk2+PFhgxoLTsroL?=
+ =?us-ascii?Q?ZszQ9891ClVrvicJ6afC0tslFhaaUmKqe1GotZ8mDw1dHBmz3lYJObnbhtw5?=
+ =?us-ascii?Q?ntANITGK5VsvqoAqg2OZjhW9N4jBD2kBZA1eJWSdVOFdHfd/bmU0DYFa9WKP?=
+ =?us-ascii?Q?tha5KYdfFo92y6Fu0fACOe8iKGM0GBW50IuDpgrKMxI98z9YLcFEVbolZvRZ?=
+ =?us-ascii?Q?uys9CgROeeaKI7G9R84XyVODqYfNFPV3fOy7FRUdCYwhU4kPEs50tXxVxvTw?=
+ =?us-ascii?Q?QMvzKlr+j5uD8CsuMpgfMj7/36QFohlmjZbNUeDDVh5QmSrxQp6pMQNKQgnn?=
+ =?us-ascii?Q?0Ckow/LrxzAhTcYCn6+p7KTWK48+PDsP92+Vh5Wd0lPJ0QRIjxWz4IrzsHZ3?=
+ =?us-ascii?Q?XnobOPyHB6JGcj02/tAngA2L8QWXtWTBKdOJg7b+WDIF7SKXmoNXQDpTs//3?=
+ =?us-ascii?Q?y+kzyEaBwkzK33Cc/UWeXT2WQwQ7LKuK54fFr3Q3IFjU+wvNe5gzoGrFXuoe?=
+ =?us-ascii?Q?MWasCqmWqbnWkAOKnzBn2wP1gWIcZxf2tcxJ3ihzP39Jg15b712HfBwjNRn/?=
+ =?us-ascii?Q?KelWttgHF8sL8Vd8JyT8mMDEcAMII997VpoXiSM0NaACnPuPItGzltbPXiF/?=
+ =?us-ascii?Q?YK49XXiexqFD/vF6/P/uG1lrwS7sNANmQdOwotc0IrF3bCetgWKUtJbZxyg0?=
+ =?us-ascii?Q?hioeTCRBGHP394SWx3N215Pn+poZCPAmhEiqqvZHLpcjmbnlc1L4wABGte4A?=
+ =?us-ascii?Q?zxncOeC3u6qa0wFtw1jSdAak3bNYI928E8DwpEWUWC3BqWpeiKRquHFHrFNY?=
+ =?us-ascii?Q?wSRYpPteuZr6NVWba/U6jqHsr3cVBrDwuiSyRe/jhiYkys6ogK9KWq/9sEKR?=
+ =?us-ascii?Q?CBc8Nhl1NKslpQ08BwOQ53oNajIa39NqV5OohTRB2bQR44SX/Ek/BIQYBs4y?=
+ =?us-ascii?Q?yx41CxiX9jTduMryAOPqcraNZXWYbLSOWqpNay9x7hdY7e9J4BOV1NF6g7wI?=
+ =?us-ascii?Q?Hp1XHJenNG1C61owLhS+5yWuEnP72dmrBQHARfbpmPPE1AjBBA5mkfWxIFzH?=
+ =?us-ascii?Q?zsia+syaGHCG0SBVi/Fo+bSlp0XEHKp5cIbbdb/trBr5Gu5JtkdQbStWAOnW?=
+ =?us-ascii?Q?f5ou78jy2c57pu1aEsa/UvWFR+1e8Wykqm+lv8qf5dOPNeJVqxUhPvYWt6uc?=
+ =?us-ascii?Q?g3fVU5YQZw+501Fthk1L3bim6G9JFRbrhvkQY11Pv0FJj6Eg?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <51E04660718A564D903A8411D920E554@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 463944b0-3f9d-4bd3-d41c-08d9b425e25a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2021 17:21:45.2764
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AGzOyYXAtk1y+opCdcYZ3dU6lrpEkUOfZa7VpVjcELWE3Nv7EEVBtvjbpkmm6+yiFxayot+FHMIYjo464IRrwO3rOPFpsy/CQD0e/kyKXhc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4310
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10184 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxscore=0 malwarescore=0
+ spamscore=0 bulkscore=0 mlxlogscore=999 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2111300089
+X-Proofpoint-ORIG-GUID: DfJvNXh7shEXIvflWTvYaQyaoH3Ppcuf
+X-Proofpoint-GUID: DfJvNXh7shEXIvflWTvYaQyaoH3Ppcuf
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2021-11-30 at 16:45 +0100, Greg Kroah-Hartman wrote:
-> On Tue, Nov 30, 2021 at 09:31:09AM -0500, Simo Sorce wrote:
-> > On Tue, 2021-11-30 at 15:04 +0100, Greg Kroah-Hartman wrote:
-> > > On Tue, Nov 30, 2021 at 07:24:15AM -0500, Jeffrey Walton wrote:
-> > > > On Mon, Nov 29, 2021 at 6:07 PM Greg Kroah-Hartman
-> > > > <gregkh@linuxfoundation.org> wrote:
-> > > > > ...
-> > > > > Sometimes, yes, it is valid to have different implementations for things
-> > > > > that do different things in the same area (like filesystems), but for a
-> > > > > core function of the kernel, so far the existing random maintainer has
-> > > > > not wanted to have multiple implementations.  Same goes for other parts
-> > > > > of the kernel, it's not specific only to this one very tiny driver.
-> > > > > 
-> > > > > As a counterpoint, we do not allow duplicate drivers that control the
-> > > > > same hardware types in the tree.  We have tried that in the past and it
-> > > > > was a nightmare to support and maintain and just caused massive user
-> > > > > confusion as well.  One can argue that the random driver is in this same
-> > > > > category.
-> > > > 
-> > > > I think an argument could be made that they are different drivers
-> > > > since they have different requirements and security goals. I don't
-> > > > think it matters where the requirements came from, whether it was ad
-> > > > hoc from the developer, NIST, KISA, CRYPTREC, NESSIE, or another
-> > > > organization.
-> > > > 
-> > > > Maybe the problem is with the name of the driver? Perhaps the current
-> > > > driver should be named random-linux, Stephan's driver should be named
-> > > > random-nist, and the driver should be wired up based on a user's
-> > > > selection. That should sidestep the problems associated with the
-> > > > "duplicate drivers" policy.
-> > > 
-> > > The "problem" here is that the drivers/char/random.c file has three users,
-> > > the userspace /dev/random and syscall api, the in-kernel "here's some
-> > > entropy for the random core to use" api, and the in-kernel "give me some
-> > > random data" api.
-> > > 
-> > > Odds are, you REALLY do not want the in-kernel calls to be pulling from
-> > > the "random-government-crippled-specification" implementation, right?
-> > 
-> > You really *do* want that.
-> > When our customers are mandated to use FIPS certified cryptography,
-> > they want to use it for kernel cryptography as well, and in general
-> > they want to use a certified randomness source as well.
-> 
-> There are huge numbers of internal kernel calls that use random data for
-> non-crypto things.
-
-Sure, but it makes little sense to use different random implementations
-unless there are specific issues in terms of performance. It is also
-not always easy to establish if a certain use of random numbers is
-actually security relevant, may be context dependent, so it is
-generally safer to just use the certified implementation for everything
-if possible.
-
-> > I do not get why you call the implementation crippled? The
-> > specification is quite thorough and provides well reasoned requirements
-> > as well as self-test that insure coding mistakes won't end up returning
-> > non-random values.
-> 
-> Which specification are you talking about exactly?  There are loads of
-> different ones it seems that people wish to follow, so it's hard to
-> claim that they all are sane :)
-
-Well, given I am interested primarily in FIPS certifications I was
-referring specifically to SP800-90A/B/C:
-https://csrc.nist.gov/publications/detail/sp/800-90a/rev-1/final
-https://csrc.nist.gov/publications/detail/sp/800-90b/final
-https://csrc.nist.gov/publications/detail/sp/800-90c/draft
-
-> > I understand the mistrust vs gov agencies due to past mishaps like the
-> > Dual-DRBG thing, but we are not talking about something like that in
-> > this case. NIST is not mandating any specific algorithmic
-> > implementation, the requirement set forth allow to use a variety of
-> > different algorithms so that everyone can choose what they think is
-> > sane.
-> > 
-> > > Again, just try evolving the existing code to meet the needs that you
-> > > all have, stop trying to do wholesale reimplementations.  Those never
-> > > succeed, and it's pretty obvious that no one wants a "plugin a random
-> > > random driver" interface, right?
-> > 
-> > I think one of the issues is that the number of changes required
-> > against the current random driver amount essentially to a re-
-> > implementation. Sure, you can do it as a series of patches that
-> > transform the current code in something completely different.
-> 
-> That is how kernel development works, it is nothing new.
-> 
-> > And the main question here is, how can we get there, in any case, if
-> > the maintainer of the random device doesn't even participate in
-> > discussions, does not pick obvious bug fixes and is simply not engaging
-> > at all?
-> 
-> What obvious bug fixes have been dropped?
-
-Stephan posted you the link a few days ago for one of the examples.
-If you look at the last year you also will see that multiple patches
-have gone in w/o the maintainer interacting, which is fine for obvious
-stuff, but does not work for stuff that requires more feedback.
-
-> > Your plan requires an active maintainer that guides these changes and
-> > interact with the people proposing them to negotiate the best outcome.
-> > But that is not happening so that road seem blocked at the moment.
-> 
-> We need working patches that fit with the kernel development model first
-> before people can start blaming maintainers :)
-
-This is a Catch-22, the maintainer is mum in what would be acceptable,
-and whenever there are patches sent, there is no feedback on whether
-they are acceptable or not. It's not like I like blaming anyone, but it
-would be nice to have at least one word that gives a direction to
-follow that the maintainer is willing to then engage with and review or
-at least accept with proper third party review.
-
-> I see almost 300 changes accepted for this tiny random.c file over the
-> years we have had git (17 years).  I think that's a very large number of
-> changes for a 2300 line file that is relied upon by everyone.
-
-Seem like a lot more are desired too :-)
-
-Simo.
-
--- 
-Simo Sorce
-RHEL Crypto Team
-Red Hat, Inc
 
 
+> On Nov 26, 2021, at 5:49 PM, Jarkko Sakkinen <jarkko@kernel.org> wrote:
+>=20
+> On Tue, 2021-11-23 at 23:41 -0500, Eric Snowberg wrote:
+>> In preparation for returning either the existing
+>> restrict_link_by_builtin_and_secondary_trusted or the upcoming
+>> restriction that includes the trusted builtin, secondary and
+>> machine keys, to improve clarity, rename
+>> get_builtin_and_secondary_restriction to get_secondary_restriction.
+>>=20
+>> Suggested-by: Mimi Zohar <zohar@linux.ibm.com>
+>> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+>> Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+>> ---
+>> v6: Initial version
+>> v7: Unmodified from v7
+>> v8: Code unmodified from v7, added Mimi's Reviewed-by
+>> ---
+>>  certs/system_keyring.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>=20
+>> diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+>> index 692365dee2bd..8f1f87579819 100644
+>> --- a/certs/system_keyring.c
+>> +++ b/certs/system_keyring.c
+>> @@ -77,7 +77,7 @@ int restrict_link_by_builtin_and_secondary_trusted(
+>>   * Allocate a struct key_restriction for the "builtin and secondary tru=
+st"
+>>   * keyring. Only for use in system_trusted_keyring_init().
+>>   */
+>> -static __init struct key_restriction *get_builtin_and_secondary_restric=
+tion(void)
+>> +static __init struct key_restriction *get_secondary_restriction(void)
+>>  {
+>>         struct key_restriction *restriction;
+>> =20
+>> @@ -117,7 +117,7 @@ static __init int system_trusted_keyring_init(void)
+>>                                KEY_USR_VIEW | KEY_USR_READ | KEY_USR_SEA=
+RCH |
+>>                                KEY_USR_WRITE),
+>>                               KEY_ALLOC_NOT_IN_QUOTA,
+>> -                             get_builtin_and_secondary_restriction(),
+>> +                             get_secondary_restriction(),
+>>                               NULL);
+>>         if (IS_ERR(secondary_trusted_keys))
+>>                 panic("Can't allocate secondary trusted keyring\n");
+>=20
+> This is wrong order.
+>=20
+> You should first do the changes that make the old name
+> obsolete and only after that have a patch that does the
+> rename. Unfortunately, this patch cannot possibly acked
+> with the current order.
 
+I can change the order, but I'm confused how this would work for a git bise=
+ct.=20
+If the rename happens afterwards, now two patches will always need to be=20
+reverted instead of the possibility of one.  Is this your expectation?
 
