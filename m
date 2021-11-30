@@ -2,82 +2,189 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E691C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 14:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 557BEC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 14:31:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242083AbhK3OSG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 09:18:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52060 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242098AbhK3OSE (ORCPT
+        id S234754AbhK3Oee (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 09:34:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23049 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242201AbhK3Oed (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 09:18:04 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DF41C061574;
-        Tue, 30 Nov 2021 06:14:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-        :In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=KgWIeLOf+hPIIUfEYbPiR7H+jakBISA9A6p+Lcr3OXA=; b=A1zJXn471mfYkvMNW9l0NjuGUL
-        l5uTdpnbOzaMWtdgY36EnpDQ5CmQ27S8Cej1bprF6hA5vSbWEa7L9RR0Soktpsy6YZlYHsVh5Hbtf
-        lQt8wPxRTTevFRlJXsRvG9EVldp5mFQxayVlohVoQkS9IIhqR4Akc8oBN4sI421gu0uxD7x3xaHLU
-        9bh8zpbqrKRjgdg0G/jaoZEGBItdSMAnJwULoW6WDKeRhxZclK8Vb78MiAwUamXHBUHwZgXZnToEd
-        SukoSAwT8M5FfgL69eJsCV5YRNrZqTcf35IsuxC9M80NqQGyPvkEoopL04f1gyb55Y/ikhx+qAkqR
-        2Ha3vhEw==;
-Received: from [2601:1c0:6280:3f0::aa0b]
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ms3tn-001Sgj-P4; Tue, 30 Nov 2021 14:14:24 +0000
-Message-ID: <f6c47b8c-6c88-f64f-fdaf-3bb240d4dab0@infradead.org>
-Date:   Tue, 30 Nov 2021 06:14:17 -0800
+        Tue, 30 Nov 2021 09:34:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638282673;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=b39QhQhZNF+m8f/S5X/tqCTJzRiTL6UGur68GxD7eAQ=;
+        b=PcnIVDLhUnV8ludtJLLnfCdP2yBKY2ka9ML70ULqIeRzgJ1ExOwCLLhCzfQ5E1fzPWpfKs
+        2j1sVxyYVo+uzQmhF/ZCyKyVM/Vhj9IUtprKC3NDw1Ux/6za3pmqM9LpSxBzGNny/E6aQr
+        rgqF7lmr7tDsPLKXWtJsZV69Ah8FYQQ=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-27-6awvsCVaMRqO09OOZYW-BQ-1; Tue, 30 Nov 2021 09:31:12 -0500
+X-MC-Unique: 6awvsCVaMRqO09OOZYW-BQ-1
+Received: by mail-qt1-f200.google.com with SMTP id u14-20020a05622a198e00b002b2f35a6dcfso27434480qtc.21
+        for <linux-crypto@vger.kernel.org>; Tue, 30 Nov 2021 06:31:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:organization:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=b39QhQhZNF+m8f/S5X/tqCTJzRiTL6UGur68GxD7eAQ=;
+        b=IDrQof+lUbr+PJoeoTP/8lt7fL0bV0fgHhGSH98dLy63MSqsY3PVPr1jZUWwLccdpT
+         8jEZf6yZjjELxjwv5mgdIaTUduhypUVu00wZtHojZAtjv44uqX932pqMpkZ3Nj3Q7K+U
+         WjCUrC3B9Yrz/JQ6ARwBl1oOTNlXFMYHVWZLofnFQb0pedOCp36ZWf4EYFNYDB4q5bTd
+         suzceNJ0UxOsPmegEh8VYCIEQcKg1HGaEZeXvW9Y6r1Bga/KW3MlUylba9XsNO1RQnY3
+         zgmkVohk+WPXXiC/77Cq18kMNZg1Elnc3R2EK+4nVxWA4X0R00WGkgO/VcaIUmQvPnJ1
+         BE6Q==
+X-Gm-Message-State: AOAM530ThHHDVWl215ejEVt9pvUuivYDd5obP4ftiwU3be78p/kdvg0H
+        DN3Hxv9dnEa4AK0OWzPJpfeurMkzWvtLayxOhBKchwbK/sz/gjGuLzdrYs+0YA5mwQ502QMZ/GZ
+        lzNhggswbrmjfhbO6M0v7wuyn
+X-Received: by 2002:a37:654e:: with SMTP id z75mr36951314qkb.732.1638282671918;
+        Tue, 30 Nov 2021 06:31:11 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJztbuhdQW1yYLX1CRtVuiT3637z0MirwXgBcjKeFgtgbog7RMQDU2wQ89ZtMkqZ275ORUcFyA==
+X-Received: by 2002:a37:654e:: with SMTP id z75mr36951269qkb.732.1638282671522;
+        Tue, 30 Nov 2021 06:31:11 -0800 (PST)
+Received: from m8.users.ipa.redhat.com (cpe-158-222-141-151.nyc.res.rr.com. [158.222.141.151])
+        by smtp.gmail.com with ESMTPSA id b9sm10605257qtb.53.2021.11.30.06.31.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Nov 2021 06:31:10 -0800 (PST)
+Message-ID: <ac123d96b31f4a51b167b4e85a205f31a6c97876.camel@redhat.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+From:   Simo Sorce <simo@redhat.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jeffrey Walton <noloader@gmail.com>
+Cc:     Stephan Mueller <smueller@chronox.de>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, Tso Ted <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>,
+        Alexander Lobakin <alobakin@mailbox.org>,
+        Jirka Hladky <jhladky@redhat.com>
+Date:   Tue, 30 Nov 2021 09:31:09 -0500
+In-Reply-To: <YaYvYdnSaAvS8MAk@kroah.com>
+References: <2036923.9o76ZdvQCi@positron.chronox.de>
+         <22137816.pfsBpAd9cS@tauon.chronox.de> <YaEJtv4A6SoDFYjc@kroah.com>
+         <9311513.S0ZZtNTvxh@tauon.chronox.de> <YaT+9MueQIa5p8xr@kroah.com>
+         <CAH8yC8nokDTGs8H6nGDkvDxRHN_qoFROAfWnTv-q6UqzYvoSWA@mail.gmail.com>
+         <YaYvYdnSaAvS8MAk@kroah.com>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [RFC PATCH 5/6] crypto: xilinx: Add Xilinx SHA3 driver
-Content-Language: en-US
-To:     Harsha <harsha.harsha@xilinx.com>, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, michal.simek@xilinx.com,
-        linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
-        devicetree@vger.kernel.org
-Cc:     saratcha@xilinx.com, harshj@xilinx.com
-References: <1638262465-10790-1-git-send-email-harsha.harsha@xilinx.com>
- <1638262465-10790-6-git-send-email-harsha.harsha@xilinx.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <1638262465-10790-6-git-send-email-harsha.harsha@xilinx.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi--
+On Tue, 2021-11-30 at 15:04 +0100, Greg Kroah-Hartman wrote:
+> On Tue, Nov 30, 2021 at 07:24:15AM -0500, Jeffrey Walton wrote:
+> > On Mon, Nov 29, 2021 at 6:07 PM Greg Kroah-Hartman
+> > <gregkh@linuxfoundation.org> wrote:
+> > > ...
+> > > Sometimes, yes, it is valid to have different implementations for things
+> > > that do different things in the same area (like filesystems), but for a
+> > > core function of the kernel, so far the existing random maintainer has
+> > > not wanted to have multiple implementations.  Same goes for other parts
+> > > of the kernel, it's not specific only to this one very tiny driver.
+> > > 
+> > > As a counterpoint, we do not allow duplicate drivers that control the
+> > > same hardware types in the tree.  We have tried that in the past and it
+> > > was a nightmare to support and maintain and just caused massive user
+> > > confusion as well.  One can argue that the random driver is in this same
+> > > category.
+> > 
+> > I think an argument could be made that they are different drivers
+> > since they have different requirements and security goals. I don't
+> > think it matters where the requirements came from, whether it was ad
+> > hoc from the developer, NIST, KISA, CRYPTREC, NESSIE, or another
+> > organization.
+> > 
+> > Maybe the problem is with the name of the driver? Perhaps the current
+> > driver should be named random-linux, Stephan's driver should be named
+> > random-nist, and the driver should be wired up based on a user's
+> > selection. That should sidestep the problems associated with the
+> > "duplicate drivers" policy.
+> 
+> The "problem" here is that the drivers/char/random.c file has three users,
+> the userspace /dev/random and syscall api, the in-kernel "here's some
+> entropy for the random core to use" api, and the in-kernel "give me some
+> random data" api.
+> 
+> Odds are, you REALLY do not want the in-kernel calls to be pulling from
+> the "random-government-crippled-specification" implementation, right?
 
-On 11/30/21 00:54, Harsha wrote:
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 51690e7..5df252e 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -796,6 +796,16 @@ config CRYPTO_DEV_ZYNQMP_AES
->  	  accelerator. Select this if you want to use the ZynqMP module
->  	  for AES algorithms.
->  
-> +config CRYPTO_DEV_ZYNQMP_SHA3
-> +	bool "Support for Xilinx ZynqMP SHA3 hw accelerator"
+You really *do* want that.
+When our customers are mandated to use FIPS certified cryptography,
+they want to use it for kernel cryptography as well, and in general
+they want to use a certified randomness source as well.
 
-s/hw/hardware/
+I do not get why you call the implementation crippled? The
+specification is quite thorough and provides well reasoned requirements
+as well as self-test that insure coding mistakes won't end up returning
+non-random values.
 
-> +	depends on ARCH_ZYNQMP || COMPILE_TEST
-> +	select CRYPTO_SHA3
-> +	help
-> +	  Xilinx ZynqMP has SHA3 engine used for secure hash calculation.
-> +	  This driver interfaces with SHA3 hw engine.
+I understand the mistrust vs gov agencies due to past mishaps like the
+Dual-DRBG thing, but we are not talking about something like that in
+this case. NIST is not mandating any specific algorithmic
+implementation, the requirement set forth allow to use a variety of
+different algorithms so that everyone can choose what they think is
+sane.
 
-s/hw/hardware/
+> Again, just try evolving the existing code to meet the needs that you
+> all have, stop trying to do wholesale reimplementations.  Those never
+> succeed, and it's pretty obvious that no one wants a "plugin a random
+> random driver" interface, right?
 
-> +	  Select this if you want to use the ZynqMP module
-> +	  for SHA3 hash computation.
+I think one of the issues is that the number of changes required
+against the current random driver amount essentially to a re-
+implementation. Sure, you can do it as a series of patches that
+transform the current code in something completely different.
 
-thanks.
+And the main question here is, how can we get there, in any case, if
+the maintainer of the random device doesn't even participate in
+discussions, does not pick obvious bug fixes and is simply not engaging
+at all?
+
+Your plan requires an active maintainer that guides these changes and
+interact with the people proposing them to negotiate the best outcome.
+But that is not happening so that road seem blocked at the moment.
+
+HTH,
+Simo.
+
 -- 
-~Randy
+Simo Sorce
+RHEL Crypto Team
+Red Hat, Inc
+
+
+
+
