@@ -2,96 +2,147 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5845BC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 18:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F557C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 19:40:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235291AbhK3SnC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 13:43:02 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:43652 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230370AbhK3SnC (ORCPT
+        id S239806AbhK3Tno (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 14:43:44 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:34796 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239704AbhK3Tnc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 13:43:02 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Tue, 30 Nov 2021 14:43:32 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id CD490CE1AFF;
-        Tue, 30 Nov 2021 18:39:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF0E5C53FCF;
-        Tue, 30 Nov 2021 18:39:39 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="O5ZPJYmP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1638297574;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 903A8212BA;
+        Tue, 30 Nov 2021 19:40:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1638301206; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WCoEJFsmjkrCrbXHjmh4SpxFM7rNSkrSOQwoA0wrSlg=;
-        b=O5ZPJYmP619ae/2A+AT1eJ8XfddgoQAEYrvpMDwmKAKTEZkat04GsS1tf52a+wcPpwoIjO
-        tQz1ouaBPQwz8k9vo219SG4KukuN89BXrcFUjlogYPQm1iphhn0fFSJaX97BYuZs/qYUly
-        8u+roXhNJOsAMIYf7RpKQk0Io80B7Gs=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4518ea8e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 30 Nov 2021 18:39:34 +0000 (UTC)
-Received: by mail-yb1-f174.google.com with SMTP id d10so55476178ybe.3;
-        Tue, 30 Nov 2021 10:39:33 -0800 (PST)
-X-Gm-Message-State: AOAM532P+QtnpZAuOsyAabDTv6FnlulqliyNrr7MVfBSmoacP9S0bS6u
-        9S7Scs/Zob1KVcHMWFOpzacYe3ZxJKS5Qk4k1iU=
-X-Google-Smtp-Source: ABdhPJzw9kTAlbNg3rrNPlczsyvFRCgkriZ+B/y7W0n1PWSmLYX8REuNa7dYjzcTTno/oHM9M46LeMy/tkPHbcXE41I=
-X-Received: by 2002:a25:9781:: with SMTP id i1mr1003847ybo.638.1638297570686;
- Tue, 30 Nov 2021 10:39:30 -0800 (PST)
+        bh=l63rcUE2OHW5ypUlliWqEBsLyZQmG3Hbq8IWsXXTz4A=;
+        b=12aMtx60u9KBtb604fOld+ki3eVdJ1v+mNTfhocasVNh6L//Rl9NMhqUd4LvoT8jYWgERP
+        nDP9hH9+Mw2T+dxZYAs72VFiJw1hYu8et+1Wb0ANyEzPPNlPeoA+CajjJbC364Nk3LnHuw
+        Fw8oLPqRPqEXZPQcNVflvDFhZnz339I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1638301206;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=l63rcUE2OHW5ypUlliWqEBsLyZQmG3Hbq8IWsXXTz4A=;
+        b=AsYbhWHpnSL6tKhtvFTF+/vcz7c8P+xPT7pr2B/izPpdBA008dOLaGWkJDiCsEoMVgb7NQ
+        zA1obA72fekhGAAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0E43313D6B;
+        Tue, 30 Nov 2021 19:40:06 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id GMaQAhZ+pmEGSAAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Tue, 30 Nov 2021 19:40:06 +0000
+Message-ID: <f3d2787a-1232-e488-3585-a7dac76fe63a@suse.cz>
+Date:   Tue, 30 Nov 2021 20:40:05 +0100
 MIME-Version: 1.0
-References: <2036923.9o76ZdvQCi@positron.chronox.de> <22137816.pfsBpAd9cS@tauon.chronox.de>
- <YaEJtv4A6SoDFYjc@kroah.com> <9311513.S0ZZtNTvxh@tauon.chronox.de>
- <YaT+9MueQIa5p8xr@kroah.com> <CAH8yC8nokDTGs8H6nGDkvDxRHN_qoFROAfWnTv-q6UqzYvoSWA@mail.gmail.com>
- <YaYvYdnSaAvS8MAk@kroah.com> <ac123d96b31f4a51b167b4e85a205f31a6c97876.camel@redhat.com>
- <YaZHKHjomEivul6U@kroah.com> <YaZqVxI1C8RByq+w@gmail.com>
-In-Reply-To: <YaZqVxI1C8RByq+w@gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 30 Nov 2021 13:39:19 -0500
-X-Gmail-Original-Message-ID: <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
-Message-ID: <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Simo Sorce <simo@redhat.com>,
-        Jeffrey Walton <noloader@gmail.com>,
-        Stephan Mueller <smueller@chronox.de>, Tso Ted <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.2
+Content-Language: en-US
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Dave Hansen <dave.hansen@intel.com>
+Cc:     Peter Gonda <pgonda@google.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Peter Matthias <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Andy Lavr <andy.lavr@gmail.com>,
-        Petr Tesarik <ptesarik@suse.cz>,
-        John Haxby <john.haxby@oracle.com>,
-        Alexander Lobakin <alobakin@mailbox.org>,
-        Jirka Hladky <jhladky@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
+ <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
+ <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
+ <5f3b3aab-9ec2-c489-eefd-9136874762ee@intel.com>
+ <d83e6668-bec4-8d1f-7f8a-085829146846@amd.com>
+ <38282b0c-7eb5-6a91-df19-2f4cfa8549ce@intel.com> <YZ5iWJuxjSCmZL5l@suse.de>
+ <bd31abd4-c8a2-bdda-ea74-1c24b29beda7@intel.com> <YZ9gAMHdEo6nQ6a0@suse.de>
+ <9503ac53-1323-eade-2863-df11a5f36b6a@amd.com>
+ <7e368c50-ff94-d87e-e93f-bae044659152@suse.cz>
+ <bf96f5d1-1cc3-1d0c-fd70-ade00cb46671@amd.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+In-Reply-To: <bf96f5d1-1cc3-1d0c-fd70-ade00cb46671@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 30, 2021 at 1:16 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> So unfortunately, as far as I can tell, Ted is not maintaining random.c anymore.
+On 11/29/21 17:13, Brijesh Singh wrote:
+>>
+>> That could work for the kmap() context.
+>> What to do for the userspace context (host userspace)?
+>> - shared->private transition - page has to be unmapped from all userspace,
+>> elevated refcount (gup() in progress) can block this unmap until it goes
+>> away - could be doable
+> 
+> An unmap of the page from all the userspace process during the page state
+> transition will be great. If we can somehow store the state information in
+> the 'struct page' then it can be later used to make better decision. I am
+> not sure that relying on the elevated refcount is the correct approach. e.g
+> in the case of encrypted guests, the HV may pin the page to prevent it from
+> migration.
+> 
+> Thoughts on how you want to approach unmaping the page from userspace page
+> table?
 
-I am happy to step up here. Feel free to CC me on random.c fixes and
-I'll review them promptly.
+After giving it more thought and rereading the threads here it seems I
+thought it would be easier than it really is, and it would have to be
+something at least like Kirill's hwpoison based approach.
 
-Jason
+>> - still, what to do if host userspace then tries to access the unmapped
+>> page? SIGSEGV instead of SIGBUS and it can recover?
+>>
+> 
+> Yes, SIGSEGV makes sense to me.
+
+OTOH the newer fd-based proposal also IIUC takes care of this part better -
+the host userspace controls the guest's shared->private conversion requests
+so it can't be tricked to access a page that's changed under it.
+
+>>
+>>
+>>> Thoughts ?
+>>>
+>>>>
+>>>> This should turn an RMP fault in the kernel which is not covered in the
+>>>> uaccess exception table into a fatal error.
+>>>>
+>>>> Regards,
+>>>>
+>>
+
