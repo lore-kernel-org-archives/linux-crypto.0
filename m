@@ -2,153 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68FE0C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 15:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 795BDC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 15:39:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234111AbhK3PeV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 10:34:21 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29608 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229769AbhK3PeU (ORCPT
+        id S231642AbhK3Pmj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 10:42:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44258 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234909AbhK3Pmf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 10:34:20 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AUFQE9v005941;
-        Tue, 30 Nov 2021 15:28:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=lRJ9EeRkehNcBeN0Slv1bMFVDNn8zq/kDiLTfuorS78=;
- b=djlV+m4uyuRwJxKWjfgbwasZlTtheaI/iQD1iWPDifkwk6+2q57+Gui7hqzlMkrJdUso
- rohgduHkETF0ss9YUMvAG0gVXd6e9i/HTyEbsbSfhpaxmQTCzUrfvS5x8GHkXyTWfWU9
- l9vVAJ5yHGCCEhZs4r8KjplCmNBt+67jxPvgAxeqBWth2Kt3BI2/ItDvOgOZl5ptvRjB
- yDj+D+9c0dVjtVX6EZZoJYHu5g4dCDBlN5LiXNMWTHDiKW52u2EaBlPqVZ7R+FCwmORf
- vka7rL1E4is9bf/y6hyVgq6RekVhn5OCBK1ZkGh0bOp6Z2RLnygk2kroWzDTUZ3ozrji jA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cnpg7099n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Nov 2021 15:28:38 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AUFQSLI007382;
-        Tue, 30 Nov 2021 15:28:37 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cnpg7098n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Nov 2021 15:28:37 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AUFD54u004410;
-        Tue, 30 Nov 2021 15:28:34 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3ckcacg7wg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Nov 2021 15:28:34 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AUFSTWQ19136886
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 Nov 2021 15:28:29 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 05C03A404D;
-        Tue, 30 Nov 2021 15:28:29 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A4C52A4059;
-        Tue, 30 Nov 2021 15:28:27 +0000 (GMT)
-Received: from osiris (unknown [9.145.157.87])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 30 Nov 2021 15:28:27 +0000 (GMT)
-Date:   Tue, 30 Nov 2021 16:28:26 +0100
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Michal Suchanek <msuchanek@suse.de>
-Cc:     keyrings@vger.kernel.org, kexec@lists.infradead.org,
-        Philipp Rudo <prudo@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
-        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        Jessica Yu <jeyu@kernel.org>, linux-kernel@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Hari Bathini <hbathini@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        Frank van der Linden <fllinden@amazon.com>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        Daniel Axtens <dja@axtens.net>, buendgen@de.ibm.com,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Baoquan He <bhe@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v2 0/6] KEXEC_SIG with appended signature
-Message-ID: <YaZDGjKSaH2YKl/h@osiris>
-References: <cover.1637862358.git.msuchanek@suse.de>
+        Tue, 30 Nov 2021 10:42:35 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D9B7C061748;
+        Tue, 30 Nov 2021 07:39:16 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 2F11BCE1A44;
+        Tue, 30 Nov 2021 15:39:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDECFC53FC7;
+        Tue, 30 Nov 2021 15:39:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1638286752;
+        bh=9wV20obSinXS+ABsgOuQMAFzhvhGcNOouX9VfzNg/S4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=METdwXbwh7NFIXdrY/nO4exuSLNBH3QC37K8CD6oZ3Kl7RnJsNV9fRkZDl8B5fqZf
+         np2XYSRXfUpATJC16TKmsvQduKfDNgWO29rPgqYy2kzlPCyXUpMh3z2LtB6SIwBjv1
+         1m+cZx5qHv5fzXbx0/Vll5sDbH9Cp62K8Iq7luIk=
+Date:   Tue, 30 Nov 2021 16:39:10 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Jeffrey Walton <noloader@gmail.com>
+Cc:     Stephan Mueller <smueller@chronox.de>,
+        Simo Sorce <simo@redhat.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, Tso Ted <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>,
+        Alexander Lobakin <alobakin@mailbox.org>,
+        Jirka Hladky <jhladky@redhat.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+Message-ID: <YaZFni65mRi7Yx/4@kroah.com>
+References: <2036923.9o76ZdvQCi@positron.chronox.de>
+ <22137816.pfsBpAd9cS@tauon.chronox.de>
+ <YaEJtv4A6SoDFYjc@kroah.com>
+ <9311513.S0ZZtNTvxh@tauon.chronox.de>
+ <YaT+9MueQIa5p8xr@kroah.com>
+ <CAH8yC8nokDTGs8H6nGDkvDxRHN_qoFROAfWnTv-q6UqzYvoSWA@mail.gmail.com>
+ <YaYvYdnSaAvS8MAk@kroah.com>
+ <CAH8yC8nWLk9vhV1iACE+vmtby2rRN8RDqeuS54qZahE-xH2X_w@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1637862358.git.msuchanek@suse.de>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: rSCYo3RBvp-zpEg4RRrySvGTJx2g36_q
-X-Proofpoint-GUID: -IO6R0uBLYVSlOsUgVLBc1VitLs8tbzj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-30_09,2021-11-28_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=829
- impostorscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0
- bulkscore=0 priorityscore=1501 mlxscore=0 phishscore=0 clxscore=1011
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111300081
+In-Reply-To: <CAH8yC8nWLk9vhV1iACE+vmtby2rRN8RDqeuS54qZahE-xH2X_w@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 25, 2021 at 07:02:38PM +0100, Michal Suchanek wrote:
-> Hello,
+On Tue, Nov 30, 2021 at 10:13:26AM -0500, Jeffrey Walton wrote:
+> On Tue, Nov 30, 2021 at 9:04 AM Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
+> >
+> > On Tue, Nov 30, 2021 at 07:24:15AM -0500, Jeffrey Walton wrote:
+> > > On Mon, Nov 29, 2021 at 6:07 PM Greg Kroah-Hartman
+> > > <gregkh@linuxfoundation.org> wrote:
+> > > > ...
+> > > > Sometimes, yes, it is valid to have different implementations for things
+> > > > that do different things in the same area (like filesystems), but for a
+> > > > core function of the kernel, so far the existing random maintainer has
+> > > > not wanted to have multiple implementations.  Same goes for other parts
+> > > > of the kernel, it's not specific only to this one very tiny driver.
+> > > >
+> > > > As a counterpoint, we do not allow duplicate drivers that control the
+> > > > same hardware types in the tree.  We have tried that in the past and it
+> > > > was a nightmare to support and maintain and just caused massive user
+> > > > confusion as well.  One can argue that the random driver is in this same
+> > > > category.
+> > >
+> > > I think an argument could be made that they are different drivers
+> > > since they have different requirements and security goals. I don't
+> > > think it matters where the requirements came from, whether it was ad
+> > > hoc from the developer, NIST, KISA, CRYPTREC, NESSIE, or another
+> > > organization.
+> > >
+> > > Maybe the problem is with the name of the driver? Perhaps the current
+> > > driver should be named random-linux, Stephan's driver should be named
+> > > random-nist, and the driver should be wired up based on a user's
+> > > selection. That should sidestep the problems associated with the
+> > > "duplicate drivers" policy.
+> >
+> > The "problem" here is that the drivers/char/random.c file has three users,
+> > the userspace /dev/random and syscall api, the in-kernel "here's some
+> > entropy for the random core to use" api, and the in-kernel "give me some
+> > random data" api.
+> >
+> > Odds are, you REALLY do not want the in-kernel calls to be pulling from
+> > the "random-government-crippled-specification" implementation, right?
 > 
-> This is resend of the KEXEC_SIG patchset.
-> 
-> The first patch is new because it'a a cleanup that does not require any
-> change to the module verification code.
-> 
-> The second patch is the only one that is intended to change any
-> functionality.
-> 
-> The rest only deduplicates code but I did not receive any review on that
-> part so I don't know if it's desirable as implemented.
-> 
-> The first two patches can be applied separately without the rest.
-> 
-> Thanks
-> 
-> Michal
-> 
-> Michal Suchanek (6):
->   s390/kexec_file: Don't opencode appended signature check.
->   powerpc/kexec_file: Add KEXEC_SIG support.
->   kexec_file: Don't opencode appended signature verification.
->   module: strip the signature marker in the verification function.
->   module: Use key_being_used_for for log messages in
->     verify_appended_signature
->   module: Move duplicate mod_check_sig users code to mod_parse_sig
-> 
->  arch/powerpc/Kconfig                     | 11 +++++
->  arch/powerpc/kexec/elf_64.c              | 14 ++++++
->  arch/s390/kernel/machine_kexec_file.c    | 42 ++----------------
->  crypto/asymmetric_keys/asymmetric_type.c |  1 +
->  include/linux/module_signature.h         |  1 +
->  include/linux/verification.h             |  4 ++
->  kernel/module-internal.h                 |  2 -
->  kernel/module.c                          | 12 +++--
->  kernel/module_signature.c                | 56 +++++++++++++++++++++++-
->  kernel/module_signing.c                  | 33 +++++++-------
->  security/integrity/ima/ima_modsig.c      | 22 ++--------
->  11 files changed, 113 insertions(+), 85 deletions(-)
+> It's not a question of whether some folks want it or not. They have to
+> accept it due to policy. They have no choice in the matter.
 
-For all patches which touch s390:
-Acked-by: Heiko Carstens <hca@linux.ibm.com>
+I strongly doubt that policy dictates all of the current calls to
+get_random_*() require that they return data that is dictated by that
+policy.  If so, that's not a valid specification for a variety of
+reasons (i.e. it will break other specification requirements...)
+
+thanks,
+
+greg k-h
