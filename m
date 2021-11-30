@@ -2,100 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBEACC43217
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 14:10:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E691C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 14:14:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236814AbhK3ON7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 09:13:59 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:60380 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236613AbhK3ON6 (ORCPT
+        id S242083AbhK3OSG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 09:18:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52060 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242098AbhK3OSE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 09:13:58 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B78D521892;
-        Tue, 30 Nov 2021 14:10:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1638281438; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hQhE8yGgIftiH52A4CWTfhYlnu/uKm6rar23ZjE1g3o=;
-        b=aeJVE1FSV0RHgteozLe3XORqMLb6MMqMztrFgX6zfnf1E23LZRpbBUl60rNhTY2DqlDIH7
-        DNuYrsxOUBPBykeUyx7NEjtye1nCRpPgeqLOv7VxVcsLTXUdxHGxyivPx9GymTa6Wpvb0s
-        tH8PX5f6yqdKx7SgLgTUfktObnQgIhU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1638281438;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hQhE8yGgIftiH52A4CWTfhYlnu/uKm6rar23ZjE1g3o=;
-        b=c6M2CeKp2xc7kB3QI2ga49txlMS65eLPFlgQg+z/aN1iMAmltVyyAQ8ecvDtbwWnGDGz/w
-        0zPwpkJGbaOVtODw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A366213D4E;
-        Tue, 30 Nov 2021 14:10:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id p/XRJt4wpmF5LgAAMHmgww
-        (envelope-from <nstange@suse.de>); Tue, 30 Nov 2021 14:10:38 +0000
-From:   Nicolai Stange <nstange@suse.de>
-To:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Torsten Duwe <duwe@suse.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Nicolai Stange <nstange@suse.de>
-Subject: [PATCH 3/3] crypto: jitter - quit sample collection loop upon RCT failure
-Date:   Tue, 30 Nov 2021 15:10:09 +0100
-Message-Id: <20211130141009.6791-4-nstange@suse.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20211130141009.6791-1-nstange@suse.de>
-References: <20211130141009.6791-1-nstange@suse.de>
+        Tue, 30 Nov 2021 09:18:04 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DF41C061574;
+        Tue, 30 Nov 2021 06:14:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+        :In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=KgWIeLOf+hPIIUfEYbPiR7H+jakBISA9A6p+Lcr3OXA=; b=A1zJXn471mfYkvMNW9l0NjuGUL
+        l5uTdpnbOzaMWtdgY36EnpDQ5CmQ27S8Cej1bprF6hA5vSbWEa7L9RR0Soktpsy6YZlYHsVh5Hbtf
+        lQt8wPxRTTevFRlJXsRvG9EVldp5mFQxayVlohVoQkS9IIhqR4Akc8oBN4sI421gu0uxD7x3xaHLU
+        9bh8zpbqrKRjgdg0G/jaoZEGBItdSMAnJwULoW6WDKeRhxZclK8Vb78MiAwUamXHBUHwZgXZnToEd
+        SukoSAwT8M5FfgL69eJsCV5YRNrZqTcf35IsuxC9M80NqQGyPvkEoopL04f1gyb55Y/ikhx+qAkqR
+        2Ha3vhEw==;
+Received: from [2601:1c0:6280:3f0::aa0b]
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ms3tn-001Sgj-P4; Tue, 30 Nov 2021 14:14:24 +0000
+Message-ID: <f6c47b8c-6c88-f64f-fdaf-3bb240d4dab0@infradead.org>
+Date:   Tue, 30 Nov 2021 06:14:17 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.2
+Subject: Re: [RFC PATCH 5/6] crypto: xilinx: Add Xilinx SHA3 driver
+Content-Language: en-US
+To:     Harsha <harsha.harsha@xilinx.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, michal.simek@xilinx.com,
+        linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
+        devicetree@vger.kernel.org
+Cc:     saratcha@xilinx.com, harshj@xilinx.com
+References: <1638262465-10790-1-git-send-email-harsha.harsha@xilinx.com>
+ <1638262465-10790-6-git-send-email-harsha.harsha@xilinx.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <1638262465-10790-6-git-send-email-harsha.harsha@xilinx.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The jitterentropy collection loop in jent_gen_entropy() can in principle
-run indefinitely without making any progress if it only receives stuck
-measurements as determined by jent_stuck(). After 31 consecutive stuck
-samples, the Repetition Count Test (RCT) would fail anyway and the
-jitterentropy RNG instances moved into ->health_failure == 1 state.
-jent_gen_entropy()'s caller, jent_read_entropy() would then check for
-this ->health_failure condition and return an error if found set. It
-follows that there's absolutely no point in continuing the collection loop
-in jent_gen_entropy() once the RCT has failed.
+Hi--
 
-Make the jitterentropy collection loop more robust by terminating it upon
-jent_health_failure() so that it won't continue to run indefinitely without
-making any progress.
+On 11/30/21 00:54, Harsha wrote:
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 51690e7..5df252e 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -796,6 +796,16 @@ config CRYPTO_DEV_ZYNQMP_AES
+>  	  accelerator. Select this if you want to use the ZynqMP module
+>  	  for AES algorithms.
+>  
+> +config CRYPTO_DEV_ZYNQMP_SHA3
+> +	bool "Support for Xilinx ZynqMP SHA3 hw accelerator"
 
-Signed-off-by: Nicolai Stange <nstange@suse.de>
----
- crypto/jitterentropy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+s/hw/hardware/
 
-diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
-index 24e087c3f526..8f5283f28ed3 100644
---- a/crypto/jitterentropy.c
-+++ b/crypto/jitterentropy.c
-@@ -547,7 +547,7 @@ static void jent_gen_entropy(struct rand_data *ec)
- 	/* priming of the ->prev_time value */
- 	jent_measure_jitter(ec);
- 
--	while (1) {
-+	while (!jent_health_failure(ec)) {
- 		/* If a stuck measurement is received, repeat measurement */
- 		if (jent_measure_jitter(ec))
- 			continue;
+> +	depends on ARCH_ZYNQMP || COMPILE_TEST
+> +	select CRYPTO_SHA3
+> +	help
+> +	  Xilinx ZynqMP has SHA3 engine used for secure hash calculation.
+> +	  This driver interfaces with SHA3 hw engine.
+
+s/hw/hardware/
+
+> +	  Select this if you want to use the ZynqMP module
+> +	  for SHA3 hash computation.
+
+thanks.
 -- 
-2.26.2
-
+~Randy
