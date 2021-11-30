@@ -2,107 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18920C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 02:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 312C4C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 03:27:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231986AbhK3C6q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Nov 2021 21:58:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37738 "EHLO
+        id S232427AbhK3Daq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 29 Nov 2021 22:30:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229996AbhK3C6q (ORCPT
+        with ESMTP id S229771AbhK3Daq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Nov 2021 21:58:46 -0500
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 674FDC061574;
-        Mon, 29 Nov 2021 18:55:27 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id o29so16202122wms.2;
-        Mon, 29 Nov 2021 18:55:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yJ076OIqjgPenNCZ4jeRYQlwYOXUIXZ8CFtTTusFwys=;
-        b=ApkCABF3+SMmNqkepoyou9vrhQQPJbhuUmyPifOiCt9M61bwpFxkRendDsuu6J/1BN
-         n48JnDY6+aPYYODIZ39tGNP5XsSBs5A2MUlFTkaCit06Oe9z6UIuxZNYFliv1RwSRCcE
-         1M7ac9yl5PLiCqduoEFM0ud0kgldrAPSqyT3PbmIm8Mjq5j1xDsRNXVuzHGHRTVlooxh
-         R/B9U7EEq0HJqD2Asan5MFnX7U9BXSXB2iN/n1Ziuc9UCOsgnPQ4BMGRXs9Yi1LPwbbW
-         /87UklTQO35R/nVhAw74bjcVuna7MeS5KcFaZeNOrxxUdLXgdjYGfl1G1NkFavbh0Uwh
-         DU1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yJ076OIqjgPenNCZ4jeRYQlwYOXUIXZ8CFtTTusFwys=;
-        b=msJ0xYbJXgP0kCLwM3AWi4Av3F9ssc7wQ00YCxLk5h2/2GTu5G+72uleRvvoMehYiw
-         wQ8jBWH94QKaSoG0ZBHYLDraLwYwkOpWV52iwE9hmoyhaIM34QvFsdbDOjXzjI9n9Jhs
-         RPrspR7JN5VAkOVwbTwlPp0O1DboXfqMQA+5VvDwUvJqmZNts7zHMGL0Kp4EbBlu2vwX
-         FIbwVix9miMwZxQ3cYR5M5rUt8GpFPTe2p0/4knGSNqIxE6n4eu4F6GVuReEvxBfRkCn
-         InDql2w9axuqmq6wA5MJeKzMROrR7wpPPUIhKuaw/3sW/inCdMd/SyZvGbAJBDoP/sIT
-         eMng==
-X-Gm-Message-State: AOAM530ZbW1YWoypT93f1OZnMTpUsJnRsOQWdeYjswxLiGrg7SmBKGSa
-        g0PNymjR3vVhqKsyeoqR/gEc7PoNXngrBkLnkH4=
-X-Google-Smtp-Source: ABdhPJwdFvld2vbGf5PnJgcyA4Z6UvYHga3hAbO9Z3wbMSFiG4jXWo/nsOKswiPZSzLLzWgq12bD/+wyDrh/MvdgKso=
-X-Received: by 2002:a7b:cf10:: with SMTP id l16mr2009715wmg.17.1638240925988;
- Mon, 29 Nov 2021 18:55:25 -0800 (PST)
+        Mon, 29 Nov 2021 22:30:46 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6F4FC061574;
+        Mon, 29 Nov 2021 19:27:27 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 7DEDCCE172A;
+        Tue, 30 Nov 2021 03:27:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34ED4C53FC1;
+        Tue, 30 Nov 2021 03:27:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638242843;
+        bh=UJ59smAJ6cnrGo7DP4M/0ZiI7nKL490BQsRhSwvFWU4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qAze2l2nmIz/HVjzLMrqxuLtOAucddHBg2siTrJ8JSKT1Hu0RhKx3HqYEQj6CJIRI
+         ZvCf4RC4H/7jNITntxBILScpPT4CkjGqr3JIvwC8M5DkUqEER4P6IdQOYS1wwfWOWs
+         Yg9XJpS0LkzThwdrHpUNE1+Twrzs/wnmGZ5HkSkmJwNABs5zlMzo4jYgAh8DIcVsBC
+         XwhXzJffU8QTihM1Rw4PyV4r/394ujigDExbmm7/8nagkOJ1Uao2QIUEdPfAHtPj3K
+         WjO2DkWunP3Sr4AIvvfCcwiHkzwm06nC2gy9bCVzHd+u9ASOU12MJ3LV30m9e6Pprd
+         8b4nEqI1HgglA==
+Date:   Mon, 29 Nov 2021 19:27:21 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc:     tglx@linutronix.de, bp@suse.de, dave.hansen@linux.intel.com,
+        mingo@kernel.org, luto@kernel.org, x86@kernel.org,
+        herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dan.j.williams@intel.com,
+        charishma1.gairuboyina@intel.com, kumar.n.dwarakanath@intel.com,
+        lalithambika.krishnakumar@intel.com, ravi.v.shankar@intel.com
+Subject: Re: [PATCH v3 00/15] x86: Support Key Locker
+Message-ID: <YaWaGfwjLLbrBzHk@sol.localdomain>
+References: <20211124200700.15888-1-chang.seok.bae@intel.com>
 MIME-Version: 1.0
-References: <4641592.OV4Wx5bFTl@positron.chronox.de> <202111221831.lPHo6KJJ-lkp@intel.com>
- <5540546.7F5nsSknLy@tauon.chronox.de> <7ee4a94e-496e-67a0-897a-0dd84bbce72f@intel.com>
-In-Reply-To: <7ee4a94e-496e-67a0-897a-0dd84bbce72f@intel.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Tue, 30 Nov 2021 10:55:12 +0800
-Message-ID: <CACXcFmmtdQLCusKu1NHq4JjiKAjCpCPj0aYBR-wxO3tEz_-nQA@mail.gmail.com>
-Subject: Re: [kbuild-all] Re: [PATCH v43 01/15] Linux Random Number Generator
-To:     "Chen, Rong A" <rong.a.chen@intel.com>
-Cc:     Stephan Mueller <smueller@chronox.de>, Tso Ted <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        kernel test robot <lkp@intel.com>, kbuild-all@lists.01.org,
-        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211124200700.15888-1-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Chen, Rong A <rong.a.chen@intel.com> wrote:
+On Wed, Nov 24, 2021 at 12:06:45PM -0800, Chang S. Bae wrote:
+> 
+> == Non Use Cases ==
+> 
+> Bare metal disk encryption is the only use case intended by these patches.
 
-> On 11/22/2021 7:47 PM, Stephan Mueller wrote:
+If that's the case, why are so many encryption modes being added (ECB, CTR, CBC,
+and XTS)?  Wouldn't just XTS be sufficient?
 
-> > Thanks for the notification.
-> >
-> > I think this is a false-positive discussed before. __latent_entropy is
-> > seemingly allowed for an entire linear buffer as seen in the declaration of
-> > the variable input_pool_data in driver/char/random.c which is an array of u32.
-> >
-> > The struct chacha20_state is a linear buffer of u32 words.
-> >
-> > struct chacha20_block {
-> >          u32 constants[4];
-> >          union {
-> >                  u32 u[CHACHA_KEY_SIZE_WORDS];
-> >                  u8  b[CHACHA_KEY_SIZE];
-> >          } key;
-> >          u32 counter;
-> >          u32 nonce[3];
-> > };
-> >
-> > Therefore it should be identical to the aforementioned example.
+> * PATCH10-15: For the x86 crypto library, it first prepares the AES-NI code
+>   to accommodate the new AES implementation. Then incrementally add base
+>   functions and various modes support -- ECB, CBC, CTR, and XTS. The code
+>   was found to pass the crypto test.
 
-No. It is a struct & there's no guarantee all compilers will lay
-it out as you  expect. There might even be a gap in the layout
-since nonce[] has an odd number of elements.
+Did you test with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
 
->> The __latent_entropy marker therefore seems to be appropriate for this structure.
-
-First, this is completely unnecessary since the input pool is marked for
-latent entropy & changes there will affect the chacha context.
-
-Also, if I'm reading the docs right, the __latent_entropy attribute
-on a data structure only gets it initialised somewhat randomly.
-If you want a continuous effect at runtime, then you need to
-make the code mix the latent_entropy global variable into the
-data structure.
+- Eric
