@@ -2,157 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 335B0C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 07:34:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2752C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 09:02:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347715AbhLAHiM (ORCPT
+        id S1348134AbhLAJFo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Dec 2021 02:38:12 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:34466 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347643AbhLAHiM (ORCPT
+        Wed, 1 Dec 2021 04:05:44 -0500
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:63792 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1348068AbhLAJFn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Dec 2021 02:38:12 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id ED7F2212B8;
-        Wed,  1 Dec 2021 07:34:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1638344090; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HPv/KSMpc/6Afkdxg6YXrd1HWK9ePYOkSEJiDy0z6gs=;
-        b=OBd7/uzxysF1VJxsi6+YbcpDOyZJMc6LTNXRaNpgCa5ijaMUTiYYbmVbe1e532tVSJFTgF
-        Vfvn/iaZqaR5iPPRbviC/IK2fpDOfSAJyXWmFrmPZlEmqAER9nQ+r0eoMyUMoosIfkfPg2
-        Sy7WOndg9LxNi/50+bMLV3/g0zKGqAE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1638344090;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HPv/KSMpc/6Afkdxg6YXrd1HWK9ePYOkSEJiDy0z6gs=;
-        b=Q09n1yg2YecMeskcC3S6ho/DtqNK9Ti3LOpYJZd8DntuLWMaazzmejYiOSMxwBASu4+luh
-        +giwebBV5vOl4cDw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1635E13AE2;
-        Wed,  1 Dec 2021 07:34:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id VH0kA5olp2HVFwAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 01 Dec 2021 07:34:50 +0000
-Subject: Re: [PATCH 18/18] crypto: dh - accept only approved safe-prime groups
- in FIPS mode
-To:     Nicolai Stange <nstange@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>,
-        Torsten Duwe <duwe@suse.de>, Zaibo Xu <xuzaibo@huawei.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        qat-linux@intel.com, keyrings@vger.kernel.org
-References: <20211201004858.19831-1-nstange@suse.de>
- <20211201004858.19831-19-nstange@suse.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <aed13346-94b7-80db-5a80-058e6dfd5bd0@suse.de>
-Date:   Wed, 1 Dec 2021 08:34:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Wed, 1 Dec 2021 04:05:43 -0500
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+        by mx0b-0016f401.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1B10fL5V028993;
+        Wed, 1 Dec 2021 01:02:16 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=akShGmMsOPl2awYdh8eGCwNPG7V+wiwKl3WNKUdogHs=;
+ b=R7FpJJPRnaedNNiMpjYZFU0oMA21XBSRLrHYMaSYfai0zW5tSye2k7HOQ0Hb949ey1pT
+ UON7KoZYzxgkeDKIf0+fOOT/jCPv86vgZ2lLPF6uh5gjkZ8hi3oxgvVEcZpwn+YX0W3a
+ LBYNjJRNjIa+Gy4XcG1P5NdL3ghDmsP54LPpqW3FzAZ+/5vCOve4TWUrg5mVPsJdzjRh
+ v48w9htx60TyXZar6aWkeZ3y2ENEEMGRFM6GfTfDEOFgAj7lnqxoeUIqlluUmLZWxiWO
+ EjHv2mYNxEEglqdJQ1ghAovLQLv0G6SVy3S6ddHSA5G1KpXx60AR7sl41C3zbyeYCdD1 oA== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3cnqvyug9j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Wed, 01 Dec 2021 01:02:16 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 1 Dec
+ 2021 01:02:13 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
+ Transport; Wed, 1 Dec 2021 01:02:13 -0800
+Received: from localhost.localdomain (unknown [10.28.34.29])
+        by maili.marvell.com (Postfix) with ESMTP id 296335B6938;
+        Wed,  1 Dec 2021 01:02:10 -0800 (PST)
+From:   Shijith Thotton <sthotton@marvell.com>
+To:     Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Shijith Thotton <sthotton@marvell.com>,
+        <linux-crypto@vger.kernel.org>, <jerinj@marvell.com>,
+        <sgoutham@marvell.com>, <gcherian@marvell.com>,
+        <ndabilpuram@marvell.com>, <schalla@marvell.com>
+Subject: [PATCH 0/2] Octeon TX2 CPT custom engine group
+Date:   Wed, 1 Dec 2021 14:31:59 +0530
+Message-ID: <cover.1638348922.git.sthotton@marvell.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20211201004858.19831-19-nstange@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: ElN7nmi9AY1YdLyHC9GIFdv9BoCDYulC
+X-Proofpoint-GUID: ElN7nmi9AY1YdLyHC9GIFdv9BoCDYulC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-30_10,2021-11-28_01,2020-04-07_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 12/1/21 1:48 AM, Nicolai Stange wrote:
-> SP800-56Arev3, sec. 5.5.2 ("Assurance of Domain-Parameter Validity")
-> asserts that an implementation needs to verify domain paramtere validity,
-> which boils down to either
-> - the domain parameters corresponding to some known safe-prime group
->    explicitly listed to be approved in the document or
-> - for parameters conforming to a "FIPS 186-type parameter-size set",
->    that the implementation needs to perform an explicit domain parameter
->    verification, which would require access to the "seed" and "counter"
->    values used in their generation.
-> 
-> The latter is not easily feasible and moreover, SP800-56Arev3 states that
-> safe-prime groups are preferred and that FIPS 186-type parameter sets
-> should only be supported for backward compatibility, if it all.
-> 
-> Make the dh implementations reject any domain parameters which don't
-> correspond to any of the approved safe-prime groups in FIPS mode. The
-> approved safe-prime groups are the ones specified in RFC 7919 and RFC 3526,
-> and given that all possible values of enum dh_group_id correspond to
-> either groups from these RFCs or to dh_group_id_unknown, it suffices to
-> make crypto_dh_decode_key() to reject any parameter set where
-> ->group_id == dh_group_id_unknown.
-> 
-> As this change will effectively render the dh implementation unusable in
-> FIPS mode if neither of the CRYPTO_DH_GROUPS_RFC7919 or
-> CRYPTO_DH_GROUPS_RFC3526 Kconfig options enabled, make CRYPTO_DH imply
-> these two if CRYPTO_FIPS is set.
-> 
-> Signed-off-by: Nicolai Stange <nstange@suse.de>
-> ---
->   crypto/Kconfig     | 2 ++
->   crypto/dh_helper.c | 4 ++++
->   2 files changed, 6 insertions(+)
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 578711b02bb3..571f2271ad2e 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -229,6 +229,8 @@ menuconfig CRYPTO_DH
->   	select CRYPTO_KPP
->   	select MPILIB
->   	select CRYPTO_RNG_DEFAULT
-> +	imply CRYPTO_DH_GROUPS_RFC7919 if CRYPTO_FIPS
-> +	imply CRYPTO_DH_GROUPS_RFC3526 if CRYPTO_FIPS
->   	help
->   	  Generic implementation of the Diffie-Hellman algorithm.
->   
-> diff --git a/crypto/dh_helper.c b/crypto/dh_helper.c
-> index cf632beca65e..f30674df0d76 100644
-> --- a/crypto/dh_helper.c
-> +++ b/crypto/dh_helper.c
-> @@ -7,6 +7,7 @@
->   #include <linux/export.h>
->   #include <linux/err.h>
->   #include <linux/string.h>
-> +#include <linux/fips.h>
->   #include <crypto/dh.h>
->   #include <crypto/kpp.h>
->   #include <crypto/rng.h>
-> @@ -622,6 +623,9 @@ int crypto_dh_decode_key(const char *buf, unsigned int len, struct dh *params)
->   	    params->g_size > params->p_size)
->   		return -EINVAL;
->   
-> +	/* Only safe-prime groups are allowed in FIPS mode. */
-> +	if (fips_enabled && params->group_id == dh_group_id_unknown)
-> +		return -EINVAL;
->   
->   	return 0;
->   }
-> 
-That was cheap.
-Maybe merge it with the previous patch?
+Octeon TX2 CPT has three type of engines to handle symmetric, asymmetric
+and ipsec specific workload. For better utilization, these engines can
+be grouped to custom groups at runtime. Devlink parameters are used to
+create and destroy the custom groups (devlink is a framework mainly used
+in network subsystem).
 
-Cheers,
+Srujana Challa (2):
+  crypto: octeontx2: add apis for custom engine groups
+  crypto: octeontx2: parameters for custom engine groups
 
-Hannes
+ drivers/crypto/marvell/octeontx2/Makefile     |   2 +-
+ .../marvell/octeontx2/otx2_cpt_common.h       |   1 +
+ .../marvell/octeontx2/otx2_cpt_devlink.c      | 108 ++++++
+ .../marvell/octeontx2/otx2_cpt_devlink.h      |  20 ++
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   3 +
+ .../marvell/octeontx2/otx2_cptpf_main.c       |   9 +
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      | 322 +++++++++++++++++-
+ .../marvell/octeontx2/otx2_cptpf_ucode.h      |   7 +-
+ 8 files changed, 464 insertions(+), 8 deletions(-)
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_devlink.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_devlink.h
+
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+2.25.1
+
