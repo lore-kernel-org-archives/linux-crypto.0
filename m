@@ -2,50 +2,51 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15AA3C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6AD2C4321E
 	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 00:51:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241086AbhLAAyQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 19:54:16 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:46174 "EHLO
+        id S1346014AbhLAAyT (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 19:54:19 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:46120 "EHLO
         smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345896AbhLAAxJ (ORCPT
+        with ESMTP id S1345927AbhLAAwy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 19:53:09 -0500
+        Tue, 30 Nov 2021 19:52:54 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 530DC218B1;
-        Wed,  1 Dec 2021 00:49:35 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id DAFD4218B0;
+        Wed,  1 Dec 2021 00:49:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1638319775; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1638319773; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oqw18w5nFaCEcD5Uelb5QETIxr3keqmWNZ5qeZ+umZ4=;
-        b=y0BQrKGwOsb5qGot0ZlzfsRXO22eSq1P6FpvFRkCyaKui/qVbgwLwEpCX5RGqQkjeJt1v6
-        +mIoLSlfPHyujFYds0IYpnPuq2MgTE6rsrCUo7W0OTKL+11P5lmgHmkhsnrPc9jUYyy7gq
-        g5RgBZtMDj4812ttu3nVd53Xy4dXAQg=
+        bh=NXnywiVMHG+5JOnuWv+Zk8oIW2CyLkb/2z/hvW1vh6c=;
+        b=FL5xOUfG+UMRPlr6thZJghC1woUSKy+DdD9o2ZlfeP90JHq//JFGgKyGITOwTXMlZmE0Sv
+        7OqqBQhnTy9ws9hXmbN3rhROpLfAgPjM4Vk+sKTBJpiV5R5ngvi0Kc2eWrLUEzyrTthF9j
+        clqOTZ1r45QcKMdA7qkpKN7ZCoB2onM=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1638319775;
+        s=susede2_ed25519; t=1638319773;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oqw18w5nFaCEcD5Uelb5QETIxr3keqmWNZ5qeZ+umZ4=;
-        b=+R56cki0OQSOLxiZibN0A4EhjeJpeslGklbhC90DGzuxe1iZosFVffqlb5bF8YSfsh4IrI
-        5w7rQwGC9m3H+pCg==
+        bh=NXnywiVMHG+5JOnuWv+Zk8oIW2CyLkb/2z/hvW1vh6c=;
+        b=FxOevjpFK5oGFKxLlqoTLN0WHV7zO1HyOO8EJ8oeC4C95OhkfbO9V9JAF0m01298VsM63K
+        qImgpgq2Tbn8aFBQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 402F113C10;
-        Wed,  1 Dec 2021 00:49:35 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C789F13C10;
+        Wed,  1 Dec 2021 00:49:33 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 1LxTDp/GpmEGKQAAMHmgww
-        (envelope-from <nstange@suse.de>); Wed, 01 Dec 2021 00:49:35 +0000
+        id 1vAwL53GpmEAKQAAMHmgww
+        (envelope-from <nstange@suse.de>); Wed, 01 Dec 2021 00:49:33 +0000
 From:   Nicolai Stange <nstange@suse.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
@@ -58,9 +59,9 @@ Cc:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         qat-linux@intel.com, keyrings@vger.kernel.org,
         Nicolai Stange <nstange@suse.de>
-Subject: [PATCH 16/18] crypto: dh - calculate Q from P for the full public key verification
-Date:   Wed,  1 Dec 2021 01:48:56 +0100
-Message-Id: <20211201004858.19831-17-nstange@suse.de>
+Subject: [PATCH 14/18] lib/mpi: export mpi_rshift
+Date:   Wed,  1 Dec 2021 01:48:54 +0100
+Message-Id: <20211201004858.19831-15-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20211201004858.19831-1-nstange@suse.de>
 References: <20211201004858.19831-1-nstange@suse.de>
@@ -70,105 +71,28 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As the ->q in struct dh_ctx gets never set anywhere, the code
-in dh_is_pubkey_valid() for doing the full public key validation in
-accordance to SP800-56Arev3 is effectively dead.
-
-However, for safe-prime groups, Q = (P - 1)/2 by definition and this
-enables dh_is_pubkey_valid() to calculate Q on the fly for these groups.
-Implement this.
-
-With this change, the last code accessing struct dh_ctx's ->q is now gone.
-Remove this member from struct dh_ctx.
+A subsequent patch will make the crypto/dh's dh_is_pubkey_valid() to
+calculate a safe-prime groups Q parameter from P: Q = (P - 1) / 2. For
+implementing this, mpi_rshift() will be needed. Export it so that it's
+accessible from crypto/dh.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- crypto/dh.c | 40 +++++++++++++++++++++++++++++-----------
- 1 file changed, 29 insertions(+), 11 deletions(-)
+ lib/mpi/mpi-bit.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/dh.c b/crypto/dh.c
-index 38547c5301da..21de91a87ea5 100644
---- a/crypto/dh.c
-+++ b/crypto/dh.c
-@@ -15,7 +15,6 @@
- struct dh_ctx {
- 	enum dh_group_id group_id;
- 	MPI p;	/* Value is guaranteed to be set. */
--	MPI q;	/* Value is optional. */
- 	MPI g;	/* Value is guaranteed to be set. */
- 	MPI xa;	/* Value is guaranteed to be set. */
- };
-@@ -23,7 +22,6 @@ struct dh_ctx {
- static void dh_clear_ctx(struct dh_ctx *ctx)
- {
- 	mpi_free(ctx->p);
--	mpi_free(ctx->q);
- 	mpi_free(ctx->g);
- 	mpi_free(ctx->xa);
- 	memset(ctx, 0, sizeof(*ctx));
-@@ -114,11 +112,12 @@ static int dh_set_secret(struct crypto_kpp *tfm, const void *buf,
- /*
-  * SP800-56A public key verification:
-  *
-- * * If Q is provided as part of the domain paramenters, a full validation
-- *   according to SP800-56A section 5.6.2.3.1 is performed.
-+ * * For safe-prime groups, Q can be computed trivially from P and a
-+ *   full validation according to SP800-56A section 5.6.2.3.1 is
-+ *   performed.
-  *
-- * * If Q is not provided, a partial validation according to SP800-56A section
-- *   5.6.2.3.2 is performed.
-+ * * For all other sets of group parameters, only a partial validation
-+ *   according to SP800-56A section 5.6.2.3.2 is performed.
-  */
- static int dh_is_pubkey_valid(struct dh_ctx *ctx, MPI y)
- {
-@@ -129,21 +128,40 @@ static int dh_is_pubkey_valid(struct dh_ctx *ctx, MPI y)
- 	 * Step 1: Verify that 2 <= y <= p - 2.
- 	 *
- 	 * The upper limit check is actually y < p instead of y < p - 1
--	 * as the mpi_sub_ui function is yet missing.
-+	 * in order to save one mpi_sub_ui() invocation here. Note that
-+	 * p - 1 is the non-trivial element of the subgroup of order 2 and
-+	 * thus, the check on y^q below would fail if y == p - 1.
- 	 */
- 	if (mpi_cmp_ui(y, 1) < 1 || mpi_cmp(y, ctx->p) >= 0)
- 		return -EINVAL;
+diff --git a/lib/mpi/mpi-bit.c b/lib/mpi/mpi-bit.c
+index 142b680835df..070ba784c9f1 100644
+--- a/lib/mpi/mpi-bit.c
++++ b/lib/mpi/mpi-bit.c
+@@ -242,6 +242,7 @@ void mpi_rshift(MPI x, MPI a, unsigned int n)
+ 	}
+ 	MPN_NORMALIZE(x->d, x->nlimbs);
+ }
++EXPORT_SYMBOL_GPL(mpi_rshift);
  
--	/* Step 2: Verify that 1 = y^q mod p */
--	if (ctx->q) {
--		MPI val = mpi_alloc(0);
-+	/*
-+	 * Step 2: Verify that 1 = y^q mod p
-+	 *
-+	 * For the safe-prime groups q = (p - 1)/2.
-+	 */
-+	if (ctx->group_id != dh_group_id_unknown) {
-+		MPI val, q;
- 		int ret;
- 
-+		val = mpi_alloc(0);
- 		if (!val)
- 			return -ENOMEM;
- 
--		ret = mpi_powm(val, y, ctx->q, ctx->p);
-+		q = mpi_alloc(mpi_get_nlimbs(ctx->p));
-+		if (!q) {
-+			mpi_free(val);
-+			return -ENOMEM;
-+		}
-+
-+		/*
-+		 * ->p is odd, so no need to explicitly subtract one
-+		 * from it before shifting to the right.
-+		 */
-+		mpi_rshift(q, ctx->p, 1);
- 
-+		ret = mpi_powm(val, y, q, ctx->p);
-+		mpi_free(q);
- 		if (ret) {
- 			mpi_free(val);
- 			return ret;
+ /****************
+  * Shift A by COUNT limbs to the left
 -- 
 2.26.2
 
