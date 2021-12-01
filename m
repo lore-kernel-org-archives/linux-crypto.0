@@ -2,142 +2,155 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95AD8C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 10:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC178C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 11:48:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348639AbhLAKb0 (ORCPT
+        id S1349027AbhLALwD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Dec 2021 05:31:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46824 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348628AbhLAKb0 (ORCPT
+        Wed, 1 Dec 2021 06:52:03 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:42012 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348563AbhLALwC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Dec 2021 05:31:26 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38551C061574;
-        Wed,  1 Dec 2021 02:28:05 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Wed, 1 Dec 2021 06:52:02 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id E8C3D212C2;
+        Wed,  1 Dec 2021 11:48:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1638359319; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WrpXoBK/4LwwvZ609Va7mvqZYMz7+OB0m9N/bzmDziw=;
+        b=HoFAEUtdm1wIBQkZ8wytWV68qtGZn5Zx5grFcSya42VQirGgSCl6A+DC2vIcZ5TdyxdbTr
+        W2NAmwDLCRrnNBybHxojCOdjDjD70hWsiQ6QiXdF+k7JVvpls0tm3Ngx0XWYwG/B7neevV
+        w/0YAfAcfrGr1j1OEHqZd2YRZeXZFvw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1638359319;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WrpXoBK/4LwwvZ609Va7mvqZYMz7+OB0m9N/bzmDziw=;
+        b=lFf3wqoLPgzv6s+15hy2N/O1nDrvid9mKt3tQRAPUvx23YZo+486dPM+tI4vMosa0+voxm
+        ihq/i/mlKzqbKOBA==
+Received: from kunlun.suse.cz (unknown [10.100.128.76])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 389FDCE1DB2;
-        Wed,  1 Dec 2021 10:28:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D209AC53FCC;
-        Wed,  1 Dec 2021 10:28:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638354481;
-        bh=m6mcqbYuHeMeS8hGqq/RnBLl6KXb9FndE6k43W6VWWo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VA3AxZbGfIiJSQyqUMMErcKvc7GlztLuXaxI6MfnvTIi8GJd0KlUku7RdXKYYc7DD
-         QwFn+fCa08o6c1SaDDMV5GXaCBra2i5oKaNn3+iKK/iwpdDtKbvIV/A4IA7LWVqgu+
-         WOppeNg/PZbQ/feuQw1y19GjoYIrNW4CqJ4c5ePkH8TfxeS8Zcf9nFdpW1r99vCTVr
-         BLrWzLjILbGWwljOpKUAk32T20jSEGE/vViTW/0pyufacOkXi0Swu6y7ED3Lkq0xX8
-         HOifikPZyAZpkbveo7+dDfD8BepfUhyK/68Gy1Bvi9xeZNTcTyLr/tBWDioq2cRSGo
-         wS9Zq0FPdRzdQ==
-Date:   Wed, 1 Dec 2021 12:27:58 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
-        "weiyongjun1@huawei.com" <weiyongjun1@huawei.com>,
-        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
-        "ebiggers@google.com" <ebiggers@google.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "nramas@linux.microsoft.com" <nramas@linux.microsoft.com>,
-        "lszubowi@redhat.com" <lszubowi@redhat.com>,
-        "jason@zx2c4.com" <jason@zx2c4.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "James.Bottomley@hansenpartnership.com" 
-        <James.Bottomley@hansenpartnership.com>,
-        "pjones@redhat.com" <pjones@redhat.com>,
-        Konrad Wilk <konrad.wilk@oracle.com>
-Subject: Re: [PATCH v8 09/17] KEYS: Rename
- get_builtin_and_secondary_restriction
-Message-ID: <YadOLrHb14MEfphi@iki.fi>
-References: <20211124044124.998170-1-eric.snowberg@oracle.com>
- <20211124044124.998170-10-eric.snowberg@oracle.com>
- <fb1d583f588e3f46fdadbe3cf6288bb098ff45f8.camel@kernel.org>
- <8906F8A4-313F-45E5-8ABD-A1A2D07BFD93@oracle.com>
+        by relay2.suse.de (Postfix) with ESMTPS id 3A7ECA3B81;
+        Wed,  1 Dec 2021 11:48:37 +0000 (UTC)
+Date:   Wed, 1 Dec 2021 12:48:36 +0100
+From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To:     Baoquan He <bhe@redhat.com>
+Cc:     Nayna <nayna@linux.vnet.ibm.com>, Mimi Zohar <zohar@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+        Paul Mackerras <paulus@samba.org>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Rob Herring <robh@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        James Morris <jmorris@namei.org>,
+        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>,
+        linux-crypto@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        Hari Bathini <hbathini@linux.ibm.com>,
+        Daniel Axtens <dja@axtens.net>,
+        Philipp Rudo <prudo@redhat.com>,
+        Frank van der Linden <fllinden@amazon.com>,
+        kexec@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        linux-security-module@vger.kernel.org,
+        Jessica Yu <jeyu@kernel.org>, linux-integrity@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        buendgen@de.ibm.com
+Subject: Re: [PATCH v2 0/6] KEXEC_SIG with appended signature
+Message-ID: <20211201114836.GD117207@kunlun.suse.cz>
+References: <cover.1637862358.git.msuchanek@suse.de>
+ <20211201023747.GN21646@MiWiFi-R3L-srv>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8906F8A4-313F-45E5-8ABD-A1A2D07BFD93@oracle.com>
+In-Reply-To: <20211201023747.GN21646@MiWiFi-R3L-srv>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 30, 2021 at 05:21:45PM +0000, Eric Snowberg wrote:
-> 
-> 
-> > On Nov 26, 2021, at 5:49 PM, Jarkko Sakkinen <jarkko@kernel.org> wrote:
-> > 
-> > On Tue, 2021-11-23 at 23:41 -0500, Eric Snowberg wrote:
-> >> In preparation for returning either the existing
-> >> restrict_link_by_builtin_and_secondary_trusted or the upcoming
-> >> restriction that includes the trusted builtin, secondary and
-> >> machine keys, to improve clarity, rename
-> >> get_builtin_and_secondary_restriction to get_secondary_restriction.
-> >> 
-> >> Suggested-by: Mimi Zohar <zohar@linux.ibm.com>
-> >> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
-> >> Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
-> >> ---
-> >> v6: Initial version
-> >> v7: Unmodified from v7
-> >> v8: Code unmodified from v7, added Mimi's Reviewed-by
-> >> ---
-> >>  certs/system_keyring.c | 4 ++--
-> >>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >> 
-> >> diff --git a/certs/system_keyring.c b/certs/system_keyring.c
-> >> index 692365dee2bd..8f1f87579819 100644
-> >> --- a/certs/system_keyring.c
-> >> +++ b/certs/system_keyring.c
-> >> @@ -77,7 +77,7 @@ int restrict_link_by_builtin_and_secondary_trusted(
-> >>   * Allocate a struct key_restriction for the "builtin and secondary trust"
-> >>   * keyring. Only for use in system_trusted_keyring_init().
-> >>   */
-> >> -static __init struct key_restriction *get_builtin_and_secondary_restriction(void)
-> >> +static __init struct key_restriction *get_secondary_restriction(void)
-> >>  {
-> >>         struct key_restriction *restriction;
-> >>  
-> >> @@ -117,7 +117,7 @@ static __init int system_trusted_keyring_init(void)
-> >>                                KEY_USR_VIEW | KEY_USR_READ | KEY_USR_SEARCH |
-> >>                                KEY_USR_WRITE),
-> >>                               KEY_ALLOC_NOT_IN_QUOTA,
-> >> -                             get_builtin_and_secondary_restriction(),
-> >> +                             get_secondary_restriction(),
-> >>                               NULL);
-> >>         if (IS_ERR(secondary_trusted_keys))
-> >>                 panic("Can't allocate secondary trusted keyring\n");
-> > 
-> > This is wrong order.
-> > 
-> > You should first do the changes that make the old name
-> > obsolete and only after that have a patch that does the
-> > rename. Unfortunately, this patch cannot possibly acked
-> > with the current order.
-> 
-> I can change the order, but I'm confused how this would work for a git bisect. 
-> If the rename happens afterwards, now two patches will always need to be 
-> reverted instead of the possibility of one.  Is this your expectation?
+Hello,
 
-I'd drop this patch altogether. Old name is a bit ugly but does it matter
-all that much?
+On Wed, Dec 01, 2021 at 10:37:47AM +0800, Baoquan He wrote:
+> Hi,
+> 
+> On 11/25/21 at 07:02pm, Michal Suchanek wrote:
+> > Hello,
+> > 
+> > This is resend of the KEXEC_SIG patchset.
+> > 
+> > The first patch is new because it'a a cleanup that does not require any
+> > change to the module verification code.
+> > 
+> > The second patch is the only one that is intended to change any
+> > functionality.
+> > 
+> > The rest only deduplicates code but I did not receive any review on that
+> > part so I don't know if it's desirable as implemented.
+> 
+> Do you have the link of your 1st version?
 
-You already 16 patches without this.
+This is the previous version:
+https://lore.kernel.org/lkml/cover.1635948742.git.msuchanek@suse.de/
 
-/Jarkko
+Thanks
+
+Michal
+
+> And after going through the whole series, it doesn't tell what this
+> patch series intends to do in cover-letter or patch log.
+> 
+> Thanks
+> Baoquan
+> 
+> > 
+> > The first two patches can be applied separately without the rest.
+> > 
+> > Thanks
+> > 
+> > Michal
+> > 
+> > Michal Suchanek (6):
+> >   s390/kexec_file: Don't opencode appended signature check.
+> >   powerpc/kexec_file: Add KEXEC_SIG support.
+> >   kexec_file: Don't opencode appended signature verification.
+> >   module: strip the signature marker in the verification function.
+> >   module: Use key_being_used_for for log messages in
+> >     verify_appended_signature
+> >   module: Move duplicate mod_check_sig users code to mod_parse_sig
+> > 
+> >  arch/powerpc/Kconfig                     | 11 +++++
+> >  arch/powerpc/kexec/elf_64.c              | 14 ++++++
+> >  arch/s390/kernel/machine_kexec_file.c    | 42 ++----------------
+> >  crypto/asymmetric_keys/asymmetric_type.c |  1 +
+> >  include/linux/module_signature.h         |  1 +
+> >  include/linux/verification.h             |  4 ++
+> >  kernel/module-internal.h                 |  2 -
+> >  kernel/module.c                          | 12 +++--
+> >  kernel/module_signature.c                | 56 +++++++++++++++++++++++-
+> >  kernel/module_signing.c                  | 33 +++++++-------
+> >  security/integrity/ima/ima_modsig.c      | 22 ++--------
+> >  11 files changed, 113 insertions(+), 85 deletions(-)
+> > 
+> > -- 
+> > 2.31.1
+> > 
+> > 
+> > _______________________________________________
+> > kexec mailing list
+> > kexec@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/kexec
+> > 
+> 
