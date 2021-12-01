@@ -2,192 +2,144 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AABFDC4332F
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 13:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9035C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 14:47:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349622AbhLANvY (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Dec 2021 08:51:24 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9180 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1349647AbhLANvK (ORCPT
+        id S234991AbhLAOuj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Dec 2021 09:50:39 -0500
+Received: from mail-oi1-f172.google.com ([209.85.167.172]:40529 "EHLO
+        mail-oi1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1351461AbhLAOuA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Dec 2021 08:51:10 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B1DcDDM019892;
-        Wed, 1 Dec 2021 13:47:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=kLrwl+sjdutKijzkkRE3ijtdTFL3tqrSpl9/QVu7zds=;
- b=dg4EXzmMpz7zee6v+kPfKEj4zvO4Ui3JsGX2AaIlIuxZ6bw2HUlpOktbMEZYq5rX+7ly
- d8Pg9yE9zet+zMbknV+j4qNfp7DKruwgMmJWRQMUIn8m2Js32Yfiq1gbzVJOc4D8He8Q
- x5LAJWwjNbvkunnyjhmu00GA2R2SZu29EgSHMGqGoaEipAeX8XqEweeGtcWR9ADiFGam
- VRVm0VQ80ldo/mtOK8MVDtOv5/WZjt/dZO4VdOR3WpFfmpZktMCRddmCqrMXbnsvrcJj
- To7Akl58jpyeNCU1Xupkcqg5ZNM2kbImDziP1SvTFqfj+TOyPF+9GT9l1sYy+pc8wkNK 0g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cp9bshbhe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 01 Dec 2021 13:47:03 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B1DcDj9020017;
-        Wed, 1 Dec 2021 13:47:02 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cp9bshbgj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 01 Dec 2021 13:47:02 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B1DTFWN020620;
-        Wed, 1 Dec 2021 13:47:00 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3ckca9rdrr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 01 Dec 2021 13:47:00 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B1DkvHR21954996
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 1 Dec 2021 13:46:57 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BFB27AE04D;
-        Wed,  1 Dec 2021 13:46:57 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 76185AE055;
-        Wed,  1 Dec 2021 13:46:54 +0000 (GMT)
-Received: from sig-9-65-78-183.ibm.com (unknown [9.65.78.183])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  1 Dec 2021 13:46:54 +0000 (GMT)
-Message-ID: <61f5d74f861ce1015831649d3bca9272a2e3b7bf.camel@linux.ibm.com>
-Subject: Re: [PATCH v8 09/17] KEYS: Rename
- get_builtin_and_secondary_restriction
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
-        "weiyongjun1@huawei.com" <weiyongjun1@huawei.com>,
-        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
-        "ebiggers@google.com" <ebiggers@google.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "nramas@linux.microsoft.com" <nramas@linux.microsoft.com>,
-        "lszubowi@redhat.com" <lszubowi@redhat.com>,
-        "jason@zx2c4.com" <jason@zx2c4.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "James.Bottomley@hansenpartnership.com" 
-        <James.Bottomley@hansenpartnership.com>,
-        "pjones@redhat.com" <pjones@redhat.com>,
-        Konrad Wilk <konrad.wilk@oracle.com>
-Date:   Wed, 01 Dec 2021 08:46:53 -0500
-In-Reply-To: <YadOLrHb14MEfphi@iki.fi>
-References: <20211124044124.998170-1-eric.snowberg@oracle.com>
-         <20211124044124.998170-10-eric.snowberg@oracle.com>
-         <fb1d583f588e3f46fdadbe3cf6288bb098ff45f8.camel@kernel.org>
-         <8906F8A4-313F-45E5-8ABD-A1A2D07BFD93@oracle.com> <YadOLrHb14MEfphi@iki.fi>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: m7A-PkvjVAc_VwmPRrA3SGHBXpos4Gvu
-X-Proofpoint-GUID: CoTpQMEuZT4FveB5sK-lbS6R6yGDSE-Z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-30_10,2021-12-01_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- bulkscore=0 adultscore=0 impostorscore=0 phishscore=0 priorityscore=1501
- clxscore=1015 malwarescore=0 lowpriorityscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112010078
+        Wed, 1 Dec 2021 09:50:00 -0500
+Received: by mail-oi1-f172.google.com with SMTP id bk14so48964854oib.7;
+        Wed, 01 Dec 2021 06:46:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kHlQKFdRmHGrGusvRZxAIIy9u1JQqYfGD9T6CB33KYM=;
+        b=3FiezFslMLAtKuir2T298DE4MhwryGsZ/M5M9ds61Tzhli/GMYKbxVHv65eVx3r0HY
+         OSRvD+vbAay6A0oyN896oltHs7WFnZThvCAdhhjzo7y8FPoSON4QQWLqXMdGyLJf5EWm
+         sJTRfETMVE1wSylVuLr12mk4Pj/bzt9ipS8wr1Oj3sPrKlSE3LjVDXoUMQDbWj/Dl1XV
+         x6dyCziakOnGcLzM9hsHOAEQlXe9JvfCBk6qeesEkX87zl/LjqTgWOdGUfe+EIKeK8s8
+         kcB0Kk4LVMCQkDJe9StFFQCMB7yZMMTah379p6SWlyjDVWUxPaRyyvmz3BrPOyP24grl
+         tmxQ==
+X-Gm-Message-State: AOAM530O7x0eUwd/fyRhUCBiswrabO2J2iGWb7BdVJulxRuodn4VE9eT
+        kROYyaaSQTrtRpzIkQlf1sYPw8pGM18yCccNtmg=
+X-Google-Smtp-Source: ABdhPJz3iqJlu25kel8NkDOAqEIDYIppOuUIXsOo5T5so4K6B2b9xfKsnjrS2jUAwAhaYdj1u6BcVDTz+x0ayz8Ocfo=
+X-Received: by 2002:aca:eb0b:: with SMTP id j11mr6381292oih.51.1638369999775;
+ Wed, 01 Dec 2021 06:46:39 -0800 (PST)
+MIME-Version: 1.0
+References: <4239b61f-f8c5-462f-2951-fbba2dec8b1d@gmail.com> <20211201063041.GC684@gondor.apana.org.au>
+In-Reply-To: <20211201063041.GC684@gondor.apana.org.au>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Wed, 1 Dec 2021 15:46:28 +0100
+Message-ID: <CAJZ5v0iEFye=BJjqUQUDP+e3r_fSWxj-bv=W7aaJO7fuk5wyZg@mail.gmail.com>
+Subject: Re: crypto: stm32 - Revert broken pm_runtime_resume_and_get changes
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Heiner Kallweit <hkallweit1@gmail.com>,
+        Shixin Liu <liushixin2@huawei.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2021-12-01 at 12:27 +0200, Jarkko Sakkinen wrote:
-> On Tue, Nov 30, 2021 at 05:21:45PM +0000, Eric Snowberg wrote:
-> > 
-> > 
-> > > On Nov 26, 2021, at 5:49 PM, Jarkko Sakkinen <jarkko@kernel.org> wrote:
-> > > 
-> > > On Tue, 2021-11-23 at 23:41 -0500, Eric Snowberg wrote:
-> > >> In preparation for returning either the existing
-> > >> restrict_link_by_builtin_and_secondary_trusted or the upcoming
-> > >> restriction that includes the trusted builtin, secondary and
-> > >> machine keys, to improve clarity, rename
-> > >> get_builtin_and_secondary_restriction to get_secondary_restriction.
-> > >> 
-> > >> Suggested-by: Mimi Zohar <zohar@linux.ibm.com>
-> > >> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
-> > >> Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
-> > >> ---
-> > >> v6: Initial version
-> > >> v7: Unmodified from v7
-> > >> v8: Code unmodified from v7, added Mimi's Reviewed-by
-> > >> ---
-> > >>  certs/system_keyring.c | 4 ++--
-> > >>  1 file changed, 2 insertions(+), 2 deletions(-)
-> > >> 
-> > >> diff --git a/certs/system_keyring.c b/certs/system_keyring.c
-> > >> index 692365dee2bd..8f1f87579819 100644
-> > >> --- a/certs/system_keyring.c
-> > >> +++ b/certs/system_keyring.c
-> > >> @@ -77,7 +77,7 @@ int restrict_link_by_builtin_and_secondary_trusted(
-> > >>   * Allocate a struct key_restriction for the "builtin and secondary trust"
-> > >>   * keyring. Only for use in system_trusted_keyring_init().
-> > >>   */
-> > >> -static __init struct key_restriction *get_builtin_and_secondary_restriction(void)
-> > >> +static __init struct key_restriction *get_secondary_restriction(void)
-> > >>  {
-> > >>         struct key_restriction *restriction;
-> > >>  
-> > >> @@ -117,7 +117,7 @@ static __init int system_trusted_keyring_init(void)
-> > >>                                KEY_USR_VIEW | KEY_USR_READ | KEY_USR_SEARCH |
-> > >>                                KEY_USR_WRITE),
-> > >>                               KEY_ALLOC_NOT_IN_QUOTA,
-> > >> -                             get_builtin_and_secondary_restriction(),
-> > >> +                             get_secondary_restriction(),
-> > >>                               NULL);
-> > >>         if (IS_ERR(secondary_trusted_keys))
-> > >>                 panic("Can't allocate secondary trusted keyring\n");
-> > > 
-> > > This is wrong order.
-> > > 
-> > > You should first do the changes that make the old name
-> > > obsolete and only after that have a patch that does the
-> > > rename. Unfortunately, this patch cannot possibly acked
-> > > with the current order.
+On Wed, Dec 1, 2021 at 7:30 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Sat, Nov 27, 2021 at 02:39:52PM +0100, Heiner Kallweit wrote:
+> > When discussing whether pm_runtime_resume_and_get() should be annotated as
+> > __must_check, I became aware of RPM usage in crypto/stm32.
 > >
-> > I can change the order, but I'm confused how this would work for a git bisect. 
-> > If the rename happens afterwards, now two patches will always need to be 
-> > reverted instead of the possibility of one.  Is this your expectation?
+> > Following two patches replace usage of pm_runtime_get_sync() with
+> > pm_runtime_resume_and_get() w/o checking the return code.
+> >
+> > 747bf30fd944 ("crypto: stm32/cryp - Fix PM reference leak on stm32-cryp.c")
+> > 1cb3ad701970 ("crypto: stm32/hash - Fix PM reference leak on stm32-hash.c")
+> >
+> > This results in RPM usage like the following in stm32_hash_export():
+> >
+> > pm_runtime_resume_and_get(hdev->dev);
+> > ...
+> > pm_runtime_mark_last_busy(hdev->dev);
+> > pm_runtime_put_autosuspend(hdev->dev);
+> >
+> > This is broken. After pm_runtime_resume_and_get() the usage count may be
+> > incremented or not. If not, then the call to pm_runtime_put_autosuspend()
+> > results in exactly the imbalance that the patch claims to fix.
+> >
+> > Therefore I think both patches should be reverted, or the return code
+> > of pm_runtime_resume_and_get() has to be checked and properly handled
+> > in the driver logic.
+>
+> I agree.  But we can't revert them completely because it does
+> fix some genuine issues with the ones where we do check the error
+> code.  What about this patch?
+>
+> ---8<---
+> We should not call pm_runtime_resume_and_get where the reference
+> count is expected to be incremented unconditionally.  This patch
+> reverts these calls to the original unconditional get_sync call.
 
-If the keyring name change is independent of any other changes, as
-Jarkko suggested, nothing would break.
+Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
-> I'd drop this patch altogether. Old name is a bit ugly but does it matter
-> all that much?
+The rule of thumb is to use pm_runtime_resume_and_get() if you want to
+check the return value (and act on it) and pm_runtime_get_sync()
+otherwise.
 
-The name "get_builtin_and_secondary_restriction" implies trust based on
-keys in the ".builtin_trusted_keys" and ".secondary_trusted_keys"
-keyrings.  This patch set is extending that to include keys on the new
-".machine" keyring, by linking it to the secondary keyring.  Is leaving
-the name unchanged really an option?
-
-> 
-> You already 16 patches without this.
-
-Agreed, it's a lot.  In the past, I've asked Eric to see if some of
-them could be squashed.
-
-Mimi
-
+> Reported-by: Heiner Kallweit <hkallweit1@gmail.com>
+> Fixes: 747bf30fd944 ("crypto: stm32/cryp - Fix PM reference leak...")
+> Fixes: 1cb3ad701970 ("crypto: stm32/hash - Fix PM reference leak...")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
+> index 7389a0536ff0..05087831e199 100644
+> --- a/drivers/crypto/stm32/stm32-cryp.c
+> +++ b/drivers/crypto/stm32/stm32-cryp.c
+> @@ -542,7 +542,7 @@ static int stm32_cryp_hw_init(struct stm32_cryp *cryp)
+>         int ret;
+>         u32 cfg, hw_mode;
+>
+> -       pm_runtime_resume_and_get(cryp->dev);
+> +       pm_runtime_get_sync(cryp->dev);
+>
+>         /* Disable interrupt */
+>         stm32_cryp_write(cryp, CRYP_IMSCR, 0);
+> diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+> index 389de9e3302d..d33006d43f76 100644
+> --- a/drivers/crypto/stm32/stm32-hash.c
+> +++ b/drivers/crypto/stm32/stm32-hash.c
+> @@ -813,7 +813,7 @@ static void stm32_hash_finish_req(struct ahash_request *req, int err)
+>  static int stm32_hash_hw_init(struct stm32_hash_dev *hdev,
+>                               struct stm32_hash_request_ctx *rctx)
+>  {
+> -       pm_runtime_resume_and_get(hdev->dev);
+> +       pm_runtime_get_sync(hdev->dev);
+>
+>         if (!(HASH_FLAGS_INIT & hdev->flags)) {
+>                 stm32_hash_write(hdev, HASH_CR, HASH_CR_INIT);
+> @@ -962,7 +962,7 @@ static int stm32_hash_export(struct ahash_request *req, void *out)
+>         u32 *preg;
+>         unsigned int i;
+>
+> -       pm_runtime_resume_and_get(hdev->dev);
+> +       pm_runtime_get_sync(hdev->dev);
+>
+>         while ((stm32_hash_read(hdev, HASH_SR) & HASH_SR_BUSY))
+>                 cpu_relax();
+> @@ -1000,7 +1000,7 @@ static int stm32_hash_import(struct ahash_request *req, const void *in)
+>
+>         preg = rctx->hw_context;
+>
+> -       pm_runtime_resume_and_get(hdev->dev);
+> +       pm_runtime_get_sync(hdev->dev);
+>
+>         stm32_hash_write(hdev, HASH_IMR, *preg++);
+>         stm32_hash_write(hdev, HASH_STR, *preg++);
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
