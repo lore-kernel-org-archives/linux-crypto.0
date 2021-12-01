@@ -2,38 +2,59 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA14EC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 18:05:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A4DC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 18:25:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237013AbhLASIq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Dec 2021 13:08:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39632 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244633AbhLASIp (ORCPT
+        id S237744AbhLAS23 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Dec 2021 13:28:29 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:55248 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229547AbhLAS22 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Dec 2021 13:08:45 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A518FC061748;
-        Wed,  1 Dec 2021 10:05:24 -0800 (PST)
+        Wed, 1 Dec 2021 13:28:28 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6BA17B8207C;
-        Wed,  1 Dec 2021 18:05:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EFC1C53FAD;
-        Wed,  1 Dec 2021 18:05:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1638381922;
-        bh=XbToeRhO4U+LcTBk8WL1vry3oDsNq28IfW0JwuLumMs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=aGFuZAZEhoZ1dywFzOAPdsrI5ui4/xc/81/dt2ZgWsc83jCnVQjY8EXC1o6rAv55M
-         lsW3JasFJS+5auOFvH73Yt2IkGl1v6zTPtFqKFL8g1kpXmR8YwlaIgQL0F1Cgr+3dx
-         oTeeqeO0IgzUNhrCwdA2ZOMgtD06hkYWGxKBWnKQ=
-Date:   Wed, 1 Dec 2021 19:05:19 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Boris Krasnovskiy <Boris.Krasnovskiy@lairdconnect.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Simo Sorce <simo@redhat.com>,
+        by sin.source.kernel.org (Postfix) with ESMTPS id 300D4CE2056;
+        Wed,  1 Dec 2021 18:25:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07D3CC53FCD;
+        Wed,  1 Dec 2021 18:25:03 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="V4XmrUPQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1638383100;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ieeo+489Wz5tzPtoA6+8qXaEQcW7DSRUaKOjLRu8YOw=;
+        b=V4XmrUPQr2LiEXbsQBIvvO+T3+dvLbUr8/+WrdSkaFxpHuT1o06adj4g2nyNxmGeIsIqXy
+        NJe5SXXgwHQ1YtEPZIfUgXFoDoicRzzxPVA2r1mTNLLE6LjinYfPnrNTUuuLVbLmKVyp62
+        PnhJZCuu8j0gBnDlErN0DDJnsmhfZQo=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e67e746f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 1 Dec 2021 18:24:59 +0000 (UTC)
+Received: by mail-yb1-f171.google.com with SMTP id f186so66018398ybg.2;
+        Wed, 01 Dec 2021 10:24:58 -0800 (PST)
+X-Gm-Message-State: AOAM5308xoRvXg2cC+P/60OGDRMQ7NLXdjbiet2fzWe4QV/3kOy//64X
+        ItDB0mRJut6fSIMfGVdwRj2ZzttaNGvmZpzPNfY=
+X-Google-Smtp-Source: ABdhPJy3Bjvv9lwuTiURT+8sdQ3ZdgyJqSR5T2hbEdwpzxDsICxg0akiXfDv040pmxdd9l7D84PH3daVcAWVQgyubdU=
+X-Received: by 2002:a25:b8c7:: with SMTP id g7mr9349799ybm.115.1638383096150;
+ Wed, 01 Dec 2021 10:24:56 -0800 (PST)
+MIME-Version: 1.0
+References: <2036923.9o76ZdvQCi@positron.chronox.de> <22137816.pfsBpAd9cS@tauon.chronox.de>
+ <YaEJtv4A6SoDFYjc@kroah.com> <9311513.S0ZZtNTvxh@tauon.chronox.de>
+ <YaT+9MueQIa5p8xr@kroah.com> <CAH8yC8nokDTGs8H6nGDkvDxRHN_qoFROAfWnTv-q6UqzYvoSWA@mail.gmail.com>
+ <YaYvYdnSaAvS8MAk@kroah.com> <ac123d96b31f4a51b167b4e85a205f31a6c97876.camel@redhat.com>
+ <YaZHKHjomEivul6U@kroah.com> <YaZqVxI1C8RByq+w@gmail.com> <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
+ <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
+ <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com> <49d6091e571e24efff7bc4dc70c4c62628eb0782.camel@redhat.com>
+In-Reply-To: <49d6091e571e24efff7bc4dc70c4c62628eb0782.camel@redhat.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 1 Dec 2021 13:24:44 -0500
+X-Gmail-Original-Message-ID: <CAHmME9q-WUGQ7NUO7oafUBkGBNtWePGXHGfEd2rTmZMUA49+DQ@mail.gmail.com>
+Message-ID: <CAHmME9q-WUGQ7NUO7oafUBkGBNtWePGXHGfEd2rTmZMUA49+DQ@mail.gmail.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+To:     Simo Sorce <simo@redhat.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jeffrey Walton <noloader@gmail.com>,
         Stephan Mueller <smueller@chronox.de>, Tso Ted <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
@@ -64,27 +85,25 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>,
         Jirka Hladky <jhladky@redhat.com>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-Message-ID: <Yae5X7lkDUrHMl+3@kroah.com>
-References: <YaT+9MueQIa5p8xr@kroah.com>
- <CAH8yC8nokDTGs8H6nGDkvDxRHN_qoFROAfWnTv-q6UqzYvoSWA@mail.gmail.com>
- <YaYvYdnSaAvS8MAk@kroah.com>
- <ac123d96b31f4a51b167b4e85a205f31a6c97876.camel@redhat.com>
- <YaZHKHjomEivul6U@kroah.com>
- <YaZqVxI1C8RByq+w@gmail.com>
- <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
- <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
- <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
- <BY5PR14MB3416DF44172D8F47D0B078A986689@BY5PR14MB3416.namprd14.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BY5PR14MB3416DF44172D8F47D0B078A986689@BY5PR14MB3416.namprd14.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 01, 2021 at 05:19:37PM +0000, Boris Krasnovskiy wrote:
-> THIS MESSAGE, ANY ATTACHMENT(S), AND THE INFORMATION CONTAINED HEREIN MAY BE PROPRIETARY TO LAIRD CONNECTIVITY, INC. AND/OR ANOTHER PARTY, AND MAY FURTHER BE INTENDED TO BE KEPT CONFIDENTIAL. IF YOU ARE NOT THE INTENDED RECIPIENT, PLEASE DELETE THE EMAIL AND ANY ATTACHMENTS, AND IMMEDIATELY NOTIFY THE SENDER BY RETURN EMAIL. THIS MESSAGE AND ITS CONTENTS ARE THE PROPERTY OF LAIRD CONNECTIVITY, INC. AND MAY NOT BE REPRODUCED OR USED WITHOUT THE EXPRESS WRITTEN CONSENT OF LAIRD CONNECTIVITY, INC.
+On Wed, Dec 1, 2021 at 12:19 PM Simo Sorce <simo@redhat.com> wrote:
+> that much it is, and it is a required one. However having worked a lot
+> on this I can tell you there is actually real cryptographic value in
+> the requirements FIPS introduced over the years
+> Well I think most of the requirements are sane practices, hopefully
+> controversial stuff will be minimal.
+> I happen to think quite a few of the requirements are actually good
+> ideas to implement to improve the guarantees of randomness
 
-Now deleted.
+If you think there are good ways to improve the RNG, of course send
+patches for this, justifying why, taking into account recent research
+into the topic you wish to patch, etc. Don't write, "because FIPS";
+instead argue rationale for each patch. And if you _do_ feel the need
+to appeal to authority, perhaps links to the various eprint papers you
+consulted would be worthwhile. Preferably you're able to do this in a
+small, incremental way, with small standalone patchsets, instead of
+gigantic series.
