@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A4DC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 18:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D803DC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 18:29:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237744AbhLAS23 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Dec 2021 13:28:29 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:55248 "EHLO
+        id S243650AbhLAScu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Dec 2021 13:32:50 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:56630 "EHLO
         sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbhLAS22 (ORCPT
+        with ESMTP id S244805AbhLAScp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Dec 2021 13:28:28 -0500
+        Wed, 1 Dec 2021 13:32:45 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 300D4CE2056;
-        Wed,  1 Dec 2021 18:25:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07D3CC53FCD;
-        Wed,  1 Dec 2021 18:25:03 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 24A9CCE206F;
+        Wed,  1 Dec 2021 18:29:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F10C0C53FCC;
+        Wed,  1 Dec 2021 18:29:20 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="V4XmrUPQ"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="PCSpO+RW"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1638383100;
+        t=1638383356;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=ieeo+489Wz5tzPtoA6+8qXaEQcW7DSRUaKOjLRu8YOw=;
-        b=V4XmrUPQr2LiEXbsQBIvvO+T3+dvLbUr8/+WrdSkaFxpHuT1o06adj4g2nyNxmGeIsIqXy
-        NJe5SXXgwHQ1YtEPZIfUgXFoDoicRzzxPVA2r1mTNLLE6LjinYfPnrNTUuuLVbLmKVyp62
-        PnhJZCuu8j0gBnDlErN0DDJnsmhfZQo=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e67e746f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 1 Dec 2021 18:24:59 +0000 (UTC)
-Received: by mail-yb1-f171.google.com with SMTP id f186so66018398ybg.2;
-        Wed, 01 Dec 2021 10:24:58 -0800 (PST)
-X-Gm-Message-State: AOAM5308xoRvXg2cC+P/60OGDRMQ7NLXdjbiet2fzWe4QV/3kOy//64X
-        ItDB0mRJut6fSIMfGVdwRj2ZzttaNGvmZpzPNfY=
-X-Google-Smtp-Source: ABdhPJy3Bjvv9lwuTiURT+8sdQ3ZdgyJqSR5T2hbEdwpzxDsICxg0akiXfDv040pmxdd9l7D84PH3daVcAWVQgyubdU=
-X-Received: by 2002:a25:b8c7:: with SMTP id g7mr9349799ybm.115.1638383096150;
- Wed, 01 Dec 2021 10:24:56 -0800 (PST)
+        bh=hfa3NlfCdsYdxGFH80CwGI0Vu8ELsod+Z2I76aPC3tY=;
+        b=PCSpO+RWCY1yAULHSHBN4H8UeXWCz+hhlQ4mA0jmalquWo3Eqg+G5AUGJRMC3WEgm96iuL
+        wu6vZ+YRk2o6lDcnMCRqqghE0uv73eZJbmY5P60YH3M6AWZ5vqqKA+1hpntnuEGOTuf+/C
+        CRCSC/hUMdK0UZg+vHaZ79JlkbFui50=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e75226bb (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 1 Dec 2021 18:29:16 +0000 (UTC)
+Received: by mail-yb1-f181.google.com with SMTP id d10so66152687ybe.3;
+        Wed, 01 Dec 2021 10:29:14 -0800 (PST)
+X-Gm-Message-State: AOAM533MYg13xgIp/ogNDanQFF1dek5banrKrjFlJHVmL0vPqcwj2Ftv
+        Tc6TAImVE4kaPkbbLQjap3oiVurk9XXAE18BK8Q=
+X-Google-Smtp-Source: ABdhPJzm64appqzjA4aYAH5eWAoxWSsIlQMIYaA4A4gxImaaHPmVuTevg1qUdzUUZ3LSV64gI9xYizxTSbGMR8WlHKU=
+X-Received: by 2002:a25:1e83:: with SMTP id e125mr8854584ybe.32.1638383353056;
+ Wed, 01 Dec 2021 10:29:13 -0800 (PST)
 MIME-Version: 1.0
 References: <2036923.9o76ZdvQCi@positron.chronox.de> <22137816.pfsBpAd9cS@tauon.chronox.de>
  <YaEJtv4A6SoDFYjc@kroah.com> <9311513.S0ZZtNTvxh@tauon.chronox.de>
@@ -49,9 +49,9 @@ References: <2036923.9o76ZdvQCi@positron.chronox.de> <22137816.pfsBpAd9cS@tauon.
  <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com> <49d6091e571e24efff7bc4dc70c4c62628eb0782.camel@redhat.com>
 In-Reply-To: <49d6091e571e24efff7bc4dc70c4c62628eb0782.camel@redhat.com>
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 1 Dec 2021 13:24:44 -0500
-X-Gmail-Original-Message-ID: <CAHmME9q-WUGQ7NUO7oafUBkGBNtWePGXHGfEd2rTmZMUA49+DQ@mail.gmail.com>
-Message-ID: <CAHmME9q-WUGQ7NUO7oafUBkGBNtWePGXHGfEd2rTmZMUA49+DQ@mail.gmail.com>
+Date:   Wed, 1 Dec 2021 13:29:01 -0500
+X-Gmail-Original-Message-ID: <CAHmME9rTT+V0X1hv1=DiVnQFomLRcPRkymmTGjDY7+EDEuw9UQ@mail.gmail.com>
+Message-ID: <CAHmME9rTT+V0X1hv1=DiVnQFomLRcPRkymmTGjDY7+EDEuw9UQ@mail.gmail.com>
 Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
 To:     Simo Sorce <simo@redhat.com>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -91,19 +91,7 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Wed, Dec 1, 2021 at 12:19 PM Simo Sorce <simo@redhat.com> wrote:
-> that much it is, and it is a required one. However having worked a lot
-> on this I can tell you there is actually real cryptographic value in
-> the requirements FIPS introduced over the years
-> Well I think most of the requirements are sane practices, hopefully
-> controversial stuff will be minimal.
-> I happen to think quite a few of the requirements are actually good
-> ideas to implement to improve the guarantees of randomness
+> Unfortunately userspace is not an option for kernel's own cryptography.
 
-If you think there are good ways to improve the RNG, of course send
-patches for this, justifying why, taking into account recent research
-into the topic you wish to patch, etc. Don't write, "because FIPS";
-instead argue rationale for each patch. And if you _do_ feel the need
-to appeal to authority, perhaps links to the various eprint papers you
-consulted would be worthwhile. Preferably you're able to do this in a
-small, incremental way, with small standalone patchsets, instead of
-gigantic series.
+I'm actually sort of curious to learn which specific uses of
+get_random_bytes you're concerned about. ECC keygen? What else?
