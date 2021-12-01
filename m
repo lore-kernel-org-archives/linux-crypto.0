@@ -2,155 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC178C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 11:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B55C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 13:06:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349027AbhLALwD (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Dec 2021 06:52:03 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:42012 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348563AbhLALwC (ORCPT
+        id S243340AbhLANKH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Dec 2021 08:10:07 -0500
+Received: from mail-ua1-f54.google.com ([209.85.222.54]:47090 "EHLO
+        mail-ua1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349470AbhLANKC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Dec 2021 06:52:02 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id E8C3D212C2;
-        Wed,  1 Dec 2021 11:48:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1638359319; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WrpXoBK/4LwwvZ609Va7mvqZYMz7+OB0m9N/bzmDziw=;
-        b=HoFAEUtdm1wIBQkZ8wytWV68qtGZn5Zx5grFcSya42VQirGgSCl6A+DC2vIcZ5TdyxdbTr
-        W2NAmwDLCRrnNBybHxojCOdjDjD70hWsiQ6QiXdF+k7JVvpls0tm3Ngx0XWYwG/B7neevV
-        w/0YAfAcfrGr1j1OEHqZd2YRZeXZFvw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1638359319;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WrpXoBK/4LwwvZ609Va7mvqZYMz7+OB0m9N/bzmDziw=;
-        b=lFf3wqoLPgzv6s+15hy2N/O1nDrvid9mKt3tQRAPUvx23YZo+486dPM+tI4vMosa0+voxm
-        ihq/i/mlKzqbKOBA==
-Received: from kunlun.suse.cz (unknown [10.100.128.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 3A7ECA3B81;
-        Wed,  1 Dec 2021 11:48:37 +0000 (UTC)
-Date:   Wed, 1 Dec 2021 12:48:36 +0100
-From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-To:     Baoquan He <bhe@redhat.com>
-Cc:     Nayna <nayna@linux.vnet.ibm.com>, Mimi Zohar <zohar@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-        Paul Mackerras <paulus@samba.org>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Rob Herring <robh@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        James Morris <jmorris@namei.org>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>,
-        linux-crypto@vger.kernel.org,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        Hari Bathini <hbathini@linux.ibm.com>,
-        Daniel Axtens <dja@axtens.net>,
-        Philipp Rudo <prudo@redhat.com>,
-        Frank van der Linden <fllinden@amazon.com>,
-        kexec@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        linux-security-module@vger.kernel.org,
-        Jessica Yu <jeyu@kernel.org>, linux-integrity@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        buendgen@de.ibm.com
-Subject: Re: [PATCH v2 0/6] KEXEC_SIG with appended signature
-Message-ID: <20211201114836.GD117207@kunlun.suse.cz>
-References: <cover.1637862358.git.msuchanek@suse.de>
- <20211201023747.GN21646@MiWiFi-R3L-srv>
+        Wed, 1 Dec 2021 08:10:02 -0500
+Received: by mail-ua1-f54.google.com with SMTP id az37so48764900uab.13;
+        Wed, 01 Dec 2021 05:06:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AgwbFm5gkjwOtodlhi0zJJvcgS/i7V2fCpFuxG8kd94=;
+        b=Jyvtm+6VZ1RGnb/UF5Vm2HvEcmFtsdfMZ5s5FZuwhPAzmzps3fGeV6/BftmLs8sXHV
+         s71tVkjgsFI4KTQJ/aqj9HiPbS3UNdPmEBViSTgCGx/BHPdUGkywaSbrUThizp07XUpS
+         FkHGwSaUj7YmL3DX9shMazC+URsI488X6vW7p1nOw5MDWr3vLdB/MK4egkaap+kjSQqL
+         LmAsGMoSG7VFgjN90qy9AyiSdiwGdoxjfBLXe47doiU6OA4TO6fXn+YFzu0oE5NbJq8e
+         DUGF4orm2PJCcltkYMeDiltd3h2HdMed3W8UCocM3HTv18220QBKFfMUtTs3+DSSjFGs
+         n6Rg==
+X-Gm-Message-State: AOAM533oN2GyOETqR8O6IEJF/qy5pqkmZe7W6uOaG2wiZ8fPXU9RHXd0
+        tBPwlTEgMseey0amVJNGlokDFNcsxguS1w==
+X-Google-Smtp-Source: ABdhPJzq0/vFLXekmqPdt2QkRJrW/G+np5DNNGqURV3YxjfADxXe/vodZVtnBIWxOE6mWhETKhsm6w==
+X-Received: by 2002:a67:bb11:: with SMTP id m17mr6696201vsn.5.1638364000316;
+        Wed, 01 Dec 2021 05:06:40 -0800 (PST)
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com. [209.85.222.46])
+        by smtp.gmail.com with ESMTPSA id 15sm11833419vkj.49.2021.12.01.05.06.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Dec 2021 05:06:40 -0800 (PST)
+Received: by mail-ua1-f46.google.com with SMTP id r15so48823383uao.3;
+        Wed, 01 Dec 2021 05:06:39 -0800 (PST)
+X-Received: by 2002:a05:6102:c89:: with SMTP id f9mr7151505vst.68.1638363999694;
+ Wed, 01 Dec 2021 05:06:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211201023747.GN21646@MiWiFi-R3L-srv>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20211130164558.85584-1-tsbogend@alpha.franken.de> <20211130164558.85584-3-tsbogend@alpha.franken.de>
+In-Reply-To: <20211130164558.85584-3-tsbogend@alpha.franken.de>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Wed, 1 Dec 2021 14:06:28 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXr1bT3U_XKvHKowfQwaW6-4XevYngoNzQFu-bYwdMP_A@mail.gmail.com>
+Message-ID: <CAMuHMdXr1bT3U_XKvHKowfQwaW6-4XevYngoNzQFu-bYwdMP_A@mail.gmail.com>
+Subject: Re: [PATCH 3/3] MIPS: TXX9: Remove TX4939 SoC support
+To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc:     "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        MTD Maling List <linux-mtd@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+Hi Thomas,
 
-On Wed, Dec 01, 2021 at 10:37:47AM +0800, Baoquan He wrote:
-> Hi,
-> 
-> On 11/25/21 at 07:02pm, Michal Suchanek wrote:
-> > Hello,
-> > 
-> > This is resend of the KEXEC_SIG patchset.
-> > 
-> > The first patch is new because it'a a cleanup that does not require any
-> > change to the module verification code.
-> > 
-> > The second patch is the only one that is intended to change any
-> > functionality.
-> > 
-> > The rest only deduplicates code but I did not receive any review on that
-> > part so I don't know if it's desirable as implemented.
-> 
-> Do you have the link of your 1st version?
+On Tue, Nov 30, 2021 at 5:46 PM Thomas Bogendoerfer
+<tsbogend@alpha.franken.de> wrote:
+> After removal of RBTX4939 board support remove code for the TX4939 SoC.
+>
+> Signed-off-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
 
-This is the previous version:
-https://lore.kernel.org/lkml/cover.1635948742.git.msuchanek@suse.de/
+Thanks for your patch!
 
-Thanks
+> ---
+>  arch/mips/pci/Makefile                |   1 -
+>  arch/mips/pci/pci-tx4939.c            | 107 -----
+>  arch/mips/txx9/Kconfig                |   8 -
+>  arch/mips/txx9/generic/Makefile       |   1 -
+>  arch/mips/txx9/generic/irq_tx4939.c   | 216 ----------
+>  arch/mips/txx9/generic/setup_tx4939.c | 568 --------------------------
+>  drivers/char/hw_random/Kconfig        |  13 -
+>  drivers/char/hw_random/Makefile       |   1 -
+>  drivers/char/hw_random/tx4939-rng.c   | 157 -------
+>  drivers/mtd/nand/raw/Kconfig          |   2 +-
+>  10 files changed, 1 insertion(+), 1073 deletions(-)
+>  delete mode 100644 arch/mips/pci/pci-tx4939.c
+>  delete mode 100644 arch/mips/txx9/generic/irq_tx4939.c
+>  delete mode 100644 arch/mips/txx9/generic/setup_tx4939.c
+>  delete mode 100644 drivers/char/hw_random/tx4939-rng.c
 
-Michal
+You forgot to remove arch/mips/include/asm/txx9/tx4939.h.
 
-> And after going through the whole series, it doesn't tell what this
-> patch series intends to do in cover-letter or patch log.
-> 
-> Thanks
-> Baoquan
-> 
-> > 
-> > The first two patches can be applied separately without the rest.
-> > 
-> > Thanks
-> > 
-> > Michal
-> > 
-> > Michal Suchanek (6):
-> >   s390/kexec_file: Don't opencode appended signature check.
-> >   powerpc/kexec_file: Add KEXEC_SIG support.
-> >   kexec_file: Don't opencode appended signature verification.
-> >   module: strip the signature marker in the verification function.
-> >   module: Use key_being_used_for for log messages in
-> >     verify_appended_signature
-> >   module: Move duplicate mod_check_sig users code to mod_parse_sig
-> > 
-> >  arch/powerpc/Kconfig                     | 11 +++++
-> >  arch/powerpc/kexec/elf_64.c              | 14 ++++++
-> >  arch/s390/kernel/machine_kexec_file.c    | 42 ++----------------
-> >  crypto/asymmetric_keys/asymmetric_type.c |  1 +
-> >  include/linux/module_signature.h         |  1 +
-> >  include/linux/verification.h             |  4 ++
-> >  kernel/module-internal.h                 |  2 -
-> >  kernel/module.c                          | 12 +++--
-> >  kernel/module_signature.c                | 56 +++++++++++++++++++++++-
-> >  kernel/module_signing.c                  | 33 +++++++-------
-> >  security/integrity/ima/ima_modsig.c      | 22 ++--------
-> >  11 files changed, 113 insertions(+), 85 deletions(-)
-> > 
-> > -- 
-> > 2.31.1
-> > 
-> > 
-> > _______________________________________________
-> > kexec mailing list
-> > kexec@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/kexec
-> > 
-> 
+My rbtx4927 still works fine afterwards, so
+Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
