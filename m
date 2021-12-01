@@ -2,129 +2,155 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 847E8C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Nov 2021 19:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39DB5C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 00:49:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235278AbhK3TqO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 14:46:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:27603 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343566AbhK3Toi (ORCPT
+        id S240854AbhLAAwp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Nov 2021 19:52:45 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:57998 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236871AbhLAAwp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 14:44:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638301278;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TfrnItGdUTATVc7verTCm21aEuOKKR+WNjyNl2tTt/s=;
-        b=K/zHQXR8KBrO8N+ofcLxFbJsifky8lASbfVFkkmz3QDVHp12jt41Q67G+6lOnFGj5sglUt
-        2WeEV+HbclN/ZpLRqzLPObUlXKMIYtf2ovHWSGhTxIqK2eefTx2781M8f1N9CiW+A9RShT
-        I7AZGJNzu1YUXTPyI7KI7wGCEgOJnkg=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-483-XlwhTJhNPjuViA1G_5hqoQ-1; Tue, 30 Nov 2021 14:41:15 -0500
-X-MC-Unique: XlwhTJhNPjuViA1G_5hqoQ-1
-Received: by mail-qk1-f199.google.com with SMTP id az44-20020a05620a172c00b0046a828b4684so30080118qkb.22
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Nov 2021 11:41:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:organization:user-agent:mime-version
-         :content-transfer-encoding;
-        bh=TfrnItGdUTATVc7verTCm21aEuOKKR+WNjyNl2tTt/s=;
-        b=JKwa2MMqecfelXHc8K1xWEI/DFE+HUsR6Am+dXxftMT4E9UAHn0gXAiEZsSlIQEfBf
-         fx7ya8jJ6YZb64r3e96hvb+eiwG1xAQDu13CvXkoh6JenhoVIKn4SAfMUAnEgaZ/FxRL
-         lq4J4Tn4/uQQWW8XUfTXZWXEdF0SDb/cE+CVfLEAtU3lcjoV2s7EV0JJuUSmzHPMgaRP
-         HMmmQWYsnl4BL1wPylNGzBsJKcIIcz1REknVIP5ckWvv7KdR9jJa+lUmAXo3N9NqhXUq
-         VGV6Y7q5HO3LJKwdZ4382dfOum4bgz6J+prHlybaXWwGixNFhvYBDjyw/ArKW3Tl4nuH
-         hdCg==
-X-Gm-Message-State: AOAM531LtzTFYqeAhsIfDhh9SZ5qsUIzqre2Kgu4ryGjZIXQuwl0MY40
-        n2NSaCgHb54LHALHfmZ+QqCetkkbkprMhSGHi65ZdN6ubsHxlQgt7HS2Ri70AETqPZhqzWutTPt
-        r7MnwSl+T9KWNIcYYayyqdHMc
-X-Received: by 2002:a05:622a:1207:: with SMTP id y7mr1711718qtx.592.1638301274690;
-        Tue, 30 Nov 2021 11:41:14 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwJ9+FRrK3xh+EE7L6zkfT/RZFYDXNc5DYJN863fnKtTH5CdGDV3FDUn0jq780tf4LLYhY8Og==
-X-Received: by 2002:a05:622a:1207:: with SMTP id y7mr1711675qtx.592.1638301274513;
-        Tue, 30 Nov 2021 11:41:14 -0800 (PST)
-Received: from m8.users.ipa.redhat.com (cpe-158-222-141-151.nyc.res.rr.com. [158.222.141.151])
-        by smtp.gmail.com with ESMTPSA id i6sm11067894qkn.26.2021.11.30.11.41.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Nov 2021 11:41:13 -0800 (PST)
-Message-ID: <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-From:   Simo Sorce <simo@redhat.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jeffrey Walton <noloader@gmail.com>,
-        Stephan Mueller <smueller@chronox.de>, Tso Ted <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Peter Matthias <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Andy Lavr <andy.lavr@gmail.com>,
-        Petr Tesarik <ptesarik@suse.cz>,
-        John Haxby <john.haxby@oracle.com>,
-        Alexander Lobakin <alobakin@mailbox.org>,
-        Jirka Hladky <jhladky@redhat.com>
-Date:   Tue, 30 Nov 2021 14:41:12 -0500
-In-Reply-To: <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
-References: <2036923.9o76ZdvQCi@positron.chronox.de>
-         <22137816.pfsBpAd9cS@tauon.chronox.de> <YaEJtv4A6SoDFYjc@kroah.com>
-         <9311513.S0ZZtNTvxh@tauon.chronox.de> <YaT+9MueQIa5p8xr@kroah.com>
-         <CAH8yC8nokDTGs8H6nGDkvDxRHN_qoFROAfWnTv-q6UqzYvoSWA@mail.gmail.com>
-         <YaYvYdnSaAvS8MAk@kroah.com>
-         <ac123d96b31f4a51b167b4e85a205f31a6c97876.camel@redhat.com>
-         <YaZHKHjomEivul6U@kroah.com> <YaZqVxI1C8RByq+w@gmail.com>
-         <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
-Organization: Red Hat
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
+        Tue, 30 Nov 2021 19:52:45 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 08B961FD2F;
+        Wed,  1 Dec 2021 00:49:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1638319764; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=LA2v/lPyow+GI4apO4cJeHeib2qXUxj68Q/tyAlOjcU=;
+        b=bNbB/4xeJ6bnNLNFL8t1RgOLCOAaUf8LwXrtPM9lvE6DKt/snzAJXmjm48CAGAV0LQmdAL
+        C0XqVCNP5PtHZEpVnuMVLq0rtac26/MqKc6udDf9r4GRKszelTMPcSlyfwiMdc3uidzeVe
+        1CmIVtJkL8RSl4LuREmrzAIIvpuxIhc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1638319764;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=LA2v/lPyow+GI4apO4cJeHeib2qXUxj68Q/tyAlOjcU=;
+        b=TzSMNZq0xVzyNQ3zvw+vWBV7Zpf9CovkivThO4jsIiRFQDjUtldbSAzf56ET3hrbL+e2TF
+        ZXc0OUWGAieY9zCQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E655613C10;
+        Wed,  1 Dec 2021 00:49:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id LtClNpPGpmHbKAAAMHmgww
+        (envelope-from <nstange@suse.de>); Wed, 01 Dec 2021 00:49:23 +0000
+From:   Nicolai Stange <nstange@suse.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
+        Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qat-linux@intel.com, keyrings@vger.kernel.org,
+        Nicolai Stange <nstange@suse.de>
+Subject: [PATCH 00/18] crypto: dh - infrastructure for NVM in-band auth and FIPS conformance
+Date:   Wed,  1 Dec 2021 01:48:40 +0100
+Message-Id: <20211201004858.19831-1-nstange@suse.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2021-11-30 at 13:39 -0500, Jason A. Donenfeld wrote:
-> On Tue, Nov 30, 2021 at 1:16 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> > So unfortunately, as far as I can tell, Ted is not maintaining random.c anymore.
-> 
-> I am happy to step up here. Feel free to CC me on random.c fixes and
-> I'll review them promptly.
+Hi all,
 
-Jason,
-are you also volunteering to review the patches needed to reach
-compliance with the NIST documents I mentioned in the thread?
+first of all, to the people primarily interested in security/keys/, there's
+a rather trivial change to security/keys/dh.c in patch 2/18. It would be
+great to get ACKs for that...
 
-Simo.
+
+Hannes' recent work on NVME in-band authentication ([1]) needs access to
+the RFC 7919 DH group parameters and also some means to generate ephemeral
+keys. He currently implements both as part of his patchset (patches 3/12
+and 8/12). After some internal discussion, we decided to split off the bits
+needed from crypto/dh into a separate series, i.e. this one here:
+ - for the RFC 7919 DH group parameters, it's undesirable from a
+   performance POV to serialize the well-known domain parameters via
+   crypto_dh_encode_key() just to deserialize them shortly after again,
+ - from an architectural POV, it would be preferrable to have the key
+   generation code in crypto/dh.c rather than in drivers/nvme/,
+   just in analogy to how key generation is supported by crypto/ecdh.c
+   already.
+
+Patches 1-13/18 implement all that is needed for the NVME in-band
+authentication support. 
+
+Unfortunately, due to the lack of HW, I have not been able to test
+the changes to the QAT or HPRE drivers (other than mere compile tests).
+Yet I figured it would be a good idea to have them behave consistently with
+dh_generic, and so I chose to introduce support for privkey generation to
+these as well.
+
+
+By coincidence, NIST SP800-56Arev3 compliance effectively requires that
+the domain parameters are checked against an approved set, which happens
+to consists of those safe-prime group parameters specified in RFC 7919,
+among others. Thus, introducing the RFC 7919 parameters to the kernel
+allows for making the DH implementation to conform to SP800-56Arev3 with
+only little effort. I used the opportunity to work crypto/dh towards
+SP800-56Arev3 conformance with the rest of this patch series, i.e.
+patches 14-18/18. I can split these into another series on its own, if you
+like. But as they depend on the earlier patches 1-13/18, I sent them
+alongside for now.
+
+This patchset has been tested with and without fips_enabled on x86_64,
+ppc64le and s390x, the latter being a big endian machine, which is relevant
+for the new test vectors.
+
+Thanks,
+
+Nicolai
+
+[1] https://lkml.kernel.org/r/20211123123801.73197-1-hare@suse.de
+
+Nicolai Stange (18):
+  crypto: dh - remove struct dh's ->q member
+  crypto: dh - constify struct dh's pointer members
+  crypto: dh - optimize domain parameter serialization for well-known
+    groups
+  crypto: dh - introduce RFC 7919 safe-prime groups
+  crypto: testmgr - add DH RFC 7919 ffdhe2048 test vector
+  crypto: dh - introduce RFC 3526 safe-prime groups
+  crypto: testmgr - add DH RFC 3526 modp2048 test vector
+  crypto: testmgr - run only subset of DH vectors based on config
+  crypto: dh - implement private key generation primitive
+  crypto: dh - introduce support for ephemeral key generation to
+    dh-generic
+  crypto: dh - introduce support for ephemeral key generation to hpre
+    driver
+  crypto: dh - introduce support for ephemeral key generation to qat
+    driver
+  crypto: testmgr - add DH test vectors for key generation
+  lib/mpi: export mpi_rshift
+  crypto: dh - store group id in dh-generic's dh_ctx
+  crypto: dh - calculate Q from P for the full public key verification
+  crypto: dh - try to match domain parameters to a known safe-prime
+    group
+  crypto: dh - accept only approved safe-prime groups in FIPS mode
+
+ crypto/Kconfig                                |  20 +-
+ crypto/dh.c                                   |  73 +-
+ crypto/dh_helper.c                            | 691 +++++++++++++++++-
+ crypto/testmgr.h                              | 342 ++++++++-
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c   |  11 +
+ drivers/crypto/qat/qat_common/qat_asym_algs.c |   9 +
+ include/crypto/dh.h                           |  52 +-
+ lib/mpi/mpi-bit.c                             |   1 +
+ security/keys/dh.c                            |   2 +-
+ 9 files changed, 1141 insertions(+), 60 deletions(-)
 
 -- 
-Simo Sorce
-RHEL Crypto Team
-Red Hat, Inc
-
-
-
+2.26.2
 
