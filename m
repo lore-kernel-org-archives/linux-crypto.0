@@ -2,51 +2,51 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6AD2C4321E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EC4AC4332F
 	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 00:51:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346014AbhLAAyT (ORCPT
+        id S1345971AbhLAAyO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 19:54:19 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:46120 "EHLO
+        Tue, 30 Nov 2021 19:54:14 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:46176 "EHLO
         smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345927AbhLAAwy (ORCPT
+        with ESMTP id S1345963AbhLAAxJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 19:52:54 -0500
+        Tue, 30 Nov 2021 19:53:09 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id DAFD4218B0;
-        Wed,  1 Dec 2021 00:49:33 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 0E173218B5;
+        Wed,  1 Dec 2021 00:49:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1638319773; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1638319776; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NXnywiVMHG+5JOnuWv+Zk8oIW2CyLkb/2z/hvW1vh6c=;
-        b=FL5xOUfG+UMRPlr6thZJghC1woUSKy+DdD9o2ZlfeP90JHq//JFGgKyGITOwTXMlZmE0Sv
-        7OqqBQhnTy9ws9hXmbN3rhROpLfAgPjM4Vk+sKTBJpiV5R5ngvi0Kc2eWrLUEzyrTthF9j
-        clqOTZ1r45QcKMdA7qkpKN7ZCoB2onM=
+        bh=0kYjcIRJ+mIjkvtJdvPpy3tX0Jl/na4C4276sDNNrCM=;
+        b=hyFa9HsoCO92KOt/swbuYXQHPYshJh4kQ8YRkyf9t67+og9Cpkvn0S9Ih5aXLcbu5uIdDZ
+        AGmWpSzKSfzaO6ovbNLDVyGF04K1d21sZ80+W0tDGUPaLniwqoArOfeGh4WolzzLR/n/EH
+        ks2Ep1ww913hfrz6rBUi5r6mGa0+psQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1638319773;
+        s=susede2_ed25519; t=1638319776;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NXnywiVMHG+5JOnuWv+Zk8oIW2CyLkb/2z/hvW1vh6c=;
-        b=FxOevjpFK5oGFKxLlqoTLN0WHV7zO1HyOO8EJ8oeC4C95OhkfbO9V9JAF0m01298VsM63K
-        qImgpgq2Tbn8aFBQ==
+        bh=0kYjcIRJ+mIjkvtJdvPpy3tX0Jl/na4C4276sDNNrCM=;
+        b=yeZIpWybSTbz2rqax6/Z2Nb2HZ/0hDUhjEARuJH/b+zNSsj796l2v5qe1OaK5jYReN1Wap
+        3zFuyidL6zSIRoAw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C789F13C10;
-        Wed,  1 Dec 2021 00:49:33 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id ECAF313C10;
+        Wed,  1 Dec 2021 00:49:35 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 1vAwL53GpmEAKQAAMHmgww
-        (envelope-from <nstange@suse.de>); Wed, 01 Dec 2021 00:49:33 +0000
+        id NwFDOJ/GpmEJKQAAMHmgww
+        (envelope-from <nstange@suse.de>); Wed, 01 Dec 2021 00:49:35 +0000
 From:   Nicolai Stange <nstange@suse.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
@@ -59,9 +59,9 @@ Cc:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         qat-linux@intel.com, keyrings@vger.kernel.org,
         Nicolai Stange <nstange@suse.de>
-Subject: [PATCH 14/18] lib/mpi: export mpi_rshift
-Date:   Wed,  1 Dec 2021 01:48:54 +0100
-Message-Id: <20211201004858.19831-15-nstange@suse.de>
+Subject: [PATCH 17/18] crypto: dh - try to match domain parameters to a known safe-prime group
+Date:   Wed,  1 Dec 2021 01:48:57 +0100
+Message-Id: <20211201004858.19831-18-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20211201004858.19831-1-nstange@suse.de>
 References: <20211201004858.19831-1-nstange@suse.de>
@@ -71,28 +71,73 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A subsequent patch will make the crypto/dh's dh_is_pubkey_valid() to
-calculate a safe-prime groups Q parameter from P: Q = (P - 1) / 2. For
-implementing this, mpi_rshift() will be needed. Export it so that it's
-accessible from crypto/dh.
+A subsequent patch will make the DH implementation to reject any input
+domain parameter set with ->group_id == dh_group_id_unknown in FIPS mode.
+However, as the keyctl(KEYCTL_DH_COMPUTE) implementation simply passes
+forward keys from userspace, it does not (and cannot) set ->group_id to
+anything else than dh_group_id_unknown.
+
+In order to still allow for keyctl(KEYCTL_DH_COMPUTE) to work on approved
+domain parameters passed in from userspace in FIPS mode, make
+crypto_dh_decode_key() to compare them against any of the known groups and
+set ->group_id upon having found a match, if any.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- lib/mpi/mpi-bit.c | 1 +
- 1 file changed, 1 insertion(+)
+ crypto/dh_helper.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/lib/mpi/mpi-bit.c b/lib/mpi/mpi-bit.c
-index 142b680835df..070ba784c9f1 100644
---- a/lib/mpi/mpi-bit.c
-+++ b/lib/mpi/mpi-bit.c
-@@ -242,6 +242,7 @@ void mpi_rshift(MPI x, MPI a, unsigned int n)
- 	}
- 	MPN_NORMALIZE(x->d, x->nlimbs);
+diff --git a/crypto/dh_helper.c b/crypto/dh_helper.c
+index 5a8c9c50297f..cf632beca65e 100644
+--- a/crypto/dh_helper.c
++++ b/crypto/dh_helper.c
+@@ -471,6 +471,36 @@ get_safe_prime_group(enum dh_group_id group_id)
+ 	return NULL;
  }
-+EXPORT_SYMBOL_GPL(mpi_rshift);
  
- /****************
-  * Shift A by COUNT limbs to the left
++static enum dh_group_id lookup_group_id(const char *g, size_t g_size,
++					const char *p, size_t p_size)
++{
++	int i;
++
++	/* All safe-prime groups use a generator of g == 2. */
++	while (g_size && !*g) {
++		++g;
++		--g_size;
++	}
++
++	if (g_size != 1 || *g != 2)
++		return dh_group_id_unknown;
++
++	while (p_size && !*p) {
++		++p;
++		--p_size;
++	}
++
++	for (i = 0; i < ARRAY_SIZE(safe_prime_groups); ++i) {
++		if (safe_prime_groups[i].p_size != p_size)
++			continue;
++
++		if (!memcmp(safe_prime_groups[i].p, p, p_size))
++			return safe_prime_groups[i].group_id;
++	}
++
++	return dh_group_id_unknown;
++}
++
+ static inline u8 *dh_pack_data(u8 *dst, u8 *end, const void *src, size_t size)
+ {
+ 	if (!dst || size > end - dst)
+@@ -566,6 +596,9 @@ int crypto_dh_decode_key(const char *buf, unsigned int len, struct dh *params)
+ 		if (memchr_inv(params->p, 0, params->p_size) == NULL)
+ 			return -EINVAL;
+ 
++		params->group_id = lookup_group_id(params->g, params->g_size,
++						   params->p, params->p_size);
++
+ 	} else {
+ 		const struct safe_prime_group *g;
+ 
 -- 
 2.26.2
 
