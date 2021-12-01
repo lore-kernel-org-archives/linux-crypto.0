@@ -2,143 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8F3C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 02:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A21E2C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Dec 2021 06:30:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241412AbhLACl1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Nov 2021 21:41:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43166 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1346227AbhLACl0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Nov 2021 21:41:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638326285;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=W0n5k4sl9AYBphe6cujkRUTAtSAAGA+Ca8Fn1jgb3kw=;
-        b=ftSNleJ4Ougk5TtZ5J/CnGL63PXW9YBWBSMxPrr+txy22bq39uKHba8tlZSZsfhHgXut+n
-        eQZilrDxPXLQ7H+vdp/KLt+2DNUEZPXR98m4V+8OlcHjCDv95ERMOJjZQ07iMOcaIXaFdz
-        znzyrTO7ujtyExp56ZDAN1r4dABDwXQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-420-PtZgyoLZM6iWg_vjmPTmng-1; Tue, 30 Nov 2021 21:38:04 -0500
-X-MC-Unique: PtZgyoLZM6iWg_vjmPTmng-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 133C5102C7EB;
-        Wed,  1 Dec 2021 02:37:59 +0000 (UTC)
-Received: from localhost (ovpn-12-42.pek2.redhat.com [10.72.12.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3ADC560C13;
-        Wed,  1 Dec 2021 02:37:50 +0000 (UTC)
-Date:   Wed, 1 Dec 2021 10:37:47 +0800
-From:   Baoquan He <bhe@redhat.com>
-To:     Michal Suchanek <msuchanek@suse.de>
-Cc:     keyrings@vger.kernel.org, kexec@lists.infradead.org,
-        Philipp Rudo <prudo@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
-        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jessica Yu <jeyu@kernel.org>, linux-kernel@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Hari Bathini <hbathini@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        Frank van der Linden <fllinden@amazon.com>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        Daniel Axtens <dja@axtens.net>, buendgen@de.ibm.com,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v2 0/6] KEXEC_SIG with appended signature
-Message-ID: <20211201023747.GN21646@MiWiFi-R3L-srv>
-References: <cover.1637862358.git.msuchanek@suse.de>
+        id S1346934AbhLAGeO (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Dec 2021 01:34:14 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:57312 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231871AbhLAGeO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Dec 2021 01:34:14 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1msJ8b-0004tU-Bn; Wed, 01 Dec 2021 17:30:42 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 01 Dec 2021 17:30:41 +1100
+Date:   Wed, 1 Dec 2021 17:30:41 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Heiner Kallweit <hkallweit1@gmail.com>
+Cc:     Shixin Liu <liushixin2@huawei.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: crypto: stm32 - Revert broken pm_runtime_resume_and_get changes
+Message-ID: <20211201063041.GC684@gondor.apana.org.au>
+References: <4239b61f-f8c5-462f-2951-fbba2dec8b1d@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1637862358.git.msuchanek@suse.de>
+In-Reply-To: <4239b61f-f8c5-462f-2951-fbba2dec8b1d@gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Sat, Nov 27, 2021 at 02:39:52PM +0100, Heiner Kallweit wrote:
+> When discussing whether pm_runtime_resume_and_get() should be annotated as
+> __must_check, I became aware of RPM usage in crypto/stm32.
+> 
+> Following two patches replace usage of pm_runtime_get_sync() with
+> pm_runtime_resume_and_get() w/o checking the return code.
+> 
+> 747bf30fd944 ("crypto: stm32/cryp - Fix PM reference leak on stm32-cryp.c")
+> 1cb3ad701970 ("crypto: stm32/hash - Fix PM reference leak on stm32-hash.c")
+> 
+> This results in RPM usage like the following in stm32_hash_export():
+> 
+> pm_runtime_resume_and_get(hdev->dev);
+> ...
+> pm_runtime_mark_last_busy(hdev->dev);
+> pm_runtime_put_autosuspend(hdev->dev);
+> 
+> This is broken. After pm_runtime_resume_and_get() the usage count may be
+> incremented or not. If not, then the call to pm_runtime_put_autosuspend()
+> results in exactly the imbalance that the patch claims to fix.
+> 
+> Therefore I think both patches should be reverted, or the return code
+> of pm_runtime_resume_and_get() has to be checked and properly handled
+> in the driver logic.
 
-On 11/25/21 at 07:02pm, Michal Suchanek wrote:
-> Hello,
-> 
-> This is resend of the KEXEC_SIG patchset.
-> 
-> The first patch is new because it'a a cleanup that does not require any
-> change to the module verification code.
-> 
-> The second patch is the only one that is intended to change any
-> functionality.
-> 
-> The rest only deduplicates code but I did not receive any review on that
-> part so I don't know if it's desirable as implemented.
+I agree.  But we can't revert them completely because it does
+fix some genuine issues with the ones where we do check the error
+code.  What about this patch?
 
-Do you have the link of your 1st version?
+---8<---
+We should not call pm_runtime_resume_and_get where the reference
+count is expected to be incremented unconditionally.  This patch
+reverts these calls to the original unconditional get_sync call.
 
-And after going through the whole series, it doesn't tell what this
-patch series intends to do in cover-letter or patch log.
+Reported-by: Heiner Kallweit <hkallweit1@gmail.com>
+Fixes: 747bf30fd944 ("crypto: stm32/cryp - Fix PM reference leak...")
+Fixes: 1cb3ad701970 ("crypto: stm32/hash - Fix PM reference leak...")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Thanks
-Baoquan
-
-> 
-> The first two patches can be applied separately without the rest.
-> 
-> Thanks
-> 
-> Michal
-> 
-> Michal Suchanek (6):
->   s390/kexec_file: Don't opencode appended signature check.
->   powerpc/kexec_file: Add KEXEC_SIG support.
->   kexec_file: Don't opencode appended signature verification.
->   module: strip the signature marker in the verification function.
->   module: Use key_being_used_for for log messages in
->     verify_appended_signature
->   module: Move duplicate mod_check_sig users code to mod_parse_sig
-> 
->  arch/powerpc/Kconfig                     | 11 +++++
->  arch/powerpc/kexec/elf_64.c              | 14 ++++++
->  arch/s390/kernel/machine_kexec_file.c    | 42 ++----------------
->  crypto/asymmetric_keys/asymmetric_type.c |  1 +
->  include/linux/module_signature.h         |  1 +
->  include/linux/verification.h             |  4 ++
->  kernel/module-internal.h                 |  2 -
->  kernel/module.c                          | 12 +++--
->  kernel/module_signature.c                | 56 +++++++++++++++++++++++-
->  kernel/module_signing.c                  | 33 +++++++-------
->  security/integrity/ima/ima_modsig.c      | 22 ++--------
->  11 files changed, 113 insertions(+), 85 deletions(-)
-> 
-> -- 
-> 2.31.1
-> 
-> 
-> _______________________________________________
-> kexec mailing list
-> kexec@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kexec
-> 
-
+diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
+index 7389a0536ff0..05087831e199 100644
+--- a/drivers/crypto/stm32/stm32-cryp.c
++++ b/drivers/crypto/stm32/stm32-cryp.c
+@@ -542,7 +542,7 @@ static int stm32_cryp_hw_init(struct stm32_cryp *cryp)
+ 	int ret;
+ 	u32 cfg, hw_mode;
+ 
+-	pm_runtime_resume_and_get(cryp->dev);
++	pm_runtime_get_sync(cryp->dev);
+ 
+ 	/* Disable interrupt */
+ 	stm32_cryp_write(cryp, CRYP_IMSCR, 0);
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index 389de9e3302d..d33006d43f76 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -813,7 +813,7 @@ static void stm32_hash_finish_req(struct ahash_request *req, int err)
+ static int stm32_hash_hw_init(struct stm32_hash_dev *hdev,
+ 			      struct stm32_hash_request_ctx *rctx)
+ {
+-	pm_runtime_resume_and_get(hdev->dev);
++	pm_runtime_get_sync(hdev->dev);
+ 
+ 	if (!(HASH_FLAGS_INIT & hdev->flags)) {
+ 		stm32_hash_write(hdev, HASH_CR, HASH_CR_INIT);
+@@ -962,7 +962,7 @@ static int stm32_hash_export(struct ahash_request *req, void *out)
+ 	u32 *preg;
+ 	unsigned int i;
+ 
+-	pm_runtime_resume_and_get(hdev->dev);
++	pm_runtime_get_sync(hdev->dev);
+ 
+ 	while ((stm32_hash_read(hdev, HASH_SR) & HASH_SR_BUSY))
+ 		cpu_relax();
+@@ -1000,7 +1000,7 @@ static int stm32_hash_import(struct ahash_request *req, const void *in)
+ 
+ 	preg = rctx->hw_context;
+ 
+-	pm_runtime_resume_and_get(hdev->dev);
++	pm_runtime_get_sync(hdev->dev);
+ 
+ 	stm32_hash_write(hdev, HASH_IMR, *preg++);
+ 	stm32_hash_write(hdev, HASH_STR, *preg++);
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
