@@ -2,73 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4709AC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Dec 2021 03:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BD22C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Dec 2021 07:12:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345086AbhLBEBR (ORCPT
+        id S1355681AbhLBHQD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Dec 2021 23:01:17 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:57346 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1345082AbhLBEBR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Dec 2021 23:01:17 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1msdDr-0002ql-U7; Thu, 02 Dec 2021 14:57:29 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Dec 2021 14:57:27 +1100
-Date:   Thu, 2 Dec 2021 14:57:27 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Geliang Tang <geliangtang@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>, Haren Myneni <haren@us.ibm.com>,
-        Anton Vorontsov <anton@enomsg.org>,
-        Colin Cross <ccross@android.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
+        Thu, 2 Dec 2021 02:16:03 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:55392 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230521AbhLBHQD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Dec 2021 02:16:03 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 27F54B8214D;
+        Thu,  2 Dec 2021 07:12:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB3C6C00446;
+        Thu,  2 Dec 2021 07:12:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1638429158;
+        bh=oHg2l/U0p0wGsRrlI/rTNcspthN6DFWCqLaMurRqCV8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hrICSyWhFF8ObziEH7FC1N9oXzGT+j/k6V1QWJ8MApkea3l7TKqmUA1QfAdQe6dV1
+         fxzTFJdm0AX98cxcqciEupwZJjf+QBj5vnkoRXoPnPEeTgGxqEWzeoZnKkbeIfabB/
+         YeM53VJy2npy2Z7lV2eLIXoNd+Cj6Ban/XW3qCOI=
+Date:   Thu, 2 Dec 2021 08:12:35 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Jeffrey Walton <noloader@gmail.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Simo Sorce <simo@redhat.com>,
+        Stephan Mueller <smueller@chronox.de>, Tso Ted <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         LKML <linux-kernel@vger.kernel.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Subject: Re: [PATCH 1/9] crypto: add zbufsize() interface
-Message-ID: <20211202035727.GC8138@gondor.apana.org.au>
-References: <20180802215118.17752-1-keescook@chromium.org>
- <20180802215118.17752-2-keescook@chromium.org>
- <20180807094513.vstt5dhbb7n6kvds@gondor.apana.org.au>
- <CAGXu5j+dPqpJZbO_AuGsNqJzq7XGcB2deXA5RELWv1-Ywi5QOA@mail.gmail.com>
- <20180808025319.32d57wtjpyyapwo5@gondor.apana.org.au>
- <202112011529.699092F@keescook>
- <20211202015820.GB8138@gondor.apana.org.au>
- <202112011947.7FA0A587C@keescook>
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>,
+        Alexander Lobakin <alobakin@mailbox.org>,
+        Jirka Hladky <jhladky@redhat.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+Message-ID: <Yahx41BRXW5E7yWQ@kroah.com>
+References: <YaYvYdnSaAvS8MAk@kroah.com>
+ <ac123d96b31f4a51b167b4e85a205f31a6c97876.camel@redhat.com>
+ <YaZHKHjomEivul6U@kroah.com>
+ <YaZqVxI1C8RByq+w@gmail.com>
+ <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
+ <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
+ <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
+ <49d6091e571e24efff7bc4dc70c4c62628eb0782.camel@redhat.com>
+ <CAHmME9q-WUGQ7NUO7oafUBkGBNtWePGXHGfEd2rTmZMUA49+DQ@mail.gmail.com>
+ <CAH8yC8k1WMwjoUXY_2nWjLMLVLPQsno3asyDEYVRJ4pg=OpLQA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202112011947.7FA0A587C@keescook>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <CAH8yC8k1WMwjoUXY_2nWjLMLVLPQsno3asyDEYVRJ4pg=OpLQA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 01, 2021 at 07:51:25PM -0800, Kees Cook wrote:
->
-> But the scomp API appears to be "internal only":
+On Wed, Dec 01, 2021 at 07:24:43PM -0500, Jeffrey Walton wrote:
+> On Wed, Dec 1, 2021 at 1:25 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >
+> > On Wed, Dec 1, 2021 at 12:19 PM Simo Sorce <simo@redhat.com> wrote:
+> > > that much it is, and it is a required one. However having worked a lot
+> > > on this I can tell you there is actually real cryptographic value in
+> > > the requirements FIPS introduced over the years
+> > > Well I think most of the requirements are sane practices, hopefully
+> > > controversial stuff will be minimal.
+> > > I happen to think quite a few of the requirements are actually good
+> > > ideas to implement to improve the guarantees of randomness
+> >
+> > If you think there are good ways to improve the RNG, of course send
+> > patches for this, justifying why, taking into account recent research
+> > into the topic you wish to patch, etc. Don't write, "because FIPS";
+> > instead argue rationale for each patch. And if you _do_ feel the need
+> > to appeal to authority, perhaps links to the various eprint papers you
+> > consulted would be worthwhile. Preferably you're able to do this in a
+> > small, incremental way, with small standalone patchsets, instead of
+> > gigantic series.
 > 
-> include/crypto/internal/scompress.h:static inline int crypto_scomp_decompress(struct crypto_scomp *tfm,
+> I may be parsing things incorrectly, but you seem to be rejecting the
+> NIST requirements, and then positioning your personal opinion as
+> superior. It sounds like one authority is being replaced by another.
+> Perhaps I am missing something.
 > 
-> What's the correct API calling sequence to do a simple decompress?
+> I am also guessing you've never read the relevant NIST documents. The
+> documents state the security goals and provide the steps to achieve
+> them in an implementation.
 
-OK we haven't wired up scomp to users because there was no user
-to start with.  So if you like you can create it just as we did
-for shash.
+Ok, I think this thread has gone on long enough without any real
+patches.
 
-The question becomes do you want to restrict your use-case to
-synchronous-only algorithms, i.e., you will never be able to access
-offload devices that support compression?
+Please, if you want to support NIST, or any other type of thing, submit
+patches that implement what you think will help achieve this.  Absent of
+that, we have no idea what NIST or any other random document aims to
+require or wish.
 
-Typically this would only make sense if you process a very small
-amount of data, but this seems counter-intuitive with compression
-(it does make sense with hashing where we often hash just 16 bytes).
+thanks,
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+greg k-h
