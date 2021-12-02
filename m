@@ -2,53 +2,51 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C264C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D14C4332F
 	for <linux-crypto@archiver.kernel.org>; Thu,  2 Dec 2021 15:24:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358948AbhLBP1c (ORCPT
+        id S1358901AbhLBP1c (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 2 Dec 2021 10:27:32 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:46460 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358901AbhLBP1c (ORCPT
+Received: from smtp-out2.suse.de ([195.135.220.29]:42100 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1358939AbhLBP1c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 2 Dec 2021 10:27:32 -0500
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 9C2752177B;
+        by smtp-out2.suse.de (Postfix) with ESMTP id A6A8E1FE01;
         Thu,  2 Dec 2021 15:24:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1638458648; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yQPKCbzaAg6zMuSNpgHZa4Q0dK8gulF3LOq3pSB3gCg=;
-        b=p78qZUx8I6xiZk6DK6BwlkQ/SHIfC/pxcO5fh/0a7+cVN6AtPIeNpYO8U33HSCl5upQfnn
-        n8e1B/5S8aW03pnLp99FQJEbqcm94MJWkxREFvJfJTIcQuPGEox9RmD6i8bU3k5nmjESlD
-        M7v1NK0mOALPnwvev/d6WudHlcTRcqE=
+        bh=UjO/egNmFWNNFKjv3uGJ3izNgDQ97ZLf0CHakF8xt+4=;
+        b=iuC7kWVldIehjY/ZWSvG4WIETeDuDzlRdGp317DBRwDP+SHYUQ9c+wygrD7OCtjlyjyrHX
+        C+eDiMGGLjGcyrTvWe7vPIrbox/wjhmmMnmxouIGgDXY8huf1YC/ztoI8mzZlTY3d8W4PK
+        T/4JqpeH+u7YldjSt6RxVFYXgTfUcoM=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1638458648;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yQPKCbzaAg6zMuSNpgHZa4Q0dK8gulF3LOq3pSB3gCg=;
-        b=lcwfbIF8qEQAr6rp3n6fh/+lEIRVRtIDMYcArz3XRVFguJTyl+UOhH/XVo2ki/uFaPbAYk
-        giY+8jNDTBTh6WBA==
+        bh=UjO/egNmFWNNFKjv3uGJ3izNgDQ97ZLf0CHakF8xt+4=;
+        b=SzZXbLUf5h7uTzYl4VcH1fqRp43iyDYDu4TDVmXEzNKrMy1Svs5GI8lf8ou4RjjvVNd372
+        ayofLEiLMXV4NsAA==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id DCEFBA3B89;
-        Thu,  2 Dec 2021 15:24:07 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id 984DAA3B8F;
+        Thu,  2 Dec 2021 15:24:08 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 1F1265191DEA; Thu,  2 Dec 2021 16:24:07 +0100 (CET)
+        id 4C6605191DFA; Thu,  2 Dec 2021 16:24:07 +0100 (CET)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Sagi Grimberg <sagi@grimberg.me>
 Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
         linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: [PATCH 01/12] crypto: add crypto_has_shash()
-Date:   Thu,  2 Dec 2021 16:23:47 +0100
-Message-Id: <20211202152358.60116-2-hare@suse.de>
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 09/12] nvmet: parse fabrics commands on io queues
+Date:   Thu,  2 Dec 2021 16:23:55 +0100
+Message-Id: <20211202152358.60116-10-hare@suse.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20211202152358.60116-1-hare@suse.de>
 References: <20211202152358.60116-1-hare@suse.de>
@@ -58,47 +56,83 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add helper function to determine if a given synchronous hash is supported.
+Some fabrics commands can be sent via io queues, so add a new
+function nvmet_parse_fabrics_io_cmd() and rename the existing
+nvmet_parse_fabrics_cmd() to nvmet_parse_fabrics_admin_cmd().
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
 ---
- crypto/shash.c        | 6 ++++++
- include/crypto/hash.h | 2 ++
- 2 files changed, 8 insertions(+)
+ drivers/nvme/target/core.c        |  4 ++++
+ drivers/nvme/target/fabrics-cmd.c | 17 ++++++++++++++++-
+ drivers/nvme/target/nvmet.h       |  3 ++-
+ 3 files changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 0a0a50cb694f..4c88e63b3350 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -521,6 +521,12 @@ struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index 5119c687de68..745c4e28a845 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -863,8 +863,12 @@ static inline u16 nvmet_io_cmd_check_access(struct nvmet_req *req)
+ 
+ static u16 nvmet_parse_io_cmd(struct nvmet_req *req)
+ {
++	struct nvme_command *cmd = req->cmd;
+ 	u16 ret;
+ 
++	if (nvme_is_fabrics(cmd))
++		return nvmet_parse_fabrics_io_cmd(req);
++
+ 	ret = nvmet_check_ctrl_status(req);
+ 	if (unlikely(ret))
+ 		return ret;
+diff --git a/drivers/nvme/target/fabrics-cmd.c b/drivers/nvme/target/fabrics-cmd.c
+index 70fb587e9413..f23c28729908 100644
+--- a/drivers/nvme/target/fabrics-cmd.c
++++ b/drivers/nvme/target/fabrics-cmd.c
+@@ -82,7 +82,7 @@ static void nvmet_execute_prop_get(struct nvmet_req *req)
+ 	nvmet_req_complete(req, status);
  }
- EXPORT_SYMBOL_GPL(crypto_alloc_shash);
  
-+int crypto_has_shash(const char *alg_name, u32 type, u32 mask)
+-u16 nvmet_parse_fabrics_cmd(struct nvmet_req *req)
++u16 nvmet_parse_fabrics_admin_cmd(struct nvmet_req *req)
+ {
+ 	struct nvme_command *cmd = req->cmd;
+ 
+@@ -103,6 +103,21 @@ u16 nvmet_parse_fabrics_cmd(struct nvmet_req *req)
+ 	return 0;
+ }
+ 
++u16 nvmet_parse_fabrics_io_cmd(struct nvmet_req *req)
 +{
-+	return crypto_type_has_alg(alg_name, &crypto_shash_type, type, mask);
++	struct nvme_command *cmd = req->cmd;
++
++	switch (cmd->fabrics.fctype) {
++	default:
++		pr_debug("received unknown capsule type 0x%x\n",
++			cmd->fabrics.fctype);
++		req->error_loc = offsetof(struct nvmf_common_command, fctype);
++		return NVME_SC_INVALID_OPCODE | NVME_SC_DNR;
++	}
++
++	return 0;
 +}
-+EXPORT_SYMBOL_GPL(crypto_has_shash);
 +
- static int shash_prepare_alg(struct shash_alg *alg)
+ static u16 nvmet_install_queue(struct nvmet_ctrl *ctrl, struct nvmet_req *req)
  {
- 	struct crypto_alg *base = &alg->base;
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index f140e4643949..f5841992dc9b 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -718,6 +718,8 @@ static inline void ahash_request_set_crypt(struct ahash_request *req,
- struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
- 					u32 mask);
+ 	struct nvmf_connect_command *c = &req->cmd->connect;
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index af193423c10b..496faea41149 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -418,7 +418,8 @@ u16 nvmet_file_parse_io_cmd(struct nvmet_req *req);
+ u16 nvmet_bdev_zns_parse_io_cmd(struct nvmet_req *req);
+ u16 nvmet_parse_admin_cmd(struct nvmet_req *req);
+ u16 nvmet_parse_discovery_cmd(struct nvmet_req *req);
+-u16 nvmet_parse_fabrics_cmd(struct nvmet_req *req);
++u16 nvmet_parse_fabrics_admin_cmd(struct nvmet_req *req);
++u16 nvmet_parse_fabrics_io_cmd(struct nvmet_req *req);
  
-+int crypto_has_shash(const char *alg_name, u32 type, u32 mask);
-+
- static inline struct crypto_tfm *crypto_shash_tfm(struct crypto_shash *tfm)
- {
- 	return &tfm->base;
+ bool nvmet_req_init(struct nvmet_req *req, struct nvmet_cq *cq,
+ 		struct nvmet_sq *sq, const struct nvmet_fabrics_ops *ops);
 -- 
 2.29.2
 
