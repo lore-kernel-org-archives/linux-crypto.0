@@ -2,129 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE1AC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Dec 2021 08:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06336C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Dec 2021 09:13:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379337AbhLCIvO (ORCPT
+        id S1379440AbhLCJQa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Dec 2021 03:51:14 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:15691 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379306AbhLCIvN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Dec 2021 03:51:13 -0500
-Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4J55xD2gCpzZdQQ;
-        Fri,  3 Dec 2021 16:45:04 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 3 Dec 2021 16:47:48 +0800
-Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
- (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Fri, 3 Dec
- 2021 16:47:48 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH v2] crypto: hisilicon - replace 'smp_processor_id' with the raw version of the macro
-Date:   Fri, 3 Dec 2021 16:43:05 +0800
-Message-ID: <20211203084305.14078-1-yekai13@huawei.com>
-X-Mailer: git-send-email 2.33.0
+        Fri, 3 Dec 2021 04:16:30 -0500
+Received: from mga03.intel.com ([134.134.136.65]:55792 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1351182AbhLCJQ3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 Dec 2021 04:16:29 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10186"; a="236880928"
+X-IronPort-AV: E=Sophos;i="5.87,283,1631602800"; 
+   d="scan'208";a="236880928"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2021 01:13:05 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,283,1631602800"; 
+   d="scan'208";a="513199598"
+Received: from lkp-server02.sh.intel.com (HELO 9e1e9f9b3bcb) ([10.239.97.151])
+  by fmsmga007.fm.intel.com with ESMTP; 03 Dec 2021 01:13:02 -0800
+Received: from kbuild by 9e1e9f9b3bcb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1mt4co-000HJn-01; Fri, 03 Dec 2021 09:13:02 +0000
+Date:   Fri, 3 Dec 2021 17:12:32 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     sgoutham@marvell.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, sunil.kovvuri@gmail.com,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Bharat Bhushan <bbhushan2@marvell.com>,
+        Joseph Longever <jlongever@marvell.com>
+Subject: Re: [PATCH] hwrng: cn10k: Add random number generator support
+Message-ID: <202112031752.wdInk91s-lkp@intel.com>
+References: <1638208423-21494-1-git-send-email-sgoutham@marvell.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1638208423-21494-1-git-send-email-sgoutham@marvell.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-smp_processor_id() is unsafe if it's used in a preemption-on critical
-section. It will cause the call trace when the preemption-on and sets the
-CONFIG_DEBUG_PREEMPT. Due to does not need CPU ID stability. So replace
-'smp_processor_id' with the raw version of the marco in preemptible to
-avoid the following call trace:
+Hi,
 
-[ 7538.874350] BUG: using smp_processor_id() in preemptible [00000000] code: af_alg06/8438
-[ 7538.874368] caller is debug_smp_processor_id+0x1c/0x28
-[ 7538.874373] CPU: 50 PID: 8438 Comm: af_alg06 Kdump: loaded Not tainted 5.10.0.pc+ #18
-[ 7538.874377] Call trace:
-[ 7538.874387]  dump_backtrace+0x0/0x210
-[ 7538.874389]  show_stack+0x2c/0x38
-[ 7538.874392]  dump_stack+0x110/0x164
-[ 7538.874394]  check_preemption_disabled+0xf4/0x108
-[ 7538.874396]  debug_smp_processor_id+0x1c/0x28
-[ 7538.874406]  sec_create_qps+0x24/0xe8 [hisi_sec2]
-[ 7538.874408]  sec_ctx_base_init+0x20/0x4d8 [hisi_sec2]
-[ 7538.874411]  sec_aead_ctx_init+0x68/0x180 [hisi_sec2]
-[ 7538.874413]  sec_aead_sha256_ctx_init+0x28/0x38 [hisi_sec2]
-[ 7538.874421]  crypto_aead_init_tfm+0x54/0x68
-[ 7538.874423]  crypto_create_tfm_node+0x6c/0x110
-[ 7538.874424]  crypto_alloc_tfm_node+0x74/0x288
-[ 7538.874426]  crypto_alloc_aead+0x40/0x50
-[ 7538.874431]  aead_bind+0x50/0xd0
-[ 7538.874433]  alg_bind+0x94/0x148
-[ 7538.874439]  __sys_bind+0x98/0x118
-[ 7538.874441]  __arm64_sys_bind+0x28/0x38
-[ 7538.874445]  do_el0_svc+0x88/0x258
-[ 7538.874447]  el0_svc+0x1c/0x28
-[ 7538.874449]  el0_sync_handler+0x8c/0xb8
-[ 7538.874452]  el0_sync+0x148/0x180
+I love your patch! Perhaps something to improve:
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
+[auto build test WARNING on char-misc/char-misc-testing]
+[also build test WARNING on herbert-cryptodev-2.6/master linux/master linus/master v5.16-rc3 next-20211202]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-changes v1->v2:
-	modify the comments, and use the raw version of
-the marco instead of wrong code modification
+url:    https://github.com/0day-ci/linux/commits/sgoutham-marvell-com/hwrng-cn10k-Add-random-number-generator-support/20211130-015707
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc.git 5d331b5922551637c586cdf5fdc1778910fc937f
+config: arm64-randconfig-s031-20211203 (https://download.01.org/0day-ci/archive/20211203/202112031752.wdInk91s-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 11.2.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # apt-get install sparse
+        # sparse version: v0.6.4-dirty
+        # https://github.com/0day-ci/linux/commit/395a6a89774841f3f1c9d994b7d8cdfaf25bc428
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review sgoutham-marvell-com/hwrng-cn10k-Add-random-number-generator-support/20211130-015707
+        git checkout 395a6a89774841f3f1c9d994b7d8cdfaf25bc428
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=arm64 SHELL=/bin/bash drivers/char/hw_random/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/char/hw_random/cn10k-rng.c:88:17: sparse: sparse: cast removes address space '__iomem' of expression
+
+vim +/__iomem +88 drivers/char/hw_random/cn10k-rng.c
+
+    82	
+    83	static int cn10k_read_trng(struct cn10k_rng *rng, u64 *value)
+    84	{
+    85		u64 addr, result = 0;
+    86		int retry_count = 5;
+    87	
+  > 88		addr = (u64)rng->reg_base + RNM_PF_RANDOM;
+    89		/* TRNG and status need to be read at a time */
+    90		while (!result && retry_count) {
+    91			__asm__ volatile("ldp  %0,%1,[%2]" :\
+    92					 "=r" (*value), "=r" (result) : "r" (addr) : );
+    93	
+    94			retry_count--;
+    95		}
+    96	
+    97		return retry_count ? 0 : -EIO;
+    98	}
+    99	
+
 ---
- drivers/crypto/hisilicon/hpre/hpre_main.c | 2 +-
- drivers/crypto/hisilicon/sec2/sec_main.c  | 2 +-
- drivers/crypto/hisilicon/zip/zip_main.c   | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index ebfab3e14499..e5ff3a46a30a 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -277,7 +277,7 @@ static inline int hpre_cluster_core_mask(struct hisi_qm *qm)
- 
- struct hisi_qp *hpre_create_qp(u8 type)
- {
--	int node = cpu_to_node(smp_processor_id());
-+	int node = cpu_to_node(raw_smp_processor_id());
- 	struct hisi_qp *qp = NULL;
- 	int ret;
- 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 26d3ab1d308b..7b5c7d049487 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -282,7 +282,7 @@ void sec_destroy_qps(struct hisi_qp **qps, int qp_num)
- 
- struct hisi_qp **sec_create_qps(void)
- {
--	int node = cpu_to_node(smp_processor_id());
-+	int node = cpu_to_node(raw_smp_processor_id());
- 	u32 ctx_num = ctx_q_num;
- 	struct hisi_qp **qps;
- 	int ret;
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 1a237d95d482..9f9311f981c3 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -277,7 +277,7 @@ MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
- int zip_create_qps(struct hisi_qp **qps, int qp_num, int node)
- {
- 	if (node == NUMA_NO_NODE)
--		node = cpu_to_node(smp_processor_id());
-+		node = cpu_to_node(raw_smp_processor_id());
- 
- 	return hisi_qm_alloc_qps_node(&zip_devices, qp_num, 0, node, qps);
- }
--- 
-2.33.0
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
