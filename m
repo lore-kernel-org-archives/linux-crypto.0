@@ -2,130 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41AC7C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Dec 2021 09:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 629ADC433EF
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Dec 2021 10:47:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384579AbhLDJ5d (ORCPT
+        id S1346348AbhLDKvJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 4 Dec 2021 04:57:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58076 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384721AbhLDJ5X (ORCPT
+        Sat, 4 Dec 2021 05:51:09 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:29088 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238470AbhLDKvI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 4 Dec 2021 04:57:23 -0500
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EF3DC0698CE;
-        Sat,  4 Dec 2021 01:53:56 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id p27-20020a05600c1d9b00b0033bf8532855so4054804wms.3;
-        Sat, 04 Dec 2021 01:53:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=j/Z7q22hz6/jZEG3t/fjQe/LIXP2juQxxdbIILcT/y4=;
-        b=HgfVC2dmrGyWIIEZEEubKF3pZeAK6/vxgibrcuoVZJZzobbLOvqs7Jp3MJvnSN3nP0
-         DfnJQfKceYfd1lCBzVMwuTGo4kAx4Dn34sYkppryT2t0xMFLFhKHg6sTpx1WZOV0yJjh
-         KNChkBP5Y7IOoZWcCa6TqBvVE0ucqVI8C2X3UlZBBXubBnEbG0LsDoAES9iAjI7h1DKt
-         pkFPYICq3N+mWm94+zvcsbg1FvcAoXL7uyaepJ5sq92maD1UJi6IzyqtG/Q8d0kgrfXE
-         8wEoS5KBiqlU/HN7W0iYDqpi9xbmKctsKBXYxvfwl45mCsgS7HTN4STcHQzpPxJZRnM/
-         Koxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=j/Z7q22hz6/jZEG3t/fjQe/LIXP2juQxxdbIILcT/y4=;
-        b=e/z1Yrz7ZaLFpcwaQuUzIFAbIWvKaOYu9dCU1IWdqmjhj3ALwCyKYNXZsWixGP4T+8
-         H1ItiGgqBRfXQn7lRebERBMRzkMcyv1SB0VjEPSkiWcVS8c0bo+U8HQG3hz5bV/+Qoy7
-         w2s/eOcRn694dPGRg/hwZMO9K/+BbxapvAiMwej9cnaVjj4OlA3rL+QwggyS/EzrD0+I
-         RSPkUIJ1BRlB0JfPqxA/TlOui2/togOF07iFqRAXNYaZRJzXtZYUYBpUG4hIHPIKtPaE
-         YtnqVGofYCxEb1zTXm89jTVzFmCJlFOZR8K8k4u3Z7FO4ki4t9z+E5hrFi2VXN8tFwlj
-         WEuw==
-X-Gm-Message-State: AOAM530iI+dGqI0UrJImRBER2MjcQ2XKYwVfs1epzGu21+98iXNVBX1P
-        AFkvxLZTWWYezmAepBun3DmeKZIztYwJY1hCVuY=
-X-Google-Smtp-Source: ABdhPJwEFX+M4vpBrMjQKMjVUF8zHIgyL4SnMphnUrqZ1Y87ChfGwFllVxhBfes4y5FdhjlczSblHLbN8AZPNjoNCbA=
-X-Received: by 2002:a7b:ce96:: with SMTP id q22mr22103483wmj.9.1638611634690;
- Sat, 04 Dec 2021 01:53:54 -0800 (PST)
+        Sat, 4 Dec 2021 05:51:08 -0500
+Received: from kwepemi100010.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4J5mY428mKz1DJXX;
+        Sat,  4 Dec 2021 18:44:56 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100010.china.huawei.com (7.221.188.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Sat, 4 Dec 2021 18:47:41 +0800
+Received: from localhost.localdomain (10.67.165.24) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Sat, 4 Dec 2021 18:47:40 +0800
+From:   Weili Qian <qianweili@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
+Subject: [PATCH] crypto: hisilicon/qm - fix incorrect return value of hisi_qm_resume()
+Date:   Sat, 4 Dec 2021 18:43:01 +0800
+Message-ID: <20211204104301.32666-1-qianweili@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-References: <2036923.9o76ZdvQCi@positron.chronox.de> <4641592.OV4Wx5bFTl@positron.chronox.de>
- <CAHmME9oaS4TOpk7rQ73BRKeVLjMUNyt6EFyeOX=hZSkFBPDu0g@mail.gmail.com>
- <56d2da397bb53f71c0354b102c3b40940e9b4eda.camel@redhat.com>
- <CACXcFmntNAWYCwQ6CmH5c3pn3fXbxKh=j75GZUeLkuqi3QdS+A@mail.gmail.com> <YaXZCdtyylHMa29o@kroah.com>
-In-Reply-To: <YaXZCdtyylHMa29o@kroah.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Sat, 4 Dec 2021 17:53:41 +0800
-Message-ID: <CACXcFmmzDrNQijjXmJaBwjXLiST_2LqVONpMO1JG5xvy-ZXhoQ@mail.gmail.com>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Simo Sorce <simo@redhat.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
-        Tso Ted <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Peter Matthias <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Andy Lavr <andy.lavr@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Petr Tesarik <ptesarik@suse.cz>,
-        John Haxby <john.haxby@oracle.com>,
-        Alexander Lobakin <alobakin@mailbox.org>,
-        Jirka Hladky <jhladky@redhat.com>,
-        John Kelsey <crypto.jmk@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
+When hisi_qm_resume() returns 0, it indicates that the device has started
+successfully.  If the device fails to start, hisi_qm_resume() needs to
+return the actual error code to the caller instead of 0.
 
-> Also, why does any of this have to be in the kernel at all?
+Fixes: d7ea53395b72 ("crypto: hisilicon - add runtime PM ops")
+Signed-off-by: Weili Qian <qianweili@huawei.com>
+---
+ drivers/crypto/hisilicon/qm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The kernel has had random(4) since Ted invented it sometime in
-the 90s. There's no question it's a good idea; that's why all the BSDs
-& some others have copied it. The only questions here are whether
-it could be made FIPS compliant & whether it should be.
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index ad706ccfe91a..896255aec87f 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -6071,7 +6071,7 @@ int hisi_qm_resume(struct device *dev)
+ 	if (ret)
+ 		pci_err(pdev, "failed to start qm(%d)\n", ret);
+ 
+-	return 0;
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(hisi_qm_resume);
+ 
+-- 
+2.33.0
 
-> If FIPS requires a deterministic random number generator
-> that will not allow entropy to be acquired from hardware
-> or external inputs,
-
-It doesn't require that at all; in fact their DRNG design
-requires an external source of random bits. However, it
-requires that the source be certified & that would be a
-problem for us. Intel & others might be able to get their
-random number instructions certified and vendors of
-crypto or SOC chips might get theirs certified, but the
-kernel community could not do that.
-
-I think the kernel's entropy collection routines are good
-enough that they could, in principle, be certified, but
-that would involve some work & considerable money.
-
-> why does the
-> kernel care at all?  Just write a fips_random.so library and get it
-> certified and have any userspace code that cares about such a crazy
-> thing to use that instead.
-
-That does not solve the problem. The library would
-also need a certified source of random inputs, so
-to get it certified you'd have to get something else
-certified first -- random(4), an instruction or a hardware
-rng.
