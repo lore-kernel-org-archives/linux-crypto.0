@@ -2,94 +2,130 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE736C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Dec 2021 09:30:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41AC7C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Dec 2021 09:54:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354962AbhLDJd5 (ORCPT
+        id S1384579AbhLDJ5d (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 4 Dec 2021 04:33:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52826 "EHLO
+        Sat, 4 Dec 2021 04:57:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236112AbhLDJd4 (ORCPT
+        with ESMTP id S1384721AbhLDJ5X (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 4 Dec 2021 04:33:56 -0500
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51BD9C061751
-        for <linux-crypto@vger.kernel.org>; Sat,  4 Dec 2021 01:30:31 -0800 (PST)
-Received: by mail-ot1-x331.google.com with SMTP id i5-20020a05683033e500b0057a369ac614so6677184otu.10
-        for <linux-crypto@vger.kernel.org>; Sat, 04 Dec 2021 01:30:31 -0800 (PST)
+        Sat, 4 Dec 2021 04:57:23 -0500
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EF3DC0698CE;
+        Sat,  4 Dec 2021 01:53:56 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id p27-20020a05600c1d9b00b0033bf8532855so4054804wms.3;
+        Sat, 04 Dec 2021 01:53:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=eLphoARnpNhDXvL/GS5YL9RgcLOE5n6S5NZrlzfMofM=;
-        b=llOAXJm5MzQYiE+MazC9mn/XoF6LdmtNr6HngrGBE+8Y1lx89AKnq42S7r0ajFUQyv
-         wFNZgOPvvg7juRdE9iSDCd27+HZkVl6OSwF+UwGReFjSamzHAEHKGJnXPhNS4sVaYvVo
-         7kruoaIHHNbgeLeun8UKl5Xd7XaGD2TMVOFmJic0DqmtjELZpZdECrgMJsUh5wUMAXkd
-         V7teXsptQWlO+fYxVvRGivJk+x1wH1Wg3JmW0QJ7ZHMLazx45NUN+14EGg6jBcF7er89
-         QbsaE/oamYMXXFeG6JLN+hW0qUdS0qv0S7NsL5u9u2Rvc/AXri17V/WWDk24uwTzuLj1
-         9GXg==
+        bh=j/Z7q22hz6/jZEG3t/fjQe/LIXP2juQxxdbIILcT/y4=;
+        b=HgfVC2dmrGyWIIEZEEubKF3pZeAK6/vxgibrcuoVZJZzobbLOvqs7Jp3MJvnSN3nP0
+         DfnJQfKceYfd1lCBzVMwuTGo4kAx4Dn34sYkppryT2t0xMFLFhKHg6sTpx1WZOV0yJjh
+         KNChkBP5Y7IOoZWcCa6TqBvVE0ucqVI8C2X3UlZBBXubBnEbG0LsDoAES9iAjI7h1DKt
+         pkFPYICq3N+mWm94+zvcsbg1FvcAoXL7uyaepJ5sq92maD1UJi6IzyqtG/Q8d0kgrfXE
+         8wEoS5KBiqlU/HN7W0iYDqpi9xbmKctsKBXYxvfwl45mCsgS7HTN4STcHQzpPxJZRnM/
+         Koxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=eLphoARnpNhDXvL/GS5YL9RgcLOE5n6S5NZrlzfMofM=;
-        b=QFeN7i76tCu/l1ECiWUuQHwLo0VH1JznH/AAR215qnScSPfWGOs4hCc1dYhmtjA+qO
-         ZHfzfkLU6DAZtNfrNZBAuia36Brx1k0M+91qRFo42cOslBx4oF7tvuHI1HdXcZkiLr44
-         2yIkvA98N++K76Gisd6QTae0XuFlimUEk5eThdPXcwW51MMBIYzhQOd53o86MY82PnAv
-         BlVvKFipzU72qJ1PuPP9sgk3X/ZFeAiVrnWdNU3NgQFDwZLEqZCWtJfXemeDDTc3xGLq
-         AkUJs45gHXBqo3nGKXHrUbwHJW8cfH6QjKlGArthC7RC3XZWwYQTJD9sqn4Rb7FOfwtF
-         KPnA==
-X-Gm-Message-State: AOAM532Hq2TVrhUVdsy6yrINOgVcxMgLT1PO49nJ7dgNgDCjvS6p+VNY
-        r5pxmZ8pa3ce/qOPIX2+LEjiqmtASqS7MxrVMZhgbw==
-X-Google-Smtp-Source: ABdhPJxWLMXNiseULS8xzg2rcQuqSyZ333C5GChbK035qBdy0M3bFTiSm/PagUOPjuOGCwafbdcw4FOLEMTUuB7OECw=
-X-Received: by 2002:a05:6830:1356:: with SMTP id r22mr20127609otq.196.1638610230450;
- Sat, 04 Dec 2021 01:30:30 -0800 (PST)
+        bh=j/Z7q22hz6/jZEG3t/fjQe/LIXP2juQxxdbIILcT/y4=;
+        b=e/z1Yrz7ZaLFpcwaQuUzIFAbIWvKaOYu9dCU1IWdqmjhj3ALwCyKYNXZsWixGP4T+8
+         H1ItiGgqBRfXQn7lRebERBMRzkMcyv1SB0VjEPSkiWcVS8c0bo+U8HQG3hz5bV/+Qoy7
+         w2s/eOcRn694dPGRg/hwZMO9K/+BbxapvAiMwej9cnaVjj4OlA3rL+QwggyS/EzrD0+I
+         RSPkUIJ1BRlB0JfPqxA/TlOui2/togOF07iFqRAXNYaZRJzXtZYUYBpUG4hIHPIKtPaE
+         YtnqVGofYCxEb1zTXm89jTVzFmCJlFOZR8K8k4u3Z7FO4ki4t9z+E5hrFi2VXN8tFwlj
+         WEuw==
+X-Gm-Message-State: AOAM530iI+dGqI0UrJImRBER2MjcQ2XKYwVfs1epzGu21+98iXNVBX1P
+        AFkvxLZTWWYezmAepBun3DmeKZIztYwJY1hCVuY=
+X-Google-Smtp-Source: ABdhPJwEFX+M4vpBrMjQKMjVUF8zHIgyL4SnMphnUrqZ1Y87ChfGwFllVxhBfes4y5FdhjlczSblHLbN8AZPNjoNCbA=
+X-Received: by 2002:a7b:ce96:: with SMTP id q22mr22103483wmj.9.1638611634690;
+ Sat, 04 Dec 2021 01:53:54 -0800 (PST)
 MIME-Version: 1.0
-References: <000000000000a9ed6205c67e08c6@google.com> <0000000000006ce3ce05d220c008@google.com>
-In-Reply-To: <0000000000006ce3ce05d220c008@google.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Sat, 4 Dec 2021 10:30:19 +0100
-Message-ID: <CACT4Y+ZJHZKD4S4CNM1L1QK2ZDdUW5DAGtUocZp1GxrGwAH1dA@mail.gmail.com>
-Subject: Re: [syzbot] INFO: task hung in set_current_rng
-To:     syzbot <syzbot+681da20be7291be15dca@syzkaller.appspotmail.com>
-Cc:     colin.king@canonical.com, f.fangjian@huawei.com,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lvivier@redhat.com, mpm@selenic.com,
-        mst@redhat.com, syzkaller-bugs@googlegroups.com,
-        tangzihao1@hisilicon.com, yuehaibing@huawei.com,
-        zhangshaokun@hisilicon.com
+References: <2036923.9o76ZdvQCi@positron.chronox.de> <4641592.OV4Wx5bFTl@positron.chronox.de>
+ <CAHmME9oaS4TOpk7rQ73BRKeVLjMUNyt6EFyeOX=hZSkFBPDu0g@mail.gmail.com>
+ <56d2da397bb53f71c0354b102c3b40940e9b4eda.camel@redhat.com>
+ <CACXcFmntNAWYCwQ6CmH5c3pn3fXbxKh=j75GZUeLkuqi3QdS+A@mail.gmail.com> <YaXZCdtyylHMa29o@kroah.com>
+In-Reply-To: <YaXZCdtyylHMa29o@kroah.com>
+From:   Sandy Harris <sandyinchina@gmail.com>
+Date:   Sat, 4 Dec 2021 17:53:41 +0800
+Message-ID: <CACXcFmmzDrNQijjXmJaBwjXLiST_2LqVONpMO1JG5xvy-ZXhoQ@mail.gmail.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Simo Sorce <simo@redhat.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
+        Tso Ted <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>,
+        Alexander Lobakin <alobakin@mailbox.org>,
+        Jirka Hladky <jhladky@redhat.com>,
+        John Kelsey <crypto.jmk@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 2 Dec 2021 at 03:43, syzbot
-<syzbot+681da20be7291be15dca@syzkaller.appspotmail.com> wrote:
->
-> syzbot suspects this issue was fixed by commit:
->
-> commit 2bb31abdbe55742c89f4dc0cc26fcbc8467364f6
-> Author: Laurent Vivier <lvivier@redhat.com>
-> Date:   Thu Oct 28 10:11:09 2021 +0000
->
->     hwrng: virtio - don't wait on cleanup
->
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=171ad129b00000
-> start commit:   3dbdb38e2869 Merge branch 'for-5.14' of git://git.kernel.o..
-> git tree:       upstream
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=1700b0b2b41cd52c
-> dashboard link: https://syzkaller.appspot.com/bug?extid=681da20be7291be15dca
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15a472e4300000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15c51a28300000
->
-> If the result looks correct, please mark the issue as fixed by replying with:
->
-> #syz fix: hwrng: virtio - don't wait on cleanup
->
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
 
+> Also, why does any of this have to be in the kernel at all?
 
-Sounds reasonable:
+The kernel has had random(4) since Ted invented it sometime in
+the 90s. There's no question it's a good idea; that's why all the BSDs
+& some others have copied it. The only questions here are whether
+it could be made FIPS compliant & whether it should be.
 
-#syz fix: hwrng: virtio - don't wait on cleanup
+> If FIPS requires a deterministic random number generator
+> that will not allow entropy to be acquired from hardware
+> or external inputs,
+
+It doesn't require that at all; in fact their DRNG design
+requires an external source of random bits. However, it
+requires that the source be certified & that would be a
+problem for us. Intel & others might be able to get their
+random number instructions certified and vendors of
+crypto or SOC chips might get theirs certified, but the
+kernel community could not do that.
+
+I think the kernel's entropy collection routines are good
+enough that they could, in principle, be certified, but
+that would involve some work & considerable money.
+
+> why does the
+> kernel care at all?  Just write a fips_random.so library and get it
+> certified and have any userspace code that cares about such a crazy
+> thing to use that instead.
+
+That does not solve the problem. The library would
+also need a certified source of random inputs, so
+to get it certified you'd have to get something else
+certified first -- random(4), an instruction or a hardware
+rng.
