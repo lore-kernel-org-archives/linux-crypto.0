@@ -2,57 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18AD4C433EF
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Dec 2021 23:03:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B45C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun,  5 Dec 2021 23:03:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239942AbhLEXGk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Dec 2021 18:06:40 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:57468 "EHLO fornost.hmeau.com"
+        id S240061AbhLEXHY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Dec 2021 18:07:24 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:57470 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229918AbhLEXGk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Dec 2021 18:06:40 -0500
+        id S229918AbhLEXHY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 5 Dec 2021 18:07:24 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1mu0X0-0006jU-20; Mon, 06 Dec 2021 10:02:55 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Dec 2021 10:02:53 +1100
-Date:   Mon, 6 Dec 2021 10:02:53 +1100
+        id 1mu0Xl-0006kE-Fv; Mon, 06 Dec 2021 10:03:42 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Dec 2021 10:03:41 +1100
+Date:   Mon, 6 Dec 2021 10:03:41 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Peter Gonda <pgonda@google.com>, thomas.lendacky@amd.com,
-        kbuild-all@lists.01.org, David Rientjes <rientjes@google.com>,
-        Marc Orr <marcorr@google.com>,
+To:     Peter Gonda <pgonda@google.com>
+Cc:     thomas.lendacky@amd.com, Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
         Joerg Roedel <jroedel@suse.de>,
         John Allen <john.allen@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH V5 5/5] crypto: ccp - Add SEV_INIT_EX support
-Message-ID: <20211205230253.GA3049@gondor.apana.org.au>
-References: <20211203144642.3460447-6-pgonda@google.com>
- <202112040501.zlOm5XQW-lkp@intel.com>
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V5.1 3/5] crypto: ccp - Refactor out sev_fw_alloc()
+Message-ID: <20211205230341.GB3049@gondor.apana.org.au>
+References: <20211203214502.3545842-1-pgonda@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202112040501.zlOm5XQW-lkp@intel.com>
+In-Reply-To: <20211203214502.3545842-1-pgonda@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Dec 04, 2021 at 05:25:25AM +0800, kernel test robot wrote:
-> Hi Peter,
+On Fri, Dec 03, 2021 at 09:45:02PM +0000, Peter Gonda wrote:
+> Create a helper function sev_fw_alloc() which can be used to allocate
+> aligned memory regions for use by the PSP firmware. Currently only used
+> for the SEV-ES TMR region but will be used for the SEV_INIT_EX NV memory
+> region.
 > 
-> I love your patch! Yet something to improve:
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> Reviewed-by: Marc Orr <marcorr@google.com>
+> Acked-by: David Rientjes <rientjes@google.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Marc Orr <marcorr@google.com>
+> Cc: Joerg Roedel <jroedel@suse.de>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: David Rientjes <rientjes@google.com>
+> Cc: John Allen <john.allen@amd.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> ---
 > 
-> [auto build test ERROR on herbert-cryptodev-2.6/master]
-> [also build test ERROR on herbert-crypto-2.6/master kvm/queue linus/master v5.16-rc3 next-20211203]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch]
+> Mistakenly send old patch, this is the fixed version.
+> 
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 20 +++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
 
-So this still seems to be broken.
+Please resubmit the whole series.
 
-Cheers,
+Otherwise automatic testing won't pick this up.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
