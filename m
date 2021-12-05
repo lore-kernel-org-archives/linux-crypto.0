@@ -2,366 +2,306 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D104C433EF
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Dec 2021 00:59:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8255C433FE
+	for <linux-crypto@archiver.kernel.org>; Sun,  5 Dec 2021 05:52:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230036AbhLEBDM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 4 Dec 2021 20:03:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58828 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229772AbhLEBDL (ORCPT
+        id S231694AbhLEF4I (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Dec 2021 00:56:08 -0500
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.54]:23505 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231688AbhLEF4H (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 4 Dec 2021 20:03:11 -0500
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42A23C061751
-        for <linux-crypto@vger.kernel.org>; Sat,  4 Dec 2021 16:59:45 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id p18so5314541wmq.5
-        for <linux-crypto@vger.kernel.org>; Sat, 04 Dec 2021 16:59:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=49tdzx3S4CEVTdEqaNq8at+kpCXkVGHoZ+cDqpI+JwQ=;
-        b=IAkC6Xj9DrrXzK5TYG88sxWKTkcNHn8IowmIqOsoqzB/DOR2UJGEGq9l64eGA8QiXj
-         YbnwQq21lbdKPitwAj1JtOGh20OIoQULaEus9sfIpKgYotKtaejQ8J7zkOF5hUhakPnc
-         sHxQz3Ct3jiIhLoReK+bokdfYZRYi/pp6u/Jideuixiaj3Oguv+upti7CQ9SQ42e7ZCf
-         JCfFjOsI/8VuhKP2kpo0NO+8y4VsEBzK+kJxn5adNEV/m9RJE49Ls2mIau/Iht5dkMjZ
-         hBwzB9nnYVEzhqpjWrR+IC1bxubc0pKi/rIIHbMFQaRrT+k2IWSYEmH19JAEqroGApdx
-         yqaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=49tdzx3S4CEVTdEqaNq8at+kpCXkVGHoZ+cDqpI+JwQ=;
-        b=cvNApP4F55+ahTk7C2rVO1xEUJ/0XoyggknRs1t2ao0uG4JslTgtCfIXsGvvoBDBgd
-         wp9OQzOBby9wuAH0E0jGRB317sOJL52RaAoiU5vGoAAsMQklJw+dmYprP/Lz9byHsp5L
-         Gwr06AsHM2bqCqvU5XHPPDyxtZ/ZSsVzwTh3fllZmbuFFEw5YQQGMfTvBjHmP9Ixnhd2
-         rkWou7p5GTWkbulo20Ko/M34lguULwPkgbaVorqjSIFNzvuFwhN0yss4gdtlIjkaPU0g
-         JnQbdO11p9tIguazv8XTS10K+AA2pkJAVku4hkueBwQX4Gnwl543awCNxCkkviHk357k
-         qiSA==
-X-Gm-Message-State: AOAM532FXfv4V0GYQCcfXc9lMapdusn7qWI8l9SlmWz65ZT1bkoqiq5c
-        IOR4t+86zoxuV8TyU5USEmp1dfphf+BsqoduBRVW1NyiMsM4/w==
-X-Google-Smtp-Source: ABdhPJxjRHfAWOiyt16LCQ2VeBZ5JkzP4c0pdHs0TioGlkglXwVNR0105oTznGDlG087VEtZ4NpFxtuI6p78OwDzV6w=
-X-Received: by 2002:a7b:ca4c:: with SMTP id m12mr27850724wml.119.1638665983444;
- Sat, 04 Dec 2021 16:59:43 -0800 (PST)
+        Sun, 5 Dec 2021 00:56:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1638683551;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=DOe1ivgGYIjYVu7ZgmE/rMb8fXb8lAPoOOTmznNTkm0=;
+    b=da8pm4YwEUEFK9b3yYMRHoG+NoHWBnYd9HDXgjexzbw0ssRznqXA8Ta7otU4UKOK03
+    ojx9rJG9LAxv0tdeVdNV7mfowaIm1127qQfz+8f7cjoPW3UmWdb5zIkKl+fUgE3W/qBI
+    k7mfFTrrVYPNmbklXP2b7cR8EEGccEoIaBGau+Jgd+BN4gLqWR9thufxg+8yO9LW7km+
+    hh5erqUWjWmRzpiV+2LFPeKtmrI/T+T9lGy54BndHB62YQkUuMuSx2ucVvZ9NahKBz/G
+    TV538dbXwVc0r6eNDQSFVbrpy9Pp3i996fIVBSZAnghgwqfoLRavM/5iRdNsxnx9p0YH
+    B18Q==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZJfSf8vUi"
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 47.34.10 DYNA|AUTH)
+    with ESMTPSA id 006230xB55qTtus
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Sun, 5 Dec 2021 06:52:29 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Nicolai Stange <nstange@suse.de>
+Cc:     Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qat-linux@intel.com, keyrings@vger.kernel.org,
+        Nicolai Stange <nstange@suse.de>
+Subject: Re: [PATCH 09/18] crypto: dh - implement private key generation primitive
+Date:   Sun, 05 Dec 2021 06:52:28 +0100
+Message-ID: <25213093.1r3eYUQgxm@positron.chronox.de>
+In-Reply-To: <20211201004858.19831-10-nstange@suse.de>
+References: <20211201004858.19831-1-nstange@suse.de> <20211201004858.19831-10-nstange@suse.de>
 MIME-Version: 1.0
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Sun, 5 Dec 2021 08:59:31 +0800
-Message-ID: <CACXcFmnEpzp-66JvENsAFTTyehM0bZoGFT6wOBPzkkbGgi7P5A@mail.gmail.com>
-Subject: [RFC] random, initialize pool at compile time
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Ted Ts'o" <tytso@mit.edu>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        John Denker <jsd@av8n.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Simo Sorce <simo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I will submit this as a patch as soon as I work out how to handle it
-in the kernel makefiles. That is not likely to be very soon since
-those files are a bit complex, I'm new to them, & I have other things
-on my plate just now.
+Am Mittwoch, 1. Dezember 2021, 01:48:49 CET schrieb Nicolai Stange:
 
-In the meanwhile, it seems worth asking for comments and/or for advice
-on the makefiles.
+Hi Nicolai,
 
-/*
- * Program to select random numbers for initialising things
- * in the random(4) driver.
- *
- * Sandy Harris sandyinchina@gmail.com
- *
- * In general, this falls well short of the ideal solution,
- * which would give every installation (rather than every
- * compiled kernel) a different seed.
- * For that, see John Denker's suggestions at:
- * http://www.av8n.com/computer/htm/secure-random.htm#sec-boot-image
- *
- * However, if every installation compiles a new kernel
- * then this becomes equivalent to Denker's suggestion,
- * or perhaps even better because it uses more random
- * material.
- *
- * Inserting random data at compile time can do no harm and
- * will make some attacks considerably harder. It is not an
- * ideal solution, and not absolutetely necessary, but cheap
- * and probably the best we can do during the build (rather
- * than install) process.
- *
- * This is not strictly necessary if any of these apply:
- *
- *      you have a trustworthy hardware RNG
- *      your CPU has a trustworthy random number instruction
- *      you have secure stored random data
- *
- * In those cases, the device can easily be initialised well;
- * the only difficulty is to ensure that is done early enough.
- * On the other hand, this is easy to do, and even if one or
- * more other methods are used as well this adds a layer for
- * defense in depth.
- *
- * The program takes one optional single-digit command-line option,
- * how many 512-bit contexts to initialise in addition to the
- * input pool
- *      -0, just the pool
- *      -1, initialise a context for Chacha as well
- *          (useful with current driver)
- *      -2, Chacha context plus a 512-bit hash context
- *          (possibe in future driver)
- * If no option is given, it defaults to just the pool.
- *
- * The program:
- *
- *      gets its data from /dev/urandom
- *      produces different output every time it runs
- *      limits the range of Hamming weights
- *      each byte has at least one bit 1, at least one 0
- *
- *      output is formatted as an array declaration
- *      suitable for inclusion by random.c
- *      declared as 64-bit unsigned to align it
- *      writes to stdout, expecting makefile to redirect
- *
- * makefile should also delete the output file after it is
- * used in compilation of random.c, ideally using a secure
- * deletion tool such as shred(1) srm(1) or wipe(1).
- * This forces the file to be rebuilt and a new version
- * used in every compile. It also prevents an enemy just
- * reading an output file in the build directory and
- * getting the data that is used in the current kernel.
- *
- * This is not full protection since they might look in
- * the kernel image or even in the running kernel. But
- * if an enemy has enough privileges to look in those
- * places, then the random driver is nowhere near the
- * most serious security worry.
- *
- * This is certainly done early enough and the data is random
- * enough, but it is not necessarily secret enough.
- *
- * For any machine that compiles its own kernel, this alone might
- * be enough to ensure secure initialisation since only an enemy
- * who already has root could discover this data. Of course even
- * there it should not be used alone, only as one layer of a
- * defense in depth.
- *
- * If a kernel is compiled once then installed on many machines
- * (for example used for an embedded device or in a Linux distro)
- * this is likely of very little value. It complicates an attack
- * somewhat, and might even be too much for some attackers, but
- * it clearly will not stop a serious attacker who has access
- * to another copy of the distro or the device. It may not even
- * slow them down much.
- *
- * In many cases there is a choice. An administrator who
- * distributes software to every machine in an organisation
- * could either compile once and give them all the same kernel
- * or produce a different kernel for each machine; the latter
- * course is not remarkably difficult or expensive.
- *
- * A Linux distro might suggest that users compile a new
- * kernel, or even require it as part of the install
- * process. This might be useful quite apart from the
- * random device, building a kernel optimised for the
- * customer's hardware.
- */
+> The support for NVME in-band authentication currently in the works ([1])
+> needs to generate ephemeral DH keys.
+> 
+> Implement crypto_dh_gen_privkey() which is intended to be used from
+> the DH implementations just in analogy to how ecc_gen_privkey() is used
+> for ECDH.
+> 
+> Make the new crypto_dh_gen_privkey() to follow the approach specified
+> in SP800-56Arev3, sec. 5.6.1.1.3 ("Key-Pair Generation Using Extra Random
+> Bits").
+> 
+> SP800-56Arev3 specifies a lower as well as an upper bound on the generated
+> key's length:
+> - it must be >= two times the maximum supported security strength of
+>   the group in question and
+> - it must be <= the length of the domain parameter Q.
+> Both of these are available only for the safe-prime groups from
+> RFC 3526 or RFC 7919, which had been introduced to the kernel with previous
+> patches: for any safe-prime group Q = (P - 1)/2 by definition and the
+> individual maximum supported security strength as specified by
+> SP800-56Arev3 has already been made available alongside the resp. domain
+> parameters with said previous patches. Restrict crypto_dh_gen_privkey() to
+> these safe-prime groups, i.e. to those groups with any group_id but
+> dh_group_id_unknown. Make it pick twice the maximum supported strength
+> rounded up to the next power of two for the output key size. This choice
+> respects both, the lower and upper bounds given by SP800-90Arev3 for
+> all safe-prime groups known to the kernel by now and is also in line with
+> the NVME base spec 2.0, which requires the key size to be >= 256bits.
+> 
+> [1] https://lkml.kernel.org/r/20211122074727.25988-4-hare@suse.de
+> 
+> Signed-off-by: Nicolai Stange <nstange@suse.de>
+> ---
+>  crypto/Kconfig      |   1 +
+>  crypto/dh_helper.c  | 128 ++++++++++++++++++++++++++++++++++++++++++++
+>  include/crypto/dh.h |  22 ++++++++
+>  3 files changed, 151 insertions(+)
+> 
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index fcb044bdc90a..578711b02bb3 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -228,6 +228,7 @@ menuconfig CRYPTO_DH
+>  	tristate "Diffie-Hellman algorithm"
+>  	select CRYPTO_KPP
+>  	select MPILIB
+> +	select CRYPTO_RNG_DEFAULT
+>  	help
+>  	  Generic implementation of the Diffie-Hellman algorithm.
+> 
+> diff --git a/crypto/dh_helper.c b/crypto/dh_helper.c
+> index fb8df4734dc1..5a8c9c50297f 100644
+> --- a/crypto/dh_helper.c
+> +++ b/crypto/dh_helper.c
+> @@ -9,6 +9,7 @@
+>  #include <linux/string.h>
+>  #include <crypto/dh.h>
+>  #include <crypto/kpp.h>
+> +#include <crypto/rng.h>
+> 
+>  #define DH_KPP_SECRET_MIN_SIZE (sizeof(struct kpp_secret) + \
+>  				sizeof(enum dh_group_id) + 3 * sizeof(int))
+> @@ -592,3 +593,130 @@ int crypto_dh_decode_key(const char *buf, unsigned int
+> len, struct dh *params) return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(crypto_dh_decode_key);
+> +
+> +static u64 __add_u64_to_be(__be64 *dst, unsigned int n, u64 val)
+> +{
+> +	unsigned int i;
+> +
+> +	for (i = n; val && i > 0; --i) {
+> +		u64 tmp = be64_to_cpu(dst[i - 1]);
+> +
+> +		tmp += val;
+> +		val = tmp >= val ? 0 : 1;
+> +		dst[i - 1] = cpu_to_be64(tmp);
+> +	}
+> +
+> +	return val;
+> +}
+> +
+> +int crypto_dh_gen_privkey(enum dh_group_id group_id,
+> +			  char key[CRYPTO_DH_MAX_PRIVKEY_SIZE],
+> +			  unsigned int *key_size)
+> +{
+> +	const struct safe_prime_group *g;
+> +	unsigned int n, tmp_size;
+> +	__be64 *tmp;
+> +	int err;
+> +	u64 h, o;
+> +
+> +	/*
+> +	 * Generate a private key following NIST SP800-56Ar3,
+> +	 * sec. 5.6.1.1.1 and 5.6.1.1.3 resp.. This is supported only
+> +	 * for the (approved) safe-prime groups.
+> +	 */
+> +	g = get_safe_prime_group(group_id);
+> +	if (!g)
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdint.h>
-#include <ctype.h>
-#include <string.h>
-#include <linux/random.h>
+What about
 
-typedef uint32_t u32 ;
-typedef uint64_t u64 ;
+if (g == dh_group_id_unknown)
 
-/*
- * Configuration information
- */
-#define INPUT_POOL_BITS     4096
-#define INPUT_POOL_WORDS    (INPUT_POOL_BITS >> 5)
-/*
-    for Salsa, SHA3 or another hash
-*/
-#define CONTEXT_BITS        512
-#define CONTEXT_WORDS       (CONTEXT_BITS >> 5)
-/*
-    large enough for any expected usage
-    may not all be used
-*/
-#define MAX_WORDS           (INPUT_POOL_WORDS + (2*CONTEXT_WORDS))
-#define MAX_64              (MAX_WORDS >> 1)
+?
 
-u64 data64[MAX_64] ;
-u32 *data32 ;
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * 5.6.1.1.1: choose key length N such that
+> +	 * 2 * ->max_strength <= N <= log2(q) + 1 = ->p_size * 8 - 1
+> +	 * with q = (p - 1) / 2 for the safe-prime groups.
+> +	 * Choose the lower bound's next power of two for N in order to
+> +	 * avoid excessively large private keys while still
+> +	 * maintaining some extra reserve beyond the bare minimum in
+> +	 * most cases. Note that for each entry in safe_prime_groups[],
+> +	 * the following holds for such N:
+> +	 * - N >= 256, in particular it is a multiple of 2^6 = 64
+> +	 *   bits and
+> +	 * - N < log2(q) + 1, i.e. N respects the upper bound.
+> +	 */
+> +	n = roundup_pow_of_two(2 * g->max_strength);
+> +	WARN_ON_ONCE(n & ((1u << 6) - 1));
+> +	n >>= 6; /* Convert N into units of u64. */
 
-int accept(u32) ;
-int hamming(u32);
-void usage(void) ;
+Couldn't we pre-compute that value for each of the safeprime groups? This 
+value should be static for each of them.
+> +
+> +	/*
+> +	 * Reserve one extra u64 to hold the extra random bits
+> +	 * required as per 5.6.1.1.3.
+> +	 */
+> +	tmp_size = (n + 1) * sizeof(__be64);
 
-int urandom ;
+Maybe add this to the pre-computed value?
 
-int main(int argc, char **argv)
-{
-        u32 i, x, *p, temp, last, n_contexts, total_words,
-total_bytes, total_64 ;
-        u64 *p64 ;
-        char *ptr ;
+> +	tmp = kmalloc(tmp_size, GFP_KERNEL);
+> +	if (!tmp)
+> +		return -ENOMEM;
+> +
+> +	/*
+> +	 * 5.6.1.1.3, step 3 (and implicitly step 4): obtain N + 64
+> +	 * random bits and interpret them as a big endian integer.
+> +	 */
+> +	err = -EFAULT;
+> +	if (crypto_get_default_rng())
+> +		goto out;
+> +
+> +	err = crypto_rng_get_bytes(crypto_default_rng, (u8 *)tmp, tmp_size);
+> +	crypto_put_default_rng();
+> +	if (err)
+> +		goto out;
+> +
+> +	/*
+> +	 * 5.6.1.1.3, step 5 is implicit: 2^N < q and thus,
+> +	 * M = min(2^N, q) = 2^N.
+> +	 *
+> +	 * For step 6, calculate
+> +	 * key = (tmp[] mod (M - 1)) + 1 = (tmp[] mod (2^N - 1)) + 1.
+> +	 *
+> +	 * In order to avoid expensive divisions, note that
+> +	 * 2^N mod (2^N - 1) = 1 and thus, for any integer h,
+> +	 * 2^N * h mod (2^N - 1) = h mod (2^N - 1) always holds.
+> +	 * The big endian integer tmp[] composed of n + 1 64bit words
+> +	 * may be written as tmp[] = h * 2^N + l, with h = tmp[0]
+> +	 * representing the 64 most significant bits and l
+> +	 * corresponding to the remaining 2^N bits. With the remark
+> +	 * from above,
+> +	 * h * 2^N + l mod (2^N - 1) = l + h mod (2^N - 1).
+> +	 * As both, l and h are less than 2^N, their sum after
+> +	 * this first reduction is guaranteed to be <= 2^(N + 1) - 2.
+> +	 * Or equivalently, that their sum can again be written as
+> +	 * h' * 2^N + l' with h' now either zero or one and if one,
+> +	 * then l' <= 2^N - 2. Thus, all bits at positions >= N will
+> +	 * be zero after a second reduction:
+> +	 * h' * 2^N + l' mod (2^N - 1) = l' + h' mod (2^N - 1).
+> +	 * At this point, it is still possible that
+> +	 * l' + h' = 2^N - 1, i.e. that l' + h' mod (2^N - 1)
+> +	 * is zero. This condition will be detected below by means of
+> +	 * the final increment overflowing in this case.
+> +	 */
+> +	h = be64_to_cpu(tmp[0]);
+> +	h = __add_u64_to_be(tmp + 1, n, h);
+> +	h = __add_u64_to_be(tmp + 1, n, h);
+> +	WARN_ON_ONCE(h);
+> +
+> +	/* Increment to obtain the final result. */
+> +	o = __add_u64_to_be(tmp + 1, n, 1);
+> +	/*
+> +	 * The overflow bit o from the increment is either zero or
+> +	 * one. If zero, tmp[1:n] holds the final result in big-endian
+> +	 * order. If one, tmp[1:n] is zero now, but needs to be set to
+> +	 * one, c.f. above.
+> +	 */
+> +	if (o)
+> +		tmp[n] = cpu_to_be64(1);
+> +
+> +	/* n is in units of u64, convert to bytes. */
+> +	*key_size = n << 3;
+> +	memcpy(key, &tmp[1], *key_size);
+> +
+> +out:
+> +	kfree_sensitive(tmp);
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(crypto_dh_gen_privkey);
+> diff --git a/include/crypto/dh.h b/include/crypto/dh.h
+> index 7eb1fad93d02..182100395bbb 100644
+> --- a/include/crypto/dh.h
+> +++ b/include/crypto/dh.h
+> @@ -99,4 +99,26 @@ int crypto_dh_encode_key(char *buf, unsigned int len,
+> const struct dh *params); */
+>  int crypto_dh_decode_key(const char *buf, unsigned int len, struct dh
+> *params);
+> 
+> +/*
+> + * The maximum key length is two times the max. sec. strength of the
+> + * safe-prime groups, rounded up to the next power of two.
+> + */
+> +#define CRYPTO_DH_MAX_PRIVKEY_SIZE (512 / 8)
+> +
+> +/**
+> + * crypto_dh_gen_privkey() - generate a DH private key
+> + * @buf:	The DH group to generate a key for
+> + * @key:	Buffer provided by the caller to receive the generated
+> + *		key
+> + * @key_size:	Pointer to an unsigned integer the generated key's length
+> + *		will be stored in
+> + *
+> + * This function is intended to generate an ephemeral DH key.
+> + *
+> + * Return:	Negative error code on failure, 0 on success
+> + */
+> +int crypto_dh_gen_privkey(enum dh_group_id group_id,
+> +			  char key[CRYPTO_DH_MAX_PRIVKEY_SIZE],
+> +			  unsigned int *key_size);
+> +
+>  #endif
 
-    if ((urandom = open("/dev/urandom", O_RDONLY)) == -1)  {
-        fprintf(stderr, "gen_random_init: no /dev/urandom, cannot continue\n") ;
-        exit(1) ;
-    }
-    switch(argc)   {
-        case 1:
-                /* just input pool */
-                n_contexts = 0 ;
-                break ;
-        case 2:
-                /*
-                 * also some 512-bit contexts
-                 * one for chacha
-                 * maybe another for 512-bit hash
-                 */
-                ptr = argv[1] ;
-                if (*ptr != '-')
-                        usage() ;
-                else    {
-                        ptr++ ;
-                        n_contexts = atoi( ptr ) ;
-                }
-                break ;
-        default:
-                usage() ;
-        break ;
-        }
-        if ((n_contexts > 2) || (n_contexts < 0))   {
-                fprintf( stderr, "This version of gen_random_init
-supports only 0, 1 or 2 contexts\n" ) ;
-                usage() ;
-        }
-        total_words = INPUT_POOL_WORDS + (n_contexts*CONTEXT_WORDS) ;
-        total_bytes = total_words << 2 ;
-        total_64 = total_words >> 1 ;
-        data32 = (u32 *) data64 ;
-    /*
-     * Initialise the pools with random data
-     */
-    x = read( urandom, (char *) data64, total_bytes ) ;
-    if (x != total_bytes)    {
-        fprintf(stderr,"gen_random_init: big read() failed, cannot
-continue\n") ;
-                exit(1) ;
-        }
-    /*
-     * Replace any array entries that fail criteria
-     *
-     * In theory, the while loop here could run for some
-     * ridiculously long time, or even go infinite
-     * In practice, this is astronomically unlikely
-     * given any sensible definition of accept() and
-     * input that is anywhere near random
-    */
-        for (i = 0, p = data32 ; i < total_words ; i++, p++)    {
-                while (!accept(*p))      {
-            x = read( urandom, (char *) &temp, 4) ;
-                        if (x != 4)    {
-                                fprintf(stderr,"gen_random_init: small
-read() failed, cannot continue\n") ;
-                                exit(1) ;
-                        }
-                        *p ^= temp ;
-                }
-        }
-        /*
-         * write a file suitable for inclusion
-         * declare array as u64 so it is 64-bit aligned
-         */
-        last = total_64 - 1 ;
-        printf("// File generated by gen_random_init.c\n") ;
-        printf("// 4096-bit input pool plus %d 512-bit contexts\n\n",
-n_contexts ) ;
-        printf("#define TOTAL_WORDS %d // size in 32-bit words\n\n",
-total_words ) ;
-        printf( "static u64 generated_pools[] = {\n" ) ;
-        for (i = 0, p64 = data64 ; i < total_64 ; i++, p64++)    {
-                printf("0x%016lx", *p64) ;
-                if (i == last)
-                        printf("\n} ;\n") ;
-                else    {
-                        putchar(',') ;
-                        switch( i % 4 ) {
-                        case 3:
-                                putchar('\n') ;
-                                break ;
-                        default:
-                                putchar(' ') ;
-                        break ;
-                        }
-                }
-        }
-}
 
-void usage()
-{
-    fprintf(stderr, "usage: gen_random_init [-0|-1|-2]\n") ;
-    exit(1) ;
-}
+Ciao
+Stephan
 
-/*
- * These tests are not strictly necessary
- *
- * We could just use the /dev/urandom output & take what comes
- * Arguably, that would be the best course;
- * "If it ain't broke, don't fix it."
- *
- * Applying any bias here makes output somewhat less random.
- *
- * However, a Hamming weight near 16 gives a better chance
- * of changing the output significantly when the number is
- * used in an addition or xor operation. This is a highly
- * desirable effect.
- *
- * Compromise: apply some bias, but not a very strong one
- */
-#define MIN  6
-#define MAX (32-MIN)
 
-int accept( u32 u )
-{
-        int h, i ;
-        char *p ;
-
-        /* reject low or high Hamming weights */
-        h = hamming(u) ;
-        if (( h < MIN ) || ( h > MAX ))
-                return(0) ;
-
-        /* at least one 1 and at least one 0 in each byte */
-        for (i = 0, p = (char *) &u ; i < 4 ; i++, p++)        {
-                switch (*p)      {
-                        case '\0':
-                        case '\255':
-                                return(0) ;
-                        default:
-                                break ;
-                }
-        }
-        return(1) ;
-}
-
-/*
- * Hamming weight is the number of bits that are 1
- * Kernighan's method
- * http://graphics.stanford.edu/~seander/bithacks.html
- */
-int hamming( u32 x )
-{
-        int h ;
-        for (h = 0 ; x ; h++)
-                x &= (x-1) ; /* clear the least significant bit set */
-        return(h) ;
-}
