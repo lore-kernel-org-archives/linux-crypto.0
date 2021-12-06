@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F914C43217
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Dec 2021 18:26:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72DA5C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Dec 2021 18:26:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347134AbhLFS37 (ORCPT
+        id S1347424AbhLFSaU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Dec 2021 13:29:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47354 "EHLO
+        Mon, 6 Dec 2021 13:30:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347059AbhLFS3x (ORCPT
+        with ESMTP id S1347362AbhLFSaO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Dec 2021 13:29:53 -0500
+        Mon, 6 Dec 2021 13:30:14 -0500
 Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6CEEC061746;
-        Mon,  6 Dec 2021 10:26:24 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id nh10-20020a17090b364a00b001a69adad5ebso562144pjb.2;
-        Mon, 06 Dec 2021 10:26:24 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F65BC061746;
+        Mon,  6 Dec 2021 10:26:45 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id gt5so8393203pjb.1;
+        Mon, 06 Dec 2021 10:26:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=22u1YgEGuUE2NUBm4aUIXRHhe1NgL4IlQ7p6nHAEJMg=;
-        b=Zh+U2u/a5Qx3uOWo98Uixyx5LiZdxs452Y1/RvET1RUL7tNPzzTZ3Y4OOkm0b8ie/K
-         foW1LcD7tb6JZbs+kIWgP5LZnk//3T3gZHNNSAFbG01vJNhjAtXS9yhJsN00v3EZNV1U
-         CKc7fS3F+j/Wj+8WVY3UpM2dBT1bZeDIAnhTK/6ZkTJ5xIGWgtc36aqlr6yOYZI2HanH
-         c1lArW+KbzPpLWPNFFsLpcuOZoaVtolS+NcpjHhUC+zKEqAH7mTsvaB3o6o0VajXlS9C
-         +i2oopFItEGl7iwTxUtXO6D7zh8+o3jUEsf7mHA2/k1iODI1rtMVcWnMzBqncSV8Vnwq
-         NsAQ==
+        bh=I18/cMLsQhJOofktwki/zSWiGzzVEzrVRJ9sFw5GkOk=;
+        b=nYcOF5vXym3mhpVAYnFbV12nN0McdPMuRRQKLbVmJth1q+Mp+tVHfYO/CScszMCnIS
+         wnTneCF7yjgss9ikFrghR+rzsQNL3gZKerBKx+b7MPG9BpZfR+8WQsydrUwLOSK4UUC9
+         iM4QxWFvpuITmeJzOZxGM/cbOXfy/qbRqakUyHAiDWbiDBLLpInDa576iGdjQQZcNlmq
+         glV7GztKKqlmeqNWi4FGul6HeG5Zh3WYQnJVbTeTdEOzVnjaRyGgEDROHFv3OHbpQ0i2
+         F3cuB4mRKaLN+Nv4Lz6CgCnQhHfuEMaF8Yx/fl6U4bbJlf816/RaO4NkCMpv3BwpFFtN
+         Q2Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=22u1YgEGuUE2NUBm4aUIXRHhe1NgL4IlQ7p6nHAEJMg=;
-        b=mzA3lOJnhnuUy6ARx9SCNJ60/TlsFyYUHtSrFl6YVWP5L0HYtr4fwpQHGB85IX47PS
-         ggGtyyaZfzjZuJEO8SyriHdFmEOa0h4jl829NG3QGpiY57I/cvcRMu6NWDoOU5saGMXT
-         j5e5gw0x5yfqjhBWcTyh7d8MxsqIkg9/gQ88MqbsOQRFV28Rft8uf5xvIlFCeq8WsGz+
-         zPfbCNNoG7Xxs7bIqNJYrOobqGML9asR6ZqEgAAw5rz0XsQ6+7GDxhnRnTOkrCBS3YDc
-         4v5oMN4MYCPqXFCO8CCftokI+jsRhN9uUPZ2dJJzsZ9UDW7G5zZZJDAr9vijMNhdmBnL
-         un2w==
-X-Gm-Message-State: AOAM530AYPG4CR8TdjHUOmO+44N4egGk2R87KF3y1I82A5R3bhJZ2/77
-        mitayZGEc6plHWudhmSu0zkHyqx8OPA=
-X-Google-Smtp-Source: ABdhPJwSVbvjR1dpvgyfdF4mNAKyCGmG960Qi+UT5jB5j7oT2D5zmuuwNPilnYXVThDeFf9l4VDShQ==
-X-Received: by 2002:a17:90a:9a8e:: with SMTP id e14mr196284pjp.231.1638815183952;
-        Mon, 06 Dec 2021 10:26:23 -0800 (PST)
+        bh=I18/cMLsQhJOofktwki/zSWiGzzVEzrVRJ9sFw5GkOk=;
+        b=78xHj7ZsR4adaAYD0bQiZDepISDs5Ewe/npibi9HoN70p9MVb5xn1EmK7GNY56dgu7
+         b8mauCVjALsV8RXdAUzpth8gueOo4kKdEzAqtN158VMCEtMqGoSJOE83wvnAvTA/9qsX
+         KJYfQlEI+uBDXlgTEv/7gNljvWaaSJtSx29xG0Lt+0blii5vKxW6lgpHe0f6fFmiKdEN
+         N4N4lmWseexIY4Ynhv55jevXRSVeFlQ1M5EsDUh0GXm5MiKY/FvW1/LwCEMefwX0+vKk
+         TYtW6msggdIhgU7biNgpz0+v6dXtsNf9mHvgbInJHo0LG1OCzb9/c0LkJNv1DQOfgQy6
+         K8aQ==
+X-Gm-Message-State: AOAM532fkSTL3qQiN+by3N6W6EhK0pOOhTyhhZ9Rey4IbksRpInn44e3
+        Qzfu8A+SY9AnFZEEcXE7W3YFre8PkSQ=
+X-Google-Smtp-Source: ABdhPJzBy0O21Nc2EF1bYgkBVgbj1vC2wiovbxWRmuqR9Q3XkDy4IsPPsVR2UzVgwg/eFntTN4tNoQ==
+X-Received: by 2002:a17:90a:9a8e:: with SMTP id e14mr198493pjp.231.1638815204680;
+        Mon, 06 Dec 2021 10:26:44 -0800 (PST)
 Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id a22sm12773097pfh.111.2021.12.06.10.26.22
+        by smtp.gmail.com with ESMTPSA id a22sm12773097pfh.111.2021.12.06.10.26.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Dec 2021 10:26:23 -0800 (PST)
+        Mon, 06 Dec 2021 10:26:44 -0800 (PST)
 From:   Florian Fainelli <f.fainelli@gmail.com>
 To:     devicetree@vger.kernel.org
 Cc:     Florian Fainelli <f.fainelli@gmail.com>,
@@ -91,9 +91,9 @@ Cc:     Florian Fainelli <f.fainelli@gmail.com>,
         linux-rtc@vger.kernel.org (open list:REAL TIME CLOCK (RTC) SUBSYSTEM),
         linux-pm@vger.kernel.org (open list:THERMAL),
         linux-usb@vger.kernel.org (open list:USB SUBSYSTEM)
-Subject: [PATCH v2 02/14] dt-bindings: reset: Convert Broadcom STB reset to YAML
-Date:   Mon,  6 Dec 2021 10:26:04 -0800
-Message-Id: <20211206182616.2089677-3-f.fainelli@gmail.com>
+Subject: [PATCH v2 12/14] dt-bindings: ata: Convert Broadcom SATA to YAML
+Date:   Mon,  6 Dec 2021 10:26:14 -0800
+Message-Id: <20211206182616.2089677-13-f.fainelli@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211206182616.2089677-1-f.fainelli@gmail.com>
 References: <20211206182616.2089677-1-f.fainelli@gmail.com>
@@ -103,102 +103,165 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert the Broadcom STB SW_INIT style reset controller binding to YAML.
+Convert the Broadcom SATA3 AHCI controller Device Tree binding to YAML
+to help with validation.
 
+Acked-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- .../bindings/reset/brcm,brcmstb-reset.txt     | 27 -----------
- .../bindings/reset/brcm,brcmstb-reset.yaml    | 48 +++++++++++++++++++
- 2 files changed, 48 insertions(+), 27 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/reset/brcm,brcmstb-reset.txt
- create mode 100644 Documentation/devicetree/bindings/reset/brcm,brcmstb-reset.yaml
+ .../bindings/ata/brcm,sata-brcm.txt           | 45 ---------
+ .../bindings/ata/brcm,sata-brcm.yaml          | 91 +++++++++++++++++++
+ 2 files changed, 91 insertions(+), 45 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/ata/brcm,sata-brcm.txt
+ create mode 100644 Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml
 
-diff --git a/Documentation/devicetree/bindings/reset/brcm,brcmstb-reset.txt b/Documentation/devicetree/bindings/reset/brcm,brcmstb-reset.txt
+diff --git a/Documentation/devicetree/bindings/ata/brcm,sata-brcm.txt b/Documentation/devicetree/bindings/ata/brcm,sata-brcm.txt
 deleted file mode 100644
-index ee59409640f2..000000000000
---- a/Documentation/devicetree/bindings/reset/brcm,brcmstb-reset.txt
+index b9ae4ce4a0a0..000000000000
+--- a/Documentation/devicetree/bindings/ata/brcm,sata-brcm.txt
 +++ /dev/null
-@@ -1,27 +0,0 @@
--Broadcom STB SW_INIT-style reset controller
--===========================================
+@@ -1,45 +0,0 @@
+-* Broadcom SATA3 AHCI Controller
 -
--Broadcom STB SoCs have a SW_INIT-style reset controller with separate
--SET/CLEAR/STATUS registers and possibly multiple banks, each of 32 bit
--reset lines.
--
--Please also refer to reset.txt in this directory for common reset
--controller binding usage.
+-SATA nodes are defined to describe on-chip Serial ATA controllers.
+-Each SATA controller should have its own node.
 -
 -Required properties:
--- compatible: should be brcm,brcmstb-reset
--- reg: register base and length
--- #reset-cells: must be set to 1
+-- compatible         : should be one or more of
+-			"brcm,bcm7216-ahci"
+-			"brcm,bcm7425-ahci"
+-			"brcm,bcm7445-ahci"
+-			"brcm,bcm-nsp-ahci"
+-			"brcm,sata3-ahci"
+-			"brcm,bcm63138-ahci"
+-- reg                : register mappings for AHCI and SATA_TOP_CTRL
+-- reg-names          : "ahci" and "top-ctrl"
+-- interrupts         : interrupt mapping for SATA IRQ
+-
+-Optional properties:
+-
+-- reset: for "brcm,bcm7216-ahci" must be a valid reset phandle
+-  pointing to the RESCAL reset controller provider node.
+-- reset-names: for "brcm,bcm7216-ahci", must be "rescal".
+-
+-Also see ahci-platform.txt.
 -
 -Example:
 -
--	reset: reset-controller@8404318 {
--		compatible = "brcm,brcmstb-reset";
--		reg = <0x8404318 0x30>;
--		#reset-cells = <1>;
--	};
+-	sata@f045a000 {
+-		compatible = "brcm,bcm7445-ahci", "brcm,sata3-ahci";
+-		reg = <0xf045a000 0xa9c>, <0xf0458040 0x24>;
+-		reg-names = "ahci", "top-ctrl";
+-		interrupts = <0 30 0>;
+-		#address-cells = <1>;
+-		#size-cells = <0>;
 -
--	&ethernet_switch {
--		resets = <&reset 26>;
--		reset-names = "switch";
+-		sata0: sata-port@0 {
+-			reg = <0>;
+-			phys = <&sata_phy 0>;
+-		};
+-
+-		sata1: sata-port@1 {
+-			reg = <1>;
+-			phys = <&sata_phy 1>;
+-		};
 -	};
-diff --git a/Documentation/devicetree/bindings/reset/brcm,brcmstb-reset.yaml b/Documentation/devicetree/bindings/reset/brcm,brcmstb-reset.yaml
+diff --git a/Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml b/Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml
 new file mode 100644
-index 000000000000..e00efa88a198
+index 000000000000..4098d56872ae
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/reset/brcm,brcmstb-reset.yaml
-@@ -0,0 +1,48 @@
-+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++++ b/Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml
+@@ -0,0 +1,91 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 +%YAML 1.2
 +---
-+$id: "http://devicetree.org/schemas/reset/brcm,brcmstb-reset.yaml#"
-+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
++$id: http://devicetree.org/schemas/ata/brcm,sata-brcm.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+title: Broadcom STB SW_INIT-style reset controller
++title: Broadcom SATA3 AHCI Controller
 +
 +description:
-+  Broadcom STB SoCs have a SW_INIT-style reset controller with separate
-+  SET/CLEAR/STATUS registers and possibly multiple banks, each of 32 bit
-+  reset lines.
-+
-+  Please also refer to reset.txt in this directory for common reset
-+  controller binding usage.
++  SATA nodes are defined to describe on-chip Serial ATA controllers.
++  Each SATA controller should have its own node.
 +
 +maintainers:
 +  - Florian Fainelli <f.fainelli@gmail.com>
 +
++allOf:
++  - $ref: sata-common.yaml#
++
 +properties:
 +  compatible:
-+    const: brcm,brcmstb-reset
++    oneOf:
++      - items:
++          - enum:
++              - brcm,bcm7216-ahci
++          - const: brcm,sata3-ahci
++      - items:
++          - enum:
++              - brcm,bcm7445-ahci
++          - const: brcm,sata3-ahci
++      - items:
++          - enum:
++              - brcm,bcm7425-ahci
++          - const: brcm,sata3-ahci
++      - items:
++          - const: brcm,bcm-nsp-ahci
++      - items:
++          - const: brcm,bcm63138-ahci
 +
 +  reg:
-+    maxItems: 1
++    minItems: 2
++    maxItems: 2
 +
-+  "#reset-cells":
-+    const: 1
++  reg-names:
++    items:
++      - const: ahci
++      - const: top-ctrl
++
++  interrupts: true
++
++if:
++  properties:
++    compatible:
++      contains:
++        enum:
++          - brcm,bcm7216-ahci
++then:
++  properties:
++    resets: true
++    reset-names:
++      items:
++        - const: rescal
 +
 +required:
 +  - compatible
 +  - reg
-+  - "#reset-cells"
++  - interrupts
++  - "#address-cells"
++  - "#size-cells"
 +
-+additionalProperties: false
++unevaluatedProperties: false
 +
 +examples:
 +  - |
-+    reset: reset-controller@8404318 {
-+      compatible = "brcm,brcmstb-reset";
-+      reg = <0x8404318 0x30>;
-+      #reset-cells = <1>;
-+    };
++    sata@f045a000 {
++        compatible = "brcm,bcm7445-ahci", "brcm,sata3-ahci";
++        reg = <0xf045a000 0xa9c>, <0xf0458040 0x24>;
++        reg-names = "ahci", "top-ctrl";
++        interrupts = <0 30 0>;
++        #address-cells = <1>;
++        #size-cells = <0>;
 +
-+    ethernet_switch {
-+      resets = <&reset 26>;
-+      reset-names = "switch";
++        sata0: sata-port@0 {
++            reg = <0>;
++            phys = <&sata_phy 0>;
++        };
++
++        sata1: sata-port@1 {
++            reg = <1>;
++            phys = <&sata_phy 1>;
++        };
 +    };
 -- 
 2.25.1
