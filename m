@@ -2,52 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EFEFC43217
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Dec 2021 18:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC0BC4321E
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Dec 2021 18:27:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244753AbhLFSbJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Dec 2021 13:31:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47432 "EHLO
+        id S1347704AbhLFSbK (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Dec 2021 13:31:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347292AbhLFSaG (ORCPT
+        with ESMTP id S1347338AbhLFSaM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Dec 2021 13:30:06 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 562F7C0698C5;
-        Mon,  6 Dec 2021 10:26:37 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id np6-20020a17090b4c4600b001a90b011e06so551585pjb.5;
-        Mon, 06 Dec 2021 10:26:37 -0800 (PST)
+        Mon, 6 Dec 2021 13:30:12 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 951F6C061746;
+        Mon,  6 Dec 2021 10:26:43 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id n26so10969805pff.3;
+        Mon, 06 Dec 2021 10:26:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=eHsb1rXkFFF/5VyRHKhImaCsYA2F/4ddGcGA/wMvypA=;
-        b=mXflqqCSqu7jgfThgaZhO/L5W9cJx9zfLPKfDRfXLNR8VGeCrrdomqPg574ueb8b/H
-         JQQAN7LR4BhCLUGuDIGbAiIDxtMPgjP36PDM75blvH6LXPswzDnmIV71NimFKnLulh3k
-         X1zaq/EjEsrcUNGPpd6ZRDgfYhT9cUwyOM99MWFtlf+vOV1Ohbgww8ZafFPjHiaJqsXt
-         EtYWG717PgOAaBz+6Q7SJB4hsvix/gfd0WuwmAWcqKe25okx13Zd+ecKxMDumsLK9IXp
-         8y+N20o7W9M9mwnwYYQ8zNTYKGc7Bq+W2EZFOY/9b81z1JhMRpiH6iejaDlua4byvtnW
-         kalg==
+        bh=lWLp0FHWwgS2RqUsytUTgTzk16sQKrqviKuiWZaiYOo=;
+        b=NqHYH+cuQCJ0IRpQhjth4Khm7QCtrOs/zMXpXMrIZvswc8Ml42q1UykGun+46SbFB6
+         uxNCME+zQn4Sea5gH2f1aXR8hJnk+gpfVMxgTb/OHOkFJtDzJFgv/t6kCp7ECCpPLjNQ
+         9lTg7gSR3kdBSRmw4O5jIxvGH5Fz8bcJ2pDvEM1EV52T9KTSfQuXyQV6SG6u+M5mBEig
+         jHSAsvG6REgCzBhaZLLIvL35xGxCTRr9WzeeoSEe4I0aKQuMrSqz+ye7B56itKDFNfir
+         Lqxy96OTFeCBMnQ+WVCiB5+LOztNvBngQl7NY6CKfAcWU0DRdV2PEQRICMN0by0ItVMI
+         zLWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=eHsb1rXkFFF/5VyRHKhImaCsYA2F/4ddGcGA/wMvypA=;
-        b=UrWK/19jK4y0UjnnE/mjaAU+bx6CPKcTbPcUAQrLvE0PwIj+q+nnrRtRFRhY0eXB8b
-         8Z6smVxYcQQ6VDHcDnNSStrlRvtNwa2kRqB1z/7PIA/iRa1iBehDYHr/zCf468m/43s8
-         s7EPDZ3R9vUnMsHp/agM3do0rpHu8Lq7+MkeIMGBdBu3Awsf+x7wadZ9lfWtzsqSJFJf
-         3n61AStdCasOiYlgcd3Zti7tgSlUZaN7/C9a6ATpThV5UTslPQF7Dal37q0i9GvvG76Q
-         2PWvud/EDTjFp4oGki8H0lUeOR8BaY/olT9s38/zXDAh/2okVAnYy5WvYzu1XS2ovfOd
-         xm1Q==
-X-Gm-Message-State: AOAM531dhYwoupCfmUoQ7Fntd6PJu0v4Zalq31uL0ErhCImrHYcTYKEA
-        7EXY5IlRvZ1CEu0uYAoyeOzLpVBbgJw=
-X-Google-Smtp-Source: ABdhPJyWHg/xjf6fl5DH+njiD1fPZSp9NRNqPNBsQoRBEP2tRQ/Ndaa1r3dCQNHWppK0XoE/Y3zSGQ==
-X-Received: by 2002:a17:90a:fd8c:: with SMTP id cx12mr234601pjb.11.1638815196416;
-        Mon, 06 Dec 2021 10:26:36 -0800 (PST)
+        bh=lWLp0FHWwgS2RqUsytUTgTzk16sQKrqviKuiWZaiYOo=;
+        b=kNfaUzFWJLXa4hc6UmtXX/69QqJTfz8zovx+OTALYeTAKPCBEph6QdNECmIG+wJs+3
+         kOfCWmPzKO6WlEDrSddJg6peXoKHMr2x3xPfo0PHS5qJ+wUnSfoxp2GXGT1t8mrmviNn
+         aNI4boqmJ2wgX9J8SkREHBRzQEx/TzB3rby+cNlNEKqLcJ7zTK0W+JNKVXGH3i6uiPL6
+         5j31Jrp+OQkhqoGAh99sYft2m2HSwS0Yg1ZfFUAhKvsdYkjENkU8NQIwB9Umd8RNB6XA
+         GHwLXaHZ9iB60SHFvnnIyH0utzpBYv5fGtO3wcmVscJb3bElIW/adqjQlZzLZcCblNf9
+         2NXA==
+X-Gm-Message-State: AOAM531LIo3n9baB5pkalp6JNDExeDcNSdIdPgb3D7O1xAviO84a9JdJ
+        NZRpeH6/L1e8XAI+SSfuQL23YAB9T3o=
+X-Google-Smtp-Source: ABdhPJwdlvaJOGGS5gAPxuxh90jlgYxt/7bcNg68Q73FLbYH6te1IIg+6ffJiY77vdVff9L+rJrEYQ==
+X-Received: by 2002:a05:6a00:124d:b0:4ad:574d:4d2f with SMTP id u13-20020a056a00124d00b004ad574d4d2fmr11197071pfi.24.1638815202670;
+        Mon, 06 Dec 2021 10:26:42 -0800 (PST)
 Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id a22sm12773097pfh.111.2021.12.06.10.26.34
+        by smtp.gmail.com with ESMTPSA id a22sm12773097pfh.111.2021.12.06.10.26.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Dec 2021 10:26:35 -0800 (PST)
+        Mon, 06 Dec 2021 10:26:42 -0800 (PST)
 From:   Florian Fainelli <f.fainelli@gmail.com>
 To:     devicetree@vger.kernel.org
 Cc:     Florian Fainelli <f.fainelli@gmail.com>,
@@ -90,9 +91,9 @@ Cc:     Florian Fainelli <f.fainelli@gmail.com>,
         linux-rtc@vger.kernel.org (open list:REAL TIME CLOCK (RTC) SUBSYSTEM),
         linux-pm@vger.kernel.org (open list:THERMAL),
         linux-usb@vger.kernel.org (open list:USB SUBSYSTEM)
-Subject: [PATCH v2 08/14] dt-bindings: interrupt-controller: Merge BCM3380 with BCM7120
-Date:   Mon,  6 Dec 2021 10:26:10 -0800
-Message-Id: <20211206182616.2089677-9-f.fainelli@gmail.com>
+Subject: [PATCH v2 11/14] dt-bindings: thermal: Convert Broadcom TMON to YAML
+Date:   Mon,  6 Dec 2021 10:26:13 -0800
+Message-Id: <20211206182616.2089677-12-f.fainelli@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211206182616.2089677-1-f.fainelli@gmail.com>
 References: <20211206182616.2089677-1-f.fainelli@gmail.com>
@@ -102,122 +103,123 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The two bindings are very similar and should be covered by the same
-document, do that so we can get rid of an additional binding file.
+Convert the Broadcom AVS TMON Device Tree binding to YAML to help with
+validation.
 
 Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- .../brcm,bcm3380-l2-intc.txt                  | 39 -------------------
- .../brcm,bcm7120-l2-intc.yaml                 | 30 +++++++++++++-
- 2 files changed, 28 insertions(+), 41 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/interrupt-controller/brcm,bcm3380-l2-intc.txt
+ .../bindings/thermal/brcm,avs-tmon.txt        | 23 --------
+ .../bindings/thermal/brcm,avs-tmon.yaml       | 57 +++++++++++++++++++
+ MAINTAINERS                                   |  2 +-
+ 3 files changed, 58 insertions(+), 24 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/thermal/brcm,avs-tmon.txt
+ create mode 100644 Documentation/devicetree/bindings/thermal/brcm,avs-tmon.yaml
 
-diff --git a/Documentation/devicetree/bindings/interrupt-controller/brcm,bcm3380-l2-intc.txt b/Documentation/devicetree/bindings/interrupt-controller/brcm,bcm3380-l2-intc.txt
+diff --git a/Documentation/devicetree/bindings/thermal/brcm,avs-tmon.txt b/Documentation/devicetree/bindings/thermal/brcm,avs-tmon.txt
 deleted file mode 100644
-index 37aea40d5430..000000000000
---- a/Documentation/devicetree/bindings/interrupt-controller/brcm,bcm3380-l2-intc.txt
+index 74a9ef09db8b..000000000000
+--- a/Documentation/devicetree/bindings/thermal/brcm,avs-tmon.txt
 +++ /dev/null
-@@ -1,39 +0,0 @@
--Broadcom BCM3380-style Level 1 / Level 2 interrupt controller
+@@ -1,23 +0,0 @@
+-* Broadcom STB thermal management
 -
--This interrupt controller shows up in various forms on many BCM338x/BCM63xx
--chipsets.  It has the following properties:
--
--- outputs a single interrupt signal to its interrupt controller parent
--
--- contains one or more enable/status word pairs, which often appear at
--  different offsets in different blocks
--
--- no atomic set/clear operations
+-Thermal management core, provided by the AVS TMON hardware block.
 -
 -Required properties:
--
--- compatible: should be "brcm,bcm3380-l2-intc"
--- reg: specifies one or more enable/status pairs, in the following format:
--  <enable_reg 0x4 status_reg 0x4>...
--- interrupt-controller: identifies the node as an interrupt controller
--- #interrupt-cells: specifies the number of cells needed to encode an interrupt
--  source, should be 1.
--- interrupts: specifies the interrupt line in the interrupt-parent controller
--  node, valid values depend on the type of parent interrupt controller
--
--Optional properties:
--
--- brcm,irq-can-wake: if present, this means the L2 controller can be used as a
--  wakeup source for system suspend/resume.
+-- compatible: must be one of:
+-	"brcm,avs-tmon-bcm7216"
+-	"brcm,avs-tmon-bcm7445"
+-	"brcm,avs-tmon"
+-- reg: address range for the AVS TMON registers
+-- interrupts: temperature monitor interrupt, for high/low threshold triggers,
+-	      required except for "brcm,avs-tmon-bcm7216"
+-- interrupt-names: should be "tmon"
 -
 -Example:
 -
--irq0_intc: interrupt-controller@10000020 {
--	compatible = "brcm,bcm3380-l2-intc";
--	reg = <0x10000024 0x4 0x1000002c 0x4>,
--	      <0x10000020 0x4 0x10000028 0x4>;
--	interrupt-controller;
--	#interrupt-cells = <1>;
--	interrupt-parent = <&cpu_intc>;
--	interrupts = <2>;
--};
-diff --git a/Documentation/devicetree/bindings/interrupt-controller/brcm,bcm7120-l2-intc.yaml b/Documentation/devicetree/bindings/interrupt-controller/brcm,bcm7120-l2-intc.yaml
-index e0c6dce40d13..8be7fe29e6a9 100644
---- a/Documentation/devicetree/bindings/interrupt-controller/brcm,bcm7120-l2-intc.yaml
-+++ b/Documentation/devicetree/bindings/interrupt-controller/brcm,bcm7120-l2-intc.yaml
-@@ -4,7 +4,7 @@
- $id: http://devicetree.org/schemas/interrupt-controller/brcm,bcm7120-l2-intc.yaml#
- $schema: http://devicetree.org/meta-schemas/core.yaml#
- 
--title: Broadcom BCM7120-style Level 2 interrupt controller
-+title: Broadcom BCM7120-style Level 2 and Broadcom BCM3380 Level 1 / Level 2
- 
- maintainers:
-   - Florian Fainelli <f.fainelli@gmail.com>
-@@ -59,16 +59,31 @@ description: >
-   ..
-   31 ........................ X
- 
-+  The BCM3380 Level 1 / Level 2 interrrupt controller shows up in various forms
-+  on many BCM338x/BCM63xx chipsets. It has the following properties:
+-	thermal@f04d1500 {
+-		compatible = "brcm,avs-tmon-bcm7445", "brcm,avs-tmon";
+-		reg = <0xf04d1500 0x28>;
+-		interrupts = <0x6>;
+-		interrupt-names = "tmon";
+-		interrupt-parent = <&avs_host_l2_intc>;
+-	};
+diff --git a/Documentation/devicetree/bindings/thermal/brcm,avs-tmon.yaml b/Documentation/devicetree/bindings/thermal/brcm,avs-tmon.yaml
+new file mode 100644
+index 000000000000..fb5c273b8bc2
+--- /dev/null
++++ b/Documentation/devicetree/bindings/thermal/brcm,avs-tmon.yaml
+@@ -0,0 +1,57 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/thermal/brcm,avs-tmon.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+  - outputs a single interrupt signal to its interrupt controller parent
++title: Broadcom STB thermal management
 +
-+  - contains one or more enable/status word pairs, which often appear at
-+    different offsets in different blocks
++description: Thermal management core, provided by the AVS TMON hardware block.
 +
-+  - no atomic set/clear operations
++maintainers:
++  - Florian Fainelli <f.fainelli@gmail.com>
 +
- allOf:
-   - $ref: /schemas/interrupt-controller.yaml#
- 
- properties:
-   compatible:
--    const: brcm,bcm7120-l2-intc
++allOf:
++  - $ref: thermal-sensor.yaml#
++
++properties:
++  compatible:
++    oneOf:
++      - items:
++          - enum:
++              - brcm,avs-tmon-bcm7216
++              - brcm,avs-tmon-bcm7445
++          - const: brcm,avs-tmon
++
++  reg:
++    maxItems: 1
++    description: >
++      Address range for the AVS TMON registers
++
++  interrupts:
++    maxItems: 1
++
++  interrupt-names:
 +    items:
-+      - enum:
-+          - brcm,bcm7120-l2-intc
-+          - brcm,bcm3380-l2-intc
- 
-   reg:
-     description: >
-       Specifies the base physical address and size of the registers
-+    minItems: 1
-+    maxItems: 4
- 
-   interrupt-controller: true
- 
-@@ -121,3 +136,14 @@ examples:
-       brcm,int-map-mask = <0xeb8>, <0x140>;
-       brcm,int-fwd-mask = <0x7>;
-     };
++      - const: tmon
 +
++  "#thermal-sensor-cells":
++    const: 0
++
++additionalProperties: false
++
++required:
++  - compatible
++  - reg
++  - "#thermal-sensor-cells"
++
++examples:
 +  - |
-+    irq1_intc: interrupt-controller@10000020 {
-+       compatible = "brcm,bcm3380-l2-intc";
-+       reg = <0x10000024 0x4>, <0x1000002c 0x4>,
-+             <0x10000020 0x4>, <0x10000028 0x4>;
-+       interrupt-controller;
-+       #interrupt-cells = <1>;
-+       interrupt-parent = <&cpu_intc>;
-+       interrupts = <2>;
-+    };
++     thermal@f04d1500 {
++          compatible = "brcm,avs-tmon-bcm7445", "brcm,avs-tmon";
++          reg = <0xf04d1500 0x28>;
++          interrupts = <0x6>;
++          interrupt-names = "tmon";
++          interrupt-parent = <&avs_host_l2_intc>;
++          #thermal-sensor-cells = <0>;
++     };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9ac67c885159..2109b6fe8ea3 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3936,7 +3936,7 @@ M:	Markus Mayer <mmayer@broadcom.com>
+ M:	bcm-kernel-feedback-list@broadcom.com
+ L:	linux-pm@vger.kernel.org
+ S:	Maintained
+-F:	Documentation/devicetree/bindings/thermal/brcm,avs-tmon.txt
++F:	Documentation/devicetree/bindings/thermal/brcm,avs-tmon.yaml
+ F:	drivers/thermal/broadcom/brcmstb*
+ 
+ BROADCOM STB DPFE DRIVER
 -- 
 2.25.1
 
