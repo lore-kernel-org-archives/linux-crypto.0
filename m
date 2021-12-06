@@ -2,129 +2,194 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A1BC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Dec 2021 10:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E45C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Dec 2021 18:26:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240455AbhLFKxs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Dec 2021 05:53:48 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:29153 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241078AbhLFKxs (ORCPT
+        id S1347005AbhLFS3u (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Dec 2021 13:29:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346999AbhLFS3u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Dec 2021 05:53:48 -0500
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4J70Wx5tSjzXdbb;
-        Mon,  6 Dec 2021 18:48:13 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Mon, 6 Dec 2021 18:50:17 +0800
-Received: from huawei.com (10.69.192.56) by dggpeml100012.china.huawei.com
- (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Mon, 6 Dec
- 2021 18:50:17 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH v3] crypto: hisilicon - replace 'smp_processor_id' with the raw version of the macro
-Date:   Mon, 6 Dec 2021 18:51:09 +0800
-Message-ID: <20211206105109.21847-1-yekai13@huawei.com>
-X-Mailer: git-send-email 2.33.0
+        Mon, 6 Dec 2021 13:29:50 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1AF3C061354;
+        Mon,  6 Dec 2021 10:26:20 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id z6so7632033plk.6;
+        Mon, 06 Dec 2021 10:26:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hE2WN/DCm9N6dOZUu7hJVv+yyUkTDtyJAizkqbQOmeM=;
+        b=ipaMazgxgTpkYikqGl6f7YCz3dX0DH+kDEHQf9IPrXn8Ty2anNzxe5KfYlV9DKm45W
+         6LcK8K52jRcL5K9k/42alehFViSE1QSnRhzjLtXd3eN7VBi5wToe9wdkyXDAGEJgDygg
+         XhSMYxgkyh8wjxjdMyVsvXhk1aE0DQvfO4C5pZBMPZlsUk4V+e2QgcgAzEU0j3AFiSx4
+         h7n9OXSRpGq6ztUgfpDLuXGOVbcSB+Vf/goU2C53KQnpyGTGHsRhf9cwPPeUSkfFFgiA
+         5PBTFLrA8M+fmqv5jj4nU15Nh1TPtq61NJxqjPcus1YOURkR8gu7zepJsCz61vYuF6E4
+         1ikw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hE2WN/DCm9N6dOZUu7hJVv+yyUkTDtyJAizkqbQOmeM=;
+        b=7odm4aRBpSoh/ebdkrGXB3ba3PnSfCw6W2aKzwZYvX6d/s7L7iqSfZVeDYPCVpJf2T
+         uRhIRo+ljNpVAq0Z8mtNXfx4ECPKdp+d2WRWMTdC6PBLhZ0mjp/iksEwHBolIxCoalVg
+         k3ZNGSSfqAa+b17msqH3P+HLhL64qPqr8Hb2zCdJkVT605rb5KW59bBMnzGxd8X9cCun
+         6E63j6GHOoD0Lhz6PUF2FJjo1Fui7oO1+ZokuwHHIMfpLqYXSSIYirOhwzz3D7fzf6pn
+         jSK6dqO3SSv8M3KPpjvxEha/5jC0/cIJiPmxeVQ2HrOWiOCqBD07sAS1OwnQTYmpvTRY
+         DH/w==
+X-Gm-Message-State: AOAM530FLKYcriURdysHPBtcWPD5eI0z+lRPdlZTZHIUCeR2FHMbJHfq
+        w+IOU/1/oBhI+ltGf4mvN09DZIWHpPM=
+X-Google-Smtp-Source: ABdhPJzHrXUEulYgTnv8rmP1N2EktMiXwXTNQXI/qz7ddNDdC9RmNahV0Zhzd5IDB4MUonyGD9AseQ==
+X-Received: by 2002:a17:90b:1892:: with SMTP id mn18mr250556pjb.178.1638815179928;
+        Mon, 06 Dec 2021 10:26:19 -0800 (PST)
+Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id a22sm12773097pfh.111.2021.12.06.10.26.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Dec 2021 10:26:19 -0800 (PST)
+From:   Florian Fainelli <f.fainelli@gmail.com>
+To:     devicetree@vger.kernel.org
+Cc:     Florian Fainelli <f.fainelli@gmail.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        bcm-kernel-feedback-list@broadcom.com (maintainer:BROADCOM BCM7XXX ARM
+        ARCHITECTURE), Gregory Fong <gregory.0xf0@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Markus Mayer <mmayer@broadcom.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Al Cooper <alcooperx@gmail.com>,
+        Doug Berger <opendmb@gmail.com>,
+        linux-ide@vger.kernel.org (open list:LIBATA SUBSYSTEM (Serial and
+        Parallel ATA drivers)), linux-kernel@vger.kernel.org (open list),
+        linux-gpio@vger.kernel.org (open list:GPIO SUBSYSTEM),
+        linux-arm-kernel@lists.infradead.org (moderated list:BROADCOM BCM7XXX
+        ARM ARCHITECTURE),
+        linux-mmc@vger.kernel.org (open list:MULTIMEDIA CARD (MMC), SECURE
+        DIGITAL (SD) AND...),
+        linux-pwm@vger.kernel.org (open list:PWM SUBSYSTEM),
+        linux-crypto@vger.kernel.org (open list:HARDWARE RANDOM NUMBER
+        GENERATOR CORE),
+        linux-rtc@vger.kernel.org (open list:REAL TIME CLOCK (RTC) SUBSYSTEM),
+        linux-pm@vger.kernel.org (open list:THERMAL),
+        linux-usb@vger.kernel.org (open list:USB SUBSYSTEM)
+Subject: [PATCH v2 00/14] Broadcom DT bindings updates to YAML
+Date:   Mon,  6 Dec 2021 10:26:02 -0800
+Message-Id: <20211206182616.2089677-1-f.fainelli@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-smp_processor_id() is unsafe if it's used in a preemption-on critical
-section. It will cause the call trace when the preemption-on and sets the
-CONFIG_DEBUG_PREEMPT. So replace 'smp_processor_id' with the raw version of
-the marco in preemptible to avoid the following call trace:
+Hi Rob,
 
-[ 7538.874350] BUG: using smp_processor_id() in preemptible [00000000] code: af_alg06/8438
-[ 7538.874368] caller is debug_smp_processor_id+0x1c/0x28
-[ 7538.874373] CPU: 50 PID: 8438 Comm: af_alg06 Kdump: loaded Not tainted 5.10.0.pc+ #18
-[ 7538.874377] Call trace:
-[ 7538.874387]  dump_backtrace+0x0/0x210
-[ 7538.874389]  show_stack+0x2c/0x38
-[ 7538.874392]  dump_stack+0x110/0x164
-[ 7538.874394]  check_preemption_disabled+0xf4/0x108
-[ 7538.874396]  debug_smp_processor_id+0x1c/0x28
-[ 7538.874406]  sec_create_qps+0x24/0xe8 [hisi_sec2]
-[ 7538.874408]  sec_ctx_base_init+0x20/0x4d8 [hisi_sec2]
-[ 7538.874411]  sec_aead_ctx_init+0x68/0x180 [hisi_sec2]
-[ 7538.874413]  sec_aead_sha256_ctx_init+0x28/0x38 [hisi_sec2]
-[ 7538.874421]  crypto_aead_init_tfm+0x54/0x68
-[ 7538.874423]  crypto_create_tfm_node+0x6c/0x110
-[ 7538.874424]  crypto_alloc_tfm_node+0x74/0x288
-[ 7538.874426]  crypto_alloc_aead+0x40/0x50
-[ 7538.874431]  aead_bind+0x50/0xd0
-[ 7538.874433]  alg_bind+0x94/0x148
-[ 7538.874439]  __sys_bind+0x98/0x118
-[ 7538.874441]  __arm64_sys_bind+0x28/0x38
-[ 7538.874445]  do_el0_svc+0x88/0x258
-[ 7538.874447]  el0_svc+0x1c/0x28
-[ 7538.874449]  el0_sync_handler+0x8c/0xb8
-[ 7538.874452]  el0_sync+0x148/0x180
+This patch series contains a number of device tree bindings being
+converted to YAML to help with validation.
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
----
-changes v1->v2:
-	modify the comments, and use the raw version of
-the marco instead of wrong code modification
-changes v2->v3:
-	modify the "changes" lines.
-	
- drivers/crypto/hisilicon/hpre/hpre_main.c | 2 +-
- drivers/crypto/hisilicon/sec2/sec_main.c  | 2 +-
- drivers/crypto/hisilicon/zip/zip_main.c   | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+There will be second, and possibly third rounds later on after those
+land in.
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 65a641396c07..ffeacdc4a85c 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -277,7 +277,7 @@ static inline int hpre_cluster_core_mask(struct hisi_qm *qm)
- 
- struct hisi_qp *hpre_create_qp(u8 type)
- {
--	int node = cpu_to_node(smp_processor_id());
-+	int node = cpu_to_node(raw_smp_processor_id());
- 	struct hisi_qp *qp = NULL;
- 	int ret;
- 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 90551bf38b52..c3d2dea40202 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -282,7 +282,7 @@ void sec_destroy_qps(struct hisi_qp **qps, int qp_num)
- 
- struct hisi_qp **sec_create_qps(void)
- {
--	int node = cpu_to_node(smp_processor_id());
-+	int node = cpu_to_node(raw_smp_processor_id());
- 	u32 ctx_num = ctx_q_num;
- 	struct hisi_qp **qps;
- 	int ret;
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 7148201ce76e..18498138eba2 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -277,7 +277,7 @@ MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
- int zip_create_qps(struct hisi_qp **qps, int qp_num, int node)
- {
- 	if (node == NUMA_NO_NODE)
--		node = cpu_to_node(smp_processor_id());
-+		node = cpu_to_node(raw_smp_processor_id());
- 
- 	return hisi_qm_alloc_qps_node(&zip_devices, qp_num, 0, node, qps);
- }
+Thanks!
+
+Changes in v2:
+
+- rebased against dt/next
+- addressed Gregory's feedback on the GPIO binding change
+- added Damien's Acked-by to the ATA binding patch
+
+Florian Fainelli (14):
+  dt-bindings: mmc: Convert Broadcom STB SDHCI binding to YAML
+  dt-bindings: reset: Convert Broadcom STB reset to YAML
+  dt-bindings: pwm: Convert BCM7038 PWM binding to YAML
+  dt-bindings: rtc: Convert Broadcom STB waketimer to YAML
+  dt-bindings: gpio: Convert Broadcom STB GPIO to YAML
+  dt-binding: interrupt-controller: Convert BCM7038 L1 intc to YAML
+  dt-bindings: interrupt-controller: Convert BCM7120 L2 to YAML
+  dt-bindings: interrupt-controller: Merge BCM3380 with BCM7120
+  dt-bindings: interrupt-controller: Convert Broadcom STB L2 to YAML
+  dt-bindings: rng: Convert iProc RNG200 to YAML
+  dt-bindings: thermal: Convert Broadcom TMON to YAML
+  dt-bindings: ata: Convert Broadcom SATA to YAML
+  dt-bindings: bus: Convert GISB arbiter to YAML
+  dt-bindings: usb: Convert BDC to YAML
+
+ .../bindings/ata/brcm,sata-brcm.txt           |  45 ------
+ .../bindings/ata/brcm,sata-brcm.yaml          |  91 +++++++++++
+ .../devicetree/bindings/bus/brcm,gisb-arb.txt |  34 ----
+ .../bindings/bus/brcm,gisb-arb.yaml           |  66 ++++++++
+ .../bindings/gpio/brcm,brcmstb-gpio.txt       |  83 ----------
+ .../bindings/gpio/brcm,brcmstb-gpio.yaml      | 105 ++++++++++++
+ .../brcm,bcm3380-l2-intc.txt                  |  39 -----
+ .../brcm,bcm7038-l1-intc.txt                  |  61 -------
+ .../brcm,bcm7038-l1-intc.yaml                 |  91 +++++++++++
+ .../brcm,bcm7120-l2-intc.txt                  |  88 -----------
+ .../brcm,bcm7120-l2-intc.yaml                 | 149 ++++++++++++++++++
+ .../interrupt-controller/brcm,l2-intc.txt     |  31 ----
+ .../interrupt-controller/brcm,l2-intc.yaml    |  64 ++++++++
+ .../bindings/mmc/brcm,sdhci-brcmstb.txt       |  53 -------
+ .../bindings/mmc/brcm,sdhci-brcmstb.yaml      | 100 ++++++++++++
+ .../bindings/pwm/brcm,bcm7038-pwm.txt         |  20 ---
+ .../bindings/pwm/brcm,bcm7038-pwm.yaml        |  43 +++++
+ .../bindings/reset/brcm,brcmstb-reset.txt     |  27 ----
+ .../bindings/reset/brcm,brcmstb-reset.yaml    |  48 ++++++
+ .../bindings/rng/brcm,iproc-rng200.txt        |  16 --
+ .../bindings/rng/brcm,iproc-rng200.yaml       |  29 ++++
+ .../bindings/rtc/brcm,brcmstb-waketimer.txt   |  20 ---
+ .../bindings/rtc/brcm,brcmstb-waketimer.yaml  |  44 ++++++
+ .../bindings/thermal/brcm,avs-tmon.txt        |  23 ---
+ .../bindings/thermal/brcm,avs-tmon.yaml       |  57 +++++++
+ .../devicetree/bindings/usb/brcm,bdc.txt      |  29 ----
+ .../devicetree/bindings/usb/brcm,bdc.yaml     |  46 ++++++
+ MAINTAINERS                                   |   6 +-
+ 28 files changed, 936 insertions(+), 572 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/ata/brcm,sata-brcm.txt
+ create mode 100644 Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml
+ delete mode 100644 Documentation/devicetree/bindings/bus/brcm,gisb-arb.txt
+ create mode 100644 Documentation/devicetree/bindings/bus/brcm,gisb-arb.yaml
+ delete mode 100644 Documentation/devicetree/bindings/gpio/brcm,brcmstb-gpio.txt
+ create mode 100644 Documentation/devicetree/bindings/gpio/brcm,brcmstb-gpio.yaml
+ delete mode 100644 Documentation/devicetree/bindings/interrupt-controller/brcm,bcm3380-l2-intc.txt
+ delete mode 100644 Documentation/devicetree/bindings/interrupt-controller/brcm,bcm7038-l1-intc.txt
+ create mode 100644 Documentation/devicetree/bindings/interrupt-controller/brcm,bcm7038-l1-intc.yaml
+ delete mode 100644 Documentation/devicetree/bindings/interrupt-controller/brcm,bcm7120-l2-intc.txt
+ create mode 100644 Documentation/devicetree/bindings/interrupt-controller/brcm,bcm7120-l2-intc.yaml
+ delete mode 100644 Documentation/devicetree/bindings/interrupt-controller/brcm,l2-intc.txt
+ create mode 100644 Documentation/devicetree/bindings/interrupt-controller/brcm,l2-intc.yaml
+ delete mode 100644 Documentation/devicetree/bindings/mmc/brcm,sdhci-brcmstb.txt
+ create mode 100644 Documentation/devicetree/bindings/mmc/brcm,sdhci-brcmstb.yaml
+ delete mode 100644 Documentation/devicetree/bindings/pwm/brcm,bcm7038-pwm.txt
+ create mode 100644 Documentation/devicetree/bindings/pwm/brcm,bcm7038-pwm.yaml
+ delete mode 100644 Documentation/devicetree/bindings/reset/brcm,brcmstb-reset.txt
+ create mode 100644 Documentation/devicetree/bindings/reset/brcm,brcmstb-reset.yaml
+ delete mode 100644 Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml
+ delete mode 100644 Documentation/devicetree/bindings/rtc/brcm,brcmstb-waketimer.txt
+ create mode 100644 Documentation/devicetree/bindings/rtc/brcm,brcmstb-waketimer.yaml
+ delete mode 100644 Documentation/devicetree/bindings/thermal/brcm,avs-tmon.txt
+ create mode 100644 Documentation/devicetree/bindings/thermal/brcm,avs-tmon.yaml
+ delete mode 100644 Documentation/devicetree/bindings/usb/brcm,bdc.txt
+ create mode 100644 Documentation/devicetree/bindings/usb/brcm,bdc.yaml
+
 -- 
-2.33.0
+2.25.1
 
