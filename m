@@ -2,63 +2,63 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A20AC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Dec 2021 23:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED45CC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Dec 2021 23:33:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242621AbhLGXgu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Dec 2021 18:36:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34222 "EHLO
+        id S242626AbhLGXg4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Dec 2021 18:36:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242614AbhLGXgt (ORCPT
+        with ESMTP id S242615AbhLGXgv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Dec 2021 18:36:49 -0500
+        Tue, 7 Dec 2021 18:36:51 -0500
 Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70FE2C061746
-        for <linux-crypto@vger.kernel.org>; Tue,  7 Dec 2021 15:33:18 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id i12-20020a63584c000000b00330ec6e2c37so281202pgm.7
-        for <linux-crypto@vger.kernel.org>; Tue, 07 Dec 2021 15:33:18 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23DD3C061574
+        for <linux-crypto@vger.kernel.org>; Tue,  7 Dec 2021 15:33:20 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id 66-20020a630545000000b0032e4e898d24so275134pgf.10
+        for <linux-crypto@vger.kernel.org>; Tue, 07 Dec 2021 15:33:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ekOV9da4eWSrPoL63ChA67xsZs2WyoWSKbx3HEcftwg=;
-        b=l3kk4SnixWXF3tsv+8v1l4PbSejH8gJCJykpVyS6vkQvCnmub/r5nqHlySnBYEnJ3R
-         NR4ESPRwI6Rgf4coACYSAVfkb8btWBUsg0w9bA8Ip8NE6IWBWSiJt3ehxqo3ict286d5
-         wj1lp1D7qhiN8rClhEH2sV0b0q6s4kqOUdTRlpw/SPTB5Rrrs581tmUfSTE5E8cLDWkG
-         wm8rDrt+KdK3pgpVAHmXp0wSohvArd2dJMUCAmbYBOt/CltCS7m5VKUZTwC3iUe5U5DT
-         GfPZmLr0vPdw714idQxMClczLIVbGoRvd3z0284BjqqWA41ua7s8InQTeaoVB03QyXgo
-         n5rw==
+        bh=46XSeEjo5H2NL/5/c9ldxW11TL6ltb9jVbtcCkM7Ayg=;
+        b=Xgj8LvxT9/2jKZhK9jYnbUqDqVoXR/eQ5CH40LJNbyuFjJh6r+NeXM5uBby5wKHKJT
+         QlXfRKBp/eDhbAS8mBIyvc+VlPtJGZqMiPQILjdGK/2FQQKV/KkSp2hWQYYtQTO2Jf34
+         q4oVotoRGdWoH93ipYuUuJbgpPueWDRA2pppegsUxoPQQYtGEdG5is1YFvYazMi21O1p
+         GlcU/42940PRMM980tPEBQwxxBhJ6OSUESXXZ3VWjXqDjHt5UKibdtMzfpv5PqtKbScO
+         zCblgAC8G7fd7gJEhA9IyvDdzRNH6bn/H+nJYUoAB8mUEoORXTqQmT47AQZJDB5r0SDV
+         zLJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ekOV9da4eWSrPoL63ChA67xsZs2WyoWSKbx3HEcftwg=;
-        b=pBFL3zsu/OCapqqQPygAtMWtrLUJT0GEu17jNrKzk21pvXqP7elBlTOsRafHdh7a4h
-         vN++bPVnYDs2JB4xg3FCtSiO4grK0cHJnfq0ZRQFaHuFALptdkSgqad0JhU349JyaTnU
-         9bx5PjsEWFAIjCTq17nabMfY41gz/WLKmjGRItqxIwO10vj7V9jJlUzQZf0aPmnZwkqH
-         nSc3gl7lfyXHMnbud2xubwbiR++noxI70C9bHZC3Vv56G2pvLu/J4ODHNd3vaBiAEZMS
-         SkqIZ2du40xvteoFrQ/NRil1IW/aWc5hexZuaPJgtBkvxYl+hkbQetFnVf8IBui2avcX
-         9v0A==
-X-Gm-Message-State: AOAM530BRTC5k8k3e+D85tlNi6iWlbCd1JeWdhA4+lIbwtvU2LLIbERS
-        flpmvl0elpZg6/YPn3hufjgcavcYjrU=
-X-Google-Smtp-Source: ABdhPJzuKzhttUxwRDHCLWpasUIlmUcvPliCCRNSdYKkfltOWOcn8RtTEBhof61Y9WOWhgY/FjJ8hItvmH0=
+        bh=46XSeEjo5H2NL/5/c9ldxW11TL6ltb9jVbtcCkM7Ayg=;
+        b=vYs34XzvVnLPcKEeIi486uX8ofgtJCF3KrKaWaRguoxNy1wSuS2e4vyBd0tfq+RRQN
+         /72FnSBlh8L4jceCwMboqkPR9ZAjYPZ99hWIc/mhOBUO+JTun+OedGkPXoMYyOhiWb+I
+         ioafrCBkBBrnPQn30wqcaE0qd5JtsyMKqW8PvW/sh3HgI5W5ikFt1WuprL3hjsQG54nO
+         +31yLDSCtkiTxS38sMIpkZbANJ6nY7RlVLSGUbzkPTy4DNi5Exg0CH046yYjgu1adUNk
+         0/fzi19bFgHTKAI+y6mug1rSDddYbuF836uH6pQJ34JoxW9jcFAygywYVQAJvPvAXw17
+         LGww==
+X-Gm-Message-State: AOAM531yE3pfic0tOOvemPzlipAs9BRof6YDtoujYTs9HsJCBdvLghIb
+        6ctmQDmCgaxrW8fRnFROny5ifxJEi/c=
+X-Google-Smtp-Source: ABdhPJy43pt5HEP3ID2ehicyXt/5AFj2Zd9cXGLqHXChM+79yHqoTBRRjrQTVB/szPpTIJj/HSuNFGtAVbM=
 X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:46ed:9c47:8229:475d])
- (user=pgonda job=sendgmr) by 2002:a17:90a:a786:: with SMTP id
- f6mr2842553pjq.158.1638919997919; Tue, 07 Dec 2021 15:33:17 -0800 (PST)
-Date:   Tue,  7 Dec 2021 15:33:04 -0800
+ (user=pgonda job=sendgmr) by 2002:a63:41c5:: with SMTP id o188mr26755932pga.206.1638919999631;
+ Tue, 07 Dec 2021 15:33:19 -0800 (PST)
+Date:   Tue,  7 Dec 2021 15:33:05 -0800
 In-Reply-To: <20211207233306.2200118-1-pgonda@google.com>
-Message-Id: <20211207233306.2200118-4-pgonda@google.com>
+Message-Id: <20211207233306.2200118-5-pgonda@google.com>
 Mime-Version: 1.0
 References: <20211207233306.2200118-1-pgonda@google.com>
 X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
-Subject: [PATCH V6 3/5] crypto: ccp - Refactor out sev_fw_alloc()
+Subject: [PATCH V6 4/5] crypto: ccp - Add psp_init_on_probe module parameter
 From:   Peter Gonda <pgonda@google.com>
 To:     thomas.lendacky@amd.com
-Cc:     Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
+Cc:     Peter Gonda <pgonda@google.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <jroedel@suse.de>,
+        Marc Orr <marcorr@google.com>, Joerg Roedel <jroedel@suse.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        David Rientjes <rientjes@google.com>,
         John Allen <john.allen@amd.com>,
         "David S. Miller" <davem@davemloft.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -68,14 +68,16 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Create a helper function sev_fw_alloc() which can be used to allocate
-aligned memory regions for use by the PSP firmware. Currently only used
-for the SEV-ES TMR region but will be used for the SEV_INIT_EX NV memory
-region.
+Add psp_init_on_probe module parameter that allows for skipping the
+PSP's SEV platform initialization during module init. User may decouple
+module init from PSP init due to use of the INIT_EX support in upcoming
+patch which allows for users to save PSP's internal state to file. The
+file may be unavailable at module init.
+
+Also moves the PSP ABI version log message to after successful PSP init
+instead of module init in case this new parameter is used.
 
 Signed-off-by: Peter Gonda <pgonda@google.com>
-Reviewed-by: Marc Orr <marcorr@google.com>
-Acked-by: David Rientjes <rientjes@google.com>
 Acked-by: Brijesh Singh <brijesh.singh@amd.com>
 Cc: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: Brijesh Singh <brijesh.singh@amd.com>
@@ -89,56 +91,57 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/ccp/sev-dev.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index ef7e8b4c6e02..8ea362ac014f 100644
+index 8ea362ac014f..686b16e69de7 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -141,6 +141,17 @@ static int sev_cmd_buffer_len(int cmd)
- 	return 0;
+@@ -43,6 +43,10 @@ static int psp_probe_timeout = 5;
+ module_param(psp_probe_timeout, int, 0644);
+ MODULE_PARM_DESC(psp_probe_timeout, " default timeout value, in seconds, during PSP device probe");
+ 
++static bool psp_init_on_probe = true;
++module_param(psp_init_on_probe, bool, 0444);
++MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initialized on module init. Else the PSP will be initialized on the first command requiring it");
++
+ MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
+ MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
+ MODULE_FIRMWARE("amd/amd_sev_fam19h_model0xh.sbin"); /* 3rd gen EPYC */
+@@ -305,7 +309,10 @@ static int __sev_platform_init_locked(int *error)
+ 
+ 	dev_dbg(sev->dev, "SEV firmware initialized\n");
+ 
+-	return rc;
++	dev_info(sev->dev, "SEV API:%d.%d build:%d\n", sev->api_major,
++		 sev->api_minor, sev->build);
++
++	return 0;
  }
  
-+static void *sev_fw_alloc(unsigned long len)
-+{
-+	struct page *page;
-+
-+	page = alloc_pages(GFP_KERNEL, get_order(len));
-+	if (!page)
-+		return NULL;
-+
-+	return page_address(page);
-+}
-+
- static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
- {
- 	struct psp_device *psp = psp_master;
-@@ -1078,7 +1089,6 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
- void sev_pci_init(void)
- {
- 	struct sev_device *sev = psp_master->sev_data;
--	struct page *tmr_page;
- 	int error, rc;
- 
- 	if (!sev)
-@@ -1094,14 +1104,10 @@ void sev_pci_init(void)
- 		sev_get_api_version();
- 
- 	/* Obtain the TMR memory area for SEV-ES use */
--	tmr_page = alloc_pages(GFP_KERNEL, get_order(SEV_ES_TMR_SIZE));
--	if (tmr_page) {
--		sev_es_tmr = page_address(tmr_page);
--	} else {
--		sev_es_tmr = NULL;
-+	sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
-+	if (!sev_es_tmr)
+ int sev_platform_init(int *error)
+@@ -1109,16 +1116,14 @@ void sev_pci_init(void)
  		dev_warn(sev->dev,
  			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
--	}
  
++	if (!psp_init_on_probe)
++		return;
++
  	/* Initialize the platform */
  	rc = sev_platform_init(&error);
+-	if (rc) {
++	if (rc)
+ 		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
+ 			error, rc);
+-		return;
+-	}
+-
+-	dev_info(sev->dev, "SEV API:%d.%d build:%d\n", sev->api_major,
+-		 sev->api_minor, sev->build);
+ 
+ 	return;
+ 
 -- 
 2.34.1.400.ga245620fadb-goog
 
