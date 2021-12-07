@@ -2,160 +2,137 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FEB3C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Dec 2021 17:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DDF2C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Dec 2021 17:52:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240023AbhLGRf6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Dec 2021 12:35:58 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:60796 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240016AbhLGRf6 (ORCPT
+        id S240241AbhLGR4V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Dec 2021 12:56:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37850 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229703AbhLGR4U (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Dec 2021 12:35:58 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id DF2B621B3A;
-        Tue,  7 Dec 2021 17:32:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1638898345; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=p08l+Qiu75dUbkbrDOZgOW1nBpHuW/LpB0uPvXqmigg=;
-        b=cH4AxDh7Z5spAiCFuPHAKizEL1PsQcuD6sHy/nDy6g6DqJxWj6EKz9trYz9SGJPlcnDGb8
-        9bDOPN4fQWIT+Snc356AncuT877BC9fLVRUEESgMaCpLUQ6mQ3DLrgvBE5l/VAwWgPb/Gd
-        DydMC8itHDTzzR0LreU778OxrU87fbU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1638898345;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=p08l+Qiu75dUbkbrDOZgOW1nBpHuW/LpB0uPvXqmigg=;
-        b=S/L+c98qLLuIOJFQUyXpN3vhB98AZn1gpW5qWmNanBuCQ6j06b/XWIz1noRFtgEfQIaB3q
-        LER5Q9QzIbV0TYCA==
-Received: from kunlun.suse.cz (unknown [10.100.128.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 05243A3B83;
-        Tue,  7 Dec 2021 17:32:23 +0000 (UTC)
-Date:   Tue, 7 Dec 2021 18:32:21 +0100
-From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-To:     Philipp Rudo <prudo@redhat.com>
-Cc:     keyrings@vger.kernel.org, kexec@lists.infradead.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
-        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jessica Yu <jeyu@kernel.org>, linux-kernel@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Hari Bathini <hbathini@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        Frank van der Linden <fllinden@amazon.com>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        Daniel Axtens <dja@axtens.net>, buendgen@de.ibm.com,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Tue, 7 Dec 2021 12:56:20 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F410FC061574;
+        Tue,  7 Dec 2021 09:52:49 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id o4so12012pfp.13;
+        Tue, 07 Dec 2021 09:52:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=veFZZ2BwM4ZKvUKxG49udfxSBvJVoaKMQ2UqudqotEQ=;
+        b=jgk5tAuMGUati/xM9n9lNn854YcG8IWqsSlnPC3BlX1x/M8A9P0BExT2hSoApDiQ4C
+         AzRvnEQ/MuyXDHUQsD5qW7yEN2tc+aOf2NEn/PlRjn7BtytXeEf8qar/IZoYu5hCzSRh
+         Sh3T4oittUtRC4IQnYUNYco5R1elFYYQaeQhj7XSJv1n6JBNI/xS4zRymEjZvj3lyYS/
+         QZKeHvGIvsLGwddK3pI3BrDBzv0lj+ftujyo4ZYyVClx9HXsTxh/BWfau/IFvX2UQyo5
+         rbiXdRDBF9nHNczwVOLdif6RqOK3UvgAfZEsCDqdvOIkqcZ/V2CVvrszzSxkRqEZknqa
+         5XhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=veFZZ2BwM4ZKvUKxG49udfxSBvJVoaKMQ2UqudqotEQ=;
+        b=IjQJgSXSbSwxjspEVVYXUl8eoLrA8otZFqfAGgwFwSkes2gMMiNrkawoszOTR/vvCc
+         L28kvZio4W5UUmrNn4fYFHKYDu9WOX5aawI7QD96dRsSnqFAytoWsyWFlaj5NzDp9EFp
+         IH7yLkL6WHM42Yuk6jyaC4a0KyA0JExa7IwfYA0Ma7LKaMBimMIDs8Glt6HInUgGageQ
+         ONV/RLvdrh08I9tysm3/fMNovE5nPTx27HIwNZGUSlSd6OICf34fe7cpxkQcY/QjEp6A
+         2o6XSx4RCAYoY0N0ndw1eKFBydhvGTDwiKL5pNr2j8OLGvfGrQ7gJeQABIwelUc/6hKZ
+         tWWA==
+X-Gm-Message-State: AOAM5327iSV9S/lsv7yriTYHA3L2t9mHTe9UybQYXsCtD3IqV0raGYXY
+        /idROkaSt1UqiUKp/W+UYLoiObA0+A0=
+X-Google-Smtp-Source: ABdhPJxJv+eohQpgN/P9mjM8WWY4HG7RyDTmtHVmTtGPQQIpL0ogZ+ePWhy4QDRVfVlcgrx9DFsDsw==
+X-Received: by 2002:a62:de83:0:b0:4ad:57f7:5a86 with SMTP id h125-20020a62de83000000b004ad57f75a86mr629241pfg.9.1638899569110;
+        Tue, 07 Dec 2021 09:52:49 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id x16sm300653pfo.165.2021.12.07.09.52.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Dec 2021 09:52:48 -0800 (PST)
+Subject: Re: [PATCH v2 05/14] dt-bindings: gpio: Convert Broadcom STB GPIO to
+ YAML
+To:     Rob Herring <robh@kernel.org>,
+        Florian Fainelli <f.fainelli@gmail.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Zhang Rui <rui.zhang@intel.com>,
+        =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Doug Berger <opendmb@gmail.com>, linux-usb@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-mmc@vger.kernel.org, Al Cooper <alcooperx@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>, linux-pm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Markus Mayer <mmayer@broadcom.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Lee Jones <lee.jones@linaro.org>, linux-gpio@vger.kernel.org,
+        Rob Herring <robh+dt@kernel.org>, linux-rtc@vger.kernel.org,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        devicetree@vger.kernel.org, Gregory Fong <gregory.0xf0@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Scott Branden <sbranden@broadcom.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Baoquan He <bhe@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v2 0/6] KEXEC_SIG with appended signature
-Message-ID: <20211207173221.GM117207@kunlun.suse.cz>
-References: <cover.1637862358.git.msuchanek@suse.de>
- <20211207171014.2cfc4a54@rhtmp>
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        "Rafael J. Wysocki" <rafael@kernel.org>, linux-ide@vger.kernel.org,
+        linux-pwm@vger.kernel.org
+References: <20211206182616.2089677-1-f.fainelli@gmail.com>
+ <20211206182616.2089677-6-f.fainelli@gmail.com>
+ <1638889090.698687.5799.nullmailer@robh.at.kernel.org>
+From:   Florian Fainelli <f.fainelli@gmail.com>
+Message-ID: <df5cc6a5-7857-d86d-e739-9a592b3a5294@gmail.com>
+Date:   Tue, 7 Dec 2021 09:52:45 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211207171014.2cfc4a54@rhtmp>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <1638889090.698687.5799.nullmailer@robh.at.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 07, 2021 at 05:10:14PM +0100, Philipp Rudo wrote:
-> Hi Michal,
+On 12/7/21 6:58 AM, Rob Herring wrote:
+> On Mon, 06 Dec 2021 10:26:07 -0800, Florian Fainelli wrote:
+>> Convert the Broadcom STB GPIO Device Tree binding to YAML to help with
+>> validation.
+>>
+>> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+>> ---
+>>  .../bindings/gpio/brcm,brcmstb-gpio.txt       |  83 --------------
+>>  .../bindings/gpio/brcm,brcmstb-gpio.yaml      | 105 ++++++++++++++++++
+>>  MAINTAINERS                                   |   2 +-
+>>  3 files changed, 106 insertions(+), 84 deletions(-)
+>>  delete mode 100644 Documentation/devicetree/bindings/gpio/brcm,brcmstb-gpio.txt
+>>  create mode 100644 Documentation/devicetree/bindings/gpio/brcm,brcmstb-gpio.yaml
+>>
 > 
-> i finally had the time to take a closer look at the series. Except for
-> the nit in patch 4 and my personal preference in patch 6 the code looks
-> good to me.
+> Running 'make dtbs_check' with the schema in this patch gives the
+> following warnings. Consider if they are expected or the schema is
+> incorrect. These may not be new warnings.
 > 
-> What I don't like are the commit messages on the first commits. In my
-> opinion they are so short that they are almost useless. For example in
-> patch 2 there is absolutely no explanation why you can simply copy the
-> s390 over to ppc.
-
-They use the same signature format. I suppose I can add a note saying
-that.
-
-> Or in patch 3 you are silently changing the error
-> code in kexec from EKEYREJECT to ENODATA. So I would appreciate it if
-
-Not sure what I should do about this. The different implementations use
-different random error codes, and when they are unified the error code
-clearly changes for one or the other.
-
-Does anything depend on a particular error code returned?
-
-Thanks
-
-Michal
-
-> you could improve them a little.
+> Note that it is not yet a requirement to have 0 warnings for dtbs_check.
+> This will change in the future.
 > 
-> Thanks
-> Philipp
+> Full log is available here: https://patchwork.ozlabs.org/patch/1564132
 > 
-> On Thu, 25 Nov 2021 19:02:38 +0100
-> Michal Suchanek <msuchanek@suse.de> wrote:
 > 
-> > Hello,
-> > 
-> > This is resend of the KEXEC_SIG patchset.
-> > 
-> > The first patch is new because it'a a cleanup that does not require any
-> > change to the module verification code.
-> > 
-> > The second patch is the only one that is intended to change any
-> > functionality.
-> > 
-> > The rest only deduplicates code but I did not receive any review on that
-> > part so I don't know if it's desirable as implemented.
-> > 
-> > The first two patches can be applied separately without the rest.
-> > 
-> > Thanks
-> > 
-> > Michal
-> > 
-> > Michal Suchanek (6):
-> >   s390/kexec_file: Don't opencode appended signature check.
-> >   powerpc/kexec_file: Add KEXEC_SIG support.
-> >   kexec_file: Don't opencode appended signature verification.
-> >   module: strip the signature marker in the verification function.
-> >   module: Use key_being_used_for for log messages in
-> >     verify_appended_signature
-> >   module: Move duplicate mod_check_sig users code to mod_parse_sig
-> > 
-> >  arch/powerpc/Kconfig                     | 11 +++++
-> >  arch/powerpc/kexec/elf_64.c              | 14 ++++++
-> >  arch/s390/kernel/machine_kexec_file.c    | 42 ++----------------
-> >  crypto/asymmetric_keys/asymmetric_type.c |  1 +
-> >  include/linux/module_signature.h         |  1 +
-> >  include/linux/verification.h             |  4 ++
-> >  kernel/module-internal.h                 |  2 -
-> >  kernel/module.c                          | 12 +++--
-> >  kernel/module_signature.c                | 56 +++++++++++++++++++++++-
-> >  kernel/module_signing.c                  | 33 +++++++-------
-> >  security/integrity/ima/ima_modsig.c      | 22 ++--------
-> >  11 files changed, 113 insertions(+), 85 deletions(-)
-> > 
-> 
+> gpio@4172c0: interrupts-extended: [[6, 6], [7, 5]] is too long
+> 	arch/arm/boot/dts/bcm7445-bcm97445svmb.dt.yaml
+
+The property is correct AFAICT, we have:
+
+                        interrupts-extended = <&irq0_aon_intc 0x6>,
+                                              <&aon_pm_l2_intc 0x5>;
+
+with both interrupt controllers having #interrupt-cells = <1>. I tried
+documenting the interrupts-extended for brcm,brcmstb-gpio.yaml to have
+maxItems: 2 but that does not eliminate the warning. Do you have any
+suggestions?
+-- 
+Florian
