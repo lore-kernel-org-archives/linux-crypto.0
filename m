@@ -2,108 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 693DDC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Dec 2021 03:41:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FD32C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Dec 2021 05:20:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234313AbhLGDp1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Dec 2021 22:45:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35154 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234282AbhLGDp0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Dec 2021 22:45:26 -0500
-Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4279BC061746;
-        Mon,  6 Dec 2021 19:41:57 -0800 (PST)
-Received: by mail-ua1-x92e.google.com with SMTP id l24so23994291uak.2;
-        Mon, 06 Dec 2021 19:41:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+WjCLq5iyPbhZoOVbo+nvWb9Wp/JdlLnIPR31C337C8=;
-        b=mZiJ1JWBFc1OWU2CphwdToWib2Fs7VeoMvRyd6OGAUdTYE7JuVX3y18pFnbL9d0SYR
-         qnkGAcFy4HWByFCmfen3y9B+gsUBd2Z4vpiAY8cExnT/X6456PRBzYpHz5lzE8xWOBLE
-         /Opn0hwl+/WEjMpD3cFa2zhWfG+2VM8IZAoAwDwKw4uis+328EKo2LCeWhkZKeKEAT9k
-         n3UXrAemi7nOM0I+lBZxbPlnpXZXWks7fOWw21TwqOUg6+DtBOdhLAZp7S1avVtceNWO
-         6hIZiEiJ4irNSwTkZ0WAOuxz06b1U7vebIqVBU87ZImLwZxD31NuI/0Q7jK48HpCxsG6
-         jbJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+WjCLq5iyPbhZoOVbo+nvWb9Wp/JdlLnIPR31C337C8=;
-        b=5b7/eFbJEOeL9ZNIuyZyAlpO52UWbGZLaf1bg2jfeQ4GVl9evTE4oJzyD9m1cSI9P/
-         DVPyXnB3/68ID+cisJSTq0toGmcK37hgecZUF+s5nTmSNshi7xyjIvERRCANsf5p2Cef
-         yJcC3400mMfT63OzCTqBEdCLqzU8xaCSeUwhc4bGPHFTFKW2b3+ptNWmWBzWiIc0kMa9
-         vZG8GfYGc42M+t896RoqpVEKnJpiKiqgug+D23TQaG32kECWATHpfW8SP/GLfqEUa5hf
-         WwNhY9eNgtRg13me9cjXzUQuEuMd15/WNRvBlpPMtNKPGOv6A2JBl3sGakYnONJo0rIu
-         Ki8w==
-X-Gm-Message-State: AOAM532t6a257QWxIXJkyZ7p6GAsPVSWe/vD+jR6CfEsncfkwhk3ZcV8
-        X+LhJLOcsUU2w0747qhtduReT7g/GebIhBzAkg0d1blr0+c=
-X-Google-Smtp-Source: ABdhPJx6RQZ3n6olyV3sCz9AbKmYBKhNAk0yZ773fOAPjf8R3q9XrHTi0PcC2P6/Zcqz0XN+NMNLS7cMSGYejK/S3F0=
-X-Received: by 2002:ab0:6813:: with SMTP id z19mr46872879uar.28.1638848516162;
- Mon, 06 Dec 2021 19:41:56 -0800 (PST)
+        id S233013AbhLGFY1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Dec 2021 00:24:27 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:57508 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232346AbhLGFY1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Dec 2021 00:24:27 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1muStx-00086p-Q6; Tue, 07 Dec 2021 16:20:30 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 07 Dec 2021 16:20:29 +1100
+Date:   Tue, 7 Dec 2021 16:20:29 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Geliang Tang <geliangtang@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>, Haren Myneni <haren@us.ibm.com>,
+        Anton Vorontsov <anton@enomsg.org>,
+        Colin Cross <ccross@android.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/9] crypto: add zbufsize() interface
+Message-ID: <20211207052029.GA12141@gondor.apana.org.au>
+References: <20180807094513.vstt5dhbb7n6kvds@gondor.apana.org.au>
+ <CAGXu5j+dPqpJZbO_AuGsNqJzq7XGcB2deXA5RELWv1-Ywi5QOA@mail.gmail.com>
+ <20180808025319.32d57wtjpyyapwo5@gondor.apana.org.au>
+ <202112011529.699092F@keescook>
+ <20211202015820.GB8138@gondor.apana.org.au>
+ <202112011947.7FA0A587C@keescook>
+ <20211202035727.GC8138@gondor.apana.org.au>
+ <202112012304.973C04859C@keescook>
+ <20211203022821.GA16082@gondor.apana.org.au>
+ <YaqC1mkcyzO2WrI/@google.com>
 MIME-Version: 1.0
-References: <20211206182616.2089677-1-f.fainelli@gmail.com> <20211206182616.2089677-6-f.fainelli@gmail.com>
-In-Reply-To: <20211206182616.2089677-6-f.fainelli@gmail.com>
-From:   Gregory Fong <gregory.0xf0@gmail.com>
-Date:   Mon, 6 Dec 2021 19:41:29 -0800
-Message-ID: <CADtm3G5Sh5sFhq7ye=aJbzd0v_FiqOPt_RAE3v_qWFQ+jH5bEQ@mail.gmail.com>
-Subject: Re: [PATCH v2 05/14] dt-bindings: gpio: Convert Broadcom STB GPIO to YAML
-To:     Florian Fainelli <f.fainelli@gmail.com>
-Cc:     devicetree@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        "maintainer:BROADCOM BCM7XXX ARM ARCHITECTURE" 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Markus Mayer <mmayer@broadcom.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Al Cooper <alcooperx@gmail.com>,
-        Doug Berger <opendmb@gmail.com>,
-        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
-        <linux-ide@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        "moderated list:BROADCOM BCM7XXX ARM ARCHITECTURE" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "open list:MULTIMEDIA CARD (MMC), SECURE DIGITAL (SD) AND..." 
-        <linux-mmc@vger.kernel.org>,
-        "open list:PWM SUBSYSTEM" <linux-pwm@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:REAL TIME CLOCK (RTC) SUBSYSTEM" 
-        <linux-rtc@vger.kernel.org>,
-        "open list:THERMAL" <linux-pm@vger.kernel.org>,
-        "open list:USB SUBSYSTEM" <linux-usb@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YaqC1mkcyzO2WrI/@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 6, 2021 at 10:26 AM Florian Fainelli <f.fainelli@gmail.com> wrote:
+On Fri, Dec 03, 2021 at 12:49:26PM -0800, Dmitry Torokhov wrote:
 >
-> Convert the Broadcom STB GPIO Device Tree binding to YAML to help with
-> validation.
->
-> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> I must be getting lost in terminology, and it feels to me that what is
+> discussed here is most likely of no interest to a lot of potential
+> users, especially ones that do compression/decompression. In majority of
+> cases they want to simply compress or decompress data, and they just
+> want to do it quickly and with minimal amount of memory consumed. They
+> do not particularly care if the task is being offloaded or executed on
+> the main CPU, either on separate thread or on the same thread, so the
+> discussion about scomp/acomp/etc is of no interest to them. From their
+> perspective they'd be totally fine with a wrapper that would do:
+> 
+> int decompress(...) {
+> 	prepare_request()
+> 	send_request()
+> 	wait_for_request()
+> }
+> 
+> and from their perspective this would be a synchronous API they are
+> happy with.
 
-Acked-by: Gregory Fong <gregory.0xf0@gmail.com>
+You can certainly do that as a Crypto API user.  And we do have
+some users who do exactly this (for example, testmgr does that
+when testing async algorithms).  However, this can't be a part of
+the API itself since many of our users execute in atomic contexts.
+
+> So from POV of such users what is actually missing is streaming mode of
+> compressing/decompressing where core would allow supplying additonal
+> data on demand and allow consuming output as it is being produced, and I
+> do not see anything like that in either scomp or acomp.
+
+That is indeed a very crucial part of the compression API that is
+missing.  And I would love someone to donate some time to addressing
+this.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
