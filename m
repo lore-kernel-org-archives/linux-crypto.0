@@ -2,55 +2,22 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C797AC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Dec 2021 06:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C00A4C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Dec 2021 06:28:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234256AbhLGG2W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Dec 2021 01:28:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42904 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230027AbhLGG2V (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Dec 2021 01:28:21 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CC20C061746;
-        Mon,  6 Dec 2021 22:24:52 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id y7so8759514plp.0;
-        Mon, 06 Dec 2021 22:24:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NqgniE7yhBdC3a/zZm7vuiVRgb+iOJ+XrnEthf5XuaI=;
-        b=n9KuB99Q6cQTR0wVyqfGthPj/cR9v1ycsfGZuquiMLnJ51IVgpcmbapo/yXZBdbMQZ
-         8F6dF4dYarkeWe8I6ixroyqR1GTVrdDzajnn7x7iUttUlzWQw9WMB1YLYF/5VLPpSJEx
-         aKNI0G7Y+NpVsZcrR/8iZ2LNDc9cB0fUTNsUGeoqJw1xnjcKr2YftHpwJf1iQuFW+bSW
-         kIjLEOzLIRJE18hRm9gQwkSRPvKsh7m1NhQES5O6ZESqNQrJrJJKV51lJKQ1rzHqZ06N
-         NdyJ/oIXpZD0+87SkUPKWDeICMJNd4UdjEivzCsad3oI5Bs5FNNSRh4rlTBqP7Fa5vsh
-         3U4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NqgniE7yhBdC3a/zZm7vuiVRgb+iOJ+XrnEthf5XuaI=;
-        b=nDafW60EgHLdoIZS/StYL1VIXqTekGrrlrs/nLQqXsE1cyrsvYltEmBBRzpIYuMX7y
-         JI3eBlv6heKGqPtoreCLJ5A8LiI4o/Qb3kKYju0Plfq9eyi0JTFLw4c6gyVGhlHdrdQ/
-         x5utEpWwsD6IsL3yMqlQUWL6UJ6tdsSnb0adJJ5s0QPNxE0QabvXWCrHsgpNaw92miqI
-         1HQ8uxZLl6VlO4XgoULGtACN7eS2OZN72cQ4M9Ni6wSq17XQWj7wnk0Bk5wtRG4mCHTd
-         BlbxQNwisbW+k5tz3sCzGiCu2ioqsugRedzosTkT4TV6EOm01NfGcxVy141ZwZTang1D
-         wvIw==
-X-Gm-Message-State: AOAM533p4xHAkBGxJu93pHv+mOJOKoaDfIs2PDD8Lu/BaxASNqOXEImb
-        ycBaVlw6F+FMAAR/r2ZW72k=
-X-Google-Smtp-Source: ABdhPJxETFEN/8WlMPuNkHvbtxRztZGO19gU4hV3L9vphwMehRZ1kaaxN3J0F7US+l3D03tFkzyXDA==
-X-Received: by 2002:a17:903:1c7:b0:141:e630:130c with SMTP id e7-20020a17090301c700b00141e630130cmr49457134plh.80.1638858291547;
-        Mon, 06 Dec 2021 22:24:51 -0800 (PST)
-Received: from google.com ([2620:15c:202:201:25b0:d110:b844:ea00])
-        by smtp.gmail.com with ESMTPSA id f3sm14237289pfg.167.2021.12.06.22.24.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Dec 2021 22:24:50 -0800 (PST)
-Date:   Mon, 6 Dec 2021 22:24:47 -0800
-From:   Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+        id S235488AbhLGGbt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Dec 2021 01:31:49 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:57512 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234928AbhLGGbt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Dec 2021 01:31:49 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1muTxD-0000Po-8T; Tue, 07 Dec 2021 17:27:56 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 07 Dec 2021 17:27:55 +1100
+Date:   Tue, 7 Dec 2021 17:27:55 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
 Cc:     Kees Cook <keescook@chromium.org>,
         Geliang Tang <geliangtang@gmail.com>,
         Arnd Bergmann <arnd@arndb.de>, Haren Myneni <haren@us.ibm.com>,
@@ -61,9 +28,8 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-crypto <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH 1/9] crypto: add zbufsize() interface
-Message-ID: <Ya7+L33dFnm0q+jm@google.com>
-References: <CAGXu5j+dPqpJZbO_AuGsNqJzq7XGcB2deXA5RELWv1-Ywi5QOA@mail.gmail.com>
- <20180808025319.32d57wtjpyyapwo5@gondor.apana.org.au>
+Message-ID: <20211207062754.GA12622@gondor.apana.org.au>
+References: <20180808025319.32d57wtjpyyapwo5@gondor.apana.org.au>
  <202112011529.699092F@keescook>
  <20211202015820.GB8138@gondor.apana.org.au>
  <202112011947.7FA0A587C@keescook>
@@ -72,48 +38,30 @@ References: <CAGXu5j+dPqpJZbO_AuGsNqJzq7XGcB2deXA5RELWv1-Ywi5QOA@mail.gmail.com>
  <20211203022821.GA16082@gondor.apana.org.au>
  <YaqC1mkcyzO2WrI/@google.com>
  <20211207052029.GA12141@gondor.apana.org.au>
+ <Ya7+L33dFnm0q+jm@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211207052029.GA12141@gondor.apana.org.au>
+In-Reply-To: <Ya7+L33dFnm0q+jm@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 07, 2021 at 04:20:29PM +1100, Herbert Xu wrote:
-> On Fri, Dec 03, 2021 at 12:49:26PM -0800, Dmitry Torokhov wrote:
-> >
-> > I must be getting lost in terminology, and it feels to me that what is
-> > discussed here is most likely of no interest to a lot of potential
-> > users, especially ones that do compression/decompression. In majority of
-> > cases they want to simply compress or decompress data, and they just
-> > want to do it quickly and with minimal amount of memory consumed. They
-> > do not particularly care if the task is being offloaded or executed on
-> > the main CPU, either on separate thread or on the same thread, so the
-> > discussion about scomp/acomp/etc is of no interest to them. From their
-> > perspective they'd be totally fine with a wrapper that would do:
-> > 
-> > int decompress(...) {
-> > 	prepare_request()
-> > 	send_request()
-> > 	wait_for_request()
-> > }
-> > 
-> > and from their perspective this would be a synchronous API they are
-> > happy with.
-> 
-> You can certainly do that as a Crypto API user.  And we do have
-> some users who do exactly this (for example, testmgr does that
-> when testing async algorithms).  However, this can't be a part of
-> the API itself since many of our users execute in atomic contexts.
+On Mon, Dec 06, 2021 at 10:24:47PM -0800, Dmitry Torokhov wrote:
+>
+> That is what I am confused about: why can't it be a part of API? Users
+> that are running in atomic contexts would not be able to use it, but we
+> have a lot of precedents for it. See for example spi_sync() vs
+> spi_async(). Callers have a choice as to which one to use, based on
+> their needs.
 
-That is what I am confused about: why can't it be a part of API? Users
-that are running in atomic contexts would not be able to use it, but we
-have a lot of precedents for it. See for example spi_sync() vs
-spi_async(). Callers have a choice as to which one to use, based on
-their needs.
+We already have a helper in the form of crypto_wait_req.  If you
+have any suggestions of making this easier to use then I'm more than
+happy to consider them.
 
-Thanks.
-
+Thanks,
 -- 
-Dmitry
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
