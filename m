@@ -2,57 +2,132 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC727C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Dec 2021 12:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42B2C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Dec 2021 13:44:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233727AbhLHMvA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Dec 2021 07:51:00 -0500
-Received: from mail-wm1-f42.google.com ([209.85.128.42]:42799 "EHLO
-        mail-wm1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232041AbhLHMu7 (ORCPT
+        id S234611AbhLHNsI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Dec 2021 08:48:08 -0500
+Received: from mail-oi1-f170.google.com ([209.85.167.170]:37831 "EHLO
+        mail-oi1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234398AbhLHNsH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Dec 2021 07:50:59 -0500
-Received: by mail-wm1-f42.google.com with SMTP id d72-20020a1c1d4b000000b00331140f3dc8so1719703wmd.1
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Dec 2021 04:47:27 -0800 (PST)
+        Wed, 8 Dec 2021 08:48:07 -0500
+Received: by mail-oi1-f170.google.com with SMTP id bj13so4210216oib.4;
+        Wed, 08 Dec 2021 05:44:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=7UZ3PObd9XM9920qAFhusZ6Y6lLkTlnyN+qYLNiW40bwJq9YoReE44ES/R494wF4am
-         zVrQDkJBCkYRlGYvs5wYzrnjLtup7BoBGvz+FosfozQNhAFarPqRj9yOn2CPmvTozGLv
-         kSPAKFwIXeEbo3SBqMitOLZsA6gvFXJseL8o5NGY0kZEgrXX7dYtto1pG7VOOZSmSfIW
-         i6dkcIUezKtKT/TDVgcAO54FJpPmIekn9QQN2bchp9VLZ16g9GoXYEVCgVSwLF0Ehuor
-         bOFDwe9YVVmqXJOQd2x2CkfqmyLJzX1imlUznHlZxKsN7NznG41iYhc4RyJ9NnTI6MyD
-         aElg==
-X-Gm-Message-State: AOAM532ZkT8JAn/godCaOdlFbyDiBIpQTAwZjDmBfgFGCcbCTDluE2IX
-        twqVjRDHuixEQE9hPmukZozqrDvdU4I=
-X-Google-Smtp-Source: ABdhPJwfww/q8VLl+i1g3RiXHzyWhPEY6AxeCyNivu8cc3kwiMTrbgdOyHsTXzeY4+qSw2EfNENq9w==
-X-Received: by 2002:a05:600c:4108:: with SMTP id j8mr15680464wmi.139.1638967647167;
-        Wed, 08 Dec 2021 04:47:27 -0800 (PST)
-Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id r8sm3316380wrz.43.2021.12.08.04.47.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Dec 2021 04:47:26 -0800 (PST)
-Subject: Re: [PATCH 09/12] nvmet: parse fabrics commands on io queues
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
-References: <20211202152358.60116-1-hare@suse.de>
- <20211202152358.60116-10-hare@suse.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <42582bda-2438-309f-ce71-2cddc831deef@grimberg.me>
-Date:   Wed, 8 Dec 2021 14:47:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-MIME-Version: 1.0
-In-Reply-To: <20211202152358.60116-10-hare@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject:date
+         :message-id;
+        bh=AZBxD1twEMvgqXTIpZvt6tYC7fmZq91YhBKnG1gw4/g=;
+        b=Ctio7YKmVOvmIo2alUmlLxrFwZj+5ThytJlAoYT5Eo2vB6Up7mCWUAWVCnSAqL1AoZ
+         kUGHlUiaeCqqeS9NohO8VS8NukDe1VihtmfdtUlB1QWFhJtglT0HmZxTxxt/JcaNsm7Q
+         lEVx6lDOYwfxLq5Mlh3nu4bGh+QPxTQ0JRYAAXSwL5AKWQWxQRxRAOh8D5N00O1ksmph
+         TKWrv+sm79hKOoVTTgEI41xSQqy7ef4vaq+5UrJROGhJRiybacJx0Z4/szbp3zDzvS/m
+         LVYgEtjjKcAWqtuD6QFftT8/nWm1uTf+sIMJR7XRxdL3Bbrp546bqDxwndZq3dy5ek+/
+         RLWA==
+X-Gm-Message-State: AOAM530Dv2Chsg2D8+cKegheS8aOl9Sniucup+UxiPFzPAHAipNcX8sf
+        D5owCTKIxu2mCaglG/wWSA==
+X-Google-Smtp-Source: ABdhPJw4CWIcu/zTZI0dRGziIGXUDpc471o4rTBw285IjDnHYfSE7mTOtDyDKGZQGTPSbpBTZ+LVug==
+X-Received: by 2002:a05:6808:124d:: with SMTP id o13mr11998548oiv.91.1638971074539;
+        Wed, 08 Dec 2021 05:44:34 -0800 (PST)
+Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
+        by smtp.gmail.com with ESMTPSA id n189sm602044oif.33.2021.12.08.05.44.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Dec 2021 05:44:33 -0800 (PST)
+Received: (nullmailer pid 3857736 invoked by uid 1000);
+        Wed, 08 Dec 2021 13:44:28 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     Florian Fainelli <f.fainelli@gmail.com>
+Cc:     Alessandro Zummo <a.zummo@towertech.it>, linux-pwm@vger.kernel.org,
+        linux-mmc@vger.kernel.org, Markus Mayer <mmayer@broadcom.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Ray Jui <rjui@broadcom.com>, Amit Kucheria <amitk@kernel.org>,
+        bcm-kernel-feedback-list@broadcom.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-pm@vger.kernel.org, Doug Berger <opendmb@gmail.com>,
+        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>, Rob Herring <robh+dt@kernel.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>, linux-usb@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-ide@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Scott Branden <sbranden@broadcom.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Al Cooper <alcooperx@gmail.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Gregory Fong <gregory.0xf0@gmail.com>,
+        linux-rtc@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Zhang Rui <rui.zhang@intel.com>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        devicetree@vger.kernel.org
+In-Reply-To: <20211208003727.3596577-14-f.fainelli@gmail.com>
+References: <20211208003727.3596577-1-f.fainelli@gmail.com> <20211208003727.3596577-14-f.fainelli@gmail.com>
+Subject: Re: [PATCH v3 13/15] dt-bindings: ata: Convert Broadcom SATA to YAML
+Date:   Wed, 08 Dec 2021 07:44:28 -0600
+Message-Id: <1638971068.770579.3857735.nullmailer@robh.at.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+On Tue, 07 Dec 2021 16:37:24 -0800, Florian Fainelli wrote:
+> Convert the Broadcom SATA3 AHCI controller Device Tree binding to YAML
+> to help with validation.
+> 
+> Acked-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> ---
+>  .../bindings/ata/brcm,sata-brcm.txt           | 45 ---------
+>  .../bindings/ata/brcm,sata-brcm.yaml          | 98 +++++++++++++++++++
+>  2 files changed, 98 insertions(+), 45 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/ata/brcm,sata-brcm.txt
+>  create mode 100644 Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml
+> 
+
+Running 'make dtbs_check' with the schema in this patch gives the
+following warnings. Consider if they are expected or the schema is
+incorrect. These may not be new warnings.
+
+Note that it is not yet a requirement to have 0 warnings for dtbs_check.
+This will change in the future.
+
+Full log is available here: https://patchwork.ozlabs.org/patch/1565011
+
+
+ahci@41000: $nodename:0: 'ahci@41000' does not match '^sata(@.*)?$'
+	arch/arm/boot/dts/bcm958522er.dt.yaml
+	arch/arm/boot/dts/bcm958525er.dt.yaml
+	arch/arm/boot/dts/bcm958525xmc.dt.yaml
+	arch/arm/boot/dts/bcm958622hr.dt.yaml
+	arch/arm/boot/dts/bcm958623hr.dt.yaml
+	arch/arm/boot/dts/bcm958625hr.dt.yaml
+	arch/arm/boot/dts/bcm958625k.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx64-a0.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx64.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx64w-a0.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx64w.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx65.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx65w.dt.yaml
+	arch/arm/boot/dts/bcm988312hr.dt.yaml
+
+ahci@41000: Unevaluated properties are not allowed ('#address-cells', '#size-cells', 'sata-port@0', 'sata-port@1' were unexpected)
+	arch/arm/boot/dts/bcm958522er.dt.yaml
+	arch/arm/boot/dts/bcm958525er.dt.yaml
+	arch/arm/boot/dts/bcm958525xmc.dt.yaml
+	arch/arm/boot/dts/bcm958622hr.dt.yaml
+	arch/arm/boot/dts/bcm958623hr.dt.yaml
+	arch/arm/boot/dts/bcm958625hr.dt.yaml
+	arch/arm/boot/dts/bcm958625k.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx64-a0.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx64.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx64w-a0.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx64w.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx65.dt.yaml
+	arch/arm/boot/dts/bcm958625-meraki-mx65w.dt.yaml
+	arch/arm/boot/dts/bcm988312hr.dt.yaml
+
