@@ -2,126 +2,201 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B4FC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Dec 2021 17:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDFF3C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Dec 2021 20:17:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235145AbhLHRhP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Dec 2021 12:37:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56834 "EHLO
+        id S240139AbhLHUVM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Dec 2021 15:21:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237956AbhLHRhO (ORCPT
+        with ESMTP id S232356AbhLHUVL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Dec 2021 12:37:14 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42AEDC0617A2;
-        Wed,  8 Dec 2021 09:33:42 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id np3so2409224pjb.4;
-        Wed, 08 Dec 2021 09:33:42 -0800 (PST)
+        Wed, 8 Dec 2021 15:21:11 -0500
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5926FC061746;
+        Wed,  8 Dec 2021 12:17:39 -0800 (PST)
+Received: by mail-io1-xd35.google.com with SMTP id k21so4168297ioh.4;
+        Wed, 08 Dec 2021 12:17:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=j51/wboThEFJzNlTL2/MvStE5Zhc5RgdP9nJ3GHQLi4=;
-        b=SbSD6mZJ015HeEhL/uBJxeceiYhXjXXX8O35V590Ke94L+Ypdy2WwxDQgcz/dz+vI1
-         9iApRbSY2daO38A2/c4VBdCm5/hoAefgOIeLm7P1O52CMdhCW27CIQQo7jkS6qbbrUPO
-         3WKj6PRExiHs43Nuk8VacP7HVUjibVx1bhNJbIiCWvhO4QqWIEn592JcsURU3789agcG
-         ncOxe6HUt2my0cYlDUL8RcSTK9JgX7BPA1pZ7AH8yULqG5uz/ZBHDwvocVsgM8St6ejv
-         1/1FST6raHCiQCFH3cNSEMmx22jHFteyEfVTMXXiJo2nr++5nPj6rqfaXIrTBjcOd4vi
-         jvTw==
+        h=date:from:to:cc:message-id:in-reply-to:references:subject
+         :mime-version:content-transfer-encoding;
+        bh=1IlLvcNlcDJQez/IYxBKSedQgBs5DpWYIT3HtbvTn/U=;
+        b=mxu9JbEUJ+Pjv54HKBrBNHCLKoxNi0tfhUxC9wBtrfqdivylb7RF073IwuKy4vKc6a
+         La57De5dW5zpWkdPm77QS3HGKDsnlb0K9tVABG/t5ror6rlmYWyP1/zrpOXjESXbMvfW
+         8VZcfRGFaLDdCprXzio+VpHAlyxBjAU6zqdGRRz1dBUpWPRn8guxgb0FCSB6i3BBXyXS
+         dGiII+VlcYuUSlQQXM8dLHK0RQfbQKB9k+AmemZfXK97wtSTyhWphOXNbi4I6pXkgJUz
+         QqeEneIb9ebTAI7vBmmNOdvMBRrzGUy89dTFX3ykspqEEv4rPLGDRvzJLAwBx0b2Oe56
+         xugw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=j51/wboThEFJzNlTL2/MvStE5Zhc5RgdP9nJ3GHQLi4=;
-        b=2r2ZvMPjWwNnf4Uog3b8BzKL7PsJVAYqvAKUuh6M7dFIo79wT3R+a2XzPFsf4/YBX3
-         gcgsUxl5CIg5fZsESW6futNxVGEN5BrqPZZaN0tHg2VJqAUYuFQuG6+geP/drKtvOwEG
-         wD0FNIdYS2/4NxkO52kyD/QkSMHPkJv3AyGZW9YGLIJ6u0iw5K3OV0fD5F426SuGiXXN
-         80FJQFpxe2VTplfG42OVMyuFvxPnQFTYHWScymghZucYE7ACEN4aQuRH1oqVtxzAleVW
-         urQj5LyEiExxVdiyzNvvQavF3jI6VPlYoTLYiZQ+vVmNdDlXLV1OtRdQ2nu76Fv4kkRP
-         z9qQ==
-X-Gm-Message-State: AOAM530AfHmYwKR5Y/NbxYHgSnWiLWJV8pog4ejg+wA+452uS5wpDKDX
-        AFOLdm10Rps3an3MNx6fkGlpHLhRF9U=
-X-Google-Smtp-Source: ABdhPJyY3AKgLSvRqD8BVr8X+ATPHvvEnFQBIBZfXeEJiyOz1hIwOAXlFSUT2pXiD/r3MLJpe5zcrA==
-X-Received: by 2002:a17:90a:e012:: with SMTP id u18mr8961529pjy.103.1638984821458;
-        Wed, 08 Dec 2021 09:33:41 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id n31sm3801031pfv.176.2021.12.08.09.33.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Dec 2021 09:33:40 -0800 (PST)
-Subject: Re: [PATCH v3 13/15] dt-bindings: ata: Convert Broadcom SATA to YAML
-To:     Rob Herring <robh@kernel.org>,
-        Florian Fainelli <f.fainelli@gmail.com>
-Cc:     Alessandro Zummo <a.zummo@towertech.it>, linux-pwm@vger.kernel.org,
-        linux-mmc@vger.kernel.org, Markus Mayer <mmayer@broadcom.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Ray Jui <rjui@broadcom.com>, Amit Kucheria <amitk@kernel.org>,
-        bcm-kernel-feedback-list@broadcom.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-pm@vger.kernel.org, Doug Berger <opendmb@gmail.com>,
-        =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
-        Rob Herring <robh+dt@kernel.org>,
-        Lee Jones <lee.jones@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>, linux-usb@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        linux-ide@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Scott Branden <sbranden@broadcom.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Al Cooper <alcooperx@gmail.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Gregory Fong <gregory.0xf0@gmail.com>,
-        linux-rtc@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Zhang Rui <rui.zhang@intel.com>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        devicetree@vger.kernel.org
-References: <20211208003727.3596577-1-f.fainelli@gmail.com>
- <20211208003727.3596577-14-f.fainelli@gmail.com>
- <1638971068.770579.3857735.nullmailer@robh.at.kernel.org>
-From:   Florian Fainelli <f.fainelli@gmail.com>
-Message-ID: <dd170216-fedd-45a1-a3a5-efc99b9f6197@gmail.com>
-Date:   Wed, 8 Dec 2021 09:33:38 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-MIME-Version: 1.0
-In-Reply-To: <1638971068.770579.3857735.nullmailer@robh.at.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:from:to:cc:message-id:in-reply-to
+         :references:subject:mime-version:content-transfer-encoding;
+        bh=1IlLvcNlcDJQez/IYxBKSedQgBs5DpWYIT3HtbvTn/U=;
+        b=uU9474+YyR24P+HB1JzzYBjzH0Gvjc3zfwoE7jVArsSRcO3D6AUOI8OJF+GKjnoA36
+         OI9h+LKqD33LPRC/Lj/egRP0nIrQ0zInQeopuJ8orzTCAUyimd8gKSHbNfO9ge0A2Nlw
+         1vQzf45+Mk0is9adj3LbQ/Ksux2X8q3whGDCoDHT6U2Oxqe3Fi+3Vw+o8UokfcAKjywR
+         uRUNZqlliH+Og2xemxwMQ1wapNFuV7e2ICn8pg6Zsma0l1PKJi7BhQcMlWY/D5LvjStx
+         aWF7l19DqB3qAr83W64fEHg1G8vFUFEW/AMzhYmg+ILBmLJrvIJbnpkSJtyN4bjdSC/l
+         96gQ==
+X-Gm-Message-State: AOAM5312j99kVRikZEbL30cM5VPp2y0tVEtYXCwkdLBCQGQNuNwbtFFn
+        WTBJpGgizqS8CHoyvrRiLt0zBVaxJLe1Xw==
+X-Google-Smtp-Source: ABdhPJzlpDudPI4/6dCizKa+bIRsa8n3xcxcMKehFOVquxdBUnIHqkdhpAk7z23teoRMpoYw7Un1sA==
+X-Received: by 2002:a05:6638:24ca:: with SMTP id y10mr2280676jat.109.1638994658649;
+        Wed, 08 Dec 2021 12:17:38 -0800 (PST)
+Received: from localhost ([172.243.151.11])
+        by smtp.gmail.com with ESMTPSA id q4sm2585797ilj.7.2021.12.08.12.17.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Dec 2021 12:17:37 -0800 (PST)
+Date:   Wed, 08 Dec 2021 12:17:30 -0800
+From:   John Fastabend <john.fastabend@gmail.com>
+To:     Luca Boccassi <bluca@debian.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        Matteo Croce <mcroce@linux.microsoft.com>
+Cc:     bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        keyrings@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Lorenzo Bianconi <lorenzo@kernel.org>
+Message-ID: <61b112daa1b84_94d5c208c7@john.notmuch>
+In-Reply-To: <f63bef1a56b12a06ed980f9b5e094f84f2434333.camel@debian.org>
+References: <20211203191844.69709-1-mcroce@linux.microsoft.com>
+ <CAADnVQLDEPxOvGn8CxwcG7phy26BKuOqpSQ5j7yZhZeEVoCC4w@mail.gmail.com>
+ <CAFnufp1_p8XCUf-RdHpByKnR9MfXQoDWw6Pvm_dtuH4nD6dZnQ@mail.gmail.com>
+ <CAADnVQ+DSGoF2YoTrp2kTLoFBNAgdU8KbcCupicrVGCWvdxZ7w@mail.gmail.com>
+ <86e70da74cb34b59c53b1e5e4d94375c1ef30aa1.camel@debian.org>
+ <CAADnVQLCmbUJD29y2ovD+SV93r8jon2-f+fJzJFp6qZOUTWA4w@mail.gmail.com>
+ <CAFnufp2S7fPt7CKSjH+MBBvvFu9F9Yop_RAkX_3ZtgtZhRqrHw@mail.gmail.com>
+ <CAADnVQ+WLGiQvaoTPwu_oRj54h4oMwh-z5RV0WAMFRA9Wco_iA@mail.gmail.com>
+ <61aae2da8c7b0_68de0208dd@john.notmuch>
+ <0079fd757676e62f45f28510a5fd13a9996870be.camel@debian.org>
+ <61ae75487d445_c5bd20827@john.notmuch>
+ <7ae146389b58f521166e9569be6c64f87359777a.camel@debian.org>
+ <f63bef1a56b12a06ed980f9b5e094f84f2434333.camel@debian.org>
+Subject: Re: [PATCH bpf-next 0/3] bpf: add signature
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 12/8/21 5:44 AM, Rob Herring wrote:
-> On Tue, 07 Dec 2021 16:37:24 -0800, Florian Fainelli wrote:
->> Convert the Broadcom SATA3 AHCI controller Device Tree binding to YAML
->> to help with validation.
->>
->> Acked-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
->> ---
->>  .../bindings/ata/brcm,sata-brcm.txt           | 45 ---------
->>  .../bindings/ata/brcm,sata-brcm.yaml          | 98 +++++++++++++++++++
->>  2 files changed, 98 insertions(+), 45 deletions(-)
->>  delete mode 100644 Documentation/devicetree/bindings/ata/brcm,sata-brcm.txt
->>  create mode 100644 Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml
->>
-> 
-> Running 'make dtbs_check' with the schema in this patch gives the
-> following warnings. Consider if they are expected or the schema is
-> incorrect. These may not be new warnings.
-> 
-> Note that it is not yet a requirement to have 0 warnings for dtbs_check.
-> This will change in the future.
-> 
-> Full log is available here: https://patchwork.ozlabs.org/patch/1565011
+[...]
 
-Likewise, those indicate that the preceding patch which renames the sata
-controller unit name has not been applied.
--- 
-Florian
+> > > > Hope this makes sense. Thanks!
+> > > =
+
+> > > I think I understand your use case. When done as BPF helper you
+> > > can get the behavior you want with a one line BPF program
+> > > loaded at boot.
+> > > =
+
+> > > int verify_all(struct bpf_prog **prog) {
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return verify_signa=
+ture(prog->insn,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0prog->len * sizeof(struct=
+ bpf_insn),
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 signature, KEYRING, BPF_SIGTYP=
+E);
+> > > }
+> > > =
+
+> > > And I can write some more specific things as,
+> > > =
+
+> > > int verify_blobs(void data) {
+> > > =C2=A0 int reject =3D verify_signature(data, data_len, sig, KEYRING=
+, TYPE);
+> > > =C2=A0 struct policy_key *key =3D map_get_key();
+> > > =
+
+> > > =C2=A0 return policy(key, reject);=C2=A0 =
+
+> > > }
+> > > =
+
+> > > map_get_key() looks into some datastor with the policy likely using=
+
+> > > 'current' to dig something up. It doesn't just apply to BPF progs
+> > > we can use it on other executables more generally. And I get more
+> > > interesting use cases like, allowing 'tc' programs unsigned, but
+> > > requiring kernel memory reads to require signatures or any N
+> > > other policies that may have value. Or only allowing my dbg user
+> > > to run read-only programs, because the dbg maybe shouldn't ever
+> > > be writing into packets, etc. Driving least privilege use cases
+> > > in fine detail.
+> > > =
+
+> > > By making it a BPF program we side step the debate where the kernel=
+
+> > > tries to get the 'right' policy for you, me, everyone now and in
+> > > the future. The only way I can see to do this without getting N
+> > > policies baked into the kernel and at M different hook points is vi=
+a
+> > > a BPF helper.
+> > > =
+
+> > > Thanks,
+> > > John
+> > =
+
+> > Now this sounds like something that could work - we can prove that th=
+is
+> > could be loaded before any writable fs comes up anywhere, so in
+> > principle I think it would be acceptable and free of races. Matteo, w=
+e
+> > should talk about this tomorrow.
+> > And this requires some infrastructure work right? Is there a WIP git
+> > tree somewhere that we can test out?
+> > =
+
+> > Thank you!
+> =
+
+
+I don't have a WIP tree, but I believe it should be fairly easy.
+First I would add a wrapper BPF helper for verify_signature() so
+we can call it from fentry/freturn context. That can be done on
+its own IMO as its a generally useful operation.
+
+Then I would stub a hook point into the BPF load path. The exact
+place to put this is going to have some debate I think, but I
+would place it immediately after the check_bpf call.
+
+With above two you have enough to do sig verification iiuc.
+
+Early boot loading I would have to check its current status. But I know
+folks have been working on it. Maybe its done?
+
+> One question more question: with the signature + kconfig approach,
+> nothing can disable the signature check. But if the signature checker
+> is itself a bpf program, is there/can there be anything stopping root
+> from unloading it?
+
+Interesting. Not that I'm aware of. Currently something with sufficient
+privileges could unload the program. Maybe we should have a flag so
+early boot programs can signal they shouldn't be unloaded ever. I would
+be OK with this and also seems generally useful. I have a case where
+I want to always set the socket cookie and we leave it running all the
+time. It would be nice if it came up and was pinned at boot.
+
+Maybe slightly better than a flag would be to have a new CAP support
+that only early boot has like CAP_BPF_EARLY. From my point of view
+this both seems doable with just some smallish changes on BPF side.
+
+Thanks,
+John=
