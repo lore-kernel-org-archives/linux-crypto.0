@@ -2,50 +2,50 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27767C43217
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Dec 2021 09:04:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FC4C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Dec 2021 09:04:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235869AbhLIJIQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S235950AbhLIJIQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 9 Dec 2021 04:08:16 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:35508 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235850AbhLIJIJ (ORCPT
+Received: from smtp-out1.suse.de ([195.135.220.28]:55028 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235759AbhLIJIG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Dec 2021 04:08:09 -0500
+        Thu, 9 Dec 2021 04:08:06 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 730391FCA3;
-        Thu,  9 Dec 2021 09:04:35 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id AF351210FE;
+        Thu,  9 Dec 2021 09:04:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1639040675; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1639040671; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=x6QSOoe8b2Utj1fyJL8EvfziEtfvl02NwsqW2WnBE7s=;
-        b=P5ZXBcfr/ktGwYpHMeTrou2ScF+P+x7pj510o4qAst0nHYFzSJ//p9nGeSsscWD/swMWWw
-        JrL9Oa3YN86AmWLFsPtkL1w/bHM26x/0vAojGckki8FKWX6a5GcsqAPI8WHMoTSNjJiHqs
-        Or0QKw2WrSMlHiNiDuGW/SUElTQL1fY=
+        bh=1S8Kd+vBb14mUMdF3f8a+NXZImSG3nDtoXeQ5pX4P50=;
+        b=x0G5RYQiaN78yFKFby5FrEL+NzEFHC4uWrMNgEGiTA7i06ggtwXY095L26Thw7YIFHNELt
+        v/x+62RSNCUR77UuZfQ9Cl/izc13JqmY3uyHhnmyeDX+vN1R51MSJA/vXBq3i0ja3G1YNM
+        AbMCZMIkvuke+6Sfay9DRnbu01lKVSM=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1639040675;
+        s=susede2_ed25519; t=1639040671;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=x6QSOoe8b2Utj1fyJL8EvfziEtfvl02NwsqW2WnBE7s=;
-        b=scaSsNK6FanjWT1V8GbQYOUvfVaf9OEti8fHGL/kRGTDr7mrMg1LBAhGxLlbTCZHazxB6H
-        M/PWt4JAfusZ7cAQ==
+        bh=1S8Kd+vBb14mUMdF3f8a+NXZImSG3nDtoXeQ5pX4P50=;
+        b=qa7nvJs1/KMnQTkpC99ZhkpWPDPFNlq+nlen3sWrWrQRiV2yvV7w/fqHM3t8dswjtgOGBO
+        xHEy3ZxJoMaOYrAQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5307C13A86;
-        Thu,  9 Dec 2021 09:04:35 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 97AB113A86;
+        Thu,  9 Dec 2021 09:04:31 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id YErIEqPGsWHWaQAAMHmgww
-        (envelope-from <nstange@suse.de>); Thu, 09 Dec 2021 09:04:35 +0000
+        id FdIYI5/GsWHGaQAAMHmgww
+        (envelope-from <nstange@suse.de>); Thu, 09 Dec 2021 09:04:31 +0000
 From:   Nicolai Stange <nstange@suse.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
@@ -58,9 +58,9 @@ Cc:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         qat-linux@intel.com, keyrings@vger.kernel.org,
         Nicolai Stange <nstange@suse.de>
-Subject: [PATCH v2 15/18] crypto: dh - store group id in dh-generic's dh_ctx
-Date:   Thu,  9 Dec 2021 10:03:55 +0100
-Message-Id: <20211209090358.28231-16-nstange@suse.de>
+Subject: [PATCH v2 12/18] crypto: dh - introduce support for ephemeral key generation to qat driver
+Date:   Thu,  9 Dec 2021 10:03:52 +0100
+Message-Id: <20211209090358.28231-13-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20211209090358.28231-1-nstange@suse.de>
 References: <20211209090358.28231-1-nstange@suse.de>
@@ -70,41 +70,42 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A subsequent patch will make the crypto/dh's dh_is_pubkey_valid() to
-calculate the Q value from the P domain parameter for safe-prime groups,
-for which by definition Q = (P - 1)/2. However, dh_is_pubkey_valid() will
-need to check first whether the group in question is actually a safe-prime
-group. In order to make this information available, introduce a new
-->group_id member to struct dh_ctx and let dh_set_params() set it to the
-value found in the struct dh as deserialized via crypto_dh_decode_key().
+A previous patch made the dh-generic implementation's ->set_secret() to
+generate an ephemeral key in case the input ->key_size is zero, just in
+analogy with ecdh. Make the qat crypto driver's DH implementation to
+behave consistently by doing the same.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- crypto/dh.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/crypto/qat/qat_common/qat_asym_algs.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/crypto/dh.c b/crypto/dh.c
-index 2e49b114e038..38547c5301da 100644
---- a/crypto/dh.c
-+++ b/crypto/dh.c
-@@ -13,6 +13,7 @@
- #include <linux/mpi.h>
+diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+index b0b78445418b..e0d3a70fa6b1 100644
+--- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+@@ -441,11 +441,20 @@ static int qat_dh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ 	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
+ 	struct device *dev = &GET_DEV(ctx->inst->accel_dev);
+ 	struct dh params;
++	char key[CRYPTO_DH_MAX_PRIVKEY_SIZE];
+ 	int ret;
  
- struct dh_ctx {
-+	enum dh_group_id group_id;
- 	MPI p;	/* Value is guaranteed to be set. */
- 	MPI q;	/* Value is optional. */
- 	MPI g;	/* Value is guaranteed to be set. */
-@@ -55,6 +56,8 @@ static int dh_set_params(struct dh_ctx *ctx, struct dh *params)
- 	if (dh_check_params_length(params->p_size << 3))
+ 	if (crypto_dh_decode_key(buf, len, &params) < 0)
  		return -EINVAL;
  
-+	ctx->group_id = params->group_id;
++	if (!params.key_size) {
++		ret = crypto_dh_gen_privkey(params.group_id, key,
++					    &params.key_size);
++		if (ret)
++			return ret;
++		params.key = key;
++	}
 +
- 	ctx->p = mpi_read_raw_data(params->p, params->p_size);
- 	if (!ctx->p)
- 		return -EINVAL;
+ 	/* Free old secret if any */
+ 	qat_dh_clear_ctx(dev, ctx);
+ 
 -- 
 2.26.2
 
