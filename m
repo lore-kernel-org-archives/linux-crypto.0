@@ -2,50 +2,50 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 538A7C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Dec 2021 09:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F91C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Dec 2021 09:04:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235970AbhLIJIR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Dec 2021 04:08:17 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:55054 "EHLO
+        id S236024AbhLIJIW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Dec 2021 04:08:22 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:55146 "EHLO
         smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235856AbhLIJIK (ORCPT
+        with ESMTP id S235926AbhLIJIN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Dec 2021 04:08:10 -0500
+        Thu, 9 Dec 2021 04:08:13 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B8C70210FB;
-        Thu,  9 Dec 2021 09:04:36 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 61AB3210FE;
+        Thu,  9 Dec 2021 09:04:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1639040676; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1639040679; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6YCiKQTqTEzYZ4U5yX9xPy3LwehSL+ohGfws/puUkEI=;
-        b=ryy2GNXwod8zc+BRyOl66smMq/EMaQKLaBdeDLMDqMXJBzeBrOj9yn/VVRJYxi3wXwhld2
-        saLcq4uXlKK9kxmeSdLDmhsCcGLpu58VgFeRZlXToDbslgVxTsLpeUTSYBAdAAI97moCFV
-        YicKKFp8b+adwHXpvD5YQoGNojJIOgA=
+        bh=IZg49RUjlaBwZL0UoVGR8SYMJcE8TonIRswbttkRw2E=;
+        b=RRZhP2J6dua1jRMtMp6ydy3jEhRspnqkqwGPbRrJM0SxKrLW9hMRsc3ia0QdSXtqoQwGXj
+        LIQUmPq10w1sFzBBrwyX4oolOB3JRm8FesENCKdiUu3UsVER+kwoWVl4ra3Lddu9Je2Ijb
+        NgUrs98oxpWkD/SbTzwRy//UaPQk/aI=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1639040676;
+        s=susede2_ed25519; t=1639040679;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6YCiKQTqTEzYZ4U5yX9xPy3LwehSL+ohGfws/puUkEI=;
-        b=BR+ms+WHneypz9Uz+ak03bG3mT99PqX7YxQzA7t8fjVilcVs53DDQzDLbBBgnnk/+B1MHT
-        Gv8OUWhQWnColhDQ==
+        bh=IZg49RUjlaBwZL0UoVGR8SYMJcE8TonIRswbttkRw2E=;
+        b=je+5tUoMH3n8h8gMosRvTcdMGNowsbXtut81A9rixQs2QI/yx+JHAmVgOrASBIMEuwJtXH
+        Yzs8UmKuO/3/VMAw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9F87513A86;
-        Thu,  9 Dec 2021 09:04:36 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4CB7913A86;
+        Thu,  9 Dec 2021 09:04:39 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id AisdJaTGsWHeaQAAMHmgww
-        (envelope-from <nstange@suse.de>); Thu, 09 Dec 2021 09:04:36 +0000
+        id jjpCEafGsWHwaQAAMHmgww
+        (envelope-from <nstange@suse.de>); Thu, 09 Dec 2021 09:04:39 +0000
 From:   Nicolai Stange <nstange@suse.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
@@ -58,9 +58,9 @@ Cc:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         qat-linux@intel.com, keyrings@vger.kernel.org,
         Nicolai Stange <nstange@suse.de>
-Subject: [PATCH v2 16/18] crypto: dh - calculate Q from P for the full public key verification
-Date:   Thu,  9 Dec 2021 10:03:56 +0100
-Message-Id: <20211209090358.28231-17-nstange@suse.de>
+Subject: [PATCH v2 18/18] crypto: dh - accept only approved safe-prime groups in FIPS mode
+Date:   Thu,  9 Dec 2021 10:03:58 +0100
+Message-Id: <20211209090358.28231-19-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20211209090358.28231-1-nstange@suse.de>
 References: <20211209090358.28231-1-nstange@suse.de>
@@ -70,106 +70,74 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As the ->q in struct dh_ctx gets never set anywhere, the code
-in dh_is_pubkey_valid() for doing the full public key validation in
-accordance to SP800-56Arev3 is effectively dead.
+SP800-56Arev3, sec. 5.5.2 ("Assurance of Domain-Parameter Validity")
+asserts that an implementation needs to verify domain paramtere validity,
+which boils down to either
+- the domain parameters corresponding to some known safe-prime group
+  explicitly listed to be approved in the document or
+- for parameters conforming to a "FIPS 186-type parameter-size set",
+  that the implementation needs to perform an explicit domain parameter
+  verification, which would require access to the "seed" and "counter"
+  values used in their generation.
 
-However, for safe-prime groups, Q = (P - 1)/2 by definition and this
-enables dh_is_pubkey_valid() to calculate Q on the fly for these groups.
-Implement this.
+The latter is not easily feasible and moreover, SP800-56Arev3 states that
+safe-prime groups are preferred and that FIPS 186-type parameter sets
+should only be supported for backward compatibility, if it all.
 
-With this change, the last code accessing struct dh_ctx's ->q is now gone.
-Remove this member from struct dh_ctx.
+Make the dh implementations reject any domain parameters which don't
+correspond to any of the approved safe-prime groups in FIPS mode. The
+approved safe-prime groups are the ones specified in RFC 7919 and RFC 3526,
+and given that all possible values of enum dh_group_id correspond to
+either groups from these RFCs or to DH_GROUP_ID_UNKNOWN, it suffices to
+make crypto_dh_decode_key() to reject any parameter set where
+->group_id == DH_GROUP_ID_UNKNOWN.
+
+As this change will effectively render the dh implementation unusable in
+FIPS mode if neither of the CRYPTO_DH_GROUPS_RFC7919 or
+CRYPTO_DH_GROUPS_RFC3526 Kconfig options enabled, make CRYPTO_DH imply
+these two if CRYPTO_FIPS is set.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- crypto/dh.c | 40 +++++++++++++++++++++++++++++-----------
- 1 file changed, 29 insertions(+), 11 deletions(-)
+ crypto/Kconfig     | 2 ++
+ crypto/dh_helper.c | 4 ++++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/crypto/dh.c b/crypto/dh.c
-index 38547c5301da..bd3ea51fbeb0 100644
---- a/crypto/dh.c
-+++ b/crypto/dh.c
-@@ -15,7 +15,6 @@
- struct dh_ctx {
- 	enum dh_group_id group_id;
- 	MPI p;	/* Value is guaranteed to be set. */
--	MPI q;	/* Value is optional. */
- 	MPI g;	/* Value is guaranteed to be set. */
- 	MPI xa;	/* Value is guaranteed to be set. */
- };
-@@ -23,7 +22,6 @@ struct dh_ctx {
- static void dh_clear_ctx(struct dh_ctx *ctx)
- {
- 	mpi_free(ctx->p);
--	mpi_free(ctx->q);
- 	mpi_free(ctx->g);
- 	mpi_free(ctx->xa);
- 	memset(ctx, 0, sizeof(*ctx));
-@@ -114,11 +112,12 @@ static int dh_set_secret(struct crypto_kpp *tfm, const void *buf,
- /*
-  * SP800-56A public key verification:
-  *
-- * * If Q is provided as part of the domain paramenters, a full validation
-- *   according to SP800-56A section 5.6.2.3.1 is performed.
-+ * * For safe-prime groups, Q can be computed trivially from P and a
-+ *   full validation according to SP800-56A section 5.6.2.3.1 is
-+ *   performed.
-  *
-- * * If Q is not provided, a partial validation according to SP800-56A section
-- *   5.6.2.3.2 is performed.
-+ * * For all other sets of group parameters, only a partial validation
-+ *   according to SP800-56A section 5.6.2.3.2 is performed.
-  */
- static int dh_is_pubkey_valid(struct dh_ctx *ctx, MPI y)
- {
-@@ -129,21 +128,40 @@ static int dh_is_pubkey_valid(struct dh_ctx *ctx, MPI y)
- 	 * Step 1: Verify that 2 <= y <= p - 2.
- 	 *
- 	 * The upper limit check is actually y < p instead of y < p - 1
--	 * as the mpi_sub_ui function is yet missing.
-+	 * in order to save one mpi_sub_ui() invocation here. Note that
-+	 * p - 1 is the non-trivial element of the subgroup of order 2 and
-+	 * thus, the check on y^q below would fail if y == p - 1.
- 	 */
- 	if (mpi_cmp_ui(y, 1) < 1 || mpi_cmp(y, ctx->p) >= 0)
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 578711b02bb3..571f2271ad2e 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -229,6 +229,8 @@ menuconfig CRYPTO_DH
+ 	select CRYPTO_KPP
+ 	select MPILIB
+ 	select CRYPTO_RNG_DEFAULT
++	imply CRYPTO_DH_GROUPS_RFC7919 if CRYPTO_FIPS
++	imply CRYPTO_DH_GROUPS_RFC3526 if CRYPTO_FIPS
+ 	help
+ 	  Generic implementation of the Diffie-Hellman algorithm.
+ 
+diff --git a/crypto/dh_helper.c b/crypto/dh_helper.c
+index b8a726b610a2..fafaf3c30bb1 100644
+--- a/crypto/dh_helper.c
++++ b/crypto/dh_helper.c
+@@ -7,6 +7,7 @@
+ #include <linux/export.h>
+ #include <linux/err.h>
+ #include <linux/string.h>
++#include <linux/fips.h>
+ #include <crypto/dh.h>
+ #include <crypto/kpp.h>
+ #include <crypto/rng.h>
+@@ -624,6 +625,9 @@ int crypto_dh_decode_key(const char *buf, unsigned int len, struct dh *params)
+ 	    params->g_size > params->p_size)
  		return -EINVAL;
  
--	/* Step 2: Verify that 1 = y^q mod p */
--	if (ctx->q) {
--		MPI val = mpi_alloc(0);
-+	/*
-+	 * Step 2: Verify that 1 = y^q mod p
-+	 *
-+	 * For the safe-prime groups q = (p - 1)/2.
-+	 */
-+	if (ctx->group_id != DH_GROUP_ID_UNKNOWN) {
-+		MPI val, q;
- 		int ret;
++	/* Only safe-prime groups are allowed in FIPS mode. */
++	if (fips_enabled && params->group_id == DH_GROUP_ID_UNKNOWN)
++		return -EINVAL;
  
-+		val = mpi_alloc(0);
- 		if (!val)
- 			return -ENOMEM;
- 
--		ret = mpi_powm(val, y, ctx->q, ctx->p);
-+		q = mpi_alloc(mpi_get_nlimbs(ctx->p));
-+		if (!q) {
-+			mpi_free(val);
-+			return -ENOMEM;
-+		}
-+
-+		/*
-+		 * ->p is odd, so no need to explicitly subtract one
-+		 * from it before shifting to the right.
-+		 */
-+		mpi_rshift(q, ctx->p, 1);
- 
-+		ret = mpi_powm(val, y, q, ctx->p);
-+		mpi_free(q);
- 		if (ret) {
- 			mpi_free(val);
- 			return ret;
+ 	return 0;
+ }
 -- 
 2.26.2
 
