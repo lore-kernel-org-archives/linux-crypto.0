@@ -2,225 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76DB1C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Dec 2021 14:30:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5843DC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Dec 2021 15:23:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234631AbhLJOdp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Dec 2021 09:33:45 -0500
-Received: from mga03.intel.com ([134.134.136.65]:51293 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234805AbhLJOdp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Dec 2021 09:33:45 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10193"; a="238296854"
-X-IronPort-AV: E=Sophos;i="5.88,195,1635231600"; 
-   d="scan'208";a="238296854"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2021 06:30:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,195,1635231600"; 
-   d="scan'208";a="463680787"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga006.jf.intel.com with ESMTP; 10 Dec 2021 06:30:07 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-        id 1B29E329; Fri, 10 Dec 2021 16:30:14 +0200 (EET)
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH v1 1/1] crypto: Replace kernel.h with the necessary inclusions
-Date:   Fri, 10 Dec 2021 16:30:09 +0200
-Message-Id: <20211210143009.4770-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.33.0
+        id S242831AbhLJP0y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Dec 2021 10:26:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40418 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239300AbhLJP0x (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Dec 2021 10:26:53 -0500
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4B86C0617A1
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Dec 2021 07:23:18 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id x10so13707608edd.5
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Dec 2021 07:23:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CaWHeGP0DuwfkbKXUdYIJmX8F+biVrGWME72+JdzhqU=;
+        b=MgLv3YrA9NlwpapqjGWsPaT057Lv4NTkMge5x9aYIzLu/EWTNZl9PQJ3i9HcLMOx6B
+         B9IguP3K+gzGh6KfKbYSO8oxGj7MjYa00frl0BCd7lnk7OkZoOhbnGk36UU3KzWuB3In
+         ZXMjkVs8K5nE10yvrBZiB/8HDzocgX7Too6WWjeeDpdcoaRlxj/sgAghwl/0IvTuGbeh
+         fAFYqtmGZZZiSOSvOT+oAtgE4HrF1eec+d4mRi7xCG+BmEL2kk0ZRTS2b7waN3H1I0k/
+         3ly7VwemPgrnfSjfL1C507DwBcuWSj3OL9qXJWKAX4/7OLRZbrfLo/DTY1QGnfnvK/nI
+         rVzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CaWHeGP0DuwfkbKXUdYIJmX8F+biVrGWME72+JdzhqU=;
+        b=pt22xUaBUJiMPnt1s5iPUHkX5b6CSXJcDzW2l88mG5bs9olq9GaDugCzNj5nBY+SLW
+         O5dotdLPQ4WRPPMPgVpdKYDlv/bnkqqlb/axGvowYszd9+mfj3XtuO44ufr/rIxDXL0o
+         SluYq7oWu+8siGv7kkUJgDKEOBiZszVzq52y/9n5n73Ya2lDdArDfQ3fJCnCajf6GXmN
+         39qNWIksBi8BmxuGMGFdtuI2GRzt6fBgXh//noyXhkEzm1HnqbIov4E+4lh3/gUm4gcf
+         LX0lFTNi4ioX/7hDOR6vWhBJ/lXl6Ot7PfcDha7uXwclKJY3ry5wHJjV5r75pka9Fybw
+         HcgQ==
+X-Gm-Message-State: AOAM532QyiDjjryNoCfTVQ2GoXJouJJ+rgFMNJuGXM2qONIx+i9aSd7b
+        WNThX+qHmBE0aaZOSwNCAepr3bzwAMAh8WzAv9pMnQ==
+X-Google-Smtp-Source: ABdhPJzwyJoQo5zS+XCmbkGk9eGVm61YMp0R/nIUhpMaAI0dyZLbksovDhkrc3SVhNC+OXjC0RSzQ3wiLRH8X7JDAvI=
+X-Received: by 2002:a05:6402:2805:: with SMTP id h5mr38690255ede.267.1639149780836;
+ Fri, 10 Dec 2021 07:23:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20211208003727.3596577-1-f.fainelli@gmail.com> <20211208003727.3596577-6-f.fainelli@gmail.com>
+In-Reply-To: <20211208003727.3596577-6-f.fainelli@gmail.com>
+From:   Bartosz Golaszewski <brgl@bgdev.pl>
+Date:   Fri, 10 Dec 2021 16:22:50 +0100
+Message-ID: <CAMRc=MdmP5UCi2SJq9Ybhe9evUmM_PhpSUfzRF24yYUiRG+MNg@mail.gmail.com>
+Subject: Re: [PATCH v3 05/15] dt-bindings: gpio: Convert Broadcom STB GPIO to YAML
+To:     Florian Fainelli <f.fainelli@gmail.com>
+Cc:     devicetree <devicetree@vger.kernel.org>,
+        Gregory Fong <gregory.0xf0@gmail.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "maintainer:BROADCOM BCM7XXX ARM ARCHITECTURE" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Markus Mayer <mmayer@broadcom.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Al Cooper <alcooperx@gmail.com>,
+        Doug Berger <opendmb@gmail.com>,
+        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
+        <linux-ide@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        "moderated list:BROADCOM BCM7XXX ARM ARCHITECTURE" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "open list:MULTIMEDIA CARD (MMC), SECURE DIGITAL (SD) AND..." 
+        <linux-mmc@vger.kernel.org>,
+        "open list:PWM SUBSYSTEM" <linux-pwm@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "open list:REAL TIME CLOCK (RTC) SUBSYSTEM" 
+        <linux-rtc@vger.kernel.org>,
+        "open list:THERMAL" <linux-pm@vger.kernel.org>,
+        "open list:USB SUBSYSTEM" <linux-usb@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When kernel.h is used in the headers it adds a lot into dependency hell,
-especially when there are circular dependencies are involved.
+On Wed, Dec 8, 2021 at 1:37 AM Florian Fainelli <f.fainelli@gmail.com> wrote:
+>
+> Convert the Broadcom STB GPIO Device Tree binding to YAML to help with
+> validation.
+>
+> Acked-by: Gregory Fong <gregory.0xf0@gmail.com>
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> ---
 
-Replace kernel.h inclusion with the list of what is really being used.
-
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- include/crypto/aead.h        | 4 +++-
- include/crypto/algapi.h      | 5 ++++-
- include/crypto/blake2b.h     | 1 -
- include/crypto/blake2s.h     | 2 +-
- include/crypto/cryptd.h      | 3 ++-
- include/crypto/engine.h      | 6 +++++-
- include/crypto/pcrypt.h      | 2 +-
- include/crypto/scatterwalk.h | 3 ++-
- include/crypto/skcipher.h    | 6 +++++-
- 9 files changed, 23 insertions(+), 9 deletions(-)
-
-diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-index 5af914c1ab8e..14db3bee0519 100644
---- a/include/crypto/aead.h
-+++ b/include/crypto/aead.h
-@@ -8,9 +8,10 @@
- #ifndef _CRYPTO_AEAD_H
- #define _CRYPTO_AEAD_H
- 
-+#include <linux/container_of.h>
- #include <linux/crypto.h>
--#include <linux/kernel.h>
- #include <linux/slab.h>
-+#include <linux/types.h>
- 
- /**
-  * DOC: Authenticated Encryption With Associated Data (AEAD) Cipher API
-@@ -73,6 +74,7 @@
-  */
- 
- struct crypto_aead;
-+struct scatterlist;
- 
- /**
-  *	struct aead_request - AEAD request
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 5f6841c73e5a..f76ec723ceae 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -7,9 +7,11 @@
- #ifndef _CRYPTO_ALGAPI_H
- #define _CRYPTO_ALGAPI_H
- 
-+#include <linux/align.h>
- #include <linux/crypto.h>
-+#include <linux/kconfig.h>
- #include <linux/list.h>
--#include <linux/kernel.h>
-+#include <linux/types.h>
- 
- /*
-  * Maximum values for blocksize and alignmask, used to allocate
-@@ -24,6 +26,7 @@
- struct crypto_aead;
- struct crypto_instance;
- struct module;
-+struct notifier_block;
- struct rtattr;
- struct seq_file;
- struct sk_buff;
-diff --git a/include/crypto/blake2b.h b/include/crypto/blake2b.h
-index 18875f16f8ca..0c0176285349 100644
---- a/include/crypto/blake2b.h
-+++ b/include/crypto/blake2b.h
-@@ -5,7 +5,6 @@
- 
- #include <linux/bug.h>
- #include <linux/types.h>
--#include <linux/kernel.h>
- #include <linux/string.h>
- 
- enum blake2b_lengths {
-diff --git a/include/crypto/blake2s.h b/include/crypto/blake2s.h
-index bc3fb59442ce..df3c6c2f9553 100644
---- a/include/crypto/blake2s.h
-+++ b/include/crypto/blake2s.h
-@@ -7,8 +7,8 @@
- #define _CRYPTO_BLAKE2S_H
- 
- #include <linux/bug.h>
-+#include <linux/kconfig.h>
- #include <linux/types.h>
--#include <linux/kernel.h>
- #include <linux/string.h>
- 
- enum blake2s_lengths {
-diff --git a/include/crypto/cryptd.h b/include/crypto/cryptd.h
-index 23169f4d87e6..796d986e58e1 100644
---- a/include/crypto/cryptd.h
-+++ b/include/crypto/cryptd.h
-@@ -13,7 +13,8 @@
- #ifndef _CRYPTO_CRYPT_H
- #define _CRYPTO_CRYPT_H
- 
--#include <linux/kernel.h>
-+#include <linux/types.h>
-+
- #include <crypto/aead.h>
- #include <crypto/hash.h>
- #include <crypto/skcipher.h>
-diff --git a/include/crypto/engine.h b/include/crypto/engine.h
-index fd4f2fa23f51..ae133e98d813 100644
---- a/include/crypto/engine.h
-+++ b/include/crypto/engine.h
-@@ -9,8 +9,10 @@
- 
- #include <linux/crypto.h>
- #include <linux/list.h>
--#include <linux/kernel.h>
- #include <linux/kthread.h>
-+#include <linux/spinlock.h>
-+#include <linux/types.h>
-+
- #include <crypto/algapi.h>
- #include <crypto/aead.h>
- #include <crypto/akcipher.h>
-@@ -18,6 +20,8 @@
- #include <crypto/skcipher.h>
- #include <crypto/kpp.h>
- 
-+struct device;
-+
- #define ENGINE_NAME_LEN	30
- /*
-  * struct crypto_engine - crypto hardware engine
-diff --git a/include/crypto/pcrypt.h b/include/crypto/pcrypt.h
-index b9bc3436196a..234d7cf3cf5e 100644
---- a/include/crypto/pcrypt.h
-+++ b/include/crypto/pcrypt.h
-@@ -9,8 +9,8 @@
- #ifndef _CRYPTO_PCRYPT_H
- #define _CRYPTO_PCRYPT_H
- 
-+#include <linux/container_of.h>
- #include <linux/crypto.h>
--#include <linux/kernel.h>
- #include <linux/padata.h>
- 
- struct pcrypt_request {
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 7af08174a721..6407b4b61350 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -12,8 +12,9 @@
- #define _CRYPTO_SCATTERWALK_H
- 
- #include <crypto/algapi.h>
-+
- #include <linux/highmem.h>
--#include <linux/kernel.h>
-+#include <linux/mm.h>
- #include <linux/scatterlist.h>
- 
- static inline void scatterwalk_crypto_chain(struct scatterlist *head,
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index ef0fc9ed4342..39f5b67c3069 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -8,9 +8,13 @@
- #ifndef _CRYPTO_SKCIPHER_H
- #define _CRYPTO_SKCIPHER_H
- 
-+#include <linux/container_of.h>
- #include <linux/crypto.h>
--#include <linux/kernel.h>
- #include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/types.h>
-+
-+struct scatterlist;
- 
- /**
-  *	struct skcipher_request - Symmetric key cipher request
--- 
-2.33.0
-
+Acked-by: Bartosz Golaszewski <brgl@bgdev.pl>
