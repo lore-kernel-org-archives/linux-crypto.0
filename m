@@ -2,112 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B833DC43219
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Dec 2021 01:44:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92933C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Dec 2021 06:46:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235000AbhLJBsY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Dec 2021 20:48:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51580 "EHLO
+        id S237108AbhLJGuJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Dec 2021 01:50:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233794AbhLJBsX (ORCPT
+        with ESMTP id S237088AbhLJGuJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Dec 2021 20:48:23 -0500
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84ED0C061D60
-        for <linux-crypto@vger.kernel.org>; Thu,  9 Dec 2021 17:44:49 -0800 (PST)
-Received: by mail-ot1-x336.google.com with SMTP id v15-20020a9d604f000000b0056cdb373b82so8194006otj.7
-        for <linux-crypto@vger.kernel.org>; Thu, 09 Dec 2021 17:44:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+eO70K6UpvUWOOZ26eI9byqpsVA1ZqLATKw9Ubqfa08=;
-        b=vwyKOTWHjgLrit+GLm9IJ66Zn1fCOfM1L+YBmfjIKF1WCwaK3dzS3Olklz2j83VtRo
-         T4jlfQ0ubaLPKehFAlrC5ij37ETxxxsBxSQnoBTcj8pr2AENLzTyfqQps4Lke9spO05l
-         xk4vf9rHG9Ijo3AkNslw7pY7KKVDKQ5kmk/XOcky9KW+dCp1njcukQO+fH1g5yqUNVkm
-         eq2GwY8m1SEXsiDwtX55G9M3F0XmWaufzrVVBA9fIbADOXtbBGVaLVD7JUHJhraR9vAY
-         ClB67OR58t4WytNRPFup+KydBuZ0oEjeceswc8C+g4c3wFfNF5RQoLM+yd69ac1wWbi1
-         nugg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+eO70K6UpvUWOOZ26eI9byqpsVA1ZqLATKw9Ubqfa08=;
-        b=wwtBrxhkzHikzIHTHW+ZI9dxwjcub/MRoFNzyP7nTvQrYVSc8xo9MtT0wSn0Hy+jb5
-         /MsnIweuHc1foFA31aNNYke6nqCdr+iJDuht836ZNb+cUaKRgClR/HruL3OlpY8Wxod9
-         DcwqLLHau3rVgS9ZA7YftK5z/sKrTNmQiu/zGNXJXNc/1zcmoJF7boXFFZi3L06/8V9+
-         evrFCexfMtEuh8TFVikCuu42pimHrnSFgTd9sU1c9WHYegtXP7feG+V6mcVr1mnOX9u2
-         LglZRwwmtTSXn84/Du8d6GZrSP/RbuuRasOqNelizXR9ec0oGOVxqIuG2aw9rsaYyMR9
-         kalg==
-X-Gm-Message-State: AOAM533uHy1FkRPrp9kVwWeKC13HxV+vA/T7ReMgonPoXXdyOLHIn5K+
-        0t5P6JtZu/Jww4t1Tp/z8RC8TaYKluaECr+jzWXkew==
-X-Google-Smtp-Source: ABdhPJwGGn/Iig24LM6iz+DDamWnJx6uVjLFPjLZrobVVHzAlLnv6hIu3SxbsvwG+AZSo3Ul47rGkcksDTGd/v0hlu4=
-X-Received: by 2002:a9d:74d0:: with SMTP id a16mr8654576otl.237.1639100688280;
- Thu, 09 Dec 2021 17:44:48 -0800 (PST)
+        Fri, 10 Dec 2021 01:50:09 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76780C061746;
+        Thu,  9 Dec 2021 22:46:34 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 283FAB82779;
+        Fri, 10 Dec 2021 06:46:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2908C00446;
+        Fri, 10 Dec 2021 06:46:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1639118791;
+        bh=OtcYWcrE7+fgmYrrmv9WrsJEdx2OzJXkqwY8azLwKO8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=xZsVpqRut1pFnfNfNJrw053jZzC2+bdbamEVFwA2g7V5ZauxQqr8+LjihlsmOpNXA
+         jWeUiDSBiSOVKK1e+1G0w66MH+JyJ9RSZvcgQ7tlGSOqvqPSkVL5l1FodT6xL205lL
+         IqjkfwHsC9D+6hMaTAIkwlpaB/eqxDsZsIaicyeQ=
+Date:   Fri, 10 Dec 2021 07:46:24 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Simo Sorce <simo@redhat.com>,
+        Jeffrey Walton <noloader@gmail.com>,
+        Stephan Mueller <smueller@chronox.de>, Tso Ted <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>,
+        Alexander Lobakin <alobakin@mailbox.org>,
+        Jirka Hladky <jhladky@redhat.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+Message-ID: <YbL3wNBFi2vjyvPj@kroah.com>
+References: <YaT+9MueQIa5p8xr@kroah.com>
+ <CAH8yC8nokDTGs8H6nGDkvDxRHN_qoFROAfWnTv-q6UqzYvoSWA@mail.gmail.com>
+ <YaYvYdnSaAvS8MAk@kroah.com>
+ <ac123d96b31f4a51b167b4e85a205f31a6c97876.camel@redhat.com>
+ <YaZHKHjomEivul6U@kroah.com>
+ <YaZqVxI1C8RByq+w@gmail.com>
+ <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
+ <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
+ <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
+ <20211210014337.xmin2lu5rhhe3b3t@valinor>
 MIME-Version: 1.0
-References: <20211208003727.3596577-1-f.fainelli@gmail.com> <20211208003727.3596577-6-f.fainelli@gmail.com>
-In-Reply-To: <20211208003727.3596577-6-f.fainelli@gmail.com>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Fri, 10 Dec 2021 02:44:36 +0100
-Message-ID: <CACRpkdYmCT9imMFY_0ZHebAYj40D3m48X+DZnjPUGgAqHEpZqg@mail.gmail.com>
-Subject: Re: [PATCH v3 05/15] dt-bindings: gpio: Convert Broadcom STB GPIO to YAML
-To:     Florian Fainelli <f.fainelli@gmail.com>
-Cc:     devicetree@vger.kernel.org, Gregory Fong <gregory.0xf0@gmail.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        "maintainer:BROADCOM BCM7XXX ARM ARCHITECTURE" 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Markus Mayer <mmayer@broadcom.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Al Cooper <alcooperx@gmail.com>,
-        Doug Berger <opendmb@gmail.com>,
-        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
-        <linux-ide@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        "moderated list:BROADCOM BCM7XXX ARM ARCHITECTURE" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "open list:MULTIMEDIA CARD (MMC), SECURE DIGITAL (SD) AND..." 
-        <linux-mmc@vger.kernel.org>,
-        "open list:PWM SUBSYSTEM" <linux-pwm@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:REAL TIME CLOCK (RTC) SUBSYSTEM" 
-        <linux-rtc@vger.kernel.org>,
-        "open list:THERMAL" <linux-pm@vger.kernel.org>,
-        "open list:USB SUBSYSTEM" <linux-usb@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211210014337.xmin2lu5rhhe3b3t@valinor>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 8, 2021 at 1:37 AM Florian Fainelli <f.fainelli@gmail.com> wrote:
+On Thu, Dec 09, 2021 at 10:43:37PM -0300, Marcelo Henrique Cerri wrote:
+> Hi, Jason. How do you think we could approach that then?
+> 
+> Are you willing to discuss the FIPS 140-3 requirements that random.c
+> doesn't currently meet so we can dive deeper on how we could implement
+> them in a way that would improve the kernel other then simply
+> providing compliance to FIPS?
 
-> Convert the Broadcom STB GPIO Device Tree binding to YAML to help with
-> validation.
->
-> Acked-by: Gregory Fong <gregory.0xf0@gmail.com>
-> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+Discussing things doesn't usually work well.  Let's see some working
+patches first, that solve problems that you have with the current random
+code, and we can go from there.
 
-Looks good to me.
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Again, like any other kernel patch submission, nothing new here at all.
 
-Yours,
-Linus Walleij
+> I believe all the distros are interested in making progress on that,
+> but without a general guidance it makes very hard for us to
+> collaborate and we end up in the current situation in which each
+> distro is carrying its own "hack", as Simo mentioned before. Canonical
+> is in the same situation as the other distros and we are carrying an
+> workaround to wire up the crypto DRBG to random.c in order to archive
+> compliance.
+
+If everyone seems to think their patches are hacks, and are not worthy
+of being submitted, then why do they think that somehow they are viable
+for their users that are actually using them?
+
+{sigh}
+
+greg k-h
