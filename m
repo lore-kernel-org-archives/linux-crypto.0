@@ -2,35 +2,35 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E26F3C4167B
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Dec 2021 11:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4310C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Dec 2021 11:30:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231137AbhLKLaU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Dec 2021 06:30:20 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:16367 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230480AbhLKLaM (ORCPT
+        id S230477AbhLKLaY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 11 Dec 2021 06:30:24 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:32911 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230497AbhLKLaP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Dec 2021 06:30:12 -0500
-Received: from kwepemi500003.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JB5CF6Q04z91Px;
-        Sat, 11 Dec 2021 19:29:29 +0800 (CST)
+        Sat, 11 Dec 2021 06:30:15 -0500
+Received: from kwepemi500005.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JB5Cp27wgzcbl1;
+        Sat, 11 Dec 2021 19:29:58 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500003.china.huawei.com (7.221.188.51) with Microsoft SMTP Server
+ kwepemi500005.china.huawei.com (7.221.188.179) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 11 Dec 2021 19:30:10 +0800
+ 15.1.2308.20; Sat, 11 Dec 2021 19:30:07 +0800
 Received: from localhost.localdomain (10.67.165.24) by
  kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 11 Dec 2021 19:30:10 +0800
+ 15.1.2308.20; Sat, 11 Dec 2021 19:30:06 +0800
 From:   Weili Qian <qianweili@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
         Weili Qian <qianweili@huawei.com>
-Subject: [PATCH 6/6] crypto: hisilicon/qm - disable queue when 'CQ' error
-Date:   Sat, 11 Dec 2021 19:25:19 +0800
-Message-ID: <20211211112519.21201-7-qianweili@huawei.com>
+Subject: [PATCH 2/6] crypto: hisilicon/qm - code movement
+Date:   Sat, 11 Dec 2021 19:25:15 +0800
+Message-ID: <20211211112519.21201-3-qianweili@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211211112519.21201-1-qianweili@huawei.com>
 References: <20211211112519.21201-1-qianweili@huawei.com>
@@ -45,71 +45,177 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If the hardware reports the 'CQ' overflow or 'CQE' error by the abnormal
-interrupt, disable the queue and stop tasks send to hardware.
+This patch does not change any code, just code movement. Preparing for
+next patch.
 
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+ drivers/crypto/hisilicon/qm.c | 138 +++++++++++++++++-----------------
+ 1 file changed, 69 insertions(+), 69 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 6c61f9d25f75..b1fe9c7b8cc8 100644
+index fba6a26089aa..d124800b67e6 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -89,7 +89,10 @@
- 
- #define QM_AEQE_PHASE(aeqe)		((le32_to_cpu((aeqe)->dw0) >> 16) & 0x1)
- #define QM_AEQE_TYPE_SHIFT		17
-+#define QM_AEQE_CQN_MASK		GENMASK(15, 0)
-+#define QM_CQ_OVERFLOW			0
- #define QM_EQ_OVERFLOW			1
-+#define QM_CQE_ERROR			2
- 
- #define QM_DOORBELL_CMD_SQ		0
- #define QM_DOORBELL_CMD_CQ		1
-@@ -989,6 +992,15 @@ static void qm_set_qp_disable(struct hisi_qp *qp, int offset)
- 	mb();
+@@ -605,6 +605,75 @@ static bool qm_qp_avail_state(struct hisi_qm *qm, struct hisi_qp *qp,
+ 	return avail;
  }
  
-+static void qm_disable_qp(struct hisi_qm *qm, u32 qp_id)
++static u32 qm_get_hw_error_status(struct hisi_qm *qm)
 +{
-+	struct hisi_qp *qp = &qm->qp_array[qp_id];
-+
-+	qm_set_qp_disable(qp, QM_RESET_STOP_TX_OFFSET);
-+	hisi_qm_stop_qp(qp);
-+	qm_set_qp_disable(qp, QM_RESET_STOP_RX_OFFSET);
++	return readl(qm->io_base + QM_ABNORMAL_INT_STATUS);
 +}
 +
- static void qm_reset_function(struct hisi_qm *qm)
++static u32 qm_get_dev_err_status(struct hisi_qm *qm)
++{
++	return qm->err_ini->get_dev_hw_err_status(qm);
++}
++
++/* Check if the error causes the master ooo block */
++static int qm_check_dev_error(struct hisi_qm *qm)
++{
++	u32 val, dev_val;
++
++	if (qm->fun_type == QM_HW_VF)
++		return 0;
++
++	val = qm_get_hw_error_status(qm);
++	dev_val = qm_get_dev_err_status(qm);
++
++	if (qm->ver < QM_HW_V3)
++		return (val & QM_ECC_MBIT) ||
++		       (dev_val & qm->err_info.ecc_2bits_mask);
++
++	return (val & readl(qm->io_base + QM_OOO_SHUTDOWN_SEL)) ||
++	       (dev_val & (~qm->err_info.dev_ce_mask));
++}
++
++static int qm_wait_reset_finish(struct hisi_qm *qm)
++{
++	int delay = 0;
++
++	/* All reset requests need to be queued for processing */
++	while (test_and_set_bit(QM_RESETTING, &qm->misc_ctl)) {
++		msleep(++delay);
++		if (delay > QM_RESET_WAIT_TIMEOUT)
++			return -EBUSY;
++	}
++
++	return 0;
++}
++
++static int qm_reset_prepare_ready(struct hisi_qm *qm)
++{
++	struct pci_dev *pdev = qm->pdev;
++	struct hisi_qm *pf_qm = pci_get_drvdata(pci_physfn(pdev));
++
++	/*
++	 * PF and VF on host doesnot support resetting at the
++	 * same time on Kunpeng920.
++	 */
++	if (qm->ver < QM_HW_V3)
++		return qm_wait_reset_finish(pf_qm);
++
++	return qm_wait_reset_finish(qm);
++}
++
++static void qm_reset_bit_clear(struct hisi_qm *qm)
++{
++	struct pci_dev *pdev = qm->pdev;
++	struct hisi_qm *pf_qm = pci_get_drvdata(pci_physfn(pdev));
++
++	if (qm->ver < QM_HW_V3)
++		clear_bit(QM_RESETTING, &pf_qm->misc_ctl);
++
++	clear_bit(QM_RESETTING, &qm->misc_ctl);
++}
++
+ static void qm_mb_pre_init(struct qm_mailbox *mailbox, u8 cmd,
+ 			   u64 base, u16 queue, bool op)
  {
- 	struct hisi_qm *pf_qm = pci_get_drvdata(pci_physfn(qm->pdev));
-@@ -1022,16 +1034,24 @@ static irqreturn_t qm_aeq_thread(int irq, void *data)
+@@ -2108,35 +2177,6 @@ static enum acc_err_result qm_hw_error_handle_v2(struct hisi_qm *qm)
+ 	return ACC_ERR_RECOVERED;
+ }
+ 
+-static u32 qm_get_hw_error_status(struct hisi_qm *qm)
+-{
+-	return readl(qm->io_base + QM_ABNORMAL_INT_STATUS);
+-}
+-
+-static u32 qm_get_dev_err_status(struct hisi_qm *qm)
+-{
+-	return qm->err_ini->get_dev_hw_err_status(qm);
+-}
+-
+-/* Check if the error causes the master ooo block */
+-static int qm_check_dev_error(struct hisi_qm *qm)
+-{
+-	u32 val, dev_val;
+-
+-	if (qm->fun_type == QM_HW_VF)
+-		return 0;
+-
+-	val = qm_get_hw_error_status(qm);
+-	dev_val = qm_get_dev_err_status(qm);
+-
+-	if (qm->ver < QM_HW_V3)
+-		return (val & QM_ECC_MBIT) ||
+-		       (dev_val & qm->err_info.ecc_2bits_mask);
+-
+-	return (val & readl(qm->io_base + QM_OOO_SHUTDOWN_SEL)) ||
+-	       (dev_val & (~qm->err_info.dev_ce_mask));
+-}
+-
+ static int qm_get_mb_cmd(struct hisi_qm *qm, u64 *msg, u16 fun_num)
  {
- 	struct hisi_qm *qm = data;
- 	struct qm_aeqe *aeqe = qm->aeqe + qm->status.aeq_head;
--	u32 type;
-+	u32 type, qp_id;
+ 	struct qm_mailbox mailbox;
+@@ -4754,46 +4794,6 @@ static int qm_try_stop_vfs(struct hisi_qm *qm, u64 cmd,
+ 	return ret;
+ }
  
- 	while (QM_AEQE_PHASE(aeqe) == qm->status.aeqc_phase) {
- 		type = le32_to_cpu(aeqe->dw0) >> QM_AEQE_TYPE_SHIFT;
-+		qp_id = le32_to_cpu(aeqe->dw0) & QM_AEQE_CQN_MASK;
- 
- 		switch (type) {
- 		case QM_EQ_OVERFLOW:
- 			dev_err(&qm->pdev->dev, "eq overflow, reset function\n");
- 			qm_reset_function(qm);
- 			return IRQ_HANDLED;
-+		case QM_CQ_OVERFLOW:
-+			dev_err(&qm->pdev->dev, "cq overflow, stop qp(%u)\n",
-+				qp_id);
-+			fallthrough;
-+		case QM_CQE_ERROR:
-+			qm_disable_qp(qm, qp_id);
-+			break;
- 		default:
- 			dev_err(&qm->pdev->dev, "unknown error type %u\n",
- 				type);
+-static int qm_wait_reset_finish(struct hisi_qm *qm)
+-{
+-	int delay = 0;
+-
+-	/* All reset requests need to be queued for processing */
+-	while (test_and_set_bit(QM_RESETTING, &qm->misc_ctl)) {
+-		msleep(++delay);
+-		if (delay > QM_RESET_WAIT_TIMEOUT)
+-			return -EBUSY;
+-	}
+-
+-	return 0;
+-}
+-
+-static int qm_reset_prepare_ready(struct hisi_qm *qm)
+-{
+-	struct pci_dev *pdev = qm->pdev;
+-	struct hisi_qm *pf_qm = pci_get_drvdata(pci_physfn(pdev));
+-
+-	/*
+-	 * PF and VF on host doesnot support resetting at the
+-	 * same time on Kunpeng920.
+-	 */
+-	if (qm->ver < QM_HW_V3)
+-		return qm_wait_reset_finish(pf_qm);
+-
+-	return qm_wait_reset_finish(qm);
+-}
+-
+-static void qm_reset_bit_clear(struct hisi_qm *qm)
+-{
+-	struct pci_dev *pdev = qm->pdev;
+-	struct hisi_qm *pf_qm = pci_get_drvdata(pci_physfn(pdev));
+-
+-	if (qm->ver < QM_HW_V3)
+-		clear_bit(QM_RESETTING, &pf_qm->misc_ctl);
+-
+-	clear_bit(QM_RESETTING, &qm->misc_ctl);
+-}
+-
+ static int qm_controller_reset_prepare(struct hisi_qm *qm)
+ {
+ 	struct pci_dev *pdev = qm->pdev;
 -- 
 2.33.0
 
