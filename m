@@ -2,35 +2,35 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 567F9C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Dec 2021 11:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE4E6C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Dec 2021 11:30:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230468AbhLKLaK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S230474AbhLKLaK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 11 Dec 2021 06:30:10 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:15727 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230448AbhLKLaI (ORCPT
+Received: from szxga02-in.huawei.com ([45.249.212.188]:16366 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230464AbhLKLaK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Dec 2021 06:30:08 -0500
-Received: from kwepemi500010.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JB58b52mHzZdXl;
-        Sat, 11 Dec 2021 19:27:11 +0800 (CST)
+        Sat, 11 Dec 2021 06:30:10 -0500
+Received: from kwepemi500004.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JB5CC0Lv2z91VG;
+        Sat, 11 Dec 2021 19:29:27 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500010.china.huawei.com (7.221.188.191) with Microsoft SMTP Server
+ kwepemi500004.china.huawei.com (7.221.188.17) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 11 Dec 2021 19:30:06 +0800
+ 15.1.2308.20; Sat, 11 Dec 2021 19:30:08 +0800
 Received: from localhost.localdomain (10.67.165.24) by
  kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 11 Dec 2021 19:30:05 +0800
+ 15.1.2308.20; Sat, 11 Dec 2021 19:30:07 +0800
 From:   Weili Qian <qianweili@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
         Weili Qian <qianweili@huawei.com>
-Subject: [PATCH 1/6] crypto: hisilicon/qm - remove unnecessary device memory reset
-Date:   Sat, 11 Dec 2021 19:25:14 +0800
-Message-ID: <20211211112519.21201-2-qianweili@huawei.com>
+Subject: [PATCH 3/6] crypto: hisilicon/qm - modify the handling method after abnormal interruption
+Date:   Sat, 11 Dec 2021 19:25:16 +0800
+Message-ID: <20211211112519.21201-4-qianweili@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211211112519.21201-1-qianweili@huawei.com>
 References: <20211211112519.21201-1-qianweili@huawei.com>
@@ -45,71 +45,39 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The internal memory of the device needs to be reset only when
-the device is globally initialized. Other scenarios, such as
-function reset, do not need to perform reset.
+After processing an interrupt event and the interrupt function is
+enabled by writing the QM_DOORBELL_CMD_AEQ register, the hardware
+may generate new interrupt events due to processing other user's task
+when the subsequent interrupt events have not been processed. The new
+interrupt event will disrupt the current normal processing flow and
+cause other problems.
+
+Therefore, the operation of writing the QM_DOORBELL_CMD_AEQ doorbell
+register needs to be placed after all interrupt events processing
+are completed.
 
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index bea8622d80e6..fba6a26089aa 100644
+index d124800b67e6..beea3a0fd0a5 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -3581,10 +3581,6 @@ static int __hisi_qm_start(struct hisi_qm *qm)
- 	WARN_ON(!qm->qdma.va);
- 
- 	if (qm->fun_type == QM_HW_PF) {
--		ret = qm_dev_mem_reset(qm);
--		if (ret)
--			return ret;
+@@ -1015,10 +1015,10 @@ static irqreturn_t qm_aeq_irq(int irq, void *data)
+ 			aeqe++;
+ 			qm->status.aeq_head++;
+ 		}
 -
- 		ret = hisi_qm_set_vft(qm, 0, qm->qp_base, qm->qp_num);
- 		if (ret)
- 			return ret;
-@@ -5083,6 +5079,12 @@ static int qm_controller_reset_done(struct hisi_qm *qm)
- 	if (qm->err_ini->open_axi_master_ooo)
- 		qm->err_ini->open_axi_master_ooo(qm);
- 
-+	ret = qm_dev_mem_reset(qm);
-+	if (ret) {
-+		pci_err(pdev, "failed to reset device memory\n");
-+		return ret;
-+	}
-+
- 	ret = qm_restart(qm);
- 	if (ret) {
- 		pci_err(pdev, "Failed to start QM!\n");
-@@ -5857,6 +5859,14 @@ int hisi_qm_init(struct hisi_qm *qm)
- 			goto err_irq_register;
+-		qm_db(qm, 0, QM_DOORBELL_CMD_AEQ, qm->status.aeq_head, 0);
  	}
  
-+	if (qm->fun_type == QM_HW_PF) {
-+		ret = qm_dev_mem_reset(qm);
-+		if (ret) {
-+			dev_err(dev, "failed to reset device memory\n");
-+			goto err_irq_register;
-+		}
-+	}
++	qm_db(qm, 0, QM_DOORBELL_CMD_AEQ, qm->status.aeq_head, 0);
 +
- 	if (qm->mode == UACCE_MODE_SVA) {
- 		ret = qm_alloc_uacce(qm);
- 		if (ret < 0)
-@@ -6014,8 +6024,11 @@ static int qm_rebuild_for_resume(struct hisi_qm *qm)
- 
- 	qm_cmd_init(qm);
- 	hisi_qm_dev_err_init(qm);
-+	ret = qm_dev_mem_reset(qm);
-+	if (ret)
-+		pci_err(pdev, "failed to reset device memory\n");
- 
--	return 0;
-+	return ret;
+ 	return IRQ_HANDLED;
  }
  
- /**
 -- 
 2.33.0
 
