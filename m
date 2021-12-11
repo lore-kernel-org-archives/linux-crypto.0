@@ -2,26 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDEB3C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Dec 2021 07:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BDC1C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Dec 2021 08:11:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229785AbhLKHIE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Dec 2021 02:08:04 -0500
-Received: from wtarreau.pck.nerim.net ([62.212.114.60]:48615 "EHLO 1wt.eu"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229455AbhLKHID (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Dec 2021 02:08:03 -0500
-Received: (from willy@localhost)
-        by pcw.home.local (8.15.2/8.15.2/Submit) id 1BB76AHD002532;
-        Sat, 11 Dec 2021 08:06:10 +0100
-Date:   Sat, 11 Dec 2021 08:06:10 +0100
-From:   Willy Tarreau <w@1wt.eu>
-To:     Simo Sorce <simo@redhat.com>
+        id S230007AbhLKILO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 11 Dec 2021 03:11:14 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([81.169.146.171]:9982 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230010AbhLKILN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 11 Dec 2021 03:11:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1639210201;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=rmuTbR1U+aS9VFNcLM66wKMxKdcM8MhagXJXOCel4FU=;
+    b=oO/9ue6kjiMT/QaPU1PsB9c2QIJg/CrfFjWoBXj1Nb99vWz2PmQ3286WgZ+UGdaxeB
+    GadEX9k/IFexEQaWnLR5L8bCLTRYa3pjS9VH0Ud3Yb2IjWtGJT+fEdLxVXPqA8O3zOvn
+    WrH0yNH/HWsprF73b6YijzpMClPJfI5WKlr+XNqsb1Ug1SKz08O3SFrPf+O0u//SjNUl
+    d9k2MAj3Aepd96kK2Q5noFL1IVb3fT4lPQaXlCsPYcf0KAJUX9fGsWZkZLvnbPVy+1A0
+    7roex6ao/LOMEAhg00wnieUPUc+4HHFl8KAWlj6ZN/Prrle/u4o01Ub8DlEEbWzwPICJ
+    EE/w==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIvSfFROW"
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 47.35.3 DYNA|AUTH)
+    with ESMTPSA id z09342xBB89u9dt
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Sat, 11 Dec 2021 09:09:56 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Simo Sorce <simo@redhat.com>, Willy Tarreau <w@1wt.eu>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jeffrey Walton <noloader@gmail.com>,
-        Stephan Mueller <smueller@chronox.de>, Tso Ted <tytso@mit.edu>,
+        Jeffrey Walton <noloader@gmail.com>, Tso Ted <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Nicolai Stange <nstange@suse.de>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -49,102 +66,56 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Alexander Lobakin <alobakin@mailbox.org>,
         Jirka Hladky <jhladky@redhat.com>
 Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-Message-ID: <20211211070610.GA2153@1wt.eu>
-References: <YaZHKHjomEivul6U@kroah.com>
- <YaZqVxI1C8RByq+w@gmail.com>
- <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
- <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
- <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
- <20211210014337.xmin2lu5rhhe3b3t@valinor>
- <YbL3wNBFi2vjyvPj@kroah.com>
- <20211210093003.lp6fexzrga3nijxn@valinor>
- <YbMiXOCibTRXYYCo@kroah.com>
- <b806a2a1a42b66f0fa5569b79862fe57277feda4.camel@redhat.com>
+Date:   Sat, 11 Dec 2021 09:09:55 +0100
+Message-ID: <25222015.1r3eYUQgxm@positron.chronox.de>
+In-Reply-To: <20211211070610.GA2153@1wt.eu>
+References: <YaZHKHjomEivul6U@kroah.com> <b806a2a1a42b66f0fa5569b79862fe57277feda4.camel@redhat.com> <20211211070610.GA2153@1wt.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b806a2a1a42b66f0fa5569b79862fe57277feda4.camel@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 12:02:35PM -0500, Simo Sorce wrote:
-> On Fri, 2021-12-10 at 10:48 +0100, Greg Kroah-Hartman wrote:
-> > Given that there are no patches here to review by anyone, why is this
-> > email thread still persisting?
+Am Samstag, 11. Dezember 2021, 08:06:10 CET schrieb Willy Tarreau:
+
+Hi Willy,
+
+> On Fri, Dec 10, 2021 at 12:02:35PM -0500, Simo Sorce wrote:
+> > On Fri, 2021-12-10 at 10:48 +0100, Greg Kroah-Hartman wrote:
+> > > Given that there are no patches here to review by anyone, why is this
+> > > email thread still persisting?
+> > 
+> > There is a will and a need to "improve" things, but given past absence
+> > of feedback, people are trying to understand if there is any point in
+> > trying to submit patches. Patches are work, and people like to know
+> > they are not wasting their time completely before committing many more
+> > hours.
 > 
-> There is a will and a need to "improve" things, but given past absence
-> of feedback, people are trying to understand if there is any point in
-> trying to submit patches. Patches are work, and people like to know
-> they are not wasting their time completely before committing many more
-> hours.
+> It is obviously natural to think this way, but you can also understand
+> that reviewing patches is extremely time consuming. And it's extremely
+> difficult to review a patch series which says "replace all that
+> infrastructure with a new one", especially when the motivations are
+> "comply with this or that standard" without the benefits being obvious
+> at all for those having to review those patches.
 
-It is obviously natural to think this way, but you can also understand
-that reviewing patches is extremely time consuming. And it's extremely
-difficult to review a patch series which says "replace all that
-infrastructure with a new one", especially when the motivations are
-"comply with this or that standard" without the benefits being obvious
-at all for those having to review those patches. And keep in mind that
-those who you expect to review the code will have to maintain it, so if
-the benefit is not obvious, why would they take the risk of breaking
-something that's been working well enough or that has been easy enough
-to improve or fix over time ?
+I am so surprised by such statements. Patch 00/15 lists in a bullet list the 
+significant benefits of the LRNG. But seemingly nobody reads the introduction 
+with its concise bullet list or the documentation. The FIPS bits are a tiny 
+aspect of the whole effort (which even can be completely compiled out based on 
+config options), the more significant aspects that have nothing to do with 
+FIPS and benefit all are testability, performance, use of contemporary 
+cryptography, and flexibility.
 
-My feeling from the beginning is that nobody felt brave enough to go
-through these series because of this.
+> But this does mean that a list of incremental changes/additions has to
+> be established on the submitter's side, not a list of replacements.
 
-The normal way to propose changes is to say "some of our customers ask
-for FIPS, we've looked at *what is missing* to accomplish that, first
-it suggests/requires/mandates properties X, Y and Z which are currently
-not supported, so these patches improve the current code by adding such
-properties". And you don't patch "for FIPS", you patch to make the
-existing code evolve to support such missing properties or features,
-till the point you figure that nothing is missing anymore, and you can
-tell your customers "now we comply with FIPS". And if it takes several
-versions to reach that point, no problem, because each version continues
-to work like before, possibly better, possibly not.
+Before I started the endeavor of the stand-alone patch of the LRNG, I 
+developed cleanup patches to random.c in 2014 and 2015. I got massively 
+discouraged to continue working on random.c as I did not get feedback from the 
+maintainer. Some patches were taken, some were not without a comment... 
 
-It's not different from supporting a new hardware. You don't bring in
-a big patch series implementing all of the machine's device drivers in
-an isolated area specific to that device. Instead you bring the various
-parts this machine relies on (serial, pcie, usb, network etc), possibly
-by improving existing drivers that are already very close or share some
-common parts, and at the end you figure you have everything you need
-and then you can proudly say "now we fully support this device".
+Ciao
+Stephan 
 
-This way of proceeding incrementally allows submitters not to waste
-time coding for nothing, and those reviewing changes to make sure
-they're not breaking everything, or to ask for some changes to stay
-safe.
 
-But this does mean that a list of incremental changes/additions has to
-be established on the submitter's side, not a list of replacements.
-Sometimes it is required to replace a part, but the justification has
-to be technical, not "this part doesn't meet standard X or Y, let's
-reinvent it". And such replacements need to be minimal so that it's
-obvious they continue to provide exactly the same services and it's
-almost impossible that a bisect lands on such a patch when something
-stops working (i.e. if it happens it's just a coding bug and not a
-design mistake).
-
-> > Again, the only way forward is to submit changes that meet our
-> > well-documented development process.  There's nothing "special" about
-> > this very tiny .c file that is any different than the other 30 million
-> > lines of kernel code we support that warrants a different process at
-> > all.
-> 
-> This very thread shows that there is an issue, people are not asking
-> for exceptions to the process, they are only asking for direction from
-> the maintainer so they can work productively and get some result, that
-> is all the "special" there is here.
-
-At least it's visible in this very thread's subject that it's addressed
-in a special way: "/dev/random - a new approach", i.e. "trash all what
-we have and restart from scratch". This is exactly what is causing the
-problem from the beginning in my opinion. But at this point I think
-that Jason, Greg and others have already been saying it, so I'll stop.
-
-Hoping this helps,
-
-Willy
