@@ -2,89 +2,124 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41AA2C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Dec 2021 08:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BF7C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Dec 2021 08:58:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229800AbhLKI4J (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Dec 2021 03:56:09 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:32910 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbhLKI4J (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Dec 2021 03:56:09 -0500
-Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JB1p0601Mzcbt4;
-        Sat, 11 Dec 2021 16:55:52 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (7.185.36.74) by
- dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 11 Dec 2021 16:56:07 +0800
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 11 Dec 2021 16:56:07 +0800
-From:   Yang Shen <shenyang39@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
-Subject: [PATCH] crypto: hisilicon/qm - fix deadlock for remove driver
-Date:   Sat, 11 Dec 2021 16:56:55 +0800
-Message-ID: <20211211085655.30294-1-shenyang39@huawei.com>
-X-Mailer: git-send-email 2.33.0
+        id S229721AbhLKI6P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 11 Dec 2021 03:58:15 -0500
+Received: from wtarreau.pck.nerim.net ([62.212.114.60]:48642 "EHLO 1wt.eu"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229455AbhLKI6O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 11 Dec 2021 03:58:14 -0500
+Received: (from willy@localhost)
+        by pcw.home.local (8.15.2/8.15.2/Submit) id 1BB8v4l7003183;
+        Sat, 11 Dec 2021 09:57:04 +0100
+Date:   Sat, 11 Dec 2021 09:57:04 +0100
+From:   Willy Tarreau <w@1wt.eu>
+To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     Simo Sorce <simo@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Jeffrey Walton <noloader@gmail.com>, Tso Ted <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>,
+        Alexander Lobakin <alobakin@mailbox.org>,
+        Jirka Hladky <jhladky@redhat.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+Message-ID: <20211211085704.GB3083@1wt.eu>
+References: <YaZHKHjomEivul6U@kroah.com>
+ <b806a2a1a42b66f0fa5569b79862fe57277feda4.camel@redhat.com>
+ <20211211070610.GA2153@1wt.eu>
+ <25222015.1r3eYUQgxm@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <25222015.1r3eYUQgxm@positron.chronox.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When remove the driver and executing the task occur at the same time,
-the following deadlock will be triggered:
+Hi Stephan,
 
-Chain exists of:
-    sva_lock --> uacce_mutex --> &qm->qps_lock
-    Possible unsafe locking scenario:
-		CPU0                    CPU1
-		----                    ----
-	lock(&qm->qps_lock);
-					lock(uacce_mutex);
-					lock(&qm->qps_lock);
-	lock(sva_lock);
+On Sat, Dec 11, 2021 at 09:09:55AM +0100, Stephan Müller wrote:
+> > It is obviously natural to think this way, but you can also understand
+> > that reviewing patches is extremely time consuming. And it's extremely
+> > difficult to review a patch series which says "replace all that
+> > infrastructure with a new one", especially when the motivations are
+> > "comply with this or that standard" without the benefits being obvious
+> > at all for those having to review those patches.
+> 
+> I am so surprised by such statements. Patch 00/15 lists in a bullet list the 
+> significant benefits of the LRNG. But seemingly nobody reads the introduction 
+> with its concise bullet list or the documentation. The FIPS bits are a tiny 
+> aspect of the whole effort (which even can be completely compiled out based on 
+> config options), the more significant aspects that have nothing to do with 
+> FIPS and benefit all are testability, performance, use of contemporary 
+> cryptography, and flexibility.
 
-And the lock 'qps_lock' is used to protect qp. Therefore, it's reasonable
-cycle is to continue until the qp memory is released. So move the release
-lock infront of 'uacce_remove'.
+But this is where the problem is. You're not proposing to improve the
+current one but to replace it. Who has enough energy to review some new
+code that claims to be compatible with older one ? It requires to perform
+a mental "diff" which is extremely complicated. There are possibly corner
+cases in the current code that nobody knows about and that some code
+currently relies on. Who wlil detect that you're not going to break them
+with a fresh new implementation ?
 
-Signed-off-by: Yang Shen <shenyang39@huawei.com>
----
- drivers/crypto/hisilicon/qm.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Incremental changes allow to focus on the changes. You don't need to
+know how everything else works, just that the modifications do not
+break the part they are inserted into. This makes a huge difference,
+and this is why everyone constantly insists on seeing small incremental
+changes. Sometimes you'll notice that you can even see review from
+different people for very close parts in the same file.
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 896255aec87f..bea8622d80e6 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -3425,6 +3425,7 @@ void hisi_qm_uninit(struct hisi_qm *qm)
- 		dma_free_coherent(dev, qm->qdma.size,
- 				  qm->qdma.va, qm->qdma.dma);
- 	}
-+	up_write(&qm->qps_lock);
+> > But this does mean that a list of incremental changes/additions has to
+> > be established on the submitter's side, not a list of replacements.
+> 
+> Before I started the endeavor of the stand-alone patch of the LRNG, I 
+> developed cleanup patches to random.c in 2014 and 2015. I got massively 
+> discouraged to continue working on random.c as I did not get feedback from the 
+> maintainer. Some patches were taken, some were not without a comment... 
 
- 	qm_irq_unregister(qm);
- 	hisi_qm_pci_uninit(qm);
-@@ -3432,8 +3433,6 @@ void hisi_qm_uninit(struct hisi_qm *qm)
- 		uacce_remove(qm->uacce);
- 		qm->uacce = NULL;
- 	}
--
--	up_write(&qm->qps_lock);
- }
- EXPORT_SYMBOL_GPL(hisi_qm_uninit);
+We all know that this is extremely irritating. It happens everywhere and
+in every project. Sometimes lack of time, lost messages, flipped priorities,
+or lack of interest, or a combination of all of this. I do it myself from
+time to time by accident and I really feel bad when this happens. That's
+not much different than when you're reminding a coworker that you need
+their help and they forget because of other priorities. And this must
+never discourage one from pinging again and asking why there's no
+response. But one thing is certain to me, it's that if a maintainer,
+for any reason, doesn't respond to tiny patches to their code, there's
+hardly any chance to see a response to a whole replacement.
 
---
-2.33.0
+Here Jason offered to invest time reviewing changes. If you have changes
+to propose, why not try ? And even if it takes one year to get everything
+done, who cares ? You seem to have been working on this for 7 years
+already, it might be worth trying another approach.
 
+Regards,
+Willy
