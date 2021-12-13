@@ -2,121 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54900C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Dec 2021 14:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 282CEC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Dec 2021 15:33:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234500AbhLMOP3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Dec 2021 09:15:29 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:48836 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231897AbhLMOP3 (ORCPT
+        id S234801AbhLMPdw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Dec 2021 10:33:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55858 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233023AbhLMPdw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Dec 2021 09:15:29 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 3B5991F3BA;
-        Mon, 13 Dec 2021 14:15:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1639404928; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=C6dEspD63rFcqGYnRle2GyYBU/guWVNw035RUv3XPpI=;
-        b=VA7zhNBInXoJ75cS7yWuDCP4bo8lkMJtQeKKubVxYcWta0XIZZLHp2I3dGgQZDGqvMWmAh
-        FRb9ffj2Ker5hcbNAlk574LiFSOMfJjP/8dVRlyDw8qbm5Zcc3AqRt0C3k2ZE/MHQLmZjM
-        57RVK2eHaJejSCXU08RUxSwrZ4G/35k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1639404928;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=C6dEspD63rFcqGYnRle2GyYBU/guWVNw035RUv3XPpI=;
-        b=jEkW3ax5lIHix7BM2VV/uLqTS7PQkWJz9bw5FFg1GzZXULsMqvsQbiPiEOhcn9DYZwzeSE
-        606f2Cgx45MDj0CQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2C38313D90;
-        Mon, 13 Dec 2021 14:15:28 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id XgALCoBVt2EiJgAAMHmgww
-        (envelope-from <hare@suse.de>); Mon, 13 Dec 2021 14:15:28 +0000
-To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Keith Busch <keith.busch@wdc.com>, linux-nvme@lists.infradead.org,
-        linux-crypto@vger.kernel.org
-References: <20211202152358.60116-1-hare@suse.de>
- <20211213080853.GA21223@lst.de>
- <9853d36a-036c-7f2b-5fb4-b3fb4bae473f@suse.de>
- <4328e4f0-9674-9362-4ed5-89ec7edba4a2@grimberg.me>
- <56f1ce1c-2272-bed2-fd6b-642854b612bb@suse.de>
- <483836f5-f850-6eac-8c38-3f03db3189ab@grimberg.me>
-From:   Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCHv8 00/12] nvme: In-band authentication support
-Message-ID: <0c4613ff-ba30-c812-a6e9-1954d77b1d1b@suse.de>
-Date:   Mon, 13 Dec 2021 15:15:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Mon, 13 Dec 2021 10:33:52 -0500
+X-Greylist: delayed 320 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 13 Dec 2021 07:33:52 PST
+Received: from smtp-190c.mail.infomaniak.ch (smtp-190c.mail.infomaniak.ch [IPv6:2001:1600:4:17::190c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17363C061574
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Dec 2021 07:33:51 -0800 (PST)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4JCQQ441LszMpxck;
+        Mon, 13 Dec 2021 16:28:28 +0100 (CET)
+Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
+        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4JCQQ050cTzlj4cD;
+        Mon, 13 Dec 2021 16:28:24 +0100 (CET)
+Message-ID: <7e8d27da-b5d4-e42c-af01-5c03a7f36a6b@digikod.net>
+Date:   Mon, 13 Dec 2021 16:30:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <483836f5-f850-6eac-8c38-3f03db3189ab@grimberg.me>
-Content-Type: text/plain; charset=utf-8
+User-Agent: 
 Content-Language: en-US
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Eric Snowberg <eric.snowberg@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Andreas Rammhold <andreas@rammhold.de>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>
+References: <20210712170313.884724-1-mic@digikod.net>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+Subject: Re: [PATCH v8 0/5] Enable root to update the blacklist keyring
+In-Reply-To: <20210712170313.884724-1-mic@digikod.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 12/13/21 2:53 PM, Sagi Grimberg wrote:
+Hi Jarkko,
+
+Since everyone seems OK with this and had plenty of time to complain, 
+could you please take this patch series in your tree? It still applies 
+on v5.16-rc5 and it is really important to us. Please let me know if you 
+need something more.
+
+Regards,
+  Mickaël
+
+
+On 12/07/2021 19:03, Mickaël Salaün wrote:
+> Hi,
 > 
->>>>> So if we want to make progress on this we need the first 3 patches
->>>>> rewviewed by the crypto maintainers.  In fact I'd prefer to get them
->>>>> merged through the crypto tree as well, and would make sure we have
->>>>> a branch that pulls them in for the nvme changes.  I'll try to find
->>>>> some time to review the nvme bits as well.
->>>>>
->>>> That is _actually_ being addressed already.
->>>> Nicolai Stange send a patchset for ephemeral keys, FFDHE support, and
->>>> FIPS-related thingies for the in-kernel DH crypto implementation
->>>> (https://lore.kernel.org/linux-crypto/20211209090358.28231-1-nstange@suse.de/).
->>>>
->>>>
->>>> This obsoletes my preliminary patches, and I have ported my patchset
->>>> to run on top of those.
->>>>
->>>> Question is how to continue from here; I can easily rebase my patchset
->>>> and send it relative to Nicolais patches. But then we'll be bound to
->>>> the acceptance of those patches, so I'm not quite sure if that's the
->>>> best way to proceed.
->>>
->>> Don't know if we have a choice here... What is the alternative you are
->>> proposing?
->>
->> That's the thing, I don't really have a good alternative, either.
->> It's just that I have so no idea about the crypto subsystem, and
->> consequently wouldn't know how long we need to wait...
->>
->> But yeah, Nicolais patchset is far superior to my attempts, so I'd be
->> happy to ditch my preliminary attempts there.
+> This new patch series is a rebase on v5.14-rc1 .  David or Jarkko, if
+> it's still OK with you, could you please push this to linux-next?
 > 
-> Can we get a sense from the crypto folks to the state of Nicolais
-> patchset?
-
-According to Nicolai things look good, rules seem to be that it'll be
-accepted if it has positive reviews (which it has) and no-one objected
-(which no-one did).
-Other than that one would have to ask the maintainer.
-Herbert?
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+> I successfully tested this patch series with the 211 entries from
+> https://uefi.org/sites/default/files/resources/dbxupdate_x64.bin
+> 
+> The goal of these patches is to add a new configuration option to enable the
+> root user to load signed keys in the blacklist keyring.  This keyring is useful
+> to "untrust" certificates or files.  Enabling to safely update this keyring
+> without recompiling the kernel makes it more usable.
+> 
+> Previous patch series:
+> https://lore.kernel.org/lkml/20210312171232.2681989-1-mic@digikod.net/
+> 
+> Regards,
+> 
+> Mickaël Salaün (5):
+>    tools/certs: Add print-cert-tbs-hash.sh
+>    certs: Check that builtin blacklist hashes are valid
+>    certs: Make blacklist_vet_description() more strict
+>    certs: Factor out the blacklist hash creation
+>    certs: Allow root user to append signed hashes to the blacklist
+>      keyring
+> 
+>   MAINTAINERS                                   |   2 +
+>   certs/.gitignore                              |   1 +
+>   certs/Kconfig                                 |  17 +-
+>   certs/Makefile                                |  17 +-
+>   certs/blacklist.c                             | 218 ++++++++++++++----
+>   crypto/asymmetric_keys/x509_public_key.c      |   3 +-
+>   include/keys/system_keyring.h                 |  14 +-
+>   scripts/check-blacklist-hashes.awk            |  37 +++
+>   .../platform_certs/keyring_handler.c          |  26 +--
+>   tools/certs/print-cert-tbs-hash.sh            |  91 ++++++++
+>   10 files changed, 346 insertions(+), 80 deletions(-)
+>   create mode 100755 scripts/check-blacklist-hashes.awk
+>   create mode 100755 tools/certs/print-cert-tbs-hash.sh
+> 
+> 
+> base-commit: e73f0f0ee7541171d89f2e2491130c7771ba58d3
+> 
