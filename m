@@ -2,138 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B67DC43219
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Dec 2021 18:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94845C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Dec 2021 18:29:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241783AbhLMSST (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Dec 2021 13:18:19 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:43556 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240751AbhLMSSR (ORCPT
+        id S241855AbhLMS30 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Dec 2021 13:29:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40874 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241723AbhLMS3Z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Dec 2021 13:18:17 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 9378921124;
-        Mon, 13 Dec 2021 18:18:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1639419495; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NtQ8d+/Axp3K9ITeu3xtcjul+fARTB+MWAgeAY7ES8g=;
-        b=G8llMkyqtSY82FpwvCQhlAcn6w1eeAAzzCKiQLREiDT2DKkX36QGiKHbeCLl6yCnTKa74+
-        4lQeQOCNZD5bqLp+6OIHyhhSwqsZXESV9Q9YVUccz5RJEvIQeiFzWTuARjxhMlXYuom92/
-        v7Yz16k3di3NxyYQAscDXqh84O6payY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1639419495;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NtQ8d+/Axp3K9ITeu3xtcjul+fARTB+MWAgeAY7ES8g=;
-        b=l+gO/DX1Vu/uXhALY45OHtc0N8cE8PsYdcruiRw0rzhYjtSwLhfrkPFCn441EcotXQWX7y
-        9OnYaR8zUFBuliCg==
-Received: from kunlun.suse.cz (unknown [10.100.128.76])
+        Mon, 13 Dec 2021 13:29:25 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BB09C061574;
+        Mon, 13 Dec 2021 10:29:25 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id D3257A3B83;
-        Mon, 13 Dec 2021 18:18:14 +0000 (UTC)
-Date:   Mon, 13 Dec 2021 19:18:13 +0100
-From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-To:     Nayna <nayna@linux.vnet.ibm.com>
-Cc:     keyrings@vger.kernel.org, kexec@lists.infradead.org,
-        Philipp Rudo <prudo@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Rob Herring <robh@kernel.org>, linux-s390@vger.kernel.org,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jessica Yu <jeyu@kernel.org>, linux-kernel@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Hari Bathini <hbathini@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        Frank van der Linden <fllinden@amazon.com>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        Daniel Axtens <dja@axtens.net>, buendgen@de.ibm.com,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1C943611AB;
+        Mon, 13 Dec 2021 18:29:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97B27C34602;
+        Mon, 13 Dec 2021 18:29:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639420164;
+        bh=dwmZCtu/nnxrkO4uE9UCl7n6sr+jvUg3xCrI1Q2jU7s=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=oF+1FRcff5FSXd2n2eexUMZ3r2KALwtrpAtkSdPPa3SGXoXACB9DHrbyQgF0ZiKL4
+         fXjrqwIH0JFPeKtyQUQAQEkXp2Lzv8VtZa3RRNJCnXVyFjrF5FyCcdftxzzGjiireA
+         EPRSO7l1z5j+rcunUB9xNEAHtB6xGFOzp2BKDSaSrVIjfpUJhwxbstW6PUetIywHWd
+         Sf5Timfd5e+jTDR4Ub167IoIw7rEMSQ2T6APYE4mCtN5es9gASDgPYg0Ol7oTZyZeq
+         RG48Z5jQR0LUnp9wl8aXHwxjnJ3a8pFZRyH4ok8GJc6pWSGaFZOa1gb6wEt+aSVDQS
+         3QLSrxerLKY4g==
+Date:   Mon, 13 Dec 2021 18:29:19 +0000
+From:   Will Deacon <will@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        XiaokangQian <xiaokang.qian@arm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Baoquan He <bhe@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v2 2/6] powerpc/kexec_file: Add KEXEC_SIG support.
-Message-ID: <20211213181813.GV117207@kunlun.suse.cz>
-References: <cover.1637862358.git.msuchanek@suse.de>
- <8b30a3c6a4e845eb77f276298424811897efdebf.1637862358.git.msuchanek@suse.de>
- <17153a1c-86c6-6ffd-35d6-5329829661df@linux.vnet.ibm.com>
+        Catalin Marinas <catalin.marinas@arm.com>, nd <nd@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: arm64/gcm-ce - unroll factors to 4-way
+ interleave of aes and ghash
+Message-ID: <20211213182918.GC12405@willie-the-truck>
+References: <20210923063027.166247-1-xiaokang.qian@arm.com>
+ <YVK1u4BgVAa84fMa@sol.localdomain>
+ <CAMj1kXHeJBUAzcLHRNYDbbUDe5vRS7Bxy_LKF5gdRLJca7TNRQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <17153a1c-86c6-6ffd-35d6-5329829661df@linux.vnet.ibm.com>
+In-Reply-To: <CAMj1kXHeJBUAzcLHRNYDbbUDe5vRS7Bxy_LKF5gdRLJca7TNRQ@mail.gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
-
-On Sun, Dec 12, 2021 at 07:46:53PM -0500, Nayna wrote:
+On Tue, Sep 28, 2021 at 11:04:03PM +0200, Ard Biesheuvel wrote:
+> On Tue, 28 Sept 2021 at 08:27, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > On Thu, Sep 23, 2021 at 06:30:25AM +0000, XiaokangQian wrote:
+> > > To improve performance on cores with deep piplines such as A72,N1,
+> > > implement gcm(aes) using a 4-way interleave of aes and ghash (totally
+> > > 8 blocks in parallel), which can make full utilize of pipelines rather
+> > > than the 4-way interleave we used currently. It can gain about 20% for
+> > > big data sizes such that 8k.
+> > >
+> > > This is a complete new version of the GCM part of the combined GCM/GHASH
+> > > driver, it will co-exist with the old driver, only serve for big data
+> > > sizes. Instead of interleaving four invocations of AES where each chunk
+> > > of 64 bytes is encrypted first and then ghashed, the new version uses a
+> > > more coarse grained approach where a chunk of 64 bytes is encrypted and
+> > > at the same time, one chunk of 64 bytes is ghashed (or ghashed and
+> > > decrypted in the converse case).
+> > >
+> > > The table below compares the performance of the old driver and the new
+> > > one on various micro-architectures and running in various modes with
+> > > various data sizes.
+> > >
+> > >             |     AES-128       |     AES-192       |     AES-256       |
+> > >      #bytes | 1024 | 1420 |  8k | 1024 | 1420 |  8k | 1024 | 1420 |  8k |
+> > >      -------+------+------+-----+------+------+-----+------+------+-----+
+> > >         A72 | 5.5% |  12% | 25% | 2.2% |  9.5%|  23%| -1%  |  6.7%| 19% |
+> > >         A57 |-0.5% |  9.3%| 32% | -3%  |  6.3%|  26%| -6%  |  3.3%| 21% |
+> > >         N1  | 0.4% |  7.6%|24.5%| -2%  |  5%  |  22%| -4%  |  2.7%| 20% |
+> > >
+> > > Signed-off-by: XiaokangQian <xiaokang.qian@arm.com>
+> >
+> > Does this pass the self-tests, including the fuzz tests which are enabled by
+> > CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
+> >
 > 
-> On 11/25/21 13:02, Michal Suchanek wrote:
-> > Copy the code from s390x
-> > 
-> > Signed-off-by: Michal Suchanek <msuchanek@suse.de>
-> > ---
-> >   arch/powerpc/Kconfig        | 11 +++++++++++
-> >   arch/powerpc/kexec/elf_64.c | 36 ++++++++++++++++++++++++++++++++++++
-> >   2 files changed, 47 insertions(+)
-> > 
-> > diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-> > index ac0c515552fd..ecc1227a77f1 100644
-> > --- a/arch/powerpc/Kconfig
-> > +++ b/arch/powerpc/Kconfig
-> > @@ -561,6 +561,17 @@ config KEXEC_FILE
-> >   config ARCH_HAS_KEXEC_PURGATORY
-> >   	def_bool KEXEC_FILE
-> > 
-> > +config KEXEC_SIG
-> > +	bool "Verify kernel signature during kexec_file_load() syscall"
-> > +	depends on KEXEC_FILE && MODULE_SIG_FORMAT
-> > +	help
-> > +	  This option makes kernel signature verification mandatory for
-> > +	  the kexec_file_load() syscall.
-> > +
+> Please test both little-endian and big-endian. (Note that you don't
+> need a big-endian user space for this - the self tests are executed
+> before the rootfs is mounted)
 > 
-> Resending my last response as looks like it didn't go through mailing list
-> because of some wrong formatting. My apologies to those who are receiving it
-> twice.
-> 
-> Since powerpc also supports IMA_ARCH_POLICY for kernel image signature
-> verification, please include the following:
-> 
-> "An alternative implementation for the powerpc arch is IMA_ARCH_POLICY. It
-> verifies the appended kernel image signature and additionally includes both
-> the signed and unsigned file hashes in the IMA measurement list, extends the
-> IMA PCR in the TPM, and prevents blacklisted binary kernel images from being
-> kexec'd."
+> Also, you will have to rebase this onto the latest cryptodev tree,
+> which carries some changes I made recently to this driver.
 
-It also does blacklist based on the file hash?
+XiaokangQian -- did you post an updated version of this? It would end up
+going via Herbert, but I was keeping half an eye on it and it all seems
+to have gone quiet.
 
-There is a downstream patch that adds the support for the module
-signatures, and when the code is reused for KEXEC_SIG the blacklist
-also applies to it.
+Thanks,
 
-Which kind of shows that people really want to use the IMA features but
-with no support on some major architectures it's not going to work.
-
-Thanks
-
-Michal
+Will
