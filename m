@@ -2,96 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B0DC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Dec 2021 18:08:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1F0C4321E
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Dec 2021 18:15:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234089AbhLNSIA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Dec 2021 13:08:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56562 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236938AbhLNSHt (ORCPT
+        id S236932AbhLNSPC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Dec 2021 13:15:02 -0500
+Received: from mail-oi1-f173.google.com ([209.85.167.173]:38609 "EHLO
+        mail-oi1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232235AbhLNSPC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Dec 2021 13:07:49 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6A28C061401
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Dec 2021 10:07:48 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id t9so33839113wrx.7
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Dec 2021 10:07:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=CM0HVogYaJVZzHpRVCw/2RBWy4bVcT+mBNwkxlDdKi8=;
-        b=N/eKZPDuHIP6Ojar14h/H2M7TZIjocqFdT3H1lnIgR1BAowh8HDx6JEyd6uUmii9rA
-         xjq5NmWo9fxHlhObOQtta1/YTP0XZvIBcvBHthO8/xyGKmSDCamLnLSYgglWT4Yg79Zp
-         qE3eOixe7ULiqfnJ5mZENHuqjo8Hq/z6eLAteS+MUnAR1QKAT/F3TmgUc0B42VTDCq9S
-         5L4PtS/5xaWj5isxvcmvYoaUq5/9Q0eY1b3h7EE5PbZHvv2eOKn5rAO1AICs7B9VqtJl
-         YVaxLKfQa+e03L/MaLWO5o2pok2ZAwsq968tncmX31GuSrkJqzmrDn+A8P8Fn08u/o9n
-         1smA==
+        Tue, 14 Dec 2021 13:15:02 -0500
+Received: by mail-oi1-f173.google.com with SMTP id r26so28265242oiw.5;
+        Tue, 14 Dec 2021 10:15:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CM0HVogYaJVZzHpRVCw/2RBWy4bVcT+mBNwkxlDdKi8=;
-        b=TziUV8kZQXT4os8yfCUwiVT2d7q0yDGpvUCYDv8KzHxoYVMxwW63eZoX90SkFN5Cof
-         Bpdef3F82qPv+nvDK9t0f9V+ivvYRjOa5Apm3FcGUCDDbXpgXyCQU1FmVvsvc1tGa76F
-         NT7K66+kMD4THN3NsQtRJack5WfZaEjqOFzL2f3lHJaqpypiDQIISZ0Lro/xy+1qfxIe
-         8AlGTotHS9EwoocdiUlAl0dMrLO/l8G19b7UAf2wCSx4+8QQbrdeYwH4XSICk8gdOcPD
-         CiRV5XXcCFRTsV1pd9gDiQDNmUvh4gGw2zfzRHbCvd5UBESoEJ+6Pkx71yJILhUcSqN3
-         obcw==
-X-Gm-Message-State: AOAM533j6AxchflwpX9hsoffFcaeKgMQTwbu9IDLQ3YqsXqn+kppXCba
-        GoalLLU8TTgwfrEAtNF7n6N9Xg==
-X-Google-Smtp-Source: ABdhPJwSGDpM/R/nKjlG6LIdQXpGso1DZTKoGnbLxAFa3z8fqYmW8BC2LuMms+9i3aIvCasHfE8tyA==
-X-Received: by 2002:adf:cd85:: with SMTP id q5mr663903wrj.80.1639505267438;
-        Tue, 14 Dec 2021 10:07:47 -0800 (PST)
-Received: from [192.168.24.132] (pd9fe987f.dip0.t-ipconnect.de. [217.254.152.127])
-        by smtp.gmail.com with ESMTPSA id bg34sm3124807wmb.47.2021.12.14.10.07.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Dec 2021 10:07:47 -0800 (PST)
-Subject: Re: [PATCH] crypto: x86/curve25519 - use in/out register constraints
- more precisely
-To:     Ard Biesheuvel <ardb@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vag+lAwsqNqq0fP4rzjw0x3sQbls/iidOvu1coS0bZY=;
+        b=oHY20pRoBXN5795ma8OiEF5evEmEwI1zwrMniEmVc/98DwxUeE4yVKeGFffOTVbhyK
+         R65b1mnnzR+fv1SD1mTdMuBihUka3c3ClKPlRj/NmZmZBeJQBBKSRd9+mKYE4ZeDhjpn
+         Xszzuj2jy367k2mT7bJOcBp3Ww0p1MVPTxglpEoLjtKXldeq0/KApP4PkuQYU3kz5YTL
+         ZHD5pbG7UybBmt5jZXbaauUEkhfuTv7TSsBWykB9LjsV9MsBnHUEtzvA3txccqmHe8Ra
+         C+4WoWNvI2b8VN/lIo9EqnBMC05fw6mvKyksv0d4YrLxeNdSNpJgeC9CaWpodwjI3VNS
+         2vgQ==
+X-Gm-Message-State: AOAM530NuupYFGfG+vuRE+dRTvYAeD5nZoWVAWiOlKeMAYx4+aafRbKr
+        Md3Jd0PJW9Amm8XiWd2weg==
+X-Google-Smtp-Source: ABdhPJzYKtXuZ1cbb2NBfDqsXAjm8AA1okLgNyIQfMkCU4HE2uWXLuR7NttWnABQtzJg2OeP4wMItA==
+X-Received: by 2002:a05:6808:1644:: with SMTP id az4mr35387948oib.86.1639505701326;
+        Tue, 14 Dec 2021 10:15:01 -0800 (PST)
+Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
+        by smtp.gmail.com with ESMTPSA id u40sm94638oiw.56.2021.12.14.10.14.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Dec 2021 10:15:00 -0800 (PST)
+Received: (nullmailer pid 3663345 invoked by uid 1000);
+        Tue, 14 Dec 2021 18:14:58 -0000
+Date:   Tue, 14 Dec 2021 12:14:58 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Florian Fainelli <f.fainelli@gmail.com>
+Cc:     Thierry Reding <thierry.reding@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Gregory Fong <gregory.0xf0@gmail.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>, Zhang Rui <rui.zhang@intel.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Al Cooper <alcooperx@gmail.com>, linux-usb@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Doug Berger <opendmb@gmail.com>,
+        Lee Jones <lee.jones@linaro.org>, linux-ide@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-rtc@vger.kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymeric Fromherz <aymeric.fromherz@inria.fr>
-References: <20211214160146.1073616-1-Jason@zx2c4.com>
- <CAMj1kXEuzHWKDtOX2nCHABWZKQ2K_QV4eJ3cF9zg4KM-6aOTuw@mail.gmail.com>
-From:   Mathias Krause <minipli@grsecurity.net>
-Message-ID: <c78ec947-c780-5058-53ff-94437b0599a7@grsecurity.net>
-Date:   Tue, 14 Dec 2021 19:07:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Marc Zyngier <maz@kernel.org>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        linux-crypto@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        bcm-kernel-feedback-list@broadcom.com, linux-pwm@vger.kernel.org,
+        Markus Mayer <mmayer@broadcom.com>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Scott Branden <sbranden@broadcom.com>,
+        linux-pm@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        linux-gpio@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v3 09/15] dt-bindings: interrupt-controller: Convert
+ Broadcom STB L2 to YAML
+Message-ID: <YbjfIk2m/WlJ6l+X@robh.at.kernel.org>
+References: <20211208003727.3596577-1-f.fainelli@gmail.com>
+ <20211208003727.3596577-10-f.fainelli@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAMj1kXEuzHWKDtOX2nCHABWZKQ2K_QV4eJ3cF9zg4KM-6aOTuw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211208003727.3596577-10-f.fainelli@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am 14.12.21 um 18:23 schrieb Ard Biesheuvel:
-> On Tue, 14 Dec 2021 at 17:02, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->>
->> Rather than passing all variables as modified, pass ones that are only
->> read into that parameter. This helps with old gcc versions when
->> alternatives are additionally used, and lets gcc's codegen be a little
->> bit more efficient. This also syncs up with the latest Vale/EverCrypt
->> output.
->>
->> Reported-by: Mathias Krause <minipli@grsecurity.net>
->> Cc: Aymeric Fromherz <aymeric.fromherz@inria.fr>
->> Link: https://lore.kernel.org/wireguard/1554725710.1290070.1639240504281.JavaMail.zimbra@inria.fr/
->> Link: https://github.com/project-everest/hacl-star/pull/501
->> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+On Tue, 07 Dec 2021 16:37:20 -0800, Florian Fainelli wrote:
+> Convert the Broadcom STB L2 generic Level 2 interrupt controller Device
+> Tree binding to YAML to help with validation.
 > 
-> Could we separate the whitespace-only changes from the code changes
-> please? Otherwise, this is really hard to review.
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> ---
+>  .../interrupt-controller/brcm,l2-intc.txt     | 31 --------
+>  .../interrupt-controller/brcm,l2-intc.yaml    | 71 +++++++++++++++++++
+>  2 files changed, 71 insertions(+), 31 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/interrupt-controller/brcm,l2-intc.txt
+>  create mode 100644 Documentation/devicetree/bindings/interrupt-controller/brcm,l2-intc.yaml
 > 
 
-Applying the patch and using `git show --color-words -w` helped me to
-lower the noise ratio to a sensible level.
-
-Mathias
+Applied, thanks!
