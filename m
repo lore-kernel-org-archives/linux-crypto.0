@@ -2,114 +2,177 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97563C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Dec 2021 10:42:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 308C5C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Dec 2021 17:45:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241709AbhLOKmx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Dec 2021 05:42:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54422 "EHLO
+        id S237569AbhLORpo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 15 Dec 2021 12:45:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236692AbhLOKmx (ORCPT
+        with ESMTP id S235513AbhLORpn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Dec 2021 05:42:53 -0500
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04648C061574
-        for <linux-crypto@vger.kernel.org>; Wed, 15 Dec 2021 02:42:53 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id o13so37314101wrs.12
-        for <linux-crypto@vger.kernel.org>; Wed, 15 Dec 2021 02:42:52 -0800 (PST)
+        Wed, 15 Dec 2021 12:45:43 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA136C061574;
+        Wed, 15 Dec 2021 09:45:42 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id n15-20020a17090a160f00b001a75089daa3so21092777pja.1;
+        Wed, 15 Dec 2021 09:45:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=u39bS1Cb1q0ZvFivSQ0bPVUI1WzG2lEMqJpYNQJ7sMI=;
-        b=E1qBKLCc9Y8v6XbRVioDhnmFJ97IRzewurZphcXXEqw5wsswfYoLqbeRvJUaoKL+Kf
-         83KEeiKEq4nFnpY/0oLwbmDOj90h/9S9a5/THImR1X8j7UoTiwjGSzSn0PWLowGlcjTS
-         uL3M1l7cmScfSmSBXTdxXilFHCXLlCX/ZwBww9q8CculQwHzPeGDnNP72sEcwouMrvFT
-         wBoPcvhqXD7A8K03SLA/VCzcf8p917SCQoI9OF0D/+F1OeWm8X2U+sUZjrfh+hWV92ih
-         j8gBrvemBVvO1Z9lGTPBbv+0V07Zyg0nD2BylG6hZbrOloHtw+4EODtI1JkU4iQ9qFQu
-         ht2A==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RLdWdHoT6O3wLXgWsRx2m2m62hSjV0BcJXlTjn5JUFY=;
+        b=fVGVY8wqrxR8Y9FDXFtr4SE6iyR8BVVbZ5vgJ4y8dkqTnryOyAM1f7oIOnezuj4A6J
+         xZUPr4yWMlNLYsHQ1fallxSJg8aU00+SwAnq0ijeJb6rpCasKd3VYye0HMu7Rz4Fmzli
+         VTY7ooY+g0kHA+TAUoyyLgzX0mSn9ha1KmFllLdg51BzQBC+Mgmo9+XdPBjphX6Y4e34
+         aHA3UHFWRC7Btex9u1tZiEFoYFee/G/WGm4rYd3nNUPqV0MpixQGc6Vx0PruHv6wejmQ
+         Ow0n2j4fyu9ba9vCZKTh9cTJvx1bERx0Yn7rh5DuRA2QxMZuAeUzJXU06wIQ9Mevfcss
+         WI7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=u39bS1Cb1q0ZvFivSQ0bPVUI1WzG2lEMqJpYNQJ7sMI=;
-        b=WdehpHiEP54QMvzDwoQaE08lx0J+jSpflSzJWTdCeoFmgRrd0gQg5aVorQ+gwkRUCD
-         JjbUp6jm938rH/U3qtKDHVbsNUNqetpAdgs1QgPzh/MM06XLFssnk7skwa4WEzLPX4EX
-         h5SpXWGfQURPZAsh/g1dJuDgSnjNc5JIWESqVa1IW5pYTiLNwrMnUe/0CwCW68FjQfYq
-         yDOf3qqTBZZuycvYFMrutdinZJt7pnrA9+V7Y894UG6SZ+2A0oF/9Wrvd5kceS7xCEsG
-         meBWGpz8Z+H+06LThD+NxLz5w+NAlzGwFWv95hwhc/lNf0g65Ct97ZSxV6KissuGGGS4
-         cuvg==
-X-Gm-Message-State: AOAM530KtEwPOf7Svv2g0ooI1qJzPHn4aNJG/2hdMMr56WnyIvHBA190
-        k8LiPlKhre0sATG9fsgmd27kRg==
-X-Google-Smtp-Source: ABdhPJz4cUohwpfTnswYYZh8vQE9RXm72Qv04LqhD754Vz22/rCynZ1rpfgFnNjQk03c7MKW0POHtQ==
-X-Received: by 2002:a5d:4ece:: with SMTP id s14mr3939045wrv.371.1639564971518;
-        Wed, 15 Dec 2021 02:42:51 -0800 (PST)
-Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id k7sm1643494wrg.105.2021.12.15.02.42.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Dec 2021 02:42:51 -0800 (PST)
-From:   Corentin Labbe <clabbe@baylibre.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH] crypto: omap: increase priority of DES/3DES
-Date:   Wed, 15 Dec 2021 10:42:39 +0000
-Message-Id: <20211215104239.800193-1-clabbe@baylibre.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RLdWdHoT6O3wLXgWsRx2m2m62hSjV0BcJXlTjn5JUFY=;
+        b=sXa4PcQUXBKlR2VROcfOlrvxsOIi4XVb+mljr5YNYnVds/2Me+M5DI44i8rGe9Rcnk
+         UY8yugizTuUUUgzZfMVuh3URcNtM660AB1Gkd67ZcxQTgY24kDF9abv/x9fBJqAeEReX
+         7Zhgo7ET0YVC0GzDKs17CDVjYYvF160fhZSSG+SILcsHJRVm1vPoqWcO6rSfwCUaY+lV
+         PlbbsWM06gUdehVGBC4896CjSbgZKstoR0VClDQoo6UyaLnWd9E9cshdwORHG/jN/RdJ
+         xaV+ctip9qT+NOtVFAFVnv0azE6qDGv3C/xyePJvckwSI/ZKrDcygb4xLSWyNvJ6P6b4
+         7aPQ==
+X-Gm-Message-State: AOAM531bZh5ia5V0qOR9CYeeK4bH6cqyS2+9ClJCKIRMj41tZ4/JaYmR
+        GzI4SXUAq703SpgzI+2TkhJHRYocxravu9zYHsQ=
+X-Google-Smtp-Source: ABdhPJxIcVzS1V95pBlMUcYP2k7Lrcyzl/rBNhnf3pbvrkTovj6aQvXpyQPCUffP2FcbLTl6T7AIgJQIhLFRrE2qAuQ=
+X-Received: by 2002:a17:90a:4a06:: with SMTP id e6mr968675pjh.228.1639590342342;
+ Wed, 15 Dec 2021 09:45:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20211128035704.270739-1-yury.norov@gmail.com> <20211128035704.270739-3-yury.norov@gmail.com>
+ <YaPGDOvBzhiRFcOP@qmqm.qmqm.pl> <CAAH8bW9-dbENFUrwPUQ-uJVVX_s=PWb2zpAJ8BqkV3vJE696mA@mail.gmail.com>
+ <0ccb827de1164b2989d652bfb6f1bbab@AcuMS.aculab.com>
+In-Reply-To: <0ccb827de1164b2989d652bfb6f1bbab@AcuMS.aculab.com>
+From:   Yury Norov <yury.norov@gmail.com>
+Date:   Wed, 15 Dec 2021 09:45:30 -0800
+Message-ID: <CAAH8bW-u5AsFTXUOJPRkF-6dk1LcL7PE0Tm+dUc9Ctb6JMy=tg@mail.gmail.com>
+Subject: Re: [PATCH 2/9] lib/bitmap: implement bitmap_{empty,full} with bitmap_weight_eq()
+To:     David Laight <David.Laight@aculab.com>
+Cc:     =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Andi Kleen <ak@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Gross <agross@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Lameter <cl@linux.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Dennis Zhou <dennis@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Geetha sowjanya <gakula@marvell.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Guo Ren <guoren@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jason Wessel <jason.wessel@windriver.com>,
+        Jens Axboe <axboe@fb.com>, Jiri Olsa <jolsa@redhat.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Kees Cook <keescook@chromium.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Marc Zyngier <maz@kernel.org>, Marcin Wojtas <mw@semihalf.com>,
+        Mark Gross <markgross@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Matti Vaittinen <mazziesaccount@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Mel Gorman <mgorman@suse.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Roy Pledge <Roy.Pledge@nxp.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Solomon Peachy <pizza@shaftnet.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Tariq Toukan <tariqt@nvidia.com>, Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Will Deacon <will@kernel.org>,
+        "bcm-kernel-feedback-list@broadcom.com" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-alpha@vger.kernel.org" <linux-alpha@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>,
+        "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-snps-arc@lists.infradead.org" 
+        <linux-snps-arc@lists.infradead.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Give the same priority of OMAP DES/3DES than OMAP AES for being sure it
-is picked before software implementation.
+On Wed, Dec 15, 2021 at 12:41 AM David Laight <David.Laight@aculab.com> wrote:
+>
+> From: Yury Norov
+> > Sent: 14 December 2021 19:43
+> ...
+> >
+> > I think that for long bitmaps the most time consuming operation is moving
+> > data to L1, and for short bitmaps the difference between approaches is
+> > barely measurable.
+> >
+> > But hweght_long on each iteration can't be more effective than the current
+> > version. So, I'll drop this patch for v2 and keep things unchanged.
+>
+> Actually do bitmap_full/empty() calls make any sense at all?
+> The result is stale since bitmaps are designed to do locked operations.
+> If you have a lock covering the bitmap then you should be using
+> something that uses non-locked accesses.
+> Rightly or wrongly that isn't the bitmap api.
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- drivers/crypto/omap-des.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
-index be77656864e3..538aff80869f 100644
---- a/drivers/crypto/omap-des.c
-+++ b/drivers/crypto/omap-des.c
-@@ -735,7 +735,7 @@ static struct skcipher_alg algs_ecb_cbc[] = {
- {
- 	.base.cra_name		= "ecb(des)",
- 	.base.cra_driver_name	= "ecb-des-omap",
--	.base.cra_priority	= 100,
-+	.base.cra_priority	= 300,
- 	.base.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
- 				  CRYPTO_ALG_ASYNC,
- 	.base.cra_blocksize	= DES_BLOCK_SIZE,
-@@ -752,7 +752,7 @@ static struct skcipher_alg algs_ecb_cbc[] = {
- {
- 	.base.cra_name		= "cbc(des)",
- 	.base.cra_driver_name	= "cbc-des-omap",
--	.base.cra_priority	= 100,
-+	.base.cra_priority	= 300,
- 	.base.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
- 				  CRYPTO_ALG_ASYNC,
- 	.base.cra_blocksize	= DES_BLOCK_SIZE,
-@@ -770,7 +770,7 @@ static struct skcipher_alg algs_ecb_cbc[] = {
- {
- 	.base.cra_name		= "ecb(des3_ede)",
- 	.base.cra_driver_name	= "ecb-des3-omap",
--	.base.cra_priority	= 100,
-+	.base.cra_priority	= 300,
- 	.base.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
- 				  CRYPTO_ALG_ASYNC,
- 	.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
-@@ -787,7 +787,7 @@ static struct skcipher_alg algs_ecb_cbc[] = {
- {
- 	.base.cra_name		= "cbc(des3_ede)",
- 	.base.cra_driver_name	= "cbc-des3-omap",
--	.base.cra_priority	= 100,
-+	.base.cra_priority	= 300,
- 	.base.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
- 				  CRYPTO_ALG_ASYNC,
- 	.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
--- 
-2.32.0
-
+Are you talking about __{set,clear}_bit()?
+include/asm-generic/bitops/non-atomic.h
