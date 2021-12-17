@@ -2,129 +2,155 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D9CC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Dec 2021 13:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31CBCC4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Dec 2021 13:54:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234403AbhLQNvp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Dec 2021 08:51:45 -0500
-Received: from mail-ua1-f43.google.com ([209.85.222.43]:43886 "EHLO
-        mail-ua1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233082AbhLQNvo (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Dec 2021 08:51:44 -0500
-Received: by mail-ua1-f43.google.com with SMTP id 107so4400892uaj.10;
-        Fri, 17 Dec 2021 05:51:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IzymPMQBtSGyl0KMkX7mRJW21YY8HhWUvGCPuNIAzLc=;
-        b=2kmyB2CVofVserc+bm2snp8gFJudz+9Hm0Ie9OK3Ob6ICL/0ZVvkFIF5D5LEna8bJE
-         qwxgbnh1ncfXnWocglQ75JtnRtLjp8vTCaoytyUTpUqANMK9P88DMsJ0S9imCGf3lFvv
-         pnI7AQYJONE9svhSkwvRLsf/94xuMPP0lMSdwNhz50oVqmpGaSom3lhqVB81QHAuaDTL
-         9XoScuDy43ZsH/uBadV6Y+jm46tv+GLJi8Vr65RfjWWqQNNasd/le0sHuW1XWFylM6dn
-         NYKu32pC+5Byz4HoZvcFw7MyBKnw/VEWn4kjMTappASDkLlNyg5fuY9jm63C3Ik2QP9N
-         Rr5A==
-X-Gm-Message-State: AOAM530VPHD6YiubK+QRkTlu98hCP8EE7I7BSCvKXLexqKXBQzKaVrCL
-        W2sHg63xPV430QP+yaLya12UhcizDFhlRA==
-X-Google-Smtp-Source: ABdhPJygqHbD/X/j8BRU0bhjpRRjRAWfUxD7m6R8LZ06FOC/Bi4xRjb7x1NpLLTc+CgbjrViTdloRw==
-X-Received: by 2002:ab0:6f49:: with SMTP id r9mr899509uat.111.1639749103352;
-        Fri, 17 Dec 2021 05:51:43 -0800 (PST)
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com. [209.85.221.174])
-        by smtp.gmail.com with ESMTPSA id c14sm1769301vkm.10.2021.12.17.05.51.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Dec 2021 05:51:43 -0800 (PST)
-Received: by mail-vk1-f174.google.com with SMTP id m200so1568227vka.6;
-        Fri, 17 Dec 2021 05:51:43 -0800 (PST)
-X-Received: by 2002:a1f:4641:: with SMTP id t62mr1041561vka.0.1639748601739;
- Fri, 17 Dec 2021 05:43:21 -0800 (PST)
-MIME-Version: 1.0
-References: <20211217093325.30612-1-conor.dooley@microchip.com> <20211217093325.30612-15-conor.dooley@microchip.com>
-In-Reply-To: <20211217093325.30612-15-conor.dooley@microchip.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Fri, 17 Dec 2021 14:43:10 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdV0N-15kNZ1fnzaj_psNVCRUQP506Noc-tHawmgxqCVeA@mail.gmail.com>
-Message-ID: <CAMuHMdV0N-15kNZ1fnzaj_psNVCRUQP506Noc-tHawmgxqCVeA@mail.gmail.com>
-Subject: Re: [PATCH v2 14/17] riscv: dts: microchip: add fpga fabric section
- to icicle kit
-To:     Conor Dooley <conor.dooley@microchip.com>
-Cc:     Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
+        id S236875AbhLQNyW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Dec 2021 08:54:22 -0500
+Received: from gate.crashing.org ([63.228.1.57]:60104 "EHLO gate.crashing.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231667AbhLQNyV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Dec 2021 08:54:21 -0500
+Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
+        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 1BHDZQmf021580;
+        Fri, 17 Dec 2021 07:35:26 -0600
+Received: (from segher@localhost)
+        by gate.crashing.org (8.14.1/8.14.1/Submit) id 1BHDZJZQ021573;
+        Fri, 17 Dec 2021 07:35:19 -0600
+X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
+Date:   Fri, 17 Dec 2021 07:35:18 -0600
+From:   Segher Boessenkool <segher@kernel.crashing.org>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Rich Felker <dalias@libc.org>,
+        "linux-sh@vger.kernel.org" <linux-sh@vger.kernel.org>,
+        "Richard Russon (FlatCap)" <ldm@flatcap.org>,
+        X86 ML <x86@kernel.org>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Paul Mackerras <paulus@samba.org>,
+        linux-m68k <linux-m68k@vger.kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:SPARC + UltraSPARC (sparc/sparc64)" 
+        <sparclinux@vger.kernel.org>, Stafford Horne <shorne@gmail.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Yoshinori Sato <ysato@users.osdn.me>,
+        Russell King <linux@armlinux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Jonas Bonn <jonas@southpole.se>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ganapathi Bhat <ganapathi017@gmail.com>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "openrisc@lists.librecores.org" <openrisc@lists.librecores.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@kernel.org>,
+        John Johansen <john.johansen@canonical.com>,
+        Xinming Hu <huxinming820@gmail.com>,
+        Vineet Gupta <vgupta@synopsys.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux I2C <linux-i2c@vger.kernel.org>,
-        Linux PWM List <linux-pwm@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
+        "linux-ntfs-dev@lists.sourceforge.net" 
+        <linux-ntfs-dev@lists.sourceforge.net>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-rtc@vger.kernel.org, linux-spi <linux-spi@vger.kernel.org>,
-        USB list <linux-usb@vger.kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Lewis Hanly <lewis.hanly@microchip.com>,
-        daire.mcnamara@microchip.com, ivan.griffin@microchip.com,
-        Atish Patra <atish.patra@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
+        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
+        <netdev@vger.kernel.org>,
+        "johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+        "open list:LINUX FOR POWERPC (32-BIT AND 64-BIT)" 
+        <linuxppc-dev@lists.ozlabs.org>,
+        Sharvari Harisangam <sharvari.harisangam@nxp.com>
+Subject: Re: [PATCH v2 00/13] Unify asm/unaligned.h around struct helper
+Message-ID: <20211217133518.GR614@gate.crashing.org>
+References: <20210514100106.3404011-1-arnd@kernel.org> <CAMj1kXG0CNomZ0aXxh_4094fT+g4bVWFCkrd7QwgTQgiqoxMWA@mail.gmail.com> <20211216185620.GP614@gate.crashing.org> <698cfc52a0d441f7b9f29424be82b2e8@AcuMS.aculab.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <698cfc52a0d441f7b9f29424be82b2e8@AcuMS.aculab.com>
+User-Agent: Mutt/1.4.2.3i
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Conor,
+On Fri, Dec 17, 2021 at 12:34:53PM +0000, David Laight wrote:
+> From: Segher Boessenkool
+> > Sent: 16 December 2021 18:56
+> ...
+> > > The only remaining problem here is reinterpreting a char* pointer to a
+> > > u32*, e.g., for accessing the IP address in an Ethernet frame when
+> > > NET_IP_ALIGN == 2, which could suffer from the same UB problem again,
+> > > as I understand it.
+> > 
+> > The problem is never casting a pointer to pointer to character type, and
+> > then later back to an appriopriate pointer type.
+> > These things are both required to work.
+> 
+> I think that is true of 'void *', not 'char *'.
 
-On Fri, Dec 17, 2021 at 10:33 AM <conor.dooley@microchip.com> wrote:
-> From: Conor Dooley <conor.dooley@microchip.com>
->
-> Split the device tree for the Microchip MPFS into two sections by adding
-> microchip-mpfs-fabric.dtsi, which contains peripherals contained in the
-> FPGA fabric.
->
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+No, see 6.3.2.3/7.  Both are allowed (and behave the same in fact).
 
-Thanks for your patch!
+> 'char' is special in that 'strict aliasing' doesn't apply to it.
+> (Which is actually a pain sometimes.)
 
-> --- /dev/null
-> +++ b/arch/riscv/boot/dts/microchip/microchip-mpfs-fabric.dtsi
-> @@ -0,0 +1,13 @@
-> +// SPDX-License-Identifier: (GPL-2.0 OR MIT)
-> +/* Copyright (c) 2020-2021 Microchip Technology Inc */
-> +
-> +/ {
-> +       corePWM0: pwm@41000000 {
-> +               compatible = "microchip,corepwm";
-> +               reg = <0x0 0x41000000 0x0 0xF0>;
-> +               microchip,sync-update = /bits/ 8 <0>;
-> +               #pwm-cells = <2>;
-> +               clocks = <&clkcfg CLK_FIC3>;
-> +               status = "disabled";
-> +       };
+That has nothing to do with it.  Yes, you can validly access any memory
+as a character type, but that has nothing to do with what pointer casts
+are allowed and which are not.
 
-I'm wondering if these should be grouped under a "fabric" subnode,
-like we have an "soc" subnode for on-SoC devices? Rob?
+> > The problem always is accessing something as if it
+> > was something of another type, which is not valid C.  This however is
+> > exactly what -fno-strict-aliasing allows, so that works as well.
+> 
+> IIRC the C language only allows you to have pointers to valid data items.
+> (Since they can only be generated by the & operator on a valid item.)
 
-BTW, do you already have a naming plan for different revisions of
-FPGA fabric cores?
+Not so.  For example you are explicitly allowed to have pointers one
+past the last element of an array (and do arithmetic on that!), and of
+course null pointers are a thing.
 
-Gr{oetje,eeting}s,
+C allows you to make up pointers from integers as well.  This is
+perfectly fine to do.  Accessing anything via such pointers might well
+be not standard C, of course.
 
-                        Geert
+> Indirecting any other pointer is probably UB!
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+If a pointer points to an object, indirecting it gives an lvalue of that
+object.  It does not matter how you got that pointer, all that matters
+is that it points at a valid object.
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+> This (sort of) allows the compiler to 'look through' casts to find
+> what the actual type is (or might be).
+> It can then use that information to make optimisation choices.
+> This has caused grief with memcpy() calls that are trying to copy
+> a structure that the coder knows is misaligned to an aligned buffer.
+
+This is 6.5/7.
+
+Alignment is 6.2.8 but it doesn't actually come into play at all here.
+
+> So while *(unaligned_ptr *)char_ptr probably has to work.
+
+Only if the original pointer points to an object that is correct
+(including correctly aligned) for such an lvalue.
+
+> If the compiler can see *(unaligned_ptr *)(char *)int_ptr it can
+> assume the alignment of the 'int_ptr' and do a single aligned access.
+
+It is undefined behaviour to have an address in int_ptr that is not
+correctly aligned for whatever type it points to.
+
+
+Segher
