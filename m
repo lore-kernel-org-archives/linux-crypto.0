@@ -2,94 +2,155 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5008C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Dec 2021 09:22:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1BBBC4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Dec 2021 09:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234089AbhLQJWr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Dec 2021 04:22:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55660 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234088AbhLQJWq (ORCPT
+        id S234121AbhLQJbr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Dec 2021 04:31:47 -0500
+Received: from esa.microchip.iphmx.com ([68.232.154.123]:64456 "EHLO
+        esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232622AbhLQJbq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Dec 2021 04:22:46 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 794E1C061574
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Dec 2021 01:22:46 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id a18so2812425wrn.6
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Dec 2021 01:22:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:from:to:cc
-         :subject:content-transfer-encoding;
-        bh=1yfNCo8VRhdwK/7VGC16YL9MFDVWcjraEVxKJN7nxPM=;
-        b=U1k+UuMfGPjj5ihhGsVe7t8IWQ91SiXkRwaQk8avDprb4IJR8WgyT3z8tm4EoTl6UF
-         lniK9xvQhtJ/S5zKxTWpXCcUDJHfSZpoe9permN0WmQNWINQN6VWJooK628lzD7uC9++
-         E+UYXxIHM8pTI4i1w5vWjYPlAdqmrcMJshKhbihOlucqhZHnI9y48yFcfOfr2s8RzbQg
-         FHumWrVUku5+7C9ydRDnYoAg+fqNBlVyRk6/kMAamnobE/QVkbTAh1dZYXnJz1j4MWsY
-         25FnC6ojBbA5n+Cmwjj8OCUN9jtenSrF2fXjWPQs9PZmJYeNctl1wRMgQud/JNUQSSrK
-         Mz8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:from:to:cc:subject:content-transfer-encoding;
-        bh=1yfNCo8VRhdwK/7VGC16YL9MFDVWcjraEVxKJN7nxPM=;
-        b=LnpTtpOKBn1GnFPkA3thB5S7/4pM01m8AY0/oO9+zHB7t94FIcEktB2e2sjzhia7vC
-         1YdcImNVrCITjxXPrf0Ct+9DfY/5yVUDOHy976JUC2RdWXQWcSfWxyGGE1KHrqFno8i8
-         Bo1JjBtTAZ1LHMTeamuPpiHVk6+xuCjtYSwe8WmPbxVcmMJaTK0GHHcRhAhFZ2Q8OND2
-         v0wA8X8g1Hs74cpjk2rHS9UhFhDMl9yyWAHZrzhMJo4ixRrFt0h6DWJnNMGM/c+7pyll
-         YX//YxyNvV48WcF2ALtJLMC0IakcSnS4L6E3JfZ7U2uZoHPUawDuyvSb3cyZ8ACb/OwF
-         TM9A==
-X-Gm-Message-State: AOAM530EmSwlwCk8+gyIPMswF7ArnpMK9Q+5EblF6yYrB7Fa4pLfZ7bz
-        EtJ0ziFAf1KtFcfO+t3k4JUhDlCGCRs=
-X-Google-Smtp-Source: ABdhPJxB/qMkQeO73a4E0Nr979wj/740Iq9suuCSF4Ri020SCDqIlOxy1kWYzfPG8w53rfj9uYvQ/g==
-X-Received: by 2002:a05:6000:1564:: with SMTP id 4mr1709823wrz.9.1639732965050;
-        Fri, 17 Dec 2021 01:22:45 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f24:fd00:5c04:3253:ca5d:176d? (p200300ea8f24fd005c043253ca5d176d.dip0.t-ipconnect.de. [2003:ea:8f24:fd00:5c04:3253:ca5d:176d])
-        by smtp.googlemail.com with ESMTPSA id j85sm11729447wmj.3.2021.12.17.01.22.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Dec 2021 01:22:44 -0800 (PST)
-Message-ID: <ed1ac2f8-5259-684d-42c8-effdf2920e78@gmail.com>
-Date:   Fri, 17 Dec 2021 10:03:30 +0100
+        Fri, 17 Dec 2021 04:31:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1639733506; x=1671269506;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AiH35vfVR97qjjvR+EuTMqv5QNgWOX0ByCYMdoaTevk=;
+  b=WfVph1qHrXSkv/zn0Lhy3l7YfA/pZ5c5voih1jWzRqicQENGRrFt/0l/
+   qUmWu4RCJ/zfoIFCSehR0OFpp/82NGinp56PQpVVqulJ+1/+bOhYuoAWo
+   lmGNUTT2A+gzg0+r2qsXbsJqPH6OleD2qdrWwqTSV4blK39xBOOYhOGMx
+   WXdlPqmtR+zzJoDIxbjUu+tCmVbSWNjQOTnMuaC6B/KVrbPcfTerI/aTh
+   E8P4kw+LEoYYdvd0XGFY3VIMySukUPMWhr37Em8RYxKyJuqwTALbyUvMQ
+   M5vCgA3saVYZXxHHcOtcLbXy3vtgaLp04CFSsmRaEUFKdBd2lvAmfZQTr
+   w==;
+IronPort-SDR: tqBhz6WjJ9sd7LE5+/I2awnGMCnbhAx3CKjmBsi3iQo9I5sLdEwA3aY+5jrs8XJE83ngcLlnwO
+ QXmpTqdyeKGX4hHiBWbMf6GEtBmtoPu3Ck5VNFXzduDzJT0wRHPn83+qV+3K/yZ02SEpKHgHsc
+ 8eUpPSkMn/winNoKoaG/+kZOu/mlEWWaNgJ51yhZlFvba+TW4TK3T3nHNPxOu6JkM6XtDlLQ07
+ OTBvNGtqSO84zcIoRetla6lbjebJEzxzfZhOhJRw9jjfUE9UdUw7QykCf45asktnjnOL/Ty5QD
+ UGHy7sOdQkJMbQ1CK/jn5Ci5
+X-IronPort-AV: E=Sophos;i="5.88,213,1635231600"; 
+   d="scan'208";a="79895886"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 17 Dec 2021 02:31:44 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.17; Fri, 17 Dec 2021 02:31:44 -0700
+Received: from wendy.microchip.com (10.10.115.15) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2375.17 via Frontend
+ Transport; Fri, 17 Dec 2021 02:31:38 -0700
+From:   <conor.dooley@microchip.com>
+To:     <linus.walleij@linaro.org>, <bgolaszewski@baylibre.com>,
+        <robh+dt@kernel.org>, <jassisinghbrar@gmail.com>,
+        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+        <aou@eecs.berkeley.edu>, <a.zummo@towertech.it>,
+        <alexandre.belloni@bootlin.com>, <broonie@kernel.org>,
+        <gregkh@linuxfoundation.org>, <thierry.reding@gmail.com>,
+        <u.kleine-koenig@pengutronix.de>, <lee.jones@linaro.org>,
+        <linux-gpio@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+        <linux-pwm@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+        <linux-crypto@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
+        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
+CC:     <krzysztof.kozlowski@canonical.com>, <geert@linux-m68k.org>,
+        <bin.meng@windriver.com>, <heiko@sntech.de>,
+        <lewis.hanly@microchip.com>, <conor.dooley@microchip.com>,
+        <daire.mcnamara@microchip.com>, <ivan.griffin@microchip.com>,
+        <atish.patra@wdc.com>
+Subject: [PATCH v2 00/17] Update the Icicle Kit device tree
+Date:   Fri, 17 Dec 2021 09:33:08 +0000
+Message-ID: <20211217093325.30612-1-conor.dooley@microchip.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Content-Language: en-US
-From:   Heiner Kallweit <hkallweit1@gmail.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: omap-aes: Fix broken pm_runtime_and_get() usage
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This fix is basically the same as 3d6b661330a7 ("crypto: stm32 -
-Revert broken pm_runtime_resume_and_get changes"), just for the omap
-driver. If the return value isn't used, then pm_runtime_get_sync()
-has to be used for ensuring that the usage count is balanced.
+From: Conor Dooley <conor.dooley@microchip.com>
 
-Fixes: 1f34cc4a8da3 ("crypto: omap-aes - Fix PM reference leak on omap-aes.c")
-Cc: stable@vger.kernel.org
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/crypto/omap-aes.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This series updates the Microchip Icicle Kit device tree by adding a
+host of peripherals, and some updates to the memory map. In addition,
+the device tree has been split into a third part, which contains "soft"
+peripherals that are in the fpga fabric.
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 9b968ac4e..a196bb8b1 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -1302,7 +1302,7 @@ static int omap_aes_suspend(struct device *dev)
- 
- static int omap_aes_resume(struct device *dev)
- {
--	pm_runtime_resume_and_get(dev);
-+	pm_runtime_get_sync(dev);
- 	return 0;
- }
- #endif
+Several of the entries are for peripherals that have not get had their
+drivers upstreamed, so in those cases the dt bindings are included where
+appropriate in order to avoid as many "DT compatible string <x> appears
+un-documented" errors as possible.
+
+Depends on mpfs clock driver series [1] to provide:
+dt-bindings/clock/microchip,mpfs-clock.h
+and on the other changes to the icicle/mpfs device tree (mmc) that are
+already in linux/riscv/for-next.
+
+Also depends on Geert's format changes to interrupt grouping etc [2].
+
+Additionally, the interrupt-extended warnings on the plic/clint are 
+cleared by [3] & [4], which lore appears to have been very confused about.
+
+[1] https://lore.kernel.org/linux-clk/20211216140022.16146-1-conor.dooley@microchip.com/T/
+[2] https://lore.kernel.org/linux-riscv/cover.1639660956.git.geert@linux-m68k.org/T/
+[3] https://patchwork.kernel.org/project/linux-riscv/cover/cover.1639662093.git.geert@linux-m68k.org/
+[4] https://patchwork.kernel.org/project/linux-riscv/cover/cover.1639661878.git.geert@linux-m68k.org/
+
+Conor Dooley (16):
+  dt-bindings: soc/microchip: update syscontroller compatibles
+  dt-bindings: soc/microchip: make systemcontroller a mfd
+  mailbox: change mailbox-mpfs compatible string
+  dt-bindings: i2c: add bindings for microchip mpfs i2c
+  dt-bindings: rng: add bindings for microchip mpfs rng
+  dt-bindings: rtc: add bindings for microchip mpfs rtc
+  dt-bindings: soc/microchip: add bindings for mpfs system services
+  dt-bindings: gpio: add bindings for microchip mpfs gpio
+  dt-bindings: spi: add bindings for microchip mpfs spi
+  dt-bindings: usb: add bindings for microchip mpfs musb
+  dt-bindings: pwm: add microchip corePWM binding
+  riscv: dts: microchip: use hart and clk defines for icicle kit
+  riscv: dts: microchip: add fpga fabric section to icicle kit
+  riscv: dts: microchip: refactor icicle kit device tree
+  riscv: dts: microchip: update peripherals in icicle kit device tree
+  MAINTAINERS: update riscv/microchip entry
+
+Ivan Griffin (1):
+  dt-bindings: interrupt-controller: create a header for RISC-V
+    interrupts
+
+ .../bindings/gpio/microchip,mpfs-gpio.yaml    |  80 +++++
+ .../bindings/i2c/microchip,mpfs-i2c.yaml      |  54 ++++
+ ...ilbox.yaml => microchip,mpfs-mailbox.yaml} |   6 +-
+ .../bindings/pwm/microchip,corepwm.yaml       |  61 ++++
+ .../bindings/rng/microchip,mpfs-rng.yaml      |  29 ++
+ .../bindings/rtc/microchip,mfps-rtc.yaml      |  63 ++++
+ .../microchip,mpfs-generic-service.yaml       |  33 ++
+ .../microchip,mpfs-sys-controller.yaml        |  62 ++++
+ ...icrochip,polarfire-soc-sys-controller.yaml |  35 ---
+ .../bindings/spi/microchip,mpfs-spi.yaml      |  61 ++++
+ .../bindings/usb/microchip,mpfs-musb.yaml     |  61 ++++
+ MAINTAINERS                                   |   2 +
+ .../dts/microchip/microchip-mpfs-fabric.dtsi  |  13 +
+ .../microchip/microchip-mpfs-icicle-kit.dts   | 111 +++++--
+ .../boot/dts/microchip/microchip-mpfs.dtsi    | 295 ++++++++++++++----
+ drivers/mailbox/mailbox-mpfs.c                |   2 +-
+ .../interrupt-controller/riscv-hart.h         |  19 ++
+ 17 files changed, 872 insertions(+), 115 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/gpio/microchip,mpfs-gpio.yaml
+ create mode 100644 Documentation/devicetree/bindings/i2c/microchip,mpfs-i2c.yaml
+ rename Documentation/devicetree/bindings/mailbox/{microchip,polarfire-soc-mailbox.yaml => microchip,mpfs-mailbox.yaml} (82%)
+ create mode 100644 Documentation/devicetree/bindings/pwm/microchip,corepwm.yaml
+ create mode 100644 Documentation/devicetree/bindings/rng/microchip,mpfs-rng.yaml
+ create mode 100644 Documentation/devicetree/bindings/rtc/microchip,mfps-rtc.yaml
+ create mode 100644 Documentation/devicetree/bindings/soc/microchip/microchip,mpfs-generic-service.yaml
+ create mode 100644 Documentation/devicetree/bindings/soc/microchip/microchip,mpfs-sys-controller.yaml
+ delete mode 100644 Documentation/devicetree/bindings/soc/microchip/microchip,polarfire-soc-sys-controller.yaml
+ create mode 100644 Documentation/devicetree/bindings/spi/microchip,mpfs-spi.yaml
+ create mode 100644 Documentation/devicetree/bindings/usb/microchip,mpfs-musb.yaml
+ create mode 100644 arch/riscv/boot/dts/microchip/microchip-mpfs-fabric.dtsi
+ create mode 100644 include/dt-bindings/interrupt-controller/riscv-hart.h
+
 -- 
-2.34.1
+2.33.1
 
