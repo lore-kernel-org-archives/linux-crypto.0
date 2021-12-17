@@ -2,45 +2,45 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C88BBC4167B
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Dec 2021 09:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F51C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Dec 2021 09:33:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234268AbhLQJdP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Dec 2021 04:33:15 -0500
+        id S234302AbhLQJdT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Dec 2021 04:33:19 -0500
 Received: from esa.microchip.iphmx.com ([68.232.153.233]:26521 "EHLO
         esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232786AbhLQJdO (ORCPT
+        with ESMTP id S234284AbhLQJdQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Dec 2021 04:33:14 -0500
+        Fri, 17 Dec 2021 04:33:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1639733594; x=1671269594;
+  t=1639733595; x=1671269595;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=AZ9n/RyDSa/dhqvl7nTlTNh+a3wwb7PMc//RGFolf8w=;
-  b=mM0x/glgcq7Do/QyCRX16aw/R+HMD1JIQmzQ+4hMKS0XpTRUCQ4SnjkW
-   AxMgdx6hdz3hza84w9CizGKVkHDjB/eyAC/pafzT7SuKCjSRgnCg+/ELp
-   ezvRFpotVDvbuuWxVrDtTWzUhI5WUSilmQ2fHmVHSjQvowodj+KnUB+T+
-   QmOIXqB8qg050SgwAcHcMJRfkEWieq8dPPTW+WU5VkHaNFB0hZ7ppHwQ+
-   i3TITGVcOgqkRYd/rM6/w4dXv6sISd+ZwTuuLx8Hj/arHnurOBqr2rqHf
-   cXg+SLfV2iUpqTDNCwxYRdy8EzhrHC+wzuueJqmzDHXdtgPzBkr670Z1w
-   g==;
-IronPort-SDR: URrvqfHRIKuhsX04dHO5TwmpgWvtDIMhF78YdofCTrkXAmRTVPOmQ1RmHEd5wpIimtFRad8/Me
- uQoAlyKxdynFMA47OHC1uo3LoJpFqPy2tcj0+afKERlsVjGnbMgXYGCexsdH3BtFKvx/DzXegY
- VFOuScWBc3AeJXLHNVNjmtbHfWCK0cvx/QO0twyAVRXyzGBk/datukPaSSkACKcoZNRiumuQcB
- /1MbgOBrWhC+NAZxuRcCP65M9mpYxhCEn3iZBI1dPSPaJyGJ5ZVOmh4wr+cb3WTa/yaxkQQQ29
- 58jmm0K0BLbxX/ZWbgCgcIPe
+  bh=tyKmBa6H+LS4VXJh8pc0QMMYrGpUxJ+pgwPwgwEvzv8=;
+  b=by6J34CCZ+qinxEpjyEU+nS4fZp4E4Z8e+s8Os7u+T1vAlkGVqVuhJcJ
+   wRKCJR4iojqlmjAieUkHBMrYIy27h17DwHpvqCo/rSE73+9USAbrmabWP
+   Uv+mUlzLYX9gjDQsfW8/wbC4IMPuU/VaRscGeHrzpRbYz+EThOzV2X5I9
+   +Dm/JI8g8IOOjNcMl3uMcl0/JXZMoV+RTZGX0eGuZOIOtxq6U4JuxCV1/
+   u/KLG0MECIPUIitsZM/2lFIfCycMdvRjuHWYef6dsYRPadXAUS6uReRrE
+   RjpRvSIYnoB763D+v4/oPRaMqolSc/2C7qS2Xf6RBpFMF8eU7faes9IaN
+   Q==;
+IronPort-SDR: AxgE/Y0JrWCILgP7tM4yQ8eyHdaaKn0SDgYPf/PgmtUucz6cvdURR/NRuIbOjI2cKHmilYEwD6
+ JJvZcJdvW4nV8u+LdmJ3LSLxNtCGLG8ShvHLq0eo6rtwUOs9lw6lL+zt7wi0oIoDnwymUo2lxr
+ zJ77X5ySuS5gJNtzcQmCGpNlbE9MIfojfSF3bPnCn9hwG/AcNXqcy0IN3SnlzX1DTnc6CNX9eN
+ doRUcwPXvYtfnLwU33Jlmo4n+coeQW7vT5cF2AgCGJ6Tz8GiqimFgbK5cGpmr14QZ1Mk8P38ma
+ UZF3suAPLTqKlMkIb4Qhx49D
 X-IronPort-AV: E=Sophos;i="5.88,213,1635231600"; 
-   d="scan'208";a="147571047"
+   d="scan'208";a="147571068"
 Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 17 Dec 2021 02:33:09 -0700
+  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 17 Dec 2021 02:33:14 -0700
 Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Fri, 17 Dec 2021 02:33:01 -0700
+ 15.1.2375.17; Fri, 17 Dec 2021 02:33:14 -0700
 Received: from wendy.microchip.com (10.10.115.15) by chn-vm-ex01.mchp-main.com
  (10.10.85.143) with Microsoft SMTP Server id 15.1.2375.17 via Frontend
- Transport; Fri, 17 Dec 2021 02:32:55 -0700
+ Transport; Fri, 17 Dec 2021 02:33:08 -0700
 From:   <conor.dooley@microchip.com>
 To:     <linus.walleij@linaro.org>, <bgolaszewski@baylibre.com>,
         <robh+dt@kernel.org>, <jassisinghbrar@gmail.com>,
@@ -59,9 +59,9 @@ CC:     <krzysztof.kozlowski@canonical.com>, <geert@linux-m68k.org>,
         <lewis.hanly@microchip.com>, <conor.dooley@microchip.com>,
         <daire.mcnamara@microchip.com>, <ivan.griffin@microchip.com>,
         <atish.patra@wdc.com>
-Subject: [PATCH v2 08/17] dt-bindings: soc/microchip: add bindings for mpfs system services
-Date:   Fri, 17 Dec 2021 09:33:16 +0000
-Message-ID: <20211217093325.30612-9-conor.dooley@microchip.com>
+Subject: [PATCH v2 10/17] dt-bindings: spi: add bindings for microchip mpfs spi
+Date:   Fri, 17 Dec 2021 09:33:18 +0000
+Message-ID: <20211217093325.30612-11-conor.dooley@microchip.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211217093325.30612-1-conor.dooley@microchip.com>
 References: <20211217093325.30612-1-conor.dooley@microchip.com>
@@ -74,54 +74,82 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Conor Dooley <conor.dooley@microchip.com>
 
-Add device tree bindings for the services provided by the system
-controller directly on the Microchip PolarFire SoC.
+Add device tree bindings for the {q,}spi controller on
+the Microchip PolarFire SoC.
 
 Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- .../microchip,mpfs-generic-service.yaml       | 33 +++++++++++++++++++
- 1 file changed, 33 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/soc/microchip/microchip,mpfs-generic-service.yaml
+ .../bindings/spi/microchip,mpfs-spi.yaml      | 61 +++++++++++++++++++
+ 1 file changed, 61 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/spi/microchip,mpfs-spi.yaml
 
-diff --git a/Documentation/devicetree/bindings/soc/microchip/microchip,mpfs-generic-service.yaml b/Documentation/devicetree/bindings/soc/microchip/microchip,mpfs-generic-service.yaml
+diff --git a/Documentation/devicetree/bindings/spi/microchip,mpfs-spi.yaml b/Documentation/devicetree/bindings/spi/microchip,mpfs-spi.yaml
 new file mode 100644
-index 000000000000..d044525b3487
+index 000000000000..fe257b3384a9
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/soc/microchip/microchip,mpfs-generic-service.yaml
-@@ -0,0 +1,33 @@
++++ b/Documentation/devicetree/bindings/spi/microchip,mpfs-spi.yaml
+@@ -0,0 +1,61 @@
 +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 +%YAML 1.2
 +---
-+$id: "http://devicetree.org/schemas/soc/microchip/microchip,mpfs-generic-service.yaml#"
-+$schema: "http://devicetree.org/meta-schemas/core.yaml#"
++$id: http://devicetree.org/schemas/spi/microchip,mpfs-spi.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+title: Microchip MPFS system services
++title: Microchip MPFS {Q,}SPI Controller Device Tree Bindings
 +
 +maintainers:
 +  - Conor Dooley <conor.dooley@microchip.com>
 +
-+description: |
-+  The PolarFire SoC system controller is communicated with via a mailbox.
-+  This binding represents several of the functions provided by the system
-+  controller which do not belong in a specific subsystem, such as reading
-+  the fpga device certificate, all of which follow the same format:
-+    - a command + optional payload sent to the sys controller
-+    - a status + a payload returned to Linux.
++allOf:
++  - $ref: spi-controller.yaml#
 +
 +properties:
 +  compatible:
-+    const: microchip,mpfs-generic-service
++    enum:
++      - microchip,mpfs-spi
++      - microchip,mpfs-qspi
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  clock-names:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  num-cs:
++    description: |
++      Number of chip selects used.
++    $ref: /schemas/types.yaml#/definitions/uint32
++    minimum: 1
++    maximum: 8
++    default: 8
 +
 +required:
 +  - compatible
++  - reg
++  - interrupts
++  - clocks
 +
-+additionalProperties: false
++unevaluatedProperties: false
 +
 +examples:
 +  - |
-+    sysserv: sysserv {
-+        compatible = "microchip,mpfs-generic-service";
++    #include "dt-bindings/clock/microchip,mpfs-clock.h"
++    spi0: spi@20108000 {
++        compatible = "microchip,mpfs-spi";
++        reg = <0x20108000 0x1000>;
++        clocks = <&clkcfg CLK_SPI0>;
++        interrupt-parent = <&plic>;
++        interrupts = <54>;
++        spi-max-frequency = <25000000>;
++        num-cs = <8>;
 +    };
++...
 -- 
 2.33.1
 
