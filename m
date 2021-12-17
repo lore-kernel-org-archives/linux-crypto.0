@@ -2,129 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0301DC4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Dec 2021 19:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F380EC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Dec 2021 02:05:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236495AbhLPTPk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Dec 2021 14:15:40 -0500
-Received: from gate.crashing.org ([63.228.1.57]:55698 "EHLO gate.crashing.org"
+        id S232180AbhLQCFy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Dec 2021 21:05:54 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58044 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231803AbhLPTPk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Dec 2021 14:15:40 -0500
-Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
-        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 1BGIuSL3021510;
-        Thu, 16 Dec 2021 12:56:28 -0600
-Received: (from segher@localhost)
-        by gate.crashing.org (8.14.1/8.14.1/Submit) id 1BGIuLq7021509;
-        Thu, 16 Dec 2021 12:56:21 -0600
-X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
-Date:   Thu, 16 Dec 2021 12:56:20 -0600
-From:   Segher Boessenkool <segher@kernel.crashing.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Arnd Bergmann <arnd@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, johannes@sipsolutions.net,
-        Kees Cook <keescook@chromium.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Rich Felker <dalias@libc.org>, linux-sh@vger.kernel.org,
-        Amitkumar Karwar <amitkarwar@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Eric Dumazet <edumazet@google.com>,
-        Paul Mackerras <paulus@samba.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "open list:SPARC + UltraSPARC (sparc/sparc64)" 
-        <sparclinux@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Yoshinori Sato <ysato@users.osdn.me>, X86 ML <x86@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "Richard Russon (FlatCap)" <ldm@flatcap.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Jonas Bonn <jonas@southpole.se>, Arnd Bergmann <arnd@arndb.de>,
-        Ganapathi Bhat <ganapathi017@gmail.com>,
-        "open list:LINUX FOR POWERPC (32-BIT AND 64-BIT)" 
-        <linuxppc-dev@lists.ozlabs.org>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        linux-block@vger.kernel.org,
-        linux-m68k <linux-m68k@vger.kernel.org>,
-        openrisc@lists.librecores.org, Borislav Petkov <bp@alien8.de>,
-        Stafford Horne <shorne@gmail.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        John Johansen <john.johansen@canonical.com>,
-        Xinming Hu <huxinming820@gmail.com>,
-        Vineet Gupta <vgupta@synopsys.com>,
-        linux-wireless@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        linux-ntfs-dev@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
-        <netdev@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Sharvari Harisangam <sharvari.harisangam@nxp.com>
-Subject: Re: [PATCH v2 00/13] Unify asm/unaligned.h around struct helper
-Message-ID: <20211216185620.GP614@gate.crashing.org>
-References: <20210514100106.3404011-1-arnd@kernel.org> <CAMj1kXG0CNomZ0aXxh_4094fT+g4bVWFCkrd7QwgTQgiqoxMWA@mail.gmail.com>
-Mime-Version: 1.0
+        id S231334AbhLQCFy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Dec 2021 21:05:54 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1my2cr-000562-MQ; Fri, 17 Dec 2021 13:05:38 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Dec 2021 13:05:37 +1100
+Date:   Fri, 17 Dec 2021 13:05:37 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH v1 1/1] crypto: Replace kernel.h with the necessary
+ inclusions
+Message-ID: <20211217020537.GA16999@gondor.apana.org.au>
+References: <20211210143009.4770-1-andriy.shevchenko@linux.intel.com>
+ <YbtVNKdrIKFsbIAc@smile.fi.intel.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXG0CNomZ0aXxh_4094fT+g4bVWFCkrd7QwgTQgiqoxMWA@mail.gmail.com>
-User-Agent: Mutt/1.4.2.3i
+In-Reply-To: <YbtVNKdrIKFsbIAc@smile.fi.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 16, 2021 at 06:29:40PM +0100, Ard Biesheuvel wrote:
-> I think this series is a huge improvement, but it does not solve the
-> UB problem completely. As we found, there are open issues in the GCC
-> bugzilla regarding assumptions in the compiler that aligned quantities
-> either overlap entirely or not at all. (e.g.,
-> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100363)
-
-That isn't open, it was closed as INVALID back in May.
-
-(Naturally) aligned quantities only overlap if they are the same datum.
-This follows directly from the definition of (naturally) aligned.  There
-is no mystery here.
-
-All unaligned data need to be marked up properly.
-
-> CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS is used in many places to
-> conditionally emit code that violates C alignment rules.
-
-Most of this is ABI, not C.  It is the ABI that requires certain
-alignments.  Ignoring that plain does not work, but even if it would
-you will end up with much slower generated code.
-
-> whereas the following pattern makes more sense, I think, and does not
-> violate any C rules in the common case:
+On Thu, Dec 16, 2021 at 05:03:16PM +0200, Andy Shevchenko wrote:
+> On Fri, Dec 10, 2021 at 04:30:09PM +0200, Andy Shevchenko wrote:
+> > When kernel.h is used in the headers it adds a lot into dependency hell,
+> > especially when there are circular dependencies are involved.
+> > 
+> > Replace kernel.h inclusion with the list of what is really being used.
 > 
-> #ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
->   // use unaligned accessors, which are cheap or even entirely free
-> #else
->   // avoid unaligned accessors, as they are expensive; instead, reorganize
->   // the data so we don't need them (similar to setting NET_IP_ALIGN to 2)
-> #endif
+> Any comments on this?
 
-Yes, this looks more reasonable.
+I'm happy with this patch and will be applying it.
 
-> The only remaining problem here is reinterpreting a char* pointer to a
-> u32*, e.g., for accessing the IP address in an Ethernet frame when
-> NET_IP_ALIGN == 2, which could suffer from the same UB problem again,
-> as I understand it.
-
-The problem is never casting a pointer to pointer to character type, and
-then later back to an appriopriate pointer type.  These things are both
-required to work.  The problem always is accessing something as if it
-was something of another type, which is not valid C.  This however is
-exactly what -fno-strict-aliasing allows, so that works as well.
-
-But this does not have much to do with alignment.
-
-
-Segher
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
