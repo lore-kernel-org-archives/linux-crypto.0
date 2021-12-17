@@ -2,169 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB0EC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Dec 2021 09:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 230D3C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Dec 2021 09:49:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234502AbhLQJls (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Dec 2021 04:41:48 -0500
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.52]:12447 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234504AbhLQJls (ORCPT
+        id S234197AbhLQJtC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Dec 2021 04:49:02 -0500
+Received: from mail-vk1-f177.google.com ([209.85.221.177]:42998 "EHLO
+        mail-vk1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233096AbhLQJtC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Dec 2021 04:41:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1639734103;
-    s=strato-dkim-0002; d=chronox.de;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=QJDvqAj2MasIMOqUtYpRs8oAybr8RohQtMM08gHmJe4=;
-    b=aMv3vhm4YeqpWCOdZ+xUN5V6MUKRpd94XpP5CEkhEtLjq1FV0Cpai24AAF8sdru7IQ
-    ibcNPv5jQppKiiJy+5tGxtk3A/bFExb2KxCsEincaHCiPE15KpgGkCj3YqnMiGw2KqU4
-    Qhff7MG0RwMl8OQylO4hI4OzWUjQ6ER2xI7iQokPYMS0Hx49bELSIL6Et9rLLT0LQQZT
-    1xmbcaCoV0NUhKVrhYgB6zsi7k84IRyN0Foo6IpcoGULCOYdZj4qdDjmYkDigpKiCrGH
-    0Q7nuzK1F/x5/Kx22T04pwqvkKr2OijIJWMq7j76byEgfSUY6U7kkI+kfMFstDiJQlfu
-    vJuQ==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zW8BKRp5UFiyGZZ4jof7Xg=="
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-    by smtp.strato.de (RZmta 47.35.3 AUTH)
-    with ESMTPSA id h03d91xBH9fgHeA
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Fri, 17 Dec 2021 10:41:42 +0100 (CET)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, simo@redhat.com, skozina@redhat.com,
-        Nicolai Stange <nstange@suse.de>
-Subject: [PATCH] crypto: jitter - add oversampling of noise source
-Date:   Fri, 17 Dec 2021 10:41:42 +0100
-Message-ID: <2573346.vuYhMxLoTh@positron.chronox.de>
+        Fri, 17 Dec 2021 04:49:02 -0500
+Received: by mail-vk1-f177.google.com with SMTP id s1so1136054vks.9;
+        Fri, 17 Dec 2021 01:49:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pV3wufp8Dvr2hDhjItQtnYu6eMKRgXVIFNhbTAtUVzU=;
+        b=yvw5bl0T3tZKXmmpbo/vH01xbr9fzBmv3P+W8H9MtsOKaHt097Nw+0XrQD2L+wMmvr
+         z42lzBUSdFLgxNCKEfMrizK1dIgAR36ZSS6XknytaEWq4mCVg6lsRzb+E1VV6U2BZWbA
+         0mDznrCCYwfZMU3VPpLgdJdCGP2DhqorfKRiuUYFpyabSrujE/j2ofb0DZqwuDOYv1ca
+         qVs97xUcVgHu8B4juOldyJ8X4eTq2aQszGvEcWRea/Ij2wDse4yb7HW/Qht5Sw9cP7oQ
+         2TIUtTHA8iiYmAVgma7H7PrU9qGz1cQb7gG0iGdvHUFWfm4kibiUQErz83Y7dsE5mH3g
+         7kWg==
+X-Gm-Message-State: AOAM531njpYNAKJMNAqxkfZBOusG9qAeRZ8tO0G/b+dUbhBV+QKsnRT/
+        gzDMo1flr+ij0c2Qpxc0ZdqgZ5Je5BWdSw==
+X-Google-Smtp-Source: ABdhPJzlqo2h8WQv5SAzvK4/3sicPepHkLvrIy/RzWGDskdL9bfhn0NyB/ZFWmKRXYRwhZRJgvObZA==
+X-Received: by 2002:a1f:a556:: with SMTP id o83mr811562vke.9.1639734540702;
+        Fri, 17 Dec 2021 01:49:00 -0800 (PST)
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com. [209.85.222.49])
+        by smtp.gmail.com with ESMTPSA id v8sm1679419vkc.52.2021.12.17.01.48.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Dec 2021 01:48:59 -0800 (PST)
+Received: by mail-ua1-f49.google.com with SMTP id u40so3318675uad.1;
+        Fri, 17 Dec 2021 01:48:59 -0800 (PST)
+X-Received: by 2002:a67:c106:: with SMTP id d6mr650580vsj.77.1639734538930;
+ Fri, 17 Dec 2021 01:48:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+References: <20211217093325.30612-1-conor.dooley@microchip.com>
+In-Reply-To: <20211217093325.30612-1-conor.dooley@microchip.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Fri, 17 Dec 2021 10:48:47 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdWTjrAiHosU0cGyJYkK=9JzNgHb=tjHXPdYxTWmkVzeYQ@mail.gmail.com>
+Message-ID: <CAMuHMdWTjrAiHosU0cGyJYkK=9JzNgHb=tjHXPdYxTWmkVzeYQ@mail.gmail.com>
+Subject: Re: [PATCH v2 00/17] Update the Icicle Kit device tree
+To:     Conor Dooley <conor.dooley@microchip.com>
+Cc:     Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-rtc@vger.kernel.org, linux-spi <linux-spi@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Bin Meng <bin.meng@windriver.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Lewis Hanly <lewis.hanly@microchip.com>,
+        daire.mcnamara@microchip.com, ivan.griffin@microchip.com,
+        Atish Patra <atish.patra@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The output n bits can receive more than n bits of min entropy, of course,
-but the fixed output of the conditioning function can only asymptotically
-approach the output size bits of min entropy, not attain that bound.
-Random maps will tend to have output collisions, which reduces the
-creditable output entropy (that is what SP 800-90B Section 3.1.5.1.2
-attempts to bound).
+Hi Conor,
 
-The value "64" is justified in Appendix A.4 of the current 90C draft,
-and aligns with NIST's in "epsilon" definition in this document, which is
-that a string can be considered "full entropy" if you can bound the min
-entropy in each bit of output to at least 1-epsilon, where epsilon is
-required to be <= 2^(-32).
+On Fri, Dec 17, 2021 at 10:31 AM <conor.dooley@microchip.com> wrote:
+> Also depends on Geert's format changes to interrupt grouping etc [2].
+>
+> Additionally, the interrupt-extended warnings on the plic/clint are
+> cleared by [3] & [4], which lore appears to have been very confused about.
 
-Note, this patch causes the Jitter RNG to cut its performance in half in
-FIPS mode because the conditioning function of the LFSR produces 64 bits
-of entropy in one block. The oversampling requires that additionally 64
-bits of entropy are sampled from the noise source. If the conditioner is
-changed, such as using SHA-256, the impact of the oversampling is only
-one fourth, because for the 256 bit block of the conditioner, only 64
-additional bits from the noise source must be sampled.
+Right, it ended up being even more messier than I thought, and confuses
+"b4 am" too.
+I will resend these 3 series later today.
 
-This patch resurrects the function jent_fips_enabled as the oversampling
-support is only enabled in FIPS mode.
+> [1] https://lore.kernel.org/linux-clk/20211216140022.16146-1-conor.dooley@microchip.com/T/
+> [2] https://lore.kernel.org/linux-riscv/cover.1639660956.git.geert@linux-m68k.org/T/
+> [3] https://patchwork.kernel.org/project/linux-riscv/cover/cover.1639662093.git.geert@linux-m68k.org/
+> [4] https://patchwork.kernel.org/project/linux-riscv/cover/cover.1639661878.git.geert@linux-m68k.org/
 
-This patch is derived from the user space jitterentropy-library.
+Gr{oetje,eeting}s,
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/jitterentropy-kcapi.c |  6 ++++++
- crypto/jitterentropy.c       | 22 ++++++++++++++++++++--
- crypto/jitterentropy.h       |  1 +
- 3 files changed, 27 insertions(+), 2 deletions(-)
+                        Geert
 
-diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
-index 2d115bec15ae..b02f93805e83 100644
---- a/crypto/jitterentropy-kcapi.c
-+++ b/crypto/jitterentropy-kcapi.c
-@@ -37,6 +37,7 @@
-  * DAMAGE.
-  */
- 
-+#include <linux/fips.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/slab.h>
-@@ -59,6 +60,11 @@ void jent_zfree(void *ptr)
- 	kfree_sensitive(ptr);
- }
- 
-+int jent_fips_enabled(void)
-+{
-+	return fips_enabled;
-+}
-+
- void jent_panic(char *s)
- {
- 	panic("%s", s);
-diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
-index 8f5283f28ed3..9996120ad23c 100644
---- a/crypto/jitterentropy.c
-+++ b/crypto/jitterentropy.c
-@@ -117,6 +117,21 @@ struct rand_data {
- #define JENT_EHEALTH		9 /* Health test failed during initialization */
- #define JENT_ERCT		10 /* RCT failed during initialization */
- 
-+/*
-+ * The output n bits can receive more than n bits of min entropy, of course,
-+ * but the fixed output of the conditioning function can only asymptotically
-+ * approach the output size bits of min entropy, not attain that bound. Random
-+ * maps will tend to have output collisions, which reduces the creditable
-+ * output entropy (that is what SP 800-90B Section 3.1.5.1.2 attempts to bound).
-+ *
-+ * The value "64" is justified in Appendix A.4 of the current 90C draft,
-+ * and aligns with NIST's in "epsilon" definition in this document, which is
-+ * that a string can be considered "full entropy" if you can bound the min
-+ * entropy in each bit of output to at least 1-epsilon, where epsilon is
-+ * required to be <= 2^(-32).
-+ */
-+#define JENT_ENTROPY_SAFETY_FACTOR	64
-+
- #include "jitterentropy.h"
- 
- /***************************************************************************
-@@ -542,7 +557,10 @@ static int jent_measure_jitter(struct rand_data *ec)
-  */
- static void jent_gen_entropy(struct rand_data *ec)
- {
--	unsigned int k = 0;
-+	unsigned int k = 0, safety_factor = JENT_ENTROPY_SAFETY_FACTOR;
-+
-+	if (!jent_fips_enabled())
-+		safety_factor = 0;
- 
- 	/* priming of the ->prev_time value */
- 	jent_measure_jitter(ec);
-@@ -556,7 +574,7 @@ static void jent_gen_entropy(struct rand_data *ec)
- 		 * We multiply the loop value with ->osr to obtain the
- 		 * oversampling rate requested by the caller
- 		 */
--		if (++k >= (DATA_SIZE_BITS * ec->osr))
-+		if (++k >= ((DATA_SIZE_BITS + safety_factor) * ec->osr))
- 			break;
- 	}
- }
-diff --git a/crypto/jitterentropy.h b/crypto/jitterentropy.h
-index b7397b617ef0..c83fff32d130 100644
---- a/crypto/jitterentropy.h
-+++ b/crypto/jitterentropy.h
-@@ -2,6 +2,7 @@
- 
- extern void *jent_zalloc(unsigned int len);
- extern void jent_zfree(void *ptr);
-+extern int jent_fips_enabled(void);
- extern void jent_panic(char *s);
- extern void jent_memcpy(void *dest, const void *src, unsigned int n);
- extern void jent_get_nstime(__u64 *out);
--- 
-2.33.1
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-
-
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
