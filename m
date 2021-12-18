@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8449C4332F
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Dec 2021 21:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77AB0C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 Dec 2021 21:20:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234307AbhLRVUb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 Dec 2021 16:20:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56208 "EHLO
+        id S234403AbhLRVUg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 18 Dec 2021 16:20:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234232AbhLRVUZ (ORCPT
+        with ESMTP id S234367AbhLRVUf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 Dec 2021 16:20:25 -0500
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1217BC06173F;
-        Sat, 18 Dec 2021 13:20:25 -0800 (PST)
-Received: by mail-oi1-x22f.google.com with SMTP id t23so9358441oiw.3;
-        Sat, 18 Dec 2021 13:20:25 -0800 (PST)
+        Sat, 18 Dec 2021 16:20:35 -0500
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB7FDC06173F;
+        Sat, 18 Dec 2021 13:20:34 -0800 (PST)
+Received: by mail-ot1-x335.google.com with SMTP id x19-20020a9d7053000000b0055c8b39420bso7509080otj.1;
+        Sat, 18 Dec 2021 13:20:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=ZRDbXQndZB+h1W3grije4oLm88mhsLSCo0DvJeL0oOc=;
-        b=RbLh966dNM6Q9dumAKT/s67Li0XDMiqpqy9QDRjKZ7xykviae8HUZGbBK4++gzts9+
-         4HWimSnZbbp981RdIy4mUiEPi5KNC27XZMzAqhbLAbSCXpzsa6pdkKTooARlGNlTUTY6
-         JoyuKChgIL/vGpnEuqm73H3imSDYRcmkvOW7G88lNj2P4DJILBf/LhHA1ZwruMX1IzE2
-         L/mAlIYrOkdOM5wMkeJ8+xwn6+2dLufPFudFw0L+ol31R0QIHi6gU0asPbGQ0WpcgUYF
-         TKKLWiuHi4Ipvj4eEi1DnTT9o6ibI9n5SLfH6H9ye6clD987ERDreQoQOmClSh/YKHYJ
-         9wZA==
+        bh=WiGS3vOK/v3O0DRzsnqINP2MiU5j/NpA/iskqvega7k=;
+        b=HlMNMuUlRLXl3FqNn86I8HMu4WV/KumXU+SYAsh5OSyredjYqpIOYGrBMItLxHzICY
+         RN3GxhpucVS2cEpQMiODoGYePr8Nq2sWHf9LcLO3Wt2YulTnoKg3c1cjdIq07nAW9GiJ
+         uGFWERQJyQgWYyrbtTxNAnq3T1rixNekBD2ai9fTLLh9dBZWHb8c2GPqXlB932zfX3o+
+         GuHX8YNBw2KAnZJZYEkpeiEnQZqfyuEgudpeOc4ta605tUeKYBdtF+JkgS/rSzrBBc6+
+         ah74/2SyVrK6WwdV7QMD08hzgClZ8gGcpdeagLX+n8RBmOqtIeXoz2fiGHcFwqgruiTn
+         mm+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ZRDbXQndZB+h1W3grije4oLm88mhsLSCo0DvJeL0oOc=;
-        b=1/rsUcLANJ/DdYeEdqzynzT+7Ohpn5Mk54qtT9njcfi9KN48ynw9CwE6zFvsA/TmcP
-         U8d19vkLI3+vfT99Lr/kcZsKa25oc/6uquXuNtWBmxtuIamXW8gMIuHibbL26YjuCV4f
-         3VxjCMZzN2hiMq00tQVunpeYGl94J848n3g1yn9soDMpdNwzO7OciaTV1DUgNaX2AHWI
-         FZHPTb/QpNPLnvCoh4CRfkx9nYu4VD+6ZXisVb0fbywwYDPsqgtgnvUQptDwfd9Ewmgm
-         qPHF4SDa5au5eA0RqD8RcpKP4DyN1RLNVBokdRs5MZieaIScTDVFjxa1clr0ogJH+JNx
-         k/Cg==
-X-Gm-Message-State: AOAM5337nziDsxGI9ct+s3TfhDcpG65cjA0jv9zmDtJhzS7MySrwNPnv
-        j/fipfwFFwKkTW5MBzkbiwyY7ABHPMHgrQ==
-X-Google-Smtp-Source: ABdhPJxshh8wZNTv7Y9Ku4jyb7QQxFrS/1r/onV0bhXisp6AJbbov2WJDwCGNF7Hkx62Pk9+Bq0Ozw==
-X-Received: by 2002:a05:6808:159a:: with SMTP id t26mr13219038oiw.106.1639862424104;
-        Sat, 18 Dec 2021 13:20:24 -0800 (PST)
+        bh=WiGS3vOK/v3O0DRzsnqINP2MiU5j/NpA/iskqvega7k=;
+        b=m9SniXETgqGmnoDqNxbHXhebDIcD9+9cj2ItE6oCCpaXi4g/GcIYyLpj3FaUKwUCpt
+         4ZDuqDBNpxxJ0wDyhEei7pOBONvhRr11sD5u9bDwqCllljvdaR2o2GaIsYoXKWCT+c1H
+         lYZGvdbxJP4kbUyJtyVdMP3z6U8lIzT2nDjUvZn4ZYpIkklsIFOqY0NOKk28qlhlxKF5
+         wThBJuUyoPXHfLEs5gdy0OPM9gdO3D/yp+ZF3/MovqqzdgGN7bDIyL1M3eIH3s/NTSSe
+         oYQMkMcUA2CV+YxAuNrbgWuv9+C2BzbQCyXxBkzEYhlt6e0Qm03WagS79/1d8lzeeuwa
+         hSuA==
+X-Gm-Message-State: AOAM532UNLWqxbIFEG+XQMNZgBzAfTu+vy4PveatBTnX0jcBpQlWcWTJ
+        4/CxV3b5bUmW49BzRHbdJMPy4F/XbOcs/A==
+X-Google-Smtp-Source: ABdhPJwkbwteJnk73XW9/tIkjfN6zwjshhmi56ETknCa39Kzdv3ha1PxAhH7MlEZqAvyT17uV1w/Cw==
+X-Received: by 2002:a05:6830:1358:: with SMTP id r24mr6673017otq.8.1639862433693;
+        Sat, 18 Dec 2021 13:20:33 -0800 (PST)
 Received: from localhost (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id 186sm2409379oig.28.2021.12.18.13.20.23
+        by smtp.gmail.com with ESMTPSA id t12sm2156587ood.22.2021.12.18.13.20.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Dec 2021 13:20:23 -0800 (PST)
+        Sat, 18 Dec 2021 13:20:33 -0800 (PST)
 From:   Yury Norov <yury.norov@gmail.com>
 To:     linux-kernel@vger.kernel.org, Yury Norov <yury.norov@gmail.com>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
@@ -135,9 +135,9 @@ To:     linux-kernel@vger.kernel.org, Yury Norov <yury.norov@gmail.com>,
         linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
         linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 02/17] drivers: rename num_*_cpus variables
-Date:   Sat, 18 Dec 2021 13:19:58 -0800
-Message-Id: <20211218212014.1315894-3-yury.norov@gmail.com>
+Subject: [PATCH 05/17] all: replace cpumask_weight with cpumask_empty where appropriate
+Date:   Sat, 18 Dec 2021 13:20:01 -0800
+Message-Id: <20211218212014.1315894-6-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211218212014.1315894-1-yury.norov@gmail.com>
 References: <20211218212014.1315894-1-yury.norov@gmail.com>
@@ -147,74 +147,344 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some drivers declare num_active_cpus and num_present_cpus,
-despite that kernel has macros with corresponding names in
-linux/cpumask.h, and the drivers include cpumask.h
-
-The following patches switch num_*_cpus() to real functions,
-which causes build failures for the drivers.
+In many cases, kernel code calls cpumask_weight() to check if any bit of
+a given cpumask is set. We can do it more efficiently with cpumask_empty()
+because cpumask_empty() stops traversing the cpumask as soon as it finds
+first set bit, while cpumask_weight() counts all bits unconditionally.
 
 Signed-off-by: Yury Norov <yury.norov@gmail.com>
 ---
- drivers/leds/trigger/ledtrig-cpu.c | 6 +++---
- drivers/scsi/storvsc_drv.c         | 6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ arch/alpha/kernel/process.c            |  2 +-
+ arch/ia64/kernel/setup.c               |  2 +-
+ arch/x86/kernel/cpu/resctrl/rdtgroup.c | 14 +++++++-------
+ arch/x86/mm/mmio-mod.c                 |  2 +-
+ arch/x86/platform/uv/uv_nmi.c          |  2 +-
+ drivers/cpufreq/qcom-cpufreq-hw.c      |  2 +-
+ drivers/cpufreq/scmi-cpufreq.c         |  2 +-
+ drivers/gpu/drm/i915/i915_pmu.c        |  2 +-
+ drivers/infiniband/hw/hfi1/affinity.c  |  4 ++--
+ drivers/irqchip/irq-bcm6345-l1.c       |  2 +-
+ kernel/irq/affinity.c                  |  2 +-
+ kernel/padata.c                        |  2 +-
+ kernel/rcu/tree_nocb.h                 |  4 ++--
+ kernel/rcu/tree_plugin.h               |  2 +-
+ kernel/sched/core.c                    |  2 +-
+ kernel/sched/topology.c                |  2 +-
+ kernel/time/clocksource.c              |  2 +-
+ mm/vmstat.c                            |  4 ++--
+ 18 files changed, 27 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/leds/trigger/ledtrig-cpu.c b/drivers/leds/trigger/ledtrig-cpu.c
-index 8af4f9bb9cde..767e9749ca41 100644
---- a/drivers/leds/trigger/ledtrig-cpu.c
-+++ b/drivers/leds/trigger/ledtrig-cpu.c
-@@ -39,7 +39,7 @@ struct led_trigger_cpu {
- static DEFINE_PER_CPU(struct led_trigger_cpu, cpu_trig);
+diff --git a/arch/alpha/kernel/process.c b/arch/alpha/kernel/process.c
+index f4759e4ee4a9..a4415ad44982 100644
+--- a/arch/alpha/kernel/process.c
++++ b/arch/alpha/kernel/process.c
+@@ -125,7 +125,7 @@ common_shutdown_1(void *generic_ptr)
+ 	/* Wait for the secondaries to halt. */
+ 	set_cpu_present(boot_cpuid, false);
+ 	set_cpu_possible(boot_cpuid, false);
+-	while (cpumask_weight(cpu_present_mask))
++	while (!cpumask_empty(cpu_present_mask))
+ 		barrier();
+ #endif
  
- static struct led_trigger *trig_cpu_all;
--static atomic_t num_active_cpus = ATOMIC_INIT(0);
-+static atomic_t _active_cpus = ATOMIC_INIT(0);
+diff --git a/arch/ia64/kernel/setup.c b/arch/ia64/kernel/setup.c
+index 5010348fa21b..fd6301eafa9d 100644
+--- a/arch/ia64/kernel/setup.c
++++ b/arch/ia64/kernel/setup.c
+@@ -572,7 +572,7 @@ setup_arch (char **cmdline_p)
+ #ifdef CONFIG_ACPI_HOTPLUG_CPU
+ 	prefill_possible_map();
+ #endif
+-	per_cpu_scan_finalize((cpumask_weight(&early_cpu_possible_map) == 0 ?
++	per_cpu_scan_finalize((cpumask_empty(&early_cpu_possible_map) ?
+ 		32 : cpumask_weight(&early_cpu_possible_map)),
+ 		additional_cpus > 0 ? additional_cpus : 0);
+ #endif /* CONFIG_ACPI_NUMA */
+diff --git a/arch/x86/kernel/cpu/resctrl/rdtgroup.c b/arch/x86/kernel/cpu/resctrl/rdtgroup.c
+index b57b3db9a6a7..e23ff03290b8 100644
+--- a/arch/x86/kernel/cpu/resctrl/rdtgroup.c
++++ b/arch/x86/kernel/cpu/resctrl/rdtgroup.c
+@@ -341,14 +341,14 @@ static int cpus_mon_write(struct rdtgroup *rdtgrp, cpumask_var_t newmask,
  
- /**
-  * ledtrig_cpu - emit a CPU event as a trigger
-@@ -79,8 +79,8 @@ void ledtrig_cpu(enum cpu_led_event ledevt)
- 
- 		/* Update trigger state */
- 		trig->is_active = is_active;
--		atomic_add(is_active ? 1 : -1, &num_active_cpus);
--		active_cpus = atomic_read(&num_active_cpus);
-+		atomic_add(is_active ? 1 : -1, &_active_cpus);
-+		active_cpus = atomic_read(&_active_cpus);
- 		total_cpus = num_present_cpus();
- 
- 		led_trigger_event(trig->_trig,
-diff --git a/drivers/scsi/storvsc_drv.c b/drivers/scsi/storvsc_drv.c
-index 20595c0ba0ae..705dd4ebde98 100644
---- a/drivers/scsi/storvsc_drv.c
-+++ b/drivers/scsi/storvsc_drv.c
-@@ -1950,7 +1950,7 @@ static int storvsc_probe(struct hv_device *device,
- {
- 	int ret;
- 	int num_cpus = num_online_cpus();
--	int num_present_cpus = num_present_cpus();
-+	int present_cpus = num_present_cpus();
- 	struct Scsi_Host *host;
- 	struct hv_host_device *host_dev;
- 	bool dev_is_ide = ((dev_id->driver_data == IDE_GUID) ? true : false);
-@@ -2060,7 +2060,7 @@ static int storvsc_probe(struct hv_device *device,
- 	 * Set the number of HW queues we are supporting.
- 	 */
- 	if (!dev_is_ide) {
--		if (storvsc_max_hw_queues > num_present_cpus) {
-+		if (storvsc_max_hw_queues > present_cpus) {
- 			storvsc_max_hw_queues = 0;
- 			storvsc_log(device, STORVSC_LOGGING_WARN,
- 				"Resetting invalid storvsc_max_hw_queues value to default.\n");
-@@ -2068,7 +2068,7 @@ static int storvsc_probe(struct hv_device *device,
- 		if (storvsc_max_hw_queues)
- 			host->nr_hw_queues = storvsc_max_hw_queues;
- 		else
--			host->nr_hw_queues = num_present_cpus;
-+			host->nr_hw_queues = present_cpus;
+ 	/* Check whether cpus belong to parent ctrl group */
+ 	cpumask_andnot(tmpmask, newmask, &prgrp->cpu_mask);
+-	if (cpumask_weight(tmpmask)) {
++	if (!cpumask_empty(tmpmask)) {
+ 		rdt_last_cmd_puts("Can only add CPUs to mongroup that belong to parent\n");
+ 		return -EINVAL;
  	}
  
- 	/*
+ 	/* Check whether cpus are dropped from this group */
+ 	cpumask_andnot(tmpmask, &rdtgrp->cpu_mask, newmask);
+-	if (cpumask_weight(tmpmask)) {
++	if (!cpumask_empty(tmpmask)) {
+ 		/* Give any dropped cpus to parent rdtgroup */
+ 		cpumask_or(&prgrp->cpu_mask, &prgrp->cpu_mask, tmpmask);
+ 		update_closid_rmid(tmpmask, prgrp);
+@@ -359,7 +359,7 @@ static int cpus_mon_write(struct rdtgroup *rdtgrp, cpumask_var_t newmask,
+ 	 * and update per-cpu rmid
+ 	 */
+ 	cpumask_andnot(tmpmask, newmask, &rdtgrp->cpu_mask);
+-	if (cpumask_weight(tmpmask)) {
++	if (!cpumask_empty(tmpmask)) {
+ 		head = &prgrp->mon.crdtgrp_list;
+ 		list_for_each_entry(crgrp, head, mon.crdtgrp_list) {
+ 			if (crgrp == rdtgrp)
+@@ -394,7 +394,7 @@ static int cpus_ctrl_write(struct rdtgroup *rdtgrp, cpumask_var_t newmask,
+ 
+ 	/* Check whether cpus are dropped from this group */
+ 	cpumask_andnot(tmpmask, &rdtgrp->cpu_mask, newmask);
+-	if (cpumask_weight(tmpmask)) {
++	if (!cpumask_empty(tmpmask)) {
+ 		/* Can't drop from default group */
+ 		if (rdtgrp == &rdtgroup_default) {
+ 			rdt_last_cmd_puts("Can't drop CPUs from default group\n");
+@@ -413,12 +413,12 @@ static int cpus_ctrl_write(struct rdtgroup *rdtgrp, cpumask_var_t newmask,
+ 	 * and update per-cpu closid/rmid.
+ 	 */
+ 	cpumask_andnot(tmpmask, newmask, &rdtgrp->cpu_mask);
+-	if (cpumask_weight(tmpmask)) {
++	if (!cpumask_empty(tmpmask)) {
+ 		list_for_each_entry(r, &rdt_all_groups, rdtgroup_list) {
+ 			if (r == rdtgrp)
+ 				continue;
+ 			cpumask_and(tmpmask1, &r->cpu_mask, tmpmask);
+-			if (cpumask_weight(tmpmask1))
++			if (!cpumask_empty(tmpmask1))
+ 				cpumask_rdtgrp_clear(r, tmpmask1);
+ 		}
+ 		update_closid_rmid(tmpmask, rdtgrp);
+@@ -488,7 +488,7 @@ static ssize_t rdtgroup_cpus_write(struct kernfs_open_file *of,
+ 
+ 	/* check that user didn't specify any offline cpus */
+ 	cpumask_andnot(tmpmask, newmask, cpu_online_mask);
+-	if (cpumask_weight(tmpmask)) {
++	if (!cpumask_empty(tmpmask)) {
+ 		ret = -EINVAL;
+ 		rdt_last_cmd_puts("Can only assign online CPUs\n");
+ 		goto unlock;
+diff --git a/arch/x86/mm/mmio-mod.c b/arch/x86/mm/mmio-mod.c
+index 933a2ebad471..c3317f0650d8 100644
+--- a/arch/x86/mm/mmio-mod.c
++++ b/arch/x86/mm/mmio-mod.c
+@@ -400,7 +400,7 @@ static void leave_uniprocessor(void)
+ 	int cpu;
+ 	int err;
+ 
+-	if (!cpumask_available(downed_cpus) || cpumask_weight(downed_cpus) == 0)
++	if (!cpumask_available(downed_cpus) || cpumask_empty(downed_cpus))
+ 		return;
+ 	pr_notice("Re-enabling CPUs...\n");
+ 	for_each_cpu(cpu, downed_cpus) {
+diff --git a/arch/x86/platform/uv/uv_nmi.c b/arch/x86/platform/uv/uv_nmi.c
+index 1e9ff28bc2e0..ea277fc08357 100644
+--- a/arch/x86/platform/uv/uv_nmi.c
++++ b/arch/x86/platform/uv/uv_nmi.c
+@@ -985,7 +985,7 @@ static int uv_handle_nmi(unsigned int reason, struct pt_regs *regs)
+ 
+ 	/* Clear global flags */
+ 	if (master) {
+-		if (cpumask_weight(uv_nmi_cpu_mask))
++		if (!cpumask_empty(uv_nmi_cpu_mask))
+ 			uv_nmi_cleanup_mask();
+ 		atomic_set(&uv_nmi_cpus_in_nmi, -1);
+ 		atomic_set(&uv_nmi_cpu, -1);
+diff --git a/drivers/cpufreq/qcom-cpufreq-hw.c b/drivers/cpufreq/qcom-cpufreq-hw.c
+index 05f3d7876e44..95a0c57ab5bb 100644
+--- a/drivers/cpufreq/qcom-cpufreq-hw.c
++++ b/drivers/cpufreq/qcom-cpufreq-hw.c
+@@ -482,7 +482,7 @@ static int qcom_cpufreq_hw_cpu_init(struct cpufreq_policy *policy)
+ 	}
+ 
+ 	qcom_get_related_cpus(index, policy->cpus);
+-	if (!cpumask_weight(policy->cpus)) {
++	if (cpumask_empty(policy->cpus)) {
+ 		dev_err(dev, "Domain-%d failed to get related CPUs\n", index);
+ 		ret = -ENOENT;
+ 		goto error;
+diff --git a/drivers/cpufreq/scmi-cpufreq.c b/drivers/cpufreq/scmi-cpufreq.c
+index 1e0cd4d165f0..919fa6e3f462 100644
+--- a/drivers/cpufreq/scmi-cpufreq.c
++++ b/drivers/cpufreq/scmi-cpufreq.c
+@@ -154,7 +154,7 @@ static int scmi_cpufreq_init(struct cpufreq_policy *policy)
+ 	 * table and opp-shared.
+ 	 */
+ 	ret = dev_pm_opp_of_get_sharing_cpus(cpu_dev, priv->opp_shared_cpus);
+-	if (ret || !cpumask_weight(priv->opp_shared_cpus)) {
++	if (ret || cpumask_empty(priv->opp_shared_cpus)) {
+ 		/*
+ 		 * Either opp-table is not set or no opp-shared was found.
+ 		 * Use the CPU mask from SCMI to designate CPUs sharing an OPP
+diff --git a/drivers/gpu/drm/i915/i915_pmu.c b/drivers/gpu/drm/i915/i915_pmu.c
+index 0b488d49694c..962e8d6bf6ea 100644
+--- a/drivers/gpu/drm/i915/i915_pmu.c
++++ b/drivers/gpu/drm/i915/i915_pmu.c
+@@ -1048,7 +1048,7 @@ static int i915_pmu_cpu_online(unsigned int cpu, struct hlist_node *node)
+ 	GEM_BUG_ON(!pmu->base.event_init);
+ 
+ 	/* Select the first online CPU as a designated reader. */
+-	if (!cpumask_weight(&i915_pmu_cpumask))
++	if (cpumask_empty(&i915_pmu_cpumask))
+ 		cpumask_set_cpu(cpu, &i915_pmu_cpumask);
+ 
+ 	return 0;
+diff --git a/drivers/infiniband/hw/hfi1/affinity.c b/drivers/infiniband/hw/hfi1/affinity.c
+index 98c813ba4304..38eee675369a 100644
+--- a/drivers/infiniband/hw/hfi1/affinity.c
++++ b/drivers/infiniband/hw/hfi1/affinity.c
+@@ -667,7 +667,7 @@ int hfi1_dev_affinity_init(struct hfi1_devdata *dd)
+ 			 * engines, use the same CPU cores as general/control
+ 			 * context.
+ 			 */
+-			if (cpumask_weight(&entry->def_intr.mask) == 0)
++			if (cpumask_empty(&entry->def_intr.mask))
+ 				cpumask_copy(&entry->def_intr.mask,
+ 					     &entry->general_intr_mask);
+ 		}
+@@ -687,7 +687,7 @@ int hfi1_dev_affinity_init(struct hfi1_devdata *dd)
+ 		 * vectors, use the same CPU core as the general/control
+ 		 * context.
+ 		 */
+-		if (cpumask_weight(&entry->comp_vect_mask) == 0)
++		if (cpumask_empty(&entry->comp_vect_mask))
+ 			cpumask_copy(&entry->comp_vect_mask,
+ 				     &entry->general_intr_mask);
+ 	}
+diff --git a/drivers/irqchip/irq-bcm6345-l1.c b/drivers/irqchip/irq-bcm6345-l1.c
+index fd079215c17f..142a7431745f 100644
+--- a/drivers/irqchip/irq-bcm6345-l1.c
++++ b/drivers/irqchip/irq-bcm6345-l1.c
+@@ -315,7 +315,7 @@ static int __init bcm6345_l1_of_init(struct device_node *dn,
+ 			cpumask_set_cpu(idx, &intc->cpumask);
+ 	}
+ 
+-	if (!cpumask_weight(&intc->cpumask)) {
++	if (cpumask_empty(&intc->cpumask)) {
+ 		ret = -ENODEV;
+ 		goto out_free;
+ 	}
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index f7ff8919dc9b..18740faf0eb1 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -258,7 +258,7 @@ static int __irq_build_affinity_masks(unsigned int startvec,
+ 	nodemask_t nodemsk = NODE_MASK_NONE;
+ 	struct node_vectors *node_vectors;
+ 
+-	if (!cpumask_weight(cpu_mask))
++	if (cpumask_empty(cpu_mask))
+ 		return 0;
+ 
+ 	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_mask, &nodemsk);
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 18d3a5c699d8..e5819bb8bd1d 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -181,7 +181,7 @@ int padata_do_parallel(struct padata_shell *ps,
+ 		goto out;
+ 
+ 	if (!cpumask_test_cpu(*cb_cpu, pd->cpumask.cbcpu)) {
+-		if (!cpumask_weight(pd->cpumask.cbcpu))
++		if (cpumask_empty(pd->cpumask.cbcpu))
+ 			goto out;
+ 
+ 		/* Select an alternate fallback CPU and notify the caller. */
+diff --git a/kernel/rcu/tree_nocb.h b/kernel/rcu/tree_nocb.h
+index 1e40519d1a05..bc038a451768 100644
+--- a/kernel/rcu/tree_nocb.h
++++ b/kernel/rcu/tree_nocb.h
+@@ -1169,7 +1169,7 @@ void __init rcu_init_nohz(void)
+ 	struct rcu_data *rdp;
+ 
+ #if defined(CONFIG_NO_HZ_FULL)
+-	if (tick_nohz_full_running && cpumask_weight(tick_nohz_full_mask))
++	if (tick_nohz_full_running && !cpumask_empty(tick_nohz_full_mask))
+ 		need_rcu_nocb_mask = true;
+ #endif /* #if defined(CONFIG_NO_HZ_FULL) */
+ 
+@@ -1353,7 +1353,7 @@ static void __init rcu_organize_nocb_kthreads(void)
+  */
+ void rcu_bind_current_to_nocb(void)
+ {
+-	if (cpumask_available(rcu_nocb_mask) && cpumask_weight(rcu_nocb_mask))
++	if (cpumask_available(rcu_nocb_mask) && !cpumask_empty(rcu_nocb_mask))
+ 		WARN_ON(sched_setaffinity(current->pid, rcu_nocb_mask));
+ }
+ EXPORT_SYMBOL_GPL(rcu_bind_current_to_nocb);
+diff --git a/kernel/rcu/tree_plugin.h b/kernel/rcu/tree_plugin.h
+index 54ef0e8c8742..3857ff6cb6f7 100644
+--- a/kernel/rcu/tree_plugin.h
++++ b/kernel/rcu/tree_plugin.h
+@@ -1216,7 +1216,7 @@ static void rcu_boost_kthread_setaffinity(struct rcu_node *rnp, int outgoingcpu)
+ 		    cpu != outgoingcpu)
+ 			cpumask_set_cpu(cpu, cm);
+ 	cpumask_and(cm, cm, housekeeping_cpumask(HK_FLAG_RCU));
+-	if (cpumask_weight(cm) == 0)
++	if (cpumask_empty(cm))
+ 		cpumask_copy(cm, housekeeping_cpumask(HK_FLAG_RCU));
+ 	set_cpus_allowed_ptr(t, cm);
+ 	mutex_unlock(&rnp->boost_kthread_mutex);
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 83872f95a1ea..9b3ec14227e1 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -8715,7 +8715,7 @@ int cpuset_cpumask_can_shrink(const struct cpumask *cur,
+ {
+ 	int ret = 1;
+ 
+-	if (!cpumask_weight(cur))
++	if (cpumask_empty(cur))
+ 		return ret;
+ 
+ 	ret = dl_cpuset_cpumask_can_shrink(cur, trial);
+diff --git a/kernel/sched/topology.c b/kernel/sched/topology.c
+index d201a7052a29..8478e2a8cd65 100644
+--- a/kernel/sched/topology.c
++++ b/kernel/sched/topology.c
+@@ -74,7 +74,7 @@ static int sched_domain_debug_one(struct sched_domain *sd, int cpu, int level,
+ 			break;
+ 		}
+ 
+-		if (!cpumask_weight(sched_group_span(group))) {
++		if (cpumask_empty(sched_group_span(group))) {
+ 			printk(KERN_CONT "\n");
+ 			printk(KERN_ERR "ERROR: empty group\n");
+ 			break;
+diff --git a/kernel/time/clocksource.c b/kernel/time/clocksource.c
+index 95d7ca35bdf2..cee5da1e54c4 100644
+--- a/kernel/time/clocksource.c
++++ b/kernel/time/clocksource.c
+@@ -343,7 +343,7 @@ void clocksource_verify_percpu(struct clocksource *cs)
+ 	cpus_read_lock();
+ 	preempt_disable();
+ 	clocksource_verify_choose_cpus();
+-	if (cpumask_weight(&cpus_chosen) == 0) {
++	if (cpumask_empty(&cpus_chosen)) {
+ 		preempt_enable();
+ 		cpus_read_unlock();
+ 		pr_warn("Not enough CPUs to check clocksource '%s'.\n", cs->name);
+diff --git a/mm/vmstat.c b/mm/vmstat.c
+index d701c335628c..295642e2c24c 100644
+--- a/mm/vmstat.c
++++ b/mm/vmstat.c
+@@ -2032,7 +2032,7 @@ static void __init init_cpu_node_state(void)
+ 	int node;
+ 
+ 	for_each_online_node(node) {
+-		if (cpumask_weight(cpumask_of_node(node)) > 0)
++		if (!cpumask_empty(cpumask_of_node(node)))
+ 			node_set_state(node, N_CPU);
+ 	}
+ }
+@@ -2059,7 +2059,7 @@ static int vmstat_cpu_dead(unsigned int cpu)
+ 
+ 	refresh_zone_stat_thresholds();
+ 	node_cpus = cpumask_of_node(node);
+-	if (cpumask_weight(node_cpus) > 0)
++	if (!cpumask_empty(node_cpus))
+ 		return 0;
+ 
+ 	node_clear_state(node, N_CPU);
 -- 
 2.30.2
 
