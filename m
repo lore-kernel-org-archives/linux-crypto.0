@@ -2,96 +2,59 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA947C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Dec 2021 16:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD941C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 Dec 2021 03:27:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239111AbhLQQ0b convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Dec 2021 11:26:31 -0500
-Received: from mail-0301.mail-europe.com ([188.165.51.139]:50599 "EHLO
-        mail-0301.mail-europe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238005AbhLQQ0a (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Dec 2021 11:26:30 -0500
-Date:   Fri, 17 Dec 2021 16:26:24 +0000
-Authentication-Results: mail-4018.proton.ch; dkim=none
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-From:   conor dooley <mail@conchuod.ie>
-Cc:     Conor.Dooley@microchip.com, linus.walleij@linaro.org,
-        bgolaszewski@baylibre.com, robh+dt@kernel.org,
-        jassisinghbrar@gmail.com, paul.walmsley@sifive.com,
-        palmer@dabbelt.com, aou@eecs.berkeley.edu, a.zummo@towertech.it,
-        alexandre.belloni@bootlin.com, broonie@kernel.org,
-        gregkh@linuxfoundation.org, thierry.reding@gmail.com,
-        u.kleine-koenig@pengutronix.de, lee.jones@linaro.org,
-        linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-pwm@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-usb@vger.kernel.org,
-        geert@linux-m68k.org, bin.meng@windriver.com, heiko@sntech.de,
-        Lewis.Hanly@microchip.com, Daire.McNamara@microchip.com,
-        Ivan.Griffin@microchip.com, atish.patra@wdc.com
-Reply-To: conor dooley <mail@conchuod.ie>
-Subject: Re: [PATCH v2 06/17] dt-bindings: rng: add bindings for microchip mpfs rng
-Message-ID: <r3tVOER8Xt_7UX5NRWualG_an6bcx-_uljhXh9_GUny45ZcO_G-dpv98jWXwKpuvSp-uTvNFSdqsLHFbYGl0Qdv_q7ZqegBHWWcgnAZUA5A=@conchuod.ie>
-In-Reply-To: <2e7588e5-9dc5-571f-d7e9-0ee5c89ab39e@canonical.com>
-References: <20211217093325.30612-1-conor.dooley@microchip.com> <20211217093325.30612-7-conor.dooley@microchip.com> <e59a60d5-4397-1f7f-66ab-3dd522e166a0@canonical.com> <19cbe2ba-7df5-7c7c-289f-6dc419d9f477@canonical.com> <422126ac-ce26-2940-5b4d-fe79a1fa89c5@microchip.com> <2e7588e5-9dc5-571f-d7e9-0ee5c89ab39e@canonical.com>
+        id S229710AbhLRD10 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Dec 2021 22:27:26 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58108 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229521AbhLRD1Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Dec 2021 22:27:25 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1myQNV-0002cU-8j; Sat, 18 Dec 2021 14:27:22 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 18 Dec 2021 14:27:21 +1100
+Date:   Sat, 18 Dec 2021 14:27:21 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     linux-crypto@vger.kernel.org, simo@redhat.com, skozina@redhat.com,
+        Nicolai Stange <nstange@suse.de>
+Subject: Re: [PATCH] crypto: jitter - add oversampling of noise source
+Message-ID: <20211218032720.GA11637@gondor.apana.org.au>
+References: <2573346.vuYhMxLoTh@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2573346.vuYhMxLoTh@positron.chronox.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-‐‐‐‐‐‐‐ Original Message ‐‐‐‐‐‐‐
+On Fri, Dec 17, 2021 at 10:41:42AM +0100, Stephan M�ller wrote:
+>
+> diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+> index 2d115bec15ae..b02f93805e83 100644
+> --- a/crypto/jitterentropy-kcapi.c
+> +++ b/crypto/jitterentropy-kcapi.c
+> @@ -59,6 +60,11 @@ void jent_zfree(void *ptr)
+>  	kfree_sensitive(ptr);
+>  }
+>  
+> +int jent_fips_enabled(void)
+> +{
+> +	return fips_enabled;
+> +}
 
-On Friday, December 17th, 2021 at 15:47, Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com> wrote:
+Why do you need this function? And why can't it be inlined?
 
-> On 17/12/2021 16:22, Conor.Dooley@microchip.com wrote:
->
-> > On 17/12/2021 15:07, Krzysztof Kozlowski wrote:
-> >
-> > > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
-> > >
-> > > On 17/12/2021 15:53, Krzysztof Kozlowski wrote:
-> > >
-> > > > On 17/12/2021 10:33, conor.dooley@microchip.com wrote:
-> > > >
-> > > > > From: Conor Dooley conor.dooley@microchip.com
-> > > > >
-> > > > > Add device tree bindings for the hardware rng device accessed via
-> > > > >
-> > > > > the system services on the Microchip PolarFire SoC.
-> > > > >
-> > > > > Signed-off-by: Conor Dooley conor.dooley@microchip.com
-> > > > > ------------------------------------------------------
-> > > >
-> > > > Three topics:
-> > > >
-> > > > 1.  Node name (as most of others are using): rng
-> > > > 2.  skip the label, not helping in example.
-> > > > 3.  This looks very simple, so I wonder if the bindings are complete. No
-> > > >
-> > > >     IO space/address... How is it going to be instantiated?
-> > > OK, now I saw the usage in DTS. I have doubts this makes sense as
-> > > separate bindings. It looks like integrated part of syscontroller, so
-> > > maybe make it part of that binding? Or at least add ref to syscontroller
-> > > bindings that such child is expected.
-> > Acking the rest of this, re: adding the ref: is what is being done in
-> > patch 03/17 insufficient?
-> Ops, I missed the 03/17. Yeah, it looks it is sufficient and in such
-> case I think you do not need this patch. The compatible is documented in
-> 03/17. The same for sysserv.
-Grand, that makes things easier.
-Conor.
->
-> Best regards,
->
-> Krzysztof
->
-> linux-riscv mailing list
->
-> linux-riscv@lists.infradead.org
->
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
+Normally fips_enabled is entirely optimised away if FIPS is
+disabled in Kconfig.  This function breaks this.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
