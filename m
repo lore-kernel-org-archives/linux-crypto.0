@@ -2,103 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59339C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Dec 2021 10:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28024C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 Dec 2021 13:26:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232653AbhLRKWK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 Dec 2021 05:22:10 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:33865 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229641AbhLRKWK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 Dec 2021 05:22:10 -0500
-Received: from kwepemi100006.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JGMMw319XzcbcT;
-        Sat, 18 Dec 2021 18:21:48 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100006.china.huawei.com (7.221.188.165) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 18 Dec 2021 18:22:08 +0800
-Received: from localhost.localdomain (10.67.165.24) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 18 Dec 2021 18:22:07 +0800
-From:   Weili Qian <qianweili@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
-Subject: [PATCH] crypto: hisilicon/qm - disable qm clock-gating
-Date:   Sat, 18 Dec 2021 18:17:20 +0800
-Message-ID: <20211218101720.18665-1-qianweili@huawei.com>
-X-Mailer: git-send-email 2.33.0
+        id S233147AbhLRN0q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 18 Dec 2021 08:26:46 -0500
+Received: from mga01.intel.com ([192.55.52.88]:38953 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233111AbhLRN0q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 18 Dec 2021 08:26:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1639834006; x=1671370006;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=Xu4gHmGIbEVw9JzCHr9PqnAgZ2d2nKSN3y4IC8HgOBY=;
+  b=Qf4VYGbGAigOgDQ20y3KuT2TC5+gb5vM6WSfCq2thxBRj66s+8X7hOYH
+   DjbwLMN5aqER7x8UOpSISvUmnRk0y8yQF7rGV+ynOWnahcrMNfNiyecG3
+   zv1/JD6KTnHVHboLGdvtOUmLtfIAfKSbpFdEh6s6AB/mgd352fX21VIW5
+   bJ2yO3kLRsjGoNLzQJ1sfyXwMNZwsqmogJdUHhcajjSLLOIiry2TrV09K
+   39ymTJdDf96o9kN7kqy+UjNdUnENShoKtkWqsM8a7NYvlVS97V3hzEqlL
+   MWpDgFwsAYVQXN+OUiQtr/LTp17lujLjItOhZWIh19Q3PLp7PVaQ64K6l
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10201"; a="264103493"
+X-IronPort-AV: E=Sophos;i="5.88,216,1635231600"; 
+   d="scan'208";a="264103493"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2021 05:26:46 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,216,1635231600"; 
+   d="scan'208";a="754862745"
+Received: from lkp-server02.sh.intel.com (HELO 9f38c0981d9f) ([10.239.97.151])
+  by fmsmga006.fm.intel.com with ESMTP; 18 Dec 2021 05:26:44 -0800
+Received: from kbuild by 9f38c0981d9f with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1myZjY-00061x-3f; Sat, 18 Dec 2021 13:26:44 +0000
+Date:   Sat, 18 Dec 2021 21:25:42 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     David Rientjes <rientjes@google.com>
+Cc:     kbuild-all@lists.01.org, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>
+Subject: [PATCH] crypto: fix semicolon.cocci warnings
+Message-ID: <20211218132541.GA80986@65b4fbea3a32>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Patchwork-Hint: ignore
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For Kunpeng930, if qm clock-gating is enabled, rate limiter
-will be inaccurate. Therefore, disable clock-gating before doing task.
+From: kernel test robot <lkp@intel.com>
 
-Signed-off-by: Weili Qian <qianweili@huawei.com>
+drivers/crypto/ccp/sev-dev.c:263:2-3: Unneeded semicolon
+
+
+ Remove unneeded semicolon.
+
+Generated by: scripts/coccinelle/misc/semicolon.cocci
+
+Fixes: 3d725965f836 ("crypto: ccp - Add SEV_INIT_EX support")
+CC: David Rientjes <rientjes@google.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: kernel test robot <lkp@intel.com>
 ---
- drivers/crypto/hisilicon/qm.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index b1fe9c7b8cc8..b731cb4ec294 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -126,6 +126,8 @@
- #define QM_CQC_VFT			0x1
- #define QM_VFT_CFG			0x100060
- #define QM_VFT_CFG_OP_ENABLE		0x100054
-+#define QM_PM_CTRL			0x100148
-+#define QM_IDLE_DISABLE			BIT(9)
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+head:   696645d25bafd6ba3562611c29bc8ecd47066dfe
+commit: 3d725965f836a7acbd1674e33644bec18373de53 [83/95] crypto: ccp - Add SEV_INIT_EX support
+:::::: branch date: 31 hours ago
+:::::: commit date: 31 hours ago
+
+ sev-dev.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -260,7 +260,7 @@ static void sev_write_init_ex_file_if_re
+ 		break;
+ 	default:
+ 		return;
+-	};
++	}
  
- #define QM_VFT_CFG_DATA_L		0x100064
- #define QM_VFT_CFG_DATA_H		0x100068
-@@ -800,6 +802,19 @@ static void qm_db(struct hisi_qm *qm, u16 qn, u8 cmd, u16 index, u8 priority)
- 	qm->ops->qm_db(qm, qn, cmd, index, priority);
+ 	sev_write_init_ex_file();
  }
- 
-+static void qm_disable_clock_gate(struct hisi_qm *qm)
-+{
-+	u32 val;
-+
-+	/* if qm enables clock gating in Kunpeng930, qos will be inaccurate. */
-+	if (qm->ver < QM_HW_V3)
-+		return;
-+
-+	val = readl(qm->io_base + QM_PM_CTRL);
-+	val |= QM_IDLE_DISABLE;
-+	writel(val, qm->io_base +  QM_PM_CTRL);
-+}
-+
- static int qm_dev_mem_reset(struct hisi_qm *qm)
- {
- 	u32 val;
-@@ -5935,6 +5950,7 @@ int hisi_qm_init(struct hisi_qm *qm)
- 	}
- 
- 	if (qm->fun_type == QM_HW_PF) {
-+		qm_disable_clock_gate(qm);
- 		ret = qm_dev_mem_reset(qm);
- 		if (ret) {
- 			dev_err(dev, "failed to reset device memory\n");
-@@ -6099,6 +6115,7 @@ static int qm_rebuild_for_resume(struct hisi_qm *qm)
- 
- 	qm_cmd_init(qm);
- 	hisi_qm_dev_err_init(qm);
-+	qm_disable_clock_gate(qm);
- 	ret = qm_dev_mem_reset(qm);
- 	if (ret)
- 		pci_err(pdev, "failed to reset device memory\n");
--- 
-2.33.0
-
