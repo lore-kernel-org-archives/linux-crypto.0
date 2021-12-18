@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 233F9C433FE
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Dec 2021 21:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD10AC4332F
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 Dec 2021 21:21:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234520AbhLRVVM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 Dec 2021 16:21:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56294 "EHLO
+        id S234566AbhLRVVm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 18 Dec 2021 16:21:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232344AbhLRVUj (ORCPT
+        with ESMTP id S234576AbhLRVVC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 Dec 2021 16:20:39 -0500
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B350C061746;
-        Sat, 18 Dec 2021 13:20:39 -0800 (PST)
-Received: by mail-oi1-x22e.google.com with SMTP id m6so9357878oim.2;
-        Sat, 18 Dec 2021 13:20:39 -0800 (PST)
+        Sat, 18 Dec 2021 16:21:02 -0500
+Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2B82C06175B;
+        Sat, 18 Dec 2021 13:20:53 -0800 (PST)
+Received: by mail-oo1-xc31.google.com with SMTP id w15-20020a4a354f000000b002d85ef0533dso1840212oog.7;
+        Sat, 18 Dec 2021 13:20:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=GUqPfWmU6f9MK/QXiRQLZcQ9F1QsVSWWK571Ot9oIxE=;
-        b=hfcawraa9tTE2tV32Lqk+3wfPsGEMDYsM0IK6gUmsFmGNuwLZjW0huAN9qU8EwuPoo
-         5k7MSSEqu01CZYqfeU5LSK/e8D6uuRrmxwt9qDMnJa1I80ulPtLA2GtHdI5tPQK1BzRX
-         at6dD7gTWW2fpasNYFbDYAhyy8of2TpYtGAllUu8hD+hDyH0tj6cTs2or3r30/AlnrIa
-         autdfD/MUkFDBqV3AuVQKfMwo3c48fzfkaZ+di2R+D2G00hS2LPKPzOThGTpvNs4snIb
-         ac4DTnMzgL2cMGCL8bdEtgRm3hqd60/4HvGqQQMJNjdiYo3rtzwfmA/hx3zgDTZC+SKy
-         Vs7g==
+        bh=8sQyawONQ80DXJHmSDH3px/iwXnd508qWqR9G9S67zc=;
+        b=Y7D3jg2nDdCluAFdaTzJ62WKeS2c+dtTaPmJUlV/zLE1aSF//0E3P38R+G4jEFET14
+         xlE85wW7isyGuED/jOFVFQvwYzXv8BywpI00ruh0C9/BSkGpvfRpAFWq2F7h9v3+T5Il
+         nblHP1zg9vVDXpyvwm44ndVFUUN5IjDhNlidNZbD5SDaUDw8vepg+0zNLqjNDTZ/05Nb
+         X9u9YW1l3M1V6kBMEhcffptynzQERZgT84KYgY25ZHoJxBBze+XJLuZ0xAF092dd7tRz
+         6Y9FD4MNstMB4NsMQkO+4hI6cQ1T/LuAF9uOZ/g+OPTNQBpwcWpSAFUUj7M8IYKHH6om
+         iwjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=GUqPfWmU6f9MK/QXiRQLZcQ9F1QsVSWWK571Ot9oIxE=;
-        b=h7nCUYz+rnFBNUJ+3fZT+dVYuPMaOCyHpsmEK+U9pKwS4L4BDlYbBNi1acxq3xK9Jp
-         qYeUznkhAKidKYMPy9IE6kqs0pElH2w0F9H9NvkeFOzlMgk/F1HNpK2j7Q7ZEBwuYkZ4
-         iJzk5M7xUXxGIYmmIaheiFW7CjHMVU33mfdU+Klcfr0Q9XmsPxKHbOgarWyXQWgWSCsh
-         7BBrcthT/Plr9zJHz/D6WfXYS+p5ynlSMatYXBINd/7YferUf7UiPzw0cDphNRUl16Lj
-         hEO0np88f+WaT6iAhAgnYP64JsBMcDlnjPdjkwXezRq///dMjZlvB7g83JsPd4OFe0Kd
-         x03A==
-X-Gm-Message-State: AOAM53197XsPpDrC7PpwRMsDJVI3uNDFdJQ+iexyr8l9niJ/Do9tOpPu
-        M6e1IVHKr3SoMIYaBTdJFqrgmsAwlEKzAg==
-X-Google-Smtp-Source: ABdhPJwMghCWSAXUdG9w873jzrPra4gD4vLC9CVG4QJCBThdyFFc0fiXAMtWvAylP2GRwZ72nMb1wQ==
-X-Received: by 2002:a05:6808:1914:: with SMTP id bf20mr6913245oib.7.1639862436787;
-        Sat, 18 Dec 2021 13:20:36 -0800 (PST)
+        bh=8sQyawONQ80DXJHmSDH3px/iwXnd508qWqR9G9S67zc=;
+        b=mXDr7iwrhQX9onx1gYG5HkgExFGNdAWltAsL5MC1afhsgJjHpSCSADehRTL7kugmFI
+         kAYX8r/K2BNIPSzwnAAwPTlRFuIV+JwLR2gLaBz3JOaa6gz9hTiFJsPPRnN8V4GmxnxS
+         w7hTHrR4zIyAQpdWRCinqUjszIv0oS7r+FdVB3YR91sfLO/UYyRFBl0s91HRMyloOgnD
+         m5Oa3aeruVv0OHe06TVhdrz6XhuB+PPGm2aoJVhMSvwSnZ+XcUTGn2QpAmvWVxHGbseB
+         jsBnO9Sg03mMycKPNyb6h2UY8vF576YB9oAT2ug8Y7FsDItr5RyTtj/hSo1m1GtRUHBU
+         p8gw==
+X-Gm-Message-State: AOAM533aasKMUg+MIkvSiNXwUlYcRJ/iWLZS3d7yWcepAjWRF/aa9hCl
+        aTJSWMQK4W/UuFQ8uIdM6h5rPyj5BWFYFw==
+X-Google-Smtp-Source: ABdhPJzvMncW7wCzGcCD5Uph699Rv7l1timnKLBDwWV9dbECCxOkiUPt5sqsHR2cKsTF/R/b2ELz2Q==
+X-Received: by 2002:a4a:acca:: with SMTP id c10mr5895528oon.1.1639862452856;
+        Sat, 18 Dec 2021 13:20:52 -0800 (PST)
 Received: from localhost (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id d11sm2335240otu.36.2021.12.18.13.20.35
+        by smtp.gmail.com with ESMTPSA id q10sm2488824oiw.17.2021.12.18.13.20.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Dec 2021 13:20:36 -0800 (PST)
+        Sat, 18 Dec 2021 13:20:52 -0800 (PST)
 From:   Yury Norov <yury.norov@gmail.com>
 To:     linux-kernel@vger.kernel.org, Yury Norov <yury.norov@gmail.com>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
@@ -135,9 +135,9 @@ To:     linux-kernel@vger.kernel.org, Yury Norov <yury.norov@gmail.com>,
         linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
         linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 06/17] all: replace nodes_weight with nodes_empty where appropriate
-Date:   Sat, 18 Dec 2021 13:20:02 -0800
-Message-Id: <20211218212014.1315894-7-yury.norov@gmail.com>
+Subject: [PATCH 11/17] lib/nodemask: add num_node_state_eq()
+Date:   Sat, 18 Dec 2021 13:20:07 -0800
+Message-Id: <20211218212014.1315894-12-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211218212014.1315894-1-yury.norov@gmail.com>
 References: <20211218212014.1315894-1-yury.norov@gmail.com>
@@ -147,52 +147,46 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Kernel code calls nodes_weight() to check if any bit of a given nodemask is
-set. We can do it more efficiently with nodes_empty() because nodes_empty()
-stops traversing the nodemask as soon as it finds first set bit, while
-nodes_weight() counts all bits unconditionally.
+Kernel code calls num_node_state() to compare number of nodes with a given
+number. The underlying code calls bitmap_weight(), and we can do it more
+efficiently with num_node_state_eq because conditional nodes_weight may
+stop traversing the nodemask earlier, as soon as condition is met.
 
 Signed-off-by: Yury Norov <yury.norov@gmail.com>
 ---
- arch/x86/mm/amdtopology.c    | 2 +-
- arch/x86/mm/numa_emulation.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ include/linux/nodemask.h | 5 +++++
+ mm/page_alloc.c          | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/mm/amdtopology.c b/arch/x86/mm/amdtopology.c
-index 058b2f36b3a6..b3ca7d23e4b0 100644
---- a/arch/x86/mm/amdtopology.c
-+++ b/arch/x86/mm/amdtopology.c
-@@ -154,7 +154,7 @@ int __init amd_numa_init(void)
- 		node_set(nodeid, numa_nodes_parsed);
- 	}
+diff --git a/include/linux/nodemask.h b/include/linux/nodemask.h
+index 197598e075e9..c5014dbf3cce 100644
+--- a/include/linux/nodemask.h
++++ b/include/linux/nodemask.h
+@@ -466,6 +466,11 @@ static inline int num_node_state(enum node_states state)
+ 	return nodes_weight(node_states[state]);
+ }
  
--	if (!nodes_weight(numa_nodes_parsed))
-+	if (nodes_empty(numa_nodes_parsed))
- 		return -ENOENT;
++static inline int num_node_state_eq(enum node_states state, int num)
++{
++	return nodes_weight_eq(node_states[state], num);
++}
++
+ #define for_each_node_state(__node, __state) \
+ 	for_each_node_mask((__node), node_states[__state])
  
- 	/*
-diff --git a/arch/x86/mm/numa_emulation.c b/arch/x86/mm/numa_emulation.c
-index 1a02b791d273..9a9305367fdd 100644
---- a/arch/x86/mm/numa_emulation.c
-+++ b/arch/x86/mm/numa_emulation.c
-@@ -123,7 +123,7 @@ static int __init split_nodes_interleave(struct numa_meminfo *ei,
- 	 * Continue to fill physical nodes with fake nodes until there is no
- 	 * memory left on any of them.
- 	 */
--	while (nodes_weight(physnode_mask)) {
-+	while (!nodes_empty(physnode_mask)) {
- 		for_each_node_mask(i, physnode_mask) {
- 			u64 dma32_end = PFN_PHYS(MAX_DMA32_PFN);
- 			u64 start, limit, end;
-@@ -270,7 +270,7 @@ static int __init split_nodes_size_interleave_uniform(struct numa_meminfo *ei,
- 	 * Fill physical nodes with fake nodes of size until there is no memory
- 	 * left on any of them.
- 	 */
--	while (nodes_weight(physnode_mask)) {
-+	while (!nodes_empty(physnode_mask)) {
- 		for_each_node_mask(i, physnode_mask) {
- 			u64 dma32_end = PFN_PHYS(MAX_DMA32_PFN);
- 			u64 start, limit, end;
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index edfd6c81af82..71f5652828b8 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -8323,7 +8323,7 @@ void __init page_alloc_init(void)
+ 	int ret;
+ 
+ #ifdef CONFIG_NUMA
+-	if (num_node_state(N_MEMORY) == 1)
++	if (num_node_state_eq(N_MEMORY, 1))
+ 		hashdist = 0;
+ #endif
+ 
 -- 
 2.30.2
 
