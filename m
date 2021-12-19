@@ -2,188 +2,156 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F46C4332F
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Dec 2021 23:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CEB6C433FE
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 Dec 2021 02:52:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232107AbhLRX2k (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 Dec 2021 18:28:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56178 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229745AbhLRX2j (ORCPT
+        id S230110AbhLSCwJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 18 Dec 2021 21:52:09 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:37208 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229804AbhLSCwI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 Dec 2021 18:28:39 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B204BC061574;
-        Sat, 18 Dec 2021 15:28:39 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id d11so5761429pgl.1;
-        Sat, 18 Dec 2021 15:28:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=pIYxkiGisug+VVJYFtmCG20TylNRXB8zO8kw91s3wyc=;
-        b=TIuyQXz6oo8PN+yMbImlC2c2rmmoCdLu5CdlQlReccXapNNMDZyLSkZvnzlgZ9AIdV
-         6+qzntuQo5gBX86FaZFlCIaH4FCNC7RUVw367F08QPEjoiFWXa2CV6SAzISHS5RZPpY/
-         QbkHqa0fdrihFEuRX0X/GeMy6P75DvnBsKWfABXcb5D5/2zTgkKaV4VEiJSuyy+zBwcd
-         zNIVzererH+Fx7ZEOWvTBpmd3THvXh1KHtzsLHvjMiIPuGFGIqMdZbyjf9H7vLYP6+7J
-         cQ/P2vAafsI3DEFtzgX9UWRj1ZmCeXy01hG6ih9PN1N9Tz70SEQsg8aJQpCrrbXl1cqP
-         QppQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=pIYxkiGisug+VVJYFtmCG20TylNRXB8zO8kw91s3wyc=;
-        b=55CrRinAexYQVLLCAVeuG8I9J21GY3IqcaFC2wR8Ap2MiD9sYKYzust2I4EPxGXnlS
-         Pe0dCuc92IRHO1MDoXneWrcsOs3n++GqV+AbWUpP/Vou5TnzYWC1vO6s+RSD0/fctkrP
-         PInFYv0lzakRglwYu8kqv8ie8FPD29R5DblmhYAINOWuiKTZW7+80IQ9deoTuWfCqWnT
-         HqmOjOvMV9tFtMFrpfSWt3ekPZ74xg1blyPjdcw0tv2jvgo63uA3Es616/CIhgUtYerz
-         hBTc4KAVndNYIcaoApCeR6jtlsw4/OwO6twxIBYK2tBHgdyBIgrVer5Lcw5EuOJh5eFk
-         4Vow==
-X-Gm-Message-State: AOAM531ln7opi6qLxgmfcxBohJ4InyB6hBVL0qNWaopTWH3Rac2lqjtR
-        Pm1Msu47bv19vvsytkJ3BktocnLs6bznKqaEF9A=
-X-Google-Smtp-Source: ABdhPJxWDXMTWC77oOKCjFiIpES/JejUzoFwUACXrmSW9T47MOn3N7k2dUXoB6NpZZlsfwgvBd+k97C3LkDR7q0l13Y=
-X-Received: by 2002:a63:2a0d:: with SMTP id q13mr8815341pgq.513.1639870119035;
- Sat, 18 Dec 2021 15:28:39 -0800 (PST)
+        Sat, 18 Dec 2021 21:52:08 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3353C60C36;
+        Sun, 19 Dec 2021 02:52:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BFE0C36AE1;
+        Sun, 19 Dec 2021 02:52:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639882327;
+        bh=LL/DQcC2N9azPevEEwI7fD5zh/Svk3aIPF7eb5otGdQ=;
+        h=From:To:Cc:Subject:Date:From;
+        b=JdrEgo3p0YIVADumT+fDaJGTfd8+FIry4DqKXny80l8ERdQk63CiOO9HChX9zznVv
+         6U2pJfCqP+p27rSg8TKHAtFs1d1PWiPK/nK8EytJuH7k+tn4Dkr+bSdTkaANq6GvtE
+         OToqqfKzx2zGqMOtQGAkxcTRLcYDPVFUJv1qFO2rTe4n/iZLkJ2co9efWg8l3ypOMC
+         8Yl7R0I5VqBdVfKYF/kOFrj0JfYciUjysekvMoYf8tfRBGCHok/f89o7v/0F+MZjsV
+         5JfqU3XTiR33Knx3j+7Lul/Fg/Gx3/Ensg0Lp6yc3HLGU3IBQPqtmVckqzO0L6Pmq8
+         zAlPsbR2V279g==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Theodore Ts'o <tytso@mit.edu>,
+        "Jason A . Donenfeld " <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        "Paul E . McKenney" <paulmck@kernel.org>, stable@vger.kernel.org
+Subject: [PATCH RESEND] random: use correct memory barriers for crng_node_pool
+Date:   Sat, 18 Dec 2021 20:51:39 -0600
+Message-Id: <20211219025139.31085-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20211218212014.1315894-1-yury.norov@gmail.com>
- <20211218212014.1315894-2-yury.norov@gmail.com> <Yb5dmqlYd3owtH29@qmqm.qmqm.pl>
-In-Reply-To: <Yb5dmqlYd3owtH29@qmqm.qmqm.pl>
-From:   Yury Norov <yury.norov@gmail.com>
-Date:   Sat, 18 Dec 2021 15:28:29 -0800
-Message-ID: <CAAH8bW9uWW+t5TvkMt_e-sKp71hiLpXhXeuGuSZPK-3kds-GgQ@mail.gmail.com>
-Subject: Re: [PATCH 01/17] all: don't use bitmap_weight() where possible
-To:     =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>
-Cc:     linux-kernel@vger.kernel.org,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Alexey Klimov <aklimov@redhat.com>,
-        Amitkumar Karwar <amitkarwar@gmail.com>,
-        Andi Kleen <ak@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Gross <agross@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Andy Shevchenko <andy@infradead.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Christoph Lameter <cl@linux.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Airlie <airlied@linux.ie>,
-        David Laight <David.Laight@aculab.com>,
-        Dennis Zhou <dennis@kernel.org>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Geetha sowjanya <gakula@marvell.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Guo Ren <guoren@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ian Rogers <irogers@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jason Wessel <jason.wessel@windriver.com>,
-        Jens Axboe <axboe@fb.com>, Jiri Olsa <jolsa@redhat.com>,
-        Joe Perches <joe@perches.com>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        Marc Zyngier <maz@kernel.org>, Marcin Wojtas <mw@semihalf.com>,
-        Mark Gross <markgross@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Matti Vaittinen <mazziesaccount@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Mel Gorman <mgorman@suse.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Petr Mladek <pmladek@suse.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Russell King <linux@armlinux.org.uk>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Solomon Peachy <pizza@shaftnet.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Sunil Goutham <sgoutham@marvell.com>,
-        Tariq Toukan <tariqt@nvidia.com>, Tejun Heo <tj@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Vineet Gupta <vgupta@kernel.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Vivien Didelot <vivien.didelot@gmail.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Will Deacon <will@kernel.org>,
-        bcm-kernel-feedback-list@broadcom.com, kvm@vger.kernel.org,
-        linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-csky@vger.kernel.org,
-        linux-ia64@vger.kernel.org, linux-mips@vger.kernel.org,
-        linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Dec 18, 2021 at 2:16 PM Micha=C5=82 Miros=C5=82aw <mirq-linux@rere.=
-qmqm.pl> wrote:
->
-> On Sat, Dec 18, 2021 at 01:19:57PM -0800, Yury Norov wrote:
-> > Don't call bitmap_weight() if the following code can get by
-> > without it.
-> >
-> > Signed-off-by: Yury Norov <yury.norov@gmail.com>
-> > ---
-> >  drivers/net/dsa/b53/b53_common.c           | 6 +-----
-> >  drivers/net/ethernet/broadcom/bcmsysport.c | 6 +-----
-> >  drivers/thermal/intel/intel_powerclamp.c   | 9 +++------
-> >  3 files changed, 5 insertions(+), 16 deletions(-)
-> [...]
->
-> Looks good,
+From: Eric Biggers <ebiggers@google.com>
 
-Does it mean Acked-by, Reviewed-by, or something else?
+When a CPU selects which CRNG to use, it accesses crng_node_pool without
+a memory barrier.  That's wrong, because crng_node_pool can be set by
+another CPU concurrently.  Without a memory barrier, the crng_state that
+is used might not appear to be fully initialized.
 
-> but I think this needs to be split per subsystem.
+There's an explicit mb() on the write side, but it's redundant with
+cmpxchg() (or cmpxchg_release()) and does nothing to fix the read side.
 
-What you ask breaks rules:
+Implement this correctly by using a cmpxchg_release() +
+smp_load_acquire() pair.
 
-Documentation/process/submitting-patches.rst:
+Note: READ_ONCE() could be used instead of smp_load_acquire(), but it is
+harder to verify that it is correct, so I'd prefer not to use it here.
 
-Separate each **logical change** into a separate patch.
+Fixes: 1e7f583af67b ("random: make /dev/urandom scalable for silly userspace programs")
+Cc: <stable@vger.kernel.org> # v4.8+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
 
-For example, if your changes include both bug fixes and performance
-enhancements for a single driver, separate those changes into two
-or more patches.  If your changes include an API update, and a new
-driver which uses that new API, separate those into two patches.
+I sent this fix about a year ago
+(https://lore.kernel.org/lkml/20200916233042.51634-1-ebiggers@kernel.org/T/#u),
+and though it's a correct fix, it was derailed by a debate about whether
+it's safe to use READ_ONCE() instead of smp_load_acquire() or not.
+Therefore, the current code, which (AFAIK) everyone agrees is buggy, was
+never actually fixed.  Since random.c has a new maintainer now, I think
+it's worth sending this fix for reconsideration.
 
-On the other hand, if you make a single change to numerous files,
-group those changes into a single patch.  Thus a single logical change
-is contained within a single patch.
+ drivers/char/random.c | 42 ++++++++++++++++++++++--------------------
+ 1 file changed, 22 insertions(+), 20 deletions(-)
 
-This is not a dead rule, refer for example the 96d4f267e40f9 ("Remove
-'type' argument from access_ok() functioin.")
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 605969ed0f96..349a6f235c61 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -843,8 +843,8 @@ static void do_numa_crng_init(struct work_struct *work)
+ 		crng_initialize_secondary(crng);
+ 		pool[i] = crng;
+ 	}
+-	mb();
+-	if (cmpxchg(&crng_node_pool, NULL, pool)) {
++	/* pairs with smp_load_acquire() in select_crng() */
++	if (cmpxchg_release(&crng_node_pool, NULL, pool) != NULL) {
+ 		for_each_node(i)
+ 			kfree(pool[i]);
+ 		kfree(pool);
+@@ -857,8 +857,26 @@ static void numa_crng_init(void)
+ {
+ 	schedule_work(&numa_crng_init_work);
+ }
++
++static inline struct crng_state *select_crng(void)
++{
++	struct crng_state **pool;
++	int nid = numa_node_id();
++
++	/* pairs with cmpxchg_release() in do_numa_crng_init() */
++	pool = smp_load_acquire(&crng_node_pool);
++	if (pool && pool[nid])
++		return pool[nid];
++
++	return &primary_crng;
++}
+ #else
+ static void numa_crng_init(void) {}
++
++static inline struct crng_state *select_crng(void)
++{
++	return &primary_crng;
++}
+ #endif
+ 
+ /*
+@@ -1005,15 +1023,7 @@ static void _extract_crng(struct crng_state *crng,
+ 
+ static void extract_crng(__u8 out[CHACHA_BLOCK_SIZE])
+ {
+-	struct crng_state *crng = NULL;
+-
+-#ifdef CONFIG_NUMA
+-	if (crng_node_pool)
+-		crng = crng_node_pool[numa_node_id()];
+-	if (crng == NULL)
+-#endif
+-		crng = &primary_crng;
+-	_extract_crng(crng, out);
++	_extract_crng(select_crng(), out);
+ }
+ 
+ /*
+@@ -1042,15 +1052,7 @@ static void _crng_backtrack_protect(struct crng_state *crng,
+ 
+ static void crng_backtrack_protect(__u8 tmp[CHACHA_BLOCK_SIZE], int used)
+ {
+-	struct crng_state *crng = NULL;
+-
+-#ifdef CONFIG_NUMA
+-	if (crng_node_pool)
+-		crng = crng_node_pool[numa_node_id()];
+-	if (crng == NULL)
+-#endif
+-		crng = &primary_crng;
+-	_crng_backtrack_protect(crng, tmp, used);
++	_crng_backtrack_protect(select_crng(), tmp, used);
+ }
+ 
+ static ssize_t extract_crng_user(void __user *buf, size_t nbytes)
+-- 
+2.34.1
 
-Or this: https://lkml.org/lkml/2021/6/14/1736
-
-Thanks,
-Yury
