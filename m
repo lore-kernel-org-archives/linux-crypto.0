@@ -2,156 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CEB6C433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 19 Dec 2021 02:52:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBBD8C433EF
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 Dec 2021 08:53:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230110AbhLSCwJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 Dec 2021 21:52:09 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:37208 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229804AbhLSCwI (ORCPT
+        id S233641AbhLSIxH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 19 Dec 2021 03:53:07 -0500
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.217]:24849 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231907AbhLSIxG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 Dec 2021 21:52:08 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3353C60C36;
-        Sun, 19 Dec 2021 02:52:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BFE0C36AE1;
-        Sun, 19 Dec 2021 02:52:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639882327;
-        bh=LL/DQcC2N9azPevEEwI7fD5zh/Svk3aIPF7eb5otGdQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=JdrEgo3p0YIVADumT+fDaJGTfd8+FIry4DqKXny80l8ERdQk63CiOO9HChX9zznVv
-         6U2pJfCqP+p27rSg8TKHAtFs1d1PWiPK/nK8EytJuH7k+tn4Dkr+bSdTkaANq6GvtE
-         OToqqfKzx2zGqMOtQGAkxcTRLcYDPVFUJv1qFO2rTe4n/iZLkJ2co9efWg8l3ypOMC
-         8Yl7R0I5VqBdVfKYF/kOFrj0JfYciUjysekvMoYf8tfRBGCHok/f89o7v/0F+MZjsV
-         5JfqU3XTiR33Knx3j+7Lul/Fg/Gx3/Ensg0Lp6yc3HLGU3IBQPqtmVckqzO0L6Pmq8
-         zAlPsbR2V279g==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Theodore Ts'o <tytso@mit.edu>,
-        "Jason A . Donenfeld " <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        "Paul E . McKenney" <paulmck@kernel.org>, stable@vger.kernel.org
-Subject: [PATCH RESEND] random: use correct memory barriers for crng_node_pool
-Date:   Sat, 18 Dec 2021 20:51:39 -0600
-Message-Id: <20211219025139.31085-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        Sun, 19 Dec 2021 03:53:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1639903980;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=4xfjlTuryYHGq4CldUoaQRCYJjyk3Av4kzeFbjPwTGU=;
+    b=R3TzUle86Rc/ggxVANCKEcoFsFQPld39OBCpaL+Jgg+U0NIhll2STO+m6RAWRgNVLi
+    IyrPFpTnADbasV0n7fCuHAc6SiDudQIirHKXarJPXccx9Xw7TiizHSJXE3tS2moNxSBs
+    NGQicSnECiyRRN3DSI0ytM/mBVsOoMNxAf5f+uY+ZeNL6AbYggF12L7hYvI0TTP9ycjD
+    /XgXrNLclgUUEfA0T+HGDJLvg5j4XWcNGMtMD3CNW/Dek2idM/JQsOM0Rsygsd6Freyq
+    iILDSSYKU1jufcMNXnyyfpIuoCyhGOW4OJ28YGRxtBJm4iphe8Fd7C4IxY2JORJ7ocnh
+    PCpg==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZI/SWzl0="
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 47.35.3 DYNA|AUTH)
+    with ESMTPSA id h03d91xBJ8qxMn7
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Sun, 19 Dec 2021 09:52:59 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, simo@redhat.com, skozina@redhat.com,
+        Nicolai Stange <nstange@suse.de>
+Subject: Re: [PATCH] crypto: jitter - add oversampling of noise source
+Date:   Sun, 19 Dec 2021 09:52:57 +0100
+Message-ID: <4499108.vXUDI8C0e8@positron.chronox.de>
+In-Reply-To: <20211218032720.GA11637@gondor.apana.org.au>
+References: <2573346.vuYhMxLoTh@positron.chronox.de> <20211218032720.GA11637@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+Am Samstag, 18. Dezember 2021, 04:27:21 CET schrieb Herbert Xu:
 
-When a CPU selects which CRNG to use, it accesses crng_node_pool without
-a memory barrier.  That's wrong, because crng_node_pool can be set by
-another CPU concurrently.  Without a memory barrier, the crng_state that
-is used might not appear to be fully initialized.
+Hi Herbert,
 
-There's an explicit mb() on the write side, but it's redundant with
-cmpxchg() (or cmpxchg_release()) and does nothing to fix the read side.
+> On Fri, Dec 17, 2021 at 10:41:42AM +0100, Stephan M=FCller wrote:
+> > diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+> > index 2d115bec15ae..b02f93805e83 100644
+> > --- a/crypto/jitterentropy-kcapi.c
+> > +++ b/crypto/jitterentropy-kcapi.c
+> > @@ -59,6 +60,11 @@ void jent_zfree(void *ptr)
+> >=20
+> >  	kfree_sensitive(ptr);
+> > =20
+> >  }
+> >=20
+> > +int jent_fips_enabled(void)
+> > +{
+> > +	return fips_enabled;
+> > +}
+>=20
+> Why do you need this function? And why can't it be inlined?
+>=20
+> Normally fips_enabled is entirely optimised away if FIPS is
+> disabled in Kconfig.  This function breaks this.
 
-Implement this correctly by using a cmpxchg_release() +
-smp_load_acquire() pair.
+You are right, fips.h can be included into jitterentropy.c and this helper=
+=20
+function can be eliminated.
 
-Note: READ_ONCE() could be used instead of smp_load_acquire(), but it is
-harder to verify that it is correct, so I'd prefer not to use it here.
+Thanks
+>=20
+> Thanks,
 
-Fixes: 1e7f583af67b ("random: make /dev/urandom scalable for silly userspace programs")
-Cc: <stable@vger.kernel.org> # v4.8+
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
 
-I sent this fix about a year ago
-(https://lore.kernel.org/lkml/20200916233042.51634-1-ebiggers@kernel.org/T/#u),
-and though it's a correct fix, it was derailed by a debate about whether
-it's safe to use READ_ONCE() instead of smp_load_acquire() or not.
-Therefore, the current code, which (AFAIK) everyone agrees is buggy, was
-never actually fixed.  Since random.c has a new maintainer now, I think
-it's worth sending this fix for reconsideration.
+Ciao
+Stephan
 
- drivers/char/random.c | 42 ++++++++++++++++++++++--------------------
- 1 file changed, 22 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 605969ed0f96..349a6f235c61 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -843,8 +843,8 @@ static void do_numa_crng_init(struct work_struct *work)
- 		crng_initialize_secondary(crng);
- 		pool[i] = crng;
- 	}
--	mb();
--	if (cmpxchg(&crng_node_pool, NULL, pool)) {
-+	/* pairs with smp_load_acquire() in select_crng() */
-+	if (cmpxchg_release(&crng_node_pool, NULL, pool) != NULL) {
- 		for_each_node(i)
- 			kfree(pool[i]);
- 		kfree(pool);
-@@ -857,8 +857,26 @@ static void numa_crng_init(void)
- {
- 	schedule_work(&numa_crng_init_work);
- }
-+
-+static inline struct crng_state *select_crng(void)
-+{
-+	struct crng_state **pool;
-+	int nid = numa_node_id();
-+
-+	/* pairs with cmpxchg_release() in do_numa_crng_init() */
-+	pool = smp_load_acquire(&crng_node_pool);
-+	if (pool && pool[nid])
-+		return pool[nid];
-+
-+	return &primary_crng;
-+}
- #else
- static void numa_crng_init(void) {}
-+
-+static inline struct crng_state *select_crng(void)
-+{
-+	return &primary_crng;
-+}
- #endif
- 
- /*
-@@ -1005,15 +1023,7 @@ static void _extract_crng(struct crng_state *crng,
- 
- static void extract_crng(__u8 out[CHACHA_BLOCK_SIZE])
- {
--	struct crng_state *crng = NULL;
--
--#ifdef CONFIG_NUMA
--	if (crng_node_pool)
--		crng = crng_node_pool[numa_node_id()];
--	if (crng == NULL)
--#endif
--		crng = &primary_crng;
--	_extract_crng(crng, out);
-+	_extract_crng(select_crng(), out);
- }
- 
- /*
-@@ -1042,15 +1052,7 @@ static void _crng_backtrack_protect(struct crng_state *crng,
- 
- static void crng_backtrack_protect(__u8 tmp[CHACHA_BLOCK_SIZE], int used)
- {
--	struct crng_state *crng = NULL;
--
--#ifdef CONFIG_NUMA
--	if (crng_node_pool)
--		crng = crng_node_pool[numa_node_id()];
--	if (crng == NULL)
--#endif
--		crng = &primary_crng;
--	_crng_backtrack_protect(crng, tmp, used);
-+	_crng_backtrack_protect(select_crng(), tmp, used);
- }
- 
- static ssize_t extract_crng_user(void __user *buf, size_t nbytes)
--- 
-2.34.1
 
