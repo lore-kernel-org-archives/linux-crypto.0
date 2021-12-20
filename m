@@ -2,105 +2,157 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21374C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Dec 2021 09:23:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3235AC43219
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Dec 2021 14:37:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232030AbhLTJXp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Dec 2021 04:23:45 -0500
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:52249 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231521AbhLTJXd (ORCPT
+        id S234278AbhLTOh4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Dec 2021 09:37:56 -0500
+Received: from mail-oi1-f175.google.com ([209.85.167.175]:44863 "EHLO
+        mail-oi1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234003AbhLTOhc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Dec 2021 04:23:33 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0V.B9zcn_1639992206;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V.B9zcn_1639992206)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 20 Dec 2021 17:23:27 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linux-crypto@vger.kernel.org, linux-mips@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, sparclinux@vger.kernel.org
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH 5/5] crypto: s390/sha512 - Use macros instead of direct IV numbers
-Date:   Mon, 20 Dec 2021 17:23:18 +0800
-Message-Id: <20211220092318.5793-6-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20211220092318.5793-1-tianjia.zhang@linux.alibaba.com>
-References: <20211220092318.5793-1-tianjia.zhang@linux.alibaba.com>
+        Mon, 20 Dec 2021 09:37:32 -0500
+Received: by mail-oi1-f175.google.com with SMTP id be32so16010867oib.11;
+        Mon, 20 Dec 2021 06:37:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=MX2xD6NxZlK32RqDAc9k/pbvJlT/hpUSltlaWuBfZyY=;
+        b=EFHAOJhyVqLeqLC/eUZp83i4qW9h4YsxiQz2Endqotu0xrixWxvWd51u/Mqkb7sMio
+         h1Lyk7zHU/w+XXWEEgVN3nKVgjv6g+RLXclq7nzzprAVXh4W9b+Ozxm4O1+5k8KN+6xy
+         XqTGAUAk5YcfTKNpVtaCVP0Ahj97GESfyZvC+rm5DzW0nr/SXBiyg96cardibAGmTXYx
+         BaRm7Y5xBsHam/DpXYVW8zj5cr4360MEa6PZsVWOd6/6IzxloEx6JGSaTz2a1rZExP2y
+         EmyzyOLEyAkn0MqxUzZBstAbOTf9K9C8J7lupepcNiEftPFer015i4OyhcLXUFuc/ZCj
+         RsTw==
+X-Gm-Message-State: AOAM531PojBh0b0PMiH0ad3dIU3BUpU2gh04Izx25rJJo1R2ztYNFii1
+        Du0pl3Pu0uP9Z+ShpT1I/A==
+X-Google-Smtp-Source: ABdhPJwb8Epp66kgn5FAQJGNGoQLiIht6dxhdac9TXEyh6nIWNGhfonlF1xdobHH+VltWNqopZLZIQ==
+X-Received: by 2002:a05:6808:11:: with SMTP id u17mr1043535oic.88.1640011051574;
+        Mon, 20 Dec 2021 06:37:31 -0800 (PST)
+Received: from robh.at.kernel.org ([12.252.7.226])
+        by smtp.gmail.com with ESMTPSA id ay40sm3423367oib.1.2021.12.20.06.37.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Dec 2021 06:37:30 -0800 (PST)
+Received: (nullmailer pid 3403888 invoked by uid 1000);
+        Mon, 20 Dec 2021 14:37:28 -0000
+Date:   Mon, 20 Dec 2021 08:37:28 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     conor.dooley@microchip.com
+Cc:     linus.walleij@linaro.org, bgolaszewski@baylibre.com,
+        jassisinghbrar@gmail.com, paul.walmsley@sifive.com,
+        palmer@dabbelt.com, aou@eecs.berkeley.edu, a.zummo@towertech.it,
+        alexandre.belloni@bootlin.com, broonie@kernel.org,
+        gregkh@linuxfoundation.org, thierry.reding@gmail.com,
+        u.kleine-koenig@pengutronix.de, lee.jones@linaro.org,
+        linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-pwm@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-usb@vger.kernel.org,
+        krzysztof.kozlowski@canonical.com, geert@linux-m68k.org,
+        bin.meng@windriver.com, heiko@sntech.de, lewis.hanly@microchip.com,
+        daire.mcnamara@microchip.com, ivan.griffin@microchip.com,
+        atish.patra@wdc.com
+Subject: Re: [PATCH v2 07/17] dt-bindings: rtc: add bindings for microchip
+ mpfs rtc
+Message-ID: <YcCVKFm+7aEG2FYH@robh.at.kernel.org>
+References: <20211217093325.30612-1-conor.dooley@microchip.com>
+ <20211217093325.30612-8-conor.dooley@microchip.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211217093325.30612-8-conor.dooley@microchip.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In the init functions of sha512 and sha384, the initial hash value
-use macros instead of numbers.
+On Fri, Dec 17, 2021 at 09:33:15AM +0000, conor.dooley@microchip.com wrote:
+> From: Conor Dooley <conor.dooley@microchip.com>
+> 
+> Add device tree bindings for the real time clock on
+> the Microchip PolarFire SoC.
+> 
+> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+> Signed-off-by: Daire McNamara <daire.mcnamara@microchip.com>
+> ---
+>  .../bindings/rtc/microchip,mfps-rtc.yaml      | 63 +++++++++++++++++++
+>  1 file changed, 63 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rtc/microchip,mfps-rtc.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/rtc/microchip,mfps-rtc.yaml b/Documentation/devicetree/bindings/rtc/microchip,mfps-rtc.yaml
+> new file mode 100644
+> index 000000000000..d57460cbe5e3
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/rtc/microchip,mfps-rtc.yaml
+> @@ -0,0 +1,63 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/rtc/microchip,mfps-rtc.yaml#
+> +
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Microchip PolarFire Soc (MPFS) RTC Device Tree Bindings
+> +
+> +allOf:
+> +  - $ref: rtc.yaml#
+> +
+> +maintainers:
+> +  - Daire McNamara <daire.mcnamara@microchip.com>
+> +  - Lewis Hanly <lewis.hanly@microchip.com>
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - microchip,mpfs-rtc
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 2
 
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
----
- arch/s390/crypto/sha512_s390.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+Need to define what each one is.
 
-diff --git a/arch/s390/crypto/sha512_s390.c b/arch/s390/crypto/sha512_s390.c
-index 29a6bd404c59..43ce4956df73 100644
---- a/arch/s390/crypto/sha512_s390.c
-+++ b/arch/s390/crypto/sha512_s390.c
-@@ -22,14 +22,14 @@ static int sha512_init(struct shash_desc *desc)
- {
- 	struct s390_sha_ctx *ctx = shash_desc_ctx(desc);
- 
--	*(__u64 *)&ctx->state[0] = 0x6a09e667f3bcc908ULL;
--	*(__u64 *)&ctx->state[2] = 0xbb67ae8584caa73bULL;
--	*(__u64 *)&ctx->state[4] = 0x3c6ef372fe94f82bULL;
--	*(__u64 *)&ctx->state[6] = 0xa54ff53a5f1d36f1ULL;
--	*(__u64 *)&ctx->state[8] = 0x510e527fade682d1ULL;
--	*(__u64 *)&ctx->state[10] = 0x9b05688c2b3e6c1fULL;
--	*(__u64 *)&ctx->state[12] = 0x1f83d9abfb41bd6bULL;
--	*(__u64 *)&ctx->state[14] = 0x5be0cd19137e2179ULL;
-+	*(__u64 *)&ctx->state[0] = SHA512_H0;
-+	*(__u64 *)&ctx->state[2] = SHA512_H1;
-+	*(__u64 *)&ctx->state[4] = SHA512_H2;
-+	*(__u64 *)&ctx->state[6] = SHA512_H3;
-+	*(__u64 *)&ctx->state[8] = SHA512_H4;
-+	*(__u64 *)&ctx->state[10] = SHA512_H5;
-+	*(__u64 *)&ctx->state[12] = SHA512_H6;
-+	*(__u64 *)&ctx->state[14] = SHA512_H7;
- 	ctx->count = 0;
- 	ctx->func = CPACF_KIMD_SHA_512;
- 
-@@ -87,14 +87,14 @@ static int sha384_init(struct shash_desc *desc)
- {
- 	struct s390_sha_ctx *ctx = shash_desc_ctx(desc);
- 
--	*(__u64 *)&ctx->state[0] = 0xcbbb9d5dc1059ed8ULL;
--	*(__u64 *)&ctx->state[2] = 0x629a292a367cd507ULL;
--	*(__u64 *)&ctx->state[4] = 0x9159015a3070dd17ULL;
--	*(__u64 *)&ctx->state[6] = 0x152fecd8f70e5939ULL;
--	*(__u64 *)&ctx->state[8] = 0x67332667ffc00b31ULL;
--	*(__u64 *)&ctx->state[10] = 0x8eb44a8768581511ULL;
--	*(__u64 *)&ctx->state[12] = 0xdb0c2e0d64f98fa7ULL;
--	*(__u64 *)&ctx->state[14] = 0x47b5481dbefa4fa4ULL;
-+	*(__u64 *)&ctx->state[0] = SHA384_H0;
-+	*(__u64 *)&ctx->state[2] = SHA384_H1;
-+	*(__u64 *)&ctx->state[4] = SHA384_H2;
-+	*(__u64 *)&ctx->state[6] = SHA384_H3;
-+	*(__u64 *)&ctx->state[8] = SHA384_H4;
-+	*(__u64 *)&ctx->state[10] = SHA384_H5;
-+	*(__u64 *)&ctx->state[12] = SHA384_H6;
-+	*(__u64 *)&ctx->state[14] = SHA384_H7;
- 	ctx->count = 0;
- 	ctx->func = CPACF_KIMD_SHA_512;
- 
--- 
-2.32.0
-
+> +
+> +  microchip,prescaler:
+> +    description: |
+> +      The prescaler divides the input frequency to create a time-based strobe (typically 1 Hz) for
+> +      the calendar counter. The Alarm and Compare Registers, in conjunction with the calendar
+> +      counter, facilitate time-matched events. To properly operate in Calendar or Binary mode,
+> +      the 26-bit prescaler must be programmed to generate a strobe to the RTC.
+> +    maxItems: 1
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  clock-names:
+> +    items:
+> +      - const: rtc
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +  - clocks
+> +  - clock-names
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/clock/microchip,mpfs-clock.h>
+> +    rtc@20124000 {
+> +        compatible = "microchip,mpfs-rtc";
+> +        reg = <0x20124000 0x1000>;
+> +        clocks = <&clkcfg CLK_RTC>;
+> +        clock-names = "rtc";
+> +        interrupts = <80>, <81>;
+> +    };
+> +...
+> -- 
+> 2.33.1
+> 
+> 
