@@ -2,67 +2,46 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D35C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Dec 2021 02:19:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB76FC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Dec 2021 02:52:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237199AbhLTCTM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 19 Dec 2021 21:19:12 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:16831 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233948AbhLTCTL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 19 Dec 2021 21:19:11 -0500
-Received: from dggpeml500022.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JHNY9470Xz91pm;
-        Mon, 20 Dec 2021 10:18:21 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Mon, 20 Dec 2021 10:19:09 +0800
-Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
- (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Mon, 20 Dec
- 2021 10:19:09 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <xuzaibo@huawei.com>,
-        <yekai13@huawei.com>
-Subject: [PATCH] MAINTAINERS: update SEC2 driver maintainers list
-Date:   Mon, 20 Dec 2021 10:14:18 +0800
-Message-ID: <20211220021418.2512-1-yekai13@huawei.com>
-X-Mailer: git-send-email 2.33.0
+        id S234011AbhLTCwv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 19 Dec 2021 21:52:51 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58286 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231167AbhLTCwv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 19 Dec 2021 21:52:51 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1mz8n7-0001rC-KK; Mon, 20 Dec 2021 13:52:46 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 20 Dec 2021 13:52:45 +1100
+Date:   Mon, 20 Dec 2021 13:52:45 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     linux-crypto@vger.kernel.org, simo@redhat.com, skozina@redhat.com,
+        Nicolai Stange <nstange@suse.de>
+Subject: Re: [PATCH v2] crypto: jitter - add oversampling of noise source
+Message-ID: <20211220025245.GA20311@gondor.apana.org.au>
+References: <2573346.vuYhMxLoTh@positron.chronox.de>
+ <4712718.vXUDI8C0e8@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4712718.vXUDI8C0e8@positron.chronox.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Adding Kai Ye as SEC2 maintainer.
+On Sun, Dec 19, 2021 at 05:25:32PM +0100, Stephan Müller wrote:
+>
+> +#include "linux/fips.h"
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
-Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+Shouldn't this be <linux/fips.h>?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 00475646e3e3..81d8db03bac2 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8628,6 +8628,7 @@ F:	drivers/scsi/hisi_sas/
- 
- HISILICON SECURITY ENGINE V2 DRIVER (SEC2)
- M:	Zaibo Xu <xuzaibo@huawei.com>
-+M:	Kai Ye <yekai13@huawei.com>
- L:	linux-crypto@vger.kernel.org
- S:	Maintained
- F:	Documentation/ABI/testing/debugfs-hisi-sec
+Thanks,
 -- 
-2.33.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
