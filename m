@@ -2,151 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FB07C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Dec 2021 18:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1917EC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Dec 2021 18:11:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240355AbhLTSEC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Dec 2021 13:04:02 -0500
-Received: from meesny.iki.fi ([195.140.195.201]:44240 "EHLO meesny.iki.fi"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240361AbhLTSD6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Dec 2021 13:03:58 -0500
-Received: from [10.0.0.10] (87-100-201-184.bb.dnainternet.fi [87.100.201.184])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        id S240390AbhLTSLT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Dec 2021 13:11:19 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:40550 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240368AbhLTSLS (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 20 Dec 2021 13:11:18 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: jussi.kivilinna)
-        by meesny.iki.fi (Postfix) with ESMTPSA id 44C932005D;
-        Mon, 20 Dec 2021 20:03:48 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-        t=1640023428;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wW83kui2hXf3Lo+4Yk8gj/d8EIV+rRJ4EwkVapYVfxc=;
-        b=IMyVkQseKjGtgDsQ03AWveqmaK+W5R3h8165fdukxV0mHCMZeV/DgAgEBkobdd+FwbUyMn
-        i2RDp14fEaqo4QvsDz7ufnV+Ywo5YHS5njNhlk6xphXSRlZTwyjiB9p2waRqQXoKnl5LZL
-        /5akhVLjIIdjTTH7bvhZYzvSXgLMeCU=
-Message-ID: <9e70bf33-bab5-83a3-1eb0-7cae442c2f64@iki.fi>
-Date:   Mon, 20 Dec 2021 20:03:47 +0200
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1D1A0B80E4F;
+        Mon, 20 Dec 2021 18:11:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D017FC36AEA;
+        Mon, 20 Dec 2021 18:11:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1640023875;
+        bh=tEPmTDL4AttPFhO9OdyUWkKX2oZMfoIsTqVVbMyvsso=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=L4TbCOntkXIQOmvOm61F5uEkVoFdjjN2RJjQC0XO5z8FS2UIBQbB0zXpPQIJ6ZnOC
+         wOL41PmtHsIi8AIkbQM57sVpycXCB4oiQROxd76gqT4evf4132+WFn/pARvzuLGUs3
+         I+eNu2lv/UDyL5OPSOQlPH1Tguv5WXyAEa44mJBWgacTkr5Ne04yZ7J9lhjFScJbyS
+         nxnLDiwSppR72QRpg0IkBNhecIL+jODwQab9lO7S8mLeeK+MaZgd3nuRh5qFH5zDoQ
+         mhDXPhXqzpp8g86Sjybjl3QvJHamQoMsdL2MhsJuFEw4WSwl5dKu9Nbjte2ZLfcyqQ
+         HP/x772+nRT0w==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+        id 904335C100E; Mon, 20 Dec 2021 10:11:15 -0800 (PST)
+Date:   Mon, 20 Dec 2021 10:11:15 -0800
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        stable <stable@vger.kernel.org>
+Subject: Re: [PATCH RESEND] random: use correct memory barriers for
+ crng_node_pool
+Message-ID: <20211220181115.GZ641268@paulmck-ThinkPad-P17-Gen-1>
+Reply-To: paulmck@kernel.org
+References: <20211219025139.31085-1-ebiggers@kernel.org>
+ <CAHmME9pQ4vp0jHpOyQXHRbJ-xQKYapQUsWPrLouK=dMO56y1zA@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.1
-Content-Language: en-US
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
-        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-References: <20211220082251.1445-1-tianjia.zhang@linux.alibaba.com>
- <20211220082251.1445-6-tianjia.zhang@linux.alibaba.com>
-From:   Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: Re: [PATCH 5/6] crypto: x86/sm3 - add AVX assembly implementation
-In-Reply-To: <20211220082251.1445-6-tianjia.zhang@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=jussi.kivilinna smtp.mailfrom=jussi.kivilinna@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1640023428; a=rsa-sha256; cv=none;
-        b=da2nvPdHYu4MgAMlGpfMmzPiDl5gUxGRnpSPjVIWl+zJepXuTwmWU4vQXzSbRJZBOs93zI
-        1EB93O8X/uSD2gM4Hz0VghF+ei0ivDzDaHfe3nFMwalLKs4fokzSjLSy9mCR9oO65Sd2JF
-        a4tsA+y/ir0jo6D5I2Daiam48rMTatU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=meesny; t=1640023428;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wW83kui2hXf3Lo+4Yk8gj/d8EIV+rRJ4EwkVapYVfxc=;
-        b=NuOqQuAbUXBFleWNfstTiT1cbyuHWx3sRdk0yigNUIzEwXN1ndB/rug5BGoLnQN4kJ8mVL
-        J7+3BCgHEAo7XNSWw4c2W1rLTILUGxMtiplDHYPfyWzCRhF3/TGqryELTbJt7/XpCupW8a
-        J3E9tBlc+i5tlps5QIoB75PE4+45uNA=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9pQ4vp0jHpOyQXHRbJ-xQKYapQUsWPrLouK=dMO56y1zA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 20.12.2021 10.22, Tianjia Zhang wrote:
-> This patch adds AVX assembly accelerated implementation of SM3 secure
-> hash algorithm. From the benchmark data, compared to pure software
-> implementation sm3-generic, the performance increase is up to 38%.
+On Mon, Dec 20, 2021 at 04:07:28PM +0100, Jason A. Donenfeld wrote:
+> Hi Eric,
 > 
-> The main algorithm implementation based on SM3 AES/BMI2 accelerated
-> work by libgcrypt at:
-> https://gnupg.org/software/libgcrypt/index.html
+> This patch seems fine to me, and I'll apply it in a few days after
+> sitting on the list for comments, but:
 > 
-> Benchmark on Intel i5-6200U 2.30GHz, performance data of two
-> implementations, pure software sm3-generic and sm3-avx acceleration.
-> The data comes from the 326 mode and 422 mode of tcrypt. The abscissas
-> are different lengths of per update. The data is tabulated and the
-> unit is Mb/s:
+> > Note: READ_ONCE() could be used instead of smp_load_acquire(), but it is
+> > harder to verify that it is correct, so I'd prefer not to use it here.
+> > (https://lore.kernel.org/lkml/20200916233042.51634-1-ebiggers@kernel.org/T/#u),
+> > and though it's a correct fix, it was derailed by a debate about whether
+> > it's safe to use READ_ONCE() instead of smp_load_acquire() or not.
 > 
-> update-size |     16      64     256    1024    2048    4096    8192
-> --------------------------------------------------------------------
-> sm3-generic | 105.97  129.60  182.12  189.62  188.06  193.66  194.88
-> sm3-avx     | 119.87  163.05  244.44  260.92  257.60  264.87  265.88
+> But holy smokes... I chuckled at your, "please explain in English." :)
 > 
-> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> ---
->   arch/x86/crypto/Makefile         |   3 +
->   arch/x86/crypto/sm3-avx-asm_64.S | 521 +++++++++++++++++++++++++++++++
->   arch/x86/crypto/sm3_avx_glue.c   | 134 ++++++++
->   crypto/Kconfig                   |  13 +
->   4 files changed, 671 insertions(+)
->   create mode 100644 arch/x86/crypto/sm3-avx-asm_64.S
->   create mode 100644 arch/x86/crypto/sm3_avx_glue.c
-> 
-> diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-> index f307c93fc90a..7cbe860f6201 100644
-> --- a/arch/x86/crypto/Makefile
-> +++ b/arch/x86/crypto/Makefile
-> @@ -88,6 +88,9 @@ nhpoly1305-avx2-y := nh-avx2-x86_64.o nhpoly1305-avx2-glue.o
->   
->   obj-$(CONFIG_CRYPTO_CURVE25519_X86) += curve25519-x86_64.o
->   
-> +obj-$(CONFIG_CRYPTO_SM3_AVX_X86_64) += sm3-avx-x86_64.o
-> +sm3-avx-x86_64-y := sm3-avx-asm_64.o sm3_avx_glue.o
-> +
->   obj-$(CONFIG_CRYPTO_SM4_AESNI_AVX_X86_64) += sm4-aesni-avx-x86_64.o
->   sm4-aesni-avx-x86_64-y := sm4-aesni-avx-asm_64.o sm4_aesni_avx_glue.o
->   
-> diff --git a/arch/x86/crypto/sm3-avx-asm_64.S b/arch/x86/crypto/sm3-avx-asm_64.S
-> new file mode 100644
-> index 000000000000..e7a9a37f3609
-> --- /dev/null
-> +++ b/arch/x86/crypto/sm3-avx-asm_64.S
-> @@ -0,0 +1,521 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/*
-> + * SM3 AVX accelerated transform.
-> + * specified in: https://datatracker.ietf.org/doc/html/draft-sca-cfrg-sm3-02
-> + *
-> + * Copyright (C) 2021 Jussi Kivilinna <jussi.kivilinna@iki.fi>
-> + * Copyright (C) 2021 Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> + */
-<snip>
-> +
-> +#define R(i, a, b, c, d, e, f, g, h, round, widx, wtype)                      \
-> +	/* rol(a, 12) => t0 */                                                \
-> +	roll3mov(12, a, t0); /* rorxl here would reduce perf by 6% on zen3 */ \
-> +	/* rol (t0 + e + t), 7) => t1 */                                      \
-> +	addl3(t0, e, t1);                                                     \
-> +	addl $K##round, t1;                                                   \
+> Paul - if you'd like to look at this patch and confirm that this
+> specific patch and usage is fine to be changed into READ_ONCE()
+> instead of smp_load_acquire(), please pipe up here. And I really do
+> mean this specific patch and usage, not to be confused with any other
+> usage elsewhere in the kernel or question about general things, which
+> doubtlessly involve larger discussions like the one Eric linked to
+> above. If you're certain this patch here is READ_ONCE()able, I'd
+> appreciate your saying so with a simple, "it is safe; go for it",
+> since I'd definitely like the optimization if it's safe. If I don't
+> hear from you, I'll apply this as-is from Eric, as I'd rather be safe
+> than sorry.
 
-It's better to use "leal K##round(t0, e, 1), t1;" here and fix K0-K63 macros
-instead as I noted at libgcrypt mailing-list:
-  https://lists.gnupg.org/pipermail/gcrypt-devel/2021-December/005209.html
+First I would want to see some evidence that READ_ONCE() was really
+providing measurable performance benefit.  Such evidence would be
+easiest to obtain by running on a weakly ordered system such as ARM,
+ARMv8, or PowerPC.
 
--Jussi
+If this does provide a measurable benefit, why not the following?
+
+static inline struct crng_state *select_crng(void)
+{
+	struct crng_state **pool;
+	struct crng_state *pooln;
+	int nid = numa_node_id();
+
+	/* pairs with cmpxchg_release() in do_numa_crng_init() */
+	pool = rcu_dereference(&crng_node_pool);
+	if (pool) {
+		pooln = rcu_dereference(pool[nid]);
+		if (pooln)
+			return pooln;
+	}
+
+	return &primary_crng;
+}
+
+This is in ignorance of the kfree() side of this code.  So another
+question is "Suppose that there was a long delay (vCPU preemption, for
+example) just before the 'return pooln'.  What prevents a use-after-free
+bug?"
+
+Of course, this question applies equally to the smp_load_acquire()
+version.
+
+							Thanx, Paul
