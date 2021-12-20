@@ -2,133 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B9F2C433EF
-	for <linux-crypto@archiver.kernel.org>; Sun, 19 Dec 2021 16:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D35C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Dec 2021 02:19:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236103AbhLSQZn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 19 Dec 2021 11:25:43 -0500
-Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.24]:35880 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233228AbhLSQZn (ORCPT
+        id S237199AbhLTCTM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 19 Dec 2021 21:19:12 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:16831 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233948AbhLTCTL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 19 Dec 2021 11:25:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1639931134;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=QsOgwlfe2+DsZQr1xQaXNwe815T+l2m3Sbqn7B/xn7c=;
-    b=BoXCux8+n3oOA9j7Md4HsE+D5mGgl1E/4xSc1gcHQGG7FBOnuK8e7xPgCzbE7ac+jW
-    R8lPEhkN207ozDN7cuRxaFuiVx68puxxP6fSVlZrTuqFPSNYSrNeiRhNYofqo46uW2oD
-    ZyKovcN+vnWSoHn72Pd8vWVyd97MW5wpnJog7edV8iyYy0qtsCHsJ5uPSdjqLFeaWUxE
-    n/DGwK4klZg/AlSFntoJ4nFgwanyrTqTIL3CTXA3q5TBcrqhQdLrkvyW1GsBnR5Pjt12
-    4o6RVgaciCFkhPjJGROi0/u+sEp685WS++7oyt8hp9lvxyxndM+J5YlsvWfHcTN05y69
-    3A7g==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZI/SWzl0="
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-    by smtp.strato.de (RZmta 47.35.3 DYNA|AUTH)
-    with ESMTPSA id h03d91xBJGPXNN6
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Sun, 19 Dec 2021 17:25:33 +0100 (CET)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, simo@redhat.com, skozina@redhat.com,
-        Nicolai Stange <nstange@suse.de>
-Subject: [PATCH v2] crypto: jitter - add oversampling of noise source
-Date:   Sun, 19 Dec 2021 17:25:32 +0100
-Message-ID: <4712718.vXUDI8C0e8@positron.chronox.de>
-In-Reply-To: <2573346.vuYhMxLoTh@positron.chronox.de>
-References: <2573346.vuYhMxLoTh@positron.chronox.de>
+        Sun, 19 Dec 2021 21:19:11 -0500
+Received: from dggpeml500022.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JHNY9470Xz91pm;
+        Mon, 20 Dec 2021 10:18:21 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Mon, 20 Dec 2021 10:19:09 +0800
+Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
+ (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Mon, 20 Dec
+ 2021 10:19:09 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <xuzaibo@huawei.com>,
+        <yekai13@huawei.com>
+Subject: [PATCH] MAINTAINERS: update SEC2 driver maintainers list
+Date:   Mon, 20 Dec 2021 10:14:18 +0800
+Message-ID: <20211220021418.2512-1-yekai13@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The output n bits can receive more than n bits of min entropy, of course,
-but the fixed output of the conditioning function can only asymptotically
-approach the output size bits of min entropy, not attain that bound.
-Random maps will tend to have output collisions, which reduces the
-creditable output entropy (that is what SP 800-90B Section 3.1.5.1.2
-attempts to bound).
+Adding Kai Ye as SEC2 maintainer.
 
-The value "64" is justified in Appendix A.4 of the current 90C draft,
-and aligns with NIST's in "epsilon" definition in this document, which is
-that a string can be considered "full entropy" if you can bound the min
-entropy in each bit of output to at least 1-epsilon, where epsilon is
-required to be <= 2^(-32).
-
-Note, this patch causes the Jitter RNG to cut its performance in half in
-FIPS mode because the conditioning function of the LFSR produces 64 bits
-of entropy in one block. The oversampling requires that additionally 64
-bits of entropy are sampled from the noise source. If the conditioner is
-changed, such as using SHA-256, the impact of the oversampling is only
-one fourth, because for the 256 bit block of the conditioner, only 64
-additional bits from the noise source must be sampled.
-
-This patch is derived from the user space jitterentropy-library.
-
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
-Reviewed-by: Simo Sorce <simo@redhat.com>
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
- crypto/jitterentropy.c | 23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
-index 8f5283f28ed3..7d6de0a29ab8 100644
---- a/crypto/jitterentropy.c
-+++ b/crypto/jitterentropy.c
-@@ -117,6 +117,22 @@ struct rand_data {
- #define JENT_EHEALTH		9 /* Health test failed during initialization */
- #define JENT_ERCT		10 /* RCT failed during initialization */
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 00475646e3e3..81d8db03bac2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -8628,6 +8628,7 @@ F:	drivers/scsi/hisi_sas/
  
-+/*
-+ * The output n bits can receive more than n bits of min entropy, of course,
-+ * but the fixed output of the conditioning function can only asymptotically
-+ * approach the output size bits of min entropy, not attain that bound. Random
-+ * maps will tend to have output collisions, which reduces the creditable
-+ * output entropy (that is what SP 800-90B Section 3.1.5.1.2 attempts to bound).
-+ *
-+ * The value "64" is justified in Appendix A.4 of the current 90C draft,
-+ * and aligns with NIST's in "epsilon" definition in this document, which is
-+ * that a string can be considered "full entropy" if you can bound the min
-+ * entropy in each bit of output to at least 1-epsilon, where epsilon is
-+ * required to be <= 2^(-32).
-+ */
-+#define JENT_ENTROPY_SAFETY_FACTOR	64
-+
-+#include "linux/fips.h"
- #include "jitterentropy.h"
- 
- /***************************************************************************
-@@ -542,7 +558,10 @@ static int jent_measure_jitter(struct rand_data *ec)
-  */
- static void jent_gen_entropy(struct rand_data *ec)
- {
--	unsigned int k = 0;
-+	unsigned int k = 0, safety_factor = 0;
-+
-+	if (fips_enabled)
-+		safety_factor = JENT_ENTROPY_SAFETY_FACTOR;
- 
- 	/* priming of the ->prev_time value */
- 	jent_measure_jitter(ec);
-@@ -556,7 +575,7 @@ static void jent_gen_entropy(struct rand_data *ec)
- 		 * We multiply the loop value with ->osr to obtain the
- 		 * oversampling rate requested by the caller
- 		 */
--		if (++k >= (DATA_SIZE_BITS * ec->osr))
-+		if (++k >= ((DATA_SIZE_BITS + safety_factor) * ec->osr))
- 			break;
- 	}
- }
+ HISILICON SECURITY ENGINE V2 DRIVER (SEC2)
+ M:	Zaibo Xu <xuzaibo@huawei.com>
++M:	Kai Ye <yekai13@huawei.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/ABI/testing/debugfs-hisi-sec
 -- 
-2.33.1
-
-
-
+2.33.0
 
