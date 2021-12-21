@@ -2,88 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CBA5C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Dec 2021 21:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B1BAC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Dec 2021 23:50:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236751AbhLUVbU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Dec 2021 16:31:20 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:42392 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235866AbhLUVbU (ORCPT
+        id S237798AbhLUXux convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Dec 2021 18:50:53 -0500
+Received: from mail-4018.proton.ch ([185.70.40.18]:43797 "EHLO
+        mail-4018.proton.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236449AbhLUXux (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Dec 2021 16:31:20 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C371C617AF;
-        Tue, 21 Dec 2021 21:31:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83A4EC36AE8;
-        Tue, 21 Dec 2021 21:31:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640122279;
-        bh=/qM5xHCT4LRaktft7rjFAPqdkqB1j9+h9rt9Y06i7Sw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gwLvcrbeeZx5Z0TOqt6iQHWvx1wwiMn/dvWJZR/lJgltanuJ83nTstkFFvsBPyo2f
-         FHxer0t72xeUNoI5HKFCTGEdIertrZctkoJAw1lDsSrzKnf9f7xqRiXKYuqGa+sb4S
-         oVfkveJvHR/oFsueEulc4DOb0i3JC7dfq080qGXejYq6vsvjH8HTK0uxp72mHbWLe3
-         70YJhHW5MQ/QBhMRm+cgScRUPIxo9TQNPBVtTORVh8WHq9T6+ZbhYk3YAx+w02anLX
-         s907LuZ3M2Kk4ozXbjP4MbBc1g2o8c2Ws9UuZxhcxbEGSTd1/UTsd4Wt+WBJpjNFFj
-         Ky00r1BepVfUA==
-Date:   Tue, 21 Dec 2021 14:31:14 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     trix@redhat.com
-Cc:     wangzhou1@hisilicon.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, ndesaulniers@google.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev
-Subject: Re: [PATCH] crypto: cleanup warning in qm_get_qos_value()
-Message-ID: <YcJHoqXXVFZatIla@archlinux-ax161>
-References: <20211221205953.3128923-1-trix@redhat.com>
+        Tue, 21 Dec 2021 18:50:53 -0500
+Date:   Tue, 21 Dec 2021 23:50:47 +0000
+Authentication-Results: mail-4018.proton.ch; dkim=none
+To:     Rob Herring <robh@kernel.org>
+From:   conor dooley <mail@conchuod.ie>
+Cc:     conor.dooley@microchip.com, linus.walleij@linaro.org,
+        bgolaszewski@baylibre.com, jassisinghbrar@gmail.com,
+        paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, a.zummo@towertech.it,
+        alexandre.belloni@bootlin.com, broonie@kernel.org,
+        gregkh@linuxfoundation.org, thierry.reding@gmail.com,
+        u.kleine-koenig@pengutronix.de, lee.jones@linaro.org,
+        linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-pwm@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-usb@vger.kernel.org,
+        krzysztof.kozlowski@canonical.com, geert@linux-m68k.org,
+        bin.meng@windriver.com, heiko@sntech.de, lewis.hanly@microchip.com,
+        daire.mcnamara@microchip.com, ivan.griffin@microchip.com,
+        atish.patra@wdc.com
+Reply-To: conor dooley <mail@conchuod.ie>
+Subject: Re: [PATCH v2 03/17] dt-bindings: soc/microchip: make systemcontroller a mfd
+Message-ID: <YfGEPBe6qV6ieFoD_Xk-rEkBwvyWlVDCxk1PNycMfHsRYK1zMpawiDI25G1EZorczGJGj8e-epWgPs_UB8_-DP4keo1ivgfrLOXJNliFRxE=@conchuod.ie>
+In-Reply-To: <YcIVFZSqt/JSuk3J@robh.at.kernel.org>
+References: <20211217093325.30612-1-conor.dooley@microchip.com> <20211217093325.30612-4-conor.dooley@microchip.com> <YcIVFZSqt/JSuk3J@robh.at.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211221205953.3128923-1-trix@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 21, 2021 at 12:59:53PM -0800, trix@redhat.com wrote:
-> From: Tom Rix <trix@redhat.com>
-> 
-> Building with clang static analysis returns this warning:
-> 
-> qm.c:4382:11: warning: The left operand of '==' is a garbage value
->         if (*val == 0 || *val > QM_QOS_MAX_VAL || ret) {
->             ~~~~ ^
-> 
-> The call to qm_qos_value_init() can return an error without setting
-> *val.  So check ret before checking *val.
-> 
-> Signed-off-by: Tom Rix <trix@redhat.com>
 
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+On Tuesday, December 21st, 2021 at 17:55, Rob Herring <robh@kernel.org> wrote:
 
-Should this have a fixes tag?
+>On Fri, Dec 17, 2021 at 09:33:11AM +0000, conor.dooley@microchip.com wrote:
+>> From: Conor Dooley <conor.dooley@microchip.com>
+>>
+>> Make the system controller on the Polarfire SoC
+>> a "simple,mfd" so that the services can be child
+>> nodes of the system controller node.
+>>
+>> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+>> ---
+>>  .../microchip,mpfs-sys-controller.yaml        | 33 +++++++++++++++++--
+>>  1 file changed, 30 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/soc/microchip/microchip,mpfs-sys-controller.yaml b/>Documentation/devicetree/bindings/soc/microchip/microchip,mpfs-sys-controller.yaml
+>> index f699772fedf3..014cb44b8f31 100644
+>> --- a/Documentation/devicetree/bindings/soc/microchip/microchip,mpfs-sys-controller.yaml
+>> +++ b/Documentation/devicetree/bindings/soc/microchip/microchip,mpfs-sys-controller.yaml
+>> @@ -13,13 +13,34 @@ description: |
+>>    The PolarFire SoC system controller is communicated with via a mailbox.
+>>    This document describes the bindings for the client portion of that mailbox.
+>>
+>> -
+>>  properties:
+>>    mboxes:
+>>      maxItems: 1
+>>
+>>    compatible:
+>> -    const: microchip,mpfs-sys-controller
+>> +    items:
+>> +      - const: microchip,mpfs-sys-controller
+>> +      - const: simple-mfd
+>
+>'simple-mfd' means there is zero dependency on the parent for the child
+>nodes. Isn't 'mboxes' a dependency?
 
-Fixes: 72b010dc33b9 ("crypto: hisilicon/qm - supports writing QoS int the host")
+I suppose it is. I was going off what had been done for the bcm2835
+firmware for the rpi its also a mailbox providing "services".
+(arm/bcm/raspberrypi,bcm2835-firmware.yaml)
+>
+>> +
+>> +  hwrandom:
+>> +    type: object
+>> +
+>> +    properties:
+>> +      compatible:
+>> +        const: microchip,mpfs-rng
+>> +
+>> +    required:
+>> +      - compatible
+>> +
+>> +  sysserv:
+>> +    type: object
+>> +
+>> +    properties:
+>> +      compatible:
+>> +        const: microchip,mpfs-generic-service
+>> +
+>> +    required:
+>> +      - compatible
+>
+>There's not really any need to have child nodes which have no resources.
+>The driver for microchip,mpfs-sys-controller can create child devices.
 
-> ---
->  drivers/crypto/hisilicon/qm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index b1fe9c7b8cc89..c906f2e59277b 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -4379,7 +4379,7 @@ static ssize_t qm_get_qos_value(struct hisi_qm *qm, const char *buf,
->  		return -EINVAL;
->  
->  	ret = qm_qos_value_init(val_buf, val);
-> -	if (*val == 0 || *val > QM_QOS_MAX_VAL || ret) {
-> +	if (ret || *val == 0 || *val > QM_QOS_MAX_VAL) {
->  		pci_err(qm->pdev, "input qos value is error, please set 1~1000!\n");
->  		return -EINVAL;
->  	}
-> -- 
-> 2.26.3
-> 
+I am assuming by this you mean say, take a list of boolean properties and
+convert those into child devices? There's a fairly decent number of services
+provided by the system controller and these children just represent the
+subset that we've implemented so far.
+
+Conor
+>
+>Rob
+
