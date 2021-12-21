@@ -2,73 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3C8FC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Dec 2021 23:40:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EBD9C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Dec 2021 00:11:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231756AbhLTXkd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Dec 2021 18:40:33 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:39282 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229690AbhLTXkc (ORCPT
+        id S232243AbhLUALa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Dec 2021 19:11:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49506 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230522AbhLUALa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Dec 2021 18:40:32 -0500
+        Mon, 20 Dec 2021 19:11:30 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05A0EC061574
+        for <linux-crypto@vger.kernel.org>; Mon, 20 Dec 2021 16:11:29 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A88876133B;
-        Mon, 20 Dec 2021 23:40:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18866C36AE8;
-        Mon, 20 Dec 2021 23:40:31 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B0ACD6133A
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Dec 2021 00:11:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7208C36AE5;
+        Tue, 21 Dec 2021 00:11:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640043631;
-        bh=4O3guiBHX3KqjqKfpW4bNoYSnEh6sqzg0PvP+9IXRkI=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=D7XG9BEWiIvcnpi7P+RJE/trXvfVEqKMTtZaVChXycVYylna5OVQ21DqwlKl0wf7Y
-         /D3JlxDuhWKQ51eVU/jE/w8VlzSx7SxcS168I0y0lRkipjAIJ5vmB7EX8qJwQQ7pYO
-         9MjhFN12pOX7b8RKQswiWzP6DK/tHmstJFJiajg0OhuyGWTh+AevNoC4Tfd6VSSS2H
-         7WY+DpmyMnoMPP9zEcqs+ebZIT03mi86hg0lp7pmyLH49I22prCpQqJbijxMYewWwP
-         WNfGm+UMqdIvDSJB6S419CdXVUpBig1pv6XvVmqGcxvBVa8QwBZ9wPm7wMm3a+7aAO
-         YBpXb62jBw1LQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-        id D56F75C0527; Mon, 20 Dec 2021 15:40:30 -0800 (PST)
-Date:   Mon, 20 Dec 2021 15:40:30 -0800
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Theodore Ts'o <tytso@mit.edu>,
-        "Jason A . Donenfeld " <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] random: fix some data races
-Message-ID: <20211220234030.GH641268@paulmck-ThinkPad-P17-Gen-1>
-Reply-To: paulmck@kernel.org
-References: <20211220224157.111959-1-ebiggers@kernel.org>
+        s=k20201202; t=1640045487;
+        bh=AYl4/47VOnsJhZ/lkMkkTtHN5zj3JzFL7MvC2ROf1Uw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=iW2qznbw5DzLRojDSq8VN9EDdemZaYCgjZvzRcf4nPHvGBOt0XCUyB6bDTbWgfRul
+         gVnrXm3lQlo49Y9qMoHOZaZ8m7LOwp2K9JbP++Fg+suHgohvvMUyj2jI9nJ/1a6xNw
+         nfAlg6wICCPh8OE5sPuNO5LQ5lpDO9UyoglvDnwFPV0/s5EDNGH9RFTwOaoYwo/2yI
+         WRLR2jVC2bL/bSIuP1ErlfLQulIr59f7ak6CcKi4q4yLKottyH+zEZzdJWuVcqZfcp
+         Y/F7UOB2K73jRH6dx8rKnIAT5Vm/d4HtQqyfWAEpiKt6udRq1iGxBnQkNawkTzq5h6
+         LlGoKNJ3oaqUA==
+Date:   Mon, 20 Dec 2021 16:11:25 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, Sabrina Dubroca <sd@queasysnail.net>
+Subject: Re: x86 AES crypto alignment
+Message-ID: <20211220161125.78bc4d66@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <20211220150343.4e12a4d2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+References: <20211207113252.162701ed@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+        <20211208044037.GA11399@gondor.apana.org.au>
+        <20211207212907.6e91821b@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+        <20211220150343.4e12a4d2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211220224157.111959-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 20, 2021 at 04:41:55PM -0600, Eric Biggers wrote:
-> This series fixes some data races in random.c.
+On Mon, 20 Dec 2021 15:03:43 -0800 Jakub Kicinski wrote:
+> On Tue, 7 Dec 2021 21:29:07 -0800 Jakub Kicinski wrote:
+> > On Wed, 8 Dec 2021 15:40:37 +1100 Herbert Xu wrote:  
+> > > There is no such thing as an alignment requirement.  If an algorithm
+> > > specifies an alignment and you pass it a request which is unaligned,
+> > > the Crypto API will automatically align the data for you.
+> > > 
+> > > So what is the actual problem here?    
+> > 
+> > By align you mean copy right? I'm trying to avoid the copy.  
 > 
-> Changed v1 => v2:
->    - Remove unneeded 'inline' keywords
->    - Use READ_ONCE() instead of smp_load_acquire()
->    - Updated commit message
->    - Added patch to fix data race on crng init time
-> 
-> Eric Biggers (2):
->   random: fix data race on crng_node_pool
->   random: fix data race on crng init time
+> Hm, I'm benchmarking things now and it appears to be a regression
+> introduced somewhere around 5.11 / 5.12. I don't see the memcpy 
+> eating 20% of performance on 5.10. Bisection time.
 
-From a memory-ordering viewpoint:
+83c83e658863 ("crypto: aesni - refactor scatterlist processing")
 
-Acked-by: Paul E. McKenney <paulmck@kernel.org>
-
->  drivers/char/random.c | 61 +++++++++++++++++++++++--------------------
->  1 file changed, 33 insertions(+), 28 deletions(-)
-> 
-> -- 
-> 2.34.1
-> 
+is what introduced the regression.
