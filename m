@@ -2,97 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C5DC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Dec 2021 15:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A13C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Dec 2021 16:14:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238929AbhLUPGY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Dec 2021 10:06:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54522 "EHLO
+        id S232021AbhLUQOn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Dec 2021 11:14:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238925AbhLUPGY (ORCPT
+        with ESMTP id S231963AbhLUQOn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Dec 2021 10:06:24 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 300C7C061574;
-        Tue, 21 Dec 2021 07:06:24 -0800 (PST)
+        Tue, 21 Dec 2021 11:14:43 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5A7AC061574;
+        Tue, 21 Dec 2021 08:14:42 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EDE08B816D7;
-        Tue, 21 Dec 2021 15:06:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81F15C36AEC;
-        Tue, 21 Dec 2021 15:06:21 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A17C461677;
+        Tue, 21 Dec 2021 16:14:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A031C36AE9;
+        Tue, 21 Dec 2021 16:14:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640099181;
-        bh=PIOehpe8QrxD1SierEdBT+o1WEmyINgWWB7fwouxwWk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=PSQMdPegvQw0MAoG/PKYkSxrMHYvUAuvM2OKsgmTZYV3YLa33p57e8V/L6cHDLazA
-         J2Jy0ej0VZSHSfF0wurtXOEz/uS0nl167dwPqq1lB+qIX1E2k3yQsJT8Yv83UD3rMQ
-         2h9be3oLgyrazho19fYh5GjAPqaKEQeHw2kN3lf35YRxwlRZMuJjKJweCzMZnz1YSm
-         YdR74HOlsC6PcWbj8aJfjhqIxG8RQ9iHZtseEMe32z35a21tEf8OgfoswnQftB8j+D
-         Ihao0dTZwzk252w8sPsi7WRWw9uSCTxmiU1a9VqCPrID2gA/jG0HcA948t03ZGE4UT
-         yveG+BZe/1Nhw==
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     herbert@gondor.apana.org.au
-Cc:     netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        stable@vger.kernel.org, x86@kernel.org, ardb@kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH crypto] x86/aesni: don't require alignment of data
-Date:   Tue, 21 Dec 2021 07:06:11 -0800
-Message-Id: <20211221150611.3692437-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.31.1
+        s=k20201202; t=1640103281;
+        bh=DCUegUz4qFBNqxU7F0Pr/UOpihyC6+MhD0WLiW8u0uQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=PEK4Ai4ZemSH+x5b78S8go//jqsIdGzld9skJw4+CoVu2VoRp6rOz65mNw9TdQexu
+         3uDJ4pur51/ci8dkzXUhwjORILopKTXWNcbf/7cQLD2Qr81ro4RMHFeEhjg/zZCgzF
+         PVi+Gq7NdFpKbxzvJznXX+OSjSOsac+Zze2yEtJGIvAwLeHF4KqxyCsl1I/BErSxdc
+         TU2QkEzEhHbEMTTySf6AGbUKfVMys5mhamVDQxCIR5JB+UDydv2GwnfEIjMU41a8CX
+         gm5Eq/XN2guDDEnbtUDNsyXT9ScGAd7Hj60pRjoVetJuw2lcOSkiokvp5TSbKpmY9s
+         Vs3jx5Cj+Ldsg==
+Received: by mail-wr1-f43.google.com with SMTP id a9so27933322wrr.8;
+        Tue, 21 Dec 2021 08:14:40 -0800 (PST)
+X-Gm-Message-State: AOAM533yzWGNPHIqHvU+SCdFcrdQrdhxTx/MehSBoSE2OJ9x746lrcpq
+        dTijPxMY1qXKq26qL28vQJlK/QhIqwqDilL2LCY=
+X-Google-Smtp-Source: ABdhPJzOcgRLgtdcEc68x50V71Z1/jvQ6npLQiCgiRWtFLuMqVaROo1BPwvjc5a4e1jjuNonj0Kkxp9HGbvFSiZv9ZU=
+X-Received: by 2002:adf:c450:: with SMTP id a16mr3069705wrg.454.1640103279352;
+ Tue, 21 Dec 2021 08:14:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20211221150611.3692437-1-kuba@kernel.org>
+In-Reply-To: <20211221150611.3692437-1-kuba@kernel.org>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 21 Dec 2021 17:14:27 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHvLyUQdM9U4hkHdBoLHFJJn19-iESRXV6XZv87=F1x8g@mail.gmail.com>
+Message-ID: <CAMj1kXHvLyUQdM9U4hkHdBoLHFJJn19-iESRXV6XZv87=F1x8g@mail.gmail.com>
+Subject: Re: [PATCH crypto] x86/aesni: don't require alignment of data
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
+        <netdev@vger.kernel.org>, "# 3.4.x" <stable@vger.kernel.org>,
+        X86 ML <x86@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-x86 AES-NI routines can deal with unaligned data. Crypto context
-(key, iv etc.) have to be aligned but we take care of that separately
-by copying it onto the stack. We were feeding unaligned data into
-crypto routines up until commit 83c83e658863 ("crypto: aesni -
-refactor scatterlist processing") switched to use the full
-skcipher API which uses cra_alignmask to decide data alignment.
+On Tue, 21 Dec 2021 at 16:06, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> x86 AES-NI routines can deal with unaligned data. Crypto context
+> (key, iv etc.) have to be aligned but we take care of that separately
+> by copying it onto the stack. We were feeding unaligned data into
+> crypto routines up until commit 83c83e658863 ("crypto: aesni -
+> refactor scatterlist processing") switched to use the full
+> skcipher API which uses cra_alignmask to decide data alignment.
+>
+> This fixes 21% performance regression in kTLS.
+>
+> Tested by booting with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+> (and running thru various kTLS packets).
+>
+> CC: stable@vger.kernel.org # 5.15+
+> Fixes: 83c83e658863 ("crypto: aesni - refactor scatterlist processing")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-This fixes 21% performance regression in kTLS.
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
-Tested by booting with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-(and running thru various kTLS packets).
-
-CC: stable@vger.kernel.org # 5.15+
-Fixes: 83c83e658863 ("crypto: aesni - refactor scatterlist processing")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: herbert@gondor.apana.org.au
-CC: x86@kernel.org
-CC: ardb@kernel.org
-CC: linux-crypto@vger.kernel.org
----
- arch/x86/crypto/aesni-intel_glue.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index e09f4672dd38..41901ba9d3a2 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1107,7 +1107,7 @@ static struct aead_alg aesni_aeads[] = { {
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize		= 1,
- 		.cra_ctxsize		= sizeof(struct aesni_rfc4106_gcm_ctx),
--		.cra_alignmask		= AESNI_ALIGN - 1,
-+		.cra_alignmask		= 0,
- 		.cra_module		= THIS_MODULE,
- 	},
- }, {
-@@ -1124,7 +1124,7 @@ static struct aead_alg aesni_aeads[] = { {
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize		= 1,
- 		.cra_ctxsize		= sizeof(struct generic_gcmaes_ctx),
--		.cra_alignmask		= AESNI_ALIGN - 1,
-+		.cra_alignmask		= 0,
- 		.cra_module		= THIS_MODULE,
- 	},
- } };
--- 
-2.31.1
-
+> ---
+> CC: herbert@gondor.apana.org.au
+> CC: x86@kernel.org
+> CC: ardb@kernel.org
+> CC: linux-crypto@vger.kernel.org
+> ---
+>  arch/x86/crypto/aesni-intel_glue.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+> index e09f4672dd38..41901ba9d3a2 100644
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -1107,7 +1107,7 @@ static struct aead_alg aesni_aeads[] = { {
+>                 .cra_flags              = CRYPTO_ALG_INTERNAL,
+>                 .cra_blocksize          = 1,
+>                 .cra_ctxsize            = sizeof(struct aesni_rfc4106_gcm_ctx),
+> -               .cra_alignmask          = AESNI_ALIGN - 1,
+> +               .cra_alignmask          = 0,
+>                 .cra_module             = THIS_MODULE,
+>         },
+>  }, {
+> @@ -1124,7 +1124,7 @@ static struct aead_alg aesni_aeads[] = { {
+>                 .cra_flags              = CRYPTO_ALG_INTERNAL,
+>                 .cra_blocksize          = 1,
+>                 .cra_ctxsize            = sizeof(struct generic_gcmaes_ctx),
+> -               .cra_alignmask          = AESNI_ALIGN - 1,
+> +               .cra_alignmask          = 0,
+>                 .cra_module             = THIS_MODULE,
+>         },
+>  } };
+> --
+> 2.31.1
+>
