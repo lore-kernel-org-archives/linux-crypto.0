@@ -2,69 +2,51 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9E6C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 22:25:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1B9C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 22:31:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240864AbhLVWZN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Dec 2021 17:25:13 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:45978 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229813AbhLVWZN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Dec 2021 17:25:13 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3B7DDB81A2B
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Dec 2021 22:25:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A641AC36AE5;
-        Wed, 22 Dec 2021 22:25:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640211911;
-        bh=rCzuXorCl3+1bgwnRJj5zQ88qmuA6k9+YBq5r4CopaI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Mvubgbc6jnq7uU2z565x3LThPg8IaXx+wX1yebQvsV1oCEJFX8BtRxDQKPdldrRpb
-         7KSQjc3oTgIQpnqHBd8Kg0ClK8Dcv9JJfW8c6qoda2n0kSrgkfLr3ZAug0FqjdLK9y
-         Utce4HUccTN6lXQJMluTwN6N/bVlE7By16EaJ/z5O78J/+/x7SgXgRHw2/etX4pOSK
-         wNYxs16sp39SoQbBIDtQQA8WDz5sYHEmXzbrwBP1O7/sRcsKSR95iQ7M8zgstvGOOk
-         Bgr8mIWHB6QCQFqk2/Mx/vBQX6wQfmXTBlBlIUUZwoNGC9PHQUx2b/+z3Em2WYSZy9
-         bbhXkZthK3EcA==
-Date:   Wed, 22 Dec 2021 16:25:07 -0600
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+        id S229813AbhLVWbj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Dec 2021 17:31:39 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58404 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229665AbhLVWbj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Dec 2021 17:31:39 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1n0A8z-0007tj-B8; Thu, 23 Dec 2021 09:31:34 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 23 Dec 2021 09:31:33 +1100
+Date:   Thu, 23 Dec 2021 09:31:33 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     Petr Vorel <pvorel@suse.cz>, linux-crypto@vger.kernel.org
 Subject: Re: ELIBBAD vs. ENOENT for ciphers not allowed by FIPS
-Message-ID: <YcOlw1UJizlngAEG@quark>
+Message-ID: <YcOnRRRYbV/MrRhO@gondor.apana.org.au>
 References: <YcN4S7NIV9F0XXPP@pevik>
  <YcOh6jij1s6KA2ee@gondor.apana.org.au>
+ <YcOlw1UJizlngAEG@quark>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YcOh6jij1s6KA2ee@gondor.apana.org.au>
+In-Reply-To: <YcOlw1UJizlngAEG@quark>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 23, 2021 at 09:08:42AM +1100, Herbert Xu wrote:
-> On Wed, Dec 22, 2021 at 08:11:07PM +0100, Petr Vorel wrote:
-> > Hi Herbert,
-> > 
-> > do I understand the crypto code correctly, that although crypto/testmgr.c in
-> > alg_test() returns -EINVAL for non-fips allowed algorithms (that means
-> > failing crypto API test) the API in crypto_alg_lookup() returns -ELIBBAD for
-> > failed test?
-> > 
-> > Why ELIBBAD and not ENOENT like for missing ciphers? To distinguish between
-> > missing cipher and disabled one due fips?
-> 
-> Correct.  ELIBBAD is returned for a failed self-test while ENOENT
-> means that there is no algorithm at all.
-> 
-> This matters if there is more than one provider of the same algorithm.
-> In that case ELIBBAD would only be returned if all failed the self-test.
-> 
+On Wed, Dec 22, 2021 at 04:25:07PM -0600, Eric Biggers wrote:
+>
+> Isn't it just an implementation detail that !fips_allowed is handled by the
+> self-test?  Wouldn't it make more sense to report ENOENT for such algorithms?
 
-Isn't it just an implementation detail that !fips_allowed is handled by the
-self-test?  Wouldn't it make more sense to report ENOENT for such algorithms?
+ELIBBAD does not necessarily mean !fips_allowed, it could also
+mean a specific implementation (or hardware) failed the self-test.
 
-- Eric
+Yes, we could change ELIBBAD to something else in the case of
+!fips_allowed, but it's certainly not a trivial change.
+
+Please give a motivation for this.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
