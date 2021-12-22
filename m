@@ -2,68 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFAB9C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 02:13:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B42C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 04:50:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238573AbhLVCNH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Dec 2021 21:13:07 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:30158 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237775AbhLVCNG (ORCPT
+        id S242503AbhLVEu2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Dec 2021 23:50:28 -0500
+Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:50612 "EHLO
+        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235801AbhLVEu1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Dec 2021 21:13:06 -0500
-Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4JJcHS721Pz8w2c;
-        Wed, 22 Dec 2021 10:10:44 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Wed, 22 Dec 2021 10:13:05 +0800
-Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
- (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Wed, 22 Dec
- 2021 10:13:04 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH] crypto: hisilicon/qm - cleanup warning in qm_vf_read_qos
-Date:   Wed, 22 Dec 2021 10:08:11 +0800
-Message-ID: <20211222020811.26292-1-yekai13@huawei.com>
-X-Mailer: git-send-email 2.33.0
+        Tue, 21 Dec 2021 23:50:27 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R881e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0V.OKG0g_1640148623;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V.OKG0g_1640148623)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 22 Dec 2021 12:50:23 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
+        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v2 0/6] Introduce x86 assembly accelerated implementation for SM3 algorithm
+Date:   Wed, 22 Dec 2021 12:50:16 +0800
+Message-Id: <20211222045022.27069-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The kernel test rebot report this warning: Uninitialized variable: ret.
-Here is fix it.
+This series of patches creates an stand-alone library for SM3 hash
+algorithm in the lib/crypto directory, and makes the implementations
+that originally depended on sm3-generic depend on the stand-alone SM3
+library, which also includes sm3-generic itself.
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
+On this basis, the AVX assembly acceleration implementation of SM3
+algorithm is introduced, the main algorithm implementation based on
+SM3 AES/BMI2 accelerated work by libgcrypt at:
+https://gnupg.org/software/libgcrypt/index.html
+
+From the performance benchmark data, the performance improvement of
+SM3 algorithm after AVX optimization can reach up to 38%.
+
 ---
- drivers/crypto/hisilicon/qm.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+v2 changes:
+ - x86/sm3: Change K macros to signed decimal and use LEA and 32-bit offset
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index b1fe9c7b8cc8..c6e9ad2041c3 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -4279,8 +4279,7 @@ static void qm_vf_get_qos(struct hisi_qm *qm, u32 fun_num)
- 
- static int qm_vf_read_qos(struct hisi_qm *qm)
- {
--	int cnt = 0;
--	int ret;
-+	int cnt = 0, ret = 0;
- 
- 	/* reset mailbox qos val */
- 	qm->mb_qos = 0;
+Tianjia Zhang (6):
+  crypto: sm3 - create SM3 stand-alone library
+  crypto: arm64/sm3-ce - make dependent on sm3 library
+  crypto: sm2 - make dependent on sm3 library
+  crypto: sm3 - make dependent on sm3 library
+  crypto: x86/sm3 - add AVX assembly implementation
+  crypto: tcrypt - add asynchronous speed test for SM3
+
+ arch/arm64/crypto/Kconfig        |   2 +-
+ arch/arm64/crypto/sm3-ce-glue.c  |  20 +-
+ arch/x86/crypto/Makefile         |   3 +
+ arch/x86/crypto/sm3-avx-asm_64.S | 517 +++++++++++++++++++++++++++++++
+ arch/x86/crypto/sm3_avx_glue.c   | 134 ++++++++
+ crypto/Kconfig                   |  16 +-
+ crypto/sm2.c                     |  38 +--
+ crypto/sm3_generic.c             | 142 +--------
+ crypto/tcrypt.c                  |  14 +-
+ include/crypto/sm3.h             |  35 ++-
+ lib/crypto/Kconfig               |   3 +
+ lib/crypto/Makefile              |   3 +
+ lib/crypto/sm3.c                 | 246 +++++++++++++++
+ 13 files changed, 1007 insertions(+), 166 deletions(-)
+ create mode 100644 arch/x86/crypto/sm3-avx-asm_64.S
+ create mode 100644 arch/x86/crypto/sm3_avx_glue.c
+ create mode 100644 lib/crypto/sm3.c
+
 -- 
-2.33.0
+2.32.0
 
