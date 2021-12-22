@@ -2,79 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA80C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 01:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFAB9C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 02:13:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233821AbhLVBo5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Dec 2021 20:44:57 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:16848 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232258AbhLVBo5 (ORCPT
+        id S238573AbhLVCNH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Dec 2021 21:13:07 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:30158 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237775AbhLVCNG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Dec 2021 20:44:57 -0500
-Received: from canpemm500005.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JJbhj4X8jz91rH;
-        Wed, 22 Dec 2021 09:44:05 +0800 (CST)
-Received: from [10.67.103.22] (10.67.103.22) by canpemm500005.china.huawei.com
- (7.192.104.229) with Microsoft SMTP Server (version=TLS1_2,
+        Tue, 21 Dec 2021 21:13:06 -0500
+Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.55])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4JJcHS721Pz8w2c;
+        Wed, 22 Dec 2021 10:10:44 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 22 Dec 2021 10:13:05 +0800
+Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
+ (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Wed, 22 Dec
- 2021 09:44:55 +0800
-Message-ID: <d3227d10-cf28-10a5-d560-f46309970c5f@hisilicon.com>
-Date:   Wed, 22 Dec 2021 09:44:50 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [PATCH] crypto: cleanup warning in qm_get_qos_value()
-To:     <trix@redhat.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <nathan@kernel.org>,
-        <ndesaulniers@google.com>
+ 2021 10:13:04 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <llvm@lists.linux.dev>
-References: <20211221205953.3128923-1-trix@redhat.com>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <20211221205953.3128923-1-trix@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.103.22]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- canpemm500005.china.huawei.com (7.192.104.229)
+        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
+Subject: [PATCH] crypto: hisilicon/qm - cleanup warning in qm_vf_read_qos
+Date:   Wed, 22 Dec 2021 10:08:11 +0800
+Message-ID: <20211222020811.26292-1-yekai13@huawei.com>
+X-Mailer: git-send-email 2.33.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-在 2021/12/22 4:59, trix@redhat.com 写道:
-> From: Tom Rix <trix@redhat.com>
-> 
-> Building with clang static analysis returns this warning:
-> 
-> qm.c:4382:11: warning: The left operand of '==' is a garbage value
->         if (*val == 0 || *val > QM_QOS_MAX_VAL || ret) {
->             ~~~~ ^
-> 
-> The call to qm_qos_value_init() can return an error without setting
-> *val.  So check ret before checking *val.
-> 
-> Signed-off-by: Tom Rix <trix@redhat.com>
-> ---
->  drivers/crypto/hisilicon/qm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index b1fe9c7b8cc89..c906f2e59277b 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -4379,7 +4379,7 @@ static ssize_t qm_get_qos_value(struct hisi_qm *qm, const char *buf,
->  		return -EINVAL;
->  
->  	ret = qm_qos_value_init(val_buf, val);
-> -	if (*val == 0 || *val > QM_QOS_MAX_VAL || ret) {
-> +	if (ret || *val == 0 || *val > QM_QOS_MAX_VAL) {
->  		pci_err(qm->pdev, "input qos value is error, please set 1~1000!\n");
->  		return -EINVAL;
->  	}
-> 
+The kernel test rebot report this warning: Uninitialized variable: ret.
+Here is fix it.
 
-Should check return firstly, thanks.
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+---
+ drivers/crypto/hisilicon/qm.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Zhou
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index b1fe9c7b8cc8..c6e9ad2041c3 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -4279,8 +4279,7 @@ static void qm_vf_get_qos(struct hisi_qm *qm, u32 fun_num)
+ 
+ static int qm_vf_read_qos(struct hisi_qm *qm)
+ {
+-	int cnt = 0;
+-	int ret;
++	int cnt = 0, ret = 0;
+ 
+ 	/* reset mailbox qos val */
+ 	qm->mb_qos = 0;
+-- 
+2.33.0
+
