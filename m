@@ -2,77 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B35D7C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 19:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38436C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 19:11:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345020AbhLVTCh (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Dec 2021 14:02:37 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:50394 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345002AbhLVTCg (ORCPT
+        id S233746AbhLVTLU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Dec 2021 14:11:20 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:44802 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345139AbhLVTLK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Dec 2021 14:02:36 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 22 Dec 2021 14:11:10 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 42152B81E08;
-        Wed, 22 Dec 2021 19:02:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F16F6C36AE8;
-        Wed, 22 Dec 2021 19:02:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640199754;
-        bh=5LMLGKVnXzb+fj+benAhxzo/CmUXZ09/1C28ds+lRUs=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=m1RadMQTnyUwr0z/bVrx9igkqkigxYyM4L5eeVsUU5x5I4F0AAqK8i53qV8qP1+VZ
-         S19FsMGxl0iQarXAVKGn/DCXYjxfj2OLp4UpRhbNLUF74t95ctwqEADpXzHojLm6yp
-         yp3/ttusBDRYDIKIhinMqGT3EBcYktDNs+gCQLV/lOfKbUtyYn0QhtGW/bbU8rwvn4
-         mrseNX+AnKHDLbHlLaM0asUuSc4UWCHmXT6hFj7I4kmqvgWGIP+DWEZI5fnWGAmGD4
-         7Y34ne8MGyqm9ys6oCphJiBM8ZURB0PE4XTH9nsSdXSA+yFSRjPKnuglA/Swel8Dwj
-         bv7ZjoaEZlLlA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D599FFE95A3;
-        Wed, 22 Dec 2021 19:02:33 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 5.16
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20200830223304.GA16882@gondor.apana.org.au>
- <20201026011159.GA2428@gondor.apana.org.au>
- <20201227113221.GA28744@gondor.apana.org.au>
- <20210108035450.GA6191@gondor.apana.org.au>
- <20210708030913.GA32097@gondor.apana.org.au>
- <20210817013601.GA14148@gondor.apana.org.au>
- <20210929023843.GA28594@gondor.apana.org.au>
- <20211029041408.GA3192@gondor.apana.org.au>
- <20211112104815.GA14105@gondor.apana.org.au> <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 27750a315aba7e6675bb1c3dfd4481c4f6888af1
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e19e226345196649e83d49c6997e806a8ecdafe6
-Message-Id: <164019975382.26306.11184236689785559312.pr-tracker-bot@kernel.org>
-Date:   Wed, 22 Dec 2021 19:02:33 +0000
+        by smtp-out2.suse.de (Postfix) with ESMTPS id EB0CC1F389;
+        Wed, 22 Dec 2021 19:11:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1640200269;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=CQ4BRD7XOXGviURz95Pcs+HPig6+APXYQuFUjee294s=;
+        b=kSYEgkaXXDoMA+aJkZuOnxGquO0766Cb/2MD5vfoRomO5QO2YFo67tUlhk9OotTuvnC3Wi
+        BvsI+woZIUOuBPRsCIG07Dkrr625ck/wviQL/CLN2SfLXhXN1xbEks0OgiF7RCITgclD00
+        McJQ5eb6K1N8w1ODMWyTUyMNeX+oCQM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1640200269;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=CQ4BRD7XOXGviURz95Pcs+HPig6+APXYQuFUjee294s=;
+        b=aknlSyfp91X/7R59N0Ddzdbq6AqNM3UFWEFzsKUgLM7Wb1fhiKgc97m977/kLNPDDHA4mz
+        VCTJCenpDCYhPbBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B454713D75;
+        Wed, 22 Dec 2021 19:11:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id mN8DKk14w2FHWAAAMHmgww
+        (envelope-from <pvorel@suse.cz>); Wed, 22 Dec 2021 19:11:09 +0000
+Date:   Wed, 22 Dec 2021 20:11:07 +0100
+From:   Petr Vorel <pvorel@suse.cz>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
+Subject: ELIBBAD vs. ENOENT for ciphers not allowed by FIPS
+Message-ID: <YcN4S7NIV9F0XXPP@pevik>
+Reply-To: Petr Vorel <pvorel@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Wed, 22 Dec 2021 16:13:07 +1100:
+Hi Herbert,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+do I understand the crypto code correctly, that although crypto/testmgr.c in
+alg_test() returns -EINVAL for non-fips allowed algorithms (that means
+failing crypto API test) the API in crypto_alg_lookup() returns -ELIBBAD for
+failed test?
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e19e226345196649e83d49c6997e806a8ecdafe6
+Why ELIBBAD and not ENOENT like for missing ciphers? To distinguish between
+missing cipher and disabled one due fips?
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Kind regards,
+Petr
