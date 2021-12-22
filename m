@@ -2,70 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38436C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 19:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2A2C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 22:08:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233746AbhLVTLU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Dec 2021 14:11:20 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:44802 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345139AbhLVTLK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Dec 2021 14:11:10 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id EB0CC1F389;
-        Wed, 22 Dec 2021 19:11:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1640200269;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=CQ4BRD7XOXGviURz95Pcs+HPig6+APXYQuFUjee294s=;
-        b=kSYEgkaXXDoMA+aJkZuOnxGquO0766Cb/2MD5vfoRomO5QO2YFo67tUlhk9OotTuvnC3Wi
-        BvsI+woZIUOuBPRsCIG07Dkrr625ck/wviQL/CLN2SfLXhXN1xbEks0OgiF7RCITgclD00
-        McJQ5eb6K1N8w1ODMWyTUyMNeX+oCQM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1640200269;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=CQ4BRD7XOXGviURz95Pcs+HPig6+APXYQuFUjee294s=;
-        b=aknlSyfp91X/7R59N0Ddzdbq6AqNM3UFWEFzsKUgLM7Wb1fhiKgc97m977/kLNPDDHA4mz
-        VCTJCenpDCYhPbBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B454713D75;
-        Wed, 22 Dec 2021 19:11:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id mN8DKk14w2FHWAAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Wed, 22 Dec 2021 19:11:09 +0000
-Date:   Wed, 22 Dec 2021 20:11:07 +0100
-From:   Petr Vorel <pvorel@suse.cz>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+        id S230063AbhLVWIp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Dec 2021 17:08:45 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58402 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235945AbhLVWIp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Dec 2021 17:08:45 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1n09ms-0007Y5-A2; Thu, 23 Dec 2021 09:08:43 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 23 Dec 2021 09:08:42 +1100
+Date:   Thu, 23 Dec 2021 09:08:42 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Petr Vorel <pvorel@suse.cz>
 Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
-Subject: ELIBBAD vs. ENOENT for ciphers not allowed by FIPS
-Message-ID: <YcN4S7NIV9F0XXPP@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
+Subject: Re: ELIBBAD vs. ENOENT for ciphers not allowed by FIPS
+Message-ID: <YcOh6jij1s6KA2ee@gondor.apana.org.au>
+References: <YcN4S7NIV9F0XXPP@pevik>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <YcN4S7NIV9F0XXPP@pevik>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+On Wed, Dec 22, 2021 at 08:11:07PM +0100, Petr Vorel wrote:
+> Hi Herbert,
+> 
+> do I understand the crypto code correctly, that although crypto/testmgr.c in
+> alg_test() returns -EINVAL for non-fips allowed algorithms (that means
+> failing crypto API test) the API in crypto_alg_lookup() returns -ELIBBAD for
+> failed test?
+> 
+> Why ELIBBAD and not ENOENT like for missing ciphers? To distinguish between
+> missing cipher and disabled one due fips?
 
-do I understand the crypto code correctly, that although crypto/testmgr.c in
-alg_test() returns -EINVAL for non-fips allowed algorithms (that means
-failing crypto API test) the API in crypto_alg_lookup() returns -ELIBBAD for
-failed test?
+Correct.  ELIBBAD is returned for a failed self-test while ENOENT
+means that there is no algorithm at all.
 
-Why ELIBBAD and not ENOENT like for missing ciphers? To distinguish between
-missing cipher and disabled one due fips?
+This matters if there is more than one provider of the same algorithm.
+In that case ELIBBAD would only be returned if all failed the self-test.
 
-Kind regards,
-Petr
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
