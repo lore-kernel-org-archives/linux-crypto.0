@@ -2,72 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90376C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 18:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B35D7C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 19:02:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344500AbhLVSKA (ORCPT
+        id S1345020AbhLVTCh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Dec 2021 13:10:00 -0500
-Received: from mail-qk1-f171.google.com ([209.85.222.171]:39751 "EHLO
-        mail-qk1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234629AbhLVSKA (ORCPT
+        Wed, 22 Dec 2021 14:02:37 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:50394 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345002AbhLVTCg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Dec 2021 13:10:00 -0500
-Received: by mail-qk1-f171.google.com with SMTP id 69so3112269qkd.6;
-        Wed, 22 Dec 2021 10:09:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KTIqQpQ7RCF278GdqSbhmvSoIu5FXpBD2evLi7Gwsvo=;
-        b=Ph16s+vi7pXX9RIlyejHAQR0O+GBULuJ/DONxPOjMDlVRuA6EISl2ZEmrnSSCa2Cr2
-         jmWDo3ZdiWrIfHxRnPKTRQ6dwdOyyT/8q8tRA1aFsNzYBdjqaIBiQRENdvFhUOtnNcv1
-         ozugIiMxuLUe+s/wUoQmMoNN81301h9thukxXapTGPC1BXwZmFfSWe8CFWicCYlityyR
-         kTsDiT+2usxZGtt7K40snMi9FtTz1nnTHwvb4Zi0kfaCBd+Ux/H4o61r3Iw62JUJSVjG
-         DKlM4Oy7P0tNwcGsVacaVq0795baU176IXEJ+TPOR0mXlGbjx2+OjTGE+vrLpbzymVjk
-         yBGQ==
-X-Gm-Message-State: AOAM533QP5u/396zDj8qUzqYo2xwOiifTo+Til9qkshifX24ZmSolqah
-        EqxeaqdCNHlIyJ2a6I/50A==
-X-Google-Smtp-Source: ABdhPJwgtaYFVUDdyame6/XYYKkRbGq5W7j9AjqEkQUD/2pDfkzBHsdHwIMdSEfPe52Am76ViUavpw==
-X-Received: by 2002:a05:620a:1792:: with SMTP id ay18mr2926162qkb.5.1640196599172;
-        Wed, 22 Dec 2021 10:09:59 -0800 (PST)
-Received: from robh.at.kernel.org ([24.55.105.145])
-        by smtp.gmail.com with ESMTPSA id q12sm2229494qtx.16.2021.12.22.10.09.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Dec 2021 10:09:58 -0800 (PST)
-Received: (nullmailer pid 2433267 invoked by uid 1000);
-        Wed, 22 Dec 2021 18:09:56 -0000
-Date:   Wed, 22 Dec 2021 14:09:56 -0400
-From:   Rob Herring <robh@kernel.org>
-To:     David Heidelberg <david@ixit.cz>
-Cc:     Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        devicetree@vger.kernel.org, Andy Gross <agross@kernel.org>,
-        linux-arm-msm@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        ~okias/devicetree@lists.sr.ht, linux-kernel@vger.kernel.org,
-        Rob Herring <robh+dt@kernel.org>, linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH] dt-bindings: crypto: convert Qualcomm PRNG to yaml
-Message-ID: <YcNp9KRLgkiI65p2@robh.at.kernel.org>
-References: <20211220184355.86582-1-david@ixit.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211220184355.86582-1-david@ixit.cz>
+        Wed, 22 Dec 2021 14:02:36 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 42152B81E08;
+        Wed, 22 Dec 2021 19:02:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F16F6C36AE8;
+        Wed, 22 Dec 2021 19:02:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1640199754;
+        bh=5LMLGKVnXzb+fj+benAhxzo/CmUXZ09/1C28ds+lRUs=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=m1RadMQTnyUwr0z/bVrx9igkqkigxYyM4L5eeVsUU5x5I4F0AAqK8i53qV8qP1+VZ
+         S19FsMGxl0iQarXAVKGn/DCXYjxfj2OLp4UpRhbNLUF74t95ctwqEADpXzHojLm6yp
+         yp3/ttusBDRYDIKIhinMqGT3EBcYktDNs+gCQLV/lOfKbUtyYn0QhtGW/bbU8rwvn4
+         mrseNX+AnKHDLbHlLaM0asUuSc4UWCHmXT6hFj7I4kmqvgWGIP+DWEZI5fnWGAmGD4
+         7Y34ne8MGyqm9ys6oCphJiBM8ZURB0PE4XTH9nsSdXSA+yFSRjPKnuglA/Swel8Dwj
+         bv7ZjoaEZlLlA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D599FFE95A3;
+        Wed, 22 Dec 2021 19:02:33 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 5.16
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+References: <20200803044024.GA6429@gondor.apana.org.au>
+ <20200830223304.GA16882@gondor.apana.org.au>
+ <20201026011159.GA2428@gondor.apana.org.au>
+ <20201227113221.GA28744@gondor.apana.org.au>
+ <20210108035450.GA6191@gondor.apana.org.au>
+ <20210708030913.GA32097@gondor.apana.org.au>
+ <20210817013601.GA14148@gondor.apana.org.au>
+ <20210929023843.GA28594@gondor.apana.org.au>
+ <20211029041408.GA3192@gondor.apana.org.au>
+ <20211112104815.GA14105@gondor.apana.org.au> <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: 27750a315aba7e6675bb1c3dfd4481c4f6888af1
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: e19e226345196649e83d49c6997e806a8ecdafe6
+Message-Id: <164019975382.26306.11184236689785559312.pr-tracker-bot@kernel.org>
+Date:   Wed, 22 Dec 2021 19:02:33 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 20 Dec 2021 19:43:55 +0100, David Heidelberg wrote:
-> Convert Qualcomm PRNG documentation to yaml format.
-> 
-> Signed-off-by: David Heidelberg <david@ixit.cz>
-> ---
->  .../devicetree/bindings/crypto/qcom,prng.txt  | 19 --------
->  .../devicetree/bindings/crypto/qcom,prng.yaml | 43 +++++++++++++++++++
->  2 files changed, 43 insertions(+), 19 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/crypto/qcom,prng.txt
->  create mode 100644 Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-> 
+The pull request you sent on Wed, 22 Dec 2021 16:13:07 +1100:
 
-Applied, thanks!
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/e19e226345196649e83d49c6997e806a8ecdafe6
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
