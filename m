@@ -2,92 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E044DC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 10:37:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B1FC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 13:11:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244207AbhLVKh7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Dec 2021 05:37:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37314 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236568AbhLVKh7 (ORCPT
+        id S245264AbhLVNLr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Dec 2021 08:11:47 -0500
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:46346 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240720AbhLVNLq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Dec 2021 05:37:59 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7173C061574
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Dec 2021 02:37:58 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mzz0M-0006MJ-Ox; Wed, 22 Dec 2021 11:37:54 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mzz0M-005zAG-4F; Wed, 22 Dec 2021 11:37:53 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1mzz0L-000531-6s; Wed, 22 Dec 2021 11:37:53 +0100
-Date:   Wed, 22 Dec 2021 11:37:39 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Guenter Roeck <linux@roeck-us.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Vladis Dronov <vdronov@redhat.com>,
-        Simo Sorce <ssorce@redhat.com>,
-        Eric Biggers <ebiggers@kernel.org>, kernel@pengutronix.de
-Subject: Re: [v2 PATCH] crypto: api - Fix built-in testing dependency failures
-Message-ID: <20211222103739.udxraiiklz6giolt@pengutronix.de>
-References: <20210913071251.GA15235@gondor.apana.org.au>
- <20210917002619.GA6407@gondor.apana.org.au>
- <20211026163319.GA2785420@roeck-us.net>
- <20211106034725.GA18680@gondor.apana.org.au>
- <729fc135-8e55-fd4f-707a-60b9a222ab97@roeck-us.net>
- <20211222102246.qibf7v2q4atl6gc6@pengutronix.de>
+        Wed, 22 Dec 2021 08:11:46 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0V.QmgAE_1640178699;
+Received: from 30.240.100.46(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V.QmgAE_1640178699)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 22 Dec 2021 21:11:42 +0800
+Message-ID: <e1d10668-3928-8b38-92d0-e92d26e20bef@linux.alibaba.com>
+Date:   Wed, 22 Dec 2021 21:11:39 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="42ytetziqhc4fssi"
-Content-Disposition: inline
-In-Reply-To: <20211222102246.qibf7v2q4atl6gc6@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Subject: Re: [PATCH v2 1/6] crypto: sm3 - create SM3 stand-alone library
+Content-Language: en-US
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        x86@kernel.org, Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+References: <20211222045022.27069-1-tianjia.zhang@linux.alibaba.com>
+ <20211222045022.27069-2-tianjia.zhang@linux.alibaba.com>
+ <CAOtvUMehn2_HW+b0etPKAV+H=V=PoENkO1xAdL78dCuHma4m_A@mail.gmail.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <CAOtvUMehn2_HW+b0etPKAV+H=V=PoENkO1xAdL78dCuHma4m_A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Gilad,
 
---42ytetziqhc4fssi
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 12/22/21 2:59 PM, Gilad Ben-Yossef wrote:
+> On Wed, Dec 22, 2021 at 6:50 AM Tianjia Zhang
+> <tianjia.zhang@linux.alibaba.com> wrote:
+>>
+>> Stand-alone implementation of the SM3 algorithm. It is designed
+>> to have as little dependencies as possible. In other cases you
+>> should generally use the hash APIs from include/crypto/hash.h.
+>> Especially when hashing large amounts of data as those APIs may
+>> be hw-accelerated. In the new SM3 stand-alone library,
+>> sm3_compress() has also been optimized, instead of simply using
+>> the code in sm3_generic.
+>>
+> 
+> I have a really minor nitpick: the commit message talks about changes
+> to sm3_compress() which was there in the original code but there is no
+> such function in the current code which is in a different patch and
+> file, so if you do another iteration for other reason, perhaps change
+> the commit message to refer to sm3_transform() instead? it's not
+> really important enough to warrant a new iteration on it's own...
+> 
+> Otherwise, I'm not smart enough to evaluate the changes to
+> sm3_transform() cryptographically  but the overall approach of moving
+> to a standalone library seems sane to me.
+> 
+> So, for what it's worth -
+> 
+> Reviewed-by: Gilad Ben-Yossef <gilad@benyosef.com>
+> 
+> Gilad
+> 
 
-Hello again,
+Thanks for your suggestion. I agree with you. In the implementation of 
+sm3_generic, sm3_compress() is a sub-function of sm3_transform(). The 
+optimization is indeed for sm3_transform(). I will fix it in the next patch.
 
-I mistyped an address in my report's Cc: list. If you respond please
-s/xx/x/. My keyboard's x key sometimes gerates two x :-\
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---42ytetziqhc4fssi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmHC/+wACgkQwfwUeK3K
-7AncBQf/ebajVEYIAmZPRZ2DBY3B7rzZtGr42yIkRUmMOWISgdlkibOVNcfE87Md
-0E0Bij5Q8BaKwXhq367FJJMk24D3y1IhQ+iLfnCNys7SURL1a3VMQnZATOGomyMy
-gfiLUsTP3v+7bZks30Sd+2odnUJYXPN35P6RFvvPJjpDzBkkeamAZ/I4Qa3OAPPr
-biKgHi4MkfWIcoTgB+wm41D9elrRQ3zPG+5b+/X9+qf1Ov2uISt2e+t/DngAPsXM
-v5eBmVJuuSMBpHioyGoeCXkRUG8LAiIrENE6qcOrOdAxL/3oUwKF592wWiA78qDP
-PON8lbK0YUBIUjwmmwAO39icrQrXHA==
-=umwu
------END PGP SIGNATURE-----
-
---42ytetziqhc4fssi--
+Best regards,
+Tianjia
