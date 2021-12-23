@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BE8C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Dec 2021 15:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A85F2C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Dec 2021 15:41:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349255AbhLWPlY (ORCPT
+        id S1349042AbhLWPlb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Dec 2021 10:41:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33808 "EHLO
+        Thu, 23 Dec 2021 10:41:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349080AbhLWPk5 (ORCPT
+        with ESMTP id S1349168AbhLWPlJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Dec 2021 10:40:57 -0500
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD2D6C061763;
-        Thu, 23 Dec 2021 07:40:50 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id o6so22974342edc.4;
-        Thu, 23 Dec 2021 07:40:50 -0800 (PST)
+        Thu, 23 Dec 2021 10:41:09 -0500
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81BF9C06179C;
+        Thu, 23 Dec 2021 07:41:08 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id bm14so22947590edb.5;
+        Thu, 23 Dec 2021 07:41:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=D9NCFWuovE5/gne38khmJwHLjO1KbxvtMh1bmnt68Y8=;
-        b=p092mNJqUcXIERjF1bU0yMXrGueKvKfHmiFQ+kpFtp+kEInGvyYy6jk3Vfnkimowu2
-         qFXyHxML4DT9+d5NxS7Xh3Cx//7Hi/8V1Fesfux5CdenO9J6ICXes2VvuaTrpHGoSGwi
-         68Ucvp1dQdzoMr4EcmWTYewoNi8KVo5GJo1JGt0Npjy4zBvFHN2+bld076Kbp6NTObiK
-         vQXOtFqVaafRbgyHfORwuRjMDIs1cTO2N4/qeZqH3k23jPKUans5Mx+xyjD3rfZirZGX
-         yQS1FWJwZZeoUaAGxUVxbLzQScCMZRDOZiAf3XMsXYBVsurdb0Pmif+QC3Ru/8ajFM2x
-         0jrA==
+        bh=4iUq/OcSfjWYCqr9JUkzg33/o8TN8G5Po1f+UBWAkdc=;
+        b=BVffC+NmjubKsmKg0fVG3XWKoVupntAcAMgFs4YXFGPNto8HftLmDl6RGM/JrhD4XC
+         EuckqX+ZQ8u2K3mUbrj23lqN0dQd05gRfeSIHruGfRpGwCO44qU/dO3fNHLZWSOCsrC/
+         SbsBHxdZeUn4uORnXRYICAVqghtcTAnGke0gpmdn7EhH56pjTt+RbzM7YUjOGn0MG7uu
+         fBdSrgzI++xciR+SpEp68eFz8NhgwYimeMEDHfi9kwWQlBQqkrMOhTYIffkIRCG2/hUw
+         Pd4qXBRJAxa9xS/kzTh2s8bcaV3kkI4Hz7lTCeZb8dqGqnH4wgWmI/FNFvMu3cYo0+NP
+         pHFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=D9NCFWuovE5/gne38khmJwHLjO1KbxvtMh1bmnt68Y8=;
-        b=jhoumE3M0s6818otvN6BcG3TTjdw54a9KlygQJmtc82pctPybSo0dO6y+MNA4puYLA
-         9VlKjyvPAEcV5MHMMfdiZfiW+7XUsON+JNZFhB0zqHJtJYGiuj9YvNrianqnree7Sso6
-         3m11NM1KXM5PN9PX4pwWMe5gyb2spCZRrKcumMK1x825IftTzighSh2w9T8kV6lalgyb
-         1kOM/qnHjktySKhjyBR+s+zbaYWUnKnrQ/wH8LPP94mak9oarRIpFfNzMHmWjxc7TnGb
-         2pQ3TM2a2QhTadsEi88Ghhv3h+LF46YKrv+uuQrNoAbBVBEqwi6CCADvk0Kjseo/LmTP
-         Gm2Q==
-X-Gm-Message-State: AOAM530DFC/1Qh+OLoXw7qS8iXRwY+rOJKWTExkoJ1DNtJ8RzwChFp4D
-        WF6435Qyg+9uPxHREIYOsnw=
-X-Google-Smtp-Source: ABdhPJyTCjyZ/as3+omHCjOhOt7qp4EcKlC6BQjiLKryJvs57IpQZCPF+NvfGVRvcupgZNpglKZU2Q==
-X-Received: by 2002:aa7:cfd5:: with SMTP id r21mr2464790edy.98.1640274049264;
-        Thu, 23 Dec 2021 07:40:49 -0800 (PST)
+        bh=4iUq/OcSfjWYCqr9JUkzg33/o8TN8G5Po1f+UBWAkdc=;
+        b=hlMahct7Ma+Gx6QtLFHNb7HzCgxG58Ttilt01656EdlOjaYRAkE73pRsMMWCj1d4xn
+         kc8OWAl8pmUnK9QBE51JYlucm7opZbCpaR8ma5U6e2BlrGn9+UFW9vj4M9AwpnlrOlLs
+         jruRGHeg46AxVG333/1t1lv/FP1tGXgoCTs2O5HmKI859V4adetjWOw+4OzJPGkw8YyI
+         vhLppx5mQ65PIOR7a908yBd91RJnmzvarGPGAGoyGQyWFLSMiQI9Dr267BYvVPo1LPac
+         /9ESvtRAX7G0GTDBz4rw3ww7+HqSfea3g5MpB66Wq+2SHF7TizqNPu87zfHdov5EbycD
+         2tJQ==
+X-Gm-Message-State: AOAM530+xhOvSqwNiKviBn6QjoGbjmJ9Uv0/4rtiEnGa1WHb0WLITKQY
+        eRk4lP3+MVpIvjJYa1BhsDU=
+X-Google-Smtp-Source: ABdhPJxJHU3KajZgoUKDODBZwe3SOa5UFbtWtH4URSYNBLyZY4qEWR4/5XOTzkzxShhv08g3xH2tdQ==
+X-Received: by 2002:a17:906:9b91:: with SMTP id dd17mr2332545ejc.371.1640274067040;
+        Thu, 23 Dec 2021 07:41:07 -0800 (PST)
 Received: from ponky.lan ([2a04:241e:501:3870:7c02:dfc6:b554:ab10])
-        by smtp.gmail.com with ESMTPSA id bx6sm2088617edb.78.2021.12.23.07.40.47
+        by smtp.gmail.com with ESMTPSA id bx6sm2088617edb.78.2021.12.23.07.41.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Dec 2021 07:40:48 -0800 (PST)
+        Thu, 23 Dec 2021 07:41:06 -0800 (PST)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>,
@@ -68,9 +68,9 @@ Cc:     Shuah Khan <shuah@kernel.org>,
         Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 07/19] tcp: authopt: Disable via sysctl by default
-Date:   Thu, 23 Dec 2021 17:40:02 +0200
-Message-Id: <c76311e735fa98af72280a3ef89d22ace28af0e9.1640273966.git.cdleonard@gmail.com>
+Subject: [PATCH v4 16/19] tcp: authopt: Add /proc/net/tcp_authopt listing all keys
+Date:   Thu, 23 Dec 2021 17:40:11 +0200
+Message-Id: <80510f065b3b17d36626962cd7c7719036a6f9e1.1640273966.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1640273966.git.cdleonard@gmail.com>
 References: <cover.1640273966.git.cdleonard@gmail.com>
@@ -80,221 +80,178 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This is mainly intended to protect against local privilege escalations
-through a rarely used feature so it is deliberately not namespaced.
-
-Enforcement is only at the setsockopt level, this should be enough to
-ensure that the tcp_authopt_needed static key never turns on.
-
-No effort is made to handle disabling when the feature is already in
-use.
-
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- Documentation/networking/ip-sysctl.rst |  6 ++++
- include/net/tcp_authopt.h              |  1 +
- net/ipv4/sysctl_net_ipv4.c             | 39 ++++++++++++++++++++++++++
- net/ipv4/tcp_authopt.c                 | 27 +++++++++++++++++-
- 4 files changed, 72 insertions(+), 1 deletion(-)
+ Documentation/networking/tcp_authopt.rst |  10 +++
+ net/ipv4/tcp_authopt.c                   | 100 ++++++++++++++++++++++-
+ 2 files changed, 109 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index c04431144f7a..2fa992ef4e02 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -987,10 +987,16 @@ tcp_limit_output_bytes - INTEGER
- tcp_challenge_ack_limit - INTEGER
- 	Limits number of Challenge ACK sent per second, as recommended
- 	in RFC 5961 (Improving TCP's Robustness to Blind In-Window Attacks)
- 	Default: 1000
+diff --git a/Documentation/networking/tcp_authopt.rst b/Documentation/networking/tcp_authopt.rst
+index 6520c6d02755..eaf389f99139 100644
+--- a/Documentation/networking/tcp_authopt.rst
++++ b/Documentation/networking/tcp_authopt.rst
+@@ -69,10 +69,20 @@ The rnextkeyid value sent on the wire is usually the recv_id of the current
+ key used for sending. If the TCP_AUTHOPT_LOCK_RNEXTKEY flag is set in
+ `tcp_authopt.flags` the value of `tcp_authopt.send_rnextkeyid` is send
+ instead.  This can be used to implement smooth rollover: the peer will switch
+ its keyid to the received rnextkeyid when it is available.
  
-+tcp_authopt - BOOLEAN
-+	Enable the TCP Authentication Option (RFC5925), a replacement for TCP
-+	MD5 Signatures (RFC2835).
++Proc interface
++--------------
 +
-+	Default: 0
++The ``/proc/net/tcp_authopt`` file contains a tab-separated table of keys. The
++first line contains column names. The number of columns might increase in the
++future if more matching criteria are added. Here is an example of the table::
 +
- UDP variables
++	flags	send_id	recv_id	alg	addr	l3index
++	0x44	0	0	1	10.10.2.2/31	0
++
+ ABI Reference
  =============
  
- udp_l3mdev_accept - BOOLEAN
- 	Enabling this option allows a "global" bound socket to work
-diff --git a/include/net/tcp_authopt.h b/include/net/tcp_authopt.h
-index 7096e3ad59a6..4c9ec1f39932 100644
---- a/include/net/tcp_authopt.h
-+++ b/include/net/tcp_authopt.h
-@@ -80,10 +80,11 @@ struct tcphdr_authopt {
- };
- 
- #ifdef CONFIG_TCP_AUTHOPT
- DECLARE_STATIC_KEY_FALSE(tcp_authopt_needed_key);
- #define tcp_authopt_needed (static_branch_unlikely(&tcp_authopt_needed_key))
-+extern int sysctl_tcp_authopt;
- 
- void tcp_authopt_free(struct sock *sk, struct tcp_authopt_info *info);
- void tcp_authopt_clear(struct sock *sk);
- int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen);
- int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *key);
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index 97eb54774924..07de2666314c 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -17,10 +17,11 @@
- #include <net/udp.h>
- #include <net/cipso_ipv4.h>
- #include <net/ping.h>
- #include <net/protocol.h>
- #include <net/netevent.h>
-+#include <net/tcp_authopt.h>
- 
- static int two = 2;
- static int three __maybe_unused = 3;
- static int four = 4;
- static int thousand = 1000;
-@@ -472,10 +473,37 @@ static int proc_fib_multipath_hash_fields(struct ctl_table *table, int write,
- 
- 	return ret;
- }
- #endif
- 
-+#ifdef CONFIG_TCP_AUTHOPT
-+static int proc_tcp_authopt(struct ctl_table *ctl,
-+			    int write, void *buffer, size_t *lenp,
-+			    loff_t *ppos)
-+{
-+	int val = sysctl_tcp_authopt;
-+	struct ctl_table tmp = {
-+		.data = &val,
-+		.mode = ctl->mode,
-+		.maxlen = sizeof(val),
-+		.extra1 = SYSCTL_ZERO,
-+		.extra2 = SYSCTL_ONE,
-+	};
-+	int err;
-+
-+	err = proc_dointvec_minmax(&tmp, write, buffer, lenp, ppos);
-+	if (err)
-+		return err;
-+	if (sysctl_tcp_authopt && !val) {
-+		net_warn_ratelimited("Enabling TCP Authentication Option is permanent\n");
-+		return -EINVAL;
-+	}
-+	sysctl_tcp_authopt = val;
-+	return 0;
-+}
-+#endif
-+
- static struct ctl_table ipv4_table[] = {
- 	{
- 		.procname	= "tcp_max_orphans",
- 		.data		= &sysctl_tcp_max_orphans,
- 		.maxlen		= sizeof(int),
-@@ -583,10 +611,21 @@ static struct ctl_table ipv4_table[] = {
- 		.mode		= 0644,
- 		.proc_handler	= proc_douintvec_minmax,
- 		.extra1		= &sysctl_fib_sync_mem_min,
- 		.extra2		= &sysctl_fib_sync_mem_max,
- 	},
-+#ifdef CONFIG_TCP_AUTHOPT
-+	{
-+		.procname	= "tcp_authopt",
-+		.data		= &sysctl_tcp_authopt,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_tcp_authopt,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ONE,
-+	},
-+#endif
- 	{ }
- };
- 
- static struct ctl_table ipv4_net_table[] = {
- 	{
+ .. kernel-doc:: include/uapi/linux/tcp.h
+    :identifiers: tcp_authopt tcp_authopt_flag tcp_authopt_key tcp_authopt_key_flag tcp_authopt_alg
 diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
-index ba20a70359ee..6be5dbcd530e 100644
+index 64bcb2a38472..22ce68c933a9 100644
 --- a/net/ipv4/tcp_authopt.c
 +++ b/net/ipv4/tcp_authopt.c
-@@ -4,10 +4,15 @@
+@@ -5,10 +5,11 @@
  #include <net/ipv6.h>
  #include <net/tcp.h>
  #include <linux/kref.h>
  #include <crypto/hash.h>
+ #include <linux/inetdevice.h>
++#include <linux/proc_fs.h>
  
-+/* This is mainly intended to protect against local privilege escalations through
-+ * a rarely used feature so it is deliberately not namespaced.
-+ */
-+int sysctl_tcp_authopt;
-+
- /* This is enabled when first struct tcp_authopt_info is allocated and never released */
- DEFINE_STATIC_KEY_FALSE(tcp_authopt_needed_key);
- EXPORT_SYMBOL(tcp_authopt_needed_key);
+ /* This is mainly intended to protect against local privilege escalations through
+  * a rarely used feature so it is deliberately not namespaced.
+  */
+ int sysctl_tcp_authopt;
+@@ -1661,26 +1662,123 @@ int __tcp_authopt_inbound_check(struct sock *sk, struct sk_buff *skb,
  
- /* All current algorithms have a mac length of 12 but crypto API digestsize can be larger */
-@@ -425,17 +430,30 @@ static int _copy_from_sockptr_tolerant(u8 *dst,
- 		memset(dst + srclen, 0, dstlen - srclen);
- 
- 	return err;
+ 	return 1;
  }
+ EXPORT_SYMBOL(__tcp_authopt_inbound_check);
  
-+static int check_sysctl_tcp_authopt(void)
++struct tcp_authopt_iter_state {
++	struct seq_net_private p;
++};
++
++static struct tcp_authopt_key_info *tcp_authopt_get_key_index(struct netns_tcp_authopt *net,
++							      int index)
 +{
-+	if (!sysctl_tcp_authopt) {
-+		net_warn_ratelimited("TCP Authentication Option disabled by sysctl.\n");
-+		return -EPERM;
++	struct tcp_authopt_key_info *key;
++
++	hlist_for_each_entry(key, &net->head, node) {
++		if (--index < 0)
++			return key;
 +	}
++
++	return NULL;
++}
++
++static void *tcp_authopt_seq_start(struct seq_file *seq, loff_t *pos)
++	__acquires(RCU)
++{
++	struct netns_tcp_authopt *net = &seq_file_net(seq)->tcp_authopt;
++
++	rcu_read_lock();
++	if (*pos == 0)
++		return SEQ_START_TOKEN;
++	else
++		return tcp_authopt_get_key_index(net, *pos - 1);
++}
++
++static void tcp_authopt_seq_stop(struct seq_file *seq, void *v)
++	__releases(RCU)
++{
++	rcu_read_unlock();
++}
++
++static void *tcp_authopt_seq_next(struct seq_file *seq, void *v, loff_t *pos)
++{
++	struct netns_tcp_authopt *net = &seq_file_net(seq)->tcp_authopt;
++	void *ret;
++
++	ret = tcp_authopt_get_key_index(net, *pos);
++	++*pos;
++
++	return ret;
++}
++
++static int tcp_authopt_seq_show(struct seq_file *seq, void *v)
++{
++	struct tcp_authopt_key_info *key = v;
++
++	/* FIXME: Document somewhere */
++	/* Key is deliberately inaccessible */
++	if (v == SEQ_START_TOKEN) {
++		seq_puts(seq, "flags\tsend_id\trecv_id\talg\taddr\tl3index\n");
++		return 0;
++	}
++
++	seq_printf(seq, "0x%x\t%d\t%d\t%d",
++		   key->flags, key->send_id, key->recv_id, (int)key->alg_id);
++	if (key->flags & TCP_AUTHOPT_KEY_ADDR_BIND) {
++		if (key->addr.ss_family == AF_INET6)
++			seq_printf(seq, "\t%pI6", &((struct sockaddr_in6 *)&key->addr)->sin6_addr);
++		else
++			seq_printf(seq, "\t%pI4", &((struct sockaddr_in *)&key->addr)->sin_addr);
++		if (key->flags & TCP_AUTHOPT_KEY_PREFIXLEN)
++			seq_printf(seq, "/%d", key->prefixlen);
++	} else {
++		seq_puts(seq, "\t*");
++	}
++	seq_printf(seq, "\t%d", key->l3index);
++	seq_puts(seq, "\n");
 +
 +	return 0;
 +}
 +
- int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
++static const struct seq_operations tcp_authopt_seq_ops = {
++	.start		= tcp_authopt_seq_start,
++	.next		= tcp_authopt_seq_next,
++	.stop		= tcp_authopt_seq_stop,
++	.show		= tcp_authopt_seq_show,
++};
++
++static int __net_init tcp_authopt_proc_init_net(struct net *net)
++{
++	if (!proc_create_net("tcp_authopt", 0400, net->proc_net,
++			     &tcp_authopt_seq_ops,
++			     sizeof(struct tcp_authopt_iter_state)))
++		return -ENOMEM;
++	return 0;
++}
++
++static void __net_exit tcp_authopt_proc_exit_net(struct net *net)
++{
++	remove_proc_entry("tcp_authopt", net->proc_net);
++}
++
+ static int tcp_authopt_init_net(struct net *full_net)
  {
- 	struct tcp_authopt opt;
- 	struct tcp_authopt_info *info;
- 	int err;
+ 	struct netns_tcp_authopt *net = &full_net->tcp_authopt;
  
- 	sock_owned_by_me(sk);
-+	err = check_sysctl_tcp_authopt();
-+	if (err)
-+		return err;
+ 	mutex_init(&net->mutex);
+ 	INIT_HLIST_HEAD(&net->head);
  
- 	err = _copy_from_sockptr_tolerant((u8 *)&opt, sizeof(opt), optval, optlen);
- 	if (err)
- 		return err;
+-	return 0;
++	return tcp_authopt_proc_init_net(full_net);
+ }
  
-@@ -453,14 +471,18 @@ int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
- 
- int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
+ static void tcp_authopt_exit_net(struct net *full_net)
  {
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	struct tcp_authopt_info *info;
-+	int err;
+ 	struct netns_tcp_authopt *net = &full_net->tcp_authopt;
+ 	struct tcp_authopt_key_info *key;
+ 	struct hlist_node *n;
  
-+	memset(opt, 0, sizeof(*opt));
- 	sock_owned_by_me(sk);
-+	err = check_sysctl_tcp_authopt();
-+	if (err)
-+		return err;
++	tcp_authopt_proc_exit_net(full_net);
+ 	mutex_lock(&net->mutex);
  
--	memset(opt, 0, sizeof(*opt));
- 	info = rcu_dereference_check(tp->authopt_info, lockdep_sock_is_held(sk));
- 	if (!info)
- 		return -ENOENT;
- 
- 	opt->flags = info->flags & TCP_AUTHOPT_KNOWN_FLAGS;
-@@ -481,10 +503,13 @@ int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
- 	struct netns_tcp_authopt *net = sock_net_tcp_authopt(sk);
- 	struct tcp_authopt_alg_imp *alg;
- 	int err;
- 
- 	sock_owned_by_me(sk);
-+	err = check_sysctl_tcp_authopt();
-+	if (err)
-+		return err;
- 	if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
- 		return -EPERM;
- 
- 	err = _copy_from_sockptr_tolerant((u8 *)&opt, sizeof(opt), optval, optlen);
- 	if (err)
+ 	hlist_for_each_entry_safe(key, n, &net->head, node) {
+ 		hlist_del_rcu(&key->node);
+ 		tcp_authopt_key_put(key);
 -- 
 2.25.1
 
