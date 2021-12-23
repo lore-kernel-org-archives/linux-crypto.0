@@ -2,80 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CA2C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Dec 2021 22:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6397EC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Dec 2021 02:16:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241831AbhLVWp4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Dec 2021 17:45:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60812 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229665AbhLVWpz (ORCPT
+        id S1345716AbhLWCQQ (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Dec 2021 21:16:16 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:15967 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229788AbhLWCQQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Dec 2021 17:45:55 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD337C061574
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Dec 2021 14:45:55 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3BAC061D0D
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Dec 2021 22:45:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39118C36AE8;
-        Wed, 22 Dec 2021 22:45:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640213154;
-        bh=i80v199yjXCe64MfBbYiIxvAaVJerN1loZyvqagvTRM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gfCkQdK+S4I1OXz/ji8CCkeJNrg29Hp+sQaL3Td/EJeuwtJa8zvJ2g+dqsp/4s034
-         ixyZ5m6E4F2M57lbTRA00LLM3ek4jpNh1ug38y0GhtaIk0Mol91u+QAxUg1CYrYthl
-         poFWG61+teKhsxY8PqscFrzxc/PpG4XWLhwyJqxfiOrAhjgCilTj1E8FHTHaBGdHBS
-         k/SFoKY9Ee6ceanuSeyma0yADwP4UWwZTJ2gnu5ecWIEJg+Y3mO4icRJI+/7VWExZn
-         CoTKwY+JEsLqaHAfeei+dbbN4L/aNhfxCWDpKTtWhvrxWefEVphCTMDrhVjK5kxH8x
-         Lsq+dNRlxRd3Q==
-Date:   Wed, 22 Dec 2021 16:45:52 -0600
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Petr Vorel <pvorel@suse.cz>, linux-crypto@vger.kernel.org
-Subject: Re: ELIBBAD vs. ENOENT for ciphers not allowed by FIPS
-Message-ID: <YcOqoGOLfNTZh/ZF@quark>
-References: <YcN4S7NIV9F0XXPP@pevik>
- <YcOh6jij1s6KA2ee@gondor.apana.org.au>
- <YcOlw1UJizlngAEG@quark>
- <YcOnRRRYbV/MrRhO@gondor.apana.org.au>
+        Wed, 22 Dec 2021 21:16:16 -0500
+Received: from dggpeml500021.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JKDHh6hNNzZdns;
+        Thu, 23 Dec 2021 10:13:04 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500021.china.huawei.com (7.185.36.21) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Thu, 23 Dec 2021 10:16:14 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Thu, 23 Dec 2021 10:16:14 +0800
+Subject: Re: [PATCH] crypto: hisilicon/qm - cleanup warning in qm_vf_read_qos
+To:     Andy Shevchenko <andy.shevchenko@gmail.com>
+References: <20211222020811.26292-1-yekai13@huawei.com>
+ <CAHp75VfoxrEjV+M3kSECo2gLReZsnkPcNsGdPNYHhaJCfQxqCg@mail.gmail.com>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "wangzhou1@hisilicon.com" <wangzhou1@hisilicon.com>
+From:   "yekai(A)" <yekai13@huawei.com>
+Message-ID: <0915e7b7-05e7-6e96-60e8-2a3113cf337a@huawei.com>
+Date:   Thu, 23 Dec 2021 10:16:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YcOnRRRYbV/MrRhO@gondor.apana.org.au>
+In-Reply-To: <CAHp75VfoxrEjV+M3kSECo2gLReZsnkPcNsGdPNYHhaJCfQxqCg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 23, 2021 at 09:31:33AM +1100, Herbert Xu wrote:
-> On Wed, Dec 22, 2021 at 04:25:07PM -0600, Eric Biggers wrote:
-> >
-> > Isn't it just an implementation detail that !fips_allowed is handled by the
-> > self-test?  Wouldn't it make more sense to report ENOENT for such algorithms?
-> 
-> ELIBBAD does not necessarily mean !fips_allowed, it could also
-> mean a specific implementation (or hardware) failed the self-test.
-> 
-> Yes, we could change ELIBBAD to something else in the case of
-> !fips_allowed, but it's certainly not a trivial change.
-> 
-> Please give a motivation for this.
-> 
-> Thanks,
 
-Some of the LTP tests check for ENOENT to determine whether an algorithm is
-intentionally unavailable, as opposed to it failing due to some other error.
-There is code in the kernel that does this same check too, e.g.
-fs/crypto/keysetup.c and block/blk-crypto-fallback.c.
 
-The way that ELIBBAD is overloaded to mean essentially the same thing as ENOENT,
-but only in some cases, is not expected.
+On 2021/12/23 9:51, Andy Shevchenko wrote:
+>
+>
+> On Wednesday, December 22, 2021, Kai Ye <yekai13@huawei.com
+> <mailto:yekai13@huawei.com>> wrote:
+>
+>     The kernel test rebot report this warning: Uninitialized variable: ret.
+>     Here is fix it.
+>
+>
+> How do you know that 0 is the correct value?
+>
+>
+>
+>     Signed-off-by: Kai Ye <yekai13@huawei.com <mailto:yekai13@huawei.com>>
+>     ---
+>      drivers/crypto/hisilicon/qm.c | 3 +--
+>      1 file changed, 1 insertion(+), 2 deletions(-)
+>
+>     diff --git a/drivers/crypto/hisilicon/qm.c
+>     b/drivers/crypto/hisilicon/qm.c
+>     index b1fe9c7b8cc8..c6e9ad2041c3 100644
+>     --- a/drivers/crypto/hisilicon/qm.c
+>     +++ b/drivers/crypto/hisilicon/qm.c
+>     @@ -4279,8 +4279,7 @@ static void qm_vf_get_qos(struct hisi_qm *qm,
+>     u32 fun_num)
+>
+>      static int qm_vf_read_qos(struct hisi_qm *qm)
+>      {
+>     -       int cnt = 0;
+>     -       int ret;
+>     +       int cnt = 0, ret = 0;
+>
+>             /* reset mailbox qos val */
+>             qm->mb_qos = 0;
+>     --
+>     2.33.0
+>
+>
+>
+> --
+> With Best Regards,
+> Andy Shevchenko
+>
+>
+we set the 0 to success in kernel style.
 
-It would be more logical for ELIBBAD to be restricted to actual test failures.
-
-If it is too late to change, then fine, but it seems like a bug to me.
-
-- Eric
+thanks
+Kai
