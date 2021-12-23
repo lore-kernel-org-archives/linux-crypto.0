@@ -2,108 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C4EC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Dec 2021 02:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E03E0C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Dec 2021 04:35:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242024AbhLWC7Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Dec 2021 21:59:25 -0500
-Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:37775 "EHLO
-        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231389AbhLWC7Z (ORCPT
+        id S1346343AbhLWEfw (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Dec 2021 23:35:52 -0500
+Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:60608 "EHLO
+        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1346323AbhLWEfw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Dec 2021 21:59:25 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0V.Thv79_1640228358;
-Received: from 30.240.100.46(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V.Thv79_1640228358)
+        Wed, 22 Dec 2021 23:35:52 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R691e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0V.TzZkA_1640234147;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V.TzZkA_1640234147)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 23 Dec 2021 10:59:20 +0800
-Message-ID: <83ab2a55-d31e-acb8-3cae-9c2d06f08f6c@linux.alibaba.com>
-Date:   Thu, 23 Dec 2021 10:59:18 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.4.1
-Subject: Re: [PATCH 1/5] crypto: sha256 - remove duplicate generic hash init
- function
-Content-Language: en-US
-To:     Julian Calaby <julian.calaby@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linux-crypto@vger.kernel.org, linux-mips@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        linuxppc-dev@lists.ozlabs.org,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        sparclinux <sparclinux@vger.kernel.org>
-References: <20211220092318.5793-1-tianjia.zhang@linux.alibaba.com>
- <20211220092318.5793-2-tianjia.zhang@linux.alibaba.com>
- <CAGRGNgXE_5H20K+e9oejqybOGh8JezMpi2yrDJKqaZ4rWJkZdA@mail.gmail.com>
+          Thu, 23 Dec 2021 12:35:48 +0800
 From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-In-Reply-To: <CAGRGNgXE_5H20K+e9oejqybOGh8JezMpi2yrDJKqaZ4rWJkZdA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
+        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v3 0/6] Introduce x86 assembly accelerated implementation for SM3 algorithm
+Date:   Thu, 23 Dec 2021 12:35:41 +0800
+Message-Id: <20211223043547.32297-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Julian,
+This series of patches creates an stand-alone library for SM3 hash
+algorithm in the lib/crypto directory, and makes the implementations
+that originally depended on sm3-generic depend on the stand-alone SM3
+library, which also includes sm3-generic itself.
 
-On 12/23/21 6:35 AM, Julian Calaby wrote:
-> Hi Tianjia,
-> 
-> On Mon, Dec 20, 2021 at 8:25 PM Tianjia Zhang
-> <tianjia.zhang@linux.alibaba.com> wrote:
->>
->> crypto_sha256_init() and sha256_base_init() are the same repeated
->> implementations, remove the crypto_sha256_init() in generic
->> implementation, sha224 is the same process.
->>
->> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->> ---
->>   crypto/sha256_generic.c | 16 ++--------------
->>   1 file changed, 2 insertions(+), 14 deletions(-)
->>
->> diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
->> index 3b377197236e..bf147b01e313 100644
->> --- a/crypto/sha256_generic.c
->> +++ b/crypto/sha256_generic.c
->> @@ -72,7 +60,7 @@ EXPORT_SYMBOL(crypto_sha256_finup);
->>
->>   static struct shash_alg sha256_algs[2] = { {
->>          .digestsize     =       SHA256_DIGEST_SIZE,
->> -       .init           =       crypto_sha256_init,
->> +       .init           =       sha256_base_init,
->>          .update         =       crypto_sha256_update,
->>          .final          =       crypto_sha256_final,
->>          .finup          =       crypto_sha256_finup,
->> @@ -86,7 +74,7 @@ static struct shash_alg sha256_algs[2] = { {
->>          }
->>   }, {
->>          .digestsize     =       SHA224_DIGEST_SIZE,
->> -       .init           =       crypto_sha224_init,
->> +       .init           =       sha224_base_init,
->>          .update         =       crypto_sha256_update,
->>          .final          =       crypto_sha256_final,
->>          .finup          =       crypto_sha256_finup,
-> 
-> Aren't these two functions defined as static inline functions? It
-> appears that these crypto_ wrappers were added so there's "actual"
-> referenceable functions for these structs.
-> 
-> Did this actually compile?
-> 
-> Thanks,
-> 
+On this basis, the AVX assembly acceleration implementation of SM3
+algorithm is introduced, the main algorithm implementation based on
+SM3 AES/BMI2 accelerated work by libgcrypt at:
+https://gnupg.org/software/libgcrypt/index.html
 
-Judging from the compilation results, there is really no difference, but 
-the modification made by this patch is still necessary, because 
-crypto_sha256_init() wrapper and sha256_base_init() are two completely 
-duplicate functions.
+From the performance benchmark data, the performance improvement of
+SM3 algorithm after AVX optimization can reach up to 38%.
 
-Best regards,
-Tianjia
+---
+v3 changes:
+ - update git commit message for patch 01
+
+v2 changes:
+ - x86/sm3: Change K macros to signed decimal and use LEA and 32-bit offset
+
+Tianjia Zhang (6):
+  crypto: sm3 - create SM3 stand-alone library
+  crypto: arm64/sm3-ce - make dependent on sm3 library
+  crypto: sm2 - make dependent on sm3 library
+  crypto: sm3 - make dependent on sm3 library
+  crypto: x86/sm3 - add AVX assembly implementation
+  crypto: tcrypt - add asynchronous speed test for SM3
+
+ arch/arm64/crypto/Kconfig        |   2 +-
+ arch/arm64/crypto/sm3-ce-glue.c  |  20 +-
+ arch/x86/crypto/Makefile         |   3 +
+ arch/x86/crypto/sm3-avx-asm_64.S | 517 +++++++++++++++++++++++++++++++
+ arch/x86/crypto/sm3_avx_glue.c   | 134 ++++++++
+ crypto/Kconfig                   |  16 +-
+ crypto/sm2.c                     |  38 +--
+ crypto/sm3_generic.c             | 142 +--------
+ crypto/tcrypt.c                  |  14 +-
+ include/crypto/sm3.h             |  34 +-
+ lib/crypto/Kconfig               |   3 +
+ lib/crypto/Makefile              |   3 +
+ lib/crypto/sm3.c                 | 246 +++++++++++++++
+ 13 files changed, 1007 insertions(+), 165 deletions(-)
+ create mode 100644 arch/x86/crypto/sm3-avx-asm_64.S
+ create mode 100644 arch/x86/crypto/sm3_avx_glue.c
+ create mode 100644 lib/crypto/sm3.c
+
+-- 
+2.32.0
+
