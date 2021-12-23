@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 802EDC4321E
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Dec 2021 15:41:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 529C6C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Dec 2021 15:41:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349236AbhLWPlV (ORCPT
+        id S1349242AbhLWPlW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Dec 2021 10:41:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33822 "EHLO
+        Thu, 23 Dec 2021 10:41:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349085AbhLWPk5 (ORCPT
+        with ESMTP id S1349102AbhLWPlF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Dec 2021 10:40:57 -0500
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85930C06179C;
-        Thu, 23 Dec 2021 07:40:52 -0800 (PST)
-Received: by mail-ed1-x531.google.com with SMTP id j21so22920348edt.9;
-        Thu, 23 Dec 2021 07:40:52 -0800 (PST)
+        Thu, 23 Dec 2021 10:41:05 -0500
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5CB1C06175C;
+        Thu, 23 Dec 2021 07:41:04 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id bm14so22946861edb.5;
+        Thu, 23 Dec 2021 07:41:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=LRGwolcJOYidDxYss3ob3FNIDs8LTy/+3TFunohiWFs=;
-        b=Y2JmeY7TS++YgnizYaWK3qTpCY8gkFES+d60o/ZzRBBImp+wBcS3EMZJO8qMdbij4o
-         E/QdoVZHKZjLkvlm7mi+2kttKO2T88/ZgMDpO7hLqBWECOzI+GF61+xZTl35N9dW4szl
-         OLkltoFXzGTDOJ4FtrW6ZgjqhzrbEHeR3wnPY6V90RRPgIZN+dRNSRNTMls1c6etq04a
-         dqZ0uxNCatJpHGjwnXrTGxtHMT4mr0dA5jCIQTuu/1MUOZeMXofmoPscMvyj4dhBawlL
-         WLcGjBKyR5Ek8LnMFOiYXxkpmeczv4ukvSIrS2CRjmSqdZP85RXWpn06JBEz3HPVEppx
-         0KGA==
+        bh=TeRKucehsWGRQRB4QdxreoInCb5o1eayi99lDN4kmfs=;
+        b=ShoE4C3BJ2bZ1XkL3fDxB+GL2U8hd0mO0ooTgg3Hkdpb0HcHc3m7a88VcLOsaknqTH
+         KExbihYLxc37V09/DGE6ZlhwzSFFPrQOPlB+qDWfrJahudS9tLR9luxxeEzZTqVx2m0q
+         /vkX5S/A2HaEAlfLg6Fi7OKOgvH1AZzTh1EXH/4skVewkxi+r25+PSwqqItTIYaK+moL
+         14+qCEQpp1brPQ2BneuZ7KzGt9hnO84W2KgDjnAglQsFW2JvaDvVBDgi7piRq07UKUgE
+         jE70/w3M9BukYfA3v/TtV+R0IU/yD7tEYHLF2hV1b1Ecvnh5+5HHhv8ibObIKzKBYmbM
+         ZZCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=LRGwolcJOYidDxYss3ob3FNIDs8LTy/+3TFunohiWFs=;
-        b=pNmBFJPEEezK7olTrhK+QfJWwQq7jy6BUkzFYKCGsJb9c46lwbV0oxTYThlasIw82E
-         Mu8iQx91676LUdZblQonoh/+EexwUfs/0y+LtrSlbwea3U+xTTTU9TDc6QQsgoddAtqL
-         BD9YOF6bcOiZ8QhE8lvHHJk46K8vmV56iSlddRo7HtdO7h+UV/7BBGIBsBlRxYkKf/jY
-         1WK2v3rYh2P8DlngDkzj/DLd3NY0UloO4FWJWqJIaeSPatTghuOtVFZOBq5JP81tVpVD
-         LlecwHzcYkx7gAlnlvLpg/wVBF4B/y3XpZbNekmu1114jEgdb4UDka3YYTiLihy5+bPt
-         1dHA==
-X-Gm-Message-State: AOAM530tzV0ixXKWEPrSsDYVa8uDwx+5OOxhL/nH3CT4g12DThBH6qUB
-        u9AfyYD6ZYGqExptkjbfK0k=
-X-Google-Smtp-Source: ABdhPJwlUMR47WGCCYDL6ptOccVfj+9SE+TW+d+N684SAfTCoFfjYqWlAIF7zbUlWzmZal8PKLQB1A==
-X-Received: by 2002:a17:907:72c5:: with SMTP id du5mr2379890ejc.43.1640274050918;
-        Thu, 23 Dec 2021 07:40:50 -0800 (PST)
+        bh=TeRKucehsWGRQRB4QdxreoInCb5o1eayi99lDN4kmfs=;
+        b=tj4dzwB8rZTKByzkbC9x9IBd8h2U0qKqp9gaFz5rFtZ0su9Tb7s0XIHXg8nS7tHSRg
+         sWWPCk7InGVUuzptxsS3NJiSxS25Qr8dyM6rAHA0futjZJF8Gy1ItZIV/1bcqqJmW+F6
+         SKeTOzaqjLEmT6Xlfe/hulW+ZwqZTnso4TtihasihaC/6mx+j9HgBmWuuas1jmw58p5p
+         f+Ba4G13GlSLd3st4z5Y1lmk/DUs/NttO6xj4/kf6wiCgvcQtGMJLIx0HhqNc4IajI+b
+         l09XTilmWaqR+jqbuuVfs/S+nkuuIv/zeKhqgET76joUKHH3g/hmLxblVpLFDhX6NJIE
+         mcbw==
+X-Gm-Message-State: AOAM5336ZUrkrI/nSSpoF69CaZp0dtMCscUGbTFjGcntfbyTj4S7JrLj
+        FZ7AYGWSWm6406L7OBHMoTM=
+X-Google-Smtp-Source: ABdhPJxthFan6y+KWhGlhqflHHV2+HpQOtwMFkGMq2yw6m+ZqatCst3ceYdpwSNFB/STsWgeG0N/6Q==
+X-Received: by 2002:a17:907:a406:: with SMTP id sg6mr2352872ejc.171.1640274063520;
+        Thu, 23 Dec 2021 07:41:03 -0800 (PST)
 Received: from ponky.lan ([2a04:241e:501:3870:7c02:dfc6:b554:ab10])
-        by smtp.gmail.com with ESMTPSA id bx6sm2088617edb.78.2021.12.23.07.40.49
+        by smtp.gmail.com with ESMTPSA id bx6sm2088617edb.78.2021.12.23.07.41.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Dec 2021 07:40:50 -0800 (PST)
+        Thu, 23 Dec 2021 07:41:03 -0800 (PST)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>,
@@ -68,9 +68,9 @@ Cc:     Shuah Khan <shuah@kernel.org>,
         Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 08/19] tcp: authopt: Implement Sequence Number Extension
-Date:   Thu, 23 Dec 2021 17:40:03 +0200
-Message-Id: <1297bfa0297d28d7b62ae6e9117f0c62dee09561.1640273966.git.cdleonard@gmail.com>
+Subject: [PATCH v4 14/19] tcp: authopt: Add NOSEND/NORECV flags
+Date:   Thu, 23 Dec 2021 17:40:09 +0200
+Message-Id: <4e3efe908b6c56bbb80f931333c3c32f6a68733a.1640273966.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1640273966.git.cdleonard@gmail.com>
 References: <cover.1640273966.git.cdleonard@gmail.com>
@@ -80,277 +80,95 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add a compute_sne function which finds the value of SNE for a certain
-SEQ given an already known "recent" SNE/SEQ. This is implemented using
-the standard tcp before/after macro and will work for SEQ values that
-are without 2^31 of the SEQ for which we know the SNE.
+Add flags to allow marking individual keys and invalid for send or recv.
+Making keys assymetric this way is not mentioned in RFC5925 but RFC8177
+requires that keys inside a keychain have independent "accept" and
+"send" lifetimes.
 
-For updating we advance the value for rcv_sne at the same time as
-rcv_nxt and for snd_sne at the same time as snd_nxt. We could track
-other values (for example snd_una) but this is good enough and works
-very easily for timewait socket.
+Flag names are negative so that the default behavior is for keys to be
+valid for both send and recv.
 
-This implementation is different from RFC suggestions and doesn't
-require additional flags. It does pass tests from this draft:
-    https://datatracker.ietf.org/doc/draft-touch-sne/
+Setting both NOSEND and NORECV for a certain peer address can be used on
+a listen socket can be used to mean "TCP-AO is required from this peer
+but no keys are currently valid".
 
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- include/net/tcp_authopt.h | 34 ++++++++++++++
- net/ipv4/tcp_authopt.c    | 98 ++++++++++++++++++++++++++++++++++++++-
- net/ipv4/tcp_input.c      |  1 +
- net/ipv4/tcp_output.c     |  1 +
- 4 files changed, 132 insertions(+), 2 deletions(-)
+ include/uapi/linux/tcp.h | 4 ++++
+ net/ipv4/tcp_authopt.c   | 9 ++++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/tcp_authopt.h b/include/net/tcp_authopt.h
-index 4c9ec1f39932..6e9b5ca22f62 100644
---- a/include/net/tcp_authopt.h
-+++ b/include/net/tcp_authopt.h
-@@ -66,10 +66,14 @@ struct tcp_authopt_info {
- 	u32 flags;
- 	/** @src_isn: Local Initial Sequence Number */
- 	u32 src_isn;
- 	/** @dst_isn: Remote Initial Sequence Number */
- 	u32 dst_isn;
-+	/** @rcv_sne: Recv-side Sequence Number Extension tracking tcp_sock.rcv_nxt */
-+	u32 rcv_sne;
-+	/** @snd_sne: Send-side Sequence Number Extension tracking tcp_sock.snd_nxt */
-+	u32 snd_sne;
+diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
+index a7f5f918ed5a..ed27feb93b0e 100644
+--- a/include/uapi/linux/tcp.h
++++ b/include/uapi/linux/tcp.h
+@@ -401,16 +401,20 @@ struct tcp_authopt {
+  *
+  * @TCP_AUTHOPT_KEY_DEL: Delete the key and ignore non-id fields
+  * @TCP_AUTHOPT_KEY_EXCLUDE_OPTS: Exclude TCP options from signature
+  * @TCP_AUTHOPT_KEY_ADDR_BIND: Key only valid for `tcp_authopt.addr`
+  * @TCP_AUTHOPT_KEY_IFINDEX: Key only valid for `tcp_authopt.ifindex`
++ * @TCP_AUTHOPT_KEY_NOSEND: Key invalid for send (expired)
++ * @TCP_AUTHOPT_KEY_NORECV: Key invalid for recv (expired)
+  */
+ enum tcp_authopt_key_flag {
+ 	TCP_AUTHOPT_KEY_DEL = (1 << 0),
+ 	TCP_AUTHOPT_KEY_EXCLUDE_OPTS = (1 << 1),
+ 	TCP_AUTHOPT_KEY_ADDR_BIND = (1 << 2),
+ 	TCP_AUTHOPT_KEY_IFINDEX = (1 << 3),
++	TCP_AUTHOPT_KEY_NOSEND = (1 << 4),
++	TCP_AUTHOPT_KEY_NORECV = (1 << 5),
  };
  
- /* TCP authopt as found in header */
- struct tcphdr_authopt {
- 	u8 num;
-@@ -185,10 +189,34 @@ static inline int tcp_authopt_inbound_check_req(struct request_sock *req, struct
- 		if (info)
- 			return __tcp_authopt_inbound_check((struct sock *)req, skb, info, opt);
- 	}
- 	return 0;
- }
-+void __tcp_authopt_update_rcv_sne(struct tcp_sock *tp, struct tcp_authopt_info *info, u32 seq);
-+static inline void tcp_authopt_update_rcv_sne(struct tcp_sock *tp, u32 seq)
-+{
-+	struct tcp_authopt_info *info;
-+
-+	if (tcp_authopt_needed) {
-+		info = rcu_dereference_protected(tp->authopt_info,
-+						 lockdep_sock_is_held((struct sock *)tp));
-+		if (info)
-+			__tcp_authopt_update_rcv_sne(tp, info, seq);
-+	}
-+}
-+void __tcp_authopt_update_snd_sne(struct tcp_sock *tp, struct tcp_authopt_info *info, u32 seq);
-+static inline void tcp_authopt_update_snd_sne(struct tcp_sock *tp, u32 seq)
-+{
-+	struct tcp_authopt_info *info;
-+
-+	if (tcp_authopt_needed) {
-+		info = rcu_dereference_protected(tp->authopt_info,
-+						 lockdep_sock_is_held((struct sock *)tp));
-+		if (info)
-+			__tcp_authopt_update_snd_sne(tp, info, seq);
-+	}
-+}
- #else
- static inline int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
- {
- 	return -ENOPROTOOPT;
- }
-@@ -235,8 +263,14 @@ static inline int tcp_authopt_inbound_check(struct sock *sk, struct sk_buff *skb
- static inline int tcp_authopt_inbound_check_req(struct request_sock *sk, struct sk_buff *skb,
- 						const u8 *opt)
- {
- 	return 0;
- }
-+static inline void tcp_authopt_update_rcv_sne(struct tcp_sock *tp, u32 seq)
-+{
-+}
-+static inline void tcp_authopt_update_snd_sne(struct tcp_sock *tp, u32 seq)
-+{
-+}
- #endif
- 
- #endif /* _LINUX_TCP_AUTHOPT_H */
+ /**
+  * enum tcp_authopt_alg - Algorithms for TCP Authentication Option
+  */
 diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
-index 6be5dbcd530e..4a624a3a572d 100644
+index f3e244d036c3..c598f3cf72d5 100644
 --- a/net/ipv4/tcp_authopt.c
 +++ b/net/ipv4/tcp_authopt.c
-@@ -644,10 +644,97 @@ static int tcp_authopt_get_isn(struct sock *sk,
- 		*disn = htonl(info->dst_isn);
- 	}
- 	return 0;
- }
+@@ -358,10 +358,12 @@ static struct tcp_authopt_key_info *tcp_authopt_lookup_send(struct netns_tcp_aut
+ 	int l3index = -1;
  
-+/* compute_sne - Calculate Sequence Number Extension
-+ *
-+ * Give old upper/lower 32bit values and a new lower 32bit value determine the
-+ * new value of the upper 32 bit. The new sequence number can be 2^31 before or
-+ * after prev_seq but TCP window scaling should limit this further.
-+ *
-+ * For correct accounting the stored SNE value should be only updated together
-+ * with the SEQ.
-+ */
-+static u32 compute_sne(u32 sne, u32 prev_seq, u32 seq)
-+{
-+	if (before(seq, prev_seq)) {
-+		if (seq > prev_seq)
-+			--sne;
-+	} else {
-+		if (seq < prev_seq)
-+			++sne;
-+	}
-+
-+	return sne;
-+}
-+
-+/* Update rcv_sne, must be called immediately before rcv_nxt update */
-+void __tcp_authopt_update_rcv_sne(struct tcp_sock *tp,
-+				  struct tcp_authopt_info *info, u32 seq)
-+{
-+	info->rcv_sne = compute_sne(info->rcv_sne, tp->rcv_nxt, seq);
-+}
-+
-+/* Update snd_sne, must be called immediately before snd_nxt update */
-+void __tcp_authopt_update_snd_sne(struct tcp_sock *tp,
-+				  struct tcp_authopt_info *info, u32 seq)
-+{
-+	info->snd_sne = compute_sne(info->snd_sne, tp->snd_nxt, seq);
-+}
-+
-+/* Compute SNE for a specific packet (by seq). */
-+static int compute_packet_sne(struct sock *sk, struct tcp_authopt_info *info,
-+			      u32 seq, bool input, __be32 *sne)
-+{
-+	u32 rcv_nxt, snd_nxt;
-+
-+	// For TCP_NEW_SYN_RECV we have no tcp_authopt_info but tcp_request_sock holds ISN.
-+	if (sk->sk_state == TCP_NEW_SYN_RECV) {
-+		struct tcp_request_sock *rsk = tcp_rsk((struct request_sock *)sk);
-+
-+		if (input)
-+			*sne = htonl(compute_sne(0, rsk->rcv_isn, seq));
-+		else
-+			*sne = htonl(compute_sne(0, rsk->snt_isn, seq));
-+		return 0;
-+	}
-+
-+	/* TCP_LISTEN only receives SYN */
-+	if (sk->sk_state == TCP_LISTEN && input)
-+		return 0;
-+
-+	/* TCP_SYN_SENT only sends SYN and receives SYN/ACK
-+	 * For the input case rcv_nxt is initialized after the packet is
-+	 * validated so tcp_sk(sk)->rcv_nxt is not initialized.
-+	 */
-+	if (sk->sk_state == TCP_SYN_SENT)
-+		return 0;
-+
-+	if (sk->sk_state == TCP_TIME_WAIT) {
-+		rcv_nxt = tcp_twsk(sk)->tw_rcv_nxt;
-+		snd_nxt = tcp_twsk(sk)->tw_snd_nxt;
-+	} else {
-+		if (WARN_ONCE(!sk_fullsock(sk),
-+			      "unexpected minisock sk=%p state=%d", sk,
-+			      sk->sk_state))
-+			return -EINVAL;
-+		rcv_nxt = tcp_sk(sk)->rcv_nxt;
-+		snd_nxt = tcp_sk(sk)->snd_nxt;
-+	}
-+
-+	if (WARN_ONCE(!info, "unexpected missing info for sk=%p sk_state=%d", sk, sk->sk_state))
-+		return -EINVAL;
-+
-+	if (input)
-+		*sne = htonl(compute_sne(info->rcv_sne, rcv_nxt, seq));
-+	else
-+		*sne = htonl(compute_sne(info->snd_sne, snd_nxt, seq));
-+
-+	return 0;
-+}
-+
- /* Feed one buffer into ahash
-  * The buffer is assumed to be DMA-able
-  */
- static int crypto_ahash_buf(struct ahash_request *req, u8 *buf, uint len)
+ 	hlist_for_each_entry_rcu(key, &net->head, node, 0) {
+ 		if (send_id >= 0 && key->send_id != send_id)
+ 			continue;
++		if (key->flags & TCP_AUTHOPT_KEY_NOSEND)
++			continue;
+ 		if (key->flags & TCP_AUTHOPT_KEY_ADDR_BIND)
+ 			if (!tcp_authopt_key_match_sk_addr(key, addr_sk))
+ 				continue;
+ 		if (key->flags & TCP_AUTHOPT_KEY_IFINDEX) {
+ 			if (l3index < 0)
+@@ -607,11 +609,13 @@ int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
+ 
+ #define TCP_AUTHOPT_KEY_KNOWN_FLAGS ( \
+ 	TCP_AUTHOPT_KEY_DEL | \
+ 	TCP_AUTHOPT_KEY_EXCLUDE_OPTS | \
+ 	TCP_AUTHOPT_KEY_ADDR_BIND | \
+-	TCP_AUTHOPT_KEY_IFINDEX)
++	TCP_AUTHOPT_KEY_IFINDEX | \
++	TCP_AUTHOPT_KEY_NOSEND | \
++	TCP_AUTHOPT_KEY_NORECV)
+ 
+ int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
  {
-@@ -679,10 +766,13 @@ int __tcp_authopt_openreq(struct sock *newsk, const struct sock *oldsk, struct r
- 	if (!new_info)
- 		return -ENOMEM;
+ 	struct tcp_authopt_key opt;
+ 	struct tcp_authopt_info *info;
+@@ -1492,10 +1496,13 @@ static struct tcp_authopt_key_info *tcp_authopt_lookup_recv(struct sock *sk,
  
- 	new_info->src_isn = tcp_rsk(req)->snt_isn;
- 	new_info->dst_isn = tcp_rsk(req)->rcv_isn;
-+	/* Caller is tcp_create_openreq_child and already initializes snd_nxt/rcv_nxt */
-+	new_info->snd_sne = compute_sne(0, new_info->src_isn, tcp_sk(newsk)->snd_nxt);
-+	new_info->rcv_sne = compute_sne(0, new_info->dst_isn, tcp_sk(newsk)->rcv_nxt);
- 	sk_gso_disable(newsk);
- 	rcu_assign_pointer(tcp_sk(newsk)->authopt_info, new_info);
- 
- 	return 0;
- }
-@@ -690,10 +780,12 @@ int __tcp_authopt_openreq(struct sock *newsk, const struct sock *oldsk, struct r
- void __tcp_authopt_finish_connect(struct sock *sk, struct sk_buff *skb,
- 				  struct tcp_authopt_info *info)
- {
- 	info->src_isn = ntohl(tcp_hdr(skb)->ack_seq) - 1;
- 	info->dst_isn = ntohl(tcp_hdr(skb)->seq);
-+	info->snd_sne = compute_sne(0, info->src_isn, tcp_sk(sk)->snd_nxt);
-+	info->rcv_sne = compute_sne(0, info->dst_isn, tcp_sk(sk)->rcv_nxt);
- }
- 
- /* feed traffic key into ahash */
- static int tcp_authopt_ahash_traffic_key(struct tcp_authopt_alg_pool *pool,
- 					 struct sock *sk,
-@@ -939,14 +1031,16 @@ static int tcp_authopt_hash_packet(struct tcp_authopt_alg_pool *pool,
- 				   bool ipv6,
- 				   bool include_options,
- 				   u8 *macbuf)
- {
- 	struct tcphdr *th = tcp_hdr(skb);
-+	__be32 sne = 0;
- 	int err;
- 
--	/* NOTE: SNE unimplemented */
--	__be32 sne = 0;
-+	err = compute_packet_sne(sk, info, ntohl(th->seq), input, &sne);
-+	if (err)
-+		return err;
- 
- 	err = crypto_ahash_init(pool->req);
- 	if (err)
- 		return err;
- 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 4c9e403971fb..bc0a90c72391 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -3517,10 +3517,11 @@ static void tcp_snd_una_update(struct tcp_sock *tp, u32 ack)
- static void tcp_rcv_nxt_update(struct tcp_sock *tp, u32 seq)
- {
- 	u32 delta = seq - tp->rcv_nxt;
- 
- 	sock_owned_by_me((struct sock *)tp);
-+	tcp_authopt_update_rcv_sne(tp, seq);
- 	tp->bytes_received += delta;
- 	WRITE_ONCE(tp->rcv_nxt, seq);
- }
- 
- /* Update our send window.
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index b959e8b949b6..6a6024a0b9e9 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -67,10 +67,11 @@ static void tcp_event_new_data_sent(struct sock *sk, struct sk_buff *skb)
- {
- 	struct inet_connection_sock *icsk = inet_csk(sk);
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	unsigned int prior_packets = tp->packets_out;
- 
-+	tcp_authopt_update_snd_sne(tp, TCP_SKB_CB(skb)->end_seq);
- 	WRITE_ONCE(tp->snd_nxt, TCP_SKB_CB(skb)->end_seq);
- 
- 	__skb_unlink(skb, &sk->sk_write_queue);
- 	tcp_rbtree_insert(&sk->tcp_rtx_queue, skb);
- 
+ 			if (l3index != key->l3index)
+ 				continue;
+ 		}
+ 		*anykey = true;
++		// If only keys with norecv flag are present still consider that
++		if (key->flags & TCP_AUTHOPT_KEY_NORECV)
++			continue;
+ 		if (recv_id >= 0 && key->recv_id != recv_id)
+ 			continue;
+ 		if (better_key_match(result, key))
+ 			result = key;
+ 		else if (result)
 -- 
 2.25.1
 
