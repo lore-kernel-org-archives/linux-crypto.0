@@ -2,407 +2,196 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A376C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Dec 2021 14:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42ED7C43217
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Dec 2021 14:57:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348786AbhLWOUb (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Dec 2021 09:20:31 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:47562 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbhLWOUb (ORCPT
+        id S243974AbhLWO47 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 23 Dec 2021 09:56:59 -0500
+Received: from esa.microchip.iphmx.com ([68.232.154.123]:28717 "EHLO
+        esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239935AbhLWO46 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Dec 2021 09:20:31 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9024C61DEE;
-        Thu, 23 Dec 2021 14:20:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB09FC36AEB;
-        Thu, 23 Dec 2021 14:20:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640269230;
-        bh=JvW1fceA8xBmE25gVMQ3VGR201N+BLM6CrOE77KrV2Q=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=OQz86ItDKunrM3PIW5m9GqalqrggwwNXOFqg4RvFiTWmZTJjpRRo8HL4H2/pEEXQD
-         MpK3j4pGf+8Png4Oawh7A2LAPHAhc82/HRJeBQUMyZtRDiQvyCK771kCSTZUN6dKNL
-         12b6vP3VpSqJa/GYYzvlfuh8xv6nuRfPD/QKEd5luGVtkNfnCAmW/KRIcTsKScrOQD
-         ynoQ9mMSgOfVe+UcyCIURP7IsxE5I6frCpAm8RTQVypbSvhH07R0RwjiuwD2YCryMK
-         0cyJ5NXC5kmN+C3XeFAqnLk3Bu4N/S29xK19Z1w9KCPDJWMeZTwtw3/Ac9oMgEVin9
-         T0B8qrWctY8ig==
-Received: by mail-wr1-f52.google.com with SMTP id e5so11779016wrc.5;
-        Thu, 23 Dec 2021 06:20:29 -0800 (PST)
-X-Gm-Message-State: AOAM530dItS0rJMNE2O/LLgnAppPKUV85eu2HsYGrmeZH5Fh0UZRAlr6
-        ApVS9scXpgcL5w1v40IYFXCRxMevy6M1J+1p7LA=
-X-Google-Smtp-Source: ABdhPJwjlPi23V4Hb4I5aSX5Rr26M+nRx+C+FVzqmgZdIawL3Y3dqCakxiBlawyrkyFdfTDSqICxZJIo13QvZ2OT2UQ=
-X-Received: by 2002:adf:dc44:: with SMTP id m4mr1899343wrj.550.1640269228146;
- Thu, 23 Dec 2021 06:20:28 -0800 (PST)
+        Thu, 23 Dec 2021 09:56:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1640271418; x=1671807418;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=In3HGj64CPzrkpvBGYGeI0iZIrZ3qGCaOe5XXg/8wKc=;
+  b=Fh4VsocREGjfKZgcy+Gi2dmFb8mXh9IxUk1ajIPQo4+z+CtCgwybKBRI
+   vKZWusYjYDL/kclDsQoqE6mHU17WdXVKgu4XtjMYqMX84E8ujOWQGVZfq
+   p/QE/Uvlj9U9NGkh6oix6Vs58jm8BZUUHtfaR09zCGbW5HXMOSNUySrCO
+   a63eeFDul7Z2bqkYgD+gZK/RNi4fUb099ezS8Ig1cwJNBzoRu7Syx4Rhb
+   ah/Os37caVz5tAJRXwVLwUQA1qIDh7vBtrsszU33LpTG/Yd7eIU8NjDqH
+   deHwmTiCsaq6qGZ0AfLlHmJdtYLOOw935g8WF+Y+CHjj+fWo0Fyv36YhX
+   w==;
+IronPort-SDR: wQ5n9WGj4wIDpN04ZusOghZzgj9F3S5v2kENTzSl+wZEtCszoecDkFzRjSWUa1B9j3NHO6tBr8
+ M8TCJ6tD7DF4wS8yk0kZSqyVIY0M7pRixtlYThPetXTrSxyMDoTq/EbVitzOkr9IISjYH5jVTY
+ I78aSWcBWE17+S9O/wjAT7eIBhihntd+GAlVhTnEKFuF/fUy6Xl7oNOAiSJ3fIo/rBvaN3kJJD
+ CSRbc1YZ0bwecuR8Qbv/23FKre0IDhSGJteYtL9a0rIolyK41dHBfxbuauoIJ16scXqwaWlnFd
+ PMMPmjNTavxuTVczBcEdn7e5
+X-IronPort-AV: E=Sophos;i="5.88,229,1635231600"; 
+   d="scan'208";a="140717891"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Dec 2021 07:56:52 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.17; Thu, 23 Dec 2021 07:56:51 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17 via Frontend
+ Transport; Thu, 23 Dec 2021 07:56:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CyDw6ccFCcWdfSPmczosCySOjRDq/4Anp5QKw0BjwGaiqmsAGq0mLqT8cRHs1HohSNFb4B59BpaGvZ3VBj3qCjAhOdqPgd3+c2QwzLFIp/FCE9KYSa5yrQXm0tMefAK2k9LXkorFKeuUwLEL1agw+hxgr3Wufn4NCpyFyqc0Krs8sj2zqYN0JeemhT05WuA9vuG1l8U/aDR63zgaoG8jB2Ed9Q9GQeAsbMyOUXAPEzFxXBMb3nFHGR+UCagdWkv4TP1uJ74/nPgE379I3FpGqjyTK9Beplk28ZoWljdBw35xm/xQ9W22noiwm3omen+XcJpALE4Dyu3u3dRywHJtBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=In3HGj64CPzrkpvBGYGeI0iZIrZ3qGCaOe5XXg/8wKc=;
+ b=L+WsOr30mD9UsJkMCJfLHeNeAAKPSOelZ7gl1gj1FRSmkL89y79AoB1nL/gWTDB/jhDWmw0iUOD4mRih0MhQ9GhDR2jcXZ3k+4GL4lj/DdGKCS0g7akHJSRWyhc/OfxEqidV7omkLar92Otz5biwM/SeJytyiwFQMT08mzDq7RRrk3RitM5QDJw0AtekXl4AS0XzFVqjnhhdhJ7gTSWp42JXa53Xsl333CYGAKa6XbPsFvDWYUfCPhfylfi5DWws0CFra+S8emDeVmSDHZ3Aq+xPweISs7myF4BiQP1W5tPS0gueYLN7UOd1fFVKPmHw5MN4ifDl191kwWnQtR/Yig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=In3HGj64CPzrkpvBGYGeI0iZIrZ3qGCaOe5XXg/8wKc=;
+ b=CMPx84UI0aN9lx9ftCtadWjwwdQ0vwh1ddgLVjl4tJS450ce9xivBDVQTXVcF4JxvWkVJEf+aN+Nux8e5EeGobMf4Tlha9IHUtjvpKxTpUkzyFLW7ikQLyHNsygnw3/DvDVJ5nGgzJ22VMvXisJSxJnk/qHeSpGNnLk0wnRon30=
+Received: from CO1PR11MB5154.namprd11.prod.outlook.com (2603:10b6:303:95::7)
+ by MW3PR11MB4571.namprd11.prod.outlook.com (2603:10b6:303:59::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.15; Thu, 23 Dec
+ 2021 14:56:46 +0000
+Received: from CO1PR11MB5154.namprd11.prod.outlook.com
+ ([fe80::a192:c9ae:1f83:797b]) by CO1PR11MB5154.namprd11.prod.outlook.com
+ ([fe80::a192:c9ae:1f83:797b%9]) with mapi id 15.20.4823.019; Thu, 23 Dec 2021
+ 14:56:45 +0000
+From:   <Conor.Dooley@microchip.com>
+To:     <krzysztof.kozlowski@canonical.com>, <linus.walleij@linaro.org>,
+        <bgolaszewski@baylibre.com>, <robh+dt@kernel.org>,
+        <jassisinghbrar@gmail.com>, <paul.walmsley@sifive.com>,
+        <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>,
+        <a.zummo@towertech.it>, <alexandre.belloni@bootlin.com>,
+        <broonie@kernel.org>, <gregkh@linuxfoundation.org>,
+        <thierry.reding@gmail.com>, <u.kleine-koenig@pengutronix.de>,
+        <lee.jones@linaro.org>, <linux-gpio@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-i2c@vger.kernel.org>, <linux-pwm@vger.kernel.org>,
+        <linux-riscv@lists.infradead.org>, <linux-crypto@vger.kernel.org>,
+        <linux-rtc@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>
+CC:     <geert@linux-m68k.org>, <bin.meng@windriver.com>,
+        <heiko@sntech.de>, <Lewis.Hanly@microchip.com>,
+        <Daire.McNamara@microchip.com>, <Ivan.Griffin@microchip.com>,
+        <atish.patra@wdc.com>
+Subject: Re: [PATCH v2 17/17] MAINTAINERS: update riscv/microchip entry
+Thread-Topic: [PATCH v2 17/17] MAINTAINERS: update riscv/microchip entry
+Thread-Index: AQHX8ylGa0v8JYrVdUWVLgWvsdOtaKw2yceAgAlrFYA=
+Date:   Thu, 23 Dec 2021 14:56:45 +0000
+Message-ID: <05d6a273-19f6-2147-75ba-1fff726a0f70@microchip.com>
+References: <20211217093325.30612-1-conor.dooley@microchip.com>
+ <20211217093325.30612-18-conor.dooley@microchip.com>
+ <61ae4cfd-a544-96d3-d521-877b8b38b5fc@canonical.com>
+In-Reply-To: <61ae4cfd-a544-96d3-d521-877b8b38b5fc@canonical.com>
+Accept-Language: en-IE, en-US
+Content-Language: en-IE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1cf516ad-21df-4561-80a1-08d9c6247091
+x-ms-traffictypediagnostic: MW3PR11MB4571:EE_
+x-microsoft-antispam-prvs: <MW3PR11MB45717350E07925E2EF8D34C3987E9@MW3PR11MB4571.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4303;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: F8hltEhFn6QG03iy3LFukzaMYqOhO0Mv1aE7zNpc8HsX+taxhCH0Yc015rWs/Uyu3VRmhPleoEC87+HY3CZUobNb2JzLmqOuPy4Md7SrrLtuFPRZXYBlAZ27Z5dwrOetgMkzKIrn/LeYZv9nIMZqaWHsmkZu6Xt4AgrZkdBOSyXY2n6lsB+baDzhJ4Fl8QaJ1W3sff3HbxIh7ysPSSYVv+zThFzId2XEbNg7n1QNf5dspDYkVUI02+R647QYJVXJe7recZYhpBBmg6wEFzDo2KHUsHPp54pUjPGFwK+yg3/gpDNU7clT9+RY0jcs5GMD9cDf0M3MgR+UhDvfcT9RBHcm391VjEYXjgV7sTQdO5jLXTfwbV9uBWLWEIi1U2sMvk4Q2NTxjvvRQM7/Yzj5uyUfcUvl0gCKhPS958e7kp8FsdiCrGvE4tyNM1Ztu7xpcIk/r5Egrtb/83TqdK/AQuGWWtPsVkpbsdfrBJ/Dqbh2nrNWf1Et5FO8/6Zhi0/irX5tOGOLSJOUiZYfCeyMFPRQDH8C8Swn/WAfASkCbq9MjQ4CdWHwGqT8LTzgK3YKbIJ5DUdwxhi5gdhzbkWdExmW2hLIWqRc+JFQUFNJ9vbqswrnc9CAaySCD6luN7N8g4t0qitOucZavbT/uHNZypnWjK9oX+1dAeNOLFqKrTF/Iyq+nAv8orzlapI0mFmn1ebj7NTlcHhm5g32/zRCgkcGiXA4Pk8MedK4AGw4Kj2HjLA7mPEfvEEMhkVbD3Dz71pn0Sp6b2/gEuIaVW4taS85LVI0r4HYBHZ8cQLMm20=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5154.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(921005)(86362001)(15650500001)(31686004)(6506007)(36756003)(38070700005)(53546011)(5660300002)(6486002)(122000001)(186003)(71200400001)(7416002)(83380400001)(31696002)(54906003)(4326008)(66556008)(6512007)(64756008)(76116006)(316002)(8936002)(508600001)(26005)(66446008)(38100700002)(66946007)(8676002)(2906002)(66476007)(110136005)(91956017)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?dldHVDEvVUhoN29hc1A3N3NCUkYzcFE4WmJrbzNENzhaa1c3TUV2LzA0bWNx?=
+ =?utf-8?B?ZHJSeUN4SUJsTVYwZC81R21sbUczWDdVNXZPWExGQ2xZWFVad1dYZDNTZ2lo?=
+ =?utf-8?B?Z0YwVVR6KzFqU0tucmgxR0J3YkVhS2pxZE43RFV5bDBvcHVpQVBKOUdzRlpi?=
+ =?utf-8?B?cWRwYlhlck1ZSkJld0V4ak5Gb3V3dGtyNmNlNmFIekRISlpLOXBkWlVtUTBi?=
+ =?utf-8?B?SytPdWdkL0l4SVo2clFZMEJYczJmU24vOFRRUnBnNndPczlkeXE4b2UwUWRQ?=
+ =?utf-8?B?czd0NlFuVjQ1dk5yY2p4bWNwdDhxSTdDcmxoQnlIRFozYlQ0eEtrMktlZFQ2?=
+ =?utf-8?B?MUVQb1owVjlaeFI0N0pERWdqWnhaWUNqYVV4MFQzYmtWMWcxUG9rdXpBK3pq?=
+ =?utf-8?B?YTMvYzNXa3dtNTY0SVpaSEp3NEgrSXlBOUFyV3pJY3E1YzNqdWo0bTRycXAy?=
+ =?utf-8?B?YjMxd0kxeGtYTG9EMzgzdEhZWityL3pMMWxYTGpRa2tBS25rV09NZSthNTRx?=
+ =?utf-8?B?alFqNE5pVjVRWWFmQXpCc1gxZE83enRORE1xaVZ2MEJ0bUd5RkdZYVU5MjhD?=
+ =?utf-8?B?Z1U0UjlMWGFkZ0t4Zm5yZ1hRUlhPUlg1dmwvdGtHOVU2ZXB5dTZ0TkRwaGM1?=
+ =?utf-8?B?L2h1dVc1MVgzMEN4TjROcDV6a1U5SjB3Yno2VmJJWVhrMHU5MzduZmhXd0xO?=
+ =?utf-8?B?L2NGOTZoZ3J2aHFJRk5XTUN4enQrZWdYWkNWMk1FaFZwMFVuY3Y4NGNFQUJv?=
+ =?utf-8?B?N2NuQzJxMWtlZDNLWW1vUTR4bTBHN1Z4ajhuRlpSTitsamZCSndON3k1ZFYy?=
+ =?utf-8?B?S24xRFpmZXg3WkdjcG14eFBSS0p2aFlnNGlWSUlHV2ZSOUcwL3lSNlJST2NQ?=
+ =?utf-8?B?L1gvRmp6T0x4SGpvamtFQXhvZ1pwQXJUK2FVSUlWNUc4T2ZtbTRUQXNnVExD?=
+ =?utf-8?B?bnp1SkFZNmRKdUEyY3o3ZklOZCs0MU9lN2pWbEdHSGRLc2pWQ0J5U0x0VFFp?=
+ =?utf-8?B?bDF2djJ1TlZ6RFN5NGlJay84OUxEL2RkOW1WdkN0K1hmODBBbEY4cXUxajhS?=
+ =?utf-8?B?elEwOUEwaXc1c2JLMFVTd1FLYUxZQUlYZElpMzU1RHU4clR0Znp3TkFmT1RE?=
+ =?utf-8?B?ZEl1RGw5ZHZGb04rZWplWVNMTUh0bnArdDFORFNNUVBhVUJ5akJ5ZkxJMjdn?=
+ =?utf-8?B?eWpkZmVncVprcnYwUnQ3NUlla3I2ZDlnV2FmRVBjdnRWdWROOW4xK2kvdG54?=
+ =?utf-8?B?a21LajBXS25mcURrcm9YT2tCTmttUlljN1p4YWFSWlJXQXBadUVYM0I1c1VG?=
+ =?utf-8?B?MW03K0lJMHk4RVhYWE4reDZ3YjBlOEtjTGVpTnE1TmJBTW93TzJOM2JEbU9D?=
+ =?utf-8?B?NHlCWFY2RmsvWnlJQWllRHV5TWdjdlYxWFRNYkxIc0VDZmFONm9Ha2tDNHhG?=
+ =?utf-8?B?MEI3azNOVzUxQm1ZNTJRT2ZtYkM0L3dnL1BMV0VZdExybnRwV1BabS9pMWhF?=
+ =?utf-8?B?U1gvMHRxT1lUWTV1Tnl0TU84L0RZQWFBM0FuUDl3MGprRlFuQXFjSXdFQ2Zu?=
+ =?utf-8?B?M01WK1JhdHRVTmtjSmdlNDlOQ1dKOXFtenVYeHBEbWJtM3NlQjI1N21kS1hi?=
+ =?utf-8?B?MnlIdGd4NTVlakxEV3plbE5DcXZTY3VqWUk2NDJRL3M5TmNJSmZEdDBwTDEw?=
+ =?utf-8?B?Z0IxQzFJWGZSOHR4aktWS1FKNlUydTNGMU1GcmdzVW5tR0ZRRHNId256RlRa?=
+ =?utf-8?B?QTI0VjB6V2ZKV01rY254eFFoODNnbUxuYlFuZXN0eE1ORCtwTE1HbHBFSUJ3?=
+ =?utf-8?B?NEoyYlEvK3UvL0xvZnNXZWU4VTFsc0UwblFSWnozV3loV2FjdXVhV1RPTGM3?=
+ =?utf-8?B?SjAwVUszWWwxY1JiVWVyc0l3R1k5a1NpbzRVZzI4NkE1R3h5QmlacllBMmJW?=
+ =?utf-8?B?SEhQN0psaU1nNStodjhyZ3hTOGQvd3BOb1krVm50Rk0xM0tVbWV3Z3N1eUNl?=
+ =?utf-8?B?Tjd3UmdST1dMc3QvL2U3OEw3WE4zaFNwT0JUOUVxanMvSjVtTnNrdnd5UE9W?=
+ =?utf-8?B?d0liWmpWdlNDYVR1anRiUU1sbUhHWDJGcWdRVk1xZTBvTURITVRuK0NkSkFj?=
+ =?utf-8?B?d3BiNnZzMVBTd3RKMjZqNGU1TjFZVi9jNUJJbUFBV09HZThzek5JUWpaOS9w?=
+ =?utf-8?B?Y1lpOHRWeVZUMDNHMXRyQkJKV1VsYnpNK21MdWduaUg3b2xPb0RjTGxhZG5y?=
+ =?utf-8?B?UmJEbE8yNlNXRDFOM3NoeExhaC9RPT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8DCDEE4DEF46AF4D89C8096190384E36@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20211223141113.1240679-1-Jason@zx2c4.com>
-In-Reply-To: <20211223141113.1240679-1-Jason@zx2c4.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 23 Dec 2021 15:20:16 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGeLUJdxd2OV3VjD0M89_aMT4YQMz+WaHSM0OLR7PxXEw@mail.gmail.com>
-Message-ID: <CAMj1kXGeLUJdxd2OV3VjD0M89_aMT4YQMz+WaHSM0OLR7PxXEw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] lib/crypto: blake2s: include as built-in
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5154.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1cf516ad-21df-4561-80a1-08d9c6247091
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Dec 2021 14:56:45.5748
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: fgLmJHD33WNm3V6skrfJYqCHzp8TfWwbck4WlfCpekE4Q8KbvfuG8YptptExXhiuyI2Vrt4aiHdC6CSVarO85LjkfyGUXuJx03xa3Oha2cE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4571
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 23 Dec 2021 at 15:11, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> In preparation for using blake2s in the RNG, we change the way that it
-> is wired-in to the build system. Instead of kconfig mazes and ifdefs, we
-> use weak symbols, so that an arch version can override the generic
-> version. Then we include the generic version in lib-y, so that it can be
-> removed from the image if the arch version doesn't fallback to it (as is
-> the case on arm though not x86). The result should be a bit simpler and
-> smaller than the code it replaces.
->
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
-> Herbert - I intend to take this via the crng/random.git tree, since it
-> forms a dependency and I'd like to send a pull early in 5.17 cycle.
->
->  Makefile                          |  2 +-
->  arch/arm/crypto/Kconfig           |  3 +--
->  arch/arm/crypto/blake2s-core.S    |  8 ++++----
->  arch/arm/crypto/blake2s-glue.c    |  6 +++---
->  arch/s390/configs/debug_defconfig |  1 -
->  arch/s390/configs/defconfig       |  1 -
-
-You can drop these two hunks - not worth the risk of a conflict with
-the S390 tree.
-
-Other than that,
-
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-
->  arch/x86/crypto/blake2s-glue.c    | 11 +++++------
->  crypto/Kconfig                    |  5 +----
->  drivers/net/Kconfig               |  1 -
->  include/crypto/internal/blake2s.h |  6 +++---
->  lib/Makefile                      |  2 +-
->  lib/crypto/Kconfig                | 25 -------------------------
->  lib/crypto/Makefile               |  7 +++----
->  lib/crypto/blake2s-generic.c      |  6 +++++-
->  lib/crypto/blake2s.c              |  6 ------
->  15 files changed, 27 insertions(+), 63 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index d85f1ff79f5c..892ea632ea63 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -668,7 +668,7 @@ drivers-y   := drivers/ sound/
->  drivers-$(CONFIG_SAMPLES) += samples/
->  drivers-$(CONFIG_NET) += net/
->  drivers-y      += virt/
-> -libs-y         := lib/
-> +libs-y         := lib/ lib/crypto/
->  endif # KBUILD_EXTMOD
->
->  # The all: target is the default when no target is given on the
-> diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-> index 2b575792363e..47cb22645746 100644
-> --- a/arch/arm/crypto/Kconfig
-> +++ b/arch/arm/crypto/Kconfig
-> @@ -63,8 +63,7 @@ config CRYPTO_SHA512_ARM
->           using optimized ARM assembler and NEON, when available.
->
->  config CRYPTO_BLAKE2S_ARM
-> -       tristate "BLAKE2s digest algorithm (ARM)"
-> -       select CRYPTO_ARCH_HAVE_LIB_BLAKE2S
-> +       bool "BLAKE2s digest algorithm (ARM)"
->         help
->           BLAKE2s digest algorithm optimized with ARM scalar instructions.  This
->           is faster than the generic implementations of BLAKE2s and BLAKE2b, but
-> diff --git a/arch/arm/crypto/blake2s-core.S b/arch/arm/crypto/blake2s-core.S
-> index 86345751bbf3..df40e46601f1 100644
-> --- a/arch/arm/crypto/blake2s-core.S
-> +++ b/arch/arm/crypto/blake2s-core.S
-> @@ -167,8 +167,8 @@
->  .endm
->
->  //
-> -// void blake2s_compress_arch(struct blake2s_state *state,
-> -//                           const u8 *block, size_t nblocks, u32 inc);
-> +// void blake2s_compress(struct blake2s_state *state,
-> +//                      const u8 *block, size_t nblocks, u32 inc);
->  //
->  // Only the first three fields of struct blake2s_state are used:
->  //     u32 h[8];       (inout)
-> @@ -176,7 +176,7 @@
->  //     u32 f[2];       (in)
->  //
->         .align          5
-> -ENTRY(blake2s_compress_arch)
-> +ENTRY(blake2s_compress)
->         push            {r0-r2,r4-r11,lr}       // keep this an even number
->
->  .Lnext_block:
-> @@ -303,4 +303,4 @@ ENTRY(blake2s_compress_arch)
->         str             r3, [r12], #4
->         bne             1b
->         b               .Lcopy_block_done
-> -ENDPROC(blake2s_compress_arch)
-> +ENDPROC(blake2s_compress)
-> diff --git a/arch/arm/crypto/blake2s-glue.c b/arch/arm/crypto/blake2s-glue.c
-> index f2cc1e5fc9ec..09d3a0cabd2c 100644
-> --- a/arch/arm/crypto/blake2s-glue.c
-> +++ b/arch/arm/crypto/blake2s-glue.c
-> @@ -11,17 +11,17 @@
->  #include <linux/module.h>
->
->  /* defined in blake2s-core.S */
-> -EXPORT_SYMBOL(blake2s_compress_arch);
-> +EXPORT_SYMBOL(blake2s_compress);
->
->  static int crypto_blake2s_update_arm(struct shash_desc *desc,
->                                      const u8 *in, unsigned int inlen)
->  {
-> -       return crypto_blake2s_update(desc, in, inlen, blake2s_compress_arch);
-> +       return crypto_blake2s_update(desc, in, inlen, blake2s_compress);
->  }
->
->  static int crypto_blake2s_final_arm(struct shash_desc *desc, u8 *out)
->  {
-> -       return crypto_blake2s_final(desc, out, blake2s_compress_arch);
-> +       return crypto_blake2s_final(desc, out, blake2s_compress);
->  }
->
->  #define BLAKE2S_ALG(name, driver_name, digest_size)                    \
-> diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
-> index e45cc27716de..caa3d1d6a0e8 100644
-> --- a/arch/s390/configs/debug_defconfig
-> +++ b/arch/s390/configs/debug_defconfig
-> @@ -757,7 +757,6 @@ CONFIG_CRYPTO_USER_API_SKCIPHER=m
->  CONFIG_CRYPTO_USER_API_RNG=m
->  CONFIG_CRYPTO_USER_API_AEAD=m
->  CONFIG_CRYPTO_STATS=y
-> -CONFIG_CRYPTO_LIB_BLAKE2S=m
->  CONFIG_CRYPTO_LIB_CURVE25519=m
->  CONFIG_CRYPTO_LIB_CHACHA20POLY1305=m
->  CONFIG_ZCRYPT=m
-> diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
-> index 1c750bfca2d8..fffc6af5358c 100644
-> --- a/arch/s390/configs/defconfig
-> +++ b/arch/s390/configs/defconfig
-> @@ -744,7 +744,6 @@ CONFIG_CRYPTO_USER_API_SKCIPHER=m
->  CONFIG_CRYPTO_USER_API_RNG=m
->  CONFIG_CRYPTO_USER_API_AEAD=m
->  CONFIG_CRYPTO_STATS=y
-> -CONFIG_CRYPTO_LIB_BLAKE2S=m
->  CONFIG_CRYPTO_LIB_CURVE25519=m
->  CONFIG_CRYPTO_LIB_CHACHA20POLY1305=m
->  CONFIG_ZCRYPT=m
-> diff --git a/arch/x86/crypto/blake2s-glue.c b/arch/x86/crypto/blake2s-glue.c
-> index a40365ab301e..ef91a3167d27 100644
-> --- a/arch/x86/crypto/blake2s-glue.c
-> +++ b/arch/x86/crypto/blake2s-glue.c
-> @@ -28,9 +28,8 @@ asmlinkage void blake2s_compress_avx512(struct blake2s_state *state,
->  static __ro_after_init DEFINE_STATIC_KEY_FALSE(blake2s_use_ssse3);
->  static __ro_after_init DEFINE_STATIC_KEY_FALSE(blake2s_use_avx512);
->
-> -void blake2s_compress_arch(struct blake2s_state *state,
-> -                          const u8 *block, size_t nblocks,
-> -                          const u32 inc)
-> +void blake2s_compress(struct blake2s_state *state, const u8 *block,
-> +                     size_t nblocks, const u32 inc)
->  {
->         /* SIMD disables preemption, so relax after processing each page. */
->         BUILD_BUG_ON(SZ_4K / BLAKE2S_BLOCK_SIZE < 8);
-> @@ -56,17 +55,17 @@ void blake2s_compress_arch(struct blake2s_state *state,
->                 block += blocks * BLAKE2S_BLOCK_SIZE;
->         } while (nblocks);
->  }
-> -EXPORT_SYMBOL(blake2s_compress_arch);
-> +EXPORT_SYMBOL(blake2s_compress);
->
->  static int crypto_blake2s_update_x86(struct shash_desc *desc,
->                                      const u8 *in, unsigned int inlen)
->  {
-> -       return crypto_blake2s_update(desc, in, inlen, blake2s_compress_arch);
-> +       return crypto_blake2s_update(desc, in, inlen, blake2s_compress);
->  }
->
->  static int crypto_blake2s_final_x86(struct shash_desc *desc, u8 *out)
->  {
-> -       return crypto_blake2s_final(desc, out, blake2s_compress_arch);
-> +       return crypto_blake2s_final(desc, out, blake2s_compress);
->  }
->
->  #define BLAKE2S_ALG(name, driver_name, digest_size)                    \
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 285f82647d2b..bfda2c82774d 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -685,7 +685,6 @@ config CRYPTO_BLAKE2B
->
->  config CRYPTO_BLAKE2S
->         tristate "BLAKE2s digest algorithm"
-> -       select CRYPTO_LIB_BLAKE2S_GENERIC
->         select CRYPTO_HASH
->         help
->           Implementation of cryptographic hash function BLAKE2s
-> @@ -702,10 +701,8 @@ config CRYPTO_BLAKE2S
->           See https://blake2.net for further information.
->
->  config CRYPTO_BLAKE2S_X86
-> -       tristate "BLAKE2s digest algorithm (x86 accelerated version)"
-> +       bool "BLAKE2s digest algorithm (x86 accelerated version)"
->         depends on X86 && 64BIT
-> -       select CRYPTO_LIB_BLAKE2S_GENERIC
-> -       select CRYPTO_ARCH_HAVE_LIB_BLAKE2S
->
->  config CRYPTO_CRCT10DIF
->         tristate "CRCT10DIF algorithm"
-> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-> index 6cccc3dc00bc..b2a4f998c180 100644
-> --- a/drivers/net/Kconfig
-> +++ b/drivers/net/Kconfig
-> @@ -81,7 +81,6 @@ config WIREGUARD
->         select CRYPTO
->         select CRYPTO_LIB_CURVE25519
->         select CRYPTO_LIB_CHACHA20POLY1305
-> -       select CRYPTO_LIB_BLAKE2S
->         select CRYPTO_CHACHA20_X86_64 if X86 && 64BIT
->         select CRYPTO_POLY1305_X86_64 if X86 && 64BIT
->         select CRYPTO_BLAKE2S_X86 if X86 && 64BIT
-> diff --git a/include/crypto/internal/blake2s.h b/include/crypto/internal/blake2s.h
-> index 8e50d487500f..d39cfa0d333e 100644
-> --- a/include/crypto/internal/blake2s.h
-> +++ b/include/crypto/internal/blake2s.h
-> @@ -11,11 +11,11 @@
->  #include <crypto/internal/hash.h>
->  #include <linux/string.h>
->
-> -void blake2s_compress_generic(struct blake2s_state *state,const u8 *block,
-> +void blake2s_compress_generic(struct blake2s_state *state, const u8 *block,
->                               size_t nblocks, const u32 inc);
->
-> -void blake2s_compress_arch(struct blake2s_state *state,const u8 *block,
-> -                          size_t nblocks, const u32 inc);
-> +void blake2s_compress(struct blake2s_state *state, const u8 *block,
-> +                     size_t nblocks, const u32 inc);
->
->  bool blake2s_selftest(void);
->
-> diff --git a/lib/Makefile b/lib/Makefile
-> index 364c23f15578..bb57b2e466fa 100644
-> --- a/lib/Makefile
-> +++ b/lib/Makefile
-> @@ -139,7 +139,7 @@ endif
->  obj-$(CONFIG_DEBUG_INFO_REDUCED) += debug_info.o
->  CFLAGS_debug_info.o += $(call cc-option, -femit-struct-debug-detailed=any)
->
-> -obj-y += math/ crypto/
-> +obj-y += math/
->
->  obj-$(CONFIG_GENERIC_IOMAP) += iomap.o
->  obj-$(CONFIG_GENERIC_PCI_IOMAP) += pci_iomap.o
-> diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-> index 545ccbddf6a1..31c6e2be3b84 100644
-> --- a/lib/crypto/Kconfig
-> +++ b/lib/crypto/Kconfig
-> @@ -8,31 +8,6 @@ config CRYPTO_LIB_AES
->  config CRYPTO_LIB_ARC4
->         tristate
->
-> -config CRYPTO_ARCH_HAVE_LIB_BLAKE2S
-> -       tristate
-> -       help
-> -         Declares whether the architecture provides an arch-specific
-> -         accelerated implementation of the Blake2s library interface,
-> -         either builtin or as a module.
-> -
-> -config CRYPTO_LIB_BLAKE2S_GENERIC
-> -       tristate
-> -       help
-> -         This symbol can be depended upon by arch implementations of the
-> -         Blake2s library interface that require the generic code as a
-> -         fallback, e.g., for SIMD implementations. If no arch specific
-> -         implementation is enabled, this implementation serves the users
-> -         of CRYPTO_LIB_BLAKE2S.
-> -
-> -config CRYPTO_LIB_BLAKE2S
-> -       tristate "BLAKE2s hash function library"
-> -       depends on CRYPTO_ARCH_HAVE_LIB_BLAKE2S || !CRYPTO_ARCH_HAVE_LIB_BLAKE2S
-> -       select CRYPTO_LIB_BLAKE2S_GENERIC if CRYPTO_ARCH_HAVE_LIB_BLAKE2S=n
-> -       help
-> -         Enable the Blake2s library interface. This interface may be fulfilled
-> -         by either the generic implementation or an arch-specific one, if one
-> -         is available and enabled.
-> -
->  config CRYPTO_ARCH_HAVE_LIB_CHACHA
->         tristate
->         help
-> diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-> index 73205ed269ba..42e1d932c077 100644
-> --- a/lib/crypto/Makefile
-> +++ b/lib/crypto/Makefile
-> @@ -10,10 +10,9 @@ libaes-y                                     := aes.o
->  obj-$(CONFIG_CRYPTO_LIB_ARC4)                  += libarc4.o
->  libarc4-y                                      := arc4.o
->
-> -obj-$(CONFIG_CRYPTO_LIB_BLAKE2S_GENERIC)       += libblake2s-generic.o
-> -libblake2s-generic-y                           += blake2s-generic.o
-> -
-> -obj-$(CONFIG_CRYPTO_LIB_BLAKE2S)               += libblake2s.o
-> +# blake2s is used by the /dev/random driver which is always builtin
-> +lib-y                                          += blake2s-generic.o
-> +obj-y                                          += libblake2s.o
->  libblake2s-y                                   += blake2s.o
->
->  obj-$(CONFIG_CRYPTO_LIB_CHACHA20POLY1305)      += libchacha20poly1305.o
-> diff --git a/lib/crypto/blake2s-generic.c b/lib/crypto/blake2s-generic.c
-> index 04ff8df24513..75ccb3e633e6 100644
-> --- a/lib/crypto/blake2s-generic.c
-> +++ b/lib/crypto/blake2s-generic.c
-> @@ -37,7 +37,11 @@ static inline void blake2s_increment_counter(struct blake2s_state *state,
->         state->t[1] += (state->t[0] < inc);
->  }
->
-> -void blake2s_compress_generic(struct blake2s_state *state,const u8 *block,
-> +void blake2s_compress(struct blake2s_state *state, const u8 *block,
-> +                     size_t nblocks, const u32 inc)
-> +                     __weak __alias(blake2s_compress_generic);
-> +
-> +void blake2s_compress_generic(struct blake2s_state *state, const u8 *block,
->                               size_t nblocks, const u32 inc)
->  {
->         u32 m[16];
-> diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
-> index 4055aa593ec4..93f2ae051370 100644
-> --- a/lib/crypto/blake2s.c
-> +++ b/lib/crypto/blake2s.c
-> @@ -16,12 +16,6 @@
->  #include <linux/init.h>
->  #include <linux/bug.h>
->
-> -#if IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_BLAKE2S)
-> -#  define blake2s_compress blake2s_compress_arch
-> -#else
-> -#  define blake2s_compress blake2s_compress_generic
-> -#endif
-> -
->  void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen)
->  {
->         __blake2s_update(state, in, inlen, blake2s_compress);
-> --
-> 2.34.1
->
+T24gMTcvMTIvMjAyMSAxNTowOSwgS3J6eXN6dG9mIEtvemxvd3NraSB3cm90ZToNCj4gRVhURVJO
+QUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5
+b3Uga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+IA0KPiBPbiAxNy8xMi8yMDIxIDEwOjMzLCBj
+b25vci5kb29sZXlAbWljcm9jaGlwLmNvbSB3cm90ZToNCj4+IEZyb206IENvbm9yIERvb2xleSA8
+Y29ub3IuZG9vbGV5QG1pY3JvY2hpcC5jb20+DQo+Pg0KPj4gVXBkYXRlIHRoZSBSSVNDLVYvTWlj
+cm9jaGlwIGVudHJ5IGJ5IGFkZGluZyB0aGUgbWljcm9jaGlwIGR0cw0KPj4gZGlyZWN0b3J5IGFu
+ZCBteXNlbGYgYXMgbWFpbnRhaW5lcg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IENvbm9yIERvb2xl
+eSA8Y29ub3IuZG9vbGV5QG1pY3JvY2hpcC5jb20+DQo+PiAtLS0NCj4+ICAgTUFJTlRBSU5FUlMg
+fCAyICsrDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZm
+IC0tZ2l0IGEvTUFJTlRBSU5FUlMgYi9NQUlOVEFJTkVSUw0KPj4gaW5kZXggN2EyMzQ1Y2U4NTIx
+Li4zYjFkNmJlN2JkNTYgMTAwNjQ0DQo+PiAtLS0gYS9NQUlOVEFJTkVSUw0KPj4gKysrIGIvTUFJ
+TlRBSU5FUlMNCj4+IEBAIC0xNjM0OCw4ICsxNjM0OCwxMCBAQCBLOiAgIHJpc2N2DQo+Pg0KPj4g
+ICBSSVNDLVYvTUlDUk9DSElQIFBPTEFSRklSRSBTT0MgU1VQUE9SVA0KPj4gICBNOiAgIExld2lz
+IEhhbmx5IDxsZXdpcy5oYW5seUBtaWNyb2NoaXAuY29tPg0KPj4gK006ICAgQ29ub3IgRG9vbGV5
+IDxjb25vci5kb29sZXlAbWljcm9jaGlwLmNvbT4NCj4+ICAgTDogICBsaW51eC1yaXNjdkBsaXN0
+cy5pbmZyYWRlYWQub3JnDQo+PiAgIFM6ICAgU3VwcG9ydGVkDQo+PiArRjogICBhcmNoL3Jpc2N2
+L2Jvb3QvZHRzL21pY3JvY2hpcC8NCj4+ICAgRjogICBkcml2ZXJzL21haWxib3gvbWFpbGJveC1t
+cGZzLmMNCj4+ICAgRjogICBkcml2ZXJzL3NvYy9taWNyb2NoaXAvDQo+PiAgIEY6ICAgaW5jbHVk
+ZS9zb2MvbWljcm9jaGlwL21wZnMuaA0KPj4NCj4gDQo+IEdvb2QgdG8gaGF2ZSB0aGUgRFRTIGNv
+dmVyZWQsIHNvIEZXSVc6DQo+IEFja2VkLWJ5OiBLcnp5c3p0b2YgS296bG93c2tpIDxrcnp5c3p0
+b2Yua296bG93c2tpQGNhbm9uaWNhbC5jb20+DQo+IA0KPiBZb3Ugc3RpbGwgc2hvdWxkIGdldCBM
+ZXdpcycgYWNrICh1bmxlc3MgaGUgbWVyZ2VzIGl0KQ0KQXllLCBpdCdsbCBiZSBhbiBhY2suIFdl
+IGRvbid0IGN1cnJlbnRseSBoYXZlIGEgdHJlZSAmIHdvdWxkIHJhdGhlciBkbyANCnRoaXMgdmlh
+IHJpc2MtdiB0aGFuIHRoZSBhdDkxL3NhbSBhcm0gc29jIHRyZWUuDQo+IA0KPiBCZXN0IHJlZ2Fy
+ZHMsDQo+IEtyenlzenRvZg0KPiANCg0K
