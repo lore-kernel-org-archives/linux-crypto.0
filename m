@@ -2,101 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6397EC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Dec 2021 02:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C4EC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Dec 2021 02:59:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345716AbhLWCQQ (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Dec 2021 21:16:16 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:15967 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229788AbhLWCQQ (ORCPT
+        id S242024AbhLWC7Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Dec 2021 21:59:25 -0500
+Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:37775 "EHLO
+        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231389AbhLWC7Z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Dec 2021 21:16:16 -0500
-Received: from dggpeml500021.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JKDHh6hNNzZdns;
-        Thu, 23 Dec 2021 10:13:04 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500021.china.huawei.com (7.185.36.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Thu, 23 Dec 2021 10:16:14 +0800
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Thu, 23 Dec 2021 10:16:14 +0800
-Subject: Re: [PATCH] crypto: hisilicon/qm - cleanup warning in qm_vf_read_qos
-To:     Andy Shevchenko <andy.shevchenko@gmail.com>
-References: <20211222020811.26292-1-yekai13@huawei.com>
- <CAHp75VfoxrEjV+M3kSECo2gLReZsnkPcNsGdPNYHhaJCfQxqCg@mail.gmail.com>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "wangzhou1@hisilicon.com" <wangzhou1@hisilicon.com>
-From:   "yekai(A)" <yekai13@huawei.com>
-Message-ID: <0915e7b7-05e7-6e96-60e8-2a3113cf337a@huawei.com>
-Date:   Thu, 23 Dec 2021 10:16:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Wed, 22 Dec 2021 21:59:25 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0V.Thv79_1640228358;
+Received: from 30.240.100.46(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V.Thv79_1640228358)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 23 Dec 2021 10:59:20 +0800
+Message-ID: <83ab2a55-d31e-acb8-3cae-9c2d06f08f6c@linux.alibaba.com>
+Date:   Thu, 23 Dec 2021 10:59:18 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAHp75VfoxrEjV+M3kSECo2gLReZsnkPcNsGdPNYHhaJCfQxqCg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Subject: Re: [PATCH 1/5] crypto: sha256 - remove duplicate generic hash init
+ function
+Content-Language: en-US
+To:     Julian Calaby <julian.calaby@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linux-crypto@vger.kernel.org, linux-mips@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        linuxppc-dev@lists.ozlabs.org,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        sparclinux <sparclinux@vger.kernel.org>
+References: <20211220092318.5793-1-tianjia.zhang@linux.alibaba.com>
+ <20211220092318.5793-2-tianjia.zhang@linux.alibaba.com>
+ <CAGRGNgXE_5H20K+e9oejqybOGh8JezMpi2yrDJKqaZ4rWJkZdA@mail.gmail.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <CAGRGNgXE_5H20K+e9oejqybOGh8JezMpi2yrDJKqaZ4rWJkZdA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Julian,
 
+On 12/23/21 6:35 AM, Julian Calaby wrote:
+> Hi Tianjia,
+> 
+> On Mon, Dec 20, 2021 at 8:25 PM Tianjia Zhang
+> <tianjia.zhang@linux.alibaba.com> wrote:
+>>
+>> crypto_sha256_init() and sha256_base_init() are the same repeated
+>> implementations, remove the crypto_sha256_init() in generic
+>> implementation, sha224 is the same process.
+>>
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>> ---
+>>   crypto/sha256_generic.c | 16 ++--------------
+>>   1 file changed, 2 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
+>> index 3b377197236e..bf147b01e313 100644
+>> --- a/crypto/sha256_generic.c
+>> +++ b/crypto/sha256_generic.c
+>> @@ -72,7 +60,7 @@ EXPORT_SYMBOL(crypto_sha256_finup);
+>>
+>>   static struct shash_alg sha256_algs[2] = { {
+>>          .digestsize     =       SHA256_DIGEST_SIZE,
+>> -       .init           =       crypto_sha256_init,
+>> +       .init           =       sha256_base_init,
+>>          .update         =       crypto_sha256_update,
+>>          .final          =       crypto_sha256_final,
+>>          .finup          =       crypto_sha256_finup,
+>> @@ -86,7 +74,7 @@ static struct shash_alg sha256_algs[2] = { {
+>>          }
+>>   }, {
+>>          .digestsize     =       SHA224_DIGEST_SIZE,
+>> -       .init           =       crypto_sha224_init,
+>> +       .init           =       sha224_base_init,
+>>          .update         =       crypto_sha256_update,
+>>          .final          =       crypto_sha256_final,
+>>          .finup          =       crypto_sha256_finup,
+> 
+> Aren't these two functions defined as static inline functions? It
+> appears that these crypto_ wrappers were added so there's "actual"
+> referenceable functions for these structs.
+> 
+> Did this actually compile?
+> 
+> Thanks,
+> 
 
-On 2021/12/23 9:51, Andy Shevchenko wrote:
->
->
-> On Wednesday, December 22, 2021, Kai Ye <yekai13@huawei.com
-> <mailto:yekai13@huawei.com>> wrote:
->
->     The kernel test rebot report this warning: Uninitialized variable: ret.
->     Here is fix it.
->
->
-> How do you know that 0 is the correct value?
->
->
->
->     Signed-off-by: Kai Ye <yekai13@huawei.com <mailto:yekai13@huawei.com>>
->     ---
->      drivers/crypto/hisilicon/qm.c | 3 +--
->      1 file changed, 1 insertion(+), 2 deletions(-)
->
->     diff --git a/drivers/crypto/hisilicon/qm.c
->     b/drivers/crypto/hisilicon/qm.c
->     index b1fe9c7b8cc8..c6e9ad2041c3 100644
->     --- a/drivers/crypto/hisilicon/qm.c
->     +++ b/drivers/crypto/hisilicon/qm.c
->     @@ -4279,8 +4279,7 @@ static void qm_vf_get_qos(struct hisi_qm *qm,
->     u32 fun_num)
->
->      static int qm_vf_read_qos(struct hisi_qm *qm)
->      {
->     -       int cnt = 0;
->     -       int ret;
->     +       int cnt = 0, ret = 0;
->
->             /* reset mailbox qos val */
->             qm->mb_qos = 0;
->     --
->     2.33.0
->
->
->
-> --
-> With Best Regards,
-> Andy Shevchenko
->
->
-we set the 0 to success in kernel style.
+Judging from the compilation results, there is really no difference, but 
+the modification made by this patch is still necessary, because 
+crypto_sha256_init() wrapper and sha256_base_init() are two completely 
+duplicate functions.
 
-thanks
-Kai
+Best regards,
+Tianjia
