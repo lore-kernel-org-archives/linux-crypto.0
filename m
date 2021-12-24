@@ -2,88 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41BF4C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Dec 2021 13:35:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D37AC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Dec 2021 17:42:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237382AbhLXNfd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Dec 2021 08:35:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40052 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234576AbhLXNfc (ORCPT
+        id S1343848AbhLXRmo (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Dec 2021 12:42:44 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:42674 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232195AbhLXRmo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Dec 2021 08:35:32 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97489C061401;
-        Fri, 24 Dec 2021 05:35:31 -0800 (PST)
+        Fri, 24 Dec 2021 12:42:44 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 628A46206B;
-        Fri, 24 Dec 2021 13:35:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F333CC36AE5;
-        Fri, 24 Dec 2021 13:35:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1640352930;
-        bh=C0Ei2STE2Eswy4QsYT97mZyVXgT9au/IrEwQygw0g4Q=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=a+0mBKZhgOVLSuIvKb4xawquloUPrnJnIL1kyUMPmVeEV38pg0hFMGy7DsuRkduZA
-         Ug9fjSc3CrXmZK6ow7w96yxKDwJyAPLk/K/gp3i7OkQTIBhWuY4FYGnenc5pJeooXb
-         xZmHEbjClzkw9jdtvzD1SUwUhtIjr6F9/KIm30Nk=
-Date:   Fri, 24 Dec 2021 14:35:16 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, tytso@mit.edu,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] lib/crypto: blake2s: include as built-in
-Message-ID: <YcXMlPc0Fs55cdsB@kroah.com>
-References: <20211223141113.1240679-1-Jason@zx2c4.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A1BF4620D3;
+        Fri, 24 Dec 2021 17:42:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A9BBC36AE8;
+        Fri, 24 Dec 2021 17:42:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1640367763;
+        bh=g6XVpxzQARxtHmP/1T2ky85FNUldvcDQeWuopHo5gtY=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=W3iorgEaeUxfCvixYCZoOeLSKYSGKUE3OViD3MkCb8lfGSfH6RmPaSxtp+iTngyf2
+         xRwST8EF5iRhTLJ3Cmpwd3/Ei1h7XybzTvX1pqIvd598Rei5WFHSzC0Y6o+U3q6a7d
+         30u408fOF2MapmslmcJhJZImCxBNupady20q2FBZEMa+P7MmWg8IemfeKrcg/2JS1h
+         VOGhuD55muNSHOAVRSdNk8JbWCZ43KAdq/qll4ptvQh4U33Jojrofl5wvHNjghla0g
+         gIEvFs4Zcyl6cb7/n/wHzlakK21FleljJjzf00s8d/M2oce2mXinK81qSdkKzzlIKV
+         MdEbwcU/u87DA==
+Message-ID: <75ec3ad1-6234-ae1f-1b83-482793e4fd23@kernel.org>
+Date:   Fri, 24 Dec 2021 09:42:39 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211223141113.1240679-1-Jason@zx2c4.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH v4 11/13] crypto: x86/aes-kl - Support AES algorithm using
+ Key Locker instructions
+Content-Language: en-US
+To:     "Chang S. Bae" <chang.seok.bae@intel.com>, tglx@linutronix.de,
+        bp@suse.de, dave.hansen@linux.intel.com, mingo@kernel.org,
+        x86@kernel.org, herbert@gondor.apana.org.au
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        ebiggers@kernel.org, dan.j.williams@intel.com,
+        charishma1.gairuboyina@intel.com, kumar.n.dwarakanath@intel.com,
+        lalithambika.krishnakumar@intel.com, ravi.v.shankar@intel.com
+References: <20211214005212.20588-1-chang.seok.bae@intel.com>
+ <20211214005212.20588-12-chang.seok.bae@intel.com>
+From:   Andy Lutomirski <luto@kernel.org>
+In-Reply-To: <20211214005212.20588-12-chang.seok.bae@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 23, 2021 at 03:11:12PM +0100, Jason A. Donenfeld wrote:
-> In preparation for using blake2s in the RNG, we change the way that it
-> is wired-in to the build system. Instead of kconfig mazes and ifdefs, we
-> use weak symbols, so that an arch version can override the generic
-> version. Then we include the generic version in lib-y, so that it can be
-> removed from the image if the arch version doesn't fallback to it (as is
-> the case on arm though not x86). The result should be a bit simpler and
-> smaller than the code it replaces.
+On 12/13/21 16:52, Chang S. Bae wrote:
+> Key Locker is a CPU feature to reduce key exfiltration opportunities while
+> maintaining a programming interface similar to AES-NI. It converts the AES
+> key into an encoded form, called the 'key handle'.
 > 
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
-> Herbert - I intend to take this via the crng/random.git tree, since it
-> forms a dependency and I'd like to send a pull early in 5.17 cycle.
+> The key handle is a wrapped version of the clear-text key where the
+> wrapping key has limited exposure. Once converted via setkey(), all
+> subsequent data encryption using new AES instructions ('AES-KL') uses this
+> key handle, reducing the exposure of private key material in memory.
 > 
->  Makefile                          |  2 +-
->  arch/arm/crypto/Kconfig           |  3 +--
->  arch/arm/crypto/blake2s-core.S    |  8 ++++----
->  arch/arm/crypto/blake2s-glue.c    |  6 +++---
->  arch/s390/configs/debug_defconfig |  1 -
->  arch/s390/configs/defconfig       |  1 -
->  arch/x86/crypto/blake2s-glue.c    | 11 +++++------
->  crypto/Kconfig                    |  5 +----
->  drivers/net/Kconfig               |  1 -
->  include/crypto/internal/blake2s.h |  6 +++---
->  lib/Makefile                      |  2 +-
->  lib/crypto/Kconfig                | 25 -------------------------
->  lib/crypto/Makefile               |  7 +++----
->  lib/crypto/blake2s-generic.c      |  6 +++++-
->  lib/crypto/blake2s.c              |  6 ------
->  15 files changed, 27 insertions(+), 63 deletions(-)
+> AES-KL is analogous to that of AES-NI. Most assembly code is translated
+> from the AES-NI code. They are operational in both 32-bit and 64-bit modes
+> like AES-NI. However, users need to be aware of the following differences:
+> 
+> == Key Handle ==
+> 
+> AES-KL may fail with an invalid key handle. It could be corrupted or fail
+> with handle restriction. A key handle may be encoded with some
+> restrictions. The implementation restricts every handle only available
+> in kernel mode via setkey().
+> 
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+I find it a bit bizarre that this tries to be a drop-in replacement for 
+normal AES.  Is this actually what we want, or do we want users to opt 
+in to the KL implementation?
+
+It seems like it might make more sense for tools like cryptsetup (or 
+dm-crypt -- the actual layer is subject to some degree of debate) to 
+explicitly create a key handle and then ask the kernel to use that key 
+handle, not for the kernel to do this by magic.
+
+What happens when someone applies your patches and runs dmsetup table 
+--showkeys?
+
+Why should the use of keylocker be part of the luksFormat operation? 
+Surely a non-KL machine should still be able to decrypt a nominally 
+KL-using volume in a pinch, for recovery purposes if nothing else.
+
+--Andy
