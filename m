@@ -2,77 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B11EC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Dec 2021 13:00:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41BF4C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Dec 2021 13:35:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352704AbhLXNAa (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Dec 2021 08:00:30 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:46404 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233233AbhLXNA3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Dec 2021 08:00:29 -0500
-Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        id S237382AbhLXNfd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Dec 2021 08:35:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40052 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234576AbhLXNfc (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Dec 2021 08:35:32 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97489C061401;
+        Fri, 24 Dec 2021 05:35:31 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 56CEA1EC047C;
-        Fri, 24 Dec 2021 14:00:24 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1640350824;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=UKOFa0PxUyKifdsyahgVU6kEgN7R2vRwQhsIcjDbUk0=;
-        b=pniIqrjJ009jKE7RX25IZ5GrgiczuILp2EgHVfXfBepqeS7ljdUYS5RgyEaIesal4SMPub
-        567sYYoskMPSjcfSBnxOVEztiWoUndQRv5zNqwDZAD4SL/9sPrtEjAhUXCZfUlO76i7Od2
-        sTP2RMVsYZG/pa1O2NRXsnemImhAzPQ=
-Date:   Fri, 24 Dec 2021 14:00:26 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 628A46206B;
+        Fri, 24 Dec 2021 13:35:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F333CC36AE5;
+        Fri, 24 Dec 2021 13:35:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1640352930;
+        bh=C0Ei2STE2Eswy4QsYT97mZyVXgT9au/IrEwQygw0g4Q=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=a+0mBKZhgOVLSuIvKb4xawquloUPrnJnIL1kyUMPmVeEV38pg0hFMGy7DsuRkduZA
+         Ug9fjSc3CrXmZK6ow7w96yxKDwJyAPLk/K/gp3i7OkQTIBhWuY4FYGnenc5pJeooXb
+         xZmHEbjClzkw9jdtvzD1SUwUhtIjr6F9/KIm30Nk=
+Date:   Fri, 24 Dec 2021 14:35:16 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, tytso@mit.edu,
         Ard Biesheuvel <ardb@kernel.org>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
-        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/6] Introduce x86 assembly accelerated implementation
- for SM3 algorithm
-Message-ID: <YcXEaldvjULKAvhc@zn.tnic>
-References: <20211223043547.32297-1-tianjia.zhang@linux.alibaba.com>
- <YcRPYHg3SMezrfiX@zn.tnic>
- <ed4ec4f9-9ede-8718-811c-8eae92c220bb@linux.alibaba.com>
+        Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kbuild@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] lib/crypto: blake2s: include as built-in
+Message-ID: <YcXMlPc0Fs55cdsB@kroah.com>
+References: <20211223141113.1240679-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ed4ec4f9-9ede-8718-811c-8eae92c220bb@linux.alibaba.com>
+In-Reply-To: <20211223141113.1240679-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 24, 2021 at 06:01:44PM +0800, Tianjia Zhang wrote:
-> I'm sorry for the trouble to the community and reviews. Thanks for your
-> reminder. I will control the time interval when sending patches in the
-> future.
+On Thu, Dec 23, 2021 at 03:11:12PM +0100, Jason A. Donenfeld wrote:
+> In preparation for using blake2s in the RNG, we change the way that it
+> is wired-in to the build system. Instead of kconfig mazes and ifdefs, we
+> use weak symbols, so that an arch version can override the generic
+> version. Then we include the generic version in lib-y, so that it can be
+> removed from the image if the arch version doesn't fallback to it (as is
+> the case on arm though not x86). The result should be a bit simpler and
+> smaller than the code it replaces.
+> 
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: Masahiro Yamada <masahiroy@kernel.org>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Herbert - I intend to take this via the crng/random.git tree, since it
+> forms a dependency and I'd like to send a pull early in 5.17 cycle.
+> 
+>  Makefile                          |  2 +-
+>  arch/arm/crypto/Kconfig           |  3 +--
+>  arch/arm/crypto/blake2s-core.S    |  8 ++++----
+>  arch/arm/crypto/blake2s-glue.c    |  6 +++---
+>  arch/s390/configs/debug_defconfig |  1 -
+>  arch/s390/configs/defconfig       |  1 -
+>  arch/x86/crypto/blake2s-glue.c    | 11 +++++------
+>  crypto/Kconfig                    |  5 +----
+>  drivers/net/Kconfig               |  1 -
+>  include/crypto/internal/blake2s.h |  6 +++---
+>  lib/Makefile                      |  2 +-
+>  lib/crypto/Kconfig                | 25 -------------------------
+>  lib/crypto/Makefile               |  7 +++----
+>  lib/crypto/blake2s-generic.c      |  6 +++++-
+>  lib/crypto/blake2s.c              |  6 ------
+>  15 files changed, 27 insertions(+), 63 deletions(-)
 
-Thanks and please peruse that file - it has a wealth of good suggestions
-in it.
-
-> Merry Christmas Eve.
-
-Happy holidays to you too!
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
