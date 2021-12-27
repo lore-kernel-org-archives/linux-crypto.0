@@ -2,58 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7399FC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Dec 2021 18:33:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19945C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Dec 2021 18:33:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231747AbhL0SdG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Dec 2021 13:33:06 -0500
-Received: from smtp-relay-internal-1.canonical.com ([185.125.188.123]:59494
+        id S231721AbhL0SdJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Dec 2021 13:33:09 -0500
+Received: from smtp-relay-internal-1.canonical.com ([185.125.188.123]:59576
         "EHLO smtp-relay-internal-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229643AbhL0SdE (ORCPT
+        by vger.kernel.org with ESMTP id S231752AbhL0SdH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Dec 2021 13:33:04 -0500
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com [209.85.208.199])
+        Mon, 27 Dec 2021 13:33:07 -0500
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com [209.85.208.197])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 6E7873FFDB
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Dec 2021 18:33:03 +0000 (UTC)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 96840402DD
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Dec 2021 18:33:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1640629983;
-        bh=3Q76L02spV6rbbuHR2sV57AudkwFdOfi5uJcF47/ZVw=;
+        s=20210705; t=1640629985;
+        bh=cDCEy25L+nu0jfudc7PZIQa9FUmo6Gd8digQKlJvlAs=;
         h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
          MIME-Version;
-        b=FDQNMg1UR5tuBhmC05kar3Pdl8TtNpCecm2xOO7nOeFIpxcwVq3B7tT3yi48dVF/x
-         u+o8cGwsxAHIfQRMO64lLmuIeJxuTHjRZvIbx0IEVPUfPsPdxfqMqHu2yLR2FtwRDb
-         H2w5LH/+ZdcNm6KsotJQI4qCVV/i8sszdIJx+p4A7lv1sYspFe9KQsAYy/itHXdS3Z
-         9Z88lIb0RljwmdXv0OCvomeNxTuSG7OutFbN+2lTnoU6BX5n6rNKHonG6y5OcVr3iD
-         iryfUfb9L9yKq084BVa2xkaxYpBByuwhk05hWzF5WiDyKMAuseECqT+UNXhJ8/WNdf
-         MRNinV8vPM4lA==
-Received: by mail-lj1-f199.google.com with SMTP id w17-20020a05651c119100b0022dcdb204b9so1914099ljo.5
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Dec 2021 10:33:03 -0800 (PST)
+        b=G0dMnEfP8dyjOvvcdjY4F54wuHm1ekTxOrUxFhgtBD/rD9iehMPkWKJQXxMSWxLFs
+         nISpm99bi7Y0Uy2pW4sRT/oTEvjAKiLcTQMrybU/YoOBtLJnUZIOVyxdtTn4AMA0jJ
+         HypfqvMGAfSogD2eSob3vHekwayDDLeM4/wCrXTmxBYojKqSxDhqiYCmTdYesAnY6O
+         VHbf6HfdN6n5Zp1wG1vzFC+CfiRfreEDePy5b92et9tI6ax59btgIVUNBVACoIvvAR
+         Aia4Qnucc3t9PJ9/NGHM4S1rclcRQ4K7VfzamH8zOigClcI+MhvLEWsuNnrQ6b9XXT
+         eDnH22ym1eDHg==
+Received: by mail-lj1-f197.google.com with SMTP id j15-20020a2e6e0f000000b0022db2724332so2935735ljc.3
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Dec 2021 10:33:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=3Q76L02spV6rbbuHR2sV57AudkwFdOfi5uJcF47/ZVw=;
-        b=M1lSkSqXsQqpONAO0V9mCW6NOUyX8IJIy+6UVIZH1fYxJuIKqOtPBF1SFuOFq5i4MJ
-         zv4eFisxL6EwN4LXD0kt1UB77z+0PQKcU67kotcyV+21pG3GXqld6diDzZ4tNf6Z73ID
-         YKrHLDcOAkNCKibDM2Jc9yBnEQ7pYoSylWovsxtc3VDzoFuOXrNIfLhadeZWkDvm//aN
-         dkrYFoN/oEB81K9SLXqteANFm2A6D+a1sSyDbOaXzWdnHoSiRjzi+AvM6PqhdWIKs8Y5
-         FcHh+iP1U4M2xDmaI5/rxpZtLHpanlnjdforBGob7dzQHZFYAA82+rHmkzB9YcZGXgsU
-         l+UA==
-X-Gm-Message-State: AOAM530TkDdJy1eKDU92zqIIvWWhsaT1AL1I+WqUzKJg8Xdqhx8QSK+q
-        vLZapjD8laY4fYJeUPd0Kt7SDs8abXk5B3pw+G+SSZwZlyFozCVW9xHB/iwHDlwGRMqLPhjgUQ0
-        GePfgSzm3iJdbbOmDBQ7zB5K+DxNLsY/IXgdrzpI21g==
-X-Received: by 2002:a2e:141c:: with SMTP id u28mr15227856ljd.338.1640629982310;
-        Mon, 27 Dec 2021 10:33:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy3O/GRYpaNdG1mlwpRYPezP3gDyMQfsP+6AvdRKYOdbC4zcWygSTmf7lt1HtEIyYzxmmRdEw==
-X-Received: by 2002:a2e:141c:: with SMTP id u28mr15227822ljd.338.1640629982100;
-        Mon, 27 Dec 2021 10:33:02 -0800 (PST)
+        bh=cDCEy25L+nu0jfudc7PZIQa9FUmo6Gd8digQKlJvlAs=;
+        b=dH90GtwI7xjSDt1iRjMAqGc36nWkISsxpu/VAk8VupE5jpl02KzHleF2y1swhawDKA
+         tlIknjZ35BkKFua0rh/1U5ZNpOw1f4pMzuY7jU4qp2VqSjs9sOsN1BroaP7Ol4LRecqk
+         mL01HNuCOnBK9XAmRvnyBGy46kcv66L4hWLIRaJcgwpwEAfKDFUneNFEkbIM/dVGCsBW
+         PGFKXmK9HpkQ9QWEti41cDN9r3XiJ/nwunhgIWm+89Sjr+LYAo3Y0IVdu1gV7UtpOVwp
+         /seRrKTCuUf0LSvcfyZHQAkgO5CEin5ha1uYkjndQHlCBbWZja2fiWji7PK3+TqKcAe6
+         iWpA==
+X-Gm-Message-State: AOAM532C1etqP36G8NDkWtNlCK1p86becYvxgYU0eBj/BVFBuCL8C5Fn
+        +HcuzZTE1ls/hofmj+0moe7ZdqsA8jCdJXBhFwL0M8WhC+MSTR8nyRS3vLsjJ4C3S53ekKRRdit
+        tM8SdFbCOLTBy3Vs54mh+Bn/9wn9Pn2dMN3nkkpKekA==
+X-Received: by 2002:a05:6512:1598:: with SMTP id bp24mr16353997lfb.65.1640629985105;
+        Mon, 27 Dec 2021 10:33:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy3kFMlMAdQXCxbskTEMB+R+oa2Xt/GVAXanOCHL6Mls3XVIJnedTi419+2LDz4zUcQPZRm8Q==
+X-Received: by 2002:a05:6512:1598:: with SMTP id bp24mr16353985lfb.65.1640629984924;
+        Mon, 27 Dec 2021 10:33:04 -0800 (PST)
 Received: from krzk-bin.lan (89-77-68-124.dynamic.chello.pl. [89.77.68.124])
-        by smtp.gmail.com with ESMTPSA id o12sm1299622ljc.5.2021.12.27.10.33.00
+        by smtp.gmail.com with ESMTPSA id o12sm1299622ljc.5.2021.12.27.10.33.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Dec 2021 10:33:01 -0800 (PST)
+        Mon, 27 Dec 2021 10:33:04 -0800 (PST)
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
 To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -76,9 +76,9 @@ To:     Matt Mackall <mpm@selenic.com>,
         Tony Lindgren <tony@atomide.com>, linux-crypto@vger.kernel.org,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, openbmc@lists.ozlabs.org
-Subject: [PATCH 5/8] dt-bindings: rng: nuvoton,npcm-rng: convert Nuvoton NPCM RNG to dtschema
-Date:   Mon, 27 Dec 2021 19:32:48 +0100
-Message-Id: <20211227183251.132525-5-krzysztof.kozlowski@canonical.com>
+Subject: [PATCH 7/8] dt-bindings: rng: st,rng: convert ST RNG to dtschema
+Date:   Mon, 27 Dec 2021 19:32:50 +0100
+Message-Id: <20211227183251.132525-7-krzysztof.kozlowski@canonical.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20211227183251.132525-1-krzysztof.kozlowski@canonical.com>
 References: <20211227183251.132525-1-krzysztof.kozlowski@canonical.com>
@@ -88,74 +88,77 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert the Nuvoton NPCM RNG bindings to DT schema.
+Convert the ST RNG bindings to DT schema.
 
 Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
 ---
- .../bindings/rng/nuvoton,npcm-rng.txt         | 12 -------
- .../bindings/rng/nuvoton,npcm-rng.yaml        | 35 +++++++++++++++++++
- 2 files changed, 35 insertions(+), 12 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt
- create mode 100644 Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.yaml
+ .../devicetree/bindings/rng/st,rng.txt        | 15 --------
+ .../devicetree/bindings/rng/st,rng.yaml       | 35 +++++++++++++++++++
+ 2 files changed, 35 insertions(+), 15 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rng/st,rng.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/st,rng.yaml
 
-diff --git a/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt b/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt
+diff --git a/Documentation/devicetree/bindings/rng/st,rng.txt b/Documentation/devicetree/bindings/rng/st,rng.txt
 deleted file mode 100644
-index 65c04172fc8c..000000000000
---- a/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt
+index 35734bc282e9..000000000000
+--- a/Documentation/devicetree/bindings/rng/st,rng.txt
 +++ /dev/null
-@@ -1,12 +0,0 @@
--NPCM SoC Random Number Generator
+@@ -1,15 +0,0 @@
+-STMicroelectronics HW Random Number Generator
+-----------------------------------------------
 -
--Required properties:
--- compatible  : "nuvoton,npcm750-rng" for the NPCM7XX BMC.
--- reg         : Specifies physical base address and size of the registers.
+-Required parameters:
+-compatible	: Should be "st,rng"
+-reg		: Base address and size of IP's register map.
+-clocks		: Phandle to device's clock (See: ../clocks/clock-bindings.txt)
 -
 -Example:
 -
--rng: rng@f000b000 {
--	compatible = "nuvoton,npcm750-rng";
--	reg = <0xf000b000 0x8>;
--};
-diff --git a/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.yaml b/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.yaml
+-rng@fee80000 {
+-	compatible      = "st,rng";
+-	reg		= <0xfee80000 0x1000>;
+-	clocks          = <&clk_sysin>;
+-}
+diff --git a/Documentation/devicetree/bindings/rng/st,rng.yaml b/Documentation/devicetree/bindings/rng/st,rng.yaml
 new file mode 100644
-index 000000000000..abd134c9d400
+index 000000000000..ff1211ef9046
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.yaml
++++ b/Documentation/devicetree/bindings/rng/st,rng.yaml
 @@ -0,0 +1,35 @@
 +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
 +%YAML 1.2
 +---
-+$id: http://devicetree.org/schemas/rng/nuvoton,npcm-rng.yaml#
++$id: http://devicetree.org/schemas/rng/st,rng.yaml#
 +$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+title: Nuvoton NPCM SoC Random Number Generator
++title: STMicroelectronics Hardware Random Number Generator
 +
 +maintainers:
-+  - Avi Fishman <avifishman70@gmail.com>
-+  - Tomer Maimon <tmaimon77@gmail.com>
-+  - Tali Perry <tali.perry1@gmail.com>
-+  - Patrick Venture <venture@google.com>
-+  - Nancy Yuen <yuenn@google.com>
-+  - Benjamin Fair <benjaminfair@google.com>
++  - Patrice Chotard <patrice.chotard@foss.st.com>
 +
 +properties:
 +  compatible:
-+    const: nuvoton,npcm750-rng
++    const: st,rng
++
++  clocks:
++    maxItems: 1
 +
 +  reg:
 +    maxItems: 1
 +
 +required:
 +  - compatible
++  - clocks
 +  - reg
 +
 +additionalProperties: false
 +
 +examples:
 +  - |
-+    rng@f000b000 {
-+        compatible = "nuvoton,npcm750-rng";
-+        reg = <0xf000b000 0x8>;
++    rng@fee80000 {
++        compatible = "st,rng";
++        reg = <0xfee80000 0x1000>;
++        clocks = <&clk_sysin>;
 +    };
 -- 
 2.32.0
