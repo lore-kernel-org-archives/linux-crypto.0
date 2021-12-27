@@ -2,62 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E610BC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Dec 2021 10:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2040FC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Dec 2021 13:43:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236127AbhL0KoG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Dec 2021 05:44:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56226 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236126AbhL0KoF (ORCPT
+        id S233985AbhL0Nn4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Dec 2021 08:43:56 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:57608 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229644AbhL0Nn4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Dec 2021 05:44:05 -0500
-Received: from albert.telenet-ops.be (albert.telenet-ops.be [IPv6:2a02:1800:110:4::f00:1a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 429EDC061757
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Dec 2021 02:44:05 -0800 (PST)
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed20:dd7:48a2:4f21:80d4])
-        by albert.telenet-ops.be with bizsmtp
-        id bNk2260010THM2Z06Nk2jY; Mon, 27 Dec 2021 11:44:02 +0100
-Received: from geert (helo=localhost)
-        by ramsan.of.borg with local-esmtp (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1n1nU1-0079Vm-NX; Mon, 27 Dec 2021 11:44:01 +0100
-Date:   Mon, 27 Dec 2021 11:44:01 +0100 (CET)
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-X-X-Sender: geert@ramsan.of.borg
-To:     linux-kernel@vger.kernel.org
-cc:     linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-um@lists.infradead.org
-Subject: Re: Build regressions/improvements in v5.16-rc7
-In-Reply-To: <20211227083126.1153239-1-geert@linux-m68k.org>
-Message-ID: <alpine.DEB.2.22.394.2112271142250.1704790@ramsan.of.borg>
-References: <20211227083126.1153239-1-geert@linux-m68k.org>
-User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+        Mon, 27 Dec 2021 08:43:56 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BC57860FFB;
+        Mon, 27 Dec 2021 13:43:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D20C7C36AEC;
+        Mon, 27 Dec 2021 13:43:54 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HFFJGz7J"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1640612633;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=m4VHVmdxDnw/5uH5g0BfZFtqGk916bztPM6sTPKTV3I=;
+        b=HFFJGz7Jf/6zCu4+EYvty3fHiUcbfLWTOpCoGCd45ezPyNkjQCXGF2ytMJnVYHMJtsiMCl
+        yeqsin2ly2k3LOPLI+Eqh66h2VgWi7bqUmFTadWLbexczAAOHON0kOj5SQMbYmomC23H/q
+        eKfu3YSIEUOlo2hchjFpHmkL5NX+FK8=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id afd2f686 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 27 Dec 2021 13:43:53 +0000 (UTC)
+Received: by mail-yb1-f176.google.com with SMTP id m19so27295916ybf.9;
+        Mon, 27 Dec 2021 05:43:52 -0800 (PST)
+X-Gm-Message-State: AOAM530oLqxsaFSGEUaYyt2U0MqROCiwp2s6LhzbPgcM7HzP6pBtq9cQ
+        pcLOcuyxLTaCHCWg5Qm++ru03Q2i0ksmkvRd1l0=
+X-Google-Smtp-Source: ABdhPJyLotRuMiaC7IB3M5SDYqi2QUChl9JVn9pBv9Z0RICSjrEf6RfbxaNIxJZEPvJzHbPa4ntJ3UXP062SN4+b0bc=
+X-Received: by 2002:a25:1e83:: with SMTP id e125mr21353761ybe.32.1640612631824;
+ Mon, 27 Dec 2021 05:43:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+References: <20211223141113.1240679-1-Jason@zx2c4.com> <CAK7LNARjb4=9JOVDdfUg1sxLG4OH-Eko44iEewbr+0Wd+CNf1Q@mail.gmail.com>
+ <CAMj1kXG7PFpj1Oz1osVCBW1NhCHQT+Oc=0WMLYSeRtC1QK4e8Q@mail.gmail.com> <CAK7LNATjF13vTrxMn9OTH4rmmrg6m-7aWjH6n3zV9APZwvus9w@mail.gmail.com>
+In-Reply-To: <CAK7LNATjF13vTrxMn9OTH4rmmrg6m-7aWjH6n3zV9APZwvus9w@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 27 Dec 2021 14:43:41 +0100
+X-Gmail-Original-Message-ID: <CAHmME9p95g0yWcRBfbrx_kX56HqFZrw8xcOLt6cn5fzVSCQXyg@mail.gmail.com>
+Message-ID: <CAHmME9p95g0yWcRBfbrx_kX56HqFZrw8xcOLt6cn5fzVSCQXyg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] lib/crypto: blake2s: include as built-in
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 27 Dec 2021, Geert Uytterhoeven wrote:
-> JFYI, when comparing v5.16-rc7[1] to v5.16-rc6[3], the summaries are:
->  - build errors: +2/-1
+Hi Masahiro,
 
-   + /kisskb/src/crypto/blake2b_generic.c: error: the frame size of 2288 bytes is larger than 2048 bytes [-Werror=frame-larger-than=]:  => 109:1
+Thanks for your feedback. Indeed it looks like you're right about the
+CONFIG_MODULE case. We'll go back to using the kconfig system
+normally, and cease tempting the beast with libs-y and such. I'll have
+a v+1 for you shortly in case you're curious, though I expect it to be
+sufficiently boring to be no longer worth your time :-).
 
-sparc64-gcc11/sparc-allmodconfig
-
-   + /kisskb/src/drivers/video/fbdev/nvidia/nvidia.c: error: passing argument 1 of 'iounmap' discards 'volatile' qualifier from pointer target type [-Werror=discarded-qualifiers]:  => 1439:10, 1414:10
-
-um-x86_64/um-all{mod,yes}config
-
-Gr{oetje,eeting}s,
-
- 						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
- 							    -- Linus Torvalds
+Jason
