@@ -2,58 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19945C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Dec 2021 18:33:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFE7C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Dec 2021 18:33:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231721AbhL0SdJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Dec 2021 13:33:09 -0500
-Received: from smtp-relay-internal-1.canonical.com ([185.125.188.123]:59576
+        id S231778AbhL0SdM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Dec 2021 13:33:12 -0500
+Received: from smtp-relay-internal-1.canonical.com ([185.125.188.123]:59624
         "EHLO smtp-relay-internal-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231752AbhL0SdH (ORCPT
+        by vger.kernel.org with ESMTP id S231757AbhL0SdJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Dec 2021 13:33:07 -0500
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com [209.85.208.197])
+        Mon, 27 Dec 2021 13:33:09 -0500
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com [209.85.167.71])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 96840402DD
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Dec 2021 18:33:05 +0000 (UTC)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 0C0F93FFD5
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Dec 2021 18:33:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1640629985;
-        bh=cDCEy25L+nu0jfudc7PZIQa9FUmo6Gd8digQKlJvlAs=;
+        s=20210705; t=1640629988;
+        bh=SIUiGPqn4sHTI4wrPpQmcuGfM1myPDztAmFG+NtIpFs=;
         h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
          MIME-Version;
-        b=G0dMnEfP8dyjOvvcdjY4F54wuHm1ekTxOrUxFhgtBD/rD9iehMPkWKJQXxMSWxLFs
-         nISpm99bi7Y0Uy2pW4sRT/oTEvjAKiLcTQMrybU/YoOBtLJnUZIOVyxdtTn4AMA0jJ
-         HypfqvMGAfSogD2eSob3vHekwayDDLeM4/wCrXTmxBYojKqSxDhqiYCmTdYesAnY6O
-         VHbf6HfdN6n5Zp1wG1vzFC+CfiRfreEDePy5b92et9tI6ax59btgIVUNBVACoIvvAR
-         Aia4Qnucc3t9PJ9/NGHM4S1rclcRQ4K7VfzamH8zOigClcI+MhvLEWsuNnrQ6b9XXT
-         eDnH22ym1eDHg==
-Received: by mail-lj1-f197.google.com with SMTP id j15-20020a2e6e0f000000b0022db2724332so2935735ljc.3
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Dec 2021 10:33:05 -0800 (PST)
+        b=bBIaC0DlCnvj42YKOnmdsYkLZ6ETIp7PBm6kdOSOmErBMZKSZzVVT+2zZDdmabIPK
+         oZW3xrfg0YT+l+nXv75h+A/6eJMVZZIQ4JiQLixL5gHeFuzu3hh5AMckg4VlCmzn1/
+         3aSdI/ShsSICGd6CGSuKV5DYHuI1x7LSGneYUV+rixNEp1+XNlgM5D9/ufaiYZPsgf
+         j40J8gwE60SKzW4WCasbUmZx5K1tJoPBpNSRh124/vDnDuPXQEm7tkM0SVj+eVv4CT
+         gvhXQqUoepUoO4SglQUOfFFamZU9oKv6G6PuBdjV0HVZ9tp9PBB94vOoTyT7A1tf4l
+         ncP556wHpYhjQ==
+Received: by mail-lf1-f71.google.com with SMTP id g40-20020a0565123ba800b00426216a233fso3742758lfv.7
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Dec 2021 10:33:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=cDCEy25L+nu0jfudc7PZIQa9FUmo6Gd8digQKlJvlAs=;
-        b=dH90GtwI7xjSDt1iRjMAqGc36nWkISsxpu/VAk8VupE5jpl02KzHleF2y1swhawDKA
-         tlIknjZ35BkKFua0rh/1U5ZNpOw1f4pMzuY7jU4qp2VqSjs9sOsN1BroaP7Ol4LRecqk
-         mL01HNuCOnBK9XAmRvnyBGy46kcv66L4hWLIRaJcgwpwEAfKDFUneNFEkbIM/dVGCsBW
-         PGFKXmK9HpkQ9QWEti41cDN9r3XiJ/nwunhgIWm+89Sjr+LYAo3Y0IVdu1gV7UtpOVwp
-         /seRrKTCuUf0LSvcfyZHQAkgO5CEin5ha1uYkjndQHlCBbWZja2fiWji7PK3+TqKcAe6
-         iWpA==
-X-Gm-Message-State: AOAM532C1etqP36G8NDkWtNlCK1p86becYvxgYU0eBj/BVFBuCL8C5Fn
-        +HcuzZTE1ls/hofmj+0moe7ZdqsA8jCdJXBhFwL0M8WhC+MSTR8nyRS3vLsjJ4C3S53ekKRRdit
-        tM8SdFbCOLTBy3Vs54mh+Bn/9wn9Pn2dMN3nkkpKekA==
-X-Received: by 2002:a05:6512:1598:: with SMTP id bp24mr16353997lfb.65.1640629985105;
-        Mon, 27 Dec 2021 10:33:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy3kFMlMAdQXCxbskTEMB+R+oa2Xt/GVAXanOCHL6Mls3XVIJnedTi419+2LDz4zUcQPZRm8Q==
-X-Received: by 2002:a05:6512:1598:: with SMTP id bp24mr16353985lfb.65.1640629984924;
-        Mon, 27 Dec 2021 10:33:04 -0800 (PST)
+        bh=SIUiGPqn4sHTI4wrPpQmcuGfM1myPDztAmFG+NtIpFs=;
+        b=V5gj18OPzLSmmOQljCDhRfompvclli1OemOKPeUorq105KD9Av+1Y2lTebCBeYmW5v
+         qkoy3cECIj3Y0HteUUnuX4RYyYI4S8wwQKK4Dpt0rsuxAKz+yJ+GWiywpcnH2RMVK0Dm
+         0uS5GDcnJORYb5zZL0o3GMmyHu3q/ZGWrmx+xK3Znv0lk5bTJNl5wCYq17FD0uZTPdib
+         rmuRJtMmJVERHX0Lj5dLHFUiEqbXng4FhHV41/XcSXF3rrR6QGdX0yfcftf+NdczOYGP
+         Z1DCxc0pQrw55JMkx27LjAQS72QxsaezNbn34Qfc3tUdwuMtiHmOOrgbOsT+qMYFTolX
+         UyZQ==
+X-Gm-Message-State: AOAM533qi0+9bdO8HVKBMDChXwjCB087VFK4VW7qW7y6g98AR4wjiWN9
+        R/E8u3gYJ81LdlWlLxX46z3hu28MpdL4x6jOfFOg2xxaI/LswHPfSgc9rY4vH+vr46sdcX/dW95
+        31iiv4AEuiTrXxZGPxK1B1zmuU9GBQ4Rl++TVOcEZmA==
+X-Received: by 2002:a05:651c:1686:: with SMTP id bd6mr6422204ljb.144.1640629987085;
+        Mon, 27 Dec 2021 10:33:07 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyiwYxvtGi5aBexdLaJuo+p/mJzCN8N3cW4pSt0ALzD1mYO4Fc/mOyRPmGVLkcxEc1Zn1IoqQ==
+X-Received: by 2002:a05:651c:1686:: with SMTP id bd6mr6422189ljb.144.1640629986863;
+        Mon, 27 Dec 2021 10:33:06 -0800 (PST)
 Received: from krzk-bin.lan (89-77-68-124.dynamic.chello.pl. [89.77.68.124])
-        by smtp.gmail.com with ESMTPSA id o12sm1299622ljc.5.2021.12.27.10.33.03
+        by smtp.gmail.com with ESMTPSA id o12sm1299622ljc.5.2021.12.27.10.33.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Dec 2021 10:33:04 -0800 (PST)
+        Mon, 27 Dec 2021 10:33:06 -0800 (PST)
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
 To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -76,9 +76,9 @@ To:     Matt Mackall <mpm@selenic.com>,
         Tony Lindgren <tony@atomide.com>, linux-crypto@vger.kernel.org,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, openbmc@lists.ozlabs.org
-Subject: [PATCH 7/8] dt-bindings: rng: st,rng: convert ST RNG to dtschema
-Date:   Mon, 27 Dec 2021 19:32:50 +0100
-Message-Id: <20211227183251.132525-7-krzysztof.kozlowski@canonical.com>
+Subject: [PATCH 8/8] dt-bindings: rng: timeriomem_rng: convert TimerIO RNG to dtschema
+Date:   Mon, 27 Dec 2021 19:32:51 +0100
+Message-Id: <20211227183251.132525-8-krzysztof.kozlowski@canonical.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20211227183251.132525-1-krzysztof.kozlowski@canonical.com>
 References: <20211227183251.132525-1-krzysztof.kozlowski@canonical.com>
@@ -88,77 +88,100 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert the ST RNG bindings to DT schema.
+Convert the TimerIO RNG bindings to DT schema.
 
 Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
 ---
- .../devicetree/bindings/rng/st,rng.txt        | 15 --------
- .../devicetree/bindings/rng/st,rng.yaml       | 35 +++++++++++++++++++
- 2 files changed, 35 insertions(+), 15 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/rng/st,rng.txt
- create mode 100644 Documentation/devicetree/bindings/rng/st,rng.yaml
+ .../bindings/rng/timeriomem_rng.txt           | 25 ----------
+ .../bindings/rng/timeriomem_rng.yaml          | 48 +++++++++++++++++++
+ 2 files changed, 48 insertions(+), 25 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rng/timeriomem_rng.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
 
-diff --git a/Documentation/devicetree/bindings/rng/st,rng.txt b/Documentation/devicetree/bindings/rng/st,rng.txt
+diff --git a/Documentation/devicetree/bindings/rng/timeriomem_rng.txt b/Documentation/devicetree/bindings/rng/timeriomem_rng.txt
 deleted file mode 100644
-index 35734bc282e9..000000000000
---- a/Documentation/devicetree/bindings/rng/st,rng.txt
+index fb4846160047..000000000000
+--- a/Documentation/devicetree/bindings/rng/timeriomem_rng.txt
 +++ /dev/null
-@@ -1,15 +0,0 @@
--STMicroelectronics HW Random Number Generator
------------------------------------------------
+@@ -1,25 +0,0 @@
+-HWRNG support for the timeriomem_rng driver
 -
--Required parameters:
--compatible	: Should be "st,rng"
--reg		: Base address and size of IP's register map.
--clocks		: Phandle to device's clock (See: ../clocks/clock-bindings.txt)
+-Required properties:
+-- compatible : "timeriomem_rng"
+-- reg : base address to sample from
+-- period : wait time in microseconds to use between samples
+-
+-Optional properties:
+-- quality : estimated number of bits of true entropy per 1024 bits read from the
+-            rng.  Defaults to zero which causes the kernel's default quality to
+-            be used instead.  Note that the default quality is usually zero
+-            which disables using this rng to automatically fill the kernel's
+-            entropy pool.
+-
+-N.B. currently 'reg' must be at least four bytes wide and 32-bit aligned
 -
 -Example:
 -
--rng@fee80000 {
--	compatible      = "st,rng";
--	reg		= <0xfee80000 0x1000>;
--	clocks          = <&clk_sysin>;
--}
-diff --git a/Documentation/devicetree/bindings/rng/st,rng.yaml b/Documentation/devicetree/bindings/rng/st,rng.yaml
+-hwrng@44 {
+-	#address-cells = <1>;
+-	#size-cells = <1>;
+-	compatible = "timeriomem_rng";
+-	reg = <0x44 0x04>;
+-	period = <1000000>;
+-};
+diff --git a/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml b/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
 new file mode 100644
-index 000000000000..ff1211ef9046
+index 000000000000..84bf518a5549
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/st,rng.yaml
-@@ -0,0 +1,35 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++++ b/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
+@@ -0,0 +1,48 @@
++# SPDX-License-Identifier: GPL-2.0-only
 +%YAML 1.2
 +---
-+$id: http://devicetree.org/schemas/rng/st,rng.yaml#
++$id: http://devicetree.org/schemas/rng/timeriomem_rng.yaml#
 +$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+title: STMicroelectronics Hardware Random Number Generator
++title: TimerIO Random Number Generator
 +
 +maintainers:
-+  - Patrice Chotard <patrice.chotard@foss.st.com>
++  - Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
 +
 +properties:
 +  compatible:
-+    const: st,rng
++    const: timeriomem_rng
 +
-+  clocks:
-+    maxItems: 1
++  period:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description: wait time in microseconds to use between samples
++
++  quality:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    default: 0
++    description:
++      Estimated number of bits of true entropy per 1024 bits read from the rng.
++      Defaults to zero which causes the kernel's default quality to be used
++      instead.  Note that the default quality is usually zero which disables
++      using this rng to automatically fill the kernel's entropy pool.
 +
 +  reg:
 +    maxItems: 1
++    description:
++      Base address to sample from. Currently 'reg' must be at least four bytes
++      wide and 32-bit aligned.
 +
 +required:
 +  - compatible
-+  - clocks
++  - period
 +  - reg
 +
 +additionalProperties: false
 +
 +examples:
 +  - |
-+    rng@fee80000 {
-+        compatible = "st,rng";
-+        reg = <0xfee80000 0x1000>;
-+        clocks = <&clk_sysin>;
++    rng@44 {
++        compatible = "timeriomem_rng";
++        reg = <0x44 0x04>;
++        period = <1000000>;
 +    };
 -- 
 2.32.0
