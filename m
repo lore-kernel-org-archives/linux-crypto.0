@@ -2,56 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3A2C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Dec 2021 05:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E610BC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Dec 2021 10:44:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232287AbhL0Fwz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Dec 2021 00:52:55 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:58610 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230061AbhL0Fwz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Dec 2021 00:52:55 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1n1iwH-0005IL-Dw; Mon, 27 Dec 2021 16:52:54 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 27 Dec 2021 16:52:53 +1100
-Date:   Mon, 27 Dec 2021 16:52:53 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Petr Vorel <pvorel@suse.cz>, linux-crypto@vger.kernel.org,
-        Cyril Hrubis <chrubis@suse.cz>
-Subject: Re: ELIBBAD vs. ENOENT for ciphers not allowed by FIPS
-Message-ID: <YclUtekRBeENk/UZ@gondor.apana.org.au>
-References: <YcN4S7NIV9F0XXPP@pevik>
- <YcOh6jij1s6KA2ee@gondor.apana.org.au>
- <YcOlw1UJizlngAEG@quark>
- <YcOnRRRYbV/MrRhO@gondor.apana.org.au>
- <YcOqoGOLfNTZh/ZF@quark>
- <YcQxeW/hzS7cCUCs@pevik>
- <YcSQ/hhu9Lwr4OSC@quark>
+        id S236127AbhL0KoG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Dec 2021 05:44:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56226 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236126AbhL0KoF (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Dec 2021 05:44:05 -0500
+Received: from albert.telenet-ops.be (albert.telenet-ops.be [IPv6:2a02:1800:110:4::f00:1a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 429EDC061757
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Dec 2021 02:44:05 -0800 (PST)
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed20:dd7:48a2:4f21:80d4])
+        by albert.telenet-ops.be with bizsmtp
+        id bNk2260010THM2Z06Nk2jY; Mon, 27 Dec 2021 11:44:02 +0100
+Received: from geert (helo=localhost)
+        by ramsan.of.borg with local-esmtp (Exim 4.93)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1n1nU1-0079Vm-NX; Mon, 27 Dec 2021 11:44:01 +0100
+Date:   Mon, 27 Dec 2021 11:44:01 +0100 (CET)
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+X-X-Sender: geert@ramsan.of.borg
+To:     linux-kernel@vger.kernel.org
+cc:     linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-um@lists.infradead.org
+Subject: Re: Build regressions/improvements in v5.16-rc7
+In-Reply-To: <20211227083126.1153239-1-geert@linux-m68k.org>
+Message-ID: <alpine.DEB.2.22.394.2112271142250.1704790@ramsan.of.borg>
+References: <20211227083126.1153239-1-geert@linux-m68k.org>
+User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YcSQ/hhu9Lwr4OSC@quark>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 23, 2021 at 09:08:46AM -0600, Eric Biggers wrote:
-> Being able to distinguish between those reasons doesn't seem to be important,
-> whereas being able to distinguish between a self-test failure and an algorithm
-> being disabled is important.
+On Mon, 27 Dec 2021, Geert Uytterhoeven wrote:
+> JFYI, when comparing v5.16-rc7[1] to v5.16-rc6[3], the summaries are:
+>  - build errors: +2/-1
 
-ELIBBAD isn't equivalent to a self-test failure at all.  ELIBBAD
-means that every implementation of an algorithm that the kernel
-could find has failed the self-test.
+   + /kisskb/src/crypto/blake2b_generic.c: error: the frame size of 2288 bytes is larger than 2048 bytes [-Werror=frame-larger-than=]:  => 109:1
 
-If one implementation fails the self-test while other implementations
-(such as the generic one) of the same algorithm still exist, the
-kernel would never return ELIBBAD.
+sparc64-gcc11/sparc-allmodconfig
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+   + /kisskb/src/drivers/video/fbdev/nvidia/nvidia.c: error: passing argument 1 of 'iounmap' discards 'volatile' qualifier from pointer target type [-Werror=discarded-qualifiers]:  => 1439:10, 1414:10
+
+um-x86_64/um-all{mod,yes}config
+
+Gr{oetje,eeting}s,
+
+ 						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+ 							    -- Linus Torvalds
