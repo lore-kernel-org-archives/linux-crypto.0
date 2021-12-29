@@ -2,63 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78EDDC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Dec 2021 02:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 462DDC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Dec 2021 02:15:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238326AbhL2CGB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Dec 2021 21:06:01 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:58688 "EHLO fornost.hmeau.com"
+        id S236918AbhL2CPK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Dec 2021 21:15:10 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58690 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238317AbhL2CGB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Dec 2021 21:06:01 -0500
+        id S229620AbhL2CPK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Dec 2021 21:15:10 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1n2OLi-0006Bp-OM; Wed, 29 Dec 2021 13:05:55 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 29 Dec 2021 13:05:54 +1100
-Date:   Wed, 29 Dec 2021 13:05:54 +1100
+        id 1n2OUD-0006Gl-J6; Wed, 29 Dec 2021 13:14:42 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 29 Dec 2021 13:14:41 +1100
+Date:   Wed, 29 Dec 2021 13:14:41 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Guenter Roeck <linux@roeck-us.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Vladis Dronov <vdronov@redhat.com>,
-        Simo Sorce <ssorce@redhat.com>,
-        Eric Biggers <ebiggers@kernel.org>, kernel@pengutronix.de
-Subject: Re: [v2 PATCH] crypto: api - Fix built-in testing dependency failures
-Message-ID: <YcvCglFcJEA87KNN@gondor.apana.org.au>
-References: <20210913071251.GA15235@gondor.apana.org.au>
- <20210917002619.GA6407@gondor.apana.org.au>
- <20211026163319.GA2785420@roeck-us.net>
- <20211106034725.GA18680@gondor.apana.org.au>
- <729fc135-8e55-fd4f-707a-60b9a222ab97@roeck-us.net>
- <20211222102246.qibf7v2q4atl6gc6@pengutronix.de>
+To:     Nicolai Stange <nstange@suse.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qat-linux@intel.com, keyrings@vger.kernel.org
+Subject: Re: [PATCH v2 03/18] crypto: dh - optimize domain parameter
+ serialization for well-known groups
+Message-ID: <YcvEkfS4cONDXXB9@gondor.apana.org.au>
+References: <20211209090358.28231-1-nstange@suse.de>
+ <20211209090358.28231-4-nstange@suse.de>
+ <20211217055227.GA20698@gondor.apana.org.au>
+ <87r1a7thy0.fsf@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211222102246.qibf7v2q4atl6gc6@pengutronix.de>
+In-Reply-To: <87r1a7thy0.fsf@suse.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 22, 2021 at 11:22:46AM +0100, Uwe Kleine-König wrote:
->
-> I still experience a problem with the patch that got
-> adad556efcdd42a1d9e060cbe5f6161cccf1fa28 in v5.16-rc1. I saw there are
-> two commit fixing this one (
+On Mon, Dec 20, 2021 at 04:27:35PM +0100, Nicolai Stange wrote:
 > 
-> 	cad439fc040e crypto: api - Do not create test larvals if manager is disabled
-> 	e42dff467ee6 crypto: api - Export crypto_boot_test_finished
-> 
-> ) but I still encounter the following on 2f47a9a4dfa3:
+> Just for my understanding: the problem here is having a (single) enum
+> for the representation of all the possible "known" groups in the first
+> place or more that the individual group id enum members have hard-coded
+> values assigned to them each?
 
-Perhaps you missed the last fix?
+Yes the fact that you need to have a list of all "known" groups is
+the issue.
 
-commit beaaaa37c664e9afdf2913aee19185d8e3793b50
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Fri Nov 5 15:26:08 2021 +0800
+> However, after some back and forth, I opted against doing something
+> similar for dh at the time, because there are quite some more possible
+> parameter sets than there are for ecdh, namely ten vs. three. If we were
 
-    crypto: api - Fix boot-up crash when crypto manager is disabled
+I don't understand why we can't support ten or an even larger
+number of parameter sets.
+
+If you are concerned about code duplication then there are ways
+around that.  Or do you have another specific concern in mind
+with respect to a large number of parameter sets under this scheme?
+ 
+> Anyway, just to make sure I'm getting it right: when you're saying
+> "template", you mean to implement a crypto_template for instantiating
+> patterns like "dh(ffdhe2048)", "dh(ffdhe3072)" and so on? The dh(...)
+> template instantiations would keep a crypto_spawn for referring to the
+> underlying, non-template "dh" kpp_alg so that "dh" implementations of
+> higher priority (hpre + qat) would take over once they'd become
+> available, correct?
+
+The template would work in the other dirirection.  It would look
+like ffdhe2048(dh) with dh being implemented in either software or
+hardware.
+
+The template wrapper would simply supply the relevant parameters.
 
 Cheers,
 -- 
