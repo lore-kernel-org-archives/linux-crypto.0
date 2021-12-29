@@ -2,83 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 462DDC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Dec 2021 02:15:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2752FC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Dec 2021 09:32:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236918AbhL2CPK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Dec 2021 21:15:10 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:58690 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229620AbhL2CPK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Dec 2021 21:15:10 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1n2OUD-0006Gl-J6; Wed, 29 Dec 2021 13:14:42 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 29 Dec 2021 13:14:41 +1100
-Date:   Wed, 29 Dec 2021 13:14:41 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Nicolai Stange <nstange@suse.de>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
-        Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        qat-linux@intel.com, keyrings@vger.kernel.org
-Subject: Re: [PATCH v2 03/18] crypto: dh - optimize domain parameter
- serialization for well-known groups
-Message-ID: <YcvEkfS4cONDXXB9@gondor.apana.org.au>
-References: <20211209090358.28231-1-nstange@suse.de>
- <20211209090358.28231-4-nstange@suse.de>
- <20211217055227.GA20698@gondor.apana.org.au>
- <87r1a7thy0.fsf@suse.de>
+        id S230482AbhL2Jcj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Dec 2021 04:32:39 -0500
+Received: from smtp21.cstnet.cn ([159.226.251.21]:54910 "EHLO cstnet.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230306AbhL2Jci (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Dec 2021 04:32:38 -0500
+Received: from localhost.localdomain (unknown [124.16.138.126])
+        by APP-01 (Coremail) with SMTP id qwCowACnr58iK8xhbnV6BQ--.12799S2;
+        Wed, 29 Dec 2021 17:32:18 +0800 (CST)
+From:   Jiasheng Jiang <jiasheng@iscas.ac.cn>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jiasheng Jiang <jiasheng@iscas.ac.cn>
+Subject: [PATCH] crypto: af_alg - check possible NULL pointer
+Date:   Wed, 29 Dec 2021 17:32:16 +0800
+Message-Id: <20211229093216.1753083-1-jiasheng@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87r1a7thy0.fsf@suse.de>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: qwCowACnr58iK8xhbnV6BQ--.12799S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZw1fCryxZrWxCw4ftw4DXFb_yoWDAwb_ur
+        WDAr4UuryUX3WfXF1Dtay3KryIga13ury8WF4Fkr43K3WkJasxZ3ZFyrySyFZrCa4xurW3
+        Gw1kKr17uw12gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbckFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY02Avz4vE14v_GFWl
+        42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJV
+        WUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAK
+        I48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r
+        4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
+        0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUIhFcUUUUU=
+X-Originating-IP: [124.16.138.126]
+X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 20, 2021 at 04:27:35PM +0100, Nicolai Stange wrote:
-> 
-> Just for my understanding: the problem here is having a (single) enum
-> for the representation of all the possible "known" groups in the first
-> place or more that the individual group id enum members have hard-coded
-> values assigned to them each?
+Because of the possible alloc failure of the alloc_page(), it could
+return NULL pointer.
+And then it will cause the BUG_ON() in sg_assign_page().
+Therefore, it should be better to check it before to avoid the bug.
 
-Yes the fact that you need to have a list of all "known" groups is
-the issue.
+Fixes: 2d97591ef43d ("crypto: af_alg - consolidation of duplicate code")
+Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+---
+ crypto/af_alg.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-> However, after some back and forth, I opted against doing something
-> similar for dh at the time, because there are quite some more possible
-> parameter sets than there are for ecdh, namely ten vs. three. If we were
-
-I don't understand why we can't support ten or an even larger
-number of parameter sets.
-
-If you are concerned about code duplication then there are ways
-around that.  Or do you have another specific concern in mind
-with respect to a large number of parameter sets under this scheme?
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 18cc82dc4a42..a1c0118e222d 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -931,11 +931,18 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 			sg_unmark_end(sg + sgl->cur - 1);
  
-> Anyway, just to make sure I'm getting it right: when you're saying
-> "template", you mean to implement a crypto_template for instantiating
-> patterns like "dh(ffdhe2048)", "dh(ffdhe3072)" and so on? The dh(...)
-> template instantiations would keep a crypto_spawn for referring to the
-> underlying, non-template "dh" kpp_alg so that "dh" implementations of
-> higher priority (hpre + qat) would take over once they'd become
-> available, correct?
-
-The template would work in the other dirirection.  It would look
-like ffdhe2048(dh) with dh being implemented in either software or
-hardware.
-
-The template wrapper would simply supply the relevant parameters.
-
-Cheers,
+ 		do {
++			struct page *pg;
+ 			unsigned int i = sgl->cur;
+ 
+ 			plen = min_t(size_t, len, PAGE_SIZE);
+ 
+-			sg_assign_page(sg + i, alloc_page(GFP_KERNEL));
++			pg = alloc_page(GFP_KERNEL);
++			if (!pg) {
++				err = -ENOMEM;
++				goto unlock;
++			}
++
++			sg_assign_page(sg + i, pg);
+ 			if (!sg_page(sg + i)) {
+ 				err = -ENOMEM;
+ 				goto unlock;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.25.1
+
