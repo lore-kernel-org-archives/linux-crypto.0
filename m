@@ -2,81 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 359CAC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Dec 2021 08:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1827BC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Dec 2021 16:51:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234661AbhL3I3J (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Dec 2021 03:29:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44772 "EHLO
+        id S241372AbhL3QvF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Dec 2021 11:51:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231140AbhL3I3J (ORCPT
+        with ESMTP id S240222AbhL3QvF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Dec 2021 03:29:09 -0500
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 088E9C061574
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Dec 2021 00:29:09 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id e5so49020998wrc.5
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Dec 2021 00:29:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=U/48TNfZ5u7u3obYpRqZY+OGr9VJLLf/2/GpB8YfDNc=;
-        b=SHJsffFlnnBgOR07CvIBfPQ1ztcWVKHP1aFDXbtsc9sc2JBM69W8tlcWSw3J6kXI/r
-         3/xOHXUQotNWGp0vZuM7x1sW9dxtWBD0jog0Gr+Ws+yRI6f/JUSW6cG2RC6Qhfr7ORIB
-         5ceEyjNQtPSkoOocXVdCwKW8+SJDB4pSAx6mnjDs3b7XRko1oe8Zj53DbuMGOIxwzfdW
-         LGfbn77SsvhkEWQ/14+uSFPudQRQptUmh9OV4h34saW8Ixu6nDgSqDt7Pr/AwsdTh5pJ
-         sw8xAwjt1mwntEjv6cb77EiRBj0SDH8fEU1z2PxTXaxaiCdOg1X7s2Hqe64BTtG343rI
-         3tPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=U/48TNfZ5u7u3obYpRqZY+OGr9VJLLf/2/GpB8YfDNc=;
-        b=FpDXiyT3JenRcysJrwPo+ytaodNl1PjpE3RudQB1k46bI1XY6kJwBA4vjB0HOS4vpz
-         V1lN4TRiuBV7faG6+lUEG9/KAptMbM86W01HfVYXD4X1DFY97p7JW/MWuXo9WqVLoSLq
-         3oaDp81AZUJuYQ16KODPJhUFEMZx6uhhk6hcQHJ35FXA0MQsztw4JUTkRAgA77dKhk0q
-         MeooseqqcQqIewcewkugzvpYTNzQacpIUYx+9eJMODcL7Grw8KzUM6X/RF4vy41JI5is
-         YH+M5nnpN8GFKbxtvNgK6gKwIuit07/LgC3x4Y6NIu7gNJypJcby6lMH+ydObXZZ5i0S
-         ymEQ==
-X-Gm-Message-State: AOAM530NVPKU3YpHyqx2jqjxRw2pE2IluEY3ZLKe8E2asrmv+HwRwohB
-        oXAsGZ1xjfYU7ZCdBgdZymRYzDPV0DNFaHEwPiMMPZJZ
-X-Google-Smtp-Source: ABdhPJzJWD/tVvM7GAFr2enWzwKxOBF+YcmFJvdIxLTsCcA3t/MYY+exJT0cbLq5N0y1vLs9cbhUtwR+azS1xPZd940=
-X-Received: by 2002:a05:6000:1b03:: with SMTP id f3mr24649642wrz.58.1640852947450;
- Thu, 30 Dec 2021 00:29:07 -0800 (PST)
+        Thu, 30 Dec 2021 11:51:05 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC80CC061574;
+        Thu, 30 Dec 2021 08:51:04 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E498DB81C6E;
+        Thu, 30 Dec 2021 16:51:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26B4CC36AE9;
+        Thu, 30 Dec 2021 16:51:01 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LbXlV06V"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1640883059;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=NItrL/aIHsIgAZesBZH/PKbW+5wd31K/1C4cnt9PMXQ=;
+        b=LbXlV06V12wjOT5pyEuwFAuWcN8DVcHH+TLaaqmMFdgOMbWXv3P/nHNy+TeX0hUeZp4B7A
+        gOKeLQ0Kjzy6SoRlLGeuC9PVN/RYJvSyvLCGmZLBrXwM0TKqWFWB3KHvGJ3IdzYw3XUk6A
+        HxLz+dYQTcarYS/X7gSb3deAPqhxkks=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ed670bdc (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 30 Dec 2021 16:50:59 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, tytso@mit.edu,
+        linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH] random: avoid superfluous call to RDRAND in CRNG extraction
+Date:   Thu, 30 Dec 2021 17:50:52 +0100
+Message-Id: <20211230165052.2698-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-References: <SY4PR01MB62510D797406741564AD5213EE429@SY4PR01MB6251.ausprd01.prod.outlook.com>
-In-Reply-To: <SY4PR01MB62510D797406741564AD5213EE429@SY4PR01MB6251.ausprd01.prod.outlook.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Thu, 30 Dec 2021 16:28:54 +0800
-Message-ID: <CACXcFmnkoLS+Gr4OH_yquvxDBbb=kDNBH0A40qhitvPsAEyujA@mail.gmail.com>
-Subject: Fwd: [Cryptography] This is it, we're all going to die
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This is a well-known expert posting  on a crypto list.
+RDRAND is not fast. RDRAND is actually quite slow. We've known this for
+a while, which is why functions like get_random_u{32,64} were converted
+to use batching of our ChaCha-based CRNG instead.
 
----------- Forwarded message ---------
-From: Peter Gutmann <pgut001@cs.auckland.ac.nz>
-Date: Thu, Dec 30, 2021 at 4:00 PM
-Subject: [Cryptography] This is it, we're all going to die
-To: cryptography@metzdowd.com <cryptography@metzdowd.com>
+Yet CRNG extraction still includes a call to RDRAND, in the hot path of
+every call to get_random_bytes(), /dev/urandom, and getrandom(2).
 
-While searching for something vaguely related, Google turned up this:
+This call to RDRAND here seems quite superfluous. CRNG is already
+extracting things based on a 256-bit key, based on good entropy, which
+is then reseeded periodically, updated, backtrack-mutated, and so
+forth. The CRNG extraction construction is something that we're already
+relying on to be secure and solid. If it's not, that's a serious
+problem, and it's unlikely that mixing in a measly 32 bits from RDRAND
+is going to alleviate things.
 
-  https://www.spinics.net/lists/stable-commits/msg184308.html
-  Patch "X.509: Fix crash caused by NULL pointer" has been added to
-the 5.10-stable tree
+There is one place, though, where such last-ditch moves might be
+quasi-sensible, and that's before the CRNG is actually ready. In that case,
+we're already very much operating from a position of trying to get
+whatever we can, so we might as well throw in the RDRAND call because
+why not.
 
-The Linux kernel has X.509 processing inside it.
+But once the CRNG is actually up, it's simply not sensible. Removing the
+call there improves performance on an i7-11850H by 370%. In other words,
+the vast majority of the work done by extract_crng() prior to this commit
+was devoted to fetching 32 bits of RDRAND.
 
-We're all going to die.
+This commit fixes the issue by only making that call to RDRAND when the
+CRNG is not yet ready.
 
-Peter.
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/char/random.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-_______________________________________________
-The cryptography mailing list
-cryptography@metzdowd.com
-https://www.metzdowd.com/mailman/listinfo/cryptography
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 54086e9da05b..239b1455b1a8 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1030,7 +1030,7 @@ static void _extract_crng(struct crng_state *crng,
+ 				    &input_pool : NULL);
+ 	}
+ 	spin_lock_irqsave(&crng->lock, flags);
+-	if (arch_get_random_long(&v))
++	if (unlikely(!crng_ready()) && arch_get_random_long(&v))
+ 		crng->state[14] ^= v;
+ 	chacha20_block(&crng->state[0], out);
+ 	if (crng->state[12] == 0)
+-- 
+2.34.1
+
