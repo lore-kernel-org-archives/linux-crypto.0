@@ -2,107 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40AA7C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Dec 2021 22:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B38C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Dec 2021 01:41:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242326AbhL3W6K (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Dec 2021 17:58:10 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:34136 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbhL3W6K (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Dec 2021 17:58:10 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 062E16175F;
-        Thu, 30 Dec 2021 22:58:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C0DDC36AE7;
-        Thu, 30 Dec 2021 22:58:08 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="lO9j06My"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1640905087;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+isKFOPChYW4uT91Wd7roEwF3E6d47PP3noE5v3NGJc=;
-        b=lO9j06MyGPHHgiw6OxWDdXQVCzlSrr3QyGXN5UttjRjPf0NNOKMlwst6WX3hAVcTjBL+OD
-        lXGLL5Rskb1qZnshKuddGBCyveCYo38GedZU9agNTPJP86l8jdJqFqMn+uC8oj+14V8lkY
-        jAZyyFKwKrOl6axLj4Hj0XZ0fTUS7vM=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 57dcd41b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 30 Dec 2021 22:58:07 +0000 (UTC)
-Received: by mail-yb1-f174.google.com with SMTP id m19so58521686ybf.9;
-        Thu, 30 Dec 2021 14:58:07 -0800 (PST)
-X-Gm-Message-State: AOAM533DsDEpQra1vPtofib6PvDOsezvCaJEFnYT1XfAd1+HOe8ugQi1
-        TB3UZ76ZO/NgkkWfuLkdpUEQ1vGakyFuawZvxxY=
-X-Google-Smtp-Source: ABdhPJziW9jNaXarvMd10MiFTD+8JHEfE3h6htAQtypHP+fbK7H60fHt9ZpWzzGWSg6EBYivl4W3NXapt1c04MDe7Q8=
-X-Received: by 2002:a25:938d:: with SMTP id a13mr26620716ybm.457.1640905086217;
- Thu, 30 Dec 2021 14:58:06 -0800 (PST)
+        id S242500AbhLaBlD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Dec 2021 20:41:03 -0500
+Received: from smtp23.cstnet.cn ([159.226.251.23]:36718 "EHLO cstnet.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S242471AbhLaBlD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 Dec 2021 20:41:03 -0500
+Received: from localhost.localdomain (unknown [124.16.138.126])
+        by APP-03 (Coremail) with SMTP id rQCowAAXHFiVX85hbHPvBA--.30636S2;
+        Fri, 31 Dec 2021 09:40:37 +0800 (CST)
+From:   Jiasheng Jiang <jiasheng@iscas.ac.cn>
+To:     ebiggers@kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jiasheng Jiang <jiasheng@iscas.ac.cn>
+Subject: [PATCH v2] crypto: af_alg - check possible NULL pointer
+Date:   Fri, 31 Dec 2021 09:40:36 +0800
+Message-Id: <20211231014036.1870631-1-jiasheng@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Received: by 2002:a05:7110:209:b0:11c:1b85:d007 with HTTP; Thu, 30 Dec 2021
- 14:58:05 -0800 (PST)
-In-Reply-To: <Yc4vBfiN529c06kI@mit.edu>
-References: <20211230165052.2698-1-Jason@zx2c4.com> <Yc4vBfiN529c06kI@mit.edu>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 30 Dec 2021 23:58:05 +0100
-X-Gmail-Original-Message-ID: <CAHmME9reW0Hp=2s73KvFwzg94Uc5QynGDk8t7bAH=q=BRquc4A@mail.gmail.com>
-Message-ID: <CAHmME9reW0Hp=2s73KvFwzg94Uc5QynGDk8t7bAH=q=BRquc4A@mail.gmail.com>
-Subject: Re: [PATCH] random: avoid superfluous call to RDRAND in CRNG extraction
-To:     "Theodore Ts'o" <tytso@mit.edu>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: rQCowAAXHFiVX85hbHPvBA--.30636S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZw1kKF4xGw1xAFWftr4ruFg_yoWkJrg_Cr
+        yDAr1Durs7Zr18CF4DJa17Gr10qayUurW8WrWjk343K3W5JasrX3Wqyr13ArZrCa4xuFWk
+        Ww1qkr17C342vjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb48FF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
+        4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2Wl
+        Yx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbV
+        WUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc2xSY4AK67AK
+        6w4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI
+        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
+        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbYFAPUUUU
+        U==
+X-Originating-IP: [124.16.138.126]
+X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ted,
+Because of the possible alloc failure of the alloc_page(), it could
+return NULL pointer.
+And there is a check below the sg_assign_page().
+But it will be more logical to move the NULL check before the
+sg_assign_page().
 
-On 12/30/21, Theodore Ts'o <tytso@mit.edu> wrote:
-> but realistically speaking, in
-> crng_init_try_arch_early(), which gets called from rand_initialize(),
-> we will have already set crng->state[4..15] via RDSEED or RDRAND.
->
-> So there's no point in setting crng->state[0] from RDRAND.  So if
-> we're wanting to speed things up, we should just remove the
-> crng->state[0] <= RDRAND entirely.
+Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+---
+Changelog:
 
-Good point, and that seems reasonable. I'll do that for v+1.
+v1 -> v2
 
-> Or if we want to improve the security of get_random_bytes() pre
-> crng_ready(), then we should try to XOR RDRAND bytes into all returned
-> buffer from get_random_bytes().  In other words, I'd argue that we
-> should "go big, or go home".  (And if we do have some real,
-> security-critical users of get_random_bytes() pre-crng_ready(), maybe
-> "go big" is the right way to go.
+* Change 1. Move the previous check in front of sg_assign_page().
+---
+ crypto/af_alg.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-That's a decent way of looking at it. Rather than dallying with
-32bits, we may as well go all the way. Or, to compromise on
-efficiency, we could just xor in 16 or 32 bytes into the key rows
-prior to each extraction. Alternatively, we have fewer things to think
-about with the "go home" route, and then it's just a matter of
-important users using get_random_bytes_wait(), which I think I mostly
-took care of through the tree a few years back.
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 18cc82dc4a42..f79e446d8132 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -931,16 +931,19 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 			sg_unmark_end(sg + sgl->cur - 1);
+ 
+ 		do {
++			struct page *pg;
+ 			unsigned int i = sgl->cur;
+ 
+ 			plen = min_t(size_t, len, PAGE_SIZE);
+ 
+-			sg_assign_page(sg + i, alloc_page(GFP_KERNEL));
+-			if (!sg_page(sg + i)) {
++			pg = alloc_page(GFP_KERNEL);
++			if (!pg) {
+ 				err = -ENOMEM;
+ 				goto unlock;
+ 			}
+ 
++			sg_assign_page(sg + i, pg);
++
+ 			err = memcpy_from_msg(page_address(sg_page(sg + i)),
+ 					      msg, plen);
+ 			if (err) {
+-- 
+2.25.1
 
-> So I'm not sure we how desperately we *need* the 370% performance improvement
-
-It's not necessary (aside from, like, people using sendfile to erase
-NVMes or something weird?), but it appeals to me for two reasons:
-- The superfluous RDRAND with only 32bits really isn't doing much, and
-having it there makes the design every so slightly more confusing and
-less straightforward.
-- I would like to see if at some point (not now, just in the future)
-it's feasible, performance wise, to replace all of prandom with
-get_batched_random() and company. I was on some thread a few years ago
-where a researcher pointed out one place prandom was used when
-get_random_u64() should have been, and in the ensuing discussion a few
-more places were found with the same issue, and then more. And then
-nobody could agree on whether the performance hit was worth it for
-whichever security model. And in the end I don't recall anything
-really happening. If that whole discussion could magicially go away
-because we make all uses secure with no performance hit, it'd be a
-major win against footguns like prandom. Maybe it won't be feasible in
-the end, but simplifying a design in the process of seeing seems like
-decent enough motivation.
-
-Jason
