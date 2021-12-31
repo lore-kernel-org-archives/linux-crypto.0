@@ -2,74 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BDA9C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Dec 2021 11:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F23EFC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Dec 2021 11:35:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229743AbhLaLfK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 Dec 2021 06:35:10 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:58796 "EHLO fornost.hmeau.com"
+        id S229642AbhLaLfd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 31 Dec 2021 06:35:33 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58798 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229718AbhLaLfK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Dec 2021 06:35:10 -0500
+        id S229498AbhLaLfc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 31 Dec 2021 06:35:32 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1n3GB5-0004sN-4E; Fri, 31 Dec 2021 22:34:32 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 Dec 2021 22:34:30 +1100
-Date:   Fri, 31 Dec 2021 22:34:30 +1100
+        id 1n3GBn-0004xW-BQ; Fri, 31 Dec 2021 22:35:16 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 Dec 2021 22:35:15 +1100
+Date:   Fri, 31 Dec 2021 22:35:15 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linux-crypto@vger.kernel.org, linux-mips@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, sparclinux@vger.kernel.org
-Subject: Re: [PATCH 0/5] Remove duplicate context init function for sha
- algorithm
-Message-ID: <Yc7qxrxxIMr5kPSj@gondor.apana.org.au>
-References: <20211220092318.5793-1-tianjia.zhang@linux.alibaba.com>
+To:     trix@redhat.com
+Cc:     wangzhou1@hisilicon.com, davem@davemloft.net, nathan@kernel.org,
+        ndesaulniers@google.com, yekai13@huawei.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev
+Subject: Re: [PATCH v2] crypto: cleanup warning in qm_get_qos_value()
+Message-ID: <Yc7q8yhSp+aRy1Xg@gondor.apana.org.au>
+References: <20211222172923.3209810-1-trix@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211220092318.5793-1-tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <20211222172923.3209810-1-trix@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 20, 2021 at 05:23:13PM +0800, Tianjia Zhang wrote:
-> This series of patches is mainly for repetitive code cleaning. The sha
-> algorithm has provided generic context initialization implementation.
-> The context initialization code in the optimized implementation of each
-> platform is a repetitive code and can be deleted. The sha*_base_init()
-> series of functions are used uniformly.
+On Wed, Dec 22, 2021 at 09:29:23AM -0800, trix@redhat.com wrote:
+> From: Tom Rix <trix@redhat.com>
 > 
-> Tianjia Zhang (5):
->   crypto: sha256 - remove duplicate generic hash init function
->   crypto: mips/sha - remove duplicate hash init function
->   crypto: powerpc/sha - remove duplicate hash init function
->   crypto: sparc/sha - remove duplicate hash init function
->   crypto: s390/sha512 - Use macros instead of direct IV numbers
+> Building with clang static analysis returns this warning:
 > 
->  arch/mips/cavium-octeon/crypto/octeon-sha1.c  | 17 +-------
->  .../mips/cavium-octeon/crypto/octeon-sha256.c | 39 ++-----------------
->  .../mips/cavium-octeon/crypto/octeon-sha512.c | 39 ++-----------------
->  arch/powerpc/crypto/sha1-spe-glue.c           | 17 +-------
->  arch/powerpc/crypto/sha1.c                    | 14 +------
->  arch/powerpc/crypto/sha256-spe-glue.c         | 39 ++-----------------
->  arch/s390/crypto/sha512_s390.c                | 32 +++++++--------
->  arch/sparc/crypto/sha1_glue.c                 | 14 +------
->  arch/sparc/crypto/sha256_glue.c               | 37 ++----------------
->  arch/sparc/crypto/sha512_glue.c               | 37 ++----------------
->  crypto/sha256_generic.c                       | 16 +-------
->  11 files changed, 41 insertions(+), 260 deletions(-)
+> qm.c:4382:11: warning: The left operand of '==' is a garbage value
+>         if (*val == 0 || *val > QM_QOS_MAX_VAL || ret) {
+>             ~~~~ ^
+> 
+> The call to qm_qos_value_init() can return an error without setting
+> *val.  So check ret before checking *val.
+> 
+> Fixes: 72b010dc33b9 ("crypto: hisilicon/qm - supports writing QoS int the host")
+> Signed-off-by: Tom Rix <trix@redhat.com>
+> ---
+> v2: Add Fixes: line
+> 
+>  drivers/crypto/hisilicon/qm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
