@@ -2,113 +2,142 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A447C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Dec 2021 08:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 702A7C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Dec 2021 11:01:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230135AbhLaIko (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 Dec 2021 03:40:44 -0500
-Received: from isilmar-4.linta.de ([136.243.71.142]:59816 "EHLO
-        isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229862AbhLaIkn (ORCPT
+        id S229535AbhLaLBD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 31 Dec 2021 06:01:03 -0500
+Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:43216 "EHLO
+        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229446AbhLaLBC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Dec 2021 03:40:43 -0500
-X-Greylist: delayed 481 seconds by postgrey-1.27 at vger.kernel.org; Fri, 31 Dec 2021 03:40:43 EST
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 28236200278;
-        Fri, 31 Dec 2021 08:32:41 +0000 (UTC)
-Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id AEC11806B7; Fri, 31 Dec 2021 09:26:12 +0100 (CET)
-From:   Dominik Brodowski <linux@dominikbrodowski.net>
-To:     "Jason A . Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux@dominikbrodowski.net,
+        Fri, 31 Dec 2021 06:01:02 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R901e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0V0Qbvzp_1640948456;
+Received: from 30.240.96.79(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V0Qbvzp_1640948456)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 31 Dec 2021 19:00:57 +0800
+Message-ID: <77861ac9-2996-4a8f-f0d1-84950e1c6af9@linux.alibaba.com>
+Date:   Fri, 31 Dec 2021 19:00:55 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Subject: Re: [PATCH v2 2/6] crypto: arm64/sm3-ce - make dependent on sm3
+ library
+Content-Language: en-US
+To:     liulongfang <liulongfang@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v2] random: early initialization of ChaCha constants
-Date:   Fri, 31 Dec 2021 09:26:08 +0100
-Message-Id: <20211231082608.171839-1-linux@dominikbrodowski.net>
-X-Mailer: git-send-email 2.34.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Vitaly Chikunov <vt@altlinux.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
+        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+References: <20211222045022.27069-1-tianjia.zhang@linux.alibaba.com>
+ <20211222045022.27069-3-tianjia.zhang@linux.alibaba.com>
+ <18fdaf2c-827e-8d17-1eb7-cb1c12d15808@huawei.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <18fdaf2c-827e-8d17-1eb7-cb1c12d15808@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Previously, the ChaCha constants for the primary pool were only
-initialized in crng_initialize_primary(), called by rand_initialize().
-However, some randomness is actually extracted from the primary pool
-beforehand, e.g. by kmem_cache_create(). Therefore, statically
-initialize the ChaCha constants for the primary pool.
+Hi
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: <linux-crypto@vger.kernel.org>
-Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
----
- drivers/char/random.c   |  5 ++++-
- include/crypto/chacha.h | 15 +++++++++++----
- 2 files changed, 15 insertions(+), 5 deletions(-)
- 
-v1->v2: do not simplify crng_initialize_primary() calling convention, add CCs
-v1 at https://lore.kernel.org/lkml/20211229211009.108091-6-linux@dominikbrodowski.net/
+On 12/31/21 3:05 PM, liulongfang wrote:
+> On 2021/12/22 12:50, Tianjia Zhang Wrote:
+>> SM3 generic library is stand-alone implementation, sm3-ce can depend
+>> on the SM3 library instead of sm3-generic.
+>>
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>> ---
+>>   arch/arm64/crypto/Kconfig       |  2 +-
+>>   arch/arm64/crypto/sm3-ce-glue.c | 20 ++++++++++++++------
+>>   2 files changed, 15 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+>> index addfa413650b..2a965aa0188d 100644
+>> --- a/arch/arm64/crypto/Kconfig
+>> +++ b/arch/arm64/crypto/Kconfig
+>> @@ -45,7 +45,7 @@ config CRYPTO_SM3_ARM64_CE
+>>   	tristate "SM3 digest algorithm (ARMv8.2 Crypto Extensions)"
+>>   	depends on KERNEL_MODE_NEON
+>>   	select CRYPTO_HASH
+>> -	select CRYPTO_SM3
+>> +	select CRYPTO_LIB_SM3
+>>   
+>>   config CRYPTO_SM4_ARM64_CE
+>>   	tristate "SM4 symmetric cipher (ARMv8.2 Crypto Extensions)"
+>> diff --git a/arch/arm64/crypto/sm3-ce-glue.c b/arch/arm64/crypto/sm3-ce-glue.c
+>> index d71faca322f2..3198f31c9446 100644
+>> --- a/arch/arm64/crypto/sm3-ce-glue.c
+>> +++ b/arch/arm64/crypto/sm3-ce-glue.c
+>> @@ -27,7 +27,7 @@ static int sm3_ce_update(struct shash_desc *desc, const u8 *data,
+>>   			 unsigned int len)
+>>   {
+>>   	if (!crypto_simd_usable())
+>> -		return crypto_sm3_update(desc, data, len);
+>> +		return sm3_update(shash_desc_ctx(desc), data, len);
+>>   
+>>   	kernel_neon_begin();
+>>   	sm3_base_do_update(desc, data, len, sm3_ce_transform);
+>> @@ -39,7 +39,7 @@ static int sm3_ce_update(struct shash_desc *desc, const u8 *data,
+>>   static int sm3_ce_final(struct shash_desc *desc, u8 *out)
+>>   {
+>>   	if (!crypto_simd_usable())
+>> -		return crypto_sm3_finup(desc, NULL, 0, out);
+>> +		return sm3_final(shash_desc_ctx(desc), out);
+>>   
+>>   	kernel_neon_begin();
+>>   	sm3_base_do_finalize(desc, sm3_ce_transform);
+>> @@ -51,14 +51,22 @@ static int sm3_ce_final(struct shash_desc *desc, u8 *out)
+>>   static int sm3_ce_finup(struct shash_desc *desc, const u8 *data,
+>>   			unsigned int len, u8 *out)
+>>   {
+>> -	if (!crypto_simd_usable())
+>> -		return crypto_sm3_finup(desc, data, len, out);
+>> +	if (!crypto_simd_usable()) {
+>> +		struct sm3_state *sctx = shash_desc_ctx(desc);
+>> +
+>> +		if (len)
+>> +			sm3_update(sctx, data, len);
+>> +		sm3_final(sctx, out);
+>> +		return 0;
+>> +	}
+>>   
+>>   	kernel_neon_begin();
+>> -	sm3_base_do_update(desc, data, len, sm3_ce_transform);
+>> +	if (len)
+>> +		sm3_base_do_update(desc, data, len, sm3_ce_transform);
+>> +	sm3_base_do_finalize(desc, sm3_ce_transform);
+>>   	kernel_neon_end();
+>>   
+>> -	return sm3_ce_final(desc, out);
+>> +	return sm3_base_finish(desc, out);
+>>   }
+>>   
+>>   static struct shash_alg sm3_alg = {
+>> You have modified the implementation of SM3 algorithm, so what benefits will be gained
+> after such modification?
+> What flaws are solved or can performance be improved?
+> Thanks.
+> Longfang.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 9b5eb6cf82ce..acb908715b62 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -457,6 +457,10 @@ struct crng_state {
- 
- static struct crng_state primary_crng = {
- 	.lock = __SPIN_LOCK_UNLOCKED(primary_crng.lock),
-+	.state[0] = CHACHA_CONSTANT_EXPA,
-+	.state[1] = CHACHA_CONSTANT_ND_3,
-+	.state[2] = CHACHA_CONSTANT_2_BY,
-+	.state[3] = CHACHA_CONSTANT_TE_K,
- };
- 
- /*
-@@ -825,7 +829,6 @@ static void __maybe_unused crng_initialize_secondary(struct crng_state *crng)
- 
- static void __init crng_initialize_primary(struct crng_state *crng)
- {
--	chacha_init_consts(crng->state);
- 	_extract_entropy(&input_pool, &crng->state[4], sizeof(__u32) * 12, 0);
- 	if (crng_init_try_arch_early(crng) && trust_cpu && crng_init < 2) {
- 		invalidate_batched_entropy();
-diff --git a/include/crypto/chacha.h b/include/crypto/chacha.h
-index dabaee698718..b3ea73b81944 100644
---- a/include/crypto/chacha.h
-+++ b/include/crypto/chacha.h
-@@ -47,12 +47,19 @@ static inline void hchacha_block(const u32 *state, u32 *out, int nrounds)
- 		hchacha_block_generic(state, out, nrounds);
- }
- 
-+enum chacha_constants { /* expand 32-byte k */
-+	CHACHA_CONSTANT_EXPA = 0x61707865U,
-+	CHACHA_CONSTANT_ND_3 = 0x3320646eU,
-+	CHACHA_CONSTANT_2_BY = 0x79622d32U,
-+	CHACHA_CONSTANT_TE_K = 0x6b206574U
-+};
-+
- static inline void chacha_init_consts(u32 *state)
- {
--	state[0]  = 0x61707865; /* "expa" */
--	state[1]  = 0x3320646e; /* "nd 3" */
--	state[2]  = 0x79622d32; /* "2-by" */
--	state[3]  = 0x6b206574; /* "te k" */
-+	state[0]  = CHACHA_CONSTANT_EXPA;
-+	state[1]  = CHACHA_CONSTANT_ND_3;
-+	state[2]  = CHACHA_CONSTANT_2_BY;
-+	state[3]  = CHACHA_CONSTANT_TE_K;
- }
- 
- void chacha_init_arch(u32 *state, const u32 *key, const u8 *iv);
--- 
-2.34.1
+This modification does not bring obvious performance improvement, but
+makes the code logic more reasonable in terms of architecture and
+calling level. The calling relationship before modification is:
+   sm3-ce -> sm3-generic -> sm3-lib,
+after this modification is: sm3-ce -> sm3-lib.
 
+Best regards,
+Tianjia
