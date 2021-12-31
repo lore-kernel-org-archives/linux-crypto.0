@@ -2,142 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 702A7C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Dec 2021 11:01:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C37C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Dec 2021 11:31:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbhLaLBD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 Dec 2021 06:01:03 -0500
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:43216 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229446AbhLaLBC (ORCPT
+        id S229613AbhLaLbj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 31 Dec 2021 06:31:39 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:34792 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229530AbhLaLbi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Dec 2021 06:01:02 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R901e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0V0Qbvzp_1640948456;
-Received: from 30.240.96.79(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V0Qbvzp_1640948456)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 31 Dec 2021 19:00:57 +0800
-Message-ID: <77861ac9-2996-4a8f-f0d1-84950e1c6af9@linux.alibaba.com>
-Date:   Fri, 31 Dec 2021 19:00:55 +0800
+        Fri, 31 Dec 2021 06:31:38 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 013016175D;
+        Fri, 31 Dec 2021 11:31:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF2C1C36AEA;
+        Fri, 31 Dec 2021 11:31:36 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="CmyVLuUC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1640950295;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bG16Sx/rFUWLFAduoTxKdTK55ZW+sW+5u57q+BYjnsM=;
+        b=CmyVLuUCqyvpx0/XOTLhHA811Cvy8Dq/EIWB54aYb04k8zdTj7ukuQvG78o1He9GXkoQ1c
+        6Bza0V/jakOyppk7NFE8IU9JmFNSgaG9T4+d9VDIFAt7Y2glzdBRJFU2B+sAE1UDSZMPTw
+        pDzu5X/o3kq7nd2TnOupMIY5uV8ajPs=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b3e5181c (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 31 Dec 2021 11:31:34 +0000 (UTC)
+Received: by mail-yb1-f173.google.com with SMTP id d1so59069830ybh.6;
+        Fri, 31 Dec 2021 03:31:34 -0800 (PST)
+X-Gm-Message-State: AOAM533Q1KsVPNI4rKdqBvkF/QgYcFo7RJIztfQMuKCdkjfnGru3JLfS
+        GWiWqDX9PZmWQ28UJBQnAgUhpoSEqA0bfl+0Eag=
+X-Google-Smtp-Source: ABdhPJxIaZtLL/5kN5yybMhjkc7+SQZ0NG6cXQNO6BiXbNOTj7Xo2/9Q4jUo9Zut1KI18sY328RFMwnN6vLRCBEVGZI=
+X-Received: by 2002:a25:a427:: with SMTP id f36mr41924649ybi.245.1640950294019;
+ Fri, 31 Dec 2021 03:31:34 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.4.1
-Subject: Re: [PATCH v2 2/6] crypto: arm64/sm3-ce - make dependent on sm3
- library
-Content-Language: en-US
-To:     liulongfang <liulongfang@huawei.com>,
+References: <20211231082608.171839-1-linux@dominikbrodowski.net>
+In-Reply-To: <20211231082608.171839-1-linux@dominikbrodowski.net>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 31 Dec 2021 12:31:23 +0100
+X-Gmail-Original-Message-ID: <CAHmME9rH1cHwPhf-mSyD7sas3rBHhYPDd1CvG+68Vw1piRR6QA@mail.gmail.com>
+Message-ID: <CAHmME9rH1cHwPhf-mSyD7sas3rBHhYPDd1CvG+68Vw1piRR6QA@mail.gmail.com>
+Subject: Re: [PATCH v2] random: early initialization of ChaCha constants
+To:     Dominik Brodowski <linux@dominikbrodowski.net>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
-        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-References: <20211222045022.27069-1-tianjia.zhang@linux.alibaba.com>
- <20211222045022.27069-3-tianjia.zhang@linux.alibaba.com>
- <18fdaf2c-827e-8d17-1eb7-cb1c12d15808@huawei.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-In-Reply-To: <18fdaf2c-827e-8d17-1eb7-cb1c12d15808@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi
+Thanks, looks good. I tried briefly to break it with the following
+assertion thing, but didn't come up with any hits, so it looks like
+we're all set. Prior to applying this patch, I found the easiest way
+of triggering the below crash was by enabling
+CONFIG_SLAB_FREELIST_RANDOM.
 
-On 12/31/21 3:05 PM, liulongfang wrote:
-> On 2021/12/22 12:50, Tianjia Zhang Wrote:
->> SM3 generic library is stand-alone implementation, sm3-ce can depend
->> on the SM3 library instead of sm3-generic.
->>
->> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->> ---
->>   arch/arm64/crypto/Kconfig       |  2 +-
->>   arch/arm64/crypto/sm3-ce-glue.c | 20 ++++++++++++++------
->>   2 files changed, 15 insertions(+), 7 deletions(-)
->>
->> diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
->> index addfa413650b..2a965aa0188d 100644
->> --- a/arch/arm64/crypto/Kconfig
->> +++ b/arch/arm64/crypto/Kconfig
->> @@ -45,7 +45,7 @@ config CRYPTO_SM3_ARM64_CE
->>   	tristate "SM3 digest algorithm (ARMv8.2 Crypto Extensions)"
->>   	depends on KERNEL_MODE_NEON
->>   	select CRYPTO_HASH
->> -	select CRYPTO_SM3
->> +	select CRYPTO_LIB_SM3
->>   
->>   config CRYPTO_SM4_ARM64_CE
->>   	tristate "SM4 symmetric cipher (ARMv8.2 Crypto Extensions)"
->> diff --git a/arch/arm64/crypto/sm3-ce-glue.c b/arch/arm64/crypto/sm3-ce-glue.c
->> index d71faca322f2..3198f31c9446 100644
->> --- a/arch/arm64/crypto/sm3-ce-glue.c
->> +++ b/arch/arm64/crypto/sm3-ce-glue.c
->> @@ -27,7 +27,7 @@ static int sm3_ce_update(struct shash_desc *desc, const u8 *data,
->>   			 unsigned int len)
->>   {
->>   	if (!crypto_simd_usable())
->> -		return crypto_sm3_update(desc, data, len);
->> +		return sm3_update(shash_desc_ctx(desc), data, len);
->>   
->>   	kernel_neon_begin();
->>   	sm3_base_do_update(desc, data, len, sm3_ce_transform);
->> @@ -39,7 +39,7 @@ static int sm3_ce_update(struct shash_desc *desc, const u8 *data,
->>   static int sm3_ce_final(struct shash_desc *desc, u8 *out)
->>   {
->>   	if (!crypto_simd_usable())
->> -		return crypto_sm3_finup(desc, NULL, 0, out);
->> +		return sm3_final(shash_desc_ctx(desc), out);
->>   
->>   	kernel_neon_begin();
->>   	sm3_base_do_finalize(desc, sm3_ce_transform);
->> @@ -51,14 +51,22 @@ static int sm3_ce_final(struct shash_desc *desc, u8 *out)
->>   static int sm3_ce_finup(struct shash_desc *desc, const u8 *data,
->>   			unsigned int len, u8 *out)
->>   {
->> -	if (!crypto_simd_usable())
->> -		return crypto_sm3_finup(desc, data, len, out);
->> +	if (!crypto_simd_usable()) {
->> +		struct sm3_state *sctx = shash_desc_ctx(desc);
->> +
->> +		if (len)
->> +			sm3_update(sctx, data, len);
->> +		sm3_final(sctx, out);
->> +		return 0;
->> +	}
->>   
->>   	kernel_neon_begin();
->> -	sm3_base_do_update(desc, data, len, sm3_ce_transform);
->> +	if (len)
->> +		sm3_base_do_update(desc, data, len, sm3_ce_transform);
->> +	sm3_base_do_finalize(desc, sm3_ce_transform);
->>   	kernel_neon_end();
->>   
->> -	return sm3_ce_final(desc, out);
->> +	return sm3_base_finish(desc, out);
->>   }
->>   
->>   static struct shash_alg sm3_alg = {
->> You have modified the implementation of SM3 algorithm, so what benefits will be gained
-> after such modification?
-> What flaws are solved or can performance be improved?
-> Thanks.
-> Longfang.
-
-This modification does not bring obvious performance improvement, but
-makes the code logic more reasonable in terms of architecture and
-calling level. The calling relationship before modification is:
-   sm3-ce -> sm3-generic -> sm3-lib,
-after this modification is: sm3-ce -> sm3-lib.
-
-Best regards,
-Tianjia
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 4de0feb69781..0d9ac045943f 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1035,6 +1035,10 @@ static void _extract_crng(struct crng_state *crng,
+  spin_lock_irqsave(&crng->lock, flags);
+  if (arch_get_random_long(&v))
+  crng->state[14] ^= v;
++ BUG_ON(crng->state[0] != CHACHA_CONSTANT_EXPA);
++ BUG_ON(crng->state[1] != CHACHA_CONSTANT_ND_3);
++ BUG_ON(crng->state[2] != CHACHA_CONSTANT_2_BY);
++ BUG_ON(crng->state[3] != CHACHA_CONSTANT_TE_K);
+  chacha20_block(&crng->state[0], out);
+  if (crng->state[12] == 0)
+  crng->state[13]++;
