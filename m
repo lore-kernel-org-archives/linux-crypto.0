@@ -2,95 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B38C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Dec 2021 01:41:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15242C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Dec 2021 03:35:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242500AbhLaBlD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Dec 2021 20:41:03 -0500
-Received: from smtp23.cstnet.cn ([159.226.251.23]:36718 "EHLO cstnet.cn"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S242471AbhLaBlD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Dec 2021 20:41:03 -0500
-Received: from localhost.localdomain (unknown [124.16.138.126])
-        by APP-03 (Coremail) with SMTP id rQCowAAXHFiVX85hbHPvBA--.30636S2;
-        Fri, 31 Dec 2021 09:40:37 +0800 (CST)
-From:   Jiasheng Jiang <jiasheng@iscas.ac.cn>
-To:     ebiggers@kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jiasheng Jiang <jiasheng@iscas.ac.cn>
-Subject: [PATCH v2] crypto: af_alg - check possible NULL pointer
-Date:   Fri, 31 Dec 2021 09:40:36 +0800
-Message-Id: <20211231014036.1870631-1-jiasheng@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+        id S242601AbhLaDf2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Dec 2021 22:35:28 -0500
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:54879 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S229590AbhLaDf2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 Dec 2021 22:35:28 -0500
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 1BV3ZO0M026478
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Dec 2021 22:35:24 -0500
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 0342A15C33A3; Thu, 30 Dec 2021 22:35:23 -0500 (EST)
+Date:   Thu, 30 Dec 2021 22:35:23 -0500
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] random: avoid superfluous call to RDRAND in CRNG
+ extraction
+Message-ID: <Yc56ey6QKwaYg0yi@mit.edu>
+References: <20211230165052.2698-1-Jason@zx2c4.com>
+ <Yc4vBfiN529c06kI@mit.edu>
+ <CAHmME9reW0Hp=2s73KvFwzg94Uc5QynGDk8t7bAH=q=BRquc4A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: rQCowAAXHFiVX85hbHPvBA--.30636S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrZw1kKF4xGw1xAFWftr4ruFg_yoWkJrg_Cr
-        yDAr1Durs7Zr18CF4DJa17Gr10qayUurW8WrWjk343K3W5JasrX3Wqyr13ArZrCa4xuFWk
-        Ww1qkr17C342vjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb48FF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
-        4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2Wl
-        Yx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbV
-        WUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc2xSY4AK67AK
-        6w4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI
-        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
-        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbYFAPUUUU
-        U==
-X-Originating-IP: [124.16.138.126]
-X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9reW0Hp=2s73KvFwzg94Uc5QynGDk8t7bAH=q=BRquc4A@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Because of the possible alloc failure of the alloc_page(), it could
-return NULL pointer.
-And there is a check below the sg_assign_page().
-But it will be more logical to move the NULL check before the
-sg_assign_page().
+On Thu, Dec 30, 2021 at 11:58:05PM +0100, Jason A. Donenfeld wrote:
+> > Or if we want to improve the security of get_random_bytes() pre
+> > crng_ready(), then we should try to XOR RDRAND bytes into all returned
+> > buffer from get_random_bytes().  In other words, I'd argue that we
+> > should "go big, or go home".  (And if we do have some real,
+> > security-critical users of get_random_bytes() pre-crng_ready(), maybe
+> > "go big" is the right way to go.
+> 
+> That's a decent way of looking at it. Rather than dallying with
+> 32bits, we may as well go all the way. Or, to compromise on
+> efficiency, we could just xor in 16 or 32 bytes into the key rows
+> prior to each extraction. Alternatively, we have fewer things to think
+> about with the "go home" route, and then it's just a matter of
+> important users using get_random_bytes_wait(), which I think I mostly
+> took care of through the tree a few years back.
 
-Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
----
-Changelog:
+I was too lazy to do an audit of all of the get_random_bytes() users
+before I wrote my last e-mail, but I'm good with "go home" route ---
+especially since actually doing that full audit to make sure we don't
+have any pre-crng_ready() security-critical users of
+get_random_bytes() would still be important to do on architectures
+like RISC-V that don't have a RDRAND equivalent.
 
-v1 -> v2
+The challenge is here is short of making adding a
+WARN_ON(!crng_ready()) to get_random_bytes(), it's hard to be sure
+that some future security critical user of get_random_bytes() in early
+boot won't creep back in.  And last I checked, we still have some
+non-security get_random_bytes() users in early boot where the
+WARN_ON() isn't going to be welcome.
 
-* Change 1. Move the previous check in front of sg_assign_page().
----
- crypto/af_alg.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+> - I would like to see if at some point (not now, just in the future)
+> it's feasible, performance wise, to replace all of prandom with
+> get_batched_random() and company.
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 18cc82dc4a42..f79e446d8132 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -931,16 +931,19 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 			sg_unmark_end(sg + sgl->cur - 1);
- 
- 		do {
-+			struct page *pg;
- 			unsigned int i = sgl->cur;
- 
- 			plen = min_t(size_t, len, PAGE_SIZE);
- 
--			sg_assign_page(sg + i, alloc_page(GFP_KERNEL));
--			if (!sg_page(sg + i)) {
-+			pg = alloc_page(GFP_KERNEL);
-+			if (!pg) {
- 				err = -ENOMEM;
- 				goto unlock;
- 			}
- 
-+			sg_assign_page(sg + i, pg);
-+
- 			err = memcpy_from_msg(page_address(sg_page(sg + i)),
- 					      msg, plen);
- 			if (err) {
--- 
-2.25.1
+That's going to be challenging, I suspect.  Some of the networking
+users of prandom() have some *very* strong performance constraints.
+Or at least, the networking developers have some benchmarks where they
+won't countenance any performance regressions.  When the prandom
+implementation was added, some of the networking devs were positively
+doing cycle counting to try to trim it down as much as possible....
 
+						- Ted
