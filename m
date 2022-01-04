@@ -2,70 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46555C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 09:04:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DF0CC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 15:59:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbiADJEH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jan 2022 04:04:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35750 "EHLO
+        id S229915AbiADP7v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Jan 2022 10:59:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229837AbiADJEG (ORCPT
+        with ESMTP id S232467AbiADP7v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jan 2022 04:04:06 -0500
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C912C061761;
-        Tue,  4 Jan 2022 01:04:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-        Resent-Cc:Resent-Message-ID; bh=LIpGUA+BIUuIAA5mn06eiD0IWkKRl9vPozuSU1YrjFw=;
-        t=1641287046; x=1642496646; b=SF3yFNpMOZiMSIMDEKf8NpaBYrj1BVzrdHa0lJj+lLLZ9gR
-        CAUahblriIFZxAfzf0KOnJYktn8RggvQDIqFvfd4nekQBo6gFnWqiusk8B9xPceO2DiPF0IwcZ0PO
-        ouZzeEgVP/inR5ypXCFSvNWG5v/d5I3CwQ3jEThGmkbv6JjPzZYH0yjLlkLrZJMSf62+8+PO1l4nT
-        kMIh7gRy/i3yzfqz/vmwX4hTGNIr9i1kdRmOQbHYvp8QzumQqN9xBzi9SBcJSKgKTAdagMnIRz2cd
-        J1IYN4+8XpLpNVR+dggwhwhR5/diXH6zca3M2qPoPrjofPM/U4u94a/yqek9icWA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.95)
-        (envelope-from <johannes@sipsolutions.net>)
-        id 1n4fjg-001het-NC;
-        Tue, 04 Jan 2022 10:04:04 +0100
-Message-ID: <0523cc8788bfe47ffba185d0436a7c77c85c6e4c.camel@sipsolutions.net>
-Subject: Re: Build regressions/improvements in v5.16-rc7
-From:   Johannes Berg <johannes@sipsolutions.net>
-To:     Geert Uytterhoeven <geert@linux-m68k.org>,
-        linux-kernel@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-um@lists.infradead.org
-Date:   Tue, 04 Jan 2022 10:04:03 +0100
-In-Reply-To: <alpine.DEB.2.22.394.2112271142250.1704790@ramsan.of.borg>
-References: <20211227083126.1153239-1-geert@linux-m68k.org>
-         <alpine.DEB.2.22.394.2112271142250.1704790@ramsan.of.borg>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.2 (3.42.2-1.fc35) 
+        Tue, 4 Jan 2022 10:59:51 -0500
+X-Greylist: delayed 501 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 04 Jan 2022 07:59:51 PST
+Received: from smtp-190b.mail.infomaniak.ch (smtp-190b.mail.infomaniak.ch [IPv6:2001:1600:3:17::190b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25D75C061761
+        for <linux-crypto@vger.kernel.org>; Tue,  4 Jan 2022 07:59:51 -0800 (PST)
+Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4JSxtT3mH9zMptZJ;
+        Tue,  4 Jan 2022 16:51:29 +0100 (CET)
+Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
+        by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4JSxtR5Z2WzljsVx;
+        Tue,  4 Jan 2022 16:51:27 +0100 (CET)
+Message-ID: <5030a9ff-a1d1-a9bd-902a-77c3d1d87446@digikod.net>
+Date:   Tue, 4 Jan 2022 16:56:36 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-malware-bazaar: not-scanned
+User-Agent: 
+Content-Language: en-US
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Eric Snowberg <eric.snowberg@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Andreas Rammhold <andreas@rammhold.de>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>
+References: <20210712170313.884724-1-mic@digikod.net>
+ <7e8d27da-b5d4-e42c-af01-5c03a7f36a6b@digikod.net> <YcGVZitNa23PCSFV@iki.fi>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+Subject: Re: [PATCH v8 0/5] Enable root to update the blacklist keyring
+In-Reply-To: <YcGVZitNa23PCSFV@iki.fi>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2021-12-27 at 11:44 +0100, Geert Uytterhoeven wrote:
+
+On 21/12/2021 09:50, Jarkko Sakkinen wrote:
+> On Mon, Dec 13, 2021 at 04:30:29PM +0100, Mickaël Salaün wrote:
+>> Hi Jarkko,
+>>
+>> Since everyone seems OK with this and had plenty of time to complain, could
+>> you please take this patch series in your tree? It still applies on
+>> v5.16-rc5 and it is really important to us. Please let me know if you need
+>> something more.
+>>
+>> Regards,
+>>   Mickaël
 > 
-> sparc64-gcc11/sparc-allmodconfig
+> I'm off-work up until end of the year, i.e. I will address only important
+> bug fixes and v5.16 up until that.
 > 
->    + /kisskb/src/drivers/video/fbdev/nvidia/nvidia.c: error: passing argument 1 of 'iounmap' discards 'volatile' qualifier from pointer target type [-Werror=discarded-qualifiers]:  => 1439:10, 1414:10
+> If any of the patches is yet missing my ack, feel free to
 > 
+> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-This should be fixed by
+Thanks Jarkko. Can you please take it into your tree?
 
-commit 5f174ec3c1d62013f86db6597249174d8cb227b2
-Author: Al Viro <viro@zeniv.linux.org.uk>
-Date:   Mon Sep 20 21:32:49 2021 +0000
-
-    logic_io instance of iounmap() needs volatile on argument
-
-
-when it lands.
-
-johannes
+Regards,
+  Mickaël
