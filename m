@@ -2,111 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C45BAC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 05:55:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A5DC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 06:46:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230287AbiADFzx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jan 2022 00:55:53 -0500
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:39638 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S230181AbiADFzw (ORCPT
+        id S231976AbiADGqi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Jan 2022 01:46:38 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:17320 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231807AbiADGqi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jan 2022 00:55:52 -0500
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 2045tn3W008635
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 4 Jan 2022 00:55:50 -0500
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 474E015C00E1; Tue,  4 Jan 2022 00:55:49 -0500 (EST)
-Date:   Tue, 4 Jan 2022 00:55:49 -0500
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v2] random: avoid superfluous call to RDRAND in CRNG
- extraction
-Message-ID: <YdPhZQqM52viEttQ@mit.edu>
-References: <Yc56ey6QKwaYg0yi@mit.edu>
- <20211231114903.60882-1-Jason@zx2c4.com>
- <Yc86TIah3w4waDEc@mit.edu>
- <CACXcFmm2nKLHdqN27Ced2nLg=h2mSX_fKWFf-OkgArVRDi3xTw@mail.gmail.com>
+        Tue, 4 Jan 2022 01:46:38 -0500
+Received: from dggpeml500022.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JSjmY692mz9s0r;
+        Tue,  4 Jan 2022 14:45:33 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 4 Jan 2022 14:46:35 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 4 Jan 2022 14:46:34 +0800
+Subject: Re: [PATCH 1/3] Documentation: update debugfs doc for Hisilicon SEC
+To:     Greg KH <gregkh@linuxfoundation.org>
+References: <20211225062718.41155-1-yekai13@huawei.com>
+ <20211225062718.41155-2-yekai13@huawei.com> <YchH4g+mhfRQKXoX@kroah.com>
+CC:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>,
+        <xuzaibo@huawei.com>
+From:   "yekai(A)" <yekai13@huawei.com>
+Message-ID: <1575f22a-f11c-3507-bd32-def3844e9bab@huawei.com>
+Date:   Tue, 4 Jan 2022 14:46:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACXcFmm2nKLHdqN27Ced2nLg=h2mSX_fKWFf-OkgArVRDi3xTw@mail.gmail.com>
+In-Reply-To: <YchH4g+mhfRQKXoX@kroah.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 04, 2022 at 01:03:43PM +0800, Sandy Harris wrote:
-> If we are removing RDRAND, what about adding some
-> cheaper mixing? Something along these lines?
-> 
-> The current code's mixing is triggered only once in 2^32
-> iterations, depends only on crng->state[], always changes
-> the same state word, and introduces no new entropy.
 
-I wouldn't call it "mixing", because the state array isn't an entropy
-pool.
 
-Recall how ChaCha20's state array is set up.  crng->state[0..3]
-contain ChaCha20's initial constants, crng->state[4..11] contain the
-ChaCha20 key, crng->state[12] is the 32-bit counter (which is
-incremented when we call ChaCha20), and crng->state[13..15] is the
-96-bit IV.
+On 2021/12/26 18:45, Greg KH wrote:
+> On Sat, Dec 25, 2021 at 02:27:16PM +0800, Kai Ye wrote:
+>> Update documentation describing DebugFS for function's QoS limiting.
+>>
+>> Signed-off-by: Kai Ye <yekai13@huawei.com>
+>> ---
+>>  Documentation/ABI/testing/debugfs-hisi-sec | 10 ++++++++++
+>>  1 file changed, 10 insertions(+)
+>>
+>> diff --git a/Documentation/ABI/testing/debugfs-hisi-sec b/Documentation/ABI/testing/debugfs-hisi-sec
+>> index 85feb4408e0f..9e50ceab94d2 100644
+>> --- a/Documentation/ABI/testing/debugfs-hisi-sec
+>> +++ b/Documentation/ABI/testing/debugfs-hisi-sec
+>> @@ -14,6 +14,16 @@ Description:    One SEC controller has one PF and multiple VFs, each function
+>>  		qm refers to.
+>>  		Only available for PF.
+>>
+>> +What:           /sys/kernel/debug/hisi_sec2/<bdf>/alg_qos
+>> +Date:           Jun 2021
+>> +Contact:        linux-crypto@vger.kernel.org
+>
+> No tabs?  Why not?
+>
+> thanks,
+>
+> greg k-h
+> .
+>
 
-The IV and counter --- state[12..15] --- is initialized when the CRNG
-is initialized.  We replace the key every time the CRNG is reseeded.
+I'm read the way it was written before，
+i will use the tabs on all Hisilicon Accelerator documentation.
 
-But what if we manage to call _extract_crng() more than 2**32 times?
-Well, that's what this is all about:
-
-    if (crng->state[12] == 0)
-        crng->state[13]++;
-
-What we've effectively done is treat state[12..13] as a 64-bit
-counter, and state[14..15] is initialized to a 64-bit random value
-("the IV") when the CRNG is initialized, and not updated during the
-life of the CRNG.  This is really the only place where we've modified
-ChaCha20.
-
-Now, either we believe in the strength of ChaCha20, or we don't.  The
-whole *point* of a CRNG is that we rely on the crypto, and adding some
-random bit-mashing to mix in the CPU cycle counter into parts of the
-ChaCha20 key (state[10..11]) and part of the ChaCha20 IV (state[12])
-isn't consistent with the philosophy of a CRNG.  At the very least,
-I'd like to get an opinion from a respected cryptographer about what
-they think this would buy us (or what it might cost).
-
-If we want to worry about what happens if we could actually manage to
-call _extract_crng() more than 2**64 times before the reseed interval
-is up --- which *is* one of the benefits of:
-
-   if (arch_get_random_long(^v))
-        crng->state[14] ^= v;
-
-I could see doing perhaps this instead:
-
-    if (crng->state[12] == 0) {
-        crng->state[13]++;
-	if (crng->state[13] == 0) {
-	    crng->state[14]++;
-	    if (crng->state[14] == 0) {
-	        crng->state[15]++;
-	    }
-	}
-   }
-	
-This essentially makes state[12..15] a 128-bit counter, which is
-initialized to a random value when the CRNG is initialized, and we
-would continue to treat state[4..11] as the 256 bit ChaCha20 key.
-This would be a much more philosophically consistent approach, and
-would allow us to more easily reason about the security based on
-cryptographic research into ChaCha20 the stream cipher.
-
-Cheers,
-
-						- Ted
+thanks
+Kai.
