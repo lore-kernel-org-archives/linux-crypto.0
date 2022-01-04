@@ -2,119 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C05BDC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 05:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C45BAC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 05:55:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229543AbiADFD6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jan 2022 00:03:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38134 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiADFD5 (ORCPT
+        id S230287AbiADFzx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Jan 2022 00:55:53 -0500
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:39638 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S230181AbiADFzw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jan 2022 00:03:57 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ACDAC061761;
-        Mon,  3 Jan 2022 21:03:57 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id a203-20020a1c7fd4000000b003457874263aso22050541wmd.2;
-        Mon, 03 Jan 2022 21:03:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bX3txH8dDchVX0wVCbxbqybQRQkhYo9my0ZLDA1n4oE=;
-        b=CV0S3MjYHGNdJsMzCoW1Ofj5SlNfSsTCDaf7bKHX39q0opZrkeY/o3vFxPMVMGJrC6
-         58kP6NQZgwJgT48g23rGuyMIqc+LCdBkf10tqUPF6vMFpznQMEShveWdQOrEIV407jUY
-         EFfbhZuTYPTA3hUZevN/RLpWsEL+C4zKvRHrP07XK9zaHFeW2Gg2Y9ADLqaZHa04SByu
-         8iXeKosc+sR+qiFyr6nzgQqfNkUBoMGSp7F9ayslzRlixUFFo2Tlqye9WSup/DeFyAoE
-         piFo58n++X07Nek1/zU90AR1KzdyA27r02GqTxFgqGd6tAjBBt234Z8YrCYxosF1RAD4
-         Ztig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bX3txH8dDchVX0wVCbxbqybQRQkhYo9my0ZLDA1n4oE=;
-        b=vipufBkx5HDoEgtSQ3R25FQoP7nrcbqVKozz67PPUVmyIkPfXFyTQiDJoVepkQ2YDX
-         TlnWtW1fxNVFIzN1E0NJOG6SkE0ZeTETtew7FKso6OQ1JsDO1CWSyfdR9F3xJZit88Pj
-         SsokTZraGo6nAjCSmd0fsulvuqak8yCyyGCyXtyqp67P2N+qRdtYA9kkM/HJyW1A6TkU
-         uZ8JjKC2d4+ZoSFVWqaQyEaa6T9dTud+rb+3+chB6+dY8YCXk1Xz6mq0XaCAiRE1/tPp
-         OZSataPB+tAtEeTPFebY1L2NhKawTSxIF5oqjGXWtBKL3++bcBARnAYMbbaR4p1g9NTQ
-         IsYQ==
-X-Gm-Message-State: AOAM531JuJMLgLM7rJ71YgJ6KFL5bXXXJh/hpT01hb1+Yp11bF1cly/P
-        8KQdtGkDlFGVhpPpL320dP+cnrRKylqwNuNpNpaqUK3/6wo=
-X-Google-Smtp-Source: ABdhPJwNB3Qvdq7axxA4E5eUQlzMMRCT1l0vcXYnVkl/wKpNoxh1CDFHqrOWJnDr7bZ2w3fKP43UxlRbq/S+YklMZ+M=
-X-Received: by 2002:a7b:c087:: with SMTP id r7mr41264307wmh.17.1641272635864;
- Mon, 03 Jan 2022 21:03:55 -0800 (PST)
-MIME-Version: 1.0
-References: <Yc56ey6QKwaYg0yi@mit.edu> <20211231114903.60882-1-Jason@zx2c4.com>
- <Yc86TIah3w4waDEc@mit.edu>
-In-Reply-To: <Yc86TIah3w4waDEc@mit.edu>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Tue, 4 Jan 2022 13:03:43 +0800
-Message-ID: <CACXcFmm2nKLHdqN27Ced2nLg=h2mSX_fKWFf-OkgArVRDi3xTw@mail.gmail.com>
-Subject: Re: [PATCH v2] random: avoid superfluous call to RDRAND in CRNG extraction
-To:     "Theodore Ts'o" <tytso@mit.edu>
+        Tue, 4 Jan 2022 00:55:52 -0500
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 2045tn3W008635
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 4 Jan 2022 00:55:50 -0500
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 474E015C00E1; Tue,  4 Jan 2022 00:55:49 -0500 (EST)
+Date:   Tue, 4 Jan 2022 00:55:49 -0500
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Sandy Harris <sandyinchina@gmail.com>
 Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v2] random: avoid superfluous call to RDRAND in CRNG
+ extraction
+Message-ID: <YdPhZQqM52viEttQ@mit.edu>
+References: <Yc56ey6QKwaYg0yi@mit.edu>
+ <20211231114903.60882-1-Jason@zx2c4.com>
+ <Yc86TIah3w4waDEc@mit.edu>
+ <CACXcFmm2nKLHdqN27Ced2nLg=h2mSX_fKWFf-OkgArVRDi3xTw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACXcFmm2nKLHdqN27Ced2nLg=h2mSX_fKWFf-OkgArVRDi3xTw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If we are removing RDRAND, what about adding some
-cheaper mixing? Something along these lines?
+On Tue, Jan 04, 2022 at 01:03:43PM +0800, Sandy Harris wrote:
+> If we are removing RDRAND, what about adding some
+> cheaper mixing? Something along these lines?
+> 
+> The current code's mixing is triggered only once in 2^32
+> iterations, depends only on crng->state[], always changes
+> the same state word, and introduces no new entropy.
 
-The current code's mixing is triggered only once in 2^32
-iterations, depends only on crng->state[], always changes
-the same state word, and introduces no new entropy.
+I wouldn't call it "mixing", because the state array isn't an entropy
+pool.
 
-Make it happen more often, depend on a randomly initialised
-counter as well as state[], make a data-dependent choice of
-word to change, and use random_get_entropy().
----
- drivers/char/random.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+Recall how ChaCha20's state array is set up.  crng->state[0..3]
+contain ChaCha20's initial constants, crng->state[4..11] contain the
+ChaCha20 key, crng->state[12] is the 32-bit counter (which is
+incremented when we call ChaCha20), and crng->state[13..15] is the
+96-bit IV.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 605969ed0f96..d2be079f004d 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -985,6 +985,10 @@ static void crng_reseed(struct crng_state *crng,
-struct entropy_store *r)
-     }
- }
+The IV and counter --- state[12..15] --- is initialized when the CRNG
+is initialized.  We replace the key every time the CRNG is reseeded.
 
-+#define CC_SHIFT 8
-+#define CC_MASK ((1<<CC_SHIFT)-1)
-+static u32 cc_count = 0 ;
-+
- static void _extract_crng(struct crng_state *crng,
-               __u8 out[CHACHA_BLOCK_SIZE])
- {
-@@ -998,8 +1002,22 @@ static void _extract_crng(struct crng_state *crng,
-     if (arch_get_random_long(&v))
-         crng->state[14] ^= v;
-     chacha20_block(&crng->state[0], out);
--    if (crng->state[12] == 0)
--        crng->state[13]++;
-+        if (cc_count == 0)
-+                cc_count = crng->state[9] ^ random_get_entropy() ;
-+    switch ((crng->state[12] ^ cc_count) & CC_MASK)        {
-+                case 0:
-+                        cc_count = crng->state[10] ^ (cc_count>>CC_SHIFT);
-+                        break ;
-+                case 31: case 97: case 253:
-+                        crng->state[crng->state[13]&7]++;
-+                        break ;
-+                case 61: case 127:
-+                        crng->state[crng->state[11]&7] += random_get_entropy();
-+                        break ;
-+                default:
-+                        break ;
-+        }
-+        cc_count++ ;
-     spin_unlock_irqrestore(&crng->lock, flags);
- }
+But what if we manage to call _extract_crng() more than 2**32 times?
+Well, that's what this is all about:
 
--- 
-Signed-off-by: Sandy Harris <sandyinchina@gmail.com>
+    if (crng->state[12] == 0)
+        crng->state[13]++;
+
+What we've effectively done is treat state[12..13] as a 64-bit
+counter, and state[14..15] is initialized to a 64-bit random value
+("the IV") when the CRNG is initialized, and not updated during the
+life of the CRNG.  This is really the only place where we've modified
+ChaCha20.
+
+Now, either we believe in the strength of ChaCha20, or we don't.  The
+whole *point* of a CRNG is that we rely on the crypto, and adding some
+random bit-mashing to mix in the CPU cycle counter into parts of the
+ChaCha20 key (state[10..11]) and part of the ChaCha20 IV (state[12])
+isn't consistent with the philosophy of a CRNG.  At the very least,
+I'd like to get an opinion from a respected cryptographer about what
+they think this would buy us (or what it might cost).
+
+If we want to worry about what happens if we could actually manage to
+call _extract_crng() more than 2**64 times before the reseed interval
+is up --- which *is* one of the benefits of:
+
+   if (arch_get_random_long(^v))
+        crng->state[14] ^= v;
+
+I could see doing perhaps this instead:
+
+    if (crng->state[12] == 0) {
+        crng->state[13]++;
+	if (crng->state[13] == 0) {
+	    crng->state[14]++;
+	    if (crng->state[14] == 0) {
+	        crng->state[15]++;
+	    }
+	}
+   }
+	
+This essentially makes state[12..15] a 128-bit counter, which is
+initialized to a random value when the CRNG is initialized, and we
+would continue to treat state[4..11] as the 256 bit ChaCha20 key.
+This would be a much more philosophically consistent approach, and
+would allow us to more easily reason about the security based on
+cryptographic research into ChaCha20 the stream cipher.
+
+Cheers,
+
+						- Ted
