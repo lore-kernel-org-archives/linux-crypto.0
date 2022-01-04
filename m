@@ -2,23 +2,23 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E79C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 08:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C80C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 08:34:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233319AbiADIeW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S234154AbiADIeW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 4 Jan 2022 03:34:22 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:31138 "EHLO
+Received: from szxga03-in.huawei.com ([45.249.212.189]:31137 "EHLO
         szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232221AbiADIeV (ORCPT
+        with ESMTP id S234137AbiADIeV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 4 Jan 2022 03:34:21 -0500
-Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4JSm760Gxgz8w8N;
-        Tue,  4 Jan 2022 16:31:46 +0800 (CST)
+Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4JSm756HnXz8wDq;
+        Tue,  4 Jan 2022 16:31:45 +0800 (CST)
 Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
+ dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 4 Jan 2022 16:34:20 +0800
+ 15.1.2308.20; Tue, 4 Jan 2022 16:34:19 +0800
 Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
  (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Tue, 4 Jan
@@ -28,9 +28,9 @@ To:     <gregkh@linuxfoundation.org>
 CC:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>,
         <yekai13@huawei.com>
-Subject: [PATCH v2 4/4] Documentation: update debugfs doc for Hisilicon HPRE
-Date:   Tue, 4 Jan 2022 16:29:19 +0800
-Message-ID: <20220104082919.45742-5-yekai13@huawei.com>
+Subject: [PATCH v2 3/4] Documentation: update debugfs doc for Hisilicon ZIP
+Date:   Tue, 4 Jan 2022 16:29:18 +0800
+Message-ID: <20220104082919.45742-4-yekai13@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20220104082919.45742-1-yekai13@huawei.com>
 References: <20220104082919.45742-1-yekai13@huawei.com>
@@ -49,29 +49,29 @@ Update documentation describing DebugFS for function's QoS limiting.
 
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 ---
- Documentation/ABI/testing/debugfs-hisi-hpre | 10 ++++++++++
+ Documentation/ABI/testing/debugfs-hisi-zip | 10 ++++++++++
  1 file changed, 10 insertions(+)
 
-diff --git a/Documentation/ABI/testing/debugfs-hisi-hpre b/Documentation/ABI/testing/debugfs-hisi-hpre
-index 68d4dcb1538d..396de7bc735d 100644
---- a/Documentation/ABI/testing/debugfs-hisi-hpre
-+++ b/Documentation/ABI/testing/debugfs-hisi-hpre
-@@ -27,6 +27,16 @@ Description:	One HPRE controller has one PF and multiple VFs, each function
+diff --git a/Documentation/ABI/testing/debugfs-hisi-zip b/Documentation/ABI/testing/debugfs-hisi-zip
+index 765e29203ef3..bf1258bc6495 100644
+--- a/Documentation/ABI/testing/debugfs-hisi-zip
++++ b/Documentation/ABI/testing/debugfs-hisi-zip
+@@ -26,6 +26,16 @@ Description:	One ZIP controller has one PF and multiple VFs, each function
  		has a QM. Select the QM which below qm refers to.
  		Only available for PF.
  
-+What:		/sys/kernel/debug/hisi_hpre/<bdf>/alg_qos
++What:		/sys/kernel/debug/hisi_zip/<bdf>/alg_qos
 +Date:		Jun 2021
 +Contact:	linux-crypto@vger.kernel.org
 +Description:	The <bdf> is related the function for PF and VF.
-+		HPRE driver supports to configure each function's QoS, the driver
++		ZIP driver supports to configure each function's QoS, the driver
 +		supports to write <bdf> value to alg_qos in the host. Such as
 +		"echo <bdf> value > alg_qos". The qos value is 1~1000, means
 +		1/1000~1000/1000 of total QoS. The driver reading alg_qos to
 +		get related QoS in the host and VM, Such as "cat alg_qos".
 +
- What:		/sys/kernel/debug/hisi_hpre/<bdf>/regs
- Date:		Sep 2019
+ What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/regs
+ Date:		Nov 2018
  Contact:	linux-crypto@vger.kernel.org
 -- 
 2.33.0
