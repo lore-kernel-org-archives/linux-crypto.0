@@ -2,83 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8972CC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 17:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98787C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 21:14:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235626AbiADREu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jan 2022 12:04:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34238 "EHLO
+        id S233878AbiADVOl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Jan 2022 16:14:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230253AbiADREt (ORCPT
+        with ESMTP id S232036AbiADVOk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jan 2022 12:04:49 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89D57C061761;
-        Tue,  4 Jan 2022 09:04:49 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 28B3E61532;
-        Tue,  4 Jan 2022 17:04:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34B96C36AED;
-        Tue,  4 Jan 2022 17:04:48 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="X3bARv48"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1641315886;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=k/o++/iKrFHJpzJR56EnHerKt1+g/uBW9pbf7o4rP70=;
-        b=X3bARv48+8YzKIvmOKIlOgvi0oSVcFpHDazytEqvlKJAiaxmBRHWiBmky1vv9X+XJB7q0k
-        HUKd1nJwiIzs5hdj1i8CMnGfEdrTmA0OFM8iMxM5NpMgdYKc9uf7R2RNATDDZj4NBhNvKS
-        IVg9dQZRqhmCKRQdzgTLjatViSMsujI=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 17c9c4aa (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 4 Jan 2022 17:04:46 +0000 (UTC)
-Received: by mail-yb1-f170.google.com with SMTP id g80so66044277ybf.0;
-        Tue, 04 Jan 2022 09:04:46 -0800 (PST)
-X-Gm-Message-State: AOAM530Z9humRVVLPrAuFQui7SQOTbA3K6qUrPFR69P/k47KGQY1dxnK
-        5h4myvz/dWri94O/n8JLHHOxSvFeeNdam3uyud8=
-X-Google-Smtp-Source: ABdhPJwXjVHuBiqVFVPB8qF1Cv2eBNUgbN8fxufOKh6//foPnGUSVKa+OQc4TVgqOOHhHGLJwZ322Ag28sYY5nzodDA=
-X-Received: by 2002:a25:938d:: with SMTP id a13mr48767794ybm.457.1641315885519;
- Tue, 04 Jan 2022 09:04:45 -0800 (PST)
+        Tue, 4 Jan 2022 16:14:40 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 687E8C061761
+        for <linux-crypto@vger.kernel.org>; Tue,  4 Jan 2022 13:14:40 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id o3so20502556wrh.10
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Jan 2022 13:14:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2oz4xSJ13L6Ug6h51CSZfD1r6n/Z5Weyr/RtlqYjS5w=;
+        b=IYs/YMTe51aOW7+P1JtiBgSHcRz1gSYx+ZvTNwMM1hB3se7rj8WuWZaBvKqOmD8aCN
+         B7WhTxsdiYE0TCP045wF1rCD7enFzscBwKuQHTqihrGiUTg2fthuAp/mvG/tTtKK4q2u
+         Dj952qhMAzdtdsAW/Yshx7V36ThvNDg0S4LoaJqCgDJw/LmxpFKc7SP+aHBDRhrygMm/
+         xSeCunEpAeeX+/HY8vgJaVxScog8cuj7/6QCeI1nZArZ5NZ7mnkFKFJkv28/wPvTOWh2
+         uERU6dtmRc+gleQ60fwGOetYcn9a5gWgFjZUppz3DmzbL/n1S8G1g6eUNr68iYEtKBJm
+         v5kA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2oz4xSJ13L6Ug6h51CSZfD1r6n/Z5Weyr/RtlqYjS5w=;
+        b=3E3YQJP41+3M0X0NDxx/r2+8hLtb9RxdstbUA6W3nUtZSH03A6Z10gOmnD9pvfNFpT
+         t94DDj43auKyThOY7dsozRXeIhi0f1K4FT6xP1h3caVy19t1rjBxcMA62gXnZUTczn3e
+         bmU2eubwajEoY6+aBJfJfWK5+/Q0UChl/Z3VgbKI+pJWQFlLgx96C+uKWbXppnCTHssk
+         GRX3qEdNVSEB8fxADRkEKfnbeXcc2akRIXLP2MTGUsJpbqziwaPX4MoWGake1wag3vA7
+         zhhFjEwwedIctVQ/F8C/vatvYCWbpcpTO7UkFLrkB5TybZJY85TQO9ZGKaNvXX4PbWlT
+         /OIA==
+X-Gm-Message-State: AOAM531YdfpkjahOdo5248T33lLX5VmNMajC4ss3OZRY4mV7X2c2Wj9J
+        EDQEFanmA/xrj07EJkMQmatvXEaeFnicslBfZLj5QQpFfSI2tA==
+X-Google-Smtp-Source: ABdhPJxhUOdQHdocLwdP2hbiqcUa2bwJcDA9DlvM35fB2oMh3UhsDg/PD3ksnhkzZ862g52u2c07juGZa+qrmV2qu5A=
+X-Received: by 2002:a05:6512:1110:: with SMTP id l16mr44392653lfg.193.1641330868243;
+ Tue, 04 Jan 2022 13:14:28 -0800 (PST)
 MIME-Version: 1.0
-References: <CAHmME9oPcEjRnqDesPNKJNOsT+i9vmWRxy9c62t+Xu9Nohsi2A@mail.gmail.com>
- <20220103123152.1043972-1-Jason@zx2c4.com> <YdOhMPwL9sXllm8X@gondor.apana.org.au>
- <CAMj1kXFhygHnB12g9MD0wMo_deZ6xd7FMEzbrvEvKVtqYdskAQ@mail.gmail.com>
-In-Reply-To: <CAMj1kXFhygHnB12g9MD0wMo_deZ6xd7FMEzbrvEvKVtqYdskAQ@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 4 Jan 2022 18:04:34 +0100
-X-Gmail-Original-Message-ID: <CAHmME9quP2W3WQzM1ZRSMPiinD=2bz3sxFv2mOFYT9U-+aPhLA@mail.gmail.com>
-Message-ID: <CAHmME9quP2W3WQzM1ZRSMPiinD=2bz3sxFv2mOFYT9U-+aPhLA@mail.gmail.com>
-Subject: Re: [PATCH v7] lib/crypto: blake2s: include as built-in
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <20211218132541.GA80986@65b4fbea3a32> <YcU+ZNqZ+pNv06QL@gondor.apana.org.au>
+In-Reply-To: <YcU+ZNqZ+pNv06QL@gondor.apana.org.au>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 4 Jan 2022 14:14:16 -0700
+Message-ID: <CAMkAt6rreu0X6DFENqYAAJ_JMEWoS8cvgf7bDhzgFxAnZturrg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: fix semicolon.cocci warnings
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     kernel test robot <lkp@intel.com>,
+        David Rientjes <rientjes@google.com>, kbuild-all@lists.01.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Marc Orr <marcorr@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ard,
-
-On Tue, Jan 4, 2022 at 6:03 PM Ard Biesheuvel <ardb@kernel.org> wrote:
-> The only downside here is that the ARM/x86 accelerated shashes and the
-> generic shash now use the same core transform, right? Given that the
-> generic blake2s shash is never used for anything in the kernel, the
-> only reason for its existence was to be able to use the randomized
-> crypto testing infrastructure to test the arch code.
+On Thu, Dec 23, 2021 at 8:28 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> Ergo, there is no point in retaining the blake2s shashes and we can
-> simply remove all of them. (Note that blake2b is used as an shash via
-> the crypto API by btrfs, but blake2s is only used via the library API)
+> On Sat, Dec 18, 2021 at 09:25:42PM +0800, kernel test robot wrote:
+> > From: kernel test robot <lkp@intel.com>
+> >
+> > drivers/crypto/ccp/sev-dev.c:263:2-3: Unneeded semicolon
+> >
+> >
+> >  Remove unneeded semicolon.
+> >
+> > Generated by: scripts/coccinelle/misc/semicolon.cocci
+> >
+> > Fixes: 3d725965f836 ("crypto: ccp - Add SEV_INIT_EX support")
+> > CC: David Rientjes <rientjes@google.com>
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Signed-off-by: kernel test robot <lkp@intel.com>
+> > ---
+> >
+> > tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> > head:   696645d25bafd6ba3562611c29bc8ecd47066dfe
+> > commit: 3d725965f836a7acbd1674e33644bec18373de53 [83/95] crypto: ccp - Add SEV_INIT_EX support
+> > :::::: branch date: 31 hours ago
+> > :::::: commit date: 31 hours ago
+> >
+> >  sev-dev.c |    2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> I don't know what happened but your patch isn't in patchwork.
+> Could you please try resending?
 
-That makes sense and is fine with me. Let's do that in a separate
-commit later. I've got a bunch of things I'd like to fix up in the
-general lib/crypto vs crypto split that are kind of interrelated.
+Herbert I see the patches I sent here:
+https://patchwork.kernel.org/project/linux-crypto/list/?series=591933&state=%2A&archive=both.
 
-Jason
+Are you asking for this bot to resend? Or should I send a fix up patch
+if that's easier.
+
+>
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
