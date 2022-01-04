@@ -2,79 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DF0CC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 15:59:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F98FC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 17:03:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229915AbiADP7v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jan 2022 10:59:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47852 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232467AbiADP7v (ORCPT
+        id S234716AbiADRDJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Jan 2022 12:03:09 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:38360 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230253AbiADRDI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jan 2022 10:59:51 -0500
-X-Greylist: delayed 501 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 04 Jan 2022 07:59:51 PST
-Received: from smtp-190b.mail.infomaniak.ch (smtp-190b.mail.infomaniak.ch [IPv6:2001:1600:3:17::190b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25D75C061761
-        for <linux-crypto@vger.kernel.org>; Tue,  4 Jan 2022 07:59:51 -0800 (PST)
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4JSxtT3mH9zMptZJ;
-        Tue,  4 Jan 2022 16:51:29 +0100 (CET)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4JSxtR5Z2WzljsVx;
-        Tue,  4 Jan 2022 16:51:27 +0100 (CET)
-Message-ID: <5030a9ff-a1d1-a9bd-902a-77c3d1d87446@digikod.net>
-Date:   Tue, 4 Jan 2022 16:56:36 +0100
+        Tue, 4 Jan 2022 12:03:08 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5EE8FB811B1;
+        Tue,  4 Jan 2022 17:03:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 133C5C36AF2;
+        Tue,  4 Jan 2022 17:03:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641315786;
+        bh=J4zfBFa5gABB/u4SU7BoX1tKxJDB84PhNKCor0c4REU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=HNB659hO2Mi3qrEI4hp4T5Tb37PeoPxyYEg67e4MtqcHmGHbf+PTdRdP4Tcoi6kUs
+         SmRsRuet3mlObsjosyBKTWyuKvY6nLvHJ4ay09d84oDhwhhsiP5lHxpuNADrVLaQ2F
+         mnOo0Pz4u57OT+btTann/jVUvcw6pNOF2uvvtvcRbwSR2bPxCXrVMSzInd8w+5FHNk
+         X6vUhtL7+HgNUOlK2qJAt7djq/OUxzsjrKwcUn5QyNvVJix6zmGt220eC8M6mr00Hv
+         D8OV3oEurq/gkBPaODY0DtBukzBUaP74PDQXku4pmcX5FDFhXIcxQFwy7g6xoRKk69
+         LTbs9U9ND41jA==
+Received: by mail-wm1-f49.google.com with SMTP id d198-20020a1c1dcf000000b0034569cdd2a2so1786103wmd.5;
+        Tue, 04 Jan 2022 09:03:05 -0800 (PST)
+X-Gm-Message-State: AOAM530j8/gcysOq2tgza/rWmMkhS4bUOEHIK4oy70GgBNBAfen9xpAW
+        ZKtVCwsuCMBr1OtmfFGqW6kDxG0rldKWiZHnvOk=
+X-Google-Smtp-Source: ABdhPJzpvIewRwFWqbaGh7wlsRMVH7s6aFI9GMMRWSI5Dtg+Ocwg6NTSVAVCVR+DNCrQd4KYTzpYXXMEm2+56PfO+54=
+X-Received: by 2002:a1c:1f93:: with SMTP id f141mr43645538wmf.56.1641315784266;
+ Tue, 04 Jan 2022 09:03:04 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: 
-Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        Andreas Rammhold <andreas@rammhold.de>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>
-References: <20210712170313.884724-1-mic@digikod.net>
- <7e8d27da-b5d4-e42c-af01-5c03a7f36a6b@digikod.net> <YcGVZitNa23PCSFV@iki.fi>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-Subject: Re: [PATCH v8 0/5] Enable root to update the blacklist keyring
-In-Reply-To: <YcGVZitNa23PCSFV@iki.fi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <CAHmME9oPcEjRnqDesPNKJNOsT+i9vmWRxy9c62t+Xu9Nohsi2A@mail.gmail.com>
+ <20220103123152.1043972-1-Jason@zx2c4.com> <YdOhMPwL9sXllm8X@gondor.apana.org.au>
+In-Reply-To: <YdOhMPwL9sXllm8X@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 4 Jan 2022 18:02:52 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFhygHnB12g9MD0wMo_deZ6xd7FMEzbrvEvKVtqYdskAQ@mail.gmail.com>
+Message-ID: <CAMj1kXFhygHnB12g9MD0wMo_deZ6xd7FMEzbrvEvKVtqYdskAQ@mail.gmail.com>
+Subject: Re: [PATCH v7] lib/crypto: blake2s: include as built-in
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, 4 Jan 2022 at 02:22, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Mon, Jan 03, 2022 at 01:31:52PM +0100, Jason A. Donenfeld wrote:
+> > In preparation for using blake2s in the RNG, we change the way that it
+> > is wired-in to the build system. Instead of using ifdefs to select the
+> > right symbol, we use weak symbols. And because ARM doesn't need the
+> > generic implementation, we make the generic one default only if an arch
+> > library doesn't need it already, and then have arch libraries that do
+> > need it opt-in. So that the arch libraries can remain tristate rather
+> > than bool, we then split the shash part from the glue code.
+> >
+> > Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Cc: Masahiro Yamada <masahiroy@kernel.org>
+> > Cc: linux-kbuild@vger.kernel.org
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: linux-crypto@vger.kernel.org
+> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> > ---
+> > Herbert - As discussed, I still intend to take this via the
+> > crng/random.git tree because it forms a dependency, and I'd like to send
+> > a pull very early in the 5.17 cycle. I've taken some care to minimize
+> > changes to the {arch/*/}crypto/Kconfig files, as you mentioned this
+> > might cause some conflicts. Your tree should work cleanly on top of this
+> > commit.
+>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> > Changes v6->v7:
+> > - Split arch shash implementations out from the glue code, so that they
+> >   can remain as tristates, and we thus don't need to touch
+> >   arch/*/crypto/Kconfig at all.
+>
+> This looks good to me although I confess that I haven't actually
+> tried to build it :) Hopefully the build robots will take care of
+> this.
+>
 
-On 21/12/2021 09:50, Jarkko Sakkinen wrote:
-> On Mon, Dec 13, 2021 at 04:30:29PM +0100, Mickaël Salaün wrote:
->> Hi Jarkko,
->>
->> Since everyone seems OK with this and had plenty of time to complain, could
->> you please take this patch series in your tree? It still applies on
->> v5.16-rc5 and it is really important to us. Please let me know if you need
->> something more.
->>
->> Regards,
->>   Mickaël
-> 
-> I'm off-work up until end of the year, i.e. I will address only important
-> bug fixes and v5.16 up until that.
-> 
-> If any of the patches is yet missing my ack, feel free to
-> 
-> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+The only downside here is that the ARM/x86 accelerated shashes and the
+generic shash now use the same core transform, right? Given that the
+generic blake2s shash is never used for anything in the kernel, the
+only reason for its existence was to be able to use the randomized
+crypto testing infrastructure to test the arch code.
 
-Thanks Jarkko. Can you please take it into your tree?
-
-Regards,
-  Mickaël
+Ergo, there is no point in retaining the blake2s shashes and we can
+simply remove all of them. (Note that blake2b is used as an shash via
+the crypto API by btrfs, but blake2s is only used via the library API)
