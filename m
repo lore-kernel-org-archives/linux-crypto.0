@@ -2,104 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98787C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 21:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B82D3C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 21:39:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233878AbiADVOl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jan 2022 16:14:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35426 "EHLO
+        id S234192AbiADVjG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Jan 2022 16:39:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232036AbiADVOk (ORCPT
+        with ESMTP id S234158AbiADVjG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jan 2022 16:14:40 -0500
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 687E8C061761
-        for <linux-crypto@vger.kernel.org>; Tue,  4 Jan 2022 13:14:40 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id o3so20502556wrh.10
-        for <linux-crypto@vger.kernel.org>; Tue, 04 Jan 2022 13:14:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2oz4xSJ13L6Ug6h51CSZfD1r6n/Z5Weyr/RtlqYjS5w=;
-        b=IYs/YMTe51aOW7+P1JtiBgSHcRz1gSYx+ZvTNwMM1hB3se7rj8WuWZaBvKqOmD8aCN
-         B7WhTxsdiYE0TCP045wF1rCD7enFzscBwKuQHTqihrGiUTg2fthuAp/mvG/tTtKK4q2u
-         Dj952qhMAzdtdsAW/Yshx7V36ThvNDg0S4LoaJqCgDJw/LmxpFKc7SP+aHBDRhrygMm/
-         xSeCunEpAeeX+/HY8vgJaVxScog8cuj7/6QCeI1nZArZ5NZ7mnkFKFJkv28/wPvTOWh2
-         uERU6dtmRc+gleQ60fwGOetYcn9a5gWgFjZUppz3DmzbL/n1S8G1g6eUNr68iYEtKBJm
-         v5kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2oz4xSJ13L6Ug6h51CSZfD1r6n/Z5Weyr/RtlqYjS5w=;
-        b=3E3YQJP41+3M0X0NDxx/r2+8hLtb9RxdstbUA6W3nUtZSH03A6Z10gOmnD9pvfNFpT
-         t94DDj43auKyThOY7dsozRXeIhi0f1K4FT6xP1h3caVy19t1rjBxcMA62gXnZUTczn3e
-         bmU2eubwajEoY6+aBJfJfWK5+/Q0UChl/Z3VgbKI+pJWQFlLgx96C+uKWbXppnCTHssk
-         GRX3qEdNVSEB8fxADRkEKfnbeXcc2akRIXLP2MTGUsJpbqziwaPX4MoWGake1wag3vA7
-         zhhFjEwwedIctVQ/F8C/vatvYCWbpcpTO7UkFLrkB5TybZJY85TQO9ZGKaNvXX4PbWlT
-         /OIA==
-X-Gm-Message-State: AOAM531YdfpkjahOdo5248T33lLX5VmNMajC4ss3OZRY4mV7X2c2Wj9J
-        EDQEFanmA/xrj07EJkMQmatvXEaeFnicslBfZLj5QQpFfSI2tA==
-X-Google-Smtp-Source: ABdhPJxhUOdQHdocLwdP2hbiqcUa2bwJcDA9DlvM35fB2oMh3UhsDg/PD3ksnhkzZ862g52u2c07juGZa+qrmV2qu5A=
-X-Received: by 2002:a05:6512:1110:: with SMTP id l16mr44392653lfg.193.1641330868243;
- Tue, 04 Jan 2022 13:14:28 -0800 (PST)
+        Tue, 4 Jan 2022 16:39:06 -0500
+Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B658AC061761;
+        Tue,  4 Jan 2022 13:39:05 -0800 (PST)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: usama.anjum)
+        with ESMTPSA id 318AB1F4153F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1641332344;
+        bh=aLC+98XwaM4HLlGjupO+FukM8iF+eKmX3/7qCNfljj0=;
+        h=Date:From:To:Cc:Subject:From;
+        b=cjQidJOWiRXpx9MBpsfBR7gqPTb2uLcHhGksbfqDw+yEig99jVWbFClSUUwfx9bKc
+         uSy+B3aPRJllejRH0sgh2YJx+CX7Dgwf2OahvLO5NsGtW8LpqpHA2r+T48SgMQuRXP
+         z9yMNL4Wxd9t/PwMF0l8DPXY3nhBpWmraVG0HG3PFumybNs1JtjtLsl6Ct4qpzyVSH
+         KYrLKZoKuZjgsYaY3e63HDORkfwDPNgv5TfUlBnUaPaOQWppH3pXtk+njJnBMUZaj8
+         olGMr2yfTGJPu8Mn99KR/9RnChr5MjGb51Uini0nXVtJMQpbJTQIo47jlGQpcuxAOt
+         B6A32cMGikTCw==
+Date:   Wed, 5 Jan 2022 02:38:58 +0500
+From:   Muhammad Usama Anjum <usama.anjum@collabora.com>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:QAT DRIVER" <qat-linux@intel.com>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Cc:     usama.anjum@collabora.com
+Subject: [PATCH] crypto: use signed variable to store status and error
+ checking
+Message-ID: <YdS+cgcyKdXUQaU+@debian-BULLSEYE-live-builder-AMD64>
 MIME-Version: 1.0
-References: <20211218132541.GA80986@65b4fbea3a32> <YcU+ZNqZ+pNv06QL@gondor.apana.org.au>
-In-Reply-To: <YcU+ZNqZ+pNv06QL@gondor.apana.org.au>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 4 Jan 2022 14:14:16 -0700
-Message-ID: <CAMkAt6rreu0X6DFENqYAAJ_JMEWoS8cvgf7bDhzgFxAnZturrg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: fix semicolon.cocci warnings
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     kernel test robot <lkp@intel.com>,
-        David Rientjes <rientjes@google.com>, kbuild-all@lists.01.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Marc Orr <marcorr@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 23, 2021 at 8:28 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Sat, Dec 18, 2021 at 09:25:42PM +0800, kernel test robot wrote:
-> > From: kernel test robot <lkp@intel.com>
-> >
-> > drivers/crypto/ccp/sev-dev.c:263:2-3: Unneeded semicolon
-> >
-> >
-> >  Remove unneeded semicolon.
-> >
-> > Generated by: scripts/coccinelle/misc/semicolon.cocci
-> >
-> > Fixes: 3d725965f836 ("crypto: ccp - Add SEV_INIT_EX support")
-> > CC: David Rientjes <rientjes@google.com>
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > Signed-off-by: kernel test robot <lkp@intel.com>
-> > ---
-> >
-> > tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> > head:   696645d25bafd6ba3562611c29bc8ecd47066dfe
-> > commit: 3d725965f836a7acbd1674e33644bec18373de53 [83/95] crypto: ccp - Add SEV_INIT_EX support
-> > :::::: branch date: 31 hours ago
-> > :::::: commit date: 31 hours ago
-> >
-> >  sev-dev.c |    2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> I don't know what happened but your patch isn't in patchwork.
-> Could you please try resending?
+ret should be signed. adf_cfg_get_param_value and match_string return
+signed statuses. The return status may be saved wrongly in unsigned ret
+variable. Correct the data type of ret to signed int.
 
-Herbert I see the patches I sent here:
-https://patchwork.kernel.org/project/linux-crypto/list/?series=591933&state=%2A&archive=both.
+Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+---
+ drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Are you asking for this bot to resend? Or should I send a fix up patch
-if that's easier.
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
+index 6d10edc40aca..68d39c833332 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
+@@ -52,7 +52,7 @@ static const char *const dev_cfg_services[] = {
+ static int get_service_enabled(struct adf_accel_dev *accel_dev)
+ {
+ 	char services[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = {0};
+-	u32 ret;
++	int ret;
+ 
+ 	ret = adf_cfg_get_param_value(accel_dev, ADF_GENERAL_SEC,
+ 				      ADF_SERVICES_ENABLED, services);
+-- 
+2.30.2
 
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
