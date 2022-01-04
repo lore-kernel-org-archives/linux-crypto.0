@@ -2,132 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52FAEC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jan 2022 17:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB019C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 01:22:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232032AbiACRgo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Jan 2022 12:36:44 -0500
-Received: from esa.microchip.iphmx.com ([68.232.154.123]:61304 "EHLO
-        esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231322AbiACRgn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Jan 2022 12:36:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1641231403; x=1672767403;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=h5ah9bdoR8qY4D5fPSZpio2M1R/z0nwpJzEW1Kpft3g=;
-  b=lpWzgE4gVpERlwy4fpPlZRy9y9Vpdvk6imPwm1CGhYSpGlVJaY1MVz6T
-   stMVJUSJNtw+wuBcwI2PQ2gkhM2bqGNAK8ZvkDFvJCR/mWA+mIcl5w3UC
-   /266g/vj9ggqEQoddrjifiO6GZZ0VnEcyEHMk9qJ7g8+8i5Y9x7mp8b+B
-   sLe/dsmBaewbLG888O/fVCqa6z6dD5QtKg9q+PYRO400xp8RJk/izTApf
-   obAw9bVyTanfSRlH1hbOeZlwJ7TQgyf646NnFjUAM1T0ajoeo968uPJF+
-   /RUy5pFQuGmf3AU8zoeYZhAJVAZM2OA3qO0hPnTHUtwptDQfFtR0HRbHq
-   w==;
-IronPort-SDR: CIH9jy6NWC10dDiYgkjh4XWTXoeLA6CIxg1PHADCjI3Wr1abyN9jUFB/r8Ct3LVzK1RZzVAvdi
- gKyOtTb8/PS01aVIjCANZVkGW02Owerl/vcyUN/xpeFTw2+umuUZ6TU9ayhymYqdS5fX9oe0XX
- Nf0BaOxACboQQMfYqGzS7L3x88EQqE6u4994y3gE/s3l1AIf4VElf9GEXdixZOrYF2it1bXI5b
- SnIfUlAfU4jdk2bsAknx0OLSiUT0ry2iF6MsMEqKK6wU2wYbMCuksH6TRAVHZ4AnahGrcmRknS
- i2QS8lAwL6gl8/b0t75A67Cu
-X-IronPort-AV: E=Sophos;i="5.88,258,1635231600"; 
-   d="scan'208";a="144175926"
-Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 03 Jan 2022 10:36:42 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Mon, 3 Jan 2022 10:36:42 -0700
-Received: from [10.12.77.169] (10.10.115.15) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2375.17 via Frontend
- Transport; Mon, 3 Jan 2022 10:36:37 -0700
-Message-ID: <045f43d9-58e5-72a6-10fc-e47d875aeb21@microchip.com>
-Date:   Mon, 3 Jan 2022 18:36:37 +0100
+        id S230231AbiADBWD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Jan 2022 20:22:03 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58904 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230227AbiADBWC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Jan 2022 20:22:02 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1n4YWO-0001Ly-LN; Tue, 04 Jan 2022 12:21:53 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 04 Jan 2022 12:21:52 +1100
+Date:   Tue, 4 Jan 2022 12:21:52 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kbuild@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v7] lib/crypto: blake2s: include as built-in
+Message-ID: <YdOhMPwL9sXllm8X@gondor.apana.org.au>
+References: <CAHmME9oPcEjRnqDesPNKJNOsT+i9vmWRxy9c62t+Xu9Nohsi2A@mail.gmail.com>
+ <20220103123152.1043972-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.1
-Subject: Re: [PATCH 2/8] dt-bindings: rng: atmel,at91-trng: convert Atmel TRNG
- to dtschema
-Content-Language: en-US
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Rob Herring <robh@kernel.org>
-CC:     Tony Lindgren <tony@atomide.com>, <linux-kernel@vger.kernel.org>,
-        "Tomer Maimon" <tmaimon77@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Avi Fishman <avifishman70@gmail.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Nishanth Menon <nm@ti.com>,
-        Patrick Venture <venture@google.com>,
-        <openbmc@lists.ozlabs.org>,
-        =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali@kernel.org>,
-        Khuong Dinh <khuong@os.amperecomputing.com>,
-        <linux-crypto@vger.kernel.org>,
-        Patrice Chotard <patrice.chotard@foss.st.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Tali Perry <tali.perry1@gmail.com>,
-        <devicetree@vger.kernel.org>,
-        Benjamin Fair <benjaminfair@google.com>,
-        "Rob Herring" <robh+dt@kernel.org>, Nancy Yuen <yuenn@google.com>,
-        "Ludovic Desroches" <ludovic.desroches@microchip.com>,
-        Santosh Shilimkar <ssantosh@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20211227183251.132525-1-krzysztof.kozlowski@canonical.com>
- <20211227183251.132525-2-krzysztof.kozlowski@canonical.com>
- <1640696040.235226.685116.nullmailer@robh.at.kernel.org>
- <5a3d7233-8ce0-dbb5-aac4-393caadf2a6a@canonical.com>
-From:   Nicolas Ferre <nicolas.ferre@microchip.com>
-Organization: microchip
-In-Reply-To: <5a3d7233-8ce0-dbb5-aac4-393caadf2a6a@canonical.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220103123152.1043972-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 28/12/2021 at 14:07, Krzysztof Kozlowski wrote:
-> On 28/12/2021 13:54, Rob Herring wrote:
->> On Mon, 27 Dec 2021 19:32:45 +0100, Krzysztof Kozlowski wrote:
->>> Convert the Atmel TRNG bindings to DT schema.
->>>
->>> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
->>> ---
->>>   .../bindings/rng/atmel,at91-trng.yaml         | 46 +++++++++++++++++++
->>>   .../devicetree/bindings/rng/atmel-trng.txt    | 16 -------
->>>   2 files changed, 46 insertions(+), 16 deletions(-)
->>>   create mode 100644 Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
->>>   delete mode 100644 Documentation/devicetree/bindings/rng/atmel-trng.txt
->>>
->>
->> Running 'make dtbs_check' with the schema in this patch gives the
->> following warnings. Consider if they are expected or the schema is
->> incorrect. These may not be new warnings.
->>
->> Note that it is not yet a requirement to have 0 warnings for dtbs_check.
->> This will change in the future.
->>
->> Full log is available here: https://patchwork.ozlabs.org/patch/1573492
->>
->>
->> rng@e2010000: compatible:0: 'microchip,sama7g5-trng' is not one of ['atmel,at91sam9g45-trng', 'microchip,sam9x60-trng']
->>        arch/arm/boot/dts/at91-sama7g5ek.dt.yaml
->>
->> rng@e2010000: compatible: Additional items are not allowed ('atmel,at91sam9g45-trng' was unexpected)
->>        arch/arm/boot/dts/at91-sama7g5ek.dt.yaml
->>
->> rng@e2010000: compatible: ['microchip,sama7g5-trng', 'atmel,at91sam9g45-trng'] is too long
->>        arch/arm/boot/dts/at91-sama7g5ek.dt.yaml
->>
+On Mon, Jan 03, 2022 at 01:31:52PM +0100, Jason A. Donenfeld wrote:
+> In preparation for using blake2s in the RNG, we change the way that it
+> is wired-in to the build system. Instead of using ifdefs to select the
+> right symbol, we use weak symbols. And because ARM doesn't need the
+> generic implementation, we make the generic one default only if an arch
+> library doesn't need it already, and then have arch libraries that do
+> need it opt-in. So that the arch libraries can remain tristate rather
+> than bool, we then split the shash part from the glue code.
 > 
-> This patch is only converting the existing bindings, so new compatible
-> is not added. The issue reported here is being fixed in the next patch
-> (3/8).
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Masahiro Yamada <masahiroy@kernel.org>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: linux-crypto@vger.kernel.org
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Herbert - As discussed, I still intend to take this via the
+> crng/random.git tree because it forms a dependency, and I'd like to send
+> a pull very early in the 5.17 cycle. I've taken some care to minimize
+> changes to the {arch/*/}crypto/Kconfig files, as you mentioned this
+> might cause some conflicts. Your tree should work cleanly on top of this
+> commit.
 
-Thanks Krzysztof!
-Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Best regards,
-   Nicolas
+> Changes v6->v7:
+> - Split arch shash implementations out from the glue code, so that they
+>   can remain as tristates, and we thus don't need to touch
+>   arch/*/crypto/Kconfig at all.
 
+This looks good to me although I confess that I haven't actually
+tried to build it :) Hopefully the build robots will take care of
+this.
 
+Thanks,
 -- 
-Nicolas Ferre
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
