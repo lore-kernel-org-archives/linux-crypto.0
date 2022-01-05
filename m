@@ -2,61 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2197CC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jan 2022 15:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F38C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jan 2022 15:20:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241337AbiAEPUQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Jan 2022 10:20:16 -0500
-Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:58639 "EHLO
-        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241250AbiAEPUO (ORCPT
+        id S241332AbiAEPUd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Jan 2022 10:20:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53988 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241250AbiAEPUc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Jan 2022 10:20:14 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R331e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0V127yqg_1641396007;
-Received: from localhost(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0V127yqg_1641396007)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 05 Jan 2022 23:20:12 +0800
-From:   Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-To:     giovanni.cabiddu@intel.com
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
-        Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH] crypto: qat - Unsigned comparison with less than zero
-Date:   Wed,  5 Jan 2022 23:20:05 +0800
-Message-Id: <20220105152005.43305-1-jiapeng.chong@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        Wed, 5 Jan 2022 10:20:32 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67031C061245
+        for <linux-crypto@vger.kernel.org>; Wed,  5 Jan 2022 07:20:32 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id h7so45276701lfu.4
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Jan 2022 07:20:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZS2/8ZpmEESquBZtXcik7qyvXFlcOFjJPJc4BBFGHpI=;
+        b=ffgNr1lOsnpNkOP2J2VKXqHe3UtoccsPsBBVXirjBjSh5v+sjrwGs7lCwuOB2PDPW2
+         BXr8PtMTbpr/0Rj1zaCBLZqCUnO6KoJs3msPq3Hjj8DG47W8iYr9lx5A2NQoG3ZmbkHk
+         KDRMXaOjHG3ATUd6xaRuunIiXQLVBWfVQUrXtzGguCLEuLVQwD4lo8QWXLhuKu4/E5+2
+         O61oxDKkuI7mE+YQwD2ATaL2EhbEghoqoIbjsIXsx8KYVglkcMhUzwq3/pRvtgTcZzWF
+         Ja4LY1VGHPLkuWeMlH+GMSBMED+jcvknRfwwlCbr04F0YsLu0qO3hu6NDI+mS5RCf+GX
+         Anpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZS2/8ZpmEESquBZtXcik7qyvXFlcOFjJPJc4BBFGHpI=;
+        b=w4R8+lkrh3yNtWh+3VDgjT2J3Qouzgx3Z/tdN73jqBIlup5Ob/enmv7tt9I4rGNYl1
+         Taod6rFb0gyeJvIDkmFQLlKwG54RWPDlxipz1Uuw5NGhQn5q3nSs+pTryIvfeaLQ3Hct
+         mLilL2YwOMHWJiziKbKZSmqmUQ+rAEF6V64WQeIKlH/uovtcbZUw6BecyF9if1tjPqNm
+         TkyXpl6fyXZcJMlpe4wQWz7e2ywyv6pP4jIfzcmgL+R/vM4UUiiAprugTAtHf6RcYeca
+         gIbS1G4WkyCB4nnu39+uBC27BIX/Kt9ECRrWO03ptc/ZY7Tzome3UjaLGZBGcHRM+ew+
+         9naw==
+X-Gm-Message-State: AOAM532Tgd0ZLP6CzvW7LAVaG+TcFSoEFNe2xJ4x355ZTFwdFvF+bpK5
+        XqUc6JoNVw1EpMTwVQkkQgIdyXfbQHCp4rde/aX+Tw==
+X-Google-Smtp-Source: ABdhPJx4ykpuDBkworuUcqnrg6aDNpgyKCjwRiKmhC1eSxPpfRH3SkTdmjh+yWGyOVzOEkkW9XuxT8AJdiWxAO5YGN4=
+X-Received: by 2002:a05:6512:1156:: with SMTP id m22mr14313487lfg.456.1641396030468;
+ Wed, 05 Jan 2022 07:20:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20211218132541.GA80986@65b4fbea3a32> <YcU+ZNqZ+pNv06QL@gondor.apana.org.au>
+ <CAMkAt6rreu0X6DFENqYAAJ_JMEWoS8cvgf7bDhzgFxAnZturrg@mail.gmail.com> <YdTmhCzAzX29PJxj@gondor.apana.org.au>
+In-Reply-To: <YdTmhCzAzX29PJxj@gondor.apana.org.au>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Wed, 5 Jan 2022 08:20:19 -0700
+Message-ID: <CAMkAt6p9pSc6OxaB3ORFpPRZLySB7BP20XhZphY08sPVBBmxCg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: fix semicolon.cocci warnings
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     kernel test robot <lkp@intel.com>,
+        David Rientjes <rientjes@google.com>, kbuild-all@lists.01.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Marc Orr <marcorr@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix coccicheck warning:
+On Tue, Jan 4, 2022 at 5:30 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Tue, Jan 04, 2022 at 02:14:16PM -0700, Peter Gonda wrote:
+> >
+> > Herbert I see the patches I sent here:
+> > https://patchwork.kernel.org/project/linux-crypto/list/?series=591933&state=%2A&archive=both.
+>
+> I meant the bot's patch.
+>
+> > Are you asking for this bot to resend? Or should I send a fix up patch
+> > if that's easier.
+>
+> If you could resend the bot's fix up patch that would be great.
 
-./drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c:67:5-8: WARNING:
-Unsigned expression compared with zero: ret < 0.
-
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
----
- drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-index 6d10edc40aca..68d39c833332 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-+++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -52,7 +52,7 @@ static const char *const dev_cfg_services[] = {
- static int get_service_enabled(struct adf_accel_dev *accel_dev)
- {
- 	char services[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = {0};
--	u32 ret;
-+	int ret;
- 
- 	ret = adf_cfg_get_param_value(accel_dev, ADF_GENERAL_SEC,
- 				      ADF_SERVICES_ENABLED, services);
--- 
-2.20.1.7.g153144c
-
+My mistake, I should have checked first. Someone has already done
+this: https://patchwork.kernel.org/project/linux-crypto/patch/20211221003828.101022-1-yang.lee@linux.alibaba.com/
+.
+>
+> Thanks!
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
