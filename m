@@ -2,73 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B82D3C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jan 2022 21:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 363ACC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jan 2022 00:28:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234192AbiADVjG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jan 2022 16:39:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40932 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234158AbiADVjG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jan 2022 16:39:06 -0500
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B658AC061761;
-        Tue,  4 Jan 2022 13:39:05 -0800 (PST)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: usama.anjum)
-        with ESMTPSA id 318AB1F4153F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1641332344;
-        bh=aLC+98XwaM4HLlGjupO+FukM8iF+eKmX3/7qCNfljj0=;
-        h=Date:From:To:Cc:Subject:From;
-        b=cjQidJOWiRXpx9MBpsfBR7gqPTb2uLcHhGksbfqDw+yEig99jVWbFClSUUwfx9bKc
-         uSy+B3aPRJllejRH0sgh2YJx+CX7Dgwf2OahvLO5NsGtW8LpqpHA2r+T48SgMQuRXP
-         z9yMNL4Wxd9t/PwMF0l8DPXY3nhBpWmraVG0HG3PFumybNs1JtjtLsl6Ct4qpzyVSH
-         KYrLKZoKuZjgsYaY3e63HDORkfwDPNgv5TfUlBnUaPaOQWppH3pXtk+njJnBMUZaj8
-         olGMr2yfTGJPu8Mn99KR/9RnChr5MjGb51Uini0nXVtJMQpbJTQIo47jlGQpcuxAOt
-         B6A32cMGikTCw==
-Date:   Wed, 5 Jan 2022 02:38:58 +0500
-From:   Muhammad Usama Anjum <usama.anjum@collabora.com>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:QAT DRIVER" <qat-linux@intel.com>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Cc:     usama.anjum@collabora.com
-Subject: [PATCH] crypto: use signed variable to store status and error
- checking
-Message-ID: <YdS+cgcyKdXUQaU+@debian-BULLSEYE-live-builder-AMD64>
+        id S236752AbiAEA2t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Jan 2022 19:28:49 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58966 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236750AbiAEA2t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Jan 2022 19:28:49 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1n4uAQ-0006EQ-Qg; Wed, 05 Jan 2022 11:28:39 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 05 Jan 2022 11:28:38 +1100
+Date:   Wed, 5 Jan 2022 11:28:38 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v7] lib/crypto: blake2s: include as built-in
+Message-ID: <YdTmNqpGxRKZTPsw@gondor.apana.org.au>
+References: <CAHmME9oPcEjRnqDesPNKJNOsT+i9vmWRxy9c62t+Xu9Nohsi2A@mail.gmail.com>
+ <20220103123152.1043972-1-Jason@zx2c4.com>
+ <YdOhMPwL9sXllm8X@gondor.apana.org.au>
+ <CAMj1kXFhygHnB12g9MD0wMo_deZ6xd7FMEzbrvEvKVtqYdskAQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <CAMj1kXFhygHnB12g9MD0wMo_deZ6xd7FMEzbrvEvKVtqYdskAQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-ret should be signed. adf_cfg_get_param_value and match_string return
-signed statuses. The return status may be saved wrongly in unsigned ret
-variable. Correct the data type of ret to signed int.
+On Tue, Jan 04, 2022 at 06:02:52PM +0100, Ard Biesheuvel wrote:
+>
+> The only downside here is that the ARM/x86 accelerated shashes and the
+> generic shash now use the same core transform, right? Given that the
+> generic blake2s shash is never used for anything in the kernel, the
+> only reason for its existence was to be able to use the randomized
+> crypto testing infrastructure to test the arch code.
+> 
+> Ergo, there is no point in retaining the blake2s shashes and we can
+> simply remove all of them. (Note that blake2b is used as an shash via
+> the crypto API by btrfs, but blake2s is only used via the library API)
 
-Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
----
- drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I have no objections to removing blake2s.
 
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-index 6d10edc40aca..68d39c833332 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-+++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -52,7 +52,7 @@ static const char *const dev_cfg_services[] = {
- static int get_service_enabled(struct adf_accel_dev *accel_dev)
- {
- 	char services[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = {0};
--	u32 ret;
-+	int ret;
- 
- 	ret = adf_cfg_get_param_value(accel_dev, ADF_GENERAL_SEC,
- 				      ADF_SERVICES_ENABLED, services);
+Thanks,
 -- 
-2.30.2
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
