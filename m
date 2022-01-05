@@ -2,57 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 363ACC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jan 2022 00:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6435C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jan 2022 00:30:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236752AbiAEA2t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jan 2022 19:28:49 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:58966 "EHLO fornost.hmeau.com"
+        id S233431AbiAEAaH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Jan 2022 19:30:07 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58968 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236750AbiAEA2t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jan 2022 19:28:49 -0500
+        id S233341AbiAEAaG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Jan 2022 19:30:06 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1n4uAQ-0006EQ-Qg; Wed, 05 Jan 2022 11:28:39 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 05 Jan 2022 11:28:38 +1100
-Date:   Wed, 5 Jan 2022 11:28:38 +1100
+        id 1n4uBg-0006FS-Bl; Wed, 05 Jan 2022 11:29:57 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 05 Jan 2022 11:29:56 +1100
+Date:   Wed, 5 Jan 2022 11:29:56 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v7] lib/crypto: blake2s: include as built-in
-Message-ID: <YdTmNqpGxRKZTPsw@gondor.apana.org.au>
-References: <CAHmME9oPcEjRnqDesPNKJNOsT+i9vmWRxy9c62t+Xu9Nohsi2A@mail.gmail.com>
- <20220103123152.1043972-1-Jason@zx2c4.com>
- <YdOhMPwL9sXllm8X@gondor.apana.org.au>
- <CAMj1kXFhygHnB12g9MD0wMo_deZ6xd7FMEzbrvEvKVtqYdskAQ@mail.gmail.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kernel test robot <lkp@intel.com>,
+        David Rientjes <rientjes@google.com>, kbuild-all@lists.01.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Marc Orr <marcorr@google.com>
+Subject: Re: [PATCH] crypto: fix semicolon.cocci warnings
+Message-ID: <YdTmhCzAzX29PJxj@gondor.apana.org.au>
+References: <20211218132541.GA80986@65b4fbea3a32>
+ <YcU+ZNqZ+pNv06QL@gondor.apana.org.au>
+ <CAMkAt6rreu0X6DFENqYAAJ_JMEWoS8cvgf7bDhzgFxAnZturrg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXFhygHnB12g9MD0wMo_deZ6xd7FMEzbrvEvKVtqYdskAQ@mail.gmail.com>
+In-Reply-To: <CAMkAt6rreu0X6DFENqYAAJ_JMEWoS8cvgf7bDhzgFxAnZturrg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 04, 2022 at 06:02:52PM +0100, Ard Biesheuvel wrote:
+On Tue, Jan 04, 2022 at 02:14:16PM -0700, Peter Gonda wrote:
 >
-> The only downside here is that the ARM/x86 accelerated shashes and the
-> generic shash now use the same core transform, right? Given that the
-> generic blake2s shash is never used for anything in the kernel, the
-> only reason for its existence was to be able to use the randomized
-> crypto testing infrastructure to test the arch code.
-> 
-> Ergo, there is no point in retaining the blake2s shashes and we can
-> simply remove all of them. (Note that blake2b is used as an shash via
-> the crypto API by btrfs, but blake2s is only used via the library API)
+> Herbert I see the patches I sent here:
+> https://patchwork.kernel.org/project/linux-crypto/list/?series=591933&state=%2A&archive=both.
 
-I have no objections to removing blake2s.
+I meant the bot's patch.
 
-Thanks,
+> Are you asking for this bot to resend? Or should I send a fix up patch
+> if that's easier.
+
+If you could resend the bot's fix up patch that would be great.
+
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
