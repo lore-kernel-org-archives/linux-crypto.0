@@ -2,78 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB402C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jan 2022 12:13:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2083DC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jan 2022 13:14:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239952AbiAEMN7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Jan 2022 07:13:59 -0500
-Received: from mga11.intel.com ([192.55.52.93]:13273 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239947AbiAEMN7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Jan 2022 07:13:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641384839; x=1672920839;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=btgv+zb0p7yqCbFYea0y1fj6VPhvIQD6R68pT1LZWO0=;
-  b=Ms8TysiyR2IG/EO/iCUT2wW3/IcjYbWRW2FkJwkiao9nlWPYGsrvKZP2
-   QV7CpIGeobUljSlik/EBs9+FbJTQt+M6pVtpBxmAmj+rQBaXRGtSShjMx
-   1jrDY1vtpXpBbMTrGyr0DtEueBgWAm+nr23GooatlQXGp7OqHJlGiXs+N
-   ONVAjRrci8F7VgiNr/XP4GgZtuURJtEmTXYW0DXsg89RVjv6Vw9YCN09q
-   yZz4RmcclvrhE2JEa+L+Aja6HQ8zCnAWUD580NjtFGBBekLl6Ch9kG1xv
-   Hc02b7jZtqQHaokvdN7Km1TAeIZSWA0pO5kqrhVV2oAnKjtp3j3mGq5UM
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="239966734"
-X-IronPort-AV: E=Sophos;i="5.88,263,1635231600"; 
-   d="scan'208";a="239966734"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 04:13:58 -0800
-X-IronPort-AV: E=Sophos;i="5.88,263,1635231600"; 
-   d="scan'208";a="512926747"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 04:13:56 -0800
-Date:   Wed, 5 Jan 2022 12:13:50 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Muhammad Usama Anjum <usama.anjum@collabora.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        id S236921AbiAENOR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Jan 2022 08:14:17 -0500
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:42512 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232983AbiAENOQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Jan 2022 08:14:16 -0500
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: usama.anjum)
+        with ESMTPSA id 14F311F41675
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1641388449;
+        bh=IwWZqhmpLW18piwprcmNzBUFX3j3YU95JZk1ANO0MaM=;
+        h=Date:From:To:Cc:Subject:From;
+        b=SUV8iyam7YQf4KN3P5zwUXPRj55SIQGEC0EWQDIU21R2WC7WdsLYha6fP6G30yoMd
+         +bLRI36IcHBoq5/hXpGXY8AYyWcfTc+ot9PT7jCo55bthcazQ4VCRkQdlwaBsIBDHc
+         rQjlA/f5EvR72LNBez76ZolJuynOHxRurbUbjwzyDS64B8kHorMoO+wGYKS2qNpi52
+         gjpSCss4KeLiMpz9sDXWns6ovaLAf6py9oEmukqsXXTItN7NrOyqCoP1rZPhLn1Awg
+         95QxQa1+TxnOAikmgkBXF+HkbNBl3YMZo7G1k4fTskMUXRl066757c5/24h9J2mb8V
+         j60mpL9FfRqTA==
+Date:   Wed, 5 Jan 2022 18:14:03 +0500
+From:   Muhammad Usama Anjum <usama.anjum@collabora.com>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         "open list:QAT DRIVER" <qat-linux@intel.com>,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
         open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: use signed variable to store status and error
- checking
-Message-ID: <YdWLfgy2tID01F8B@silpixa00400314>
-References: <YdS+cgcyKdXUQaU+@debian-BULLSEYE-live-builder-AMD64>
+Cc:     usama.anjum@collabora.com
+Subject: [PATCH v2] crypto: qat - use signed variable to store status and
+ error checking
+Message-ID: <YdWZm6QJAYbYTKAR@debian-BULLSEYE-live-builder-AMD64>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YdS+cgcyKdXUQaU+@debian-BULLSEYE-live-builder-AMD64>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thanks for your patch.
+ret should be signed. adf_cfg_get_param_value() and match_string()
+return signed statuses. The return status may be saved wrongly in
+unsigned ret variable. Correct the data type of ret to signed int.
 
-Patches to the qat driver have the following headline
-     crypto: qat - ...
-not just
-     crypto: ...
-
-On Wed, Jan 05, 2022 at 02:38:58AM +0500, Muhammad Usama Anjum wrote:
-> ret should be signed. adf_cfg_get_param_value and match_string return
-Use () when refer to the function().
-
-> signed statuses. The return status may be saved wrongly in unsigned ret
-> variable. Correct the data type of ret to signed int.
-> 
-> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
-After fixing,
 Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+---
+Changes in v2:
+	Updated commit message
+---
+ drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards,
-
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
+index 6d10edc40aca..68d39c833332 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
+@@ -52,7 +52,7 @@ static const char *const dev_cfg_services[] = {
+ static int get_service_enabled(struct adf_accel_dev *accel_dev)
+ {
+ 	char services[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = {0};
+-	u32 ret;
++	int ret;
+ 
+ 	ret = adf_cfg_get_param_value(accel_dev, ADF_GENERAL_SEC,
+ 				      ADF_SERVICES_ENABLED, services);
 -- 
-Giovanni
+2.30.2
+
