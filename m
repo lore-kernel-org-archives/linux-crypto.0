@@ -2,74 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2083DC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jan 2022 13:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B85C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jan 2022 13:30:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236921AbiAENOR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Jan 2022 08:14:17 -0500
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:42512 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232983AbiAENOQ (ORCPT
+        id S236728AbiAENaY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Jan 2022 08:30:24 -0500
+Received: from mail-oi1-f178.google.com ([209.85.167.178]:35778 "EHLO
+        mail-oi1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233322AbiAENaY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Jan 2022 08:14:16 -0500
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: usama.anjum)
-        with ESMTPSA id 14F311F41675
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1641388449;
-        bh=IwWZqhmpLW18piwprcmNzBUFX3j3YU95JZk1ANO0MaM=;
-        h=Date:From:To:Cc:Subject:From;
-        b=SUV8iyam7YQf4KN3P5zwUXPRj55SIQGEC0EWQDIU21R2WC7WdsLYha6fP6G30yoMd
-         +bLRI36IcHBoq5/hXpGXY8AYyWcfTc+ot9PT7jCo55bthcazQ4VCRkQdlwaBsIBDHc
-         rQjlA/f5EvR72LNBez76ZolJuynOHxRurbUbjwzyDS64B8kHorMoO+wGYKS2qNpi52
-         gjpSCss4KeLiMpz9sDXWns6ovaLAf6py9oEmukqsXXTItN7NrOyqCoP1rZPhLn1Awg
-         95QxQa1+TxnOAikmgkBXF+HkbNBl3YMZo7G1k4fTskMUXRl066757c5/24h9J2mb8V
-         j60mpL9FfRqTA==
-Date:   Wed, 5 Jan 2022 18:14:03 +0500
-From:   Muhammad Usama Anjum <usama.anjum@collabora.com>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Wed, 5 Jan 2022 08:30:24 -0500
+Received: by mail-oi1-f178.google.com with SMTP id m6so64445056oim.2;
+        Wed, 05 Jan 2022 05:30:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+zF0DYhczYohQzVtQksUxrHBVJTvqinpDR5pxsDDR8M=;
+        b=H+CHhFTl6NBZaQ0fcLZp4GIU4YWA16+pJGQoLNnxqVPssWjnGKhSXesB1yvdicdmEq
+         MfqfOy+plBvRL3cAemt6DAxKz0CTbBnIE/LiZonIg1Tje11K3YQJYOlKY8Im4bA9YF6v
+         2bwxTiaIi+EuYOptZVqSvHHzRpFTdqzMZ8dfWh31mhGKfKXighQgaeGoHhEVlD78jsko
+         cTrRWWDox9ygi1yqnXdHIANl2ImzDUn4kNUKNfxPZjHi3rzR0rndfPtSsKpn2MtLYy9A
+         Mcvj6X0wUus+uuyQ0SnF763tBvfizmZymWKjLD8thOfvpcltxMVHw587H+kfydJ0/3hC
+         6yMg==
+X-Gm-Message-State: AOAM533qjaePOG2ruKmlraogja00kut1tuNEdtOPEicmr4XwqybUfKzP
+        s6gAFYAqx5qEfx/OCgMcMQ==
+X-Google-Smtp-Source: ABdhPJw1d5ah49d3Jl3IsUw0xrOgpEkxfYxAa2QPu9MPmIFKwyRRk2oGBlauz6+RNW3y6n6OMTzriw==
+X-Received: by 2002:aca:5a87:: with SMTP id o129mr2609359oib.114.1641389423719;
+        Wed, 05 Jan 2022 05:30:23 -0800 (PST)
+Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
+        by smtp.gmail.com with ESMTPSA id ay40sm10287652oib.1.2022.01.05.05.30.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jan 2022 05:30:23 -0800 (PST)
+Received: (nullmailer pid 2950533 invoked by uid 1000);
+        Wed, 05 Jan 2022 13:30:21 -0000
+Date:   Wed, 5 Jan 2022 07:30:21 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:QAT DRIVER" <qat-linux@intel.com>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Cc:     usama.anjum@collabora.com
-Subject: [PATCH v2] crypto: qat - use signed variable to store status and
- error checking
-Message-ID: <YdWZm6QJAYbYTKAR@debian-BULLSEYE-live-builder-AMD64>
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Ludovic Desroches <ludovic.desroches@microchip.com>,
+        Avi Fishman <avifishman70@gmail.com>,
+        Tomer Maimon <tmaimon77@gmail.com>,
+        Tali Perry <tali.perry1@gmail.com>,
+        Patrick Venture <venture@google.com>,
+        Nancy Yuen <yuenn@google.com>,
+        Benjamin Fair <benjaminfair@google.com>,
+        Khuong Dinh <khuong@os.amperecomputing.com>,
+        Patrice Chotard <patrice.chotard@foss.st.com>,
+        Nishanth Menon <nm@ti.com>,
+        Santosh Shilimkar <ssantosh@kernel.org>,
+        Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
+        Tony Lindgren <tony@atomide.com>, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, openbmc@lists.ozlabs.org
+Subject: Re: [PATCH 1/8] dt-bindings: rng: apm,x-gene-rng: convert APM RNG to
+ dtschema
+Message-ID: <YdWdbac/WQloqU57@robh.at.kernel.org>
+References: <20211227183251.132525-1-krzysztof.kozlowski@canonical.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20211227183251.132525-1-krzysztof.kozlowski@canonical.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-ret should be signed. adf_cfg_get_param_value() and match_string()
-return signed statuses. The return status may be saved wrongly in
-unsigned ret variable. Correct the data type of ret to signed int.
+On Mon, Dec 27, 2021 at 07:32:44PM +0100, Krzysztof Kozlowski wrote:
+> Convert the APM X-Gene RNG bindings to DT schema.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+> ---
+>  .../devicetree/bindings/rng/apm,rng.txt       | 17 -------
+>  .../bindings/rng/apm,x-gene-rng.yaml          | 47 +++++++++++++++++++
+>  2 files changed, 47 insertions(+), 17 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/rng/apm,rng.txt
+>  create mode 100644 Documentation/devicetree/bindings/rng/apm,x-gene-rng.yaml
 
-Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
----
-Changes in v2:
-	Updated commit message
----
- drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Series applied, thanks.
 
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-index 6d10edc40aca..68d39c833332 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-+++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -52,7 +52,7 @@ static const char *const dev_cfg_services[] = {
- static int get_service_enabled(struct adf_accel_dev *accel_dev)
- {
- 	char services[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = {0};
--	u32 ret;
-+	int ret;
- 
- 	ret = adf_cfg_get_param_value(accel_dev, ADF_GENERAL_SEC,
- 				      ADF_SERVICES_ENABLED, services);
--- 
-2.30.2
-
+Rob
