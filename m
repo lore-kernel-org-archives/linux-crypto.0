@@ -2,64 +2,64 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57438C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jan 2022 00:48:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 880DAC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jan 2022 00:48:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343958AbiAFAr7 (ORCPT
+        id S1343976AbiAFAsD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Jan 2022 19:47:59 -0500
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:16616 "EHLO
+        Wed, 5 Jan 2022 19:48:03 -0500
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:20618 "EHLO
         mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232760AbiAFArz (ORCPT
+        by vger.kernel.org with ESMTP id S1343955AbiAFAr7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Jan 2022 19:47:55 -0500
+        Wed, 5 Jan 2022 19:47:59 -0500
 Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 205N4TM0023248;
-        Thu, 6 Jan 2022 00:47:22 GMT
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 205N4TM5023248;
+        Thu, 6 Jan 2022 00:47:31 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references :
  content-transfer-encoding : content-type : mime-version;
- s=corp-2021-07-09; bh=KgMOY08OYy5Jfl+TXf47eMq8wi/R/m1t5Tc7eqelZAA=;
- b=obA+DWnirHZieNnVEX++4t6Tr6JYwiQLZmt7W4rzKZGH9QPZJh8FogPqWSLX2E6I+qfN
- 1NKJ1kRohMBBbt8gQ7LE6t6FdKU02kKZXfXy8JvdZcsi7x3Z1ttGqcvCYsnT3//1icSk
- N1GJ0x44ARbb1EGCzrj6Mkq0kKhYdfddvYk7QDYnNu5/5M6h6O1KZ6WeVewwJJOuuIiS
- XGyksNvnZkbH5SwxrZEF867rngoW2HjbhXgq9s8VQgcLOgZ8qxPLvODJitCk8gDma2Rc
- QjwQTEMV3AlXdrvFnE1KX81UdeZNRywnXeSZbCpxjYOPEnSVSqJrZD3Z0WAskG7NvCzL iQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3ddmpeg41f-1
+ s=corp-2021-07-09; bh=4h9fxZQjoge9zoEz5uRD/jyfg0rfEsOFpuVpN34IFis=;
+ b=MU68LcvTccjVYNTtRXvU2vTAXEYW+GEWznU0SfO1UKDYorpzR26aQv9uh/9TmuaTKw2n
+ MN8gmiACR3Xh/w/2OiqVpIk/RgXw+q5/ZLmjzflXtUaGYb+OGdbI00/UOiP8frpgOKUq
+ zMdJUmYwAVIovFiu36Ws9+JBaqyc/vS8zz+36/20C2E6P/HDwXFYvn52PKC/LgH+i9Ua
+ k7hic7GhT7h2I9DICf/Qn1je58Y06eyWBNJKkLoDmAlO5q1xWUfbT5hwgV4xo1qNnk5x
+ 9ZM/V6gEa3xd1iXU+44t6TtD7tCeNBNG+YGRp1V3smzdzin+ln7Gi3JfaTxDwJUBG+S7 Ww== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3ddmpeg421-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jan 2022 00:47:21 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 2060VgcA076335;
-        Thu, 6 Jan 2022 00:47:20 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2043.outbound.protection.outlook.com [104.47.57.43])
-        by aserp3020.oracle.com with ESMTP id 3ddmqa3d1h-1
+        Thu, 06 Jan 2022 00:47:29 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 2060VIsZ107309;
+        Thu, 6 Jan 2022 00:47:27 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2047.outbound.protection.outlook.com [104.47.66.47])
+        by userp3020.oracle.com with ESMTP id 3ddmq5uwk0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jan 2022 00:47:20 +0000
+        Thu, 06 Jan 2022 00:47:27 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HZYGTUx3O/Jt9dXL3LxDxabdxxwBmwuB/zJUlTDYbUhlVneSKEiV/ENLjN4evJvPZAKsS/deabTUnPduwfEWWb50sfpImnG5kQcK+4x7KO+qf1kbjmsEAeNb6ahuOrZl8+ZrI4Kgq0HsGWZQzR2Y82CfjmPrYLnjOfjndy/SSK6cMlKDbMJ4cDwt5dqrVKxb9qOFf7ei7cQznWJ8T+HjDXse9Kt3KYPvdasjf6ncPrQktF2m5Ci8kQwK35D1MkNW2mwe1om1wVpLhluSyHXSv2B9boKGwZkLtgpdN4IOIlcSZ77KwcjMlTVxqnnV+8Z2I2L494Rmvz1PuYuwjmCvDg==
+ b=Ras/B4sEn1e609S5NQVAYJwtO1VGIS4SJj4DYQQ9kINQmMjUGzt3/BMRz75keSCTWDmN672Dr6fRXnMtd58dB2DJ5eDIE/RCKnXWiiEEeoFoWH2Sl7ZAgVWAlvsxS7B6EruY/cPZ2YNJcZpcjJMSSkTmjweVvf+zXZZF4W6Kxeg1Mhqg7jRySj56tEfVDv3dTyBMz/fTWBcTu/YTPWUM2hkgsFPYMMonSHCaHYcVUfJM/dXxUR7iuQzOQsamXxr5Eu6aX4HIX/LFV+83WZAAVgzxsg/HeQKXkk3PQQvQS74L694Y12BRx86NIICejOPYoJs7FudvF0Y+hID2GhFELw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KgMOY08OYy5Jfl+TXf47eMq8wi/R/m1t5Tc7eqelZAA=;
- b=QDzWIabzL1Wh5kAWalj6vSY8avHk9oXE09+04m2R8DaHJonZnFEng/XFekL/lTgvakRZ/Rn9hBdfh8yynwJ3bF9snsmLJjvrWlhsDiv/6R8XIVmGrY+s3pE5fr3WgJmbHAuMIcjse/oe/cGPtMMoucXr0P5VHH+MI1d40I1jHhi4O9Wbr7EYJtKX+TG3J8mVAhPR3ICCmXOISlq11jYTooC0ibyr8Wmp22tdMF/P5p3vp44211o2mJFYmoWqCy4lS9dn1s+DA1HsxRRXjmqoFN3Hh8k7cSgsgoLn7lZY10fZzTAF7H1jODmkGrcjTtqh98R4Hg7vNU9PLdMkuG8YHg==
+ bh=4h9fxZQjoge9zoEz5uRD/jyfg0rfEsOFpuVpN34IFis=;
+ b=Cq/GtN7QeJsE2GLGtb7ku2aNb2j8nCvGbYClXjyZdg3XBYeYnE227y7o6PpZMczoquQWygJiQIbuM+RExZ1CbU6aNpzYLdSOAI+scw8CWrLdpSHTMbzPy5oZuZDsmYGsTgx4kHe1r8YCdZfAWTgchyZJ12SCLxQq0sFH2S6XIOcyYeTfid5BVvtM0h5gaiNFV026iGhVkAZYeUJaL25iagFhrwzz7fO6SaPhMp4JXyKCUafG1VvKMYomU31gdifFtSVXfDnNrZ19vgPiy/dEvKwBSDunKSsKL3hbslWf3YcVgr2gXe/Qa/qmYKCEZgeOsWBDF/RyuJ1sIpTQd+zZSA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KgMOY08OYy5Jfl+TXf47eMq8wi/R/m1t5Tc7eqelZAA=;
- b=v+U+oy8wb9riz2oYRvfy1ZtVfF3adOBgEHvuwzaUGDjyQKOXEugeZ4Rfju6t2vZxazZBKxo8clKqvx4NvAVbS7XPX+aFmQa6Lxg0XR2Lj4yojjf1j01T8aP6uqkimbRztd6s2vLuOdHIEqwyBR6/Y3d07PKd3R5UKUBZwmd8VsY=
+ bh=4h9fxZQjoge9zoEz5uRD/jyfg0rfEsOFpuVpN34IFis=;
+ b=Zb77Ind/eqFI9u6gz9jzqxYNngiT2589S7qO/PyEelfyOtJOXxoilgDe/XSYscpPXRO2oyzr5FW/nk0MpQqQGoIR3L2DHeJG7lNdsWOXBCzFFtpR9prK3CMBIFKXJB1UjipsrqZTH+LWfxxKg6tqrlrY/NgN7sx4Hh50r+A/uyg=
 Received: from PH7PR10MB5698.namprd10.prod.outlook.com (2603:10b6:510:126::18)
  by PH0PR10MB4422.namprd10.prod.outlook.com (2603:10b6:510:38::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Thu, 6 Jan
- 2022 00:47:18 +0000
+ 2022 00:47:24 +0000
 Received: from PH7PR10MB5698.namprd10.prod.outlook.com
  ([fe80::85a3:23bc:dc92:52d3]) by PH7PR10MB5698.namprd10.prod.outlook.com
  ([fe80::85a3:23bc:dc92:52d3%9]) with mapi id 15.20.4867.009; Thu, 6 Jan 2022
- 00:47:19 +0000
+ 00:47:24 +0000
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Alexander Duyck <alexanderduyck@fb.com>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -85,9 +85,9 @@ To:     Alexander Duyck <alexanderduyck@fb.com>,
 Cc:     linux-mm@kvack.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [RFC 02/16] padata: Return first error from a job
-Date:   Wed,  5 Jan 2022 19:46:42 -0500
-Message-Id: <20220106004656.126790-3-daniel.m.jordan@oracle.com>
+Subject: [RFC 04/16] padata: Detect deadlocks between main and helper threads
+Date:   Wed,  5 Jan 2022 19:46:44 -0500
+Message-Id: <20220106004656.126790-5-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
 References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
@@ -98,219 +98,198 @@ X-ClientProxiedBy: MN2PR20CA0019.namprd20.prod.outlook.com
  (2603:10b6:510:126::18)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 512a504a-9bd6-405f-adbb-08d9d0ae1790
+X-MS-Office365-Filtering-Correlation-Id: b4597dcc-d4b5-48c4-63e3-08d9d0ae1ad4
 X-MS-TrafficTypeDiagnostic: PH0PR10MB4422:EE_
-X-Microsoft-Antispam-PRVS: <PH0PR10MB4422289FBF38F936AA268060D94C9@PH0PR10MB4422.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
+X-Microsoft-Antispam-PRVS: <PH0PR10MB442282A0E782DEA42288DFAED94C9@PH0PR10MB4422.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:538;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6Lb5mBnrM58MOmrLMWJf9fCodHNjPLb/fLVYNHx+Ed39u58V2s1rkBSv3GC05I7145sijpese8488pp6LzgDZrokOpPy0ViSwRofU9ind8v0LmiTz8pTk5UnIoPU684WeH43Br8jXQlG9bxxMPjme83tqcMSX+tU3MWmr4Io8WBXMyeu83PWcTzeJaDLPMNzcKBNB8Sh63TztnfylfUfVxCzylLrikM9bRhpEQC6ibQ5e6Ei01gvGLtgrh1criWed5jgaY75P5NUphD2R39v3SGYJpCiAUL2G49fiKV4YvjcAIZfyF583QcFxL2PJuBx2I3n06fKym44KKNLWWmD1/dKHR05oK90IBnQKx0/HcwnYAd5tp0JPzQ9MF/k+vVrYVfH8smXO6B+6EwFH5QlfybX7DYRrH+b4frGKUaFvmzOywRpx5DrpZOKXdPQAUdLYCdikGN7diti1c+7Z7l5rzQEgpSo2h1M/R0b9+qmeAMO6TtnkER0QUtvQ+f6i+6L50SgxDQWNAf44BA4A8qsqLv/xUVhg4fI9xzrOi6mttNxeThNvmhppQn1wlJ4KDaHtWcBjYCbYrLSeGZHs1xPwVDzAAgzU7KEnw23HKA+UaD7AshcGUwky+GVWQ2cDocnJNjGKqIQIm/AeLXwWkRYb18z3Fc4FA0Ic+BNRok6nacF0g+ZF6VWKeLeOU7dCQWScy2Ln+c/kuk58DeMgVfjrigatXPyC0iVlVmkT62h7Us=
+X-Microsoft-Antispam-Message-Info: UJuxC5rg3ADIN4UcifVaKMIALHSC/v5eRjy3LGiYUPPtvBZ6RhdQ57Y4xnMMRyQm50gMbv6J3m0s9D+GoOTvGGApevnsRb5nY0WDIHKX7DsrcppxmSGtSsRRgK+vfxTbb45Wj7wl4RbpV7BEyKhLdQDLKMWJUkrCyMekAVUen7LS+g5LWGcK1ZdoR9cBaVOMeO8JjEA/s0cpnCJUZioKQvmOwiuOYO3uLJ9CUQiT8gV/laHP+ZLXSRI5BjIx6S9c5lM5lDQ1U1PQ7e/ysm6yysM7SIgIoBqFDKDSq/BGKrI1+fD0ybcFdVYX62/mball15kkrcXRw0raPWpHuwok0kxb2544wGtk0/5RJ1CZS8TbMIZH9OiMpBL7QlpPij/ZF3VozW1ReUuWrF1FdmC19iT7DHuv+K04II0G3w2CPv2FP0/ezNIXbH1BaVcM78iTEabXsFuRXi9f80PmLrCqWbE1XpWUJQmdCWVEpItevdongS3IvkdJbKbkhz70/SsB/DgnEoqHqOl7H0Lwz05h/T1z03P0HT23NFIATFHqCfIhkHLbNJA50vc99nljY1Mtno17Uc51dl+uKK5hhgAfjvJ4OThiARHbqh/XKWFRh8RWg5wRMnZvXvhraVl3+OZQM/rVQ9b9QD/cOAnRPOqYjkjjn0vcH9yikjac3OVID+umLoNuvvNKUYQchRxKShB3z0txKfYp/fA3jVzVZJ6W0+NE7cPaPGulN/a6inZ1NXc=
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR10MB5698.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(4326008)(2906002)(316002)(38100700002)(5660300002)(38350700002)(6666004)(83380400001)(508600001)(66946007)(66476007)(66556008)(26005)(52116002)(186003)(6506007)(7416002)(8676002)(110136005)(8936002)(921005)(1076003)(6486002)(2616005)(36756003)(86362001)(103116003)(107886003)(6512007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?aXMXNG+lg0slpWdQELMzu8lRJE/kse2CaRag2Tjq4BVo+gfCdRUX6bSAa2U/?=
- =?us-ascii?Q?E3VHcKsjX6P2vpyB6a2ZH4BaLasjEINyT6zzgJ/0iNvNaULLvUOauBj8OjsU?=
- =?us-ascii?Q?/c3GZhsFdVzzfrVC2YXSju9rpL4TkOh+GL7FHwl6O+i/027W5wHJEt0g3Ock?=
- =?us-ascii?Q?HIZOebo4CoXDwnj1BbpMgbGnlyxh6ljL+u96jNpU2jsjd176BDaYg5Pbu6Mc?=
- =?us-ascii?Q?rzthaIUDn91vYi+L/ziFngwMhcw7q/Xre1pRc9tqWRPTHd6TKZToKPX0BCOh?=
- =?us-ascii?Q?oap2VsRglV0xvBah/M2UJhArah0n4BBer7gSx0ei6RrUQQGRHHb5MzHM/bIY?=
- =?us-ascii?Q?EjIz23R57x8MhuF66VfGI582prQwHurB8wZU8bEF7Kh7h6VJPp1RgbNUVZbp?=
- =?us-ascii?Q?vldKDlEBGiA+qGzMOu8D+dEjG6DKZ+sCY8TcZPEVekcinH40SIyF0PjXUS0a?=
- =?us-ascii?Q?aufSabWmvTKeFclgnUh+zfnEiiBjCzlPvP8nY7vaXzgloZVB44tMyIYjUbWE?=
- =?us-ascii?Q?N2JTLkuOOFlwVqHbuAK+7U42kcpHGdXe3TldAs1kDkEesU3KfrNZLz9rwRUt?=
- =?us-ascii?Q?jOYJ2Jl+o3FMstnQtuT0fC4gq9e99WZwO7lK0jHR6WTjHPQa7ZhoxBoxnMm3?=
- =?us-ascii?Q?XR2UykxoPLAOQKECAJIqCjyBM0OuASp9FiXVjtlO9aDmBTWpNJ3bctbTJrek?=
- =?us-ascii?Q?WAeNceVjl4aWZbsaxnS6duIYZKh2kE94SofZQgqTN0rWuwrnjUlSaTby5mgc?=
- =?us-ascii?Q?zVsqlUCWWqYm04BAqoU+utioBepZYeC8PKDm9lrQVGB/YjK1hvZ2RWH1Q3ZA?=
- =?us-ascii?Q?Put5/tFex6OZdYguK1eGW7JzXPDPUiARxls4iznumnuXcA5vr5Xo/VbowwmK?=
- =?us-ascii?Q?Xg5CZDzes1pfz6rqRXuny9fVdyp3ag+oEnPHmYqO6qDBfAoKmn0F+wAJ4/3w?=
- =?us-ascii?Q?ovLkweAoRPH6QM+v2y4eF5eAs6UEOH7Hn5d/8nJ4Clili5plOBROudNqKG7T?=
- =?us-ascii?Q?UmNpzCoX89a5WKhoEA9teBsfneuH52KWHVH1EtQPc5VUIiJaw/ZZDfpS/rsD?=
- =?us-ascii?Q?Pu0Lh4iEQVdO5/5I1C9jGRleeuzB4Ffh9DzyfIJ4d7N1IMMf9LZGMyRwuHRk?=
- =?us-ascii?Q?OxzhBi6beyw4/Cx248+kd8X4l2r3zgRq78VxWtqSJ5k9wNzhpWxZNr6fkXzU?=
- =?us-ascii?Q?OjDjXu+7PdL0XnnHWxrjwmFCSmGL8bzvjk/d0E3iAgcg72d0cNxZrxZsmcHT?=
- =?us-ascii?Q?AA7fQtGCwGo3HgdgOTOkcc1orp13hyaH6L7w5waMRhhe5Kr9CyYSncBmBCkl?=
- =?us-ascii?Q?YdSBFBC1i3PH4xbsS5ksSU5rUq1DCeBKnIHTN9YnM65sgFGU6uhVfopGuQ8L?=
- =?us-ascii?Q?Xc+4VbRSWtd4szwTM2lduC09ApG881jBKEJZh8t42Iuoh79AotrCTOotqbn0?=
- =?us-ascii?Q?/Ecvd8tWaZLEhm+XcfdvbBhdWVSNd76xHN7m8MqjRnFR7ODBdDnye9+dzkH4?=
- =?us-ascii?Q?jN0uj5EtHwsJ7TK6JcAMnKJBZCyr9FdYkeAoSHvLmNnnAW2rd0DeoQ+4tFjg?=
- =?us-ascii?Q?OY6hNVpJJ8JbqaleMCTrWpKTDksSy05JMOblIYpv3r2CC12PCwi6MqFGFyMj?=
- =?us-ascii?Q?+H6zn9BmsjFlB+xAPlWor2mOf8kGIrwqLyhGWJVlSbRFx/E006Z9+QBFylRD?=
- =?us-ascii?Q?2avWUZdtwK2gjujmdazXWAtUuFg=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?96/3BNgUbgvDGAZIxyrKpgGq9V8RlsY6EHveVDUYmoNzBzPajee7GezxgQ40?=
+ =?us-ascii?Q?8XOG1KbAH3a7mKIc8n5InGnctRWl7G7SDUoxmLaobOqk3imqAbMlmXhAniRw?=
+ =?us-ascii?Q?GKLznOkSBB1CYso07VWh9oY5wqBXXbbRR0BkomYVnPeWKNxnJ6wly2aFIprv?=
+ =?us-ascii?Q?AVM4rLS0ZPExAI3k3Al6RsB+g6vr80eeaG9IIcDbAvl2juVRYKruq/QSv0dB?=
+ =?us-ascii?Q?XGYAYU8B34KNy2CPdmNZz+HmFgOnObc+ZzneeVAuKKKDW0YsIDrPRM/+cNMq?=
+ =?us-ascii?Q?ARdXcAWZEEUtMToKc08jcZORnAByJlRzIKcK29NKn7hWtCfWHe+w+cj4ewtI?=
+ =?us-ascii?Q?HluUmKN7SmPm2NjEqzMBGH5nkf99CZ4C1gTsFxxBK8hxZZT6hgDJJhIpQbx7?=
+ =?us-ascii?Q?CoArFgk4XeKeRPMQ3uAEaKkvhuArvNw7eSTBh5XzuWXyO1pcyWF0sgCU/Hzn?=
+ =?us-ascii?Q?wWEjb6kAvIdfY+3UIMYmgcoUUdt8FJCBSJjr5LWuLurhyM64GMOjeS7ob3M3?=
+ =?us-ascii?Q?BEgunxS0xDmRGB4elkJyNtkdWboyBMdwkhdunFoBAMfMuePxLjGL1t+yK7vu?=
+ =?us-ascii?Q?12v4txjSEo+T7e9Wg6/US8jweYYvNzWuHB/tUF8kQX/4Bewad+Rmsf1Pmd7V?=
+ =?us-ascii?Q?+OMjy78eurvNKpCoNS6o3EkwhpVU1OAXtQXlBqvd7xiLFuxkQpje8Mahx5/s?=
+ =?us-ascii?Q?0mdgdSp3X8mrQiOUyHTBZ7/BVgr1cN0vUtiGdXFpv6SZQqORu6WsmZIh3aNi?=
+ =?us-ascii?Q?cD8dBniahyeacYtB5ZuJK8Dwh2MFcChlSE4Gl4gy6l+Lbk2tqRuxgQEm+8i7?=
+ =?us-ascii?Q?FcrsDTnWj4tw4wM9puLkgQvyjtTtWcRmohgmaS3OqSDXhCXeRdPRAUpmSgII?=
+ =?us-ascii?Q?utfwDk5RfFSFNiQPNXjaEIdaCyi3WYZHORW7fIKomDR1c+34Spb2c8h3ykpD?=
+ =?us-ascii?Q?u5U3bfHB8PfMscPfO+u8wmh3z+PfdMy8+1YRLP4l29prDyXhJSgAlHVd4EIs?=
+ =?us-ascii?Q?Kd4pvhzPqozH+nbaEW3aUTCBEasut5S95kldec27EsNeahbFHxlTA5kq+g4b?=
+ =?us-ascii?Q?nW8YddK1gc2SCBvSZOLSbHZs/4PnnHIDV59CcwWfU1o7asWsRcZ3xfmwscmR?=
+ =?us-ascii?Q?2pLbQdjtypsjM8oXx3CU6ZjkbQz7AiTs2rXiMaawJptP+rDu9+6F00yE7165?=
+ =?us-ascii?Q?veBYkMwQatUPsxcHq3gIdg9C4Y/cSdHBot1y99jAdhjiUaNI1p9MMRw84dVz?=
+ =?us-ascii?Q?hiNdz9KiNendxAtS0QCbc+khwMccGzJhSJRJ5btF33zY1kGT+EjfVokxdL3z?=
+ =?us-ascii?Q?426LdyxtT6Tp8BhNrfRoV1AhPRgPEbHR7hauFs3azWXSg+OVfXhgq9uGt8sF?=
+ =?us-ascii?Q?Q+6rfr+v8S3EkUQhic/SOnUzT6cyT9JPxFmv76E5xQvECsfKgo5VGxdDPNzZ?=
+ =?us-ascii?Q?C/2+1tFPu4YPExWzQpCacURSPeYtYn4rA66LOqHCR8pmW3bI/JeNIH5TETNL?=
+ =?us-ascii?Q?DLM+KTUq8Ka5zt69X05g9kUvZqel7EpXA6UvmhGfpO2ni3XodL4S3jTmYz30?=
+ =?us-ascii?Q?gfU3a39sADgm2E/SBbowKQj7h7j3h9uYqSQPCqw/xyPTQkK7ahc4XiZKaz7p?=
+ =?us-ascii?Q?Q0p1DGDQaHsxynJWrxX9oQomuKjjFIYAvWfRh4I0OeHicYKd8+10kDFtU5gU?=
+ =?us-ascii?Q?qLrK50SFSq6z7YLdejDc1AkLiDc=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 512a504a-9bd6-405f-adbb-08d9d0ae1790
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4597dcc-d4b5-48c4-63e3-08d9d0ae1ad4
 X-MS-Exchange-CrossTenant-AuthSource: PH7PR10MB5698.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2022 00:47:18.9473
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2022 00:47:24.4133
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tBWAB5rGKG/lXbAC+wwPy3pUFItO1xR0rk39xh8mTOSAXbhGLUvsT1E/sDk84kRWk63MNvRFxsMZC9DjO9ztSJZJv+GvJPU3rxpVRNLy4d4=
+X-MS-Exchange-CrossTenant-UserPrincipalName: GQ9S0WN4CzH9RifL8BPYGTmr1T7LZf2hQ1H77f4rOAtwZAlPK9dKHpfFJnx6pWOuHmGgXrT//3ttx8heP7cBLFtl6Es56av0ihsvj6DwGs0=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4422
 X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10218 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0 suspectscore=0
- bulkscore=0 mlxlogscore=690 phishscore=0 mlxscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 spamscore=0
+ suspectscore=0 mlxlogscore=546 phishscore=0 bulkscore=0 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2112160000
  definitions=main-2201060001
-X-Proofpoint-ORIG-GUID: jQanJTV1FTLmez4qLUmhqXWU1nnSHByB
-X-Proofpoint-GUID: jQanJTV1FTLmez4qLUmhqXWU1nnSHByB
+X-Proofpoint-ORIG-GUID: VPF4fmMAJ08kkXoGfE_JRmztebTYOvOY
+X-Proofpoint-GUID: VPF4fmMAJ08kkXoGfE_JRmztebTYOvOY
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The only current user of multithreaded jobs, deferred struct page init,
-can't fail, but soon the world won't be perfect anymore.  Return the
-first error encountered during a job.
+A caller of padata_do_multithreaded() can unwittingly introduce
+deadlocks if it already holds lock(s) that thread_fn() takes.  Lockdep
+can't detect such a dependency because it doesn't know that
+padata_do_multithreaded() waits on the helper threads.
 
-Threads can fail for different reasons, which may need special handling
-in the future, but returning the first will do for the upcoming new user
-because the kernel unwinds the same way no matter the error.
+Use a lockdep_map to encode the dependency, following the pattern in
+workqueue, CPU hotplug, and other parts of the kernel.  See
+commit 4e6045f13478 ("workqueue: debug flushing deadlocks with lockdep")
+for an example of a similar situation.
+
+Each padata_do_multithreaded() callsite gets its own lock_class_key to
+avoid false positives involving locks from different calls that don't
+depend on each other.
 
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
 ---
- include/linux/padata.h |  5 +++--
- kernel/padata.c        | 22 ++++++++++++++++------
- mm/page_alloc.c        |  4 +++-
- 3 files changed, 22 insertions(+), 9 deletions(-)
+ include/linux/padata.h | 22 +++++++++++++++++++++-
+ kernel/padata.c        | 15 +++++++++++++--
+ 2 files changed, 34 insertions(+), 3 deletions(-)
 
 diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 0dc031d54742..1c8670a24ccf 100644
+index 2a9fa459463d..907d624a8ca4 100644
 --- a/include/linux/padata.h
 +++ b/include/linux/padata.h
-@@ -126,6 +126,7 @@ struct padata_shell {
-  * struct padata_mt_job - represents one multithreaded job
-  *
-  * @thread_fn: Called for each chunk of work that a padata thread does.
-+ *             Returns 0 or client-specific nonzero error code.
-  * @fn_arg: The thread function argument.
-  * @start: The start of the job (units are job-specific).
-  * @size: size of this node's work (units are job-specific).
-@@ -138,7 +139,7 @@ struct padata_shell {
-  *               depending on task size and minimum chunk size.
-  */
- struct padata_mt_job {
--	void (*thread_fn)(unsigned long start, unsigned long end, void *arg);
-+	int (*thread_fn)(unsigned long start, unsigned long end, void *arg);
- 	void			*fn_arg;
- 	unsigned long		start;
- 	unsigned long		size;
-@@ -188,7 +189,7 @@ extern void padata_free_shell(struct padata_shell *ps);
+@@ -17,6 +17,7 @@
+ #include <linux/spinlock.h>
+ #include <linux/list.h>
+ #include <linux/kobject.h>
++#include <linux/lockdep.h>
+ 
+ #define PADATA_CPU_SERIAL   0x01
+ #define PADATA_CPU_PARALLEL 0x02
+@@ -188,6 +189,23 @@ extern void __init padata_init(void);
+ static inline void __init padata_init(void) {}
+ #endif
+ 
++#ifdef CONFIG_LOCKDEP
++
++#define padata_do_multithreaded(job)					      \
++({									      \
++	static struct lock_class_key __key;				      \
++	const char *__map_name = "padata master waiting";		      \
++									      \
++	padata_do_multithreaded_job((job), &__key, __map_name);		      \
++})
++
++#else
++
++#define padata_do_multithreaded(job)					      \
++	padata_do_multithreaded_job((job), NULL, NULL)
++
++#endif
++
+ extern struct padata_instance *padata_alloc(const char *name);
+ extern void padata_free(struct padata_instance *pinst);
+ extern struct padata_shell *padata_alloc_shell(struct padata_instance *pinst);
+@@ -195,7 +213,9 @@ extern void padata_free_shell(struct padata_shell *ps);
  extern int padata_do_parallel(struct padata_shell *ps,
  			      struct padata_priv *padata, int *cb_cpu);
  extern void padata_do_serial(struct padata_priv *padata);
--extern void padata_do_multithreaded(struct padata_mt_job *job);
-+extern int padata_do_multithreaded(struct padata_mt_job *job);
+-extern int padata_do_multithreaded(struct padata_mt_job *job);
++extern int padata_do_multithreaded_job(struct padata_mt_job *job,
++				       struct lock_class_key *key,
++				       const char *map_name);
  extern int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
  			      cpumask_var_t cpumask);
  #endif
 diff --git a/kernel/padata.c b/kernel/padata.c
-index 5d13920d2a12..1596ca22b316 100644
+index d0876f861464..b458deb17121 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -54,6 +54,7 @@ struct padata_mt_job_state {
- 	struct padata_mt_job	*job;
- 	int			nworks;
- 	int			nworks_fini;
-+	int			error; /* first error from thread_fn */
- 	unsigned long		chunk_size;
+@@ -64,6 +64,9 @@ struct padata_mt_job_state {
+ 	unsigned long		position;
+ 	unsigned long		remaining_size;
+ 	struct list_head	failed_works;
++#ifdef CONFIG_LOCKDEP
++	struct lockdep_map	lockdep_map;
++#endif
  };
  
-@@ -446,8 +447,9 @@ static void padata_mt_helper(struct work_struct *w)
- 
- 	spin_lock(&ps->lock);
- 
--	while (job->size > 0) {
-+	while (job->size > 0 && ps->error == 0) {
- 		unsigned long start, size, end;
-+		int ret;
- 
- 		start = job->start;
- 		/* So end is chunk size aligned if enough work remains. */
-@@ -459,8 +461,12 @@ static void padata_mt_helper(struct work_struct *w)
- 		job->size -= size;
+ static void padata_free_pd(struct parallel_data *pd);
+@@ -470,9 +473,11 @@ static void padata_mt_helper(struct work_struct *w)
+ 		ps->remaining_size -= size;
  
  		spin_unlock(&ps->lock);
--		job->thread_fn(start, end, job->fn_arg);
-+		ret = job->thread_fn(start, end, job->fn_arg);
- 		spin_lock(&ps->lock);
-+
-+		/* Save first error code only. */
-+		if (ps->error == 0)
-+			ps->error = ret;
- 	}
++		lock_map_acquire(&ps->lockdep_map);
  
- 	++ps->nworks_fini;
-@@ -476,8 +482,10 @@ static void padata_mt_helper(struct work_struct *w)
+ 		ret = job->thread_fn(position, end, job->fn_arg);
+ 
++		lock_map_release(&ps->lockdep_map);
+ 		spin_lock(&ps->lock);
+ 
+ 		if (ret) {
+@@ -552,14 +557,16 @@ static void padata_undo(struct padata_mt_job_state *ps,
+ }
+ 
+ /**
+- * padata_do_multithreaded - run a multithreaded job
++ * padata_do_multithreaded_job - run a multithreaded job
   * @job: Description of the job.
   *
   * See the definition of struct padata_mt_job for more details.
-+ *
-+ * Return: 0 or a client-specific nonzero error code.
+  *
+  * Return: 0 or a client-specific nonzero error code.
   */
--void padata_do_multithreaded(struct padata_mt_job *job)
-+int padata_do_multithreaded(struct padata_mt_job *job)
+-int padata_do_multithreaded(struct padata_mt_job *job)
++int padata_do_multithreaded_job(struct padata_mt_job *job,
++				struct lock_class_key *key,
++				const char *map_name)
  {
  	/* In case threads finish at different times. */
  	static const unsigned long load_balance_factor = 4;
-@@ -487,7 +495,7 @@ void padata_do_multithreaded(struct padata_mt_job *job)
- 	int nworks;
- 
- 	if (job->size == 0)
--		return;
-+		return 0;
- 
- 	/* Ensure at least one thread when size < min_chunk. */
- 	nworks = max(job->size / job->min_chunk, 1ul);
-@@ -495,8 +503,8 @@ void padata_do_multithreaded(struct padata_mt_job *job)
- 
- 	if (nworks == 1) {
- 		/* Single thread, no coordination needed, cut to the chase. */
--		job->thread_fn(job->start, job->start + job->size, job->fn_arg);
--		return;
-+		return job->thread_fn(job->start, job->start + job->size,
-+				      job->fn_arg);
- 	}
+@@ -583,6 +590,7 @@ int padata_do_multithreaded(struct padata_mt_job *job)
  
  	spin_lock_init(&ps.lock);
-@@ -504,6 +512,7 @@ void padata_do_multithreaded(struct padata_mt_job *job)
- 	ps.job	       = job;
- 	ps.nworks      = padata_work_alloc_mt(nworks, &ps, &works);
- 	ps.nworks_fini = 0;
-+	ps.error       = 0;
+ 	init_completion(&ps.completion);
++	lockdep_init_map(&ps.lockdep_map, map_name, key, 0);
+ 	INIT_LIST_HEAD(&ps.failed_works);
+ 	ps.job		  = job;
+ 	ps.nworks	  = padata_work_alloc_mt(nworks, &ps, &works);
+@@ -601,6 +609,9 @@ int padata_do_multithreaded(struct padata_mt_job *job)
+ 	ps.chunk_size = max(ps.chunk_size, job->min_chunk);
+ 	ps.chunk_size = roundup(ps.chunk_size, job->align);
  
- 	/*
- 	 * Chunk size is the amount of work a helper does per call to the
-@@ -527,6 +536,7 @@ void padata_do_multithreaded(struct padata_mt_job *job)
- 
- 	destroy_work_on_stack(&my_work.pw_work);
- 	padata_works_free(&works);
-+	return ps.error;
- }
- 
- static void __padata_list_init(struct padata_list *pd_list)
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index eeb3a9cb36bb..039786d840cf 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -2018,7 +2018,7 @@ deferred_init_maxorder(u64 *i, struct zone *zone, unsigned long *start_pfn,
- 	return nr_pages;
- }
- 
--static void __init
-+static int __init
- deferred_init_memmap_chunk(unsigned long start_pfn, unsigned long end_pfn,
- 			   void *arg)
- {
-@@ -2036,6 +2036,8 @@ deferred_init_memmap_chunk(unsigned long start_pfn, unsigned long end_pfn,
- 		deferred_init_maxorder(&i, zone, &spfn, &epfn);
- 		cond_resched();
- 	}
++	lock_map_acquire(&ps.lockdep_map);
++	lock_map_release(&ps.lockdep_map);
 +
-+	return 0;
- }
+ 	list_for_each_entry(pw, &works, pw_list)
+ 		queue_work(system_unbound_wq, &pw->pw_work);
  
- /* An arch may override for more concurrency. */
 -- 
 2.34.1
 
