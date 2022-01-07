@@ -2,80 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA64CC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 02:37:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C78AC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 02:44:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344793AbiAGChX (ORCPT
+        id S1344731AbiAGCo5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jan 2022 21:37:23 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:59068 "EHLO fornost.hmeau.com"
+        Thu, 6 Jan 2022 21:44:57 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:59070 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344794AbiAGChX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jan 2022 21:37:23 -0500
+        id S1344689AbiAGCo5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Jan 2022 21:44:57 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1n5f78-0006EM-9F; Fri, 07 Jan 2022 13:36:23 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Jan 2022 13:36:21 +1100
-Date:   Fri, 7 Jan 2022 13:36:21 +1100
+        id 1n5fF4-0006RF-Jm; Fri, 07 Jan 2022 13:44:35 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Jan 2022 13:44:34 +1100
+Date:   Fri, 7 Jan 2022 13:44:34 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     ZHIZHIKIN Andrey <andrey.zhizhikin@leica-geosystems.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "shawnguo@kernel.org" <shawnguo@kernel.org>,
-        "michael@walle.cc" <michael@walle.cc>,
-        "s.hauer@pengutronix.de" <s.hauer@pengutronix.de>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        "festevam@gmail.com" <festevam@gmail.com>,
-        "linux-imx@nxp.com" <linux-imx@nxp.com>,
-        "horia.geanta@nxp.com" <horia.geanta@nxp.com>,
-        "pankaj.gupta@nxp.com" <pankaj.gupta@nxp.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "l.stach@pengutronix.de" <l.stach@pengutronix.de>,
-        "qiangqing.zhang@nxp.com" <qiangqing.zhang@nxp.com>,
-        "peng.fan@nxp.com" <peng.fan@nxp.com>,
-        "alice.guo@nxp.com" <alice.guo@nxp.com>,
-        "aford173@gmail.com" <aford173@gmail.com>,
-        "frieder.schrempf@kontron.de" <frieder.schrempf@kontron.de>,
-        "krzk@kernel.org" <krzk@kernel.org>,
-        "shengjiu.wang@nxp.com" <shengjiu.wang@nxp.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "ping.bai@nxp.com" <ping.bai@nxp.com>,
-        "daniel.baluta@nxp.com" <daniel.baluta@nxp.com>,
-        "jun.li@nxp.com" <jun.li@nxp.com>, "marex@denx.de" <marex@denx.de>,
-        "thunder.leizhen@huawei.com" <thunder.leizhen@huawei.com>,
-        "martink@posteo.de" <martink@posteo.de>,
-        "leonard.crestez@nxp.com" <leonard.crestez@nxp.com>,
-        "hongxing.zhu@nxp.com" <hongxing.zhu@nxp.com>,
-        "agx@sigxcpu.org" <agx@sigxcpu.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "op-tee@lists.trustedfirmware.org" <op-tee@lists.trustedfirmware.org>
-Subject: Re: [PATCH v3 0/2] CAAM Driver: re-factor and set proper JR status
-Message-ID: <YdenJaDAVmJB2AGd@gondor.apana.org.au>
-References: <20211111164601.13135-1-andrey.zhizhikin@leica-geosystems.com>
- <20211207230206.14637-1-andrey.zhizhikin@leica-geosystems.com>
- <AM6PR06MB469129E72ED6FBE0B33C693DA64C9@AM6PR06MB4691.eurprd06.prod.outlook.com>
+To:     Stephan Mueller <smueller@chronox.de>
+Cc:     Nicolai Stange <nstange@suse.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qat-linux@intel.com, keyrings@vger.kernel.org, simo@redhat.com
+Subject: Re: [PATCH v2 03/18] crypto: dh - optimize domain parameter
+ serialization for well-known groups
+Message-ID: <YdepEhTI/LB9wdJr@gondor.apana.org.au>
+References: <20211209090358.28231-1-nstange@suse.de>
+ <87r1a7thy0.fsf@suse.de>
+ <YcvEkfS4cONDXXB9@gondor.apana.org.au>
+ <2468270.qO8rWLYou6@tauon.chronox.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AM6PR06MB469129E72ED6FBE0B33C693DA64C9@AM6PR06MB4691.eurprd06.prod.outlook.com>
+In-Reply-To: <2468270.qO8rWLYou6@tauon.chronox.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 06, 2022 at 10:56:12AM +0000, ZHIZHIKIN Andrey wrote:
-> Hello Herbert,
-> 
-> Gentle ping on this V3. I see that in Patchwork this series state is set to "Deferred".
-> 
-> Is there anything missing here to proceed further?
+On Thu, Jan 06, 2022 at 03:30:04PM +0100, Stephan Mueller wrote:
+>
+> This means in FIPS mode, invoking the algo of "dh" should not be possible. 
+> Yet, on the other hand, we cannot mark "dh" as fips_allowed == 0 as the 
+> templates would not be able to instantiate them.
 
-Please get the caam driver maintainer to review and ack the
-patch series.
+Right, we have exactly the same problem with sha1 where sha1
+per se should be not be allowed in FIPS mode but hmac(sha1)
+should be.
 
-Thanks,
+> Therefore, I think we should mark "dh" as CRYPTO_ALG_INTERNAL if in FIPS mode. 
+I think the annotation should be added to testmgr.c.  We could
+mark dh and sha1 as not fips_allowed but allowed as the parameter
+of a template.  This could then be represented in the crypto_alg
+object by a new flag.
+
+This flag could then be set automatically in crypto_grab_* to
+allow them to be picked up automatically for templates.
+
+I'm already writing this up for sha1 anyway so let me polish it
+off and I'll post it soon which you can then reuse it for dh.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
