@@ -2,92 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D5EC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 12:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB04FC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 12:07:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238640AbiAGMFG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jan 2022 07:05:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40132 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237918AbiAGMFF (ORCPT
+        id S238033AbiAGMHG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Jan 2022 07:07:06 -0500
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:59062 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237988AbiAGMHG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jan 2022 07:05:05 -0500
-Received: from ssl.serverraum.org (ssl.serverraum.org [IPv6:2a01:4f8:151:8464::1:2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C4D8C061212;
-        Fri,  7 Jan 2022 04:05:05 -0800 (PST)
-Received: from ssl.serverraum.org (web.serverraum.org [172.16.0.2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ssl.serverraum.org (Postfix) with ESMTPSA id F19302223B;
-        Fri,  7 Jan 2022 13:05:01 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
-        t=1641557103;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vYzcSUS8yvyk0FFz/CBJ9UzBPJSFoz+LxktBb7PpgvA=;
-        b=Vnu+iGdr76U6X2zEQaPCWsKqZrw7uZ9QaTl85ShL3UTuO3+qJRNlat9FancNW0NiPftkJL
-        g6Vg4Z1yJcwRZRGPpmigCnWaSu3U1nAO2QZM3d55p6BT2MFXJnEJiFGEcZY6i/nvDvO2Ox
-        Awg3LEhCoEdyK4+D5ha7/RlvJer8QV4=
+        Fri, 7 Jan 2022 07:07:06 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0V1AdPfV_1641557221;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V1AdPfV_1641557221)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 07 Jan 2022 20:07:02 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
+        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v4 0/6] Introduce x86 assembly accelerated implementation for SM3 algorithm
+Date:   Fri,  7 Jan 2022 20:06:54 +0800
+Message-Id: <20220107120700.730-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Fri, 07 Jan 2022 13:05:01 +0100
-From:   Michael Walle <michael@walle.cc>
-To:     Lucas Stach <l.stach@pengutronix.de>
-Cc:     Rouven Czerwinski <r.czerwinski@pengutronix.de>,
-        ZHIZHIKIN Andrey <andrey.zhizhikin@leica-geosystems.com>,
-        linux-kernel@vger.kernel.org, peng.fan@nxp.com, ping.bai@nxp.com,
-        alice.guo@nxp.com, agx@sigxcpu.org, krzk@kernel.org,
-        leonard.crestez@nxp.com, festevam@gmail.com, marex@denx.de,
-        herbert@gondor.apana.org.au, horia.geanta@nxp.com,
-        daniel.baluta@nxp.com, frieder.schrempf@kontron.de,
-        linux-imx@nxp.com, devicetree@vger.kernel.org,
-        hongxing.zhu@nxp.com, s.hauer@pengutronix.de, pankaj.gupta@nxp.com,
-        robh+dt@kernel.org, thunder.leizhen@huawei.com, martink@posteo.de,
-        aford173@gmail.com, linux-arm-kernel@lists.infradead.org,
-        gregkh@linuxfoundation.org, shengjiu.wang@nxp.com,
-        qiangqing.zhang@nxp.com, op-tee@lists.trustedfirmware.org,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        shawnguo@kernel.org, davem@davemloft.net, jun.li@nxp.com
-Subject: Re: [PATCH v3 2/2] arm64: dts: imx8m: define proper status for caam
- jr
-In-Reply-To: <8fa36ec0a6252db4b0c7fbbf09de5e816d634206.camel@pengutronix.de>
-References: <20211111164601.13135-1-andrey.zhizhikin@leica-geosystems.com>
- <20211207230206.14637-1-andrey.zhizhikin@leica-geosystems.com>
- <20211207230206.14637-3-andrey.zhizhikin@leica-geosystems.com>
- <aa84249b7e099cf23b49016433b22ae541c0a41d.camel@pengutronix.de>
- <AM6PR06MB469100A5D7A069AF84A83EEFA64C9@AM6PR06MB4691.eurprd06.prod.outlook.com>
- <30312d09effae6b78309723a7261f85915b8d5b8.camel@pengutronix.de>
- <4ed84dc354eee36067ade567097ddd68@walle.cc>
- <8fa36ec0a6252db4b0c7fbbf09de5e816d634206.camel@pengutronix.de>
-User-Agent: Roundcube Webmail/1.4.12
-Message-ID: <00e083278fb4a8c96fdef564a2183600@walle.cc>
-X-Sender: michael@walle.cc
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am 2022-01-07 12:58, schrieb Lucas Stach:
-> Am Freitag, dem 07.01.2022 um 12:47 +0100 schrieb Michael Walle:
->> Hi Rouven,
->> 
->> Am 2022-01-07 10:46, schrieb Rouven Czerwinski:
->> > .. since AFAIK i.MX8M* can not be run without TF-A.
->> 
->> Are you sure? There probably aren't any boards out there
->> without TF-A, but why shouldn't it work without it?
-> 
-> PSCI, i.e. the only means to start the secondary CPUs, is implemented
-> in TF-A, so it's very unlikely that anyone would want to run a system
-> without TF-A. Also quite a bit of the lowlevel SoC initialization is
-> implemented in TF-A.
+This series of patches creates an stand-alone library for SM3 hash
+algorithm in the lib/crypto directory, and makes the implementations
+that originally depended on sm3-generic depend on the stand-alone SM3
+library, which also includes sm3-generic itself.
 
-Doesn't mean u-boot cannot implement PSCI; actually you doesn't need
-it at all, you can still use spin tables. I just keep hearing the same
-arguments for the LS1028A SoC and yet there is one board without TF-A ;)
-Anyway, I admit it's rather unlikely.
+On this basis, the AVX assembly acceleration implementation of SM3
+algorithm is introduced, the main algorithm implementation based on
+SM3 AES/BMI2 accelerated work by libgcrypt at:
+https://gnupg.org/software/libgcrypt/index.html
 
--michael
+From the performance benchmark data, the performance improvement of
+SM3 algorithm after AVX optimization can reach up to 38%.
+
+---
+v4 changes:
+ - Rebase on latest cryptodev-2.6/master
+ - Fix the compilation error of arm64/sm3
+
+v3 changes:
+ - update git commit message for patch 01
+
+v2 changes:
+ - x86/sm3: Change K macros to signed decimal and use LEA and 32-bit offset
+
+Tianjia Zhang (6):
+  crypto: sm3 - create SM3 stand-alone library
+  crypto: arm64/sm3-ce - make dependent on sm3 library
+  crypto: sm2 - make dependent on sm3 library
+  crypto: sm3 - make dependent on sm3 library
+  crypto: x86/sm3 - add AVX assembly implementation
+  crypto: tcrypt - add asynchronous speed test for SM3
+
+ arch/arm64/crypto/Kconfig        |   2 +-
+ arch/arm64/crypto/sm3-ce-glue.c  |  28 +-
+ arch/x86/crypto/Makefile         |   3 +
+ arch/x86/crypto/sm3-avx-asm_64.S | 517 +++++++++++++++++++++++++++++++
+ arch/x86/crypto/sm3_avx_glue.c   | 134 ++++++++
+ crypto/Kconfig                   |  16 +-
+ crypto/sm2.c                     |  38 +--
+ crypto/sm3_generic.c             | 142 +--------
+ crypto/tcrypt.c                  |  14 +-
+ include/crypto/sm3.h             |  34 +-
+ lib/crypto/Kconfig               |   3 +
+ lib/crypto/Makefile              |   3 +
+ lib/crypto/sm3.c                 | 246 +++++++++++++++
+ 13 files changed, 1013 insertions(+), 167 deletions(-)
+ create mode 100644 arch/x86/crypto/sm3-avx-asm_64.S
+ create mode 100644 arch/x86/crypto/sm3_avx_glue.c
+ create mode 100644 lib/crypto/sm3.c
+
+-- 
+2.34.1
+
