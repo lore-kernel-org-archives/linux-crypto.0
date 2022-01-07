@@ -2,56 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68835C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 03:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5D0C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 06:37:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345848AbiAGDeV (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jan 2022 22:34:21 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:59076 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1345090AbiAGDeU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jan 2022 22:34:20 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1n5g16-0007Be-2y; Fri, 07 Jan 2022 14:34:13 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Jan 2022 14:34:11 +1100
-Date:   Fri, 7 Jan 2022 14:34:11 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Jiasheng Jiang <jiasheng@iscas.ac.cn>
-Cc:     ebiggers@kernel.org, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: af_alg - check possible NULL pointer
-Message-ID: <Yde0s8CAr30qrCoj@gondor.apana.org.au>
-References: <20211231014036.1870631-1-jiasheng@iscas.ac.cn>
+        id S231805AbiAGGhd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Jan 2022 01:37:33 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:51454 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231269AbiAGGhc (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Jan 2022 01:37:32 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 30CE121117;
+        Fri,  7 Jan 2022 06:37:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1641537451; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vIQjcAIlZIBanVtOIP65zLGslt4nQ94ZBtMBJM1KnBg=;
+        b=Nt/gVl/PR8oGMBsVx7ETqvvijQ2sj3ZcUigBVm7c4nDgAonMZPnepg5ZbPBBFutCv+TRb8
+        bDvPmWNoMSzvA2wI1kwyY27db7ohXyuBaA0OsRiwyShaiOy7Nwg9ZILhKJhROhmWMfuqy9
+        QjaHPPnvWUP/d4gu7cXvfiTz+e5U0BY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1641537451;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vIQjcAIlZIBanVtOIP65zLGslt4nQ94ZBtMBJM1KnBg=;
+        b=uBWkCLFm1ckuD5XriBHye1lbxZ2qtjiDG0BLtdKG3QM7iNhBFpS9GDJF/I99taQz/u7Bz6
+        s7eHIXHUi795HjBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A940C13CA2;
+        Fri,  7 Jan 2022 06:37:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id p0OoJ6rf12HWEwAAMHmgww
+        (envelope-from <nstange@suse.de>); Fri, 07 Jan 2022 06:37:30 +0000
+From:   Nicolai Stange <nstange@suse.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Stephan Mueller <smueller@chronox.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qat-linux@intel.com, keyrings@vger.kernel.org, simo@redhat.com
+Subject: Re: [PATCH v2 03/18] crypto: dh - optimize domain parameter serialization for well-known groups
+In-Reply-To: <YdepEhTI/LB9wdJr@gondor.apana.org.au> (Herbert Xu's message of
+        "Fri, 7 Jan 2022 13:44:34 +1100")
+References: <20211209090358.28231-1-nstange@suse.de> <87r1a7thy0.fsf@suse.de>
+        <YcvEkfS4cONDXXB9@gondor.apana.org.au>
+        <2468270.qO8rWLYou6@tauon.chronox.de>
+        <YdepEhTI/LB9wdJr@gondor.apana.org.au>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
+Date:   Fri, 07 Jan 2022 07:37:30 +0100
+Message-ID: <87lezs3vbp.fsf@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211231014036.1870631-1-jiasheng@iscas.ac.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 31, 2021 at 09:40:36AM +0800, Jiasheng Jiang wrote:
-> Because of the possible alloc failure of the alloc_page(), it could
-> return NULL pointer.
-> And there is a check below the sg_assign_page().
-> But it will be more logical to move the NULL check before the
-> sg_assign_page().
-> 
-> Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
-> ---
-> Changelog:
-> 
-> v1 -> v2
-> 
-> * Change 1. Move the previous check in front of sg_assign_page().
-> ---
->  crypto/af_alg.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+Herbert Xu <herbert@gondor.apana.org.au> writes:
 
-Patch applied with modified Subject line.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> On Thu, Jan 06, 2022 at 03:30:04PM +0100, Stephan Mueller wrote:
+>>
+>> This means in FIPS mode, invoking the algo of "dh" should not be possibl=
+e.=20
+>> Yet, on the other hand, we cannot mark "dh" as fips_allowed =3D=3D 0 as =
+the=20
+>> templates would not be able to instantiate them.
+>
+> Right, we have exactly the same problem with sha1 where sha1
+> per se should be not be allowed in FIPS mode but hmac(sha1)
+> should be.
+>
+>> Therefore, I think we should mark "dh" as CRYPTO_ALG_INTERNAL if in FIPS=
+ mode.=20
+> I think the annotation should be added to testmgr.c.  We could
+> mark dh and sha1 as not fips_allowed but allowed as the parameter
+> of a template.  This could then be represented in the crypto_alg
+> object by a new flag.
+>
+> This flag could then be set automatically in crypto_grab_* to
+> allow them to be picked up automatically for templates.
+>
+> I'm already writing this up for sha1 anyway so let me polish it
+> off and I'll post it soon which you can then reuse it for dh.
+
+Perfect, this will solve my problem with how to handle "dh"
+vs. fips_enabled quite nicely.
+
+Many thanks!
+
+Nicolai
+
+--=20
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, G=
+ermany
+(HRB 36809, AG N=C3=BCrnberg), GF: Ivo Totev
