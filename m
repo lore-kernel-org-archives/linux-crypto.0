@@ -2,139 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CDEDC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 07:01:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 156DEC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 08:57:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232115AbiAGHBI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jan 2022 02:01:08 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:52230 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229715AbiAGHBI (ORCPT
+        id S1346229AbiAGI5s (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Jan 2022 03:57:48 -0500
+Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:57341 "EHLO
+        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1346181AbiAGI5q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jan 2022 02:01:08 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id BD48B21110;
-        Fri,  7 Jan 2022 07:01:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1641538866; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/C+FOPOAlJErWFC/CZxgo1BoC+YGMpjmEjNtbMN44+M=;
-        b=utyw9gMiU2bGyYmvN6Ae8LkMV0GQP5wVM/VEANIrJu3UfiQAjgd4G8OlvLIaasuPcTffHN
-        rtb2cU1PcZu9LCYPXYriCszszNqRpBz64dUixvSckenAvmdEduH6YXVL6iLymVZ2fVfRtN
-        BlcUW15Nnqo+bG7Wu3D6i1cHfFjmPnw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1641538866;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/C+FOPOAlJErWFC/CZxgo1BoC+YGMpjmEjNtbMN44+M=;
-        b=u8WdzK0XZuYwh/NYEgeFRuNfi9yiPpT42fQ3UI7kH9gS75Wvvk0VDKTDeWwbrZuX6G/3/L
-        rNxcG9AEciy2TIAw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5225713CA1;
-        Fri,  7 Jan 2022 07:01:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 2m2pEjLl12GJGgAAMHmgww
-        (envelope-from <nstange@suse.de>); Fri, 07 Jan 2022 07:01:06 +0000
-From:   Nicolai Stange <nstange@suse.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Nicolai Stange <nstange@suse.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>,
-        Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        qat-linux@intel.com, keyrings@vger.kernel.org
-Subject: Re: [PATCH v2 03/18] crypto: dh - optimize domain parameter serialization for well-known groups
-In-Reply-To: <YcvEkfS4cONDXXB9@gondor.apana.org.au> (Herbert Xu's message of
-        "Wed, 29 Dec 2021 13:14:41 +1100")
-References: <20211209090358.28231-1-nstange@suse.de>
-        <20211209090358.28231-4-nstange@suse.de>
-        <20211217055227.GA20698@gondor.apana.org.au> <87r1a7thy0.fsf@suse.de>
-        <YcvEkfS4cONDXXB9@gondor.apana.org.au>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
-Date:   Fri, 07 Jan 2022 08:01:05 +0100
-Message-ID: <87ee5k3u8e.fsf@suse.de>
+        Fri, 7 Jan 2022 03:57:46 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0V1AKtGu_1641545860;
+Received: from 30.240.102.225(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V1AKtGu_1641545860)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 07 Jan 2022 16:57:42 +0800
+Message-ID: <c3ddb561-15b0-855f-b50c-c97ebd0f5976@linux.alibaba.com>
+Date:   Fri, 7 Jan 2022 16:57:39 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Subject: Re: [PATCH v3 2/6] crypto: arm64/sm3-ce - make dependent on sm3
+ library
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
+        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+References: <20211223043547.32297-1-tianjia.zhang@linux.alibaba.com>
+ <20211223043547.32297-3-tianjia.zhang@linux.alibaba.com>
+ <YdezdZQHZT2+iYV3@gondor.apana.org.au>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <YdezdZQHZT2+iYV3@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
+Hi Herbert,
 
-> On Mon, Dec 20, 2021 at 04:27:35PM +0100, Nicolai Stange wrote:
->>=20
->> Just for my understanding: the problem here is having a (single) enum
->> for the representation of all the possible "known" groups in the first
->> place or more that the individual group id enum members have hard-coded
->> values assigned to them each?
->
-> Yes the fact that you need to have a list of all "known" groups is
-> the issue.
+On 1/7/22 11:28 AM, Herbert Xu wrote:
+> On Thu, Dec 23, 2021 at 12:35:43PM +0800, Tianjia Zhang wrote:
+>> SM3 generic library is stand-alone implementation, sm3-ce can depend
+>> on the SM3 library instead of sm3-generic.
+>>
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>> ---
+>>   arch/arm64/crypto/Kconfig       |  2 +-
+>>   arch/arm64/crypto/sm3-ce-glue.c | 20 ++++++++++++++------
+>>   2 files changed, 15 insertions(+), 7 deletions(-)
+> 
+> This doesn't compile cleanly with C=1 W=1:
+> 
+>    CC [M]  arch/arm64/crypto/sm3-ce-glue.o
+>    AS [M]  arch/arm64/crypto/sm3-ce-core.o
+>    CC [M]  arch/arm64/crypto/sm4-ce-glue.o
+>    CHECK   ../arch/arm64/crypto/sha3-ce-glue.c
+> ../arch/arm64/crypto/sm3-ce-glue.c: In function ‘sm3_ce_update’:
+> ../arch/arm64/crypto/sm3-ce-glue.c:30:10: error: void value not ignored as it ought to be
+>     30 |   return sm3_update(shash_desc_ctx(desc), data, len);
+>        |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> ../arch/arm64/crypto/sm3-ce-glue.c: In function ‘sm3_ce_final’:
+> ../arch/arm64/crypto/sm3-ce-glue.c:42:10: error: void value not ignored as it ought to be
+>     42 |   return sm3_final(shash_desc_ctx(desc), out);
+>        |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> make[3]: *** [../scripts/Makefile.build:287: arch/arm64/crypto/sm3-ce-glue.o] Error 1
+> make[3]: *** Waiting for unfinished jobs....
+> 
+> Please make sure everything builds cleanly with C=1 W=1 *before*
+> you submit.
+> 
+> Thanks,
 
-Ok, understood. Thanks for the clarification.
+Thanks for pointing it out, will fix it in next patch. There will never 
+be such a low-level error in the future
 
-
->> However, after some back and forth, I opted against doing something
->> similar for dh at the time, because there are quite some more possible
->> parameter sets than there are for ecdh, namely ten vs. three. If we were
->
-> I don't understand why we can't support ten or an even larger
-> number of parameter sets.
-
-There's no real reason. I just didn't dare to promote what I considered
-mere input parameter sets to full-fledged crypto_alg instances with
-their associated overhead each:
-- the global crypto_alg_list will get longer, which might have an
-  impact on the lookup searches,
-- every ffdheXYZ(dh) template instance will need to have individual
-  TVs associated with it.
-
-However, I take it as that's fine and I'd be more than happy to
-implement the ffhdheXYZ(dh) template approach you suggested in a v3.
-
-
->
-> If you are concerned about code duplication then there are ways
-> around that.  Or do you have another specific concern in mind
-> with respect to a large number of parameter sets under this scheme?
->=20=20
->> Anyway, just to make sure I'm getting it right: when you're saying
->> "template", you mean to implement a crypto_template for instantiating
->> patterns like "dh(ffdhe2048)", "dh(ffdhe3072)" and so on? The dh(...)
->> template instantiations would keep a crypto_spawn for referring to the
->> underlying, non-template "dh" kpp_alg so that "dh" implementations of
->> higher priority (hpre + qat) would take over once they'd become
->> available, correct?
->
-> The template would work in the other dirirection.  It would look
-> like ffdhe2048(dh) with dh being implemented in either software or
-> hardware.
->
-> The template wrapper would simply supply the relevant parameters.
-
-Makes sense.
-
-Thanks!
-
-Nicolai
-
---=20
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, G=
-ermany
-(HRB 36809, AG N=C3=BCrnberg), GF: Ivo Totev
+Kind Regards,
+Tianjia
