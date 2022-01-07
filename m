@@ -2,79 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34818C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 11:48:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64EC3C43217
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 11:55:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347186AbiAGLsA (ORCPT
+        id S1347358AbiAGLzs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jan 2022 06:48:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35952 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238037AbiAGLsA (ORCPT
+        Fri, 7 Jan 2022 06:55:48 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:35834 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1347307AbiAGLzp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jan 2022 06:48:00 -0500
-Received: from ssl.serverraum.org (ssl.serverraum.org [IPv6:2a01:4f8:151:8464::1:2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 220F3C061245;
-        Fri,  7 Jan 2022 03:48:00 -0800 (PST)
-Received: from ssl.serverraum.org (web.serverraum.org [172.16.0.2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ssl.serverraum.org (Postfix) with ESMTPSA id 428EF2223B;
-        Fri,  7 Jan 2022 12:47:54 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
-        t=1641556077;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4p2nvLSi28IUF15b8Rsri9q/8pTR/coNz2dgph7kT0U=;
-        b=NvwmnqY5W/+W0iOI3tSIXP6ErPH9ynsq3YKQBZqAuhLSZIrdWyoFhHrvoM4FgPAyeGQzMc
-        anNpMPelKR9bVpTfPLzqZP0Z9PXBdFwzNB2BPHGsxtkdEnj1yqONCff1My2OrW1dsCUiDZ
-        sS5BdbRDpIof1/OeUwoJMz6QJeLJv3o=
+        Fri, 7 Jan 2022 06:55:45 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 095101F39C;
+        Fri,  7 Jan 2022 11:55:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1641556543; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=NLOYJhZxOiXByA38wXhVENRBwHFkUqymDefaIYtjAww=;
+        b=DYJoYIvMIuaAn4jT6wzepOZddowzB3R6YLybX2O6n7TCAQCZlR4zDeU0GcYPnKW505nABj
+        su4oZEJ0oCH/m55uGP7Yy8WYS2BMfpXyjxmpyLh4GOyEj5o4ZfyvIZxpFvDygtVE3Fuflf
+        UZa4paGKe6qZiNlPFieplKDZDzlXTZ8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1641556543;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=NLOYJhZxOiXByA38wXhVENRBwHFkUqymDefaIYtjAww=;
+        b=bNOaWUaTqMbaig6Oa1FbHF72xkJH1yRNSzF6PLDJzt5jO3qibt3lGaCHNMAjYvcm6B/ewl
+        K+WzVdl2lkZBQJAw==
+Received: from kitsune.suse.cz (kitsune.suse.cz [10.100.12.127])
+        by relay2.suse.de (Postfix) with ESMTP id 668BAA3B83;
+        Fri,  7 Jan 2022 11:55:38 +0000 (UTC)
+From:   Michal Suchanek <msuchanek@suse.de>
+To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Cc:     Michal Suchanek <msuchanek@suse.de>, kexec@lists.infradead.org,
+        Philipp Rudo <prudo@redhat.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
+        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
+        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Jessica Yu <jeyu@kernel.org>, linux-kernel@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Hari Bathini <hbathini@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        Frank van der Linden <fllinden@amazon.com>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        Daniel Axtens <dja@axtens.net>, buendgen@de.ibm.com,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Baoquan He <bhe@redhat.com>,
+        linux-security-module@vger.kernel.org
+Subject: [PATCH v3 0/6] KEXEC_SIG with appended signature
+Date:   Fri,  7 Jan 2022 12:53:44 +0100
+Message-Id: <cover.1641555875.git.msuchanek@suse.de>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Fri, 07 Jan 2022 12:47:53 +0100
-From:   Michael Walle <michael@walle.cc>
-To:     Rouven Czerwinski <r.czerwinski@pengutronix.de>
-Cc:     ZHIZHIKIN Andrey <andrey.zhizhikin@leica-geosystems.com>,
-        linux-kernel@vger.kernel.org, peng.fan@nxp.com, ping.bai@nxp.com,
-        alice.guo@nxp.com, agx@sigxcpu.org, krzk@kernel.org,
-        leonard.crestez@nxp.com, festevam@gmail.com, marex@denx.de,
-        herbert@gondor.apana.org.au, horia.geanta@nxp.com,
-        daniel.baluta@nxp.com, frieder.schrempf@kontron.de,
-        linux-imx@nxp.com, devicetree@vger.kernel.org,
-        hongxing.zhu@nxp.com, s.hauer@pengutronix.de, pankaj.gupta@nxp.com,
-        robh+dt@kernel.org, thunder.leizhen@huawei.com, martink@posteo.de,
-        aford173@gmail.com, linux-arm-kernel@lists.infradead.org,
-        gregkh@linuxfoundation.org, shengjiu.wang@nxp.com,
-        qiangqing.zhang@nxp.com, op-tee@lists.trustedfirmware.org,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        l.stach@pengutronix.de, shawnguo@kernel.org, davem@davemloft.net,
-        jun.li@nxp.com
-Subject: Re: [PATCH v3 2/2] arm64: dts: imx8m: define proper status for caam
- jr
-In-Reply-To: <30312d09effae6b78309723a7261f85915b8d5b8.camel@pengutronix.de>
-References: <20211111164601.13135-1-andrey.zhizhikin@leica-geosystems.com>
- <20211207230206.14637-1-andrey.zhizhikin@leica-geosystems.com>
- <20211207230206.14637-3-andrey.zhizhikin@leica-geosystems.com>
- <aa84249b7e099cf23b49016433b22ae541c0a41d.camel@pengutronix.de>
- <AM6PR06MB469100A5D7A069AF84A83EEFA64C9@AM6PR06MB4691.eurprd06.prod.outlook.com>
- <30312d09effae6b78309723a7261f85915b8d5b8.camel@pengutronix.de>
-User-Agent: Roundcube Webmail/1.4.12
-Message-ID: <4ed84dc354eee36067ade567097ddd68@walle.cc>
-X-Sender: michael@walle.cc
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Rouven,
+Hello,
 
-Am 2022-01-07 10:46, schrieb Rouven Czerwinski:
-> .. since AFAIK i.MX8M* can not be run without TF-A.
+This is a refresh of the KEXEC_SIG series.
 
-Are you sure? There probably aren't any boards out there
-without TF-A, but why shouldn't it work without it?
+This adds KEXEC_SIG support on powerpc and deduplicates the code dealing
+with appended signatures in the kernel.
 
--michael
+powerpc supports IMA_KEXEC but that's an exception rather than the norm.
+On the other hand, KEXEC_SIG is portable across platforms.
+
+For distributions to have uniform security features across platforms one
+option should be used on all platforms.
+
+Thanks
+
+Michal
+
+Previous revision: https://lore.kernel.org/linuxppc-dev/cover.1637862358.git.msuchanek@suse.de/
+Patched kernel tree: https://github.com/hramrach/kernel/tree/kexec_sig
+
+Michal Suchanek (6):
+  s390/kexec_file: Don't opencode appended signature check.
+  powerpc/kexec_file: Add KEXEC_SIG support.
+  kexec_file: Don't opencode appended signature verification.
+  module: strip the signature marker in the verification function.
+  module: Use key_being_used_for for log messages in
+    verify_appended_signature
+  module: Move duplicate mod_check_sig users code to mod_parse_sig
+
+ arch/powerpc/Kconfig                     | 16 +++++++
+ arch/powerpc/kexec/elf_64.c              | 14 ++++++
+ arch/s390/Kconfig                        |  2 +-
+ arch/s390/kernel/machine_kexec_file.c    | 43 ++----------------
+ crypto/asymmetric_keys/asymmetric_type.c |  1 +
+ include/linux/module_signature.h         |  1 +
+ include/linux/verification.h             |  4 ++
+ kernel/module-internal.h                 |  2 -
+ kernel/module.c                          | 12 +++--
+ kernel/module_signature.c                | 56 +++++++++++++++++++++++-
+ kernel/module_signing.c                  | 33 +++++++-------
+ security/integrity/ima/ima_modsig.c      | 22 ++--------
+ 12 files changed, 119 insertions(+), 87 deletions(-)
+
+-- 
+2.31.1
+
