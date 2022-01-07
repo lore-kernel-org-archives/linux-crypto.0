@@ -2,31 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC10C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 11:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D5EC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jan 2022 12:05:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237351AbiAGL7i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jan 2022 06:59:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38870 "EHLO
+        id S238640AbiAGMFG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Jan 2022 07:05:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238658AbiAGL7d (ORCPT
+        with ESMTP id S237918AbiAGMFF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jan 2022 06:59:33 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC757C061245
-        for <linux-crypto@vger.kernel.org>; Fri,  7 Jan 2022 03:59:32 -0800 (PST)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <l.stach@pengutronix.de>)
-        id 1n5ntc-0004Qo-QE; Fri, 07 Jan 2022 12:59:00 +0100
-Message-ID: <8fa36ec0a6252db4b0c7fbbf09de5e816d634206.camel@pengutronix.de>
-Subject: Re: [PATCH v3 2/2] arm64: dts: imx8m: define proper status for caam
- jr
-From:   Lucas Stach <l.stach@pengutronix.de>
-To:     Michael Walle <michael@walle.cc>,
-        Rouven Czerwinski <r.czerwinski@pengutronix.de>
-Cc:     ZHIZHIKIN Andrey <andrey.zhizhikin@leica-geosystems.com>,
+        Fri, 7 Jan 2022 07:05:05 -0500
+Received: from ssl.serverraum.org (ssl.serverraum.org [IPv6:2a01:4f8:151:8464::1:2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C4D8C061212;
+        Fri,  7 Jan 2022 04:05:05 -0800 (PST)
+Received: from ssl.serverraum.org (web.serverraum.org [172.16.0.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ssl.serverraum.org (Postfix) with ESMTPSA id F19302223B;
+        Fri,  7 Jan 2022 13:05:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
+        t=1641557103;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vYzcSUS8yvyk0FFz/CBJ9UzBPJSFoz+LxktBb7PpgvA=;
+        b=Vnu+iGdr76U6X2zEQaPCWsKqZrw7uZ9QaTl85ShL3UTuO3+qJRNlat9FancNW0NiPftkJL
+        g6Vg4Z1yJcwRZRGPpmigCnWaSu3U1nAO2QZM3d55p6BT2MFXJnEJiFGEcZY6i/nvDvO2Ox
+        Awg3LEhCoEdyK4+D5ha7/RlvJer8QV4=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Fri, 07 Jan 2022 13:05:01 +0100
+From:   Michael Walle <michael@walle.cc>
+To:     Lucas Stach <l.stach@pengutronix.de>
+Cc:     Rouven Czerwinski <r.czerwinski@pengutronix.de>,
+        ZHIZHIKIN Andrey <andrey.zhizhikin@leica-geosystems.com>,
         linux-kernel@vger.kernel.org, peng.fan@nxp.com, ping.bai@nxp.com,
         alice.guo@nxp.com, agx@sigxcpu.org, krzk@kernel.org,
         leonard.crestez@nxp.com, festevam@gmail.com, marex@denx.de,
@@ -40,41 +52,42 @@ Cc:     ZHIZHIKIN Andrey <andrey.zhizhikin@leica-geosystems.com>,
         qiangqing.zhang@nxp.com, op-tee@lists.trustedfirmware.org,
         linux-crypto@vger.kernel.org, kernel@pengutronix.de,
         shawnguo@kernel.org, davem@davemloft.net, jun.li@nxp.com
-Date:   Fri, 07 Jan 2022 12:58:58 +0100
-In-Reply-To: <4ed84dc354eee36067ade567097ddd68@walle.cc>
+Subject: Re: [PATCH v3 2/2] arm64: dts: imx8m: define proper status for caam
+ jr
+In-Reply-To: <8fa36ec0a6252db4b0c7fbbf09de5e816d634206.camel@pengutronix.de>
 References: <20211111164601.13135-1-andrey.zhizhikin@leica-geosystems.com>
-         <20211207230206.14637-1-andrey.zhizhikin@leica-geosystems.com>
-         <20211207230206.14637-3-andrey.zhizhikin@leica-geosystems.com>
-         <aa84249b7e099cf23b49016433b22ae541c0a41d.camel@pengutronix.de>
-         <AM6PR06MB469100A5D7A069AF84A83EEFA64C9@AM6PR06MB4691.eurprd06.prod.outlook.com>
-         <30312d09effae6b78309723a7261f85915b8d5b8.camel@pengutronix.de>
-         <4ed84dc354eee36067ade567097ddd68@walle.cc>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-1.fc34) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: l.stach@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+ <20211207230206.14637-1-andrey.zhizhikin@leica-geosystems.com>
+ <20211207230206.14637-3-andrey.zhizhikin@leica-geosystems.com>
+ <aa84249b7e099cf23b49016433b22ae541c0a41d.camel@pengutronix.de>
+ <AM6PR06MB469100A5D7A069AF84A83EEFA64C9@AM6PR06MB4691.eurprd06.prod.outlook.com>
+ <30312d09effae6b78309723a7261f85915b8d5b8.camel@pengutronix.de>
+ <4ed84dc354eee36067ade567097ddd68@walle.cc>
+ <8fa36ec0a6252db4b0c7fbbf09de5e816d634206.camel@pengutronix.de>
+User-Agent: Roundcube Webmail/1.4.12
+Message-ID: <00e083278fb4a8c96fdef564a2183600@walle.cc>
+X-Sender: michael@walle.cc
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, dem 07.01.2022 um 12:47 +0100 schrieb Michael Walle:
-> Hi Rouven,
+Am 2022-01-07 12:58, schrieb Lucas Stach:
+> Am Freitag, dem 07.01.2022 um 12:47 +0100 schrieb Michael Walle:
+>> Hi Rouven,
+>> 
+>> Am 2022-01-07 10:46, schrieb Rouven Czerwinski:
+>> > .. since AFAIK i.MX8M* can not be run without TF-A.
+>> 
+>> Are you sure? There probably aren't any boards out there
+>> without TF-A, but why shouldn't it work without it?
 > 
-> Am 2022-01-07 10:46, schrieb Rouven Czerwinski:
-> > .. since AFAIK i.MX8M* can not be run without TF-A.
-> 
-> Are you sure? There probably aren't any boards out there
-> without TF-A, but why shouldn't it work without it?
+> PSCI, i.e. the only means to start the secondary CPUs, is implemented
+> in TF-A, so it's very unlikely that anyone would want to run a system
+> without TF-A. Also quite a bit of the lowlevel SoC initialization is
+> implemented in TF-A.
 
-PSCI, i.e. the only means to start the secondary CPUs, is implemented
-in TF-A, so it's very unlikely that anyone would want to run a system
-without TF-A. Also quite a bit of the lowlevel SoC initialization is
-implemented in TF-A.
+Doesn't mean u-boot cannot implement PSCI; actually you doesn't need
+it at all, you can still use spin tables. I just keep hearing the same
+arguments for the LS1028A SoC and yet there is one board without TF-A ;)
+Anyway, I admit it's rather unlikely.
 
-Regards,
-Lucas
-
+-michael
