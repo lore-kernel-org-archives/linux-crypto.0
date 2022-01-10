@@ -2,29 +2,39 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07EF6C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jan 2022 19:51:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 553C0C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jan 2022 20:05:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241338AbiAJTvP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jan 2022 14:51:15 -0500
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:49309 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S239531AbiAJTvP (ORCPT
+        id S243611AbiAJUFN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Jan 2022 15:05:13 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:54680 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243553AbiAJUFN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jan 2022 14:51:15 -0500
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 20AJnORK019332
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Jan 2022 14:49:25 -0500
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id D0A2A15C00C8; Mon, 10 Jan 2022 14:49:24 -0500 (EST)
-Date:   Mon, 10 Jan 2022 14:49:24 -0500
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Simo Sorce <simo@redhat.com>,
+        Mon, 10 Jan 2022 15:05:13 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 29740B817D2;
+        Mon, 10 Jan 2022 20:05:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0641C36AE9;
+        Mon, 10 Jan 2022 20:05:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641845110;
+        bh=5UEoJ7LADym/lTJ6UBzOx14TlXiB1WSHgVxNCt8uJaY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VHNydo81TYOGXNPN05R9ogZ/ri3VFhOQ9PvkHgeD0RJ5OsUOhlFUUFKjDoCso/KM2
+         OGZoj+PMuGGC2MyuIGt3FSYfdHcBl5qBypGBtd476RyWiy+IL0CWQgNTlbg3mxZn6E
+         3pm6IcgZMWqJa0y3eSnTFIeAEXs8MHbdn9dwW3QlUDL++/AfZLVoNVqWaplS6PJjf4
+         fS9JL2KwJL0xKVa/Wu6W3uLYms9yIRr4guRlaOXRQX8f3r2XVyAcBjJ9sAyvOClqHg
+         sp/PntthmERkaDv2fpLdYITPVA0v9Bd7Q+lXO/3QIzYDEbK7nouW+QwsJ2aAIftNar
+         MGfEu99SsZkBA==
+Date:   Mon, 10 Jan 2022 12:05:08 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Simo Sorce <simo@redhat.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Theodore Ts'o <tytso@mit.edu>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jeffrey Walton <noloader@gmail.com>,
         Stephan Mueller <smueller@chronox.de>,
@@ -45,7 +55,6 @@ Cc:     Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
         Florian Weimer <fweimer@redhat.com>,
         Lennart Poettering <mzxreary@0pointer.de>,
         Peter Matthias <matthias.peter@bsi.bund.de>,
-        Neil Horman <nhorman@redhat.com>,
         Randy Dunlap <rdunlap@infradead.org>,
         Julia Lawall <julia.lawall@inria.fr>,
         Dan Carpenter <dan.carpenter@oracle.com>,
@@ -53,12 +62,10 @@ Cc:     Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
         Petr Tesarik <ptesarik@suse.cz>,
         John Haxby <john.haxby@oracle.com>,
         Alexander Lobakin <alobakin@mailbox.org>,
-        Jirka Hladky <jhladky@redhat.com>,
-        Eric Biggers <ebiggers@kernel.org>
+        Jirka Hladky <jhladky@redhat.com>
 Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-Message-ID: <YdyNxJzdBmSSEtDC@mit.edu>
-References: <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
- <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
+Message-ID: <YdyRdK5y+xfh3VJQ@sol.localdomain>
+References: <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
  <20211210014337.xmin2lu5rhhe3b3t@valinor>
  <20220110132349.siplwka7yhe2tmwc@valinor>
  <CAHmME9oSK5sVVhMewm-oVvn=twP4yyYnLY0OVebYZ0sy1mQAyA@mail.gmail.com>
@@ -67,62 +74,37 @@ References: <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
  <Ydxu+KS5UkQ6hU9R@mit.edu>
  <Ydx7D3H0PS0Zs9/B@sol.localdomain>
  <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
+ <cdfd8173b1b343413b054957dc2984c27587495c.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
+In-Reply-To: <cdfd8173b1b343413b054957dc2984c27587495c.camel@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 07:44:23PM +0100, Jason A. Donenfeld wrote:
-> b) Userspace to use some other RNG.
+On Mon, Jan 10, 2022 at 02:41:33PM -0500, Simo Sorce wrote:
+> On Mon, 2022-01-10 at 19:44 +0100, Jason A. Donenfeld wrote:
+> > On Mon, Jan 10, 2022 at 4:08 PM Marcelo Henrique Cerri
+> > <marcelo.cerri@canonical.com> wrote:
+> > > > Just to confirm, this little patch here gives you FIPS certification?
+> > > It does
+> > 
+> > On Mon, Jan 10, 2022 at 7:29 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> > > Now, the idea of certifying the whole kernel as a FIPS cryptographic module is
+> > > stupid
 > 
-> (b) can be accomplished in userspace by just (i) disabling getrandom()
-> (making it return ENOSYS), and then (ii) replacing the /dev/urandom
-> path with a CUSE device or similar.
+> Not that it is not the whole kernel, but a "module boundary" is drawn
+> around the crypto API and vicinity.
+> It would be really nice if this whole "boundary" could be built as a
+> single binary module to be loaded in the kernel in fips mode. That way
+> we could update the rest of the kernel w/o rebuilding the module, but
+> we are not there.
 
-I don't think you even need to do this.  In general, you need FIPS
-certification for some specific use cases / application.  For example,
-if you're going for PCI compliance, then you might only need FIPS
-compliance for your OpenSSL library.  What the FIPS certification lab
-might consider acceptable for its entropy for its DRBG is an
-interesting question.  For some, simply having the OpenSSL library use
-RDSEED or RDRAND might be sufficient.  Or it could talk to an actual
-physical RNG device.
+FWIW, the "FIPS module as a loadable kernel module" approach was implemented in
+the Android kernel; grep for "fips140" in branch "android13-5.10" of
+https://android.googlesource.com/kernel/common.  It's a lot of work for nothing
+IMO, but the FIPS certification lab being used is happy with the approach.
+Note that random.c is outside of the FIPS module with this approach.
 
-So disabling getrandom() is probably not necessary, just so long as
-you can demonstrate that the FIPS cryptographic module --- i.e., the
-OpenSSL library --- is getting its entropy from an acceptable source.
-
-I suspect what's actually going on is that some enterprise customers
-have FIPS complaince on a check-off list, and they aren't actually
-getting a formal FIPS certification.  Or they only need something to
-wave under the noses of their PCI certification company, and so the
-question is what makes them happy.
-
-Going into the details of whether ChaCha20 is blessed by FIPS is
-probably more into technical weeds than most of the people who *say*
-they want FIPS certification actually will go.  After all, the
-in-kernel DRBG is using as its "entropy source" the timing
-instructions from a bunch of x86 assembly instructions which is
-**soooo** complicated that people are willing to drink from the snake
-oil and claim that it is secure.  Is it really?  Has FIPS said that
-it's OK?  Not any more than they've said anything about ChaCha20!
-
-And this is why some FIPS certification have gotten by just *fine*
-with a pure userspace OpenSSL library as their FIPS cryptographic
-module.  Where you draw the line between a "blessed" entropy source
-and one that's just hand-waving is really at the discretion of the
-certification lab.
-
-Personally, if I was doing something that I really, *really* wanted to
-be secure, I'd be mixing in several hardware RNG's.  Given that most
-server and client platforms have a TPM, or some other hardened
-security module, using that is probably the best bet of I was
-architecting some that *really* needed to be secure.  But of course,
-we're not talking about real security in this thread; we're talking
-about whatever security theater will make the FIPS certification labs,
-and the people who say they want FIPS on their check-off list, happy.  :-)
-
-    	       	       	    	      	       - Ted
+- Eric
