@@ -2,134 +2,157 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BCBC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jan 2022 18:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DE8C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jan 2022 19:31:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242148AbiAJSos (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jan 2022 13:44:48 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:50426 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242072AbiAJSoq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jan 2022 13:44:46 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EAC95B8175A;
-        Mon, 10 Jan 2022 18:44:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72630C36AE9;
-        Mon, 10 Jan 2022 18:44:43 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Av1IVnPG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1641840278;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GyWLj5/EaUv61VIhefKCE8M8yK1R8B4gDJ2B3ClXFkc=;
-        b=Av1IVnPG3akYv8tFAXc/F6rGdEPch6+SuubzrsRRCv/A24k31PwUvFh95VdBBCdy8pzfrL
-        tsXt6OzbH0nNOrdnMrS5KKjAI7kWCA2EOg0o8z/jBMjAZHiF4ogWTAbWwCNikzL87IdXSY
-        +X2U8qHWBk10hTleUO1qz4DvJMxKM3E=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 47a1a059 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 10 Jan 2022 18:44:38 +0000 (UTC)
-Received: by mail-yb1-f176.google.com with SMTP id v186so31201449ybg.1;
-        Mon, 10 Jan 2022 10:44:35 -0800 (PST)
-X-Gm-Message-State: AOAM531LyxvH++SNQbZEc07jG8bmW9Rk4FZ+mfDXuExFEuxkY7QYsXC/
-        1YHdm7QCFMT6ygA4Psb8N+7ufKmf4HNHTxhSUIA=
-X-Google-Smtp-Source: ABdhPJyxOBZvO7ufgXkscYSaL7Xx/j61FicVu+7hLVAxoUXwoLdLSI9k8N3yEn0BKHp6CwQ0etFo0dwakC+SMONxixs=
-X-Received: by 2002:a25:8c4:: with SMTP id 187mr1208892ybi.245.1641840274572;
- Mon, 10 Jan 2022 10:44:34 -0800 (PST)
+        id S243858AbiAJTbP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Jan 2022 14:31:15 -0500
+Received: from mga03.intel.com ([134.134.136.65]:1828 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243831AbiAJTbO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Jan 2022 14:31:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641843074; x=1673379074;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cbEnl3Vfju27AwT6EgqVlpPsZM4JemUZUkFPfJnaPBA=;
+  b=HmcXGgoOUPWoAQTB8QrTUhD6aBX/GkeS8Omwz3aQXEZhK2vTd8Ji0M1Z
+   nvScB0ls6A2ROwDSKgYRm3XFB84+FfmWBsSO1gq6RxrH8qjG/ebCrZ0V6
+   blh7TQhhrUFfbMl9LR7cTSMf6ZSweG6lPX9HQfuTllmpNxLhLkAPitXxe
+   pd6Ohylku9o7tvuzY4Rba1TWMC5b10FxnDP98iajSBdV3giX+TOdnn2St
+   aXkFZcYnkIsci6D2pY8jRqXwyUqSL4aB7kBTVDGEfR8N5Ygg0GuW3lkW4
+   JhJ3j1cl48dqvnhTdVCcLBQZjpSaPUMvAdrQCznT7zaIR4XfudIPZshoq
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10223"; a="243259724"
+X-IronPort-AV: E=Sophos;i="5.88,277,1635231600"; 
+   d="scan'208";a="243259724"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2022 11:31:13 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,277,1635231600"; 
+   d="scan'208";a="472174244"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 10 Jan 2022 11:31:10 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1n70Nq-0003tC-2U; Mon, 10 Jan 2022 19:31:10 +0000
+Date:   Tue, 11 Jan 2022 03:30:09 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Michal Suchanek <msuchanek@suse.de>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, Michal Suchanek <msuchanek@suse.de>,
+        kexec@lists.infradead.org, Philipp Rudo <prudo@redhat.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v4 6/6] module: Move duplicate mod_check_sig users code
+ to mod_parse_sig
+Message-ID: <202201110303.sLPF0o29-lkp@intel.com>
+References: <59d134a3eae4fa802ed9135385cee6fe4838ec01.1641822505.git.msuchanek@suse.de>
 MIME-Version: 1.0
-References: <YaZqVxI1C8RByq+w@gmail.com> <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
- <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
- <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
- <20211210014337.xmin2lu5rhhe3b3t@valinor> <20220110132349.siplwka7yhe2tmwc@valinor>
- <CAHmME9oSK5sVVhMewm-oVvn=twP4yyYnLY0OVebYZ0sy1mQAyA@mail.gmail.com>
- <YdxCsI3atPILABYe@mit.edu> <CAHmME9oRdoc3c36gXAcmOwumwvUi_6oqCsLmFxRP_NDMz_MK1Q@mail.gmail.com>
- <Ydxu+KS5UkQ6hU9R@mit.edu> <Ydx7D3H0PS0Zs9/B@sol.localdomain>
-In-Reply-To: <Ydx7D3H0PS0Zs9/B@sol.localdomain>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 10 Jan 2022 19:44:23 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
-Message-ID: <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-To:     Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Simo Sorce <simo@redhat.com>
-Cc:     "Theodore Ts'o" <tytso@mit.edu>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jeffrey Walton <noloader@gmail.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Peter Matthias <matthias.peter@bsi.bund.de>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Andy Lavr <andy.lavr@gmail.com>,
-        Petr Tesarik <ptesarik@suse.cz>,
-        John Haxby <john.haxby@oracle.com>,
-        Alexander Lobakin <alobakin@mailbox.org>,
-        Jirka Hladky <jhladky@redhat.com>,
-        Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <59d134a3eae4fa802ed9135385cee6fe4838ec01.1641822505.git.msuchanek@suse.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 4:08 PM Marcelo Henrique Cerri
-<marcelo.cerri@canonical.com> wrote:
-> > Just to confirm, this little patch here gives you FIPS certification?
-> It does
+Hi Michal,
 
-On Mon, Jan 10, 2022 at 7:29 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> Now, the idea of certifying the whole kernel as a FIPS cryptographic module is
-> stupid
+Thank you for the patch! Yet something to improve:
 
-Alright, so if that's the case, then what you ostensibly want is:
-a) Some cryptoapi users to use crypto_rng_get_bytes, as they already
-do now. (In a private thread with Simo, I pointed out a missing place
-and encouraged him to send a patch for that but none has arrived.)
-b) Userspace to use some other RNG.
+[auto build test ERROR on powerpc/next]
+[also build test ERROR on s390/features linus/master jeyu/modules-next v5.16 next-20220110]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-(a) is basically already done.
+url:    https://github.com/0day-ci/linux/commits/Michal-Suchanek/KEXEC_SIG-with-appended-signature/20220110-215157
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git next
+config: arc-allyesconfig (https://download.01.org/0day-ci/archive/20220111/202201110303.sLPF0o29-lkp@intel.com/config)
+compiler: arceb-elf-gcc (GCC) 11.2.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/cc363ca7724d96c534c176b8ed248336f562b7ae
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Michal-Suchanek/KEXEC_SIG-with-appended-signature/20220110-215157
+        git checkout cc363ca7724d96c534c176b8ed248336f562b7ae
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=arc SHELL=/bin/bash
 
-(b) can be accomplished in userspace by just (i) disabling getrandom()
-(making it return ENOSYS), and then (ii) replacing the /dev/urandom
-path with a CUSE device or similar.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-I suppose (b.i) might be able to be done with some bpf seccomp cgroup
-situation. Or, if that's problematic, somebody could propose a
-"disable getrandom(2)" cmdline option. That doesn't seem very hard.
-And (b.ii) could use combined inputs from /dev/urandom and whatever
-FIPSy userspace jitter entropy daemon you have.
+All errors (new ones prefixed by >>):
 
-In order to prevent the actual security from regressing on this, all
-you have to do is ensure that you're always using at least 32 bytes
-from the kernel's real /dev/urandom, and then whatever you add on top
-of that becomes just for the certification aspect. As your various
-green compliance checkboxes change over time and per region, you can
-just swap out the extra-paper-pushing-bytes-on-top with whatever the
-particular requirements of a certification body are. And you get to do
-this all in userspace.
+   kernel/module_signing.c: In function 'verify_appended_signature':
+>> kernel/module_signing.c:33:35: error: passing argument 2 of 'mod_parse_sig' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      33 |         ret = mod_parse_sig(data, len, &sig_len, key_being_used_for[purpose]);
+         |                                   ^~~
+         |                                   |
+         |                                   long unsigned int *
+   In file included from kernel/module_signing.c:11:
+   include/linux/module_signature.h:45:45: note: expected 'size_t *' {aka 'unsigned int *'} but argument is of type 'long unsigned int *'
+      45 | int mod_parse_sig(const void *data, size_t *len, size_t *sig_len, const char *name);
+         |                                     ~~~~~~~~^~~
+   kernel/module_signing.c:33:40: error: passing argument 3 of 'mod_parse_sig' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      33 |         ret = mod_parse_sig(data, len, &sig_len, key_being_used_for[purpose]);
+         |                                        ^~~~~~~~
+         |                                        |
+         |                                        long unsigned int *
+   In file included from kernel/module_signing.c:11:
+   include/linux/module_signature.h:45:58: note: expected 'size_t *' {aka 'unsigned int *'} but argument is of type 'long unsigned int *'
+      45 | int mod_parse_sig(const void *data, size_t *len, size_t *sig_len, const char *name);
+         |                                                  ~~~~~~~~^~~~~~~
+   cc1: some warnings being treated as errors
+--
+   security/integrity/ima/ima_modsig.c: In function 'ima_read_modsig':
+>> security/integrity/ima/ima_modsig.c:47:33: error: passing argument 2 of 'mod_parse_sig' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      47 |         rc = mod_parse_sig(buf, &buf_len, &sig_len, func_tokens[func]);
+         |                                 ^~~~~~~~
+         |                                 |
+         |                                 long unsigned int *
+   In file included from security/integrity/ima/ima_modsig.c:12:
+   include/linux/module_signature.h:45:45: note: expected 'size_t *' {aka 'unsigned int *'} but argument is of type 'long unsigned int *'
+      45 | int mod_parse_sig(const void *data, size_t *len, size_t *sig_len, const char *name);
+         |                                     ~~~~~~~~^~~
+   security/integrity/ima/ima_modsig.c:47:43: error: passing argument 3 of 'mod_parse_sig' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      47 |         rc = mod_parse_sig(buf, &buf_len, &sig_len, func_tokens[func]);
+         |                                           ^~~~~~~~
+         |                                           |
+         |                                           long unsigned int *
+   In file included from security/integrity/ima/ima_modsig.c:12:
+   include/linux/module_signature.h:45:58: note: expected 'size_t *' {aka 'unsigned int *'} but argument is of type 'long unsigned int *'
+      45 | int mod_parse_sig(const void *data, size_t *len, size_t *sig_len, const char *name);
+         |                                                  ~~~~~~~~^~~~~~~
+   cc1: some warnings being treated as errors
 
-Marcelo/Simo - could you tell me what you find deficient about that
-plan? It strikes me that this would give you maximum flexibility and
-pretty much accomplish the goals?
 
-Thanks,
-Jason
+vim +/mod_parse_sig +33 kernel/module_signing.c
+
+    16	
+    17	/**
+    18	 * verify_appended_signature - Verify the signature on a module
+    19	 * @data: The data to be verified
+    20	 * @len: Size of @data.
+    21	 * @trusted_keys: Keyring to use for verification
+    22	 * @purpose: The use to which the key is being put
+    23	 */
+    24	int verify_appended_signature(const void *data, unsigned long *len,
+    25				      struct key *trusted_keys,
+    26				      enum key_being_used_for purpose)
+    27	{
+    28		unsigned long sig_len;
+    29		int ret;
+    30	
+    31		pr_devel("==>%s %s(,%lu)\n", __func__, key_being_used_for[purpose], *len);
+    32	
+  > 33		ret = mod_parse_sig(data, len, &sig_len, key_being_used_for[purpose]);
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
