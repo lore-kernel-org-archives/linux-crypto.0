@@ -2,41 +2,64 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 042A8C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jan 2022 21:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B14D5C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jan 2022 22:20:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244307AbiAJViu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jan 2022 16:38:50 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:55404 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244498AbiAJViu (ORCPT
+        id S1345333AbiAJWUQ (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Jan 2022 17:20:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59782 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233977AbiAJWUQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jan 2022 16:38:50 -0500
+        Mon, 10 Jan 2022 17:20:16 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 016E7C06173F;
+        Mon, 10 Jan 2022 14:20:15 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A052861470;
-        Mon, 10 Jan 2022 21:38:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C4ECC36AEF;
-        Mon, 10 Jan 2022 21:38:46 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 14E2C61241;
+        Mon, 10 Jan 2022 22:20:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 290BBC36AE3;
+        Mon, 10 Jan 2022 22:20:14 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="nGSXNiOY"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Gl96fnML"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1641850724;
+        t=1641853211;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=/ZvI34k5qopJ7LeVmPLQAXBYV6MHZ7fIrRCNdpRkt04=;
-        b=nGSXNiOYP3xPcCFVhh+vex4wGgo61Z13xqOTxD+n+OXf3aRgZzDoKF11qBhecKxQrZ90RU
-        CZxOYW+4nY2Wi61BstCVT9bIka0dL5Wd6/9dh4fxPW8vscFIfc+q5VoPaq6wJ8moj75fcQ
-        u7F+z/UiWjBmqZXHGC+mDsNLGm1zMB8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9a7e174a (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 10 Jan 2022 21:38:44 +0000 (UTC)
-Date:   Mon, 10 Jan 2022 22:38:38 +0100
+        bh=LDSjYBiVjmfDGkZBblJE/jv/nN3aUC6CEZepPvepyqo=;
+        b=Gl96fnMLJkvsRUxxAhNiZsqmY+H5vGFP7OsoD2J/0nd3pF3rK0h9fxSVnlz+z7sqaeKKqv
+        XXS+Gf6vbBl2K7DQnULYUY+I3lE9Ah04blPwNJv2enx1i/t66LZGb2SF//d7v0fWSHPqrD
+        UlgP0ppUDSCh5KW/N+RdOwV6SPNHNIY=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 75df7dca (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 10 Jan 2022 22:20:11 +0000 (UTC)
+Received: by mail-yb1-f180.google.com with SMTP id j83so42169637ybg.2;
+        Mon, 10 Jan 2022 14:20:10 -0800 (PST)
+X-Gm-Message-State: AOAM530FuSms7SngkLMzrf62ONfghpbzaw29DEjFIidupsaP/hyqdtQb
+        u+m2Lf38zfb0KfkEHIkfwGUo5KPaJNcpOs+vL2U=
+X-Google-Smtp-Source: ABdhPJwB36MohLbdRs5j8ZD0Fdnts0YRJJQx7iRXUj3f6lm4yTmmuEgoVyjnzxAUg7QyB67JPX3Cn5jF4ymfqbTVT+8=
+X-Received: by 2002:a25:f90d:: with SMTP id q13mr2468547ybe.32.1641853207457;
+ Mon, 10 Jan 2022 14:20:07 -0800 (PST)
+MIME-Version: 1.0
+References: <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
+ <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
+ <20211210014337.xmin2lu5rhhe3b3t@valinor> <20220110132349.siplwka7yhe2tmwc@valinor>
+ <CAHmME9oSK5sVVhMewm-oVvn=twP4yyYnLY0OVebYZ0sy1mQAyA@mail.gmail.com>
+ <YdxCsI3atPILABYe@mit.edu> <CAHmME9oRdoc3c36gXAcmOwumwvUi_6oqCsLmFxRP_NDMz_MK1Q@mail.gmail.com>
+ <Ydxu+KS5UkQ6hU9R@mit.edu> <Ydx7D3H0PS0Zs9/B@sol.localdomain>
+ <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com> <YdyNxJzdBmSSEtDC@mit.edu>
+In-Reply-To: <YdyNxJzdBmSSEtDC@mit.edu>
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Simo Sorce <simo@redhat.com>
-Cc:     Theodore Ts'o <tytso@mit.edu>,
+Date:   Mon, 10 Jan 2022 23:19:56 +0100
+X-Gmail-Original-Message-ID: <CAHmME9rmWBA02SyeFiiGZ8=kydYJSJwcYPscBrTBzoXMEPH9sQ@mail.gmail.com>
+Message-ID: <CAHmME9rmWBA02SyeFiiGZ8=kydYJSJwcYPscBrTBzoXMEPH9sQ@mail.gmail.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+To:     "Theodore Ts'o" <tytso@mit.edu>
+Cc:     Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Simo Sorce <simo@redhat.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jeffrey Walton <noloader@gmail.com>,
         Stephan Mueller <smueller@chronox.de>,
@@ -67,151 +90,49 @@ Cc:     Theodore Ts'o <tytso@mit.edu>,
         Alexander Lobakin <alobakin@mailbox.org>,
         Jirka Hladky <jhladky@redhat.com>,
         Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-Message-ID: <YdynXjhhuQfbYuSb@zx2c4.com>
-References: <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
- <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
- <20211210014337.xmin2lu5rhhe3b3t@valinor>
- <20220110132349.siplwka7yhe2tmwc@valinor>
- <CAHmME9oSK5sVVhMewm-oVvn=twP4yyYnLY0OVebYZ0sy1mQAyA@mail.gmail.com>
- <YdxCsI3atPILABYe@mit.edu>
- <CAHmME9oRdoc3c36gXAcmOwumwvUi_6oqCsLmFxRP_NDMz_MK1Q@mail.gmail.com>
- <Ydxu+KS5UkQ6hU9R@mit.edu>
- <Ydx7D3H0PS0Zs9/B@sol.localdomain>
- <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Just in case you were curious...
+On Mon, Jan 10, 2022 at 9:18 PM Theodore Ts'o <tytso@mit.edu> wrote:
+> In general, you need FIPS
+> certification for some specific use cases / application.  For example,
+> if you're going for PCI compliance, then you might only need FIPS
+> compliance for your OpenSSL library.  What the FIPS certification lab
+> might consider acceptable for its entropy for its DRBG is an
+> interesting question.  For some, simply having the OpenSSL library use
+> RDSEED or RDRAND might be sufficient.  Or it could talk to an actual
+> physical RNG device.
+>
+> So disabling getrandom() is probably not necessary, just so long as
+> you can demonstrate that the FIPS cryptographic module --- i.e., the
+> OpenSSL library --- is getting its entropy from an acceptable source.
 
-On Mon, Jan 10, 2022 at 07:44:23PM +0100, Jason A. Donenfeld wrote:
-> (b) can be accomplished in userspace by just (i) disabling getrandom()
-> (making it return ENOSYS), and then (ii) replacing the /dev/urandom
-> path with a CUSE device or similar.
-> 
-> I suppose (b.i) might be able to be done with some bpf seccomp cgroup
-> situation. Or, if that's problematic, somebody could propose a
-> "disable getrandom(2)" cmdline option. That doesn't seem very hard.
-> And (b.ii) could use combined inputs from /dev/urandom and whatever
-> FIPSy userspace jitter entropy daemon you have.
+I don't know exactly what these people think they want, but what you
+say seems probably correct.
 
-The below took all of 5 minutes to write. Should be easy to tweak this
-for whatever flavors required.
+> I suspect what's actually going on is that some enterprise customers
+> have FIPS complaince on a check-off list, and they aren't actually
+> getting a formal FIPS certification.  Or they only need something to
+> wave under the noses of their PCI certification company, and so the
+> question is what makes them happy.
 
-====
+Right.
 
-/* Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
- *
- * Usage:
- *   # gcc -O2 jrandom.c `pkg-config fuse3 --cflags --libs` -o jrandom
- *   # ./jrandom
- *   # chmod 666 /dev/jrandom
- *   # ln -sf jrandom /dev/urandom
- *   # ln -sf jrandom /dev/random
- */
+> And this is why some FIPS certification have gotten by just *fine*
+> with a pure userspace OpenSSL library as their FIPS cryptographic
+> module.  Where you draw the line between a "blessed" entropy source
+> and one that's just hand-waving is really at the discretion of the
+> certification lab.
 
+Hah, probably correct.
 
-#define FUSE_USE_VERSION 31
+So, seen this way, and combined with the solution provided at [1] (or
+similar) for people who think they need something there, it seems like
+the FIPS people can likely get what they need without really needing
+to involve the kernel anyway.
 
-#include <cuse_lowlevel.h>
-#include <fuse_opt.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <linux/if_alg.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
+Jason
 
-static int rng;
-
-static void fipsrng_open(fuse_req_t req, struct fuse_file_info *fi)
-{
-	fuse_reply_open(req, fi);
-}
-
-static void fipsrng_read(fuse_req_t req, size_t size, off_t off,
-			 struct fuse_file_info *fi)
-{
-	char random[128];
-	ssize_t ret_bytes;
-
-	if (size > sizeof(random))
-		size = sizeof(random);
-
-	ret_bytes = read(rng, random, size);
-	if (ret_bytes < 0)
-		fuse_reply_err(req, errno);
-	else
-		fuse_reply_buf(req, random, ret_bytes);
-}
-
-static void fipsrng_write(fuse_req_t req, const char *buf, size_t size,
-			  off_t off, struct fuse_file_info *fi)
-{
-	/* Swallow it, we don't care. */
-	fuse_reply_write(req, size);
-}
-
-static void fipsrng_ioctl(fuse_req_t req, int cmd, void *arg,
-			  struct fuse_file_info *fi, unsigned flags,
-			  const void *in_buf, size_t in_bufsz, size_t out_bufsz)
-{
-	/* TODO: implement the various RNG ioctls */
-	fuse_reply_err(req, ENOSYS);
-}
-
-static const struct cuse_lowlevel_ops fipsrng_clop = {
-	.open		= fipsrng_open,
-	.read		= fipsrng_read,
-	.write		= fipsrng_write,
-	.ioctl		= fipsrng_ioctl,
-};
-
-int main(int argc, char **argv)
-{
-	static const struct sockaddr_alg sa = {
-		.salg_family = AF_ALG,
-		.salg_type = "rng",
-		.salg_name = "jitterentropy_rng"
-	};
-	static const char *dev_info_argv[] = { "DEVNAME=jrandom" };
-	static const struct cuse_info ci = {
-		.dev_info_argc = 1,
-		.dev_info_argv = dev_info_argv,
-		.flags = CUSE_UNRESTRICTED_IOCTL
-	};
-	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
-	int ret = 1, afalg;
-
-	if (fuse_opt_parse(&args, NULL, NULL, NULL)) {
-		fprintf(stderr, "failed to parse options\n");
-		goto out;
-	}
-
-	afalg = socket(AF_ALG, SOCK_SEQPACKET, 0);
-	if (afalg < 0) {
-		perror("socket(AF_ALG)");
-		goto out;
-	}
-	if (bind(afalg, (const struct sockaddr *)&sa, sizeof(sa)) < 0) {
-		perror("bind(\"rng\", \"jitterentropy_rng\")");
-		goto out;
-	}
-	rng = accept(afalg, NULL, 0);
-	if (rng < 0) {
-		perror("accept()");
-		goto out;
-	}
-	ret = cuse_lowlevel_main(args.argc, args.argv, &ci, &fipsrng_clop, NULL);
-out:
-	fuse_opt_free_args(&args);
-	return ret;
-}
+[1] https://lore.kernel.org/lkml/YdynXjhhuQfbYuSb@zx2c4.com/
