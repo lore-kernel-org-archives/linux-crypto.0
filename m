@@ -2,90 +2,230 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B95D1C433EF
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Jan 2022 17:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9316DC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jan 2022 06:05:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236163AbiAIRT4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 9 Jan 2022 12:19:56 -0500
-Received: from m12-11.163.com ([220.181.12.11]:28515 "EHLO m12-11.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236161AbiAIRT4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 9 Jan 2022 12:19:56 -0500
-X-Greylist: delayed 948 seconds by postgrey-1.27 at vger.kernel.org; Sun, 09 Jan 2022 12:19:55 EST
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id; bh=/3u4u8Sx8RQrVhoBwH
-        sSEkpcdFoYJP3wCDfinFuxldY=; b=iJUj2xn7ijz84WUkFgFVjRlU2wC2Bb4Ynt
-        Jl7jR50ddLMEl/qkkqtcpMMcA6wq8GTFEERS77jDV2dvBHnoRAJy/iDpK9WU+8iL
-        SjdaDwdNNq8vt8CkoXoyPE2J3dxN9agkQRZaXk6iopLzXOR2pUrRL+N+x20hewOO
-        +a9sq3fsU=
-Received: from ubuntu.localdomain (unknown [115.171.170.5])
-        by smtp7 (Coremail) with SMTP id C8CowADnDMovFdthAi5jPQ--.10064S2;
-        Mon, 10 Jan 2022 01:02:40 +0800 (CST)
-From:   Peng Luo <wuhanluop@163.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-        terrelln@fb.com, linux-crypto@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Peng Luo <wuhanluop@163.com>
-Subject: [PATCH] crypto: testmgr - fix some wrong vectors of aes-ccm
-Date:   Mon, 10 Jan 2022 01:02:39 +0800
-Message-Id: <20220109170239.4322-1-wuhanluop@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: C8CowADnDMovFdthAi5jPQ--.10064S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7ZryrKFyDJFykCr15tw1DKFg_yoW8WrWDpr
-        Z7JFWjyFWDWa4rKF1UJw4UGF47Wr9Ivws7u3W8J3s7GF13Gw1rZFW2kw10qF1DWFykCr45
-        ArWUAry5uw43trDanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Ul1v-UUUUU=
-X-Originating-IP: [115.171.170.5]
-X-CM-SenderInfo: pzxkt0hoxr1qqrwthudrp/1tbiEBCD9F8YI7XEFAAAs2
+        id S238865AbiAJGFG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Jan 2022 01:05:06 -0500
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:43061 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238861AbiAJGFE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Jan 2022 01:05:04 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R581e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=shirong@linux.alibaba.com;NM=1;PH=DS;RN=25;SR=0;TI=SMTPD_---0V1LvBNz_1641794698;
+Received: from localhost.localdomain(mailfrom:shirong@linux.alibaba.com fp:SMTPD_---0V1LvBNz_1641794698)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 10 Jan 2022 14:05:00 +0800
+From:   Shirong Hao <shirong@linux.alibaba.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.co, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        brijesh.singh@amd.com, thomas.lendacky@amd.com, john.allen@amd.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        srutherford@google.com, ashish.kalra@amd.com, natet@google.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, zhang.jia@linux.alibaba.com,
+        Shirong Hao <shirong@linux.alibaba.com>
+Subject: [PATCH 0/3] Allow guest to query AMD SEV(-ES) runtime attestation evidence
+Date:   Mon, 10 Jan 2022 14:04:42 +0800
+Message-Id: <20220110060445.549800-1-shirong@linux.alibaba.com>
+X-Mailer: git-send-email 2.27.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some vectors of aes-ccm are wrong.
-This patch has been tested with kernel 4.9 and openssl1.1.1k.
+This patch series is provided to allow the guest application to query
+AMD SEV(-ES) runtime attestation evidence by communicating with the host
+service (Attestation Evidence Broker).
 
-Signed-off-by: Peng Luo <wuhanluop@163.com>
----
- crypto/testmgr.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+The following is the design document.
 
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index a253d66ba1c1..ff171fe53979 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -19865,8 +19865,8 @@ static const struct aead_testvec aes_ccm_tv_template[] = {
- 			  "\xd0\xd1\x3d\x1a\xa3\x6d\xe4\x0a"
- 			  "\x86\xb0\x87\x6b\x62\x33\x8c\x34"
- 			  "\xce\xab\x57\xcc\x79\x0b\xe0\x6f"
--			  "\x5c\x3e\x48\x1f\x6c\x46\xf7\x51"
--			  "\x8b\x84\x83\x2a\xc1\x05\xb8\xc5",
-+			  "\xCF\xE9\xF9\x21\x3C\x1A\xCE\x67"
-+			  "\x62\x7B\x36\x3A\xEA\x19\xAC\x58",
- 		.clen	= 48,
- 		.novrfy	= 1,
- 	}, {
-@@ -19952,8 +19952,8 @@ static const struct aead_testvec aes_ccm_tv_template[] = {
- 			  "\xc6\x0e\x6e\xe5\xd6\x98\xa6\x37"
- 			  "\x8c\x26\x33\xc6\xb2\xa2\x17\xfa"
- 			  "\x64\x19\xc0\x30\xd7\xfc\x14\x6b"
--			  "\xe3\x33\xc2\x04\xb0\x37\xbe\x3f"
--			  "\xa9\xb4\x2d\x68\x03\xa3\x44\xef",
-+			  "\x08\x5A\x20\x4A\xB0\x2C\xF9\x49"
-+			  "\x10\x1C\x9C\x85\x8C\x12\xE0\x3A",
- 		.clen	= 48,
- 		.novrfy	= 1,
- 	}, {
-@@ -19983,7 +19983,7 @@ static const struct aead_testvec aes_ccm_tv_template[] = {
- 			  "\x3e\xaf\x70\x5e\xb2\x4d\xea\x39"
- 			  "\x89\xd4\x75\x7a\x63\xb1\xda\x93",
- 		.plen	= 32,
--		.ctext	= "\x48\x01\x5e\x02\x24\x04\x66\x47"
-+		.ctext	= "\x14\x01\x5e\x02\x24\x04\x66\x47"
- 			  "\xa1\xea\x6f\xaf\xe8\xfc\xfb\xdd"
- 			  "\xa5\xa9\x87\x8d\x84\xee\x2e\x77"
- 			  "\xbb\x86\xb9\xf5\x5c\x6c\xff\xf6"
+> Background
+
+Compared with SEV-SNP and Intel TDX, the runtime attestation of
+SEV(-ES) does NOT support guest-provided data included in the
+attestation report [1,2]. In addition, SEV(-ES) also does NOT support
+the dynamic measurement. During runtime, it can only generate static
+attestation report with the constant launch digest reflecting the
+initial measurement.
+
+Although SEV(-ES) has above limitations, its runtime attestation is
+still useful. When the SEV(-ES) guest is running, it can report the
+attestation report with fixed launch digest as a heartbeat for trusted
+healthy check.
+
+SEV(-ES) runtime attestation includes two participants:
+attester and verifier.
+
+- The attester running in a SEV(-ES) guest is responsible for
+  collecting attestation evidence.
+- The verifier running in a trusted environment is responsible for
+  verifying the attestation evidence provided by the attester. Note
+  that the verifier can run on any platform even non-TEE.
+
+> SEV(-ES) Attestation Evidence
+
+Verifier uses the following SEV(-ES) certificate chains to verify the
+signature of the attestation report generated by the `ATTESTATION`
+command [2]:
+
+1. certificate chain for device identity:
+ARK -> ASK -> CEK -> PEK -> report
+2. certificate chain for platform owner identity:
+OCA -> PEK -> report
+
+- `foo -> bar` indicates using the public key of `foo` to verify the
+  signature of `bar`.
+- ARK is the root of trust of AMD and OCA is the root of trust for
+  platform owners. OCA has two ways:
+    1. Self-owned: The OCA Key Pair and self-signed OCA certificate
+       are automatically generated by the SEV(-ES) firmware.
+    2. Externally-owned: External users use OCA Key Pair to generate
+       self-signed OCA certificates in a trusted environment.
+
+Verifier needs to verify the attestation report with the certificate chain.
+ARK and ASK can be obtained directly from the AMD KDS server. CEK, PEK,
+OCA, and attestation report are related to the specific SEV(-ES) platform,
+therefore SEV(-ES) Attestation Evidence collected by attester should
+include attestation report (with the constant launch digest), PEK, CEK,
+and OCA certificate.
+
+| Contents of SEV(-ES) Attestation Evidence 	| SEV(-ES) firmware command	|
+| :-: | :-: |
+| attestation report				| ATTESTATION			|
+| CEK						| GET_ID			|
+| OCA,PEK					| PDH_CERT_EXPORT		|
+
+> Query SEV(-ES) Attestation Evidence
+
+According to the official feedback[3], SEV(-ES) firmware APIs don't support
+query attestation report in SEV(-ES) guest and there is no plan to support
+it in the future. Instead, this capability will be available in SEV-SNP.
+
+In some scenarios, the guest application needs to query the attestation
+report to establish an attested channel with the remote peer. There are
+two approaches for a guest application to query an attestation evidence:
+
+- Hypercall approach
+- VSOCK approach
+
+Considering time and cost, we only need to implement one of them.
+
+- Hypercall approach
+
+SEV(-ES) guest exits to VMM using `hypercall` and then interacts with SEV
+firmware to query the components composing an attestation evidence,
+including attestation report, PEK, CEK, OCA certificate. To build an
+attestation evidence, the steps include:
+
+1. The guest application requests a shared memory page, initiates a
+   hypercall, and switches from the guest mode to the host mode.
+2. In the host mode, KVM sends the `GET_ID, PDH_CERT_EXPORT, ATTESTATION`
+   command requests to SEV firmware.
+3. The shared memory page is filled with the data returned by the
+   SEV firmware.
+4. The guest application can obtain attestation evidence by reading the
+   data in the shared memory.
+
+Although this method can meet our requirements, it requires a lot of
+modifications to the guest kernel and KVM.
+
+- VSOCK approach
+
+In the current implementation, QEMU provides the QMP interface
+"query-sev-attestation-report" to query the attestation report in the host.
+ However, QEMU is not the only VMM. In order to support various VMM in
+different scenarios, it is necessary to design a general host service, such
+as attestation evidence Broker (AEB) to query attestation evidence from the
+host.
+
+The workflow of AEB is as followed:
+
+1. The user-level application in the guest sends a request
+   (including guest firmware handle) to AEB through VSOCK.
+2. AEB requests to query attestation report, PEK, CEK, OCA certificate by
+   calling multiple SEV firmware APIs (refer to the table above for
+   specific API commands) and assembles these information into the
+   attestation evidence.
+3. AEB returns the attestation evidence to the application in the guest.
+
+To query the attestation report in host with AEB, we provides three patches
+to achieve the following two goals.
+
+1. It is necessary to add a `SEV_GET_REPORT` interface in ccp driver so
+   that AEB can execute `ioctl` on the `/dev/sev` device and then call
+   the `SEV_GET_REPORT` interface to send the `ATTESTATION` command to
+   the SEV firmware to query attestation report.
+
+2. In order to obtain the guest handle required by the `ATTESTATION`
+   command to the SEV firmware, a new hypercall needs to be added to the
+   KVM. The application in the guest obtains the guest handle through this
+   newly added hypercal, and then sends it to the AEB service through
+   VSOCK. The AEB service uses the guest handle as the input parameter
+   of the `ATTESTATION` command to interact with the SEV firmware.
+
+Note that hypercall is not the only way to obtain the guest handle.
+Actually the qmp interface `query-sev` can query the guest handle as well.
+However, as mentioned previously, qemu is not the only VMM.
+
+> Communication protocol
+
+Below is the communication protocol between the guest application and AEB.
+
+```protobuf
+syntax = "proto3";
+...
+message RetrieveAttestationEvidenceSizeRequest{
+    uint32 guest_handle = 1;
+}
+message RetrieveAttestationEvidenceRequest{
+    uint32 guest_handle = 1;
+    uint32 evidence_size = 2;
+}
+message RetrieveAttestationEvidenceSizeResponse{
+    uint32 error_code = 1;
+    uint32 evidence_size = 2;
+}
+message RetrieveAttestationEvidenceResponse{
+    uint32 error_code = 1;
+    uint32 evidence_size = 2;
+    bytes evidence = 3;
+}
+service AEBService {
+    rpc RetrieveAttestationEvidenceSize
+         (RetrieveAttestationEvidenceSizeRequest)
+         returns (RetrieveAttestationEvidenceSizeResponse);
+    rpc RetrieveAttestationEvidence(RetrieveAttestationEvidenceRequest)
+         returns (RetrieveAttestationEvidenceResponse);
+}
+```
+
+> Reference
+
+[1] https://www.amd.com/system/files/TechDocs/
+55766_SEV-KM_API_Specification.pdf
+[2] https://www.amd.com/system/files/TechDocs/56860.pdf
+[3] https://github.com/AMDESE/AMDSEV/issues/71#issuecomment-926118314
+
+Shirong Hao (3):
+  KVM: X86: Introduce KVM_HC_VM_HANDLE hypercall
+  KVM/SVM: move the implementation of sev_get_attestation_report to ccp
+    driver
+  crypto: ccp: Implement SEV_GET_REPORT ioctl command
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/svm/sev.c          | 49 +++-------------------
+ arch/x86/kvm/svm/svm.c          | 11 +++++
+ arch/x86/kvm/x86.c              |  7 +++-
+ drivers/crypto/ccp/sev-dev.c    | 74 +++++++++++++++++++++++++++++++++
+ include/linux/psp-sev.h         |  7 ++++
+ include/uapi/linux/kvm_para.h   |  1 +
+ include/uapi/linux/psp-sev.h    | 17 ++++++++
+ 8 files changed, 123 insertions(+), 44 deletions(-)
+
 -- 
-2.17.1
+2.27.0
 
