@@ -2,157 +2,238 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DE8C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jan 2022 19:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1947DC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jan 2022 19:41:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243858AbiAJTbP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jan 2022 14:31:15 -0500
-Received: from mga03.intel.com ([134.134.136.65]:1828 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243831AbiAJTbO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jan 2022 14:31:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641843074; x=1673379074;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cbEnl3Vfju27AwT6EgqVlpPsZM4JemUZUkFPfJnaPBA=;
-  b=HmcXGgoOUPWoAQTB8QrTUhD6aBX/GkeS8Omwz3aQXEZhK2vTd8Ji0M1Z
-   nvScB0ls6A2ROwDSKgYRm3XFB84+FfmWBsSO1gq6RxrH8qjG/ebCrZ0V6
-   blh7TQhhrUFfbMl9LR7cTSMf6ZSweG6lPX9HQfuTllmpNxLhLkAPitXxe
-   pd6Ohylku9o7tvuzY4Rba1TWMC5b10FxnDP98iajSBdV3giX+TOdnn2St
-   aXkFZcYnkIsci6D2pY8jRqXwyUqSL4aB7kBTVDGEfR8N5Ygg0GuW3lkW4
-   JhJ3j1cl48dqvnhTdVCcLBQZjpSaPUMvAdrQCznT7zaIR4XfudIPZshoq
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10223"; a="243259724"
-X-IronPort-AV: E=Sophos;i="5.88,277,1635231600"; 
-   d="scan'208";a="243259724"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2022 11:31:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,277,1635231600"; 
-   d="scan'208";a="472174244"
-Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 10 Jan 2022 11:31:10 -0800
-Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1n70Nq-0003tC-2U; Mon, 10 Jan 2022 19:31:10 +0000
-Date:   Tue, 11 Jan 2022 03:30:09 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Michal Suchanek <msuchanek@suse.de>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, Michal Suchanek <msuchanek@suse.de>,
-        kexec@lists.infradead.org, Philipp Rudo <prudo@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v4 6/6] module: Move duplicate mod_check_sig users code
- to mod_parse_sig
-Message-ID: <202201110303.sLPF0o29-lkp@intel.com>
-References: <59d134a3eae4fa802ed9135385cee6fe4838ec01.1641822505.git.msuchanek@suse.de>
+        id S243804AbiAJTlj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Jan 2022 14:41:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:55918 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241122AbiAJTli (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Jan 2022 14:41:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641843697;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cBMBe4dO3nSB0U6CFk7w2nP+S3gF44je8ioEtuONEO0=;
+        b=dsaddWyW9r26y/WAh/NN/VOD7cra0ig+6Nij+1n7a6Uz5EHmhAMh+wInRjDEf0K2bV7GsV
+        bI+B0izs29tjU40IsbLCdsEnKamT678TbHqKUBwMw1SasrTnK9vmEBVWqPN3H4gqMzD7pw
+        QIF+7/nvuWMehnVNYB+XwM6Um4q57Gs=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-333-7nsO13pANn-mUwxHEBG3RQ-1; Mon, 10 Jan 2022 14:41:36 -0500
+X-MC-Unique: 7nsO13pANn-mUwxHEBG3RQ-1
+Received: by mail-qv1-f70.google.com with SMTP id gv14-20020a056214262e00b0041192fab00dso14061813qvb.23
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Jan 2022 11:41:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:organization:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=cBMBe4dO3nSB0U6CFk7w2nP+S3gF44je8ioEtuONEO0=;
+        b=fIGrY/AJ30LpdoIEnwjHu773GR6iTbkA9BKFigicGax/F5QjPopKOeaYp2BQGDqr5T
+         rq3ByFo7rsOfd2T0zR7g51fRLpCQ7b0szauMvvOO+nfn2kwfEmL1gVbfysodk4eUOYXZ
+         nqxnc+Ou/a/T11fce0YUU2g6pLoHg/YeJ4wLGvaC2n4ZZoUVveAk2JV5ZXG6QsjEOJuv
+         Smz6e4oOlZBM4QEQNZ2zLpsZ+NR1gLMFAQQ9sKzkahOZVqZxqx06KiNtxE5saHf2XOEY
+         24z2AJLFIQ0tUa+K9bsl0NzXRGf+HHDnXEU1fv/UHL2jc2IdDdIN2rkcdZkvh+XePdrE
+         3BeQ==
+X-Gm-Message-State: AOAM5330uHQ3ybgZ6roMWEOE8h5l59RUYjPmMFCKn0+dUAkJaFrBaANM
+        K/k/HBgQE+rlVi9BoOSs1Q0hptV0ixXteTpIMcUdP46QdzL0BwqqJpkiPfJ9hrrgIq3eCd4givl
+        4Rnp9kmIoddAFGAZzqlomcaDW
+X-Received: by 2002:a05:622a:49:: with SMTP id y9mr1097791qtw.647.1641843695560;
+        Mon, 10 Jan 2022 11:41:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzcWiY5G1FVUMTQxu0P+OADGVn+crDsTX92wmng6dtru+mvd6ypr9sgJrt3hXVwdBb2+aXKEw==
+X-Received: by 2002:a05:622a:49:: with SMTP id y9mr1097751qtw.647.1641843695259;
+        Mon, 10 Jan 2022 11:41:35 -0800 (PST)
+Received: from m8.users.ipa.redhat.com (cpe-158-222-141-151.nyc.res.rr.com. [158.222.141.151])
+        by smtp.gmail.com with ESMTPSA id f11sm1639365qtk.28.2022.01.10.11.41.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jan 2022 11:41:34 -0800 (PST)
+Message-ID: <cdfd8173b1b343413b054957dc2984c27587495c.camel@redhat.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+From:   Simo Sorce <simo@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Cc:     Theodore Ts'o <tytso@mit.edu>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jeffrey Walton <noloader@gmail.com>,
+        Stephan Mueller <smueller@chronox.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>,
+        Alexander Lobakin <alobakin@mailbox.org>,
+        Jirka Hladky <jhladky@redhat.com>,
+        Eric Biggers <ebiggers@kernel.org>
+Date:   Mon, 10 Jan 2022 14:41:33 -0500
+In-Reply-To: <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
+References: <YaZqVxI1C8RByq+w@gmail.com>
+         <CAHmME9p60Ve5XJTVcmGvSpUkg_hRp_i0rGG0R9VhuwLs0o_nXQ@mail.gmail.com>
+         <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
+         <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
+         <20211210014337.xmin2lu5rhhe3b3t@valinor>
+         <20220110132349.siplwka7yhe2tmwc@valinor>
+         <CAHmME9oSK5sVVhMewm-oVvn=twP4yyYnLY0OVebYZ0sy1mQAyA@mail.gmail.com>
+         <YdxCsI3atPILABYe@mit.edu>
+         <CAHmME9oRdoc3c36gXAcmOwumwvUi_6oqCsLmFxRP_NDMz_MK1Q@mail.gmail.com>
+         <Ydxu+KS5UkQ6hU9R@mit.edu> <Ydx7D3H0PS0Zs9/B@sol.localdomain>
+         <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <59d134a3eae4fa802ed9135385cee6fe4838ec01.1641822505.git.msuchanek@suse.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Michal,
+On Mon, 2022-01-10 at 19:44 +0100, Jason A. Donenfeld wrote:
+> On Mon, Jan 10, 2022 at 4:08 PM Marcelo Henrique Cerri
+> <marcelo.cerri@canonical.com> wrote:
+> > > Just to confirm, this little patch here gives you FIPS certification?
+> > It does
+> 
+> On Mon, Jan 10, 2022 at 7:29 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> > Now, the idea of certifying the whole kernel as a FIPS cryptographic module is
+> > stupid
 
-Thank you for the patch! Yet something to improve:
+Not that it is not the whole kernel, but a "module boundary" is drawn
+around the crypto API and vicinity.
+It would be really nice if this whole "boundary" could be built as a
+single binary module to be loaded in the kernel in fips mode. That way
+we could update the rest of the kernel w/o rebuilding the module, but
+we are not there.
 
-[auto build test ERROR on powerpc/next]
-[also build test ERROR on s390/features linus/master jeyu/modules-next v5.16 next-20220110]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Rebuilding the kernel does technically invalidate certification however
+NIST themselves tells people to care first about the security of the
+systems as long as the vendor is undergoing or promising certification
+of the patched kernel.
 
-url:    https://github.com/0day-ci/linux/commits/Michal-Suchanek/KEXEC_SIG-with-appended-signature/20220110-215157
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git next
-config: arc-allyesconfig (https://download.01.org/0day-ci/archive/20220111/202201110303.sLPF0o29-lkp@intel.com/config)
-compiler: arceb-elf-gcc (GCC) 11.2.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/cc363ca7724d96c534c176b8ed248336f562b7ae
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Michal-Suchanek/KEXEC_SIG-with-appended-signature/20220110-215157
-        git checkout cc363ca7724d96c534c176b8ed248336f562b7ae
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=arc SHELL=/bin/bash
+There is an assumption of good faith.
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+> Alright, so if that's the case, then what you ostensibly want is:
+> a) Some cryptoapi users to use crypto_rng_get_bytes, as they already
+> do now. (In a private thread with Simo, I pointed out a missing place
+> and encouraged him to send a patch for that but none has arrived.)
 
-All errors (new ones prefixed by >>):
+I noted your point, just haven' had time to act on it.
 
-   kernel/module_signing.c: In function 'verify_appended_signature':
->> kernel/module_signing.c:33:35: error: passing argument 2 of 'mod_parse_sig' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      33 |         ret = mod_parse_sig(data, len, &sig_len, key_being_used_for[purpose]);
-         |                                   ^~~
-         |                                   |
-         |                                   long unsigned int *
-   In file included from kernel/module_signing.c:11:
-   include/linux/module_signature.h:45:45: note: expected 'size_t *' {aka 'unsigned int *'} but argument is of type 'long unsigned int *'
-      45 | int mod_parse_sig(const void *data, size_t *len, size_t *sig_len, const char *name);
-         |                                     ~~~~~~~~^~~
-   kernel/module_signing.c:33:40: error: passing argument 3 of 'mod_parse_sig' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      33 |         ret = mod_parse_sig(data, len, &sig_len, key_being_used_for[purpose]);
-         |                                        ^~~~~~~~
-         |                                        |
-         |                                        long unsigned int *
-   In file included from kernel/module_signing.c:11:
-   include/linux/module_signature.h:45:58: note: expected 'size_t *' {aka 'unsigned int *'} but argument is of type 'long unsigned int *'
-      45 | int mod_parse_sig(const void *data, size_t *len, size_t *sig_len, const char *name);
-         |                                                  ~~~~~~~~^~~~~~~
-   cc1: some warnings being treated as errors
---
-   security/integrity/ima/ima_modsig.c: In function 'ima_read_modsig':
->> security/integrity/ima/ima_modsig.c:47:33: error: passing argument 2 of 'mod_parse_sig' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      47 |         rc = mod_parse_sig(buf, &buf_len, &sig_len, func_tokens[func]);
-         |                                 ^~~~~~~~
-         |                                 |
-         |                                 long unsigned int *
-   In file included from security/integrity/ima/ima_modsig.c:12:
-   include/linux/module_signature.h:45:45: note: expected 'size_t *' {aka 'unsigned int *'} but argument is of type 'long unsigned int *'
-      45 | int mod_parse_sig(const void *data, size_t *len, size_t *sig_len, const char *name);
-         |                                     ~~~~~~~~^~~
-   security/integrity/ima/ima_modsig.c:47:43: error: passing argument 3 of 'mod_parse_sig' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      47 |         rc = mod_parse_sig(buf, &buf_len, &sig_len, func_tokens[func]);
-         |                                           ^~~~~~~~
-         |                                           |
-         |                                           long unsigned int *
-   In file included from security/integrity/ima/ima_modsig.c:12:
-   include/linux/module_signature.h:45:58: note: expected 'size_t *' {aka 'unsigned int *'} but argument is of type 'long unsigned int *'
-      45 | int mod_parse_sig(const void *data, size_t *len, size_t *sig_len, const char *name);
-         |                                                  ~~~~~~~~^~~~~~~
-   cc1: some warnings being treated as errors
+> b) Userspace to use some other RNG.
+> 
+> (a) is basically already done.
+> 
+> (b) can be accomplished in userspace by just (i) disabling getrandom()
+> (making it return ENOSYS), and then (ii) replacing the /dev/urandom
+> path with a CUSE device or similar.
+
+While this is technically possible it is not very helpful, as it
+requires downstream patching of userspace programs, most of which do
+not have either runtime nor compile time switches to change the used
+random device.
+
+> I suppose (b.i) might be able to be done with some bpf seccomp cgroup
+> situation. Or, if that's problematic, somebody could propose a
+> "disable getrandom(2)" cmdline option. That doesn't seem very hard.
+> And (b.ii) could use combined inputs from /dev/urandom and whatever
+> FIPSy userspace jitter entropy daemon you have.
+
+It is simply easier to just patch /dev/[u]random/getrandom() to use a
+certified DRBG in FIPS mode, although we also considered all the
+options you mentioned we couldn't really find a good reason to add 
+more work, and make a more complicated solution when it is simple to
+wire up the correct DRBG to the random device userspace applications
+use and is the de facto standard API for obtaining good random numbers.
+
+> In order to prevent the actual security from regressing on this, all
+> you have to do is ensure that you're always using at least 32 bytes
+> from the kernel's real /dev/urandom, and then whatever you add on top
+> of that becomes just for the certification aspect. As your various
+> green compliance checkboxes change over time and per region, you can
+> just swap out the extra-paper-pushing-bytes-on-top with whatever the
+> particular requirements of a certification body are. And you get to do
+> this all in userspace.
+
+You can do the whole jitterbug in userspace, but that is simply not
+efficient and too disruptive (the above patching of all downstream
+usage).
+
+> 
+> Marcelo/Simo - could you tell me what you find deficient about that
+> plan? It strikes me that this would give you maximum flexibility and
+> pretty much accomplish the goals?
+
+My goal is to deviate as little as possible both in kernel and user-
+space from what upstreams do. Creating new interfaces is easy, making 
+people use them is almost impossible. Witness the process in getting
+people to use getrandom() 
 
 
-vim +/mod_parse_sig +33 kernel/module_signing.c
+Let me also add that NIST requirements are not capricious, they are
+written by people that study entropy sources and random generation as
+their job and know what they are doing, I err on the side of giving
+them credit. The requirements set by the various 90A/90B/90C documents
+are about raising the bar, to guarantee that random number generators
+are actually "certifiably" good. There are entropy assessment performed
+by the labs as part of the certification process to insure the random
+source is a good source and does produce output that passes randomness
+tests.  I personally think the kernel would benefit from implementing
+those "checkboxes", it is basically like implementing a sane CI/CD and
+testing environment.
 
-    16	
-    17	/**
-    18	 * verify_appended_signature - Verify the signature on a module
-    19	 * @data: The data to be verified
-    20	 * @len: Size of @data.
-    21	 * @trusted_keys: Keyring to use for verification
-    22	 * @purpose: The use to which the key is being put
-    23	 */
-    24	int verify_appended_signature(const void *data, unsigned long *len,
-    25				      struct key *trusted_keys,
-    26				      enum key_being_used_for purpose)
-    27	{
-    28		unsigned long sig_len;
-    29		int ret;
-    30	
-    31		pr_devel("==>%s %s(,%lu)\n", __func__, key_being_used_for[purpose], *len);
-    32	
-  > 33		ret = mod_parse_sig(data, len, &sig_len, key_being_used_for[purpose]);
+To answer to Ted,
+every certification program necessarily requires a certain amount of
+bureaucracy, especially when governments are involved, but that doesn't
+mean that it's all security theater.
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+The FIPS certification process has changed over the years as well not
+just the requirements. Until a few years ago the requirement to use
+FIPS certified cryptography could be waived, and because very few
+consumer programs were certified a lot of agencies considered it just a
+burden and didn't care much. That has changed, it is now required as a
+matter of law for most government agencies, and the waiver process has
+been discontinued. So we really need to provide FIPS certification to
+our public sector customers, moreover various other security standards
+now reference FIPS standards, so it is extending beyond government
+agencies and their contractors.
+
+FIPS is painful for us undergoing certification, but as a program it
+also does have positive effects. We scrutinize all cryptographic
+modules a lot more than we used to, we have a lot more testing than we
+used to and a lot more confidence in the solidity of the provided
+cryptography in the Linux world also thanks to this scrutiny. I wish
+the certification process was less painful for sure, but I believe it
+does add value when done sensibly.
+
+Simo.
+
+-- 
+Simo Sorce
+RHEL Crypto Team
+Red Hat, Inc
+
+
+
+
