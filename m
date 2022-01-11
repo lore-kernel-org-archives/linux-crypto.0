@@ -2,64 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 404BDC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 20:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87226C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 21:44:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234266AbiAKU6l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 15:58:41 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:58236 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236303AbiAKU6k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 15:58:40 -0500
-X-Greylist: delayed 1509 seconds by postgrey-1.27 at vger.kernel.org; Tue, 11 Jan 2022 15:58:39 EST
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1n7NpY-00034Q-U7; Tue, 11 Jan 2022 21:33:20 +0100
-Message-ID: <ab29dd6f-1301-e012-8898-9c739ca511a3@maciej.szmigiero.name>
-Date:   Tue, 11 Jan 2022 21:33:15 +0100
+        id S245451AbiAKVoF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 16:44:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245445AbiAKVoB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Jan 2022 16:44:01 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CDC8C06173F
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 13:44:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0A564617AF
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 21:44:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51EFDC36AE3;
+        Tue, 11 Jan 2022 21:44:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641937440;
+        bh=T4c2OoSAdRrkTt8fLZY/k1miG6vyy4R0XrZSy0eZWl0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qXrU0w6eJTyVmXl817zj6o2nqMvH35CAdF71P/3jKtHlZkpn9NhEXigzoc8j8WUCK
+         EnpMD9q94/pAdVKcpWUE+DfK/u+v5wFCYZlY+NhKvaFJTOLBuxQeDLNeCes74axH+a
+         qORV8dubtByJyp1vtXo89mCr5GgjyWACXemDf9Y5XGmj/j1nLWNm51XJ2/j0VX7lMY
+         HaW8juRiNCTos6hiB3DnUzVVCmu/CRJrxoBsGNuZDBnchMCajdqk7z7FqEaqvlGTJf
+         MxmVZ7408oQl4X9+EeallPVG4qzcp+enL5YIp17wck4jQuhMsjtPcueL3Xqj8Ke21T
+         3/gI/nwdXnf4w==
+Date:   Tue, 11 Jan 2022 13:43:58 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] crypto: testmgr - Move crypto_simd_disabled_for_test out
+Message-ID: <Yd36HsgI+ya6P7RF@gmail.com>
+References: <Yd0jA4VOjysrdOu7@gondor.apana.org.au>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Content-Language: en-US
-To:     Roberto Sassu <roberto.sassu@huawei.com>
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-kernel@vger.kernel.org, zohar@linux.ibm.com,
-        ebiggers@kernel.org, dhowells@redhat.com, dwmw2@infradead.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-References: <20220111180318.591029-1-roberto.sassu@huawei.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH 00/14] KEYS: Add support for PGP keys and signatures
-In-Reply-To: <20220111180318.591029-1-roberto.sassu@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yd0jA4VOjysrdOu7@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11.01.2022 19:03, Roberto Sassu wrote:
-> Support for PGP keys and signatures was proposed by David long time ago,
-> before the decision of using PKCS#7 for kernel modules signatures
-> verification was made. After that, there has been not enough interest to
-> support PGP too.
+On Tue, Jan 11, 2022 at 05:26:11PM +1100, Herbert Xu wrote:
+> As testmgr is part of cryptomgr which was designed to be unloadable
+> as a module, it shouldn't export any symbols for other crypto
+> modules to use as that would prevent it from being unloaded.  All
+> its functionality is meant to be accessed through notifiers.
 > 
-> Lately, when discussing a proposal of introducing fsverity signatures in
-> Fedora [1], developers expressed their preference on not having a separate
-> key for signing, which would complicate the management of the distribution.
-> They would be more in favor of using the same PGP key, currently used for
-> signing RPM headers, also for file-based signatures (not only fsverity, but
-> also IMA ones).
+> The symbol crypto_simd_disabled_for_test was added to testmgr
+> which caused it to be pinned as a module if its users were also
+> loaded.  This patch moves it out of testmgr and into crypto/simd.c
+> so cryptomgr can again be unloaded and replaced on demand.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/crypto/simd.c b/crypto/simd.c
+> index edaa479a1ec5..2027d747b746 100644
+> --- a/crypto/simd.c
+> +++ b/crypto/simd.c
+> @@ -47,6 +47,11 @@ struct simd_skcipher_ctx {
+>  	struct cryptd_skcipher *cryptd_tfm;
+>  };
+>  
+> +#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
+> +DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
+> +EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
+> +#endif
+> +
+>  static int simd_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+>  				unsigned int key_len)
+>  {
 
-Aren't PGP keys simply RSA / ECC / EdDSA keys with additional metadata?
-Can't they be unwrapped from their (complex) PGP format in userspace and
-loaded raw into the kernel, in a similar way as they are sometimes used
-for SSH authentication?
+It doesn't look like all the users of crypto_simd_usable() select CRYPTO_SIMD.
+So this will cause a build break in some configurations.
 
-This will save us from having to add complex parsers (a well-known source
-of bugs) into the kernel - I guess there aren't any plans to add an
-in-kernel PGP Web of Trust implementation.
+Maybe CRYPTO_MANAGER_EXTRA_TESTS should select CRYPTO_SIMD?
 
-Thanks,
-Maciej
+- Eric
