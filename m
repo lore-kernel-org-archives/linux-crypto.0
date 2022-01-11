@@ -2,98 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C6FC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 11:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B65BC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 12:06:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239471AbiAKL7h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 06:59:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50372 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239378AbiAKL7b (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 06:59:31 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF377C06173F;
-        Tue, 11 Jan 2022 03:59:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=L90dZXr+DchG0EERWhDGtHsJnyZXsrxTqBwOQGncg8Q=; b=SoTdUUyLlm0b3pZIpOMczUxg/U
-        xJbtK0g+lu8BnWTD214WLoFzAQKb9gxtskfxFKvLcXy/J3ww+3uMdEDygFIA1epmBjKtSy8Hs85ef
-        cNAfn+nm8dMuuOAzB5oRHc4+JgVJUpODgEfHI8npUAQNIy7rnRgf+OpHn9agoozCFC+0ZovL1vcP2
-        9Xkuo0ZEy/cHKGNwt3GaA4fFE60C+lK3kvQjN+1Zl+XOy52ODKcFEKA3VMMv4pMpLC7UQep2R8auq
-        Xw+1/sNbQmmr2In80BNcSG0MrBHplHV3Yx9T3L5RF7nnlw7zF07qsrKCoZNM2/gBfu1lvG1O3rh+P
-        f58fiK8g==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1n7Fnj-003DIw-Ch; Tue, 11 Jan 2022 11:58:55 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6ABDC3002C5;
-        Tue, 11 Jan 2022 12:58:53 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 25934203E80F6; Tue, 11 Jan 2022 12:58:53 +0100 (CET)
-Date:   Tue, 11 Jan 2022 12:58:53 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Alexander Duyck <alexanderduyck@fb.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ben Segall <bsegall@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Michal Hocko <mhocko@suse.com>, Nico Pache <npache@redhat.com>,
-        Pasha Tatashin <pasha.tatashin@soleen.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Tejun Heo <tj@kernel.org>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        linux-mm@kvack.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [RFC 15/16] sched/fair: Account kthread runtime debt for CFS
- bandwidth
-Message-ID: <Yd1w/TxTcGk5Ht53@hirez.programming.kicks-ass.net>
-References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
- <20220106004656.126790-16-daniel.m.jordan@oracle.com>
+        id S239450AbiAKMGE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 07:06:04 -0500
+Received: from mga17.intel.com ([192.55.52.151]:45334 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239371AbiAKMGD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Jan 2022 07:06:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641902763; x=1673438763;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JRk9zfpEfh7TMLOwa1VQX7FshiH5JyCeZcz+h+6TOkE=;
+  b=Iuc0VqGVeZqdxB8XrbIQAo43GzGDrkPEKNMpkJ6+gMvoi55T5Jv+OpXH
+   H2zDZjPVBK/wvvC/D4xLprBWyn5dGwI0qBU+C2WcF0PMpWfUeiNWGqmVM
+   8b5ASFyhHaObZSx9M/z1m4VucHP2zq7qQ7duacT4rojALwNduOvEyDizd
+   cjnC7+YP2j9RcW6CBx16QGaEgXz2Z/qbjSIqkNfEk6A8ogo/L68kpeSrL
+   d5dcELp7ezO4VgvA+hhF0oAYt2abuyQqMrb3B1b2a1oS4vvTezhvcd/IH
+   mBR9NJYrdcJbyAxniaHboeb56lrPhIvo1qnYp76+BIxBKzqj6aeQuoLpM
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10223"; a="224166752"
+X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
+   d="scan'208";a="224166752"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2022 04:06:00 -0800
+X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
+   d="scan'208";a="613197572"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2022 04:05:57 -0800
+Date:   Tue, 11 Jan 2022 12:05:51 +0000
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Tomasz Kowalik <tomaszx.kowalik@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Marco Chiappero <marco.chiappero@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        Mateuszx Potrola <mateuszx.potrola@intel.com>,
+        qat-linux@intel.com, linux-crypto@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] crypto: qat - fix a signedness bug in
+ get_service_enabled()
+Message-ID: <Yd1yn4FHaueG4Lv8@silpixa00400314>
+References: <20220111071806.GD11243@kili>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220106004656.126790-16-daniel.m.jordan@oracle.com>
+In-Reply-To: <20220111071806.GD11243@kili>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 05, 2022 at 07:46:55PM -0500, Daniel Jordan wrote:
-> As before, helpers in multithreaded jobs don't honor the main thread's
-> CFS bandwidth limits, which could lead to the group exceeding its quota.
+On Tue, Jan 11, 2022 at 10:18:06AM +0300, Dan Carpenter wrote:
+> The "ret" variable needs to be signed or there is an error message which
+> will not be printed correctly.
 > 
-> Fix it by having helpers remote charge their CPU time to the main
-> thread's task group.  A helper calls a pair of new interfaces
-> cpu_cgroup_remote_begin() and cpu_cgroup_remote_charge() (see function
-> header comments) to achieve this.
-> 
-> This is just supposed to start a discussion, so it's pretty simple.
-> Once a kthread has finished a remote charging period with
-> cpu_cgroup_remote_charge(), its runtime is subtracted from the target
-> task group's runtime (cfs_bandwidth::runtime) and any remainder is saved
-> as debt (cfs_bandwidth::debt) to pay off in later periods.
-> 
-> Remote charging tasks aren't throttled when the group reaches its quota,
-> and a task group doesn't run at all until its debt is completely paid,
-> but these shortcomings can be addressed if the approach ends up being
-> taken.
-> 
+> Fixes: 0cec19c761e5 ("crypto: qat - add support for compression for 4xxx")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Thanks Dan.
+Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-*groan*... and not a single word on why it wouldn't be much better to
-simply move the task into the relevant cgroup..
+@Herbert, there are 2 other (identical) patches in the list that fix the
+same issue:
+    https://patchwork.kernel.org/project/linux-crypto/patch/YdWZm6QJAYbYTKAR@debian-BULLSEYE-live-builder-AMD64/
+    https://patchwork.kernel.org/project/linux-crypto/patch/20220105152005.43305-1-jiapeng.chong@linux.alibaba.com/
+
+Since none of them made into the pull request for 5.17, I'm fine with
+taking this one as it is the only one which contains the Fixes tag.
+
+Regards,
+
+-- 
+Giovanni
