@@ -2,84 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87226C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 21:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9657C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 22:05:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245451AbiAKVoF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 16:44:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
+        id S1345505AbiAKWFV (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 17:05:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245445AbiAKVoB (ORCPT
+        with ESMTP id S1345416AbiAKWFV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 16:44:01 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CDC8C06173F
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 13:44:01 -0800 (PST)
+        Tue, 11 Jan 2022 17:05:21 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26290C06173F;
+        Tue, 11 Jan 2022 14:05:21 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0A564617AF
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 21:44:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51EFDC36AE3;
-        Tue, 11 Jan 2022 21:44:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1641937440;
-        bh=T4c2OoSAdRrkTt8fLZY/k1miG6vyy4R0XrZSy0eZWl0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qXrU0w6eJTyVmXl817zj6o2nqMvH35CAdF71P/3jKtHlZkpn9NhEXigzoc8j8WUCK
-         EnpMD9q94/pAdVKcpWUE+DfK/u+v5wFCYZlY+NhKvaFJTOLBuxQeDLNeCes74axH+a
-         qORV8dubtByJyp1vtXo89mCr5GgjyWACXemDf9Y5XGmj/j1nLWNm51XJ2/j0VX7lMY
-         HaW8juRiNCTos6hiB3DnUzVVCmu/CRJrxoBsGNuZDBnchMCajdqk7z7FqEaqvlGTJf
-         MxmVZ7408oQl4X9+EeallPVG4qzcp+enL5YIp17wck4jQuhMsjtPcueL3Xqj8Ke21T
-         3/gI/nwdXnf4w==
-Date:   Tue, 11 Jan 2022 13:43:58 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] crypto: testmgr - Move crypto_simd_disabled_for_test out
-Message-ID: <Yd36HsgI+ya6P7RF@gmail.com>
-References: <Yd0jA4VOjysrdOu7@gondor.apana.org.au>
+        by ams.source.kernel.org (Postfix) with ESMTPS id E01A8B81D53;
+        Tue, 11 Jan 2022 22:05:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE47AC36AE9;
+        Tue, 11 Jan 2022 22:05:17 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Otbpq+tu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1641938716;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8Cdvgb4D8xjNM3H+eoQR37WQXKMdUq8WCPEoF9YXne4=;
+        b=Otbpq+tuY/czAeOvirwPCnRnA5W1Z0lop+JXW67s7Lz46Zl9pDHR+jP7TrsEUbDBLPjOzC
+        3Q4vPoPAEXPaKVdGLtVNmtZtOhZSAjLTLll/ETmNDw58C/ABxgECsIcTogKlySB1cl/Heg
+        /Lt96wXjiFZB1UVNbp/75PYhacTxhcI=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f2775939 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 11 Jan 2022 22:05:15 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+        bpf@vger.kernel.org, geert@linux-m68k.org, tytso@mit.edu,
+        gregkh@linuxfoundation.org, jeanphilippe.aumasson@gmail.com,
+        ardb@kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH crypto v3 0/2] reduce code size from blake2s on m68k and other small platforms
+Date:   Tue, 11 Jan 2022 23:05:04 +0100
+Message-Id: <20220111220506.742067-1-Jason@zx2c4.com>
+In-Reply-To: <20220111181037.632969-1-Jason@zx2c4.com>
+References: <20220111181037.632969-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yd0jA4VOjysrdOu7@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 05:26:11PM +1100, Herbert Xu wrote:
-> As testmgr is part of cryptomgr which was designed to be unloadable
-> as a module, it shouldn't export any symbols for other crypto
-> modules to use as that would prevent it from being unloaded.  All
-> its functionality is meant to be accessed through notifiers.
-> 
-> The symbol crypto_simd_disabled_for_test was added to testmgr
-> which caused it to be pinned as a module if its users were also
-> loaded.  This patch moves it out of testmgr and into crypto/simd.c
-> so cryptomgr can again be unloaded and replaced on demand.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/crypto/simd.c b/crypto/simd.c
-> index edaa479a1ec5..2027d747b746 100644
-> --- a/crypto/simd.c
-> +++ b/crypto/simd.c
-> @@ -47,6 +47,11 @@ struct simd_skcipher_ctx {
->  	struct cryptd_skcipher *cryptd_tfm;
->  };
->  
-> +#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
-> +DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
-> +EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
-> +#endif
-> +
->  static int simd_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
->  				unsigned int key_len)
->  {
+Hi,
 
-It doesn't look like all the users of crypto_simd_usable() select CRYPTO_SIMD.
-So this will cause a build break in some configurations.
+Geert emailed me this afternoon concerned about blake2s codesize on m68k
+and other small systems. We identified two effective ways of chopping
+down the size. One of them moves some wireguard-specific things into
+wireguard proper. The other one adds a slower codepath for small
+machines to blake2s. This worked, and was v1 of this patchset, but I
+wasn't so much of a fan. Then someone pointed out that the generic C
+SHA-1 implementation is still unrolled, which is a *lot* of extra code.
+Simply rerolling that saves about as much as v1 did. So, we instead do
+that in this patchset. SHA-1 is being phased out, and soon it won't
+be included at all (hopefully). And nothing performance-oriented has
+anything to do with it anyway.
 
-Maybe CRYPTO_MANAGER_EXTRA_TESTS should select CRYPTO_SIMD?
+The result of these two patches mitigates Geert's feared code size
+increase for 5.17.
 
-- Eric
+v3 improves on v2 by making the re-rolling of SHA-1 much simpler,
+resulting in even larger code size reduction and much better
+performance. The reason I'm sending yet a third version in such a short
+amount of time is because the trick here feels obvious and substantial
+enough that I'd hate for Geert to waste time measuring the impact of the
+previous commit.
+
+Thanks,
+Jason
+
+Jason A. Donenfeld (2):
+  lib/crypto: blake2s: move hmac construction into wireguard
+  lib/crypto: sha1: re-roll loops to reduce code size
+
+ drivers/net/wireguard/noise.c | 45 ++++++++++++++---
+ include/crypto/blake2s.h      |  3 --
+ lib/crypto/blake2s-selftest.c | 31 ------------
+ lib/crypto/blake2s.c          | 37 --------------
+ lib/sha1.c                    | 95 ++++++-----------------------------
+ 5 files changed, 53 insertions(+), 158 deletions(-)
+
+-- 
+2.34.1
+
